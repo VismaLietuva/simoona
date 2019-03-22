@@ -1,0 +1,179 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "webAppPlanName": {
+            "type": "string",
+            "defaultValue": "simoona-app"
+        },
+        "webAppName": {
+            "type": "string",
+            "defaultValue": "simoona-app"
+        },
+        "skuName": {
+            "type": "string",
+            "defaultValue": "S1",
+            "allowedValues": [
+                "F1",
+                "B1",
+                "B2",
+                "B3",
+                "S1",
+                "S2",
+                "S3",
+                "P1",
+                "P2",
+                "P3",
+                "P1V2",
+                "P2V2",
+                "P3V2"
+            ],
+            "metadata": {
+                "description": "Describes plan's pricing tier and instance size. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
+            }
+        },
+        "skuCapacity": {
+            "type": "int",
+            "defaultValue": 1,
+            "allowedValues": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10
+            ]
+        },
+        "appInsightsInstrumentationKey": {
+            "type": "string"
+        },
+        "defaultEmailLink": {
+            "type": "string"
+        },
+        "defaultGoogleCalendarId": {
+            "type": "string"
+        },
+        "emailEnabled": {
+            "type": "bool"
+        },
+        "eventRecurrenceJobsEnabled": {
+            "type": "bool"
+        },
+        "isProductionBuild": {
+            "type": "bool"
+        },
+        "oAuthRedirectUri": {
+            "type": "string"
+        },
+        "websiteLoadCertificates": {
+            "type": "string",
+            "defaultValue": "*"
+        },
+        "vismaConnectionString": {
+            "type": "string"
+        },
+        "backgroundJobsConnectionString": {
+            "type": "string"
+        }
+    },
+    "resources": [{
+            "apiVersion": "2016-09-01",
+            "type": "Microsoft.Web/serverfarms",
+            "name": "[parameters('webAppPlanName')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "[parameters('skuName')]",
+                "capacity": "[parameters('skuCapacity')]"
+            },
+            "properties": {
+                "name": "[parameters('webAppPlanName')]"
+            }
+        },
+        {
+            "apiVersion": "2016-08-01",
+            "type": "Microsoft.Web/sites",
+            "name": "[parameters('webAppName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "enabled": true,
+                "name": "[parameters('webAppName')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('webAppPlanName'))]",
+                "enabledHostNames": [
+                    "[concat(parameters('webAppName'), '.azurewebsites.net')]",
+                    "[concat(parameters('webAppName'), '.scm.azurewebsites.net')]"
+                ],
+                "siteConfig": {
+                    "httpsOnly": true,
+                    "phpVersion": "",
+                    "alwaysOn": true,
+                    "use32BitWorkerProcess": false,
+                    "virtualApplications": [
+                        {
+                            "virtualPath": "/",
+                            "physicalPath": "site\\wwwroot",
+                            "preloadEnabled": false
+                        },
+                        {
+                            "virtualPath": "/api",
+                            "physicalPath": "site\\wwwroot\\api",
+                            "preloadEnabled": false
+                        }
+                    ],
+                    "appSettings": [
+                        {
+                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                            "value": "[parameters('appInsightsInstrumentationKey')]"
+                        },
+                        {
+                          "name": "DefaultEmailLink",
+                          "value": "[parameters('defaultEmailLink')]"
+                        },
+                        {
+                            "name": "DefaultGoogleCalendarId",
+                            "value": "[parameters('defaultGoogleCalendarId')]"
+                        },
+                        {
+                            "name": "EmailEnabled",
+                            "value": "[parameters('emailEnabled')]"
+                        },
+                        {
+                            "name": "EventRecurrenceJobsEnabled",
+                            "value": "[parameters('eventRecurrenceJobsEnabled')]"
+                        },
+                        {
+                            "name": "IsProductionBuild",
+                            "value": "[parameters('isProductionBuild')]"
+                        },
+                        {
+                            "name": "OAuthRedirectUri",
+                            "value": "[parameters('oAuthRedirectUri')]"
+                        },
+                        {
+                            "name": "WEBSITE_LOAD_CERTIFICATES",
+                            "value": "[parameters('websiteLoadCertificates')]"
+                        }
+                    ],
+                    "connectionStrings": [
+                        {
+                            "name": "Visma",
+                            "connectionString": "[parameters('vismaConnectionString')]",
+                            "type": "SQLAzure"
+                        },
+                        {
+                          "name": "BackgroundJobs",
+                          "connectionString": "[parameters('backgroundJobsConnectionString')]",
+                          "type": "SQLAzure"
+                        }
+                    ]
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', parameters('webAppPlanName'))]"
+            ]
+        }
+    ]
+}

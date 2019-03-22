@@ -1,0 +1,48 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "resourceGroupName": {
+            "value": ""
+        },
+        "applicationInsightsName": {
+            "value": ""
+        },
+        "sqlServerName": {
+            "value": ""
+        },
+        "sqlServerAdminLogin": {
+            "value": ""
+        },
+        "sqlServerAdminPassword": {
+            "value": ""
+        },
+        "sqlDbName": {
+            "value": ""
+        },
+        "sqlDbMaxSizeBytes": {
+            "value": ""
+        },
+        "sqlDbSkuName": {
+            "value": ""
+        },
+        "sqlDbSkuTier": {
+            "value": ""
+        },
+        "omsWorkspaceName": {
+            "value": ""
+        },
+        "omsWorkspaceServiceTier": {
+            "value": ""
+        },
+        "omsWorkspaceDataRetention": {
+            "value": ""
+        },
+        "storageAccountName": {
+            "value": ""
+        },
+        "storageSkuName": {
+            "value": ""
+        }
+    }
+}
