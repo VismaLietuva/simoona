@@ -1,0 +1,398 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{CE5546D3-8819-4B25-8DDC-B02769BAB42F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Shrooms.Premium</RootNamespace>
+    <AssemblyName>Shrooms.Premium</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Autofac, Version=3.5.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.3.5.2\lib\net40\Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="AutoMapper, Version=4.2.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.4.2.1\lib\net45\AutoMapper.dll</HintPath>
+    </Reference>
+    <Reference Include="BouncyCastle.Crypto, Version=1.7.4137.9688, Culture=neutral, PublicKeyToken=a4292a325f69b123, processorArchitecture=MSIL">
+      <HintPath>..\packages\BouncyCastle.1.7.0\lib\Net40-Client\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Excel, Version=2.1.2.3, Culture=neutral, PublicKeyToken=93517dbe6a4012fa, processorArchitecture=MSIL">
+      <HintPath>..\packages\ExcelDataReader.2.1.2.3\lib\net45\Excel.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis, Version=1.13.1.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Apis.1.13.1\lib\net45\Google.Apis.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis.Auth, Version=1.13.1.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Apis.Auth.1.13.1\lib\net45\Google.Apis.Auth.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis.Auth.PlatformServices, Version=1.13.1.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Apis.Auth.1.13.1\lib\net45\Google.Apis.Auth.PlatformServices.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis.Calendar.v3, Version=1.13.1.537, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Apis.Calendar.v3.1.13.1.537\lib\portable-net45+netcore45+wpa81+wp8\Google.Apis.Calendar.v3.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis.Core, Version=1.13.1.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Apis.Core.1.13.1\lib\net45\Google.Apis.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis.PlatformServices, Version=1.13.1.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Apis.1.13.1\lib\net45\Google.Apis.PlatformServices.dll</HintPath>
+    </Reference>
+    <Reference Include="Hangfire.Autofac, Version=2.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Hangfire.Autofac.2.2.0\lib\net45\Hangfire.Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="Hangfire.Core, Version=1.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Hangfire.Core.1.5.0\lib\net45\Hangfire.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="LinqKit, Version=1.1.3.1, Culture=neutral, PublicKeyToken=bc217f8844052a91, processorArchitecture=MSIL">
+      <HintPath>..\packages\LinqKit.1.1.3.1\lib\net45\LinqKit.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.EntityFramework, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.EntityFramework.2.2.1\lib\net45\Microsoft.AspNet.Identity.EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Owin, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.2.1\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.2.2.1\lib\net45\Microsoft.AspNet.SignalR.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.SystemWeb, Version=2.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.2.2.1\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.3.1.0\lib\net45\Microsoft.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.3.0.1\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.3.1.0\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Cookies, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.Cookies.2.1.0\lib\net45\Microsoft.Owin.Security.Cookies.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.OAuth, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.OAuth.3.0.1\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
+    </Reference>
+    <Reference Include="MoreLinq, Version=1.4.18916.0, Culture=neutral, PublicKeyToken=384d532d7e88985d, processorArchitecture=MSIL">
+      <HintPath>..\packages\morelinq.1.4.0\lib\net35\MoreLinq.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
+      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="PagedList, Version=1.17.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
+      <HintPath>..\packages\PagedList.1.17.0.0\lib\net40\PagedList.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Linq.Dynamic, Version=1.0.5840.25917, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Linq.Dynamic.1.0.6\lib\net40\System.Linq.Dynamic.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.Owin, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Owin.5.2.3\lib\net45\System.Web.Http.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WebApi.OutputCache.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Strathweb.CacheOutput.WebApi2.0.10.0\lib\net45\WebApi.OutputCache.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="WebApi.OutputCache.V2, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Strathweb.CacheOutput.WebApi2.0.10.0\lib\net45\WebApi.OutputCache.V2.dll</HintPath>
+    </Reference>
+    <Reference Include="Zlib.Portable, Version=1.11.0.0, Culture=neutral, PublicKeyToken=431cba815f6a8b5b, processorArchitecture=MSIL">
+      <HintPath>..\packages\Zlib.Portable.Signed.1.11.0\lib\portable-net4+sl5+wp8+win8+wpa81+MonoTouch+MonoAndroid\Zlib.Portable.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Infrastructure\Shrooms.Infrastructure\Calendar\GoogleCalendarService.cs" />
+    <Compile Include="Infrastructure\Shrooms.Infrastructure\Calendar\ICalendarService.cs" />
+    <Compile Include="Infrastructure\Shrooms.Infrastructure\VacationBot\IVacationBotService.cs" />
+    <Compile Include="Infrastructure\Shrooms.Infrastructure\VacationBot\VacationBotService.cs" />
+    <Compile Include="Infrastructure\Shrooms.Infrastructure\VacationBot\VacationInfo.cs" />
+    <Compile Include="Infrastructure\Shrooms.IoC\Modules\BooksModule.cs" />
+    <Compile Include="Infrastructure\Shrooms.IoC\Modules\CalendarModule.cs" />
+    <Compile Include="Infrastructure\Shrooms.IoC\Modules\CommitteeModule.cs" />
+    <Compile Include="Infrastructure\Shrooms.IoC\Modules\EventsModule.cs" />
+    <Compile Include="Infrastructure\Shrooms.IoC\Modules\OfficeMapModule.cs" />
+    <Compile Include="Infrastructure\Shrooms.IoC\Modules\OrganizationalStructureModule.cs" />
+    <Compile Include="Infrastructure\Shrooms.IoC\Modules\ServiceModule.cs" />
+    <Compile Include="Infrastructure\Shrooms.IoC\Modules\VacationModule.cs" />
+    <Compile Include="Infrastructure\Shrooms.IoC\Modules\WebHookCallbacksModule.cs" />
+    <Compile Include="Infrastructure\Shrooms.ModelMappings\Helpers.cs" />
+    <Compile Include="Infrastructure\Shrooms.ModelMappings\Profiles\BooksProfile.cs" />
+    <Compile Include="Infrastructure\Shrooms.ModelMappings\Profiles\CommitteeProfile.cs" />
+    <Compile Include="Infrastructure\Shrooms.ModelMappings\Profiles\EventsProfile.cs" />
+    <Compile Include="Infrastructure\Shrooms.ModelMappings\Profiles\KudosShopProfile.cs" />
+    <Compile Include="Infrastructure\Shrooms.ModelMappings\Profiles\OfficeMapProfile.cs" />
+    <Compile Include="Infrastructure\Shrooms.ModelMappings\Profiles\OrganizationalStructureProfile.cs" />
+    <Compile Include="Infrastructure\Shrooms.ModelMappings\Profiles\PostsProfile.cs" />
+    <Compile Include="Infrastructure\Shrooms.ModelMappings\Profiles\ServiceRequestProfile.cs" />
+    <Compile Include="Infrastructure\Shrooms.ModelMappings\Profiles\UsersProfile.cs" />
+    <Compile Include="Infrastructure\Shrooms.ModelMappings\Profiles\VacationsProfile.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BookMobileDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BookMobileGetDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BookMobileLogDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BookMobilePostDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BookMobileReturnDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BookMobileTakeSpecificDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\MobileUserDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Calendar\CalendarAttendeeAction.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Calendar\CalendarEventDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Committees\CommitteeMembersDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Committees\CommitteePostDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Committees\CommitteeSuggestionPostDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Committees\CommitteeSuggestionViewDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Committees\CommitteeViewDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\CreateEventDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\CreateEventTypeDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\EditEventDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\EventDetailsDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\EventDetailsOptionDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\EventDetailsParticipantDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\EventEditDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\EventJoinDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\EventJoinResultDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\EventJoinValidationDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\EventListItemDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\EventOptionCountDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\EventOptionDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\EventOptionsDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\EventParticipantDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\EventTypeDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\EventUserSearchResultDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\MyEventsOptionsDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\UpdateEventTypeDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Kudos\KudosShopItemDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\OfficeMap\OfficeRoomDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\OfficeMap\OfficeUserDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\OfficeMap\UserOfficeAndFloorDto.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\OrganizationalStructure\OrganizationalStructureDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\OrganizationalStructure\OrganizationalStructureUserDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\ServiceRequest\ServiceRequestCategoryDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\ServiceRequest\ServiceRequestCommentDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\ServiceRequest\ServiceRequestDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Vacations\VacationAvailableDaysDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Vacations\VacationDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DomainExceptions\Exceptions\Event\EventException.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DomainServiceValidators\Validators\Events\EventValidationService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DomainServiceValidators\Validators\Events\IEventValidationService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Books\BookMobileService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Books\IBookMobileService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Committees\CommitteesService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Committees\ICommitteesService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Email\Committee\CommitteeNotificationService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Email\Committee\ICommitteeNotificationService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Email\Event\EventNotificationService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Email\Event\IEventNotificationService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Email\Kudos\IKudosNotificationService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Email\Kudos\KudosNotificationService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Email\ServiceRequest\IServiceRequestNotificationService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Email\ServiceRequest\ServiceRequestNotificationService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Events\Calendar\EventCalendarService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Events\Calendar\IEventCalendarService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Events\EventService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Events\Export\EventExportService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Events\Export\IEventExportService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Events\IEventService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Events\List\EventListingService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Events\List\IEventListingService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Events\Participation\EventParticipationService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Events\Participation\IEventParticipationService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Events\Utilities\EventUtilitiesService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Events\Utilities\IEventUtilitiesService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\KudosShop\IKudosShopService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\KudosShop\KudosShopService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Notifications\INotificationService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Notifications\NotificationService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\OfficeMap\IOfficeMapService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\OfficeMap\OfficeMapService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\OrganizationalStructure\IOrganizationalStructureService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\OrganizationalStructure\OranizationalStructureService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\ServiceRequests\IServiceRequestExportService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\ServiceRequests\IServiceRequestService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\ServiceRequests\ServiceRequestExportService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\ServiceRequests\ServiceRequestService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Vacations\IVacationDomainService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Vacations\IVacationHistoryService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Vacations\IVacationService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Vacations\VacationDomainService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Vacations\VacationHistoryService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Vacations\VacationService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\WebHookCallbacks\Events\EventsWebHookService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\WebHookCallbacks\Events\IEventsWebHookService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\WebHookCallbacks\IWebHookCallbackServices.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\WebHookCallbacks\LoyaltyKudos\ILoyaltyKudosService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\WebHookCallbacks\LoyaltyKudos\LoyaltyKudos.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\WebHookCallbacks\LoyaltyKudos\LoyaltyKudosService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\WebHookCallbacks\WebHookCallbackServices.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\Book\BookMobileController.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\CommitteesController.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\EventController.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\EventTypeController.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\ExternalPremiumJobsController.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\MapController.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\OrganizationalStructureController.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\Kudos\KudosShopController.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\ServiceRequestsController.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\VacationsController.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Book\BookDetails\RetrievedMobileBookInfoViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Book\BookMobileGetViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Book\BookMobileLogViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Book\BookMobilePostViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Book\BookMobileReturnViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Book\BookMobileTakeSpecificViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Book\BookMobileTakeViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Book\MobileUserViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Committees\CommitteePostViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Committees\CommitteeSuggestionPostViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Committees\CommitteeSuggestionViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Committees\CommitteeViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Events\CreateEventTypeViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Events\CreateEventViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Events\EventDetailsCommentViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Events\EventDetailsOptionViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Events\EventDetailsParticipantViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Events\EventDetailsViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Events\EventEditViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Events\EventJoinMultipleViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Events\EventJoinViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Events\EventListItemViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Events\EventOptionsViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Events\EventOptionViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Events\EventTypeViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Events\MyEventsOptionsViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Events\ShareEventViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Events\UpdateEventTypeViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Events\UpdateEventViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\KudosShop\KudosShopItemViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\OrganizationalStructure\OrganizationalStructureViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\ServiceRequests\ServiceRequestCategoryCreateViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\ServiceRequests\ServiceRequestCategoryViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\ServiceRequests\ServiceRequestCommentPostViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\ServiceRequests\ServiceRequestCommentViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\ServiceRequests\ServiceRequestCreateViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\ServiceRequests\ServiceRequestPostViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\ServiceRequests\ServiceRequestUpdateViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\ServiceRequests\ServiceRequestViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\User\EventUserSearchResultViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Vacations\VacationAvailableDaysViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Vacations\VacationViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Wall\Posts\EventPostViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\ValidationAttributes\ValidEndDateAttribute.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\ValidationAttributes\ValidRegistrationDeadlineDateAttribute.cs" />
+    <Compile Include="Other\Shrooms.Constants\ErrorCodes\ErrorCodes.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Infrastructure\Shrooms.IoC\Modules\KudosShopModule.cs" />
+    <Compile Include="Infrastructure\Shrooms.IoC\Modules\ServiceRequestModule.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Infrastructure\Shrooms.Authentification\Shrooms.Authentification.csproj">
+      <Project>{DA661AA0-3313-4C2D-81A9-C1A2B74F7317}</Project>
+      <Name>Shrooms.Authentification</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure\Shrooms.Infrastructure\Shrooms.Infrastructure.csproj">
+      <Project>{D9C5606D-3855-44A0-BDB3-98D963D63FCF}</Project>
+      <Name>Shrooms.Infrastructure</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Main\BuisnessLayer\Shrooms.DataTransferObjects\Shrooms.DataTransferObjects.csproj">
+      <Project>{6611930D-880E-455C-8681-E0E2A33CF5A9}</Project>
+      <Name>Shrooms.DataTransferObjects</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Main\BuisnessLayer\Shrooms.DomainExceptions\Shrooms.DomainExceptions.csproj">
+      <Project>{8B48F02F-79E6-45CF-8DE3-BF9085D4C3A2}</Project>
+      <Name>Shrooms.DomainExceptions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Main\BuisnessLayer\Shrooms.DomainServiceValidators\Shrooms.DomainServiceValidators.csproj">
+      <Project>{3D4343C8-1CF9-4AAB-B458-C2AC52E4A47A}</Project>
+      <Name>Shrooms.DomainServiceValidators</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Main\BuisnessLayer\Shrooms.Domain\Shrooms.Domain.csproj">
+      <Project>{F75814B0-ADE3-4E55-B44D-2EE966C41344}</Project>
+      <Name>Shrooms.Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Main\DataLayer\Shrooms.DataLayer\Shrooms.DataLayer.csproj">
+      <Project>{AFFE7B8B-3294-4DD3-990D-7DA5E256C987}</Project>
+      <Name>Shrooms.DataLayer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Main\DataLayer\Shrooms.EntityModels\Shrooms.EntityModels.csproj">
+      <Project>{8AD6F857-708C-4B5E-98BC-B3206E7DD918}</Project>
+      <Name>Shrooms.EntityModels</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Main\PresentationLayer\Shrooms.API\Shrooms.API.csproj">
+      <Project>{D92E5D79-8D6B-410F-B9FC-0FCE46FBC116}</Project>
+      <Name>Shrooms.API</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Main\PresentationLayer\Shrooms.WebViewModels\Shrooms.WebViewModels.csproj">
+      <Project>{1F63D29F-E593-47F0-A304-54D62CC1AD2B}</Project>
+      <Name>Shrooms.WebViewModels</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Other\Shrooms.Constants\Shrooms.Constants.csproj">
+      <Project>{E07394B9-558C-4A70-9926-6400ABB0FB5D}</Project>
+      <Name>Shrooms.Constants</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Other\Shrooms.Resources\Shrooms.Resources.csproj">
+      <Project>{c6fc692b-dfad-4ed5-86d5-8000dbd06b02}</Project>
+      <Name>Shrooms.Resources</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

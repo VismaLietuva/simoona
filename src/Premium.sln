@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shrooms.Premium", "Shrooms.Premium\Shrooms.Premium.csproj", "{CE5546D3-8819-4B25-8DDC-B02769BAB42F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shrooms.Premium.UnitTests", "Shrooms.Premium.UnitTests\Shrooms.Premium.UnitTests.csproj", "{BF77FA0D-51D3-4DB6-9ADE-D5AAD70E2625}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CE5546D3-8819-4B25-8DDC-B02769BAB42F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE5546D3-8819-4B25-8DDC-B02769BAB42F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE5546D3-8819-4B25-8DDC-B02769BAB42F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE5546D3-8819-4B25-8DDC-B02769BAB42F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF77FA0D-51D3-4DB6-9ADE-D5AAD70E2625}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF77FA0D-51D3-4DB6-9ADE-D5AAD70E2625}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF77FA0D-51D3-4DB6-9ADE-D5AAD70E2625}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF77FA0D-51D3-4DB6-9ADE-D5AAD70E2625}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5FCC5E10-9506-4A6B-9BB4-0C1ADAF68970}
+	EndGlobalSection
+EndGlobal

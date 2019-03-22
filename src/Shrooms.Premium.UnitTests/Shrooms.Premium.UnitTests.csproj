@@ -1,0 +1,185 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{BF77FA0D-51D3-4DB6-9ADE-D5AAD70E2625}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Shrooms.Premium.UnitTests</RootNamespace>
+    <AssemblyName>Shrooms.Premium.UnitTests</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">15.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
+    <IsCodedUITest>False</IsCodedUITest>
+    <TestProjectType>UnitTest</TestProjectType>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Autofac, Version=3.5.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.3.5.2\lib\net40\Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="AutofacContrib.NSubstitute, Version=3.3.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutofacContrib.NSubstitute.3.3.5\lib\NET40\AutofacContrib.NSubstitute.dll</HintPath>
+    </Reference>
+    <Reference Include="AutoMapper, Version=4.2.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.4.2.1\lib\net45\AutoMapper.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Excel, Version=2.1.2.3, Culture=neutral, PublicKeyToken=93517dbe6a4012fa, processorArchitecture=MSIL">
+      <HintPath>..\packages\ExcelDataReader.2.1.2.3\lib\net45\Excel.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.EntityFramework, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.EntityFramework.2.2.1\lib\net45\Microsoft.AspNet.Identity.EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Owin, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.3.1.0\lib\net45\Microsoft.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.3.1.0\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="NSubstitute, Version=1.8.2.0, Culture=neutral, PublicKeyToken=92dd2e9066daa5ca, processorArchitecture=MSIL">
+      <HintPath>..\packages\NSubstitute.1.8.2.0\lib\net45\NSubstitute.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.core, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnitTestAdapter.2.0.0\lib\nunit.core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="nunit.core.interfaces, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnitTestAdapter.2.0.0\lib\nunit.core.interfaces.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.util, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnitTestAdapter.2.0.0\lib\nunit.util.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NUnit.VisualStudio.TestAdapter, Version=2.0.0.0, Culture=neutral, PublicKeyToken=4cb40d35494691ac, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnitTestAdapter.2.0.0\lib\NUnit.VisualStudio.TestAdapter.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Linq.Dynamic, Version=1.0.5840.25917, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Linq.Dynamic.1.0.6\lib\net40\System.Linq.Dynamic.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DomainService\BookMobileServiceTests.cs" />
+    <Compile Include="DomainService\EventCrudServiceTests.cs" />
+    <Compile Include="DomainService\EventListingServiceTests.cs" />
+    <Compile Include="DomainService\EventServices\EventExportServiceTests.cs" />
+    <Compile Include="DomainService\EventServices\EventParticipantServiceTests.cs" />
+    <Compile Include="DomainService\EventUtilitiesServiceTests.cs" />
+    <Compile Include="DomainService\LoyaltyKudosTests.cs" />
+    <Compile Include="DomainService\OfficeMapServiceTests.cs" />
+    <Compile Include="DomainService\OrganizationalStructureTests.cs" />
+    <Compile Include="DomainService\ServiceRequestExportServiceTests.cs" />
+    <Compile Include="DomainService\ServiceRequestServiceTests.cs" />
+    <Compile Include="DomainService\VacationService\VacationDomainServiceTests.cs" />
+    <Compile Include="ModelMappings\AutoMapperTests.cs" />
+    <Compile Include="ModelMappings\ModelMapper.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Infrastructure\Shrooms.Authentification\Shrooms.Authentification.csproj">
+      <Project>{da661aa0-3313-4c2d-81a9-c1a2b74f7317}</Project>
+      <Name>Shrooms.Authentification</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure\Shrooms.Infrastructure\Shrooms.Infrastructure.csproj">
+      <Project>{D9C5606D-3855-44A0-BDB3-98D963D63FCF}</Project>
+      <Name>Shrooms.Infrastructure</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure\Shrooms.ModelMappings\Shrooms.ModelMappings.csproj">
+      <Project>{550f0c4a-34ab-49e5-83dd-19d3d77af3c5}</Project>
+      <Name>Shrooms.ModelMappings</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Main\BuisnessLayer\Shrooms.DataTransferObjects\Shrooms.DataTransferObjects.csproj">
+      <Project>{6611930D-880E-455C-8681-E0E2A33CF5A9}</Project>
+      <Name>Shrooms.DataTransferObjects</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Main\BuisnessLayer\Shrooms.DomainExceptions\Shrooms.DomainExceptions.csproj">
+      <Project>{8B48F02F-79E6-45CF-8DE3-BF9085D4C3A2}</Project>
+      <Name>Shrooms.DomainExceptions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Main\BuisnessLayer\Shrooms.DomainServiceValidators\Shrooms.DomainServiceValidators.csproj">
+      <Project>{3D4343C8-1CF9-4AAB-B458-C2AC52E4A47A}</Project>
+      <Name>Shrooms.DomainServiceValidators</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Main\BuisnessLayer\Shrooms.Domain\Shrooms.Domain.csproj">
+      <Project>{F75814B0-ADE3-4E55-B44D-2EE966C41344}</Project>
+      <Name>Shrooms.Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Main\DataLayer\Shrooms.DataLayer\Shrooms.DataLayer.csproj">
+      <Project>{AFFE7B8B-3294-4DD3-990D-7DA5E256C987}</Project>
+      <Name>Shrooms.DataLayer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Main\DataLayer\Shrooms.EntityModels\Shrooms.EntityModels.csproj">
+      <Project>{8AD6F857-708C-4B5E-98BC-B3206E7DD918}</Project>
+      <Name>Shrooms.EntityModels</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Main\PresentationLayer\Shrooms.API\Shrooms.API.csproj">
+      <Project>{d92e5d79-8d6b-410f-b9fc-0fce46fbc116}</Project>
+      <Name>Shrooms.API</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Main\PresentationLayer\Shrooms.WebViewModels\Shrooms.WebViewModels.csproj">
+      <Project>{1f63d29f-e593-47f0-a304-54d62cc1ad2b}</Project>
+      <Name>Shrooms.WebViewModels</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Other\Shrooms.Constants\Shrooms.Constants.csproj">
+      <Project>{E07394B9-558C-4A70-9926-6400ABB0FB5D}</Project>
+      <Name>Shrooms.Constants</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Other\Shrooms.Resources\Shrooms.Resources.csproj">
+      <Project>{C6FC692B-DFAD-4ED5-86D5-8000DBD06B02}</Project>
+      <Name>Shrooms.Resources</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Shrooms.Premium\Shrooms.Premium.csproj">
+      <Project>{CE5546D3-8819-4B25-8DDC-B02769BAB42F}</Project>
+      <Name>Shrooms.Premium</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tests\Shrooms.Tests\Shrooms.UnitTests.csproj">
+      <Project>{093fe583-996b-435c-a4d2-201c94aa71e0}</Project>
+      <Name>Shrooms.UnitTests</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
