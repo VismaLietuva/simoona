@@ -2,47 +2,86 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-       "webAppPlanName": {
-           "value": ""
-       },
-       "webAppName": {
-           "value": ""
-       },
-       "skuName": {
-           "value": ""
-       },
-       "skuCapacity": {
-           "value": 1
-       },
-       "appInsightsInstrumentationKey": {
-           "value": ""
-       },
-       "defaultEmailLink": {
-           "value": ""
-       },
-       "defaultGoogleCalendarId": {
-           "value": ""
-       },
-       "emailEnabled": {
-           "value": true
-       },
-       "eventRecurrenceJobsEnabled": {
-           "value": true
-       },
-       "isProductionBuild": {
-           "value": true
-       },
-       "oAuthRedirectUri": {
-           "value": ""
-       },
-       "websiteLoadCertificates": {
-           "value": ""
-       },
-       "vismaConnectionString": {
-           "value": ""
-       },
-       "backgroundJobsConnectionString": {
-           "value": ""
-       }
+        "resourceGroupName": {
+            "value": "simoona-staging"
+        },
+        "applicationInsightsName": {
+            "value": "simoona-staging"
+        },
+        "sqlServerName": {
+            "value": "simoona-staging"
+        },
+        "sqlServerAdminLogin": {
+            "value": "simoona-staging"
+        },
+        "sqlServerAdminPassword": {
+            "value": ""
+        },
+        "sqlDbName": {
+            "value": "simoona-staging"
+        },
+        "sqlDbMaxSizeBytes": {
+            "value": "2147483648"
+        },
+        "sqlDbSkuName": {
+            "value": "Basic"
+        },
+        "sqlDbSkuTier": {
+            "value": "Basic"
+        },
+        "omsWorkspaceName": {
+            "value": "simoona-staging"
+        },
+        "omsWorkspaceServiceTier": {
+            "value": "Standalone"
+        },
+        "omsWorkspaceDataRetention": {
+            "value": "7"
+        },
+        "storageAccountName": {
+            "value": "simoonastaging"
+        },
+        "storageSkuName": {
+            "value": "Standard_RAGRS"
+        },
+        "webAppPlanName": {
+            "value": "simoona-staging"
+        },
+        "webAppName": {
+            "value": "simoona-staging"
+        },
+        "skuName": {
+            "value": "S1"
+        },
+        "skuCapacity": {
+            "value": 1
+        },
+        "defaultEmailLink": {
+            "value": ""
+        },
+        "defaultGoogleCalendarId": {
+            "value": ""
+        },
+        "emailEnabled": {
+            "value": true
+        },
+        "eventRecurrenceJobsEnabled": {
+            "value": true
+        },
+        "isProductionBuild": {
+            "value": true
+        },
+        "oAuthRedirectUri": {
+            "value": ""
+        },
+        "websiteLoadCertificates": {
+            "value": "*"
+        },
+        "vismaConnectionString": {
+            "value": ""
+        },
+        "backgroundJobsConnectionString": {
+            "value": ""
+        }
     }
 }
