@@ -344,51 +344,51 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Infrastructure\Shrooms.Authentification\Shrooms.Authentification.csproj">
+    <ProjectReference Include="..\..\open-source\src\api\Infrastructure\Shrooms.Authentification\Shrooms.Authentification.csproj">
       <Project>{DA661AA0-3313-4C2D-81A9-C1A2B74F7317}</Project>
       <Name>Shrooms.Authentification</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Infrastructure\Shrooms.Infrastructure\Shrooms.Infrastructure.csproj">
+    <ProjectReference Include="..\..\open-source\src\api\Infrastructure\Shrooms.Infrastructure\Shrooms.Infrastructure.csproj">
       <Project>{D9C5606D-3855-44A0-BDB3-98D963D63FCF}</Project>
       <Name>Shrooms.Infrastructure</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Main\BuisnessLayer\Shrooms.DataTransferObjects\Shrooms.DataTransferObjects.csproj">
+    <ProjectReference Include="..\..\open-source\src\api\Main\BuisnessLayer\Shrooms.DataTransferObjects\Shrooms.DataTransferObjects.csproj">
       <Project>{6611930D-880E-455C-8681-E0E2A33CF5A9}</Project>
       <Name>Shrooms.DataTransferObjects</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Main\BuisnessLayer\Shrooms.DomainExceptions\Shrooms.DomainExceptions.csproj">
+    <ProjectReference Include="..\..\open-source\src\api\Main\BuisnessLayer\Shrooms.DomainExceptions\Shrooms.DomainExceptions.csproj">
       <Project>{8B48F02F-79E6-45CF-8DE3-BF9085D4C3A2}</Project>
       <Name>Shrooms.DomainExceptions</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Main\BuisnessLayer\Shrooms.DomainServiceValidators\Shrooms.DomainServiceValidators.csproj">
+    <ProjectReference Include="..\..\open-source\src\api\Main\BuisnessLayer\Shrooms.DomainServiceValidators\Shrooms.DomainServiceValidators.csproj">
       <Project>{3D4343C8-1CF9-4AAB-B458-C2AC52E4A47A}</Project>
       <Name>Shrooms.DomainServiceValidators</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Main\BuisnessLayer\Shrooms.Domain\Shrooms.Domain.csproj">
+    <ProjectReference Include="..\..\open-source\src\api\Main\BuisnessLayer\Shrooms.Domain\Shrooms.Domain.csproj">
       <Project>{F75814B0-ADE3-4E55-B44D-2EE966C41344}</Project>
       <Name>Shrooms.Domain</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Main\DataLayer\Shrooms.DataLayer\Shrooms.DataLayer.csproj">
+    <ProjectReference Include="..\..\open-source\src\api\Main\DataLayer\Shrooms.DataLayer\Shrooms.DataLayer.csproj">
       <Project>{AFFE7B8B-3294-4DD3-990D-7DA5E256C987}</Project>
       <Name>Shrooms.DataLayer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Main\DataLayer\Shrooms.EntityModels\Shrooms.EntityModels.csproj">
+    <ProjectReference Include="..\..\open-source\src\api\Main\DataLayer\Shrooms.EntityModels\Shrooms.EntityModels.csproj">
       <Project>{8AD6F857-708C-4B5E-98BC-B3206E7DD918}</Project>
       <Name>Shrooms.EntityModels</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Main\PresentationLayer\Shrooms.API\Shrooms.API.csproj">
+    <ProjectReference Include="..\..\open-source\src\api\Main\PresentationLayer\Shrooms.API\Shrooms.API.csproj">
       <Project>{D92E5D79-8D6B-410F-B9FC-0FCE46FBC116}</Project>
       <Name>Shrooms.API</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Main\PresentationLayer\Shrooms.WebViewModels\Shrooms.WebViewModels.csproj">
+    <ProjectReference Include="..\..\open-source\src\api\Main\PresentationLayer\Shrooms.WebViewModels\Shrooms.WebViewModels.csproj">
       <Project>{1F63D29F-E593-47F0-A304-54D62CC1AD2B}</Project>
       <Name>Shrooms.WebViewModels</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Other\Shrooms.Constants\Shrooms.Constants.csproj">
+    <ProjectReference Include="..\..\open-source\src\api\Other\Shrooms.Constants\Shrooms.Constants.csproj">
       <Project>{E07394B9-558C-4A70-9926-6400ABB0FB5D}</Project>
       <Name>Shrooms.Constants</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Other\Shrooms.Resources\Shrooms.Resources.csproj">
+    <ProjectReference Include="..\..\open-source\src\api\Other\Shrooms.Resources\Shrooms.Resources.csproj">
       <Project>{c6fc692b-dfad-4ed5-86d5-8000dbd06b02}</Project>
       <Name>Shrooms.Resources</Name>
     </ProjectReference>
