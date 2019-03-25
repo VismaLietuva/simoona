@@ -1,9 +1,9 @@
 ﻿using Shrooms.API.Controllers;
-using Shrooms.API.Controllers.WebApi.Kudos;
 using Shrooms.API.Filters;
 using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.WebHookCallbacks;
 using System.Threading.Tasks;
 using System.Web.Http;
+using Shrooms.API.Controllers.Kudos;
 using WebApi.OutputCache.V2;
 
 namespace Shrooms.Premium.Main.PresentationLayer.Shrooms.API.Controllers

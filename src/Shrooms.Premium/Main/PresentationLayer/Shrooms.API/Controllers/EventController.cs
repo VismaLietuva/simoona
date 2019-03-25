@@ -22,7 +22,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
-using Shrooms.API.Hubs;
 using Shrooms.WebViewModels.Models.Notifications;
 using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Notifications;
 
