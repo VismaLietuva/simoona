@@ -1,0 +1,13 @@
+﻿{
+  "coordinates": "Koordinatės",
+  "createRoom": "Naujas kambarys",
+  "editRoom": "Redaguoti kambarį",
+  "employees": "Darbuotojai",
+  "entityName": "Kambarys",
+  "entityNamePlural": "Kambariai",
+  "floor": "Aukštas",
+  "name": "Kambarys",
+  "number": "Numeris",
+  "office": "Ofisas",
+  "roomData": "Kambario informacija"
+}

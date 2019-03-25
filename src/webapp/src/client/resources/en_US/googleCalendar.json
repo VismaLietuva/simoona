@@ -1,0 +1,6 @@
+﻿{
+  "eventNullError": "Google Calendar Event was not created",
+  "serviceNullError": "Google Calendar Api service is not created",
+  "updateError": "Google Calendar Event couln't be updated",
+  "x509CertificateNotFoundError": "X509Certificate file not found"
+}

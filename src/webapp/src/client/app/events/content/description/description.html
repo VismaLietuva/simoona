@@ -1,0 +1,64 @@
+<div class="panel panel-default">
+    <wave-spinner ng-if="vm.isLoading"></wave-spinner>
+    <div class="panel-heading" ng-if="!vm.isLoading">
+        <span class="event-description-title">{{vm.event.name}}</span>
+
+        <ace-event-description-actions event="vm.event"></ace-event-description-actions>
+    </div>
+    <div class="panel-body event-description-body" ng-if="!vm.isLoading">
+        <div class="row">
+
+            <div class="col-xs-12 col-sm-6 col-lg-4 text-center">
+                <img class="event-details-image"
+                     alt="{{vm.event.name}}"
+                     ng-src="{{vm.event.imageName | imageThumb:vm.eventImageSize:'crop'}}" image-loading>
+            </div>
+
+            <div class="col-xs-12 col-sm-6 col-lg-3 event-details-registration-container">
+                <div data-test-id="event-start-date-label" class="col-xs-12 event-details-start-date text-center">
+                    <span translate="events.eventStart"></span>
+                </div>
+                <div data-test-id="event-start-time" class="col-xs-12 event-details-start-time text-center" ng-cloak>
+                    {{vm.event.startDate | amUtc | amLocal | amDateFormat:'HH:mm'}}
+                </div>
+                <div data-test-id="event-start-date" class="col-xs-12 event-details-start-date text-center" ng-cloak>
+                    {{vm.event.startDate | amUtc | amLocal | amDateFormat:'MMMM DD'}}
+                </div>
+                <div class="col-xs-12 nopadding-left nopadding-right event-details-registration">
+                    <ace-event-status event="vm.event" is-details="true" is-add-colleague="false"></ace-event-status>
+                </div>
+            </div>
+
+            <div class="col-xs-12 col-lg-5 event-details-info-container">
+                <div class="col-xs-12" ng-if="vm.event.registrationDeadlineDate !== vm.event.startDate">
+                    <span class="glyphicon glyphicon-hourglass"></span>
+                    <b><span translate="events.eventRegistrationDeadline"></span> :</b>
+                    <span data-test-id="event-registration-deadline" class="event-details-date" ng-cloak>
+                        {{vm.event.registrationDeadlineDate | amUtc | amLocal | amDateFormat:'YYYY-MM-DD HH:mm'}}
+                    </span>
+                </div>
+                <div class="col-xs-12">
+                    <span class="glyphicon glyphicon-clock"></span>
+                    <b><span translate="events.eventEndDate"></span> :</b>
+                    <span data-test-id="event-end-date" class="event-details-date" ng-cloak>
+                        {{vm.event.endDate | amUtc | amLocal | amDateFormat:'YYYY-MM-DD HH:mm'}}
+                    </span>
+                </div>
+                <div class="col-xs-12">
+                    <span class="glyphicon glyphicon-map-marker"></span>
+                    <b><span translate="events.eventLocation"></span> :</b>
+                    <span data-test-id="event-location" ng-cloak>{{vm.event.location}}</span>
+                </div>
+                <div class="col-xs-12">
+                    <span class="glyphicon glyphicon-user"></span>
+                    <b><span translate="events.responsiblePerson"></span> :</b>
+                    <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: vm.event.hostUserId })"><span data-test-id="event-host" ng-cloak>{{vm.event.hostUserFullName}}</span></a>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="col-xs-12 event-details-description" ng-show="!!vm.event.description.length">
+            <p ng-bind-html="vm.event.description | linky: '_blank' | newlineToBr"></p>
+        </div>
+    </div>
+</div>

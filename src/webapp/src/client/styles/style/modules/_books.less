@@ -1,0 +1,81 @@
+@media (max-width: 991px)
+{
+    .find-book-btn{
+        margin-top: 5px;
+    }
+}
+
+.book-actions-nowrap{
+    white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+    .book-actions-nowrap{
+        white-space: initial;
+    }
+
+    table.book-log-list-table {
+        thead, tbody, th, td, tr {
+            display: block
+        }
+
+        thead tr { 
+            display: none;
+        }
+
+        tbody > tr > td:last-child {
+            border-right-width: 0px;
+        }
+
+        tbody > tr:last-child > td {
+            border-bottom-color: #eee;
+        }
+
+        tr { 
+            border-top: 1px solid #ccc;
+            border-left: 1px solid #ccc;
+            border-right: 1px solid #ccc; 
+        }
+
+        td { 
+            text-align: left;
+            border-bottom: 1px solid #eee;
+
+            > div:first-child {
+                display: inline;
+            }
+        }
+
+        tr:last-child {
+            border-bottom: 1px solid #ccc;
+            td:last-child {
+                border-bottom-width: 0px !important;
+            }
+        }
+
+        td:first-child {
+            border-left-width: 0px !important;
+        }
+
+        td:last-child {
+            border-left-width: 0px !important;
+        }
+
+        td:not(.no-responsive-title):before { 
+            padding-right: 10px; 
+            white-space: nowrap;
+            font-weight: 600;
+            content: attr(th)
+        }
+
+        .book-actions-container{
+            display: flex;
+            justify-content: space-between;
+        }
+    }
+}
+
+.book-button{
+    margin-left: 2px; 
+    margin-right: 2px; 
+}

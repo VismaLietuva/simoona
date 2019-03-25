@@ -1,0 +1,21 @@
+<div ng-if="vm.isAddColleague"
+     ng-click="vm.joinEvent(vm.event.id)" 
+     class="event-add-colleagues-button text-center"
+     data-test-id="event-add-colleagues-button">
+    <span class="event-add-colleagues-text" translate="events.eventAddColleaguesButton"></span>
+</div>
+<div ng-if="!vm.isAddColleague" class="text-center text-nowrap">
+    <a ng-if="!vm.event.isParticipating"
+       class="nc-btn nc-btn-default"
+       ng-click="vm.joinEvent(vm.event.id)"
+       translate-attr-title="events.eventJoin"
+       data-test-id="join-event-button" translate>
+       <span class="vismaicon vismaicon-add2-circle"></span><span translate="events.eventJoin"></span></a>
+
+   <a ng-if="vm.event.isParticipating"
+      class="nc-btn nc-btn-danger"
+      ng-click="vm.leaveEvent(vm.event.id)"
+      translate-attr-title="events.eventLeave"
+      data-test-id="leave-event-button" translate>
+       <span class="vismaicon vismaicon-remove-circle"></span><span translate="events.eventLeave"></span></a>
+</div>

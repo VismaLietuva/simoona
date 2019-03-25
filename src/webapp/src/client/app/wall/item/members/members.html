@@ -1,0 +1,86 @@
+<div class="panel panel-default">
+	<wave-spinner ng-if="vm.isLoading"></wave-spinner>
+	<div class="panel-body wall-member-container" 
+		 ng-if="vm.members && !vm.isLoading">
+		<div class="wall-members-filter"
+			 ng-if="vm.members.length > vm.pageSize">
+		    <div class="form-group search-group search-group-lg padding-bot-10">
+		        <input type="text"
+		        	   id="search-block"
+		        	   class="form-control"
+		        	   data-test-id="wall-member-filter-input"
+		        	   ng-change="vm.onListFilter()"
+		        	   ng-model="vm.filterText"
+		        	   translate-attr-placeholder="wall.filterWallMembers"
+		        	   translate>
+		    </div>
+		</div>
+
+		<div ng-repeat="member in filterData = (vm.members | filter: {fullName: vm.filterText} | orderBy:'-isModerator') | limitTo:vm.pageSize:vm.pageSize*(vm.filter.page-1) track by member.id"
+			 class="wall-member-card-item">
+			<div class="wall-member-card">
+
+				<div class="wall-member-card-image">
+					<a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: member.id })">
+						<img class="wall-member-image" alt="{{:: member.fullName}}"
+		                     title="{{:: member.fullName}}"
+		                     ng-src="{{member.profilePicture | imageThumb:{w:50,h:50}:'crop'}}" 
+		                     data-test-id="wall-member-profile-picture"
+		                     image-loading>
+	                </a>
+				</div>
+
+				<div class="wall-member-card-info">
+					<div class="wall-member-card-content">
+						<div class="wall-member-card-name-wrapper">
+							<div class="wall-member-card-full-name"
+								title="{{:: member.fullName}}">
+								<a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: member.id })"
+								data-test-id="wall-member-full-name">
+									{{:: member.fullName}}
+								</a>
+							</div>
+							<span ng-if="member.isModerator"
+								class="glyphicon glyphicon-police"
+								translate-attr-title="wall.moderator"
+								translate
+								data-test-id="wall-member-is-moderator"></span>
+						</div>
+						<div ng-if="!!member.jobTitle"
+							 class="wall-member-card-job-title"
+							 title="{{:: member.jobTitle}}"
+							 data-test-id="wall-member-job-title">
+							{{:: member.jobTitle}}
+						</div>						
+					</div>
+					<div class="clearfix"></div>
+
+					<div class="wall-member-card-action">
+						<wave-spinner ng-if="member.isLoading"></wave-spinner>
+
+		                <a ng-if="vm.wallServiceData.wallHeader.type !== 'Main' && !!member.id && !member.isLoading && !member.isModerator && (vm.isWallAdmin || vm.isWallModerator)"
+	                       class="vismaicon vismaicon-cancel-circle"
+	                       ace-confirmation-modal="vm.expelMemberFromWall(member)"
+	                       confirmation-modal-message="wall.expelMemberConfirmationMessage"
+	                       data-test-id="wall-member-expel-button"
+	                       title="{{'common.delete' | translate}}" translate-cloak>
+		                </a>
+					</div>
+					
+				</div>
+			</div>
+			
+		</div>
+		<div class="clearfix"></div>
+
+		<div class="col-xs-12 nopadding">
+			<ace-list-pagination total-item-count="filterData.length" 
+								 page-size="vm.pageSize"
+								 page-count="vm.Math.ceil(filterData.length / vm.pageSize)"
+								 current-page="vm.filter.page"
+								 on-changed="vm.changePage(page)"></ace-list-pagination>
+		</div>
+
+	</div>
+
+</div>

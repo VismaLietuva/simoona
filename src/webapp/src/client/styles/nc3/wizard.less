@@ -1,0 +1,854 @@
+/**
+ * Wizard styles - Nordic Cool 3.0
+*/
+
+@import url("_variables.less");
+@import url("_mixins.less");
+
+.wizard {
+	height: 50px;
+	overflow: hidden;
+	margin-bottom: 30px;
+	width: 100%;
+	clear: both;
+	}
+	
+.wizard ul {
+	display: block;
+	list-style: none;
+	padding-left: 0px;
+	margin-top: 0px;
+	}
+	
+.wizard ul li {
+	cursor: pointer;
+    display: block;
+    float: left;
+    height: 50px;
+    margin-left: -13px; 
+    min-width: 10px;
+    overflow: hidden;
+    padding: 1px 0 0 0;
+	width: 21.61%;
+	}
+	
+.wizard ul li:first-child { margin-left: 0px !important; }
+		
+.childs-11.wizard ul li { width: 10.53%; }
+.childs-10.wizard ul li { width: 11.43%; }
+.childs-9.wizard ul li { width: 12.12%; }
+.childs-8.wizard ul li { width: 13.49%; }
+.childs-7.wizard ul li { width: 15.26%; }
+.childs-6.wizard ul li { width: 17.6%; }
+.childs-5.wizard ul li { width: 20.9%; }
+.childs-4.wizard ul li { width: 25.83%; }
+.childs-3.wizard ul li { width: 34.05%; }
+.childs-2.wizard ul li { width: 50.55%; }
+.childs-1.wizard ul li { width: 100%; }
+
+.wizard ul li a {
+    cursor: pointer;
+    display: block;
+    height: 50px;
+    line-height: 125%;
+    min-width: 10px;
+    padding: 14px 12px 13px;
+    text-decoration: none;
+    vertical-align: baseline;
+	font-size: @font-size-base;
+	font-weight: @font-weight-base;
+	position: relative;
+    width: auto;
+	margin-right: 13px;
+	span {
+		display: block;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		width: 100%;
+		word-wrap: normal;
+		}
+	}
+	
+.wizard ul li:last-child a { margin-right: 0px; }
+	
+.wizard ul li:first-child a {
+	border-top-left-radius: 1px;
+	border-bottom-left-radius: 1px;
+	padding-left: 18px;
+	margin-left: 0 !important;
+	}
+	
+	
+
+/* Visited */	
+.wizard ul li.visited {}
+	
+.wizard ul li.visited.first a:before { 
+	background: url(../images/wizard/visited-left-end.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 3px;
+	}
+	
+.wizard ul li.visited a:before { 
+	background: url(../images/wizard/visited-before.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    left: -12px;
+    position: absolute;
+    top: 0;
+    width: 13px;
+	}
+	
+
+.wizard ul li.normal a:focus + li.visited a:before { left: -12px; }
+	
+.wizard ul li.visited a { 
+	background: url(../images/wizard/visited-inner.png) repeat-x scroll right 0 transparent;
+    color: #fff;
+	z-index: 9;
+	&:focus { outline: 0px !important; }
+	}
+	
+.wizard ul li.visited:not(:first-child) a { margin-left: 13px; }
+	
+.wizard ul li.visited a:after { 
+	background: url(../images/wizard/visited-after.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    right: -13px;
+	left: auto;
+    position: absolute;
+    top: 0;
+    width: 13px;
+	}
+	
+.wizard ul li.visited.last a:after { 
+	background: url(../images/wizard/visited-right-end.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+	right: 0px;
+    left: auto;
+    position: absolute;
+    top: 0;
+    width: 3px;
+	}
+	
+
+/* Normal */	
+.wizard ul li.normal.first a:before { 
+	background: url(../images/wizard/normal-left-end.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 3px;
+	}
+	
+.wizard ul li.normal.last a:after { 
+	background: url(../images/wizard/normal-right-end.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    left: auto;
+    right: 0;
+    position: absolute;
+    top: 0;
+    width: 3px;
+	}
+	
+.wizard ul li.normal a:before { 
+	background: url(../images/wizard/normal-before.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    left: -13px;
+    position: absolute;
+    top: 0;
+    width: 13px;
+	}
+	
+.wizard ul li.normal a { 
+	background: url(../images/wizard/normal-inner.png) repeat-x scroll right 0 transparent;
+    color: @base-color;
+	z-index: 8;
+	margin-left: 15px;
+	}
+	
+.wizard ul li.normal a:after { 
+	background: url(../images/wizard/normal-after.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    right: -13px;
+    position: absolute;
+    top: 0;
+    width: 13px;
+	}	
+	
+	
+/* Normal Hover */	
+.wizard ul li.normal.first a:hover:before,
+.wizard ul li.normal.hover.first a:before { 
+	background: url(../images/wizard/hover-normal-left-end.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 3px;
+	}
+	
+.wizard ul li.normal.last a:hover:after,
+.wizard ul li.normal.hover.last a:after { 
+	background: url(../images/wizard/hover-normal-right-end.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    left: auto;
+    right: 0;
+    position: absolute;
+    top: 0;
+    width: 3px;
+	}
+	
+.wizard ul li.normal a:hover:before,
+.wizard ul li.normal.hover a:before { 
+	background: url(../images/wizard/hover-normal-before.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    left: -13px;
+    position: absolute;
+    top: 0;
+    width: 13px;
+	}
+	
+.wizard ul li.normal a:hover,
+.wizard ul li.normal.hover a { 
+	background: url(../images/wizard/hover-normal-inner.png) repeat-x scroll right 0 transparent;
+    color: @base-color;
+	z-index: 8;
+	margin-left: 15px;
+	}
+	
+.wizard ul li.normal a:hover:after,
+.wizard ul li.normal.hover a:after { 
+	background: url(../images/wizard/hover-normal-after.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    right: -13px;
+    position: absolute;
+    top: 0;
+    width: 13px;
+	}	
+
+	
+/* Focus */
+.wizard ul li.last.focus:not(.disabled):not(.visited) a:after,
+.wizard ul li.last:not(.disabled):not(.visited) a:focus:after { 
+	background: url(../images/wizard/focus-right-end.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    left: auto;
+    right: 0px;
+    position: absolute;
+    top: 0;
+    width: 4px;
+	}
+
+.wizard ul li.first.focus:not(.disabled):not(.visited) a:before,
+.wizard ul li.first:not(.disabled):not(.visited) a:focus:before { 
+	background: url(../images/wizard/focus-left-end.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    left: 0px;
+    position: absolute;
+    top: 0;
+    width: 4px;
+	} 
+	
+.wizard ul li.focus:not(.disabled):not(.visited) a,
+.wizard ul li:not(.disabled):not(.visited) a:focus { 
+	background: url(../images/wizard/focus-inner.png) repeat-x scroll right 0 transparent;
+    color: @base-color;
+	outline: none !important;
+	margin-left: 15px;
+	z-index: 13;
+	}
+	
+.wizard ul li.focus:not(.disabled):not(.visited) a:after, 
+.wizard ul li:not(.disabled):not(.visited) a:focus:after { 
+	background: url(../images/wizard/focus-after.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    right: -13px;
+    position: absolute;
+    top: 0;
+    width: 13px;
+	}	
+	
+.wizard ul li.focus:not(.disabled):not(.visited) a:before, 
+.wizard ul li:not(.disabled):not(.visited) a:focus:before { 
+	background: url(../images/wizard/focus-before.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    left: -13px;
+    position: absolute;
+    top: 0;
+    width: 13px;
+	}	
+
+	
+/* Focus hover */
+.wizard ul li.last.focus:not(.disabled):not(.visited) a:hover:after,
+.wizard ul li.last:not(.disabled):not(.visited) a:hover:focus:after,
+.wizard ul li.last.focus:not(.disabled):not(.visited) a.hover:after,
+.wizard ul li.last:not(.disabled):not(.visited) a.hover:focus:after { 
+	background: url(../images/wizard/focus-hover-right-end.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    left: auto;
+    right: 0px;
+    position: absolute;
+    top: 0;
+    width: 4px;
+	}
+
+.wizard ul li.first.focus:not(.disabled):not(.visited) a:hover:before,
+.wizard ul li.first:not(.disabled):not(.visited) a:hover:focus:before,
+.wizard ul li.first.focus:not(.disabled):not(.visited) a.hover:before,
+.wizard ul li.first:not(.disabled):not(.visited) a.hover:focus:before { 
+	background: url(../images/wizard/focus-hover-left-end.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    left: 0px;
+    position: absolute;
+    top: 0;
+    width: 4px;
+	} 
+	
+.wizard ul li.focus:not(.disabled):not(.visited) a:hover,
+.wizard ul li:not(.disabled):not(.visited) a:hover:focus,
+.wizard ul li.focus:not(.disabled):not(.visited) a.hover,
+.wizard ul li:not(.disabled):not(.visited) a.hover:focus { 
+	background: url(../images/wizard/focus-hover-inner.png) repeat-x scroll right 0 transparent;
+    color: @base-color;
+	outline: none !important;
+	margin-left: 15px;
+	z-index: 13;
+	}
+	
+.wizard ul li.focus:not(.disabled):not(.visited) a:hover:after, 
+.wizard ul li:not(.disabled):not(.visited) a:hover:focus:after
+.wizard ul li.focus:not(.disabled):not(.visited) a.hover:after, 
+.wizard ul li:not(.disabled):not(.visited) a.hover:focus:after { 
+	background: url(../images/wizard/focus-hover-after.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    right: -13px;
+    position: absolute;
+    top: 0;
+    width: 13px;
+	}	
+	
+.wizard ul li.focus:not(.disabled):not(.visited) a:hover:before, 
+.wizard ul li:not(.disabled):not(.visited) a:hover:focus:before,
+.wizard ul li.focus:not(.disabled):not(.visited) a.hover:before, 
+.wizard ul li:not(.disabled):not(.visited) a.hover:focus:before { 
+	background: url(../images/wizard/focus-hover-before.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    left: -13px;
+    position: absolute;
+    top: 0;
+    width: 13px;
+	}	
+
+	
+/* Active */
+.wizard ul li.active { }
+	
+.wizard ul li.active.first a:before { 
+	background: url(../images/wizard/active-left-end.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 3px;
+	}
+	
+.wizard ul li.active.last a:after { 
+	background: url(../images/wizard/active-right-end.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    left: auto;
+    right: 0;
+    position: absolute;
+    top: 0;
+    width: 3px;
+	}
+	
+.wizard ul li.active a:before { 
+	background: url(../images/wizard/active-before.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    left: -10px;
+    position: absolute;
+    top: 0;
+    width: 13px;
+	}
+	
+.wizard ul li.active a { 
+	background: url(../images/wizard/active-inner.png) repeat-x scroll right 0 transparent;
+    color: @base-color;
+	margin-left: 13px;
+	z-index: 11;
+	}
+	
+.wizard ul li.active a:after { 
+	background: url(../images/wizard/active-after.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    right: -13px;
+    position: absolute;
+    top: 0;
+    width: 13px;
+	}		
+	
+
+/* Active Focus */
+.wizard ul li.active.first.focus:not(.disabled):not(.visited) a:before,
+.wizard ul li.active.first:not(.disabled):not(.visited) a:focus:before { 
+	background: url(../images/wizard/active-focus-left-end.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    left: 0px;
+    position: absolute;
+    top: 0;
+    width: 4px;
+	}
+	
+.wizard ul li.active.last.focus:not(.disabled):not(.visited) a:after,
+.wizard ul li.active.last:not(.disabled):not(.visited) a:focus:after { 
+	background: url(../images/wizard/active-focus-right-end.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    left: auto;
+    right: 0;
+    position: absolute;
+    top: 0;
+    width: 4px;
+	}
+	
+.wizard ul li.active:not(.disabled):not(.visited) a:focus,
+.wizard ul li.active.focus:not(.disabled):not(.visited) a { 
+	background: url(../images/wizard/active-focus-inner.png) repeat-x scroll right 0 transparent;
+    color: @base-color;
+	z-index: 15;
+	outline: none;
+	margin-left: 11px;
+	padding-left: 14px;
+	}
+	
+.wizard ul li.active.focus:not(.disabled):not(.visited) a:after,
+.wizard ul li.active:not(.disabled):not(.visited) a:focus:after { 
+	background: url(../images/wizard/active-focus-after.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    right: -13px;
+    position: absolute;
+    top: 0;
+    width: 13px;
+	}	
+	
+.wizard ul li.active.focus:not(.disabled):not(.visited) a:before,
+.wizard ul li.active:not(.disabled):not(.visited) a:focus:before { 
+	background: url(../images/wizard/active-focus-before.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    left: -11px;
+    position: absolute;
+    top: 0;
+    width: 13px;
+	}	
+
+	
+	
+	
+/* Disabled */	
+.wizard ul li.disabled.first { padding-left: 3px; }
+
+.wizard ul li.disabled.first a:before { 
+	background: url(../images/wizard/disabled-left-end.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    left: -3px;
+    position: absolute;
+    top: 0;
+    width: 3px;
+	}
+	
+.wizard ul li.disabled.last a:after { 
+	background: url(../images/wizard/disabled-right-end.png) no-repeat scroll right 0px transparent;
+    content: "";
+    height: 50px;
+    left: auto;
+    right: 0;
+    position: absolute;
+    top: 0;
+    width: 1px;
+	}
+	
+.wizard ul li.disabled a:before { 
+	background: url(../images/wizard/disabled-before.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    left: -13px;
+    position: absolute;
+    top: 0;
+    width: 13px;
+	}
+	
+.wizard ul li.disabled a { 
+	background: url(../images/wizard/disabled-inner.png) repeat-x scroll right 0 transparent;
+    color: @disabled-color;
+	z-index: 7;
+	margin-left: 13px;
+	cursor: default;
+	}
+	
+.wizard ul li.disabled a:focus { outline: none !important; }
+	
+.wizard ul li.disabled a:after { 
+	background: url(../images/wizard/disabled-after.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    right: -13px;
+    position: absolute;
+    top: 0;
+    width: 13px;
+	}
+
+	
+	
+/* Wizard primary */	
+	
+/* Active */
+.wizard-primary ul li.active { }
+	
+.wizard-primary ul li.active.first a:before { 
+	background: url(../images/wizard/primary-active-left-end.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 3px;
+	}
+	
+.wizard ul li.active.last a:after { 
+	background: url(../images/wizard/primary-active-right-end.png) no-repeat scroll right 0px transparent;
+    content: "";
+    height: 50px;
+    left: auto;
+    right: 0;
+    position: absolute;
+    top: 0;
+    width: 3px;
+	}
+	
+.wizard-primary ul li.active a:before { 
+	background: url(../images/wizard/primary-active-before.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    left: -13px;
+    position: absolute;
+    top: 0;
+    width: 13px;
+	}
+	
+.wizard-primary ul li.active a { 
+	background: url(../images/wizard/primary-active-inner.png) repeat-x scroll right 0 transparent;
+    color: #fff;
+	margin-left: 13px;
+	}
+	
+.wizard-primary ul li.active a:after { 
+	background: url(../images/wizard/primary-active-after.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    right: -13px;
+    position: absolute;
+    top: 0;
+    width: 13px;
+	}		
+	
+
+/* Active Focus */
+.wizard-primary  ul li.active.first.focus:not(.disabled):not(.visited) a:before,
+.wizard-primary  ul li.active.first:not(.disabled):not(.visited) a:focus:before { 
+	background: url(../images/wizard/primary-active-focus-left-end.png) no-repeat scroll 0 0 transparent;
+    content: "";
+    height: 50px;
+    left: 0;
+    position: absolute;
+    top: 0px;
+    width: 5px;
+	}
+	
+.wizard-primary  ul li.active.last.focus:not(.disabled):not(.visited) a:after,
+.wizard-primary  ul li.active.last:not(.disabled):not(.visited) a:focus:after { 
+	background: url(../images/wizard/primary-active-focus-right-end.png) no-repeat scroll -1px 0 transparent;
+    content: "";
+    height: 50px;
+    left: auto;
+    right: 0px;
+    position: absolute;
+    top: 0px;
+    width: 5px;
+	}
+	
+.wizard-primary  ul li.active:not(.disabled):not(.visited) a:focus,
+.wizard-primary  ul li.active.focus:not(.disabled):not(.visited) a { 
+	background: url(../images/wizard/primary-active-focus-inner.png) repeat-x scroll right 0 transparent;
+    color: #fff;
+	outline: none;
+	margin-left: 13px;
+	padding-left: 12px;
+	padding-top: 14px;
+	height: 50px;
+	top: -1px;
+	z-index: 15;
+	}
+	
+.wizard-primary  ul li.active.focus:not(.disabled):not(.visited) a:after,
+.wizard-primary  ul li.active:not(.disabled):not(.visited) a:focus:after { 
+	background: url(../images/wizard/primary-active-focus-after.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    right: -13px;
+    position: absolute;
+    top: 0px;
+    width: 14px;
+	}	
+	
+.wizard-primary  ul li.active.focus:not(.disabled):not(.visited) a:before,
+.wizard-primary  ul li.active:not(.disabled):not(.visited) a:focus:before { 
+	background: url(../images/wizard/primary-active-focus-before.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    left: -13px;
+    position: absolute;
+    top: 0px;
+    width: 13px;
+	}	
+	
+	
+	
+/* Pressed */	
+.wizard ul li.normal.pressed.first a:before,
+.wizard ul li.normal.pressed.first a:focus:before,
+.wizard ul li.normal.focus.pressed.first a:before,
+.wizard ul li.normal.focus.pressed.first a:focus:before,
+.wizard ul li.active.pressed.first a:before,
+.wizard ul li.active.pressed.first a:focus:before,
+.wizard ul li.active.focus.pressed.first:not(.disabled) a:before,
+.wizard ul li.active.focus.pressed.first:not(.disabled) a:focus:before,
+.wizard ul li.visited.pressed.first a:before,
+.wizard ul li.visited.pressed.first a:focus:before { 
+	background: url(../images/wizard/pressed-normal-left-end.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 3px;
+	}
+	
+.wizard ul li.normal.pressed.last a:after,
+.wizard ul li.normal.pressed.last a:focus:after,
+.wizard ul li.normal.focus.pressed.last a:after,
+.wizard ul li.normal.focus.pressed.last a:focus:after,
+.wizard ul li.active.pressed.last a:after,
+.wizard ul li.active.pressed.last a:focus:after,
+.wizard ul li.active.focus.pressed.last:not(.disabled) a:after,
+.wizard ul li.active.focus.pressed.last:not(.disabled) a:focus:after,
+.wizard ul li.visited.pressed.last a:after,
+.wizard ul li.visited.pressed.last a:focus:after { 
+	background: url(../images/wizard/pressed-normal-right-end.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    left: auto;
+    right: 0;
+    position: absolute;
+    top: 0;
+    width: 3px;
+	}
+	
+.wizard ul li.normal.pressed a:before,
+.wizard ul li.normal.pressed a:focus:before,
+.wizard ul li.normal.focus.pressed a:before,
+.wizard ul li.normal.focus.pressed a:focus:before,
+.wizard ul li.active.pressed a:before,
+.wizard ul li.active.pressed a:focus:before,
+.wizard ul li.active.focus.pressed:not(.disabled) a:before,
+.wizard ul li.active.focus.pressed:not(.disabled) a:focus:before,
+.wizard ul li.visited.pressed a:before,
+.wizard ul li.visited.pressed a:focus:before { 
+	background: url(../images/wizard/pressed-normal-before.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    left: -12px;
+    position: absolute;
+    top: 0;
+    width: 13px;
+	}
+	
+.wizard ul li.normal.pressed a,
+.wizard ul li.normal.pressed a:focus,
+.wizard ul li.normal.focus.pressed a,
+.wizard ul li.normal.focus.pressed a:focus,
+.wizard ul li.active.pressed a,
+.wizard ul li.active.pressed a:focus,
+.wizard ul li.active.focus.pressed:not(.disabled) a,
+.wizard ul li.active.focus.pressed:not(.disabled) a:focus,
+.wizard ul li.visited.pressed a,
+.wizard ul li.visited.pressed a:focus { 
+	background: url(../images/wizard/pressed-normal-inner.png) repeat-x scroll right 0 transparent;
+    color: @base-color;
+	z-index: 8;
+	margin-left: 15px;
+	pointer-events: none;
+	}
+	
+.wizard ul li.active.pressed a,
+.wizard ul li.active.pressed a:focus,
+.wizard ul li.active.focus.pressed:not(.disabled) a,
+.wizard ul li.active.focus.pressed:not(.disabled) a:focus { 
+	/*padding-left: 10px; */
+	margin-left: 11px;
+	}
+
+.wizard ul li.normal.pressed a:after,
+.wizard ul li.normal.pressed a:focus:after,
+.wizard ul li.normal.focus.pressed a:after,
+.wizard ul li.normal.focus.pressed a:focus:after,
+.wizard ul li.active.pressed a:after,
+.wizard ul li.active.pressed a:focus:after,
+.wizard ul li.active.focus.pressed:not(.disabled) a:after,
+.wizard ul li.active.focus.pressed:not(.disabled) a:focus:after,
+.wizard ul li.visited.pressed a:after,
+.wizard ul li.visited.pressed a:focus:after { 
+	background: url(../images/wizard/pressed-normal-after.png) no-repeat scroll 0px 0 transparent;
+    content: "";
+    height: 50px;
+    right: -13px;
+    position: absolute;
+    top: 0;
+    width: 13px;
+	}	
+	
+
+	
+/* Responsiveness */
+@media (max-width: 1200px){  
+	.childs-8.wizard ul li { width: 13.7%; }
+	.childs-7.wizard ul li { width: 15.45%; }
+	.childs-6.wizard ul li { width: 17.8%; }
+	.childs-5.wizard ul li { width: 21.1%; }
+	.childs-4.wizard ul li { width: 26%; }
+	.childs-3.wizard ul li { width: 34.2%; }
+	.childs-2.wizard ul li { width: 50.65%; }
+}
+
+@media (max-width: 992px){  
+	.childs-8.wizard ul li { width: 14.05%; }
+	.childs-7.wizard ul li { width: 15.8%; }
+	.childs-6.wizard ul li { width: 18.15%; }
+	.childs-5.wizard ul li { width: 21.4%; }
+	.childs-4.wizard ul li { width: 26.34%; }
+	.childs-3.wizard ul li { width: 34.5%; }
+	.childs-2.wizard ul li { width: 50.75%; }
+}
+	
+@media (max-width: 769px){  
+	.wizard ul li.normal.first a:hover:before,
+	.wizard ul li.normal.first.hover a:before { 
+		background: url(../images/wizard/pressed-normal-left-end.png) no-repeat scroll 0px 0 transparent;
+		content: "";
+		height: 50px;
+		left: 0;
+		position: absolute;
+		top: 0;
+		width: 3px;
+		}
+		
+	.wizard ul li.normal.last a:hover:after,
+	.wizard ul li.normal.last.hover a:after { 
+		background: url(../images/wizard/pressed-normal-right-end.png) no-repeat scroll 0px 0 transparent;
+		content: "";
+		height: 50px;
+		left: auto;
+		right: 0;
+		position: absolute;
+		top: 0;
+		width: 3px;
+		}
+		
+	.wizard ul li.normal a:hover:before,
+	.wizard ul li.normal.hover a:before { 
+		background: url(../images/wizard/pressed-normal-before.png) no-repeat scroll 0px 0 transparent;
+		content: "";
+		height: 50px;
+		left: -12px;
+		position: absolute;
+		top: 0;
+		width: 13px;
+		}
+		
+	.wizard ul li.normal a:hover,
+	.wizard ul li.normal.hover a { 
+		background: url(../images/wizard/pressed-normal-inner.png) repeat-x scroll right 0 transparent;
+		color: @base-color;
+		z-index: 8;
+		margin-left: 15px;
+		}
+		
+	.wizard ul li.normal a:hover:after,
+	.wizard ul li.normal.hover a:after { 
+		background: url(../images/wizard/pressed-normal-after.png) no-repeat scroll 0px 0 transparent;
+		content: "";
+		height: 50px;
+		right: -13px;
+		position: absolute;
+		top: 0;
+		width: 13px;
+		}	
+}
+	
+	
+@media (max-width: 500px){  
+	.wizard ul li a {
+		padding-right: 0px; 
+		padding-left: 0px; 
+		}
+	
+	.wizard ul li:first-child a { padding-left: 10px; }
+	
+	.wizard ul li:last-child a { padding-right: 10px; }
+	
+	.wizard ul li.active:not(.disabled):not(.visited) a:focus, 
+	.wizard ul li.active.focus:not(.disabled):not(.visited) a { padding-left: 0; }
+	
+	.wizard ul li a span { text-overflow: inherit; }
+	
+	.childs-8.wizard ul li { width: 14.05%; }
+	.childs-7.wizard ul li { width: 15.8%; }
+	.childs-6.wizard ul li { width: 18.15%; }
+	.childs-5.wizard ul li { width: 23.5%; }
+	.childs-4.wizard ul li { width: 28.2%; }
+	.childs-3.wizard ul li { width: 34.5%; }
+	.childs-2.wizard ul li { width: 50.75%; }
+	}

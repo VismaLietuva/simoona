@@ -1,0 +1,20 @@
+<script type="text/ng-template" id="notifications-popup.html">
+    <div class="notifications-popup-title clearfix">
+        <a class="notifications-settings-link" ui-sref="Root.WithOrg.Client.Settings.Notifications"></a>
+        <span translate="settings.notifications"></span>
+        <ace-notifications-dismiss-all ng-if="vm.notifications.data.length > 1"></ace-notifications-dismiss-all>
+    </div>
+    <div class="notifications-popup-content" ng-class="{ 'notifications-scrollable': vm.notifications.data.length > 5 }">
+        <div ng-show="!vm.notifications.data.length" 
+             class="notifications-popup-no-notifications">
+            <span translate="navbar.noNotifications"></span>
+        </div>
+
+        <ul ng-show="vm.notifications.data.length" class="popup-notification-list">
+            <li ng-repeat="notification in vm.notifications.data">
+                <ace-popup-notification notification="notification">
+                </ace-popup-notification>
+            </li>
+        </ul>
+    </div>       
+</script>

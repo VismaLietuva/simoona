@@ -1,0 +1,10 @@
+﻿{
+  "addApplicationUserPlaceholder": "Add user. Ex: Jhon Snow",
+  "intersectWarningMessage": "You cannot draw on top of another room!",
+  "nameMap": "Office map",
+  "redraw": "Redraw",
+  "roomSavedMessage": "Room saved!",
+  "startDrawMessage": "Click on the map to start drawing a room!",
+  "zoomIn": "Zoom in",
+  "zoomOut": "Zoom out"
+}

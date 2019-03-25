@@ -1,0 +1,12 @@
+<div class="pull-right">
+    <a type="button"
+       ng-if="vm.hasDatePassed(vm.event.endDate) && (vm.event.hostUserId === vm.currentUserId || vm.hasEventAdminPermissions)"
+       class="vismaicon vismaicon-edit event-description-title-button"
+       ui-sref="Root.WithOrg.Client.Events.EditEvent({id: {{'vm.event.id'}}})"
+       translate-attr-title="common.edit"
+       data-test-id="event-description-edit-event" translate>
+    </a>
+    <ace-share-btn ng-if="vm.hasDatePassed(vm.event.endDate)"
+                   share-item-category="event"
+                   share-item-id="{{vm.event.id}}"></ace-share-btn>
+</div>

@@ -1,0 +1,12 @@
+
+<div class="search-group search-group-lg">
+    <input type="text"
+           class="form-control without-button"
+           ng-model="vm.filterValue"
+           ng-model-options="{ debounce: 350 }"
+           ng-change="vm.onSearch(vm.filterValue)"
+           translate-attr-placeholder="common.typeToFilter"
+           translate-values="{ count: vm.minCharacters }"
+           data-test-id="list-search-input"
+           autofocus no-enter ng-cloak translate>
+</div>

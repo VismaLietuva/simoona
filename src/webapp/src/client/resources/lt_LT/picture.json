@@ -1,0 +1,9 @@
+﻿{
+  "entityName": "Paveiksliukas",
+  "entityNamePlural": "Paveiksliukas",
+  "imageAttached": "Paveikslėlis sėkmingai prisegtas",
+  "imageAttachedPreview": "Prisegtas paveikslėlis:",
+  "imageInvalidType": "Netinkamas paveikslėlio formatas. Palaikomi formatai yra gif, jpg, jpeg, ir png.",
+  "imageSizeExceeded": "Pasirinktas paveikslėlis yra per didelis. Maksimalus leistinas dydis yra 5MB.",
+  "imageUploadError": "Nepavyko įkelti paveikslėlio!"
+}

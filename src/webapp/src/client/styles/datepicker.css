@@ -1,0 +1,336 @@
+.date-field .dropdown-menu {
+    border-width: 1px;
+    border-style: solid;
+    border-color: #e4e4e4 #dedede #d4d4d4;
+    background: #fff;
+    color: #282828;
+    padding: 15px 20px;
+    width: 260px;
+    margin-top: 4px;
+    margin-left: -1.5%;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, .1)
+}
+
+.date-field .dropdown-menu:after, .date-field .dropdown-menu:before {
+    content: "";
+    height: 0;
+    left: 50%;
+    position: absolute;
+    width: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid transparent;
+    display: block;
+    margin-left: -8px;
+}
+
+.date-field .dropdown-menu:after {
+    border-bottom: 8px solid #fff;
+    top: -15px
+}
+
+.date-field .dropdown-menu:before {
+    border-bottom: 8px solid #e4e4e4;
+    top: -16px
+}
+
+.date-field .dropdown-menu a {
+    color: #282828
+}
+
+.date-field .btn {
+    min-height: 0;
+}
+
+.date-field .dropdown-menu li div table tbody td {
+    min-width: 0 !important;
+}
+
+.date-field .dropdown-menu .btn-default {
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+    box-shadow: none;
+    height: auto;
+}
+.date-field .dropdown-menu table {
+    width: 100%;
+}
+.date-field .dropdown-menu table thead .btn.pull-left {
+    margin-left: 0;
+    margin-top: 0;
+    width: 10px;
+    height: 14px;
+    background: url(../images/datepick_arrows.png) no-repeat transparent 0 -20px;
+}
+.date-field .dropdown-menu table thead .btn.pull-right {
+    margin-left: 0;
+    margin-top: 0;
+    width: 10px;
+    height: 14px;
+    background: url(../images/datepick_arrows.png) no-repeat transparent 0 0;
+}
+
+.date-field .dropdown-menu table thead .btn:focus:active {
+    padding: 0;
+    -moz-box-shadow: none;
+    -wekit-box-shadow: none;
+    box-shadow: none;
+}
+.date-field .dropdown-menu table thead .btn[role=heading] {
+    background: transparent;
+    border: 1px solid transparent;
+    padding: 0;
+    margin: 0;
+    vertical-align: top;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-indent: 0;
+    text-overflow: "";
+    cursor: pointer;
+    min-width: 0;
+    width: 125%;
+    font-size: 18px;
+    line-height: 23px;
+}
+.date-field .dropdown-menu table thead .btn[role=heading] strong {
+    font-weight: normal;
+}
+.date-field .dropdown-menu table thead .btn .glyphicon {
+    display: none;
+}
+
+.date-field .dropdown-menu table thead tr:nth-child(2) {
+    border-bottom: 1px solid #e5e5e5;
+}
+.date-field .dropdown-menu table thead tr:nth-child(2) th {
+    padding: 5px 1px 0 1px;
+    text-align: center;
+    font-weight: 400;
+    border: 0;
+    font-size: 10px;
+}
+.date-field .dropdown-menu table tbody td {
+    padding: 0 1px;
+}
+.date-field .dropdown-menu table[role=grid] tbody .btn-default {
+    font-size: 0.8em;
+    text-align: center;
+}
+.date-field .dropdown-menu table tbody .btn-default {
+    display: block;
+    padding: 3px 5px;
+    text-align: right;
+    text-decoration: none;
+    border-radius: 20px;
+    border: 1px solid transparent;
+}
+.date-field .dropdown-menu table tbody .btn-default.active {
+    color: #000;
+}
+
+.date-field .dropdown-menu table tbody .btn-default[disabled].active {
+    color: #a0a0a0;
+}
+
+.date-field .dropdown-menu table tbody .btn-info,
+.date-field .dropdown-menu table tbody .btn-info.active,
+.date-field .dropdown-menu table tbody .btn-info:hover {
+    border: 1px solid #0089D9;
+    background: #0089D9;
+    color: #fff;
+}
+.date-field .dropdown-menu table tbody .btn-info:hover .text-info {
+    color: #282828;
+}
+.date-field .dropdown-menu table tbody .btn-info .text-info {
+    color: #fff;
+}
+.date-field .dropdown-menu table tbody .btn-default:hover {
+    background: #DDF2FF;
+    color: #282828;
+    border: 1px solid #d8eaf5;
+}
+.date-field .dropdown-menu table tbody .h6,
+.date-field .dropdown-menu table tbody .text-muted {
+    color: #282828;
+    opacity: 0.5;
+}
+.date-field .dropdown-menu table tbody .h6 {
+    font-size: 0.6em;
+}
+
+.date-field .dropdown-menu .btn-success {
+    display: none;
+}
+.date-field .dropdown-menu .btn-group>.btn:first-child:not(:last-child):not(.dropdown-toggle) {
+    border-radius: 10px;
+}
+.date-field .dropdown-menu .btn-group>.btn:first-child:not(:last-child):not(.dropdown-toggle) {
+    border-radius: 10px;
+}
+.date-field .dropdown-menu li:nth-child(2) {
+    padding: 0 !important;
+}
+.date-field .dropdown-menu .btn-group {
+    overflow: hidden;
+    border-top: 1px solid #e5e5e5;
+    padding: 5px 15px 0;
+    margin-top: 10px;
+    width: 100%;
+}
+.date-field .dropdown-menu .btn-group .btn-info {
+    text-indent: 0;
+    margin: 2px;
+    color: #d73848;
+    border: 1px solid #DF6874;
+    background: transparent;
+    border-radius: 10px;
+    width: auto;
+    height: 24px;
+    font-weight: 400;
+    padding-left: 10px;
+    padding-right: 10px;
+    float: left;
+    text-decoration: none;
+    min-width: 0;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.date-field .dropdown-menu .btn-group .btn-danger {
+    text-indent: 0;
+    margin: 2px;
+    color: #797979;
+    border: 1px solid #999999;
+    background: transparent;
+    border-radius: 10px;
+    width: auto;
+    height: 24px;
+    font-weight: 400;
+    padding-left: 10px;
+    padding-right: 10px;
+    text-decoration: none;
+    min-width: 0;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    font-size: 14px;
+    opacity: 0.7;
+    line-height: 1;
+    float: right;
+}
+
+.date-field .dropdown-menu .btn-group .btn-danger:hover,
+.date-field .dropdown-menu .btn-group .btn-danger:active,
+.date-field .dropdown-menu .btn-group .btn-danger:focus,
+.date-field .dropdown-menu .btn-group .btn-info:hover,
+.date-field .dropdown-menu .btn-group .btn-info:active,
+.date-field .dropdown-menu .btn-group .btn-info:focus{
+    background: transparent !important;
+}
+
+.date-field-inline .dropdown-menu {
+    position: static;
+    top: auto;
+    left: auto;
+    display: block;
+}
+.date-field-inline .dropdown-menu:before,
+.date-field-inline .dropdown-menu:after {
+    display: none;
+}
+
+.date-field {
+    position: relative
+}
+
+.hasDatepicker {
+    width: 100%;
+    background: url(../images/datepick_trigger.png) 97% 4px no-repeat #fff
+}
+
+.date-field:hover .hasDatepicker {
+    background-position: 97% -68px
+}
+
+.date-field .hasDatepicker:active, .date-field:hover .hasDatepicker:active, .date-field:active .hasDatepicker:active {
+    background-position: 97% -104px
+}
+
+.date-field .hasDatepicker + .ui-datepicker-trigger:focus, .date-field .hasDatepicker + .ui-datepicker-trigger:active {
+    background: url(../images/datepick_trigger.png) 6px -104px no-repeat #fff
+}
+
+.date-field .hasDatepicker + .ui-datepicker-trigger {
+    background: url(../images/datepick_trigger.png) 6px -104px no-repeat #fff
+}
+
+.date-field .hasDatepicker:focus, .date-field:hover .hasDatepicker:focus {
+    background-position: 97% -104px;
+    border-color: #c8c8c8;
+    box-shadow: none
+}
+
+.ui-datepicker-trigger {
+    background: transparent;
+    border: 0;
+    height: 28px;
+    padding: 0;
+    position: absolute;
+    right: 1px;
+    text-indent: -9999px;
+    top: 1px;
+    width: 28px
+}
+
+.date-group > .date-field {
+    padding-right: 10px
+}
+
+.date-group > .date-field.separator {
+    padding-left: 10px;
+    padding-right: 0
+}
+
+.date-group > .date-field.separator:before {
+    content: "-";
+    float: left;
+    left: -9px;
+    position: relative
+}
+
+.datepicker-week-selection tr:hover td:not(.h6){
+    background: #ebf4fa;
+    color: #282828;
+}
+.datepicker-week-selection tr:hover td:not(.h6) .btn {
+    color: #282828;
+}
+.datepicker-week-selection tr.active-week td:not(.h6),
+.datepicker-week-selection tr.active-week:hover td:not(.h6) {
+    background: #0089D9;
+    color: #fff;
+}
+.datepicker-week-selection tr.active-week td .btn,
+.datepicker-week-selection tr.active-week:hover td .btn {
+    color: #fff;
+}
+.datepicker-week-selection tr.active-week td .btn:hover {
+    background: none;
+    border-color: transparent;
+}
+.date-field .datepicker-week-selection table tbody .btn-default:hover {
+    border-color: transparent;
+}
+.datepicker-week-selection tr td:not(.h6):nth-child(8n+2) {
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
+.datepicker-week-selection tr td:last-child {
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+}

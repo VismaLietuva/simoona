@@ -1,0 +1,12 @@
+﻿{
+  "login": "Prisijungti",
+  "loginFailure": "Prisijungimo klaida",
+  "mustBeLoggedInToConfirm": "Turite prisijungti, kad galėtumėte atlikti patvirtinimą",
+  "pleaseLogin": "Prašome prisijungti",
+  "emailFailure": "Nepavyko pasiekti el. pašto Facebook paskyroje",
+  "notFound": "Prašome užsiregistruoti arba susieti turimą paskyrą su nauju prisijungimu",
+  "providerExists": "Kitas prisijungimas su šiuo el. paštu jau yra naudojamas",
+  "register": "Registracija",
+  "passwordReset": "Slaptažodžio atkūrimas",
+  "forgotPassword": "Pamiršau slaptažodį"
+}

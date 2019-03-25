@@ -1,0 +1,13 @@
+﻿{
+  "coordinates": "Coordinates",
+  "createRoom": "New Room",
+  "editRoom": "Edit Room",
+  "employees": "Employees",
+  "entityName": "Room",
+  "entityNamePlural": "Rooms",
+  "floor": "Floor",
+  "name": "Title",
+  "number": "Number",
+  "office": "Office",
+  "roomData": "Room Data"
+}

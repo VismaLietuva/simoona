@@ -1,0 +1,124 @@
+// nc-btn
+.nc-btn {
+    font-size: 14px;
+    font-weight: normal;
+    display: inline-block;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+
+    .vismaicon {
+        top: -2px;
+        vertical-align: middle;
+        padding-right: 5px;
+    }
+    &:hover {
+        .vismaicon:before {
+            background-position: -58px 0px;
+        }
+    }
+    .vismaicon-form-group {
+        margin-top:4px;
+    }
+}
+
+.nc-btn-default {
+    color: #337ab7;
+    &:hover {
+        color: #0089D9 !important;
+    }
+}
+
+.nc-btn-success {
+    color: #68A611;
+    &:hover {
+        color: #4D8400 !important;
+    }
+    &:focus {
+        color: #4D8400 !important;
+    }
+}
+
+.nc-btn-danger {
+    color: #D6565A;
+    &:hover {
+        color: #E57377 !important;
+    }
+    &:focus {
+        color: #E57377 !important;
+    }
+}
+
+// nc-radio-buttons
+
+.nc-radio-buttons {
+    .nc-radio-button {
+        display: inline-block;
+        margin: 5px;
+        padding: 4px 15px;
+        width: 160px;
+        min-height: 30px;
+        border: 1px solid #e0e0e0;
+        text-align: center;
+        vertical-align: middle;
+        cursor: pointer;
+        color: #282828;
+        background-color: #FFFFFF;
+        &[disabled],
+        .disabled {
+            cursor: default;
+            color: #282828 !important;
+            background-color: #D7D7D7 !important;
+        }
+        &:hover {
+            color: #282828;
+            background-color: #CCEBFF;
+        }
+        &:active {
+            color: #FFFFFF;
+            background-color: #0974B3;
+        }
+        &.selected,
+        &.selected:focus {
+            cursor: default;
+            color: #FFFFFF;
+            background: @blue-color;
+            .radio-button-content {
+                .badge {
+                    color: @blue-color;
+                    background-color: white;
+                }
+            }
+        }
+        .radio-button-content {
+            display: flex;
+            .text-content {
+                flex: 1 1 0%;
+                display: inline-block;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
+            }
+            .badge {
+                padding: 2px 5px;
+                margin-left: 5px;
+                font-weight: 400;
+                vertical-align: middle;
+                background-color: @blue-bg;
+            }
+        }
+    }
+    input[type="radio"] {
+        visibility: hidden;
+        margin: 0px 0px 0 -15px;
+    }
+}
+
+// \nc-radio-buttons
+
+.nc-filter input[type="radio"] {
+    visibility: hidden;
+    margin: 0px 0px 0 -15px;
+}

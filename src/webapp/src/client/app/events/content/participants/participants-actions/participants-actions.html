@@ -1,0 +1,20 @@
+<div class="text-center event-participants-export" ng-class="{'no-reset': {{ vm.isEventFinished || !vm.isAdmin }}}">
+    <a class="nc-btn nc-btn-default"
+       ng-click="vm.exportParticipantsData()"
+       title="{{'events.export' | translate}}"
+       data-test-id="event-export-participants" ng-cloak translate-cloak>
+        <span class="vismaicon vismaicon-office-excel"></span><span translate="events.export"></span>
+    </a>
+</div>
+<div class="text-center" ng-if="!vm.isEventFinished">
+    <a class="nc-btn nc-btn-danger"
+       ng-if="vm.isAdmin"
+       title="{{'events.resetParticipantsButton' | translate}}"
+       ace-confirmation-modal="vm.resetParticipantList()"
+       confirmation-modal-message="events.eventParticipantsListReset"
+       ng-disabled="!vm.event.participants.length || !vm.event.participants"
+       data-test-id="event-reset-participants-list" ng-cloak translate-cloak>
+        <span class="vismaicon vismaicon-cancel-circle"></span><span translate="events.resetParticipantsButton"></span>
+    </a>
+</div>
+<div class="clearfix"></div>

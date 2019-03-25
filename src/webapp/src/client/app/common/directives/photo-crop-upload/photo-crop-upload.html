@@ -1,0 +1,16 @@
+<div>
+    <input type="file"
+           id="image-file-input"
+           onchange="angular.element(this).scope().handleFileSelect(this.files)"
+           accept="image/x-png, image/gif, image/jpeg"
+           data-test-id="photo-crop-upload-input"/>
+    <div ng-if="vm.isCropVisible" class="image-crop-area">
+        <img-crop image="vm.image"
+                  area-type="rectangle"
+                  aspect-ratio="vm.aspectRatio"
+                  result-image="vm.resultImage"
+                  result-image-size="vm.imageSize">
+        </img-crop>
+    </div>
+</div>
+

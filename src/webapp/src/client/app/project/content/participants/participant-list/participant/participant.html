@@ -1,0 +1,36 @@
+<div class="participant" ng-attr-title="{{:: !!vm.member.id ? vm.member.fullName : undefined}}">
+    <div class="participant-image loading-image-placeholder">
+        <a ng-if="!!vm.member.id" ui-sref="Root.WithOrg.Client.Profiles.Details({ id: vm.member.id })">
+            <img class="media-object"
+                 width="{{:: vm.participantThumbSettings.width}}"
+                 height="{{:: vm.participantThumbSettings.height}}"
+                 ng-src="{{:: vm.member.pictureId | participantThumb: vm.participantThumbSettings}}"
+                 alt="{{:: vm.member.fullName}}"
+                 data-test-id="participant-image" image-loading ng-cloak/>
+         </a>
+
+         <div ng-if="!vm.member.id">
+             <img class="media-object"
+                  width="{{:: vm.participantThumbSettings.width}}"
+                  height="{{:: vm.participantThumbSettings.height}}"
+                  ng-src="{{:: vm.member.pictureId | participantThumb: vm.participantThumbSettings}}"
+                  translate-attr-alt="common.deletedAccount"
+                  data-test-id="participant-image" ng-cloak translate-cloak/>
+          </div>
+     </div>
+
+    <span ng-if="!!vm.member.id"
+          class="participant-user"
+          ng-class="{'current-user': vm.currentid === vm.member.id}"
+          data-test-id="project-participant-full-name" ng-cloak>
+          {{:: vm.member.firstName}} {{:: vm.member.lastName}}
+    </span>
+
+    <span ng-if="!vm.member.id"
+          class="participant-user"
+          data-test-id="project-participant-full-name"
+          translate="common.deletedAccount">
+     </span>
+
+     <span ng-transclude></span>
+</div>

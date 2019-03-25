@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html ng-app="simoonaApp">
+
+<head>
+    <meta http-equiv="x-ua-compatible" content="IE=edge" />
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-Control" content="no-cache">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <base target="_top" href="/" />
+    <title translate="{{pageTitle}}"></title>
+    <link rel="shortcut icon" href="/images/favicon.ico?v=2" />
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:500,400,300,200' rel='stylesheet' type='text/css'>
+    <style>
+        [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+            display: none !important;
+        }
+    </style>
+
+    <!-- build:css styles/styles.css -->
+    <!-- inject:cssBootstrap -->
+    <link rel="stylesheet" href="/.tmp/bootstrap.css">
+    <!-- endinject -->
+
+    <link href="/src/client/styles/jquery-ui/jquery-ui-1.10.4.custom.css" rel="stylesheet" />
+    <link href="/src/client/styles/ng-tags-input.css" rel="stylesheet" />
+    <link href="/src/client/styles/bootstrap/ng-tags-input.bootstrap.css" rel="stylesheet" />
+    <link href="/src/client/styles/toaster.css" rel="stylesheet" />
+    <link href="/src/client/styles/treeView.css" rel="stylesheet" />
+    <link href="/src/client/styles/bootstrap-tour.min.css" rel="stylesheet" />
+    <link href="/src/client/styles/jasny-bootstrap.min.css" rel="stylesheet" />
+    <link href="/src/client/styles/angular-spinkit.min.css" rel="stylesheet" />
+    <link href="/src/client/styles/animate.css" rel="stylesheet" />
+
+    <!-- inject:css -->
+    <link rel="stylesheet" href="/.tmp/styles.css">
+    <!-- endinject -->
+
+    <link href="/src/client/styles/angular-chart.css" rel="stylesheet" />
+    <link href="/src/client/styles/loading-bar.min.css" rel="stylesheet" />
+    <link href="/src/client/styles/datepicker.css" rel="stylesheet" />
+    <link href="/src/client/styles/ng-img-crop.css" rel="stylesheet" />
+    <!-- bower:css -->
+    <link rel="stylesheet" href="/bower_components/angular-bootstrap-lightbox/dist/angular-bootstrap-lightbox.css" />
+    <!-- endbower -->
+    <!-- endbuild -->
+</head>
+
+<body ng-class="{'users-bar map-body': $state.current.name === homeStateName}" class="body-padding-top-42" ng-cloak>
+<div class="max-width-container">
+    <toaster-container></toaster-container>
+    <ui-view class="main-body-div">
+        <ui-view></ui-view>
+    </ui-view>
+</div>
+    <!-- build:js js/toplibs.js -->
+    <script src="/src/client/Libs/jquery/jquery-2.1.1.js"></script>
+    <script src="/src/client/Libs/jquery/jquery.cookie.js"></script>
+    <script src="/src/client/Libs/Raphael.min.js"></script>
+    <script src="/src/client/Libs/export-scripts/alasql.min.js"></script>
+    <script src="/src/client/Libs/export-scripts/xlsx.core.min.js"></script>
+    <script src="/src/client/Libs/jquery.signalR.js"></script>
+    <script src="/src/client/Libs/load-image.all.min.js"></script>
+    <!-- bower:js -->
+    <script src="/bower_components/angular/angular.js"></script>
+    <script src="/bower_components/moment/moment.js"></script>
+    <script src="/bower_components/d3/d3.js"></script>
+    <script src="/bower_components/angular-moment/angular-moment.js"></script>
+    <script src="/bower_components/angular-translate/angular-translate.js"></script>
+    <script src="/bower_components/angular-dynamic-locale/src/tmhDynamicLocale.js"></script>
+    <script src="/bower_components/angular-cookies/angular-cookies.js"></script>
+    <script src="/bower_components/angular-translate-storage-cookie/angular-translate-storage-cookie.js"></script>
+    <script src="/bower_components/angular-translate-storage-local/angular-translate-storage-local.js"></script>
+    <script src="/bower_components/angular-translate-loader-static-files/angular-translate-loader-static-files.js"></script>
+    <script src="/bower_components/angular-translate-handler-log/angular-translate-handler-log.js"></script>
+    <script src="/bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+    <script src="/bower_components/angular-bootstrap-lightbox/dist/angular-bootstrap-lightbox.js"></script>
+    <script src="/bower_components/angular-google-analytics/dist/angular-google-analytics.min.js"></script>
+    <script src="/bower_components/showdown/dist/showdown.js"></script>
+    <!-- endbower -->
+    <script src="/bower_components/moment/locale/lt.js"></script>
+    <script src="/src/client/Libs/angular/angular-resource.js"></script>
+    <script src="/src/client/Libs/angular/angular-local-storage.min.js"></script>
+    <script src="/src/client/Libs/angular/angular-animate.js"></script>
+    <script src="/src/client/Libs/angular/angular-sanitize.js"></script>
+    <script src="/src/client/Libs/angular/elastic.js"></script>
+    <script src="/src/client/Libs/angular/angular-file-upload.js"></script>
+    <script src="/src/client/Libs/angular-ui-router/angular-ui-router.js"></script>
+    <script src="/src/client/Libs/toaster.js"></script>
+    <script src="/src/client/Libs/treeView.js"></script>
+    <script src="/src/client/Libs/ng-infinite-scroll.js"></script>
+    <script src="/src/client/Libs/angular-ui-tree.js"></script>
+    <script src="/src/client/Libs/angular-scrollto.js"></script>
+    <script src="/src/client/Libs/ng-FitText.js"></script>
+    <script src="/src/client/Libs/FileSaver.min.js"></script>
+    <script src="/src/client/Libs/featureFlags.min.js"></script>
+    <script src="/src/client/Libs/angular-timer.min.js"></script>
+    <script src="/src/client/Libs/moment.min.js"></script>
+    <script src="/src/client/Libs/humanize-duration.js"></script>
+    <script src="/src/client/Libs/Chart.min.js"></script>
+    <script src="/src/client/Libs/angular/angular-chart.js"></script>
+    <script src="/src/client/Libs/clipboard.min.js"></script>
+    <script src="/src/client/Libs/ngclipboard.min.js"></script>
+    <script src="/src/client/Libs/xregexp-all.min.js"></script>
+    <script src="/src/client/Libs/ng-lodash.js"></script>
+    <script src="/src/client/Libs/angular-spinkit.js"></script>
+    <script src="/src/client/Libs/nsPopover.js"></script>
+    <script src="/src/client/Libs/ng-img-crop.js"></script>
+    <script src="/src/client/Libs/signalr-hub.js"></script>
+    <script src="/src/client/Libs/bootstrap-tour.min.js"></script>
+    <!--endbuild -->
+
+
+    <!-- build:js js/app.js -->
+    <!-- inject:js -->
+    <script src="/src/client/app/config.js"></script>
+    <script src="/src/client/app/routing.js"></script>
+    <script src="/src/client/app/auth/auth.module.js"></script>
+    <script src="/src/client/app/birthdays/birthdays.module.js"></script>
+    <script src="/src/client/app/books/books.module.js"></script>
+    <script src="/src/client/app/certificate/certificate.module.js"></script>
+    <script src="/src/client/app/committee/committee.module.js"></script>
+    <script src="/src/client/app/common/common.module.js"></script>
+    <script src="/src/client/app/common/confirmation-popup/confirmation-popup.module.js"></script>
+    <script src="/src/client/app/common/directives/wall/youtube-preview/youtube-preview.module.js"></script>
+    <script src="/src/client/app/customization/customization.module.js"></script>
+    <script src="/src/client/app/customization/event-types/event-types.module.js"></script>
+    <script src="/src/client/app/customization/external-links/external-links.module.js"></script>
+    <script src="/src/client/app/customization/job-titles/job-titles.module.js"></script>
+    <script src="/src/client/app/customization/kudos-shop/kudos-shop.module.js"></script>
+    <script src="/src/client/app/customization/kudos-types/kudos-types.module.js"></script>
+    <script src="/src/client/app/customization/organization-settings/organization-settings.module.js"></script>
+    <script src="/src/client/app/customization/service-request-types/service-request-types.module.js"></script>
+    <script src="/src/client/app/employee-list/employee-list.module.js"></script>
+    <script src="/src/client/app/events/events.module.js"></script>
+    <script src="/src/client/app/hashtags/hashtag.module.js"></script>
+    <script src="/src/client/app/kudos/kudos.module.js"></script>
+    <script src="/src/client/app/layout/layout.module.js"></script>
+    <script src="/src/client/app/layout/left-menu/left-menu.module.js"></script>
+    <script src="/src/client/app/layout/navigation-bar/navigation-bar.module.js"></script>
+    <script src="/src/client/app/office/floor/floor.module.js"></script>
+    <script src="/src/client/app/office/floor/room/room.module.js"></script>
+    <script src="/src/client/app/office/map/map.module.js"></script>
+    <script src="/src/client/app/office/map/user-bar/user-bar.module.js"></script>
+    <script src="/src/client/app/office/office.module.js"></script>
+    <script src="/src/client/app/organizational-structure/organizational-structure.module.js"></script>
+    <script src="/src/client/app/picture/picture-modal/picture-modal.module.js"></script>
+    <script src="/src/client/app/picture/picture.module.js"></script>
+    <script src="/src/client/app/profile/profile.module.js"></script>
+    <script src="/src/client/app/project/project.module.js"></script>
+    <script src="/src/client/app/role/role.module.js"></script>
+    <script src="/src/client/app/room-type/room-type.module.js"></script>
+    <script src="/src/client/app/service-request/service-request.module.js"></script>
+    <script src="/src/client/app/settings/settings.module.js"></script>
+    <script src="/src/client/app/skill/skill.module.js"></script>
+    <script src="/src/client/app/support/support.module.js"></script>
+    <script src="/src/client/app/users/users.module.js"></script>
+    <script src="/src/client/app/vacations/vacations.module.js"></script>
+    <script src="/src/client/app/wall/wall.module.js"></script>
+    <script src="/src/client/app/widget/kudos-basket/kudos-basket.module.js"></script>
+    <script src="/src/client/app/widget/widget.module.js"></script>
+    <script src="/src/client/app/auth/auth.service.js"></script>
+    <script src="/src/client/app/auth/forgot-password/forgot-password.controller.js"></script>
+    <script src="/src/client/app/auth/interceptors/auth-interceptor.service.js"></script>
+    <script src="/src/client/app/auth/interceptors/unauth-interceptor.service.js"></script>
+    <script src="/src/client/app/auth/login/login.controller.js"></script>
+    <script src="/src/client/app/auth/login/loginAuth.controller.js"></script>
+    <script src="/src/client/app/auth/logoff/logoff.controller.js"></script>
+    <script src="/src/client/app/auth/register/register.controller.js"></script>
+    <script src="/src/client/app/auth/reset-password/reset-password.controller.js"></script>
+    <script src="/src/client/app/auth/verify-email/verify-email.controller.js"></script>
+    <script src="/src/client/app/birthdays/birthdays.component.js"></script>
+    <script src="/src/client/app/birthdays/birthdays.repository.js"></script>
+    <script src="/src/client/app/books/books.controller.js"></script>
+    <script src="/src/client/app/books/books.repository.js"></script>
+    <script src="/src/client/app/books/create-edit/create-edit.controller.js"></script>
+    <script src="/src/client/app/books/create-edit/create-edit.service.js"></script>
+    <script src="/src/client/app/build-config.js"></script>
+    <script src="/src/client/app/certificate/certificate.repository.js"></script>
+    <script src="/src/client/app/committee/committee-new-edit-modal.controller.js"></script>
+    <script src="/src/client/app/committee/committee-suggestion.controller.js"></script>
+    <script src="/src/client/app/committee/committee.controller.js"></script>
+    <script src="/src/client/app/committee/committee.repository.js"></script>
+    <script src="/src/client/app/common/confirmation-popup/confirmation-popup.controller.js"></script>
+    <script src="/src/client/app/common/directives/autocomplete/autocomplete.directive.js"></script>
+    <script src="/src/client/app/common/directives/confirmation-modal/confirmation-modal.directive.js"></script>
+    <script src="/src/client/app/common/directives/has-permissions/has-permissions.directive.js"></script>
+    <script src="/src/client/app/common/directives/image-loading/image-loading.directive.js"></script>
+    <script src="/src/client/app/common/directives/image-on-load.directive.js"></script>
+    <script src="/src/client/app/common/directives/image-preview/image-preview-thumb.directive.js"></script>
+    <script src="/src/client/app/common/directives/input-wrapper/input-wrapper.directive.js"></script>
+    <script src="/src/client/app/common/directives/item-filter-panel/item-filter-panel.directive.js"></script>
+    <script src="/src/client/app/common/directives/item-filter-panel/item-filter-panel.service.js"></script>
+    <script src="/src/client/app/common/directives/item-list-filter/item-list-filter.directive.js"></script>
+    <script src="/src/client/app/common/directives/item-list-pagination/item-list-pagination.directive.js"></script>
+    <script src="/src/client/app/common/directives/length-counter/length-counter.directive.js"></script>
+    <script src="/src/client/app/common/directives/list-alert/list-alert.directive.js"></script>
+    <script src="/src/client/app/common/directives/list-filter/list-filter.directive.js"></script>
+    <script src="/src/client/app/common/directives/list-pagination/list-pagination.directive.js"></script>
+    <script src="/src/client/app/common/directives/markdown.directive.js"></script>
+    <script src="/src/client/app/common/directives/navbar-height-change-watcher.directive.js"></script>
+    <script src="/src/client/app/common/directives/ng-thumb.directive.js"></script>
+    <script src="/src/client/app/common/directives/ngEnter.directive.js"></script>
+    <script src="/src/client/app/common/directives/no-enter/no-enter.directive.js"></script>
+    <script src="/src/client/app/common/directives/participant-thumb-filter/participant-thumb.filter.js"></script>
+    <script src="/src/client/app/common/directives/photo-crop-upload/photo-crop-upload.directive.js"></script>
+    <script src="/src/client/app/common/directives/picture-modal/picture-modal.directive.js"></script>
+    <script src="/src/client/app/common/directives/progress-bar/progress-bar.directive.js"></script>
+    <script src="/src/client/app/common/directives/save-back-info/saveBackInfo.directive.js"></script>
+    <script src="/src/client/app/common/directives/share-btn/share-btn.component.js"></script>
+    <script src="/src/client/app/common/directives/share-btn/share-modal/share-modal.directive.js"></script>
+    <script src="/src/client/app/common/directives/share-btn/share-modal/share-modal.repository.js"></script>
+    <script src="/src/client/app/common/directives/show-more-btn/show-more-btn.directive.js"></script>
+    <script src="/src/client/app/common/directives/show-more-text/show-more-text.directive.js"></script>
+    <script src="/src/client/app/common/directives/sort-link/sort-link.directive.js"></script>
+    <script src="/src/client/app/common/directives/tabs/tabs.directive.js"></script>
+    <script src="/src/client/app/common/directives/thumbnail-link/thumbnail-link.directive.js"></script>
+    <script src="/src/client/app/common/directives/time.directive.js"></script>
+    <script src="/src/client/app/common/directives/timepicker-mod/timepicker-mod.directive.js"></script>
+    <script src="/src/client/app/common/directives/uib-datepicker-popup/uib-datepicker-popup.directive.js"></script>
+    <script src="/src/client/app/common/directives/valid-if-changed/valid-if-changed.directive.js"></script>
+    <script src="/src/client/app/common/directives/wall/actions/actions.component.js"></script>
+    <script src="/src/client/app/common/directives/wall/comments/collapse-comments.filter.js"></script>
+    <script src="/src/client/app/common/directives/wall/comments/comment-create/comment-create.component.js"></script>
+    <script src="/src/client/app/common/directives/wall/comments/comment-show-hide/comment-show-hide.component.js"></script>
+    <script src="/src/client/app/common/directives/wall/comments/comment.component.js"></script>
+    <script src="/src/client/app/common/directives/wall/comments/comment.repository.js"></script>
+    <script src="/src/client/app/common/directives/wall/message-like/button/like-button.component.js"></script>
+    <script src="/src/client/app/common/directives/wall/message-like/list/like-list-popover/like-list-popover.directive.js"></script>
+    <script src="/src/client/app/common/directives/wall/message-like/list/like-list.directive.js"></script>
+    <script src="/src/client/app/common/directives/wall/message-like/message-like.component.js"></script>
+    <script src="/src/client/app/common/directives/wall/message-like/message-like.service.js"></script>
+    <script src="/src/client/app/common/directives/wall/message-show-more/message-show-more.directive.js"></script>
+    <script src="/src/client/app/common/directives/wall/posts/post-create/post-create.component.js"></script>
+    <script src="/src/client/app/common/directives/wall/posts/post.component.js"></script>
+    <script src="/src/client/app/common/directives/wall/posts/post.repository.js"></script>
+    <script src="/src/client/app/common/directives/wall/shared-event/shared-event.component.js"></script>
+    <script src="/src/client/app/common/directives/wall/shared-event/shared-event.repository.js"></script>
+    <script src="/src/client/app/common/directives/wall/soundcloud-player/soundcloud-player-link.directive.js"></script>
+    <script src="/src/client/app/common/directives/wall/soundcloud-player/soundcloud-player.directive.js"></script>
+    <script src="/src/client/app/common/directives/wall/user-profile/user-profile.component.js"></script>
+    <script src="/src/client/app/common/directives/wall/wall-socket/wall-hub-listener.js"></script>
+    <script src="/src/client/app/common/directives/wall/wall.component.js"></script>
+    <script src="/src/client/app/common/directives/wall/wall.service.js"></script>
+    <script src="/src/client/app/common/directives/wall/youtube-preview/youtube-preview-info/youtube-preview-info.directive.js"></script>
+    <script src="/src/client/app/common/directives/wall/youtube-preview/youtube-preview-link/youtube-preview-link.directive.js"></script>
+    <script src="/src/client/app/common/directives/wall/youtube-preview/youtube-preview.directive.js"></script>
+    <script src="/src/client/app/common/directives/wall/youtube-preview/youtube-preview.service.js"></script>
+    <script src="/src/client/app/common/filters/array-to-string.filter.js"></script>
+    <script src="/src/client/app/common/filters/boldify-suggestion.filter.js"></script>
+    <script src="/src/client/app/common/filters/comment-max-length.filter.js"></script>
+    <script src="/src/client/app/common/filters/convert-to-current-timezone.filter.js"></script>
+    <script src="/src/client/app/common/filters/format.filter.js"></script>
+    <script src="/src/client/app/common/filters/image-thumb.filter.js"></script>
+    <script src="/src/client/app/common/filters/limit-characters.filter.js"></script>
+    <script src="/src/client/app/common/filters/lowercase-first-letter.filter.js"></script>
+    <script src="/src/client/app/common/filters/newline-to-br.filter.js"></script>
+    <script src="/src/client/app/common/filters/normalize-url.filter.js"></script>
+    <script src="/src/client/app/common/filters/range.filter.js"></script>
+    <script src="/src/client/app/common/filters/time-span.filter.js"></script>
+    <script src="/src/client/app/common/filters/time.filter.js"></script>
+    <script src="/src/client/app/common/filters/trunc.filter.js"></script>
+    <script src="/src/client/app/common/helpers.js"></script>
+    <script src="/src/client/app/common/services/advanced-location.service.js"></script>
+    <script src="/src/client/app/common/services/chart.service.js"></script>
+    <script src="/src/client/app/common/services/data-handler.service.js"></script>
+    <script src="/src/client/app/common/services/data-helper.service.js"></script>
+    <script src="/src/client/app/common/services/error-handler.service.js"></script>
+    <script src="/src/client/app/common/services/file-upload.service.js"></script>
+    <script src="/src/client/app/common/services/generic.service.js"></script>
+    <script src="/src/client/app/common/services/locale.service.js"></script>
+    <script src="/src/client/app/common/services/missing-translation.service.js"></script>
+    <script src="/src/client/app/common/services/navigation.service.js"></script>
+    <script src="/src/client/app/common/services/notification.service.js"></script>
+    <script src="/src/client/app/common/services/notify.service.js"></script>
+    <script src="/src/client/app/common/services/picture.service.js"></script>
+    <script src="/src/client/app/common/services/qualification-level.service.js"></script>
+    <script src="/src/client/app/common/services/resource-cache.service.js"></script>
+    <script src="/src/client/app/common/services/smooth-scroll.service.js"></script>
+    <script src="/src/client/app/common/services/timepicker-convertions.service.js"></script>
+    <script src="/src/client/app/common/services/walkthrough.service.js"></script>
+    <script src="/src/client/app/customization/customization.controller.js"></script>
+    <script src="/src/client/app/customization/customization.service.js"></script>
+    <script src="/src/client/app/customization/event-types/create-edit/create-edit.controller.js"></script>
+    <script src="/src/client/app/customization/event-types/event-types.controller.js"></script>
+    <script src="/src/client/app/customization/event-types/event-types.repository.js"></script>
+    <script src="/src/client/app/customization/external-links/external-links.controller.js"></script>
+    <script src="/src/client/app/customization/external-links/external-links.repository.js"></script>
+    <script src="/src/client/app/customization/job-titles/create-edit/create-edit.controller.js"></script>
+    <script src="/src/client/app/customization/job-titles/job-titles.controller.js"></script>
+    <script src="/src/client/app/customization/job-titles/job-titles.repository.js"></script>
+    <script src="/src/client/app/customization/kudos-shop/create-edit/create-edit.controller.js"></script>
+    <script src="/src/client/app/customization/kudos-shop/kudos-shop.controller.js"></script>
+    <script src="/src/client/app/customization/kudos-shop/kudos-shop.repository.js"></script>
+    <script src="/src/client/app/customization/kudos-types/create-edit/create-edit.controller.js"></script>
+    <script src="/src/client/app/customization/kudos-types/kudos-types.repository.js"></script>
+    <script src="/src/client/app/customization/kudos-types/list/list.controller.js"></script>
+    <script src="/src/client/app/customization/organization-settings/organization-settings.controller.js"></script>
+    <script src="/src/client/app/customization/organization-settings/organization-settings.repository.js"></script>
+    <script src="/src/client/app/customization/service-request-types/create-edit/create-edit.controller.js"></script>
+    <script src="/src/client/app/customization/service-request-types/list/list.controller.js"></script>
+    <script src="/src/client/app/customization/service-request-types/service-request-types.repository.js"></script>
+    <script src="/src/client/app/employee-list/employee-list.controller.js"></script>
+    <script src="/src/client/app/employee-list/employee-list.repository.js"></script>
+    <script src="/src/client/app/events/content/content.controller.js"></script>
+    <script src="/src/client/app/events/content/description/description-actions/description-actions.component.js"></script>
+    <script src="/src/client/app/events/content/description/description.component.js"></script>
+    <script src="/src/client/app/events/content/participants/participant-list/participant-list.component.js"></script>
+    <script src="/src/client/app/events/content/participants/participant-list/participant/participant.component.js"></script>
+    <script src="/src/client/app/events/content/participants/participant-options/participant-options.component.js"></script>
+    <script src="/src/client/app/events/content/participants/participants-actions/participants-actions.component.js"></script>
+    <script src="/src/client/app/events/content/participants/participants.component.js"></script>
+    <script src="/src/client/app/events/content/participants/participants.service.js"></script>
+    <script src="/src/client/app/events/create-edit/create-edit.controller.js"></script>
+    <script src="/src/client/app/events/events.controller.js"></script>
+    <script src="/src/client/app/events/events.repository.js"></script>
+    <script src="/src/client/app/events/join/join-options/join-options.controller.js"></script>
+    <script src="/src/client/app/events/join/join.component.js"></script>
+    <script src="/src/client/app/events/list/by-type/by-type.controller.js"></script>
+    <script src="/src/client/app/events/list/list-tabs/list-tabs.component.js"></script>
+    <script src="/src/client/app/events/list/list.controller.js"></script>
+    <script src="/src/client/app/events/status/status.component.js"></script>
+    <script src="/src/client/app/events/status/status.service.js"></script>
+    <script src="/src/client/app/hashtags/hashtag.service.js"></script>
+    <script src="/src/client/app/hashtags/hashtagify.directive.js"></script>
+    <script src="/src/client/app/impersonate/impersonate.controller.js"></script>
+    <script src="/src/client/app/kudos/achievement-board-widget/achievement-board-widget.component.js"></script>
+    <script src="/src/client/app/kudos/achievement-board/achievement-board.controller.js"></script>
+    <script src="/src/client/app/kudos/approved-list-widget/approved-list-widget.component.js"></script>
+    <script src="/src/client/app/kudos/chart/chart.component.js"></script>
+    <script src="/src/client/app/kudos/committee-widget/committee-widget.component.js"></script>
+    <script src="/src/client/app/kudos/how-to-send-widget/how-to-send-widget.component.js"></script>
+    <script src="/src/client/app/kudos/kudos.controller.js"></script>
+    <script src="/src/client/app/kudos/kudos.repository.js"></script>
+    <script src="/src/client/app/kudos/kudosify-modal/kudosify-modal.directive.js"></script>
+    <script src="/src/client/app/kudos/kudosify-modal/kudosify-modal.repository.js"></script>
+    <script src="/src/client/app/kudos/log-list/list.controller.js"></script>
+    <script src="/src/client/app/kudos/rejection-modal/rejection-modal.directive.js"></script>
+    <script src="/src/client/app/kudos/user-information/user-information.controller.js"></script>
+    <script src="/src/client/app/kudos/user-search-widget/user-search-widget.component.js"></script>
+    <script src="/src/client/app/kudos/user-widget/user-widget.component.js"></script>
+    <script src="/src/client/app/kudos/wall-widget/buy-shop-item.directive.js"></script>
+    <script src="/src/client/app/kudos/wall-widget/wall-widget.directive.js"></script>
+    <script src="/src/client/app/layout/layout.controller.js"></script>
+    <script src="/src/client/app/layout/left-menu/left-menu.controller.js"></script>
+    <script src="/src/client/app/layout/left-menu/left-menu.service.js"></script>
+    <script src="/src/client/app/layout/navigation-bar/navigation-bar.controller.js"></script>
+    <script src="/src/client/app/layout/navigation-bar/notifications/notifications.repository.js"></script>
+    <script src="/src/client/app/layout/navigation-bar/notifications/popup/dismiss-all-btn/dismiss-all-btn.component.js"></script>
+    <script src="/src/client/app/layout/navigation-bar/notifications/popup/notification/notification.component.js"></script>
+    <script src="/src/client/app/layout/navigation-bar/notifications/popup/popup.component.js"></script>
+    <script src="/src/client/app/office/floor/floor-manage.controller.js"></script>
+    <script src="/src/client/app/office/floor/floor.controller.js"></script>
+    <script src="/src/client/app/office/floor/floor.repository.js"></script>
+    <script src="/src/client/app/office/floor/room/room-list.controller.js"></script>
+    <script src="/src/client/app/office/floor/room/room-manage.controller.js"></script>
+    <script src="/src/client/app/office/floor/room/room-manage.service.js"></script>
+    <script src="/src/client/app/office/floor/room/room.repository.js"></script>
+    <script src="/src/client/app/office/map/map-options.controller.js"></script>
+    <script src="/src/client/app/office/map/map-options.directive.js"></script>
+    <script src="/src/client/app/office/map/map.controller.js"></script>
+    <script src="/src/client/app/office/map/map.directive.js"></script>
+    <script src="/src/client/app/office/map/map.repository.js"></script>
+    <script src="/src/client/app/office/map/pin.service.js"></script>
+    <script src="/src/client/app/office/map/user-bar/user-bar-infinite-scroll.directive.js"></script>
+    <script src="/src/client/app/office/map/user-bar/user-bar.controller.js"></script>
+    <script src="/src/client/app/office/map/user-bar/user-bar.directive.js"></script>
+    <script src="/src/client/app/office/map/zoom.service.js"></script>
+    <script src="/src/client/app/office/office-list.controller.js"></script>
+    <script src="/src/client/app/office/office-manage.controller.js"></script>
+    <script src="/src/client/app/office/office.controller.js"></script>
+    <script src="/src/client/app/office/office.repository.js"></script>
+    <script src="/src/client/app/organizational-structure/organizational-structure.controller.js"></script>
+    <script src="/src/client/app/organizational-structure/organizational-structure.repository.js"></script>
+    <script src="/src/client/app/organizational-structure/orphans/orphans.directive.js"></script>
+    <script src="/src/client/app/organizational-structure/tree/tree.directive.js"></script>
+    <script src="/src/client/app/picture/background-thumb.filter.js"></script>
+    <script src="/src/client/app/picture/mini-thumb.filter.js"></script>
+    <script src="/src/client/app/picture/picture-modal/picture-modal.controller.js"></script>
+    <script src="/src/client/app/picture/picture.filter.js"></script>
+    <script src="/src/client/app/picture/thumb.filter.js"></script>
+    <script src="/src/client/app/picture/user-background-thumb.filter.js"></script>
+    <script src="/src/client/app/picture/user-picture.filter.js"></script>
+    <script src="/src/client/app/picture/user-thumb.filter.js"></script>
+    <script src="/src/client/app/picture/wall-image-thumb.filter.js"></script>
+    <script src="/src/client/app/profile/filters/profile-filter.js"></script>
+    <script src="/src/client/app/profile/profile-details/profile-details.controller.js"></script>
+    <script src="/src/client/app/profile/profile-edit/job-info/exams-modal/delete-exam.controller.js"></script>
+    <script src="/src/client/app/profile/profile-edit/job-info/exams-modal/exams-modal.controller.js"></script>
+    <script src="/src/client/app/profile/profile-edit/job-info/job-info.directive.js"></script>
+    <script src="/src/client/app/profile/profile-edit/profile-edit.controller.js"></script>
+    <script src="/src/client/app/profile/profile-edit/profile-info/user-profile-info.directive.js"></script>
+    <script src="/src/client/app/profile/profile-edit/profile-office/user-profile-office.directive.js"></script>
+    <script src="/src/client/app/profile/profile-helper.js"></script>
+    <script src="/src/client/app/profile/profile.repository.js"></script>
+    <script src="/src/client/app/project/content/content.controller.js"></script>
+    <script src="/src/client/app/project/content/description/description-actions/description-actions.component.js"></script>
+    <script src="/src/client/app/project/content/description/description.component.js"></script>
+    <script src="/src/client/app/project/content/participants/participant-list/participant-list.component.js"></script>
+    <script src="/src/client/app/project/content/participants/participant-list/participant/participant.component.js"></script>
+    <script src="/src/client/app/project/content/participants/participants.component.js"></script>
+    <script src="/src/client/app/project/create/create-edit.controller.js"></script>
+    <script src="/src/client/app/project/list/list.controller.js"></script>
+    <script src="/src/client/app/project/project.repository.js"></script>
+    <script src="/src/client/app/role/role-list.controller.js"></script>
+    <script src="/src/client/app/role/role-manage.controller.js"></script>
+    <script src="/src/client/app/role/role.repository.js"></script>
+    <script src="/src/client/app/room-type/room-type-manage.controller.js"></script>
+    <script src="/src/client/app/room-type/room-type.controller.js"></script>
+    <script src="/src/client/app/room-type/room-type.repository.js"></script>
+    <script src="/src/client/app/service-request/minus-kudos-modal.controller.js"></script>
+    <script src="/src/client/app/service-request/service-request-comments.directive.js"></script>
+    <script src="/src/client/app/service-request/service-request-description-modal.controller.js"></script>
+    <script src="/src/client/app/service-request/service-request-filters.directive.js"></script>
+    <script src="/src/client/app/service-request/service-request-new-modal.controller.js"></script>
+    <script src="/src/client/app/service-request/service-request-table.directive.js"></script>
+    <script src="/src/client/app/service-request/service-request.controller.js"></script>
+    <script src="/src/client/app/service-request/service-request.repository.js"></script>
+    <script src="/src/client/app/settings/general/general.controller.js"></script>
+    <script src="/src/client/app/settings/notifications/notifications.controller.js"></script>
+    <script src="/src/client/app/settings/providers/providers.controller.js"></script>
+    <script src="/src/client/app/settings/settings.controller.js"></script>
+    <script src="/src/client/app/settings/settings.repository.js"></script>
+    <script src="/src/client/app/skill/skill.repository.js"></script>
+    <script src="/src/client/app/support/submit-ticket/submit-ticket.controller.js"></script>
+    <script src="/src/client/app/support/support.repository.js"></script>
+    <script src="/src/client/app/users/users.controller.js"></script>
+    <script src="/src/client/app/users/users.repository.js"></script>
+    <script src="/src/client/app/vacations/vacations.controller.js"></script>
+    <script src="/src/client/app/vacations/vacations.repository.js"></script>
+    <script src="/src/client/app/wall/discover-walls/create-edit/create-edit.controller.js"></script>
+    <script src="/src/client/app/wall/discover-walls/list/list.controller.js"></script>
+    <script src="/src/client/app/wall/discover-walls/menu-button/menu-button.component.js"></script>
+    <script src="/src/client/app/wall/item/feed/feed.controller.js"></script>
+    <script src="/src/client/app/wall/item/header/actions/actions.component.js"></script>
+    <script src="/src/client/app/wall/item/header/header.component.js"></script>
+    <script src="/src/client/app/wall/item/item.controller.js"></script>
+    <script src="/src/client/app/wall/item/members/members.controller.js"></script>
+    <script src="/src/client/app/wall/menu-navigation/menu-navigation.component.js"></script>
+    <script src="/src/client/app/wall/menu-navigation/menu-navigation.repository.js"></script>
+    <script src="/src/client/app/wall/wall.controller.js"></script>
+    <script src="/src/client/app/wall/wall.repository.js"></script>
+    <script src="/src/client/app/widget/kudos-basket/kudos-basket.controller.js"></script>
+    <script src="/src/client/app/widget/kudos-basket/kudos-basket.repository.js"></script>
+    <script src="/src/client/app/widget/kudos-basket/modal/modal.directive.js"></script>
+    <script src="/src/client/app/widget/kudos-basket/widget/widget.directive.js"></script>
+    <!-- endinject -->
+    <!-- inject:templates:js -->
+    <!-- endinject -->
+    <!-- endbuild -->
+
+    <!-- build:js js/botlibs.js -->
+    <script src="/src/client/Libs/bootstrap/bootstrap.js"></script>
+    <script src="/src/client/Libs/jasny-bootstrap.js"></script>
+    <script src="/src/client/Libs/jquery/jquery-ui/jquery-ui-1.10.4.js"></script>
+    <script src="/src/client/Libs/ng-tags-input.js"></script>
+    <script src="/src/client/Libs/ngTagsInput-restrictToMaxTags.js"></script>
+    <script src="/src/client/Libs/bootstrap-datetimePicker.js"></script>
+    <script src="/src/client/Libs/bootstrap-tabdrop.js"></script>
+    <script src="/src/client/Libs/hideVertMenu.js"></script>
+    <script src="/src/client/Libs/visma-additional.js"></script>
+    <script src="/src/client/Libs/shrooms-additional.js"></script>
+    <script src="/src/client/Libs/loading-bar.min.js"></script>
+    <!--endbuild -->
+
+</body>
+</html>

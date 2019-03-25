@@ -1,0 +1,9 @@
+<!-- wall -->
+<div class="wall-module-container">
+	<wave-spinner ng-if="!vm.wallServiceData.isWallLoading && (!!vm.getCurrentWallId() && vm.wallServiceData.isWallHeaderLoading)"></wave-spinner>
+	<ace-wall-header header="vm.wallServiceData.wallHeader"
+	                 ng-if="!!vm.getCurrentWallId() && !vm.stateParams.post && !!vm.wallServiceData.wallHeader && !vm.wallServiceData.isWallHeaderLoading">
+	</ace-wall-header>
+
+	<ui-view></ui-view>	
+</div>

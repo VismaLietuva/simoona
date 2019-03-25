@@ -1,0 +1,62 @@
+<div class="event-options">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="vm.closeModal()">&times;</button>
+        <h3 ng-if="!!vm.options.length" class="modal-title" translate="events.messageConfirmOptions"></h3>
+        <h3 ng-if="!vm.options.length && !vm.isAddColleague" class="modal-title" translate="events.joinTitle"></h3>
+        <h3 ng-if="!vm.options.length && vm.isAddColleague" class="modal-title" translate="events.eventAddColleaguesTitle"></h3>
+    </div>
+    <div class="modal-body">
+        <p ng-if="!!vm.options.length" ng-cloak data-test-id="maximum-options">
+            {{:: vm.messageMaximumOptions}}
+        </p>
+
+        <p ng-if="!!vm.options.length" class="row-margin text-error">
+            <span ng-show="vm.isTooManyOptionsSelected()" translate="errorCodeMessages.messageTooManyOptionsProvided" data-test-id="too-many-options-selected">
+            </span>
+        </p>
+
+        <div class="row row-options">
+            <div ng-repeat="option in vm.options" class="col-xs-6 {{vm.inputType}}">
+                <label for="selectedOption{{option.id}}"
+                       uib-tooltip="{{option.option}}"
+                       tooltip-placement="bottom"
+                       tooltip-append-to-body="true"
+                       data-test-id="option-to-select">
+                    <input id="selectedOption{{option.id}}" type="{{vm.inputType}}" name="option" ng-click="vm.selectOption(option.id)" data-test-id="option-check-box"> {{option.option}}
+                </label>
+            </div>
+        </div>
+
+        <tags-input ng-if="vm.isAddColleague"
+                    id="participants"
+                    name="participants"
+                    ng-model="vm.participants"
+                    add-from-autocomplete-only="true"
+                    display-property="fullName"
+                    ng-attr-placeholder="{{'events.addFriends' | translate}}"
+                    add-on-enter="true"
+                    add-on-space="true"
+                    add-on-comma="true"
+                    add-on-blur="true"
+                    wrapped translate-cloak>
+            <auto-complete source="vm.getUserForAutoComplete($query)" min-length="0" max-results-to-show="5"></auto-complete>
+        </tags-input>
+
+        <div class="clearfix"></div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary"
+                ng-click="vm.joinEvent()"
+                ng-disabled="vm.isOptionsJoinAvailable() || vm.isActionDisabled"
+                data-test-id="join-event-modal-button">
+                <span ng-if="!vm.isAddColleague" translate="events.eventJoin"></span>
+                <span ng-if="vm.isAddColleague" translate="events.eventAdd"></span>
+        </button>
+
+        <button class="btn btn-default"
+                ng-click="vm.closeModal()"
+                data-test-id="close-event-modal-button">
+                <span translate="common.cancel"></span>
+        </button>
+    </div>
+</div>

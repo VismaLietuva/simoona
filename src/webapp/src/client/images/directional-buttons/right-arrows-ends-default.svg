@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 19.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="292px"
+	 height="175px" viewBox="0 0 292 175" enable-background="new 0 0 292 175" xml:space="preserve">
+<g id="Left_Arrows_Ends_-_Pressed__x28_Green_x29_">
+</g>
+<g id="Left_Arrows_Ends_-_Focused__x28_Green_x29_">
+</g>
+<g id="Left_Arrows_Ends_-_Hover__x28_Green_x29_">
+</g>
+<g id="Left_Arrows_Ends_-_Disabled__x28_Green_x29_">
+</g>
+<g id="Left_Arrows_Ends_-_Normal__x28_Green_x29_">
+</g>
+<g id="Left_Arrows_Tips_-_Pressed__x28_Green_x29_">
+</g>
+<g id="Left_Arrows_Tips_-_Focused__x28_Green_x29_">
+</g>
+<g id="Left_Arrows_Tips_-_Hover__x28_Green_x29_">
+</g>
+<g id="Left_Arrows_Tips_-_Disabled__x28_Green_x29_">
+</g>
+<g id="Left_Arrows_Tips_-_Normal__x28_Green_x29_">
+</g>
+<g id="Left_Arrows_Ends_-_Pressed__x28_Silver_x29_">
+	
+		<linearGradient id="Body_38_" gradientUnits="userSpaceOnUse" x1="139" y1="173.9996" x2="139" y2="144" gradientTransform="matrix(-1 0 0 1 286 0)">
+		<stop  offset="0" style="stop-color:#E5E5E5"/>
+		<stop  offset="1" style="stop-color:#E0E0E0"/>
+	</linearGradient>
+	<path id="Body_19_" fill-rule="evenodd" clip-rule="evenodd" fill="url(#Body_38_)" d="M2,148v22c0,2,2,4,4,4h286v-30H6
+		C4,144,2,146,2,148z"/>
+	<path id="Stroke_19_" fill-rule="evenodd" clip-rule="evenodd" fill="#C9C9C9" d="M6,144h286v1H7c-2.5,0-4,1.5-4,4v20
+		c0,2.6,1.5,4,4,4h285v1H6c-2,0-4-2-4-4v-22C2,146,4,144,6,144z"/>
+	<path fill-rule="evenodd" clip-rule="evenodd" fill-opacity="0.15" d="M292,145c0,0-288.2,0-288.5,0c0.4-0.4,1.5-1,2.4-1
+		c0.3,0,286.1,0,286.1,0V145z"/>
+	<path fill-rule="evenodd" clip-rule="evenodd" fill-opacity="0.1" d="M292,146c0,0-289.1,0-289.3,0c0.2-0.3,0.6-0.8,0.9-1
+		c0.2,0,288.5,0,288.5,0V146z"/>
+	<path fill-rule="evenodd" clip-rule="evenodd" fill-opacity="5.000000e-002" d="M292,147c0,0-289.2,0-289.8,0
+		c0.1-0.3,0.3-0.8,0.5-1c0.4,0,289.4,0,289.4,0V147z"/>
+</g>
+<g id="Left_Arrows_Ends_-_Focused__x28_Silver_x29_">
+	
+		<linearGradient id="Shadow_38_" gradientUnits="userSpaceOnUse" x1="157" y1="139.9996" x2="157" y2="108" gradientTransform="matrix(-1 0 0 1 304 0)">
+		<stop  offset="0.25" style="stop-color:#F0F0F0"/>
+		<stop  offset="0.9" style="stop-color:#FFFFFF"/>
+	</linearGradient>
+	<path id="Shadow_18_" fill-rule="evenodd" clip-rule="evenodd" fill="url(#Shadow_38_)" d="M2,112v24c0,2,2,4,4,4h286v-32H6
+		C4,108,2,110,2,112z"/>
+	
+		<linearGradient id="Body_39_" gradientUnits="userSpaceOnUse" x1="157" y1="138.9996" x2="157" y2="107" gradientTransform="matrix(-1 0 0 1 304 0)">
+		<stop  offset="0.25" style="stop-color:#F0F0F0"/>
+		<stop  offset="0.9" style="stop-color:#FFFFFF"/>
+	</linearGradient>
+	<path id="Body_18_" fill-rule="evenodd" clip-rule="evenodd" fill="url(#Body_39_)" d="M2,111v24c0,2,2,4,4,4h286v-32H6
+		C4,107,2,109,2,111z"/>
+	<path id="Stroke_18_" fill-rule="evenodd" clip-rule="evenodd" fill="#0089D9" d="M6,107h286v2H8c-2.5,0-4,1.5-4,4v20
+		c0,2.6,1.5,4,4,4h284v2H6c-2,0-4-2-4-4v-24C2,109,4,107,6,107z"/>
+</g>
+<g id="Left_Arrows_Ends_-_Hover__x28_Silver_x29_">
+	<path id="Shadow_17_" fill-rule="evenodd" clip-rule="evenodd" fill-opacity="8.000000e-002" d="M2,77v22c0,2,2,4,4,4h286V73H6
+		C4,73,2,75,2,77z"/>
+	
+		<linearGradient id="Body_40_" gradientUnits="userSpaceOnUse" x1="151" y1="101.9996" x2="151" y2="72" gradientTransform="matrix(-1 0 0 1 298 0)">
+		<stop  offset="0.25" style="stop-color:#DAE7EF"/>
+		<stop  offset="0.9" style="stop-color:#E8F6FF"/>
+	</linearGradient>
+	<path id="Body_17_" fill-rule="evenodd" clip-rule="evenodd" fill="url(#Body_40_)" d="M2,76v22c0,2,2,4,4,4h286V72H6
+		C4,72,2,74,2,76z"/>
+	<path id="Stroke_17_" fill-rule="evenodd" clip-rule="evenodd" fill="#BECAD1" d="M6,72h286v1H7c-2.5,0-4,1.5-4,4v20
+		c0,2.6,1.5,4,4,4h285v1H6c-2,0-4-2-4-4V76C2,74,4,72,6,72z"/>
+	<path id="Inner_7_" fill-rule="evenodd" clip-rule="evenodd" fill="#969FA4" d="M2.5,76L2,98c0,2,2,4,4,4h286v-1H7
+		c-2.5,0-4-1.4-4-4L2.5,76z"/>
+</g>
+<g id="Left_Arrows_Ends_-_Disabled__x28_Silver_x29_">
+	<path id="Body_16_" fill-rule="evenodd" clip-rule="evenodd" fill="#F5F5F5" d="M2,40v22c0,2,2,4,4,4h286V36H6C4,36,2,38,2,40z"/>
+	<path id="Stroke_16_" fill-rule="evenodd" clip-rule="evenodd" fill="#D7D7D7" d="M6,36h286v1H7c-2.5,0-4,1.5-4,4v20
+		c0,2.6,1.5,4,4,4h285v1H6c-2,0-4-2-4-4V40C2,38,4,36,6,36z"/>
+</g>
+<g id="Left_Arrows_Ends_-_Normal__x28_Silver_x29_">
+	
+		<linearGradient id="Shadow_39_" gradientUnits="userSpaceOnUse" x1="143" y1="30.9996" x2="143" y2="1" gradientTransform="matrix(-1 0 0 1 290 0)">
+		<stop  offset="0.25" style="stop-color:#F0F0F0"/>
+		<stop  offset="0.9" style="stop-color:#FFFFFF"/>
+	</linearGradient>
+	<path id="Shadow_15_" fill-rule="evenodd" clip-rule="evenodd" fill="url(#Shadow_39_)" d="M2,5v22c0,2,2,4,4,4h286V1H6
+		C4,1,2,3,2,5z"/>
+	
+		<linearGradient id="Body_41_" gradientUnits="userSpaceOnUse" x1="143" y1="29.9996" x2="143" y2="3.818323e-007" gradientTransform="matrix(-1 0 0 1 290 0)">
+		<stop  offset="0.25" style="stop-color:#F0F0F0"/>
+		<stop  offset="0.9" style="stop-color:#FFFFFF"/>
+	</linearGradient>
+	<path id="Body_15_" fill-rule="evenodd" clip-rule="evenodd" fill="url(#Body_41_)" d="M2,4v22c0,2,2,4,4,4h286V0L6,0C4,0,2,2,2,4z
+		"/>
+	<path id="Stroke_15_" fill-rule="evenodd" clip-rule="evenodd" fill="#D1D1D1" d="M6,0h286v1H7C4.5,1,3,2.5,3,5v20c0,2.6,1.5,4,4,4
+		h285v1H6c-2,0-4-2-4-4V4C2,2,4,0,6,0z"/>
+	<path id="Inner_6_" fill-rule="evenodd" clip-rule="evenodd" fill="#A5A5A5" d="M2.5,4L2,26c0,2,2,4,4,4h286v-1H7c-2.5,0-4-1.4-4-4
+		L2.5,4z"/>
+</g>
+<g id="Left_Arrows_Tips_-_Pressed__x28_Silver_x29_">
+</g>
+<g id="Left_Arrows_Tips_-_Focused__x28_Silver_x29_">
+</g>
+<g id="Left_Arrows_Tips_-_Hover__x28_Silver_x29_">
+</g>
+<g id="Left_Arrows_Tips_-_Disabled__x28_Silver_x29_">
+</g>
+<g id="Left_Arrows_Tips_-_Normal__x28_Silver_x29_">
+</g>
+<g id="Guides">
+</g>
+</svg>

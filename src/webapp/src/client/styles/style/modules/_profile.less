@@ -1,0 +1,234 @@
+.wall-description {
+    margin-top: 3px;
+    text-align: justify;
+    min-height: 60px;
+}
+
+.nc-form-horizontal .nc-form-group label {
+    color: #282828;
+    line-height: 145%;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    margin: 5px 0;
+}
+
+.total-user-badge {
+    padding: 2px 5px;
+    margin-top: -1px;
+    margin-left: 5px;
+    font-weight: 400;
+    vertical-align: middle;
+    background-color: #0974b3;
+}
+
+.tab-content p {
+    color: rgb(40, 40, 40);
+}
+
+.wall-user-list-container {
+    min-height: 230px;
+}
+
+.wall-user-list {
+    list-style: none;
+    height: 230px;
+    padding-left: 15px;
+    overflow-Y: auto;
+    margin: 0;
+}
+
+.wall-user {
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    cursor: default;
+    padding-left: 0;
+    margin: 1px 0;
+}
+
+.current-user {
+    font-weight: bold;
+}
+
+.wall-user:hover {
+    background-color: #ccebff;
+}
+
+.wall-user-image {
+    display: inline-block;
+}
+
+.wall-user-name {
+    padding-left: 10px;
+    position: relative;
+    top: 1px;
+}
+
+.multiwall-description-heading {
+    font-size: 16px;
+}
+
+.multiwall-description-text {
+    // height: 140px;
+}
+
+.members-heading {
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+.wall-select-button.selected{
+    pointer-events: none;
+}
+
+.profile-details-list{
+    margin-bottom: 0;
+    margin-left: 20px;
+}
+
+.profile-show-more {
+    margin-left: 15px;
+    @media(max-width: 1000px) {
+        margin-left: 0;
+    }
+}
+
+input.btn.btn-primary.add-new-btn{
+    margin-bottom: 6px;
+}
+
+@media (min-width:1600px) {
+    .multiwall-description-text {
+        height: 100px;
+    }
+}
+
+@media (max-width:1599px) {
+    .multiwall-description-text {
+        height: 120px;
+    }
+}
+
+@media (max-width:1200px) {
+    .multiwall-description-text {
+        height: 140px;
+    }
+}
+
+@media (max-width:1100px) {
+    .multiwall-description-text {
+        height: 160px;
+    }
+}
+
+.profile-details-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    > div:not(.profile-picture-container) {
+        @media(max-width: 1000px) {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        > div:not(.panel-form-image) {
+
+            @media(max-width: 1000px) {
+                flex: 0 1 100%;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                 > div {
+                    word-break: break-all;
+                }
+            }
+            .btn {
+                height: 24px;
+                max-width: 150px;
+                display: flex;
+            }           
+        }
+    }
+    label {
+        float: right;
+        text-align: right;
+        word-break: break-word;
+    }
+    @media(max-width: 1000px) {
+        label {
+            float: left;
+            text-align: left;
+            font-weight: 600;
+        }
+        .panel-form-body {
+            padding-left: 0;
+            margin-bottom: 5px;
+        }
+    }
+}
+
+.profile-kudos-button {
+    flex: 0 1 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+}
+
+.profile-timepicker-wrapper {
+    display: inline-block;
+
+    label {
+        padding-right: 5px;
+    }
+    .profile-timepicker-wrapper-from, .profile-timepicker-wrapper-to {
+        padding-bottom: 5px;
+        display: flex;
+        flex: 0 1 100%;
+    }
+
+    .profile-timepicker-wrapper-to label {
+            padding-left: 15px;
+            padding-right: 16px;
+    }
+}
+
+@media(min-width: 1024px) {
+    .profile-timepicker-wrapper {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .profile-timepicker-wrapper-to label {
+            padding-right: 5px;
+    }
+}
+
+
+.form-horizontal {
+    .control-label, label {
+        padding-right: 10px;
+    }
+    &.profile-form {
+        .form-group { 
+            margin-left: 0;
+        }
+    }
+}
+
+.profile-edit-button {
+    flex: 0 1 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.profile-image-thumb {
+    max-width: 40px;
+}
+
+.profile-image {
+    max-width: 200px;
+}

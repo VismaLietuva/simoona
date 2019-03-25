@@ -1,0 +1,34 @@
+<div class="user-info-modal">
+    <wave-spinner ng-if="vm.isLoading"></wave-spinner>
+    <div ng-if="!vm.isLoading" class="user-info-modal-header">
+        <h3 ng-cloak>
+            <span class="glyphicon glyphicon-user"></span> {{vm.user.firstName}} {{vm.user.lastName}}
+        </h3>
+    </div>
+    <div ng-if="!vm.isLoading" class="user-info-modal-body">
+        <img ng-if="vm.user.pictureId" class="kudos-info-user-photo loading-image" ng-src="{{vm.user.pictureId | userThumb}}" />
+        <div class="kudos-points" ng-cloak>
+            <p>
+                <span translate="kudos.totalKudos"></span>: <span class="kudos-bold" data-test-id="kudos-user-widget-total-kudos">{{vm.user.totalKudos}}</span>
+            </p>
+            <p>
+                <span translate="kudos.spentKudos"></span>: <span class="kudos-bold" data-test-id="kudos-user-widget-spent-kudos">{{vm.user.spentKudos}}</span>
+            </p>
+            <p class="kudos-remaining-points kudos-bold">
+                <span translate="kudos.remainingKudos"></span>: <span data-test-id="kudos-user-widget-remaining-kudos">{{vm.user.remainingKudos}}</span>
+            </p>
+            <p>
+                <span translate="kudos.sentKudos"></span>: <span class="kudos-bold" data-test-id="kudos-user-widget-sent-kudos">{{vm.user.sentKudos}}</span>
+            </p>
+            <p>
+                <span translate="kudos.availableKudos"></span>: <span class="kudos-bold" data-test-id="kudos-user-widget-available-kudos">{{vm.user.availableKudos}}</span>
+            </p>
+        </div>
+        <a ace-kudosify-modal="vm.kudosifyUser"
+           ga-track-event="['Kudos', 'Kudos page plus kudos', 'opened']"
+           class="btn btn-lg btn-success give-kudos-button" 
+           data-test-id="kudos-user-widget-kudosify-button">
+            <span class="glyphicon glyphicon-plus"></span> <span translate="kudos.giveKudosButton"></span>
+        </a>
+    </div>
+</div>

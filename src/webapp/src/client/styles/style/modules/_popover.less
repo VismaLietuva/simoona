@@ -1,0 +1,127 @@
+@import "../../nc3/_mixins.less";
+@import "../../nc3/_variables.less";
+
+.popover .room-submit {
+    width: 100%;
+}
+
+.popover .room-submit:not(:last-child) {
+    margin-bottom: 5px;
+}
+
+.popover .room-details-heading {
+    margin-top: 0;
+}
+
+.popover form {
+    margin-bottom: 0;
+}
+
+.popover .form-group {
+    margin-bottom: 10px;
+}
+
+.popover .popover-content > .close {
+    font-size: inherit;
+    margin-right: -12px;
+    margin-top: -8px;
+}
+
+.popover .header {
+    padding: 4px 2px;
+    margin-bottom: 4px;
+}
+
+.popover .list-group {
+    margin-bottom: 5px;
+}
+
+.popover .empty {
+    font-weight: bold;
+}
+
+.popover button.close {
+    margin-top: -4px;
+}
+
+.popover .preview img {
+    height: 30px;
+    margin-right: 5px;
+}
+
+.popover .preview.extended img {
+    display: block;
+    height: 50px;
+    margin: 0 auto;
+}
+
+.popover .preview.extended {
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.popover .info p {
+    margin-bottom: 5px;
+}
+
+.walkthrough-popover.popover {
+    border-color: @green-bg-illustrations;
+    
+    .popover-title {
+        border-bottom: none;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: #68A611;
+        padding-top: 20px;
+        padding-bottom: 0;
+        font-size: 1.4rem;
+    }
+    .popover-navigation {
+        background: #68A611;
+        background: linear-gradient(to bottom, #68A611 70%, #548f00 100%);
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#68A611', endColorstr='#548f00', GradientType=0);
+        padding: 5px;
+    }
+    
+    button.close {
+        margin-top: 2px;
+        margin-right: 6px;
+    }
+    
+    .btn {
+        color: #fff;
+        background-color: inherit;
+        margin-bottom: 0;
+        
+        &:disabled {
+            &:hover {
+                box-shadow: none;
+            }  
+        }
+        
+        &:hover {
+            box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.125);
+        }
+        
+        &:focus {
+            outline: none;
+        }
+    }
+
+}
+
+.walkthrough-popover.right > .arrow {
+    border-right-color: @green-bg-illustrations;
+}
+
+.walkthrough-popover.left > .arrow {
+    border-left-color: @green-bg-illustrations;
+}
+
+.walkthrough-popover.top > .arrow {
+    border-top-color: @green-bg-illustrations;
+}
+
+.walkthrough-popover.bottom > .arrow {
+    border-bottom-color: @green-bg-illustrations;
+}

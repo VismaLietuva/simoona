@@ -1,0 +1,78 @@
+﻿<div class="row">
+    <div class="col-xs-12">
+    <h3>
+        <a ui-sref="Root.WithOrg.Admin.Offices.List">{{"office.entityNamePlural" | translate}}</a>
+        <span ng-if="titleCreate">&rarr; {{"office.editOffice" | translate}}: {{ office.name }}</span>
+        <span ng-if="titleEdit">&rarr; {{"office.createOffice" | translate}}</span>
+    </h3>
+    <form name="officeForm" class="form-horizontal" role="form">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <span class="glyphicon glyphicon-home"></span> {{"office.officeData" | translate}}
+            </div>
+            <div class="panel-body">
+                <div class="form-group" ng-class="{'has-error has-feedback': officeForm.officeName.$invalid && officeForm.officeName.$dirty}">
+                    <label for="officeName" class="control-label col-xs-2 bold">
+                        {{"office.name" | translate}}
+                        <span class="text-danger">*</span>
+                    </label>
+                    <div class="col-xs-9">
+                        <input class="form-control" name="officeName" ng-model="office.name" id="officeName" required="true">
+                        <span class="glyphicon glyphicon-exclamation-sign form-control-feedback" ng-show="officeForm.officeName.$invalid && officeForm.officeName.$dirty"></span>
+                        <div class="text-danger help-block" ng-show="officeForm.officeName.$error.required && officeForm.officeName.$dirty">{{"common.messageFieldIsRequired" | translate}}</div>
+                    </div>
+                </div>
+                <div class="form-group" ng-class="{'has-error has-feedback': officeForm.officeCountry.$invalid && officeForm.officeCountry.$dirty}">
+                    <label for="officeCountry" class="control-label col-xs-2 bold">
+                        {{"office.country" | translate}}
+                        <span class="text-danger">*</span>
+                    </label>
+                    <div class="col-xs-9">
+                        <input class="form-control" name="officeCountry" ng-model="office.address.country" id="officeCountry" required="true">
+                        <span class="glyphicon glyphicon-exclamation-sign form-control-feedback" ng-show="officeForm.officeCountry.$invalid && officeForm.officeCountry.$dirty"></span>
+                        <div class="text-danger help-block" ng-show="officeForm.officeCountry.$error.required && officeForm.officeCountry.$dirty">{{"common.messageFieldIsRequired" | translate}}</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="officeCity" class="control-label col-xs-2 bold">
+                        {{"office.city" | translate}}
+                    </label>
+                    <div class="col-xs-9">
+                        <input class="form-control" name="officeCity" ng-model="office.address.city" id="officeCity">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="officeStreet" class="control-label col-xs-2 bold">
+                        {{"office.street" | translate}}
+                    </label>
+                    <div class="col-xs-9">
+                        <input class="form-control" name="officeStreet" ng-model="office.address.street" id="officeStreet">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="officeBuilding" class="control-label col-xs-2 bold">
+                        {{"office.building" | translate}}
+                    </label>
+                    <div class="col-xs-9">
+                        <input class="form-control" name="officeBuilding" ng-model="office.address.building" id="officeBuilding">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="isDefault" class="control-label col-xs-2 bold">
+                        {{"office.isDefault" | translate}}
+                    </label>
+                    <div class="col-xs-9">
+                        <input style="margin-top: 8px;" name="isDefault" ng-model="office.isDefault" id="isDefault" type="checkbox">
+                    </div>
+                </div>
+                <div class="form-group" ng-show="errors.length > 0">
+                    <div class="col-sm-offset-2 col-xs-10">
+                        <p class="text-danger" ng-repeat="error in errors">{{error}}</p>
+                    </div>
+                </div>
+                <save-back-info-error class="top-space" save-disabled="officeForm.$invalid" on-back="goBack" on-save="onSave" errors="errors" infos="infos" show-required="true"></save-back-info-error>
+            </div>
+        </div>
+    </form>
+    </div>
+</div>

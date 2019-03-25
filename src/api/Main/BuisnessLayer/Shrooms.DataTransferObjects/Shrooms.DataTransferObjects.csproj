@@ -1,0 +1,299 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{6611930D-880E-455C-8681-E0E2A33CF5A9}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Shrooms.DataTransferObjects</RootNamespace>
+    <AssemblyName>Shrooms.DataTransferObjects</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>..\..\PresentationLayer\Shrooms.API\Shrooms.API.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Deploy-Dev|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Deploy-Dev\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Development|AnyCPU'">
+    <OutputPath>bin\Development\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Staging|AnyCPU'">
+    <OutputPath>bin\Staging\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Azure|AnyCPU'">
+    <OutputPath>bin\Azure\</OutputPath>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DevelopmentTest|AnyCPU'">
+    <OutputPath>bin\DevelopmentTest\</OutputPath>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'AzureDemo|AnyCPU'">
+    <OutputPath>bin\AzureDemo\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'AzureProduction|AnyCPU'">
+    <OutputPath>bin\AzureProduction\</OutputPath>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ExternalQA|AnyCPU'">
+    <OutputPath>bin\ExternalQA\</OutputPath>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'AzureStaging|AnyCPU'">
+    <OutputPath>bin\AzureStaging\</OutputPath>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.EntityFramework, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.AspNet.Identity.EntityFramework.2.2.1\lib\net45\Microsoft.AspNet.Identity.EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks.Extensions, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks.Extensions.Desktop, Version=1.0.168.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.Desktop.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Net.Http.Extensions, Version=2.2.29.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.Net.Http.2.2.29\lib\net45\System.Net.Http.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Net.Http.Primitives, Version=4.2.29.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.Net.Http.2.2.29\lib\net45\System.Net.Http.Primitives.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Net.Http.WebRequest" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="EmailTemplateViewModels\BaseEmailTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\BirthdaysNotificationEmployeeViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\BirthdaysNotificationTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\BookTakenEmailTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\CommitteeSuggestionEmailTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\EventParticipantExpelledEmailTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\KudosReceivedDecreasedEmailTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\KudosRejectedEmailTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\KudosSentEmailTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\NewCommentEmailTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\NewWallPostEmailTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\NotificationAboutNewUserEmailTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\ResetPasswordTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\ServiceRequestCommentEmailTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\ServiceRequestEmailTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\ServiceRequestUpdateEmailTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\UserConfirmationEmailTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\VerifyEmailTemplateViewModel.cs" />
+    <Compile Include="Models\Administration\AdministrationProjectDTO.cs" />
+    <Compile Include="Models\Administration\AdministrationSkillDTO.cs" />
+    <Compile Include="Models\Administration\AdministrationUserDTO.cs" />
+    <Compile Include="Models\Administration\FilterDTO.cs" />
+    <Compile Include="Models\ApplicationUserMinimalViewModelDto.cs" />
+    <Compile Include="Models\Birthdays\BirthdayDTO.cs" />
+    <Compile Include="Models\Birthdays\UserBirthdayInfoDTO.cs" />
+    <Compile Include="Models\Books\BookDetails\BookDetailsAdministrationDTO.cs" />
+    <Compile Include="Models\Books\BookDetails\BookDetailsLogDTO.cs" />
+    <Compile Include="Models\Books\BasicBookDto.cs" />
+    <Compile Include="Models\Books\BookDetails\BookQuantityByOfficeDTO.cs" />
+    <Compile Include="Models\Books\BookDetails\EditBookDTO.cs" />
+    <Compile Include="Models\Books\BookDetails\NewBookQuantityDTO.cs" />
+    <Compile Include="Models\Books\BookDetails\NewBookDTO.cs" />
+    <Compile Include="Models\Books\BooksByOffice\BasicBookUserDTO.cs" />
+    <Compile Include="Models\Books\BooksByOffice\BooksByOfficeOptionsDTO.cs" />
+    <Compile Include="Models\Books\BookDetails\BookDetailsDTO.cs" />
+    <Compile Include="Models\Books\BooksByOffice\BooksByOfficeDTO.cs" />
+    <Compile Include="Models\Books\BookDTO.cs" />
+    <Compile Include="Models\Books\BookLogDTO.cs" />
+    <Compile Include="Models\Books\BookTakeDTO.cs" />
+    <Compile Include="Models\Books\MobileBookOfficeLogsDTO.cs" />
+    <Compile Include="Models\Books\OfficeBookDTO.cs" />
+    <Compile Include="Models\Books\RetrievedBookInfoDTO.cs" />
+    <Compile Include="Models\Emails\EmailDto.cs" />
+    <Compile Include="Models\Emails\EmailSendingDTO.cs" />
+    <Compile Include="Models\ExternalLinks\AddEditDeleteExternalLinkDTO.cs" />
+    <Compile Include="Models\ExternalLinks\ExternalLinkDTO.cs" />
+    <Compile Include="Models\ExternalLinks\NewExternalLinkDTO.cs" />
+    <Compile Include="Models\Jobs\JobTypeDTO.cs" />
+    <Compile Include="Models\Notification\NotificationDto.cs" />
+    <Compile Include="Models\Notification\SourcesDto.cs" />
+    <Compile Include="Models\Projects\ProjectDetailsDto.cs" />
+    <Compile Include="Models\Kudos\NewKudosTypeDto.cs" />
+    <Compile Include="Models\Projects\ProjectsAutoCompleteDto.cs" />
+    <Compile Include="Models\Projects\EditProjectDisplayDto.cs" />
+    <Compile Include="Models\Projects\EditProjectDto.cs" />
+    <Compile Include="Models\Projects\NewProjectDto.cs" />
+    <Compile Include="Models\Projects\ProjectsListItemDto.cs" />
+    <Compile Include="Models\Support\SupportDto.cs" />
+    <Compile Include="Models\HubUser.cs" />
+    <Compile Include="Models\ImageDTO.cs" />
+    <Compile Include="Models\KudosBasket\KudosBasketCreateDTO.cs" />
+    <Compile Include="Models\KudosBasket\KudosBasketDonationDTO.cs" />
+    <Compile Include="Models\KudosBasket\KudosBasketDTO.cs" />
+    <Compile Include="Models\KudosBasket\KudosBasketEditDTO.cs" />
+    <Compile Include="Models\KudosBasket\KudosBasketLogDTO.cs" />
+    <Compile Include="Models\KudosBasket\KudosBasketLogUserDTO.cs" />
+    <Compile Include="Models\KudosBasket\KudosBasketWidgetViewModel.cs" />
+    <Compile Include="Models\Kudos\AddKudosDTO.cs" />
+    <Compile Include="Models\Kudos\AddKudosLogDTO.cs" />
+    <Compile Include="Models\Kudos\KudosBasicDataDTO.cs" />
+    <Compile Include="Models\Kudos\MainKudosLogDTO.cs" />
+    <Compile Include="Models\Kudos\KudosLogInputDTO.cs" />
+    <Compile Include="Models\Kudos\KudosLogsFilterDTO.cs" />
+    <Compile Include="Models\Kudos\KudosLogsEntriesDto.cs" />
+    <Compile Include="Models\Kudos\KudosLogUserDTO.cs" />
+    <Compile Include="Models\Kudos\KudosPieChartSliceDto.cs" />
+    <Compile Include="Models\Kudos\KudosRejectDTO.cs" />
+    <Compile Include="Models\Kudos\KudosTypeDTO.cs" />
+    <Compile Include="Models\Kudos\KudosLogTypeDTO.cs" />
+    <Compile Include="Models\Kudos\KudosUserLogDTO.cs" />
+    <Compile Include="Models\Kudos\UserKudosAutocompleteDTO.cs" />
+    <Compile Include="Models\Kudos\UserKudosDTO.cs" />
+    <Compile Include="Models\Kudos\UserKudosInformationDTO.cs" />
+    <Compile Include="Models\Kudos\WallKudosLogDTO.cs" />
+    <Compile Include="Models\LazyPaged\ILazyPaged.cs" />
+    <Compile Include="Models\LazyPaged\LazyPaged.cs" />
+    <Compile Include="Models\Monitors\MonitorDTO.cs" />
+    <Compile Include="Models\Organizations\OrganizationDTO.cs" />
+    <Compile Include="Models\Permissions\PermissionDTO.cs" />
+    <Compile Include="Models\Permissions\PermissionGroupDTO.cs" />
+    <Compile Include="Models\RefreshTokens\RefreshTokenDTO.cs" />
+    <Compile Include="Models\Roles\RoleDetailsDTO.cs" />
+    <Compile Include="Models\Roles\RoleDTO.cs" />
+    <Compile Include="Models\Roles\RoleUserDTO.cs" />
+    <Compile Include="Models\UserAndOrganizationDTO.cs" />
+    <Compile Include="Models\UserAndOrganizationHubDto.cs" />
+    <Compile Include="Models\Users\ChangeUserLocalizationSettingsDto.cs" />
+    <Compile Include="Models\Users\LanguageDto.cs" />
+    <Compile Include="Models\Users\UserNotificationsSettingsDto.cs" />
+    <Compile Include="Models\Users\WallNotificationsDto.cs" />
+    <Compile Include="Models\Users\LocalizationSettingsDto.cs" />
+    <Compile Include="Models\Users\TimeZoneDto.cs" />
+    <Compile Include="Models\WallPosts\UserDTO.cs" />
+    <Compile Include="Models\Wall\Moderator\ModeratorDto.cs" />
+    <Compile Include="Models\Wall\UpdateWallDto.cs" />
+    <Compile Include="Models\Wall\WallsListFilter.cs" />
+    <Compile Include="Models\Wall\WallUserAction.cs" />
+    <Compile Include="Models\Wall\Posts\Comments\CommentCreatedDTO.cs" />
+    <Compile Include="Models\Wall\CreateWallDto.cs" />
+    <Compile Include="Models\Wall\Posts\Comments\CommentDTO.cs" />
+    <Compile Include="Models\Wall\Posts\Comments\EditCommentDTO.cs" />
+    <Compile Include="Models\Wall\Posts\Comments\NewCommentDTO.cs" />
+    <Compile Include="Models\Wall\Posts\EditPostDTO.cs" />
+    <Compile Include="Models\Wall\Likes\LikeDTO.cs" />
+    <Compile Include="Models\Wall\Posts\NewlyCreatedPostDTO.cs" />
+    <Compile Include="Models\Wall\Posts\NewPostDTO.cs" />
+    <Compile Include="Models\Wall\Posts\PostDTO.cs" />
+    <Compile Include="Models\Users\UserDTO.cs" />
+    <Compile Include="Models\Wall\UserWallDTO.cs" />
+    <Compile Include="Models\Wall\WallDto.cs" />
+    <Compile Include="Models\Wall\WallMemberDto.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <AdditionalFiles Include="..\..\..\stylecop.json">
+      <Link>stylecop.json</Link> 
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </AdditionalFiles>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Other\Shrooms.Constants\Shrooms.Constants.csproj">
+      <Project>{e07394b9-558c-4a70-9926-6400abb0fb5d}</Project>
+      <Name>Shrooms.Constants</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\DataLayer\Shrooms.EntityModels\Shrooms.EntityModels.csproj">
+      <Project>{8ad6f857-708c-4b5e-98bc-b3206e7dd918}</Project>
+      <Name>Shrooms.EntityModels</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\..\..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\Newtonsoft.Json.dll" />
+    <Analyzer Include="..\..\..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
+    <Analyzer Include="..\..\..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

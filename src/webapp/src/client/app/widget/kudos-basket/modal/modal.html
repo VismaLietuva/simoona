@@ -1,0 +1,48 @@
+﻿<div class="modal-header">
+    <button type="button" class="close" ng-click="vm.closeModal()">&times;</button>
+    <h4 class="modal-title" data-test-id="kudos-basket-modal-title" ng-cloak>
+        {{:: vm.kudosBasketData.title}}
+    </h4>
+</div>
+<div class="modal-body">
+    <div ng-if="vm.kudosBasketData.description"
+         ng-bind-html="vm.kudosBasketData.description | linky: '_blank' | newlineToBr"
+         class="description"
+         data-test-id="kudos-basket-modal-description"
+         ng-cloak>
+    </div>
+    <form class="form-horizontal" name="kudosBasketForm" role="form">
+        <div class="form-group required-right">
+            <label for="amount" class="text-right control-label col-xs-3" translate="kudosBasket.amount"></label>
+            <div class="col-xs-9" ng-class="{ 'has-error' : kudosBasketForm.amount.$invalid && !kudosBasketForm.amount.$pristine }">
+                <input type="text"
+                       id="amount"
+                       class="form-control"
+                       name="amount"
+                       ng-model="vm.amount"
+                       ng-change="vm.onChangeFixValidity()"
+                       required
+                       ng-min="0.01"
+                       ng-pattern="/^[0-9]+([\,.][0-9]{1,2})?$/"
+                       ignore-mouse-wheel
+                       translate-attr-placeholder="kudosBasket.enterAmount"
+                       data-test-id="kudos-basket-amount-input-field" translate/>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary"
+            type="button"
+            ng-click="vm.submitDonation()"
+            ng-disabled="kudosBasketForm.$invalid || vm.isBusy"
+            data-test-id="kudos-basket-modal-donate-confirm-button">
+            <span translate="kudosBasket.donate"></span>
+    </button>
+    <button class="btn btn-danger"
+            type="button"
+            ng-click="vm.closeModal()"
+            data-test-id="kudos-basket-modal-cancel-confirm-button">
+            <span translate="common.cancel"></span>
+    </button>
+</div>

@@ -1,0 +1,11 @@
+﻿{
+  "submitTicket": "Susisiekite su Simoona komanda",
+  "type": "Tipas",
+  "message": "Pranešimas",
+  "subject": "Tema",
+  "typeBug": "Klaida",
+  "typeIncident": "Incidentas",
+  "typeFeatureRequest": "Patobulinimas",
+  "typeQuestion": "Klausimas",
+  "success" : "Ačiū, greitai susisieksime!"
+}

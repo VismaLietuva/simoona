@@ -1,0 +1,91 @@
+{
+    "excludeFiles": ["node_modules/**", "bower_components/**"],
+
+    "safeContextKeyword": ["vm"],
+
+    "requireCurlyBraces": [
+        "if",
+        "else",
+        "for",
+        "while",
+        "do",
+        "try",
+        "catch"
+    ],
+    "requireOperatorBeforeLineBreak": true,
+    "requireCamelCaseOrUpperCaseIdentifiers": {
+            "ignoreProperties": true,
+            "allowedSuffixes": ["_token"]
+    },
+    "maximumLineLength": {
+      "value": 130,
+      "allowComments": true,
+      "allowRegex": true
+    },
+    "validateIndentation": 4,
+    "validateQuoteMarks": "'",
+    "validateLineBreaks": "CRLF",
+
+    "disallowMultipleLineStrings": true,
+    "disallowMixedSpacesAndTabs": true,
+    "disallowTrailingWhitespace": true,
+    "disallowSpaceAfterPrefixUnaryOperators": true,
+    "disallowMultipleVarDecl": null,
+
+    "requireSpaceAfterKeywords": [
+      "if",
+      "else",
+      "for",
+      "while",
+      "do",
+      "switch",
+      "return",
+      "try",
+      "catch"
+    ],
+    "requireSpaceBeforeBinaryOperators": [
+        "=", "+=", "-=", "*=", "/=", "%=", "<<=", ">>=", ">>>=",
+        "&=", "|=", "^=", "+=",
+
+        "+", "-", "*", "/", "%", "<<", ">>", ">>>", "&",
+        "|", "^", "&&", "||", "===", "==", ">=",
+        "<=", "<", ">", "!=", "!=="
+    ],
+    "requireSpaceAfterBinaryOperators": true,
+    "requireSpacesInConditionalExpression": true,
+    "requireSpaceBeforeBlockStatements": true,
+    "requireLineFeedAtFileEnd": false,
+    "requireTrailingComma": false,
+    "requirePaddingNewLinesAfterBlocks": {
+        "allExcept" : [
+            "inCallExpressions",
+            "inNewExpressions",
+            "inArrayExpressions",
+            "inProperties"
+        ]
+    },
+
+    "disallowSpacesInsideObjectBrackets": "all",
+    "disallowSpacesInsideArrayBrackets": "all",
+    "disallowSpacesInsideParentheses": true,
+
+    "jsDoc": {
+        "checkAnnotations": true,
+        "checkParamNames": true,
+        "requireParamTypes": true,
+        "checkReturnTypes": true,
+        "checkTypes": true
+    },
+
+    "disallowMultipleLineBreaks": true,
+
+    "disallowCommaBeforeLineBreak": null,
+    "disallowDanglingUnderscores": null,
+    "disallowEmptyBlocks": null,
+    "disallowMultipleLineStrings": null,
+    "disallowTrailingComma": true,
+    "requireCommaBeforeLineBreak": null,
+    "requireDotNotation": null,
+    "requireMultipleVarDecl": null,
+    "requireParenthesesAroundIIFE": true
+}

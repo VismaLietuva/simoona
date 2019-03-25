@@ -1,0 +1,38 @@
+<div class="panel panel-default">
+    <wave-spinner ng-if="vm.isLoading"></wave-spinner>
+    <div class="panel-heading project-panel-heading" ng-if="!vm.isLoading">
+        <div class="project-description-title">{{vm.project.name}}</div>
+
+        <ace-project-description-actions project="vm.project"></ace-project-description-actions>
+    </div>
+    <div class="panel-body project-description-body" ng-if="!vm.isLoading">
+        <div class="row">
+
+            <div class="col-xs-12 col-sm-6 col-lg-4 text-center">
+                <img class="project-details-image"
+                     alt="{{vm.project.name}}"
+                     ng-src="{{vm.project.logoId | imageThumb:vm.projectImageSize:'crop'}}" image-loading>
+            </div>
+
+            <div class="col-xs-12 col-sm-6 col-lg-8 project-details-info-container">
+                <div class="col-xs-12" ng-if="vm.project.owner.firstName.length">
+                    <span class="glyphicon glyphicon-user"></span>
+                    <b><span translate="projects.projectLead"></span> :</b>
+                    <span data-test-id="project-owner" ng-cloak>{{vm.project.owner.firstName}} {{vm.project.owner.lastName}}</span>
+                </div>
+                <div class="col-xs-12" ng-if="vm.project.attributes.length">
+                    <span class="glyphicon glyphicon-briefcase"></span>
+                    <b><span translate="projects.attributes"></span> :</b>
+                    <span ng-repeat="tech in vm.project.attributes" 
+                          class="badge badge-default project-technology-badge">
+                        {{tech}}
+                    </span>
+
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="col-xs-12 project-details-description" ng-show="!!vm.project.desc.length">
+            <p ng-bind-html="vm.project.desc | linky: '_blank' | newlineToBr"></p>
+        </div>
+    </div>
+</div>

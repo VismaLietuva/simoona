@@ -1,0 +1,39 @@
+﻿<div class="row">
+    <div class="col-xs-12">
+        <h3><span>{{"roomType.entityNamePlural" | translate}}</span></h3>
+        <ace-item-list-filter filter-value="filter.s" on-filtering="onSearch"></ace-item-list-filter>
+        <div class="btn-group pull-right" ng-if="allowEdit">
+            <a ui-sref="Root.WithOrg.Admin.RoomTypes.Create" class="btn btn-primary" title="{{'common.createNew' | translate}}"><span class="glyphicon glyphicon-plus"></span> <span>{{"common.createNew" | translate}}</span></a>
+        </div>
+        <table class="table table-grey table-hover table-active" ng-if="itemCount > 0">
+            <thead>
+                <tr>
+                    <th>
+                        <ace-sort-link on-sort="onsort" sort-dir="filter.dir" sort-field="filter.sort" sort-value="name"><span>{{"roomType.name" | translate}}</span></ace-sort-link>
+                    </th>
+                    <th>
+                        <span>{{"roomType.color" | translate}}</span>
+                    </th>
+                    <th class="text-center" ng-if="allowEdit">
+                        {{"common.actions" | translate}}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="roomType in roomTypes">
+                    <td>
+                        {{ roomType.name }}
+                    </td>
+                    <td>
+                        <div class="label" ng-style="{'background-color':roomType.color,width:50,display:'inline-block'}">&nbsp;</div>
+                    </td>
+                    <td class="text-center" ng-if="allowEdit">
+                        <a ui-sref="Root.WithOrg.Admin.RoomTypes.Edit({ id : roomType.id })" class="btn btn-default glyphicon glyphicon-pencil" title="{{'common.edit' | translate}}"></a>
+                        <a class="btn btn-danger glyphicon glyphicon-bin delete" ace-confirmation-modal="ondelete(roomType)" title="{{'common.delete' | translate}}"></a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <ace-item-list-pagination total-item-count="itemCount" page-size="pageSize" current-page="filter" on-changed="onpagechanged"></ace-item-list-pagination>
+    </div>
+</div>

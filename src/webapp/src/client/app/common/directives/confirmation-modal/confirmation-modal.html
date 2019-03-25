@@ -1,0 +1,19 @@
+<div class="modal-header">
+    <button type="button" class="close" ng-click="vm.closeModal()">&times;</button>
+    <h4 class="modal-title" translate="{{:: vm.confirmationModalTitle}}"></h4>
+</div>
+<div ng-if="!!vm.confirmationModalMessage" class="modal-body" translate="{{:: vm.confirmationModalMessage}}"></div>
+<div ng-if="!vm.confirmationModalMessage" class="modal-body" translate="common.deletePopupMessage"></div>
+<div class="modal-footer">
+    <button type="button"
+            class="btn btn-danger"
+            ng-click="vm.deleteItem()"
+            translate="{{:: vm.confirmationModalConfirm}}"
+            data-test-id="delete-confirm-button"></button>
+
+    <button type="button"
+            class="btn btn-default"
+            ng-click="vm.closeModal()"
+            translate="{{:: vm.confirmationModalReject}}"
+            data-test-id="delete-cancel-button"></button>
+</div>

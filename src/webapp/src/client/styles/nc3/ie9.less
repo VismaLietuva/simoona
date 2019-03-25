@@ -1,0 +1,212 @@
+/**
+ * Internet Explorer 9 styles - Nordic Cool 3.0
+*/
+
+@import url("_variables.less");
+@import url("_mixins.less");
+
+/****  Fonts - Open Sans  ****/
+@font-face {
+    font-family: 'open_sansregular';
+    src: url('../fonts/OpenSans-Regular-webfont.eot');
+    font-weight: normal;
+    font-style: normal;
+	}
+
+@font-face {
+    font-family: 'open_sanslight';
+    src: url('../fonts/OpenSans-Light-webfont.eot');
+    font-weight: normal;
+    font-style: normal;
+	}
+
+@font-face {
+    font-family: 'open_sanssemibold';
+    src: url('../fonts/OpenSans-Semibold-webfont.eot');
+    font-weight: normal;
+    font-style: normal;
+	}
+
+@font-face {
+    font-family: 'open_sansbold';
+    src: url('../fonts/OpenSans-Bold-webfont.eot');
+    font-weight: normal;
+    font-style: normal;
+	}
+	
+	
+body, label, button, a, p { font-family: open_sansregular; }
+
+h4, h5, h6, b, strong { font-family: open_sansbold; }
+
+h1, .h1,
+h2, .h2 { font-family: open_sanslight; }
+
+h3, .h3 { font-family: open_sansregular; }
+
+.lead { font-family: open_sanslight; }
+	
+	
+/* Close */
+.close,
+.close:hover { font-family: open_sanslight; }
+	
+	
+/* Helper classes */
+h4.text-disabled, h4.text-primary, h4.text-error, h4.text-default,
+h3.text-disabled, h3.text-primary, h3.text-error, h3.text-default,
+h2.text-disabled, h2.text-primary, h2.text-error, h2.text-default,
+h1.text-disabled, h1.text-primary, h1.text-error, h1.text-default { 
+	font-family: open_sanslight;
+	}
+	
+/* Navbar */
+.navbar .navbar-brand, 
+.navbar .navbar-brand:focus { font-family: open_sanslight; }
+
+.navbar .nav > li > a { font-family: open_sanslight; }
+
+.navbar .active-on-mobile { font-family: open_sanslight; }
+
+.navbar-default .navbar-toggle,
+.navbar-default .navbar-toggle:hover,
+.navbar-default .navbar-toggle:focus { font-family: open_sanslight; }
+
+/* Panels */
+.panel > .panel-heading .panel-title,
+.panel > .panel-heading { font-family: open_sanslight; }
+
+/* Alerts */
+.alert h1, .alert h2, .alert h3, .alert h4, .alert .h1, .alert .h2, .alert .h3, .alert .h4 { font-family: open_sanslight; }
+
+/* List groups */
+.list-group > .list-group-item.list-group-title, 
+.list-group > .list-group-item.list-group-title:hover, 
+.list-group > .list-group-item.list-group-title:focus, 
+.list-group > .list-group-item.list-group-title:active,
+.list-group > .list-group-item .list-group-item-heading { font-family: open_sanslight; }
+
+.list-group > .list-group-title .badge { 
+	background: #ececec; 
+	filter: none !important; 
+	}
+
+/****  /Fonts - Open Sans  ****/
+
+
+/* Gradients */
+.gradient,
+.input-group-addon,
+.sidenav .nav > li > a,
+.table > thead > tr, 
+.btn { filter: none !important; }
+
+.table > thead > tr {}
+	
+.table > thead > tr > td.active, 
+.table > thead > tr > th.active, 
+.table > thead > tr.active > td, 
+.table > thead > tr.active > th { 
+	background: transparent !important;
+	&:hover {
+		background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2U4ZjZmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNkYWU3ZWYiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+)!important;
+		}
+	}
+	
+.table { border-collapse: collapse; }
+	
+.table > tbody > tr.active > td, 
+.table > tbody > tr.active > th, 
+.table > tfoot > tr.active > td,
+.table > tfoot > tr.active > th,
+.table.table-active > tbody > tr.active > td, 
+.table.table-active > tbody > tr.active > th, 
+.table.table-active > tfoot > tr.active > td,
+.table.table-active > tfoot > tr.active > th,
+.table.table-sorter > tbody > tr.active > td, 
+.table.table-sorter > tbody > tr.active > th, 
+.table.table-sorter > tfoot > tr.active > td,
+.table.table-sorter > tfoot > tr.active > th,
+.table > tbody > tr > td.active, 
+.table > tbody > tr > th.active, 
+.table > tfoot > tr > td.active,
+.table > tfoot > tr > th.active { 
+	filter: none !important;
+	}
+
+.radio input, 
+.checkbox input { top: 4px; }
+
+.input-group-addon,
+.input-group-btn {
+	float: left;
+	display: inline-block; 
+	width: auto;
+	}
+	
+span.input-group-addon,
+span.input-group-btn,
+div.input-group-addon,
+div.input-group-btn {
+	width: auto;
+	> .btn { min-width: 1%; }
+	& + .form-control { float: none; }
+	}
+	
+.input-group {
+	input[type="text"],
+	.form-control { float: none; }
+	}
+	
+.input-group-lg a.input-group-addon { padding-top: 13px !important; }
+
+
+/* Navbar */ 
+.navbar-second-level .second-level > li > a.active { font-family: open_sansbold; }
+
+.navbar .nav > li.open.dropdown > a, .navbar .nav > li.open.dropdown > a:hover, .navbar .nav > li.open.dropdown > a:focus { filter: none; }
+
+.ie9 .navbar-second-level .collapse.navbar-collapse { height: 79px !important; }
+
+.ie9 .navbar-second-level .second-level { bottom: 0px; }
+
+
+/* Badge/Labels */
+.badge, .label { font-family: open_sansbold; }
+	
+	
+/* Carets */
+
+
+/* Vertical menu */
+.sidenav .inner-scroll .nav > li:after {
+	background: url(../images/vertical-nav-ie.png) no-repeat transparent 1px 0px;
+	background-size: auto auto;
+	-ms-transform: rotate(0deg);
+	height: 13px;
+	top: 15px;
+	}
+	
+.sidenav .inner-scroll > .nav > li.active-child.active:after {
+	background-position: -33px -3px;
+	}
+	
+.sidenav .inner-scroll > .nav > li:not(.active-child).active:after {
+	background-position: -100px -3px;
+	top: 18px;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

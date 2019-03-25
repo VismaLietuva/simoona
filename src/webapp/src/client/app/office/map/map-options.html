@@ -1,0 +1,48 @@
+<div class="options-wrapper">
+    <div ng-if="allOffices">
+        <label ng-init="currentOffice = office" for="office-offices"><span translate="floor.office"></span></label>
+        <select id="office-offices"
+                ng-model="currentOffice"
+                ng-options="currentOffice as currentOffice.name for currentOffice in allOffices track by currentOffice.id"
+                ng-change="changeOfficeSelection(currentOffice)"></select>
+    </div>
+    <div ng-if="showFloorChange && office.floors.length > 1">
+        <label for="office-floors"><span translate="room.floor"></span></label>
+        <select id="office-floors"
+                ng-model="office.floors[0]"
+                ng-options="currentFloor as currentFloor.name for currentFloor in office.floors | orderBy:'name' track by currentFloor.id"
+                ng-change="changeFloorSelection(office.floors[0])"></select>
+    </div>
+    <div class="no-label zoom-options" ng-hide="zoomDisabled">
+        <div class="btn-group-xs" role="group">
+            <button class="btn btn-default" ng-mousedown="zoomIn()" ng-mouseup="cancelZoom()" ng-click="clickZoomIn()" translate-attr-title="map.zoomIn" translate>
+                <span class="glyphicon glyphicon-zoom-in"></span>
+            </button>
+            <button class="btn btn-default middle-button" ng-mousedown="zoomOut()" ng-mouseup="cancelZoom()" ng-click="clickZoomOut()" translate-attr-title="map.zoomOut" translate>
+                <span class="glyphicon glyphicon-zoom-out"></span>
+            </button>
+            <button class="btn btn-default" ng-click="resetPan()" translate-attr-title="common.reset" translate>
+                <span class="glyphicon glyphicon-remove"></span>
+            </button>
+        </div>
+    </div>
+    <div class="emails-block" ng-if="allOffices">
+        <label for="office-emails"><span translate="floor.emails"></span></label>
+        <select id="office-emails"
+                ng-model="currentSelectedEmailOption"
+                ng-options="currentEmailOption.optionName | translate for currentEmailOption in emailOptions track by currentEmailOption.optionId"
+                ng-change="currentSelectedEmailOption.optionFunc()"
+                data-test-id="select-emails-list">
+        </select>
+    </div>
+    <div class="no-label" ng-if="allOffices">
+        <button class="btn btn-default copy-emails"
+                ng-disabled="isRoomSelected"
+                ng-click="addToClipboard()"
+                ngclipboard
+                data-clipboard-text="{{currentEmailsList || ' '}}"
+                data-test-id="copy-to-clipboard-emails">
+            <span translate="floor.copyEmailsToClipboard"></span>
+        </button>
+    </div>
+</div>

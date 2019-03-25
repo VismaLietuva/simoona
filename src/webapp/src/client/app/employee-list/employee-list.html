@@ -1,0 +1,65 @@
+<div has-permissions="['EMPLOYEELIST_BASIC']" class="col-xs-12">
+    <div class="row">
+        <h3 ng-cloak>{{"common.employeeList" | translate}}</h3>
+        <ace-item-list-filter filter-value="filter.search" on-filtering="onSearch"></ace-item-list-filter>
+        <table class="table table-grey table-hover" ng-if="pagedEmployeeList.itemCount > 0">
+            <thead>
+                <tr>
+                    <th class="text-center">
+                        <ace-sort-link on-sort="onSort" sort-dir="filter.sortOrder" sort-field="filter.sortBy" sort-value="firstName">
+                            <span translate="applicationUser.firstName"></span>
+                        </ace-sort-link>,
+                        <ace-sort-link on-sort="onSort" sort-dir="filter.sortOrder" sort-field="filter.sortBy" sort-value="lastName">
+                            <span translate="applicationUser.lastName"></span>
+                        </ace-sort-link>
+                    </th>
+                    <th class="text-center hidden-xs">
+                        <ace-sort-link on-sort="onSort" sort-dir="filter.sortOrder" sort-field="filter.sortBy" sort-value="birthDay">
+                            <span translate="applicationUser.birthday"></span>
+                        </ace-sort-link>
+                    </th>
+                    <th class="text-center hidden-xs">
+                        <ace-sort-link on-sort="onSort" sort-dir="filter.sortOrder" sort-field="filter.sortBy" sort-value="jobPosition.Title">
+                            <span translate="applicationUser.jobTitle"></span>
+                        </ace-sort-link>
+                    </th>
+                    <th ng-if="isAdmin" class="text-center hidden-xs">
+                        <span translate="applicationUser.phoneNumber"></span>
+                    </th>
+                    <th class="text-center hidden-xs">
+                        <span translate="applicationUser.workingHours"></span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-ng-repeat="applicationUser in pagedEmployeeList.pagedList" id="lastId@(item.Id)">
+                    <td class="col-xs-4 text-center">
+                        <a data-ui-sref="Root.WithOrg.Client.Profiles.Details({ id: applicationUser.id })">{{applicationUser.firstName}} {{applicationUser.lastName}}</a>
+                    </td>
+                    <td class="col-xs-2 text-center hidden-xs">
+                        <span ng-if="isAdmin">
+                            {{:: applicationUser.birthDay | date:'yyyy-MM-dd' }}
+                        </span>
+                        <span ng-if="!isAdmin">
+                            {{:: applicationUser.birthDay | date:'MM-dd' }}
+                        </span>
+                    </td>
+                    <td class="col-xs-2 text-center hidden-xs">
+                        {{applicationUser.jobTitle}}
+                    </td>
+                    <td ng-if="isAdmin" class="col-xs-2 text-center hidden-xs">
+                        <div data-ng-if="applicationUser.phoneNumber">
+                            +{{applicationUser.phoneNumber}}
+                        </div>
+                    </td>
+                    <td class="col-xs-2 text-center hidden-xs">
+                        <div data-ng-if="applicationUser.workingHours.startTime != null && applicationUser.workingHours.endTime != null">
+                            {{applicationUser.workingHours.startTime | time:'HH:mm'}} - {{applicationUser.workingHours.endTime | time:'HH:mm'}}
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <ace-item-list-pagination total-item-count="pagedEmployeeList.itemCount" page-size="pagedEmployeeList.pageSize" current-page="filter" on-changed="changedPage"></ace-item-list-pagination>
+    </div>
+</div>

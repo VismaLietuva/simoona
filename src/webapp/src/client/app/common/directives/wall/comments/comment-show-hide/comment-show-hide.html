@@ -1,0 +1,13 @@
+﻿<div ng-show="vm.isVisible()"
+     class="comment-show-hide-toggler">
+    <a ng-click="vm.toggleCollapse()"
+       data-test-id="show-all-replies"
+       ng-show="vm.isCollapsed">
+        <span class="glyphicon glyphicon-comment comment-hide-glyphicon"></span>
+        <span translate="common.showAll"></span> {{vm.commentsCount}} <span translate="common.replies"></span>
+    </a>
+    <a ng-click="vm.toggleCollapse()" data-test-id="hide-replies" ng-hide="vm.isCollapsed">
+        <span class="glyphicon glyphicon-comment comment-hide-glyphicon"></span>
+        <span translate="common.hideReplies"></span>
+    </a>
+</div>

@@ -1,0 +1,34 @@
+<div class="popup-notification" ng-click="vm.openNotification($event, vm.notification.id)" ng-attr-title="{{:: vm.notification.fullName}}">
+    <div class="popup-notification-image loading-image-placeholder">
+        <div>
+            <img class="media-object notification-image"
+                ng-if="!!vm.notification.pictureId"
+                width="{{:: vm.notificationThumbSettings.width}}"
+                height="{{:: vm.notificationThumbSettings.height}}"
+                ng-src="{{:: vm.notification.pictureId | participantThumb: vm.notificationThumbSettings}}"
+                alt="{{:: vm.notification.title}}"
+                data-test-id="popup-notification-image" image-loading ng-cloak/>
+        </div>
+    </div>
+    <div class="popup-notification-details">
+        <span class="popup-notification-user"
+              data-test-id="popup-notification-full-name" ng-cloak>
+            {{:: vm.notification.title}}
+        </span>
+        <span class="popup-notification-type"
+              data-test-id="popup-notification-type" ng-cloak
+              uib-tooltip="{{:: vm.notificationType}}" 
+              tooltip-placement="bottom" tooltip-class="word-break" tooltip-append-to-body="true">
+            {{:: vm.notificationType}}
+        </span>    
+    </div>
+
+    <wave-spinner class="popup-notification-spinner" ng-if="vm.notification.isLoading"></wave-spinner>
+    
+    <span ng-if="!vm.notification.isLoading"
+        class="popup-notification-delete-button glyphicon glyphicon-remove" 
+        ng-click="vm.markAsRead(vm.notification.id)" 
+        data-test-id="popup-notification-remove"
+        title="{{'common.dismiss' | translate}}" translate-cloak>
+    </span>
+</div>

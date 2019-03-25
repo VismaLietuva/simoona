@@ -1,0 +1,8 @@
+<a data-test-id="kudos-user-autocomplete-result-{{match.model.id}}">
+    <img ng-src="{{match.model.pictureId | miniThumb}}" class="kudos-person-searchbar-photo" data-dismiss="modal"/>
+    <div class="kudos-autocomplete-template-content">
+        <strong><span data-test-id="kudos-user-autocomplete-result-fullname-{{match.model.id}}" ng-bind-html="match.label | uibTypeaheadHighlight:query"></span></strong>
+        <br />
+        <i>({{match.model.email}}, {{match.model.userName}})</i>
+    </div>
+</a>

@@ -1,0 +1,10 @@
+﻿{
+  "addApplicationUserPlaceholder": "Pridėkite vartotoją. Pav: Vardenis Pavardenis",
+  "intersectWarningMessage": "Piešti ant kito kambario viršaus negalima!",
+  "nameMap": "Ofiso planas",
+  "redraw": "Perpiešti",
+  "roomSavedMessage": "Kambarys išsaugotas!",
+  "startDrawMessage": "Paspausk ant plano, kad pradėtum piešt kambarį!",
+  "zoomIn": "Priartinti",
+  "zoomOut": "Nutolinti"
+}

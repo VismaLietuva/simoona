@@ -1,0 +1,120 @@
+@login-container-max-width: 550px;
+
+.login-page-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    >div {
+        width: 100%;
+        max-width: @login-container-max-width;
+    }
+}
+
+.login-button-placement {
+    margin-top: 10%;
+}
+
+.register-form-placement {
+    margin-top: 1%;
+}
+
+.auth-login-container {
+    display: inline-block;
+    animation: fadein 0.5s;
+    background-color: #ffffff;
+    box-shadow: 0 1px 1px rgba(0,0,0,.05);
+    border-width: 1px;
+    border-style: solid;
+    border-color: #e7e7e7 #e7e7e7 #dbdbdb;
+    padding: 25px 20px;
+    max-width: @login-container-max-width;    
+
+    .wave-spinner {
+        margin: 0 auto;
+        margin-top: 10px;
+    }
+
+    .search-group {
+        max-width: 320px;
+        width: 100%;
+        display: inline-block;
+
+        .form-control {
+            font-size: 18px;
+            border-radius: 0;
+            border: 1px solid #c8c8c8;
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+    }
+
+    .auth-btn {
+        font-size: 18px;
+        margin-top: 10px;
+        background-color: #FFFFFF;
+        border: 1px solid #0974B3;
+        box-shadow: 1px 1px 1px #EBEBEB;
+        padding: 10px;
+        &:hover {
+            text-decoration: none;
+            background-color: #0974B3;
+            color: #FFFFFF !important;
+            span {
+                color: #FFFFFF !important;
+            }
+        }
+    }
+
+    .auth-provider-login-btn{
+        width: 244px;
+    }
+
+    .auth-signin-title {
+        font-size: 26px;
+        font-weight: 600;
+    	color: #737373;
+    	margin-bottom: 20px;
+    }
+
+    .auth-signin-url {
+        font-size: 14px;
+    }
+}
+
+.register-form-container {
+	display: inline-block;
+    animation: fadein 0.5s;
+    background-color: #ffffff;
+    box-shadow: 0 1px 1px rgba(0,0,0,.05);
+    border-width: 1px;
+    border-style: solid;
+    border-color: #e7e7e7 #e7e7e7 #dbdbdb;
+    padding: 25px 20px;
+    width: 100%;
+
+    .auth-register-text {
+        font-size: 14px;
+        font-weight: 500;
+        color: #737373;
+        overflow-wrap: break-word;
+    }
+}
+
+.auth-link {
+    font-family: inherit;
+    text-align: left;
+    color: #337ab7;
+    background: none;
+    margin: 0;
+    padding: 0;
+    border: none;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+button.auth-link:hover ,
+button.auth-link:focus {
+    color: #23527c;
+}

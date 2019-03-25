@@ -1,0 +1,104 @@
+<div class="row body-container" has-permissions="['PROJECT_BASIC']">
+    <div class="col-xs-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <span translate="projects.projectListTitle"></span>
+                <div class="pull-right" 
+                     has-permissions="['PROJECT_ADMINISTRATION']">
+                    <a class="nc-btn nc-btn-default" 
+                       ui-sref="Root.WithOrg.Client.Projects.Create" 
+                       translate-attr-title="projects.addProjectTitle" 
+                       data-test-id="project-list-add-project"
+                       translate>
+                        <span class="vismaicon vismaicon-add2-circle"></span>
+                        <span translate="common.addNew" 
+                              class="hidden-xs"></span>
+                    </a>
+                </div>
+            </div>
+            
+            <wave-spinner ng-if="vm.isLoading"></wave-spinner>
+            <div ng-if="!vm.isLoading && vm.projects.length" 
+                 class="panel-body">
+                <div class="wall-members-filter" 
+                     ng-if="vm.projects.length > vm.pageSize">
+                    <div class="form-group search-group search-group-lg padding-bot-10">
+                        <input type="text" 
+                               id="search-block" 
+                               class="form-control" 
+                               data-test-id="projects-filter-input" 
+                               ng-change="vm.onListFilter()"
+                               ng-model="vm.filterText" 
+                               translate-attr-placeholder="projects.filterProjects" 
+                               translate>
+                    </div>
+                </div>
+                <table class="nc-table nc-table-active project-list-table" ng-if="vm.projects.length">
+                    <thead ng-if="vm.dataFilter.length">
+                        <tr>
+                            <th translate="projects.projectTitle"></th>
+                            <th class="hidden-xs" translate="projects.attributes"></th>
+                            <th class="hidden-xs" translate="projects.members"></th>
+                            <th class="text-right" translate="projects.actions"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="project in vm.dataFilter = (vm.projects | filter: vm.filterText | orderBy:['-isCurrentUserAMember', 'name']) | limitTo:vm.pageSize:vm.pageSize*(vm.filter.page-1) track by project.id"
+                            ng-class="{highlightRow: project.isCurrentUserAMember}">
+                            <td class="col-xs-3 word-break"
+                                title="{{:: project.name}}"
+                                data-test-id="project-name"
+                                ng-cloak>
+                                {{::project.name | characters:50}}
+                            </td>
+                            <td class="col-xs-4 hidden-xs" 
+                                data-test-id="project-technolgies"
+                                title="{{:: project.attributes | arrayToString}}" 
+                                ng-cloak>
+                                {{::project.attributes | arrayToString:100}}
+                            </td>
+                            <td class="col-xs-4 hidden-xs" 
+                                data-test-id="project-members"
+                                title="{{:: project.members | arrayToString}}" 
+                                ng-cloak>
+                                {{::project.members | arrayToString:100}}
+                            </td>
+                            <td data-test-id="project-actions" 
+                                class="col-xs-1 text-nowrap text-right">
+                                <a class="link padding-right" 
+                                   ui-sref="Root.WithOrg.Client.Projects.ProjectContent({ id: project.id})" 
+                                   translate-attr-title="common.details"
+                                   data-test-id="project-details" 
+                                   translate>
+                                    <span class="vismaicon vismaicon-other-circle" 
+                                          aria-hidden="true"></span>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="clearfix"></div>
+
+                <div class="col-xs-12 nopadding">
+
+                    <ace-list-pagination total-item-count="vm.dataFilter.length"
+                                         page-size="vm.pageSize"
+                                         page-count="vm.Math.ceil(vm.dataFilter.length / vm.pageSize)"
+                                         current-page="vm.filter.page"
+                                         on-changed="vm.changePage(page)">
+                    </ace-list-pagination>
+
+                </div>
+            </div>
+        </div>
+        <div class="alert projects-alert" 
+             role="alert"
+             ng-if="!vm.isLoading && !vm.projects.length"
+             alert-msg="projects.noProjects"
+             alert-type="info"
+             translate-cloak>
+                <span class="vismaicon vismaicon-filled vismaicon-info"></span><span translate="projects.noProjects"></span>
+        </div>
+    </div>
+</div>

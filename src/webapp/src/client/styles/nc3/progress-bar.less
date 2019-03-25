@@ -1,0 +1,98 @@
+/**
+ * Progress bar - Nordic Cool 3.0
+*/
+
+@import url("_variables.less");
+@import url("_mixins.less");
+
+.progressBar { 
+	width: 200px; 
+	position: relative; 
+	overflow: hidden;
+	}
+	
+.progress {
+	background: #d7d7d7;
+    border: 0px;
+    border-collapse: separate;
+    border-radius: 2px;
+    box-shadow: none;
+    overflow: visible;
+    position: relative;
+    vertical-align: middle;
+    width: 200px;	
+	}
+	
+.progress-bar[aria-valuenow="0"] { min-width: 0px; }
+	
+.progressBar .counter { 
+	color: #FFFFFF;
+    float: right;
+    font-size: @font-size-base;
+    line-height: 120%;
+    padding-right: 8px;
+    padding-left: 8px;
+    padding-top: 6px;
+    text-shadow: 0 -1px 0 #23688F;
+	}
+	
+.progressBar.bottom-counter { text-align:center; }
+
+.progressBar.right-counter-lg .counter { padding-top: 12px; }
+	
+.progressBar.right-counter-sm .counter { 
+	line-height: 100%;
+    padding-top: 1px;
+	font-size: 12px;
+	}
+	
+.progress, 
+.progress.progress-default, 
+.progress.progress-default .progress-bar { height: 30px; }
+
+.progress.progress-lg, 
+.progress.progress-lg .progress-bar { height: 45px; }
+
+.progress.progress-xs, 
+.progress.progress-xs .progress-bar  { 
+	height: 6px; 
+	border-radius: 6px; 
+	.percentage { top: -9px; }
+	}
+
+.progress.progress-sm, 
+.progress.progress-sm .progress-bar { 
+	height: 10px; 
+	border-radius: 6px; 
+	.percentage { top: -5px; }
+	}
+
+.progress .progress-bar {
+	border: 0px;
+    border-radius: 3px;
+    box-shadow: none;
+	overflow: hidden;
+	&:before {
+		background: #0091e6;
+		background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzAwOTFlNiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDgxY2MiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+		background: -webkit-linear-gradient(left,  #0091e6 0%,#0081cc 100%);
+		background: linear-gradient(to right,  #0091e6 0%,#0081cc 100%);
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0091e6', endColorstr='#0081cc',GradientType=1 );
+		border-radius: 3px;
+		content: "";
+		display: block;
+		height: 30px;
+		position: relative;
+		width: 200px;
+		z-index: 30;
+		}
+		
+	.percentage {
+		color: #737373;
+		position: absolute;
+		left: 102%;
+		top: 5px;
+		z-index: 40;
+		font-size: @font-size-base;
+		}
+	} /* /.progress .progress-bar */

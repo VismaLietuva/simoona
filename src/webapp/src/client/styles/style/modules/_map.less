@@ -1,0 +1,246 @@
+@import "../../nc3/_mixins.less";
+@import "../../nc3/_variables.less";
+
+.map-body .main-body.container {
+    width: 100%;
+    position: absolute;
+    /*TODO: monitor map sizing/overflow behaviour - if it isn't causing troubles, commented CSS might be removed*/
+    /*padding: 0;
+    margin: 0;
+    height: 100%;
+    top: 51px;
+    left: 0;*/
+}
+
+.map-body {
+    overflow-y: hidden;
+}
+
+.fixed-size-square {
+    width: 15px;
+    height: 15px;
+    margin-top: 2px;
+}
+
+.home-table-text {
+    margin: 10px;
+    padding: 5px 0 0 5px;
+}
+
+.home-table tr {
+    line-height: 20px;
+}
+
+.map-options .thumbnail {
+    background: rgba(255,255,255,0.8);
+    margin-bottom: 0;
+}
+
+.map-options .homelegends {
+    opacity: 1;
+}
+
+.map-options {
+    position: relative;
+    z-index: 1000;
+    white-space: nowrap;
+}
+
+.map-options > .options-wrapper {
+    position: absolute;
+    top: 6px;
+    right: 0;
+    min-width: 230px;
+    margin-right: 5px;
+    background-color: rgba(230,230,230,0.8);
+    padding: 10px 10px 10px 0;
+
+    label {
+        width: 65px;
+        text-align: right;
+    }
+    select, .copy-emails {
+        width: 160px;
+    }
+    .emails-block {
+        margin-top: 20px;
+    }
+    .no-label {
+        margin-left: 68px;
+    }
+    .middle-button {
+        margin: 0px 11px 3px 11px;
+    }
+}
+
+.map-options .btn-group,
+.map-options .map-nav {
+    padding: 4px;
+}
+
+.map-options .dropdown-menu {
+    margin-top: 1px;
+    font-size: 12px;
+    right: 0;
+    float: right;
+    left: auto;
+}
+
+.map-options .btn {
+    background-color: #f8f8f8;
+    border: 1px solid #e7e7e7;
+}
+
+.map-options .dropdown-menu > li > a,
+.map-options .dropdown-menu > li > div {
+    padding: 3px 10px;
+}
+
+.map-options .dropdown-menu > li > div {
+    clear: both;
+    white-space: nowrap;
+}
+
+#pin {
+    position: absolute;
+    display: none;
+}
+
+#map-container {
+    position: relative;
+    padding: 0;
+    margin: 0 auto;
+}
+
+.map-label {
+    min-width: 120px;
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    z-index: 1000;
+    margin-left: -60px;
+}
+
+.map-label .panel {
+    position: relative;
+    /*left: -50%;*/
+    text-align: center;
+    background: rgba(255,255,255,0.9);
+    border-radius: 0;
+    margin-bottom: 0;
+}
+
+.map-label .panel-body {
+    padding: 5px;
+}
+
+.map-label-header {
+    font-size: 17px;
+    font-weight: bold;
+}
+
+.map-label-subheader {
+    font-size: 12px;
+    font-style: italic;
+}
+
+.office-map-edit {
+    .map-options, .map-alert {
+        display: none;
+    }
+}
+
+.map-alert{
+    display:block;
+    height:20px;
+    margin:0 25px 20px 10px;
+
+}
+.map-alert .alert{
+    padding: 3px 15px;
+    opacity: 0.75;
+    -moz-opacity: 0.75;
+    -webkit-opacity: 0.75;
+}
+
+.floor-map {
+    position: absolute;
+    width: 1000px;
+    height: 700px;
+    z-index: 1000;
+}
+
+.floor-mini-map {
+    height: 380px;
+}
+
+
+@media (max-width: 768px) {
+    .map-wrapper {
+        padding-top: 250px; 
+    }
+
+    .map-options {
+        float: none !important;
+
+        > .options-wrapper {
+            margin-top: -250px;
+            width: 100%;
+            position: static;
+            padding: 10px;
+
+            > div + div {
+                margin: 10px 0 0 !important;
+            }
+
+            label, select {
+                width: 100%;
+                display: block;
+                text-align: left;
+            }
+
+            .zoom-options {
+                display: none;
+            }
+
+            .no-label {
+                margin: 5px 0 0;
+                text-align: right
+            }
+
+            .copy-emails {
+                text-align: center;
+                width: auto;
+                padding: 5px 15px
+            }
+        }
+    }
+
+    #map-container {
+        padding-top: 53px;
+    }
+
+    .map-label-wrapper {
+        position: relative;
+
+        .map-label {
+            position: absolute;
+            top: -21px;
+            left: 0;
+            z-index: 1000;
+            width: 100%;
+            margin: 0;
+
+            .panel {
+                border: 0;
+                box-shadow: none;
+            }
+        }
+    }
+
+    .users-bar-tooltip {
+        display: none;
+    }
+
+    
+}

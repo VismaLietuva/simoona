@@ -1,0 +1,88 @@
+/**
+ * Alert styles - Nordic Cool 3.0
+*/
+
+@import url("_variables.less");
+@import url("_mixins.less");
+	
+.alert {
+	background: #fff;
+    border-radius: 0;
+    border-width: 1px;
+	border-color: #f0f0f0 #e9e9e9 #dedede;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.08);
+    color: @base-color;
+    line-height: 50px;
+    margin-bottom: 20px;
+    min-height: 90px;
+    padding: 20px 40px 20px 90px;
+    position: relative;
+	> div {
+		display: inline-block;
+		vertical-align: middle;
+		line-height: normal;
+		> *:last-child { margin-bottom: 0; }
+		}
+		
+	h1, h2, h3, h4,
+	.h1, .h2, .h3, .h4 { 
+		margin: 0px 0 5px; 
+		font-size: 22px;
+		font-weight: lighter;
+		}
+		
+	p { 
+		color: #787878; 
+		.btn { margin: 10px 0 5px 0; }
+		}
+	
+	a, .alert-link {
+		color: @blue-color;
+		font-weight: @font-weight-base;
+		}
+		
+	.vismaicon { 
+		position: absolute;
+		left: 20px;
+		top: 50%;
+		-webkit-transform: translateY(-50%);
+		-ms-transform: translateY(-50%);
+		transform: translateY(-50%);
+		}
+		
+	.close { 
+		top: 50%; 
+		right: 20px; 
+		position: absolute;
+		-webkit-transform: translateY(-50%);
+		-ms-transform: translateY(-50%);
+		transform: translateY(-50%);
+		}
+		
+	&.alert-options { 
+		padding-right: 20px; 
+		padding-left: 130px; 
+		.close {
+			background-position: 14px 15px;
+			border-left: 1px solid #ebebeb;
+			border-bottom: 1px solid #e9e9e9;
+			top: 0px;
+			right: 0px;
+			width: 39px;
+			height: 39px;
+			-webkit-transform: none;
+			-ms-transform: none;
+			transform: none;
+			}
+			
+		.vismaicon { left: 40px; }
+		}
+	} /* /.alert */
+	
+.alert.alert-sm {
+	line-height: 18px;
+    min-height: 42px;
+    padding: 12px 30px 12px 55px;
+	.vismaicon { left: 10px; }
+	} /* /.alert.alert-sm */
+

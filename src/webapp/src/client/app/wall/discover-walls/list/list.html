@@ -1,0 +1,89 @@
+<div class="panel panel-default discover-walls-header">
+    <div class="panel-heading">
+        <span translate="wall.discoverWalls"></span>
+        <div class="pull-right wall-create-button">
+            <a class="nc-btn nc-btn-default"
+               ui-sref="Root.WithOrg.Client.Wall.Create"
+               translate-attr-title="wall.createWall"
+               data-test-id="create-wall-button" translate>
+                <span class="vismaicon vismaicon-add2-circle"></span><span translate="wall.createWall" class="hidden-xs"></span>
+            </a>
+        </div>
+    </div>
+
+    <div class="panel-body">
+        <span translate="wall.discoverWallsDescription"></span>
+    </div>
+</div>
+
+<wave-spinner ng-if="vm.isWallListLoading"></wave-spinner>
+
+<div class="discover-walls-body" 
+     ng-if="!vm.isWallListLoading">
+
+    <div ng-repeat="wall in vm.wallList" 
+         class="discover-walls-card panel panel-body nopadding-right">
+
+        <div class="discover-walls-card-logo hidden-xs">
+            <a ui-sref="Root.WithOrg.Client.Wall.Item.Feed({wall: wall.id, search: null, post: null})"
+               data-test-id="discover-walls-wall-image-link">
+                <img alt="{{:: wall.name}}"
+                     title="{{:: wall.name}}"
+                     ng-src="{{wall.logo | imageThumb:{w:150,h:100}:'crop'}}" image-loading>
+            </a>
+        </div>
+        <div class="discover-walls-card-info">
+            <div class="col-xs-8 col-lg-9 discover-walls-card-content nopadding-left">
+                <div class="discover-walls-card-title">
+                    <a ui-sref="Root.WithOrg.Client.Wall.Item.Feed({wall: wall.id, search: null, post: null})"
+                       data-test-id="discover-walls-wall-name-link">
+                        {{:: wall.name}}
+                    </a>
+                </div>
+                <div class="discover-walls-card-description">
+                    {{:: wall.description}}
+                </div>
+                <div ng-if="wall.moderators[0].fullname.length" class="discover-walls-card-footer">
+                    <span translate="wall.wallOwner"></span> <span class="wall-owner">{{:: wall.moderators[0].fullname}}</span>
+                </div>
+            </div>
+
+            <div class="col-xs-4 col-lg-3 discover-walls-card-action nopadding"
+                 ng-init="isWallOwner = vm.isCurrentUserWallOwner(wall.moderators)">
+
+                <a ng-if="wall.type === 'Main' || isWallOwner"
+                   class="nc-btn nc-btn-danger wall-unfollow-disabled" 
+                   ng-click="vm.toggleFollowWall(wall)" 
+                   translate-attr-title="wall.unfollow" 
+                   data-test-id="unfollow-wall-button" 
+                   translate>
+                    <span class="glyphicon glyphicon-minus disabled"></span><span translate="wall.unfollow"></span>
+                </a>
+
+                <a ng-if="!wall.isFollowing && wall.type !== 'Main' && !isWallOwner" 
+                   class="nc-btn nc-btn-default" 
+                   ng-click="vm.toggleFollowWall(wall)" 
+                   translate-attr-title="wall.follow" 
+                   data-test-id="follow-wall-button" 
+                   translate>
+                    <circle-spinner ng-if="wall.isLoading"></circle-spinner>
+                    <span ng-if="!wall.isLoading" 
+                          class="glyphicon glyphicon-plus"></span><span translate="wall.follow"></span>
+                </a>
+                <a ng-if="wall.isFollowing && wall.type !== 'Main' && !isWallOwner" 
+                   class="nc-btn nc-btn-danger" 
+                   ng-click="vm.toggleFollowWall(wall)" 
+                   translate-attr-title="wall.unfollow" 
+                   data-test-id="unfollow-wall-button" 
+                   translate>
+                    <circle-spinner ng-if="wall.isLoading"></circle-spinner>
+                    <span ng-if="!wall.isLoading" 
+                          class="glyphicon glyphicon-minus"></span><span translate="wall.unfollow"></span>
+                </a>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+
+        <div class="clearfix"></div>
+    </div>
+</div>

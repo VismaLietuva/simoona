@@ -1,0 +1,121 @@
+.customization-options-container {
+    margin: 0 15px;
+    @media(max-width: 767px) {
+       margin: 0; 
+    }
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -ms-flex-flow: row wrap;
+    flex-flow: row wrap;
+    -webkit-justify-content: flex-start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+}
+
+.customization-option {
+    display: block;
+    padding: 15px;
+    margin: 20px 0 !important;
+}
+
+.customization-option:hover {
+    background-color: #f5f5f5;
+    .customization-option-subtitle:after {
+        background-color: #f5f5f5;
+    }
+}
+
+.customization-option-icon-container {
+    float: left;
+    margin-right: 5px;
+    span {
+        font-size: 30px;
+        color: #337ab7;
+    }
+}
+
+.customization-option-text-container {
+    float: left;
+    width: 200px;
+}
+
+.customization-options-container::before {
+    content: none;
+}
+
+.customization-option-subtitle {
+    height: 40px;
+    text-align: left;
+    color: #282828;
+    font-size: 13px;
+    margin-bottom: 0;
+}
+
+.customization-option-title,
+.customization-option-title:hover {
+    color: #337ab7;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+
+@media(max-width:1120px) {
+    .customization-option-text-container {
+        width: 160px;
+    }
+}
+.external-link-list-container {
+
+    .external-link-container {
+        display: inline-block;
+        width: 100%;
+        
+        @media(max-width: 767px) {
+            display: -webkit-box;
+            display: flex;
+            border-bottom: 1px solid #D7D7D7;
+            padding-bottom: 15px;
+            margin-bottom: 5px;
+        }
+        &:last-child {
+            border-bottom: 0;
+        }
+    }
+}
+
+.link-input-container {
+    > label {
+        padding-right: 0;
+        text-align: right;
+        @media(max-width: 767px) {
+            text-align: left;
+        }
+    }
+    > div {
+        padding-right: 0;
+    }
+    .has-error, .has-error:focus {
+        border: 1px solid #C72828 !important;
+        box-shadow: 1px 1px 0 #C72828 inset, -1px -1px 0 #C72828 inset !important;
+        -webkit-box-shadow: 1px 1px 0 #C72828 inset, -1px -1px 0 #C72828 inset !important;
+    }
+}
+
+.external-link-delete-container {
+    text-align: center;
+    @media(max-width: 767px) {
+        margin-top: 66px;
+    }
+}
+
+
+.add-button-container {
+    text-align: center;
+    margin: 10px 0;
+}
+
+.event-type-warning {
+    padding: 5px;
+    color: #A0A0A0;
+}

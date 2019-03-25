@@ -1,0 +1,58 @@
+<div id="wall-post-create" class="panel panel-body" has-permissions="['POST_BASIC']">
+    <form name="postForm">
+        <textarea class="form-control post-comment-textarea"
+                  ng-model="vm.postForm.messageBody"
+                  ng-maxlength="vm.maxLength"
+                  ng-trim="false"
+                  name="messageBody"
+                  msd-elastic
+                  type="text"
+                  ng-click="vm.showSubmit()"
+                  translate-attr-placeholder="wall.startConversation"
+                  data-test-id="add-post-text-field" translate></textarea>
+
+        <div ng-if="vm.showSubmitButton" class="panel panel-footer-post">
+
+            <div class="col-xs-12 nopadding">
+                <button class="btn btn-default pull-right"
+                        ng-disabled="!vm.isSubmittable()"
+                        ng-click="vm.submitPost()"
+                        data-test-id="add-post-submit-button" translate="common.submit">
+                </button>
+                <div class="pull-right col-xs-12 col-sm-9 wall-main-create-post-warning"
+                     ng-if="vm.wallType === 'Main' && vm.isWallModule">
+                    <span class="vismaicon vismaicon-sm vismaicon-filled vismaicon-warning"></span>
+                    <span translate="wall.mainWallCreatePostWarning"></span>
+                </div>
+
+                <length-counter max-length="vm.maxLength"
+                                current-length="postForm.messageBody.$viewValue.length"
+                                class="pull-right">
+                </length-counter>   
+                <div class="image-upload-component" has-permissions="['PICTURE_BASIC']">
+                    <span class="glyphicon glyphicon-camera media-icons"></span>
+                    <input type="file"
+                           accept="image/*"
+                           onchange="angular.element(this).scope().vm.attachImage(this)"
+                           data-test-id="image-upload-input-field">
+                </div>             
+            </div>
+
+            <div class="col-xs-12 pull-left nopadding">
+
+                <div ng-if="!!vm.attachedFiles.length"
+                     data-test-id="image-preview-before-upload" translate="wall.imageAttachedPreview">
+                </div>
+
+                <div image-preview-thumb
+                     ng-if="vm.imageSource" 
+                     source="vm.imageSource" 
+                     sources="vm.attachedFiles">
+                </div>
+
+            </div>
+            
+            <div class="clearfix"></div>
+        </div>
+    </form>
+</div>

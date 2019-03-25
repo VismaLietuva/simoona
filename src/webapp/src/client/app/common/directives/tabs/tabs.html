@@ -1,0 +1,12 @@
+<div class="panel-tab-heading">
+    <ul class="nc-tabs" translate-cloak>
+        <li ng-repeat="tab in vm.tabs" >
+            <a ui-sref="{{tab.state}}({{tab.params}})"
+               ng-class="{active: vm.$state.includes(tab.state)}"
+               data-test-id="{{tab.testId}}">
+               <span translate="{{:: tab.resource }}"></span>
+               <span ng-if="tab.badgeData">({{tab.badgeData.data[tab.badgeData.key]}})</span>
+            </a>   
+        </li>
+    </ul>
+</div>

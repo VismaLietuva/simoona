@@ -1,0 +1,37 @@
+<div class="panel panel-default birthday-module">
+    <div class="birthday-module-header">
+        <h5 translate="navbar.birthdays"></h5>
+    </div>
+
+    <div class="panel-body">
+        <ul class="birthday-module-users"
+            ng-if="vm.users.length">
+            <li class="birthday-module-user"
+                ng-repeat="user in vm.users">
+                <div class="media">
+                    <div class="media-left">
+                        <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: user.id })">
+                        <img class="media-object birthday-notification-image"
+                            width="{{:: vm.userThumbSettings.width}}"
+                            height="{{:: vm.userThumbSettings.height}}"
+                            ng-src="{{:: user.pictureId | participantThumb: vm.userThumbSettings}}"
+                            alt="{{:: user.firstName}} {{:: user.lastName}}"
+                            data-test-id="birthday-user-image" image-loading ng-cloak/>
+                        </a>
+                    </div>
+                    <div class="media-body">
+                        <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: user.id })"
+                        data-test-id="birthday-module-user-fullname" ng-cloak>
+                            {{:: user.firstName}} {{:: user.lastName}}
+                        </a>
+                        <span class="clearfix" data-test-id="birthday-module-user-birthday-date" ng-cloak>
+                            {{:: user.dateString}} (<span translate="{{'common.' + user.dayOfWeek.toLowerCase()}}"></span>) 
+                        </span>
+                    </div>
+                </div>
+            </li>
+        </ul>
+
+        <p ng-if="!vm.users.length" data-test-id="birthday-module-no-user-title" translate="navbar.noBirthdays"></p>
+    </div>
+</div>

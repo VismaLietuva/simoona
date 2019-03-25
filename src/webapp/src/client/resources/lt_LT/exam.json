@@ -1,0 +1,7 @@
+﻿{
+  "entityName": "Egzaminas",
+  "entityNamePlural": "Egzaminai",
+  "number": "Numeris",
+  "title": "Pavadinimas",
+  "wrongAutoCompleteTypeError": "Blogas 'type' parametras. Turi būti 'Title' arba 'Number'."
+}

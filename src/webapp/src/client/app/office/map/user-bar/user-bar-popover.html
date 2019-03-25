@@ -1,0 +1,24 @@
+﻿<div class="triangle"></div>
+<div class="users-bar-tooltip">
+    <div class="users-bar-tooltip-headerrow">
+        <div class="users-bar-tooltip-headericon pull-left">
+            <span class="glyphicon glyphicon-user"></span>
+        </div>
+        <div class="users-bar-tooltip-header"><a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: item.id })">{{item.firstName}} {{item.lastName}}</a></div>
+        <div ng-show="item.jobTitle || item.qualificationLevelName" class="users-bar-tooltip-subheader">{{getTitleAndQualification(item)}}</div>
+    </div>
+    <div class="users-bar-tooltip-body" ng-show="item.employmentDate != null || !!item.projects.length || !!item.skills">
+        <div ng-show="!!item.employmentDate">
+            <b><span>{{"applicationUser.employmentDateFriendly" | translate}}</span></b> {{item.employmentDate | dateConvertFilter | date:'yyyy-MM-dd'}}
+        </div>
+        <div ng-show="!!item.projects.length">
+            <b><span>{{"applicationUser.projectFriendly" | translate}}</span></b> {{getProjectsCsv(item.projects)}}
+        </div>
+        <div ng-show="!!item.skills.length">
+            <b><span>{{"applicationUser.skillsFriendly" | translate}}</span></b> <span ng-repeat="skill in item.skills">{{skill.title}}<span ng-if="!$last">, </span></span>
+        </div>
+        <div ng-show="!!item.isAbsent">
+            <b><span>{{"applicationUser.absent" | translate}}</span></b> {{item.absentComment | lowerCaseFirstLetter}}
+        </div>
+    </div>
+</div>

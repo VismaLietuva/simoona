@@ -1,0 +1,19 @@
+﻿{
+  "copyEmailsToClipboard": "Copy emails",
+  "createFloor": "New Floor",
+  "currentPlan": "Current Plan",
+  "editFloor": "Edit Floor",
+  "emailOptionFloor": "This floor",
+  "emailOptionOffice": "This office",
+  "emailOptionRoom": "Selected room",
+  "emails": "Emails",
+  "entityName": "Floor",
+  "entityNamePlural": "Floors",
+  "floorData": "Floor Data",
+  "map": "Map",
+  "name": "Title",
+  "newPlanUpload": "Upload New Plan",
+  "office": "Office",
+  "rooms": "Rooms",
+  "successToClipboard": "Successfully copied to clipboard!"
+}

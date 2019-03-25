@@ -1,0 +1,190 @@
+<div class="kudos-approve-table" has-permissions="['KUDOS_ADMINISTRATION']">
+    <wave-spinner ng-if="vm.isKudosStatusLoading"></wave-spinner>
+    <form ng-if="!vm.isKudosStatusLoading" role="form" class="kudos-filters-group">
+        <div class="form-group input-group-sm col-md-6 col-xs-12">
+            <label for="username" translate="applicationUser.username"></label>
+            <input class="form-control input-search kudos-filter-user"
+                   id="username"
+                   type="text"
+                   ng-model="vm.filter.searchUser"
+                   translate-attr-placeholder="common.findPerson"
+                   uib-typeahead="user as user.formattedName for user in vm.getUsersForAutocomplete($viewValue)"
+                   typeahead-template-url="app/kudos/user-autocomplete/user-autocomplete.html"
+                   typeahead-min-length="1"
+                   typeahead-wait-ms="100"
+                   autocomplete="off"
+                   data-test-id="kudos-log-list-filter-user" translate/>
+        </div>
+        <div class="form-group input-group-sm col-md-6 col-xs-12">
+            <label for="statuses" translate="kudos.statuses"></label>
+            <select class="form-control"
+                    id="statuses"
+                    ng-model="vm.filter.status"
+                    ng-options="statuses for statuses in vm.statuses"
+                    data-test-id="kudos-log-list-filter-status"></select>
+        </div>
+        <div class="form-group col-md-6 col-xs-12 pull-right">
+            <button class="btn btn-group btn-info kudos-filter-apply-button"
+                    ng-click="vm.getFilteredKudosLogList()"
+                    data-test-id="kudos-log-list-filter-button" translate="kudos.filter"></button>
+            <button class="btn btn-group btn-info kudos-filter-apply-button"
+                    ng-click="vm.exportToExcel()"
+                    ng-disabled="vm.isExcelLoading"
+                    data-test-id="kudos-log-list-export-button">
+                    <circle-spinner ng-if="vm.isExcelLoading"></circle-spinner>
+                    <span ng-if="!vm.isExcelLoading" translate="kudos.export"></span>
+            </button>
+        </div>
+        <div class="clearfix"></div>
+    </form>
+    <wave-spinner ng-if="vm.isKudosLogsLoading"></wave-spinner>
+    <div ng-if="!vm.isKudosLogsLoading" class="kudos-log-list-content">
+        <table class="table table-grey table-hover kudos-log-list-table word-break">
+            <thead>
+                <tr class="info">
+                    <th translate="kudos.action"></th>
+                    <th>
+                        <ace-sort-link on-sort="vm.getColumnFilteredKudosLogList" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortBy" sort-value="Receiver.FullName">
+                            <span translate="kudos.kudosTo"></span>
+                        </ace-sort-link>
+                    </th>
+                    <th >
+                        <ace-sort-link on-sort="vm.getColumnFilteredKudosLogList" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortBy" sort-value="Type.Name">
+                            <span translate="kudos.kudosType"></span>
+                        </ace-sort-link>
+                    </th>
+                    <th>
+                        <ace-sort-link on-sort="vm.getColumnFilteredKudosLogList" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortBy" sort-value="Multiplier">
+                            <span translate="kudos.multiplier"></span>
+                        </ace-sort-link>
+                    </th>
+                    <th class="kudos-log-list-table-small-column" >
+                        <ace-sort-link on-sort="vm.getColumnFilteredKudosLogList" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortBy" sort-value="Points">
+                            <span translate="kudos.points"></span>
+                        </ace-sort-link>
+                    </th>
+                    <th>
+                        <ace-sort-link on-sort="vm.getColumnFilteredKudosLogList" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortBy" sort-value="Comment">
+                            <span translate="kudos.comments"></span>
+                        </ace-sort-link>
+                    </th>
+                    <th class="kudos-log-list-table-small-column">
+                        <ace-sort-link on-sort="vm.getColumnFilteredKudosLogList" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortBy" sort-value="Sender.FullName">
+                            <span translate="kudos.kudosFrom"></span>
+                        </ace-sort-link>
+                    </th>
+                    <th class="kudos-log-list-table-small-column">
+                        <ace-sort-link on-sort="vm.getColumnFilteredKudosLogList" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortBy" sort-value="Created">
+                            <span translate="kudos.date"></span>
+                        </ace-sort-link>
+                    </th>
+                    <th class="kudos-log-list-table-small-column">
+                        <span translate="kudos.kudosPhoto"></span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="kudosEntry in vm.kudos track by kudosEntry.id"
+                    ng-class="{success: kudosEntry.status == 'Approved', danger: kudosEntry.status == 'Rejected'}">
+                    <td class="no-responsive-title">
+                        <button class="btn btn-xs btn-success btn-block kudos-log-list-btn "
+                                has-permissions="['KUDOS_ADMINISTRATION']"
+                                ng-show="kudosEntry.status == 'Pending'"
+                                ng-click="vm.approveKudos(kudosEntry)"
+                                data-test-id="kudos-log-list-approve-button"
+                                title="{{ 'kudos.approveButton' | translate }}">
+                            <circle-spinner ng-if="kudosEntry.isLoading"></circle-spinner>
+                            <span ng-if="!kudosEntry.isLoading" 
+                                  class="glyphicon glyphicon-ok"></span>
+                        </button>
+                        <button ace-kudos-rejection-modal="kudosEntry"
+                                on-reject="vm.modalReject(kudosEntry)"
+                                class="btn btn-xs btn-danger btn-block kudos-log-list-btn "
+                                ng-show="kudosEntry.status == 'Pending'"
+                                data-test-id="kudos-log-list-reject-button"
+                                title="{{ 'kudos.rejectButton' | translate }}"
+                                >
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </button>
+                        <div ng-mouseenter="kudosEntry.TooltipOpen = true" 
+                             ng-mouseleave="kudosEntry.TooltipOpen = false" 
+                             ng-show="kudosEntry.status != 'Pending'" 
+                             data-test-id="kudos-log-list-status" 
+                             class="text-nowrap" 
+                             ng-cloak>
+                            {{:: kudosEntry.status}}
+                            <span ng-if="kudosEntry.rejectionMessage && kudosEntry.status === 'Rejected'"
+                                  class="glyphicon glyphicon-exclamation-sign"
+                                  uib-tooltip-html="kudosEntry.rejectionMessage"
+                                  tooltip-placement="top"
+                                  tooltip-trigger="none"
+                                  tooltip-is-open="kudosEntry.TooltipOpen"
+                                  data-test-id="kudos-log-list-rejection-message">
+                            </span>
+                        </div>
+                    </td>
+                    <td th="{{ 'kudos.kudosTo' | translate }}" data-test-id="kudos-log-list-receiver">
+                        <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: kudosEntry.receiver.id })">
+                            {{:: kudosEntry.receiver.fullName}}
+                        </a>
+                    </td>
+                    <td th="{{ 'kudos.kudosType' | translate }}" data-test-id="kudos-log-list-type">
+                        {{:: kudosEntry.type.name }} ({{:: kudosEntry.type.value}})
+                    </td>
+                    <td th="{{ 'kudos.multiplier' | translate }}" data-test-id="kudos-log-list-multiplyby">
+                        {{:: kudosEntry.multiplier }}
+                    </td>
+                    <td th="{{ 'kudos.points' | translate }}" class="kudos-log-list-table-small-column" data-test-id="kudos-log-list-points">
+                        {{:: kudosEntry.points }}
+                    </td>
+                    <td ng-if="kudosEntry.comment.length > vm.kudosLogSettings.maxCommentsLength" 
+                        th="{{ 'kudos.comments' | translate }}"
+                        class="kudos-comment" 
+                        uib-tooltip="{{:: kudosEntry.comment | limitTo: vm.kudosLogSettings.maxCommentsLength}}..." 
+                        tooltip-placement="top" 
+                        tooltip-class="word-break"
+                        tooltip-append-to-body="true"
+                        data-test-id="kudos-approved-list-item-comment" ng-cloak>
+                        {{:: kudosEntry.comment | characters: vm.kudosLogSettings.minCommentsLength-3}}
+                    </td>
+                    <td ng-if="kudosEntry.comment.length > vm.kudosLogSettings.minCommentsLength && kudosEntry.comment.length <= vm.kudosLogSettings.maxCommentsLength" 
+                        th="{{ 'kudos.comments' | translate }}"
+                        class="kudos-comment"
+                        ng-mouseenter="kudosEntry.commentTooltipOpen = true" 
+                        ng-mouseleave="kudosEntry.commentTooltipOpen = false"
+                        ng-cloak> 
+                        <div uib-tooltip="{{:: kudosEntry.comment}}" 
+                             tooltip-placement="top" 
+                             tooltip-class="word-break"
+                             tooltip-trigger="none"
+                             tooltip-is-open="kudosEntry.commentTooltipOpen"
+                             data-test-id="kudos-approved-list-item-comment">
+                        {{:: kudosEntry.comment | characters: vm.kudosLogSettings.minCommentsLength-3}}</div>
+                    </td>
+                    <td ng-if="kudosEntry.comment.length <= vm.kudosLogSettings.minCommentsLength" 
+                        th="{{ 'kudos.comments' | translate }}"
+                        data-test-id="kudos-approved-list-item-comment" 
+                        ng-cloak>
+                        {{:: kudosEntry.comment}}
+                    </td>
+                    <td th="{{ 'kudos.kudosFrom' | translate }}" class="kudos-log-list-table-small-column" data-test-id="kudos-log-list-sender">
+                        <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: kudosEntry.sender.id })">
+                            {{:: kudosEntry.sender.fullName }}
+                        </a>
+                    </td>
+                    <td th="{{ 'kudos.date' | translate }}" class="kudos-log-list-table-small-column" data-test-id="kudos-log-list-created">
+                        {{:: kudosEntry.created | date: 'yyyy-MM-dd' }}
+                    </td>
+                    <td th="{{ 'kudos.kudosPhoto' | translate }}" class="kudos-log-list-table-small-column" data-test-id="kudos-log-list-picture">
+                        <span ng-if="!!kudosEntry.pictureId" class="glyphicon glyphicon-camera media-icons kudos-image" ace-picture-modal="kudosEntry.pictureId"></span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="pull-left" ng-show="vm.totalItems > vm.perPage">
+            <ace-item-list-pagination total-item-count="vm.totalItems" page-size="vm.perPage" current-page="vm.filter" on-changed="vm.getFilteredKudosLogList"></ace-item-list-pagination>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+</div>

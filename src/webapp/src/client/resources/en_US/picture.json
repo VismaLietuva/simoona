@@ -1,0 +1,9 @@
+﻿{
+  "entityName": "Picture",
+  "entityNamePlural": "Pictures",
+  "imageAttached": "Image has been successfuly attached",
+  "imageAttachedPreview": "Attached image:",
+  "imageInvalidType": "The selected image type is invalid. Supported types are gif, jpg, jpeg, and png.",
+  "imageSizeExceeded": "The selected image is too big to upload! Maximum image size is 5MB.",
+  "imageUploadError": "Failed to upload an image!"
+}

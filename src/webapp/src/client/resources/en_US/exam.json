@@ -1,0 +1,7 @@
+﻿{
+  "entityName": "Exam",
+  "entityNamePlural": "Exams",
+  "number": "Number",
+  "title": "Title",
+  "wrongAutoCompleteTypeError": "Incorrect 'type' parameter. Must be 'Title' or 'Number'."
+}

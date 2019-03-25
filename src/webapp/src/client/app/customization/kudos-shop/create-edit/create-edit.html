@@ -1,0 +1,155 @@
+<div class="row body-container">
+    <div class="col-xs-12" has-permissions="['KUDOSSHOP_ADMINISTRATION']">
+        <wave-spinner ng-if="vm.isLoading"></wave-spinner>
+        <div class="panel panel-default" ng-if="!vm.isLoading">
+            <div class="panel-heading">
+                <span ng-if="vm.states.isEdit" translate="kudosShop.editKudosShopItem"></span>
+                <span ng-if="vm.states.isAdd" translate="kudosShop.createKudosShopItem"></span>
+            </div>
+            <div class="panel-body">
+                <form name="kudosShopForm" class="form-horizontal" autocomplete="off">
+
+                    <!--Kudos shop item name-->
+                    <div class="form-group required"
+                         ng-class="{'has-error': kudosShopForm.name.$invalid && kudosShopForm.name.$dirty}">
+                        
+                        <label for="kudosShopItemName"
+                               class="control-label col-xs-12 col-sm-4"
+                               translate="kudosShop.kudosShopItemName"></label>
+                        
+                        <div class="col-xs-12 col-sm-4">
+                            <input id="kudosShopItemName" 
+                                   type="text" class="form-control" 
+                                   name="name" 
+                                   ng-model="vm.kudosShopItem.name" 
+                                   ng-maxlength="30" 
+                                   required/>
+                            
+                            <p class="text-danger help-block"
+                               ng-show="kudosShopForm.name.$error.required && kudosShopForm.name.$dirty" translate="common.messageFieldIsRequired"></p>
+                            
+                            <p class="text-danger help-block" 
+                               ng-show="kudosShopForm.name.$error.maxlength && kudosShopForm.name.$dirty" translate="common.messageInvalidLength" 
+                               translate-values="{ one: 30 }"></p>
+                        </div>
+                        
+                    </div>
+                    
+                    <!--Kudos shop item price-->
+                    <div class="form-group required"
+                         ng-class="{'has-error': kudosShopForm.price.$invalid && kudosShopForm.price.$dirty}">
+                        
+                        <label for="kudosShopItemPrice"
+                               class="control-label col-xs-12 col-sm-4" 
+                               translate="kudosShop.kudosShopItemPrice"></label>
+                        
+                        <div class="col-xs-12 col-sm-4">
+                            <input id="kudosShopPrice"
+                                   type="number" 
+                                   class="form-control"
+                                   name="price" 
+                                   ng-model="vm.kudosShopItem.price"
+                                   min="1" 
+                                   ng-pattern="/^([0-9]|10){1,10}$/"
+                                   ng-maxlength="10"
+                                   translate
+                                   translate-attr-placeholder="common.onlyWholeNumbers"
+                                   required>
+                            
+                            <p class="text-danger help-block" 
+                               ng-show="kudosShopForm.price.$invalid && kudosShopForm.price.$dirty || kudosShopForm.price.$error.pattern">
+                            </p>
+                            
+                            <p class="text-danger help-block" 
+                               ng-show="kudosShopForm.price.$error.required && kudosShopForm.price.$dirty" translate="common.messageFieldIsRequired"></p>
+                            
+                            <p class="text-danger help-block"
+                               ng-show="kudosShopForm.price.$error.maxlength && kudosShopForm.price.$dirty" translate="common.messageInvalidLength" 
+                               translate-values="{ one: 10 }"></p>
+                        </div>
+
+                    </div>
+                    
+                    <!--Kudos shop item description-->
+                    <div class="form-group" 
+                         ng-class="{'has-error': kudosShopForm.description.$invalid && kudosShopForm.description.$dirty}">
+                        
+                        <label for="kudosShopItemDescription" 
+                               class="control-label col-xs-12 col-sm-4" translate="kudosShop.kudosShopItemDescription"></label>
+                        
+                        <div class="col-xs-12 col-sm-4">
+                            <textarea id="kudosShopDescription" 
+                                      class="form-control" 
+                                      name="description" 
+                                      ng-model="vm.kudosShopItem.description" 
+                                      ng-maxlength="300" 
+                                      rows="5">
+                            </textarea>
+                            
+                            <p class="text-danger help-block" 
+                               ng-show="kudosShopForm.description.$error.maxlength && kudosShopForm.description.$dirty"
+                               translate="common.messageInvalidLength" 
+                               translate-values="{ one: 300 }"></p>
+                        </div>
+                        
+                    </div>
+
+                    <div has-permissions="['PICTURE_BASIC']">
+                        <input-wrapper label-text="{{'kudos.kudosPhoto' | translate}}"
+                                       classes="col-xs-12 col-sm-4 nopadding-left" label-classes="control-label col-xs-12 col-sm-4 nopadding-left">
+                                       <div class="col-xs-12 col-sm-4">
+                                            <input id="pictureSelect"
+                                                name="kudos-image"
+                                                type="file"
+                                                accept="image/*"
+                                                class="form-control"
+                                                onchange="angular.element(this).scope().vm.attachImage(this)"
+                                                data-test-id="image-upload-input-field"/>
+                                        </div>
+                            <a class="col-xs-12 col-sm-12" href="#" onclick="$('#pictureSelect').click(); return false;">
+                                <div ng-if="!vm.attachedFiles.length">
+                                    <img ng-src="{{vm.kudosShopItem.pictureId | thumb}}" />
+                                </div>            
+                                <div image-preview-thumb
+                                     ng-if="vm.imageSource" 
+                                     source="vm.imageSource" 
+                                     sources="vm.attachedFiles">
+                                </div>
+                            </a>
+                        </input-wrapper>
+                    </div>
+                    
+                    <!--Kudos shop buttons right -->
+                    <div class="pull-right">
+
+                        <button class="btn btn-primary" ng-if="vm.states.isAdd" ng-click="vm.saveKudosShopItem(vm.createKudosShopItem)" ng-disabled="kudosShopForm.$invalid">
+                            <span translate="common.save"></span>
+                        </button>
+
+                        <button class="btn btn-primary" ng-if="vm.states.isEdit" ng-click="vm.saveKudosShopItem(vm.updateKudosShopItem)" ng-disabled="kudosShopForm.$invalid">
+                            <span translate="common.update"></span>
+                        </button>
+
+                        <button class="btn btn-default" ui-sref="Root.WithOrg.Admin.Customization.KudosShop.List">
+                            <span translate="common.cancel"></span>
+                        </button>
+
+                    </div>
+
+                    <!--Kudos shop delete button left -->
+                    <div class="pull-left">
+
+                        <div class="pull-left">
+                            <button ng-if="vm.states.isEdit" class="btn btn-danger" ace-confirmation-modal="vm.deleteKudosShopItem(vm.kudosShopItem.id)">
+                                <span translate="common.delete"></span>
+                            </button>
+                        </div>
+
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>

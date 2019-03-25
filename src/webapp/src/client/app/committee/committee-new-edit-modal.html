@@ -1,0 +1,172 @@
+﻿<div ng-if="hasPermissions">
+    <div class="modal-header">
+        <button type="button" class="close" data-ng-click="cancel()">&times;</button>
+        <h4 ng-show="!edit" class="modal-title"><span>{{"committee.newCommittee" | translate}}</span></h4>
+        <h4 ng-show="edit" class="modal-title"><span>{{"committee.editCommittee" | translate}}</span></h4>
+    </div>
+    <div class="modal-body">
+        <form name="newCommittee" role="form" novalidate>
+            <!--NAME-->
+            <div class="form-group" ng-class="{ 'has-error' : newCommittee.name.$error.required && !newCommittee.name.$pristine }">
+                <label>{{"committee.name" | translate}} <span class="text-danger">*</span></label>
+                <input data-test-id="committeeName"
+                       type="text" name="name"
+                       class="form-control"
+                       ng-model="committee.name"
+                       ng-maxlength="100" required />
+                <p data-test-id="newCommitteeNameError"
+                   ng-show="newCommittee.name.$error.required && !newCommittee.name.$pristine"
+                   class="help-block">{{"committee.nameError" | translate}}</p>
+                <p data-test-id="newCommitteeNameLengthError"
+                   ng-show="newCommittee.name.$error.maxlength && !newCommittee.name.$pristine"
+                   class="help-block">{{"committee.nameLengthError" | translate}}</p>
+            </div>
+
+            <!--PICTURE-->
+            <div class="form-group">
+                <label class="col-md-12 nopadding-left">{{"committee.picture" | translate}}</label>
+                <div class="col-md-12">
+                    <div ng-if="!attachedFiles.length">
+                        <img class="center-block cursorHand" onclick="$('#pictureSelect').click(); return false;" ng-src="{{committee.pictureId | userThumb}}" />
+                    </div>
+                    <span ng-if="attachedFiles.length"
+                          onclick="$('#pictureSelect').click(); return false;"
+                          ng-repeat="file in attachedFiles"
+                          ng-thumb="{ file: file, height: thumbHeight, class: 'user-thumb center-block cursorHand' }">
+                        <canvas></canvas>
+                    </span>
+                    
+                    <label id="committeePictureBtn" class="btn btn-warning center-block">
+                        <input id="pictureSelect"
+                               data-test-id="pictureSelect"
+                               type="file"
+                               accept="image/*"
+                               onchange="angular.element(this).scope().imageAttached(this)" ng-hide="true" ng-required="true" />{{"committee.choosePicture" | translate}}
+                    </label>
+                </div>
+            </div>
+
+            <!--LEADS-->
+            <div class="form-group">
+                <label>{{"committee.leads" | translate}}</label>
+                <tags-input id="leads"
+                            name="leads"
+                            ng-model="committee.leads"
+                            add-from-autocomplete-only="true"
+                            display-property="fullName"
+                            add-on-enter="true"
+                            add-on-space="true"
+                            add-on-comma="true"
+                            placeholder="{{'committee.leadsPlaceHolder' | translate}}"
+                            add-on-blur="true"
+                            wrapped>
+                    <auto-complete source="allUsers($query)" min-length="0" max-results-to-show="5"></auto-complete>
+                </tags-input>
+                <p data-test-id="newCommitteeLeadsError"
+                   ng-show="!committee.leads.length && !newCommittee.leads.$pristine"
+                   class="help-block">{{"committee.leadsError" | translate}}</p>
+            </div>
+
+            <!--MEMBERS-->
+            <div class="form-group">
+                <label>{{"committee.members" | translate}}</label>
+                <tags-input id="members"
+                            name="members"
+                            ng-model="committee.members"
+                            add-from-autocomplete-only="true"
+                            display-property="fullName"
+                            add-on-enter="true"
+                            add-on-space="true"
+                            add-on-comma="true"
+                            placeholder="{{'committee.membersPlaceHolder' | translate}}"
+                            add-on-blur="true"
+                            wrapped>
+                    <auto-complete source="allUsers($query)" min-length="0" max-results-to-show="5"></auto-complete>
+                </tags-input>
+                <p data-test-id="newCommitteeMembersError"
+                   ng-show="!committee.members.length && !newCommittee.members.$pristine"
+                   class="help-block">{{"committee.membersError" | translate}}</p>
+            </div>
+
+            <!--DELEGATES-->
+            <div class="form-group">
+                <label>{{"committee.delegates" | translate}}</label>
+                <tags-input id="delegates"
+                            name="delegates"
+                            ng-model="committee.delegates"
+                            add-from-autocomplete-only="true"
+                            display-property="fullName"
+                            add-on-enter="true"
+                            add-on-space="true"
+                            add-on-comma="true"
+                            placeholder="{{'committee.delegatesPlaceHolder' | translate}}"
+                            add-on-blur="true"
+                            wrapped>
+                    <auto-complete source="allUsers($query)" min-length="0" max-results-to-show="5"></auto-complete>
+                </tags-input>
+                <p data-test-id="newCommitteeDelegatesError"
+                   ng-show="!committee.delegates.length && !newCommittee.delegates.$pristine"
+                   class="help-block">{{"committee.delegatesError" | translate}}</p>
+            </div>
+
+            <!--WEBSITE-->
+            <div class="form-group" ng-class="{ 'has-error' : newCommittee.website.$invalid && !newCommittee.website.$pristine }">
+                <label>{{"committee.website" | translate}}</label>
+                <input type="text"
+                       data-test-id="committeeWebsite"
+                       name="website"
+                       class="form-control"
+                       ng-model="committee.website"></input>
+                <p data-test-id="newWebsiteError"
+                   ng-show="newCommittee.website.$error.url && !newCommittee.website.$pristine"
+                   class="help-block">{{"committee.websiteError" | translate}}</p>
+            </div>
+
+            <!--KUDOS COMITEE-->
+            <div class="form-group">
+                <label>
+                    <input type="checkbox"
+                           data-test-id="isKudosCommittee"
+                           name="isKudosCommittee"
+                           ng-model="committee.isKudosCommittee"
+                           ng-change="triggerComiteeChange(committee)"></input>
+                    {{"committee.isKudosCommittee" | translate}}
+                </label>
+            </div>
+
+
+            <!--DESCRIPTION-->
+            <div class="form-group" ng-class="{ 'has-error' : newCommittee.description.$invalid && !newCommittee.description.$pristine }">
+                <label>{{"committee.description" | translate}} <span class="text-danger">*</span></label>
+                <textarea type="text"
+                          data-test-id="committeeDescription"
+                          name="description"
+                          ng-model="committee.description"
+                          class="form-control kudosify-modal-comments"
+                          rows="3"
+                          ng-maxlength="1000" required></textarea>
+                <p data-test-id="newCommitteeDescriptionError"
+                   ng-show="newCommittee.description.$error.required && !newCommittee.description.$pristine"
+                   class="help-block">{{"committee.descriptionError" | translate}}</p>
+                <p data-test-id="newCommitteeDescriptionLengthError"
+                   ng-show="newCommittee.description.$error.maxlength && !newCommittee.description.$pristine"
+                   class="help-block">{{"committee.descriptionLengthError" | translate}}</p>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button ng-if="hasPermissions"
+                class="btn btn-primary"
+                data-test-id="committeeSubmit"
+                ng-disabled="newCommittee.$invalid"
+                ng-click="submitNewCommittee(committee)">
+            <span class="glyphicon glyphicon-disk-save"></span>
+            {{"common.save" | translate}}
+        </button>
+        <button class="btn btn-default"
+                data-test-id="committeeCancel"
+                data-ng-click="cancel()">
+            {{"common.cancel" | translate}}
+        </button>
+    </div>
+</div>

@@ -1,0 +1,14 @@
+﻿{
+  "createPermission": "New Permission",
+  "editPermission": "Edit Permission",
+  "name": "Name",
+  "roles": "Roles",
+  "entityName": "Permission",
+  "entityNamePlural": "Permissions",
+  "showAdmin": "Only administration permission",
+  "showAll": "Show all",
+  "showBasic": "Only basic permissions",
+  "scope": "Scope",
+  "admin": "Administration",
+  "basic": "Basic"
+}

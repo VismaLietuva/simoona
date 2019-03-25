@@ -1,0 +1,6 @@
+﻿{
+  "eventNullError": "Google kalendoriaus renginys nebuvo sukurtas",
+  "serviceNullError": "Google Calendar Api servisas nėra sukurtas",
+  "updateError": "Google kalendoriaus renginys nebuvo atnaujintas",
+  "x509CertificateNotFoundError": "X509 sertifikato failas nerastas"
+}

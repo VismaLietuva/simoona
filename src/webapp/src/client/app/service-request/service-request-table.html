@@ -1,0 +1,82 @@
+<table class="nc-table nc-table-active nopadding" ng-if="!!pagedServiceRequestList.itemCount">
+    <thead>
+        <tr>
+            <th class="hidden-xs hidden-sm">
+                <ace-sort-link on-sort="onSort" sort-dir="filter.sortOrder" sort-field="filter.sortBy" sort-value="created"><span>{{"serviceRequest.date" | translate}}</span></ace-sort-link>
+            </th>
+            <th>
+                <ace-sort-link on-sort="onSort" sort-dir="filter.sortOrder" sort-field="filter.sortBy" sort-value="title"><span>{{"serviceRequest.title" | translate}}</span></ace-sort-link>
+            </th>
+            <th class="hidden-xs hidden-sm">
+                <ace-sort-link on-sort="onSort" sort-dir="filter.sortOrder" sort-field="filter.sortBy" sort-value="status.title"><span>{{"serviceRequest.status" | translate}}</span></ace-sort-link>
+                <span class="glyphicon glyphicon-exclamation-sign" uib-tooltip-template="'tooltipTemplate.html'" tooltip-placement="right" tooltip-append-to-body="true" tooltip-class="service-request-status-tooltip"></span>
+            </th>
+            <th>
+                <ace-sort-link on-sort="onSort" sort-dir="filter.sortOrder" sort-field="filter.sortBy" sort-value="employee.userName"><span>{{"serviceRequest.user" | translate}}</span></ace-sort-link>
+            </th>
+            <th class="hidden-xs hidden-sm">
+                <ace-sort-link on-sort="onSort" sort-dir="filter.sortOrder" sort-field="filter.sortBy" sort-value="priority.id"><span>{{"serviceRequest.priority" | translate}}</span></ace-sort-link>
+            </th>
+            <th class="hidden-xs hidden-sm">
+                <ace-sort-link on-sort="onSort" sort-dir="filter.sortOrder" sort-field="filter.sortBy" sort-value="CategoryName"><span>{{"serviceRequest.category" | translate}}</span></ace-sort-link>
+            </th>
+            <th class="text-center">
+                {{"common.actions" | translate}}
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="serviceRequest in pagedServiceRequestList.pagedList" id="lastId@(item.Id)">
+            <td class="hidden-xs hidden-sm">
+                {{serviceRequest.created | date:'yyyy-MM-dd'}}
+            </td>
+            <td>
+                <a ng-click="openRequestDescriptionModal(serviceRequest)">{{serviceRequest.title | characters:50}}</a>
+            </td>
+            <td class="hidden-xs hidden-sm">
+                {{"serviceRequest." + serviceRequest.status.title.toLowerCase() | translate}}
+            </td>
+            <td>
+                <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: serviceRequest.employee.id })">{{serviceRequest.employee.firstName}} {{serviceRequest.employee.lastName}}</a>
+            </td>
+            <td class="hidden-xs hidden-sm">
+                {{"serviceRequest." + serviceRequest.priority.title.toLowerCase() | translate}}
+            </td>
+            <td class="hidden-xs hidden-sm">
+                {{serviceRequest.categoryName}}
+            </td>
+            <td class="text-center">
+                <div class="btn-group-xs space-around-elements">
+                    <a ng-click="editServiceRequestButtonClick(serviceRequest)"
+                       class="link"
+                       translate-attr-title="common.edit"
+                       translate>
+                        <span class="vismaicon vismaicon-edit" aria-hidden="true"></span>
+                    </a>
+                    <a class="btn btn-primary glyphicon glyphicon-ok" 
+                       ng-click="closeKudosServiceRequestButtonClick(serviceRequest)" 
+                       title="{{'common.close' | translate}}" 
+                       ng-if="(isAdmin || serviceRequest.isCloseable) && serviceRequest.status.title !== 'Done' && serviceRequest.categoryName === 'Kudos'"></a>
+                    <a class="btn btn-primary glyphicon glyphicon-ok" 
+                       ng-click="closeServiceRequestButtonClick(serviceRequest)" 
+                       title="{{'common.close' | translate}}" 
+                       ng-if="(isAdmin || serviceRequest.isCloseable) && serviceRequest.status.title !== 'Done' && serviceRequest.categoryName !== 'Kudos'"></a>
+                    <div ng-if="(isAdmin || serviceRequest.isCloseable) && serviceRequest.status.title === 'Done'" style="width: 44px"></div>
+                    <div ng-if="hasEditableServiceRequests && !serviceRequest.isCloseable" style="width: 44px"></div>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+    <script type="text/ng-template" id="tooltipTemplate.html">
+        <div>
+            <p>{{'serviceRequest.open' | translate}} - {{'serviceRequest.statusOpenDescription' | translate}}</p>
+            <p>{{'serviceRequest.in progress' | translate}} - {{'serviceRequest.statusInProgressDescription' | translate}}</p>
+            <p>{{'serviceRequest.cancelled' | translate}} - {{'serviceRequest.statusCancelledDescription' | translate}}</p>
+            <p>{{'serviceRequest.done' | translate}} - {{'serviceRequest.statusDoneDescription' | translate}}</p>
+            <p>{{'serviceRequest.purchased' | translate}} - {{'serviceRequest.statusPurchasedDescription' | translate}}</p>
+        </div>
+    </script>
+</table>
+<div class="col-xs-12 nopadding">
+    <ace-item-list-pagination total-item-count="pagedServiceRequestList.itemCount" page-size="pagedServiceRequestList.pageSize" current-page="filter" on-changed="changedPage"></ace-item-list-pagination>
+</div>

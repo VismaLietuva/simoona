@@ -1,0 +1,14 @@
+﻿<div class="image-thumb">
+    <img class="wall-image-preview" 
+         ng-show="source" 
+         ng-src="{{source}}" />
+    <button type="button"
+            class="close dismissButton"
+            ng-if="source"
+            ng-click="dismiss()"
+            data-test-id="beforeUploadPostCommentPreviewDismissButton">
+        &times;
+    </button>
+
+    <div class="clearfix"></div>
+</div>

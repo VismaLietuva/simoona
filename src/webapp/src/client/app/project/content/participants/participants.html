@@ -1,0 +1,21 @@
+<div class="col-xs-12 participants-container" ng-cloak translate-cloak>
+    <wave-spinner ng-if="vm.isLoading"></wave-spinner>
+
+    <div class="participants-container-header" ng-if="!vm.isLoading">
+        <div class="participants-title">
+            <span translate="projects.members"></span>
+            <span class="badge badge-default">
+                {{vm.project.members.length}}
+            </span>
+        </div>
+    </div>
+
+    <div class="participants-container-body" ng-if="!vm.isLoading">
+        <div class="tab-content-show">
+            <ace-project-participant-list members="vm.project.members" 
+                                          on-leave-project="vm.expelUserFromProject(member)" 
+                                          is-delete-visible="vm.isAdmin">
+            </ace-project-participant-list>
+        </div>
+    </div>
+</div>

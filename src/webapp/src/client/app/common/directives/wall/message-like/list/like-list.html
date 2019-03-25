@@ -1,0 +1,46 @@
+﻿<span ng-if="positionedLikes.length === 1" ng-cloak translate-cloak>
+    <span class="glyphicon glyphicon-thumbs-up link-color"></span>
+    <span ng-if="!!user">
+        <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: positionedLikes[0].userId })" 
+           translate="common.you"></a>
+        <span translate="wall.likeThis"></span>.
+    </span>
+
+    <span ng-if="!user">
+        <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: positionedLikes[0].userId })">
+            {{::positionedLikes[0].fullName}}</a>
+        <span translate="wall.likesThis"></span>
+    </span>
+</span>
+<span ng-if="positionedLikes.length === 2" ng-cloak translate-cloak>
+    <span class="glyphicon glyphicon-thumbs-up link-color"></span>
+    <a ng-if="!!user"
+       ui-sref="Root.WithOrg.Client.Profiles.Details({ id: positionedLikes[0].userId })" 
+       translate="common.you"></a>
+
+    <a ng-if="!user"
+       ui-sref="Root.WithOrg.Client.Profiles.Details({ id: positionedLikes[0].userId })">
+        {{::positionedLikes[0].fullName}}</a>
+    <span translate="common.and"></span>
+    <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: positionedLikes[1].userId })">
+        {{::positionedLikes[1].fullName}}</a>
+    <span translate="wall.likeThis"></span>.
+</span>
+<span ng-if="positionedLikes.length > 2" ng-cloak translate-cloak>
+    <span class="glyphicon glyphicon-thumbs-up link-color"></span>
+    <a ng-if="!!user" 
+       ui-sref="Root.WithOrg.Client.Profiles.Details({ id: positionedLikes[0].userId })" 
+       translate="common.you"></a>
+
+    <a ng-if="!user"
+       ui-sref="Root.WithOrg.Client.Profiles.Details({ id: positionedLikes[0].userId })">
+        {{::positionedLikes[0].fullName}}</a>
+    <span translate="common.and"></span>
+    <a ace-message-like-list-popover
+       likes="positionedLikes"
+       popover-placement="right"
+       data-test-id="{{::likeType}}-like-others">
+       <span translate="common.others"
+             translate-values="{ likeCount: positionedLikes.length - 1 }"></span></a>
+    <span translate="wall.likeThis"></span>.
+</span>

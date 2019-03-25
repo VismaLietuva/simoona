@@ -1,0 +1,13 @@
+﻿{
+  "create": "New organization",
+  "createSite": "New user and organization site",
+  "edit": "Edit organization",
+  "entityName": "Organization",
+  "entityNamePlural": "Organizations",
+  "existsWithSameName": "Organization with same name or short name exists, try other name",
+  "existsWithSameName2": "Organization with name '{{ one }}' ('{{ two }}') allready exists, try other name",
+  "language": "Language",
+  "name": "Title",
+  "noNameReceived": "Organization must have name ant short name.",
+  "shortName": "Short Title"
+}

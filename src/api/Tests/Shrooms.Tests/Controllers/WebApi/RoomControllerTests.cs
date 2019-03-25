@@ -1,0 +1,210 @@
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Dynamic;
+using System.Net;
+using System.Net.Http;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using System.Web.Http;
+using System.Web.Http.Controllers;
+using System.Web.Http.Hosting;
+using AutoMapper;
+using Microsoft.AspNet.Identity;
+using NSubstitute;
+using NUnit.Framework;
+using Shrooms.API.Controllers.WebApi;
+using Shrooms.Authentification;
+using Shrooms.DataLayer;
+using Shrooms.EntityModels.Models;
+using Shrooms.ModelMappings;
+using Shrooms.UnitTests.ModelMappings;
+using Shrooms.WebViewModels.Models;
+using Shrooms.WebViewModels.Models.User;
+
+namespace Shrooms.UnitTests.Controllers.WebApi
+{
+    [TestFixture]
+    public class RoomControllerTests
+    {
+        private IUnitOfWork _unitOfWork;
+        private RoomController _roomController;
+        private IUserStore<ApplicationUser> _userStore;
+        private IRoleStore<ApplicationRole, string> _roleStore;
+        private ShroomsUserManager _userManager;
+        private ShroomsRoleManager _roleManager;
+        private IRepository<ApplicationUser> _applicationUserRepository;
+        private IMapper _mapper;
+
+        [SetUp]
+        public void TestInitializer()
+        {
+            _unitOfWork = new MockUnitOfWork();
+            _applicationUserRepository = _unitOfWork.GetRepository<ApplicationUser>();
+            _userStore = MockIdentity.MockShroomsUserStore(_unitOfWork.DbContext);
+            _roleStore = MockIdentity.MockRoleStore();
+            _userManager = MockIdentity.MockUserManager(_userStore, _unitOfWork.DbContext);
+            _roleManager = MockIdentity.MockRoleManager(_roleStore);
+            _mapper = ModelMapper.Create();
+
+            _roomController = new RoomController(_mapper, _unitOfWork, _userManager, _roleManager);
+            _roomController.ControllerContext = Substitute.For<HttpControllerContext>();
+            _roomController.Request = new HttpRequestMessage();
+            _roomController.Request.Properties.Add(HttpPropertyKeys.HttpConfigurationKey, new HttpConfiguration());
+            _roomController.Request.SetConfiguration(new HttpConfiguration());
+            _roomController.RequestContext.Principal =
+                new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, "1") }));
+        }
+
+        [Test]
+        public async void Room_Get_Should_Return_Correct_View_Model()
+        {
+            var result = _roomController.Get(1);
+            var room = await result.Content.ReadAsAsync<RoomViewModel>();
+
+            Assert.IsInstanceOf<RoomViewModel>(room);
+        }
+
+        [Test]
+        public async void Room_Get_Should_Return_Correct_Id()
+        {
+            var result = _roomController.Get(1);
+            var model = await result.Content.ReadAsAsync<RoomViewModel>();
+
+            Assert.AreEqual(1, model.Id);
+        }
+
+        [Test]
+        public void Room_GetPaged_Should_Return_Correct_Paged_Model()
+        {
+            var rooms = _roomController.GetPaged();
+            Assert.IsInstanceOf<PagedViewModel<RoomViewModel>>(rooms);
+        }
+
+        [Test]
+        public void Room_GetPaged_Should_Return_Correct_Page_Count()
+        {
+            var rooms = _roomController.GetPaged(page: 1, pageSize: 2);
+            Assert.AreEqual(3, rooms.PageCount);
+        }
+
+        [Test]
+        public void Room_GetPagedByFloor_Should_Return_Correct_Paged_Model()
+        {
+            var rooms = _roomController.GetAllRoomsByFloor(floorId: 1);
+            Assert.IsInstanceOf<PagedViewModel<RoomViewModel>>(rooms);
+        }
+
+        [Test]
+        public void Room_GetPagedByFloor_Should_Return_Correct_Page_Count()
+        {
+            var rooms = _roomController.GetAllRoomsByFloor(floorId: 1, page: 1, pageSize: 2);
+            Assert.AreEqual(2, rooms.PageCount);
+        }
+
+        [Test]
+        public void Room_Post_Should_Return_Ok_Response_If()
+        {
+            var testRoom = new RoomPostViewModel()
+            {
+                Id = 7,
+                Name = "testName",
+                Number = "2",
+                Coordinates = "111,222,333",
+                FloorId = 1,
+                ApplicationUsers = new List<ApplicationUserViewModel>
+                                {
+                                    new ApplicationUserViewModel
+                                        {
+                                            Id = "1"
+                                        }
+                                }
+            };
+
+            var userToReturn = _unitOfWork.GetDbContextAs<MockDbContext>().ApplicationUsers.Find(p => p.Id == "1");
+            _userManager.FindByIdAsync("1").Returns(Task.FromResult(userToReturn));
+
+            _roomController.Request = new HttpRequestMessage();
+            _roomController.Request.SetConfiguration(new HttpConfiguration());
+            _roomController.Validate(testRoom);
+
+            var response = _roomController.Post(testRoom);
+
+            Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
+        }
+
+        [Test]
+        public void Room_Post_Should_Return_Bad_Request_If_Invalid_Room_Model_Provided()
+        {
+            var response = _roomController.Post(null);
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Test]
+        public void Room_Put_Should_Return_Ok_Response_If()
+        {
+            var applicationUser = _applicationUserRepository.Get().FirstOrDefault();
+            var applicationUserViewModel = _mapper.Map<ApplicationUser, ApplicationUserViewModel>(applicationUser);
+
+            var testRoom = new RoomPostViewModel()
+            {
+                Id = 1,
+                Name = "testName",
+                Number = "2",
+                Coordinates = "111,222,333",
+                FloorId = 1,
+                ApplicationUsers = new List<ApplicationUserViewModel>
+                                {
+                                    applicationUserViewModel
+                                }
+            };
+
+            _userManager.FindByIdAsync(applicationUser.Id).Returns(Task.FromResult(applicationUser));
+
+            _roomController.Validate(testRoom);
+            var response = _roomController.Put(testRoom);
+
+            Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
+        }
+
+        [Test]
+        public void Room_Put_Should_Return_Not_Found_If_Updating_Invalid_Room()
+        {
+            var testRoom = new RoomPostViewModel()
+            {
+                Id = 100,
+                Name = "testName",
+                Number = "2",
+                Coordinates = "111,222,333",
+                FloorId = 1,
+                ApplicationUsers = new List<ApplicationUserViewModel>()
+            };
+
+            _roomController.Validate(testRoom);
+            var response = _roomController.Put(testRoom);
+
+            Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Test]
+        public void Room_Delete_Should_Return_Not_Found_If_Incorrect_Id_Provided()
+        {
+            _roomController.Request = new HttpRequestMessage();
+            _roomController.Request.SetConfiguration(new HttpConfiguration());
+
+            var response = _roomController.Delete(-1);
+
+            Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Test]
+        public void Room_Delete_Should_Return_Ok_If_Room_Deleted_SuccessfullyDeleteReturnOkResponse()
+        {
+            _roomController.Request = new HttpRequestMessage();
+            _roomController.Request.SetConfiguration(new HttpConfiguration());
+
+            var response = _roomController.Delete(1);
+
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        }
+    }
+}

@@ -1,0 +1,7 @@
+<div ui-view="navigation-bar"></div>
+<div class="container-fluid">
+    <div class="row">
+        <div ng-if="vm.isAuthenticated() && !vm.isExternal" ui-view="left-menu" class="col-sm-3 col-md-2"></div>
+        <ui-view ng-class="vm.isAuthenticatedNotNewUser() && !vm.isExternal ? 'col-xs-12 col-sm-9 col-md-10' : 'col-xs-12'"></ui-view>
+    </div>
+</div>

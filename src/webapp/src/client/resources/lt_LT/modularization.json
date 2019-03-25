@@ -1,0 +1,9 @@
+﻿{
+  "moduleOff": "IŠJUNG.",
+  "moduleOn": "ĮJUNG.",
+  "modulePanelLinkTitle": "Moduliai",
+  "modulesPanelHeader": "Modulių nustatymai",
+  "moduleStatusTableHeader": "Įjungta/Išjungta",
+  "switchModulesButtonTitle": "Patvirtinti",
+  "moduleNameTableHeader": "Modulio pavadinimas"
+}

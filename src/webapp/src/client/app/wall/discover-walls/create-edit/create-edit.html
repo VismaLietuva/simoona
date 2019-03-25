@@ -1,0 +1,155 @@
+<div class="row">
+    <div class="col-xs-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <span ng-if="vm.states.isCreate" data-test-id="create-wall-header" translate="wall.createNewWall"></span>
+                <span ng-if="vm.states.isEdit" data-test-id="edit-wall-header" translate="wall.editWall"></span>
+            </div>
+            <div class="panel-body">
+                <form name="wallForm" class="form-horizontal" autocomplete="off">
+
+                    <!--wall name-->
+                    <div class="form-group required"
+                    	 ng-class="{'has-error': wallForm.name.$invalid && wallForm.name.$dirty}">
+                        <label for="name"
+                        	   class="control-label col-xs-4"
+                        	   translate="wall.wallName"></label>
+                        <div class="col-xs-7 col-md-6 col-lg-5">
+                            <input id="name"
+                            	   type="text"
+                            	   class="form-control"
+                            	   name="name"
+                            	   ng-model="vm.wall.name"
+                            	   ng-maxlength="vm.wallSettings.wallNameLength"
+                            	   data-test-id="wall-form-name-input"
+                            	   required/>
+                            <p class="text-danger help-block"
+                           	   ng-if="wallForm.name.$error.required && wallForm.name.$dirty"
+                           	   translate="common.messageFieldIsRequired"></p>
+                            <p class="text-danger help-block"
+                               ng-if="wallForm.name.$error.maxlength && wallForm.name.$dirty"
+                               translate="common.messageInvalidLength"
+                               translate-values="{ one: vm.wallSettings.wallNameLength }"></p>
+                        </div>
+                    </div>
+
+                    <!--wall description-->
+                    <div class="form-group required"
+                    	 ng-class="{'has-error': wallForm.description.$invalid && wallForm.description.$dirty}">
+                        <label for="description"
+                        	   class="control-label col-xs-4"
+                        	   translate="wall.wallDescription"></label>
+                        <div class="col-xs-7 col-md-6 col-lg-5">
+                            <textarea id="description"
+                            		  name="description"
+                            		  class="form-control"
+                            		  ng-model="vm.wall.description"
+                            		  ng-maxlength="vm.wallSettings.wallDescriptionLength"
+                            		  rows="3"
+                            		  data-test-id="wall-form-description-input"
+                            		  required></textarea>
+                          	<p class="text-danger help-block"
+                           	   ng-if="wallForm.description.$error.required && wallForm.description.$dirty"
+                           	   translate="common.messageFieldIsRequired"></p>
+                            <p class="text-danger help-block"
+                               ng-if="wallForm.description.$error.maxlength && wallForm.description.$dirty"
+                               translate="common.messageInvalidLength"
+                               translate-values="{ one: vm.wallSettings.wallDescriptionLength }"></p>
+                        </div>
+                    </div>
+
+                    <!--wall moderators-->
+                    <div class="form-group required"
+                         ng-class="{'has-error': wallForm.moderators.$invalid && wallForm.moderators.$dirty}">
+
+                        <label for="moderators"
+                               class="control-label col-xs-4"
+                               translate="wall.wallModerators">
+                        </label>
+                        <div class="col-xs-7 col-md-6 col-lg-5" >
+                            <tags-input name="wallModerators"
+                                        id="moderators"
+                                        add-from-autocomplete-only="true"
+                                        ng-model="vm.wall.moderators"
+                                        display-property="fullName"
+                                        add-on-enter="true"
+                                        add-on-space="true"
+                                        add-on-comma="true"
+                                        add-on-blur="true"
+                                        placeholder="{{'wall.addModerators' | translate}}"
+                                        data-test-id="wall-moderators" wrapped translate-cloak required>
+                                <auto-complete source="vm.searchUsersAsModerators($query)" min-length="2" max-results-to-show="5"></auto-complete>
+                            </tags-input>
+                        </div>
+                    </div>
+
+                    <!--wall photo-->
+                    <div class="form-group required"
+                    	 ng-class="{'has-error': wallForm.image-file-input.$invalid && wallForm.image-file-input.$dirty}">
+                        <label for="image-file-input"
+                        	   class="control-label col-xs-4"
+                        	   translate="wall.wallLogo"></label>
+                        <div class="col-xs-7 col-md-6 col-lg-5">
+                            <ace-photo-crop-upload image="vm.wallLogo"
+                            					   is-crop-visible="vm.states.isCreate || !!vm.wallLogo"
+                            					   aspect-ratio="1.5"
+                            					   result-image="vm.wallCroppedLogo"
+                            					   image-size="vm.wallLogoSize">
+                            </ace-photo-crop-upload>
+                            <img ng-if="vm.states.isEdit && !vm.wallCroppedLogo && !vm.wallLogo" src="{{vm.wall.logo | imageThumb:vm.wallLogoSize:'crop'}}" />
+                        </div>
+                    </div>
+
+                    <!-- Wall delete button left -->
+                    <div class="pull-left">
+                        <button type="button"
+                                ng-if="vm.states.isEdit"
+                                class="btn btn-danger"
+                                ace-confirmation-modal="vm.deleteWall(vm.wall)"
+                                ng-disabled="vm.wall.type === 'Main'"
+                                data-test-id="wall-delete-button">
+                            <span translate="common.delete"></span>
+                        </button>
+                    </div>
+
+                    <!--wall create/edit buttons right -->
+                    <div class="pull-right">
+                        <button type="button"
+                                class="btn btn-primary"
+                                ng-if="vm.states.isCreate"
+                        		ng-click="vm.saveWall(vm.createWall, true)"
+                        		ng-disabled="wallForm.$invalid || !vm.wallLogo || !vm.wallCroppedLogo"
+                        		data-test-id="wall-form-save-button">
+                            <span translate="common.save"></span>
+                        </button>
+
+                        <button type="button"
+                                class="btn btn-primary"
+                                ng-if="vm.states.isEdit"
+                                ng-click="vm.saveWall(vm.editWall, !!vm.wallLogo)"
+                                ng-disabled="wallForm.$invalid || (!!vm.wallLogo && !vm.wallCroppedLogo)"
+                                data-test-id="wall-form-edit-button">
+                            <span translate="common.update"></span>
+                        </button>
+
+                        <button type="button"
+                                class="btn btn-default"
+                                ng-if="vm.states.isCreate"
+                        		ui-sref="Root.WithOrg.Client.Wall.List"
+                        		data-test-id="wall-form-cancel-button">
+                            <span translate="common.cancel"></span>
+                        </button>
+
+                        <button type="button"
+                                class="btn btn-default"
+                                ng-if="vm.states.isEdit"
+                                ui-sref="Root.WithOrg.Client.Wall.Item.Feed({wall: vm.wall.id, search: null, post: null})"
+                                data-test-id="wall-form-cancel-button">
+                            <span translate="common.cancel"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

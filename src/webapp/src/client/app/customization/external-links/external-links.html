@@ -1,0 +1,95 @@
+<div class="row body-container">
+    <div class="col-xs-12" has-permissions="['EXTERNALLINK_ADMINISTRATION']">
+        <div class="panel panel-default">
+            <div class="panel-heading" translate="customization.externalLinks"></div>
+            <div class="panel-body">
+                <wave-spinner ng-if="vm.isLoadingLinks"></wave-spinner>
+                <div ng-if="!vm.isLoadingLinks" 
+                     ng-form 
+                     name="externalLinksForm"
+                     class="external-link-list-container">
+                    <div>
+                        <div ng-form name="externalLinkForm"
+                             class="external-link-container"
+                             ng-repeat="link in vm.externalLinks track by $index">
+
+                            <div class="col-xs-10 col-sm-11 nopadding form-group link-input-container required">
+                                
+                                <!-- Name -->
+                                <label class="col-xs-12 col-sm-2" 
+                                        translate="customization.name"></label>
+                                <div class="col-xs-12 col-sm-4">
+                                    <input id="linkName{{$index}}" 
+                                            name="linkName" 
+                                            type="text" 
+                                            ng-model="link.name"
+                                            ng-maxlength="30" 
+                                            required
+                                            ng-required="true"
+                                            ng-class="{'has-error': !vm.isLinkUnique(link, 'name') || (externalLinkForm.linkName.$error.required && externalLinkForm.linkName.$dirty) || (externalLinkForm.linkName.$error.maxlength)}">
+                                    <p class="text-danger help-block" 
+                                        ng-if="externalLinkForm.linkName.$error.required && externalLinkForm.linkName.$dirty" 
+                                        translate="common.messageFieldIsRequired"></p>
+                                    <p class="text-danger help-block" 
+                                        ng-if="externalLinkForm.linkName.$error.maxlength" 
+                                        translate="common.maxLengthError" 
+                                        translate-values="{ two: 30 }"></p>
+                                    <p class="text-danger help-block" 
+                                        ng-if="!vm.isLinkUnique(link, 'name')" 
+                                        translate="customization.linkNameNotUnique"></p>
+                                </div>
+
+                                <!-- Url -->
+                                <label class="col-xs-12 col-sm-1" 
+                                        translate="common.url"></label>
+                                <div class="col-xs-12 col-sm-4">
+                                    <input id="linkUrl{{$index}}" 
+                                            name="linkUrl" 
+                                            type="url" 
+                                            ng-pattern="vm.urlRegex" 
+                                            placeholder="{{'customization.urlPlaceholder' | translate}}" 
+                                            ng-model="link.url"
+                                            required
+                                            ng-required="true"
+                                            ng-class="{'has-error': !vm.isLinkUnique(link, 'url') || (externalLinkForm.linkUrl.$error.required && externalLinkForm.linkUrl.$dirty) || externalLinkForm.linkUrl.$error.url || externalLinkForm.linkUrl.$error.pattern}" >
+                                    <p class="text-danger help-block" 
+                                        ng-if="externalLinkForm.linkUrl.$error.required && externalLinkForm.linkUrl.$dirty" 
+                                        translate="common.messageFieldIsRequired"></p>
+                                    <p class="text-danger help-block" 
+                                        ng-if="externalLinkForm.linkUrl.$error.url || externalLinkForm.linkUrl.$error.pattern" 
+                                        translate="customization.invalidUrl"></p>
+                                    <p class="text-danger help-block" 
+                                        ng-if="!vm.isLinkUnique(link, 'url')" 
+                                        translate="customization.linkUrlNotUnique"></p>
+                                </div>
+                            </div>
+
+                            <!-- Delete -->
+                            <div class="col-xs-2 col-sm-1 external-link-delete-container">
+                                <a ng-click="vm.deleteLink($index)" data-test-id="delete-external-link" translate-attr-title="common.delete" translate>
+                                    <span class="vismaicon vismaicon-delete"></span>
+                                </a>
+                            </div>
+                        </div>    
+                    </div> 
+                    
+
+                    <div class="col-xs-12 add-button-container">
+                        <a class="nc-btn nc-btn-default" ng-click="vm.addLink()" data-test-id="add-external-link" translate-attr-title="customization.addExternalLink" translate>
+                            <span class="vismaicon vismaicon-add2-circle"></span><span translate="customization.addExternalLink"></span>
+                        </a>
+                    </div>
+
+                    <div class="pull-right">
+                        <button class="btn btn-primary" ng-click="vm.saveLinks()" ng-disabled="externalLinksForm.$invalid || !vm.isLinksUnique() || !vm.isUpdated()" data-test-id="save-button">
+                            <span translate="common.save"></span>
+                        </button>
+                        <button class="btn btn-default" ng-click="vm.cancelLinksUpdate()" data-test-id="cancel-button">
+                            <span translate="common.cancel"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

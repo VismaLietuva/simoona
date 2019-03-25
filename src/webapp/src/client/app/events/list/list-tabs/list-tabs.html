@@ -1,0 +1,11 @@
+<div class="nc-filter events-list-tabs">
+	<wave-spinner ng-if="vm.isLoading"></wave-spinner>
+    <label ng-repeat="tab in vm.eventsTabs" 
+    	   ng-if="!vm.isLoading"
+    	   ui-sref-active="selected"
+    	   title="{{tab.name}}"
+    	   data-test-id="event-list-tab">
+    	<input type="radio" ui-sref="Root.WithOrg.Client.Events.List.Type({type: tab.id})"/>
+		<span ng-bind="tab.name | translate"></span>
+    </label translate-cloak>
+</div>

@@ -1,0 +1,19 @@
+{
+  "welcome": "Sveiki!",
+  "welcomeDescription": "Susipažinkite su Simoonos galimybėmis.",
+  "walls": "Sienos",
+  "wallsDescription": "Čia yra diskusijų vieta, kuri vadinasi Sienos. Sienose gali peržiūrėti visas įmonės diskusijas, jas sekti ar prie jų prisijungti bei sukurti naują diskusijų sieną savo pasirinkta aktualia tema.",
+  "activities": "Veikla",
+  "activitiesDescription": "Čia yra tavo veiklų aplinka, kur gali prisijungti prie įmonės organizuojamų renginių arba sukurti savo renginį, peržiūrėti Kudosų statistiką, pasiimti knygas ar užsisakyti kitas įmonės paslaugas.",
+  "company": "Įmonė",
+  "companyDescription": "Čia yra įmonės aplinka, kurioje gali peržiūrėti informaciją apie kolegas, biuro žemėlapį, kompanijos struktūrą, projektus ir kitą su įmone susijusią informaciją.",
+  "profile": "Profilis",
+  "profileDescription": "Čia yra tavo aplinka, kurioje  gali redaguoti informaciją apie save, keisti kalbą bei pranešimų nustatymus.",
+  "kudos": "Kudos",
+  "kudosDescription": "Čia yra Kudosų aplinka, kurioje gali spausti Pliusą, kad pasidalinti Kudosais su kolega. Taip pat peržiūrėti paskutines naujienas kas, kiek  ir už ką gavo Kudosų.",
+  "administration": "Administracija",
+  "administrationDescription": "Čia yra Simoonos administravimo aplinka, kurioje gali patvirtinti naujus vartotojus, redaguoti vartotojų roles, biurų vietas ir pavadinimus, kabinetus, Kudosų krepšelį ir kt.",
+  "prev": "Atgal",
+  "next": "Kitas",
+  "done": "Baigti"
+}

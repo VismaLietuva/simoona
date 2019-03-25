@@ -1,0 +1,17 @@
+<div>
+    <h3 data-test-id="no-entries-found" ng-if="vm.totalItemCount == 0" translate="common.noResults"></h3>
+    <div ng-if="vm.totalItemCount > vm.pageSize">
+        <ul uib-pagination 
+            boundary-links="true"
+            items-per-page="vm.pageSize"
+            total-items="vm.totalItemCount"
+            ng-model="vm.paging.page"
+            ng-change="vm.changePage()"
+            max-size="5"
+            previous-text="&lsaquo;"
+            next-text="&rsaquo;"
+            first-text="&laquo;"
+            last-text="&raquo;">
+        </ul>
+    </div>
+</div>

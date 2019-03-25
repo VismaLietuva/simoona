@@ -1,0 +1,47 @@
+﻿<div class="row body-container">
+    <div class="col-xs-12">
+        <div class="panel panel-default">
+             <div class="panel-heading">
+                <span data-test-id="submit-ticket-header" translate="support.submitTicket"></span>
+            </div>
+            <div class="panel-body">
+                <form class="form-horizontal" name="supportForm">
+                    <div class="row">
+                        <div class="form-group required" ng-class="{'has-error': supportForm.issueType.$invalid && supportForm.issueType.$dirty}">
+                            <label for="issueType" class="control-label col-xs-12 col-sm-3 col-md-4" translate="support.type"></label>
+                            <div class="col-xs-12 col-sm-9 col-md-4">
+                                <select id="issueType" name="issueType" class="form-control" ng-model="vm.ticket.type" ng-options="type as 'support.type' + vm.supportTypesResources[type] | translate for type in vm.supportTypes" data-test-id="support-form-type-input" required translate-cloak>
+                                </select>
+                                <p class="text-danger help-block" ng-if="supportForm.issueType.$invalid && supportForm.issueType.$dirty" translate="common.messageFieldIsRequired"></p>
+                            </div>
+                        </div>
+
+                        <div class="form-group required" ng-class="{'has-error': supportForm.subject.$invalid && supportForm.subject.$dirty}">
+                            <label for="subject" class="control-label col-xs-12 col-sm-3 col-md-4" translate="support.subject"></label>
+                            <div class="col-xs-12 col-sm-9 col-md-4">
+                                <input id="subject" type="text" class="form-control" name="subject" ng-model="vm.ticket.subject" ng-maxlength="vm.supportSettings.subjectLength" data-test-id="support-form-subject-input" required/>
+                                <p class="text-danger help-block" ng-if="supportForm.subject.$error.required && supportForm.subject.$dirty" translate="common.messageFieldIsRequired"></p>
+                                <p class="text-danger help-block" ng-if="supportForm.subject.$error.maxlength && supportForm.subject.$dirty" translate="common.messageInvalidLength" translate-values="{ one: vm.supportSettings.subjectLength }"></p>
+                            </div>
+                        </div>
+
+                        <div class="form-group required" ng-class="{'has-error': supportForm.message.$invalid && supportForm.message.$dirty}">
+                            <label for="message" class="control-label col-xs-12 col-sm-3 col-md-4" translate="support.message"></label>
+                            <div class="col-xs-12 col-sm-9 col-md-4">
+                                <textarea id="message" name="message" class="form-control" ng-model="vm.ticket.message" ng-maxlength="vm.supportSettings.messageLength" rows="5" data-test-id="support-form-message-input" required></textarea>
+                                <p class="text-danger help-block" ng-if="supportForm.message.$error.required && supportForm.message.$dirty" translate="common.messageFieldIsRequired"></p>
+                                <p class="text-danger help-block" ng-if="supportForm.message.$error.maxlength && supportForm.message.$dirty" translate="common.messageInvalidLength" translate-values="{ one: vm.supportSettings.messageLength }"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pull-right padding-top">
+                        <button class="btn btn-primary pull-right" ng-click="vm.submitTicket(vm.ticket)" ng-disabled="supportForm.$invalid" data-test-id="support-form-save-button">
+                            <span translate="common.save"></span>
+                        </button>
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

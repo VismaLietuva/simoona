@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 19.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="58px"
+	 height="16px" viewBox="0 0 58 16" enable-background="new 0 0 58 16" xml:space="preserve">
+<g id="Move_Down">
+</g>
+<g id="Move_Up">
+</g>
+<g id="Move_Right">
+</g>
+<g id="Move_Left">
+</g>
+<g id="Last">
+</g>
+<g id="First">
+</g>
+<g id="Play">
+</g>
+<g id="Pause">
+	<g>
+		<g>
+			<path fill-rule="evenodd" clip-rule="evenodd" fill="#0089D9" d="M6.5,4C6.2,4,6,4.2,6,4.5v6C6,10.8,6.2,11,6.5,11S7,10.8,7,10.5
+				v-6C7,4.2,6.8,4,6.5,4z M7.5,0C3.3,0,0,3.4,0,7.5C0,11.6,3.3,15,7.5,15c4.1,0,7.5-3.4,7.5-7.5C15,3.4,11.6,0,7.5,0z M7.5,14
+				C3.9,14,1,11.1,1,7.5C1,3.9,3.9,1,7.5,1C11.1,1,14,3.9,14,7.5C14,11.1,11.1,14,7.5,14z M8.5,4C8.2,4,8,4.2,8,4.5v6
+				C8,10.8,8.2,11,8.5,11C8.8,11,9,10.8,9,10.5v-6C9,4.2,8.8,4,8.5,4z"/>
+		</g>
+	</g>
+	<g>
+		<g>
+			<path fill-rule="evenodd" clip-rule="evenodd" fill="#C8C8C8" d="M27.5,4C27.2,4,27,4.2,27,4.5v6c0,0.3,0.2,0.5,0.5,0.5
+				c0.3,0,0.5-0.2,0.5-0.5v-6C28,4.2,27.8,4,27.5,4z M28.5,0C24.4,0,21,3.4,21,7.5c0,4.1,3.4,7.5,7.5,7.5c4.1,0,7.5-3.4,7.5-7.5
+				C36,3.4,32.7,0,28.5,0z M28.5,14c-3.6,0-6.5-2.9-6.5-6.5C22,3.9,24.9,1,28.5,1C32.1,1,35,3.9,35,7.5C35,11.1,32.1,14,28.5,14z
+				 M29.5,4C29.2,4,29,4.2,29,4.5v6c0,0.3,0.2,0.5,0.5,0.5s0.5-0.2,0.5-0.5v-6C30,4.2,29.8,4,29.5,4z"/>
+		</g>
+	</g>
+	<g>
+		<g>
+			<path fill-rule="evenodd" clip-rule="evenodd" fill="#39A6E6" d="M49.5,0C45.3,0,42,3.4,42,7.5c0,4.1,3.4,7.5,7.5,7.5
+				c4.1,0,7.5-3.4,7.5-7.5C57,3.4,53.6,0,49.5,0z M49.5,14c-3.6,0-6.5-2.9-6.5-6.5C43,3.9,45.9,1,49.5,1C53.1,1,56,3.9,56,7.5
+				C56,11.1,53.1,14,49.5,14z M48.5,4C48.2,4,48,4.2,48,4.5v6c0,0.3,0.2,0.5,0.5,0.5s0.5-0.2,0.5-0.5v-6C49,4.2,48.8,4,48.5,4z
+				 M50.5,4C50.2,4,50,4.2,50,4.5v6c0,0.3,0.2,0.5,0.5,0.5c0.3,0,0.5-0.2,0.5-0.5v-6C51,4.2,50.8,4,50.5,4z"/>
+		</g>
+	</g>
+</g>
+<g id="Rewind">
+</g>
+<g id="Forward">
+</g>
+<g id="More">
+</g>
+<g id="Collapse">
+</g>
+<g id="Expand">
+</g>
+<g id="Arrow_Right">
+</g>
+<g id="Arrow_Left">
+</g>
+<g id="Arrow_Down">
+</g>
+<g id="Arrow_Up">
+</g>
+<g id="Cancel">
+</g>
+<g id="OK">
+</g>
+<g id="Remove">
+</g>
+<g id="Add_Blue">
+</g>
+<g id="Add_Green">
+</g>
+<g id="Burger">
+</g>
+<g id="Guides" display="none" opacity="0.2">
+	<rect display="inline" fill="#0089D9" width="16" height="16"/>
+	<rect x="21" display="inline" fill="#0089D9" width="16" height="16"/>
+	<rect x="42" display="inline" fill="#0089D9" width="16" height="16"/>
+</g>
+</svg>

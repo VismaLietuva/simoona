@@ -1,0 +1,11 @@
+﻿{
+  "submitTicket": "Report to Simoona team",
+  "type": "Type",
+  "message": "Message",
+  "subject": "Subject",
+  "typeBug": "Bug",
+  "typeIncident": "Incident",
+  "typeFeatureRequest": "Feature Request",
+  "typeQuestion": "Question",
+  "success" : "Thank you, we will be contacting you soon!"
+}

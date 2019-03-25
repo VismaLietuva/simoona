@@ -1,0 +1,27 @@
+<div class="body-container" has-permissions="['SERVICEREQUESTS_BASIC']">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            {{"serviceRequest.serviceRequests" | translate}} <i class="pull-right"></i>
+            <div class="btn-group pull-right">
+                <a class="nc-btn nc-btn-default"
+                    ng-click="exportButtonClick()"
+                    ng-if="isAdmin || hasEditableServiceRequests"
+                    title="{{'serviceRequest.exportToExcelTitle' | translate}}"
+                    data-test-id="export-service-req">
+                        <span class="vismaicon vismaicon-office-excel"></span><span class="hidden-xs hidden-sm" translate="serviceRequest.exportToExcel"></span>
+                </a>
+                <a class="nc-btn nc-btn-default"
+                   ng-click="onNewRequestButtonClick(false)"
+                   translate-attr-title="serviceRequest.createNewTitle"
+                   data-test-id="create-service-req" translate>
+                    <span class="vismaicon vismaicon-add2-circle"></span><span class="hidden-xs hidden-sm" translate="common.createNew"></span>
+                </a>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <service-request-filters></service-request-filters>
+        <div class="padding-top panel-body">
+            <service-request-table></service-request-table>
+        </div>
+    </div>
+</div>

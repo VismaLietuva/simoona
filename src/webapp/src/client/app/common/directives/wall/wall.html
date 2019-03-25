@@ -1,0 +1,74 @@
+<wave-spinner ng-if="vm.wallServiceData.isWallLoading"></wave-spinner>
+<div ng-if="!vm.wallServiceData.isWallLoading"
+     ng-init="isUserCreatedWall = !vm.isWallModule || (vm.isWallModule && !!vm.getCurrentWallId())">
+
+    <ace-wall-post-create on-create-post="vm.createPost(post)"
+                          wall-type="vm.wallServiceData.wallHeader.type"
+                          is-wall-module="vm.isWallModule"
+                          ng-if="isUserCreatedWall && !vm.stateParams.post">
+    </ace-wall-post-create>
+
+    <wave-spinner ng-if="vm.wallServiceData.isWallPostsLoading"></wave-spinner>
+
+    <div ng-if="!vm.wallServiceData.isWallPostsLoading">
+
+        <div ng-if="vm.wallServiceData.isNewContentAvailable"
+             ng-click="vm.reloadWall()"
+             class="alert alert-info cursor-pointer new-posts-heading-link">
+           <div class="alert-link"
+                data-test-id="new-posts-available-link"
+                translate="wall.newPostsAvailable">
+           </div>
+       </div>
+
+        <div class="panel panel-body"
+             ng-repeat="post in vm.wallServiceData.posts"
+             data-test-id="wall-post">
+
+            <ace-wall-post post="post"
+                           is-admin="vm.isAdmin"
+                           has-hashtagify="vm.hasHashtagify"
+                           is-collapsed="isCollapsed"
+                           wall-id="vm.wallId"
+                           is-wall-module="vm.isWallModule"
+                           index="$index"
+                           id="{{post.id}}">
+            </ace-wall-post>
+
+            <div class="post-container" ng-if="!post.isHidden || post.comments.length > 0">
+                <div class="comments-block">
+
+                    <ace-comment-show-hide is-single-post="vm.wallServiceData.posts.length === 1"
+                                           is-collapsed="isCollapsed"
+                                           comments-count="post.comments.length">
+                    </ace-comment-show-hide>
+
+                    <div class="comment-container"
+                         ng-repeat="comment in post.comments | collapseComments: isCollapsed track by comment.id">
+
+                        <ace-wall-comment comment="comment"
+                                          is-admin="vm.isAdmin"
+                                          wall-id="vm.wallId"
+                                          is-wall-module="vm.isWallModule"
+                                          has-hashtagify="vm.hasHashtagify">
+                        </ace-wall-comment>
+
+                    </div>
+
+                </div>
+
+                <div class="media-body"
+                     id="comment-create-anchor-{{$index}}"
+                     has-permissions="['COMMENT_BASIC']">
+
+                    <ace-wall-comment-create post="post"
+                                             ng-if="!post.isHidden"
+                                             wall-id="vm.wallId"
+                                             is-wall-module="vm.isWallModule">
+                    </ace-wall-comment-create>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

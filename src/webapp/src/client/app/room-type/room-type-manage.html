@@ -1,0 +1,47 @@
+﻿<div class="row">
+    <div class="col-xs-12">
+    <h3>
+        <a data-ui-sref="^.List">{{"roomType.entityNamePlural" | translate}}</a>
+        <span data-ng-if="state.edit">&rarr; {{"roomType.editRoomType" | translate}}: {{ roomType.name }}</span>
+        <span data-ng-if="state.create">&rarr; {{"roomType.createRoomType" | translate}}</span>
+    </h3>
+
+    <form class="form-horizontal" name="roomTypeForm">
+        <div class="panel panel-default">
+            <div class="panel-heading"><span class="glyphicon glyphicon-home"></span> {{"roomType.roomTypeData" | translate}}</div>
+            <div class="panel-body">
+                <div class="form-group" data-ng-class="{'has-error has-feedback': roomTypeForm.name.$invalid && roomTypeForm.name.$dirty}">
+                    <label class="control-label col-xs-2" for="name">
+                        {{"roomType.name" | translate}}
+                        <span class="text-danger">*</span>
+                    </label>
+                    <div class="col-xs-9">
+                        <input class="form-control" id="name" name="name" ng-model="roomType.name" required />
+                        <span class="glyphicon glyphicon-exclamation-sign form-control-feedback" data-ng-show="roomTypeForm.name.$invalid && roomTypeForm.name.$dirty"></span>
+                        <span class="text-danger help-block" ng-show="roomTypeForm.name.$error.required && roomTypeForm.name.$dirty">{{"common.messageFieldIsRequired" | translate}}</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-xs-2" for="name">{{"roomType.color" | translate}}</label>
+                    <div class="col-xs-9">
+                        <input class="form-control color-picker" name="color" ng-model="roomType.color" type="color" style="padding:0;" data-ng-style="roomTypeColorStyle" />
+                        <ng-color-circle height="100" width="100" model-object="roomType" model-property="color"></ng-color-circle>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-xs-2" for="isWorkingRoom">{{"roomType.isWorkingRoom" | translate}}</label>
+                    <div class="col-xs-9">
+                        <div class="checkbox">
+                            <input name="isWorkingRoom" ng-model="roomType.isWorkingRoom" id="isWorkingRoom" type="checkbox">
+                        </div>
+                    </div>
+                </div>
+
+                <save-back-info-error class="top-space" save-disabled="roomTypeForm.$invalid" on-back="goBack" on-save="save" errors="errors" infos="infos" show-required="true"></save-back-info-error>
+            </div>
+        </div>
+    </form>
+    </div>
+</div>

@@ -1,0 +1,41 @@
+<div class="panel panel-default wall-header-panel"
+	 ng-if="!vm.wallServiceData.isWallHeaderLoading">
+    <div class="panel-body wall-header">
+        <div class="wall-header-logo"
+        	 data-test-id="wall-header-image">
+	        <img alt="{{vm.wallServiceData.wallHeader.name}}"
+	             title="{{vm.wallServiceData.wallHeader.name}}"
+	             ng-src="{{vm.wallServiceData.wallHeader.logo | imageThumb:{w:150,h:100}:'crop'}}" image-loading>
+	    </div>
+
+	    <div class="wall-header-info">
+	        <div class="col-xs-12 wall-header-content nopadding">
+
+	        	<div class="wall-header-top">
+
+	        		<div class="wall-header-title"
+	        			 title="{{vm.wallServiceData.wallHeader.name}}"
+	        		 	 data-test-id="wall-header-title">
+	        			{{vm.wallServiceData.wallHeader.name}}
+                	</div>
+
+                	<ace-wall-header-actions wall="vm.wallServiceData.wallHeader"></ace-wall-header-actions>
+
+	        	</div>
+
+	            <div class="wall-header-description"
+	            	 data-test-id="wall-header-description"
+	            	 ng-bind-html="vm.wallServiceData.wallHeader.description | linky">
+	            </div>
+
+	            <div class="wall-header-footer"
+	            	 data-test-id="wall-header-footer">
+	            	<ace-tabs tabs="vm.tabs"></ace-tabs>
+	            </div>
+
+	        </div>
+	    </div>
+    </div>
+
+    <div class="clearfix"></div>
+</div>

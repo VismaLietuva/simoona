@@ -1,0 +1,108 @@
+<div class="row body-container">
+    <div class="col-xs-12" has-permissions="['EVENT_ADMINISTRATION']">
+        <wave-spinner ng-if="vm.isLoading"></wave-spinner>
+        <div class="panel panel-default"
+             ng-if="!vm.isLoading">
+            <div class="panel-heading">
+                <span ng-if="vm.states.isEdit" 
+                      translate="customization.editEventType"></span>
+                <span ng-if="vm.states.isAdd" 
+                      translate="customization.createEventType"></span>
+            </div>
+            <div class="panel-body">
+                <form name="eventTypeForm" class="form-horizontal" autocomplete="off">
+
+                    <!--event type name-->
+                    <div class="form-group required" 
+                         ng-class="{'has-error': eventTypeForm.name.$invalid && eventTypeForm.name.$dirty}">
+                        <label for="eventTypeName" 
+                               class="control-label col-xs-12 col-sm-4" 
+                               translate="customization.eventTypeName"></label>
+                        <div class="col-xs-12 col-sm-4">
+                            <input id="eventTypeName" 
+                                   type="text" 
+                                   class="form-control" 
+                                   name="name" 
+                                   ng-model="vm.eventType.name" 
+                                   ng-maxlength="30" 
+                                   data-test-id="event-type-form-name-input" 
+                                   required/>
+                            <p class="text-danger help-block" 
+                               ng-if="eventTypeForm.name.$error.required && eventTypeForm.name.$dirty" 
+                               translate="common.messageFieldIsRequired"></p>
+                            <p class="text-danger help-block" 
+                               ng-if="eventTypeForm.name.$error.maxlength && eventTypeForm.name.$dirty" 
+                               translate="common.messageInvalidLength" 
+                               translate-values="{ one: 30 }"></p>
+                        </div>
+                    </div>
+
+                    <!--event type is single join -->
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-4"></label>
+                        <div class="col-xs-12 col-sm-4">
+                            <input id="single-join" 
+                                   type="checkbox" 
+                                   class="event-form-checkbox" 
+                                   ng-model="vm.eventType.isSingleJoin" 
+                                   data-test-id="event-type-form-is-single-join-input"/>
+                            <label for="single-join" 
+                                   class="control-label" 
+                                   translate="customization.eventTypeSingleJoin"></label>
+                        </div>
+                    </div>
+
+                    <!--event type buttons right -->
+                    <div class="pull-right">
+
+                        <button class="btn btn-primary" 
+                                ng-if="vm.states.isAdd" 
+                                ng-click="vm.saveEventType(vm.createEventType)" 
+                                ng-disabled="eventTypeForm.$invalid" 
+                                data-test-id="event-type-form-save-button">
+                            <span translate="common.save"></span>
+                        </button>
+
+                        <button class="btn btn-primary" 
+                                ng-if="vm.states.isEdit" 
+                                ng-click="vm.saveEventType(vm.updateEventType)" 
+                                ng-disabled="eventTypeForm.$invalid" 
+                                data-test-id="event-type-form-update-button">
+                            <span translate="common.update"></span>
+                        </button>
+
+                        <button class="btn btn-default" 
+                                ui-sref="Root.WithOrg.Admin.Customization.EventTypes.List" 
+                                data-test-id="event-form-cancel-button">
+                            <span translate="common.cancel"></span>
+                        </button>
+
+                    </div>
+
+                    <!--event type delete button left -->
+                    <div class="pull-left">
+                        
+                        <div class="pull-left">
+                            <button ng-if="vm.states.isEdit"
+                                    class="btn btn-danger"
+                                    ace-confirmation-modal="vm.deleteEventType(vm.eventType.id)"
+                                    ng-disabled="vm.eventType.hasActiveEvents"
+                                    data-test-id="wall-delete-button">
+                                <span translate="common.delete"></span>
+                            </button>        
+                        </div>
+
+                        <div class="pull-left event-type-warning" 
+                             ng-if="vm.eventType.hasActiveEvents">
+                            <span class="vismaicon vismaicon-sm vismaicon-filled vismaicon-warning"></span>
+                            <span translate="customization.eventTypeWarning"></span>
+                        </div>
+                        
+                    </div>   
+
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>

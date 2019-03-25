@@ -1,0 +1,19 @@
+﻿{
+  "color": "Spalvinimas",
+  "createRoomType": "Naujas kambario tipas",
+  "editRoomType": "Redaguoti kambario tipą",
+  "entityName": "Kambario tipas",
+  "entityNamePlural": "Kambario tipai",
+  "name": "Kambario tipas",
+  "room": "Kambarys",
+  "rooms": "Kambariai",
+  "roomsCount": "Kambarių kiekis",
+  "roomTypeData": "Kambario tipo informacija",
+  "roomTypePostError1": "Toks kambario tipo pavadinimas jau yra.",
+  "roomTypePutError1": "Toks kambario tipas jau yra.",
+  "icon": "Ikona",
+  "removeIcon": "Pašalinti ikoną",
+  "notWorkingRoomError": "Kambarys nėra darbo kambarys.",
+  "isWorkingRoom": "Darbo kambarys",
+  "iconDeleted": "Ikona sėkmingai ištrinta!"
+}

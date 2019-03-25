@@ -1,0 +1,29 @@
+//Custom mixins
+//   -------------------------
+.transform(@string){
+    -o-transform: @string;
+    -ms-transform: @string;
+    -moz-transform: @string;
+    -webkit-transform: @string;
+    transform: @string;
+}
+
+.transition (@transition) {
+	-webkit-transition: @transition;  
+	-moz-transition:    @transition;
+	-ms-transition:     @transition; 
+	-o-transition:      @transition;  
+}
+
+.box-shadow (@string, @string2) {
+	-webkit-box-shadow: @string, @string2;
+	-moz-box-shadow:    @string, @string2;
+	box-shadow:         @string, @string2;
+}
+
+.opacity(@opacity) {
+  opacity: @opacity;
+  // IE8 filter
+  @opacity-ie: (@opacity * 100);
+  filter: ~"alpha(opacity=@{opacity-ie})";
+}

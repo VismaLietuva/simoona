@@ -1,0 +1,75 @@
+﻿<div class="modal-header">
+    <h3 class="modal-title">
+        <span>{{"applicationUser.addNewExam" | translate}}</span>
+    </h3>
+</div>
+<div class="modal-body">
+    <form name="examModal" role="form" class="form examModal clearfix">
+        <div class="col-xs-12">
+            <label>
+                {{"applicationUser.certificateType" | translate}}
+                <span class="text-danger">*</span>
+            </label>
+            <input type="text" class="form-control"
+                   ng-model="certificate.name"
+                   typeahead-on-select="selectCertificate($model)"
+                   uib-typeahead="certificate as certificate.name for certificate in allCertificates($viewValue)"
+                   typeahead-min-length="1" typeahead-loading="isLoading" typeahead-wait-ms="100" autocomplete="off" />
+        </div>
+        <div class="col-xs-12" data-ng-repeat="exam in certificate.exams">
+            <div class="row">
+                <div class="col-xs-7">
+                    <div class="form-group">
+                        <label>{{"applicationUser.examTitle" | translate}}</label>
+                        <input type="text" class="form-control"
+                               ng-model="exam.title"
+                               typeahead-on-select="selectExam(exam, $model)"
+                               uib-typeahead="exam as exam.title for exam in allExams(exam, $viewValue)"
+                               typeahead-min-length="1" typeahead-loading="isLoading" typeahead-wait-ms="100" autocomplete="off" />
+                    </div>
+                </div>
+
+                <div class="col-xs-3">
+                    <div class="form-group">
+                        <label>{{"applicationUser.examNumber" | translate}}</label>
+                        <input type="text" class="form-control"
+                               ng-model="exam.number"
+                               typeahead-on-select="selectExam(exam, $model)"
+                               uib-typeahead="exam as exam.number for exam in allExams(exam, $viewValue)"
+                               typeahead-min-length="1" typeahead-loading="isLoading" typeahead-wait-ms="100" autocomplete="off" />
+                    </div>
+                </div>
+                <div class="col-xs-2">
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+
+                        <div class="form-control btn btn-default" data-ng-click="deleteExam(exam)">
+                            <span class="glyphicon glyphicon-bin"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12">
+            <button class="btn btn-info" ng-click="addEmptyExam()">
+                {{"applicationUser.addExam" | translate}}
+            </button>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <div class="pull-left left-padding-15">
+        <label>
+            <input type="checkbox" name="examsPassed" ng-model="certificate.inProgress" data-ng-click="passExam()" />
+            {{"applicationUser.examsPassed" | translate}}
+        </label>
+    </div>
+
+    <button class="btn btn-default" data-ng-click="cancel()">
+        {{"common.cancel" | translate}}
+    </button>
+
+    <button class="btn btn-primary" ng-disabled="!certificate.name" data-ng-click="save()">
+        {{"common.save" | translate}}
+    </button>
+</div>

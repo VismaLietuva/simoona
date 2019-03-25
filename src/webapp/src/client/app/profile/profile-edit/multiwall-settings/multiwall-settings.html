@@ -1,0 +1,49 @@
+<div class="tab-content">
+    <wave-spinner ng-if="vm.isLoading"></wave-spinner>
+    <div class="tab-pane-content" ng-if="!vm.isLoading">
+        <form name="multiWallForm" role="form" class="nc-form-horizontal profile-form" ng-submit="vm.openModal()">
+            <div class="row">
+                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-4 col-lg-offset-1 text-right no-right-padding">
+                    <div class="nc-form-group">
+                        <div class="row">
+                            <div class="col-xs-6 col-lg-6 col-lg-offset-1 text-right no-right-padding">
+                                <label class="control-label ng-binding multiwall-select-label" translate="applicationUser.multiWallSelect"></label>
+                            </div>
+                            <div class="nc-radio-buttons multiwall-select-buttons col-xs-6 col-lg-5 text-left">
+                                <label class="nc-radio-button wall-select-button" ng-repeat="wall in vm.multiWallList" ng-disabled="!!wall.isMainWall" ng-class="{selected: vm.selectedWallId === wall.id}" ng-attr-title="{{:: wall.name}}" ng-cloak>
+                                    <div class="radio-button-content">
+                                        <input type="radio" ng-click="vm.chooseWall(wall)" data-test-id="choose-multiwall-button" />
+                                        <span class="text-content" data-test-id="choose-multiwall-name" ng-cloak>
+                                    {{:: wall.name}}
+                                </span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6 col-sm-6 col-md-5 col-lg-5 wall-description">
+                    <h5 class="multiwall-description-heading" translate="applicationUser.description"></h5>
+                    <p class="multiwall-description-text">{{ vm.selectedWallDescription }}</p>
+                    <h5 class="members-heading">
+                        {{'applicationUser.members' | translate }}
+                        <span class="badge badge-default total-user-badge" data-test-id="choose-multiwall-total-users" ng-cloak>
+                            {{ vm.totalUsers }}
+                        </span>
+                    </h5>
+                    <ace-multiwall-member-list members="vm.members" is-loading-members="vm.isLoadingMembers"></ace-multiwall-member-list>
+                </div>
+            </div>
+            <div class="row">
+                <div class="top-space col-xs-offset-4 text-left">
+                    <button class="btn btn-primary" type="submit" data-test-id="submit-settings-button">
+                        <span class="glyphicon glyphicon-disk-save"></span>
+                        <span translate="common.save"></span>
+                    </button>
+                    <button ui-sref="Root.WithOrg.Client.Profiles.Details({ id: vm.userId })" class="btn btn-default" data-test-id="back-to-profile-button" translate="applicationUser.backToProfile">
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

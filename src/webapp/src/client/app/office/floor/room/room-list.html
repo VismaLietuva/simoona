@@ -1,0 +1,72 @@
+﻿<div ng-keypress="clearAll()" class="col-xs-12" has-permissions="['ROOM_ADMINISTRATION']">
+    <h3>
+        <span data-ng-if="floorId">
+            <a data-ui-sref="^.^.^.List"><span>{{"office.entityNamePlural" | translate}}</span></a> &rarr;
+            <a data-ui-sref="^.^.List"><span>{{"office.entityName" | translate}}</span>: {{ office.name }}</a> &rarr;
+            <span>{{"floor.entityName" | translate}}</span>: {{ floor.name }}
+        </span>
+        <span data-ng-if="!floorId">
+            <a href="Office"><span>{{"office.entityNamePlural" | translate}}</span></a> &rarr;
+            <a href="Floor"><span>{{"floor.entityNamePlural" | translate}}</span></a> &rarr;
+            <span>{{"room.entityNamePlural" | translate}}</span>
+        </span>
+    </h3>
+    <div class="row">
+        <div class="col-md-4" data-ng-hide="isInProgress">
+                <div class="nopadding">
+                    <ace-item-list-filter filter-value="filter.s" on-filtering="onSearch" on-filter-reset="onReset" class="pull-left"></ace-item-list-filter>
+                    <div class="btn-group pull-right" ng-if="allowEdit">
+                        <div class="btn btn-primary" ng-click="manageRoom('Create', 0)" title="{{'common.createNew' | translate}}" data-ng-disabled="isInProgress">
+                            <span class="glyphicon glyphicon-plus"></span>
+                            <span>{{"common.createNew" | translate}}</span>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+    <div class="row office-map-edit">
+        <div class="col-md-4" data-ng-hide="isInProgress">
+            <div class="table-responsive nopadding">
+                <table class="table table-bordered table-condensed table-hover" data-ng-if="rooms.itemCount > 0">
+                    <tr>
+                        <th>
+                            <ace-sort-link on-sort="onSort" sort-dir="filter.dir" sort-field="filter.sort" sort-value="Name"><span>{{"room.name" | translate}}</span></ace-sort-link> /
+                            <ace-sort-link on-sort="onSort" sort-dir="filter.dir" sort-field="filter.sort" sort-value="Number"><span>{{"room.number" | translate}}</span></ace-sort-link>
+                        </th>
+                        <th>
+                            <span>{{"room.employees" | translate}}</span>
+                        </th>
+                        <th ng-if="allowEdit"></th>
+                    </tr>
+                    <tr data-ng-repeat="room in rooms.pagedList">
+                        <td ng-if="room.name.length < 20">
+                            {{room.name}} {{room.number}}
+                        </td>
+                        <td uib-tooltip="{{room.name}}" tooltip-placement="bottom" tooltip-append-to-body="true" ng-if=" room.name.length>20">
+                            {{room.name | limitTo:20}}... {{room.number}}
+                        </td>
+                        <td class="text-center">
+                            {{room.applicationUsersCount}}
+                        </td>
+                        <td ng-if="allowEdit" class="text-center">
+                            <div class="btn-group btn-group-xs">
+                                <a ng-click="manageRoom('Edit',room)" class="btn btn-default glyphicon glyphicon-pencil" title="{{'common.edit' | translate}}" data-ng-disabled="isInProgress"></a>
+                                <a ace-confirmation-modal="onDelete(room)" class="btn btn-danger glyphicon glyphicon-bin" title="{{'common.delete' | translate}}" data-ng-disabled="isInProgress"></a>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                <div ng-if="rooms.itemCount == 0">
+                    <h3>{{"common.noResults" | translate}}</h3>
+                </div>
+                <shrooms-pagination total="rooms.itemCount" items="rooms.pageSize" currentpage="filter" on-changed="getRooms" onelineheight="33"></shrooms-pagination>
+            </div>
+        </div>
+        <div has-permissions="['MAP_BASIC']" class="col-md-8" data-ng-if="!isInProgress">
+            <map-dir class="floor-mini-map" id="map" floor="floor" office="office" enable-pin="false" enable-zoom="false" show-floor-change="false" enable-full-screen="false"></map-dir>
+        </div>
+        <div id="div" has-permissions="['MAP_BASIC']" class="floor-map" data-ng-if="isInProgress">
+            <map-dir id="map" floor="floor" office="office" enable-pin="false" enable-zoom="false" show-floor-change="false" enable-full-screen="false"></map-dir>
+        </div>
+    </div>
+</div>

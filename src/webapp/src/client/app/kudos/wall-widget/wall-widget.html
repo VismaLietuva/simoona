@@ -1,0 +1,54 @@
+<div id="kudos-wall-widget" ng-if="hasKudosPermissions">
+    <div class="kudos-big-buttons-wrapper">
+        <div class="kudos-big-button">
+            <a ace-kudosify-modal ga-track-event="['Kudos', 'wall big plus', 'opened']" data-test-id="kudosify-button-plus">
+                <span uib-tooltip="{{'kudos.sendKudos' | translate}}" 
+                      tooltip-placement="bottom" 
+                      tooltip-class="word-break" 
+                      class="glyphicon glyphicon-plus kudosify-big-plus-btn" 
+                      aria-hidden="true"></span>
+            </a>
+        </div>
+        <div class="kudos-big-button" feature-flag="premium">
+            <buy-shop-item></buy-shop-item>
+        </div>
+    </div>
+    <div class="kudos-activity-log-container" ng-repeat="kudos in lastApprovedKudos">
+        <div class="kudos-activity-log-inner">
+            <div class="text-center kudos-activity-log-count-box">
+                <span class="kudos-activity-log-count-lg" ng-class="{'kudos-activity-log-count-sm': kudos.points.toString().length >= 5}" ng-cloak>+{{:: kudos.points}}</span>
+                <div class="kudos-activity-log-date" data-test-id="kudos-activity-log-date" ng-cloak>
+                    {{:: kudos.created | date: 'MM-dd'}}
+                </div>
+            </div>
+            <div class="kudos-activity-log-content-box">
+                <div class="kudos-activity-log-fullname">
+                    <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: kudos.receiver.id })"
+                       title="{{:: kudos.receiver.fullName }}"
+                       data-test-id="kudos-activity-log-receiver-fullname" ng-cloak>
+                        {{:: kudos.receiver.fullName }}
+                    </a>
+                </div>
+                <div class="kudos-activity-log-comment" 
+                     ng-class="{'kudos-activity-log-comment-with-sender': !!kudos.sender.id}" 
+                     uib-tooltip="{{:: kudos.comment}}" 
+                     tooltip-placement="bottom" tooltip-class="word-break" tooltip-append-to-body="true">
+                    <span data-test-id="kudos-activity-log-comment" ng-cloak>
+                        {{:: kudos.comment}}
+                    </span>
+                </div>
+                <div class="kudos-activity-log-sender" ng-if="!!kudos.sender.id">
+                    <span translate="common.from"></span>:
+                    <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: kudos.sender.id })"
+                       title="{{:: kudos.sender.fullName }}"
+                       class="kudos-activity-log-sender-fullname" data-test-id="kudos-activity-log-sender-fullname" ng-cloak>
+                        {{:: kudos.sender.fullName}}
+                    </a>
+                </div>
+            </div>
+            <div class="kudos-activity-log-image-box" ng-if="!!kudos.pictureId">
+                <span class="glyphicon glyphicon-camera media-icons kudos-image" ace-picture-modal="kudos.pictureId"></span>
+            </div>
+        </div>
+    </div>
+</div>

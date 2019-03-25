@@ -1,0 +1,34 @@
+<a ng-if="!!vm.user.userId" class="pull-left post-comment-user-image"
+   ui-sref="Root.WithOrg.Client.Profiles.Details({ id: vm.user.userId })">
+    <img class="profile-image-thumb" ng-src="{{:: vm.user.pictureId | miniThumb}}"
+         alt="{{:: vm.user.fullName}}"
+         data-test-id="user-image-post" image-loading ng-cloak />
+</a>
+
+<div ng-if="!vm.user.userId" class="pull-left">
+    <img class="profile-image-thumb" ng-src="{{:: vm.user.pictureId | miniThumb}}"
+         alt="{{:: vm.user.fullName}}"
+         data-test-id="user-image-post" image-loading ng-cloak />
+</div>
+
+<div class="header-content-margin">
+    <h4 class="media-heading">
+        <a ng-if="!!vm.user.userId" ui-sref="Root.WithOrg.Client.Profiles.Details({ id: vm.user.userId })"
+           data-test-id="user-profile-full-name" ng-cloak>
+            {{:: vm.user.fullName}}
+        </a>
+        <span ng-if="!vm.user.userId" ng-cloak>
+            {{:: vm.user.fullName}}
+        </span>
+    </h4>
+
+    <div class="post-comment-date"
+         data-test-id="user-profile-date" ng-cloak>
+        <span class="post-comment-date-created">
+            {{:: vm.date | convertToCurrentTimezone | date:'yyyy-MM-dd, HH:mm'}}
+        </span>
+        <span class="post-comment-date-edited" ng-if="vm.isEdited && !vm.isHidden">
+            <span translate="common.edited"></span>: {{:: vm.editedDate | convertToCurrentTimezone | date:'yyyy-MM-dd, HH:mm'}}
+        </span>
+    </div>
+</div>

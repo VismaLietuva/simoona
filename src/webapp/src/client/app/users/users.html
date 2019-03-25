@@ -1,0 +1,139 @@
+<div class="row">
+    <div class="col-xs-12">
+        <h3 ng-cloak>{{"applicationUser.entityNamePlural" | translate}}</h3>
+        <ace-item-list-filter filter-value="vm.filter.s" on-filtering="vm.onFilteringItemList"></ace-item-list-filter>
+        <div class="row">
+           <div class="col-xs-11">
+               <ace-item-filter-panel is-open="vm.customFilterIsOpen"
+                                      filter-title="vm.customFilter.header"
+                                      filter-list="vm.customFilter.filters"
+                                      filter-params="vm.customFilter.filterValues"
+                                      trigger-item-filtering="vm.triggerItemFiltering">
+               </ace-item-filter-panel>
+           </div>
+           <div class="col-xs-1">
+               <a ng-if="vm.allowEdit"
+                  class="pull-right excel-button-padding"
+                  ng-click="vm.getExcel()"
+                  title="{{'common.generateExcel' | translate}}">
+                   <span class="vismaicon vismaicon-lg vismaicon-office-excel"></span>
+               </a>
+           </div>
+        </div>
+        <table class="table table-grey table-hover table-active" ng-if="vm.usersModel.itemCount > 0">
+            <thead>
+                <tr>
+                    <th class="col-xs-2">
+                        <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.dir" sort-field="vm.filter.sort" sort-value="firstName" ng-cloak>
+                            {{"applicationUser.firstName" | translate}}
+                        </ace-sort-link>,
+                        <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.dir" sort-field="vm.filter.sort" sort-value="lastName" ng-cloak>
+                            {{"applicationUser.lastName" | translate}}
+                        </ace-sort-link>
+                    </th>
+                    <th class="col-xs-1" ng-if="vm.allowEdit">
+                        <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.dir" sort-field="vm.filter.sort" sort-value="UserName" ng-cloak>
+                            {{"applicationUser.username" | translate}}
+                        </ace-sort-link>
+                    </th>
+                    <th class="col-xs-2">
+                        <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.dir" sort-field="vm.filter.sort" sort-value="jobPosition.Title" ng-cloak>
+                            {{"applicationUser.jobTitle" | translate}}
+                        </ace-sort-link>
+                    </th>
+                    <th class="col-xs-2">
+                        <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.dir" sort-field="vm.filter.sort" sort-value="Skills.Count()" ng-cloak>
+                            {{"applicationUser.skills" | translate}}
+                        </ace-sort-link>
+                    </th>
+                    <th class="col-xs-1">
+                        <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.dir" sort-field="vm.filter.sort" sort-value="Projects.Count()" ng-cloak>
+                            {{"applicationUser.projects" | translate}}
+                        </ace-sort-link>
+                    </th>
+                    <th class="col-xs-1" ng-if="vm.allowEdit">
+                        <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.dir" sort-field="vm.filter.sort" sort-value="roomId" ng-cloak>
+                            {{"applicationUser.hasRoom" | translate}}
+                        </ace-sort-link>
+                    </th>
+                    <th class="col-xs-1" ng-if="vm.allowEdit">
+                        <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.dir" sort-field="vm.filter.sort" sort-value="NewUser" ng-cloak>
+                            {{"applicationUser.waitingConfirmationShort" | translate}}
+                        </ace-sort-link>
+                    </th>
+                    <th class="col-xs-2 text-center" ng-if="vm.allowEdit">
+                            {{"common.actions" | translate}}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="applicationUser in vm.usersModel.pagedList track by applicationUser.id">
+                    <td>
+                        <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: applicationUser.id })" ng-cloak>
+                            {{:: applicationUser.firstName}} {{:: applicationUser.lastName}}
+                        </a>
+                    </td>
+                    <td ng-if="vm.allowEdit" ng-cloak>
+                        {{:: applicationUser.userName}}
+                    </td>
+                    <td ng-cloak>
+                        {{:: applicationUser.jobTitle}}
+                    </td>
+                    <td>
+                        <div ng-if="applicationUser.skills" ng-switch>
+                            <div ng-switch-when="applicationUser.skills.length > 100" class="trim-skills" uib-tooltip="{{applicationUser.skills}}">
+                                <span ng-repeat="skill in applicationUser.skills" ng-cloak>
+                                    {{:: skill.title}}<span ng-if="!$last">, </span>
+                                </span>
+                            </div>
+                            <div ng-switch-default>
+                                <span ng-repeat="skill in applicationUser.skills" ng-cloak>
+                                    {{:: skill.title}}<span ng-if="!$last">, </span>
+                                </span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span ng-repeat="project in applicationUser.projects" ng-cloak>
+                            {{:: project.name}}<span ng-if="!$last">, </span>
+                        </span>
+                    </td>
+                    <td class="text-center" ng-if="vm.allowEdit">
+                        <span ng-if="!applicationUser.hasRoom" class="label label-danger" ng-cloak>
+                            {{"common.no" | translate}}
+                        </span>
+                        <span ng-if="applicationUser.hasRoom" class="label label-success" ng-cloak>
+                            {{"common.yes" | translate}}
+                        </span>
+                    </td>
+                    <td class="text-center" ng-if="vm.allowEdit">
+                        <span ng-if="!applicationUser.isNewUser" class="label label-success" ng-cloak>
+                            {{"common.no" | translate}}
+                        </span>
+                        <span ng-if="applicationUser.isNewUser" class="label label-warning" ng-cloak>
+                            {{"common.yes" | translate}}
+                        </span>
+                    </td>
+                    <td class="text-center" ng-if="vm.allowEdit">
+                        <button type="button"
+                                class="btn btn-default"
+                                ui-sref="Root.WithOrg.Client.Profiles.Edit({ id: applicationUser.id, tab: 'Personal' })"
+                                title="{{'common.edit' | translate}}">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                        </button>
+                        <button type="button"
+                                ace-confirmation-modal="vm.deleteItem(applicationUser)"
+                                class="btn btn-danger"
+                                title="{{'common.delete' | translate}}">
+                            <span class="glyphicon glyphicon-bin"></span>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <ace-item-list-pagination total-item-count="vm.usersModel.itemCount"
+                                  page-size="vm.usersModel.pageSize"
+                                  current-page="vm.filter"
+                                  on-changed="vm.changedPage"></ace-item-list-pagination>
+    </div>
+</div>

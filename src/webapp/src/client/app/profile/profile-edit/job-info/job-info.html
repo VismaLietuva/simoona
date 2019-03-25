@@ -1,0 +1,333 @@
+<div class="alert alert-warning" ng-show="info.emailToConfirm != null">
+    <strong><resx>Common:Attention</resx></strong> <resx>Models.ApplicationUser.ApplicationUser:UserAsksToChangeEmail</resx> <i>{{ info.emailToConfirm}}</i>.
+</div>
+<div class="tab-content">
+    <div class="tab-pane-content">
+        <form name="jobInfo" role="form" class="form-horizontal profile-form" ng-submit="submitJobInfo()">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="form-horizontal profile-form">
+
+                        <!-- MANAGER -->
+
+                        <input-wrapper label-text="{{'organizationalStructure.manager' | translate}}"
+                                       input-value="jobInfo.manager"
+                                       classes="col-xs-12 col-sm-6 nopadding-left" label-classes="control-label col-xs-12 col-sm-4 nopadding-left">
+
+                            <input ng-model="info.manager" name="manager" wrapped hidden />
+                            <autocomplete load-data="managers"
+                                          shown="firstName lastName"
+                                          bound-model="info.manager"
+                                          with-image="true"
+                                          data-test-id="profileEditManager">
+                            </autocomplete>
+                        </input-wrapper>
+
+
+                        <!-- PROJECTS -->
+                        <div has-permissions="['PROJECT_BASIC']">
+                            <input-wrapper label-text="{{'applicationUser.projects' | translate}}"
+                                           input-value="jobInfo.projects"
+                                           classes="col-xs-12 col-sm-6 nopadding-left" label-classes="control-label col-xs-12 col-sm-4 nopadding-left">
+                                <tags-input id="projects"
+                                            data-test-id="profileEditProjects"
+                                            name="projects"
+                                            ng-model="info.projects"
+                                            add-from-autocomplete-only="true"
+                                            display-property="name"
+                                            add-on-enter="true"
+                                            add-on-space="true"
+                                            add-on-comma="true"
+                                            add-on-blur="true"
+                                            wrapped>
+                                    <auto-complete source="allProjects($query)" min-length="0" max-results-to-show="5"></auto-complete>
+                                </tags-input>
+                            </input-wrapper>
+                        </div>
+                        <!-- JOB TITLE -->
+                        <input-wrapper label-text="{{'applicationUser.jobTitle' | translate}}"
+                                       input-value="jobInfo.jobPosition"
+                                       classes="col-xs-12 col-sm-6 nopadding-left" label-classes="control-label col-xs-12 col-sm-4 nopadding-left">
+
+                            <select id="jobPosition"
+                                        data-test-id="profileEditJobPosition"
+                                        name="jobPosition"
+                                        ng-model="info.currentJobPosition"
+                                        class="form-control"
+                                        ng-options="job.title for job in info.jobPositions track by job.id"
+                                        wrapped></select>
+                        </input-wrapper>
+
+                        <!-- SKILLS -->
+                        <div has-permissions="['SKILL_BASIC']">
+                            <input-wrapper label-text="{{'applicationUser.skills' | translate}}"
+                                           input-value="jobInfo.skills"
+                                           classes="col-xs-12 col-sm-6 nopadding-left" label-classes="control-label col-xs-12 col-sm-4 nopadding-left">
+                                <tags-input id="skills"
+                                            data-test-id="profileEditSkills"
+                                            name="skills"
+                                            ng-model="info.skills"
+                                            add-form-autocomplete-only="false"
+                                            display-property="title"
+                                            on-tag-added="addSkillTag($tag)"
+                                            replace-spaces-with-dashes="false"
+                                            add-on-enter="true"
+                                            add-on-comma="false"
+                                            add-on-blur="true"
+                                            min-length="1"
+                                            wrapped>
+                                    <auto-complete source="allSkills($query)" min-length="1" max-results-to-show="5"></auto-complete>
+                                </tags-input>
+                            </input-wrapper>
+                        </div>
+                        <!-- QUALIFICATION -->
+                        <div has-permissions="['QUALIFICATIONLEVEL_BASIC']">
+                            <input-wrapper label-text="{{'applicationUser.qualification' | translate}}"
+                                           input-value="jobInfo.qualificationLevel"
+                                           classes="col-xs-12 col-sm-6 nopadding-left" label-classes="control-label col-xs-12 col-sm-4 nopadding-left">
+                                <select id="qualificationLevel"
+                                        data-test-id="profileEditQualificationLevel"
+                                        name="qualificationLevel"
+                                        ng-model="info.qualificationLevel"
+                                        class="form-control"
+                                        ng-options="level.name for level in qualificationLevels track by level.id"
+                                        wrapped></select>
+                            </input-wrapper>
+                        </div>
+                        <!-- WORKING HOURS -->
+                        <input-wrapper label-text="{{'applicationUser.fullTime' | translate}}"
+                                       input-value="jobInfo.fullTime"
+                                       classes="col-xs-12 col-sm-6 nopadding-left" label-classes="control-label col-xs-12 col-sm-4 nopadding-left">
+                            <select id="fullTime"
+                                    data-test-id="profileEditFullTime"
+                                    name="fullTime"
+                                    ng-model="info.workingHours.fullTime"
+                                    class="form-control"
+                                    ng-options="item.value as item.resource | translate for item in workingHoursResource"
+                                    wrapped></select>
+                        </input-wrapper>
+
+                        <input-wrapper label-text="{{'applicationUser.partTime' | translate}}"
+                                       input-value="jobInfo.partTimeHours"
+                                       ng-hide="info.workingHours.fullTime || info.workingHours.fullTime == null"
+                                       classes="col-xs-12 col-sm-6 nopadding-left" label-classes="control-label col-xs-12 col-sm-4 nopadding-left">
+                            <select id="partTimeHours"
+                                    data-test-id="profileEditPartTimeHours"
+                                    name="partTimeHours"
+                                    ng-model="info.workingHours.partTimeHours"
+                                    class="form-control"
+                                    ng-options="hour for hour in partTimeHours"
+                                    wrapped></select>
+                        </input-wrapper>
+
+                        <div class="form-group">
+                            <label class="control-label col-xs-12 col-sm-4 nopadding-left" for="startTime">
+                                {{"applicationUser.workingHours" | translate}}
+                            </label>
+                            <div class="col-xs-12 col-sm-6 profile-timepicker-wrapper">
+                                <div class="profile-timepicker-wrapper-from">
+                                    <label class="nomargin-bottom">
+                                        {{"common.timeFrom" | translate}}
+                                    </label>
+                                    <div>
+                                        <timepicker-mod id="profileEditWorkingHoursStart"
+                                                        data-test-id="profileEditWorkingHoursStart"
+                                                        name="startTime"
+                                                        ng-model="startTime"
+                                                        show-meridian="false"
+                                                        show-spinners="false"></timepicker-mod>
+                                    </div>
+                                </div>
+                                <div class="profile-timepicker-wrapper-to">
+                                    <label class="nomargin-bottom">
+                                        {{"common.timeTo" | translate}}
+                                    </label>
+                                    <div>
+                                        <timepicker-mod id="profileEditWorkingHoursEnd"
+                                                        data-test-id="profileEditWorkingHoursEnd"
+                                                        name="endTime"
+                                                        ng-model="endTime"
+                                                        show-meridian="false"
+                                                        show-spinners="false"></timepicker-mod>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- LUNCHBREAK -->
+                        <div class="form-group">
+                            <label class="control-label col-xs-12 col-sm-4 nopadding-left" for="lunchBreakStart">
+                                {{"applicationUser.lunchBreak" | translate}}
+                            </label>
+                            <div class="col-xs-12 col-sm-6 profile-timepicker-wrapper">
+                                <div class="profile-timepicker-wrapper-from">
+                                    <label class="nomargin-bottom">
+                                      {{"common.timeFrom" | translate}}
+                                    </label>
+                                    <div class="">
+                                        <timepicker-mod id="profileEditLunchFrom"
+                                                        data-test-id="profileEditLunchFrom"
+                                                        name="lunchBreakStart"
+                                                        ng-model="lunchStart"
+                                                        show-meridian="false"
+                                                        show-spinners="false"></timepicker-mod>
+                                    </div>
+                                </div>
+                                <div class="profile-timepicker-wrapper-to">
+                                    <label class="nomargin-bottom">
+                                        {{"common.timeTo" | translate}}
+                                    </label>
+                                    <div class="">
+                                        <timepicker-mod id="profileEditWorkingHoursEnd"
+                                                        data-test-id="profileEditWorkingHoursEnd"
+                                                        name="lunchBreakEnd"
+                                                        ng-model="lunchEnd"
+                                                        show-meridian="false"
+                                                        show-spinners="false"></timepicker-mod>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- EMPLOYMENT DATE -->
+                        <span ng-if="isAccountAdministrator">
+                            <input-wrapper label-text="{{'applicationUser.employmentDate' | translate}}"
+                                           input-value="jobInfo.employmentDate"
+                                           classes="col-xs-12 col-sm-6 nopadding-left" label-classes="control-label col-xs-12 col-sm-4 nopadding-left"
+                                           exclamation-mark="false">
+                                <div class="date-field">
+                                    <input type="text" 
+                                           name="employmentDate" 
+                                           id="employmentDate" 
+                                           data-test-id="profile-edit-employment-date"
+                                           class="hasDatepicker" 
+                                           uib-datepicker-popup="yyyy-MM-dd" 
+                                           popup-placement="bottom"
+                                           ng-model="info.employmentDate"
+                                           is-open="datePickers.employmentDate" 
+                                           ng-required="true"
+                                           ng-click="openDatePicker($event, 'employmentDate')" />
+                                </div>
+                            </input-wrapper>
+                        </span>
+
+                        <span ng-if="!isAccountAdministrator">
+                            <input-wrapper label-text="{{'applicationUser.employmentDate' | translate}}"
+                                           input-value="jobInfo.employmentDate"
+                                           classes="col-xs-12 col-sm-6 nopadding-left" label-classes="control-label col-xs-12 col-sm-4 nopadding-left"
+                                           exclamation-mark="false">
+
+                                <p class="input-group">
+                                    <input type="text"
+                                           id="employmentDate"
+                                           data-test-id="profile-edit-employment-date"
+                                           name="employmentDate"
+                                           class="form-control"
+                                           ng-disabled="true"
+                                           uib-datepicker-popup=""
+                                           ng-model="info.employmentDate"
+                                           is-open="datePickers.employmentDate"
+                                           ng-attr-placeholder="YYYY-MM-DD"
+                                           wrapped />
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-default" ng-disabled="true" ng-click="toggleDatePicker('employmentDate', $event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                                    </span>
+                                </p>
+                            </input-wrapper>
+                        </span>
+
+                        <!-- EXAMS + CERTIFICATES -->
+                        <div has-permissions="['EXAM_BASIC']">
+                            <input-wrapper label-text="{{'applicationUser.examsAndCertificates' | translate}}"
+                                           input-value="jobInfo.exams"
+                                           classes="col-xs-12 col-sm-6 nopadding-left" label-classes="control-label col-xs-12 col-sm-4 nopadding-left">
+                                <input type="button" class="btn btn-primary add-new-btn" ng-click="openExamModal()" value="{{'common.addNew' | translate}}" data-test-id="profileEditAddExamsButton" has-permissions="['EXAM_BASIC']">
+                                <input type="text"
+                                       id="exams"
+                                       name="exams"
+                                       ng-model="info.exams"
+                                       wrapped
+                                       hidden />
+
+                                <table ng-if="info.certificates.length"
+                                       class="table table-bordered table-grey table-hover">
+                                       <thead>
+                                          <tr class="info">
+                                              <th>
+                                                  {{"applicationUser.certificateType" | translate}}
+                                              </th>
+                                              <th class="hidden-xs hidden-sm">
+                                                  {{"applicationUser.examTitle" | translate}}&nbsp;({{"applicationUser.examNumber" | translate}})
+                                              </th>
+                                              <th>
+                                              </th>
+                                          </tr>
+                                       </thead>
+                                       <tbody>
+                                         <tr ng-repeat="certificate in info.certificates" data-test-id="profileEditExams">
+                                              <td th="{{ 'applicationUser.certificateType' | translate }}">
+                                                  {{certificate.name}}
+                                              </td>
+                                              <td class="hidden-xs hidden-sm" th="{{ 'applicationUser.examTitle' | translate }}">
+                                                  <ul class="nopadding-left">
+                                                      <li ng-repeat="exam in certificate.exams" class="no-bullets">
+                                                          {{exam.title}}&nbsp;<span ng-if="exam.number">({{exam.number}})</span>
+                                                      </li>
+                                                  </ul>
+                                              </td>
+                                              <td class="text-center">
+                                                  <div class="btn-group btn-group-xs">
+                                                      <a class="btn btn-default glyphicon glyphicon-pencil" ng-click="openExamModal(certificate)" title="{{'common.edit' | translate}}" data-test-id="profileEditExamsEditButton" has-permissions="['EXAM_BASIC']"></a>
+                                                      <a class="btn btn-default glyphicon glyphicon-remove delete" ng-click="openExamDeleteModal(certificate)" title="{{'common.delete' | translate}}" data-test-id="profileEditExamsDeleteButton"></a>
+                                                  </div>
+                                              </td>
+                                          </tr>
+                                       </tbody>
+                                    
+                                    
+                                </table>
+
+                            </input-wrapper>
+                        </div>
+                        <!-- ROLES -->
+                        <input-wrapper label-text="{{'applicationUser.roles' | translate}}"
+                                       input-value="jobInfo.roles"
+                                       classes="col-xs-12 col-sm-6 nopadding-left" label-classes="control-label col-xs-12 col-sm-4 nopadding-left"
+                                       ng-if="isAdmin">
+                            <tags-input id="roles"
+                                        name="roles"
+                                        data-test-id="profileEditRole"
+                                        ng-model="info.roles"
+                                        add-from-autocomplete-only="true"
+                                        display-property="name"
+                                        add-on-enter="true"
+                                        add-on-space="true"
+                                        add-on-comma="true"
+                                        add-on-blur="true"
+                                        wrapped>
+                                <auto-complete source="allRoles($query)" min-length="0" max-results-to-show="5"></auto-complete>
+                            </tags-input>
+                        </input-wrapper>
+
+                        <div class="top-space col-xs-offset-4 text-left">
+                            <button class="btn btn-primary"
+                                    type="submit"
+                                    data-test-id="profileEditJobSubmit"
+                                    ng-disabled="jobInfo.$invalid">
+                                <span class="glyphicon glyphicon-disk-save"></span>
+                                {{"common.save" | translate}}
+                            </button>
+                            <button ui-sref="Root.WithOrg.Client.Profiles.Details({ id: model.id })"
+                                    class="btn btn-default"
+                                    data-test-id="profileEditBackToProfile"
+                                    ng-if="!isNewUser">
+                                {{"applicationUser.backToProfile" | translate}}
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="clearfix"></div>
+    </div>
+</div>

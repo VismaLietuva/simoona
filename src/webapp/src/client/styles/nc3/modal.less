@@ -1,0 +1,143 @@
+/**
+ * Modal styles - Nordic Cool 3.0
+*/
+
+@import url("_variables.less");
+@import url("_mixins.less");
+
+.modal { 
+	z-index: 9995; 
+	a { line-height: 21px; }
+	}
+
+.modal-content {
+	border-radius: 0px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+	border:0px;
+	}
+	
+.modal-header {
+    border-bottom: 1px solid #e0e0e0;
+    min-height: 48px;
+    padding: 13px 20px 10px;
+	background: #f7f7f7;
+	box-shadow: 1px 1px 0 #fff inset, -1px -1px 0 #fff inset;
+	.close { margin-top: -5px; }
+	}
+	
+.modal-title {
+	font-size: 16px;
+	color: @base-color;
+	}
+	
+.modal-body {
+	margin: 18px 0px 20px;
+	padding: 0 20px;
+	min-height: 55px;
+	}
+	
+.modal-body h4 {
+	color: #323232;
+	font-size: @font-size-base;
+	margin-bottom: 5px;
+	}
+	
+.modal-body p {
+	margin-bottom: 3px;
+	&.text-disabled { color: #787878; }
+	}
+	
+.modal-body .form-group { margin-bottom: 6px; }
+
+.modal-body .form-group textarea { min-height: 95px; }
+	
+.modal-help, .modal-info, .modal-error, .modal-warning {
+	.modal-body { 
+		margin: 25px 0px 25px 20px;
+		padding: 0 20px 0 70px;
+		}
+	}
+
+.modal-help .modal-body,
+.modal-info .modal-body,
+.modal-error .modal-body,
+.modal-warning .modal-body,
+.modal-success .modal-body { 
+	&:before {
+		content:"";
+		width: 50px;
+		height: 50px;
+		left: 0;
+		background-image: url(../images/vismaicons/informative-filled-icons/50_informative_icons.png); 
+		background-repeat: no-repeat; 
+		background-color: transparent; 
+		position: absolute;
+		}
+	}
+
+.modal-help .modal-body:before { background-position: 0 0; }
+
+.modal-info .modal-body:before { background-position: -280px 0; }
+
+.modal-error .modal-body:before { background-position: -70px 0; }
+
+.modal-warning .modal-body:before { background-position: -140px 0; }
+
+.modal-success .modal-body:before { background-position: -210px 0; }
+
+.modal-footer {
+    border-top: 1px solid #e5e5e5;
+    padding: 11px 20px;
+    text-align: right;
+	.btn { margin-bottom: 0px; }
+	}
+	
+.modal-footer .btn + .btn {
+    margin-bottom: 0;
+    margin-left: 1px;
+	}
+	
+.fade {
+	opacity: 0;
+    -webkit-transition-delay: 0.05s;
+    -moz-transition-delay: 0.05s; 
+    transition-delay: 0.05s;
+	-webkit-transition-duration: 0.05s;
+	-moz-transition-duration: 0.05s;
+	transition-duration: 0.05s;
+	}
+	
+.modal.fade .modal-dialog {
+	-ms-transform: translate(0px, -1%);
+    -webkit-transform: translate(0px, -1%);
+    transform: translate(0px, -1%);
+	-webkit-transition: none;
+	-moz-transition: none;
+	transition: none;
+	}
+	
+.modal-backdrop.in { opacity: 0.51; }
+
+.modal-backdrop { z-index: 9990; }
+
+.modal {
+	.btn:not(.btn-lg) + .popover { margin-top: 28px; }
+	.btn.btn-lg + .popover { margin-top: 28px; }
+	}
+
+.ie11, .ie10, .ie9, .ie8  { 
+	.modal .btn.btn-primary {
+		box-shadow: 0px 1px 0px rgba(0,0,0,0.15), inset 0px -1px 0px #477a00, inset 1px 0px 0px #4e8700, inset -1px 0px 0px #4e8700;
+		&:hover { box-shadow: 0 1px 0 rgba(0, 0, 0, 0.15), inset 0px -1px 0px #4f8700, inset 1px 0px 0px #548f00, inset -1px 0px 0px #548f00; }
+		&:active { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.15), inset 0px -1px 0px #497d00, inset 1px 0px 0px #447500, inset -1px 0px 0px #447500 !important; }
+		}
+	}
+
+	
+@media (min-width:500px) {	
+	.modal-sm { width: 400px; }
+	}
+	
+@media (max-width:500px) {	
+	.modal-sm { width: 90%; }
+	}

@@ -1,0 +1,23 @@
+<div ng-repeat="tab in vm.tabs">
+    <div class="panel panel-default kudos-achievement-board-widget">
+
+        <wave-spinner ng-if="vm.isLoading"></wave-spinner>
+
+        <div ng-if="!vm.isLoading" class="panel-heading kudos-achievement-board-widget-header">
+            <h5 translate="kudos.kudosRatingForMonths" translate-values="{ one: tab.months}"></h5>
+        </div>
+
+        <div ng-if="!vm.isLoading" class="panel-body">
+            <ul class="kudos-achievement-board-widget-users">
+                <li ng-repeat="user in tab.users" class="kudos-achievement-board-widget-user">
+                    <span data-test-id="most-kudos-user-amount" ng-cloak>
+                    {{:: user.name}} ({{:: user.kudosAmount}})
+                    </span>
+                    <div class="clearfix"></div>
+                    <ace-progress-bar value="user.kudosAmount" max="tab.users[0].kudosAmount"></ace-progress-bar>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+</div>

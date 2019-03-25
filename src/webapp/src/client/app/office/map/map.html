@@ -1,0 +1,22 @@
+﻿<div id="map-wrapper">
+    <map-options class="map-options pull-right"></map-options>
+
+    <div ng-if="RoomState" class="map-alert" ng-class="{opacity: (warningMessage == true || infoMessage == true) ? 1 : 0 }">
+        <span class="text-danger alert-danger alert" ng-if="warningMessage == true"><b>{{"map.intersectWarningMessage" | translate}}</b></span>
+        <span class="text-success alert-success alert" ng-if="infoMessage == true"><b>{{"map.startDrawMessage" | translate}}</b></span>
+    </div>
+
+    
+    <div id="map-container"></div>
+    <div id="hidden-container" class="hide">
+        <img ng-src="{{floor.pictureId | picture}}" image-on-load="officeImageOnLoad(width, height)">
+    </div>
+    
+    <div ng-repeat="room in floor.rooms" class="hide">
+        <img ng-src="{{room.roomType.iconId | picture}}" image-on-load="iconImageOnLoad(width, height, data)" image-on-load-data="room">
+    </div>
+
+    <div ng-show="templateIsSet">
+        <div ng-include="template.url"></div>
+    </div>
+</div>

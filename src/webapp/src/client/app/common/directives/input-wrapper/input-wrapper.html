@@ -1,0 +1,59 @@
+<div class="form-group" data-ng-class="{'has-error has-feedback': inputValue ? errors.hasError() : false}">
+    <label class="text-right {{labelClasses || 'control-label col-xs-4'}}">
+        <span>{{labelText}}</span>
+        <span ng-if="isRequired" class="text-danger">*</span>
+    </label>
+    <div class="{{classes || 'col-xs-4'}}">
+        <div class="wrapped-input-container">
+            <div ng-transclude></div>
+            <span ng-if="errors.showExclamationMark()" class="glyphicon glyphicon-exclamation-sign form-control-feedback"></span>
+        </div>
+        <div class="text-danger help-block" ng-if="errors.required()">
+            {{"common.messageFieldIsRequired" | translate}}
+        </div>
+        <div class="text-danger help-block" ng-if="errors.charMaxLimit()">
+            {{"common.fieldCharLimitExceeded" | translate : '{one : $scope.charLimit}'}}
+        </div>
+        <div class="text-danger help-block" ng-if="errors.charMinLimit()">
+            {{"common.fieldValueTooShort" | translate : '{one : $scope.minlength}'}}
+        </div>
+        <div class="text-danger help-block" ng-if="errors.email()">
+            {{"common.messageInvalidEmail" | translate}}
+        </div>
+        <div class="text-danger help-block" ng-if="errors.url()">
+            {{"common.messageInvalidUrl" | translate}}
+        </div>
+        <div class="text-danger help-block" ng-if="errors.date()">
+            {{"common.invalidDate" | translate}}
+        </div>
+        <div class="text-danger help-block" ng-if="!errors.date() && errors.minDate()">
+            {{"common.birthdayDateIsTooOld" | translate}}
+        </div>
+        <div class="text-danger help-block" ng-if="!errors.date() && errors.maxDate()">
+            {{"common.birthdayDateValidationError" | translate}}
+        </div>
+        <div class="text-danger help-block" ng-if="errors.phone()">
+            {{"common.invalidPhone" | translate}}
+        </div>
+        <div class="text-danger help-block" ng-if="errors.compareTo()">
+            {{labelText}} {{"common.compareToError" | translate}}
+        </div>
+        <div class="text-danger help-block" ng-if="errors.containsDigit()">
+            {{"common.containsDigitError" | translate}}
+        </div>
+        <div class="text-danger help-block" ng-if="errors.containsLowerCase()">
+            {{"common.containsLowerCaseError" | translate}}
+        </div>
+        <div class="text-danger help-block" ng-if="errors.containsUpperCase()">
+            {{"common.containsUpperCaseError" | translate}}
+        </div>
+        <div class="text-danger help-block" ng-if="customValidityMessage">
+            {{customValidityMessage}}
+        </div>
+    </div>
+    <div ng-if="canBePrivate" class="col-xs-2">
+        <label class="control-label privacy-label">
+            <input type="checkbox" ng-model="$parent.isPrivate" value="{{isPrivate}}" ng-checked="isPrivate"> {{"common.private" | translate}}
+        </label>
+    </div>
+</div>

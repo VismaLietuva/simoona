@@ -1,0 +1,52 @@
+<div class="wall-header-actions">
+
+    <!-- Follow/unfollow wall buttons -->
+    <a ng-if="vm.wall.type === 'Main' || vm.isWallOwner"
+       class="nc-btn nc-btn-danger wall-unfollow-disabled"
+       translate-attr-title="wall.following" 
+       data-test-id="unfollow-wall-button" 
+       translate>
+        <span class="glyphicon glyphicon-ok disabled"></span><span translate="wall.following"></span>
+    </a>
+
+    <a ng-if="vm.wall.isFollowing && vm.wall.type !== 'Main' && !vm.isWallOwner" 
+       class="nc-btn"
+       ng-click="vm.toggleFollowWall(vm.wall)"
+       ng-mouseover="vm.unfollow=true" 
+       ng-mouseleave="vm.unfollow=false"
+       translate-attr-title="wall.unfollow"
+       data-test-id="unfollow-wall-button" 
+       translate>
+        <circle-spinner ng-if="vm.isLoading"></circle-spinner>
+        <div ng-if="!vm.unfollow" 
+             class="wall-header-btn-following">
+            <span ng-if="!vm.isLoading" 
+                  class="glyphicon glyphicon-ok"></span><span translate="wall.following"></span>
+        </div>
+        <div ng-if="!!vm.unfollow" class="wall-header-btn-unfollow">
+            <span ng-if="!vm.isLoading"
+                  class="glyphicon glyphicon-minus"></span><span translate="wall.unfollow"></span>
+        </div>
+    </a>
+
+    <a ng-if="!vm.wall.isFollowing && vm.wall.type !== 'Main' && !vm.isWallOwner" 
+       class="nc-btn nc-btn-default" 
+       ng-click="vm.toggleFollowWall(vm.wall)" 
+       translate-attr-title="wall.follow" 
+       data-test-id="follow-wall-button" 
+       translate>
+        <circle-spinner ng-if="vm.isLoading"></circle-spinner>
+        <span ng-if="!vm.isLoading"
+              class="glyphicon glyphicon-plus"></span><span translate="wall.follow"></span>
+    </a>
+
+    <!-- Edit wall button -->
+    <a type="button"
+       ng-if="vm.hasWallEditPermissions"
+       ui-sref="Root.WithOrg.Client.Wall.Edit({id: {{'vm.wall.id'}}})"
+       class="vismaicon vismaicon-sm vismaicon-edit wall-header-actions-edit"
+       translate-attr-title="common.edit"
+       data-test-id="edit-wall-button" translate>
+    </a>
+
+</div>

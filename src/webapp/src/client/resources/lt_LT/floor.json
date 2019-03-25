@@ -1,0 +1,19 @@
+﻿{
+  "copyEmailsToClipboard": "Kopijuoti el. paštus",
+  "createFloor": "Naujas aukštas",
+  "currentPlan": "Dabartinis planas",
+  "editFloor": "Redaguoti aukštą",
+  "emailOptionFloor": "Šis aukštas",
+  "emailOptionOffice": "Šis ofisas",
+  "emailOptionRoom": "Pasirinktas kambarys",
+  "emails": "El. paštai",
+  "entityName": "Aukštas",
+  "entityNamePlural": "Aukštai",
+  "floorData": "Aukšto informacija",
+  "map": "Planas",
+  "name": "Pavadinimas",
+  "newPlanUpload": "Įkelti naują planą",
+  "office": "Ofisas",
+  "rooms": "Kambariai",
+  "successToClipboard": "Sėkmingai nukipijuota į iškarpinę!"
+}

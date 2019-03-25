@@ -1,0 +1,7 @@
+﻿<a ng-click="vm.sortColumn(vm.sortValue)">
+    <ng-transclude></ng-transclude>
+    <span ng-if="vm.sortField == vm.sortValue">
+        <i ng-if="vm.sortDir == 'desc'" class="glyphicon glyphicon-chevron-down"></i>
+        <i ng-if="vm.sortDir == 'asc'" class="glyphicon glyphicon-chevron-up"></i>
+    </span>
+</a>

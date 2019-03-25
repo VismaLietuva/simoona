@@ -1,0 +1,210 @@
+@import "../../nc3/_mixins.less";
+@import "../../nc3/_variables.less";
+
+body.users-bar {
+    padding-bottom: 140px;
+    overflow-x: hidden;
+    background-color: white;
+}
+
+/*#region users-bar*/
+.users-bar.navbar-default {
+    border: 0;
+}
+
+.users-bar.navbar-fixed-bottom .container {
+    box-shadow: 0 1px 0 #1971a4 inset;
+    height: 150px;
+    white-space: nowrap;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    padding: 0;
+}
+
+.users-bar ul {
+    margin: 0;
+    padding-left: 0;
+}
+
+.users-bar-container {
+    height: 133px;
+    position: absolute;
+    text-align: center;
+    width: 100%;
+}
+
+.users-bar-block {
+    display: inline-block;
+    list-style: none;
+    width: 130px;
+    height: 130px;
+    margin-right: 4px;
+    bottom: 0;
+}
+
+.users-bar-block.animate.ng-enter {
+    -moz-transition: opacity 0.4s 0.1s ease-out;
+    -o-transition: opacity 0.4s 0.1s ease-out;
+    -webkit-transition: opacity 0.4s 0.1s ease-out;
+    transition: opacity 0.4s 0.1s ease-out;
+    opacity: 0;
+}
+
+.users-bar-block.animate.ng-enter-active {
+    opacity: 1;
+}
+
+.users-bar-block.active {
+}
+
+.users-bar-block-img {
+    background: #fff;
+    position: absolute;
+    bottom: 0;
+    width: 130px;
+    height: 130px;
+    border: 1px solid #e8e8e8;
+    /* Profile picture aspect ratio fix */
+    background-repeat: no-repeat;
+    background-position: center 10%;
+    background-size: cover;
+}
+
+.users-bar-block-img img {
+    width: 130px;
+    height: 130px;
+    clip: rect(0, 130px, 130px, 0);
+}
+
+.users-bar-block-text {
+    color: #ffffff;
+    background-color: rgba(0, 0, 0, 0.6);
+    text-shadow: 0 1px 8px #ffffff;
+    position: absolute;
+    bottom: 0;
+    width: 128px;
+    margin-left: 1px;
+    padding: 0 3px;
+    font-size: 0.85em;
+    -ms-text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    overflow-x: hidden;
+    white-space: normal;
+}
+
+.users-bar .popover {
+    border: rgba(200, 200, 200, 0.90) 1px solid;
+    background: rgba(255,255,255, 0.95);
+    box-shadow: 0 1px 5px rgba(200,200,200, 0.90);
+    border-radius: 0;
+    max-width: 320px;
+    min-width: 320px;
+}
+
+.users-bar-tooltip.popover-content {
+    padding: 0;
+}
+
+.users-bar-tooltip div {
+    -ms-text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    overflow-x: hidden;
+}
+
+.users-bar-tooltip-headerrow {
+    background: rgba(220, 220, 220, 0.85);
+    padding: 4px 14px 2px 14px;
+}
+
+.users-bar-tooltip-header {
+    font-size: 18px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.users-bar-tooltip-headericon {
+    padding: 2px 15px 0 1px;
+    font-size: 32px;
+}
+
+.users-bar-tooltip-subheader {
+    font-size: 11px;
+    font-style: italic;
+    margin-bottom: 5px;
+}
+
+.users-bar-tooltip-body {
+    padding: 4px 14px;
+    background-color: #ffffff;
+}
+
+.users-bar .absent-label {
+    position: absolute;
+    margin-top: 5px;
+    margin-left: 4px;
+}
+
+.users-bar .absent .users-bar-block-img img {
+    opacity: 0.6;
+}
+
+#origin-point {
+    color: white;
+    font-weight: bold;
+    background-color: #06a;
+    margin: 5em auto;
+    text-align: center;
+    line-height: 70px;
+    height: 70px;
+    width: 70px;
+    border-radius: 100%;
+}
+
+#users-bar-linkline {
+    z-index: 0;
+    position: absolute;
+    width: 1px;
+    background-color: rgba(141, 141, 141, 0.90);
+    z-index: 1005;
+    height: 0;
+
+    /* transform-origin sets rotation around top left (instead of the geometrical center) */
+    -webkit-transform-origin: top left;
+    -moz-transform-origin: top left;
+    -o-transform-origin: top left;
+    -ms-transform-origin: top left;
+    transform-origin: top left;    
+
+    -moz-transition-property: height;
+    -o-transition-property: height;
+    -webkit-transition-property: height;
+    transition-property: height;
+
+    -moz-transition-timing-function: linear;
+    -o-transition-timing-function: linear;
+    -webkit-transition-timing-function: linear;
+    transition-timing-function: linear;
+
+    -moz-transition-duration: 0.3s;
+    -o-transition-duration: 0.3s;
+    -webkit-transition-duration: 0.3s;
+    transition-duration: 0.3s;
+}
+
+.users-bar-linkline-head {
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    right: -2px;
+    bottom: -3px;
+    background: #777;
+    position: absolute;
+}
+
+.notification-image {
+    object-fit: cover;
+    height: 45px;
+    width: 45px;
+}

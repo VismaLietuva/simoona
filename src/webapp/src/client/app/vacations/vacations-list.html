@@ -1,0 +1,71 @@
+<div class="row" has-permissions="['VACATIONS_BASIC']">
+
+    <h3 class="col-xs-12" translate="common.vacations"></h3>
+
+    <div class="pull-right">
+        <label class="btn btn-warning" 
+               has-permissions="['VACATIONS_ADMINISTRATION']">
+            <input id="xlsSelect" 
+                   data-test-id="xlsSelect" 
+                   type="file" 
+                   accept=".xls" 
+                   onchange="angular.element(this).scope().fileAttached(this)" 
+                   ng-hide="true" 
+                   ng-required="true" /> 
+            <span translate="vacations.chooseFile"></span>
+        </label>
+    </div>
+
+    <wave-spinner ng-if="vm.isLoading"></wave-spinner>
+
+    <div class="col-xs-12 text-center"
+         ng-if="!vm.isLoading">
+        <strong translate="vacations.youHaveAvailableDays"
+                translate-values="{ one : vm.availableDays.availableDays }">
+        </strong>
+        <br />
+        <strong ng-if="!!vm.availableDays.lastTimeUpdated">
+            <span translate="vacations.lastTimeUpdated"></span> {{vm.availableDays.lastTimeUpdated | date:'yyyy-MM-dd'}}
+        </strong>
+        <strong ng-if="!vm.availableDays.lastTimeUpdated" 
+                translate="vacations.neverBeenUpdated"></strong>
+    </div>
+
+    <div class="col-xs-12 text-left padding-top-bottom"
+         ng-if="!vm.isLoading">
+        <strong>
+           Vacation
+        </strong>
+    </div>
+
+    <!--Vacation bot integration-->
+
+    <!--<div class="col-xs-12">
+
+        <table class="nc-table nc-table-active" 
+               ng-if="!vm.isLoading && vm.vacationList.length">
+            <thead>
+                <tr>
+                    <th translate="vacations.dateStart"></th>
+                    <th translate="vacations.dateEnd"></th>
+                    <th translate="vacations.duration"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="vacation in vm.vacationList">
+                    <td class="col-xs-1 word-break">
+                        {{vacation.dateStart | date : 'yyyy-MM-dd'}}
+                    </td>
+                    <td class="col-xs-1">
+                        {{vacation.dateEnd | date : 'yyyy-MM-dd'}}
+                    </td>
+                    <td class="col-xs-1">
+                        {{(vacation.dateEnd | amDifference : vacation.dateStart : 'days') + 1}}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>-->
+
+</div>

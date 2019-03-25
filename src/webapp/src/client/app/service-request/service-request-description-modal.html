@@ -1,0 +1,66 @@
+<div class="modal-header">
+    <button type="button" class="close" ng-click="cancel()">&times;</button>
+    <h4 class="modal-title" ng-cloak>{{"serviceRequest.descriptionModalTitle" | translate}}</h4>
+</div>
+<div class="modal-body comment-word-break">
+    <ul class="list-group">
+        <li class="list-group-item row" ng-cloak>
+            <strong ng-cloak>{{"serviceRequest.status" | translate}}: </strong>
+            <span data-test-id="service-request-status">
+                {{"serviceRequest." + serviceRequest.status.title.toLowerCase() | translate}}
+            </span>
+        </li>
+        <li class="list-group-item row" ng-cloak>
+            <strong ng-cloak>{{"serviceRequest.priority" | translate}}: </strong>
+            <span data-test-id="service-request-priority">
+                {{"serviceRequest." + serviceRequest.priority.title.toLowerCase() | translate}}
+            </span>
+        </li>
+        <li class="list-group-item row" ng-cloak>
+            <strong ng-cloak>{{"serviceRequest.category" | translate}}: </strong>
+            <span data-test-id="service-request-category">
+                {{serviceRequest.categoryName}}
+            </span>
+        </li>
+        <li class="list-group-item row" ng-if="serviceRequest.serviceRequestCategory.name === 'Kudos'" ng-cloak>
+            <strong ng-cloak>{{"common.minusKudosMailAmmount" | translate}}: </strong>
+            <span data-test-id="service-request-kudos-amount">
+                {{serviceRequest.kudosAmmount}}
+            </span>
+        </li>
+        <li class="list-group-item row" ng-cloak>
+            <strong ng-cloak>{{"serviceRequest.description" | translate}}: </strong>
+            <span data-test-id="service-request-description">
+                {{serviceRequest.description}}
+            </span>
+        </li>
+        <li class="list-group-item row" ng-if="!!serviceRequest.pictureId" ng-cloak>
+            <strong ng-cloak>{{"serviceRequest.image" | translate}}: </strong>
+            <div>
+                <img ng-src="{{serviceRequest.pictureId | thumb}}" ace-picture-modal="serviceRequest.pictureId "/>
+            </div>
+        </li>
+        <li class="list-group-item row" ng-if="!!comments.length">
+            <strong ng-cloak>{{"serviceRequest.comments" | translate}}</strong>
+            <div class="rows">
+                <ul>
+                    <li ng-repeat="comment in comments" ng-cloak>
+                        {{comment.created | date:'yyyy-MM-dd'}}
+                        {{comment.employeeFirstName}}
+                        {{comment.employeeLastName}}:
+                        <div class="kudosify-modal-comments comment-word-break"
+                             data-test-id="service-request-comment-{{$index}}"
+                             ng-cloak>
+                            {{comment.content}}
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </li>
+    </ul>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-default" data-test-id="service-request-description-close" ng-click="cancel()" ng-cloak>
+        {{"common.close" | translate}}
+    </button>
+</div>

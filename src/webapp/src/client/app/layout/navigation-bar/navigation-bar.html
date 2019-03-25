@@ -1,0 +1,234 @@
+<nav class="navbar navbar-default navbar-fixed-top" 
+     navbar-height-change-watcher 
+     id="navigation-bar">
+    <div class="max-width-container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header pull-left">
+        <button ng-if="vm.isAuthenticated()" 
+                type="button" 
+                class="navbar-toggle" 
+                ng-click="vm.toggleSidebar()">
+            <span class="sr-only" 
+                  translate="navbar.toggleNavigation">
+            </span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <a ng-if="vm.isAuthenticated()" 
+           class="navbar-brand" 
+           ui-sref="{{::vm.homeState}}" 
+           ui-sref-opts="{reload:true}" 
+           ng-click="vm.reloadLeftMenuItems()"
+           data-test-id="brand-logo" 
+           translate="common.projectName">
+        </a>
+        <a ng-if="!vm.isAuthenticated()" 
+           class="navbar-brand" 
+           href="/" 
+           data-test-id="brand-logo" 
+           translate="common.projectName">
+        </a>
+    </div>
+    <div class="navbar-header pull-left hidden-xs hidden-sm">
+      <ul class="nav navbar-nav navbar-left">
+            <li ng-repeat="item in vm.topMenuItemsList | orderBy: 'order'" 
+                ng-if="vm.isAuthenticatedNotNewUser()" 
+                has-permissions="[item.permission]"
+                ng-class="{active: $state.includes(item.active)}">
+                <a ui-sref="{{item.url}}" 
+                   data-test-id="{{item.testId}}" 
+                   translate="{{item.resource}}">
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="navbar-header pull-right">
+      <ul class="nav navbar-nav navbar-right">
+            <li ng-if="vm.isAuthenticatedNotNewUser()">
+                <form class="navbar-form navbar-left hidden-xs" 
+                      role="search">
+                    <div class="form-group focus">
+                        <input type="text" 
+                               id="wall-search-input" 
+                               class="form-control" 
+                               translate translate-attr-placeholder="navbar.search" 
+                               ng-model="vm.searchQuery.query" 
+                               maxlength="50" 
+                               ng-enter="vm.search()" 
+                               data-test-id="wall-search-input"/>
+                        <span class="input-clear glyphicon glyphicon-remove-circle" 
+                              ng-click="vm.searchReset()" 
+                              ng-show="vm.searchQuery.query.length" 
+                              data-test-id="wall-search-input-reset">
+                        </span>
+                        <span class="search-icon" ></span>
+                    </div>
+                </form>
+                <span class="vismaicon vismaicon-menu vismaicon-search visible-xs-inline-block" 
+                      ng-click="vm.isSearchVisible = !vm.isSearchVisible"></span>
+            </li>
+            <li id="user-nav-btn"
+                class="dropdown"
+                ng-class="{active: $state.includes('Root.WithOrg.Client.Profiles') || $state.includes('Root.WithOrg.Client.Settings')}"
+                ng-if="vm.isAuthenticated()"
+                ng-click="vm.closeNotificationsPopup()">
+                <a class="dropdown-toggle navbar-text-profile-name hidden-xs" 
+                   data-toggle="dropdown" 
+                   data-test-id="profile-select">
+                    {{vm.identity.fullName}}
+                    <span class="caret hidden-xs"></span>
+                </a>
+                <span class="dropdown-toggle vismaicon vismaicon-menu vismaicon-user visible-xs-inline-block" 
+                      data-toggle="dropdown"></span>
+                <ul class="dropdown-menu">
+                    <li ng-class="{active: $state.includes('Root.WithOrg.Client.Profiles')}">
+                        <a data-test-id="profile-button"
+                           ui-sref-opts="{reload:true}" 
+                           ui-sref="Root.WithOrg.Client.Profiles.Details({id: vm.identity.userId})"
+                           translate="navbar.profile">
+                        </a>
+                    </li>
+                    <li ng-if="vm.isAuthenticatedNotNewUser()"
+                        ng-class="{active: $state.includes('Root.WithOrg.Client.Settings')}">
+                        <a data-test-id="settings-button" 
+                           ui-sref="Root.WithOrg.Client.Settings.General"
+                           translate="navbar.settings">
+                        </a>
+                    </li>
+                    <li ng-if="vm.isImpersonationEnabled">
+                        <a data-test-id="impersonate-button" 
+                           ng-click="vm.openImpersonateModal()" 
+                           translate="impersonation.impersonate">
+                        </a>
+                    </li>
+                    <li ng-if="vm.isImpersonationEnabled && vm.isImpersonated">
+                        <a data-test-id="revert-impersonate-button" 
+                           ng-click="vm.revertImpersonate()" 
+                           translate="impersonation.revertImpersonate">
+                        </a>
+                    </li>
+                    <li>
+                        <a data-test-id="logout-button" 
+                           ui-sref="Root.WithOrg.LogOff" 
+                           translate="navbar.logout">
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="icon"
+                ng-if="vm.isAuthenticatedNotNewUser()">
+                <ace-notifications-popup></ace-notifications-popup>
+                <a title="{{'settings.notifications' | translate}}"
+                   uib-popover-template="'notifications-popup.html'"
+                   popover-trigger="outsideClick"
+                   popover-placement="bottom-right"
+                   popover-class="notifications-popup"
+                   data-test-id="notifications-button"
+                   popover-is-open="vm.isPopupOpen">
+                    <span class="vismaicon vismaicon-menu vismaicon-announcement"></span>
+                    <span ng-show="vm.notifications.data.length" class="badge">{{vm.notifications.data.length}}</span>
+                </a>
+            </li>
+            <!-- Admin drowpdown -->
+            <li id="administration-nav-btn"
+                class="icon dropdown icon-dropdown hidden-xs" 
+                ng-if="vm.isAuthenticatedNotNewUser() && (vm.showAdminButton || vm.isAdmin)"
+                ng-class="{active: $state.includes('Root.WithOrg.Admin')}"
+                ng-click="vm.closeNotificationsPopup()">
+                <a class="dropdown-toggle hidden-xs" 
+                   translate-attr-title="navbar.administration" 
+                   data-toggle="dropdown" 
+                   data-test-id="nav-administration-button" 
+                   translate>
+                    <span class="vismaicon vismaicon-menu vismaicon-settings"></span>
+                    <b class="caret icon-caret hidden-xs"></b>
+                </a>
+                <span class="dropdown-toggle vismaicon vismaicon-menu vismaicon-settings visible-xs-inline-block" 
+                      data-toggle="dropdown"></span>
+                <ul class="dropdown-menu">
+                    <li ng-class="{active: $state.includes('Root.WithOrg.Admin.ApplicationUsers')}" 
+                        has-permissions="['APPLICATIONUSER_ADMINISTRATION']">
+                        <a ui-sref="Root.WithOrg.Admin.ApplicationUsers" 
+                           data-test-id="admin-user-list-button" 
+                           translate-attr-title="applicationUser.entityNamePlural" 
+                           translate="applicationUser.entityNamePlural">
+                        </a>
+                    </li>
+                    <li ng-class="{active: $state.includes('Root.WithOrg.Admin.Roles')}" 
+                        has-permissions="['ROLES_ADMINISTRATION']">
+                        <a ui-sref="Root.WithOrg.Admin.Roles.List" 
+                           data-test-id="admin-roles-list-button" 
+                           translate-attr-title="role.entityNamePlural" 
+                           translate="role.entityNamePlural">
+                        </a>
+                    </li>
+                    <li ng-class="{active: $state.includes('Root.WithOrg.Admin.Offices')}" 
+                        has-permissions="['OFFICE_ADMINISTRATION']">
+                        <a ui-sref="Root.WithOrg.Admin.Offices.List" 
+                           data-test-id="admin-office-list-button" 
+                           translate-attr-title="office.entityNamePlural" 
+                           translate="office.entityNamePlural">
+                        </a>
+                    </li>
+                    <li ng-class="{active: $state.includes('Root.WithOrg.Admin.RoomTypes')}" 
+                        has-permissions="['ROOMTYPE_ADMINISTRATION']">
+                        <a ui-sref="Root.WithOrg.Admin.RoomTypes.List" 
+                           data-test-id="admin-roomtype-list-button" 
+                           translate-attr-title="roomType.entityNamePlural" 
+                           translate="roomType.entityNamePlural">
+                        </a>
+                    </li>
+                    <li ng-class="{active: $state.includes('Root.WithOrg.Admin.KudosBasket')}" 
+                        has-permissions="['KUDOSBASKET_ADMINISTRATION']">
+                        <a ui-sref='Root.WithOrg.Admin.KudosBasket' 
+                           data-test-id="admin-kudos-basket-button" 
+                           translate-attr-title="kudosBasket.kudosBasketAdministrationTitle" 
+                           translate="kudosBasket.kudosBasketAdministrationTitle">
+                        </a>
+                    </li>
+                    <li ng-class="{active: $state.includes('Root.WithOrg.Admin.Customization')}" 
+                        ng-if="vm.showCustomizationLink">
+                        <a ui-sref="Root.WithOrg.Admin.Customization.List" 
+                           translate-attr-title="common.customizationLinkTitle" 
+                           translate="common.customizationLinkTitle">
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="icon"
+                ng-if="vm.isAuthenticatedNotNewUser() && vm.showSimoonaSupport"
+                ng-class="{active: $state.includes('Root.WithOrg.Client.SubmitTicket')}">
+                <a ui-sref="Root.WithOrg.Client.SubmitTicket" 
+                   class="navbar-last-child"
+                   translate-attr-title="support.submitTicket" 
+                   data-test-id="support-button" 
+                   translate>
+                    <span class="vismaicon vismaicon-menu vismaicon-message"></span>
+                </a>
+            </li>
+
+        </ul>
+    </div>
+    </div>
+<form class="search-form visible-xs-block" 
+      ng-if="!!vm.isSearchVisible" 
+      role="">
+    <div class="form-group focus">
+        <input type="text" 
+          id="wall-search-input" 
+          class="form-control" 
+          translate translate-attr-placeholder="navbar.search" 
+          ng-model="vm.searchQuery.query" 
+          maxlength="50" 
+          ng-enter="vm.search()" 
+          data-test-id="wall-search-input"/>
+        <span class="input-clear glyphicon glyphicon-remove-circle" 
+          ng-click="vm.searchReset()" 
+          ng-show="vm.searchQuery.query.length" 
+          data-test-id="wall-search-input-reset">
+        </span>
+        <span class="search-icon"></span>
+    </div>
+</form>
+</nav>

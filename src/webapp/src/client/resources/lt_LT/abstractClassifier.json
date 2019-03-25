@@ -1,0 +1,11 @@
+﻿{
+  "createPermission": "Naujas klasifikatorius",
+  "name": "Pavadinimas",
+  "organization": "Organizacija",
+  "entityName": "Klasifikatorius",
+  "entityNamePlural": "Klasifikatoriai",
+  "abstractClassifierType": "Tipas",
+  "sortOrder": "Rikiavimo reikšmė",
+  "value": "Reikšmė",
+  "certificateEntityName": "Sertifikatas"
+}

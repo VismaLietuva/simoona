@@ -1,0 +1,56 @@
+﻿<div class="col-xs-12" has-permissions="['FLOOR_ADMINISTRATION']">
+    <h3>
+        <a ui-sref="^.^.List"><span>{{"office.entityNamePlural" | translate}}</span></a>
+        <span ng-if="filter.officeId">&rarr; <span>{{"office.entityName" | translate}}</span>: {{model.office.name}}</span>
+        <span ng-if="!filter.officeId">&rarr; <span>{{"floor.entityNamePlural" | translate}}</span></span>
+    </h3>
+    <ace-item-list-filter filter-value="filter.s" on-filtering="onSearch" on-filter-reset="onReset" class="pull-left"></ace-item-list-filter>
+    <div class="btn-group pull-right" has-permissions="['FLOOR_ADMINISTRATION']">
+        <a ui-sref="Root.WithOrg.Admin.Offices.Floors.Create({officeId: filter.officeId})" class="btn btn-primary" type="button">
+            <span class="glyphicon glyphicon-plus"></span> {{"common.createNew" | translate}}
+        </a>
+    </div>
+    <table class="table table-grey table-hover table-active" ng-if="model.itemCount > 0">
+        <thead>
+            <tr>
+                <th>
+                    <ace-sort-link on-sort="onSort" sort-dir="filter.dir" sort-field="filter.sort" sort-value="Name">
+                        <span>{{"floor.name" | translate}}</span>
+                    </ace-sort-link>
+                </th>
+                <th class="text-center col-xs-2">
+                    <div>{{"floor.map" | translate}}</div>
+                </th>
+                <th class="text-center">
+                    {{"room.entityNamePlural" | translate}}/{{"applicationUser.entityNamePlural" | translate}}
+                </th>
+                <th class="col-xs-1" ng-if="allowEdit"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr id="lastId{{item.Id}}" ng-if="model.itemCount !== 0" ng-repeat="item in model.pagedList">
+                <td>
+                    <a ng-if="hasRoomAdminPermission && isPremium" ui-sref="Root.WithOrg.Admin.Offices.Floors.Rooms.List({floorId : item.id})">{{item.name}}</a>
+                    <span ng-if="!hasRoomAdminPermission || !isPremium">{{item.name}}</span>
+                </td>
+                <td class="text-center">
+                    <thumbnail-link ng-if="item.pictureId" picture-id="item.pictureId" organization-name="item.organizationName" ng-click="openPictureModal(item.pictureId)"></thumbnail-link>
+                </td>
+                <td class="text-center">
+                    {{item.roomsCount}}/{{item.applicationUsersCount}}
+                </td>
+                <td class="text-center">
+                    <div class="btn-group btn-group-xs">
+                        <a ui-sref="Root.WithOrg.Admin.Offices.Floors.Edit({id: item.id})" class="btn btn-default glyphicon glyphicon-pencil" title="{{'common.edit' | translate}}" has-permissions="['FLOOR_ADMINISTRATION']"></a>
+                        <a ace-confirmation-modal="onDelete(item)"
+                           confirmation-modal-message="office.confirmFloorDeleteMessage"
+                           title="{{'common.delete' | translate}}" class="btn btn-danger glyphicon glyphicon-bin">
+                        </a>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="clearfix"></div>
+    <ace-item-list-pagination total-item-count="model.itemCount" page-size="model.pageSize" current-page="filter" on-changed="getFloors"></ace-item-list-pagination>
+</div>

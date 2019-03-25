@@ -1,0 +1,81 @@
+<div class="row body-container">
+    <div class="col-xs-12" has-permissions="['JOB_ADMINISTRATION']">
+        <wave-spinner ng-if="vm.isLoading"></wave-spinner>
+        <div class="panel panel-default"
+             ng-if="!vm.isLoading">
+            <div class="panel-heading">
+                <span ng-if="vm.states.isEdit" 
+                      translate="customization.editJobTitle"></span>
+                <span ng-if="vm.states.isAdd" 
+                      translate="customization.createJobTitle"></span>
+            </div>
+            <div class="panel-body">
+                <form name="jobTitleForm" class="form-horizontal" autocomplete="off">
+
+                    <!--job title name-->
+                    <div class="form-group required" 
+                         ng-class="{'has-error': jobTitleForm.name.$invalid && jobTitleForm.name.$dirty}">
+                        <label for="jobTitleName" 
+                               class="control-label col-xs-12 col-sm-4" 
+                               translate="customization.jobTitleName"></label>
+                        <div class="col-xs-12 col-sm-4">
+                            <input id="jobTitleName" 
+                                   type="text" 
+                                   class="form-control" 
+                                   name="name" 
+                                   ng-model="vm.jobTitleData.title" 
+                                   ng-maxlength="50" 
+                                   required/>
+                            <p class="text-danger help-block" 
+                               ng-if="jobTitleForm.name.$error.required && jobTitleForm.name.$dirty" 
+                               translate="common.messageFieldIsRequired"></p>
+                            <p class="text-danger help-block" 
+                               ng-if="jobTitleForm.name.$error.maxlength && jobTitleForm.name.$dirty" 
+                               translate="common.messageInvalidLength" 
+                               translate-values="{ one: 50 }"></p>
+                        </div>
+                    </div>
+
+                    <!--event type buttons right -->
+                    <div class="pull-right">
+
+                        <button class="btn btn-primary" 
+                                ng-if="vm.states.isAdd" 
+                                ng-click="vm.saveJobTitle(vm.createJobTitle)" 
+                                ng-disabled="jobTitleForm.$invalid" >
+                            <span translate="common.save"></span>
+                        </button>
+
+                        <button class="btn btn-primary" 
+                                ng-if="vm.states.isEdit" 
+                                ng-click="vm.saveJobTitle(vm.updateJobTitle)" 
+                                ng-disabled="jobTitleForm.$invalid" >
+                            <span translate="common.update"></span>
+                        </button>
+
+                        <button class="btn btn-default" 
+                                ui-sref="Root.WithOrg.Admin.Customization.JobTitles.List"> 
+                            <span translate="common.cancel"></span>
+                        </button>
+
+                    </div>
+
+                    <!--job title delete button left -->
+                    <div class="pull-left">
+                        
+                        <div class="pull-left">
+                            <button ng-if="vm.states.isEdit"
+                                    class="btn btn-danger"
+                                    ace-confirmation-modal="vm.deleteJobTitle(vm.jobTitleData.id)">
+                                <span translate="common.delete"></span>
+                            </button>        
+                        </div>
+                        
+                    </div>   
+
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>

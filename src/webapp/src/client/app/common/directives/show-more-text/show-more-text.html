@@ -1,0 +1,5 @@
+<span>{{displayedText}}</span>
+<span ng-if="collapsed && toggleableText">...</span>
+<span ng-if="!collapsed && toggleableText">{{toggleableText}}</span>
+<a ng-if="toggleableText" ng-click="toggle()">{{collapsed ? ("common.showMore" | translate) : ("common.showLess" | translate)}}</a>
+

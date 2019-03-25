@@ -1,0 +1,14 @@
+﻿{
+  "createPermission": "Naujas leidimas",
+  "editPermission": "Redaguoti leidimą",
+  "name": "Pavadinimas",
+  "roles": "Rolės",
+  "entityName": "Leidimas",
+  "entityNamePlural": "Leidimai",
+  "showAdmin": "Tik administraciniai leidimai",
+  "showAll": "Rodyti viską",
+  "showBasic": "Tik pagrindiniai leidimai",
+  "scope": "Sritis",
+  "admin": "Administraciniai",
+  "basic": "Pagrindiniai"
+}

@@ -1,0 +1,372 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{1F63D29F-E593-47F0-A304-54D62CC1AD2B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Shrooms.WebViewModels</RootNamespace>
+    <AssemblyName>Shrooms.WebViewModels</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>..\Shrooms.API\Shrooms.API.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Deploy-Dev|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Deploy-Dev\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Development|AnyCPU'">
+    <OutputPath>bin\Development\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Staging|AnyCPU'">
+    <OutputPath>bin\Staging\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Azure|AnyCPU'">
+    <OutputPath>bin\Azure\</OutputPath>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DevelopmentTest|AnyCPU'">
+    <OutputPath>bin\DevelopmentTest\</OutputPath>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'AzureDemo|AnyCPU'">
+    <OutputPath>bin\AzureDemo\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'AzureProduction|AnyCPU'">
+    <OutputPath>bin\AzureProduction\</OutputPath>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ExternalQA|AnyCPU'">
+    <OutputPath>bin\ExternalQA\</OutputPath>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'AzureStaging|AnyCPU'">
+    <OutputPath>bin\AzureStaging\</OutputPath>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DataAnnotationsExtensions, Version=5.0.1.16, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\DataAnnotationsExtensions.5.0.1.16\lib\NETFramework40\DataAnnotationsExtensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.EntityFramework, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.AspNet.Identity.EntityFramework.2.2.1\lib\net45\Microsoft.AspNet.Identity.EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks.Extensions, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks.Extensions.Desktop, Version=1.0.168.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.Desktop.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PagedList, Version=1.17.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\PagedList.1.17.0.0\lib\net40\PagedList.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Net.Http.Extensions, Version=2.2.29.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.Net.Http.2.2.29\lib\net45\System.Net.Http.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Net.Http.Primitives, Version=4.2.29.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.Net.Http.2.2.29\lib\net45\System.Net.Http.Primitives.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Net.Http.WebRequest" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\AccountModels\ProviderViewModel.cs" />
+    <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\ExternalLink\AddEditDeleteExternalLinkViewModel.cs" />
+    <Compile Include="Models\ExternalLink\ExternalLinkViewModel.cs" />
+    <Compile Include="Models\ExternalLink\NewExternalLinkViewModel.cs" />
+    <Compile Include="Models\ExternalLink\UpdatedExternalLinkViewModel.cs" />
+    <Compile Include="Models\Jobs\NewJobTypeViewModel.cs" />
+    <Compile Include="Models\Jobs\JobTypeViewModel.cs" />
+    <Compile Include="Models\KudosTypes\NewKudosTypeViewModel.cs" />
+    <Compile Include="Models\Monitors\CreateMonitorViewModel.cs" />
+    <Compile Include="Models\Monitors\MonitorViewModel.cs" />
+    <Compile Include="Models\Notifications\NotificationViewModel.cs" />
+    <Compile Include="Models\Notifications\SourcesViewModel.cs" />
+    <Compile Include="Models\Profile\JobPosition\JobPositionViewModel.cs" />
+    <Compile Include="Models\Projects\ProjectDetailsViewModel.cs" />
+    <Compile Include="Models\Projects\ProjectsBasicInfoViewModel.cs" />
+    <Compile Include="Models\Projects\EditProjectDisplayViewModel.cs" />
+    <Compile Include="Models\Projects\EditProjectViewModel.cs" />
+    <Compile Include="Models\Projects\NewProjectViewModel.cs" />
+    <Compile Include="Models\Projects\ProjectsListItemViewModel.cs" />
+    <Compile Include="Models\Roles\RoleDetailsViewModel.cs" />
+    <Compile Include="Models\Roles\RoleUserViewModel.cs" />
+    <Compile Include="Models\Users\Kudos\KudosBasicDataViewModel.cs" />
+    <Compile Include="Models\Users\Kudos\KudosListBasicDataViewModel.cs" />
+    <Compile Include="Models\User\ChangeUserLocalizationSettingsViewModel.cs" />
+    <Compile Include="Models\Book\BookDetails\RetrievedBookInfoViewModel.cs" />
+    <Compile Include="Models\User\LanguageViewModel.cs" />
+    <Compile Include="Models\User\UserNotificationsSettingsViewModel.cs" />
+    <Compile Include="Models\User\WallNotificationsViewModel.cs" />
+    <Compile Include="Models\User\LocalizationSettingsViewModel.cs" />
+    <Compile Include="Models\User\TimeZoneViewModel.cs" />
+    <Compile Include="Models\Wall\CreateWallViewModel.cs" />
+    <Compile Include="Models\Wall\Moderator\ModeratorViewModel.cs" />
+    <Compile Include="Models\Wall\Posts\Comments\EditCommentViewModel.cs" />
+    <Compile Include="Models\Wall\Posts\Comments\HideCommentViewModel.cs" />
+    <Compile Include="Models\Wall\Posts\Comments\NewCommentViewModel.cs" />
+    <Compile Include="Models\Wall\Posts\CreateWallPostViewModel.cs" />
+    <Compile Include="Models\Wall\Posts\HidePostViewModel.cs" />
+    <Compile Include="Models\Wall\UpdateWallViewModel.cs" />
+    <Compile Include="Models\Wall\UserWallViewModel.cs" />
+    <Compile Include="Models\Wall\WallListViewModel.cs" />
+    <Compile Include="Models\Wall\WallMemberViewModel.cs" />
+    <Compile Include="ValidationAttributes\DateTimeNotExpiredAttribute.cs" />
+    <Compile Include="ValidationAttributes\HasNoDuplicateLinksAttribute.cs" />
+    <Compile Include="ValidationAttributes\MinValueAttribute.cs" />
+    <Compile Include="Models\AbstractClassifierAbstractViewModel.cs" />
+    <Compile Include="Models\AbstractClassifierTypeViewModel.cs" />
+    <Compile Include="Models\AbstractClassifierViewModel.cs" />
+    <Compile Include="Models\AbstractViewModel.cs" />
+    <Compile Include="Models\AddressPostViewModel.cs" />
+    <Compile Include="Models\AddressViewModel.cs" />
+    <Compile Include="Models\ApplicationRoleMiniViewModel.cs" />
+    <Compile Include="Models\ApplicationRoleViewModel.cs" />
+    <Compile Include="Models\ApplicationUserReturnViewModel.cs" />
+    <Compile Include="Models\User\ApplicationUserAutoCompleteViewModel.cs" />
+    <Compile Include="Models\User\ApplicationUserBaseViewModel.cs" />
+    <Compile Include="Models\User\ApplicationUserDetailsViewModel.cs" />
+    <Compile Include="Models\User\ApplicationUserExamsPostModel.cs" />
+    <Compile Include="Models\User\ApplicationUserJobInfoViewModel.cs" />
+    <Compile Include="Models\User\ApplicationUserLoginInfoViewModel.cs" />
+    <Compile Include="Models\User\ApplicationUserMinimalViewModel.cs" />
+    <Compile Include="Models\User\ApplicationUserOfficeInfoViewModel.cs" />
+    <Compile Include="Models\User\ApplicationUserPasswordModel.cs" />
+    <Compile Include="Models\User\ApplicationUserPersonalInfoViewModel.cs" />
+    <Compile Include="Models\User\ApplicationUserProfileViewModel.cs" />
+    <Compile Include="Models\User\ApplicationUserPutJobInfoViewModel.cs" />
+    <Compile Include="Models\User\ApplicationUserPutLoginInfoViewModel.cs" />
+    <Compile Include="Models\User\ApplicationUserPutOfficeInfoViewModel.cs" />
+    <Compile Include="Models\User\ApplicationUserPutPersonalInfoViewModel.cs" />
+    <Compile Include="Models\User\ApplicationUserShroomsInfoViewModel.cs" />
+    <Compile Include="Models\User\ApplicationUserViewModel.cs" />
+    <Compile Include="Models\Birthday\BirthdayViewModel.cs" />
+    <Compile Include="Models\Book\BookDetails\BookDetailsAdministrationViewModel.cs" />
+    <Compile Include="Models\Book\BookDetails\BookDetailsLogViewModel.cs" />
+    <Compile Include="Models\Book\BookDetails\BookDetailsViewModel.cs" />
+    <Compile Include="Models\Book\BookDetails\BookQuantityByOfficeViewModel.cs" />
+    <Compile Include="Models\Book\BookDetails\EditBookViewModel.cs" />
+    <Compile Include="Models\Book\BookDetails\NewBookQuantityViewModel.cs" />
+    <Compile Include="Models\Book\BookDetails\NewBookViewModel.cs" />
+    <Compile Include="Models\Book\BooksByOffice\BasicBookUserViewModel.cs" />
+    <Compile Include="Models\Book\BooksByOffice\BooksByOfficeViewModel.cs" />
+    <Compile Include="Models\Book\OfficeBookViewModel.cs" />
+    <Compile Include="Models\Book\RetrievedBookForPostViewModel.cs" />
+    <Compile Include="Models\Certificate\CertificateAutoCompleteViewModel.cs" />
+    <Compile Include="Models\Certificate\CertificateMiniViewModel.cs" />
+    <Compile Include="Models\Certificate\CertificatePostViewModel.cs" />
+    <Compile Include="Models\Certificate\CertificateViewModel.cs" />
+    <Compile Include="Models\ChangeProfile\ChangeProfileBaseModel.cs" />
+    <Compile Include="Models\ChangeProfile\ChangeProfileInfoViewModel.cs" />
+    <Compile Include="Models\ChangeProfile\ChangeProfileLoginViewModel.cs" />
+    <Compile Include="Models\ChangeProfile\ChangeProfileOfficeViewModel.cs" />
+    <Compile Include="Models\ChangeProfile\ChangeProfileViewModel.cs" />
+    <Compile Include="Models\CommentViewModel.cs" />
+    <Compile Include="Models\EmployeeListViewModel.cs" />
+    <Compile Include="Models\Exam\ExamAutoCompleteViewModel.cs" />
+    <Compile Include="Models\Exam\ExamMiniViewModel.cs" />
+    <Compile Include="Models\Exam\ExamPostViewModel.cs" />
+    <Compile Include="Models\Exam\ExamViewModel.cs" />
+    <Compile Include="Models\AccountModels\ExternalLoginViewModel.cs" />
+    <Compile Include="Models\FloorMiniViewModel.cs" />
+    <Compile Include="Models\FloorViewModel.cs" />
+    <Compile Include="Models\KudosBaskets\KudosBasketCreateViewModel.cs" />
+    <Compile Include="Models\KudosBaskets\KudosBasketDonateViewModel.cs" />
+    <Compile Include="Models\KudosBaskets\KudosBasketEditViewModel.cs" />
+    <Compile Include="Models\KudosBaskets\KudosBasketLogUserViewModel.cs" />
+    <Compile Include="Models\KudosBaskets\KudosBasketLogViewModel.cs" />
+    <Compile Include="Models\KudosBaskets\KudosBasketViewModel.cs" />
+    <Compile Include="Models\Users\Kudos\AddKudosLogViewModel.cs" />
+    <Compile Include="Models\Users\Kudos\KudosFilterParameters.cs" />
+    <Compile Include="Models\Users\Kudos\KudosLogInputModel.cs" />
+    <Compile Include="Models\Users\Kudos\KudosLogListViewModel.cs" />
+    <Compile Include="Models\Users\Kudos\KudosLogsFilterViewModel.cs" />
+    <Compile Include="Models\Users\Kudos\KudosLogTypeViewModel.cs" />
+    <Compile Include="Models\Users\Kudos\KudosLogUserViewModel.cs" />
+    <Compile Include="Models\Users\Kudos\KudosLogViewModel.cs" />
+    <Compile Include="Models\Users\Kudos\KudosPaginatedViewModel.cs" />
+    <Compile Include="Models\Users\Kudos\KudosPieChartSliceViewModel.cs" />
+    <Compile Include="Models\Users\Kudos\KudosRejectViewModel.cs" />
+    <Compile Include="Models\Users\Kudos\KudosTypeViewModel.cs" />
+    <Compile Include="Models\Users\Kudos\KudosUserLogViewModel.cs" />
+    <Compile Include="Models\Users\Kudos\KudosViewModel.cs" />
+    <Compile Include="Models\Users\Kudos\UserKudosAutocompleteViewModel.cs" />
+    <Compile Include="Models\Users\Kudos\UserKudosInformationViewModel.cs" />
+    <Compile Include="Models\Users\Kudos\UserKudosViewModel.cs" />
+    <Compile Include="Models\Users\Kudos\WallKudosLogViewModel.cs" />
+    <Compile Include="Models\AccountModels\LoggedInUserInfoViewModel.cs" />
+    <Compile Include="Models\Like\LikeViewModel.cs" />
+    <Compile Include="Models\ManagerMiniViewModel.cs" />
+    <Compile Include="Models\Map\MapAllFloorsViewModel.cs" />
+    <Compile Include="Models\Map\MapApplicationUserViewModel.cs" />
+    <Compile Include="Models\Map\MapFloorViewModel.cs" />
+    <Compile Include="Models\Map\MapOfficeViewModel.cs" />
+    <Compile Include="Models\Map\MapRoomTypeViewModel.cs" />
+    <Compile Include="Models\Map\MapRoomViewModel.cs" />
+    <Compile Include="Models\Map\MapViewModel.cs" />
+    <Compile Include="Models\OfficeDropdownViewModel.cs" />
+    <Compile Include="Models\OfficeMiniViewModel.cs" />
+    <Compile Include="Models\OfficeViewModel.cs" />
+    <Compile Include="Models\OrganizationNameCheckResultModel.cs" />
+    <Compile Include="Models\OrganizationViewModel.cs" />
+    <Compile Include="Models\PagedViewModel.cs" />
+    <Compile Include="Models\PartTimeHoursOptions.cs" />
+    <Compile Include="Models\PermissionGroupViewModel.cs" />
+    <Compile Include="Models\PostModels\AbstractClassifierPostViewModel.cs" />
+    <Compile Include="Models\PostModels\CommentPostViewModel.cs" />
+    <Compile Include="Models\Support\SupportPostViewModel.cs" />
+    <Compile Include="Models\PostModels\FloorPostViewModel.cs" />
+    <Compile Include="Models\PostModels\OfficePostViewModel.cs" />
+    <Compile Include="Models\PostModels\OrganizationPostViewModel.cs" />
+    <Compile Include="Models\PostModels\QualificationLevelPostViewModel.cs" />
+    <Compile Include="Models\PostModels\RoomPostViewModel.cs" />
+    <Compile Include="Models\PostModels\RoomTypePostViewModel.cs" />
+    <Compile Include="Models\QualificationLevelAutoCompleteViewModel.cs" />
+    <Compile Include="Models\QualificationLevelMiniViewModel.cs" />
+    <Compile Include="Models\QualificationLevelViewModel.cs" />
+    <Compile Include="Models\Roles\RoleMiniViewModel.cs" />
+    <Compile Include="Models\Roles\RoleViewModel.cs" />
+    <Compile Include="Models\RoomMiniViewModel.cs" />
+    <Compile Include="Models\RoomTypeMiniViewModel.cs" />
+    <Compile Include="Models\RoomTypeViewModel.cs" />
+    <Compile Include="Models\RoomViewModel.cs" />
+    <Compile Include="Models\Skill\SkillAutoCompleteViewModel.cs" />
+    <Compile Include="Models\Skill\SkillMiniViewModel.cs" />
+    <Compile Include="Models\Skill\SkillPostViewModel.cs" />
+    <Compile Include="Models\AccountModels\ExternalUserInfoViewModel.cs" />
+    <Compile Include="Models\UserViewModel.cs" />
+    <Compile Include="Models\Wall\PagedWallViewModel.cs" />
+    <Compile Include="Models\Wall\Posts\Comments\CommentViewModel.cs" />
+    <Compile Include="Models\Wall\Posts\EditPostViewModel.cs" />
+    <Compile Include="Models\Wall\Posts\WallPostViewModel.cs" />
+    <Compile Include="Models\WorkingHoursViewModel.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Models\Permissions\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Other\Shrooms.Constants\Shrooms.Constants.csproj">
+      <Project>{e07394b9-558c-4a70-9926-6400abb0fb5d}</Project>
+      <Name>Shrooms.Constants</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Other\Shrooms.Resources\Shrooms.Resources.csproj">
+      <Project>{c6fc692b-dfad-4ed5-86d5-8000dbd06b02}</Project>
+      <Name>Shrooms.Resources</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\DataLayer\Shrooms.DataLayer\Shrooms.DataLayer.csproj">
+      <Project>{affe7b8b-3294-4dd3-990d-7da5e256c987}</Project>
+      <Name>Shrooms.DataLayer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\DataLayer\Shrooms.EntityModels\Shrooms.EntityModels.csproj">
+      <Project>{8ad6f857-708c-4b5e-98bc-b3206e7dd918}</Project>
+      <Name>Shrooms.EntityModels</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <AdditionalFiles Include="..\..\..\stylecop.json">
+      <Link>stylecop.json</Link> 
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </AdditionalFiles>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\..\..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\Newtonsoft.Json.dll" />
+    <Analyzer Include="..\..\..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
+    <Analyzer Include="..\..\..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

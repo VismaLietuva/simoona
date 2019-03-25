@@ -1,0 +1,22 @@
+﻿{
+  "address": "Address",
+  "building": "Building",
+  "city": "City",
+  "country": "Country",
+  "createOffice": "New Office",
+  "editOffice": "Edit Office",
+  "employeesCount": "Employees",
+  "entityName": "Office",
+  "entityNamePlural": "Offices",
+  "floors": "Floors",
+  "floorsCount": "Floors",
+  "isDefault": "Default",
+  "mapImageSizeExceeded": "The selected file is too big to upload! Maximum file size is 10MB.",
+  "mapImageUnsupportedFormat": "The selected file type is invalid. Supported file types are jpg, jpeg, and png.",
+  "name": "Title",
+  "officeData": "Office Data",
+  "roomsCount": "Rooms",
+  "street": "Street",
+  "confirmOfficeDeleteMessage": "You are about to delete office map. All floors and rooms inside this map will be deleted. All users that have this office as their location, will get their location reset!",
+  "confirmFloorDeleteMessage":"You are about to delete office floor. All rooms inside this floor will be deleted. All users that have this floor as their location, will get their location reset!"
+}

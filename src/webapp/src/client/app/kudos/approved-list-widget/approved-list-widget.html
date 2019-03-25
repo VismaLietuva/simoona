@@ -1,0 +1,68 @@
+<wave-spinner ng-if="vm.isKudosLogsLoading"></wave-spinner>
+<table ng-if="!vm.isKudosLogsLoading && vm.approvedList.length" class="table table-grey table-hover kudos-approve-table">
+    <thead>
+        <tr class="info">
+            <th translate="kudos.status" class="hidden-xs hidden-sm"></th>
+            <th translate="kudos.kudosCategory"></th>
+            <th translate="kudos.kudosComment"></th>
+            <th translate="kudos.kudosPoints"></th>
+            <th translate="kudos.multiplier" class="hidden-xs hidden-sm"></th>
+            <th translate="kudos.kudosSender"></th>
+            <th translate="kudos.date" class="hidden-xs hidden-sm"></th>
+            <th translate="kudos.kudosPhoto" class="hidden-xs hidden-sm"></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="approvedItem in vm.approvedList">
+            <td class="hidden-xs hidden-sm" data-test-id="kudos-approved-list-status" ng-cloak>
+                {{:: approvedItem.status}}
+            </td>
+            <td data-test-id="kudos-approved-list-item-name" th="{{ 'kudos.kudosCategory' | translate }}" ng-cloak>
+                {{:: approvedItem.type.name}}({{::approvedItem.type.value}})
+            </td>
+            <td ng-if="approvedItem.comment.length > vm.kudosLogSettings.maxCommentsLength" class="kudos-comment" uib-tooltip="{{:: approvedItem.comment | limitTo: vm.kudosLogSettings.maxCommentsLength}}..." tooltip-placement="top" tooltip-append-to-body="true" data-test-id="kudos-approved-list-item-comment" th="{{ 'kudos.kudosComment' | translate }}" ng-cloak>
+                {{:: approvedItem.comment | characters: vm.kudosLogSettings.minCommentsLength-3}}
+            </td>
+            <td ng-if="approvedItem.comment.length > vm.kudosLogSettings.minCommentsLength && approvedItem.comment.length <= vm.kudosLogSettings.maxCommentsLength" 
+                class="kudos-comment"  
+                ng-mouseenter="approvedItem.TooltipOpen = true" 
+                ng-mouseleave="approvedItem.TooltipOpen = false"
+                th="{{ 'kudos.kudosComment' | translate }}"
+                ng-cloak> 
+                <div uib-tooltip="{{:: approvedItem.comment}}" 
+                     tooltip-placement="top" 
+                     tooltip-class="word-break"
+                     tooltip-trigger="none"
+                     tooltip-is-open="approvedItem.TooltipOpen"
+                     data-test-id="kudos-approved-list-item-comment">
+                    {{:: approvedItem.comment | characters: vm.kudosLogSettings.minCommentsLength-3}}
+                </div>
+            </td>
+            <td ng-if="approvedItem.comment.length <= vm.kudosLogSettings.minCommentsLength" data-test-id="kudos-approved-list-item-comment" th="{{ 'kudos.kudosComment' | translate }}" ng-cloak>
+                {{:: approvedItem.comment}}
+            </td>
+            <td data-test-id="kudos-approved-list-item-points" th="{{ 'kudos.kudosPoints' | translate }}" ng-cloak>
+                {{:: approvedItem.points}}
+            </td>
+            <td class="hidden-xs hidden-sm" data-test-id="kudos-approved-list-item-multiplyBy" ng-cloak>
+                {{:: approvedItem.multiplier}}
+            </td>
+            <td th="{{ 'kudos.kudosSender' | translate }}">
+                <a data-ui-sref="Root.WithOrg.Client.Profiles.Details({ id: approvedItem.sender.id })" data-test-id="kudos-approved-list-item-user" ng-cloak>
+                    {{:: approvedItem.sender.fullName}}
+                </a>
+            </td>
+            <td class="hidden-xs hidden-sm" data-test-id="kudos-approved-list-item-created" ng-cloak>
+                {{:: approvedItem.created | date: 'yyyy-MM-dd' }}
+            </td>
+            <td th="{{ 'kudos.kudosPhoto' | translate }}" class="kudos-log-list-table-small-column" data-test-id="kudos-log-list-picture">
+                <span ng-if="!!approvedItem.pictureId" class="glyphicon glyphicon-camera media-icons kudos-image" ace-picture-modal="approvedItem.pictureId"></span>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="pull-left" ng-show="vm.totalItems > vm.perPage">
+    <ace-item-list-pagination total-item-count="vm.totalItems" page-size="vm.perPage" current-page="vm.filter" on-changed="vm.getApprovedKudosList"></ace-item-list-pagination>
+</div>
+<div class="clearfix"></div>

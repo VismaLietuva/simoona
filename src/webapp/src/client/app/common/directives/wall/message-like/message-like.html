@@ -1,0 +1,14 @@
+<div>
+	<div class="{{vm.type}}-list-wrapper" has-permissions="['LIKE_BASIC']">
+		<ace-message-like-list message-object="vm.messageObject" 
+							   like-type="{{::vm.type}}" 
+							   data-test-id="{{::vm.type}}-like-list">
+							   </ace-message-like-list>
+	</div>
+	<ace-message-like-button message-object="vm.messageObject" 
+		                     like-type="{{::vm.type}}" 
+		                     data-test-id="{{::vm.type}}-like-button">
+		                     </ace-message-like-button>
+	<div ng-if="vm.type === 'comment'" class="clearfix"></div>
+</div>
+

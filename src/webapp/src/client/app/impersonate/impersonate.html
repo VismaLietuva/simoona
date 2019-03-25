@@ -1,0 +1,44 @@
+﻿<div>
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="vm.cancel()">&times;</button>
+        <h4 class="modal-title" translate="impersonation.impersonateSomebody"></h4>
+    </div>
+    <div class="modal-body">
+        <form name="impersonate" role="form" novalidate>
+            <div class="form-group">
+                <div class="col-md-12">
+                    <div class="col-md-4">
+                        <label translate="impersonation.userToImpersonate"></label>
+                    </div>
+
+                    <div class="col-md-8">
+                        <input ng-model="vm.userToImpersonate" name=" " wrapped hidden ng-required="true"/>
+                        <autocomplete load-data="vm.searchUsersForAutocomplete"
+                                      shown="firstName lastName"
+                                      bound-model="vm.userToImpersonate"
+                                      with-image="true"
+                                      ng-required="true"
+                                      data-test-id="userToImpersonate">
+                        </autocomplete>
+                    </div>
+                </div>
+            </div>
+            <br/>
+            <br/>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary"
+                ng-click="vm.impersonateUser(vm.userToImpersonate)"
+                ng-disabled="vm.userToImpersonate.userName === undefined || vm.userToImpersonate.userName === '' "
+                data-test-id="impersonateSubmit">
+            <span class="glyphicon glyphicon-disk-save"></span>
+            <span translate="common.ok"></span>
+        </button>
+        <button class="btn btn-default"
+                data-ng-click="vm.cancel()"
+                data-test-id="impersonateCancel">
+            <span translate="common.cancel"></span>
+        </button>
+    </div>
+</div>

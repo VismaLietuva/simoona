@@ -1,0 +1,19 @@
+<div class="modal-body" ng-swipe-left="Lightbox.nextImage()" ng-swipe-right="Lightbox.prevImage()">
+    <div class="lightbox-nav">
+        <button class="close" aria-hidden="true" ng-click="$dismiss()">×</button>
+    </div>
+    <div class="lightbox-image-container">
+        <wave-spinner ng-if="Lightbox.loading"></wave-spinner>
+        <img ng-if="!Lightbox.isVideo(Lightbox.image) && !Lightbox.loading" lightbox-src="{{Lightbox.imageUrl}}">
+        <div ng-if="Lightbox.isVideo(Lightbox.image)" class="embed-responsive embed-responsive-16by9">
+            <video ng-if="!Lightbox.isSharedVideo(Lightbox.image)" lightbox-src="{{Lightbox.imageUrl}}" controls autoplay></video>
+            <embed-video ng-if="Lightbox.isSharedVideo(Lightbox.image)"
+                         lightbox-src="{{Lightbox.imageUrl}}"
+                         ng-href="{{Lightbox.imageUrl}}"
+                         iframe-id="lightbox-video"
+                         class="embed-responsive-item">
+                <a ng-href="{{Lightbox.imageUrl}}" translate="common.watchVideo"></a>
+            </embed-video>
+        </div>
+    </div>
+</div>

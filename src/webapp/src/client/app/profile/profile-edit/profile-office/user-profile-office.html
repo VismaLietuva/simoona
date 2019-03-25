@@ -1,0 +1,73 @@
+<div class="tab-content">
+    <div class="tab-pane-content">
+        <form name="userOffice"
+              role="form"
+              class="form-horizontal profile-form"
+              ng-submit="saveInfo(room, info.id)">
+
+            <input-wrapper label-text="{{'applicationUser.office' | translate}}"
+                           input-value="userOffice.office"
+                           classes="col-xs-12 col-sm-6  nopadding-left" label-classes="control-label col-xs-12 col-sm-4 nopadding-left">
+                <select name="office"
+                        data-test-id="profileEditOffice"
+                        class="form-control"
+                        ng-model="room.officeId"
+                        ng-options="office.id as office.name for office in offices"
+                        ng-change="loadFloors(room.officeId)"
+                        wrapped>
+                    <option value=""></option>
+                </select>
+            </input-wrapper>
+
+            <input-wrapper label-text="{{'applicationUser.floor' | translate}}"
+                           input-value="userOffice.floor"
+                           classes="col-xs-12 col-sm-6 nopadding-left" label-classes="control-label col-xs-12 col-sm-4 nopadding-left"
+                           ng-show="room.officeId">
+                <select name="floor"
+                        data-test-id="profileEditFloor"
+                        class="form-control"
+                        ng-model="room.floorId"
+                        ng-disabled="!room.officeId"
+                        ng-options="floor.id as floor.name for floor in floors"
+                        ng-change="loadRooms(room.floorId)"
+                        required
+                        wrapped>
+                    <option value=""></option>
+                </select>
+            </input-wrapper>
+
+            <input-wrapper label-text="{{'applicationUser.room' | translate}}"
+                           input-value="userOffice.room"
+                           classes="col-xs-12 col-sm-6 nopadding-left" label-classes="control-label col-xs-12 col-sm-4 nopadding-left"
+                           ng-show="room.floorId">
+                <select name="room"
+                        data-test-id="profileEditRoom"
+                        class="form-control"
+                        ng-model="room.id"
+                        ng-disabled="!room.floorId"
+                        ng-options="room.id as room.name for room in rooms"
+                        required
+                        wrapped>
+                    <option value=""></option>
+                </select>
+            </input-wrapper>
+
+            <div class="top-space col-xs-offset-4 text-left">
+                <button class="btn btn-primary"
+                        type="submit"
+                        data-test-id="profileEditOfficeSave"
+                        ng-disabled="userOffice.$invalid">
+                    <span class="glyphicon glyphicon-disk-save"></span>
+                    {{"common.save" | translate}}
+                </button>
+                <button ui-sref="Root.WithOrg.Client.Profiles.Details({ id: info.id })"
+                        class="btn btn-default"
+                        ng-if="isNotNewUser"
+                        data-test-id="profileEditOfficeBackToProfile">
+                    {{"applicationUser.backToProfile" | translate}}
+                </button>
+            </div>
+        </form>
+        <div class="clearfix"></div>
+    </div>
+</div>

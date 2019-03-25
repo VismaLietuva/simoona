@@ -1,0 +1,49 @@
+<div class="row body-container">
+    <div class="col-xs-12" has-permissions="['ORGANIZATION_ADMINISTRATION']">
+        <div class="panel panel-default">
+            <div class="panel-heading" translate="customization.organizationSettings"></div>
+            <div class="panel-body">
+                <wave-spinner ng-if="vm.isLoading"></wave-spinner>
+                <form ng-if="!vm.isLoading"
+                      name="organizationSettingsForm"
+                      class="form-horizontal">
+
+                    <div class="form-group required" 
+                         ng-class="{'has-error': !vm.settings.manager.id}">
+                        <label for="organizationManager" 
+                               class="control-label col-xs-12 col-sm-4" 
+                               translate="customization.organizationSettingsManager"></label>
+                        <div class="col-xs-12 col-sm-4">
+                            <input id="organizationManager"
+                                   ng-model="vm.settings.manager" 
+                                   name="organizationManager" wrapped hidden />
+                            <autocomplete load-data="vm.getManagers"
+                                          shown="fullName"
+                                          bound-model="vm.settings.manager"
+                                          with-image="true"
+                                          data-test-id="organization-manager-autocomplete">
+                            </autocomplete>
+                            <p class="text-danger help-block" 
+                               ng-if="!vm.settings.manager.id" 
+                               translate="common.messageFieldIsRequired"></p>
+                        </div>
+                    </div>
+
+                    <div class="pull-right">
+                        <button class="btn btn-primary" 
+                                ng-click="vm.saveSettings()" 
+                                ng-disabled="!vm.settings.manager.id" 
+                                data-test-id="save-button">
+                            <span translate="common.save"></span>
+                        </button>
+                        <button class="btn btn-default" 
+                                ng-click="vm.cancelUpdate()" 
+                                data-test-id="cancel-button">
+                            <span translate="common.cancel"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

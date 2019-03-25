@@ -1,0 +1,64 @@
+<div class="row body-container">
+    <div class="col-xs-12" has-permissions="['KUDOSSHOP_ADMINISTRATION']">
+        <div class="panel panel-default">
+
+            <div class="panel-heading flex-panel-heading">
+                <span translate="customization.kudosShop"></span>
+
+                <div class="pull-right wall-create-button">
+                    <a class="nc-btn nc-btn-default"
+                       ui-sref="Root.WithOrg.Admin.Customization.KudosShop.Create"
+                       translate-attr-title="kudosShop.createKudosShopItem">
+                        <span class="vismaicon vismaicon-add2-circle"></span><span class="hidden-xs" translate="kudosShop.createKudosShopItem"></span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="panel-body">
+                <wave-spinner ng-if="vm.isLoading"></wave-spinner>
+                <table class="nc-table nc-table-active" ng-if="vm.kudosShopItems.length">
+                    <thead>
+                        <tr>
+                            <th class="col-xs-4" 
+                                translate="kudosShop.kudosShopItemName"></th>
+                            <th class="col-xs-2 hidden-xs" 
+                                translate="kudosShop.kudosShopItemPrice"></th>
+                            <th class="col-xs-4 hidden-xs" 
+                                translate="kudosShop.kudosShopItemDescription"></th>
+                            <th class="col-xs-2 text-center" 
+                                translate="common.action"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="kudosShopItem in vm.kudosShopItems">
+                            <td>
+                                {{kudosShopItem.name}}
+                            </td>
+                            <td class="hidden-xs">
+                                {{kudosShopItem.price}}
+                            </td>
+                            <td class="hidden-xs table-item-description">
+                                <span ng-if="!!kudosShopItem.description"
+                                      uib-tooltip="{{:: kudosShopItem.description}}" 
+                                      tooltip-placement="top-left" 
+                                      tooltip-class="word-break"
+                                      tooltip-enable="kudosShopItem.description.length > 71">
+                                      {{ kudosShopItem.description }}
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <a ui-sref="Root.WithOrg.Admin.Customization.KudosShop.Edit({ id : {{kudosShopItem.id}}})" 
+                                   class="link"
+                                   translate-attr-title="common.edit"
+                                   translate>
+                                   <span class="vismaicon vismaicon-edit" aria-hidden="true"></span>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>

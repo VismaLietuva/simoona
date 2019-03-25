@@ -1,0 +1,37 @@
+<div>
+    <h4 data-test-id="no-entries-found" ng-if="vm.totalItemCount === 0" translate="common.noResults"></h4>
+
+    <nav ng-if="vm.totalItemCount > vm.pageSize" class="nc-pagination">
+        <ul class="pagination">
+            <li>
+                <a class="go2first btn" href="#" ng-click="vm.firstPage()" aria-label="go-to-first" ng-class="{disabled: vm.currentPage <= 1}">
+                    <span class="caret" aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li>
+                <a class="prev btn" href="#" ng-click="vm.prevPage()" aria-label="Previous" ng-class="{disabled: vm.currentPage <= 1}">
+                    <span class="caret" aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li>
+                <a ng-cloak>{{(vm.currentPage - 1) * vm.pageSize + 1}} - {{vm.currentPage * vm.pageSize > vm.totalItemCount ? vm.totalItemCount : vm.currentPage * vm.pageSize}}</a>
+            </li>
+            <li class="of">
+                <span translate="common.of"></span>
+            </li>
+            <li>
+                <a ng-cloak>{{vm.totalItemCount}}</a>
+            </li>
+            <li>
+                <a class="next btn" href="#" ng-click="vm.nextPage()" aria-label="Next" ng-class="{disabled: vm.currentPage >= vm.pageCount}">
+                    <span class="caret" aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            <li>
+                <a class="go2last btn" href="#" ng-click="vm.lastPage()" aria-label="go-to-last" ng-class="{disabled: vm.currentPage >= vm.pageCount}">
+                    <span class="caret" aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>

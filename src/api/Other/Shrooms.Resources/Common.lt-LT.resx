@@ -1,0 +1,222 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Edit" xml:space="preserve">
+    <value>Redaguoti</value>
+  </data>
+  <data name="MessageRequiredField" xml:space="preserve">
+    <value>{0} - privalomas laukas</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>Ne</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Taip</value>
+  </data>
+  <data name="DoesNotExist" xml:space="preserve">
+    <value>{0} neegzistuoja</value>
+  </data>
+  <data name="MaxLengthError" xml:space="preserve">
+    <value>Laukas {0} turi būti ne ilgesnis nei {1} simboliai</value>
+  </data>
+  <data name="RequiredError" xml:space="preserve">
+    <value>{0} laukas yra privalomas</value>
+  </data>
+  <data name="StringLengthError" xml:space="preserve">
+    <value>Laukas {0} turi būti tarp {2} ir {1} simbolių</value>
+  </data>
+  <data name="CompareError" xml:space="preserve">
+    <value>{0} ir {1} nesutampa.</value>
+  </data>
+  <data name="EmailAddressError" xml:space="preserve">
+    <value>Blogas el. pašto formatas</value>
+  </data>
+  <data name="PhoneError" xml:space="preserve">
+    <value>Blogas telefono numerio formatas</value>
+  </data>
+  <data name="ConfirmUser" xml:space="preserve">
+    <value>Patvirtinti vartotoją</value>
+  </data>
+  <data name="NewUserConfirmEmailMessage" xml:space="preserve">
+    <value>Naujas vartotojas prisijungė pirmą kartą, užpildė profilį ir laukia kol bus patvirtintas administratoriaus.</value>
+  </data>
+  <data name="NewUserConfirmedNotificationEmailSubject" xml:space="preserve">
+    <value>Jūsų registracija patvirtinta</value>
+  </data>
+  <data name="ServiceRequestAdminChangedStatusMessage" xml:space="preserve">
+    <value>Administratorius pakeitė Jūsų paslaugos prašymo statusą į "{0}"</value>
+  </data>
+  <data name="ServiceRequestAdminCommentedMessage" xml:space="preserve">
+    <value>Administratorius pakomentavo Jūsų paslaugos prašymą.</value>
+  </data>
+  <data name="ServiceRequestAdminCommentedSubject" xml:space="preserve">
+    <value>Jūsų paslaugos prašyme yra naujas komentaras</value>
+  </data>
+  <data name="Day" xml:space="preserve">
+    <value>Diena</value>
+  </data>
+  <data name="WrongManager" xml:space="preserve">
+    <value>Negalima būti savo paties vadovu arba sudaryti ratą iš vadovų nuorodų</value>
+  </data>
+  <data name="CommitteeSuggestionsEmailBody" xml:space="preserve">
+    <value>komitetas gavo naują pasiūlymą.</value>
+  </data>
+  <data name="CommitteeSuggestionEmailSubject" xml:space="preserve">
+    <value>Naujas pasiūlymas {0}</value>
+  </data>
+  <data name="NotFound" xml:space="preserve">
+    <value>Nerastas joks įrašas su pateiktu id.</value>
+  </data>
+  <data name="BirthdayDateValidationError" xml:space="preserve">
+    <value>Gimimo data negali būti vėlesnė nei dabar</value>
+  </data>
+  <data name="BirthdayDateIsTooOld" xml:space="preserve">
+    <value>Mažiausia galima datos reikšmė yra 1900-01-01</value>
+  </data>
+  <data name="EmailSignatureText" xml:space="preserve">
+    <value>Daugiau naujienų galite gauti, apsilankę mūsų</value>
+  </data>
+  <data name="ServiceRequestAdminChangedStatusSubject" xml:space="preserve">
+    <value>Jūsų paslaugos prašymo statusas pasikeitė</value>
+  </data>
+  <data name="BirthdayNotSet" xml:space="preserve">
+    <value>Neįvesta gimimo data</value>
+  </data>
+  <data name="NewUserConfirmedNotificationEmailMessage" xml:space="preserve">
+    <value>Administratorius patvirtino Jūsų registraciją, dabar galite prisijungti</value>
+  </data>
+  <data name="NewUserConfirmEmailSubject" xml:space="preserve">
+    <value>Naujas vartotojas laukia patvirtinimo</value>
+  </data>
+  <data name="CommentMessageBody" xml:space="preserve">
+    <value>Komentaro žinutė</value>
+  </data>
+  <data name="EmptyMessageError" xml:space="preserve">
+    <value>Žinutė negali būti tuščia</value>
+  </data>
+  <data name="PostMessageBody" xml:space="preserve">
+    <value>Žinutė</value>
+  </data>
+  <data name="UserResetPasswordEmailSubject" xml:space="preserve">
+    <value>Pakeisti slaptažodį</value>
+  </data>
+  <data name="UserVerifyEmailSubject" xml:space="preserve">
+    <value>Patvirtinkite jūsų elektroninio pašto adresą</value>
+  </data>
+</root>

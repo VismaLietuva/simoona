@@ -1,0 +1,90 @@
+<div class="text-center login-page-container row">
+
+	<div class="login-button-placement auth-login-container" ng-if="!vm.isLoggingIn">
+		<div class="col-xs-12 text-center auth-signin-title">
+			<span translate="applicationUser.signInTo"></span><span> {{vm.organizationName}}</span>
+		</div>
+
+		<form name="signIn-form" ng-submit="vm.signIn()" ng-show="vm.isInternal">
+			<div class="col-xs-12">
+				<div class="form-group search-group search-group-lg padding-bot-10 required">
+					<input type="text"
+						class="form-control"
+						ng-model="vm.email"
+						translate-attr-placeholder="applicationUser.enterEmailAddress"
+						translate
+						ng-cloak>
+				</div>			
+				<div class="form-group search-group search-group-lg padding-bot-10 required">
+					<input type="password"
+						class="form-control"
+						ng-model="vm.password"
+						translate-attr-placeholder="applicationUser.enterPassword"
+						translate
+						ng-cloak>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-xs-4 col-xs-offset-2">
+					<div class="checkbox">
+						<label>
+							<input type="checkbox" ng-model="vm.isPersistance"> {{ vm.rememberMe }}
+						</label>
+					</div>
+				</div>
+				<div class="col-xs-4">
+					<button type="button" class="auth-link" ng-click="vm.redirectToForgotPassword()">{{ vm.forgotPassword }}</button>
+				</div>
+			</div>
+
+			<div class="col-xs-12">
+				<button type="submit"
+						class="nc-btn nc-btn-default auth-btn auth-provider-login-btn">
+					<span translate="applicationUser.login"></span>
+				</button>
+			</div>
+		</form>
+		
+		<form name="login-form" ng-submit="vm.providerSignIn()">
+			<div class="col-xs-12" ng-show="vm.isGoogle" >
+				<wave-spinner ng-if="vm.isLoading"></wave-spinner>
+				<button type="submit"
+						ng-if="!vm.isLoading"
+						class="nc-btn nc-btn-default  auth-btn auth-provider-login-btn"
+						data-test-id="google-sign-in-button"
+						ng-click=vm.setProviderName('Google')>
+					<span class="vismaicon vismaicon-google"></span><span translate="applicationUser.signInWithGoogle"></span>
+				</button>
+			</div>
+			<div class="col-xs-12" ng-show="vm.isFacebook">
+				<wave-spinner ng-if="vm.isLoading"></wave-spinner>
+				<button type="submit"
+						ng-if="!vm.isLoading"
+						class="nc-btn nc-btn-default auth-btn auth-provider-login-btn"
+						data-test-id="facebook-sign-in-button"
+						ng-click=vm.setProviderName('Facebook')>
+						<span class="vismaicon vismaicon-facebook"></span><span translate="applicationUser.signInWithFacebook"><span>
+				</button>
+			</div>
+		</form>
+    </div>
+    
+	<div class="register-form-placement" ng-if="!vm.isLoggingIn">
+		<div name="register-form" class="register-form-container">
+			<div class="col-xs-12 text-center auth-register-text">
+				<span>{{ vm.newEmployee }}</span><br>
+                <span> 
+					{{ vm.registerWith }} 
+					<button ng-show="vm.isInternal" class="auth-link" ng-click="vm.register()">{{ vm.here }}</button>
+					<span ng-show="vm.isInternal && (vm.isGoogle || vm.isFacebook)">{{ vm.or }}</span>
+					<span ng-show="vm.isGoogle || vm.isFacebook">{{ vm.with }}</span>
+					<button ng-show="vm.isGoogle" class="auth-link" ng-click="vm.providerRegister('GoogleRegistration')">Google</button> 
+					<span ng-show="vm.isGoogle && vm.isFacebook">{{ vm.or }}</span>
+					<button ng-show="vm.isFacebook" class="auth-link" ng-click="vm.providerRegister('FacebookRegistration')">Facebook</button>
+				</span>
+			</div>
+		</div>
+    </div>
+
+</div>

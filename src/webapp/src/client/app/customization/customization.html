@@ -1,0 +1,25 @@
+<div class="row body-container">
+    <div class="col-xs-12" ng-if="vm.hasAccessToCustomization">
+        <div class="panel panel-default">
+            <div class="panel-heading" translate="customization.customizationPanelHeader" ng-cloak></div>
+            <div class="panel-body customization-options-container">
+                <a ui-sref="{{::item.state}}" 
+                   class="customization-option" 
+                   ng-repeat="item in vm.customizationMenuItems | orderBy: 'order' track by $index"
+                   data-test-id="{{::item.testId}}">
+                    <div class="customization-option-icon-container">
+                        <span class="glyphicon {{::item.iconName}}" aria-hidden="true"></span>
+                    </div>
+                    <div class="customization-option-text-container">
+                        <p class="customization-option-title" 
+                           translate="{{::item.nameResource}}"
+                           data-test-id="{{::item.testId}}-title"></p>
+                        <p class="customization-option-subtitle" 
+                           translate="{{::item.descriptionResource}}"
+                           data-test-id="{{::item.testId}}-description"></p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

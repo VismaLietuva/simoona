@@ -1,0 +1,20 @@
+<div class="kudos-achievement-board">
+    <div class="nc-filter pull-left kudos-achievement-board-filter">
+	    <label ng-repeat="tab in vm.kudosAchievementBoardTabs" 
+	    	   ng-class="{selected: !!tab.isOpen}">
+	        <input type="radio" name="tabs" ng-click="tab.getStats()"/>
+	        <span translate="kudos.kudosTopMonths" translate-values="{ one: tab.months }"></span>
+	    </label>
+	</div>
+
+	<div class="clearfix"></div>
+	<wave-spinner ng-if="vm.isLoading"></wave-spinner>
+    <canvas ng-if="!vm.isLoading"
+    		id="horizontal" 
+    	    class="chart chart-horizontal-bar" 
+    	    chart-data="vm.kudosAchievementBoardData.data" 
+    	    chart-labels="vm.kudosAchievementBoardData.labels"
+    	    chart-series="vm.chartSeries"
+    	    chart-colors="vm.chartColors"
+    	    chart-options="vm.chartOptions"></canvas>
+</div>

@@ -1,0 +1,25 @@
+<div class="event-status">
+    <div ng-if="vm.eventStatusService.getEventStatus(vm.event) === vm.eventStatus.Full"
+         translate="events.eventFull"
+         data-test-id="event-status">
+    </div>
+
+    <div ng-if="vm.eventStatusService.getEventStatus(vm.event) === vm.eventStatus.RegistrationIsClosed"
+         translate="events.eventRegistrationIsClosed"
+         data-test-id="event-status">
+    </div>
+
+    <div ng-if="vm.eventStatusService.getEventStatus(vm.event) === vm.eventStatus.InProgress"
+         translate="events.eventInProgress"
+         data-test-id="event-status">
+    </div>
+
+    <div ng-if="vm.eventStatusService.getEventStatus(vm.event) === vm.eventStatus.Finished"
+         translate="events.eventEnded"
+         data-test-id="event-status">
+    </div>
+
+    <div ng-if="vm.eventStatusService.getEventStatus(vm.event) === vm.eventStatus.Join">
+        <ace-event-join event="vm.event" is-details="vm.isDetails" is-add-colleague="vm.isAddColleague"></ace-event-join>
+    </div>
+</div>

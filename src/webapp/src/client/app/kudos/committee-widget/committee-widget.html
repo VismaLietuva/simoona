@@ -1,0 +1,23 @@
+<div class="kudos-committee-modal">
+    <div class="kudos-committee-modal-header">
+        <h3 translate="kudos.kudosComitee"></h3>
+    </div>
+    <div ng-if="vm.kudosCommittee.members" class="kudos-committee-modal-body" data-test-id="kudos-committee-members">
+        <h3 translate="kudos.kudosComiteeMembers"></h3>
+        <div class="thumbnail kudos-committee-member-thumbnail" ng-repeat="member in vm.kudosCommittee.members">
+            <div class="cursorHand kudos-committees-member-img"
+                 ui-sref="Root.WithOrg.Client.Profiles.Details({ id: member.id })"
+                 ng-style="{{ member.pictureId | userBackgroundThumb }}"
+                 data-test-id="kudos-committee-member-image">
+            </div>
+            <div>
+                <h4 class="kudos-committee-member-name" data-test-id="kudos-committee-member-name">
+                    {{:: member.firstName}}
+                </h4>
+            </div>
+        </div>
+    </div>
+    <div ng-if="!vm.kudosCommittee.members" class="kudos-committee-modal-body" data-test-id="kudos-committee-no-members">
+        <h2 translate="kudos.noKudosCommitteeFound"></h2>
+    </div>
+</div>

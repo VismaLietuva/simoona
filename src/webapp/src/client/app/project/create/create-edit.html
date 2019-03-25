@@ -1,0 +1,155 @@
+<div ng-if="vm.showTemplate" class="row body-container">
+    <div class="col-xs-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <span ng-if="vm.states.isCreate" data-test-id="create-project-header" translate="projects.createProject"></span>
+                <span ng-if="vm.states.isEdit" data-test-id="edit-project-header" translate="projects.editProject"></span>
+            </div>
+            <div class="panel-body">
+                <form name="projectForm" class="form-horizontal" autocomplete="off">
+                    <!--project title-->
+                    <div class="form-group required" ng-class="{'has-error': projectForm.title.$invalid && projectForm.title.$dirty}">
+                        <label for="projectName" class="control-label col-xs-12 col-sm-4" translate="projects.projectTitle"></label>
+                        <div class="col-xs-12 col-sm-6 col-md-4">
+                            <input id="projectTitle" 
+                                   type="text" 
+                                   class="form-control" 
+                                   name="title" 
+                                   ng-model="vm.project.title" 
+                                   ng-maxlength="vm.projectSettings.titleLength" 
+                                   data-test-id="project-form-title-input" 
+                                   required/>
+                            <p class="text-danger help-block" 
+                               ng-if="projectForm.title.$error.required && projectForm.title.$dirty" 
+                               translate="common.messageFieldIsRequired">
+                            </p>
+                            <p class="text-danger help-block" 
+                               ng-if="projectForm.title.$error.maxlength && projectForm.title.$dirty" 
+                               translate="common.messageInvalidLength" 
+                               translate-values="{ one: vm.projectSettings.titleLength }">
+                            </p>
+                        </div>
+                    </div>
+                    <!--project description-->
+                    <div class="form-group" ng-class="{'has-error': projectForm.description.$error.maxlength && projectForm.description.$dirty}">
+                        <label for="description" class="control-label col-xs-12 col-sm-4" translate="projects.projectDescription"></label>
+                        <div class="col-xs-12 col-sm-6 col-md-4">
+                            <textarea id="description" 
+                                      name="description" 
+                                      class="form-control" 
+                                      ng-model="vm.project.description" 
+                                      ng-maxlength="vm.projectSettings.descriptionLength" 
+                                      rows="3" 
+                                      data-test-id="project-form-project-description-input">
+                            </textarea>
+                            <p class="text-danger help-block" 
+                               ng-if="projectForm.description.$error.maxlength && projectForm.description.$dirty" 
+                               translate="common.messageInvalidLength" 
+                               translate-values="{ one: vm.projectSettings.descriptionLength }">
+                            </p>
+                        </div>
+                    </div>
+                     <!--project owner-->
+                    <div class="form-group required" ng-class="{'has-error': vm.isOwnerError}">
+                        <label for="owner" class="control-label col-xs-12 col-sm-4" translate="projects.projectOwner"></label>
+                        <div class="col-xs-12 col-sm-6 col-md-4">
+                            <autocomplete id="owner" 
+                                          name="owner"
+                                          load-data="vm.autocompleteUser" 
+                                          shown="fullName"
+                                          bound-model="vm.project.owner" 
+                                          with-image="true" 
+                                          data-test-id="project-form-owner-autocomplete-input">
+                            </autocomplete>
+                            <p class="text-danger help-block" ng-if="vm.isOwnerError" translate="common.messageFieldIsRequired"></p>
+                        </div>
+                    </div>
+                    <!-- project members -->
+                    <div class="form-group">
+                        <label for="projectMembers" class="control-label col-xs-12 col-sm-4" translate="projects.projectMembers"></label>
+                        <div class="col-xs-12 col-sm-6 col-md-4">
+                            <tags-input id="projectMembers"
+                                        data-test-id="project-members-input"
+                                        name="projectMembers"
+                                        ng-model="vm.members"
+                                        add-from-autocomplete-only="true"
+                                        display-property="fullName"
+                                        add-on-enter="true"
+                                        add-on-space="true"
+                                        add-on-comma="true"
+                                        add-on-blur="true"
+                                        wrapped>
+                                <auto-complete debounce-delay="500" source="vm.autocompleteUser($query)" min-length="0" max-results-to-show="5"></auto-complete>
+                            </tags-input>
+                        </div>
+                    </div>
+                    <!-- project attributes -->
+                    <div class="form-group">
+                        <label for="attributes" class="control-label col-xs-12 col-sm-4" translate="projects.attributes"></label>
+                        <div class="col-xs-12 col-sm-6 col-md-4">
+                            <tags-input id="attributes"
+                                        data-test-id="project-tech-input"
+                                        name="attributes"
+                                        ng-model="vm.attributes"
+                                        add-form-autocomplete-only="false"
+                                        display-property="title"
+                                        replace-spaces-with-dashes="false"
+                                        on-tag-added="vm.onTagAdded($tag)"
+                                        on-tag-removed="vm.onTagRemoved($tag)"
+                                        add-on-enter="true"
+                                        add-on-comma="false"
+                                        add-on-blur="true"
+                                        min-length="1"
+                                        wrapped>
+                                <auto-complete debounce-delay="500" source="vm.searchAttributes($query)" min-length="1" max-results-to-show="5"></auto-complete>
+                            </tags-input>
+                        </div>
+                    </div>
+                    <!--project logo-->
+                    <div class="form-group" ng-class="{'has-error': projectForm.image-file-input.$invalid && projectForm.image-file-input.$dirty}">
+                        <label for="image-file-input" class="control-label col-xs-12 col-sm-4" translate="projects.projectLogo"></label>
+                        <div class="col-xs-12 col-sm-6 col-md-4">
+                            <ace-photo-crop-upload 
+                                image="vm.projectLogo" 
+                                is-crop-visible="vm.states.isCreate || !!vm.projectLogo || !vm.project.logo" 
+                                aspect-ratio="1.7" 
+                                result-image="vm.projectCroppedLogo" 
+                                image-size="vm.projectLogoSize">
+                            </ace-photo-crop-upload>
+                            <img ng-if="vm.states.isEdit && !vm.projectCroppedLogo && !vm.projectLogo && vm.project.logo" src="{{vm.project.logo | imageThumb:vm.projectLogoSize:'crop'}}" />
+                        </div>
+                    </div>
+                    <!--delete project button-->
+                    <div class="pull-left">
+                        <button ng-if="vm.states.isEdit"
+                                class="btn btn-danger"
+                                ace-confirmation-modal="vm.deleteProject()"
+                                data-test-id="project-delete-button">
+                            <span translate="common.delete"></span>
+                        </button>
+                    </div>
+                    <!--project buttons-->
+                    <div class="pull-right">
+                        <button class="btn btn-primary" 
+                                ng-if="vm.states.isCreate"
+                                ng-click="vm.submitProjectForm(vm.createProject, true)"
+                                ng-disabled="projectForm.$invalid || !vm.project.owner" 
+                                data-test-id="project-form-save-button">
+                            <span translate="common.save"></span>
+                        </button>
+                        <button class="btn btn-primary" 
+                                ng-if="vm.states.isEdit"
+                                ng-click="vm.submitProjectForm(vm.updateProject, true)"
+                                ng-disabled="projectForm.$invalid || !vm.project.owner.id" 
+                                data-test-id="project-form-save-button">
+                            <span translate="common.save"></span>
+                        </button>
+                        <button class="btn btn-default" ui-sref="Root.WithOrg.Client.Projects.List" data-test-id="project-form-cancel-button">
+                            <span translate="common.cancel"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

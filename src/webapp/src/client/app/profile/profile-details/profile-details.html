@@ -1,0 +1,254 @@
+<div class="col-xs-12">
+    <h3 ng-cloak>{{"applicationUser.profiles" | translate}}</h3>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="applicationuser-headericon pull-left">
+                <span class="glyphicon glyphicon-user"></span>
+            </div>
+            <div class="applicationuser-header">
+                <a ui-sref="Root.WithOrg.Client.Office({user: model.username})" data-test-id="profile-username-link">
+                    {{model.displayName()}}
+                </a>
+            </div>
+            <div class="applicationuser-subheader" data-test-id="profileJobTitle">
+                {{model.jobTitle}} <span ng-show="model.qualificationLevel.name" data-test-id="profileQualificationLevel">({{ model.qualificationLevel.name }})</span>
+            </div>
+        </div>
+        <div class="panel-body profile-details-container">
+            <div class="col-xs-12 col-md-3 profile-picture-container">
+                <div class="panel-form-image col-xs-12">
+                    <img class="profile-image" ng-src="{{model.pictureId | userThumb}}" />
+                </div>
+                <div class="clearfix"></div>
+                <div class="col-xs-12 profile-kudos-button" has-permissions="['KUDOS_BASIC']">
+                    <button type="button" 
+                         class="btn btn-success" 
+                         ga-track-event="['Kudos', 'profile go to kudos', 'opened']"
+                         ui-sref="Root.WithOrg.Client.Kudos.KudosUserInformation({ userId: model.id })" 
+                         data-test-id="profileKudosbutton">
+                        {{"applicationUser.goToKudosPage" | translate}}
+                    </button>
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-9">
+                <div class="col-xs-12 nopadding">
+                    <div class="col-xs-12 col-md-4 nopadding">
+                        <label class="control-label">
+                            {{"applicationUser.email" | translate}}
+                        </label>
+                    </div>
+                    <div class="col-xs-12 col-md-8 panel-form-body">
+                        <a href="mailto:{{model.email}}" data-test-id="profileEmail">
+                            {{model.email}}
+                        </a>
+                    </div>
+                </div>
+                <div class="col-xs-12 nopadding" ng-if="isAdmin || model.id === identity.userId">
+                    <div class="col-xs-12 col-md-4 nopadding">
+                        <label class="control-label">
+                            {{"applicationUser.phoneNumber" | translate}}
+                        </label>
+                    </div>
+                    <div class="col-xs-12 col-md-8 panel-form-body" data-test-id="profile-phone-number">
+                        {{model.phoneNumber}}
+                    </div>
+                </div>
+                <div class="col-xs-12 nopadding">
+                    <div class="col-xs-12 col-md-4 nopadding">
+                        <label class="control-label">
+                            {{"applicationUser.birthday" | translate}}
+                        </label>
+                    </div>
+                    <div class="col-xs-12 col-md-8 panel-form-body" data-test-id="profileBirthday">
+                        <span ng-if="isAdmin || isCurrentUser">
+                            {{:: model.birthDay | date:'yyyy-MM-dd' }}
+                        </span>
+                        <span ng-if="!isAdmin && !isCurrentUser">
+                            {{:: model.birthDay | date:'MM-dd' }}
+                        </span>
+                    </div>
+                </div>
+                <div class="col-xs-12 nopadding">
+                    <div class="col-xs-12 col-md-4 nopadding">
+                        <label class="control-label">
+                            {{"applicationUser.employmentDate" | translate}}
+                        </label>
+                    </div>
+                    <div class="col-xs-12 col-md-8 panel-form-body" data-test-id="profileEmploymentDate">
+                        {{model.employmentDate | date : 'yyyy-MM-dd'}}
+                        <a ng-if="isAdmin && !model.employmentDate" ui-sref="Root.WithOrg.Client.Profiles.Edit({ id: model.id, tab: 'Job' })" title="{{'applicationUser.employmentDateConfirmation' | translate}}">
+                            <span class="glyphicon glyphicon-exclamation-sign text-danger"></span>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-xs-12 nopadding">
+                    <div class="col-xs-12 col-md-4 nopadding">
+                        <label class="control-label">
+                            {{"applicationUser.fullTime" | translate}}
+                        </label>
+                    </div>
+                    <div class="col-xs-12 col-md-8 panel-form-body" ng-if="model.workingHours" data-test-id="profileFullTime">
+                        {{"common." + workFullTime | translate}} <span ng-show="!model.workingHours.fullTime">({{"applicationUser.partTimeHours" | translate}} - {{model.workingHours.partTimeHours}})</span>
+                    </div>
+                </div>
+                <div class="col-xs-12 nopadding">
+                    <div class="col-xs-12 col-md-4 nopadding">
+                        <label class="control-label">
+                            {{"applicationUser.workingHours" | translate}}
+                        </label>
+                    </div>
+                    <div class="col-xs-12 col-md-8 panel-form-body" ng-if="model.workingHours" data-test-id="profileWorkingHours">
+                        {{model.workingHours.startTime | time:'HH:mm'}} <span ng-show="model.workingHours.startTime">-</span> {{model.workingHours.endTime | time:'HH:mm'}}
+                        <span ng-if="hasLunch()" data-test-id="profileLunchTime">
+                            ({{"applicationUser.lunch" | translate}}: {{model.workingHours.lunchStart | time: 'HH:mm'}}
+                            <span ng-show="model.workingHours.lunchStart && model.workingHours.lunchEnd">-</span> {{model.workingHours.lunchEnd | time:'HH:mm'}})
+                        </span>
+                    </div>
+                </div>
+                <div class="col-xs-12 nopadding">
+                    <div class="col-xs-12 col-md-4 nopadding">
+                        <label class="control-label">
+                            {{"common.manager" | translate}}
+                        </label>
+                    </div>
+                    <div class="col-xs-12 col-md-8 panel-form-body" data-test-id="profileManager">
+                        {{model.manager.firstName}} {{model.manager.lastName}}
+                    </div>
+                </div>
+                <div class="col-xs-12 nopadding" has-permissions="['PROJECT_BASIC']">
+                    <div class="col-xs-12 col-md-4 nopadding">
+                        <label class="control-label">
+                            {{"applicationUser.projects" | translate}}
+                        </label>
+                    </div>
+                    <div class="col-xs-12 col-md-8 nopadding">
+                        <ul class="panel-form-body profile-details-list" data-test-id="profileProjects">
+                            <li ng-repeat="project in model.projects | limitTo: projectsLength">
+                                {{ project.name }}
+                            </li>
+                        </ul>
+                        <show-more-btn show-array="model.projects"
+                                       show-length="projectsLength"
+                                       min-length="minLength"
+                                       class="profile-show-more">
+                        </show-more-btn>
+                    </div>
+                </div>
+                <div class="col-xs-12 nopadding" has-permissions="['OFFICE_BASIC']">
+                    <div class="col-xs-12 col-md-4 nopadding">
+                        <label class="control-label">
+                            {{"applicationUser.location" | translate}}
+                        </label>
+                    </div>
+                    <div class="col-xs-12 col-md-8 panel-form-body">
+                        <span ng-if="model.roomId" data-test-id="profileLocationOfficeAndFloor">
+                            {{model.room.floor.office.name}} / {{model.room.floor.name}} /
+                        </span>
+                        <a ng-if="isPremium" ui-sref="Root.WithOrg.Client.Office({user: model.username})" data-test-id="profileLocationRoom">
+                            {{model.room.name}} {{model.room.number}}
+                        </a>
+                        <span ng-if="!isPremium" data-test-id="profileLocationRoom">
+                            {{model.room.name}} {{model.room.number}}
+                        </span>
+                    </div>
+                </div>
+                <div class="col-xs-12 nopadding" ng-if="model.skills.length" has-permissions="['SKILL_BASIC']">
+                    <div class="col-xs-12 col-md-4 nopadding">
+                        <label class="control-label">
+                            {{"applicationUser.skills" | translate}}
+                        </label>
+                    </div>
+                    <div class="col-xs-12 col-md-8 panel-form-body" data-test-id="profileSkills">
+                        <span ng-repeat="skill in model.skills">
+                            {{skill.title}}
+                            <span ng-show="!$last">, </span>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-xs-12 nopadding">
+                    <div class="col-xs-12 col-md-4 nopadding">
+                        <label class="control-label">
+                            {{"applicationUser.bio" | translate}}
+                        </label>
+                    </div>
+                    <div class="col-xs-12 col-md-8 panel-form-body" data-test-id="profileBio">
+                        <p show-more-text show-more-text-text="model.bio" show-more-text-length="100">
+                        </p>
+                    </div>
+                </div>
+                <div class="col-xs-12 nopadding" ng-if="model.certificates.length">
+                    <div class="col-xs-12 col-md-4 nopadding">
+                        <label class="control-label">
+                            {{"applicationUser.certificates" | translate}}
+                        </label>
+                    </div>
+                    <div class="col-xs-12 col-md-8 panel-form-body nopadding">
+                        <ul class="panel-form-body profile-details-list" data-test-id="profileCertificates">
+                            <li ng-repeat="certificate in model.certificates | limitTo: certificatesLength">
+                                {{ certificate.name }}
+                            </li>
+                        </ul>
+                        <show-more-btn show-array="model.certificates"
+                                       show-length="certificatesLength"
+                                       min-length="minLength"
+                                       class="profile-show-more">
+                        </show-more-btn>
+                    </div>
+                </div>
+                <div class="col-xs-12 nopadding" ng-if="model.exams.length" has-permissions="['EXAM_BASIC']">
+                    <div class="col-xs-12 col-md-4 nopadding">
+                        <label class="control-label">
+                            {{"applicationUser.exams" | translate}}
+                        </label>
+                    </div>
+                    <div class="col-xs-12 col-md-8 panel-form-body nopadding">
+                        <ul class="panel-form-body profile-details-list" data-test-id="profileExams">
+                            <li ng-repeat="exam in model.exams | limitTo: examsLength">
+                                {{ (exam.number || '' ) + ' ' + exam.title }}
+                            </li>
+                        </ul>
+                        <show-more-btn show-array="model.exams"
+                                       show-length="examsLength"
+                                       min-length="minLength"
+                                       class="profile-show-more">
+                        </show-more-btn>
+                    </div>
+                </div>
+                <div class="col-xs-12 nopadding" ng-if="isAdmin">
+                    <div class="col-xs-12 col-md-4 nopadding">
+                        <label class="control-label">
+                            {{"applicationUser.roles" | translate}}
+                        </label>
+                    </div>
+                    <div class="col-xs-12 col-md-8 panel-form-body" data-test-id="profileRoles">
+                        <span ng-repeat="role in model.roles">
+                            {{ role.name }}
+                            <span ng-show="!$last">,</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="profile-edit-button top-space col-xs-12">
+                    <button class="btn btn-primary" 
+                            ng-if="isAdmin || isCurrentUser" 
+                            ui-sref="Root.WithOrg.Client.Profiles.Edit({ id: model.id, tab: 'Personal' })"  
+                            title="{{'common.edit' | translate}}" 
+                            data-test-id="profileEditButton">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                        <span>&nbsp;</span>
+                        {{"common.edit" | translate}}
+                    </button>
+                    <span>&nbsp;</span>
+                    <button class="btn btn-primary" 
+                            ng-if="isAdmin && isNewUser()" 
+                            ng-disabled="isFirstLogin()" 
+                            ng-click="confirmUser(model.id)">
+                        {{"common.confirm" | translate}}
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+</div>

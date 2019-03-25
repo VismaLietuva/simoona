@@ -1,0 +1,30 @@
+<div class="row text-center login-button-placement">
+	<div ng-if="!vm.isLoggingIn" 
+		 class="auth-login-container">
+		 <form name="login-form" ng-submit="vm.continueLogin()">
+			<div class="col-xs-12 text-center auth-signin-title">
+		        <span translate="applicationUser.signIn"></span>
+			</div>
+			<div class="col-xs-12">
+				<div class="form-group search-group search-group-lg padding-bot-10 required">
+			        <input type="text"
+			        	   class="form-control"
+			        	   data-test-id="organization-name-login-input"
+			        	   ng-model="vm.organizationName"
+			        	   translate-attr-placeholder="applicationUser.enterOrganizationName"
+			        	   translate
+			        	   ng-cloak>
+		    	</div>
+			</div>
+			<div class="col-xs-12">
+				<wave-spinner ng-if="vm.isLoading"></wave-spinner>
+				<button type="submit"
+						ng-if="!vm.isLoading"
+						class="nc-btn nc-btn-default auth-btn"
+						data-test-id="continue-sign-in-button">
+		        	<span translate="applicationUser.continueLogin"></span>
+		    	</button>
+			</div>
+		</form>
+	</div>
+</div>

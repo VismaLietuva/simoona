@@ -1,0 +1,90 @@
+﻿<div class="col-xs-12">
+    <h3>
+        <a ui-sref="^.^.List"><span></span><span>{{"office.entityNamePlural" | translate}}</span></a> &rarr;
+        <a ui-sref="^.List"><span>{{"office.entityName" | translate}}</span>: {{ floor.office.name }}</a>
+        <span ng-if="state.create"> &rarr; <span>{{"floor.createFloor" | translate}}</span></span>
+        <span ng-if="state.edit"> &rarr; <span>{{"floor.editFloor" | translate}}</span>: {{ floor.name }}</span>
+    </h3>
+
+    <form class="form-horizontal" name="floorForm" novalidate>
+        <div class="panel panel-default">
+            <div class="panel-heading"><span class="glyphicon glyphicon-home"></span> <span>{{"floor.floorData" | translate}}</span></div>
+            <div class="panel-body">
+                <div class="form-group" ng-class="{'has-error has-feedback': floorForm.name.$invalid && floorForm.name.$dirty}">
+                    <label class="control-label col-xs-2" for="name">
+                        <span>{{"floor.name" | translate}}</span>
+                        <span class="text-danger">*</span>
+                    </label>
+                    <div class="col-xs-9">
+                        <input class="form-control" name="name" ng-model="floor.name" required />
+                        <span class="glyphicon glyphicon-exclamation-sign form-control-feedback" ng-show="floorForm.name.$invalid && floorForm.name.$dirty"></span>
+                        <span class="text-danger help-block" ng-show="floorForm.name.$error.required && floorForm.name.$dirty">
+                            <span>{{"common.messageFieldIsRequired" | translate}}</span>
+                        </span>
+                    </div>
+                </div>
+                <div ng-if="state.edit" class="form-group">
+                    <label class="control-label col-xs-2" for="picture">
+                        <span>{{"floor.currentPlan" | translate}}</span>
+                    </label>
+                    <div class="col-xs-9">
+                        <img style="cursor: pointer;"
+                             ng-if="!!floor.pictureId"
+                             ng-src="{{:: floor.pictureId | wallImageThumb}}"
+                             ace-picture-modal="floor.pictureId" image-loading>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-xs-2" for="mapFile">
+                        <span>{{"floor.map" | translate}}</span>
+                        <span ng-if="state.create" class="text-danger">*</span>
+                    </label>
+                    <div class="col-xs-9">
+                        <div class="image-upload-component">
+                            <span class="glyphicon glyphicon-camera media-icons"></span>
+                            <input class="image-preview-button"
+                                   type="file"
+                                   accept="image/*"
+                                   onchange="angular.element(this).scope().attachImage(this)">
+                        </div>
+                        <div image-preview-thumb
+                                 ng-if="previewImage.imageSource"
+                                 source="previewImage.imageSource" 
+                                 sources="previewImage.attachedFiles">
+                            </div>
+                        <span class="text-danger help-block" ng-show="floorForm.mapFile.$error.required && floorForm.mapFile.$dirty">
+                            <span>{{"common.messageFieldIsRequired" | translate}}</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group" ng-show="errors.length > 0">
+                    <div class="col-xs-offset-2 col-xs-10">
+                        <p class="text-danger" ng-repeat="error in errors">{{error}}</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-offset-2 col-xs-9">
+                        <div class="btn-group">
+                            <button ng-if="state.edit" class="btn btn-primary" ng-disabled="floorForm.$invalid || isPlanInvalid" ng-click="update()">
+                                <span class="glyphicon glyphicon-disk-save"></span>
+                                <span>{{"common.save" | translate}}</span>
+                            </button>
+
+                            <button ng-if="state.create" class="btn btn-primary" ng-disabled="floorForm.$invalid || !isPictureSelected || isPlanInvalid" ng-click="create()">
+                                <span class="glyphicon glyphicon-disk-save"></span>
+                                <span>{{"common.save" | translate}}</span>
+                            </button>
+                            <a ui-sref="^.List" class="btn btn-danger" type="button">
+                                <span>{{"common.cancel" | translate}}</span>
+                            </a>
+                        </div>
+                        <div class="pull-right">
+                            <span class="text-danger">*</span>
+                            <span>{{"common.messageFieldIsRequired" | translate}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

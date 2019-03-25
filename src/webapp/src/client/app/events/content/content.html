@@ -1,0 +1,26 @@
+<div class="row body-container" has-permissions="['EVENT_BASIC']">
+    <div class="col-xs-12 col-md-8 col-xl-9">
+        <!-- event description container -->
+        <ace-event-description is-loading="vm.isEventLoading" event="vm.event"></ace-event-description>
+    </div>
+
+    <div class="col-xs-12 col-md-4 col-xl-3 event-participants-parent">
+        <!-- event participants container -->
+        <ace-event-participants is-loading="vm.isEventLoading" 
+                                event="vm.event" 
+                                is-admin="vm.isEventAdmin"></ace-event-participants>
+    </div>
+
+    <div class="col-xs-12 col-md-8 col-xl-9">
+        <div class="event-message-board"
+             ng-if="!!vm.event.wallId">
+            <!-- event wall container -->
+            <ace-wall is-wall-module="false"
+                      wall-id="vm.event.wallId"
+                      is-admin="vm.isEventAdmin"
+                      has-hashtagify="false">
+            </ace-wall>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+</div>

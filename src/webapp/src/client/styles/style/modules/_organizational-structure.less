@@ -1,0 +1,65 @@
+.organizational-structure {
+    overflow: hidden;
+    height: auto;
+    width: auto;
+}
+
+.organizational-structure .node circle {
+    fill: #fff;
+    stroke: #0974B3;
+    stroke-width: 1.5px;
+}
+
+.organizational-structure .node text {
+    cursor: default;
+}
+
+.link {
+    fill: none;
+    stroke: #D7D7D7;
+    stroke-width: 1.5px;
+}
+
+div.org-fullname-tooltip {
+    opacity: 0;
+    position: absolute;
+    text-align: center;
+    width: 100px;
+    min-height: 10px;
+    padding: 2px;
+    font-size: 12px;
+    background: #F5F5F5;
+    border: solid 1px #0974B3;
+    pointer-events: none;
+}
+
+.org-tree-options {
+    position: relative;
+    z-index: 1000;
+    white-space: nowrap;
+}
+
+.org-tree-options > .options-wrapper {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+}
+
+.org-tree-options > .options-wrapper > .btn {
+    padding-right: 12px;
+    white-space: nowrap;
+    .vismaicon:hover:before {
+        background-position: 0px 0;
+        &.vismaicon-sm:hover:before { background-position: 0px 0; }
+    }
+}
+
+.ie11, .ie10, .ie9, .ie8  {
+    .org-tree-options > .options-wrapper > .btn:not(.left):not(.right):active span:not(.caret),
+    .org-tree-options > .options-wrapper > .btn:not(.left):not(.right):focus span:not(.caret) {
+        width: auto !important;
+        display: inline-block !important;
+        left: -2px;
+        top: -2px;
+    }
+}

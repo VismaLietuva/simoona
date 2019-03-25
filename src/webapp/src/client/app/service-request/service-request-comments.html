@@ -1,0 +1,24 @@
+<div ng-if="edit">
+    <div ng-if="comments != ''">
+        <label>{{"serviceRequest.comments" | translate}}</label>
+        <div class="rows">
+            <ul>
+                <li ng-repeat="comnt in comments" ng-if="comnt.content">
+                    <div>{{comnt.created | date:'yyyy-MM-dd'}} {{ comnt.employeeFirstName }} {{comnt.employeeLastName}}:</div>
+                    <div class="kudosify-modal-comments comment-word-break">{{comnt.content}}</div>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div ng-class="{ 'has-error' : newServiceRequest.newCommentField.$invalid && !newServiceRequest.newCommentField.$pristine }">
+        <label>{{"serviceRequest.newCommentLabel" | translate}}</label>
+        <textarea type="text"
+                  data-test-id="serviceRequestNewComment"
+                  name="newCommentField"
+                  ng-model="newComment.content"
+                  class="form-control kudosify-modal-comments"
+                  rows="3"
+                  ng-maxlength="1000"></textarea>
+        <p data-test-id="newCommentError" ng-show="newServiceRequest.newCommentField.$invalid && !newServiceRequest.newCommentField.$pristine" class="help-block">{{"serviceRequest.commentError" | translate}}</p>
+    </div>
+</div>

@@ -1,0 +1,116 @@
+<div class="post-comment-container">
+
+    <div class="post-comment-content">
+            <div class="sub-wall-title" ng-if="(!vm.stateParams.wall || !!vm.stateParams.post) && vm.isWallModule">
+                <span class="vismaicon vismaicon-sm vismaicon-users"></span>
+                <a ui-sref="Root.WithOrg.Client.Wall.Item.Feed({wall: vm.post.wallId, search: null, post: null})"
+                    ui-sref-opts="{reload: true}" data-test-id="discover-walls-wall-name-link">
+                    {{::vm.post.wallName}}
+                </a>
+            </div>
+
+        <div class="clearfix">
+            <ace-message-user-profile user="vm.post.author"
+                                      date="vm.post.created"
+                                      edited-date="vm.post.lastEdit"
+                                      is-edited="vm.post.isEdited"
+                                      is-hidden="vm.post.isHidden"
+            >
+            </ace-message-user-profile>        
+        </div>
+
+        <div class="post-content-margin">
+            <form name="editPostForm" class="edit-text-area" ng-if="vm.editFieldEnabled">
+                <textarea name="messageBody"
+                          class="form-control post-comment-textarea"
+                          msd-elastic
+                          type="text"
+                          ng-model="vm.editableValue"
+                          ng-maxlength="vm.maxLength"
+                          valid-if-changed="{{vm.post.messageBody}}"
+                          data-test-id="post-edit-input-field" required></textarea>
+
+                <div class="comment-edit-properties pull-right">
+                    <a class="post-save-property"
+                       ng-disabled="editPostForm.$invalid"
+                       ng-click="!editPostForm.$invalid && vm.editPost(vm.editableValue)"
+                       data-test-id="post-edit-save-button" translate="common.save"></a>
+
+                    <a ng-click="vm.disableEditor()"
+                       data-test-id="post-edit-cancel-button" translate="common.cancel"></a>
+                </div>
+
+                <length-counter class="edit"
+                                max-length="vm.maxLength"
+                                current-length="editPostForm.messageBody.$viewValue.length">
+                </length-counter>
+            </form>
+
+            <div class="message-box"
+                 ng-if="!vm.editFieldEnabled && !vm.post.isHidden"
+                 ace-message-show-more
+                 has-hashtagify="vm.hasHashtagify"
+                 message="{{:: vm.post.messageBody}}"
+                 show-more-type="post"
+                 data-test-id="post-message">
+            </div>
+
+            <div class="media-datetime"
+                 ng-if="vm.post.isHidden"
+                 data-test-id="message-deleted"
+                 ng-cloak>
+            <span class="media-deleted-date">
+                <span translate="common.postDeleted"></span>: {{:: vm.post.lastEdit | convertToCurrentTimezone | date:'yyyy-MM-dd, HH:mm'}}
+            </span>
+            </div>
+
+            <ace-youtube-preview-link ng-if="!vm.editFieldEnabled && !vm.post.isHidden"
+                                      type="post"
+                                      message="{{:: vm.post.messageBody}}"
+                                      preview-width="{{:: vm.youtubePreviewWidth}}"
+                                      preview-height="{{:: vm.youtubePreviewHeight}}"
+                                      player-width="{{:: vm.youtubeWidth}}"
+                                      player-height="{{:: vm.youtubeHeight}}">
+            </ace-youtube-preview-link>
+
+            <ace-soundcloud-player-link ng-if="!vm.editFieldEnabled && !vm.post.isHidden"
+                                        type="post"
+                                        message="{{:: vm.post.messageBody}}">
+            </ace-soundcloud-player-link>
+            
+            <img class="post-image"
+                 ng-if="!!vm.post.pictureId && !vm.post.isHidden"
+                 ng-src="{{:: vm.post.pictureId | wallImageThumb}}"
+                 ace-picture-modal="vm.post.pictureId"
+                 data-test-id="post-picture" image-loading>
+
+            <ace-wall-shared-event ng-if="!!vm.post.sharedEventId && !vm.post.isHidden"
+                                   shared-event-id="vm.post.sharedEventId">
+            </ace-wall-shared-event>
+
+            <ace-message-like ng-if="!vm.post.isHidden" message-object="vm.post" type="post"></ace-message-like>
+
+            <a class="message-reply-button"
+               ng-if="!vm.post.isHidden"
+               ng-click="vm.showCommentForm(vm.index)"
+               data-test-id="post-reply" translate="wall.reply"></a>
+        </div>
+    </div>
+    <ace-message-actions  message-user-id="vm.post.author.userId"
+                             ng-if="!vm.post.isHidden"
+                             is-admin="vm.isAdmin"
+                             can-moderate-post="vm.post.canModerate"
+                             enable-editor="vm.enableEditor()"
+                             delete-message="vm.deletePost()"
+                             current-wall-id="vm.stateParams.wall"
+                             is-wall-module="vm.isWallModule"
+                             ng-show="!vm.editFieldEnabled">
+    </ace-message-actions>   
+
+    <a 
+    ngclipboard
+    ng-click="vm.successMessage()"
+    data-clipboard-text="{{vm.getPostUrl(vm.post.id)}}" 
+    class="clipboard-post-link vismaicon vismaicon-sm"></a>
+
+</div>

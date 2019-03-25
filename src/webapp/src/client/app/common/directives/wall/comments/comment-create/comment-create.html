@@ -1,0 +1,43 @@
+<form name="commentForm">
+    <textarea class="form-control"
+              ng-model="vm.commentForm.messageBody"
+              ng-maxlength="vm.maxLength"
+              ng-trim="false"
+              name="messageBody"
+              msd-elastic
+              type="text"
+              ng-click="vm.showSubmit()"
+              translate-attr-placeholder="wall.addComment"
+              data-test-id="add-comment-text-field" translate></textarea>
+
+    <div ng-if="vm.showSubmitButton" class="panel panel-footer-comment">
+        <button class="btn btn-default pull-right"
+                ng-disabled="!vm.isSubmittable()"
+                ng-click="vm.submitComment()"
+                data-test-id="add-comment-submit-button" translate="common.submit">
+        </button>
+
+        <length-counter max-length="vm.maxLength"
+                        current-length="commentForm.messageBody.$viewValue.length">
+        </length-counter>
+
+        <div class="image-upload-component" has-permissions="['PICTURE_BASIC']">
+            <span class="glyphicon glyphicon-camera media-icons"></span>
+            <input type="file"
+                   accept="image/*"
+                   onchange="angular.element(this).scope().vm.attachImage(this)"
+                   data-test-id="image-upload-input-field">
+        </div>
+
+        <div class="image-preview-label"
+             ng-if="!!vm.attachedFiles.length"
+             data-test-id="image-preview-before-upload" translate="wall.imageAttachedPreview">
+        </div>
+
+        <div image-preview-thumb
+             ng-if="vm.imageSource"
+             source="vm.imageSource" 
+             sources="vm.attachedFiles">
+        </div>
+    </div>
+</form>

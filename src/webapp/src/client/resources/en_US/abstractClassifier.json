@@ -1,0 +1,12 @@
+﻿{
+  "createAbstractClassifier": "New Clasifier",
+  "name": "Name",
+  "organization": "Organization",
+  "entityName": "Classifier",
+  "entityNamePlural": "Classifiers",
+  "abstractClassifierType": "Type",
+  "parent": "Parent",
+  "sortOrder": "Sort Order",
+  "value": "Value",
+  "certificateEntityName": "Certificate"
+}

@@ -1,0 +1,21 @@
+<div>
+    <ul ng-if="!!vm.participants.length" class="event-participant-list">
+        <li ng-repeat="participant in vm.participants">
+            <ace-event-participant participant="participant">
+                <wave-spinner class="event-participant-spinner" ng-if="participant.isLoading"></wave-spinner>
+
+                <span ng-if="!!participant.userId && !participant.isLoading && vm.isDeleteVisible"
+                      class="event-participant-delete-button vismaicon vismaicon-cancel-circle"
+                      ace-confirmation-modal="vm.onLeaveEvent({participant: participant})"
+                      confirmation-modal-message="events.deleteUserConfirmationMessage"
+                      data-test-id="event-participant-delete-user"
+                      title="{{'common.delete' | translate}}" translate-cloak>
+                </span>
+            </ace-event-participant>
+        </li>
+    </ul>
+
+    <div ng-if="!vm.participants.length"
+    	 class="event-no-participants text-center"
+    	 translate="events.eventNoParticipants"></div>
+</div>

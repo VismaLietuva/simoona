@@ -1,0 +1,62 @@
+﻿<div has-permissions="['COMMITTEES_BASIC']">
+    <div class="modal-header">
+        <button type="button" class="close" data-ng-click="cancel()">&times;</button>
+        <h4 ng-show="!edit" class="modal-title"><span>{{"committee.newSuggestion" | translate}}</span></h4>
+    </div>
+    <div class="modal-body">
+        <form name="newSuggestion">
+
+            <!--Title-->
+            <input-wrapper label-text="{{'committee.title' | translate}}"
+                           input-value="newSuggestion.title"
+                           class="committee-suggestion"
+                           label-classes="control-label col-md-12 "
+                           classes="col-md-12">
+                <input type="text"
+                       id="title"
+                       data-test-id="title"
+                       name="title"
+                       ng-model="suggestion.title"
+                       class="form-control"
+                       required
+                       ng-maxlength="100"
+                       wrapped />
+            </input-wrapper>
+
+
+            <!--Description-->
+            <input-wrapper label-text="{{'committee.description' | translate}}"
+                           input-value="newSuggestion.description"
+                           class="committee-suggestion"
+                           label-classes="control-label col-md-12"
+                           classes="col-md-12">
+                <textarea type="text"
+                          data-test-id="description"
+                          name="description"
+                          ng-model="suggestion.description"
+                          classes="col-md-12"
+                          class="form-control kudosify-modal-comments"
+                          rows="3"
+                          ng-maxlength="700"
+                          wrapped
+                          required />
+            </input-wrapper>
+
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button has-permissions="['COMMITTEES_BASIC']"
+                class="btn btn-primary"
+                data-test-id="newSuggestionSubmit"
+                ng-disabled="newSuggestion.$invalid || isSaving"
+                ng-click="submitSuggestion(suggestion)">
+            <span class="glyphicon glyphicon-disk-save"></span>
+            {{"common.save" | translate}}
+        </button>
+        <button class="btn btn-default"
+                data-test-id="suggestionCancel"
+                data-ng-click="cancel()">
+            {{"common.cancel" | translate}}
+        </button>
+    </div>
+</div>

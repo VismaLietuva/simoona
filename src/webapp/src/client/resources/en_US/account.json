@@ -1,0 +1,12 @@
+﻿{
+  "login": "Log in",
+  "loginFailure": "Login Failure",
+  "mustBeLoggedInToConfirm": "You must be logged in to make confirmation",
+  "pleaseLogin": "Please log in",
+  "emailFailure": "Access required to get email provided by Facebook",
+  "notFound": "Please first register or log in and link your existing account",
+  "providerExists": "Another login provider of the same type is used for this email",
+  "register": "Register",
+  "passwordReset": "Password Reset",
+  "forgotPassword": "Forgot Password"
+}

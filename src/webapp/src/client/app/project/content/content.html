@@ -1,0 +1,27 @@
+<div class="row body-container" has-permissions="['PROJECT_BASIC']">
+    <div class="col-xs-12 col-md-8 col-xl-9">
+        <!-- project description container -->
+        <ace-project-description is-loading="vm.isProjectLoading" project="vm.project"></ace-project-description>
+    </div>
+
+    <div class="col-xs-12 col-md-4 col-xl-3 project-participants-parent">
+        <!-- project participants container -->
+        <ace-project-participants is-loading="vm.isProjectLoading" 
+                                  project="vm.project" 
+                                  is-admin="vm.isProjectAdmin">
+        </ace-project-participants>
+    </div>
+
+    <div class="col-xs-12 col-md-8 col-xl-9">
+        <div class="project-message-board"
+             ng-if="!!vm.project.wallId">
+            <!-- project wall container -->
+            <ace-wall is-wall-module="false"
+                      wall-id="vm.project.wallId"
+                      is-admin="vm.isProjectAdmin"
+                      has-hashtagify="false">
+            </ace-wall>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+</div>

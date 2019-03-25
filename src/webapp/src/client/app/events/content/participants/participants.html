@@ -1,0 +1,50 @@
+<div class="col-xs-12 event-participants-container" ng-cloak translate-cloak>
+    <wave-spinner ng-if="vm.isLoading"></wave-spinner>
+
+    <div class="event-participants-container-header" ng-if="!vm.isLoading">
+        <div ng-if="!!vm.event.options.length"
+             class="event-participants-tabs"
+             data-toggle="buttons">
+            <div class="btn event-options-tab"
+                 ng-class="{active: vm.isActiveTab('OptionsList')}"
+                 ng-click="vm.goToTab('OptionsList')"
+                 title="{{'events.eventParticipantsOptions' | translate}}" translate-cloak>
+                <input type="radio" />
+                <span class="glyphicon glyphicon-list-alt"></span>
+            </div>
+            <div class="btn event-participants-tab"
+                 ng-class="{active: vm.isActiveTab('ParticipantsList')}"
+                 ng-click="vm.goToTab('ParticipantsList')"
+                 title="{{'events.eventParticipantsList' | translate}}" translate-cloak>
+                <input type="radio" />
+                <span translate="events.eventParticipants"></span>
+                <span class="badge badge-default" data-test-id="participants-count">
+                    {{vm.event.participants.length}}/{{vm.event.maxParticipants}}
+                </span>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div ng-if="!vm.event.options.length" class="event-participants-title">
+            <span translate="events.eventParticipants"></span>
+            <span class="badge badge-default" data-test-id="participants-count">
+                {{vm.event.participants.length}}/{{vm.event.maxParticipants}}
+            </span>
+        </div>
+    </div>
+    <div class="event-participants-container-actions" ng-if="!vm.isLoading && !!vm.event.participants.length">
+        <ace-event-participants-actions event="vm.event" is-admin="vm.isAdmin"></ace-event-participants-actions>
+    </div>
+    <div class="event-participants-container-body" ng-if="!vm.isLoading">
+        <div class="event-tab-content-show" ng-show="vm.isActiveTab('ParticipantsList')">
+            <ace-event-join ng-if="vm.eventStatusService.getEventStatus(vm.event, true) === vm.eventStatus.Join"
+                            event="vm.event"
+                            is-details="true"
+                            is-add-colleague="true"></ace-event-join>
+
+            <ace-event-participant-list participants="vm.event.participants" on-leave-event="vm.expelUserFromEvent(participant)" is-delete-visible="vm.isDeleteVisible()"></ace-event-participant-list>
+        </div>
+        <div class="event-tab-content-show" ng-show="vm.isActiveTab('OptionsList')">
+            <ace-event-participant-options participants="vm.event.participants" options="vm.event.options"></ace-event-participant-options>
+        </div>
+    </div>
+</div>

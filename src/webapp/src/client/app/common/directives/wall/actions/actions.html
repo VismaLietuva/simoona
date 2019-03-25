@@ -1,0 +1,20 @@
+<div class="dropdown"
+     ng-class="{'main-wall-settings': !vm.currentWallId && vm.isWallModule}"
+     ng-if="vm.isAdmin || vm.canModerateComment || vm.canModeratePost">
+    <span class="glyphicon glyphicon-cogwheel dropdown-toggle post-comment-settings-icon"
+          data-toggle="dropdown"
+          data-test-id="message-dropdown-menu-icon">
+    </span>
+    <ul class="dropdown-menu pull-right">
+        <li>
+            <a ng-click="vm.enableEditor()" tabindex="-1" data-test-id="message-edit-button">
+                <span translate="common.edit"></span>
+            </a>
+        </li>
+        <li>
+            <a ace-confirmation-modal="vm.deleteMessage()" tabindex="-1" data-test-id="message-delete-button">
+                <span translate="common.delete"></span>
+            </a>
+        </li>
+    </ul>
+</div>

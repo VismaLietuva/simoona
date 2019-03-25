@@ -1,0 +1,9 @@
+<div class="pull-right">
+    <a type="button"
+       ng-if="vm.project.owner.id === vm.currentUserId || vm.hasProjectAdminPermissions"
+       class="vismaicon vismaicon-edit project-description-title-button"
+       ui-sref="Root.WithOrg.Client.Projects.Edit({id: {{'vm.currentProjectId'}}})"
+       translate-attr-title="common.edit"
+       data-test-id="project-description-edit-project" translate>
+    </a>
+</div>

@@ -1,0 +1,56 @@
+<div>
+	<wave-spinner ng-if="vm.isLoading"></wave-spinner>
+
+	<form ng-if="!vm.isLoading" 
+		  name="generalForm" 
+		  class="form-horizontal" 
+		  autocomplete="off">
+        <!--language select-->
+        <div class="row">
+        <div class="form-group">
+            <label for="language" 
+            	   class="control-label col-xs-12 col-sm-3 col-md-4" 
+            	   translate="navbar.language"></label>
+            <div class="col-xs-12 col-sm-9 col-md-4">
+                <select id="language" 
+                		name="language" 
+                		class="form-control" 
+                		ng-model="vm.generalSettings.languageCode" 
+                		ng-options="language.name as language.displayName for language in vm.languages" 
+                		data-test-id="general-form-language-select">
+                </select>
+            </div>
+        </div>
+
+        <!--timeZone-->
+        <div class="form-group">
+            <label for="timeZone" 
+            	   class="control-label col-xs-12 col-sm-3 col-md-4" 
+            	   translate="settings.time_zone"></label>
+            <div class="col-xs-12 col-sm-9 col-md-4">
+                <select id="timeZone" 
+                		name="timeZone" 
+                		class="form-control" 
+                		ng-model="vm.generalSettings.timeZoneId" 
+                		ng-options="timeZone.id as timeZone.displayName for timeZone in vm.timeZones" 
+                		data-test-id="general-form-timeZone-select">
+                </select>
+            </div>
+        </div>
+        </div>
+        <!--general settings buttons right-->
+        <div class="pull-right padding-top">
+            <button class="btn btn-primary"
+            		ng-click="vm.saveGeneral(); generalForm.$setPristine()" 
+            		ng-disabled="generalForm.$invalid || generalForm.$pristine"
+            		data-test-id="general-form-update-button">
+                <span translate="common.save"></span>
+            </button>
+            <button class="btn btn-default" 
+            		ui-sref="{{vm.appConfig.homeStateName}}" 
+            		data-test-id="general-form-cancel-button">
+                <span translate="common.cancel"></span>
+            </button>
+        </div>
+    </form>
+</div>

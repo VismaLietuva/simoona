@@ -1,0 +1,47 @@
+<div class="modal-header">
+    <button type="button" class="close" data-ng-click="closePopupOnDemand()">&times;</button>
+    <h4 class="modal-title"><span>{{"room.roomData" | translate}}</span></h4>
+</div>
+
+<div class="modal-body">
+    <div data-ng-if="errors" data-ng-repeat="error in errors" class="alert-animation">
+        <div class="alert alert-danger alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only"><span>{{"common.close" | translate}}</span></span></button>
+            {{ error }}
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="name"><span>{{"room.name" | translate}}</span></label>
+        <input class="form-control" type="text" data-ng-model="model.name">
+    </div>
+    <div class="form-group">
+        <label for="number"><span>{{"room.number" | translate}}</span></label>
+        <input class="display-inline-block form-control" id="number" type="text" data-ng-model="model.number">
+    </div>
+    <div class="form-group">
+        <label for="applicationUsers"><span>{{"room.employees" | translate}}</span></label><br />
+        <tags-input id="applicationUsers" data-ng-model="model.applicationUsers" data-add-from-autocomplete-only="true" data-display-property="fullName" placeholder="{{'map.addApplicationUserPlaceholder' | translate}}">
+            <auto-complete data-source="loadApplicationUsers($query)" data-min-length="0" data-max-results-to-show="5"></auto-complete>
+        </tags-input>
+    </div>
+    <div class="form-group">
+        <label><span>{{"roomType.color" | translate}}</span></label>
+        <select name="room" class="form-control" data-ng-model="model.roomTypeId" data-ng-options="type.id as type.name for type in roomTypes"></select>
+    </div>
+</div>
+<div class="modal-footer">
+    <div class="btn-group btn-group-justified">
+        <div data-ng-if="!editStage">
+            <button class="btn btn-default room-submit" id="redraw" ng-click="onRedraw(model)"><span>{{"map.redraw" | translate}}</span></button>
+            <button class="btn btn-default room-submit" id="save" ng-click="onCreate()"><span>{{"common.save" | translate}}</span></button>
+            <button class="btn btn-default room-submit" id="cancel" ng-click="cancel()"><span>{{"common.cancel" | translate}}</span></button>
+        </div>
+
+        <div data-ng-if="editStage">
+            <button class="btn btn-default room-submit" id="redraw" ng-click="onRedraw(model)"><span>{{"map.redraw" | translate}}</span></button>
+            <button class="btn btn-default room-submit" id="save" ng-click="onEdit()"><span>{{"common.save" | translate}}</span></button>
+            <button class="btn btn-default room-submit" id="cancel" ng-click="cancel()"><span>{{"common.cancel" | translate}}</span></button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,165 @@
+<div class="alert alert-warning" data-ng-show="info.emailToConfirm != null">
+    <strong><resx>Common:Attention</resx></strong> <resx>Models.ApplicationUser.ApplicationUser:UserAsksToChangeEmail</resx> <i>{{ info.emailToConfirm}}</i>.
+</div>
+<div class="tab-content">
+    <div class="tab-pane-content">
+        <form name="personalInfo" role="form" class="form-horizontal profile-form" ng-submit="saveInfo()">
+
+            <!-- PICTURE -->
+            <div has-permissions="['PICTURE_BASIC']">
+                <input-wrapper label-text="{{'applicationUser.currentPhoto' | translate}}"
+                               input-value="personalInfo.profilePicture"
+                               classes="col-xs-12 col-sm-6 nopadding-left" label-classes="control-label col-xs-12 col-sm-4 nopadding-left">
+
+
+                    <a href="#"
+                       onclick="$('#pictureSelect').click(); return false;">
+                        <div ng-if="!attachedFiles.length">
+                            <img class="profile-image" ng-src="{{info.pictureId | userThumb}}" />
+                        </div>
+
+                        <div image-preview-thumb
+                             ng-if="imageSource" 
+                             source="imageSource" 
+                             sources="attachedFiles">
+                        </div>
+                    </a>
+
+                    <div>
+                        <input id="pictureSelect"
+                               data-test-id="profileEditPicture"
+                               type="file"
+                               accept="image/*"
+                               class="form-control"
+                               onchange="angular.element(this).scope().imageAttached(this)">
+                    </div>
+
+                    <input ng-hide="true"
+                           name="profilePicture"
+                           wrapped
+                           required
+                           ng-model="profilePicture">
+
+                </input-wrapper>
+            </div>
+
+
+            <!-- FIRSTNAME -->
+            <input-wrapper label-text="{{'applicationUser.firstName' | translate}}"
+                           input-value="personalInfo.firstName"
+                           classes="col-xs-12 col-sm-6 nopadding-left" label-classes="control-label col-xs-12 col-sm-4 nopadding-left">
+                <input type="text"
+                       id="firstName"
+                       data-test-id="profileEditFirstName"
+                       name="firstName"
+                       ng-model="info.firstName"
+                       class="form-control"
+                       ng-disabled="!canEditUserProfiles"
+                       required
+                       wrapped />
+            </input-wrapper>
+
+            <!-- LASTNAME -->
+            <input-wrapper label-text="{{'applicationUser.lastName' | translate}}"
+                           input-value="personalInfo.lastName"
+                           classes="col-xs-12 col-sm-6 nopadding-left" label-classes="control-label col-xs-12 col-sm-4 nopadding-left">
+                <input type="text"
+                       id="lastName"
+                       data-test-id="profileEditLastName"
+                       name="lastName"
+                       ng-model="info.lastName"
+                       class="form-control"
+                       ng-disabled="!canEditUserProfiles"
+                       required
+                       wrapped />
+            </input-wrapper>
+
+            <!-- EMAIL -->
+            <input-wrapper label-text="{{'applicationUser.email' | translate}}"
+                           input-value="personalInfo.email"
+                           classes="col-xs-12 col-sm-6 nopadding-left" label-classes="control-label col-xs-12 col-sm-4 nopadding-left">
+                <input type="email"
+                       id="email"
+                       data-test-id="profileEditEmail"
+                       name="email"
+                       ng-model="info.email"
+                       class="form-control"
+                       ng-maxlength="40"
+                       required
+                       wrapped />
+            </input-wrapper>
+
+            <!-- PHONENUMBER -->
+            <input-wrapper label-text="{{'applicationUser.phoneNumber' | translate}}"
+                           input-value="personalInfo.phoneNumber"
+                           classes="col-xs-12 col-sm-6 nopadding-left" label-classes="control-label col-xs-12 col-sm-4 nopadding-left">
+                <div class="input-group">
+                    <span class="input-group-addon">+</span>
+                    <input type="tel"
+                           id="phoneNumber"
+                           data-test-id="profileEditPhoneNumber"
+                           name="phoneNumber"
+                           ng-model="info.phoneNumber"
+                           class="form-control"
+                           ng-maxlength="15"
+                           ng-attr-placeholder="370..."
+                           required
+                           wrapped />
+                </div>
+            </input-wrapper>
+
+            <!-- BIRTHDAY -->
+            <input-wrapper label-text="{{'applicationUser.birthday' | translate}}"
+                           input-value="personalInfo.birthDay"
+                           classes="col-xs-12 col-sm-6 nopadding-left" label-classes="control-label col-xs-12 col-sm-4 nopadding-left">
+                <div class="date-field">
+                    <input type="text" 
+                           name="birthDay" 
+                           id="birthDay" 
+                           class="hasDatepicker" 
+                           uib-datepicker-popup="yyyy-MM-dd" 
+                           popup-placement="bottom"
+                           ng-model="info.birthDay" 
+                           ng-change="onChangeValidateBirthDay()"
+                           is-open="datePickers.birthDay" 
+                           ng-required="true" 
+                           ng-click="openDatePicker($event, 'birthDay')"
+                           datepicker-options="{datepickerMode: 'year'}"
+                           required
+                           wrapped />
+                </div>
+            </input-wrapper>            
+
+            <!-- ABOUTME -->
+            <input-wrapper label-text="{{'applicationUser.bio' | translate}}"
+                           input-value="personalInfo.bio"
+                           classes="col-xs-12 col-sm-6 nopadding-left" label-classes="control-label col-xs-12 col-sm-4 nopadding-left">
+                <textarea msd-elastic type="text"
+                          id="bio"
+                          data-test-id="profileEditBio"
+                          name="bio"
+                          ng-model="info.bio"
+                          class="form-control"
+                          ng-maxlength="500"
+                          wrapped></textarea>
+            </input-wrapper>
+
+            <div class="top-space col-xs-offset-4 text-left">
+                <button class="btn btn-primary"
+                        type="submit"
+                        data-test-id="profileEditSubmit"
+                        ng-disabled="personalInfo.$invalid">
+                    <span class="glyphicon glyphicon-disk-save"></span>
+                    {{"common.save" | translate}}
+                </button>
+                <button ui-sref="Root.WithOrg.Client.Profiles.Details({ id: model.id })"
+                        class="btn btn-default"
+                        data-test-id="profileEditBackToProfile"
+                        ng-if="!isNewUser">
+                    {{"applicationUser.backToProfile" | translate}}
+                </button>
+            </div>
+        </form>
+        <div class="clearfix"></div>
+    </div>
+</div>

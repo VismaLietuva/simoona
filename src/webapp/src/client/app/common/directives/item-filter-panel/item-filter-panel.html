@@ -1,0 +1,33 @@
+<div>
+    <uib-accordion class="accordion" close-others="false" ng-if="vm.filterList.length > 0">
+        <div uib-accordion-group is-open="vm.isOpen">
+            <uib-accordion-heading>
+                <div ng-click="vm.toggleOpen()">
+                    <span translate="{{vm.filterTitle}}"></span> <i class="pull-right" ng-class="{'caret-up': vm.isOpen, 'caret': !vm.isOpen}"></i>
+                </div>
+            </uib-accordion-heading>
+            <uib-accordion-body class="form-horizontal">
+                <div class="form-group" ng-repeat="item in vm.filterList">
+                    <label for="item.model" class="col-xs-2 control-label" translate="{{item.label}}"></label>
+                    <div class="col-xs-9">
+                        <tags-input ng-model="item.model"
+                                    display-property="name"
+                                    placeholder="{{!!item.placeholder ? (item.placeholder | translate) : ('common.tagInputPlaceholder' | translate)}}"
+                                    min-length="1"
+                                    add-from-autocomplete-only="false"
+                                    replace-spaces-with-dashes="false"
+                                    add-on-enter="true"
+                                    add-on-space="true"
+                                    add-on-comma="true"
+                                    on-tag-added="vm.executeFilter()"
+                                    on-tag-removed="vm.executeFilter()"
+                                    add-on-blur="true" wrapped translate-cloak>
+                            <auto-complete source="item.load($query)" min-length="1" max-results-to-show="20" debounce-delay="300">
+                            </auto-complete>
+                        </tags-input>
+                    </div>
+                </div>
+            </uib-accordion-body>
+        </div>
+    </uib-accordion>
+</div>

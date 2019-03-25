@@ -1,0 +1,56 @@
+<div class="row body-container">
+    <div class="col-xs-12" has-permissions="['EVENT_ADMINISTRATION']">
+        <div class="panel panel-default">
+
+            <div class="panel-heading">
+                <span translate="customization.eventTypes"></span>
+
+                <div class="pull-right wall-create-button">
+                    <a class="nc-btn nc-btn-default"
+                       ui-sref="Root.WithOrg.Admin.Customization.EventTypes.Create"
+                       translate-attr-title="customization.createEventType"
+                       data-test-id="create-wall-button" translate>
+                        <span class="vismaicon vismaicon-add2-circle"></span><span class="hidden-xs" translate="customization.createEventType"></span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="panel-body">
+                <wave-spinner ng-if="vm.isLoading"></wave-spinner>
+                <table class="nc-table nc-table-active" ng-if="vm.eventTypes.length">
+                    <thead>
+                        <tr>
+                            <th class="col-xs-5" 
+                                translate="customization.eventTypeName"></th>
+
+                            <th class="col-xs-3 text-center hidden-xs" 
+                                translate="customization.eventTypeSingleJoin"></th>
+
+                            <th class="col-xs-3 text-center" 
+                                translate="common.action"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="eventType in vm.eventTypes">
+                            <td>
+                                {{eventType.name}}
+                            </td>
+                            <td class="text-center hidden-xs">
+                                {{eventType.isSingleJoin ? 'Yes' : 'No'}}
+                            </td>
+                            <td class="text-center">
+                                <a ui-sref="Root.WithOrg.Admin.Customization.EventTypes.Edit({ id : {{eventType.id}}})" 
+                                   class="link"
+                                   translate-attr-title="common.edit"
+                                   translate>
+                                   <span class="vismaicon vismaicon-edit" aria-hidden="true"></span>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>

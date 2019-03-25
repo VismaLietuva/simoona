@@ -1,0 +1,119 @@
+.participant-heading-toggle {
+    font-size: 12px;
+    color: #0089D9;
+    float: right;
+    top: 5px;
+}
+
+.participant-list,
+.participant-options {
+    list-style: none;
+    padding-left: 5px;
+    li {
+        margin-top: 5px;
+        &:hover {
+            background-color: #CCEBFF;
+            .participant-delete-button {
+                display: inline;
+                cursor: pointer;
+            }
+        }
+        .participant-delete-button {
+            float: right;
+            display: none;
+            margin-top: 5px;
+            margin-right: 5px;
+        }
+        .participant-spinner .wave-spinner {
+            margin-left: 0px;
+            margin-right: 0px;
+            margin-top: 5px;
+            margin-bottom: 0px;
+            float: right;
+            width: 41px;
+            transform: scale(0.7, 0.7);
+        }
+    }
+    .participant {
+        height: 35px;
+        > .current-user {
+            font-weight: 600;
+        }
+    }
+    .participant-image {
+        width: 35px;
+        height: 35px;
+        display: inline-block;
+    }
+    .participant-user {
+        padding-left: 10px;
+        line-height: 35px;
+        display: inline-block;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        cursor: default;
+    }
+}
+
+.participant-list .participant-user {
+    width: ~'calc(100% - 80px)';
+    width: ~'-moz-calc(100% - 80px)';
+    width: ~'-webkit-calc(100% - 80px)';
+}
+
+//event participants container
+@participants-tab-height: 60px;
+@participants-tabs-height: @participants-tab-height + 15px;
+@participants-tabs-border: 1px solid #d0d0d0;
+@participants-tab-inactive-color: #737373;
+@participants-tab-active-color: #0974b3;
+@participants-tab-font-size: 22px;
+@participants-background: #fff;
+.participants-parent {
+    float: right !important;
+    @media (min-width: 992px) {
+        padding-left: 0;
+    }
+}
+
+.participants-container {
+    background-color: @participants-background;
+    min-width: 265px;
+    margin-bottom: 20px;
+    animation: fadein 0.5s;
+    box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.05);
+    border: 1px solid;
+    border-color: #e7e7e7 #e7e7e7 #dbdbdb;
+    padding: 0;
+}
+
+.participants-container-header {
+    height: @participants-tab-height;
+    color: @participants-tab-active-color;
+    margin-bottom: 15px;
+    border-bottom: @participants-tabs-border;
+    .participants-title {
+        text-align: center;
+        font-size: @participants-tab-font-size;
+        padding-top: 14px;
+        .badge {
+            vertical-align: middle;
+            font-weight: 400;
+            background-color: @participants-tab-active-color;
+        }
+    }
+}
+
+.participants-container-body {
+    padding: 10px;
+    *.no-participants {
+        padding: 15px;
+    }
+    .tab-content-show {
+        display: inline;
+        &.ng-hide {
+            display: none;
+        }
+    }
+}

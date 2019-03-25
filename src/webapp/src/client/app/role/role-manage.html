@@ -1,0 +1,83 @@
+<div class="row">
+    <div class="col-xs-12">
+        <h3>
+            <a ui-sref="^.List">{{"role.entityNamePlural" | translate}}</a>
+            <span ng-if="titleEdit">&rarr; {{"role.editRole" | translate}}: {{role.name}}</span>
+            <span ng-if="titleCreate">&rarr; {{"role.createRole" | translate}}</span>
+        </h3>
+
+        <form class="form-horizontal" name="roleForm">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <span class="glyphicon glyphicon-home"></span>
+                    {{"role.roleInfo" | translate}}
+                </div>
+                <div class="panel-body">
+                    <div class="form-group" ng-class="{'has-error has-feedback': roleForm.name.$invalid && roleForm.name.$dirty}">
+                        <label class="control-label col-xs-2" for="name">
+                            {{"role.name" | translate}}
+                            <span class="text-danger">*</span>
+                        </label>
+                        <div class="col-xs-9">
+                            <input class="form-control" name="name" ng-model="role.name" required="" />
+                            <span class="glyphicon glyphicon-exclamation-sign form-control-feedback" ng-show="roleForm.name.$invalid && roleForm.name.$dirty"></span>
+                            <span class="text-danger help-block" ng-show="roleForm.name.$error.required && roleForm.name.$dirty">{{"common.messageFieldIsRequired" | translate}}</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-xs-2">
+                            {{"role.permissions" | translate}}
+                        </label>
+                        <div class="col-xs-9 role-permissions">
+                            <div ng-repeat="permission in permissionGroups">
+                                <label class="absent-label col-xs-12 nopadding-left nomargin-bottom">
+                                    <span class="glyphicon glyphicon-chevron-right small"></span>&nbsp;{{"role." + permission.name | translate}} ({{permission.name}})
+                                </label>
+                                <div class="col-xs-12 role-permission-border"></div>
+                                <div class="col-xs-12 nopadding-right role-permission-group">
+                                    <label class="col-xs-5 nopadding thin-font">
+                                        {{"role.administrationPermissions" | translate}}
+                                        <input type="radio"
+                                               name="{{permission.Name}}"
+                                               data-test-id="role-permissions-admin"
+                                               value="admin"
+                                               ng-model="permission.activeScope" />
+                                    </label>
+                                    <label class="col-xs-4 nopadding thin-font">
+                                        {{"role.basicPermissions" | translate}}
+                                        <input type="radio"
+                                               name="{{permission.Name}}"
+                                               data-test-id="role-permissions-basic"
+                                               value="basic"
+                                               ng-model="permission.activeScope" />
+                                    </label>
+                                    <label class="col-xs-3 nopadding thin-font">
+                                        {{"role.nonePermissions" | translate}}
+                                        <input type="radio"
+                                               name="{{permission.Name}}"
+                                               data-test-id="certificate-show-exams"
+                                               value=""
+                                               ng-model="permission.activeScope" />
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-xs-2" for="users">
+                            {{"role.users" | translate}}
+                        </label>
+                        <div class="col-xs-9">
+                            <tags-input ng-model="role.users" data-add-from-autocomplete-only="false" data-display-property="fullName" ng-attr-placeholder="{{'role.rolePlaceholderForUsers' | translate}}">
+                                <auto-complete data-source="loadUsers($query)" data-min-lenght="1" data-max-results-to-show="5"></auto-complete>
+                            </tags-input>
+                        </div>
+                    </div>
+                    <save-back-info-error class="top-space" save-disabled="roleForm.$invalid" on-back="goBack" on-save="onSave" errors="errors" infos="infos" show-required="true"></save-back-info-error>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,9 @@
+<div class="col-xs-12 col-sm-6" ng-class="{ 'input-group padding-bot-10' : !vm.defaultLayout }">
+    <input type="text" class="input-search form-control"
+           ng-model="vm.filterValue"
+           ng-model-options="{ debounce: 350 }"
+           ng-change="vm.executeFilter()"
+           translate-attr-placeholder="common.typeToFilterList"
+           autofocus translate/>
+    <span ng-show="!vm.defaultLayout" class="input-reset-no-button glyphicon glyphicon-remove-circle" ng-click="vm.filterInputReset()"></span>
+</div>

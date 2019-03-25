@@ -1,0 +1,75 @@
+<div class="row text-center login-button-placement">
+	<div class="auth-login-container">
+		 <form name="register-form" ng-submit="vm.register()">
+			<div class="col-xs-12 text-center auth-signin-title">
+		        <span translate="applicationUser.register"></span>
+			</div>
+			<div class="col-xs-12">
+                <div class="form-group search-group search-group-lg padding-bot-10 required">
+                    <input type="text"
+                        class="form-control"
+                        ng-model="vm.firstName"
+                        translate-attr-placeholder="applicationUser.enterFirstName"
+                        translate
+                        ng-cloak
+                    />
+                </div>
+                <div class="form-group search-group search-group-lg padding-bot-10 required">
+                    <input type="text"
+                        class="form-control"
+                        ng-model="vm.lastName"
+                        translate-attr-placeholder="applicationUser.enterLastName"
+                        translate
+                        ng-cloak
+                    />
+                </div>
+				<div class="form-group search-group search-group-lg padding-bot-10 required">
+			        <input type="text"
+                        class="form-control"
+                        ng-model="vm.email"
+                        translate-attr-placeholder="applicationUser.enterEmailAddress"
+                        translate
+                        ng-cloak
+                    />
+                </div>
+                <div class="form-group search-group search-group-lg padding-bot-10 required">
+                    <input type="password"
+                        class="form-control"
+                        ng-model="vm.password"
+                        translate-attr-placeholder="applicationUser.enterPassword"
+                        translate
+                        ng-cloak
+                    />
+                </div>
+                <div class="form-group search-group search-group-lg padding-bot-10 required">
+                    <input type="password"
+                        class="form-control"
+                        ng-model="vm.repeatedPassword"
+                        translate-attr-placeholder="applicationUser.confirmPassword"
+                        translate
+                        ng-cloak
+                    />
+		    	</div>
+			</div>
+			<div class="col-xs-12">
+				<wave-spinner ng-if="vm.isLoading"></wave-spinner>
+				<button type="submit"
+						ng-if="!vm.isLoading"
+						class="nc-btn nc-btn-default auth-btn auth-provider-login-btn"
+                        >
+		        	<span translate="applicationUser.register"></span>
+		    	</button>
+			</div>
+        </form>
+        
+        <div class="col-xs-12">
+            <wave-spinner ng-if="vm.isLoading"></wave-spinner>
+            <button ng-if="!vm.isLoading"
+                    class="nc-btn nc-btn-default auth-btn auth-provider-login-btn"
+                    ng-click="vm.redirectToLogin()"
+                    >
+                <span translate="applicationUser.back"></span>
+            </button>
+        </div>
+	</div>
+</div>

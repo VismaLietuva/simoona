@@ -1,0 +1,8 @@
+﻿<div class="post-text-container">
+	<span ng-if="!hasHashtagify" markdown
+	      ng-bind-html="newMessage | linky: '_blank' | newlineToBr"></span>
+	<span ng-if="!!hasHashtagify" markdown
+		  ng-bind-html="newMessage | linky: '_blank' | newlineToBr" 
+		  hashtagify="tagTermClick($event)"></span>
+	<span class="show-more-container"></span>
+</div>

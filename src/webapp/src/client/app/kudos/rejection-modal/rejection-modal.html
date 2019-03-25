@@ -1,0 +1,36 @@
+﻿<div class="modal-header">
+    <button type="button" class="close" ng-click="vm.cancelForm()">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <h3 class="modal-title" translate="kudos.rejectKudosTitle"></h3>
+</div>
+<div class="modal-body">
+    <form role="form" name="kudosForm" class="form-horizontal kudosRejectForm">
+        <div class="form-group required-right" ng-class="{ 'has-error' : kudosForm.kudosRejectionMessage.$invalid && !kudosForm.kudosRejectionMessage.$pristine }">
+            <label for="kudosRejectionMessage" class="control-label col-xs-2 text-right kudosRejectionMessage" translate="kudos.rejectKudosMessage"></label>
+            <div class="col-xs-12 col-md-10">
+                <input class="form-control"
+                       type="text"
+                       id="kudosRejectionMessage"
+                       name="kudosRejectionMessage"
+                       ng-model="vm.kudosRejectionMessage"
+                       translate-atrr-placeholder="kudos.enterKudosRejectionMessage"
+                       data-test-id="kudos-rejection-modal-reject-message-input" required translate/>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary"
+            has-permissions="['KUDOS_ADMINISTRATION']"
+            ng-disabled="kudosForm.$invalid"
+            ng-click="vm.rejectForm()"
+            data-test-id="kudos-rejection-modal-reject-button">
+            <span translate="common.reject"></span>
+    </button>
+    <button class="btn btn-danger"
+            ng-click="vm.cancelForm()"
+            data-test-id="kudos-rejection-modal-cancel-button">
+            <span translate="common.cancel"></span>
+    </button>
+</div>

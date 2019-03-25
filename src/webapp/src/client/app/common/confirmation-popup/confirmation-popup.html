@@ -1,0 +1,11 @@
+<div class="modal-header">
+    <button type="button" class="close" data-ng-click="cancel()">&times;</button>
+    <h4 class="modal-title">{{title | translate}}</h4>
+</div>
+<div class="modal-body">
+    <div ng-bind-html="message | translate"></div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-success" data-ng-click="ok()"><div>{{"common.ok" | translate}}</div></button>
+    <button type="button" class="btn btn-warning" data-ng-click="cancel()"><div>{{"common.cancel" | translate}}</div></button>
+</div>

@@ -1,0 +1,19 @@
+﻿{
+  "color": "Fill Color",
+  "createRoomType": "New Room Type",
+  "editRoomType": "Edit Room Type",
+  "entityName": "Room Type",
+  "entityNamePlural": "Room Types",
+  "name": "Title",
+  "room": "Room",
+  "rooms": "Rooms",
+  "roomsCount": "Rooms Count",
+  "roomTypeData": "Room Type Data",
+  "roomTypePostError1": "Same Room type name allready exists.",
+  "roomTypePutError1": "Same Room type allready exists.",
+  "icon": "Icon",
+  "removeIcon": "Remove icon",
+  "notWorkingRoomError": "Room is not working room.",
+  "isWorkingRoom": "Working room",
+  "iconDeleted": "Icon successfully deleted!"
+}

@@ -1,0 +1,12 @@
+﻿<div class="kudos-basket-widget" ng-if="vm.kudosBasketIsActive" has-permissions="['KUDOSBASKET_BASIC']">
+    <div class="kudos-basket-widget-header">
+        <h5 class="header" data-test-id="kudos-basket-widget-title" ng-cloak>{{:: vm.kudosBasketData.title}}</h5>
+    </div>
+    <div class="kudos-basket-widget-body text-center">
+        <div class="donated-kudos" translate="kudosBasket.donatedKudos"></div>
+        <div class="amount" data-test-id="kudos-basket-donated-amount" ng-cloak>{{vm.kudosBasketData.kudosDonated}}</div>
+        <a ace-kudos-basket-modal="vm.addDonation" class="btn btn-default">
+            <span translate="kudosBasket.donateNow"></span>
+        </a>
+    </div>
+</div>

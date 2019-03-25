@@ -1,0 +1,42 @@
+<div class="panel-body form-horizontal">
+    <div class="form-group">
+        <label for="item.model" class="col-xs-12 col-sm-3 control-label">{{"serviceRequest.search" | translate}}</label>
+        <ace-item-list-filter filter-value="filter.search" on-filtering="onSearch" default-layout="true"></ace-item-list-filter>
+    </div>
+    <div class="form-group">
+        <label for="item.model" class="col-xs-12 col-sm-3 control-label">{{"serviceRequest.status" | translate}}</label>
+        <div class="col-xs-12 col-sm-6">
+            <select data-test-id="serviceRequestStatusFilter"
+                    name="status" ng-model="filter.status"
+                    ng-change="getServiceRequestsList()"
+                    class="form-control"
+                    ng-options="status.title as 'serviceRequest.' + status.title.toLowerCase() | translate for status in statuses">
+                <option selected value="">{{"serviceRequest.allOption" | translate}}</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="item.model" class="col-xs-12 col-sm-3 control-label">{{"serviceRequest.priority" | translate}}</label>
+        <div class="col-xs-12 col-sm-6">
+            <select data-test-id="serviceRequestPriorityFilter"
+                    name="priority" ng-model="filter.priority"
+                    ng-change="getServiceRequestsList()"
+                    class="form-control"
+                    ng-options="priority.title as 'serviceRequest.' + priority.title.toLowerCase() | translate for priority in priorities">
+                <option selected value="">{{"serviceRequest.allOption" | translate}}</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="item.model" class="col-xs-12 col-sm-3 control-label">{{"serviceRequest.category" | translate}}</label>
+        <div class="col-xs-12 col-sm-6">
+            <select data-test-id="serviceRequestCategoryFilter"
+                    name="category" ng-model="filter.serviceRequestCategory"
+                    ng-change="getServiceRequestsList()"
+                    class="form-control"
+                    ng-options="category.name for category in categories">
+                <option selected value="">{{"serviceRequest.allOption" | translate}}</option>
+            </select>
+        </div>
+    </div>
+</div>

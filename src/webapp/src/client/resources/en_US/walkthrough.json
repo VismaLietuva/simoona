@@ -1,0 +1,19 @@
+{
+  "welcome": "Welcome!",
+  "welcomeDescription": "Take a quick walk through how to use Simoona.",
+  "walls": "Walls",
+  "wallsDescription": "This is a discussions place, called Walls. You can view the entire list of walls, follow or join the discussion, and create a new Wall to talk on a hot new topic.",
+  "activities": "Activities",
+  "activitiesDescription": "Here are all your activities. You can join an event, or create a new event for others to join, view Kudos statistics, take books, or order other company services.",
+  "company": "Company",
+  "companyDescription": "This is a company place. It provides information about your colleagues, you can view the office map, organizational structure, projects and other company related info.",
+  "profile": "Profile",
+  "profileDescription": "This is your place. Here you can edit your profile information and edit notifications’ and language settings.",
+  "kudos": "Kudos",
+  "kudosDescription": "This is a Kudos place. Here you can quickly send Kudos to your colleagues by clicking the Plus icon and see the latest on who got Kudos and for what.",
+  "administration": "Administration",
+  "administrationDescription": "Here you administrate and customize Simoona. You can confirm new users, edit user roles, offices and rooms, Kudos basket and so on.",
+  "prev": "Prev",
+  "next": "Next",
+  "done": "Done"
+}

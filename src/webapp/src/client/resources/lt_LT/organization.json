@@ -1,0 +1,13 @@
+﻿{
+  "create": "Nauja organizacija",
+  "createSite": "Nauja vartotojas ir organizacija",
+  "edit": "Redaguoti organizacija",
+  "entityName": "Organizacija",
+  "entityNamePlural": "Organizacijos",
+  "existsWithSameName": "Organizacija su tokiu pavadinimu arba trumpu pavadinimu jau yra",
+  "existsWithSameName2": "Organizacija su pavadinimu '{{ one }}' ('{{ two }}') jau yra, bandykite kitą pavadinimą",
+  "language": "Kalba",
+  "name": "Pavadinimas",
+  "noNameReceived": "Nenurodytas organizacijos pavadinimas arba trumpinys",
+  "shortName": "Trumpinys"
+}

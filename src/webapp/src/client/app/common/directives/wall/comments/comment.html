@@ -1,0 +1,92 @@
+<div class="post-comment-container">
+
+    <div class="post-comment-content">
+
+        <div class="clearfix">
+            <ace-message-user-profile user="vm.comment.author"
+                                      date="vm.comment.created"
+                                      edited-date="vm.comment.lastEdit"
+                                      is-edited="vm.comment.isEdited"
+                                      is-hidden="vm.comment.isHidden"
+                                      >
+            </ace-message-user-profile>
+        </div>
+
+        <div class="comment-content-margin">
+
+            <form name="editCommentForm" class="edit-text-area" ng-if="vm.editFieldEnabled">
+                <textarea name="messageBody"
+                          class="form-control post-comment-textarea"
+                          msd-elastic
+                          type="text"
+                          ng-model="vm.editableValue"
+                          ng-maxlength="vm.maxLength"
+                          valid-if-changed="{{vm.comment.messageBody}}"
+                          data-test-id="comment-edit-input-field" required></textarea>
+
+                <div class="comment-edit-properties pull-right">
+                    <a class="comment-save-property"
+                       ng-disabled="editCommentForm.$invalid"
+                       ng-click="!editCommentForm.$invalid && vm.editComment(vm.editableValue)"
+                       data-test-id="comment-edit-save-button" translate="common.save"></a>
+
+                    <a ng-click="vm.disableEditor()"
+                       data-test-id="comment-edit-cancel-button" translate="common.cancel"></a>
+                </div>
+
+                <length-counter class="edit"
+                                max-length="vm.maxLength"
+                                current-length="editCommentForm.messageBody.$viewValue.length">
+                </length-counter>
+            </form>
+
+            <div class="message-box comment-word-break"
+                 ng-if="!vm.editFieldEnabled && !vm.comment.isHidden"
+                 ace-message-show-more
+                 has-hashtagify="vm.hasHashtagify"
+                 message="{{:: vm.comment.messageBody}}"
+                 show-more-type="comment"
+                 data-test-id="comment-message">
+            </div>
+
+            <div class="media-datetime"
+                 ng-if="vm.comment.isHidden"
+                 data-test-id="comment-deleted"
+                 ng-cloak>
+                <span class="media-deleted-date">
+                    <span translate="common.commentDeleted"></span>: {{:: vm.comment.lastEdit | convertToCurrentTimezone | date:'yyyy-MM-dd, HH:mm'}}
+                </span>
+            </div>
+
+            <ace-youtube-preview-link ng-if="!vm.editFieldEnabled && !vm.comment.isHidden"
+                                      message="{{:: vm.comment.messageBody}}"
+                                      type="comment"
+                                      preview-width="{{:: vm.youtubePreviewWidth}}"
+                                      preview-height="{{:: vm.youtubePreviewHeight}}"
+                                      player-width="{{:: vm.youtubeWidth}}"
+                                      player-height="{{:: vm.youtubeHeight}}">
+            </ace-youtube-preview-link>
+
+            <ace-soundcloud-player-link ng-if="!vm.editFieldEnabled && !vm.comment.isHidden"
+                                        type="comment"
+                                        message="{{:: vm.comment.messageBody}}">
+            </ace-soundcloud-player-link>
+
+            <img class="comment-image"
+                 ng-if="!!vm.comment.pictureId && !vm.comment.isHidden"
+                 ng-src="{{:: vm.comment.pictureId | wallImageThumb}}"
+                 ace-picture-modal="vm.comment.pictureId"
+                 data-test-id="comment-picture" image-loading>
+
+            <ace-message-like ng-if="!vm.comment.isHidden" message-object="vm.comment" type="comment"></ace-message-like>
+        </div>
+    </div>
+    <ace-message-actions message-user-id="vm.comment.author.userId"
+                                 is-admin="vm.isAdmin"
+                                 ng-if="!vm.comment.isHidden"
+                                 can-moderate-comment="vm.comment.canModerate"
+                                 enable-editor="vm.enableEditor()"
+                                 delete-message="vm.deleteComment()"
+                                 ng-show="!vm.editFieldEnabled">
+    </ace-message-actions>
+</div>

@@ -1,0 +1,29 @@
+<wave-spinner ng-if="vm.isLoading"></wave-spinner>
+<div class="shared-event-wrapper" ng-if="!vm.isLoading && vm.eventExists">
+    <div class="shared-event-image">
+        <a ui-sref="Root.WithOrg.Client.Events.EventContent({id:{{'vm.eventDetails.id'}}})">
+            <img alt="{{vm.eventDetails.name}}" 
+                 title="{{vm.eventDetails.name}}"
+                 ng-src="{{vm.eventDetails.imageName | imageThumb:{w:200,h:120}:'crop'}}" 
+                 image-loading>
+        </a>
+    </div>
+    <div class="shared-event-info">
+        <h4 class="media-heading">
+            <a ui-sref="Root.WithOrg.Client.Events.EventContent({id:{{'vm.eventDetails.id'}}})">
+                {{vm.eventDetails.name}}
+            </a>
+        </h4>
+        <p class="shared-event-location">{{vm.eventDetails.location}}</p>
+        <p class="shared-event-datetime">
+            {{vm.eventDetails.startDate | amUtc | amLocal | amDateFormat:'HH:mm, MMMM DD'}}
+        </p>
+        <p title="{{vm.eventDetails.description}}" class="shared-event-description">
+            {{vm.eventDetails.description}}
+        </p>
+    </div>
+</div>
+
+<div class="shared-event-wrapper" ng-if="!vm.isLoading && !vm.eventExists">
+    <p class="bold top-margin bottom-margin" translate="errorCodeMessages.eventDoesNotExist"></p>
+</div>

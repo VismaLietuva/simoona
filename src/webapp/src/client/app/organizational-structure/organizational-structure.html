@@ -1,0 +1,24 @@
+<div class="row body-container" has-permissions="['ORGANIZATIONALSTRUCTURE_BASIC']">
+    <div class="col-xs-12">
+        <div class="panel panel-default">
+            <div class="panel-heading" translate="navbar.organizationalStructure"></div>
+            <div class="panel-body">
+                <div class="row organizational-structure">
+                    <div class="org-tree-options pull-right">
+                        <div class="options-wrapper">
+                            <button type="button"
+                                    title="{{'common.reset' | translate}}"
+                                    class="btn btn-default"
+                                    ng-click="vm.resetTreeFn(resetTree)"
+                                    ng-cloak translate-cloak>
+                                <span class="vismaicon vismaicon-sm vismaicon-refresh"></span> <span translate="common.reset"></span>
+                            </button>
+                            <div class="clear"></div>
+                        </div>
+                    </div>
+                    <ace-organization-tree id="orgStructure" reset-tree="vm.resetOrgTree(resetTreeFn)"></ace-organization-tree>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,51 @@
+{
+  "name": "Simoona-project",
+  "version": "2.0.2",
+  "description": "Simoona project",
+  "authors": [
+    "Tomas Lidžius",
+    "Deimantas Šyvokas",
+    "Egidijus Macijauskas",
+    "Roland Maksimovicz",
+    "Vaida Rabazauskaitė"
+  ],
+  "license": "Visma Lietuva",
+  "homepage": "http://simoona.com",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {},
+  "dependencies": {
+    "angular": "~1.5.10",
+    "moment": "2.12.0",
+    "d3": "3.5.17",
+    "angular-moment": "1.0.0",
+    "angular-translate": "~2.13.1",
+    "angular-dynamic-locale": "0.1.32",
+    "angular-translate-storage-local": "~2.13.1",
+    "angular-translate-loader-static-files": "~2.13.1",
+    "angular-i18n": "1.5.5",
+    "angular-translate-handler-log": "~2.13.1",
+    "angular-bootstrap-lightbox": "0.12.0",
+    "angular-google-analytics": "1.1.7",
+    "angular-ui-bootstrap": "ui-bootstrap#^2.2.0",
+    "angular-bootstrap": "2.2.0",
+    "showdown": "^1.8.6"
+  },
+  "overrides": {
+    "bootstrap": {
+      "main": "dist/css/bootstrap.css",
+      "dist": "dist/js/bootstrap.js"
+    }
+  },
+  "resolutions": {
+    "angular-translate": "~2.13.1",
+    "angular-translate-storage-cookie": "~2.13.1",
+    "angular-bootstrap": "2.2.0",
+    "angular": ">=1"
+  }
+}

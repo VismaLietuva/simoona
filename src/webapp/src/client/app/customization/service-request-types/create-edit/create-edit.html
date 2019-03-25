@@ -1,0 +1,107 @@
+<div class="row body-container">
+    <div class="col-xs-12" has-permissions="['SERVICEREQUESTS_ADMINISTRATION']">
+        <wave-spinner ng-if="vm.isLoading"></wave-spinner>
+        <div class="panel panel-default"
+             ng-if="!vm.isLoading">
+            <div class="panel-heading">
+                <span ng-if="vm.states.isEdit"
+                      translate="customization.editServiceRequestsTypes"></span>
+                <span ng-if="vm.states.isCreate"
+                      translate="customization.createServiceRequestsType"></span>
+            </div>
+            <div class="panel-body">
+                <form name="serviceRequestsTypeForm" class="form-horizontal" autocomplete="off">
+
+                    <!--serviceRequests type name-->
+                    <div class="form-group required"
+                         ng-class="{'has-error': serviceRequestsTypeForm.name.$invalid && serviceRequestsTypeForm.name.$dirty}">
+                        <label for="serviceRequestsTypeName"
+                               class="control-label col-xs-12 col-sm-4"
+                               translate="customization.serviceRequestsTypeName"></label>
+                        <div class="col-xs-12 col-sm-4">
+                            <input id="serviceRequestsTypeName"
+                                   type="text"
+                                   class="form-control"
+                                   name="name"
+                                   ng-model="vm.serviceRequestsType.name"
+                                   ng-maxlength="30"
+                                   ng-disabled="vm.serviceRequestsType.isNecessary"
+                                   data-test-id="service-requeststype-form-name-input"
+                                   required/>
+                            <p class="text-danger help-block"
+                               ng-if="serviceRequestsTypeForm.name.$error.required && serviceRequestsTypeForm.name.$dirty"
+                               translate="common.messageFieldIsRequired"></p>
+                            <p class="text-danger help-block"
+                               ng-if="serviceRequestsTypeForm.name.$error.maxlength && serviceRequestsTypeForm.name.$dirty"
+                               translate="common.messageInvalidLength"
+                               translate-values="{ one: 30 }"></p>
+                        </div>
+                    </div>
+                    <!--ASSIGNEES-->
+                    <div class="form-group">
+                        <label for="assignees"
+                               class="control-label col-xs-12 col-sm-4"
+                               translate="customization.assignees"></label>
+                        <div class="col-xs-12 col-sm-4">
+                            <tags-input id="assignees"
+                                        name="assignees"
+                                        ng-model="vm.serviceRequestsType.assignees"
+                                        add-from-autocomplete-only="true"
+                                        display-property="fullName"
+                                        add-on-enter="true"
+                                        add-on-space="true"
+                                        add-on-comma="true"
+                                        placeholder="{{'customization.assigneesPlaceHolder' | translate}}"
+                                        add-on-blur="true"
+                                        wrapped>
+                                <auto-complete source="vm.allUsers($query)" min-length="0" max-results-to-show="5"></auto-complete>
+                            </tags-input>
+                        </div>
+                    </div>
+                    <!--serviceRequests type buttons right -->
+                    <div class="pull-right">
+
+                        <button class="btn btn-primary"
+                                ng-if="vm.states.isCreate"
+                                ng-click="vm.createServiceRequestsType()"
+                                ng-disabled="serviceRequestsTypeForm.$invalid"
+                                data-test-id="service-requeststype-form-save-button">
+                            <span translate="common.save"></span>
+                        </button>
+
+                        <button class="btn btn-primary"
+                                ng-if="vm.states.isEdit"
+                                ng-click="vm.updateServiceRequestsType()"
+                                ng-disabled="serviceRequestsTypeForm.$invalid"
+                                data-test-id="service-requeststype-form-update-button">
+                            <span translate="common.update"></span>
+                        </button>
+
+                        <button class="btn btn-default"
+                                ui-sref="Root.WithOrg.Admin.Customization.ServiceRequestsTypes.List"
+                                data-test-id="service-requestsform-cancel-button">
+                            <span translate="common.cancel"></span>
+                        </button>
+
+                    </div>
+
+                    <!--serviceRequests type delete button left -->
+                    <div class="pull-left">
+
+                        <div class="pull-left">
+                            <button ng-if="vm.states.isEdit && !vm.serviceRequestsType.isNecessary"
+                                    class="btn btn-danger"
+                                    ace-confirmation-modal="vm.disableServiceRequestsType()"
+                                    ng-disabled="vm.serviceRequestsType.isNecessary"
+                                    data-test-id="service-requeststype-disable-button">
+                                <span translate="common.delete"></span>
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>

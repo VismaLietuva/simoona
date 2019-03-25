@@ -1,0 +1,20 @@
+﻿<div class="row body-container map-wrapper">
+    <div class="col-xs-12">
+        <div class="map-label-wrapper">
+            <div class="map-label" ng-if="params.room">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="map-label-header">{{params.room.name}} {{params.room.number}}</div>
+                        <div class="map-label-subheader">
+                            {{params.room.roomType.name}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div has-permissions="['MAP_BASIC']">
+            <map-dir map-control="mapControl" ng-if="floor.pictureId" floor="floor" all-offices="allOffices" office="office" enable-zoom="true" enable-pin="true" params="params" show-floor-change="true" enable-full-screen="true" height-offset="75"></map-dir>
+        </div>
+    </div>
+    <div data-users-bar="" params="params"></div>
+</div>

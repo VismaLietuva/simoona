@@ -1,0 +1,22 @@
+﻿{
+  "address": "Adresas",
+  "building": "Namo nr.",
+  "city": "Miestas",
+  "country": "Šalis",
+  "createOffice": "Naujas ofisas",
+  "editOffice": "Redaguoti ofisą",
+  "employeesCount": "Darbuotojų",
+  "entityName": "Ofisas",
+  "entityNamePlural": "Ofisai",
+  "floors": "Aukštai",
+  "floorsCount": "Aukštų",
+  "isDefault": "Pagrindinis",
+  "mapImageSizeExceeded": "Pasirinktas failas yra per didelis. Maksimalus leistinas dydis yra 10MB.",
+  "mapImageUnsupportedFormat": "Netinkamas failo formatas. Palaikomi formatai yra jpg, jpeg, ir png.",
+  "name": "Pavadinimas",
+  "officeData": "Ofiso informacija",
+  "roomsCount": "Kambarių",
+  "street": "Gatvė",
+  "confirmOfficeDeleteMessage": "Ištrynus ofisą, ištrinsite jame esančius aukštus ir kambarius. Vartotojam kurie turi šį ofisą nusistatę kaip sedėjimo vietą, vietos bus ištrintos.",
+  "confirmFloorDeleteMessage": "Ištrynus aukštą, ištrinsite jame esančius kambarius. Vartotojam kurie turi šį aukštą nusistatę kaip sedėjimo vietą, vietos bus ištrintos."
+}

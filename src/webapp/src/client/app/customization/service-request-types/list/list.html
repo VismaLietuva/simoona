@@ -1,0 +1,46 @@
+<div class="row body-container">
+    <div class="col-xs-12" has-permissions="['SERVICEREQUESTS_ADMINISTRATION']">
+        <div class="panel panel-default">
+
+            <div class="panel-heading flex-panel-heading">
+                <span translate="customization.serviceRequestsTypes"></span>
+
+                <div class="pull-right service-requests-type-create-button">
+                    <a class="nc-btn nc-btn-default"
+                       ui-sref="Root.WithOrg.Admin.Customization.ServiceRequestsTypes.Create"
+                       translate-attr-title="customization.createServiceRequestsType"
+                       data-test-id="create-service-requests-type-button" 
+                       translate>
+                        <span class="vismaicon vismaicon-add2-circle"></span><span class="hidden-xs" translate="customization.createServiceRequestsType"></span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="panel-body">
+                <wave-spinner ng-if="vm.isLoading"></wave-spinner>
+                <table class="nc-table nc-table-active" ng-if="vm.serviceRequestsTypes.length">
+                    <thead>
+                        <tr>
+                            <th class="col-xs-5" translate="customization.serviceRequestsTypeName"></th>
+                            <th class="col-xs-3 text-center" translate="common.action"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="type in vm.serviceRequestsTypes">
+                            <td>{{type.name}}</td>
+                            <td class="text-center">
+                                <a ui-sref="Root.WithOrg.Admin.Customization.ServiceRequestsTypes.Edit({ id : {{type.id}}})" 
+                                   class="link"
+                                   translate-attr-title="common.edit"
+                                   translate>
+                                   <span class="vismaicon vismaicon-edit" aria-hidden="true"></span>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>

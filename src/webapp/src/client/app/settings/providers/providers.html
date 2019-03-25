@@ -1,0 +1,76 @@
+<div>
+    <wave-spinner ng-if="vm.isLoading"></wave-spinner>
+    <div ng-show="!vm.externalProviders.length" ng-if="!vm.isLoading" class="text-center">
+        <h2>{{ vm.noExternalProviders }}</h2>
+    </div>
+    
+    <table ng-show="vm.externalProviders.length" ng-if="!vm.isLoading" class="nc-table nc-table-active">
+        <thead>
+            <tr>
+                <th translate="settings.providers"></th>
+                <th colspan="2" translate="settings.providerEmail"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-show="vm.isInternalProvider">
+                <td class="col-xs-3 word-break"
+                    title="Internal"
+                    data-test-id="internal-provider"
+                    ng-cloak>
+                    <label>Internal</label>
+                    <span ng-show="vm.isInternalLinked && !vm.unlinkEnabled" class="glyphicon glyphicon-exclamation-sign" uib-tooltip-template="'linkedProviderTemplate.html'" tooltip-placement="right" tooltip-append-to-body="true" tooltip-class="settings-providers-status-tooltip"></span>
+                </td>
+                <td>
+                    <span ng-show="vm.showInternalEmail">{{vm.internalEmail}}</span>
+                </td>
+                <td></td>
+            </tr>
+            <tr ng-show="vm.isGoogleProvider">
+                <td class="col-xs-3 word-break"
+                    title="Google"
+                    data-test-id="google-provider"
+                    ng-cloak>
+                    <label>Google</label>
+                    <span ng-show="vm.isGoogleLinked && !vm.unlinkEnabled" class="glyphicon glyphicon-exclamation-sign" uib-tooltip-template="'linkedProviderTemplate.html'" tooltip-placement="right" tooltip-append-to-body="true" tooltip-class="settings-providers-status-tooltip"></span>
+                </td>
+                <td>
+                    <button type="submit"
+                            ng-if="!vm.isGoogleLinked"
+                            class="nc-btn nc-btn-default providers-btn"
+                            data-test-id="google-sign-in-button"
+                            ng-click=vm.providerSignIn('Google')>
+                        <span class="vismaicon vismaicon-google"></span><span translate="applicationUser.signInWithGoogle"></span>
+                    </button>
+                    <span ng-show="vm.showGoogleEmail">{{vm.googleEmail}}</span>
+                    <span ng-show="vm.isGoogleLinked && !vm.showGoogleEmail" translate="settings.linked"/>
+                </td>
+                <td><a ng-if="vm.isGoogleLinked && vm.unlinkEnabled" data-test-id="facebook-unlink-button" ng-click="vm.providerUnlink('Google')" translate="settings.removeProvider"/></td>
+            </tr>
+            <tr ng-show="vm.isFacebookProvider">
+                <td class="col-xs-3 word-break"
+                    title="Facebook"
+                    data-test-id="facebook-provider"
+                    ng-cloak>
+                    <label>Facebook</label>
+                    <span ng-show="vm.isFacebookLinked && !vm.unlinkEnabled" class="glyphicon glyphicon-exclamation-sign" uib-tooltip-template="'linkedProviderTemplate.html'" tooltip-placement="right" tooltip-append-to-body="true" tooltip-class="settings-providers-status-tooltip"></span>
+                </td>
+                <td>
+                    <button type="submit"
+                            ng-if="!vm.isFacebookLinked"
+                            class="nc-btn nc-btn-default providers-btn"
+                            data-test-id="facebook-link-button"
+                            ng-click=vm.providerSignIn('Facebook')>
+                        <span class="vismaicon vismaicon-facebook"></span><span translate="applicationUser.signInWithFacebook"><span>
+                    </button>
+                    <span ng-show="vm.showFacebookEmail">{{vm.facebookEmail}}</span>
+                    <span ng-show="vm.isFacebookLinked && !vm.showFacebookEmail" translate="settings.linked"/>
+                </td>
+                <td><a ng-if="vm.isFacebookLinked && vm.unlinkEnabled" data-test-id="facebook-unlink-button" ng-click="vm.providerUnlink('Facebook')" translate="settings.removeProvider"/></td>
+            </tr>
+            <script type="text/ng-template" id="linkedProviderTemplate.html">
+				<p class="col-xs-12"><strong>{{vm.activeProvider}}</strong> <span translate="settings.onlyProvider"></span></p>
+			</script>
+        </tbody>
+    </table>
+    <div class="clearfix"></div>
+</div>

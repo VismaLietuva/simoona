@@ -1,0 +1,52 @@
+<div class="row">
+    <div class="col-xs-12" has-permissions="['OFFICE_ADMINISTRATION']">
+        <h3><span>{{"office.entityNamePlural" | translate}}</span></h3>
+        <ace-item-list-filter filter-value="filter.s" on-filtering="onSearch" on-filter-reset="onReset" class="pull-left"></ace-item-list-filter>
+    <div class="btn-group pull-right" has-permissions="['OFFICE_ADMINISTRATION']">
+            <a ui-sref="Root.WithOrg.Admin.Offices.Create" class="btn btn-primary" title="{{'common.createNew' | translate}}"><span class="glyphicon glyphicon-plus"></span> <span>{{"common.createNew" | translate}}</span></a>
+        </div>
+        <table class="table table-grey table-hover table-active" ng-if="itemCount > 0">
+            <thead>
+                <tr>
+                    <th ng-repeat="header in headers">
+                        <ace-sort-link on-sort="onSort" sort-dir="filter.dir" sort-field="filter.sort" sort-value="{{ header.value }}">{{header.title | translate}}</ace-sort-link>
+                    </th>
+                    <th><span>{{"office.floorsCount" | translate}}</span>/<span>{{"office.roomsCount" | translate}}</span>/<span>{{"office.employeesCount" | translate}}</span></th>
+                    <th class="text-center" ng-if="allowEdit">
+                        {{"common.actions" | translate}}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="office in offices">
+                    <td>
+                        <a ng-if="hasFloorAdminPermission" ui-sref="Root.WithOrg.Admin.Offices.Floors.List({officeId : office.id})">{{ office.name }}</a>
+                        <span ng-if="!hasFloorAdminPermission">{{ office.name }}</span>
+                    </td>
+                    <td>
+                        {{ office.address.country }}
+                    </td>
+                    <td>
+                        {{ office.address.city }}
+                    </td>
+                    <td>
+                        {{ office.address.street }} {{ office.address.building }}
+                    </td>
+                    <td>
+                        {{ office.floorsCount }}/{{ office.roomsCount }}/{{ office.applicationUsersCount }}
+                    </td>
+                    <td class="text-center">
+                        <a ui-sref="Root.WithOrg.Admin.Offices.Edit({ id : office.id})" class="btn btn-default glyphicon glyphicon-pencil" title="{{'common.edit' | translate}}" has-permissions="['OFFICE_ADMINISTRATION']"></a>
+                        <span has-permissions="['OFFICE_ADMINISTRATION']">
+                                <a ace-confirmation-modal="onDelete(office)"
+                                   confirmation-modal-message="office.confirmOfficeDeleteMessage"
+                                   class="btn btn-danger glyphicon glyphicon-bin delete" title="{{'common.delete' | translate}}"></a>
+                            </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="clearfix"></div>
+        <ace-item-list-pagination total-item-count="itemCount" page-size="pageSize" current-page="filter" on-changed="changedPage"></ace-item-list-pagination>
+    </div>
+</div>

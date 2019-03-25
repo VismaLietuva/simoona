@@ -1,0 +1,11 @@
+<div class="progress progress-sm" data-test-id="progress-bar">
+    <div class="progress-bar"
+         ng-class="{'progress-danger': vm.isFull}"
+         role="progressbar"
+         aria-valuenow="{{vm.value}}"
+         aria-valuemin="0"
+         aria-valuemax="{{vm.max}}"
+         ng-style="{'width': vm.percents + '%'}">
+        <span class="sr-only" data-test-id="progress-bar-percents">{{vm.percents}}%</span>
+    </div>
+</div>

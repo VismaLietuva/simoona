@@ -1,0 +1,20 @@
+﻿<input ng-model="query"
+       class="form-control"
+       ng-change="getSuggestions(query)"
+       ng-blur="formatQuery()"
+       ng-keydown="onKeyPress($event)"
+       data-test-id="autocomplete-input" />
+<ul class="list-group">
+    <li ng-repeat="item in suggestions"
+        ng-mouseover="makeSelected($index)"
+        ng-mouseleave="makeSelected(-1)"
+        class="list-group-item autocomplete-li"
+        ng-click="setBoundModel(item)"
+        ng-class="{'selected': isSelected($index), 'text-only': !withImage}">
+        <div ng-if="withImage"
+             ng-style="{{item.pictureId | userBackgroundThumb}}"
+             class="autocomplete-image">
+        </div>
+        <span ng-bind-html="getShownText(item) | boldifySuggestion : query"></span>
+    </li>
+</ul>

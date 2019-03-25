@@ -1,0 +1,5 @@
+<wave-spinner ng-if="vm.isLoading"></wave-spinner>
+<div ng-if="!vm.isLoading" class="kudos-pie-chart">
+    <h3 class="text-center" ng-if="vm.kudosChartData.data.length === 0" translate="kudos.noDataMessage"></h3>
+    <canvas id="pie" class="chart chart-pie" chart-data="vm.kudosChartData.data" chart-labels="vm.kudosChartData.labels"></canvas>
+</div>
