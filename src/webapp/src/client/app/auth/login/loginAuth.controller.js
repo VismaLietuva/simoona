@@ -22,6 +22,7 @@
         var vm = this;
         var hashArray = authService.getHashArrayFromUrl();
         var access_token = hashArray['access_token'];
+        var redirect = $location.search().redirect; 
 
         vm.organizationName = authService.getOrganizationNameFromUrl() || '';
         vm.endPoint = endPoint;
@@ -95,12 +96,18 @@
                 authService.getUserInfo(access_token).then(function(response) {
                     if (response.hasRegistered) {
                         authService.setAuthenticationData(response, access_token);
+                        if (redirect){
+                            $window.location.href = redirect;
+                        }
                         authService.redirectToHome();
                     } else {
                         registerExternal(response);
                     }
                 });
             } else if (authService.identity.isAuthenticated){
+                if (redirect){
+                    $window.location.href = redirect;
+                }
                 authService.redirectToHome();
             }
         }
@@ -206,8 +213,8 @@
                 returnUrl += ':' + $location.port();
             }
 
-            returnUrl += '/' + vm.organizationName + '/Login';
-
+            returnUrl += '/' + vm.organizationName + '/Login';        
+            if (redirect) returnUrl += '?redirect=' + redirect;
             return returnUrl;
         }
     }
