@@ -127,6 +127,9 @@
                 "description": "Storage SKU (Account type)"
             }
         },
+        "storageAccountContainerName": {
+            "type": "string"
+        },
         "webAppPlanName": {
             "type": "string",
             "defaultValue": "simoona-app"
@@ -173,33 +176,9 @@
                 10
             ]
         },
-        "defaultEmailLink": {
-            "type": "string"
-        },
-        "defaultGoogleCalendarId": {
-            "type": "string"
-        },
-        "emailEnabled": {
-            "type": "bool"
-        },
-        "eventRecurrenceJobsEnabled": {
-            "type": "bool"
-        },
-        "isProductionBuild": {
-            "type": "bool"
-        },
-        "oAuthRedirectUri": {
-            "type": "string"
-        },
         "websiteLoadCertificates": {
             "type": "string",
             "defaultValue": "*"
-        },
-        "vismaConnectionString": {
-            "type": "string"
-        },
-        "backgroundJobsConnectionString": {
-            "type": "string"
         }
     },
     "resources": [{
@@ -304,14 +283,27 @@
             "resources": []
         },
         {
-            "apiVersion": "2017-10-01",
+            "apiVersion": "2018-11-01",
             "type": "Microsoft.Storage/storageAccounts",
             "name": "[parameters('storageAccountName')]",
             "location": "[resourceGroup().location]",
             "sku": {
                 "name": "[parameters('storageSkuName')]"
             },
-            "kind": "Storage"        
+            "kind": "Storage",
+            "resources": [
+                {
+                    "name": "[concat('default/', parameters('storageAccountContainerName'))]",
+                    "type": "blobServices/containers",
+                    "apiVersion": "2018-11-01",
+                    "properties": {
+                      "publicAccess": "Blob"
+                    },
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+                    ]
+                }
+            ]    
         },
         {
             "apiVersion": "2016-09-01",
@@ -361,48 +353,8 @@
                     ],
                     "appSettings": [
                         {
-                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                            "value": "[reference(resourceId('Microsoft.Insights/components', parameters('applicationInsightsName')), '2014-04-01').InstrumentationKey]"
-                        },
-                        {
-                          "name": "DefaultEmailLink",
-                          "value": "[parameters('defaultEmailLink')]"
-                        },
-                        {
-                            "name": "DefaultGoogleCalendarId",
-                            "value": "[parameters('defaultGoogleCalendarId')]"
-                        },
-                        {
-                            "name": "EmailEnabled",
-                            "value": "[parameters('emailEnabled')]"
-                        },
-                        {
-                            "name": "EventRecurrenceJobsEnabled",
-                            "value": "[parameters('eventRecurrenceJobsEnabled')]"
-                        },
-                        {
-                            "name": "IsProductionBuild",
-                            "value": "[parameters('isProductionBuild')]"
-                        },
-                        {
-                            "name": "OAuthRedirectUri",
-                            "value": "[parameters('oAuthRedirectUri')]"
-                        },
-                        {
                             "name": "WEBSITE_LOAD_CERTIFICATES",
                             "value": "[parameters('websiteLoadCertificates')]"
-                        }
-                    ],
-                    "connectionStrings": [
-                        {
-                            "name": "Visma",
-                            "connectionString": "[parameters('vismaConnectionString')]",
-                            "type": "SQLAzure"
-                        },
-                        {
-                          "name": "BackgroundJobs",
-                          "connectionString": "[parameters('backgroundJobsConnectionString')]",
-                          "type": "SQLAzure"
                         }
                     ]
                 }

@@ -44,6 +44,9 @@
         "storageSkuName": {
             "value": "Standard_RAGRS"
         },
+        "storageAccountContainerName": {
+            "value": "test"
+        },
         "webAppPlanName": {
             "value": "simoona-staging"
         },
@@ -56,32 +59,8 @@
         "skuCapacity": {
             "value": 1
         },
-        "defaultEmailLink": {
-            "value": ""
-        },
-        "defaultGoogleCalendarId": {
-            "value": ""
-        },
-        "emailEnabled": {
-            "value": true
-        },
-        "eventRecurrenceJobsEnabled": {
-            "value": true
-        },
-        "isProductionBuild": {
-            "value": true
-        },
-        "oAuthRedirectUri": {
-            "value": ""
-        },
         "websiteLoadCertificates": {
             "value": "*"
-        },
-        "vismaConnectionString": {
-            "value": ""
-        },
-        "backgroundJobsConnectionString": {
-            "value": ""
         }
     }
 }
