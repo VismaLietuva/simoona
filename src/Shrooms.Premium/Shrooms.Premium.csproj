@@ -342,7 +342,7 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-    <Content Include="Web.release.config" />
+    <Content Include="Web.Staging.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\open-source\src\api\Infrastructure\Shrooms.Authentification\Shrooms.Authentification.csproj">
