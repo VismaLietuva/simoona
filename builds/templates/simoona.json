@@ -179,6 +179,15 @@
         "websiteLoadCertificates": {
             "type": "string",
             "defaultValue": "*"
+        },
+        "connectionStrings": {
+            "type": "array",
+            "defaultValue": [
+                {
+                    "name": "",
+                    "connectionString": ""
+                }
+            ]
         }
     },
     "resources": [{
@@ -355,6 +364,17 @@
                         {
                             "name": "WEBSITE_LOAD_CERTIFICATES",
                             "value": "[parameters('websiteLoadCertificates')]"
+                        }
+                    ],
+                    "copy": [
+                        {
+                            "name": "connectionStrings",
+                            "count": "[length(parameters('connectionStrings'))]",
+                            "input": {
+                                "name": "[parameters('connectionStrings')[copyIndex('connectionStrings')].name]",
+                                "connectionString": "[parameters('connectionStrings')[copyIndex('connectionStrings')].connectionString]",
+                                "type": "SQLAzure"
+                            }
                         }
                     ]
                 }
