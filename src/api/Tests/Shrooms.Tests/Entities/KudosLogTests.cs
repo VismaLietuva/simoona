@@ -11,16 +11,14 @@ namespace Shrooms.UnitTests.Entities
         private readonly string _userId = Guid.NewGuid().ToString();
 
         [Test]
-        [ExpectedException(typeof(ValidationException))]
         public void Approve_UserIsEmpty()
         {
             var log = new KudosLog();
 
-            log.Approve(string.Empty);
+            Assert.Throws<ValidationException>(() => log.Approve(string.Empty));
         }
 
         [Test]
-        [ExpectedException(typeof(ValidationException))]
         public void Approve_SenderCannotApproveKudos()
         {
             var log = new KudosLog
@@ -28,11 +26,10 @@ namespace Shrooms.UnitTests.Entities
                 CreatedBy = Guid.NewGuid().ToString()
             };
 
-            log.Approve(_userId);
+            Assert.Throws<ValidationException>(() => log.Approve(_userId));
         }
 
         [Test]
-        [ExpectedException(typeof(ValidationException))]
         public void Approve_SenderCannotSendKudosToSelf()
         {
             var log = new KudosLog
@@ -40,11 +37,10 @@ namespace Shrooms.UnitTests.Entities
                 EmployeeId = _userId
             };
 
-            log.Approve(_userId);
+            Assert.Throws<ValidationException>(() => log.Approve(_userId));
         }
 
         [Test]
-        [ExpectedException(typeof(ValidationException))]
         public void Approve_LogAlreadyProcessed()
         {
             var log = new KudosLog
@@ -52,7 +48,7 @@ namespace Shrooms.UnitTests.Entities
                 Status = KudosStatus.Rejected
             };
 
-            log.Approve(_userId);
+            Assert.Throws<ValidationException>(() => log.Approve(_userId));
         }
 
         [Test]
@@ -84,25 +80,22 @@ namespace Shrooms.UnitTests.Entities
         }
 
         [Test]
-        [ExpectedException(typeof(ValidationException))]
         public void Reject_UserIsEmpty()
         {
             var log = new KudosLog();
 
-            log.Reject(string.Empty, "not_empty");
+            Assert.Throws<ValidationException>(() => log.Reject(string.Empty, "not_empty"));
         }
 
         [Test]
-        [ExpectedException(typeof(ValidationException))]
         public void Reject_ReasonMessageIsEmpty()
         {
             var log = new KudosLog();
 
-            log.Reject(_userId, string.Empty);
+            Assert.Throws<ValidationException>(() => log.Reject(_userId, string.Empty));
         }
 
         [Test]
-        [ExpectedException(typeof(ValidationException))]
         public void Reject_LogAlreadyProcessed()
         {
             var log = new KudosLog
@@ -110,7 +103,7 @@ namespace Shrooms.UnitTests.Entities
                 Status = KudosStatus.Approved
             };
 
-            log.Reject(_userId, "reason");
+            Assert.Throws<ValidationException>(() => log.Reject(_userId, "reason"));
         }
 
         [Test]

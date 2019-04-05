@@ -86,7 +86,7 @@ namespace Shrooms.UnitTests.DomainService
 
             // Act, Assert
             var result = _usersDbSet.First();
-            var ex = Assert.Throws<ValidationException>(async () => await _userService.ChangeUserLocalizationSettings(changeSettingsDto));
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _userService.ChangeUserLocalizationSettings(changeSettingsDto));
             Assert.AreEqual(ErrorCodes.CultureUnsupported, ex.ErrorCode);
             Assert.AreEqual("en-US", result.CultureCode);
             Assert.AreEqual("FLE Standard Time", result.TimeZone);
@@ -106,7 +106,7 @@ namespace Shrooms.UnitTests.DomainService
 
             // Act, Assert
             var result = _usersDbSet.First();
-            var ex = Assert.Throws<ValidationException>(async () => await _userService.ChangeUserLocalizationSettings(changeSettingsDto));
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _userService.ChangeUserLocalizationSettings(changeSettingsDto));
             Assert.AreEqual(ErrorCodes.TimezoneUnsupported, ex.ErrorCode);
             Assert.AreEqual("en-US", result.CultureCode);
             Assert.AreEqual("FLE Standard Time", result.TimeZone);

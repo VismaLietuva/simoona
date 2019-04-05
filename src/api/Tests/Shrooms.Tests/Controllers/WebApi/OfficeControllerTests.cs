@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Hosting;
@@ -61,7 +62,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         }
 
         [Test]
-        public async void Office_Get_Returns_Correct_Office()
+        public async Task Office_Get_Returns_Correct_Office()
         {
             var result = _officeController.Get(1);
             var model = await result.Content.ReadAsAsync<OfficeViewModel>();

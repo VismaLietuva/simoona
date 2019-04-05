@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Hosting;
@@ -36,7 +37,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         }
 
         [Test]
-        public async void QualificationLevel_Get_Should_Return_Correct_Id()
+        public async Task QualificationLevel_Get_Should_Return_Correct_Id()
         {
             var result = _qualificationLevelController.Get(1);
             var model = await result.Content.ReadAsAsync<QualificationLevelViewModel>();

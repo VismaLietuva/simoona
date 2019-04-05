@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Hosting;
@@ -42,7 +43,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         }
 
         [Test]
-        public async void Floor_Get_Should_Return_View_Model()
+        public async Task Floor_Get_Should_Return_View_Model()
         {
             var result = _floorController.Get(1);
             var floor = await result.Content.ReadAsAsync<FloorViewModel>();
@@ -51,7 +52,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         }
 
         [Test]
-        public async void Floor_Get_Should_Return_Correct_Floor()
+        public async Task Floor_Get_Should_Return_Correct_Floor()
         {
             int id = 1;
 

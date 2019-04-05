@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Http;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Hosting;
@@ -38,7 +39,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         }
 
         [Test]
-        public async void RoomType_Get_Should_Return_Correct_Id()
+        public async Task RoomType_Get_Should_Return_Correct_Id()
         {
             var result = _roomController.Get(1);
             var model = await result.Content.ReadAsAsync<RoomTypeViewModel>();
@@ -47,7 +48,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         }
 
         [Test]
-        public async void RoomType_Get_Should_Return_MeetingRoomTypeViewModel()
+        public async Task RoomType_Get_Should_Return_MeetingRoomTypeViewModel()
         {
             var result = _roomController.Get(2);
             var model = await result.Content.ReadAsAsync<RoomTypeViewModel>();
@@ -134,7 +135,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         }
 
         [Test]
-        public async void RoomType_Update_Should_Return_Updated_Room_If_Successfully_Updated()
+        public async Task RoomType_Update_Should_Return_Updated_Room_If_Successfully_Updated()
         {
             var result = _roomController.Get(2);
             var model = await result.Content.ReadAsAsync<RoomTypeViewModel>();

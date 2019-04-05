@@ -37,7 +37,7 @@ namespace Shrooms.UnitTests.DomainService
             var result = _pictureService.UploadFromStream(null, null, "test.jpg", 2).Result;
 
             // Assert
-            Assert.That(result, Is.StringEnding(".jpg"));
+            Assert.That(result, Does.EndWith(".jpg"));
         }
 
         [Test]
@@ -50,7 +50,7 @@ namespace Shrooms.UnitTests.DomainService
             var result = _pictureService.UploadFromStream(null, null, "test.png", 2).Result;
 
             // Assert
-            Assert.That(result, Is.StringEnding(".png"));
+            Assert.That(result, Does.EndWith(".png"));
         }
 
         [Test]
@@ -63,7 +63,7 @@ namespace Shrooms.UnitTests.DomainService
             var result = _pictureService.UploadFromStream(null, null, "test.gif", 2).Result;
 
             // Assert
-            Assert.That(result, Is.StringEnding(".gif"));
+            Assert.That(result, Does.EndWith(".gif"));
         }
     }
 }

@@ -56,7 +56,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         }
 
         [Test]
-        public async void Room_Get_Should_Return_Correct_View_Model()
+        public async Task Room_Get_Should_Return_Correct_View_Model()
         {
             var result = _roomController.Get(1);
             var room = await result.Content.ReadAsAsync<RoomViewModel>();
@@ -65,7 +65,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         }
 
         [Test]
-        public async void Room_Get_Should_Return_Correct_Id()
+        public async Task Room_Get_Should_Return_Correct_Id()
         {
             var result = _roomController.Get(1);
             var model = await result.Content.ReadAsAsync<RoomViewModel>();

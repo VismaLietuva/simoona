@@ -16,7 +16,6 @@ using Shrooms.Domain.Services.Wall;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Multiwall;
-using Shrooms.ModelMappings;
 using Shrooms.UnitTests.Extensions;
 using Shrooms.UnitTests.ModelMappings;
 
@@ -235,7 +234,7 @@ namespace Shrooms.UnitTests.DomainService
             };
 
             // Act, Assert
-            var ex = Assert.Throws<ValidationException>(async () => await _wallService.CreateNewWall(newWallDto));
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _wallService.CreateNewWall(newWallDto));
             Assert.AreEqual(ErrorCodes.WallNameAlreadyExists, ex.ErrorCode);
         }
 
@@ -270,7 +269,6 @@ namespace Shrooms.UnitTests.DomainService
         }
 
         [Test]
-        [ExpectedException(typeof(ValidationException))]
         public void User_Can_Not_Follow_Different_Tenant_Wall()
         {
             MockWallsForJoinLeave();
@@ -278,11 +276,10 @@ namespace Shrooms.UnitTests.DomainService
             var tenantId = 2;
             var userId = "user2";
 
-            _wallService.JoinLeaveWall(2, userId, userId, tenantId, false);
+            Assert.Throws<ValidationException>(() => _wallService.JoinLeaveWall(2, userId, userId, tenantId, false));
         }
 
         [Test]
-        [ExpectedException(typeof(ValidationException))]
         public void User_Can_Not_Leave_Main_Wall()
         {
             MockWallsForJoinLeave();
@@ -290,7 +287,7 @@ namespace Shrooms.UnitTests.DomainService
             var tenantId = 2;
             var userId = "user1";
 
-            _wallService.JoinLeaveWall(1, userId, userId, tenantId, false);
+            Assert.Throws<ValidationException>(() => _wallService.JoinLeaveWall(1, userId, userId, tenantId, false));
         }
 
         [Test]
@@ -623,7 +620,6 @@ namespace Shrooms.UnitTests.DomainService
         }
 
         [Test]
-        [ExpectedException(typeof(ValidationException))]
         public void Should_Throw_When_Deleting_Wall_With_Type_Other_Than_User_Created()
         {
             MockWallsForDelete();
@@ -634,11 +630,10 @@ namespace Shrooms.UnitTests.DomainService
                 UserId = "userId"
             };
 
-            _wallService.DeleteWall(1, userOrg, WallType.Events);
+            Assert.Throws<ValidationException>(() => _wallService.DeleteWall(1, userOrg, WallType.Events));
         }
 
         [Test]
-        [ExpectedException(typeof(ValidationException))]
         public void Should_Throw_When_Deleting_Wall_With_Type_Other_Than_Event()
         {
             MockWallsForDelete();
@@ -649,11 +644,10 @@ namespace Shrooms.UnitTests.DomainService
                 UserId = "userId"
             };
 
-            _wallService.DeleteWall(1, userOrg, WallType.UserCreated);
+            Assert.Throws<ValidationException>(() => _wallService.DeleteWall(1, userOrg, WallType.UserCreated));
         }
 
         [Test]
-        [ExpectedException(typeof(UnauthorizedException))]
         public void Should_Throw_When_User_Is_Not_Admin_Nor_Moderator()
         {
             MockWallsForDelete();
@@ -666,7 +660,7 @@ namespace Shrooms.UnitTests.DomainService
 
             _permissionService.UserHasPermission(userOrg, AdministrationPermissions.Wall).Returns(false);
 
-            _wallService.DeleteWall(2, userOrg, WallType.UserCreated);
+            Assert.Throws<UnauthorizedException>(() => _wallService.DeleteWall(2, userOrg, WallType.UserCreated));
         }
 
         private static void MockRoleService(IRoleService roleService)

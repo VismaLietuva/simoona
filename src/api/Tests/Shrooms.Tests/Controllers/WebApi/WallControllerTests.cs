@@ -47,7 +47,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         }
 
         [Test]
-        public async void Wall_GetWall_List_Should_Return_View_Model()
+        public async Task Wall_GetWall_List_Should_Return_View_Model()
         {
             IEnumerable<WallDto> walls = new List<WallDto>
             {
@@ -73,7 +73,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         }
 
         [Test]
-        public async void Wall_GetWall_Should_Return_Bad_Request()
+        public async Task Wall_GetWall_Should_Return_Bad_Request()
         {
             var wallId = -1;
 
@@ -83,7 +83,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         }
 
         [Test]
-        public async void Wall_GetWall_Should_Return_View_Model()
+        public async Task Wall_GetWall_Should_Return_View_Model()
         {
             var wallId = 1;
             var wall = new WallDto
@@ -125,7 +125,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         }
 
         [Test]
-        public async void Wall_GetWallMembers_Should_Return_View_Model()
+        public async Task Wall_GetWallMembers_Should_Return_View_Model()
         {
             var wallId = 0;
             IEnumerable<WallMemberDto> members = new List<WallMemberDto>
@@ -148,7 +148,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         }
 
         [Test]
-        public async void Wall_GetPagedWall_Should_Return_Bad_Request()
+        public async Task Wall_GetPagedWall_Should_Return_Bad_Request()
         {
             var wallId = 0;
             var page = 1;
@@ -159,7 +159,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         }
 
         [Test]
-        public async void Wall_GetPagedWall_Should_Return_View_Model()
+        public async Task Wall_GetPagedWall_Should_Return_View_Model()
         {
             var wallId = 1;
             var page = 1;
@@ -184,7 +184,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         }
 
         [Test]
-        public async void Wall_GetPagedWall_Should_Return_Ok()
+        public async Task Wall_GetPagedWall_Should_Return_Ok()
         {
             var page = 1;
 
@@ -194,7 +194,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         }
 
         [Test]
-        public async void Wall_SearchWall_Should_Return_Bad_Request_If_ModelState_Invalid()
+        public async Task Wall_SearchWall_Should_Return_Bad_Request_If_ModelState_Invalid()
         {
             var page = 1;
             var searchString = "testing";
@@ -206,7 +206,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         }
 
         [Test]
-        public async void Wall_SearchWall_Should_Return_Ok()
+        public async Task Wall_SearchWall_Should_Return_Ok()
         {
             var searchString = "test";
             var page = 1;
@@ -217,7 +217,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         }
 
         [Test]
-        public async void Wall_CreateWall_Should_Return_Invalid_Model_State()
+        public async Task Wall_CreateWall_Should_Return_Invalid_Model_State()
         {
             var wall = new CreateWallViewModel
             {
@@ -231,7 +231,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         }
 
         [Test]
-        public async void Wall_EditWall_Should_Return_Invalid_Model_State()
+        public async Task Wall_EditWall_Should_Return_Invalid_Model_State()
         {
             var wall = new UpdateWallViewModel
             {

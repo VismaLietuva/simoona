@@ -62,7 +62,7 @@ namespace Shrooms.UnitTests.DomainService
         }
 
         [Test]
-        public async void Should_Return_Correctly_Mapped_Book_Info_By_Isbn()
+        public async Task Should_Return_Correctly_Mapped_Book_Info_By_Isbn()
         {
             MockBookRetrieval();
             var expected = new RetrievedBookInfoDTO

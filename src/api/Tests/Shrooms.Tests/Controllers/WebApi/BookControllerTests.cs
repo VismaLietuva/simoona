@@ -313,7 +313,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         }
 
         [Test]
-        public async void Book_FindByIsbn_Should_Return_Bad_Request()
+        public async Task Book_FindByIsbn_Should_Return_Bad_Request()
         {
             string isbn = null;
 
@@ -323,7 +323,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         }
 
         [Test]
-        public async void Book_FindByIsbn_Should_Return_Ok()
+        public async Task Book_FindByIsbn_Should_Return_Ok()
         {
             var isbn = "test";
 
@@ -333,7 +333,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         }
 
         [Test]
-        public async void Book_FindByIsbn_Should_Return_Bad_Request_If_Exception()
+        public async Task Book_FindByIsbn_Should_Return_Bad_Request_If_Exception()
         {
             var isbn = "test";
             var exception = "test";
