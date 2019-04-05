@@ -65,8 +65,8 @@ namespace Shrooms.UnitTests.DomainService
                 var excelRows = excelData.Tables[0].Rows;
                 var excelColumns = excelData.Tables[0].Columns;
 
-                Assert.AreEqual("Sender", excelColumns[0].ColumnName);
-                Assert.AreEqual("Receiver", excelColumns[1].ColumnName);
+                Assert.AreEqual(Resources.Models.Kudos.Kudos.ExportColumnSender, excelColumns[0].ColumnName);
+                Assert.AreEqual(Resources.Models.Kudos.Kudos.ExportColumnReceiver, excelColumns[1].ColumnName);
                 Assert.AreEqual("name surname", excelRows[0].ItemArray[0]);
                 Assert.AreEqual("name surname", excelRows[0].ItemArray[1]);
                 Assert.AreEqual("name2 surname2", excelRows[1].ItemArray[0]);
