@@ -160,9 +160,10 @@ namespace Shrooms.Domain.Services.Kudos
                 .OrderBy(string.Concat(options.SortBy, " ", options.SortOrder));
 
             var logsTotalCount = kudosLogsQuery.Count();
+            int entriesCountToSkip = EntriesCountToSkip(options.Page);
             var kudosLogs = kudosLogsQuery
-                .Skip(EntriesCountToSkip(options.Page))
-                .Take(ConstBusinessLayer.MaxKudosLogsPerPage)
+                .Skip(() => entriesCountToSkip)
+                .Take(() => ConstBusinessLayer.MaxKudosLogsPerPage)
                 .ToList();
 
             foreach (var kudosLog in kudosLogs)
@@ -192,10 +193,12 @@ namespace Shrooms.Domain.Services.Kudos
                 .Select(MapUserKudosLogsToDto());
 
             var logCount = userLogsQuery.Count();
+            int entreisCountToSkip = EntriesCountToSkip(page);
             var userLogs = userLogsQuery
-                .Skip(EntriesCountToSkip(page))
-                .Take(ConstBusinessLayer.MaxKudosLogsPerPage)
+                .Skip(() => entreisCountToSkip)
+                .Take(() => ConstBusinessLayer.MaxKudosLogsPerPage)
                 .ToList();
+
             SetKudosSendersName(userLogs.Select(log => log.Sender));
 
             foreach (var userLog in userLogs)
@@ -223,7 +226,7 @@ namespace Shrooms.Domain.Services.Kudos
                     log.OrganizationId == userAndOrg.OrganizationId)
                 .OrderByDescending(log => log.Created)
                 .Select(MapKudosLogToWallKudosLogDTO())
-                .Take(ConstBusinessLayer.WallKudosLogCount)
+                .Take(() => ConstBusinessLayer.WallKudosLogCount)
                 .ToList();
 
             SetKudosSendersName(approvedKudos.Select(log => log.Sender));
@@ -467,7 +470,7 @@ namespace Shrooms.Domain.Services.Kudos
                     KudosAmount = log.Sum(s => s.Points)
                 })
                 .OrderByDescending(log => log.KudosAmount)
-                .Take(amount)
+                .Take(() => amount)
                 .ToList();
 
             var userIds = kudosLogsStats.Select(s => s.Name).ToArray();

@@ -130,7 +130,7 @@ namespace Shrooms.Domain.Services.Notifications
                             .Where(w => !w.IsAlreadySeen && w.UserId == userOrg.UserId)
                             .Select(s => s.Notification)
                             .OrderByDescending(o => o.Created)
-                            .Take(BusinessConstants.MaxNotificationsToShow)
+                            .Take(() => BusinessConstants.MaxNotificationsToShow)
                             .ToListAsync();
 
             return _mapper.Map<IEnumerable<NotificationDto>>(result);

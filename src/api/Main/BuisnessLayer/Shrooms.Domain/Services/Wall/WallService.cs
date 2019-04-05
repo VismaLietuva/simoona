@@ -600,14 +600,15 @@ namespace Shrooms.Domain.Services.Wall
                 (await GetWallsList(userOrg, WallsListFilter.Followed))
                     .Select(w => w.Id).ToList();
 
+            int entriesCountToSkip = (pageNumber - 1) * pageSize;
             var posts = await _postsDbSet
                 .Include(post => post.Wall)
                 .Include(post => post.Comments)
                 .Where(post => wallsIds.Contains(post.WallId))
                 .Where(filter)
                 .OrderByDescending(x => x.LastActivity)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
+                .Skip(() => entriesCountToSkip)
+                .Take(() => pageSize)
                 .ToListAsync();
 
             IEnumerable<WallModerator> moderators = await _moderatorsDbSet.Where(x => wallsIds.Contains(x.WallId)).ToListAsync();

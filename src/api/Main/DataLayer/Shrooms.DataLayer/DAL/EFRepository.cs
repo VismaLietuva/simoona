@@ -44,7 +44,7 @@ namespace Shrooms.DataLayer
 
             if (maxResults > 0)
             {
-                queryableSet = queryableSet.Take(maxResults);
+                queryableSet = queryableSet.Take(() => maxResults);
             }
 
             if (!string.IsNullOrWhiteSpace(includeProperties))
@@ -80,7 +80,7 @@ namespace Shrooms.DataLayer
 
             if (maxResults > 0)
             {
-                queryableSet = queryableSet.Take(maxResults);
+                queryableSet = queryableSet.Take(() => maxResults);
             }
 
             if (!string.IsNullOrWhiteSpace(includeProperties))

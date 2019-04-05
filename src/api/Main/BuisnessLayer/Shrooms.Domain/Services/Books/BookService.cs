@@ -74,9 +74,10 @@ namespace Shrooms.Domain.Services.Books
                 .Select(MapBooksWithReadersToDto(options.UserId));
 
             var totalBooksCount = allBooks.Count();
+            int entriesCountToSkip = EntriesCountToSkip(options.Page);
             var books = allBooks
-                .Skip(EntriesCountToSkip(options.Page))
-                .Take(ConstBusinessLayer.BooksPerPage)
+                .Skip(() => entriesCountToSkip)
+                .Take(() => ConstBusinessLayer.BooksPerPage)
                 .ToList();
 
             var pageDto = new LazyPaged<BooksByOfficeDTO>(books, options.Page, ConstBusinessLayer.BooksPerPage, totalBooksCount);
@@ -373,7 +374,7 @@ namespace Shrooms.Domain.Services.Books
                 Url = x.Book.Url,
                 Isbn = x.Book.Code,
                 Title = x.Book.Title,
-                CanBeTaken = BookQuantityZero < (x.Quantity - x.BookLogs.Count(v => v.Returned == null)),
+                CanBeTaken = (x.Quantity - x.BookLogs.Count(v => v.Returned == null)) > BookQuantityZero,
                 OwnerId = x.Book.ApplicationUserId,
                 OwnerFullName = (x.Book.ApplicationUserId != null) ? x.Book.ApplicationUser.FirstName + " " + x.Book.ApplicationUser.LastName : null,
                 Note = x.Book.Note,
