@@ -1,6 +1,6 @@
 # Simoona
 
-![API Build Status](https://ci.appveyor.com/api/projects/status/waj5nco2jh1u37dx?svg=true&passingText=API%20-%20passing&pendingText=API%20-%20pending&failingText=API%20-%20failing) ![Front-end Build Status](https://ci.appveyor.com/api/projects/status/7x8uuw3t9i9g83b5?svg=true&passingText=Front-end%20-%20passing&pendingText=Front-end%20-%20pending&failingText=Front-end%20-%20failing)
+[![API Build Status](https://ci.appveyor.com/api/projects/status/waj5nco2jh1u37dx?svg=true&passingText=API%20-%20passing&pendingText=API%20-%20pending&failingText=API%20-%20failing)](https://ci.appveyor.com/project/Simoona/simoona) [![Front-end Build Status](https://ci.appveyor.com/api/projects/status/7x8uuw3t9i9g83b5?svg=true&passingText=Front-end%20-%20passing&pendingText=Front-end%20-%20pending&failingText=Front-end%20-%20failing)](https://ci.appveyor.com/project/Simoona/simoona-tc3c1)
 
 Simoona is smart and intuitive social intranet solution made for effective communication, empowerment, acknowledgement and social networking of your company employees.
 
