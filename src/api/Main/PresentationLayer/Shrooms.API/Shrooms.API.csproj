@@ -553,8 +553,6 @@
     <Content Include="EmailTemplates\Wall\NewComment.cshtml" />
     <Content Include="EmailTemplates\AdministrationUsers\UserResetPassword.cshtml" />
     <Content Include="EmailTemplates\AdministrationUsers\UserVerifyEmail.cshtml" />
-    <None Include="Properties\PublishProfiles\ShroomsAPI.pubxml" />
-    <None Include="Properties\PublishProfiles\testBook.pubxml" />
     <Content Include="Service References\Application Insights\ConnectedService.json" />
     <None Include="Shrooms.API.ruleset" />
   </ItemGroup>
