@@ -49,12 +49,12 @@ namespace Shrooms.API.Controllers.WebApi
         private readonly IUnitOfWork _unitOfWork;
         private readonly IRepository<Room> _roomRepository;
         private readonly IRepository<ApplicationUser> _applicationUserRepository;
-        private readonly IDbSet<Project> _projectDbSet;
+
         private readonly IRepository<QualificationLevel> _qualificationLevelRepository;
         private readonly IRepository<ApplicationRole> _rolesRepository;
         private readonly IRepository<Exam> _examsRepository;
         private readonly IRepository<Skill> _skillsRepository;
-        private readonly IImpersonateService _impesonateService;
+        private readonly IImpersonateService _impersonateService;
         private readonly IAdministrationUsersService _administrationUsersService;
         private readonly IPermissionService _permissionService;
         private readonly IUserService _userService;
@@ -70,7 +70,7 @@ namespace Shrooms.API.Controllers.WebApi
             IUnitOfWork2 uow,
             IUnitOfWork unitOfWork,
             ShroomsUserManager userManager,
-            IImpersonateService impesonateService,
+            IImpersonateService impersonateService,
             IAdministrationUsersService administrationUsersService,
             IPermissionService permissionService,
             IOrganizationService organizationService,
@@ -87,9 +87,8 @@ namespace Shrooms.API.Controllers.WebApi
             _examsRepository = _unitOfWork.GetRepository<Exam>();
             _skillsRepository = _unitOfWork.GetRepository<Skill>();
             _jobPositionsDbSet = uow.GetDbSet<JobPosition>();
-            _projectDbSet = uow.GetDbSet<Project>();
             _qualificationLevelRepository = _unitOfWork.GetRepository<QualificationLevel>();
-            _impesonateService = impesonateService;
+            _impersonateService = impersonateService;
             _administrationUsersService = administrationUsersService;
             _permissionService = permissionService;
             _organizationService = organizationService;
@@ -290,7 +289,7 @@ namespace Shrooms.API.Controllers.WebApi
 
             if (user == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, new string[]
+                return Request.CreateResponse(HttpStatusCode.NotFound, new[]
                     {
                         string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName)
                     });
@@ -353,7 +352,7 @@ namespace Shrooms.API.Controllers.WebApi
             var user = _applicationUserRepository.Get(e => e.Id == id, includeProperties: "Roles,ManagedUsers,Manager,Room,Room.RoomType,Room.Floor,Room.Floor.Office,RoomToConfirm,RoomToConfirm.RoomType,RoomToConfirm.Floor,RoomToConfirm.Floor.Office,Projects,Organization,Certificates,WorkingHours,Skills,QualificationLevel,Exams").FirstOrDefault();
             if (user == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, new string[]
+                return Request.CreateResponse(HttpStatusCode.NotFound, new[]
                     {
                         string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName)
                     });
@@ -381,7 +380,7 @@ namespace Shrooms.API.Controllers.WebApi
             var user = _applicationUserRepository.GetByID(id);
             if (user == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, new string[] { string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName) });
+                return Request.CreateResponse(HttpStatusCode.NotFound, new[] { string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName) });
             }
 
             var model = MapPersonalInfo(user);
@@ -401,7 +400,7 @@ namespace Shrooms.API.Controllers.WebApi
             var user = _applicationUserRepository.Get(u => u.Id == id, includeProperties: ConstWebApi.PropertiesForUserJobInfo).FirstOrDefault();
             if (user == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, new string[] { string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName) });
+                return Request.CreateResponse(HttpStatusCode.NotFound, new[] { string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName) });
             }
 
             var model = MapJobInfo(user);
@@ -433,7 +432,7 @@ namespace Shrooms.API.Controllers.WebApi
             var user = _applicationUserRepository.Get(u => u.Id == id, includeProperties: ConstWebApi.PropertiesForUserOfficeInfo).FirstOrDefault();
             if (user == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, new string[] { string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName) });
+                return Request.CreateResponse(HttpStatusCode.NotFound, new[] { string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName) });
             }
 
             var model = MapOfficeInfo(user);
@@ -452,7 +451,7 @@ namespace Shrooms.API.Controllers.WebApi
             var user = _applicationUserRepository.Get(u => u.Id == id).FirstOrDefault();
             if (user == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, new string[] { string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName) });
+                return Request.CreateResponse(HttpStatusCode.NotFound, new[] { string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName) });
             }
 
             var model = MapShroomsInfo(user);
@@ -803,7 +802,6 @@ namespace Shrooms.API.Controllers.WebApi
             s = s.ToLowerInvariant();
 
             var managerRole = _rolesRepository.Get().FirstOrDefault(role => role.Name == Roles.Manager);
-            var userForWhoThisListIs = _applicationUserRepository.GetByID(userId);
 
             if (ConstWebApi.OrganizationManagerUsername.Equals(User.Identity.Name, StringComparison.InvariantCultureIgnoreCase))
             {
@@ -858,7 +856,7 @@ namespace Shrooms.API.Controllers.WebApi
             {
                 if (!personalInfo.ShowBirthDay)
                 {
-                    personalInfo.ShowableBirthDay = personalInfo.BirthDay != null ? $"****-{personalInfo.BirthDay.Value.ToString("MM-dd")}" : "";
+                    personalInfo.ShowableBirthDay = personalInfo.BirthDay != null ? $"****-{personalInfo.BirthDay?.ToString("MM-dd")}" : "";
                     personalInfo.BirthDay = null;
                 }
             }

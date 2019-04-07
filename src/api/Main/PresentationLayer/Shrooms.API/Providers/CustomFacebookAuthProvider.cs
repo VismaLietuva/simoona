@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IdentityModel.Claims;
 using System.Linq;
-using System.Web;
 using Autofac;
 using Microsoft.Owin.Security.Facebook;
 using Newtonsoft.Json.Linq;
