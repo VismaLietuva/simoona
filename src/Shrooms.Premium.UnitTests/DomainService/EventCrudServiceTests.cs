@@ -288,7 +288,7 @@ namespace Shrooms.UnitTests.DomainService
                     "Type1"
                 }
             };
-            var ex = Assert.Throws<EventException>(async () => await _eventService.CreateEvent(newEvent));
+            var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
             Assert.That(ex.Message, Is.EqualTo(EventOptionsCantDuplicate));
         }
 
@@ -316,7 +316,7 @@ namespace Shrooms.UnitTests.DomainService
                     "Type2"
                 }
             };
-            var ex = Assert.Throws<EventException>(async () => await _eventService.CreateEvent(newEvent));
+            var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
             Assert.That(ex.Message, Is.EqualTo(EventResponsiblePersonDoesNotExistCode));
         }
 
@@ -345,7 +345,7 @@ namespace Shrooms.UnitTests.DomainService
                 }
             };
 
-            var ex = Assert.Throws<EventException>(async () => await _eventService.CreateEvent(newEvent));
+            var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
             Assert.That(ex.Message, Is.EqualTo(EventTypeDoesNotExistCode));
         }
 
@@ -375,7 +375,7 @@ namespace Shrooms.UnitTests.DomainService
                     "Type2"
                 }
             };
-            var ex = Assert.Throws<EventException>(async () => await _eventService.CreateEvent(newEvent));
+            var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
             Assert.That(ex.Message, Is.EqualTo(EventRegistrationDeadlineIsExpired));
         }
 
@@ -405,7 +405,7 @@ namespace Shrooms.UnitTests.DomainService
                     "Type2"
                 }
             };
-            var ex = Assert.Throws<EventException>(async () => await _eventService.CreateEvent(newEvent));
+            var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
             Assert.That(ex.Message, Is.EqualTo(EventRegistrationDeadlineGreaterThanStartDateCode));
         }
 
@@ -433,7 +433,7 @@ namespace Shrooms.UnitTests.DomainService
                     "Type2"
                 }
             };
-            var ex = Assert.Throws<EventException>(async () => await _eventService.CreateEvent(newEvent));
+            var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
             Assert.That(ex.Message, Is.EqualTo(EventStartDateGreaterThanEndDateCode));
         }
 
@@ -461,7 +461,7 @@ namespace Shrooms.UnitTests.DomainService
                     "Type2"
                 }
             };
-            var ex = Assert.Throws<EventException>(async () => await _eventService.CreateEvent(newEvent));
+            var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
             Assert.That(ex.Message, Is.EqualTo(EventNeedTohaveMaxChoiceCode));
         }
 

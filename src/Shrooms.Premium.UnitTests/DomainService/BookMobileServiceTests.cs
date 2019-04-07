@@ -128,7 +128,7 @@ namespace Shrooms.UnitTests.DomainService
         [Test]
         public void Should_Return_If_Validation_For_Not_Existing_Book_In_Google_API_Fails()
         {
-            Assert.Throws<BookException>(async () => await _bookService.GetBookForPostAsync("0", 1));
+            Assert.ThrowsAsync<BookException>(async () => await _bookService.GetBookForPostAsync("0", 1));
         }
 
         [Test]
