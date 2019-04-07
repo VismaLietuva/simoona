@@ -23,11 +23,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		stylecop.json = stylecop.json
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{92A8BDAB-06A0-495B-952E-64678D9756F2}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\packages.config = .nuget\packages.config
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shrooms.Authentification", "..\open-source\src\api\Infrastructure\Shrooms.Authentification\Shrooms.Authentification.csproj", "{DA661AA0-3313-4C2D-81A9-C1A2B74F7317}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shrooms.Infrastructure", "..\open-source\src\api\Infrastructure\Shrooms.Infrastructure\Shrooms.Infrastructure.csproj", "{D9C5606D-3855-44A0-BDB3-98D963D63FCF}"
@@ -513,8 +508,8 @@ Global
 		{BF77FA0D-51D3-4DB6-9ADE-D5AAD70E2625} = {F5595798-28B5-44CA-AFE8-679919396C33}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.Common.6.0.1304.0\lib\NET45;packages\EnterpriseLibrary.Logging.6.0.1304.0\lib\NET45
 		SolutionGuid = {4B7BEB0E-C314-4215-8F22-59E3B8655722}
+		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.Common.6.0.1304.0\lib\NET45;packages\EnterpriseLibrary.Logging.6.0.1304.0\lib\NET45
 	EndGlobalSection
 	GlobalSection(CodealikeProperties) = postSolution
 		SolutionGuid = 26bdd0af-3b1d-458d-a138-31fef424d65b
