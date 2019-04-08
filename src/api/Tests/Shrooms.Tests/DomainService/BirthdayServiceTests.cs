@@ -10,7 +10,7 @@ using Shrooms.Domain.Services.Roles;
 using Shrooms.EntityModels.Models;
 using Shrooms.UnitTests.Extensions;
 
-namespace Ace.Shrooms.Tests.DomainService
+namespace Shrooms.UnitTests.DomainService
 {
     public class BirthdayServiceTests
     {

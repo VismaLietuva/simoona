@@ -287,7 +287,7 @@
     <Compile Include="DomainService\KudosBasketServiceTests.cs" />
     <Compile Include="DomainService\KudosServiceTests.cs" />
     <Compile Include="DomainService\PostServiceTests.cs" />
-    <Compile Include="DomainService\ValidatorTests\WallValidatorTests.cs" />
+    <Compile Include="DomainService\WallValidatorTests.cs" />
     <Compile Include="DomainService\WallServiceTests.cs" />
     <Compile Include="Entities\KudosLogTests.cs" />
     <Compile Include="Extensions\MockingExtensions.cs" />
