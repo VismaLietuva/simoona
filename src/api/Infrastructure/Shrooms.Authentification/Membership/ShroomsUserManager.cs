@@ -72,15 +72,15 @@ namespace Shrooms.Authentification
             return identityRresult;
         }
 
-        public override Task<IdentityResult> AddLoginAsync(string userId, UserLoginInfo login)
+        public override async Task<IdentityResult> AddLoginAsync(string userId, UserLoginInfo login)
         {
-            var user = FindAsync(login).Result;
+            var user = await FindAsync(login);
             if (user == null)
             {
-                return base.AddLoginAsync(userId, login);
+                return await base.AddLoginAsync(userId, login);
             }
 
-            return Task.FromResult<IdentityResult>(null);
+            return null;
         }
     }
 }
