@@ -6,10 +6,10 @@ Simoona's front-end is built using [AngularJS](https://angularjs.org/) framework
 
 Gulp is used for automating and executing various commands. To use the command simply open command line inside `src/webapp/` folder and type `gulp <command name>`:
 
-1. `gulp serve-dev` - serves development environment and opens browser
+1. `gulp serve-dev`   - serves development environment and opens browser
 2. `gulp serve-build` - serves build environment
-3. `gulp build-dev` - builds everything
-4. `gulp build-prod` - builds and optimizes everything
+3. `gulp build-dev`   - builds everything
+4. `gulp build-prod`  - builds and optimizes everything
 
 For all the commands open `src/webapp/gulpfile.js` file.
 
