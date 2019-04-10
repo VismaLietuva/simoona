@@ -10,7 +10,7 @@ Simoona's back-end is built using ASP.NET with Entity Framework. Project's depen
 4. Wait for project to build.
 5. If database is set up and Web.config has correct connection string the project should start. To set up the database head over to [build](../../build) folder.
 
-## SMTP Client set-up
+## SMTP Client Setup
 
 Simoona uses email sending services to send its user various important and optional notifications. If you don't set up the mailing service users won't be able to receive these notifications, it's especially important to set it up if local sign-up/sign-in system is being used (by default it is), because the system uses email service to send information about verifying email addresses and resetting passwords. For development purposes the easiest way to set up SMTP Server is to use [MailTrap](https://mailtrap.io/). For sending emails to their destinations we recommend services like [SendGrid](https://sendgrid.com/).
 
@@ -82,7 +82,7 @@ If you don't use [ImageResizer](http://imageresizing.net/) Performance Edition p
     </system.webServer>
     ```
 
-### 2. Google and Facebook sign in
+### 2. Google and Facebook Sign-in
 
 Simoona supports sign in with Google and Facebook. To enable this feature follow these steps:
 
@@ -101,7 +101,7 @@ Simoona supports sign in with Google and Facebook. To enable this feature follow
   </appSettings>
   ```
 
-### 3. ImageResizer plugins
+### 3. ImageResizer Plugins
 
 Simoona can also leverage [ImageResizer Performance plugins](http://imageresizing.net/plugins/editions/performance) to make media delivery faster. If you wish to try these plugins in development environment or you have a license to use them follow these steps:
 
