@@ -1,6 +1,6 @@
 # Simoona
 
-[![Build status](https://ci.appveyor.com/api/projects/status/j5y450yftsvso2je?svg=true)](https://ci.appveyor.com/project/Simoona/simoona-ks9ka) [![Join the chat at https://gitter.im/simoona-oss2/community](https://badges.gitter.im/simoona-oss2/community.svg)](https://gitter.im/simoona-oss2/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build status](https://ci.appveyor.com/api/projects/status/j5y450yftsvso2je?svg=true)](https://ci.appveyor.com/project/Simoona/simoona-ks9ka) [![Join the chat at https://gitter.im/simoona-oss/community](https://badges.gitter.im/simoona-oss/community.svg)](https://gitter.im/simoona-oss/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Simoona is smart and intuitive social intranet solution made for effective communication, empowerment, acknowledgement and social networking of your company employees.
 Simoona encourages more interactions, more social activities, more fun. Focus on what's important and create the atmosphere of respect and acknowledgment.
