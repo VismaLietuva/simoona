@@ -98,3 +98,12 @@ creates the database for you using SQL scripts, inserts organization name and co
         * ASP.NET 4.7
         * ISAPI Extensions
         * ISAPI Filters
+        
+1. build.bat hangs on "Preparing to run build script..."
+
+    * Inspect your NuGet package sources. One way of doing that is by running "nuget sources" command
+    * Disable NuGet package sources that require authentication. Ideally, you should enable only nuget.org as a source
+    * Run build.bat as administrator
+    * Enable the disabled packages after installation is complete
+
+    
