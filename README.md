@@ -32,7 +32,7 @@ Due too tight coupling Premium features front-end part is located in open-source
 
 To enable Premium features:
 - Set `window.isPremium = true;` in front-end app
-- Compile Premium project and copy `Shrooms.Premium.dll` to `Extensions` folder of `Shrooms.API` (open-source project)
+- Compile Premium project and copy `Shrooms.Premium.dll` to `Extensions` folder of `$\open-source\src\api\Main\PresentationLayer\Shrooms.API\Extensions\` (open-source project)
 
 ## Development
 
