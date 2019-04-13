@@ -104,7 +104,7 @@ module.exports = class extends Generator {
         this.spawnCommandSync(
           (this.props.bypassExecPolicy ? 'powershell  -ExecutionPolicy Bypass ': 'powershell'),
           [
-            './hello.ps1', 
+            './build.ps1', 
             '-organization="' + this.props.organization + '"',
             '-email="' + this.props.email + '"',
             '-connectionString="' + this.props.connectionString + '"',
