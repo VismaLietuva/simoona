@@ -123,16 +123,17 @@
         }
 
         function getTokenFromUrl() {
-            var pathArray = $location.path().split('/Token/');
+            var urlParams = new URLSearchParams($location.search());
+            var token = urlParams.get('Token');
 
-            return pathArray[pathArray.length - 1];
+            return token;
         }
 
-        function getUserNameFromUrl(prefix) {
-            var pathArray = $location.path().split(prefix);
-            pathArray = pathArray[pathArray.length - 1].split('/Token/');
+        function getUserNameFromUrl() {
+            var urlParams = new URLSearchParams($location.search());
+            var userName = urlParams.get('UserName');
 
-            return pathArray[0];
+            return userName;
         }
 
         function setOrganizationName(name) {

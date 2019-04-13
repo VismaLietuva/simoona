@@ -101,13 +101,13 @@
             controllerAs: 'vm'
         })
         .state('Root.WithOrg.Reset', {
-            url: '/Reset/*userName/Token/*token',
+            url: '/Reset',
             templateUrl: 'app/auth/reset-password/reset-password.html',
             controller: 'resetPasswordController',
             controllerAs: 'vm'
         })
         .state('Root.WithOrg.Verify', {
-            url: '/Verify/*userName/Token/*token',
+            url: '/Verify',
             controller: 'verifyEmailController',
             controllerAs: 'vm'
         })
