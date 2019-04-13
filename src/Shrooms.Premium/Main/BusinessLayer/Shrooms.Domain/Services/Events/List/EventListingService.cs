@@ -49,10 +49,26 @@ namespace Shrooms.Domain.Services.Events.List
         {
             var events = _eventsDbSet
                 .Include(x => x.EventParticipants)
+                .Include(x => x.Office)
                 .Where(t =>
                     t.OrganizationId == userOrganization.OrganizationId &
                     t.EndDate > DateTime.UtcNow)
                 .Where(EventTypeFilter(typeId))
+                .Select(MapEventToListItemDto(userOrganization.UserId))
+                .OrderBy(e => e.StartDate)
+                .ToList();
+            return events;
+        }
+
+        public IEnumerable<EventListItemDTO> GetEventsByOffice(UserAndOrganizationDTO userOrganization, int? officeId = null)
+        {
+            var events = _eventsDbSet
+                .Include(x => x.EventParticipants)
+                .Include(x => x.Office)
+                .Where(t =>
+                    t.OrganizationId == userOrganization.OrganizationId &
+                    t.EndDate > DateTime.UtcNow)
+                .Where(EventOfficeFilter(officeId))
                 .Select(MapEventToListItemDto(userOrganization.UserId))
                 .OrderBy(e => e.StartDate)
                 .ToList();
@@ -64,6 +80,7 @@ namespace Shrooms.Domain.Services.Events.List
             var myEventFilter = EventFilters[options.Filter](options.UserId);
             var events = _eventsDbSet
                 .Include(x => x.EventParticipants)
+                .Include(x => x.Office)
                 .Where(t => t.OrganizationId == options.OrganizationId)
                 .Where(SearchFilter(options.SearchString))
                 .Where(myEventFilter)
@@ -105,6 +122,7 @@ namespace Shrooms.Domain.Services.Events.List
                 ImageName = e.ImageName,
                 MaxParticipants = e.MaxParticipants,
                 Name = e.Name,
+                Office = e.Office.Name,
                 Place = e.Place,
                 StartDate = e.StartDate,
                 EndDate = e.EndDate,
@@ -139,6 +157,16 @@ namespace Shrooms.Domain.Services.Events.List
             return x => x.EventTypeId == typeId;
         }
 
+        private static Expression<Func<Event, bool>> EventOfficeFilter(int? officeId)
+        {
+            if (officeId == null)
+            {
+                return x => true;
+            }
+
+            return x => x.OfficeId == officeId;
+        }
+
         private static Expression<Func<Event, bool>> SearchFilter(string searchString)
         {
             if (string.IsNullOrEmpty(searchString))
@@ -146,9 +174,7 @@ namespace Shrooms.Domain.Services.Events.List
                 return e => true;
             }
 
-            return e =>
-                e.Name.Contains(searchString) ||
-                e.Place.Contains(searchString);
+            return e => e.Name.Contains(searchString) || e.Place.Contains(searchString);
         }
     }
 }

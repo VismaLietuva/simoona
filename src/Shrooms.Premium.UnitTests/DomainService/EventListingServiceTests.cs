@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using Shrooms.EntityModels.Models;
 using static Shrooms.Constants.BusinessLayer.ConstBusinessLayer;
 using static Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes.ErrorCodes;
 
@@ -265,7 +266,8 @@ namespace Shrooms.UnitTests.DomainService
 
         private Guid[] MockEventsListTest()
         {
-            Guid[] guids = Enumerable.Repeat(0, 4).Select(x => Guid.NewGuid()).ToArray();
+            var guids = Enumerable.Repeat(0, 4).Select(x => Guid.NewGuid()).ToArray();
+
             var participant1 = new EventParticipant
             {
                 ApplicationUserId = "responsibleUserId",
@@ -301,6 +303,7 @@ namespace Shrooms.UnitTests.DomainService
                     EventTypeId = 1,
                     ResponsibleUserId = "responsibleUserId",
                     ImageName = "imageUrl",
+                    Office = new Office { Name = "office" },
                     Name = "Drinking event",
                     Place = "City",
                     MaxParticipants = 15,
@@ -317,6 +320,7 @@ namespace Shrooms.UnitTests.DomainService
                     EventTypeId = 2,
                     ResponsibleUserId = "responsibleUserId",
                     ImageName = "imageUrl",
+                    Office = new Office { Name = "office" },
                     Name = "Drinking event",
                     Place = "City",
                     MaxParticipants = 15,
@@ -333,6 +337,7 @@ namespace Shrooms.UnitTests.DomainService
                     EventTypeId = 3,
                     ResponsibleUserId = "responsibleUserId",
                     ImageName = "imageUrl",
+                    Office = new Office { Name = "office" },
                     Name = "Some event",
                     Place = "Some place",
                     MaxParticipants = 10,
@@ -349,6 +354,7 @@ namespace Shrooms.UnitTests.DomainService
                     EventTypeId = 3,
                     ResponsibleUserId = "responsibleUserId2",
                     ImageName = "imageUrl",
+                    Office = new Office { Name = "office" },
                     Name = "Some event",
                     Place = "Some place",
                     MaxParticipants = 10,

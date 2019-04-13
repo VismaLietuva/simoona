@@ -15,7 +15,10 @@ namespace Shrooms.ModelMappings.Profiles
         {
             CreateMap<ApplicationUser, OfficeUserDTO>()
                 .ForMember(dest => dest.JobTitle, opt => opt.MapFrom(u => u.JobPosition.Title));
+
             CreateMap<Room, OfficeRoomDTO>();
+
+            CreateMap<Office, OfficeDTO>();
         }
     }
 }

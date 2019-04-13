@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Shrooms.DataTransferObjects.Models.Events;
+using Shrooms.DataTransferObjects.Models.OfficeMap;
 using Shrooms.EntityModels.Models.Events;
 using Shrooms.WebViewModels.Models.Events;
 
@@ -16,6 +17,7 @@ namespace Shrooms.ModelMappings.Profiles
 
         private void CreateDtoToViewModelMappings()
         {
+            CreateMap<OfficeDTO, EventOfficeViewModel>();
             CreateMap<EventTypeDTO, EventTypeViewModel>();
             CreateMap<EventListItemDTO, EventListItemViewModel>();
             CreateMap<EventOptionDTO, EventOptionViewModel>();

@@ -1,25 +1,23 @@
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Linq.Expressions;
+using Shrooms.Constants.BusinessLayer;
+using Shrooms.DataLayer.DAL;
+using Shrooms.DataTransferObjects.Models;
+using Shrooms.EntityModels.Models;
+using Shrooms.Infrastructure.ExcelGenerator;
+
 namespace Shrooms.Domain.Services.ServiceRequests.Export
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Data.Entity;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using Shrooms.Constants.BusinessLayer;
-    using Shrooms.DataLayer.DAL;
-    using Shrooms.DataTransferObjects.Models;
-    using Shrooms.EntityModels.Models;
-    using Shrooms.Infrastructure.ExcelGenerator;
-
     public class ServiceRequestExportService : IServiceRequestExportService
     {
         private readonly IUnitOfWork2 _uow;
         private readonly IDbSet<ServiceRequest> _serviceRequestsDbSet;
         private readonly IExcelBuilder _excelBuilder;
 
-        public ServiceRequestExportService(
-            IUnitOfWork2 uow,
-            IExcelBuilder excelBuilder)
+        public ServiceRequestExportService(IUnitOfWork2 uow, IExcelBuilder excelBuilder)
         {
             _uow = uow;
             _serviceRequestsDbSet = _uow.GetDbSet<ServiceRequest>();
