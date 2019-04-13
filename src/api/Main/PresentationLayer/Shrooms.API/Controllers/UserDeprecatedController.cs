@@ -26,6 +26,7 @@ using Shrooms.DataTransferObjects.Models.Administration;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Administration;
 using Shrooms.Domain.Services.Impersonate;
+using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Projects;
@@ -64,6 +65,7 @@ namespace Shrooms.API.Controllers.WebApi
         private readonly ICustomCache<string, IEnumerable<string>> _permissionsCache;
         private readonly IDbSet<JobPosition> _jobPositionsDbSet;
         private readonly IProjectsService _projectService;
+        private readonly IKudosService _kudosService;
 
         public UserDeprecatedController(
             IMapper mapper,
@@ -77,7 +79,8 @@ namespace Shrooms.API.Controllers.WebApi
             IUserService userService,
             ICustomCache<string, IEnumerable<string>> permissionsCache,
             IRoleService roleService,
-            IProjectsService projectService)
+            IProjectsService projectService,
+            IKudosService kudosService)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -97,6 +100,7 @@ namespace Shrooms.API.Controllers.WebApi
             _userManager = userManager;
             _roleService = roleService;
             _projectService = projectService;
+            _kudosService = kudosService;
         }
 
         private bool HasPermission(UserAndOrganizationDTO userOrg, string permission)
@@ -113,8 +117,14 @@ namespace Shrooms.API.Controllers.WebApi
                 return BadRequest();
             }
 
-            _userService.Delete(id, GetUserAndOrganization());
+            bool canNotBeDeleted = _kudosService.HasPendingKudos(id);
 
+            if (canNotBeDeleted)
+            {
+                return Content(HttpStatusCode.MethodNotAllowed, "Employee has pending kudos");
+            }
+
+            _userService.Delete(id, GetUserAndOrganization());
             return Ok();
         }
 
@@ -244,7 +254,7 @@ namespace Shrooms.API.Controllers.WebApi
             return PagedViewModel(page, pageSize, administrationUsersDto);
         }
 
-        private PagedViewModel<T> PagedViewModel<T>(int page, int pageSize, IEnumerable<T> officeUsers) 
+        private PagedViewModel<T> PagedViewModel<T>(int page, int pageSize, IEnumerable<T> officeUsers)
             where T : class
         {
             var officeUserPagedViewModel = officeUsers.ToPagedList(page, pageSize);
