@@ -29,6 +29,19 @@ module.exports = class extends Generator {
           type    : 'confirm',
           name    : 'hasAgreed',
           message : 'Are you sure you want to drop databases related to Simoona?'
+        }, {
+          type: 'list',
+          name: 'bypassExecPolicy',
+          message: 'Select powershell build script ExecutionPolicy',
+          choices: [
+            {
+              name: 'Default',
+              value: false
+            }, {
+              name: 'Bypass',
+              value: true
+            },
+          ]
         }]).then((answers) => {
           this.props = answers;
         });
@@ -36,7 +49,10 @@ module.exports = class extends Generator {
 
       install() {
           if(this.props.hasAgreed) {
-            this.spawnCommandSync('powershell', ['./build.ps1', '-target="DropDatabases"']);
+            this.spawnCommandSync(
+              (this.props.bypassExecPolicy ?  'powershell  -ExecutionPolicy Bypass ' : 'powershell'), 
+              ['./build.ps1', '-target="DropDatabases"']
+            );
           }
       }
   };
