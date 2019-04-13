@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using System.Web;
 
 namespace Shrooms.Infrastructure.Configuration
 {
@@ -73,9 +73,9 @@ namespace Shrooms.Infrastructure.Configuration
 
         public string ServiceRequestUrl(string tenant, int id) => $"{ClientUrl}/{tenant}/ServiceRequests/List?Id={id}";
 
-        public string ResetPasswordUrl(string organization, string userName, string token) => $"{ClientUrl}/{organization}/Reset/{userName}/Token/{token}";
+        public string ResetPasswordUrl(string organization, string userName, string token) => $"{ClientUrl}/{organization}/Reset?UserName={HttpUtility.UrlEncode(userName)}&Token={HttpUtility.UrlEncode(token)}";
 
-        public string VerifyEmailUrl(string organization, string userName, string token) => $"{ClientUrl}/{organization}/Verify/{userName}/Token/{token}";
+        public string VerifyEmailUrl(string organization, string userName, string token) => $"{ClientUrl}/{organization}/Verify?UserName={HttpUtility.UrlEncode(userName)}&Token={HttpUtility.UrlEncode(token)}";
 
         public string ApiUrl => string.Format(ConfigurationManager.AppSettings["ApiUrl"]);
     }
