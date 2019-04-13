@@ -13,12 +13,18 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var fs = require('fs');
 
-
-var ssl_options = {
-  key: fs.readFileSync('./src/server/newkey.pem'),
-  cert: fs.readFileSync('./src/server/cert.pem')
-};
-var secureServer = https.createServer(ssl_options, app);
+var secureServer;
+try {
+  var ssl_options = {
+    key: fs.readFileSync('./src/server/newkey.pem'),
+    cert: fs.readFileSync('./src/server/cert.pem')
+  };
+  secureServer = https.createServer(ssl_options, app);
+  console.log('Creating server with SSL');
+} catch (error) {
+  secureServer = https.createServer(app);
+  console.log('Creating server without SSL');
+}
 
 var port = process.env.PORT || 7203;
 
