@@ -101,6 +101,10 @@
                 isOpenEventDeadlineDatePicker: false
             };
 
+            eventRepository.getEventOffices().then(function(response) {
+                vm.eventOffices = response;
+            });
+
             eventRepository.getEventTypes().then(function(response) {
                 vm.eventTypes = response;
             });
@@ -148,6 +152,7 @@
                 vm.event = {
                     name: '',
                     typeId: null,
+                    officeId: null,
                     startDate: moment().add(1, 'hours').local().startOf('minute').toDate(),
                     endDate: moment().add(3, 'hours').local().startOf('minute').toDate(),
                     recurrence: 0,
