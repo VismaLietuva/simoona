@@ -11,7 +11,8 @@
             'LocalStorageModule',
             'pascalprecht.translate',
             'simoonaApp.Constant',
-            'simoonaApp.Common.ConfirmationPopup'
+            'simoonaApp.Common.ConfirmationPopup',
+            'vkEmojiPicker'
         ])
         .config(config);
 

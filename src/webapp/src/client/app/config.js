@@ -13,7 +13,6 @@
         'bootstrapLightbox',
         'LocalStorageModule',
         'monospaced.elastic',
-        'ngSanitize',
         'SignalR',
         'pascalprecht.translate',
         'tmh.dynamicLocale',
@@ -25,6 +24,7 @@
         'simoonaApp.Auth',
         'feature-flags',
         'angularMoment',
+        'vkEmojiPicker',
         //Shrooms modules
         'simoonaApp.Certificate',
         'simoonaApp.Picture',
@@ -93,7 +93,7 @@
             'name': 'AnimatedGifs',
             'description': 'Used to set if back-end uses AnimatedGifs plugin'
         }]);
-   
+
         Analytics.pageView();
 
         $rootScope.$state = $state;
