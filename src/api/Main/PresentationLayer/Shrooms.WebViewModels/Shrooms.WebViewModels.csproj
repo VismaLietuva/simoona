@@ -184,6 +184,9 @@
     <Compile Include="Models\Wall\UserWallViewModel.cs" />
     <Compile Include="Models\Wall\WallListViewModel.cs" />
     <Compile Include="Models\Wall\WallMemberViewModel.cs" />
+    <Compile Include="Models\Wall\Widgets\GetWidgetsViewModel.cs" />
+    <Compile Include="Models\Wall\Widgets\KudosBasketWidgetViewModel.cs" />
+    <Compile Include="Models\Wall\Widgets\WidgetsViewModel.cs" />
     <Compile Include="ValidationAttributes\DateTimeNotExpiredAttribute.cs" />
     <Compile Include="ValidationAttributes\HasNoDuplicateLinksAttribute.cs" />
     <Compile Include="ValidationAttributes\MinValueAttribute.cs" />

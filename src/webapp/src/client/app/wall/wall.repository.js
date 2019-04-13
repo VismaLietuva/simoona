@@ -12,6 +12,7 @@
 
     function wallRepository($resource, endPoint) {
         var wallUrl = endPoint + '/Wall/';
+        var wallWidgetsUrl = endPoint + '/WallWidgets/';
 
         var service = {
             createWall: createWall,
@@ -19,7 +20,8 @@
             getWallDetails: getWallDetails,
             deleteWall: deleteWall,
             getWallMembers: getWallMembers,
-            expelMemberFromWall: expelMemberFromWall
+            expelMemberFromWall: expelMemberFromWall,
+            getWidgetsInfo: getWidgetsInfo
         };
         return service;
 
@@ -60,6 +62,12 @@
                 wallId: wallId,
                 attendeeId: userId
             }, { put: { method: 'PUT' } }).put().$promise;
+        }
+
+        function getWidgetsInfo(){
+            return $resource(wallWidgetsUrl + 'Get')
+                .get()
+                .$promise;
         }
     }
 })();

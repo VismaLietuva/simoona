@@ -453,7 +453,7 @@ namespace Shrooms.Domain.Services.Kudos
 
         public IEnumerable<KudosBasicDataDTO> GetKudosStats(int months, int amount, int organizationId)
         {
-            var date = DateTime.UtcNow.AddMonths(0 - months);
+            var date = DateTime.UtcNow.AddMonths(-months);
 
             var kudosLogsStats = _kudosLogsDbSet
                 .Include(log => log.Employee)

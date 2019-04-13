@@ -8,7 +8,9 @@
     function kudosBasketWidget() {
         var directive = {
             restrict: 'E',
-            scope: {},
+            scope: {
+                kudosBasketData: '=?'
+            },
             templateUrl: 'app/widget/kudos-basket/widget/widget.html',
             bindToController: true,
             controller: kudosBasketWidgetController,
@@ -26,33 +28,22 @@
         /* jshint validthis: true */
         var vm = this;
 
-        var hasKudosBasketPermission = authService.hasPermissions(['KUDOSBASKET_BASIC']) || authService.hasPermissions(['KUDOSBASKET_ADMINISTRATION']);
-
-        vm.kudosBasketData = {};
-        vm.kudosBasketIsActive = false;
+        var hasPermissions = hasPermissions();
+        vm.kudosBasketIsActive = function () { 
+            return vm.kudosBasketData && hasPermissions;
+        };
 
         vm.addDonation = addDonation;
 
-        init();
-
         ////////////
-
-        function init() {
-            if (hasKudosBasketPermission) {
-                kudosBasketRepository.getKudosBasketWidget().then(function(response) {
-                    if (JSON.stringify(response) !== '{}') {
-                        vm.kudosBasketIsActive = true;
-                    }
-
-                    vm.kudosBasketData = response;
-                });
-            }
-        }
 
         function addDonation(donatedAmount) {
             vm.kudosBasketData.kudosDonated = parseFloat(vm.kudosBasketData.kudosDonated) + parseFloat(donatedAmount);
             vm.kudosBasketData.kudosDonated = (vm.kudosBasketData.kudosDonated.toFixed(2) * 1).toString();
         }
 
+        function hasPermissions() {
+            return authService.hasPermissions(['KUDOSBASKET_BASIC']) || authService.hasPermissions(['KUDOSBASKET_ADMINISTRATION']);
+        }
     }
 })();

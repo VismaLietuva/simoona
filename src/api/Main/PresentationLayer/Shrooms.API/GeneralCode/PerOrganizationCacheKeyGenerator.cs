@@ -5,7 +5,7 @@ using WebApi.OutputCache.V2;
 
 namespace Shrooms.API.GeneralCode
 {
-    public class CustomCacheKeyGenerator : DefaultCacheKeyGenerator
+    public class PerOrganizationCacheKeyGenerator : DefaultCacheKeyGenerator
     {
         public override string MakeCacheKey(HttpActionContext context, MediaTypeHeaderValue mediaType, bool excludeQueryString = false)
         {
