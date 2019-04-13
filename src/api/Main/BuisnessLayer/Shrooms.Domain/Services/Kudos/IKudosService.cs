@@ -52,5 +52,7 @@ namespace Shrooms.Domain.Services.Kudos
         IEnumerable<KudosBasicDataDTO> GetKudosStats(int months, int amount, int organizationId);
 
         void UpdateProfileKudos(ApplicationUser user, UserAndOrganizationDTO userOrg);
+
+        bool HasPendingKudos(string employeeId);
     }
 }

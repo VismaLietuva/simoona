@@ -33,5 +33,7 @@
 	"messageEventTypeNameExists": "Event type name already exists",
 	"messageNameAlreadyExists": "Name already exists",
 	"messageShopItemAlreadyExists": "This item already exists",
-	"messageAllFieldsAreRequired": "All fields are required"
+	"messageAllFieldsAreRequired": "All fields are required",
+	"userHasPendingKudos" : "User has pending kudos"
+
 }
