@@ -21,7 +21,6 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Threading.Tasks;
 using static Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes.ErrorCodes;
 
 namespace Shrooms.UnitTests.DomainService
@@ -184,7 +183,7 @@ namespace Shrooms.UnitTests.DomainService
         {
             MockUsers();
             MockEventTypes();
-            var newEvent = new CreateEventDto()
+            var newEvent = new CreateEventDto
             {
                 EndDate = DateTime.UtcNow.AddHours(2),
                 StartDate = DateTime.UtcNow.AddHours(1),
@@ -209,7 +208,7 @@ namespace Shrooms.UnitTests.DomainService
         {
             MockUsers();
             MockEventTypes();
-            var newEvent = new CreateEventDto()
+            var newEvent = new CreateEventDto
             {
                 EndDate = DateTime.UtcNow.AddHours(2),
                 StartDate = DateTime.UtcNow.AddHours(1),
@@ -240,7 +239,7 @@ namespace Shrooms.UnitTests.DomainService
         {
             MockUsers();
             MockEventTypes();
-            var newEvent = new CreateEventDto()
+            var newEvent = new CreateEventDto
             {
                 EndDate = DateTime.UtcNow.AddHours(2),
                 StartDate = DateTime.UtcNow.AddHours(1),
@@ -269,7 +268,7 @@ namespace Shrooms.UnitTests.DomainService
         {
             MockUsers();
             MockEventTypes();
-            var newEvent = new CreateEventDto()
+            var newEvent = new CreateEventDto
             {
                 EndDate = DateTime.UtcNow.AddHours(2),
                 StartDate = DateTime.UtcNow.AddHours(1),
@@ -297,7 +296,7 @@ namespace Shrooms.UnitTests.DomainService
         {
             MockUsers();
             MockEventTypes();
-            var newEvent = new CreateEventDto()
+            var newEvent = new CreateEventDto
             {
                 EndDate = DateTime.UtcNow.AddHours(2),
                 StartDate = DateTime.UtcNow.AddHours(1),
@@ -325,7 +324,7 @@ namespace Shrooms.UnitTests.DomainService
         {
             MockUsers();
             MockEventTypes();
-            var newEvent = new CreateEventDto()
+            var newEvent = new CreateEventDto
             {
                 EndDate = DateTime.UtcNow.AddHours(2),
                 StartDate = DateTime.UtcNow.AddHours(1),
@@ -355,7 +354,7 @@ namespace Shrooms.UnitTests.DomainService
             MockUsers();
             MockEventTypes();
             _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-04-05"));
-            var newEvent = new CreateEventDto()
+            var newEvent = new CreateEventDto
             {
                 EndDate = DateTime.Parse("2016-04-10"),
                 StartDate = DateTime.Parse("2016-04-09"),
@@ -385,7 +384,7 @@ namespace Shrooms.UnitTests.DomainService
             MockUsers();
             MockEventTypes();
             _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-04-05"));
-            var newEvent = new CreateEventDto()
+            var newEvent = new CreateEventDto
             {
                 EndDate = DateTime.Parse("2016-04-10"),
                 StartDate = DateTime.Parse("2016-04-06"),
@@ -414,7 +413,7 @@ namespace Shrooms.UnitTests.DomainService
         {
             MockUsers();
             MockEventTypes();
-            var newEvent = new CreateEventDto()
+            var newEvent = new CreateEventDto
             {
                 EndDate = DateTime.UtcNow.AddHours(1),
                 StartDate = DateTime.UtcNow.AddHours(2),
@@ -442,7 +441,7 @@ namespace Shrooms.UnitTests.DomainService
         {
             MockUsers();
             MockEventTypes();
-            var newEvent = new CreateEventDto()
+            var newEvent = new CreateEventDto
             {
                 EndDate = DateTime.UtcNow.AddHours(3),
                 StartDate = DateTime.UtcNow.AddHours(2),
@@ -471,7 +470,7 @@ namespace Shrooms.UnitTests.DomainService
             MockUsers();
             MockEventTypes();
             MockEventsListTest();
-            var newEvent = new EditEventDTO()
+            var newEvent = new EditEventDTO
             {
                 Id = Guid.NewGuid(),
                 ResetParticipantList = false,
@@ -512,7 +511,7 @@ namespace Shrooms.UnitTests.DomainService
             MockUsers();
             MockEventTypes();
             var eventsGuids = MockEventsListTest();
-            var newEvent = new EditEventDTO()
+            var newEvent = new EditEventDTO
             {
                 Id = eventsGuids[0],
                 UserId = "2",
@@ -555,7 +554,7 @@ namespace Shrooms.UnitTests.DomainService
             MockEventTypes();
             var eventsGuids = MockEventsListTest();
             MockEventOptions();
-            var newEvent = new EditEventDTO()
+            var newEvent = new EditEventDTO
             {
                 Id = eventsGuids[0],
                 UserId = "1",
@@ -632,7 +631,7 @@ namespace Shrooms.UnitTests.DomainService
         {
             var types = new List<ApplicationUser>
             {
-               new ApplicationUser()
+               new ApplicationUser
                {
                    Id = "1"
                }
@@ -642,7 +641,7 @@ namespace Shrooms.UnitTests.DomainService
 
         private Guid[] MockEventsListTest()
         {
-            Guid[] guids = Enumerable.Repeat(0, 4).Select(x => Guid.NewGuid()).ToArray();
+            var guids = Enumerable.Repeat(0, 4).Select(x => Guid.NewGuid()).ToArray();
             var participant1 = new EventParticipant
             {
                 ApplicationUserId = "responsibleUserId",
@@ -683,7 +682,7 @@ namespace Shrooms.UnitTests.DomainService
                     MaxParticipants = 15,
                     OrganizationId = 2,
                     EventParticipants = new List<EventParticipant> { participant1, participant2 },
-                    EventOptions = new List<EventOption>()
+                    EventOptions = new List<EventOption>
                     {
                         new EventOption
                         {
@@ -892,6 +891,7 @@ namespace Shrooms.UnitTests.DomainService
                     RegistrationDeadline = DateTime.UtcNow,
                     MaxChoices = 1,
                     MaxParticipants = 3,
+                    Office = new Office { Name = "office" },
                     Name = "name",
                     OrganizationId = 2,
                     ResponsibleUser = responsibleUser1,

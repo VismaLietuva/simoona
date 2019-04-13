@@ -48,15 +48,15 @@ namespace Shrooms.UnitTests.DomainService
 
             var stream = _serviceRequestExportService.ExportToExcel(userAndOrg, null);
 
-            using (IExcelDataReader excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
+            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
             {
                 excelReader.IsFirstRowAsColumnNames = true;
                 var excelData = excelReader.AsDataSet();
                 var excelRows = excelData.Tables[0].Rows;
                 var excelColumns = excelData.Tables[0].Columns;
 
-                Assert.AreEqual("Title", excelColumns[0].ColumnName);
-                Assert.AreEqual("Description", excelColumns[1].ColumnName);
+                Assert.AreEqual(Resources.Models.ServiceRequest.ServiceRequest.ExportColumnNameTitle, excelColumns[0].ColumnName);
+                Assert.AreEqual(Resources.Models.ServiceRequest.ServiceRequest.ExportColumnNameDescription, excelColumns[1].ColumnName);
                 Assert.AreEqual("Need 1", excelRows[0].ItemArray[0]);
                 Assert.AreEqual("Description 1", excelRows[0].ItemArray[1]);
                 Assert.AreEqual(3, excelRows.Count);

@@ -218,6 +218,7 @@
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\MyEventsOptionsDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\UpdateEventTypeDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Kudos\KudosShopItemDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\OfficeMap\OfficeDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\OfficeMap\OfficeRoomDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\OfficeMap\OfficeUserDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\OfficeMap\UserOfficeAndFloorDto.cs" />
@@ -314,6 +315,7 @@
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Events\EventListItemViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Events\EventOptionsViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Events\EventOptionViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Events\EventOfficeViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Events\EventTypeViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Events\MyEventsOptionsViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Events\ShareEventViewModel.cs" />

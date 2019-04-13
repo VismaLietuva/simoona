@@ -17,6 +17,8 @@ namespace Shrooms.DataTransferObjects.Models.Events
         public DateTime? RegistrationDeadlineDate { get; set; }
 
         public EventRecurrenceOptions Recurrence { get; set; }
+        
+        public int? OfficeId { get; set; }
 
         public string Location { get; set; }
 

@@ -5,6 +5,7 @@ namespace Shrooms.Domain.Services.OfficeMap
 {
     public interface IOfficeMapService
     {
+        IEnumerable<OfficeDTO> GetOffices();
         IEnumerable<OfficeUserDTO> GetOfficeUsers(int floorId, string includeProperties);
         IEnumerable<string> GetEmailsByOffice(int officeId);
         IEnumerable<string> GetEmailsByFloor(int floorId);

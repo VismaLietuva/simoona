@@ -15,6 +15,7 @@ namespace Shrooms.Domain.Services.OfficeMap
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUnitOfWork2 _uow;
         private readonly IRepository<ApplicationUser> _applicationUserRepository;
+        private readonly IDbSet<Office> _officeDbSet;
         private readonly IDbSet<ApplicationUser> _usersDbSet;
         private readonly IMapper _mapper;
         private readonly IRoleService _roleService;
@@ -26,7 +27,15 @@ namespace Shrooms.Domain.Services.OfficeMap
             _uow = uow;
             _applicationUserRepository = _unitOfWork.GetRepository<ApplicationUser>();
             _usersDbSet = _uow.GetDbSet<ApplicationUser>();
+            _officeDbSet = _uow.GetDbSet<Office>();
             _roleService = roleService;
+        }
+
+        public IEnumerable<OfficeDTO> GetOffices()
+        {
+            var offices = _officeDbSet.ToList();
+
+            return _mapper.Map<IEnumerable<Office>, IEnumerable<OfficeDTO>>(offices);
         }
 
         public IEnumerable<OfficeUserDTO> GetOfficeUsers(int floorId, string includeProperties)

@@ -22,6 +22,8 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
+using Shrooms.DataTransferObjects.Models.OfficeMap;
+using Shrooms.Domain.Services.OfficeMap;
 using Shrooms.WebViewModels.Models.Notifications;
 using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Notifications;
 
@@ -40,6 +42,7 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
         private readonly INotificationService _notificationService;
         private readonly IPostService _postService;
         private readonly IWallService _wallService;
+        private readonly IOfficeMapService _officeMapService;
 
         public EventController(
             IMapper mapper,
@@ -50,7 +53,8 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
             IEventExportService eventExportService,
             INotificationService notificationService,
             IPostService postService,
-            IWallService wallService)
+            IWallService wallService,
+            IOfficeMapService officeMapService)
         {
             _mapper = mapper;
             _eventService = eventService;
@@ -61,6 +65,7 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
             _notificationService = notificationService;
             _postService = postService;
             _wallService = wallService;
+            _officeMapService = officeMapService;
         }
 
         [Route("Recurrences")]
@@ -81,6 +86,15 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
             return Ok(result);
         }
 
+        [Route("Offices")]
+        [PermissionAuthorize(Permission = BasicPermissions.Event)]
+        public IHttpActionResult GetOffices()
+        {
+            var officeDtos = _officeMapService.GetOffices();
+            var result = _mapper.Map<IEnumerable<OfficeDTO>, IEnumerable<EventOfficeViewModel>>(officeDtos);
+            return Ok(result);
+        }
+
         [Route("ByType")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
         public IHttpActionResult GetEventsByType(int typeId)
@@ -92,6 +106,23 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
 
             var userOrganization = GetUserAndOrganization();
             var eventsListDto = _eventListingService.GetEventsByType(userOrganization, typeId);
+            var result = _mapper.Map<IEnumerable<EventListItemDTO>, IEnumerable<EventListItemViewModel>>(eventsListDto);
+            return Ok(result);
+        }
+
+        [Route("ByOffice")]
+        [PermissionAuthorize(Permission = BasicPermissions.Event)]
+        public IHttpActionResult GetEventsByOffice(string officeId)
+        {
+            int? officeIdNullable = null;
+
+            if (officeId != "all" && int.TryParse(officeId, out var officeIdParsed))
+            {
+                officeIdNullable = officeIdParsed;
+            }
+
+            var userOrganization = GetUserAndOrganization();
+            var eventsListDto = _eventListingService.GetEventsByOffice(userOrganization, officeIdNullable);
             var result = _mapper.Map<IEnumerable<EventListItemDTO>, IEnumerable<EventListItemViewModel>>(eventsListDto);
             return Ok(result);
         }
@@ -390,7 +421,7 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
             {
                 return BadRequest(e.Message);
             }
-            
+
             var postModel = _mapper.Map<ShareEventViewModel, NewPostDTO>(shareEventViewModel);
             SetOrganizationAndUser(postModel);
 

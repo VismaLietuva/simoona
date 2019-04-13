@@ -27,6 +27,8 @@ namespace Shrooms.WebViewModels.Models.Events
         [Required]
         public EventRecurrenceOptions Recurrence { get; set; }
 
+        public int? OfficeId { get; set; }
+
         [Required]
         [StringLength(ConstWebApi.EventLocationMaxLength)]
         public string Location { get; set; }

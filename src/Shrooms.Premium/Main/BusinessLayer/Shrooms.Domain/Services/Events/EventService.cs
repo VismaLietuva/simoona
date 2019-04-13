@@ -36,7 +36,7 @@ namespace Shrooms.Domain.Services.Events
         private readonly IDbSet<Event> _eventsDbSet;
         private readonly IDbSet<EventType> _eventTypesDbSet;
         private readonly IDbSet<ApplicationUser> _usersDbSet;
-        private readonly IDbSet<EventOption> _eventOptionsDbset;
+        private readonly IDbSet<EventOption> _eventOptionsDbSet;
 
         public EventService(
             IUnitOfWork2 uow,
@@ -51,7 +51,7 @@ namespace Shrooms.Domain.Services.Events
             _eventsDbSet = uow.GetDbSet<Event>();
             _eventTypesDbSet = uow.GetDbSet<EventType>();
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
-            _eventOptionsDbset = uow.GetDbSet<EventOption>();
+            _eventOptionsDbSet = uow.GetDbSet<EventOption>();
 
             _permissionService = permissionService;
             _eventUtilitiesService = eventUtilitiesService;
@@ -109,6 +109,7 @@ namespace Shrooms.Domain.Services.Events
         {
             var @event = _eventsDbSet
                 .Include(e => e.ResponsibleUser)
+                .Include(e => e.Office)
                 .Include(e => e.EventParticipants.Select(v => v.EventOptions))
                 .Where(e =>
                     e.Id == id &&
@@ -191,7 +192,7 @@ namespace Shrooms.Domain.Services.Events
 
         private static DateTime SetRegistrationDeadline(CreateEventDto newEventDto)
         {
-            return !newEventDto.RegistrationDeadlineDate.HasValue ? newEventDto.StartDate : newEventDto.RegistrationDeadlineDate.Value;
+            return newEventDto.RegistrationDeadlineDate ?? newEventDto.StartDate;
         }
 
         private static Expression<Func<Event, EventEditDTO>> MapToEventEditDto()
@@ -201,6 +202,7 @@ namespace Shrooms.Domain.Services.Events
                 Id = e.Id,
                 Description = e.Description,
                 ImageName = e.ImageName,
+                OfficeId = e.OfficeId,
                 Location = e.Place,
                 Name = e.Name,
                 MaxOptions = e.MaxChoices,
@@ -280,7 +282,7 @@ namespace Shrooms.Domain.Services.Events
 
             foreach (var option in removedOptions)
             {
-                _eventOptionsDbset.Remove(option);
+                _eventOptionsDbSet.Remove(option);
             }
 
             foreach (var newOption in editedEvent.NewOptions)
@@ -294,7 +296,7 @@ namespace Shrooms.Domain.Services.Events
                     Modified = DateTime.UtcNow,
                     ModifiedBy = editedEvent.UserId,
                 };
-                _eventOptionsDbset.Add(option);
+                _eventOptionsDbSet.Add(option);
             }
         }
 
@@ -315,7 +317,7 @@ namespace Shrooms.Domain.Services.Events
                             Option = optionName,
                             Event = newEvent
                         };
-                        _eventOptionsDbset.Add(newOption);
+                        _eventOptionsDbSet.Add(newOption);
                     }
                 }
             }
@@ -360,6 +362,7 @@ namespace Shrooms.Domain.Services.Events
             newEvent.ImageName = newEventDto.ImageName;
             newEvent.MaxChoices = newEventDto.MaxOptions;
             newEvent.MaxParticipants = newEventDto.MaxParticipants;
+            newEvent.OfficeId = newEventDto.OfficeId;
             newEvent.Place = newEventDto.Location;
             newEvent.ResponsibleUserId = newEventDto.ResponsibleUserId;
             newEvent.StartDate = newEventDto.StartDate;
@@ -375,6 +378,8 @@ namespace Shrooms.Domain.Services.Events
                 Description = e.Description,
                 ImageName = e.ImageName,
                 Name = e.Name,
+                OfficeId = e.OfficeId,
+                OfficeName = e.Office.Name,
                 Location = e.Place,
                 RegistrationDeadlineDate = e.RegistrationDeadline,
                 StartDate = e.StartDate,

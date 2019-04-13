@@ -44,19 +44,17 @@ namespace Shrooms.API.Controllers.WebApi
             {
                 return GetByFloor(userOfficeAndFloor.FloorId.Value);
             }
-            else
+
+            var office = _officeRepository.Get(o => o.IsDefault).FirstOrDefault();
+
+            if (office == null)
             {
-                var office = _officeRepository.Get(o => o.IsDefault).FirstOrDefault();
+                office = _officeRepository.Get().FirstOrDefault();
+            }
 
-                if (office == null)
-                {
-                    office = _officeRepository.Get().FirstOrDefault();
-                }
-
-                if (office != null)
-                {
-                    return GetByOffice(office.Id);
-                }
+            if (office != null)
+            {
+                return GetByOffice(office.Id);
             }
 
             return new MapViewModel();
