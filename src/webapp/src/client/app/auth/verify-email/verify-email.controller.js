@@ -30,7 +30,7 @@
 
             const params = {
                 code: authService.getTokenFromUrl(),
-                email: authService.getUserNameFromUrl('/Verify/')
+                email: authService.getUserNameFromUrl()
             }
 
             authService.verifyEmail(params).then(function (res) {
