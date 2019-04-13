@@ -31,7 +31,7 @@ It might change, but currently it is as following:
 Due too tight coupling Premium features front-end part is located in open-source repository. These features are hidden from UI, however unhiding them - won't make them work, because they also require back-end part.
 
 To enable Premium features:
-- Set `window.isPremium = false;` in front-end app
+- Set `window.isPremium = true;` in front-end app
 - Compile Premium project and copy `Shrooms.Premium.dll` to `Extensions` folder of `Shrooms.API` (open-source project)
 
 ## Development
