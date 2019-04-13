@@ -31,7 +31,13 @@
         ///////////
 
         function init() {
-            if ($stateParams.type === 'all') {
+            if ($stateParams.office) {
+                eventRepository.getEventsByOffice($stateParams.office).then(function (result) {
+                    vm.eventsList = result;
+                    setResponseUtilities(result);
+                });
+            }
+            else if ($stateParams.type === 'all') {
                 eventRepository.getAllEvents().then(function (result) {
                     vm.eventsList = result;
 
