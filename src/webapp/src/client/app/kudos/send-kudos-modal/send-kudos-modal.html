@@ -37,6 +37,24 @@
                 </tags-input>
         </div>
 
+        <div class="form-group required-right">
+                <label for="choose-type" translate="kudos.chooseType"></label>
+                <div class="kudos-modal-buttons-group kudos-points-type">
+                    <button class="btn btn-sm btn-info kudos-type-button kudos-points-type kudosify-modal-buttons-inactive"
+                            type="button"
+                            uib-tooltip="{{kudosType.description | translate }}"
+                            tooltip-placement="bottom"
+                            tooltip-class="word-break"
+                            tooltip-append-to-body="true"
+                            ng-model="vm.pointsType"
+                            ng-click="vm.setModalType(kudosType, $event)"
+                            ng-repeat="kudosType in vm.kudosTypes"
+                            data-test-id="{{kudosType.name}}" ng-cloak>
+                        {{:: kudosType.name}} ({{:: kudosType.value}})
+                    </button>
+                </div>
+            </div>
+
         <div class="form-group required-right" has-permissions="['KUDOS_ADMINISTRATION']" ng-class="{ 'has-error' : kudosifyForm.totalPoints.$invalid && !kudosifyForm.totalPoints.$pristine }">
             <label for="totalPoints" translate="kudos.amountOfKudos"></label>
             <input class="form-control"
@@ -96,7 +114,7 @@
     <button class="btn btn-primary"
         has-permissions="['KUDOS_BASIC']"
         ng-disabled="vm.isBusy || kudosifyForm.$invalid || !vm.kudosReceivers.length"
-        ng-click="vm.submitKudos(vm.kudosReceivers, vm.kudosifyInfo, 1)"
+        ng-click="vm.submitKudos(vm.kudosReceivers, vm.kudosifyInfo, vm.pointsType)"
         data-test-id="ok-button-green">
         <span translate="common.send"></span>
     </button>
