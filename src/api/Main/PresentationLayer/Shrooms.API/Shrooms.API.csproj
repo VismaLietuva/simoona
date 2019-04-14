@@ -37,6 +37,7 @@
     <DocumentationFile>bin\Shrooms.API.XML</DocumentationFile>
     <CodeAnalysisRuleSet>Shrooms.API.ruleset</CodeAnalysisRuleSet>
     <NoWarn>1591</NoWarn>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
