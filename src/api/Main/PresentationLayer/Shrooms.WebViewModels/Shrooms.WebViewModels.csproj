@@ -318,9 +318,7 @@
     <Compile Include="Models\WorkingHoursViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\Permissions\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\..\..\Other\Shrooms.Constants\Shrooms.Constants.csproj">
       <Project>{e07394b9-558c-4a70-9926-6400abb0fb5d}</Project>

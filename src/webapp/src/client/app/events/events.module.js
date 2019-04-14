@@ -42,6 +42,12 @@
                 controller: 'eventsByTypeController',
                 controllerAs: 'vm'
             })
+            .state('Root.WithOrg.Client.Events.List.Office', {
+                url: '/office/:office',
+                templateUrl: 'app/events/list/by-type/by-type.html',
+                controller: 'eventsByTypeController',
+                controllerAs: 'vm'
+            })
             .state('Root.WithOrg.Client.Events.EventContent', {
                 url: '/EventContent/:id',
                 templateUrl: 'app/events/content/content.html',

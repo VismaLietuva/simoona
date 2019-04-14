@@ -510,6 +510,13 @@ namespace Shrooms.Domain.Services.Kudos
             _uow.SaveChanges(userOrg.UserId);
         }
 
+        public bool HasPendingKudos(string employeeId)
+        {
+            IList<KudosLog> kudosLogs = _kudosLogsDbSet.Where(e => e.EmployeeId == employeeId).ToList();
+
+            return kudosLogs.Any();
+        }
+
         private static Expression<Func<ApplicationUser, UserKudosAutocompleteDTO>> MapUsersToAutocompleteDTO()
         {
             return u => new UserKudosAutocompleteDTO() { Id = u.Id, FormattedName = u.FirstName + " " + u.LastName, Email = u.Email, UserName = u.UserName, PictureId = u.PictureId };
