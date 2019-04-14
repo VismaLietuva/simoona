@@ -7,18 +7,10 @@ var bodyParser = require('body-parser');
 var compress = require('compression');
 var cors = require('cors');
 var errorHandler = require('./utils/errorHandler')();
-//var forceSSL = require('express-force-ssl');
 var four0four = require('./utils/404')();
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var fs = require('fs');
-
-
-var ssl_options = {
-  key: fs.readFileSync('./src/server/newkey.pem'),
-  cert: fs.readFileSync('./src/server/cert.pem')
-};
-var secureServer = https.createServer(ssl_options, app);
 
 var port = process.env.PORT || 7203;
 
@@ -73,7 +65,18 @@ switch (environment) {
         break;
 }
 
-secureServer.listen(44330);
+var secureServer;
+try {
+  var ssl_options = {
+    key: fs.readFileSync('./src/server/newkey.pem'),
+    cert: fs.readFileSync('./src/server/cert.pem')
+  };
+  secureServer = https.createServer(ssl_options, app);
+  console.log('Creating server with SSL');
+  secureServer.listen(44330);
+} catch (error) {
+  console.info('No certificate found for SSL');
+}
 
 app.listen(port, function() {
     console.log('Express server listening on port ' + port);

@@ -631,6 +631,7 @@ namespace Shrooms.API.Controllers.WebApi
         [ValidationFilter]
         [HttpPut]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [InvalidateCacheOutput(nameof(WallWidgetsController.GetKudosBasketWidget), typeof(WallWidgetsController))]
         public async Task<HttpResponseMessage> PutPersonalInfo(ApplicationUserPutPersonalInfoViewModel model)
         {
             var validatedModel = ValidateModel(model);
@@ -677,9 +678,6 @@ namespace Shrooms.API.Controllers.WebApi
 
                 response = new { requiresConfirmation };
             }
-
-            var cache = Configuration.CacheOutputConfiguration().GetCacheOutputProvider(Request);
-            cache.RemoveStartsWith(Configuration.CacheOutputConfiguration().MakeBaseCachekey((BirthdaysController t) => t.GetWeeklyBirthdays()));
 
             return response != null ? Request.CreateResponse(HttpStatusCode.OK, response) : Request.CreateResponse(HttpStatusCode.OK);
         }

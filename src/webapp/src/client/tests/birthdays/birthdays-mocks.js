@@ -12,9 +12,6 @@ beforeEach(function () {
             error: function () { },
             success: function () { }
         },
-        endpoint: '',
-        birthdaysRepository: {
-            getUsers: function () { }
-        }
+        endpoint: ''
     }
 });

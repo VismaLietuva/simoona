@@ -9,6 +9,7 @@ using Shrooms.DataTransferObjects.Models.KudosBasket;
 using Shrooms.Domain.Services.KudosBaskets;
 using Shrooms.DomainExceptions.Exceptions.KudosBaskets;
 using Shrooms.WebViewModels.Models.KudosBaskets;
+using Shrooms.WebViewModels.Models.Wall.Widgets;
 using WebApi.OutputCache.V2;
 
 namespace Shrooms.API.Controllers.WebApi
