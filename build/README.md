@@ -34,6 +34,12 @@ Build script has two main operations:
 
 1. build\build.ps1 cannot be loaded. The file build\build.ps1 is not digitally signed. You cannot run this script on the current system. For more information about running scripts and setting execution policy, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170.
 
+    Option a)
+
+    * Select option in build script 'Select powershell build script ExecutionPolicy' -> Bypass
+
+    Option b)
+
     * Right-click on build.ps1
     * Click on Properties
     * Check Unblock checkbox

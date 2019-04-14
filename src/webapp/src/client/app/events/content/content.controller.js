@@ -9,20 +9,16 @@
         '$rootScope',
         '$stateParams',
         '$state',
-        '$location',
-        '$anchorScroll',
-        '$timeout',
+        '$translate',
         'eventRepository',
         'authService',
         'errorHandler'
     ];
 
-    function EventContentController($rootScope, $stateParams, $state, $location, $anchorScroll, 
-        $timeout, eventRepository, authService, errorHandler) {
+    function EventContentController($rootScope, $stateParams, $state, $translate,
+        eventRepository, authService, errorHandler
+    ) {
         var vm = this;
-
-        $rootScope.pageTitle = 'events.eventsTitle';
-
         vm.event = {};
         var eventId = $stateParams.id;
 
@@ -45,6 +41,7 @@
             vm.isEventLoading = true;
             eventRepository.getEventDetails(eventId).then(function(response) {
                 vm.event = response;
+                $rootScope.pageTitle = $translate.instant('events.eventTitle') + ' - ' + vm.event.name;
                 vm.event.participantsCount = vm.event.participants.length;
                 vm.isEventAdmin = vm.hasAdministrationPermission || vm.event.hostUserId === vm.currentUser;
                 vm.isEventLoading = false;
