@@ -1,6 +1,6 @@
 # Simoona API
 
-Simoona's back-end is built using ASP.NET with Entity Framework. Project's dependencies are managed with NuGet.
+Simoona's back-end is built using ASP.NET with Entity Framework. Project dependencies are managed via NuGet.
 
 ## QuickStart
 
@@ -12,7 +12,7 @@ Simoona's back-end is built using ASP.NET with Entity Framework. Project's depen
 
 ## SMTP Client Setup
 
-Simoona uses email sending services to send its user various important and optional notifications. If you don't set up the mailing service users won't be able to receive these notifications, it's especially important to set it up if local sign-up/sign-in system is being used (by default it is), because the system uses email service to send information about verifying email addresses and resetting passwords. For development purposes the easiest way to set up SMTP Server is to use [MailTrap](https://mailtrap.io/). For sending emails to their destinations we recommend services like [SendGrid](https://sendgrid.com/).
+Simoona uses email sending services to send its users various important and optional notifications. If you don't set up the mailing service, users won't be able to receive these notifications. It's especially important to set it up if local sign-up/sign-in system is being used (by default it is), because the system uses email service to send information about verifying email addresses and resetting passwords. For development purposes the easiest way to set up SMTP Server is to use [MailTrap](https://mailtrap.io/). For sending emails to their destinations we recommend services like [SendGrid](https://sendgrid.com/).
 
 Follow these steps to configure mail sending service in Simoona:
 
@@ -30,6 +30,20 @@ Follow these steps to configure mail sending service in Simoona:
       </mailSettings>
     </system.net>
     ```
+
+Another way to work with email services while developing is installing [smtp4dev](https://github.com/smorks/smtp4dev/releases/latest) and setting your `Web.config` according to this:
+
+    ```xml
+    <system.net>
+      <mailSettings>
+        <smtp from="noreply@simoona.com">
+            <network host="localhost" port="25" />
+        </smtp>
+      </mailSettings>
+    </system.net>
+    ```
+	
+You will see all your sent emails in the dedicated application on your local machine while actually no third party or online service is involved.
 
 ## Configuration
 
