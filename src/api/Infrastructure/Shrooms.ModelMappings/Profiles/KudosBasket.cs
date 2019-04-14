@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Shrooms.DataTransferObjects.Models.KudosBasket;
 using Shrooms.WebViewModels.Models.KudosBaskets;
+using Shrooms.WebViewModels.Models.Wall.Widgets;
 
 namespace Shrooms.ModelMappings.Profiles
 {

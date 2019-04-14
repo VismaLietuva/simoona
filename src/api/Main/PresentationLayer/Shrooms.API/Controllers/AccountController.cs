@@ -70,12 +70,12 @@ namespace Shrooms.API.Controllers.WebApi
 
         [HostAuthentication(DefaultAuthenticationTypes.ExternalBearer)]
         [Route("UserInfo")]
-        public IHttpActionResult GetUserInfo()
+        public async Task<IHttpActionResult> GetUserInfo()
         {
             var externalLogin = ExternalLoginData.FromIdentity(User.Identity as ClaimsIdentity);
             if (externalLogin == null && User.Identity.IsAuthenticated)
             {
-                var loggedUser = GetLoggedInUserInfo();
+                var loggedUser = await GetLoggedInUserInfo();
                 return Ok(loggedUser);
             }
             else
@@ -139,7 +139,7 @@ namespace Shrooms.API.Controllers.WebApi
                 return BadRequest();
             }
 
-            var user = _userManager.Find(model.UserName, model.Password);
+            var user = await _userManager.FindAsync(model.UserName, model.Password);
 
             if (user == null)
             {
@@ -255,8 +255,9 @@ namespace Shrooms.API.Controllers.WebApi
         {
             if (User.Identity.IsAuthenticated)
             {
-                _refreshTokenService.RemoveTokenBySubject(GetUserAndOrganization());
-                _permissionService.RemoveCache(GetUserAndOrganization().UserId);
+                var userAndOrganization = GetUserAndOrganization();
+                _refreshTokenService.RemoveTokenBySubject(userAndOrganization);
+                _permissionService.RemoveCache(userAndOrganization.UserId);
                 Authentication.SignOut();
             }
 
@@ -440,16 +441,16 @@ namespace Shrooms.API.Controllers.WebApi
             return properties;
         }
     
-        private LoggedInUserInfoViewModel GetLoggedInUserInfo()
+        private async Task<LoggedInUserInfoViewModel> GetLoggedInUserInfo()
         {
             var userId = User.Identity.GetUserId();
             var organizationId = User.Identity.GetOrganizationId();
             var claimsIdentity = User.Identity as ClaimsIdentity;
-            var user = _userManager.FindById(userId);
+            var user = await _userManager.FindByIdAsync(userId);
             var userInfo = new LoggedInUserInfoViewModel
             {
                 HasRegistered = true,
-                Roles = _userManager.GetRoles(userId),
+                Roles = await _userManager.GetRolesAsync(userId),
                 UserName = User.Identity.Name,
                 UserId = userId,
                 OrganizationName = claimsIdentity.FindFirstValue(ConstWebApi.ClaimOrganizationName),

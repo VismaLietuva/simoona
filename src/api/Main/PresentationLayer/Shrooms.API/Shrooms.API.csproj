@@ -459,7 +459,6 @@
     <Compile Include="Controllers\UserDeprecatedController.cs" />
     <Compile Include="Controllers\UserDeprecatedController.Impersonation.cs" />
     <Compile Include="Controllers\BaseController.cs" />
-    <Compile Include="Controllers\BirthdaysController.cs" />
     <Compile Include="Controllers\Book\BookController.cs" />
     <Compile Include="Controllers\CertificateController.cs" />
     <Compile Include="Controllers\CommentController.cs" />
@@ -482,8 +481,12 @@
     <Compile Include="Controllers\RoomController.cs" />
     <Compile Include="Controllers\RoomTypeController.cs" />
     <Compile Include="Controllers\SkillController.cs" />
+    <Compile Include="Filters\PermissionAwareCacheOutputFilterAttribute.cs" />
+    <Compile Include="Helpers\IdentityExtensions.cs" />
+    <Compile Include="GeneralCode\PerPermissionCacheKeyGenerator.cs" />
     <Compile Include="Controllers\Wall\WallController.cs" />
     <Compile Include="Controllers\ExternalJobsController.cs" />
+    <Compile Include="Controllers\Wall\WallWidgetsController.cs" />
     <Compile Include="Filters\FeatureToggleAttribute.cs" />
     <Compile Include="Filters\HMACAuthenticationAttribute.cs" />
     <Compile Include="Filters\BasicAuthenticationAttribute.cs" />
@@ -492,8 +495,8 @@
     <Compile Include="Filters\OrganizationValidationFilterAttribute.cs" />
     <Compile Include="Filters\QueryStringBearerAuthorizeAttribute.cs" />
     <Compile Include="Filters\SkipOrganizationValidationFilterAttribute.cs" />
-    <Compile Include="GeneralCode\CustomCacheKeyGenerator.cs" />
     <Compile Include="GeneralCode\OrganizationUtils.cs" />
+    <Compile Include="GeneralCode\PerOrganizationCacheKeyGenerator.cs" />
     <Compile Include="Handlers\CancelledTaskBugWorkaroundMessageHandler.cs" />
     <Compile Include="Filters\PermissionAuthorizeAttribute.cs" />
     <Compile Include="Filters\ValidationFilterAttribute.cs" />
