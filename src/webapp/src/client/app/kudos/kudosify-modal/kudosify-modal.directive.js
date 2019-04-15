@@ -6,7 +6,8 @@
         .constant('kudosifySettings', {
             maxMinus: 99999
         })
-        .directive('aceKudosifyModal', kudosifyModal);
+        .directive('aceKudosifyModal', kudosifyModal)
+        .directive('aceSendKudosModal', sendKudosModal);
 
     kudosifyModal.$inject = [
         '$uibModal'
@@ -38,9 +39,36 @@
         }
     }
 
+    function sendKudosModal($uibModal) {
+        var directive = {
+            restrict: 'A',
+            scope: {
+                aceSendKudosModal: '=?'
+            },
+            link: linkFunc
+        };
+        return directive;
+
+        function linkFunc(scope, elem) {
+            elem.bind('click', function () {
+                $uibModal.open({
+                    templateUrl: 'app/kudos/send-kudos-modal/send-kudos-modal.html',
+                    controller: kudosifyModalController,
+                    controllerAs: 'vm',
+                    resolve: {
+                        currentUser: function () {
+                            return scope.aceKudosifyModal;
+                        }
+                    }
+                });
+            });
+        }
+    }
+
     kudosifyModalController.$inject = [
         '$scope',
         '$uibModalInstance',
+        'authService',
         'kudosifyModalFactory',
         'kudosFactory',
         'notifySrv',
@@ -54,7 +82,7 @@
         'errorHandler'
     ];
 
-    function kudosifyModalController($scope, $uibModalInstance, kudosifyModalFactory, kudosFactory,
+    function kudosifyModalController($scope, $uibModalInstance, authService, kudosifyModalFactory, kudosFactory,
         notifySrv, kudosifySettings, currentUser, imageValidationSettings, shroomsFileUploader,
         pictureRepository, lodash, dataHandler, errorHandler) {
         /*jshint validthis: true */
@@ -65,6 +93,8 @@
         vm.getUsers = getUsersForAutocomplete;
         vm.attachImage = attachImage;
         vm.onMultiplierValueChanged = onMultiplierValueChanged;
+
+        vm.userId = authService.identity.userId;
 
         vm.pointsType = {};
         vm.kudosifyInfo = {};
@@ -92,6 +122,15 @@
         function init() {
             kudosifyModalFactory.getPointsTypes().then(function (result) {
                 vm.kudosTypes = result;
+            });
+
+            kudosFactory.getUserInformation(vm.userId).then(function (response) {
+                vm.user = response;
+                vm.kudosifyUser = {
+                    formattedName: response.firstName + ' ' + response.lastName,
+                    id: vm.userId
+                };
+                vm.isLoading = false;
             });
 
             if (currentUser) {

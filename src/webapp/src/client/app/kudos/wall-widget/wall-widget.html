@@ -3,11 +3,20 @@
     <div class="kudos-big-buttons-wrapper">
         <div class="kudos-big-button">
             <a ace-kudosify-modal ga-track-event="['Kudos', 'wall big plus', 'opened']" data-test-id="kudosify-button-plus">
-                <span uib-tooltip="{{'kudos.sendKudos' | translate}}" 
+                <span uib-tooltip="{{'kudos.submitKudos' | translate}}" 
                       tooltip-placement="bottom" 
                       tooltip-class="word-break" 
                       class="glyphicon glyphicon-plus kudosify-big-plus-btn" 
                       aria-hidden="true"></span>
+            </a>
+        </div>
+        <div class="kudos-big-button">
+            <a ace-send-kudos-modal ga-track-event="['Kudos', 'wall send kudos', 'opened']" data-test-id="kudos-user-widget-kudosify-button">
+                <span uib-tooltip="{{'kudos.sendKudos' | translate}}"
+                  tooltip-placement="bottom"
+                  tooltip-class="word-break"
+                  class="glyphicon glyphicon-gift kudosify-big-plus-btn"
+                  aria-hidden="true"></span>
             </a>
         </div>
         <div class="kudos-big-button" feature-flag="premium">
