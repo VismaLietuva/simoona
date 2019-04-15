@@ -53,8 +53,7 @@
             wallService.createPost(post, vm.isWallModule);
         }
 
-        function reloadWall()
-        {
+        function reloadWall() {
             wallService.reloadWall(vm.isWallModule);
         }
 
