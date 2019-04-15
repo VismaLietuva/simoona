@@ -131,7 +131,17 @@
                             <select id="recurrence" name="recurrence" class="form-control" ng-model="vm.event.recurrence" ng-options="type.value as 'events.' + vm.recurringTypesResources[type.value] | translate for type in vm.recurringTypes" data-test-id="event-form-recurring-input" translate-cloak></select>
                         </div>
                     </div>
-                    <!--event loation-->
+                    <!--event office-->
+                    <div class="form-group" ng-class="{'has-error': eventForm.officeId.$invalid && eventForm.officeId.$dirty}">
+                        <label for="officeId" class="control-label col-xs-12 col-sm-4" translate="events.eventOffice"></label>
+                        <div class="col-xs-12 col-sm-6 col-md-4">
+                            <select id="officeId" name="officeId" class="form-control" ng-model="vm.event.officeId" ng-options="office.id as office.name for office in vm.eventOffices" data-test-id="event-form-event-type-input" translate-cloak>
+                                <option selected value="">{{"events.all" | translate}}</option>
+                            </select>
+                            <p class="text-danger help-block" ng-if="eventForm.officeId.$invalid && eventForm.officeId.$dirty" translate="common.messageFieldIsRequired"></p>
+                        </div>
+                    </div>
+                    <!--event location-->
                     <div class="form-group required" ng-class="{'has-error': eventForm.location.$invalid && eventForm.location.$dirty}">
                         <label for="location" class="control-label col-xs-12 col-sm-4" translate="events.eventLocation"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">

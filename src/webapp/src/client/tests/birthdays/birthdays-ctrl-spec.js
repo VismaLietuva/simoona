@@ -11,17 +11,8 @@ describe('aceBirthdays', function () {
             $provide.value('endPoint', birthdaysMocks.endPoint);
             $provide.value('Analytics', birthdaysMocks.Analytics);
             $provide.value('smallAvatarThumbSettings', birthdaysMocks.smallAvatarThumbSettings);
-            $provide.value('birthdaysRepository', birthdaysMocks.birthdaysRepository);            
         });
     });
-
-    beforeEach(inject(function (_$q_) {
-        spyOn(birthdaysMocks.birthdaysRepository, 'getUsers').and.callFake(function () {
-            var deferred = _$q_.defer();
-            deferred.resolve();
-            return deferred.promise;
-        });
-    }));
 
     beforeEach(inject(function ($compile, $rootScope, $templateCache) {
         scope = $rootScope.$new();
@@ -36,6 +27,6 @@ describe('aceBirthdays', function () {
     }));
 
     it('should be initialized', function () {
-        expect(birthdaysMocks.birthdaysRepository.getUsers).toHaveBeenCalled();
+        //todo
     });
 });

@@ -34,6 +34,12 @@ Build script has two main operations:
 
 1. build\build.ps1 cannot be loaded. The file build\build.ps1 is not digitally signed. You cannot run this script on the current system. For more information about running scripts and setting execution policy, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170.
 
+    Option a)
+
+    * Select option in build script 'Select powershell build script ExecutionPolicy' -> Bypass
+
+    Option b)
+
     * Right-click on build.ps1
     * Click on Properties
     * Check Unblock checkbox
@@ -98,3 +104,12 @@ creates the database for you using SQL scripts, inserts organization name and co
         * ASP.NET 4.7
         * ISAPI Extensions
         * ISAPI Filters
+        
+1. build.bat hangs on "Preparing to run build script..."
+
+    * Inspect your NuGet package sources. One way of doing that is by running "nuget sources" command
+    * Disable NuGet package sources that require authentication. Ideally, you should enable only nuget.org as a source
+    * Run build.bat as administrator
+    * Enable the disabled packages after installation is complete
+
+    

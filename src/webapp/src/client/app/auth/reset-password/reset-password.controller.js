@@ -73,7 +73,7 @@
                 password: vm.password,
                 confirmPassword: vm.confirmPassword,
                 code: authService.getTokenFromUrl(),
-                email: authService.getUserNameFromUrl('/Reset/')
+                email: authService.getUserNameFromUrl()
             }
 
             authService.resetPassword(params).then(function(response){

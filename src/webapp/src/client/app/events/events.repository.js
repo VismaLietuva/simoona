@@ -17,9 +17,11 @@
 
         var service = {
             getAllEvents: getAllEvents,
+            getEventOffices: getEventOffices,
             getEventTypes: getEventTypes,
             getEventRecurringTypes: getEventRecurringTypes,
             getEventsByType: getEventsByType,
+            getEventsByOffice: getEventsByOffice,
             getMyEvents: getMyEvents,
             getEventDetails: getEventDetails,
             getEventUpdate: getEventUpdate,
@@ -46,6 +48,10 @@
             return $resource(eventUrl + 'All').query().$promise;
         }
 
+        function getEventOffices() {
+            return $resource(eventUrl + 'Offices').query().$promise;
+        }
+
         function getEventTypes() {
             return $resource(eventUrl + 'Types').query().$promise;
         }
@@ -56,6 +62,10 @@
 
         function getEventsByType(id) {
             return $resource(eventUrl + 'ByType').query({ typeId: id }).$promise;
+        }
+
+        function getEventsByOffice(id) {
+            return $resource(eventUrl + 'ByOffice').query({ officeId: id }).$promise;
         }
 
         function getMyEvents(filter) {

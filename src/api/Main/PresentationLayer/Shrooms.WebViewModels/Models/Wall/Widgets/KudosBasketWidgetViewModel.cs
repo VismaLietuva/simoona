@@ -1,4 +1,4 @@
-﻿namespace Shrooms.DataTransferObjects.Models.KudosBasket
+﻿namespace Shrooms.WebViewModels.Models.Wall.Widgets
 {
     public class KudosBasketWidgetViewModel
     {
