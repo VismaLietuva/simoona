@@ -24,7 +24,6 @@
         'simoonaApp.Auth',
         'feature-flags',
         'angularMoment',
-        'vkEmojiPicker',
         //Shrooms modules
         'simoonaApp.Certificate',
         'simoonaApp.Picture',

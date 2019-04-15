@@ -34,9 +34,7 @@
     "angular-google-analytics": "1.1.7",
     "angular-ui-bootstrap": "ui-bootstrap#^2.2.0",
     "angular-bootstrap": "2.2.0",
-    "showdown": "^1.8.6",
-    "angular-emoji-picker": "^0.3.0",
-    "angular-strap": "^2.3.12"
+    "showdown": "^1.8.6"
   },
   "overrides": {
     "bootstrap": {

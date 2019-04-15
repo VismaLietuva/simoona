@@ -3,10 +3,8 @@
 
     angular.module('simoonaApp.Common')
         .directive('markdown', markdown);
-        
-    markdown.$inject = ['$filter'];
 
-    function markdown($filter) {
+    function markdown() {
         var directive = {
             restrict: 'A',
             replace: true,
@@ -29,17 +27,16 @@
                 converter.setOption('underline', true);
             }
 
-            function linkValidator(text, converter){
+            function linkValidator(text, converter) {
                 var reg = /(<a.*?<\/a>)/g;
                 // text splits into array with elements and every second one is link which is not modified to markdowns and emojis
                 var textAndLinks = text.split(reg);
                 for (var i = 0; i < textAndLinks.length; i = i + 2){
                     textAndLinks[i] = converter.makeHtml(textAndLinks[i]);
-                    textAndLinks[i] = $filter('imagify')(textAndLinks[i]);
                 }
-                var text = textAndLinks.join('');
-                return text;
+                var result = textAndLinks.join('');
+                return result;
             }
-        };
+        }
     }
 })();
