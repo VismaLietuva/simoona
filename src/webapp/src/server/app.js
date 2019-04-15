@@ -12,6 +12,15 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var fs = require('fs');
 
+var sslKeyPath = './src/server/newkey.pem';
+var sslCertPath = './src/server/cert.pem';
+var sslEnabled = function() {
+    return sslKeyPath
+        && sslCertPath
+        && fs.existsSync(sslKeyPath)
+        && fs.existsSync(sslCertPath);
+};
+
 var port = process.env.PORT || 7203;
 
 var environment = process.env.NODE_ENV;
@@ -65,17 +74,18 @@ switch (environment) {
         break;
 }
 
-var secureServer;
-try {
-  var ssl_options = {
-    key: fs.readFileSync('./src/server/newkey.pem'),
-    cert: fs.readFileSync('./src/server/cert.pem')
-  };
-  secureServer = https.createServer(ssl_options, app);
-  console.log('Creating server with SSL');
-  secureServer.listen(44330);
-} catch (error) {
-  console.info('No certificate found for SSL');
+if (sslEnabled()) {
+    try {
+        var ssl_options = {
+            key: fs.readFileSync(sslKeyPath),
+            cert: fs.readFileSync(sslCertPath)
+        };
+        var secureServer = https.createServer(ssl_options, app);
+        console.info('Creating HTTPS server');
+        secureServer.listen(44330);
+    } catch (error) {
+        console.warn('Failed to create HTTPS server', error);
+    }
 }
 
 app.listen(port, function() {

@@ -54,7 +54,7 @@
         vm.stateParams = $state.params;
 
         vm.getPostUrl = getPostUrl;
-        vm.successMessage = successMessage;
+        vm.notifyCopied = notifyCopied;
 
         /////////
 
@@ -127,12 +127,14 @@
             }
         }
 
-        function successMessage(){
-            if(vm.post.id) {
+        function notifyCopied(e) {
+            if (vm.post.id) {
                 notifySrv.success('wall.successToClipboard');
             } else {
                 notifySrv.error('errorCodeMessages.messageError');
             }
+
+            e && e.preventDefault();
         }
     }
 }());
