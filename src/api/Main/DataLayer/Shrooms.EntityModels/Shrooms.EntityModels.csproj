@@ -136,10 +136,11 @@
     <Compile Include="Models\Address.cs" />
     <Compile Include="Models\ApplicationRole.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
-    <Compile Include="Models\Badges\BadgeCalculator.cs" />
+    <Compile Include="Models\Badges\BadgeCalculationPolicyType.cs" />
     <Compile Include="Models\Badges\BadgeCategory.cs" />
     <Compile Include="Models\Badges\BadgeCategoryKudosType.cs" />
     <Compile Include="Models\Badges\BadgeType.cs" />
+    <Compile Include="Models\Badges\BadgeLog.cs" />
     <Compile Include="Models\BaseModel.cs" />
     <Compile Include="Models\BaseModelWithOrg.cs" />
     <Compile Include="Models\Books\Book.cs" />

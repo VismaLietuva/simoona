@@ -31,5 +31,12 @@ namespace Shrooms.API.Controllers
         {
             _webHookService.BirthdaysNotification.SendNotifications(GetOrganizationName());
         }
+
+        [HttpPost]
+        [Route("AssignBadges")]
+        public async Task AssignBadges()
+        {
+            await _webHookService.BadgesService.AssignBadgesAsync(GetUserAndOrganization().OrganizationId);
+        }
     }
 }

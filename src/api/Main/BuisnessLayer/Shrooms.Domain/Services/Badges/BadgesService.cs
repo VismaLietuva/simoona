@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
+using Shrooms.Constants.ErrorCodes;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DomainExceptions.Exceptions;
+using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Badges;
+using Shrooms.EntityModels.Models.Kudos;
 
 namespace Shrooms.Domain.Services.Badges
 {
@@ -16,6 +20,9 @@ namespace Shrooms.Domain.Services.Badges
         private readonly IDbSet<BadgeCategory> _badgeCategoriesDbSet;
         private readonly IDbSet<BadgeCategoryKudosType> _badgeCategoryKudosTypesDbSet;
         private readonly IDbSet<BadgeLog> _badgeLogsDbSet;
+
+        private readonly IDbSet<ApplicationUser> _usersDbSet;
+        private readonly IDbSet<KudosLog> _kudosLogsDbSet;
         public BadgesService(IUnitOfWork2 uow)
         {
             _uow = uow;
@@ -24,6 +31,9 @@ namespace Shrooms.Domain.Services.Badges
             _badgeCategoriesDbSet = _uow.GetDbSet<BadgeCategory>();
             _badgeCategoryKudosTypesDbSet = _uow.GetDbSet<BadgeCategoryKudosType>();
             _badgeLogsDbSet = _uow.GetDbSet<BadgeLog>();
+            
+            _usersDbSet = _uow.GetDbSet<ApplicationUser>();
+            _kudosLogsDbSet = _uow.GetDbSet<KudosLog>();
         }
 
         #region Create
@@ -39,7 +49,7 @@ namespace Shrooms.Domain.Services.Badges
 
             if (alreadyExists)
             {
-                throw new ValidationException(444, $"Badge type {title} already exists");
+                throw new ValidationException(ErrorCodes.DuplicatesIntolerable, $"Badge type {title} already exists");
             }
 
             var entity = new BadgeType
@@ -65,7 +75,7 @@ namespace Shrooms.Domain.Services.Badges
 
             if (alreadyExists)
             {
-                throw new ValidationException(444, $"Badge category {title} already exists");
+                throw new ValidationException(ErrorCodes.DuplicatesIntolerable, $"Badge category {title} already exists");
             }
 
             var entity = new BadgeCategory
@@ -79,21 +89,22 @@ namespace Shrooms.Domain.Services.Badges
             await SaveChangesAsync();
         }
 
-        public async Task AddBadgeCategoryToKudosTypeAsync(int badgeCategoryId, int kudosTypeId)
+        public async Task AddBadgeCategoryToKudosTypeAsync(int badgeCategoryId, int kudosTypeId, BadgeCalculationPolicyType calculationPolicy)
         {
             var alreadyExists = await _badgeCategoryKudosTypesDbSet
                 .AnyAsync(x => x.BadgeCategoryId == badgeCategoryId && x.KudosTypeId == kudosTypeId);
 
             if (alreadyExists)
             {
-                throw new ValidationException(444, 
+                throw new ValidationException(ErrorCodes.DuplicatesIntolerable, 
                     $"Badge category (ID {badgeCategoryId}) and kudos type (ID {kudosTypeId}) relationship already exists");
             }
 
             var entity = new BadgeCategoryKudosType
             {
                 BadgeCategoryId = badgeCategoryId,
-                KudosTypeId = kudosTypeId
+                KudosTypeId = kudosTypeId,
+                CalculationPolicyType = calculationPolicy
             };
 
             _badgeCategoryKudosTypesDbSet.Add(entity);
@@ -108,7 +119,7 @@ namespace Shrooms.Domain.Services.Badges
 
             if (alreadyExists)
             {
-                throw new ValidationException(444,
+                throw new ValidationException(ErrorCodes.DuplicatesIntolerable,
                     $"Badge type (ID {badgeTypeId}), employee (ID {employeeId}) and organization (ID {organizationId}) relationship already exists");
             }
 
@@ -128,7 +139,7 @@ namespace Shrooms.Domain.Services.Badges
         public async Task<object> GetBadgeTypesByCategoryAsync(int badgeCategoryId)
             => await _badgeTypesDbSet.Where(x => x.BadgeCategoryId == badgeCategoryId).ToListAsync();
 
-        public async Task<object> GetAllBadgeCategoriesAsync()
+        public async Task<IList<BadgeCategory>> GetAllBadgeCategoriesAsync()
             => await _badgeCategoriesDbSet.ToListAsync();
 
         public async Task<object> GetAllUserBadgesAsync(string employeeId, int organizationId) 
@@ -163,7 +174,7 @@ namespace Shrooms.Domain.Services.Badges
         public async Task DeleteBadgeCategoryAsync(int badgeCategoryId)
         {
             var badgeCategory = _badgeCategoriesDbSet.Find(badgeCategoryId) 
-                                ?? throw new ValidationException(444, $"Badge category with ID {badgeCategoryId} not found");
+                                ?? throw new ValidationException(ErrorCodes.BadgeCategoryNotFound, $"Badge category with ID {badgeCategoryId} not found");
             _badgeCategoriesDbSet.Remove(badgeCategory);
             await SaveChangesAsync();
         }
@@ -172,7 +183,7 @@ namespace Shrooms.Domain.Services.Badges
         {
             var relationship = await _badgeCategoryKudosTypesDbSet
                                    .FirstOrDefaultAsync(x => x.BadgeCategoryId == badgeCategoryId && x.KudosTypeId == kudosTypeId)
-                               ?? throw new ValidationException(444,
+                               ?? throw new ValidationException(ErrorCodes.BadgeToKudosRelationshipNotFound,
                                    $"Badge category (ID {badgeCategoryId}) and kudos type (ID {kudosTypeId}) relationship does not exist");
 
             _badgeCategoryKudosTypesDbSet.Remove(relationship);
@@ -180,16 +191,56 @@ namespace Shrooms.Domain.Services.Badges
         }
         #endregion
 
+        #region Other
+
+        public async Task AssignBadgesAsync(int organizationId)
+        {
+            // TODO magic
+            var categories = await GetAllBadgeCategoriesAsync();
+            var badgeCategoryToKudosType = await _badgeCategoryKudosTypesDbSet.Include(x => x.KudosType).ToListAsync();
+            var users = await _usersDbSet.Where(x => x.OrganizationId == organizationId).ToListAsync(); // Maybe in batches? In case we have tons of users, this might take a while
+
+            foreach (var user in users.AsParallel())
+            {
+                var userId = user.Id;
+                foreach (var category in categories.AsParallel())
+                {
+                    var categoryId = category.Id;
+                    var relationshipWithKudos = badgeCategoryToKudosType.Where(x => x.BadgeCategoryId == categoryId);
+                    var amount = 0;
+                    foreach (var relationship in relationshipWithKudos)
+                    {
+                        var userKudos = await _kudosLogsDbSet.Where(x => x.EmployeeId == userId && x.Status == KudosStatus.Approved && !x.IsMinus()).ToListAsync();
+                        switch (relationship.CalculationPolicyType)
+                        {
+                            case BadgeCalculationPolicyType.PointsStrategy:
+                                amount = (int)Math.Round(userKudos.Sum(x => x.Points * x.MultiplyBy), 0);
+                                break;
+                            case BadgeCalculationPolicyType.MultiplierStrategy:
+                                amount = userKudos.Sum(x => x.MultiplyBy);
+                                break;
+                        }
+                    }
+
+                    var availableKudosWithGivenAmount = await _badgeTypesDbSet.Where(x => x.IsActive && x.BadgeCategoryId == categoryId && x.Value <= amount).ToListAsync();
+                    // TODO
+                }
+            }
+        }
+
+        #endregion
+
         #region Private methods
         private BadgeType GetBadgeType(int badgeTypeId) 
             => _badgeTypesDbSet.Find(badgeTypeId)
-                    ?? throw new ValidationException(444, $"Badge type with ID {badgeTypeId} not found");
+                    ?? throw new ValidationException(ErrorCodes.BadgeTypeNotFound, $"Badge type with ID {badgeTypeId} not found");
+        
         private async Task SaveChangesAsync()
         {
             var response = await _uow.SaveChangesAsync();
             if (response == 0)
             {
-                throw new Exception("Changes could not be saved in BadgesService"); // TODO use appropriate exception
+                throw new ApplicationException("Changes could not be saved in BadgesService");
             }
         }
         #endregion

@@ -208,9 +208,9 @@
   <ItemGroup>
     <Compile Include="DAL\EntityTypeConfigurations\AbstractClassifierConfiguration.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\ApplicationRoleConfiguration.cs" />
-    <Compile Include="DAL\EntityTypeConfigurations\Badges\BadgeCalculatorEntityConfiguration.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\Badges\BadgeCategoryEntityConfiguration.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\Badges\BadgeCategoryKudosTypeEntityConfiguration.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\Badges\BadgeLogEntityConfiguration.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\Badges\BadgeTypeEntityConfiguration.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\BookEntityConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\BookLogEntityConfig.cs" />
