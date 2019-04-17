@@ -54,5 +54,6 @@
   "filterWallMembers": "Filter wall members...",
   "wallModerators": "Moderators",
   "addModerators": "Add moderators",
-  "successToClipboard": "Successfully copied to clipboard!"  
+  "successToClipboard": "Successfully copied to clipboard!",
+  "markdownSuggestions": "**bold** __underlined__ *italics* ~~strikethrough~~ `code`"
 }
