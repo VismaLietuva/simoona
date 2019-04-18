@@ -18,7 +18,10 @@
         var directive = {
             restrict: 'E',
             templateUrl: 'app/kudos/wall-widget/wall-widget.html',
-            link: linkFunc
+            link: linkFunc,
+            scope: {
+                lastApprovedKudos: '=?'
+            }
         };
         return directive;
 
@@ -31,14 +34,8 @@
                 getLastApprovedKudos();
             });
             
-            init();
-
             ////////
             
-            function init() {
-                getLastApprovedKudos();
-            }
-
             function getLastApprovedKudos() {
                 kudosFactory.getLastApprovedKudos(kudosWallWidgetSettings.approvedKudosCount).then(function (result) {
                     scope.lastApprovedKudos = result;

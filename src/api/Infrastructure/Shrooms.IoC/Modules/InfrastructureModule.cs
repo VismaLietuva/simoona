@@ -4,6 +4,7 @@ using Autofac.Core.Lifetime;
 using Hangfire;
 using ReallySimpleFeatureToggle;
 using Shrooms.Azure;
+using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.DailyMailingService;
 using Shrooms.Infrastructure.Configuration;
 using Shrooms.Infrastructure.CustomCache;
@@ -22,6 +23,7 @@ namespace Shrooms.IoC.Modules
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterType<Logger>().As<ILogger>().InstancePerMatchingLifetimeScope(AutofacJobActivator.LifetimeScopeTag, MatchingScopeLifetimeTags.RequestLifetimeScopeTag);
+            builder.RegisterType<CommonMarkMarkdownConverter>().As<IMarkdownConverter>().InstancePerRequest();
             builder.RegisterType<MailingService>().As<IMailingService>().InstancePerMatchingLifetimeScope(AutofacJobActivator.LifetimeScopeTag, MatchingScopeLifetimeTags.RequestLifetimeScopeTag);
             builder.RegisterGeneric(typeof(CustomCache<,>)).As(typeof(ICustomCache<,>)).SingleInstance();
             builder.RegisterType<ApplicationSettings>().As<IApplicationSettings>().InstancePerRequest();

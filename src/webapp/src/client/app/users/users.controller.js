@@ -121,7 +121,12 @@
                 okCallback($state.params.page, item);
                 $advancedLocation.search($state.params);
             }, function (response) {
-                notifySrv.error(response);
+                if(response.status === 405) {
+                    notifySrv.error('errorCodeMessages.userHasPendingKudos');
+                } else {
+                    notifySrv.error(response);
+                }
+
             });
 
         }

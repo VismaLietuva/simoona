@@ -64,6 +64,10 @@
                 notifySrv.error('applicationUser.passwordErrorMustContainUpperCase');              
                 valid = false;
             }
+            if (!/[a-z]/.test(vm.password)) {
+                notifySrv.error('applicationUser.passwordErrorMustContainLowerCase');              
+                valid = false;
+            }
 
             return valid;
         }

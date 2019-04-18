@@ -849,6 +849,10 @@
     <Compile Include="Migrations\201804261017590_AddKudosYearlyMultipliersColumn.Designer.cs">
       <DependentUpon>201804261017590_AddKudosYearlyMultipliersColumn.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201904131234290_AddOfficeIdToEvents.cs" />
+    <Compile Include="Migrations\201904131234290_AddOfficeIdToEvents.Designer.cs">
+      <DependentUpon>201904131234290_AddOfficeIdToEvents.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
@@ -1333,6 +1337,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201804261017590_AddKudosYearlyMultipliersColumn.resx">
       <DependentUpon>201804261017590_AddKudosYearlyMultipliersColumn.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201904131234290_AddOfficeIdToEvents.resx">
+      <DependentUpon>201904131234290_AddOfficeIdToEvents.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

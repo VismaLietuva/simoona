@@ -16,10 +16,10 @@
                         {{:: event.name}}
                     </a>
                 </div>
-                <!-- location -->
+                <!-- office/location -->
                 <div class="col-xs-12">
                     <p class="event-list-item-place" data-test-id="event-list-item-place" ng-cloak>
-                        {{:: event.place}}
+                        <span ng-if="event.office">{{:: event.office}}</span><span ng-if="!event.office">{{ :: "events.all" | translate }}</span>/{{:: event.place}}
                     </p>
                 </div>
                 <!-- date/time -->

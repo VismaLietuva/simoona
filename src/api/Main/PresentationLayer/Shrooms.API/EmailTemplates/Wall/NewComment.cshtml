@@ -1,5 +1,5 @@
-﻿@using RazorEngine.Text
-@using Shrooms.Constants
+﻿@using Shrooms.Constants
+@using Shrooms.Domain.Helpers
 @{
     Layout = EmailTemplateCacheKeys.HeaderFooterLayout;
 }
@@ -35,7 +35,7 @@
                         <!-- DYNAMIC WALL POST USER DISPLAY END -->
 
                         <p style="color: #282828;text-align: left;font-size: 14px;padding-left: 10px;padding-bottom: 15px;font-weight: 400;word-wrap: break-word;word-break: break-all; word-break: break-word;overflow-wrap: break-word; font-family: 'Segoe UI',Helvetica,Arial,sans-serif;margin: 0 0 0 0;">
-                            @Raw(new HtmlEncodedString(Model.MessageBody).ToString().Replace("\n", "<br>"))
+                            @Raw(HtmlSanitizerHelper.Sanitize(Model.MessageBody).Replace("\n", "<br>"))
                         </p>
                     </td>
                 </tr>

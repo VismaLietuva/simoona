@@ -32,21 +32,27 @@
             <div class="col-xs-12 col-lg-5 event-details-info-container">
                 <div class="col-xs-12" ng-if="vm.event.registrationDeadlineDate !== vm.event.startDate">
                     <span class="glyphicon glyphicon-hourglass"></span>
-                    <b><span translate="events.eventRegistrationDeadline"></span> :</b>
+                    <b><span translate="events.eventRegistrationDeadline"></span>:</b>
                     <span data-test-id="event-registration-deadline" class="event-details-date" ng-cloak>
                         {{vm.event.registrationDeadlineDate | amUtc | amLocal | amDateFormat:'YYYY-MM-DD HH:mm'}}
                     </span>
                 </div>
                 <div class="col-xs-12">
                     <span class="glyphicon glyphicon-clock"></span>
-                    <b><span translate="events.eventEndDate"></span> :</b>
+                    <b><span translate="events.eventEndDate"></span>:</b>
                     <span data-test-id="event-end-date" class="event-details-date" ng-cloak>
                         {{vm.event.endDate | amUtc | amLocal | amDateFormat:'YYYY-MM-DD HH:mm'}}
                     </span>
                 </div>
                 <div class="col-xs-12">
                     <span class="glyphicon glyphicon-map-marker"></span>
-                    <b><span translate="events.eventLocation"></span> :</b>
+                    <b><span translate="events.eventOffice"></span>:</b>
+                    <span data-test-id="event-office" ng-cloak ng-if="vm.event.officeName">{{vm.event.officeName}}</span>
+                    <span data-test-id="event-office" ng-cloak ng-if="!vm.event.officeName">{{"events.all" | translate}}</span>
+                </div>
+                <div class="col-xs-12">
+                    <span class="glyphicon glyphicon-map-marker"></span>
+                    <b><span translate="events.eventLocation"></span>:</b>
                     <span data-test-id="event-location" ng-cloak>{{vm.event.location}}</span>
                 </div>
                 <div class="col-xs-12">

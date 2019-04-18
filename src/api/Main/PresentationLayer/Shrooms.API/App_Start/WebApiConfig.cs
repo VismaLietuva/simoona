@@ -26,7 +26,7 @@ namespace Shrooms.API
 
             //config.IncludeErrorDetailPolicy = applicationSettings.IsProductionBuild ? IncludeErrorDetailPolicy.Never : IncludeErrorDetailPolicy.Always;
 
-            config.CacheOutputConfiguration().RegisterDefaultCacheKeyGeneratorProvider(() => new CustomCacheKeyGenerator());
+            config.CacheOutputConfiguration().RegisterDefaultCacheKeyGeneratorProvider(() => new PerOrganizationCacheKeyGenerator());
 
             config.MessageHandlers.Add(new CancelledTaskBugWorkaroundMessageHandler());
 

@@ -23,6 +23,9 @@ namespace Shrooms.EntityModels.Models.Events
         public DateTime EndDate { get; set; }
         public DateTime RegistrationDeadline { get; set; }
         public EventRecurrenceOptions EventRecurring { get; set; }
+        [ForeignKey("Office")]
+        public int? OfficeId { get; set; }
+        public virtual Office Office { get; set; }
         public string Place { get; set; }
         public string Description { get; set; }
         [Range(0, short.MaxValue)]
@@ -42,22 +45,22 @@ namespace Shrooms.EntityModels.Models.Events
         [NotMapped]
         public DateTime LocalStartDate
         {
-            get { return GetLocalDateFromUtcDate(StartDate); }
-            set { StartDate = GetUtcDateFromLocalDate(value); }
+            get => GetLocalDateFromUtcDate(StartDate);
+            set => StartDate = GetUtcDateFromLocalDate(value);
         }
 
         [NotMapped]
         public DateTime LocalEndDate
         {
-            get { return GetLocalDateFromUtcDate(EndDate); }
-            set { EndDate = GetUtcDateFromLocalDate(value); }
+            get => GetLocalDateFromUtcDate(EndDate);
+            set => EndDate = GetUtcDateFromLocalDate(value);
         }
 
         [NotMapped]
         public DateTime LocalRegistrationDeadline
         {
-            get { return GetLocalDateFromUtcDate(RegistrationDeadline); }
-            set { RegistrationDeadline = GetUtcDateFromLocalDate(value); }
+            get => GetLocalDateFromUtcDate(RegistrationDeadline);
+            set => RegistrationDeadline = GetUtcDateFromLocalDate(value);
         }
 
         private DateTime GetLocalDateFromUtcDate(DateTime utcDateTime) => 
