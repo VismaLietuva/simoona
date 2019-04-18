@@ -1,9 +1,6 @@
-﻿using System.Threading.Tasks;
-using System.Web.Http;
-using Shrooms.API.Controllers.WebApi;
+﻿using System.Web.Http;
 using Shrooms.API.Filters;
 using Shrooms.Domain.Services.WebHookCallbacks;
-using WebApi.OutputCache.V2;
 
 namespace Shrooms.API.Controllers
 {
@@ -30,13 +27,6 @@ namespace Shrooms.API.Controllers
         public void SendBirthdaysNotifications()
         {
             _webHookService.BirthdaysNotification.SendNotifications(GetOrganizationName());
-        }
-
-        [HttpPost]
-        [Route("AssignBadges")]
-        public async Task AssignBadges()
-        {
-            await _webHookService.BadgesService.AssignBadgesAsync(GetUserAndOrganization().OrganizationId);
         }
     }
 }

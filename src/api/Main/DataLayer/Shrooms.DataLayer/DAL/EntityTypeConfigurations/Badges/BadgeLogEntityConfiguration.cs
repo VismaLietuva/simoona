@@ -17,6 +17,10 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations.Badges
 
             Property(log => log.OrganizationId)
                 .IsRequired();
+
+            HasRequired(x => x.Employee)
+                .WithMany(x => x.BadgeLogs)
+                .WillCascadeOnDelete(false);
         }
     }
 }

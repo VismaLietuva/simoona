@@ -21,6 +21,16 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations.Badges
 
             Property(u => u.CreatedBy)
                 .HasMaxLength(50);
+
+            HasMany(x => x.RelationshipsWithKudosTypes)
+                .WithRequired()
+                .HasForeignKey(x => x.BadgeCategoryId)
+                .WillCascadeOnDelete(value: false);
+            
+            HasMany(x => x.BadgeTypes)
+                .WithRequired()
+                .HasForeignKey(x => x.BadgeCategoryId)
+                .WillCascadeOnDelete(value: true);
         }
     }
 }
