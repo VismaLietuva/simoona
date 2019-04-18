@@ -1,17 +1,32 @@
 <div id="wall-post-create" class="panel panel-body" has-permissions="['POST_BASIC']">
-    <form name="postForm">
-        <textarea class="form-control post-comment-textarea"
-                  ng-model="vm.postForm.messageBody"
-                  ng-maxlength="vm.maxLength"
-                  ng-trim="false"
-                  name="messageBody"
-                  msd-elastic
-                  type="text"
-                  ng-click="vm.showSubmit()"
-                  translate-attr-placeholder="wall.startConversation"
-                  data-test-id="add-post-text-field" translate></textarea>
 
+    <form name="postForm">
+
+        <div class="comment-input-emoji-container">
+
+            <textarea class="form-control post-comment-textarea comment-input-text"
+                ng-model="vm.postForm.messageBody"
+                ng-maxlength="vm.maxLength"
+                ng-trim="false"
+                name="messageBody"
+                msd-elastic
+                type="text"
+                ng-click="vm.showSubmit()"
+                translate-attr-placeholder="wall.startConversation"
+                data-test-id="add-post-text-field" translate></textarea>
+
+            <div class="emoji-picker-container">
+                <span class="emoji-picker-span"
+                    emoji-picker="vm.postForm.messageBody"
+                    placement="top"
+                    output-format="alias"></span>
+            </div>
+        </div>
         <div ng-if="vm.showSubmitButton" class="panel panel-footer-post">
+
+            <div class="pull-right">
+                <span class="markdown-suggestion" translate="wall.markdownSuggestions"></span>
+            </div>
 
             <div class="col-xs-12 nopadding">
                 <button class="btn btn-default pull-right"

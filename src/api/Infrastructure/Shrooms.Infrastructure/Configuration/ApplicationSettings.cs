@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
+using System.IO;
 using System.Security.Cryptography.X509Certificates;
+using System.Web;
 
 namespace Shrooms.Infrastructure.Configuration
 {
@@ -12,16 +13,7 @@ namespace Shrooms.Infrastructure.Configuration
 
         public bool IsEmailEnabled => bool.Parse(ConfigurationManager.AppSettings["EmailEnabled"]);
 
-        public bool IsProductionBuild
-        {
-            get
-            {
-                bool result;
-                bool.TryParse(ConfigurationManager.AppSettings["IsProductionBuild"], out result);
-
-                return result;
-            }
-        }
+        public bool IsProductionBuild => bool.TryParse(ConfigurationManager.AppSettings["IsProductionBuild"], out var result) && result;
 
         public IEnumerable<string> OAuthRedirectUris => ConfigurationManager.AppSettings["OAuthRedirectUri"].Split(',');
 
@@ -51,32 +43,34 @@ namespace Shrooms.Infrastructure.Configuration
 
         public string VacationsBotHistoryUrl => ConfigurationManager.AppSettings["VacationsBotHistoryUrl"];
 
-        public string ClientUrlWithOrg(string tenant) => $"{ClientUrl}/{tenant}";
+        public string ClientUrlWithOrg(string tenant) => GetClientPath(tenant);
 
-        public string PictureUrl(string tenantPicturesContainer, string pictureName) => $"{ClientUrl}/api/storage/{tenantPicturesContainer.ToLowerInvariant()}/{pictureName}";
+        public string PictureUrl(string tenantPicturesContainer, string pictureName) => GetClientPath($"api/storage/{tenantPicturesContainer.ToLowerInvariant()}/{pictureName}");
 
-        public string WallPostUrl(string organization, int postId) => $"{ClientUrl}/{organization}/Wall/feed?post={postId}";
+        public string WallPostUrl(string organization, int postId) => GetClientPath($"{organization}/Wall/feed?post={postId}");
 
-        public string UserNotificationSettingsUrl(string tenant) => $"{ClientUrl}/{tenant}/Settings/Notifications";
+        public string UserNotificationSettingsUrl(string tenant) => GetClientPath($"{tenant}/Settings/Notifications");
 
-        public string UserProfileUrl(string tenant, string userId) => $"{ClientUrl}/{tenant}/profiles/{userId}";
+        public string UserProfileUrl(string tenant, string userId) => GetClientPath($"{tenant}/profiles/{userId}");
 
-        public string BookUrl(string tenant, int bookOfficeId, int officeId) => $"{ClientUrl}/{tenant}/Books/Edit/{bookOfficeId}/{officeId}";
+        public string BookUrl(string tenant, int bookOfficeId, int officeId) => GetClientPath($"{tenant}/Books/Edit/{bookOfficeId}/{officeId}");
 
-        public string KudosProfileUrl(string tenant, string userId) => $"{ClientUrl}/{tenant}/Kudos/KudosUserInformation/{userId}";
+        public string KudosProfileUrl(string tenant, string userId) => GetClientPath($"{tenant}/Kudos/KudosUserInformation/{userId}");
 
-        public string EventUrl(string tenant, string eventId) => $"{ClientUrl}/{tenant}/Events/EventContent/{eventId}";
+        public string EventUrl(string tenant, string eventId) => GetClientPath($"{tenant}/Events/EventContent/{eventId}");
 
-        public string ProjectUrl(string tenant, string projectId) => $"{ClientUrl}/{tenant}/Projects/Details/{projectId}";
+        public string ProjectUrl(string tenant, string projectId) => GetClientPath($"{tenant}/Projects/Details/{projectId}");
 
-        public string CommitteeSugestionUrl(string tenant) => $"{ClientUrl}/{tenant}/Committees/List";
+        public string CommitteeSugestionUrl(string tenant) => GetClientPath($"{tenant}/Committees/List");
 
-        public string ServiceRequestUrl(string tenant, int id) => $"{ClientUrl}/{tenant}/ServiceRequests/List?Id={id}";
+        public string ServiceRequestUrl(string tenant, int id) => GetClientPath($"{tenant}/ServiceRequests/List?Id={id}");
 
-        public string ResetPasswordUrl(string organization, string userName, string token) => $"{ClientUrl}/{organization}/Reset/{userName}/Token/{token}";
+        public string ResetPasswordUrl(string organization, string userName, string token) => GetClientPath($"{organization}/Reset?UserName={HttpUtility.UrlEncode(userName)}&Token={HttpUtility.UrlEncode(token)}");
 
-        public string VerifyEmailUrl(string organization, string userName, string token) => $"{ClientUrl}/{organization}/Verify/{userName}/Token/{token}";
+        public string VerifyEmailUrl(string organization, string userName, string token) => GetClientPath($"{organization}/Verify?UserName={HttpUtility.UrlEncode(userName)}&Token={HttpUtility.UrlEncode(token)}");
 
         public string ApiUrl => string.Format(ConfigurationManager.AppSettings["ApiUrl"]);
+
+        private string GetClientPath(string relativePath) => Path.Combine(ClientUrl, relativePath);
     }
 }

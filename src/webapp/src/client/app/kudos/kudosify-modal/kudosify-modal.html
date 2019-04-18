@@ -2,7 +2,7 @@
     <button type="button" class="close" ng-click="vm.cancelKudos()">
         <span aria-hidden="true">&times;</span>
     </button>
-    <h3 class="modal-title" translate="kudos.sayThankYou"></h3>
+    <h3 class="modal-title" translate="kudos.submitKudosForAchievement"></h3>
 </div>
 <div class="modal-body">
     <form role="form" name="kudosifyForm">
@@ -124,7 +124,7 @@
             ng-disabled="vm.isBusy || kudosifyForm.$invalid || !vm.pointsType.id || !vm.kudosReceivers.length"
             ng-click="vm.submitKudos(vm.kudosReceivers, vm.kudosifyInfo, vm.pointsType)"
             data-test-id="ok-button-green">
-            <span translate="common.send"></span>
+            <span translate="common.submit"></span>
     </button>
     <button class="btn btn-default"
             ng-click="vm.cancelKudos()"

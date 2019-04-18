@@ -45,21 +45,11 @@ window.usingAnimatedGifs = false; // Used to determine if back-end uses Animated
 
 If you have SSL certificate file in `.pem` format you can put the certificate inside `src\webapp\src\server\` folder the name of that file should be `cert.pem`, you will also have to put RSA private key's file in the same folder, but the name of that file has to be `newkey.pem`.
 
-You can change the naming of these files inside of `src\webapp\src\server\app.js` file, just open it and find the code snippet shown bellow:
+You can change the naming and/or path of these files inside of `src\webapp\src\server\app.js` file, just open it and find the code snippet shown bellow:
 
 ```javascript
-var secureServer;
-try {
-  var ssl_options = {
-    key: fs.readFileSync('./src/server/newkey.pem'),
-    cert: fs.readFileSync('./src/server/cert.pem')
-  };
-  secureServer = https.createServer(ssl_options, app);
-  console.log('Creating server with SSL');
-} catch (error) {
-  secureServer = https.createServer(app);
-  console.log('Creating server without SSL');
-}
+var sslKeyPath = './src/server/newkey.pem';
+var sslCertPath = './src/server/cert.pem';
 ```
 
 ## Web Config
@@ -70,8 +60,8 @@ If you want to redirect all requests to HTTPS open `src\webapp\src\client\web.co
 <rule name="Redirect production to https" stopProcessing="true">
   <match url="(.*)" />
   <conditions>
-  <add input="{HTTP_HOST}" pattern="yourwebsite.url" ignoreCase="true" />
-  <add input="{HTTPS}" pattern="^OFF$" ignoreCase="true" />
+    <add input="{HTTP_HOST}" pattern="yourwebsite.url" ignoreCase="true" />
+    <add input="{HTTPS}" pattern="^OFF$" ignoreCase="true" />
   </conditions>
   <action type="Redirect" url="https://{HTTP_HOST}/{R:1}" redirectType="Permanent" />
 </rule>

@@ -453,7 +453,7 @@ namespace Shrooms.Domain.Services.Kudos
 
         public IEnumerable<KudosBasicDataDTO> GetKudosStats(int months, int amount, int organizationId)
         {
-            var date = DateTime.UtcNow.AddMonths(0 - months);
+            var date = DateTime.UtcNow.AddMonths(-months);
 
             var kudosLogsStats = _kudosLogsDbSet
                 .Include(log => log.Employee)
@@ -508,6 +508,13 @@ namespace Shrooms.Domain.Services.Kudos
             user.SpentKudos = spentKudos;
             user.RemainingKudos = kudosTotal - spentKudos;
             _uow.SaveChanges(userOrg.UserId);
+        }
+
+        public bool HasPendingKudos(string employeeId)
+        {
+            IList<KudosLog> kudosLogs = _kudosLogsDbSet.Where(e => e.EmployeeId == employeeId).ToList();
+
+            return kudosLogs.Any();
         }
 
         private static Expression<Func<ApplicationUser, UserKudosAutocompleteDTO>> MapUsersToAutocompleteDTO()

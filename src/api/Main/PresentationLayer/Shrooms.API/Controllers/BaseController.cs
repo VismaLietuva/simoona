@@ -4,6 +4,7 @@ using Microsoft.AspNet.Identity;
 using Shrooms.API.Helpers;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DomainExceptions.Exceptions;
+using Shrooms.API.GeneralCode;
 
 namespace Shrooms.API.Controllers
 {
@@ -26,11 +27,7 @@ namespace Shrooms.API.Controllers
 
         public UserAndOrganizationDTO GetUserAndOrganization()
         {
-            return new UserAndOrganizationDTO
-            {
-                OrganizationId = User.Identity.GetOrganizationId(),
-                UserId = User.Identity.GetUserId()
-            };
+            return User.Identity.GetUserAndOrganization();
         }
 
         public UserAndOrganizationHubDto GetUserAndOrganizationHub()

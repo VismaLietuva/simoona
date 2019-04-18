@@ -41,6 +41,15 @@
 
                 $timeout(addDefaultTabs, 100);
             });
+
+            eventRepository.getEventOffices().then(function(result) {
+                if (result) {
+                    vm.eventOffices = result;
+
+                    var allOffices = $translate.instant('events.eventOfficeAll');
+                    vm.eventOffices.unshift({ id: "all", name: allOffices });
+                }
+            });
         }
 
         function addDefaultTabs() {

@@ -6,18 +6,19 @@
         .component('aceBirthdays', {
             templateUrl: 'app/birthdays/birthdays.html',
             controller: birthdaysController,
-            controllerAs: 'vm'
+            controllerAs: 'vm',
+            bindings: {
+                users: '<'
+            }
         });
 
     birthdaysController.$inject = [
         '$locale',
         'authService',
-        'birthdaysRepository',
-        'Analytics',
         'smallAvatarThumbSettings'
     ];
 
-    function birthdaysController($locale, authService, birthdaysRepository, Analytics, smallAvatarThumbSettings) {
+    function birthdaysController($locale, authService, smallAvatarThumbSettings) {
         /*jshint validthis: true */
         var vm = this;
 
@@ -30,15 +31,8 @@
 
         function init() {
             if (authService.hasPermissions(['BIRTHDAYS_BASIC'])) {
-                getUsers();
                 getMonths();
             }
-        }
-
-        function getUsers() {
-            birthdaysRepository.getUsers().then(function(response) {
-                vm.users = response;
-            });
         }
 
         function getMonths() {

@@ -13,7 +13,6 @@
         'bootstrapLightbox',
         'LocalStorageModule',
         'monospaced.elastic',
-        'ngSanitize',
         'SignalR',
         'pascalprecht.translate',
         'tmh.dynamicLocale',
@@ -93,7 +92,7 @@
             'name': 'AnimatedGifs',
             'description': 'Used to set if back-end uses AnimatedGifs plugin'
         }]);
-   
+
         Analytics.pageView();
 
         $rootScope.$state = $state;

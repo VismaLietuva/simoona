@@ -217,3 +217,4 @@ src/webapp/src/client/resources/locale-lt_LT.json
 src/webapp/src/client/resources/locale-en_US.json
 src/webapp/src/client/app/build-config.js
 .vscode/settings.json
+/src/api/Main/PresentationLayer/Shrooms.API/Extensions/**

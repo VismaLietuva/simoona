@@ -53,6 +53,7 @@ module.exports = class extends Generator {
           type    : 'input',
           name    : 'organization',
           message : 'Enter organization name:',
+          default : 'SimoonaTest',
           validate: function (organization){
             return organization !== '';
           }
@@ -68,6 +69,7 @@ module.exports = class extends Generator {
           type    : 'input',
           name    : 'connectionString',
           message : 'Enter database server connection string (without database name):',
+          default : "Data Source=localhost\\SQLEXPRESS;Integrated Security=True;Connect Timeout=60; MultipleActiveResultSets=True;",
           validate: function (connectionString){
             var conn = connectionString.toLowerCase();
             return conn !== '';
@@ -76,17 +78,40 @@ module.exports = class extends Generator {
           type    : 'input',
           name    : 'dbName',
           message : 'Enter database name for Simoona:',
+          default : 'SimoonaDB',
           validate: function (dbName){
             return dbName !== '';
           }
-        }]).then((answers) => {
+        }, {
+          type: 'list',
+          name: 'bypassExecPolicy',
+          message: 'Select powershell build script ExecutionPolicy',
+          choices: [
+            {
+              name: 'Default',
+              value: false
+            }, {
+              name: 'Bypass',
+              value: true
+            },
+          ]
+        },]).then((answers) => {
           this.props = answers;
         });
       }
 
       install() {
-        this.spawnCommandSync('powershell', ['./build.ps1', '-organization="' + this.props.organization + '"', '-email="' + this.props.email + '"', 
-        '-connectionString="' + this.props.connectionString + '"', '-dbName="'+ this.props.dbName +'"', '-activity="' + this.props.activity + '"',
-        '-dropdb="' + this.props.dropdb + '"']);
+        this.spawnCommandSync(
+          (this.props.bypassExecPolicy ? 'powershell  -ExecutionPolicy Bypass ': 'powershell'),
+          [
+            './build.ps1', 
+            '-organization="' + this.props.organization + '"',
+            '-email="' + this.props.email + '"',
+            '-connectionString="' + this.props.connectionString + '"',
+            '-dbName="'+ this.props.dbName +'"',
+            '-activity="' + this.props.activity + '"',
+            '-dropdb="' + this.props.dropdb + '"'
+          ]
+        );
       }
   };
