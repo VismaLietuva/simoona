@@ -8,6 +8,7 @@ using System.Web;
 using Microsoft.AspNet.Identity;
 using Shrooms.DataLayer.DAL.EntityTypeConfigurations;
 using Shrooms.EntityModels.Models;
+using Shrooms.EntityModels.Models.Badges;
 using Shrooms.EntityModels.Models.Books;
 using Shrooms.EntityModels.Models.Events;
 using Shrooms.EntityModels.Models.Kudos;
@@ -121,6 +122,11 @@ namespace Shrooms.DataLayer.DAL
         public virtual DbSet<KudosShopItem> KudosShopItems { get; set; }
 
         public virtual DbSet<Notification> Notifications { get; set; }
+
+        public virtual DbSet<BadgeCategory> BadgeCategories { get; set; }
+        public virtual DbSet<BadgeType> BadgeTypes { get; set; }
+        public virtual DbSet<BadgeCategoryKudosType> BadgeCategoryKudosType { get; set; }
+        public virtual DbSet<BadgeLog> BadgeLogs { get; set; }
 
         public int SaveChanges(string userId)
         {

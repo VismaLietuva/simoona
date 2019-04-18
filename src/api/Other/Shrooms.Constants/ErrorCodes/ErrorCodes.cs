@@ -44,5 +44,10 @@
 
         // Organization, 12**
         public const int UserIsNotAManager = 1200;
+
+        // Badges, 13**
+        public const int BadgeTypeNotFound = 1300;
+        public const int BadgeCategoryNotFound = 1301;
+        public const int BadgeToKudosRelationshipNotFound = 1302;
     }
 }

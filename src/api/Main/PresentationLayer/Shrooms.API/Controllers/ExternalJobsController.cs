@@ -1,9 +1,6 @@
-﻿using System.Threading.Tasks;
-using System.Web.Http;
-using Shrooms.API.Controllers.WebApi;
+﻿using System.Web.Http;
 using Shrooms.API.Filters;
 using Shrooms.Domain.Services.WebHookCallbacks;
-using WebApi.OutputCache.V2;
 
 namespace Shrooms.API.Controllers
 {
