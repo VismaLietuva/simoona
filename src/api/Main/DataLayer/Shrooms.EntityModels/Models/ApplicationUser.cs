@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using DataLayer.Models;
 using Microsoft.AspNet.Identity.EntityFramework;
+using Shrooms.EntityModels.Models.Badges;
 using Shrooms.EntityModels.Models.Events;
 using Shrooms.EntityModels.Models.Kudos;
 using Shrooms.EntityModels.Models.Multiwall;
@@ -101,6 +102,8 @@ namespace Shrooms.EntityModels.Models
         public virtual ICollection<Book> Books { get; set; }
 
         public virtual ICollection<BookLog> BookLogs { get; set; }
+
+        public virtual ICollection<BadgeLog> BadgeLogs { get; set; }
 
         public virtual ICollection<Event> Events { get; set; }
 
