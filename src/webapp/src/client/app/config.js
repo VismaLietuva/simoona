@@ -41,7 +41,7 @@
     ];
 
     window.modules = modulesList;
-    window.isPremium = false; // Enable/disable premium modules
+    window.isPremium = true; // Enable/disable premium modules
     window.usingAnimatedGifs = false; // Used to determine if back-end uses AnimatedGifs plugin
 
     angular.module('simoonaApp', window.modules)
@@ -91,6 +91,12 @@
             'active': window.usingAnimatedGifs,
             'name': 'AnimatedGifs',
             'description': 'Used to set if back-end uses AnimatedGifs plugin'
+        },
+        {
+            'key': 'kudosSendImproved',
+            'active': false,
+            'name': 'Improved Kudos Send',
+            'description': 'Adds more clear functionality to send your own Kudos to other'
         }]);
 
         Analytics.pageView();
@@ -134,13 +140,13 @@
 
         if (!!environment && environment === 'prod') {
             AnalyticsProvider.setAccount({
-                tracker: 'trackerNumber',
+                tracker: 'trackerNumberProd',
                 trackEvent: true
             });
         } else {
             AnalyticsProvider.setDomainName('none');
             AnalyticsProvider.setAccount({
-                tracker: 'trackerNumber',
+                tracker: 'trackerNumberNone',
                 trackEvent: true
             });
         }
