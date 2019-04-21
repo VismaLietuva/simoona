@@ -2,7 +2,7 @@
 
 namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Email.Kudos
 {
-    public interface IKudosNotificationService
+    public interface IKudosPremiumNotificationService
     {
         void SendLoyaltyBotNotification(KudosLog kudosLog);
     }

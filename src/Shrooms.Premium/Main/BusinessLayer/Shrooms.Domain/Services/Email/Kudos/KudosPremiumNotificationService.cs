@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Email.Kudos
 {
-    public class KudosNotificationService : IKudosNotificationService
+    public class KudosPremiumNotificationService : IKudosPremiumNotificationService
     {
         private readonly IMailTemplate _mailTemplate;
         private readonly IMailingService _mailingService;
@@ -20,7 +20,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Email.Kudos
 
         private readonly IDbSet<Organization> _organizationsDbSet;
 
-        public KudosNotificationService(IUnitOfWork2 uow, IMailingService mailingService, IApplicationSettings appSettings, IMailTemplate mailTemplate)
+        public KudosPremiumNotificationService(IUnitOfWork2 uow, IMailingService mailingService, IApplicationSettings appSettings, IMailTemplate mailTemplate)
         {
             _appSettings = appSettings;
             _mailTemplate = mailTemplate;

@@ -21,9 +21,9 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos
         private readonly IDbSet<Organization> _organizationsDbSet;
 
         private readonly ILogger _logger;
-        private readonly IKudosNotificationService _kudosNotificationService;
+        private readonly IKudosPremiumNotificationService _kudosNotificationService;
 
-        public LoyaltyKudosService(IUnitOfWork2 uow, ILogger logger, IKudosNotificationService kudosNotificationService)
+        public LoyaltyKudosService(IUnitOfWork2 uow, ILogger logger, IKudosPremiumNotificationService kudosNotificationService)
         {
             _logger = logger;
             _kudosNotificationService = kudosNotificationService;

@@ -8,12 +8,13 @@ using WebApi.OutputCache.V2;
 
 namespace Shrooms.Premium.Main.PresentationLayer.Shrooms.API.Controllers
 {
+    [RoutePrefix("ExternalPremiumJobs")]
     [IdentityBasicAuthentication]
     public class ExternalPremiumJobsController : BaseController
     {
-        private readonly IWebHookCallbackServices _webHookService;
+        private readonly IWebHookCallbackPremiumServices _webHookService;
 
-        public ExternalPremiumJobsController(IWebHookCallbackServices webHookService)
+        public ExternalPremiumJobsController(IWebHookCallbackPremiumServices webHookService)
         {
             _webHookService = webHookService;
         }

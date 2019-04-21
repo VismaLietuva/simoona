@@ -34,7 +34,7 @@ namespace Shrooms.UnitTests.DomainService
             _organizationsDbSet = uow.MockDbSet<Organization>();
 
             var loggerMock = Substitute.For<ILogger>();
-            var notificationServiceMock = Substitute.For<IKudosNotificationService>();
+            var notificationServiceMock = Substitute.For<IKudosPremiumNotificationService>();
 
             _loyaltyKudosService = new LoyaltyKudosService(uow, loggerMock, notificationServiceMock);
         }
