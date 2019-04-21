@@ -17,18 +17,6 @@
         "sqlServerAdminPassword": {
             "value": ""
         },
-        "sqlDbName": {
-            "value": "simoona-staging"
-        },
-        "sqlDbMaxSizeBytes": {
-            "value": "2147483648"
-        },
-        "sqlDbSkuName": {
-            "value": "Basic"
-        },
-        "sqlDbSkuTier": {
-            "value": "Basic"
-        },
         "omsWorkspaceName": {
             "value": "simoona-staging"
         },
@@ -43,9 +31,6 @@
         },
         "storageSkuName": {
             "value": "Standard_RAGRS"
-        },
-        "storageAccountContainerName": {
-            "value": "test"
         },
         "webAppPlanName": {
             "value": "simoona-staging"
