@@ -32,6 +32,9 @@
         "storageSkuName": {
             "value": "Standard_RAGRS"
         },
+        "storageKind": {
+            "value": "StorageV2"
+        },
         "webAppPlanName": {
             "value": "simoona-staging"
         },

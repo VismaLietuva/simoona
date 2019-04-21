@@ -93,6 +93,19 @@
                 "description": "Storage SKU (Account type)"
             }
         },
+        "storageKind": {
+            "defaultValue": "StorageV2",
+            "type": "string",
+            "allowedValues": [
+                "Storage",
+                "StorageV2",
+                "BlobStorage",
+                "FileStorage"
+            ],
+            "metadata": {
+                "description": "Indicates the type of storage account"
+            }
+        },
         "webAppPlanName": {
             "type": "string",
             "defaultValue": "simoona-app"
@@ -231,14 +244,14 @@
             "resources": []
         },
         {
-            "apiVersion": "2018-11-01",
+            "apiVersion": "2018-07-01",
             "type": "Microsoft.Storage/storageAccounts",
             "name": "[parameters('storageAccountName')]",
             "location": "[resourceGroup().location]",
             "sku": {
                 "name": "[parameters('storageSkuName')]"
             },
-            "kind": "Storage"
+            "kind": "[parameters('storageKind')]"
         },
         {
             "apiVersion": "2016-09-01",
