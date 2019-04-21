@@ -181,34 +181,35 @@
             "defaultValue": "*"
         }
     },
-    "resources": [{
-        "apiVersion": "2014-04-01",
-        "type": "Microsoft.Insights/components",
-        "kind": "other",
-        "name": "[parameters('applicationInsightsName')]",
-        "location": "[resourceGroup().location]",
-        "tags": {
-            "resourceType": "Application Insights",
-            "clusterName": "[parameters('resourceGroupName')]"
+    "resources": [
+        {
+            "apiVersion": "2014-04-01",
+            "type": "Microsoft.Insights/components",
+            "kind": "other",
+            "name": "[parameters('applicationInsightsName')]",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "resourceType": "Application Insights",
+                "clusterName": "[parameters('resourceGroupName')]"
+            },
+            "properties": {
+                "ApplicationId": "[parameters('resourceGroupName')]"
+            },
+            "dependsOn": []
         },
-        "properties": {
-            "ApplicationId": "[parameters('resourceGroupName')]"
-        },
-        "dependsOn": []
-    },
-    {
-        "apiVersion": "2015-05-01-preview",
-        "type": "Microsoft.Sql/servers",
-        "kind": "v12.0",
-        "name": "[parameters('sqlServerName')]",
-        "location": "[resourceGroup().location]",
-        "properties": {
-            "administratorLogin": "[parameters('sqlServerAdminLogin')]",
-            "administratorLoginPassword": "[parameters('sqlServerAdminPassword')]",
-            "version": "12.0"
-        },
-        "dependsOn": [],
-        "resources": [
+        {
+            "apiVersion": "2015-05-01-preview",
+            "type": "Microsoft.Sql/servers",
+            "kind": "v12.0",
+            "name": "[parameters('sqlServerName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "administratorLogin": "[parameters('sqlServerAdminLogin')]",
+                "administratorLoginPassword": "[parameters('sqlServerAdminPassword')]",
+                "version": "12.0"
+            },
+            "dependsOn": [],
+            "resources": [
                 {
                     "apiVersion": "2017-10-01-preview",
                     "type": "databases",
@@ -276,7 +277,7 @@
             "location": "[resourceGroup().location]",
             "properties": {
                 "sku": {
-                    "Name": "[parameters('omsWorkspaceServiceTier')]"
+                    "name": "[parameters('omsWorkspaceServiceTier')]"
                 },
                 "retention": "[parameters('omsWorkspaceDataRetention')]"
             },
@@ -297,13 +298,13 @@
                     "type": "blobServices/containers",
                     "apiVersion": "2018-11-01",
                     "properties": {
-                      "publicAccess": "Blob"
+                        "publicAccess": "Blob"
                     },
                     "dependsOn": [
                         "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
                     ]
                 }
-            ]    
+            ]
         },
         {
             "apiVersion": "2016-09-01",
@@ -330,12 +331,12 @@
                 "enabled": true,
                 "name": "[parameters('webAppName')]",
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('webAppPlanName'))]",
+                "httpsOnly": true,
                 "enabledHostNames": [
                     "[concat(parameters('webAppName'), '.azurewebsites.net')]",
                     "[concat(parameters('webAppName'), '.scm.azurewebsites.net')]"
                 ],
                 "siteConfig": {
-                    "httpsOnly": true,
                     "phpVersion": "",
                     "alwaysOn": true,
                     "use32BitWorkerProcess": false,
