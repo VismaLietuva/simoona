@@ -34,13 +34,6 @@ In order to change WebApp's configuration open file located in `src\webapp\gulp.
 
 One of the most important properties is `endpoint` if your API project is running on a different address don't forget to change the config property accordingly.
 
-WebApp project has one more config file located in `src\webapp\src\client\app\config.js`. If your API project is using [ImageResizer Performance plugins](http://imageresizing.net/plugins/editions/performance) you should change `window.usingAnimatedGifs` to `true`. Default configuration is shown below:
-
-```javascript
-window.isPremium = false; // Enable/disable premium modules (it also needs premium modules enabled on the backend)
-window.usingAnimatedGifs = false; // Used to determine if back-end uses AnimatedGifs plugin
-```
-
 ## SSL Certificate
 
 If you have SSL certificate file in `.pem` format you can put the certificate inside `src\webapp\src\server\` folder the name of that file should be `cert.pem`, you will also have to put RSA private key's file in the same folder, but the name of that file has to be `newkey.pem`.

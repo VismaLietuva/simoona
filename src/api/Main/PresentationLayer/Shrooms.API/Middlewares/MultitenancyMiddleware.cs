@@ -68,6 +68,7 @@ namespace Shrooms.API.Middlewares
             }
             else if (requestPath.StartsWith("/token") ||
                 requestPath.StartsWith("/externaljobs") ||
+                requestPath.StartsWith("/externalpremiumjobs") ||
                 requestPath.StartsWith("/Account/ExternalLogin") ||
                 requestPath.StartsWith("/Account/RegisterExternal") ||
                 requestPath.StartsWith("/Account/InternalLogins") ||
