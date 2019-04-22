@@ -41,7 +41,7 @@
     ];
 
     window.modules = modulesList;
-    window.isPremium = true; // Enable/disable premium modules
+    window.isPremium = false; // Enable/disable premium modules
     window.usingAnimatedGifs = false; // Used to determine if back-end uses AnimatedGifs plugin
 
     angular.module('simoonaApp', window.modules)
