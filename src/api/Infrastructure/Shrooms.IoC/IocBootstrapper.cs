@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Web.Http;
 using Autofac;
@@ -86,18 +87,18 @@ namespace Shrooms.IoC
 
         private static void RegisterExtensions(ContainerBuilder builder, ILogger logger)
         {
-            string extensionPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Extensions");
+            var extensionsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Extensions");
 
-            if (!Directory.Exists(extensionPath))
+            if (!Directory.Exists(extensionsPath))
             {
                 logger.Error(new DirectoryNotFoundException("Extension directory does not exist"));
 
                 return;
             }
 
-            var files = Directory.GetFiles(extensionPath, "*.dll", SearchOption.AllDirectories);
+            var files = Directory.GetFiles(extensionsPath, "*.dll", SearchOption.AllDirectories);
 
-            foreach (string dll in files)
+            foreach (var dll in files)
             {
                 try
                 {
@@ -121,6 +122,20 @@ namespace Shrooms.IoC
                     logger.Error(nullException);
                 }
             }
+
+            // Needed for Hangfire to process jobs from extension assemblies
+            AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
+            {
+                var assemblyName = new AssemblyName(args.Name);
+                var existing = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(c => c.FullName == assemblyName.FullName);
+
+                if (existing != null)
+                {
+                    return existing;
+                }
+
+                return null;
+            };
         }
 
         private static void RegisterMapper(ContainerBuilder builder)
