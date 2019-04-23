@@ -1,4 +1,5 @@
-﻿using Shrooms.Domain.Services.WebHookCallbacks.Events;
+﻿using Shrooms.Domain.Services.Badges;
+using Shrooms.Domain.Services.WebHookCallbacks.Events;
 using Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.WebHookCallbacks
@@ -8,5 +9,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.WebHookCall
         IEventsWebHookService Events { get; set; }
 
         ILoyaltyKudosService LoyaltyKudos { get; set; }
+
+        IBadgesService BadgesService { get; set; }
     }
 }
