@@ -9,7 +9,6 @@ namespace Shrooms.Premium.Infrastructure.Shrooms.IoC.Modules
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterType<NotificationService>().As<INotificationService>().InstancePerRequest();
-            builder.RegisterType<KudosPremiumNotificationService>().As<IKudosPremiumNotificationService>().InstancePerRequest();
         }
     }
 }
