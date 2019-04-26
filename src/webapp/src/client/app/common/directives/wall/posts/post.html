@@ -107,10 +107,10 @@
                              ng-show="!vm.editFieldEnabled">
     </ace-message-actions>   
 
-    <a 
-    ngclipboard
-    ng-click="vm.successMessage()"
-    data-clipboard-text="{{vm.getPostUrl(vm.post.id)}}" 
-    class="clipboard-post-link vismaicon vismaicon-sm"></a>
+    <a  ngclipboard
+        ng-click="vm.notifyCopied($event)"
+        ng-href="{{vm.getPostUrl(vm.post.id)}}"
+        data-clipboard-text="{{vm.getPostUrl(vm.post.id)}}" 
+        class="clipboard-post-link vismaicon vismaicon-sm"></a>
 
 </div>

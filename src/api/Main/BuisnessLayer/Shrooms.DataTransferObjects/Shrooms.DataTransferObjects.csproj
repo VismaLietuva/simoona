@@ -198,7 +198,6 @@
     <Compile Include="Models\KudosBasket\KudosBasketEditDTO.cs" />
     <Compile Include="Models\KudosBasket\KudosBasketLogDTO.cs" />
     <Compile Include="Models\KudosBasket\KudosBasketLogUserDTO.cs" />
-    <Compile Include="Models\KudosBasket\KudosBasketWidgetViewModel.cs" />
     <Compile Include="Models\Kudos\AddKudosDTO.cs" />
     <Compile Include="Models\Kudos\AddKudosLogDTO.cs" />
     <Compile Include="Models\Kudos\KudosBasicDataDTO.cs" />

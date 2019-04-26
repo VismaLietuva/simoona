@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Shrooms.DataLayer;
+using Shrooms.Infrastructure.Configuration;
 using Shrooms.UnitTests.Extensions;
 
 namespace Shrooms.UnitTests.Mocks
@@ -11,7 +12,7 @@ namespace Shrooms.UnitTests.Mocks
         private readonly List<TEntity> _listContext;
 
         public NewMockRepository(IDbContext context)
-            : base(context)
+            : base(context, new ApplicationSettings())
         {
             _listContext = context.Set<TEntity>().ToList();
         }

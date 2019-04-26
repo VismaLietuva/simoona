@@ -37,7 +37,6 @@ namespace Shrooms.API
         {
             var config = new HttpConfiguration();
             RegisterTelemetryInstrumentationKey();
-            StartBackgroundWorker(app);
             EmailTemplatesConfig.Register(AppDomain.CurrentDomain.BaseDirectory);
             SwaggerConfig.Setup(config);
             SerializationIgnoreConfigs.Configure();
@@ -54,6 +53,8 @@ namespace Shrooms.API
             var container = IocBootstrapper.Bootstrap(app, ExtractConnString, config);
             config.DependencyResolver = new AutofacWebApiDependencyResolver(container);
             GlobalHost.DependencyResolver = new Autofac.Integration.SignalR.AutofacDependencyResolver(container);
+
+            StartBackgroundWorker(app);
 
             ConfigureAuthServer(app, container);
 

@@ -18,7 +18,6 @@ beforeEach(function () {
             getDonations: function () { },
             makeDonation: function () { },
             getKudosBasket: function () { },
-            getKudosBasketWidget: function () { },
             createNewBasket: function () { },
             editKudosBasket: function () { },
             deleteKudosBasket: function () { }

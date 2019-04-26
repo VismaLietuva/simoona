@@ -6,13 +6,21 @@
         .controller('wallController', wallController);
 
     wallController.$inject = [
-        '$rootScope'
+        '$rootScope',
+        'wallRepository'
     ];
 
-    function wallController($rootScope) {
+    function wallController($rootScope, wallRepository) {
         /*jshint validthis: true */
         var vm = this;
 
         $rootScope.pageTitle = 'wall.wallTitle';
+
+        //init
+        vm.widgetsInfo = {};
+        wallRepository.getWidgetsInfo()
+            .then(function(widgetsInfo) { 
+                vm.widgetsInfo = widgetsInfo;
+            });
     }
 }());

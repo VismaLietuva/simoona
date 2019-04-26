@@ -8,7 +8,7 @@ namespace Shrooms.Infrastructure.FireAndForget
     {
         public void Enqueue<T>(Expression<Action<T>> method)
         {
-            BackgroundJob.Enqueue<T>(method);
+            BackgroundJob.Enqueue(method);
         }
     }
 }

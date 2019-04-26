@@ -9,6 +9,8 @@ namespace Shrooms.Infrastructure.Configuration
 
         bool IsEmailEnabled { get; }
 
+        int DefaultOrganizationId { get; }
+
         bool IsProductionBuild { get; }
 
         string DemoAccountDefaultPictureId { get; }

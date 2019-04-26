@@ -17,13 +17,9 @@ namespace Shrooms.Domain.Services.Permissions
     {
         private readonly IDbSet<Permission> _permissionsDbSet;
         private readonly ICustomCache<string, IEnumerable<string>> _permissionsCache;
-        private readonly IDbSet<ApplicationRole> _rolesDbSet;
-        private readonly IDbSet<ApplicationUser> _usersDbSet;
 
         public PermissionService(IUnitOfWork2 unitOfWork, ICustomCache<string, IEnumerable<string>> permissionsCache)
         {
-            _usersDbSet = unitOfWork.GetDbSet<ApplicationUser>();
-            _rolesDbSet = unitOfWork.GetDbSet<ApplicationRole>();
             _permissionsDbSet = unitOfWork.GetDbSet<Permission>();
             _permissionsCache = permissionsCache;
         }
@@ -41,7 +37,7 @@ namespace Shrooms.Domain.Services.Permissions
                 _permissionsCache.TryAdd(userAndOrg.UserId, permissions);
             }
 
-            var isPermitted = permissions.Any(x => x == permissionName);
+            var isPermitted = permissions.Contains(permissionName);
             return isPermitted;
         }
 

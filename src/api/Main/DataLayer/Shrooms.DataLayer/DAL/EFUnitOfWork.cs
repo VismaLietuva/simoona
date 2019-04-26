@@ -1,22 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Shrooms.Infrastructure.Configuration;
 
 namespace Shrooms.DataLayer
 {
     public class EFUnitOfWork : IUnitOfWork
     {
-        private readonly IDbContext _dbContext;
         private readonly Dictionary<Type, object> _repositories;
 
-        public IDbContext DbContext
-        {
-            get { return _dbContext; }
-        }
+        public IDbContext DbContext { get; }
 
         public EFUnitOfWork(IDbContext context)
         {
-            _dbContext = context;
+            DbContext = context;
             _repositories = new Dictionary<Type, object>();
         }
 
@@ -31,20 +28,22 @@ namespace Shrooms.DataLayer
                 return repository;
             }
 
-            repository = new EFRepository<TEntity>(DbContext);
+            IApplicationSettings _appSettings = new ApplicationSettings();
+
+            repository = new EFRepository<TEntity>(DbContext, _appSettings);
             _repositories.Add(typeof(TEntity), repository);
             return repository;
         }
 
         public void Save()
         {
-            _dbContext.SaveChanges();
+            DbContext.SaveChanges();
         }
 
         public T GetDbContextAs<T>()
             where T : class, IDbContext
         {
-            return _dbContext as T;
+            return DbContext as T;
         }
     }
 }

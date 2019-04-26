@@ -208,6 +208,10 @@
   <ItemGroup>
     <Compile Include="DAL\EntityTypeConfigurations\AbstractClassifierConfiguration.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\ApplicationRoleConfiguration.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\Badges\BadgeCategoryEntityConfiguration.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\Badges\BadgeCategoryKudosTypeEntityConfiguration.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\Badges\BadgeLogEntityConfiguration.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\Badges\BadgeTypeEntityConfiguration.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\BookEntityConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\BookLogEntityConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\BookOfficeEntityConfig.cs" />
@@ -845,6 +849,14 @@
     <Compile Include="Migrations\201804261017590_AddKudosYearlyMultipliersColumn.Designer.cs">
       <DependentUpon>201804261017590_AddKudosYearlyMultipliersColumn.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201904131234290_AddOfficeIdToEvents.cs" />
+    <Compile Include="Migrations\201904131234290_AddOfficeIdToEvents.Designer.cs">
+      <DependentUpon>201904131234290_AddOfficeIdToEvents.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201904180838055_AddedBadgesEntities.cs" />
+    <Compile Include="Migrations\201904180838055_AddedBadgesEntities.Designer.cs">
+      <DependentUpon>201904180838055_AddedBadgesEntities.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\201904131312193_AddKudosWelcomeColumns.cs" />
     <Compile Include="Migrations\201904131312193_AddKudosWelcomeColumns.Designer.cs">
       <DependentUpon>201904131312193_AddKudosWelcomeColumns.cs</DependentUpon>
@@ -1336,6 +1348,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201904131312193_AddKudosWelcomeColumns.resx">
       <DependentUpon>201904131312193_AddKudosWelcomeColumns.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201904131234290_AddOfficeIdToEvents.resx">
+      <DependentUpon>201904131234290_AddOfficeIdToEvents.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201904180838055_AddedBadgesEntities.resx">
+      <DependentUpon>201904180838055_AddedBadgesEntities.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

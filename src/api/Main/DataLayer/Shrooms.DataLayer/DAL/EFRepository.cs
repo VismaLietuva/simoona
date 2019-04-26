@@ -5,6 +5,7 @@ using System.Linq.Dynamic;
 using System.Linq.Expressions;
 using PagedList;
 using Shrooms.EntityModels.Models;
+using Shrooms.Infrastructure.Configuration;
 
 namespace Shrooms.DataLayer
 {
@@ -12,19 +13,22 @@ namespace Shrooms.DataLayer
         where TEntity : class
     {
         protected IDbContext Context;
+        private readonly IApplicationSettings _appSettings;
+
         protected DbSet<TEntity> DbSet;
         public const string ClaimOrganizationId = "OrganizationId";
 
         public int OrganizationId
         {
-            get { return 1; }
+            get => _appSettings.DefaultOrganizationId;
             set { }
         }
 
-        public EFRepository(IDbContext context)
+        public EFRepository(IDbContext context, IApplicationSettings appSettings)
         {
             Context = context;
             DbSet = Context.Set<TEntity>();
+            _appSettings = appSettings;
         }
 
         public virtual IQueryable<TEntity> Get(Expression<Func<TEntity, bool>> filter = null, int maxResults = 0, string orderBy = null, string includeProperties = "",

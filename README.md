@@ -7,8 +7,8 @@ Simoona encourages more interactions, more social activities, more fun. Focus on
 
 Simoona consists of two main parts:
 
-* Front-end webapp - purely (no server-side code) AngularJS appication
-* Back-end app - ASP.NET MVC+WebApi project, with EntityFramework code-first database
+* Front-end webapp - purely AngularJS appication (no server-side code),
+* Back-end app - ASP.NET MVC+WebApi project, with EntityFramework code-first database.
 
 ## Quickstart
 
@@ -19,7 +19,7 @@ The easiest and fastest way to start exploring Simoona is to follow [installatio
 
 ## Developing and Contributing
 
-After you finished with initial installation and wan't to start developing - please look into more detailed documentation about Simoona parts:
+After you're done with initial installation and want to start developing, please look into more detailed documentation about Simoona parts:
 
 1. [Front-end webapp](src/webapp/README.md)
     * Gulp Command List

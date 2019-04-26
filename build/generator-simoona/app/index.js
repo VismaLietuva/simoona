@@ -69,7 +69,7 @@ module.exports = class extends Generator {
           type    : 'input',
           name    : 'connectionString',
           message : 'Enter database server connection string (without database name):',
-          default : "Data Source=localhost\SQLEXPRESS;Integrated Security=True;Connect Timeout=60; MultipleActiveResultSets=True;",
+          default : "Data Source=localhost\\SQLEXPRESS;Integrated Security=True;Connect Timeout=60; MultipleActiveResultSets=True;",
           validate: function (connectionString){
             var conn = connectionString.toLowerCase();
             return conn !== '';
@@ -104,7 +104,7 @@ module.exports = class extends Generator {
         this.spawnCommandSync(
           (this.props.bypassExecPolicy ? 'powershell  -ExecutionPolicy Bypass ': 'powershell'),
           [
-            './hello.ps1', 
+            './build.ps1', 
             '-organization="' + this.props.organization + '"',
             '-email="' + this.props.email + '"',
             '-connectionString="' + this.props.connectionString + '"',

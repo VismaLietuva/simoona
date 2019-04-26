@@ -4,6 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <LangVersion>7.1</LangVersion>
     <ProductVersion>
     </ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
@@ -107,6 +108,10 @@
     <Reference Include="Google.Apis.Auth.PlatformServices, Version=1.13.1.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\Google.Apis.Auth.1.13.1\lib\net45\Google.Apis.Auth.PlatformServices.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="Google.Apis.Calendar.v3, Version=1.13.1.537, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\packages\Google.Apis.Calendar.v3.1.13.1.537\lib\portable-net45+netcore45+wpa81+wp8\Google.Apis.Calendar.v3.dll</HintPath>
     </Reference>
     <Reference Include="Google.Apis.Core, Version=1.13.1.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\Google.Apis.Core.1.13.1\lib\net45\Google.Apis.Core.dll</HintPath>
@@ -458,7 +463,6 @@
     <Compile Include="Controllers\UserDeprecatedController.cs" />
     <Compile Include="Controllers\UserDeprecatedController.Impersonation.cs" />
     <Compile Include="Controllers\BaseController.cs" />
-    <Compile Include="Controllers\BirthdaysController.cs" />
     <Compile Include="Controllers\Book\BookController.cs" />
     <Compile Include="Controllers\CertificateController.cs" />
     <Compile Include="Controllers\CommentController.cs" />
@@ -481,8 +485,12 @@
     <Compile Include="Controllers\RoomController.cs" />
     <Compile Include="Controllers\RoomTypeController.cs" />
     <Compile Include="Controllers\SkillController.cs" />
+    <Compile Include="Filters\PermissionAwareCacheOutputFilterAttribute.cs" />
+    <Compile Include="Helpers\IdentityExtensions.cs" />
+    <Compile Include="GeneralCode\PerPermissionCacheKeyGenerator.cs" />
     <Compile Include="Controllers\Wall\WallController.cs" />
     <Compile Include="Controllers\ExternalJobsController.cs" />
+    <Compile Include="Controllers\Wall\WallWidgetsController.cs" />
     <Compile Include="Filters\FeatureToggleAttribute.cs" />
     <Compile Include="Filters\HMACAuthenticationAttribute.cs" />
     <Compile Include="Filters\BasicAuthenticationAttribute.cs" />
@@ -491,8 +499,8 @@
     <Compile Include="Filters\OrganizationValidationFilterAttribute.cs" />
     <Compile Include="Filters\QueryStringBearerAuthorizeAttribute.cs" />
     <Compile Include="Filters\SkipOrganizationValidationFilterAttribute.cs" />
-    <Compile Include="GeneralCode\CustomCacheKeyGenerator.cs" />
     <Compile Include="GeneralCode\OrganizationUtils.cs" />
+    <Compile Include="GeneralCode\PerOrganizationCacheKeyGenerator.cs" />
     <Compile Include="Handlers\CancelledTaskBugWorkaroundMessageHandler.cs" />
     <Compile Include="Filters\PermissionAuthorizeAttribute.cs" />
     <Compile Include="Filters\ValidationFilterAttribute.cs" />

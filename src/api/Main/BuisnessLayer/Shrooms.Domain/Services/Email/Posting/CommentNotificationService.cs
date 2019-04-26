@@ -5,6 +5,7 @@ using Shrooms.Constants;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.DataTransferObjects.Models.Emails;
+using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.UserService;
 using Shrooms.EntityModels.Models;
@@ -23,6 +24,7 @@ namespace Shrooms.Domain.Services.Email.Posting
         private readonly IMailingService _mailingService;
         private readonly IApplicationSettings _appSettings;
         private readonly IOrganizationService _organizationService;
+        private readonly IMarkdownConverter _markdownConverter;
 
         private readonly IDbSet<EntityModels.Models.Events.Event> _eventsDbSet;
         private readonly IDbSet<Project> _projectsDbSet;
@@ -33,13 +35,15 @@ namespace Shrooms.Domain.Services.Email.Posting
             IMailTemplate mailTemplate,
             IMailingService mailingService,
             IApplicationSettings appSettings,
-            IOrganizationService organizationService)
+            IOrganizationService organizationService,
+            IMarkdownConverter markdownConverter)
         {
             _appSettings = appSettings;
             _userService = userService;
             _mailTemplate = mailTemplate;
             _mailingService = mailingService;
             _organizationService = organizationService;
+            _markdownConverter = markdownConverter;
 
             _eventsDbSet = uow.GetDbSet<EntityModels.Models.Events.Event>();
             _projectsDbSet = uow.GetDbSet<Project>();
@@ -50,7 +54,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             var organization = _organizationService.GetOrganizationById(commentCreator.OrganizationId);
 
             var destinationEmails = _userService.GetPostCommentersEmails(commentCreator.Email, comment.PostId);
-            string postAuthorEmail = (comment.Post.AuthorId == comment.AuthorId) ? null : _userService.GetPostAuthorEmail(comment.Post.AuthorId);
+            var postAuthorEmail = (comment.Post.AuthorId == comment.AuthorId) ? null : _userService.GetPostAuthorEmail(comment.Post.AuthorId);
             if (postAuthorEmail != null && destinationEmails.Contains(postAuthorEmail) == false)
             {
                 destinationEmails.Add(postAuthorEmail);
@@ -62,13 +66,14 @@ namespace Shrooms.Domain.Services.Email.Posting
                 var authorPictureUrl = _appSettings.PictureUrl(organization.ShortName, commentCreator.PictureId);
                 var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
                 var subject = string.Format(Templates.NewPostCommentEmailSubject, CutMessage(comment.Post.MessageBody), commentCreator.FullName);
+                var body = _markdownConverter.ConvertToHtml(comment.MessageBody);
 
                 var emailTemplateViewModel = new NewCommentEmailTemplateViewModel(
                     string.Format(Constants.BusinessLayer.Templates.PostCommentTitle, CutMessage(comment.Post.MessageBody)),
                     authorPictureUrl,
                     commentCreator.FullName,
                     postLink,
-                    comment.MessageBody,
+                    body,
                     userNotificationSettingsUrl,
                     Constants.BusinessLayer.Templates.DefautlActionButtonTitle);
 

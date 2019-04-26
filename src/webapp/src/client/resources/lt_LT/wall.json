@@ -54,5 +54,6 @@
   "filterWallMembers": "Sienos narių paieška...",
   "wallModerators": "Sienos moderatoriai",
   "addModerators": "Pridėkite moderatorius",
-  "successToClipboard": "Sėkmingai nukopijuota į iškarpinę!"
+  "successToClipboard": "Sėkmingai nukopijuota į iškarpinę!",
+  "markdownSuggestions": "**bold** __underlined__ *italics* ~~strikethrough~~ `code`"
 }

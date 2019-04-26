@@ -4,6 +4,7 @@ using Shrooms.Constants;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.DataTransferObjects.Models.Emails;
+using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.UserService;
 using Shrooms.EntityModels.Models;
@@ -22,6 +23,7 @@ namespace Shrooms.Domain.Services.Email.Posting
         private readonly IMailingService _mailingService;
         private readonly IApplicationSettings _appSettings;
         private readonly IOrganizationService _organizationService;
+        private readonly IMarkdownConverter _markdownConverter;
 
         private readonly IDbSet<EntityModels.Models.Multiwall.Wall> _wallsDbSet;
         private readonly IDbSet<EntityModels.Models.Events.Event> _eventsDbSet;
@@ -33,13 +35,15 @@ namespace Shrooms.Domain.Services.Email.Posting
             IMailTemplate mailTemplate,
             IMailingService mailingService,
             IApplicationSettings appSettings,
-            IOrganizationService organizationService)
+            IOrganizationService organizationService,
+            IMarkdownConverter markdownConverter)
         {
             _appSettings = appSettings;
             _userService = userService;
             _mailTemplate = mailTemplate;
             _mailingService = mailingService;
             _organizationService = organizationService;
+            _markdownConverter = markdownConverter;
 
             _wallsDbSet = uow.GetDbSet<EntityModels.Models.Multiwall.Wall>();
             _eventsDbSet = uow.GetDbSet<EntityModels.Models.Events.Event>();
@@ -56,13 +60,14 @@ namespace Shrooms.Domain.Services.Email.Posting
             var authorPictureUrl = _appSettings.PictureUrl(organization.ShortName, postCreator.PictureId);
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
             var subject = string.Format(Templates.NewWallPostEmailSubject, wall.Name, postCreator.FullName);
+            var body = _markdownConverter.ConvertToHtml(post.MessageBody);
 
             var emailTemplateViewModel = new NewWallPostEmailTemplateViewModel(
                 GetWallTitle(wall),
                 authorPictureUrl,
                 postCreator.FullName,
                 postLink,
-                post.MessageBody,
+                body,
                 userNotificationSettingsUrl,
                 GetActionButtonTitle(wall));
             var content = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.NewWallPost);
