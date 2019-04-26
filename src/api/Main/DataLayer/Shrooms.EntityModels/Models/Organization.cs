@@ -39,5 +39,11 @@ namespace Shrooms.EntityModels.Models
         public string AuthenticationProviders { get; set; }
 
         public string KudosYearlyMultipliers { get; set; }
+
+        public int KudosWelcomeAmount { get; set; }
+
+        public bool KudosWelcomeEnabled { get; set; }
+
+        public string KudosWelcomeComment { get; set; }
     }
 }
