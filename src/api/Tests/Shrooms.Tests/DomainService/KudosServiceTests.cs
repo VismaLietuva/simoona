@@ -493,6 +493,26 @@ namespace Shrooms.API.Tests.DomainService
 
         #endregion
 
+        #region HasPendingKudos
+
+        [Test]
+        public void HasPendingKudos_Should_Return_True()
+        {
+            MockKudosLogsForStats();
+            var actual = _kudosService.HasPendingKudos("User1");
+            Assert.AreEqual(true, actual);
+        }
+
+        [Test]
+        public void HasPendingKudos_Should_Return_False()
+        {
+            MockKudosLogsForStats();
+            var actual = _kudosService.HasPendingKudos("User2");
+            Assert.AreEqual(false, actual);
+        }
+
+        #endregion
+
         #region MockData
 
         private static void MockRoleService(IRoleService roleService)
