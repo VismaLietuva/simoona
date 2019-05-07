@@ -10,6 +10,7 @@ var rootPath =  Argument("rootPath", @"..\src");
 var simoonaOssPath = Argument("simoonaOssPath", @"..\..\open-source");
 
 var projectPathUser = Path.Combine(rootPath, @"Shrooms.Premium\Shrooms.Premium.csproj.user");
+var testsProjectPathUser = Path.Combine(rootPath, @"Shrooms.Premium.UnitTests\Shrooms.Premium.UnitTests.csproj.user");
 var projectPath = Path.Combine(rootPath, @"Shrooms.Premium\Shrooms.Premium.csproj");
 var nugetConfigPath = Path.Combine(rootPath, @".nuget\nuget.config");
 var packagesPath = Path.Combine(simoonaOssPath, @"src\api\packages");
@@ -26,10 +27,12 @@ Task("Default")
     if (!FileExists(projectPathUser))
     {
         CreateCsprojUser(projectPathUser, simoonaOssPath);
+        CreateCsprojUser(testsProjectPathUser, simoonaOssPath);
     }
     else 
     {
         UpdateCsprojUser(projectPathUser, simoonaOssPath);
+        UpdateCsprojUser(testsProjectPathUser, simoonaOssPath);
     }
 
     UpdateCsprojReferences(projectPath, packagesPath);

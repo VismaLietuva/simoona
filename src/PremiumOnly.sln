@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.352
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Premium", "Premium", "{F5595798-28B5-44CA-AFE8-679919396C33}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shrooms.Premium", "Shrooms.Premium\Shrooms.Premium.csproj", "{CE5546D3-8819-4B25-8DDC-B02769BAB42F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shrooms.Premium.UnitTests", "Shrooms.Premium.UnitTests\Shrooms.Premium.UnitTests.csproj", "{BF77FA0D-51D3-4DB6-9ADE-D5AAD70E2625}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CE5546D3-8819-4B25-8DDC-B02769BAB42F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE5546D3-8819-4B25-8DDC-B02769BAB42F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE5546D3-8819-4B25-8DDC-B02769BAB42F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE5546D3-8819-4B25-8DDC-B02769BAB42F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF77FA0D-51D3-4DB6-9ADE-D5AAD70E2625}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF77FA0D-51D3-4DB6-9ADE-D5AAD70E2625}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF77FA0D-51D3-4DB6-9ADE-D5AAD70E2625}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF77FA0D-51D3-4DB6-9ADE-D5AAD70E2625}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CE5546D3-8819-4B25-8DDC-B02769BAB42F} = {F5595798-28B5-44CA-AFE8-679919396C33}
+		{BF77FA0D-51D3-4DB6-9ADE-D5AAD70E2625} = {F5595798-28B5-44CA-AFE8-679919396C33}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4B7BEB0E-C314-4215-8F22-59E3B8655722}
+		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.Common.6.0.1304.0\lib\NET45;packages\EnterpriseLibrary.Logging.6.0.1304.0\lib\NET45
+	EndGlobalSection
+	GlobalSection(CodealikeProperties) = postSolution
+		SolutionGuid = 26bdd0af-3b1d-458d-a138-31fef424d65b
+	EndGlobalSection
+EndGlobal
