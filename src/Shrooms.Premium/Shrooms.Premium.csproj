@@ -445,11 +445,11 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="RecycleWebapp" BeforeTargets="Clean">
+  <Target Name="RecycleWebapp" BeforeTargets="Clean" Condition=" '$(Configuration)|$(Platform)' != 'Release|AnyCPU' ">
     <Message Text="Recycling web app..." Importance="High" />
     <Exec Command="%windir%\system32\inetsrv\appcmd recycle apppool /apppool.name:Simoona" />
   </Target>
   <PropertyGroup>
-    <PreBuildEvent>%25windir%25\system32\inetsrv\appcmd recycle apppool /apppool.name:Simoona</PreBuildEvent>
+    <PreBuildEvent Condition=" '$(Configuration)|$(Platform)' != 'Release|AnyCPU' ">%25windir%25\system32\inetsrv\appcmd recycle apppool /apppool.name:Simoona</PreBuildEvent>
   </PropertyGroup>
 </Project>
