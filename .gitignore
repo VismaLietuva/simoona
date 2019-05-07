@@ -200,3 +200,6 @@ Tests/Shrooms.Tests/Shrooms.UnitTests.csproj.VisualState.xml
 .idea/
 .vs/slnx.sqlite
 .vs/
+
+/builds/tools/
+/src/.nuget/nuget.config
