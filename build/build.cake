@@ -1,19 +1,23 @@
-﻿#addin "nuget:?package=Cake.SqlServer"
-#addin "Cake.IIS"
-#addin "Microsoft.Win32.Registry"
-#addin "System.Reflection.TypeExtensions"
-#addin "Cake.Npm"
-#addin "Cake.Gulp"
-#addin "Cake.Hosts"
-#addin "Cake.FileHelpers"
+﻿#addin "nuget:?package=Cake.FileHelpers&version=3.2.0"
+#addin "nuget:?package=Cake.Gulp&version=0.12.0"
+#addin "nuget:?package=Cake.Hosts&version=1.5.1"
+#addin "nuget:?package=Cake.IIS&version=0.4.2"
+#addin "nuget:?package=Cake.Npm&version=0.17.0"
+#addin "nuget:?package=Cake.SqlServer&version=2.0.1"
+#addin "nuget:?package=Microsoft.Win32.Registry&version=4.5.0"
+#addin "nuget:?package=System.Reflection.TypeExtensions&version=4.5.0"
+
+#tool "nuget:?package=EntityFramework&version=6.1.3"
+#tool "nuget:?package=vswhere&version=2.6.7"
 
 using System.Data.SqlClient;
+using Path = System.IO.Path;
 
 var target = Argument("activity", "Start");
 var organization = Argument("organization", "test");
 var email = Argument("email", "");
 var connectionString = Argument("connectionString", "");
-var dbName = Argument("dbName", "Shrooms.DataLayer.DAL.ShroomsDbContext");
+var dbName = Argument("dbName", "SimoonaDb");
 var jobsDbName = dbName + "Jobs";
 var dropDb = Argument("dropdb", "");
 var APIpath = "../src/api/";
@@ -83,6 +87,32 @@ Task("CreateDatabase")
     throw exception;
 });
 
+Task("ExecuteMigrations")
+    .Does(() =>
+{
+    connectionString = NormalizeConnectionString(connectionString);
+    var fullConnectionString = string.Format("{0}Database={1};", connectionString, dbName);
+
+    var migrateExePath = Context.Tools.Resolve("migrate.exe");
+    var assemblyBinPath = Path.GetFullPath(Path.Combine(APIpath, @"Main\DataLayer\Shrooms.DataLayer\bin\Debug"));
+    var assemblyName = "Shrooms.DataLayer.dll";
+
+    Information("Migrate.exe path: {0}", migrateExePath);
+    Information("Assembly bin path: {0}", assemblyBinPath);
+
+    var settings = new ProcessSettings 
+    {
+        Arguments = new ProcessArgumentBuilder()
+            .Append(assemblyName)
+            .Append("/startUpDirectory=\"" + assemblyBinPath + "\"")
+            .Append("/connectionProviderName:\"System.Data.SqlClient\"")
+            .Append("/connectionString:\"" + fullConnectionString + "\"")
+            .Append("/verbose")
+    };
+
+    StartProcess(migrateExePath, settings);
+});
+
 Task("AddOrganization")
     .IsDependentOn("CreateDatabase")
     .Does(() => 
@@ -99,25 +129,20 @@ Task("AddOrganization")
     organizationElement.SetAttribute("value", organization);
     organizationsNode.AppendChild(organizationElement);
 
-    string conn = connectionString;
-    if(connectionString.Substring(connectionString.Length - 1) != ";")
-    {
-        conn = conn + ";";
-    }
-
+    connectionString = NormalizeConnectionString(connectionString);
     var mainConnectionString = xmlDoc.SelectSingleNode("configuration/connectionStrings/add[not(@name = 'BackgroundJobs') and not(@name = 'StorageConnectionString')]");
 
     mainConnectionString.Attributes["name"].Value = organization;
-    mainConnectionString.Attributes["connectionString"].Value = string.Format("{0}Database={1};", conn, dbName);
+    mainConnectionString.Attributes["connectionString"].Value = string.Format("{0}Database={1};", connectionString, dbName);
 
     var jobsConnectionString = xmlDoc.SelectSingleNode("configuration/connectionStrings/add[@name = 'BackgroundJobs']");
-    jobsConnectionString.Attributes["connectionString"].Value = string.Format("{0}Database={1};", conn, jobsDbName);
+    jobsConnectionString.Attributes["connectionString"].Value = string.Format("{0}Database={1};", connectionString, jobsDbName);
 
     xmlDoc.Save(xmlFile);
     using (var connection = OpenSqlConnection(connectionString))
     {
-        ExecuteSqlCommand(connection, "USE \""+dbName+"\"");
-        ExecuteSqlCommand(connection, "UPDATE dbo.Organizations SET Name='"+organization+"', ShortName='"+organization+"', AuthenticationProviders='internal;google;facebook' WHERE Id=1");
+        ExecuteSqlCommand(connection, "USE \"" + dbName + "\"");
+        ExecuteSqlCommand(connection, "UPDATE dbo.Organizations SET Name='" + organization + "', ShortName='" + organization + "', AuthenticationProviders='internal;google;facebook' WHERE Id=1");
     }
     LogMessage(logFile, "Task AddOrganization is finished successfully");
 })
@@ -143,7 +168,7 @@ Task("BuildAPI")
     .IsDependentOn("CreateDatabase")
     .IsDependentOn("AddOrganization")
     .IsDependentOn("Restore")
-    .Does(() => 
+    .Does(ctx => 
 {
     var fileLogger = new MSBuildFileLogger() {
         AppendToLogFile = true,
@@ -152,12 +177,18 @@ Task("BuildAPI")
         Verbosity = Verbosity.Minimal
     };
 
-    MSBuild(APIpath + "Shrooms.sln", configurator => configurator
-        .SetConfiguration("Debug")
-        .SetVerbosity(Verbosity.Quiet)
-        .AddFileLogger(fileLogger)
-    );
+    var msbuildPath = GetMSBuildPath(ctx.FileSystem, ctx.Environment, MSBuildPlatform.Automatic);
 
+    var settings = new MSBuildSettings
+    {
+        Verbosity = Verbosity.Quiet,
+        Configuration = "Debug",
+        ToolPath = msbuildPath
+    };
+
+    settings.FileLoggers.Add(fileLogger);
+
+    MSBuild(APIpath + "Shrooms.sln", settings);
     LogMessage(logFile, "Task BuildAPI is finished successfully");
 });
 
@@ -267,6 +298,7 @@ Task("Start")
     .IsDependentOn("CreateHostsRecord")
     .IsDependentOn("BuildAPI")
     .IsDependentOn("BuildWebApp")
+    .IsDependentOn("ExecuteMigrations")
     .Does(() => 
 {
     System.Diagnostics.Process.Start("http://" + webAppHostName);
@@ -292,6 +324,17 @@ Task("OnlyDbAndDependencies")
     LogMessage(logFile, exception.Message);
     throw exception;
 });
+
+private string NormalizeConnectionString(string connectionString)
+{
+    string normalizedConnectionString = connectionString;
+    if(connectionString.Substring(connectionString.Length - 1) != ";")
+    {
+        normalizedConnectionString = normalizedConnectionString + ";";
+    }
+
+    return normalizedConnectionString;
+}
 
 private void LogMessage(FilePath filePath, string message)
 {
@@ -383,6 +426,35 @@ private void AlterJobsDb(SqlConnection connection)
     GO", jobsDbName);
 
     ExecuteSqlCommand(connectionString, dbAlterScript);
+}
+
+private FilePath GetMSBuildPath(IFileSystem fileSystem, ICakeEnvironment environment, MSBuildPlatform buildPlatform)
+{
+    var visualStudio2019Path = VSWhereLatest();
+
+    var binPath = visualStudio2019Path.Combine("MSBuild/Current/Bin");
+    Information("MSBuild path: {0}", binPath);
+
+    if (fileSystem.Exist(binPath))
+    {
+        if (buildPlatform == MSBuildPlatform.Automatic)
+        {
+            if (environment.Platform.Is64Bit)
+            {
+                binPath = binPath.Combine("amd64");
+            }
+        }
+        if (buildPlatform == MSBuildPlatform.x64)
+        {
+            binPath = binPath.Combine("amd64");
+        }
+    }
+    else
+    {
+        binPath = visualStudio2019Path.Combine("Microsoft Visual Studio/2019/Professional/MSBuild/16.0/Bin");
+    }
+
+    return binPath.CombineWithFilePath("MSBuild.exe");
 }
 
 RunTarget(target);
