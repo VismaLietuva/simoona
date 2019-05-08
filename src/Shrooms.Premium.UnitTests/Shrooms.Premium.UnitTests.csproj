@@ -2,8 +2,9 @@
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\..\open-source\src\api\packages\NUnit3TestAdapter.3.13.0\build\net35\NUnit3TestAdapter.props" Condition="Exists('..\..\open-source\src\api\packages\NUnit3TestAdapter.3.13.0\build\net35\NUnit3TestAdapter.props')" />
   <Import Project="..\..\open-source\src\api\packages\NUnit.3.11.0\build\NUnit.props" Condition="Exists('..\..\open-source\src\api\packages\NUnit.3.11.0\build\NUnit.props')" />
+  <Import Project="Shrooms.Premium.UnitTests.props" Condition="Exists('Shrooms.Premium.UnitTests.props')" />
   <PropertyGroup>
-    <SimoonaCoreLocation>..\..\open-source</SimoonaCoreLocation>
+    <SimoonaCoreLocation Condition=" '$(SimoonaCoreLocation)' == '' ">..\..\open-source</SimoonaCoreLocation>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{BF77FA0D-51D3-4DB6-9ADE-D5AAD70E2625}</ProjectGuid>

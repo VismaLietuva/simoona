@@ -1,8 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="Shrooms.Premium.props" Condition="Exists('Shrooms.Premium.props')" />
   <PropertyGroup>
-    <SimoonaCoreLocation>..\..\open-source</SimoonaCoreLocation>
+    <SimoonaCoreLocation Condition=" '$(SimoonaCoreLocation)' == '' ">..\..\open-source</SimoonaCoreLocation>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{CE5546D3-8819-4B25-8DDC-B02769BAB42F}</ProjectGuid>

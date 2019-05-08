@@ -3,36 +3,46 @@
 
 using System.Xml;
 using Path = System.IO.Path;
+using IODirectory = System.IO.Directory;
 
 var target = Argument("target", "Default");
 
 var rootPath =  Argument("rootPath", @"..\src");
 var simoonaOssPath = Argument("simoonaOssPath", @"..\..\open-source");
 
-var projectPathUser = Path.Combine(rootPath, @"Shrooms.Premium\Shrooms.Premium.csproj.user");
-var testsProjectPathUser = Path.Combine(rootPath, @"Shrooms.Premium.UnitTests\Shrooms.Premium.UnitTests.csproj.user");
-var projectPath = Path.Combine(rootPath, @"Shrooms.Premium\Shrooms.Premium.csproj");
-var nugetConfigPath = Path.Combine(rootPath, @".nuget\nuget.config");
-var packagesPath = Path.Combine(simoonaOssPath, @"src\api\packages");
-
 Task("Default")
     .Does(() =>
 {
+    var simoonaOssRelativePathToSln = MakeRelativePath(IODirectory.GetCurrentDirectory() + "\\", simoonaOssPath);
+    var simoonaOssRelativePathToCsproj = MakeRelativePath(IODirectory.GetCurrentDirectory() + "\\src\\", simoonaOssPath);
+
+    var projectPathUser = Path.Combine(rootPath, @"Shrooms.Premium\Shrooms.Premium.props");
+    var testsProjectPathUser = Path.Combine(rootPath, @"Shrooms.Premium.UnitTests\Shrooms.Premium.UnitTests.props");
+    var projectPath = Path.Combine(rootPath, @"Shrooms.Premium\Shrooms.Premium.csproj");
+    var customSlnPath = Path.Combine(rootPath, @"Premium.WithForkedOss.sln");
+    var nugetConfigPath = Path.Combine(rootPath, @".nuget\nuget.config");
+
+    var packagesPath = Path.Combine(simoonaOssRelativePathToCsproj, @"src\api\packages");
+
+    Information("Current directory: {0}", IODirectory.GetCurrentDirectory());
     Information("Root path: {0}", rootPath);
     Information("Simoona OSS path: {0}", simoonaOssPath);
+    Information("Simoona OSS relative path to sln: {0}", simoonaOssRelativePathToSln);
+    Information("Simoona OSS relative path to csproj: {0}", simoonaOssRelativePathToCsproj);
     Information("Project path (user): {0}", projectPathUser);
+    Information("Custom sln path: {0}", customSlnPath);
     Information("nuget.config path: {0}", nugetConfigPath);
     Information("Packages path: {0}", packagesPath);
 
     if (!FileExists(projectPathUser))
     {
-        CreateCsprojUser(projectPathUser, simoonaOssPath);
-        CreateCsprojUser(testsProjectPathUser, simoonaOssPath);
+        CreateCsprojUser(projectPathUser, simoonaOssRelativePathToCsproj);
+        CreateCsprojUser(testsProjectPathUser, simoonaOssRelativePathToCsproj);
     }
     else 
     {
-        UpdateCsprojUser(projectPathUser, simoonaOssPath);
-        UpdateCsprojUser(testsProjectPathUser, simoonaOssPath);
+        UpdateCsprojUser(projectPathUser, simoonaOssRelativePathToCsproj);
+        UpdateCsprojUser(testsProjectPathUser, simoonaOssRelativePathToCsproj);
     }
 
     UpdateCsprojReferences(projectPath, packagesPath);
@@ -43,6 +53,7 @@ Task("Default")
     }
 
     UpdateNugetConfig(nugetConfigPath, packagesPath);
+    UpdateCustomSln(customSlnPath, simoonaOssRelativePathToSln);
 });
 
 void CreateCsprojUser(string projectPathUser, string simoonaCoreLocation)
@@ -125,8 +136,15 @@ void UpdateCsprojReferences(string projectPath, string packagesPath)
             }
         }
     }
-    
+
     xmlDoc.Save(projectPath);
+
+    //ReplaceTextInFiles(projectPath, @"..\..\open-source\src\api\packages", packagesPath);
+}
+
+void UpdateCustomSln(string slnPath, string simoonaOssRelativePath)
+{
+    ReplaceTextInFiles(slnPath, @"..\open-source", simoonaOssRelativePath);
 }
 
 void CreateNugetConfig(string nugetConfigPath, string packagesPath)
@@ -159,6 +177,44 @@ void UpdateNugetConfig(string nugetConfigPath, string packagesPath)
 
     // Ex.: nuget config -set repositoryPath=..\packages -configfile ..\.nuget\nuget.config
     StartProcess(nugetPath, settings);
+}
+
+private String MakeRelativePath(string fromPath, string toPath)
+{
+    if (string.IsNullOrEmpty(fromPath))
+    {
+         throw new ArgumentNullException("fromPath");
+    }
+
+    if (string.IsNullOrEmpty(toPath)) 
+    {
+        throw new ArgumentNullException("toPath");
+    }
+
+    var path = new DirectoryPath(toPath);
+
+    if (path.IsRelative)
+    {
+        throw new ArgumentException("toPath", "Path is already relative");
+    }
+
+    Uri fromUri = new Uri(fromPath);
+    Uri toUri = new Uri(toPath);
+
+    if (fromUri.Scheme != toUri.Scheme) 
+    {
+         return toPath; // path can't be made relative.
+    }
+
+    var relativeUri = fromUri.MakeRelativeUri(toUri);
+    var relativePath = Uri.UnescapeDataString(relativeUri.ToString());
+
+    if (toUri.Scheme.Equals("file", StringComparison.InvariantCultureIgnoreCase))
+    {
+        relativePath = relativePath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+    }
+
+    return relativePath;
 }
 
 RunTarget(target);
