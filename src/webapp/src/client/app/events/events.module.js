@@ -37,13 +37,7 @@
                 controllerAs: 'vm'
             })
             .state('Root.WithOrg.Client.Events.List.Type', {
-                url: '/:type',
-                templateUrl: 'app/events/list/by-type/by-type.html',
-                controller: 'eventsByTypeController',
-                controllerAs: 'vm'
-            })
-            .state('Root.WithOrg.Client.Events.List.Office', {
-                url: '/office/:office',
+                url: '/:type/office/:office',
                 templateUrl: 'app/events/list/by-type/by-type.html',
                 controller: 'eventsByTypeController',
                 controllerAs: 'vm'
@@ -83,7 +77,7 @@
         }
         menuNavigationFactory.defineLeftMenuItem({
             permission: 'EVENT_BASIC',
-            url: 'Root.WithOrg.Client.Events.List.Type({type: "all"})',
+            url: 'Root.WithOrg.Client.Events.List.Type({type: "all", office: "all"})',
             active: 'Root.WithOrg.Client.Events',
             resource: 'navbar.events',
             order: 1,

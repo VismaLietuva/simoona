@@ -31,13 +31,7 @@
         ///////////
 
         function init() {
-            if ($stateParams.office) {
-                eventRepository.getEventsByOffice($stateParams.office).then(function (result) {
-                    vm.eventsList = result;
-                    setResponseUtilities(result);
-                });
-            }
-            else if ($stateParams.type === 'all') {
+            if ($stateParams.type === 'all' && $stateParams.office === 'all') {
                 eventRepository.getAllEvents().then(function (result) {
                     vm.eventsList = result;
 
@@ -46,7 +40,7 @@
             } else if ($stateParams.type === 'host' || $stateParams.type === 'participant') {
                 getMyEvents($stateParams.type);
             } else {
-                eventRepository.getEventsByType($stateParams.type).then(function (result) {
+                eventRepository.getEventsByTypeAndOffice($stateParams.type, $stateParams.office).then(function (result) {
                     vm.eventsList = result;
                     setResponseUtilities(result);
                 });

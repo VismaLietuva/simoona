@@ -20,8 +20,7 @@
             getEventOffices: getEventOffices,
             getEventTypes: getEventTypes,
             getEventRecurringTypes: getEventRecurringTypes,
-            getEventsByType: getEventsByType,
-            getEventsByOffice: getEventsByOffice,
+            getEventsByTypeAndOffice: getEventsByTypeAndOffice,
             getMyEvents: getMyEvents,
             getEventDetails: getEventDetails,
             getEventUpdate: getEventUpdate,
@@ -60,12 +59,8 @@
             return $resource(eventUrl + 'Recurrences').query().$promise;
         }
 
-        function getEventsByType(id) {
-            return $resource(eventUrl + 'ByType').query({ typeId: id }).$promise;
-        }
-
-        function getEventsByOffice(id) {
-            return $resource(eventUrl + 'ByOffice').query({ officeId: id }).$promise;
+        function getEventsByTypeAndOffice(typeId, officeId) {
+            return $resource(eventUrl + 'ByTypeAndOffice').query({ typeId: typeId, officeId: officeId }).$promise;
         }
 
         function getMyEvents(filter) {
