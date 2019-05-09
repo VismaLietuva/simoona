@@ -30,8 +30,7 @@
         </li>
         <li class="list-group-item row" ng-cloak>
             <strong ng-cloak>{{"serviceRequest.description" | translate}}: </strong>
-            <span data-test-id="service-request-description">
-                {{serviceRequest.description}}
+            <span data-test-id="service-request-description" ng-bind-html="serviceRequest.description | newlineToBr">
             </span>
         </li>
         <li class="list-group-item row" ng-if="!!serviceRequest.pictureId" ng-cloak>
