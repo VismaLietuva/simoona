@@ -5,17 +5,17 @@
            ui-sref-active="selected"
            title="{{tab.name}}"
            data-test-id="event-list-tab">
-        <input type="radio" ui-sref="Root.WithOrg.Client.Events.List.Type({type: tab.id})"/>
-        <span ng-bind="tab.name | translate"></span>
-		</label translate-cloak>
+        <input type="radio" ui-sref="Root.WithOrg.Client.Events.List.Type({type: tab.id, office: vm.stateParams.office})"/>
+        <span ng-bind="tab.name"></span>
+    </label>
 </div>
 <div class="nc-filter events-list-tabs">
     <label ng-repeat="tab in vm.eventOffices" 
            ng-if="!vm.isLoading"
            ui-sref-active="selected"
            title="{{tab.name}}"
-           data-test-id="event-list-tab">
-        <input type="radio" ui-sref="Root.WithOrg.Client.Events.List.Office({office: tab.id})"/>
+           data-test-id="event-list-office-tab">
+        <input type="radio" ui-sref="Root.WithOrg.Client.Events.List.Type({type: vm.stateParams.type, office: tab.id})"/>
         <span ng-bind="tab.name"></span>
     </label>
 </div>
