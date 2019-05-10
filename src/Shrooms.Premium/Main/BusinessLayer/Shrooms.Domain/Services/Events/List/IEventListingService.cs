@@ -7,7 +7,7 @@ namespace Shrooms.Domain.Services.Events.List
 {
     public interface IEventListingService
     {
-        IEnumerable<EventListItemDTO> GetMyEvents(MyEventsOptionsDTO options);
+        IEnumerable<EventListItemDTO> GetMyEvents(MyEventsOptionsDTO options, int? officeId = null);
         EventOptionsDTO GetEventOptions(Guid eventId, UserAndOrganizationDTO userOrg);
         IEnumerable<EventListItemDTO> GetEventsByType(UserAndOrganizationDTO userOrganization, int typeId = 0);
         IEnumerable<EventListItemDTO> GetEventsByTypeAndOffice(UserAndOrganizationDTO userOrganization, int? typeId = null, int? officeId = null);

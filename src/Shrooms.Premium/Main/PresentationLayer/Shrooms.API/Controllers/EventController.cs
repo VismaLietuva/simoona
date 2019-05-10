@@ -184,11 +184,18 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
         [HttpGet]
         [Route("MyEvents")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult GetMyEvents([FromUri]MyEventsOptionsViewModel options)
+        public IHttpActionResult GetMyEvents([FromUri]MyEventsOptionsViewModel options, string officeId)
         {
+            int? officeIdNullable = null;
+
+            if (officeId != "all" && int.TryParse(officeId, out var officeIdParsed))
+            {
+                officeIdNullable = officeIdParsed;
+            }
+
             var optionsDto = _mapper.Map<MyEventsOptionsViewModel, MyEventsOptionsDTO>(options);
             SetOrganizationAndUser(optionsDto);
-            var myEventsListDto = _eventListingService.GetMyEvents(optionsDto);
+            var myEventsListDto = _eventListingService.GetMyEvents(optionsDto, officeIdNullable);
             var result = _mapper.Map<IEnumerable<EventListItemDTO>, IEnumerable<EventListItemViewModel>>(myEventsListDto);
             return Ok(result);
         }

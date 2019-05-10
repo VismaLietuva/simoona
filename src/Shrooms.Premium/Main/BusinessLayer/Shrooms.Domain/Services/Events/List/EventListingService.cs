@@ -76,7 +76,7 @@ namespace Shrooms.Domain.Services.Events.List
             return events;
         }
 
-        public IEnumerable<EventListItemDTO> GetMyEvents(MyEventsOptionsDTO options)
+        public IEnumerable<EventListItemDTO> GetMyEvents(MyEventsOptionsDTO options, int? officeId = null)
         {
             var myEventFilter = EventFilters[options.Filter](options.UserId);
             var events = _eventsDbSet
@@ -85,6 +85,7 @@ namespace Shrooms.Domain.Services.Events.List
                 .Where(t => t.OrganizationId == options.OrganizationId)
                 .Where(SearchFilter(options.SearchString))
                 .Where(myEventFilter)
+                .Where(EventOfficeFilter(officeId))
                 .Select(MapEventToListItemDto(options.UserId))
                 .OrderBy(e => e.StartDate)
                 .ToList();
