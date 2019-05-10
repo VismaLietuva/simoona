@@ -63,8 +63,8 @@
             return $resource(eventUrl + 'ByTypeAndOffice').query({ typeId: typeId, officeId: officeId }).$promise;
         }
 
-        function getMyEvents(filter) {
-            return $resource(eventUrl + 'MyEvents').query(filter).$promise;
+        function getMyEvents(filter, officeId) {
+            return $resource(eventUrl + 'MyEvents').query({ filter: filter, officeId: officeId }).$promise;
         }
 
         function getEventUpdate(id) {

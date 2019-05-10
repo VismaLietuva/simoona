@@ -40,7 +40,11 @@
                 url: '/:type/office/:office',
                 templateUrl: 'app/events/list/by-type/by-type.html',
                 controller: 'eventsByTypeController',
-                controllerAs: 'vm'
+                controllerAs: 'vm',
+                params: {
+                    type: 'all',
+                    office: 'all'
+                }
             })
             .state('Root.WithOrg.Client.Events.EventContent', {
                 url: '/EventContent/:id',
@@ -77,7 +81,7 @@
         }
         menuNavigationFactory.defineLeftMenuItem({
             permission: 'EVENT_BASIC',
-            url: 'Root.WithOrg.Client.Events.List.Type({type: "all", office: "all"})',
+            url: 'Root.WithOrg.Client.Events.List.Type',
             active: 'Root.WithOrg.Client.Events',
             resource: 'navbar.events',
             order: 1,
