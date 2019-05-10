@@ -415,9 +415,7 @@
 
         function redirectToEvents() {
             $state.go('Root.WithOrg.Client.Events.List.Type', {
-                organizationName: authorizationData.organizationName,
-                type: 'all',
-                office: 'all'
+                organizationName: authorizationData.organizationName
             }, {
                 reload: true
             });
