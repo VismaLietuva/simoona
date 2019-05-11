@@ -16,8 +16,8 @@ var ossPathForked = Argument("ossPathForked", ossRelativePathToCsprojOriginal);
 var ossRelativePathToSlnForked = MakeRelativePath(IODirectory.GetCurrentDirectory() + "\\", ossPathForked);
 var ossRelativePathToCsprojForked = MakeRelativePath(IODirectory.GetCurrentDirectory() + "\\src\\", ossPathForked);
 
-var projectPathUser = Path.Combine(rootPath, @"Shrooms.Premium\Shrooms.Premium.props");
-var testsProjectPathUser = Path.Combine(rootPath, @"Shrooms.Premium.UnitTests\Shrooms.Premium.UnitTests.props");
+var projectPropsPath = Path.Combine(rootPath, @"Shrooms.Premium\Shrooms.Premium.props");
+var testsProjectPropsPath = Path.Combine(rootPath, @"Shrooms.Premium.UnitTests\Shrooms.Premium.UnitTests.props");
 var projectPath = Path.Combine(rootPath, @"Shrooms.Premium\Shrooms.Premium.csproj");
 var slnPath = Path.Combine(rootPath, @"Premium.sln");
 var slnPathForked = Path.Combine(rootPath, @"Premium.WithForkedOss.sln");
@@ -34,7 +34,7 @@ Information("Simoona OSS relative path to *.csproj: {0}", ossRelativePathToCspro
 Information("Simoona OSS path (forked): {0}", ossPathForked);
 Information("Simoona OSS relative path to *.sln (forked): {0}", ossRelativePathToSlnForked);
 Information("Simoona OSS relative path to *.csproj (forked): {0}", ossRelativePathToCsprojForked);
-Information("Project path (*.csproj.user): {0}", projectPathUser);
+Information("Project path (*.csproj.user): {0}", projectPropsPath);
 Information("*.sln path: {0}", slnPath);
 Information("*.sln path (forked): {0}", slnPathForked);
 Information("nuget.config path: {0}", nugetConfigPath);
@@ -44,15 +44,22 @@ Information("Packages path (forked): {0}", packagesPathForked);
 Task("Default")
     .Does(() =>
 {
-    if (!FileExists(projectPathUser))
+    if (!FileExists(projectPropsPath))
     {
-        CreateCsprojUser(projectPathUser, ossRelativePathToSlnForked);
-        CreateCsprojUser(testsProjectPathUser, ossRelativePathToCsprojForked);
+        CreateCsprojProps(projectPropsPath, ossRelativePathToCsprojForked);
     }
     else 
     {
-        UpdateCsprojUser(projectPathUser, ossRelativePathToSlnForked);
-        UpdateCsprojUser(testsProjectPathUser, ossRelativePathToCsprojForked);
+        UpdateCsprojProps(projectPropsPath, ossRelativePathToCsprojForked);
+    }
+
+    if (!FileExists(testsProjectPropsPath))
+    {
+        CreateCsprojProps(testsProjectPropsPath, ossRelativePathToCsprojForked);
+    }
+    else 
+    {
+        UpdateCsprojProps(testsProjectPropsPath, ossRelativePathToCsprojForked);
     }
 
     UpdateCsprojReferences(projectPath, packagesInnerPath, packagesPathOriginal, packagesPathForked);
@@ -66,7 +73,7 @@ Task("Default")
     UpdateCustomSln(slnPath, slnPathForked, ossRelativePathToSlnOriginal, ossRelativePathToSlnForked);
 });
 
-void CreateCsprojUser(string projectPathUser, string simoonaCoreLocationValue)
+void CreateCsprojProps(string projectPropsPath, string simoonaCoreLocationValue)
 {
     var csprojXml = string.Format(@"<?xml version=""1.0"" encoding=""utf-8""?>
 <Project ToolsVersion=""15.0"" xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"">
@@ -75,12 +82,12 @@ void CreateCsprojUser(string projectPathUser, string simoonaCoreLocationValue)
   </PropertyGroup>
 </Project>", simoonaCoreLocationValue);
 
-    FileWriteText(projectPathUser, csprojXml);
+    FileWriteText(projectPropsPath, csprojXml);
 }
 
-void UpdateCsprojUser(string projectPathUser, string simoonaCoreLocationValue)
+void UpdateCsprojProps(string projectPropsPath, string simoonaCoreLocationValue)
 {
-    var projectFile = File(projectPathUser);
+    var projectFile = File(projectPropsPath);
 
     var xPath = "/ns:Project/ns:PropertyGroup/ns:SimoonaCoreLocation";
     var namespaceUrl = "http://schemas.microsoft.com/developer/msbuild/2003";
@@ -99,7 +106,7 @@ void UpdateCsprojUser(string projectPathUser, string simoonaCoreLocationValue)
         Information("SimoonaCoreLocation property does not exist, creating new");
 
         var xmlDoc = new XmlDocument();
-        xmlDoc.Load(projectPathUser);
+        xmlDoc.Load(projectPropsPath);
 
         var namespaceManager = new XmlNamespaceManager(xmlDoc.NameTable);
         namespaceManager.AddNamespace("ns", namespaceUrl);
@@ -112,7 +119,7 @@ void UpdateCsprojUser(string projectPathUser, string simoonaCoreLocationValue)
         propertyGroupNode.AppendChild(simoonaCoreLocationNode);
         rootNode.AppendChild(propertyGroupNode);
 
-        xmlDoc.Save(projectPathUser);
+        xmlDoc.Save(projectPropsPath);
     }
     else
     {
