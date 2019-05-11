@@ -7,68 +7,78 @@ using IODirectory = System.IO.Directory;
 
 var target = Argument("target", "Default");
 
+var ossRelativePathToSlnOriginal = @"..\open-source";
+var ossRelativePathToCsprojOriginal = @"..\..\open-source";
+
 var rootPath =  Argument("rootPath", @"..\src");
-var simoonaOssPath = Argument("simoonaOssPath", @"..\..\open-source");
+var ossPathForked = Argument("ossPathForked", ossRelativePathToCsprojOriginal);
+
+var ossRelativePathToSlnForked = MakeRelativePath(IODirectory.GetCurrentDirectory() + "\\", ossPathForked);
+var ossRelativePathToCsprojForked = MakeRelativePath(IODirectory.GetCurrentDirectory() + "\\src\\", ossPathForked);
+
+var projectPathUser = Path.Combine(rootPath, @"Shrooms.Premium\Shrooms.Premium.props");
+var testsProjectPathUser = Path.Combine(rootPath, @"Shrooms.Premium.UnitTests\Shrooms.Premium.UnitTests.props");
+var projectPath = Path.Combine(rootPath, @"Shrooms.Premium\Shrooms.Premium.csproj");
+var slnPath = Path.Combine(rootPath, @"Premium.sln");
+var slnPathForked = Path.Combine(rootPath, @"Premium.WithForkedOss.sln");
+var nugetConfigPath = Path.Combine(rootPath, @".nuget\nuget.config");
+
+var packagesInnerPath = @"src\api\packages";
+var packagesPathOriginal = Path.Combine(ossRelativePathToCsprojOriginal, packagesInnerPath);
+var packagesPathForked = Path.Combine(ossRelativePathToCsprojForked, packagesInnerPath);
+
+Information("Current directory: {0}", IODirectory.GetCurrentDirectory());
+Information("Root solution relative path: {0}", rootPath);
+Information("Simoona OSS relative path to *.sln (original): {0}", ossRelativePathToSlnOriginal);
+Information("Simoona OSS relative path to *.csproj: {0}", ossRelativePathToCsprojOriginal);
+Information("Simoona OSS path (forked): {0}", ossPathForked);
+Information("Simoona OSS relative path to *.sln (forked): {0}", ossRelativePathToSlnForked);
+Information("Simoona OSS relative path to *.csproj (forked): {0}", ossRelativePathToCsprojForked);
+Information("Project path (*.csproj.user): {0}", projectPathUser);
+Information("*.sln path: {0}", slnPath);
+Information("*.sln path (forked): {0}", slnPathForked);
+Information("nuget.config path: {0}", nugetConfigPath);
+Information("Packages path: {0}", packagesPathOriginal);
+Information("Packages path (forked): {0}", packagesPathForked);
 
 Task("Default")
     .Does(() =>
 {
-    var simoonaOssRelativePathToSln = MakeRelativePath(IODirectory.GetCurrentDirectory() + "\\", simoonaOssPath);
-    var simoonaOssRelativePathToCsproj = MakeRelativePath(IODirectory.GetCurrentDirectory() + "\\src\\", simoonaOssPath);
-
-    var projectPathUser = Path.Combine(rootPath, @"Shrooms.Premium\Shrooms.Premium.props");
-    var testsProjectPathUser = Path.Combine(rootPath, @"Shrooms.Premium.UnitTests\Shrooms.Premium.UnitTests.props");
-    var projectPath = Path.Combine(rootPath, @"Shrooms.Premium\Shrooms.Premium.csproj");
-    var customSlnPath = Path.Combine(rootPath, @"Premium.WithForkedOss.sln");
-    var nugetConfigPath = Path.Combine(rootPath, @".nuget\nuget.config");
-
-    var packagesPath = Path.Combine(simoonaOssRelativePathToCsproj, @"src\api\packages");
-
-    Information("Current directory: {0}", IODirectory.GetCurrentDirectory());
-    Information("Root path: {0}", rootPath);
-    Information("Simoona OSS path: {0}", simoonaOssPath);
-    Information("Simoona OSS relative path to sln: {0}", simoonaOssRelativePathToSln);
-    Information("Simoona OSS relative path to csproj: {0}", simoonaOssRelativePathToCsproj);
-    Information("Project path (user): {0}", projectPathUser);
-    Information("Custom sln path: {0}", customSlnPath);
-    Information("nuget.config path: {0}", nugetConfigPath);
-    Information("Packages path: {0}", packagesPath);
-
     if (!FileExists(projectPathUser))
     {
-        CreateCsprojUser(projectPathUser, simoonaOssRelativePathToCsproj);
-        CreateCsprojUser(testsProjectPathUser, simoonaOssRelativePathToCsproj);
+        CreateCsprojUser(projectPathUser, ossRelativePathToSlnForked);
+        CreateCsprojUser(testsProjectPathUser, ossRelativePathToCsprojForked);
     }
     else 
     {
-        UpdateCsprojUser(projectPathUser, simoonaOssRelativePathToCsproj);
-        UpdateCsprojUser(testsProjectPathUser, simoonaOssRelativePathToCsproj);
+        UpdateCsprojUser(projectPathUser, ossRelativePathToSlnForked);
+        UpdateCsprojUser(testsProjectPathUser, ossRelativePathToCsprojForked);
     }
 
-    UpdateCsprojReferences(projectPath, packagesPath);
+    UpdateCsprojReferences(projectPath, packagesInnerPath, packagesPathOriginal, packagesPathForked);
 
     if (!FileExists(nugetConfigPath))
     {
-        CreateNugetConfig(nugetConfigPath, packagesPath);
+        CreateNugetConfig(nugetConfigPath, packagesPathForked);
     }
 
-    UpdateNugetConfig(nugetConfigPath, packagesPath);
-    UpdateCustomSln(customSlnPath, simoonaOssRelativePathToSln);
+    UpdateNugetConfig(nugetConfigPath, packagesPathForked);
+    UpdateCustomSln(slnPath, slnPathForked, ossRelativePathToSlnOriginal, ossRelativePathToSlnForked);
 });
 
-void CreateCsprojUser(string projectPathUser, string simoonaCoreLocation)
+void CreateCsprojUser(string projectPathUser, string simoonaCoreLocationValue)
 {
     var csprojXml = string.Format(@"<?xml version=""1.0"" encoding=""utf-8""?>
 <Project ToolsVersion=""15.0"" xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"">
   <PropertyGroup>
     <SimoonaCoreLocation>{0}</SimoonaCoreLocation>
   </PropertyGroup>
-</Project>", simoonaCoreLocation);
+</Project>", simoonaCoreLocationValue);
 
     FileWriteText(projectPathUser, csprojXml);
 }
 
-void UpdateCsprojUser(string projectPathUser, string simoonaCoreLocation)
+void UpdateCsprojUser(string projectPathUser, string simoonaCoreLocationValue)
 {
     var projectFile = File(projectPathUser);
 
@@ -97,7 +107,7 @@ void UpdateCsprojUser(string projectPathUser, string simoonaCoreLocation)
         var rootNode = xmlDoc.SelectSingleNode("/ns:Project", namespaceManager);
         var propertyGroupNode = xmlDoc.CreateNode(XmlNodeType.Element, "PropertyGroup", namespaceUrl);
         var simoonaCoreLocationNode = xmlDoc.CreateNode(XmlNodeType.Element, "SimoonaCoreLocation", namespaceUrl);
-        simoonaCoreLocationNode.InnerText = simoonaCoreLocation;
+        simoonaCoreLocationNode.InnerText = simoonaCoreLocationValue;
 
         propertyGroupNode.AppendChild(simoonaCoreLocationNode);
         rootNode.AppendChild(propertyGroupNode);
@@ -106,11 +116,11 @@ void UpdateCsprojUser(string projectPathUser, string simoonaCoreLocation)
     }
     else
     {
-        XmlPoke(projectFile, xPath, simoonaCoreLocation, xmlPokeSettings);
+        XmlPoke(projectFile, xPath, simoonaCoreLocationValue, xmlPokeSettings);
     }
 }
 
-void UpdateCsprojReferences(string projectPath, string packagesPath)
+void UpdateCsprojReferences(string projectPath, string packagesInnerPath, string packagesPathOriginal, string packagesPathForked)
 {
     var namespaceUrl = "http://schemas.microsoft.com/developer/msbuild/2003";
 
@@ -122,7 +132,7 @@ void UpdateCsprojReferences(string projectPath, string packagesPath)
     {
         var xmlElement = (XmlElement)reference;
 
-        if (xmlElement.HasChildNodes && xmlElement["HintPath"].InnerText.Contains(packagesPath))
+        if (xmlElement.HasChildNodes && xmlElement["HintPath"].InnerText.Contains(packagesInnerPath))
         {
             if (xmlElement["Private"] != null)
             {
@@ -139,12 +149,14 @@ void UpdateCsprojReferences(string projectPath, string packagesPath)
 
     xmlDoc.Save(projectPath);
 
-    //ReplaceTextInFiles(projectPath, @"..\..\open-source\src\api\packages", packagesPath);
+    // To change nuget packages references paths:
+    //ReplaceTextInFiles(projectPath, packagesPathOriginal, packagesPathForked);
 }
 
-void UpdateCustomSln(string slnPath, string simoonaOssRelativePath)
+void UpdateCustomSln(string slnPath, string slnPathUser, string originalOssRelativePath, string ossRelativePath)
 {
-    ReplaceTextInFiles(slnPath, @"..\open-source", simoonaOssRelativePath);
+    CopyFile(slnPath, slnPathUser);
+    ReplaceTextInFiles(slnPathUser, originalOssRelativePath, ossRelativePath);
 }
 
 void CreateNugetConfig(string nugetConfigPath, string packagesPath)

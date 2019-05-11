@@ -205,3 +205,4 @@ Tests/Shrooms.Tests/Shrooms.UnitTests.csproj.VisualState.xml
 /src/.nuget/nuget.config
 /src/Shrooms.Premium.UnitTests/Shrooms.Premium.UnitTests.props
 /src/Shrooms.Premium/Shrooms.Premium.props
+/src/Premium.WithForkedOss.sln
