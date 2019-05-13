@@ -457,6 +457,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\FilterConfig.cs" />
+    <Compile Include="GeneralCode\NLogExceptionLogger.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="App_Start\SwaggerConfig.cs" />
@@ -494,7 +495,9 @@
     <Compile Include="Controllers\RoomController.cs" />
     <Compile Include="Controllers\RoomTypeController.cs" />
     <Compile Include="Controllers\SkillController.cs" />
+    <Compile Include="Filters\ApplicationInsightsHandleErrorAttribute.cs" />
     <Compile Include="Filters\PermissionAwareCacheOutputFilterAttribute.cs" />
+    <Compile Include="GeneralCode\ApplicationInsightsExceptionsLogger.cs" />
     <Compile Include="Helpers\IdentityExtensions.cs" />
     <Compile Include="GeneralCode\PerPermissionCacheKeyGenerator.cs" />
     <Compile Include="Controllers\Wall\WallController.cs" />

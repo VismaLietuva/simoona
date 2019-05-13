@@ -7,7 +7,7 @@ using Shrooms.DataTransferObjects.EmailTemplateViewModels;
 
 namespace Shrooms.Infrastructure.Email.Templating
 {
-    public class EmailTemplatesConfig
+    public static class EmailTemplatesConfig
     {
         private static string _baseDir;
 
