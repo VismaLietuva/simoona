@@ -8,7 +8,7 @@ Open-source part is located in GitHub: https://github.com/VismaLietuva/simoona
 
 ## Features
 
-|Freemium (open-source) features |Premium features|
+|Freemium (Open-source) features |Premium features|
 |--------------------------------|----------------|
 | Wall                           | Events         |
 | Projects                       | Books          |
@@ -24,38 +24,35 @@ Open-source part is located in GitHub: https://github.com/VismaLietuva/simoona
 ## Structure
 
 It might change, but currently it is as following:
-- Front-end app is located fully (including Premium) in open-source repository
-- Back-end part in open-source repository (Simoona "core")
+- Front-end app is located fully (including Premium) in Open-source repository
+- Back-end part in Open-source repository (Simoona "core")
 - Back-end part in Premium repository (Premium features)
 
-Due too tight coupling Premium features front-end part is located in open-source repository. These features are hidden from UI, however unhiding them - won't make them work, because they also require back-end part.
+Due to tight coupling - front-end part for Premium features is located in Open-source repository. These features are hidden from UI by default, however unhiding them - won't make them work, because they also require back-end part.
 
 To enable Premium features:
 - Set `window.isPremium = true;` in front-end app
-- Compile Premium project and copy `Shrooms.Premium.dll` to `Extensions` folder of `$\open-source\src\api\Main\PresentationLayer\Shrooms.API\Extensions\` (open-source project)
+- Back-end part for Premium features (`Shrooms.Premium.dll`) should be copied to `Extensions` folder of Open-source project (`$\open-source\src\api\Main\PresentationLayer\Shrooms.API\Extensions\`)
 
 ## Development
 
-Open-source repository (master branch) is included in this repository as Git sub-module. It means that all needed code can be checked-out automatically from both repositories,
+Open-source repository (master branch) is referenced in this repository as Git sub-module. It means that all needed code can be checked-out automatically from both repositories,
 and all projects can be included in one VS solution (`Premium.sln`).
-This development workflow is not yet mature and has known issues, therefore all ideas and suggestions are welcome.
 
-Current known issues:
-- To compile `Shrooms.Premium.csproj` you need either to compile Simoona open-source part manually or use `Premium.sln`.
-- Using `Premium.sln` you still probably will need to open `Shrooms.sln` (open-source solution) and restore NuGet packages for it, because paths are mixed between solutions.
-- If you need to work both on Premium and open-source branches - included sub-module probably won't help you, because you will want to point project to your own GitHub repository fork.
-- There are tasks in a backlog to improve development - feel free to contribute and improve!
+For better development experience, especially when you need to work with both Open-source and Premium at the same time and you have forked Open-source repository there is another solution:
+- Execute `build.bat` file (`$\builds\build.bat`) and provide what is asked.
+- The script will update paths pointing to your forked Open-source version and also will create `Premium.WithForkedOss.sln` solution, which you can use for further development.
+- When you build `Shrooms.Premium.csproj` project - it will recycle Simoona webapp (to release the lock on files) and copy needed extensions dlls to correct location automatically, thus making development experience smoother.
+
+**Note 1:** additional attention is still needed when you plan to update/install NuGet packages in any of the projects. Make sure that you don't end commiting project files refering your local paths.
+
+**Note 2:** if you plan to add new projects to solution, they should be added to main `Premium.sln` solution.
 
 ## CI/CD pipeline
 
 Build and deployment are driven by Azure Pipelines:
 - Build: https://dev.azure.com/vismalietuva/simoona/_build
 - Deployment/releases: https://dev.azure.com/vismalietuva/simoona/_release
-
-Current status and planned improvements:
-- Currently CI build is not being triggered automatically on every commit (because there is build time limit on hosted agents, which might be hit during "active development").
-- DB migrations are currently not being executed automatically during deployment (there is a task in backlog)
-- Deployment currently works only to staging environment. Production deployment needs more investigation and preparation, since it's more critical and being used by customers. (There is also task in backlog.)
 
 ## Staging environment
 - URL: https://simoona-staging.azurewebsites.net/test ("test" - is default company)

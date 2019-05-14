@@ -1,8 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\NUnit3TestAdapter.3.13.0\build\net35\NUnit3TestAdapter.props" Condition="Exists('..\packages\NUnit3TestAdapter.3.13.0\build\net35\NUnit3TestAdapter.props')" />
-  <Import Project="..\packages\NUnit.3.11.0\build\NUnit.props" Condition="Exists('..\packages\NUnit.3.11.0\build\NUnit.props')" />
+  <Import Project="..\..\open-source\src\api\packages\NUnit3TestAdapter.3.13.0\build\net35\NUnit3TestAdapter.props" Condition="Exists('..\..\open-source\src\api\packages\NUnit3TestAdapter.3.13.0\build\net35\NUnit3TestAdapter.props')" />
+  <Import Project="..\..\open-source\src\api\packages\NUnit.3.11.0\build\NUnit.props" Condition="Exists('..\..\open-source\src\api\packages\NUnit.3.11.0\build\NUnit.props')" />
+  <Import Project="Shrooms.Premium.UnitTests.props" Condition="Exists('Shrooms.Premium.UnitTests.props')" />
   <PropertyGroup>
+    <SimoonaCoreLocation Condition=" '$(SimoonaCoreLocation)' == '' ">..\..\open-source</SimoonaCoreLocation>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{BF77FA0D-51D3-4DB6-9ADE-D5AAD70E2625}</ProjectGuid>
@@ -38,50 +40,113 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>$(SimoonaCoreLocation)\src\api\Main\PresentationLayer\Shrooms.API\Shrooms.API.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Autofac, Version=3.5.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
-      <HintPath>..\packages\Autofac.3.5.2\lib\net40\Autofac.dll</HintPath>
+      <HintPath>..\..\open-source\src\api\packages\Autofac.3.5.2\lib\net40\Autofac.dll</HintPath>
     </Reference>
     <Reference Include="AutofacContrib.NSubstitute, Version=3.3.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutofacContrib.NSubstitute.3.3.5\lib\NET40\AutofacContrib.NSubstitute.dll</HintPath>
+      <HintPath>..\..\open-source\src\api\packages\AutofacContrib.NSubstitute.3.3.5\lib\NET40\AutofacContrib.NSubstitute.dll</HintPath>
     </Reference>
     <Reference Include="AutoMapper, Version=4.2.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoMapper.4.2.1\lib\net45\AutoMapper.dll</HintPath>
+      <HintPath>..\..\open-source\src\api\packages\AutoMapper.4.2.1\lib\net45\AutoMapper.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <HintPath>..\..\open-source\src\api\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <HintPath>..\..\open-source\src\api\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="Excel, Version=2.1.2.3, Culture=neutral, PublicKeyToken=93517dbe6a4012fa, processorArchitecture=MSIL">
-      <HintPath>..\packages\ExcelDataReader.2.1.2.3\lib\net45\Excel.dll</HintPath>
+      <HintPath>..\..\open-source\src\api\packages\ExcelDataReader.2.1.2.3\lib\net45\Excel.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
+      <HintPath>..\..\open-source\src\api\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="LinqKit, Version=1.1.3.1, Culture=neutral, PublicKeyToken=bc217f8844052a91, processorArchitecture=MSIL">
+      <HintPath>..\..\open-source\src\api\packages\LinqKit.1.1.3.1\lib\net45\LinqKit.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\open-source\src\api\packages\Microsoft.AspNet.Identity.Core.2.2.2\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.AspNet.Identity.EntityFramework, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.Identity.EntityFramework.2.2.1\lib\net45\Microsoft.AspNet.Identity.EntityFramework.dll</HintPath>
+      <HintPath>..\..\open-source\src\api\packages\Microsoft.AspNet.Identity.EntityFramework.2.2.2\lib\net45\Microsoft.AspNet.Identity.EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Owin, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.3.1.0\lib\net45\Microsoft.Owin.dll</HintPath>
+      <HintPath>..\..\open-source\src\api\packages\Microsoft.Owin.3.1.0\lib\net45\Microsoft.Owin.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Owin.Security, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.Security.3.1.0\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+      <HintPath>..\..\open-source\src\api\packages\Microsoft.Owin.Security.3.1.0\lib\net45\Microsoft.Owin.Security.dll</HintPath>
     </Reference>
     <Reference Include="NSubstitute, Version=1.8.2.0, Culture=neutral, PublicKeyToken=92dd2e9066daa5ca, processorArchitecture=MSIL">
-      <HintPath>..\packages\NSubstitute.1.8.2.0\lib\net45\NSubstitute.dll</HintPath>
+      <HintPath>..\..\open-source\src\api\packages\NSubstitute.1.8.2.0\lib\net45\NSubstitute.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework, Version=3.11.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.3.11.0\lib\net45\nunit.framework.dll</HintPath>
+      <HintPath>..\..\open-source\src\api\packages\NUnit.3.11.0\lib\net45\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="Shrooms.API, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(SimoonaCoreLocation)\src\api\Main\PresentationLayer\Shrooms.API\bin\Shrooms.API.dll</HintPath>
+    </Reference>
+    <Reference Include="Shrooms.Authentification, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(SimoonaCoreLocation)\src\api\Infrastructure\Shrooms.Authentification\bin\$(Configuration)\Shrooms.Authentification.dll</HintPath>
+    </Reference>
+    <Reference Include="Shrooms.Constants, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(SimoonaCoreLocation)\src\api\Other\Shrooms.Constants\bin\$(Configuration)\Shrooms.Constants.dll</HintPath>
+    </Reference>
+    <Reference Include="Shrooms.DataLayer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(SimoonaCoreLocation)\src\api\Main\DataLayer\Shrooms.DataLayer\bin\$(Configuration)\Shrooms.DataLayer.dll</HintPath>
+    </Reference>
+    <Reference Include="Shrooms.DataTransferObjects, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(SimoonaCoreLocation)\src\api\Main\BuisnessLayer\Shrooms.DataTransferObjects\bin\$(Configuration)\Shrooms.DataTransferObjects.dll</HintPath>
+    </Reference>
+    <Reference Include="Shrooms.Domain, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(SimoonaCoreLocation)\src\api\Main\BuisnessLayer\Shrooms.Domain\bin\$(Configuration)\Shrooms.Domain.dll</HintPath>
+    </Reference>
+    <Reference Include="Shrooms.DomainExceptions, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(SimoonaCoreLocation)\src\api\Main\BuisnessLayer\Shrooms.DomainExceptions\bin\$(Configuration)\Shrooms.DomainExceptions.dll</HintPath>
+    </Reference>
+    <Reference Include="Shrooms.DomainServiceValidators, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(SimoonaCoreLocation)\src\api\Main\BuisnessLayer\Shrooms.DomainServiceValidators\bin\$(Configuration)\Shrooms.DomainServiceValidators.dll</HintPath>
+    </Reference>
+    <Reference Include="Shrooms.EntityModels, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(SimoonaCoreLocation)\src\api\Main\DataLayer\Shrooms.EntityModels\bin\$(Configuration)\Shrooms.EntityModels.dll</HintPath>
+    </Reference>
+    <Reference Include="Shrooms.Infrastructure, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(SimoonaCoreLocation)\src\api\Infrastructure\Shrooms.Infrastructure\bin\$(Configuration)\Shrooms.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="Shrooms.ModelMappings, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(SimoonaCoreLocation)\src\api\Infrastructure\Shrooms.ModelMappings\bin\$(Configuration)\Shrooms.ModelMappings.dll</HintPath>
+    </Reference>
+    <Reference Include="Shrooms.Resources, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(SimoonaCoreLocation)\src\api\Other\Shrooms.Resources\bin\$(Configuration)\Shrooms.Resources.dll</HintPath>
+    </Reference>
+    <Reference Include="Shrooms.UnitTests, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(SimoonaCoreLocation)\src\api\Tests\Shrooms.Tests\bin\$(Configuration)\Shrooms.UnitTests.dll</HintPath>
+    </Reference>
+    <Reference Include="Shrooms.WebViewModels, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(SimoonaCoreLocation)\src\api\Main\PresentationLayer\Shrooms.WebViewModels\bin\$(Configuration)\Shrooms.WebViewModels.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
     <Reference Include="System.Linq.Dynamic, Version=1.0.5840.25917, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Linq.Dynamic.1.0.6\lib\net40\System.Linq.Dynamic.dll</HintPath>
+      <HintPath>..\..\open-source\src\api\packages\System.Linq.Dynamic.1.0.6\lib\net40\System.Linq.Dynamic.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -107,65 +172,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\open-source\src\api\Infrastructure\Shrooms.Authentification\Shrooms.Authentification.csproj">
-      <Project>{da661aa0-3313-4c2d-81a9-c1a2b74f7317}</Project>
-      <Name>Shrooms.Authentification</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\open-source\src\api\Infrastructure\Shrooms.Infrastructure\Shrooms.Infrastructure.csproj">
-      <Project>{D9C5606D-3855-44A0-BDB3-98D963D63FCF}</Project>
-      <Name>Shrooms.Infrastructure</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\open-source\src\api\Infrastructure\Shrooms.ModelMappings\Shrooms.ModelMappings.csproj">
-      <Project>{550f0c4a-34ab-49e5-83dd-19d3d77af3c5}</Project>
-      <Name>Shrooms.ModelMappings</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\open-source\src\api\Main\BuisnessLayer\Shrooms.DataTransferObjects\Shrooms.DataTransferObjects.csproj">
-      <Project>{6611930D-880E-455C-8681-E0E2A33CF5A9}</Project>
-      <Name>Shrooms.DataTransferObjects</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\open-source\src\api\Main\BuisnessLayer\Shrooms.DomainExceptions\Shrooms.DomainExceptions.csproj">
-      <Project>{8B48F02F-79E6-45CF-8DE3-BF9085D4C3A2}</Project>
-      <Name>Shrooms.DomainExceptions</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\open-source\src\api\Main\BuisnessLayer\Shrooms.DomainServiceValidators\Shrooms.DomainServiceValidators.csproj">
-      <Project>{3D4343C8-1CF9-4AAB-B458-C2AC52E4A47A}</Project>
-      <Name>Shrooms.DomainServiceValidators</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\open-source\src\api\Main\BuisnessLayer\Shrooms.Domain\Shrooms.Domain.csproj">
-      <Project>{F75814B0-ADE3-4E55-B44D-2EE966C41344}</Project>
-      <Name>Shrooms.Domain</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\open-source\src\api\Main\DataLayer\Shrooms.DataLayer\Shrooms.DataLayer.csproj">
-      <Project>{AFFE7B8B-3294-4DD3-990D-7DA5E256C987}</Project>
-      <Name>Shrooms.DataLayer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\open-source\src\api\Main\DataLayer\Shrooms.EntityModels\Shrooms.EntityModels.csproj">
-      <Project>{8AD6F857-708C-4B5E-98BC-B3206E7DD918}</Project>
-      <Name>Shrooms.EntityModels</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\open-source\src\api\Main\PresentationLayer\Shrooms.API\Shrooms.API.csproj">
-      <Project>{d92e5d79-8d6b-410f-b9fc-0fce46fbc116}</Project>
-      <Name>Shrooms.API</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\open-source\src\api\Main\PresentationLayer\Shrooms.WebViewModels\Shrooms.WebViewModels.csproj">
-      <Project>{1f63d29f-e593-47f0-a304-54d62cc1ad2b}</Project>
-      <Name>Shrooms.WebViewModels</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\open-source\src\api\Other\Shrooms.Constants\Shrooms.Constants.csproj">
-      <Project>{E07394B9-558C-4A70-9926-6400ABB0FB5D}</Project>
-      <Name>Shrooms.Constants</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\open-source\src\api\Other\Shrooms.Resources\Shrooms.Resources.csproj">
-      <Project>{C6FC692B-DFAD-4ED5-86D5-8000DBD06B02}</Project>
-      <Name>Shrooms.Resources</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Shrooms.Premium\Shrooms.Premium.csproj">
-      <Project>{CE5546D3-8819-4B25-8DDC-B02769BAB42F}</Project>
+      <Project>{ce5546d3-8819-4b25-8ddc-b02769bab42f}</Project>
       <Name>Shrooms.Premium</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\open-source\src\api\Tests\Shrooms.Tests\Shrooms.UnitTests.csproj">
-      <Project>{093fe583-996b-435c-a4d2-201c94aa71e0}</Project>
-      <Name>Shrooms.UnitTests</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
@@ -174,7 +183,9 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\NUnit.3.11.0\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NUnit.3.11.0\build\NUnit.props'))" />
-    <Error Condition="!Exists('..\packages\NUnit3TestAdapter.3.13.0\build\net35\NUnit3TestAdapter.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NUnit3TestAdapter.3.13.0\build\net35\NUnit3TestAdapter.props'))" />
+    <Error Condition="!Exists('..\..\open-source\src\api\packages\NUnit.3.11.0\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\open-source\src\api\packages\NUnit.3.11.0\build\NUnit.props'))" />
+    <Error Condition="!Exists('..\..\open-source\src\api\packages\NUnit3TestAdapter.3.13.0\build\net35\NUnit3TestAdapter.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\open-source\src\api\packages\NUnit3TestAdapter.3.13.0\build\net35\NUnit3TestAdapter.props'))" />
+    <Error Condition="!Exists('..\..\open-source\src\api\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\open-source\src\api\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
   </Target>
+  <Import Project="..\..\open-source\src\api\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\open-source\src\api\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
 </Project>
