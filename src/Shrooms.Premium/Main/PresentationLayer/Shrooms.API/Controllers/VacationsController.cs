@@ -55,9 +55,9 @@ namespace Shrooms.API.Controllers.WebApi
                 return BadRequest("File is too large");
             }
 
-            _vacationService.UploadVacationReportFile(await fileContent.ReadAsStreamAsync());
+            var skippedImports = _vacationService.UploadVacationReportFile(await fileContent.ReadAsStreamAsync());
 
-            return Ok();
+            return Ok(skippedImports);
         }
 
         [HttpGet]
