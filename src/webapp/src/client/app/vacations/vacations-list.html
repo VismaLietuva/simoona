@@ -38,6 +38,30 @@
         </strong>
     </div>
 
+    <div class="col-xs-12"
+        ng-if="!vm.isLoading && vm.importFailures && vm.importFailures.length">
+        <h3 class="text-danger" translate="vacations.importFailureHeader">
+        </h3>
+        <table class="nc-table nc-table-active">
+            <thead>
+                <tr>
+                    <th translate="vacations.importCode"></th>
+                    <th translate="vacations.importFullName"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="importFailure in vm.importFailures">
+                    <td class="col-xs-1">
+                        {{importFailure.code}}
+                    </td>
+                    <td class="col-xs-11">
+                        {{importFailure.fullName}}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
     <!--Vacation bot integration-->
 
     <!--<div class="col-xs-12">
