@@ -233,6 +233,7 @@
     <Compile Include="Main\BusinessLayer\Shrooms.DomainExceptions\Exceptions\Event\EventException.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DomainServiceValidators\Validators\Events\EventValidationService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DomainServiceValidators\Validators\Events\IEventValidationService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\EmployeeComparer.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Badges\BadgesService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Badges\IBadgesService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Books\BookMobileService.cs" />

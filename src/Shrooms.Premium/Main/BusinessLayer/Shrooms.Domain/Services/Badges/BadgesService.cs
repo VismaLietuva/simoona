@@ -10,6 +10,7 @@ using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Badges;
 using Shrooms.EntityModels.Models.Kudos;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain;
 
 namespace Shrooms.Domain.Services.Badges
 {
@@ -139,7 +140,13 @@ namespace Shrooms.Domain.Services.Badges
 
         #region Get
         public async Task<IList<BadgeCategory>> GetAllBadgeCategoriesAsync()
-            => await _badgeCategoriesDbSet.Include(x => x.RelationshipsWithKudosTypes.Select(y => y.KudosType)).Include(x => x.BadgeTypes).ToListAsync();
+        {
+            return await _badgeCategoriesDbSet.Include(x => x.RelationshipsWithKudosTypes.Select(y => y.KudosType))
+                                              .Include(x => x.BadgeTypes)
+                                              .AsNoTracking()
+                                              .ToListAsync();
+        }
+
         #endregion
 
         #region Update
@@ -168,8 +175,13 @@ namespace Shrooms.Domain.Services.Badges
 
         public async Task DeleteBadgeCategoryAsync(int badgeCategoryId)
         {
-            var badgeCategory = _badgeCategoriesDbSet.Find(badgeCategoryId) 
-                                ?? throw new ValidationException(ErrorCodes.BadgeCategoryNotFound, $"Badge category with ID {badgeCategoryId} not found");
+            var badgeCategory = _badgeCategoriesDbSet.Find(badgeCategoryId);
+            
+            if (badgeCategory == null)
+            {
+                throw new ValidationException(ErrorCodes.BadgeCategoryNotFound, $"Badge category with ID {badgeCategoryId} not found");
+            }
+
             _badgeCategoriesDbSet.Remove(badgeCategory);
             await SaveChangesAsync();
         }
@@ -177,9 +189,7 @@ namespace Shrooms.Domain.Services.Badges
         public async Task DeleteBadgeCategoryFromKudosTypeAsync(int badgeCategoryId, int kudosTypeId)
         {
             var relationship = await _badgeCategoryKudosTypesDbSet
-                                   .FirstOrDefaultAsync(x => x.BadgeCategoryId == badgeCategoryId && x.KudosTypeId == kudosTypeId)
-                               ?? throw new ValidationException(ErrorCodes.BadgeToKudosRelationshipNotFound,
-                                   $"Badge category (ID {badgeCategoryId}) and kudos type (ID {kudosTypeId}) relationship does not exist");
+                                   .FirstAsync(x => x.BadgeCategoryId == badgeCategoryId && x.KudosTypeId == kudosTypeId);
 
             _badgeCategoryKudosTypesDbSet.Remove(relationship);
             await SaveChangesAsync();
@@ -190,8 +200,18 @@ namespace Shrooms.Domain.Services.Badges
 
         public async Task AssignBadgesAsync()
         {
-            var categories = await GetAllBadgeCategoriesAsync();
-            var oneDayAgo = DateTime.UtcNow.Date.AddDays(-1).Date; // This depends on how often the job should run
+            var categories = (await GetAllBadgeCategoriesAsync())
+                .Where(x => x.RelationshipsWithKudosTypes.Any() &&
+                            x.BadgeTypes.Any(y => y.IsActive))
+                .ToList();
+
+            if (!categories.Any())
+            {
+                return;
+            }
+
+            // TODO with any open-source check-in add configuration key to set how many days ago we should check for changes here.
+            var oneDayAgo = DateTime.UtcNow.Date.AddDays(-1).Date;
 
             List<ApplicationUser> users;
             if (categories.Any(x => x.Created >= oneDayAgo 
@@ -199,6 +219,7 @@ namespace Shrooms.Domain.Services.Badges
             { // We might have a new category or type, that means we have to take all users.
                 users = await _usersDbSet.Where(x => x.TotalKudos > 0)
                                          .Include(x => x.BadgeLogs)
+                                         .AsNoTracking()
                                          .ToListAsync();
             }
             else
@@ -209,39 +230,45 @@ namespace Shrooms.Domain.Services.Badges
                                                          && x.KudosSystemType != ConstBusinessLayer.KudosTypeEnum.Minus)
                                              .Select(x => x.Employee)
                                              .Include(x => x.BadgeLogs)
-                                             .Distinct()
+                                             .Distinct(new EmployeeComparer())
+                                             .AsNoTracking()
                                              .ToListAsync();
             }
 
             foreach (var user in users.AsParallel())
             {
                 var userId = user.Id;
+                var userKudosLogs = await _kudosLogsDbSet.Where(x => x.EmployeeId == userId
+                                                                  && x.Status == KudosStatus.Approved
+                                                                  && x.KudosSystemType != ConstBusinessLayer.KudosTypeEnum.Minus)
+                                                         .AsNoTracking()
+                                                         .ToListAsync();
+
                 foreach (var category in categories.AsParallel())
                 {
-                    var categoryId = category.Id;
-                    var userKudosLogs = await _kudosLogsDbSet.Where(x => x.EmployeeId == userId 
-                                                                         && x.Status == KudosStatus.Approved 
-                                                                         && x.KudosSystemType != ConstBusinessLayer.KudosTypeEnum.Minus)
-                                                             .ToListAsync();
                     var amount = 0;
-                    foreach (var relationship in category.RelationshipsWithKudosTypes.Where(x => x.BadgeCategoryId == categoryId))
+                    foreach (var relationship in category.RelationshipsWithKudosTypes)
                     {
                         var kudosTypeName = relationship.KudosType.Name;
-                        var relationshipUserKudos = userKudosLogs.Where(x => x.KudosTypeName == kudosTypeName);
+                        var userKudosLogsForBadgeCategory = userKudosLogs.Where(x => x.KudosTypeName == kudosTypeName);
                         switch (relationship.CalculationPolicyType)
                         {
                             case BadgeCalculationPolicyType.PointsStrategy:
-                                amount = (int)Math.Round(relationshipUserKudos.Sum(x => x.Points), 0);
+                                amount += (int)Math.Round(userKudosLogsForBadgeCategory.Sum(x => x.Points), 0);
                                 break;
                             case BadgeCalculationPolicyType.MultiplierStrategy:
-                                amount = relationshipUserKudos.Sum(x => x.MultiplyBy);
+                                amount += userKudosLogsForBadgeCategory.Sum(x => x.MultiplyBy);
                                 break;
                         }
                     }
 
-                    var availableKudosWithGivenAmount = category.BadgeTypes.Where(x => x.IsActive 
-                                                                                       && x.BadgeCategoryId == categoryId 
-                                                                                       && x.Value <= amount)
+                    if (amount == 0)
+                    {
+                        continue;
+                    }
+
+                    var categoryId = category.Id;
+                    var availableKudosWithGivenAmount = category.BadgeTypes.Where(x => x.IsActive && x.Value <= amount)
                                                                            .ToList();
                     if (!availableKudosWithGivenAmount.Any())
                     {
@@ -269,10 +296,18 @@ namespace Shrooms.Domain.Services.Badges
         #endregion
 
         #region Private methods
-        private BadgeType GetBadgeType(int badgeTypeId) 
-            => _badgeTypesDbSet.Find(badgeTypeId)
-                    ?? throw new ValidationException(ErrorCodes.BadgeTypeNotFound, $"Badge type with ID {badgeTypeId} not found");
-        
+        private BadgeType GetBadgeType(int badgeTypeId)
+        {
+            var badgeType = _badgeTypesDbSet.Find(badgeTypeId);
+
+            if (badgeType == null)
+            {
+                throw new ValidationException(ErrorCodes.BadgeTypeNotFound, $"Badge type with ID {badgeTypeId} not found");
+            }
+
+            return badgeType;
+        }
+
         private async Task SaveChangesAsync()
         {
             var response = await _uow.SaveChangesAsync();
