@@ -84,6 +84,7 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.Events
                 ImageName = @event.ImageName,
                 MaxChoices = @event.MaxChoices,
                 MaxParticipants = @event.MaxParticipants,
+                OfficeId = @event.OfficeId,
                 OrganizationId = @event.OrganizationId,
                 Name = @event.Name,
                 Modified = @event.Modified,
