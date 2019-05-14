@@ -71,7 +71,7 @@
         function uploadVacationFile() {
             vacationsRepository.uploadVacationFile(xlsVacationFile).then(function (response) {
                     notifySrv.success('vacations.vacationTimeReportImportedSuccessfully');
-                    vm.importFailures = response.data;
+                    vm.importStatus = response.data;
                     getAvailableDays();
                 }, errorHandler.handleErrorMessage);
         }
