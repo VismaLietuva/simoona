@@ -42,13 +42,18 @@ namespace Shrooms.Domain.Services.Vacations
             _vacationDomainService = vacationDomainService;
         }
 
-        public IList<VacationSkippedImportDTO> UploadVacationReportFile(Stream fileStream)
+        public VacationImportStatusDTO UploadVacationReportFile(Stream fileStream)
         {
             var excelReader = ExcelReaderFactory.CreateBinaryReader(fileStream);
 
             var sheets = GetWorksheetNames(excelReader);
             var workSheet = GetWorksheetData(excelReader, sheets.First());
-            var skippedImports = new List<VacationSkippedImportDTO>();
+
+            var importStatus = new VacationImportStatusDTO
+            {
+                Imported = new List<VacationImportEntryDTO>(),
+                Skipped = new List<VacationImportEntryDTO>()
+            };
 
             foreach (var row in workSheet)
             {
@@ -79,6 +84,8 @@ namespace Shrooms.Domain.Services.Vacations
                     userToUpdate.VacationUsedTime = usedTime;
                     userToUpdate.VacationUnusedTime = unusedTime;
                     userToUpdate.VacationLastTimeUpdated = DateTime.UtcNow;
+
+                    importStatus.Imported.Add(new VacationImportEntryDTO { Code = code, FullName = fullName });
                 }
                 else
                 {
@@ -94,14 +101,14 @@ namespace Shrooms.Domain.Services.Vacations
                     exceptionTelemetry.Properties.Add("Entry last name, first name", fullName);
                     _telemetryClient.TrackException(exceptionTelemetry);
 
-                    skippedImports.Add(new VacationSkippedImportDTO { Code = code, FullName = fullName });
+                    importStatus.Skipped.Add(new VacationImportEntryDTO { Code = code, FullName = fullName });
                 }
             }
 
             _uow.SaveChanges();
             excelReader.Close();
 
-            return skippedImports;
+            return importStatus;
         }
 
         public async Task<VacationAvailableDaysDTO> GetAvailableDays(UserAndOrganizationDTO userOrgDto)

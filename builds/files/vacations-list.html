@@ -49,9 +49,10 @@
     </div>
 
     <div class="col-xs-12"
-        ng-if="!vm.isLoading && vm.importFailures && vm.importFailures.length">
-        <h3 class="text-danger" translate="vacations.importFailureHeader">
-        </h3>
+        ng-if="!vm.isLoading && vm.importStatus">
+        <div class="bold text-danger" translate="vacations.importStatusHeader" translate-values="{ one: vm.importStatus.imported.length, two: vm.importStatus.skipped.length }">
+        </div>
+        <div class="bold" translate="vacations.importSkippedEntries"></div>
         <table class="nc-table nc-table-active">
             <thead>
                 <tr>
@@ -60,7 +61,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="importFailure in vm.importFailures">
+                <tr ng-repeat="importFailure in vm.importStatus.skipped">
                     <td class="col-xs-1">
                         {{importFailure.code}}
                     </td>

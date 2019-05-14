@@ -10,7 +10,6 @@ using Shrooms.DataLayer;
 using Shrooms.DataTransferObjects.Models.Vacations;
 using Shrooms.Domain.Services.Vacations;
 using Shrooms.DomainExceptions.Exceptions;
-using Shrooms.EntityModels.Models;
 using Shrooms.WebViewModels.Models;
 
 namespace Shrooms.API.Controllers.WebApi
@@ -19,10 +18,8 @@ namespace Shrooms.API.Controllers.WebApi
     public class VacationsController : BaseController
     {
         private readonly IMapper _mapper;
-        private readonly IUnitOfWork _unitOfWork;
         private readonly IVacationService _vacationService;
         private readonly IVacationHistoryService _vacationHistoryService;
-        private readonly IRepository<ApplicationUser> _applicationUserRepository;
 
         public VacationsController(
             IMapper mapper,
@@ -31,8 +28,6 @@ namespace Shrooms.API.Controllers.WebApi
             IVacationHistoryService vacationHistoryService)
         {
             _mapper = mapper;
-            _unitOfWork = unitOfWork;
-            _applicationUserRepository = _unitOfWork.GetRepository<ApplicationUser>();
 
             _vacationService = vacationService;
             _vacationHistoryService = vacationHistoryService;
@@ -55,9 +50,9 @@ namespace Shrooms.API.Controllers.WebApi
                 return BadRequest("File is too large");
             }
 
-            var skippedImports = _vacationService.UploadVacationReportFile(await fileContent.ReadAsStreamAsync());
+            var importStatus = _vacationService.UploadVacationReportFile(await fileContent.ReadAsStreamAsync());
 
-            return Ok(skippedImports);
+            return Ok(importStatus);
         }
 
         [HttpGet]
