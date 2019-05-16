@@ -1,5 +1,10 @@
 ﻿@using Shrooms.Constants
+@using Shrooms.DataTransferObjects.EmailTemplateViewModels
 @using Shrooms.Domain.Helpers
+@using RazorEngine.Templating
+
+@inherits TemplateBase<NewWallPostEmailTemplateViewModel>
+
 @{
     Layout = EmailTemplateCacheKeys.HeaderFooterLayout;
 }
@@ -46,7 +51,7 @@
                                 <tr>
                                     <td align="center" style="display:inline-block; background:#006199; ">
                                         <a href="@Model.PostDeepLink" style="color:#ffffff; font-family:'Segoe UI',Helvetica,Arial,sans-serif; font-size:15px; line-height:15px; font-weight: 400; white-space:nowrap; text-decoration:none;" target="_blank">
-                                            @Model.ActionButtonTitle 
+                                            @Model.ActionButtonTitle
                                         </a>
                                     </td>
                                 </tr>

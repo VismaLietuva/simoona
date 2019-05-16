@@ -22,9 +22,9 @@ namespace Shrooms.Authentification
             foreach (var error in errors)
             {
                 var strBuilder = new StringBuilder(error);
-                strBuilder = strBuilder.Replace("Passwords must have at least one digit ('0'-'9').", Shrooms.Resources.Models.ApplicationUser.ApplicationUser.PasswordErrorMustContainDigit);
-                strBuilder = strBuilder.Replace("Passwords must have at least one lowercase ('a'-'z').", Shrooms.Resources.Models.ApplicationUser.ApplicationUser.PasswordErrorMustContainLowerCase);
-                strBuilder = strBuilder.Replace("Passwords must have at least one uppercase ('A'-'Z').", Shrooms.Resources.Models.ApplicationUser.ApplicationUser.PasswordErrorMustContainUpperCase);
+                strBuilder = strBuilder.Replace("Passwords must have at least one digit ('0'-'9').", Resources.Models.ApplicationUser.ApplicationUser.PasswordErrorMustContainDigit);
+                strBuilder = strBuilder.Replace("Passwords must have at least one lowercase ('a'-'z').", Resources.Models.ApplicationUser.ApplicationUser.PasswordErrorMustContainLowerCase);
+                strBuilder = strBuilder.Replace("Passwords must have at least one uppercase ('A'-'Z').", Resources.Models.ApplicationUser.ApplicationUser.PasswordErrorMustContainUpperCase);
                 yield return strBuilder.ToString();
             }
         }

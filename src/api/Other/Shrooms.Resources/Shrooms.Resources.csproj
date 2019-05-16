@@ -131,8 +131,8 @@
     <EmbeddedResource Include="Models\ApplicationUser\ApplicationUser.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Views\Account\Account.lt-LT.resx" />
-    <EmbeddedResource Include="Views\Account\Account.resx" />
+    <EmbeddedResource Include="Models\Account\Account.lt-LT.resx" />
+    <EmbeddedResource Include="Models\Account\Account.resx" />
     <EmbeddedResource Include="Widgets\KudosBasket\KudosBasket.lt-LT.resx" />
     <EmbeddedResource Include="Widgets\KudosBasket\KudosBasket.resx" />
   </ItemGroup>

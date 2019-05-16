@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Shrooms.Resources.Views.Account;
+using Shrooms.Resources.Models.Account;
 
 namespace Shrooms.WebViewModels.Models
 {
@@ -17,7 +17,7 @@ namespace Shrooms.WebViewModels.Models
         public string OldPassword { get; set; }
 
         [Required]
-        [StringLength(100, ErrorMessageResourceType = typeof(Account), ErrorMessageResourceName = "ValidationLengthError", MinimumLength = 6)]
+        [StringLength(100, ErrorMessageResourceType = typeof(Account), ErrorMessageResourceName = "PasswordLengthInvalid", MinimumLength = 6)]
         [DataType(DataType.Password)]
         public string NewPassword { get; set; }
 
@@ -56,7 +56,7 @@ namespace Shrooms.WebViewModels.Models
         public string UserName { get; set; }
 
         [Required]
-        [StringLength(100, ErrorMessageResourceType = typeof(Account), ErrorMessageResourceName = "ValidationLengthError", MinimumLength = 6)]
+        [StringLength(100, ErrorMessageResourceType = typeof(Account), ErrorMessageResourceName = "PasswordLengthInvalid", MinimumLength = 6)]
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
