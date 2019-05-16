@@ -148,19 +148,19 @@ namespace Shrooms.API.Controllers
 
         private PagedViewModel<ServiceRequestViewModel> GetFilteredPaged(string includeProperties = null, int page = 1, int pageSize = ConstWebApi.DefaultPageSize, string sort = null, string dir = "", Expression<Func<ServiceRequest, bool>> filter = null)
         {
-            string sortQuery = string.IsNullOrEmpty(sort) ? null : string.Format("{0} {1}", sort, dir);
+            var sortQuery = string.IsNullOrEmpty(sort) ? null : $"{sort} {dir}";
 
-            IPagedList<ServiceRequest> models = _serviceRequestRepository.Get(
+            var models = _serviceRequestRepository.Get(
                 includeProperties: includeProperties, filter: filter, orderBy: sortQuery ?? "Created")
                 .ToPagedList(page, pageSize);
 
-            var pagedVM = new StaticPagedList<ServiceRequestViewModel>(_mapper.Map<IEnumerable<ServiceRequest>, IEnumerable<ServiceRequestViewModel>>(models), models.PageNumber, models.PageSize, models.TotalItemCount);
+            var pagedModel = new StaticPagedList<ServiceRequestViewModel>(_mapper.Map<IEnumerable<ServiceRequest>, IEnumerable<ServiceRequestViewModel>>(models), models.PageNumber, models.PageSize, models.TotalItemCount);
 
             var result = new PagedViewModel<ServiceRequestViewModel>
             {
-                PagedList = pagedVM,
-                PageCount = pagedVM.PageCount,
-                ItemCount = pagedVM.TotalItemCount,
+                PagedList = pagedModel,
+                PageCount = pagedModel.PageCount,
+                ItemCount = pagedModel.TotalItemCount,
                 PageSize = pageSize
             };
 

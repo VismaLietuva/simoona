@@ -90,10 +90,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(SimoonaCoreLocation)\src\api\Main\PresentationLayer\Shrooms.API\bin\Shrooms.API.dll</HintPath>
     </Reference>
-    <Reference Include="Shrooms.Authentification, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SimoonaCoreLocation)\src\api\Infrastructure\Shrooms.Authentification\bin\$(Configuration)\Shrooms.Authentification.dll</HintPath>
-    </Reference>
     <Reference Include="Shrooms.Constants, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(SimoonaCoreLocation)\src\api\Other\Shrooms.Constants\bin\$(Configuration)\Shrooms.Constants.dll</HintPath>

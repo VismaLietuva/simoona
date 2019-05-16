@@ -27,7 +27,6 @@ namespace Shrooms.Domain.Services.Books
         private readonly IDbSet<Office> _officeDbSet;
         private readonly IDbSet<BookOffice> _bookOfficeDbSet;
         private readonly IDbSet<ApplicationUser> _userDbSet;
-        private readonly IDbSet<Organization> _organizationDbSet;
         private readonly IBookMobileServiceValidator _serviceValidator;
         private readonly IBookInfoService _bookInfoService;
 
@@ -38,7 +37,6 @@ namespace Shrooms.Domain.Services.Books
             _bookLogDbSet = uow.GetDbSet<BookLog>();
             _officeDbSet = uow.GetDbSet<Office>();
             _userDbSet = uow.GetDbSet<ApplicationUser>();
-            _organizationDbSet = uow.GetDbSet<Organization>();
             _bookOfficeDbSet = uow.GetDbSet<BookOffice>();
             _serviceValidator = serviceValidator;
             _bookInfoService = bookInfoService;
@@ -108,9 +106,7 @@ namespace Shrooms.Domain.Services.Books
             {
                 var book = _bookDbSet
                     .Include(b => b.BookOffices)
-                    .Where(b => b.Code == bookDTO.Code
-                        && b.OrganizationId == bookDTO.OrganizationId)
-                    .FirstOrDefault();
+                    .FirstOrDefault(b => b.Code == bookDTO.Code && b.OrganizationId == bookDTO.OrganizationId);
 
                 if (book == null)
                 {
@@ -152,9 +148,7 @@ namespace Shrooms.Domain.Services.Books
 
         public void ReturnSpecificBook(int bookLogId)
         {
-            var log = _bookLogDbSet
-                .FirstOrDefault(l => l.Id == bookLogId
-                    && l.Returned == null);
+            var log = _bookLogDbSet.FirstOrDefault(l => l.Id == bookLogId && l.Returned == null);
 
             _serviceValidator.ThrowIfBookDoesNotExist(log != null);
 

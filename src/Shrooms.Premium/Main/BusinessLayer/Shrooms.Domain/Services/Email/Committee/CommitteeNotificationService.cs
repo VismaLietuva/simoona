@@ -19,7 +19,7 @@ namespace Shrooms.Domain.Services.Email.Committee
         private readonly IApplicationSettings _appSettings;
         private readonly IMailingService _mailingService;
 
-        public CommitteeNotificationService(UnitOfWork2 uow,
+        public CommitteeNotificationService(IUnitOfWork2 uow,
             IMailTemplate mailTemplate,
             IApplicationSettings appSettings,
             IMailingService mailingService)

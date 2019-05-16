@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Shrooms.API.Filters;
-using Shrooms.Authentification;
 using Shrooms.DataLayer;
 using Shrooms.DataTransferObjects.Models.Committees;
 using Shrooms.EntityModels.Models;
@@ -20,8 +19,8 @@ namespace Shrooms.API.Controllers.WebApi
     {
         private readonly ICommitteesService _committeesService;
 
-        public CommitteesController(IMapper mapper, IUnitOfWork unitOfWork, ShroomsUserManager userManager, ShroomsRoleManager roleManager, ICommitteesService committeesService)
-            : base(mapper, unitOfWork, userManager, roleManager, "Created")
+        public CommitteesController(IMapper mapper, IUnitOfWork unitOfWork, ICommitteesService committeesService)
+            : base(mapper, unitOfWork, "Created")
         {
             _committeesService = committeesService;
         }
