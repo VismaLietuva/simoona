@@ -468,18 +468,21 @@ namespace <#= T4ResXHelpers.Current.NormalizeString(item.NameSpace)#>  {
 		///<summary>
 		/// Reformat a string to various forms
 		///</summary>
-		public string NormalizeString(string s, bool isClass = true, bool camelCase = true)
+		public string NormalizeString(string s)
 		{
+			bool isClass = true;
 
 			return s.Split('.')
-					.Aggregate((c, n) => NormalizeItem(c, isClass, camelCase) + (isClass ? "." : "_") + NormalizeItem(n, isClass, camelCase));
+					.Aggregate((c, n) => NormalizeItem(c, isClass) + (isClass ? "." : "_") + NormalizeItem(n, isClass));
 		}
 
 		/// <summary>
 		/// Same as above but single item
 		/// </summary>
-		public string NormalizeItem(string s, bool isClass = true, bool camelCase = true)
+		public string NormalizeItem(string s, bool isClass)
 		{
+			bool camelCase = true;
+
 			s = s.Replace(isClass ? "." : "_", "#");
 
 			var r = @"[^\p{L}0-9#]";
@@ -619,7 +622,8 @@ namespace <#= T4ResXHelpers.Current.NormalizeString(item.NameSpace)#>  {
 	
 		public EnvDTE.Project GetProject(string projectName)
 		{
-			return GetAllProjects().First(p => p.Name == projectName);
+			var projects = GetAllProjects();
+			return projects.First(p => p.Name == projectName);
 		}
 	
 		/// <summary>
@@ -632,18 +636,10 @@ namespace <#= T4ResXHelpers.Current.NormalizeString(item.NameSpace)#>  {
 			var projectList = new List<EnvDTE.Project>();
 		
 			var folders = Dte.Solution.Projects.Cast<EnvDTE.Project>().Where(p => p.Kind == EnvDTE80.ProjectKinds.vsProjectKindSolutionFolder);
-
+				
 			foreach (EnvDTE.Project folder in folders)
 			{
-				if (folder.ProjectItems == null) continue;
-			
-				foreach (EnvDTE.ProjectItem item in folder.ProjectItems)
-				{
-					if (item.Object is EnvDTE.Project)
-					{
-						projectList.Add(item.Object as EnvDTE.Project);
-					}
-				}
+				projectList.AddRange(GetProjectItems(folder.ProjectItems));				
 			}
 		
 			var projects = Dte.Solution.Projects.Cast<EnvDTE.Project>().Where(p => p.Kind != EnvDTE80.ProjectKinds.vsProjectKindSolutionFolder);
@@ -652,6 +648,27 @@ namespace <#= T4ResXHelpers.Current.NormalizeString(item.NameSpace)#>  {
 				projectList.AddRange(projects);
 			}
 		
+			return projectList;
+		}
+
+		public IEnumerable<EnvDTE.Project> GetProjectItems(EnvDTE.ProjectItems projectItems)
+		{
+			var projectList = new List<EnvDTE.Project>();
+
+			if (projectItems != null) 
+			{
+				foreach (EnvDTE.ProjectItem item in projectItems)
+				{
+					if (item.Object is EnvDTE.Project)
+					{
+						projectList.Add(item.Object as EnvDTE.Project);
+
+						var folder = item.Object as EnvDTE.Project;
+						projectList.AddRange(GetProjectItems(folder.ProjectItems));
+					}
+				}
+			}
+
 			return projectList;
 		}
 

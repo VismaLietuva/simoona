@@ -51,7 +51,7 @@
 		
 		public static string GetLocalizedJs(string ns)
 		{
-			return $"var ResX = {Utilities.GetResourcesByNameSpace(ns).ToJson()};";
+			return string.Format("var ResX = {0};", Utilities.GetResourcesByNameSpace(ns).ToJson());
 		}
 
 		/// <summary>
@@ -115,10 +115,12 @@
 	}
  }
 	
+
 namespace Shrooms.Resources  {
 	[Utilities.Localized]	
 	public partial class Common {
 	
+
 		///<summary>
 		/// Return this class as a Dictionary&lt;class, Dictionary&lt;key, value&gt;&gt;
 		///</summary>
@@ -184,6 +186,7 @@ namespace Shrooms.Resources  {
 			return value;
 		} 
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -204,13 +207,16 @@ namespace Shrooms.Resources  {
 		public const string EditKey = "Edit";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -223,6 +229,7 @@ namespace Shrooms.Resources  {
 		///</summary>
 		public static string MessageRequiredFieldFormatted(params object[] args) { return GetResourceString("MessageRequiredField", args); }
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -243,13 +250,16 @@ namespace Shrooms.Resources  {
 		public const string MessageRequiredFieldKey = "MessageRequiredField";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -270,13 +280,16 @@ namespace Shrooms.Resources  {
 		public const string NoKey = "No";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -297,13 +310,16 @@ namespace Shrooms.Resources  {
 		public const string YesKey = "Yes";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -316,6 +332,7 @@ namespace Shrooms.Resources  {
 		///</summary>
 		public static string DoesNotExistFormatted(params object[] args) { return GetResourceString("DoesNotExist", args); }
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -336,13 +353,16 @@ namespace Shrooms.Resources  {
 		public const string DoesNotExistKey = "DoesNotExist";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -355,6 +375,7 @@ namespace Shrooms.Resources  {
 		///</summary>
 		public static string MaxLengthErrorFormatted(params object[] args) { return GetResourceString("MaxLengthError", args); }
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -375,13 +396,16 @@ namespace Shrooms.Resources  {
 		public const string MaxLengthErrorKey = "MaxLengthError";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -394,6 +418,7 @@ namespace Shrooms.Resources  {
 		///</summary>
 		public static string RequiredErrorFormatted(params object[] args) { return GetResourceString("RequiredError", args); }
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -414,13 +439,16 @@ namespace Shrooms.Resources  {
 		public const string RequiredErrorKey = "RequiredError";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -433,6 +461,7 @@ namespace Shrooms.Resources  {
 		///</summary>
 		public static string StringLengthErrorFormatted(params object[] args) { return GetResourceString("StringLengthError", args); }
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -453,13 +482,16 @@ namespace Shrooms.Resources  {
 		public const string StringLengthErrorKey = "StringLengthError";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -472,6 +504,7 @@ namespace Shrooms.Resources  {
 		///</summary>
 		public static string CompareErrorFormatted(params object[] args) { return GetResourceString("CompareError", args); }
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -492,13 +525,16 @@ namespace Shrooms.Resources  {
 		public const string CompareErrorKey = "CompareError";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -519,13 +555,16 @@ namespace Shrooms.Resources  {
 		public const string EmailAddressErrorKey = "EmailAddressError";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -546,13 +585,16 @@ namespace Shrooms.Resources  {
 		public const string PhoneErrorKey = "PhoneError";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -573,13 +615,16 @@ namespace Shrooms.Resources  {
 		public const string ConfirmUserKey = "ConfirmUser";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -600,13 +645,16 @@ namespace Shrooms.Resources  {
 		public const string NewUserConfirmEmailMessageKey = "NewUserConfirmEmailMessage";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -627,13 +675,16 @@ namespace Shrooms.Resources  {
 		public const string NewUserConfirmedNotificationEmailSubjectKey = "NewUserConfirmedNotificationEmailSubject";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -646,6 +697,7 @@ namespace Shrooms.Resources  {
 		///</summary>
 		public static string ServiceRequestAdminChangedStatusMessageFormatted(params object[] args) { return GetResourceString("ServiceRequestAdminChangedStatusMessage", args); }
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -666,13 +718,16 @@ namespace Shrooms.Resources  {
 		public const string ServiceRequestAdminChangedStatusMessageKey = "ServiceRequestAdminChangedStatusMessage";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -693,13 +748,16 @@ namespace Shrooms.Resources  {
 		public const string ServiceRequestAdminChangedStatusSubjectKey = "ServiceRequestAdminChangedStatusSubject";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -720,13 +778,16 @@ namespace Shrooms.Resources  {
 		public const string ServiceRequestAdminCommentedMessageKey = "ServiceRequestAdminCommentedMessage";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -747,13 +808,16 @@ namespace Shrooms.Resources  {
 		public const string ServiceRequestAdminCommentedSubjectKey = "ServiceRequestAdminCommentedSubject";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -774,13 +838,16 @@ namespace Shrooms.Resources  {
 		public const string DayKey = "Day";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -801,13 +868,16 @@ namespace Shrooms.Resources  {
 		public const string WrongManagerKey = "WrongManager";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -828,13 +898,16 @@ namespace Shrooms.Resources  {
 		public const string CommitteeSuggestionsEmailBodyKey = "CommitteeSuggestionsEmailBody";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -847,6 +920,7 @@ namespace Shrooms.Resources  {
 		///</summary>
 		public static string CommitteeSuggestionEmailSubjectFormatted(params object[] args) { return GetResourceString("CommitteeSuggestionEmailSubject", args); }
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -867,13 +941,16 @@ namespace Shrooms.Resources  {
 		public const string CommitteeSuggestionEmailSubjectKey = "CommitteeSuggestionEmailSubject";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -894,13 +971,16 @@ namespace Shrooms.Resources  {
 		public const string NotFoundKey = "NotFound";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -921,13 +1001,16 @@ namespace Shrooms.Resources  {
 		public const string BirthdayDateValidationErrorKey = "BirthdayDateValidationError";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -948,13 +1031,16 @@ namespace Shrooms.Resources  {
 		public const string BirthdayDateIsTooOldKey = "BirthdayDateIsTooOld";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -975,13 +1061,16 @@ namespace Shrooms.Resources  {
 		public const string EmailSignatureTextKey = "EmailSignatureText";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1002,13 +1091,16 @@ namespace Shrooms.Resources  {
 		public const string BirthdayNotSetKey = "BirthdayNotSet";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1029,13 +1121,16 @@ namespace Shrooms.Resources  {
 		public const string NewUserConfirmedNotificationEmailMessageKey = "NewUserConfirmedNotificationEmailMessage";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1056,13 +1151,16 @@ namespace Shrooms.Resources  {
 		public const string NewUserConfirmEmailSubjectKey = "NewUserConfirmEmailSubject";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1083,13 +1181,16 @@ namespace Shrooms.Resources  {
 		public const string CommentMessageBodyKey = "CommentMessageBody";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1110,13 +1211,16 @@ namespace Shrooms.Resources  {
 		public const string EmptyMessageErrorKey = "EmptyMessageError";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1137,13 +1241,16 @@ namespace Shrooms.Resources  {
 		public const string PostMessageBodyKey = "PostMessageBody";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1164,13 +1271,16 @@ namespace Shrooms.Resources  {
 		public const string UserResetPasswordEmailSubjectKey = "UserResetPasswordEmailSubject";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources  {
 		
 	public partial class Common {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1191,13 +1301,16 @@ namespace Shrooms.Resources  {
 		public const string UserVerifyEmailSubjectKey = "UserVerifyEmailSubject";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Emails  {
 	[Utilities.Localized]	
 	public partial class Templates {
 	
+
 		///<summary>
 		/// Return this class as a Dictionary&lt;class, Dictionary&lt;key, value&gt;&gt;
 		///</summary>
@@ -1263,6 +1376,7 @@ namespace Shrooms.Resources.Emails  {
 			return value;
 		} 
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1283,13 +1397,16 @@ namespace Shrooms.Resources.Emails  {
 		public const string BirthdaysNotificationEmailSubjectKey = "BirthdaysNotificationEmailSubject";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Emails  {
 		
 	public partial class Templates {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1310,13 +1427,16 @@ namespace Shrooms.Resources.Emails  {
 		public const string DefaultEmailSubjectKey = "DefaultEmailSubject";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Emails  {
 		
 	public partial class Templates {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1329,6 +1449,7 @@ namespace Shrooms.Resources.Emails  {
 		///</summary>
 		public static string DefaultNotificationSignatureFormatted(params object[] args) { return GetResourceString("DefaultNotificationSignature", args); }
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1349,13 +1470,16 @@ namespace Shrooms.Resources.Emails  {
 		public const string DefaultNotificationSignatureKey = "DefaultNotificationSignature";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Emails  {
 		
 	public partial class Templates {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1368,6 +1492,7 @@ namespace Shrooms.Resources.Emails  {
 		///</summary>
 		public static string EventPostNotificationBodyFormatted(params object[] args) { return GetResourceString("EventPostNotificationBody", args); }
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1388,13 +1513,16 @@ namespace Shrooms.Resources.Emails  {
 		public const string EventPostNotificationBodyKey = "EventPostNotificationBody";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Emails  {
 		
 	public partial class Templates {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1407,6 +1535,7 @@ namespace Shrooms.Resources.Emails  {
 		///</summary>
 		public static string EventPostNotificationSubjectFormatted(params object[] args) { return GetResourceString("EventPostNotificationSubject", args); }
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1427,13 +1556,16 @@ namespace Shrooms.Resources.Emails  {
 		public const string EventPostNotificationSubjectKey = "EventPostNotificationSubject";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Emails  {
 		
 	public partial class Templates {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1446,6 +1578,7 @@ namespace Shrooms.Resources.Emails  {
 		///</summary>
 		public static string NewPostCommentEmailSubjectFormatted(params object[] args) { return GetResourceString("NewPostCommentEmailSubject", args); }
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1466,13 +1599,16 @@ namespace Shrooms.Resources.Emails  {
 		public const string NewPostCommentEmailSubjectKey = "NewPostCommentEmailSubject";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Emails  {
 		
 	public partial class Templates {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1485,6 +1621,7 @@ namespace Shrooms.Resources.Emails  {
 		///</summary>
 		public static string NewWallPostEmailSubjectFormatted(params object[] args) { return GetResourceString("NewWallPostEmailSubject", args); }
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1505,13 +1642,387 @@ namespace Shrooms.Resources.Emails  {
 		public const string NewWallPostEmailSubjectKey = "NewWallPostEmailSubject";
 
 		
+
 	}
 }
+
+
+namespace Shrooms.Resources.Models.Account  {
+	[Utilities.Localized]	
+	public partial class Account {
+	
+
+		///<summary>
+		/// Return this class as a Dictionary&lt;class, Dictionary&lt;key, value&gt;&gt;
+		///</summary>
+		public static Dictionary<string, Dictionary<string, string>> GetAsDictionary() {
+			return Utilities.GetResourcesByNameSpace("Models.Account^Account");
+		}
+
+		private static System.Resources.ResourceManager _resourceManager;    
+	
+		///<summary>
+		/// Get the ResourceManager
+		///</summary>
+		private static System.Resources.ResourceManager ResourceManager 
+		{
+			get 
+			{
+				return _resourceManager ?? (_resourceManager = new System.Resources.ResourceManager("Shrooms.Resources.Models.Account.Account", typeof(Account).Assembly));
+			}
+		}
+
+		///<summary>
+		///	Get localized entry for a given key
+		///</summary>
+		public static string GetResourceString(string key, params object[] args)
+		{
+			var value = ResourceManager.GetString(key, Thread.CurrentThread.CurrentCulture);
+
+			if (!string.IsNullOrEmpty(value))
+			{
+				var regex  = @"{\b\p{Lu}{3,}\b}";
+				var tokens = Regex.Matches(value, regex).Cast<Match>().Select(m => m.Value).ToList();
+					tokens
+						.ForEach(t =>
+						{
+							value = value.Replace(t, Utilities.GetReplacementString(t.Replace("{", "").Replace("}", "")));
+						});
+
+				if (args.Any())
+				{
+					regex  = @"{[0-9]{1}}";
+					tokens = Regex.Matches(value, regex).Cast<Match>().Select(m => m.Value).ToList();
+
+					if (tokens.Any())
+					{
+						// If argument length is less than token length, add an error message
+						// This can happen if arguments are accidentally forgottent in a translation
+						if (args.Count() < tokens.Count())
+						{
+							var newArgs = new List<object>();
+							for (var i = 0; i < tokens.Count(); i++)
+							{
+								newArgs.Add(args.Length > i ? args[i] : "argument {" + i + "} is undefined");
+							}
+
+							args = newArgs.ToArray();
+						}
+
+						value = string.Format(value, args);
+					}
+				}		        		
+			}
+	
+			return value;
+		} 
+		
+
+		///<summary>
+		///    <list type='bullet'>
+		///        <item>
+		///            <description>Email &apos;{0}&apos; is already taken.</description>
+		///        </item>
+		///        <item>
+		///            <description></description>
+		///        </item>
+		///    </list>
+		///</summary>
+		public static string DuplicateEmailFormatted(params object[] args) { return GetResourceString("DuplicateEmail", args); }
+		
+
+		///<summary>
+		///    <list type='bullet'>
+		///        <item>
+		///            <description>Email &apos;{0}&apos; is already taken.</description>
+		///        </item>
+		///        <item>
+		///            <description></description>
+		///        </item>
+		///    </list>
+		///</summary>
+		[Utilities.Localized]
+		public static string DuplicateEmail { get { return GetResourceString(DuplicateEmailKey); } }
+
+		/// <summary>
+		/// Resource key for <see cref="DuplicateEmail"/>
+		/// You can use it e.g. in validation attributes for <see cref="System.ComponentModel.DataAnnotations.ValidationAttribute.ErrorMessageResourceName"/> parameter.
+		/// </summary>
+		public const string DuplicateEmailKey = "DuplicateEmail";
+
+		
+
+	}
+}
+
+
+namespace Shrooms.Resources.Models.Account  {
+		
+	public partial class Account {
+	
+
+		///<summary>
+		///    <list type='bullet'>
+		///        <item>
+		///            <description>Email &apos;{0}&apos; is invalid.</description>
+		///        </item>
+		///        <item>
+		///            <description></description>
+		///        </item>
+		///    </list>
+		///</summary>
+		public static string InvalidEmailFormatted(params object[] args) { return GetResourceString("InvalidEmail", args); }
+		
+
+		///<summary>
+		///    <list type='bullet'>
+		///        <item>
+		///            <description>Email &apos;{0}&apos; is invalid.</description>
+		///        </item>
+		///        <item>
+		///            <description></description>
+		///        </item>
+		///    </list>
+		///</summary>
+		[Utilities.Localized]
+		public static string InvalidEmail { get { return GetResourceString(InvalidEmailKey); } }
+
+		/// <summary>
+		/// Resource key for <see cref="InvalidEmail"/>
+		/// You can use it e.g. in validation attributes for <see cref="System.ComponentModel.DataAnnotations.ValidationAttribute.ErrorMessageResourceName"/> parameter.
+		/// </summary>
+		public const string InvalidEmailKey = "InvalidEmail";
+
+		
+
+	}
+}
+
+
+namespace Shrooms.Resources.Models.Account  {
+		
+	public partial class Account {
+	
+
+		///<summary>
+		///    <list type='bullet'>
+		///        <item>
+		///            <description>Username &apos;{0}&apos; is invalid.</description>
+		///        </item>
+		///        <item>
+		///            <description></description>
+		///        </item>
+		///    </list>
+		///</summary>
+		public static string InvalidUserNameFormatted(params object[] args) { return GetResourceString("InvalidUserName", args); }
+		
+
+		///<summary>
+		///    <list type='bullet'>
+		///        <item>
+		///            <description>Username &apos;{0}&apos; is invalid.</description>
+		///        </item>
+		///        <item>
+		///            <description></description>
+		///        </item>
+		///    </list>
+		///</summary>
+		[Utilities.Localized]
+		public static string InvalidUserName { get { return GetResourceString(InvalidUserNameKey); } }
+
+		/// <summary>
+		/// Resource key for <see cref="InvalidUserName"/>
+		/// You can use it e.g. in validation attributes for <see cref="System.ComponentModel.DataAnnotations.ValidationAttribute.ErrorMessageResourceName"/> parameter.
+		/// </summary>
+		public const string InvalidUserNameKey = "InvalidUserName";
+
+		
+
+	}
+}
+
+
+namespace Shrooms.Resources.Models.Account  {
+		
+	public partial class Account {
+	
+
+		///<summary>
+		///    <list type='bullet'>
+		///        <item>
+		///            <description>{0} cannot be null or empty</description>
+		///        </item>
+		///        <item>
+		///            <description></description>
+		///        </item>
+		///    </list>
+		///</summary>
+		public static string PropertyTooShortFormatted(params object[] args) { return GetResourceString("PropertyTooShort", args); }
+		
+
+		///<summary>
+		///    <list type='bullet'>
+		///        <item>
+		///            <description>{0} cannot be null or empty</description>
+		///        </item>
+		///        <item>
+		///            <description></description>
+		///        </item>
+		///    </list>
+		///</summary>
+		[Utilities.Localized]
+		public static string PropertyTooShort { get { return GetResourceString(PropertyTooShortKey); } }
+
+		/// <summary>
+		/// Resource key for <see cref="PropertyTooShort"/>
+		/// You can use it e.g. in validation attributes for <see cref="System.ComponentModel.DataAnnotations.ValidationAttribute.ErrorMessageResourceName"/> parameter.
+		/// </summary>
+		public const string PropertyTooShortKey = "PropertyTooShort";
+
+		
+
+	}
+}
+
+
+namespace Shrooms.Resources.Models.Account  {
+		
+	public partial class Account {
+	
+
+		///<summary>
+		///    <list type='bullet'>
+		///        <item>
+		///            <description>Username &apos;{0}&apos; is already taken.</description>
+		///        </item>
+		///        <item>
+		///            <description></description>
+		///        </item>
+		///    </list>
+		///</summary>
+		public static string DuplicateNameFormatted(params object[] args) { return GetResourceString("DuplicateName", args); }
+		
+
+		///<summary>
+		///    <list type='bullet'>
+		///        <item>
+		///            <description>Username &apos;{0}&apos; is already taken.</description>
+		///        </item>
+		///        <item>
+		///            <description></description>
+		///        </item>
+		///    </list>
+		///</summary>
+		[Utilities.Localized]
+		public static string DuplicateName { get { return GetResourceString(DuplicateNameKey); } }
+
+		/// <summary>
+		/// Resource key for <see cref="DuplicateName"/>
+		/// You can use it e.g. in validation attributes for <see cref="System.ComponentModel.DataAnnotations.ValidationAttribute.ErrorMessageResourceName"/> parameter.
+		/// </summary>
+		public const string DuplicateNameKey = "DuplicateName";
+
+		
+
+	}
+}
+
+
+namespace Shrooms.Resources.Models.Account  {
+		
+	public partial class Account {
+	
+
+		///<summary>
+		///    <list type='bullet'>
+		///        <item>
+		///            <description>Current password</description>
+		///        </item>
+		///        <item>
+		///            <description></description>
+		///        </item>
+		///    </list>
+		///</summary>
+		[Utilities.Localized]
+		public static string CurrentPassword { get { return GetResourceString(CurrentPasswordKey); } }
+
+		/// <summary>
+		/// Resource key for <see cref="CurrentPassword"/>
+		/// You can use it e.g. in validation attributes for <see cref="System.ComponentModel.DataAnnotations.ValidationAttribute.ErrorMessageResourceName"/> parameter.
+		/// </summary>
+		public const string CurrentPasswordKey = "CurrentPassword";
+
+		
+
+	}
+}
+
+
+namespace Shrooms.Resources.Models.Account  {
+		
+	public partial class Account {
+	
+
+		///<summary>
+		///    <list type='bullet'>
+		///        <item>
+		///            <description>Password is too short</description>
+		///        </item>
+		///        <item>
+		///            <description></description>
+		///        </item>
+		///    </list>
+		///</summary>
+		[Utilities.Localized]
+		public static string PasswordLengthInvalid { get { return GetResourceString(PasswordLengthInvalidKey); } }
+
+		/// <summary>
+		/// Resource key for <see cref="PasswordLengthInvalid"/>
+		/// You can use it e.g. in validation attributes for <see cref="System.ComponentModel.DataAnnotations.ValidationAttribute.ErrorMessageResourceName"/> parameter.
+		/// </summary>
+		public const string PasswordLengthInvalidKey = "PasswordLengthInvalid";
+
+		
+
+	}
+}
+
+
+namespace Shrooms.Resources.Models.Account  {
+		
+	public partial class Account {
+	
+
+		///<summary>
+		///    <list type='bullet'>
+		///        <item>
+		///            <description>Passwords don&apos;t match</description>
+		///        </item>
+		///        <item>
+		///            <description></description>
+		///        </item>
+		///    </list>
+		///</summary>
+		[Utilities.Localized]
+		public static string ValidationPasswordDontMatch { get { return GetResourceString(ValidationPasswordDontMatchKey); } }
+
+		/// <summary>
+		/// Resource key for <see cref="ValidationPasswordDontMatch"/>
+		/// You can use it e.g. in validation attributes for <see cref="System.ComponentModel.DataAnnotations.ValidationAttribute.ErrorMessageResourceName"/> parameter.
+		/// </summary>
+		public const string ValidationPasswordDontMatchKey = "ValidationPasswordDontMatch";
+
+		
+
+	}
+}
+
 
 namespace Shrooms.Resources.Models.ApplicationUser  {
 	[Utilities.Localized]	
 	public partial class ApplicationUser {
 	
+
 		///<summary>
 		/// Return this class as a Dictionary&lt;class, Dictionary&lt;key, value&gt;&gt;
 		///</summary>
@@ -1577,6 +2088,7 @@ namespace Shrooms.Resources.Models.ApplicationUser  {
 			return value;
 		} 
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1597,13 +2109,16 @@ namespace Shrooms.Resources.Models.ApplicationUser  {
 		public const string EntityNameKey = "EntityName";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ApplicationUser  {
 		
 	public partial class ApplicationUser {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1624,13 +2139,16 @@ namespace Shrooms.Resources.Models.ApplicationUser  {
 		public const string FirstNameKey = "FirstName";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ApplicationUser  {
 		
 	public partial class ApplicationUser {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1651,13 +2169,16 @@ namespace Shrooms.Resources.Models.ApplicationUser  {
 		public const string JobTitleKey = "JobTitle";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ApplicationUser  {
 		
 	public partial class ApplicationUser {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1678,13 +2199,16 @@ namespace Shrooms.Resources.Models.ApplicationUser  {
 		public const string LastNameKey = "LastName";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ApplicationUser  {
 		
 	public partial class ApplicationUser {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1705,13 +2229,16 @@ namespace Shrooms.Resources.Models.ApplicationUser  {
 		public const string PhoneNumberKey = "PhoneNumber";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ApplicationUser  {
 		
 	public partial class ApplicationUser {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1732,13 +2259,16 @@ namespace Shrooms.Resources.Models.ApplicationUser  {
 		public const string QualificationLevelNameKey = "QualificationLevelName";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ApplicationUser  {
 		
 	public partial class ApplicationUser {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1759,13 +2289,16 @@ namespace Shrooms.Resources.Models.ApplicationUser  {
 		public const string FailedToCreateNewProjectKey = "FailedToCreateNewProject";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ApplicationUser  {
 		
 	public partial class ApplicationUser {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1786,13 +2319,16 @@ namespace Shrooms.Resources.Models.ApplicationUser  {
 		public const string NotAllowedToCreateProjectsKey = "NotAllowedToCreateProjects";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ApplicationUser  {
 		
 	public partial class ApplicationUser {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1813,13 +2349,16 @@ namespace Shrooms.Resources.Models.ApplicationUser  {
 		public const string IncorrectPasswordOrUserNameKey = "IncorrectPasswordOrUserName";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ApplicationUser  {
 		
 	public partial class ApplicationUser {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1840,13 +2379,16 @@ namespace Shrooms.Resources.Models.ApplicationUser  {
 		public const string BirthdayKey = "Birthday";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ApplicationUser  {
 		
 	public partial class ApplicationUser {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1867,13 +2409,16 @@ namespace Shrooms.Resources.Models.ApplicationUser  {
 		public const string ManagerKey = "Manager";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ApplicationUser  {
 		
 	public partial class ApplicationUser {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1894,13 +2439,16 @@ namespace Shrooms.Resources.Models.ApplicationUser  {
 		public const string WorkingHoursKey = "WorkingHours";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ApplicationUser  {
 		
 	public partial class ApplicationUser {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1921,13 +2469,16 @@ namespace Shrooms.Resources.Models.ApplicationUser  {
 		public const string PasswordErrorMustContainLowerCaseKey = "PasswordErrorMustContainLowerCase";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ApplicationUser  {
 		
 	public partial class ApplicationUser {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1948,13 +2499,16 @@ namespace Shrooms.Resources.Models.ApplicationUser  {
 		public const string PasswordErrorMustContainDigitKey = "PasswordErrorMustContainDigit";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ApplicationUser  {
 		
 	public partial class ApplicationUser {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -1975,13 +2529,16 @@ namespace Shrooms.Resources.Models.ApplicationUser  {
 		public const string PasswordErrorMustContainUpperCaseKey = "PasswordErrorMustContainUpperCase";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ApplicationUser  {
 		
 	public partial class ApplicationUser {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -2002,13 +2559,16 @@ namespace Shrooms.Resources.Models.ApplicationUser  {
 		public const string IncorrectHoursKey = "IncorrectHours";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ApplicationUser  {
 		
 	public partial class ApplicationUser {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -2029,13 +2589,16 @@ namespace Shrooms.Resources.Models.ApplicationUser  {
 		public const string IncorrectLunchHoursKey = "IncorrectLunchHours";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ApplicationUser  {
 		
 	public partial class ApplicationUser {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -2056,13 +2619,16 @@ namespace Shrooms.Resources.Models.ApplicationUser  {
 		public const string PartTimeHoursEmptyKey = "PartTimeHoursEmpty";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ApplicationUser  {
 		
 	public partial class ApplicationUser {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -2083,13 +2649,16 @@ namespace Shrooms.Resources.Models.ApplicationUser  {
 		public const string EmailAlreadyExsistsKey = "EmailAlreadyExsists";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ApplicationUser  {
 		
 	public partial class ApplicationUser {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -2110,13 +2679,16 @@ namespace Shrooms.Resources.Models.ApplicationUser  {
 		public const string WrongEmailDomainKey = "WrongEmailDomain";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ApplicationUser  {
 		
 	public partial class ApplicationUser {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -2137,13 +2709,16 @@ namespace Shrooms.Resources.Models.ApplicationUser  {
 		public const string HasPictureKey = "HasPicture";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Books  {
 	[Utilities.Localized]	
 	public partial class Books {
 	
+
 		///<summary>
 		/// Return this class as a Dictionary&lt;class, Dictionary&lt;key, value&gt;&gt;
 		///</summary>
@@ -2209,6 +2784,7 @@ namespace Shrooms.Resources.Models.Books  {
 			return value;
 		} 
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -2229,13 +2805,16 @@ namespace Shrooms.Resources.Models.Books  {
 		public const string NoBookKey = "NoBook";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Books  {
 		
 	public partial class Books {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -2256,13 +2835,16 @@ namespace Shrooms.Resources.Models.Books  {
 		public const string UserAlreadyHasSameBookKey = "UserAlreadyHasSameBook";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Books  {
 		
 	public partial class Books {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -2283,13 +2865,16 @@ namespace Shrooms.Resources.Models.Books  {
 		public const string NoBooksToReturnKey = "NoBooksToReturn";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Books  {
 		
 	public partial class Books {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -2310,13 +2895,16 @@ namespace Shrooms.Resources.Models.Books  {
 		public const string BookAlreadyExistKey = "BookAlreadyExist";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Books  {
 		
 	public partial class Books {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -2337,13 +2925,16 @@ namespace Shrooms.Resources.Models.Books  {
 		public const string NoOfficeKey = "NoOffice";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Books  {
 		
 	public partial class Books {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -2364,13 +2955,16 @@ namespace Shrooms.Resources.Models.Books  {
 		public const string NoAvailableBooksKey = "NoAvailableBooks";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Books  {
 		
 	public partial class Books {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -2391,13 +2985,16 @@ namespace Shrooms.Resources.Models.Books  {
 		public const string UserDoesNotExistKey = "UserDoesNotExist";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Books  {
 		
 	public partial class Books {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -2418,13 +3015,16 @@ namespace Shrooms.Resources.Models.Books  {
 		public const string NoBooksInGoogleApiKey = "NoBooksInGoogleApi";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Books  {
 		
 	public partial class Books {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -2445,13 +3045,16 @@ namespace Shrooms.Resources.Models.Books  {
 		public const string BookCannotBeReturnedKey = "BookCannotBeReturned";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Books  {
 		
 	public partial class Books {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -2472,13 +3075,16 @@ namespace Shrooms.Resources.Models.Books  {
 		public const string EmailSubjectKey = "EmailSubject";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Committee  {
 	[Utilities.Localized]	
 	public partial class Committee {
 	
+
 		///<summary>
 		/// Return this class as a Dictionary&lt;class, Dictionary&lt;key, value&gt;&gt;
 		///</summary>
@@ -2544,6 +3150,7 @@ namespace Shrooms.Resources.Models.Committee  {
 			return value;
 		} 
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -2564,13 +3171,16 @@ namespace Shrooms.Resources.Models.Committee  {
 		public const string CommitteeIdExceptionKey = "CommitteeIdException";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Committee  {
 		
 	public partial class Committee {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -2591,13 +3201,16 @@ namespace Shrooms.Resources.Models.Committee  {
 		public const string ModelNotFoundExceptionKey = "ModelNotFoundException";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Committee  {
 		
 	public partial class Committee {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -2618,13 +3231,16 @@ namespace Shrooms.Resources.Models.Committee  {
 		public const string NameDescriptionErrorKey = "NameDescriptionError";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Committee  {
 		
 	public partial class Committee {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -2645,13 +3261,16 @@ namespace Shrooms.Resources.Models.Committee  {
 		public const string SuggestionCommiteNotFoundKey = "SuggestionCommiteNotFound";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Committee  {
 		
 	public partial class Committee {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -2672,13 +3291,16 @@ namespace Shrooms.Resources.Models.Committee  {
 		public const string SuggestionTitleErrorKey = "SuggestionTitleError";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Events  {
 	[Utilities.Localized]	
 	public partial class Events {
 	
+
 		///<summary>
 		/// Return this class as a Dictionary&lt;class, Dictionary&lt;key, value&gt;&gt;
 		///</summary>
@@ -2744,6 +3366,7 @@ namespace Shrooms.Resources.Models.Events  {
 			return value;
 		} 
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -2764,13 +3387,16 @@ namespace Shrooms.Resources.Models.Events  {
 		public const string ResetParticipantListEmailSubjectKey = "ResetParticipantListEmailSubject";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Events  {
 		
 	public partial class Events {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -2791,13 +3417,16 @@ namespace Shrooms.Resources.Models.Events  {
 		public const string CountKey = "Count";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Events  {
 		
 	public partial class Events {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -2818,13 +3447,16 @@ namespace Shrooms.Resources.Models.Events  {
 		public const string OptionKey = "Option";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Floor  {
 	[Utilities.Localized]	
 	public partial class Floor {
 	
+
 		///<summary>
 		/// Return this class as a Dictionary&lt;class, Dictionary&lt;key, value&gt;&gt;
 		///</summary>
@@ -2890,6 +3522,7 @@ namespace Shrooms.Resources.Models.Floor  {
 			return value;
 		} 
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -2910,13 +3543,16 @@ namespace Shrooms.Resources.Models.Floor  {
 		public const string CopyEmailsToClipboardKey = "CopyEmailsToClipboard";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Floor  {
 		
 	public partial class Floor {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -2937,13 +3573,16 @@ namespace Shrooms.Resources.Models.Floor  {
 		public const string CreateFloorKey = "CreateFloor";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Floor  {
 		
 	public partial class Floor {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -2964,13 +3603,16 @@ namespace Shrooms.Resources.Models.Floor  {
 		public const string CurrentPlanKey = "CurrentPlan";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Floor  {
 		
 	public partial class Floor {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -2991,13 +3633,16 @@ namespace Shrooms.Resources.Models.Floor  {
 		public const string EditFloorKey = "EditFloor";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Floor  {
 		
 	public partial class Floor {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3018,13 +3663,16 @@ namespace Shrooms.Resources.Models.Floor  {
 		public const string EmailOptionFloorKey = "EmailOptionFloor";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Floor  {
 		
 	public partial class Floor {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3045,13 +3693,16 @@ namespace Shrooms.Resources.Models.Floor  {
 		public const string EmailOptionOfficeKey = "EmailOptionOffice";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Floor  {
 		
 	public partial class Floor {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3072,13 +3723,16 @@ namespace Shrooms.Resources.Models.Floor  {
 		public const string EmailOptionRoomKey = "EmailOptionRoom";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Floor  {
 		
 	public partial class Floor {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3099,13 +3753,16 @@ namespace Shrooms.Resources.Models.Floor  {
 		public const string EmailsKey = "Emails";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Floor  {
 		
 	public partial class Floor {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3126,13 +3783,16 @@ namespace Shrooms.Resources.Models.Floor  {
 		public const string EntityNameKey = "EntityName";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Floor  {
 		
 	public partial class Floor {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3153,13 +3813,16 @@ namespace Shrooms.Resources.Models.Floor  {
 		public const string EntityNamePluralKey = "EntityNamePlural";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Floor  {
 		
 	public partial class Floor {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3180,13 +3843,16 @@ namespace Shrooms.Resources.Models.Floor  {
 		public const string FloorDataKey = "FloorData";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Floor  {
 		
 	public partial class Floor {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3207,13 +3873,16 @@ namespace Shrooms.Resources.Models.Floor  {
 		public const string MapKey = "Map";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Floor  {
 		
 	public partial class Floor {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3234,13 +3903,16 @@ namespace Shrooms.Resources.Models.Floor  {
 		public const string NameKey = "Name";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Floor  {
 		
 	public partial class Floor {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3261,13 +3933,16 @@ namespace Shrooms.Resources.Models.Floor  {
 		public const string NewPlanUploadKey = "NewPlanUpload";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Floor  {
 		
 	public partial class Floor {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3288,13 +3963,16 @@ namespace Shrooms.Resources.Models.Floor  {
 		public const string OfficeKey = "Office";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Floor  {
 		
 	public partial class Floor {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3315,13 +3993,16 @@ namespace Shrooms.Resources.Models.Floor  {
 		public const string RoomsKey = "Rooms";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Floor  {
 		
 	public partial class Floor {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3342,13 +4023,16 @@ namespace Shrooms.Resources.Models.Floor  {
 		public const string SuccessToClipboardKey = "SuccessToClipboard";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.GoogleCalendar  {
 	[Utilities.Localized]	
 	public partial class GoogleCalendar {
 	
+
 		///<summary>
 		/// Return this class as a Dictionary&lt;class, Dictionary&lt;key, value&gt;&gt;
 		///</summary>
@@ -3414,6 +4098,7 @@ namespace Shrooms.Resources.Models.GoogleCalendar  {
 			return value;
 		} 
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3434,13 +4119,16 @@ namespace Shrooms.Resources.Models.GoogleCalendar  {
 		public const string EventNullErrorKey = "EventNullError";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.GoogleCalendar  {
 		
 	public partial class GoogleCalendar {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3461,13 +4149,16 @@ namespace Shrooms.Resources.Models.GoogleCalendar  {
 		public const string ServiceNullErrorKey = "ServiceNullError";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.GoogleCalendar  {
 		
 	public partial class GoogleCalendar {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3488,13 +4179,16 @@ namespace Shrooms.Resources.Models.GoogleCalendar  {
 		public const string UpdateErrorKey = "UpdateError";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.GoogleCalendar  {
 		
 	public partial class GoogleCalendar {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3515,13 +4209,16 @@ namespace Shrooms.Resources.Models.GoogleCalendar  {
 		public const string X509CertificateNotFoundErrorKey = "X509CertificateNotFoundError";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Kudos  {
 	[Utilities.Localized]	
 	public partial class Kudos {
 	
+
 		///<summary>
 		/// Return this class as a Dictionary&lt;class, Dictionary&lt;key, value&gt;&gt;
 		///</summary>
@@ -3587,6 +4284,7 @@ namespace Shrooms.Resources.Models.Kudos  {
 			return value;
 		} 
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3607,13 +4305,16 @@ namespace Shrooms.Resources.Models.Kudos  {
 		public const string KudosifyModalErrorKey = "KudosifyModalError";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Kudos  {
 		
 	public partial class Kudos {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3634,13 +4335,16 @@ namespace Shrooms.Resources.Models.Kudos  {
 		public const string EmailSubjectKey = "EmailSubject";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Kudos  {
 		
 	public partial class Kudos {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3661,13 +4365,16 @@ namespace Shrooms.Resources.Models.Kudos  {
 		public const string MinusKudosEmailSubjectKey = "MinusKudosEmailSubject";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Kudos  {
 		
 	public partial class Kudos {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3688,13 +4395,16 @@ namespace Shrooms.Resources.Models.Kudos  {
 		public const string RejectedKudosEmailSubjectKey = "RejectedKudosEmailSubject";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Kudos  {
 		
 	public partial class Kudos {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3715,13 +4425,16 @@ namespace Shrooms.Resources.Models.Kudos  {
 		public const string KudosTypeMinusKey = "KudosTypeMinus";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Kudos  {
 		
 	public partial class Kudos {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3742,13 +4455,16 @@ namespace Shrooms.Resources.Models.Kudos  {
 		public const string KudosTypeOtherKey = "KudosTypeOther";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Kudos  {
 		
 	public partial class Kudos {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3769,13 +4485,16 @@ namespace Shrooms.Resources.Models.Kudos  {
 		public const string KudosTypeSendKey = "KudosTypeSend";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Kudos  {
 		
 	public partial class Kudos {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3796,13 +4515,16 @@ namespace Shrooms.Resources.Models.Kudos  {
 		public const string ExportColumnCommentKey = "ExportColumnComment";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Kudos  {
 		
 	public partial class Kudos {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3823,13 +4545,16 @@ namespace Shrooms.Resources.Models.Kudos  {
 		public const string ExportColumnCreatedKey = "ExportColumnCreated";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Kudos  {
 		
 	public partial class Kudos {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3850,13 +4575,16 @@ namespace Shrooms.Resources.Models.Kudos  {
 		public const string ExportColumnKudosTypeKey = "ExportColumnKudosType";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Kudos  {
 		
 	public partial class Kudos {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3877,13 +4605,16 @@ namespace Shrooms.Resources.Models.Kudos  {
 		public const string ExportColumnKudosTypeValueKey = "ExportColumnKudosTypeValue";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Kudos  {
 		
 	public partial class Kudos {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3904,13 +4635,16 @@ namespace Shrooms.Resources.Models.Kudos  {
 		public const string ExportColumnMultiplyByKey = "ExportColumnMultiplyBy";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Kudos  {
 		
 	public partial class Kudos {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3931,13 +4665,16 @@ namespace Shrooms.Resources.Models.Kudos  {
 		public const string ExportColumnPointsInTotalKey = "ExportColumnPointsInTotal";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Kudos  {
 		
 	public partial class Kudos {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3958,13 +4695,16 @@ namespace Shrooms.Resources.Models.Kudos  {
 		public const string ExportColumnReceiverKey = "ExportColumnReceiver";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Kudos  {
 		
 	public partial class Kudos {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -3985,13 +4725,16 @@ namespace Shrooms.Resources.Models.Kudos  {
 		public const string ExportColumnRejectionMessageKey = "ExportColumnRejectionMessage";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Kudos  {
 		
 	public partial class Kudos {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -4012,13 +4755,16 @@ namespace Shrooms.Resources.Models.Kudos  {
 		public const string ExportColumnSenderKey = "ExportColumnSender";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Kudos  {
 		
 	public partial class Kudos {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -4039,13 +4785,16 @@ namespace Shrooms.Resources.Models.Kudos  {
 		public const string ExportColumnStatusKey = "ExportColumnStatus";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Role  {
 	[Utilities.Localized]	
 	public partial class Role {
 	
+
 		///<summary>
 		/// Return this class as a Dictionary&lt;class, Dictionary&lt;key, value&gt;&gt;
 		///</summary>
@@ -4111,6 +4860,7 @@ namespace Shrooms.Resources.Models.Role  {
 			return value;
 		} 
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -4131,13 +4881,16 @@ namespace Shrooms.Resources.Models.Role  {
 		public const string RoleNameExistsErrorKey = "RoleNameExistsError";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Room  {
 	[Utilities.Localized]	
 	public partial class Room {
 	
+
 		///<summary>
 		/// Return this class as a Dictionary&lt;class, Dictionary&lt;key, value&gt;&gt;
 		///</summary>
@@ -4203,6 +4956,7 @@ namespace Shrooms.Resources.Models.Room  {
 			return value;
 		} 
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -4223,13 +4977,16 @@ namespace Shrooms.Resources.Models.Room  {
 		public const string EntityNameKey = "EntityName";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.RoomType  {
 	[Utilities.Localized]	
 	public partial class RoomType {
 	
+
 		///<summary>
 		/// Return this class as a Dictionary&lt;class, Dictionary&lt;key, value&gt;&gt;
 		///</summary>
@@ -4295,6 +5052,7 @@ namespace Shrooms.Resources.Models.RoomType  {
 			return value;
 		} 
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -4315,13 +5073,16 @@ namespace Shrooms.Resources.Models.RoomType  {
 		public const string RoomTypePostError1Key = "RoomTypePostError1";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.RoomType  {
 		
 	public partial class RoomType {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -4342,13 +5103,16 @@ namespace Shrooms.Resources.Models.RoomType  {
 		public const string RoomTypePutError1Key = "RoomTypePutError1";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ServiceRequest  {
 	[Utilities.Localized]	
 	public partial class ServiceRequest {
 	
+
 		///<summary>
 		/// Return this class as a Dictionary&lt;class, Dictionary&lt;key, value&gt;&gt;
 		///</summary>
@@ -4414,6 +5178,7 @@ namespace Shrooms.Resources.Models.ServiceRequest  {
 			return value;
 		} 
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -4434,13 +5199,16 @@ namespace Shrooms.Resources.Models.ServiceRequest  {
 		public const string NotAllRequiredFieldsFilledKey = "NotAllRequiredFieldsFilled";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ServiceRequest  {
 		
 	public partial class ServiceRequest {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -4461,13 +5229,16 @@ namespace Shrooms.Resources.Models.ServiceRequest  {
 		public const string EmailMessageBodyKey = "EmailMessageBody";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ServiceRequest  {
 		
 	public partial class ServiceRequest {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -4488,13 +5259,16 @@ namespace Shrooms.Resources.Models.ServiceRequest  {
 		public const string EmailMessageSubjectKey = "EmailMessageSubject";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ServiceRequest  {
 		
 	public partial class ServiceRequest {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -4515,13 +5289,16 @@ namespace Shrooms.Resources.Models.ServiceRequest  {
 		public const string ExportColumnNameCategoryKey = "ExportColumnNameCategory";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ServiceRequest  {
 		
 	public partial class ServiceRequest {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -4542,13 +5319,16 @@ namespace Shrooms.Resources.Models.ServiceRequest  {
 		public const string ExportColumnNameDateKey = "ExportColumnNameDate";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ServiceRequest  {
 		
 	public partial class ServiceRequest {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -4569,13 +5349,16 @@ namespace Shrooms.Resources.Models.ServiceRequest  {
 		public const string ExportColumnNameModifiedKey = "ExportColumnNameModified";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ServiceRequest  {
 		
 	public partial class ServiceRequest {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -4596,13 +5379,16 @@ namespace Shrooms.Resources.Models.ServiceRequest  {
 		public const string ExportColumnNameModifiedByKey = "ExportColumnNameModifiedBy";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ServiceRequest  {
 		
 	public partial class ServiceRequest {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -4623,13 +5409,16 @@ namespace Shrooms.Resources.Models.ServiceRequest  {
 		public const string ExportColumnNamePriorityKey = "ExportColumnNamePriority";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ServiceRequest  {
 		
 	public partial class ServiceRequest {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -4650,13 +5439,16 @@ namespace Shrooms.Resources.Models.ServiceRequest  {
 		public const string ExportColumnNameStatusKey = "ExportColumnNameStatus";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ServiceRequest  {
 		
 	public partial class ServiceRequest {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -4677,13 +5469,16 @@ namespace Shrooms.Resources.Models.ServiceRequest  {
 		public const string ExportColumnNameTitleKey = "ExportColumnNameTitle";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ServiceRequest  {
 		
 	public partial class ServiceRequest {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -4704,13 +5499,16 @@ namespace Shrooms.Resources.Models.ServiceRequest  {
 		public const string ExportColumnNameUserKey = "ExportColumnNameUser";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ServiceRequest  {
 		
 	public partial class ServiceRequest {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -4731,13 +5529,16 @@ namespace Shrooms.Resources.Models.ServiceRequest  {
 		public const string ExportColumnNameDescriptionKey = "ExportColumnNameDescription";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ServiceRequest  {
 		
 	public partial class ServiceRequest {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -4758,13 +5559,16 @@ namespace Shrooms.Resources.Models.ServiceRequest  {
 		public const string ExportColumnNameKudosAmountKey = "ExportColumnNameKudosAmount";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.ServiceRequest  {
 		
 	public partial class ServiceRequest {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -4785,13 +5589,16 @@ namespace Shrooms.Resources.Models.ServiceRequest  {
 		public const string ExportColumnNameKudosShopItemKey = "ExportColumnNameKudosShopItem";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Vacations  {
 	[Utilities.Localized]	
 	public partial class Vacations {
 	
+
 		///<summary>
 		/// Return this class as a Dictionary&lt;class, Dictionary&lt;key, value&gt;&gt;
 		///</summary>
@@ -4857,6 +5664,7 @@ namespace Shrooms.Resources.Models.Vacations  {
 			return value;
 		} 
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -4877,13 +5685,16 @@ namespace Shrooms.Resources.Models.Vacations  {
 		public const string cannotDeputyYourselfKey = "cannotDeputyYourself";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Vacations  {
 		
 	public partial class Vacations {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -4904,13 +5715,16 @@ namespace Shrooms.Resources.Models.Vacations  {
 		public const string deputyNotFoundKey = "deputyNotFound";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Vacations  {
 		
 	public partial class Vacations {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -4931,13 +5745,16 @@ namespace Shrooms.Resources.Models.Vacations  {
 		public const string noDeputySelectedKey = "noDeputySelected";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Vacations  {
 		
 	public partial class Vacations {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -4958,13 +5775,16 @@ namespace Shrooms.Resources.Models.Vacations  {
 		public const string notAuthorizedKey = "notAuthorized";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Vacations  {
 		
 	public partial class Vacations {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -4985,13 +5805,16 @@ namespace Shrooms.Resources.Models.Vacations  {
 		public const string noVacationFoundKey = "noVacationFound";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Vacations  {
 		
 	public partial class Vacations {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -5012,13 +5835,16 @@ namespace Shrooms.Resources.Models.Vacations  {
 		public const string typeNotSelectedKey = "typeNotSelected";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Vacations  {
 		
 	public partial class Vacations {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -5039,13 +5865,16 @@ namespace Shrooms.Resources.Models.Vacations  {
 		public const string vacationAlreadyExsistsKey = "vacationAlreadyExsists";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Vacations  {
 		
 	public partial class Vacations {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -5066,13 +5895,16 @@ namespace Shrooms.Resources.Models.Vacations  {
 		public const string vacationInProgressKey = "vacationInProgress";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Vacations  {
 		
 	public partial class Vacations {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -5093,13 +5925,16 @@ namespace Shrooms.Resources.Models.Vacations  {
 		public const string wrongVacationPeriodKey = "wrongVacationPeriod";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Vacations  {
 		
 	public partial class Vacations {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -5120,13 +5955,16 @@ namespace Shrooms.Resources.Models.Vacations  {
 		public const string cancelVacationEmailSubjectKey = "cancelVacationEmailSubject";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Vacations  {
 		
 	public partial class Vacations {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -5139,6 +5977,7 @@ namespace Shrooms.Resources.Models.Vacations  {
 		///</summary>
 		public static string cancelVacationEmailTemplateFormatted(params object[] args) { return GetResourceString("cancelVacationEmailTemplate", args); }
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -5159,13 +5998,16 @@ namespace Shrooms.Resources.Models.Vacations  {
 		public const string cancelVacationEmailTemplateKey = "cancelVacationEmailTemplate";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Vacations  {
 		
 	public partial class Vacations {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -5178,6 +6020,7 @@ namespace Shrooms.Resources.Models.Vacations  {
 		///</summary>
 		public static string dateFormatFormatted(params object[] args) { return GetResourceString("dateFormat", args); }
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -5198,13 +6041,16 @@ namespace Shrooms.Resources.Models.Vacations  {
 		public const string dateFormatKey = "dateFormat";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Vacations  {
 		
 	public partial class Vacations {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -5217,6 +6063,7 @@ namespace Shrooms.Resources.Models.Vacations  {
 		///</summary>
 		public static string youHaveAvailableDaysFormatted(params object[] args) { return GetResourceString("youHaveAvailableDays", args); }
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -5237,13 +6084,16 @@ namespace Shrooms.Resources.Models.Vacations  {
 		public const string youHaveAvailableDaysKey = "youHaveAvailableDays";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Vacations  {
 		
 	public partial class Vacations {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -5264,13 +6114,16 @@ namespace Shrooms.Resources.Models.Vacations  {
 		public const string notEnoughDataKey = "notEnoughData";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Vacations  {
 		
 	public partial class Vacations {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -5283,6 +6136,7 @@ namespace Shrooms.Resources.Models.Vacations  {
 		///</summary>
 		public static string wrongDeputyDateSelectedFormatted(params object[] args) { return GetResourceString("wrongDeputyDateSelected", args); }
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -5303,13 +6157,16 @@ namespace Shrooms.Resources.Models.Vacations  {
 		public const string wrongDeputyDateSelectedKey = "wrongDeputyDateSelected";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Vacations  {
 		
 	public partial class Vacations {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -5330,13 +6187,16 @@ namespace Shrooms.Resources.Models.Vacations  {
 		public const string vacationTimeNotCoveredKey = "vacationTimeNotCovered";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Models.Vacations  {
 		
 	public partial class Vacations {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -5357,273 +6217,16 @@ namespace Shrooms.Resources.Models.Vacations  {
 		public const string tooManyDeputiesAtTheSameTimeKey = "tooManyDeputiesAtTheSameTime";
 
 		
+
 	}
 }
 
-namespace Shrooms.Resources.Views.Account  {
-	[Utilities.Localized]	
-	public partial class Account {
-	
-		///<summary>
-		/// Return this class as a Dictionary&lt;class, Dictionary&lt;key, value&gt;&gt;
-		///</summary>
-		public static Dictionary<string, Dictionary<string, string>> GetAsDictionary() {
-			return Utilities.GetResourcesByNameSpace("Views.Account^Account");
-		}
-
-		private static System.Resources.ResourceManager _resourceManager;    
-	
-		///<summary>
-		/// Get the ResourceManager
-		///</summary>
-		private static System.Resources.ResourceManager ResourceManager 
-		{
-			get 
-			{
-				return _resourceManager ?? (_resourceManager = new System.Resources.ResourceManager("Shrooms.Resources.Views.Account.Account", typeof(Account).Assembly));
-			}
-		}
-
-		///<summary>
-		///	Get localized entry for a given key
-		///</summary>
-		public static string GetResourceString(string key, params object[] args)
-		{
-			var value = ResourceManager.GetString(key, Thread.CurrentThread.CurrentCulture);
-
-			if (!string.IsNullOrEmpty(value))
-			{
-				var regex  = @"{\b\p{Lu}{3,}\b}";
-				var tokens = Regex.Matches(value, regex).Cast<Match>().Select(m => m.Value).ToList();
-					tokens
-						.ForEach(t =>
-						{
-							value = value.Replace(t, Utilities.GetReplacementString(t.Replace("{", "").Replace("}", "")));
-						});
-
-				if (args.Any())
-				{
-					regex  = @"{[0-9]{1}}";
-					tokens = Regex.Matches(value, regex).Cast<Match>().Select(m => m.Value).ToList();
-
-					if (tokens.Any())
-					{
-						// If argument length is less than token length, add an error message
-						// This can happen if arguments are accidentally forgottent in a translation
-						if (args.Count() < tokens.Count())
-						{
-							var newArgs = new List<object>();
-							for (var i = 0; i < tokens.Count(); i++)
-							{
-								newArgs.Add(args.Length > i ? args[i] : "argument {" + i + "} is undefined");
-							}
-
-							args = newArgs.ToArray();
-						}
-
-						value = string.Format(value, args);
-					}
-				}		        		
-			}
-	
-			return value;
-		} 
-		
-		///<summary>
-		///    <list type='bullet'>
-		///        <item>
-		///            <description>Email &apos;{0}&apos; is already taken.</description>
-		///        </item>
-		///        <item>
-		///            <description></description>
-		///        </item>
-		///    </list>
-		///</summary>
-		public static string DuplicateEmailFormatted(params object[] args) { return GetResourceString("DuplicateEmail", args); }
-		
-		///<summary>
-		///    <list type='bullet'>
-		///        <item>
-		///            <description>Email &apos;{0}&apos; is already taken.</description>
-		///        </item>
-		///        <item>
-		///            <description></description>
-		///        </item>
-		///    </list>
-		///</summary>
-		[Utilities.Localized]
-		public static string DuplicateEmail { get { return GetResourceString(DuplicateEmailKey); } }
-
-		/// <summary>
-		/// Resource key for <see cref="DuplicateEmail"/>
-		/// You can use it e.g. in validation attributes for <see cref="System.ComponentModel.DataAnnotations.ValidationAttribute.ErrorMessageResourceName"/> parameter.
-		/// </summary>
-		public const string DuplicateEmailKey = "DuplicateEmail";
-
-		
-	}
-}
-
-namespace Shrooms.Resources.Views.Account  {
-		
-	public partial class Account {
-	
-		///<summary>
-		///    <list type='bullet'>
-		///        <item>
-		///            <description>Email &apos;{0}&apos; is invalid.</description>
-		///        </item>
-		///        <item>
-		///            <description></description>
-		///        </item>
-		///    </list>
-		///</summary>
-		public static string InvalidEmailFormatted(params object[] args) { return GetResourceString("InvalidEmail", args); }
-		
-		///<summary>
-		///    <list type='bullet'>
-		///        <item>
-		///            <description>Email &apos;{0}&apos; is invalid.</description>
-		///        </item>
-		///        <item>
-		///            <description></description>
-		///        </item>
-		///    </list>
-		///</summary>
-		[Utilities.Localized]
-		public static string InvalidEmail { get { return GetResourceString(InvalidEmailKey); } }
-
-		/// <summary>
-		/// Resource key for <see cref="InvalidEmail"/>
-		/// You can use it e.g. in validation attributes for <see cref="System.ComponentModel.DataAnnotations.ValidationAttribute.ErrorMessageResourceName"/> parameter.
-		/// </summary>
-		public const string InvalidEmailKey = "InvalidEmail";
-
-		
-	}
-}
-
-namespace Shrooms.Resources.Views.Account  {
-		
-	public partial class Account {
-	
-		///<summary>
-		///    <list type='bullet'>
-		///        <item>
-		///            <description>Username &apos;{0}&apos; is invalid.</description>
-		///        </item>
-		///        <item>
-		///            <description></description>
-		///        </item>
-		///    </list>
-		///</summary>
-		public static string InvalidUserNameFormatted(params object[] args) { return GetResourceString("InvalidUserName", args); }
-		
-		///<summary>
-		///    <list type='bullet'>
-		///        <item>
-		///            <description>Username &apos;{0}&apos; is invalid.</description>
-		///        </item>
-		///        <item>
-		///            <description></description>
-		///        </item>
-		///    </list>
-		///</summary>
-		[Utilities.Localized]
-		public static string InvalidUserName { get { return GetResourceString(InvalidUserNameKey); } }
-
-		/// <summary>
-		/// Resource key for <see cref="InvalidUserName"/>
-		/// You can use it e.g. in validation attributes for <see cref="System.ComponentModel.DataAnnotations.ValidationAttribute.ErrorMessageResourceName"/> parameter.
-		/// </summary>
-		public const string InvalidUserNameKey = "InvalidUserName";
-
-		
-	}
-}
-
-namespace Shrooms.Resources.Views.Account  {
-		
-	public partial class Account {
-	
-		///<summary>
-		///    <list type='bullet'>
-		///        <item>
-		///            <description>{0} cannot be null or empty</description>
-		///        </item>
-		///        <item>
-		///            <description></description>
-		///        </item>
-		///    </list>
-		///</summary>
-		public static string PropertyTooShortFormatted(params object[] args) { return GetResourceString("PropertyTooShort", args); }
-		
-		///<summary>
-		///    <list type='bullet'>
-		///        <item>
-		///            <description>{0} cannot be null or empty</description>
-		///        </item>
-		///        <item>
-		///            <description></description>
-		///        </item>
-		///    </list>
-		///</summary>
-		[Utilities.Localized]
-		public static string PropertyTooShort { get { return GetResourceString(PropertyTooShortKey); } }
-
-		/// <summary>
-		/// Resource key for <see cref="PropertyTooShort"/>
-		/// You can use it e.g. in validation attributes for <see cref="System.ComponentModel.DataAnnotations.ValidationAttribute.ErrorMessageResourceName"/> parameter.
-		/// </summary>
-		public const string PropertyTooShortKey = "PropertyTooShort";
-
-		
-	}
-}
-
-namespace Shrooms.Resources.Views.Account  {
-		
-	public partial class Account {
-	
-		///<summary>
-		///    <list type='bullet'>
-		///        <item>
-		///            <description>Username &apos;{0}&apos; is already taken.</description>
-		///        </item>
-		///        <item>
-		///            <description></description>
-		///        </item>
-		///    </list>
-		///</summary>
-		public static string DuplicateNameFormatted(params object[] args) { return GetResourceString("DuplicateName", args); }
-		
-		///<summary>
-		///    <list type='bullet'>
-		///        <item>
-		///            <description>Username &apos;{0}&apos; is already taken.</description>
-		///        </item>
-		///        <item>
-		///            <description></description>
-		///        </item>
-		///    </list>
-		///</summary>
-		[Utilities.Localized]
-		public static string DuplicateName { get { return GetResourceString(DuplicateNameKey); } }
-
-		/// <summary>
-		/// Resource key for <see cref="DuplicateName"/>
-		/// You can use it e.g. in validation attributes for <see cref="System.ComponentModel.DataAnnotations.ValidationAttribute.ErrorMessageResourceName"/> parameter.
-		/// </summary>
-		public const string DuplicateNameKey = "DuplicateName";
-
-		
-	}
-}
 
 namespace Shrooms.Resources.Widgets.KudosBasket  {
 	[Utilities.Localized]	
 	public partial class KudosBasket {
 	
+
 		///<summary>
 		/// Return this class as a Dictionary&lt;class, Dictionary&lt;key, value&gt;&gt;
 		///</summary>
@@ -5689,6 +6292,7 @@ namespace Shrooms.Resources.Widgets.KudosBasket  {
 			return value;
 		} 
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -5701,6 +6305,7 @@ namespace Shrooms.Resources.Widgets.KudosBasket  {
 		///</summary>
 		public static string KudosBasketDonationCommentFormatted(params object[] args) { return GetResourceString("KudosBasketDonationComment", args); }
 		
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -5721,13 +6326,16 @@ namespace Shrooms.Resources.Widgets.KudosBasket  {
 		public const string KudosBasketDonationCommentKey = "KudosBasketDonationComment";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Widgets.KudosBasket  {
 		
 	public partial class KudosBasket {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -5748,13 +6356,16 @@ namespace Shrooms.Resources.Widgets.KudosBasket  {
 		public const string KudosBasketNotEnoughKudosKey = "KudosBasketNotEnoughKudos";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Widgets.KudosBasket  {
 		
 	public partial class KudosBasket {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -5775,13 +6386,16 @@ namespace Shrooms.Resources.Widgets.KudosBasket  {
 		public const string KudosBasketNotExistsKey = "KudosBasketNotExists";
 
 		
+
 	}
 }
+
 
 namespace Shrooms.Resources.Widgets.KudosBasket  {
 		
 	public partial class KudosBasket {
 	
+
 		///<summary>
 		///    <list type='bullet'>
 		///        <item>
@@ -5802,5 +6416,7 @@ namespace Shrooms.Resources.Widgets.KudosBasket  {
 		public const string KudosBasketInactiveKey = "KudosBasketInactive";
 
 		
+
 	}
 }
+
