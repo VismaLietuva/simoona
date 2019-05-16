@@ -43,7 +43,7 @@ namespace Shrooms.Authentification
 
             if (string.IsNullOrWhiteSpace(email))
             {
-                errors.Add(string.Format(CultureInfo.CurrentCulture, Shrooms.Resources.Views.Account.Account.PropertyTooShort, "Email"));
+                errors.Add(string.Format(CultureInfo.CurrentCulture, Resources.Models.Account.Account.PropertyTooShort, "Email"));
             }
             else
             {
@@ -53,7 +53,7 @@ namespace Shrooms.Authentification
                 }
                 catch (FormatException)
                 {
-                    errors.Add(string.Format(CultureInfo.CurrentCulture, Shrooms.Resources.Views.Account.Account.InvalidEmail, email));
+                    errors.Add(string.Format(CultureInfo.CurrentCulture, Resources.Models.Account.Account.InvalidEmail, email));
                     return;
                 }
 
@@ -61,7 +61,7 @@ namespace Shrooms.Authentification
 
                 if (foundUser != null && !string.Equals(foundUser.Id, user.Id))
                 {
-                    errors.Add(string.Format(CultureInfo.CurrentCulture, Shrooms.Resources.Views.Account.Account.DuplicateEmail, email));
+                    errors.Add(string.Format(CultureInfo.CurrentCulture, Resources.Models.Account.Account.DuplicateEmail, email));
                 }
             }
         }
@@ -70,13 +70,13 @@ namespace Shrooms.Authentification
         {
             if (string.IsNullOrWhiteSpace(user.UserName))
             {
-                errors.Add(string.Format(CultureInfo.CurrentCulture, Shrooms.Resources.Views.Account.Account.PropertyTooShort, "Name"));
+                errors.Add(string.Format(CultureInfo.CurrentCulture, Resources.Models.Account.Account.PropertyTooShort, "Name"));
             }
             else
             {
                 if (AllowOnlyAlphanumericUserNames && !Regex.IsMatch(user.UserName, "^[A-Za-z0-9@_\\.]+$"))
                 {
-                    errors.Add(string.Format(CultureInfo.CurrentCulture, Shrooms.Resources.Views.Account.Account.InvalidUserName, user.UserName));
+                    errors.Add(string.Format(CultureInfo.CurrentCulture, Resources.Models.Account.Account.InvalidUserName, user.UserName));
                 }
                 else
                 {
@@ -84,7 +84,7 @@ namespace Shrooms.Authentification
 
                     if (foundUser != null && !string.Equals(foundUser.Id, user.Id))
                     {
-                        errors.Add(string.Format(CultureInfo.CurrentCulture, Shrooms.Resources.Views.Account.Account.DuplicateName, user.UserName));
+                        errors.Add(string.Format(CultureInfo.CurrentCulture, Resources.Models.Account.Account.DuplicateName, user.UserName));
                     }
                 }
             }
