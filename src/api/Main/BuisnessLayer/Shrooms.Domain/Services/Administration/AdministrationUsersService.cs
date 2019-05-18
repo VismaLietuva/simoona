@@ -166,11 +166,11 @@ namespace Shrooms.Domain.Services.Administration
             var applicationUser = _usersDbSet.First(user => user.Id == userId);
             _userAdministrationValidator.CheckIfEmploymentDateIsSet(applicationUser.EmploymentDate);
 
-            var hasRole = _userManager.IsInRole(userId, Constants.Authorization.Roles.FirstLogin);
+            var hasRole = _userManager.IsInRole(userId, Host.Contracts.Constants.Roles.FirstLogin);
             _userAdministrationValidator.CheckIfUserHasFirstLoginRole(hasRole);
 
-            var addRoleResult = _userManager.AddToRole(userId, Constants.Authorization.Roles.User);
-            var removeRoleResult = _userManager.RemoveFromRole(userId, Constants.Authorization.Roles.NewUser);
+            var addRoleResult = _userManager.AddToRole(userId, Host.Contracts.Constants.Roles.User);
+            var removeRoleResult = _userManager.RemoveFromRole(userId, Host.Contracts.Constants.Roles.NewUser);
 
             _userAdministrationValidator.CheckForAddingRemovingRoleErrors(addRoleResult.Errors, removeRoleResult.Errors);
             _notificationService.SendConfirmedNotificationEmail(applicationUser.Email, userAndOrg);
@@ -273,7 +273,7 @@ namespace Shrooms.Domain.Services.Administration
         {
             includeProperties += (includeProperties != string.Empty ? "," : string.Empty) + "Roles,Skills,JobPosition,Projects";
             var applicationUsers = _applicationUserRepository
-                .Get(GenerateQuery(search), orderBy: sortQuery.Contains(Constants.Authorization.Roles.NewUser) ? string.Empty : sortQuery, includeProperties: includeProperties)
+                .Get(GenerateQuery(search), orderBy: sortQuery.Contains(Host.Contracts.Constants.Roles.NewUser) ? string.Empty : sortQuery, includeProperties: includeProperties)
                 .ToList();
 
             var administrationUserDto = _mapper.Map<IEnumerable<ApplicationUser>, IEnumerable<AdministrationUserDTO>>(applicationUsers);
@@ -285,7 +285,7 @@ namespace Shrooms.Domain.Services.Administration
                 administrationUserDto = GetFilteredResults(filterModel, administrationUserDto);
             }
 
-            if (sortQuery.StartsWith(Constants.Authorization.Roles.NewUser))
+            if (sortQuery.StartsWith(Host.Contracts.Constants.Roles.NewUser))
             {
                 administrationUserDto = sortQuery.EndsWith("asc") ? administrationUserDto.OrderBy(u => u.IsNewUser) :
                     administrationUserDto.OrderByDescending(u => u.IsNewUser);
@@ -405,13 +405,13 @@ namespace Shrooms.Domain.Services.Administration
 
         private void AddNewUserRoles(string id)
         {
-            _userManager.AddToRole(id, Constants.Authorization.Roles.NewUser);
-            _userManager.AddToRole(id, Constants.Authorization.Roles.FirstLogin);
+            _userManager.AddToRole(id, Host.Contracts.Constants.Roles.NewUser);
+            _userManager.AddToRole(id, Host.Contracts.Constants.Roles.FirstLogin);
         }
 
         private void SetNewUsersValues(IEnumerable<AdministrationUserDTO> administrationUserDto, IEnumerable<ApplicationUser> applicationUsers)
         {
-            var newUserRole = _rolesRepository.Get(x => x.Name == Constants.Authorization.Roles.NewUser).Select(x => x.Id).FirstOrDefault();
+            var newUserRole = _rolesRepository.Get(x => x.Name == Host.Contracts.Constants.Roles.NewUser).Select(x => x.Id).FirstOrDefault();
 
             var usersWaitingForConfirmationIds =
                 applicationUsers.Where(x => x.Roles.Any(y => y.RoleId == newUserRole)).Select(x => x.Id).ToList();

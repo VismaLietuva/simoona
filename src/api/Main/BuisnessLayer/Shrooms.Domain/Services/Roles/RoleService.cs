@@ -45,7 +45,7 @@ namespace Shrooms.Domain.Services.Roles
 
         public IList<string> GetAdministrationRoleEmails(int orgId)
         {
-            var administrationRole = GetRole(role => role.Name == Constants.Authorization.Roles.Administration && role.OrganizationId == orgId, orgId, true);
+            var administrationRole = GetRole(role => role.Name == Host.Contracts.Constants.Roles.Administration && role.OrganizationId == orgId, orgId, true);
 
             if (administrationRole == null || !administrationRole.Users.Any())
             {

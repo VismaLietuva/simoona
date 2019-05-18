@@ -17,7 +17,6 @@ using Shrooms.API.Controllers.Wall;
 using Shrooms.API.Filters;
 using Shrooms.API.Helpers;
 using Shrooms.Authentification.Membership;
-using Shrooms.Constants.Authorization;
 using Shrooms.Constants.WebApi;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Administration;

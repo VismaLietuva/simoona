@@ -8,7 +8,6 @@ namespace Shrooms.Constants.BusinessLayer
         public static readonly IEnumerable<CultureInfo> SupportedLanguages = new[] { CultureInfo.GetCultureInfo("en-US"), CultureInfo.GetCultureInfo("lt-LT") };
 
         public const string DefaultCulture = "en-US";
-        public const string EmptyUserId = "";
 
         public const string DefaultEmailLinkName = "Simoona";
         public const string DefaultSignatureTemplate = "<hr><u></u><div>{0} <a href='{1}' target='_blank'>{2}</a>.</div>";
@@ -57,19 +56,6 @@ namespace Shrooms.Constants.BusinessLayer
         public const string EmailSenderName = "Simoona";
         #endregion
 
-        #region Events
-        public const string FoodEventTypeName = "foodEventType";
-        public const int EventOptionsMinimumCount = 2;
-        public const string EventParticipantsExcelTableName = "Event Participants";
-        public const string EventOptionsExcelTableName = "Event Options";
-
-        public enum MyEventsOptions
-        {
-            Host,
-            Participant
-        }
-        #endregion
-
         #region Books
         public const int BooksPerPage = 10;
         public const int MinCharactersInBookSearch = 2;
@@ -85,11 +71,5 @@ namespace Shrooms.Constants.BusinessLayer
         #endregion
 
         public const int MaxNotificationsToShow = 100;
-
-        #region ServiceRequests
-
-        public const string ServiceRequestsExcelSheetName = "Service requests";
-
-        #endregion
     }
 }

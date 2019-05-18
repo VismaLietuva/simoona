@@ -6,7 +6,6 @@ using System.Linq;
 using System.Web;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Constants.Authorization;
 using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Kudos;
@@ -18,6 +17,7 @@ using Shrooms.DomainExceptions.Exceptions.Kudos;
 using Shrooms.DomainServiceValidators.Validators.Kudos;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.UnitTests.Extensions;
 

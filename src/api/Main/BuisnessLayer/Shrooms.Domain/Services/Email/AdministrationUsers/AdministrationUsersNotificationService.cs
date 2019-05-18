@@ -1,6 +1,5 @@
 ﻿using System.Data.Entity;
 using System.Linq;
-using Shrooms.Constants;
 using Shrooms.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Emails;

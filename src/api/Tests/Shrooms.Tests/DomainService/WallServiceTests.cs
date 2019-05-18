@@ -4,8 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Constants.Authorization;
-using Shrooms.Constants.ErrorCodes;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Wall;
 using Shrooms.Domain.Services.Permissions;

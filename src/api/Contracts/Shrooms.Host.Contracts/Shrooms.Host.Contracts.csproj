@@ -53,6 +53,9 @@
   <ItemGroup>
     <Compile Include="Constants\AdministrationPermissions.cs" />
     <Compile Include="Constants\BasicPermissions.cs" />
+    <Compile Include="Constants\EmailTemplateCacheKeys.cs" />
+    <Compile Include="Constants\ErrorCodes.cs" />
+    <Compile Include="Constants\Roles.cs" />
     <Compile Include="DAL\IDbContext.cs" />
     <Compile Include="DAL\IRepository.cs" />
     <Compile Include="DAL\IUnitOfWork.cs" />

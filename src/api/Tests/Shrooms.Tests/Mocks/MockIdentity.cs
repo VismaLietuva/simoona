@@ -7,7 +7,6 @@ using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security.DataProtection;
 using NSubstitute;
 using Shrooms.Authentification.Membership;
-using Shrooms.Constants.Authorization;
 using Shrooms.Constants.WebApi;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.Domain.Services.Permissions;

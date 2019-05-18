@@ -42,7 +42,7 @@ namespace Shrooms.Domain.Services.Birthday
             return _userDbSet
                     .Where(u => u.BirthDay.HasValue)
                     .Where(FilterWeeklyBirthdays(firstDayOfTheWeek, lastDayOfTheWeek))
-                    .Where(_roleService.ExcludeUsersWithRole(Constants.Authorization.Roles.NewUser))
+                    .Where(_roleService.ExcludeUsersWithRole(Host.Contracts.Constants.Roles.NewUser))
                     .OrderByDescending(x => x.BirthDay.Value.Month)
                     .ThenByDescending(x => x.BirthDay.Value.Day)
                     .Select(MapUserBirthdayInfo())

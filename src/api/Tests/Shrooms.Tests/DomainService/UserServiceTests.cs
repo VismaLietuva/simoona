@@ -9,13 +9,13 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Authentification.Membership;
-using Shrooms.Constants.ErrorCodes;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Users;
 using Shrooms.Domain.Services.UserService;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Multiwall;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.UnitTests.Extensions;
 using Shrooms.UnitTests.Mocks;
@@ -364,13 +364,13 @@ namespace Shrooms.UnitTests.DomainService
             {
                 new ApplicationRole
                 {
-                    Name = Constants.Authorization.Roles.NewUser,
+                    Name = Roles.NewUser,
                     Id = "role1",
                     OrganizationId = 2
                 },
                 new ApplicationRole
                 {
-                    Name = Constants.Authorization.Roles.External,
+                    Name = Roles.External,
                     Id = "role2",
                     OrganizationId = 2
                 }

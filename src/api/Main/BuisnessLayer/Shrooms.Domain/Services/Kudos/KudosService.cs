@@ -9,7 +9,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using MoreLinq;
 using Shrooms.Constants.BusinessLayer;
-using Shrooms.Constants.ErrorCodes;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.Domain.Helpers;
@@ -313,7 +312,7 @@ namespace Shrooms.Domain.Services.Kudos
         {
             var users = _usersDbSet
                 .Where(user => user.UserName.Contains(s) || user.Email.Contains(s) || (user.FirstName + " " + user.LastName).Contains(s))
-                .Where(_roleService.ExcludeUsersWithRole(Constants.Authorization.Roles.NewUser))
+                .Where(_roleService.ExcludeUsersWithRole(Host.Contracts.Constants.Roles.NewUser))
                 .Select(MapUsersToAutocompleteDTO())
                 .ToList();
 

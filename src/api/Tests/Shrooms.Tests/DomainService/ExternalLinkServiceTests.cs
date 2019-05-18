@@ -4,11 +4,11 @@ using System.Data.Entity;
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Constants.ErrorCodes;
 using Shrooms.DataTransferObjects.Models.ExternalLinks;
 using Shrooms.Domain.Services.ExternalLinks;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.UnitTests.Extensions;
 

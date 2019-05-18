@@ -1,13 +1,13 @@
 ﻿using System.Data.Entity;
 using System.Linq;
 using System.Net.Mail;
-using Shrooms.Constants.ErrorCodes;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Users;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.DomainExceptions.Exceptions.Organization;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.Domain.Services.Organizations
@@ -106,7 +106,7 @@ namespace Shrooms.Domain.Services.Organizations
 
         public void SetManagingDirector(string userId, UserAndOrganizationDTO userAndOrganizationDTO)
         {
-            if (!_roleService.HasRole(userId, Shrooms.Constants.Authorization.Roles.Manager))
+            if (!_roleService.HasRole(userId, Host.Contracts.Constants.Roles.Manager))
             {
                 throw new ValidationException(ErrorCodes.UserIsNotAManager, "User need to have manager role to become a managing director");
             }

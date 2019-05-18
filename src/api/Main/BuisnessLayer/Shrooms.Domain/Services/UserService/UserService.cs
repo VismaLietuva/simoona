@@ -9,13 +9,13 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Shrooms.Authentification.Membership;
 using Shrooms.Constants.BusinessLayer;
-using Shrooms.Constants.ErrorCodes;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Users;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.EntityModels.Models.Notifications;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
 using WallModel = Shrooms.EntityModels.Models.Multiwall.Wall;
 
@@ -157,12 +157,12 @@ namespace Shrooms.Domain.Services.UserService
         public IEnumerable<string> GetWallUserAppNotificationEnabledIds(string posterId, int wallId)
         {
             var newUserAndExternalRoles = _rolesDbSet
-                .Where(r => r.Name == Shrooms.Constants.Authorization.Roles.NewUser ||
-                            r.Name == Shrooms.Constants.Authorization.Roles.External)
+                .Where(r => r.Name == Host.Contracts.Constants.Roles.NewUser ||
+                            r.Name == Host.Contracts.Constants.Roles.External)
                 .ToList();
 
-            var newUserRoleId = newUserAndExternalRoles.First(r => r.Name == Shrooms.Constants.Authorization.Roles.NewUser).Id;
-            var externalRoleId = newUserAndExternalRoles.First(r => r.Name == Shrooms.Constants.Authorization.Roles.External).Id;
+            var newUserRoleId = newUserAndExternalRoles.First(r => r.Name == Host.Contracts.Constants.Roles.NewUser).Id;
+            var externalRoleId = newUserAndExternalRoles.First(r => r.Name == Host.Contracts.Constants.Roles.External).Id;
 
             var wall = _wallDbSet.Single(w => w.Id == wallId);
 
@@ -183,12 +183,12 @@ namespace Shrooms.Domain.Services.UserService
         public IList<string> GetWallUsersEmails(string senderEmail, EntityModels.Models.Multiwall.Wall wall)
         {
             var newUserAndExternalRoles = _rolesDbSet
-                .Where(r => r.Name == Shrooms.Constants.Authorization.Roles.NewUser ||
-                            r.Name == Shrooms.Constants.Authorization.Roles.External)
+                .Where(r => r.Name == Host.Contracts.Constants.Roles.NewUser ||
+                            r.Name == Host.Contracts.Constants.Roles.External)
                 .ToList();
 
-            var newUserRoleId = newUserAndExternalRoles.First(r => r.Name == Shrooms.Constants.Authorization.Roles.NewUser).Id;
-            var externalRoleId = newUserAndExternalRoles.First(r => r.Name == Shrooms.Constants.Authorization.Roles.External).Id;
+            var newUserRoleId = newUserAndExternalRoles.First(r => r.Name == Host.Contracts.Constants.Roles.NewUser).Id;
+            var externalRoleId = newUserAndExternalRoles.First(r => r.Name == Host.Contracts.Constants.Roles.External).Id;
 
             var emails = _usersDbSet
                 .Include(u => u.WallUsers)

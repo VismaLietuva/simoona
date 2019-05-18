@@ -6,7 +6,6 @@ using System.Web.Http;
 using AutoMapper;
 using PagedList;
 using Shrooms.API.Filters;
-using Shrooms.Constants.Authorization;
 using Shrooms.Constants.WebApi;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Permissions;

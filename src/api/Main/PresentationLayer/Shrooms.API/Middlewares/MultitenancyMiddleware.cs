@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Owin;
 using Shrooms.API.GeneralCode;
-using Shrooms.Constants.ErrorCodes;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Resources.Helpers;
 
 namespace Shrooms.API.Middlewares

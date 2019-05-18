@@ -1,8 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using Shrooms.Constants.BusinessLayer;
-using Shrooms.Constants.ErrorCodes;
 using Shrooms.DomainExceptions.Exceptions;
+using Shrooms.Host.Contracts.Constants;
 
 namespace Shrooms.EntityModels.Models.Kudos
 {

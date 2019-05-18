@@ -1,6 +1,6 @@
 ﻿using System;
-using Shrooms.Constants.ErrorCodes;
 using Shrooms.DomainExceptions.Exceptions.Book;
+using Shrooms.Host.Contracts.Constants;
 
 namespace Shrooms.DomainServiceValidators.Validators.Books
 {
