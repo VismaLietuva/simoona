@@ -2,6 +2,9 @@
 {
     public static class WebApiConstants
     {
+        public const int DefaultPageSize = 10;
+        public const int MaximumPictureSizeInBytes = 12000000;
+
         public const int EventNameMaxLength = 35;
         public const int EventTypeNameMaxLength = 30;
         public const int EventMinimumParticipants = 0;

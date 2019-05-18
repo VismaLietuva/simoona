@@ -7,7 +7,7 @@ using NUnit.Framework;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.EntityModels.Models.Events;
 using Shrooms.Host.Contracts.DAL;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Utilities;
+using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Utilities;
 using Shrooms.UnitTests.Extensions;
 
 namespace Shrooms.Premium.UnitTests.DomainService

@@ -12,9 +12,9 @@ using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.Configuration;
 using Shrooms.Infrastructure.Email;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.ServiceRequest;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Email.ServiceRequest;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.ServiceRequests;
+using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.ServiceRequest;
+using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.ServiceRequest;
+using Shrooms.Premium.Main.BusinessLayer.Domain.Services.ServiceRequests;
 using Shrooms.UnitTests.Extensions;
 
 namespace Shrooms.Premium.UnitTests.DomainService

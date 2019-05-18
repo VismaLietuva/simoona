@@ -5,9 +5,9 @@ using Shrooms.API.Controllers;
 using Shrooms.API.Filters;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.Host.Contracts.Constants;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Events;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Utilities;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.DomainExceptions.Exceptions.Event;
+using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events;
+using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Utilities;
+using Shrooms.Premium.Main.BusinessLayer.DomainExceptions.Event;
 using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Events;
 
 namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers

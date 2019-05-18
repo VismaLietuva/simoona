@@ -9,8 +9,8 @@ using Shrooms.Domain.ServiceExceptions;
 using Shrooms.EntityModels.Models.Committee;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Committees;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Committees;
+using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Committees;
+using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Committees;
 using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Committees;
 
 namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers

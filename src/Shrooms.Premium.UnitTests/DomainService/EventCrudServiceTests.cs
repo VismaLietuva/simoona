@@ -13,14 +13,14 @@ using Shrooms.EntityModels.Models.Events;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.SystemClock;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Events;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Calendar;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Participation;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Utilities;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.DomainExceptions.Exceptions.Event;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.DomainServiceValidators.Validators.Events;
-using Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes;
+using Shrooms.Premium.Constants;
+using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events;
+using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events;
+using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Calendar;
+using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Participation;
+using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Utilities;
+using Shrooms.Premium.Main.BusinessLayer.DomainExceptions.Event;
+using Shrooms.Premium.Main.BusinessLayer.DomainServiceValidators.Events;
 using Shrooms.UnitTests.Extensions;
 
 namespace Shrooms.Premium.UnitTests.DomainService
@@ -288,7 +288,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
                 }
             };
             var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
-            Assert.That(ex.Message, Is.EqualTo(ErrorCodes.EventOptionsCantDuplicate));
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventOptionsCantDuplicate));
         }
 
         [Test]
@@ -316,7 +316,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
                 }
             };
             var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
-            Assert.That(ex.Message, Is.EqualTo(ErrorCodes.EventResponsiblePersonDoesNotExistCode));
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventResponsiblePersonDoesNotExistCode));
         }
 
         [Test]
@@ -345,7 +345,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
             };
 
             var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
-            Assert.That(ex.Message, Is.EqualTo(ErrorCodes.EventTypeDoesNotExistCode));
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventTypeDoesNotExistCode));
         }
 
         [Test]
@@ -375,7 +375,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
                 }
             };
             var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
-            Assert.That(ex.Message, Is.EqualTo(ErrorCodes.EventRegistrationDeadlineIsExpired));
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventRegistrationDeadlineIsExpired));
         }
 
         [Test]
@@ -405,7 +405,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
                 }
             };
             var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
-            Assert.That(ex.Message, Is.EqualTo(ErrorCodes.EventRegistrationDeadlineGreaterThanStartDateCode));
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventRegistrationDeadlineGreaterThanStartDateCode));
         }
 
         [Test]
@@ -433,7 +433,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
                 }
             };
             var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
-            Assert.That(ex.Message, Is.EqualTo(ErrorCodes.EventStartDateGreaterThanEndDateCode));
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventStartDateGreaterThanEndDateCode));
         }
 
         [Test]
@@ -461,7 +461,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
                 }
             };
             var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
-            Assert.That(ex.Message, Is.EqualTo(ErrorCodes.EventNeedToHaveMaxChoiceCode));
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventNeedToHaveMaxChoiceCode));
         }
 
         [Test]
@@ -501,7 +501,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
                 }
             };
             var ex = Assert.Throws<EventException>(() => _eventService.UpdateEvent(newEvent));
-            Assert.That(ex.Message, Is.EqualTo(ErrorCodes.EventDoesNotExistCode));
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventDoesNotExistCode));
         }
 
         [Test]
@@ -543,7 +543,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
                 }
             };
             var ex = Assert.Throws<EventException>(() => _eventService.UpdateEvent(newEvent));
-            Assert.That(ErrorCodes.EventDontHavePermissionCode, Is.EqualTo(ex.Message));
+            Assert.That(PremiumErrorCodes.EventDontHavePermissionCode, Is.EqualTo(ex.Message));
         }
 
         [Test]

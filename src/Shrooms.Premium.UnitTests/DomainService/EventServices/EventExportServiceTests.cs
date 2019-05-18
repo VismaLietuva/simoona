@@ -6,10 +6,10 @@ using NSubstitute;
 using NUnit.Framework;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.Infrastructure.ExcelGenerator;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Events;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Export;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Participation;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Utilities;
+using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events;
+using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Export;
+using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Participation;
+using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Utilities;
 
 namespace Shrooms.Premium.UnitTests.DomainService.EventServices
 {
@@ -61,13 +61,13 @@ namespace Shrooms.Premium.UnitTests.DomainService.EventServices
         [Test]
         public void Should_Return_Excel_File_With_Participants_And_Without_Options()
         {
-            var UserAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDTO
             {
                 OrganizationId = 2,
             };
-            var guid = MockParticipantsWithoutOptionsForExport(UserAndOrg);
+            var guid = MockParticipantsWithoutOptionsForExport(userAndOrg);
 
-            var stream = _eventExportService.ExportOptionsAndParticipants(guid, UserAndOrg);
+            var stream = _eventExportService.ExportOptionsAndParticipants(guid, userAndOrg);
 
             using (IExcelDataReader excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
             {
@@ -82,13 +82,13 @@ namespace Shrooms.Premium.UnitTests.DomainService.EventServices
         [Test]
         public void Should_Return_Excel_File_With_Options()
         {
-            var UserAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDTO
             {
                 OrganizationId = 2,
             };
-            var guid = MockParticipantsWithOptionsForExport(UserAndOrg);
+            var guid = MockParticipantsWithOptionsForExport(userAndOrg);
 
-            var stream = _eventExportService.ExportOptionsAndParticipants(guid, UserAndOrg);
+            var stream = _eventExportService.ExportOptionsAndParticipants(guid, userAndOrg);
 
             using (IExcelDataReader excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
             {
@@ -145,7 +145,7 @@ namespace Shrooms.Premium.UnitTests.DomainService.EventServices
             return eventId;
         }
 
-        private Guid MockParticipantsWithoutOptionsForExport(UserAndOrganizationDTO UserAndOrg)
+        private Guid MockParticipantsWithoutOptionsForExport(UserAndOrganizationDTO userAndOrg)
         {
             var eventId = Guid.NewGuid();
 
@@ -160,8 +160,8 @@ namespace Shrooms.Premium.UnitTests.DomainService.EventServices
 
             var options = new List<EventOptionCountDTO>();
 
-            _eventParticipationService.GetEventParticipants(eventId, UserAndOrg).Returns(users);
-            _eventUtilitiesService.GetEventChosenOptions(eventId, UserAndOrg).Returns(options);
+            _eventParticipationService.GetEventParticipants(eventId, userAndOrg).Returns(users);
+            _eventUtilitiesService.GetEventChosenOptions(eventId, userAndOrg).Returns(options);
             return eventId;
         }
     }

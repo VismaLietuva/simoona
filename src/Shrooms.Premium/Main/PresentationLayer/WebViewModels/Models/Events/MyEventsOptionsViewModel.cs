@@ -1,4 +1,4 @@
-﻿using Shrooms.Constants.BusinessLayer;
+﻿using Shrooms.Premium.Constants;
 
 namespace Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Events
 {

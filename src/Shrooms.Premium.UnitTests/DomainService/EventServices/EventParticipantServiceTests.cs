@@ -4,22 +4,22 @@ using System.Data.Entity;
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Constants.Authorization;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Events;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.SystemClock;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Events;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Email.Event;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Calendar;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Participation;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.DomainExceptions.Exceptions.Event;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.DomainServiceValidators.Validators.Events;
-using Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes;
+using Shrooms.Premium.Constants;
+using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events;
+using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.Event;
+using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Calendar;
+using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Participation;
+using Shrooms.Premium.Main.BusinessLayer.DomainExceptions.Event;
+using Shrooms.Premium.Main.BusinessLayer.DomainServiceValidators.Events;
 using Shrooms.UnitTests.Extensions;
 
 namespace Shrooms.Premium.UnitTests.DomainService.EventServices
@@ -122,7 +122,7 @@ namespace Shrooms.Premium.UnitTests.DomainService.EventServices
 
             var registrationDeadline = DateTime.Parse("2016-06-20");
             var ex = Assert.Throws<EventException>(() => _eventValidationService.CheckIfRegistrationDeadlineIsExpired(registrationDeadline));
-            Assert.That(ex.Message, Is.EqualTo(ErrorCodes.EventRegistrationDeadlineIsExpired));
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventRegistrationDeadlineIsExpired));
         }
 
         [Test]
@@ -138,7 +138,7 @@ namespace Shrooms.Premium.UnitTests.DomainService.EventServices
             var maxChoices = 2;
             var choicesProvided = 0;
             var ex = Assert.Throws<EventException>(() => _eventValidationService.CheckIfJoiningNotEnoughChoicesProvided(maxChoices, choicesProvided));
-            Assert.That(ex.Message, Is.EqualTo(ErrorCodes.EventNotEnoughChoicesProvidedCode));
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventNotEnoughChoicesProvidedCode));
         }
 
         [Test]
@@ -147,7 +147,7 @@ namespace Shrooms.Premium.UnitTests.DomainService.EventServices
             var maxChoices = 2;
             var choicesProvided = 3;
             var ex = Assert.Throws<EventException>(() => _eventValidationService.CheckIfJoiningTooManyChoicesProvided(maxChoices, choicesProvided));
-            Assert.That(ex.Message, Is.EqualTo(ErrorCodes.EventTooManyChoicesProvidedCode));
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventTooManyChoicesProvidedCode));
         }
 
         [Test]
@@ -156,7 +156,7 @@ namespace Shrooms.Premium.UnitTests.DomainService.EventServices
             var maxParticipants = 5;
             var participantsCount = 6;
             var ex = Assert.Throws<EventException>(() => _eventValidationService.CheckIfEventHasEnoughPlaces(maxParticipants, participantsCount));
-            Assert.That(ex.Message, Is.EqualTo(ErrorCodes.EventIsFullCode));
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventIsFullCode));
         }
 
         [Test]
@@ -164,7 +164,7 @@ namespace Shrooms.Premium.UnitTests.DomainService.EventServices
         {
             var isAlreadyParticipating = true;
             var ex = Assert.Throws<EventException>(() => _eventValidationService.CheckIfUserAlreadyJoinedSameEvent(isAlreadyParticipating));
-            Assert.That(ex.Message, Is.EqualTo(ErrorCodes.EventUserAlreadyParticipatesCode));
+            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventUserAlreadyParticipatesCode));
         }
 
         [Test]

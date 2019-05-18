@@ -6,8 +6,8 @@ using Shrooms.API.Controllers;
 using Shrooms.API.Filters;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.Host.Contracts.Constants;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Kudos;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.KudosShop;
+using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Kudos;
+using Shrooms.Premium.Main.BusinessLayer.Domain.Services.KudosShop;
 using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.KudosShop;
 
 namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers.Kudos

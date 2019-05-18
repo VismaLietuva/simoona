@@ -4,17 +4,16 @@ using System.Data.Entity;
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Events;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.SystemClock;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Events;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.List;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.DomainExceptions.Exceptions.Event;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.DomainServiceValidators.Validators.Events;
-using Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes;
+using Shrooms.Premium.Constants;
+using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events;
+using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.List;
+using Shrooms.Premium.Main.BusinessLayer.DomainExceptions.Event;
+using Shrooms.Premium.Main.BusinessLayer.DomainServiceValidators.Events;
 using Shrooms.UnitTests.Extensions;
 
 namespace Shrooms.Premium.UnitTests.DomainService
@@ -145,7 +144,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
             var deadlineDate = DateTime.Parse("2016-05-01");
             var startDate = DateTime.Parse("2016-04-28");
             var ex = Assert.Throws<EventException>(() => _eventValidationService.CheckIfRegistrationDeadlineExceedsStartDate(deadlineDate, startDate));
-            Assert.AreEqual(ex.Message, ErrorCodes.EventRegistrationDeadlineGreaterThanStartDateCode);
+            Assert.AreEqual(ex.Message, PremiumErrorCodes.EventRegistrationDeadlineGreaterThanStartDateCode);
         }
 
         [Test]
@@ -170,7 +169,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
             var deadlineDate = DateTime.Parse("2016-05-01");
             _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-05-02"));
             var ex = Assert.Throws<EventException>(() => _eventValidationService.CheckIfRegistrationDeadlineIsExpired(deadlineDate));
-            Assert.AreEqual(ex.Message, ErrorCodes.EventRegistrationDeadlineIsExpired);
+            Assert.AreEqual(ex.Message, PremiumErrorCodes.EventRegistrationDeadlineIsExpired);
         }
 
         [Test]
@@ -179,7 +178,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
             var deadlineDate = DateTime.Parse("2016-05-01");
             _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-05-02"));
             var ex = Assert.Throws<EventException>(() => _eventValidationService.CheckIfRegistrationDeadlineIsExpired(deadlineDate));
-            Assert.AreEqual(ex.Message, ErrorCodes.EventRegistrationDeadlineIsExpired);
+            Assert.AreEqual(ex.Message, PremiumErrorCodes.EventRegistrationDeadlineIsExpired);
         }
 
         #region Mocks

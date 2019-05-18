@@ -4,11 +4,11 @@ using System.Linq;
 using AutoMapper;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Constants.Authorization;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.OfficeMap;
+using Shrooms.Premium.Main.BusinessLayer.Domain.Services.OfficeMap;
 using Shrooms.UnitTests.Extensions;
 
 namespace Shrooms.Premium.UnitTests.DomainService
@@ -49,10 +49,10 @@ namespace Shrooms.Premium.UnitTests.DomainService
                     Id = "testUserId",
                     RoomId = 1,
                     Email = "email1",
-                    Room = new Room()
+                    Room = new Room
                     {
                         FloorId = 1,
-                        Floor = new Floor()
+                        Floor = new Floor
                         {
                             OfficeId = 1
                         }
@@ -63,10 +63,10 @@ namespace Shrooms.Premium.UnitTests.DomainService
                     Id = "testUserId2",
                     RoomId = 1,
                     Email = "email2",
-                    Room = new Room()
+                    Room = new Room
                     {
                         FloorId = 1,
-                        Floor = new Floor()
+                        Floor = new Floor
                         {
                             OfficeId = 1
                         }
@@ -77,10 +77,10 @@ namespace Shrooms.Premium.UnitTests.DomainService
                     Id = "testUserId3",
                     RoomId = 2,
                     Email = "email3",
-                    Room = new Room()
+                    Room = new Room
                     {
                         FloorId = 1,
-                        Floor = new Floor()
+                        Floor = new Floor
                         {
                             OfficeId = 1
                         }
@@ -91,10 +91,10 @@ namespace Shrooms.Premium.UnitTests.DomainService
                     Id = "testUserId4",
                     RoomId = 2,
                     Email = "email4",
-                    Room = new Room()
+                    Room = new Room
                     {
                         FloorId = 2,
-                        Floor = new Floor()
+                        Floor = new Floor
                         {
                             OfficeId = 3
                         }

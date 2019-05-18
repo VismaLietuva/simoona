@@ -10,7 +10,7 @@ using Shrooms.DataTransferObjects.Models;
 using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.ExcelGenerator;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.ServiceRequests;
+using Shrooms.Premium.Main.BusinessLayer.Domain.Services.ServiceRequests;
 using Shrooms.UnitTests.Extensions;
 
 namespace Shrooms.Premium.UnitTests.DomainService

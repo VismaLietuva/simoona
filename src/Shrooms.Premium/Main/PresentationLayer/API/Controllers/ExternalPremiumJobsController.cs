@@ -3,7 +3,7 @@ using System.Web.Http;
 using Shrooms.API.Controllers;
 using Shrooms.API.Controllers.Kudos;
 using Shrooms.API.Filters;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.WebHookCallbacks;
+using Shrooms.Premium.Main.BusinessLayer.Domain.Services.WebHookCallbacks;
 using WebApi.OutputCache.V2;
 
 namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers

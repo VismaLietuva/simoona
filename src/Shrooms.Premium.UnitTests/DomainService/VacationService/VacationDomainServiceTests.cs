@@ -2,7 +2,7 @@
 using System.Linq;
 using NUnit.Framework;
 using Shrooms.EntityModels.Models;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Vacations;
+using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Vacations;
 
 namespace Shrooms.Premium.UnitTests.DomainService.VacationService
 {
