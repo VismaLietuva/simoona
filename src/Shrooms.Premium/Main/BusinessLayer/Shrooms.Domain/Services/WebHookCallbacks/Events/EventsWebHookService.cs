@@ -1,5 +1,4 @@
-﻿using Shrooms.DataLayer.DAL;
-using Shrooms.DataTransferObjects.Models.Wall;
+﻿using Shrooms.DataTransferObjects.Models.Wall;
 using Shrooms.Domain.Services.Events.Calendar;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.EntityModels.Models.Events;
@@ -9,12 +8,13 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
+using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.Domain.Services.WebHookCallbacks.Events
 {
     public class EventsWebHookService : IEventsWebHookService
     {
-        private static readonly Dictionary<EventRecurrenceOptions, Func<DateTime, DateTime>> RecurrancePeriods = new Dictionary<EventRecurrenceOptions, Func<DateTime, DateTime>>
+        private static readonly Dictionary<EventRecurrenceOptions, Func<DateTime, DateTime>> _recurrancePeriods = new Dictionary<EventRecurrenceOptions, Func<DateTime, DateTime>>
         {
             { EventRecurrenceOptions.EveryDay, e => e.AddDays(1) },
             { EventRecurrenceOptions.EveryWeek, e => e.AddDays(7) },
@@ -91,9 +91,9 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.Events
                 ModifiedBy = @event.ModifiedBy,
                 Place = @event.Place,
                 Created = @event.Created,
-                LocalStartDate = RecurrancePeriods[@event.EventRecurring](@event.LocalStartDate),
-                LocalEndDate = RecurrancePeriods[@event.EventRecurring](@event.LocalEndDate),
-                LocalRegistrationDeadline = RecurrancePeriods[@event.EventRecurring](@event.LocalRegistrationDeadline),
+                LocalStartDate = _recurrancePeriods[@event.EventRecurring](@event.LocalStartDate),
+                LocalEndDate = _recurrancePeriods[@event.EventRecurring](@event.LocalEndDate),
+                LocalRegistrationDeadline = _recurrancePeriods[@event.EventRecurring](@event.LocalRegistrationDeadline),
                 WallId = wallId
             };
         }

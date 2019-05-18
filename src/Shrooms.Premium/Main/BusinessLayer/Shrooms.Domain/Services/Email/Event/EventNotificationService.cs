@@ -1,9 +1,9 @@
 ﻿using Shrooms.Constants;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.DataTransferObjects.Models.Emails;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.Configuration;
 using Shrooms.Infrastructure.Email;
 using Shrooms.Infrastructure.Email.Templating;

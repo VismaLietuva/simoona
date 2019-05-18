@@ -1,7 +1,6 @@
 ﻿using DomainServiceValidators.Validators.Books;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models.Books;
 using Shrooms.DomainExceptions.Exceptions.Book;
 using Shrooms.EntityModels.Models;
@@ -13,6 +12,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using Shrooms.Domain.Services.Books;
+using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.UnitTests.DomainService
 {

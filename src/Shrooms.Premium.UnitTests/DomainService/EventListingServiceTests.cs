@@ -1,6 +1,5 @@
 ﻿using NSubstitute;
 using NUnit.Framework;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Events;
 using Shrooms.Domain.Services.Events.List;
@@ -14,6 +13,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.DAL;
 using static Shrooms.Constants.BusinessLayer.ConstBusinessLayer;
 using static Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes.ErrorCodes;
 

@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Shrooms.API.Filters;
-using Shrooms.DataLayer;
 using Shrooms.DataTransferObjects.Models.Committees;
 using Shrooms.EntityModels.Models;
 using Shrooms.WebViewModels.Models.Committees;
@@ -11,6 +10,7 @@ using System.Web.Http;
 using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Domain.ServiceExceptions;
 using Shrooms.Domain.Services.Committees;
+using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.API.Controllers.WebApi
 {

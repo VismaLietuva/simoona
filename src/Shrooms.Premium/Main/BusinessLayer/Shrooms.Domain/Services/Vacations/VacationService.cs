@@ -5,7 +5,6 @@ using System.Data.Entity;
 using System.IO;
 using System.Linq;
 using Excel;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.EntityModels.Models;
 using Shrooms.DataTransferObjects.Models.Vacations;
@@ -13,6 +12,7 @@ using System.Threading.Tasks;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Shrooms.DomainExceptions.Exceptions.Vacation;
+using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.Domain.Services.Vacations
 {

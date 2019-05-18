@@ -1,13 +1,13 @@
-﻿using Shrooms.DataLayer.DAL;
-using Shrooms.DataTransferObjects.Models;
+﻿using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Events;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models.Events;
+using Shrooms.Host.Contracts.DAL;
+using Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes;
 using static Shrooms.Constants.ErrorCodes.ErrorCodes;
 
 namespace Shrooms.Domain.Services.Events.Utilities
@@ -78,7 +78,7 @@ namespace Shrooms.Domain.Services.Events.Utilities
                     Id = x.Id,
                     IsSingleJoin = x.IsSingleJoin,
                     Name = x.Name,
-                    HasActiveEvents = x.Events.Any(e => e.EndDate > DateTime.UtcNow 
+                    HasActiveEvents = x.Events.Any(e => e.EndDate > DateTime.UtcNow
                                                      || e.EventRecurring != EventRecurrenceOptions.None)
                 })
                 .SingleOrDefault();
@@ -133,7 +133,7 @@ namespace Shrooms.Domain.Services.Events.Utilities
             }
 
             var eventType = _eventTypesDbSet
-                .SingleOrDefault(x => x.OrganizationId == userAndOrg.OrganizationId 
+                .SingleOrDefault(x => x.OrganizationId == userAndOrg.OrganizationId
                     && x.Id == id);
 
             if (eventType == null)

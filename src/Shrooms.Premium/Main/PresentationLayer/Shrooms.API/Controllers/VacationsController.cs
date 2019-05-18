@@ -6,10 +6,10 @@ using Microsoft.AspNet.Identity;
 using Shrooms.API.Filters;
 using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.WebApi;
-using Shrooms.DataLayer;
 using Shrooms.DataTransferObjects.Models.Vacations;
 using Shrooms.Domain.Services.Vacations;
 using Shrooms.DomainExceptions.Exceptions;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.WebViewModels.Models;
 
 namespace Shrooms.API.Controllers.WebApi

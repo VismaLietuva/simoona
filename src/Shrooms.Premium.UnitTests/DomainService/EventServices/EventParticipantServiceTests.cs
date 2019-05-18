@@ -1,7 +1,6 @@
 ﻿using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Constants.Authorization;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Events;
 using Shrooms.Domain.Services.Email.Event;
@@ -20,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using Shrooms.Host.Contracts.DAL;
 using static Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes.ErrorCodes;
 
 namespace Shrooms.UnitTests.DomainService.EventServices
@@ -67,15 +67,15 @@ namespace Shrooms.UnitTests.DomainService.EventServices
             MockRoleService(roleService);
             _wallService = Substitute.For<IWallService>();
 
-            _eventParticipationService = 
+            _eventParticipationService =
                 new EventParticipationService(
-                    _uow2, 
-                    _systemClockMock, 
-                    roleService, 
-                    permissionService, 
-                    calendarService, 
-                    _eventValidationServiceMock, 
-                    eventNotificationService, 
+                    _uow2,
+                    _systemClockMock,
+                    roleService,
+                    permissionService,
+                    calendarService,
+                    _eventValidationServiceMock,
+                    eventNotificationService,
                     _wallService);
         }
 

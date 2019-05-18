@@ -1,9 +1,9 @@
 ﻿using Shrooms.Constants;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.DataTransferObjects.Models.Emails;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.Configuration;
 using Shrooms.Infrastructure.Email;
 using Shrooms.Infrastructure.Email.Templating;
@@ -49,6 +49,6 @@ namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Email.Kudos
         }
 
         private Organization getOrganizationName(int orgId) => _organizationsDbSet
-                .Single(x => x.Id == orgId);     
+                .Single(x => x.Id == orgId);
     }
 }

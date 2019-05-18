@@ -1,9 +1,9 @@
 ﻿using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models.Vacations;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.VacationBot;
 
 namespace Shrooms.Domain.Services.Vacations

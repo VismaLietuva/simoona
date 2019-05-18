@@ -1,11 +1,11 @@
-﻿using Shrooms.DataLayer.DAL;
-using Shrooms.EntityModels.Models;
+﻿using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
 using Shrooms.Infrastructure.Logger;
 using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Email.Kudos;
 using System;
 using System.Data.Entity;
 using System.Linq;
+using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos
 {

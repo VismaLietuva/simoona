@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Shrooms.API.Filters;
-using Shrooms.DataLayer;
 using Shrooms.EntityModels.Models;
 using Shrooms.WebViewModels.Models;
 using System.Collections.Generic;
@@ -11,6 +10,7 @@ using Shrooms.Domain.Services.OfficeMap;
 using Shrooms.DataTransferObjects.Models.OfficeMap;
 using Shrooms.Constants.WebApi;
 using PagedList;
+using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.API.Controllers.WebApi
 {

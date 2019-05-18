@@ -1,25 +1,21 @@
 ﻿using AutoMapper;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Events;
 using Shrooms.DataTransferObjects.Models.Notification;
 using Shrooms.Domain.Services.Wall;
-using Shrooms.EntityModels.Models.Events;
 using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.EntityModels.Models.Notifications;
-using System;
-using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Notifications
 {
     public class NotificationService : INotificationService
     {
         private readonly IDbSet<Notification> _notificationDbSet;
-        private readonly IDbSet<EntityModels.Models.Multiwall.Wall> _wallDbSet;
+        private readonly IDbSet<Wall> _wallDbSet;
 
         private readonly IWallService _wallService;
 
@@ -30,13 +26,13 @@ namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Notificatio
         public NotificationService(IUnitOfWork2 uow, IMapper mapper, IWallService wallService)
         {
             _notificationDbSet = uow.GetDbSet<Notification>();
-            _wallDbSet = uow.GetDbSet<EntityModels.Models.Multiwall.Wall>();
+            _wallDbSet = uow.GetDbSet<Wall>();
             _uow = uow;
 
             _mapper = mapper;
 
             _wallService = wallService;
-        }    
+        }
 
         public async Task<NotificationDto> CreateForEvent(UserAndOrganizationDTO userOrg, CreateEventDto eventDto)
         {

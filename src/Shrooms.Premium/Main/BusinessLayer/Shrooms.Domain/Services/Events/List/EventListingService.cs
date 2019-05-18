@@ -1,9 +1,9 @@
 ﻿using Shrooms.Constants.BusinessLayer;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Events;
 using Shrooms.DomainServiceValidators.Validators.Events;
 using Shrooms.EntityModels.Models.Events;
+using Shrooms.Host.Contracts.DAL;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;

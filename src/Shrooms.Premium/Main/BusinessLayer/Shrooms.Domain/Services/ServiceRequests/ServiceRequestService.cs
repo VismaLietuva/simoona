@@ -4,7 +4,6 @@ using System.Data.Entity;
 using System.Linq;
 using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.ErrorCodes;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.ServiceRequest;
 using Shrooms.Domain.Helpers;
@@ -12,6 +11,7 @@ using Shrooms.Domain.Services.Email.ServiceRequest;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.DAL;
 using static Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes.ErrorCodes;
 
 namespace Shrooms.Domain.Services.ServiceRequests
@@ -138,8 +138,7 @@ namespace Shrooms.Domain.Services.ServiceRequests
             ValidateServiceRequestForUpdate(serviceRequest, serviceRequestDTO);
 
             var serviceRequestCategory = _serviceRequestCategoryDbSet
-                    .Where(x => x.Id == serviceRequestDTO.ServiceRequestCategoryId)
-                    .FirstOrDefault();
+                    .FirstOrDefault(x => x.Id == serviceRequestDTO.ServiceRequestCategoryId);
 
             if (serviceRequestCategory == null)
             {
@@ -183,9 +182,8 @@ namespace Shrooms.Domain.Services.ServiceRequests
         public void CreateComment(ServiceRequestCommentDTO comment, UserAndOrganizationDTO userAndOrganizationDTO)
         {
             var serviceRequest = _serviceRequestsDbSet
-                    .Where(x => x.Id == comment.ServiceRequestId &&
-                        x.OrganizationId == userAndOrganizationDTO.OrganizationId)
-                    .SingleOrDefault();
+                    .SingleOrDefault(x => x.Id == comment.ServiceRequestId &&
+                            x.OrganizationId == userAndOrganizationDTO.OrganizationId);
 
             if (serviceRequest == null)
             {
@@ -298,10 +296,10 @@ namespace Shrooms.Domain.Services.ServiceRequests
             if (category == null)
             {
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Service request category does not exist");
-            }            
-            
+            }
+
             _serviceRequestCategoryDbSet.Remove(category);
-            _uow.SaveChanges(userId);            
+            _uow.SaveChanges(userId);
         }
 
         private List<string> GetCategoryAssignees(string categoryName)

@@ -1,6 +1,5 @@
 ﻿using NSubstitute;
 using NUnit.Framework;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.Domain.Services.Events.Utilities;
 using Shrooms.EntityModels.Models.Events;
@@ -9,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.UnitTests.DomainService
 {

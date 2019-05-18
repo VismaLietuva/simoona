@@ -1,9 +1,9 @@
 ﻿using Shrooms.Constants;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Emails;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.Configuration;
 using Shrooms.Infrastructure.Email;
 using Shrooms.Infrastructure.Email.Templating;
@@ -38,7 +38,7 @@ namespace Shrooms.Domain.Services.Email.ServiceRequest
         public void NotifyAboutNewServiceRequest(EntityModels.Models.ServiceRequest newServiceRequest, UserAndOrganizationDTO userAndOrg)
         {
             var organizationName = GetOrganizationName(newServiceRequest.OrganizationId);
-            
+
             var emails = _usersDbSet
                 .Where(x => x.ServiceRequestCategoriesAssigned.Any(y => y.Name == newServiceRequest.CategoryName))
                 .Where(x => x.Id != newServiceRequest.EmployeeId)

@@ -172,11 +172,6 @@
       <HintPath>$(SimoonaCoreLocation)\src\api\Other\Shrooms.Constants\bin\$(Configuration)\Shrooms.Constants.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Shrooms.DataLayer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SimoonaCoreLocation)\src\api\Main\DataLayer\Shrooms.DataLayer\bin\$(Configuration)\Shrooms.DataLayer.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Shrooms.DataTransferObjects, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(SimoonaCoreLocation)\src\api\Main\BuisnessLayer\Shrooms.DataTransferObjects\bin\$(Configuration)\Shrooms.DataTransferObjects.dll</HintPath>
@@ -214,6 +209,11 @@
     <Reference Include="Shrooms.WebViewModels, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(SimoonaCoreLocation)\src\api\Main\PresentationLayer\Shrooms.WebViewModels\bin\$(Configuration)\Shrooms.WebViewModels.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Shrooms.Host.Contracts, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(SimoonaCoreLocation)\src\api\Contracts\Shrooms.Host.Contracts\bin\$(Configuration)\Shrooms.Host.Contracts.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -451,7 +451,6 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="RecycleWebapp" BeforeTargets="Clean" Condition=" '$(Configuration)|$(Platform)' != 'Release|AnyCPU' ">
     <Message Text="Recycling web app..." Importance="High" />

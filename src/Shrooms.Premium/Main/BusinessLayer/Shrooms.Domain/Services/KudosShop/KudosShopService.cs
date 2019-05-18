@@ -4,15 +4,12 @@ using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using AutoMapper;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.ErrorCodes;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Kudos;
-using Shrooms.Domain.Services.Permissions;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models.Kudos;
+using Shrooms.Host.Contracts.DAL;
 using static Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes.ErrorCodes;
 
 namespace Shrooms.Domain.Services.KudosShop
@@ -20,16 +17,11 @@ namespace Shrooms.Domain.Services.KudosShop
     public class KudosShopService : IKudosShopService
     {
         private readonly IUnitOfWork2 _uow;
-        private readonly IMapper _mapper;
         private readonly IDbSet<KudosShopItem> _kudosShopItemsDbSet;
 
-        public KudosShopService(
-            IUnitOfWork2 uow,
-            IMapper mapper
-        )
+        public KudosShopService(IUnitOfWork2 uow)
         {
             _uow = uow;
-            _mapper = mapper;
             _kudosShopItemsDbSet = uow.GetDbSet<KudosShopItem>();
         }
 

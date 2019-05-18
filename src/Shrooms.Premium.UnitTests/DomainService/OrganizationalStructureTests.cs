@@ -1,7 +1,6 @@
 ﻿using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Constants.Authorization;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.Domain.Services.OrganizationalStructure;
 using Shrooms.Domain.Services.Roles;
@@ -10,6 +9,7 @@ using Shrooms.UnitTests.Extensions;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.UnitTests.DomainService
 {

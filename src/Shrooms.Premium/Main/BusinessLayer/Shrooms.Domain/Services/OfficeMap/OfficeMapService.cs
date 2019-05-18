@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
-using Shrooms.DataLayer;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models.OfficeMap;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.EntityModels.Models;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.Domain.Services.OfficeMap
 {

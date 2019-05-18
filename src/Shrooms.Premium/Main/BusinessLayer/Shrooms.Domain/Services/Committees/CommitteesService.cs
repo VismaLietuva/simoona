@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
 using MoreLinq;
 using Shrooms.Constants.ErrorCodes;
-using Shrooms.DataLayer;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models.Committees;
 using Shrooms.Domain.ServiceExceptions;
 using Shrooms.Domain.Services.Email.Committee;
@@ -13,6 +11,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using Shrooms.DataTransferObjects.Models;
+using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.Domain.Services.Committees
 {

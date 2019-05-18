@@ -5,14 +5,13 @@ using Shrooms.DataTransferObjects.Models;
 using Shrooms.Infrastructure.ExcelGenerator;
 using System.Collections.Generic;
 using System.IO;
-using Shrooms.DataLayer.DAL;
 using Shrooms.EntityModels.Models;
 using System.Data.Entity;
 using Shrooms.Domain.Services.ServiceRequests.Export;
 using Shrooms.UnitTests.Extensions;
-using System.Linq;
 using System.Linq.Expressions;
 using System;
+using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.UnitTests.DomainService
 {

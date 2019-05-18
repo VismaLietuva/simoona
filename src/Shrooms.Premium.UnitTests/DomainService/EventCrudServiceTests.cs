@@ -1,7 +1,6 @@
 ﻿using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Constants.Authorization.Permissions;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Events;
 using Shrooms.DataTransferObjects.Models.Wall;
@@ -21,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using Shrooms.Host.Contracts.DAL;
 using static Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes.ErrorCodes;
 
 namespace Shrooms.UnitTests.DomainService

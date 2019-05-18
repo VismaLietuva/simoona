@@ -12,7 +12,6 @@ using PagedList;
 using Shrooms.API.Filters;
 using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.WebApi;
-using Shrooms.DataLayer;
 using Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.DataTransferObjects.Models.ServiceRequest;
 using Shrooms.Domain.Services.KudosShop;
@@ -24,6 +23,7 @@ using Shrooms.WebViewModels.Models;
 using Shrooms.WebViewModels.Models.KudosShop;
 using Shrooms.WebViewModels.Models.ServiceRequests;
 using Shrooms.Domain.Services.ServiceRequests.Export;
+using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.API.Controllers
 {

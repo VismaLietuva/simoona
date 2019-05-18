@@ -1,7 +1,7 @@
-﻿using Shrooms.DataLayer.DAL;
-using Shrooms.DataTransferObjects.Models.CalendarEvent;
+﻿using Shrooms.DataTransferObjects.Models.CalendarEvent;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Events;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.Calendar;
 using Shrooms.Infrastructure.FireAndForget;
 using System;
