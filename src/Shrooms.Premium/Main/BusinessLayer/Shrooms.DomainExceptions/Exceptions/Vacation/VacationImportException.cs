@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Shrooms.DomainExceptions.Exceptions.Vacation
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.DomainExceptions.Exceptions.Vacation
 {
     public class VacationImportException : Exception
     {

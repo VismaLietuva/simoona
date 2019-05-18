@@ -1,8 +1,7 @@
-﻿using System;
-using Shrooms.DataTransferObjects.Models;
-using Shrooms.DataTransferObjects.Models.OrganizationalStructure;
+﻿using Shrooms.DataTransferObjects.Models;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.OrganizationalStructure;
 
-namespace Shrooms.Domain.Services.OrganizationalStructure
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.OrganizationalStructure
 {
     public interface IOrganizationalStructureService
     {

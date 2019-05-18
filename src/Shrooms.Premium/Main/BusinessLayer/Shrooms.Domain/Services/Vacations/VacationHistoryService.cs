@@ -1,12 +1,12 @@
 ﻿using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
-using Shrooms.DataTransferObjects.Models.Vacations;
 using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.DAL;
-using Shrooms.Infrastructure.VacationBot;
+using Shrooms.Premium.Infrastructure.Shrooms.Infrastructure.VacationBot;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Vacations;
 
-namespace Shrooms.Domain.Services.Vacations
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Vacations
 {
     public class VacationHistoryService : IVacationHistoryService
     {

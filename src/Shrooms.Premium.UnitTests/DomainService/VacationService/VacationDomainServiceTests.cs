@@ -1,12 +1,10 @@
-﻿using NUnit.Framework;
-using Shrooms.EntityModels.Models;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using Shrooms.Domain.Services.Vacations;
+using NUnit.Framework;
+using Shrooms.EntityModels.Models;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Vacations;
 
-namespace Shrooms.UnitTests.DomainService.VacationService
+namespace Shrooms.Premium.UnitTests.DomainService.VacationService
 {
     [TestFixture]
     public class VacationDomainServiceTests
@@ -22,7 +20,7 @@ namespace Shrooms.UnitTests.DomainService.VacationService
         [Test]
         public void FilterUsersByNamesQuery_ShouldBuildPredicate()
         {
-            string fullName = "x y z";
+            const string fullName = "x y z";
 
             IList<ApplicationUser> users = new List<ApplicationUser> {
                 new ApplicationUser { Id = "1", FirstName = "x", LastName = "x" },
@@ -37,7 +35,7 @@ namespace Shrooms.UnitTests.DomainService.VacationService
                 new ApplicationUser { Id = "10", FirstName = "Real", LastName = "Name" }
             };
 
-            Expression<Func<ApplicationUser, bool>> filter = _vacationDomainService.UsersByNamesFilter(fullName);
+            var filter = _vacationDomainService.UsersByNamesFilter(fullName);
 
             var result = users.Where(filter.Compile()).ToList();
 
@@ -47,7 +45,7 @@ namespace Shrooms.UnitTests.DomainService.VacationService
         [Test]
         public void FindUser_ShouldReturnUser()
         {
-            string fullName = "LastName von FirstName";
+            const string fullName = "LastName von FirstName";
 
             IList<ApplicationUser> users = new List<ApplicationUser> {
                 new ApplicationUser { Id = "1", FirstName = "John", LastName = "Armstrong" },
@@ -56,7 +54,7 @@ namespace Shrooms.UnitTests.DomainService.VacationService
                 new ApplicationUser { Id = "4", FirstName = "FirstName von", LastName = "LastName" }
             };
 
-            ApplicationUser user = _vacationDomainService.FindUser(users, fullName);
+            var user = _vacationDomainService.FindUser(users, fullName);
 
             Assert.That(user, Is.Not.Null);
             Assert.That(user.Id, Is.EqualTo("3"));
@@ -65,7 +63,7 @@ namespace Shrooms.UnitTests.DomainService.VacationService
         [Test]
         public void FindUser_ShouldReturnNull()
         {
-            string fullName = "LastName von FirstName";
+            const string fullName = "LastName von FirstName";
 
             IList<ApplicationUser> users = new List<ApplicationUser> {
                 new ApplicationUser { Id = "1", FirstName = "John", LastName = "Armstrong" },
@@ -73,7 +71,7 @@ namespace Shrooms.UnitTests.DomainService.VacationService
                 new ApplicationUser { Id = "3", FirstName = "FirstName", LastName = "LastName" },
             };
 
-            ApplicationUser user = _vacationDomainService.FindUser(users, fullName);
+            var user = _vacationDomainService.FindUser(users, fullName);
 
             Assert.That(user, Is.Null);
         }

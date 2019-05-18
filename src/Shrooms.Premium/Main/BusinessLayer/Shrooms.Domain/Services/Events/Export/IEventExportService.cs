@@ -1,7 +1,7 @@
 ﻿using System;
 using Shrooms.DataTransferObjects.Models;
 
-namespace Shrooms.Domain.Services.Events.Export
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Export
 {
     public interface IEventExportService
     {

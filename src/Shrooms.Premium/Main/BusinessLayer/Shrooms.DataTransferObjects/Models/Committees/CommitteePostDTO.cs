@@ -1,7 +1,7 @@
-﻿using Shrooms.EntityModels.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Shrooms.EntityModels.Models;
 
-namespace Shrooms.DataTransferObjects.Models.Committees
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Committees
 {
     public class CommitteePostDTO
     {

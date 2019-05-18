@@ -1,23 +1,23 @@
-﻿using NSubstitute;
-using NUnit.Framework;
-using Shrooms.DataTransferObjects.Models;
-using Shrooms.DataTransferObjects.Models.Events;
-using Shrooms.Domain.Services.Events.List;
-using Shrooms.DomainExceptions.Exceptions.Event;
-using Shrooms.DomainServiceValidators.Validators.Events;
-using Shrooms.EntityModels.Models.Events;
-using Shrooms.Infrastructure.SystemClock;
-using Shrooms.UnitTests.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using NSubstitute;
+using NUnit.Framework;
+using Shrooms.Constants.BusinessLayer;
+using Shrooms.DataTransferObjects.Models;
 using Shrooms.EntityModels.Models;
+using Shrooms.EntityModels.Models.Events;
 using Shrooms.Host.Contracts.DAL;
-using static Shrooms.Constants.BusinessLayer.ConstBusinessLayer;
-using static Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes.ErrorCodes;
+using Shrooms.Infrastructure.SystemClock;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Events;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.List;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DomainExceptions.Exceptions.Event;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DomainServiceValidators.Validators.Events;
+using Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes;
+using Shrooms.UnitTests.Extensions;
 
-namespace Shrooms.UnitTests.DomainService
+namespace Shrooms.Premium.UnitTests.DomainService
 {
     public class EventListingServiceTests
     {
@@ -49,7 +49,8 @@ namespace Shrooms.UnitTests.DomainService
                 OrganizationId = 2,
                 UserId = "responsibleUserId"
             };
-            var result = _eventListingService.GetEventsByType(userOrg, 1);
+
+            var result = _eventListingService.GetEventsByType(userOrg, 1).ToList();
             Assert.AreEqual(result.First().Id, eventsGuids[0]);
             Assert.IsTrue(result.First().IsCreator);
             Assert.AreEqual(result.First().ParticipantsCount, 2);
@@ -65,14 +66,13 @@ namespace Shrooms.UnitTests.DomainService
                 OrganizationId = 2,
                 UserId = "notParticipantOrCreatorId"
             };
-            var result = _eventListingService.GetEventsByType(userOrg, 1);
+
+            var result = _eventListingService.GetEventsByType(userOrg, 1).ToList();
             Assert.AreEqual(result.First().Id, eventsGuids[0]);
             Assert.IsFalse(result.First().IsCreator);
             Assert.AreEqual(result.First().ParticipantsCount, 2);
             Assert.IsFalse(result.First().IsParticipating);
         }
-
-
 
         [Test]
         public void Should_Return_All_Events()
@@ -83,8 +83,8 @@ namespace Shrooms.UnitTests.DomainService
                 OrganizationId = 2,
                 UserId = "userId"
             };
-            var result = _eventListingService.GetEventsByType(userOrg);
-            Assert.AreEqual(2, result.Count());
+            var result = _eventListingService.GetEventsByType(userOrg).ToList();
+            Assert.AreEqual(2, result.Count);
             Assert.AreEqual(eventGuids[2], result.First().Id);
         }
 
@@ -97,10 +97,11 @@ namespace Shrooms.UnitTests.DomainService
                 OrganizationId = 2,
                 UserId = "testUser1",
                 SearchString = null,
-                Filter = MyEventsOptions.Participant
+                Filter = BusinessLayerConstants.MyEventsOptions.Participant
             };
-            var result = _eventListingService.GetMyEvents(myEventsOptions);
-            Assert.AreEqual(result.Count(), 3);
+
+            var result = _eventListingService.GetMyEvents(myEventsOptions).ToList();
+            Assert.AreEqual(result.Count, 3);
             Assert.IsTrue(result.First(x => x.Id == eventGuids[2]).IsParticipating);
             Assert.IsTrue(result.First(x => x.Id == eventGuids[0]).IsParticipating);
             Assert.IsTrue(result.First(x => x.Id == eventGuids[2]).StartDate < result.First(x => x.Id == eventGuids[0]).StartDate);
@@ -115,10 +116,11 @@ namespace Shrooms.UnitTests.DomainService
                 OrganizationId = 2,
                 UserId = "responsibleUserId2",
                 SearchString = null,
-                Filter = MyEventsOptions.Host
+                Filter = BusinessLayerConstants.MyEventsOptions.Host
             };
-            var result = _eventListingService.GetMyEvents(myEventsOptions);
-            Assert.AreEqual(result.Count(), 1);
+
+            var result = _eventListingService.GetMyEvents(myEventsOptions).ToList();
+            Assert.AreEqual(result.Count, 1);
             Assert.IsTrue(result.First(x => x.Id == eventGuids[3]).IsCreator);
         }
 
@@ -130,6 +132,7 @@ namespace Shrooms.UnitTests.DomainService
             {
                 OrganizationId = 2
             };
+
             var result = _eventListingService.GetEventOptions(eventsGuids[1], userOrg);
             Assert.AreEqual(result.Options.Count(), 2);
             Assert.AreEqual(result.Options.First(o => o.Id == 4).Option, "Option1");
@@ -142,7 +145,7 @@ namespace Shrooms.UnitTests.DomainService
             var deadlineDate = DateTime.Parse("2016-05-01");
             var startDate = DateTime.Parse("2016-04-28");
             var ex = Assert.Throws<EventException>(() => _eventValidationService.CheckIfRegistrationDeadlineExceedsStartDate(deadlineDate, startDate));
-            Assert.AreEqual(ex.Message, EventRegistrationDeadlineGreaterThanStartDateCode);
+            Assert.AreEqual(ex.Message, ErrorCodes.EventRegistrationDeadlineGreaterThanStartDateCode);
         }
 
         [Test]
@@ -167,7 +170,7 @@ namespace Shrooms.UnitTests.DomainService
             var deadlineDate = DateTime.Parse("2016-05-01");
             _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-05-02"));
             var ex = Assert.Throws<EventException>(() => _eventValidationService.CheckIfRegistrationDeadlineIsExpired(deadlineDate));
-            Assert.AreEqual(ex.Message, EventRegistrationDeadlineIsExpired);
+            Assert.AreEqual(ex.Message, ErrorCodes.EventRegistrationDeadlineIsExpired);
         }
 
         [Test]
@@ -176,7 +179,7 @@ namespace Shrooms.UnitTests.DomainService
             var deadlineDate = DateTime.Parse("2016-05-01");
             _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-05-02"));
             var ex = Assert.Throws<EventException>(() => _eventValidationService.CheckIfRegistrationDeadlineIsExpired(deadlineDate));
-            Assert.AreEqual(ex.Message, EventRegistrationDeadlineIsExpired);
+            Assert.AreEqual(ex.Message, ErrorCodes.EventRegistrationDeadlineIsExpired);
         }
 
         #region Mocks

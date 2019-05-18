@@ -1,15 +1,15 @@
-﻿using Shrooms.DataTransferObjects.Models.CalendarEvent;
-using Shrooms.EntityModels.Models;
-using Shrooms.EntityModels.Models.Events;
-using Shrooms.Host.Contracts.DAL;
-using Shrooms.Infrastructure.Calendar;
-using Shrooms.Infrastructure.FireAndForget;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using Shrooms.EntityModels.Models;
+using Shrooms.EntityModels.Models.Events;
+using Shrooms.Host.Contracts.DAL;
+using Shrooms.Infrastructure.FireAndForget;
+using Shrooms.Premium.Infrastructure.Shrooms.Infrastructure.Calendar;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Calendar;
 
-namespace Shrooms.Domain.Services.Events.Calendar
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Calendar
 {
     public class EventCalendarService : IEventCalendarService
     {

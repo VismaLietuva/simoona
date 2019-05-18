@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Shrooms.DataTransferObjects.Models;
-using Shrooms.DataTransferObjects.Models.Events;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Events;
 
-namespace Shrooms.Domain.Services.Events.Utilities
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Utilities
 {
     public interface IEventUtilitiesService
     {

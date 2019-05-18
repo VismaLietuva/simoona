@@ -1,29 +1,29 @@
-﻿using NSubstitute;
-using NUnit.Framework;
-using Shrooms.Constants.Authorization.Permissions;
-using Shrooms.DataTransferObjects.Models;
-using Shrooms.DataTransferObjects.Models.Events;
-using Shrooms.DataTransferObjects.Models.Wall;
-using Shrooms.Domain.Services.Events;
-using Shrooms.Domain.Services.Events.Calendar;
-using Shrooms.Domain.Services.Events.Participation;
-using Shrooms.Domain.Services.Events.Utilities;
-using Shrooms.Domain.Services.Permissions;
-using Shrooms.Domain.Services.Wall;
-using Shrooms.DomainExceptions.Exceptions.Event;
-using Shrooms.DomainServiceValidators.Validators.Events;
-using Shrooms.EntityModels.Models;
-using Shrooms.EntityModels.Models.Events;
-using Shrooms.Infrastructure.SystemClock;
-using Shrooms.UnitTests.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using NSubstitute;
+using NUnit.Framework;
+using Shrooms.DataTransferObjects.Models;
+using Shrooms.DataTransferObjects.Models.Wall;
+using Shrooms.Domain.Services.Permissions;
+using Shrooms.Domain.Services.Wall;
+using Shrooms.EntityModels.Models;
+using Shrooms.EntityModels.Models.Events;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
-using static Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes.ErrorCodes;
+using Shrooms.Infrastructure.SystemClock;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Events;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Calendar;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Participation;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Utilities;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DomainExceptions.Exceptions.Event;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DomainServiceValidators.Validators.Events;
+using Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes;
+using Shrooms.UnitTests.Extensions;
 
-namespace Shrooms.UnitTests.DomainService
+namespace Shrooms.Premium.UnitTests.DomainService
 {
     public class EventCrudServiceTests
     {
@@ -288,7 +288,7 @@ namespace Shrooms.UnitTests.DomainService
                 }
             };
             var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
-            Assert.That(ex.Message, Is.EqualTo(EventOptionsCantDuplicate));
+            Assert.That(ex.Message, Is.EqualTo(ErrorCodes.EventOptionsCantDuplicate));
         }
 
         [Test]
@@ -316,7 +316,7 @@ namespace Shrooms.UnitTests.DomainService
                 }
             };
             var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
-            Assert.That(ex.Message, Is.EqualTo(EventResponsiblePersonDoesNotExistCode));
+            Assert.That(ex.Message, Is.EqualTo(ErrorCodes.EventResponsiblePersonDoesNotExistCode));
         }
 
         [Test]
@@ -345,7 +345,7 @@ namespace Shrooms.UnitTests.DomainService
             };
 
             var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
-            Assert.That(ex.Message, Is.EqualTo(EventTypeDoesNotExistCode));
+            Assert.That(ex.Message, Is.EqualTo(ErrorCodes.EventTypeDoesNotExistCode));
         }
 
         [Test]
@@ -375,7 +375,7 @@ namespace Shrooms.UnitTests.DomainService
                 }
             };
             var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
-            Assert.That(ex.Message, Is.EqualTo(EventRegistrationDeadlineIsExpired));
+            Assert.That(ex.Message, Is.EqualTo(ErrorCodes.EventRegistrationDeadlineIsExpired));
         }
 
         [Test]
@@ -405,7 +405,7 @@ namespace Shrooms.UnitTests.DomainService
                 }
             };
             var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
-            Assert.That(ex.Message, Is.EqualTo(EventRegistrationDeadlineGreaterThanStartDateCode));
+            Assert.That(ex.Message, Is.EqualTo(ErrorCodes.EventRegistrationDeadlineGreaterThanStartDateCode));
         }
 
         [Test]
@@ -433,7 +433,7 @@ namespace Shrooms.UnitTests.DomainService
                 }
             };
             var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
-            Assert.That(ex.Message, Is.EqualTo(EventStartDateGreaterThanEndDateCode));
+            Assert.That(ex.Message, Is.EqualTo(ErrorCodes.EventStartDateGreaterThanEndDateCode));
         }
 
         [Test]
@@ -461,7 +461,7 @@ namespace Shrooms.UnitTests.DomainService
                 }
             };
             var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
-            Assert.That(ex.Message, Is.EqualTo(EventNeedTohaveMaxChoiceCode));
+            Assert.That(ex.Message, Is.EqualTo(ErrorCodes.EventNeedToHaveMaxChoiceCode));
         }
 
         [Test]
@@ -501,7 +501,7 @@ namespace Shrooms.UnitTests.DomainService
                 }
             };
             var ex = Assert.Throws<EventException>(() => _eventService.UpdateEvent(newEvent));
-            Assert.That(ex.Message, Is.EqualTo(EventDoesNotExistCode));
+            Assert.That(ex.Message, Is.EqualTo(ErrorCodes.EventDoesNotExistCode));
         }
 
         [Test]
@@ -543,7 +543,7 @@ namespace Shrooms.UnitTests.DomainService
                 }
             };
             var ex = Assert.Throws<EventException>(() => _eventService.UpdateEvent(newEvent));
-            Assert.That(EventDontHavePermissionCode, Is.EqualTo(ex.Message));
+            Assert.That(ErrorCodes.EventDontHavePermissionCode, Is.EqualTo(ex.Message));
         }
 
         [Test]

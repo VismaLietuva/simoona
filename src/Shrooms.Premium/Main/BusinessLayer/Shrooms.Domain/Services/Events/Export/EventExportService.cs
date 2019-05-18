@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataTransferObjects.Models;
-using Shrooms.Domain.Services.Events.Participation;
-using Shrooms.Domain.Services.Events.Utilities;
 using Shrooms.Infrastructure.ExcelGenerator;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Participation;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Utilities;
 
-namespace Shrooms.Domain.Services.Events.Export
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Export
 {
     public class EventExportService : IEventExportService
     {
         private readonly IEventParticipationService _eventParticipationService;
-        private readonly IEventUtilitiesService _eventUtlitiesService;
+        private readonly IEventUtilitiesService _eventUtilitiesService;
         private readonly IExcelBuilder _excelBuilder;
 
         public EventExportService(
@@ -21,7 +21,7 @@ namespace Shrooms.Domain.Services.Events.Export
             IExcelBuilder excelBuilder)
         {
             _eventParticipationService = eventParticipationService;
-            _eventUtlitiesService = eventUtilitiesService;
+            _eventUtilitiesService = eventUtilitiesService;
             _excelBuilder = excelBuilder;
         }
         public byte[] ExportOptionsAndParticipants(Guid eventId, UserAndOrganizationDTO userAndOrg)
@@ -30,7 +30,7 @@ namespace Shrooms.Domain.Services.Events.Export
                 .GetEventParticipants(eventId, userAndOrg)
                 .Select(x => new List<string> { x.FirstName, x.LastName });
 
-            var options = _eventUtlitiesService.GetEventChosenOptions(eventId, userAndOrg)
+            var options = _eventUtilitiesService.GetEventChosenOptions(eventId, userAndOrg)
                 .Select(x => new List<string> { x.Option, x.Count.ToString() });
 
             AddParticipants(participants);
@@ -52,7 +52,7 @@ namespace Shrooms.Domain.Services.Events.Export
             };
 
             _excelBuilder.AddNewWorksheet(
-                ConstBusinessLayer.EventOptionsExcelTableName,
+                BusinessLayerConstants.EventOptionsExcelTableName,
                 header,
                 options);
         }
@@ -66,7 +66,7 @@ namespace Shrooms.Domain.Services.Events.Export
             };
 
             _excelBuilder.AddNewWorksheet(
-                ConstBusinessLayer.EventParticipantsExcelTableName,
+                BusinessLayerConstants.EventParticipantsExcelTableName,
                 header,
                 participants);
         }

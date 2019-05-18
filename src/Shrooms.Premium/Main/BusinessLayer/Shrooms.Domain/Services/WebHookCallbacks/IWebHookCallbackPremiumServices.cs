@@ -1,5 +1,5 @@
-﻿using Shrooms.Domain.Services.WebHookCallbacks.Events;
-using Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos;
+﻿using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.WebHookCallbacks.Events;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.WebHookCallbacks
 {

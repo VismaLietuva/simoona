@@ -1,17 +1,17 @@
-﻿using NSubstitute;
+﻿using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Constants.Authorization;
 using Shrooms.DataTransferObjects.Models;
-using Shrooms.Domain.Services.OrganizationalStructure;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.EntityModels.Models;
-using Shrooms.UnitTests.Extensions;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.OrganizationalStructure;
+using Shrooms.UnitTests.Extensions;
 
-namespace Shrooms.UnitTests.DomainService
+namespace Shrooms.Premium.UnitTests.DomainService
 {
     [TestFixture]
     public class OrganizationalStructureTests

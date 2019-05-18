@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using Shrooms.EntityModels.Models;
 
-namespace Shrooms.Domain.Services.Vacations
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Vacations
 {
     public interface IVacationDomainService
     {

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Shrooms.DataTransferObjects.Models.Events;
-using Shrooms.WebViewModels.Models.User;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Events;
+using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.User;
 
 namespace Shrooms.Premium.Infrastructure.Shrooms.ModelMappings.Profiles
 {
@@ -12,8 +12,8 @@ namespace Shrooms.Premium.Infrastructure.Shrooms.ModelMappings.Profiles
         }
 
         private void CreateDtoToViewModelMappings()
-        { 
-            CreateMap<EventUserSearchResultDTO, EventUserSearchResultViewModel>(); 
+        {
+            CreateMap<EventUserSearchResultDTO, EventUserSearchResultViewModel>();
         }
     }
 }

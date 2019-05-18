@@ -1,17 +1,17 @@
-﻿using AutoMapper;
+﻿using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using AutoMapper;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Constants.Authorization;
-using Shrooms.EntityModels.Models;
-using Shrooms.UnitTests.Extensions;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using Shrooms.Domain.Services.OfficeMap;
 using Shrooms.Domain.Services.Roles;
+using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.OfficeMap;
+using Shrooms.UnitTests.Extensions;
 
-namespace Ace.Shrooms.Tests.DomainService
+namespace Shrooms.Premium.UnitTests.DomainService
 {
     [TestFixture]
     public class OfficeMapServiceTests

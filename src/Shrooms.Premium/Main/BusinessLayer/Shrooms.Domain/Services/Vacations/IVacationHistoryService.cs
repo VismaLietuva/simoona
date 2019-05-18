@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
-using Shrooms.DataTransferObjects.Models.Vacations;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Vacations;
 
-namespace Shrooms.Domain.Services.Vacations
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Vacations
 {
     public interface IVacationHistoryService
     {

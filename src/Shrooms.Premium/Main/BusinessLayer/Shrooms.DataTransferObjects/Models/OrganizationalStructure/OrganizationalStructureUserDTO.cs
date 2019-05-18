@@ -1,4 +1,4 @@
-﻿namespace Shrooms.DataTransferObjects.Models.OrganizationalStructure
+﻿namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.OrganizationalStructure
 {
     public class OrganizationalStructureUserDTO
     {

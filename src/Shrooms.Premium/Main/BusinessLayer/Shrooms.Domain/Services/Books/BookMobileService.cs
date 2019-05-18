@@ -4,15 +4,15 @@ using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using DomainServiceValidators.Validators.Books;
 using Shrooms.DataTransferObjects.Models.Books;
+using Shrooms.DomainServiceValidators.Validators.Books;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Books;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.GoogleBookApiService;
-using Shrooms.Infrastructure.GoogleBookService;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Books;
 
-namespace Shrooms.Domain.Services.Books
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Books
 {
     public class BookMobileService : IBookMobileService
     {

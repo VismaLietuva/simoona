@@ -1,16 +1,17 @@
-﻿using Shrooms.Constants;
+﻿using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using Shrooms.Constants;
 using Shrooms.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.DataTransferObjects.Models.Emails;
 using Shrooms.EntityModels.Models;
+using Shrooms.EntityModels.Models.Committee;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.Configuration;
 using Shrooms.Infrastructure.Email;
 using Shrooms.Infrastructure.Email.Templating;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
 
-namespace Shrooms.Domain.Services.Email.Committee
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Email.Committee
 {
     public class CommitteeNotificationService : ICommitteeNotificationService
     {
@@ -30,7 +31,7 @@ namespace Shrooms.Domain.Services.Email.Committee
             _mailingService = mailingService;
         }
 
-        public void NotifyCommitteeMembersAboutNewSuggestion(EntityModels.Models.Committee committee, CommitteeSuggestion suggestion)
+        public void NotifyCommitteeMembersAboutNewSuggestion(EntityModels.Models.Committee.Committee committee, CommitteeSuggestion suggestion)
         {
             if (committee.Members != null && committee.Members.Any())
             {

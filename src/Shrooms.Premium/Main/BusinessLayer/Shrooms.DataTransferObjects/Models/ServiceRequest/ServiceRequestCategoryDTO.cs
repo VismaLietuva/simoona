@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Shrooms.EntityModels.Models;
 
-namespace Shrooms.DataTransferObjects.Models.ServiceRequest
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.ServiceRequest
 {
     public class ServiceRequestCategoryDTO
     {

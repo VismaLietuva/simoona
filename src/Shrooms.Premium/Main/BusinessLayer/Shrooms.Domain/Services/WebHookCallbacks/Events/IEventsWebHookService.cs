@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Shrooms.Domain.Services.WebHookCallbacks.Events
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.WebHookCallbacks.Events
 {
     public interface IEventsWebHookService
     {

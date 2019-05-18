@@ -1,16 +1,15 @@
-﻿using Shrooms.DataTransferObjects.Models;
-using Shrooms.DataTransferObjects.Models.Events;
-using Shrooms.DomainExceptions.Exceptions;
-using Shrooms.EntityModels.Models.Events;
-using Shrooms.Host.Contracts.DAL;
-using Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using static Shrooms.Constants.ErrorCodes.ErrorCodes;
+using Shrooms.DataTransferObjects.Models;
+using Shrooms.DomainExceptions.Exceptions;
+using Shrooms.EntityModels.Models.Events;
+using Shrooms.Host.Contracts.DAL;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Events;
+using ErrorCodes = Shrooms.Constants.ErrorCodes.ErrorCodes;
 
-namespace Shrooms.Domain.Services.Events.Utilities
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Utilities
 {
     public class EventUtilitiesService : IEventUtilitiesService
     {
@@ -85,7 +84,7 @@ namespace Shrooms.Domain.Services.Events.Utilities
 
             if (eventType == null)
             {
-                throw new ValidationException(ContentDoesNotExist, "Event type does not exist");
+                throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Event type does not exist");
             }
 
             return eventType;
@@ -109,7 +108,7 @@ namespace Shrooms.Domain.Services.Events.Utilities
 
             if (orgEventType == null)
             {
-                throw new ValidationException(ContentDoesNotExist, "Event type does not exist");
+                throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Event type does not exist");
             }
 
             orgEventType.IsSingleJoin = eventType.IsSingleJoin;
@@ -129,7 +128,7 @@ namespace Shrooms.Domain.Services.Events.Utilities
 
             if (anyActiveEvents)
             {
-                throw new ValidationException(ContentDoesNotExist, "Event type has active events");
+                throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Event type has active events");
             }
 
             var eventType = _eventTypesDbSet
@@ -138,7 +137,7 @@ namespace Shrooms.Domain.Services.Events.Utilities
 
             if (eventType == null)
             {
-                throw new ValidationException(ContentDoesNotExist, "Event type does not exist");
+                throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Event type does not exist");
             }
 
             _eventTypesDbSet.Remove(eventType);
@@ -180,7 +179,7 @@ namespace Shrooms.Domain.Services.Events.Utilities
 
             if (nameAlreadyExists)
             {
-                throw new ValidationException(ErrorCodes.EventTypeNameAlreadyExists, "Event type name should be unique");
+                throw new ValidationException(Other.Shrooms.Constants.ErrorCodes.ErrorCodes.EventTypeNameAlreadyExists, "Event type name should be unique");
             }
         }
 

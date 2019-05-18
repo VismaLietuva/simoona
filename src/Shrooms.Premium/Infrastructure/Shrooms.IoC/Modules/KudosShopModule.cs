@@ -1,7 +1,7 @@
 ﻿using Autofac;
-using Shrooms.Domain.Services.KudosShop;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.KudosShop;
 
-namespace Shrooms.IoC.Modules
+namespace Shrooms.Premium.Infrastructure.Shrooms.IoC.Modules
 {
     public class KudosShopModule : Module
     {

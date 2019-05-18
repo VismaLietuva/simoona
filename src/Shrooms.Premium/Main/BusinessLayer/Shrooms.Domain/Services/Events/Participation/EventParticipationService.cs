@@ -1,29 +1,30 @@
-﻿using Shrooms.Constants.Authorization.Permissions;
-using Shrooms.Constants.BusinessLayer;
-using Shrooms.DataTransferObjects.Models;
-using Shrooms.DataTransferObjects.Models.Events;
-using Shrooms.Domain.Helpers;
-using Shrooms.Domain.Services.Email.Event;
-using Shrooms.Domain.Services.Events.Calendar;
-using Shrooms.Domain.Services.Permissions;
-using Shrooms.Domain.Services.Roles;
-using Shrooms.Domain.Services.Wall;
-using Shrooms.DomainServiceValidators.Validators.Events;
-using Shrooms.EntityModels.Models;
-using Shrooms.EntityModels.Models.Events;
-using Shrooms.Host.Contracts.DAL;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
+using Shrooms.Constants.Authorization;
+using Shrooms.Constants.BusinessLayer;
+using Shrooms.DataTransferObjects.Models;
+using Shrooms.Domain.Helpers;
+using Shrooms.Domain.Services.Permissions;
+using Shrooms.Domain.Services.Roles;
+using Shrooms.Domain.Services.Wall;
+using Shrooms.EntityModels.Models;
+using Shrooms.EntityModels.Models.Events;
+using Shrooms.Host.Contracts.Constants;
+using Shrooms.Host.Contracts.DAL;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Events;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Email.Event;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Calendar;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DomainServiceValidators.Validators.Events;
 using ISystemClock = Shrooms.Infrastructure.SystemClock.ISystemClock;
 
-namespace Shrooms.Domain.Services.Events.Participation
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Participation
 {
     public class EventParticipationService : IEventParticipationService
     {
-        private static object multiUserJoinLock = new object();
+        private static object _multiUserJoinLock = new object();
 
         private readonly IUnitOfWork2 _uow;
 
@@ -101,7 +102,7 @@ namespace Shrooms.Domain.Services.Events.Participation
 
         public void Join(EventJoinDTO joinDto)
         {
-            lock (multiUserJoinLock)
+            lock (_multiUserJoinLock)
             {
                 var @event = _eventsDbSet
                     .Include(x => x.EventParticipants)
@@ -207,7 +208,7 @@ namespace Shrooms.Domain.Services.Events.Participation
                     !participants.Contains(u.Id) &&
                     u.OrganizationId == userOrg.OrganizationId &&
                     u.Id != userOrg.UserId)
-                .Where(_roleService.ExcludeUsersWithRole(Constants.Authorization.Roles.NewUser))
+                .Where(_roleService.ExcludeUsersWithRole(global::Shrooms.Constants.Authorization.Roles.NewUser))
                 .OrderBy(u => u.Id)
                 .Select(u => new EventUserSearchResultDTO
                 {
@@ -271,9 +272,8 @@ namespace Shrooms.Domain.Services.Events.Participation
         public int GetMaxParticipantsCount(UserAndOrganizationDTO userAndOrganizationDTO)
         {
             var maxParticipantsCount = _usersDbSet
-                .Where(_roleService.ExcludeUsersWithRole(Constants.Authorization.Roles.NewUser))
-                .Where(x => x.OrganizationId == userAndOrganizationDTO.OrganizationId)
-                .Count();
+                .Where(_roleService.ExcludeUsersWithRole(Roles.NewUser))
+                .Count(x => x.OrganizationId == userAndOrganizationDTO.OrganizationId);
 
             return maxParticipantsCount;
         }
@@ -301,11 +301,9 @@ namespace Shrooms.Domain.Services.Events.Participation
             var participant = _eventParticipantsDbSet
                             .Include(p => p.Event)
                             .Include(p => p.EventOptions)
-                            .Where(p =>
-                                p.EventId == eventId &&
-                                p.Event.OrganizationId == userOrg &&
-                                p.ApplicationUserId == userId)
-                            .SingleOrDefault();
+                            .SingleOrDefault(p => p.EventId == eventId &&
+                                    p.Event.OrganizationId == userOrg &&
+                                    p.ApplicationUserId == userId);
 
             _eventValidationService.CheckIfEventExists(participant);
             _eventValidationService.CheckIfParticipantExists(participant);
@@ -318,11 +316,11 @@ namespace Shrooms.Domain.Services.Events.Participation
             return e => e.EventParticipants.Select(p => new EventParticipantDTO
             {
                 FirstName = string.IsNullOrEmpty(p.ApplicationUser.FirstName)
-                        ? ConstBusinessLayer.DeletedUserFirstName
+                        ? BusinessLayerConstants.DeletedUserFirstName
                         : p.ApplicationUser.FirstName,
 
                 LastName = string.IsNullOrEmpty(p.ApplicationUser.LastName)
-                        ? ConstBusinessLayer.DeletedUserLastName
+                        ? BusinessLayerConstants.DeletedUserLastName
                         : p.ApplicationUser.LastName
             });
         }
@@ -353,18 +351,16 @@ namespace Shrooms.Domain.Services.Events.Participation
             {
                 var eventToLeave = _eventsDbSet
                     .Include(e => e.EventParticipants)
-                    .Where(x =>
-                        x.EventTypeId == eventTypeId &&
-                        x.OrganizationId == organizationId &&
-                        x.StartDate > _systemClock.UtcNow &&
-                        x.EventParticipants.Any(p => p.ApplicationUserId == userId))
-                    .SingleOrDefault();
+                    .SingleOrDefault(x => x.EventTypeId == eventTypeId &&
+                            x.OrganizationId == organizationId &&
+                            x.StartDate > _systemClock.UtcNow &&
+                            x.EventParticipants.Any(p => p.ApplicationUserId == userId));
 
                 _eventValidationService.CheckIfUserExistsInOtherSingleJoinEvent(eventToLeave);
             }
         }
 
-        private void AddParticipant(string userId, Guid eventId, List<EventOption> eventOptions)
+        private void AddParticipant(string userId, Guid eventId, ICollection<EventOption> eventOptions)
         {
             var timeStamp = _systemClock.UtcNow;
             var newParticipant = new EventParticipant

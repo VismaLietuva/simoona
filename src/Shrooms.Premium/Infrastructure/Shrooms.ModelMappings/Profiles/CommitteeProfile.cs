@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
-using Shrooms.DataTransferObjects.Models.Committees;
 using Shrooms.EntityModels.Models;
-using Shrooms.WebViewModels.Models.Committees;
+using Shrooms.EntityModels.Models.Committee;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Committees;
+using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Committees;
 
-namespace Shrooms.ModelMappings.Profiles
+namespace Shrooms.Premium.Infrastructure.Shrooms.ModelMappings.Profiles
 {
     public class CommitteeProfile : Profile
     {
@@ -16,8 +17,8 @@ namespace Shrooms.ModelMappings.Profiles
 
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<CommitteePostViewModel, CommitteePostDTO>();        
-            CreateMap<CommitteeSuggestionPostViewModel, CommitteeSuggestionPostDTO>();                     
+            CreateMap<CommitteePostViewModel, CommitteePostDTO>();
+            CreateMap<CommitteeSuggestionPostViewModel, CommitteeSuggestionPostDTO>();
         }
 
         private void CreateViewModelMappings()

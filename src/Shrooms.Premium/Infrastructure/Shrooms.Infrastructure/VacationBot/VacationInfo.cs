@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Shrooms.Infrastructure.VacationBot
+namespace Shrooms.Premium.Infrastructure.Shrooms.Infrastructure.VacationBot
 {
     public class VacationInfo
     {

@@ -1,28 +1,28 @@
-﻿using NSubstitute;
-using NUnit.Framework;
-using Shrooms.Constants.Authorization;
-using Shrooms.DataTransferObjects.Models;
-using Shrooms.DataTransferObjects.Models.Events;
-using Shrooms.Domain.Services.Email.Event;
-using Shrooms.Domain.Services.Events.Calendar;
-using Shrooms.Domain.Services.Events.Participation;
-using Shrooms.Domain.Services.Permissions;
-using Shrooms.Domain.Services.Roles;
-using Shrooms.Domain.Services.Wall;
-using Shrooms.DomainExceptions.Exceptions.Event;
-using Shrooms.DomainServiceValidators.Validators.Events;
-using Shrooms.EntityModels.Models;
-using Shrooms.EntityModels.Models.Events;
-using Shrooms.Infrastructure.SystemClock;
-using Shrooms.UnitTests.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using NSubstitute;
+using NUnit.Framework;
+using Shrooms.Constants.Authorization;
+using Shrooms.DataTransferObjects.Models;
+using Shrooms.Domain.Services.Permissions;
+using Shrooms.Domain.Services.Roles;
+using Shrooms.Domain.Services.Wall;
+using Shrooms.EntityModels.Models;
+using Shrooms.EntityModels.Models.Events;
 using Shrooms.Host.Contracts.DAL;
-using static Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes.ErrorCodes;
+using Shrooms.Infrastructure.SystemClock;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Events;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Email.Event;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Calendar;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Participation;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DomainExceptions.Exceptions.Event;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DomainServiceValidators.Validators.Events;
+using Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes;
+using Shrooms.UnitTests.Extensions;
 
-namespace Shrooms.UnitTests.DomainService.EventServices
+namespace Shrooms.Premium.UnitTests.DomainService.EventServices
 {
     [TestFixture]
     public class EventParticipantServiceTests
@@ -88,7 +88,7 @@ namespace Shrooms.UnitTests.DomainService.EventServices
             var eventJoinDto = new EventJoinDTO
             {
                 ChosenOptions = new List<int>(),
-                ParticipantIds = new List<string>() { "testUserId" },
+                ParticipantIds = new List<string> { "testUserId" },
                 EventId = eventGuid,
                 UserId = "testUserId",
                 OrganizationId = 2
@@ -106,7 +106,7 @@ namespace Shrooms.UnitTests.DomainService.EventServices
             var eventJoinDto = new EventJoinDTO
             {
                 ChosenOptions = new List<int> { 1 },
-                ParticipantIds = new List<string>() { "testUserId" },
+                ParticipantIds = new List<string> { "testUserId" },
                 EventId = eventGuid,
                 UserId = "testUserId",
                 OrganizationId = 2
@@ -122,7 +122,7 @@ namespace Shrooms.UnitTests.DomainService.EventServices
 
             var registrationDeadline = DateTime.Parse("2016-06-20");
             var ex = Assert.Throws<EventException>(() => _eventValidationService.CheckIfRegistrationDeadlineIsExpired(registrationDeadline));
-            Assert.That(ex.Message, Is.EqualTo(EventRegistrationDeadlineIsExpired));
+            Assert.That(ex.Message, Is.EqualTo(ErrorCodes.EventRegistrationDeadlineIsExpired));
         }
 
         [Test]
@@ -138,7 +138,7 @@ namespace Shrooms.UnitTests.DomainService.EventServices
             var maxChoices = 2;
             var choicesProvided = 0;
             var ex = Assert.Throws<EventException>(() => _eventValidationService.CheckIfJoiningNotEnoughChoicesProvided(maxChoices, choicesProvided));
-            Assert.That(ex.Message, Is.EqualTo(EventNotEnoughChoicesProvidedCode));
+            Assert.That(ex.Message, Is.EqualTo(ErrorCodes.EventNotEnoughChoicesProvidedCode));
         }
 
         [Test]
@@ -147,7 +147,7 @@ namespace Shrooms.UnitTests.DomainService.EventServices
             var maxChoices = 2;
             var choicesProvided = 3;
             var ex = Assert.Throws<EventException>(() => _eventValidationService.CheckIfJoiningTooManyChoicesProvided(maxChoices, choicesProvided));
-            Assert.That(ex.Message, Is.EqualTo(EventTooManyChoicesProvidedCode));
+            Assert.That(ex.Message, Is.EqualTo(ErrorCodes.EventTooManyChoicesProvidedCode));
         }
 
         [Test]
@@ -156,7 +156,7 @@ namespace Shrooms.UnitTests.DomainService.EventServices
             var maxParticipants = 5;
             var participantsCount = 6;
             var ex = Assert.Throws<EventException>(() => _eventValidationService.CheckIfEventHasEnoughPlaces(maxParticipants, participantsCount));
-            Assert.That(ex.Message, Is.EqualTo(EventIsFullCode));
+            Assert.That(ex.Message, Is.EqualTo(ErrorCodes.EventIsFullCode));
         }
 
         [Test]
@@ -164,7 +164,7 @@ namespace Shrooms.UnitTests.DomainService.EventServices
         {
             var isAlreadyParticipating = true;
             var ex = Assert.Throws<EventException>(() => _eventValidationService.CheckIfUserAlreadyJoinedSameEvent(isAlreadyParticipating));
-            Assert.That(ex.Message, Is.EqualTo(EventUserAlreadyParticipatesCode)); ;
+            Assert.That(ex.Message, Is.EqualTo(ErrorCodes.EventUserAlreadyParticipatesCode));
         }
 
         [Test]
@@ -175,8 +175,8 @@ namespace Shrooms.UnitTests.DomainService.EventServices
             _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-04-02"));
             var eventJoinDto = new EventJoinDTO
             {
-                ParticipantIds = new List<string>() { "testUserId", "1" },
-                ChosenOptions = new List<int>() { 1 },
+                ParticipantIds = new List<string> { "testUserId", "1" },
+                ChosenOptions = new List<int> { 1 },
                 EventId = eventGuid,
                 OrganizationId = 2
             };
@@ -195,8 +195,8 @@ namespace Shrooms.UnitTests.DomainService.EventServices
                 OrganizationId = 2
             };
 
-            var result = _eventParticipationService.GetEventParticipants(eventGuid, userAndOrg);
-            Assert.AreEqual(2, result.Count());
+            var result = _eventParticipationService.GetEventParticipants(eventGuid, userAndOrg).ToList();
+            Assert.AreEqual(2, result.Count);
             Assert.AreEqual("Name", result.First().FirstName);
         }
 
@@ -300,8 +300,8 @@ namespace Shrooms.UnitTests.DomainService.EventServices
         {
             var userId = "user";
             var eventCreatorId = "creator";
-            var IsAdmin = false;
-            Assert.Throws<EventException>(() => _eventValidationService.CheckIfUserHasPermission(userId, eventCreatorId, IsAdmin));
+            var isAdmin = false;
+            Assert.Throws<EventException>(() => _eventValidationService.CheckIfUserHasPermission(userId, eventCreatorId, isAdmin));
         }
 
         [Test]
@@ -309,8 +309,8 @@ namespace Shrooms.UnitTests.DomainService.EventServices
         {
             var userId = "creator";
             var eventCreatorId = "creator";
-            var IsAdmin = false;
-            Assert.DoesNotThrow(() => _eventValidationService.CheckIfUserHasPermission(userId, eventCreatorId, IsAdmin));
+            var isAdmin = false;
+            Assert.DoesNotThrow(() => _eventValidationService.CheckIfUserHasPermission(userId, eventCreatorId, isAdmin));
         }
 
         [Test]
@@ -318,8 +318,8 @@ namespace Shrooms.UnitTests.DomainService.EventServices
         {
             var userId = "user";
             var eventCreatorId = "creator";
-            var IsAdmin = true;
-            Assert.DoesNotThrow(() => _eventValidationService.CheckIfUserHasPermission(userId, eventCreatorId, IsAdmin));
+            var isAdmin = true;
+            Assert.DoesNotThrow(() => _eventValidationService.CheckIfUserHasPermission(userId, eventCreatorId, isAdmin));
         }
 
         [Test]
@@ -331,8 +331,8 @@ namespace Shrooms.UnitTests.DomainService.EventServices
             {
                 OrganizationId = 2
             };
-            var result = _eventParticipationService.SearchForEventJoinAutocomplete(eventId, searchString, userOrg);
-            Assert.AreEqual(3, result.Count());
+            var result = _eventParticipationService.SearchForEventJoinAutocomplete(eventId, searchString, userOrg).ToList();
+            Assert.AreEqual(3, result.Count);
             Assert.IsFalse(result.Any(x => x.Id == "user1"));
             Assert.IsFalse(result.Any(x => x.Id == "user2"));
         }
@@ -346,8 +346,8 @@ namespace Shrooms.UnitTests.DomainService.EventServices
             {
                 OrganizationId = 2
             };
-            var result = _eventParticipationService.SearchForEventJoinAutocomplete(eventId, searchString, userOrg);
-            Assert.AreEqual(1, result.Count());
+            var result = _eventParticipationService.SearchForEventJoinAutocomplete(eventId, searchString, userOrg).ToList();
+            Assert.AreEqual(1, result.Count);
             Assert.AreEqual("user4", result.First().Id);
         }
 
@@ -360,8 +360,8 @@ namespace Shrooms.UnitTests.DomainService.EventServices
             {
                 OrganizationId = 2
             };
-            var result = _eventParticipationService.SearchForEventJoinAutocomplete(eventId, searchString, userOrg);
-            Assert.AreEqual(1, result.Count());
+            var result = _eventParticipationService.SearchForEventJoinAutocomplete(eventId, searchString, userOrg).ToList();
+            Assert.AreEqual(1, result.Count);
             Assert.AreEqual("user1", result.First().Id);
         }
 
@@ -374,8 +374,8 @@ namespace Shrooms.UnitTests.DomainService.EventServices
             {
                 OrganizationId = 2
             };
-            var result = _eventParticipationService.SearchForEventJoinAutocomplete(eventId, searchString, userOrg);
-            Assert.AreEqual(1, result.Count());
+            var result = _eventParticipationService.SearchForEventJoinAutocomplete(eventId, searchString, userOrg).ToList();
+            Assert.AreEqual(1, result.Count);
             Assert.AreEqual("user1", result.First().Id);
         }
 
@@ -388,8 +388,8 @@ namespace Shrooms.UnitTests.DomainService.EventServices
             {
                 OrganizationId = 2
             };
-            var result = _eventParticipationService.SearchForEventJoinAutocomplete(eventId, searchString, userOrg);
-            Assert.AreEqual(1, result.Count());
+            var result = _eventParticipationService.SearchForEventJoinAutocomplete(eventId, searchString, userOrg).ToList();
+            Assert.AreEqual(1, result.Count);
             Assert.AreEqual("user1", result.First().Id);
         }
 
@@ -410,7 +410,7 @@ namespace Shrooms.UnitTests.DomainService.EventServices
                     Id = guid,
                     OrganizationId = 2,
                     Name = "Test event",
-                    EventParticipants = new List<EventParticipant>()
+                    EventParticipants = new List<EventParticipant>
                     {
                         new EventParticipant
                         {
@@ -435,7 +435,7 @@ namespace Shrooms.UnitTests.DomainService.EventServices
             return guid;
         }
 
-        public Guid MockEventAndUsersForSearch2()
+        private Guid MockEventAndUsersForSearch2()
         {
             var eventId = Guid.NewGuid();
             var @event = new Event
@@ -494,7 +494,7 @@ namespace Shrooms.UnitTests.DomainService.EventServices
             return eventId;
         }
 
-        public Guid MockEventAndUsersForSearch()
+        private Guid MockEventAndUsersForSearch()
         {
             var eventId = Guid.NewGuid();
             var participants = new List<EventParticipant>
@@ -634,7 +634,7 @@ namespace Shrooms.UnitTests.DomainService.EventServices
 
         private Guid MockLeaveEvent()
         {
-            _eventValidationServiceMock.When(x => x.CheckIfParticipantExists(null)).Do(x => { throw new EventException("Exception"); });
+            _eventValidationServiceMock.When(x => x.CheckIfParticipantExists(null)).Do(x => throw new EventException("Exception"));
             var eventId = Guid.NewGuid();
             var @event = new Event
             {
@@ -991,12 +991,12 @@ namespace Shrooms.UnitTests.DomainService.EventServices
         {
             var types = new List<ApplicationUser>
             {
-               new ApplicationUser()
+               new ApplicationUser
                {
                    Id = "1",
                    OrganizationId = 2
                },
-               new ApplicationUser()
+               new ApplicationUser
                {
                    Id = "testUserId",
                    OrganizationId = 2

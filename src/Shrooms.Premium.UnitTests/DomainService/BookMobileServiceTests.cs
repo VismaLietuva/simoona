@@ -1,20 +1,20 @@
-﻿using DomainServiceValidators.Validators.Books;
-using NSubstitute;
-using NUnit.Framework;
-using Shrooms.DataTransferObjects.Models.Books;
-using Shrooms.DomainExceptions.Exceptions.Book;
-using Shrooms.EntityModels.Models;
-using Shrooms.EntityModels.Models.Books;
-using Shrooms.Infrastructure.GoogleBookService;
-using Shrooms.UnitTests.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using Shrooms.Domain.Services.Books;
+using NSubstitute;
+using NUnit.Framework;
+using Shrooms.DomainExceptions.Exceptions.Book;
+using Shrooms.DomainServiceValidators.Validators.Books;
+using Shrooms.EntityModels.Models;
+using Shrooms.EntityModels.Models.Books;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Infrastructure.GoogleBookApiService;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Books;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Books;
+using Shrooms.UnitTests.Extensions;
 
-namespace Shrooms.UnitTests.DomainService
+namespace Shrooms.Premium.UnitTests.DomainService
 {
     [TestFixture]
     public class BookMobileServiceTests
@@ -58,16 +58,16 @@ namespace Shrooms.UnitTests.DomainService
         [Test]
         public void Should_Return_If_Gets_Wrong_Users_From_Autocomplete()
         {
-            var result = _bookService.GetUsersForAutoComplete("Fir", 1);
-            Assert.AreEqual(1, result.Count());
+            var result = _bookService.GetUsersForAutoComplete("Fir", 1).ToList();
+            Assert.AreEqual(1, result.Count);
             Assert.AreEqual("FirstName", result.First().FirstName);
         }
 
         [Test]
         public void Should_Return_If_Gets_Wrong_User_From_Autocomplete_By_Full_Name()
         {
-            var result = _bookService.GetUsersForAutoComplete("Eglė Vąlkyščkytė", 1);
-            Assert.AreEqual(1, result.Count());
+            var result = _bookService.GetUsersForAutoComplete("Eglė Vąlkyščkytė", 1).ToList();
+            Assert.AreEqual(1, result.Count);
             Assert.AreEqual("Vąlkyščkytė", result.First().LastName);
         }
 
@@ -207,8 +207,8 @@ namespace Shrooms.UnitTests.DomainService
                 OfficeId = 1
             };
 
-            var result = _bookService.ReturnBook(bookMobileReturnDTO);
-            Assert.AreEqual(2, result.Count());
+            var result = _bookService.ReturnBook(bookMobileReturnDTO).ToList();
+            Assert.AreEqual(2, result.Count);
             Assert.AreEqual(3, result.First().LogId);
         }
 

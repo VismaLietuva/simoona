@@ -1,9 +1,8 @@
 ﻿using Autofac;
-using Shrooms.Domain.Services.Email.ServiceRequest;
-using Shrooms.Domain.Services.ServiceRequests;
-using Shrooms.Domain.Services.ServiceRequests.Export;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Email.ServiceRequest;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.ServiceRequests;
 
-namespace Shrooms.IoC.Modules
+namespace Shrooms.Premium.Infrastructure.Shrooms.IoC.Modules
 {
     public class ServiceRequestModule : Module
     {

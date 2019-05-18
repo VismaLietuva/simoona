@@ -2,19 +2,18 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.ErrorCodes;
 using Shrooms.DataTransferObjects.Models;
-using Shrooms.DataTransferObjects.Models.ServiceRequest;
 using Shrooms.Domain.Helpers;
-using Shrooms.Domain.Services.Email.ServiceRequest;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
-using static Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes.ErrorCodes;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.ServiceRequest;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Email.ServiceRequest;
 
-namespace Shrooms.Domain.Services.ServiceRequests
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.ServiceRequests
 {
     public class ServiceRequestService : IServiceRequestService
     {
@@ -339,7 +338,7 @@ namespace Shrooms.Domain.Services.ServiceRequests
 
             if (currentServiceRequest.Status.Title == ServiceRequestStatusDone && currentServiceRequest.CategoryName == ServiceRequestCategoryKudos)
             {
-                throw new ValidationException(ServiceRequestIsClosed, "Kudos request status is done");
+                throw new ValidationException(Other.Shrooms.Constants.ErrorCodes.ErrorCodes.ServiceRequestIsClosed, "Kudos request status is done");
             }
         }
 

@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Shrooms.DataTransferObjects.Models.Books;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Books;
 
-namespace Shrooms.Domain.Services.Books
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Books
 {
     public interface IBookMobileService
     {

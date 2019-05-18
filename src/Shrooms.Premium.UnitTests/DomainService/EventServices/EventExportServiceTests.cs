@@ -1,19 +1,19 @@
-﻿using Excel;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using Excel;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.DataTransferObjects.Models;
-using Shrooms.DataTransferObjects.Models.Events;
 using Shrooms.Infrastructure.ExcelGenerator;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using Shrooms.Domain.Services.Events.Export;
-using Shrooms.Domain.Services.Events.Participation;
-using Shrooms.Domain.Services.Events.Utilities;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Events;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Export;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Participation;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Utilities;
 
-namespace Shrooms.UnitTests.DomainService.EventServices
+namespace Shrooms.Premium.UnitTests.DomainService.EventServices
 {
-    class EventExportServiceTests
+    public class EventExportServiceTests
     {
         private IEventUtilitiesService _eventUtilitiesService;
         private IEventParticipationService _eventParticipationService;
@@ -36,13 +36,14 @@ namespace Shrooms.UnitTests.DomainService.EventServices
         [Test]
         public void Should_Return_Excel_File_With_Participants()
         {
-            var UserAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDTO
             {
                 OrganizationId = 2,
             };
-            var guid = MockParticipantsWithOptionsForExport(UserAndOrg);
 
-            var stream = _eventExportService.ExportOptionsAndParticipants(guid, UserAndOrg);
+            var guid = MockParticipantsWithOptionsForExport(userAndOrg);
+
+            var stream = _eventExportService.ExportOptionsAndParticipants(guid, userAndOrg);
 
             using (IExcelDataReader excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
             {

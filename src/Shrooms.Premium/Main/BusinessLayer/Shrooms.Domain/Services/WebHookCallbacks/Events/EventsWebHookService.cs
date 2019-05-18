@@ -1,16 +1,16 @@
-﻿using Shrooms.DataTransferObjects.Models.Wall;
-using Shrooms.Domain.Services.Events.Calendar;
-using Shrooms.Domain.Services.Wall;
-using Shrooms.EntityModels.Models.Events;
-using Shrooms.Infrastructure.SystemClock;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
+using Shrooms.DataTransferObjects.Models.Wall;
+using Shrooms.Domain.Services.Wall;
+using Shrooms.EntityModels.Models.Events;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Infrastructure.SystemClock;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Calendar;
 
-namespace Shrooms.Domain.Services.WebHookCallbacks.Events
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.WebHookCallbacks.Events
 {
     public class EventsWebHookService : IEventsWebHookService
     {

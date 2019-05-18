@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Shrooms.DomainExceptions.Exceptions.Event
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.DomainExceptions.Exceptions.Event
 {
     public class EventException : Exception
     {

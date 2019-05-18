@@ -1,4 +1,4 @@
-﻿namespace Shrooms.DataTransferObjects.Models.Books
+﻿namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Books
 {
     public class MobileUserDTO
     {

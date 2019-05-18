@@ -1,10 +1,10 @@
-﻿using Shrooms.EntityModels.Models;
-using Shrooms.EntityModels.Models.Kudos;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Shrooms.EntityModels.Models;
+using Shrooms.EntityModels.Models.Kudos;
 
-namespace Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos
 {
     public class LoyaltyKudos
     {

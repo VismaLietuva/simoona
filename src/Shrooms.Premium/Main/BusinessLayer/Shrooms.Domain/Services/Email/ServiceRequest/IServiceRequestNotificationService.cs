@@ -1,7 +1,7 @@
 ﻿using Shrooms.DataTransferObjects.Models;
 using Shrooms.EntityModels.Models;
 
-namespace Shrooms.Domain.Services.Email.ServiceRequest
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Email.ServiceRequest
 {
     public interface IServiceRequestNotificationService
     {

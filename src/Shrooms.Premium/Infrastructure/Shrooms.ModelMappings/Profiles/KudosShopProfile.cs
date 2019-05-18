@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using Shrooms.DataTransferObjects.Models.Kudos;
-using Shrooms.WebViewModels.Models.KudosShop;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Kudos;
+using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.KudosShop;
 
-namespace Shrooms.ModelMappings.Profiles
+namespace Shrooms.Premium.Infrastructure.Shrooms.ModelMappings.Profiles
 {
     public class KudosShopProfile : Profile
     {

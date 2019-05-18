@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
-using Shrooms.ModelMappings.Profiles;
 using System;
+using Shrooms.Premium.Infrastructure.Shrooms.ModelMappings.Profiles;
 
 namespace Shrooms.Premium.UnitTests.ModelMappings
 {
-    public class ModelMapper
+    public static class ModelMapper
     {
         public static IMapper Create()
         {

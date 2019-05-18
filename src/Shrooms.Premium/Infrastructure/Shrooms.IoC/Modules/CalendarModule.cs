@@ -1,6 +1,6 @@
 ﻿using Autofac;
 using Hangfire;
-using Shrooms.Infrastructure.Calendar;
+using Shrooms.Premium.Infrastructure.Shrooms.Infrastructure.Calendar;
 
 namespace Shrooms.Premium.Infrastructure.Shrooms.IoC.Modules
 {

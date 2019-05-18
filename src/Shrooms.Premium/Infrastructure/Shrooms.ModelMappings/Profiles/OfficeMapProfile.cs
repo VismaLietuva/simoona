@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using Shrooms.DataTransferObjects.Models.OfficeMap;
 using Shrooms.EntityModels.Models;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.OfficeMap;
 
-namespace Shrooms.ModelMappings.Profiles
+namespace Shrooms.Premium.Infrastructure.Shrooms.ModelMappings.Profiles
 {
     public class OfficeMapProfile : Profile
     {

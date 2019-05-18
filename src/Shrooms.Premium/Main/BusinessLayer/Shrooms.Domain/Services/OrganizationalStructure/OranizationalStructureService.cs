@@ -5,12 +5,12 @@ using System.Linq;
 using System.Linq.Expressions;
 using MoreLinq;
 using Shrooms.DataTransferObjects.Models;
-using Shrooms.DataTransferObjects.Models.OrganizationalStructure;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.OrganizationalStructure;
 
-namespace Shrooms.Domain.Services.OrganizationalStructure
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.OrganizationalStructure
 {
     public class OrganizationalStructureService : IOrganizationalStructureService
     {
@@ -27,7 +27,7 @@ namespace Shrooms.Domain.Services.OrganizationalStructure
         {
             var userList = _applicationUsersDbSet
                 .Where(u => u.OrganizationId == userAndOrg.OrganizationId)
-                .Where(_roleService.ExcludeUsersWithRole(Constants.Authorization.Roles.NewUser))
+                .Where(_roleService.ExcludeUsersWithRole(global::Shrooms.Constants.Authorization.Roles.NewUser))
                 .Select(MapToOrganizationalStructureUserDTO())
                 .ToList();
 

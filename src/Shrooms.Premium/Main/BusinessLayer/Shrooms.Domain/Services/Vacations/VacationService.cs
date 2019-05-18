@@ -4,17 +4,17 @@ using System.Data;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
-using Excel;
-using Shrooms.DataTransferObjects.Models;
-using Shrooms.EntityModels.Models;
-using Shrooms.DataTransferObjects.Models.Vacations;
 using System.Threading.Tasks;
+using Excel;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
-using Shrooms.DomainExceptions.Exceptions.Vacation;
+using Shrooms.DataTransferObjects.Models;
+using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Vacations;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DomainExceptions.Exceptions.Vacation;
 
-namespace Shrooms.Domain.Services.Vacations
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Vacations
 {
     public class VacationService : IVacationService
     {

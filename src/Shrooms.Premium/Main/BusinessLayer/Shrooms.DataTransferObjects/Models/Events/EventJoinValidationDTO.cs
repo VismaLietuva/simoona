@@ -1,8 +1,8 @@
-﻿using Shrooms.EntityModels.Models.Events;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Shrooms.EntityModels.Models.Events;
 
-namespace Shrooms.DataTransferObjects.Models.Events
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Events
 {
     public class EventJoinValidationDTO
     {

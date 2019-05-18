@@ -1,9 +1,9 @@
-﻿using Shrooms.EntityModels.Models.Events;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using Shrooms.DataTransferObjects.Models.Events;
+using Shrooms.EntityModels.Models.Events;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Events;
 
-namespace Shrooms.DomainServiceValidators.Validators.Events
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.DomainServiceValidators.Validators.Events
 {
     public interface IEventValidationService
     {

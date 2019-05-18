@@ -1,7 +1,7 @@
 ﻿using Autofac;
-using Shrooms.Domain.Services.OrganizationalStructure;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.OrganizationalStructure;
 
-namespace Shrooms.IoC.Modules
+namespace Shrooms.Premium.Infrastructure.Shrooms.IoC.Modules
 {
     public class OrganizationalStructureModule : Module
     {

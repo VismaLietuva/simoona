@@ -1,13 +1,13 @@
-﻿using AutoMapper;
-using Shrooms.DataTransferObjects.Models.OfficeMap;
-using Shrooms.Domain.Services.Roles;
-using Shrooms.EntityModels.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using AutoMapper;
+using Shrooms.Domain.Services.Roles;
+using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.OfficeMap;
 
-namespace Shrooms.Domain.Services.OfficeMap
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.OfficeMap
 {
     public class OfficeMapService : IOfficeMapService
     {
@@ -41,7 +41,7 @@ namespace Shrooms.Domain.Services.OfficeMap
         {
             var applicationUsers = _applicationUserRepository
                 .Get(e => e.Room.FloorId == floorId, includeProperties: includeProperties)
-                .Where(_roleService.ExcludeUsersWithRole(Constants.Authorization.Roles.NewUser))
+                .Where(_roleService.ExcludeUsersWithRole(global::Shrooms.Constants.Authorization.Roles.NewUser))
                 .ToList();
 
             return _mapper.Map<IEnumerable<ApplicationUser>, IEnumerable<OfficeUserDTO>>(applicationUsers);
@@ -53,7 +53,7 @@ namespace Shrooms.Domain.Services.OfficeMap
                .Include(x => x.Room)
                .Include(x => x.Room.Floor)
                .Where(x => x.Room.Floor.OfficeId == officeId)
-               .Where(_roleService.ExcludeUsersWithRole(Constants.Authorization.Roles.NewUser))
+               .Where(_roleService.ExcludeUsersWithRole(global::Shrooms.Constants.Authorization.Roles.NewUser))
                .Select(x => x.Email)
                .ToList();
 
@@ -65,7 +65,7 @@ namespace Shrooms.Domain.Services.OfficeMap
             var usersEmail = _usersDbSet
                .Include(x => x.Room)
                .Where(x => x.Room.FloorId == floorId)
-               .Where(_roleService.ExcludeUsersWithRole(Constants.Authorization.Roles.NewUser))
+               .Where(_roleService.ExcludeUsersWithRole(global::Shrooms.Constants.Authorization.Roles.NewUser))
                .Select(x => x.Email)
                .ToList();
 
@@ -76,7 +76,7 @@ namespace Shrooms.Domain.Services.OfficeMap
         {
             var usersEmail = _usersDbSet
                 .Where(x => x.RoomId == roomId)
-                .Where(_roleService.ExcludeUsersWithRole(Constants.Authorization.Roles.NewUser))
+                .Where(_roleService.ExcludeUsersWithRole(global::Shrooms.Constants.Authorization.Roles.NewUser))
                 .Select(x => x.Email)
                 .ToList();
 

@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using Shrooms.DataTransferObjects.Models;
-using Shrooms.DataTransferObjects.Models.ServiceRequest;
+﻿using Shrooms.DataTransferObjects.Models;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.ServiceRequest;
+using System.Collections.Generic;
 
-namespace Shrooms.Domain.Services.ServiceRequests
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.ServiceRequests
 {
     public interface IServiceRequestService
     {
@@ -15,7 +15,7 @@ namespace Shrooms.Domain.Services.ServiceRequests
         IEnumerable<ServiceRequestCategoryDTO> GetCategories();
 
         void CreateCategory(ServiceRequestCategoryDTO category, string userId);
-        
+
         ServiceRequestCategoryDTO GetCategory(int categoryId);
 
         void EditCategory(ServiceRequestCategoryDTO modelDto, string userId);

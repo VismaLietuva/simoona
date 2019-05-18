@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Shrooms.DataTransferObjects.Models.OfficeMap;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.OfficeMap;
 
-namespace Shrooms.Domain.Services.OfficeMap
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.OfficeMap
 {
     public interface IOfficeMapService
     {

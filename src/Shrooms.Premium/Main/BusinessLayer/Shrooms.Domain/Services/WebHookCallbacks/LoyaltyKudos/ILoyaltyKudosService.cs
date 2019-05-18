@@ -1,4 +1,4 @@
-﻿namespace Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos
+﻿namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos
 {
     public interface ILoyaltyKudosService
     {

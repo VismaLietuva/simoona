@@ -9,7 +9,7 @@ using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.ExcelGenerator;
 
-namespace Shrooms.Domain.Services.ServiceRequests.Export
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.ServiceRequests
 {
     public class ServiceRequestExportService : IServiceRequestExportService
     {
@@ -69,7 +69,7 @@ namespace Shrooms.Domain.Services.ServiceRequests.Export
             };
 
             _excelBuilder.AddNewWorksheet(
-                ConstBusinessLayer.ServiceRequestsExcelSheetName,
+                BusinessLayerConstants.ServiceRequestsExcelSheetName,
                 header,
                 serviceRequests);
 

@@ -1,5 +1,5 @@
 ﻿using Autofac;
-using Shrooms.Domain.Services.Books;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Books;
 
 namespace Shrooms.Premium.Infrastructure.Shrooms.IoC.Modules
 {

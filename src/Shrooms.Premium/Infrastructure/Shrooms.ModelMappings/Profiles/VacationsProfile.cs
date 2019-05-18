@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using Shrooms.DataTransferObjects.Models.Vacations;
-using Shrooms.WebViewModels.Models;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Vacations;
+using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Vacations;
 
-namespace Shrooms.ModelMappings.Profiles
+namespace Shrooms.Premium.Infrastructure.Shrooms.ModelMappings.Profiles
 {
     public class VacationsProfile : Profile
     {

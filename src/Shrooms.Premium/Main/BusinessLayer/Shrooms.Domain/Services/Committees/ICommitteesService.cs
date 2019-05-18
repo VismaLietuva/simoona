@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using Shrooms.DataTransferObjects.Models;
-using Shrooms.DataTransferObjects.Models.Committees;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Committees;
 
-namespace Shrooms.Domain.Services.Committees
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Committees
 {
     public interface ICommitteesService
     {

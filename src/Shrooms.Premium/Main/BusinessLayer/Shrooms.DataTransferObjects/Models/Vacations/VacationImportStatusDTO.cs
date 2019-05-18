@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Shrooms.DataTransferObjects.Models.Vacations
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Vacations
 {
     public class VacationImportStatusDTO
     {

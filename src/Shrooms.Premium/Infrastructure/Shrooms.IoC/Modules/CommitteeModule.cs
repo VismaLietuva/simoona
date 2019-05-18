@@ -1,8 +1,8 @@
 ﻿using Autofac;
-using Shrooms.Domain.Services.Committees;
-using Shrooms.Domain.Services.Email.Committee;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Committees;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Email.Committee;
 
-namespace Shrooms.IoC.Modules
+namespace Shrooms.Premium.Infrastructure.Shrooms.IoC.Modules
 {
     public class CommitteeModule : Module
     {

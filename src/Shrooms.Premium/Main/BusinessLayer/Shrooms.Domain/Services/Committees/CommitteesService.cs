@@ -1,19 +1,20 @@
-﻿using AutoMapper;
-using MoreLinq;
-using Shrooms.Constants.ErrorCodes;
-using Shrooms.DataTransferObjects.Models.Committees;
-using Shrooms.Domain.ServiceExceptions;
-using Shrooms.Domain.Services.Email.Committee;
-using Shrooms.DomainExceptions.Exceptions;
-using Shrooms.EntityModels.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using AutoMapper;
+using MoreLinq;
+using Shrooms.Constants.ErrorCodes;
 using Shrooms.DataTransferObjects.Models;
+using Shrooms.Domain.ServiceExceptions;
+using Shrooms.DomainExceptions.Exceptions;
+using Shrooms.EntityModels.Models;
+using Shrooms.EntityModels.Models.Committee;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Committees;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Email.Committee;
 
-namespace Shrooms.Domain.Services.Committees
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Committees
 {
     public class CommitteesService : ICommitteesService
     {

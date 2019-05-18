@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Shrooms.DataTransferObjects.Models.CalendarEvent
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Calendar
 {
     public class CalendarEventDTO
     {

@@ -1,4 +1,6 @@
-﻿namespace Shrooms.DataTransferObjects.Models.Kudos
+﻿using Shrooms.DataTransferObjects.Models;
+
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Kudos
 {
     public class KudosShopItemDTO : UserAndOrganizationDTO
     {

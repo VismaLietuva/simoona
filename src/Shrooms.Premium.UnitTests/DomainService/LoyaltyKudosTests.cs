@@ -4,17 +4,17 @@ using System.Data.Entity;
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.Logger;
 using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Email.Kudos;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos;
 using Shrooms.UnitTests.Extensions;
 
-namespace Shrooms.UnitTests.DomainService
+namespace Shrooms.Premium.UnitTests.DomainService
 {
-    class LoyaltyKudosTests
+    public class LoyaltyKudosTests
     {
         private ILoyaltyKudosService _loyaltyKudosService;
 

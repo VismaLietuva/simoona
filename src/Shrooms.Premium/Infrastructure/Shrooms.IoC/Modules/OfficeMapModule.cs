@@ -1,5 +1,5 @@
 ﻿using Autofac;
-using Shrooms.Domain.Services.OfficeMap;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.OfficeMap;
 
 namespace Shrooms.Premium.Infrastructure.Shrooms.IoC.Modules
 {

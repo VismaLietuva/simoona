@@ -2,7 +2,7 @@
 {
     public static class ErrorCodes
     {
-        // KudosShop 
+        // KudosShop
         public const int KudosShopItemAlreadyExist = 350;
 
         // Events, 2**
@@ -11,7 +11,7 @@
         public const string EventResponsiblePersonDoesNotExistCode = "202";
         public const string EventInsufficientOptionsCode = "203";
         public const string EventTypeDoesNotExistCode = "204";
-        public const string EventNeedTohaveMaxChoiceCode = "205";
+        public const string EventNeedToHaveMaxChoiceCode = "205";
         public const string EventDoesNotExistCode = "206";
         public const string EventDontHavePermissionCode = "207";
         public const string EventNotEnoughChoicesProvidedCode = "208";

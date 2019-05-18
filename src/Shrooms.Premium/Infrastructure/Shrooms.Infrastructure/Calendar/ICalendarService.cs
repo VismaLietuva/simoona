@@ -1,8 +1,8 @@
-﻿using Shrooms.DataTransferObjects.Models.CalendarEvent;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Calendar;
 
-namespace Shrooms.Infrastructure.Calendar
+namespace Shrooms.Premium.Infrastructure.Shrooms.Infrastructure.Calendar
 {
     public interface ICalendarService
     {

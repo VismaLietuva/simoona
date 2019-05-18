@@ -1,9 +1,9 @@
-﻿using Shrooms.DataTransferObjects.Models;
-using Shrooms.DataTransferObjects.Models.Events;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Shrooms.DataTransferObjects.Models;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Events;
 
-namespace Shrooms.Domain.Services.Events.Participation
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Participation
 {
     public interface IEventParticipationService
     {

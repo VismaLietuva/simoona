@@ -1,4 +1,4 @@
-﻿namespace Shrooms.DataTransferObjects.Models.ServiceRequest
+﻿namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.ServiceRequest
 {
     public class ServiceRequestDTO
     {

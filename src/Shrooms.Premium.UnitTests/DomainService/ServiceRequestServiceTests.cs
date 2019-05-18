@@ -4,20 +4,20 @@ using System.Data.Entity;
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.DataTransferObjects.Models;
-using Shrooms.DataTransferObjects.Models.ServiceRequest;
-using Shrooms.Domain.Services.Email.ServiceRequest;
 using Shrooms.Domain.Services.Permissions;
-using Shrooms.Domain.Services.ServiceRequests;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.Configuration;
 using Shrooms.Infrastructure.Email;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.ServiceRequest;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Email.ServiceRequest;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.ServiceRequests;
 using Shrooms.UnitTests.Extensions;
 
-namespace Shrooms.UnitTests.DomainService
+namespace Shrooms.Premium.UnitTests.DomainService
 {
     [TestFixture]
     public class ServiceRequestServiceTests

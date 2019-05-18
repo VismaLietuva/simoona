@@ -1,9 +1,9 @@
-﻿using AutoMapper;
-using Shrooms.DataTransferObjects.Models;
-using System;
+﻿using System;
 using System.Linq.Expressions;
+using AutoMapper;
+using Shrooms.DataTransferObjects.Models;
 
-namespace Shrooms.ModelMappings
+namespace Shrooms.Premium.Infrastructure.Shrooms.ModelMappings
 {
     internal static class Helpers
     {

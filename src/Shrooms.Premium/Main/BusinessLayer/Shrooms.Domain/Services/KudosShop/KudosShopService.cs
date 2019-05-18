@@ -4,15 +4,14 @@ using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Shrooms.Constants.ErrorCodes;
 using Shrooms.DataTransferObjects.Models;
-using Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models.Kudos;
 using Shrooms.Host.Contracts.DAL;
-using static Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes.ErrorCodes;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Kudos;
+using ErrorCodes = Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes.ErrorCodes;
 
-namespace Shrooms.Domain.Services.KudosShop
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.KudosShop
 {
     public class KudosShopService : IKudosShopService
     {
@@ -32,7 +31,7 @@ namespace Shrooms.Domain.Services.KudosShop
 
             if (alreadyExists)
             {
-                throw new ValidationException(KudosShopItemAlreadyExist, "Kudos shop item already exists");
+                throw new ValidationException(ErrorCodes.KudosShopItemAlreadyExist, "Kudos shop item already exists");
             }
 
             var modified = DateTime.UtcNow;
@@ -71,7 +70,7 @@ namespace Shrooms.Domain.Services.KudosShop
 
             if (type == null)
             {
-                throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Item not found");
+                throw new ValidationException(global::Shrooms.Constants.ErrorCodes.ErrorCodes.ContentDoesNotExist, "Item not found");
             }
 
             return type;
@@ -99,7 +98,7 @@ namespace Shrooms.Domain.Services.KudosShop
 
             if (alreadyExists)
             {
-                throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "Kudos shop item with that name already exists");
+                throw new ValidationException(global::Shrooms.Constants.ErrorCodes.ErrorCodes.DuplicatesIntolerable, "Kudos shop item with that name already exists");
             }
 
             var itemToUpdate = await _kudosShopItemsDbSet
@@ -107,7 +106,7 @@ namespace Shrooms.Domain.Services.KudosShop
 
             if (itemToUpdate == null)
             {
-                throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Item not found");
+                throw new ValidationException(global::Shrooms.Constants.ErrorCodes.ErrorCodes.ContentDoesNotExist, "Item not found");
             }
 
             itemToUpdate.Name = dto.Name;
@@ -125,7 +124,7 @@ namespace Shrooms.Domain.Services.KudosShop
 
             if (item == null)
             {
-                throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Item not found");
+                throw new ValidationException(global::Shrooms.Constants.ErrorCodes.ErrorCodes.ContentDoesNotExist, "Item not found");
             }
 
             _kudosShopItemsDbSet.Remove(item);

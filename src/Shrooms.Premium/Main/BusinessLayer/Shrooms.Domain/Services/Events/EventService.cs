@@ -1,26 +1,26 @@
-﻿using Shrooms.Constants.Authorization.Permissions;
-using Shrooms.Constants.BusinessLayer;
-using Shrooms.DataTransferObjects.Models;
-using Shrooms.DataTransferObjects.Models.Events;
-using Shrooms.DataTransferObjects.Models.Wall;
-using Shrooms.Domain.Services.Events.Calendar;
-using Shrooms.Domain.Services.Events.Participation;
-using Shrooms.Domain.Services.Events.Utilities;
-using Shrooms.Domain.Services.Permissions;
-using Shrooms.Domain.Services.Wall;
-using Shrooms.DomainServiceValidators.Validators.Events;
-using Shrooms.EntityModels.Models;
-using Shrooms.EntityModels.Models.Events;
-using Shrooms.EntityModels.Models.Multiwall;
-using Shrooms.Host.Contracts.DAL;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Shrooms.Constants.BusinessLayer;
+using Shrooms.DataTransferObjects.Models;
+using Shrooms.DataTransferObjects.Models.Wall;
+using Shrooms.Domain.Services.Permissions;
+using Shrooms.Domain.Services.Wall;
+using Shrooms.EntityModels.Models;
+using Shrooms.EntityModels.Models.Events;
+using Shrooms.EntityModels.Models.Multiwall;
+using Shrooms.Host.Contracts.Constants;
+using Shrooms.Host.Contracts.DAL;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Events;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Calendar;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Participation;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Utilities;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DomainServiceValidators.Validators.Events;
 
-namespace Shrooms.Domain.Services.Events
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events
 {
     public class EventService : IEventService
     {
@@ -398,7 +398,7 @@ namespace Shrooms.Domain.Services.Events
                         .Select(p => new EventDetailsParticipantDTO
                         {
                             Id = p.Id,
-                            UserId = p.ApplicationUser == null ? ConstBusinessLayer.EmptyUserId : p.ApplicationUserId,
+                            UserId = p.ApplicationUser == null ? BusinessLayerConstants.EmptyUserId : p.ApplicationUserId,
                             FullName = p.ApplicationUser.FirstName + " " + p.ApplicationUser.LastName,
                             ImageName = p.ApplicationUser.PictureId,
                         })
@@ -406,7 +406,7 @@ namespace Shrooms.Domain.Services.Events
                 Participants = e.EventParticipants.Select(p => new EventDetailsParticipantDTO
                 {
                     Id = p.Id,
-                    UserId = p.ApplicationUser == null ? ConstBusinessLayer.EmptyUserId : p.ApplicationUserId,
+                    UserId = p.ApplicationUser == null ? BusinessLayerConstants.EmptyUserId : p.ApplicationUserId,
                     FullName = p.ApplicationUser.FirstName + " " + p.ApplicationUser.LastName,
                     ImageName = p.ApplicationUser.PictureId,
                 })

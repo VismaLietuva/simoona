@@ -1,9 +1,9 @@
-﻿using Shrooms.DataTransferObjects.Models;
-using Shrooms.DataTransferObjects.Models.Kudos;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Shrooms.DataTransferObjects.Models;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Kudos;
 
-namespace Shrooms.Domain.Services.KudosShop
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.KudosShop
 {
     public interface IKudosShopService
     {

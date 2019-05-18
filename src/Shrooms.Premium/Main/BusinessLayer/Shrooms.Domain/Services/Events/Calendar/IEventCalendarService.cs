@@ -1,8 +1,8 @@
-﻿using Shrooms.EntityModels.Models.Events;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Shrooms.EntityModels.Models.Events;
 
-namespace Shrooms.Domain.Services.Events.Calendar
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Calendar
 {
     public interface IEventCalendarService
     {

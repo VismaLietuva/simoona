@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using Shrooms.DataTransferObjects.Models.Books;
 using Shrooms.EntityModels.Models;
+using Shrooms.EntityModels.Models.Books;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Books;
+using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Book;
+using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Book.BookDetails;
 using Shrooms.WebViewModels.Models.Book;
-using Shrooms.WebViewModels.Models.Book.BookDetails;
 
 namespace Shrooms.Premium.Infrastructure.Shrooms.ModelMappings.Profiles
 {

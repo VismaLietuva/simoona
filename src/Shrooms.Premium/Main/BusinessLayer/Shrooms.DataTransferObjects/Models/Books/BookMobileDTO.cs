@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using Shrooms.DataTransferObjects.Models.Books;
 
-namespace Shrooms.DataTransferObjects.Models.Books
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Books
 {
     public class BookMobileDTO
     {

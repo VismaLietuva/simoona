@@ -1,20 +1,20 @@
-﻿using Google;
-using Google.Apis.Auth.OAuth2;
-using Google.Apis.Calendar.v3;
-using Google.Apis.Calendar.v3.Data;
-using Google.Apis.Services;
-using Shrooms.DataTransferObjects.Models.CalendarEvent;
-using Shrooms.Infrastructure.Configuration;
-using Shrooms.Infrastructure.Logger;
-using Shrooms.Infrastructure.Retryer;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using Google;
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Calendar.v3;
+using Google.Apis.Calendar.v3.Data;
+using Google.Apis.Services;
+using Shrooms.Infrastructure.Configuration;
+using Shrooms.Infrastructure.Logger;
+using Shrooms.Infrastructure.Retryer;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Calendar;
 
-namespace Shrooms.Infrastructure.Calendar
+namespace Shrooms.Premium.Infrastructure.Shrooms.Infrastructure.Calendar
 {
     public class GoogleCalendarService : ICalendarService
     {
@@ -26,7 +26,7 @@ namespace Shrooms.Infrastructure.Calendar
         public GoogleCalendarService()
         {
             _appSettings = new ApplicationSettings();
-            _logger = new Logger.Logger();
+            _logger = new global::Shrooms.Infrastructure.Logger.Logger();
         }
 
         public void DeleteEvent(Guid eventId, string tenantCalendarId)

@@ -1,8 +1,8 @@
 ﻿using Autofac;
-using Shrooms.Domain.Services.WebHookCallbacks.Events;
-using Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos;
 using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Email.Kudos;
 using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.WebHookCallbacks;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.WebHookCallbacks.Events;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos;
 
 namespace Shrooms.Premium.Infrastructure.Shrooms.IoC.Modules
 {

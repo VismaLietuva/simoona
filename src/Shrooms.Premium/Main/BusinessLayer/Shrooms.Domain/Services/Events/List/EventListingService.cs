@@ -1,24 +1,24 @@
-﻿using Shrooms.Constants.BusinessLayer;
-using Shrooms.DataTransferObjects.Models;
-using Shrooms.DataTransferObjects.Models.Events;
-using Shrooms.DomainServiceValidators.Validators.Events;
-using Shrooms.EntityModels.Models.Events;
-using Shrooms.Host.Contracts.DAL;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
+using Shrooms.Constants.BusinessLayer;
+using Shrooms.DataTransferObjects.Models;
+using Shrooms.EntityModels.Models.Events;
+using Shrooms.Host.Contracts.DAL;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Events;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DomainServiceValidators.Validators.Events;
 
-namespace Shrooms.Domain.Services.Events.List
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.List
 {
     public class EventListingService : IEventListingService
     {
-        private static readonly Dictionary<ConstBusinessLayer.MyEventsOptions, Func<string, Expression<Func<Event, bool>>>>
-            EventFilters = new Dictionary<ConstBusinessLayer.MyEventsOptions, Func<string, Expression<Func<Event, bool>>>>
+        private static readonly Dictionary<BusinessLayerConstants.MyEventsOptions, Func<string, Expression<Func<Event, bool>>>>
+            EventFilters = new Dictionary<BusinessLayerConstants.MyEventsOptions, Func<string, Expression<Func<Event, bool>>>>
         {
-            { ConstBusinessLayer.MyEventsOptions.Host, MyEventsAsMasterFilter },
-            { ConstBusinessLayer.MyEventsOptions.Participant, MyEventsAsParticipantFilter }
+            { BusinessLayerConstants.MyEventsOptions.Host, MyEventsAsMasterFilter },
+            { BusinessLayerConstants.MyEventsOptions.Participant, MyEventsAsParticipantFilter }
         };
 
         private readonly IEventValidationService _eventValidationService;

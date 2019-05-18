@@ -1,14 +1,9 @@
-﻿using Shrooms.EntityModels.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Shrooms.EntityModels.Models.Committee;
 
-namespace Shrooms.Domain.Services.Email.Committee
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Email.Committee
 {
     public interface ICommitteeNotificationService
     {
-        void NotifyCommitteeMembersAboutNewSuggestion(EntityModels.Models.Committee committee, CommitteeSuggestion suggestion);
+        void NotifyCommitteeMembersAboutNewSuggestion(EntityModels.Models.Committee.Committee committee, CommitteeSuggestion suggestion);
     }
 }

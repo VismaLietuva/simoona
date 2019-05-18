@@ -1,8 +1,8 @@
 ﻿using Autofac;
-using Shrooms.Domain.Services.Vacations;
-using Shrooms.Infrastructure.VacationBot;
+using Shrooms.Premium.Infrastructure.Shrooms.Infrastructure.VacationBot;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Vacations;
 
-namespace Shrooms.IoC.Modules
+namespace Shrooms.Premium.Infrastructure.Shrooms.IoC.Modules
 {
     public class VacationModule : Module
     {

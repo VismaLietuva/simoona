@@ -1,4 +1,6 @@
-﻿namespace Shrooms.DataTransferObjects.Models.Events
+﻿using Shrooms.DataTransferObjects.Models;
+
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Events
 {
     public class CreateEventTypeDTO : UserAndOrganizationDTO
     {

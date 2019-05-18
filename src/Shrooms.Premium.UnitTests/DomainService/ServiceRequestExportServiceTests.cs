@@ -1,19 +1,19 @@
-﻿using Excel;
+﻿using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.IO;
+using System.Linq.Expressions;
+using Excel;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.DataTransferObjects.Models;
-using Shrooms.Infrastructure.ExcelGenerator;
-using System.Collections.Generic;
-using System.IO;
 using Shrooms.EntityModels.Models;
-using System.Data.Entity;
-using Shrooms.Domain.Services.ServiceRequests.Export;
-using Shrooms.UnitTests.Extensions;
-using System.Linq.Expressions;
-using System;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Infrastructure.ExcelGenerator;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.ServiceRequests;
+using Shrooms.UnitTests.Extensions;
 
-namespace Shrooms.UnitTests.DomainService
+namespace Shrooms.Premium.UnitTests.DomainService
 {
     public class ServiceRequestExportServiceTests
     {

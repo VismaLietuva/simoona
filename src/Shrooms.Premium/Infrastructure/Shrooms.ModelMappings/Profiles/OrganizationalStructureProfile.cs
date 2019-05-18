@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using Shrooms.DataTransferObjects.Models.OrganizationalStructure;
-using Shrooms.WebViewModels.Models.OrganizationalStructure;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.OrganizationalStructure;
+using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.OrganizationalStructure;
 
-namespace Shrooms.ModelMappings.Profiles
+namespace Shrooms.Premium.Infrastructure.Shrooms.ModelMappings.Profiles
 {
     public class OrganizationalStructureProfile : Profile
     {

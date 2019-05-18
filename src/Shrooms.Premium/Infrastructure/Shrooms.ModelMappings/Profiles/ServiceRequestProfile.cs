@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
-using Shrooms.DataTransferObjects.Models.ServiceRequest;
 using Shrooms.EntityModels.Models;
-using Shrooms.WebViewModels.Models.ServiceRequests;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.ServiceRequest;
+using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.ServiceRequests;
 
-namespace Shrooms.ModelMappings.Profiles
+namespace Shrooms.Premium.Infrastructure.Shrooms.ModelMappings.Profiles
 {
     public class ServiceRequestProfile : Profile
     {

@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
-using Shrooms.DataTransferObjects.Models.Events;
-using Shrooms.DataTransferObjects.Models.OfficeMap;
 using Shrooms.EntityModels.Models.Events;
-using Shrooms.WebViewModels.Models.Events;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Events;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.OfficeMap;
+using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Events;
 
-namespace Shrooms.ModelMappings.Profiles
+namespace Shrooms.Premium.Infrastructure.Shrooms.ModelMappings.Profiles
 {
     public class EventsProfile : Profile
     {

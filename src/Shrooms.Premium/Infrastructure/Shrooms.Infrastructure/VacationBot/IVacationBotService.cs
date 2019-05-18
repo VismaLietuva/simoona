@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Shrooms.Infrastructure.VacationBot
+namespace Shrooms.Premium.Infrastructure.Shrooms.Infrastructure.VacationBot
 {
     public interface IVacationBotService
     {

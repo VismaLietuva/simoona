@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Shrooms.DataTransferObjects.Models.OfficeMap
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.OfficeMap
 {
     public class OfficeUserDTO
     {

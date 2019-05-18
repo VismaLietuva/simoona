@@ -1,16 +1,16 @@
-﻿using NSubstitute;
-using NUnit.Framework;
-using Shrooms.DataTransferObjects.Models;
-using Shrooms.Domain.Services.Events.Utilities;
-using Shrooms.EntityModels.Models.Events;
-using Shrooms.UnitTests.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using NSubstitute;
+using NUnit.Framework;
+using Shrooms.DataTransferObjects.Models;
+using Shrooms.EntityModels.Models.Events;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Utilities;
+using Shrooms.UnitTests.Extensions;
 
-namespace Shrooms.UnitTests.DomainService
+namespace Shrooms.Premium.UnitTests.DomainService
 {
     public class EventUtilitiesServiceTests
     {
@@ -44,8 +44,8 @@ namespace Shrooms.UnitTests.DomainService
         {
             MockEventTypes();
             var organizationId = 2;
-            var result = _eventUtilitiesService.GetEventTypes(organizationId);
-            Assert.AreEqual(result.Count(), 3);
+            var result = _eventUtilitiesService.GetEventTypes(organizationId).ToList();
+            Assert.AreEqual(result.Count, 3);
             Assert.AreEqual(result.First(x => x.Id == 1).Name, "type1");
         }
 
@@ -58,12 +58,12 @@ namespace Shrooms.UnitTests.DomainService
             };
             var guid = MockParticipantsWithOptionsForExport();
 
-            var options = _eventUtilitiesService.GetEventChosenOptions(guid, userAndOrg);
+            var options = _eventUtilitiesService.GetEventChosenOptions(guid, userAndOrg).ToList();
             Assert.AreEqual("Option1", options.ToArray()[0].Option);
             Assert.AreEqual("Option2", options.ToArray()[1].Option);
             Assert.AreEqual(2, options.ToArray()[0].Count);
             Assert.AreEqual(1, options.ToArray()[1].Count);
-            Assert.AreEqual(2, options.Count());
+            Assert.AreEqual(2, options.Count);
         }
 
         [Test]
@@ -112,19 +112,19 @@ namespace Shrooms.UnitTests.DomainService
                     EventId = eventId,
                     Option = "Option1",
                     Event = @event,
-                    EventParticipants = new List<EventParticipant>()
+                    EventParticipants = new List<EventParticipant>
                     {
-                        new EventParticipant()
+                        new EventParticipant
                         {
                             EventId = eventId
                         },
-                        new EventParticipant()
+                        new EventParticipant
                         {
                             EventId = eventId
                         },
-                        new EventParticipant()
+                        new EventParticipant
                         {
-                            EventId = default(Guid)
+                            EventId = default
                         }
                     },
                 },
@@ -133,15 +133,15 @@ namespace Shrooms.UnitTests.DomainService
                     EventId = eventId,
                     Option = "Option2",
                     Event = @event,
-                    EventParticipants = new List<EventParticipant>()
+                    EventParticipants = new List<EventParticipant>
                     {
-                        new EventParticipant()
+                        new EventParticipant
                         {
                             EventId = eventId
                         },
-                        new EventParticipant()
+                        new EventParticipant
                         {
-                            EventId = default(Guid)
+                            EventId = default
                         }
                     }
                 },
@@ -209,9 +209,9 @@ namespace Shrooms.UnitTests.DomainService
                     Id = 3,
                     Name = "type3",
                     OrganizationId = 2,
-                    Events = new List<Event>()
+                    Events = new List<Event>
                     {
-                        new Event()
+                        new Event
                         {
                             EndDate = DateTime.UtcNow.AddHours(-1)
                         }
@@ -222,9 +222,9 @@ namespace Shrooms.UnitTests.DomainService
                     Id = 4,
                     Name = "type4",
                     OrganizationId = 3,
-                    Events = new List<Event>()
+                    Events = new List<Event>
                     {
-                        new Event()
+                        new Event
                         {
                             EndDate = DateTime.UtcNow.AddHours(1)
                         }

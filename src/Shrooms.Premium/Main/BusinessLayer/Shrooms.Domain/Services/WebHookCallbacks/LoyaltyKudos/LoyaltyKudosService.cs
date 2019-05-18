@@ -1,13 +1,13 @@
-﻿using Shrooms.EntityModels.Models;
-using Shrooms.EntityModels.Models.Kudos;
-using Shrooms.Infrastructure.Logger;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Email.Kudos;
-using System;
+﻿using System;
 using System.Data.Entity;
 using System.Linq;
+using Shrooms.EntityModels.Models;
+using Shrooms.EntityModels.Models.Kudos;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Infrastructure.Logger;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Email.Kudos;
 
-namespace Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos
 {
     public class LoyaltyKudosService : ILoyaltyKudosService
     {

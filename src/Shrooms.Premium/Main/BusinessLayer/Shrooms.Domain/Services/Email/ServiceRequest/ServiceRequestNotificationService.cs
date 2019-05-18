@@ -1,4 +1,6 @@
-﻿using Shrooms.Constants;
+﻿using System.Data.Entity;
+using System.Linq;
+using Shrooms.Constants;
 using Shrooms.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Emails;
@@ -7,10 +9,8 @@ using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.Configuration;
 using Shrooms.Infrastructure.Email;
 using Shrooms.Infrastructure.Email.Templating;
-using System.Data.Entity;
-using System.Linq;
 
-namespace Shrooms.Domain.Services.Email.ServiceRequest
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Email.ServiceRequest
 {
     public class ServiceRequestNotificationService : IServiceRequestNotificationService
     {
@@ -132,7 +132,7 @@ namespace Shrooms.Domain.Services.Email.ServiceRequest
                 .FirstOrDefault();
 
         private string GetUserNotificationRoleId() => _rolesDbSet
-                .Where(x => x.Name == Constants.Authorization.Roles.ServiceRequestNotification)
+                .Where(x => x.Name == global::Shrooms.Constants.Authorization.Roles.ServiceRequestNotification)
                 .Select(x => x.Id)
                 .FirstOrDefault();
     }

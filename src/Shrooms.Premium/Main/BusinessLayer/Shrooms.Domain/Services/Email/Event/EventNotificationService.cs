@@ -1,4 +1,8 @@
-﻿using Shrooms.Constants;
+﻿using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using Shrooms.Constants;
 using Shrooms.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.DataTransferObjects.Models.Emails;
 using Shrooms.Domain.Services.Organizations;
@@ -7,12 +11,8 @@ using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.Configuration;
 using Shrooms.Infrastructure.Email;
 using Shrooms.Infrastructure.Email.Templating;
-using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
 
-namespace Shrooms.Domain.Services.Email.Event
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Email.Event
 {
     public class EventNotificationService : IEventNotificationService
     {

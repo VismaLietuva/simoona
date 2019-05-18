@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Shrooms.DataTransferObjects.Models;
-using Shrooms.DataTransferObjects.Models.Events;
 using Shrooms.DataTransferObjects.Models.Notification;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.EntityModels.Models.Multiwall;
@@ -9,6 +8,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Events;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Notifications
 {

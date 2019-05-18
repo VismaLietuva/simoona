@@ -1,20 +1,20 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.Infrastructure.Configuration;
-using System;
 using Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes;
 
-namespace Shrooms.Infrastructure.VacationBot
+namespace Shrooms.Premium.Infrastructure.Shrooms.Infrastructure.VacationBot
 {
     public class VacationBotService : IVacationBotService
     {
         private readonly IApplicationSettings _appSettings;
-        private readonly Logger.ILogger _logger;
+        private readonly global::Shrooms.Infrastructure.Logger.ILogger _logger;
 
-        public VacationBotService(IApplicationSettings appSettings, Logger.ILogger logger)
+        public VacationBotService(IApplicationSettings appSettings, global::Shrooms.Infrastructure.Logger.ILogger logger)
         {
             _appSettings = appSettings;
             _logger = logger;

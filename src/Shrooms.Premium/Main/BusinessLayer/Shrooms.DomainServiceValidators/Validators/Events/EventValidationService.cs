@@ -1,16 +1,15 @@
-﻿using Shrooms.Constants.BusinessLayer;
-using Shrooms.DomainExceptions.Exceptions.Event;
-using Shrooms.EntityModels.Models.Events;
-using Shrooms.Infrastructure.SystemClock;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Shrooms.DataTransferObjects.Models.Events;
-using static Shrooms.Constants.ErrorCodes.ErrorCodes;
-using static Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes.ErrorCodes;
+using Shrooms.Constants.BusinessLayer;
 using Shrooms.DomainExceptions.Exceptions;
+using Shrooms.EntityModels.Models.Events;
+using Shrooms.Infrastructure.SystemClock;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Events;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DomainExceptions.Exceptions.Event;
+using Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes;
 
-namespace Shrooms.DomainServiceValidators.Validators.Events
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.DomainServiceValidators.Validators.Events
 {
     public class EventValidationService : IEventValidationService
     {
@@ -25,7 +24,7 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
         {
             if (participant == null)
             {
-                throw new EventException(EventParticipantNotFound);
+                throw new EventException(ErrorCodes.EventParticipantNotFound);
             }
         }
 
@@ -33,7 +32,7 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
         {
             if (providedOptions.Count() != foundOptions.Count())
             {
-                throw new EventException(EventNoSuchOptionsCode);
+                throw new EventException(ErrorCodes.EventNoSuchOptionsCode);
             }
         }
 
@@ -41,7 +40,7 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
         {
             if (userParticipationEvent != null)
             {
-                throw new EventException(EventCannotJoinMultipleSingleJoinEventsCode);
+                throw new EventException(ErrorCodes.EventCannotJoinMultipleSingleJoinEventsCode);
             }
         }
 
@@ -49,7 +48,7 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
         {
             if (startDate < _systemClock.UtcNow)
             {
-                throw new EventException(EventJoinStartDateHasPassedCode);
+                throw new EventException(ErrorCodes.EventJoinStartDateHasPassedCode);
             }
         }
 
@@ -57,7 +56,7 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
         {
             if (isParticipating)
             {
-                throw new EventException(EventUserAlreadyParticipatesCode);
+                throw new EventException(ErrorCodes.EventUserAlreadyParticipatesCode);
             }
         }
 
@@ -65,7 +64,7 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
         {
             if (maxParticipants <= participantsCount)
             {
-                throw new EventException(EventIsFullCode);
+                throw new EventException(ErrorCodes.EventIsFullCode);
             }
         }
 
@@ -73,7 +72,7 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
         {
             if (maxChoices < choicesProvidedCount)
             {
-                throw new EventException(EventTooManyChoicesProvidedCode);
+                throw new EventException(ErrorCodes.EventTooManyChoicesProvidedCode);
             }
         }
 
@@ -81,7 +80,7 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
         {
             if (endDate < _systemClock.UtcNow)
             {
-                throw new EventException(EventHasAlreadyExpiredCode);
+                throw new EventException(ErrorCodes.EventHasAlreadyExpiredCode);
             }
         }
 
@@ -89,7 +88,7 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
         {
             if (maxChoices > 0 && choicesProvidedCount == 0)
             {
-                throw new EventException(EventNotEnoughChoicesProvidedCode);
+                throw new EventException(ErrorCodes.EventNotEnoughChoicesProvidedCode);
             }
         }
 
@@ -97,7 +96,7 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
         {
             if (_systemClock.UtcNow > startDate)
             {
-                throw new EventException(EventCreateStartDateIncorrectCode);
+                throw new EventException(ErrorCodes.EventCreateStartDateIncorrectCode);
             }
         }
 
@@ -105,7 +104,7 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
         {
             if (_systemClock.UtcNow > registrationDeadline)
             {
-                throw new EventException(EventRegistrationDeadlineIsExpired);
+                throw new EventException(ErrorCodes.EventRegistrationDeadlineIsExpired);
             }
         }
 
@@ -113,7 +112,7 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
         {
             if (startDate < registrationDeadline)
             {
-                throw new EventException(EventRegistrationDeadlineGreaterThanStartDateCode);
+                throw new EventException(ErrorCodes.EventRegistrationDeadlineGreaterThanStartDateCode);
             }
         }
 
@@ -121,7 +120,7 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
         {
             if (endDate < startDate)
             {
-                throw new EventException(EventStartDateGreaterThanEndDateCode);
+                throw new EventException(ErrorCodes.EventStartDateGreaterThanEndDateCode);
             }
         }
 
@@ -129,7 +128,7 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
         {
             if (!userExists)
             {
-                throw new EventException(EventResponsiblePersonDoesNotExistCode);
+                throw new EventException(ErrorCodes.EventResponsiblePersonDoesNotExistCode);
             }
         }
 
@@ -137,9 +136,9 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
         {
             if (optionsCount != 0)
             {
-                if (maxChoices > optionsCount || optionsCount < ConstBusinessLayer.EventOptionsMinimumCount)
+                if (maxChoices > optionsCount || optionsCount < BusinessLayerConstants.EventOptionsMinimumCount)
                 {
-                    throw new EventException(EventInsufficientOptionsCode);
+                    throw new EventException(ErrorCodes.EventInsufficientOptionsCode);
                 }
             }
         }
@@ -150,7 +149,7 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
             {
                 if (maxChoices < 1)
                 {
-                    throw new EventException(EventNeedTohaveMaxChoiceCode);
+                    throw new EventException(ErrorCodes.EventNeedToHaveMaxChoiceCode);
                 }
             }
         }
@@ -159,7 +158,7 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
         {
             if (!eventTypeExists)
             {
-                throw new EventException(EventTypeDoesNotExistCode);
+                throw new EventException(ErrorCodes.EventTypeDoesNotExistCode);
             }
         }
 
@@ -169,7 +168,7 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
             {
                 if (!hasPermission)
                 {
-                    throw new EventException(EventDontHavePermissionCode);
+                    throw new EventException(ErrorCodes.EventDontHavePermissionCode);
                 }
             }
         }
@@ -178,7 +177,7 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
         {
             if (@event == null)
             {
-                throw new EventException(EventDoesNotExistCode);
+                throw new EventException(ErrorCodes.EventDoesNotExistCode);
             }
         }
 
@@ -186,13 +185,13 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
         {
             if (participant == null)
             {
-                throw new ValidationException(ContentDoesNotExist, "Event does not exist");
+                throw new ValidationException(global::Shrooms.Constants.ErrorCodes.ErrorCodes.ContentDoesNotExist, "Event does not exist");
             }
             else
             {
                 if (participant.Event == null)
                 {
-                    throw new ValidationException(ContentDoesNotExist, "Event does not exist");
+                    throw new ValidationException(global::Shrooms.Constants.ErrorCodes.ErrorCodes.ContentDoesNotExist, "Event does not exist");
                 }
             }
         }
@@ -201,7 +200,7 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
         {
             if (maxParticipants < participantsCount)
             {
-                throw new EventException(EventIsFullCode);
+                throw new EventException(ErrorCodes.EventIsFullCode);
             }
         }
 
@@ -209,29 +208,32 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
         {
             if (!userExists)
             {
-                throw new EventException(EventJoinUserDoesNotExists);
+                throw new EventException(ErrorCodes.EventJoinUserDoesNotExists);
             }
         }
 
         public void CheckIfOptionsAreDifferent(IEnumerable<string> options)
         {
-            if (options != null)
+            if (options == null)
             {
-                var duplicateKeys = options.GroupBy(x => x)
-                        .Where(group => group.Count() > 1)
-                        .Select(group => group.Key);
-                if (duplicateKeys.Count() > 0)
-                {
-                    throw new EventException(EventOptionsCantDuplicate);
-                }
+                return;
+            }
+
+            var duplicateKeys = options.GroupBy(x => x)
+                .Where(group => @group.Count() > 1)
+                .Select(group => @group.Key);
+
+            if (duplicateKeys.Any())
+            {
+                throw new EventException(ErrorCodes.EventOptionsCantDuplicate);
             }
         }
 
         public void CheckIfEventHasParticipants(IEnumerable<EventParticipantDTO> eventParticipants)
         {
-            if (eventParticipants.Count() == 0)
+            if (!eventParticipants.Any())
             {
-                throw new EventException(EventParticipantsNotFound);
+                throw new EventException(ErrorCodes.EventParticipantsNotFound);
             }
         }
     }

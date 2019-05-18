@@ -1,6 +1,7 @@
 ﻿using System;
+using Shrooms.DataTransferObjects.Models;
 
-namespace Shrooms.DataTransferObjects.Models.Committees
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Committees
 {
     public class CommitteeSuggestionViewDTO
     {

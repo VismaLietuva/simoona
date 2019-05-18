@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Shrooms.Domain.Services.Email.Event
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Email.Event
 {
     public interface IEventNotificationService
     {

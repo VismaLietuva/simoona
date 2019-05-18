@@ -1,14 +1,14 @@
 ﻿using Autofac;
-using Shrooms.Domain.Services.Email.Event;
-using Shrooms.Domain.Services.Events;
-using Shrooms.Domain.Services.Events.Calendar;
-using Shrooms.Domain.Services.Events.Export;
-using Shrooms.Domain.Services.Events.List;
-using Shrooms.Domain.Services.Events.Participation;
-using Shrooms.Domain.Services.Events.Utilities;
-using Shrooms.DomainServiceValidators.Validators.Events;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Email.Event;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Calendar;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Export;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.List;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Participation;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Utilities;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DomainServiceValidators.Validators.Events;
 
-namespace Shrooms.IoC.Modules
+namespace Shrooms.Premium.Infrastructure.Shrooms.IoC.Modules
 {
     public class EventsModule : Module
     {
