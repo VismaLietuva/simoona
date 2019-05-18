@@ -1,4 +1,4 @@
-﻿namespace DomainServiceValidators.Validators.Books
+﻿namespace Shrooms.DomainServiceValidators.Validators.Books
 {
     public interface IBookServiceValidator
     {

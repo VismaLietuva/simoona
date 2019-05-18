@@ -3,7 +3,7 @@ using Shrooms.DataTransferObjects.Models.KudosBasket;
 using Shrooms.DomainExceptions.Exceptions.KudosBaskets;
 using Shrooms.EntityModels.Models;
 
-namespace DomainServiceValidators.Validators.KudosBaskets
+namespace Shrooms.DomainServiceValidators.Validators.KudosBaskets
 {
     public class KudosBasketValidator : IKudosBasketValidator
     {

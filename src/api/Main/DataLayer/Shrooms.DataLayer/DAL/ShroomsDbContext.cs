@@ -10,6 +10,7 @@ using Shrooms.DataLayer.DAL.EntityTypeConfigurations;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Badges;
 using Shrooms.EntityModels.Models.Books;
+using Shrooms.EntityModels.Models.Committee;
 using Shrooms.EntityModels.Models.Events;
 using Shrooms.EntityModels.Models.Kudos;
 using Shrooms.EntityModels.Models.Monitors;

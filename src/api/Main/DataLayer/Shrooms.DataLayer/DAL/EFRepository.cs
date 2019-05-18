@@ -8,7 +8,7 @@ using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.Configuration;
 
-namespace Shrooms.DataLayer
+namespace Shrooms.DataLayer.DAL
 {
     public class EFRepository<TEntity> : IRepository<TEntity>
         where TEntity : class

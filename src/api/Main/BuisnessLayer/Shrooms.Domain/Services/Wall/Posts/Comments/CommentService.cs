@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.ErrorCodes;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Wall.Posts.Comments;
@@ -12,6 +11,7 @@ using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.EntityModels.Models.Notifications;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Infrastructure.SystemClock;
 using Shrooms.Host.Contracts.DAL;
 

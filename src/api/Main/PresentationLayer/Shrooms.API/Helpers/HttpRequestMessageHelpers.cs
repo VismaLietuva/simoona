@@ -1,5 +1,4 @@
 ﻿using System.Net.Http;
-using System.Web;
 
 namespace Shrooms.API.Helpers
 {

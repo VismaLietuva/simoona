@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using DataLayer.Models;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Shrooms.EntityModels.Models.Badges;
+using Shrooms.EntityModels.Models.Books;
 using Shrooms.EntityModels.Models.Events;
 using Shrooms.EntityModels.Models.Kudos;
 using Shrooms.EntityModels.Models.Multiwall;
@@ -71,13 +71,13 @@ namespace Shrooms.EntityModels.Models
 
         public virtual ICollection<ApplicationUser> ManagedUsers { get; set; }
 
-        public virtual ICollection<Committee> Committees { get; set; }
+        public virtual ICollection<Committee.Committee> Committees { get; set; }
 
         [InverseProperty("Leads")]
-        public virtual ICollection<Committee> LeadingCommittees { get; set; }
+        public virtual ICollection<Committee.Committee> LeadingCommittees { get; set; }
 
         [InverseProperty("Delegates")]
-        public virtual ICollection<Committee> DelegatingCommittees { get; set; }
+        public virtual ICollection<Committee.Committee> DelegatingCommittees { get; set; }
 
         public int OrganizationId { get; set; }
 

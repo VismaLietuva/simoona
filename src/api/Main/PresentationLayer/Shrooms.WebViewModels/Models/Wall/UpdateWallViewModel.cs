@@ -13,11 +13,11 @@ namespace Shrooms.WebViewModels.Models.Wall
         public int Id { get; set; }
 
         [Required]
-        [StringLength(ConstWebApi.WallNameMaxLength)]
+        [StringLength(WebApiConstants.WallNameMaxLength)]
         public string Name { get; set; }
 
         [Required]
-        [StringLength(ConstWebApi.WallDescMaxLength)]
+        [StringLength(WebApiConstants.WallDescMaxLength)]
         public string Description { get; set; }
 
         [Required]

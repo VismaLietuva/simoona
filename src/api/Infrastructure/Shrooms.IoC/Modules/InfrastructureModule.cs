@@ -3,7 +3,6 @@ using Autofac;
 using Autofac.Core.Lifetime;
 using Hangfire;
 using ReallySimpleFeatureToggle;
-using Shrooms.Azure;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.DailyMailingService;
 using Shrooms.Infrastructure.Configuration;
@@ -13,6 +12,8 @@ using Shrooms.Infrastructure.Email.Templating;
 using Shrooms.Infrastructure.ExcelGenerator;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Infrastructure.Logger;
+using Shrooms.Infrastructure.Storage;
+using Shrooms.Infrastructure.Storage.AzureBlob;
 using Shrooms.Infrastructure.Storage.FileSystem;
 using Shrooms.Infrastructure.SystemClock;
 

@@ -6,7 +6,7 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
 using Shrooms.Infrastructure.Configuration;
 
-namespace Shrooms.Azure
+namespace Shrooms.Infrastructure.Storage.AzureBlob
 {
     public class AzureStorage : IStorage
     {

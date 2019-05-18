@@ -14,10 +14,10 @@ namespace Shrooms.DataTransferObjects.Models.Kudos
 
         public bool IsNecessary { get; set; }
 
-        public ConstBusinessLayer.KudosTypeEnum Type { get; set; }
-        
+        public BusinessLayerConstants.KudosTypeEnum Type { get; set; }
+
         public string Description { get; set; }
-        
+
         public override int GetHashCode()
         {
             return Id.GetHashCode();
@@ -30,8 +30,7 @@ namespace Shrooms.DataTransferObjects.Models.Kudos
 
         public bool Equals(KudosTypeDTO kudosTypeDto)
         {
-            if (kudosTypeDto != null &&
-                Id == kudosTypeDto.Id)
+            if (kudosTypeDto != null && Id == kudosTypeDto.Id)
             {
                 return true;
             }

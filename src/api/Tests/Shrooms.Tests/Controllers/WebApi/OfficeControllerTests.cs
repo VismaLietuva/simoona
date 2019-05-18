@@ -14,6 +14,7 @@ using Shrooms.API.Controllers;
 using Shrooms.Constants.WebApi;
 using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.UnitTests.Mocks;
 using Shrooms.UnitTests.ModelMappings;
 using Shrooms.WebViewModels.Models;
 using Shrooms.WebViewModels.Models.PostModels;
@@ -79,8 +80,8 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         }
 
         [Test]
-        [TestCase("City", ConstWebApi.DefaultPageSize, "A-Office")]
-        [TestCase("StreetBuilding", ConstWebApi.DefaultPageSize, "B-Office")]
+        [TestCase("City", WebApiConstants.DefaultPageSize, "A-Office")]
+        [TestCase("StreetBuilding", WebApiConstants.DefaultPageSize, "B-Office")]
         public void Office_GetPaged_Should_Return_Sorted_List(string sort, int amountResult, string officeNameResult)
         {
             var result = _officeController.GetPaged(sort: sort);

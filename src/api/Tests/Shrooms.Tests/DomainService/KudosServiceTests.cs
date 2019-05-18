@@ -4,7 +4,6 @@ using System.Data.Entity;
 using System.IO;
 using System.Linq;
 using System.Web;
-using DomainServiceValidators.Validators.Kudos;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Constants.Authorization;
@@ -16,12 +15,13 @@ using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.DomainExceptions.Exceptions.Kudos;
+using Shrooms.DomainServiceValidators.Validators.Kudos;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.UnitTests.Extensions;
 
-namespace Shrooms.API.Tests.DomainService
+namespace Shrooms.UnitTests.DomainService
 {
     public class KudosServiceTests
     {
@@ -72,7 +72,7 @@ namespace Shrooms.API.Tests.DomainService
             {
                 OrganizationId = 2,
                 Page = 1,
-                Status = ConstBusinessLayer.KudosStatusAllFilter,
+                Status = BusinessLayerConstants.KudosStatusAllFilter,
                 UserId = "testUserId",
                 SortBy = "Created",
                 SortOrder = "desc"
@@ -105,7 +105,7 @@ namespace Shrooms.API.Tests.DomainService
             {
                 OrganizationId = 2,
                 Page = 1,
-                Status = ConstBusinessLayer.KudosStatusAllFilter,
+                Status = BusinessLayerConstants.KudosStatusAllFilter,
                 SortBy = "Created",
                 SortOrder = "desc"
             };
@@ -150,8 +150,8 @@ namespace Shrooms.API.Tests.DomainService
                 OrganizationId = 1,
                 UserId = "UserId"
             };
-            var result = _kudosService.GetLastKudosLogsForWall(userAndOrg);
-            Assert.AreEqual(1, result.Count());
+            var result = _kudosService.GetLastKudosLogsForWall(userAndOrg).ToList();
+            Assert.AreEqual(1, result.Count);
             Assert.AreEqual("Comment2", result.First().Comment);
         }
 
@@ -159,8 +159,8 @@ namespace Shrooms.API.Tests.DomainService
         public void Should_Return_Kudos_Logs_For_Pie_Chart_With_Organization_Filter()
         {
             MockKudosLogsForPieChart();
-            var result = _kudosService.GetKudosPieChartData(1, "UserId");
-            Assert.AreEqual(1, result.Count());
+            var result = _kudosService.GetKudosPieChartData(1, "UserId").ToList();
+            Assert.AreEqual(1, result.Count);
             Assert.AreEqual(3, result.First().Value);
         }
 
@@ -168,8 +168,8 @@ namespace Shrooms.API.Tests.DomainService
         public void Should_Return_Kudos_Logs_For_Pie_Chart_With_Organization_Filter_2()
         {
             MockKudosLogsForPieChart();
-            var result = _kudosService.GetKudosPieChartData(2, "UserId");
-            Assert.AreEqual(2, result.Count());
+            var result = _kudosService.GetKudosPieChartData(2, "UserId").ToList();
+            Assert.AreEqual(2, result.Count);
             Assert.AreEqual(2, result.First().Value);
             Assert.AreEqual(10, result.ToArray()[1].Value);
             Assert.AreEqual("Type2", result.ToArray()[1].Name);
@@ -179,8 +179,8 @@ namespace Shrooms.API.Tests.DomainService
         public void Should_Return_Approved_Kudos_Logs_With_Organization_Filter()
         {
             MockKudosLogsForApprovedList();
-            var result = _kudosService.GetApprovedKudosList("UserId", 1);
-            Assert.AreEqual(1, result.Count());
+            var result = _kudosService.GetApprovedKudosList("UserId", 1).ToList();
+            Assert.AreEqual(1, result.Count);
             Assert.AreEqual("Comment2", result.First().Comments);
             Assert.AreEqual("CreatedUserId", result.First().Sender.Id);
         }
@@ -189,8 +189,8 @@ namespace Shrooms.API.Tests.DomainService
         public void Should_Return_Approved_Kudos_Logs_With_Organization_Filter_2()
         {
             MockKudosLogsForApprovedList();
-            var result = _kudosService.GetApprovedKudosList("UserId", 2);
-            Assert.AreEqual(2, result.Count());
+            var result = _kudosService.GetApprovedKudosList("UserId", 2).ToList();
+            Assert.AreEqual(2, result.Count);
             Assert.AreEqual("Comment1", result.First().Comments);
             Assert.AreEqual("CreatedUserId", result.First().Sender.Id);
             Assert.AreEqual("Comment3", result.ToArray()[1].Comments);
@@ -259,7 +259,7 @@ namespace Shrooms.API.Tests.DomainService
         [Test]
         public void Should_Return_If_Rejection_Doesnt_Update_Status()
         {
-            var kudosRejectDTO = new KudosRejectDTO()
+            var kudosRejectDTO = new KudosRejectDTO
             {
                 OrganizationId = 2,
                 UserId = "testUserId",
@@ -269,7 +269,7 @@ namespace Shrooms.API.Tests.DomainService
 
             _kudosService.RejectKudos(kudosRejectDTO);
 
-            var log = _kudosLogsDbSet.Where(x => x.Id == 1).First();
+            var log = _kudosLogsDbSet.First(x => x.Id == 1);
             Assert.AreEqual(KudosStatus.Rejected, log.Status);
             Assert.AreEqual("testMessage", log.RejectionMessage);
         }
@@ -279,7 +279,7 @@ namespace Shrooms.API.Tests.DomainService
         {
             MockKudosLogsForUpdate();
 
-            var kudosRejectDTO = new KudosRejectDTO()
+            var kudosRejectDTO = new KudosRejectDTO
             {
                 OrganizationId = 1,
                 UserId = "testUserId",
@@ -293,13 +293,13 @@ namespace Shrooms.API.Tests.DomainService
         [Test]
         public void Should_Update_User_Profile_Kudos_Depending_On_Logs()
         {
-            var user = new ApplicationUser()
+            var user = new ApplicationUser
             {
                 Id = "Id",
                 EmploymentDate = DateTime.UtcNow.AddDays(-10)
             };
 
-            var userOrg = new UserAndOrganizationDTO()
+            var userOrg = new UserAndOrganizationDTO
             {
                 OrganizationId = 1,
                 UserId = "userId"
@@ -317,7 +317,7 @@ namespace Shrooms.API.Tests.DomainService
 
         #region AddKudosLogs
 
-        //Checks if permission validation for minus kudos operation works properly. 
+        //Checks if permission validation for minus kudos operation works properly.
         [Test]
         public void Should_Return_If_User_Has_No_Permission()
         {
@@ -326,7 +326,7 @@ namespace Shrooms.API.Tests.DomainService
                 OrganizationId = 2,
                 PointsTypeId = 1,
                 UserId = "testUserId",
-                ReceivingUserIds = new List<string>() { "testUserId" },
+                ReceivingUserIds = new List<string> { "testUserId" },
                 MultiplyBy = 2,
                 Comment = "Comment"
             };
@@ -343,7 +343,7 @@ namespace Shrooms.API.Tests.DomainService
                 OrganizationId = 2,
                 PointsTypeId = 1,
                 UserId = "testUserId2",
-                ReceivingUserIds = new List<string>() { "testUserId3", "testUserId4" },
+                ReceivingUserIds = new List<string> { "testUserId3", "testUserId4" },
                 MultiplyBy = 2,
                 Comment = "Comment"
             };
@@ -363,7 +363,7 @@ namespace Shrooms.API.Tests.DomainService
                 OrganizationId = 2,
                 PointsTypeId = 2,
                 UserId = "testUserId2",
-                ReceivingUserIds = new List<string>() { "testUserId3", "testUserId4" },
+                ReceivingUserIds = new List<string> { "testUserId3", "testUserId4" },
                 MultiplyBy = 2,
                 Comment = "Comment"
             };
@@ -388,7 +388,7 @@ namespace Shrooms.API.Tests.DomainService
                 OrganizationId = 2,
                 PointsTypeId = 2,
                 UserId = "testUserId2",
-                ReceivingUserIds = new List<string>() { "testUserId3", "testUserId4" },
+                ReceivingUserIds = new List<string> { "testUserId3", "testUserId4" },
                 MultiplyBy = 2,
                 Comment = "Comment"
             };
@@ -410,7 +410,7 @@ namespace Shrooms.API.Tests.DomainService
                 OrganizationId = 2,
                 PointsTypeId = 2,
                 UserId = "testUserId2",
-                ReceivingUserIds = new List<string>() { "testUserId3", "testUserId4", "testUserId" },
+                ReceivingUserIds = new List<string> { "testUserId3", "testUserId4", "testUserId" },
                 MultiplyBy = 2,
                 Comment = "Comment"
             };
@@ -427,7 +427,7 @@ namespace Shrooms.API.Tests.DomainService
                 OrganizationId = 2,
                 PointsTypeId = 2,
                 UserId = "testUserId2",
-                ReceivingUserIds = new List<string>() { "testUserId3", "testUserId2" },
+                ReceivingUserIds = new List<string> { "testUserId3", "testUserId2" },
                 MultiplyBy = 1,
                 Comment = "Comment"
             };
@@ -436,7 +436,7 @@ namespace Shrooms.API.Tests.DomainService
         }
 
         //User can send limited amount of kudos per month, so this test
-        //checks if validation for monthly sending kudos works properly. 
+        //checks if validation for monthly sending kudos works properly.
         [Test]
         public void Should_Return_If_User_Has_No_Available_Monthly_Kudos()
         {
@@ -445,7 +445,7 @@ namespace Shrooms.API.Tests.DomainService
                 OrganizationId = 2,
                 PointsTypeId = 2,
                 UserId = "testUserId5",
-                ReceivingUserIds = new List<string>() { "testUserId3", "testUserId4", "testUserId" },
+                ReceivingUserIds = new List<string> { "testUserId3", "testUserId4", "testUserId" },
                 MultiplyBy = 2,
                 Comment = "Comment"
             };
@@ -462,7 +462,7 @@ namespace Shrooms.API.Tests.DomainService
                 OrganizationId = 2,
                 PointsTypeId = 3,
                 UserId = "testUserId2",
-                ReceivingUserIds = new List<string>() { "testUserId3", "testUserId4" },
+                ReceivingUserIds = new List<string> { "testUserId3", "testUserId4" },
                 MultiplyBy = 2,
                 Comment = "Comment"
             };
@@ -533,35 +533,35 @@ namespace Shrooms.API.Tests.DomainService
             var kudosServiceValidation = Substitute.For<IKudosServiceValidator>();
             kudosServiceValidation
                 .When(x => x.ValidateKudosMinusPermission(false))
-                .Do(x => { throw new KudosException(""); });
+                .Do(x => throw new KudosException(""));
 
             kudosServiceValidation
                 .When(x => x.ValidateUserAvailableKudos(4, 6))
-                .Do(x => { throw new KudosException(""); });
+                .Do(x => throw new KudosException(""));
 
             kudosServiceValidation
                 .When(x => x.ValidateUserAvailableKudosToSendPerMonth(2, 0))
-                .Do(x => { throw new KudosException(""); });
+                .Do(x => throw new KudosException(""));
 
             kudosServiceValidation
                .When(x => x.ValidateSendingToSameUserAsReceiving("testUserId2", "testUserId2"))
-               .Do(x => { throw new KudosException(""); });
+               .Do(x => throw new KudosException(""));
             return kudosServiceValidation;
         }
 
         private void MockFindMethod()
         {
-            _organizationDbSet.Find(2).Returns(MockOrganization().Where(x => x.Id == 2).FirstOrDefault());
+            _organizationDbSet.Find(2).Returns(MockOrganization().FirstOrDefault(x => x.Id == 2));
 
-            _kudosTypesDbSet.Find(1).Returns(MockKudosTypes().Where(x => x.Id == 1).FirstOrDefault());
-            _kudosTypesDbSet.Find(2).Returns(MockKudosTypes().Where(x => x.Id == 2).FirstOrDefault());
-            _kudosTypesDbSet.Find(3).Returns(MockKudosTypes().Where(x => x.Id == 3).FirstOrDefault());
+            _kudosTypesDbSet.Find(1).Returns(MockKudosTypes().FirstOrDefault(x => x.Id == 1));
+            _kudosTypesDbSet.Find(2).Returns(MockKudosTypes().FirstOrDefault(x => x.Id == 2));
+            _kudosTypesDbSet.Find(3).Returns(MockKudosTypes().FirstOrDefault(x => x.Id == 3));
 
-            _usersDbSet.Find("testUserId").Returns(MockUsers().Where(x => x.Id == "testUserId").FirstOrDefault());
-            _usersDbSet.Find("testUserId2").Returns(MockUsers().Where(x => x.Id == "testUserId2").FirstOrDefault());
-            _usersDbSet.Find("testUserId3").Returns(MockUsers().Where(x => x.Id == "testUserId3").FirstOrDefault());
-            _usersDbSet.Find("testUserId4").Returns(MockUsers().Where(x => x.Id == "testUserId4").FirstOrDefault());
-            _usersDbSet.Find("testUserId5").Returns(MockUsers().Where(x => x.Id == "testUserId5").FirstOrDefault());
+            _usersDbSet.Find("testUserId").Returns(MockUsers().FirstOrDefault(x => x.Id == "testUserId"));
+            _usersDbSet.Find("testUserId2").Returns(MockUsers().FirstOrDefault(x => x.Id == "testUserId2"));
+            _usersDbSet.Find("testUserId3").Returns(MockUsers().FirstOrDefault(x => x.Id == "testUserId3"));
+            _usersDbSet.Find("testUserId4").Returns(MockUsers().FirstOrDefault(x => x.Id == "testUserId4"));
+            _usersDbSet.Find("testUserId5").Returns(MockUsers().FirstOrDefault(x => x.Id == "testUserId5"));
         }
 
         private IQueryable<Organization> MockOrganization()
@@ -633,21 +633,21 @@ namespace Shrooms.API.Tests.DomainService
                     Id = 1,
                     Name = "Minus",
                     Value = 1,
-                    Type = ConstBusinessLayer.KudosTypeEnum.Minus
+                    Type = BusinessLayerConstants.KudosTypeEnum.Minus
                 },
                 new KudosType
                 {
                     Id = 2,
                     Name = "Send",
                     Value = 1,
-                    Type = ConstBusinessLayer.KudosTypeEnum.Send
+                    Type = BusinessLayerConstants.KudosTypeEnum.Send
                 },
                 new KudosType
                 {
                     Id = 3,
                     Name = "AnythingElse",
                     Value = 2,
-                    Type = ConstBusinessLayer.KudosTypeEnum.Ordinary
+                    Type = BusinessLayerConstants.KudosTypeEnum.Ordinary
                 },
             }.AsQueryable();
         }
@@ -668,7 +668,7 @@ namespace Shrooms.API.Tests.DomainService
                         LastName = "surname"
                     },
                     KudosTypeName = "Type1",
-                    KudosSystemType = ConstBusinessLayer.KudosTypeEnum.Ordinary,
+                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
                     OrganizationId = 2,
                     CreatedBy = "testUserId"
                 },
@@ -684,7 +684,7 @@ namespace Shrooms.API.Tests.DomainService
                         LastName = "surname"
                     },
                     KudosTypeName = "Type1",
-                    KudosSystemType = ConstBusinessLayer.KudosTypeEnum.Ordinary,
+                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
                     OrganizationId = 2,
                     CreatedBy = "testUserId"
                 },
@@ -700,7 +700,7 @@ namespace Shrooms.API.Tests.DomainService
                         LastName = "surname"
                     },
                     KudosTypeName = "Type2",
-                    KudosSystemType = ConstBusinessLayer.KudosTypeEnum.Ordinary,
+                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
                     OrganizationId = 2,
                     CreatedBy = "testUserId",
                     Points = 0,
@@ -712,7 +712,7 @@ namespace Shrooms.API.Tests.DomainService
                     Id = 4,
                     EmployeeId = "testUserId3",
                     KudosTypeName = "Send",
-                    KudosSystemType = ConstBusinessLayer.KudosTypeEnum.Send,
+                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Send,
                     Employee = new ApplicationUser
                     {
                         Id = "testUserId",
@@ -721,9 +721,9 @@ namespace Shrooms.API.Tests.DomainService
                     },
                     OrganizationId = 2,
                     CreatedBy = "testUserId5",
-                    MultiplyBy = ConstBusinessLayer.KudosAvailableToSendThisMonth - 2,
+                    MultiplyBy = BusinessLayerConstants.KudosAvailableToSendThisMonth - 2,
                     Created = DateTime.UtcNow,
-                    Points = ConstBusinessLayer.KudosAvailableToSendThisMonth - 2,
+                    Points = BusinessLayerConstants.KudosAvailableToSendThisMonth - 2,
                     Comments = "Hello"
                 }
             };
@@ -928,7 +928,7 @@ namespace Shrooms.API.Tests.DomainService
                 {
                     KudosTypeName = "Type1",
                     KudosTypeValue = 1,
-                    KudosSystemType = ConstBusinessLayer.KudosTypeEnum.Ordinary,
+                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
                     Employee = new ApplicationUser
                     {
                         Id = "User1",
@@ -947,7 +947,7 @@ namespace Shrooms.API.Tests.DomainService
                 {
                     KudosTypeName = "Type1",
                     KudosTypeValue = 1,
-                    KudosSystemType = ConstBusinessLayer.KudosTypeEnum.Ordinary,
+                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
                     Employee = new ApplicationUser
                     {
                         Id = "User1",
@@ -966,7 +966,7 @@ namespace Shrooms.API.Tests.DomainService
                 {
                     KudosTypeName = "Type2",
                     KudosTypeValue = 2,
-                    KudosSystemType = ConstBusinessLayer.KudosTypeEnum.Ordinary,
+                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
                     Employee = new ApplicationUser
                     {
                         Id = "User1",
@@ -985,7 +985,7 @@ namespace Shrooms.API.Tests.DomainService
                 {
                     KudosTypeName = "Minus",
                     KudosTypeValue = 2,
-                    KudosSystemType = ConstBusinessLayer.KudosTypeEnum.Minus,
+                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Minus,
                     Employee = new ApplicationUser
                     {
                         Id = "User1",
@@ -1004,7 +1004,7 @@ namespace Shrooms.API.Tests.DomainService
                 {
                     KudosTypeName = "Type2",
                     KudosTypeValue = 2,
-                    KudosSystemType = ConstBusinessLayer.KudosTypeEnum.Ordinary,
+                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
                     Employee = new ApplicationUser
                     {
                         Id = "User1",
@@ -1023,7 +1023,7 @@ namespace Shrooms.API.Tests.DomainService
                 {
                     KudosTypeName = "Type2",
                     KudosTypeValue = 2,
-                    KudosSystemType = ConstBusinessLayer.KudosTypeEnum.Ordinary,
+                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
                     Employee = new ApplicationUser
                     {
                         Id = "User1",
@@ -1044,7 +1044,7 @@ namespace Shrooms.API.Tests.DomainService
                 {
                     KudosTypeName = "Type2",
                     KudosTypeValue = 2,
-                    KudosSystemType = ConstBusinessLayer.KudosTypeEnum.Ordinary,
+                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
                     Employee = new ApplicationUser
                     {
                         Id = "User2",
@@ -1063,7 +1063,7 @@ namespace Shrooms.API.Tests.DomainService
                 {
                     KudosTypeName = "Type2",
                     KudosTypeValue = 2,
-                    KudosSystemType = ConstBusinessLayer.KudosTypeEnum.Ordinary,
+                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
                     Employee = new ApplicationUser
                     {
                         Id = "User2",
@@ -1084,7 +1084,7 @@ namespace Shrooms.API.Tests.DomainService
                 {
                     KudosTypeName = "Type2",
                     KudosTypeValue = 2,
-                    KudosSystemType = ConstBusinessLayer.KudosTypeEnum.Ordinary,
+                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
                     Employee = new ApplicationUser
                     {
                         Id = "User3",
@@ -1105,7 +1105,7 @@ namespace Shrooms.API.Tests.DomainService
                 {
                     KudosTypeName = "Type2",
                     KudosTypeValue = 2,
-                    KudosSystemType = ConstBusinessLayer.KudosTypeEnum.Ordinary,
+                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
                     Employee = new ApplicationUser
                     {
                         Id = "User4",
@@ -1124,7 +1124,7 @@ namespace Shrooms.API.Tests.DomainService
                 {
                     KudosTypeName = "Type2",
                     KudosTypeValue = 2,
-                    KudosSystemType = ConstBusinessLayer.KudosTypeEnum.Ordinary,
+                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
                     Employee = new ApplicationUser
                     {
                         Id = "User4",
@@ -1141,7 +1141,7 @@ namespace Shrooms.API.Tests.DomainService
                 }
             };
 
-            var users = new List<ApplicationUser>()
+            var users = new List<ApplicationUser>
             {
                 new ApplicationUser
                 {
@@ -1188,7 +1188,7 @@ namespace Shrooms.API.Tests.DomainService
                     Id = 1,
                     EmployeeId = "Id",
                     KudosTypeName = "Type1",
-                    KudosSystemType = ConstBusinessLayer.KudosTypeEnum.Ordinary,
+                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
                     OrganizationId = 1,
                     Created = DateTime.UtcNow,
                     CreatedBy = "testUserId"
@@ -1201,7 +1201,7 @@ namespace Shrooms.API.Tests.DomainService
                     Id = 2,
                     EmployeeId = "Id",
                     KudosTypeName = "Type1",
-                    KudosSystemType = ConstBusinessLayer.KudosTypeEnum.Ordinary,
+                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
                     OrganizationId = 2,
                     Created = DateTime.UtcNow,
                     Points = 1
@@ -1214,7 +1214,7 @@ namespace Shrooms.API.Tests.DomainService
                     Id = 3,
                     EmployeeId = "Id",
                     KudosTypeName = "Type2",
-                    KudosSystemType = ConstBusinessLayer.KudosTypeEnum.Ordinary,
+                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
                     KudosTypeValue = 2,
                     OrganizationId = 1,
                     Created = DateTime.UtcNow.AddDays(-11),
@@ -1226,7 +1226,7 @@ namespace Shrooms.API.Tests.DomainService
                     Id = 4,
                     EmployeeId = "Id",
                     KudosTypeName = "Type2",
-                    KudosSystemType = ConstBusinessLayer.KudosTypeEnum.Ordinary,
+                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
                     OrganizationId = 1,
                     Created = DateTime.UtcNow,
                     Points = 10
@@ -1237,7 +1237,7 @@ namespace Shrooms.API.Tests.DomainService
                     Id = 5,
                     EmployeeId = "Id",
                     KudosTypeName = "Type2",
-                    KudosSystemType = ConstBusinessLayer.KudosTypeEnum.Ordinary,
+                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
                     OrganizationId = 1,
                     Created = DateTime.UtcNow,
                     Points = 1
@@ -1248,7 +1248,7 @@ namespace Shrooms.API.Tests.DomainService
                     Id = 6,
                     EmployeeId = "Id",
                     KudosTypeName = "Minus",
-                    KudosSystemType = ConstBusinessLayer.KudosTypeEnum.Minus,
+                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Minus,
                     OrganizationId = 1,
                     Created = DateTime.UtcNow,
                     Points = 1
@@ -1259,7 +1259,7 @@ namespace Shrooms.API.Tests.DomainService
                     Id = 6,
                     EmployeeId = "Id",
                     KudosTypeName = "Other",
-                    KudosSystemType = ConstBusinessLayer.KudosTypeEnum.Other,
+                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Other,
                     OrganizationId = 1,
                     Created = DateTime.UtcNow,
                     Points = 1,

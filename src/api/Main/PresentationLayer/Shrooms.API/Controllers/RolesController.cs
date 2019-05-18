@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -11,7 +10,7 @@ using AutoMapper;
 using Microsoft.AspNet.Identity;
 using PagedList;
 using Shrooms.API.Filters;
-using Shrooms.Authentification;
+using Shrooms.Authentification.Membership;
 using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.WebApi;
 using Shrooms.DataTransferObjects.Models.Permissions;
@@ -19,13 +18,14 @@ using Shrooms.DataTransferObjects.Models.Roles;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.EntityModels.Models;
-using Shrooms.Infrastructure.CustomCache;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Infrastructure.CustomCache;
 using Shrooms.WebViewModels.Models;
 using Shrooms.WebViewModels.Models.Roles;
 using Shrooms.WebViewModels.Models.User;
 
-namespace Shrooms.API.Controllers.WebApi
+namespace Shrooms.API.Controllers
 {
     [Authorize]
     [RoutePrefix("Role")]
@@ -236,7 +236,7 @@ namespace Shrooms.API.Controllers.WebApi
         [HttpGet]
         [Route("GetPaged")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Role)]
-        public PagedViewModel<RoleViewModel> GetPaged(int page = 1, int pageSize = ConstWebApi.DefaultPageSize, string s = "",
+        public PagedViewModel<RoleViewModel> GetPaged(int page = 1, int pageSize = WebApiConstants.DefaultPageSize, string s = "",
             string sort = "Name", string dir = "", string includeProperties = "")
         {
             string sortString = string.IsNullOrEmpty(sort) ? null : $"{sort} {dir}";

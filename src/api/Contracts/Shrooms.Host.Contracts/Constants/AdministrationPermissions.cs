@@ -1,4 +1,4 @@
-﻿namespace Shrooms.Constants.Authorization.Permissions
+﻿namespace Shrooms.Host.Contracts.Constants
 {
     public static class AdministrationPermissions
     {

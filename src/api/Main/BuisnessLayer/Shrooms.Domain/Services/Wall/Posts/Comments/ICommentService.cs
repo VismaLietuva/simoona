@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Wall.Posts.Comments;
-using Shrooms.EntityModels.Models.Multiwall;
 
 namespace Shrooms.Domain.Services.Wall.Posts.Comments
 {

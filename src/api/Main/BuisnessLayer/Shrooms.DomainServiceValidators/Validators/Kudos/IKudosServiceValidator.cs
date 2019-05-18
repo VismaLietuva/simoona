@@ -2,7 +2,7 @@
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
 
-namespace DomainServiceValidators.Validators.Kudos
+namespace Shrooms.DomainServiceValidators.Validators.Kudos
 {
     public interface IKudosServiceValidator
     {

@@ -9,7 +9,7 @@ using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.Configuration;
 
-namespace Shrooms.Authorization.BasicAuth
+namespace Shrooms.Authentification.BasicAuth
 {
     public class BasicAuthValidator : IBasicAuthValidator
     {
@@ -40,7 +40,7 @@ namespace Shrooms.Authorization.BasicAuth
             {
                 new Claim("name", "app"),
                 new Claim("role", "scheduler-webhook"),
-                new Claim(ConstWebApi.ClaimOrganizationName, tenantName)
+                new Claim(WebApiConstants.ClaimOrganizationName, tenantName)
             };
 
             var identity = new ClaimsIdentity(claims, "Basic", "name", "role");

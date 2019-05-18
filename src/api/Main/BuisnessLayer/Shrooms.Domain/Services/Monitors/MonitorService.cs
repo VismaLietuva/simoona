@@ -87,7 +87,7 @@ namespace Shrooms.Domain.Services.Monitors
 
             monitor.Name = monitorDTO.Name;
             monitor.Modified = DateTime.UtcNow;
-            monitor.ModifiedBy = userAndOrganizationDTO.UserId; 
+            monitor.ModifiedBy = userAndOrganizationDTO.UserId;
             _uow.SaveChanges(false);
         }
     }

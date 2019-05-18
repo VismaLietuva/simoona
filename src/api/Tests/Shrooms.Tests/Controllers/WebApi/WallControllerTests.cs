@@ -63,12 +63,12 @@ namespace Shrooms.UnitTests.Controllers.WebApi
                     Description = "Description",
                     IsFollowing = false
                 }
-            };  
+            };
 
             _wallService.GetWallsList(null, WallsListFilter.All).ReturnsForAnyArgs(Task.Run(() => walls));
 
             var response = await _wallController.GetWallList(WallsListFilter.All);
-         
+
             Assert.IsInstanceOf<OkNegotiatedContentResult<IEnumerable<WallListViewModel>>>(response);
         }
 
@@ -176,7 +176,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
                 }
             };
 
-            _wallService.GetWallPosts(page, ConstWebApi.DefaultPageSize, null, wallId).ReturnsForAnyArgs(Task.Run(() => posts));
+            _wallService.GetWallPosts(page, WebApiConstants.DefaultPageSize, null, wallId).ReturnsForAnyArgs(Task.Run(() => posts));
 
             var response = await _wallController.GetPagedWall(wallId, page);
 
@@ -231,7 +231,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         }
 
         [Test]
-        public async Task Wall_EditWall_Should_Return_Invalid_Model_State()
+        public void Wall_EditWall_Should_Return_Invalid_Model_State()
         {
             var wall = new UpdateWallViewModel
             {

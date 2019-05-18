@@ -9,7 +9,7 @@ namespace Shrooms.WebViewModels.Models.Jobs
         public int Id { get; set; }
 
         [Required]
-        [StringLength(ConstWebApi.JobTitleMaxLength, MinimumLength = 1)]
+        [StringLength(WebApiConstants.JobTitleMaxLength, MinimumLength = 1)]
         public string Title { get; set; }
     }
 }

@@ -6,14 +6,14 @@ using System.Net.Http;
 using System.Web.Http;
 using AutoMapper;
 using Shrooms.API.Filters;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.WebApi;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.WebViewModels.Models;
 using Shrooms.WebViewModels.Models.PostModels;
 
-namespace Shrooms.API.Controllers.WebApi
+namespace Shrooms.API.Controllers
 {
     [Authorize]
     [PermissionAuthorize(AdministrationPermissions.RoomType)]
@@ -43,8 +43,8 @@ namespace Shrooms.API.Controllers.WebApi
 
             var roomType = _mapper.Map<RoomTypePostViewModel, RoomType>(crudViewModel);
 
-            Repository.Insert(roomType);
-            UnitOfWork.Save();
+            _repository.Insert(roomType);
+            _unitOfWork.Save();
 
             return Request.CreateResponse(HttpStatusCode.Created);
         }
@@ -61,8 +61,8 @@ namespace Shrooms.API.Controllers.WebApi
 
             _mapper.Map(crudViewModel, roomTypeModel);
 
-            Repository.Update(roomTypeModel);
-            UnitOfWork.Save();
+            _repository.Update(roomTypeModel);
+            _unitOfWork.Save();
 
             return Request.CreateResponse(HttpStatusCode.Created);
         }
@@ -70,7 +70,7 @@ namespace Shrooms.API.Controllers.WebApi
         [PermissionAuthorize(Permission = AdministrationPermissions.RoomType)]
         public override HttpResponseMessage Delete(int id)
         {
-            var roomType = Repository.Get(maxResults: 1, filter: r => r.Id.Equals(id), includeProperties: "Rooms").FirstOrDefault();
+            var roomType = _repository.Get(maxResults: 1, filter: r => r.Id.Equals(id), includeProperties: "Rooms").FirstOrDefault();
 
             if (roomType == null)
             {
@@ -86,14 +86,14 @@ namespace Shrooms.API.Controllers.WebApi
                 }
             }
 
-            Repository.DeleteById(roomType.Id);
-            UnitOfWork.Save();
+            _repository.DeleteById(roomType.Id);
+            _unitOfWork.Save();
 
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         [PermissionAuthorize(Permission = AdministrationPermissions.RoomType)]
-        public override PagedViewModel<RoomTypeViewModel> GetPaged(string includeProperties = null, int page = 1, int pageSize = ConstWebApi.DefaultPageSize,
+        public override PagedViewModel<RoomTypeViewModel> GetPaged(string includeProperties = null, int page = 1, int pageSize = WebApiConstants.DefaultPageSize,
             string sort = null, string dir = "", string s = "")
         {
             return GetFilteredPaged(includeProperties, page, pageSize, sort, dir, p => p.Name.Contains(s));
@@ -103,8 +103,8 @@ namespace Shrooms.API.Controllers.WebApi
 
         private RoomType GetByIdOrName(string name, int id = -1, string includeProperties = "")
         {
-            var test = Repository.Get();
-            var res = Repository.Get(f => f.Name.Equals(name, StringComparison.OrdinalIgnoreCase) || f.Id.Equals(id), 1, includeProperties: includeProperties).FirstOrDefault();
+            var test = _repository.Get();
+            var res = _repository.Get(f => f.Name.Equals(name, StringComparison.OrdinalIgnoreCase) || f.Id.Equals(id), 1, includeProperties: includeProperties).FirstOrDefault();
 
             return res;
         }
@@ -112,7 +112,7 @@ namespace Shrooms.API.Controllers.WebApi
         [PermissionAuthorize(Permission = AdministrationPermissions.RoomType)]
         public IEnumerable<RoomTypeViewModel> GetByFloor(int floorId, string includeProperties = "")
         {
-            var model = Repository.Get(t => t.Rooms.Any(r => r.FloorId == floorId), includeProperties: includeProperties);
+            var model = _repository.Get(t => t.Rooms.Any(r => r.FloorId == floorId), includeProperties: includeProperties);
             return _mapper.Map<IEnumerable<RoomType>, IEnumerable<RoomTypeViewModel>>(model);
         }
     }

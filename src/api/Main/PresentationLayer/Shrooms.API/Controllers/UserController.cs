@@ -7,11 +7,11 @@ using AutoMapper;
 using Microsoft.AspNet.Identity;
 using Shrooms.API.Filters;
 using Shrooms.Constants.Authentication;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.DataTransferObjects.Models.Users;
 using Shrooms.Domain.Services.UserService;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.WebViewModels.Models.AccountModels;
 using Shrooms.WebViewModels.Models.User;
 

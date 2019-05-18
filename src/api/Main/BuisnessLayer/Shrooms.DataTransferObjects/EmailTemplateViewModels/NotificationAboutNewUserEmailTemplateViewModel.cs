@@ -7,12 +7,12 @@
 
         public NotificationAboutNewUserEmailTemplateViewModel(
             string userNotificationSettingsUrl,
-            string newUserProfileUrl, 
+            string newUserProfileUrl,
             string newUserName)
             : base(userNotificationSettingsUrl)
         {
-            this.NewUserProfileUrl = newUserProfileUrl;
-            this.NewUserName = newUserName;
+            NewUserProfileUrl = newUserProfileUrl;
+            NewUserName = newUserName;
         }
     }
 }

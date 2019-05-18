@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Autofac;
-using DomainServiceValidators.Validators.KudosBaskets;
+﻿using Autofac;
 using Shrooms.Domain.Services.KudosBaskets;
+using Shrooms.DomainServiceValidators.Validators.KudosBaskets;
 
 namespace Shrooms.IoC.Modules
 {

@@ -3,9 +3,9 @@ using System.Data.Entity;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Shrooms.Azure;
 using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Infrastructure.Storage;
 
 namespace Shrooms.Domain.Services.Picture
 {

@@ -1,7 +1,7 @@
 ﻿using Autofac;
-using DomainServiceValidators.Validators.Kudos;
 using Shrooms.Domain.Services.Email.Kudos;
 using Shrooms.Domain.Services.Kudos;
+using Shrooms.DomainServiceValidators.Validators.Kudos;
 
 namespace Shrooms.IoC.Modules
 {

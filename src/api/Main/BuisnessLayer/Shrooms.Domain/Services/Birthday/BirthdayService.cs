@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
-using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Birthdays;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.EntityModels.Models;

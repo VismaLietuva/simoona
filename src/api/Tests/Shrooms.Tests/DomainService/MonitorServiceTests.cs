@@ -38,7 +38,7 @@ namespace Shrooms.UnitTests.DomainService
         {
             MockExternalLinks();
 
-            var result = _monitorService.GetMonitorList(2);
+            var result = _monitorService.GetMonitorList(2).ToList();
             Assert.AreEqual(2, result.Count());
             Assert.AreEqual("Test1", result.First().Name);
         }
@@ -149,7 +149,7 @@ namespace Shrooms.UnitTests.DomainService
         {
             var monitors = new List<Monitor>()
             {
-                new Monitor 
+                new Monitor
                 {
                     Id = 1,
                     Name = "Test1",

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Shrooms.Constants.BusinessLayer;
 
-namespace Shrooms.WebViewModels.Models.Kudos
+namespace Shrooms.WebViewModels.Models.Users.Kudos
 {
     public class KudosRejectViewModel
     {
@@ -9,7 +9,7 @@ namespace Shrooms.WebViewModels.Models.Kudos
         public int Id { get; set; }
 
         [Required]
-        [MaxLength(ConstBusinessLayer.MaxMessageLength)]
+        [MaxLength(BusinessLayerConstants.MaxMessageLength)]
         public string KudosRejectionMessage { get; set; }
     }
 }

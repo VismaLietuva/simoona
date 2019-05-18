@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Data.Entity;
 using System.Linq;
+using Shrooms.Constants.ErrorCodes;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.Host.Contracts.DAL;
-using static Shrooms.Constants.ErrorCodes.ErrorCodes;
 
-namespace DomainServiceValidators.Validators.Wall
+namespace Shrooms.DomainServiceValidators.Validators.Wall
 {
     public class WallValidator : IWallValidator
     {
@@ -34,7 +34,7 @@ namespace DomainServiceValidators.Validators.Wall
             {
                 if (!HasUserAccessToWall(userId, postWallId.Value))
                 {
-                    throw new ValidationException(UserIsNotAMemberOfWall, "Not permitted");
+                    throw new ValidationException(ErrorCodes.UserIsNotAMemberOfWall, "Not permitted");
                 }
             }
         }

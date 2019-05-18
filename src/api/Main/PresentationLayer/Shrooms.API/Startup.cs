@@ -144,11 +144,11 @@ namespace Shrooms.API
 
         private static void SetupGlobalization(IAppBuilder app)
         {
-            var globalizationOptions = new OwinGlobalizationOptions(ConstWebApi.DefaultLanguage)
-                .CustomCookieName(ConstWebApi.LanguageCookieName)
+            var globalizationOptions = new OwinGlobalizationOptions(WebApiConstants.DefaultLanguage)
+                .CustomCookieName(WebApiConstants.LanguageCookieName)
                 .DisableCultureInPath();
 
-            foreach (var language in ConstWebApi.SupportedLanguages)
+            foreach (var language in WebApiConstants.SupportedLanguages)
             {
                 globalizationOptions.Add(language, true);
             }

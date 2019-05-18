@@ -26,7 +26,7 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations.Badges
                 .WithRequired()
                 .HasForeignKey(x => x.BadgeCategoryId)
                 .WillCascadeOnDelete(value: false);
-            
+
             HasMany(x => x.BadgeTypes)
                 .WithRequired()
                 .HasForeignKey(x => x.BadgeCategoryId)

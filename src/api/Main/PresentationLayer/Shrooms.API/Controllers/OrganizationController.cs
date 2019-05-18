@@ -5,17 +5,17 @@ using System.Net.Http;
 using System.Web.Http;
 using AutoMapper;
 using Shrooms.API.Filters;
-using Shrooms.Authentification;
-using Shrooms.Constants.Authorization.Permissions;
+using Shrooms.Authentification.Membership;
 using Shrooms.Constants.WebApi;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.WebViewModels.Models;
 using Shrooms.WebViewModels.Models.PostModels;
 
-namespace Shrooms.API.Controllers.WebApi
+namespace Shrooms.API.Controllers
 {
     [Authorize]
     public class OrganizationController : AbstractWebApiController<Organization, OrganizationViewModel, OrganizationPostViewModel>
@@ -45,14 +45,14 @@ namespace Shrooms.API.Controllers.WebApi
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Organization)]
         public override PagedViewModel<OrganizationViewModel> GetPaged(string includeProperties = null, int page = 1,
-            int pageSize = ConstWebApi.DefaultPageSize, string sort = null, string dir = "", string s = "")
+            int pageSize = WebApiConstants.DefaultPageSize, string sort = null, string dir = "", string s = "")
         {
             return base.GetPaged(includeProperties, page, pageSize, sort, dir, s);
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Organization)]
         protected override PagedViewModel<OrganizationViewModel> GetFilteredPaged(
-            string includeProperties = null, int page = 1, int pageSize = ConstWebApi.DefaultPageSize,
+            string includeProperties = null, int page = 1, int pageSize = WebApiConstants.DefaultPageSize,
             string sort = null, string dir = "", Expression<Func<Organization, bool>> filter = null)
         {
             return base.GetFilteredPaged(includeProperties, page, pageSize, sort, dir, filter);

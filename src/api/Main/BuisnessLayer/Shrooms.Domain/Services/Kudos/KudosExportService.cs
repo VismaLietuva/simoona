@@ -7,8 +7,8 @@ using Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.Domain.Helpers;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
-using Shrooms.Infrastructure.ExcelGenerator;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Infrastructure.ExcelGenerator;
 
 namespace Shrooms.Domain.Services.Kudos
 {
@@ -70,7 +70,7 @@ namespace Shrooms.Domain.Services.Kudos
             };
 
             _excelBuilder.AddNewWorksheet(
-                ConstBusinessLayer.KudosLogExcelSheetName,
+                BusinessLayerConstants.KudosLogExcelSheetName,
                 header,
                 kudosLogs);
 

@@ -5,13 +5,13 @@
         public string Comment { get; set; }
         public ServiceRequestCommentEmailTemplateViewModel(
             string userNotificationSettingsUrl,
-            string serviceRequestTitle, 
+            string serviceRequestTitle,
             string fullName,
             string comment,
             string url)
             : base(userNotificationSettingsUrl, serviceRequestTitle, fullName, url)
         {
-            this.Comment = comment;
+            Comment = comment;
         }
     }
 }

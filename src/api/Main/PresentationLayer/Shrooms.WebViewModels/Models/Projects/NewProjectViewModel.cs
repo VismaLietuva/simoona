@@ -7,7 +7,7 @@ namespace Shrooms.WebViewModels.Models.Projects
     public class NewProjectViewModel
     {
         [Required]
-        [StringLength(ConstWebApi.ProjectNameMaxLength)]
+        [StringLength(WebApiConstants.ProjectNameMaxLength)]
         public string Title { get; set; }
 
         public string Description { get; set; }

@@ -50,8 +50,7 @@ namespace Shrooms.Domain.Services.DailyMailingService
             // Select new posts created in 24 hours
             var postsToEmail = _postDbSet
                 .Include(p => p.Author)
-                .Where(p => 
-                p.Created <= todaysDate && p.Created > yesterdaysDate)
+                .Where(p => p.Created <= todaysDate && p.Created > yesterdaysDate)
                 .ToList();
 
             if (!postsToEmail.Any())
@@ -82,7 +81,7 @@ namespace Shrooms.Domain.Services.DailyMailingService
         private void SendEmail(string userEmail, IEnumerable<Post> wallPosts, string organizationShortName)
         {
             var messageBody = GetMessageBody(wallPosts, organizationShortName);
-            var messageSubject = ConstBusinessLayer.ShroomsInfoEmailSubject;
+            var messageSubject = BusinessLayerConstants.ShroomsInfoEmailSubject;
 
             var emailDTO = new EmailDto(userEmail, messageSubject, messageBody);
 
@@ -94,20 +93,20 @@ namespace Shrooms.Domain.Services.DailyMailingService
             var wallPostList = new StringBuilder();
             foreach (var post in wallPosts)
             {
-                var displayName = post.Author == null ? ConstBusinessLayer.DeletedUserName :
+                var displayName = post.Author == null ? BusinessLayerConstants.DeletedUserName :
                     (string.IsNullOrEmpty(post.Author.FirstName) && string.IsNullOrEmpty(post.Author.LastName)
                     ? post.Author.UserName
                     : $"{post.Author.FirstName} {post.Author.LastName}");
 
                 // Could be some issues with time zones, because post.Created is UTC, local is server's (not user's) local
                 wallPostList.AppendFormat(
-                    ConstBusinessLayer.WallPostsListTemplate,
-                    post.Created.ToString("yyyy-MM-dd HH:mm"), 
-                    displayName, 
+                    BusinessLayerConstants.WallPostsListTemplate,
+                    post.Created.ToString("yyyy-MM-dd HH:mm"),
+                    displayName,
                     post.MessageBody);
             }
 
-            return string.Format(ConstBusinessLayer.ShroomsInfoEmailMessageBodyTemplate, wallPostList, ConstBusinessLayer.SimonaUrl, organizationShortName);
+            return string.Format(BusinessLayerConstants.ShroomsInfoEmailMessageBodyTemplate, wallPostList, BusinessLayerConstants.SimonaUrl, organizationShortName);
         }
     }
 }

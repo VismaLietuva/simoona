@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Shrooms.WebViewModels.Models.Birthday;
-using Shrooms.WebViewModels.Models.Kudos;
 using Shrooms.WebViewModels.Models.Users.Kudos;
 
 namespace Shrooms.WebViewModels.Models.Wall.Widgets

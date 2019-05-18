@@ -2,7 +2,7 @@
 
 namespace Shrooms.DataTransferObjects.Models.LazyPaged
 {
-    public interface ILazyPaged<T> 
+    public interface ILazyPaged<T>
         where T : class
     {
         IEnumerable<T> Entries { get; set; }

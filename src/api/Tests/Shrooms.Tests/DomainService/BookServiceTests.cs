@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
-using DomainServiceValidators.Validators.Books;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.DataTransferObjects.Models;
@@ -13,11 +12,11 @@ using Shrooms.DataTransferObjects.Models.Books.BooksByOffice;
 using Shrooms.Domain.Services.Books;
 using Shrooms.Domain.Services.Email.Book;
 using Shrooms.DomainExceptions.Exceptions.Book;
+using Shrooms.DomainServiceValidators.Validators.Books;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Books;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.GoogleBookApiService;
-using Shrooms.Infrastructure.GoogleBookService;
 using Shrooms.UnitTests.Extensions;
 
 namespace Shrooms.UnitTests.DomainService

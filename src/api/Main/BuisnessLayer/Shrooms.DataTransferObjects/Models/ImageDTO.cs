@@ -1,4 +1,4 @@
-﻿namespace Shrooms.DomainService.Services.DTO
+﻿namespace Shrooms.DataTransferObjects.Models
 {
     public class ImageDTO
     {

@@ -64,8 +64,7 @@ namespace Shrooms.Domain.Services.Roles
         {
             return _roleDbSet
                 .Include(x => x.Users)
-                .Any(x => x.Name == roleName && 
-                          x.Users.Any(u => u.UserId == userId));
+                .Any(x => x.Name == roleName && x.Users.Any(u => u.UserId == userId));
         }
 
         private RoleDetailsDTO GetRole(Expression<Func<ApplicationRole, bool>> roleFilter, int orgId, bool skipPermission = false)

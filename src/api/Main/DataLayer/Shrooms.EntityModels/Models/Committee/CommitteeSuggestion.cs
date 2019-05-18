@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Shrooms.EntityModels.Models
+namespace Shrooms.EntityModels.Models.Committee
 {
     public class CommitteeSuggestion : BaseModel
     {

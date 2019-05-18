@@ -7,14 +7,14 @@ using AutoMapper;
 using MoreLinq;
 using PagedList;
 using Shrooms.API.Filters;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.WebApi;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.WebViewModels.Models;
 using Shrooms.WebViewModels.Models.PostModels;
 
-namespace Shrooms.API.Controllers.WebApi
+namespace Shrooms.API.Controllers
 {
     [Authorize]
     public class FloorController : AbstractWebApiController<Floor, FloorViewModel, FloorPostViewModel>
@@ -46,24 +46,24 @@ namespace Shrooms.API.Controllers.WebApi
         [PermissionAuthorize(Permission = BasicPermissions.Floor)]
         public FloorViewModel GetByRoom(int roomId)
         {
-            var model = Repository.Get(f => f.Rooms.Any(r => r.Id == roomId), 1).FirstOrDefault();
+            var model = _repository.Get(f => f.Rooms.Any(r => r.Id == roomId), 1).FirstOrDefault();
             return _mapper.Map<Floor, FloorViewModel>(model);
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Floor)]
         public IEnumerable<FloorViewModel> GetByOffice(int officeId)
         {
-            var model = Repository.Get(f => f.OfficeId == officeId, includeProperties: "Picture");
+            var model = _repository.Get(f => f.OfficeId == officeId, includeProperties: "Picture");
             return _mapper.Map<IEnumerable<Floor>, IEnumerable<FloorViewModel>>(model);
         }
 
         [PermissionAuthorize(Permission = AdministrationPermissions.Floor)]
-        public FloorViewPagedModel GetAllFloors(int officeId, int page = 1, int pageSize = ConstWebApi.DefaultPageSize, string s = "", string sort = "Id", string dir = "")
+        public FloorViewPagedModel GetAllFloors(int officeId, int page = 1, int pageSize = WebApiConstants.DefaultPageSize, string s = "", string sort = "Id", string dir = "")
         {
             var sortQuery = string.IsNullOrEmpty(sort) ? null : $"{sort} {dir}";
             s = s ?? string.Empty;
 
-            var floors = Repository.GetPaged(f => (officeId == -1 ? f.OfficeId != -1 : f.OfficeId == officeId) && f.Name.Contains(s),
+            var floors = _repository.GetPaged(f => (officeId == -1 ? f.OfficeId != -1 : f.OfficeId == officeId) && f.Name.Contains(s),
                                                         orderBy: sortQuery, includeProperties: "Rooms,Rooms.ApplicationUsers");
 
             var floorId = floors.Where(n => n != null).Select(n => n.Id).FirstOrDefault();
@@ -104,12 +104,12 @@ namespace Shrooms.API.Controllers.WebApi
         }
 
         [PermissionAuthorize(Permission = AdministrationPermissions.Floor)]
-        public FloorViewPagedModel GetPaged(int officeId, int page = 1, int pageSize = ConstWebApi.DefaultPageSize, string s = "", string sort = "Id", string dir = "")
+        public FloorViewPagedModel GetPaged(int officeId, int page = 1, int pageSize = WebApiConstants.DefaultPageSize, string s = "", string sort = "Id", string dir = "")
         {
             var sortQuery = string.IsNullOrEmpty(sort) ? null : $"{sort} {dir}";
             s = s ?? string.Empty;
 
-            var floors = Repository.GetPaged(f => (officeId == -1 ? f.OfficeId != -1 : f.OfficeId == officeId) && f.Name.Contains(s),
+            var floors = _repository.GetPaged(f => (officeId == -1 ? f.OfficeId != -1 : f.OfficeId == officeId) && f.Name.Contains(s),
                                                         orderBy: sortQuery, includeProperties: "Picture,Rooms,Rooms.ApplicationUsers");
 
             var floorId = floors.Where(n => n != null).Select(n => n.Id).FirstOrDefault();
@@ -152,7 +152,7 @@ namespace Shrooms.API.Controllers.WebApi
         [PermissionAuthorize(Permission = AdministrationPermissions.Floor)]
         public override HttpResponseMessage Delete(int id)
         {
-            var floor = Repository.Get(filter: of => of.Id == id, includeProperties: "Rooms,Rooms.ApplicationUsers").FirstOrDefault();
+            var floor = _repository.Get(filter: of => of.Id == id, includeProperties: "Rooms,Rooms.ApplicationUsers").FirstOrDefault();
 
             if (floor == null)
             {
@@ -165,8 +165,8 @@ namespace Shrooms.API.Controllers.WebApi
                 r.FloorId = null;
             });
 
-            Repository.Delete(floor);
-            UnitOfWork.Save();
+            _repository.Delete(floor);
+            _unitOfWork.Save();
 
             return Request.CreateResponse(HttpStatusCode.OK);
         }

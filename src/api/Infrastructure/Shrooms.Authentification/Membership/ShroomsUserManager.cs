@@ -7,7 +7,7 @@ using Microsoft.Owin.Security.DataProtection;
 using Shrooms.EntityModels.Models;
 using Shrooms.Infrastructure.CustomCache;
 
-namespace Shrooms.Authentification
+namespace Shrooms.Authentification.Membership
 {
     public class ShroomsUserManager : UserManager<ApplicationUser>
     {

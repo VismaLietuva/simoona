@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace Shrooms.Constants.BusinessLayer
 {
-    public static class ConstBusinessLayer
+    public static class BusinessLayerConstants
     {
         public static readonly IEnumerable<CultureInfo> SupportedLanguages = new[] { CultureInfo.GetCultureInfo("en-US"), CultureInfo.GetCultureInfo("lt-LT") };
 
@@ -15,7 +15,7 @@ namespace Shrooms.Constants.BusinessLayer
         public const string DefaultEmailTemplate = "<div>{0}</div>{1}";
         public const int MaxMessageLength = 300;
         public const int WallKudosLogCount = 5;
-        public static readonly char[] SearchSplitter = new char[] { ' ', ',', ';', '|' };
+        public static readonly char[] SearchSplitter = { ' ', ',', ';', '|' };
 
         public const string DeletedUserName = "Deleted Account";
         public const string DeletedUserFirstName = "Deleted";
@@ -52,7 +52,7 @@ namespace Shrooms.Constants.BusinessLayer
         public const int MinCharactersInLeadearboardSearch = 2;
         public const string SimonaUrl = "http://simona:8888";
 
-        #region mailingService
+        #region MailingService
         public const string FromEmailAddress = "noreply@simoona.com";
         public const string EmailSenderName = "Simoona";
         #endregion

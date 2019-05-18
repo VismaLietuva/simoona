@@ -1,6 +1,5 @@
 ﻿using System;
 using Shrooms.EntityModels.Models;
-using Shrooms.EntityModels.Models.Kudos;
 
 namespace Shrooms.DataTransferObjects.Models.Kudos
 {

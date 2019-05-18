@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Shrooms.DataTransferObjects.Models;
+using Shrooms.DataTransferObjects.Models.Birthdays;
 using Shrooms.WebViewModels.Models.Birthday;
 
 namespace Shrooms.ModelMappings.Profiles

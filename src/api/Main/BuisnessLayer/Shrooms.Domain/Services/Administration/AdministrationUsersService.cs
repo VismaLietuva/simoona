@@ -10,10 +10,9 @@ using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AutoMapper;
-using DomainServiceValidators.Validators.UserAdministration;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
-using Shrooms.Authentification;
+using Shrooms.Authentification.Membership;
 using Shrooms.Constants.Authentication;
 using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataLayer.DAL;
@@ -22,6 +21,7 @@ using Shrooms.DataTransferObjects.Models.Administration;
 using Shrooms.Domain.Services.Email.AdministrationUsers;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.Picture;
+using Shrooms.DomainServiceValidators.Validators.UserAdministration;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.Host.Contracts.DAL;
@@ -137,7 +137,7 @@ namespace Shrooms.Domain.Services.Administration
             if (user.PictureId == null && externalIdentity.FindFirst("picture") != null)
             {
                 byte[] data = data = await new WebClient().DownloadDataTaskAsync(externalIdentity.FindFirst("picture").Value);
-                user.PictureId = await _pictureService.UploadFromStream(new MemoryStream(data), "image/jpeg", Guid.NewGuid().ToString() + ".jpg", user.OrganizationId);
+                user.PictureId = await _pictureService.UploadFromStream(new MemoryStream(data), "image/jpeg", Guid.NewGuid() + ".jpg", user.OrganizationId);
                 _uow.SaveChanges(userId);
             }
         }
@@ -197,7 +197,7 @@ namespace Shrooms.Domain.Services.Administration
                 LastName = externalIdentity.FindFirst(ClaimTypes.Surname).Value,
                 OrganizationId = _organizationService.GetOrganizationByName(requestedOrganization).Id,
                 EmploymentDate = DateTime.UtcNow,
-                CultureCode = userSettings.CultureCode ?? ConstBusinessLayer.DefaultCulture,
+                CultureCode = userSettings.CultureCode ?? BusinessLayerConstants.DefaultCulture,
                 TimeZone = userSettings.TimeZone,
                 NotificationsSettings = null
             };
@@ -205,7 +205,7 @@ namespace Shrooms.Domain.Services.Administration
             if (externalIdentity.FindFirst("picture") != null)
             {
                 byte[] data = data = await new WebClient().DownloadDataTaskAsync(externalIdentity.FindFirst("picture").Value);
-                user.PictureId = await _pictureService.UploadFromStream(new MemoryStream(data), "image/jpeg", Guid.NewGuid().ToString() + ".jpg", user.OrganizationId);
+                user.PictureId = await _pictureService.UploadFromStream(new MemoryStream(data), "image/jpeg", Guid.NewGuid() + ".jpg", user.OrganizationId);
             }
 
             var result = _userManager.Create(user);
@@ -227,7 +227,7 @@ namespace Shrooms.Domain.Services.Administration
 
             user.OrganizationId = _organizationService.GetOrganizationByName(requestedOrganization).Id;
             user.EmploymentDate = DateTime.UtcNow;
-            user.CultureCode = userSettings.CultureCode ?? ConstBusinessLayer.DefaultCulture;
+            user.CultureCode = userSettings.CultureCode ?? BusinessLayerConstants.DefaultCulture;
             user.TimeZone = userSettings.TimeZone;
             user.NotificationsSettings = null;
 
@@ -329,7 +329,7 @@ namespace Shrooms.Domain.Services.Administration
                 return null;
             }
 
-            var searchKeyWords = s.Split(ConstBusinessLayer.SearchSplitter).Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
+            var searchKeyWords = s.Split(BusinessLayerConstants.SearchSplitter).Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
             return e => searchKeyWords.Count(n =>
                 e.UserName.Contains(n) ||
                 e.FirstName.Contains(n) ||

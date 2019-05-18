@@ -7,7 +7,7 @@ using Shrooms.Constants.WebApi;
 using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.DAL;
 
-namespace Shrooms.Authentification
+namespace Shrooms.Authentification.Membership
 {
     public class ShroomsClaimsIdentityFactory : ClaimsIdentityFactory<ApplicationUser, string>
     {
@@ -22,7 +22,7 @@ namespace Shrooms.Authentification
         {
             var contextUser = HttpContext.Current.User as ClaimsPrincipal;
             var claimsIdentity = base.CreateAsync(userManager, user, authenticationType).Result;
-            var organizationIdClaim = new Claim(ConstWebApi.ClaimOrganizationId, user.OrganizationId.ToString());
+            var organizationIdClaim = new Claim(WebApiConstants.ClaimOrganizationId, user.OrganizationId.ToString());
 
             if (!claimsIdentity.HasClaim(claim => claim.Type == ClaimTypes.GivenName))
             {
@@ -34,17 +34,17 @@ namespace Shrooms.Authentification
                 claimsIdentity.AddClaim(organizationIdClaim);
             }
 
-            var organizationNameClaim = new Claim(ConstWebApi.ClaimOrganizationName, GetOrganization(user.OrganizationId).ShortName);
+            var organizationNameClaim = new Claim(WebApiConstants.ClaimOrganizationName, GetOrganization(user.OrganizationId).ShortName);
             if (!claimsIdentity.HasClaim(organizationNameClaim.Type, organizationNameClaim.Value))
             {
                 claimsIdentity.AddClaim(organizationNameClaim);
             }
 
             //if user is impersonated add additional claims
-            if (contextUser != null && contextUser.Claims.Any(c => c.Type == ConstWebApi.ClaimUserImpersonation && c.Value == true.ToString()) && contextUser.Claims.First(c => c.Type == ConstWebApi.ClaimOriginalUsername).Value != user.UserName)
+            if (contextUser != null && contextUser.Claims.Any(c => c.Type == WebApiConstants.ClaimUserImpersonation && c.Value == true.ToString()) && contextUser.Claims.First(c => c.Type == WebApiConstants.ClaimOriginalUsername).Value != user.UserName)
             {
-                claimsIdentity.AddClaim(contextUser.Claims.FirstOrDefault(c => c.Type == ConstWebApi.ClaimUserImpersonation));
-                claimsIdentity.AddClaim(contextUser.Claims.FirstOrDefault(c => c.Type == ConstWebApi.ClaimOriginalUsername));
+                claimsIdentity.AddClaim(contextUser.Claims.FirstOrDefault(c => c.Type == WebApiConstants.ClaimUserImpersonation));
+                claimsIdentity.AddClaim(contextUser.Claims.FirstOrDefault(c => c.Type == WebApiConstants.ClaimOriginalUsername));
                 claimsIdentity.AddClaim(contextUser.Claims.FirstOrDefault(c => c.Type == ClaimTypes.PrimarySid));
             }
 

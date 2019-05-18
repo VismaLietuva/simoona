@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Shrooms.DataTransferObjects.Models.Kudos;
-using Shrooms.WebViewModels.Models.Kudos;
 using Shrooms.WebViewModels.Models.KudosTypes;
+using Shrooms.WebViewModels.Models.Users.Kudos;
 
 namespace Shrooms.ModelMappings.Profiles
 {
@@ -30,7 +30,7 @@ namespace Shrooms.ModelMappings.Profiles
             CreateMap<KudosRejectViewModel, KudosRejectDTO>();
             CreateMap<KudosBasicDataViewModel, KudosBasicDataDTO>();
             CreateMap<NewKudosTypeViewModel, NewKudosTypeDto>();
-            CreateMap<KudosTypeViewModel, KudosTypeDTO>();        
+            CreateMap<KudosTypeViewModel, KudosTypeDTO>();
         }
     }
 }

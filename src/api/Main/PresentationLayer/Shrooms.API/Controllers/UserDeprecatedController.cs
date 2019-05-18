@@ -13,11 +13,11 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using PagedList;
 using Shrooms.API.Controllers.Kudos;
+using Shrooms.API.Controllers.Wall;
 using Shrooms.API.Filters;
 using Shrooms.API.Helpers;
-using Shrooms.Authentification;
+using Shrooms.Authentification.Membership;
 using Shrooms.Constants.Authorization;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.WebApi;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Administration;
@@ -32,14 +32,15 @@ using Shrooms.Domain.Services.Roles;
 using Shrooms.Domain.Services.UserService;
 using Shrooms.DomainExceptions.Exceptions.UserAdministration;
 using Shrooms.EntityModels.Models;
-using Shrooms.Infrastructure.CustomCache;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Infrastructure.CustomCache;
 using Shrooms.WebViewModels.Models;
 using Shrooms.WebViewModels.Models.Profile.JobPosition;
 using Shrooms.WebViewModels.Models.User;
 using WebApi.OutputCache.V2;
 
-namespace Shrooms.API.Controllers.WebApi
+namespace Shrooms.API.Controllers
 {
     [Authorize]
     [RoutePrefix("ApplicationUser")]
@@ -233,7 +234,7 @@ namespace Shrooms.API.Controllers.WebApi
         [Route("GetPaged")]
         [HttpGet, HttpPost]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public PagedViewModel<AdministrationUserDTO> GetPaged(int page = 1, int pageSize = ConstWebApi.DefaultPageSize, string s = "", string sort = "LastName", string dir = "", string filter = null, string includeProperties = "")
+        public PagedViewModel<AdministrationUserDTO> GetPaged(int page = 1, int pageSize = WebApiConstants.DefaultPageSize, string s = "", string sort = "LastName", string dir = "", string filter = null, string includeProperties = "")
         {
             var sortQuery = string.IsNullOrEmpty(sort) ? null : $"{sort} {dir}";
             FilterDTO[] filterModel = null;
@@ -293,7 +294,7 @@ namespace Shrooms.API.Controllers.WebApi
         public HttpResponseMessage GetDetails(string id)
         {
             var user = _applicationUserRepository
-                .Get(u => u.Id == id, includeProperties: ConstWebApi.PropertiesForUserDetails)
+                .Get(u => u.Id == id, includeProperties: WebApiConstants.PropertiesForUserDetails)
                 .FirstOrDefault();
 
             if (user == null)
@@ -406,7 +407,7 @@ namespace Shrooms.API.Controllers.WebApi
                 return Request.CreateResponse(HttpStatusCode.Forbidden);
             }
 
-            var user = _applicationUserRepository.Get(u => u.Id == id, includeProperties: ConstWebApi.PropertiesForUserJobInfo).FirstOrDefault();
+            var user = _applicationUserRepository.Get(u => u.Id == id, includeProperties: WebApiConstants.PropertiesForUserJobInfo).FirstOrDefault();
             if (user == null)
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound, new[] { string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName) });
@@ -438,7 +439,7 @@ namespace Shrooms.API.Controllers.WebApi
                 return Request.CreateResponse(HttpStatusCode.Forbidden);
             }
 
-            var user = _applicationUserRepository.Get(u => u.Id == id, includeProperties: ConstWebApi.PropertiesForUserOfficeInfo).FirstOrDefault();
+            var user = _applicationUserRepository.Get(u => u.Id == id, includeProperties: WebApiConstants.PropertiesForUserOfficeInfo).FirstOrDefault();
             if (user == null)
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound, new[] { string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName) });
@@ -690,7 +691,7 @@ namespace Shrooms.API.Controllers.WebApi
 
             if (model.BirthDay != null)
             {
-                if (model.BirthDay.Value.Year < ConstWebApi.LowestBirthdayYear)
+                if (model.BirthDay.Value.Year < WebApiConstants.LowestBirthdayYear)
                 {
                     return Request.CreateResponse(HttpStatusCode.BadRequest, new[] { string.Format(Resources.Common.BirthdayDateIsTooOld) });
                 }
@@ -771,7 +772,7 @@ namespace Shrooms.API.Controllers.WebApi
         [Route("GetForAutoComplete")]
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public IEnumerable<ApplicationUserAutoCompleteViewModel> GetForAutoComplete(string s, int pageSize = ConstWebApi.DefaultAutocompleteListSize)
+        public IEnumerable<ApplicationUserAutoCompleteViewModel> GetForAutoComplete(string s, int pageSize = WebApiConstants.DefaultAutocompleteListSize)
         {
             if (string.IsNullOrWhiteSpace(s))
             {
@@ -794,7 +795,7 @@ namespace Shrooms.API.Controllers.WebApi
         [HttpGet]
         [Route("GetManagersForAutoComplete")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public IEnumerable<ApplicationUserAutoCompleteViewModel> GetManagersForAutoComplete(string s, string userId = null, int pageSize = ConstWebApi.DefaultAutocompleteListSize)
+        public IEnumerable<ApplicationUserAutoCompleteViewModel> GetManagersForAutoComplete(string s, string userId = null, int pageSize = WebApiConstants.DefaultAutocompleteListSize)
         {
             if (string.IsNullOrWhiteSpace(s))
             {
@@ -810,7 +811,7 @@ namespace Shrooms.API.Controllers.WebApi
 
             var managerRole = _rolesRepository.Get().FirstOrDefault(role => role.Name == Roles.Manager);
 
-            if (ConstWebApi.OrganizationManagerUsername.Equals(User.Identity.Name, StringComparison.InvariantCultureIgnoreCase))
+            if (WebApiConstants.OrganizationManagerUsername.Equals(User.Identity.Name, StringComparison.InvariantCultureIgnoreCase))
             {
                 var managersWithMantas = _applicationUserRepository
                 .Get(m => m.Roles.Any(r => r.RoleId == managerRole.Id) && (m.UserName.ToLower().StartsWith(s)

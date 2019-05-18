@@ -2,10 +2,10 @@
 using System.Web.Http;
 using System.Web.Http.Cors;
 using Shrooms.API.Filters;
-using Shrooms.Constants.Authorization.Permissions;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Resources;
 
-namespace Shrooms.API.Controllers.WebApi
+namespace Shrooms.API.Controllers
 {
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     [AllowAnonymous]

@@ -6,7 +6,7 @@ namespace Shrooms.Infrastructure.ExcelGenerator
 {
     public class ExcelBuilder : IDisposable, IExcelBuilder
     {
-        private ExcelPackage _package;
+        private readonly ExcelPackage _package;
 
         public ExcelBuilder()
         {
@@ -14,8 +14,8 @@ namespace Shrooms.Infrastructure.ExcelGenerator
         }
 
         public IExcelBuilder AddNewWorksheet(
-            string sheetName, 
-            IEnumerable<string> headerItems, 
+            string sheetName,
+            IEnumerable<string> headerItems,
             IEnumerable<IEnumerable<object>> rows)
         {
             var worksheet = _package.Workbook.Worksheets.Add(sheetName);

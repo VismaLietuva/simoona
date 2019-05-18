@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Shrooms.WebViewModels.Models.Exam;
 
-namespace Shrooms.WebViewModels.Models
+namespace Shrooms.WebViewModels.Models.Certificate
 {
     public class CertificatePostViewModel
     {

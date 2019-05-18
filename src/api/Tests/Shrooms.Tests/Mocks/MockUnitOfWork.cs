@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using Shrooms.Host.Contracts.DAL;
-using Shrooms.UnitTests.Mocks;
 
-namespace Shrooms.UnitTests
+namespace Shrooms.UnitTests.Mocks
 {
     public class MockUnitOfWork : IUnitOfWork
     {
         private bool _disposed = false;
-        private MockDbContext _mockDbContext;
-        private Dictionary<Type, object> _repositories;
+        private readonly MockDbContext _mockDbContext;
+        private readonly Dictionary<Type, object> _repositories;
 
         public MockUnitOfWork()
         {
@@ -42,10 +41,7 @@ namespace Shrooms.UnitTests
             return _mockDbContext as T;
         }
 
-        public IDbContext DbContext
-        {
-            get { return _mockDbContext; }
-        }
+        public IDbContext DbContext => _mockDbContext;
 
         protected void Dispose(bool disposing)
         {

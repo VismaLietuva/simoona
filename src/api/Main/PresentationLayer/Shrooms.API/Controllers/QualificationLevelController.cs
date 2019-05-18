@@ -7,14 +7,14 @@ using System.Web.Http;
 using AutoMapper;
 using PagedList;
 using Shrooms.API.Filters;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.WebApi;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.WebViewModels.Models;
 using Shrooms.WebViewModels.Models.PostModels;
 
-namespace Shrooms.API.Controllers.WebApi
+namespace Shrooms.API.Controllers
 {
     [Authorize]
     public class QualificationLevelController : AbstractWebApiController<QualificationLevel, QualificationLevelViewModel, QualificationLevelPostViewModel>
@@ -26,7 +26,7 @@ namespace Shrooms.API.Controllers.WebApi
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.QualificationLevel)]
-        public IEnumerable<QualificationLevelAutoCompleteViewModel> GetForAutoComplete(string s, int pageSize = ConstWebApi.DefaultAutocompleteListSize)
+        public IEnumerable<QualificationLevelAutoCompleteViewModel> GetForAutoComplete(string s, int pageSize = WebApiConstants.DefaultAutocompleteListSize)
         {
             if (string.IsNullOrWhiteSpace(s))
             {
@@ -34,7 +34,7 @@ namespace Shrooms.API.Controllers.WebApi
             }
 
             s = s.ToLowerInvariant();
-            var users = Repository
+            var users = _repository
                     .Get(q => q.Name.ToLower().StartsWith(s))
                     .OrderBy(q => q.Id)
                     .ToPagedList(1, pageSize);
@@ -59,14 +59,14 @@ namespace Shrooms.API.Controllers.WebApi
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.QualificationLevel)]
         public override PagedViewModel<QualificationLevelViewModel> GetPaged(string includeProperties = null, int page = 1,
-            int pageSize = ConstWebApi.DefaultPageSize, string sort = null, string dir = "", string s = "")
+            int pageSize = WebApiConstants.DefaultPageSize, string sort = null, string dir = "", string s = "")
         {
             return base.GetPaged(includeProperties, page, pageSize, sort, dir, s);
         }
 
         [PermissionAuthorize(BasicPermissions.QualificationLevel)]
         protected override PagedViewModel<QualificationLevelViewModel> GetFilteredPaged(
-            string includeProperties = null, int page = 1, int pageSize = ConstWebApi.DefaultPageSize,
+            string includeProperties = null, int page = 1, int pageSize = WebApiConstants.DefaultPageSize,
             string sort = null, string dir = "", Expression<Func<QualificationLevel, bool>> filter = null)
         {
             return base.GetFilteredPaged(includeProperties, page, pageSize, sort, dir, filter);

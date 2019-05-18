@@ -5,6 +5,7 @@ using Shrooms.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.DataTransferObjects.Models.Books;
 using Shrooms.DataTransferObjects.Models.Emails;
 using Shrooms.EntityModels.Models;
+using Shrooms.EntityModels.Models.Books;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.Configuration;
 using Shrooms.Infrastructure.Email;

@@ -11,12 +11,14 @@ using AutoMapper;
 using Microsoft.AspNet.Identity;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.API.Controllers.WebApi;
-using Shrooms.Authentification;
+using Shrooms.API.Controllers;
+using Shrooms.Authentification.Membership;
 using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.UnitTests.Mocks;
 using Shrooms.UnitTests.ModelMappings;
 using Shrooms.WebViewModels.Models;
+using Shrooms.WebViewModels.Models.PostModels;
 using Shrooms.WebViewModels.Models.User;
 
 namespace Shrooms.UnitTests.Controllers.WebApi

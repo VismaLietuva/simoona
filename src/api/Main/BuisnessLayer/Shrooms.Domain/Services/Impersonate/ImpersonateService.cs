@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.OAuth;
-using Shrooms.Authentification;
+using Shrooms.Authentification.Membership;
 using Shrooms.Constants.DataLayer;
 using OwinDate = Microsoft.Owin.Infrastructure;
 

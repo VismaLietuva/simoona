@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using Shrooms.Constants.DataLayer;
@@ -17,7 +16,7 @@ namespace Shrooms.API.Helpers
             }
 
             var claimsIdentity = identity as ClaimsIdentity;
-            var orgIdClaim = claimsIdentity.FindFirst(ConstWebApi.ClaimOrganizationId);
+            var orgIdClaim = claimsIdentity.FindFirst(WebApiConstants.ClaimOrganizationId);
             if (orgIdClaim == null)
             {
                 return 0;
@@ -34,7 +33,7 @@ namespace Shrooms.API.Helpers
             }
 
             var claimsIdentity = identity as ClaimsIdentity;
-            var orgNameClaim = claimsIdentity.FindFirst(ConstWebApi.ClaimOrganizationName);
+            var orgNameClaim = claimsIdentity.FindFirst(WebApiConstants.ClaimOrganizationName);
             if (orgNameClaim == null)
             {
                 return string.Empty;

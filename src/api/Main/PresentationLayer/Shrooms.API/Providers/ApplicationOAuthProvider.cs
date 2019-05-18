@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Autofac;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.OAuth;
-using Shrooms.Authentification;
+using Shrooms.Authentification.Membership;
 using Shrooms.Infrastructure.Configuration;
 
 namespace Shrooms.API.Providers
@@ -70,7 +70,7 @@ namespace Shrooms.API.Providers
 
         public override Task TokenEndpoint(OAuthTokenEndpointContext context)
         {
-            foreach (KeyValuePair<string, string> property in context.Properties.Dictionary)
+            foreach (var property in context.Properties.Dictionary)
             {
                 context.AdditionalResponseParameters.Add(property.Key, property.Value);
             }
@@ -98,7 +98,7 @@ namespace Shrooms.API.Providers
 
         public override Task AuthorizationEndpointResponse(OAuthAuthorizationEndpointResponseContext context)
         {
-            string refreshToken = string.Empty;
+            var refreshToken = string.Empty;
             context.OwinContext.Authentication.AuthenticationResponseGrant.Properties.Dictionary.TryGetValue("refresh_token", out refreshToken);
 
             if (!string.IsNullOrEmpty(refreshToken))
@@ -128,9 +128,9 @@ namespace Shrooms.API.Providers
         }
 
         public override Task ValidateClientAuthentication(OAuthValidateClientAuthenticationContext context)
-        {      
-            string clientId = string.Empty;
-            string clientSecret = string.Empty;
+        {
+            var clientId = string.Empty;
+            var clientSecret = string.Empty;
 
             if (!context.TryGetBasicCredentials(out clientId, out clientSecret))
             {

@@ -17,7 +17,7 @@ namespace Shrooms.EntityModels.Models.Kudos
 
         public decimal KudosTypeValue { get; set; }
 
-        public ConstBusinessLayer.KudosTypeEnum KudosSystemType { get; set; }
+        public BusinessLayerConstants.KudosTypeEnum KudosSystemType { get; set; }
 
         public KudosStatus Status { get; set; }
 
@@ -36,7 +36,7 @@ namespace Shrooms.EntityModels.Models.Kudos
 
         public bool IsRecipientDeleted() => !string.IsNullOrEmpty(EmployeeId) && Employee == null;
 
-        public bool IsMinus() => KudosSystemType == ConstBusinessLayer.KudosTypeEnum.Minus;
+        public bool IsMinus() => KudosSystemType == BusinessLayerConstants.KudosTypeEnum.Minus;
 
         public string PictureId { get; set; }
 
@@ -77,7 +77,7 @@ namespace Shrooms.EntityModels.Models.Kudos
             }
 
             StatusShouldntBeProcessed();
-           
+
             Status = KudosStatus.Rejected;
             RejectionMessage = reason;
             Modified = DateTime.UtcNow;

@@ -42,7 +42,7 @@ namespace Shrooms.API.Hubs
             var notificationHub = GlobalHost.ConnectionManager.GetHubContext<NotificationHub>();
 
             var connectionIds = NotificationHubUsers
-                .Where(x => x.Key.UserId != userOrg.UserId && 
+                .Where(x => x.Key.UserId != userOrg.UserId &&
                             x.Key.OrganizationId == userOrg.OrganizationId &&
                             x.Key.OrganizationName == userOrg.OrganizationName)
                 .SelectMany(u => u.Value.ConnectionIds)
@@ -52,7 +52,7 @@ namespace Shrooms.API.Hubs
         }
 
         public static void SendNotificationToParticularUsers(
-            NotificationViewModel notification, 
+            NotificationViewModel notification,
             UserAndOrganizationHubDto userOrg,
             IEnumerable<string> membersIds)
         {
@@ -64,7 +64,7 @@ namespace Shrooms.API.Hubs
                             u.Key.OrganizationName == userOrg.OrganizationName)
                 .SelectMany(u => u.Value.ConnectionIds)
                 .ToList();
-             
+
             notificationHub.Clients.Clients(connectionIds).newNotification(notification);
         }
 

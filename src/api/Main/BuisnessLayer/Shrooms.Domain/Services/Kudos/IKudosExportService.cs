@@ -1,6 +1,5 @@
 ﻿namespace Shrooms.Domain.Services.Kudos
 {
-    using Shrooms.DataTransferObjects.Models;
     using Shrooms.DataTransferObjects.Models.Kudos;
 
     public interface IKudosExportService

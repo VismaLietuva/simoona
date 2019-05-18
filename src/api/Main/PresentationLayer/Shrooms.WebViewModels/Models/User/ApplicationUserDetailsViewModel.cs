@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using Shrooms.WebViewModels.Models.Certificate;
+using Shrooms.WebViewModels.Models.Exam;
 using Shrooms.WebViewModels.Models.Projects;
+using Shrooms.WebViewModels.Models.Skill;
 
 namespace Shrooms.WebViewModels.Models.User
 {

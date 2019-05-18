@@ -83,7 +83,7 @@ namespace Shrooms.API
                     Fields = { "email", "name", "first_name", "last_name", "picture.width(800).height(800)" }
                 };
                 app.UseFacebookAuthentication(facebookOAuthOptions);
-            }         
+            }
         }
 
         private bool HasProviderSettings(string idKey, string secretKey)

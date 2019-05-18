@@ -4,7 +4,7 @@ using System.Linq;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.Configuration;
 
-namespace Shrooms.DataLayer
+namespace Shrooms.DataLayer.DAL
 {
     public class EFUnitOfWork : IUnitOfWork
     {

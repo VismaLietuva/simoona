@@ -4,7 +4,6 @@ using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using DomainServiceValidators.Validators.Books;
 using MoreLinq;
 using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataTransferObjects.Models;
@@ -13,22 +12,20 @@ using Shrooms.DataTransferObjects.Models.Books.BookDetails;
 using Shrooms.DataTransferObjects.Models.Books.BooksByOffice;
 using Shrooms.DataTransferObjects.Models.LazyPaged;
 using Shrooms.Domain.Services.Email.Book;
+using Shrooms.DomainServiceValidators.Validators.Books;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Books;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.GoogleBookApiService;
-using Shrooms.Infrastructure.GoogleBookService;
 
 namespace Shrooms.Domain.Services.Books
 {
     public class BookService : IBookService
     {
         private const int LastPage = 1;
-        private const int OneMonth = 1;
         private const int BookQuantityZero = 0;
-        private const int ReservationExtensionInMonths = 1;
-        private static object newBookLock = new object();
-        private static object takeBookLock = new object();
+        private static readonly object _newBookLock = new object();
+        private static readonly object _takeBookLock = new object();
 
         private readonly IUnitOfWork2 _uow;
         private readonly IBookInfoService _bookInfoService;
@@ -77,10 +74,10 @@ namespace Shrooms.Domain.Services.Books
             int entriesCountToSkip = EntriesCountToSkip(options.Page);
             var books = allBooks
                 .Skip(() => entriesCountToSkip)
-                .Take(() => ConstBusinessLayer.BooksPerPage)
+                .Take(() => BusinessLayerConstants.BooksPerPage)
                 .ToList();
 
-            var pageDto = new LazyPaged<BooksByOfficeDTO>(books, options.Page, ConstBusinessLayer.BooksPerPage, totalBooksCount);
+            var pageDto = new LazyPaged<BooksByOfficeDTO>(books, options.Page, BusinessLayerConstants.BooksPerPage, totalBooksCount);
             return pageDto;
         }
 
@@ -173,10 +170,9 @@ namespace Shrooms.Domain.Services.Books
 
         public void TakeBook(BookTakeDTO bookDTO)
         {
-            MobileBookOfficeLogsDTO officeBookWithLogs;
-            lock (takeBookLock)
+            lock (_takeBookLock)
             {
-                officeBookWithLogs = _bookOfficesDbSet
+                var officeBookWithLogs = _bookOfficesDbSet
                     .Include(b => b.Book)
                     .Include(b => b.BookLogs)
                     .Where(b => b.OrganizationId == bookDTO.OrganizationId
@@ -209,17 +205,16 @@ namespace Shrooms.Domain.Services.Books
 
         public void AddBook(NewBookDTO bookDto)
         {
-            bool bookAlreadyExists;
-            lock (newBookLock)
+            lock (_newBookLock)
             {
-                bookAlreadyExists = _booksDbSet
-                .Any(book =>
-                    (bookDto.Isbn != null && 
-                    book.Code == bookDto.Isbn &&
-                    book.OrganizationId == bookDto.OrganizationId) ||
-                    (bookDto.Isbn == null &&
-                    book.OrganizationId == bookDto.OrganizationId &&
-                    book.Title == bookDto.Title));
+                var bookAlreadyExists = _booksDbSet
+                    .Any(book =>
+                        (bookDto.Isbn != null &&
+                            book.Code == bookDto.Isbn &&
+                            book.OrganizationId == bookDto.OrganizationId) ||
+                        (bookDto.Isbn == null &&
+                            book.OrganizationId == bookDto.OrganizationId &&
+                            book.Title == bookDto.Title));
 
                 _bookServiceValidator.CheckIfBookAlreadyExists(bookAlreadyExists);
                 ValidateQuantifiedOffices(bookDto.QuantityByOffice.Select(o => o.OfficeId));
@@ -353,10 +348,10 @@ namespace Shrooms.Domain.Services.Books
             });
         }
 
-        private void RemoveBookRelatedEntities(IEnumerable<BookOffice> bookOffices)
+        private void RemoveBookRelatedEntities(IList<BookOffice> bookOffices)
         {
             var bookToRemove = bookOffices.First().Book;
-            bookOffices.ToList().ForEach(bookOffice =>
+            bookOffices.ForEach(bookOffice =>
             {
                 bookOffice.BookLogs.ToList().ForEach(log => _bookLogsDbSet.Remove(log));
                 _bookOfficesDbSet.Remove(bookOffice);
@@ -397,7 +392,7 @@ namespace Shrooms.Domain.Services.Books
                 Author = bookOffice.Book.Author,
                 Title = bookOffice.Book.Title,
                 Url = bookOffice.Book.Url,
-                QuantityLeft = bookOffice.Quantity - bookOffice.BookLogs.Where(x => x.Returned == null).Count(),
+                QuantityLeft = bookOffice.Quantity - bookOffice.BookLogs.Count(x => x.Returned == null),
                 OwnerId = bookOffice.Book.ApplicationUserId,
                 Note = bookOffice.Book.Note,
                 Readers = bookOffice.BookLogs.Where(x => x.Returned == null).Select(x => new BasicBookUserDTO
@@ -421,7 +416,7 @@ namespace Shrooms.Domain.Services.Books
 
         private static int EntriesCountToSkip(int pageRequested)
         {
-            return (pageRequested - LastPage) * ConstBusinessLayer.BooksPerPage;
+            return (pageRequested - LastPage) * BusinessLayerConstants.BooksPerPage;
         }
 
         private RetrievedBookInfoDTO MapBookInfoToDto(ExternalBookInfo book)

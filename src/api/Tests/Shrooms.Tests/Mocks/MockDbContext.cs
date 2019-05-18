@@ -9,7 +9,7 @@ using Shrooms.EntityModels.Models.Kudos;
 using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.Host.Contracts.DAL;
 
-namespace Shrooms.UnitTests
+namespace Shrooms.UnitTests.Mocks
 {
     public class MockDbContext : DbContext, IDbContext
     {
@@ -63,7 +63,7 @@ namespace Shrooms.UnitTests
 
             #region Rooms
 
-            Room room1 = new Room
+            var room1 = new Room
             {
                 Id = 1,
                 Name = "A-Room",
@@ -81,7 +81,7 @@ namespace Shrooms.UnitTests
                 ApplicationUsers = new List<ApplicationUser> { ApplicationUsers[0], ApplicationUsers[1] }
             };
 
-            Room room2 = new Room
+            var room2 = new Room
             {
                 Id = 2,
                 Name = "Z-Room",
@@ -98,7 +98,7 @@ namespace Shrooms.UnitTests
                 ApplicationUsers = new List<ApplicationUser> { ApplicationUsers[2] }
             };
 
-            Room room3 = new Room
+            var room3 = new Room
             {
                 Id = 3,
                 Name = "B-Room",
@@ -115,7 +115,7 @@ namespace Shrooms.UnitTests
                 ApplicationUsers = new List<ApplicationUser>()
             };
 
-            Room room4 = new Room
+            var room4 = new Room
             {
                 Id = 4,
                 Name = "D-Room",
@@ -131,7 +131,7 @@ namespace Shrooms.UnitTests
                 ApplicationUsers = new List<ApplicationUser>()
             };
 
-            Room room5 = new Room
+            var room5 = new Room
             {
                 Id = 5,
                 Name = "5-Room",
@@ -151,7 +151,7 @@ namespace Shrooms.UnitTests
 
             #region Floors
 
-            Floor floor1 = new Floor
+            var floor1 = new Floor
             {
                 Id = 1,
                 Name = "A-Floor",
@@ -161,7 +161,7 @@ namespace Shrooms.UnitTests
                 Rooms = new List<Room> { room1, room2, room4 }
             };
 
-            Floor floor2 = new Floor
+            var floor2 = new Floor
             {
                 Id = 2,
                 Name = "Z-Floor",
@@ -171,7 +171,7 @@ namespace Shrooms.UnitTests
                 OrganizationId = TestConstants.DefaultOrganizationId
             };
 
-            Floor floor3 = new Floor
+            var floor3 = new Floor
             {
                 Id = 3,
                 Name = "D-Floor",
@@ -180,7 +180,7 @@ namespace Shrooms.UnitTests
                 OrganizationId = TestConstants.DefaultOrganizationId
             };
 
-            Floor floor4 = new Floor
+            var floor4 = new Floor
             {
                 Id = 4,
                 Name = "4floor",
@@ -193,7 +193,7 @@ namespace Shrooms.UnitTests
 
             #region Offices
 
-            Office office1 = new Office
+            var office1 = new Office
             {
                 Id = 1,
                 Name = "B-Office",
@@ -208,7 +208,7 @@ namespace Shrooms.UnitTests
                 OrganizationId = TestConstants.DefaultOrganizationId
             };
 
-            Office office2 = new Office
+            var office2 = new Office
             {
                 Id = 2,
                 Name = "Z-Office",
@@ -224,7 +224,7 @@ namespace Shrooms.UnitTests
                 OrganizationId = TestConstants.DefaultOrganizationId
             };
 
-            Office office3 = new Office
+            var office3 = new Office
             {
                 Id = 3,
                 Name = "A-Office",
@@ -238,7 +238,7 @@ namespace Shrooms.UnitTests
                 }
             };
 
-            Office office4 = new Office
+            var office4 = new Office
             {
                 Id = 4,
                 Name = "W-Office",
@@ -339,7 +339,7 @@ namespace Shrooms.UnitTests
 
         private void CreateOrganizations()
         {
-            var organizations = new Organization[] 
+            var organizations = new[]
             {
                 new Organization
                 {
@@ -469,7 +469,7 @@ namespace Shrooms.UnitTests
             ApplicationUsers = new List<ApplicationUser> { applicationUser1, applicationUser2, applicationUser3, applicationUser4, applicationUser5, applicationUser6 };
         }
 
-        public List<T> GetList<T>()
+        private List<T> GetList<T>()
             where T : class
         {
             var prop = GetType().GetProperties().FirstOrDefault(p => p.PropertyType == typeof(List<T>));

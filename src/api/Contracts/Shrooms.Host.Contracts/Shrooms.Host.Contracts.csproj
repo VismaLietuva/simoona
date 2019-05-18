@@ -51,6 +51,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants\AdministrationPermissions.cs" />
+    <Compile Include="Constants\BasicPermissions.cs" />
     <Compile Include="DAL\IDbContext.cs" />
     <Compile Include="DAL\IRepository.cs" />
     <Compile Include="DAL\IUnitOfWork.cs" />

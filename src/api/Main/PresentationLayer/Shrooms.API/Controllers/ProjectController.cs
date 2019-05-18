@@ -3,13 +3,13 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
 using Shrooms.API.Filters;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.DataTransferObjects.Models.Projects;
 using Shrooms.Domain.Services.Projects;
 using Shrooms.DomainExceptions.Exceptions;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.WebViewModels.Models.Projects;
 
-namespace Shrooms.API.Controllers.WebApi
+namespace Shrooms.API.Controllers
 {
     [RoutePrefix("Project")]
     [Authorize]

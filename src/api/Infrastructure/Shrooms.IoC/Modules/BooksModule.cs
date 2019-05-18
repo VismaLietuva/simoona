@@ -1,7 +1,7 @@
 ﻿using Autofac;
-using DomainServiceValidators.Validators.Books;
 using Shrooms.Domain.Services.Books;
 using Shrooms.Domain.Services.Email.Book;
+using Shrooms.DomainServiceValidators.Validators.Books;
 
 namespace Shrooms.IoC.Modules
 {

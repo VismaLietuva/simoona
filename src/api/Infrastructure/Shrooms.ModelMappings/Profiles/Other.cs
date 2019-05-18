@@ -1,20 +1,24 @@
-﻿using System;
-using AutoMapper;
-using DataLayer.Models;
+﻿using AutoMapper;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Administration;
 using Shrooms.DataTransferObjects.Models.Books;
 using Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.DataTransferObjects.Models.Support;
 using Shrooms.EntityModels.Models;
+using Shrooms.EntityModels.Models.Books;
 using Shrooms.EntityModels.Models.Kudos;
 using Shrooms.ModelMappings.Resolvers;
 using Shrooms.WebViewModels.Models;
-using Shrooms.WebViewModels.Models.Kudos;
+using Shrooms.WebViewModels.Models.Certificate;
+using Shrooms.WebViewModels.Models.ChangeProfile;
+using Shrooms.WebViewModels.Models.Exam;
+using Shrooms.WebViewModels.Models.Map;
 using Shrooms.WebViewModels.Models.PostModels;
 using Shrooms.WebViewModels.Models.Roles;
+using Shrooms.WebViewModels.Models.Skill;
 using Shrooms.WebViewModels.Models.Support;
 using Shrooms.WebViewModels.Models.User;
+using Shrooms.WebViewModels.Models.Users.Kudos;
 
 namespace Shrooms.ModelMappings.Profiles
 {
@@ -184,7 +188,7 @@ namespace Shrooms.ModelMappings.Profiles
                 .ForMember(dest => dest.ApplicationUserFirstName, opt => opt.MapFrom(src => src.ApplicationUser != null ? src.ApplicationUser.FirstName : null))
                 .ForMember(dest => dest.ApplicationUserLastName, opt => opt.MapFrom(src => src.ApplicationUser != null ? src.ApplicationUser.LastName : null));
             CreateMap<BookLogDTO, BookLog>();
-          
+
             CreateMap<OfficePostViewModel, Office>()
                 .ForMember(dest => dest.Floors, src => src.Ignore());
             CreateMap<Office, OfficeViewModel>();

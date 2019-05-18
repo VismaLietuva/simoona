@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using Shrooms.WebViewModels.Models.User;
 
-namespace Shrooms.WebViewModels.Models
+namespace Shrooms.WebViewModels.Models.PostModels
 {
     public class RoomPostViewModel : AbstractViewModel
     {

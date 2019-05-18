@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Shrooms.DataLayer;
+using Shrooms.DataLayer.DAL;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.Configuration;
 using Shrooms.UnitTests.Extensions;

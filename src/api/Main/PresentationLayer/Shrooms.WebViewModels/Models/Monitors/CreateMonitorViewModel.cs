@@ -6,7 +6,7 @@ namespace Shrooms.WebViewModels.Models.Monitors
     public class CreateMonitorViewModel
     {
         [Required(AllowEmptyStrings = false)]
-        [StringLength(ConstWebApi.MonitorNameMaxLength)]
+        [StringLength(WebApiConstants.MonitorNameMaxLength)]
         public string Name { get; set; }
     }
 }

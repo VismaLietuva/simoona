@@ -1,24 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
-using DomainServiceValidators.Validators.UserAdministration;
 using Microsoft.AspNet.Identity;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Authentification;
+using Shrooms.Authentification.Membership;
 using Shrooms.Domain.Services.Administration;
 using Shrooms.Domain.Services.Email.AdministrationUsers;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.Picture;
 using Shrooms.DomainExceptions.Exceptions.UserAdministration;
+using Shrooms.DomainServiceValidators.Validators.UserAdministration;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.Host.Contracts.DAL;
-using Shrooms.UnitTests;
 using Shrooms.UnitTests.Extensions;
+using Shrooms.UnitTests.Mocks;
 using Shrooms.UnitTests.ModelMappings;
 
-namespace Shrooms.API.Tests.DomainService
+namespace Shrooms.UnitTests.DomainService
 {
     public class AdministrationUsersServiceTests
     {

@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
-using Shrooms.Authentification;
+using Shrooms.Authentification.Membership;
 using Shrooms.Constants.BusinessLayer;
 using Shrooms.Constants.ErrorCodes;
 using Shrooms.DataTransferObjects.Models;
@@ -62,7 +62,7 @@ namespace Shrooms.Domain.Services.UserService
                 throw new ValidationException(ErrorCodes.CultureUnsupported, "Unsupported culture");
             }
 
-            var isLanguageSupported = ConstBusinessLayer.SupportedLanguages.Any(x => x.LCID == culture.LCID);
+            var isLanguageSupported = BusinessLayerConstants.SupportedLanguages.Any(x => x.LCID == culture.LCID);
             if (!isLanguageSupported)
             {
                 throw new ValidationException(ErrorCodes.CultureUnsupported, "Unsupported culture");
@@ -121,7 +121,7 @@ namespace Shrooms.Domain.Services.UserService
 
             var settingsDto = new LocalizationSettingsDto
             {
-                Languages = ConstBusinessLayer.SupportedLanguages
+                Languages = BusinessLayerConstants.SupportedLanguages
                     .Select(c => new LanguageDto { DisplayName = c.DisplayName, Name = c.Name, IsSelected = userCulture.LCID == c.LCID })
                     .OrderBy(l => l.DisplayName)
                     .ToList(),
@@ -170,7 +170,7 @@ namespace Shrooms.Domain.Services.UserService
                 .Include(u => u.WallUsers)
                 .Include(u => u.Roles)
                 .Where(user => user.WallUsers.Any(x => x.WallId == wall.Id && x.AppNotificationsEnabled == true) &&
-                               !user.Roles.Any(r => r.RoleId == newUserRoleId) &&
+                               user.Roles.All(r => r.RoleId != newUserRoleId) &&
                                user.Id != posterId)
                 .Where(ExternalRoleFilter(wall, externalRoleId))
                 .Select(u => u.Id)
@@ -194,7 +194,7 @@ namespace Shrooms.Domain.Services.UserService
                 .Include(u => u.WallUsers)
                 .Include(u => u.Roles)
                 .Where(user => user.WallUsers.Any(x => x.WallId == wall.Id && x.EmailNotificationsEnabled == true) &&
-                               !user.Roles.Any(r => r.RoleId == newUserRoleId) &&
+                               user.Roles.All(r => r.RoleId != newUserRoleId) &&
                                user.Email != senderEmail)
                 .Where(ExternalRoleFilter(wall, externalRoleId))
                 .Select(u => u.Email)
@@ -262,14 +262,14 @@ namespace Shrooms.Domain.Services.UserService
 
             var settingsDto = new UserNotificationsSettingsDto
             {
-                EventsAppNotifications = (settings != null) ? settings.EventsAppNotifications : true,
-                EventsEmailNotifications = (settings != null) ? settings.EventsEmailNotifications : true,
-                ProjectsAppNotifications = (settings != null) ? settings.ProjectsAppNotifications : true,
-                ProjectsEmailNotifications = (settings != null) ? settings.ProjectsEmailNotifications : true,
-                MyPostsAppNotifications = (settings != null) ? settings.MyPostsAppNotifications : true,
-                MyPostsEmailNotifications = (settings != null) ? settings.MyPostsEmailNotifications : true,
-                FollowingPostsAppNotifications = (settings != null) ? settings.FollowingPostsAppNotifications : true,
-                FollowingPostsEmailNotifications = (settings != null) ? settings.FollowingPostsEmailNotifications : true,
+                EventsAppNotifications = (settings == null) || settings.EventsAppNotifications,
+                EventsEmailNotifications = (settings == null) || settings.EventsEmailNotifications,
+                ProjectsAppNotifications = (settings == null) || settings.ProjectsAppNotifications,
+                ProjectsEmailNotifications = (settings == null) || settings.ProjectsEmailNotifications,
+                MyPostsAppNotifications = (settings == null) || settings.MyPostsAppNotifications,
+                MyPostsEmailNotifications = (settings == null) || settings.MyPostsEmailNotifications,
+                FollowingPostsAppNotifications = (settings == null) || settings.FollowingPostsAppNotifications,
+                FollowingPostsEmailNotifications = (settings == null) || settings.FollowingPostsEmailNotifications,
 
                 Walls = _wallMembersDbSet
                 .Include(x => x.Wall)

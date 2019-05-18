@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DomainServiceValidators.Validators.RefreshTokens
+namespace Shrooms.DomainServiceValidators.Validators.RefreshTokens
 {
     public class RefreshTokenException : Exception
     {

@@ -7,16 +7,16 @@ using AutoMapper;
 using PagedList;
 using Shrooms.API.Filters;
 using Shrooms.Constants.Authorization;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.WebApi;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.WebViewModels.Models;
 
-namespace Shrooms.API.Controllers.WebApi
+namespace Shrooms.API.Controllers
 {
     [Authorize]
     public class EmployeeListController : BaseController
@@ -40,15 +40,15 @@ namespace Shrooms.API.Controllers.WebApi
         {
             if (!string.IsNullOrEmpty(search))
             {
-                var searchWords = search.Split(ConstWebApi.SearchSplitter);
-                return GetFilteredPaged("WorkingHours,JobPosition", page, ConstWebApi.DefaultPageSize, sortBy, sortOrder, s => searchWords.Count(sw => s.FirstName.Contains(sw) || s.LastName.Contains(sw) || s.JobPosition.Title.Contains(sw)) == searchWords.Count());
+                var searchWords = search.Split(WebApiConstants.SearchSplitter);
+                return GetFilteredPaged("WorkingHours,JobPosition", page, WebApiConstants.DefaultPageSize, sortBy, sortOrder, s => searchWords.Count(sw => s.FirstName.Contains(sw) || s.LastName.Contains(sw) || s.JobPosition.Title.Contains(sw)) == searchWords.Count());
             }
 
-            return GetFilteredPaged("WorkingHours,JobPosition", page, ConstWebApi.DefaultPageSize, sortBy, sortOrder);
+            return GetFilteredPaged("WorkingHours,JobPosition", page, WebApiConstants.DefaultPageSize, sortBy, sortOrder);
         }
 
         protected virtual PagedViewModel<EmployeeListViewModel> GetFilteredPaged(
-            string includeProperties = null, int page = 1, int pageSize = ConstWebApi.DefaultPageSize,
+            string includeProperties = null, int page = 1, int pageSize = WebApiConstants.DefaultPageSize,
             string sort = null, string dir = "", Expression<Func<ApplicationUser, bool>> filter = null)
         {
             var isAdmin = _permissionService.UserHasPermission(GetUserAndOrganization(), AdministrationPermissions.ApplicationUser);

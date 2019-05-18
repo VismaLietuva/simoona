@@ -7,11 +7,11 @@ namespace Shrooms.EntityModels.Models
     public class Organization : BaseModel
     {
         [Required]
-        [StringLength(ConstBusinessLayer.MaxOrganizationNameLength)]
+        [StringLength(BusinessLayerConstants.MaxOrganizationNameLength)]
         public string Name { get; set; }
 
         [Required]
-        [StringLength(ConstBusinessLayer.MaxOrganizationShortNameLength)]
+        [StringLength(BusinessLayerConstants.MaxOrganizationShortNameLength)]
         public string ShortName { get; set; }
 
         [StringLength(50)]
@@ -23,7 +23,7 @@ namespace Shrooms.EntityModels.Models
         public virtual ICollection<Module> ShroomsModules { get; set; }
 
         [Required]
-        [StringLength(ConstBusinessLayer.WelcomeEmailLength)]
+        [StringLength(BusinessLayerConstants.WelcomeEmailLength)]
         public string WelcomeEmail { get; set; }
 
         public bool RequiresUserConfirmation { get; set; }

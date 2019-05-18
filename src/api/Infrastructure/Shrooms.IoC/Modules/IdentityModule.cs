@@ -1,7 +1,7 @@
 ﻿using Autofac;
 using Microsoft.AspNet.Identity;
-using Shrooms.Authentification;
-using Shrooms.Authorization.BasicAuth;
+using Shrooms.Authentification.BasicAuth;
+using Shrooms.Authentification.Membership;
 using Shrooms.EntityModels.Models;
 using Shrooms.Infrastructure.Email;
 using Module = Autofac.Module;

@@ -2,7 +2,7 @@
 using Shrooms.Constants.BusinessLayer;
 using Shrooms.Constants.WebApi;
 
-namespace Shrooms.WebViewModels.Models.Kudos
+namespace Shrooms.WebViewModels.Models.Users.Kudos
 {
     public class KudosTypeViewModel
     {
@@ -10,19 +10,19 @@ namespace Shrooms.WebViewModels.Models.Kudos
         public int Id { get; set; }
 
         [Required]
-        [StringLength(ConstWebApi.KudosTypeNameMaxLength, MinimumLength = 1)]
+        [StringLength(WebApiConstants.KudosTypeNameMaxLength, MinimumLength = 1)]
         public string Name { get; set; }
 
         [Required]
         public decimal Value { get; set; }
 
-        public ConstBusinessLayer.KudosTypeEnum Type { get; set; }
+        public BusinessLayerConstants.KudosTypeEnum Type { get; set; }
 
         public bool Hidden { get; set; }
 
         public bool IsNecessary { get; set; }
 
-        [MaxLength(ConstBusinessLayer.MaxKudosDescriptionLength)]
+        [MaxLength(BusinessLayerConstants.MaxKudosDescriptionLength)]
         public string Description { get; set; }
     }
 }

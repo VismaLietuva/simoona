@@ -94,7 +94,7 @@ namespace Shrooms.Domain.Services.Email.Kudos
                 userNotificationSettingsUrl,
                 kudosLog.Points,
                 kudosLog.KudosTypeName,
-                sendingUserFullName == null ? ConstBusinessLayer.DeletedUserName : sendingUserFullName,
+                sendingUserFullName == null ? BusinessLayerConstants.DeletedUserName : sendingUserFullName,
                 kudosLog.Comments,
                 kudosProfileUrl);
             var body = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.KudosReceived);
@@ -114,7 +114,7 @@ namespace Shrooms.Domain.Services.Email.Kudos
                 userNotificationSettingsUrl,
                 kudosLog.Points,
                 kudosLog.KudosTypeName,
-                sendingUserFullName == null ? ConstBusinessLayer.DeletedUserName : sendingUserFullName,
+                sendingUserFullName == null ? BusinessLayerConstants.DeletedUserName : sendingUserFullName,
                 kudosLog.Comments,
                 kudosProfileUrl);
             var body = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.KudosDecreased);

@@ -63,7 +63,7 @@ namespace Shrooms.EntityModels.Models.Events
             set => RegistrationDeadline = GetUtcDateFromLocalDate(value);
         }
 
-        private DateTime GetLocalDateFromUtcDate(DateTime utcDateTime) => 
+        private DateTime GetLocalDateFromUtcDate(DateTime utcDateTime) =>
             TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, TimeZoneInfo.FindSystemTimeZoneById(ResponsibleUser.TimeZone));
 
         private DateTime GetUtcDateFromLocalDate(DateTime localDateTime) =>

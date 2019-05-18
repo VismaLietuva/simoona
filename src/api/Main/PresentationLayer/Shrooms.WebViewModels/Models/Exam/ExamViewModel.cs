@@ -1,7 +1,7 @@
 ﻿using System;
 using Shrooms.WebViewModels.Models.User;
 
-namespace Shrooms.WebViewModels.Models
+namespace Shrooms.WebViewModels.Models.Exam
 {
     public class ExamViewModel : AbstractViewModel
     {

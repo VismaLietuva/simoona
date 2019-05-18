@@ -5,14 +5,14 @@ using AutoMapper;
 using MoreLinq;
 using PagedList;
 using Shrooms.API.Filters;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.WebApi;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
-using Shrooms.WebViewModels.Models;
+using Shrooms.WebViewModels.Models.Certificate;
 
-namespace Shrooms.API.Controllers.WebApi
+namespace Shrooms.API.Controllers
 {
     [Authorize]
     public class CertificateController : BaseController
@@ -21,7 +21,6 @@ namespace Shrooms.API.Controllers.WebApi
         private readonly IUnitOfWork _unitOfWork;
         private readonly IPermissionService _permissionService;
         private readonly IRepository<Exam> _examRepository;
-        private readonly IRepository<ApplicationUser> _userRepository;
         private readonly IRepository<Certificate> _certificateRepository;
 
         public CertificateController(
@@ -34,14 +33,13 @@ namespace Shrooms.API.Controllers.WebApi
             _permissionService = permissionService;
 
             _examRepository = _unitOfWork.GetRepository<Exam>();
-            _userRepository = _unitOfWork.GetRepository<ApplicationUser>();
             _certificateRepository = _unitOfWork.GetRepository<Certificate>();
             _permissionService = permissionService;
         }
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Certificate)]
-        public IEnumerable<CertificateAutoCompleteViewModel> GetForAutocomplete(string s, int pageSize = ConstWebApi.DefaultAutocompleteListSize)
+        public IEnumerable<CertificateAutoCompleteViewModel> GetForAutocomplete(string s, int pageSize = WebApiConstants.DefaultAutocompleteListSize)
         {
             if (string.IsNullOrWhiteSpace(s))
             {

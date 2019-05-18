@@ -18,7 +18,7 @@ namespace Shrooms.WebViewModels.Models.User
 
         [Required(ErrorMessageResourceType = typeof(Resources.Common), ErrorMessageResourceName = "RequiredError")]
         [Phone(ErrorMessage = null, ErrorMessageResourceType = typeof(Resources.Common), ErrorMessageResourceName = "PhoneError")]
-        [MaxLength(ConstWebApi.MaxPhoneNumberLength)]
+        [MaxLength(WebApiConstants.MaxPhoneNumberLength)]
         public string PhoneNumber { get; set; }
 
         [Required(ErrorMessageResourceType = typeof(Resources.Common), ErrorMessageResourceName = "RequiredError")]

@@ -6,7 +6,6 @@ using System.Web;
 using System.Web.Configuration;
 using Microsoft.AspNet.Identity;
 using Shrooms.DataTransferObjects.Models.Emails;
-using Shrooms.Infrastructure.Configuration;
 
 namespace Shrooms.Infrastructure.Email
 {

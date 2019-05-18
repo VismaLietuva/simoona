@@ -1,6 +1,6 @@
 ﻿using Shrooms.Constants.BusinessLayer;
 
-namespace Shrooms.WebViewModels.Models.Kudos
+namespace Shrooms.WebViewModels.Models.Users.Kudos
 {
     public class KudosLogsFilterViewModel
     {
@@ -17,7 +17,7 @@ namespace Shrooms.WebViewModels.Models.Kudos
         public KudosLogsFilterViewModel()
         {
             Page = 1;
-            Status = ConstBusinessLayer.KudosStatusAllFilter;
+            Status = BusinessLayerConstants.KudosStatusAllFilter;
         }
     }
 }
