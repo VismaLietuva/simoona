@@ -3,7 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using PagedList;
 
-namespace Shrooms.DataLayer
+namespace Shrooms.Host.Contracts.DAL
 {
     public interface IRepository<TEntity>
         where TEntity : class

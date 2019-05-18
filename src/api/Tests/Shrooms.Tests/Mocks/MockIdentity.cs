@@ -10,10 +10,10 @@ using Shrooms.Authentification;
 using Shrooms.Constants.Authorization;
 using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.WebApi;
-using Shrooms.DataLayer;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.CustomCache;
 
 namespace Shrooms.UnitTests

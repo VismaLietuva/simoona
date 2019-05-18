@@ -20,6 +20,7 @@ using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Projects;
 using Shrooms.Domain.Services.SyncTokens;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.Email;
 using Shrooms.Infrastructure.Logger;
 using Shrooms.IoC.Modules;

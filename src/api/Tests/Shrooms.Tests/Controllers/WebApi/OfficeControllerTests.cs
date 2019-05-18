@@ -8,16 +8,12 @@ using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Hosting;
 using AutoMapper;
-using Microsoft.AspNet.Identity;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.API.Controllers;
-using Shrooms.API.Controllers.WebApi;
-using Shrooms.Authentification;
 using Shrooms.Constants.WebApi;
-using Shrooms.DataLayer;
 using Shrooms.EntityModels.Models;
-using Shrooms.ModelMappings;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.UnitTests.ModelMappings;
 using Shrooms.WebViewModels.Models;
 using Shrooms.WebViewModels.Models.PostModels;
@@ -29,20 +25,12 @@ namespace Shrooms.UnitTests.Controllers.WebApi
     {
         private IUnitOfWork _unitOfWork;
         private OfficeController _officeController;
-        private IUserStore<ApplicationUser> _userStore;
-        private IRoleStore<ApplicationRole, string> _roleStore;
-        private ShroomsUserManager _userManager;
-        private ShroomsRoleManager _roleManager;
         private IMapper _mapper;
 
         [SetUp]
         public void TestInitializer()
         {
             _unitOfWork = new MockUnitOfWork();
-            _userStore = MockIdentity.MockShroomsUserStore(_unitOfWork.DbContext);
-            _roleStore = MockIdentity.MockRoleStore();
-            _userManager = MockIdentity.MockUserManager(_userStore, _unitOfWork.DbContext);
-            _roleManager = MockIdentity.MockRoleManager(_roleStore);
             _mapper = ModelMapper.Create();
 
             _officeController = new OfficeController(_mapper, _unitOfWork);

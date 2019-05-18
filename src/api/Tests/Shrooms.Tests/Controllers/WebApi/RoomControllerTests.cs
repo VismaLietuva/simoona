@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Dynamic;
 using System.Net;
 using System.Net.Http;
 using System.Security.Claims;
@@ -14,9 +13,8 @@ using NSubstitute;
 using NUnit.Framework;
 using Shrooms.API.Controllers.WebApi;
 using Shrooms.Authentification;
-using Shrooms.DataLayer;
 using Shrooms.EntityModels.Models;
-using Shrooms.ModelMappings;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.UnitTests.ModelMappings;
 using Shrooms.WebViewModels.Models;
 using Shrooms.WebViewModels.Models.User;

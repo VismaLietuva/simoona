@@ -1,10 +1,10 @@
 ﻿using System.Data.Entity;
 using System.Linq;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Emails;
 using Shrooms.DataTransferObjects.Models.Support;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.Configuration;
 using Shrooms.Infrastructure.Email;
 

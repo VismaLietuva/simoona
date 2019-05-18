@@ -5,12 +5,12 @@ using System.Linq;
 using System.Linq.Expressions;
 using DomainServiceValidators.Validators.KudosBaskets;
 using Shrooms.Constants.BusinessLayer;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.KudosBasket;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
+using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.Domain.Services.KudosBaskets
 {

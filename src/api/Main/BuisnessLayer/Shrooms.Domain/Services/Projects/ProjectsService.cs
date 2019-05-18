@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.DataLayer;
 using Shrooms.Constants.ErrorCodes;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Projects;
 using Shrooms.DataTransferObjects.Models.Users;
@@ -16,6 +15,7 @@ using Shrooms.Domain.Services.Wall;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Multiwall;
+using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.Domain.Services.Projects
 {

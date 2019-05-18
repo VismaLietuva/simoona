@@ -12,8 +12,6 @@ using MoreLinq;
 using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.BusinessLayer;
 using Shrooms.Constants.ErrorCodes;
-using Shrooms.DataLayer;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.Domain.Helpers;
@@ -23,6 +21,7 @@ using Shrooms.Domain.Services.Roles;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.Resources;
 
 namespace Shrooms.Domain.Services.Kudos

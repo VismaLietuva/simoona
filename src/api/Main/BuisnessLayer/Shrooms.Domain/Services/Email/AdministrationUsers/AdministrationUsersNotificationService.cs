@@ -2,12 +2,12 @@
 using System.Linq;
 using Shrooms.Constants;
 using Shrooms.Constants.Authorization.Permissions;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Emails;
 using Shrooms.Domain.Services.UserService;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.Configuration;
 using Shrooms.Infrastructure.Email;
 using Shrooms.Infrastructure.Email.Templating;

@@ -4,10 +4,10 @@ using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
-using Shrooms.DataLayer;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
 using Shrooms.EntityModels.Models.Multiwall;
+using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.UnitTests
 {

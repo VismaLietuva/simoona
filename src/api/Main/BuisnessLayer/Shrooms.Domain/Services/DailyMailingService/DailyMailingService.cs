@@ -3,10 +3,10 @@ using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using Shrooms.Constants.BusinessLayer;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models.Emails;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Multiwall;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.Email;
 using Shrooms.Infrastructure.SystemClock;
 

@@ -3,9 +3,8 @@ using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 using NSubstitute;
-using Shrooms.DataLayer;
-using Shrooms.DataLayer.DAL;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.UnitTests.Mocks;
 
 namespace Shrooms.UnitTests.Extensions

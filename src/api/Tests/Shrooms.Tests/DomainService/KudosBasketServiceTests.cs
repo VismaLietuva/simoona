@@ -6,7 +6,6 @@ using DomainServiceValidators.Validators.KudosBaskets;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Constants.BusinessLayer;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.KudosBasket;
 using Shrooms.Domain.Services.Kudos;
@@ -14,6 +13,7 @@ using Shrooms.Domain.Services.KudosBaskets;
 using Shrooms.DomainExceptions.Exceptions.KudosBaskets;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.UnitTests.Extensions;
 
 namespace Shrooms.API.Tests.DomainService

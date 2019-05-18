@@ -5,11 +5,11 @@ using System.Linq;
 using System.Linq.Expressions;
 using MoreLinq;
 using Shrooms.Constants.DataLayer;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Permissions;
 using Shrooms.EntityModels.Models;
 using Shrooms.Infrastructure.CustomCache;
+using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.Domain.Services.Permissions
 {

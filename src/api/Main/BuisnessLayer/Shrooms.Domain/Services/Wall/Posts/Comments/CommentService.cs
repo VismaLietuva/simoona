@@ -4,7 +4,6 @@ using System.Data.Entity;
 using System.Linq;
 using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.ErrorCodes;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Wall.Posts.Comments;
 using Shrooms.Domain.Services.Email.Posting;
@@ -14,6 +13,7 @@ using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.EntityModels.Models.Notifications;
 using Shrooms.Infrastructure.SystemClock;
+using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.Domain.Services.Wall.Posts.Comments
 {

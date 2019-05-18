@@ -4,9 +4,9 @@ using System.Linq;
 using DomainServiceValidators.Validators.Wall;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models.Multiwall;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.UnitTests.Extensions;
 
 namespace Shrooms.UnitTests.DomainService.ValidatorTests

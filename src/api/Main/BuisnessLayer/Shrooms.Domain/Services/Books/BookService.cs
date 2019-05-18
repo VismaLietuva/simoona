@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using DomainServiceValidators.Validators.Books;
 using MoreLinq;
 using Shrooms.Constants.BusinessLayer;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Books;
 using Shrooms.DataTransferObjects.Models.Books.BookDetails;
@@ -16,6 +15,7 @@ using Shrooms.DataTransferObjects.Models.LazyPaged;
 using Shrooms.Domain.Services.Email.Book;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Books;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.GoogleBookApiService;
 using Shrooms.Infrastructure.GoogleBookService;
 

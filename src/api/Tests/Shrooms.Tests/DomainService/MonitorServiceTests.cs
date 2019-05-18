@@ -4,12 +4,12 @@ using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Constants.ErrorCodes;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Monitors;
 using Shrooms.Domain.Services.Monitors;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models.Monitors;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.UnitTests.Extensions;
 
 namespace Shrooms.UnitTests.DomainService

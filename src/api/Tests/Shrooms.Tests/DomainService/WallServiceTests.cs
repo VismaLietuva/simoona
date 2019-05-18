@@ -7,7 +7,6 @@ using NUnit.Framework;
 using Shrooms.Constants.Authorization;
 using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.ErrorCodes;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Wall;
 using Shrooms.Domain.Services.Permissions;
@@ -16,6 +15,7 @@ using Shrooms.Domain.Services.Wall;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Multiwall;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.UnitTests.Extensions;
 using Shrooms.UnitTests.ModelMappings;
 

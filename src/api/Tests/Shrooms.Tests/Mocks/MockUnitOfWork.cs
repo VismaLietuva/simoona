@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Shrooms.DataLayer;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.UnitTests.Mocks;
 
 namespace Shrooms.UnitTests

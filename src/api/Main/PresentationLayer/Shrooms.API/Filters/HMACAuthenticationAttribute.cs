@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Linq;
-using System.Linq.Dynamic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http.Filters;
 using System.Web.Http.Results;
-using Shrooms.DataLayer.DAL;
-using Shrooms.Domain.Services.Permissions;
 using Shrooms.EntityModels.Models;
-using Shrooms.Infrastructure.Configuration;
+using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.API.Filters
 {
@@ -47,10 +44,7 @@ namespace Shrooms.API.Filters
             return Task.FromResult(0);
         }
 
-        public bool AllowMultiple
-        {
-            get { return false; }
-        }
+        public bool AllowMultiple => false;
 
         private string GetAuthorizationGuid(HttpAuthenticationContext context)
         {

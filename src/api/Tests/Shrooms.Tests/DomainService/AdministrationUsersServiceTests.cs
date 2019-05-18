@@ -6,8 +6,6 @@ using Microsoft.AspNet.Identity;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Authentification;
-using Shrooms.DataLayer;
-using Shrooms.DataLayer.DAL;
 using Shrooms.Domain.Services.Administration;
 using Shrooms.Domain.Services.Email.AdministrationUsers;
 using Shrooms.Domain.Services.Organizations;
@@ -15,6 +13,7 @@ using Shrooms.Domain.Services.Picture;
 using Shrooms.DomainExceptions.Exceptions.UserAdministration;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Multiwall;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.UnitTests;
 using Shrooms.UnitTests.Extensions;
 using Shrooms.UnitTests.ModelMappings;
@@ -41,7 +40,7 @@ namespace Shrooms.API.Tests.DomainService
             var dbContext = Substitute.For<IDbContext>();
             var userStore = Substitute.For<IUserStore<ApplicationUser>>();
             _userManager = MockIdentity.MockUserManager(userStore, dbContext);
-         
+
             _organizationService = Substitute.For<IOrganizationService>();
             _pictureService = Substitute.For<IPictureService>();
             _administrationUsersNotificationService = Substitute.For<IAdministrationNotificationService>();
@@ -99,7 +98,7 @@ namespace Shrooms.API.Tests.DomainService
             var removeRoleErrors = new List<string> { "error1", "error2" };
             Assert.Throws<UserAdministrationException>(() => _userAdministrationValidator.CheckForAddingRemovingRoleErrors(addRoleErrors, removeRoleErrors));
         }
-        
+
         [Test]
         public void Should_Set_User_Tutorial_Status_To_Completed()
         {

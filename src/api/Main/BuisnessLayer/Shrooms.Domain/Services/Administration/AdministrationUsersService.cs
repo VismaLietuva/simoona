@@ -16,7 +16,6 @@ using Microsoft.AspNet.Identity.Owin;
 using Shrooms.Authentification;
 using Shrooms.Constants.Authentication;
 using Shrooms.Constants.BusinessLayer;
-using Shrooms.DataLayer;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Administration;
@@ -25,6 +24,7 @@ using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.Picture;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Multiwall;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.ExcelGenerator;
 using userRes = Shrooms.Resources.Models.ApplicationUser.ApplicationUser;
 

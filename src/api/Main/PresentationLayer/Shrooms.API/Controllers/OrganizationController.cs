@@ -8,10 +8,10 @@ using Shrooms.API.Filters;
 using Shrooms.Authentification;
 using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.WebApi;
-using Shrooms.DataLayer;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.WebViewModels.Models;
 using Shrooms.WebViewModels.Models.PostModels;
 
@@ -20,15 +20,11 @@ namespace Shrooms.API.Controllers.WebApi
     [Authorize]
     public class OrganizationController : AbstractWebApiController<Organization, OrganizationViewModel, OrganizationPostViewModel>
     {
-        private readonly IRepository<Page> _pageRepository;
-        private readonly IRepository<Permission> _permissionRepository;
         private readonly IOrganizationService _organizationService;
 
         public OrganizationController(IMapper mapper, IUnitOfWork unitOfWork, ShroomsUserManager userManager, ShroomsRoleManager roleManager, IOrganizationService organizationService)
-            : base(mapper, unitOfWork, userManager, roleManager, null)
+            : base(mapper, unitOfWork, userManager, roleManager)
         {
-            _pageRepository = unitOfWork.GetRepository<Page>();
-            _permissionRepository = unitOfWork.GetRepository<Permission>();
             _organizationService = organizationService;
         }
 

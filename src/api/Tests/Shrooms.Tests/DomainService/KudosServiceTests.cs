@@ -9,8 +9,6 @@ using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Constants.Authorization;
 using Shrooms.Constants.BusinessLayer;
-using Shrooms.DataLayer;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.Domain.Services.Email.Kudos;
@@ -20,6 +18,7 @@ using Shrooms.Domain.Services.Roles;
 using Shrooms.DomainExceptions.Exceptions.Kudos;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.UnitTests.Extensions;
 
 namespace Shrooms.API.Tests.DomainService

@@ -6,7 +6,6 @@ using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.ErrorCodes;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Wall.Posts.Comments;
 using Shrooms.Domain.Services.Email.Posting;
@@ -15,6 +14,7 @@ using Shrooms.Domain.Services.Wall.Posts.Comments;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Multiwall;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.SystemClock;
 using Shrooms.UnitTests.Extensions;
 

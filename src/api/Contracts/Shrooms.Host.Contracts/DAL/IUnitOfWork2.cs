@@ -1,7 +1,7 @@
 ﻿using System.Data.Entity;
 using System.Threading.Tasks;
 
-namespace Shrooms.DataLayer.DAL
+namespace Shrooms.Host.Contracts.DAL
 {
     public interface IUnitOfWork2
     {

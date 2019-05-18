@@ -4,12 +4,12 @@ using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using Shrooms.Constants.Authorization.Permissions;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Permissions;
 using Shrooms.DataTransferObjects.Models.Roles;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.Domain.Services.Roles
 {
@@ -31,7 +31,7 @@ namespace Shrooms.Domain.Services.Roles
         {
             var roleId = GetRoleIdByName(roleName);
 
-            return x => !x.Roles.Any(y => y.RoleId == roleId);
+            return x => x.Roles.All(y => y.RoleId != roleId);
         }
 
         public IEnumerable<RoleDTO> GetRolesForAutocomplete(string search, UserAndOrganizationDTO userOrg)

@@ -1,15 +1,14 @@
-﻿using System;
-using System.Data.Entity;
+﻿using System.Data.Entity;
 using System.Linq;
 using System.Net.Mail;
 using Shrooms.Constants.ErrorCodes;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Users;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.DomainExceptions.Exceptions.Organization;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.Domain.Services.Organizations
 {

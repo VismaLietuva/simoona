@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Data.Entity;
 using System.Linq;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models.Multiwall;
+using Shrooms.Host.Contracts.DAL;
 using static Shrooms.Constants.ErrorCodes.ErrorCodes;
 
 namespace DomainServiceValidators.Validators.Wall

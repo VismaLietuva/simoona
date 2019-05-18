@@ -10,8 +10,8 @@ using PagedList;
 using Shrooms.API.Filters;
 using Shrooms.Authentification;
 using Shrooms.Constants.WebApi;
-using Shrooms.DataLayer;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.WebViewModels.Models;
 
 namespace Shrooms.API.Controllers

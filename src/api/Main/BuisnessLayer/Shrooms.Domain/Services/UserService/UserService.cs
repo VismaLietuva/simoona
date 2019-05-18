@@ -10,13 +10,13 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Shrooms.Authentification;
 using Shrooms.Constants.BusinessLayer;
 using Shrooms.Constants.ErrorCodes;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Users;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.EntityModels.Models.Notifications;
+using Shrooms.Host.Contracts.DAL;
 using WallModel = Shrooms.EntityModels.Models.Multiwall.Wall;
 
 namespace Shrooms.Domain.Services.UserService

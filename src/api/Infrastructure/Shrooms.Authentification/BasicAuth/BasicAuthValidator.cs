@@ -5,8 +5,8 @@ using System.Security.Principal;
 using System.Threading;
 using Microsoft.Owin;
 using Shrooms.Constants.WebApi;
-using Shrooms.DataLayer;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.Configuration;
 
 namespace Shrooms.Authorization.BasicAuth
