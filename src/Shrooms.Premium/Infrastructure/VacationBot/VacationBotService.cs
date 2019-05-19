@@ -4,7 +4,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using Shrooms.DomainExceptions.Exceptions;
-using Shrooms.Infrastructure.Configuration;
+using Shrooms.Host.Contracts.Infrastructure;
 using Shrooms.Premium.Constants;
 
 namespace Shrooms.Premium.Infrastructure.VacationBot
@@ -12,9 +12,9 @@ namespace Shrooms.Premium.Infrastructure.VacationBot
     public class VacationBotService : IVacationBotService
     {
         private readonly IApplicationSettings _appSettings;
-        private readonly global::Shrooms.Infrastructure.Logger.ILogger _logger;
+        private readonly ILogger _logger;
 
-        public VacationBotService(IApplicationSettings appSettings, global::Shrooms.Infrastructure.Logger.ILogger logger)
+        public VacationBotService(IApplicationSettings appSettings, global::Shrooms.Host.Contracts.Infrastructure.ILogger logger)
         {
             _appSettings = appSettings;
             _logger = logger;

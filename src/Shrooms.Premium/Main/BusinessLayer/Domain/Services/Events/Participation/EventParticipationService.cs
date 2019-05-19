@@ -17,7 +17,7 @@ using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.Event;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Calendar;
 using Shrooms.Premium.Main.BusinessLayer.DomainServiceValidators.Events;
-using ISystemClock = Shrooms.Infrastructure.SystemClock.ISystemClock;
+using ISystemClock = Shrooms.Host.Contracts.Infrastructure.ISystemClock;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Participation
 {

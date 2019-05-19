@@ -9,7 +9,7 @@ using Shrooms.DomainServiceValidators.Validators.Books;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Books;
 using Shrooms.Host.Contracts.DAL;
-using Shrooms.Infrastructure.GoogleBookApiService;
+using Shrooms.Host.Contracts.Infrastructure;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Books;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Books;
 using Shrooms.UnitTests.Extensions;

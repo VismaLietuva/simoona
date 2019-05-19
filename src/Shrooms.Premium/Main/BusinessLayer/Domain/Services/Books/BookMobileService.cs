@@ -5,11 +5,12 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Shrooms.DataTransferObjects.Models.Books;
+using Shrooms.DataTransferObjects.Models.GoogleBookApiService;
 using Shrooms.DomainServiceValidators.Validators.Books;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Books;
 using Shrooms.Host.Contracts.DAL;
-using Shrooms.Infrastructure.GoogleBookApiService;
+using Shrooms.Host.Contracts.Infrastructure;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Books;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Books

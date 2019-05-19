@@ -10,8 +10,6 @@ using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
-using Shrooms.Infrastructure.Configuration;
-using Shrooms.Infrastructure.Email;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.ServiceRequest;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.ServiceRequest;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.ServiceRequests;
@@ -56,8 +54,6 @@ namespace Shrooms.Premium.UnitTests.DomainService
             _serviceRequestStatusDbSet = Substitute.For<IDbSet<ServiceRequestStatus>>();
             _uow.GetDbSet<ServiceRequestStatus>().Returns(_serviceRequestStatusDbSet);
 
-            var mailingService = Substitute.For<IMailingService>();
-            var appSettings = Substitute.For<IApplicationSettings>();
             _notificationService = Substitute.For<IServiceRequestNotificationService>();
             _permissionService = Substitute.For<IPermissionService>();
 
@@ -212,7 +208,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
 
             _serviceRequestService.UpdateServiceRequest(serviceRequestDTO, userAndOrg);
 
-            var updatedServiceRequest = _serviceRequestsDbSet.Where(x => x.Id == serviceRequestDTO.Id).First();
+            var updatedServiceRequest = _serviceRequestsDbSet.First(x => x.Id == serviceRequestDTO.Id);
 
             Assert.AreEqual("test1", updatedServiceRequest.CategoryName);
             Assert.AreEqual(serviceRequestDTO.Title, updatedServiceRequest.Title);
@@ -253,7 +249,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
 
             _serviceRequestService.UpdateServiceRequest(serviceRequestDTO, userAndOrg);
 
-            var updatedServiceRequest = _serviceRequestsDbSet.Where(x => x.Id == serviceRequestDTO.Id).First();
+            var updatedServiceRequest = _serviceRequestsDbSet.First(x => x.Id == serviceRequestDTO.Id);
 
             Assert.AreEqual(null, updatedServiceRequest.CategoryName);
             Assert.AreEqual(null, updatedServiceRequest.Title);
@@ -295,7 +291,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
 
             _serviceRequestService.UpdateServiceRequest(serviceRequestDTO, userAndOrg);
 
-            var updatedServiceRequest = _serviceRequestsDbSet.Where(x => x.Id == serviceRequestDTO.Id).First();
+            var updatedServiceRequest = _serviceRequestsDbSet.First(x => x.Id == serviceRequestDTO.Id);
 
             Assert.AreEqual(serviceRequestDTO.StatusId, updatedServiceRequest.StatusId);
 

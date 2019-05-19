@@ -7,7 +7,7 @@ using Shrooms.DataTransferObjects.Models.Wall;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.EntityModels.Models.Events;
 using Shrooms.Host.Contracts.DAL;
-using Shrooms.Infrastructure.SystemClock;
+using Shrooms.Host.Contracts.Infrastructure;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Calendar;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.WebHookCallbacks.Events
@@ -102,11 +102,11 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.WebHookCallbacks.Ev
         {
             var wallDto = new CreateWallDto
             {
-                Access = EntityModels.Models.Multiwall.WallAccess.Private,
+                Access = WallAccess.Private,
                 Name = @event.Name,
                 ModeratorsIds = new List<string> { @event.ResponsibleUserId },
                 MembersIds = new List<string> { @event.ResponsibleUserId },
-                Type = EntityModels.Models.Multiwall.WallType.Events,
+                Type = WallType.Events,
                 Logo = @event.ImageName,
                 OrganizationId = @event.OrganizationId.Value,
                 UserId = @event.ResponsibleUserId,

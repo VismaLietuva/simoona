@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Shrooms.DataTransferObjects.Models;
-using Shrooms.Infrastructure.ExcelGenerator;
+using Shrooms.Host.Contracts.Infrastructure;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Participation;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Utilities;

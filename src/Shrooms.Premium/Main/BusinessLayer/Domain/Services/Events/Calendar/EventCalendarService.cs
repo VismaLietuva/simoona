@@ -5,7 +5,7 @@ using System.Linq;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Events;
 using Shrooms.Host.Contracts.DAL;
-using Shrooms.Infrastructure.FireAndForget;
+using Shrooms.Host.Contracts.Infrastructure;
 using Shrooms.Premium.Infrastructure.Calendar;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Calendar;
 

@@ -10,7 +10,6 @@ using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Events;
-using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events;

@@ -4,7 +4,7 @@ using System.Linq;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
 using Shrooms.Host.Contracts.DAL;
-using Shrooms.Infrastructure.Logger;
+using Shrooms.Host.Contracts.Infrastructure;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.Kudos;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.WebHookCallbacks.LoyaltyKudos

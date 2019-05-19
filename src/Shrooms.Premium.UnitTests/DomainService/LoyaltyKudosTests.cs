@@ -7,7 +7,7 @@ using NUnit.Framework;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
 using Shrooms.Host.Contracts.DAL;
-using Shrooms.Infrastructure.Logger;
+using Shrooms.Host.Contracts.Infrastructure;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.Kudos;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.WebHookCallbacks.LoyaltyKudos;
 using Shrooms.UnitTests.Extensions;

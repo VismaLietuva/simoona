@@ -9,9 +9,7 @@ using Google.Apis.Auth.OAuth2;
 using Google.Apis.Calendar.v3;
 using Google.Apis.Calendar.v3.Data;
 using Google.Apis.Services;
-using Shrooms.Infrastructure.Configuration;
-using Shrooms.Infrastructure.Logger;
-using Shrooms.Infrastructure.Retryer;
+using Shrooms.Host.Contracts.Infrastructure;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Calendar;
 
 namespace Shrooms.Premium.Infrastructure.Calendar
@@ -23,10 +21,10 @@ namespace Shrooms.Premium.Infrastructure.Calendar
         private readonly IApplicationSettings _appSettings;
         private readonly ILogger _logger;
 
-        public GoogleCalendarService()
+        public GoogleCalendarService(IApplicationSettings appSettings, ILogger logger)
         {
-            _appSettings = new ApplicationSettings();
-            _logger = new global::Shrooms.Infrastructure.Logger.Logger();
+            _appSettings = appSettings;
+            _logger = logger;
         }
 
         public void DeleteEvent(Guid eventId, string tenantCalendarId)

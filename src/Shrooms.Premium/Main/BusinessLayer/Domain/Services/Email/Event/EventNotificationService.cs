@@ -8,9 +8,8 @@ using Shrooms.Domain.Services.Organizations;
 using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
-using Shrooms.Infrastructure.Configuration;
-using Shrooms.Infrastructure.Email;
-using Shrooms.Infrastructure.Email.Templating;
+using Shrooms.Host.Contracts.Infrastructure;
+using Shrooms.Host.Contracts.Infrastructure.Email;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.Event
 {

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Notification;
+using Shrooms.DataTransferObjects.Models.Wall;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.EntityModels.Models.Notifications;

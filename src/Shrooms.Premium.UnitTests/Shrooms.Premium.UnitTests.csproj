@@ -133,7 +133,6 @@
     <Reference Include="Shrooms.Host.Contracts, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(SimoonaCoreLocation)\src\api\Contracts\Shrooms.Host.Contracts\bin\$(Configuration)\Shrooms.Host.Contracts.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />

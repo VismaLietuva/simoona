@@ -5,6 +5,7 @@ using Excel;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.DataTransferObjects.Models;
+using Shrooms.Host.Contracts.Infrastructure;
 using Shrooms.Infrastructure.ExcelGenerator;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Export;
@@ -18,7 +19,7 @@ namespace Shrooms.Premium.UnitTests.DomainService.EventServices
         private IEventUtilitiesService _eventUtilitiesService;
         private IEventParticipationService _eventParticipationService;
         private IEventExportService _eventExportService;
-        private ExcelBuilder _excelBuilder;
+        private IExcelBuilder _excelBuilder;
 
         [SetUp]
         public void TestInitializer()
@@ -27,10 +28,7 @@ namespace Shrooms.Premium.UnitTests.DomainService.EventServices
             _eventUtilitiesService = Substitute.For<IEventUtilitiesService>();
             _excelBuilder = new ExcelBuilder();
 
-            _eventExportService = new EventExportService(
-                _eventParticipationService,
-                _eventUtilitiesService,
-                _excelBuilder);
+            _eventExportService = new EventExportService(_eventParticipationService, _eventUtilitiesService, _excelBuilder);
         }
 
         [Test]
@@ -45,7 +43,7 @@ namespace Shrooms.Premium.UnitTests.DomainService.EventServices
 
             var stream = _eventExportService.ExportOptionsAndParticipants(guid, userAndOrg);
 
-            using (IExcelDataReader excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
+            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
             {
                 excelReader.IsFirstRowAsColumnNames = true;
                 var excelData = excelReader.AsDataSet();
@@ -69,7 +67,7 @@ namespace Shrooms.Premium.UnitTests.DomainService.EventServices
 
             var stream = _eventExportService.ExportOptionsAndParticipants(guid, userAndOrg);
 
-            using (IExcelDataReader excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
+            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
             {
                 excelReader.IsFirstRowAsColumnNames = true;
                 var excelData = excelReader.AsDataSet();
@@ -90,7 +88,7 @@ namespace Shrooms.Premium.UnitTests.DomainService.EventServices
 
             var stream = _eventExportService.ExportOptionsAndParticipants(guid, userAndOrg);
 
-            using (IExcelDataReader excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
+            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
             {
                 excelReader.IsFirstRowAsColumnNames = true;
                 var excelData = excelReader.AsDataSet();
@@ -113,7 +111,7 @@ namespace Shrooms.Premium.UnitTests.DomainService.EventServices
             _excelBuilder?.Dispose();
         }
 
-        private Guid MockParticipantsWithOptionsForExport(UserAndOrganizationDTO UserAndOrg)
+        private Guid MockParticipantsWithOptionsForExport(UserAndOrganizationDTO userAndOrg)
         {
             var eventId = Guid.NewGuid();
 
@@ -140,8 +138,8 @@ namespace Shrooms.Premium.UnitTests.DomainService.EventServices
                 }
             };
 
-            _eventParticipationService.GetEventParticipants(eventId, UserAndOrg).Returns(users);
-            _eventUtilitiesService.GetEventChosenOptions(eventId, UserAndOrg).Returns(options);
+            _eventParticipationService.GetEventParticipants(eventId, userAndOrg).Returns(users);
+            _eventUtilitiesService.GetEventChosenOptions(eventId, userAndOrg).Returns(options);
             return eventId;
         }
 

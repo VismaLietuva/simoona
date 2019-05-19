@@ -191,11 +191,6 @@
       <HintPath>$(SimoonaCoreLocation)\src\api\Main\DataLayer\Shrooms.EntityModels\bin\$(Configuration)\Shrooms.EntityModels.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Shrooms.Infrastructure, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SimoonaCoreLocation)\src\api\Infrastructure\Shrooms.Infrastructure\bin\$(Configuration)\Shrooms.Infrastructure.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Shrooms.Resources, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(SimoonaCoreLocation)\src\api\Other\Shrooms.Resources\bin\$(Configuration)\Shrooms.Resources.dll</HintPath>
@@ -262,6 +257,7 @@
     <Compile Include="Constants\ValidationConstants.cs" />
     <Compile Include="Infrastructure\Calendar\GoogleCalendarService.cs" />
     <Compile Include="Infrastructure\Calendar\ICalendarService.cs" />
+    <Compile Include="Infrastructure\Calendar\Retry.cs" />
     <Compile Include="Infrastructure\VacationBot\IVacationBotService.cs" />
     <Compile Include="Infrastructure\VacationBot\VacationBotService.cs" />
     <Compile Include="Infrastructure\VacationBot\VacationInfo.cs" />

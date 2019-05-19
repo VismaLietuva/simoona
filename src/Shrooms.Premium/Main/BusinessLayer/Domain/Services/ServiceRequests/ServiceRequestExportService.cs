@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.DAL;
-using Shrooms.Infrastructure.ExcelGenerator;
+using Shrooms.Host.Contracts.Infrastructure;
 using Shrooms.Premium.Constants;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.ServiceRequests
@@ -68,10 +68,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.ServiceRequests
                 Resources.Models.ServiceRequest.ServiceRequest.ExportColumnNameModified
             };
 
-            _excelBuilder.AddNewWorksheet(
-                BusinessLayerConstants.ServiceRequestsExcelSheetName,
-                header,
-                serviceRequests);
+            _excelBuilder.AddNewWorksheet(BusinessLayerConstants.ServiceRequestsExcelSheetName, header, serviceRequests);
 
             return _excelBuilder.GenerateByteArray();
         }

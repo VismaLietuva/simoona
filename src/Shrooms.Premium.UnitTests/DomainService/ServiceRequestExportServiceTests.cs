@@ -9,6 +9,7 @@ using NUnit.Framework;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Infrastructure;
 using Shrooms.Infrastructure.ExcelGenerator;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.ServiceRequests;
 using Shrooms.UnitTests.Extensions;
@@ -20,7 +21,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
         private IUnitOfWork2 _uow;
         private IDbSet<ServiceRequest> _serviceRequestsDbSet;
         private IServiceRequestExportService _serviceRequestExportService;
-        private ExcelBuilder _excelBuilder;
+        private IExcelBuilder _excelBuilder;
 
         [SetUp]
         public void TestInitializer()
@@ -31,9 +32,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
 
             _excelBuilder = new ExcelBuilder();
 
-            _serviceRequestExportService = new ServiceRequestExportService(
-                _uow,
-                _excelBuilder);
+            _serviceRequestExportService = new ServiceRequestExportService(_uow, _excelBuilder);
         }
 
         [Test]

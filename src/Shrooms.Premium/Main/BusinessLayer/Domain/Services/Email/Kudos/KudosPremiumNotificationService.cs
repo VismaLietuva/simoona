@@ -6,9 +6,8 @@ using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
-using Shrooms.Infrastructure.Configuration;
-using Shrooms.Infrastructure.Email;
-using Shrooms.Infrastructure.Email.Templating;
+using Shrooms.Host.Contracts.Infrastructure;
+using Shrooms.Host.Contracts.Infrastructure.Email;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.Kudos
 {
@@ -31,7 +30,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.Kudos
 
         public void SendLoyaltyBotNotification(KudosLog kudosLog)
         {
-            var organization = getOrganizationName(kudosLog.OrganizationId);
+            var organization = GetOrganizationName(kudosLog.OrganizationId);
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
             var kudosProfileUrl = _appSettings.KudosProfileUrl(organization.ShortName, kudosLog.EmployeeId);
             var subject = Resources.Models.Kudos.Kudos.EmailSubject;
@@ -48,7 +47,6 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.Kudos
             _mailingService.SendEmail(new EmailDto(kudosLog.Employee.Email, subject, body));
         }
 
-        private Organization getOrganizationName(int orgId) => _organizationsDbSet
-                .Single(x => x.Id == orgId);
+        private Organization GetOrganizationName(int orgId) => _organizationsDbSet.Single(x => x.Id == orgId);
     }
 }
