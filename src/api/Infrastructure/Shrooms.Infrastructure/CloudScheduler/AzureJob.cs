@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.WindowsAzure.Scheduler.Models;
-using Shrooms.Infrastructure.Configuration;
+using Shrooms.Host.Contracts.Infrastructure;
 
 namespace Shrooms.Infrastructure.CloudScheduler
 {
@@ -12,8 +12,8 @@ namespace Shrooms.Infrastructure.CloudScheduler
         protected AzureJob(string name, string endpointPath, string tenant, IApplicationSettings appSettings)
         {
             _apiAddress = appSettings.ApiUrl;
-            var username = appSettings.BasicUsername; // ConfigurationManager.AppSettings["BasicUsername"];
-            var password = appSettings.BasicPassword; //ConfigurationManager.AppSettings["BasicPassword"];
+            var username = appSettings.BasicUsername;
+            var password = appSettings.BasicPassword;
 
             if (string.IsNullOrEmpty(name))
             {

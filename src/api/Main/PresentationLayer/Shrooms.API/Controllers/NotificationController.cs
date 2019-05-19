@@ -1,19 +1,19 @@
-﻿namespace Shrooms.API.Controllers
-{
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using System.Web.Http;
-    using AutoMapper;
-    using Shrooms.DataTransferObjects.Models.Notification;
-    using Shrooms.Domain.Services.Notifications;
-    using Shrooms.WebViewModels.Models.Notifications;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Web.Http;
+using AutoMapper;
+using Shrooms.DataTransferObjects.Models.Notification;
+using Shrooms.Domain.Services.Notifications;
+using Shrooms.WebViewModels.Models.Notifications;
 
+namespace Shrooms.API.Controllers
+{
     [Authorize]
     public class NotificationController : BaseController
     {
-        private INotificationService _notificationService;
-        private IMapper _mapper;
+        private readonly INotificationService _notificationService;
+        private readonly IMapper _mapper;
 
         public NotificationController(INotificationService notificationService, IMapper mapper)
         {
@@ -46,7 +46,7 @@
 
         private IEnumerable<NotificationViewModel> MakeCommentsStacked(IEnumerable<NotificationDto> comments)
         {
-            List<NotificationViewModel> stackedList = new List<NotificationViewModel>();
+            var stackedList = new List<NotificationViewModel>();
 
             foreach (var item in comments)
             {

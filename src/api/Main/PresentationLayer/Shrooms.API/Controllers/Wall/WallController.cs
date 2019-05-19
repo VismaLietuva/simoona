@@ -277,7 +277,7 @@ namespace Shrooms.API.Controllers.Wall
 
             try
             {
-                _wallService.DeleteWall(wallId, GetUserAndOrganization(), EntityModels.Models.Multiwall.WallType.UserCreated);
+                _wallService.DeleteWall(wallId, GetUserAndOrganization(), WallType.UserCreated);
                 return Ok();
             }
             catch (ValidationException e)

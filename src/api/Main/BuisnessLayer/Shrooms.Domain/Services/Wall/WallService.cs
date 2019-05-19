@@ -539,7 +539,8 @@ namespace Shrooms.Domain.Services.Wall
                     Id = m.User.Id,
                     WallId = m.WallId,
                     Fullname = string.IsNullOrEmpty(m.User.FirstName) && string.IsNullOrEmpty(m.User.LastName) ?
-                                 string.Empty : $"{m.User.FirstName} {m.User.LastName}"
+                        string.Empty :
+                        m.User.FirstName + " " + m.User.LastName
                 })
                 .ToListAsync();
 

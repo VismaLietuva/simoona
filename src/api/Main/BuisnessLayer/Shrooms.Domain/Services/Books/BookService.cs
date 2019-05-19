@@ -10,13 +10,14 @@ using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Books;
 using Shrooms.DataTransferObjects.Models.Books.BookDetails;
 using Shrooms.DataTransferObjects.Models.Books.BooksByOffice;
+using Shrooms.DataTransferObjects.Models.GoogleBookApiService;
 using Shrooms.DataTransferObjects.Models.LazyPaged;
 using Shrooms.Domain.Services.Email.Book;
 using Shrooms.DomainServiceValidators.Validators.Books;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Books;
 using Shrooms.Host.Contracts.DAL;
-using Shrooms.Infrastructure.GoogleBookApiService;
+using Shrooms.Host.Contracts.Infrastructure;
 
 namespace Shrooms.Domain.Services.Books
 {

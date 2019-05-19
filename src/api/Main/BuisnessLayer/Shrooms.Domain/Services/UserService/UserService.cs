@@ -11,6 +11,7 @@ using Shrooms.Authentification.Membership;
 using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Users;
+using Shrooms.DataTransferObjects.Models.Wall;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Multiwall;
@@ -260,6 +261,19 @@ namespace Shrooms.Domain.Services.UserService
                 .Select(u => u.NotificationsSettings)
                 .FirstOrDefaultAsync();
 
+            var walls = _wallMembersDbSet
+                .Include(x => x.Wall)
+                .Where(x => x.UserId == userOrg.UserId && x.Wall != null && x.Wall.OrganizationId == userOrg.OrganizationId)
+                .Where(x => x.Wall.Type == WallType.UserCreated || x.Wall.Type == WallType.Main)
+                .Select(x => new WallNotificationsDto
+                {
+                    WallName = x.Wall.Name,
+                    WallId = x.WallId,
+                    IsMainWall = x.Wall.Type == WallType.Main,
+                    IsAppNotificationEnabled = x.AppNotificationsEnabled,
+                    IsEmailNotificationEnabled = x.EmailNotificationsEnabled
+                });
+
             var settingsDto = new UserNotificationsSettingsDto
             {
                 EventsAppNotifications = (settings == null) || settings.EventsAppNotifications,
@@ -271,21 +285,7 @@ namespace Shrooms.Domain.Services.UserService
                 FollowingPostsAppNotifications = (settings == null) || settings.FollowingPostsAppNotifications,
                 FollowingPostsEmailNotifications = (settings == null) || settings.FollowingPostsEmailNotifications,
 
-                Walls = _wallMembersDbSet
-                .Include(x => x.Wall)
-                .Where(x => x.UserId == userOrg.UserId &&
-                    x.Wall != null &&
-                    x.Wall.OrganizationId == userOrg.OrganizationId)
-                .Where(x => x.Wall.Type == WallType.UserCreated ||
-                    x.Wall.Type == WallType.Main)
-                .Select(x => new WallNotificationsDto()
-                {
-                    WallName = x.Wall.Name,
-                    WallId = x.WallId,
-                    IsMainWall = x.Wall.Type == WallType.Main,
-                    IsAppNotificationEnabled = x.AppNotificationsEnabled,
-                    IsEmailNotificationEnabled = x.EmailNotificationsEnabled
-                })
+                Walls = walls
             };
 
             return settingsDto;

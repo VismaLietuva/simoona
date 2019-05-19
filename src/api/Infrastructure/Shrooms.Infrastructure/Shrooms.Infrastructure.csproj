@@ -195,33 +195,23 @@
     <Compile Include="CloudScheduler\Jobs\RecurringEvents.cs" />
     <Compile Include="CloudScheduler\JobSchedulerException.cs" />
     <Compile Include="Configuration\ApplicationSettings.cs" />
-    <Compile Include="Configuration\IApplicationSettings.cs" />
     <Compile Include="CustomCache\ICustomCache.cs" />
     <Compile Include="Email\Templating\EmailTemplatesConfig.cs" />
-    <Compile Include="Email\IMailingService.cs" />
     <Compile Include="Email\MailingService.cs" />
-    <Compile Include="Email\Templating\IMailTemplate.cs" />
     <Compile Include="Email\Templating\MailTemplate.cs" />
     <Compile Include="ExcelGenerator\ExcelBuilder.cs" />
     <Compile Include="ExcelGenerator\ExcelWorksheetBuilder.cs" />
-    <Compile Include="ExcelGenerator\IExcelBuilder.cs" />
     <Compile Include="FeatureToggle\Feature.cs" />
     <Compile Include="FireAndForget\HangFireScheduler.cs" />
-    <Compile Include="FireAndForget\IJobScheduler.cs" />
     <Compile Include="GoogleBookApiService\GoogleBookService.cs" />
-    <Compile Include="GoogleBookApiService\IBookInfoService.cs" />
-    <Compile Include="GoogleBookApiService\ExternalBookInfo.cs" />
     <Compile Include="ExcelGenerator\ExcelGenerator.cs" />
-    <Compile Include="Logger\ILogger.cs" />
     <Compile Include="Logger\Logger.cs" />
     <Compile Include="CustomCache\CustomCache.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Retryer\Retry.cs" />
     <Compile Include="Storage\AzureBlob\AzureSettings.cs" />
     <Compile Include="Storage\AzureBlob\AzureStorage.cs" />
     <Compile Include="Storage\FileSystem\FileSystemStorage.cs" />
     <Compile Include="Storage\IStorage.cs" />
-    <Compile Include="SystemClock\ISystemClock.cs" />
     <Compile Include="SystemClock\SystemClock.cs" />
   </ItemGroup>
   <ItemGroup>

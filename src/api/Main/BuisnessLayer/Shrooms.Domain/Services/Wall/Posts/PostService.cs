@@ -3,6 +3,7 @@ using System.Data.Entity;
 using System.Linq;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Users;
+using Shrooms.DataTransferObjects.Models.Wall;
 using Shrooms.DataTransferObjects.Models.Wall.Posts;
 using Shrooms.Domain.Services.Email.Posting;
 using Shrooms.Domain.Services.Permissions;

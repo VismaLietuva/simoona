@@ -5,8 +5,8 @@ using Shrooms.DataTransferObjects.Models.Emails;
 using Shrooms.DataTransferObjects.Models.Support;
 using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.DAL;
-using Shrooms.Infrastructure.Configuration;
-using Shrooms.Infrastructure.Email;
+using Shrooms.Host.Contracts.Infrastructure;
+using Shrooms.Host.Contracts.Infrastructure.Email;
 
 namespace Shrooms.Domain.Services.Support
 {
@@ -16,16 +16,16 @@ namespace Shrooms.Domain.Services.Support
         private readonly IMailingService _mailingService;
         private readonly IApplicationSettings _applicationSettings;
 
-        public SupportService(IUnitOfWork2 uof, IMailingService mailingService, IApplicationSettings applicationSettings)
+        public SupportService(IUnitOfWork2 uow, IMailingService mailingService, IApplicationSettings applicationSettings)
         {
             _mailingService = mailingService;
             _applicationSettings = applicationSettings;
-            _applicationUsers = uof.GetDbSet<ApplicationUser>();
+            _applicationUsers = uow.GetDbSet<ApplicationUser>();
         }
 
         public void SubmitTicket(UserAndOrganizationDTO userAndOrganization, SupportDto support)
         {
-            ApplicationUser currentApplicationUser = _applicationUsers.Single(u => u.Id == userAndOrganization.UserId);
+            var currentApplicationUser = _applicationUsers.Single(u => u.Id == userAndOrganization.UserId);
 
             var email = new EmailDto(currentApplicationUser.FullName, currentApplicationUser.Email, _applicationSettings.SupportEmail, $"{support.Type}: {support.Subject}", support.Message);
 

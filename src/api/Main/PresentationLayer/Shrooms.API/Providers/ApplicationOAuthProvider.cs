@@ -7,7 +7,7 @@ using Autofac;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.OAuth;
 using Shrooms.Authentification.Membership;
-using Shrooms.Infrastructure.Configuration;
+using Shrooms.Host.Contracts.Infrastructure;
 
 namespace Shrooms.API.Providers
 {
@@ -98,8 +98,7 @@ namespace Shrooms.API.Providers
 
         public override Task AuthorizationEndpointResponse(OAuthAuthorizationEndpointResponseContext context)
         {
-            var refreshToken = string.Empty;
-            context.OwinContext.Authentication.AuthenticationResponseGrant.Properties.Dictionary.TryGetValue("refresh_token", out refreshToken);
+            context.OwinContext.Authentication.AuthenticationResponseGrant.Properties.Dictionary.TryGetValue("refresh_token", out var refreshToken);
 
             if (!string.IsNullOrEmpty(refreshToken))
             {
@@ -129,12 +128,9 @@ namespace Shrooms.API.Providers
 
         public override Task ValidateClientAuthentication(OAuthValidateClientAuthenticationContext context)
         {
-            var clientId = string.Empty;
-            var clientSecret = string.Empty;
-
-            if (!context.TryGetBasicCredentials(out clientId, out clientSecret))
+            if (!context.TryGetBasicCredentials(out var clientId, out _))
             {
-                context.TryGetFormCredentials(out clientId, out clientSecret);
+                context.TryGetFormCredentials(out clientId, out _);
             }
 
             if (clientId != _jsAppClientId && clientId != _mobileAppClientId)

@@ -7,7 +7,7 @@ using Microsoft.Owin;
 using Shrooms.Constants.WebApi;
 using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.DAL;
-using Shrooms.Infrastructure.Configuration;
+using Shrooms.Host.Contracts.Infrastructure;
 
 namespace Shrooms.Authentification.BasicAuth
 {

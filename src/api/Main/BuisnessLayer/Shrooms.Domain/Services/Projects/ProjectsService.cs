@@ -12,7 +12,6 @@ using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
-using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
 

@@ -12,7 +12,6 @@ using Shrooms.DataTransferObjects.Models.Wall.Posts.Comments;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Events;
-using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.EntityModels.Models.Notifications;
 using Shrooms.Host.Contracts.DAL;
 

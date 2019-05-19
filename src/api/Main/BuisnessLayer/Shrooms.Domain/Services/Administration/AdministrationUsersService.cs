@@ -18,6 +18,7 @@ using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Administration;
+using Shrooms.DataTransferObjects.Models.Wall;
 using Shrooms.Domain.Services.Email.AdministrationUsers;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.Picture;

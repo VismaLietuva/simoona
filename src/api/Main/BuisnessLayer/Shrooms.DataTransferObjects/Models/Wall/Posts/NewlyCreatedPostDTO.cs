@@ -1,6 +1,5 @@
 ﻿using System;
 using Shrooms.DataTransferObjects.Models.Users;
-using Shrooms.EntityModels.Models.Multiwall;
 
 namespace Shrooms.DataTransferObjects.Models.Wall.Posts
 {

@@ -814,6 +814,10 @@
       <Project>{e07394b9-558c-4a70-9926-6400abb0fb5d}</Project>
       <Name>Shrooms.Constants</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\BuisnessLayer\Shrooms.DataTransferObjects\Shrooms.DataTransferObjects.csproj">
+      <Project>{6611930D-880E-455C-8681-E0E2A33CF5A9}</Project>
+      <Name>Shrooms.DataTransferObjects</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Shrooms.EntityModels\Shrooms.EntityModels.csproj">
       <Project>{8ad6f857-708c-4b5e-98bc-b3206e7dd918}</Project>
       <Name>Shrooms.EntityModels</Name>

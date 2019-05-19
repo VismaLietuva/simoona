@@ -8,7 +8,6 @@ using AutoMapper;
 using Shrooms.API.Filters;
 using Shrooms.DataTransferObjects.Models.Support;
 using Shrooms.Domain.Services.Support;
-using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.WebViewModels.Models.Support;
 

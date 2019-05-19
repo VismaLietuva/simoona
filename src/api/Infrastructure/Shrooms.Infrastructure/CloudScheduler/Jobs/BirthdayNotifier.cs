@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using Microsoft.WindowsAzure.Scheduler.Models;
-using Shrooms.Infrastructure.Configuration;
+using Shrooms.Host.Contracts.Infrastructure;
 
 namespace Shrooms.Infrastructure.CloudScheduler.Jobs
 {

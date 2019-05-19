@@ -1,4 +1,4 @@
-﻿namespace Shrooms.EntityModels.Models
+﻿namespace Shrooms.DataTransferObjects.Models.Support
 {
     public enum SupportType
     {

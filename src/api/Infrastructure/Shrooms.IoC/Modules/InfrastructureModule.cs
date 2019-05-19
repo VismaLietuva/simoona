@@ -5,6 +5,8 @@ using Hangfire;
 using ReallySimpleFeatureToggle;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.DailyMailingService;
+using Shrooms.Host.Contracts.Infrastructure;
+using Shrooms.Host.Contracts.Infrastructure.Email;
 using Shrooms.Infrastructure.Configuration;
 using Shrooms.Infrastructure.CustomCache;
 using Shrooms.Infrastructure.Email;

@@ -9,6 +9,7 @@ using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Books;
 using Shrooms.DataTransferObjects.Models.Books.BookDetails;
 using Shrooms.DataTransferObjects.Models.Books.BooksByOffice;
+using Shrooms.DataTransferObjects.Models.GoogleBookApiService;
 using Shrooms.Domain.Services.Books;
 using Shrooms.Domain.Services.Email.Book;
 using Shrooms.DomainExceptions.Exceptions.Book;
@@ -16,7 +17,7 @@ using Shrooms.DomainServiceValidators.Validators.Books;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Books;
 using Shrooms.Host.Contracts.DAL;
-using Shrooms.Infrastructure.GoogleBookApiService;
+using Shrooms.Host.Contracts.Infrastructure;
 using Shrooms.UnitTests.Extensions;
 
 namespace Shrooms.UnitTests.DomainService
@@ -275,7 +276,7 @@ namespace Shrooms.UnitTests.DomainService
 
             _validationService
                 .When(x => x.ThrowIfUserDoesNotExist(null))
-                .Do(x => { throw new BookException("ThrowIfUserDoesNotExist"); });
+                .Do(x => throw new BookException("ThrowIfUserDoesNotExist"));
 
             Assert.Throws<BookException>(() => _bookService.TakeBook(bookTake));
         }

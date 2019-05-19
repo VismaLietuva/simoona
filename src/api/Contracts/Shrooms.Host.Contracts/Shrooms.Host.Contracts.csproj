@@ -60,11 +60,28 @@
     <Compile Include="DAL\IRepository.cs" />
     <Compile Include="DAL\IUnitOfWork.cs" />
     <Compile Include="DAL\IUnitOfWork2.cs" />
+    <Compile Include="Infrastructure\Email\IMailingService.cs" />
+    <Compile Include="Infrastructure\Email\IMailTemplate.cs" />
+    <Compile Include="Infrastructure\IApplicationSettings.cs" />
+    <Compile Include="Infrastructure\IBookInfoService.cs" />
+    <Compile Include="Infrastructure\IExcelBuilder.cs" />
+    <Compile Include="Infrastructure\IJobScheduler.cs" />
+    <Compile Include="Infrastructure\ILogger.cs" />
+    <Compile Include="Infrastructure\ISystemClock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Main\BuisnessLayer\Shrooms.DataTransferObjects\Shrooms.DataTransferObjects.csproj">
+      <Project>{6611930d-880e-455c-8681-e0e2a33cf5a9}</Project>
+      <Name>Shrooms.DataTransferObjects</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ModelEnums\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

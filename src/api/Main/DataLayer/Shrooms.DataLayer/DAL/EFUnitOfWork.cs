@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Infrastructure;
 using Shrooms.Infrastructure.Configuration;
 
 namespace Shrooms.DataLayer.DAL
@@ -31,7 +32,7 @@ namespace Shrooms.DataLayer.DAL
 
             IApplicationSettings appSettings = new ApplicationSettings();
 
-            repository = new EFRepository<TEntity>(DbContext, appSettings);
+            repository = new EfRepository<TEntity>(DbContext, appSettings);
             _repositories.Add(typeof(TEntity), repository);
             return repository;
         }

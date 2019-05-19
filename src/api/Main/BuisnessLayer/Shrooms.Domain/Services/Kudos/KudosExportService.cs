@@ -8,7 +8,7 @@ using Shrooms.Domain.Helpers;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
 using Shrooms.Host.Contracts.DAL;
-using Shrooms.Infrastructure.ExcelGenerator;
+using Shrooms.Host.Contracts.Infrastructure;
 
 namespace Shrooms.Domain.Services.Kudos
 {
@@ -19,9 +19,7 @@ namespace Shrooms.Domain.Services.Kudos
         private readonly IDbSet<ApplicationUser> _userDbSet;
         private readonly IExcelBuilder _excelBuilder;
 
-        public KudosExportService(
-            IUnitOfWork2 uow,
-            IExcelBuilder excelBuilder)
+        public KudosExportService(IUnitOfWork2 uow, IExcelBuilder excelBuilder)
         {
             _uow = uow;
             _kudosLogsDbSet = _uow.GetDbSet<KudosLog>();

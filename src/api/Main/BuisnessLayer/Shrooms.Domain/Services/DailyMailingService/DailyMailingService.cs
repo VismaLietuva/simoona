@@ -7,8 +7,8 @@ using Shrooms.DataTransferObjects.Models.Emails;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.Host.Contracts.DAL;
-using Shrooms.Infrastructure.Email;
-using Shrooms.Infrastructure.SystemClock;
+using Shrooms.Host.Contracts.Infrastructure;
+using Shrooms.Host.Contracts.Infrastructure.Email;
 
 namespace Shrooms.Domain.Services.DailyMailingService
 {

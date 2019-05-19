@@ -112,6 +112,7 @@
     <Compile Include="Models\Administration\AdministrationSkillDTO.cs" />
     <Compile Include="Models\Administration\AdministrationUserDTO.cs" />
     <Compile Include="Models\Administration\FilterDTO.cs" />
+    <Compile Include="Models\ApplicationUserDTO.cs" />
     <Compile Include="Models\ApplicationUserMinimalViewModelDto.cs" />
     <Compile Include="Models\Birthdays\BirthdayDTO.cs" />
     <Compile Include="Models\Birthdays\UserBirthdayInfoDTO.cs" />
@@ -137,8 +138,10 @@
     <Compile Include="Models\ExternalLinks\AddEditDeleteExternalLinkDTO.cs" />
     <Compile Include="Models\ExternalLinks\ExternalLinkDTO.cs" />
     <Compile Include="Models\ExternalLinks\NewExternalLinkDTO.cs" />
+    <Compile Include="Models\GoogleBookApiService\ExternalBookInfo.cs" />
     <Compile Include="Models\Jobs\JobTypeDTO.cs" />
     <Compile Include="Models\Notification\NotificationDto.cs" />
+    <Compile Include="Models\Notification\NotificationType.cs" />
     <Compile Include="Models\Notification\SourcesDto.cs" />
     <Compile Include="Models\Projects\ProjectDetailsDto.cs" />
     <Compile Include="Models\Kudos\NewKudosTypeDto.cs" />
@@ -183,6 +186,7 @@
     <Compile Include="Models\Roles\RoleDetailsDTO.cs" />
     <Compile Include="Models\Roles\RoleDTO.cs" />
     <Compile Include="Models\Roles\RoleUserDTO.cs" />
+    <Compile Include="Models\Support\SupportType.cs" />
     <Compile Include="Models\UserAndOrganizationDTO.cs" />
     <Compile Include="Models\UserAndOrganizationHubDto.cs" />
     <Compile Include="Models\Users\ChangeUserLocalizationSettingsDto.cs" />
@@ -194,7 +198,9 @@
     <Compile Include="Models\WallPosts\UserDTO.cs" />
     <Compile Include="Models\Wall\Moderator\ModeratorDto.cs" />
     <Compile Include="Models\Wall\UpdateWallDto.cs" />
+    <Compile Include="Models\Wall\WallAccess.cs" />
     <Compile Include="Models\Wall\WallsListFilter.cs" />
+    <Compile Include="Models\Wall\WallType.cs" />
     <Compile Include="Models\Wall\WallUserAction.cs" />
     <Compile Include="Models\Wall\Posts\Comments\CommentCreatedDTO.cs" />
     <Compile Include="Models\Wall\CreateWallDto.cs" />
@@ -224,10 +230,6 @@
     <ProjectReference Include="..\..\..\Other\Shrooms.Constants\Shrooms.Constants.csproj">
       <Project>{e07394b9-558c-4a70-9926-6400abb0fb5d}</Project>
       <Name>Shrooms.Constants</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\DataLayer\Shrooms.EntityModels\Shrooms.EntityModels.csproj">
-      <Project>{8ad6f857-708c-4b5e-98bc-b3206e7dd918}</Project>
-      <Name>Shrooms.EntityModels</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

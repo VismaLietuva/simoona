@@ -6,17 +6,17 @@ using System.Linq.Expressions;
 using PagedList;
 using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.DAL;
-using Shrooms.Infrastructure.Configuration;
+using Shrooms.Host.Contracts.Infrastructure;
 
 namespace Shrooms.DataLayer.DAL
 {
-    public class EFRepository<TEntity> : IRepository<TEntity>
+    public class EfRepository<TEntity> : IRepository<TEntity>
         where TEntity : class
     {
-        protected IDbContext Context;
+        protected IDbContext _context;
         private readonly IApplicationSettings _appSettings;
 
-        protected DbSet<TEntity> DbSet;
+        protected DbSet<TEntity> _dbSet;
         public const string ClaimOrganizationId = "OrganizationId";
 
         public int OrganizationId
@@ -25,17 +25,17 @@ namespace Shrooms.DataLayer.DAL
             set { }
         }
 
-        public EFRepository(IDbContext context, IApplicationSettings appSettings)
+        public EfRepository(IDbContext context, IApplicationSettings appSettings)
         {
-            Context = context;
-            DbSet = Context.Set<TEntity>();
+            _context = context;
+            _dbSet = _context.Set<TEntity>();
             _appSettings = appSettings;
         }
 
         public virtual IQueryable<TEntity> Get(Expression<Func<TEntity, bool>> filter = null, int maxResults = 0, string orderBy = null, string includeProperties = "",
             int? organizationId = 2)
         {
-            IQueryable<TEntity> queryableSet = DbSet;
+            IQueryable<TEntity> queryableSet = _dbSet;
 
             if (typeof(IOrganization).IsAssignableFrom(typeof(TEntity)))
             {
@@ -54,7 +54,7 @@ namespace Shrooms.DataLayer.DAL
 
             if (!string.IsNullOrWhiteSpace(includeProperties))
             {
-                foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                foreach (var includeProperty in includeProperties.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                 {
                     queryableSet = queryableSet.Include(includeProperty);
                 }
@@ -71,7 +71,7 @@ namespace Shrooms.DataLayer.DAL
         public virtual IQueryable<TEntity> Get(Expression<Func<TEntity, bool>> filter = null, int maxResults = 0, Expression<Func<TEntity, DateTime>> orderBy = null, string includeProperties = "",
            int? organizationId = 2)
         {
-            IQueryable<TEntity> queryableSet = DbSet;
+            IQueryable<TEntity> queryableSet = _dbSet;
 
             if (typeof(IOrganization).IsAssignableFrom(typeof(TEntity)))
             {
@@ -90,7 +90,7 @@ namespace Shrooms.DataLayer.DAL
 
             if (!string.IsNullOrWhiteSpace(includeProperties))
             {
-                foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                foreach (var includeProperty in includeProperties.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                 {
                     queryableSet = queryableSet.Include(includeProperty);
                 }
@@ -116,7 +116,7 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual TEntity GetByID(object id)
         {
-            return DbSet.Find(id);
+            return _dbSet.Find(id);
         }
 
         public virtual void Insert(TEntity entity)
@@ -128,13 +128,13 @@ namespace Shrooms.DataLayer.DAL
                 property.SetValue(entity, OrganizationId);
             }
 
-            DbSet.Add(entity);
+            _dbSet.Add(entity);
         }
 
         public virtual void Update(TEntity entity)
         {
-            DbSet.Attach(entity);
-            Context.Entry(entity).State = EntityState.Modified;
+            _dbSet.Attach(entity);
+            _context.Entry(entity).State = EntityState.Modified;
         }
 
         public virtual void DeleteById(object id)
@@ -145,12 +145,12 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual void Delete(TEntity entity)
         {
-            if (Context.Entry(entity).State == EntityState.Detached)
+            if (_context.Entry(entity).State == EntityState.Detached)
             {
-                DbSet.Attach(entity);
+                _dbSet.Attach(entity);
             }
 
-            DbSet.Remove(entity);
+            _dbSet.Remove(entity);
         }
     }
 }

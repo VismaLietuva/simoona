@@ -286,6 +286,10 @@
       <Project>{c6fc692b-dfad-4ed5-86d5-8000dbd06b02}</Project>
       <Name>Shrooms.Resources</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\BuisnessLayer\Shrooms.DataTransferObjects\Shrooms.DataTransferObjects.csproj">
+      <Project>{6611930D-880E-455C-8681-E0E2A33CF5A9}</Project>
+      <Name>Shrooms.DataTransferObjects</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\DataLayer\Shrooms.DataLayer\Shrooms.DataLayer.csproj">
       <Project>{affe7b8b-3294-4dd3-990d-7da5e256c987}</Project>
       <Name>Shrooms.DataLayer</Name>

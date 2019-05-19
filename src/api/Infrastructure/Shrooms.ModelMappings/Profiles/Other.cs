@@ -76,6 +76,9 @@ namespace Shrooms.ModelMappings.Profiles
 
         private void CreateApplicationUserModelMappings()
         {
+            CreateMap<ApplicationUser, ApplicationUserDTO>();
+            CreateMap<ApplicationUserDTO, ApplicationUser>();
+
             CreateMap<ApplicationUser, ApplicationUserDetailsViewModel>()
                 .ForMember(dest => dest.Roles, opt => opt.Ignore())
                 .ForMember(dest => dest.JobTitle, src => src.MapFrom(d => d.JobPosition.Title))

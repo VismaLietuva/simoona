@@ -7,10 +7,9 @@ using Shrooms.DataTransferObjects.Models.Emails;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.Constants;
-using Shrooms.Infrastructure.Configuration;
-using Shrooms.Infrastructure.Email;
-using Shrooms.Infrastructure.Email.Templating;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Infrastructure;
+using Shrooms.Host.Contracts.Infrastructure.Email;
 
 namespace Shrooms.Domain.Services.WebHookCallbacks.BirthdayNotification
 {

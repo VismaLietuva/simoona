@@ -3,6 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Google.Apis.Books.v1;
 using Google.Apis.Services;
+using Shrooms.DataTransferObjects.Models.GoogleBookApiService;
+using Shrooms.Host.Contracts.Infrastructure;
 
 namespace Shrooms.Infrastructure.GoogleBookApiService
 {

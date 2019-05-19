@@ -11,8 +11,8 @@ using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.EntityModels.Models.Notifications;
 using Shrooms.Host.Contracts.Constants;
-using Shrooms.Infrastructure.SystemClock;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Infrastructure;
 
 namespace Shrooms.Domain.Services.Wall.Posts.Comments
 {

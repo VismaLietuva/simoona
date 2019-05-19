@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Shrooms.Infrastructure.SystemClock
+namespace Shrooms.Host.Contracts.Infrastructure
 {
     public interface ISystemClock
     {

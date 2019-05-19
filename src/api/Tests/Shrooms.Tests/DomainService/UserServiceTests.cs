@@ -11,6 +11,7 @@ using NUnit.Framework;
 using Shrooms.Authentification.Membership;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Users;
+using Shrooms.DataTransferObjects.Models.Wall;
 using Shrooms.Domain.Services.UserService;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;

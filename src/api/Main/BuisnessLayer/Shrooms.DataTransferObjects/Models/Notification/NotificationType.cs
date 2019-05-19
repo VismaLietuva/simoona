@@ -1,4 +1,4 @@
-﻿namespace Shrooms.EntityModels.Models.Notifications
+﻿namespace Shrooms.DataTransferObjects.Models.Notification
 {
     public enum NotificationType
     {

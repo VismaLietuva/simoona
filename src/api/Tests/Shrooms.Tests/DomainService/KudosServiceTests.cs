@@ -4,6 +4,7 @@ using System.Data.Entity;
 using System.IO;
 using System.Linq;
 using System.Web;
+using AutoMapper;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Constants.BusinessLayer;
@@ -20,6 +21,7 @@ using Shrooms.EntityModels.Models.Kudos;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.UnitTests.Extensions;
+using Shrooms.UnitTests.ModelMappings;
 
 namespace Shrooms.UnitTests.DomainService
 {
@@ -31,11 +33,14 @@ namespace Shrooms.UnitTests.DomainService
         private IDbSet<KudosType> _kudosTypesDbSet;
         private IDbSet<Organization> _organizationDbSet;
         private IUnitOfWork2 _uow;
+        private IMapper _mapper;
 
         [SetUp]
         public void TestInitializer()
         {
             _uow = Substitute.For<IUnitOfWork2>();
+            _mapper = ModelMapper.Create();
+
             _kudosLogsDbSet = Substitute.For<IDbSet<KudosLog>>();
             _kudosLogsDbSet.SetDbSetData(MockKudosLogs());
             _usersDbSet = Substitute.For<IDbSet<ApplicationUser>>();
@@ -60,7 +65,7 @@ namespace Shrooms.UnitTests.DomainService
             var roleService = Substitute.For<IRoleService>();
             MockRoleService(roleService);
 
-            _kudosService = new KudosService(_uow, uow2, roleService, permissionService, kudosServiceValidation, kudosNotificationService);
+            _kudosService = new KudosService(_uow, uow2, _mapper, roleService, permissionService, kudosServiceValidation, kudosNotificationService);
         }
 
         #region GetKudosLogs

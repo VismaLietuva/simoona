@@ -10,7 +10,7 @@ using Microsoft.Owin.Security.Google;
 using Microsoft.Owin.Security.OAuth;
 using Owin;
 using Shrooms.API.Providers;
-using Shrooms.Infrastructure.Configuration;
+using Shrooms.Host.Contracts.Infrastructure;
 
 namespace Shrooms.API
 {
@@ -18,9 +18,9 @@ namespace Shrooms.API
     {
         public static OAuthAuthorizationServerOptions OAuthServerOptions { get; set; }
 
-        public static string JsAppClientId { get; } = ConfigurationManager.AppSettings["AngularClientId"].ToString();
+        public static string JsAppClientId { get; } = ConfigurationManager.AppSettings["AngularClientId"];
 
-        public static string MobileAppClientId { get; } = ConfigurationManager.AppSettings["MobileAppClientId"].ToString();
+        public static string MobileAppClientId { get; } = ConfigurationManager.AppSettings["MobileAppClientId"];
 
         public void ConfigureAuthMiddleware(IAppBuilder app)
         {
@@ -66,8 +66,8 @@ namespace Shrooms.API
                 var googleOAuthOptions = new GoogleOAuth2AuthenticationOptions
                 {
                     Provider = new CustomGoogleAuthProvider(container),
-                    ClientId = ConfigurationManager.AppSettings["GoogleAccountClientId"].ToString(),
-                    ClientSecret = ConfigurationManager.AppSettings["GoogleAccountClientSecret"].ToString()
+                    ClientId = ConfigurationManager.AppSettings["GoogleAccountClientId"],
+                    ClientSecret = ConfigurationManager.AppSettings["GoogleAccountClientSecret"]
                 };
                 app.UseGoogleAuthentication(googleOAuthOptions);
             }
@@ -77,8 +77,8 @@ namespace Shrooms.API
                 var facebookOAuthOptions = new FacebookAuthenticationOptions
                 {
                     Provider = new CustomFacebookAuthProvider(container),
-                    AppId = ConfigurationManager.AppSettings["FacebookAccountAppId"].ToString(),
-                    AppSecret = ConfigurationManager.AppSettings["FacebookAccountAppSecret"].ToString(),
+                    AppId = ConfigurationManager.AppSettings["FacebookAccountAppId"],
+                    AppSecret = ConfigurationManager.AppSettings["FacebookAccountAppSecret"],
                     Scope = { "public_profile", "email" },
                     Fields = { "email", "name", "first_name", "last_name", "picture.width(800).height(800)" }
                 };
@@ -88,8 +88,8 @@ namespace Shrooms.API
 
         private bool HasProviderSettings(string idKey, string secretKey)
         {
-            return !string.IsNullOrEmpty(ConfigurationManager.AppSettings[idKey].ToString()) &&
-                !string.IsNullOrEmpty(ConfigurationManager.AppSettings[secretKey].ToString());
+            return !string.IsNullOrEmpty(ConfigurationManager.AppSettings[idKey]) &&
+                !string.IsNullOrEmpty(ConfigurationManager.AppSettings[secretKey]);
         }
 
         public class QueryStringBearerAuthProvider : OAuthBearerAuthenticationProvider

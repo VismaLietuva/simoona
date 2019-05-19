@@ -7,6 +7,7 @@ using System.Linq.Dynamic;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoMapper;
 using MoreLinq;
 using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataTransferObjects.Models;
@@ -30,6 +31,7 @@ namespace Shrooms.Domain.Services.Kudos
         private const int LastPage = 1;
 
         private readonly IUnitOfWork2 _uow;
+        private readonly IMapper _mapper;
         private readonly IRoleService _roleService;
         private readonly IPermissionService _permissionService;
         private readonly IKudosServiceValidator _kudosServiceValidator;
@@ -41,19 +43,21 @@ namespace Shrooms.Domain.Services.Kudos
         private readonly IRepository<KudosLog> _kudosLogRepository;
         private readonly IRepository<ApplicationUser> _applicationUserRepository;
 
-        private Expression<Func<KudosType, bool>> _excludeNecessaryKudosTypes = x => x.Type != BusinessLayerConstants.KudosTypeEnum.Send &&
+        private readonly Expression<Func<KudosType, bool>> _excludeNecessaryKudosTypes = x => x.Type != BusinessLayerConstants.KudosTypeEnum.Send &&
                               x.Type != BusinessLayerConstants.KudosTypeEnum.Minus &&
                               x.Type != BusinessLayerConstants.KudosTypeEnum.Other;
 
         public KudosService(
             IUnitOfWork2 uow,
             IUnitOfWork unitOfWork,
+            IMapper mapper,
             IRoleService roleService,
             IPermissionService permissionService,
             IKudosServiceValidator kudosServiceValidator,
             IKudosNotificationService kudosNotificationService)
         {
             _uow = uow;
+            _mapper = mapper;
             _roleService = roleService;
             _permissionService = permissionService;
             _kudosServiceValidator = kudosServiceValidator;
@@ -427,7 +431,7 @@ namespace Shrooms.Domain.Services.Kudos
             foreach (var receivingUser in receivingUsers)
             {
                 _kudosServiceValidator.ValidateUser(receivingUser);
-                kudosDto.ReceivingUser = receivingUser;
+                kudosDto.ReceivingUser = _mapper.Map<ApplicationUserDTO>(receivingUser);
                 ChooseKudosifyType(kudosDto);
             }
 
@@ -437,15 +441,16 @@ namespace Shrooms.Domain.Services.Kudos
             {
                 if (kudosDto.KudosType.Type == BusinessLayerConstants.KudosTypeEnum.Send)
                 {
-                    kudosDto.ReceivingUser = receivingUser;
+                    kudosDto.ReceivingUser = _mapper.Map<ApplicationUserDTO>(receivingUser);
                     _kudosNotificationService.NotifyAboutKudosSent(kudosDto);
-                    UpdateProfileKudos(kudosDto.ReceivingUser, kudosLog);
+                    UpdateProfileKudos(receivingUser, kudosLog);
                 }
             }
 
             if (kudosDto.KudosType.Type == BusinessLayerConstants.KudosTypeEnum.Send)
             {
-                UpdateProfileKudos(kudosDto.SendingUser, kudosLog);
+                var sendingUser = _mapper.Map<ApplicationUser>(kudosDto.SendingUser);
+                UpdateProfileKudos(sendingUser, kudosLog);
             }
         }
 
@@ -518,7 +523,7 @@ namespace Shrooms.Domain.Services.Kudos
 
         private static Expression<Func<ApplicationUser, UserKudosAutocompleteDTO>> MapUsersToAutocompleteDTO()
         {
-            return u => new UserKudosAutocompleteDTO() { Id = u.Id, FormattedName = u.FirstName + " " + u.LastName, Email = u.Email, UserName = u.UserName, PictureId = u.PictureId };
+            return u => new UserKudosAutocompleteDTO { Id = u.Id, FormattedName = u.FirstName + " " + u.LastName, Email = u.Email, UserName = u.UserName, PictureId = u.PictureId };
         }
 
         private static Expression<Func<ApplicationUser, UserKudosDTO>> MapUserToKudosDTO()
@@ -545,18 +550,18 @@ namespace Shrooms.Domain.Services.Kudos
 
         private Expression<Func<KudosLog, UserKudosInformationDTO>> MapKudosLogsToKudosInformationDTO()
         {
-            return x => new UserKudosInformationDTO()
+            return x => new UserKudosInformationDTO
             {
                 Comments = x.Comments,
                 Created = x.Created,
                 MultiplyBy = x.MultiplyBy,
                 Points = x.Points,
-                Type = new KudosTypeDTO()
+                Type = new KudosTypeDTO
                 {
                     Name = x.KudosTypeName,
                     Value = x.KudosTypeValue
                 },
-                Sender = _usersDbSet.FirstOrDefault(u => u.Id == x.CreatedBy)
+                Sender = _mapper.Map<ApplicationUserDTO>(_usersDbSet.FirstOrDefault(u => u.Id == x.CreatedBy))
             };
         }
 
@@ -609,17 +614,12 @@ namespace Shrooms.Domain.Services.Kudos
         private static string GetUserFullName(IEnumerable<KudosLogUserDTO> users, string userId)
         {
             var user = users.FirstOrDefault(usr => usr.Id == userId);
-            if (user == null)
-            {
-                return null;
-            }
-
-            return user.FullName;
+            return user?.FullName;
         }
 
         private KudosTypeDTO MapKudosTypesToDTO(KudosType kudosType)
         {
-            return new KudosTypeDTO()
+            return new KudosTypeDTO
             {
                 Id = kudosType.Id,
                 Name = kudosType.Name,
@@ -674,8 +674,8 @@ namespace Shrooms.Domain.Services.Kudos
             return new AddKudosDTO
             {
                 KudosLog = kudosLog,
-                KudosType = kudosType,
-                SendingUser = sendingUser,
+                KudosType = MapKudosTypesToDTO(kudosType),
+                SendingUser = _mapper.Map<ApplicationUserDTO>(sendingUser),
                 TotalKudosPointsInLog = overridenPoints ?? kudosLog.MultiplyBy * kudosType.Value,
                 PictureId = kudosLog.PictureId
             };
@@ -739,8 +739,7 @@ namespace Shrooms.Domain.Services.Kudos
 
         private AddKudosDTO GenerateLogForKudosMinusOperation(AddKudosDTO kudosDTO)
         {
-            var minusKudosType = _kudosTypesDbSet
-                    .FirstOrDefault(n => n.Type == BusinessLayerConstants.KudosTypeEnum.Minus);
+            var minusKudosType = _kudosTypesDbSet.FirstOrDefault(n => n.Type == BusinessLayerConstants.KudosTypeEnum.Minus);
 
             var kudosLogForMinusKudos = new AddKudosLogDTO
             {
@@ -757,7 +756,7 @@ namespace Shrooms.Domain.Services.Kudos
                 ReceivingUser = kudosDTO.SendingUser,
                 SendingUser = kudosDTO.ReceivingUser,
                 TotalKudosPointsInLog = kudosDTO.TotalKudosPointsInLog,
-                KudosType = minusKudosType,
+                KudosType = MapKudosTypesToDTO(minusKudosType),
                 PictureId = kudosDTO.PictureId
             };
 

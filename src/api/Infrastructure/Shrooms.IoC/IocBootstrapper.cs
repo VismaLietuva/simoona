@@ -20,6 +20,8 @@ using Shrooms.Domain.Services.Projects;
 using Shrooms.Domain.Services.SyncTokens;
 using Shrooms.DomainServiceValidators.Validators.UserAdministration;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Infrastructure;
+using Shrooms.Host.Contracts.Infrastructure.Email;
 using Shrooms.Infrastructure.Email;
 using Shrooms.Infrastructure.Logger;
 using Shrooms.IoC.Modules;
@@ -46,7 +48,7 @@ namespace Shrooms.IoC
             builder.RegisterType(typeof(UnitOfWork2)).As(typeof(IUnitOfWork2)).InstancePerRequest();
             builder.Register(c => new ShroomsDbContext(GetConnectionStringName())).As<IDbContext>().InstancePerRequest();
             builder.RegisterType(typeof(EFUnitOfWork)).As(typeof(IUnitOfWork)).InstancePerRequest();
-            builder.RegisterGeneric(typeof(EFRepository<>)).As(typeof(IRepository<>));
+            builder.RegisterGeneric(typeof(EfRepository<>)).As(typeof(IRepository<>));
 
             // Authorization types
             builder.RegisterType<MailingService>().As<IMailingService>().InstancePerRequest();

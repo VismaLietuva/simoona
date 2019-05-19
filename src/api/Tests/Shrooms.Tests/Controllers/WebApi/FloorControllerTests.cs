@@ -12,7 +12,6 @@ using NUnit.Framework;
 using Shrooms.API.Controllers;
 using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.DAL;
-using Shrooms.Infrastructure.Email;
 using Shrooms.UnitTests.Mocks;
 using Shrooms.UnitTests.ModelMappings;
 using Shrooms.WebViewModels.Models;
@@ -30,8 +29,6 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         public void TestInitializer()
         {
             _unitOfWork = new MockUnitOfWork();
-
-            var emailService = Substitute.For<IMailingService>();
 
             _floorController = new FloorController(ModelMapper.Create(), _unitOfWork);
             _floorController.ControllerContext = Substitute.For<HttpControllerContext>();

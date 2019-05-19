@@ -1,6 +1,7 @@
 ﻿using RazorEngine;
 using RazorEngine.Templating;
 using Shrooms.DataTransferObjects.EmailTemplateViewModels;
+using Shrooms.Host.Contracts.Infrastructure.Email;
 
 namespace Shrooms.Infrastructure.Email.Templating
 {
