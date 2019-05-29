@@ -98,7 +98,7 @@ namespace Shrooms.Domain.Services.Badges
 
             if (alreadyExists)
             {
-                throw new ValidationException(ErrorCodes.DuplicatesIntolerable, 
+                throw new ValidationException(ErrorCodes.DuplicatesIntolerable,
                     $"Badge category (ID {badgeCategoryId}) and kudos type (ID {kudosTypeId}) relationship already exists");
             }
 
@@ -218,18 +218,18 @@ namespace Shrooms.Domain.Services.Badges
                                     || x.BadgeTypes.Any(y => y.IsActive && y.Modified >= oneDayAgo)))
             { // We might have a new category or type, that means we have to take all users.
                 users = await _usersDbSet.Where(x => x.TotalKudos > 0)
-                                         .Include(x => x.BadgeLogs)
+                                         .Include(x => x.BadgeLogs.Select(y => y.BadgeType))
                                          .AsNoTracking()
                                          .ToListAsync();
             }
             else
             { // We have no new badges, thus recalculate only for those that received new kudos
-                users = await _kudosLogsDbSet.Where(x => x.Status == KudosStatus.Approved 
-                                                         && x.Modified > oneDayAgo 
-                                                         && !string.IsNullOrEmpty(x.EmployeeId) 
+                users = await _kudosLogsDbSet.Where(x => x.Status == KudosStatus.Approved
+                                                         && x.Modified > oneDayAgo
+                                                         && !string.IsNullOrEmpty(x.EmployeeId)
                                                          && x.KudosSystemType != ConstBusinessLayer.KudosTypeEnum.Minus)
                                              .Select(x => x.Employee)
-                                             .Include(x => x.BadgeLogs)
+                                             .Include(x => x.BadgeLogs.Select(y => y.BadgeType))
                                              .Distinct(new EmployeeComparer())
                                              .AsNoTracking()
                                              .ToListAsync();
