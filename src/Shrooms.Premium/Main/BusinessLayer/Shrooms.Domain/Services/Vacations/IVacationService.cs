@@ -7,8 +7,7 @@ namespace Shrooms.Domain.Services.Vacations
 {
     public interface IVacationService
     {
-        void UploadVacationReportFile(Stream fileStream);
-
+        VacationImportStatusDTO UploadVacationReportFile(Stream fileStream);
         Task<VacationAvailableDaysDTO> GetAvailableDays(UserAndOrganizationDTO userOrgDto);
     }
 }

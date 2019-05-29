@@ -48,6 +48,31 @@
         </strong>
     </div>
 
+    <div class="col-xs-12"
+        ng-if="!vm.isLoading && vm.importStatus">
+        <div class="bold text-danger" translate="vacations.importStatusHeader" translate-values="{ one: vm.importStatus.imported.length, two: vm.importStatus.skipped.length }">
+        </div>
+        <div class="bold" translate="vacations.importSkippedEntries"></div>
+        <table class="nc-table nc-table-active">
+            <thead>
+                <tr>
+                    <th translate="vacations.importCode"></th>
+                    <th translate="vacations.importFullName"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="importFailure in vm.importStatus.skipped">
+                    <td class="col-xs-1">
+                        {{importFailure.code}}
+                    </td>
+                    <td class="col-xs-11">
+                        {{importFailure.fullName}}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
     <!--Vacation bot integration-->
 
     <!--<div class="col-xs-12">

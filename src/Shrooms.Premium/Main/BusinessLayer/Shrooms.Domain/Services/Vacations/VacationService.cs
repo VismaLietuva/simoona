@@ -4,20 +4,22 @@ using System.Data;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
-using System.Linq.Dynamic;
 using Excel;
-using Shrooms.DataLayer;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.EntityModels.Models;
 using Shrooms.DataTransferObjects.Models.Vacations;
 using System.Threading.Tasks;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
+using Shrooms.DomainExceptions.Exceptions.Vacation;
 
 namespace Shrooms.Domain.Services.Vacations
 {
     public class VacationService : IVacationService
     {
         private readonly IUnitOfWork2 _uow;
+        private readonly TelemetryClient _telemetryClient;
 
         private readonly IDbSet<ApplicationUser> _applicationUserDbSet;
         private readonly IVacationDomainService _vacationDomainService;
@@ -34,54 +36,79 @@ namespace Shrooms.Domain.Services.Vacations
         public VacationService(IUnitOfWork2 unitOfWork2, IVacationDomainService vacationDomainService)
         {
             _uow = unitOfWork2;
+            _telemetryClient = new TelemetryClient();
 
             _applicationUserDbSet = unitOfWork2.GetDbSet<ApplicationUser>();
-
             _vacationDomainService = vacationDomainService;
         }
 
-        public void UploadVacationReportFile(Stream fileStream)
+        public VacationImportStatusDTO UploadVacationReportFile(Stream fileStream)
         {
-            IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(fileStream);
+            var excelReader = ExcelReaderFactory.CreateBinaryReader(fileStream);
 
             var sheets = GetWorksheetNames(excelReader);
             var workSheet = GetWorksheetData(excelReader, sheets.First());
 
+            var importStatus = new VacationImportStatusDTO
+            {
+                Imported = new List<VacationImportEntryDTO>(),
+                Skipped = new List<VacationImportEntryDTO>()
+            };
+
             foreach (var row in workSheet)
             {
-                var acceptableData = row[_codeColIndex].GetType() == typeof(string) &&
-                    row[_fullnameColIndex].GetType() == typeof(string) &&
-                    row[_operationColIndex].GetType() == typeof(string) &&
-                    row[_officeColIndex].GetType() == typeof(string) &&
-                    row[_jobTitleColIndex].GetType() == typeof(string) &&
-                    (row[_vacationTotalTimeColIndex].GetType() == typeof(double) || row[_vacationTotalTimeColIndex].GetType() == typeof(int)) &&
-                    (row[_vacationUsedTimeColIndex].GetType() == typeof(double) || row[_vacationUsedTimeColIndex].GetType() == typeof(int)) &&
-                    (row[_vacationUnusedTimeColIndex].GetType() == typeof(double) || row[_vacationUnusedTimeColIndex].GetType() == typeof(int));
+                var acceptableData = row[_codeColIndex] is string && row[_fullnameColIndex] is string
+                                          && row[_operationColIndex] is string && row[_officeColIndex] is string
+                                          && row[_jobTitleColIndex] is string
+                                          && (row[_vacationTotalTimeColIndex] is double || row[_vacationTotalTimeColIndex] is int)
+                                          && (row[_vacationUsedTimeColIndex] is double || row[_vacationUsedTimeColIndex] is int)
+                                          && (row[_vacationUnusedTimeColIndex] is double || row[_vacationUnusedTimeColIndex] is int);
 
-                if (acceptableData)
+                if (!acceptableData)
                 {
-                    var fullName = row[_fullnameColIndex].ToString();
+                    continue;
+                }
 
-                    var users = _applicationUserDbSet.Where(_vacationDomainService.UsersByNamesFilter(fullName).Compile()).ToList();
+                var fullName = row[_fullnameColIndex].ToString();
+                var code = row[_codeColIndex].ToString();
+                var users = _applicationUserDbSet.Where(_vacationDomainService.UsersByNamesFilter(fullName).Compile()).ToList();
+                var userToUpdate = _vacationDomainService.FindUser(users, fullName);
 
-                    ApplicationUser userToUpdate = _vacationDomainService.FindUser(users, fullName);
+                if (userToUpdate != null)
+                {
+                    var fullTime = (double)row[_vacationTotalTimeColIndex];
+                    var usedTime = (double)row[_vacationUsedTimeColIndex];
+                    var unusedTime = (double)row[_vacationUnusedTimeColIndex];
 
-                    if (userToUpdate != null)
+                    userToUpdate.VacationTotalTime = fullTime;
+                    userToUpdate.VacationUsedTime = usedTime;
+                    userToUpdate.VacationUnusedTime = unusedTime;
+                    userToUpdate.VacationLastTimeUpdated = DateTime.UtcNow;
+
+                    importStatus.Imported.Add(new VacationImportEntryDTO { Code = code, FullName = fullName });
+                }
+                else
+                {
+                    var exception = new VacationImportException($"User wasn't found during import - entry code: {code}, fullname: {fullName}");
+
+                    var exceptionTelemetry = new ExceptionTelemetry
                     {
-                        var fullTime = (double)row[_vacationTotalTimeColIndex];
-                        var usedTime = (double)row[_vacationUsedTimeColIndex];
-                        var unusedTime = (double)row[_vacationUnusedTimeColIndex];
+                        Message = exception.Message,
+                        Exception = exception
+                    };
 
-                        userToUpdate.VacationTotalTime = fullTime;
-                        userToUpdate.VacationUsedTime = usedTime;
-                        userToUpdate.VacationUnusedTime = unusedTime;
-                        userToUpdate.VacationLastTimeUpdated = DateTime.UtcNow;
-                    }
+                    exceptionTelemetry.Properties.Add("Entry code", code);
+                    exceptionTelemetry.Properties.Add("Entry last name, first name", fullName);
+                    _telemetryClient.TrackException(exceptionTelemetry);
+
+                    importStatus.Skipped.Add(new VacationImportEntryDTO { Code = code, FullName = fullName });
                 }
             }
 
             _uow.SaveChanges();
             excelReader.Close();
+
+            return importStatus;
         }
 
         public async Task<VacationAvailableDaysDTO> GetAvailableDays(UserAndOrganizationDTO userOrgDto)
