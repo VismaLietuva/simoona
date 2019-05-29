@@ -10,16 +10,18 @@ Simoona consists of two main parts:
 * Front-end webapp - purely AngularJS appication (no server-side code),
 * Back-end app - ASP.NET MVC+WebApi project, with EntityFramework code-first database.
 
-## Quickstart
+## Install from Binaries
 
-The easiest and fastest way to start exploring Simoona is to follow [installation guidelines](build/README.md). Just head over there and follow the instructions, including:
-* Required software
-* Installation instructions
-* Installation troubleshooting
+The easiest way to install and try out Simoona is from pre-compiled binaries.
+To do it, please follow [Install from binaries guidelines](LocalSetup.md).
+
+## Install from Source Code
+
+If you are planning to contribute or change Simoona code we suggest to follow [Installation from source code guidelines](build/README.md). Just head over there and follow the instructions.
 
 ## Developing and Contributing
 
-After you're done with initial installation and want to start developing, please look into more detailed documentation about Simoona parts:
+If you are planning to do developing and contributing to Simoona code, please look into more detailed documentation about Simoona parts:
 
 1. [Front-end webapp](src/webapp/README.md)
     * Gulp Command List
