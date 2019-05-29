@@ -202,6 +202,7 @@ Tests/Shrooms.Tests/Shrooms.UnitTests.csproj.VisualState.xml
 .vs/
 
 build/tools/*
+build/local-setup/tools/*
 /tools/*
 !build/tools/packages.config
 build/node_modules/
