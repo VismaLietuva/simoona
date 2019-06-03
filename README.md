@@ -2,8 +2,7 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/j5y450yftsvso2je?svg=true)](https://ci.appveyor.com/project/Simoona/simoona-ks9ka) [![Join the chat at https://gitter.im/simoona-oss/community](https://badges.gitter.im/simoona-oss/community.svg)](https://gitter.im/simoona-oss/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-Simoona is smart and intuitive social intranet solution made for effective communication, empowerment, acknowledgement and social networking of your company employees.
-Simoona encourages more interactions, more social activities, more fun. Focus on what's important and create the atmosphere of respect and acknowledgment.
+Simoona is an open source intranet solution powered by Visma. We created Simoona so your company could make its communication more intuitive, more efficient, more empowering, and more fun. In the open source version you will be able to use the core functions of Simoona. Want to add a feature? No problem, you can either get the full version from us or edit the open source version and make it the best intranet solution for your team. Focus on what's important and create an atmosphere of respect and acknowledgment.
 
 Simoona consists of two main parts:
 
