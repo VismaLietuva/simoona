@@ -11,12 +11,11 @@
         'vacationsRepository',
         'notifySrv',
         'shroomsFileUploader',
-        'authService',
         'errorHandler'
     ];
 
     function vacationsController($rootScope, $scope, vacationsRepository, notifySrv,
-        shroomsFileUploader, authService, errorHandler) {
+        shroomsFileUploader, errorHandler) {
         var vm = this;
 
         var uploadConfig = {
@@ -72,7 +71,7 @@
         function uploadVacationFile() {
             vacationsRepository.uploadVacationFile(xlsVacationFile).then(function (response) {
                     notifySrv.success('vacations.vacationTimeReportImportedSuccessfully');
-
+                    vm.importStatus = response.data;
                     getAvailableDays();
                 }, errorHandler.handleErrorMessage);
         }

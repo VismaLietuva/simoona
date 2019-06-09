@@ -1,16 +1,20 @@
-# Build
+# Installation from Source Code
 
 The contents of this folder is used to make building and starting Simoona easier. For this purposes we are using [Yeoman](http://yeoman.io/) with a combination of [Cake](https://cakebuild.net/).
 
 ## Required Software
 
+1. Internet Information Services (IIS) Server (<https://www.iis.net/>) - can be turned on as Windows feature
+2. IIS URL Rewrite extension for IIS (<https://www.iis.net/downloads/microsoft/url-rewrite>)
+3. SQL Server Express (<https://www.microsoft.com/en-us/sql-server/sql-server-editions-express>)- Basic version should be enough
+
+## Required Development Tools
+
 1. NPM and Node.js (<https://www.npmjs.com/get-npm>)
 2. Yeoman (<http://yeoman.io>)
 3. Bower (<https://bower.io>)
-4. SQL Server Express (<https://www.microsoft.com/en-us/sql-server/sql-server-editions-express>)
-5. IIS URL Rewrite (<https://www.iis.net/downloads/microsoft/url-rewrite>)
-6. Git (<https://git-scm.com/downloads>)
-7. Visual Studio, or Microsoft Build Tools 2015 (<https://www.microsoft.com/en-us/download/details.aspx?id=48159>) and Windows 8.x SDK (<https://developer.microsoft.com/en-us/windows/downloads/sdk-archive>)
+4. Git (<https://git-scm.com/downloads>)
+5. Visual Studio 2015+ (<https://www.microsoft.com/en-us/download/details.aspx?id=48159>)
 
 ## Installation Instructions
 
@@ -104,12 +108,10 @@ creates the database for you using SQL scripts, inserts organization name and co
         * ASP.NET 4.7
         * ISAPI Extensions
         * ISAPI Filters
-        
+
 1. build.bat hangs on "Preparing to run build script..."
 
     * Inspect your NuGet package sources. One way of doing that is by running "nuget sources" command
     * Disable NuGet package sources that require authentication. Ideally, you should enable only nuget.org as a source
     * Run build.bat as administrator
     * Enable the disabled packages after installation is complete
-
-    

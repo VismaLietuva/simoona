@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Cors;
 using System.Web.Http;
+using System.Web.Mvc;
 using Autofac.Integration.WebApi;
 using Hangfire;
 using Hangfire.SqlServer;
@@ -42,6 +43,7 @@ namespace Shrooms.API
             SerializationIgnoreConfigs.Configure();
             RouteConfig.Register(config);
             WebApiConfig.Register(config);
+            FilterConfig.RegisterGlobalMvcFilters(GlobalFilters.Filters);
             FilterConfig.RegisterGlobalWebApiFilters(config.Filters);
 
             ConfigureAuthMiddleware(app);

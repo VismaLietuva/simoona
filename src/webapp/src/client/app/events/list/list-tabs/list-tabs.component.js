@@ -8,6 +8,9 @@
             { id: 'participant' },
             { id: 'host' }
         ])
+        .constant('defaultOfficeTabs', [
+            { id: 'all' }
+        ])
         .component('aceEventsListTabs', {
             replace: true,
             templateUrl: 'app/events/list/list-tabs/list-tabs.html',
@@ -16,18 +19,21 @@
         });
 
     eventsListTabsController.$inject = [
+        '$stateParams',
         '$translate',
         '$timeout',
         'eventRepository',
-        'defaultEventTabs'
+        'defaultEventTabs',
+        'defaultOfficeTabs'
     ];
 
-    function eventsListTabsController($translate, $timeout, eventRepository, defaultEventTabs) {
+    function eventsListTabsController($stateParams, $translate, $timeout, eventRepository, defaultEventTabs, defaultOfficeTabs) {
         /* jshint validthis: true */
         var vm = this;
 
         vm.eventsTabs = [];
         vm.isLoading = true;
+        vm.stateParams = $stateParams;
 
         init();
 
@@ -39,31 +45,45 @@
                     vm.eventsTabs = result;
                 }
 
-                $timeout(addDefaultTabs, 100);
+                $timeout(addDefaultEventTabs, 100);
             });
 
             eventRepository.getEventOffices().then(function(result) {
                 if (result) {
                     vm.eventOffices = result;
-
-                    var allOffices = $translate.instant('events.eventOfficeAll');
-                    vm.eventOffices.unshift({ id: "all", name: allOffices });
                 }
+
+                $timeout(addDefaultOfficeTabs, 100);
             });
         }
 
-        function addDefaultTabs() {
+        function addDefaultEventTabs() {
             for (var i = 0; i < defaultEventTabs.length; i++) {
                 var tabId = defaultEventTabs[i].id;
                 if (tabId === 'all') {
-                    vm.eventsTabs.unshift({ id: tabId, name: 'events.' + tabId });
+                    var allEvents = $translate.instant('events.' + tabId);
+                    vm.eventsTabs.unshift({ id: tabId, name: allEvents });
                 } else {
-                    vm.eventsTabs.push({ id: tabId, name: 'events.' + tabId });
+                    var translatedType = $translate.instant('events.' + tabId);
+                    vm.eventsTabs.push({ id: tabId, name: translatedType });
+                }
+            }
+
+            vm.isLoading = false;
+        }
+
+        function addDefaultOfficeTabs() {
+            for (var i = 0; i < defaultOfficeTabs.length; i++) {
+                var tabId = defaultOfficeTabs[i].id;
+                if (tabId === 'all') {
+                    var allOffices = $translate.instant('events.eventOfficeAll');
+                    vm.eventOffices.unshift({ id: tabId, name: allOffices });
+                } else {
+                    vm.eventOffices.push({ id: tabId, name: tabId });
                 }
             }
 
             vm.isLoading = false;
         }
     }
-
 })();
