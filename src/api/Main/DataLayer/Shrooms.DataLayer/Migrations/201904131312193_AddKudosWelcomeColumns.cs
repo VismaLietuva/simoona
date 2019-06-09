@@ -7,9 +7,9 @@ namespace Shrooms.DataLayer.Migrations
     {
         public override void Up()
         {
-            AddColumn("dbo.Organizations", "KudosWelcomeAmount", c => c.Int(nullable: false));
-            AddColumn("dbo.Organizations", "KudosWelcomeEnabled", c => c.Boolean(nullable: false));
-            AddColumn("dbo.Organizations", "KudosWelcomeComment", c => c.String());
+            AddColumn("dbo.Organizations", "KudosWelcomeAmount", c => c.Int(nullable: false, defaultValue: 0));
+            AddColumn("dbo.Organizations", "KudosWelcomeEnabled", c => c.Boolean(nullable: false, defaultValue: false));
+            AddColumn("dbo.Organizations", "KudosWelcomeComment", c => c.String(defaultValue: String.Empty));
         }
         
         public override void Down()
