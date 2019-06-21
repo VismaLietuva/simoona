@@ -214,8 +214,8 @@ namespace Shrooms.Domain.Services.Badges
             var oneDayAgo = DateTime.UtcNow.Date.AddDays(-1).Date;
 
             List<ApplicationUser> users;
-            if (categories.Any(x => x.Created >= oneDayAgo 
-                                    || x.BadgeTypes.Any(y => y.IsActive && y.Modified >= oneDayAgo)))
+            if (categories.Any(x => x.Created >= oneDayAgo || x.Modified >= oneDayAgo
+                                    || x.BadgeTypes.Any(y => y.IsActive && (y.Created >= oneDayAgo || y.Modified >= oneDayAgo))))
             { // We might have a new category or type, that means we have to take all users.
                 users = await _usersDbSet.Where(x => x.TotalKudos > 0)
                                          .Include(x => x.BadgeLogs.Select(y => y.BadgeType))
