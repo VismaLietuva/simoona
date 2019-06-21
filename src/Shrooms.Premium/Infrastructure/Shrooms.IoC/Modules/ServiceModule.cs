@@ -1,5 +1,4 @@
 ﻿using Autofac;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Email.Kudos;
 using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Notifications;
 
 namespace Shrooms.Premium.Infrastructure.Shrooms.IoC.Modules
