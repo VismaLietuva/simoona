@@ -35,5 +35,12 @@ namespace Shrooms.Premium.Main.PresentationLayer.Shrooms.API.Controllers
             var cache = Configuration.CacheOutputConfiguration().GetCacheOutputProvider(Request);
             cache.RemoveStartsWith(Configuration.CacheOutputConfiguration().MakeBaseCachekey((KudosController t) => t.GetLastKudosLogRecords()));
         }
+
+        [HttpPost]
+        [Route("AssignBadges")]
+        public async Task AssignBadges()
+        {
+            await _webHookService.BadgesService.AssignBadgesAsync();
+        }
     }
 }

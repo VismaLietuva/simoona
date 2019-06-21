@@ -51,7 +51,7 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos
                         o.Id,
                         o.KudosYearlyMultipliers
                     })
-                    .SingleOrDefault();
+                    .Single();
 
                 var organizationId = organization.Id;
                 var kudosYearlyMultipliers = ParseKudosYearlyMultipliersString(organization.KudosYearlyMultipliers);

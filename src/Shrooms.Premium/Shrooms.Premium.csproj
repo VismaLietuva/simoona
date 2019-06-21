@@ -271,6 +271,7 @@
     <Compile Include="Infrastructure\Shrooms.Infrastructure\VacationBot\IVacationBotService.cs" />
     <Compile Include="Infrastructure\Shrooms.Infrastructure\VacationBot\VacationBotService.cs" />
     <Compile Include="Infrastructure\Shrooms.Infrastructure\VacationBot\VacationInfo.cs" />
+    <Compile Include="Infrastructure\Shrooms.IoC\Modules\BadgesModule.cs" />
     <Compile Include="Infrastructure\Shrooms.IoC\Modules\BooksModule.cs" />
     <Compile Include="Infrastructure\Shrooms.IoC\Modules\CalendarModule.cs" />
     <Compile Include="Infrastructure\Shrooms.IoC\Modules\CommitteeModule.cs" />
@@ -341,6 +342,9 @@
     <Compile Include="Main\BusinessLayer\Shrooms.DomainExceptions\Exceptions\Vacation\VacationImportException.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DomainServiceValidators\Validators\Events\EventValidationService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DomainServiceValidators\Validators\Events\IEventValidationService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\EmployeeComparer.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Badges\BadgesService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Badges\IBadgesService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Books\BookMobileService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Books\IBookMobileService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Committees\CommitteesService.cs" />
