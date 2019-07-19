@@ -28,6 +28,10 @@
     "morgan": "^1.9.1",
     "serve-favicon": "^2.0.1"
   },
+  "browserslist": [
+    "last 2 version",
+    "> 5%"
+  ],
   "devDependencies": {
     "browser-sync": "^2.26.7",
     "chalk": "^2.4.2",
@@ -67,7 +71,7 @@
     "gulp-strip-css-comments": "^2.0.0",
     "gulp-tap": "^1.0.1",
     "gulp-task-listing": "^1.1.0",
-    "gulp-uglify": "^3.0.2",
+    "gulp-terser": "^1.2.0",
     "gulp-useref": "^3.1.6",
     "imagemin": "^7.0.0",
     "jasmine": "^3.4.0",
