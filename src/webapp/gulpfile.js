@@ -2,25 +2,23 @@ var args = require('yargs').argv;
 var config = require('./gulp.config')();
 var tap = require('gulp-tap');
 var del = require('del');
-var glob = require('glob');
 var gulp = require('gulp');
 var path = require('path');
 var file = require('gulp-file');
 var ngConfig = require('gulp-ng-config');
 var jeditor = require('gulp-json-editor');
+var log = require('fancy-log');
 var merge = require('gulp-merge-json');
 var mergeStream = require('merge-stream');
+var plumber = require('gulp-plumber');
+var useref = require('gulp-useref');
 var stripCssComments = require('gulp-strip-css-comments');
 var _ = require('lodash');
-var ga = require('gulp-ga');
 var jsonminify = require('gulp-jsonminify');
 var $ = require('gulp-load-plugins')({
     lazy: true
 });
-var octo = require('@octopusdeploy/gulp-octo');
 
-var colors = $.util.colors;
-var envenv = $.util.env;
 var port = process.env.PORT || config.defaultPort;
 
 var buildDestination = config.build;
@@ -43,7 +41,7 @@ if (!args.deploy) {
  * List the available gulp tasks
  */
 gulp.task('help', $.taskListing);
-gulp.task('default', ['help']);
+gulp.task('default', gulp.series('help'));
 
 /**
  * vet the code and create coverage report
@@ -64,20 +62,15 @@ gulp.task('vet', function() {
 });
 
 /**
- * Compile less to css
- * @return {Stream}
+ * Remove all styles from the build and temp folders
+ * @param  {Function} done - callback when complete
  */
-gulp.task('styles', ['clean-styles', 'styles-bootstrap'], function() {
-    log('Compiling Less --> CSS');
-
-    return gulp
-        .src(config.less)
-        .pipe($.plumber()) // exit gracefully if something fails after this
-        .pipe($.less())
-        .pipe($.autoprefixer({
-            browsers: ['last 2 version', '> 5%']
-        }))
-        .pipe(gulp.dest(config.temp));
+gulp.task('clean-styles', function(done) {
+    var files = [].concat(
+        config.temp + '**/*.css',
+        buildDestination + 'styles/**/*.css'
+    );
+    clean(files, done);
 });
 
 /**
@@ -89,7 +82,7 @@ gulp.task('styles-bootstrap', function() {
 
     return gulp
         .src(config.bootstrapLess)
-        .pipe($.plumber()) // exit gracefully if something fails after this
+        .pipe(plumber()) // exit gracefully if something fails after this
         .pipe($.less())
         .pipe($.autoprefixer({
             browsers: ['last 2 version', '> 5%']
@@ -98,10 +91,49 @@ gulp.task('styles-bootstrap', function() {
 });
 
 /**
+ * Compile less to css
+ * @return {Stream}
+ */
+gulp.task('styles', function(done) {
+    gulp.series('clean-styles', 'styles-bootstrap')(done);
+    log('Compiling Less --> CSS');
+
+    return gulp
+        .src(config.less)
+        .pipe(plumber()) // exit gracefully if something fails after this
+        .pipe($.less())
+        .pipe($.autoprefixer({
+            browsers: ['last 2 version', '> 5%']
+        }))
+        .pipe(gulp.dest(config.temp));
+});
+
+/**
+ * Remove all fonts from the build folder
+ * @param  {Function} done - callback when complete
+ */
+gulp.task('clean-fonts', function(done) {
+    clean(buildDestination + 'fonts/**/*.*', done);
+});
+
+/**
+ * Remove all translations from the build and temp folders
+ * @param  {Function} done - callback when complete
+ */
+gulp.task('clean-translations', function(done) {
+    var files = [].concat(
+        config.client + 'resources/*.json',
+        buildDestination + 'resources/*.json'
+    );
+    clean(files, done);
+});
+
+/**
  * Copy fonts
  * @return {Stream}
  */
-gulp.task('fonts', ['clean-fonts'], function() {
+gulp.task('fonts', function(done) {
+    gulp.series('clean-fonts')(done);
     log('Copying fonts');
 
     return gulp
@@ -113,7 +145,9 @@ gulp.task('fonts', ['clean-fonts'], function() {
  * Merge translatoins
  * @return {Stream}
  */
-gulp.task('translations', ['clean-translations'], function() {
+gulp.task('translations', function(done) {
+    gulp.series('clean-translations')(done);
+
     log('Merging translation files');
 
     var stream = mergeStream();
@@ -121,7 +155,7 @@ gulp.task('translations', ['clean-translations'], function() {
     for (var i = 0; config.locales.length > i; i++) {
         var localeStream =
             gulp.src(config.client + 'resources/' + config.locales[i] + '/*.json')
-            .pipe($.plumber())
+            .pipe(plumber())
             .pipe(tap(function(file) {
                 var fileName = path.basename(file.path).replace('.json', '');
                 var json = JSON.parse(file.contents.toString());
@@ -161,10 +195,32 @@ gulp.task('extras', function() {
 });
 
 /**
+ * Remove all images from the build folder
+ * @param  {Function} done - callback when complete
+ */
+gulp.task('clean-images', function(done) {
+    clean(buildDestination + 'images/**/*.*', done);
+});
+
+/**
+ * Remove all js and html from the build and temp folders
+ * @param  {Function} done - callback when complete
+ */
+gulp.task('clean-code', function(done) {
+    var files = [].concat(
+        config.temp + '**/*.js',
+        buildDestination + 'js/**/*.js',
+        buildDestination + '**/*.html'
+    );
+    clean(files, done);
+});
+
+/**
  * Compress images
  * @return {Stream}
  */
-gulp.task('images', ['clean-images'], function() {
+gulp.task('images', function(done) {
+    gulp.series('clean-images')(done);
     log('Compressing and copying images');
 
     return gulp
@@ -179,7 +235,8 @@ gulp.task('images', ['clean-images'], function() {
  * Non compress images
  * @return {Stream}
  */
-gulp.task('images-dev', ['clean-images'], function() {
+gulp.task('images-dev', function(done) {
+    gulp.series('clean-images')(done);
     log('Copying images');
 
     return gulp
@@ -187,15 +244,17 @@ gulp.task('images-dev', ['clean-images'], function() {
         .pipe(gulp.dest(buildDestination + 'images'));
 });
 
-gulp.task('less-watcher', function() {
+gulp.task('less-watcher', function(done) {
     gulp.watch([config.less], ['styles']);
+    done();
 });
 
 /**
  * Create $templateCache from the html templates
  * @return {Stream}
  */
-gulp.task('templatecache', ['clean-code'], function() {
+gulp.task('templatecache', function(done) {
+    gulp.series('clean-code')(done);
     log('Creating an AngularJS $templateCache');
 
     return gulp
@@ -220,12 +279,12 @@ gulp.task('templatecache', ['clean-code'], function() {
 gulp.task('build-config', function() {
     var buildConfigs = {
         'build': config.defaultBuildConfig,
-		'build-prod': config.productionBuildConfig,
+        'build-prod': config.productionBuildConfig,
         'build-dev': config.defaultBuildConfig
     };
 
     var build = buildConfigs[args._[0]];
- 
+
     if (!build) {
         build = config.defaultBuildConfig;
     }
@@ -265,7 +324,8 @@ gulp.task('build-config', function() {
  * Wire-up the bower dependencies
  * @return {Stream}
  */
-gulp.task('wiredep', ['build-config', 'translations'], function() {
+gulp.task('wiredep', function(done) {
+    gulp.series('build-config', 'translations')(done);
     log('Wiring the bower dependencies into the html');
 
     var wiredep = require('wiredep').stream;
@@ -281,7 +341,8 @@ gulp.task('wiredep', ['build-config', 'translations'], function() {
         .pipe(gulp.dest(config.client));
 });
 
-gulp.task('inject', ['styles', 'templatecache', 'wiredep'], function() {
+gulp.task('inject', function(done) {
+    gulp.series('styles', 'templatecache', 'wiredep')(done);
     log('Wire up css into the html, after files are ready');
         
     return gulp
@@ -291,7 +352,7 @@ gulp.task('inject', ['styles', 'templatecache', 'wiredep'], function() {
         .pipe(gulp.dest(config.client));
 });
 
-gulp.task('move-locales', function() {
+gulp.task('move-locales', function(done) {
     log('Moving AngularJS locales to resources');
 
     return gulp
@@ -300,77 +361,14 @@ gulp.task('move-locales', function() {
 });
 
 /**
- * Build everything
- * This is separate so we can run tests on
- * optimize before handling image or fonts
- */
-gulp.task('build', ['optimize', 'images', 'fonts', 'extras'], function() {
-    log('Building everything');
-
-    var msg = {
-        title: 'gulp build',
-        subtitle: 'Deployed to the build folder',
-        message: 'Finishing `gulp build`'
-    };
-    del(config.temp);
-    log(msg);
-    notify(msg);
-});
-
-gulp.task('build-prod', ['optimize', 'images', 'fonts', 'prod-extras'], function() {
-    log('Building everything for azure production');
-
-    var msg = {
-        title: 'gulp build-prod',
-        subtitle: 'Deployed to the build folder',
-        message: 'Finishing `gulp build-prod`'
-    };
-    del(config.temp);
-    log(msg);
-    notify(msg);
-});
-
-gulp.task('prod-extras', function() {
-    log('Copying extra files');
-
-    return gulp
-        .src(config.prod_extras, {
-            dot: true
-        })
-        .pipe(gulp.dest(buildDestination));
-});
-
-
-
-/**
- * Build without optimizing for development
- * This is separate so we can run tests on
- * optimize before handling image or fonts
- */
-gulp.task('build-dev', ['optimize-dev', 'images-dev', 'fonts', 'extras'], function() {
-    log('Building development build');
-
-    var msg = {
-        title: 'gulp build-dev',
-        subtitle: 'Deployed to the build folder',
-        message: 'Finishing `gulp build-dev`'
-    };
-    del(config.temp);
-    log(msg);
-    notify(msg);
-});
-
-/**
  * Optimize all files, move to a build folder,
  * and inject them into the new index.html
  * @return {Stream}
  */
-gulp.task('optimize', ['move-locales', 'inject'], function() { //'test'
+gulp.task('optimize', function(done) { //'test'
+    gulp.series('move-locales', 'inject')(done);
     log('Optimizing the js, css, and html');
 
-    var assets = $.useref.assets({
-        searchPath: './'
-    });
     var uglifyOptions = {
         preserveComments: 'none'
     };
@@ -387,14 +385,14 @@ gulp.task('optimize', ['move-locales', 'inject'], function() { //'test'
 
     return gulp
         .src(config.index)
-        .pipe($.plumber())
+        .pipe(plumber())
         .pipe(inject(templateCache, 'templates'))
-        .pipe(assets) // Gather all assets from the html with useref
+        .pipe(useref({searchPath: './'})) // Gather all assets from the html with useref
         // Get the css
         .pipe(cssFilter)
         .pipe($.csso())
         .pipe(stripCssComments(stripCssOptions))
-        .pipe(cssFilter.restore())
+        .pipe(cssFilter.restore)
         // Get the custom javascript
         .pipe(jsAppFilter)
         .pipe($.ngAnnotate({
@@ -412,8 +410,7 @@ gulp.task('optimize', ['move-locales', 'inject'], function() { //'test'
         // Take inventory of the file names for future rev numbers
         .pipe($.rev())
         // Apply the concat and file replacement with useref
-        .pipe(assets.restore())
-        .pipe($.useref())
+        .pipe(useref({searchPath: './'}))
         // Replace the file names in the html with rev numbers
         .pipe($.revReplace())
         .pipe(gulp.dest(buildDestination));
@@ -424,12 +421,10 @@ gulp.task('optimize', ['move-locales', 'inject'], function() { //'test'
  * and inject them into the new index.html
  * @return {Stream}
  */
-gulp.task('optimize-dev', ['move-locales', 'inject'], function() {
+gulp.task('optimize-dev', function(done) {
+    gulp.series('move-locales', 'inject')(done);
     log('Optimizing for development the js, css, and html');
 
-    var assets = $.useref.assets({
-        searchPath: './'
-    });
     // Filters are named for the gulp-useref path
     var cssFilter = $.filter('**/*.css');
     var jsAppFilter = $.filter('**/' + config.optimized.app);
@@ -440,12 +435,12 @@ gulp.task('optimize-dev', ['move-locales', 'inject'], function() {
 
     return gulp
         .src(config.index)
-        .pipe($.plumber())
+        .pipe(plumber())
         .pipe(inject(templateCache, 'templates'))
-        .pipe(assets) // Gather all assets from the html with useref
+        .pipe(useref({searchPath: './'})) // Gather all assets from the html with useref
         // Get the css
         .pipe(cssFilter)
-        .pipe(cssFilter.restore())
+        .pipe(cssFilter.restore)
         // Get the custom javascript
         .pipe(jsAppFilter)
         .pipe($.ngAnnotate({
@@ -460,11 +455,80 @@ gulp.task('optimize-dev', ['move-locales', 'inject'], function() {
         // Take inventory of the file names for future rev numbers
         .pipe($.rev())
         // Apply the concat and file replacement with useref
-        .pipe(assets.restore())
-        .pipe($.useref())
+        .pipe(useref({searchPath: './'}))
         // Replace the file names in the html with rev numbers
         .pipe($.revReplace())
         .pipe(gulp.dest(buildDestination));
+});
+
+/**
+ * Build everything
+ * This is separate so we can run tests on
+ * optimize before handling image or fonts
+ */
+gulp.task('build', function(done) {
+    gulp.series('optimize', 'images', 'fonts', 'extras')(done);
+    log('Building everything');
+
+    var msg = {
+        title: 'gulp build',
+        subtitle: 'Deployed to the build folder',
+        message: 'Finishing `gulp build`'
+    };
+
+    del(config.temp);
+    log(msg);
+    notify(msg);
+    done();
+});
+
+gulp.task('prod-extras', function() {
+    log('Copying extra files');
+
+    return gulp
+        .src(config.prod_extras, {
+            dot: true
+        })
+        .pipe(gulp.dest(buildDestination));
+});
+
+gulp.task('build-prod', function(done) {
+    gulp.series('optimize', 'images', 'fonts', 'prod-extras')(done);
+    log('Building everything for azure production');
+
+    var msg = {
+        title: 'gulp build-prod',
+        subtitle: 'Deployed to the build folder',
+        message: 'Finishing `gulp build-prod`'
+    };
+
+    del(config.temp);
+    log(msg);
+    notify(msg);
+
+    done();
+});
+
+/**
+ * Build without optimizing for development
+ * This is separate so we can run tests on
+ * optimize before handling image or fonts
+ */
+gulp.task('build-dev', function(done) {
+    gulp.series('optimize-dev', 'images-dev', 'fonts', 'extras')(done);
+    log('Building development build');
+
+    var msg = {
+        title: 'gulp build-dev',
+        subtitle: 'Deployed to the build folder',
+        message: 'Finishing `gulp build-dev`'
+    };
+
+    del(config.temp);
+    log(msg);
+    notify(msg);
+
+    done();
 });
 
 /**
@@ -473,63 +537,10 @@ gulp.task('optimize-dev', ['move-locales', 'inject'], function() {
  */
 gulp.task('clean', function(done) {
     var delconfig = [].concat(buildDestination, config.temp, config.report);
-    log('Cleaning: ' + $.util.colors.blue(delconfig));
+    log('Cleaning: ' + delconfig);
     del(delconfig, {
         force: true
     }, done);
-});
-
-/**
- * Remove all fonts from the build folder
- * @param  {Function} done - callback when complete
- */
-gulp.task('clean-fonts', function(done) {
-    clean(buildDestination + 'fonts/**/*.*', done);
-});
-
-/**
- * Remove all images from the build folder
- * @param  {Function} done - callback when complete
- */
-gulp.task('clean-images', function(done) {
-    clean(buildDestination + 'images/**/*.*', done);
-});
-
-/**
- * Remove all translations from the build and temp folders
- * @param  {Function} done - callback when complete
- */
-gulp.task('clean-translations', function(done) {
-    var files = [].concat(
-        config.client + 'resources/*.json',
-        buildDestination + 'resources/*.json'
-    );
-    clean(files, done);
-});
-
-/**
- * Remove all styles from the build and temp folders
- * @param  {Function} done - callback when complete
- */
-gulp.task('clean-styles', function(done) {
-    var files = [].concat(
-        config.temp + '**/*.css',
-        buildDestination + 'styles/**/*.css'
-    );
-    clean(files, done);
-});
-
-/**
- * Remove all js and html from the build and temp folders
- * @param  {Function} done - callback when complete
- */
-gulp.task('clean-code', function(done) {
-    var files = [].concat(
-        config.temp + '**/*.js',
-        buildDestination + 'js/**/*.js',
-        buildDestination + '**/*.html'
-    );
-    clean(files, done);
 });
 
 /**
@@ -538,7 +549,7 @@ gulp.task('clean-code', function(done) {
  *    gulp test --startServers
  * @return {Stream}
  */
-gulp.task('test', [], function(done) {
+gulp.task('test', function(done) {
     startTests(true /*singleRun*/ , done);
 });
 
@@ -557,8 +568,10 @@ gulp.task('autotest', function(done) {
  * --debug-brk or --debug
  * --nosync
  */
-gulp.task('serve-dev', ['inject'], function() {
-    serve(true /*isDev*/ );
+gulp.task('serve-dev', function(done) {
+    gulp.series('inject')(done);
+    serve(true /*isDev*/);
+    done();
 });
 
 /**
@@ -566,26 +579,18 @@ gulp.task('serve-dev', ['inject'], function() {
  * --debug-brk or --debug
  * --nosync
  */
-gulp.task('serve-build', ['build'], function() {
+gulp.task('serve-build', function(done) {
+    gulp.series('build')(done);
     serve(false /*isDev*/ );
-});
-
-
-gulp.task('publish', function () {
- 	process.chdir('./build'); //known workaround, otherwise gulp-octo throws error: https://github.com/OctopusDeploy/gulp-octo/issues/7
-
-	return gulp.src(['./**'])
-    	.pipe(octo.pack({id: args.id, version: args.version}))
-      	.pipe(octo.push({apiKey: args.key, host: args.host}));
+    done();
 });
 
 /**
  * Optimize the code and re-load browserSync
  */
 if (!args.deploy) {
-    gulp.task('bsReload', ['optimize'], browserSync.reload);
-
-    gulp.task('bsBuildStylesAndReload', ['styles'], browserSync.reload);
+    gulp.task('bsReload', gulp.series('optimize'), browserSync.reload);
+    gulp.task('bsBuildStylesAndReload', gulp.series('styles'), browserSync.reload);
 }
 
 /**
@@ -603,7 +608,7 @@ function changeEvent(event) {
  * @param  {Function} done - callback when complete
  */
 function clean(path, done) {
-    log('Cleaning: ' + $.util.colors.blue(path));
+    log('Cleaning: ' + path);
     del(path, {
         force: true
     }, done);
@@ -617,9 +622,7 @@ function clean(path, done) {
  * @returns {Stream}   The stream
  */
 function inject(src, label, order) {
-    var options = {
-        read: false
-    };
+    var options = {};
     if (label) {
         options.name = 'inject:' + label;
     }
@@ -842,11 +845,11 @@ function log(msg) {
     if (typeof(msg) === 'object') {
         for (var item in msg) {
             if (msg.hasOwnProperty(item)) {
-                $.util.log($.util.colors.blue(msg[item]));
+                log(msg[item]);
             }
         }
     } else {
-        $.util.log($.util.colors.blue(msg));
+        log(msg);
     }
 }
 
