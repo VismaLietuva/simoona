@@ -2,25 +2,25 @@ var args = require('yargs').argv;
 var config = require('./gulp.config')();
 var tap = require('gulp-tap');
 var del = require('del');
-var glob = require('glob');
 var gulp = require('gulp');
 var path = require('path');
 var file = require('gulp-file');
 var ngConfig = require('gulp-ng-config');
 var jeditor = require('gulp-json-editor');
+var filter = require('gulp-filter');
+var log = require('fancy-log');
 var merge = require('gulp-merge-json');
 var mergeStream = require('merge-stream');
+var plumber = require('gulp-plumber');
+var useref = require('gulp-useref');
+var terser = require('gulp-terser');
 var stripCssComments = require('gulp-strip-css-comments');
 var _ = require('lodash');
-var ga = require('gulp-ga');
 var jsonminify = require('gulp-jsonminify');
 var $ = require('gulp-load-plugins')({
     lazy: true
 });
-var octo = require('@octopusdeploy/gulp-octo');
 
-var colors = $.util.colors;
-var envenv = $.util.env;
 var port = process.env.PORT || config.defaultPort;
 
 var buildDestination = config.build;
@@ -43,7 +43,7 @@ if (!args.deploy) {
  * List the available gulp tasks
  */
 gulp.task('help', $.taskListing);
-gulp.task('default', ['help']);
+gulp.task('default', gulp.series('help'));
 
 /**
  * vet the code and create coverage report
@@ -60,68 +60,109 @@ gulp.task('vet', function() {
             verbose: true
         }))
         .pipe($.jshint.reporter('fail'))
-        .pipe($.jscs());
+        .pipe($.jscs())
+        .on('end', done);
+});
+
+/**
+ * Remove all styles from the build and temp folders
+ * @param  {Function} done - callback when complete
+ */
+gulp.task('clean-styles', function(done) {
+    var files = [].concat(
+        config.temp + '**/*.css',
+        buildDestination + 'styles/**/*.css'
+    );
+
+    clean(files);
+    done();
 });
 
 /**
  * Compile less to css
  * @return {Stream}
  */
-gulp.task('styles', ['clean-styles', 'styles-bootstrap'], function() {
-    log('Compiling Less --> CSS');
-
-    return gulp
-        .src(config.less)
-        .pipe($.plumber()) // exit gracefully if something fails after this
-        .pipe($.less())
-        .pipe($.autoprefixer({
-            browsers: ['last 2 version', '> 5%']
-        }))
-        .pipe(gulp.dest(config.temp));
-});
-
-/**
- * Compile less to css
- * @return {Stream}
- */
-gulp.task('styles-bootstrap', function() {
+gulp.task('styles-bootstrap', function(done) {
     log('Compiling Bootstrap Less --> CSS');
 
     return gulp
         .src(config.bootstrapLess)
-        .pipe($.plumber()) // exit gracefully if something fails after this
+        .pipe(plumber()) // exit gracefully if something fails after this
         .pipe($.less())
-        .pipe($.autoprefixer({
-            browsers: ['last 2 version', '> 5%']
-        }))
-        .pipe(gulp.dest(config.temp));
+        .pipe($.autoprefixer())
+        .pipe(gulp.dest(config.temp))
+        .on('end', done);
+});
+
+/**
+ * Compile less to css
+ * @return {Stream}
+ */
+gulp.task('styles', gulp.series('clean-styles', 'styles-bootstrap', function(done) {
+    log('Compiling Less --> CSS');
+
+    return gulp
+        .src(config.less)
+        .pipe(plumber()) // exit gracefully if something fails after this
+        .pipe($.less())
+        .pipe($.autoprefixer())
+        .pipe(gulp.dest(config.temp))
+        .on('end', done);
+}));
+
+/**
+ * Remove all fonts from the build folder
+ * @param  {Function} done - callback when complete
+ */
+gulp.task('clean-fonts', function(done) {
+    clean(buildDestination + 'fonts/**/*.*');
+    done();
+});
+
+/**
+ * Remove all translations from the build and temp folders
+ * @param  {Function} done - callback when complete
+ */
+gulp.task('clean-translations', function(done) {
+    var files = [].concat(
+        config.client + 'resources/*.json',
+        buildDestination + 'resources/*.json'
+    );
+
+    clean(files);
+    done();
 });
 
 /**
  * Copy fonts
  * @return {Stream}
  */
-gulp.task('fonts', ['clean-fonts'], function() {
+gulp.task('fonts', gulp.series('clean-fonts', function(done) {
     log('Copying fonts');
 
     return gulp
         .src(config.fonts)
-        .pipe(gulp.dest(buildDestination + 'fonts'));
-});
+        .pipe(gulp.dest(buildDestination + 'fonts'))
+        .on('end', done);
+}));
 
 /**
  * Merge translatoins
  * @return {Stream}
  */
-gulp.task('translations', ['clean-translations'], function() {
+gulp.task('translations', gulp.series('clean-translations', function(done) {
     log('Merging translation files');
 
     var stream = mergeStream();
 
     for (var i = 0; config.locales.length > i; i++) {
+        var mergeJsonOptions = {
+            fileName: 'locale-' + config.locales[i] + '.json'
+        };
+
         var localeStream =
             gulp.src(config.client + 'resources/' + config.locales[i] + '/*.json')
-            .pipe($.plumber())
+            .pipe(plumber())
             .pipe(tap(function(file) {
                 var fileName = path.basename(file.path).replace('.json', '');
                 var json = JSON.parse(file.contents.toString());
@@ -133,9 +174,9 @@ gulp.task('translations', ['clean-translations'], function() {
                     }
                 }
 
-                file.contents = new Buffer(JSON.stringify(json));
+                file.contents = Buffer.from(JSON.stringify(json));
             }))
-            .pipe(merge('locale-' + config.locales[i] + '.json'))
+            .pipe(merge(mergeJsonOptions))
             .pipe(gulp.dest(config.client + 'resources'))
             .pipe(jsonminify())
             .pipe(gulp.dest(buildDestination + 'resources'));
@@ -144,7 +185,7 @@ gulp.task('translations', ['clean-translations'], function() {
     }
 
     return stream;
-});
+}));
 
 /**
  * Copy extras
@@ -161,10 +202,33 @@ gulp.task('extras', function() {
 });
 
 /**
+ * Remove all images from the build folder
+ * @param  {Function} done - callback when complete
+ */
+gulp.task('clean-images', function(done) {
+    clean(buildDestination + 'images/**/*.*');
+    done();
+});
+
+/**
+ * Remove all js and html from the build and temp folders
+ * @param  {Function} done - callback when complete
+ */
+gulp.task('clean-code', function(done) {
+    var files = [].concat(
+        config.temp + '**/*.js',
+        buildDestination + 'js/**/*.js',
+        buildDestination + '**/*.html'
+    );
+    clean(files);
+    done();
+});
+
+/**
  * Compress images
  * @return {Stream}
  */
-gulp.task('images', ['clean-images'], function() {
+gulp.task('images', gulp.series('clean-images', function(done) {
     log('Compressing and copying images');
 
     return gulp
@@ -172,30 +236,33 @@ gulp.task('images', ['clean-images'], function() {
         .pipe($.imagemin({
             optimizationLevel: 4
         }))
-        .pipe(gulp.dest(buildDestination + 'images'));
-});
+        .pipe(gulp.dest(buildDestination + 'images'))
+        .on('end', done);
+}));
 
 /**
  * Non compress images
  * @return {Stream}
  */
-gulp.task('images-dev', ['clean-images'], function() {
+gulp.task('images-dev', gulp.series('clean-images', function(done) {
     log('Copying images');
 
     return gulp
         .src(config.images)
-        .pipe(gulp.dest(buildDestination + 'images'));
-});
+        .pipe(gulp.dest(buildDestination + 'images'))
+        .on('end', done);
+}));
 
-gulp.task('less-watcher', function() {
-    gulp.watch([config.less], ['styles']);
+gulp.task('less-watcher', function(done) {
+    gulp.watch([config.less], gulp.series('styles'));
+    done();
 });
 
 /**
  * Create $templateCache from the html templates
  * @return {Stream}
  */
-gulp.task('templatecache', ['clean-code'], function() {
+gulp.task('templatecache', gulp.series('clean-code', function(done) {
     log('Creating an AngularJS $templateCache');
 
     return gulp
@@ -210,22 +277,23 @@ gulp.task('templatecache', ['clean-code'], function() {
             config.templateCache.file,
             config.templateCache.options
         ))
-        .pipe(gulp.dest(config.temp));
-});
+        .pipe(gulp.dest(config.temp))
+        .on('end', done);
+}));
 
 /**
  * Create build config
  * @return {Stream}
  */
-gulp.task('build-config', function() {
+gulp.task('build-config', function(done) {
     var buildConfigs = {
         'build': config.defaultBuildConfig,
-		'build-prod': config.productionBuildConfig,
+        'build-prod': config.productionBuildConfig,
         'build-dev': config.defaultBuildConfig
     };
 
     var build = buildConfigs[args._[0]];
- 
+
     if (!build) {
         build = config.defaultBuildConfig;
     }
@@ -246,8 +314,7 @@ gulp.task('build-config', function() {
     log('Show missing translations files is ' + (showMissingTranslations ? 'enabled' : 'disabled'));
     log('Environment: ' + environment);
 
-    return gulp.src('{}')
-        .pipe(file('build-config.js', '{}'))
+    return file('build-config.js', '{}', { src: true})
         .pipe(jeditor({
             'endPoint': endpoint,
             'impersonate': impersonate,
@@ -258,14 +325,15 @@ gulp.task('build-config', function() {
         .pipe(ngConfig('simoonaApp.Constant', {
             createModule: true
         }))
-        .pipe(gulp.dest(config.clientApp));
+        .pipe(gulp.dest(config.clientApp))
+        .on('end', done);
 });
 
 /**
  * Wire-up the bower dependencies
  * @return {Stream}
  */
-gulp.task('wiredep', ['build-config', 'translations'], function() {
+gulp.task('wiredep', gulp.series('build-config', 'translations', function(done) {
     log('Wiring the bower dependencies into the html');
 
     var wiredep = require('wiredep').stream;
@@ -278,33 +346,139 @@ gulp.task('wiredep', ['build-config', 'translations'], function() {
         .src(config.index)
         .pipe(wiredep(options))
         .pipe(inject(js, '', config.jsOrder))
-        .pipe(gulp.dest(config.client));
-});
+        .pipe(gulp.dest(config.client))
+        .on('end', done);
+}));
 
-gulp.task('inject', ['styles', 'templatecache', 'wiredep'], function() {
+gulp.task('inject', gulp.series('styles', 'templatecache', 'wiredep', function(done) {
     log('Wire up css into the html, after files are ready');
-        
+
     return gulp
         .src(config.index)
         .pipe(inject(config.cssBootstrap, 'cssBootstrap'))
         .pipe(inject(config.css, 'css'))
-        .pipe(gulp.dest(config.client));
-});
+        .pipe(gulp.dest(config.client))
+        .on('end', done);
+}));
 
-gulp.task('move-locales', function() {
+gulp.task('move-locales', function(done) {
     log('Moving AngularJS locales to resources');
 
     return gulp
         .src(config.angularLocales)
-        .pipe(gulp.dest(buildDestination + 'resources'));
+        .pipe(gulp.dest(buildDestination + 'resources'))
+        .on('end', done);
 });
+
+/**
+ * Optimize all files, move to a build folder,
+ * and inject them into the new index.html
+ * @return {Stream}
+ */
+gulp.task('optimize', gulp.series('move-locales', 'inject', function(done) { //'test'
+    log('Optimizing the js, css, and html');
+
+    var stripCssOptions = {
+        preserve: false
+    };
+
+    // Filters are named for the gulp-useref path
+    var cssFilter = filter('**/*.css', { restore: true });
+    var jsAppFilter = filter('**/' + config.optimized.app, { restore: true });
+    var jsToplibFilter = filter('**/' + config.optimized.toplib, { restore: true });
+    var jsBotlibFilter = filter('**/' + config.optimized.botlib, { restore: true });
+    var notIndexFilter = filter(['**/*', '!**/index.html'], { restore: true });
+
+    var templateCache = config.temp + config.templateCache.file;
+
+    return gulp
+        .src(config.index)
+        .pipe(plumber())
+        .pipe(inject(templateCache, 'templates'))
+        .pipe(useref({ searchPath: './' })) // Gather all assets from the html with useref
+        // Get the css
+        .pipe(cssFilter)
+        .pipe($.csso())
+        .pipe(stripCssComments(stripCssOptions))
+        .pipe(cssFilter.restore)
+        // Get the custom javascript
+        .pipe(jsAppFilter)
+        .pipe($.ngAnnotate({
+            add: true
+        }))
+        .pipe(terser())
+        .pipe(jsAppFilter.restore)
+        // Get the vendor javascript
+        .pipe(jsToplibFilter)
+        .pipe(terser()) // another option is to override wiredep to use min files
+        .pipe(jsToplibFilter.restore)
+        .pipe(jsBotlibFilter)
+        .pipe(terser()) // another option is to override wiredep to use min files
+        .pipe(jsBotlibFilter.restore)
+        // Take inventory of the file names for future rev numbers
+        .pipe(notIndexFilter)
+        .pipe($.rev())
+        // Apply the concat and file replacement with useref
+        .pipe(notIndexFilter.restore)
+        // Replace the file names in the html with rev numbers
+        .pipe($.revReplace())
+        .pipe(gulp.dest(buildDestination))
+        .on('end', done);
+}));
+
+/**
+ * Optimize all files, move to a build folder,
+ * and inject them into the new index.html
+ * @return {Stream}
+ */
+gulp.task('optimize-dev', gulp.series('move-locales', 'inject', function(done) {
+    log('Optimizing for development the js, css, and html');
+
+    // Filters are named for the gulp-useref path
+    var cssFilter = filter('**/*.css', { restore: true });
+    var jsAppFilter = filter('**/' + config.optimized.app, { restore: true });
+    var jsToplibFilter = filter('**/' + config.optimized.toplib, { restore: true });
+    var jsBotlibFilter = filter('**/' + config.optimized.botlib, { restore: true });
+    var notIndexFilter = filter(['**/*', '!**/index.html'], { restore: true });
+
+    var templateCache = config.temp + config.templateCache.file;
+
+    return gulp
+        .src(config.index)
+        .pipe(plumber())
+        .pipe(inject(templateCache, 'templates'))
+        .pipe(useref({ searchPath: './' })) // Gather all assets from the html with useref
+        // Get the css
+        .pipe(cssFilter)
+        .pipe(cssFilter.restore)
+        // Get the custom javascript
+        .pipe(jsAppFilter)
+        .pipe($.ngAnnotate({
+            add: true
+        }))
+        .pipe(jsAppFilter.restore)
+        // Get the vendor javascript
+        .pipe(jsToplibFilter)
+        .pipe(jsToplibFilter.restore)
+        .pipe(jsBotlibFilter)
+        .pipe(jsBotlibFilter.restore)
+        // Take inventory of the file names for future rev numbers
+        .pipe(notIndexFilter)
+        .pipe($.rev())
+        // Apply the concat and file replacement with useref
+        .pipe(notIndexFilter.restore)
+        // Replace the file names in the html with rev numbers
+        .pipe($.revReplace())
+        .pipe(gulp.dest(buildDestination))
+        .on('end', done);
+}));
 
 /**
  * Build everything
  * This is separate so we can run tests on
  * optimize before handling image or fonts
  */
-gulp.task('build', ['optimize', 'images', 'fonts', 'extras'], function() {
+gulp.task('build', gulp.series('optimize', 'images', 'fonts', 'extras', function(done) {
     log('Building everything');
 
     var msg = {
@@ -312,12 +486,25 @@ gulp.task('build', ['optimize', 'images', 'fonts', 'extras'], function() {
         subtitle: 'Deployed to the build folder',
         message: 'Finishing `gulp build`'
     };
+
     del(config.temp);
     log(msg);
     notify(msg);
+    done();
+}));
+
+gulp.task('prod-extras', function(done) {
+    log('Copying extra files');
+
+    return gulp
+        .src(config.prod_extras, {
+            dot: true
+        })
+        .pipe(gulp.dest(buildDestination))
+        .on('end', done);
 });
 
-gulp.task('build-prod', ['optimize', 'images', 'fonts', 'prod-extras'], function() {
+gulp.task('build-prod', gulp.series('optimize', 'images', 'fonts', 'prod-extras', function(done) {
     log('Building everything for azure production');
 
     var msg = {
@@ -325,29 +512,20 @@ gulp.task('build-prod', ['optimize', 'images', 'fonts', 'prod-extras'], function
         subtitle: 'Deployed to the build folder',
         message: 'Finishing `gulp build-prod`'
     };
+
     del(config.temp);
     log(msg);
     notify(msg);
-});
 
-gulp.task('prod-extras', function() {
-    log('Copying extra files');
-
-    return gulp
-        .src(config.prod_extras, {
-            dot: true
-        })
-        .pipe(gulp.dest(buildDestination));
-});
-
-
+    done();
+}));
 
 /**
  * Build without optimizing for development
  * This is separate so we can run tests on
  * optimize before handling image or fonts
  */
-gulp.task('build-dev', ['optimize-dev', 'images-dev', 'fonts', 'extras'], function() {
+gulp.task('build-dev', gulp.series('optimize-dev', 'images-dev', 'fonts', 'extras', function(done) {
     log('Building development build');
 
     var msg = {
@@ -355,117 +533,13 @@ gulp.task('build-dev', ['optimize-dev', 'images-dev', 'fonts', 'extras'], functi
         subtitle: 'Deployed to the build folder',
         message: 'Finishing `gulp build-dev`'
     };
+
     del(config.temp);
     log(msg);
     notify(msg);
-});
 
-/**
- * Optimize all files, move to a build folder,
- * and inject them into the new index.html
- * @return {Stream}
- */
-gulp.task('optimize', ['move-locales', 'inject'], function() { //'test'
-    log('Optimizing the js, css, and html');
-
-    var assets = $.useref.assets({
-        searchPath: './'
-    });
-    var uglifyOptions = {
-        preserveComments: 'none'
-    };
-    var stripCssOptions = {
-        preserve: false
-    };
-    // Filters are named for the gulp-useref path
-    var cssFilter = $.filter('**/*.css');
-    var jsAppFilter = $.filter('**/' + config.optimized.app);
-    var jsToplibFilter = $.filter('**/' + config.optimized.toplib);
-    var jsBotlibFilter = $.filter('**/' + config.optimized.botlib);
-
-    var templateCache = config.temp + config.templateCache.file;
-
-    return gulp
-        .src(config.index)
-        .pipe($.plumber())
-        .pipe(inject(templateCache, 'templates'))
-        .pipe(assets) // Gather all assets from the html with useref
-        // Get the css
-        .pipe(cssFilter)
-        .pipe($.csso())
-        .pipe(stripCssComments(stripCssOptions))
-        .pipe(cssFilter.restore())
-        // Get the custom javascript
-        .pipe(jsAppFilter)
-        .pipe($.ngAnnotate({
-            add: true
-        }))
-        .pipe($.uglify(uglifyOptions))
-        .pipe(jsAppFilter.restore())
-        // Get the vendor javascript
-        .pipe(jsToplibFilter)
-        .pipe($.uglify(uglifyOptions)) // another option is to override wiredep to use min files
-        .pipe(jsToplibFilter.restore())
-        .pipe(jsBotlibFilter)
-        .pipe($.uglify(uglifyOptions)) // another option is to override wiredep to use min files
-        .pipe(jsBotlibFilter.restore())
-        // Take inventory of the file names for future rev numbers
-        .pipe($.rev())
-        // Apply the concat and file replacement with useref
-        .pipe(assets.restore())
-        .pipe($.useref())
-        // Replace the file names in the html with rev numbers
-        .pipe($.revReplace())
-        .pipe(gulp.dest(buildDestination));
-});
-
-/**
- * Optimize all files, move to a build folder,
- * and inject them into the new index.html
- * @return {Stream}
- */
-gulp.task('optimize-dev', ['move-locales', 'inject'], function() {
-    log('Optimizing for development the js, css, and html');
-
-    var assets = $.useref.assets({
-        searchPath: './'
-    });
-    // Filters are named for the gulp-useref path
-    var cssFilter = $.filter('**/*.css');
-    var jsAppFilter = $.filter('**/' + config.optimized.app);
-    var jsToplibFilter = $.filter('**/' + config.optimized.toplib);
-    var jsBotlibFilter = $.filter('**/' + config.optimized.botlib);
-
-    var templateCache = config.temp + config.templateCache.file;
-
-    return gulp
-        .src(config.index)
-        .pipe($.plumber())
-        .pipe(inject(templateCache, 'templates'))
-        .pipe(assets) // Gather all assets from the html with useref
-        // Get the css
-        .pipe(cssFilter)
-        .pipe(cssFilter.restore())
-        // Get the custom javascript
-        .pipe(jsAppFilter)
-        .pipe($.ngAnnotate({
-            add: true
-        }))
-        .pipe(jsAppFilter.restore())
-        // Get the vendor javascript
-        .pipe(jsToplibFilter)
-        .pipe(jsToplibFilter.restore())
-        .pipe(jsBotlibFilter)
-        .pipe(jsBotlibFilter.restore())
-        // Take inventory of the file names for future rev numbers
-        .pipe($.rev())
-        // Apply the concat and file replacement with useref
-        .pipe(assets.restore())
-        .pipe($.useref())
-        // Replace the file names in the html with rev numbers
-        .pipe($.revReplace())
-        .pipe(gulp.dest(buildDestination));
-});
+    done();
+}));
 
 /**
  * Remove all files from the build, temp, and reports folders
@@ -473,63 +547,10 @@ gulp.task('optimize-dev', ['move-locales', 'inject'], function() {
  */
 gulp.task('clean', function(done) {
     var delconfig = [].concat(buildDestination, config.temp, config.report);
-    log('Cleaning: ' + $.util.colors.blue(delconfig));
-    del(delconfig, {
-        force: true
-    }, done);
-});
+    log('Cleaning: ' + delconfig);
+    del(delconfig, { force: true });
 
-/**
- * Remove all fonts from the build folder
- * @param  {Function} done - callback when complete
- */
-gulp.task('clean-fonts', function(done) {
-    clean(buildDestination + 'fonts/**/*.*', done);
-});
-
-/**
- * Remove all images from the build folder
- * @param  {Function} done - callback when complete
- */
-gulp.task('clean-images', function(done) {
-    clean(buildDestination + 'images/**/*.*', done);
-});
-
-/**
- * Remove all translations from the build and temp folders
- * @param  {Function} done - callback when complete
- */
-gulp.task('clean-translations', function(done) {
-    var files = [].concat(
-        config.client + 'resources/*.json',
-        buildDestination + 'resources/*.json'
-    );
-    clean(files, done);
-});
-
-/**
- * Remove all styles from the build and temp folders
- * @param  {Function} done - callback when complete
- */
-gulp.task('clean-styles', function(done) {
-    var files = [].concat(
-        config.temp + '**/*.css',
-        buildDestination + 'styles/**/*.css'
-    );
-    clean(files, done);
-});
-
-/**
- * Remove all js and html from the build and temp folders
- * @param  {Function} done - callback when complete
- */
-gulp.task('clean-code', function(done) {
-    var files = [].concat(
-        config.temp + '**/*.js',
-        buildDestination + 'js/**/*.js',
-        buildDestination + '**/*.html'
-    );
-    clean(files, done);
+    done();
 });
 
 /**
@@ -538,7 +559,7 @@ gulp.task('clean-code', function(done) {
  *    gulp test --startServers
  * @return {Stream}
  */
-gulp.task('test', [], function(done) {
+gulp.task('test', function(done) {
     startTests(true /*singleRun*/ , done);
 });
 
@@ -557,44 +578,37 @@ gulp.task('autotest', function(done) {
  * --debug-brk or --debug
  * --nosync
  */
-gulp.task('serve-dev', ['inject'], function() {
-    serve(true /*isDev*/ );
-});
+gulp.task('serve-dev', gulp.series('inject', function(done) {
+    serve(true /*isDev*/);
+    done();
+}));
 
 /**
  * serve the build environment
  * --debug-brk or --debug
  * --nosync
  */
-gulp.task('serve-build', ['build'], function() {
-    serve(false /*isDev*/ );
-});
-
-
-gulp.task('publish', function () {
- 	process.chdir('./build'); //known workaround, otherwise gulp-octo throws error: https://github.com/OctopusDeploy/gulp-octo/issues/7
-
-	return gulp.src(['./**'])
-    	.pipe(octo.pack({id: args.id, version: args.version}))
-      	.pipe(octo.push({apiKey: args.key, host: args.host}));
-});
+gulp.task('serve-build', gulp.series('build', function(done) {
+    serve(false /*isDev*/);
+    done();
+}));
 
 /**
  * Optimize the code and re-load browserSync
  */
 if (!args.deploy) {
-    gulp.task('bsReload', ['optimize'], browserSync.reload);
-
-    gulp.task('bsBuildStylesAndReload', ['styles'], browserSync.reload);
+    gulp.task('bsReload', gulp.series('optimize'), browserSync.reload);
+    gulp.task('bsBuildStylesAndReload', gulp.series('styles'), browserSync.reload);
 }
 
 /**
  * When files change, log it
- * @param  {Object} event - event that fired
+ * @param  {String} path - The path of the file that changed. If the cwd option was set, the path will be made relative by removing the cwd.
+ * @param  {Object} stats - An fs.Stat object, but could be undefined. If the alwaysStat option was set to true, stats will always be provided.
  */
-function changeEvent(event) {
+function changeEvent(path, stats) {
     var srcPattern = new RegExp('/.*(?=/' + config.source + ')/');
-    log('File ' + event.path.replace(srcPattern, '') + ' ' + event.type);
+    log('File ' + path.replace(srcPattern, ''));
 }
 
 /**
@@ -602,11 +616,11 @@ function changeEvent(event) {
  * @param  {Array}   path - array of paths to delete
  * @param  {Function} done - callback when complete
  */
-function clean(path, done) {
-    log('Cleaning: ' + $.util.colors.blue(path));
+function clean(path) {
+    log('Cleaning: ' + path);
     del(path, {
         force: true
-    }, done);
+    });
 }
 
 /**
@@ -617,9 +631,7 @@ function clean(path, done) {
  * @returns {Stream}   The stream
  */
 function inject(src, label, order) {
-    var options = {
-        read: false
-    };
+    var options = {};
     if (label) {
         options.name = 'inject:' + label;
     }
@@ -717,20 +729,21 @@ function startBrowserSync(isDev, specRunner) {
     // If build: watches the files, builds, and restarts browser-sync.
     // If dev: watches less, compiles it to css, browser-sync handles reload
     if (isDev) {
-        gulp.watch([config.allLess], ['bsBuildStylesAndReload'])
+        gulp.watch([config.allLess], gulp.series('bsBuildStylesAndReload'))
             .on('change', changeEvent);
 
         gulp.watch([config.client + '**/*.*', '!' + config.client + '**/*.less'])
-            .on('change', function (event) {
-                changeEvent(event); browserSync.reload(); 
+            .on('change', function(path, stats) {
+                changeEvent(path, stats); browserSync.reload();
             });
 
-        gulp.watch([config.resources], ['translations'])
+        gulp.watch([config.resources], gulp.series('translations'))
             .on('change', changeEvent);
     } else {
-        gulp.watch([config.allLess, config.js, config.htmltemplates], ['bsReload'])
+        gulp.watch([config.allLess, config.js, config.htmltemplates], gulp.series('bsReload'))
             .on('change', changeEvent);
     }
+
     log('Browser sync: ' + port);
     var options = {
         proxy: 'http://localhost:' + port,
@@ -778,7 +791,6 @@ function startTests(singleRun, done) {
             done();
         }
     });
-
 }
 
 /**
@@ -842,11 +854,11 @@ function log(msg) {
     if (typeof(msg) === 'object') {
         for (var item in msg) {
             if (msg.hasOwnProperty(item)) {
-                $.util.log($.util.colors.blue(msg[item]));
+                log(msg[item]);
             }
         }
     } else {
-        $.util.log($.util.colors.blue(msg));
+        log(msg);
     }
 }
 
