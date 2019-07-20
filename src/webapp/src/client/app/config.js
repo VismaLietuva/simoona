@@ -133,13 +133,13 @@
     function configuration($httpProvider, $locationProvider, cfpLoadingBarProvider,
         ChartJsProvider, AnalyticsProvider, environment, applicationInsightsServiceProvider) {
 
-        var appInsightsEnabled = false;
         var options = { 
             applicationName: '',
-            appInsightsInstrumentationKey: 'appInsightsInstrumentationKey'
+            appInsightsEnabled: false,
+            appInsightsInstrumentationKey: 'appInsightsInstrumentationKeyValue'
         };
 
-        if (!appInsightsEnabled)
+        if (!options.appInsightsEnabled)
         {
             options.autoPageViewTracking = false;
             options.autoStateChangeTracking = false;
