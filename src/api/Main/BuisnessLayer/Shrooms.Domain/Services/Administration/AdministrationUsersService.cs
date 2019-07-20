@@ -24,6 +24,7 @@ using Shrooms.Domain.Services.Email.AdministrationUsers;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.Picture;
 using Shrooms.EntityModels.Models;
+using Shrooms.EntityModels.Models.Kudos;
 using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.Infrastructure.ExcelGenerator;
 using userRes = Shrooms.Resources.Models.ApplicationUser.ApplicationUser;
@@ -177,6 +178,8 @@ namespace Shrooms.Domain.Services.Administration
 
             SetTutorialStatus(applicationUser, false);
 
+            SetWelcomeKudos(applicationUser);
+
             AddUserToMainWall(userId);
             _uow.SaveChanges(userAndOrg.UserId);
         }
@@ -320,6 +323,31 @@ namespace Shrooms.Domain.Services.Administration
             }
 
             _uow.SaveChanges(userId);
+        }
+
+        private void SetWelcomeKudos(ApplicationUser applicationUser)
+        {
+            var organizationDb = _organizationService.GetOrganizationById(applicationUser.OrganizationId);
+
+            if (organizationDb.KudosWelcomeEnabled)
+            {
+                KudosLog welcomeKudos = new KudosLog
+                {
+                    EmployeeId = applicationUser.Id,
+                    OrganizationId = applicationUser.OrganizationId,
+                    Comments = organizationDb.KudosWelcomeComment,
+                    Points = organizationDb.KudosWelcomeAmount,
+                    Created = DateTime.UtcNow,
+                    Modified = DateTime.UtcNow,
+                    Status = KudosStatus.Pending,
+                    MultiplyBy = 1,
+                    KudosSystemType = ConstBusinessLayer.KudosTypeEnum.Other,
+                    KudosTypeValue = (short)ConstBusinessLayer.KudosTypeEnum.Other,
+                    KudosTypeName = ConstBusinessLayer.KudosTypeEnum.Other.ToString()
+                };
+
+                _uow.GetDbSet<KudosLog>().Add(welcomeKudos);
+            }
         }
 
         private static Expression<Func<ApplicationUser, bool>> GenerateQuery(string s)
