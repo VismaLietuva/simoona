@@ -40,6 +40,7 @@ namespace Shrooms.API.Controllers.WebApi
 
         [HttpPost]
         [PermissionAuthorize(Permission = AdministrationPermissions.KudosBasket)]
+        [InvalidateCacheOutput("Get", typeof(WallWidgetsController))]
         public IHttpActionResult CreateNewKudosBasket(KudosBasketCreateViewModel newBasket)
         {
             if (!ModelState.IsValid)
@@ -83,6 +84,7 @@ namespace Shrooms.API.Controllers.WebApi
 
         [HttpDelete]
         [PermissionAuthorize(Permission = AdministrationPermissions.KudosBasket)]
+        [InvalidateCacheOutput("Get", typeof(WallWidgetsController))]
         public IHttpActionResult DeleteKudosBasket()
         {
             var userAndOrganization = GetUserAndOrganization();
@@ -92,6 +94,7 @@ namespace Shrooms.API.Controllers.WebApi
 
         [HttpPut]
         [PermissionAuthorize(Permission = AdministrationPermissions.KudosBasket)]
+        [InvalidateCacheOutput("Get", typeof(WallWidgetsController))]
         public IHttpActionResult EditKudosBasket(KudosBasketEditViewModel editedBasket)
         {
             if (!ModelState.IsValid)
@@ -107,6 +110,7 @@ namespace Shrooms.API.Controllers.WebApi
 
         [HttpPost]
         [PermissionAuthorize(Permission = BasicPermissions.KudosBasket)]
+        [InvalidateCacheOutput("Get", typeof(WallWidgetsController))]
         public IHttpActionResult MakeDonation(KudosBasketDonateViewModel donation)
         {
             if (!ModelState.IsValid)

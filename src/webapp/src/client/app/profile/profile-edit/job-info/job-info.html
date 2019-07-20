@@ -40,7 +40,7 @@
                                             add-on-comma="true"
                                             add-on-blur="true"
                                             wrapped>
-                                    <auto-complete source="allProjects($query)" min-length="0" max-results-to-show="5"></auto-complete>
+                                    <auto-complete source="allProjects($query)" min-length="0" max-results-to-show="5" debounce-delay="500"></auto-complete>
                                 </tags-input>
                             </input-wrapper>
                         </div>
@@ -76,7 +76,7 @@
                                             add-on-blur="true"
                                             min-length="1"
                                             wrapped>
-                                    <auto-complete source="allSkills($query)" min-length="1" max-results-to-show="5"></auto-complete>
+                                    <auto-complete source="allSkills($query)" min-length="1" max-results-to-show="5" debounce-delay="500"></auto-complete>
                                 </tags-input>
                             </input-wrapper>
                         </div>
@@ -304,7 +304,7 @@
                                         add-on-comma="true"
                                         add-on-blur="true"
                                         wrapped>
-                                <auto-complete source="allRoles($query)" min-length="0" max-results-to-show="5"></auto-complete>
+                                <auto-complete source="allRoles($query)" min-length="0" max-results-to-show="5" debounce-delay="500"></auto-complete>
                             </tags-input>
                         </input-wrapper>
 

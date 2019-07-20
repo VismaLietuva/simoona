@@ -21,6 +21,7 @@ using Shrooms.API.Filters;
 using Shrooms.API.GeneralCode;
 using Shrooms.API.GeneralCode.SerializationIgnorer;
 using Shrooms.API.Middlewares;
+using Shrooms.Constants.DataLayer;
 using Shrooms.Constants.WebApi;
 using Shrooms.Infrastructure.CloudScheduler;
 using Shrooms.Infrastructure.CloudScheduler.Jobs;
@@ -37,7 +38,8 @@ namespace Shrooms.API
         public void Configuration(IAppBuilder app)
         {
             var config = new HttpConfiguration();
-            RegisterTelemetryInstrumentationKey();
+
+            ConfigureTelemetry();
             EmailTemplatesConfig.Register(AppDomain.CurrentDomain.BaseDirectory);
             SwaggerConfig.Setup(config);
             SerializationIgnoreConfigs.Configure();
@@ -92,7 +94,7 @@ namespace Shrooms.API
                 QueuePollInterval = TimeSpan.FromSeconds(Convert.ToInt16(interval))
             };
 
-            Hangfire.GlobalConfiguration.Configuration.UseSqlServerStorage("BackgroundJobs", options);
+            Hangfire.GlobalConfiguration.Configuration.UseSqlServerStorage(ConstDataLayer.ConnectionStringNameBackgroundJobs, options);
 
             app.UseHangfireDashboard();
             app.UseHangfireServer();
@@ -174,18 +176,25 @@ namespace Shrooms.API
             }
         }
 
-        private static void RegisterTelemetryInstrumentationKey()
+        private static void ConfigureTelemetry()
         {
             var isTelemetryEnabled = bool.Parse(ConfigurationManager.AppSettings["EnableAITelemetry"]);
             if (isTelemetryEnabled)
             {
-                TelemetryConfiguration.Active.InstrumentationKey =
-                    ConfigurationManager.AppSettings["AIInstrumentationKey"];
+                TelemetryConfiguration.Active.InstrumentationKey = ConfigurationManager.AppSettings["AIInstrumentationKey"];
+                ConfigureTelemetryFilter();
             }
             else
             {
                 TelemetryConfiguration.Active.DisableTelemetry = true;
             }
+        }
+
+        private static void ConfigureTelemetryFilter()
+        {
+            var builder = TelemetryConfiguration.Active.TelemetryProcessorChainBuilder;
+            builder.Use(next => new UnwantedTelemetryFilter(next));
+            builder.Build();
         }
     }
 }
