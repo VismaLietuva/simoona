@@ -84,9 +84,18 @@ namespace Shrooms.API.GeneralCode
 
         private static bool IsHangfireBackgroundJobs(DependencyTelemetry dependency)
         {
-            if (BackgroundJobsDbName != null && dependency.Type == "SQL" && dependency.Name.Contains(BackgroundJobsDbName) && dependency.Success.GetValueOrDefault(false))
+            if (BackgroundJobsDbName != null && dependency.Type == "SQL" && dependency.Success.GetValueOrDefault(false))
             {
-                return true;
+                if (dependency.Name.Contains(BackgroundJobsDbName))
+                {
+                    return true;
+                }
+
+                if (dependency.Target.Contains(BackgroundJobsDbName)
+                    && (dependency.Name.Equals("sp_getapplock") || dependency.Name.Equals("sp_releaseapplock")))
+                {
+                    return true;
+                }
             }
 
             return false;
