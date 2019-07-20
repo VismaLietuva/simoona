@@ -28,9 +28,9 @@ namespace Shrooms.DataLayer
                 return repository;
             }
 
-            IApplicationSettings _appSettings = new ApplicationSettings();
+            IApplicationSettings appSettings = new ApplicationSettings();
 
-            repository = new EFRepository<TEntity>(DbContext, _appSettings);
+            repository = new EFRepository<TEntity>(DbContext, appSettings);
             _repositories.Add(typeof(TEntity), repository);
             return repository;
         }

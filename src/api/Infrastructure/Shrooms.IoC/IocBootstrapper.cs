@@ -37,7 +37,6 @@ namespace Shrooms.IoC
 
             builder.RegisterApiControllers(shroomsApi);
             builder.RegisterHubs(shroomsApi);
-            builder.RegisterWebApiModelBinders(shroomsApi);
             builder.RegisterWebApiModelBinderProvider();
             builder.RegisterWebApiFilterProvider(config);
             builder.RegisterAssemblyTypes(dataLayer);

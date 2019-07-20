@@ -512,7 +512,7 @@ namespace Shrooms.Domain.Services.Kudos
 
         public bool HasPendingKudos(string employeeId)
         {
-            IList<KudosLog> kudosLogs = _kudosLogsDbSet.Where(e =>  e.EmployeeId == employeeId &&
+            IList<KudosLog> kudosLogs = _kudosLogsDbSet.Where(e => e.EmployeeId == employeeId &&
                                                                     e.Status == KudosStatus.Pending).ToList();
 
             return kudosLogs.Any();

@@ -13,10 +13,7 @@ namespace Shrooms.Infrastructure.ExcelGenerator
             _package = new ExcelPackage();
         }
 
-        public IExcelBuilder AddNewWorksheet(
-            string sheetName, 
-            IEnumerable<string> headerItems, 
-            IEnumerable<IEnumerable<object>> rows)
+        public IExcelBuilder AddNewWorksheet(string sheetName, IEnumerable<string> headerItems, IEnumerable<IEnumerable<object>> rows)
         {
             var worksheet = _package.Workbook.Worksheets.Add(sheetName);
             var worksheetBuilder = new ExcelWorksheetBuilder(worksheet);
