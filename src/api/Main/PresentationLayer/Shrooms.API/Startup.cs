@@ -37,7 +37,8 @@ namespace Shrooms.API
         public void Configuration(IAppBuilder app)
         {
             var config = new HttpConfiguration();
-            RegisterTelemetryInstrumentationKey();
+
+            ConfigureTelemetry();
             EmailTemplatesConfig.Register(AppDomain.CurrentDomain.BaseDirectory);
             SwaggerConfig.Setup(config);
             SerializationIgnoreConfigs.Configure();
@@ -174,18 +175,25 @@ namespace Shrooms.API
             }
         }
 
-        private static void RegisterTelemetryInstrumentationKey()
+        private static void ConfigureTelemetry()
         {
             var isTelemetryEnabled = bool.Parse(ConfigurationManager.AppSettings["EnableAITelemetry"]);
             if (isTelemetryEnabled)
             {
-                TelemetryConfiguration.Active.InstrumentationKey =
-                    ConfigurationManager.AppSettings["AIInstrumentationKey"];
+                TelemetryConfiguration.Active.InstrumentationKey = ConfigurationManager.AppSettings["AIInstrumentationKey"];
+                ConfigureTelemetryFilter();
             }
             else
             {
                 TelemetryConfiguration.Active.DisableTelemetry = true;
             }
+        }
+
+        private static void ConfigureTelemetryFilter()
+        {
+            var builder = TelemetryConfiguration.Active.TelemetryProcessorChainBuilder;
+            builder.Use(next => new UnwantedTelemetryFilter(next));
+            builder.Build();
         }
     }
 }
