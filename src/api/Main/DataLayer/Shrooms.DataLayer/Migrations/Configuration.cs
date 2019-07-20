@@ -12,6 +12,9 @@ namespace Shrooms.DataLayer.Migrations
             AutomaticMigrationDataLossAllowed = false;
             ContextKey = "Shrooms.DataLayer.ShroomsDbContext";
             CommandTimeout = 60 * 5;
+
+            SetSqlGenerator("System.Data.SqlClient", new DefaultValueSqlServerMigrationSqlGenerator());
+
         }
 
         protected override void Seed(ShroomsDbContext context)
