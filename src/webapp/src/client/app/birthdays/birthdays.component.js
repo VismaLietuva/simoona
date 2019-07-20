@@ -4,12 +4,12 @@
     angular
         .module('simoonaApp.Birthdays')
         .component('aceBirthdays', {
+            bindings: {
+                users: '='
+            },
             templateUrl: 'app/birthdays/birthdays.html',
             controller: birthdaysController,
-            controllerAs: 'vm',
-            bindings: {
-                users: '<'
-            }
+            controllerAs: 'vm'
         });
 
     birthdaysController.$inject = [

@@ -1,7 +1,7 @@
-﻿using System.Linq;
+﻿using Shrooms.API.Controllers.Kudos;
 using WebApi.OutputCache.V2;
 
-namespace Shrooms.API.Controllers.Kudos
+namespace Shrooms.API.Filters
 {
     public class PermissionAwareCacheOutputFilterAttribute : CacheOutputAttribute
     {

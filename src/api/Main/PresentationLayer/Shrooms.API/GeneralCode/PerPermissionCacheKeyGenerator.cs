@@ -2,10 +2,10 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web.Http.Controllers;
+using Shrooms.API.Filters;
 using Shrooms.API.GeneralCode;
 using Shrooms.API.Helpers;
 using Shrooms.Domain.Services.Permissions;
-using WebApi.OutputCache.V2;
 
 namespace Shrooms.API.Controllers.Kudos
 {

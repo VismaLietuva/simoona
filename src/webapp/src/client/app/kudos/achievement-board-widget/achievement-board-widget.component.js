@@ -5,6 +5,7 @@
         .module('simoonaApp.Kudos')
         .component('aceKudosAchievementBoardWidget', {
             bindings: {
+                tabs: '=',
                 tabonemonths: '=',
                 taboneamount: '=',
                 tabtwomonths: '=',
@@ -15,30 +16,9 @@
             controllerAs: 'vm'
         });
 
-    kudosAchievementBoardController.$inject = [
-        'kudosFactory',
-        'errorHandler'
-    ];
-
-    function kudosAchievementBoardController(kudosFactory, errorHandler) {
+    function kudosAchievementBoardController() {
         /*jshint validthis: true */
         var vm = this;
-
         vm.tabs = [];
-        vm.isLoading = true;
-
-        init();
-
-        /////////
-
-        function init() {
-            kudosFactory.getKudosWidgetStats(vm.tabonemonths, vm.taboneamount, vm.tabtwomonths, vm.tabtwoamount).then(function(response) {
-                vm.tabs = response;
-                vm.isLoading = false;
-            }, function(error) {
-                errorHandler.handleErrorMessage(error);
-                vm.isLoading = false;
-            });
-        }
     }
 }());

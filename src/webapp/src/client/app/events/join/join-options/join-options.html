@@ -39,7 +39,7 @@
                     add-on-comma="true"
                     add-on-blur="true"
                     wrapped translate-cloak>
-            <auto-complete source="vm.getUserForAutoComplete($query)" min-length="0" max-results-to-show="5"></auto-complete>
+            <auto-complete source="vm.getUserForAutoComplete($query)" min-length="0" max-results-to-show="5" debounce-delay="500"></auto-complete>
         </tags-input>
 
         <div class="clearfix"></div>
