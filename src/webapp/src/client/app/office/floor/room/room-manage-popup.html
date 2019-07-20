@@ -22,7 +22,7 @@
     <div class="form-group">
         <label for="applicationUsers"><span>{{"room.employees" | translate}}</span></label><br />
         <tags-input id="applicationUsers" data-ng-model="model.applicationUsers" data-add-from-autocomplete-only="true" data-display-property="fullName" placeholder="{{'map.addApplicationUserPlaceholder' | translate}}">
-            <auto-complete data-source="loadApplicationUsers($query)" data-min-length="0" data-max-results-to-show="5"></auto-complete>
+            <auto-complete data-source="loadApplicationUsers($query)" data-min-length="0" data-max-results-to-show="5" debounce-delay="500"></auto-complete>
         </tags-input>
     </div>
     <div class="form-group">

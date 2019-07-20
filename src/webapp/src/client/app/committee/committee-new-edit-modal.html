@@ -60,7 +60,7 @@
                             placeholder="{{'committee.leadsPlaceHolder' | translate}}"
                             add-on-blur="true"
                             wrapped>
-                    <auto-complete source="allUsers($query)" min-length="0" max-results-to-show="5"></auto-complete>
+                    <auto-complete source="allUsers($query)" min-length="0" max-results-to-show="5" debounce-delay="500"></auto-complete>
                 </tags-input>
                 <p data-test-id="newCommitteeLeadsError"
                    ng-show="!committee.leads.length && !newCommittee.leads.$pristine"
@@ -81,7 +81,7 @@
                             placeholder="{{'committee.membersPlaceHolder' | translate}}"
                             add-on-blur="true"
                             wrapped>
-                    <auto-complete source="allUsers($query)" min-length="0" max-results-to-show="5"></auto-complete>
+                    <auto-complete source="allUsers($query)" min-length="0" max-results-to-show="5" debounce-delay="500"></auto-complete>
                 </tags-input>
                 <p data-test-id="newCommitteeMembersError"
                    ng-show="!committee.members.length && !newCommittee.members.$pristine"
@@ -102,7 +102,7 @@
                             placeholder="{{'committee.delegatesPlaceHolder' | translate}}"
                             add-on-blur="true"
                             wrapped>
-                    <auto-complete source="allUsers($query)" min-length="0" max-results-to-show="5"></auto-complete>
+                    <auto-complete source="allUsers($query)" min-length="0" max-results-to-show="5" debounce-delay="500"></auto-complete>
                 </tags-input>
                 <p data-test-id="newCommitteeDelegatesError"
                    ng-show="!committee.delegates.length && !newCommittee.delegates.$pristine"

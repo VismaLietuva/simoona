@@ -78,7 +78,7 @@
                                         add-on-blur="true"
                                         placeholder="{{'wall.addModerators' | translate}}"
                                         data-test-id="wall-moderators" wrapped translate-cloak required>
-                                <auto-complete source="vm.searchUsersAsModerators($query)" min-length="2" max-results-to-show="5"></auto-complete>
+                                <auto-complete source="vm.searchUsersAsModerators($query)" min-length="2" max-results-to-show="5" debounce-delay="500"></auto-complete>
                             </tags-input>
                         </div>
                     </div>
