@@ -35,8 +35,7 @@ namespace Shrooms.API.Controllers.Kudos
         private readonly IKudosExportService _kudosExportService;
         private readonly IPermissionService _permissionService;
 
-        public KudosController(IMapper mapper, IKudosService kudosService, IKudosExportService kudosExportService,
-            IPermissionService permissionService)
+        public KudosController(IMapper mapper, IKudosService kudosService, IKudosExportService kudosExportService, IPermissionService permissionService)
         {
             _mapper = mapper;
             _kudosService = kudosService;
@@ -245,6 +244,7 @@ namespace Shrooms.API.Controllers.Kudos
 
         [HttpPost]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
+        [InvalidateCacheOutput("Get", typeof(WallWidgetsController))]
         public IHttpActionResult AddKudosLog(AddKudosLogViewModel kudosLog)
         {
             if (!ModelState.IsValid)
@@ -274,6 +274,7 @@ namespace Shrooms.API.Controllers.Kudos
 
         [HttpPost]
         [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
+        [InvalidateCacheOutput("Get", typeof(WallWidgetsController))]
         public IHttpActionResult ApproveKudos(int id)
         {
             try
