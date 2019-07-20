@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using WebApi.OutputCache.V2;
+﻿using WebApi.OutputCache.V2;
 
 namespace Shrooms.API.Controllers.Kudos
 {

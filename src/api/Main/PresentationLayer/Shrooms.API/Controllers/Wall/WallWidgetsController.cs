@@ -44,8 +44,7 @@ namespace Shrooms.API.Controllers.Kudos
         }
 
         [HttpGet]
-        [PermissionAwareCacheOutputFilter(BasicPermissions.Kudos, BasicPermissions.Birthday, BasicPermissions.KudosBasket,
-            ServerTimeSpan = ConstWebApi.OneHour)]
+        [PermissionAwareCacheOutputFilter(BasicPermissions.Kudos, BasicPermissions.Birthday, BasicPermissions.KudosBasket, ServerTimeSpan = ConstWebApi.OneHour)]
         public WidgetsViewModel Get([FromUri]GetWidgetsViewModel getWidgetsViewModel)
         {
             var userAndOrganization = GetUserAndOrganization();
