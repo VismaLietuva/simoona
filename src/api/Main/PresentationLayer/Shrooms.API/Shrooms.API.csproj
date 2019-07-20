@@ -140,28 +140,28 @@
       <HintPath>..\..\..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
     <Reference Include="ImageResizer, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\ImageResizer.4.0.4\lib\net45\ImageResizer.dll</HintPath>
       <Private>True</Private>
+      <HintPath>..\..\..\packages\ImageResizer.4.2.5\lib\net45\ImageResizer.dll</HintPath>
     </Reference>
     <Reference Include="ImageResizer.Plugins.AnimatedGifs, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\ImageResizer.Plugins.AnimatedGifs.4.0.4\lib\net45\ImageResizer.Plugins.AnimatedGifs.dll</HintPath>
       <Private>True</Private>
+      <HintPath>..\..\..\packages\ImageResizer.Plugins.AnimatedGifs.4.2.5\lib\net45\ImageResizer.Plugins.AnimatedGifs.dll</HintPath>
     </Reference>
     <Reference Include="ImageResizer.Plugins.AzureReader2, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\ImageResizer.Plugins.AzureReader2.4.0.4\lib\net45\ImageResizer.Plugins.AzureReader2.dll</HintPath>
       <Private>True</Private>
+      <HintPath>..\..\..\packages\ImageResizer.Plugins.AzureReader2.4.2.5\lib\net45\ImageResizer.Plugins.AzureReader2.dll</HintPath>
     </Reference>
     <Reference Include="ImageResizer.Plugins.DiskCache, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\ImageResizer.Plugins.DiskCache.4.0.4\lib\net45\ImageResizer.Plugins.DiskCache.dll</HintPath>
       <Private>True</Private>
+      <HintPath>..\..\..\packages\ImageResizer.Plugins.DiskCache.4.2.5\lib\net45\ImageResizer.Plugins.DiskCache.dll</HintPath>
     </Reference>
     <Reference Include="ImageResizer.Plugins.PrettyGifs, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\ImageResizer.Plugins.PrettyGifs.4.0.4\lib\net45\ImageResizer.Plugins.PrettyGifs.dll</HintPath>
       <Private>True</Private>
+      <HintPath>..\..\..\packages\ImageResizer.Plugins.PrettyGifs.4.2.5\lib\net45\ImageResizer.Plugins.PrettyGifs.dll</HintPath>
     </Reference>
     <Reference Include="ImageResizer.Storage, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\ImageResizer.Storage.4.0.4\lib\net45\ImageResizer.Storage.dll</HintPath>
       <Private>True</Private>
+      <HintPath>..\..\..\packages\ImageResizer.Storage.4.2.5\lib\net45\ImageResizer.Storage.dll</HintPath>
     </Reference>
     <Reference Include="LinqKit, Version=1.1.3.1, Culture=neutral, PublicKeyToken=bc217f8844052a91, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\LinqKit.1.1.3.1\lib\net45\LinqKit.dll</HintPath>
@@ -676,11 +676,6 @@
   </Target>
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
   <Import Project="..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
-  <Import Project="..\..\..\packages\OctoPack.3.4.6\tools\OctoPack.targets" Condition="Exists('..\..\..\packages\OctoPack.3.4.6\tools\OctoPack.targets')" />
-  <Target Name="EnsureOctoPackImported" BeforeTargets="BeforeBuild" Condition="'$(OctoPackImported)' == ''">
-    <Error Condition="!Exists('..\..\..\packages\OctoPack.3.4.6\tools\OctoPack.targets') And ('$(RunOctoPack)' != '' And $(RunOctoPack))" Text="You are trying to build with OctoPack, but the NuGet targets file that OctoPack depends on is not available on this computer. This is probably because the OctoPack package has not been committed to source control, or NuGet Package Restore is not enabled. Please enable NuGet Package Restore to download them. For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
-    <Error Condition="Exists('..\..\..\packages\OctoPack.3.4.6\tools\OctoPack.targets') And ('$(RunOctoPack)' != '' And $(RunOctoPack))" Text="OctoPack cannot be run because NuGet packages were restored prior to the build running, and the targets file was unavailable when the build started. Please build the project again to include these packages in the build. You may also need to make sure that your build server does not delete packages prior to each build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568." HelpKeyword="BCLBUILD2002" />
-  </Target>
   <Import Project="..\..\..\packages\Microsoft.ApplicationInsights.DependencyCollector.2.9.1\build\Microsoft.ApplicationInsights.DependencyCollector.targets" Condition="Exists('..\..\..\packages\Microsoft.ApplicationInsights.DependencyCollector.2.9.1\build\Microsoft.ApplicationInsights.DependencyCollector.targets')" />
   <Import Project="..\..\..\packages\Microsoft.ApplicationInsights.PerfCounterCollector.2.9.1\build\Microsoft.ApplicationInsights.PerfCounterCollector.targets" Condition="Exists('..\..\..\packages\Microsoft.ApplicationInsights.PerfCounterCollector.2.9.1\build\Microsoft.ApplicationInsights.PerfCounterCollector.targets')" />
   <Import Project="..\..\..\packages\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.2.9.1\build\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.targets" Condition="Exists('..\..\..\packages\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.2.9.1\build\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.targets')" />
