@@ -146,3 +146,38 @@ To use these plugins in production environment you will have to put [ImageResize
   </licenses>
 </resizer>
 ```
+
+## EntityFramework Database Migrations
+
+1. Open model (e.g. `ServiceRequest.cs`) and add new property, for example:
+
+```csharp
+public string PictureId { get; set; }
+```
+
+2. Open Package Manager Console in Visual Studio and call command:
+
+```
+add-migration MigrationName -ConnectionString "ConnectionString" -ConnectionProviderName "System.Data.SqlClient" -StartUpProjectName Shrooms.API -ProjectName Shrooms.DataLayer
+```
+
+Connection string can be found in `Web.config`.
+
+3. Once it was done - new migration file should appear in `DataLayer` project. Content should be something like:
+
+```csharp
+AddColumn("dbo.ServiceRequests", "PictureId", c => c.String());
+```
+
+4. To apply migration on the database, execute following command in Package Manager Console:
+
+```
+update-database -verbose -ConnectionString "ConnectionString" -ConnectionProviderName "System.Data.SqlClient" -StartUpProjectName Shrooms.API -ProjectName Shrooms.DataLayer
+```
+
+5. Migration is done
+
+For more details, please reffer to
+https://msdn.microsoft.com/en-us/library/jj591621(v=vs.113).aspx or 
+http://www.entityframeworktutorial.net/code-first/code-based-migration-in-code-first.aspx
+
