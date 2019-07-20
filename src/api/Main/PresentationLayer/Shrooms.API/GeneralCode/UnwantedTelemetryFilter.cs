@@ -74,7 +74,7 @@ namespace Shrooms.API.GeneralCode
 
         private static bool IsSignalr([NotNull]RequestTelemetry request)
         {
-            if (request.Name?.Contains("signalr") == true)
+            if (request.Name.Contains("signalr") == true)
             {
                 return true;
             }
@@ -84,7 +84,7 @@ namespace Shrooms.API.GeneralCode
 
         private static bool IsHangfireBackgroundJobs(DependencyTelemetry dependency)
         {
-            if (BackgroundJobsDbName != null && dependency.Type == "SQL" && dependency.Name?.Contains(BackgroundJobsDbName) == true && dependency.Success == false)
+            if (BackgroundJobsDbName != null && dependency.Type == "SQL" && dependency.Name.Contains(BackgroundJobsDbName) && dependency.Success.GetValueOrDefault(false))
             {
                 return true;
             }
