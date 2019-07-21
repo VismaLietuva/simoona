@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
     'use strict';
 
     angular.module('simoonaApp.Common')
@@ -13,29 +13,33 @@
         return directive;
         function linkFunc (scope, element, attrs) {
 
-            scope.$evalAsync(function(){
-                var converter = new showdown.Converter();
-                changeSettings(converter);
-                var text = element[0].innerHTML;
-                var convertedText = linkValidator(text, converter);
-                convertedText = convertedText.toString().replace(/&lt;br&gt;/g, '<br>'); //changes all shown <br>'s with actual line break
-                element[0].innerHTML = convertedText;
+            scope.$evalAsync(function() {
+                const text = convertMarkdownToHtml(element[0].innerHTML);
+                element[0].innerHTML = text;
             })
 
-            function changeSettings(converter){
-                converter.setOption('strikethrough', true);
-                converter.setOption('underline', true);
+            function convertMarkdownToHtml(input) {
+                const converterInput = input.replace('&gt;', '>'); // Sanitizer encodes this, needed for blockquote.
+                return getMarkdownConverter().makeHtml(converterInput);
             }
 
-            function linkValidator(text, converter) {
-                var reg = /(<a.*?<\/a>)/g;
-                // text splits into array with elements and every second one is link which is not modified to markdowns and emojis
-                var textAndLinks = text.split(reg);
-                for (var i = 0; i < textAndLinks.length; i = i + 2){
-                    textAndLinks[i] = converter.makeHtml(textAndLinks[i]);
-                }
-                var result = textAndLinks.join('');
-                return result;
+            function getMarkdownConverter() {
+                const converter = new showdown.Converter();
+                changeSettings(converter);
+                return converter;
+            }
+
+            function changeSettings(converter) {
+                const enabledFeatures = [
+                    'excludeTrailingPunctuationFromURLs',
+                    'openLinksInNewWindow',
+                    'requireSpaceBeforeHeadingText',
+                    'simpleLineBreaks',
+                    'simplifiedAutoLink',
+                    'strikethrough',
+                    'underline'
+                ];
+                enabledFeatures.forEach(option => converter.setOption(option, true));
             }
         }
     }

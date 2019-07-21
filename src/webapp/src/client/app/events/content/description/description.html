@@ -64,7 +64,7 @@
             <div class="clearfix"></div>
         </div>
         <div class="col-xs-12 event-details-description" ng-show="!!vm.event.description.length">
-            <p ng-bind-html="vm.event.description | linky: '_blank' | newlineToBr"></p>
+            <p markdown ng-bind-html="vm.event.description"></p>
         </div>
     </div>
 </div>

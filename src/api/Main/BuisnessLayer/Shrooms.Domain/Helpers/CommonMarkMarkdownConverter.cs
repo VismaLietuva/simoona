@@ -13,6 +13,7 @@ namespace Shrooms.Domain.Helpers
         {
             var settings = CommonMarkSettings.Default;
             settings.AdditionalFeatures |= CommonMarkAdditionalFeatures.StrikethroughTilde;
+            settings.RenderSoftLineBreaksAsLineBreaks = true;
             return settings;
         }
 

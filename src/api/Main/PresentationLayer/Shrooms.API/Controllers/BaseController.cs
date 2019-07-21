@@ -4,7 +4,6 @@ using Microsoft.AspNet.Identity;
 using Shrooms.API.Helpers;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DomainExceptions.Exceptions;
-using Shrooms.API.GeneralCode;
 
 namespace Shrooms.API.Controllers
 {
