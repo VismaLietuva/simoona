@@ -21,7 +21,7 @@ namespace Shrooms.Infrastructure.Interceptors
 
             if (invocation.Method.DeclaringType != null)
             {
-                if (invocation.Method.DeclaringType == typeof(IDisposable))
+                if (invocation.Method.DeclaringType == typeof(IDisposable) || invocation.Method.Name == "Dispose")
                 {
                     return;
                 }
