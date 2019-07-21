@@ -784,11 +784,16 @@
     <Compile Include="Migrations\201904180838055_AddedBadgesEntities.Designer.cs">
       <DependentUpon>201904180838055_AddedBadgesEntities.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201907201330177_AddKudosWelcomeColumns.cs" />
+    <Compile Include="Migrations\201907201330177_AddKudosWelcomeColumns.Designer.cs">
+      <DependentUpon>201907201330177_AddKudosWelcomeColumns.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\RoleInitializer.cs" />
+    <Compile Include="Migrations\DefaultValueSqlServerMigrationSqlGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DAL\ShroomsDbContext.cs" />
     <Compile Include="DAL\EFUnitOfWork.cs" />
@@ -1282,6 +1287,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201904180838055_AddedBadgesEntities.resx">
       <DependentUpon>201904180838055_AddedBadgesEntities.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201907201330177_AddKudosWelcomeColumns.resx">
+      <DependentUpon>201907201330177_AddKudosWelcomeColumns.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

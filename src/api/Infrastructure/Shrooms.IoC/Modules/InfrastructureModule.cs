@@ -13,6 +13,7 @@ using Shrooms.Infrastructure.Email;
 using Shrooms.Infrastructure.Email.Templating;
 using Shrooms.Infrastructure.ExcelGenerator;
 using Shrooms.Infrastructure.FireAndForget;
+using Shrooms.Infrastructure.Interceptors;
 using Shrooms.Infrastructure.Logger;
 using Shrooms.Infrastructure.Storage;
 using Shrooms.Infrastructure.Storage.AzureBlob;
@@ -27,7 +28,9 @@ namespace Shrooms.IoC.Modules
         {
             builder.RegisterType<Logger>().As<ILogger>().InstancePerMatchingLifetimeScope(AutofacJobActivator.LifetimeScopeTag, MatchingScopeLifetimeTags.RequestLifetimeScopeTag);
             builder.RegisterType<CommonMarkMarkdownConverter>().As<IMarkdownConverter>().InstancePerRequest();
-            builder.RegisterType<MailingService>().As<IMailingService>().InstancePerMatchingLifetimeScope(AutofacJobActivator.LifetimeScopeTag, MatchingScopeLifetimeTags.RequestLifetimeScopeTag);
+            builder.RegisterType<MailingService>().As<IMailingService>()
+                .InstancePerMatchingLifetimeScope(AutofacJobActivator.LifetimeScopeTag, MatchingScopeLifetimeTags.RequestLifetimeScopeTag)
+                .EnableInterfaceTelemetryInterceptor();
             builder.RegisterGeneric(typeof(CustomCache<,>)).As(typeof(ICustomCache<,>)).SingleInstance();
             builder.RegisterType<ApplicationSettings>().As<IApplicationSettings>().InstancePerRequest();
             builder.RegisterType<ApplicationSettings>().As<IApplicationSettings>().InstancePerBackgroundJob();

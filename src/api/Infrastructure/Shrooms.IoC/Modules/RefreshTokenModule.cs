@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Shrooms.Domain.Services.RefreshTokens;
+using Shrooms.Infrastructure.Interceptors;
 
 namespace Shrooms.IoC.Modules
 {
@@ -7,7 +8,7 @@ namespace Shrooms.IoC.Modules
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<RefreshTokenService>().As<IRefreshTokenService>().InstancePerRequest();
+            builder.RegisterType<RefreshTokenService>().As<IRefreshTokenService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
         }
     }
 }

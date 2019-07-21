@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
+using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using Microsoft.AspNet.Identity;
 using Shrooms.DataLayer.DAL.EntityTypeConfigurations;
+using Shrooms.EntityModels;
+using Shrooms.EntityModels.Attributes;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Badges;
 using Shrooms.EntityModels.Models.Books;
@@ -201,6 +204,9 @@ namespace Shrooms.DataLayer.DAL
             modelBuilder.Configurations.Add(new MonitorConfig());
             modelBuilder.Configurations.Add(new NotificationConfig());
             modelBuilder.Configurations.Add(new NotifiationUserConfig());
+
+            var convention = new AttributeToColumnAnnotationConvention<SqlDefaultValueAttribute, string>("SqlDefaultValue", (p, attributes) => attributes.Single().DefaultValue);
+            modelBuilder.Conventions.Add(convention);
 
             new OtherEntitiesConfig(modelBuilder).Add();
         }

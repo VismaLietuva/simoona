@@ -71,7 +71,7 @@
                         </label>
                         <div class="col-xs-9">
                             <tags-input ng-model="role.users" data-add-from-autocomplete-only="false" data-display-property="fullName" ng-attr-placeholder="{{'role.rolePlaceholderForUsers' | translate}}">
-                                <auto-complete data-source="loadUsers($query)" data-min-lenght="1" data-max-results-to-show="5"></auto-complete>
+                                <auto-complete data-source="loadUsers($query)" data-min-lenght="1" data-max-results-to-show="5" debounce-delay="500"></auto-complete>
                             </tags-input>
                         </div>
                     </div>

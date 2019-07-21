@@ -26,8 +26,7 @@ namespace Shrooms.Domain.Services.Permissions
 
         public bool UserHasPermission(UserAndOrganizationDTO userAndOrg, string permissionName)
         {
-            IEnumerable<string> permissions;
-            if (!_permissionsCache.TryGetValue(userAndOrg.UserId, out permissions))
+            if (!_permissionsCache.TryGetValue(userAndOrg.UserId, out var permissions))
             {
                 permissions = _permissionsDbSet
                     .Where(p => p.Roles.Any(r => r.Users.Any(u => u.UserId == userAndOrg.UserId)))

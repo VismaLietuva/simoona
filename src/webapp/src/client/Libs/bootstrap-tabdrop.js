@@ -1,5 +1,5 @@
 /* =========================================================
- * bootstrap-tabdrop.js 
+ * bootstrap-tabdrop.js
  * http://www.eyecon.ro/bootstrap-tabdrop
  * =========================================================
  * Copyright 2012 Stefan Petre
@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * ========================================================= */
- 
+
 !function( $ ) {
 
 	var WinReszier = (function(){
@@ -36,7 +36,7 @@
 			register: function(fn) {
 				registered.push(fn);
 				if (inited === false) {
-					$(window).bind('resize', resize);
+					$(window).on('resize', resize);
 					inited = true;
 				}
 			},
@@ -53,7 +53,7 @@
 
 	var TabDrop = function(element, options) {
 		this.element = $(element);
-		this.dropdown = $('<li class="dropdown hide tabdrop"><a class="dropdown-toggle" data-toggle="dropdown" href="#">'+options.text+' <b class="caret"></b></a><ul class="dropdown-menu"></ul></li>')
+		this.dropdown = $('<li class="dropdown hide tabdrop"><a class="dropdown-toggle" data-toggle="dropdown">'+options.text+' <b class="caret"></b></a><ul class="dropdown-menu"></ul></li>')
 							.appendTo(this.element);
 		if (this.element.parent().is('.tabs-below')) {
 			this.dropdown.addClass('dropup');
@@ -71,7 +71,7 @@
 			this.element
 				.append(this.dropdown.find('li'))
 				.find('>li')
-				.not('.tabdrop')
+				.not('.tabdrop').not('.second-level-item').not('.third-level-item')
 				.each(function(){
 					if(this.offsetTop > 0) {
 						collection.push(this);

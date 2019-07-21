@@ -21,7 +21,7 @@
                             add-on-blur="true"
                             placeholder="{{'kudos.addPeople' | translate}}"
                             data-test-id="kudosify-multiple-users-input" wrapped translate-cloak>
-                    <auto-complete source="vm.getUsers($query)" min-length="2" max-results-to-show="5"></auto-complete>
+                    <auto-complete source="vm.getUsers($query)" min-length="2" max-results-to-show="5" debounce-delay="500"></auto-complete>
                 </tags-input>
         </div>
 

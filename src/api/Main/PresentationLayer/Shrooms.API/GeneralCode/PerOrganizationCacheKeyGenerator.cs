@@ -11,7 +11,7 @@ namespace Shrooms.API.GeneralCode
         {
             var defaultKey = base.MakeCacheKey(context, mediaType, excludeQueryString);
             var organization = context.Request.GetRequestedTenant();
-            var modifiedKey = $"{defaultKey} {organization.GetType().ToString()}={organization};";
+            var modifiedKey = $"{defaultKey} {organization.GetType()}={organization};";
             return modifiedKey;
         }
     }

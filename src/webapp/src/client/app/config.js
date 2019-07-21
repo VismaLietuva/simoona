@@ -13,6 +13,7 @@
         'bootstrapLightbox',
         'LocalStorageModule',
         'monospaced.elastic',
+        'ApplicationInsightsModule',
         'SignalR',
         'pascalprecht.translate',
         'tmh.dynamicLocale',
@@ -125,11 +126,28 @@
         'cfpLoadingBarProvider',
         'ChartJsProvider',
         'AnalyticsProvider',
-        'environment'
+        'environment',
+        'applicationInsightsServiceProvider'
     ];
 
     function configuration($httpProvider, $locationProvider, cfpLoadingBarProvider,
-        ChartJsProvider, AnalyticsProvider, environment) {
+        ChartJsProvider, AnalyticsProvider, environment, applicationInsightsServiceProvider) {
+
+        var options = { 
+            applicationName: '',
+            appInsightsEnabled: false,
+            appInsightsInstrumentationKey: 'appInsightsInstrumentationKeyValue'
+        };
+
+        if (!options.appInsightsEnabled)
+        {
+            options.autoPageViewTracking = false;
+            options.autoStateChangeTracking = false;
+            options.autoLogTracking = false;
+            options.autoExceptionTracking = false;
+        }
+
+        applicationInsightsServiceProvider.configure(options.appInsightsInstrumentationKey, options);
 
         $locationProvider.html5Mode(true);
 

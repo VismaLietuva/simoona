@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Shrooms.Constants.BusinessLayer;
+using Shrooms.EntityModels.Attributes;
 
 namespace Shrooms.EntityModels.Models
 {
@@ -39,5 +41,13 @@ namespace Shrooms.EntityModels.Models
         public string AuthenticationProviders { get; set; }
 
         public string KudosYearlyMultipliers { get; set; }
+
+        [SqlDefaultValue(DefaultValue = "0")]
+        public int KudosWelcomeAmount { get; set; }
+
+        [SqlDefaultValue(DefaultValue = "0")]
+        public bool KudosWelcomeEnabled { get; set; }
+
+        public string KudosWelcomeComment { get; set; }
     }
 }

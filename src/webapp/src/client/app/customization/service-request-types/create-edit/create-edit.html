@@ -54,7 +54,7 @@
                                         placeholder="{{'customization.assigneesPlaceHolder' | translate}}"
                                         add-on-blur="true"
                                         wrapped>
-                                <auto-complete source="vm.allUsers($query)" min-length="0" max-results-to-show="5"></auto-complete>
+                                <auto-complete source="vm.allUsers($query)" min-length="0" max-results-to-show="5" debounce-delay="500"></auto-complete>
                             </tags-input>
                         </div>
                     </div>

@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Shrooms.Domain.Services.Support;
+using Shrooms.Infrastructure.Interceptors;
 
 namespace Shrooms.IoC.Modules
 {
@@ -7,7 +8,7 @@ namespace Shrooms.IoC.Modules
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<SupportService>().As<ISupportService>().InstancePerRequest();
+            builder.RegisterType<SupportService>().As<ISupportService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
         }
     }
 }

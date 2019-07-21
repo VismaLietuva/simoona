@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using Shrooms.Domain.Services.Administration;
 using Shrooms.Domain.Services.Email.AdministrationUsers;
+using Shrooms.Infrastructure.Interceptors;
 
 namespace Shrooms.IoC.Modules
 {
@@ -8,8 +9,8 @@ namespace Shrooms.IoC.Modules
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<AdministrationUsersService>().As<IAdministrationUsersService>().InstancePerRequest();
-            builder.RegisterType<AdministrationUsersNotificationService>().As<IAdministrationNotificationService>().InstancePerRequest();
+            builder.RegisterType<AdministrationUsersService>().As<IAdministrationUsersService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            builder.RegisterType<AdministrationUsersNotificationService>().As<IAdministrationNotificationService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
         }
     }
 }

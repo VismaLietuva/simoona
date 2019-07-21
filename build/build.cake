@@ -177,14 +177,18 @@ Task("BuildAPI")
         Verbosity = Verbosity.Minimal
     };
 
-    var msbuildPath = GetMSBuildPath(ctx.FileSystem, ctx.Environment, MSBuildPlatform.Automatic);
-
     var settings = new MSBuildSettings
     {
         Verbosity = Verbosity.Quiet,
-        Configuration = "Debug",
-        ToolPath = msbuildPath
+        Configuration = "Debug"
     };
+
+    var msbuildPath = GetMSBuildPath(ctx.FileSystem, ctx.Environment, MSBuildPlatform.Automatic);
+
+    if (msbuildPath != null) 
+    {
+        settings.ToolPath = msbuildPath;
+    }
 
     settings.FileLoggers.Add(fileLogger);
 
@@ -430,9 +434,14 @@ private void AlterJobsDb(SqlConnection connection)
 
 private FilePath GetMSBuildPath(IFileSystem fileSystem, ICakeEnvironment environment, MSBuildPlatform buildPlatform)
 {
-    var visualStudio2019Path = VSWhereLatest();
+    var visualStudioPath = VSWhereLatest();
 
-    var binPath = visualStudio2019Path.Combine("MSBuild/Current/Bin");
+    if (visualStudioPath == null)
+    {
+        return null;
+    }
+
+    var binPath = visualStudioPath.Combine("MSBuild/Current/Bin");
     Information("MSBuild path: {0}", binPath);
 
     if (fileSystem.Exist(binPath))
@@ -451,7 +460,7 @@ private FilePath GetMSBuildPath(IFileSystem fileSystem, ICakeEnvironment environ
     }
     else
     {
-        binPath = visualStudio2019Path.Combine("Microsoft Visual Studio/2019/Professional/MSBuild/16.0/Bin");
+        binPath = visualStudioPath.Combine("Microsoft Visual Studio/2019/Professional/MSBuild/16.0/Bin");
     }
 
     return binPath.CombineWithFilePath("MSBuild.exe");

@@ -34,8 +34,7 @@ namespace Shrooms.API.Controllers.Kudos
         private readonly IKudosExportService _kudosExportService;
         private readonly IPermissionService _permissionService;
 
-        public KudosController(IMapper mapper, IKudosService kudosService, IKudosExportService kudosExportService,
-            IPermissionService permissionService)
+        public KudosController(IMapper mapper, IKudosService kudosService, IKudosExportService kudosExportService, IPermissionService permissionService)
         {
             _mapper = mapper;
             _kudosService = kudosService;
@@ -81,6 +80,7 @@ namespace Shrooms.API.Controllers.Kudos
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
+        [CacheOutput(ServerTimeSpan = ConstWebApi.OneHour)]
         public IEnumerable<KudosTypeViewModel> GetKudosTypesForFilter()
         {
             var types = new List<KudosTypeViewModel>()
@@ -131,6 +131,7 @@ namespace Shrooms.API.Controllers.Kudos
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
+        [CacheOutput(ServerTimeSpan = ConstWebApi.OneHour)]
         public IEnumerable<KudosTypeViewModel> GetKudosTypes()
         {
             var kudosTypeDto = _kudosService.GetKudosTypes(GetUserAndOrganization());
@@ -141,6 +142,8 @@ namespace Shrooms.API.Controllers.Kudos
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
+        [InvalidateCacheOutput("GetKudosTypes", typeof(KudosController))]
+        [InvalidateCacheOutput("GetKudosTypesForFilter", typeof(KudosController))]
         public async Task<IHttpActionResult> EditType(int id)
         {
             if (id < 1)
@@ -163,6 +166,8 @@ namespace Shrooms.API.Controllers.Kudos
 
         [HttpPut]
         [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
+        [InvalidateCacheOutput("GetKudosTypes", typeof(KudosController))]
+        [InvalidateCacheOutput("GetKudosTypesForFilter", typeof(KudosController))]
         public async Task<IHttpActionResult> EditType(KudosTypeViewModel model)
         {
             if (!ModelState.IsValid)
@@ -185,6 +190,8 @@ namespace Shrooms.API.Controllers.Kudos
 
         [HttpPost]
         [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
+        [InvalidateCacheOutput("GetKudosTypes", typeof(KudosController))]
+        [InvalidateCacheOutput("GetKudosTypesForFilter", typeof(KudosController))]
         public async Task<IHttpActionResult> CreateType(NewKudosTypeViewModel model)
         {
             if (!ModelState.IsValid)
@@ -208,6 +215,8 @@ namespace Shrooms.API.Controllers.Kudos
 
         [HttpPut]
         [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
+        [InvalidateCacheOutput("GetKudosTypes", typeof(KudosController))]
+        [InvalidateCacheOutput("GetKudosTypesForFilter", typeof(KudosController))]
         public async Task<IHttpActionResult> RemoveType(int id)
         {
             if (id < 1)
@@ -244,6 +253,7 @@ namespace Shrooms.API.Controllers.Kudos
 
         [HttpPost]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
+        [InvalidateCacheOutput("Get", typeof(WallWidgetsController))]
         public IHttpActionResult AddKudosLog(AddKudosLogViewModel kudosLog)
         {
             if (!ModelState.IsValid)
@@ -273,6 +283,7 @@ namespace Shrooms.API.Controllers.Kudos
 
         [HttpPost]
         [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
+        [InvalidateCacheOutput("Get", typeof(WallWidgetsController))]
         public IHttpActionResult ApproveKudos(int id)
         {
             try

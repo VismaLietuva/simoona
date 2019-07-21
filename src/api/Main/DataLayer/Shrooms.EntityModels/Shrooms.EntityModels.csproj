@@ -90,6 +90,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\SqlDefaultValueAttribute.cs" />
     <Compile Include="Models\AbstractClassifier.cs" />
     <Compile Include="Models\Address.cs" />
     <Compile Include="Models\ApplicationRole.cs" />
