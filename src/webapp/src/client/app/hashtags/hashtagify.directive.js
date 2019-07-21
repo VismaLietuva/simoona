@@ -22,7 +22,7 @@
                     }
 
                     if (attrs.hashtagify) {
-                        var regex = XRegExp('(?:\\s|^)#([a-z0-9_\\p{L}]+)', 'g');
+                        var regex = XRegExp('(?:\\s|^|\<p\>)#([a-z0-9_\\p{L}]+)', 'g');
 
                         html = html.replace(regex, ' <a ng-click="tagClick({$event: $event})" class="hashtag">#$1</a>');
                     }
