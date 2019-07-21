@@ -24,14 +24,14 @@ namespace Shrooms.Domain.Services.Vacations
         private readonly IDbSet<ApplicationUser> _applicationUserDbSet;
         private readonly IVacationDomainService _vacationDomainService;
 
-        private readonly int _codeColIndex = 0;
-        private readonly int _fullnameColIndex = 1;
-        private readonly int _operationColIndex = 3;
-        private readonly int _officeColIndex = 4;
-        private readonly int _jobTitleColIndex = 5;
-        private readonly int _vacationTotalTimeColIndex = 6;
-        private readonly int _vacationUsedTimeColIndex = 7;
-        private readonly int _vacationUnusedTimeColIndex = 8;
+        private const int CodeColIndex = 0;
+        private const int FullnameColIndex = 1;
+        private const int OperationColIndex = 3;
+        private const int OfficeColIndex = 4;
+        private const int JobTitleColIndex = 5;
+        private const int VacationTotalTimeColIndex = 6;
+        private const int VacationUsedTimeColIndex = 7;
+        private const int VacationUnusedTimeColIndex = 8;
 
         public VacationService(IUnitOfWork2 unitOfWork2, IVacationDomainService vacationDomainService)
         {
@@ -57,28 +57,28 @@ namespace Shrooms.Domain.Services.Vacations
 
             foreach (var row in workSheet)
             {
-                var acceptableData = row[_codeColIndex] is string && row[_fullnameColIndex] is string
-                                          && row[_operationColIndex] is string && row[_officeColIndex] is string
-                                          && row[_jobTitleColIndex] is string
-                                          && (row[_vacationTotalTimeColIndex] is double || row[_vacationTotalTimeColIndex] is int)
-                                          && (row[_vacationUsedTimeColIndex] is double || row[_vacationUsedTimeColIndex] is int)
-                                          && (row[_vacationUnusedTimeColIndex] is double || row[_vacationUnusedTimeColIndex] is int);
+                var acceptableData = row[CodeColIndex] is string && row[FullnameColIndex] is string
+                                          && row[OperationColIndex] is string && row[OfficeColIndex] is string
+                                          && row[JobTitleColIndex] is string
+                                          && (row[VacationTotalTimeColIndex] is double || row[VacationTotalTimeColIndex] is int)
+                                          && (row[VacationUsedTimeColIndex] is double || row[VacationUsedTimeColIndex] is int)
+                                          && (row[VacationUnusedTimeColIndex] is double || row[VacationUnusedTimeColIndex] is int);
 
                 if (!acceptableData)
                 {
                     continue;
                 }
 
-                var fullName = row[_fullnameColIndex].ToString();
-                var code = row[_codeColIndex].ToString();
+                var fullName = row[FullnameColIndex].ToString();
+                var code = row[CodeColIndex].ToString();
                 var users = _applicationUserDbSet.Where(_vacationDomainService.UsersByNamesFilter(fullName).Compile()).ToList();
                 var userToUpdate = _vacationDomainService.FindUser(users, fullName);
 
                 if (userToUpdate != null)
                 {
-                    var fullTime = (double)row[_vacationTotalTimeColIndex];
-                    var usedTime = (double)row[_vacationUsedTimeColIndex];
-                    var unusedTime = (double)row[_vacationUnusedTimeColIndex];
+                    var fullTime = (double)row[VacationTotalTimeColIndex];
+                    var usedTime = (double)row[VacationUsedTimeColIndex];
+                    var unusedTime = (double)row[VacationUnusedTimeColIndex];
 
                     userToUpdate.VacationTotalTime = fullTime;
                     userToUpdate.VacationUsedTime = usedTime;

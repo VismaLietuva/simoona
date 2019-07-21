@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using Hangfire;
 using Shrooms.Infrastructure.Calendar;
+using Shrooms.Infrastructure.Interceptors;
 
 namespace Shrooms.Premium.Infrastructure.Shrooms.IoC.Modules
 {
@@ -8,7 +9,7 @@ namespace Shrooms.Premium.Infrastructure.Shrooms.IoC.Modules
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<GoogleCalendarService>().As<ICalendarService>().InstancePerBackgroundJob();
+            builder.RegisterType<GoogleCalendarService>().As<ICalendarService>().InstancePerBackgroundJob().EnableInterfaceTelemetryInterceptor();
         }
     }
 }

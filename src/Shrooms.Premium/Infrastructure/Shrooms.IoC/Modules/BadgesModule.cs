@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Shrooms.Domain.Services.Badges;
+using Shrooms.Infrastructure.Interceptors;
 
 namespace Shrooms.Premium.Infrastructure.Shrooms.IoC.Modules
 {
@@ -7,7 +8,7 @@ namespace Shrooms.Premium.Infrastructure.Shrooms.IoC.Modules
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<BadgesService>().As<IBadgesService>().InstancePerRequest();
+            builder.RegisterType<BadgesService>().As<IBadgesService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
         }
     }
 }

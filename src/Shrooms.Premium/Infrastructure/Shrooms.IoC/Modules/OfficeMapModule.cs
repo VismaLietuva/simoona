@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Shrooms.Domain.Services.OfficeMap;
+using Shrooms.Infrastructure.Interceptors;
 
 namespace Shrooms.Premium.Infrastructure.Shrooms.IoC.Modules
 {
@@ -7,7 +8,7 @@ namespace Shrooms.Premium.Infrastructure.Shrooms.IoC.Modules
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<OfficeMapService>().As<IOfficeMapService>().InstancePerRequest();
+            builder.RegisterType<OfficeMapService>().As<IOfficeMapService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
         }
     }
 }
