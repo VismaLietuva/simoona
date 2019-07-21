@@ -176,6 +176,13 @@ void CreateNugetConfig(string nugetConfigPath, string packagesPath)
     var xmlDeclaration = xmlDoc.CreateXmlDeclaration( "1.0", "UTF-8", null);
     xmlDoc.InsertBefore(xmlDeclaration, rootNode);
 
+    var fileInfo = new FileInfo(nugetConfigPath);
+
+    if (!fileInfo.Directory.Exists)
+    {
+        fileInfo.Directory.Create();
+    }
+
     xmlDoc.Save(nugetConfigPath);
 }
 

@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.KudosShop;
+using Shrooms.Infrastructure.Interceptors;
 
 namespace Shrooms.Premium.Infrastructure.IoC.Modules
 {
@@ -7,7 +8,7 @@ namespace Shrooms.Premium.Infrastructure.IoC.Modules
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<KudosShopService>().As<IKudosShopService>().InstancePerRequest();
+            builder.RegisterType<KudosShopService>().As<IKudosShopService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
         }
     }
 }
