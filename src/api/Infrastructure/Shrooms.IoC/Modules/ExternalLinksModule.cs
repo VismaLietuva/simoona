@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Shrooms.Domain.Services.ExternalLinks;
+using Shrooms.Infrastructure.Interceptors;
 
 namespace Shrooms.IoC.Modules
 {
@@ -7,7 +8,7 @@ namespace Shrooms.IoC.Modules
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<ExternalLinkService>().As<IExternalLinkService>().InstancePerRequest();
+            builder.RegisterType<ExternalLinkService>().As<IExternalLinkService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
         }
     }
 }

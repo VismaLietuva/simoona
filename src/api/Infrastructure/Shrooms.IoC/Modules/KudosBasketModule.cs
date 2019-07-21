@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Autofac;
+﻿using Autofac;
 using DomainServiceValidators.Validators.KudosBaskets;
 using Shrooms.Domain.Services.KudosBaskets;
+using Shrooms.Infrastructure.Interceptors;
 
 namespace Shrooms.IoC.Modules
 {
@@ -14,7 +10,7 @@ namespace Shrooms.IoC.Modules
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterType<KudosBasketValidator>().As<IKudosBasketValidator>().InstancePerRequest();
-            builder.RegisterType<KudosBasketService>().As<IKudosBasketService>().InstancePerRequest();
+            builder.RegisterType<KudosBasketService>().As<IKudosBasketService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
         }
     }
 }

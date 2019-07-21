@@ -1,5 +1,6 @@
 using Autofac;
 using Shrooms.Domain.Services.Jobs;
+using Shrooms.Infrastructure.Interceptors;
 
 namespace Shrooms.IoC.Modules
 {
@@ -7,7 +8,7 @@ namespace Shrooms.IoC.Modules
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<JobService>().As<IJobService>().InstancePerRequest();
+            builder.RegisterType<JobService>().As<IJobService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
         }
     }
 }
