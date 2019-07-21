@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using System.Web;
 using Microsoft.AspNet.Identity;
 using Shrooms.DataLayer.DAL.EntityTypeConfigurations;
-using Shrooms.EntityModels;
 using Shrooms.EntityModels.Attributes;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Badges;

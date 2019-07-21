@@ -2,6 +2,7 @@
 using System.Web.Http;
 using AutoMapper;
 using Shrooms.API.Controllers.Kudos;
+using Shrooms.API.Controllers.Wall;
 using Shrooms.API.Filters;
 using Shrooms.Constants.WebApi;
 using Shrooms.DataTransferObjects.Models.KudosBasket;

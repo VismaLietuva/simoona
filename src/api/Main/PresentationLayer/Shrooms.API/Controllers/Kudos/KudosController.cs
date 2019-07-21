@@ -7,6 +7,7 @@ using System.Web.Http;
 using AutoMapper;
 using Microsoft.AspNet.Identity;
 using PagedList;
+using Shrooms.API.Controllers.Wall;
 using Shrooms.API.Filters;
 using Shrooms.Constants.BusinessLayer;
 using Shrooms.Constants.WebApi;
@@ -80,7 +81,7 @@ namespace Shrooms.API.Controllers.Kudos
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
-        [CacheOutput(ServerTimeSpan = ConstWebApi.OneHour)]
+        [CacheOutput(ServerTimeSpan = WebApiConstants.OneHour)]
         public IEnumerable<KudosTypeViewModel> GetKudosTypesForFilter()
         {
             var types = new List<KudosTypeViewModel>()
@@ -131,7 +132,7 @@ namespace Shrooms.API.Controllers.Kudos
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
-        [CacheOutput(ServerTimeSpan = ConstWebApi.OneHour)]
+        [CacheOutput(ServerTimeSpan = WebApiConstants.OneHour)]
         public IEnumerable<KudosTypeViewModel> GetKudosTypes()
         {
             var kudosTypeDto = _kudosService.GetKudosTypes(GetUserAndOrganization());

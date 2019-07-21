@@ -1,5 +1,4 @@
-﻿using Shrooms.API.Controllers.Kudos;
-using Shrooms.API.GeneralCode;
+﻿using Shrooms.API.GeneralCode;
 using WebApi.OutputCache.V2;
 
 namespace Shrooms.API.Filters
