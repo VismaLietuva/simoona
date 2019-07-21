@@ -14,7 +14,6 @@ namespace Shrooms.DataLayer.Migrations
             CommandTimeout = 60 * 5;
 
             SetSqlGenerator("System.Data.SqlClient", new DefaultValueSqlServerMigrationSqlGenerator());
-
         }
 
         protected override void Seed(ShroomsDbContext context)

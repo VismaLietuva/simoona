@@ -17,7 +17,6 @@ using Shrooms.WebViewModels.Models.Birthday;
 using Shrooms.WebViewModels.Models.Kudos;
 using Shrooms.WebViewModels.Models.Users.Kudos;
 using Shrooms.WebViewModels.Models.Wall.Widgets;
-using WebApi.OutputCache.V2;
 
 namespace Shrooms.API.Controllers.Kudos
 {

@@ -21,6 +21,7 @@ using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Projects;
 using Shrooms.Domain.Services.SyncTokens;
 using Shrooms.Infrastructure.Email;
+using Shrooms.Infrastructure.Interceptors;
 using Shrooms.Infrastructure.Logger;
 using Shrooms.IoC.Modules;
 
@@ -37,11 +38,13 @@ namespace Shrooms.IoC
 
             builder.RegisterApiControllers(shroomsApi);
             builder.RegisterHubs(shroomsApi);
-            builder.RegisterWebApiModelBinders(shroomsApi);
             builder.RegisterWebApiModelBinderProvider();
             builder.RegisterWebApiFilterProvider(config);
             builder.RegisterAssemblyTypes(dataLayer);
             builder.RegisterAssemblyTypes(modelMappings).AssignableTo(typeof(Profile)).As<Profile>();
+
+            // Interceptor
+            builder.Register(c => new TelemetryLoggingInterceptor());
 
             builder.RegisterType(typeof(UnitOfWork2)).As(typeof(IUnitOfWork2)).InstancePerRequest();
             builder.Register(c => new ShroomsDbContext(GetConnectionStringName())).As<IDbContext>().InstancePerRequest();
@@ -49,16 +52,16 @@ namespace Shrooms.IoC
             builder.RegisterGeneric(typeof(EFRepository<>)).As(typeof(IRepository<>));
 
             // Authorization types
-            builder.RegisterType<MailingService>().As<IMailingService>().InstancePerRequest();
-            builder.RegisterType<PostNotificationService>().As<IPostNotificationService>().InstancePerRequest();
-            builder.RegisterType<CommentNotificationService>().As<ICommentNotificationService>().InstancePerRequest();
+            builder.RegisterType<MailingService>().As<IMailingService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            builder.RegisterType<PostNotificationService>().As<IPostNotificationService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            builder.RegisterType<CommentNotificationService>().As<ICommentNotificationService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.Register(c => app.GetDataProtectionProvider()).InstancePerRequest();
-            builder.RegisterType<PermissionService>().As<IPermissionService>().PropertiesAutowired().InstancePerRequest();
-            builder.RegisterType<SyncTokenService>().As<ISyncTokenService>().InstancePerRequest();
-            builder.RegisterType<ImpersonateService>().As<IImpersonateService>().InstancePerRequest();
+            builder.RegisterType<PermissionService>().As<IPermissionService>().PropertiesAutowired().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            builder.RegisterType<SyncTokenService>().As<ISyncTokenService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            builder.RegisterType<ImpersonateService>().As<IImpersonateService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<UserAdministrationValidator>().As<IUserAdministrationValidator>().InstancePerRequest();
-            builder.RegisterType<OrganizationService>().As<IOrganizationService>().InstancePerRequest();
-            builder.RegisterType<ProjectsService>().As<IProjectsService>().InstancePerRequest();
+            builder.RegisterType<OrganizationService>().As<IOrganizationService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            builder.RegisterType<ProjectsService>().As<IProjectsService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
 
             builder.RegisterModule(new IdentityModule());
             builder.RegisterModule(new ServicesModule());

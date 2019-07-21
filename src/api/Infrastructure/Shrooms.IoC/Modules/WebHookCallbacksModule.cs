@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using Shrooms.Domain.Services.WebHookCallbacks;
 using Shrooms.Domain.Services.WebHookCallbacks.BirthdayNotification;
+using Shrooms.Infrastructure.Interceptors;
 
 namespace Shrooms.IoC.Modules
 {
@@ -8,9 +9,9 @@ namespace Shrooms.IoC.Modules
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<BirthdaysNotificationWebHookService>().As<IBirthdaysNotificationWebHookService>().InstancePerRequest();
+            builder.RegisterType<BirthdaysNotificationWebHookService>().As<IBirthdaysNotificationWebHookService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
 
-            builder.RegisterType<WebHookCallbackServices>().As<IWebHookCallbackServices>().InstancePerRequest().PropertiesAutowired();
+            builder.RegisterType<WebHookCallbackServices>().As<IWebHookCallbackServices>().InstancePerRequest().PropertiesAutowired().EnableInterfaceTelemetryInterceptor();
         }
     }
 }
