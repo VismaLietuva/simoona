@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.Linq;
 using System.Resources;
-using System.Threading;
 
 namespace Shrooms.Resources
 {
@@ -18,10 +17,10 @@ namespace Shrooms.Resources
                                                   r => r.Value.ToString());
         }
 
-        public static string GetResourceValue(string resource, string name)
+        public static string GetResourceValue(string resource, string name, CultureInfo culture)
         {
             var resourceManager = new ResourceManager($"Shrooms.Resources.{resource}", typeof(ResourceUtilities).Assembly);
-            return resourceManager.GetString(name, Thread.CurrentThread.CurrentCulture);
+            return resourceManager.GetString(name, culture);
         }
     }
 }

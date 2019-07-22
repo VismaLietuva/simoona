@@ -77,7 +77,7 @@ namespace Shrooms.EntityModels.Models.Kudos
             }
 
             StatusShouldntBeProcessed();
-           
+
             Status = KudosStatus.Rejected;
             RejectionMessage = reason;
             Modified = DateTime.UtcNow;

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
 using Microsoft.AspNet.Identity;
+using Shrooms.API.Controllers.Kudos;
 using Shrooms.API.Filters;
 using Shrooms.Constants.Authentication;
 using Shrooms.Constants.Authorization.Permissions;
@@ -14,6 +15,7 @@ using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.WebViewModels.Models.AccountModels;
 using Shrooms.WebViewModels.Models.User;
+using WebApi.OutputCache.V2;
 
 namespace Shrooms.API.Controllers
 {
@@ -38,6 +40,8 @@ namespace Shrooms.API.Controllers
         [HttpGet]
         [Route("GeneralSettings")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [InvalidateCacheOutput("GetKudosTypes", typeof(KudosController))]
+        [InvalidateCacheOutput("GetKudosTypesForFilter", typeof(KudosController))]
         public async Task<IHttpActionResult> GetLocalizationSettings()
         {
             var settingsDto = await _userService.GetUserLocalizationSettings(GetUserAndOrganization());
@@ -55,6 +59,8 @@ namespace Shrooms.API.Controllers
         [HttpPut]
         [Route("GeneralSettings")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [InvalidateCacheOutput("GetKudosTypes", typeof(KudosController))]
+        [InvalidateCacheOutput("GetKudosTypesForFilter", typeof(KudosController))]
         public async Task<IHttpActionResult> ChangeLocalizationSettings(ChangeUserLocalizationSettingsViewModel localizationSettings)
         {
             if (!ModelState.IsValid)

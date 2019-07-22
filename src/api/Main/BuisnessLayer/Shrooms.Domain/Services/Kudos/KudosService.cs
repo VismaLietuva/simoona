@@ -170,11 +170,13 @@ namespace Shrooms.Domain.Services.Kudos
 
             if (user != null)
             {
+                var culture = CultureInfo.GetCultureInfo(user.CultureCode);
+
                 foreach (var kudosLog in kudosLogs)
                 {
                     if (IsTranslatableKudosType(kudosLog.Type.Type))
                     {
-                        kudosLog.Type.Name = TranslateKudos(user.CultureCode, "KudosType" + kudosLog.Type.Name);
+                        kudosLog.Type.Name = TranslateKudos(culture, "KudosType" + kudosLog.Type.Name);
                     }
                 }
             }
@@ -209,11 +211,13 @@ namespace Shrooms.Domain.Services.Kudos
 
             if (user != null)
             {
+                var culture = CultureInfo.GetCultureInfo(user.CultureCode);
+
                 foreach (var userLog in userLogs)
                 {
                     if (IsTranslatableKudosType(userLog.Type.Type))
                     {
-                        userLog.Type.Name = TranslateKudos(user.CultureCode, "KudosType" + userLog.Type.Name);
+                        userLog.Type.Name = TranslateKudos(culture, "KudosType" + userLog.Type.Name);
                     }
                 }
             }
@@ -259,11 +263,13 @@ namespace Shrooms.Domain.Services.Kudos
 
             if (user != null)
             {
+                var culture = CultureInfo.GetCultureInfo(user.CultureCode);
+
                 foreach (var kudosLog in kudosLogs)
                 {
                     if (IsTranslatableKudosType(kudosLog.KudosSystemType))
                     {
-                        kudosLog.KudosTypeName = TranslateKudos(user.CultureCode, "KudosType" + kudosLog.KudosTypeName);
+                        kudosLog.KudosTypeName = TranslateKudos(culture, "KudosType" + kudosLog.KudosTypeName);
                     }
                 }
             }
@@ -292,11 +298,13 @@ namespace Shrooms.Domain.Services.Kudos
 
             if (user != null)
             {
+                var culture = CultureInfo.GetCultureInfo(user.CultureCode);
+
                 foreach (var kudosType in kudosTypesDTO)
                 {
                     if (IsTranslatableKudosType(kudosType.Type))
                     {
-                        kudosType.Name = TranslateKudos(user.CultureCode, "KudosType" + kudosType.Name);
+                        kudosType.Name = TranslateKudos(culture, "KudosType" + kudosType.Name);
                     }
                 }
             }
@@ -859,10 +867,9 @@ namespace Shrooms.Domain.Services.Kudos
             return true;
         }
 
-        private string TranslateKudos(string cultureCode, string textToTranslate)
+        private string TranslateKudos(CultureInfo culture, string textToTranslate)
         {
-            Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo(cultureCode);
-            return ResourceUtilities.GetResourceValue("Models.Kudos.Kudos", textToTranslate);
+            return ResourceUtilities.GetResourceValue("Models.Kudos.Kudos", textToTranslate, culture);
         }
 
         private static bool IsTranslatableKudosType(ConstBusinessLayer.KudosTypeEnum type)
