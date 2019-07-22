@@ -49,9 +49,8 @@ namespace Shrooms.Domain.Services.Wall.Posts
 
         public NewlyCreatedPostDTO CreateNewPost(NewPostDTO newPostDto)
         {
-            var wall = _wallsDbSet
-                .Where(x => x.Id == newPostDto.WallId && x.OrganizationId == newPostDto.OrganizationId).
-                FirstOrDefault();
+            var wall = _wallsDbSet.
+                FirstOrDefault(x => x.Id == newPostDto.WallId && x.OrganizationId == newPostDto.OrganizationId);
 
             if (wall == null)
             {
