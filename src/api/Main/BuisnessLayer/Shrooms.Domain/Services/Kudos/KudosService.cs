@@ -160,7 +160,8 @@ namespace Shrooms.Domain.Services.Kudos
                 .OrderBy(string.Concat(options.SortBy, " ", options.SortOrder));
 
             var logsTotalCount = kudosLogsQuery.Count();
-            int entriesCountToSkip = EntriesCountToSkip(options.Page);
+
+            var entriesCountToSkip = EntriesCountToSkip(options.Page);
             var kudosLogs = kudosLogsQuery
                 .Skip(() => entriesCountToSkip)
                 .Take(() => ConstBusinessLayer.MaxKudosLogsPerPage)
@@ -193,20 +194,21 @@ namespace Shrooms.Domain.Services.Kudos
             ValidateUser(organizationId, userId);
 
             var userLogsQuery = _kudosLogsDbSet
-                .Where(log =>
-                    log.EmployeeId == userId &&
-                    log.OrganizationId == organizationId)
-                .OrderByDescending(log => log.Created)
-                .Select(MapUserKudosLogsToDto());
+                .Where(log => log.EmployeeId == userId && log.OrganizationId == organizationId)
+                .Join(_usersDbSet,
+                    l => l.CreatedBy,
+                    s => s.Id,
+                    MapUserKudosLogsToDto())
+                .OrderByDescending(log => log.Created);
 
             var logCount = userLogsQuery.Count();
+
             var entriesCountToSkip = EntriesCountToSkip(page);
             var userLogs = userLogsQuery
                 .Skip(() => entriesCountToSkip)
                 .Take(() => ConstBusinessLayer.MaxKudosLogsPerPage)
                 .ToList();
 
-            SetKudosSendersName(userLogs.Select(log => log.Sender));
             var user = _usersDbSet.Find(userId);
 
             if (user != null)
@@ -237,12 +239,14 @@ namespace Shrooms.Domain.Services.Kudos
                     log.Status == KudosStatus.Approved &&
                     log.KudosSystemType != ConstBusinessLayer.KudosTypeEnum.Minus &&
                     log.OrganizationId == userAndOrg.OrganizationId)
+                .Join(_usersDbSet,
+                    l => l.CreatedBy,
+                    s => s.Id,
+                    MapKudosLogToWallKudosLogDTO())
                 .OrderByDescending(log => log.Created)
-                .Select(MapKudosLogToWallKudosLogDTO())
                 .Take(() => ConstBusinessLayer.WallKudosLogCount)
                 .ToList();
 
-            SetKudosSendersName(approvedKudos.Select(log => log.Sender));
             return approvedKudos;
         }
 
@@ -522,17 +526,17 @@ namespace Shrooms.Domain.Services.Kudos
             var kudosTotal = allUserKudosLogs
                 .Where(x => x.KudosSystemType != ConstBusinessLayer.KudosTypeEnum.Minus &&
                             x.KudosBasketId == null)
-                .Sum(x => x.Points);
+                .Sum(x => (decimal?)x.Points);
 
-            user.TotalKudos = kudosTotal;
+            user.TotalKudos = kudosTotal ?? 0;
 
             var spentKudos = allUserKudosLogs
                 .Where(x => x.KudosSystemType == ConstBusinessLayer.KudosTypeEnum.Minus ||
                             x.KudosBasketId != null)
-                .Sum(x => x.Points);
+                .Sum(x => (decimal?)x.Points);
 
-            user.SpentKudos = spentKudos;
-            user.RemainingKudos = kudosTotal - spentKudos;
+            user.SpentKudos = spentKudos ?? 0;
+            user.RemainingKudos = user.TotalKudos - user.SpentKudos;
             _uow.SaveChanges(userOrg.UserId);
         }
 
@@ -598,9 +602,9 @@ namespace Shrooms.Domain.Services.Kudos
             return (pageRequested - LastPage) * ConstBusinessLayer.MaxKudosLogsPerPage;
         }
 
-        private static Expression<Func<KudosLog, KudosUserLogDTO>> MapUserKudosLogsToDto()
+        private static Expression<Func<KudosLog, ApplicationUser, KudosUserLogDTO>> MapUserKudosLogsToDto()
         {
-            return log => new KudosUserLogDTO
+            return (log, sender) => new KudosUserLogDTO
             {
                 Comment = log.Comments,
                 Created = log.Created,
@@ -616,33 +620,11 @@ namespace Shrooms.Domain.Services.Kudos
                 Status = log.Status.ToString(),
                 Sender = new KudosLogUserDTO
                 {
+                    FullName = sender.FirstName + " " + sender.LastName,
                     Id = log.CreatedBy
                 },
                 PictureId = log.PictureId
             };
-        }
-
-        private void SetKudosSendersName(IEnumerable<KudosLogUserDTO> users)
-        {
-            var logCreatorsId = users
-                .Select(log => log.Id);
-
-            var logCreators = _usersDbSet
-                .Where(usr => logCreatorsId.Contains(usr.Id))
-                .Select(x => new KudosLogUserDTO
-                {
-                    FullName = x.FirstName + " " + x.LastName,
-                    Id = x.Id
-                })
-                .ToList();
-
-            users.ForEach(log => log.FullName = GetUserFullName(logCreators, log.Id));
-        }
-
-        private static string GetUserFullName(IEnumerable<KudosLogUserDTO> users, string userId)
-        {
-            var user = users.FirstOrDefault(usr => usr.Id == userId);
-            return user?.FullName;
         }
 
         private KudosTypeDTO MapKudosTypesToDTO(KudosType kudosType)
@@ -670,9 +652,9 @@ namespace Shrooms.Domain.Services.Kudos
             return type => type.Type != ConstBusinessLayer.KudosTypeEnum.Minus;
         }
 
-        private Expression<Func<KudosLog, WallKudosLogDTO>> MapKudosLogToWallKudosLogDTO()
+        private Expression<Func<KudosLog, ApplicationUser, WallKudosLogDTO>> MapKudosLogToWallKudosLogDTO()
         {
-            return log => new WallKudosLogDTO
+            return (log, sender) => new WallKudosLogDTO
             {
                 Comment = log.Comments,
                 Points = log.Points,
@@ -680,13 +662,13 @@ namespace Shrooms.Domain.Services.Kudos
                 PictureId = log.PictureId,
                 Receiver = new KudosLogUserDTO
                 {
-                    Id = log.Employee != null ? log.Employee.Id : null,
-                    FullName = log.Employee != null ? log.Employee.FirstName + " " + log.Employee.LastName : null
+                    FullName = log.Employee != null ? log.Employee.FirstName + " " + log.Employee.LastName : null,
+                    Id = log.Employee != null ? log.Employee.Id : null
                 },
                 Sender = new KudosLogUserDTO
                 {
-                    Id = log.KudosSystemType == ConstBusinessLayer.KudosTypeEnum.Send ? log.CreatedBy : null,
-                    FullName = null
+                    FullName = sender.FirstName + " " + sender.LastName,
+                    Id = log.KudosSystemType == ConstBusinessLayer.KudosTypeEnum.Send ? log.CreatedBy : null
                 }
             };
         }
