@@ -761,6 +761,7 @@ namespace Shrooms.API.Tests.DomainService
                     Comments = "Comment1",
                     MultiplyBy = 1,
                     Points = 2,
+                    CreatedBy = "CreatedUserId",
                     Status = KudosStatus.Approved,
                     Created = DateTime.UtcNow
                 },
@@ -780,10 +781,21 @@ namespace Shrooms.API.Tests.DomainService
                     Comments = "Comment2",
                     MultiplyBy = 1,
                     Points = 2,
+                    CreatedBy = "CreatedUserId",
                     Status = KudosStatus.Approved,
                     Created = DateTime.UtcNow
                 }
             };
+
+            var users = new List<ApplicationUser>
+            {
+                new ApplicationUser
+                {
+                    Id = "CreatedUserId"
+                }
+            };
+
+            _usersDbSet.SetDbSetData(users.AsQueryable());
             _kudosLogsDbSet.SetDbSetData(kudosLogs.AsQueryable());
         }
 
