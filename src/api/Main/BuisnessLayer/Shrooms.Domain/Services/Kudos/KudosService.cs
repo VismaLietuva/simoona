@@ -517,8 +517,7 @@ namespace Shrooms.Domain.Services.Kudos
                 .Where(x => x.EmployeeId == user.Id &&
                             x.Status == KudosStatus.Approved &&
                             x.Created >= user.EmploymentDate &&
-                            x.OrganizationId == userOrg.OrganizationId)
-                .ToList();
+                            x.OrganizationId == userOrg.OrganizationId);
 
             var kudosTotal = allUserKudosLogs
                 .Where(x => x.KudosSystemType != ConstBusinessLayer.KudosTypeEnum.Minus &&
