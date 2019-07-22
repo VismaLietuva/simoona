@@ -157,20 +157,20 @@ namespace Shrooms.Domain.Services.UserService
         public IEnumerable<string> GetWallUserAppNotificationEnabledIds(string posterId, int wallId)
         {
             var newUserAndExternalRoles = _rolesDbSet
-                .Where(r => r.Name == Shrooms.Constants.Authorization.Roles.NewUser ||
-                            r.Name == Shrooms.Constants.Authorization.Roles.External)
+                .Where(r => r.Name == Constants.Authorization.Roles.NewUser ||
+                            r.Name == Constants.Authorization.Roles.External)
                 .ToList();
 
-            var newUserRoleId = newUserAndExternalRoles.First(r => r.Name == Shrooms.Constants.Authorization.Roles.NewUser).Id;
-            var externalRoleId = newUserAndExternalRoles.First(r => r.Name == Shrooms.Constants.Authorization.Roles.External).Id;
+            var newUserRoleId = newUserAndExternalRoles.First(r => r.Name == Constants.Authorization.Roles.NewUser).Id;
+            var externalRoleId = newUserAndExternalRoles.First(r => r.Name == Constants.Authorization.Roles.External).Id;
 
             var wall = _wallDbSet.Single(w => w.Id == wallId);
 
             var userAppNotificationEnabledIds = _usersDbSet
                 .Include(u => u.WallUsers)
                 .Include(u => u.Roles)
-                .Where(user => user.WallUsers.Any(x => x.WallId == wall.Id && x.AppNotificationsEnabled == true) &&
-                               !user.Roles.Any(r => r.RoleId == newUserRoleId) &&
+                .Where(user => user.WallUsers.Any(x => x.WallId == wall.Id && x.AppNotificationsEnabled) &&
+                               user.Roles.All(r => r.RoleId != newUserRoleId) &&
                                user.Id != posterId)
                 .Where(ExternalRoleFilter(wall, externalRoleId))
                 .Select(u => u.Id)
@@ -180,21 +180,21 @@ namespace Shrooms.Domain.Services.UserService
             return userAppNotificationEnabledIds;
         }
 
-        public IList<string> GetWallUsersEmails(string senderEmail, EntityModels.Models.Multiwall.Wall wall)
+        public IList<string> GetWallUsersEmails(string senderEmail, WallModel wall)
         {
             var newUserAndExternalRoles = _rolesDbSet
-                .Where(r => r.Name == Shrooms.Constants.Authorization.Roles.NewUser ||
-                            r.Name == Shrooms.Constants.Authorization.Roles.External)
+                .Where(r => r.Name == Constants.Authorization.Roles.NewUser ||
+                            r.Name == Constants.Authorization.Roles.External)
                 .ToList();
 
-            var newUserRoleId = newUserAndExternalRoles.First(r => r.Name == Shrooms.Constants.Authorization.Roles.NewUser).Id;
-            var externalRoleId = newUserAndExternalRoles.First(r => r.Name == Shrooms.Constants.Authorization.Roles.External).Id;
+            var newUserRoleId = newUserAndExternalRoles.First(r => r.Name == Constants.Authorization.Roles.NewUser).Id;
+            var externalRoleId = newUserAndExternalRoles.First(r => r.Name == Constants.Authorization.Roles.External).Id;
 
             var emails = _usersDbSet
                 .Include(u => u.WallUsers)
                 .Include(u => u.Roles)
-                .Where(user => user.WallUsers.Any(x => x.WallId == wall.Id && x.EmailNotificationsEnabled == true) &&
-                               !user.Roles.Any(r => r.RoleId == newUserRoleId) &&
+                .Where(user => user.WallUsers.Any(x => x.WallId == wall.Id && x.EmailNotificationsEnabled) &&
+                               user.Roles.All(r => r.RoleId != newUserRoleId) &&
                                user.Email != senderEmail)
                 .Where(ExternalRoleFilter(wall, externalRoleId))
                 .Select(u => u.Email)
@@ -262,14 +262,14 @@ namespace Shrooms.Domain.Services.UserService
 
             var settingsDto = new UserNotificationsSettingsDto
             {
-                EventsAppNotifications = (settings != null) ? settings.EventsAppNotifications : true,
-                EventsEmailNotifications = (settings != null) ? settings.EventsEmailNotifications : true,
-                ProjectsAppNotifications = (settings != null) ? settings.ProjectsAppNotifications : true,
-                ProjectsEmailNotifications = (settings != null) ? settings.ProjectsEmailNotifications : true,
-                MyPostsAppNotifications = (settings != null) ? settings.MyPostsAppNotifications : true,
-                MyPostsEmailNotifications = (settings != null) ? settings.MyPostsEmailNotifications : true,
-                FollowingPostsAppNotifications = (settings != null) ? settings.FollowingPostsAppNotifications : true,
-                FollowingPostsEmailNotifications = (settings != null) ? settings.FollowingPostsEmailNotifications : true,
+                EventsAppNotifications = settings?.EventsAppNotifications ?? true,
+                EventsEmailNotifications = settings?.EventsEmailNotifications ?? true,
+                ProjectsAppNotifications = settings?.ProjectsAppNotifications ?? true,
+                ProjectsEmailNotifications = settings?.ProjectsEmailNotifications ?? true,
+                MyPostsAppNotifications = settings?.MyPostsAppNotifications ?? true,
+                MyPostsEmailNotifications = settings?.MyPostsEmailNotifications ?? true,
+                FollowingPostsAppNotifications = settings?.FollowingPostsAppNotifications ?? true,
+                FollowingPostsEmailNotifications = settings?.FollowingPostsEmailNotifications ?? true,
 
                 Walls = _wallMembersDbSet
                 .Include(x => x.Wall)
@@ -404,11 +404,11 @@ namespace Shrooms.Domain.Services.UserService
             }
         }
 
-        private Expression<Func<ApplicationUser, bool>> ExternalRoleFilter(EntityModels.Models.Multiwall.Wall wall, string externalRoleId)
+        private Expression<Func<ApplicationUser, bool>> ExternalRoleFilter(WallModel wall, string externalRoleId)
         {
             if (wall.Type != WallType.Events)
             {
-                return user => !user.Roles.Any(r => r.RoleId == externalRoleId);
+                return user => user.Roles.All(r => r.RoleId != externalRoleId);
             }
             else
             {
