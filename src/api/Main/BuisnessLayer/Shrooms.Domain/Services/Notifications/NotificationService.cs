@@ -57,11 +57,11 @@ namespace Shrooms.Domain.Services.Notifications
             {
                 case WallType.Events:
                     postType = NotificationType.EventPost;
-                    sources.EventId = _eventDbSet.FirstOrDefault(x => x.WallId == wallId).Id.ToString();
+                    sources.EventId = _eventDbSet.Where(x => x.WallId == wallId).FirstOrDefault().Id.ToString();
                     break;
                 case WallType.Project:
                     postType = NotificationType.ProjectPost;
-                    sources.ProjectId = _projectDbSet.FirstOrDefault(x => x.WallId == wallId).Id.ToString();
+                    sources.ProjectId = _projectDbSet.Where(x => x.WallId == wallId).FirstOrDefault().Id.ToString();
                     break;
             }
 

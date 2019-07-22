@@ -81,7 +81,7 @@ namespace Shrooms.API.Controllers.Kudos
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
-        [CacheOutput(ServerTimeSpan = ConstWebApi.OneDay)]
+        [CacheOutput(ServerTimeSpan = ConstWebApi.OneHour)]
         public IEnumerable<KudosTypeViewModel> GetKudosTypesForFilter()
         {
             var types = new List<KudosTypeViewModel>()
@@ -132,7 +132,7 @@ namespace Shrooms.API.Controllers.Kudos
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
-        [CacheOutput(ServerTimeSpan = ConstWebApi.OneDay)]
+        [CacheOutput(ServerTimeSpan = ConstWebApi.OneHour)]
         public IEnumerable<KudosTypeViewModel> GetKudosTypes()
         {
             var kudosTypeDto = _kudosService.GetKudosTypes(GetUserAndOrganization());
