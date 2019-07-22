@@ -8,10 +8,11 @@
     KudosController.$inject = [
         '$rootScope',
         '$state',
-        'authService'
+        'authService',
+        'kudosFactory'
     ];
 
-    function KudosController($rootScope, $state, authService) {
+    function KudosController($rootScope, $state, authService, kudosFactory) {
         /*jshint validthis: true */
         var vm = this;
 
@@ -37,6 +38,8 @@
             isTabShown: vm.hasKudosAdminPermissions
         }];
 
+        vm.userInformationIsLoading = true;
+
         init();
 
         //////////
@@ -45,6 +48,15 @@
             $rootScope.$on('$stateChangeStart', function(event, toState, toParams) {
                 vm.userId = toParams.userId || vm.userId;
                 vm.currentTabState = toState.name;
+            });
+
+            kudosFactory.getUserInformation(vm.userId).then(function (response) {
+                vm.user = response;
+                vm.kudosifyUser = {
+                    formattedName: response.firstName + ' ' + response.lastName,
+                    id: vm.userId
+                };
+                vm.userInformationIsLoading = false;
             });
         }
 
