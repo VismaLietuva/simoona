@@ -174,7 +174,7 @@ namespace Shrooms.Domain.Services.Kudos
                 {
                     if (IsTranslatableKudosType(kudosLog.Type.Type))
                     {
-                        kudosLog.Type.Name = TranslateKudos(options.UserId, "KudosType" + kudosLog.Type.Name);
+                        kudosLog.Type.Name = TranslateKudos(user.CultureCode, "KudosType" + kudosLog.Type.Name);
                     }
                 }
             }
@@ -213,7 +213,7 @@ namespace Shrooms.Domain.Services.Kudos
                 {
                     if (IsTranslatableKudosType(userLog.Type.Type))
                     {
-                        userLog.Type.Name = TranslateKudos(userId, "KudosType" + userLog.Type.Name);
+                        userLog.Type.Name = TranslateKudos(user.CultureCode, "KudosType" + userLog.Type.Name);
                     }
                 }
             }
