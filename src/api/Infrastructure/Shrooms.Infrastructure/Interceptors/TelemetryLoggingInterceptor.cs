@@ -23,7 +23,6 @@ namespace Shrooms.Infrastructure.Interceptors
             {
                 if (invocation.Method.DeclaringType == typeof(IDisposable) || invocation.Method.Name == "Dispose")
                 {
-                    invocation.Proceed();
                     return;
                 }
 
@@ -51,7 +50,6 @@ namespace Shrooms.Infrastructure.Interceptors
                 {
                     operation.Telemetry.Success = false;
                     _telemetryClient.TrackException(ex);
-                    throw;
                 }
             }
         }
