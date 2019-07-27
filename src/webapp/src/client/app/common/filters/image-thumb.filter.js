@@ -25,7 +25,7 @@
                 parameters = '?width=' + size.w + '&height=' + size.h + '&mode=' + mode;
             }
 
-            return endPoint + '/storage/' + authService.identity.organizationName.toLowerCase() + '/wall-default.png' + parameters;
+            return 'images/wall-default.png' + parameters;
         };
     }
 })();
