@@ -229,8 +229,11 @@
     <Compile Include="ExcelGenerator\ExcelWorksheetBuilder.cs" />
     <Compile Include="ExcelGenerator\IExcelBuilder.cs" />
     <Compile Include="FeatureToggle\Feature.cs" />
+    <Compile Include="FireAndForget\AsyncRunner.cs" />
     <Compile Include="FireAndForget\HangFireScheduler.cs" />
+    <Compile Include="FireAndForget\IBackgroundWorker.cs" />
     <Compile Include="FireAndForget\IJobScheduler.cs" />
+    <Compile Include="FireAndForget\TenantNameContainer.cs" />
     <Compile Include="GoogleBookApiService\GoogleBookService.cs" />
     <Compile Include="GoogleBookApiService\IBookInfoService.cs" />
     <Compile Include="GoogleBookApiService\ExternalBookInfo.cs" />
