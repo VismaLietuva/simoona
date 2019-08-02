@@ -59,6 +59,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shrooms.Premium", "Shrooms.
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shrooms.Premium.UnitTests", "Shrooms.Premium.UnitTests\Shrooms.Premium.UnitTests.csproj", "{BF77FA0D-51D3-4DB6-9ADE-D5AAD70E2625}"
+	ProjectSection(ProjectDependencies) = postProject
+		{093FE583-996B-435C-A4D2-201C94AA71E0} = {093FE583-996B-435C-A4D2-201C94AA71E0}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Open-source", "Open-source", "{BC89A2FB-8005-4D1F-A108-79F5759313A3}"
 EndProject
@@ -167,8 +170,8 @@ Global
 		{BF77FA0D-51D3-4DB6-9ADE-D5AAD70E2625} = {F5595798-28B5-44CA-AFE8-679919396C33}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.Common.6.0.1304.0\lib\NET45;packages\EnterpriseLibrary.Logging.6.0.1304.0\lib\NET45
 		SolutionGuid = {4B7BEB0E-C314-4215-8F22-59E3B8655722}
+		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.Common.6.0.1304.0\lib\NET45;packages\EnterpriseLibrary.Logging.6.0.1304.0\lib\NET45
 	EndGlobalSection
 	GlobalSection(CodealikeProperties) = postSolution
 		SolutionGuid = 26bdd0af-3b1d-458d-a138-31fef424d65b

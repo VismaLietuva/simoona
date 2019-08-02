@@ -26,6 +26,9 @@ using Shrooms.DataTransferObjects.Models.OfficeMap;
 using Shrooms.Domain.Services.OfficeMap;
 using Shrooms.WebViewModels.Models.Notifications;
 using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Notifications;
+using Shrooms.Infrastructure.FireAndForget;
+using Shrooms.API.BackgroundWorkers;
+using Shrooms.Premium.Main.PresentationLayer.Shrooms.API.BackgroundWorkers;
 
 namespace Shrooms.API.Controllers.WebApi.EventControllers
 {
@@ -39,10 +42,11 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
         private readonly IEventUtilitiesService _eventUtilitiesService;
         private readonly IEventParticipationService _eventParticipationService;
         private readonly IEventExportService _eventExportService;
-        private readonly INotificationService _notificationService;
         private readonly IPostService _postService;
         private readonly IWallService _wallService;
         private readonly IOfficeMapService _officeMapService;
+        private readonly IAsyncRunner _asyncRunner;
+
 
         public EventController(
             IMapper mapper,
@@ -51,10 +55,10 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
             IEventUtilitiesService eventUtilitiesService,
             IEventParticipationService eventParticipationService,
             IEventExportService eventExportService,
-            INotificationService notificationService,
             IPostService postService,
             IWallService wallService,
-            IOfficeMapService officeMapService)
+            IOfficeMapService officeMapService,
+            IAsyncRunner asyncRunner)
         {
             _mapper = mapper;
             _eventService = eventService;
@@ -62,10 +66,10 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
             _eventUtilitiesService = eventUtilitiesService;
             _eventParticipationService = eventParticipationService;
             _eventExportService = eventExportService;
-            _notificationService = notificationService;
             _postService = postService;
             _wallService = wallService;
             _officeMapService = officeMapService;
+            _asyncRunner = asyncRunner;
         }
 
         [Route("Recurrences")]
@@ -131,14 +135,15 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
 
             var createEventDTO = _mapper.Map<CreateEventDto>(eventViewModel);
             SetOrganizationAndUser(createEventDTO);
-
+            var userHubDto = GetUserAndOrganizationHub();
             try
             {
                 var createdEvent = await _eventService.CreateEvent(createEventDTO);
+                _asyncRunner.Run<NewEventNotifier>(notif =>
+                {
+                    notif.Notify(createdEvent, userHubDto);
+                }, GetOrganizationName());
 
-                var notification = await _notificationService.CreateForEvent(GetUserAndOrganization(), createdEvent);
-
-                NotificationHub.SendNotificationToAllUsers(_mapper.Map<NotificationViewModel>(notification), GetUserAndOrganizationHub());
             }
             catch (EventException e)
             {
@@ -423,14 +428,17 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
 
             var postModel = _mapper.Map<ShareEventViewModel, NewPostDTO>(shareEventViewModel);
             SetOrganizationAndUser(postModel);
-
+            var userHubDto = GetUserAndOrganizationHub();
             try
             {
                 var createdPost = _postService.CreateNewPost(postModel);
-                var newPostViewModel = _mapper.Map<WallPostViewModel>(createdPost);
+                _asyncRunner.Run<SharedEventNotifier>(notif =>
+                {
+                    notif.Notify(postModel,createdPost, userHubDto);
+                }, GetOrganizationName());
 
-                var membersToNotify = _wallService.GetWallMembersIds(postModel.WallId, postModel);
-                NotificationHub.SendWallNotification(postModel.WallId, membersToNotify, createdPost.WallType, GetUserAndOrganizationHub());
+
+                var newPostViewModel = _mapper.Map<WallPostViewModel>(createdPost);
 
                 return Ok(newPostViewModel);
             }
