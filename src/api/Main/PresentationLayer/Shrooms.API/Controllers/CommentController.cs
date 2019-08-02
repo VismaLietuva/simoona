@@ -1,20 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Web.Http;
+﻿using System.Web.Http;
 using AutoMapper;
 using Shrooms.API.BackgroundWorkers;
 using Shrooms.API.Filters;
-using Shrooms.API.Hubs;
 using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.DataTransferObjects.Models.Wall.Posts.Comments;
-using Shrooms.Domain.Services.Notifications;
-using Shrooms.Domain.Services.Wall;
 using Shrooms.Domain.Services.Wall.Posts.Comments;
 using Shrooms.DomainExceptions.Exceptions;
-using Shrooms.EntityModels.Models.Notifications;
 using Shrooms.Infrastructure.FireAndForget;
-using Shrooms.WebViewModels.Models.Notifications;
 using Shrooms.WebViewModels.Models.Wall.Posts.Comments;
 
 namespace Shrooms.API.Controllers
@@ -23,18 +15,13 @@ namespace Shrooms.API.Controllers
     public class CommentController : BaseController
     {
         private readonly IMapper _mapper;
-        private readonly IWallService _wallService;
         private readonly ICommentService _commentService;
-        private readonly INotificationService _notificationService;
         private readonly IAsyncRunner _asyncRunner;
 
-
-        public CommentController(IMapper mapper, IWallService wallService, ICommentService commentService, INotificationService notificationService, IAsyncRunner asyncRunner)
+        public CommentController(IMapper mapper, ICommentService commentService, IAsyncRunner asyncRunner)
         {
             _mapper = mapper;
-            _wallService = wallService;
             _commentService = commentService;
-            _notificationService = notificationService;
             _asyncRunner = asyncRunner;
         }
 
