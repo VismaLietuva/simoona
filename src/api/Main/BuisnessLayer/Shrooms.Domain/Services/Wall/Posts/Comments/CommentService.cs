@@ -7,10 +7,8 @@ using Shrooms.Constants.ErrorCodes;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Wall.Posts.Comments;
-using Shrooms.Domain.Services.Email.Posting;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.DomainExceptions.Exceptions;
-using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.EntityModels.Models.Notifications;
 using Shrooms.Infrastructure.SystemClock;
@@ -22,19 +20,16 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
         private readonly IUnitOfWork2 _uow;
         private readonly ISystemClock _systemClock;
         private readonly IPermissionService _permissionService;
-        private readonly ICommentNotificationService _commentNotificationService;
 
         private readonly IDbSet<Post> _postsDbSet;
         private readonly IDbSet<Comment> _commentsDbSet;
         private readonly IDbSet<WallModerator> _wallModeratorsDbSet;
-        private readonly IDbSet<ApplicationUser> _usersDbSet;
         private readonly IDbSet<NotificationsSettings> _notificationsDbSet;
 
         public CommentService(
             IUnitOfWork2 uow,
             ISystemClock systemClock,
-            IPermissionService permissionService,
-            ICommentNotificationService commentNotificationService)
+            IPermissionService permissionService)
         {
             _uow = uow;
             _systemClock = systemClock;
@@ -43,9 +38,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             _postsDbSet = uow.GetDbSet<Post>();
             _commentsDbSet = uow.GetDbSet<Comment>();
             _wallModeratorsDbSet = uow.GetDbSet<WallModerator>();
-            _usersDbSet = uow.GetDbSet<ApplicationUser>();
             _notificationsDbSet = uow.GetDbSet<NotificationsSettings>();
-            _commentNotificationService = commentNotificationService;
         }
 
         public void ToggleLike(int commentId, UserAndOrganizationDTO userOrg)
@@ -114,8 +107,6 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
 
             post.LastActivity = _systemClock.UtcNow;
             _uow.SaveChanges(commentDto.UserId);
-
-            _commentNotificationService.NotifyAboutNewComment(comment, _usersDbSet.SingleOrDefault(user => user.Id == commentDto.UserId));
 
             return new CommentCreatedDTO { WallId = post.WallId, CommentId = comment.Id, WallType = post.Wall.Type, CommentCreator = comment.AuthorId, PostCreator = post.AuthorId, PostId = post.Id };
         }

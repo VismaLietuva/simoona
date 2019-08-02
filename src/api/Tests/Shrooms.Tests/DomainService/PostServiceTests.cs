@@ -44,7 +44,7 @@ namespace Shrooms.UnitTests.DomainService
 
             var commentService = Substitute.For<ICommentService>();
 
-            _postService = new PostService(uow, _permissionService, postNotificationService, commentService);
+            _postService = new PostService(uow, _permissionService, commentService);
         }
 
         [Test]

@@ -21,7 +21,6 @@ namespace Shrooms.Domain.Services.Wall.Posts
         private static object postDeleteLock = new object();
 
         private readonly IPermissionService _permissionService;
-        private readonly IPostNotificationService _postNotificationService;
         private readonly ICommentService _commentService;
 
         private readonly IUnitOfWork2 _uow;
@@ -33,12 +32,10 @@ namespace Shrooms.Domain.Services.Wall.Posts
         public PostService(
             IUnitOfWork2 uow,
             IPermissionService permissionService,
-            IPostNotificationService postNotificationService,
             ICommentService commentService)
         {
             _uow = uow;
             _permissionService = permissionService;
-            _postNotificationService = postNotificationService;
             _commentService = commentService;
 
             _postsDbSet = uow.GetDbSet<Post>();
@@ -77,7 +74,6 @@ namespace Shrooms.Domain.Services.Wall.Posts
             var postCreatorDto = MapUserToDto(postCreator);
             var newlyCreatedPostDto = MapNewlyCreatedPostToDto(post, postCreatorDto, wall.Type);
 
-            _postNotificationService.NotifyAboutNewPost(post, postCreator);
             return newlyCreatedPostDto;
         }
 
@@ -220,7 +216,8 @@ namespace Shrooms.Domain.Services.Wall.Posts
                 Created = post.Created,
                 CreatedBy = post.CreatedBy,
                 User = user,
-                WallType = wallType
+                WallType = wallType,
+                WallId = post.WallId
             };
             return newlyCreatedPostDto;
         }

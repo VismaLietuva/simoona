@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Web;
 using System.Web.Http;
 using Autofac;
 using Autofac.Integration.SignalR;
@@ -21,6 +22,7 @@ using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Projects;
 using Shrooms.Domain.Services.SyncTokens;
 using Shrooms.Infrastructure.Email;
+using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Infrastructure.Interceptors;
 using Shrooms.Infrastructure.Logger;
 using Shrooms.IoC.Modules;
@@ -38,6 +40,9 @@ namespace Shrooms.IoC
 
             builder.RegisterApiControllers(shroomsApi);
             builder.RegisterHubs(shroomsApi);
+            builder.RegisterAssemblyTypes(shroomsApi).
+                Where(t => typeof(IBackgroundWorker).IsAssignableFrom(t)).InstancePerDependency().AsSelf();
+            builder.RegisterType<AsyncRunner>().As<IAsyncRunner>().SingleInstance();
             builder.RegisterWebApiModelBinderProvider();
             builder.RegisterWebApiFilterProvider(config);
             builder.RegisterAssemblyTypes(dataLayer);
@@ -47,7 +52,10 @@ namespace Shrooms.IoC
             builder.Register(c => new TelemetryLoggingInterceptor());
 
             builder.RegisterType(typeof(UnitOfWork2)).As(typeof(IUnitOfWork2)).InstancePerRequest();
-            builder.Register(c => new ShroomsDbContext(GetConnectionStringName())).As<IDbContext>().InstancePerRequest();
+            builder.Register(c => HttpContext.Current == null ?
+                    new ShroomsDbContext(c.Resolve<ITenantNameContainer>().TenantName) :
+                    new ShroomsDbContext(GetConnectionStringName())
+                    ).As<IDbContext>().InstancePerRequest();
             builder.RegisterType(typeof(EFUnitOfWork)).As(typeof(IUnitOfWork)).InstancePerRequest();
             builder.RegisterGeneric(typeof(EFRepository<>)).As(typeof(IRepository<>));
 
