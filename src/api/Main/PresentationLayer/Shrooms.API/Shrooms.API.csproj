@@ -457,6 +457,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\FilterConfig.cs" />
+    <Compile Include="BackgroundWorkers\NewCommentNotifier.cs" />
+    <Compile Include="BackgroundWorkers\NewPostNotifier.cs" />
     <Compile Include="GeneralCode\UnwantedTelemetryFilter.cs" />
     <Compile Include="GeneralCode\NLogExceptionLogger.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />

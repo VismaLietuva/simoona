@@ -19,5 +19,6 @@ namespace Shrooms.DataTransferObjects.Models.Wall.Posts
         public UserDto User { get; set; }
 
         public WallType WallType { get; set; }
+        public int WallId { get; set; }
     }
 }

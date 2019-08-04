@@ -45,7 +45,7 @@ namespace Shrooms.UnitTests.DomainService
             _permissionService = Substitute.For<IPermissionService>();
             _commentNotificationService = Substitute.For<ICommentNotificationService>();
 
-            _commentService = new CommentService(uow, _systemClock, _permissionService, _commentNotificationService);
+            _commentService = new CommentService(uow, _systemClock, _permissionService);
         }
 
         [Test]

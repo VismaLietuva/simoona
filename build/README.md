@@ -7,6 +7,7 @@ The contents of this folder is used to make building and starting Simoona easier
 1. Internet Information Services (IIS) Server (<https://www.iis.net/>) - can be turned on as Windows feature
 2. IIS URL Rewrite extension for IIS (<https://www.iis.net/downloads/microsoft/url-rewrite>)
 3. SQL Server Express (<https://www.microsoft.com/en-us/sql-server/sql-server-editions-express>)- Basic version should be enough
+4. It's recommended to use Visual Studio 2019 (older versions are not being actively supported)
 
 ## Required Development Tools
 
