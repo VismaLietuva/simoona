@@ -51,19 +51,15 @@ namespace Shrooms.API.Controllers.WebApi
                 return UnsupportedMediaType();
             }
 
-            if (imgObj.RawFormat.Guid != ImageFormat.Png.Guid &&
-                imgObj.RawFormat.Guid != ImageFormat.Gif.Guid &&
-                imgObj.RawFormat.Guid != ImageFormat.Jpeg.Guid &&
-                imgObj.RawFormat.Guid != ImageFormat.Bmp.Guid)
+            if (imgObj.RawFormat.Guid != ImageFormat.Png.Guid && imgObj.RawFormat.Guid != ImageFormat.Gif.Guid 
+                    && imgObj.RawFormat.Guid != ImageFormat.Jpeg.Guid && imgObj.RawFormat.Guid != ImageFormat.Bmp.Guid)
             {
                 return UnsupportedMediaType();
             }
 
             imageStream.Position = 0;
 
-            var pictureName = await _pictureService
-                .UploadFromStream(
-                    imageStream,
+            var pictureName = await _pictureService.UploadFromStream(imageStream,
                     imageContent.Headers.ContentType.ToString(),
                     imageContent.Headers.ContentDisposition.FileName.Replace("\"", string.Empty),
                     GetUserAndOrganization().OrganizationId);
