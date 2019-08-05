@@ -16,6 +16,7 @@ namespace Shrooms.Premium.Infrastructure.Shrooms.IoC.Modules
         {
             builder.RegisterType<NewEventNotifier>().As<IBackgroundWorker>().InstancePerDependency().AsSelf();
             builder.RegisterType<SharedEventNotifier>().As<IBackgroundWorker>().InstancePerDependency().AsSelf();
+            builder.RegisterType<ComiteeSuggestionNotifier>().As<IBackgroundWorker>().InstancePerDependency().AsSelf();
         }
     }
 }

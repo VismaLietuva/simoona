@@ -1,4 +1,5 @@
-﻿using Shrooms.EntityModels.Models;
+﻿using Shrooms.DataTransferObjects.Models.Committees;
+using Shrooms.EntityModels.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,6 @@ namespace Shrooms.Domain.Services.Email.Committee
 {
     public interface ICommitteeNotificationService
     {
-        void NotifyCommitteeMembersAboutNewSuggestion(EntityModels.Models.Committee committee, CommitteeSuggestion suggestion);
+        void NotifyCommitteeMembersAboutNewSuggestion(ComiteeSuggestionCreatedDto createdDto);
     }
 }

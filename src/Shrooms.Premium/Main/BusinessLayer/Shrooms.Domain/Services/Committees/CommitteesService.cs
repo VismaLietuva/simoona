@@ -25,19 +25,16 @@ namespace Shrooms.Domain.Services.Committees
         private readonly IRepository<ApplicationUser> _applicationUserRepository;
         private readonly IRepository<Committee> _committeeRepository;
         private readonly IMapper _mapper;
-        private readonly ICommitteeNotificationService _committeeNotificationService;
 
         public CommitteesService(
             IMapper mapper,
             IUnitOfWork unitOfWork,
-            IUnitOfWork2 uow,
-            ICommitteeNotificationService notificationService)
+            IUnitOfWork2 uow)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _applicationUserRepository = _unitOfWork.GetRepository<ApplicationUser>();
             _committeeRepository = _unitOfWork.GetRepository<Committee>();
-            _committeeNotificationService = notificationService;
             _uow = uow;
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
             _committteeDbSet = uow.GetDbSet<Committee>();
@@ -148,7 +145,7 @@ namespace Shrooms.Domain.Services.Committees
             _unitOfWork.Save();
         }
 
-        public void PostSuggestion(CommitteeSuggestionPostDTO modelDTO, string userId)
+        public ComiteeSuggestionCreatedDto PostSuggestion(CommitteeSuggestionPostDTO modelDTO, string userId)
         {
             var committee = _committeeRepository.Get(c => c.Id == modelDTO.CommitteeId, includeProperties: "Suggestions, Members").FirstOrDefault();
 
@@ -167,7 +164,11 @@ namespace Shrooms.Domain.Services.Committees
             _committeeRepository.Update(committee);
             _unitOfWork.Save();
 
-            _committeeNotificationService.NotifyCommitteeMembersAboutNewSuggestion(committee, suggestion);
+            return new ComiteeSuggestionCreatedDto
+            {
+                ComiteeId = committee.Id,
+                SuggestionId = suggestion.Id
+            };
         }
 
         public IEnumerable<CommitteeSuggestionViewDTO> GetCommitteeSuggestions(int id)

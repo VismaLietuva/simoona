@@ -10,7 +10,7 @@ namespace Shrooms.Domain.Services.Committees
         void PostCommittee(CommitteePostDTO modelDTO);
         CommitteeViewDTO GetKudosCommittee();
         int GetKudosCommitteeId();
-        void PostSuggestion(CommitteeSuggestionPostDTO modelDTO, string userId);
+        ComiteeSuggestionCreatedDto PostSuggestion(CommitteeSuggestionPostDTO modelDTO, string userId);
         IEnumerable<CommitteeSuggestionViewDTO> GetCommitteeSuggestions(int id);
         void DeleteComitteeSuggestion(int comitteeId, int suggestionId, UserAndOrganizationDTO userAndOrg);
     }
