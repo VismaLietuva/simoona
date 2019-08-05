@@ -27,15 +27,14 @@ namespace Shrooms.Azure
 
         public async Task RemovePicture(string blobKey, string tenantPicturesContainer)
         {
-            CloudBlockBlob blockBlob = GetBlockBlob(blobKey, tenantPicturesContainer);
+            var blockBlob = GetBlockBlob(blobKey, tenantPicturesContainer);
 
             await blockBlob.DeleteAsync(DeleteSnapshotsOption.None, null, _blobRequestOptions, null);
         }
 
         public async Task UploadPicture(Stream stream, string blobKey, string mimeType, string tenantPicturesContainer)
         {
-            CloudBlockBlob blockBlob = GetBlockBlob(blobKey, tenantPicturesContainer);
-
+            var blockBlob = GetBlockBlob(blobKey, tenantPicturesContainer);
             blockBlob.Properties.ContentType = mimeType;
 
             await blockBlob.UploadFromStreamAsync(stream, null, _blobRequestOptions, null);
@@ -43,11 +42,9 @@ namespace Shrooms.Azure
 
         private CloudBlockBlob GetBlockBlob(string blobKey, string containerName)
         {
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(_settings.StorageConnectionString);
-
-            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
-
-            CloudBlobContainer container = blobClient.GetContainerReference(containerName);
+            var storageAccount = CloudStorageAccount.Parse(_settings.StorageConnectionString);
+            var blobClient = storageAccount.CreateCloudBlobClient();
+            var container = blobClient.GetContainerReference(containerName);
 
             return container.GetBlockBlobReference(blobKey);
         }

@@ -536,6 +536,8 @@
     <Compile Include="Helpers\CustomUrlHelper.cs" />
     <Compile Include="Hubs\BaseHub.cs" />
     <Compile Include="Hubs\NotificationHub.cs" />
+    <Compile Include="ImageResizerPlugins\ImageResizerBlobCache.cs" />
+    <Compile Include="ImageResizerPlugins\WritableBlobProvider.cs" />
     <Compile Include="Middlewares\ImageResizerMiddleware.cs" />
     <Compile Include="Middlewares\MultitenancyMiddleware.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
