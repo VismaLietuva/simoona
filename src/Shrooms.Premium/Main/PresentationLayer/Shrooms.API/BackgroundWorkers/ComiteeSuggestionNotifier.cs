@@ -15,9 +15,10 @@ namespace Shrooms.Premium.Main.PresentationLayer.Shrooms.API.BackgroundWorkers
         private readonly ILogger _logger;
         private readonly ICommitteeNotificationService _committeeNotificationService;
 
-        public ComiteeSuggestionNotifier()
+        public ComiteeSuggestionNotifier(ILogger logger, ICommitteeNotificationService committeeNotificationService)
         {
-
+            _logger = logger;
+            _committeeNotificationService = committeeNotificationService;
         }
 
         public void Notify(ComiteeSuggestionCreatedDto createdDto)

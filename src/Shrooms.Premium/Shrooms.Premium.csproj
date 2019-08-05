@@ -323,6 +323,7 @@
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\EventOptionDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\EventOptionsDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\EventParticipantDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\EventParticipantsChangeDto.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\EventTypeDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\EventUserSearchResultDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\MyEventsOptionsDTO.cs" />
@@ -398,6 +399,7 @@
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\WebHookCallbacks\WebHookCallbackPremiumServices.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\BackgroundWorkers\ComiteeSuggestionNotifier.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\BackgroundWorkers\NewEventNotifier.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.API\BackgroundWorkers\RemovedParticipantsNotifier.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\BackgroundWorkers\SharedEventNotifier.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\Book\BookMobileController.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\CommitteesController.cs" />
