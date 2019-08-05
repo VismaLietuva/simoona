@@ -30,6 +30,15 @@ namespace Shrooms.API.ImageResizerPlugins
             return subPath;
         }
 
+        protected string GetTenantPart(string virtualPath)
+        {
+            var subPath = StripPrefix(virtualPath).Trim('/', '\\');
+            var tenantPartIndex = subPath.IndexOf("/", StringComparison.InvariantCulture);
+            var tenantPart = subPath.Substring(0, tenantPartIndex);
+
+            return tenantPart;
+        }
+
         protected static string EncodeFileName(string virtualPath)
         {
             var queryStringIndex = virtualPath.IndexOf("?", StringComparison.InvariantCulture);

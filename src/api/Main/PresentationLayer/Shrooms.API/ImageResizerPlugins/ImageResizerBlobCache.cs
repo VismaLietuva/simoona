@@ -166,8 +166,9 @@ namespace Shrooms.API.ImageResizerPlugins
         {
             var subPath = StripPrefixWithTenant(virtualPath);
             var fileName = EncodeFileName(subPath);
+            var tenantPart = GetTenantPart(virtualPath);
 
-            var relativeBlobUrl = $"{_cloudBlobClient.BaseUri.OriginalString.TrimEnd('/', '\\')}/{BlobContainerName}/{fileName}";
+            var relativeBlobUrl = $"{_cloudBlobClient.BaseUri.OriginalString.TrimEnd('/', '\\')}/{BlobContainerName}/{tenantPart}/{fileName}";
             return _cloudBlobClient.GetBlobReferenceFromServerAsync(new Uri(relativeBlobUrl));
         }
 
@@ -178,7 +179,10 @@ namespace Shrooms.API.ImageResizerPlugins
 
             var subPath = StripPrefixWithTenant(virtualPath).Trim('/', '\\');
             var fileName = EncodeFileName(subPath);
-            return blobContainer.GetBlockBlobReference(fileName);
+            var tenantPart = GetTenantPart(virtualPath);
+
+            var fullFilePath = $"{tenantPart}/{fileName}";
+            return blobContainer.GetBlockBlobReference(fullFilePath);
         }
 
         protected IBlobMetadata FetchMetadata(string virtualPath, NameValueCollection queryString)
