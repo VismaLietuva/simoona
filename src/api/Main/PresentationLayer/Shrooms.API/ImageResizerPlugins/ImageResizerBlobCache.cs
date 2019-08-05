@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Specialized;
 using System.Configuration;
 using System.IO;
@@ -10,23 +11,25 @@ using ImageResizer.Configuration;
 using ImageResizer.ExtensionMethods;
 using ImageResizer.Plugins;
 using ImageResizer.Plugins.Basic;
+using ImageResizer.Storage;
+using ImageResizer.Util;
 using Microsoft.Azure;
 using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace Shrooms.API.ImageResizerPlugins
 {
     public class ImageResizerBlobCache : WritableBlobProvider, ICache, IAsyncTyrantCache
     {
-        private readonly string _blobStorageConnection;
+        private string _blobStorageConnection;
         private string _blobStorageEndpoint;
+        private CloudBlobClient _cloudBlobClient;
 
         public ImageResizerBlobCache(NameValueCollection args)
+            : base(args)
         {
             _blobStorageConnection = args["connectionstring"];
             _blobStorageEndpoint = args.GetAsString("blobstorageendpoint", args.GetAsString("endpoint", null));
-
-            VirtualFilesystemPrefix = args["sourcePrefix"];
-            BlobContainerName = args["blobContainerName"];
         }
 
         public override IPlugin Install(Config config)
@@ -89,15 +92,23 @@ namespace Shrooms.API.ImageResizerPlugins
 
         public void Process(HttpContext context, IResponseArgs e)
         {
-            var metaData = FetchMetadata(e.RequestKey, null);
+            var file = GetFile(e.RequestKey, null);
+            var reprocessCache = false;
 
-            if (metaData.Exists == true)
+            if (file != null)
             {
-                var file = GetFile(e.RequestKey, null);
-                var stream = file.Open();
-                ((ResponseArgs)e).ResizeImageToStream = s => stream.CopyTo(s);
+                try
+                {
+                    var stream = file.Open();
+                    ((ResponseArgs)e).ResizeImageToStream = s => stream.CopyTo(s);
+                }
+                catch (FileNotFoundException)
+                {
+                    reprocessCache = true;
+                }
             }
-            else
+
+            if (file == null || reprocessCache)
             {
                 var stream = new MemoryStream(4096);
                 e.ResizeImageToStream(stream);
@@ -120,15 +131,23 @@ namespace Shrooms.API.ImageResizerPlugins
 
         public async Task ProcessAsync(HttpContext context, IAsyncResponsePlan e)
         {
-            var metaData = await FetchMetadataAsync(e.RequestCachingKey, null);
+            var file = await GetFileAsync(e.RequestCachingKey, null);
+            var reprocessCache = false;
 
-            if (metaData.Exists == true)
+            if (file != null)
             {
-                var file = await GetFileAsync(e.RequestCachingKey, null);
-                var stream = file.Open();
-                await e.CreateAndWriteResultAsync(stream, e);
+                try
+                {
+                    var stream = await file.OpenAsync();
+                    await e.CreateAndWriteResultAsync(stream, e);
+                }
+                catch (FileNotFoundException)
+                {
+                    reprocessCache = true;
+                }
             }
-            else
+
+            if (file == null || reprocessCache)
             {
                 var stream = new MemoryStream(4096);
                 await e.CreateAndWriteResultAsync(stream, e);
@@ -136,6 +155,99 @@ namespace Shrooms.API.ImageResizerPlugins
             }
 
             context.RemapHandler(new NoCacheAsyncHandler(e));
+        }
+
+        private ICloudBlob GetBlobRef(string virtualPath)
+        {
+            return AsyncUtils.RunSync(() => GetBlobRefAsync(virtualPath));
+        }
+
+        private Task<ICloudBlob> GetBlobRefAsync(string virtualPath)
+        {
+            var subPath = StripPrefixWithTenant(virtualPath);
+            var fileName = EncodeFileName(subPath);
+
+            var relativeBlobUrl = $"{_cloudBlobClient.BaseUri.OriginalString.TrimEnd('/', '\\')}/{BlobContainerName}/{fileName}";
+            return _cloudBlobClient.GetBlobReferenceFromServerAsync(new Uri(relativeBlobUrl));
+        }
+
+        private CloudBlockBlob GetBlockBlobRef(string virtualPath)
+        {
+            var blobContainer = _cloudBlobClient.GetContainerReference(BlobContainerName);
+            blobContainer.CreateIfNotExists();
+
+            var subPath = StripPrefixWithTenant(virtualPath).Trim('/', '\\');
+            var fileName = EncodeFileName(subPath);
+            return blobContainer.GetBlockBlobReference(fileName);
+        }
+
+        protected IBlobMetadata FetchMetadata(string virtualPath, NameValueCollection queryString)
+        {
+            return AsyncUtils.RunSync(() => FetchMetadataAsync(virtualPath, queryString));
+        }
+
+        public override async Task<IBlobMetadata> FetchMetadataAsync(string virtualPath, NameValueCollection queryString)
+        {
+            try
+            {
+                var cloudBlob = await GetBlobRefAsync(virtualPath);
+                var meta = new BlobMetadata { Exists = true };
+
+                var utc = cloudBlob.Properties.LastModified;
+                if (utc != null)
+                {
+                    meta.LastModifiedDateUtc = utc.Value.UtcDateTime;
+                }
+
+                return meta;
+            }
+            catch (StorageException e)
+            {
+                if (e.RequestInformation.HttpStatusCode == 404)
+                {
+                    return new BlobMetadata { Exists = false };
+                }
+
+                throw;
+            }
+        }
+
+        public override async Task<Stream> OpenAsync(string virtualPath, NameValueCollection queryString)
+        {
+            var memoryStream = new MemoryStream(4096);
+
+            try
+            {
+                var cloudBlob = await GetBlobRefAsync(virtualPath);
+                await cloudBlob.DownloadToStreamAsync(memoryStream);
+            }
+            catch (StorageException e)
+            {
+                if (e.RequestInformation.HttpStatusCode == 404)
+                {
+                    throw new FileNotFoundException("Azure blob file not found", e);
+                }
+
+                throw;
+            }
+
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            return memoryStream;
+        }
+
+        protected override void Upload(string virtualPath, MemoryStream memoryStream, NameValueCollection queryString)
+        {
+            AsyncUtils.RunSync(() => UploadAsync(virtualPath, memoryStream, queryString));
+        }
+
+        protected override async Task UploadAsync(string virtualPath, MemoryStream memoryStream, NameValueCollection queryString)
+        {
+            ResetBlobMetadataCache(virtualPath, queryString);
+
+            var cloudBlob = GetBlockBlobRef(virtualPath);
+
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            await cloudBlob.UploadFromStreamAsync(memoryStream);
         }
     }
 }
