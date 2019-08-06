@@ -336,6 +336,7 @@
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\OfficeMap\UserOfficeAndFloorDto.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\OrganizationalStructure\OrganizationalStructureDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\OrganizationalStructure\OrganizationalStructureUserDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\ServiceRequest\CreatedServiceRequestDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\ServiceRequest\ServiceRequestCategoryDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\ServiceRequest\ServiceRequestCommentDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\ServiceRequest\ServiceRequestDTO.cs" />
@@ -402,6 +403,7 @@
     <Compile Include="Main\PresentationLayer\Shrooms.API\BackgroundWorkers\KudosAwardNotifier.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\BackgroundWorkers\NewEventNotifier.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\BackgroundWorkers\RemovedParticipantsNotifier.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.API\BackgroundWorkers\ServiceRequestNotifier.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\BackgroundWorkers\SharedEventNotifier.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\Book\BookMobileController.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\CommitteesController.cs" />

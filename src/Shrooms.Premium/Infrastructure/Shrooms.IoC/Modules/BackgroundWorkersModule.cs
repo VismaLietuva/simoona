@@ -19,6 +19,7 @@ namespace Shrooms.Premium.Infrastructure.Shrooms.IoC.Modules
             builder.RegisterType<ComiteeSuggestionNotifier>().As<IBackgroundWorker>().InstancePerDependency().AsSelf();
             builder.RegisterType<RemovedParticipantsNotifier>().As<IBackgroundWorker>().InstancePerDependency().AsSelf();
             builder.RegisterType<KudosAwardNotifier>().As<IBackgroundWorker>().InstancePerDependency().AsSelf();
+            builder.RegisterType<ServiceRequestNotifier>().As<IBackgroundWorker>().InstancePerDependency().AsSelf();
         }
     }
 }

@@ -24,6 +24,8 @@ using Shrooms.WebViewModels.Models;
 using Shrooms.WebViewModels.Models.KudosShop;
 using Shrooms.WebViewModels.Models.ServiceRequests;
 using Shrooms.Domain.Services.ServiceRequests.Export;
+using Shrooms.Infrastructure.FireAndForget;
+using Shrooms.Premium.Main.PresentationLayer.Shrooms.API.BackgroundWorkers;
 
 namespace Shrooms.API.Controllers
 {
@@ -41,6 +43,7 @@ namespace Shrooms.API.Controllers
         private readonly IServiceRequestExportService _serviceRequestExportService;
         private readonly IPermissionService _permissionService;
         private readonly IMapper _mapper;
+        private readonly IAsyncRunner _asyncRunner;
 
         public ServiceRequestsController(
             IMapper mapper,
@@ -48,7 +51,8 @@ namespace Shrooms.API.Controllers
             IKudosShopService kudosShopService,
             IPermissionService permissionService,
             IServiceRequestService serviceRequestService,
-            IServiceRequestExportService serviceRequestExportService)
+            IServiceRequestExportService serviceRequestExportService,
+            IAsyncRunner asyncRunner)
         {
             _categoryRepository = unitOfWork.GetRepository<ServiceRequestCategory>();
             _priorityRepository = unitOfWork.GetRepository<ServiceRequestPriority>();
@@ -61,6 +65,7 @@ namespace Shrooms.API.Controllers
             _serviceRequestExportService = serviceRequestExportService;
             _uow = unitOfWork;
             _mapper = mapper;
+            _asyncRunner = asyncRunner;
         }
 
         [HttpGet]
@@ -227,7 +232,8 @@ namespace Shrooms.API.Controllers
 
             try
             {
-                _serviceRequestService.CreateComment(comment, GetUserAndOrganization());
+                var createdComment = _serviceRequestService.CreateComment(comment, GetUserAndOrganization());
+                _asyncRunner.Run<ServiceRequestNotifier>(n=>n.NotifyOnComment(createdComment), GetOrganizationName());
             }
             catch (ValidationException e)
             {
@@ -250,7 +256,8 @@ namespace Shrooms.API.Controllers
 
             try
             {
-                _serviceRequestService.CreateNewServiceRequest(newServiceRequestDTO, GetUserAndOrganization());
+                var createdDto=_serviceRequestService.CreateNewServiceRequest(newServiceRequestDTO, GetUserAndOrganization());
+                _asyncRunner.Run<ServiceRequestNotifier>(n => n.NotifyOnCreate(createdDto), GetOrganizationName());
             }
             catch (ValidationException e)
             {
@@ -273,7 +280,9 @@ namespace Shrooms.API.Controllers
 
             try
             {
-                _serviceRequestService.UpdateServiceRequest(serviceRequestDTO, GetUserAndOrganization());
+                var userOrg = GetUserAndOrganization();
+                var updatedRequest=_serviceRequestService.UpdateServiceRequest(serviceRequestDTO, userOrg);
+                _asyncRunner.Run<ServiceRequestNotifier>(n=>n.NotifyOnStatusUpdate(updatedRequest,userOrg), GetOrganizationName());
             }
             catch (ValidationException e)
             {
@@ -293,7 +302,10 @@ namespace Shrooms.API.Controllers
         {
             try
             {
-                _serviceRequestService.MoveRequestToDone(id, GetUserAndOrganization());
+                var userOrg = GetUserAndOrganization();
+                var updatedReq=_serviceRequestService.MoveRequestToDone(id, GetUserAndOrganization());
+
+                _asyncRunner.Run<ServiceRequestNotifier>(ntf => ntf.NotifyOnStatusUpdate(updatedReq, userOrg), GetOrganizationName());
             }
             catch (ValidationException e)
             {
