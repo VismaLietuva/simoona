@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using Shrooms.API.Controllers.Kudos;
 using WebApi.OutputCache.V2;
+using Shrooms.Infrastructure.FireAndForget;
+using Shrooms.Premium.Main.PresentationLayer.Shrooms.API.BackgroundWorkers;
 
 namespace Shrooms.Premium.Main.PresentationLayer.Shrooms.API.Controllers
 {
@@ -13,10 +15,12 @@ namespace Shrooms.Premium.Main.PresentationLayer.Shrooms.API.Controllers
     public class ExternalPremiumJobsController : BaseController
     {
         private readonly IWebHookCallbackPremiumServices _webHookService;
+        private readonly IAsyncRunner _asyncRunner;
 
-        public ExternalPremiumJobsController(IWebHookCallbackPremiumServices webHookService)
+        public ExternalPremiumJobsController(IWebHookCallbackPremiumServices webHookService, IAsyncRunner asyncRunner)
         {
             _webHookService = webHookService;
+            _asyncRunner = asyncRunner;
         }
 
         [HttpPost]
@@ -30,7 +34,9 @@ namespace Shrooms.Premium.Main.PresentationLayer.Shrooms.API.Controllers
         [Route("GiveLoyaltyKudos")]
         public void GiveLoyaltyKudos()
         {
-            _webHookService.LoyaltyKudos.AwardEmployeesWithKudos(GetOrganizationName());
+            string orgName = GetOrganizationName();
+            var awardedEmployees=_webHookService.LoyaltyKudos.AwardEmployeesWithKudos(orgName);
+            _asyncRunner.Run<KudosAwardNotifier>(ntf => ntf.Notify(awardedEmployees),orgName);
 
             var cache = Configuration.CacheOutputConfiguration().GetCacheOutputProvider(Request);
             cache.RemoveStartsWith(Configuration.CacheOutputConfiguration().MakeBaseCachekey((KudosController t) => t.GetLastKudosLogRecords()));

@@ -342,7 +342,10 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
         {
             try
             {
-                _eventParticipationService.Expel(eventId, GetUserAndOrganization(), userId);
+                var usrOrg = GetUserAndOrganization();
+                var changesDto = _eventParticipationService.Expel(eventId, GetUserAndOrganization(), userId);
+                _asyncRunner.Run<RemovedParticipantsNotifier>(ntf => ntf.NotifyOnUserRemoval(changesDto, usrOrg), GetOrganizationName());
+
                 return Ok();
             }
             catch (EventException e)
@@ -372,7 +375,9 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
         {
             try
             {
-                _eventParticipationService.ResetAttendees(eventId, GetUserAndOrganization());
+                var usrOrg = GetUserAndOrganization();
+                var changesDto = _eventParticipationService.ResetAttendees(eventId, GetUserAndOrganization());
+                _asyncRunner.Run<RemovedParticipantsNotifier>(ntf => ntf.NotifyOnEventReset(changesDto, usrOrg), GetOrganizationName());
                 return Ok();
             }
             catch (EventException e)
@@ -434,7 +439,7 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
                 var createdPost = _postService.CreateNewPost(postModel);
                 _asyncRunner.Run<SharedEventNotifier>(notif =>
                 {
-                    notif.Notify(postModel,createdPost, userHubDto);
+                    notif.Notify(postModel, createdPost, userHubDto);
                 }, GetOrganizationName());
 
 

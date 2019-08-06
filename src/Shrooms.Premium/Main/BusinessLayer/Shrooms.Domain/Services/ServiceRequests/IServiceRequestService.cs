@@ -6,11 +6,11 @@ namespace Shrooms.Domain.Services.ServiceRequests
 {
     public interface IServiceRequestService
     {
-        void CreateComment(ServiceRequestCommentDTO comment, UserAndOrganizationDTO userAndOrganizationDTO);
+        ServiceRequestCreatedCommentDTO CreateComment(ServiceRequestCommentDTO comment, UserAndOrganizationDTO userAndOrganizationDTO);
 
-        void CreateNewServiceRequest(ServiceRequestDTO newServiceRequestDTO, UserAndOrganizationDTO userAndOrganizationDTO);
+        CreatedServiceRequestDTO CreateNewServiceRequest(ServiceRequestDTO newServiceRequestDTO, UserAndOrganizationDTO userAndOrganizationDTO);
 
-        void UpdateServiceRequest(ServiceRequestDTO serviceRequestDTO, UserAndOrganizationDTO userAndOrganizationDTO);
+        UpdatedServiceRequestDTO UpdateServiceRequest(ServiceRequestDTO serviceRequestDTO, UserAndOrganizationDTO userAndOrganizationDTO);
 
         IEnumerable<ServiceRequestCategoryDTO> GetCategories();
 
@@ -22,6 +22,6 @@ namespace Shrooms.Domain.Services.ServiceRequests
 
         void DeleteCategory(int categoryId, string userId);
 
-        void MoveRequestToDone(int requestId, UserAndOrganizationDTO userAndOrganizationDTO);
+        UpdatedServiceRequestDTO MoveRequestToDone(int requestId, UserAndOrganizationDTO userAndOrganizationDTO);
     }
 }

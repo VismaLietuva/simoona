@@ -36,7 +36,6 @@ namespace Shrooms.Domain.Services.Events.Participation
         private readonly IPermissionService _permissionService;
         private readonly IEventCalendarService _calendarService;
         private readonly IEventValidationService _eventValidationService;
-        private readonly IEventNotificationService _eventNotificationService;
         private readonly IWallService _wallService;
 
         public EventParticipationService(
@@ -46,7 +45,6 @@ namespace Shrooms.Domain.Services.Events.Participation
             IPermissionService permissionService,
             IEventCalendarService calendarService,
             IEventValidationService eventValidationService,
-            IEventNotificationService eventNotificationService,
             IWallService wallService)
         {
             _uow = uow;
@@ -58,12 +56,11 @@ namespace Shrooms.Domain.Services.Events.Participation
             _calendarService = calendarService;
             _permissionService = permissionService;
             _eventValidationService = eventValidationService;
-            _eventNotificationService = eventNotificationService;
             _roleService = roleService;
             _wallService = wallService;
         }
 
-        public void ResetAttendees(Guid eventId, UserAndOrganizationDTO userOrg)
+        public EventParticipantsChangeDto ResetAttendees(Guid eventId, UserAndOrganizationDTO userOrg)
         {
             var @event = _eventsDbSet
                 .Include(e => e.EventParticipants)
@@ -94,9 +91,12 @@ namespace Shrooms.Domain.Services.Events.Participation
             }
 
             _uow.SaveChanges(false);
-
-            _eventNotificationService.NotifyRemovedEventParticipants(@event.Name, @event.Id, userOrg.OrganizationId, users);
-            _calendarService.ResetParticipants(eventId, userOrg.OrganizationId);
+            return new EventParticipantsChangeDto
+            {
+                EventId = @event.Id,
+                EventName = @event.Name,
+                RemovedUsers = users
+            };
         }
 
         public void Join(EventJoinDTO joinDto)
@@ -220,7 +220,7 @@ namespace Shrooms.Domain.Services.Events.Participation
             return users;
         }
 
-        public void Expel(Guid eventId, UserAndOrganizationDTO userOrg, string userId)
+        public EventParticipantsChangeDto Expel(Guid eventId, UserAndOrganizationDTO userOrg, string userId)
         {
             var participant = GetParticipant(eventId, userOrg.OrganizationId, userId);
             var @event = participant.Event;
@@ -233,12 +233,12 @@ namespace Shrooms.Domain.Services.Events.Participation
 
             JoinLeaveEventWall(@event.ResponsibleUserId, userId, @event.WallId, userOrg);
 
-            _calendarService.RemoveParticipants(eventId, userOrg.OrganizationId, new List<string> { userId });
-            _eventNotificationService.NotifyRemovedEventParticipants(
-                @event.Name,
-                @event.Id,
-                userOrg.OrganizationId,
-                new List<string> { userId });
+            return new EventParticipantsChangeDto
+            {
+                EventId = @event.Id,
+                EventName = @event.Name,
+                RemovedUsers = new List<string> { userId }
+            };
         }
 
         public void Leave(Guid eventId, UserAndOrganizationDTO userOrg)
