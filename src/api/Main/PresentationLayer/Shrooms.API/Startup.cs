@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -20,6 +21,7 @@ using Shrooms.API.App_Start;
 using Shrooms.API.Filters;
 using Shrooms.API.GeneralCode;
 using Shrooms.API.GeneralCode.SerializationIgnorer;
+using Shrooms.API.ImageResizerPlugins;
 using Shrooms.API.Middlewares;
 using Shrooms.Constants.DataLayer;
 using Shrooms.Constants.WebApi;
@@ -73,26 +75,22 @@ namespace Shrooms.API
 
         private void ConfigureSignalr(IAppBuilder app)
         {
-            app.Map("/signalr", map =>
-            {
-                var hubConfig = new HubConfiguration
+            app.Map(
+                "/signalr",
+                map =>
                 {
-                    EnableDetailedErrors = true
-                };
-                var authorizer = new QueryStringBearerAuthorizeAttribute();
-                var module = new AuthorizeModule(authorizer, authorizer);
-                GlobalHost.HubPipeline.AddModule(module);
-                map.RunSignalR(hubConfig);
-            });
+                    var hubConfig = new HubConfiguration { EnableDetailedErrors = true };
+                    var authorizer = new QueryStringBearerAuthorizeAttribute();
+                    var module = new AuthorizeModule(authorizer, authorizer);
+                    GlobalHost.HubPipeline.AddModule(module);
+                    map.RunSignalR(hubConfig);
+                });
         }
 
         private static void StartBackgroundWorker(IAppBuilder app)
         {
             var interval = ConfigurationManager.AppSettings["BackgroundWorkerSqlPollingIntervalInSeconds"];
-            var options = new SqlServerStorageOptions
-            {
-                QueuePollInterval = TimeSpan.FromSeconds(Convert.ToInt16(interval))
-            };
+            var options = new SqlServerStorageOptions { QueuePollInterval = TimeSpan.FromSeconds(Convert.ToInt16(interval)) };
 
             Hangfire.GlobalConfiguration.Configuration.UseSqlServerStorage(ConstDataLayer.ConnectionStringNameBackgroundJobs, options);
 
@@ -109,13 +107,7 @@ namespace Shrooms.API
 
         private static CorsOptions SetupCorsOptions()
         {
-            var corsPolicy = new CorsPolicy
-            {
-                AllowAnyMethod = true,
-                AllowAnyHeader = true,
-                SupportsCredentials = true,
-                PreflightMaxAge = short.MaxValue
-            };
+            var corsPolicy = new CorsPolicy { AllowAnyMethod = true, AllowAnyHeader = true, SupportsCredentials = true, PreflightMaxAge = short.MaxValue };
 
             // Try and load allowed origins from web.config
             // If none are specified we'll allow all origins
@@ -134,13 +126,7 @@ namespace Shrooms.API
                 corsPolicy.AllowAnyOrigin = true;
             }
 
-            var corsOptions = new CorsOptions
-            {
-                PolicyProvider = new CorsPolicyProvider
-                {
-                    PolicyResolver = context => Task.FromResult(corsPolicy)
-                }
-            };
+            var corsOptions = new CorsOptions { PolicyProvider = new CorsPolicyProvider { PolicyResolver = context => Task.FromResult(corsPolicy) } };
             return corsOptions;
         }
 

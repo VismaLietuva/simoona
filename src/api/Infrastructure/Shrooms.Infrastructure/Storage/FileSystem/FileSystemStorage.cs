@@ -11,7 +11,12 @@ namespace Shrooms.Infrastructure.Storage.FileSystem
         public Task RemovePicture(string blobKey, string tenantPicturesContainer)
         {
             var filePath = HostingEnvironment.MapPath("~/storage/" + tenantPicturesContainer + "/" + blobKey);
-            File.Delete(filePath);
+            var fileInfo = new FileInfo(filePath);
+
+            if (fileInfo.Exists)
+            {
+                fileInfo.Delete();
+            }
 
             return Task.FromResult<object>(null);
         }
