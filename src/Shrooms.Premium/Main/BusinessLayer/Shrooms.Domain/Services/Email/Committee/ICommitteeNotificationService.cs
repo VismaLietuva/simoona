@@ -10,6 +10,6 @@ namespace Shrooms.Domain.Services.Email.Committee
 {
     public interface ICommitteeNotificationService
     {
-        void NotifyCommitteeMembersAboutNewSuggestion(ComiteeSuggestionCreatedDto createdDto);
+        void NotifyCommitteeMembersAboutNewSuggestion(CommitteeSuggestionCreatedDto createdDto);
     }
 }

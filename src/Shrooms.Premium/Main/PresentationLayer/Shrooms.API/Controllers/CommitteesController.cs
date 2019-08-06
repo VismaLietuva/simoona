@@ -129,7 +129,7 @@ namespace Shrooms.API.Controllers.WebApi
             try
             {
                 var created=_committeesService.PostSuggestion(modelDTO, GetUserAndOrganization().UserId);
-                _asyncRunner.Run<Premium.Main.PresentationLayer.Shrooms.API.BackgroundWorkers.ComiteeSuggestionNotifier>(notif =>
+                _asyncRunner.Run<Premium.Main.PresentationLayer.Shrooms.API.BackgroundWorkers.CommitteeSuggestionNotifier>(notif =>
                 {
                     notif.Notify(created);
                 }, GetOrganizationName());

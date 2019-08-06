@@ -145,7 +145,7 @@ namespace Shrooms.Domain.Services.Committees
             _unitOfWork.Save();
         }
 
-        public ComiteeSuggestionCreatedDto PostSuggestion(CommitteeSuggestionPostDTO modelDTO, string userId)
+        public CommitteeSuggestionCreatedDto PostSuggestion(CommitteeSuggestionPostDTO modelDTO, string userId)
         {
             var committee = _committeeRepository.Get(c => c.Id == modelDTO.CommitteeId, includeProperties: "Suggestions, Members").FirstOrDefault();
 
@@ -164,9 +164,9 @@ namespace Shrooms.Domain.Services.Committees
             _committeeRepository.Update(committee);
             _unitOfWork.Save();
 
-            return new ComiteeSuggestionCreatedDto
+            return new CommitteeSuggestionCreatedDto
             {
-                ComiteeId = committee.Id,
+                CommitteeId = committee.Id,
                 SuggestionId = suggestion.Id
             };
         }

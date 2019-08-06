@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Shrooms.DataTransferObjects.Models.Committees
 {
-    public class ComiteeSuggestionCreatedDto
+    public class CommitteeSuggestionCreatedDto
     {
-        public int ComiteeId { get; set; }
+        public int CommitteeId { get; set; }
         public int SuggestionId { get; set; }
     }
 }

@@ -37,9 +37,9 @@ namespace Shrooms.Domain.Services.Email.Committee
             _suggestionDbSet = uow.GetDbSet<CommitteeSuggestion>();
         }
 
-        public void NotifyCommitteeMembersAboutNewSuggestion(ComiteeSuggestionCreatedDto createdDto)
+        public void NotifyCommitteeMembersAboutNewSuggestion(CommitteeSuggestionCreatedDto createdDto)
         {
-            var committee = _committeeDbSet.Include(inc => inc.Members).Where(wh => wh.Id == createdDto.ComiteeId).FirstOrDefault();
+            var committee = _committeeDbSet.Include(inc => inc.Members).Where(wh => wh.Id == createdDto.CommitteeId).FirstOrDefault();
             if (committee == null)
             {
                 throw new ServiceException(Resources.Models.Committee.Committee.SuggestionCommiteNotFound);
@@ -47,7 +47,7 @@ namespace Shrooms.Domain.Services.Email.Committee
             var suggestion = _suggestionDbSet.Find(createdDto.SuggestionId);
             if(suggestion==null)
             {
-                throw new ServiceException($"Suggestion {createdDto.SuggestionId} for committee {createdDto.ComiteeId} not found");
+                throw new ServiceException($"Suggestion {createdDto.SuggestionId} for committee {createdDto.CommitteeId} not found");
             }
             NotifyCommitteeMembersAboutNewSuggestion(committee, suggestion);
         }
