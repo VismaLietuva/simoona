@@ -14,13 +14,13 @@ using Shrooms.DataLayer;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Kudos;
-using Shrooms.Domain.Services.Email.Kudos;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.DomainExceptions.Exceptions.Kudos;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
+using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.UnitTests.Extensions;
 
 namespace Shrooms.API.Tests.DomainService
@@ -57,13 +57,13 @@ namespace Shrooms.API.Tests.DomainService
 
             var uow2 = Substitute.For<IUnitOfWork>();
 
-            var kudosNotificationService = Substitute.For<IKudosNotificationService>();
             var kudosServiceValidation = MockServiceValidator();
             var permissionService = MockPermissionService();
             var roleService = Substitute.For<IRoleService>();
+            var asyncRunner = Substitute.For<IAsyncRunner>();
             MockRoleService(roleService);
 
-            _kudosService = new KudosService(_uow, uow2, roleService, permissionService, kudosServiceValidation, kudosNotificationService);
+            _kudosService = new KudosService(_uow, uow2, roleService, permissionService, kudosServiceValidation, asyncRunner);
         }
 
         #region GetKudosLogs
@@ -181,7 +181,7 @@ namespace Shrooms.API.Tests.DomainService
         [Test]
         public void Should_Return_Approved_Kudos_Logs_With_Organization_Filter()
         {
-            var test =_usersDbSet.Find("CreatedUserId");
+            var test = _usersDbSet.Find("CreatedUserId");
 
             MockKudosLogsForApprovedList();
             var result = _kudosService.GetApprovedKudosList("UserId", 1);

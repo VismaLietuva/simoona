@@ -16,6 +16,7 @@ using Shrooms.Domain.Services.Email.Book;
 using Shrooms.DomainExceptions.Exceptions.Book;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Books;
+using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Infrastructure.GoogleBookApiService;
 using Shrooms.Infrastructure.GoogleBookService;
 using Shrooms.UnitTests.Extensions;
@@ -57,8 +58,8 @@ namespace Shrooms.UnitTests.DomainService
             _validationService = Substitute.For<IBookMobileServiceValidator>();
             _bookInfoService = Substitute.For<IBookInfoService>();
             _bookServiceValidator = new BookServiceValidator();
-            var bookNotificationService = Substitute.For<IBooksNotificationService>();
-            _bookService = new BookService(uow, _bookInfoService, _bookServiceValidator, _validationService);
+            var asyncRunner = Substitute.For<IAsyncRunner>();
+            _bookService = new BookService(uow, _bookInfoService, _bookServiceValidator, _validationService, asyncRunner);
         }
 
         [Test]

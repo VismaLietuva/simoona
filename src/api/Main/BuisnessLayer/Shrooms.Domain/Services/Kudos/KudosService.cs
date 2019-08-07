@@ -23,6 +23,7 @@ using Shrooms.Domain.Services.Roles;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
+using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Resources;
 
 namespace Shrooms.Domain.Services.Kudos
@@ -35,14 +36,12 @@ namespace Shrooms.Domain.Services.Kudos
         private readonly IRoleService _roleService;
         private readonly IPermissionService _permissionService;
         private readonly IKudosServiceValidator _kudosServiceValidator;
-        private readonly IKudosNotificationService _kudosNotificationService;
-
+        private readonly IAsyncRunner _asyncRunner;
         private readonly IDbSet<KudosLog> _kudosLogsDbSet;
         private readonly IDbSet<KudosType> _kudosTypesDbSet;
         private readonly IDbSet<ApplicationUser> _usersDbSet;
         private readonly IRepository<KudosLog> _kudosLogRepository;
         private readonly IRepository<ApplicationUser> _applicationUserRepository;
-
         private Expression<Func<KudosType, bool>> _excludeNecessaryKudosTypes = x => x.Type != ConstBusinessLayer.KudosTypeEnum.Send &&
                               x.Type != ConstBusinessLayer.KudosTypeEnum.Minus &&
                               x.Type != ConstBusinessLayer.KudosTypeEnum.Other;
@@ -53,14 +52,13 @@ namespace Shrooms.Domain.Services.Kudos
             IRoleService roleService,
             IPermissionService permissionService,
             IKudosServiceValidator kudosServiceValidator,
-            IKudosNotificationService kudosNotificationService)
+            IAsyncRunner asyncRunner)
         {
             _uow = uow;
             _roleService = roleService;
             _permissionService = permissionService;
             _kudosServiceValidator = kudosServiceValidator;
-            _kudosNotificationService = kudosNotificationService;
-
+            _asyncRunner = asyncRunner;
             _kudosLogsDbSet = uow.GetDbSet<KudosLog>();
             _kudosTypesDbSet = uow.GetDbSet<KudosType>();
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
@@ -366,11 +364,11 @@ namespace Shrooms.Domain.Services.Kudos
             {
                 if (kudosLog.IsMinus())
                 {
-                    _kudosNotificationService.NotifyApprovedKudosDecreaseRecipient(kudosLog);
+                    _asyncRunner.Run<IKudosNotificationService>(n => n.NotifyApprovedKudosDecreaseRecipient(kudosLog), _uow.ConnectionName);
                 }
                 else
                 {
-                    _kudosNotificationService.NotifyApprovedKudosRecipient(kudosLog);
+                    _asyncRunner.Run<IKudosNotificationService>(n => n.NotifyApprovedKudosRecipient(kudosLog), _uow.ConnectionName);
                 }
             }
 
@@ -391,7 +389,7 @@ namespace Shrooms.Domain.Services.Kudos
 
             if (!kudosLog.IsRecipientDeleted())
             {
-                _kudosNotificationService.NotifyRejectedKudosLogSender(kudosLog);
+                _asyncRunner.Run<IKudosNotificationService>(n => n.NotifyRejectedKudosLogSender(kudosLog), _uow.ConnectionName);
             }
 
             _uow.SaveChanges(false);
@@ -471,7 +469,7 @@ namespace Shrooms.Domain.Services.Kudos
                 if (kudosDto.KudosType.Type == ConstBusinessLayer.KudosTypeEnum.Send)
                 {
                     kudosDto.ReceivingUser = receivingUser;
-                    _kudosNotificationService.NotifyAboutKudosSent(kudosDto);
+                    _asyncRunner.Run<IKudosNotificationService>(n => n.NotifyAboutKudosSent(kudosDto), _uow.ConnectionName);
                     UpdateProfileKudos(kudosDto.ReceivingUser, kudosLog);
                 }
             }

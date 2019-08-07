@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
-using Shrooms.API.BackgroundWorkers;
 using Shrooms.API.Filters;
 using Shrooms.API.Helpers;
 using Shrooms.Constants.Authorization.Permissions;
@@ -220,8 +219,7 @@ namespace Shrooms.API.Controllers.Book
             var userAndOrg = GetUserAndOrganization();
             try
             {
-                var bookDto = _bookService.TakeBook(bookOfficeId, userAndOrg);
-                _asyncRunner.Run<BookNotifier>(n=>n.Notify(bookDto), GetOrganizationName());
+                 _bookService.TakeBook(bookOfficeId, userAndOrg);
                 return Ok();
             }
             catch (BookException e)

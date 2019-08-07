@@ -13,8 +13,10 @@ using Shrooms.DataTransferObjects.Models.Books;
 using Shrooms.DataTransferObjects.Models.Books.BookDetails;
 using Shrooms.DataTransferObjects.Models.Books.BooksByOffice;
 using Shrooms.DataTransferObjects.Models.LazyPaged;
+using Shrooms.Domain.Services.Email.Book;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Books;
+using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Infrastructure.GoogleBookApiService;
 using Shrooms.Infrastructure.GoogleBookService;
 
@@ -31,7 +33,7 @@ namespace Shrooms.Domain.Services.Books
         private readonly IBookInfoService _bookInfoService;
         private readonly IBookServiceValidator _bookServiceValidator;
         private readonly IBookMobileServiceValidator _serviceValidator;
-
+        private readonly IAsyncRunner _asyncRunner;
         private readonly IDbSet<Book> _booksDbSet;
         private readonly IDbSet<Office> _officesDbSet;
         private readonly IDbSet<BookLog> _bookLogsDbSet;
@@ -42,7 +44,8 @@ namespace Shrooms.Domain.Services.Books
             IUnitOfWork2 uow,
             IBookInfoService bookInfoService,
             IBookServiceValidator bookServiceValidator,
-            IBookMobileServiceValidator bookMobileServiceValidator)
+            IBookMobileServiceValidator bookMobileServiceValidator,
+            IAsyncRunner asyncRunner)
         {
             _uow = uow;
             _booksDbSet = uow.GetDbSet<Book>();
@@ -54,6 +57,7 @@ namespace Shrooms.Domain.Services.Books
             _bookInfoService = bookInfoService;
             _bookServiceValidator = bookServiceValidator;
             _serviceValidator = bookMobileServiceValidator;
+            this._asyncRunner = asyncRunner;
         }
 
         public ILazyPaged<BooksByOfficeDTO> GetBooksByOffice(BooksByOfficeOptionsDTO options)
@@ -154,7 +158,7 @@ namespace Shrooms.Domain.Services.Books
             return retrievedBookDto;
         }
 
-        public TakenBookDTO TakeBook(int bookOfficeId, UserAndOrganizationDTO userAndOrg)
+        public void TakeBook(int bookOfficeId, UserAndOrganizationDTO userAndOrg)
         {
             var bookDTO = new BookTakeDTO
             {
@@ -162,10 +166,10 @@ namespace Shrooms.Domain.Services.Books
                 BookOfficeId = bookOfficeId,
                 OrganizationId = userAndOrg.OrganizationId
             };
-            return TakeBook(bookDTO);
+            TakeBook(bookDTO);
         }
 
-        public TakenBookDTO TakeBook(BookTakeDTO bookDTO)
+        public void TakeBook(BookTakeDTO bookDTO)
         {
             MobileBookOfficeLogsDTO officeBookWithLogs;
             lock (takeBookLock)
@@ -183,7 +187,7 @@ namespace Shrooms.Domain.Services.Books
                 BorrowBook(officeBookWithLogs, bookDTO);
             }
 
-            return new TakenBookDTO
+            var book = new TakenBookDTO
             {
                 UserId = bookDTO.ApplicationUserId,
                 OrganizationId = bookDTO.OrganizationId,
@@ -192,6 +196,7 @@ namespace Shrooms.Domain.Services.Books
                 Author = officeBookWithLogs.Author,
                 Title = officeBookWithLogs.Title
             };
+            _asyncRunner.Run<IBooksNotificationService>(n => n.SendEmail(book), _uow.ConnectionName);
         }
 
         public void ReturnBook(int bookOfficeId, UserAndOrganizationDTO userAndOrg)

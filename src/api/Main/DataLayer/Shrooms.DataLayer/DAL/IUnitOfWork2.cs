@@ -5,6 +5,7 @@ namespace Shrooms.DataLayer.DAL
 {
     public interface IUnitOfWork2
     {
+        string ConnectionName { get; }
         IDbSet<T> GetDbSet<T>()
             where T : class;
 

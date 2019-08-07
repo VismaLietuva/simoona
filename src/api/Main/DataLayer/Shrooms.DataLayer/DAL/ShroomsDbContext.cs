@@ -31,6 +31,7 @@ namespace Shrooms.DataLayer.DAL
         public ShroomsDbContext(string connectionStringName)
             : base(connectionStringName)
         {
+            ConnectionName = connectionStringName;
             Configuration.LazyLoadingEnabled = false;
             Configuration.ProxyCreationEnabled = false;
             Database.SetInitializer<ShroomsDbContext>(null);
@@ -130,6 +131,8 @@ namespace Shrooms.DataLayer.DAL
         public virtual DbSet<BadgeType> BadgeTypes { get; set; }
         public virtual DbSet<BadgeCategoryKudosType> BadgeCategoryKudosType { get; set; }
         public virtual DbSet<BadgeLog> BadgeLogs { get; set; }
+
+        public string ConnectionName { get; }
 
         public int SaveChanges(string userId)
         {
