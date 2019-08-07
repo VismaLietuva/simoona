@@ -12,7 +12,6 @@ using System.Web.Http;
 using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Domain.ServiceExceptions;
 using Shrooms.Domain.Services.Committees;
-using Shrooms.Infrastructure.FireAndForget;
 
 namespace Shrooms.API.Controllers.WebApi
 {
@@ -20,13 +19,11 @@ namespace Shrooms.API.Controllers.WebApi
     public class CommitteesController : AbstractWebApiController<Committee, CommitteeViewModel, CommitteePostViewModel>
     {
         private readonly ICommitteesService _committeesService;
-        private readonly IAsyncRunner _asyncRunner;
 
-        public CommitteesController(IMapper mapper, IUnitOfWork unitOfWork, ShroomsUserManager userManager, ShroomsRoleManager roleManager, ICommitteesService committeesService,IAsyncRunner asyncRunner )
+        public CommitteesController(IMapper mapper, IUnitOfWork unitOfWork, ShroomsUserManager userManager, ShroomsRoleManager roleManager, ICommitteesService committeesService)
             : base(mapper, unitOfWork, userManager, roleManager, "Created")
         {
             _committeesService = committeesService;
-            _asyncRunner = asyncRunner;
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Committees)]
@@ -128,12 +125,7 @@ namespace Shrooms.API.Controllers.WebApi
 
             try
             {
-                var created=_committeesService.PostSuggestion(modelDTO, GetUserAndOrganization().UserId);
-                _asyncRunner.Run<Premium.Main.PresentationLayer.Shrooms.API.BackgroundWorkers.CommitteeSuggestionNotifier>(notif =>
-                {
-                    notif.Notify(created);
-                }, GetOrganizationName());
-
+                _committeesService.PostSuggestion(modelDTO, GetUserAndOrganization().UserId);
             }
             catch (ServiceException ex)
             {

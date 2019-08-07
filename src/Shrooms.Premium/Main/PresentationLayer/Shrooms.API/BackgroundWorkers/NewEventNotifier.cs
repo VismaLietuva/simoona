@@ -19,28 +19,19 @@ namespace Shrooms.Premium.Main.PresentationLayer.Shrooms.API.BackgroundWorkers
     public class NewEventNotifier : IBackgroundWorker
     {
         private readonly IMapper _mapper;
-        private readonly ILogger _logger;
         private readonly INotificationService _notificationService;
 
-        public NewEventNotifier(ILogger logger, INotificationService notificationService, IMapper mapper)
+        public NewEventNotifier(INotificationService notificationService, IMapper mapper)
         {
-            _logger = logger;
             _notificationService = notificationService;
             _mapper = mapper;
         }
 
         public void Notify(CreateEventDto eventDto, UserAndOrganizationHubDto userAndOrganizationHubDto)
         {
-            try
-            {
-                var notification = _notificationService.CreateForEvent(userAndOrganizationHubDto, eventDto).GetAwaiter().GetResult();
+            var notification = _notificationService.CreateForEvent(userAndOrganizationHubDto, eventDto).GetAwaiter().GetResult();
 
-                NotificationHub.SendNotificationToAllUsers(_mapper.Map<NotificationViewModel>(notification), userAndOrganizationHubDto);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex);
-            }
+            NotificationHub.SendNotificationToAllUsers(_mapper.Map<NotificationViewModel>(notification), userAndOrganizationHubDto);
         }
     }
 }

@@ -43,7 +43,6 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
         private readonly IEventParticipationService _eventParticipationService;
         private readonly IEventExportService _eventExportService;
         private readonly IPostService _postService;
-        private readonly IWallService _wallService;
         private readonly IOfficeMapService _officeMapService;
         private readonly IAsyncRunner _asyncRunner;
 
@@ -56,7 +55,6 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
             IEventParticipationService eventParticipationService,
             IEventExportService eventExportService,
             IPostService postService,
-            IWallService wallService,
             IOfficeMapService officeMapService,
             IAsyncRunner asyncRunner)
         {
@@ -67,7 +65,6 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
             _eventParticipationService = eventParticipationService;
             _eventExportService = eventExportService;
             _postService = postService;
-            _wallService = wallService;
             _officeMapService = officeMapService;
             _asyncRunner = asyncRunner;
         }
@@ -342,10 +339,7 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
         {
             try
             {
-                var usrOrg = GetUserAndOrganization();
-                var changesDto = _eventParticipationService.Expel(eventId, GetUserAndOrganization(), userId);
-                _asyncRunner.Run<RemovedParticipantsNotifier>(ntf => ntf.NotifyOnUserRemoval(changesDto, usrOrg), GetOrganizationName());
-
+                _eventParticipationService.Expel(eventId, GetUserAndOrganization(), userId);
                 return Ok();
             }
             catch (EventException e)
@@ -375,9 +369,7 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
         {
             try
             {
-                var usrOrg = GetUserAndOrganization();
-                var changesDto = _eventParticipationService.ResetAttendees(eventId, GetUserAndOrganization());
-                _asyncRunner.Run<RemovedParticipantsNotifier>(ntf => ntf.NotifyOnEventReset(changesDto, usrOrg), GetOrganizationName());
+                _eventParticipationService.ResetAttendees(eventId, GetUserAndOrganization());
                 return Ok();
             }
             catch (EventException e)

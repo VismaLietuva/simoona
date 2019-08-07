@@ -13,11 +13,11 @@ namespace Shrooms.Domain.Services.Events.Participation
 
         void Leave(Guid eventId, UserAndOrganizationDTO userOrg);
 
-        EventParticipantsChangeDto ResetAttendees(Guid eventId, UserAndOrganizationDTO userOrg);
+        void ResetAttendees(Guid eventId, UserAndOrganizationDTO userOrg);
 
         IEnumerable<string> GetParticipantsEmailsIncludingHost(Guid eventId);
 
-        EventParticipantsChangeDto Expel(Guid eventId, UserAndOrganizationDTO userOrg, string userId);
+        void Expel(Guid eventId, UserAndOrganizationDTO userOrg, string userId);
 
         IEnumerable<EventParticipantDTO> GetEventParticipants(Guid eventId, UserAndOrganizationDTO userAndOrg);
 

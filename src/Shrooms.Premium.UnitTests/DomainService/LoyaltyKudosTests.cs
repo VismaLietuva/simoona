@@ -8,6 +8,7 @@ using Shrooms.DataLayer.DAL;
 using Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
+using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Infrastructure.Logger;
 using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Email.Kudos;
 using Shrooms.UnitTests.Extensions;
@@ -34,8 +35,8 @@ namespace Shrooms.UnitTests.DomainService
             _organizationsDbSet = uow.MockDbSet<Organization>();
 
             var loggerMock = Substitute.For<ILogger>();
-
-            _loyaltyKudosService = new LoyaltyKudosService(uow, loggerMock);
+            var asyncRunner = Substitute.For<IAsyncRunner>();
+            _loyaltyKudosService = new LoyaltyKudosService(uow, loggerMock, asyncRunner);
         }
 
         [Test]

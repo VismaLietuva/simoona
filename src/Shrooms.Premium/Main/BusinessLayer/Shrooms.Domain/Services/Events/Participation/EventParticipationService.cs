@@ -12,6 +12,7 @@ using Shrooms.Domain.Services.Wall;
 using Shrooms.DomainServiceValidators.Validators.Events;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Events;
+using Shrooms.Infrastructure.FireAndForget;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -37,6 +38,7 @@ namespace Shrooms.Domain.Services.Events.Participation
         private readonly IEventCalendarService _calendarService;
         private readonly IEventValidationService _eventValidationService;
         private readonly IWallService _wallService;
+        private readonly IAsyncRunner _asyncRunner;
 
         public EventParticipationService(
             IUnitOfWork2 uow,
@@ -45,7 +47,8 @@ namespace Shrooms.Domain.Services.Events.Participation
             IPermissionService permissionService,
             IEventCalendarService calendarService,
             IEventValidationService eventValidationService,
-            IWallService wallService)
+            IWallService wallService,
+            IAsyncRunner asyncRunner)
         {
             _uow = uow;
             _eventsDbSet = _uow.GetDbSet<Event>();
@@ -58,9 +61,10 @@ namespace Shrooms.Domain.Services.Events.Participation
             _eventValidationService = eventValidationService;
             _roleService = roleService;
             _wallService = wallService;
+            _asyncRunner = asyncRunner;
         }
 
-        public EventParticipantsChangeDto ResetAttendees(Guid eventId, UserAndOrganizationDTO userOrg)
+        public void ResetAttendees(Guid eventId, UserAndOrganizationDTO userOrg)
         {
             var @event = _eventsDbSet
                 .Include(e => e.EventParticipants)
@@ -91,12 +95,9 @@ namespace Shrooms.Domain.Services.Events.Participation
             }
 
             _uow.SaveChanges(false);
-            return new EventParticipantsChangeDto
-            {
-                EventId = @event.Id,
-                EventName = @event.Name,
-                RemovedUsers = users
-            };
+
+            _asyncRunner.Run<IEventNotificationService>(n=>n.NotifyRemovedEventParticipants(@event.Name,@event.Id, userOrg.OrganizationId,users), _uow.ConnectionName);
+            _asyncRunner.Run<IEventCalendarService>(n => n.ResetParticipants(@event.Id, userOrg.OrganizationId), _uow.ConnectionName);
         }
 
         public void Join(EventJoinDTO joinDto)
@@ -220,7 +221,7 @@ namespace Shrooms.Domain.Services.Events.Participation
             return users;
         }
 
-        public EventParticipantsChangeDto Expel(Guid eventId, UserAndOrganizationDTO userOrg, string userId)
+        public void Expel(Guid eventId, UserAndOrganizationDTO userOrg, string userId)
         {
             var participant = GetParticipant(eventId, userOrg.OrganizationId, userId);
             var @event = participant.Event;
@@ -233,12 +234,8 @@ namespace Shrooms.Domain.Services.Events.Participation
 
             JoinLeaveEventWall(@event.ResponsibleUserId, userId, @event.WallId, userOrg);
 
-            return new EventParticipantsChangeDto
-            {
-                EventId = @event.Id,
-                EventName = @event.Name,
-                RemovedUsers = new List<string> { userId }
-            };
+            _asyncRunner.Run<IEventCalendarService>(n => n.RemoveParticipants(@event.Id, userOrg.OrganizationId, new [] { userId }), _uow.ConnectionName);
+            _asyncRunner.Run<IEventNotificationService>(n=>n.NotifyRemovedEventParticipants(@event.Name,@event.Id, userOrg.OrganizationId,new[] { userId}),_uow.ConnectionName);
         }
 
         public void Leave(Guid eventId, UserAndOrganizationDTO userOrg)

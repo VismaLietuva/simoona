@@ -12,6 +12,7 @@ using Shrooms.Domain.Services.Email.ServiceRequest;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
+using Shrooms.Infrastructure.FireAndForget;
 using static Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes.ErrorCodes;
 
 namespace Shrooms.Domain.Services.ServiceRequests
@@ -29,10 +30,12 @@ namespace Shrooms.Domain.Services.ServiceRequests
         private readonly IDbSet<ServiceRequestStatus> _serviceRequestStatusDbSet;
         private readonly IDbSet<ApplicationUser> _userDbSet;
         private readonly IPermissionService _permissionService;
+        private readonly IAsyncRunner _asyncRunner;
 
         public ServiceRequestService(
             IUnitOfWork2 uow,
-            IPermissionService permissionService)
+            IPermissionService permissionService,
+            IAsyncRunner asyncRunner)
         {
             _uow = uow;
             _serviceRequestsDbSet = _uow.GetDbSet<ServiceRequest>();
@@ -42,9 +45,10 @@ namespace Shrooms.Domain.Services.ServiceRequests
             _serviceRequestStatusDbSet = _uow.GetDbSet<ServiceRequestStatus>();
             _userDbSet = _uow.GetDbSet<ApplicationUser>();
             _permissionService = permissionService;
+            _asyncRunner = asyncRunner;
         }
 
-        public CreatedServiceRequestDTO CreateNewServiceRequest(ServiceRequestDTO newServiceRequestDTO, UserAndOrganizationDTO userAndOrganizationDTO)
+        public void CreateNewServiceRequest(ServiceRequestDTO newServiceRequestDTO, UserAndOrganizationDTO userAndOrganizationDTO)
         {
             ValidateServiceRequestForCreate(newServiceRequestDTO);
 
@@ -88,10 +92,11 @@ namespace Shrooms.Domain.Services.ServiceRequests
             _serviceRequestsDbSet.Add(serviceRequest);
             _uow.SaveChanges(false);
 
-            return new CreatedServiceRequestDTO { ServiceRequestId = serviceRequest.Id };
+            var srqDto = new CreatedServiceRequestDTO { ServiceRequestId = serviceRequest.Id };
+            _asyncRunner.Run<IServiceRequestNotificationService>(n => n.NotifyAboutNewServiceRequest(srqDto), _uow.ConnectionName);
         }
 
-        public UpdatedServiceRequestDTO MoveRequestToDone(int requestId, UserAndOrganizationDTO userAndOrganizationDTO)
+        public void MoveRequestToDone(int requestId, UserAndOrganizationDTO userAndOrganizationDTO)
         {
             var serviceRequest = _serviceRequestsDbSet
                 .Include(x => x.Status)
@@ -118,10 +123,11 @@ namespace Shrooms.Domain.Services.ServiceRequests
 
             _uow.SaveChanges(false);
 
-            return new UpdatedServiceRequestDTO { ServiceRequestId = requestId, NewStatusId = serviceRequest.StatusId };
+            var statusDto = new UpdatedServiceRequestDTO { ServiceRequestId = requestId, NewStatusId = serviceRequest.StatusId };
+            _asyncRunner.Run<IServiceRequestNotificationService>(n => n.NotifyAboutServiceRequestStatusUpdate(statusDto, userAndOrganizationDTO), _uow.ConnectionName);
         }
 
-        public UpdatedServiceRequestDTO UpdateServiceRequest(ServiceRequestDTO serviceRequestDTO, UserAndOrganizationDTO userAndOrganizationDTO)
+        public void UpdateServiceRequest(ServiceRequestDTO serviceRequestDTO, UserAndOrganizationDTO userAndOrganizationDTO)
         {
             var serviceRequest = _serviceRequestsDbSet
                 .Include(x => x.Status)
@@ -163,14 +169,18 @@ namespace Shrooms.Domain.Services.ServiceRequests
 
             _uow.SaveChanges(false);
 
-            return new UpdatedServiceRequestDTO
+            if (statusHasBeenChanged)
             {
-                ServiceRequestId = serviceRequestDTO.Id,
-                NewStatusId = statusHasBeenChanged ? serviceRequest.StatusId : default(int?)
-            };
+                var statusDto = new UpdatedServiceRequestDTO
+                {
+                    ServiceRequestId = serviceRequestDTO.Id,
+                    NewStatusId = serviceRequest.StatusId
+                };
+                _asyncRunner.Run<IServiceRequestNotificationService>(n => n.NotifyAboutServiceRequestStatusUpdate(statusDto, userAndOrganizationDTO), _uow.ConnectionName);
+            }
         }
 
-        public ServiceRequestCreatedCommentDTO CreateComment(ServiceRequestCommentDTO comment, UserAndOrganizationDTO userAndOrganizationDTO)
+        public void CreateComment(ServiceRequestCommentDTO comment, UserAndOrganizationDTO userAndOrganizationDTO)
         {
             var serviceRequest = _serviceRequestsDbSet
                     .Where(x => x.Id == comment.ServiceRequestId &&
@@ -199,12 +209,13 @@ namespace Shrooms.Domain.Services.ServiceRequests
             _serviceRequestCommentsDbSet.Add(serviceRequestComment);
             _uow.SaveChanges(false);
 
-            return new ServiceRequestCreatedCommentDTO
+            var createdComment = new ServiceRequestCreatedCommentDTO
             {
                 ServiceRequestId = comment.ServiceRequestId,
                 CommentedEmployeeId = serviceRequestComment.EmployeeId,
                 CommentContent = serviceRequestComment.Content
             };
+            _asyncRunner.Run<IServiceRequestNotificationService>(n => n.NotifyAboutNewComment(createdComment), _uow.ConnectionName);
         }
 
         public IEnumerable<ServiceRequestCategoryDTO> GetCategories()
@@ -293,10 +304,10 @@ namespace Shrooms.Domain.Services.ServiceRequests
             if (category == null)
             {
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Service request category does not exist");
-            }            
-            
+            }
+
             _serviceRequestCategoryDbSet.Remove(category);
-            _uow.SaveChanges(userId);            
+            _uow.SaveChanges(userId);
         }
 
         private List<string> GetCategoryAssignees(string categoryName)

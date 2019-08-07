@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using Shrooms.DataTransferObjects.Models;
+using Shrooms.Infrastructure.FireAndForget;
 
 namespace Shrooms.Domain.Services.Committees
 {
@@ -20,6 +21,7 @@ namespace Shrooms.Domain.Services.Committees
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUnitOfWork2 _uow;
+        private readonly IAsyncRunner _asyncRunner;
         private readonly IDbSet<ApplicationUser> _usersDbSet;
         private readonly IDbSet<Committee> _committteeDbSet;
         private readonly IRepository<ApplicationUser> _applicationUserRepository;
@@ -29,13 +31,15 @@ namespace Shrooms.Domain.Services.Committees
         public CommitteesService(
             IMapper mapper,
             IUnitOfWork unitOfWork,
-            IUnitOfWork2 uow)
+            IUnitOfWork2 uow,
+            IAsyncRunner asyncRunner)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _applicationUserRepository = _unitOfWork.GetRepository<ApplicationUser>();
             _committeeRepository = _unitOfWork.GetRepository<Committee>();
             _uow = uow;
+            _asyncRunner = asyncRunner;
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
             _committteeDbSet = uow.GetDbSet<Committee>();
         }
@@ -145,7 +149,7 @@ namespace Shrooms.Domain.Services.Committees
             _unitOfWork.Save();
         }
 
-        public CommitteeSuggestionCreatedDto PostSuggestion(CommitteeSuggestionPostDTO modelDTO, string userId)
+        public void PostSuggestion(CommitteeSuggestionPostDTO modelDTO, string userId)
         {
             var committee = _committeeRepository.Get(c => c.Id == modelDTO.CommitteeId, includeProperties: "Suggestions, Members").FirstOrDefault();
 
@@ -164,11 +168,12 @@ namespace Shrooms.Domain.Services.Committees
             _committeeRepository.Update(committee);
             _unitOfWork.Save();
 
-            return new CommitteeSuggestionCreatedDto
+            var suggestionDto= new CommitteeSuggestionCreatedDto
             {
                 CommitteeId = committee.Id,
                 SuggestionId = suggestion.Id
             };
+            _asyncRunner.Run<ICommitteeNotificationService>(n=>n.NotifyCommitteeMembersAboutNewSuggestion(suggestionDto), _uow.ConnectionName);
         }
 
         public IEnumerable<CommitteeSuggestionViewDTO> GetCommitteeSuggestions(int id)
