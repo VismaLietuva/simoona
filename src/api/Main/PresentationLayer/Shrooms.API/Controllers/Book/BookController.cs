@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
+using Shrooms.API.BackgroundWorkers;
 using Shrooms.API.Filters;
 using Shrooms.API.Helpers;
 using Shrooms.Constants.Authorization.Permissions;
@@ -13,6 +14,7 @@ using Shrooms.DataTransferObjects.Models.Books.BooksByOffice;
 using Shrooms.DataTransferObjects.Models.LazyPaged;
 using Shrooms.Domain.Services.Books;
 using Shrooms.DomainExceptions.Exceptions.Book;
+using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.WebViewModels.Models.Book.BookDetails;
 using Shrooms.WebViewModels.Models.Book.BooksByOffice;
 
@@ -24,11 +26,13 @@ namespace Shrooms.API.Controllers.Book
     {
         private readonly IMapper _mapper;
         private readonly IBookService _bookService;
+        private readonly IAsyncRunner _asyncRunner;
 
-        public BookController(IMapper mapper, IBookService bookService)
+        public BookController(IMapper mapper, IBookService bookService, IAsyncRunner asyncRunner)
         {
             _mapper = mapper;
             _bookService = bookService;
+            _asyncRunner = asyncRunner;
         }
 
         [HttpPost]
@@ -216,7 +220,8 @@ namespace Shrooms.API.Controllers.Book
             var userAndOrg = GetUserAndOrganization();
             try
             {
-                _bookService.TakeBook(bookOfficeId, userAndOrg);
+                var bookDto = _bookService.TakeBook(bookOfficeId, userAndOrg);
+                _asyncRunner.Run<BookNotifier>(n=>n.Notify(bookDto), GetOrganizationName());
                 return Ok();
             }
             catch (BookException e)

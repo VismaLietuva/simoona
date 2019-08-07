@@ -58,7 +58,7 @@ namespace Shrooms.UnitTests.DomainService
             _bookInfoService = Substitute.For<IBookInfoService>();
             _bookServiceValidator = new BookServiceValidator();
             var bookNotificationService = Substitute.For<IBooksNotificationService>();
-            _bookService = new BookService(uow, _bookInfoService, _bookServiceValidator, bookNotificationService, _validationService);
+            _bookService = new BookService(uow, _bookInfoService, _bookServiceValidator, _validationService);
         }
 
         [Test]

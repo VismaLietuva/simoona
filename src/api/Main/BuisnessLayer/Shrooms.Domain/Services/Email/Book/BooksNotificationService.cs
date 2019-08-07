@@ -31,26 +31,28 @@ namespace Shrooms.Domain.Services.Email.Book
             _organizationsDbSet = uow.GetDbSet<Organization>();
         }
 
-        public void SendEmail(BookLog bookLog, MobileBookOfficeLogsDTO bookOffice)
+        public void SendEmail(TakenBookDTO takenBook)
         {
             var organizationName = _organizationsDbSet
-                .Where(organization => organization.Id == bookLog.OrganizationId)
+                .Where(organization => organization.Id == takenBook.OrganizationId)
                 .Select(organization => organization.ShortName)
                 .FirstOrDefault();
 
             var userEmail = _usersDbSet
-                .Where(u => u.Id == bookLog.ApplicationUserId)
+                .Where(u => u.Id == takenBook.UserId)
                 .Select(u => u.Email)
                 .First();
 
             var subject = Resources.Models.Books.Books.EmailSubject;
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organizationName);
-            var bookUrl = _appSettings.BookUrl(organizationName, bookOffice.BookOfficeId, bookOffice.OfficeId);
+            var bookUrl = _appSettings.BookUrl(organizationName, takenBook.BookOfficeId, takenBook.OfficeId);
 
-            var emailTemplateViewModel = new BookTakenEmailTemplateViewModel(userNotificationSettingsUrl, bookOffice.Title, bookOffice.Author, bookUrl);
+            var emailTemplateViewModel = new BookTakenEmailTemplateViewModel(userNotificationSettingsUrl, takenBook.Title, takenBook.Author, bookUrl);
             var body = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.BookTaken);
 
             _mailingService.SendEmail(new EmailDto(userEmail, subject, body));
         }
+
+
     }
 }

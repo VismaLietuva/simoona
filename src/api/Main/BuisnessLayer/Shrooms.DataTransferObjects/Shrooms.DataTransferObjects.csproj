@@ -132,6 +132,7 @@
     <Compile Include="Models\Books\MobileBookOfficeLogsDTO.cs" />
     <Compile Include="Models\Books\OfficeBookDTO.cs" />
     <Compile Include="Models\Books\RetrievedBookInfoDTO.cs" />
+    <Compile Include="Models\Books\TakenBookDTO.cs" />
     <Compile Include="Models\Emails\EmailDto.cs" />
     <Compile Include="Models\Emails\EmailSendingDTO.cs" />
     <Compile Include="Models\ExternalLinks\AddEditDeleteExternalLinkDTO.cs" />

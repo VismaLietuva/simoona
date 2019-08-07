@@ -1,25 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Hosting;
 using System.Web.Http.Results;
-using AutoMapper;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.API.Controllers.Book;
-using Shrooms.API.Controllers.WebApi;
 using Shrooms.DataTransferObjects.Models;
-using Shrooms.DataTransferObjects.Models.Books.BookDetails;
 using Shrooms.DataTransferObjects.Models.LazyPaged;
 using Shrooms.Domain.Services.Books;
 using Shrooms.DomainExceptions.Exceptions.Book;
+using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.UnitTests.ModelMappings;
 using Shrooms.WebViewModels.Models.Book.BookDetails;
 using Shrooms.WebViewModels.Models.Book.BooksByOffice;
@@ -36,8 +30,9 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         public void TestInitializer()
         {
             _bookService = Substitute.For<IBookService>();
+            var asyncRunner = Substitute.For<IAsyncRunner>();
 
-            _bookController = new BookController(ModelMapper.Create(), _bookService);
+            _bookController = new BookController(ModelMapper.Create(), _bookService, asyncRunner);
             _bookController.ControllerContext = Substitute.For<HttpControllerContext>();
             _bookController.Request = new HttpRequestMessage();
             _bookController.Request.Properties.Add(HttpPropertyKeys.HttpConfigurationKey, new HttpConfiguration());

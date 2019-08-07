@@ -13,7 +13,6 @@ using Shrooms.DataTransferObjects.Models.Books;
 using Shrooms.DataTransferObjects.Models.Books.BookDetails;
 using Shrooms.DataTransferObjects.Models.Books.BooksByOffice;
 using Shrooms.DataTransferObjects.Models.LazyPaged;
-using Shrooms.Domain.Services.Email.Book;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Books;
 using Shrooms.Infrastructure.GoogleBookApiService;
@@ -24,9 +23,7 @@ namespace Shrooms.Domain.Services.Books
     public class BookService : IBookService
     {
         private const int LastPage = 1;
-        private const int OneMonth = 1;
         private const int BookQuantityZero = 0;
-        private const int ReservationExtensionInMonths = 1;
         private static object newBookLock = new object();
         private static object takeBookLock = new object();
 
@@ -34,7 +31,6 @@ namespace Shrooms.Domain.Services.Books
         private readonly IBookInfoService _bookInfoService;
         private readonly IBookServiceValidator _bookServiceValidator;
         private readonly IBookMobileServiceValidator _serviceValidator;
-        private readonly IBooksNotificationService _bookNotificationService;
 
         private readonly IDbSet<Book> _booksDbSet;
         private readonly IDbSet<Office> _officesDbSet;
@@ -46,7 +42,6 @@ namespace Shrooms.Domain.Services.Books
             IUnitOfWork2 uow,
             IBookInfoService bookInfoService,
             IBookServiceValidator bookServiceValidator,
-            IBooksNotificationService bookNotificationService,
             IBookMobileServiceValidator bookMobileServiceValidator)
         {
             _uow = uow;
@@ -59,7 +54,6 @@ namespace Shrooms.Domain.Services.Books
             _bookInfoService = bookInfoService;
             _bookServiceValidator = bookServiceValidator;
             _serviceValidator = bookMobileServiceValidator;
-            _bookNotificationService = bookNotificationService;
         }
 
         public ILazyPaged<BooksByOfficeDTO> GetBooksByOffice(BooksByOfficeOptionsDTO options)
@@ -160,7 +154,7 @@ namespace Shrooms.Domain.Services.Books
             return retrievedBookDto;
         }
 
-        public void TakeBook(int bookOfficeId, UserAndOrganizationDTO userAndOrg)
+        public TakenBookDTO TakeBook(int bookOfficeId, UserAndOrganizationDTO userAndOrg)
         {
             var bookDTO = new BookTakeDTO
             {
@@ -168,10 +162,10 @@ namespace Shrooms.Domain.Services.Books
                 BookOfficeId = bookOfficeId,
                 OrganizationId = userAndOrg.OrganizationId
             };
-            TakeBook(bookDTO);
+            return TakeBook(bookDTO);
         }
 
-        public void TakeBook(BookTakeDTO bookDTO)
+        public TakenBookDTO TakeBook(BookTakeDTO bookDTO)
         {
             MobileBookOfficeLogsDTO officeBookWithLogs;
             lock (takeBookLock)
@@ -188,6 +182,16 @@ namespace Shrooms.Domain.Services.Books
 
                 BorrowBook(officeBookWithLogs, bookDTO);
             }
+
+            return new TakenBookDTO
+            {
+                UserId = bookDTO.ApplicationUserId,
+                OrganizationId = bookDTO.OrganizationId,
+                BookOfficeId = bookDTO.BookOfficeId,
+                OfficeId = officeBookWithLogs.OfficeId,
+                Author = officeBookWithLogs.Author,
+                Title = officeBookWithLogs.Title
+            };
         }
 
         public void ReturnBook(int bookOfficeId, UserAndOrganizationDTO userAndOrg)
@@ -480,8 +484,6 @@ namespace Shrooms.Domain.Services.Books
 
             _bookLogsDbSet.Add(bookLog);
             _uow.SaveChanges(false);
-
-            _bookNotificationService.SendEmail(bookLog, officeBookWithLogs);
         }
     }
 }
