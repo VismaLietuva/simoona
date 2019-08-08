@@ -228,6 +228,7 @@
     <Compile Include="Entities\KudosLogTests.cs" />
     <Compile Include="Extensions\MockingExtensions.cs" />
     <Compile Include="helpers\CustomUrlHelperTest.cs" />
+    <Compile Include="Infrastructure\MailTemplateTests.cs" />
     <Compile Include="Mocks\TestDbAsyncQueryProvider{TEntity}.cs" />
     <Compile Include="ModelMappings\AutoMapperTests.cs" />
     <Compile Include="Mocks\MockPasswordHasher.cs" />
