@@ -15,25 +15,16 @@ namespace Shrooms.Premium.Main.PresentationLayer.Shrooms.API.BackgroundWorkers
 {
     public class SharedEventNotifier : IBackgroundWorker
     {
-        private readonly ILogger _logger;
         private readonly IWallService _wallService;
-        public SharedEventNotifier(ILogger logger, IWallService wallService)
+        public SharedEventNotifier(IWallService wallService)
         {
-            _logger = logger;
             _wallService = wallService;
         }
 
         public void Notify(NewPostDTO postModel, NewlyCreatedPostDTO createdPost, UserAndOrganizationHubDto userHubDto)
         {
-            try
-            {
-                var membersToNotify = _wallService.GetWallMembersIds(postModel.WallId, postModel);
-                NotificationHub.SendWallNotification(postModel.WallId, membersToNotify, createdPost.WallType, userHubDto);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex);
-            }
+            var membersToNotify = _wallService.GetWallMembersIds(postModel.WallId, postModel);
+            NotificationHub.SendWallNotification(postModel.WallId, membersToNotify, createdPost.WallType, userHubDto);
         }
     }
 }

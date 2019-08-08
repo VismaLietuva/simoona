@@ -5,6 +5,6 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos
 {
     public interface ILoyaltyKudosService
     {
-        List<AwardedKudosEmployeeDTO> AwardEmployeesWithKudos(string organizationName);
+        void AwardEmployeesWithKudos(string organizationName);
     }
 }

@@ -101,9 +101,6 @@ namespace Shrooms.Domain.Services.Email.ServiceRequest
             UpdatedServiceRequestDTO updatedRequest,
             UserAndOrganizationDTO userAndOrganizationDTO)
         {
-            if (!updatedRequest.NewStatusId.HasValue)
-                return;
-
             var serviceRequest = _serviceRequestDbSet.Single(s => s.Id == updatedRequest.ServiceRequestId);
             var newStatusName = _serviceRequestStatusDbSet.Where(x => x.Id == serviceRequest.StatusId).Select(x => x.Title).First();
 

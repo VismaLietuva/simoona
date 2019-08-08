@@ -15,12 +15,10 @@ namespace Shrooms.Premium.Main.PresentationLayer.Shrooms.API.Controllers
     public class ExternalPremiumJobsController : BaseController
     {
         private readonly IWebHookCallbackPremiumServices _webHookService;
-        private readonly IAsyncRunner _asyncRunner;
 
-        public ExternalPremiumJobsController(IWebHookCallbackPremiumServices webHookService, IAsyncRunner asyncRunner)
+        public ExternalPremiumJobsController(IWebHookCallbackPremiumServices webHookService)
         {
             _webHookService = webHookService;
-            _asyncRunner = asyncRunner;
         }
 
         [HttpPost]
@@ -35,8 +33,7 @@ namespace Shrooms.Premium.Main.PresentationLayer.Shrooms.API.Controllers
         public void GiveLoyaltyKudos()
         {
             string orgName = GetOrganizationName();
-            var awardedEmployees=_webHookService.LoyaltyKudos.AwardEmployeesWithKudos(orgName);
-            _asyncRunner.Run<KudosAwardNotifier>(ntf => ntf.Notify(awardedEmployees),orgName);
+            _webHookService.LoyaltyKudos.AwardEmployeesWithKudos(orgName);
 
             var cache = Configuration.CacheOutputConfiguration().GetCacheOutputProvider(Request);
             cache.RemoveStartsWith(Configuration.CacheOutputConfiguration().MakeBaseCachekey((KudosController t) => t.GetLastKudosLogRecords()));

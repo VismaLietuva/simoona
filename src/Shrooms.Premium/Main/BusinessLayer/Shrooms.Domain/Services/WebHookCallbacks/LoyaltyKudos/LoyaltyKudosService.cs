@@ -1,6 +1,7 @@
 ﻿using Shrooms.DataLayer.DAL;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
+using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Infrastructure.Logger;
 using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Email.Kudos;
@@ -21,13 +22,13 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos
         private readonly IDbSet<KudosType> _kudosTypesDbSet;
         private readonly IDbSet<ApplicationUser> _usersDbSet;
         private readonly IDbSet<Organization> _organizationsDbSet;
-
         private readonly ILogger _logger;
+        private readonly IAsyncRunner _asyncRunner;
 
-        public LoyaltyKudosService(IUnitOfWork2 uow, ILogger logger)
+        public LoyaltyKudosService(IUnitOfWork2 uow, ILogger logger,IAsyncRunner asyncRunner)
         {
             _logger = logger;
-
+            _asyncRunner = asyncRunner;
             _uow = uow;
             _kudosLogsDbSet = uow.GetDbSet<KudosLog>();
             _kudosTypesDbSet = uow.GetDbSet<KudosType>();
@@ -35,9 +36,9 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos
             _organizationsDbSet = uow.GetDbSet<Organization>();
         }
 
-        public List<AwardedKudosEmployeeDTO> AwardEmployeesWithKudos(string organizationName)
+        public void AwardEmployeesWithKudos(string organizationName)
         {
-            var result = new List<AwardedKudosEmployeeDTO>();
+            var awardedEmployees = new List<AwardedKudosEmployeeDTO>();
             lock (concurrencyLock)
             {
                 if (string.IsNullOrEmpty(organizationName))
@@ -58,7 +59,7 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos
                 var kudosYearlyMultipliers = ParseKudosYearlyMultipliersString(organization.KudosYearlyMultipliers);
                 if (kudosYearlyMultipliers == null)
                 {
-                    return result;
+                    return;
                 }
 
                 var loyaltyType = _kudosTypesDbSet
@@ -94,7 +95,7 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos
                             if (loyaltyKudosLog != null)
                             {
                                 _kudosLogsDbSet.Add(loyaltyKudosLog);
-                                result.Add(MapTo(loyaltyKudosLog));
+                                awardedEmployees.Add(MapTo(loyaltyKudosLog));
                             }
                         }
                     }
@@ -105,7 +106,7 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos
                 }
 
                 _uow.SaveChanges(false);
-                return result;
+                _asyncRunner.Run<IKudosPremiumNotificationService>(ntf => ntf.SendLoyaltyBotNotification(awardedEmployees), _uow.ConnectionName);
             }
         }
 

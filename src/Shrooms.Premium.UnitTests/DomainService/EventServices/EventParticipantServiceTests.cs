@@ -14,6 +14,7 @@ using Shrooms.DomainExceptions.Exceptions.Event;
 using Shrooms.DomainServiceValidators.Validators.Events;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Events;
+using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Infrastructure.SystemClock;
 using Shrooms.UnitTests.Extensions;
 using System;
@@ -65,7 +66,7 @@ namespace Shrooms.UnitTests.DomainService.EventServices
             var roleService = Substitute.For<IRoleService>();
             MockRoleService(roleService);
             _wallService = Substitute.For<IWallService>();
-
+            var asyncRunner = Substitute.For<IAsyncRunner>();
             _eventParticipationService = 
                 new EventParticipationService(
                     _uow2,
@@ -74,7 +75,8 @@ namespace Shrooms.UnitTests.DomainService.EventServices
                     permissionService,
                     calendarService,
                     _eventValidationServiceMock,
-                    _wallService);
+                    _wallService,
+                    asyncRunner);
         }
 
         [Test]

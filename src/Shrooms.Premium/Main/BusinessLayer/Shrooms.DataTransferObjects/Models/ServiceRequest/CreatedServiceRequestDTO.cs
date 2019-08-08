@@ -13,7 +13,7 @@ namespace Shrooms.DataTransferObjects.Models.ServiceRequest
 
     public class UpdatedServiceRequestDTO : CreatedServiceRequestDTO
     {
-        public int? NewStatusId { get; set; }
+        public int NewStatusId { get; set; }
     }
 
     public class ServiceRequestCreatedCommentDTO : CreatedServiceRequestDTO

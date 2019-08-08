@@ -15,6 +15,7 @@ using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.Infrastructure.Configuration;
 using Shrooms.Infrastructure.Email;
+using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.UnitTests.Extensions;
 
 namespace Shrooms.UnitTests.DomainService
@@ -60,8 +61,8 @@ namespace Shrooms.UnitTests.DomainService
             var appSettings = Substitute.For<IApplicationSettings>();
             _notificationService = Substitute.For<IServiceRequestNotificationService>();
             _permissionService = Substitute.For<IPermissionService>();
-
-            _serviceRequestService = new ServiceRequestService(_uow, _permissionService);
+            var asyncRunner = Substitute.For<IAsyncRunner>();
+            _serviceRequestService = new ServiceRequestService(_uow, _permissionService, asyncRunner);
         }
 
         [Test]
@@ -129,7 +130,7 @@ namespace Shrooms.UnitTests.DomainService
                 UserId = "UserId"
             };
 
-            _serviceRequestService.CreateNewServiceRequest(serviceRequestDTO ,userAndOrg);
+            _serviceRequestService.CreateNewServiceRequest(serviceRequestDTO, userAndOrg);
             _serviceRequestsDbSet
                 .Received(1)
                 .Add(Arg.Any<ServiceRequest>());
@@ -353,7 +354,7 @@ namespace Shrooms.UnitTests.DomainService
         private void MockPermissioService()
         {
             _permissionService
-                .UserHasPermission(Arg.Is<UserAndOrganizationDTO>(x => x.UserId == "AdminId" && x.OrganizationId == 1 ), AdministrationPermissions.ServiceRequest)
+                .UserHasPermission(Arg.Is<UserAndOrganizationDTO>(x => x.UserId == "AdminId" && x.OrganizationId == 1), AdministrationPermissions.ServiceRequest)
                 .Returns(true);
 
             _permissionService
