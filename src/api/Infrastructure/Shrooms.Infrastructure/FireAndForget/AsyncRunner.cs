@@ -2,7 +2,7 @@
 using System.Web.Hosting;
 using Autofac;
 using Autofac.Core.Lifetime;
-using Autofac.Features.OwnedInstances;
+using Shrooms.Infrastructure.Logger;
 
 namespace Shrooms.Infrastructure.FireAndForget
 {
@@ -24,8 +24,16 @@ namespace Shrooms.Infrastructure.FireAndForget
                      builder.RegisterInstance(new TenantNameContainer(tenantName)).As<ITenantNameContainer>().SingleInstance();
                  }))
                 {
+                    var logger = container.Resolve<ILogger>();
                     var service = container.Resolve<T>();
-                    action(service);
+                    try
+                    {
+                        action(service);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Error(ex);
+                    }
                 }
             });
         }
