@@ -70,7 +70,7 @@
                     'stroke-width': 0
                 })
                 .mouseover(function() {
-                    if (!room.selected) {
+                    if (!room.selected && room.drawing) {
                         room.drawing.attr({
                             opacity: self.mouseoverOpacity
                         });
@@ -79,7 +79,7 @@
                     $scope.container.removeClass('cursor-inherit').addClass('pointer');
                 })
                 .mouseout(function() {
-                    if (!room.selected) {
+                    if (!room.selected && room.drawing) {
                         room.drawing.attr({
                             opacity: self.opacity
                         });

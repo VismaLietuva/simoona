@@ -349,7 +349,7 @@
                 progressState: function() {
                     return roomScope.isInProgress;
                 }
-            }
+            };
 
             return roomManageService;
         }

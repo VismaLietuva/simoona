@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.Entity;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,6 +19,16 @@ namespace Shrooms.Domain.Services.Picture
         {
             _storage = storage;
             _organizationsDbSet = uow.GetDbSet<Organization>();
+        }
+
+        public async Task<string> UploadFromImage(Image image, string mimeType, string fileName, int orgId)
+        {
+            var pictureName = GetNewPictureName(fileName);
+            var tenantPicturesContainer = _organizationsDbSet.Where(o => o.Id == orgId).Select(o => o.ShortName).First().ToLowerInvariant();
+
+            await _storage.UploadPicture(image, pictureName, mimeType, tenantPicturesContainer);
+
+            return pictureName;
         }
 
         public async Task<string> UploadFromStream(Stream stream, string mimeType, string fileName, int orgId)

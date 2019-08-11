@@ -86,29 +86,25 @@
                 includeProperties: "ApplicationUsers,RoomType,Floor,Floor.Office"
             }, search);
 
-            roomRepository.getPaged(filterWithIncludes).then(function (response) {
-                $scope.rooms = response;
-            });
-            $scope.rooms = roomRepository.getPaged(filterWithIncludes);
-            //$state.go('Root.WithOrg.Admin.Offices.Floors.Rooms.List', search, { reload: true });
-        }
+            $state.go('Root.WithOrg.Admin.Offices.Floors.Rooms.List', search, { reload: true });
+        };
 
         $scope.onSort = function (sort, dir) {
             $scope.filter.dir = dir;
             $scope.filter.sort = sort;
             $scope.filter.page = 1;
             $scope.getRooms();
-        }
+        };
 
         $scope.onSearch = function (search) {
             $scope.filter.s = search;
             $scope.filter.page = 1;
             $scope.getRooms();
-        }
+        };
 
         $scope.onReset = function () {
             $scope.onSearch('');
-        }
+        };
 
         $scope.onDelete = function (room) {
             roomRepository.delete(room.id).then(function () {
@@ -123,7 +119,7 @@
             }, function (response) {
                 notifySrv.error(response.data);
             });
-        }
+        };
 
         $scope.escapeKeyPressed = function (evt) {
             // Ignore if it's not esc button.
@@ -138,7 +134,7 @@
 
             // Since this is not an angular event we need to notify the scope that smth changed!
             $scope.$apply();
-        }
+        };
 
         $document.bind('keydown', $scope.escapeKeyPressed);
         $scope.manageRoom = function (mode, room) {
@@ -158,7 +154,7 @@
                 roomManageService.clearVariables(mode);
                 roomManageService.openPopupFromOutside(room);
             }
-        }
+        };
 
         function enableDrawing() {
             var mode = 'Create';

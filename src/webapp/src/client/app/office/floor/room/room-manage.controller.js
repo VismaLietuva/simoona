@@ -19,7 +19,7 @@
             roomManageService.disableProgress();
             //$scope.dismiss();
             $uibModalInstance.close();
-        }
+        };
 
         $scope.onRedraw = function (room) {
             var original = roomManageService.getOriginalRoom();
@@ -28,8 +28,7 @@
             }
             roomManageService.onRedraw(original);
             $uibModalInstance.close();
-
-        }
+        };
 
         $scope.onCreate = function () {
             //$scope.deselectRoom(model);
@@ -38,7 +37,6 @@
             if ($scope.model.roomTypeId === undefined) {
                 $scope.model.roomTypeId = 1;
             }
-
 
             $scope.model.drawing = null;
             $scope.model.mark = null;
@@ -51,7 +49,7 @@
                 function (response) {
                     $scope.errors = response.data;
                 });
-        }
+        };
 
         $scope.onEdit = function () {
             //$scope.deselectRoom(model);
@@ -71,21 +69,20 @@
                 function (response) {
                     $scope.errors = response.data;
                 });
-        }
+        };
 
         $scope.cancel = function () {
             $uibModalInstance.dismiss('cancel');
-        }
+        };
 
         $scope.loadApplicationUsers = function (search) {
             return userRepository.getForAutocomplete(search);
-        }
+        };
 
         if (authService.hasPermissions(['ROOMTYPE_ADMINISTRATION'])) {
             roomTypeRepository.getAll().then(function (data) {
                 $scope.roomTypes = data;
             });
         }
-
     }
 })();

@@ -82,10 +82,21 @@
                             }, 0);
                         };
 
+                        container.on('scroll', function() {
+                            handler();
+                        });
+
+                        scope.$on('$destroy', function() {
+                            return container.off('scroll', handler);
+                        });
+
                         scope.$on('executeInfiniteScrollLoad', function() {
                             if (container.scrollLeft() > 0) {
                                 // If container is already scrolled, scroll it to 0 - then onScroll will fire and execute handler()
                                 container.scrollLeft(0);
+                            } else {
+                                // Execute handler() manually, because container is not scrolled and onScroll will not fire handler()
+                                handler();
                             }
                         });
 
