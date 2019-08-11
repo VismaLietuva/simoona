@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
@@ -32,11 +33,23 @@ namespace Shrooms.Azure
             await blockBlob.DeleteAsync(DeleteSnapshotsOption.None, null, _blobRequestOptions, null);
         }
 
-        public async Task UploadPicture(Stream stream, string blobKey, string mimeType, string tenantPicturesContainer)
+        public async Task UploadPicture(Image image, string blobKey, string mimeType, string tenantPicturesContainer)
         {
             var blockBlob = GetBlockBlob(blobKey, tenantPicturesContainer);
             blockBlob.Properties.ContentType = mimeType;
 
+            using (var stream = new MemoryStream())
+            {
+                image.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                stream.Position = 0;
+                await blockBlob.UploadFromStreamAsync(stream, null, _blobRequestOptions, null);
+            }
+        }
+
+        public async Task UploadPicture(Stream stream, string blobKey, string mimeType, string tenantPicturesContainer)
+        {
+            var blockBlob = GetBlockBlob(blobKey, tenantPicturesContainer);
+            blockBlob.Properties.ContentType = mimeType;
             await blockBlob.UploadFromStreamAsync(stream, null, _blobRequestOptions, null);
         }
 
