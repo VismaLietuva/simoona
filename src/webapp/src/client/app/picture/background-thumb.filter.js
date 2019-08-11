@@ -3,7 +3,7 @@
 
     angular.module('simoonaApp.Picture')
         .filter('backgroundThumb', backgroundThumb);
-    
+
     backgroundThumb.$inject = ['$filter'];
 
     function backgroundThumb($filter) {

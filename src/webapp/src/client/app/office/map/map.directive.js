@@ -87,7 +87,7 @@
                 scope.internalControl = scope.mapControl || {};
                 scope.internalControl.deselectRoom = function() {
                     scope.deselectRoom();
-                }
+                };
 
                 scope.$watch(function() {
                         return scope.floor;
@@ -147,7 +147,7 @@
                     var paperSize = {
                         width: scope.svg.width(),
                         height: scope.svg.height()
-                    }
+                    };
 
                     if (picture.width < paperSize.width && picture.height < paperSize.height) {
                         //scope.aspectRatio = 1;
@@ -167,7 +167,8 @@
                     var backgroundSize = {
                         width: picture.width * scope.aspectRatio,
                         height: picture.height * scope.aspectRatio
-                    }
+                    };
+
                     scope.background = scope.paper
                         .image($filter('picture')(scope.floor.pictureId), 0, 0, backgroundSize.width, backgroundSize.height).attr({
                             'stroke': '#000000',
@@ -208,9 +209,9 @@
                                     element.bind('mousemove', function(event) {
                                         var isFirefoxBrowser = window.navigator.userAgent.indexOf("Firefox") !== -1;
                                         var currentCoords = {
-                                            x: event.offsetX == undefined || isFirefoxBrowser ? event.originalEvent.layerX : event.offsetX,
-                                            y: event.offsetY == undefined || isFirefoxBrowser ? event.originalEvent.layerY : event.offsetY
-                                        }
+                                            x: event.offsetX === undefined || isFirefoxBrowser ? event.originalEvent.layerX : event.offsetX,
+                                            y: event.offsetY === undefined || isFirefoxBrowser ? event.originalEvent.layerY : event.offsetY
+                                        };
                                         roomManageService.drawTempLine(currentCoords);
                                     });
                                 }

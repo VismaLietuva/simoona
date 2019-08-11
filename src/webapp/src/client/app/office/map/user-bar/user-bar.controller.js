@@ -77,7 +77,6 @@
                 $scope.currentMode = showMode.byFloor;
                 $scope.applicationUsersAll = [];
                 $scope.needMore = true;
-                $scope.getItems(0, 0);
                 $scope.$broadcast('executeInfiniteScrollLoad');
                 $scope.$broadcast('onItemsUpdated');
             }
@@ -108,8 +107,8 @@
                 var currentPage = Math.floor(currentCount / itemsToAdd);
 
                 if (filter.page === currentPage + 1) {
-                    // If page is not changed - stop getting new data. 
-                    //  It's needed when it tries to get data even after all data is recieved (scrollbar is at the end).
+                    // If page is not changed - stop getting new data.
+                    // It's needed when it tries to get data even after all data is received (scrollbar is at the end).
                     // Without this check it would try getting the data infinitely.
                     return;
                 }
@@ -120,14 +119,14 @@
 
             filter.floorId = $scope.params.floorId;
 
-            // TODO: This request might happen even when $scope.needMore is false, 
+            // TODO: This request might happen even when $scope.needMore is false,
             //  because the previous $promise might be still not resolved so quick.
             userRepository.getPagedByFloor(filter).then(function(applicationUsers) {
                 if (!$scope.needMore) {
                     return;
                 }
 
-                // If it returns smaller amount than was requested - 
+                // If it returns smaller amount than was requested -
                 //  it means all items are loaded and further requests are not needed
                 if (applicationUsers.pagedList.length < filter.pageSize) {
                     $scope.needMore = false;
