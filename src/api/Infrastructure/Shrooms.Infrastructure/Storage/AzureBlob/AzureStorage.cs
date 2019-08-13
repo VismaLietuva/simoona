@@ -40,7 +40,7 @@ namespace Shrooms.Azure
 
             using (var stream = new MemoryStream())
             {
-                image.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                image.Save(stream, image.RawFormat);
                 stream.Position = 0;
                 await blockBlob.UploadFromStreamAsync(stream, null, _blobRequestOptions, null);
             }
