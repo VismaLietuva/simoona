@@ -25,7 +25,7 @@ namespace Shrooms.Domain.Services.Support
 
         public void SubmitTicket(UserAndOrganizationDTO userAndOrganization, SupportDto support)
         {
-            ApplicationUser currentApplicationUser = _applicationUsers.Single(u => u.Id == userAndOrganization.UserId);
+            var currentApplicationUser = _applicationUsers.Single(u => u.Id == userAndOrganization.UserId);
 
             var email = new EmailDto(currentApplicationUser.FullName, currentApplicationUser.Email, _applicationSettings.SupportEmail, $"{support.Type}: {support.Subject}", support.Message);
 
