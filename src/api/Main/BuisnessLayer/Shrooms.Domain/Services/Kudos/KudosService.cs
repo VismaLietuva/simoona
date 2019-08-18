@@ -5,10 +5,9 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Dynamic;
 using System.Linq.Expressions;
-using System.Threading;
+using System.Resources;
 using System.Threading.Tasks;
 using DomainServiceValidators.Validators.Kudos;
-using MoreLinq;
 using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.BusinessLayer;
 using Shrooms.Constants.ErrorCodes;
@@ -46,6 +45,8 @@ namespace Shrooms.Domain.Services.Kudos
                               x.Type != ConstBusinessLayer.KudosTypeEnum.Minus &&
                               x.Type != ConstBusinessLayer.KudosTypeEnum.Other;
 
+        private readonly ResourceManager _resourceManager;
+
         public KudosService(
             IUnitOfWork2 uow,
             IUnitOfWork unitOfWork,
@@ -64,6 +65,8 @@ namespace Shrooms.Domain.Services.Kudos
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
             _kudosLogRepository = unitOfWork.GetRepository<KudosLog>();
             _applicationUserRepository = unitOfWork.GetRepository<ApplicationUser>();
+
+            _resourceManager = new ResourceManager("Shrooms.Resources.Models.Kudos.Kudos", typeof(ResourceUtilities).Assembly);
         }
 
         public async Task CreateKudosType(NewKudosTypeDto dto)
@@ -175,7 +178,7 @@ namespace Shrooms.Domain.Services.Kudos
                 {
                     if (IsTranslatableKudosType(kudosLog.Type.Type))
                     {
-                        kudosLog.Type.Name = TranslateKudos(culture, "KudosType" + kudosLog.Type.Name);
+                        kudosLog.Type.Name = TranslateKudos("KudosType" + kudosLog.Type.Name, culture);
                     }
                 }
             }
@@ -206,7 +209,6 @@ namespace Shrooms.Domain.Services.Kudos
                 .Skip(() => entriesCountToSkip)
                 .Take(() => ConstBusinessLayer.MaxKudosLogsPerPage)
                 .ToList();
-
             var user = _usersDbSet.Find(userId);
 
             if (user != null)
@@ -217,7 +219,7 @@ namespace Shrooms.Domain.Services.Kudos
                 {
                     if (IsTranslatableKudosType(userLog.Type.Type))
                     {
-                        userLog.Type.Name = TranslateKudos(culture, "KudosType" + userLog.Type.Name);
+                        userLog.Type.Name = TranslateKudos("KudosType" + userLog.Type.Name, culture);
                     }
                 }
             }
@@ -271,7 +273,7 @@ namespace Shrooms.Domain.Services.Kudos
                 {
                     if (IsTranslatableKudosType(kudosLog.KudosSystemType))
                     {
-                        kudosLog.KudosTypeName = TranslateKudos(culture, "KudosType" + kudosLog.KudosTypeName);
+                        kudosLog.KudosTypeName = TranslateKudos("KudosType" + kudosLog.KudosTypeName, culture);
                     }
                 }
             }
@@ -306,7 +308,7 @@ namespace Shrooms.Domain.Services.Kudos
                 {
                     if (IsTranslatableKudosType(kudosType.Type))
                     {
-                        kudosType.Name = TranslateKudos(culture, "KudosType" + kudosType.Name);
+                        kudosType.Name = TranslateKudos("KudosType" + kudosType.Name, culture);
                     }
                 }
             }
@@ -846,9 +848,9 @@ namespace Shrooms.Domain.Services.Kudos
             return true;
         }
 
-        private string TranslateKudos(CultureInfo culture, string textToTranslate)
+        private string TranslateKudos(string textToTranslate, CultureInfo culture)
         {
-            return ResourceUtilities.GetResourceValue("Models.Kudos.Kudos", textToTranslate, culture);
+            return ResourceUtilities.GetResourceValue(_resourceManager, textToTranslate, culture);
         }
 
         private static bool IsTranslatableKudosType(ConstBusinessLayer.KudosTypeEnum type)
