@@ -219,7 +219,7 @@ namespace Shrooms.Domain.Services.Kudos
                 {
                     if (IsTranslatableKudosType(userLog.Type.Type))
                     {
-                        userLog.Type.Name = TranslateKudos("KudosType" + userLog.Type.Name, culture);
+                        userLog.Type.Name = TranslateKudos($"KudosType{userLog.Type.Name}", culture);
                     }
                 }
             }
@@ -273,7 +273,7 @@ namespace Shrooms.Domain.Services.Kudos
                 {
                     if (IsTranslatableKudosType(kudosLog.KudosSystemType))
                     {
-                        kudosLog.KudosTypeName = TranslateKudos("KudosType" + kudosLog.KudosTypeName, culture);
+                        kudosLog.KudosTypeName = TranslateKudos($"KudosType{kudosLog.KudosTypeName}", culture);
                     }
                 }
             }
@@ -308,7 +308,8 @@ namespace Shrooms.Domain.Services.Kudos
                 {
                     if (IsTranslatableKudosType(kudosType.Type))
                     {
-                        kudosType.Name = TranslateKudos("KudosType" + kudosType.Name, culture);
+                        kudosType.Name = TranslateKudos($"KudosType{kudosType.Name}", culture);
+                        kudosType.Description = TranslateKudos($"KudosType{kudosType.Name}Description", culture);
                     }
                 }
             }

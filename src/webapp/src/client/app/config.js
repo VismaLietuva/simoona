@@ -159,13 +159,19 @@
         if (!!environment && environment === 'prod') {
             AnalyticsProvider.setAccount({
                 tracker: 'trackerNumberProd',
-                trackEvent: true
+                trackEvent: true,
+                set: {
+                    forceSSL: true
+                }
             });
         } else {
             AnalyticsProvider.setDomainName('none');
             AnalyticsProvider.setAccount({
                 tracker: 'trackerNumberNone',
-                trackEvent: true
+                trackEvent: true,
+                set: {
+                    forceSSL: true
+                }
             });
         }
 

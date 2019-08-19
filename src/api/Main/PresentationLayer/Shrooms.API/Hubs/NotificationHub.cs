@@ -42,7 +42,7 @@ namespace Shrooms.API.Hubs
             var notificationHub = GlobalHost.ConnectionManager.GetHubContext<NotificationHub>();
 
             var connectionIds = NotificationHubUsers
-                .Where(x => x.Key.UserId != userOrg.UserId && 
+                .Where(x => x.Key.UserId != userOrg.UserId &&
                             x.Key.OrganizationId == userOrg.OrganizationId &&
                             x.Key.OrganizationName == userOrg.OrganizationName)
                 .SelectMany(u => u.Value.ConnectionIds)
@@ -51,10 +51,7 @@ namespace Shrooms.API.Hubs
             notificationHub.Clients.Clients(connectionIds).newNotification(notification);
         }
 
-        public static void SendNotificationToParticularUsers(
-            NotificationViewModel notification, 
-            UserAndOrganizationHubDto userOrg,
-            IEnumerable<string> membersIds)
+        public static void SendNotificationToParticularUsers(NotificationViewModel notification, UserAndOrganizationHubDto userOrg, IEnumerable<string> membersIds)
         {
             var notificationHub = GlobalHost.ConnectionManager.GetHubContext<NotificationHub>();
 
@@ -64,7 +61,7 @@ namespace Shrooms.API.Hubs
                             u.Key.OrganizationName == userOrg.OrganizationName)
                 .SelectMany(u => u.Value.ConnectionIds)
                 .ToList();
-             
+
             notificationHub.Clients.Clients(connectionIds).newNotification(notification);
         }
 
@@ -86,8 +83,7 @@ namespace Shrooms.API.Hubs
 
         private void RemoveUserConnections(UserAndOrganizationHubDto userOrg)
         {
-            HubUser user;
-            NotificationHubUsers.TryGetValue(userOrg, out user);
+            NotificationHubUsers.TryGetValue(userOrg, out var user);
 
             if (user == null)
             {
@@ -103,8 +99,7 @@ namespace Shrooms.API.Hubs
                     return;
                 }
 
-                HubUser removedUser;
-                NotificationHubUsers.TryRemove(userOrg, out removedUser);
+                NotificationHubUsers.TryRemove(userOrg, out _);
             }
         }
 

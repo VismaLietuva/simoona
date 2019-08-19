@@ -30,7 +30,7 @@
             <div class="kudos-modal-buttons-group kudos-points-type">
                 <button class="btn btn-sm btn-info kudos-type-button kudos-points-type kudosify-modal-buttons-inactive"
                         type="button"
-                        uib-tooltip="{{kudosType.description | translate }}"
+                        uib-tooltip="{{kudosType.description}}"
                         tooltip-placement="bottom"
                         tooltip-class="word-break"
                         tooltip-append-to-body="true"
@@ -102,17 +102,17 @@
 
         <div class="kudos-image-upload-component" has-permissions="['PICTURE_BASIC']">
             <span for="kudos-image" translate="kudos.kudosPhoto"></span>
-            <input 
+            <input
                 name="kudos-image"
                 type="file"
                 accept="image/*"
                 onchange="angular.element(this).scope().vm.attachImage(this)"
                 data-test-id="image-upload-input-field">
         </div>
-    
+
         <div image-preview-thumb
             ng-if="vm.imageSource"
-            source="vm.imageSource" 
+            source="vm.imageSource"
             sources="vm.attachedFiles">
         </div>
 
