@@ -168,4 +168,13 @@
   <data name="ExportColumnStatus" xml:space="preserve">
     <value>Statusas</value>
   </data>
+  <data name="KudosTypeMinusDescription" xml:space="preserve">
+    <value>Minusavimas leidžia nuskaičiuoti bet kokią Kudos taškų sumą nuo vartotojo Kudosų sąskaitos</value>
+  </data>
+  <data name="KudosTypeOtherDescription" xml:space="preserve">
+    <value>Naudokitės Kita, jeigu reikia duoti Kudos taškus už tai, ko nėra išvardinta Kudos tipuose</value>
+  </data>
+  <data name="KudosTypeSendDescription" xml:space="preserve">
+    <value>Siuntimas leidžia iškart suteikti Kudos taškų kolegai iš savo sąskaitos. Šiam Kudos tipui nereikia administratoriaus patvirtinimo</value>
+  </data>
 </root>
