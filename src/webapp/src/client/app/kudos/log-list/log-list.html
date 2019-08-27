@@ -23,6 +23,14 @@
                     ng-options="statuses for statuses in vm.statuses"
                     data-test-id="kudos-log-list-filter-status"></select>
         </div>
+        <div class="form-group input-group-sm col-md-6 col-xs-12">
+            <label for="filteringType" translate="kudos.filteringTypes"></label>
+            <select class="form-control"
+                    id="filteringType"
+                    ng-model="vm.filter.filteringType"
+                    ng-options="filterTypes for filterTypes in vm.filterTypes"
+                    data-test-id="kudos-log-list-filter-type"></select>
+        </div>
         <div class="form-group col-md-6 col-xs-12 pull-right">
             <button class="btn btn-group btn-info kudos-filter-apply-button"
                     ng-click="vm.getFilteredKudosLogList()"

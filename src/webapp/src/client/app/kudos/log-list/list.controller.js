@@ -23,13 +23,15 @@
 
         vm.kudos = {};
         vm.statuses = {};
+        vm.filterTypes={};
 
         vm.filter = {
             page: 1,
             searchUser: null,
             status: 'Pending',
             sortBy: 'Created',
-            sortOrder: 'desc'
+            sortOrder: 'desc',
+            filteringType: 'All'
         };
 
         vm.perPage = 0;
@@ -55,6 +57,14 @@
 
             kudosFactory.getKudosStatuses().then(function (response) {
                 vm.statuses = response;
+                vm.isKudosStatusLoading = false;
+            }, function (error) {
+                vm.isKudosStatusLoading = false;
+                errorHandler.handleErrorMessage(error);
+            });
+
+            kudosFactory.getKudosFilteringTypes().then(function (response) {
+                vm.filterTypes = response;
                 vm.isKudosStatusLoading = false;
             }, function (error) {
                 vm.isKudosStatusLoading = false;
@@ -159,7 +169,8 @@
                 status: vm.filter.status,
                 page: vm.filter.page,
                 sortBy: vm.filter.sortBy,
-                sortOrder: vm.filter.sortOrder
+                sortOrder: vm.filter.sortOrder,
+                filteringType: vm.filter.filteringType
             };
             return filter;
         }
