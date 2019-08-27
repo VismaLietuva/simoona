@@ -10,21 +10,27 @@ using Shrooms.DataTransferObjects.Models.Wall.Posts;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.API.Hubs;
+using Shrooms.Domain.Services.Email.Posting;
 
 namespace Shrooms.Premium.Main.PresentationLayer.Shrooms.API.BackgroundWorkers
 {
-    public class SharedEventNotifier : IBackgroundWorker
-    {
-        private readonly IWallService _wallService;
-        public SharedEventNotifier(IWallService wallService)
-        {
-            _wallService = wallService;
-        }
+  public class SharedEventNotifier : IBackgroundWorker
+  {
+    private readonly IWallService _wallService;
+    private readonly IPostNotificationService _postNotificationService;
 
-        public void Notify(NewPostDTO postModel, NewlyCreatedPostDTO createdPost, UserAndOrganizationHubDto userHubDto)
-        {
-            var membersToNotify = _wallService.GetWallMembersIds(postModel.WallId, postModel);
-            NotificationHub.SendWallNotification(postModel.WallId, membersToNotify, createdPost.WallType, userHubDto);
-        }
+    public SharedEventNotifier(IWallService wallService, IPostNotificationService postNotificationService)
+    {
+      _wallService = wallService;
+      _postNotificationService = postNotificationService;
     }
+
+    public void Notify(NewPostDTO postModel, NewlyCreatedPostDTO createdPost, UserAndOrganizationHubDto userHubDto)
+    {
+      _postNotificationService.NotifyAboutNewPost(createdPost);
+
+      var membersToNotify = _wallService.GetWallMembersIds(postModel.WallId, postModel);
+      NotificationHub.SendWallNotification(postModel.WallId, membersToNotify, createdPost.WallType, userHubDto);
+    }
+  }
 }
