@@ -78,5 +78,6 @@
   "typeSend": "Siuntimas leidžia iškart suteikti Kudos taškų kolegai iš savo sąskaitos. Šiam Kudos tipui nereikia administratoriaus patvirtinimo",
   "typeMinus": "Minusavimas leidžia nuskaičiuoti bet kokią Kudos taškų sumą nuo vartotojo Kudosų sąskaitos",
   "typeOther": "Naudokitės Kita, jeigu reikia duoti Kudos taškus už tai, ko nėra išvardinta Kudos tipuose",
-  "kudosPhoto": "Nuotrauka"
+  "kudosPhoto": "Nuotrauka",
+  "filteringTypes": "Tipai"
 }

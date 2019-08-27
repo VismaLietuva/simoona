@@ -24,6 +24,7 @@
             getLastApprovedKudos: getLastApprovedKudos,
             getPointsTypes: getPointsTypes,
             getKudosStatuses: getKudosStatuses,
+            getKudosFilteringTypes: getKudosFilteringTypes,
             getKudosLogs: getKudosLogs,
             getKudosTypeId: getKudosTypeId,
             getKudosStats: getKudosStats,
@@ -93,6 +94,10 @@
 
         function getKudosStatuses() {
             return $resource(url + 'GetKudosStatuses').query().$promise;
+        }
+        
+        function getKudosFilteringTypes() {
+            return $resource(url + 'GetKudosFilteringTypes').query().$promise;
         }
 
         function getKudosLogs(filter) {
