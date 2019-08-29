@@ -119,6 +119,7 @@
     <Compile Include="Models\Events\EventType.cs" />
     <Compile Include="Models\Exam.cs" />
     <Compile Include="Models\ExternalLink.cs" />
+    <Compile Include="Models\Multiwall\PostWatcher.cs" />
     <Compile Include="Models\Notifications\Notification.cs" />
     <Compile Include="Models\Notifications\NotificationType.cs" />
     <Compile Include="Models\Notifications\NotificationUser.cs" />
