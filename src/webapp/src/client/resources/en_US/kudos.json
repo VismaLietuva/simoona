@@ -79,5 +79,7 @@
   "typeSend": "Use Send, to instantly give Kudos to your colleague from your own Kudos account. No Admin approval is needed",
   "typeMinus": "Use Minus to deduct any Kudos amount from a user’s Kudos account",
   "typeOther": "Use Other, if you want to give Kudos for something that is not listed in the Kudos type list",
-  "kudosPhoto": "Image"
+  "kudosPhoto": "Image",
+  "filteringTypes": "Types"
+  
 }

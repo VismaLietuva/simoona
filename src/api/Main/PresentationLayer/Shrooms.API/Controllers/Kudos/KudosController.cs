@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -114,6 +115,14 @@ namespace Shrooms.API.Controllers.Kudos
             }
 
             return statuses;
+        }
+
+        [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
+        public IEnumerable<string> GetKudosFilteringTypes()
+        {
+            var statuses = new List<string> { ConstBusinessLayer.KudosFilteringTypeAllFilter };
+            var kudosTypeDto = _kudosService.GetKudosTypes(GetUserAndOrganization());
+            return statuses.Concat(kudosTypeDto.Select(s => s.Name));
         }
 
         [HttpGet]

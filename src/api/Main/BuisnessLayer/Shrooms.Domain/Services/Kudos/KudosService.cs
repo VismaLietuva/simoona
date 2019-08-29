@@ -157,6 +157,7 @@ namespace Shrooms.Domain.Services.Kudos
                     log.KudosBasketId == null)
                 .Where(KudosServiceHelper.StatusFilter(options.Status))
                 .Where(KudosServiceHelper.UserFilter(options.SearchUserId))
+                .Where(KudosServiceHelper.TypeFilter(options.FilteringType))
                 .GroupJoin(_usersDbSet, log => log.CreatedBy, u => u.Id, KudosServiceHelper.MapKudosLogsToDto())
                 .OrderBy(string.Concat(options.SortBy, " ", options.SortOrder));
 

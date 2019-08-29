@@ -26,6 +26,7 @@ namespace Shrooms.Constants.BusinessLayer
         public const string KudosServiceStatusDone = "Done";
         public const string KudosServiceStatusCancelled = "Cancelled";
         public const string KudosStatusAllFilter = "All";
+        public const string KudosFilteringTypeAllFilter = "All";
         public const int KudosAvailableToSendThisMonth = 20;
         public const int MaxKudosLogsPerPage = 50;
 
