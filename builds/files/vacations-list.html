@@ -2,33 +2,15 @@
 
     <h3 class="col-xs-12" translate="common.vacations"></h3>
 
-    <div class="pull-right">
-        <label class="btn btn-warning" 
-               has-permissions="['VACATIONS_ADMINISTRATION']">
-            <input id="xlsSelect" 
-                   data-test-id="xlsSelect" 
-                   type="file" 
-                   accept=".xls" 
-                   onchange="angular.element(this).scope().fileAttached(this)" 
-                   ng-hide="true" 
-                   ng-required="true" /> 
-            <span translate="vacations.chooseFile"></span>
-        </label>
-    </div>
-
     <wave-spinner ng-if="vm.isLoading"></wave-spinner>
 
-    <div class="col-xs-12 text-center"
+    <div class="col-xs-12 text-left padding-top-bottom"
          ng-if="!vm.isLoading">
-        <strong translate="vacations.youHaveAvailableDays"
-                translate-values="{ one : vm.availableDays.availableDays }">
+        <strong>
+            Your available vacation days are no longer presented in Simoona.
+            <br />
+            You can check it monthly in your salary slip instead.
         </strong>
-        <br />
-        <strong ng-if="!!vm.availableDays.lastTimeUpdated">
-            <span translate="vacations.lastTimeUpdated"></span> {{vm.availableDays.lastTimeUpdated | date:'yyyy-MM-dd'}}
-        </strong>
-        <strong ng-if="!vm.availableDays.lastTimeUpdated" 
-                translate="vacations.neverBeenUpdated"></strong>
     </div>
 
     <div class="col-xs-12 text-left padding-top-bottom"
