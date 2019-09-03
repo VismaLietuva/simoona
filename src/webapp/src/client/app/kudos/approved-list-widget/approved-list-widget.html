@@ -48,9 +48,12 @@
                 {{:: approvedItem.multiplier}}
             </td>
             <td th="{{ 'kudos.kudosSender' | translate }}">
-                <a data-ui-sref="Root.WithOrg.Client.Profiles.Details({ id: approvedItem.sender.id })" data-test-id="kudos-approved-list-item-user" ng-cloak>
+                <a ng-if="approvedItem.sender.id" data-ui-sref="Root.WithOrg.Client.Profiles.Details({ id: approvedItem.sender.id })" data-test-id="kudos-approved-list-item-user" ng-cloak>
                     {{:: approvedItem.sender.fullName}}
                 </a>
+                <span ng-if="!approvedItem.sender.id">
+                        {{:: approvedItem.sender.fullName}}
+                </span>
             </td>
             <td class="hidden-xs hidden-sm" data-test-id="kudos-approved-list-item-created" ng-cloak>
                 {{:: approvedItem.created | date: 'yyyy-MM-dd' }}
