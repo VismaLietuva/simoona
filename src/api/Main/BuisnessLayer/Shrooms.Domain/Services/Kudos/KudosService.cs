@@ -214,7 +214,7 @@ namespace Shrooms.Domain.Services.Kudos
                                Status = kudLog.Status.ToString(),
                                Sender = new KudosLogUserDTO
                                {
-                                   FullName = usr == null ? kudLog.CreatedBy : usr.FirstName + " " + usr.LastName,
+                                   FullName = usr == null ? string.Empty : usr.FirstName + " " + usr.LastName,
                                    Id = usr == null ? string.Empty : kudLog.CreatedBy
                                },
                                PictureId = kudLog.PictureId
