@@ -195,13 +195,30 @@ namespace Shrooms.Domain.Services.Kudos
         {
             ValidateUser(organizationId, userId);
 
-            var userLogsQuery = _kudosLogsDbSet
-                .Where(log => log.EmployeeId == userId && log.OrganizationId == organizationId)
-                .Join(_usersDbSet,
-                    l => l.CreatedBy,
-                    s => s.Id,
-                    MapUserKudosLogsToDto())
-                .OrderByDescending(log => log.Created);
+            var userLogsQuery = (from kudLog in _kudosLogsDbSet
+                           where kudLog.EmployeeId == userId && kudLog.OrganizationId == organizationId
+                           from usr in _usersDbSet.Where(u => u.Id == kudLog.CreatedBy).DefaultIfEmpty()
+                           select new KudosUserLogDTO
+                           {
+                               Comment = kudLog.Comments,
+                               Created = kudLog.Created,
+                               Id = kudLog.Id,
+                               Multiplier = kudLog.MultiplyBy,
+                               Points = kudLog.Points,
+                               Type = new KudosLogTypeDTO
+                               {
+                                   Name = kudLog.KudosTypeName,
+                                   Value = kudLog.KudosTypeValue,
+                                   Type = kudLog.KudosSystemType
+                               },
+                               Status = kudLog.Status.ToString(),
+                               Sender = new KudosLogUserDTO
+                               {
+                                   FullName = usr == null ? kudLog.CreatedBy : usr.FirstName + " " + usr.LastName,
+                                   Id = usr == null ? string.Empty : kudLog.CreatedBy
+                               },
+                               PictureId = kudLog.PictureId
+                           }).OrderByDescending(o => o.Created);
 
             var logCount = userLogsQuery.Count();
 
@@ -602,31 +619,6 @@ namespace Shrooms.Domain.Services.Kudos
         private static int EntriesCountToSkip(int pageRequested)
         {
             return (pageRequested - LastPage) * ConstBusinessLayer.MaxKudosLogsPerPage;
-        }
-
-        private static Expression<Func<KudosLog, ApplicationUser, KudosUserLogDTO>> MapUserKudosLogsToDto()
-        {
-            return (log, sender) => new KudosUserLogDTO
-            {
-                Comment = log.Comments,
-                Created = log.Created,
-                Id = log.Id,
-                Multiplier = log.MultiplyBy,
-                Points = log.Points,
-                Type = new KudosLogTypeDTO
-                {
-                    Name = log.KudosTypeName,
-                    Value = log.KudosTypeValue,
-                    Type = log.KudosSystemType
-                },
-                Status = log.Status.ToString(),
-                Sender = new KudosLogUserDTO
-                {
-                    FullName = sender.FirstName + " " + sender.LastName,
-                    Id = log.CreatedBy
-                },
-                PictureId = log.PictureId
-            };
         }
 
         private KudosTypeDTO MapKudosTypesToDTO(KudosType kudosType)
