@@ -29,11 +29,12 @@
         'youtubeSettings',
         'wallPostRepository',
         'wallService',
-        'notifySrv'
+        'notifySrv',
+        '$window'
     ];
 
     function wallPostController($scope, $state, $location, SmoothScroll, wallSettings,
-        errorHandler, youtubeSettings, wallPostRepository, wallService, notifySrv) {
+        errorHandler, youtubeSettings, wallPostRepository, wallService, notifySrv,$window) {
         /*jshint validthis: true */
         var vm = this;
 
@@ -52,9 +53,12 @@
         vm.youtubePreviewWidth = youtubeSettings.previewWidth;
         vm.youtubePreviewHeight = youtubeSettings.previewHeight;
         vm.stateParams = $state.params;
+        vm.useUnwatch=$window.useUnwatch;
 
         vm.getPostUrl = getPostUrl;
         vm.notifyCopied = notifyCopied;
+        vm.watchPost = watchPost;
+        vm.unwatchPost = unwatchPost;
 
         /////////
 
@@ -135,6 +139,30 @@
             }
 
             e && e.preventDefault();
+        }
+
+        function unwatchPost() {
+            if (vm.isActionsEnabled && vm.post.isWatched) {
+
+                vm.isActionsEnabled = false;
+
+                wallPostRepository.unwatchPost(vm.post).then(function() {
+                    vm.isActionsEnabled = true;
+                    vm.post.isWatched = false;
+                }, vm.handleErrorMessage);
+            }
+        }
+
+        function watchPost() {
+            if (vm.isActionsEnabled && !vm.post.isWatched) {
+
+                vm.isActionsEnabled = false;
+
+                wallPostRepository.watchPost(vm.post).then(function() {
+                    vm.isActionsEnabled = true;
+                    vm.post.isWatched = true;
+                }, vm.handleErrorMessage);
+            }
         }
     }
 }());

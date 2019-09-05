@@ -35,6 +35,7 @@ namespace Shrooms.Domain.Services.Wall
         private readonly IDbSet<ApplicationUser> _usersDbSet;
         private readonly IDbSet<WallModerator> _moderatorsDbSet;
         private readonly IDbSet<EntityModels.Models.Multiwall.Wall> _wallsDbSet;
+        private readonly IDbSet<PostWatcher> _postWatchers;
 
         public WallService(
             IMapper mapper,
@@ -50,6 +51,7 @@ namespace Shrooms.Domain.Services.Wall
             _moderatorsDbSet = uow.GetDbSet<WallModerator>();
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
             _wallsDbSet = uow.GetDbSet<EntityModels.Models.Multiwall.Wall>();
+            _postWatchers = uow.GetDbSet<PostWatcher>();
         }
 
         public async Task<int> CreateNewWall(CreateWallDto newWallDto)
@@ -224,10 +226,11 @@ namespace Shrooms.Domain.Services.Wall
 
             var moderators = await _moderatorsDbSet.Where(x => x.WallId == post.WallId).ToListAsync();
             var postInList = new List<Post>() { post };
+            var watchedPosts = await RetrieveWatchedPosts(userOrg.UserId, postInList);
             var users = await GetUsers(postInList);
-            var posts = MapPostsWithChildEntitiesToDto(userOrg.UserId, postInList, users, moderators)
-                .FirstOrDefault();
-            return posts;
+            var posts = MapPostsWithChildEntitiesToDto(userOrg.UserId, postInList, users, moderators, watchedPosts);
+
+            return posts.FirstOrDefault();
         }
 
         public async Task<IEnumerable<PostDTO>> SearchWall(string searchString, UserAndOrganizationDTO userOrg, int pageNumber, int pageSize)
@@ -611,13 +614,14 @@ namespace Shrooms.Domain.Services.Wall
                 .Take(() => pageSize)
                 .ToListAsync();
 
-            IEnumerable<WallModerator> moderators = await _moderatorsDbSet.Where(x => wallsIds.Contains(x.WallId)).ToListAsync();
-            IEnumerable<ApplicationUser> users = await GetUsers(posts);
+            var moderators = await _moderatorsDbSet.Where(x => wallsIds.Contains(x.WallId)).ToListAsync();
+            var watchedPosts = await RetrieveWatchedPosts(userOrg.UserId, posts);
+            var users = await GetUsers(posts);
 
-            return MapPostsWithChildEntitiesToDto(userOrg.UserId, posts, users, moderators);
+            return MapPostsWithChildEntitiesToDto(userOrg.UserId, posts, users, moderators, watchedPosts);
         }
 
-        private async Task<IEnumerable<ApplicationUser>> GetUsers(IEnumerable<Post> posts)
+        private async Task<List<ApplicationUser>> GetUsers(List<Post> posts)
         {
             var comments = posts.SelectMany(s => s.Comments).ToList();
 
@@ -638,9 +642,8 @@ namespace Shrooms.Domain.Services.Wall
             return await _usersDbSet.Where(user => userIds.Contains(user.Id)).ToListAsync();
         }
 
-        private IEnumerable<PostDTO> MapPostsWithChildEntitiesToDto(string userId, IEnumerable<Post> posts, IEnumerable<ApplicationUser> users, IEnumerable<WallModerator> moderators)
+        private IEnumerable<PostDTO> MapPostsWithChildEntitiesToDto(string userId, List<Post> posts, List<ApplicationUser> users, List<WallModerator> moderators, HashSet<int> watchedPosts)
         {
-            var results = new List<PostDTO>();
             foreach (var post in posts)
             {
                 var postDto = _mapper.Map<PostDTO>(post);
@@ -678,11 +681,18 @@ namespace Shrooms.Domain.Services.Wall
                     LastEdit = c.LastEdit,
                     IsHidden = c.IsHidden
                 });
+                postDto.IsWatched = watchedPosts.Contains(post.Id);
 
-                results.Add(postDto);
+                yield return postDto;
             }
+        }
 
-            return results;
+        private async Task<HashSet<int>> RetrieveWatchedPosts(string userId, List<Post> posts)
+        {
+            var postIds = posts.Select(s => s.Id).ToList();
+            var userGuid = Guid.Parse(userId);
+            var watchedList = await _postWatchers.Where(wh => wh.UserId == userGuid && postIds.Contains(wh.PostId)).Select(s => s.PostId).ToListAsync();
+            return new HashSet<int>(watchedList);
         }
 
         private UserDto MapUserToDto(string userId, IEnumerable<ApplicationUser> users)

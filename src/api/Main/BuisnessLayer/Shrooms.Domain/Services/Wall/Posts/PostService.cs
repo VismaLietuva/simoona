@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using Shrooms.Constants.Authorization.Permissions;
@@ -28,6 +29,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
         private readonly IDbSet<ApplicationUser> _usersDbSet;
         private readonly IDbSet<WallModerator> _moderatorsDbSet;
         private readonly IDbSet<EntityModels.Models.Multiwall.Wall> _wallsDbSet;
+        private readonly IDbSet<PostWatcher> _postWatchers;
 
         public PostService(
             IUnitOfWork2 uow,
@@ -42,6 +44,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
             _moderatorsDbSet = uow.GetDbSet<WallModerator>();
             _wallsDbSet = uow.GetDbSet<EntityModels.Models.Multiwall.Wall>();
+            _postWatchers = uow.GetDbSet<PostWatcher>();
         }
 
         public NewlyCreatedPostDTO CreateNewPost(NewPostDTO newPostDto)
@@ -68,6 +71,13 @@ namespace Shrooms.Domain.Services.Wall.Posts
                 Likes = new LikesCollection()
             };
             _postsDbSet.Add(post);
+            _uow.SaveChanges(newPostDto.UserId);
+            _postWatchers.Add(
+                new PostWatcher
+                {
+                    PostId = post.Id,
+                    UserId = Guid.Parse(newPostDto.UserId)
+                });
             _uow.SaveChanges(newPostDto.UserId);
 
             var postCreator = _usersDbSet.Single(user => user.Id == newPostDto.UserId);
@@ -220,6 +230,35 @@ namespace Shrooms.Domain.Services.Wall.Posts
                 WallId = post.WallId
             };
             return newlyCreatedPostDto;
+        }
+
+        public void ToggleWatch(int postId, UserAndOrganizationDTO userAndOrg, bool shouldWatch)
+        {
+            var userGuid = Guid.Parse(userAndOrg.UserId);
+            var entity = _postWatchers.Find(postId, userGuid);
+            if (shouldWatch && entity == null)
+            {
+                entity = new PostWatcher
+                {
+                    PostId = postId,
+                    UserId = userGuid
+                };
+                _postWatchers.Add(entity);
+            }
+
+            if (!shouldWatch && entity != null)
+            {
+                _postWatchers.Remove(entity);
+            }
+
+            _uow.SaveChanges();
+        }
+
+        public IEnumerable<string> GetPostWatchers(int postId)
+        {
+            return _postWatchers.Where(wh => wh.PostId == postId)
+                .Select(s => s.UserId).ToList()
+                .Select(s => s.ToString());
         }
     }
 }

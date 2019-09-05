@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using AutoMapper;
 using Shrooms.API.Hubs;
 using Shrooms.DataTransferObjects.Models;
@@ -6,6 +7,7 @@ using Shrooms.DataTransferObjects.Models.Wall.Posts.Comments;
 using Shrooms.Domain.Services.Email.Posting;
 using Shrooms.Domain.Services.Notifications;
 using Shrooms.Domain.Services.Wall;
+using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.Domain.Services.Wall.Posts.Comments;
 using Shrooms.EntityModels.Models.Notifications;
 using Shrooms.Infrastructure.FireAndForget;
@@ -20,17 +22,21 @@ namespace Shrooms.API.BackgroundWorkers
         private readonly INotificationService _notificationService;
         private readonly ICommentNotificationService _commentNotificationService;
         private readonly ICommentService _commentService;
+        private readonly IPostService _postService;
+
         public NewCommentNotifier(IMapper mapper,
             IWallService wallService,
             INotificationService notificationService,
             ICommentNotificationService commentNotificationService,
-            ICommentService commentService)
+            ICommentService commentService,
+            IPostService postService)
         {
             _mapper = mapper;
             _wallService = wallService;
             _notificationService = notificationService;
             _commentNotificationService = commentNotificationService;
             _commentService = commentService;
+            _postService = postService;
         }
 
         public void Notify(CommentCreatedDTO commentDto, UserAndOrganizationHubDto userHubDto)
@@ -40,9 +46,7 @@ namespace Shrooms.API.BackgroundWorkers
             var membersToNotify = _wallService.GetWallMembersIds(commentDto.WallId, userHubDto);
             NotificationHub.SendWallNotification(commentDto.WallId, membersToNotify, commentDto.WallType, userHubDto);
 
-            var commentsAuthorsToNotify = _commentService.GetCommentsAuthorsToNotify(
-                                                commentDto.PostId,
-                                                new List<string>() { commentDto.CommentCreator });
+            var commentsAuthorsToNotify = _postService.GetPostWatchers(commentDto.PostId).ToList();
 
             if (commentDto.PostCreator != commentDto.CommentCreator && _commentService.IsPostAuthorAppNotificationsEnabled(commentDto.PostCreator))
             {
