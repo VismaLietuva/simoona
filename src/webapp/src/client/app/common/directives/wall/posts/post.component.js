@@ -29,11 +29,12 @@
         'youtubeSettings',
         'wallPostRepository',
         'wallService',
-        'notifySrv'
+        'notifySrv',
+        '$window'
     ];
 
     function wallPostController($scope, $state, $location, SmoothScroll, wallSettings,
-        errorHandler, youtubeSettings, wallPostRepository, wallService, notifySrv) {
+        errorHandler, youtubeSettings, wallPostRepository, wallService, notifySrv,$window) {
         /*jshint validthis: true */
         var vm = this;
 
@@ -52,6 +53,7 @@
         vm.youtubePreviewWidth = youtubeSettings.previewWidth;
         vm.youtubePreviewHeight = youtubeSettings.previewHeight;
         vm.stateParams = $state.params;
+        vm.useUnwatch=$window.useUnwatch;
 
         vm.getPostUrl = getPostUrl;
         vm.notifyCopied = notifyCopied;

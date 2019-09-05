@@ -106,10 +106,10 @@
                              is-wall-module="vm.isWallModule"
                              ng-show="!vm.editFieldEnabled">
     </ace-message-actions>
-<a ng-if="vm.post.isWatched" ng-click="vm.unwatchPost()">
+<a ng-if="vm.useUnwatch && vm.post.isWatched" ng-click="vm.unwatchPost()">
     <span translate="wall.unwatch"></span>
 </a>
-<a ng-if="!vm.post.isWatched" ng-click="vm.watchPost()">
+<a ng-if="vmUseUnwatch && !vm.post.isWatched" ng-click="vm.watchPost()">
     <span translate="wall.watch"></span>
 </a>
     <a  ngclipboard
