@@ -81,6 +81,9 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Post does not exist");
             }
 
+            var userGuid = Guid.Parse(commentDto.UserId);
+            var watchEntity = _postWatchers.Find(commentDto.PostId, userGuid);
+
             var comment = new Comment
             {
                 AuthorId = commentDto.UserId,
@@ -93,12 +96,16 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             _commentsDbSet.Add(comment);
 
             post.LastActivity = _systemClock.UtcNow;
-            _postWatchers.Add(
+
+            if (watchEntity == null)
+            {
+                _postWatchers.Add(
                 new PostWatcher
                 {
                     PostId = post.Id,
-                    UserId = Guid.Parse(commentDto.UserId)
+                    UserId = userGuid
                 });
+            }
 
             _uow.SaveChanges(commentDto.UserId);
 
