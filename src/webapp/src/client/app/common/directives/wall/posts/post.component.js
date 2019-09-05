@@ -55,6 +55,8 @@
 
         vm.getPostUrl = getPostUrl;
         vm.notifyCopied = notifyCopied;
+        vm.watchPost = watchPost;
+        vm.unwatchPost = unwatchPost;
 
         /////////
 
@@ -135,6 +137,30 @@
             }
 
             e && e.preventDefault();
+        }
+
+        function unwatchPost() {
+            if (vm.isActionsEnabled && vm.post.isWatched) {
+
+                vm.isActionsEnabled = false;
+
+                wallPostRepository.unwatchPost(vm.post).then(function() {
+                    vm.isActionsEnabled = true;
+                    vm.post.isWatched = false;
+                }, vm.handleErrorMessage);
+            }
+        }
+
+        function watchPost() {
+            if (vm.isActionsEnabled && !vm.post.isWatched) {
+
+                vm.isActionsEnabled = false;
+
+                wallPostRepository.watchPost(vm.post).then(function() {
+                    vm.isActionsEnabled = true;
+                    vm.post.isWatched = true;
+                }, vm.handleErrorMessage);
+            }
         }
     }
 }());

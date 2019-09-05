@@ -21,7 +21,9 @@
             createPost: createPost,
             editPost: editPost,
             deletePost: deletePost,
-            searchWall: searchWall
+            searchWall: searchWall,
+            watchPost: watchPost,
+            unwatchPost: unwatchPost
         };
         return service;
 
@@ -74,5 +76,26 @@
         function searchWall(params) {
             return $resource(wallUrl + 'Search').get(params).$promise;
         }
+
+        function watchPost(post) {
+            return $resource(postUrl + 'Watch', '', {
+                put: {
+                    method: 'PUT'
+                }
+            }).put({
+                id: post.id
+            }).$promise;
+        }
+
+        function unwatchPost(post) {
+            return $resource(postUrl + 'Unwatch', '', {
+                put: {
+                    method: 'PUT'
+                }
+            }).put({
+                id: post.id
+            }).$promise;
+        }
+
     }
 })();

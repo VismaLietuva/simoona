@@ -25,6 +25,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
         private readonly IDbSet<Comment> _commentsDbSet;
         private readonly IDbSet<WallModerator> _wallModeratorsDbSet;
         private readonly IDbSet<NotificationsSettings> _notificationsDbSet;
+        private readonly IDbSet<PostWatcher> _postWatchers;
 
         public CommentService(
             IUnitOfWork2 uow,
@@ -39,6 +40,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             _commentsDbSet = uow.GetDbSet<Comment>();
             _wallModeratorsDbSet = uow.GetDbSet<WallModerator>();
             _notificationsDbSet = uow.GetDbSet<NotificationsSettings>();
+            _postWatchers = uow.GetDbSet<PostWatcher>();
         }
 
         public void ToggleLike(int commentId, UserAndOrganizationDTO userOrg)
@@ -67,21 +69,6 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             _uow.SaveChanges(userOrg.UserId);
         }
 
-        public IList<string> GetCommentsAuthorsToNotify(int postId, IEnumerable<string> excludeUsers)
-        {
-            var comments = _commentsDbSet
-                .Where(comment => postId == comment.PostId && comment.AuthorId != null)
-                .OrderBy(o => o.Created)
-                .ToList();
-
-            var commentsAuthorsToNotify = comments
-                    .Where(c => excludeUsers.Contains(c.AuthorId) == false && c.Author != null)
-                    .Where(c => FollowingPostsAppNotificationsEnabled(c.Author.Id))
-                    .Select(c => c.AuthorId).Distinct().ToList();
-
-            return commentsAuthorsToNotify;
-        }
-
         public CommentCreatedDTO CreateComment(NewCommentDTO commentDto)
         {
             var post = _postsDbSet
@@ -106,6 +93,13 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             _commentsDbSet.Add(comment);
 
             post.LastActivity = _systemClock.UtcNow;
+            _postWatchers.Add(
+                new PostWatcher
+                {
+                    PostId = post.Id,
+                    UserId = Guid.Parse(commentDto.UserId)
+                });
+
             _uow.SaveChanges(commentDto.UserId);
 
             return new CommentCreatedDTO { WallId = post.WallId, CommentId = comment.Id, WallType = post.Wall.Type, CommentCreator = comment.AuthorId, PostCreator = post.AuthorId, PostId = post.Id };
@@ -210,15 +204,6 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             return _notificationsDbSet
                 .Where(x => x.ApplicationUser.Id == userId)
                 .Select(x => x.MyPostsAppNotifications)
-                .DefaultIfEmpty(true)
-                .SingleOrDefault();
-        }
-
-        private bool FollowingPostsAppNotificationsEnabled(string userId)
-        {
-            return _notificationsDbSet
-                .Where(x => x.ApplicationUser.Id == userId)
-                .Select(x => x.FollowingPostsAppNotifications)
                 .DefaultIfEmpty(true)
                 .SingleOrDefault();
         }
