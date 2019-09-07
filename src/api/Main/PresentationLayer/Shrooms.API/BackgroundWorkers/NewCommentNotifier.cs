@@ -47,14 +47,7 @@ namespace Shrooms.API.BackgroundWorkers
             var membersToNotify = _wallService.GetWallMembersIds(commentDto.WallId, userHubDto);
             NotificationHub.SendWallNotification(commentDto.WallId, membersToNotify, commentDto.WallType, userHubDto);
 
-            Guid? commentCreatorId = null;
-
-            if (!string.IsNullOrEmpty(commentDto.CommentCreator) && Guid.TryParse(commentDto.CommentCreator, out var tempCommentCreatorId))
-            {
-                commentCreatorId = tempCommentCreatorId;
-            }
-
-            var commentsAuthorsToNotify = _postService.GetPostWatchers(commentDto.PostId, commentCreatorId).ToList();
+            var postWatchers = _postService.GetPostWatchersIds(commentDto.PostId, commentDto.CommentCreator).ToList();
 
             if (commentDto.PostCreator != commentDto.CommentCreator && _commentService.IsPostAuthorAppNotificationsEnabled(commentDto.PostCreator))
             {
@@ -64,15 +57,15 @@ namespace Shrooms.API.BackgroundWorkers
                     NotificationHub.SendNotificationToParticularUsers(_mapper.Map<NotificationViewModel>(notificationAuthorDto), userHubDto, new List<string> { commentDto.PostCreator });
                 }
 
-                commentsAuthorsToNotify.Remove(commentDto.PostCreator);
+                postWatchers.Remove(commentDto.PostCreator);
             }
 
-            if (commentsAuthorsToNotify.Count > 0)
+            if (postWatchers.Count > 0)
             {
-                var notificationDto = _notificationService.CreateForComment(userHubDto, commentDto, NotificationType.FollowingComment, commentsAuthorsToNotify).GetAwaiter().GetResult();
+                var notificationDto = _notificationService.CreateForComment(userHubDto, commentDto, NotificationType.FollowingComment, postWatchers).GetAwaiter().GetResult();
                 if (notificationDto != null)
                 {
-                    NotificationHub.SendNotificationToParticularUsers(_mapper.Map<NotificationViewModel>(notificationDto), userHubDto, commentsAuthorsToNotify);
+                    NotificationHub.SendNotificationToParticularUsers(_mapper.Map<NotificationViewModel>(notificationDto), userHubDto, postWatchers);
                 }
             }
         }

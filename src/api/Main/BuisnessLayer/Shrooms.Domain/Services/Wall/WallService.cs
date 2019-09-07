@@ -690,8 +690,8 @@ namespace Shrooms.Domain.Services.Wall
         private async Task<HashSet<int>> RetrieveWatchedPosts(string userId, List<Post> posts)
         {
             var postIds = posts.Select(s => s.Id).ToList();
-            var userGuid = Guid.Parse(userId);
-            var watchedList = await _postWatchers.Where(wh => wh.UserId == userGuid && postIds.Contains(wh.PostId)).Select(s => s.PostId).ToListAsync();
+            var watchedList = await _postWatchers.Where(w => w.UserId == userId && postIds.Contains(w.PostId)).Select(s => s.PostId).ToListAsync();
+
             return new HashSet<int>(watchedList);
         }
 
