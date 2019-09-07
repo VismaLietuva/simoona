@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using Shrooms.API.Hubs;
@@ -46,14 +47,21 @@ namespace Shrooms.API.BackgroundWorkers
             var membersToNotify = _wallService.GetWallMembersIds(commentDto.WallId, userHubDto);
             NotificationHub.SendWallNotification(commentDto.WallId, membersToNotify, commentDto.WallType, userHubDto);
 
-            var commentsAuthorsToNotify = _postService.GetPostWatchers(commentDto.PostId).ToList();
+            Guid? commentCreatorId = null;
+
+            if (!string.IsNullOrEmpty(commentDto.CommentCreator) && Guid.TryParse(commentDto.CommentCreator, out var tempCommentCreatorId))
+            {
+                commentCreatorId = tempCommentCreatorId;
+            }
+
+            var commentsAuthorsToNotify = _postService.GetPostWatchers(commentDto.PostId, commentCreatorId).ToList();
 
             if (commentDto.PostCreator != commentDto.CommentCreator && _commentService.IsPostAuthorAppNotificationsEnabled(commentDto.PostCreator))
             {
                 var notificationAuthorDto = _notificationService.CreateForComment(userHubDto, commentDto, NotificationType.WallComment, new List<string> { commentDto.PostCreator }).GetAwaiter().GetResult();
                 if (notificationAuthorDto != null)
                 {
-                    NotificationHub.SendNotificationToParticularUsers(_mapper.Map<NotificationViewModel>(notificationAuthorDto), userHubDto, new List<string>() { commentDto.PostCreator });
+                    NotificationHub.SendNotificationToParticularUsers(_mapper.Map<NotificationViewModel>(notificationAuthorDto), userHubDto, new List<string> { commentDto.PostCreator });
                 }
 
                 commentsAuthorsToNotify.Remove(commentDto.PostCreator);
