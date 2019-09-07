@@ -72,7 +72,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
                 new PostWatcher
                 {
                     PostId = post.Id,
-                    UserId = Guid.Parse(newPostDto.UserId)
+                    UserId = newPostDto.UserId
                 });
             _uow.SaveChanges(newPostDto.UserId);
 
@@ -88,8 +88,8 @@ namespace Shrooms.Domain.Services.Wall.Posts
             var post = _postsDbSet
                 .Include(x => x.Wall)
                 .FirstOrDefault(x =>
-                    x.Id == postId &&
-                    x.Wall.OrganizationId == userOrg.OrganizationId);
+                        x.Id == postId &&
+                        x.Wall.OrganizationId == userOrg.OrganizationId);
 
             if (post == null)
             {
@@ -114,8 +114,8 @@ namespace Shrooms.Domain.Services.Wall.Posts
             var post = _postsDbSet
                 .Include(x => x.Wall)
                 .FirstOrDefault(x =>
-                    x.Id == editPostDto.Id &&
-                    x.Wall.OrganizationId == editPostDto.OrganizationId);
+                        x.Id == editPostDto.Id &&
+                        x.Wall.OrganizationId == editPostDto.OrganizationId);
 
             if (post == null)
             {
@@ -146,8 +146,8 @@ namespace Shrooms.Domain.Services.Wall.Posts
                 var post = _postsDbSet
                     .Include(x => x.Wall)
                     .FirstOrDefault(s =>
-                        s.Id == postId &&
-                        s.Wall.OrganizationId == userOrg.OrganizationId);
+                            s.Id == postId &&
+                            s.Wall.OrganizationId == userOrg.OrganizationId);
 
                 if (post == null)
                 {
@@ -177,8 +177,8 @@ namespace Shrooms.Domain.Services.Wall.Posts
                 var post = _postsDbSet
                     .Include(x => x.Wall)
                     .FirstOrDefault(s =>
-                        s.Id == postId &&
-                        s.Wall.OrganizationId == userOrg.OrganizationId);
+                            s.Id == postId &&
+                            s.Wall.OrganizationId == userOrg.OrganizationId);
 
                 if (post == null)
                 {
@@ -230,14 +230,13 @@ namespace Shrooms.Domain.Services.Wall.Posts
 
         public void ToggleWatch(int postId, UserAndOrganizationDTO userAndOrg, bool shouldWatch)
         {
-            var userGuid = Guid.Parse(userAndOrg.UserId);
-            var entity = _postWatchers.Find(postId, userGuid);
+            var entity = _postWatchers.Find(postId, userAndOrg.UserId);
             if (shouldWatch && entity == null)
             {
                 entity = new PostWatcher
                 {
                     PostId = postId,
-                    UserId = userGuid
+                    UserId = userAndOrg.UserId
                 };
                 _postWatchers.Add(entity);
             }
@@ -250,11 +249,21 @@ namespace Shrooms.Domain.Services.Wall.Posts
             _uow.SaveChanges();
         }
 
-        public IEnumerable<string> GetPostWatchers(int postId, Guid? excludedUser)
+        public IEnumerable<string> GetPostWatchersIds(int postId)
         {
-            return _postWatchers.Where(w => w.PostId == postId && (!excludedUser.HasValue || w.UserId != excludedUser))
+            return _postWatchers
+                .Where(w => w.PostId == postId)
                 .Select(s => s.UserId).ToList()
                 .Select(s => s.ToString());
+        }
+
+        public IEnumerable<ApplicationUser> GetPostWatchers(int postId)
+        {
+            return _postWatchers
+                .Where(w => w.PostId == postId)
+                .Include(w => w.User)
+                .Where(w => w.User != null)
+                .Select(w => w.User).ToList();
         }
     }
 }

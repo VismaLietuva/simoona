@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using Shrooms.Constants;
@@ -10,9 +11,11 @@ using Shrooms.DataTransferObjects.Models.Wall.Posts.Comments;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.UserService;
+using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Multiwall;
+using Shrooms.EntityModels.Models.Notifications;
 using Shrooms.Infrastructure.Configuration;
 using Shrooms.Infrastructure.Email;
 using Shrooms.Infrastructure.Email.Templating;
@@ -27,11 +30,13 @@ namespace Shrooms.Domain.Services.Email.Posting
         private readonly IMailingService _mailingService;
         private readonly IApplicationSettings _appSettings;
         private readonly IOrganizationService _organizationService;
+        private readonly IPostService _postService;
         private readonly IMarkdownConverter _markdownConverter;
 
         private readonly IDbSet<EntityModels.Models.Events.Event> _eventsDbSet;
         private readonly IDbSet<Project> _projectsDbSet;
         private readonly IDbSet<Comment> _commentsDbSet;
+        private readonly IDbSet<NotificationsSettings> _notificationsDbSet;
 
         public CommentNotificationService(
             IUnitOfWork2 uow,
@@ -40,7 +45,8 @@ namespace Shrooms.Domain.Services.Email.Posting
             IMailingService mailingService,
             IApplicationSettings appSettings,
             IOrganizationService organizationService,
-            IMarkdownConverter markdownConverter)
+            IMarkdownConverter markdownConverter,
+            IPostService postService)
         {
             _appSettings = appSettings;
             _userService = userService;
@@ -48,17 +54,20 @@ namespace Shrooms.Domain.Services.Email.Posting
             _mailingService = mailingService;
             _organizationService = organizationService;
             _markdownConverter = markdownConverter;
+            _postService = postService;
 
             _eventsDbSet = uow.GetDbSet<EntityModels.Models.Events.Event>();
             _projectsDbSet = uow.GetDbSet<Project>();
             _commentsDbSet = uow.GetDbSet<Comment>();
+            _notificationsDbSet = uow.GetDbSet<NotificationsSettings>();
         }
 
         public void NotifyAboutNewComment(Comment comment, ApplicationUser commentCreator)
         {
             var organization = _organizationService.GetOrganizationById(commentCreator.OrganizationId);
 
-            var destinationEmails = _userService.GetPostCommentersEmails(commentCreator.Email, comment.PostId);
+            var destinationEmails = GetPostCommentersEmails(commentCreator.Email, comment.PostId, commentCreator.Id);
+
             var postAuthorEmail = (comment.Post.AuthorId == comment.AuthorId) ? null : _userService.GetPostAuthorEmail(comment.Post.AuthorId);
             if (postAuthorEmail != null && destinationEmails.Contains(postAuthorEmail) == false)
             {
@@ -93,12 +102,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             var commentCreator = _userService.GetApplicationUser(commentDto.CommentCreator);
             var organization = _organizationService.GetOrganizationById(commentCreator.OrganizationId);
 
-            var destinationEmails = _userService.GetPostCommentersEmails(commentCreator.Email, commentDto.PostId);
-            var postAuthorEmail = (commentDto.CommentCreator == commentDto.PostCreator) ? null : _userService.GetPostAuthorEmail(commentDto.PostCreator);
-            if (postAuthorEmail != null && destinationEmails.Contains(postAuthorEmail) == false)
-            {
-                destinationEmails.Add(postAuthorEmail);
-            }
+            var destinationEmails = GetPostCommentersEmails(commentCreator.Email, commentDto.PostId, commentCreator.Id);
 
             if (destinationEmails.Count > 0)
             {
@@ -122,6 +126,26 @@ namespace Shrooms.Domain.Services.Email.Posting
                 var emailData = new EmailDto(destinationEmails, subject, content);
                 _mailingService.SendEmail(emailData);
             }
+        }
+
+        private IList<string> GetPostCommentersEmails(string senderEmail, int postId, string commentCreatorId)
+        {
+            var postWatchers = _postService.GetPostWatchers(postId).ToList();
+
+            return postWatchers
+                          .Where(w => w.Email != senderEmail && w.Id != commentCreatorId && FollowingPostsEmailNotificationsEnabled(w.Id))
+                          .Select(w => w.Email)
+                          .Distinct()
+                          .ToList();
+        }
+
+        private bool FollowingPostsEmailNotificationsEnabled(string userId)
+        {
+            return _notificationsDbSet
+                .Where(x => x.ApplicationUser.Id == userId)
+                .Select(x => x.FollowingPostsEmailNotifications)
+                .DefaultIfEmpty(true)
+                .SingleOrDefault();
         }
 
         private string CutMessage(string value)

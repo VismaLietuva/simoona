@@ -79,6 +79,11 @@ namespace Shrooms.Domain.Services.Notifications
             return _mapper.Map<NotificationDto>(newNotification);
         }
 
+        public async Task<NotificationDto> CreateForComment(UserAndOrganizationDTO userOrg, CommentCreatedDTO comment, NotificationType type, string memberToNotify)
+        {
+            return await CreateForComment(userOrg, comment, type, new List<string> { memberToNotify });
+        }
+
         public async Task<NotificationDto> CreateForComment(UserAndOrganizationDTO userOrg, CommentCreatedDTO comment, NotificationType type, IEnumerable<string> membersToNotify)
         {
             var sources = new Sources { PostId = comment.PostId };

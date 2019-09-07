@@ -7,8 +7,15 @@ namespace Shrooms.EntityModels.Models.Multiwall
     public class PostWatcher
     {
         [Key, Column(Order = 0)]
+        [ForeignKey("Post")]
         public int PostId { get; set; }
+
         [Key, Column(Order = 1)]
-        public Guid UserId { get; set; }
+        [ForeignKey("User")]
+        public string UserId { get; set; }
+
+        public virtual Post Post { get; set; }
+
+        public virtual ApplicationUser User { get; set; }
     }
 }

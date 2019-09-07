@@ -28,7 +28,6 @@ namespace Shrooms.Domain.Services.UserService
         private readonly IDbSet<WallMember> _wallMembersDbSet;
         private readonly IDbSet<WallModerator> _wallModeratorsDbSet;
         private readonly IDbSet<WallModel> _wallDbSet;
-        private readonly IDbSet<Comment> _commentsDbSet;
         private readonly IDbSet<NotificationsSettings> _notificationsDbSet;
 
         private readonly IUnitOfWork2 _uow;
@@ -41,7 +40,6 @@ namespace Shrooms.Domain.Services.UserService
             _wallModeratorsDbSet = uow.GetDbSet<WallModerator>();
             _wallMembersDbSet = uow.GetDbSet<WallMember>();
             _wallDbSet = uow.GetDbSet<WallModel>();
-            _commentsDbSet = uow.GetDbSet<Comment>();
             _notificationsDbSet = uow.GetDbSet<NotificationsSettings>();
 
             _uow = uow;
@@ -204,20 +202,6 @@ namespace Shrooms.Domain.Services.UserService
             return emails;
         }
 
-        public IList<string> GetPostCommentersEmails(string senderEmail, int postId)
-        {
-            var authors = _commentsDbSet
-                .Where(c => c.PostId == postId)
-                .Include(c => c.Author)
-                .Where(c => c.Author != null && c.Author.Email != senderEmail)
-                .Select(c => c.Author).ToList();
-
-            return authors.Where(a => FollowingPostsEmailNotificationsEnabled(a.Id))
-                          .Select(a => a.Email)
-                          .Distinct()
-                          .ToList();
-        }
-
         public string GetPostAuthorEmail(string userId)
         {
             bool emailEnabled = _notificationsDbSet
@@ -370,15 +354,6 @@ namespace Shrooms.Domain.Services.UserService
         public ApplicationUser GetApplicationUser(string id)
         {
             return _usersDbSet.First(u => u.Id == id);
-        }
-
-        private bool FollowingPostsEmailNotificationsEnabled(string userId)
-        {
-            return _notificationsDbSet
-                .Where(x => x.ApplicationUser.Id == userId)
-                .Select(x => x.FollowingPostsEmailNotifications)
-                .DefaultIfEmpty(true)
-                .SingleOrDefault();
         }
 
         private void UnassignUserFromWalls(string userId, int tenantId)
