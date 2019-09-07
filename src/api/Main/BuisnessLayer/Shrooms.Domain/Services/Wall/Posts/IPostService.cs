@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Wall.Posts;
 
@@ -12,6 +13,6 @@ namespace Shrooms.Domain.Services.Wall.Posts
         void DeleteWallPost(int postId, UserAndOrganizationDTO userOrg);
         void HideWallPost(int postId, UserAndOrganizationDTO userOrg);
         void ToggleWatch(int postId, UserAndOrganizationDTO userAndOrg, bool shouldWatch);
-        IEnumerable<string> GetPostWatchers(int postId);
+        IEnumerable<string> GetPostWatchers(int postId, Guid? excludedUser);
     }
 }

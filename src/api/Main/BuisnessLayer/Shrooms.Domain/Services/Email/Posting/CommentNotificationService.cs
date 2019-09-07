@@ -33,7 +33,6 @@ namespace Shrooms.Domain.Services.Email.Posting
         private readonly IDbSet<Project> _projectsDbSet;
         private readonly IDbSet<Comment> _commentsDbSet;
 
-
         public CommentNotificationService(
             IUnitOfWork2 uow,
             IUserService userService,
@@ -68,7 +67,7 @@ namespace Shrooms.Domain.Services.Email.Posting
 
             if (destinationEmails.Count > 0)
             {
-                var postLink = GetPostLink(comment.Post.Wall.Type,comment.Post.WallId, organization.ShortName, comment.Post.Id);
+                var postLink = GetPostLink(comment.Post.Wall.Type, comment.Post.WallId, organization.ShortName, comment.Post.Id);
                 var authorPictureUrl = _appSettings.PictureUrl(organization.ShortName, commentCreator.PictureId);
                 var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
                 var subject = string.Format(Templates.NewPostCommentEmailSubject, CutMessage(comment.Post.MessageBody), commentCreator.FullName);
@@ -104,7 +103,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             if (destinationEmails.Count > 0)
             {
                 var comment = LoadComment(commentDto.CommentId);
-                var postLink = GetPostLink(commentDto.WallType,commentDto.WallId, organization.ShortName, commentDto.PostId);
+                var postLink = GetPostLink(commentDto.WallType, commentDto.WallId, organization.ShortName, commentDto.PostId);
                 var authorPictureUrl = _appSettings.PictureUrl(organization.ShortName, commentCreator.PictureId);
                 var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
                 var subject = string.Format(Templates.NewPostCommentEmailSubject, CutMessage(comment.Post.MessageBody), commentCreator.FullName);
@@ -141,7 +140,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             return value;
         }
 
-        private string GetPostLink(WallType wallType,int wallId, string orgName, int postId)
+        private string GetPostLink(WallType wallType, int wallId, string orgName, int postId)
         {
             switch (wallType)
             {
@@ -166,13 +165,13 @@ namespace Shrooms.Domain.Services.Email.Posting
         {
             var comment = _commentsDbSet
                             .Include(x => x.Post)
-                            .FirstOrDefault(c =>
-                                c.Id == commentId);
+                            .FirstOrDefault(c => c.Id == commentId);
 
             if (comment == null)
             {
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, $"Comment {commentId} does not exist");
             }
+
             return comment;
         }
     }

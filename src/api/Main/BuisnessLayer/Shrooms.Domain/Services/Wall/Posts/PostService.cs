@@ -8,7 +8,6 @@ using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Users;
 using Shrooms.DataTransferObjects.Models.Wall.Posts;
-using Shrooms.Domain.Services.Email.Posting;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall.Posts.Comments;
 using Shrooms.DomainExceptions.Exceptions;
@@ -31,10 +30,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
         private readonly IDbSet<EntityModels.Models.Multiwall.Wall> _wallsDbSet;
         private readonly IDbSet<PostWatcher> _postWatchers;
 
-        public PostService(
-            IUnitOfWork2 uow,
-            IPermissionService permissionService,
-            ICommentService commentService)
+        public PostService(IUnitOfWork2 uow, IPermissionService permissionService, ICommentService commentService)
         {
             _uow = uow;
             _permissionService = permissionService;
@@ -254,9 +250,9 @@ namespace Shrooms.Domain.Services.Wall.Posts
             _uow.SaveChanges();
         }
 
-        public IEnumerable<string> GetPostWatchers(int postId)
+        public IEnumerable<string> GetPostWatchers(int postId, Guid? excludedUser)
         {
-            return _postWatchers.Where(wh => wh.PostId == postId)
+            return _postWatchers.Where(w => w.PostId == postId && (!excludedUser.HasValue || w.UserId != excludedUser))
                 .Select(s => s.UserId).ToList()
                 .Select(s => s.ToString());
         }
