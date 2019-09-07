@@ -14,7 +14,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
         void DeleteWallPost(int postId, UserAndOrganizationDTO userOrg);
         void HideWallPost(int postId, UserAndOrganizationDTO userOrg);
         void ToggleWatch(int postId, UserAndOrganizationDTO userAndOrg, bool shouldWatch);
-        IEnumerable<string> GetPostWatchersIds(int postId, string excludedUserId);
-        IEnumerable<ApplicationUser> GetPostWatchers(int postId, string excludedUserId);
+        IEnumerable<string> GetPostWatchersIds(int postId);
+        IEnumerable<ApplicationUser> GetPostWatchers(int postId);
     }
 }

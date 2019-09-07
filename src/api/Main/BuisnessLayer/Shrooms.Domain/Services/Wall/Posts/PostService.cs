@@ -249,18 +249,18 @@ namespace Shrooms.Domain.Services.Wall.Posts
             _uow.SaveChanges();
         }
 
-        public IEnumerable<string> GetPostWatchersIds(int postId, string excludedUserId)
+        public IEnumerable<string> GetPostWatchersIds(int postId)
         {
             return _postWatchers
-                .Where(w => w.PostId == postId && (string.IsNullOrEmpty(excludedUserId) || w.UserId != excludedUserId))
+                .Where(w => w.PostId == postId)
                 .Select(s => s.UserId).ToList()
                 .Select(s => s.ToString());
         }
 
-        public IEnumerable<ApplicationUser> GetPostWatchers(int postId, string excludedUserId)
+        public IEnumerable<ApplicationUser> GetPostWatchers(int postId)
         {
             return _postWatchers
-                .Where(w => w.PostId == postId && (string.IsNullOrEmpty(excludedUserId) || w.UserId != excludedUserId))
+                .Where(w => w.PostId == postId)
                 .Include(w => w.User)
                 .Where(w => w.User != null)
                 .Select(w => w.User).ToList();
