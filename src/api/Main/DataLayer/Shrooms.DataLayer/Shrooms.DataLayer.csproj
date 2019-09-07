@@ -793,9 +793,9 @@
     <Compile Include="Migrations\201907201330177_AddKudosWelcomeColumns.Designer.cs">
       <DependentUpon>201907201330177_AddKudosWelcomeColumns.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201908291156144_PostWatchers.cs" />
-    <Compile Include="Migrations\201908291156144_PostWatchers.Designer.cs">
-      <DependentUpon>201908291156144_PostWatchers.cs</DependentUpon>
+    <Compile Include="Migrations\201909071758421_PostWatchers.cs" />
+    <Compile Include="Migrations\201909071758421_PostWatchers.Designer.cs">
+      <DependentUpon>201909071758421_PostWatchers.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
@@ -1292,8 +1292,8 @@
     <EmbeddedResource Include="Migrations\201907201330177_AddKudosWelcomeColumns.resx">
       <DependentUpon>201907201330177_AddKudosWelcomeColumns.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201908291156144_PostWatchers.resx">
-      <DependentUpon>201908291156144_PostWatchers.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201909071758421_PostWatchers.resx">
+      <DependentUpon>201909071758421_PostWatchers.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
