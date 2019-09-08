@@ -53,7 +53,7 @@
         vm.youtubePreviewWidth = youtubeSettings.previewWidth;
         vm.youtubePreviewHeight = youtubeSettings.previewHeight;
         vm.stateParams = $state.params;
-        vm.useUnwatch=$window.useUnwatch;
+        vm.usePostWatching = $window.usePostWatching;
 
         vm.getPostUrl = getPostUrl;
         vm.notifyCopied = notifyCopied;

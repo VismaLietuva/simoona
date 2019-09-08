@@ -18,7 +18,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
 {
     public class PostService : IPostService
     {
-        private static object postDeleteLock = new object();
+        private static object _postDeleteLock = new object();
 
         private readonly IPermissionService _permissionService;
         private readonly ICommentService _commentService;
@@ -141,7 +141,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
 
         public void DeleteWallPost(int postId, UserAndOrganizationDTO userOrg)
         {
-            lock (postDeleteLock)
+            lock (_postDeleteLock)
             {
                 var post = _postsDbSet
                     .Include(x => x.Wall)
@@ -163,7 +163,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
                     throw new UnauthorizedException();
                 }
 
-                _commentService.DeleteCommentsByPost(post.Id, userOrg);
+                _commentService.DeleteCommentsByPost(post.Id);
                 _postsDbSet.Remove(post);
 
                 _uow.SaveChanges(userOrg.UserId);
@@ -172,7 +172,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
 
         public void HideWallPost(int postId, UserAndOrganizationDTO userOrg)
         {
-            lock (postDeleteLock)
+            lock (_postDeleteLock)
             {
                 var post = _postsDbSet
                     .Include(x => x.Wall)
@@ -249,18 +249,18 @@ namespace Shrooms.Domain.Services.Wall.Posts
             _uow.SaveChanges();
         }
 
-        public IEnumerable<string> GetPostWatchersIds(int postId)
+        public IEnumerable<string> GetPostWatchersForAppNotifications(int postId)
         {
             return _postWatchers
-                .Where(w => w.PostId == postId)
+                .Where(w => w.PostId == postId && w.User.NotificationsSettings.FollowingPostsAppNotifications)
                 .Select(s => s.UserId).ToList()
                 .Select(s => s.ToString());
         }
 
-        public IEnumerable<ApplicationUser> GetPostWatchers(int postId)
+        public IEnumerable<ApplicationUser> GetPostWatchersForEmailNotifications(int postId)
         {
             return _postWatchers
-                .Where(w => w.PostId == postId)
+                .Where(w => w.PostId == postId && w.User.NotificationsSettings.FollowingPostsEmailNotifications)
                 .Include(w => w.User)
                 .Where(w => w.User != null)
                 .Select(w => w.User).ToList();

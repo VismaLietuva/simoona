@@ -24,8 +24,6 @@ namespace Shrooms.Domain.Services.UserService
 
         IList<string> GetWallUsersEmails(string senderEmail, EntityModels.Models.Multiwall.Wall wall);
 
-        string GetPostAuthorEmail(string userId);
-
         Task<UserNotificationsSettingsDto> GetWallNotificationSettings(UserAndOrganizationDTO userOrg);
 
         void ChangeWallNotificationSettings(UserNotificationsSettingsDto wallNotificationsSettingsDto, UserAndOrganizationDTO userOrg);

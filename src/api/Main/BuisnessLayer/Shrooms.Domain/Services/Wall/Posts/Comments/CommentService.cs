@@ -27,10 +27,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
         private readonly IDbSet<NotificationsSettings> _notificationsDbSet;
         private readonly IDbSet<PostWatcher> _postWatchers;
 
-        public CommentService(
-            IUnitOfWork2 uow,
-            ISystemClock systemClock,
-            IPermissionService permissionService)
+        public CommentService(IUnitOfWork2 uow, ISystemClock systemClock, IPermissionService permissionService)
         {
             _uow = uow;
             _systemClock = systemClock;
@@ -73,8 +70,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
         {
             var post = _postsDbSet
                 .Include(x => x.Wall)
-                .FirstOrDefault(p =>
-                    p.Id == commentDto.PostId && p.Wall.OrganizationId == commentDto.OrganizationId);
+                .FirstOrDefault(p => p.Id == commentDto.PostId && p.Wall.OrganizationId == commentDto.OrganizationId);
 
             if (post == null)
             {
@@ -92,6 +88,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
                 Likes = new LikesCollection(),
                 LastEdit = DateTime.UtcNow
             };
+
             _commentsDbSet.Add(comment);
 
             post.LastActivity = _systemClock.UtcNow;
@@ -107,7 +104,10 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
 
             _uow.SaveChanges(commentDto.UserId);
 
-            return new CommentCreatedDTO { WallId = post.WallId, CommentId = comment.Id, WallType = post.Wall.Type, CommentCreator = comment.AuthorId, PostCreator = post.AuthorId, PostId = post.Id };
+            return new CommentCreatedDTO
+            {
+                WallId = post.WallId, CommentId = comment.Id, WallType = post.Wall.Type, CommentCreator = comment.AuthorId, PostCreator = post.AuthorId, PostId = post.Id
+            };
         }
 
         public void EditComment(EditCommentDTO commentDto)
@@ -124,7 +124,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             }
 
             var isWallModerator = _wallModeratorsDbSet
-                .Any(x => x.UserId == commentDto.UserId && x.WallId == comment.Post.WallId) || commentDto.UserId == comment.CreatedBy;
+                                      .Any(x => x.UserId == commentDto.UserId && x.WallId == comment.Post.WallId) || commentDto.UserId == comment.CreatedBy;
 
             var isAdministrator = _permissionService.UserHasPermission(commentDto, AdministrationPermissions.Post);
 
@@ -153,7 +153,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             }
 
             var isWallModerator = _wallModeratorsDbSet
-                .Any(x => x.UserId == userOrg.UserId && x.WallId == comment.Post.WallId) || comment.CreatedBy == userOrg.UserId;
+                                      .Any(x => x.UserId == userOrg.UserId && x.WallId == comment.Post.WallId) || comment.CreatedBy == userOrg.UserId;
 
             var isAdministrator = _permissionService.UserHasPermission(userOrg, AdministrationPermissions.Post);
 
@@ -180,7 +180,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             }
 
             var isWallModerator = _wallModeratorsDbSet
-                .Any(x => x.UserId == userOrg.UserId && x.WallId == comment.Post.WallId) || comment.CreatedBy == userOrg.UserId;
+                                      .Any(x => x.UserId == userOrg.UserId && x.WallId == comment.Post.WallId) || comment.CreatedBy == userOrg.UserId;
 
             var isAdministrator = _permissionService.UserHasPermission(userOrg, AdministrationPermissions.Post);
 
@@ -195,22 +195,13 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             _uow.SaveChanges(userOrg.UserId);
         }
 
-        public void DeleteCommentsByPost(int postId, UserAndOrganizationDTO userAndOrg)
+        public void DeleteCommentsByPost(int postId)
         {
             var comments = _commentsDbSet
                 .Where(x => x.PostId == postId)
                 .ToList();
 
             comments.ForEach(x => _commentsDbSet.Remove(x));
-        }
-
-        public bool IsPostAuthorAppNotificationsEnabled(string userId)
-        {
-            return _notificationsDbSet
-                .Where(x => x.ApplicationUser.Id == userId)
-                .Select(x => x.MyPostsAppNotifications)
-                .DefaultIfEmpty(true)
-                .SingleOrDefault();
         }
     }
 }

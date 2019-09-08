@@ -20,45 +20,36 @@ namespace Shrooms.API.BackgroundWorkers
         private readonly IMapper _mapper;
         private readonly IWallService _wallService;
         private readonly INotificationService _notificationService;
-        private readonly ICommentNotificationService _commentNotificationService;
+        private readonly ICommentEmailNotificationService _commentEmailNotificationService;
         private readonly ICommentService _commentService;
         private readonly IPostService _postService;
 
         public NewCommentNotifier(IMapper mapper,
-            IWallService wallService,
-            INotificationService notificationService,
-            ICommentNotificationService commentNotificationService,
-            ICommentService commentService,
-            IPostService postService)
+                                  IWallService wallService,
+                                  INotificationService notificationService,
+                                  ICommentEmailNotificationService commentEmailNotificationService,
+                                  ICommentService commentService,
+                                  IPostService postService)
         {
             _mapper = mapper;
             _wallService = wallService;
             _notificationService = notificationService;
-            _commentNotificationService = commentNotificationService;
+            _commentEmailNotificationService = commentEmailNotificationService;
             _commentService = commentService;
             _postService = postService;
         }
 
         public void Notify(CommentCreatedDTO commentDto, UserAndOrganizationHubDto userHubDto)
         {
-            _commentNotificationService.NotifyAboutNewComment(commentDto);
+            _commentEmailNotificationService.SendEmailNotification(commentDto);
 
             var membersToNotify = _wallService.GetWallMembersIds(commentDto.WallId, userHubDto);
             NotificationHub.SendWallNotification(commentDto.WallId, membersToNotify, commentDto.WallType, userHubDto);
 
-            var postWatchers = _postService.GetPostWatchersIds(commentDto.PostId).ToList();
+            var postWatchers = _postService.GetPostWatchersForAppNotifications(commentDto.PostId).ToList();
 
-            // Ignore comment author - he doesn't need to receive notification about his own comment
+            // Comment author doesn't need to receive notification about his own comment
             postWatchers.Remove(commentDto.CommentCreator);
-
-            // Send notification to author if he is watching and setting is enabled
-            if (postWatchers.Contains(commentDto.PostCreator) && _commentService.IsPostAuthorAppNotificationsEnabled(commentDto.PostCreator))
-            {
-                SendNotification(commentDto, userHubDto, NotificationType.WallComment, commentDto.PostCreator);
-            }
-
-            // Post create no longer needed for notifications
-            postWatchers.Remove(commentDto.PostCreator);
 
             // Send notification to other users
             if (postWatchers.Count > 0)
