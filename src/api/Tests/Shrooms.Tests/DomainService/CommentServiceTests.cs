@@ -27,7 +27,6 @@ namespace Shrooms.UnitTests.DomainService
         private ISystemClock _systemClock;
         private IDbSet<Comment> _commentsDbSet;
         private CommentService _commentService;
-        private ICommentNotificationService _commentNotificationService;
         private IPermissionService _permissionService;
         private IDbSet<WallModerator> _wallModeratorsDbSet;
         private string _userId = Guid.NewGuid().ToString();
@@ -44,7 +43,6 @@ namespace Shrooms.UnitTests.DomainService
 
             _systemClock = Substitute.For<ISystemClock>();
             _permissionService = Substitute.For<IPermissionService>();
-            _commentNotificationService = Substitute.For<ICommentNotificationService>();
 
             _commentService = new CommentService(uow, _systemClock, _permissionService);
         }
