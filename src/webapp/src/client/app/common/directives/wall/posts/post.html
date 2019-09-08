@@ -106,9 +106,9 @@
                              ng-show="!vm.editFieldEnabled">
     </ace-message-actions>
 
-    <a ng-if="vm.useUnwatch && vm.post.isWatched" ng-click="vm.unwatchPost()" class="post-buttons glyphicon glyphicon-star" title="{{ 'wall.unwatch' | translate }}">
+    <a feature-flag="usePostWatching" ng-if="vm.post.isWatched" ng-click="vm.unwatchPost()" class="post-buttons glyphicon glyphicon-star" title="{{ 'wall.unwatch' | translate }}">
     </a>
-    <a ng-if="vm.useUnwatch && !vm.post.isWatched" ng-click="vm.watchPost()" class="post-buttons glyphicon glyphicon-star-empty" title="{{ 'wall.watch' | translate }}">
+    <a feature-flag="usePostWatching" ng-if="!vm.post.isWatched" ng-click="vm.watchPost()" class="post-buttons glyphicon glyphicon-star-empty" title="{{ 'wall.watch' | translate }}">
     </a>
 
     <a ngclipboard ng-click="vm.notifyCopied($event)" ng-href="{{vm.getPostUrl(vm.post.id)}}" data-clipboard-text="{{vm.getPostUrl(vm.post.id)}}" class="vismaicon vismaicon-sm icon-post-link"></a>
