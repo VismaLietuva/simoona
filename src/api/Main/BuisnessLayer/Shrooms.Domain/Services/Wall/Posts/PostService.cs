@@ -252,7 +252,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
         public IEnumerable<string> GetPostWatchersForAppNotifications(int postId)
         {
             return _postWatchers
-                .Where(w => w.PostId == postId && w.User.NotificationsSettings.FollowingPostsAppNotifications)
+                .Where(w => w.PostId == postId && (w.User.NotificationsSettings == null || w.User.NotificationsSettings.FollowingPostsAppNotifications))
                 .Select(s => s.UserId).ToList()
                 .Select(s => s.ToString());
         }
@@ -260,7 +260,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
         public IEnumerable<ApplicationUser> GetPostWatchersForEmailNotifications(int postId)
         {
             return _postWatchers
-                .Where(w => w.PostId == postId && w.User.NotificationsSettings.FollowingPostsEmailNotifications)
+                .Where(w => w.PostId == postId && (w.User.NotificationsSettings == null || w.User.NotificationsSettings.FollowingPostsEmailNotifications))
                 .Include(w => w.User)
                 .Where(w => w.User != null)
                 .Select(w => w.User).ToList();
