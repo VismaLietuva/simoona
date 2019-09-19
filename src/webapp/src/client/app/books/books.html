@@ -3,7 +3,7 @@
       <div class="panel panel-default">
           <div class="panel-heading">
               <span translate="books.books"></span>
-              <div class="pull-right" has-permissions="['BOOK_ADMINISTRATION']">
+              <div class="pull-right" ng-if="vm.offices.length !== 0" has-permissions="['BOOK_ADMINISTRATION']">
                          <a class="nc-btn nc-btn-default"
                             ui-sref="Root.WithOrg.Client.Books.Add"
                             translate-attr-title="books.addBookTitle"
