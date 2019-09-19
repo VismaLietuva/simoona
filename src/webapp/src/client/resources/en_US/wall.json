@@ -55,5 +55,7 @@
   "wallModerators": "Moderators",
   "addModerators": "Add moderators",
   "successToClipboard": "Successfully copied to clipboard!",
-  "markdownSuggestions": "**bold** __underlined__ *italics* ~~strikethrough~~ `code`"
+  "markdownSuggestions": "**bold** __underlined__ *italics* ~~strikethrough~~ `code`",
+  "watch": "Watch",
+  "unwatch": "Unwatch"
 }
