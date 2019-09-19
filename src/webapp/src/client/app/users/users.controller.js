@@ -28,6 +28,7 @@
 
         var filterObject = !!$state.params.filter ? JSON.parse($state.params.filter) : [];
 
+        vm.currentUser = authService.identity.userName;
         vm.usersModel = usersModel;
         vm.allowEdit = authService.hasPermissions(['APPLICATIONUSER_ADMINISTRATION']);
         vm.customFilterIsOpen = false;

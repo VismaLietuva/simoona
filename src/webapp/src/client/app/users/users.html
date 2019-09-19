@@ -121,7 +121,7 @@
                                 title="{{'common.edit' | translate}}">
                             <span class="glyphicon glyphicon-pencil"></span>
                         </button>
-                        <button type="button"
+                        <button ng-if="!(applicationUser.userName === vm.currentUser)" type="button"
                                 ace-confirmation-modal="vm.deleteItem(applicationUser)"
                                 class="btn btn-danger"
                                 title="{{'common.delete' | translate}}">
