@@ -1,83 +1,86 @@
 <div class="row body-container" has-permissions="['BOOK_BASIC']">
-  <div class="col-xs-12">
-      <div class="panel panel-default">
-          <div class="panel-heading">
-              <span translate="books.books"></span>
-              <div class="pull-right" ng-if="vm.offices.length !== 0" has-permissions="['BOOK_ADMINISTRATION']">
-                         <a class="nc-btn nc-btn-default"
-                            ui-sref="Root.WithOrg.Client.Books.Add"
-                            translate-attr-title="books.addBookTitle"
-                            data-test-id="book-list-add-book" translate>
-                             <span class="vismaicon vismaicon-add2-circle"></span>
-                             <span class="hidden-xs hidden-sm" translate="common.addNew"></span>
-                         </a>
-              </div>
-          </div>
-          <div class="panel-body">
-              <form name="bookSearchForm" class="form-horizontal">
-                 <div class="row">
-                     <div class="col-xs-12 col-md-6">
-                         <ace-list-filter on-filtering="vm.searchFilter(search)" min-characters="2"></ace-list-filter>
-                     </div>
-                 </div>
-                
-                 <div ng-if="!vm.isLoading" class="nc-filter">
-                     <label ng-repeat="office in vm.offices" ng-class="{selected: office.id === vm.filter.officeId}">
-                         <input type="radio" name="office" ng-click="vm.toggleOffice(office)"/>
-                         {{:: office.name}}
-                     </label>
-  				</div>
-              </form>
-              <wave-spinner ng-if="vm.isLoading"></wave-spinner>
-              <table class="nc-table nc-table-active" ng-if="vm.books.itemCount && !vm.isLoading">
-                  <thead>
-                      <tr>
-                          <th translate="books.booksInfo"></th>
-                          <th class="hidden-xs hidden-sm" translate="books.whoHasIt"></th>
-                          <th class="hidden-xs hidden-sm" translate="books.copiesLeft"></th>
-                          <th class="text-right" translate="books.actions"></th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      <tr ng-repeat="book in vm.books.entries" ng-class="{highlightRow: book.takenByCurrentUser}">
-                          <td class="col-xs-7 word-break" data-test-id="book-title-and-author" ng-cloak>
-                              "{{book.title}}" <span translate="common.by"></span> {{book.author}}
-                          </td>
-                          <td class="col-xs-2 hidden-xs hidden-sm" data-test-id="reader-full-name" ng-cloak>
-                              <div ng-repeat="reader in book.readers">
-                                  {{reader.fullName}}<span ng-if="!$last">,</span>
-                              </div>
-                          </td>
-                          <td class="col-xs-2 hidden-xs hidden-sm" data-test-id="book-quantity-left" ng-cloak>
-                              {{book.quantityLeft > 0 ? book.quantityLeft : 0}}
-                          </td>
-                          <td data-test-id="book-actions" class="col-xs-1 text-nowrap text-right">
-                              <a class="link"
-                                 ng-if="book.quantityLeft > 0"
-                                 ng-show="!book.takenByCurrentUser"
-                                 ng-click="vm.takeBook(book)"
-                                 translate="books.takeBook"
-                                 data-test-id="take-book"></a>
+    <div class="col-xs-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <span translate="books.books"></span>
+                <div class="pull-right" ng-if="!!vm.offices.length" has-permissions="['BOOK_ADMINISTRATION']">
+                    <a class="nc-btn nc-btn-default" ui-sref="Root.WithOrg.Client.Books.Add"
+                        translate-attr-title="books.addBookTitle" data-test-id="book-list-add-book" translate>
+                        <span class="vismaicon vismaicon-add2-circle"></span>
+                        <span class="hidden-xs hidden-sm" translate="common.addNew"></span>
+                    </a>
+                </div>
+            </div>
+            <div class="panel-body">
+                <form name="bookSearchForm" class="form-horizontal">
+                    <div class="row">
+                        <div class="col-xs-12 col-md-6" ng-if="!!vm.offices.length">
+                            <ace-list-filter on-filtering="vm.searchFilter(search)" min-characters="2">
+                            </ace-list-filter>
+                        </div>
+                        <div class="btn-group pull-right ng-isolate-scope" ng-if="!vm.offices.length" has-permissions="['OFFICE_ADMINISTRATION']">
+                                <a ui-sref="Root.WithOrg.Admin.Offices.Create" class="btn btn-primary" title="Create new" href="/testorg/Admin/Offices/Create"><span class="glyphicon glyphicon-plus"></span> <span class="ng-binding">Create new</span></a>
+                            </div>
+                        <div>
+                                <h3 data-test-id="no-entries-found" ng-if="!vm.offices.length" translate="common.noOffices"
+                                class="ng-scope"></h3>
+                        </div>
 
-                              <a class="link"
-                                 ng-show="book.takenByCurrentUser"
-                                 ng-click="vm.returnBook(book)"
-                                 translate="books.returnBook"
-                                 data-test-id="return-book"></a>
 
-                              <a class="link padding-right" ng-if="vm.hasUpdatePermissions"
-                                 ui-sref="Root.WithOrg.Client.Books.Edit({ id: book.id, officeId: vm.filter.officeId})"
-                                 translate-attr-title="common.details"
-                                 data-test-id="book-details" translate>
-                                  <span class="vismaicon vismaicon-other-circle" aria-hidden="true"></span>
-                              </a>
-                          </td>
-                      </tr>
-                  </tbody>
-              </table>
+                    </div>
 
-              <ace-list-pagination total-item-count="vm.books.itemCount" page-size="vm.books.pageSize" page-count="vm.books.pageCount" current-page="vm.filter.page" on-changed="vm.changePage(page)"></ace-list-pagination>
-          </div>
-      </div>
+                    <div ng-if="!vm.isLoading" class="nc-filter">
+                        <label ng-repeat="office in vm.offices" ng-class="{selected: office.id === vm.filter.officeId}">
+                            <input type="radio" name="office" ng-click="vm.toggleOffice(office)" />
+                            {{:: office.name}}
+                        </label>
+                    </div>
+                </form>
+                <wave-spinner ng-if="vm.isLoading"></wave-spinner>
+                <table class="nc-table nc-table-active" ng-if="vm.books.itemCount && !vm.isLoading">
+                    <thead>
+                        <tr>
+                            <th translate="books.booksInfo"></th>
+                            <th class="hidden-xs hidden-sm" translate="books.whoHasIt"></th>
+                            <th class="hidden-xs hidden-sm" translate="books.copiesLeft"></th>
+                            <th class="text-right" translate="books.actions"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="book in vm.books.entries" ng-class="{highlightRow: book.takenByCurrentUser}">
+                            <td class="col-xs-7 word-break" data-test-id="book-title-and-author" ng-cloak>
+                                "{{book.title}}" <span translate="common.by"></span> {{book.author}}
+                            </td>
+                            <td class="col-xs-2 hidden-xs hidden-sm" data-test-id="reader-full-name" ng-cloak>
+                                <div ng-repeat="reader in book.readers">
+                                    {{reader.fullName}}<span ng-if="!$last">,</span>
+                                </div>
+                            </td>
+                            <td class="col-xs-2 hidden-xs hidden-sm" data-test-id="book-quantity-left" ng-cloak>
+                                {{book.quantityLeft > 0 ? book.quantityLeft : 0}}
+                            </td>
+                            <td data-test-id="book-actions" class="col-xs-1 text-nowrap text-right">
+                                <a class="link" ng-if="book.quantityLeft > 0" ng-show="!book.takenByCurrentUser"
+                                    ng-click="vm.takeBook(book)" translate="books.takeBook"
+                                    data-test-id="take-book"></a>
+
+                                <a class="link" ng-show="book.takenByCurrentUser" ng-click="vm.returnBook(book)"
+                                    translate="books.returnBook" data-test-id="return-book"></a>
+
+                                <a class="link padding-right" ng-if="vm.hasUpdatePermissions"
+                                    ui-sref="Root.WithOrg.Client.Books.Edit({ id: book.id, officeId: vm.filter.officeId})"
+                                    translate-attr-title="common.details" data-test-id="book-details" translate>
+                                    <span class="vismaicon vismaicon-other-circle" aria-hidden="true"></span>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <ace-list-pagination total-item-count="vm.books.itemCount" page-size="vm.books.pageSize"
+                    page-count="vm.books.pageCount" current-page="vm.filter.page" on-changed="vm.changePage(page)">
+                </ace-list-pagination>
+            </div>
+        </div>
     </div>
 </div>
