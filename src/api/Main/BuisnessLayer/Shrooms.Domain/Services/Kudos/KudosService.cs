@@ -136,7 +136,8 @@ namespace Shrooms.Domain.Services.Kudos
                     Id = t.Id,
                     Name = t.Name,
                     Value = t.Value,
-                    Description = t.Description
+                    Description = t.Description,
+                    IsActive = t.IsActive
                 })
                 .FirstOrDefaultAsync();
 
