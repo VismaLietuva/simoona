@@ -20,10 +20,10 @@ namespace Shrooms.DataLayer.Migrations
                 .Index(t => t.PostId)
                 .Index(t => t.UserId);
 
-            Sql("insert into dbo.PostWatchers (PostId,UserId) " +
-                "select distinct postid,authorid from dbo.Comments " +
-                " union " +
-                "select distinct id, AuthorId from dbo.Posts");
+            Sql("INSERT INTO dbo.PostWatchers (PostId, UserId) " +
+                "SELECT DISTINCT PostId,AuthorId FROM dbo.Comments WHERE AuthorId IS NOT NULL" +
+                " UNION " +
+                "SELECT DISTINCT Id, AuthorId FROM dbo.Posts");
         }
         
         public override void Down()
