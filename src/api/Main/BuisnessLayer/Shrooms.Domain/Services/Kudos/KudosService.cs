@@ -106,6 +106,7 @@ namespace Shrooms.Domain.Services.Kudos
             type.Name = dto.Name;
             type.Value = dto.Value;
             type.Description = dto.Description;
+            type.IsActive = dto.IsActive;
 
             await _uow.SaveChangesAsync(dto.UserId);
         }
