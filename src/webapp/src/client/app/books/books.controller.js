@@ -42,11 +42,12 @@
             bookRepository.getAllOffices().then(function (response) {
                 vm.offices = response;
 
-                if (!!response) {
+                if (response.length!==0) {
                     vm.filter.officeId = response[0].id;
+                    getFilteredBooks(vm.filter);
                 }
 
-                getFilteredBooks(vm.filter);
+                    vm.isLoading = false;              
             });
         }
 
