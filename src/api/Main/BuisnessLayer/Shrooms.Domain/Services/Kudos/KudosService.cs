@@ -634,7 +634,8 @@ namespace Shrooms.Domain.Services.Kudos
                 Description = kudosType.Description,
                 IsNecessary = kudosType.Type == ConstBusinessLayer.KudosTypeEnum.Send ||
                               kudosType.Type == ConstBusinessLayer.KudosTypeEnum.Minus ||
-                              kudosType.Type == ConstBusinessLayer.KudosTypeEnum.Other
+                              kudosType.Type == ConstBusinessLayer.KudosTypeEnum.Other,
+                IsActive = kudosType.IsActive
             };
         }
 
