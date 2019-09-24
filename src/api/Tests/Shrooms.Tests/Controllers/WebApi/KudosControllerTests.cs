@@ -50,7 +50,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         }
 
         [Test]
-        public void GetKodosTypes_Should_Return_IEnumerable_Of_KudosType_ViewModel()
+        public void GetKudosTypes_Should_Return_IEnumerable_Of_KudosType_ViewModel()
         {
             var userAndOrganization = new UserAndOrganizationDTO()
             {
