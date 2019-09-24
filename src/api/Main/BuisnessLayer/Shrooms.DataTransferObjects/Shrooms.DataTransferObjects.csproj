@@ -139,6 +139,7 @@
     <Compile Include="Models\ExternalLinks\ExternalLinkDTO.cs" />
     <Compile Include="Models\ExternalLinks\NewExternalLinkDTO.cs" />
     <Compile Include="Models\Jobs\JobTypeDTO.cs" />
+    <Compile Include="Models\Kudos\KudosWelcomeDTO.cs" />
     <Compile Include="Models\Notification\NotificationDto.cs" />
     <Compile Include="Models\Notification\SourcesDto.cs" />
     <Compile Include="Models\Projects\ProjectDetailsDto.cs" />

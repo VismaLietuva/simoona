@@ -15,6 +15,7 @@ using Shrooms.WebViewModels.Models.PostModels;
 using Shrooms.WebViewModels.Models.Roles;
 using Shrooms.WebViewModels.Models.Support;
 using Shrooms.WebViewModels.Models.User;
+using Shrooms.WebViewModels.Models.Users.Kudos;
 
 namespace Shrooms.ModelMappings.Profiles
 {
@@ -28,6 +29,7 @@ namespace Shrooms.ModelMappings.Profiles
             CreateKudosViewModel();
             CreateAdministrationMappings();
             CreateKudosLogDtoMappings();
+            CreateKudosWelcomeMappings();
             CreateMiscDtoMappings();
         }
 
@@ -44,6 +46,13 @@ namespace Shrooms.ModelMappings.Profiles
             CreateMap<KudosType, KudosTypeDTO>();
 
             CreateMap<KudosLog, UserKudosInformationDTO>();
+        }
+
+        private void CreateKudosWelcomeMappings()
+        {
+            CreateMap<KudosWelcomeDTO, WelcomeKudosViewModel>();
+            CreateMap<WelcomeKudosViewModel, KudosWelcomeDTO>();
+
         }
 
         private void CreateAdministrationMappings()
