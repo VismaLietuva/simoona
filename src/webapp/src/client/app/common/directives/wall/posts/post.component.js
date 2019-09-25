@@ -27,22 +27,29 @@
         'wallSettings',
         'errorHandler',
         'youtubeSettings',
+        'notificationFactory',
         'wallPostRepository',
         'wallService',
         'notifySrv'
     ];
 
     function wallPostController($scope, $state, $location, SmoothScroll, wallSettings,
-        errorHandler, youtubeSettings, wallPostRepository, wallService, notifySrv) {
+        errorHandler, youtubeSettings, notificationFactory, wallPostRepository, wallService, notifySrv) {
         /*jshint validthis: true */
         var vm = this;
 
+        vm.isSeen = isSeen;
+        vm.markNotification = markNotification;
         vm.editPost = editPost;
         vm.deletePost = deletePost;
         vm.enableEditor = enableEditor;
-        vm.disableEditor = disableEditor;
+        vm.disableEditor = disableEditor;    
         vm.showCommentForm = showCommentForm;
         vm.handleErrorMessage = handleErrorMessage;
+
+        vm.notificationId = {};
+        vm.notifications = notificationFactory.notification;
+        vm.markAsRead = notificationFactory.markAsRead;
 
         vm.isActionsEnabled = true;
         vm.editFieldEnabled = false;
@@ -52,12 +59,40 @@
         vm.youtubePreviewWidth = youtubeSettings.previewWidth;
         vm.youtubePreviewHeight = youtubeSettings.previewHeight;
         vm.stateParams = $state.params;
-
         vm.getPostUrl = getPostUrl;
         vm.notifyCopied = notifyCopied;
 
+        vm.hasNotification = isSeen(vm.post.id);
+
         /////////
 
+        function isSeen(postId)
+        {
+            var hasNotification = false;
+            angular.forEach(vm.notifications.data, (value, key) => {
+                if (postId === value.sourceIds.postId) {
+                    vm.notificationId = [value.id];
+                    hasNotification = true;
+
+                    if(vm.stateParams.post)
+                    {
+                        vm.markAsRead(vm.notificationId);
+                        hasNotification = false;
+                    }        
+                }
+            });
+            return hasNotification;
+        }
+
+        function markNotification()
+        {
+            if(vm.hasNotification)
+            {
+                vm.hasNotification = false;
+                vm.markAsRead(vm.notificationId);
+            }
+           
+        }
         function editPost(messageBody) {
             if (vm.isActionsEnabled) {
                 vm.disableEditor();
@@ -111,6 +146,7 @@
         }
 
         function enableEditor() {
+            console.log("kvietimas");
             vm.editFieldEnabled = true;
             vm.editableValue = vm.post.messageBody;
         }

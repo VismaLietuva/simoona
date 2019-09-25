@@ -11,6 +11,7 @@
   "imageSizeExceeded": "Pasirinktas failas yra per didelis. Maksimalus leistinas dydis yra 5MB.",
   "imageUploadError": "Nepavyko įkelti paveikslėlio! Netinkamas failas.",
   "like": "Patinka",
+  "markAsRead": "Žymėti kaip skaitytas",
   "message": "Žinutė",
   "multipleImageUploadError": "Vienu metu galite įkelti tik vieną paveikslėlį",
   "newPostsAvailable": "Siena atsinaujino!",

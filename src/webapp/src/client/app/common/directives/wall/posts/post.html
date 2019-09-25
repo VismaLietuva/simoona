@@ -8,7 +8,7 @@
                     {{::vm.post.wallName}}
                 </a>
             </div>
-
+           
         <div class="clearfix">
             <ace-message-user-profile user="vm.post.author"
                                       date="vm.post.created"
@@ -18,7 +18,6 @@
             >
             </ace-message-user-profile>
         </div>
-
         <div class="post-content-margin">
             <form name="editPostForm" class="edit-text-area" ng-if="vm.editFieldEnabled">
                 <textarea name="messageBody"
@@ -106,6 +105,13 @@
                              is-wall-module="vm.isWallModule"
                              ng-show="!vm.editFieldEnabled">
     </ace-message-actions>
+
+    <div>
+        <a ng-if="vm.hasNotification" class="post-notification-announcement vismaicon vismaicon-sm"
+        ng-click="vm.markNotification()"title="{{ 'wall.markAsRead' | translate}}" translate-cloak="" style="">
+    </a>
+    </div>
+  
 
     <a  ngclipboard
         ng-click="vm.notifyCopied($event)"
