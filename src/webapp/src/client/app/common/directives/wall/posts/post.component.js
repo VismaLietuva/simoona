@@ -47,7 +47,7 @@
         vm.showCommentForm = showCommentForm;
         vm.handleErrorMessage = handleErrorMessage;
 
-        vm.notificationIds = {};
+        vm.notificationIds = [];
         vm.notifications = notificationFactory.notification;
         vm.markAsRead = notificationFactory.markAsRead;
 
@@ -66,27 +66,26 @@
 
         /////////
 
-        function isSeen(postId)
-        {
-            var hasNotification = false;
+        function isSeen(postId) {
+            var isNotified = false;
 
             angular.forEach(vm.notifications.data, (notification) => {
                 if (postId === notification.sourceIds.postId) {
-                    vm.notificationIds = [notification.id];
-                    hasNotification = true;
+                    vm.notificationIds.push(notification.id);
+                    isNotified = true;
 
-                    if(vm.stateParams.post)
-                    {
+                    if (vm.stateParams.post) {
+                        isNotified = false;
                         vm.markNotification();
-                    }        
+                    }
                 }
             });
-            return hasNotification;
+            return isNotified;
         }
 
         function markNotification()
         {
-            if(vm.hasNotification)
+            if(!!vm.notificationIds)
             {
                 vm.hasNotification = false;
                 vm.markAsRead(vm.notificationIds);
