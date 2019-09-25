@@ -108,6 +108,7 @@ namespace Shrooms.Domain.Services.Kudos
             type.Name = dto.Name;
             type.Value = dto.Value;
             type.Description = dto.Description;
+            type.IsActive = dto.IsActive;
 
             await _uow.SaveChangesAsync(dto.UserId);
         }
@@ -138,7 +139,8 @@ namespace Shrooms.Domain.Services.Kudos
                     Id = t.Id,
                     Name = t.Name,
                     Value = t.Value,
-                    Description = t.Description
+                    Description = t.Description,
+                    IsActive = t.IsActive
                 })
                 .FirstOrDefaultAsync();
 
@@ -634,7 +636,8 @@ namespace Shrooms.Domain.Services.Kudos
                 Description = kudosType.Description,
                 IsNecessary = kudosType.Type == ConstBusinessLayer.KudosTypeEnum.Send ||
                               kudosType.Type == ConstBusinessLayer.KudosTypeEnum.Minus ||
-                              kudosType.Type == ConstBusinessLayer.KudosTypeEnum.Other
+                              kudosType.Type == ConstBusinessLayer.KudosTypeEnum.Other,
+                IsActive = kudosType.IsActive
             };
         }
 

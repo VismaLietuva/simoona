@@ -39,6 +39,7 @@
                         vm.kudosType.name = type.name; 
                         vm.kudosType.multiplier = parseInt(type.value);
                         vm.kudosType.description = type.description;
+                        vm.kudosType.isActive = type.isActive;
                         vm.isLoading = false;
                     }, function (error) {
                     errorHandler.handleErrorMessage(error);
@@ -59,7 +60,8 @@
                 id: vm.kudosType.id, 
                 name: vm.kudosType.name, 
                 value: vm.kudosType.multiplier, 
-                description: vm.kudosType.description
+                description: vm.kudosType.description,
+                isActive: vm.kudosType.isActive
                 })
                 .then(function() {
                     $state.go(listState);
