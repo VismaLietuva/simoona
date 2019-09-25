@@ -94,6 +94,25 @@
                                translate-values="{ one: 300 }"></p>
                         </div>
                     </div>
+
+                    <div class="form-group">
+                        <label 
+                            for="isActiveSwitch" 
+                            class="control-label col-xs-12 col-sm-4" 
+                            translate="">
+                            Enabled
+                        </label>
+                        <div class="col-xs-12 col-sm-4">
+                            <div class="onoffswitch" id="isActiveSwitch">
+                                <input type="checkbox" name="notification" class="onoffswitch-checkbox" id="notification" ng-model="vm.kudosType.isActive">
+                                <label class="onoffswitch-label" for="notification">
+                                <span on-switch-attr="{{'kudosBasket.widgetIsOn' | translate }}" off-switch-attr="{{'kudosBasket.widgetIsOff' | translate }}" class="onoffswitch-inner" translate-cloak></span>
+                                <span class="onoffswitch-switch"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
                 
                     <!--kudos type buttons right -->
                     <div class="pull-right">
