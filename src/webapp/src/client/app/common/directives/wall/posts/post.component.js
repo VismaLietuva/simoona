@@ -146,7 +146,6 @@
         }
 
         function enableEditor() {
-            console.log("kvietimas");
             vm.editFieldEnabled = true;
             vm.editableValue = vm.post.messageBody;
         }
