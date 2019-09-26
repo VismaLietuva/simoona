@@ -13,7 +13,7 @@
             isCreate: $state.includes('Root.WithOrg.Admin.Customization.KudosTypes.Create'),
             isEdit: $state.includes('Root.WithOrg.Admin.Customization.KudosTypes.Edit')
         };
-        
+
         vm.isLoading = vm.states.isCreate ? false : true;
 
         if(vm.states.isCreate) {
@@ -41,6 +41,7 @@
                         vm.kudosType.description = type.description;
                         vm.kudosType.isActive = type.isActive;
                         vm.isLoading = false;
+                        vm.allowDelete = type.type !== 5;
                     }, function (error) {
                     errorHandler.handleErrorMessage(error);
                     $state.go(listState);

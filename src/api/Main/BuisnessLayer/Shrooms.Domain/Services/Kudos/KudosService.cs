@@ -140,7 +140,8 @@ namespace Shrooms.Domain.Services.Kudos
                     Name = t.Name,
                     Value = t.Value,
                     Description = t.Description,
-                    IsActive = t.IsActive
+                    IsActive = t.IsActive,
+                    Type = t.Type
                 })
                 .FirstOrDefaultAsync();
 
@@ -200,29 +201,29 @@ namespace Shrooms.Domain.Services.Kudos
             ValidateUser(organizationId, userId);
 
             var userLogsQuery = (from kudLog in _kudosLogsDbSet
-                           where kudLog.EmployeeId == userId && kudLog.OrganizationId == organizationId
-                           from usr in _usersDbSet.Where(u => u.Id == kudLog.CreatedBy).DefaultIfEmpty()
-                           select new KudosUserLogDTO
-                           {
-                               Comment = kudLog.Comments,
-                               Created = kudLog.Created,
-                               Id = kudLog.Id,
-                               Multiplier = kudLog.MultiplyBy,
-                               Points = kudLog.Points,
-                               Type = new KudosLogTypeDTO
-                               {
-                                   Name = kudLog.KudosTypeName,
-                                   Value = kudLog.KudosTypeValue,
-                                   Type = kudLog.KudosSystemType
-                               },
-                               Status = kudLog.Status.ToString(),
-                               Sender = new KudosLogUserDTO
-                               {
-                                   FullName = usr == null ? string.Empty : usr.FirstName + " " + usr.LastName,
-                                   Id = usr == null ? string.Empty : kudLog.CreatedBy
-                               },
-                               PictureId = kudLog.PictureId
-                           }).OrderByDescending(o => o.Created);
+                                 where kudLog.EmployeeId == userId && kudLog.OrganizationId == organizationId
+                                 from usr in _usersDbSet.Where(u => u.Id == kudLog.CreatedBy).DefaultIfEmpty()
+                                 select new KudosUserLogDTO
+                                 {
+                                     Comment = kudLog.Comments,
+                                     Created = kudLog.Created,
+                                     Id = kudLog.Id,
+                                     Multiplier = kudLog.MultiplyBy,
+                                     Points = kudLog.Points,
+                                     Type = new KudosLogTypeDTO
+                                     {
+                                         Name = kudLog.KudosTypeName,
+                                         Value = kudLog.KudosTypeValue,
+                                         Type = kudLog.KudosSystemType
+                                     },
+                                     Status = kudLog.Status.ToString(),
+                                     Sender = new KudosLogUserDTO
+                                     {
+                                         FullName = usr == null ? string.Empty : usr.FirstName + " " + usr.LastName,
+                                         Id = usr == null ? string.Empty : kudLog.CreatedBy
+                                     },
+                                     PictureId = kudLog.PictureId
+                                 }).OrderByDescending(o => o.Created);
 
             var logCount = userLogsQuery.Count();
 

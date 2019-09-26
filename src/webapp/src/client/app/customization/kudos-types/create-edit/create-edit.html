@@ -145,7 +145,7 @@
                     <div class="pull-left">
                         
                         <div class="pull-left">
-                            <button ng-if="vm.states.isEdit"
+                            <button ng-if="vm.states.isEdit && vm.allowDelete"
                                     class="btn btn-danger"
                                     ace-confirmation-modal="vm.disableKudosType()"
                                     data-test-id="kudos-type-disable-button">
