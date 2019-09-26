@@ -113,7 +113,8 @@
 			ORDINARY: 1,
 			SEND: 2,
 			MINUS: 3,
-			OTHER: 4
+            OTHER: 4,
+            WELCOME: 5,
 		};
 		
         init();
