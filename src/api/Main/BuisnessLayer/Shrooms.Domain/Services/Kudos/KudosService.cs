@@ -86,7 +86,7 @@ namespace Shrooms.Domain.Services.Kudos
                 Name = dto.Name,
                 Value = dto.Multiplier,
                 Type = ConstBusinessLayer.KudosTypeEnum.Ordinary,
-                Description = dto.Description
+                IsActive = dto.IsActive
             };
 
             _kudosTypesDbSet.Add(newType);
