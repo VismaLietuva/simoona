@@ -107,7 +107,7 @@
     </ace-message-actions>
 
     <div>
-        <a ng-if="vm.hasNotification" class="post-notification-announcement vismaicon vismaicon-sm"
+        <a ng-if="vm.hasNotification && !!vm.notifications.data.length" class="post-notification-announcement vismaicon vismaicon-sm"
         ng-click="vm.markNotification()"title="{{ 'wall.markAsRead' | translate}}" translate-cloak="" style="">
     </a>
     </div>
