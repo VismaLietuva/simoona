@@ -71,7 +71,7 @@
         var vm = this;
         vm.submitKudos = submitKudos;
         vm.cancelKudos = cancelKudos;
-        vm.setModalType = setModalType;
+        vm.chooseKudosType = chooseKudosType;
         vm.getUsers = getUsersForAutocomplete;
         vm.attachImage = attachImage;
 
@@ -90,13 +90,6 @@
 
         vm.maxMinus = kudosifySettings.maxMinus;
 
-		var KudosTypesEnum = {
-			ORDINARY: 1,
-			SEND: 2,
-			MINUS: 3,
-			OTHER: 4
-        };
-        
         init();
 
         //////
@@ -127,14 +120,14 @@
             }
         }
 
-        function setModalType(type, dom) {
-            if (!dom.target.classList.contains('kudosify-modal-buttons-inactive') && vm.isButtonSelected) {
+        function chooseKudosType(type, dom) {
+            if (isSelectedSameType(dom)) {
                 vm.kudosifyInfo.multiplyBy++;
             } else {
                 vm.isButtonSelected = true;
                 vm.kudosifyInfo.multiplyBy = 1;
-                var buttons = document.getElementsByClassName('kudos-type-button');
 
+                var buttons = document.getElementsByClassName('kudos-type-button');
                 for (var i = 0; i < buttons.length; i++) {
                     buttons[i].classList.add('kudosify-modal-buttons-inactive');
                 }
@@ -143,6 +136,15 @@
                 vm.pointsType = type;
                 recalculateTotalPoints();
             }
+        }
+
+        function isSelectedSameType(dom)
+        {
+            if (!dom.target.classList.contains('kudosify-modal-buttons-inactive') && vm.isButtonSelected)
+            {
+                return true;
+            }
+            return false;
         }
 
         function recalculateTotalPoints(){
