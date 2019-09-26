@@ -2,7 +2,7 @@
 <!-- <div id="kudos-wall-widget" ng-if="hasKudosPermissions"> -->
     <div class="kudos-big-buttons-wrapper">
         <div class="kudos-big-button">
-            <a ace-kudosify-modal ga-track-event="['Kudos', 'wall big plus', 'opened']" data-test-id="kudosify-button-plus">
+            <a ace-kudosify-modal kudosify-type="submit" ga-track-event="['Kudos', 'wall big plus', 'opened']" data-test-id="kudosify-button-plus">
                 <span uib-tooltip="{{'kudos.submitKudos' | translate}}" 
                       tooltip-placement="bottom" 
                       tooltip-class="word-break" 
@@ -10,8 +10,8 @@
                       aria-hidden="true"></span>
             </a>
         </div>
-        <div class="kudos-big-button" feature-flag="kudosSendImproved">
-            <a ace-send-kudos-modal ga-track-event="['Kudos', 'wall send kudos', 'opened']" data-test-id="kudos-user-widget-kudosify-button">
+        <div class="kudos-big-button">
+            <a ace-kudosify-modal kudosify-type="send" ga-track-event="['Kudos', 'wall send kudos', 'opened']" data-test-id="kudos-user-widget-kudosify-button">
                 <span uib-tooltip="{{'kudos.sendKudos' | translate}}"
                   tooltip-placement="bottom"
                   tooltip-class="word-break"
