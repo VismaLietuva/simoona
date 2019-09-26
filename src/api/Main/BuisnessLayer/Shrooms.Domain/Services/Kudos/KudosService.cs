@@ -126,6 +126,23 @@ namespace Shrooms.Domain.Services.Kudos
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
+        public IEnumerable<KudosTypeDTO> GetNecessaryKudosTypes(UserAndOrganizationDTO userOrg)
+        {
+            var type = _kudosTypesDbSet
+                .Where(x => x.Type == ConstBusinessLayer.KudosTypeEnum.Send ||
+                              x.Type == ConstBusinessLayer.KudosTypeEnum.Minus ||
+                              x.Type == ConstBusinessLayer.KudosTypeEnum.Other)
+                .Select(MapKudosTypesToDTO)
+                .ToList();
+
+            if (type == null)
+            {
+                throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Type not found");
+            }
+
+            return type;
+        }
+
         public async Task<KudosTypeDTO> GetKudosType(int id, UserAndOrganizationDTO userOrg)
         {
             var type = await _kudosTypesDbSet

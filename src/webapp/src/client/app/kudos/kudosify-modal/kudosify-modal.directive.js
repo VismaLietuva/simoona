@@ -4,10 +4,6 @@
     angular
         .module('simoonaApp.Kudos')
         .constant('kudosifySettings', {
-            KudosifyTypes: {
-                0: 'submit',
-                1: 'send'
-            },
             maxMinus: 99999
         })
         .directive('aceKudosifyModal', kudosifyModal);
@@ -103,7 +99,9 @@
             }
             else if (vm.context === 'send')
             {
-                vm.kudosTypes = [ 'send' ];
+                kudosifyModalFactory.getSendType().then(function (result) {
+                    vm.kudosTypes = [ result ];
+                });
             }
 
             kudosFactory.getUserInformation(vm.userId).then(function (response) {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -148,6 +149,16 @@ namespace Shrooms.API.Controllers.Kudos
             var kudosTypeViewModel = _mapper.Map<IEnumerable<KudosTypeDTO>, IEnumerable<KudosTypeViewModel>>(kudosTypeDto);
 
             return kudosTypeViewModel;
+        }
+
+        [HttpGet]
+        [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
+        public KudosTypeViewModel GetSendType()
+        {
+            var kudosTypeDto = _kudosService.GetNecessaryKudosTypes(GetUserAndOrganization()).FirstOrDefault(x => x.Type == ConstBusinessLayer.KudosTypeEnum.Send);
+            var sendTypeViewModel = _mapper.Map<KudosTypeDTO, KudosTypeViewModel>(kudosTypeDto);
+
+            return sendTypeViewModel;
         }
 
         [HttpGet]
