@@ -2,7 +2,19 @@
     <button type="button" class="close" ng-click="vm.cancelKudos()">
         <span aria-hidden="true">&times;</span>
     </button>
-    <h3 class="modal-title" translate="kudos.submitKudosForAchievement"></h3>
+    <h3 class="modal-title" ng-if="vm.context === 'submit'" translate="kudos.submitKudosForAchievement"></h3>
+    <h3 class="modal-title" ng-if="vm.context === 'send'" translate="kudos.sayThankYouAndSendYourKudos"></h3>
+</div>
+<div class="modal-body" ng-if="vm.context === 'send'">
+    <p class="kudos-remaining-points kudos-bold">
+        <b><span translate="kudos.remainingKudos"></span>: <span data-test-id="kudos-user-widget-remaining-kudos">{{vm.user.remainingKudos}}</span></b>
+    </p>
+    <p>
+        <span translate="kudos.sentKudos"></span>: <span class="kudos-bold" data-test-id="kudos-user-widget-sent-kudos"><b>{{vm.user.sentKudos}}</b></span>
+    </p>
+    <p>
+        <span translate="kudos.availableKudos"></span>: <span class="kudos-bold" data-test-id="kudos-user-widget-available-kudos"><b>{{vm.user.availableKudos}}</b></span>
+    </p>
 </div>
 <div class="modal-body">
     <form role="form" name="kudosifyForm">
@@ -24,17 +36,6 @@
                     <auto-complete source="vm.getUsers($query)" min-length="2" max-results-to-show="5" debounce-delay="500"></auto-complete>
                 </tags-input>
         </div>
-    <div class="form-group" ng-if="vm.context === 'send'">
-            <p class="kudos-remaining-points kudos-bold">
-                <span translate="kudos.remainingKudos"></span>: <span data-test-id="kudos-user-widget-remaining-kudos">{{vm.user.remainingKudos}}</span>
-            </p>
-            <p>
-                <span translate="kudos.sentKudos"></span>: <span class="kudos-bold" data-test-id="kudos-user-widget-sent-kudos">{{vm.user.sentKudos}}</span>
-            </p>
-            <p>
-                <span translate="kudos.availableKudos"></span>: <span class="kudos-bold" data-test-id="kudos-user-widget-available-kudos"><b>{{vm.user.availableKudos}}</b></span>
-            </p>
-    </div>
         <div class="form-group required-right" ng-if="vm.context === 'submit'">
             <label for="choose-type" translate="kudos.chooseType"></label>
             <div class="kudos-modal-buttons-group kudos-points-type">
@@ -134,7 +135,8 @@
             ng-disabled="vm.isBusy || kudosifyForm.$invalid || !vm.pointsType.id || !vm.kudosReceivers.length"
             ng-click="vm.submitKudos(vm.kudosReceivers, vm.kudosifyInfo, vm.pointsType)"
             data-test-id="ok-button-green">
-            <span translate="common.submit"></span>
+            <span ng-if="vm.context === 'submit'"translate="common.submit"></span>
+            <span ng-if="vm.context === 'send'"translate="common.send"></span>
     </button>
     <button class="btn btn-default"
             ng-click="vm.cancelKudos()"
