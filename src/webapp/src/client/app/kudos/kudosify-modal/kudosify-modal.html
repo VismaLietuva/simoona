@@ -24,8 +24,18 @@
                     <auto-complete source="vm.getUsers($query)" min-length="2" max-results-to-show="5" debounce-delay="500"></auto-complete>
                 </tags-input>
         </div>
-
-        <div class="form-group required-right">
+    <div class="form-group" ng-if="vm.context === 'send'">
+            <p class="kudos-remaining-points kudos-bold">
+                <span translate="kudos.remainingKudos"></span>: <span data-test-id="kudos-user-widget-remaining-kudos">{{vm.user.remainingKudos}}</span>
+            </p>
+            <p>
+                <span translate="kudos.sentKudos"></span>: <span class="kudos-bold" data-test-id="kudos-user-widget-sent-kudos">{{vm.user.sentKudos}}</span>
+            </p>
+            <p>
+                <span translate="kudos.availableKudos"></span>: <span class="kudos-bold" data-test-id="kudos-user-widget-available-kudos"><b>{{vm.user.availableKudos}}</b></span>
+            </p>
+    </div>
+        <div class="form-group required-right" ng-if="vm.context === 'submit'">
             <label for="choose-type" translate="kudos.chooseType"></label>
             <div class="kudos-modal-buttons-group kudos-points-type">
                 <button class="btn btn-sm btn-info kudos-type-button kudos-points-type kudosify-modal-buttons-inactive"
