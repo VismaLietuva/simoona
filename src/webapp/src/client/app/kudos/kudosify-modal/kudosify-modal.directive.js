@@ -101,7 +101,6 @@
             else if (vm.context === 'send')
             {
                 kudosifyModalFactory.getSendType().then(function (result) {
-                    vm.kudosTypes = [ result ];
                     vm.pointsType = result;
                 });
                 vm.isButtonSelected = true;
