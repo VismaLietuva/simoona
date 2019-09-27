@@ -27,9 +27,9 @@ namespace Shrooms.UnitTests.DomainService
         private ISystemClock _systemClock;
         private IDbSet<Comment> _commentsDbSet;
         private CommentService _commentService;
-        private ICommentNotificationService _commentNotificationService;
         private IPermissionService _permissionService;
         private IDbSet<WallModerator> _wallModeratorsDbSet;
+        private string _userId = Guid.NewGuid().ToString();
 
         [SetUp]
         public void TestInitializer()
@@ -43,7 +43,6 @@ namespace Shrooms.UnitTests.DomainService
 
             _systemClock = Substitute.For<ISystemClock>();
             _permissionService = Substitute.For<IPermissionService>();
-            _commentNotificationService = Substitute.For<ICommentNotificationService>();
 
             _commentService = new CommentService(uow, _systemClock, _permissionService);
         }
@@ -115,7 +114,7 @@ namespace Shrooms.UnitTests.DomainService
             {
                 new ApplicationUser
                 {
-                    Id = "testUser"
+                    Id = _userId
                 }
             };
             _usersDbSet.SetDbSetData(users.AsQueryable());
@@ -129,7 +128,7 @@ namespace Shrooms.UnitTests.DomainService
                 OrganizationId = 2,
                 PictureId = "pic",
                 PostId = 1,
-                UserId = "testUser"
+                UserId = _userId
             };
 
             // Act
@@ -138,7 +137,7 @@ namespace Shrooms.UnitTests.DomainService
             // Assert
             _commentsDbSet.Received(1)
                 .Add(Arg.Is<Comment>(c =>
-                    c.AuthorId == "testUser" &&
+                    c.AuthorId == _userId &&
                     c.MessageBody == "test" &&
                     c.PostId == 1));
             Assert.AreEqual(_postsDbSet.First().LastActivity, expectedDateTime);

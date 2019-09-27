@@ -66,9 +66,9 @@ namespace Shrooms.Domain.Services.Notifications
             }
 
             var wallName = await _wallDbSet
-                .Where(x => x.Id == wallId && x.OrganizationId == userOrg.OrganizationId)
-                .Select(s => s.Name)
-                .SingleAsync();
+                               .Where(x => x.Id == wallId && x.OrganizationId == userOrg.OrganizationId)
+                               .Select(s => s.Name)
+                               .SingleAsync();
 
             var newNotification = Notification.Create(post.User.FullName, wallName, post.User.PictureId, sources, postType, userOrg.OrganizationId, membersToNotify);
 
@@ -79,19 +79,24 @@ namespace Shrooms.Domain.Services.Notifications
             return _mapper.Map<NotificationDto>(newNotification);
         }
 
+        public async Task<NotificationDto> CreateForComment(UserAndOrganizationDTO userOrg, CommentCreatedDTO comment, NotificationType type, string memberToNotify)
+        {
+            return await CreateForComment(userOrg, comment, type, new List<string> { memberToNotify });
+        }
+
         public async Task<NotificationDto> CreateForComment(UserAndOrganizationDTO userOrg, CommentCreatedDTO comment, NotificationType type, IEnumerable<string> membersToNotify)
         {
             var sources = new Sources { PostId = comment.PostId };
 
             var wallName = await _wallDbSet
-                .Where(x => x.Id == comment.WallId && x.OrganizationId == userOrg.OrganizationId)
-                .Select(s => s.Name)
-                .SingleAsync();
+                               .Where(x => x.Id == comment.WallId && x.OrganizationId == userOrg.OrganizationId)
+                               .Select(s => s.Name)
+                               .SingleAsync();
 
             var commentCreator = await _userDbSet
-                .Where(x => x.Id == comment.CommentCreator)
-                .Select(c => new { c.FirstName, c.LastName, c.PictureId })
-                .SingleAsync();
+                                     .Where(x => x.Id == comment.CommentCreator)
+                                     .Select(c => new { c.FirstName, c.LastName, c.PictureId })
+                                     .SingleAsync();
             var commentCreatorApplicationUser = new ApplicationUser
             {
                 FirstName = commentCreator.FirstName,
@@ -126,12 +131,12 @@ namespace Shrooms.Domain.Services.Notifications
         public async Task<IEnumerable<NotificationDto>> GetAll(UserAndOrganizationDTO userOrg)
         {
             var result = await _notificationUserDbSet
-                            .Include(x => x.Notification)
-                            .Where(w => !w.IsAlreadySeen && w.UserId == userOrg.UserId)
-                            .Select(s => s.Notification)
-                            .OrderByDescending(o => o.Created)
-                            .Take(() => BusinessConstants.MaxNotificationsToShow)
-                            .ToListAsync();
+                             .Include(x => x.Notification)
+                             .Where(w => !w.IsAlreadySeen && w.UserId == userOrg.UserId)
+                             .Select(s => s.Notification)
+                             .OrderByDescending(o => o.Created)
+                             .Take(() => BusinessConstants.MaxNotificationsToShow)
+                             .ToListAsync();
 
             return _mapper.Map<IEnumerable<NotificationDto>>(result);
         }
@@ -141,9 +146,9 @@ namespace Shrooms.Domain.Services.Notifications
             var notificationUsers = _notificationUserDbSet
                 .Include(i => i.Notification)
                 .Where(s => notificationIds.Contains(s.NotificationId) &&
-                    s.Notification.OrganizationId == userOrg.OrganizationId &&
-                    s.UserId == userOrg.UserId &&
-                    !s.IsAlreadySeen).ToList();
+                            s.Notification.OrganizationId == userOrg.OrganizationId &&
+                            s.UserId == userOrg.UserId &&
+                            !s.IsAlreadySeen).ToList();
 
             if (notificationUsers.Count == 0)
             {
@@ -161,11 +166,11 @@ namespace Shrooms.Domain.Services.Notifications
         public async Task MarkAllAsRead(UserAndOrganizationDTO userOrg)
         {
             var notificationUsers = await _notificationUserDbSet
-                .Include(i => i.Notification)
-                .Where(s => s.Notification.OrganizationId == userOrg.OrganizationId &&
-                    s.UserId == userOrg.UserId &&
-                    !s.IsAlreadySeen)
-                .ToListAsync();
+                                        .Include(i => i.Notification)
+                                        .Where(s => s.Notification.OrganizationId == userOrg.OrganizationId &&
+                                                    s.UserId == userOrg.UserId &&
+                                                    !s.IsAlreadySeen)
+                                        .ToListAsync();
 
             if (!notificationUsers.Any())
             {
