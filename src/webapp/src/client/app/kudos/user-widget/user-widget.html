@@ -25,12 +25,14 @@
             </p>
         </div>
         <a ace-kudosify-modal="vm.kudosifyUser"
+            kudosify-type="submit"
             ga-track-event="['Kudos', 'Kudos page plus kudos', 'opened']"
             class="btn btn-lg btn-success give-kudos-button"
             data-test-id="kudos-user-widget-kudosify-button">
             <span class="glyphicon glyphicon-plus"></span> <span translate="kudos.giveKudosButton"></span>
         </a>
-        <a ace-send-kudos-modal="vm.kudosifyUser" feature-flag="kudosSendImproved" send-your-kudos="true"
+        <a ace-kudosify-modal="vm.kudosifyUser"
+            kudosify-type="send"
             ga-track-event="['Kudos', 'Kudos page plus kudos', 'opened']"
             class="btn btn-lg btn-info send-kudos-button"
             data-test-id="kudos-user-widget-kudosify-button">

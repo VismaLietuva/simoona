@@ -55,7 +55,8 @@
         </div>
 
         <div class="form-group required-right" ng-class="{ 'has-error' : kudosifyForm.multiplyBy.$invalid && !kudosifyForm.multiplyBy.$pristine }">
-            <label for="multiply" translate="kudos.multiplyBy"></label>
+            <label for="multiply" ng-if="vm.context === 'submit'" translate="kudos.multiplyBy"></label>
+            <label for="multiply" ng-if="vm.context === 'send'" translate="kudos.kudos.amountOfKudos"></label>
             <input class="form-control"
                    type="number"
                    name="multiplyBy"
