@@ -8,7 +8,7 @@ namespace Shrooms.DataTransferObjects.Models.Kudos
 {
     public class KudosWelcomeDTO
     {
-        public int KudosWelcomeAmount { get; set; }
+        public decimal KudosWelcomeAmount { get; set; }
 
         public bool KudosWelcomeEnabled { get; set; }
 

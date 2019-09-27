@@ -848,17 +848,17 @@ namespace Shrooms.Domain.Services.Kudos
             return true;
         }
 
-        public async Task<KudosWelcomeDTO> GetWelcomeKudos(int organizationId)
+        public KudosWelcomeDTO GetWelcomeKudos()
         {
-            var welcomeKudos = await _organizationsDbSet
-                .Where(org => org.Id == organizationId)
-                .Select(org => new KudosWelcomeDTO()
+            var welcomeKudos = _kudosTypesDbSet
+                .Where(kudosType => kudosType.Type == ConstBusinessLayer.KudosTypeEnum.Welcome)
+                .Select(kudosType => new KudosWelcomeDTO()
                 {
-                    KudosWelcomeAmount = org.KudosWelcomeAmount,
-                    KudosWelcomeComment = org.KudosWelcomeComment,
-                    KudosWelcomeEnabled = org.KudosWelcomeEnabled
+                    KudosWelcomeAmount = kudosType.Value,
+                    KudosWelcomeComment = kudosType.Description,
+                    KudosWelcomeEnabled = kudosType.IsActive
                 })
-                .FirstOrDefaultAsync();
+                .FirstOrDefault();
 
             if (welcomeKudos == null)
             {
@@ -866,20 +866,6 @@ namespace Shrooms.Domain.Services.Kudos
             }
 
             return welcomeKudos;
-        }
-
-        public async Task EditWelcomeKudos(KudosWelcomeDTO welcomeKudos, int organizationId)
-        {
-            var organization = _organizationsDbSet.Find(organizationId);
-
-            if (organization != null)
-            {
-                organization.KudosWelcomeAmount = welcomeKudos.KudosWelcomeAmount;
-                organization.KudosWelcomeComment = welcomeKudos.KudosWelcomeComment;
-                organization.KudosWelcomeEnabled = welcomeKudos.KudosWelcomeEnabled;
-
-                await _uow.SaveChangesAsync();
-            }
         }
 
         private string TranslateKudos(string textToTranslate, CultureInfo culture)

@@ -424,28 +424,12 @@ namespace Shrooms.API.Controllers.Kudos
         [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
         public async Task<IHttpActionResult> GetWelcomeKudos()
         {
-            var welcomeKudosDTO = await _kudosService.GetWelcomeKudos(GetUserAndOrganization().OrganizationId);
+            var welcomeKudosDTO = _kudosService.GetWelcomeKudos();
 
             var result = _mapper.Map<KudosWelcomeDTO, WelcomeKudosViewModel>(welcomeKudosDTO);
 
             return Ok(result);
         }
-
-        [HttpPut]
-        [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
-        public async Task<IHttpActionResult> EditWelcomeKudos(WelcomeKudosViewModel welcomeKudos)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(Resources.Models.Kudos.Kudos.KudosifyModalError);
-            }
-
-            var welcomeKudosDTO = _mapper.Map<WelcomeKudosViewModel, KudosWelcomeDTO>(welcomeKudos);
-
-            await _kudosService.EditWelcomeKudos(welcomeKudosDTO, GetUserAndOrganization().OrganizationId);
-
-            return Ok();
-        } 
 
         private KudosListBasicDataViewModel CalculateStats(int months, int amount)
         {
