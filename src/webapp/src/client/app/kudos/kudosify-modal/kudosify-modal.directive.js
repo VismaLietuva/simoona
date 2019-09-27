@@ -95,6 +95,13 @@
             {
                 kudosifyModalFactory.getPointsTypes().then(function (result) {
                     vm.kudosTypes = result;
+                    for(var i = 0; i < vm.kudosTypes.length; i++)
+                    {
+                        if(vm.kudosTypes[i].name === "Send")
+                        {
+                            vm.kudosTypes.splice(vm.kudosTypes[i], 1);
+                        }
+                    }
                     
                 });
             }
