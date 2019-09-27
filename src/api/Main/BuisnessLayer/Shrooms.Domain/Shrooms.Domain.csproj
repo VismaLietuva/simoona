@@ -225,8 +225,8 @@
     <Compile Include="Services\Email\Kudos\IKudosNotificationService.cs" />
     <Compile Include="Services\Email\Kudos\KudosNotificationService.cs" />
     <Compile Include="Services\Email\AdministrationUsers\IAdministrationNotificationService.cs" />
-    <Compile Include="Services\Email\Posting\CommentNotificationService.cs" />
-    <Compile Include="Services\Email\Posting\ICommentNotificationService.cs" />
+    <Compile Include="Services\Email\Posting\CommentEmailNotificationService.cs" />
+    <Compile Include="Services\Email\Posting\ICommentEmailNotificationService.cs" />
     <Compile Include="Services\ExternalLinks\ExternalLinkService.cs" />
     <Compile Include="Services\ExternalLinks\IExternalLinkService.cs" />
     <Compile Include="Services\Jobs\IJobService.cs" />

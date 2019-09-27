@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using Shrooms.Constants.Authorization.Permissions;
@@ -7,7 +8,6 @@ using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Users;
 using Shrooms.DataTransferObjects.Models.Wall.Posts;
-using Shrooms.Domain.Services.Email.Posting;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall.Posts.Comments;
 using Shrooms.DomainExceptions.Exceptions;
@@ -18,7 +18,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
 {
     public class PostService : IPostService
     {
-        private static object postDeleteLock = new object();
+        private static object _postDeleteLock = new object();
 
         private readonly IPermissionService _permissionService;
         private readonly ICommentService _commentService;
@@ -28,11 +28,9 @@ namespace Shrooms.Domain.Services.Wall.Posts
         private readonly IDbSet<ApplicationUser> _usersDbSet;
         private readonly IDbSet<WallModerator> _moderatorsDbSet;
         private readonly IDbSet<EntityModels.Models.Multiwall.Wall> _wallsDbSet;
+        private readonly IDbSet<PostWatcher> _postWatchers;
 
-        public PostService(
-            IUnitOfWork2 uow,
-            IPermissionService permissionService,
-            ICommentService commentService)
+        public PostService(IUnitOfWork2 uow, IPermissionService permissionService, ICommentService commentService)
         {
             _uow = uow;
             _permissionService = permissionService;
@@ -42,6 +40,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
             _moderatorsDbSet = uow.GetDbSet<WallModerator>();
             _wallsDbSet = uow.GetDbSet<EntityModels.Models.Multiwall.Wall>();
+            _postWatchers = uow.GetDbSet<PostWatcher>();
         }
 
         public NewlyCreatedPostDTO CreateNewPost(NewPostDTO newPostDto)
@@ -69,6 +68,13 @@ namespace Shrooms.Domain.Services.Wall.Posts
             };
             _postsDbSet.Add(post);
             _uow.SaveChanges(newPostDto.UserId);
+            _postWatchers.Add(
+                new PostWatcher
+                {
+                    PostId = post.Id,
+                    UserId = newPostDto.UserId
+                });
+            _uow.SaveChanges(newPostDto.UserId);
 
             var postCreator = _usersDbSet.Single(user => user.Id == newPostDto.UserId);
             var postCreatorDto = MapUserToDto(postCreator);
@@ -82,8 +88,8 @@ namespace Shrooms.Domain.Services.Wall.Posts
             var post = _postsDbSet
                 .Include(x => x.Wall)
                 .FirstOrDefault(x =>
-                    x.Id == postId &&
-                    x.Wall.OrganizationId == userOrg.OrganizationId);
+                        x.Id == postId &&
+                        x.Wall.OrganizationId == userOrg.OrganizationId);
 
             if (post == null)
             {
@@ -108,8 +114,8 @@ namespace Shrooms.Domain.Services.Wall.Posts
             var post = _postsDbSet
                 .Include(x => x.Wall)
                 .FirstOrDefault(x =>
-                    x.Id == editPostDto.Id &&
-                    x.Wall.OrganizationId == editPostDto.OrganizationId);
+                        x.Id == editPostDto.Id &&
+                        x.Wall.OrganizationId == editPostDto.OrganizationId);
 
             if (post == null)
             {
@@ -135,13 +141,13 @@ namespace Shrooms.Domain.Services.Wall.Posts
 
         public void DeleteWallPost(int postId, UserAndOrganizationDTO userOrg)
         {
-            lock (postDeleteLock)
+            lock (_postDeleteLock)
             {
                 var post = _postsDbSet
                     .Include(x => x.Wall)
                     .FirstOrDefault(s =>
-                        s.Id == postId &&
-                        s.Wall.OrganizationId == userOrg.OrganizationId);
+                            s.Id == postId &&
+                            s.Wall.OrganizationId == userOrg.OrganizationId);
 
                 if (post == null)
                 {
@@ -157,7 +163,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
                     throw new UnauthorizedException();
                 }
 
-                _commentService.DeleteCommentsByPost(post.Id, userOrg);
+                _commentService.DeleteCommentsByPost(post.Id);
                 _postsDbSet.Remove(post);
 
                 _uow.SaveChanges(userOrg.UserId);
@@ -166,13 +172,13 @@ namespace Shrooms.Domain.Services.Wall.Posts
 
         public void HideWallPost(int postId, UserAndOrganizationDTO userOrg)
         {
-            lock (postDeleteLock)
+            lock (_postDeleteLock)
             {
                 var post = _postsDbSet
                     .Include(x => x.Wall)
                     .FirstOrDefault(s =>
-                        s.Id == postId &&
-                        s.Wall.OrganizationId == userOrg.OrganizationId);
+                            s.Id == postId &&
+                            s.Wall.OrganizationId == userOrg.OrganizationId);
 
                 if (post == null)
                 {
@@ -220,6 +226,44 @@ namespace Shrooms.Domain.Services.Wall.Posts
                 WallId = post.WallId
             };
             return newlyCreatedPostDto;
+        }
+
+        public void ToggleWatch(int postId, UserAndOrganizationDTO userAndOrg, bool shouldWatch)
+        {
+            var entity = _postWatchers.Find(postId, userAndOrg.UserId);
+            if (shouldWatch && entity == null)
+            {
+                entity = new PostWatcher
+                {
+                    PostId = postId,
+                    UserId = userAndOrg.UserId
+                };
+                _postWatchers.Add(entity);
+            }
+
+            if (!shouldWatch && entity != null)
+            {
+                _postWatchers.Remove(entity);
+            }
+
+            _uow.SaveChanges();
+        }
+
+        public IEnumerable<string> GetPostWatchersForAppNotifications(int postId)
+        {
+            return _postWatchers
+                .Where(w => w.PostId == postId && (w.User.NotificationsSettings == null || w.User.NotificationsSettings.FollowingPostsAppNotifications))
+                .Select(s => s.UserId).ToList()
+                .Select(s => s.ToString());
+        }
+
+        public IEnumerable<ApplicationUser> GetPostWatchersForEmailNotifications(int postId)
+        {
+            return _postWatchers
+                .Where(w => w.PostId == postId && (w.User.NotificationsSettings == null || w.User.NotificationsSettings.FollowingPostsEmailNotifications))
+                .Include(w => w.User)
+                .Where(w => w.User != null)
+                .Select(w => w.User).ToList();
         }
     }
 }

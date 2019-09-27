@@ -205,6 +205,7 @@ namespace Shrooms.DataLayer.DAL
             modelBuilder.Configurations.Add(new MonitorConfig());
             modelBuilder.Configurations.Add(new NotificationConfig());
             modelBuilder.Configurations.Add(new NotifiationUserConfig());
+            modelBuilder.Configurations.Add(new PostWatcherConfig());
 
             var convention = new AttributeToColumnAnnotationConvention<SqlDefaultValueAttribute, string>("SqlDefaultValue", (p, attributes) => attributes.Single().DefaultValue);
             modelBuilder.Conventions.Add(convention);
