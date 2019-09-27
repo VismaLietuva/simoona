@@ -62,25 +62,29 @@
         vm.getPostUrl = getPostUrl;
         vm.notifyCopied = notifyCopied;
 
-        vm.hasNotification = isSeen(vm.post.id);
+        init();
 
         /////////
 
+        function init()
+        {
+            isSeen(vm.post.id);
+        }
+
         function isSeen(postId) {
-            var isNotified = false;
+            vm.hasNotification = false;
 
             angular.forEach(vm.notifications.data, (notification) => {
                 if (postId === notification.sourceIds.postId) {
                     vm.notificationIds.push(notification.id);
-                    isNotified = true;
+                    vm.hasNotification = true;
 
                     if (vm.stateParams.post) {
-                        isNotified = false;
+                        vm.hasNotification = false;
                         vm.markNotification();
                     }
                 }
             });
-            return isNotified;
         }
 
         function markNotification()
