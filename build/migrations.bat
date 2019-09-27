@@ -1,0 +1,1 @@
+powershell -ExecutionPolicy ByPass -File build.ps1 -activity="ExecuteMigrations" -connectionString="Data Source=localhost\SQLEXPRESS;Integrated Security=True;Connect Timeout=60; MultipleActiveResultSets=True;" -dbName="SimoonaDb"

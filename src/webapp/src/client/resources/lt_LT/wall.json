@@ -55,5 +55,7 @@
   "wallModerators": "Sienos moderatoriai",
   "addModerators": "Pridėkite moderatorius",
   "successToClipboard": "Sėkmingai nukopijuota į iškarpinę!",
-  "markdownSuggestions": "**bold** __underlined__ *italics* ~~strikethrough~~ `code`"
+  "markdownSuggestions": "**bold** __underlined__ *italics* ~~strikethrough~~ `code`",
+  "watch": "Sekti",
+  "unwatch": "Nesekti"
 }
