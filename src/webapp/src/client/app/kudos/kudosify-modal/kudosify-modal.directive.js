@@ -97,7 +97,7 @@
                     vm.kudosTypes = result;
                     for(var i = 0; i < vm.kudosTypes.length; i++)
                     {
-                        if(vm.kudosTypes[i].name === "Send")
+                        if(vm.kudosTypes[i].type === 2)
                         {
                             vm.kudosTypes.splice(vm.kudosTypes[i], 1);
                         }
