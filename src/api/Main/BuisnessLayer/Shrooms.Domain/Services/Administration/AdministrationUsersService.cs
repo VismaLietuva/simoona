@@ -347,9 +347,9 @@ namespace Shrooms.Domain.Services.Administration
                     Modified = DateTime.UtcNow,
                     Status = KudosStatus.Pending,
                     MultiplyBy = 1,
-                    KudosSystemType = ConstBusinessLayer.KudosTypeEnum.Other,
-                    KudosTypeValue = (short)ConstBusinessLayer.KudosTypeEnum.Other,
-                    KudosTypeName = ConstBusinessLayer.KudosTypeEnum.Other.ToString()
+                    KudosSystemType = ConstBusinessLayer.KudosTypeEnum.Welcome,
+                    KudosTypeValue = (short)ConstBusinessLayer.KudosTypeEnum.Welcome,
+                    KudosTypeName = ConstBusinessLayer.KudosTypeEnum.Welcome.ToString()
                 };
 
                 _uow.GetDbSet<KudosLog>().Add(welcomeKudos);
