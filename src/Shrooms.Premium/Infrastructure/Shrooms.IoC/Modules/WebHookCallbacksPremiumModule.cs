@@ -13,9 +13,9 @@ namespace Shrooms.Premium.Infrastructure.Shrooms.IoC.Modules
         {
             builder.RegisterType<KudosPremiumNotificationService>().As<IKudosPremiumNotificationService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<LoyaltyKudosService>().As<ILoyaltyKudosService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<EventsWebHookService>().As<IEventsWebHookService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
 
-            builder.RegisterType<WebHookCallbackPremiumServices>().As<IWebHookCallbackPremiumServices>().InstancePerRequest().PropertiesAutowired().EnableInterfaceTelemetryInterceptor();
+            builder.RegisterType<EventsWebHookService>().As<IEventsWebHookService>().InstancePerRequest(); //.EnableInterfaceTelemetryInterceptor();
+            builder.RegisterType<WebHookCallbackPremiumServices>().As<IWebHookCallbackPremiumServices>().InstancePerRequest().PropertiesAutowired(); //.EnableInterfaceTelemetryInterceptor();
         }
     }
 }
