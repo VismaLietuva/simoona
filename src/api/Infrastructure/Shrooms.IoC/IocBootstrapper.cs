@@ -64,7 +64,7 @@ namespace Shrooms.IoC
             builder.RegisterType<PostNotificationService>().As<IPostNotificationService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<CommentEmailNotificationService>().As<ICommentEmailNotificationService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.Register(c => app.GetDataProtectionProvider()).InstancePerRequest();
-            builder.RegisterType<PermissionService>().As<IPermissionService>().PropertiesAutowired().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            builder.RegisterType<PermissionService>().As<IPermissionService>().PropertiesAutowired().InstancePerRequest(); //.EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<SyncTokenService>().As<ISyncTokenService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<ImpersonateService>().As<IImpersonateService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<UserAdministrationValidator>().As<IUserAdministrationValidator>().InstancePerRequest();

@@ -54,7 +54,7 @@ namespace Shrooms.API.GeneralCode
         {
             if (item is RequestTelemetry request)
             {
-                if (IsSignalr(request))
+                if (IsSignalr(request) || IsSuccesfulJob(request))
                 {
                     return;
                 }
@@ -72,9 +72,20 @@ namespace Shrooms.API.GeneralCode
             Next.Process(item);
         }
 
-        private static bool IsSignalr([NotNull]RequestTelemetry request)
+        private static bool IsSuccesfulJob([NotNull] RequestTelemetry request)
         {
-            if (request.Name.Contains("signalr") == true)
+            // Ignore successful job calls to reduce sampling
+            if ((request.Name.Contains("externalpremiumjobs") || request.Name.Contains("externaljobs")) && request.Success == true)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool IsSignalr([NotNull] RequestTelemetry request)
+        {
+            if (request.Name.Contains("signalr"))
             {
                 return true;
             }
