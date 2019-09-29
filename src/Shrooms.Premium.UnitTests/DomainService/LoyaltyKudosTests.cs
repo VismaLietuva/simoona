@@ -384,6 +384,20 @@ namespace Shrooms.UnitTests.DomainService
         }
 
         [Test]
+        public void Should_Not_Award_If_Years_To_Award_Is_Negative()
+        {
+            // Setup
+            var yearsEmployed = 2;
+            var loyaltyAwardsAlreadyReceived = 3;
+
+            // Act
+            var yearsToAwardFor = LoyaltyKudos.CalculateYearsToAwardFor(yearsEmployed, loyaltyAwardsAlreadyReceived);
+
+            // Assert
+            Assert.AreEqual(0, yearsToAwardFor.Count());
+        }
+
+        [Test]
         public void Should_Calculate_Which_Year_Employee_Needs_To_Be_Awarded_With_Loyalty_2()
         {
             // Setup
@@ -438,7 +452,11 @@ namespace Shrooms.UnitTests.DomainService
             _kudosLogsDbSet.SetDbSetData(kudosLogs.AsQueryable());
             _kudosTypeDbSet.SetDbSetData(new[] { loyaltyKudosType }.AsQueryable());
             _organizationsDbSet.SetDbSetData(organizations.AsQueryable());
-
+            
+            _loyaltyKudosService.AwardEmployeesWithKudos("tenant2");
+            // Let's fake that we execute bgr job the second day.
+            kudosLogs.Add(new KudosLog { Id = 2, EmployeeId = "user1", KudosTypeName = "Loyalty", OrganizationId = 2, Status = KudosStatus.Approved, Points = 40 });
+            kudosLogs.Add(new KudosLog { Id = 2, EmployeeId = "user2", KudosTypeName = "Loyalty", OrganizationId = 2, Status = KudosStatus.Approved, Points = 40 });
             _loyaltyKudosService.AwardEmployeesWithKudos("tenant2");
 
             _kudosLogsDbSet.Received(2).Add(Arg.Any<KudosLog>());

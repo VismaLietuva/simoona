@@ -71,7 +71,11 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos
         public static IEnumerable<int> CalculateYearsToAwardFor(int yearsEmployed, int loyaltyAwardsAlreadyReceived)
         {
             var yearsToAwardCount = yearsEmployed - loyaltyAwardsAlreadyReceived;
-            var yearsToAwardFor = Enumerable.Range(loyaltyAwardsAlreadyReceived + 1, yearsToAwardCount);
+            var yearsToAwardFor = Enumerable.Empty<int>();
+            if (yearsToAwardCount >= 0)
+            {
+                yearsToAwardFor = Enumerable.Range(loyaltyAwardsAlreadyReceived + 1, yearsToAwardCount);
+            }
 
             return yearsToAwardFor;
         }
