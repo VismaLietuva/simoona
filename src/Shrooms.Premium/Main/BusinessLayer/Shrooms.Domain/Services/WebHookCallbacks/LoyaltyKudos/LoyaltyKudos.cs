@@ -18,19 +18,29 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos
         public static KudosLog CreateLoyaltyKudosLog(ApplicationUser recipient, KudosType loyaltyKudosType, int organizationId, int[] kudosYearlyMultipliers, int yearOfEmployment)
         {
             if (yearOfEmployment <= 0)
+            {
                 throw new ArgumentException("Invalid argument", nameof(yearOfEmployment));
+            }
 
             if (organizationId <= 0)
+            {
                 throw new ArgumentException("Invalid argument", nameof(organizationId));
+            }
 
             if (recipient == null)
+            {
                 throw new ArgumentNullException(nameof(recipient));
+            }
 
             if (loyaltyKudosType == null)
+            {
                 throw new ArgumentNullException(nameof(loyaltyKudosType));
+            }
 
             if (kudosYearlyMultipliers == null || kudosYearlyMultipliers.Length == 0)
+            {
                 throw new ArgumentException("Invalid argument", nameof(kudosYearlyMultipliers));
+            }
 
             var timestamp = DateTime.UtcNow;
             var yearlyLoyaltyKudosMultiplier = CalculateYearlyMultiplier(yearOfEmployment, kudosYearlyMultipliers);

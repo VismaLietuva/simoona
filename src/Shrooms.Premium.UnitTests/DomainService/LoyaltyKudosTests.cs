@@ -413,6 +413,40 @@ namespace Shrooms.UnitTests.DomainService
         }
 
         [Test]
+        public void Should_Award_Employee_With_Loyalty_Kudos_OnlyAfter3Years()
+        {
+            var employees = new List<ApplicationUser>
+            {
+                new ApplicationUser { Id = "user1", OrganizationId = 2, EmploymentDate = DateTime.UtcNow.AddYears(-3).AddDays(-10) },
+                new ApplicationUser { Id = "user2", OrganizationId = 2, EmploymentDate = DateTime.UtcNow.AddYears(-3).AddDays(-10) },
+                new ApplicationUser { Id = "user3", OrganizationId = 2, EmploymentDate = DateTime.UtcNow.AddDays(-100) }
+            };
+
+            var organizations = new List<Organization>
+            {
+                new Organization { Id = 2, ShortName = "tenant2", KudosYearlyMultipliers = "0;0;4" }
+            };
+
+            var kudosLogs = new List<KudosLog>
+            {
+                new KudosLog { Id = 1, EmployeeId = "user1", KudosTypeName = "Loyalty", OrganizationId = 2, Status = KudosStatus.Approved, Points = 20 }
+            };
+
+            var loyaltyKudosType = new KudosType { Id = 1, Value = 1, Name = "Loyalty" };
+
+            _usersDbSet.SetDbSetData(employees.AsQueryable());
+            _kudosLogsDbSet.SetDbSetData(kudosLogs.AsQueryable());
+            _kudosTypeDbSet.SetDbSetData(new[] { loyaltyKudosType }.AsQueryable());
+            _organizationsDbSet.SetDbSetData(organizations.AsQueryable());
+
+            _loyaltyKudosService.AwardEmployeesWithKudos("tenant2");
+
+            _kudosLogsDbSet.Received(2).Add(Arg.Any<KudosLog>());
+            _kudosLogsDbSet.Received(1).Add(Arg.Is<KudosLog>(x => x.EmployeeId == "user1"));
+            _kudosLogsDbSet.Received(1).Add(Arg.Is<KudosLog>(x => x.EmployeeId == "user2"));
+        }
+
+        [Test]
         public void Should_Map_Retrieved_Users_KudosLogs_Organization_And_KudosType_Correctly()
         {
             var employees = new List<ApplicationUser>

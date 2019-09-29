@@ -66,9 +66,7 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos
                     .SingleOrDefault(t => t.Name == LoyaltyKudosTypeName);
 
                 var employees = _usersDbSet
-                    .Where(u =>
-                        u.OrganizationId == organizationId &&
-                        u.EmploymentDate.HasValue)
+                    .Where(u => u.OrganizationId == organizationId && u.EmploymentDate.HasValue)
                     .ToList();
 
                 var employeesIds = employees.Select(x => x.Id).ToList();
@@ -122,7 +120,7 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos
             };
         }
 
-        private int[] ParseKudosYearlyMultipliersString(string multipliers)
+        private static int[] ParseKudosYearlyMultipliersString(string multipliers)
         {
             if (string.IsNullOrEmpty(multipliers))
             {
