@@ -98,7 +98,6 @@ namespace Shrooms.API.GeneralCode
         {
             if (request.Name.Contains("imagecache") && request.Success == true)
             {
-                request.Context.
                 return true;
             }
 
