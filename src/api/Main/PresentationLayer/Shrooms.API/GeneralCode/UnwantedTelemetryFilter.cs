@@ -54,7 +54,7 @@ namespace Shrooms.API.GeneralCode
         {
             if (item is RequestTelemetry request)
             {
-                if (IsSignalr(request) || IsSuccessfulJob(request) || IsImageCache(request))
+                if (IsSignalr(request) || IsSuccessfulJobRequest(request) || IsImageCacheRequest(request))
                 {
                     return;
                 }
@@ -62,7 +62,7 @@ namespace Shrooms.API.GeneralCode
 
             if (item is DependencyTelemetry dependency)
             {
-                if (IsHangfireBackgroundJobs(dependency))
+                if (IsHangfireBackgroundJobs(dependency) || IsSuccessfulJobDependency(dependency) || IsImageCacheDependency(dependency))
                 {
                     return;
                 }
@@ -72,7 +72,7 @@ namespace Shrooms.API.GeneralCode
             Next.Process(item);
         }
 
-        private static bool IsSuccessfulJob([NotNull] RequestTelemetry request)
+        private static bool IsSuccessfulJobRequest([NotNull] RequestTelemetry request)
         {
             // Ignore successful job calls to reduce sampling
             if ((request.Name.Contains("externalpremiumjobs") || request.Name.Contains("externaljobs")) && request.Success == true)
@@ -83,9 +83,31 @@ namespace Shrooms.API.GeneralCode
             return false;
         }
 
-        private static bool IsImageCache([NotNull] RequestTelemetry request)
+        private static bool IsSuccessfulJobDependency([NotNull] DependencyTelemetry dependency)
+        {
+            // Ignore successful job calls to reduce sampling
+            if ((dependency.Context.Operation.Name.Contains("externalpremiumjobs") || dependency.Context.Operation.Name.Contains("externaljobs")) && dependency.Success == true)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool IsImageCacheRequest([NotNull] RequestTelemetry request)
         {
             if (request.Name.Contains("imagecache") && request.Success == true)
+            {
+                request.Context.
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool IsImageCacheDependency([NotNull] DependencyTelemetry dependency)
+        {
+            if (dependency.Type == "Azure blob" && dependency.Success == true)
             {
                 return true;
             }
