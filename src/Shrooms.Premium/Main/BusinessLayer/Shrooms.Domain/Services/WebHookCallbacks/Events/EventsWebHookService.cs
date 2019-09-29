@@ -14,7 +14,7 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.Events
 {
     public class EventsWebHookService : IEventsWebHookService
     {
-        private static readonly Dictionary<EventRecurrenceOptions, Func<DateTime, DateTime>> RecurrancePeriods = new Dictionary<EventRecurrenceOptions, Func<DateTime, DateTime>>
+        private static readonly Dictionary<EventRecurrenceOptions, Func<DateTime, DateTime>> _recurrencePeriods = new Dictionary<EventRecurrenceOptions, Func<DateTime, DateTime>>
         {
             { EventRecurrenceOptions.EveryDay, e => e.AddDays(1) },
             { EventRecurrenceOptions.EveryWeek, e => e.AddDays(7) },
@@ -91,9 +91,9 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.Events
                 ModifiedBy = @event.ModifiedBy,
                 Place = @event.Place,
                 Created = @event.Created,
-                LocalStartDate = RecurrancePeriods[@event.EventRecurring](@event.LocalStartDate),
-                LocalEndDate = RecurrancePeriods[@event.EventRecurring](@event.LocalEndDate),
-                LocalRegistrationDeadline = RecurrancePeriods[@event.EventRecurring](@event.LocalRegistrationDeadline),
+                LocalStartDate = _recurrencePeriods[@event.EventRecurring](@event.LocalStartDate),
+                LocalEndDate = _recurrencePeriods[@event.EventRecurring](@event.LocalEndDate),
+                LocalRegistrationDeadline = _recurrencePeriods[@event.EventRecurring](@event.LocalRegistrationDeadline),
                 WallId = wallId
             };
         }
