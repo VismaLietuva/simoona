@@ -75,7 +75,7 @@ namespace Shrooms.API.GeneralCode
         private static bool IsSuccessfulJobRequest([NotNull] RequestTelemetry request)
         {
             // Ignore successful job calls to reduce sampling
-            if ((request.Name.Contains("externalpremiumjobs") || request.Name.Contains("externaljobs")) && request.Success == true)
+            if (request.Success == true && request.Name != null && (request.Name.Contains("externalpremiumjobs") || request.Name.Contains("externaljobs")))
             {
                 return true;
             }
@@ -86,7 +86,7 @@ namespace Shrooms.API.GeneralCode
         private static bool IsSuccessfulJobDependency([NotNull] DependencyTelemetry dependency)
         {
             // Ignore successful job calls to reduce sampling
-            if ((dependency.Context.Operation.Name.Contains("externalpremiumjobs") || dependency.Context.Operation.Name.Contains("externaljobs")) && dependency.Success == true)
+            if (dependency.Success == true && dependency.Context?.Operation?.Name != null && (dependency.Context.Operation.Name.Contains("externalpremiumjobs") || dependency.Context.Operation.Name.Contains("externaljobs")))
             {
                 return true;
             }
