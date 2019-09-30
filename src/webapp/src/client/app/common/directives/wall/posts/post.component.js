@@ -66,7 +66,7 @@
         vm.unwatchPost = unwatchPost;
 
         init();
-
+        
         /////////
 
         function init()
@@ -77,11 +77,17 @@
         function isSeen(postId) {
 
             if (vm.stateParams.post) {
+                var notificationIds = [];
                 angular.forEach(vm.notifications.data, (notification) => {
                     if (postId === notification.sourceIds.postId) {
-                        vm.markAsRead(notifications.sourceIds.postId);
+                        notificationIds.push(notification.id);
                     }
                 });
+                if(!!notificationIds)
+                {
+                    vm.markAsRead(notificationIds);
+                    notificationIds = [];
+                }
             }
         }
         function editPost(messageBody) {
