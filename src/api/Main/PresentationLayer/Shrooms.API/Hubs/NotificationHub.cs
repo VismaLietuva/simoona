@@ -51,6 +51,11 @@ namespace Shrooms.API.Hubs
             notificationHub.Clients.Clients(connectionIds).newNotification(notification);
         }
 
+        public static void SendNotificationToParticularUsers(NotificationViewModel notification, UserAndOrganizationHubDto userOrg, string memberId)
+        {
+            SendNotificationToParticularUsers(notification, userOrg, new List<string> { memberId });
+        }
+
         public static void SendNotificationToParticularUsers(NotificationViewModel notification, UserAndOrganizationHubDto userOrg, IEnumerable<string> membersIds)
         {
             var notificationHub = GlobalHost.ConnectionManager.GetHubContext<NotificationHub>();

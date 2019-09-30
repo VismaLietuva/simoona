@@ -177,5 +177,50 @@ namespace Shrooms.API.Controllers
                 return BadRequestWithError(e);
             }
         }
+
+        [HttpPut]
+        [Route("Watch")]
+        [PermissionAuthorize(Permission = BasicPermissions.Post)]
+        public IHttpActionResult WatchPost(HidePostViewModel post)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var userAndOrg = GetUserAndOrganization();
+            try
+            {
+                _postService.ToggleWatch(post.Id, userAndOrg,true);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequestWithError(e);
+            }
+
+            return Ok();
+        }
+
+        [HttpPut]
+        [Route("Unwatch")]
+        [PermissionAuthorize(Permission = BasicPermissions.Post)]
+        public IHttpActionResult UnwatchPost(HidePostViewModel post)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var userAndOrg = GetUserAndOrganization();
+            try
+            {
+                _postService.ToggleWatch(post.Id, userAndOrg, false);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequestWithError(e);
+            }
+            return Ok();
+        }
     }
 }

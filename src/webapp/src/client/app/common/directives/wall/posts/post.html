@@ -14,8 +14,7 @@
                                       date="vm.post.created"
                                       edited-date="vm.post.lastEdit"
                                       is-edited="vm.post.isEdited"
-                                      is-hidden="vm.post.isHidden"
-            >
+                                      is-hidden="vm.post.isHidden">
             </ace-message-user-profile>
         </div>
         <div class="post-content-margin">
@@ -111,12 +110,12 @@
         ng-click="vm.markNotification()"title="{{ 'wall.markAsRead' | translate}}" translate-cloak="" style="">
     </a>
     </div>
-  
+    <div feature-flag="usePostWatching">
+        <a ng-if="vm.post.isWatched" ng-click="vm.unwatchPost()" class="post-buttons glyphicon glyphicon-star" title="{{ 'wall.unwatch' | translate }}">
+        </a>
+        <a ng-if="!vm.post.isWatched" ng-click="vm.watchPost()" class="post-buttons glyphicon glyphicon-star-empty" title="{{ 'wall.watch' | translate }}">
+        </a>
+    </div>
 
-    <a  ngclipboard
-        ng-click="vm.notifyCopied($event)"
-        ng-href="{{vm.getPostUrl(vm.post.id)}}"
-        data-clipboard-text="{{vm.getPostUrl(vm.post.id)}}"
-        class="clipboard-post-link vismaicon vismaicon-sm"></a>
-
+    <a ngclipboard ng-click="vm.notifyCopied($event)" ng-href="{{vm.getPostUrl(vm.post.id)}}" data-clipboard-text="{{vm.getPostUrl(vm.post.id)}}" class="vismaicon vismaicon-sm icon-post-link"></a>
 </div>

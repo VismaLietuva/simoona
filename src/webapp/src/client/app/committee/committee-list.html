@@ -30,47 +30,42 @@
                 <h3>{{focusedCommittee.name}}</h3>
             </div>
             <div class="row committees-info-body">
-                <div class="col-xs-12 col-sm-12 col-md-5 committee-members-area">
-                    <div ng-if="focusedCommittee.leads.length">
-                        <span class="pull-left" translate="committee.leads"></span>
-                        <br />
-                        <div class="committee-members-area pull-left">
-                            <div ng-repeat="lead in focusedCommittee.leads">
-                                <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: lead.id })">{{lead.firstName}} {{lead.lastName}}</a>
-                            </div>
-                        </div>
-                        <br />
-                    </div>
-                    <div ng-if="focusedCommittee.members.length">
-                        <span class="pull-left" translate="committee.members"></span>
-                        <br />
-                        <div class="committee-members-area pull-left">
-                            <div ng-repeat="member in focusedCommittee.members">
-                                <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: member.id })">{{member.firstName}} {{member.lastName}}</a>
-                            </div>
-                        </div>
-                        <br />
-                    </div>
-                    <div ng-if="focusedCommittee.delegates.length">
-                        <span class="pull-left" translate="committee.delegates"></span>
-                        <br />
-                        <div class="committee-members-area pull-left">
-                            <div ng-repeat="delegate in focusedCommittee.delegates">
-                                <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: delegate.id })">{{delegate.firstName}} {{delegate.lastName}}</a>
-                            </div>
+                <div class="col-xs-12 col-sm-12 col-md-12 committee-members-area" ng-if="focusedCommittee.leads.length">
+                    <strong translate="committee.leads"></strong>
+                    <div class="committee-members-area">
+                        <div ng-repeat="lead in focusedCommittee.leads">
+                            <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: lead.id })">{{lead.firstName}} {{lead.lastName}}</a>
                         </div>
                     </div>
                 </div>
-                <div class="col-xs-12 col-sm-12 col-md-7">
-                    <span class="pull-left">{{"committee.description" | translate}}:</span>
-                    <br />
+                <div class="col-xs-12 col-sm-12 col-md-12 committee-members-area" ng-if="focusedCommittee.members.length">
+                    <strong translate="committee.members"></strong>
+                    <div class="committee-members-area">
+                        <div ng-repeat="member in focusedCommittee.members">
+                            <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: member.id })">{{member.firstName}} {{member.lastName}}</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-12 committee-members-area" ng-if="focusedCommittee.delegates.length">
+                    <strong translate="committee.delegates"></strong>
+                    <div class="committee-members-area">
+                        <div ng-repeat="delegate in focusedCommittee.delegates">
+                            <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: delegate.id })">{{delegate.firstName}} {{delegate.lastName}}</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-12 committee-members-area">
+                    <strong >{{"committee.description" | translate}}</strong>
                     <div class="committee-description-area">
-                        <span class="comment-word-break pull-left" ng-bind-html="focusedCommittee.description | linky: '_blank'"></span>
+                        <span class="comment-word-break" ng-bind-html="focusedCommittee.description | linky: '_blank' | newlineToBr"></span>
                     </div>
                 </div>
-            </div>
-            <div class="row committees-info-body">
-                <span ng-show="focusedCommittee.website !== null" class="col-xs-12 committees-mailtext">{{"committee.website" | translate}}: <a href="{{focusedCommittee.website}}" target="_blank">{{focusedCommittee.website}}</a></span>
+                <div class="col-xs-12 col-sm-12 col-md-12 committee-members-area" ng-if="focusedCommittee.website !== null">
+                    <strong>{{"committee.website" | translate}}</strong>
+                    <div class="committee-description-area">
+                        <a href="{{focusedCommittee.website}}" target="_blank">{{focusedCommittee.website}}</a>
+                    </div>
+                </div>
             </div>
             <div class="row committees-info-body">
                 <span class="col-xs-12 committees-mailtext">{{"committee.emailText" | translate}} {{"committee.emailUs" | translate}}</span>

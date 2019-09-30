@@ -1,15 +1,24 @@
-.clipboard-post-link {
+.icon-post-link {
     float: right;
     background-image: url(../images/vismaicons/worksurface/16_link.svg);
-    background-position: -39px 0px;
+    background-position: -38px 0;
     background-repeat: no-repeat;
     width: 16px;
     height: 16px;
     margin-left: 2px;
     &:hover{ 
-        background-position: 0px 0px;
+        background-position: 0 0;
     }
 }
+
+.post-buttons {
+    margin-left: 2px;
+}
+
+.post-buttons.glyphicon::before {
+    font-weight: bold;
+}
+
 .wall-image-preview {
     float: left;
     max-width: 425px;
