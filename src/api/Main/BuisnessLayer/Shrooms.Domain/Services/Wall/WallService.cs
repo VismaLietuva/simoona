@@ -171,7 +171,7 @@ namespace Shrooms.Domain.Services.Wall
                     Name = x.Name,
                     Description = x.Description,
                     Type = x.Type,
-                    IsFollowing = x.Members.Any(m => m.UserId == userOrg.UserId),
+                    IsFollowing = x.Type == WallType.Main ? true : x.Members.Any(m => m.UserId == userOrg.UserId),
                     Logo = x.Logo,
                     TotalMembers = x.Members.Count
                 })
@@ -742,7 +742,7 @@ namespace Shrooms.Domain.Services.Wall
                     Id = w.Id,
                     Name = w.Name,
                     Description = w.Description,
-                    IsFollowing = w.Members.Any(m => m.UserId == userOrg.UserId),
+                    IsFollowing = w.Type == WallType.Main ? true : w.Members.Any(m => m.UserId == userOrg.UserId),
                     Type = w.Type,
                     Logo = w.Logo
                 })
@@ -768,6 +768,26 @@ namespace Shrooms.Domain.Services.Wall
                     Logo = x.Wall.Logo
                 })
                 .ToListAsync();
+
+            if (!walls.Any(wall => wall.Type == WallType.Main))
+            {
+                var mainWall = await _wallUsersDbSet
+                    .Include(wall => wall.Wall)
+                    .Where(wall => wall.Wall.Type == WallType.Main && wall.Wall.OrganizationId == userOrg.OrganizationId)
+                    .Select(x => new WallDto
+                    {
+                        Id = x.Wall.Id,
+                        Name = x.Wall.Name,
+                        Description = x.Wall.Description,
+                        Type = x.Wall.Type,
+                        IsFollowing = true,
+                        Logo = x.Wall.Logo
+                    })
+                    .FirstOrDefaultAsync();
+
+                walls.Add(mainWall);
+            };
+
             return walls;
         }
     }
