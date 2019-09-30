@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -213,7 +214,7 @@ namespace Shrooms.API.Tests.DomainService
             };
 
             var types = _kudosService.GetKudosTypes(userAndOrg);
-            Assert.AreEqual(3, types.Count());
+            Assert.AreEqual(4, types.Count());
         }
 
         [Test]
@@ -225,7 +226,7 @@ namespace Shrooms.API.Tests.DomainService
             };
 
             var types = _kudosService.GetKudosTypes(userAndOrg);
-            Assert.AreEqual(2, types.Count());
+            Assert.AreEqual(3, types.Count());
         }
         #endregion
 
@@ -517,6 +518,80 @@ namespace Shrooms.API.Tests.DomainService
 
         #endregion
 
+        #region GetNecessaryKudosTypes
+        [Test]
+        public void Should_Return_All_Necessary_Kudos_Types()
+        {
+            var expectedCollection = new List<KudosTypeDTO>
+            {
+                new KudosTypeDTO
+                {
+                    Id = 1,
+                    Name = "Minus",
+                    Value = 1,
+                    Type = ConstBusinessLayer.KudosTypeEnum.Minus
+                },
+                new KudosTypeDTO
+                {
+                    Id = 2,
+                    Name = "Send",
+                    Value = 1,
+                    Type = ConstBusinessLayer.KudosTypeEnum.Send
+                },
+                new KudosTypeDTO
+                {
+                    Id = 4,
+                    Name = "Other",
+                    Value = 3,
+                    Type = ConstBusinessLayer.KudosTypeEnum.Other
+                }
+            };
+
+            var userAndOrg = new UserAndOrganizationDTO
+            {
+                UserId = "testUserId2"
+            };
+
+            var types = _kudosService.GetNecessaryKudosTypes(userAndOrg);
+            Assert.AreEqual(3, types.Count());
+            CollectionAssert.Contains(types, expectedCollection[0]);
+            CollectionAssert.Contains(types, expectedCollection[1]);
+            CollectionAssert.Contains(types, expectedCollection[2]);
+        }
+
+        [Test]
+        public void Should_Return_Necessary_Kudos_Types_Without_Minus()
+        {
+            var expectedCollection = new List<KudosTypeDTO>
+            {
+                new KudosTypeDTO
+                {
+                    Id = 2,
+                    Name = "Send",
+                    Value = 1,
+                    Type = ConstBusinessLayer.KudosTypeEnum.Send
+                },
+                new KudosTypeDTO
+                {
+                    Id = 4,
+                    Name = "Other",
+                    Value = 3,
+                    Type = ConstBusinessLayer.KudosTypeEnum.Other
+                }
+            };
+
+            var userAndOrg = new UserAndOrganizationDTO
+            {
+                UserId = "testUserId"
+            };
+
+            var types = _kudosService.GetNecessaryKudosTypes(userAndOrg);
+            Assert.AreEqual(2, types.Count());
+            CollectionAssert.Contains(types, expectedCollection[0]);
+            CollectionAssert.Contains(types, expectedCollection[1]);
+        }
+        #endregion
+
         #region MockData
 
         private static void MockRoleService(IRoleService roleService)
@@ -659,6 +734,13 @@ namespace Shrooms.API.Tests.DomainService
                     Name = "AnythingElse",
                     Value = 2,
                     Type = ConstBusinessLayer.KudosTypeEnum.Ordinary
+                },
+                new KudosType
+                {
+                    Id = 4,
+                    Name = "Other",
+                    Value = 3,
+                    Type = ConstBusinessLayer.KudosTypeEnum.Other
                 },
             }.AsQueryable();
         }

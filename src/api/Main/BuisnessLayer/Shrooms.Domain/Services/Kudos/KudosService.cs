@@ -128,12 +128,15 @@ namespace Shrooms.Domain.Services.Kudos
 
         public IEnumerable<KudosTypeDTO> GetNecessaryKudosTypes(UserAndOrganizationDTO userOrg)
         {
+            var hasKudosAdminPermission = HasKudosAdministratorPermission(userOrg);
+
             var type = _kudosTypesDbSet
+                .Where(GetKudosTypeQuery(hasKudosAdminPermission))
                 .Where(x => x.Type == ConstBusinessLayer.KudosTypeEnum.Send ||
                               x.Type == ConstBusinessLayer.KudosTypeEnum.Minus ||
                               x.Type == ConstBusinessLayer.KudosTypeEnum.Other)
                 .Select(MapKudosTypesToDTO)
-                .ToList();
+                .AsEnumerable();
 
             if (type == null)
             {
