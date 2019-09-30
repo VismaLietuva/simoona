@@ -27,6 +27,7 @@
         'wallSettings',
         'errorHandler',
         'youtubeSettings',
+        'notificationFactory',
         'wallPostRepository',
         'wallService',
         'notifySrv',
@@ -34,16 +35,20 @@
     ];
 
     function wallPostController($scope, $state, $location, SmoothScroll, wallSettings,
-        errorHandler, youtubeSettings, wallPostRepository, wallService, notifySrv,$window) {
+        errorHandler, youtubeSettings, notificationFactory, wallPostRepository, wallService, notifySrv, $window) {
         /*jshint validthis: true */
         var vm = this;
 
+        vm.isSeen = isSeen;
         vm.editPost = editPost;
         vm.deletePost = deletePost;
         vm.enableEditor = enableEditor;
-        vm.disableEditor = disableEditor;
+        vm.disableEditor = disableEditor;    
         vm.showCommentForm = showCommentForm;
         vm.handleErrorMessage = handleErrorMessage;
+
+        vm.notifications = notificationFactory.notification;
+        vm.markAsRead = notificationFactory.markAsRead;
 
         vm.isActionsEnabled = true;
         vm.editFieldEnabled = false;
@@ -60,8 +65,25 @@
         vm.watchPost = watchPost;
         vm.unwatchPost = unwatchPost;
 
+        init();
+
         /////////
 
+        function init()
+        {
+            isSeen(vm.post.id);
+        }
+
+        function isSeen(postId) {
+
+            if (vm.stateParams.post) {
+                angular.forEach(vm.notifications.data, (notification) => {
+                    if (postId === notification.sourceIds.postId) {
+                        vm.markAsRead(notifications.sourceIds.postId);
+                    }
+                });
+            }
+        }
         function editPost(messageBody) {
             if (vm.isActionsEnabled) {
                 vm.disableEditor();
