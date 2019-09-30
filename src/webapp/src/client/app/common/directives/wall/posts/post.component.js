@@ -40,7 +40,6 @@
         var vm = this;
 
         vm.isSeen = isSeen;
-        vm.markNotification = markNotification;
         vm.editPost = editPost;
         vm.deletePost = deletePost;
         vm.enableEditor = enableEditor;
@@ -48,7 +47,6 @@
         vm.showCommentForm = showCommentForm;
         vm.handleErrorMessage = handleErrorMessage;
 
-        vm.notificationIds = [];
         vm.notifications = notificationFactory.notification;
         vm.markAsRead = notificationFactory.markAsRead;
 
@@ -77,29 +75,14 @@
         }
 
         function isSeen(postId) {
-            vm.hasNotification = false;
 
-            angular.forEach(vm.notifications.data, (notification) => {
-                if (postId === notification.sourceIds.postId) {
-                    vm.notificationIds.push(notification.id);
-                    vm.hasNotification = true;
-
-                    if (vm.stateParams.post) {
-                        vm.hasNotification = false;
-                        vm.markNotification();
+            if (vm.stateParams.post) {
+                angular.forEach(vm.notifications.data, (notification) => {
+                    if (postId === notification.sourceIds.postId) {
+                        vm.markAsRead(notifications.sourceIds.postId);
                     }
-                }
-            });
-        }
-
-        function markNotification()
-        {
-            if(!!vm.notificationIds)
-            {
-                vm.hasNotification = false;
-                vm.markAsRead(vm.notificationIds);
+                });
             }
-           
         }
         function editPost(messageBody) {
             if (vm.isActionsEnabled) {
