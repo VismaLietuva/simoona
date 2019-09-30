@@ -1,10 +1,10 @@
 <div class="dropdown"
      ng-class="{'main-wall-settings': !vm.currentWallId && vm.isWallModule}"
      ng-if="vm.isAdmin || vm.canModerateComment || vm.canModeratePost">
-    <span class="glyphicon glyphicon-cogwheel dropdown-toggle post-comment-settings-icon"
+    <a class="glyphicon glyphicon-cogwheel dropdown-toggle post-comment-settings-icon"
           data-toggle="dropdown"
           data-test-id="message-dropdown-menu-icon">
-    </span>
+    </a>
     <ul class="dropdown-menu pull-right">
         <li>
             <a ng-click="vm.enableEditor()" tabindex="-1" data-test-id="message-edit-button">

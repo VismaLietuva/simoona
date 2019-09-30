@@ -167,6 +167,7 @@
     <Compile Include="DAL\EntityTypeConfigurations\PageEntityConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\PermissionEntityConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\PostEntityConfig.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\PostWatcherConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\RefreshTokenConfiguration.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\RoomEntityConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\WallConfiguration.cs" />
@@ -792,6 +793,10 @@
     <Compile Include="Migrations\201907201330177_AddKudosWelcomeColumns.Designer.cs">
       <DependentUpon>201907201330177_AddKudosWelcomeColumns.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201909072124268_PostWatchers.cs" />
+    <Compile Include="Migrations\201909072124268_PostWatchers.Designer.cs">
+      <DependentUpon>201909072124268_PostWatchers.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\201909201038299_AddIsActiveColumnToKudoType.cs" />
     <Compile Include="Migrations\201909201038299_AddIsActiveColumnToKudoType.Designer.cs">
       <DependentUpon>201909201038299_AddIsActiveColumnToKudoType.cs</DependentUpon>
@@ -1290,6 +1295,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201907201330177_AddKudosWelcomeColumns.resx">
       <DependentUpon>201907201330177_AddKudosWelcomeColumns.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201909072124268_PostWatchers.resx">
+      <DependentUpon>201909072124268_PostWatchers.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201909201038299_AddIsActiveColumnToKudoType.resx">
       <DependentUpon>201909201038299_AddIsActiveColumnToKudoType.cs</DependentUpon>
