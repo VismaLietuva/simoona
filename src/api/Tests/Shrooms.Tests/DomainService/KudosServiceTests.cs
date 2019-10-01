@@ -227,6 +227,18 @@ namespace Shrooms.API.Tests.DomainService
             var types = _kudosService.GetKudosTypes(userAndOrg);
             Assert.AreEqual(2, types.Count());
         }
+
+        [Test]
+        public void Should_Return_Active_Kudos_Types()
+        {
+            var userAndOrg = new UserAndOrganizationDTO
+            {
+                UserId = "testUserId"
+            };
+
+            var types = _kudosService.GetKudosTypes(userAndOrg);
+            Assert.IsTrue(types.Any(type => type.IsActive));
+        }
         #endregion
 
         #region UpdateKudosLogs
@@ -333,7 +345,8 @@ namespace Shrooms.API.Tests.DomainService
                 UserId = "testUserId",
                 ReceivingUserIds = new List<string>() { "testUserId" },
                 MultiplyBy = 2,
-                Comment = "Comment"
+                Comment = "Comment",
+                IsActive = true
             };
 
             Assert.Throws<KudosException>(() => _kudosService.AddKudosLog(kudosLog));
@@ -350,7 +363,8 @@ namespace Shrooms.API.Tests.DomainService
                 UserId = "testUserId2",
                 ReceivingUserIds = new List<string>() { "testUserId3", "testUserId4" },
                 MultiplyBy = 2,
-                Comment = "Comment"
+                Comment = "Comment",
+                IsActive = true
             };
 
             _kudosService.AddKudosLog(kudosLog);
@@ -370,7 +384,8 @@ namespace Shrooms.API.Tests.DomainService
                 UserId = "testUserId2",
                 ReceivingUserIds = new List<string>() { "testUserId3", "testUserId4" },
                 MultiplyBy = 2,
-                Comment = "Comment"
+                Comment = "Comment",
+                IsActive = true
             };
 
             // Act
@@ -395,7 +410,8 @@ namespace Shrooms.API.Tests.DomainService
                 UserId = "testUserId2",
                 ReceivingUserIds = new List<string>() { "testUserId3", "testUserId4" },
                 MultiplyBy = 2,
-                Comment = "Comment"
+                Comment = "Comment",
+                IsActive = true
             };
 
             _kudosService.AddKudosLog(kudosLog);
@@ -417,7 +433,8 @@ namespace Shrooms.API.Tests.DomainService
                 UserId = "testUserId2",
                 ReceivingUserIds = new List<string>() { "testUserId3", "testUserId4", "testUserId" },
                 MultiplyBy = 2,
-                Comment = "Comment"
+                Comment = "Comment",
+                IsActive = true
             };
 
             Assert.Throws<KudosException>(() => _kudosService.AddKudosLog(kudosLog));
@@ -434,7 +451,8 @@ namespace Shrooms.API.Tests.DomainService
                 UserId = "testUserId2",
                 ReceivingUserIds = new List<string>() { "testUserId3", "testUserId2" },
                 MultiplyBy = 1,
-                Comment = "Comment"
+                Comment = "Comment",
+                IsActive = true
             };
 
             Assert.Throws<KudosException>(() => _kudosService.AddKudosLog(kudosLog));
@@ -452,7 +470,8 @@ namespace Shrooms.API.Tests.DomainService
                 UserId = "testUserId5",
                 ReceivingUserIds = new List<string>() { "testUserId3", "testUserId4", "testUserId" },
                 MultiplyBy = 2,
-                Comment = "Comment"
+                Comment = "Comment",
+                IsActive = true
             };
 
             Assert.Throws<KudosException>(() => _kudosService.AddKudosLog(kudosLog));
@@ -469,7 +488,8 @@ namespace Shrooms.API.Tests.DomainService
                 UserId = "testUserId2",
                 ReceivingUserIds = new List<string>() { "testUserId3", "testUserId4" },
                 MultiplyBy = 2,
-                Comment = "Comment"
+                Comment = "Comment",
+                IsActive = true
             };
 
             _kudosService.AddKudosLog(kudosLog);
@@ -644,21 +664,24 @@ namespace Shrooms.API.Tests.DomainService
                     Id = 1,
                     Name = "Minus",
                     Value = 1,
-                    Type = ConstBusinessLayer.KudosTypeEnum.Minus
+                    Type = ConstBusinessLayer.KudosTypeEnum.Minus,
+                    IsActive = false
                 },
                 new KudosType
                 {
                     Id = 2,
                     Name = "Send",
                     Value = 1,
-                    Type = ConstBusinessLayer.KudosTypeEnum.Send
+                    Type = ConstBusinessLayer.KudosTypeEnum.Send,
+                    IsActive = true
                 },
                 new KudosType
                 {
                     Id = 3,
                     Name = "AnythingElse",
                     Value = 2,
-                    Type = ConstBusinessLayer.KudosTypeEnum.Ordinary
+                    Type = ConstBusinessLayer.KudosTypeEnum.Ordinary,
+                    IsActive = false
                 },
             }.AsQueryable();
         }
