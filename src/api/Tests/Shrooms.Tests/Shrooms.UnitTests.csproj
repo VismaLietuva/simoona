@@ -256,10 +256,6 @@
       <Project>{8ad6f857-708c-4b5e-98bc-b3206e7dd918}</Project>
       <Name>Shrooms.EntityModels</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Main\PresentationLayer\Shrooms.API\Shrooms.API.csproj">
-      <Project>{d92e5d79-8d6b-410f-b9fc-0fce46fbc116}</Project>
-      <Name>Shrooms.API</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Main\PresentationLayer\Shrooms.WebViewModels\Shrooms.WebViewModels.csproj">
       <Project>{1f63d29f-e593-47f0-a304-54d62cc1ad2b}</Project>
       <Name>Shrooms.WebViewModels</Name>
