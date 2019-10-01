@@ -229,7 +229,7 @@ namespace Shrooms.API.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_Inactive_Kudos_Types()
+        public void Should_Return_Active_Kudos_Types()
         {
             var userAndOrg = new UserAndOrganizationDTO
             {
