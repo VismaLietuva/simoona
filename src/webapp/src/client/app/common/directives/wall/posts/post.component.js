@@ -75,8 +75,7 @@
         }
 
         function isSeen(postId) {
-
-            if (vm.stateParams.post) {
+            if (!!vm.stateParams.post) {
                 var notificationIds = [];
                 angular.forEach(vm.notifications.data, (notification) => {
                     if (postId === notification.sourceIds.postId) {
