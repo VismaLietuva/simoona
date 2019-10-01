@@ -752,43 +752,32 @@ namespace Shrooms.Domain.Services.Wall
 
         private async Task<IEnumerable<WallDto>> GetUserFollowedWalls(UserAndOrganizationDTO userOrg)
         {
-            var walls = await _wallUsersDbSet
-                .Include(x => x.Wall)
-                .Where(x => x.UserId == userOrg.UserId && x.Wall.OrganizationId == userOrg.OrganizationId)
-                .Where(x => x.Wall.Type == WallType.Main || x.Wall.Type == WallType.UserCreated)
-                .OrderBy(x => x.Wall.Type)
-                .ThenBy(x => x.Wall.Name)
-                .Select(x => new WallDto
-                {
-                    Id = x.Wall.Id,
-                    Name = x.Wall.Name,
-                    Description = x.Wall.Description,
-                    Type = x.Wall.Type,
-                    IsFollowing = true,
-                    Logo = x.Wall.Logo
-                })
+            var followedWalls = await _wallsDbSet
+               .Include(w => w.Members)
+               .Join(_wallUsersDbSet, wall => wall.Id, walluser => walluser.WallId, (wall, wallUser) => new
+               {
+                   Id = wall.Id,
+                   Name = wall.Name,
+                   Description = wall.Description,
+                   Type = wall.Type,
+                   IsFollowing = true,
+                   Logo = wall.Logo,
+                   UserId = wallUser.UserId
+               })
+               .Where(x => x.UserId == userOrg.UserId || x.Type == WallType.Main)
+               .Select(x => new WallDto
+               {
+                   Id = x.Id,
+                   Name = x.Name,
+                   Description = x.Description,
+                   Type = x.Type,
+                   IsFollowing = true,
+                   Logo = x.Logo
+               })
+                .Distinct()
                 .ToListAsync();
 
-            if (!walls.Any(wall => wall.Type == WallType.Main))
-            {
-                var mainWall = await _wallUsersDbSet
-                    .Include(wall => wall.Wall)
-                    .Where(wall => wall.Wall.Type == WallType.Main && wall.Wall.OrganizationId == userOrg.OrganizationId)
-                    .Select(x => new WallDto
-                    {
-                        Id = x.Wall.Id,
-                        Name = x.Wall.Name,
-                        Description = x.Wall.Description,
-                        Type = x.Wall.Type,
-                        IsFollowing = true,
-                        Logo = x.Wall.Logo
-                    })
-                    .FirstOrDefaultAsync();
-
-                walls.Add(mainWall);
-            };
-
-            return walls;
+            return followedWalls;
         }
     }
 }
