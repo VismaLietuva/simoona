@@ -475,20 +475,21 @@ namespace Shrooms.Domain.Services.Kudos
 
         private bool UserHasPermission(AddKudosLogDTO kudosDto)
         {
-            var authorizedRoles = new List<string>() { Constants.Authorization.Roles.Admin, Constants.Authorization.Roles.KudosAdmin };
-            if (!kudosDto.IsActive)
+            if (kudosDto.IsActive)
             {
-                if (authorizedRoles.Any(role => _roleService.HasRole(kudosDto.UserId, role)))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                return true;
             }
 
-            return true;
+            var authorizedRoles = new List<string>() { Constants.Authorization.Roles.Admin, Constants.Authorization.Roles.KudosAdmin };
+
+            if (authorizedRoles.Any(role => _roleService.HasRole(kudosDto.UserId, role)))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         private void AddKudosRequest(AddKudosLogDTO kudosLog, decimal? points = null)
