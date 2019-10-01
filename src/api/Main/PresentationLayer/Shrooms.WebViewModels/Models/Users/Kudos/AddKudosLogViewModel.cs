@@ -15,7 +15,7 @@ namespace Shrooms.WebViewModels.Models.Kudos
         [Required]
         [Range(ValidationConstants.KudosMultiplyByMinValue, ValidationConstants.KudosMultiplyByMaxValue)]
         public int MultiplyBy { get; set; }
-
+        
         /// <summary>
         /// Explicit number of points each receiver should get. If null, amount will be calculated.
         /// </summary>
@@ -26,7 +26,5 @@ namespace Shrooms.WebViewModels.Models.Kudos
         public string Comment { get; set; }
 
         public string PictureId { get; set; }
-        public bool IsActive { get; set; }
-
     }
 }

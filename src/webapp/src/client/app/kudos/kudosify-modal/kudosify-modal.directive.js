@@ -93,7 +93,6 @@
         vm.getUsers = getUsersForAutocomplete;
         vm.attachImage = attachImage;
         vm.onMultiplierValueChanged = onMultiplierValueChanged;
-        vm.isAdmin = authService.identity.roles.contains("Admin") || authService.identity.roles.contains("KudosAdmin");
 
         vm.userId = authService.identity.userId;
 

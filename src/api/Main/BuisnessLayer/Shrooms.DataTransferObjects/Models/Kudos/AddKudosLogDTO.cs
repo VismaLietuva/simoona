@@ -10,6 +10,5 @@ namespace Shrooms.DataTransferObjects.Models.Kudos
         public int MultiplyBy { get; set; }
         public string Comment { get; set; }
         public string PictureId { get; set; }
-        public bool IsActive { get; set; }
     }
 }
