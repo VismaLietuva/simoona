@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using AutoMapper;
 using Shrooms.API.Hubs;
 using Shrooms.DataTransferObjects.Models;
@@ -6,6 +7,7 @@ using Shrooms.DataTransferObjects.Models.Wall.Posts.Comments;
 using Shrooms.Domain.Services.Email.Posting;
 using Shrooms.Domain.Services.Notifications;
 using Shrooms.Domain.Services.Wall;
+using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.Domain.Services.Wall.Posts.Comments;
 using Shrooms.EntityModels.Models.Notifications;
 using Shrooms.Infrastructure.FireAndForget;
@@ -18,51 +20,60 @@ namespace Shrooms.API.BackgroundWorkers
         private readonly IMapper _mapper;
         private readonly IWallService _wallService;
         private readonly INotificationService _notificationService;
-        private readonly ICommentNotificationService _commentNotificationService;
+        private readonly ICommentEmailNotificationService _commentEmailNotificationService;
         private readonly ICommentService _commentService;
+        private readonly IPostService _postService;
+
         public NewCommentNotifier(IMapper mapper,
-            IWallService wallService,
-            INotificationService notificationService,
-            ICommentNotificationService commentNotificationService,
-            ICommentService commentService)
+                                  IWallService wallService,
+                                  INotificationService notificationService,
+                                  ICommentEmailNotificationService commentEmailNotificationService,
+                                  ICommentService commentService,
+                                  IPostService postService)
         {
             _mapper = mapper;
             _wallService = wallService;
             _notificationService = notificationService;
-            _commentNotificationService = commentNotificationService;
+            _commentEmailNotificationService = commentEmailNotificationService;
             _commentService = commentService;
+            _postService = postService;
         }
 
         public void Notify(CommentCreatedDTO commentDto, UserAndOrganizationHubDto userHubDto)
         {
-            _commentNotificationService.NotifyAboutNewComment(commentDto);
+            _commentEmailNotificationService.SendEmailNotification(commentDto);
 
             var membersToNotify = _wallService.GetWallMembersIds(commentDto.WallId, userHubDto);
             NotificationHub.SendWallNotification(commentDto.WallId, membersToNotify, commentDto.WallType, userHubDto);
 
-            var commentsAuthorsToNotify = _commentService.GetCommentsAuthorsToNotify(
-                                                commentDto.PostId,
-                                                new List<string>() { commentDto.CommentCreator });
+            var postWatchers = _postService.GetPostWatchersForAppNotifications(commentDto.PostId).ToList();
 
-            if (commentDto.PostCreator != commentDto.CommentCreator && _commentService.IsPostAuthorAppNotificationsEnabled(commentDto.PostCreator))
+            // Comment author doesn't need to receive notification about his own comment
+            postWatchers.Remove(commentDto.CommentCreator);
+
+            // Send notification to other users
+            if (postWatchers.Count > 0)
             {
-                var notificationAuthorDto = _notificationService.CreateForComment(userHubDto, commentDto, NotificationType.WallComment, new List<string> { commentDto.PostCreator }).GetAwaiter().GetResult();
-                if (notificationAuthorDto != null)
-                {
-                    NotificationHub.SendNotificationToParticularUsers(_mapper.Map<NotificationViewModel>(notificationAuthorDto), userHubDto, new List<string>() { commentDto.PostCreator });
-                }
+                SendNotification(commentDto, userHubDto, NotificationType.FollowingComment, postWatchers);
+            }
+        }
 
-                commentsAuthorsToNotify.Remove(commentDto.PostCreator);
+        private void SendNotification(CommentCreatedDTO commentDto, UserAndOrganizationHubDto userHubDto, NotificationType notificationType, string commentDtoPostCreator)
+        {
+            SendNotification(commentDto, userHubDto, notificationType, new List<string> { commentDtoPostCreator });
+        }
+
+        private void SendNotification(CommentCreatedDTO commentDto, UserAndOrganizationHubDto userHubDto, NotificationType notificationType, IList<string> watchers)
+        {
+            var notificationAuthorDto = _notificationService.CreateForComment(userHubDto, commentDto, notificationType, watchers).GetAwaiter().GetResult();
+
+            if (notificationAuthorDto == null)
+            {
+                return;
             }
 
-            if (commentsAuthorsToNotify.Count > 0)
-            {
-                var notificationDto = _notificationService.CreateForComment(userHubDto, commentDto, NotificationType.FollowingComment, commentsAuthorsToNotify).GetAwaiter().GetResult();
-                if (notificationDto != null)
-                {
-                    NotificationHub.SendNotificationToParticularUsers(_mapper.Map<NotificationViewModel>(notificationDto), userHubDto, commentsAuthorsToNotify);
-                }
-            }
+            var notification = _mapper.Map<NotificationViewModel>(notificationAuthorDto);
+            NotificationHub.SendNotificationToParticularUsers(notification, userHubDto, watchers);
         }
     }
 }

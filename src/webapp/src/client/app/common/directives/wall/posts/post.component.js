@@ -27,22 +27,28 @@
         'wallSettings',
         'errorHandler',
         'youtubeSettings',
+        'notificationFactory',
         'wallPostRepository',
         'wallService',
-        'notifySrv'
+        'notifySrv',
+        '$window'
     ];
 
     function wallPostController($scope, $state, $location, SmoothScroll, wallSettings,
-        errorHandler, youtubeSettings, wallPostRepository, wallService, notifySrv) {
+        errorHandler, youtubeSettings, notificationFactory, wallPostRepository, wallService, notifySrv, $window) {
         /*jshint validthis: true */
         var vm = this;
 
+        vm.isSeen = isSeen;
         vm.editPost = editPost;
         vm.deletePost = deletePost;
         vm.enableEditor = enableEditor;
-        vm.disableEditor = disableEditor;
+        vm.disableEditor = disableEditor;    
         vm.showCommentForm = showCommentForm;
         vm.handleErrorMessage = handleErrorMessage;
+
+        vm.notifications = notificationFactory.notification;
+        vm.markAsRead = notificationFactory.markAsRead;
 
         vm.isActionsEnabled = true;
         vm.editFieldEnabled = false;
@@ -52,12 +58,37 @@
         vm.youtubePreviewWidth = youtubeSettings.previewWidth;
         vm.youtubePreviewHeight = youtubeSettings.previewHeight;
         vm.stateParams = $state.params;
+        vm.usePostWatching = $window.usePostWatching;
 
         vm.getPostUrl = getPostUrl;
         vm.notifyCopied = notifyCopied;
+        vm.watchPost = watchPost;
+        vm.unwatchPost = unwatchPost;
 
+        init();
+        
         /////////
 
+        function init()
+        {
+            isSeen(vm.post.id);
+        }
+
+        function isSeen(postId) {
+            if (!!vm.stateParams.post) {
+                var notificationIds = [];
+                angular.forEach(vm.notifications.data, (notification) => {
+                    if (postId === notification.sourceIds.postId) {
+                        notificationIds.push(notification.id);
+                    }
+                });
+                if(!!notificationIds)
+                {
+                    vm.markAsRead(notificationIds);
+                    notificationIds = [];
+                }
+            }
+        }
         function editPost(messageBody) {
             if (vm.isActionsEnabled) {
                 vm.disableEditor();
@@ -135,6 +166,30 @@
             }
 
             e && e.preventDefault();
+        }
+
+        function unwatchPost() {
+            if (vm.isActionsEnabled && vm.post.isWatched) {
+
+                vm.isActionsEnabled = false;
+
+                wallPostRepository.unwatchPost(vm.post).then(function() {
+                    vm.isActionsEnabled = true;
+                    vm.post.isWatched = false;
+                }, vm.handleErrorMessage);
+            }
+        }
+
+        function watchPost() {
+            if (vm.isActionsEnabled && !vm.post.isWatched) {
+
+                vm.isActionsEnabled = false;
+
+                wallPostRepository.watchPost(vm.post).then(function() {
+                    vm.isActionsEnabled = true;
+                    vm.post.isWatched = true;
+                }, vm.handleErrorMessage);
+            }
         }
     }
 }());

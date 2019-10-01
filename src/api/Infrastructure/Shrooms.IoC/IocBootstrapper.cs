@@ -62,9 +62,9 @@ namespace Shrooms.IoC
             // Authorization types
             builder.RegisterType<MailingService>().As<IMailingService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<PostNotificationService>().As<IPostNotificationService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<CommentNotificationService>().As<ICommentNotificationService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            builder.RegisterType<CommentEmailNotificationService>().As<ICommentEmailNotificationService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.Register(c => app.GetDataProtectionProvider()).InstancePerRequest();
-            builder.RegisterType<PermissionService>().As<IPermissionService>().PropertiesAutowired().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            builder.RegisterType<PermissionService>().As<IPermissionService>().PropertiesAutowired().InstancePerRequest(); //.EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<SyncTokenService>().As<ISyncTokenService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<ImpersonateService>().As<IImpersonateService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<UserAdministrationValidator>().As<IUserAdministrationValidator>().InstancePerRequest();

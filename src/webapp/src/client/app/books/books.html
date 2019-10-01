@@ -18,9 +18,12 @@
                             <ace-list-filter on-filtering="vm.searchFilter(search)" min-characters="2">
                             </ace-list-filter>
                         </div>
-                        <div class="btn-group pull-right ng-isolate-scope" ng-if="!vm.offices.length" has-permissions="['OFFICE_ADMINISTRATION']">
-                                <a ui-sref="Root.WithOrg.Admin.Offices.Create" class="btn btn-primary" title="Create new" href="/testorg/Admin/Offices/Create"><span class="glyphicon glyphicon-plus"></span> <span class="ng-binding">Create new</span></a>
-                            </div>
+                        <div class="btn-group pull-right ng-isolate-scope" ng-if="!vm.offices.length"
+                            has-permissions="['OFFICE_ADMINISTRATION']">
+                            <a ui-sref="Root.WithOrg.Admin.Offices.Create" class="btn btn-primary" title="{{'common.createNew' | translate}}"
+                                href="/testorg/Admin/Offices/Create"><span class="glyphicon glyphicon-plus"></span> <span
+                                    class="ng-binding">{{"common.createNew" | translate}}</span></a>
+                        </div>
                         <div>
                                 <h3 data-test-id="no-entries-found" ng-if="!vm.offices.length" translate="common.noOffices"
                                 class="ng-scope"></h3>
