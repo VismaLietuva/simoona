@@ -8,7 +8,7 @@
                     {{::vm.post.wallName}}
                 </a>
             </div>
-
+           
         <div class="clearfix">
             <ace-message-user-profile user="vm.post.author"
                                       date="vm.post.created"
@@ -17,7 +17,6 @@
                                       is-hidden="vm.post.isHidden">
             </ace-message-user-profile>
         </div>
-
         <div class="post-content-margin">
             <form name="editPostForm" class="edit-text-area" ng-if="vm.editFieldEnabled">
                 <textarea name="messageBody"
@@ -105,7 +104,6 @@
                              is-wall-module="vm.isWallModule"
                              ng-show="!vm.editFieldEnabled">
     </ace-message-actions>
-
     <div feature-flag="usePostWatching">
         <a ng-if="vm.post.isWatched" ng-click="vm.unwatchPost()" class="post-buttons glyphicon glyphicon-star" title="{{ 'wall.unwatch' | translate }}">
         </a>
