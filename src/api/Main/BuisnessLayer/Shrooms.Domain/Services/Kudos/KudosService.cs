@@ -198,29 +198,29 @@ namespace Shrooms.Domain.Services.Kudos
             ValidateUser(organizationId, userId);
 
             var userLogsQuery = (from kudLog in _kudosLogsDbSet
-                           where kudLog.EmployeeId == userId && kudLog.OrganizationId == organizationId
-                           from usr in _usersDbSet.Where(u => u.Id == kudLog.CreatedBy).DefaultIfEmpty()
-                           select new KudosUserLogDTO
-                           {
-                               Comment = kudLog.Comments,
-                               Created = kudLog.Created,
-                               Id = kudLog.Id,
-                               Multiplier = kudLog.MultiplyBy,
-                               Points = kudLog.Points,
-                               Type = new KudosLogTypeDTO
-                               {
-                                   Name = kudLog.KudosTypeName,
-                                   Value = kudLog.KudosTypeValue,
-                                   Type = kudLog.KudosSystemType
-                               },
-                               Status = kudLog.Status.ToString(),
-                               Sender = new KudosLogUserDTO
-                               {
-                                   FullName = usr == null ? string.Empty : usr.FirstName + " " + usr.LastName,
-                                   Id = usr == null ? string.Empty : kudLog.CreatedBy
-                               },
-                               PictureId = kudLog.PictureId
-                           }).OrderByDescending(o => o.Created);
+                                 where kudLog.EmployeeId == userId && kudLog.OrganizationId == organizationId
+                                 from usr in _usersDbSet.Where(u => u.Id == kudLog.CreatedBy).DefaultIfEmpty()
+                                 select new KudosUserLogDTO
+                                 {
+                                     Comment = kudLog.Comments,
+                                     Created = kudLog.Created,
+                                     Id = kudLog.Id,
+                                     Multiplier = kudLog.MultiplyBy,
+                                     Points = kudLog.Points,
+                                     Type = new KudosLogTypeDTO
+                                     {
+                                         Name = kudLog.KudosTypeName,
+                                         Value = kudLog.KudosTypeValue,
+                                         Type = kudLog.KudosSystemType
+                                     },
+                                     Status = kudLog.Status.ToString(),
+                                     Sender = new KudosLogUserDTO
+                                     {
+                                         FullName = usr == null ? string.Empty : usr.FirstName + " " + usr.LastName,
+                                         Id = usr == null ? string.Empty : kudLog.CreatedBy
+                                     },
+                                     PictureId = kudLog.PictureId
+                                 }).OrderByDescending(o => o.Created);
 
             var logCount = userLogsQuery.Count();
 
@@ -459,12 +459,36 @@ namespace Shrooms.Domain.Services.Kudos
 
         public void AddKudosLog(AddKudosLogDTO kudosLog)
         {
-            AddKudosRequest(kudosLog);
+            if (UserHasPermission(kudosLog))
+            {
+                AddKudosRequest(kudosLog);
+            }
         }
 
         public void AddKudosLog(AddKudosLogDTO kudosDto, decimal points)
         {
-            AddKudosRequest(kudosDto, points);
+            if (UserHasPermission(kudosDto))
+            {
+                AddKudosRequest(kudosDto, points);
+            }
+        }
+
+        private bool UserHasPermission(AddKudosLogDTO kudosDto)
+        {
+            var authorizedRoles = new List<string>() { Constants.Authorization.Roles.Admin, Constants.Authorization.Roles.KudosAdmin };
+            if (!kudosDto.IsActive)
+            {
+                if (authorizedRoles.Any(role => _roleService.HasRole(kudosDto.UserId, role)))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private void AddKudosRequest(AddKudosLogDTO kudosLog, decimal? points = null)

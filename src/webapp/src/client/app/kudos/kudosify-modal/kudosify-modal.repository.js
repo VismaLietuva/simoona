@@ -25,7 +25,8 @@
                 Comment: kudosifyInfo.comment,
                 TotalPointsPerReceiver: kudosifyInfo.totalPoints,
                 PointsTypeId: pointsType.id,
-                PictureId: kudosifyInfo.imageName
+                PictureId: kudosifyInfo.imageName,
+                IsActive: pointsType.isActive
             }).$promise;
         }
 
