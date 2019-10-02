@@ -754,6 +754,7 @@ namespace Shrooms.Domain.Services.Wall
         {
             var followedWalls = await _wallsDbSet
                .Include(w => w.Members)
+               .Where(w => w.Type == WallType.Main || w.Type == WallType.UserCreated)
                .Join(_wallUsersDbSet, wall => wall.Id, walluser => walluser.WallId, (wall, wallUser) => new
                {
                    Id = wall.Id,
