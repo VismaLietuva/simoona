@@ -42,8 +42,11 @@ namespace Shrooms.Domain.Services.Kudos
         private readonly IRepository<KudosLog> _kudosLogRepository;
         private readonly IRepository<ApplicationUser> _applicationUserRepository;
         private Expression<Func<KudosType, bool>> _excludeNecessaryKudosTypes = x => x.Type != ConstBusinessLayer.KudosTypeEnum.Send &&
-                              x.Type != ConstBusinessLayer.KudosTypeEnum.Minus &&
-                              x.Type != ConstBusinessLayer.KudosTypeEnum.Other;
+                                x.Type != ConstBusinessLayer.KudosTypeEnum.Minus &&
+                                x.Type != ConstBusinessLayer.KudosTypeEnum.Other;
+        private Expression<Func<KudosType, bool>> _includeNecessaryKudosTypes = x => x.Type == ConstBusinessLayer.KudosTypeEnum.Send && 
+                                x.Type == ConstBusinessLayer.KudosTypeEnum.Minus &&
+                                x.Type == ConstBusinessLayer.KudosTypeEnum.Other;
 
         private readonly ResourceManager _resourceManager;
 
@@ -132,9 +135,7 @@ namespace Shrooms.Domain.Services.Kudos
 
             var type = _kudosTypesDbSet
                 .Where(GetKudosTypeQuery(hasKudosAdminPermission))
-                .Where(x => x.Type == ConstBusinessLayer.KudosTypeEnum.Send ||
-                              x.Type == ConstBusinessLayer.KudosTypeEnum.Minus ||
-                              x.Type == ConstBusinessLayer.KudosTypeEnum.Other)
+                .Where(_includeNecessaryKudosTypes)
                 .Select(MapKudosTypesToDTO)
                 .AsEnumerable();
 
