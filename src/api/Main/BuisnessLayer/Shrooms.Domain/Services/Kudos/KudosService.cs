@@ -41,7 +41,6 @@ namespace Shrooms.Domain.Services.Kudos
         private readonly IDbSet<ApplicationUser> _usersDbSet;
         private readonly IRepository<KudosLog> _kudosLogRepository;
         private readonly IRepository<ApplicationUser> _applicationUserRepository;
-        private readonly IDbSet<Organization> _organizationsDbSet;
         private Expression<Func<KudosType, bool>> _excludeNecessaryKudosTypes = x => x.Type != ConstBusinessLayer.KudosTypeEnum.Send &&
                               x.Type != ConstBusinessLayer.KudosTypeEnum.Minus &&
                               x.Type != ConstBusinessLayer.KudosTypeEnum.Other;
@@ -66,7 +65,6 @@ namespace Shrooms.Domain.Services.Kudos
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
             _kudosLogRepository = unitOfWork.GetRepository<KudosLog>();
             _applicationUserRepository = unitOfWork.GetRepository<ApplicationUser>();
-            _organizationsDbSet = uow.GetDbSet<Organization>();
 
             _resourceManager = new ResourceManager("Shrooms.Resources.Models.Kudos.Kudos", typeof(ResourceUtilities).Assembly);
         }
