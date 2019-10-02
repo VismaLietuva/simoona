@@ -82,7 +82,7 @@
                         notificationIds.push(notification.id);
                     }
                 });
-                if(!!notificationIds)
+                if(!!notificationIds.length)
                 {
                     vm.markAsRead(notificationIds);
                     notificationIds = [];

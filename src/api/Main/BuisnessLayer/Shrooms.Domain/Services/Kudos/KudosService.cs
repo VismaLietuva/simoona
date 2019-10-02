@@ -106,6 +106,7 @@ namespace Shrooms.Domain.Services.Kudos
             type.Name = dto.Name;
             type.Value = dto.Value;
             type.Description = dto.Description;
+            type.IsActive = dto.IsActive;
 
             await _uow.SaveChangesAsync(dto.UserId);
         }
@@ -136,7 +137,8 @@ namespace Shrooms.Domain.Services.Kudos
                     Id = t.Id,
                     Name = t.Name,
                     Value = t.Value,
-                    Description = t.Description
+                    Description = t.Description,
+                    IsActive = t.IsActive
                 })
                 .FirstOrDefaultAsync();
 
@@ -196,29 +198,29 @@ namespace Shrooms.Domain.Services.Kudos
             ValidateUser(organizationId, userId);
 
             var userLogsQuery = (from kudLog in _kudosLogsDbSet
-                           where kudLog.EmployeeId == userId && kudLog.OrganizationId == organizationId
-                           from usr in _usersDbSet.Where(u => u.Id == kudLog.CreatedBy).DefaultIfEmpty()
-                           select new KudosUserLogDTO
-                           {
-                               Comment = kudLog.Comments,
-                               Created = kudLog.Created,
-                               Id = kudLog.Id,
-                               Multiplier = kudLog.MultiplyBy,
-                               Points = kudLog.Points,
-                               Type = new KudosLogTypeDTO
-                               {
-                                   Name = kudLog.KudosTypeName,
-                                   Value = kudLog.KudosTypeValue,
-                                   Type = kudLog.KudosSystemType
-                               },
-                               Status = kudLog.Status.ToString(),
-                               Sender = new KudosLogUserDTO
-                               {
-                                   FullName = usr == null ? string.Empty : usr.FirstName + " " + usr.LastName,
-                                   Id = usr == null ? string.Empty : kudLog.CreatedBy
-                               },
-                               PictureId = kudLog.PictureId
-                           }).OrderByDescending(o => o.Created);
+                                 where kudLog.EmployeeId == userId && kudLog.OrganizationId == organizationId
+                                 from usr in _usersDbSet.Where(u => u.Id == kudLog.CreatedBy).DefaultIfEmpty()
+                                 select new KudosUserLogDTO
+                                 {
+                                     Comment = kudLog.Comments,
+                                     Created = kudLog.Created,
+                                     Id = kudLog.Id,
+                                     Multiplier = kudLog.MultiplyBy,
+                                     Points = kudLog.Points,
+                                     Type = new KudosLogTypeDTO
+                                     {
+                                         Name = kudLog.KudosTypeName,
+                                         Value = kudLog.KudosTypeValue,
+                                         Type = kudLog.KudosSystemType
+                                     },
+                                     Status = kudLog.Status.ToString(),
+                                     Sender = new KudosLogUserDTO
+                                     {
+                                         FullName = usr == null ? string.Empty : usr.FirstName + " " + usr.LastName,
+                                         Id = usr == null ? string.Empty : kudLog.CreatedBy
+                                     },
+                                     PictureId = kudLog.PictureId
+                                 }).OrderByDescending(o => o.Created);
 
             var logCount = userLogsQuery.Count();
 
@@ -457,12 +459,37 @@ namespace Shrooms.Domain.Services.Kudos
 
         public void AddKudosLog(AddKudosLogDTO kudosLog)
         {
-            AddKudosRequest(kudosLog);
+            if (UserHasPermission(kudosLog))
+            {
+                AddKudosRequest(kudosLog);
+            }
         }
 
         public void AddKudosLog(AddKudosLogDTO kudosDto, decimal points)
         {
-            AddKudosRequest(kudosDto, points);
+            if (UserHasPermission(kudosDto))
+            {
+                AddKudosRequest(kudosDto, points);
+            }
+        }
+
+        private bool UserHasPermission(AddKudosLogDTO kudosDto)
+        {
+            if (kudosDto.IsActive)
+            {
+                return true;
+            }
+
+            var authorizedRoles = new List<string>() { Constants.Authorization.Roles.Admin, Constants.Authorization.Roles.KudosAdmin };
+
+            if (authorizedRoles.Any(role => _roleService.HasRole(kudosDto.UserId, role)))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         private void AddKudosRequest(AddKudosLogDTO kudosLog, decimal? points = null)
@@ -632,7 +659,8 @@ namespace Shrooms.Domain.Services.Kudos
                 Description = kudosType.Description,
                 IsNecessary = kudosType.Type == ConstBusinessLayer.KudosTypeEnum.Send ||
                               kudosType.Type == ConstBusinessLayer.KudosTypeEnum.Minus ||
-                              kudosType.Type == ConstBusinessLayer.KudosTypeEnum.Other
+                              kudosType.Type == ConstBusinessLayer.KudosTypeEnum.Other,
+                IsActive = kudosType.IsActive
             };
         }
 

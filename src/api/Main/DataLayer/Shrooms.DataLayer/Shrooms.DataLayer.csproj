@@ -777,6 +777,14 @@
     <Compile Include="Migrations\201909072124268_PostWatchers.Designer.cs">
       <DependentUpon>201909072124268_PostWatchers.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201909201038299_AddIsActiveColumnToKudoType.cs" />
+    <Compile Include="Migrations\201909201038299_AddIsActiveColumnToKudoType.Designer.cs">
+      <DependentUpon>201909201038299_AddIsActiveColumnToKudoType.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201910011943144_DummyMigration.cs" />
+    <Compile Include="Migrations\201910011943144_DummyMigration.Designer.cs">
+      <DependentUpon>201910011943144_DummyMigration.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
@@ -1274,6 +1282,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201909072124268_PostWatchers.resx">
       <DependentUpon>201909072124268_PostWatchers.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201909201038299_AddIsActiveColumnToKudoType.resx">
+      <DependentUpon>201909201038299_AddIsActiveColumnToKudoType.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201910011943144_DummyMigration.resx">
+      <DependentUpon>201910011943144_DummyMigration.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
