@@ -29,7 +29,7 @@
 
         vm.createKudosType = createKudosType;
         vm.updateKudosType = updateKudosType;
-        vm.disableKudosType = disableKudosType;
+        vm.removeKudosType = removeKudosType;
 
         init();
         //////////
@@ -72,8 +72,8 @@
                 }, errorHandler.handleErrorMessage);
         }
 
-        function disableKudosType() {
-            kudosTypesRepository.disableType(vm.kudosType.id)
+        function removeKudosType() {
+            kudosTypesRepository.removeType(vm.kudosType.id)
                 .then(function() {
                     $state.go(listState);
                 }, errorHandler.handleErrorMessage);
