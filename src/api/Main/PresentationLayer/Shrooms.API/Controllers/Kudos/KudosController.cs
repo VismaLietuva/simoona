@@ -426,7 +426,7 @@ namespace Shrooms.API.Controllers.Kudos
         {
             var welcomeKudosDTO = _kudosService.GetWelcomeKudos();
 
-            var result = _mapper.Map<KudosWelcomeDTO, WelcomeKudosViewModel>(welcomeKudosDTO);
+            var result = _mapper.Map<WelcomeKudosDTO, WelcomeKudosViewModel>(welcomeKudosDTO);
 
             return Ok(result);
         }

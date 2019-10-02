@@ -16,7 +16,7 @@ namespace Shrooms.Domain.Services.Kudos
 
         Task<KudosTypeDTO> GetKudosType(int id, UserAndOrganizationDTO userOrg);
 
-        KudosWelcomeDTO GetWelcomeKudos();
+        WelcomeKudosDTO GetWelcomeKudos();
 
         IEnumerable<KudosPieChartSliceDto> GetKudosPieChartData(int organizationId, string userId);
 

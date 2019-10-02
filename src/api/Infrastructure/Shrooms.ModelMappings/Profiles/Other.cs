@@ -50,8 +50,8 @@ namespace Shrooms.ModelMappings.Profiles
 
         private void CreateKudosWelcomeMappings()
         {
-            CreateMap<KudosWelcomeDTO, WelcomeKudosViewModel>();
-            CreateMap<WelcomeKudosViewModel, KudosWelcomeDTO>();
+            CreateMap<WelcomeKudosDTO, WelcomeKudosViewModel>();
+            CreateMap<WelcomeKudosViewModel, WelcomeKudosDTO>();
 
         }
 
@@ -193,7 +193,7 @@ namespace Shrooms.ModelMappings.Profiles
                 .ForMember(dest => dest.ApplicationUserFirstName, opt => opt.MapFrom(src => src.ApplicationUser != null ? src.ApplicationUser.FirstName : null))
                 .ForMember(dest => dest.ApplicationUserLastName, opt => opt.MapFrom(src => src.ApplicationUser != null ? src.ApplicationUser.LastName : null));
             CreateMap<BookLogDTO, BookLog>();
-          
+
             CreateMap<OfficePostViewModel, Office>()
                 .ForMember(dest => dest.Floors, src => src.Ignore());
             CreateMap<Office, OfficeViewModel>();

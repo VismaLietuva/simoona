@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Shrooms.DataTransferObjects.Models.Kudos
 {
-    public class KudosWelcomeDTO
+    public class WelcomeKudosDTO
     {
         public decimal KudosWelcomeAmount { get; set; }
 

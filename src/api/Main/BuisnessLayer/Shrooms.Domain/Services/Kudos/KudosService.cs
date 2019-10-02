@@ -872,11 +872,11 @@ namespace Shrooms.Domain.Services.Kudos
             return true;
         }
 
-        public KudosWelcomeDTO GetWelcomeKudos()
+        public WelcomeKudosDTO GetWelcomeKudos()
         {
             var welcomeKudos = _kudosTypesDbSet
                 .Where(kudosType => kudosType.Type == ConstBusinessLayer.KudosTypeEnum.Welcome)
-                .Select(kudosType => new KudosWelcomeDTO()
+                .Select(kudosType => new WelcomeKudosDTO()
                 {
                     KudosWelcomeAmount = kudosType.Value,
                     KudosWelcomeComment = kudosType.Description,
