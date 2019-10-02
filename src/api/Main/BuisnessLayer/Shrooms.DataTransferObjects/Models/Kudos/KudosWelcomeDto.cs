@@ -10,7 +10,7 @@ namespace Shrooms.DataTransferObjects.Models.Kudos
     {
         public decimal KudosWelcomeAmount { get; set; }
 
-        public bool KudosWelcomeEnabled { get; set; }
+        public bool KudosWelcomeIsActive { get; set; }
 
         public string KudosWelcomeComment { get; set; }
     }

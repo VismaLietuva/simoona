@@ -335,7 +335,7 @@ namespace Shrooms.Domain.Services.Administration
 
             var welcomeKudosDTO = _kudosService.GetWelcomeKudos();
 
-            if (welcomeKudosDTO.KudosWelcomeEnabled)
+            if (welcomeKudosDTO.KudosWelcomeIsActive)
             {
                 KudosLog welcomeKudos = new KudosLog
                 {

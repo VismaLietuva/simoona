@@ -880,7 +880,7 @@ namespace Shrooms.Domain.Services.Kudos
                 {
                     KudosWelcomeAmount = kudosType.Value,
                     KudosWelcomeComment = kudosType.Description,
-                    KudosWelcomeEnabled = kudosType.IsActive
+                    KudosWelcomeIsActive = kudosType.IsActive
                 })
                 .FirstOrDefault();
 
