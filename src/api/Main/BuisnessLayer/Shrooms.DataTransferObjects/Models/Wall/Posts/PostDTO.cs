@@ -24,5 +24,6 @@ namespace Shrooms.DataTransferObjects.Models.Wall.Posts
         public bool IsHidden { get; set; }
         public DateTime Modified { get; set; }
         public DateTime LastEdit { get; set; }
+        public bool IsWatched { get; set; }
     }
 }

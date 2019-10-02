@@ -19,6 +19,8 @@ namespace Shrooms.Domain.Services.Notifications
 
         Task<NotificationDto> CreateForPost(UserAndOrganizationDTO userOrg, NewlyCreatedPostDTO post, int wallId, IEnumerable<string> membersToNotify);
 
+        Task<NotificationDto> CreateForComment(UserAndOrganizationDTO userOrg, CommentCreatedDTO comment, NotificationType type, string memberToNotify);
+
         Task<NotificationDto> CreateForComment(UserAndOrganizationDTO userOrg, CommentCreatedDTO comment, NotificationType type, IEnumerable<string> membersToNotify);
 
         Task<NotificationDto> CreateForWall(UserAndOrganizationDTO userOrg, CreateWallDto wallDto, int wallId);
