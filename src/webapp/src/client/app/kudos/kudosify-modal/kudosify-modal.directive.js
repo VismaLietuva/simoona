@@ -5,7 +5,7 @@
         .module('simoonaApp.Kudos')
         .constant('kudosifySettings', {
             maxMinus: 99999,
-            hiddeKudosTypes: [5]
+            hiddeKudosTypes: [3, 5]
         })
         .directive('aceKudosifyModal', kudosifyModal)
         .directive('aceSendKudosModal', sendKudosModal);
