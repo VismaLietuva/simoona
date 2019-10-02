@@ -4,7 +4,8 @@
     angular
         .module('simoonaApp.Kudos')
         .constant('kudosifySettings', {
-            maxMinus: 99999
+            maxMinus: 99999,
+            hiddeKudosTypes: [5]
         })
         .directive('aceKudosifyModal', kudosifyModal)
         .directive('aceSendKudosModal', sendKudosModal);
@@ -108,6 +109,7 @@
         vm.thumbHeight = 300;
 
         vm.maxMinus = kudosifySettings.maxMinus;
+        vm.hiddenKudosTypes = kudosifySettings.hiddeKudosTypes;
 
 		var KudosTypesEnum = {
 			ORDINARY: 1,

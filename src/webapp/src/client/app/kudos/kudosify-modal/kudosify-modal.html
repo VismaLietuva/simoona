@@ -29,7 +29,7 @@
             <label for="choose-type" translate="kudos.chooseType"></label>
             <div class="kudos-modal-buttons-group kudos-points-type">
                 <button class="btn btn-sm btn-info kudos-type-button kudos-points-type kudosify-modal-buttons-inactive"
-                        ng-if="(!kudosType.isActive && vm.isAdmin"
+                        ng-if="(!kudosType.isActive && vm.isAdmin)"
                         type="button"
                         uib-tooltip="{{kudosType.description}}"
                         tooltip-placement="bottom"
@@ -41,7 +41,7 @@
                     {{:: kudosType.name}} ({{:: kudosType.value}})
                 </button>
                 <button class="btn btn-sm btn-info kudos-type-button kudos-points-type kudosify-modal-buttons-inactive"
-                        ng-if="kudosType.isActive && kudosType.type !== 5"
+                        ng-if="kudosType.isActive && !vm.hiddenKudosTypes.includes(kudosType.type)"
                         type="button"
                         uib-tooltip="{{kudosType.description}}"
                         tooltip-placement="bottom"
