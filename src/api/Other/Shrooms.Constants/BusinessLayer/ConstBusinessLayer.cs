@@ -39,7 +39,8 @@ namespace Shrooms.Constants.BusinessLayer
             Ordinary = 1,
             Send,
             Minus,
-            Other
+            Other,
+            Welcome
         }
         #endregion
 

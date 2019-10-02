@@ -15,7 +15,7 @@
             createKudosType: create,
             updateKudosType: update,
             getKudosType: get,
-            disableType: disableType
+            removeType: removeType
         }
 
         return service;
@@ -42,7 +42,7 @@
             return $resource(kudosUrl + 'EditType').get({ id: id }).$promise;
         }
 
-        function disableType(id) {
+        function removeType(id) {
             return $resource(kudosUrl + 'RemoveType/:id', { id: id }, {
                 put: {
                     method: 'PUT'

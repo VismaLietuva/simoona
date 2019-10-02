@@ -41,7 +41,20 @@
                     {{:: kudosType.name}} ({{:: kudosType.value}})
                 </button>
                 <button class="btn btn-sm btn-info kudos-type-button kudos-points-type kudosify-modal-buttons-inactive"
-                        ng-if="kudosType.isActive"
+                        ng-if="kudosType.isActive && !vm.hiddenKudosTypes.includes(kudosType.type)"
+                        type="button"
+                        uib-tooltip="{{kudosType.description}}"
+                        tooltip-placement="bottom"
+                        tooltip-class="word-break"
+                        tooltip-append-to-body="true"
+                        ng-model="vm.pointsType"
+                        ng-click="vm.setModalType(kudosType, $event)"
+                        ng-repeat="kudosType in vm.kudosTypes"
+                        data-test-id="{{kudosType.name}}" ng-cloak>
+                    {{:: kudosType.name}} ({{:: kudosType.value}})
+                </button>
+                <button class="btn btn-sm btn-info kudos-type-button kudos-points-type kudosify-modal-buttons-inactive"
+                        ng-if="kudosType.isActive && vm.hiddenKudosTypes.includes(kudosType.type) && vm.isAdmin"
                         type="button"
                         uib-tooltip="{{kudosType.description}}"
                         tooltip-placement="bottom"

@@ -104,6 +104,7 @@
     <Compile Include="Models\Roles\RoleUserViewModel.cs" />
     <Compile Include="Models\Users\Kudos\KudosBasicDataViewModel.cs" />
     <Compile Include="Models\Users\Kudos\KudosListBasicDataViewModel.cs" />
+    <Compile Include="Models\Users\Kudos\WelcomeKudosViewModel.cs" />
     <Compile Include="Models\User\ChangeUserLocalizationSettingsViewModel.cs" />
     <Compile Include="Models\Book\BookDetails\RetrievedBookInfoViewModel.cs" />
     <Compile Include="Models\User\LanguageViewModel.cs" />

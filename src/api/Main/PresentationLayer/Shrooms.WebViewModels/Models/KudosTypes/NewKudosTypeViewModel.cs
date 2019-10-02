@@ -15,5 +15,8 @@ namespace Shrooms.WebViewModels.Models.KudosTypes
 
         [MaxLength(ConstBusinessLayer.MaxKudosDescriptionLength)]
         public string Description { get; set; }
+
+        [Required]
+        public bool IsActive { get; set; }
     }
 }
