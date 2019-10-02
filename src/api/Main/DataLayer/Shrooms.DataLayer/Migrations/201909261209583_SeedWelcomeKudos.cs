@@ -10,7 +10,7 @@ namespace Shrooms.DataLayer.Migrations
             Sql(
                 "INSERT INTO KudosTypes" +
                 "(Name, Value, Created, Modified, Description, Type, IsActive)" +
-                "VALUES ('Welcome', 1, GETDATE(), GETDATE(), 'kudos.typeWelcome', 5, 0)"
+                "VALUES ('Welcome', 3, GETDATE(), GETDATE(), 'Welcome Kudos for you. Be active and earn more!', 5, 0)"
                 );
         }
 
