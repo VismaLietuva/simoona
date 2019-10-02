@@ -789,6 +789,10 @@
     <Compile Include="Migrations\201910011943144_DummyMigration.Designer.cs">
       <DependentUpon>201910011943144_DummyMigration.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201910021146410_RemoveWelcomeKudosFromOrganizationEntity.cs" />
+    <Compile Include="Migrations\201910021146410_RemoveWelcomeKudosFromOrganizationEntity.Designer.cs">
+      <DependentUpon>201910021146410_RemoveWelcomeKudosFromOrganizationEntity.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
@@ -1295,6 +1299,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201910011943144_DummyMigration.resx">
       <DependentUpon>201910011943144_DummyMigration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201910021146410_RemoveWelcomeKudosFromOrganizationEntity.resx">
+      <DependentUpon>201910021146410_RemoveWelcomeKudosFromOrganizationEntity.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
