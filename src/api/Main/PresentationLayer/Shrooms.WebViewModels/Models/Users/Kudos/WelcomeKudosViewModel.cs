@@ -10,11 +10,11 @@ namespace Shrooms.WebViewModels.Models.Users.Kudos
     public class WelcomeKudosViewModel
     {
         [Required]
-        public int KudosWelcomeAmount { get; set; }
+        public int WelcomeKudosAmount { get; set; }
         [Required]
-        public bool KudosWelcomeIsActive { get; set; }
+        public bool WelcomeKudosIsActive { get; set; }
 
-        public string KudosWelcomeComment { get; set; }
+        public string WelcomeKudosComment { get; set; }
 
     }
 }

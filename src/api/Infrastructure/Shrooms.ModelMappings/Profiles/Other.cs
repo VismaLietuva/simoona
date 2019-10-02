@@ -29,7 +29,7 @@ namespace Shrooms.ModelMappings.Profiles
             CreateKudosViewModel();
             CreateAdministrationMappings();
             CreateKudosLogDtoMappings();
-            CreateKudosWelcomeMappings();
+            CreateWelcomeKudosMappings();
             CreateMiscDtoMappings();
         }
 
@@ -48,7 +48,7 @@ namespace Shrooms.ModelMappings.Profiles
             CreateMap<KudosLog, UserKudosInformationDTO>();
         }
 
-        private void CreateKudosWelcomeMappings()
+        private void CreateWelcomeKudosMappings()
         {
             CreateMap<WelcomeKudosDTO, WelcomeKudosViewModel>();
             CreateMap<WelcomeKudosViewModel, WelcomeKudosDTO>();

@@ -335,14 +335,14 @@ namespace Shrooms.Domain.Services.Administration
 
             var welcomeKudosDTO = _kudosService.GetWelcomeKudos();
 
-            if (welcomeKudosDTO.KudosWelcomeIsActive)
+            if (welcomeKudosDTO.WelcomeKudosIsActive)
             {
                 KudosLog welcomeKudos = new KudosLog
                 {
                     EmployeeId = applicationUser.Id,
                     OrganizationId = applicationUser.OrganizationId,
-                    Comments = welcomeKudosDTO.KudosWelcomeComment,
-                    Points = welcomeKudosDTO.KudosWelcomeAmount,
+                    Comments = welcomeKudosDTO.WelcomeKudosComment,
+                    Points = welcomeKudosDTO.WelcomeKudosAmount,
                     Created = DateTime.UtcNow,
                     Modified = DateTime.UtcNow,
                     Status = KudosStatus.Pending,

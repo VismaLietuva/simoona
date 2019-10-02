@@ -878,9 +878,9 @@ namespace Shrooms.Domain.Services.Kudos
                 .Where(kudosType => kudosType.Type == ConstBusinessLayer.KudosTypeEnum.Welcome)
                 .Select(kudosType => new WelcomeKudosDTO()
                 {
-                    KudosWelcomeAmount = kudosType.Value,
-                    KudosWelcomeComment = kudosType.Description,
-                    KudosWelcomeIsActive = kudosType.IsActive
+                    WelcomeKudosAmount = kudosType.Value,
+                    WelcomeKudosComment = kudosType.Description,
+                    WelcomeKudosIsActive = kudosType.IsActive
                 })
                 .FirstOrDefault();
 
