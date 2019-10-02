@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Configuration;
-using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Cors;
@@ -21,12 +19,9 @@ using Shrooms.API.App_Start;
 using Shrooms.API.Filters;
 using Shrooms.API.GeneralCode;
 using Shrooms.API.GeneralCode.SerializationIgnorer;
-using Shrooms.API.ImageResizerPlugins;
 using Shrooms.API.Middlewares;
 using Shrooms.Constants.DataLayer;
 using Shrooms.Constants.WebApi;
-using Shrooms.Infrastructure.CloudScheduler;
-using Shrooms.Infrastructure.CloudScheduler.Jobs;
 using Shrooms.Infrastructure.Configuration;
 using Shrooms.Infrastructure.Email.Templating;
 using Shrooms.IoC;
@@ -69,8 +64,6 @@ namespace Shrooms.API
             SetupGlobalization(app);
             ConfigureSignalr(app);
             app.UseWebApi(config);
-
-            // InitiateScheduledJobs();
         }
 
         private void ConfigureSignalr(IAppBuilder app)
@@ -142,24 +135,6 @@ namespace Shrooms.API
             }
 
             app.UseGlobalization(globalizationOptions);
-        }
-
-        private static void InitiateScheduledJobs()
-        {
-            var isProductionEnvironment = bool.Parse(ConfigurationManager.AppSettings["IsProductionBuild"]);
-            if (!isProductionEnvironment)
-            {
-                return;
-            }
-
-            var appSettings = new ApplicationSettings();
-            var tenants = OrganizationUtils.AvailableOrganizations.Values.ToArray();
-
-            foreach (var tenant in tenants)
-            {
-                BackgroundJob.Enqueue(() => AzureJobScheduler.Launch(new BirthdayNotifier(tenant, appSettings)));
-                BackgroundJob.Enqueue(() => AzureJobScheduler.Launch(new RecurringEvents(tenant, appSettings)));
-            }
         }
 
         private static void ConfigureTelemetry()

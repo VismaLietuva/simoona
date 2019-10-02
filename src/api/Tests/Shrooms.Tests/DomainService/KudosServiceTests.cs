@@ -229,7 +229,7 @@ namespace Shrooms.API.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_Inactive_Kudos_Types()
+        public void Should_Return_Active_Kudos_Types()
         {
             var userAndOrg = new UserAndOrganizationDTO
             {
@@ -345,7 +345,8 @@ namespace Shrooms.API.Tests.DomainService
                 UserId = "testUserId",
                 ReceivingUserIds = new List<string>() { "testUserId" },
                 MultiplyBy = 2,
-                Comment = "Comment"
+                Comment = "Comment",
+                IsActive = true
             };
 
             Assert.Throws<KudosException>(() => _kudosService.AddKudosLog(kudosLog));
@@ -362,7 +363,8 @@ namespace Shrooms.API.Tests.DomainService
                 UserId = "testUserId2",
                 ReceivingUserIds = new List<string>() { "testUserId3", "testUserId4" },
                 MultiplyBy = 2,
-                Comment = "Comment"
+                Comment = "Comment",
+                IsActive = true
             };
 
             _kudosService.AddKudosLog(kudosLog);
@@ -382,7 +384,8 @@ namespace Shrooms.API.Tests.DomainService
                 UserId = "testUserId2",
                 ReceivingUserIds = new List<string>() { "testUserId3", "testUserId4" },
                 MultiplyBy = 2,
-                Comment = "Comment"
+                Comment = "Comment",
+                IsActive = true
             };
 
             // Act
@@ -407,7 +410,8 @@ namespace Shrooms.API.Tests.DomainService
                 UserId = "testUserId2",
                 ReceivingUserIds = new List<string>() { "testUserId3", "testUserId4" },
                 MultiplyBy = 2,
-                Comment = "Comment"
+                Comment = "Comment",
+                IsActive = true
             };
 
             _kudosService.AddKudosLog(kudosLog);
@@ -429,7 +433,8 @@ namespace Shrooms.API.Tests.DomainService
                 UserId = "testUserId2",
                 ReceivingUserIds = new List<string>() { "testUserId3", "testUserId4", "testUserId" },
                 MultiplyBy = 2,
-                Comment = "Comment"
+                Comment = "Comment",
+                IsActive = true
             };
 
             Assert.Throws<KudosException>(() => _kudosService.AddKudosLog(kudosLog));
@@ -446,7 +451,8 @@ namespace Shrooms.API.Tests.DomainService
                 UserId = "testUserId2",
                 ReceivingUserIds = new List<string>() { "testUserId3", "testUserId2" },
                 MultiplyBy = 1,
-                Comment = "Comment"
+                Comment = "Comment",
+                IsActive = true
             };
 
             Assert.Throws<KudosException>(() => _kudosService.AddKudosLog(kudosLog));
@@ -464,7 +470,8 @@ namespace Shrooms.API.Tests.DomainService
                 UserId = "testUserId5",
                 ReceivingUserIds = new List<string>() { "testUserId3", "testUserId4", "testUserId" },
                 MultiplyBy = 2,
-                Comment = "Comment"
+                Comment = "Comment",
+                IsActive = true
             };
 
             Assert.Throws<KudosException>(() => _kudosService.AddKudosLog(kudosLog));
@@ -481,7 +488,8 @@ namespace Shrooms.API.Tests.DomainService
                 UserId = "testUserId2",
                 ReceivingUserIds = new List<string>() { "testUserId3", "testUserId4" },
                 MultiplyBy = 2,
-                Comment = "Comment"
+                Comment = "Comment",
+                IsActive = true
             };
 
             _kudosService.AddKudosLog(kudosLog);
