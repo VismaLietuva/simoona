@@ -49,6 +49,7 @@
         'kudosFactory',
         'notifySrv',
         'kudosifySettings',
+        'modalTypes',
         'currentUser',
         'context',
         'imageValidationSettings',
@@ -60,7 +61,7 @@
     ];
 
     function kudosifyModalController($scope, $uibModalInstance, authService, kudosifyModalFactory, kudosFactory,
-        notifySrv, kudosifySettings, currentUser, context, imageValidationSettings, shroomsFileUploader,
+        notifySrv, kudosifySettings, modalTypes, currentUser, context, imageValidationSettings, shroomsFileUploader,
         pictureRepository, lodash, dataHandler, errorHandler) {
         /*jshint validthis: true */
 
@@ -85,13 +86,17 @@
         vm.thumbHeight = 300;
 
         vm.maxMinus = kudosifySettings.maxMinus;
+        vm.modalTypes = modalTypes;
+
+        vm.isSubmitModal = isSubmitModal;
+        vm.isSendModal = isSendModal;
 
         init();
 
         //////
-
         function init() {
-            if (vm.context === 'submit')
+            
+            if (vm.isSubmitModal())
             {
                 kudosifyModalFactory.getPointsTypes().then(function (result) {
                     vm.kudosTypes = result;
@@ -105,7 +110,7 @@
                     
                 });
             }
-            else if (vm.context === 'send')
+            else if (vm.isSendModal())
             {
                 kudosifyModalFactory.getSendType().then(function (result) {
                     vm.pointsType = result;
@@ -132,7 +137,7 @@
 
         function chooseKudosType(type, dom) {
            
-            if (vm.context === 'submit' && isSelectedSameType(dom)) {
+            if (vm.isSubmitModal() && isSelectedSameType(dom)) {
                 vm.kudosifyInfo.multiplyBy++;
             } else {
                 vm.isButtonSelected = true;
@@ -233,6 +238,13 @@
 
         function cancelKudos() {
             $uibModalInstance.dismiss('cancel');
+        }
+
+        function isSubmitModal() {
+            return vm.context == vm.modalTypes.submit;
+        }
+        function isSendModal() {
+            return vm.context == vm.modalTypes.send;
         }
     }
 })();
