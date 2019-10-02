@@ -113,11 +113,11 @@
                 vm.isButtonSelected = true;
                 vm.kudosifyInfo.multiplyBy = 1;
                 recalculateTotalPoints();
-
             }
 
             kudosFactory.getUserInformation(vm.userId).then(function (response) {
                 vm.user = response;
+                
                 vm.kudosifyUser = {
                     formattedName: response.firstName + ' ' + response.lastName,
                     id: vm.userId

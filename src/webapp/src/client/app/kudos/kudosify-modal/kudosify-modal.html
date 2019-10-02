@@ -75,7 +75,7 @@
             </p>
         </div>
 
-        <div class="form-group required-right" has-permissions="['KUDOS_ADMINISTRATION']" ng-class="{ 'has-error' : kudosifyForm.totalPoints.$invalid && !kudosifyForm.totalPoints.$pristine }">
+        <div class="form-group required-right" ng-if="vm.context === 'submit'" has-permissions="['KUDOS_ADMINISTRATION']" ng-class="{ 'has-error' : kudosifyForm.totalPoints.$invalid && !kudosifyForm.totalPoints.$pristine }">
             <label for="totalPoints" translate="kudos.points"></label>
             <input class="form-control"
                    type="number"

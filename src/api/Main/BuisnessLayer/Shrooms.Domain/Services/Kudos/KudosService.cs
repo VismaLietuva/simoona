@@ -44,8 +44,8 @@ namespace Shrooms.Domain.Services.Kudos
         private Expression<Func<KudosType, bool>> _excludeNecessaryKudosTypes = x => x.Type != ConstBusinessLayer.KudosTypeEnum.Send &&
                                 x.Type != ConstBusinessLayer.KudosTypeEnum.Minus &&
                                 x.Type != ConstBusinessLayer.KudosTypeEnum.Other;
-        private Expression<Func<KudosType, bool>> _includeNecessaryKudosTypes = x => x.Type == ConstBusinessLayer.KudosTypeEnum.Send && 
-                                x.Type == ConstBusinessLayer.KudosTypeEnum.Minus &&
+        private Expression<Func<KudosType, bool>> _includeNecessaryKudosTypes = x => x.Type == ConstBusinessLayer.KudosTypeEnum.Send || 
+                                x.Type == ConstBusinessLayer.KudosTypeEnum.Minus ||
                                 x.Type == ConstBusinessLayer.KudosTypeEnum.Other;
 
         private readonly ResourceManager _resourceManager;
@@ -133,18 +133,18 @@ namespace Shrooms.Domain.Services.Kudos
         {
             var hasKudosAdminPermission = HasKudosAdministratorPermission(userOrg);
 
-            var type = _kudosTypesDbSet
+            var types = _kudosTypesDbSet
                 .Where(GetKudosTypeQuery(hasKudosAdminPermission))
                 .Where(_includeNecessaryKudosTypes)
                 .Select(MapKudosTypesToDTO)
                 .AsEnumerable();
 
-            if (type == null)
+            if (types == null)
             {
-                throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Type not found");
+                throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Types not found");
             }
 
-            return type;
+            return types;
         }
 
         public async Task<KudosTypeDTO> GetKudosType(int id, UserAndOrganizationDTO userOrg)
