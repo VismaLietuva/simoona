@@ -1,0 +1,44 @@
+<div class="row">
+        <div class="col-xs-12">
+            <h3><span>{{"lotteries.entityNamePlural" | translate}}</span></h3>
+            <ace-item-list-filter filter-value="filter.s" on-filtering="onSearch"></ace-item-list-filter>
+            <div class="btn-group pull-right" ng-if="allowEdit">
+                <a ui-sref="Root.WithOrg.Admin.Lotteries.Create" class="btn btn-primary" title="{{'common.createNew' | translate}}"><span class="glyphicon glyphicon-plus"></span> <span>{{"common.createNew" | translate}}</span></a>
+            </div>
+            <table class="table table-grey table-hover table-active">
+                <thead>
+                    <tr>
+                        <th class="col-xs-3">
+                            <ace-sort-link on-sort="onSort" sort-dir="filter.dir" sort-field="filter.sort" sort-value="name"><span>{{"lotteries.lotteryTitle" | translate}}</span></ace-sort-link>
+                        </th>
+                        <th class="col-xs-3">
+                            <ace-sort-link on-sort="onSort" sort-dir="filter.dir" sort-field="filter.sort" sort-value="title"><span>{{"lotteries.status" | translate}}</span></ace-sort-link>
+                        </th>
+                        <th class="col-xs-3">
+                            <ace-sort-link on-sort="onSort" sort-dir="filter.dir" sort-field="filter.sort" sort-value="endDate"><span>{{"lotteries.endDate" | translate}}</span></ace-sort-link>
+                        </th>    
+                        <th class="col-xs-3 text-center" ng-if="allowEdit">
+                            {{"common.actions" | translate}}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="lottery in lotteries.pagedList">
+                        <td>
+                            {{lottery.name}}
+                        </td>
+                        <td>
+                            {{lottery.status}}
+                        </td>
+                        <td>
+                            {{lottery.endDate}}
+                        </td>  
+                        <td ng-if="allowEdit" class="text-center">
+                            <a ui-sref="Root.WithOrg.Admin.Lotteries.Edit({ lotteryId : lottery.id})" class="btn btn-default glyphicon glyphicon-pencil" title="{{'common.edit' | translate}}"></a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <ace-item-list-pagination total-item-count="lotteries.itemCount" page-size="lotteries.pageSize" current-page="filter" on-changed="getItems"></ace-item-list-pagination>
+        </div>
+    </div>

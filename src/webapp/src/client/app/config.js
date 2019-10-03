@@ -38,6 +38,7 @@
         'simoonaApp.Impersonate',
         'simoonaApp.Widget',
         'simoonaApp.Customization',
+        'simoonaApp.Lotteries',
         'simoonaApp.Settings'
     ];
 
