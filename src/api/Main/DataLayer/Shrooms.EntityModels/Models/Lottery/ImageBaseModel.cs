@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shrooms.EntityModels.Models.Lottery
+namespace Shrooms.EntityModels.Models.Lotteries
 {
     public abstract class ImageBaseModel : BaseModelWithOrg
     {

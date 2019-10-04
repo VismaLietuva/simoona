@@ -15,7 +15,7 @@ using Shrooms.EntityModels.Models.Badges;
 using Shrooms.EntityModels.Models.Books;
 using Shrooms.EntityModels.Models.Events;
 using Shrooms.EntityModels.Models.Kudos;
-using Shrooms.EntityModels.Models.Lottery;
+using Shrooms.EntityModels.Models.Lotteries;
 using Shrooms.EntityModels.Models.Monitors;
 using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.EntityModels.Models.Notifications;

@@ -9,6 +9,7 @@
         public const string User = "User";
         public const string NewUser = "NewUser";
         public const string Manager = "Manager";
+        public const string LotteryAdmin = "LotteryAdmin";
         public const string ServiceRequest = "ServiceRequest";
         public const string ServiceRequestNotification = "ServiceRequestNotification";
         public const string FirstLogin = "FirstLogin";
