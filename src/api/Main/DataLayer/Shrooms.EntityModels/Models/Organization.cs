@@ -42,12 +42,5 @@ namespace Shrooms.EntityModels.Models
 
         public string KudosYearlyMultipliers { get; set; }
 
-        [SqlDefaultValue(DefaultValue = "0")]
-        public int KudosWelcomeAmount { get; set; }
-
-        [SqlDefaultValue(DefaultValue = "0")]
-        public bool KudosWelcomeEnabled { get; set; }
-
-        public string KudosWelcomeComment { get; set; }
     }
 }

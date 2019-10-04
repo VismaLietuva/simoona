@@ -10,6 +10,7 @@ using Shrooms.DataLayer;
 using Shrooms.DataLayer.DAL;
 using Shrooms.Domain.Services.Administration;
 using Shrooms.Domain.Services.Email.AdministrationUsers;
+using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.Picture;
 using Shrooms.DomainExceptions.Exceptions.UserAdministration;
@@ -29,6 +30,7 @@ namespace Shrooms.API.Tests.DomainService
         private IOrganizationService _organizationService;
         private IPictureService _pictureService;
         private IAdministrationNotificationService _administrationUsersNotificationService;
+        private IKudosService _kudosService;
         private IDbSet<ApplicationUser> _userDbSet;
         private IDbSet<Wall> _wallsDbSet;
 
@@ -41,10 +43,11 @@ namespace Shrooms.API.Tests.DomainService
             var dbContext = Substitute.For<IDbContext>();
             var userStore = Substitute.For<IUserStore<ApplicationUser>>();
             _userManager = MockIdentity.MockUserManager(userStore, dbContext);
-         
+
             _organizationService = Substitute.For<IOrganizationService>();
             _pictureService = Substitute.For<IPictureService>();
             _administrationUsersNotificationService = Substitute.For<IAdministrationNotificationService>();
+            _kudosService = Substitute.For<IKudosService>();
 
             _userDbSet = Substitute.For<IDbSet<ApplicationUser>>();
             uow2.GetDbSet<ApplicationUser>().Returns(_userDbSet);
@@ -53,7 +56,7 @@ namespace Shrooms.API.Tests.DomainService
             uow2.GetDbSet<Wall>().Returns(_wallsDbSet);
 
             _userAdministrationValidator = new UserAdministrationValidator();
-            _administrationUsersService = new AdministrationUsersService(ModelMapper.Create(), uow, uow2, _userAdministrationValidator, _userManager, _organizationService, _pictureService, dbContext, _administrationUsersNotificationService);
+            _administrationUsersService = new AdministrationUsersService(ModelMapper.Create(), uow, uow2, _userAdministrationValidator, _userManager, _organizationService, _pictureService, dbContext, _administrationUsersNotificationService, _kudosService);
         }
 
         [Test]
@@ -99,7 +102,7 @@ namespace Shrooms.API.Tests.DomainService
             var removeRoleErrors = new List<string> { "error1", "error2" };
             Assert.Throws<UserAdministrationException>(() => _userAdministrationValidator.CheckForAddingRemovingRoleErrors(addRoleErrors, removeRoleErrors));
         }
-        
+
         [Test]
         public void Should_Set_User_Tutorial_Status_To_Completed()
         {

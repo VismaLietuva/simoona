@@ -1,11 +1,14 @@
 (function() {
 
     angular.module('simoonaApp.Customization.KudosTypes')
+        .constant('kudosTypesSettings', {
+            nonDeletableTypes: [2, 3, 4, 5]
+        })
         .controller('createEditKudosTypesController', createEditKudosTypesController);
 
-    createEditKudosTypesController.$inject = ['$rootScope', '$stateParams', '$state', 'kudosTypesRepository', 'errorHandler'];
+    createEditKudosTypesController.$inject = ['$rootScope', '$stateParams', '$state', 'kudosTypesRepository', 'errorHandler', 'kudosTypesSettings'];
 
-    function createEditKudosTypesController($rootScope, $stateParams, $state, kudosTypesRepository, errorHandler) {
+    function createEditKudosTypesController($rootScope, $stateParams, $state, kudosTypesRepository, errorHandler, kudosTypesSettings) {
         var vm = this;
         var listState = 'Root.WithOrg.Admin.Customization.KudosTypes.List';
 
@@ -13,7 +16,7 @@
             isCreate: $state.includes('Root.WithOrg.Admin.Customization.KudosTypes.Create'),
             isEdit: $state.includes('Root.WithOrg.Admin.Customization.KudosTypes.Edit')
         };
-        
+
         vm.isLoading = vm.states.isCreate ? false : true;
 
         if(vm.states.isCreate) {
@@ -26,7 +29,7 @@
 
         vm.createKudosType = createKudosType;
         vm.updateKudosType = updateKudosType;
-        vm.disableKudosType = disableKudosType;
+        vm.removeKudosType = removeKudosType;
 
         init();
         //////////
@@ -41,6 +44,7 @@
                         vm.kudosType.description = type.description;
                         vm.kudosType.isActive = type.isActive;
                         vm.isLoading = false;
+                        vm.allowDelete = !kudosTypesSettings.nonDeletableTypes.includes(type.type);
                     }, function (error) {
                     errorHandler.handleErrorMessage(error);
                     $state.go(listState);
@@ -68,8 +72,8 @@
                 }, errorHandler.handleErrorMessage);
         }
 
-        function disableKudosType() {
-            kudosTypesRepository.disableType(vm.kudosType.id)
+        function removeKudosType() {
+            kudosTypesRepository.removeType(vm.kudosType.id)
                 .then(function() {
                     $state.go(listState);
                 }, errorHandler.handleErrorMessage);

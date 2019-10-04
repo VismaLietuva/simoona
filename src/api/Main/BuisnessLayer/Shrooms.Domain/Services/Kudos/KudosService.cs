@@ -84,7 +84,8 @@ namespace Shrooms.Domain.Services.Kudos
                 Name = dto.Name,
                 Value = dto.Multiplier,
                 Type = ConstBusinessLayer.KudosTypeEnum.Ordinary,
-                Description = dto.Description
+                Description = dto.Description,
+                IsActive = dto.IsActive
             };
 
             _kudosTypesDbSet.Add(newType);
@@ -138,7 +139,8 @@ namespace Shrooms.Domain.Services.Kudos
                     Name = t.Name,
                     Value = t.Value,
                     Description = t.Description,
-                    IsActive = t.IsActive
+                    IsActive = t.IsActive,
+                    Type = t.Type
                 })
                 .FirstOrDefaultAsync();
 
@@ -868,6 +870,26 @@ namespace Shrooms.Domain.Services.Kudos
             }
 
             return true;
+        }
+
+        public WelcomeKudosDTO GetWelcomeKudos()
+        {
+            var welcomeKudos = _kudosTypesDbSet
+                .Where(kudosType => kudosType.Type == ConstBusinessLayer.KudosTypeEnum.Welcome)
+                .Select(kudosType => new WelcomeKudosDTO()
+                {
+                    WelcomeKudosAmount = kudosType.Value,
+                    WelcomeKudosComment = kudosType.Description,
+                    WelcomeKudosIsActive = kudosType.IsActive
+                })
+                .FirstOrDefault();
+
+            if (welcomeKudos == null)
+            {
+                throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Welcome kudos not found");
+            }
+
+            return welcomeKudos;
         }
 
         private string TranslateKudos(string textToTranslate, CultureInfo culture)

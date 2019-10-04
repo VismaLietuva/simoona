@@ -15,6 +15,7 @@ using Shrooms.WebViewModels.Models.PostModels;
 using Shrooms.WebViewModels.Models.Roles;
 using Shrooms.WebViewModels.Models.Support;
 using Shrooms.WebViewModels.Models.User;
+using Shrooms.WebViewModels.Models.Users.Kudos;
 
 namespace Shrooms.ModelMappings.Profiles
 {
@@ -28,6 +29,7 @@ namespace Shrooms.ModelMappings.Profiles
             CreateKudosViewModel();
             CreateAdministrationMappings();
             CreateKudosLogDtoMappings();
+            CreateWelcomeKudosMappings();
             CreateMiscDtoMappings();
         }
 
@@ -44,6 +46,13 @@ namespace Shrooms.ModelMappings.Profiles
             CreateMap<KudosType, KudosTypeDTO>();
 
             CreateMap<KudosLog, UserKudosInformationDTO>();
+        }
+
+        private void CreateWelcomeKudosMappings()
+        {
+            CreateMap<WelcomeKudosDTO, WelcomeKudosViewModel>();
+            CreateMap<WelcomeKudosViewModel, WelcomeKudosDTO>();
+
         }
 
         private void CreateAdministrationMappings()
@@ -184,7 +193,7 @@ namespace Shrooms.ModelMappings.Profiles
                 .ForMember(dest => dest.ApplicationUserFirstName, opt => opt.MapFrom(src => src.ApplicationUser != null ? src.ApplicationUser.FirstName : null))
                 .ForMember(dest => dest.ApplicationUserLastName, opt => opt.MapFrom(src => src.ApplicationUser != null ? src.ApplicationUser.LastName : null));
             CreateMap<BookLogDTO, BookLog>();
-          
+
             CreateMap<OfficePostViewModel, Office>()
                 .ForMember(dest => dest.Floors, src => src.Ignore());
             CreateMap<Office, OfficeViewModel>();

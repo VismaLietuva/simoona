@@ -781,9 +781,17 @@
     <Compile Include="Migrations\201909201038299_AddIsActiveColumnToKudoType.Designer.cs">
       <DependentUpon>201909201038299_AddIsActiveColumnToKudoType.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201909261209583_SeedWelcomeKudos.cs" />
+    <Compile Include="Migrations\201909261209583_SeedWelcomeKudos.Designer.cs">
+      <DependentUpon>201909261209583_SeedWelcomeKudos.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\201910011943144_DummyMigration.cs" />
     <Compile Include="Migrations\201910011943144_DummyMigration.Designer.cs">
       <DependentUpon>201910011943144_DummyMigration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201910021146410_RemoveWelcomeKudosFromOrganizationEntity.cs" />
+    <Compile Include="Migrations\201910021146410_RemoveWelcomeKudosFromOrganizationEntity.Designer.cs">
+      <DependentUpon>201910021146410_RemoveWelcomeKudosFromOrganizationEntity.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
@@ -1286,8 +1294,14 @@
     <EmbeddedResource Include="Migrations\201909201038299_AddIsActiveColumnToKudoType.resx">
       <DependentUpon>201909201038299_AddIsActiveColumnToKudoType.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201909261209583_SeedWelcomeKudos.resx">
+      <DependentUpon>201909261209583_SeedWelcomeKudos.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201910011943144_DummyMigration.resx">
       <DependentUpon>201910011943144_DummyMigration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201910021146410_RemoveWelcomeKudosFromOrganizationEntity.resx">
+      <DependentUpon>201910021146410_RemoveWelcomeKudosFromOrganizationEntity.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
