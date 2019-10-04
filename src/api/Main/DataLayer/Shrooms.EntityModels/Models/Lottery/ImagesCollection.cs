@@ -2,7 +2,7 @@
 using System.Collections.ObjectModel;
 using Newtonsoft.Json;
 
-namespace Shrooms.EntityModels.Models.Lottery
+namespace Shrooms.EntityModels.Models.Lotteries
 {
     public class ImagesCollection : Collection<string>
     {

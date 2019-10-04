@@ -1,12 +1,8 @@
-﻿using Shrooms.Constants.EntityValidationValues;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Shrooms.Constants.EntityValidationValues;
 
-namespace Shrooms.EntityModels.Models.Lottery
+namespace Shrooms.EntityModels.Models.Lotteries
 {
     public class Lottery : ImageBaseModel
     {
