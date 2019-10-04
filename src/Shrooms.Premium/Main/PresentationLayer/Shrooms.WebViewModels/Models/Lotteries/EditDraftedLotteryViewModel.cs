@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shrooms.DataTransferObjects.Models.Lotteries
+namespace Shrooms.WebViewModels.Models.Lotteries
 {
-    public class CreateLotteryDTO : UserAndOrganizationDTO
+    public class EditDraftedLotteryViewModel
     {
         public int Id { get; set; }
         public string Title { get; set; }

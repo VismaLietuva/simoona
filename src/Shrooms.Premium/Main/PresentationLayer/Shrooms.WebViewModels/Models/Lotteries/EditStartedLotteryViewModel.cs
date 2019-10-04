@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shrooms.DataTransferObjects.Models.Lotteries
+namespace Shrooms.WebViewModels.Models.Lotteries
 {
-    public class EditStartedLotteryDTO : UserAndOrganizationDTO
+    public class EditStartedLotteryViewModel
     {
         public int Id { get; set; }
         public string Description { get; set; }
- 
     }
 }

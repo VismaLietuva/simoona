@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Shrooms.DataTransferObjects.Models.Lotteries
 {
-    public class EditDraftedLotteryDTO
+    public class EditDraftedLotteryDTO : CreateLotteryDTO
     {
     }
 }

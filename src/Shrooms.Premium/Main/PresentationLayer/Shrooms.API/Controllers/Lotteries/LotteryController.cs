@@ -71,5 +71,38 @@ namespace Shrooms.API.Controllers.Lotteries
                 return BadRequest(e.Message);
             }
         }
+        [HttpPut]
+        [Route("UpdateDrafted")]
+        public IHttpActionResult UpdateDrafted(EditDraftedLotteryViewModel editLotteryViewModel)
+        {
+            try
+            {
+                var editDraftedLotteryDTO = _mapper.Map<EditDraftedLotteryViewModel, EditDraftedLotteryDTO>(editLotteryViewModel);
+                SetOrganizationAndUser(editDraftedLotteryDTO);
+                _lotteryService.EditDraftedLottery(editDraftedLotteryDTO);
+
+                return Ok();
+            }
+            catch(LotteryException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+        [HttpPatch]
+        [Route("UpdateStarted")]
+        public IHttpActionResult UpdateStarted(EditStartedLotteryViewModel editLotteryViewModel)
+        {
+            try
+            {
+                var editStartedLotteryDTO = _mapper.Map<EditStartedLotteryViewModel, EditStartedLotteryDTO>(editLotteryViewModel);
+                SetOrganizationAndUser(editStartedLotteryDTO);
+                _lotteryService.EditStartedLottery(editStartedLotteryDTO);
+                return Ok();
+            }
+            catch (LotteryException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
     }
 }

@@ -10,6 +10,7 @@ using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Lotteries;
 using Shrooms.EntityModels.Models.Lotteries;
+using static Shrooms.Constants.BusinessLayer.ConstBusinessLayer;
 
 namespace Shrooms.Domain.Services.Lotteries
 {
@@ -27,23 +28,41 @@ namespace Shrooms.Domain.Services.Lotteries
         }
         public async Task<CreateLotteryDTO> CreateLottery(CreateLotteryDTO newLotteryDTO)
         {
+            if(newLotteryDTO.EndDate < DateTime.UtcNow)
+            {
+                // exception (cant create lottery in past)
+            }
             var newLottery = MapNewLottery(newLotteryDTO);
             _lotteriesDbSet.Add(newLottery);
             await _uow.SaveChangesAsync(newLotteryDTO.UserId);
 
-            newLotteryDTO.Id = newLottery.Id.ToString();
+            newLotteryDTO.Id = newLottery.Id;
 
             return newLotteryDTO;
         }
 
         public void EditDraftedLottery(EditDraftedLotteryDTO lotteryDTO)
         {
-            throw new NotImplementedException();
+            var lottery = _lotteriesDbSet.SingleOrDefault(p => p.Id == lotteryDTO.Id);
+            if(lottery.Status != (int)LotteryStatusEnum.Drafted)
+            {
+                // exception (can only edit drafted lottery)
+            }
+            UpdateDraftedLottery(lottery, lotteryDTO);
+            _uow.SaveChanges(false);
         }
 
         public void EditStartedLottery(EditStartedLotteryDTO lotteryDTO)
         {
-            throw new NotImplementedException();
+            var lottery = _lotteriesDbSet.SingleOrDefault(p => p.Id == lotteryDTO.Id);
+
+            if(lottery.Status != (int)LotteryStatusEnum.Started)
+            {
+               // exception (Lottery has started or ended)
+            }
+            lottery.Description = lotteryDTO.Description;
+            _uow.SaveChanges();
+
         }
 
         public LotteryDetailsDTO GetLotteryDetails(Guid id, UserAndOrganizationDTO userOrg)
@@ -53,12 +72,13 @@ namespace Shrooms.Domain.Services.Lotteries
 
         public void RemoveLottery(int id, UserAndOrganizationDTO userOrg)
         {
-            var @lottery = _lotteriesDbSet.SingleOrDefault(p => p.Id == id && p.OrganizationId == userOrg.OrganizationId);
-            @lottery.Status = 2;
+            var lottery = _lotteriesDbSet.SingleOrDefault(p => p.Id == id && p.OrganizationId == userOrg.OrganizationId);
+            lottery.Status = (int)LotteryStatusEnum.Aborted;
+
 
          //   _lotteriesDbSet.Remove(@lottery);
 
-            _uow.SaveChanges(false);
+            _uow.SaveChanges();
 
 
         }
@@ -93,6 +113,14 @@ namespace Shrooms.Domain.Services.Lotteries
                EndDate = e.EndDate,
                Status = e.Status
             };
+        }
+        private void UpdateDraftedLottery(Lottery lottery, EditDraftedLotteryDTO draftedLotteryDTO)
+        {
+            lottery.EntryFee = draftedLotteryDTO.EntryFee;
+            lottery.EndDate = draftedLotteryDTO.EndDate;
+            lottery.Description = draftedLotteryDTO.Description;
+            lottery.Status = draftedLotteryDTO.Status;
+            lottery.Title = draftedLotteryDTO.Title;
         }
     }
 }

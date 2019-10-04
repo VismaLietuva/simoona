@@ -24,11 +24,22 @@ namespace Shrooms.ModelMappings.Profiles
 
             CreateMap<LotteryDetailsDTO, LotteryDetailsViewModel>();
             CreateMap<LotteryDetailsViewModel, LotteryDetailsDTO>();
+
+            CreateMap<EditDraftedLotteryViewModel, EditDraftedLotteryDTO>();
+            CreateMap<EditDraftedLotteryDTO, EditDraftedLotteryViewModel>();
+
+            CreateMap<EditStartedLotteryViewModel, EditStartedLotteryDTO>();
+            CreateMap<EditStartedLotteryDTO, EditStartedLotteryViewModel>();
         }
         private void CreateDtoMappings()
         {
-            CreateMap<CreateLotteryDTO, Lottery>();
-            CreateMap<Lottery, CreateLotteryDTO>();
+            CreateMap<CreateLotteryDTO, Lottery>()
+                .Ignore(x => x.Id);
+            CreateMap<Lottery, CreateLotteryDTO>()
+                .Ignore(x => x.Id);
+
+            CreateMap<EditDraftedLotteryDTO, Lottery>();
+            CreateMap<Lottery, EditDraftedLotteryDTO>();
         }
     }
 }
