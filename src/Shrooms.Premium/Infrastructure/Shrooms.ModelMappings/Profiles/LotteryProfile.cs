@@ -15,14 +15,15 @@ namespace Shrooms.ModelMappings.Profiles
         protected override void Configure()
         {
             CreateViewModelToDtoMappings();
-            /*
-            CreateViewModelMappings(); */
             CreateDtoMappings();
         }
         private void CreateViewModelToDtoMappings()
         {
             CreateMap<CreateLotteryDTO, CreateLotteryViewModel>();
             CreateMap<CreateLotteryViewModel, CreateLotteryDTO>();
+
+            CreateMap<LotteryDetailsDTO, LotteryDetailsViewModel>();
+            CreateMap<LotteryDetailsViewModel, LotteryDetailsDTO>();
         }
         private void CreateDtoMappings()
         {

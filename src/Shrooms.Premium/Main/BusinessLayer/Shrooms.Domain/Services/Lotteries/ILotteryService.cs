@@ -13,7 +13,8 @@ namespace Shrooms.Domain.Services.Lotteries
         Task<CreateLotteryDTO> CreateLottery(CreateLotteryDTO newLotteryDTO);
         void EditDraftedLottery(EditDraftedLotteryDTO lotteryDTO);
         void EditStartedLottery(EditStartedLotteryDTO lotteryDTO);
-        void RemoveLottery(Guid id, UserAndOrganizationDTO userOrg);
+        void RemoveLottery(int id, UserAndOrganizationDTO userOrg);
+        IEnumerable<LotteryDetailsDTO> GetLotteries(UserAndOrganizationDTO userOrganization);
         LotteryDetailsDTO GetLotteryDetails(Guid id, UserAndOrganizationDTO userOrg);
     }
 }
