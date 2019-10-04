@@ -16,6 +16,7 @@ namespace Shrooms.Premium.UnitTests.ModelMappings
                 cfg.AddProfile<KudosShopProfile>();
                 cfg.AddProfile<EventsProfile>();
                 cfg.AddProfile<VacationsProfile>();
+                cfg.AddProfile<LotteryProfile>();
             };
 
             var configuration = new MapperConfiguration(mappings);
