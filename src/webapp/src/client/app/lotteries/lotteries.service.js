@@ -3,10 +3,5 @@
 
     angular
         .module('simoonaApp.Lotteries')
-    
-    customizationNavigationFactory.$inject = [
-        'authService',
-        'lodash'
-    ];
 
 })();

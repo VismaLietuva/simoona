@@ -9,10 +9,11 @@
         '$rootScope',
         '$scope',
         'authService',
-        '$location'
+        '$location',
+        'lotteryFactory'
     ];    
 
-    function lotteryListController($rootScope, $scope, authService, $location) {
+    function lotteryListController($rootScope, $scope, authService, $location, lotteryFactory) {
     	/* jshint validthis: true */
         var vm = this;
         $rootScope.pageTitle = 'lotteries.lotteriesPanelHeader';
@@ -29,6 +30,14 @@
                 endDate: Date.now()
             }
         ]}
+
+        init();
+
+        function init() {
+            lotteryFactory.getAllLotteries().then(function (response) {
+                $scope.lotteries = response;
+            })
+        }
     }
 
 })();
