@@ -33,11 +33,9 @@ namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Email.Kudos
             _employeeDbSet = uow.GetDbSet<ApplicationUser>();
         }
 
-
-
         private void SendLoyaltyBotNotification(AwardedKudosEmployeeDTO kudosLog)
         {
-            var organization = getOrganizationName(kudosLog.OrganizationId);
+            var organization = GetOrganization(kudosLog.OrganizationId);
             var employee = _employeeDbSet.Single(s => s.Id == kudosLog.EmployeeId);
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
             var kudosProfileUrl = _appSettings.KudosProfileUrl(organization.ShortName, kudosLog.EmployeeId);
@@ -48,21 +46,23 @@ namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Email.Kudos
                 kudosLog.Points,
                 kudosLog.KudosTypeName,
                 organization.Name,
-                kudosLog.KudosComments,
+                kudosLog.Comments,
                 kudosProfileUrl);
             var body = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.KudosReceived);
 
             _mailingService.SendEmail(new EmailDto(employee.Email, subject, body));
         }
 
-        private Organization getOrganizationName(int orgId) => _organizationsDbSet
-                .Single(x => x.Id == orgId);
+        private Organization GetOrganization(int orgId)
+        {
+            return _organizationsDbSet.Single(x => x.Id == orgId);
+        }
 
         public void SendLoyaltyBotNotification(IEnumerable<AwardedKudosEmployeeDTO> awardedEmployees)
         {
-            foreach (var empl in awardedEmployees)
+            foreach (var employee in awardedEmployees)
             {
-                SendLoyaltyBotNotification(empl);
+                SendLoyaltyBotNotification(employee);
             }
         }
     }

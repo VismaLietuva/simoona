@@ -283,6 +283,7 @@
     <Compile Include="Infrastructure\Shrooms.ModelMappings\Profiles\CommitteeProfile.cs" />
     <Compile Include="Infrastructure\Shrooms.ModelMappings\Profiles\EventsProfile.cs" />
     <Compile Include="Infrastructure\Shrooms.ModelMappings\Profiles\KudosShopProfile.cs" />
+    <Compile Include="Infrastructure\Shrooms.ModelMappings\Profiles\LoyaltyKudosProfile.cs" />
     <Compile Include="Infrastructure\Shrooms.ModelMappings\Profiles\OfficeMapProfile.cs" />
     <Compile Include="Infrastructure\Shrooms.ModelMappings\Profiles\OrganizationalStructureProfile.cs" />
     <Compile Include="Infrastructure\Shrooms.ModelMappings\Profiles\PostsProfile.cs" />
@@ -324,6 +325,7 @@
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\MyEventsOptionsDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\UpdateEventTypeDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Kudos\AwardedKudosEmployeeDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Kudos\EmployeeLoyaltyKudosDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Kudos\KudosShopItemDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\OfficeMap\OfficeDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\OfficeMap\OfficeRoomDTO.cs" />
@@ -390,8 +392,9 @@
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\WebHookCallbacks\Events\EventsWebHookService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\WebHookCallbacks\Events\IEventsWebHookService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\WebHookCallbacks\IWebHookCallbackPremiumServices.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\WebHookCallbacks\LoyaltyKudos\ILoyaltyKudosCalculator.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\WebHookCallbacks\LoyaltyKudos\ILoyaltyKudosService.cs" />
-    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\WebHookCallbacks\LoyaltyKudos\LoyaltyKudos.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\WebHookCallbacks\LoyaltyKudos\LoyaltyKudosCalculator.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\WebHookCallbacks\LoyaltyKudos\LoyaltyKudosService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\WebHookCallbacks\WebHookCallbackPremiumServices.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\BackgroundWorkers\NewEventNotifier.cs" />

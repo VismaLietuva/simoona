@@ -9,13 +9,14 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using AutoMapper;
 
 namespace Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos
 {
     public class LoyaltyKudosService : ILoyaltyKudosService
     {
         private const string LoyaltyKudosTypeName = "Loyalty";
-        private static object concurrencyLock = new object();
+        private static readonly object _concurrencyLock = new object();
 
         private readonly IUnitOfWork2 _uow;
         private readonly IDbSet<KudosLog> _kudosLogsDbSet;
@@ -24,11 +25,15 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos
         private readonly IDbSet<Organization> _organizationsDbSet;
         private readonly ILogger _logger;
         private readonly IAsyncRunner _asyncRunner;
+        private readonly IMapper _mapper;
+        private readonly ILoyaltyKudosCalculator _loyaltyKudosCalculator;
 
-        public LoyaltyKudosService(IUnitOfWork2 uow, ILogger logger,IAsyncRunner asyncRunner)
+        public LoyaltyKudosService(IUnitOfWork2 uow, ILogger logger, IAsyncRunner asyncRunner, IMapper mapper, ILoyaltyKudosCalculator loyaltyKudosCalculator)
         {
             _logger = logger;
             _asyncRunner = asyncRunner;
+            _loyaltyKudosCalculator = loyaltyKudosCalculator;
+            _mapper = mapper;
             _uow = uow;
             _kudosLogsDbSet = uow.GetDbSet<KudosLog>();
             _kudosTypesDbSet = uow.GetDbSet<KudosType>();
@@ -39,11 +44,11 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos
         public void AwardEmployeesWithKudos(string organizationName)
         {
             var awardedEmployees = new List<AwardedKudosEmployeeDTO>();
-            lock (concurrencyLock)
+            lock (_concurrencyLock)
             {
                 if (string.IsNullOrEmpty(organizationName))
                 {
-                    throw new ArgumentNullException(organizationName);
+                    throw new ArgumentNullException(nameof(organizationName));
                 }
 
                 var organization = _organizationsDbSet
@@ -55,47 +60,44 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos
                     })
                     .Single();
 
-                var organizationId = organization.Id;
-                var kudosYearlyMultipliers = ParseKudosYearlyMultipliersString(organization.KudosYearlyMultipliers);
+                var kudosYearlyMultipliers = GetKudosYearlyMultipliersArray(organization.KudosYearlyMultipliers);
                 if (kudosYearlyMultipliers == null)
                 {
                     return;
                 }
 
-                var loyaltyType = _kudosTypesDbSet
-                    .SingleOrDefault(t => t.Name == LoyaltyKudosTypeName);
+                var loyaltyType = _kudosTypesDbSet.SingleOrDefault(t => t.Name == LoyaltyKudosTypeName);
 
-                var employees = _usersDbSet
-                    .Where(u => u.OrganizationId == organizationId && u.EmploymentDate.HasValue)
-                    .ToList();
+                var loyaltyKudosLog = (from u in _usersDbSet
+                                       where u.OrganizationId == organization.Id && u.EmploymentDate.HasValue
+                                       join kl in _kudosLogsDbSet on u.Id equals kl.EmployeeId into klx
+                                       from kl in klx.DefaultIfEmpty()
+                                       where kl == null || (kl.OrganizationId == organization.Id && kl.Status == KudosStatus.Approved && kl.KudosTypeName == LoyaltyKudosTypeName)
+                                       select new
+                                       {
+                                           Employee = u,
+                                           KudosAddedDate = kl != null ? (DateTime?)(kl.Created) : null
+                                       }).ToList();
 
-                var employeesIds = employees.Select(x => x.Id).ToList();
-                var employeesReceivedLoyaltyKudos = _kudosLogsDbSet
-                    .Where(l => l.OrganizationId == organizationId && employeesIds.Contains(l.EmployeeId))
-                    .GroupBy(x => x.EmployeeId)
-                    .Select(l => new
+                var employeesReceivedLoyaltyKudos = loyaltyKudosLog
+                    .GroupBy(l => l.Employee)
+                    .Select(l => new EmployeeLoyaltyKudosDTO
                     {
-                        Id = l.Key,
-                        loyaltiesReceivedAlready = l.Count(log => log.Status == KudosStatus.Approved && log.KudosTypeName == LoyaltyKudosTypeName)
+                        Employee = l.Key,
+                        AwardedEmploymentYears = l.Where(log => log.Employee.EmploymentDate != null && log.KudosAddedDate != null).Select(log => GetLoyaltyKudosEmploymentYear(log.Employee.EmploymentDate.Value, log.KudosAddedDate.Value)),
+                        AwardedLoyaltyKudosCount = l.Count(log => log.KudosAddedDate != null)
                     })
                     .ToList();
 
-                foreach (var employee in employees)
+                foreach (var employeeLoyaltyKudos in employeesReceivedLoyaltyKudos)
                 {
-                    var loyaltiesAlreadyReceived = employeesReceivedLoyaltyKudos.FirstOrDefault(x => x.Id == employee.Id)?.loyaltiesReceivedAlready ?? 0;
-                    var yearsToAwardFor = LoyaltyKudos.CalculateYearsToAwardFor(employee.YearsEmployed, loyaltiesAlreadyReceived);
-
                     try
                     {
-                        foreach (var year in yearsToAwardFor)
-                        {
-                            var loyaltyKudosLog = LoyaltyKudos.CreateLoyaltyKudosLog(employee, loyaltyType, organizationId, kudosYearlyMultipliers, year);
-                            if (loyaltyKudosLog != null)
-                            {
-                                _kudosLogsDbSet.Add(loyaltyKudosLog);
-                                awardedEmployees.Add(MapTo(loyaltyKudosLog));
-                            }
-                        }
+                        var loyaltyKudosLogList = _loyaltyKudosCalculator.GetEmployeeLoyaltyKudosLog(employeeLoyaltyKudos, loyaltyType, organization.Id, kudosYearlyMultipliers);
+                        var awardedKudosEmployeeList = _mapper.Map<List<AwardedKudosEmployeeDTO>>(loyaltyKudosLogList);
+                        awardedEmployees.AddRange(awardedKudosEmployeeList);
+
+                        loyaltyKudosLogList.ForEach(l => _kudosLogsDbSet.Add(l));
                     }
                     catch (ArgumentException e)
                     {
@@ -108,19 +110,7 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos
             }
         }
 
-        private AwardedKudosEmployeeDTO MapTo(KudosLog kudosLog)
-        {
-            return new AwardedKudosEmployeeDTO
-            {
-                EmployeeId = kudosLog.EmployeeId,
-                OrganizationId = kudosLog.OrganizationId,
-                KudosComments = kudosLog.Comments,
-                KudosTypeName = kudosLog.KudosTypeName,
-                Points = kudosLog.Points
-            };
-        }
-
-        private static int[] ParseKudosYearlyMultipliersString(string multipliers)
+        private int[] GetKudosYearlyMultipliersArray(string multipliers)
         {
             if (string.IsNullOrEmpty(multipliers))
             {
@@ -135,6 +125,17 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos
             {
                 return null;
             }
+        }
+
+        private int GetLoyaltyKudosEmploymentYear(DateTime employmentDate, DateTime loyaltyAddedDate)
+        {
+            var employmentYear = loyaltyAddedDate.Year - employmentDate.Year;
+            if (loyaltyAddedDate < employmentDate.AddYears(employmentYear))
+            {
+                employmentYear = employmentYear >= 1 ? employmentYear - 1 : employmentYear;
+            }
+
+            return employmentYear;
         }
     }
 }

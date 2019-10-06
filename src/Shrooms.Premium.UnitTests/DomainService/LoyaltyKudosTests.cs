@@ -10,14 +10,15 @@ using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Infrastructure.Logger;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Email.Kudos;
+using Shrooms.Premium.UnitTests.ModelMappings;
 using Shrooms.UnitTests.Extensions;
 
 namespace Shrooms.UnitTests.DomainService
 {
-    class LoyaltyKudosTests
+    public class LoyaltyKudosTests
     {
         private ILoyaltyKudosService _loyaltyKudosService;
+        private ILoyaltyKudosCalculator _loyaltyKudosCalculator;
 
         private IDbSet<KudosLog> _kudosLogsDbSet;
         private IDbSet<KudosType> _kudosTypeDbSet;
@@ -36,7 +37,10 @@ namespace Shrooms.UnitTests.DomainService
 
             var loggerMock = Substitute.For<ILogger>();
             var asyncRunner = Substitute.For<IAsyncRunner>();
-            _loyaltyKudosService = new LoyaltyKudosService(uow, loggerMock, asyncRunner);
+            var mapper = ModelMapper.Create();
+
+            _loyaltyKudosCalculator = new LoyaltyKudosCalculator();
+            _loyaltyKudosService = new LoyaltyKudosService(uow, loggerMock, asyncRunner, mapper, _loyaltyKudosCalculator);
         }
 
         [Test]
@@ -51,7 +55,8 @@ namespace Shrooms.UnitTests.DomainService
                 Id = "user",
                 OrganizationId = 2,
                 RemainingKudos = 0,
-                TotalKudos = 10
+                TotalKudos = 10,
+                EmploymentDate = DateTime.Now.AddYears(-2)
             };
 
             var loyaltyKudosType = new KudosType
@@ -62,7 +67,7 @@ namespace Shrooms.UnitTests.DomainService
             };
 
             // Act
-            var loyaltyKudosLog = LoyaltyKudos.CreateLoyaltyKudosLog(oneYearEmployee, loyaltyKudosType, organizationId,
+            var loyaltyKudosLog = _loyaltyKudosCalculator.CreateLoyaltyKudosLog(oneYearEmployee, loyaltyKudosType, organizationId,
                 kudosYearlyMultipliers, yearOfEmployment);
 
             Assert.AreEqual(oneYearEmployee.Id, loyaltyKudosLog.EmployeeId);
@@ -89,7 +94,8 @@ namespace Shrooms.UnitTests.DomainService
                 Id = "user",
                 OrganizationId = 2,
                 RemainingKudos = 0,
-                TotalKudos = 10
+                TotalKudos = 10,
+                EmploymentDate = DateTime.Now.AddYears(-2)
             };
 
             var loyaltyKudosType = new KudosType
@@ -100,7 +106,7 @@ namespace Shrooms.UnitTests.DomainService
             };
 
             // Act
-            var loyaltyKudosLog = LoyaltyKudos.CreateLoyaltyKudosLog(twoYearEmployee, loyaltyKudosType, organizationId,
+            var loyaltyKudosLog = _loyaltyKudosCalculator.CreateLoyaltyKudosLog(twoYearEmployee, loyaltyKudosType, organizationId,
                 kudosYearlyMultipliers, yearOfEmployment);
 
             // Assert
@@ -128,7 +134,8 @@ namespace Shrooms.UnitTests.DomainService
                 Id = "user",
                 OrganizationId = 2,
                 RemainingKudos = 0,
-                TotalKudos = 10
+                TotalKudos = 10,
+                EmploymentDate = DateTime.Now.AddYears(-2)
             };
 
             var loyaltyKudosType = new KudosType
@@ -139,7 +146,7 @@ namespace Shrooms.UnitTests.DomainService
             };
 
             // Act
-            var loyaltyKudosLog = LoyaltyKudos.CreateLoyaltyKudosLog(threeYearEmployee, loyaltyKudosType, organizationId,
+            var loyaltyKudosLog = _loyaltyKudosCalculator.CreateLoyaltyKudosLog(threeYearEmployee, loyaltyKudosType, organizationId,
                 kudosYearlyMultipliers, yearOfEmployment);
 
             // Assert
@@ -167,7 +174,8 @@ namespace Shrooms.UnitTests.DomainService
                 Id = "user",
                 OrganizationId = 2,
                 RemainingKudos = 0,
-                TotalKudos = 10
+                TotalKudos = 10,
+                EmploymentDate = DateTime.Now.AddYears(-2)
             };
 
             var loyaltyKudosType = new KudosType
@@ -178,7 +186,7 @@ namespace Shrooms.UnitTests.DomainService
             };
 
             // Act
-            var loyaltyKudosLog = LoyaltyKudos.CreateLoyaltyKudosLog(threeYearEmployee, loyaltyKudosType, organizationId,
+            var loyaltyKudosLog = _loyaltyKudosCalculator.CreateLoyaltyKudosLog(threeYearEmployee, loyaltyKudosType, organizationId,
                 kudosYearlyMultipliers, yearOfEmployment);
 
             // Assert
@@ -216,7 +224,7 @@ namespace Shrooms.UnitTests.DomainService
             };
 
             // Act
-            var loyaltyKudosLog = LoyaltyKudos.CreateLoyaltyKudosLog(twoYearEmployee, loyaltyKudosType, organizationId,
+            var loyaltyKudosLog = _loyaltyKudosCalculator.CreateLoyaltyKudosLog(twoYearEmployee, loyaltyKudosType, organizationId,
                 kudosYearlyMultipliers, yearOfEmployment);
 
             // Assert
@@ -246,8 +254,11 @@ namespace Shrooms.UnitTests.DomainService
                 Value = 10
             };
 
-            // Assert, Act
-            var e = Assert.Throws<ArgumentException>(() => LoyaltyKudos.CreateLoyaltyKudosLog(oneYearEmployee, loyaltyKudosType, organizationId, kudosYearlyMultipliers, yearOfEmployment));
+            // Act
+            void Action() => _loyaltyKudosCalculator.CreateLoyaltyKudosLog(oneYearEmployee, loyaltyKudosType, organizationId, kudosYearlyMultipliers, yearOfEmployment);
+
+            // Assert
+            var e = Assert.Throws<ArgumentException>(Action);
             Assert.AreEqual("yearOfEmployment", e.ParamName);
         }
 
@@ -264,8 +275,11 @@ namespace Shrooms.UnitTests.DomainService
                 Value = 10
             };
 
-            // Assert, Act
-            var e = Assert.Throws<ArgumentNullException>(() => LoyaltyKudos.CreateLoyaltyKudosLog(null, loyaltyKudosType, organizationId, kudosYearlyMultipliers, yearOfEmployment));
+            // Act
+            void Action() => _loyaltyKudosCalculator.CreateLoyaltyKudosLog(null, loyaltyKudosType, organizationId, kudosYearlyMultipliers, yearOfEmployment);
+
+            // Assert
+            var e = Assert.Throws<ArgumentNullException>(Action);
             Assert.AreEqual("recipient", e.ParamName);
         }
 
@@ -284,8 +298,11 @@ namespace Shrooms.UnitTests.DomainService
                 TotalKudos = 10
             };
 
-            // Assert, Act
-            var e = Assert.Throws<ArgumentNullException>(() => LoyaltyKudos.CreateLoyaltyKudosLog(employee, null, organizationId, kudosYearlyMultipliers, yearOfEmployment));
+            // Act
+            void Action() => _loyaltyKudosCalculator.CreateLoyaltyKudosLog(employee, null, organizationId, kudosYearlyMultipliers, yearOfEmployment);
+
+            // Assert
+            var e = Assert.Throws<ArgumentNullException>(Action);
             Assert.AreEqual("loyaltyKudosType", e.ParamName);
         }
 
@@ -311,8 +328,12 @@ namespace Shrooms.UnitTests.DomainService
                 Name = "Loyalty"
             };
 
-            // Assert, Act
-            var e = Assert.Throws<ArgumentException>(() => LoyaltyKudos.CreateLoyaltyKudosLog(employee, loyaltyKudosType, organizationId, kudosYearlyMultipliers, yearOfEmployment));
+            // Act
+            // ReSharper disable once ExpressionIsAlwaysNull
+            void Action() => _loyaltyKudosCalculator.CreateLoyaltyKudosLog(employee, loyaltyKudosType, organizationId, kudosYearlyMultipliers, yearOfEmployment);
+
+            // Assert
+            var e = Assert.Throws<ArgumentException>(Action);
             Assert.AreEqual("kudosYearlyMultipliers", e.ParamName);
         }
 
@@ -338,8 +359,11 @@ namespace Shrooms.UnitTests.DomainService
                 Name = "Loyalty"
             };
 
-            // Assert, Act
-            var e = Assert.Throws<ArgumentException>(() => LoyaltyKudos.CreateLoyaltyKudosLog(employee, loyaltyKudosType, organizationId, kudosYearlyMultipliers, yearOfEmployment));
+            // Act
+            void Action() => _loyaltyKudosCalculator.CreateLoyaltyKudosLog(employee, loyaltyKudosType, organizationId, kudosYearlyMultipliers, yearOfEmployment);
+
+            // Assert
+            var e = Assert.Throws<ArgumentException>(Action);
             Assert.AreEqual("kudosYearlyMultipliers", e.ParamName);
         }
 
@@ -364,8 +388,11 @@ namespace Shrooms.UnitTests.DomainService
                 Value = 10
             };
 
-            // Assert, Act
-            var e = Assert.Throws<ArgumentException>(() => LoyaltyKudos.CreateLoyaltyKudosLog(employee, loyaltyKudosType, 0, kudosYearlyMultipliers, yearOfEmployment));
+            // Act
+            void Action() => _loyaltyKudosCalculator.CreateLoyaltyKudosLog(employee, loyaltyKudosType, 0, kudosYearlyMultipliers, yearOfEmployment);
+
+            // Assert
+            var e = Assert.Throws<ArgumentException>(Action);
             Assert.AreEqual("organizationId", e.ParamName);
         }
 
@@ -377,7 +404,7 @@ namespace Shrooms.UnitTests.DomainService
             var loyaltyAwardsAlreadyReceived = 1;
 
             // Act
-            var yearsToAwardFor = LoyaltyKudos.CalculateYearsToAwardFor(yearsEmployed, loyaltyAwardsAlreadyReceived);
+            var yearsToAwardFor = _loyaltyKudosCalculator.CalculateYearsToAwardFor(yearsEmployed, loyaltyAwardsAlreadyReceived);
 
             // Assert
             Assert.AreEqual(2, yearsToAwardFor.First());
@@ -391,7 +418,7 @@ namespace Shrooms.UnitTests.DomainService
             var loyaltyAwardsAlreadyReceived = 3;
 
             // Act
-            var yearsToAwardFor = LoyaltyKudos.CalculateYearsToAwardFor(yearsEmployed, loyaltyAwardsAlreadyReceived);
+            var yearsToAwardFor = _loyaltyKudosCalculator.CalculateYearsToAwardFor(yearsEmployed, loyaltyAwardsAlreadyReceived);
 
             // Assert
             Assert.AreEqual(0, yearsToAwardFor.Count());
@@ -401,11 +428,11 @@ namespace Shrooms.UnitTests.DomainService
         public void Should_Calculate_Which_Year_Employee_Needs_To_Be_Awarded_With_Loyalty_2()
         {
             // Setup
-            var yearsEmployed = 4;
-            var loyaltyAwardsAlreadyReceived = 2;
+            const int yearsEmployed = 4;
+            const int loyaltyAwardsAlreadyReceived = 2;
 
             // Act
-            var yearsToAwardFor = LoyaltyKudos.CalculateYearsToAwardFor(yearsEmployed, loyaltyAwardsAlreadyReceived);
+            var yearsToAwardFor = _loyaltyKudosCalculator.CalculateYearsToAwardFor(yearsEmployed, loyaltyAwardsAlreadyReceived).ToList();
 
             // Assert
             Assert.AreEqual(3, yearsToAwardFor.First());
@@ -416,11 +443,11 @@ namespace Shrooms.UnitTests.DomainService
         public void Should_Calculate_Which_Year_Employee_Needs_To_Be_Awarded_With_Loyalty_3()
         {
             // Setup
-            var yearsEmployed = 0;
-            var loyaltyAwardsAlreadyReceived = 0;
+            const int yearsEmployed = 0;
+            const int loyaltyAwardsAlreadyReceived = 0;
 
             // Act
-            var yearsToAwardFor = LoyaltyKudos.CalculateYearsToAwardFor(yearsEmployed, loyaltyAwardsAlreadyReceived);
+            var yearsToAwardFor = _loyaltyKudosCalculator.CalculateYearsToAwardFor(yearsEmployed, loyaltyAwardsAlreadyReceived);
 
             // Assert
             Assert.AreEqual(0, yearsToAwardFor.Count());
@@ -429,11 +456,13 @@ namespace Shrooms.UnitTests.DomainService
         [Test]
         public void Should_Award_Employee_With_Loyalty_Kudos_OnlyAfter3Years()
         {
+            var user1 = new ApplicationUser { Id = "user1", OrganizationId = 2, EmploymentDate = DateTime.UtcNow.AddYears(-3).AddDays(-10) };
+            var user2 = new ApplicationUser { Id = "user2", OrganizationId = 2, EmploymentDate = DateTime.UtcNow.AddYears(-3).AddDays(-10) };
+            var user3 = new ApplicationUser { Id = "user3", OrganizationId = 2, EmploymentDate = DateTime.UtcNow.AddDays(-100) };
+
             var employees = new List<ApplicationUser>
             {
-                new ApplicationUser { Id = "user1", OrganizationId = 2, EmploymentDate = DateTime.UtcNow.AddYears(-3).AddDays(-10) },
-                new ApplicationUser { Id = "user2", OrganizationId = 2, EmploymentDate = DateTime.UtcNow.AddYears(-3).AddDays(-10) },
-                new ApplicationUser { Id = "user3", OrganizationId = 2, EmploymentDate = DateTime.UtcNow.AddDays(-100) }
+                user1, user2, user3
             };
 
             var organizations = new List<Organization>
@@ -443,7 +472,8 @@ namespace Shrooms.UnitTests.DomainService
 
             var kudosLogs = new List<KudosLog>
             {
-                new KudosLog { Id = 1, EmployeeId = "user1", KudosTypeName = "Loyalty", OrganizationId = 2, Status = KudosStatus.Approved, Points = 20 }
+                new KudosLog { Id = 1, EmployeeId = "user1", Created = DateTime.UtcNow.AddYears(-2), KudosTypeName = "Loyalty", OrganizationId = 2, Status = KudosStatus.Approved, Points = 20, Employee = user1 },
+                new KudosLog { Id = 1, EmployeeId = "user1", Created = DateTime.UtcNow.AddYears(-1), KudosTypeName = "Other", OrganizationId = 2, Status = KudosStatus.Approved, Points = 20, Employee = user1 }
             };
 
             var loyaltyKudosType = new KudosType { Id = 1, Value = 1, Name = "Loyalty" };
@@ -452,27 +482,72 @@ namespace Shrooms.UnitTests.DomainService
             _kudosLogsDbSet.SetDbSetData(kudosLogs.AsQueryable());
             _kudosTypeDbSet.SetDbSetData(new[] { loyaltyKudosType }.AsQueryable());
             _organizationsDbSet.SetDbSetData(organizations.AsQueryable());
-            
-            _loyaltyKudosService.AwardEmployeesWithKudos("tenant2");
-            // Let's fake that we execute bgr job the second day.
-            kudosLogs.Add(new KudosLog { Id = 2, EmployeeId = "user1", KudosTypeName = "Loyalty", OrganizationId = 2, Status = KudosStatus.Approved, Points = 40 });
-            kudosLogs.Add(new KudosLog { Id = 2, EmployeeId = "user2", KudosTypeName = "Loyalty", OrganizationId = 2, Status = KudosStatus.Approved, Points = 40 });
+
             _loyaltyKudosService.AwardEmployeesWithKudos("tenant2");
 
-            _kudosLogsDbSet.Received(2).Add(Arg.Any<KudosLog>());
+            // Let's fake that we execute bgr job the second day.
+            kudosLogs.Add(new KudosLog { Id = 2, EmployeeId = "user1", Created = DateTime.UtcNow.AddMinutes(-5), KudosTypeName = "Loyalty", OrganizationId = 2, Status = KudosStatus.Approved, Points = 40, Employee = user1 });
+            kudosLogs.Add(new KudosLog { Id = 2, EmployeeId = "user2", Created = DateTime.UtcNow.AddMinutes(-5), KudosTypeName = "Loyalty", OrganizationId = 2, Status = KudosStatus.Approved, Points = 40, Employee = user2 });
+            _loyaltyKudosService.AwardEmployeesWithKudos("tenant2");
+
             _kudosLogsDbSet.Received(1).Add(Arg.Is<KudosLog>(x => x.EmployeeId == "user1"));
             _kudosLogsDbSet.Received(1).Add(Arg.Is<KudosLog>(x => x.EmployeeId == "user2"));
+            _kudosLogsDbSet.Received(2).Add(Arg.Any<KudosLog>());
+        }
+
+        [Test]
+        public void Should_Award_Employee_With_Loyalty_Kudos_OnlyAfter2And3Years()
+        {
+            var user1 = new ApplicationUser { Id = "user1", OrganizationId = 2, EmploymentDate = DateTime.UtcNow.AddYears(-3).AddDays(-10) };
+            var user2 = new ApplicationUser { Id = "user2", OrganizationId = 2, EmploymentDate = DateTime.UtcNow.AddYears(-3).AddDays(-10) };
+            var user3 = new ApplicationUser { Id = "user3", OrganizationId = 2, EmploymentDate = DateTime.UtcNow.AddDays(-100) };
+
+            var employees = new List<ApplicationUser>
+            {
+                user1, user2, user3
+            };
+
+            var organizations = new List<Organization>
+            {
+                new Organization { Id = 2, ShortName = "tenant2", KudosYearlyMultipliers = "0;2;4" }
+            };
+
+            var kudosLogs = new List<KudosLog>
+            {
+                new KudosLog { Id = 1, EmployeeId = "user1", Created = DateTime.UtcNow.AddYears(-2), KudosTypeName = "Loyalty", OrganizationId = 2, Status = KudosStatus.Approved, Points = 20, Employee = user1 },
+                new KudosLog { Id = 1, EmployeeId = "user1", Created = DateTime.UtcNow.AddYears(-1), KudosTypeName = "Other", OrganizationId = 2, Status = KudosStatus.Approved, Points = 20, Employee = user1 }
+            };
+
+            var loyaltyKudosType = new KudosType { Id = 1, Value = 1, Name = "Loyalty" };
+
+            _usersDbSet.SetDbSetData(employees.AsQueryable());
+            _kudosLogsDbSet.SetDbSetData(kudosLogs.AsQueryable());
+            _kudosTypeDbSet.SetDbSetData(new[] { loyaltyKudosType }.AsQueryable());
+            _organizationsDbSet.SetDbSetData(organizations.AsQueryable());
+
+            _loyaltyKudosService.AwardEmployeesWithKudos("tenant2");
+
+            // Let's fake that we execute bgr job the second day.
+            kudosLogs.Add(new KudosLog { Id = 2, EmployeeId = "user1", Created = DateTime.UtcNow.AddMinutes(-5), KudosTypeName = "Loyalty", OrganizationId = 2, Status = KudosStatus.Approved, Points = 40, Employee = user1 });
+            kudosLogs.Add(new KudosLog { Id = 2, EmployeeId = "user2", Created = DateTime.UtcNow.AddMinutes(-5), KudosTypeName = "Loyalty", OrganizationId = 2, Status = KudosStatus.Approved, Points = 40, Employee = user2 });
+            _loyaltyKudosService.AwardEmployeesWithKudos("tenant2");
+
+            _kudosLogsDbSet.Received(2).Add(Arg.Is<KudosLog>(x => x.EmployeeId == "user1"));
+            _kudosLogsDbSet.Received(3).Add(Arg.Is<KudosLog>(x => x.EmployeeId == "user2"));
+            _kudosLogsDbSet.Received(5).Add(Arg.Any<KudosLog>());
         }
 
         [Test]
         public void Should_Map_Retrieved_Users_KudosLogs_Organization_And_KudosType_Correctly()
         {
+            var user1 = new ApplicationUser { Id = "user1", OrganizationId = 2, EmploymentDate = DateTime.UtcNow.AddYears(-2).AddDays(-2) };
+            var user2 = new ApplicationUser { Id = "user2", OrganizationId = 2, EmploymentDate = DateTime.UtcNow.AddYears(-2).AddDays(-2) };
+            var user3 = new ApplicationUser { Id = "user3", OrganizationId = 2, EmploymentDate = DateTime.UtcNow.AddDays(-100) };
+            var user4 = new ApplicationUser { Id = "user4", OrganizationId = 1, EmploymentDate = null };
+
             var employees = new List<ApplicationUser>
             {
-                new ApplicationUser { Id = "user1", OrganizationId = 2, EmploymentDate = DateTime.UtcNow.AddYears(-2).AddDays(-2) },
-                new ApplicationUser { Id = "user2", OrganizationId = 2, EmploymentDate = DateTime.UtcNow.AddYears(-2).AddDays(-2) },
-                new ApplicationUser { Id = "user3", OrganizationId = 2, EmploymentDate = DateTime.UtcNow.AddDays(-100) },
-                new ApplicationUser { Id = "user4", OrganizationId = 1, EmploymentDate = null }
+                user1, user2, user3, user4
             };
 
             var organizations = new List<Organization>
@@ -483,10 +558,10 @@ namespace Shrooms.UnitTests.DomainService
 
             var kudosLogs = new List<KudosLog>
             {
-                new KudosLog { Id = 1, EmployeeId = "user2", KudosTypeName = "Loyalty", OrganizationId = 2, Status = KudosStatus.Approved },
-                new KudosLog { Id = 2, EmployeeId = "user2", KudosTypeName = "Loyalty", OrganizationId = 2, Status = KudosStatus.Approved },
-                new KudosLog { Id = 3, EmployeeId = "user1", KudosTypeName = "Loyalty", OrganizationId = 2, Status = KudosStatus.Approved },
-                new KudosLog { Id = 4, EmployeeId = "user4", KudosTypeName = "Loyalty", OrganizationId = 1, Status = KudosStatus.Approved }
+                new KudosLog { Id = 1, EmployeeId = "user2", KudosTypeName = "Loyalty", OrganizationId = 2, Status = KudosStatus.Approved, Employee = user2 },
+                new KudosLog { Id = 2, EmployeeId = "user2", KudosTypeName = "Loyalty", OrganizationId = 2, Status = KudosStatus.Approved, Employee = user2 },
+                new KudosLog { Id = 3, EmployeeId = "user1", KudosTypeName = "Loyalty", OrganizationId = 2, Status = KudosStatus.Approved, Employee = user1 },
+                new KudosLog { Id = 4, EmployeeId = "user4", KudosTypeName = "Loyalty", OrganizationId = 1, Status = KudosStatus.Approved, Employee = user4 }
             };
 
             var loyaltyKudosType = new KudosType { Id = 1, Value = 1, Name = "Loyalty" };
