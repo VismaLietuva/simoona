@@ -79,6 +79,16 @@ namespace Shrooms.Constants.BusinessLayer
 
         #endregion
 
+        #region Lotteries
+        public enum LotteryStatusEnum
+        {
+            Drafted = 1,
+            Started,
+            Aborted,
+            Ended
+        }
+        #endregion
+
         #region Organization
         public const int MaxOrganizationNameLength = 300;
         public const int MinOrganizationNameLength = 2;
