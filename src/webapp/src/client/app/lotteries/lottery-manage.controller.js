@@ -2,16 +2,24 @@
     'use strict';
 
     angular.module('simoonaApp.Lotteries')
+        .constant('lotteryStatuses', {
+            Drafted: 1,
+            Started: 2,
+            Aborted: 3,
+            Ended: 4
+        })
         .controller('lotteryManageController', lotteryManageController);
 
-    lotteryManageController.$inject = ['$scope', '$state', 'lotteryFactory', '$rootScope', 'notifySrv', '$q', 'localeSrv', 'errorHandler'
+    lotteryManageController.$inject = ['$scope', '$state', 'lotteryFactory', '$rootScope',
+    'notifySrv', '$q', 'localeSrv', 'errorHandler', 'lotteryStatuses'
     ];
 
-    function lotteryManageController($scope, $state, lotteryFactory, $rootScope, notifySrv, $q, localeSrv, errorHandler) {
+    function lotteryManageController($scope, $state, lotteryFactory, $rootScope, notifySrv, $q, localeSrv, errorHandler, lotteryStatuses) {
         
         var vm = this;
         vm.openDatePicker = openDatePicker;
         vm.startLottery = startLottery;
+        vm.createLottery = createLottery;
         vm.datePicker = {
             isOpen: false
         };
@@ -44,7 +52,16 @@
         }
 
         function startLottery() {
-            vm.lottery.status = 2;
+            vm.lottery.status = lotteryStatuses.Started;
+            lotteryFactory.create(vm.lottery)
+                .then(function() {
+                    notifySrv.success(localeSrv.formatTranslation('lotteries.hasStarted', { one: 'lotteries.entityNameSingular', two: vm.lottery.title }));
+                    $state.go('^.List');
+                })
+        }
+
+        function createLottery() {
+            vm.lottery.status = lotteryStatuses.Drafted;
             lotteryFactory.create(vm.lottery)
         }
 

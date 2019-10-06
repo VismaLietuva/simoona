@@ -1,5 +1,6 @@
 {
     "entityNamePlural": "Lotteries",
+    "entityNameSingular": "Lottery",
     "lotteriesPanelHeader": "Lotteries",
     "lotteryTitle": "Title",
     "status": "Status",
@@ -12,5 +13,6 @@
     "start": "Start",
     "save": "Save",
     "update": "Update",
-    "abort": "Abort"
+    "abort": "Abort",
+    "hasStarted": "{{ one }} \"{{ two }}\" was successfully started"
 }

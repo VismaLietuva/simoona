@@ -1,5 +1,6 @@
 {
     "entityNamePlural": "Loterijos",
+    "entityNameSingular": "Loterija",
     "lotteriesPanelHeader": "Loterijos",
     "lotteryTitle": "Pavadinimas",
     "status": "Statusas",
@@ -12,5 +13,6 @@
     "start": "Pradėti",
     "save": "Išsaugoti",
     "update": "Atnaujinti",
-    "abort": "Atšaukti"
+    "abort": "Atšaukti",
+    "hasStarted": "{{ one }} \"{{ two }}\" prasidejo"
 }
