@@ -3,5 +3,14 @@
     "lotteriesPanelHeader": "Lotteries",
     "lotteryTitle": "Title",
     "status": "Status",
-    "endDate": "End Data"
+    "endDate": "End Date",
+    "endTime": "End Time",
+    "editLottery": "Edit Lottery",
+    "createLottery": "Create Lottery",
+    "description": "Description",
+    "entryFee": "Entry Fee",
+    "start": "Start",
+    "save": "Save",
+    "update": "Update",
+    "abort": "Abort"
 }

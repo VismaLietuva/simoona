@@ -15,7 +15,8 @@
         var url = endPoint + '/Lottery/';
 
         var service = {
-            getAllLotteries: getAllLotteries
+            getAllLotteries: getAllLotteries,
+            create: create
         };
         return service;
 
@@ -23,6 +24,10 @@
 
         function getAllLotteries() {
             return $resource(url + 'All').query().$promise;
+        }
+
+        function create(lottery) {
+            return $resource(url + 'Create').save(lottery).$promise;
         }
     }
 })();
