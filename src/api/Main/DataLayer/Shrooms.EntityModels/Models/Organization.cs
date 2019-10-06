@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Shrooms.Constants.BusinessLayer;
 using Shrooms.EntityModels.Attributes;
 
@@ -42,5 +44,26 @@ namespace Shrooms.EntityModels.Models
 
         public string KudosYearlyMultipliers { get; set; }
 
+
+        [NotMapped]
+        public int[] KudosYearlyMultipliersArray
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(KudosYearlyMultipliers))
+                {
+                    return null;
+                }
+
+                try
+                {
+                    return Array.ConvertAll(KudosYearlyMultipliers.Split(';'), int.Parse);
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+        }
     }
 }
