@@ -3,6 +3,12 @@
 
     angular
         .module('simoonaApp.Lotteries')
+        .constant('lotteryStatuses', {
+            1: "Drafted",
+            2: "Started",
+            3: "Aborted",
+            4: "Ended"
+        })
         .controller('lotteryListController', lotteryListController);
 
     lotteryListController.$inject = [
@@ -10,12 +16,14 @@
         '$scope',
         'authService',
         '$location',
-        'lotteryFactory'
+        'lotteryFactory',
+        'lotteryStatuses'
     ];    
 
-    function lotteryListController($rootScope, $scope, authService, $location, lotteryFactory) {
+    function lotteryListController($rootScope, $scope, authService, $location, lotteryFactory, lotteryStatuses) {
     	/* jshint validthis: true */
         var vm = this;
+        vm.lotteryStatuses = lotteryStatuses;
         $rootScope.pageTitle = 'lotteries.lotteriesPanelHeader';
         $scope.allowEdit = authService.hasPermissions(['ROLES_ADMINISTRATION']);
 
