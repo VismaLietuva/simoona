@@ -63,6 +63,21 @@ namespace Shrooms.API.Controllers.Lotteries
             return pagedModel;
         }
 
+        [Route("Details")]
+        public IHttpActionResult GetLottery(int id)
+        {
+            var lotteryDTO = _lotteryService.GetLotteryDetails(id, GetUserAndOrganization());
+
+            if (lotteryDTO != null)
+            {
+                return Ok(lotteryDTO);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
         [HttpPost]
         [Route("Create")]
         public async Task<IHttpActionResult> CreateLottery(CreateLotteryViewModel lotteryViewModel)
@@ -95,7 +110,7 @@ namespace Shrooms.API.Controllers.Lotteries
                 _lotteryService.RemoveLottery(id, GetUserAndOrganization());
                 return Ok();
             }
-            catch(LotteryException e)
+            catch (LotteryException e)
             {
                 return BadRequest(e.Message);
             }
@@ -113,7 +128,7 @@ namespace Shrooms.API.Controllers.Lotteries
 
                 return Ok();
             }
-            catch(LotteryException e)
+            catch (LotteryException e)
             {
                 return BadRequest(e.Message);
             }

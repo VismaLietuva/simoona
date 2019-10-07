@@ -16,6 +16,7 @@ namespace Shrooms.ModelMappings.Profiles
         {
             CreateViewModelToDtoMappings();
             CreateDtoMappings();
+            CreateLotteryToLotteryDetailDTOMappings();
         }
         private void CreateViewModelToDtoMappings()
         {
@@ -40,6 +41,12 @@ namespace Shrooms.ModelMappings.Profiles
 
             CreateMap<EditDraftedLotteryDTO, Lottery>();
             CreateMap<Lottery, EditDraftedLotteryDTO>();
+        }
+
+        public void CreateLotteryToLotteryDetailDTOMappings()
+        {
+            CreateMap<Lottery, LotteryDetailsDTO>();
+            CreateMap<LotteryDetailsDTO, Lottery>();
         }
     }
 }

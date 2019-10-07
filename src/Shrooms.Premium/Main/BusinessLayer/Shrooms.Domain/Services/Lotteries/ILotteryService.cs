@@ -16,6 +16,6 @@ namespace Shrooms.Domain.Services.Lotteries
         void RemoveLottery(int id, UserAndOrganizationDTO userOrg);
         IEnumerable<LotteryDetailsDTO> GetLotteries(UserAndOrganizationDTO userOrganization);
         IEnumerable<LotteryDetailsDTO> GetFilteredLotteries(UserAndOrganizationDTO userOrganization, string filter);
-        LotteryDetailsDTO GetLotteryDetails(Guid id, UserAndOrganizationDTO userOrg);
+        EditDraftedLotteryDTO GetLotteryDetails(int id, UserAndOrganizationDTO userOrg);
     }
 }

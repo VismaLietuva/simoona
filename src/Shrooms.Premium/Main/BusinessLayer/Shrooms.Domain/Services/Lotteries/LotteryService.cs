@@ -67,9 +67,13 @@ namespace Shrooms.Domain.Services.Lotteries
 
         }
 
-        public LotteryDetailsDTO GetLotteryDetails(Guid id, UserAndOrganizationDTO userOrg)
+        public EditDraftedLotteryDTO GetLotteryDetails(int id, UserAndOrganizationDTO userOrg)
         {
-            throw new NotImplementedException();
+            var lottery = _lotteriesDbSet.Find(id);
+
+            var lotteryDetailsDTO = _mapper.Map<Lottery, EditDraftedLotteryDTO>(lottery);
+
+            return lotteryDetailsDTO;
         }
 
         public void RemoveLottery(int id, UserAndOrganizationDTO userOrg)
