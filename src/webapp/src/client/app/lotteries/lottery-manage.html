@@ -23,7 +23,8 @@
                                        name="title" 
                                        ng-model="vm.lottery.title" 
                                        ng-maxlength="30" 
-                                       required/>
+                                       required
+                                       ng-disabled="vm.states.isEdit && vm.isStarted"/>
                                 <p class="text-danger help-block" 
                                    ng-if="lotteryForm.title.$error.required && lotteryForm.title.$dirty" 
                                    translate="common.messageFieldIsRequired"></p>
@@ -52,7 +53,8 @@
                                        ng-maxlength="10"
                                        translate
                                        translate-attr-placeholder="common.onlyWholeNumbers"
-                                       required/>
+                                       required
+                                       ng-disabled="vm.states.isEdit && vm.isStarted"/>
 
                                 <p class="text-danger help-block" 
                                    ng-show="lotteryForm.entryFee.$invalid && lotteryForm.entryFee.$dirty || lotteryForm.entryFee.$error.pattern">
@@ -80,7 +82,8 @@
                                            ng-model="vm.lottery.endDate"
                                            is-open="vm.datePicker.isOpen" 
                                            ng-required="true" 
-                                           ng-click="vm.openDatePicker($event, 'isOpen')" />
+                                           ng-click="vm.openDatePicker($event, 'isOpen')"
+                                           ng-disabled="vm.states.isEdit && vm.isStarted"/>
                                 </div>
                                 <p class="text-danger help-block" ng-if="lotteryForm.endDateInput.$invalid && lotteryForm.endDateInput.$dirty" translate="common.messageFieldIsRequired"></p>
                             </div>
@@ -94,7 +97,8 @@
                                     ng-model="vm.lottery.endDate"
                                     hour-step="1" minute-step="1"
                                     show-meridian="false"
-                                    data-test-id="end-time-input">
+                                    data-test-id="end-time-input"
+                                    ng-disabled="vm.states.isEdit && vm.isStarted">
                                 </div>
                                  <p class="text-danger help-block" ng-if="lotteryForm.endDateInput.$invalid && lotteryForm.endDateInput.$dirty" translate="common.messageFieldIsRequired"></p>
                             </div>

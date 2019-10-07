@@ -31,7 +31,10 @@
 
         if (vm.states.isEdit) {
             vm.lottery = lottery;
+            vm.isDrafted = vm.lottery.status === lotteryStatus.Drafted;
+            vm.isStarted = vm.lottery.status === lotteryStatus.Started;
             setTitleScope(true, false, 'role.editRole');
+
         } else if (vm.states.isCreate) {
             setTitleScope(false, true, 'role.createRole');
         }
