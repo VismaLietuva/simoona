@@ -14,5 +14,6 @@
     "save": "Išsaugoti",
     "update": "Atnaujinti",
     "abort": "Atšaukti",
-    "hasStarted": "{{ one }} \"{{ two }}\" prasidejo"
+    "hasStarted": "{{ one }} \"{{ two }}\" prasidejo!",
+    "hasBeenSaved": "{{ one }} \"{{ two }}\" išsaugota!"
 }

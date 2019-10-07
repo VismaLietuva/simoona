@@ -14,5 +14,7 @@
     "save": "Save",
     "update": "Update",
     "abort": "Abort",
-    "hasStarted": "{{ one }} \"{{ two }}\" was successfully started"
+    "hasStarted": "{{ one }} \"{{ two }}\" was successfully started!",
+    "hasBeenSaved": "{{ one }} \"{{ two }}\" was successfully saved!"
+
 }
