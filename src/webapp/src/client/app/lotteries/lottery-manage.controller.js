@@ -69,18 +69,22 @@
         function createLottery() {
             vm.lottery.status = lotteryStatus.Drafted;
             lotteryFactory.create(vm.lottery)
-                .then(function() {
-                    notifySrv.success(localeSrv.formatTranslation('lotteries.hasBeenSaved', { one: 'lotteries.entityNameSingular', two: vm.lottery.title }));
-                    $state.go('^.List');
-                })
+                .then(updateSucess())
         }
 
         function updateLottery() {
             if (vm.isDrafted) {
                 lotteryFactory.updateDrafted(vm.lottery)
+                    .then(updateSucess())
             } else if (vm.isStarted) {
-                lotteryFactory.updateStarted({ description: vm.lottery.description })
+                lotteryFactory.updateStarted({ description: vm.lottery.description, id: vm.lottery.id })
+                    .then(updateSucess())
             }
+        }
+
+        function updateSucess() {
+            notifySrv.success(localeSrv.formatTranslation('lotteries.hasBeenSaved', { one: 'lotteries.entityNameSingular', two: vm.lottery.title }));
+            $state.go('^.List');
         }
 
     };
