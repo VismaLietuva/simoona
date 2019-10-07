@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
+using PagedList;
 using Shrooms.API.Controllers;
 using Shrooms.API.Filters;
 using Shrooms.Constants.Authorization.Permissions;
+using Shrooms.Constants.WebApi;
 using Shrooms.DataTransferObjects.Models.Lotteries;
 using Shrooms.Domain.Services.Lotteries;
 using Shrooms.DomainExceptions.Exceptions.Lotteries;
+using Shrooms.WebViewModels.Models;
 using Shrooms.WebViewModels.Models.Lotteries;
 using System;
 using System.Collections.Generic;
@@ -21,11 +24,13 @@ namespace Shrooms.API.Controllers.Lotteries
     {
         private readonly IMapper _mapper;
         private readonly ILotteryService _lotteryService;
+
         public LotteryController(IMapper mapper, ILotteryService lotteryService)
         {
             _mapper = mapper;
             _lotteryService = lotteryService;
         }
+
         [Route("All")]
         public IHttpActionResult GetAllLotteries()
         {
@@ -35,6 +40,29 @@ namespace Shrooms.API.Controllers.Lotteries
 
             return Ok(result);
         }
+
+        [HttpGet]
+        [Route("GetPaged")]
+        [PermissionAuthorize(Permission = AdministrationPermissions.Lottery)]
+        public PagedViewModel<LotteryDetailsViewModel> GetPaged(string filter = "", int page = 1, int pageSize = ConstWebApi.DefaultPageSize)
+        {
+            var lotteriesDTO = _lotteryService.GetFilteredLotteries(GetUserAndOrganization(), filter);
+
+            var result = _mapper.Map<IEnumerable<LotteryDetailsDTO>, IEnumerable<LotteryDetailsViewModel>>(lotteriesDTO);
+
+            var pagedLotteries = result.ToPagedList(page, pageSize);
+
+            var pagedModel = new PagedViewModel<LotteryDetailsViewModel>
+            {
+                PagedList = pagedLotteries,
+                PageCount = pagedLotteries.PageCount,
+                ItemCount = pagedLotteries.TotalItemCount,
+                PageSize = pageSize
+            };
+
+            return pagedModel;
+        }
+
         [HttpPost]
         [Route("Create")]
         public async Task<IHttpActionResult> CreateLottery(CreateLotteryViewModel lotteryViewModel)
@@ -57,6 +85,7 @@ namespace Shrooms.API.Controllers.Lotteries
 
             return Ok();
         }
+
         [HttpDelete]
         [Route("Delete")]
         public IHttpActionResult Delete(int id)
@@ -71,6 +100,7 @@ namespace Shrooms.API.Controllers.Lotteries
                 return BadRequest(e.Message);
             }
         }
+
         [HttpPut]
         [Route("UpdateDrafted")]
         public IHttpActionResult UpdateDrafted(EditDraftedLotteryViewModel editLotteryViewModel)
@@ -88,6 +118,7 @@ namespace Shrooms.API.Controllers.Lotteries
                 return BadRequest(e.Message);
             }
         }
+
         [HttpPatch]
         [Route("UpdateStarted")]
         public IHttpActionResult UpdateStarted(EditStartedLotteryViewModel editLotteryViewModel)
