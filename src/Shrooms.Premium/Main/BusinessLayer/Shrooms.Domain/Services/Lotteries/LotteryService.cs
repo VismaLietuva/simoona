@@ -46,7 +46,7 @@ namespace Shrooms.Domain.Services.Lotteries
         public void EditDraftedLottery(EditDraftedLotteryDTO lotteryDTO)
         {
             var lottery = _lotteriesDbSet.SingleOrDefault(p => p.Id == lotteryDTO.Id);
-            if (lottery.Status != (int)LotteryStatusEnum.Drafted)
+            if (lottery.Status != (int)LotteryStatus.Drafted)
             {
                 // exception (can only edit drafted lottery)
             }
@@ -58,7 +58,7 @@ namespace Shrooms.Domain.Services.Lotteries
         {
             var lottery = _lotteriesDbSet.SingleOrDefault(p => p.Id == lotteryDTO.Id);
 
-            if (lottery.Status != (int)LotteryStatusEnum.Started)
+            if (lottery.Status != (int)LotteryStatus.Started)
             {
                 // exception (Lottery has started or ended)
             }
@@ -67,11 +67,15 @@ namespace Shrooms.Domain.Services.Lotteries
 
         }
 
-        public EditDraftedLotteryDTO GetLotteryDetails(int id, UserAndOrganizationDTO userOrg)
+        public LotteryDetailsDTO GetLotteryDetails(int id, UserAndOrganizationDTO userOrg)
         {
             var lottery = _lotteriesDbSet.Find(id);
-
-            var lotteryDetailsDTO = _mapper.Map<Lottery, EditDraftedLotteryDTO>(lottery);
+            if(lottery == null)
+            {
+                // exception (Lottery not found)
+            }
+ 
+            var lotteryDetailsDTO = _mapper.Map<Lottery, LotteryDetailsDTO>(lottery);
 
             return lotteryDetailsDTO;
         }
@@ -79,10 +83,10 @@ namespace Shrooms.Domain.Services.Lotteries
         public void RemoveLottery(int id, UserAndOrganizationDTO userOrg)
         {
             var lottery = _lotteriesDbSet.SingleOrDefault(p => p.Id == id && p.OrganizationId == userOrg.OrganizationId);
-            lottery.Status = (int)LotteryStatusEnum.Aborted;
+            lottery.Status = (int)LotteryStatus.Aborted;
 
 
-            //   _lotteriesDbSet.Remove(@lottery);
+            //   _lotteriesDbSet.Remove(lottery);
 
             _uow.SaveChanges();
 
@@ -115,7 +119,6 @@ namespace Shrooms.Domain.Services.Lotteries
 
             newLottery.Created = newLotteryDTO.StartDate;
             newLottery.CreatedBy = newLotteryDTO.UserId;
-            newLottery.Images = new ImagesCollection { "Images" };
             newLottery.Modified = DateTime.UtcNow;
             newLottery.ModifiedBy = newLotteryDTO.UserId;
 

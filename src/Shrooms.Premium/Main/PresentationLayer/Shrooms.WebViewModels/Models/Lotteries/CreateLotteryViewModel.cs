@@ -1,4 +1,5 @@
 ﻿using Shrooms.Constants.WebApi;
+using Shrooms.EntityModels.Models.Lotteries;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -22,5 +23,6 @@ namespace Shrooms.WebViewModels.Models.Lotteries
         public int Status { get; set; }
         [Required]
         public int EntryFee { get; set; }
+        public ImagesCollection Images { get; set; }
     }
 }

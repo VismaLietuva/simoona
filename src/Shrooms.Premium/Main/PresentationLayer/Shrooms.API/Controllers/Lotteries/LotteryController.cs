@@ -63,19 +63,25 @@ namespace Shrooms.API.Controllers.Lotteries
             return pagedModel;
         }
 
+        [HttpGet]
         [Route("Details")]
         public IHttpActionResult GetLottery(int id)
         {
-            var lotteryDTO = _lotteryService.GetLotteryDetails(id, GetUserAndOrganization());
+            try
+            {
+                var lotteryDTO = _lotteryService.GetLotteryDetails(id, GetUserAndOrganization());
 
-            if (lotteryDTO != null)
-            {
-                return Ok(lotteryDTO);
+                var lotteryViewModel = _mapper.Map<LotteryDetailsDTO, LotteryDetailsViewModel>(lotteryDTO);
+
+                return Ok(lotteryViewModel);
+
             }
-            else
+            catch (LotteryException e)
             {
-                return NotFound();
+                return BadRequest(e.Message);
             }
+
+           
         }
 
         [HttpPost]
