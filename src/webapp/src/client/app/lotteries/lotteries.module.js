@@ -44,18 +44,31 @@
                 templateUrl: 'app/lotteries/lottery-manage.html',
                 controller: 'lotteryManageController',
                 controllerAs: 'vm',
+                resolve: {
+                    lottery: function () {
+                        return {};
+                    }
+                },
                 data: {
-                    authorizeRole: 'Admin',
-                    authorizeOneOfPermissions: [
-                        'EVENT_ADMINISTRATION',
-                        'SERVICEREQUESTS_ADMINISTRATION',
-                        'ORGANIZATION_ADMINISTRATION',
-                        'JOB_ADMINISTRATION',
-                        'KUDOSSHOP_ADMINISTRATION',
-                        'KUDOS_ADMINISTRATION',
-                        'EXTERNALLINK_ADMINISTRATION'
-                    ]
+                    authorizeRole: 'Admin'
                 }
-            });
+            })
+            .state('Root.WithOrg.Admin.Lotteries.Edit', {
+                abstract: false,
+                url: '/:lotteryId/Edit',
+                templateUrl: 'app/lotteries/lottery-manage.html',
+                controller: 'lotteryManageController',
+                controllerAs: 'vm',
+                resolve: {
+                    lottery: [
+                        '$stateParams', 'lotteryFactory', function ($stateParams, lotteryFactory) {
+                            return lotteryFactory.getLottery($stateParams.lotteryId);
+                        },
+                    ]
+                },
+                data: {
+                    authorizeRole: 'Admin'
+                }
+            })
     }
 })();

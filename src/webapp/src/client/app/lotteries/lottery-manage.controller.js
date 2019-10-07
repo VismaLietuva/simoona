@@ -11,10 +11,10 @@
         .controller('lotteryManageController', lotteryManageController);
 
     lotteryManageController.$inject = ['$scope', '$state', 'lotteryFactory', '$rootScope',
-    'notifySrv', '$q', 'localeSrv', 'errorHandler', 'lotteryStatus'
+    'notifySrv', '$q', 'localeSrv', 'errorHandler', 'lotteryStatus', 'lottery'
     ];
 
-    function lotteryManageController($scope, $state, lotteryFactory, $rootScope, notifySrv, $q, localeSrv, errorHandler, lotteryStatus) {
+    function lotteryManageController($scope, $state, lotteryFactory, $rootScope, notifySrv, $q, localeSrv, errorHandler, lotteryStatus, lottery) {
         
         var vm = this;
         vm.openDatePicker = openDatePicker;
@@ -30,6 +30,7 @@
         };
 
         if (vm.states.isEdit) {
+            vm.lottery = lottery;
             setTitleScope(true, false, 'role.editRole');
         } else if (vm.states.isCreate) {
             setTitleScope(false, true, 'role.createRole');
