@@ -80,7 +80,7 @@ namespace Shrooms.Constants.BusinessLayer
         #endregion
 
         #region Lotteries
-        public enum LotteryStatusEnum
+        public enum LotteryStatus
         {
             Drafted = 1,
             Started,
