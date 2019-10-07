@@ -20,6 +20,7 @@
         vm.openDatePicker = openDatePicker;
         vm.startLottery = startLottery;
         vm.createLottery = createLottery;
+        vm.updateLottery = updateLottery;
         vm.datePicker = {
             isOpen: false
         };
@@ -31,6 +32,7 @@
 
         if (vm.states.isEdit) {
             vm.lottery = lottery;
+            vm.lottery.endDate = moment.utc(vm.lottery.endDate).local().startOf('minute').toDate();
             vm.isDrafted = vm.lottery.status === lotteryStatus.Drafted;
             vm.isStarted = vm.lottery.status === lotteryStatus.Started;
             setTitleScope(true, false, 'role.editRole');
@@ -71,6 +73,14 @@
                     notifySrv.success(localeSrv.formatTranslation('lotteries.hasBeenSaved', { one: 'lotteries.entityNameSingular', two: vm.lottery.title }));
                     $state.go('^.List');
                 })
+        }
+
+        function updateLottery() {
+            if (vm.isDrafted) {
+                lotteryFactory.updateDrafted(vm.lottery)
+            } else if (vm.isStarted) {
+                lotteryFactory.updateStarted({ description: vm.lottery.description })
+            }
         }
 
     };

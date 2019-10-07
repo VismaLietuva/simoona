@@ -17,7 +17,9 @@
         var service = {
             getAllLotteries: getAllLotteries,
             getLottery: getLottery,
-            create: create
+            create: create,
+            updateDrafted: updateDrafted,
+            updateStarted: updateStarted
         };
         return service;
 
@@ -34,5 +36,21 @@
         function create(lottery) {
             return $resource(url + 'Create').save(lottery).$promise;
         }
+
+        function updateDrafted(lottery) {
+            return $resource(url + 'UpdateDrafted', '', {
+                put: {
+                    method: 'PUT'
+                }
+                }).put(lottery).$promise;
+        }
+
+        function updateStarted(lottery) {
+            return $resource(url + 'UpdateStarted', '', {
+                patch: {
+                    method: 'PATCH'
+                }
+            }).patch(lottery).$promise;
+        } 
     }
 })();
