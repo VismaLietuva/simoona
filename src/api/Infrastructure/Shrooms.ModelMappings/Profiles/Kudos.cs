@@ -30,7 +30,7 @@ namespace Shrooms.ModelMappings.Profiles
             CreateMap<KudosRejectViewModel, KudosRejectDTO>();
             CreateMap<KudosBasicDataViewModel, KudosBasicDataDTO>();
             CreateMap<NewKudosTypeViewModel, NewKudosTypeDto>();
-            CreateMap<KudosTypeViewModel, KudosTypeDTO>();        
+            CreateMap<KudosTypeViewModel, KudosTypeDTO>();
         }
     }
 }
