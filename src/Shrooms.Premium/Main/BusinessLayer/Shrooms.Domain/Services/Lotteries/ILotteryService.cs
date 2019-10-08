@@ -1,4 +1,6 @@
-﻿using Shrooms.DataTransferObjects.Models;
+﻿using PagedList;
+using Shrooms.Constants.WebApi;
+using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Lotteries;
 using System;
 using System.Collections.Generic;
@@ -15,7 +17,8 @@ namespace Shrooms.Domain.Services.Lotteries
         void EditStartedLottery(EditStartedLotteryDTO lotteryDTO);
         void RemoveLottery(int id, UserAndOrganizationDTO userOrg);
         IEnumerable<LotteryDetailsDTO> GetLotteries(UserAndOrganizationDTO userOrganization);
-        IEnumerable<LotteryDetailsDTO> GetFilteredLotteries(UserAndOrganizationDTO userOrganization, string filter);
+        IEnumerable<LotteryDetailsDTO> GetFilteredLotteries(string filter);
+        IPagedList<LotteryDetailsDTO> GetPagedLotteries(string filter, int page, int pageSize = ConstWebApi.DefaultPageSize);
         EditDraftedLotteryDTO GetLotteryDetails(int id, UserAndOrganizationDTO userOrg);
     }
 }

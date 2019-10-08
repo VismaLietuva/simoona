@@ -44,15 +44,11 @@ namespace Shrooms.API.Controllers.Lotteries
         [HttpGet]
         [Route("GetPaged")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Lottery)]
-        public PagedViewModel<LotteryDetailsViewModel> GetPaged(string filter = "", int page = 1, int pageSize = ConstWebApi.DefaultPageSize)
+        public PagedViewModel<LotteryDetailsDTO> GetPagedLotteries(string filter = "", int page = 1, int pageSize = ConstWebApi.DefaultPageSize)
         {
-            var lotteriesDTO = _lotteryService.GetFilteredLotteries(GetUserAndOrganization(), filter);
+            var pagedLotteries = _lotteryService.GetPagedLotteries(filter, page);
 
-            var result = _mapper.Map<IEnumerable<LotteryDetailsDTO>, IEnumerable<LotteryDetailsViewModel>>(lotteriesDTO);
-
-            var pagedLotteries = result.ToPagedList(page, pageSize);
-
-            var pagedModel = new PagedViewModel<LotteryDetailsViewModel>
+            var pagedModel = new PagedViewModel<LotteryDetailsDTO>
             {
                 PagedList = pagedLotteries,
                 PageCount = pagedLotteries.PageCount,

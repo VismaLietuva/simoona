@@ -6,6 +6,8 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using PagedList;
+using Shrooms.Constants.WebApi;
 using Shrooms.DataLayer;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
@@ -99,14 +101,21 @@ namespace Shrooms.Domain.Services.Lotteries
             return lotteries;
         }
 
-        public IEnumerable<LotteryDetailsDTO> GetFilteredLotteries(UserAndOrganizationDTO userOrganization, string filter)
+        public IEnumerable<LotteryDetailsDTO> GetFilteredLotteries(string filter)
         {
             var lotteries = _lotteriesDbSet
-                .Where(x => x.OrganizationId == userOrganization.OrganizationId && x.Title.Contains(filter))
+                .Where(x => x.Title.Contains(filter))
                 .Select(MapLotteriesToListItemDto())
-                .OrderBy(p => p.EndDate).ToList();
+                .OrderByDescending(x => x.EndDate)
+                .ToList();
 
             return lotteries;
+        }
+
+        public IPagedList<LotteryDetailsDTO> GetPagedLotteries(string filter, int page, int pageSize)
+        {
+            var filteredLotteries = GetFilteredLotteries(filter);
+            return filteredLotteries.ToPagedList(page, pageSize);
         }
 
         private Lottery MapNewLottery(CreateLotteryDTO newLotteryDTO)
