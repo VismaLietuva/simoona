@@ -141,6 +141,8 @@ namespace Shrooms.Domain.Services.Lotteries
                 Id = e.Id,
                 Title = e.Title,
                 Description = e.Description,
+                EntryFee = e.EntryFee,
+                Images = e.Images,
                 EndDate = e.EndDate,
                 Status = e.Status
             };
@@ -154,6 +156,16 @@ namespace Shrooms.Domain.Services.Lotteries
             lottery.Status = draftedLotteryDTO.Status;
             lottery.Title = draftedLotteryDTO.Title;
             lottery.Images = draftedLotteryDTO.Images;
+        }
+
+        public IEnumerable<LotteryDetailsDTO> GetRunningLotteries(UserAndOrganizationDTO userAndOrganization)
+        {
+            var lotteries = _lotteriesDbSet
+               .Where(p => p.OrganizationId == userAndOrganization.OrganizationId && p.Status == (int)LotteryStatus.Started)
+               .Select(MapLotteriesToListItemDto())
+               .OrderBy(p => p.EndDate).ToList();
+
+            return lotteries;
         }
     }
 }
