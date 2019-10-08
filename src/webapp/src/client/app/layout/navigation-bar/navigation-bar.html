@@ -194,6 +194,13 @@
                            translate="common.customizationLinkTitle">
                         </a>
                     </li>
+                    <li ng-class="{active: $state.includes('Root.WithOrg.Admin.Lotteries')}" 
+                        has-permissions="['APPLICATIONUSER_ADMINISTRATION']">
+                        <a ui-sref="Root.WithOrg.Admin.Lotteries.List" 
+                            translate-attr-title="lotteries.entityNamePlural" 
+                            translate="lotteries.entityNamePlural">
+                    </a>
+                    </li>
                 </ul>
             </li>
             <li class="icon"

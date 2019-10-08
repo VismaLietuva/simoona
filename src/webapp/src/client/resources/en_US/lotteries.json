@@ -1,0 +1,20 @@
+{
+    "entityNamePlural": "Lotteries",
+    "entityNameSingular": "Lottery",
+    "lotteriesPanelHeader": "Lotteries",
+    "lotteryTitle": "Title",
+    "status": "Status",
+    "endDate": "End Date",
+    "endTime": "End Time",
+    "editLottery": "Edit Lottery",
+    "createLottery": "Create Lottery",
+    "description": "Description",
+    "entryFee": "Entry Fee",
+    "start": "Start",
+    "save": "Save",
+    "update": "Update",
+    "abort": "Abort",
+    "hasStarted": "{{ one }} \"{{ two }}\" was successfully started!",
+    "hasBeenSaved": "{{ one }} \"{{ two }}\" was successfully saved!"
+
+}

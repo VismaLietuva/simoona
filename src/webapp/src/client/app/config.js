@@ -38,11 +38,12 @@
         'simoonaApp.Impersonate',
         'simoonaApp.Widget',
         'simoonaApp.Customization',
+        'simoonaApp.Lotteries',
         'simoonaApp.Settings'
     ];
 
     window.modules = modulesList;
-    window.isPremium = false; // Enable/disable premium modules
+    window.isPremium = true; // Enable/disable premium modules
     window.usingAnimatedGifs = false; // Used to determine if back-end uses AnimatedGifs plugin
     window.kudosSendImproved = false;
     window.usePostWatching = true; // Used to show/hide post watching feature

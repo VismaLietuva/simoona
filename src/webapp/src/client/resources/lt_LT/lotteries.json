@@ -1,0 +1,19 @@
+{
+    "entityNamePlural": "Loterijos",
+    "entityNameSingular": "Loterija",
+    "lotteriesPanelHeader": "Loterijos",
+    "lotteryTitle": "Pavadinimas",
+    "status": "Statusas",
+    "endDate": "Pabaigos data",
+    "endTime": "Pabaigos laikas",
+    "editLottery": "Redaguoti",
+    "createLottery": "Kurti",
+    "description": "Aprašymas",
+    "entryFee": "Bilieto kaina",
+    "start": "Pradėti",
+    "save": "Išsaugoti",
+    "update": "Atnaujinti",
+    "abort": "Atšaukti",
+    "hasStarted": "{{ one }} \"{{ two }}\" prasidejo!",
+    "hasBeenSaved": "{{ one }} \"{{ two }}\" išsaugota!"
+}
