@@ -8,23 +8,33 @@
             Aborted: 3,
             Ended: 4
         })
+        .constant('lotteryImageSettings', {
+            height: 165,
+            width: 291,
+        })
         .controller('lotteryManageController', lotteryManageController);
 
     lotteryManageController.$inject = ['$scope', '$state', 'lotteryFactory', '$rootScope',
-    'notifySrv', '$q', 'localeSrv', 'errorHandler', 'lotteryStatus', 'lottery'
+    'notifySrv', '$q', 'localeSrv', 'errorHandler', 'lotteryStatus', 'lottery', 'pictureRepository', 'dataHandler', 'lotteryImageSettings'
     ];
 
-    function lotteryManageController($scope, $state, lotteryFactory, $rootScope, notifySrv, $q, localeSrv, errorHandler, lotteryStatus, lottery) {
+    function lotteryManageController($scope, $state, lotteryFactory, $rootScope, notifySrv, $q, localeSrv, errorHandler, lotteryStatus, lottery, pictureRepository, dataHandler, lotteryImageSettings) {
         
         var vm = this;
         vm.openDatePicker = openDatePicker;
         vm.startLottery = startLottery;
         vm.createLottery = createLottery;
         vm.updateLottery = updateLottery;
+
+        vm.lotteryImageSize = {
+            w: lotteryImageSettings.width,
+            h: lotteryImageSettings.height
+        };
+
         vm.datePicker = {
             isOpen: false
         };
-
+        
         vm.states = {
             isCreate: $state.includes('Root.WithOrg.Admin.Lotteries.Create'),
             isEdit: $state.includes('Root.WithOrg.Admin.Lotteries.Edit')
@@ -58,24 +68,57 @@
         }
 
         function startLottery() {
-            vm.lottery.status = lotteryStatus.Started;
-            lotteryFactory.create(vm.lottery)
-                .then(function() {
-                    notifySrv.success(localeSrv.formatTranslation('lotteries.hasStarted', { one: 'lotteries.entityNameSingular', two: vm.lottery.title }));
-                    $state.go('^.List');
+            saveimage()
+                .then(result => {
+                    vm.lottery.status = lotteryStatus.Started;
+                    vm.lottery.images = [result.data];
+                    lotteryFactory.create(vm.lottery)
+                    .then(function() {
+                        notifySrv.success(localeSrv.formatTranslation('lotteries.hasStarted', { one: 'lotteries.entityNameSingular', two: vm.lottery.title }));
+                        $state.go('^.List');
+                    })
                 })
+
         }
 
         function createLottery() {
-            vm.lottery.status = lotteryStatus.Drafted;
-            lotteryFactory.create(vm.lottery)
-                .then(updateSucess())
+            saveimage()
+                .then(result => {
+                    vm.lottery.status = lotteryStatus.Drafted;
+                    vm.lottery.images = [result.data];
+                    lotteryFactory.create(vm.lottery)
+                        .then(updateSucess())
+                });
+
+
+        }
+
+        function saveimage() {
+            var lotteryImageBlob = dataHandler.dataURItoBlob(vm.lotteryCroppedImage, vm.lotteryImage.type);
+            lotteryImageBlob.lastModifiedDate = new Date();
+            lotteryImageBlob.name = vm.lotteryImage.name;
+            
+            return $q(function(resolve, reject) {
+                pictureRepository.upload([lotteryImageBlob]).then(function(result) {
+                    resolve(result);
+                });
+            })
+
         }
 
         function updateLottery() {
             if (vm.isDrafted) {
-                lotteryFactory.updateDrafted(vm.lottery)
+                if (vm.lotteryCroppedImage) {
+                    saveimage()
+                        .then(result => {
+                            vm.lottery.images = [result.data];
+                            lotteryFactory.updateDrafted(vm.lottery)
+                            .then(updateSucess())
+                        })
+                } else {
+                    lotteryFactory.updateDrafted(vm.lottery)
                     .then(updateSucess())
+                }
             } else if (vm.isStarted) {
                 lotteryFactory.updateStarted({ description: vm.lottery.description, id: vm.lottery.id })
                     .then(updateSucess())
