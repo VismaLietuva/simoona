@@ -72,11 +72,11 @@ namespace Shrooms.Domain.Services.Lotteries
         public LotteryDetailsDTO GetLotteryDetails(int id, UserAndOrganizationDTO userOrg)
         {
             var lottery = _lotteriesDbSet.Find(id);
-            if(lottery == null)
+            if (lottery == null)
             {
                 // exception (Lottery not found)
             }
- 
+
             var lotteryDetailsDTO = _mapper.Map<Lottery, LotteryDetailsDTO>(lottery);
 
             return lotteryDetailsDTO;
@@ -153,6 +153,7 @@ namespace Shrooms.Domain.Services.Lotteries
             lottery.Description = draftedLotteryDTO.Description;
             lottery.Status = draftedLotteryDTO.Status;
             lottery.Title = draftedLotteryDTO.Title;
+            lottery.Images = draftedLotteryDTO.Images;
         }
     }
 }
