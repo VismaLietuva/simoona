@@ -4,6 +4,9 @@ using System.Linq;
 using Shrooms.DataLayer.DAL;
 using Shrooms.EntityModels.Models.Lotteries;
 using Shrooms.DataTransferObjects.Models.Lotteries;
+using System.Linq.Expressions;
+using System;
+using Shrooms.EntityModels.Models;
 
 namespace Shrooms.Domain.Services.Lotteries
 {
@@ -23,17 +26,20 @@ namespace Shrooms.Domain.Services.Lotteries
             return _participantsDbSet.Where(x => x.LotteryId == lotteryId).Select(x => x.UserId);
         }
 
-        public IEnumerable<ParticipantDTO> GetParticipantsCounted(int lotteryId)
+        public IEnumerable<LotteryParticipantDTO> GetParticipantsCounted(int lotteryId)
         {
-            var participants = _participantsDbSet.Where(x => x.LotteryId == lotteryId)
-              .GroupBy(l => l.User)
-              .Select(g => new ParticipantDTO
-              {
-                  FullName = g.Key.FirstName + g.Key.LastName,
-                  Tickets = g.Distinct().Count()
-              });
+            return _participantsDbSet.Where(x => x.LotteryId == lotteryId)
+              .GroupBy(l => l.User).Select(MapToParticipantDto());
+        }
 
-            return participants;
+        private Expression<Func<IGrouping<ApplicationUser, LotteryParticipant>, LotteryParticipantDTO>> MapToParticipantDto()
+        {
+            return group => new LotteryParticipantDTO
+            {
+                UserId = group.Key.Id,
+                FullName = group.Key.FirstName + " " + group.Key.LastName,
+                Tickets = group.Distinct().Count()
+            };
         }
     }
 }
