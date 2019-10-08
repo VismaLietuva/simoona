@@ -37,6 +37,7 @@ namespace Shrooms.Domain.Services.Lotteries
                 // exception (cant create lottery in past)
             }
             var newLottery = MapNewLottery(newLotteryDTO);
+            newLottery.Status = (int)LotteryStatus.Started;
             _lotteriesDbSet.Add(newLottery);
             await _uow.SaveChangesAsync(newLotteryDTO.UserId);
 
@@ -126,7 +127,6 @@ namespace Shrooms.Domain.Services.Lotteries
         {
             var newLottery = _mapper.Map<CreateLotteryDTO, Lottery>(newLotteryDTO);
 
-            newLottery.Created = newLotteryDTO.StartDate;
             newLottery.CreatedBy = newLotteryDTO.UserId;
             newLottery.Modified = DateTime.UtcNow;
             newLottery.ModifiedBy = newLotteryDTO.UserId;
