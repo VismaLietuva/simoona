@@ -274,6 +274,7 @@
     <Compile Include="Infrastructure\Shrooms.IoC\Modules\CommitteeModule.cs" />
     <Compile Include="Infrastructure\Shrooms.IoC\Modules\EventsModule.cs" />
     <Compile Include="Infrastructure\Shrooms.IoC\Modules\LotteryModule.cs" />
+    <Compile Include="Infrastructure\Shrooms.IoC\Modules\LotteryParticipantModule.cs" />
     <Compile Include="Infrastructure\Shrooms.IoC\Modules\OfficeMapModule.cs" />
     <Compile Include="Infrastructure\Shrooms.IoC\Modules\OrganizationalStructureModule.cs" />
     <Compile Include="Infrastructure\Shrooms.IoC\Modules\ServiceModule.cs" />
@@ -331,6 +332,7 @@
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Lotteries\EditDraftedLotteryDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Lotteries\EditStartedLotteryDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Lotteries\LotteryDetailsDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Lotteries\ParticipantDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\OfficeMap\OfficeDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\OfficeMap\OfficeRoomDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\OfficeMap\OfficeUserDTO.cs" />
@@ -379,7 +381,9 @@
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\KudosShop\IKudosShopService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\KudosShop\KudosShopService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Lotteries\ILotteryService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Lotteries\IParticipantService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Lotteries\LotteryService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Lotteries\ParticipantService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Notifications\INotificationService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Notifications\NotificationService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\OfficeMap\IOfficeMapService.cs" />
@@ -411,6 +415,7 @@
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\EventTypeController.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\ExternalPremiumJobsController.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\Lotteries\LotteryController.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\Lotteries\LotteryParticipantController.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\MapController.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\OrganizationalStructureController.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\Kudos\KudosShopController.cs" />
