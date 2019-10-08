@@ -25,6 +25,7 @@
         vm.startLottery = startLottery;
         vm.createLottery = createLottery;
         vm.updateLottery = updateLottery;
+        vm.revokeLottery = revokeLottery;
 
         vm.lotteryImageSize = {
             w: lotteryImageSettings.width,
@@ -45,10 +46,10 @@
             vm.lottery.endDate = moment.utc(vm.lottery.endDate).local().startOf('minute').toDate();
             vm.isDrafted = vm.lottery.status === lotteryStatus.Drafted;
             vm.isStarted = vm.lottery.status === lotteryStatus.Started;
-            setTitleScope(true, false, 'role.editRole');
+            setTitleScope(true, false, 'lotteries.editLottery');
 
         } else if (vm.states.isCreate) {
-            setTitleScope(false, true, 'role.createRole');
+            setTitleScope(false, true, 'lotteries.createLottery');
         }
 
         function setTitleScope(titleEdit, titleCreate, pageTitle) {
@@ -123,6 +124,14 @@
                 lotteryFactory.updateStarted({ description: vm.lottery.description, id: vm.lottery.id })
                     .then(updateSucess())
             }
+        }
+
+        function revokeLottery(id) {
+            lotteryFactory.revokeLottery(id).then(function(result) {
+                notifySrv.success('lotteries.successDelete');
+
+                $state.go('Root.WithOrg.Admin.Lotteries.List');
+            }, errorHandler.handleErrorMessage);
         }
 
         function updateSucess() {

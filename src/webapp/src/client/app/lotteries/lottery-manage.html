@@ -167,14 +167,14 @@
     
                         </div>
     
-                        <!--abort button left -->
+                        <!--revoke button left -->
                         <div class="pull-left">
                             
                             <div class="pull-left">
                                 <button ng-if="vm.states.isEdit"
                                         class="btn btn-danger"
-                                        ace-confirmation-modal="vm.abortLottery()">
-                                    <span translate="lotteries.abort"></span>
+                                        ace-confirmation-modal="vm.revokeLottery(vm.lottery.id)">
+                                    <span translate="lotteries.revoke"></span>
                                 </button>
                             </div>
     

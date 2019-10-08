@@ -19,7 +19,8 @@
             getLottery: getLottery,
             create: create,
             updateDrafted: updateDrafted,
-            updateStarted: updateStarted
+            updateStarted: updateStarted,
+            revokeLottery: revokeLottery
         };
         return service;
 
@@ -51,6 +52,10 @@
                     method: 'PATCH'
                 }
             }).patch(lottery).$promise;
-        } 
+        }
+
+        function revokeLottery(id) {
+            return $resource(url + 'Delete').delete({id}).$promise;
+        }
     }
 })();

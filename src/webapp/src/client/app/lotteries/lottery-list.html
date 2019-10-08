@@ -33,8 +33,8 @@
                         <td>
                             {{lottery.endDate}}
                         </td>  
-                        <td ng-if="allowEdit" class="text-center">
-                            <a ui-sref="Root.WithOrg.Admin.Lotteries.Edit({ lotteryId : lottery.id})" class="btn btn-default glyphicon glyphicon-pencil" title="{{'common.edit' | translate}}"></a>
+                        <td ng-if="allowEdit " class="text-center">
+                            <a ng-if="lottery.status !== 3" ui-sref="Root.WithOrg.Admin.Lotteries.Edit({ lotteryId : lottery.id})" class="btn btn-default glyphicon glyphicon-pencil" title="{{'common.edit' | translate}}"></a>
                         </td>
                     </tr>
                 </tbody>
