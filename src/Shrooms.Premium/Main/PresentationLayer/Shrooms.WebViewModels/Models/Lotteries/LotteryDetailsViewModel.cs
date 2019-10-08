@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Shrooms.EntityModels.Models.Lotteries;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,8 @@ namespace Shrooms.WebViewModels.Models.Lotteries
         public string Title { get; set; }
         public string Description { get; set; }
         public DateTime EndDate { get; set; }
+        public int EntryFee { get; set; }
         public int Status { get; set; }
+        public ImagesCollection Images { get; set; }
     }
 }

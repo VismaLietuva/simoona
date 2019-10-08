@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Shrooms.EntityModels.Models.Lotteries;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,5 +16,6 @@ namespace Shrooms.DataTransferObjects.Models.Lotteries
         public DateTime EndDate { get; set; }
         public DateTime StartDate { get; set; }
         public int EntryFee { get; set; }
+        public ImagesCollection Images { get; set; }
     }
 }
