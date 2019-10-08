@@ -12,6 +12,7 @@ using Shrooms.DataLayer;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Lotteries;
+using Shrooms.DomainExceptions.Exceptions.Lotteries;
 using Shrooms.EntityModels.Models.Lotteries;
 using static Shrooms.Constants.BusinessLayer.ConstBusinessLayer;
 
@@ -34,7 +35,7 @@ namespace Shrooms.Domain.Services.Lotteries
         {
             if (newLotteryDTO.EndDate < DateTime.UtcNow)
             {
-                // exception (cant create lottery in past)
+                throw new LotteryException("Lottery cant start in the past");
             }
             var newLottery = MapNewLottery(newLotteryDTO);
             newLottery.Status = (int)LotteryStatus.Started;
@@ -51,7 +52,7 @@ namespace Shrooms.Domain.Services.Lotteries
             var lottery = _lotteriesDbSet.SingleOrDefault(p => p.Id == lotteryDTO.Id);
             if (lottery.Status != (int)LotteryStatus.Drafted)
             {
-                // exception (can only edit drafted lottery)
+                throw new LotteryException("Lottery has started or ended");
             }
             UpdateDraftedLottery(lottery, lotteryDTO);
             _uow.SaveChanges(false);
@@ -63,7 +64,7 @@ namespace Shrooms.Domain.Services.Lotteries
 
             if (lottery.Status != (int)LotteryStatus.Started)
             {
-                // exception (Lottery has started or ended)
+                throw new LotteryException("Lottery is not running");
             }
             lottery.Description = lotteryDTO.Description;
             _uow.SaveChanges();
@@ -75,7 +76,7 @@ namespace Shrooms.Domain.Services.Lotteries
             var lottery = _lotteriesDbSet.Find(id);
             if (lottery == null)
             {
-                // exception (Lottery not found)
+                throw new LotteryException("Lottery not found");
             }
 
             var lotteryDetailsDTO = _mapper.Map<Lottery, LotteryDetailsDTO>(lottery);
@@ -86,14 +87,13 @@ namespace Shrooms.Domain.Services.Lotteries
         public void RemoveLottery(int id, UserAndOrganizationDTO userOrg)
         {
             var lottery = _lotteriesDbSet.SingleOrDefault(p => p.Id == id && p.OrganizationId == userOrg.OrganizationId);
+            if (lottery == null)
+            {
+                throw new LotteryException("Lottery not found");
+            }
+
             lottery.Status = (int)LotteryStatus.Aborted;
-
-
-            //   _lotteriesDbSet.Remove(lottery);
-
             _uow.SaveChanges();
-
-
         }
 
         public IEnumerable<LotteryDetailsDTO> GetLotteries(UserAndOrganizationDTO userOrganization)
