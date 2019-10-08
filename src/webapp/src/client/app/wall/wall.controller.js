@@ -18,9 +18,19 @@
 
         //init
         vm.widgetsInfo = {};
+        vm.lotteryWidgetInfo = {};
+
         wallRepository.getWidgetsInfo()
             .then(function(widgetsInfo) { 
                 vm.widgetsInfo = widgetsInfo;
-            });
+            }); 
+            
+        if(window.isPremium)
+        {
+            wallRepository.getLotteryWidgetInfo()
+            .then(function(widgetInfo){
+                vm.lotteryWidgetInfo = widgetInfo;
+            })
+        }
     }
 }());
