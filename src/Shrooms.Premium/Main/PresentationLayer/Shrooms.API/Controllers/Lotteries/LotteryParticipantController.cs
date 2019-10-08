@@ -1,5 +1,6 @@
 ﻿using Shrooms.API.Controllers;
 using Shrooms.DataLayer.DAL;
+using Shrooms.Domain.Services.Lotteries;
 using Shrooms.EntityModels.Models.Lotteries;
 using System;
 using System.Collections.Generic;
@@ -9,29 +10,24 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
 
-namespace Shrooms.Premium.Main.PresentationLayer.Shrooms.API.Controllers.Lotteries
+namespace Shrooms.API.Controllers.Lotteries
 {
     [Authorize]
     [RoutePrefix("Lottery")]
     public class LotteryParticipantController : BaseController
     {
-        public LotteryParticipantController()
+        private readonly IParticipantService _participantService;
+
+        public LotteryParticipantController(IParticipantService participantService)
         {
+            _participantService = participantService;
         }
 
-/*        [HttpGet]
-        [Route("test")]
-        public IHttpActionResult Test(int lotteryId)
+        [HttpGet]
+        [Route("{id}/Participants")]
+        public IHttpActionResult GetParticipants(int id)
         {
-            var par = _participantsDbSet.Where(x => x.LotteryId == lotteryId)
-              .GroupBy(l => l.UserId)
-              .Select(g => new
-              {
-                  UserId = g.Key,
-                  Count = g.Distinct().Count()
-              });
-
-            return Ok(par);
-        }*/
+            return Ok(_participantService.GetParticipantsCounted(id));
+        }
     }
 }
