@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Lotteries
+namespace Shrooms.DataTransferObjects.Models.Lotteries
 {
     public class BuyLotteryTicketDTO
     {

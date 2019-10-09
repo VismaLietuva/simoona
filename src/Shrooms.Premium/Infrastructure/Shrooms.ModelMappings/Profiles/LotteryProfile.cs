@@ -36,7 +36,11 @@ namespace Shrooms.ModelMappings.Profiles
 
             CreateMap<BuyLotteryTicketViewModel, BuyLotteryTicketDTO>();
             CreateMap<BuyLotteryTicketDTO, BuyLotteryTicketViewModel>();
+
+            CreateMap<LotteryParticipantViewModel, LotteryParticipantDTO>();
+            CreateMap<LotteryParticipantDTO, LotteryParticipantViewModel>();
         }
+
         private void CreateDtoMappings()
         {
             CreateMap<CreateLotteryDTO, Lottery>()

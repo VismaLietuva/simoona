@@ -458,6 +458,7 @@
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Lotteries\EditDraftedLotteryViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Lotteries\EditStartedLotteryViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Lotteries\LotteryDetailsViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Lotteries\LotteryParticipantViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\OrganizationalStructure\OrganizationalStructureViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\ServiceRequests\ServiceRequestCategoryCreateViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\ServiceRequests\ServiceRequestCategoryViewModel.cs" />

@@ -38,17 +38,7 @@ namespace Shrooms.Domain.Services.Lotteries
         public IEnumerable<LotteryParticipantDTO> GetParticipantsCounted(int lotteryId)
         {
             return _participantsDbSet.Where(x => x.LotteryId == lotteryId)
-              .GroupBy(l => l.User).Select(MapToParticipantDto());
-        }
-
-        private Expression<Func<IGrouping<ApplicationUser, LotteryParticipant>, LotteryParticipantDTO>> MapToParticipantDto()
-        {
-            return group => new LotteryParticipantDTO
-            {
-                UserId = group.Key.Id,
-                FullName = group.Key.FirstName + " " + group.Key.LastName,
-                Tickets = group.Distinct().Count()
-            };
+              .GroupBy(l => l.User).Select(MapToParticipantDto);
         }
 
         public async Task BuyLotteryTicketAsync(BuyLotteryTicketDTO lotteryTicketDTO, UserAndOrganizationDTO userOrg)
@@ -90,5 +80,13 @@ namespace Shrooms.Domain.Services.Lotteries
 
             return participant;
         }
+       
+        private Expression<Func<IGrouping<ApplicationUser, LotteryParticipant>, LotteryParticipantDTO>> MapToParticipantDto =>
+         group => new LotteryParticipantDTO
+         {
+             UserId = group.Key.Id,
+             FullName = group.Key.FirstName + " " + group.Key.LastName,
+             Tickets = group.Distinct().Count()
+         };
     }
 }

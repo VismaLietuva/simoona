@@ -157,6 +157,7 @@
     <Compile Include="DomainService\EventServices\EventExportServiceTests.cs" />
     <Compile Include="DomainService\EventServices\EventParticipantServiceTests.cs" />
     <Compile Include="DomainService\EventUtilitiesServiceTests.cs" />
+    <Compile Include="DomainService\LotteryServices\ParticipantServiceTests.cs" />
     <Compile Include="DomainService\LoyaltyKudosTests.cs" />
     <Compile Include="DomainService\OfficeMapServiceTests.cs" />
     <Compile Include="DomainService\OrganizationalStructureTests.cs" />

@@ -7,12 +7,10 @@ using System.Threading.Tasks;
 
 namespace Shrooms.WebViewModels.Models.Lotteries
 {
-    public class BuyLotteryTicketViewModel
+    public class LotteryParticipantViewModel
     {
-        [Required]
-        public int LotteryId { get; set; }
-
-        [Required]
+        public string UserId { get; set; }
+        public string FullName { get; set; }
         public int Tickets { get; set; }
     }
 }
