@@ -20,7 +20,8 @@
             create: create,
             updateDrafted: updateDrafted,
             updateStarted: updateStarted,
-            revokeLottery: revokeLottery
+            revokeLottery: revokeLottery,
+            getLotteryListPaged: getLotteryListPaged
         };
         return service;
 
@@ -56,6 +57,16 @@
 
         function revokeLottery(id) {
             return $resource(url + 'Delete').delete({id}).$promise;
+        }
+
+        function getLotteryListPaged(filters) {
+            return $resource(url + 'Paged', '', {
+                'query': {
+                    method: 'GET',
+                    isArray: false,
+                    filters: filters
+                }
+            }).query(filters).$promise;
         }
     }
 })();
