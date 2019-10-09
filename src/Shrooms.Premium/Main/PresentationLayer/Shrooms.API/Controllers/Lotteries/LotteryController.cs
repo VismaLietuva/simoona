@@ -42,7 +42,7 @@ namespace Shrooms.API.Controllers.Lotteries
         }
 
         [HttpGet]
-        [Route("GetPaged")]
+        [Route("Paged")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Lottery)]
         public PagedViewModel<LotteryDetailsDTO> GetPagedLotteries(string filter = "", int page = 1, int pageSize = ConstWebApi.DefaultPageSize)
         {

@@ -98,23 +98,18 @@ namespace Shrooms.Domain.Services.Lotteries
 
         public IEnumerable<LotteryDetailsDTO> GetLotteries(UserAndOrganizationDTO userOrganization)
         {
-            var lotteries = _lotteriesDbSet
+            return _lotteriesDbSet
                 .Where(p => p.OrganizationId == userOrganization.OrganizationId)
-                .Select(MapLotteriesToListItemDto())
-                .OrderBy(p => p.EndDate).ToList();
-
-            return lotteries;
+                .Select(MapLotteriesToListItemDto)
+                .OrderByDescending(ByEndDate).ToList();
         }
 
         public IEnumerable<LotteryDetailsDTO> GetFilteredLotteries(string filter)
         {
-            var lotteries = _lotteriesDbSet
+            return _lotteriesDbSet
                 .Where(x => x.Title.Contains(filter))
-                .Select(MapLotteriesToListItemDto())
-                .OrderByDescending(x => x.EndDate)
-                .ToList();
-
-            return lotteries;
+                .Select(MapLotteriesToListItemDto)
+                .OrderByDescending(ByEndDate);
         }
 
         public IPagedList<LotteryDetailsDTO> GetPagedLotteries(string filter, int page, int pageSize)
@@ -134,17 +129,18 @@ namespace Shrooms.Domain.Services.Lotteries
             return newLottery;
         }
 
-        private Expression<Func<Lottery, LotteryDetailsDTO>> MapLotteriesToListItemDto()
-        {
-            return e => new LotteryDetailsDTO
-            {
-                Id = e.Id,
-                Title = e.Title,
-                Description = e.Description,
-                EndDate = e.EndDate,
-                Status = e.Status
-            };
-        }
+        private readonly Expression<Func<LotteryDetailsDTO, DateTime>> ByEndDate = e => e.EndDate;
+
+        private Expression<Func<Lottery, LotteryDetailsDTO>> MapLotteriesToListItemDto =>
+         e => new LotteryDetailsDTO
+         {
+             Id = e.Id,
+             Title = e.Title,
+             Description = e.Description,
+             EndDate = e.EndDate,
+             Status = e.Status
+         };
+
 
         private void UpdateDraftedLottery(Lottery lottery, EditDraftedLotteryDTO draftedLotteryDTO)
         {
