@@ -32,14 +32,12 @@ namespace Shrooms.Domain.Services.Lotteries
               .GroupBy(l => l.User).Select(MapToParticipantDto());
         }
 
-        private Expression<Func<IGrouping<ApplicationUser, LotteryParticipant>, LotteryParticipantDTO>> MapToParticipantDto()
-        {
-            return group => new LotteryParticipantDTO
-            {
-                UserId = group.Key.Id,
-                FullName = group.Key.FirstName + " " + group.Key.LastName,
-                Tickets = group.Distinct().Count()
-            };
-        }
+        private Expression<Func<IGrouping<ApplicationUser, LotteryParticipant>, LotteryParticipantDTO>> MapToParticipantDto() =>
+         group => new LotteryParticipantDTO
+         {
+             UserId = group.Key.Id,
+             FullName = group.Key.FirstName + " " + group.Key.LastName,
+             Tickets = group.Distinct().Count()
+         };
     }
 }
