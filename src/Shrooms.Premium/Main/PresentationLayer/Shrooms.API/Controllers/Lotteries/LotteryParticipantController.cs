@@ -1,6 +1,10 @@
-﻿using Shrooms.API.Controllers;
+﻿using AutoMapper;
+using Shrooms.API.Controllers;
 using Shrooms.DataLayer.DAL;
+using Shrooms.DataTransferObjects.Models.Lotteries;
+using Shrooms.Domain.Services.Lotteries;
 using Shrooms.EntityModels.Models.Lotteries;
+using Shrooms.WebViewModels.Models.Lotteries;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -9,29 +13,28 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
 
-namespace Shrooms.Premium.Main.PresentationLayer.Shrooms.API.Controllers.Lotteries
+namespace Shrooms.API.Controllers.Lotteries
 {
     [Authorize]
     [RoutePrefix("Lottery")]
     public class LotteryParticipantController : BaseController
     {
-        public LotteryParticipantController()
+        private readonly IParticipantService _participantService;
+        private readonly IMapper _mapper;
+
+        public LotteryParticipantController(IParticipantService participantService, IMapper mapper)
         {
+            _participantService = participantService;
+            _mapper = mapper;
         }
 
-/*        [HttpGet]
-        [Route("test")]
-        public IHttpActionResult Test(int lotteryId)
+        [HttpGet]
+        [Route("{id}/Participants")]
+        public IHttpActionResult GetParticipants(int id)
         {
-            var par = _participantsDbSet.Where(x => x.LotteryId == lotteryId)
-              .GroupBy(l => l.UserId)
-              .Select(g => new
-              {
-                  UserId = g.Key,
-                  Count = g.Distinct().Count()
-              });
-
-            return Ok(par);
-        }*/
+            var participants = _participantService.GetParticipantsCounted(id);
+            var viewModel = _mapper.Map<IEnumerable<LotteryParticipantDTO>, IEnumerable<LotteryParticipantViewModel>>(participants);
+            return Ok(viewModel);
+        }
     }
 }

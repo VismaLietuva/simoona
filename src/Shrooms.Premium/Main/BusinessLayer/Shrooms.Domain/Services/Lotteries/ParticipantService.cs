@@ -1,13 +1,14 @@
-﻿using Shrooms.DataLayer.DAL;
-using Shrooms.EntityModels.Models.Lotteries;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Shrooms.DataLayer.DAL;
+using Shrooms.EntityModels.Models.Lotteries;
+using Shrooms.DataTransferObjects.Models.Lotteries;
+using System.Linq.Expressions;
+using System;
+using Shrooms.EntityModels.Models;
 
-namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Lotteries
+namespace Shrooms.Domain.Services.Lotteries
 {
     public class ParticipantService : IParticipantService
     {
@@ -23,6 +24,22 @@ namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Lotteries
         public IEnumerable<string> GetParticipantsId(int lotteryId)
         {
             return _participantsDbSet.Where(x => x.LotteryId == lotteryId).Select(x => x.UserId);
+        }
+
+        public IEnumerable<LotteryParticipantDTO> GetParticipantsCounted(int lotteryId)
+        {
+            return _participantsDbSet.Where(x => x.LotteryId == lotteryId)
+              .GroupBy(l => l.User).Select(MapToParticipantDto());
+        }
+
+        private Expression<Func<IGrouping<ApplicationUser, LotteryParticipant>, LotteryParticipantDTO>> MapToParticipantDto()
+        {
+            return group => new LotteryParticipantDTO
+            {
+                UserId = group.Key.Id,
+                FullName = group.Key.FirstName + " " + group.Key.LastName,
+                Tickets = group.Distinct().Count()
+            };
         }
     }
 }

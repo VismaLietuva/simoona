@@ -332,6 +332,7 @@
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Lotteries\EditDraftedLotteryDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Lotteries\EditStartedLotteryDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Lotteries\LotteryDetailsDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Lotteries\LotteryParticipantDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\OfficeMap\OfficeDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\OfficeMap\OfficeRoomDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\OfficeMap\OfficeUserDTO.cs" />
@@ -455,6 +456,7 @@
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Lotteries\EditDraftedLotteryViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Lotteries\EditStartedLotteryViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Lotteries\LotteryDetailsViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Lotteries\LotteryParticipantViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\OrganizationalStructure\OrganizationalStructureViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\ServiceRequests\ServiceRequestCategoryCreateViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\ServiceRequests\ServiceRequestCategoryViewModel.cs" />
