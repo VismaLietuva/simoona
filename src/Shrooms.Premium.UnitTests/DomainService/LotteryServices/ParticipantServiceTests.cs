@@ -42,7 +42,7 @@ namespace Shrooms.Premium.UnitTests.DomainService.LotteryServices
 
         [TestCase(5, 2)]
         [TestCase(1000, 0)]
-        public void GetParticipantsCounted(int lotteryId, int tickets)
+        public void GetParticipantsCounted_AnyLotteryId_ReturnsCorrectTicketsCount(int lotteryId, int tickets)
         {
             _lotteryParticipants.SetDbSetData(GetParticipants());
 
