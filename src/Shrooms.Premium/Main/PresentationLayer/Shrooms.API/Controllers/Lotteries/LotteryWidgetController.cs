@@ -12,6 +12,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
+using static Shrooms.Constants.BusinessLayer.ConstBusinessLayer;
 
 namespace Shrooms.API.Controllers.Lotteries
 {
@@ -28,10 +29,10 @@ namespace Shrooms.API.Controllers.Lotteries
         }
         
         [HttpGet]
-        [PermissionAwareCacheOutputFilter(BasicPermissions.Lottery, ServerTimeSpan = ConstWebApi.OneHour)]
+        [PermissionAwareCacheOutputFilter(BasicPermissions.Lottery, ServerTimeSpan = ConstWebApi.FiveMinutes)]
         public IEnumerable<LotteryWidgetViewModel> Get()
         {
-            var lotteriesDTO = _lotteryService.GetRunningLotteries(GetUserAndOrganization());
+            var lotteriesDTO = _lotteryService.GetLotteriesByStatus((int)LotteryStatus.Started,GetUserAndOrganization());
 
             var lotteriesWidgetViewModel = _mapper.Map<IEnumerable<LotteryDetailsDTO>, IEnumerable<LotteryWidgetViewModel>>(lotteriesDTO);
 

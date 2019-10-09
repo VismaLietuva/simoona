@@ -17,7 +17,7 @@ namespace Shrooms.Domain.Services.Lotteries
         void EditStartedLottery(EditStartedLotteryDTO lotteryDTO);
         void RemoveLottery(int id, UserAndOrganizationDTO userOrg);
         IEnumerable<LotteryDetailsDTO> GetLotteries(UserAndOrganizationDTO userOrganization);
-        IEnumerable<LotteryDetailsDTO> GetRunningLotteries(UserAndOrganizationDTO userAndOrganization);
+        IEnumerable<LotteryDetailsDTO> GetLotteriesByStatus(int status, UserAndOrganizationDTO userAndOrganization);
         IEnumerable<LotteryDetailsDTO> GetFilteredLotteries(string filter);
         IPagedList<LotteryDetailsDTO> GetPagedLotteries(string filter, int page, int pageSize = ConstWebApi.DefaultPageSize);
         LotteryDetailsDTO GetLotteryDetails(int id, UserAndOrganizationDTO userOrg);
