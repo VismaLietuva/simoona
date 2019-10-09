@@ -13,7 +13,6 @@
     function wallRepository($resource, endPoint) {
         var wallUrl = endPoint + '/Wall/';
         var wallWidgetsUrl = endPoint + '/WallWidgets/';
-        var lotteryWidgetUrl = endPoint + '/LotteryWidget/';
 
         var service = {
             createWall: createWall,
@@ -23,7 +22,6 @@
             getWallMembers: getWallMembers,
             expelMemberFromWall: expelMemberFromWall,
             getWidgetsInfo: getWidgetsInfo,
-            getLotteryWidgetInfo: getLotteryWidgetInfo,
         };
         return service;
 
@@ -71,10 +69,6 @@
                 .get()
                 .$promise;
         }
-        function getLotteryWidgetInfo(){
-            return $resource(lotteryWidgetUrl + 'Get')
-                .query()
-                .$promise;
-        }
+
     }
 })();

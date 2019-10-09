@@ -1,0 +1,36 @@
+<div id="lotteries-wall-widget">
+    <div class="lottery-activity-log-container" ng-repeat="lottery in latestLotteries">
+        <div class="lottery-activity-log-inner">
+            <div class="lottery-widget-box">
+                <div class="lottery-widget-button-grp">
+                    <button class="lottery-button">Details</button>
+                    <button class="lottery-button">Tickets</button>
+                </div>
+            </div>
+            <div class="lottery-activity-log-content-box">
+                <div class="lottery-activity-log-fullname">
+                    <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: kudos.receiver.id })"
+                        title="{{:: kudos.receiver.fullName }}" data-test-id="kudos-activity-log-receiver-fullname"
+                        ng-cloak>
+                        Tittle: {{ lottery.title }}
+                    </a>
+                </div>
+                <div class="kudos-activity-log-comment"
+                    ng-class="{'kudos-activity-log-comment-with-sender': !!kudos.sender.id}"
+                    uib-tooltip="{{:: kudos.comment}}" tooltip-placement="bottom" tooltip-class="word-break"
+                    tooltip-append-to-body="true">
+                    <span data-test-id="kudos-activity-log-comment" ng-cloak>
+                            <b>Entry Fee: {{lottery.entryFee}}</b>
+                    </span>
+                </div>
+                <div>
+                    {{:: lottery.timeLeft}}
+                </div>
+            </div>
+            <div class="kudos-activity-log-image-box" ng-if="!!kudos.pictureId">
+                <span class="glyphicon glyphicon-camera media-icons kudos-image"
+                    ace-picture-modal="kudos.pictureId"></span>
+            </div>
+        </div>
+    </div>
+</div>

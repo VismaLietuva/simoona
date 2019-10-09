@@ -13,14 +13,17 @@
 
     function lotteryFactory($resource, $http, endPoint) {
         var url = endPoint + '/Lottery/';
+        var lotteryWidgetUrl = endPoint + '/LotteryWidget/';
 
         var service = {
             getAllLotteries: getAllLotteries,
+            getLotteriesByStatus: getLotteriesByStatus,
             getLottery: getLottery,
             create: create,
             updateDrafted: updateDrafted,
             updateStarted: updateStarted,
-            revokeLottery: revokeLottery
+            revokeLottery: revokeLottery,
+            getLotteryWidgetInfo: getLotteryWidgetInfo
         };
         return service;
 
@@ -28,6 +31,12 @@
 
         function getAllLotteries() {
             return $resource(url + 'All').query().$promise;
+        }
+
+        function getLotteriesByStatus(status){
+            return $resource(url + 'Lotteries').query({
+                status: status
+            }).$promise;
         }
 
         function getLottery(id) {
@@ -56,6 +65,11 @@
 
         function revokeLottery(id) {
             return $resource(url + 'Delete').delete({id}).$promise;
+        }
+        function getLotteryWidgetInfo(){
+            return $resource(lotteryWidgetUrl + 'Get')
+                .query()
+                .$promise;
         }
     }
 })();

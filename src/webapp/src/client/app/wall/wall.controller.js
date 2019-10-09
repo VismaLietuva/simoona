@@ -24,13 +24,5 @@
             .then(function(widgetsInfo) { 
                 vm.widgetsInfo = widgetsInfo;
             }); 
-            
-        if(window.isPremium)
-        {
-            wallRepository.getLotteryWidgetInfo()
-            .then(function(widgetInfo){
-                vm.lotteryWidgetInfo = widgetInfo;
-            })
-        }
     }
 }());
