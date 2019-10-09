@@ -1,4 +1,6 @@
-﻿using Shrooms.DataTransferObjects.Models.Lotteries;
+﻿using Shrooms.DataTransferObjects.Models;
+using Shrooms.DataTransferObjects.Models.Lotteries;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Lotteries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +14,7 @@ namespace Shrooms.Domain.Services.Lotteries
         IEnumerable<string> GetParticipantsId(int lotteryId);
 
         IEnumerable<LotteryParticipantDTO> GetParticipantsCounted(int lotteryId);
+
+        Task BuyLotteryTicketAsync(BuyLotteryTicketDTO lotteryTicketDTO, UserAndOrganizationDTO userOrg);
     }
 }
