@@ -38,7 +38,6 @@ namespace Shrooms.Domain.Services.Lotteries
                 throw new LotteryException("Lottery cant start in the past");
             }
             var newLottery = MapNewLottery(newLotteryDTO);
-            newLottery.Status = (int)LotteryStatus.Started;
             _lotteriesDbSet.Add(newLottery);
             await _uow.SaveChangesAsync(newLotteryDTO.UserId);
 

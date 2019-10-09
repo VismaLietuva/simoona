@@ -20,6 +20,8 @@ namespace Shrooms.WebViewModels.Models.Lotteries
         public DateTime EndDate { get; set; }
         [Required]
         public int EntryFee { get; set; }
+        [Required]
+        public int Status { get; set; }
         public ImagesCollection Images { get; set; }
     }
 }
