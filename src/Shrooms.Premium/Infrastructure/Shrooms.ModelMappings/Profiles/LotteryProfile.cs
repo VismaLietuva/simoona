@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
 using Shrooms.DataTransferObjects.Models.Lotteries;
 using Shrooms.EntityModels.Models.Lotteries;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Lotteries;
-using Shrooms.Premium.Main.PresentationLayer.Shrooms.WebViewModels.Models.Lotteries;
 using Shrooms.WebViewModels.Models.Lotteries;
 using System;
 using System.Collections.Generic;

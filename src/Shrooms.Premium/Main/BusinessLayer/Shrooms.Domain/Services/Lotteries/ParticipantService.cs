@@ -7,11 +7,13 @@ using Shrooms.DataTransferObjects.Models.Lotteries;
 using System.Linq.Expressions;
 using System;
 using Shrooms.EntityModels.Models;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Lotteries;
 using Shrooms.DataTransferObjects.Models;
 using System.Threading.Tasks;
 using Shrooms.Domain.Services.UserService;
 using Shrooms.DomainExceptions.Exceptions.Lotteries;
+using Shrooms.Domain.Services.Kudos;
+using Shrooms.DataTransferObjects.Models.Kudos;
+using Shrooms.Constants.BusinessLayer;
 
 namespace Shrooms.Domain.Services.Lotteries
 {
@@ -21,13 +23,15 @@ namespace Shrooms.Domain.Services.Lotteries
         private readonly IDbSet<LotteryParticipant> _participantsDbSet;
         private readonly ILotteryService _lotteryService;
         private readonly IUserService _userService;
+        private readonly IKudosService _kudosService;
 
-        public ParticipantService(IUnitOfWork2 unitOfWork, ILotteryService lotteryService, IUserService userService)
+        public ParticipantService(IUnitOfWork2 unitOfWork, ILotteryService lotteryService, IUserService userService, IKudosService kudosService)
         {
             _unitOfWork = unitOfWork;
             _participantsDbSet = _unitOfWork.GetDbSet<LotteryParticipant>();
             _lotteryService = lotteryService;
             _userService = userService;
+            _kudosService = kudosService;
         }
 
         public IEnumerable<string> GetParticipantsId(int lotteryId)
@@ -56,12 +60,21 @@ namespace Shrooms.Domain.Services.Lotteries
             {
                 LotteryParticipant participant = MapNewLotteryParticipant(lotteryTicketDTO, userOrg);
 
-                applicationUser.SpentKudos += lotteryDetails.EntryFee;
-
-                applicationUser.RemainingKudos -= lotteryDetails.EntryFee;
-
                 _participantsDbSet.Add(participant);
+
             }
+
+            AddKudosLogDTO kudosLogDTO = new AddKudosLogDTO()
+            {
+                ReceivingUserIds = new List<string>() { userOrg.UserId },
+                PointsTypeId = 2,
+                MultiplyBy = lotteryTicketDTO.Tickets * lotteryDetails.EntryFee,
+                Comment = $"For {lotteryTicketDTO.Tickets} tickets",
+                UserId = userOrg.UserId,
+                OrganizationId = userOrg.OrganizationId
+            };
+
+            await _kudosService.AddLotteryKudosLog(kudosLogDTO, userOrg);
 
             await _unitOfWork.SaveChangesAsync(applicationUser.Id);
 
@@ -75,7 +88,9 @@ namespace Shrooms.Domain.Services.Lotteries
                 UserId = userOrg.UserId,
                 Entered = DateTime.Now,
                 CreatedBy = userOrg.UserId,
-                ModifiedBy = userOrg.UserId
+                ModifiedBy = userOrg.UserId,
+                Modified = DateTime.Now,
+                Created = DateTime.Now
             };
 
             return participant;
