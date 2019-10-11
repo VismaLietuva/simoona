@@ -152,5 +152,23 @@ namespace Shrooms.API.Controllers.Lotteries
                 return BadRequest(e.Message);
             }
         }
+
+        [HttpPatch]
+        [Route("Finish")]
+        public async Task<IHttpActionResult> FinishLottery(int id)
+        {
+            try
+            {
+                await _lotteryService.FinishLotteryAsync(id);
+
+                return Ok();
+
+            }
+            catch (LotteryException ex)
+            {
+                return BadRequest();
+            }
+
+        }
     }
 }

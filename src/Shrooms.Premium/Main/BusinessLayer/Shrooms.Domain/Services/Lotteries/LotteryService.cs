@@ -95,6 +95,20 @@ namespace Shrooms.Domain.Services.Lotteries
             _uow.SaveChanges();
         }
 
+        public async Task FinishLotteryAsync(int lotteryId)
+        {
+            var lottery = _lotteriesDbSet.Find(lotteryId);
+
+            if (lottery == null)
+            {
+                throw new LotteryException("Lottery not found");
+            }
+
+            lottery.Status = (int)LotteryStatus.Ended;
+
+            await _uow.SaveChangesAsync();
+        }
+
         public IEnumerable<LotteryDetailsDTO> GetLotteries(UserAndOrganizationDTO userOrganization)
         {
             return _lotteriesDbSet
