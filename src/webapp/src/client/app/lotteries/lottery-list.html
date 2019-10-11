@@ -30,8 +30,8 @@
                         <td>
                             {{vm.lotteryStatuses[lottery.status]}}
                         </td>
-                        <td>
-                            {{lottery.endDate.replace('T', '  ').substring(0, lottery.endDate.length - 2)}}
+                        <td class="ng-binding">
+                            {{lottery.endDate | convertToCurrentTimezone | date:'yyyy-MM-dd, HH:mm'}}
                         </td>  
                         <td ng-if="vm.allowEdit " class="text-center">
                             <a ng-if="!vm.editableLotteries.includes(lottery.status)" ui-sref="Root.WithOrg.Admin.Lotteries.Edit({ lotteryId : lottery.id})" class="btn btn-default glyphicon glyphicon-pencil" title="{{'common.edit' | translate}}"></a>
