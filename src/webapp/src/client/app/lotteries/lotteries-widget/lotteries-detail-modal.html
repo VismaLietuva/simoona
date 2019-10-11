@@ -1,0 +1,50 @@
+<div class="modal-header">
+    <button type="button" class="close" ng-click="vm.cancel()">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <h3 class="modal-title">{{vm.lottery.title}}</h3>
+</div>
+<div class="modal-body">
+    <form role="form" name="sendKudosForm">
+        <div class="form-group">
+
+        </div>
+        <div class="row">
+            <div class="col-xs-6 form-group">
+                <div ng-repeat="image in vm.lottery.images">
+                    <img src="{{image | imageThumb:vm.lotteryImageSize:'crop'}}">
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="row">
+                    <label class="col-xs-12">Tickets:</label>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 col-sm-6">
+                        <input class="form-control" type="text" />
+                    </div>
+                    <div class="col-xs-12 col-sm-6">
+                        <button type="button" class="btn btn-primary">Buy</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="row">
+                    <label class="col-xs-12">Participants <b>{{vm.lottery.participants}}</b></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-12"><b>Description</b> </label>
+                </div>
+                <div class="row">
+                    <textarea readonly id="story" name="story" rows="5" cols="33">{{vm.lottery.description}}
+                    </textarea>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-default" ng-click="vm.cancel()" data-test-id="cancel-button-yellow">
+        <span translate="common.cancel"></span>
+    </button>
+</div>
