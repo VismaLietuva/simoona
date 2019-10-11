@@ -10,7 +10,7 @@ namespace Shrooms.WebViewModels.Models.Lotteries
     {
         public int Id { get; set; }
         public string Title { get; set; }
-        public TimeSpan TimeLeft { get; set; }
+        public DateTime EndDate { get; set; }
         public int EntryFee { get; set; }
     }
 }

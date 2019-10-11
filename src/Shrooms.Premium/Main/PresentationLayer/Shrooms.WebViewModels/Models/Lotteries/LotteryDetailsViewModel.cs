@@ -16,5 +16,6 @@ namespace Shrooms.WebViewModels.Models.Lotteries
         public int EntryFee { get; set; }
         public int Status { get; set; }
         public ImagesCollection Images { get; set; }
+        public int Participants { get; set; }
     }
 }

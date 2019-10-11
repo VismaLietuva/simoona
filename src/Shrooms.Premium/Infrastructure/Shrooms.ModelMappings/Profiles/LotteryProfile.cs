@@ -33,8 +33,7 @@ namespace Shrooms.ModelMappings.Profiles
             CreateMap<EditStartedLotteryDTO, EditStartedLotteryViewModel>();
 
             CreateMap<LotteryWidgetViewModel, LotteryDetailsDTO>();
-            CreateMap<LotteryDetailsDTO, LotteryWidgetViewModel>()
-                     .ForMember(dest => dest.TimeLeft, opt => opt.MapFrom(u => u.EndDate - DateTime.UtcNow));
+            CreateMap<LotteryDetailsDTO, LotteryWidgetViewModel>();
 
         }
         private void CreateDtoMappings()

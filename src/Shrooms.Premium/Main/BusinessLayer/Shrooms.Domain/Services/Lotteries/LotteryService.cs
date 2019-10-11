@@ -21,6 +21,7 @@ namespace Shrooms.Domain.Services.Lotteries
     {
         private readonly IUnitOfWork2 _uow;
         private readonly IDbSet<Lottery> _lotteriesDbSet;
+        private readonly IDbSet<LotteryParticipant> _lotteryParticipantsDbSet;
         private readonly IMapper _mapper;
 
         public LotteryService(IUnitOfWork2 uow, IMapper mapper)
@@ -28,6 +29,7 @@ namespace Shrooms.Domain.Services.Lotteries
             _uow = uow;
             _mapper = mapper;
             _lotteriesDbSet = uow.GetDbSet<Lottery>();
+            _lotteryParticipantsDbSet = uow.GetDbSet<LotteryParticipant>();
         }
 
         public async Task<CreateLotteryDTO> CreateLottery(CreateLotteryDTO newLotteryDTO)
@@ -78,6 +80,7 @@ namespace Shrooms.Domain.Services.Lotteries
             }
 
             var lotteryDetailsDTO = _mapper.Map<Lottery, LotteryDetailsDTO>(lottery);
+            lotteryDetailsDTO.Participants = _lotteryParticipantsDbSet.Count(p => p.LotteryId == id);
 
             return lotteryDetailsDTO;
         }
@@ -144,8 +147,9 @@ namespace Shrooms.Domain.Services.Lotteries
                 EntryFee = e.EntryFee,
                 Images = e.Images,
                 EndDate = e.EndDate,
-                Status = e.Status
-            };
+                Status = e.Status,
+                Participants = _lotteryParticipantsDbSet.Count(p => p.LotteryId == e.Id)
+        };
         }
 
         private void UpdateDraftedLottery(Lottery lottery, EditDraftedLotteryDTO draftedLotteryDTO)
@@ -164,6 +168,7 @@ namespace Shrooms.Domain.Services.Lotteries
                .Where(p => p.OrganizationId == userAndOrganization.OrganizationId && p.Status == status)
                .Select(MapLotteriesToListItemDto())
                .OrderBy(p => p.EndDate).ToList();
+
 
             return lotteries;
         }
