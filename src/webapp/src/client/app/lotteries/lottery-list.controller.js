@@ -20,13 +20,13 @@
         '$scope',
         'authService',
         '$location',
-        'lotteryFactory',
+        'lotteryRepository',
         'lotteryStatuses',
         'lotteryPageSettings',
         'editableLotteries'
     ];    
 
-    function lotteryListController($rootScope, $scope, authService, $location, lotteryFactory, lotteryStatuses, lotteryPageSettings, editableLotteries) {
+    function lotteryListController($rootScope, $scope, authService, $location, lotteryRepository, lotteryStatuses, lotteryPageSettings, editableLotteries) {
     	/* jshint validthis: true */
         var vm = this;
         vm.lotteryStatuses = lotteryStatuses;
@@ -40,7 +40,7 @@
         init();
 
         function init() {
-            lotteryFactory.getLotteryListPaged(vm.filters).then(function (response) {
+            lotteryRepository.getLotteryListPaged(vm.filters).then(function (response) {
                 vm.lotteries = response.pagedList;
                 vm.filters.itemCount = response.itemCount;
             })
@@ -64,7 +64,7 @@
             if (!!vm.filters.s) {
                 filterParams.filter = vm.filters.s;
             }
-            lotteryFactory.getLotteryListPaged(filterParams).then(function (lotteries) {
+            lotteryRepository.getLotteryListPaged(filterParams).then(function (lotteries) {
                 vm.lotteries = lotteries.pagedList;
                 vm.filters.itemCount = lotteries.itemCount;
             });

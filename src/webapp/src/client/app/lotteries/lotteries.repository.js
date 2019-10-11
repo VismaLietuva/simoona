@@ -3,15 +3,15 @@
 
     angular
         .module('simoonaApp.Lotteries')
-        .factory('lotteryFactory', lotteryFactory);
+        .factory('lotteryRepository', lotteryRepository);
 
-    lotteryFactory.$inject = [
+    lotteryRepository.$inject = [
         '$resource',
         '$http',
         'endPoint'
     ];
 
-    function lotteryFactory($resource, $http, endPoint) {
+    function lotteryRepository($resource, $http, endPoint) {
         var url = endPoint + '/Lottery/';
 
         var service = {
@@ -21,7 +21,8 @@
             updateDrafted: updateDrafted,
             updateStarted: updateStarted,
             revokeLottery: revokeLottery,
-            getLotteryListPaged: getLotteryListPaged
+            getLotteryListPaged: getLotteryListPaged,
+            finishLottery: finishLottery
         };
         return service;
 
@@ -67,6 +68,14 @@
                     filters: filters
                 }
             }).query(filters).$promise;
+        }
+
+        function finishLottery(id) {
+            return $resource(url + 'Finish' + `?id=${id}`, '', {
+                patch: {
+                    method: 'PATCH'
+                }
+            }).patch().$promise;
         }
     }
 })();

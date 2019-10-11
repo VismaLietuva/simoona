@@ -161,8 +161,14 @@
                                 <span translate="lotteries.update"></span>
                             </button>
 
+                            <button class="btn btn-primary" 
+                                    ng-if="vm.isStarted" 
+                                    ng-click="vm.finishLottery()">
+                                <span translate="lotteries.finish"></span>
+                            </button>
+
                             <button class="btn btn-default" ui-sref="Root.WithOrg.Admin.Lotteries.List">
-                                    <span translate="common.cancel"></span>
+                                    <span translate="lotteries.cancel"></span>
                             </button>
     
                         </div>

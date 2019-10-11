@@ -61,8 +61,8 @@
                 controllerAs: 'vm',
                 resolve: {
                     lottery: [
-                        '$stateParams', 'lotteryFactory', function ($stateParams, lotteryFactory) {
-                            return lotteryFactory.getLottery($stateParams.lotteryId);
+                        '$stateParams', 'lotteryRepository', function ($stateParams, lotteryRepository) {
+                            return lotteryRepository.getLottery($stateParams.lotteryId);
                         },
                     ]
                 },
