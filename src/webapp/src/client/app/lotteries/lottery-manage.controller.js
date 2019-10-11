@@ -15,10 +15,12 @@
         .controller('lotteryManageController', lotteryManageController);
 
     lotteryManageController.$inject = ['$scope', '$state', 'lotteryFactory', '$rootScope',
-    'notifySrv', '$q', 'localeSrv', 'errorHandler', 'lotteryStatus', 'lottery', 'pictureRepository', 'dataHandler', 'lotteryImageSettings'
+    'notifySrv', '$q', 'localeSrv', 'errorHandler', 'lotteryStatus', 'lottery', 'pictureRepository', 'dataHandler', 'lotteryImageSettings', '$timeout'
     ];
 
-    function lotteryManageController($scope, $state, lotteryFactory, $rootScope, notifySrv, $q, localeSrv, errorHandler, lotteryStatus, lottery, pictureRepository, dataHandler, lotteryImageSettings) {
+    function lotteryManageController(
+        $scope, $state, lotteryFactory, $rootScope, notifySrv, $q, localeSrv, errorHandler,
+        lotteryStatus, lottery, pictureRepository, dataHandler, lotteryImageSettings, $timeout) {
         
         var vm = this;
         vm.openDatePicker = openDatePicker;

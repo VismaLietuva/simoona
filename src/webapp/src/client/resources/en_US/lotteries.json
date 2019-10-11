@@ -13,8 +13,8 @@
     "start": "Start",
     "save": "Save",
     "update": "Update",
-    "abort": "Abort",
+    "revoke": "Revoke",
     "hasStarted": "{{ one }} \"{{ two }}\" was successfully started!",
-    "hasBeenSaved": "{{ one }} \"{{ two }}\" was successfully saved!"
-
+    "hasBeenSaved": "{{ one }} \"{{ two }}\" was successfully saved!",
+    "photos": "Photos"
 }

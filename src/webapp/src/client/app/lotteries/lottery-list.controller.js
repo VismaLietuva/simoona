@@ -9,6 +9,7 @@
             3: "Aborted",
             4: "Ended"
         })
+        .constant('editableLotteries', [3, 4])
         .constant('lotteryPageSettings', {
             'pageSize': 10
         })
@@ -22,17 +23,19 @@
         'lotteryFactory',
         'lotteryStatuses',
         'lotteryPageSettings',
+        'editableLotteries'
     ];    
 
-    function lotteryListController($rootScope, $scope, authService, $location, lotteryFactory, lotteryStatuses, lotteryPageSettings) {
+    function lotteryListController($rootScope, $scope, authService, $location, lotteryFactory, lotteryStatuses, lotteryPageSettings, editableLotteries) {
     	/* jshint validthis: true */
         var vm = this;
         vm.lotteryStatuses = lotteryStatuses;
+        vm.editableLotteries = editableLotteries;
         vm.onSearch = onSearch;
         vm.filters = lotteryPageSettings;
         vm.onPageChange = onPageChange;
         $rootScope.pageTitle = 'lotteries.lotteriesPanelHeader';
-        vm.allowEdit = authService.hasPermissions(['ROLES_ADMINISTRATION']);
+        vm.allowEdit = authService.hasPermissions(["LOTTERY_ADMINISTRATION"]);
 
         init();
 
