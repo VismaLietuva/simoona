@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using Shrooms.Domain.Helpers;
 using static Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes.ErrorCodes;
 
 namespace Shrooms.UnitTests.DomainService
@@ -56,15 +57,9 @@ namespace Shrooms.UnitTests.DomainService
             var eventUtilitiesService = Substitute.For<IEventUtilitiesService>();
             var calendarService = Substitute.For<IEventCalendarService>();
             var eventValidationService = new EventValidationService(_systemClockMock);
+            var markdownConverter = Substitute.For<IMarkdownConverter>();
 
-            _eventService = new EventService(
-                _uow,
-                _permissionService,
-                eventUtilitiesService,
-                eventValidationService,
-                eventParticipationService,
-                calendarService,
-                _wallService);
+            _eventService = new EventService(_uow, _permissionService, eventUtilitiesService, eventValidationService, eventParticipationService, calendarService, _wallService, markdownConverter);
         }
 
         [Test]
@@ -631,10 +626,10 @@ namespace Shrooms.UnitTests.DomainService
         {
             var types = new List<ApplicationUser>
             {
-               new ApplicationUser
-               {
-                   Id = "1"
-               }
+                new ApplicationUser
+                {
+                    Id = "1"
+                }
             };
             _usersDbSet.SetDbSetData(types.AsQueryable());
         }
@@ -753,16 +748,16 @@ namespace Shrooms.UnitTests.DomainService
         {
             var types = new List<EventOption>
             {
-               new EventOption
-               {
-                   Id = 1,
-                   Option = "test1"
-               },
-               new EventOption
-               {
-                   Id = 2,
-                   Option = "test2"
-               }
+                new EventOption
+                {
+                    Id = 1,
+                    Option = "test1"
+                },
+                new EventOption
+                {
+                    Id = 2,
+                    Option = "test2"
+                }
             };
             _eventOptionsDbSet.SetDbSetData(types.AsQueryable());
         }
