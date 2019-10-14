@@ -155,10 +155,8 @@ namespace Shrooms.API.Controllers.Kudos
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
         public KudosTypeViewModel GetSendType()
         {
-            var kudosTypeDto = _kudosService.GetNecessaryKudosTypes(GetUserAndOrganization()).FirstOrDefault(x => x.Type == ConstBusinessLayer.KudosTypeEnum.Send);
-            var sendTypeViewModel = _mapper.Map<KudosTypeDTO, KudosTypeViewModel>(kudosTypeDto);
-
-            return sendTypeViewModel;
+            var kudosTypeDto = _kudosService.GetKudosTypeSend(GetUserAndOrganization());
+            return _mapper.Map<KudosTypeDTO, KudosTypeViewModel>(kudosTypeDto);
         }
 
         [HttpGet]

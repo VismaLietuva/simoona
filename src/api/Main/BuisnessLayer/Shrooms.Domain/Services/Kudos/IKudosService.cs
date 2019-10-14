@@ -14,7 +14,7 @@ namespace Shrooms.Domain.Services.Kudos
 
         Task RemoveKudosType(int id, UserAndOrganizationDTO userOrg);
 
-        IEnumerable<KudosTypeDTO> GetNecessaryKudosTypes(UserAndOrganizationDTO userOrg);
+        KudosTypeDTO GetKudosTypeSend(UserAndOrganizationDTO userOrg);
 
         IEnumerable<KudosPieChartSliceDto> GetKudosPieChartData(int organizationId, string userId);
 

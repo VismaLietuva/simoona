@@ -44,9 +44,6 @@ namespace Shrooms.Domain.Services.Kudos
         private Expression<Func<KudosType, bool>> _excludeNecessaryKudosTypes = x => x.Type != ConstBusinessLayer.KudosTypeEnum.Send &&
                                 x.Type != ConstBusinessLayer.KudosTypeEnum.Minus &&
                                 x.Type != ConstBusinessLayer.KudosTypeEnum.Other;
-        private Expression<Func<KudosType, bool>> _includeNecessaryKudosTypes = x => x.Type == ConstBusinessLayer.KudosTypeEnum.Send || 
-                                x.Type == ConstBusinessLayer.KudosTypeEnum.Minus ||
-                                x.Type == ConstBusinessLayer.KudosTypeEnum.Other;
 
         private readonly ResourceManager _resourceManager;
 
@@ -129,22 +126,21 @@ namespace Shrooms.Domain.Services.Kudos
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
-        public IEnumerable<KudosTypeDTO> GetNecessaryKudosTypes(UserAndOrganizationDTO userOrg)
+        public KudosTypeDTO GetKudosTypeSend(UserAndOrganizationDTO userOrg)
         {
             var hasKudosAdminPermission = HasKudosAdministratorPermission(userOrg);
 
-            var types = _kudosTypesDbSet
-                .Where(GetKudosTypeQuery(hasKudosAdminPermission))
-                .Where(_includeNecessaryKudosTypes)
+            var sendType = _kudosTypesDbSet
+                .Where(x => x.Type == ConstBusinessLayer.KudosTypeEnum.Send)
                 .Select(MapKudosTypesToDTO)
-                .AsEnumerable();
+                .FirstOrDefault();
 
-            if (types == null)
+            if (sendType == null)
             {
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Types not found");
             }
 
-            return types;
+            return sendType;
         }
 
         public async Task<KudosTypeDTO> GetKudosType(int id, UserAndOrganizationDTO userOrg)
