@@ -52,11 +52,13 @@
             }
         var timestamp = new Date(input);
 
+    
         if (timestamp == 'Invalid Date') {
             return '(invalid date)';
         }
 
         var now = new Date();
+        var nowUtc = new Date( now.getTime() + (now.getTimezoneOffset() * 60 * 1000));
 
         var year = timestamp.getFullYear();
 
@@ -64,7 +66,7 @@
             return (now.getFullYear() - year) + ' years ago';
         }
 
-        var seconds = ((now.getTime() - timestamp) * .001) >> 0;
+        var seconds = ((timestamp - nowUtc) * .001) >> 0;
 
         if (seconds < 0) {
             seconds = Math.abs(seconds);

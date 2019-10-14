@@ -7,40 +7,87 @@
 <div class="modal-body">
     <form role="form" name="sendKudosForm">
         <div class="form-group">
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="row">
+                        <div id="my-pics" class="carousel slide" data-ride="carousel" style="width:300px;margin:auto;">
 
-        </div>
-        <div class="row">
-            <div class="col-xs-6 form-group">
-                <div ng-repeat="image in vm.lottery.images">
-                    <img src="{{image | imageThumb:vm.lotteryImageSize:'crop'}}">
-                </div>
-            </div>
-            <div class="col-xs-6">
-                <div class="row">
-                    <label class="col-xs-12">Tickets:</label>
-                </div>
-                <div class="row">
-                    <div class="col-xs-12 col-sm-6">
-                        <input class="form-control" type="text" />
+                            <!-- Indicators -->
+                            <ol class="carousel-indicators">
+                                <li data-target="#my-pics" data-slide-to="0" class="active"></li>
+                                <li data-target="#my-pics" data-slide-to="1"></li>
+                                <li data-target="#my-pics" data-slide-to="2"></li>
+                            </ol>
+
+                            <!-- Content -->
+                            <div class="carousel-inner" role="listbox">
+
+                                <!-- Slide 1 -->
+                                <div class="item active">
+                                    <img src="{{vm.lottery.images[0] | imageThumb:vm.lotteryImageSize:'crop'}}"
+                                        alt="Sunset over beach">
+                                </div>
+
+                                <!-- Slide 2 -->
+                                <div class="item" ng-repeat="lottery in vm.lottery.images" ng-if="$index > 0">
+                                    <img src="{{lottery | imageThumb:vm.lotteryImageSize:'crop'}}">
+                                </div>
+                            </div>
+
+                            <!-- Previous/Next controls -->
+                            <a class="left carousel-control" href="#my-pics" role="button" data-slide="prev">
+                                <span class="icon-prev" aria-hidden="true"></span>
+                                <span class="sr-only">Previous</span>
+                            </a>
+                            <a class="right carousel-control" href="#my-pics" role="button" data-slide="next">
+                                <span class="icon-next" aria-hidden="true"></span>
+                                <span class="sr-only">Next</span>
+                            </a>
+
+                        </div>
                     </div>
-                    <div class="col-xs-12 col-sm-6">
-                        <button type="button" class="btn btn-primary">Buy</button>
+                    <div class="row">
+                        <label><b>Description</b> </label>
+                        <div class="card">
+                            <div class="card-body">
+                                {{vm.lottery.description}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="row">
+                        <div class="col-sm-7">
+                            <div class="input-group">
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-default btn-number" ng-click="vm.ticketDown()"
+                                        data-type="minus" data-field="quant[1]">
+                                        <span class="glyphicon glyphicon-minus"></span>
+                                    </button>
+                                </span>
+                                <input type="text" name="quant[1]" class="form-control input-number" value="{{vm.ticketCount}}" min="1"
+                                    max="100">
+                                <span class="input-group-btn">
+                                    <button type="button" ng-click="vm.ticketUp()"class="btn btn-default btn-number" data-type="plus"
+                                        data-field="quant[1]">
+                                        <span class="glyphicon glyphicon-plus"></span>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="row">
+                                <button type="button" ng-click="vm.buyTickets()" class="btn btn-primary">Buy</button>
+                        </div>
+                          
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-6">
+                            <label clasS>Total cost: <b>{{vm.lottery.entryFee}}</b></label> 
+                            <label class>Participants: <b>{{vm.lottery.participants}}</b></label>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-xs-6">
-                <div class="row">
-                    <label class="col-xs-12">Participants <b>{{vm.lottery.participants}}</b></label>
-                </div>
-                <div class="row">
-                    <label class="col-xs-12"><b>Description</b> </label>
-                </div>
-                <div class="row">
-                    <textarea readonly id="story" name="story" rows="5" cols="33">{{vm.lottery.description}}
-                    </textarea>
-                </div>
-            </div>
-        </div>
     </form>
 </div>
 <div class="modal-footer">

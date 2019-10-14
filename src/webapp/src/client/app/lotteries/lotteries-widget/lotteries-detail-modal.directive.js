@@ -60,6 +60,11 @@
         };
         vm.cancel = cancel;
         vm.currentLottery = currentLottery;
+        vm.ticketUp = ticketUp;
+        vm.ticketDown = ticketDown;
+        vm.buyTickets = buyTickets;
+
+        vm.ticketCount = 0;
         init();
         
         //////
@@ -74,6 +79,18 @@
         }
         function cancel() {
             $uibModalInstance.dismiss('cancel');
+        }
+        function ticketUp() {
+            vm.ticketCount += 1;
+        }
+        function ticketDown() {
+            if(vm.ticketCount > 0){
+                vm.ticketCount -= 1;
+            }
+        }
+        function buyTickets(){
+            console.log(vm.currentLottery)
+            console.log(vm.ticketCount);
         }
     }
 })();
