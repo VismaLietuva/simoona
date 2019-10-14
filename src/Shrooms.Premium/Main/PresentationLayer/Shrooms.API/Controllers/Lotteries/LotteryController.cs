@@ -15,6 +15,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
+using WebApi.OutputCache.V2;
 
 namespace Shrooms.API.Controllers.Lotteries
 {
@@ -40,17 +41,6 @@ namespace Shrooms.API.Controllers.Lotteries
 
             return Ok(result);
         }
-        [HttpGet]
-        [Route("Lotteries")]
-        public IHttpActionResult GetLotteriesByStatus(int status)
-        {
-            var lotteriesDTO = _lotteryService.GetLotteriesByStatus(status, GetUserAndOrganization());
-
-            var result = _mapper.Map<IEnumerable<LotteryDetailsDTO>, IEnumerable<LotteryDetailsViewModel>>(lotteriesDTO);
-
-            return Ok(result);
-        }
-
         [HttpGet]
         [Route("GetPaged")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Lottery)]
@@ -92,6 +82,7 @@ namespace Shrooms.API.Controllers.Lotteries
 
         [HttpPost]
         [Route("Create")]
+        [InvalidateCacheOutput("Get", typeof(LotteryWidgetController))]
         public async Task<IHttpActionResult> CreateLottery(CreateLotteryViewModel lotteryViewModel)
         {
             if (!ModelState.IsValid)

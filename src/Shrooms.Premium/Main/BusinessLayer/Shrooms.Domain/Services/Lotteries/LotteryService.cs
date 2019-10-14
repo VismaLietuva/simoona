@@ -161,14 +161,14 @@ namespace Shrooms.Domain.Services.Lotteries
             lottery.Title = draftedLotteryDTO.Title;
             lottery.Images = draftedLotteryDTO.Images;
         }
-
-        public IEnumerable<LotteryDetailsDTO> GetLotteriesByStatus(int status, UserAndOrganizationDTO userAndOrganization)
+        public IEnumerable<LotteryDetailsDTO> GetRunningLotteries(UserAndOrganizationDTO userAndOrganization)
         {
-            var lotteries = _lotteriesDbSet
-               .Where(p => p.OrganizationId == userAndOrganization.OrganizationId && p.Status == status)
-               .Select(MapLotteriesToListItemDto())
-               .OrderBy(p => p.EndDate).ToList();
-
+            var lotteries = _lotteriesDbSet.
+                Where(p => p.OrganizationId == userAndOrganization.OrganizationId 
+                && p.Status == (int)LotteryStatus.Started 
+                && p.EndDate > DateTime.UtcNow)
+                .Select(MapLotteriesToListItemDto())
+                .OrderBy(p => p.EndDate).ToList();
 
             return lotteries;
         }
