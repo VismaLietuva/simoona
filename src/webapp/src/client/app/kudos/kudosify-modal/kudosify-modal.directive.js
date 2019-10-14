@@ -99,15 +99,7 @@
             if (vm.isSubmitModal())
             {
                 kudosifyModalFactory.getPointsTypes().then(function (result) {
-                    vm.kudosTypes = result;
-                    for(var i = 0; i < vm.kudosTypes.length; i++)
-                    {
-                        if(vm.kudosTypes[i].type === 2)
-                        {
-                            vm.kudosTypes.splice(vm.kudosTypes[i], 1);
-                        }
-                    }
-                    
+                    vm.kudosTypes = result.filter(kudos => kudos.type !== vm.modalTypes.send);
                 });
             }
             else if (vm.isSendModal())
@@ -155,11 +147,7 @@
 
         function isSelectedSameType(dom)
         {
-            if (!dom.target.classList.contains('kudosify-modal-buttons-inactive') && vm.isButtonSelected)
-            {
-                return true;
-            }
-            return false;
+            return !dom.target.classList.contains('kudosify-modal-buttons-inactive') && vm.isButtonSelected;
         }
 
         function recalculateTotalPoints(){
