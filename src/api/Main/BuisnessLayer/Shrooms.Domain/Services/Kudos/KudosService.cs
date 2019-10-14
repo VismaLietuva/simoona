@@ -733,6 +733,28 @@ namespace Shrooms.Domain.Services.Kudos
             }
         }
 
+        public async Task AddLotteryKudosLog(AddKudosLogDTO kudosLogDTO, UserAndOrganizationDTO userOrg)
+        {
+            var kudosDto = MapInitialInfoToDTO(kudosLogDTO);
+
+            var receivingUser = _usersDbSet
+                .FirstOrDefault(x => x.Id == kudosLogDTO.UserId &&
+                            x.OrganizationId == kudosLogDTO.OrganizationId);
+
+            if (receivingUser == null)
+            {
+                throw new ValidationException(ErrorCodes.ContentDoesNotExist, "User not found");
+            }
+
+            kudosDto.ReceivingUser = receivingUser;
+
+            InsertKudosLog(kudosDto, KudosStatus.Approved);
+
+            await _uow.SaveChangesAsync(false);
+
+            UpdateProfileKudos(kudosDto.SendingUser, userOrg);
+        }
+
         private void MinusKudos(AddKudosDTO kudosDTO)
         {
             var hasKudosAdminPermission = HasKudosAdministratorPermission(kudosDTO.KudosLog);
