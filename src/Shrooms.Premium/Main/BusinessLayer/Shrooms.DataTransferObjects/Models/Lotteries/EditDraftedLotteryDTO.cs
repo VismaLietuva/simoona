@@ -8,5 +8,6 @@ namespace Shrooms.DataTransferObjects.Models.Lotteries
 {
     public class EditDraftedLotteryDTO : CreateLotteryDTO
     {
+        public int Status { get; set; }
     }
 }

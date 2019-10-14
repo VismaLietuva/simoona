@@ -11,18 +11,17 @@ namespace Shrooms.WebViewModels.Models.Lotteries
 {
     public class CreateLotteryViewModel
     {
+        public int Id { get; set; }
         [Required]
         public string Title { get; set; }
         [StringLength(ConstWebApi.EventNameMaxLength)]
         public string Description { get; set; }
         [Required]
-        public DateTime StartDate { get; set; }
-        [Required]
         public DateTime EndDate { get; set; }
         [Required]
-        public int Status { get; set; }
-        [Required]
         public int EntryFee { get; set; }
+        [Required]
+        public int Status { get; set; }
         public ImagesCollection Images { get; set; }
     }
 }

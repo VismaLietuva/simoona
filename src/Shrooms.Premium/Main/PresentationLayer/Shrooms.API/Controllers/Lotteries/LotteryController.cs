@@ -42,7 +42,7 @@ namespace Shrooms.API.Controllers.Lotteries
         }
 
         [HttpGet]
-        [Route("GetPaged")]
+        [Route("Paged")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Lottery)]
         public PagedViewModel<LotteryDetailsDTO> GetPagedLotteries(string filter = "", int page = 1, int pageSize = ConstWebApi.DefaultPageSize)
         {
@@ -151,6 +151,24 @@ namespace Shrooms.API.Controllers.Lotteries
             {
                 return BadRequest(e.Message);
             }
+        }
+
+        [HttpPatch]
+        [Route("Finish")]
+        public async Task<IHttpActionResult> FinishLottery(int id)
+        {
+            try
+            {
+                await _lotteryService.FinishLotteryAsync(id);
+
+                return Ok();
+
+            }
+            catch (LotteryException ex)
+            {
+                return BadRequest();
+            }
+
         }
     }
 }
