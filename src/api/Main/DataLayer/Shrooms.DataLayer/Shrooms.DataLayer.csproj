@@ -797,6 +797,10 @@
     <Compile Include="Migrations\201910031316520_AddLotteryAndLotteryParticipant.Designer.cs">
       <DependentUpon>201910031316520_AddLotteryAndLotteryParticipant.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201910140939226_AddFieldToLotteryParticipant.cs" />
+    <Compile Include="Migrations\201910140939226_AddFieldToLotteryParticipant.Designer.cs">
+      <DependentUpon>201910140939226_AddFieldToLotteryParticipant.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
@@ -1309,6 +1313,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201910031316520_AddLotteryAndLotteryParticipant.resx">
       <DependentUpon>201910031316520_AddLotteryAndLotteryParticipant.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201910140939226_AddFieldToLotteryParticipant.resx">
+      <DependentUpon>201910140939226_AddFieldToLotteryParticipant.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
