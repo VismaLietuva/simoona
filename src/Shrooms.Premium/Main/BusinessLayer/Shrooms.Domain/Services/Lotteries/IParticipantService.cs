@@ -14,6 +14,5 @@ namespace Shrooms.Domain.Services.Lotteries
 
         IEnumerable<LotteryParticipantDTO> GetParticipantsCounted(int lotteryId);
 
-        Task BuyLotteryTicketAsync(BuyLotteryTicketDTO lotteryTicketDTO, UserAndOrganizationDTO userOrg);
     }
 }

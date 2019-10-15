@@ -21,17 +21,12 @@ namespace Shrooms.Domain.Services.Lotteries
     {
         private readonly IUnitOfWork2 _unitOfWork;
         private readonly IDbSet<LotteryParticipant> _participantsDbSet;
-        private readonly ILotteryService _lotteryService;
-        private readonly IUserService _userService;
-        private readonly IKudosService _kudosService;
 
-        public ParticipantService(IUnitOfWork2 unitOfWork, ILotteryService lotteryService, IUserService userService, IKudosService kudosService)
+
+        public ParticipantService(IUnitOfWork2 unitOfWork)
         {
             _unitOfWork = unitOfWork;
             _participantsDbSet = _unitOfWork.GetDbSet<LotteryParticipant>();
-            _lotteryService = lotteryService;
-            _userService = userService;
-            _kudosService = kudosService;
         }
 
         public IEnumerable<string> GetParticipantsId(int lotteryId)
@@ -43,57 +38,6 @@ namespace Shrooms.Domain.Services.Lotteries
         {
             return _participantsDbSet.Where(x => x.LotteryId == lotteryId)
               .GroupBy(l => l.User).Select(MapToParticipantDto);
-        }
-
-        public async Task BuyLotteryTicketAsync(BuyLotteryTicketDTO lotteryTicketDTO, UserAndOrganizationDTO userOrg)
-        {
-            ApplicationUser applicationUser = _userService.GetApplicationUser(userOrg.UserId);
-
-            LotteryDetailsDTO lotteryDetails = _lotteryService.GetLotteryDetails(lotteryTicketDTO.LotteryId, userOrg);
-
-            if (applicationUser.RemainingKudos < lotteryDetails.EntryFee * lotteryTicketDTO.Tickets)
-            {
-                throw new LotteryException("User does not have enough kudos for the purchase.");
-            }
-
-            for (int i = 0; i < lotteryTicketDTO.Tickets; i++)
-            {
-                LotteryParticipant participant = MapNewLotteryParticipant(lotteryTicketDTO, userOrg);
-
-                _participantsDbSet.Add(participant);
-
-            }
-
-            AddKudosLogDTO kudosLogDTO = new AddKudosLogDTO()
-            {
-                ReceivingUserIds = new List<string>() { userOrg.UserId },
-                PointsTypeId = 2,
-                MultiplyBy = lotteryTicketDTO.Tickets * lotteryDetails.EntryFee,
-                Comment = $"For {lotteryTicketDTO.Tickets} tickets",
-                UserId = userOrg.UserId,
-                OrganizationId = userOrg.OrganizationId
-            };
-
-            await _kudosService.AddLotteryKudosLog(kudosLogDTO, userOrg);
-
-            await _unitOfWork.SaveChangesAsync(applicationUser.Id);
-
-        }
-
-        private LotteryParticipant MapNewLotteryParticipant(BuyLotteryTicketDTO lotteryTicketDTO, UserAndOrganizationDTO userOrg)
-        {
-            LotteryParticipant participant = new LotteryParticipant()
-            {
-                LotteryId = lotteryTicketDTO.LotteryId,
-                UserId = userOrg.UserId,
-                Entered = DateTime.Now,
-                CreatedBy = userOrg.UserId,
-                ModifiedBy = userOrg.UserId,
-                Modified = DateTime.Now,
-                Created = DateTime.Now
-            };
-
-            return participant;
         }
        
         private Expression<Func<IGrouping<ApplicationUser, LotteryParticipant>, LotteryParticipantDTO>> MapToParticipantDto =>

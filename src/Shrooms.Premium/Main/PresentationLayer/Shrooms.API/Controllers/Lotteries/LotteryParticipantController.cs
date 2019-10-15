@@ -37,25 +37,5 @@ namespace Shrooms.API.Controllers.Lotteries
             var viewModel = _mapper.Map<IEnumerable<LotteryParticipantDTO>, IEnumerable<LotteryParticipantViewModel>>(participants);
             return Ok(viewModel);
         }
-
-        [HttpPost]
-        [Route("Enter")]
-        public async Task<IHttpActionResult> BuyLotteryTicket(BuyLotteryTicketViewModel lotteryTickets)
-        {
-            try
-            {
-                var buyLotterTicketDTO = _mapper.Map<BuyLotteryTicketViewModel, BuyLotteryTicketDTO>(lotteryTickets);
-
-                await _participantService.BuyLotteryTicketAsync(buyLotterTicketDTO, GetUserAndOrganization());
-
-                return Ok();
-
-            }
-            catch (LotteryException ex)
-            {
-
-                return BadRequest(ex.Message);
-            }
-        }
     }
 }

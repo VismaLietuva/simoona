@@ -103,6 +103,26 @@ namespace Shrooms.API.Controllers.Lotteries
             return Ok();
         }
 
+        [HttpPost]
+        [Route("Enter")]
+        public async Task<IHttpActionResult> BuyLotteryTicket(BuyLotteryTicketViewModel lotteryTickets)
+        {
+            try
+            {
+                var buyLotterTicketDTO = _mapper.Map<BuyLotteryTicketViewModel, BuyLotteryTicketDTO>(lotteryTickets);
+
+                await _lotteryService.BuyLotteryTicketAsync(buyLotterTicketDTO, GetUserAndOrganization());
+
+                return Ok();
+
+            }
+            catch (LotteryException ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpDelete]
         [Route("Delete")]
         public IHttpActionResult Delete(int id)
@@ -169,6 +189,23 @@ namespace Shrooms.API.Controllers.Lotteries
                 return BadRequest();
             }
 
+        }
+
+        [HttpGet]
+        [Route("{id}/Stats")]
+        public IHttpActionResult LotteryStats(int id)
+        {
+            try
+            {
+                var lotteryStats = _lotteryService.GetLotteryStats(id);
+
+                return Ok(lotteryStats);
+            }
+            catch (LotteryException ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
