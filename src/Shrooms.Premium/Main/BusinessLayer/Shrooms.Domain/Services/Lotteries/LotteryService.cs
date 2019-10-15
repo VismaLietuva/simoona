@@ -37,6 +37,17 @@ namespace Shrooms.Domain.Services.Lotteries
             {
                 throw new LotteryException("Lottery cant start in the past");
             }
+
+            if (newLotteryDTO.EntryFee < 1)
+            {
+                throw new LotteryException("Invalid entry fee");
+            }
+
+            if (newLotteryDTO.Status == (int)LotteryStatus.Aborted || newLotteryDTO.Status == (int)LotteryStatus.Ended)
+            {
+                throw new LotteryException("Invalid status of created lottery");
+            }
+
             var newLottery = MapNewLottery(newLotteryDTO);
             _lotteriesDbSet.Add(newLottery);
             await _uow.SaveChangesAsync(newLotteryDTO.UserId);
