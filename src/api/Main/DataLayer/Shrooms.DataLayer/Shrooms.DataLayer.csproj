@@ -797,6 +797,10 @@
     <Compile Include="Migrations\201910031316520_AddLotteryAndLotteryParticipant.Designer.cs">
       <DependentUpon>201910031316520_AddLotteryAndLotteryParticipant.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201910150905268_RemoveRedundantImageBaseModel.cs" />
+    <Compile Include="Migrations\201910150905268_RemoveRedundantImageBaseModel.Designer.cs">
+      <DependentUpon>201910150905268_RemoveRedundantImageBaseModel.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
@@ -1309,6 +1313,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201910031316520_AddLotteryAndLotteryParticipant.resx">
       <DependentUpon>201910031316520_AddLotteryAndLotteryParticipant.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201910150905268_RemoveRedundantImageBaseModel.resx">
+      <DependentUpon>201910150905268_RemoveRedundantImageBaseModel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

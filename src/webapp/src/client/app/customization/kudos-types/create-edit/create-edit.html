@@ -50,7 +50,7 @@
                                    class="form-control"
                                    name="multiplier"
                                    ng-model="vm.kudosType.multiplier"
-                                   min="1" 
+                                   min="0" 
                                    ng-pattern="/^([0-9]|10){1,10}$/"
                                    ng-maxlength="10"
                                    translate
@@ -99,8 +99,7 @@
                         <label 
                             for="isActiveSwitch" 
                             class="control-label col-xs-12 col-sm-4" 
-                            translate="">
-                            Enabled
+                            translate="kudos.visible">
                         </label>
                         <div class="col-xs-12 col-sm-4">
                             <div class="onoffswitch" id="isActiveSwitch">
