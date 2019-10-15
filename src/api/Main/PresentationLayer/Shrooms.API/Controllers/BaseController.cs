@@ -39,6 +39,11 @@ namespace Shrooms.API.Controllers
             };
         }
 
+        public int GetOrganizationId()
+        {
+            return User.Identity.GetOrganizationId();
+        }
+
         public string GetOrganizationName()
         {
             return User.Identity.GetOrganizationName();
