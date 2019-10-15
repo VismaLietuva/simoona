@@ -5,7 +5,7 @@
     <h3 class="modal-title">{{vm.lottery.title}}</h3>
 </div>
 <div class="modal-body">
-    <form role="form" name="sendKudosForm">
+    <form role="form" name="sendKudosForm" style="margin-left: 15px;">
         <div class="form-group">
             <div class="row">
                 <div class="col-xs-6">
@@ -15,8 +15,9 @@
                             <!-- Indicators -->
                             <ol class="carousel-indicators">
                                 <li data-target="#my-pics" data-slide-to="0" class="active"></li>
-                                <li data-target="#my-pics" data-slide-to="1"></li>
-                                <li data-target="#my-pics" data-slide-to="2"></li>
+                                <li style="margin-left: 5%" ng-repeat="lottery in vm.lottery.images" ng-if="$index > 0"
+                                    data-target="#my-pics" data-slide-to="$index"></li>
+                                </class>
                             </ol>
 
                             <!-- Content -->
@@ -24,8 +25,7 @@
 
                                 <!-- Slide 1 -->
                                 <div class="item active">
-                                    <img src="{{vm.lottery.images[0] | imageThumb:vm.lotteryImageSize:'crop'}}"
-                                        alt="Sunset over beach">
+                                    <img src="{{vm.lottery.images[0] | imageThumb:vm.lotteryImageSize:'crop'}}">
                                 </div>
 
                                 <!-- Slide 2 -->
@@ -46,51 +46,43 @@
 
                         </div>
                     </div>
-                    <div class="row">
-                        <label><b>Description</b> </label>
-                        <div class="card">
-                            <div class="card-body">
-                                {{vm.lottery.description}}
-                            </div>
-                        </div>
-                    </div>
                 </div>
                 <div class="col-xs-6">
-                    <div class="row">
-                        <div class="col-sm-7">
-                            <div class="input-group">
+                        <div class="col-sm-7" style="margin-left: 22px;">
+                            <div class="input-group" >
                                 <span class="input-group-btn">
                                     <button type="button" class="btn btn-default btn-number" ng-click="vm.ticketDown()"
                                         data-type="minus" data-field="quant[1]">
                                         <span class="glyphicon glyphicon-minus"></span>
                                     </button>
                                 </span>
-                                <input type="text" name="quant[1]" class="form-control input-number" value="{{vm.ticketCount}}" min="1"
-                                    max="100">
+                                <input type="text" name="quant[1]" class="form-control input-number"
+                                    value="{{vm.ticketCount}}" min="1" max="100">
                                 <span class="input-group-btn">
-                                    <button type="button" ng-click="vm.ticketUp()"class="btn btn-default btn-number" data-type="plus"
-                                        data-field="quant[1]">
+                                    <button type="button" ng-click="vm.ticketUp()" class="btn btn-default btn-number"
+                                        data-type="plus" data-field="quant[1]">
                                         <span class="glyphicon glyphicon-plus"></span>
                                     </button>
                                 </span>
                             </div>
                         </div>
-                        <div class="row">
-                                <button type="button" ng-click="vm.buyTickets()" class="btn btn-primary">Buy</button>
+                            <button type="button" ng-click="vm.buyTickets()" class="btn btn-primary">Buy</button>
+                            <div style="margin-left: 55px;">
+                            <label class>Total cost: <b>{{vm.lottery.entryFee * vm.ticketCount}}</b></label>
                         </div>
-                          
-                    </div>
-                    <div class="row">
-                        <div class="col-xs-12 col-sm-6">
-                            <label clasS>Total cost: <b>{{vm.lottery.entryFee}}</b></label> 
-                            <label class>Participants: <b>{{vm.lottery.participants}}</b></label>
-                        </div>
-                    </div>
-                </div>
+                    <div>
+                            <div class="card">
+                                    <div class="card-body lottery-description">
+                                        {{vm.lottery.description}}
+                                    </div>
+                                </div>
+                    </div>          
+                </div>                      
             </div>
+        </div>
     </form>
 </div>
-<div class="modal-footer">
+<div class="lottery-details-modal-footer">
     <button class="btn btn-default" ng-click="vm.cancel()" data-test-id="cancel-button-yellow">
         <span translate="common.cancel"></span>
     </button>
