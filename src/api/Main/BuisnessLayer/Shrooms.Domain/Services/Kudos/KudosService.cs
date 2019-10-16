@@ -585,7 +585,8 @@ namespace Shrooms.Domain.Services.Kudos
 
             user.SpentKudos = spentKudos ?? 0;
             user.RemainingKudos = user.TotalKudos - user.SpentKudos;
-            _uow.SaveChanges(userOrg.UserId);
+
+            _uow.SaveChanges();
         }
 
         public bool HasPendingKudos(string employeeId)
@@ -902,6 +903,17 @@ namespace Shrooms.Domain.Services.Kudos
             return type == ConstBusinessLayer.KudosTypeEnum.Send ||
                    type == ConstBusinessLayer.KudosTypeEnum.Minus ||
                    type == ConstBusinessLayer.KudosTypeEnum.Other;
+        }
+
+        public void RefundLotteryTicket(AddKudosLogDTO kudosLogDTO, UserAndOrganizationDTO userOrg)
+        {
+            var kudosDto = MapInitialInfoToDTO(kudosLogDTO);
+            kudosDto.ReceivingUser = _usersDbSet.FirstOrDefault(x => x.Id == kudosLogDTO.UserId);
+
+            InsertKudosLog(kudosDto, KudosStatus.Approved);
+            _uow.SaveChanges();
+
+            UpdateProfileKudos(kudosDto.ReceivingUser, userOrg);
         }
     }
 }
