@@ -2,7 +2,17 @@
     <button type="button" class="close" ng-click="vm.closeModal()">
         <span aria-hidden="true">&times;</span>
     </button>
-    <h3 class="modal-title" translate="lotteries.lotteryStatsModalName"></h3>
+    <div class="col-xs-9">
+        <h3 class="modal-title" translate="lotteries.lotteryStatsModalName"></h3>
+    </div>
+    <span class="text-center event-participants-export">
+        <a class="nc-btn nc-btn-default"
+           ng-click="vm.exportParticipantsData()"
+           title="{{'lottery.export' | translate}}"
+           data-test-id="event-export-participants" ng-cloak translate-cloak>
+            <span class="vismaicon vismaicon-office-excel"></span><span translate="events.export"></span>
+        </a>
+    </span>
 </div>
 <div class="lotteries-modal-body">
     <ul class="lotteries-modal-list">

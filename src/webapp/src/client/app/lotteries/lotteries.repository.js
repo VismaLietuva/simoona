@@ -23,7 +23,8 @@
             revokeLottery: revokeLottery,
             getLotteryListPaged: getLotteryListPaged,
             finishLottery: finishLottery,
-            getLotteryStatistics: getLotteryStatistics
+            getLotteryStatistics: getLotteryStatistics,
+            exportParticipants: exportParticipants
         };
         return service;
 
@@ -81,6 +82,11 @@
 
         function getLotteryStatistics(id) {
             return $resource(url + `${id}/Stats`).get().$promise;
+        }
+        function exportParticipants(lotteryId) {
+            return $http.get(url + 'Export?lotteryId=' + lotteryId, {
+                responseType: 'arraybuffer'
+            });
         }
     }
 })();

@@ -1,5 +1,6 @@
 {
     "entityNamePlural": "Lotteries",
+    "export": "Export",
     "entityNameSingular": "Lottery",
     "lotteriesPanelHeader": "Lotteries",
     "lotteryTitle": "Title",

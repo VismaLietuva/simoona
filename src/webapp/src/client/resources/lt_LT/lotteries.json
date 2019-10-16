@@ -1,5 +1,6 @@
 {
     "entityNamePlural": "Loterijos",
+    "export": "Eksportuoti",
     "entityNameSingular": "Loterija",
     "lotteriesPanelHeader": "Loterijos",
     "lotteryTitle": "Pavadinimas",
