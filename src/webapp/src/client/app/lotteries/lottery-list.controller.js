@@ -4,12 +4,12 @@
     angular
         .module('simoonaApp.Lotteries')
         .constant('lotteryStatuses', {
-            1: "Drafted",
-            2: "Started",
-            3: "Aborted",
-            4: "Ended"
+            1: "drafted",
+            2: "started",
+            3: "aborted",
+            4: "ended"
         })
-        .constant('editableLotteries', [3, 4])
+        .constant('editableLotteries', [1, 2])
         .constant('lotteryPageSettings', {
             'pageSize': 10
         })
@@ -47,7 +47,7 @@
         }
 
         function onSearch(searchString) {
-            vm.filters.s = searchString;
+            vm.filters.searchString = searchString;
             vm.filters.page = 1;
             changeState();
         }
@@ -61,8 +61,8 @@
             if (!!vm.filters.page) {
                 filterParams.page = vm.filters.page;
             }
-            if (!!vm.filters.s) {
-                filterParams.filter = vm.filters.s;
+            if (!!vm.filters.searchString) {
+                filterParams.filter = vm.filters.searchString;
             }
             lotteryRepository.getLotteryListPaged(filterParams).then(function (lotteries) {
                 vm.lotteries = lotteries.pagedList;

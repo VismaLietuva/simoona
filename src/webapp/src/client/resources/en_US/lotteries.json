@@ -19,5 +19,9 @@
     "photos": "Photos",
     "finish": "Finish",
     "successFinish": "{{ one }} \"{{ two }}\" was successfully finished!",
-    "cancel": "Return to lottery list"
+    "cancel": "Return to lottery list",
+    "drafted": "Drafted",
+    "started": "Started",
+    "aborted": "Aborted",
+    "ended": "Ended"
 }

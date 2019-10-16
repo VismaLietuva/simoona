@@ -44,21 +44,17 @@
             isEdit: $state.includes('Root.WithOrg.Admin.Lotteries.Edit')
         };
 
-        if (vm.states.isEdit) {
-            vm.lottery = lottery;
-            vm.lottery.endDate = moment.utc(vm.lottery.endDate).local().startOf('minute').toDate();
-            vm.isDrafted = vm.lottery.status === lotteryStatus.Drafted;
-            vm.isStarted = vm.lottery.status === lotteryStatus.Started;
-            setTitleScope(true, false, 'lotteries.editLottery');
+        setTitleScope(vm.states);
 
-        } else if (vm.states.isCreate) {
-            setTitleScope(false, true, 'lotteries.createLottery');
-        }
-
-        function setTitleScope(titleEdit, titleCreate, pageTitle) {
-            $scope.titleEdit = titleEdit;
-            $scope.titleCreate = titleCreate;
-            $rootScope.pageTitle = pageTitle;
+        function setTitleScope(states) {
+            if (states.isEdit) {
+                vm.lottery = lottery;
+                vm.lottery.endDate = moment.utc(vm.lottery.endDate).local().startOf('minute').toDate();
+                vm.isStarted = vm.lottery.status === lotteryStatus.Started;
+                $rootScope.pageTitle = 'lotteries.editLottery';
+            } else if (states.isCreate) {
+                $rootScope.pageTitle = 'lotteries.createLottery';
+            }
         }
 
         function openDatePicker($event, datePicker) {
@@ -91,7 +87,7 @@
                     vm.lottery.status = lotteryStatus.Drafted;
                     vm.lottery.images = [result.data];
                     lotteryRepository.create(vm.lottery)
-                        .then(updateSucess())
+                        .then(updateSucess('lotteries.hasStarted'))
                 });
 
 
@@ -117,15 +113,15 @@
                         .then(result => {
                             vm.lottery.images = [result.data];
                             lotteryRepository.updateDrafted(vm.lottery)
-                            .then(updateSucess())
+                            .then(updateSucess('lotteries.haveBeenSaved'))
                         })
                 } else {
                     lotteryRepository.updateDrafted(vm.lottery)
-                    .then(updateSucess())
+                    .then(updateSucess('lotteries.haveBeenSaved'))
                 }
             } else if (vm.isStarted) {
                 lotteryRepository.updateStarted({ description: vm.lottery.description, id: vm.lottery.id })
-                    .then(updateSucess())
+                    .then(updateSucess('lotteries.hasBeenSaved'))
             }
         }
 
@@ -144,10 +140,9 @@
                 }, errorHandler.handleErrorMessage);
         }
 
-        function updateSucess() {
-            notifySrv.success(localeSrv.formatTranslation('lotteries.hasBeenSaved', { one: 'lotteries.entityNameSingular', two: vm.lottery.title }));
+        function updateSucess(translation) {
+            notifySrv.success(localeSrv.formatTranslation(translation, { one: 'lotteries.entityNameSingular', two: vm.lottery.title }));
             $state.go('^.List');
         }
-
     };
 })();

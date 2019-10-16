@@ -57,7 +57,7 @@
         }
 
         function revokeLottery(id) {
-            return $resource(url + 'Delete').delete({id}).$promise;
+            return $resource(url + 'Abort').delete({id}).$promise;
         }
 
         function getLotteryListPaged(filters) {

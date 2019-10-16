@@ -19,5 +19,9 @@
     "photos": "Nuotraukos",
     "finish": "Užbaigti",
     "successFinish": "{{ one }} \"{{ two }}\" sekmingai užbaigta!",
-    "cancel": "Grįžti į loterijų sąrašą"
+    "cancel": "Grįžti į loterijų sąrašą",
+    "drafted": "Parengta",
+    "started": "Pradėta",
+    "aborted": "Atšaukta",
+    "ended": "Pasibaigusi"
 }
