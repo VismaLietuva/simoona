@@ -22,7 +22,8 @@
             updateStarted: updateStarted,
             revokeLottery: revokeLottery,
             getLotteryListPaged: getLotteryListPaged,
-            finishLottery: finishLottery
+            finishLottery: finishLottery,
+            getLotteryStatistics: getLotteryStatistics
         };
         return service;
 
@@ -76,6 +77,10 @@
                     method: 'PATCH'
                 }
             }).patch().$promise;
+        }
+
+        function getLotteryStatistics(id) {
+            return $resource(url + `${id}/Stats`).get().$promise;
         }
     }
 })();

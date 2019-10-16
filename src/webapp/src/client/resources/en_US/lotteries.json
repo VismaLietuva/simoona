@@ -19,5 +19,11 @@
     "photos": "Photos",
     "finish": "Finish",
     "successFinish": "{{ one }} \"{{ two }}\" was successfully finished!",
-    "cancel": "Return to lottery list"
+    "cancel": "Return to lottery list",
+    "lotteryStatsModalName": "Lottery statistics",
+    "totalParticipants": "Total participants: ",
+    "ticketsSold": "Tickets sold: ",
+    "kudosSpent": "Kudos spent: ",
+    "userNameSurname": "Name, Surname",
+    "ticketsBougth": "Tickets bought"
 }

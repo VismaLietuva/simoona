@@ -1,0 +1,38 @@
+<div class="modal-header">
+    <button type="button" class="close" ng-click="vm.closeModal()">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <h3 class="modal-title" translate="lotteries.lotteryStatsModalName"></h3>
+</div>
+<div class="lotteries-modal-body">
+    <ul class="lotteries-modal-list">
+        <li><h3><span translate="lotteries.totalParticipants"></span> <b>{{vm.lotteryData.totalParticipants}}</b></h3></li>
+        <li><h3><span translate="lotteries.ticketsSold"></span> <b>{{vm.lotteryData.ticketsSold}}</b></h3></li>
+        <li><h3><span translate="lotteries.kudosSpent"></span> <b>{{vm.lotteryData.kudosSpent}}</b></h3></li>
+    </ul>
+    <table class="table table-grey table-hover table-active lotteries-modal-table" ng-if="vm.lotteryData.participants.length > 0">
+        <thead>
+            <tr>
+                <th class="col-xs-5">
+                    <ace-sort-link on-sort="onSort" sort-dir="filter.dir" sort-field="filter.sort" sort-value="name"><span>{{"lotteries.userNameSurname" | translate}}</span></ace-sort-link>
+                </th>
+                <th class="col-xs-3" >
+                    {{"lotteries.ticketsBougth" | translate}}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+                <tr ng-repeat="lotteryParticipant in vm.lotteryData.participants">
+                <td>
+                    <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: lotteryParticipant.userId })">{{lotteryParticipant.fullName}}</a>
+                </td>
+                <td>
+                    {{lotteryParticipant.tickets}}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    
+</div>
+<div class="modal-footer">
+</div>
