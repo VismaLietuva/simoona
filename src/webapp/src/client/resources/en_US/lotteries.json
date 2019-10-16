@@ -1,4 +1,10 @@
 {
+    "totalCost": "Total cost",
+    "hours" : "hours",
+    "buy": "Buy",
+    "cancel": "Cancel",
+    "endsIn": "Ends in",
+    "kudosPerTicket": "kudos/ticket",
     "entityNamePlural": "Lotteries",
     "entityNameSingular": "Lottery",
     "lotteriesPanelHeader": "Lotteries",

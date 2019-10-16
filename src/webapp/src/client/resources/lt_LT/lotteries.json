@@ -1,4 +1,9 @@
 {
+    "totalCost": "Bendra suma",
+    "buy": "Pirkti",
+    "cancel": "Atšaukti",
+    "endsIn": "Pasibaigs už",
+    "kudosPerTicket": "kudos/bilietas",
     "entityNamePlural": "Loterijos",
     "entityNameSingular": "Loterija",
     "lotteriesPanelHeader": "Loterijos",

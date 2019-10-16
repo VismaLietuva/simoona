@@ -5,7 +5,7 @@
     <h3 class="modal-title">{{vm.lottery.title}}</h3>
 </div>
 <div class="modal-body">
-    <form role="form" name="sendKudosForm" style="margin-left: 15px;">
+    <form role="form" style="margin-left: 15px;">
         <div class="form-group">
             <div class="row">
                 <div class="col-xs-6">
@@ -48,36 +48,45 @@
                     </div>
                 </div>
                 <div class="col-xs-6">
-                        <div class="col-sm-7" style="margin-left: 22px;">
-                            <div class="input-group" >
-                                <span class="input-group-btn">
-                                    <button type="button" class="btn btn-default btn-number" ng-click="vm.ticketDown()"
-                                        data-type="minus" data-field="quant[1]">
-                                        <span class="glyphicon glyphicon-minus"></span>
-                                    </button>
-                                </span>
-                                <input type="text" name="quant[1]" class="form-control input-number"
-                                    value="{{vm.ticketCount}}" min="1" max="100">
-                                <span class="input-group-btn">
-                                    <button type="button" ng-click="vm.ticketUp()" class="btn btn-default btn-number"
-                                        data-type="plus" data-field="quant[1]">
-                                        <span class="glyphicon glyphicon-plus"></span>
-                                    </button>
-                                </span>
-                            </div>
+                    <div class="col-sm-8" style="margin-left: 10px;">
+                        <div class="input-group">
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default btn-number" ng-click="vm.ticketDown()"
+                                    data-type="minus" data-field="quant[1]">
+                                    <span class="glyphicon glyphicon-minus"></span>
+                                </button>
+                            </span>
+                            <input type="text" name="quant[1]" class="form-control input-number"
+                                value="{{vm.ticketCount}}" style="text-align: center;" min="1" max="100">
+                            <span class="input-group-btn">
+                                <button type="button" ng-click="vm.ticketUp()" class="btn btn-default btn-number"
+                                    data-type="plus" data-field="quant[1]">
+                                    <span class="glyphicon glyphicon-plus"></span>
+                                </button>
+                            </span>
                         </div>
-                            <button type="button" ng-click="vm.buyTickets()" class="btn btn-primary">Buy</button>
-                            <div style="margin-left: 55px;">
-                            <label class>Total cost: <b>{{vm.lottery.entryFee * vm.ticketCount}}</b></label>
+                    </div>
+                    <div class="col-sm-3">
+                            <button type="button" ng-click="vm.buyTickets()" class="btn btn-primary"><span translate="lotteries.buy"></span></button>
+                    </div>
+                 <div class="row">
+                    <div style="margin-left: 55px;">
+                        <label class><span translate="lotteries.totalCost"></span> <b>{{vm.lottery.entryFee * vm.ticketCount}}</b></label>
+                    </div>
+                </div>
+                <div class="row">
+                        <div class="lottery-end-date-component">
+                            <label style="margin-bottom: 0px; padding-bottom: 0px;"><span translate="lotteries.endDate"></span> <b>{{vm.lottery.endDate | convertToCurrentTimezone | date:'yyyy-MM-dd, HH:mm'}}</b></label>
                         </div>
-                    <div>
-                            <div class="card">
-                                    <div class="card-body lottery-description">
-                                        {{vm.lottery.description}}
-                                    </div>
-                                </div>
-                    </div>          
-                </div>                      
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="card">
+                    <div class="card-body lottery-description">
+                        {{vm.lottery.description}}
+                    </div>
+                </div>
             </div>
         </div>
     </form>
