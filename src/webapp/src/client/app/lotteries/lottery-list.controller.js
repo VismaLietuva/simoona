@@ -4,12 +4,12 @@
     angular
         .module('simoonaApp.Lotteries')
         .constant('lotteryStatuses', {
-            1: "drafted",
-            2: "started",
-            3: "aborted",
-            4: "ended"
+            drafted: 1,
+            started: 2,
+            aborted: 3,
+            ended: 4
         })
-        .constant('editableLotteries', [1, 2])
+        .constant('editableLotteries', ['drafted', 'started'])
         .constant('lotteryPageSettings', {
             'pageSize': 10
         })
@@ -34,6 +34,8 @@
         vm.onSearch = onSearch;
         vm.filters = lotteryPageSettings;
         vm.onPageChange = onPageChange;
+        vm.getLotteryStatusString = getLotteryStatusString;
+        vm.isLotteryEditable = isLotteryEditable;
         $rootScope.pageTitle = 'lotteries.lotteriesPanelHeader';
         vm.allowEdit = authService.hasPermissions(["LOTTERY_ADMINISTRATION"]);
 
@@ -68,6 +70,14 @@
                 vm.lotteries = lotteries.pagedList;
                 vm.filters.itemCount = lotteries.itemCount;
             });
+        }
+
+        function getLotteryStatusString(status) {
+            return 'lotteries.' + Object.keys(vm.lotteryStatuses).find(key => vm.lotteryStatuses[key] === status);
+        }
+
+        function isLotteryEditable(lottery) {
+            return vm.editableLotteries.some(status => vm.lotteryStatuses[status] === lottery.status);
         }
     }
 
