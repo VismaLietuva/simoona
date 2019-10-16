@@ -14,11 +14,13 @@
         })
         .controller('lotteryManageController', lotteryManageController);
 
-    lotteryManageController.$inject = ['$scope', '$state', 'lotteryFactory', '$rootScope',
-    'notifySrv', '$q', 'localeSrv', 'errorHandler', 'lotteryStatus', 'lottery', 'pictureRepository', 'dataHandler', 'lotteryImageSettings'
+    lotteryManageController.$inject = ['$scope', '$state', 'lotteryRepository', '$rootScope',
+    'notifySrv', '$q', 'localeSrv', 'errorHandler', 'lotteryStatus', 'lottery', 'pictureRepository', 'dataHandler', 'lotteryImageSettings', '$timeout'
     ];
 
-    function lotteryManageController($scope, $state, lotteryFactory, $rootScope, notifySrv, $q, localeSrv, errorHandler, lotteryStatus, lottery, pictureRepository, dataHandler, lotteryImageSettings) {
+    function lotteryManageController(
+        $scope, $state, lotteryRepository, $rootScope, notifySrv, $q, localeSrv, errorHandler,
+        lotteryStatus, lottery, pictureRepository, dataHandler, lotteryImageSettings, $timeout) {
         
         var vm = this;
         vm.openDatePicker = openDatePicker;
@@ -26,6 +28,7 @@
         vm.createLottery = createLottery;
         vm.updateLottery = updateLottery;
         vm.revokeLottery = revokeLottery;
+        vm.finishLottery = finishLottery;
 
         vm.lotteryImageSize = {
             w: lotteryImageSettings.width,
@@ -73,7 +76,7 @@
                 .then(result => {
                     vm.lottery.status = lotteryStatus.Started;
                     vm.lottery.images = [result.data];
-                    lotteryFactory.create(vm.lottery)
+                    lotteryRepository.create(vm.lottery)
                     .then(function() {
                         notifySrv.success(localeSrv.formatTranslation('lotteries.hasStarted', { one: 'lotteries.entityNameSingular', two: vm.lottery.title }));
                         $state.go('^.List');
@@ -87,7 +90,7 @@
                 .then(result => {
                     vm.lottery.status = lotteryStatus.Drafted;
                     vm.lottery.images = [result.data];
-                    lotteryFactory.create(vm.lottery)
+                    lotteryRepository.create(vm.lottery)
                         .then(updateSucess())
                 });
 
@@ -113,25 +116,32 @@
                     saveimage()
                         .then(result => {
                             vm.lottery.images = [result.data];
-                            lotteryFactory.updateDrafted(vm.lottery)
+                            lotteryRepository.updateDrafted(vm.lottery)
                             .then(updateSucess())
                         })
                 } else {
-                    lotteryFactory.updateDrafted(vm.lottery)
+                    lotteryRepository.updateDrafted(vm.lottery)
                     .then(updateSucess())
                 }
             } else if (vm.isStarted) {
-                lotteryFactory.updateStarted({ description: vm.lottery.description, id: vm.lottery.id })
+                lotteryRepository.updateStarted({ description: vm.lottery.description, id: vm.lottery.id })
                     .then(updateSucess())
             }
         }
 
         function revokeLottery(id) {
-            lotteryFactory.revokeLottery(id).then(function(result) {
+            lotteryRepository.revokeLottery(id).then(function() {
                 notifySrv.success('lotteries.successDelete');
-
                 $state.go('Root.WithOrg.Admin.Lotteries.List');
             }, errorHandler.handleErrorMessage);
+        }
+
+        function finishLottery() {
+            lotteryRepository.finishLottery(vm.lottery.id)
+                .then(function() {
+                    notifySrv.success(localeSrv.formatTranslation('lotteries.successFinish', { one: 'lotteries.entityNameSingular', two: vm.lottery.title }));
+                    $state.go('Root.WithOrg.Admin.Lotteries.List');
+                }, errorHandler.handleErrorMessage);
         }
 
         function updateSucess() {

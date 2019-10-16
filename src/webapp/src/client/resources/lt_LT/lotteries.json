@@ -13,7 +13,11 @@
     "start": "Pradėti",
     "save": "Išsaugoti",
     "update": "Atnaujinti",
-    "abort": "Atšaukti",
+    "revoke": "Atšaukti",
     "hasStarted": "{{ one }} \"{{ two }}\" prasidejo!",
-    "hasBeenSaved": "{{ one }} \"{{ two }}\" išsaugota!"
+    "hasBeenSaved": "{{ one }} \"{{ two }}\" išsaugota!",
+    "photos": "Nuotraukos",
+    "finish": "Užbaigti",
+    "successFinish": "{{ one }} \"{{ two }}\" sekmingai užbaigta!",
+    "cancel": "Grįžti į loterijų sąrašą"
 }
