@@ -13,7 +13,7 @@ namespace Shrooms.WebViewModels.Models.Lotteries
     {
         [Required]
         public string Title { get; set; }
-        [StringLength(ConstWebApi.EventNameMaxLength)]
+        [StringLength(ConstWebApi.EventDescriptionMaxLength)]
         public string Description { get; set; }
         [Required]
         public DateTime StartDate { get; set; }
