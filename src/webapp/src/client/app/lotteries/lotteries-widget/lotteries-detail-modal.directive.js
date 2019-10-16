@@ -7,13 +7,13 @@
             height: 165,
             width: 291,
         })
-        .directive('aceLotteriesDetailModal', kudosifyModal)
+        .directive('aceLotteriesDetailModal', lotteryDetailModal)
 
-    kudosifyModal.$inject = [
+        lotteryDetailModal.$inject = [
         '$uibModal'
     ];
 
-    function kudosifyModal($uibModal) {
+    function lotteryDetailModal($uibModal) {
         var directive = {
             restrict: 'A',
             scope: {
@@ -40,31 +40,27 @@
     }
 
     lotteriesDetailController.$inject = [
-        '$scope',
         '$uibModalInstance',
-        'authService',
-        'lodash',
-        'dataHandler',
-        'errorHandler',
         'lotteryFactory',
         'currentLottery',
         'lotteryImageSettings'
     ];
 
-    function lotteriesDetailController($scope, $uibModalInstance, authService, 
-        lodash, dataHandler, errorHandler, lotteryFactory, currentLottery, lotteryImageSettings) {
+    function lotteriesDetailController($uibModalInstance, lotteryFactory, currentLottery, lotteryImageSettings) {
         var vm = this;
         vm.lotteryImageSize = {
             w: lotteryImageSettings.width,
             h: lotteryImageSettings.height
         };
-        vm.cancel = cancel;
+
+        vm.ticketCount = 0;
         vm.currentLottery = currentLottery;
+        
+        vm.cancel = cancel;
         vm.ticketUp = ticketUp;
         vm.ticketDown = ticketDown;
         vm.buyTickets = buyTickets;
 
-        vm.ticketCount = 0;
         init();
         
         //////
@@ -74,7 +70,6 @@
             lotteryFactory.getLottery(currentLottery)
             .then(function(lottery){
                 vm.lottery = lottery;
-                console.log(vm.lottery);
             });
         }
         function cancel() {
@@ -89,8 +84,7 @@
             }
         }
         function buyTickets(){
-            console.log(vm.currentLottery)
-            console.log(vm.ticketCount);
+
         }
     }
 })();
