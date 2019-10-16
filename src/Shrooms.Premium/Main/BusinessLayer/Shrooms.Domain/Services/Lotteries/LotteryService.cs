@@ -6,14 +6,18 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using Hangfire;
 using PagedList;
 using Shrooms.Constants.WebApi;
 using Shrooms.DataLayer;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
+using Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.DataTransferObjects.Models.Lotteries;
+using Shrooms.Domain.Services.Kudos;
 using Shrooms.DomainExceptions.Exceptions.Lotteries;
 using Shrooms.EntityModels.Models.Lotteries;
+using Shrooms.Infrastructure.FireAndForget;
 using static Shrooms.Constants.BusinessLayer.ConstBusinessLayer;
 
 namespace Shrooms.Domain.Services.Lotteries
@@ -21,14 +25,20 @@ namespace Shrooms.Domain.Services.Lotteries
     public class LotteryService : ILotteryService
     {
         private readonly IUnitOfWork2 _uow;
+
         private readonly IDbSet<Lottery> _lotteriesDbSet;
+
         private readonly IMapper _mapper;
 
-        public LotteryService(IUnitOfWork2 uow, IMapper mapper)
+        private readonly IAsyncRunner _asyncRunner;
+
+        public LotteryService(IUnitOfWork2 uow, IMapper mapper,
+            IAsyncRunner asyncRunner)
         {
             _uow = uow;
             _mapper = mapper;
             _lotteriesDbSet = uow.GetDbSet<Lottery>();
+            _asyncRunner = asyncRunner;
         }
 
         public async Task<CreateLotteryDTO> CreateLottery(CreateLotteryDTO newLotteryDTO)
@@ -37,6 +47,7 @@ namespace Shrooms.Domain.Services.Lotteries
             {
                 throw new LotteryException("Lottery cant start in the past");
             }
+
             var newLottery = MapNewLottery(newLotteryDTO);
             newLottery.Status = (int)LotteryStatus.Started;
             _lotteriesDbSet.Add(newLottery);
@@ -54,6 +65,7 @@ namespace Shrooms.Domain.Services.Lotteries
             {
                 throw new LotteryException("Lottery has started or ended");
             }
+
             UpdateDraftedLottery(lottery, lotteryDTO);
             _uow.SaveChanges(false);
         }
@@ -66,6 +78,7 @@ namespace Shrooms.Domain.Services.Lotteries
             {
                 throw new LotteryException("Lottery is not running");
             }
+
             lottery.Description = lotteryDTO.Description;
             _uow.SaveChanges();
 
@@ -84,14 +97,20 @@ namespace Shrooms.Domain.Services.Lotteries
             return lotteryDetailsDTO;
         }
 
-        public void RemoveLottery(int id, UserAndOrganizationDTO userOrg)
+        public void AbortLottery(int id, UserAndOrganizationDTO userOrg)
         {
-            var lottery = _lotteriesDbSet.SingleOrDefault(p => p.Id == id && p.OrganizationId == userOrg.OrganizationId);
+            var lottery = _lotteriesDbSet.Find(id);
+
             if (lottery == null)
             {
-                throw new LotteryException("Lottery not found");
+                throw new LotteryException("Lottery not found.");
             }
 
+            if (lottery.Status == (int)LotteryStatus.Started)
+            {
+                _asyncRunner.Run<ILotteryAbortService>(n => n.RefundLottery(lottery, userOrg), _uow.ConnectionName);
+            }
+                       
             lottery.Status = (int)LotteryStatus.Aborted;
             _uow.SaveChanges();
         }
@@ -140,7 +159,6 @@ namespace Shrooms.Domain.Services.Lotteries
              EndDate = e.EndDate,
              Status = e.Status
          };
-
 
         private void UpdateDraftedLottery(Lottery lottery, EditDraftedLotteryDTO draftedLotteryDTO)
         {

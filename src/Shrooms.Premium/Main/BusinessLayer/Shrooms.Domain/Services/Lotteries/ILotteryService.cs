@@ -13,12 +13,19 @@ namespace Shrooms.Domain.Services.Lotteries
     public interface ILotteryService
     {
         Task<CreateLotteryDTO> CreateLottery(CreateLotteryDTO newLotteryDTO);
+
         void EditDraftedLottery(EditDraftedLotteryDTO lotteryDTO);
+
         void EditStartedLottery(EditStartedLotteryDTO lotteryDTO);
-        void RemoveLottery(int id, UserAndOrganizationDTO userOrg);
+
+        void AbortLottery(int id, UserAndOrganizationDTO userOrg);
+
         IEnumerable<LotteryDetailsDTO> GetLotteries(UserAndOrganizationDTO userOrganization);
+
         IEnumerable<LotteryDetailsDTO> GetFilteredLotteries(string filter);
+
         IPagedList<LotteryDetailsDTO> GetPagedLotteries(string filter, int page, int pageSize = ConstWebApi.DefaultPageSize);
+
         LotteryDetailsDTO GetLotteryDetails(int id, UserAndOrganizationDTO userOrg);
     }
 }

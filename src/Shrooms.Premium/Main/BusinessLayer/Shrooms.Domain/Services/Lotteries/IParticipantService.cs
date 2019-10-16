@@ -1,4 +1,5 @@
 ﻿using Shrooms.DataTransferObjects.Models.Lotteries;
+using Shrooms.EntityModels.Models.Lotteries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +13,9 @@ namespace Shrooms.Domain.Services.Lotteries
         IEnumerable<string> GetParticipantsId(int lotteryId);
 
         IEnumerable<LotteryParticipantDTO> GetParticipantsCounted(int lotteryId);
+
+        IEnumerable<LotteryParticipantDTO> GetParticipantsToRefund(int lotteryId);
+
+        void SetTicketsAsRefunded(int lotteryId, string userId);
     }
 }

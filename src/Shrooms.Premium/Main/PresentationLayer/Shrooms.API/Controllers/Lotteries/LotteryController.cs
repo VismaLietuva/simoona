@@ -77,7 +77,7 @@ namespace Shrooms.API.Controllers.Lotteries
                 return BadRequest(e.Message);
             }
 
-           
+
         }
 
         [HttpPost]
@@ -93,7 +93,7 @@ namespace Shrooms.API.Controllers.Lotteries
             SetOrganizationAndUser(createLotteryDTO);
             try
             {
-                var createLottery = await _lotteryService.CreateLottery(createLotteryDTO);
+                await _lotteryService.CreateLottery(createLotteryDTO);
             }
             catch (LotteryException e)
             {
@@ -103,19 +103,12 @@ namespace Shrooms.API.Controllers.Lotteries
             return Ok();
         }
 
-        [HttpDelete]
-        [Route("Delete")]
-        public IHttpActionResult Delete(int id)
+        [HttpGet]
+        [Route("Abort")]
+        public IHttpActionResult Abort(int id)
         {
-            try
-            {
-                _lotteryService.RemoveLottery(id, GetUserAndOrganization());
-                return Ok();
-            }
-            catch (LotteryException e)
-            {
-                return BadRequest(e.Message);
-            }
+            _lotteryService.AbortLottery(id, GetUserAndOrganization());
+            return Ok();
         }
 
         [HttpPut]
