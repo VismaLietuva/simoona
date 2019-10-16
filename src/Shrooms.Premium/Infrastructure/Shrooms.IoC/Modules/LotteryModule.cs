@@ -11,6 +11,7 @@ namespace Shrooms.IoC.Modules
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterType<LotteryService>().As<ILotteryService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            builder.RegisterType<LotteryExportService>().As<ILotteryExportService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
         }
     }
 }
