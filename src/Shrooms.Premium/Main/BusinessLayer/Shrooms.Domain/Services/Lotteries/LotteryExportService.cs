@@ -34,7 +34,7 @@ namespace Shrooms.Domain.Services.Lotteries
 
                     numberOfTicketsAdded++;
 
-                    if(numberOfTicketsAdded % ConstBusinessLayer.ParticipantsInRow == 0)
+                    if(numberOfTicketsAdded % ConstBusinessLayer.LotteryParticipantsInRow == 0)
                     {
                         tickets.Add(participantTickets);
                         participantTickets = new List<string>();
@@ -43,7 +43,7 @@ namespace Shrooms.Domain.Services.Lotteries
             }
             tickets.Add(participantTickets);
 
-            _excelBuilder.AddNewWorksheet(ConstBusinessLayer.LotteryParticipantsExcelTableName, new List<string>(), tickets);
+            _excelBuilder.AddNewWorksheet(ConstBusinessLayer.LotteryParticipantsExcelTableName, tickets);
 
             return _excelBuilder.GenerateByteArray();
         }
