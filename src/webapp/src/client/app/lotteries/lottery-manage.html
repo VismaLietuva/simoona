@@ -108,9 +108,15 @@
                         <div class="form-group required" ng-class="{'has-error': lotteryForm.image-file-input.$invalid}">
                             <label for="image-file-input" class="control-label col-xs-12 col-sm-4" translate="lotteries.photos"></label>
                             <div class="col-xs-12 col-sm-6 col-md-4">
-                                <ace-photo-crop-upload ng-if="!vm.isStarted" image="vm.lotteryImage" is-crop-visible="vm.isCreate || !!vm.lotteryImage" aspect-ratio="1.7" result-image="vm.lotteryCroppedImage" image-size="vm.lotteryImageSize">
+                                <ace-photo-crop-upload ng-if="!vm.isStarted" multiple="true" images="vm.lotteryImages" is-crop-visible="vm.isCreate || !!vm.lotteryImage" aspect-ratio="1.7" result-image="vm.lotteryCroppedImages" image-size="vm.lotteryImageSize">
                                 </ace-photo-crop-upload>
-                                <img ng-if="vm.states.isEdit && !vm.lotteryCroppedImage && !vm.lotteryImage" src="{{vm.lottery.images[0] | imageThumb:vm.lotteryImageSize:'crop'}}" />
+                                <br/>
+                                <div ng-if="vm.states.isEdit && !vm.lotteryCroppedImage && !vm.lotteryImage" ng-repeat="lotteryImage in vm.lottery.images">
+                                    <div class="lottery-image">
+                                        <img ng-cloak ng-src="{{lotteryImage| imageThumb:vm.lotteryImageSize:'crop'}}" />
+                                        <span ng-if="vm.states.isCreate || vm.isDrafted" class="vismaicon vismaicon-sm vismaicon-delete" ng-click="vm.removeImage(lotteryImage)"></span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         
@@ -143,21 +149,28 @@
                             <button class="btn btn-primary" 
                                     ng-if="vm.states.isCreate" 
                                     ng-click="vm.startLottery()" 
-                                    ng-disabled="lotteryForm.$invalid || !vm.lotteryCroppedImage">
+                                    ng-disabled="lotteryForm.$invalid || !(vm.lotteryCroppedImages.length > 0 || vm.lottery.images.length > 0)">
                                 <span translate="lotteries.start"></span>
                             </button>
-    
+
+                            <button class="btn btn-primary" 
+                                    ng-if="vm.isDrafted" 
+                                    ng-click="vm.updateLottery(true)" 
+                                    ng-disabled="lotteryForm.$invalid || !(vm.lotteryCroppedImages.length > 0 || vm.lottery.images.length > 0)">
+                                <span translate="lotteries.start"></span>
+                            </button>
+
                             <button class="btn btn-primary" 
                                     ng-if="vm.states.isCreate" 
                                     ng-click="vm.createLottery()" 
-                                    ng-disabled="lotteryForm.$invalid">
+                                    ng-disabled="lotteryForm.$invalid || vm.lotteryCroppedImages.length < 1">
                                 <span translate="lotteries.save"></span>
                             </button>
 
                             <button class="btn btn-primary" 
-                                    ng-if="vm.states.isEdit" 
+                                    ng-if="vm.isDrafted || vm.isStarted" 
                                     ng-click="vm.updateLottery()" 
-                                    ng-disabled="lotteryForm.$invalid">
+                                    ng-disabled="lotteryForm.$invalid || !(vm.lotteryCroppedImages.length > 0 || vm.lottery.images.length > 0)">
                                 <span translate="lotteries.update"></span>
                             </button>
 

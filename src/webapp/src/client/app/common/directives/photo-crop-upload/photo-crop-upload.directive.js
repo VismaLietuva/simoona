@@ -15,7 +15,9 @@
                 isCropVisible: '=',
                 aspectRatio: '=',
                 resultImage: '=',
-                imageSize: '='
+                imageSize: '=',
+                multiple: '=',
+                images: "=?"
             },
             controller: photoCropUploadController,
             controllerAs: 'vm',
@@ -36,21 +38,33 @@
     function photoCropUploadController($scope, shroomsFileUploader, imageValidationSettings, notifySrv) {
         /* jshint validthis: true */
         var vm = this;
-
+        vm.images = [];
         $scope.handleFileSelect = handleFileSelect;
-
         ///////
 
         function handleFileSelect(files) {
             if (imageAttached(files)) {
-                vm.image = files[0];
-                if (vm.image) {
-                    var reader = new FileReader();
-                    reader.onload = function (files) {
-                        $scope.$apply();
-                    };
+                if (files.length > 1 || $scope.vm.multiple) {
+                    vm.images = [];
+                    Object.keys(files).forEach(function(photo, index) {
+                        vm.images.push(files[photo]);
+                        var reader = new FileReader();
+                        reader.onload = function (files) {
+                            $scope.$apply();
+                        };
+                        reader.readAsDataURL(vm.images[index]);
+                    });
 
-                    reader.readAsDataURL(vm.image);
+                } else {
+                    vm.image = files[0];
+                    if (vm.image) {
+                        var reader = new FileReader();
+                        reader.onload = function (files) {
+                            $scope.$apply();
+                        };
+
+                        reader.readAsDataURL(vm.image);
+                    }
                 }
             }
         }
