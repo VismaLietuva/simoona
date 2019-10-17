@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.EntityModels.Models.Lotteries;
+using Shrooms.Infrastructure.Logger;
 
 namespace Shrooms.Domain.Services.Lotteries
 {
@@ -12,10 +14,14 @@ namespace Shrooms.Domain.Services.Lotteries
 
         private readonly IKudosService _kudosService;
 
-        public LotteryAbortJob(IKudosService kudosService, IParticipantService participantService)
+        private readonly ILogger _logger;
+
+        public LotteryAbortJob(IKudosService kudosService, IParticipantService participantService,
+            ILogger logger)
         {
             _kudosService = kudosService;
             _participantService = participantService;
+            _logger = logger;
         }
 
         public void RefundLottery(Lottery lottery, UserAndOrganizationDTO userOrg)
@@ -24,19 +30,26 @@ namespace Shrooms.Domain.Services.Lotteries
 
             foreach (var user in usersToRefund)
             {
-                var totalReturn = user.Tickets * lottery.EntryFee;
-                var kudosLog = new AddKudosLogDTO
+                try
                 {
-                    ReceivingUserIds = new List<string> { user.UserId },
-                    PointsTypeId = 3,
-                    MultiplyBy = totalReturn,
-                    Comment = FormatComment(lottery, totalReturn),
-                    UserId = user.UserId,
-                    OrganizationId = userOrg.OrganizationId
-                };
+                    var totalReturn = user.Tickets * lottery.EntryFee;
+                    var kudosLog = new AddKudosLogDTO
+                    {
+                        ReceivingUserIds = new List<string> { user.UserId },
+                        PointsTypeId = 3,
+                        MultiplyBy = totalReturn,
+                        Comment = FormatComment(lottery, totalReturn),
+                        UserId = user.UserId,
+                        OrganizationId = 2
+                    };
 
-                _kudosService.RefundLotteryTicket(kudosLog, userOrg);
-                _participantService.SetTicketsAsRefunded(lottery.Id, user.UserId);
+                    _kudosService.RefundLotteryTicket(kudosLog, userOrg);
+                    _participantService.SetTicketsAsRefunded(lottery.Id, user.UserId);
+                }
+                catch (Exception e)
+                {
+                    _logger.Error(e);
+                }
             }
         }
 
