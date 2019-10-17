@@ -19,19 +19,10 @@ namespace Shrooms.Infrastructure.ExcelGenerator
             var worksheet = _package.Workbook.Worksheets.Add(sheetName);
             var worksheetBuilder = new ExcelWorksheetBuilder(worksheet);
 
-            if (headerItems.Count() == 0)
-            {
-                worksheetBuilder
-                    .WithRows(rows)
-                    .Build();
-            }
-            else
-            {
                 worksheetBuilder
                     .WithHeader(headerItems)
                     .WithRows(rows)
                     .Build();
-            }
 
             return this;
         }
