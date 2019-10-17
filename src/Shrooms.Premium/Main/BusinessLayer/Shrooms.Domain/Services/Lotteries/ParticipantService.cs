@@ -1,13 +1,13 @@
-﻿using Shrooms.DataLayer.DAL;
-using Shrooms.DataTransferObjects.Models.Lotteries;
-using Shrooms.EntityModels.Models;
-using Shrooms.EntityModels.Models.Lotteries;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Shrooms.DataLayer.DAL;
+using Shrooms.DataTransferObjects.Models.Lotteries;
+using Shrooms.EntityModels.Models;
+using Shrooms.EntityModels.Models.Lotteries;
 
 namespace Shrooms.Domain.Services.Lotteries
 {

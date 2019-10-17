@@ -1,25 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Hangfire;
-using Shrooms.DataLayer.DAL;
+﻿using System.Collections.Generic;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.EntityModels.Models.Lotteries;
-using Shrooms.Infrastructure.FireAndForget;
 
 namespace Shrooms.Domain.Services.Lotteries
 {
-    public class LotteryAbortService : ILotteryAbortService
+    public class LotteryAbortJob : ILotteryAbortJob
     {
         private readonly IParticipantService _participantService;
 
         private readonly IKudosService _kudosService;
 
-        public LotteryAbortService(IKudosService kudosService, IParticipantService participantService)
+        public LotteryAbortJob(IKudosService kudosService, IParticipantService participantService)
         {
             _kudosService = kudosService;
             _participantService = participantService;
@@ -31,20 +24,25 @@ namespace Shrooms.Domain.Services.Lotteries
 
             foreach (var user in usersToRefund)
             {
-                _participantService.SetTicketsAsRefunded(lottery.Id, user.UserId);
-
+                var totalReturn = user.Tickets * lottery.EntryFee;
                 var kudosLog = new AddKudosLogDTO
                 {
                     ReceivingUserIds = new List<string> { user.UserId },
                     PointsTypeId = 3,
-                    MultiplyBy = user.Tickets * lottery.EntryFee,
-                    Comment = $"Refund for lottery {lottery.Title}",
+                    MultiplyBy = totalReturn,
+                    Comment = FormatComment(lottery, totalReturn),
                     UserId = user.UserId,
                     OrganizationId = userOrg.OrganizationId
                 };
 
                 _kudosService.RefundLotteryTicket(kudosLog, userOrg);
+                _participantService.SetTicketsAsRefunded(lottery.Id, user.UserId);
             }
+        }
+
+        private string FormatComment(Lottery lottery, int total)
+        {
+            return $"Refund for lottery {lottery.Title}. Returned {total} kudos.";
         }
     }
 }

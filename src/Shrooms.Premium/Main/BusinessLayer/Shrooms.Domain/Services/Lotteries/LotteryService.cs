@@ -3,18 +3,13 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
-using Hangfire;
 using PagedList;
-using Shrooms.Constants.WebApi;
-using Shrooms.DataLayer;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
-using Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.DataTransferObjects.Models.Lotteries;
-using Shrooms.Domain.Services.Kudos;
+using Shrooms.Domain.Services.Args;
 using Shrooms.DomainExceptions.Exceptions.Lotteries;
 using Shrooms.EntityModels.Models.Lotteries;
 using Shrooms.Infrastructure.FireAndForget;
@@ -28,28 +23,28 @@ namespace Shrooms.Domain.Services.Lotteries
 
         private readonly IDbSet<Lottery> _lotteriesDbSet;
 
-        private readonly IMapper _mapper;
-
         private readonly IAsyncRunner _asyncRunner;
 
-        public LotteryService(IUnitOfWork2 uow, IMapper mapper,
-            IAsyncRunner asyncRunner)
+        private readonly IMapper _mapper;
+
+        public LotteryService(IUnitOfWork2 uow, IMapper mapper, IAsyncRunner asyncRunner)
         {
             _uow = uow;
-            _mapper = mapper;
             _lotteriesDbSet = uow.GetDbSet<Lottery>();
             _asyncRunner = asyncRunner;
+            _mapper = mapper;
         }
 
         public async Task<CreateLotteryDTO> CreateLottery(CreateLotteryDTO newLotteryDTO)
         {
             if (newLotteryDTO.EndDate < DateTime.UtcNow)
             {
-                throw new LotteryException("Lottery cant start in the past");
+                throw new LotteryException("Lottery can't start in the past.");
             }
 
             var newLottery = MapNewLottery(newLotteryDTO);
             newLottery.Status = (int)LotteryStatus.Started;
+
             _lotteriesDbSet.Add(newLottery);
             await _uow.SaveChangesAsync(newLotteryDTO.UserId);
 
@@ -60,7 +55,8 @@ namespace Shrooms.Domain.Services.Lotteries
 
         public void EditDraftedLottery(EditDraftedLotteryDTO lotteryDTO)
         {
-            var lottery = _lotteriesDbSet.SingleOrDefault(p => p.Id == lotteryDTO.Id);
+            var lottery = _lotteriesDbSet.Find(lotteryDTO.Id);
+
             if (lottery.Status != (int)LotteryStatus.Drafted)
             {
                 throw new LotteryException("Lottery has started or ended");
@@ -72,7 +68,7 @@ namespace Shrooms.Domain.Services.Lotteries
 
         public void EditStartedLottery(EditStartedLotteryDTO lotteryDTO)
         {
-            var lottery = _lotteriesDbSet.SingleOrDefault(p => p.Id == lotteryDTO.Id);
+            var lottery = _lotteriesDbSet.Find(lotteryDTO.Id);
 
             if (lottery.Status != (int)LotteryStatus.Started)
             {
@@ -81,38 +77,34 @@ namespace Shrooms.Domain.Services.Lotteries
 
             lottery.Description = lotteryDTO.Description;
             _uow.SaveChanges();
-
         }
 
         public LotteryDetailsDTO GetLotteryDetails(int id, UserAndOrganizationDTO userOrg)
         {
             var lottery = _lotteriesDbSet.Find(id);
+
             if (lottery == null)
             {
                 throw new LotteryException("Lottery not found");
             }
 
-            var lotteryDetailsDTO = _mapper.Map<Lottery, LotteryDetailsDTO>(lottery);
-
-            return lotteryDetailsDTO;
+            return _mapper.Map<Lottery, LotteryDetailsDTO>(lottery);
         }
 
         public void AbortLottery(int id, UserAndOrganizationDTO userOrg)
         {
             var lottery = _lotteriesDbSet.Find(id);
 
-            if (lottery == null)
+            if (lottery != null)
             {
-                throw new LotteryException("Lottery not found.");
-            }
+                if (lottery.Status == (int)LotteryStatus.Started)
+                {
+                    _asyncRunner.Run<ILotteryAbortJob>(n => n.RefundLottery(lottery, userOrg), _uow.ConnectionName);
+                }
 
-            if (lottery.Status == (int)LotteryStatus.Started)
-            {
-                _asyncRunner.Run<ILotteryAbortService>(n => n.RefundLottery(lottery, userOrg), _uow.ConnectionName);
+                lottery.Status = (int)LotteryStatus.Aborted;
+                _uow.SaveChanges();
             }
-                       
-            lottery.Status = (int)LotteryStatus.Aborted;
-            _uow.SaveChanges();
         }
 
         public IEnumerable<LotteryDetailsDTO> GetLotteries(UserAndOrganizationDTO userOrganization)
@@ -120,21 +112,23 @@ namespace Shrooms.Domain.Services.Lotteries
             return _lotteriesDbSet
                 .Where(p => p.OrganizationId == userOrganization.OrganizationId)
                 .Select(MapLotteriesToListItemDto)
-                .OrderByDescending(ByEndDate).ToList();
+                .OrderByDescending(ByEndDate)
+                .ToList();
         }
 
-        public IEnumerable<LotteryDetailsDTO> GetFilteredLotteries(string filter)
+        public IEnumerable<LotteryDetailsDTO> GetFilteredLotteries(string filter, UserAndOrganizationDTO userOrg)
         {
             return _lotteriesDbSet
+                .Where(x => x.OrganizationId == userOrg.OrganizationId)
                 .Where(x => x.Title.Contains(filter))
                 .Select(MapLotteriesToListItemDto)
                 .OrderByDescending(ByEndDate);
         }
 
-        public IPagedList<LotteryDetailsDTO> GetPagedLotteries(string filter, int page, int pageSize)
+        public IPagedList<LotteryDetailsDTO> GetPagedLotteries(GetPagedLotteriesArgs args)
         {
-            var filteredLotteries = GetFilteredLotteries(filter);
-            return filteredLotteries.ToPagedList(page, pageSize);
+            var filteredLotteries = GetFilteredLotteries(args.Filter, args.UserOrg);
+            return filteredLotteries.ToPagedList(args.PageNumber, args.PageSize);
         }
 
         private Lottery MapNewLottery(CreateLotteryDTO newLotteryDTO)

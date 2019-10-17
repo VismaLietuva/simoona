@@ -1,20 +1,21 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Web.Http;
+using AutoMapper;
 using PagedList;
 using Shrooms.API.Controllers;
 using Shrooms.API.Filters;
 using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.WebApi;
 using Shrooms.DataTransferObjects.Models.Lotteries;
+using Shrooms.Domain.Services.Args;
 using Shrooms.Domain.Services.Lotteries;
 using Shrooms.DomainExceptions.Exceptions.Lotteries;
 using Shrooms.WebViewModels.Models;
 using Shrooms.WebViewModels.Models.Lotteries;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Http;
 
 namespace Shrooms.API.Controllers.Lotteries
 {
@@ -23,6 +24,7 @@ namespace Shrooms.API.Controllers.Lotteries
     public class LotteryController : BaseController
     {
         private readonly IMapper _mapper;
+
         private readonly ILotteryService _lotteryService;
 
         public LotteryController(IMapper mapper, ILotteryService lotteryService)
@@ -46,17 +48,16 @@ namespace Shrooms.API.Controllers.Lotteries
         [PermissionAuthorize(Permission = AdministrationPermissions.Lottery)]
         public PagedViewModel<LotteryDetailsDTO> GetPagedLotteries(string filter = "", int page = 1, int pageSize = ConstWebApi.DefaultPageSize)
         {
-            var pagedLotteries = _lotteryService.GetPagedLotteries(filter, page);
+            var args = new GetPagedLotteriesArgs { Filter = filter, PageNumber = page, PageSize = pageSize, UserOrg = GetUserAndOrganization() };
+            var pagedLotteries = _lotteryService.GetPagedLotteries(args);
 
-            var pagedModel = new PagedViewModel<LotteryDetailsDTO>
+            return new PagedViewModel<LotteryDetailsDTO>
             {
                 PagedList = pagedLotteries,
                 PageCount = pagedLotteries.PageCount,
                 ItemCount = pagedLotteries.TotalItemCount,
                 PageSize = pageSize
             };
-
-            return pagedModel;
         }
 
         [HttpGet]
@@ -70,14 +71,11 @@ namespace Shrooms.API.Controllers.Lotteries
                 var lotteryViewModel = _mapper.Map<LotteryDetailsDTO, LotteryDetailsViewModel>(lotteryDTO);
 
                 return Ok(lotteryViewModel);
-
             }
             catch (LotteryException e)
             {
                 return BadRequest(e.Message);
             }
-
-
         }
 
         [HttpPost]
@@ -91,6 +89,7 @@ namespace Shrooms.API.Controllers.Lotteries
 
             var createLotteryDTO = _mapper.Map<CreateLotteryViewModel, CreateLotteryDTO>(lotteryViewModel);
             SetOrganizationAndUser(createLotteryDTO);
+
             try
             {
                 await _lotteryService.CreateLottery(createLotteryDTO);
@@ -119,6 +118,7 @@ namespace Shrooms.API.Controllers.Lotteries
             {
                 var editDraftedLotteryDTO = _mapper.Map<EditDraftedLotteryViewModel, EditDraftedLotteryDTO>(editLotteryViewModel);
                 SetOrganizationAndUser(editDraftedLotteryDTO);
+
                 _lotteryService.EditDraftedLottery(editDraftedLotteryDTO);
 
                 return Ok();
@@ -137,7 +137,9 @@ namespace Shrooms.API.Controllers.Lotteries
             {
                 var editStartedLotteryDTO = _mapper.Map<EditStartedLotteryViewModel, EditStartedLotteryDTO>(editLotteryViewModel);
                 SetOrganizationAndUser(editStartedLotteryDTO);
+
                 _lotteryService.EditStartedLottery(editStartedLotteryDTO);
+
                 return Ok();
             }
             catch (LotteryException e)

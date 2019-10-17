@@ -20,8 +20,8 @@ namespace Shrooms.IoC.Modules
                 .InstancePerRequest()
                 .EnableInterfaceTelemetryInterceptor();
 
-            builder.RegisterType<LotteryAbortService>()
-                .As<ILotteryAbortService>()
+            builder.RegisterType<LotteryAbortJob>()
+                .As<ILotteryAbortJob>()
                 .EnableInterfaceTelemetryInterceptor();
         }
     }
