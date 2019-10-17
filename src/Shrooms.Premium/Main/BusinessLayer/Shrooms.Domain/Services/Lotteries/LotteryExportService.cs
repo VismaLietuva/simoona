@@ -20,35 +20,30 @@ namespace Shrooms.Domain.Services.Lotteries
         }
         public byte[] ExportParticipants(int lotteryId, UserAndOrganizationDTO userAndOrg)
         {
-            int numberOfTicketsAdded = 0;
-            var tickets = new List<List<string>>();
-
             var participantsDTO = _participantService.GetParticipantsCounted(lotteryId).ToList();
 
-            foreach(var participant in participantsDTO)
+            int numberOfTicketsAdded = 0;
+            var participantTickets = new List<string>();
+            var tickets = new List<List<string>>();
+
+            foreach (var participant in participantsDTO)
             {
-                var participantTickets = new List<string>();
                 for(int i = 0; i < participant.Tickets; i++)
                 {
                     participantTickets.Add(participant.FullName);
 
                     numberOfTicketsAdded++;
 
-                    if(numberOfTicketsAdded %6 == 0)
+                    if(numberOfTicketsAdded % ConstBusinessLayer.ParticipantsInRow == 0)
                     {
                         tickets.Add(participantTickets);
                         participantTickets = new List<string>();
                     }
                 }
-                tickets.Add(participantTickets);
             }
+            tickets.Add(participantTickets);
 
-            var header = new List<string>
-            {
-
-            };
-
-            _excelBuilder.AddNewWorksheet(ConstBusinessLayer.LotteryParticipantsExcelTableName, header, tickets);
+            _excelBuilder.AddNewWorksheet(ConstBusinessLayer.LotteryParticipantsExcelTableName, new List<string>(), tickets);
 
             return _excelBuilder.GenerateByteArray();
         }
