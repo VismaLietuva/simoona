@@ -1,0 +1,20 @@
+<div id="lotteries-wall-widget">
+    <div class="lottery-activity-log-container" ng-repeat="lottery in latestLotteries"
+        ace-lotteries-detail-modal="lottery.id">
+        <div class="lottery-activity-log-inner">
+            <div class="lottery-activity-log-content-box">
+                <div class="lottery-activity-log-title">
+                    {{ lottery.title }}
+                </div>
+                <div class="lottery-activity-log-info" tooltip-placement="bottom" tooltip-class="word-break"
+                    tooltip-append-to-body="true">
+                    <b>{{ lottery.entryFee }} </b><span translate="lotteries.kudosPerTicket"></span>
+                    <div class="row lottery-activity-log-end-date">
+                        <span translate="lotteries.endsIn"></span> <b>{{:: getRemainingTime(lottery.endDate)}}</b>
+                    </div>
+                </div>
+            </div>
+            <div class="lottery-activity-ticket-image"></div>
+        </div>
+    </div>
+</div>

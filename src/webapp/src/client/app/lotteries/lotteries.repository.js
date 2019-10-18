@@ -13,16 +13,20 @@
 
     function lotteryRepository($resource, $http, endPoint) {
         var url = endPoint + '/Lottery/';
+        var lotteryWidgetUrl = endPoint + '/LotteryWidget/';
 
         var service = {
             getAllLotteries: getAllLotteries,
+            getLotteriesByStatus: getLotteriesByStatus,
             getLottery: getLottery,
             create: create,
             updateDrafted: updateDrafted,
             updateStarted: updateStarted,
             revokeLottery: revokeLottery,
             getLotteryListPaged: getLotteryListPaged,
-            finishLottery: finishLottery
+            finishLottery: finishLottery,
+            getLotteryWidgetInfo: getLotteryWidgetInfo,
+            buyTickets: buyTickets
         };
         return service;
 
@@ -76,6 +80,14 @@
                     method: 'PATCH'
                 }
             }).patch().$promise;
+        }
+        function getLotteryWidgetInfo(){
+            return $resource(lotteryWidgetUrl + 'Get')
+                .query()
+                .$promise;
+        }
+        function buyTickets(lotteryTickets) {
+            return $resource(url + 'Enter').save(lotteryTickets).$promise;
         }
     }
 })();
