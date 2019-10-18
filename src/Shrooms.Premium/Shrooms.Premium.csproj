@@ -418,6 +418,8 @@
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\ExternalPremiumJobsController.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\Lotteries\LotteryController.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\Lotteries\LotteryParticipantController.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\Lotteries\LotteryWidgetController.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Lotteries\LotteryWidgetViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\MapController.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\OrganizationalStructureController.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\Kudos\KudosShopController.cs" />

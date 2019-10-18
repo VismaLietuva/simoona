@@ -102,6 +102,7 @@ namespace Shrooms.Domain.Services.Lotteries
             }
 
             var lotteryDetailsDTO = _mapper.Map<Lottery, LotteryDetailsDTO>(lottery);
+            lotteryDetailsDTO.Participants = _participantsDbSet.Count(p => p.LotteryId == id);
 
             return lotteryDetailsDTO;
         }
@@ -222,7 +223,18 @@ namespace Shrooms.Domain.Services.Lotteries
             await _kudosService.AddLotteryKudosLog(kudosLogDTO, userOrg);
 
             await _uow.SaveChangesAsync(applicationUser.Id);
+        }
 
+        public IEnumerable<LotteryDetailsDTO> GetRunningLotteries(UserAndOrganizationDTO userAndOrganization)
+        {
+            var lotteries = _lotteriesDbSet.
+                Where(p => p.OrganizationId == userAndOrganization.OrganizationId
+                && p.Status == (int)LotteryStatus.Started
+                && p.EndDate > DateTime.UtcNow)
+                .Select(MapLotteriesToListItemDto)
+                .OrderBy(p => p.EndDate).ToList();
+
+            return lotteries;
         }
 
         private readonly Expression<Func<LotteryDetailsDTO, DateTime>> ByEndDate = e => e.EndDate;
@@ -233,6 +245,7 @@ namespace Shrooms.Domain.Services.Lotteries
              Id = e.Id,
              Title = e.Title,
              Description = e.Description,
+             EntryFee = e.EntryFee,
              EndDate = e.EndDate,
              Status = e.Status
          };
