@@ -17,7 +17,6 @@
 
         var service = {
             getAllLotteries: getAllLotteries,
-            getLotteriesByStatus: getLotteriesByStatus,
             getLottery: getLottery,
             create: create,
             updateDrafted: updateDrafted,

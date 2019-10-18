@@ -16,12 +16,12 @@
 
         lotteriesWallWidget.$inject = [
             'authService',
-            'lotteryFactory',
+            'lotteryRepository',
             'lotteryStatus',
             'localeSrv'
         ];
 
-        function lotteriesWallWidget(authService, lotteryFactory, lotteryStatus, localeSrv){
+        function lotteriesWallWidget(authService, lotteryRepository, lotteryStatus, localeSrv){
             var directive = {
                 restrict: 'E',
                 templateUrl: 'app/lotteries/lotteries-widget/lottery-widget.html',
@@ -40,7 +40,7 @@
                 ////////
 
                 function getLotteryWidgetInfo(){
-                    lotteryFactory.getLotteryWidgetInfo().then(function(result) {
+                    lotteryRepository.getLotteryWidgetInfo().then(function(result) {
                         scope.latestLotteries = result;
                     })
                 }
@@ -104,7 +104,7 @@
                 } 
 
                 if(timeRemaining) {
-                    return timeRemaining + ' ' + localeSrv.translate('lotteries.' + unitOfTime);
+                    return `${timeRemaining} ${localeSrv.translate('lotteries.' + unitOfTime)}`
                 }
                 else {
                     return localeSrv.translate('lotteries.' + unitOfTime);

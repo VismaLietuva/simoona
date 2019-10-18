@@ -41,14 +41,14 @@
 
     lotteriesDetailController.$inject = [
         '$uibModalInstance',
-        'lotteryFactory',
+        'lotteryRepository',
         'currentLottery',
         'lotteryImageSettings',
         'notifySrv',
-        'localeSrv'
+        'localeSrv',
     ];
 
-    function lotteriesDetailController($uibModalInstance, lotteryFactory, currentLottery, lotteryImageSettings, notifySrv, localeSrv) {
+    function lotteriesDetailController($uibModalInstance, lotteryRepository, currentLottery, lotteryImageSettings, notifySrv, localeSrv) {
         var vm = this;
         vm.lotteryImageSize = {
             w: lotteryImageSettings.width,
@@ -71,7 +71,7 @@
 
         function init() {
 
-            lotteryFactory.getLottery(currentLottery)
+            lotteryRepository.getLottery(currentLottery)
             .then(function(lottery){
                 vm.lottery = lottery;
             });
@@ -93,7 +93,7 @@
                 var lotteryTickets = {};
                 lotteryTickets.lotteryId = currentLottery;
                 lotteryTickets.tickets = vm.ticketCount;
-                lotteryFactory.buyTickets(lotteryTickets)
+                lotteryRepository.buyTickets(lotteryTickets)
                 .then(function(){
                     vm.notifySrv.success(vm.localeSrv.formatTranslation('lotteries.hasBeenBought', { one: vm.ticketCount, two: vm.lottery.title }));
                 });
