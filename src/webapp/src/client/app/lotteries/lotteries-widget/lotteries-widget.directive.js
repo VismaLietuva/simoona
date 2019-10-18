@@ -17,10 +17,11 @@
         lotteriesWallWidget.$inject = [
             'authService',
             'lotteryFactory',
-            'lotteryStatus'
+            'lotteryStatus',
+            'localeSrv'
         ];
 
-        function lotteriesWallWidget(authService, lotteryFactory, lotteryStatus){
+        function lotteriesWallWidget(authService, lotteryFactory, lotteryStatus, localeSrv){
             var directive = {
                 restrict: 'E',
                 templateUrl: 'app/lotteries/lotteries-widget/lottery-widget.html',
@@ -31,6 +32,7 @@
             function linkFunc(scope) {
                 scope.lotteryStatus = lotteryStatus;
                 scope.latestLotteries = [];
+                scope.getRemainingTime = getRemainingTime;
                 scope.hasLotteryPermisions = authService.hasPermissions(['LOTTERY_BASIC']);
 
                 getLotteryWidgetInfo();
@@ -41,6 +43,71 @@
                     lotteryFactory.getLotteryWidgetInfo().then(function(result) {
                         scope.latestLotteries = result;
                     })
+                }
+            }
+            function getRemainingTime(input){
+
+                var timeRemaining;
+                var unitOfTime = "";
+                if(!input){
+                    return '';
+                }
+
+                var seconds = (moment.utc(input)-moment()) *.001;
+                var minutes = seconds / 60;
+                var hours = minutes / 60;
+                var days = hours / 24;
+                var years = days / 365;
+
+                if(seconds < 10)
+                {
+                    unitOfTime = "fewSeconds";
+                }
+                else if(seconds < 60) {
+                    timeRemaining = Math.round(seconds);
+                    unitOfTime = "seconds";
+                }
+                else if(minutes < 1.5) {
+                    unitOfTime = "minute";
+                }     
+                else if(minutes < 60) {
+                    timeRemaining = Math.round(minutes);
+                    unitOfTime = "minutes";
+                }   
+                else if(hours < 1.5) {
+                    unitOfTime = "hour";
+                }   
+                else if(hours < 60) {
+                    timeRemaining = Math.round(hours);
+                    unitOfTime = "hours";
+                }
+                else if(hours < 42) {
+                    unitOfTime = "tomorrow";
+                }  
+                else if(days < 30) {
+                    timeRemaining = Math.round(days);
+                    unitOfTime = "months";
+                }  
+                else if(days < 45) {
+                    unitOfTime = "month";
+                } 
+                else if(days < 365) {
+                    timeRemaining = Math.round(days / 30);
+                    unitOfTime = "months";
+                } 
+                else if(years < 1.5) {
+                    unitOfTime = "year";
+                } 
+                else {
+                    timeRemaining = Math.round(years);
+                    unitOfTime = "years";
+                } 
+
+                if(timeRemaining) {
+                    return timeRemaining + ' ' + localeSrv.translate('lotteries.' + unitOfTime);
+                }
+                else {
+                    return localeSrv.translate('lotteries.' + unitOfTime);
                 }
             }
             

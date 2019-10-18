@@ -3,7 +3,7 @@
     "hours": "hours",
     "hour": "hour",
     "minutes": "minutes",
-    "minute": "minute",
+    "minute": "a minute",
     "tommorow": "tommorow",
     "days": "days",
     "months": "months",
@@ -14,7 +14,7 @@
     "fewSeconds": "a few seconds",
     "buy": "Buy",
     "cancel": "Cancel",
-    "endsIn": "Ends",
+    "endsIn": "Ends in",
     "kudosPerTicket": "kudos/ticket",
     "entityNamePlural": "Lotteries",
     "entityNameSingular": "Lottery",
@@ -32,6 +32,8 @@
     "update": "Update",
     "abort": "Abort",
     "hasStarted": "{{ one }} \"{{ two }}\" was successfully started!",
-    "hasBeenSaved": "{{ one }} \"{{ two }}\" was successfully saved!"
+    "hasBeenSaved": "{{ one }} \"{{ two }}\" was successfully saved!",
+    "hasBeenBought": "Successfully bought {{ one }} tickets for \"{{ two }}\" lottery!",
+    "invalidTicketNumber": "Invalid ticket count!"
 
 }

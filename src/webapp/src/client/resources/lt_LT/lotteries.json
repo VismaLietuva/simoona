@@ -14,7 +14,7 @@
     "fewSeconds": "už kelių sekundžių",
     "buy": "Pirkti",
     "cancel": "Atšaukti",
-    "endsIn": "Pasibaigs",
+    "endsIn": "Pasibaigs už",
     "kudosPerTicket": "kudos/bilietas",
     "entityNamePlural": "Loterijos",
     "entityNameSingular": "Loterija",
@@ -32,5 +32,7 @@
     "update": "Atnaujinti",
     "abort": "Atšaukti",
     "hasStarted": "{{ one }} \"{{ two }}\" prasidejo!",
-    "hasBeenSaved": "{{ one }} \"{{ two }}\" išsaugota!"
+    "hasBeenSaved": "{{ one }} \"{{ two }}\" išsaugota!",
+    "hasBeenBought": "Sėkmingai nusipirkti {{ one }} bilietai \"{{ two }}\" loterijoje!",
+    "invalidTicketNumber": "Neteisingas bilietų skaičius!"
 }
