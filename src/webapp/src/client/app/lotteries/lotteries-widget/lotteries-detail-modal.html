@@ -10,13 +10,13 @@
             <div class="row">
                 <div class="col-xs-6">
                     <div class="row">
-                        <div id="my-pics" class="carousel slide lottery-detail-modal-carousel" data-ride="carousel">
+                        <div id="lottery-pics" class="carousel slide lottery-detail-modal-carousel" data-ride="carousel">
 
                             <!-- Indicators -->
                             <ol class="carousel-indicators">
-                                <li data-target="#my-pics" data-slide-to="0" class="active"></li>
+                                <li data-target="#lottery-pics" data-slide-to="0" class="active"></li>
                                 <li ng-repeat="lottery in vm.lottery.images" ng-if="$index > 0"
-                                    data-target="#my-pics" data-slide-to="$index"></li>
+                                    data-target="#lottery-pics" data-slide-to="{{$index}}"></li>
                             </ol>
 
                             <!-- Content -->
@@ -34,11 +34,11 @@
                             </div>
 
                             <!-- Previous/Next controls -->
-                            <a class="left carousel-control" href="#my-pics" role="button" data-slide="prev">
+                            <a class="left carousel-control" data-target="#lottery-pics" role="button" data-slide="prev">
                                 <span class="icon-prev" aria-hidden="true"></span>
                                 <span class="sr-only"></span>
                             </a>
-                            <a class="right carousel-control" href="#my-pics" role="button" data-slide="next">
+                            <a class="right carousel-control" data-target="#lottery-pics" role="button" data-slide="next">
                                 <span class="icon-next" aria-hidden="true"></span>
                                 <span class="sr-only"></span>
                             </a>
