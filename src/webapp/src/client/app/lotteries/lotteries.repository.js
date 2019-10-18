@@ -23,7 +23,8 @@
             updateDrafted: updateDrafted,
             updateStarted: updateStarted,
             revokeLottery: revokeLottery,
-            getLotteryWidgetInfo: getLotteryWidgetInfo
+            getLotteryWidgetInfo: getLotteryWidgetInfo,
+            buyTickets: buyTickets
         };
         return service;
 
@@ -70,6 +71,9 @@
             return $resource(lotteryWidgetUrl + 'Get')
                 .query()
                 .$promise;
+        }
+        function buyTickets(lotteryTickets) {
+            return $resource(url + 'Enter').save(lotteryTickets).$promise;
         }
     }
 })();

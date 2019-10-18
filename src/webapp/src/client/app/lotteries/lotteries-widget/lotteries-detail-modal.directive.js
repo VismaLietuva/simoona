@@ -90,7 +90,13 @@
         function buyTickets(){
             if(vm.ticketCount > 0)
             {
-                vm.notifySrv.success(vm.localeSrv.formatTranslation('lotteries.hasBeenBought', { one: vm.ticketCount, two: vm.lottery.title }));
+                var lotteryTickets = {};
+                lotteryTickets.lotteryId = currentLottery;
+                lotteryTickets.tickets = vm.ticketCount;
+                lotteryFactory.buyTickets(lotteryTickets)
+                .then(function(){
+                    vm.notifySrv.success(vm.localeSrv.formatTranslation('lotteries.hasBeenBought', { one: vm.ticketCount, two: vm.lottery.title }));
+                });
             }
             else
             {
