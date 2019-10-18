@@ -46,9 +46,10 @@
         'lotteryImageSettings',
         'notifySrv',
         'localeSrv',
+        'errorHandler'
     ];
 
-    function lotteriesDetailController($uibModalInstance, lotteryRepository, currentLottery, lotteryImageSettings, notifySrv, localeSrv) {
+    function lotteriesDetailController($uibModalInstance, lotteryRepository, currentLottery, lotteryImageSettings, notifySrv, localeSrv, errorHandler) {
         var vm = this;
         vm.lotteryImageSize = {
             w: lotteryImageSettings.width,
@@ -96,6 +97,8 @@
                 lotteryRepository.buyTickets(lotteryTickets)
                 .then(function(){
                     vm.notifySrv.success(vm.localeSrv.formatTranslation('lotteries.hasBeenBought', { one: vm.ticketCount, two: vm.lottery.title }));
+                }, function (error) {
+                    errorHandler.handleErrorMessage(error);
                 });
             }
             else
