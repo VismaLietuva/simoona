@@ -7,6 +7,13 @@ using Shrooms.DataTransferObjects.Models.Lotteries;
 using System.Linq.Expressions;
 using System;
 using Shrooms.EntityModels.Models;
+using Shrooms.DataTransferObjects.Models;
+using System.Threading.Tasks;
+using Shrooms.Domain.Services.UserService;
+using Shrooms.DomainExceptions.Exceptions.Lotteries;
+using Shrooms.Domain.Services.Kudos;
+using Shrooms.DataTransferObjects.Models.Kudos;
+using Shrooms.Constants.BusinessLayer;
 
 namespace Shrooms.Domain.Services.Lotteries
 {
@@ -14,6 +21,7 @@ namespace Shrooms.Domain.Services.Lotteries
     {
         private readonly IUnitOfWork2 _unitOfWork;
         private readonly IDbSet<LotteryParticipant> _participantsDbSet;
+
 
         public ParticipantService(IUnitOfWork2 unitOfWork)
         {
@@ -29,17 +37,15 @@ namespace Shrooms.Domain.Services.Lotteries
         public IEnumerable<LotteryParticipantDTO> GetParticipantsCounted(int lotteryId)
         {
             return _participantsDbSet.Where(x => x.LotteryId == lotteryId)
-              .GroupBy(l => l.User).Select(MapToParticipantDto());
+              .GroupBy(l => l.User).Select(MapToParticipantDto);
         }
-
-        private Expression<Func<IGrouping<ApplicationUser, LotteryParticipant>, LotteryParticipantDTO>> MapToParticipantDto()
-        {
-            return group => new LotteryParticipantDTO
-            {
-                UserId = group.Key.Id,
-                FullName = group.Key.FirstName + " " + group.Key.LastName,
-                Tickets = group.Distinct().Count()
-            };
-        }
+       
+        private Expression<Func<IGrouping<ApplicationUser, LotteryParticipant>, LotteryParticipantDTO>> MapToParticipantDto =>
+         group => new LotteryParticipantDTO
+         {
+             UserId = group.Key.Id,
+             FullName = group.Key.FirstName + " " + group.Key.LastName,
+             Tickets = group.Distinct().Count()
+         };
     }
 }

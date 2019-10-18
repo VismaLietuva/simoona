@@ -17,6 +17,8 @@ namespace Shrooms.Domain.Services.Lotteries
         void EditStartedLottery(EditStartedLotteryDTO lotteryDTO);
         void RemoveLottery(int id, UserAndOrganizationDTO userOrg);
         Task FinishLotteryAsync(int lotteryId);
+        LotteryStatsDTO GetLotteryStats (int lotteryId);
+        Task BuyLotteryTicketAsync(BuyLotteryTicketDTO lotteryTicketDTO, UserAndOrganizationDTO userOrg);
         IEnumerable<LotteryDetailsDTO> GetLotteries(UserAndOrganizationDTO userOrganization);
         IEnumerable<LotteryDetailsDTO> GetFilteredLotteries(string filter);
         IPagedList<LotteryDetailsDTO> GetPagedLotteries(string filter, int page, int pageSize = ConstWebApi.DefaultPageSize);

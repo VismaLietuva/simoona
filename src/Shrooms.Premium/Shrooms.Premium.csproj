@@ -328,11 +328,13 @@
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\UpdateEventTypeDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Kudos\AwardedKudosEmployeeDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Kudos\KudosShopItemDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Lotteries\BuyLotteryTicketDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Lotteries\CreateLotteryDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Lotteries\EditDraftedLotteryDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Lotteries\EditStartedLotteryDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Lotteries\LotteryDetailsDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Lotteries\LotteryParticipantDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Lotteries\LotteryStatsDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\OfficeMap\OfficeDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\OfficeMap\OfficeRoomDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\OfficeMap\OfficeUserDTO.cs" />
@@ -452,6 +454,7 @@
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Events\UpdateEventTypeViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Events\UpdateEventViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\KudosShop\KudosShopItemViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Lotteries\BuyLotteryTicketViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Lotteries\CreateLotteryViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Lotteries\EditDraftedLotteryViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Lotteries\EditStartedLotteryViewModel.cs" />

@@ -3,6 +3,7 @@ using Shrooms.API.Controllers;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models.Lotteries;
 using Shrooms.Domain.Services.Lotteries;
+using Shrooms.DomainExceptions.Exceptions.Lotteries;
 using Shrooms.EntityModels.Models.Lotteries;
 using Shrooms.WebViewModels.Models.Lotteries;
 using System;

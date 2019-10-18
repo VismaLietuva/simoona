@@ -11,8 +11,12 @@ using Shrooms.Constants.WebApi;
 using Shrooms.DataLayer;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
+using Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.DataTransferObjects.Models.Lotteries;
+using Shrooms.Domain.Services.Kudos;
+using Shrooms.Domain.Services.UserService;
 using Shrooms.DomainExceptions.Exceptions.Lotteries;
+using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Lotteries;
 using static Shrooms.Constants.BusinessLayer.ConstBusinessLayer;
 
@@ -22,13 +26,21 @@ namespace Shrooms.Domain.Services.Lotteries
     {
         private readonly IUnitOfWork2 _uow;
         private readonly IDbSet<Lottery> _lotteriesDbSet;
+        private readonly IDbSet<LotteryParticipant> _participantsDbSet;
         private readonly IMapper _mapper;
+        private readonly IParticipantService _participantService;
+        private readonly IUserService _userService;
+        private readonly IKudosService _kudosService;
 
-        public LotteryService(IUnitOfWork2 uow, IMapper mapper)
+        public LotteryService(IUnitOfWork2 uow, IMapper mapper, IParticipantService participantService, IUserService userService, IKudosService kudosService)
         {
             _uow = uow;
             _mapper = mapper;
             _lotteriesDbSet = uow.GetDbSet<Lottery>();
+            _participantsDbSet = uow.GetDbSet<LotteryParticipant>();
+            _participantService = participantService;
+            _userService = userService;
+            _kudosService = kudosService;
         }
 
         public async Task<CreateLotteryDTO> CreateLottery(CreateLotteryDTO newLotteryDTO)
@@ -120,6 +132,31 @@ namespace Shrooms.Domain.Services.Lotteries
             await _uow.SaveChangesAsync();
         }
 
+        public LotteryStatsDTO GetLotteryStats(int lotteryId)
+        {
+            var lottery = _lotteriesDbSet.Find(lotteryId);
+
+            if (lottery == null)
+            {
+                throw new LotteryException("Lottery not found.");
+            }
+            var participants = _participantService.GetParticipantsCounted(lotteryId);
+
+            var ticketsSold = participants.Sum(participant => participant.Tickets);
+
+            LotteryStatsDTO lotteryStats = new LotteryStatsDTO()
+            {
+                TotalParticipants = participants.Count(),
+                TicketsSold = ticketsSold,
+                KudosSpent = ticketsSold * lottery.EntryFee,
+                Participants = participants
+            };
+
+            return lotteryStats;
+
+        }
+
+
         public IEnumerable<LotteryDetailsDTO> GetLotteries(UserAndOrganizationDTO userOrganization)
         {
             return _lotteriesDbSet
@@ -153,6 +190,41 @@ namespace Shrooms.Domain.Services.Lotteries
             return newLottery;
         }
 
+        public async Task BuyLotteryTicketAsync(BuyLotteryTicketDTO lotteryTicketDTO, UserAndOrganizationDTO userOrg)
+        {
+            ApplicationUser applicationUser = _userService.GetApplicationUser(userOrg.UserId);
+
+            LotteryDetailsDTO lotteryDetails = GetLotteryDetails(lotteryTicketDTO.LotteryId, userOrg);
+
+            if (applicationUser.RemainingKudos < lotteryDetails.EntryFee * lotteryTicketDTO.Tickets)
+            {
+                throw new LotteryException("User does not have enough kudos for the purchase.");
+            }
+
+            for (int i = 0; i < lotteryTicketDTO.Tickets; i++)
+            {
+                LotteryParticipant participant = MapNewLotteryParticipant(lotteryTicketDTO, userOrg);
+
+                _participantsDbSet.Add(participant);
+
+            }
+
+            AddKudosLogDTO kudosLogDTO = new AddKudosLogDTO()
+            {
+                ReceivingUserIds = new List<string>() { userOrg.UserId },
+                PointsTypeId = 2,
+                MultiplyBy = lotteryTicketDTO.Tickets * lotteryDetails.EntryFee,
+                Comment = $"For {lotteryTicketDTO.Tickets} tickets",
+                UserId = userOrg.UserId,
+                OrganizationId = userOrg.OrganizationId
+            };
+
+            await _kudosService.AddLotteryKudosLog(kudosLogDTO, userOrg);
+
+            await _uow.SaveChangesAsync(applicationUser.Id);
+
+        }
+
         private readonly Expression<Func<LotteryDetailsDTO, DateTime>> ByEndDate = e => e.EndDate;
 
         private Expression<Func<Lottery, LotteryDetailsDTO>> MapLotteriesToListItemDto =>
@@ -174,6 +246,22 @@ namespace Shrooms.Domain.Services.Lotteries
             lottery.Status = draftedLotteryDTO.Status;
             lottery.Title = draftedLotteryDTO.Title;
             lottery.Images = draftedLotteryDTO.Images;
+        }
+
+        private LotteryParticipant MapNewLotteryParticipant(BuyLotteryTicketDTO lotteryTicketDTO, UserAndOrganizationDTO userOrg)
+        {
+            LotteryParticipant participant = new LotteryParticipant()
+            {
+                LotteryId = lotteryTicketDTO.LotteryId,
+                UserId = userOrg.UserId,
+                Entered = DateTime.Now,
+                CreatedBy = userOrg.UserId,
+                ModifiedBy = userOrg.UserId,
+                Modified = DateTime.Now,
+                Created = DateTime.Now
+            };
+
+            return participant;
         }
     }
 }
