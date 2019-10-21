@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading.Tasks;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.Domain.Services.Kudos;
@@ -27,29 +29,31 @@ namespace Shrooms.Domain.Services.Lotteries
         public void RefundLottery(Lottery lottery, UserAndOrganizationDTO userOrg)
         {
             var usersToRefund = _participantService.GetParticipantsToRefund(lottery.Id);
+            var usersToSendKudos = new List<AddKudosLogDTO>();
 
             foreach (var user in usersToRefund)
             {
-                try
+                var totalReturn = user.Tickets * lottery.EntryFee;
+                var kudosLog = new AddKudosLogDTO
                 {
-                    var totalReturn = user.Tickets * lottery.EntryFee;
-                    var kudosLog = new AddKudosLogDTO
-                    {
-                        ReceivingUserIds = new List<string> { user.UserId },
-                        PointsTypeId = 3,
-                        MultiplyBy = totalReturn,
-                        Comment = FormatComment(lottery, totalReturn),
-                        UserId = user.UserId,
-                        OrganizationId = 2
-                    };
+                    ReceivingUserIds = new List<string> { user.UserId },
+                    PointsTypeId = 3,
+                    MultiplyBy = totalReturn,
+                    Comment = FormatComment(lottery, totalReturn),
+                    UserId = user.UserId,
+                    OrganizationId = userOrg.OrganizationId
+                };
+                usersToSendKudos.Add(kudosLog);
+            }
 
-                    _kudosService.RefundLotteryTicket(kudosLog, userOrg);
-                    _participantService.SetTicketsAsRefunded(lottery.Id, user.UserId);
-                }
-                catch (Exception e)
-                {
-                    _logger.Error(e);
-                }
+            try
+            {
+                _kudosService.RefundLotteryTickets(usersToSendKudos, userOrg);
+                _participantService.SetTicketsAsRefunded(lottery.Id);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
             }
         }
 

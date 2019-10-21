@@ -4,6 +4,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using MoreLinq;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models.Lotteries;
 using Shrooms.EntityModels.Models;
@@ -44,14 +45,12 @@ namespace Shrooms.Domain.Services.Lotteries
                 .GroupBy(l => l.User)
                 .Select(MapToParticipantDto);
         }
-
-        public void SetTicketsAsRefunded(int lotteryId, string userId)
+        
+        public void SetTicketsAsRefunded(int lotteryId)
         {
-            var tickets = _participantsDbSet.Where(x => x.UserId == userId && x.LotteryId == lotteryId);
-            foreach (var ticket in tickets)
-            {
-                ticket.IsRefunded = true;
-            }
+            _participantsDbSet
+                .Where(x => x.LotteryId == lotteryId)
+                .ForEach(x => x.IsRefunded = true);
 
             _unitOfWork.SaveChanges();
         }

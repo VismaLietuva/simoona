@@ -16,6 +16,6 @@ namespace Shrooms.Domain.Services.Lotteries
 
         IEnumerable<LotteryParticipantDTO> GetParticipantsToRefund(int lotteryId);
 
-        void SetTicketsAsRefunded(int lotteryId, string userId);
+        void SetTicketsAsRefunded(int lotteryId);
     }
 }
