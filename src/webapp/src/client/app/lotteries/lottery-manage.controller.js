@@ -54,6 +54,7 @@
                 vm.lottery.endDate = moment.utc(vm.lottery.endDate).local().startOf('minute').toDate();
                 vm.isStarted = vm.lottery.status === lotteryStatus.Started;
                 vm.isDrafted = vm.lottery.status === lotteryStatus.Drafted;
+                vm.isEnded = (vm.lottery.status === lotteryStatus.Aborted) || (vm.lottery.status === lotteryStatus.Ended);
                 $rootScope.pageTitle = 'lotteries.editLottery';
             } else if (states.isCreate) {
                 $rootScope.pageTitle = 'lotteries.createLottery';
