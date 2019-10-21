@@ -23,11 +23,12 @@
             revokeLottery: revokeLottery,
             getLotteryListPaged: getLotteryListPaged,
             finishLottery: finishLottery,
-            getLotteryStatistics: getLotteryStatistics
+            getLotteryStatistics: getLotteryStatistics,
+            getLotteryParticipants: getLotteryParticipants
         };
         return service;
 
-        /////
+        /////0
 
         function getAllLotteries() {
             return $resource(url + 'All').query().$promise;
@@ -81,6 +82,15 @@
 
         function getLotteryStatistics(id) {
             return $resource(url + `${id}/Stats`).get().$promise;
+        }
+
+        function getLotteryParticipants(filters) {
+            return $resource(url + `Participants/Paged`, '', {
+                'query': {
+                    method: 'GET',
+                    isArray: false
+                }
+            }).query(filters).$promise;
         }
     }
 })();
