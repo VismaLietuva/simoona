@@ -1,15 +1,34 @@
 <div>
-    <input type="file"
+    <input ng-if="!vm.multiple"
+           type="file"
            id="image-file-input"
            onchange="angular.element(this).scope().handleFileSelect(this.files)"
            accept="image/x-png, image/gif, image/jpeg"
-           data-test-id="photo-crop-upload-input"/>
+           data-test-id="photo-crop-upload-input"
+           />
+   <input
+        ng-if="vm.multiple"
+        type="file"
+        id="image-file-input"
+        onchange="angular.element(this).scope().handleFileSelect(this.files)"
+        accept="image/x-png, image/gif, image/jpeg"
+        data-test-id="photo-crop-upload-input"
+        multiple
+    />
     <div ng-if="vm.isCropVisible" class="image-crop-area">
         <img-crop image="vm.image"
                   area-type="rectangle"
                   aspect-ratio="vm.aspectRatio"
                   result-image="vm.resultImage"
                   result-image-size="vm.imageSize">
+        </img-crop>
+    </div>
+    <div ng-repeat="image in vm.images" class="multiple-image-crop-area">
+        <img-crop image="image"
+            area-type="rectangle"
+            aspect-ratio="vm.aspectRatio"
+            result-image="vm.resultImage[$index]"
+            result-image-size="vm.imageSize">
         </img-crop>
     </div>
 </div>
