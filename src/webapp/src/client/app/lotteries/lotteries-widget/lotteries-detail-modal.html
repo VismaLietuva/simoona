@@ -6,9 +6,9 @@
 </div>
 <div class="modal-body">
     <form role="form" class="lottery-detail-modal-form">
-        <div class="form-group">
+        <div class="form-group lottery-detail-modal-main-screen">
             <div class="row">
-                <div class="col-lg-6">
+                <div class="col-sm-6">
                     <div class="row">
                         <div id="lottery-pics" class="carousel slide lottery-detail-modal-carousel"
                             data-ride="carousel">
@@ -67,19 +67,17 @@
                                 </button>
                             </span>
                         </div>
-                    </div>
-                    <div class="col-xs-3">
-                            <button type="button" ng-click="vm.buyTickets()" ng-disabled="vm.ticketCount < 1" class="btn btn-primary"><span
-                                    translate="lotteries.buy"></span></button>
-                        </div>
-                    </div>
-                    <div class="lottery-detail-modal-information">
                         <div class="row">
-                            <div>
+                            <div class="lotteries-detail-modal-total-cost">
                                 <label class><span translate="lotteries.totalCost"></span>
                                     <b>{{vm.lottery.entryFee * vm.ticketCount}}</b></label>
                             </div>
                         </div>
+                    </div>
+                    <div class="col-xs-3 lottery-detail-modal-buy-button">
+                        <button type="button" ng-click="vm.buyTickets()" ng-disabled="vm.ticketCount < 1" class="btn btn-primary"><span
+                                translate="lotteries.buy"></span></button>
+                    </div>
                         <div class="row">
                             <div class="lottery-end-date-component">
                                 <label><span translate="lotteries.endDate"></span>
@@ -87,10 +85,11 @@
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
             <div class="row">
-                <div class="card lottery-card">
+                <div class="card lotteries-detail-modal-description">
                     <div class="card-body">
                         {{vm.lottery.description}}
                     </div>
