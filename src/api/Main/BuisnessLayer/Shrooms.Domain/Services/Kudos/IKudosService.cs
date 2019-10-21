@@ -45,6 +45,8 @@ namespace Shrooms.Domain.Services.Kudos
         /// <param name="points">requested points</param>
         void AddKudosLog(AddKudosLogDTO kudosDto, decimal points);
 
+        void RefundLotteryTickets(IEnumerable<AddKudosLogDTO> kudosLogDTO, UserAndOrganizationDTO userOrg);
+
         KudosLogsEntriesDto<MainKudosLogDTO> GetKudosLogs(KudosLogsFilterDTO options);
 
         KudosLogsEntriesDto<KudosUserLogDTO> GetUserKudosLogs(string userId, int page, int organizationId);
@@ -57,6 +59,5 @@ namespace Shrooms.Domain.Services.Kudos
 
         bool HasPendingKudos(string employeeId);
 
-        void RefundLotteryTicket(AddKudosLogDTO kudosLogDTO, UserAndOrganizationDTO userOrg);
     }
 }
