@@ -129,11 +129,11 @@
                         .then(newImages => {
                             vm.lottery.images = vm.lottery.images.concat(newImages);
                             lotteryRepository.updateDrafted(vm.lottery)
-                            .then(updateSucess('lotteries.haveBeenSaved'))
+                            .then(updateSucess('lotteries.hasBeenSaved'))
                         })
                 } else {
                     lotteryRepository.updateDrafted(vm.lottery)
-                    .then(updateSucess('lotteries.haveBeenSaved'))
+                    .then(updateSucess('lotteries.hasBeenSaved'))
                 }
             } else if (vm.isStarted) {
                 lotteryRepository.updateStarted({ description: vm.lottery.description, id: vm.lottery.id })
