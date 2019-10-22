@@ -15,9 +15,7 @@ namespace Shrooms.EntityModels.Models.Lotteries
         [ForeignKey("User")]
         public string UserId { get; set; }
 
-        public DateTime Entered { get; set; }
-
-        public bool? IsRefunded { get; set; }
+        public DateTime Joined { get; set; }
 
         public virtual ApplicationUser User { get; set; }
 
