@@ -483,8 +483,9 @@ namespace Shrooms.Domain.Services.Kudos
             {
                 var kudosDto = MapInitialInfoToDTO(log);
 
-                var user = _usersDbSet.Find(log.UserId);
+                var user = _usersDbSet.Find(log.ReceivingUserIds.First());
                 kudosDto.ReceivingUser = user;
+
                 users.Add(user);
 
                 InsertKudosLog(kudosDto, KudosStatus.Approved);
@@ -761,28 +762,6 @@ namespace Shrooms.Domain.Services.Kudos
                     AddNewKudos(kudosDTO);
                     break;
             }
-        }
-
-        public async Task AddLotteryKudosLog(AddKudosLogDTO kudosLogDTO, UserAndOrganizationDTO userOrg)
-        {
-            var kudosDto = MapInitialInfoToDTO(kudosLogDTO);
-
-            var receivingUser = _usersDbSet
-                .FirstOrDefault(x => x.Id == kudosLogDTO.UserId &&
-                            x.OrganizationId == kudosLogDTO.OrganizationId);
-
-            if (receivingUser == null)
-            {
-                throw new ValidationException(ErrorCodes.ContentDoesNotExist, "User not found");
-            }
-
-            kudosDto.ReceivingUser = receivingUser;
-
-            InsertKudosLog(kudosDto, KudosStatus.Approved);
-
-            await _uow.SaveChangesAsync(false);
-
-            UpdateProfileKudos(kudosDto.SendingUser, userOrg);
         }
 
         private void MinusKudos(AddKudosDTO kudosDTO)

@@ -26,8 +26,6 @@ namespace Shrooms.Domain.Services.Kudos
 
         IEnumerable<UserKudosAutocompleteDTO> GetUsersForAutocomplete(string s);
 
-        Task AddLotteryKudosLog(AddKudosLogDTO kudosLogDTO, UserAndOrganizationDTO userOrg);
-
         void ApproveKudos(int kudosLogId, UserAndOrganizationDTO userOrg);
 
         void RejectKudos(KudosRejectDTO kudosRejectDTO);
