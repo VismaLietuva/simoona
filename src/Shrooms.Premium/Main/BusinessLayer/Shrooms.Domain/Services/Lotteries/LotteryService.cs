@@ -150,7 +150,6 @@ namespace Shrooms.Domain.Services.Lotteries
                 TotalParticipants = participants.Count(),
                 TicketsSold = ticketsSold,
                 KudosSpent = ticketsSold * lottery.EntryFee,
-                Participants = participants
             };
 
             return lotteryStats;
@@ -267,7 +266,7 @@ namespace Shrooms.Domain.Services.Lotteries
             {
                 LotteryId = lotteryTicketDTO.LotteryId,
                 UserId = userOrg.UserId,
-                Entered = DateTime.Now,
+                Joined = DateTime.Now,
                 CreatedBy = userOrg.UserId,
                 ModifiedBy = userOrg.UserId,
                 Modified = DateTime.Now,

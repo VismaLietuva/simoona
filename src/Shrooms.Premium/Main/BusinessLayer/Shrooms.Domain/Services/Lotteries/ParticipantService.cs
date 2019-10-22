@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using Shrooms.DataLayer.DAL;
@@ -14,6 +15,7 @@ using Shrooms.DomainExceptions.Exceptions.Lotteries;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.Constants.BusinessLayer;
+using PagedList;
 
 namespace Shrooms.Domain.Services.Lotteries
 {
@@ -37,9 +39,16 @@ namespace Shrooms.Domain.Services.Lotteries
         public IEnumerable<LotteryParticipantDTO> GetParticipantsCounted(int lotteryId)
         {
             return _participantsDbSet.Where(x => x.LotteryId == lotteryId)
-              .GroupBy(l => l.User).Select(MapToParticipantDto);
+              .GroupBy(l => l.User).Select(MapToParticipantDto).OrderBy(p => p.FullName);
         }
-       
+
+        public IPagedList<LotteryParticipantDTO> GetPagedParticipants(int id, int page, int pageSize)
+        {
+            var filteredParticipants = GetParticipantsCounted(id);
+
+            return filteredParticipants.ToPagedList(page, pageSize);
+        }
+
         private Expression<Func<IGrouping<ApplicationUser, LotteryParticipant>, LotteryParticipantDTO>> MapToParticipantDto =>
          group => new LotteryParticipantDTO
          {
