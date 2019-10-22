@@ -23,7 +23,7 @@
             <buy-shop-item></buy-shop-item>
         </div>
     </div>
-    <div class="kudos-activity-log-container" ng-repeat="kudos in lastApprovedKudos">
+    <div class="kudos-activity-log-container hidden-sm hidden-xs" ng-repeat="kudos in lastApprovedKudos">
         <div class="kudos-activity-log-inner">
             <div class="text-center kudos-activity-log-count-box">
                 <span class="kudos-activity-log-count-lg" ng-class="{'kudos-activity-log-count-sm': kudos.points.toString().length >= 5}" ng-cloak>+{{:: kudos.points}}</span>
