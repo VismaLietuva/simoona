@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.EntityModels.Models.Lotteries;
+using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Infrastructure.Logger;
+using static Shrooms.Constants.BusinessLayer.ConstBusinessLayer;
 
 namespace Shrooms.Domain.Services.Lotteries
 {
@@ -16,14 +19,23 @@ namespace Shrooms.Domain.Services.Lotteries
 
         private readonly IKudosService _kudosService;
 
+        private readonly ILotteryService _lotteryService;
+
+        private readonly IAsyncRunner _asyncRunner;
+
         private readonly ILogger _logger;
 
+        private readonly IUnitOfWork2 _uow;
+
         public LotteryAbortJob(IKudosService kudosService, IParticipantService participantService,
-            ILogger logger)
+            ILogger logger, ILotteryService lotteryService, IAsyncRunner asyncRunner, IUnitOfWork2 uow)
         {
             _kudosService = kudosService;
             _participantService = participantService;
             _logger = logger;
+            _lotteryService = lotteryService;
+            _asyncRunner = asyncRunner;
+            _uow = uow;
         }
 
         public void RefundLottery(Lottery lottery, UserAndOrganizationDTO userOrg)
@@ -49,11 +61,12 @@ namespace Shrooms.Domain.Services.Lotteries
             try
             {
                 _kudosService.RefundLotteryTickets(usersToSendKudos, userOrg);
-                _participantService.SetTicketsAsRefunded(lottery.Id);
+                _lotteryService.EditLotteryStatus(lottery.Id, LotteryStatus.Aborted);
             }
             catch (Exception e)
             {
                 _logger.Error(e);
+                _asyncRunner.Run<ILotteryService>(n => n.EditLotteryStatus(lottery.Id, LotteryStatus.RefundFailed), _uow.ConnectionName);
             }
         }
 

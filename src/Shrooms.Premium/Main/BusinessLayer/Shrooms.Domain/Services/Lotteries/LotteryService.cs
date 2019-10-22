@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AutoMapper;
 using PagedList;
+using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Lotteries;
@@ -102,8 +103,19 @@ namespace Shrooms.Domain.Services.Lotteries
                     _asyncRunner.Run<ILotteryAbortJob>(n => n.RefundLottery(lottery, userOrg), _uow.ConnectionName);
                 }
 
-                lottery.Status = (int)LotteryStatus.Aborted;
+                lottery.Status = (int)LotteryStatus.RefundStarted;
+
                 _uow.SaveChanges();
+            }
+        }
+
+        public void RefundParticipants(int id, UserAndOrganizationDTO userOrg)
+        {
+            var lottery = _lotteriesDbSet.Find(id);
+
+            if (lottery.Status == (int)LotteryStatus.RefundFailed)
+            {
+                _asyncRunner.Run<ILotteryAbortJob>(n => n.RefundLottery(lottery, userOrg), _uow.ConnectionName);
             }
         }
 
@@ -129,6 +141,20 @@ namespace Shrooms.Domain.Services.Lotteries
         {
             var filteredLotteries = GetFilteredLotteries(args.Filter, args.UserOrg);
             return filteredLotteries.ToPagedList(args.PageNumber, args.PageSize);
+        }
+
+        public int GetLotteryStatus(int id)
+        {
+            return _lotteriesDbSet.Find(id).Status;
+        }
+
+        public void EditLotteryStatus(int id, LotteryStatus status)
+        {
+            var lottery = _lotteriesDbSet.Find(id);
+
+            lottery.Status = (int) status;
+
+            _uow.SaveChanges();
         }
 
         private Lottery MapNewLottery(CreateLotteryDTO newLotteryDTO)

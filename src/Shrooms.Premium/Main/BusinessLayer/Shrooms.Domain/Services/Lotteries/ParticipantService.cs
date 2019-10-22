@@ -45,7 +45,7 @@ namespace Shrooms.Domain.Services.Lotteries
                 .GroupBy(l => l.User)
                 .Select(MapToParticipantDto);
         }
-        
+
         public void SetTicketsAsRefunded(int lotteryId)
         {
             _participantsDbSet

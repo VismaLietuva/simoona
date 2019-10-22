@@ -16,6 +16,7 @@ using Shrooms.Domain.Services.Lotteries;
 using Shrooms.DomainExceptions.Exceptions.Lotteries;
 using Shrooms.WebViewModels.Models;
 using Shrooms.WebViewModels.Models.Lotteries;
+using static Shrooms.Constants.BusinessLayer.ConstBusinessLayer;
 
 namespace Shrooms.API.Controllers.Lotteries
 {
@@ -107,7 +108,26 @@ namespace Shrooms.API.Controllers.Lotteries
         public IHttpActionResult Abort(int id)
         {
             _lotteryService.AbortLottery(id, GetUserAndOrganization());
+
             return Ok();
+        }
+
+        [HttpPatch]
+        [Route("{id}/Refund")]
+        public IHttpActionResult RefundParticipants(int id)
+        {
+            _lotteryService.RefundParticipants(id, GetUserAndOrganization());
+
+            return Ok();
+        }
+
+        [HttpGet]
+        [Route("{id}/Status")]
+        public IHttpActionResult GetStatus(int id)
+        {
+            var status =_lotteryService.GetLotteryStatus(id);
+
+            return Ok(new { status });
         }
 
         [HttpPut]

@@ -8,6 +8,7 @@ using Shrooms.Constants.WebApi;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Lotteries;
 using Shrooms.Domain.Services.Args;
+using static Shrooms.Constants.BusinessLayer.ConstBusinessLayer;
 
 namespace Shrooms.Domain.Services.Lotteries
 {
@@ -21,6 +22,8 @@ namespace Shrooms.Domain.Services.Lotteries
 
         void AbortLottery(int id, UserAndOrganizationDTO userOrg);
 
+        void RefundParticipants(int id, UserAndOrganizationDTO userOrg);
+
         IEnumerable<LotteryDetailsDTO> GetLotteries(UserAndOrganizationDTO userOrganization);
 
         IEnumerable<LotteryDetailsDTO> GetFilteredLotteries(string filter, UserAndOrganizationDTO userOrg);
@@ -28,5 +31,9 @@ namespace Shrooms.Domain.Services.Lotteries
         IPagedList<LotteryDetailsDTO> GetPagedLotteries(GetPagedLotteriesArgs args);
 
         LotteryDetailsDTO GetLotteryDetails(int id, UserAndOrganizationDTO userOrg);
+
+        int GetLotteryStatus(int id);
+
+        void EditLotteryStatus(int id, LotteryStatus status);
     }
 }
