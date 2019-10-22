@@ -74,7 +74,7 @@ namespace Shrooms.Domain.Services.Lotteries
             var lottery = _lotteriesDbSet.SingleOrDefault(p => p.Id == lotteryDTO.Id);
             if (lottery.Status != (int)LotteryStatus.Drafted)
             {
-                throw new LotteryException("Lottery has started or ended");
+                throw new LotteryException("Editing forbidden, non drafted lottery.");
             }
             UpdateDraftedLottery(lottery, lotteryDTO);
             _uow.SaveChanges(false);
@@ -98,7 +98,7 @@ namespace Shrooms.Domain.Services.Lotteries
             var lottery = _lotteriesDbSet.Find(id);
             if (lottery == null)
             {
-                throw new LotteryException("Lottery not found");
+                return null;
             }
 
             var lotteryDetailsDTO = _mapper.Map<Lottery, LotteryDetailsDTO>(lottery);
@@ -109,27 +109,23 @@ namespace Shrooms.Domain.Services.Lotteries
         public void RemoveLottery(int id, UserAndOrganizationDTO userOrg)
         {
             var lottery = _lotteriesDbSet.SingleOrDefault(p => p.Id == id && p.OrganizationId == userOrg.OrganizationId);
-            if (lottery == null)
+            if (lottery != null)
             {
-                throw new LotteryException("Lottery not found");
+                lottery.Status = (int)LotteryStatus.Aborted;
+                _uow.SaveChanges();
             }
-
-            lottery.Status = (int)LotteryStatus.Aborted;
-            _uow.SaveChanges();
         }
 
         public async Task FinishLotteryAsync(int lotteryId)
         {
             var lottery = _lotteriesDbSet.Find(lotteryId);
 
-            if (lottery == null)
+            if (lottery != null)
             {
-                throw new LotteryException("Lottery not found");
+                lottery.Status = (int)LotteryStatus.Ended;
+
+                await _uow.SaveChangesAsync();
             }
-
-            lottery.Status = (int)LotteryStatus.Ended;
-
-            await _uow.SaveChangesAsync();
         }
 
         public LotteryStatsDTO GetLotteryStats(int lotteryId)
@@ -138,7 +134,7 @@ namespace Shrooms.Domain.Services.Lotteries
 
             if (lottery == null)
             {
-                throw new LotteryException("Lottery not found.");
+                return null;
             }
             var participants = _participantService.GetParticipantsCounted(lotteryId);
 
