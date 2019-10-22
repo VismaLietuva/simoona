@@ -17,7 +17,8 @@ namespace Shrooms.API.Helpers
             }
 
             var claimsIdentity = identity as ClaimsIdentity;
-            var orgIdClaim = claimsIdentity.FindFirst(ConstWebApi.ClaimOrganizationId);
+            var orgIdClaim = claimsIdentity?.FindFirst(ConstWebApi.ClaimOrganizationId);
+
             if (orgIdClaim == null)
             {
                 return 0;
@@ -34,7 +35,7 @@ namespace Shrooms.API.Helpers
             }
 
             var claimsIdentity = identity as ClaimsIdentity;
-            var orgNameClaim = claimsIdentity.FindFirst(ConstWebApi.ClaimOrganizationName);
+            var orgNameClaim = claimsIdentity?.FindFirst(ConstWebApi.ClaimOrganizationName);
             if (orgNameClaim == null)
             {
                 return string.Empty;
@@ -45,11 +46,6 @@ namespace Shrooms.API.Helpers
 
         public static string GetOriginalUsername(this IPrincipal principal)
         {
-            if (principal == null)
-            {
-                return string.Empty;
-            }
-
             var claimsPrincipal = principal as ClaimsPrincipal;
             if (claimsPrincipal == null)
             {

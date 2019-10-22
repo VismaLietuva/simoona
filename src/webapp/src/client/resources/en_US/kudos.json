@@ -80,6 +80,6 @@
   "typeMinus": "Use Minus to deduct any Kudos amount from a user’s Kudos account",
   "typeOther": "Use Other, if you want to give Kudos for something that is not listed in the Kudos type list",
   "kudosPhoto": "Image",
-  "filteringTypes": "Types"
-  
+  "filteringTypes": "Types",
+  "visible": "Visible"
 }
