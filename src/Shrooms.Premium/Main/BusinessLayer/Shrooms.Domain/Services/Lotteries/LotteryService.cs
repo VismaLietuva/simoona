@@ -101,10 +101,13 @@ namespace Shrooms.Domain.Services.Lotteries
                 if (lottery.Status == (int)LotteryStatus.Started)
                 {
                     _asyncRunner.Run<ILotteryAbortJob>(n => n.RefundLottery(lottery, userOrg), _uow.ConnectionName);
+                    lottery.Status = (int)LotteryStatus.RefundStarted;
                 }
-
-                lottery.Status = (int)LotteryStatus.RefundStarted;
-
+                else
+                {
+                    lottery.Status = (int)LotteryStatus.Aborted;
+                }
+                
                 _uow.SaveChanges();
             }
         }
