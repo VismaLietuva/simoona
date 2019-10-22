@@ -40,7 +40,7 @@ namespace Shrooms.Domain.Services.Lotteries
 
         public void RefundLottery(Lottery lottery, UserAndOrganizationDTO userOrg)
         {
-            var usersToRefund = _participantService.GetParticipantsToRefund(lottery.Id);
+            var usersToRefund = _participantService.GetParticipantsCounted(lottery.Id);
             var usersToSendKudos = new List<AddKudosLogDTO>();
 
             foreach (var user in usersToRefund)
@@ -52,7 +52,7 @@ namespace Shrooms.Domain.Services.Lotteries
                     PointsTypeId = 3,
                     MultiplyBy = totalReturn,
                     Comment = FormatComment(lottery, totalReturn),
-                    UserId = user.UserId,
+                    UserId = userOrg.UserId,
                     OrganizationId = userOrg.OrganizationId
                 };
                 usersToSendKudos.Add(kudosLog);
