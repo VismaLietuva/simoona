@@ -49,7 +49,7 @@ namespace Shrooms.Domain.Services.Lotteries
                 var kudosLog = new AddKudosLogDTO
                 {
                     ReceivingUserIds = new List<string> { user.UserId },
-                    PointsTypeId = 3,
+                    PointsTypeId = 5,
                     MultiplyBy = totalReturn,
                     Comment = FormatComment(lottery, totalReturn),
                     UserId = userOrg.UserId,

@@ -38,23 +38,6 @@ namespace Shrooms.Domain.Services.Lotteries
               .Select(MapToParticipantDto);
         }
 
-        public IEnumerable<LotteryParticipantDTO> GetParticipantsToRefund(int lotteryId)
-        {
-            return _participantsDbSet
-                .Where(x => x.LotteryId == lotteryId && x.IsRefunded != true)
-                .GroupBy(l => l.User)
-                .Select(MapToParticipantDto);
-        }
-
-        public void SetTicketsAsRefunded(int lotteryId)
-        {
-            _participantsDbSet
-                .Where(x => x.LotteryId == lotteryId)
-                .ForEach(x => x.IsRefunded = true);
-
-            _unitOfWork.SaveChanges();
-        }
-
         private Expression<Func<IGrouping<ApplicationUser, LotteryParticipant>, LotteryParticipantDTO>> MapToParticipantDto =>
             group => new LotteryParticipantDTO
             {
