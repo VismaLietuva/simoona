@@ -104,7 +104,7 @@
             }
             else if (vm.isSendModal())
             {
-                kudosifyModalFactory.getSendType().then(function (result) {
+                kudosifyModalFactory.getSendKudosType().then(function (result) {
                     vm.pointsType = result;
                 });
                 vm.isButtonSelected = true;

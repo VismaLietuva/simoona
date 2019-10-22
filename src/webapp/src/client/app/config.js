@@ -92,12 +92,6 @@
             'active': window.usingAnimatedGifs,
             'name': 'AnimatedGifs',
             'description': 'Used to set if back-end uses AnimatedGifs plugin'
-        },
-        {
-            'key': 'kudosSendImproved',
-            'active': false,
-            'name': 'Improved Kudos Send',
-            'description': 'Adds more clear functionality to send your own Kudos to other'
         }]);
 
         Analytics.pageView();
