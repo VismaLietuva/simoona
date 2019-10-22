@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Shrooms.DomainExceptions.Exceptions.Lotteries
 {
-    class LotteryException : Exception
+    public class LotteryException : Exception
     {
         public LotteryException(string message) : base (message)
         {
