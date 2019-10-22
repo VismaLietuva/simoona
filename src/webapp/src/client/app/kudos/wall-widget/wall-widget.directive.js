@@ -11,17 +11,23 @@
     kudosWallWidget.$inject = [
         'authService',
         'kudosFactory',
+        'modalTypes',
         'kudosWallWidgetSettings'
     ];
 
-    function kudosWallWidget(authService, kudosFactory, kudosWallWidgetSettings) {
+    function kudosWallWidget(authService, kudosFactory, modalTypes, kudosWallWidgetSettings) {
         var directive = {
             restrict: 'E',
             templateUrl: 'app/kudos/wall-widget/wall-widget.html',
             link: linkFunc,
             scope: {
                 lastApprovedKudos: '=?'
-            }
+            },
+            controller: function(modalTypes){
+                var vm = this;
+                vm.modalTypes = modalTypes;
+            },
+            controllerAs: 'vm'
         };
         return directive;
 
@@ -35,7 +41,7 @@
             });
             
             ////////
-            
+
             function getLastApprovedKudos() {
                 kudosFactory.getLastApprovedKudos(kudosWallWidgetSettings.approvedKudosCount).then(function (result) {
                     scope.lastApprovedKudos = result;

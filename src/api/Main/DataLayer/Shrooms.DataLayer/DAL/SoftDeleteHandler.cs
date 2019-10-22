@@ -15,7 +15,7 @@ namespace Shrooms.DataLayer.DAL
 {
     public static class SoftDeleteHandler
     {
-        private static readonly Dictionary<Type, EntitySetBase> MappingCache = new Dictionary<Type, EntitySetBase>();
+        private static readonly Dictionary<Type, EntitySetBase> _mappingCache = new Dictionary<Type, EntitySetBase>();
         private static ShroomsDbContext _context;
 
         public static void Execute(IEnumerable<DbEntityEntry> entries, ShroomsDbContext ctx)
@@ -27,19 +27,19 @@ namespace Shrooms.DataLayer.DAL
             foreach (var entry in deletedItems)
             {
                 var e = entry.Entity;
-                string id = string.Empty;
+                var id = string.Empty;
 
                 if (e is IdentityUser || e is ApplicationRole)
                 {
                     id = ((IdentityUser)e).Id;
                 }
-                else if (e is BaseModel)
+                else if (e is BaseModel model)
                 {
-                    id = ((BaseModel)e).Id.ToString();
+                    id = model.Id.ToString();
                 }
-                else if (e is Event)
+                else if (e is Event @event)
                 {
-                    id = ((Event)e).Id.ToString();
+                    id = @event.Id.ToString();
                 }
 
                 if (string.IsNullOrEmpty(id))
@@ -47,7 +47,7 @@ namespace Shrooms.DataLayer.DAL
                     throw new ArgumentException("Id not found in SoftDelete() method", id);
                 }
 
-                string tableName = GetTableName(e.GetType());
+                var tableName = GetTableName(e.GetType());
                 _context.Database.ExecuteSqlCommand($"UPDATE {tableName} SET IsDeleted = 1 WHERE ID = @id", new SqlParameter("id", id));
 
                 // Marking it Unchanged prevents the hard delete - entry.State = EntityState.Unchanged;
@@ -65,19 +65,19 @@ namespace Shrooms.DataLayer.DAL
             foreach (var entry in deletedItems)
             {
                 var e = entry.Entity;
-                string id = string.Empty;
+                var id = string.Empty;
 
                 if (e is IdentityUser || e is ApplicationRole)
                 {
                     id = ((IdentityUser)e).Id;
                 }
-                else if (e is BaseModel)
+                else if (e is BaseModel model)
                 {
-                    id = ((BaseModel)e).Id.ToString();
+                    id = model.Id.ToString();
                 }
-                else if (e is Event)
+                else if (e is Event @event)
                 {
-                    id = ((Event)e).Id.ToString();
+                    id = @event.Id.ToString();
                 }
 
                 if (string.IsNullOrEmpty(id))
@@ -85,7 +85,7 @@ namespace Shrooms.DataLayer.DAL
                     throw new ArgumentException("Id not found in SoftDelete() method", id);
                 }
 
-                string tableName = GetTableName(e.GetType());
+                var tableName = GetTableName(e.GetType());
                 await _context.Database.ExecuteSqlCommandAsync($"UPDATE {tableName} SET IsDeleted = 1 WHERE ID = @id", new SqlParameter("id", id));
 
                 // Marking it Unchanged prevents the hard delete - entry.State = EntityState.Unchanged;
@@ -96,7 +96,7 @@ namespace Shrooms.DataLayer.DAL
 
         internal static string GetTableName(Type type)
         {
-            EntitySetBase entitySet = GetEntitySet(type);
+            var entitySet = GetEntitySet(type);
 
             return $"[{entitySet.Schema}].[{entitySet.Table}]";
         }
@@ -108,16 +108,16 @@ namespace Shrooms.DataLayer.DAL
 
         private static EntitySetBase GetEntitySet(Type type)
         {
-            if (MappingCache.ContainsKey(type))
+            if (_mappingCache.ContainsKey(type))
             {
-                return MappingCache[type];
+                return _mappingCache[type];
             }
 
             type = GetObjectType(type);
-            string baseTypeName = type.BaseType.Name;
-            string typeName = type.Name;
+            var baseTypeName = type.BaseType?.Name;
+            var typeName = type.Name;
 
-            ObjectContext context = ((IObjectContextAdapter)_context).ObjectContext;
+            var context = ((IObjectContextAdapter)_context).ObjectContext;
             var entitySet = context.MetadataWorkspace
                             .GetItemCollection(DataSpace.SSpace)
                             .GetItems<EntityContainer>()
@@ -128,6 +128,8 @@ namespace Shrooms.DataLayer.DAL
             {
                 throw new ArgumentException("Entity type not found in GetEntitySet() method", typeName);
             }
+
+            _mappingCache.Add(type, entitySet);
 
             return entitySet;
         }
