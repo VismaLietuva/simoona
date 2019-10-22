@@ -63,20 +63,17 @@ namespace Shrooms.API.Controllers.Lotteries
         [Route("Details")]
         public IHttpActionResult GetLottery(int id)
         {
-            try
+
+            var lotteryDTO = _lotteryService.GetLotteryDetails(id, GetUserAndOrganization());
+
+            if (lotteryDTO == null)
             {
-                var lotteryDTO = _lotteryService.GetLotteryDetails(id, GetUserAndOrganization());
-
-                var lotteryViewModel = _mapper.Map<LotteryDetailsDTO, LotteryDetailsViewModel>(lotteryDTO);
-
-                return Ok(lotteryViewModel);
-
-            }
-            catch (LotteryException e)
-            {
-                return BadRequest(e.Message);
+                return Ok();
             }
 
+            var lotteryViewModel = _mapper.Map<LotteryDetailsDTO, LotteryDetailsViewModel>(lotteryDTO);
+
+            return Ok(lotteryViewModel);
            
         }
 
@@ -196,17 +193,9 @@ namespace Shrooms.API.Controllers.Lotteries
         [Route("{id}/Stats")]
         public IHttpActionResult LotteryStats(int id)
         {
-            try
-            {
-                var lotteryStats = _lotteryService.GetLotteryStats(id);
+            var lotteryStats = _lotteryService.GetLotteryStats(id);
 
-                return Ok(lotteryStats);
-            }
-            catch (LotteryException ex)
-            {
-
-                return BadRequest(ex.Message);
-            }
+            return Ok(lotteryStats);
         }
     }
 }
