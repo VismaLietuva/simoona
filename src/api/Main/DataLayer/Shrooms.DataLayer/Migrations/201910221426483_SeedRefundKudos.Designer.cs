@@ -7,13 +7,13 @@ namespace Shrooms.DataLayer.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class AddFieldToLotteryParticipant : IMigrationMetadata
+    public sealed partial class SeedRefundKudos : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddFieldToLotteryParticipant));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(SeedRefundKudos));
         
         string IMigrationMetadata.Id
         {
-            get { return "201910140939226_AddFieldToLotteryParticipant"; }
+            get { return "201910221426483_SeedRefundKudos"; }
         }
         
         string IMigrationMetadata.Source

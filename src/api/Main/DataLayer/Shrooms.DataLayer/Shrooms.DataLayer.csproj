@@ -797,9 +797,9 @@
     <Compile Include="Migrations\201910211051464_AddLotteryAndLotteryParticipant.Designer.cs">
       <DependentUpon>201910211051464_AddLotteryAndLotteryParticipant.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201910140939226_AddFieldToLotteryParticipant.cs" />
-    <Compile Include="Migrations\201910140939226_AddFieldToLotteryParticipant.Designer.cs">
-      <DependentUpon>201910140939226_AddFieldToLotteryParticipant.cs</DependentUpon>
+    <Compile Include="Migrations\201910221426483_SeedRefundKudos.cs" />
+    <Compile Include="Migrations\201910221426483_SeedRefundKudos.Designer.cs">
+      <DependentUpon>201910221426483_SeedRefundKudos.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
@@ -1314,8 +1314,8 @@
     <EmbeddedResource Include="Migrations\201910211051464_AddLotteryAndLotteryParticipant.resx">
       <DependentUpon>201910211051464_AddLotteryAndLotteryParticipant.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201910140939226_AddFieldToLotteryParticipant.resx">
-      <DependentUpon>201910140939226_AddFieldToLotteryParticipant.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201910221426483_SeedRefundKudos.resx">
+      <DependentUpon>201910221426483_SeedRefundKudos.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
