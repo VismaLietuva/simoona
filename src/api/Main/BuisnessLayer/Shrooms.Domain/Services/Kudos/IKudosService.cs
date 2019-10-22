@@ -14,7 +14,7 @@ namespace Shrooms.Domain.Services.Kudos
 
         Task RemoveKudosType(int id, UserAndOrganizationDTO userOrg);
 
-        KudosTypeDTO GetKudosTypeSend(UserAndOrganizationDTO userOrg);
+        KudosTypeDTO GetSendKudosType(UserAndOrganizationDTO userOrg);
 
         WelcomeKudosDTO GetWelcomeKudos();
 

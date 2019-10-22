@@ -547,7 +547,7 @@ namespace Shrooms.API.Tests.DomainService
                 UserId = "testUserId2"
             };
 
-            var result = _kudosService.GetKudosTypeSend(userAndOrg);
+            var result = _kudosService.GetSendKudosType(userAndOrg);
 
             Assert.AreEqual(result.Type, ConstBusinessLayer.KudosTypeEnum.Send);
         }

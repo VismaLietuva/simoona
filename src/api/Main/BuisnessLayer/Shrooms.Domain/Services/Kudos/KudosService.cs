@@ -128,7 +128,7 @@ namespace Shrooms.Domain.Services.Kudos
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
-        public KudosTypeDTO GetKudosTypeSend(UserAndOrganizationDTO userOrg)
+        public KudosTypeDTO GetSendKudosType(UserAndOrganizationDTO userOrg)
         {
             var hasKudosAdminPermission = HasKudosAdministratorPermission(userOrg);
 
