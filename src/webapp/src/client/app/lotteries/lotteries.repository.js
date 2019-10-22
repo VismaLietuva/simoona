@@ -22,7 +22,9 @@
             updateStarted: updateStarted,
             revokeLottery: revokeLottery,
             getLotteryListPaged: getLotteryListPaged,
-            finishLottery: finishLottery
+            finishLottery: finishLottery,
+            getLotteryStatus: getLotteryStatus,
+            refundParticipants: refundParticipants
         };
         return service;
 
@@ -57,9 +59,10 @@
         }
 
         function revokeLottery(id) {
-            return $resource(url + 'Abort').delete({id}).$promise;
+            return $resource(url + 'Abort').get({id}).$promise;
         }
 
+        
         function getLotteryListPaged(filters) {
             return $resource(url + 'Paged', '', {
                 'query': {
@@ -69,9 +72,21 @@
                 }
             }).query(filters).$promise;
         }
-
+        
         function finishLottery(id) {
             return $resource(url + 'Finish' + `?id=${id}`, '', {
+                patch: {
+                    method: 'PATCH'
+                }
+            }).patch().$promise;
+        }
+
+        function getLotteryStatus(id) {
+            return $resource(url + `${id}/Status`).get().$promise;
+        }
+
+        function refundParticipants(id) {
+            return $resource(url + `${id}/Refund`, '', {
                 patch: {
                     method: 'PATCH'
                 }
