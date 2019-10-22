@@ -17,6 +17,7 @@
     "endsIn": "Pasibaigs už",
     "kudosPerTicket": "kudos/bilietas",
     "entityNamePlural": "Loterijos",
+    "export": "Eksportuoti",
     "entityNameSingular": "Loterija",
     "lotteriesPanelHeader": "Loterijos",
     "lotteryTitle": "Pavadinimas",
@@ -41,5 +42,11 @@
     "aborted": "Atšaukta",
     "ended": "Pasibaigusi",
     "hasBeenBought": "Sėkmingai nusipirkti {{ one }} bilietai \"{{ two }}\" loterijoje!",
-    "invalidTicketNumber": "Neteisingas bilietų skaičius!"
+    "invalidTicketNumber": "Neteisingas bilietų skaičius!",
+    "lotteryStatsModalName": "Loterijos duomenys",
+    "totalParticipants": "Viso dalyvių: ",
+    "ticketsSold": "Parduota bilietų: ",
+    "kudosSpent": "Išleista 'Kudos': ",
+    "userNameSurname": "Vardas, Pavardė",
+    "ticketsBougth": "Nupirko bilietų"
 }

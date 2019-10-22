@@ -17,6 +17,7 @@
     "endsIn": "Ends in",
     "kudosPerTicket": "kudos/ticket",
     "entityNamePlural": "Lotteries",
+    "export": "Export",
     "entityNameSingular": "Lottery",
     "lotteriesPanelHeader": "Lotteries",
     "lotteryTitle": "Title",
@@ -41,6 +42,11 @@
     "aborted": "Aborted",
     "ended": "Ended",
     "hasBeenBought": "Successfully bought {{ one }} tickets for \"{{ two }}\" lottery!",
-    "invalidTicketNumber": "Invalid ticket count!"
-
+    "invalidTicketNumber": "Invalid ticket count!",
+    "lotteryStatsModalName": "Lottery statistics",
+    "totalParticipants": "Total participants: ",
+    "ticketsSold": "Tickets sold: ",
+    "kudosSpent": "Kudos spent: ",
+    "userNameSurname": "Name, Surname",
+    "ticketsBougth": "Tickets bought"
 }
