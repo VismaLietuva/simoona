@@ -40,6 +40,32 @@
             <label for="choose-type" translate="kudos.chooseType"></label>
             <div class="kudos-modal-buttons-group kudos-points-type">
                 <button class="btn btn-sm btn-info kudos-type-button kudos-points-type kudosify-modal-buttons-inactive"
+                        ng-if="(!kudosType.isActive && vm.isAdmin)"
+                        type="button"
+                        uib-tooltip="{{kudosType.description}}"
+                        tooltip-placement="bottom"
+                        tooltip-class="word-break"
+                        tooltip-append-to-body="true"
+                        ng-model="vm.pointsType"
+                        ng-click="vm.chooseKudosType(kudosType, $event)" ng-repeat="kudosType in vm.kudosTypes"
+                        data-test-id="{{kudosType.name}}" ng-cloak>
+                    {{:: kudosType.name}} ({{:: kudosType.value}})
+                </button>
+                <button class="btn btn-sm btn-info kudos-type-button kudos-points-type kudosify-modal-buttons-inactive"
+                        ng-if="kudosType.isActive && !vm.hiddenKudosTypes.includes(kudosType.type)"
+                        type="button"
+                        uib-tooltip="{{kudosType.description}}"
+                        tooltip-placement="bottom"
+                        tooltip-class="word-break"
+                        tooltip-append-to-body="true"
+                        ng-model="vm.pointsType"
+                        ng-click="vm.chooseKudosType(kudosType, $event)"
+                        ng-repeat="kudosType in vm.kudosTypes"
+                        data-test-id="{{kudosType.name}}" ng-cloak>
+                    {{:: kudosType.name}} ({{:: kudosType.value}})
+                </button>
+                <button class="btn btn-sm btn-info kudos-type-button kudos-points-type kudosify-modal-buttons-inactive"
+                        ng-if="kudosType.isActive && vm.hiddenKudosTypes.includes(kudosType.type) && vm.isAdmin"
                         type="button"
                         uib-tooltip="{{kudosType.description}}"
                         tooltip-placement="bottom"
@@ -62,7 +88,7 @@
                    name="multiplyBy"
                    ng-pattern="/^[0-9]{1,9}$/"
                    ng-model="vm.kudosifyInfo.multiplyBy"
-                   ng-change="vm.onMultiplierValueChanged()"
+                   ng-change="vm.recalculateTotalPoints()"
                    min="1" max="{{vm.maxMinus}}"
                    required
                    ignore-mouse-wheel

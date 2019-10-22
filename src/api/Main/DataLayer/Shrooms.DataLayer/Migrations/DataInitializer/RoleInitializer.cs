@@ -25,6 +25,7 @@ namespace Shrooms.DataLayer.Migrations.DataInitializer
                 new ApplicationRole { Name = Roles.ServiceRequestNotification, CreatedTime = timestamp },
                 new ApplicationRole { Name = Roles.User, CreatedTime = timestamp },
                 new ApplicationRole { Name = Roles.KudosAdmin, CreatedTime = timestamp },
+                new ApplicationRole { Name = Roles.LotteryAdmin, CreatedTime = timestamp},
             };
 
             var rolesWithOrg = GenerateRolesForEveryOrganization(newRoles, context);

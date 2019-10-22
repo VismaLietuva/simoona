@@ -40,5 +40,6 @@ namespace Shrooms.WebViewModels.Models.Wall.Posts
         public DateTime Modified { get; set; }
 
         public DateTime LastEdit { get; set; }
+        public bool IsWatched { get; set; }
     }
 }

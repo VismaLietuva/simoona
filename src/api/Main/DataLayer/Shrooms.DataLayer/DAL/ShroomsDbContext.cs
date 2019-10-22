@@ -15,6 +15,7 @@ using Shrooms.EntityModels.Models.Badges;
 using Shrooms.EntityModels.Models.Books;
 using Shrooms.EntityModels.Models.Events;
 using Shrooms.EntityModels.Models.Kudos;
+using Shrooms.EntityModels.Models.Lotteries;
 using Shrooms.EntityModels.Models.Monitors;
 using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.EntityModels.Models.Notifications;
@@ -131,6 +132,8 @@ namespace Shrooms.DataLayer.DAL
         public virtual DbSet<BadgeType> BadgeTypes { get; set; }
         public virtual DbSet<BadgeCategoryKudosType> BadgeCategoryKudosType { get; set; }
         public virtual DbSet<BadgeLog> BadgeLogs { get; set; }
+        public virtual DbSet<Lottery> Lotteries { get; set; }
+        public virtual DbSet<LotteryParticipant> LotteryParticipants { get; set; }
 
         public string ConnectionName { get; }
 
@@ -205,6 +208,7 @@ namespace Shrooms.DataLayer.DAL
             modelBuilder.Configurations.Add(new MonitorConfig());
             modelBuilder.Configurations.Add(new NotificationConfig());
             modelBuilder.Configurations.Add(new NotifiationUserConfig());
+            modelBuilder.Configurations.Add(new PostWatcherConfig());
 
             var convention = new AttributeToColumnAnnotationConvention<SqlDefaultValueAttribute, string>("SqlDefaultValue", (p, attributes) => attributes.Single().DefaultValue);
             modelBuilder.Conventions.Add(convention);

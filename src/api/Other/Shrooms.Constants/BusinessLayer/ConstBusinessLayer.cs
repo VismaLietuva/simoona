@@ -39,7 +39,8 @@ namespace Shrooms.Constants.BusinessLayer
             Ordinary = 1,
             Send,
             Minus,
-            Other
+            Other,
+            Welcome
         }
         #endregion
 
@@ -76,6 +77,16 @@ namespace Shrooms.Constants.BusinessLayer
         public const int MinCharactersInBookSearch = 2;
         public const string LoyaltyBotName = "Loyalty bot";
 
+        #endregion
+
+        #region Lotteries
+        public enum LotteryStatus
+        {
+            Drafted = 1,
+            Started,
+            Aborted,
+            Ended
+        }
         #endregion
 
         #region Organization

@@ -9,7 +9,9 @@ namespace Shrooms.DataTransferObjects.Models.Kudos
         public int Multiplier { get; set; }
 
         public ConstBusinessLayer.KudosTypeEnum Type { get; set; }
-        
+
         public string Description { get; set; }
+
+        public bool IsActive { get; set; }
     }
 }

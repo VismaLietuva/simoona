@@ -4,7 +4,8 @@
     angular
         .module('simoonaApp.Kudos')
         .constant('kudosifySettings', {
-            maxMinus: 99999
+            maxMinus: 99999,
+            hiddeKudosTypes: [3, 5]
         })
         .directive('aceKudosifyModal', kudosifyModal);
 
@@ -72,6 +73,8 @@
         vm.getUsers = getUsersForAutocomplete;
         vm.attachImage = attachImage;
 
+        vm.isAdmin = authService.identity.roles.contains("Admin") || authService.identity.roles.contains("KudosAdmin");
+
         vm.userId = authService.identity.userId;
         vm.context = context;
 
@@ -90,6 +93,8 @@
 
         vm.isSubmitModal = isSubmitModal;
         vm.isSendModal = isSendModal;
+
+        vm.hiddenKudosTypes = kudosifySettings.hiddeKudosTypes;
 
         init();
 

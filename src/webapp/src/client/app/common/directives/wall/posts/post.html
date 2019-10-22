@@ -8,17 +8,15 @@
                     {{::vm.post.wallName}}
                 </a>
             </div>
-
+           
         <div class="clearfix">
             <ace-message-user-profile user="vm.post.author"
                                       date="vm.post.created"
                                       edited-date="vm.post.lastEdit"
                                       is-edited="vm.post.isEdited"
-                                      is-hidden="vm.post.isHidden"
-            >
+                                      is-hidden="vm.post.isHidden">
             </ace-message-user-profile>
         </div>
-
         <div class="post-content-margin">
             <form name="editPostForm" class="edit-text-area" ng-if="vm.editFieldEnabled">
                 <textarea name="messageBody"
@@ -106,11 +104,12 @@
                              is-wall-module="vm.isWallModule"
                              ng-show="!vm.editFieldEnabled">
     </ace-message-actions>
+    <div feature-flag="usePostWatching">
+        <a ng-if="vm.post.isWatched" ng-click="vm.unwatchPost()" class="post-buttons glyphicon glyphicon-star" title="{{ 'wall.unwatch' | translate }}">
+        </a>
+        <a ng-if="!vm.post.isWatched" ng-click="vm.watchPost()" class="post-buttons glyphicon glyphicon-star-empty" title="{{ 'wall.watch' | translate }}">
+        </a>
+    </div>
 
-    <a  ngclipboard
-        ng-click="vm.notifyCopied($event)"
-        ng-href="{{vm.getPostUrl(vm.post.id)}}"
-        data-clipboard-text="{{vm.getPostUrl(vm.post.id)}}"
-        class="clipboard-post-link vismaicon vismaicon-sm"></a>
-
+    <a ngclipboard ng-click="vm.notifyCopied($event)" ng-href="{{vm.getPostUrl(vm.post.id)}}" data-clipboard-text="{{vm.getPostUrl(vm.post.id)}}" class="vismaicon vismaicon-sm icon-post-link"></a>
 </div>

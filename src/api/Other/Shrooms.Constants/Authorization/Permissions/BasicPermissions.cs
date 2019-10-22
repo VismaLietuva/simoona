@@ -31,5 +31,6 @@
         public const string Office = "OFFICE_BASIC";
         public const string KudosBasket = "KUDOSBASKET_BASIC";
         public const string Wall = "WALL_BASIC";
+        public const string Lottery = "LOTTERY_BASIC";
     }
 }

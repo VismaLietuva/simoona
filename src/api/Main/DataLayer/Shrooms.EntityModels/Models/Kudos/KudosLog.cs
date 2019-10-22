@@ -57,7 +57,7 @@ namespace Shrooms.EntityModels.Models.Kudos
                 throw new ValidationException(ErrorCodes.CanNotSendKudosToSelf, "Kudos receiver can not be a sender");
             }
 
-            StatusShouldntBeProcessed();
+            ValidateStatusPending();
 
             Status = KudosStatus.Approved;
             Modified = DateTime.UtcNow;
@@ -76,7 +76,7 @@ namespace Shrooms.EntityModels.Models.Kudos
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Rejection message is empty");
             }
 
-            StatusShouldntBeProcessed();
+            ValidateStatusPending();
 
             Status = KudosStatus.Rejected;
             RejectionMessage = reason;
@@ -84,7 +84,7 @@ namespace Shrooms.EntityModels.Models.Kudos
             ModifiedBy = userId;
         }
 
-        private void StatusShouldntBeProcessed()
+        private void ValidateStatusPending()
         {
             if (Status != KudosStatus.Pending)
             {

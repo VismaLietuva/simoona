@@ -15,6 +15,7 @@ using Shrooms.Constants.BusinessLayer;
 using Shrooms.Constants.WebApi;
 using Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.Domain.Services.Kudos;
+using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models.Kudos;
@@ -426,6 +427,17 @@ namespace Shrooms.API.Controllers.Kudos
             {
                 return BadRequest(e.Message);
             }
+        }
+
+        [HttpGet]
+        [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
+        public async Task<IHttpActionResult> GetWelcomeKudos()
+        {
+            var welcomeKudosDTO = _kudosService.GetWelcomeKudos();
+
+            var result = _mapper.Map<WelcomeKudosDTO, WelcomeKudosViewModel>(welcomeKudosDTO);
+
+            return Ok(result);
         }
 
         private KudosListBasicDataViewModel CalculateStats(int months, int amount)
