@@ -25,7 +25,9 @@
             getLotteryListPaged: getLotteryListPaged,
             finishLottery: finishLottery,
             getLotteryWidgetInfo: getLotteryWidgetInfo,
-            buyTickets: buyTickets
+            buyTickets: buyTickets,
+            getLotteryStatistics: getLotteryStatistics,
+            exportParticipants: exportParticipants
         };
         return service;
 
@@ -87,6 +89,15 @@
         }
         function buyTickets(lotteryTickets) {
             return $resource(url + 'Enter').save(lotteryTickets).$promise;
+        }
+
+        function getLotteryStatistics(id) {
+            return $resource(url + `${id}/Stats`).get().$promise;
+        }
+        function exportParticipants(lotteryId) {
+            return $http.get(url + 'Export?lotteryId=' + lotteryId, {
+                responseType: 'arraybuffer'
+            });
         }
     }
 })();

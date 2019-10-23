@@ -87,6 +87,8 @@ namespace Shrooms.Constants.BusinessLayer
             Aborted,
             Ended
         }
+        public const string LotteryParticipantsExcelTableName = "Lottery Participants";
+        public const int LotteryParticipantsInRow = 4;
         #endregion
 
         #region Organization

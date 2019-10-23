@@ -6,11 +6,12 @@
 </div>
 <div class="modal-body">
     <form role="form" class="lottery-detail-modal-form">
-        <div class="form-group">
+        <div class="form-group lottery-detail-modal-main-screen">
             <div class="row">
-                <div class="col-xs-6">
+                <div class="col-sm-6">
                     <div class="row">
-                        <div id="lottery-pics" class="carousel slide lottery-detail-modal-carousel" data-ride="carousel">
+                        <div id="lottery-pics" class="carousel slide lottery-detail-modal-carousel"
+                            data-ride="carousel">
 
                             <!-- Indicators -->
                             <ol class="carousel-indicators">
@@ -34,11 +35,13 @@
                             </div>
 
                             <!-- Previous/Next controls -->
-                            <a class="left carousel-control" data-target="#lottery-pics" role="button" data-slide="prev">
+                            <a class="left carousel-control" data-target="#lottery-pics" role="button"
+                                data-slide="prev">
                                 <span class="icon-prev" aria-hidden="true"></span>
                                 <span class="sr-only"></span>
                             </a>
-                            <a class="right carousel-control" data-target="#lottery-pics" role="button" data-slide="next">
+                            <a class="right carousel-control" data-target="#lottery-pics" role="button"
+                                data-slide="next">
                                 <span class="icon-next" aria-hidden="true"></span>
                                 <span class="sr-only"></span>
                             </a>
@@ -46,8 +49,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-xs-6">
-                    <div class="col-sm-8 lotteries-detail-modal-ticket-counter">
+                <div class="col-sm-6">
+                    <div class="col-xs-8 lotteries-detail-modal-ticket-counter">
                         <div class="input-group">
                             <span class="input-group-btn">
                                 <button type="button" class="btn btn-default btn-number" ng-click="vm.ticketDown()"
@@ -56,7 +59,7 @@
                                 </button>
                             </span>
                             <input type="number" name="quant[1]" class="form-control input-number"
-                               ng-model="vm.ticketCount" min="1" max="100">
+                                ng-model="vm.ticketCount" min="1" max="100">
                             <span class="input-group-btn">
                                 <button type="button" ng-click="vm.ticketUp()" class="btn btn-default btn-number"
                                     data-type="plus" data-field="quant[1]">
@@ -64,25 +67,30 @@
                                 </button>
                             </span>
                         </div>
-                    </div>
-                    <div class="col-sm-3">
-                            <button type="button" ng-click="vm.buyTickets()" ng-disabled="vm.ticketCount < 1" class="btn btn-primary"><span translate="lotteries.buy"></span></button>
-                    </div>
-                 <div class="row">
-                    <div class="lottery-detail-modal-total-cost">
-                        <label class><span translate="lotteries.totalCost"></span> <b>{{vm.lottery.entryFee * vm.ticketCount}}</b></label>
-                    </div>
-                </div>
-                <div class="row">
-                        <div class="lottery-end-date-component">
-                            <label><span translate="lotteries.endDate"></span> <b>{{vm.lottery.endDate | convertToCurrentTimezone | date:'yyyy-MM-dd, HH:mm'}}</b></label>
+                        <div class="row">
+                            <div class="lotteries-detail-modal-total-cost">
+                                <label class><span translate="lotteries.totalCost"></span>
+                                    <b>{{vm.lottery.entryFee * vm.ticketCount}}</b></label>
+                            </div>
                         </div>
                     </div>
+                    <div class="col-xs-3 lottery-detail-modal-buy-button">
+                        <button type="button" ng-click="vm.buyTickets()" ng-disabled="vm.ticketCount < 1" class="btn btn-primary"><span
+                                translate="lotteries.buy"></span></button>
+                    </div>
+                        <div class="row">
+                            <div class="lottery-end-date-component">
+                                <label><span translate="lotteries.endDate"></span>
+                                    <b>{{vm.lottery.endDate | convertToCurrentTimezone | date:'yyyy-MM-dd, HH:mm'}}</b></label>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
             <div class="row">
-                <div class="card">
-                    <div class="card-body lottery-description">
+                <div class="card lotteries-detail-modal-description">
+                    <div class="card-body">
                         {{vm.lottery.description}}
                     </div>
                 </div>
