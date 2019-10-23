@@ -58,7 +58,7 @@ namespace Shrooms.Domain.Services.Lotteries
                 throw new LotteryException("Invalid entry fee");
             }
 
-            if (newLotteryDTO.Status != (int)LotteryStatus.Started ||
+            if (newLotteryDTO.Status != (int)LotteryStatus.Started &&
                 newLotteryDTO.Status != (int)LotteryStatus.Drafted)
             {
                 throw new LotteryException("Invalid status of created lottery");
