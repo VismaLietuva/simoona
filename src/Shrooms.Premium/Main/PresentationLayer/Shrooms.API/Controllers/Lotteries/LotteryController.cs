@@ -107,6 +107,7 @@ namespace Shrooms.API.Controllers.Lotteries
 
         [HttpGet]
         [Route("Abort")]
+        [InvalidateCacheOutput("Get", typeof(LotteryWidgetController))]
         public IHttpActionResult Abort(int id)
         {
             _lotteryService.AbortLottery(id, GetUserAndOrganization());
@@ -190,6 +191,7 @@ namespace Shrooms.API.Controllers.Lotteries
 
         [HttpPatch]
         [Route("Finish")]
+        [InvalidateCacheOutput("Get", typeof(LotteryWidgetController))]
         public async Task<IHttpActionResult> FinishLottery(int id)
         {
             try
