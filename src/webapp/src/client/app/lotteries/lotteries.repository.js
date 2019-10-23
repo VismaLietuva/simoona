@@ -24,6 +24,8 @@
             revokeLottery: revokeLottery,
             getLotteryListPaged: getLotteryListPaged,
             finishLottery: finishLottery,
+            getLotteryStatus: getLotteryStatus,
+            refundParticipants: refundParticipants,
             getLotteryWidgetInfo: getLotteryWidgetInfo,
             buyTickets: buyTickets,
             getLotteryStatistics: getLotteryStatistics,
@@ -62,9 +64,10 @@
         }
 
         function revokeLottery(id) {
-            return $resource(url + 'Abort').delete({id}).$promise;
+            return $resource(url + 'Abort').get({id}).$promise;
         }
 
+        
         function getLotteryListPaged(filters) {
             return $resource(url + 'Paged', '', {
                 'query': {
@@ -74,7 +77,7 @@
                 }
             }).query(filters).$promise;
         }
-
+        
         function finishLottery(id) {
             return $resource(url + 'Finish' + `?id=${id}`, '', {
                 patch: {
@@ -82,11 +85,25 @@
                 }
             }).patch().$promise;
         }
+
+        function getLotteryStatus(id) {
+            return $resource(url + `${id}/Status`).get().$promise;
+        }
+
+        function refundParticipants(id) {
+            return $resource(url + `${id}/Refund`, '', {
+                patch: {
+                    method: 'PATCH'
+                }
+            }).patch().$promise;
+        }
+
         function getLotteryWidgetInfo(){
             return $resource(lotteryWidgetUrl + 'Get')
                 .query()
                 .$promise;
         }
+
         function buyTickets(lotteryTickets) {
             return $resource(url + 'Enter').save(lotteryTickets).$promise;
         }
@@ -94,6 +111,7 @@
         function getLotteryStatistics(id) {
             return $resource(url + `${id}/Stats`).get().$promise;
         }
+        
         function exportParticipants(lotteryId) {
             return $http.get(url + 'Export?lotteryId=' + lotteryId, {
                 responseType: 'arraybuffer'

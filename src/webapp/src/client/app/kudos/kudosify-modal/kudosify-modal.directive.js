@@ -7,8 +7,7 @@
             maxMinus: 99999,
             hiddeKudosTypes: [3, 5]
         })
-        .directive('aceKudosifyModal', kudosifyModal)
-        .directive('aceSendKudosModal', sendKudosModal);
+        .directive('aceKudosifyModal', kudosifyModal);
 
     kudosifyModal.$inject = [
         '$uibModal'
@@ -24,7 +23,7 @@
         };
         return directive;
 
-        function linkFunc(scope, elem) {
+        function linkFunc(scope, elem, attrs) {
             elem.bind('click', function () {
                 $uibModal.open({
                     templateUrl: 'app/kudos/kudosify-modal/kudosify-modal.html',
@@ -33,32 +32,9 @@
                     resolve: {
                         currentUser: function () {
                             return scope.aceKudosifyModal;
-                        }
-                    }
-                });
-            });
-        }
-    }
-
-    function sendKudosModal($uibModal) {
-        var directive = {
-            restrict: 'A',
-            scope: {
-                aceSendKudosModal: '=?'
-            },
-            link: linkFunc
-        };
-        return directive;
-
-        function linkFunc(scope, elem) {
-            elem.bind('click', function () {
-                $uibModal.open({
-                    templateUrl: 'app/kudos/send-kudos-modal/send-kudos-modal.html',
-                    controller: kudosifyModalController,
-                    controllerAs: 'vm',
-                    resolve: {
-                        currentUser: function () {
-                            return scope.aceKudosifyModal;
+                        },
+                        context: function() {
+                            return attrs.kudosifyType;
                         }
                     }
                 });
@@ -74,7 +50,9 @@
         'kudosFactory',
         'notifySrv',
         'kudosifySettings',
+        'modalTypes',
         'currentUser',
+        'context',
         'imageValidationSettings',
         'shroomsFileUploader',
         'pictureRepository',
@@ -84,19 +62,21 @@
     ];
 
     function kudosifyModalController($scope, $uibModalInstance, authService, kudosifyModalFactory, kudosFactory,
-        notifySrv, kudosifySettings, currentUser, imageValidationSettings, shroomsFileUploader,
+        notifySrv, kudosifySettings, modalTypes, currentUser, context, imageValidationSettings, shroomsFileUploader,
         pictureRepository, lodash, dataHandler, errorHandler) {
         /*jshint validthis: true */
+
         var vm = this;
         vm.submitKudos = submitKudos;
         vm.cancelKudos = cancelKudos;
-        vm.setModalType = setModalType;
+        vm.chooseKudosType = chooseKudosType;
         vm.getUsers = getUsersForAutocomplete;
         vm.attachImage = attachImage;
-        vm.onMultiplierValueChanged = onMultiplierValueChanged;
+
         vm.isAdmin = authService.identity.roles.contains("Admin") || authService.identity.roles.contains("KudosAdmin");
 
         vm.userId = authService.identity.userId;
+        vm.context = context;
 
         vm.pointsType = {};
         vm.kudosifyInfo = {};
@@ -109,27 +89,37 @@
         vm.thumbHeight = 300;
 
         vm.maxMinus = kudosifySettings.maxMinus;
+        vm.modalTypes = modalTypes;
+
+        vm.isSubmitModal = isSubmitModal;
+        vm.isSendModal = isSendModal;
+
         vm.hiddenKudosTypes = kudosifySettings.hiddeKudosTypes;
 
-		var KudosTypesEnum = {
-			ORDINARY: 1,
-			SEND: 2,
-			MINUS: 3,
-            OTHER: 4,
-            WELCOME: 5,
-		};
-		
         init();
 
         //////
-
         function init() {
-            kudosifyModalFactory.getPointsTypes().then(function (result) {
-                vm.kudosTypes = result;
-            });
+            
+            if (vm.isSubmitModal())
+            {
+                kudosifyModalFactory.getPointsTypes().then(function (result) {
+                    vm.kudosTypes = result.filter(kudos => kudos.type !== vm.modalTypes.send);
+                });
+            }
+            else if (vm.isSendModal())
+            {
+                kudosifyModalFactory.getSendKudosType().then(function (result) {
+                    vm.pointsType = result;
+                });
+                vm.isButtonSelected = true;
+                vm.kudosifyInfo.multiplyBy = 1;
+                recalculateTotalPoints();
+            }
 
             kudosFactory.getUserInformation(vm.userId).then(function (response) {
                 vm.user = response;
+                
                 vm.kudosifyUser = {
                     formattedName: response.firstName + ' ' + response.lastName,
                     id: vm.userId
@@ -142,59 +132,31 @@
             }
         }
 
-        function setModalType(type, dom) {
-            handleSendAndMinusTypes($(dom.toElement), type.type);
-
-            if (!dom.target.classList.contains('kudosify-modal-buttons-inactive') && vm.isButtonSelected) {
+        function chooseKudosType(type, dom) {
+           
+            if (vm.isSubmitModal() && isSelectedSameType(dom)) {
                 vm.kudosifyInfo.multiplyBy++;
             } else {
                 vm.isButtonSelected = true;
                 vm.kudosifyInfo.multiplyBy = 1;
-                var buttons = document.getElementsByClassName('kudos-type-button');
 
+                var buttons = document.getElementsByClassName('kudos-type-button');
                 for (var i = 0; i < buttons.length; i++) {
                     buttons[i].classList.add('kudosify-modal-buttons-inactive');
                 }
-
                 dom.target.classList.remove('kudosify-modal-buttons-inactive');
                 vm.pointsType = type;
-                onMultiplierValueChanged();
+                recalculateTotalPoints();
             }
         }
 
-        function onMultiplierValueChanged(){
-            recalculateTotalPoints();
+        function isSelectedSameType(dom)
+        {
+            return !dom.target.classList.contains('kudosify-modal-buttons-inactive') && vm.isButtonSelected;
         }
 
         function recalculateTotalPoints(){
             vm.kudosifyInfo.totalPoints = vm.kudosifyInfo.multiplyBy * vm.pointsType.value;
-        }
-
-        function handleSendAndMinusTypes(element, kudosSystemType) {
-            if (kudosSystemType === KudosTypesEnum.SEND) {
-                element.addClass('kudos-type-send');
-            }
-
-            if (kudosSystemType === KudosTypesEnum.MINUS) {
-                element.addClass('kudos-type-minus');
-            }
-
-            if (vm.lastSelectedButton) {
-                var e = vm.lastSelectedButton.element;
-
-                if (vm.lastSelectedButton.kudosSystemType === KudosTypesEnum.MINUS && kudosSystemType !== KudosTypesEnum.MINUS) {
-                    e.removeClass('kudos-type-minus');
-                }
-
-                if (vm.lastSelectedButton.kudosSystemType === KudosTypesEnum.SEND && kudosSystemType !== KudosTypesEnum.SEND) {
-                    e.removeClass('kudos-type-send');
-                }
-            }
-
-            vm.lastSelectedButton = {
-                element: element,
-                kudosSystemType: kudosSystemType
-            };
         }
 
         function getUsersForAutocomplete(query) {
@@ -269,6 +231,13 @@
 
         function cancelKudos() {
             $uibModalInstance.dismiss('cancel');
+        }
+
+        function isSubmitModal() {
+            return vm.context == vm.modalTypes.submit;
+        }
+        function isSendModal() {
+            return vm.context == vm.modalTypes.send;
         }
     }
 })();

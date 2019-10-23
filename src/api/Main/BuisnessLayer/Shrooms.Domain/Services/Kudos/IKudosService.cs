@@ -14,13 +14,15 @@ namespace Shrooms.Domain.Services.Kudos
 
         Task RemoveKudosType(int id, UserAndOrganizationDTO userOrg);
 
-        Task<KudosTypeDTO> GetKudosType(int id, UserAndOrganizationDTO userOrg);
+        KudosTypeDTO GetSendKudosType(UserAndOrganizationDTO userOrg);
 
         WelcomeKudosDTO GetWelcomeKudos();
 
         IEnumerable<KudosPieChartSliceDto> GetKudosPieChartData(int organizationId, string userId);
 
         IEnumerable<KudosTypeDTO> GetKudosTypes(UserAndOrganizationDTO userAndOrg);
+
+        Task<KudosTypeDTO> GetKudosType(int id, UserAndOrganizationDTO userOrg);
 
         IEnumerable<UserKudosInformationDTO> GetApprovedKudosList(string id, int organizationId);
 
@@ -47,6 +49,8 @@ namespace Shrooms.Domain.Services.Kudos
         /// <param name="points">requested points</param>
         void AddKudosLog(AddKudosLogDTO kudosDto, decimal points);
 
+        void RefundLotteryTickets(IEnumerable<AddKudosLogDTO> kudosLogDTO, UserAndOrganizationDTO userOrg);
+
         KudosLogsEntriesDto<MainKudosLogDTO> GetKudosLogs(KudosLogsFilterDTO options);
 
         KudosLogsEntriesDto<KudosUserLogDTO> GetUserKudosLogs(string userId, int page, int organizationId);
@@ -58,5 +62,6 @@ namespace Shrooms.Domain.Services.Kudos
         void UpdateProfileKudos(ApplicationUser user, UserAndOrganizationDTO userOrg);
 
         bool HasPendingKudos(string employeeId);
+
     }
 }

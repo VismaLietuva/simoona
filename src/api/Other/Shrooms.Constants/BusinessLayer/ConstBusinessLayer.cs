@@ -85,7 +85,9 @@ namespace Shrooms.Constants.BusinessLayer
             Drafted = 1,
             Started,
             Aborted,
-            Ended
+            Ended,
+            RefundStarted,
+            RefundFailed
         }
         public const string LotteryParticipantsExcelTableName = "Lottery Participants";
         public const int LotteryParticipantsInRow = 4;
