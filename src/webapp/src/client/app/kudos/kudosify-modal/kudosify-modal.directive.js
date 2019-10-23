@@ -72,6 +72,7 @@
         vm.chooseKudosType = chooseKudosType;
         vm.getUsers = getUsersForAutocomplete;
         vm.attachImage = attachImage;
+        vm.recalculateTotalPoints = recalculateTotalPoints;
 
         vm.isAdmin = authService.identity.roles.contains("Admin") || authService.identity.roles.contains("KudosAdmin");
 
