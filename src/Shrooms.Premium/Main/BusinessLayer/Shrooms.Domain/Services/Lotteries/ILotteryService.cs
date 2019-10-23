@@ -23,6 +23,6 @@ namespace Shrooms.Domain.Services.Lotteries
         IEnumerable<LotteryDetailsDTO> GetRunningLotteries(UserAndOrganizationDTO userAndOrganization);
         IEnumerable<LotteryDetailsDTO> GetFilteredLotteries(string filter);
         IPagedList<LotteryDetailsDTO> GetPagedLotteries(string filter, int page, int pageSize = ConstWebApi.DefaultPageSize);
-        LotteryDetailsDTO GetLotteryDetails(int id, UserAndOrganizationDTO userOrg);
+        LotteryDetailsDTO GetLotteryDetails(int id);
     }
 }

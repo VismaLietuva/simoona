@@ -93,7 +93,7 @@ namespace Shrooms.Domain.Services.Lotteries
 
         }
 
-        public LotteryDetailsDTO GetLotteryDetails(int id, UserAndOrganizationDTO userOrg)
+        public LotteryDetailsDTO GetLotteryDetails(int id)
         {
             var lottery = _lotteriesDbSet.Find(id);
             if (lottery == null)
@@ -190,7 +190,7 @@ namespace Shrooms.Domain.Services.Lotteries
         {
             ApplicationUser applicationUser = _userService.GetApplicationUser(userOrg.UserId);
 
-            LotteryDetailsDTO lotteryDetails = GetLotteryDetails(lotteryTicketDTO.LotteryId, userOrg);
+            LotteryDetailsDTO lotteryDetails = GetLotteryDetails(lotteryTicketDTO.LotteryId);
 
             if (applicationUser.RemainingKudos < lotteryDetails.EntryFee * lotteryTicketDTO.Tickets)
             {

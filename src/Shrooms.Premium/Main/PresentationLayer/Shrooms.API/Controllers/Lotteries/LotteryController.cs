@@ -64,7 +64,7 @@ namespace Shrooms.API.Controllers.Lotteries
         public IHttpActionResult GetLottery(int id)
         {
 
-            var lotteryDTO = _lotteryService.GetLotteryDetails(id, GetUserAndOrganization());
+            var lotteryDTO = _lotteryService.GetLotteryDetails(id);
 
             if (lotteryDTO == null)
             {
