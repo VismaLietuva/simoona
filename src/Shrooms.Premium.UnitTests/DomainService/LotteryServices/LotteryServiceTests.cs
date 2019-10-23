@@ -17,6 +17,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Shrooms.Premium.UnitTests.ModelMappings;
 using Shrooms.DataTransferObjects.Models;
+using Shrooms.Infrastructure.FireAndForget;
 
 namespace Shrooms.Premium.UnitTests.DomainService.LotteryServices
 {
@@ -49,7 +50,9 @@ namespace Shrooms.Premium.UnitTests.DomainService.LotteryServices
 
             var mapper = ModelMapper.Create();
 
-            _lotteryService = new LotteryService(_unitOfWork, mapper, _participantSercice, _userService, _kudosService);
+            IAsyncRunner asyncRunner = Substitute.For<IAsyncRunner>();
+
+            _lotteryService = new LotteryService(_unitOfWork, mapper, _participantSercice, _userService, _kudosService, asyncRunner);
         }
 
         [TestCase]
@@ -75,65 +78,6 @@ namespace Shrooms.Premium.UnitTests.DomainService.LotteryServices
 
             Assert.ThrowsAsync<LotteryException>(async () => await _lotteryService.CreateLottery(lottery));
         }
-
-        [TestCase(4)]
-        [TestCase(5)]
-        [TestCase(6)]
-        public void EditDraftedLottery_Should_Throw_Exception_When_Given_Lottery_With_Incorrect_Status(int lotteryDtoId)
-        {
-            var nonDraftedLottery = GetEditDraftedLotteryDTOList().Single(editDTO => editDTO.Id == lotteryDtoId);
-
-            Assert.Throws<LotteryException>(() => _lotteryService.EditDraftedLottery(nonDraftedLottery));
-        }
-
-        [TestCase(7)]
-        [TestCase(8)]
-        public void EditDraftedLottery_Should_Correctly_Update_Lottery_Status_To_Started(int lotteryDtoId)
-        {
-            var draftedLottery = GetEditDraftedLotteryDTOList().Single(editDTO => editDTO.Id == lotteryDtoId);
-
-            _lotteryService.EditDraftedLottery(draftedLottery);
-
-            var updatedLotteries = _lotteryService.GetLotteries(new UserAndOrganizationDTO() { OrganizationId = 1 });
-
-            Assert.IsTrue(updatedLotteries.SingleOrDefault(lottery => lottery.Id == draftedLottery.Id).Status == draftedLottery.Status);
-        }
-
-        [TestCase(3)]
-        [TestCase(5)]
-        [TestCase(6)]
-        public void EditStartedLottery_Should_Throw_Exception_When_Given_Lottery_With_Non_Started_Status(int lotteryId)
-        {
-            var dtoOfNonStartedLottery = GetEditStartedLotteryDTOList().SingleOrDefault(lottery => lottery.Id == lotteryId);
-
-            Assert.Throws<LotteryException>(() => _lotteryService.EditStartedLottery(dtoOfNonStartedLottery));
-        }
-
-        [TestCase(1)]
-        [TestCase(2)]
-        [TestCase(4)]
-        public void EditStartedLottery_Should_Update_Lottery_Description(int lotteryId)
-        {
-            var editStartedLotteryDto = GetEditStartedLotteryDTOList().Single(editDTO => editDTO.Id == lotteryId);
-
-            _lotteryService.EditStartedLottery(editStartedLotteryDto);
-
-            var updatedLotteries = _lotteryService.GetLotteries(new UserAndOrganizationDTO() { OrganizationId = 1 });
-
-            Assert.IsTrue(updatedLotteries.SingleOrDefault(lottery => lottery.Id == editStartedLotteryDto.Id).Description == editStartedLotteryDto.Description);
-
-        }
-
-        [TestCase(1)]
-        [TestCase(2)]
-        [TestCase(3)]
-        [TestCase(4)]
-        public void GetLotteryDetails_Should_Return_Lottery_With_Proviced_Id(int lotteryId)
-        {
-            var lottery = _lotteryService.GetLotteryDetails(lotteryId);
-            Assert.IsTrue(lottery.Id == lotteryId);
-        }
-
 
         private List<Lottery> GetLotteries()
         {

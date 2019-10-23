@@ -34,9 +34,7 @@ namespace Shrooms.API.Controllers.Lotteries
         {
             var lotteriesDTO = _lotteryService.GetRunningLotteries(GetUserAndOrganization());
 
-            var lotteriesWidgetViewModel = _mapper.Map<IEnumerable<LotteryDetailsDTO>, IEnumerable<LotteryWidgetViewModel>>(lotteriesDTO);
-
-            return lotteriesWidgetViewModel;
+            return _mapper.Map<IEnumerable<LotteryDetailsDTO>, IEnumerable<LotteryWidgetViewModel>>(lotteriesDTO);
         }
     }
 }
