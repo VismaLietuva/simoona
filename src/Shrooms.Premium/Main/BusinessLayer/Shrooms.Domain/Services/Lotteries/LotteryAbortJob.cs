@@ -16,15 +16,10 @@ namespace Shrooms.Domain.Services.Lotteries
     public class LotteryAbortJob : ILotteryAbortJob
     {
         private readonly IParticipantService _participantService;
-
         private readonly IKudosService _kudosService;
-
         private readonly ILotteryService _lotteryService;
-
         private readonly IAsyncRunner _asyncRunner;
-
         private readonly ILogger _logger;
-
         private readonly IUnitOfWork2 _uow;
 
         public LotteryAbortJob(IKudosService kudosService, IParticipantService participantService,

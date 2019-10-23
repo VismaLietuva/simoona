@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Http;
-using AutoMapper;
+﻿using AutoMapper;
 using PagedList;
 using Shrooms.API.Controllers;
 using Shrooms.API.Filters;
@@ -16,8 +10,14 @@ using Shrooms.Domain.Services.Lotteries;
 using Shrooms.DomainExceptions.Exceptions.Lotteries;
 using Shrooms.WebViewModels.Models;
 using Shrooms.WebViewModels.Models.Lotteries;
-using static Shrooms.Constants.BusinessLayer.ConstBusinessLayer;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Web.Http;
 using WebApi.OutputCache.V2;
+using static Shrooms.Constants.BusinessLayer.ConstBusinessLayer;
 
 namespace Shrooms.API.Controllers.Lotteries
 {
@@ -44,6 +44,7 @@ namespace Shrooms.API.Controllers.Lotteries
 
             return Ok(result);
         }
+
         [HttpGet]
         [Route("Paged")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Lottery)]
@@ -144,7 +145,7 @@ namespace Shrooms.API.Controllers.Lotteries
         [Route("{id}/Status")]
         public IHttpActionResult GetStatus(int id)
         {
-            var status =_lotteryService.GetLotteryStatus(id);
+            var status = _lotteryService.GetLotteryStatus(id);
 
             return Ok(new { status });
         }
@@ -196,13 +197,11 @@ namespace Shrooms.API.Controllers.Lotteries
                 await _lotteryService.FinishLotteryAsync(id);
 
                 return Ok();
-
             }
-            catch (LotteryException ex)
+            catch (LotteryException)
             {
                 return BadRequest();
             }
-
         }
 
         [HttpGet]
@@ -217,7 +216,6 @@ namespace Shrooms.API.Controllers.Lotteries
             }
             catch (LotteryException ex)
             {
-
                 return BadRequest(ex.Message);
             }
         }

@@ -13,9 +13,7 @@ namespace Shrooms.Domain.Services.Lotteries
     public class ParticipantService : IParticipantService
     {
         private readonly IUnitOfWork2 _unitOfWork;
-
         private readonly IDbSet<LotteryParticipant> _participantsDbSet;
-
 
         public ParticipantService(IUnitOfWork2 unitOfWork)
         {
