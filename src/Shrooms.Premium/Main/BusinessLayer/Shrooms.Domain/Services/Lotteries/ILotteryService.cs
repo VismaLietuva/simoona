@@ -33,12 +33,11 @@ namespace Shrooms.Domain.Services.Lotteries
         IEnumerable<LotteryDetailsDTO> GetLotteries(UserAndOrganizationDTO userOrganization);
 
         IEnumerable<LotteryDetailsDTO> GetRunningLotteries(UserAndOrganizationDTO userAndOrganization);
-
         IEnumerable<LotteryDetailsDTO> GetFilteredLotteries(string filter, UserAndOrganizationDTO userOrg);
 
         IPagedList<LotteryDetailsDTO> GetPagedLotteries(GetPagedLotteriesArgs args);
 
-        LotteryDetailsDTO GetLotteryDetails(int id, UserAndOrganizationDTO userOrg);
+        LotteryDetailsDTO GetLotteryDetails(int id);
 
         int GetLotteryStatus(int id);
 

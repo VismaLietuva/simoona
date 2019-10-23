@@ -80,7 +80,7 @@ namespace Shrooms.Domain.Services.Lotteries
 
             if (lottery.Status != (int)LotteryStatus.Drafted)
             {
-                throw new LotteryException("Lottery has started or ended");
+                throw new LotteryException("Editing forbidden, non drafted lottery.");
             }
 
             UpdateDraftedLottery(lottery, lotteryDTO);
@@ -102,13 +102,13 @@ namespace Shrooms.Domain.Services.Lotteries
             _uow.SaveChanges();
         }
 
-        public LotteryDetailsDTO GetLotteryDetails(int id, UserAndOrganizationDTO userOrg)
+        public LotteryDetailsDTO GetLotteryDetails(int id)
         {
             var lottery = _lotteriesDbSet.Find(id);
 
             if (lottery == null)
             {
-                throw new LotteryException("Lottery not found");
+                return null;
             }
 
             var lotteryDetailsDTO = _mapper.Map<Lottery, LotteryDetailsDTO>(lottery);
@@ -154,14 +154,12 @@ namespace Shrooms.Domain.Services.Lotteries
         {
             var lottery = _lotteriesDbSet.Find(lotteryId);
 
-            if (lottery == null)
+            if (lottery != null)
             {
-                throw new LotteryException("Lottery not found");
+                lottery.Status = (int)LotteryStatus.Ended;
+
+                await _uow.SaveChangesAsync();
             }
-
-            lottery.Status = (int)LotteryStatus.Ended;
-
-            await _uow.SaveChangesAsync();
         }
 
         public LotteryStatsDTO GetLotteryStats(int lotteryId)
@@ -170,7 +168,7 @@ namespace Shrooms.Domain.Services.Lotteries
 
             if (lottery == null)
             {
-                throw new LotteryException("Lottery not found.");
+                return null;
             }
 
             var participants = _participantService.GetParticipantsCounted(lotteryId);
@@ -182,7 +180,6 @@ namespace Shrooms.Domain.Services.Lotteries
                 TotalParticipants = participants.Count(),
                 TicketsSold = ticketsSold,
                 KudosSpent = ticketsSold * lottery.EntryFee,
-                Participants = participants
             };
         }
 
@@ -227,7 +224,7 @@ namespace Shrooms.Domain.Services.Lotteries
         {
             var applicationUser = _userService.GetApplicationUser(userOrg.UserId);
 
-            var lotteryDetails = GetLotteryDetails(lotteryTicketDTO.LotteryId, userOrg);
+            var lotteryDetails = GetLotteryDetails(lotteryTicketDTO.LotteryId);
 
             if (applicationUser.RemainingKudos < lotteryDetails.EntryFee * lotteryTicketDTO.Tickets)
             {

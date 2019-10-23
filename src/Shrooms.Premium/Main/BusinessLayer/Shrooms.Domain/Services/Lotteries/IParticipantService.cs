@@ -1,3 +1,5 @@
+using PagedList;
+using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Lotteries;
 using System.Collections.Generic;
 
@@ -8,5 +10,8 @@ namespace Shrooms.Domain.Services.Lotteries
         IEnumerable<string> GetParticipantsId(int lotteryId);
 
         IEnumerable<LotteryParticipantDTO> GetParticipantsCounted(int lotteryId);
+
+        IPagedList<LotteryParticipantDTO> GetPagedParticipants(int id, int page, int pageSize);
+
     }
 }

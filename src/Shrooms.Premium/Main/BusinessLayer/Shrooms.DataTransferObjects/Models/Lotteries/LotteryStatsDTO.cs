@@ -11,6 +11,5 @@ namespace Shrooms.DataTransferObjects.Models.Lotteries
         public int TotalParticipants { get; set; }
         public int TicketsSold { get; set; }
         public int KudosSpent { get; set; }
-        public IEnumerable<LotteryParticipantDTO> Participants { get; set; }
     }
 }

@@ -51,6 +51,17 @@ namespace Shrooms.Premium.UnitTests.DomainService.LotteryServices
             Assert.That(result, Is.All.Matches<LotteryParticipantDTO>(x => x.Tickets == tickets));
         }
 
+        [TestCase(1, 1, 2)]
+        [TestCase(1, 1, 3)]
+        public void GetPagedParticipants_Returns_Requested_Amount_Of_Participants(int lotteryId, int page, int pageSize)
+        {
+            _lotteryParticipants.SetDbSetData(GetParticipants());
+
+            var result = _participantService.GetPagedParticipants(lotteryId, page, pageSize);
+
+            Assert.IsTrue(result.Count == pageSize);
+        }
+
         private IEnumerable<LotteryParticipant> GetParticipants()
         {
             var user1 = new ApplicationUser { Id = "1", FirstName = "Paul", LastName = "Giraffe" };
