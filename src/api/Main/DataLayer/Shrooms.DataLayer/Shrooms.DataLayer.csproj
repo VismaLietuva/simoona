@@ -793,9 +793,13 @@
     <Compile Include="Migrations\201910021146410_RemoveWelcomeKudosFromOrganizationEntity.Designer.cs">
       <DependentUpon>201910021146410_RemoveWelcomeKudosFromOrganizationEntity.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201910031316520_AddLotteryAndLotteryParticipant.cs" />
-    <Compile Include="Migrations\201910031316520_AddLotteryAndLotteryParticipant.Designer.cs">
-      <DependentUpon>201910031316520_AddLotteryAndLotteryParticipant.cs</DependentUpon>
+    <Compile Include="Migrations\201910211051464_AddLotteryAndLotteryParticipant.cs" />
+    <Compile Include="Migrations\201910211051464_AddLotteryAndLotteryParticipant.Designer.cs">
+      <DependentUpon>201910211051464_AddLotteryAndLotteryParticipant.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201910221426483_SeedRefundKudos.cs" />
+    <Compile Include="Migrations\201910221426483_SeedRefundKudos.Designer.cs">
+      <DependentUpon>201910221426483_SeedRefundKudos.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
@@ -1307,8 +1311,11 @@
     <EmbeddedResource Include="Migrations\201910021146410_RemoveWelcomeKudosFromOrganizationEntity.resx">
       <DependentUpon>201910021146410_RemoveWelcomeKudosFromOrganizationEntity.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201910031316520_AddLotteryAndLotteryParticipant.resx">
-      <DependentUpon>201910031316520_AddLotteryAndLotteryParticipant.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201910211051464_AddLotteryAndLotteryParticipant.resx">
+      <DependentUpon>201910211051464_AddLotteryAndLotteryParticipant.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201910221426483_SeedRefundKudos.resx">
+      <DependentUpon>201910221426483_SeedRefundKudos.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

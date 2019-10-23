@@ -8,6 +8,14 @@
 
     angular
         .module('simoonaApp.Lotteries', modules)
+        .constant('lotteryStatuses', {
+            drafted: 1,
+            started: 2,
+            aborted: 3,
+            ended: 4,
+            refundStarted: 5,
+            refundFailed: 6
+        })
         .config(config);
 
     config.$inject = ['$stateProvider'];
@@ -63,6 +71,23 @@
                     lottery: [
                         '$stateParams', 'lotteryRepository', function ($stateParams, lotteryRepository) {
                             return lotteryRepository.getLottery($stateParams.lotteryId);
+                        },
+                    ]
+                },
+                data: {
+                    authorizeRole: 'Admin'
+                }
+            })
+            .state('Root.WithOrg.Admin.Lotteries.Refund', {
+                abstract: false,
+                url: '/:lotteryId/Refunding',
+                templateUrl: 'app/lotteries/lottery-refund.html',
+                controller: 'lotteryRefundController',
+                controllerAs: 'vm',
+                resolve: {
+                    lottery: [
+                        '$stateParams', 'lotteryRepository', function () {
+                            return {};
                         },
                     ]
                 },

@@ -12,7 +12,8 @@
 
         var service = {
             postKudos: postKudos,
-            getPointsTypes: getPointsTypes
+            getPointsTypes: getPointsTypes,
+            getSendKudosType: getSendKudosType
         };
         return service;
 
@@ -32,6 +33,10 @@
 
         function getPointsTypes() {
             return $resource(url + 'GetKudosTypes').query().$promise;
+        }
+
+        function getSendKudosType() {
+            return $resource(url + 'GetSendKudosType').get().$promise;
         }
     }
 })();
