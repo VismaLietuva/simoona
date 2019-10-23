@@ -232,6 +232,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -274,7 +275,6 @@
     <Compile Include="Infrastructure\Shrooms.IoC\Modules\CommitteeModule.cs" />
     <Compile Include="Infrastructure\Shrooms.IoC\Modules\EventsModule.cs" />
     <Compile Include="Infrastructure\Shrooms.IoC\Modules\LotteryModule.cs" />
-    <Compile Include="Infrastructure\Shrooms.IoC\Modules\LotteryParticipantModule.cs" />
     <Compile Include="Infrastructure\Shrooms.IoC\Modules\OfficeMapModule.cs" />
     <Compile Include="Infrastructure\Shrooms.IoC\Modules\OrganizationalStructureModule.cs" />
     <Compile Include="Infrastructure\Shrooms.IoC\Modules\ServiceModule.cs" />
@@ -354,6 +354,7 @@
     <Compile Include="Main\BusinessLayer\Shrooms.DomainServiceValidators\Validators\Events\EventValidationService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DomainServiceValidators\Validators\Events\IEventValidationService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\EmployeeComparer.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Args\GetPagedLotteriesArgs.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Badges\BadgesService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Badges\IBadgesService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Books\BookMobileService.cs" />
@@ -382,8 +383,10 @@
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Events\Utilities\IEventUtilitiesService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\KudosShop\IKudosShopService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\KudosShop\KudosShopService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Lotteries\ILotteryAbortJob.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Lotteries\ILotteryService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Lotteries\IParticipantService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Lotteries\LotteryAbortJob.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Lotteries\LotteryService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Lotteries\ParticipantService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Notifications\INotificationService.cs" />
