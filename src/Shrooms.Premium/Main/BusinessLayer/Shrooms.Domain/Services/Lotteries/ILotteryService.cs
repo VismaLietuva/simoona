@@ -24,7 +24,15 @@ namespace Shrooms.Domain.Services.Lotteries
 
         void RefundParticipants(int id, UserAndOrganizationDTO userOrg);
 
+        Task FinishLotteryAsync(int lotteryId);
+
+        LotteryStatsDTO GetLotteryStats (int lotteryId);
+
+        Task BuyLotteryTicketAsync(BuyLotteryTicketDTO lotteryTicketDTO, UserAndOrganizationDTO userOrg);
+
         IEnumerable<LotteryDetailsDTO> GetLotteries(UserAndOrganizationDTO userOrganization);
+
+        IEnumerable<LotteryDetailsDTO> GetRunningLotteries(UserAndOrganizationDTO userAndOrganization);
 
         IEnumerable<LotteryDetailsDTO> GetFilteredLotteries(string filter, UserAndOrganizationDTO userOrg);
 

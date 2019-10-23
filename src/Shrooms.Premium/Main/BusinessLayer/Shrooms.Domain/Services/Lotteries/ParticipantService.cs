@@ -1,14 +1,12 @@
-﻿using System;
+﻿using Shrooms.DataLayer.DAL;
+using Shrooms.DataTransferObjects.Models.Lotteries;
+using Shrooms.EntityModels.Models;
+using Shrooms.EntityModels.Models.Lotteries;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
-using MoreLinq;
-using Shrooms.DataLayer.DAL;
-using Shrooms.DataTransferObjects.Models.Lotteries;
-using Shrooms.EntityModels.Models;
-using Shrooms.EntityModels.Models.Lotteries;
 
 namespace Shrooms.Domain.Services.Lotteries
 {
@@ -17,6 +15,7 @@ namespace Shrooms.Domain.Services.Lotteries
         private readonly IUnitOfWork2 _unitOfWork;
 
         private readonly IDbSet<LotteryParticipant> _participantsDbSet;
+
 
         public ParticipantService(IUnitOfWork2 unitOfWork)
         {

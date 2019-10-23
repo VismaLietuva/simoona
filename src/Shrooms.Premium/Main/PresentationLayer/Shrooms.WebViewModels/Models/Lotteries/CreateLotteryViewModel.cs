@@ -1,4 +1,5 @@
-﻿using Shrooms.Constants.WebApi;
+﻿using Shrooms.Constants.EntityValidationValues;
+using Shrooms.Constants.WebApi;
 using Shrooms.EntityModels.Models.Lotteries;
 using System;
 using System.Collections.Generic;
@@ -14,12 +15,14 @@ namespace Shrooms.WebViewModels.Models.Lotteries
         public int Id { get; set; }
         [Required]
         public string Title { get; set; }
-        [StringLength(ConstWebApi.EventNameMaxLength)]
+        [StringLength(ValidationConstants.MaxPostMessageBodyLength)]
         public string Description { get; set; }
         [Required]
         public DateTime EndDate { get; set; }
         [Required]
         public int EntryFee { get; set; }
+        [Required]
+        public int Status { get; set; }
         public ImagesCollection Images { get; set; }
     }
 }

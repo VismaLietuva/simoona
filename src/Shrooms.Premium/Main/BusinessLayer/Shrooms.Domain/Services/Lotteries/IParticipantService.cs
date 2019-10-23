@@ -1,10 +1,5 @@
-﻿using Shrooms.DataTransferObjects.Models.Lotteries;
-using Shrooms.EntityModels.Models.Lotteries;
-using System;
+using Shrooms.DataTransferObjects.Models.Lotteries;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Shrooms.Domain.Services.Lotteries
 {

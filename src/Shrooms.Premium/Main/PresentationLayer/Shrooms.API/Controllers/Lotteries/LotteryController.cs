@@ -17,6 +17,7 @@ using Shrooms.DomainExceptions.Exceptions.Lotteries;
 using Shrooms.WebViewModels.Models;
 using Shrooms.WebViewModels.Models.Lotteries;
 using static Shrooms.Constants.BusinessLayer.ConstBusinessLayer;
+using WebApi.OutputCache.V2;
 
 namespace Shrooms.API.Controllers.Lotteries
 {
@@ -43,7 +44,6 @@ namespace Shrooms.API.Controllers.Lotteries
 
             return Ok(result);
         }
-
         [HttpGet]
         [Route("Paged")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Lottery)]
@@ -81,6 +81,7 @@ namespace Shrooms.API.Controllers.Lotteries
 
         [HttpPost]
         [Route("Create")]
+        [InvalidateCacheOutput("Get", typeof(LotteryWidgetController))]
         public async Task<IHttpActionResult> CreateLottery(CreateLotteryViewModel lotteryViewModel)
         {
             if (!ModelState.IsValid)
@@ -110,6 +111,24 @@ namespace Shrooms.API.Controllers.Lotteries
             _lotteryService.AbortLottery(id, GetUserAndOrganization());
 
             return Ok();
+        }
+
+        [HttpPost]
+        [Route("Enter")]
+        public async Task<IHttpActionResult> BuyLotteryTicket(BuyLotteryTicketViewModel lotteryTickets)
+        {
+            try
+            {
+                var buyLotterTicketDTO = _mapper.Map<BuyLotteryTicketViewModel, BuyLotteryTicketDTO>(lotteryTickets);
+
+                await _lotteryService.BuyLotteryTicketAsync(buyLotterTicketDTO, GetUserAndOrganization());
+
+                return Ok();
+            }
+            catch (LotteryException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPatch]
@@ -165,6 +184,41 @@ namespace Shrooms.API.Controllers.Lotteries
             catch (LotteryException e)
             {
                 return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPatch]
+        [Route("Finish")]
+        public async Task<IHttpActionResult> FinishLottery(int id)
+        {
+            try
+            {
+                await _lotteryService.FinishLotteryAsync(id);
+
+                return Ok();
+
+            }
+            catch (LotteryException ex)
+            {
+                return BadRequest();
+            }
+
+        }
+
+        [HttpGet]
+        [Route("{id}/Stats")]
+        public IHttpActionResult LotteryStats(int id)
+        {
+            try
+            {
+                var lotteryStats = _lotteryService.GetLotteryStats(id);
+
+                return Ok(lotteryStats);
+            }
+            catch (LotteryException ex)
+            {
+
+                return BadRequest(ex.Message);
             }
         }
     }
