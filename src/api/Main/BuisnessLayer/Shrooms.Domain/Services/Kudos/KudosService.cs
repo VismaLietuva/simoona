@@ -277,6 +277,7 @@ namespace Shrooms.Domain.Services.Kudos
                 .Where(log =>
                     log.Status == KudosStatus.Approved &&
                     log.KudosSystemType != ConstBusinessLayer.KudosTypeEnum.Minus &&
+                    log.KudosSystemType != ConstBusinessLayer.KudosTypeEnum.Refund &&
                     log.OrganizationId == userAndOrg.OrganizationId)
                 .Join(_usersDbSet,
                     l => l.CreatedBy,
