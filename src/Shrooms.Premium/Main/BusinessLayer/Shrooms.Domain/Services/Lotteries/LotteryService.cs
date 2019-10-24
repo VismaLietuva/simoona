@@ -117,7 +117,7 @@ namespace Shrooms.Domain.Services.Lotteries
             return lotteryDetailsDTO;
         }
 
-        public void AbortLottery(int id, UserAndOrganizationDTO userOrg)
+        public bool AbortLottery(int id, UserAndOrganizationDTO userOrg)
         {
             var lottery = _lotteriesDbSet.Find(id);
 
@@ -134,7 +134,11 @@ namespace Shrooms.Domain.Services.Lotteries
                 }
 
                 _uow.SaveChanges();
+
+                return true;
             }
+
+            return false;
         }
 
         public void RefundParticipants(int id, UserAndOrganizationDTO userOrg)

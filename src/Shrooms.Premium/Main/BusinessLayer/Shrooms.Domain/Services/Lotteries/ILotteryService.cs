@@ -20,7 +20,7 @@ namespace Shrooms.Domain.Services.Lotteries
 
         void EditStartedLottery(EditStartedLotteryDTO lotteryDTO);
 
-        void AbortLottery(int id, UserAndOrganizationDTO userOrg);
+        bool AbortLottery(int id, UserAndOrganizationDTO userOrg);
 
         void RefundParticipants(int id, UserAndOrganizationDTO userOrg);
 
