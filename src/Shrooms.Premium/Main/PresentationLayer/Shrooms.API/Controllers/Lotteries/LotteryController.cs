@@ -207,9 +207,9 @@ namespace Shrooms.API.Controllers.Lotteries
 
                 return Ok();
             }
-            catch (LotteryException)
+            catch (LotteryException e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
         }
 

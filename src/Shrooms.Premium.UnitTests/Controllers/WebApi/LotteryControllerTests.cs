@@ -22,6 +22,8 @@ using Shrooms.Constants.WebApi;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute.ExceptionExtensions;
+using PagedList;
+using Shrooms.WebViewModels.Models;
 
 namespace Shrooms.Premium.UnitTests.Controllers.WebApi
 {
@@ -187,6 +189,7 @@ namespace Shrooms.Premium.UnitTests.Controllers.WebApi
             var response = await _lotteryController.CreateLottery(lotteryViewModel);
 
             //
+            Assert.IsNotNull(response);
             Assert.IsInstanceOf<OkResult>(response);
             await _lotteryService.Received(1).CreateLottery(lotteryDTO);
         }
@@ -268,6 +271,71 @@ namespace Shrooms.Premium.UnitTests.Controllers.WebApi
             Assert.IsInstanceOf<BadRequestErrorMessageResult>(response);
             await _lotteryService.Received(1).BuyLotteryTicketAsync(ticketDTOModel, GetUserAndOrganization());
 
+        }
+
+        [TestCase]
+        public void GetPagedLotteries_Should_Return_Ok()
+        {
+            //
+            var args = new GetPagedLotteriesArgs
+            {
+                Filter = "",
+                PageNumber = 1,
+                PageSize = 10,
+                UserOrg = GetUserAndOrganization()
+            };
+            _lotteryService.GetPagedLotteries(args).Returns(LotteryDetailsDTO.ToPagedList(args.PageNumber, args.PageSize));
+
+            //
+            var response = _lotteryController.GetPagedLotteries("", 1, 10);
+
+            //
+            Assert.IsNotNull(response);
+            Assert.IsInstanceOf<OkNegotiatedContentResult<PagedViewModel<LotteryDetailsDTO>>>(response);
+            _lotteryService.Received(1).GetPagedLotteries(Arg.Any<GetPagedLotteriesArgs>());
+
+        }
+
+        [TestCase]
+        public void RefundParticipants_Should_Return_Ok()
+        {
+            //
+
+            //
+            var response = _lotteryController.RefundParticipants(1337);
+
+            //
+            Assert.IsNotNull(response);
+            Assert.IsInstanceOf<OkResult>(response);
+            _lotteryService.Received(1).RefundParticipants(1337, GetUserAndOrganization());
+        }
+
+        [TestCase]
+        public async Task FinishLottery_Should_Return_Ok()
+        {
+            //
+
+            //
+            var response = await _lotteryController.FinishLottery(37);
+
+            //
+            Assert.IsNotNull(response);
+            Assert.IsInstanceOf<OkResult>(response);
+            await _lotteryService.Received(1).FinishLotteryAsync(37);
+        }
+
+        [TestCase]
+        public async Task FinishLottery_Should_Return_Bad_Request()
+        {
+            //
+            _lotteryService.FinishLotteryAsync(37).Throws(new LotteryException("Yeet"));
+            //
+            var response = await _lotteryController.FinishLottery(37);
+
+            //
+            Assert.IsNotNull(response);
+            Assert.IsInstanceOf<BadRequestErrorMessageResult>(response);
+            await _lotteryService.Received(1).FinishLotteryAsync(37);
         }
 
         private IEnumerable<LotteryDetailsDTO> LotteryDetailsDTO => new List<LotteryDetailsDTO>
