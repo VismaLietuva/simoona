@@ -40,7 +40,8 @@ namespace Shrooms.Constants.BusinessLayer
             Send,
             Minus,
             Other,
-            Welcome
+            Welcome,
+            Refund
         }
         #endregion
 
