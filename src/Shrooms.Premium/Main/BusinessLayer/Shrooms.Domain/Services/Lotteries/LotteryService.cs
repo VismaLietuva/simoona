@@ -217,7 +217,7 @@ namespace Shrooms.Domain.Services.Lotteries
 
             lottery.Status = (int)status;
 
-            _uow.SaveChanges();
+            _uow.SaveChanges(false);
         }
 
         public async Task BuyLotteryTicketAsync(BuyLotteryTicketDTO lotteryTicketDTO, UserAndOrganizationDTO userOrg)
