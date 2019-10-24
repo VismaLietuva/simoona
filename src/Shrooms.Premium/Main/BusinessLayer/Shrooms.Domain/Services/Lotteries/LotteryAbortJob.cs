@@ -56,12 +56,12 @@ namespace Shrooms.Domain.Services.Lotteries
             try
             {
                 _kudosService.RefundLotteryTickets(usersToSendKudos, userOrg);
-                _lotteryService.EditLotteryStatus(lottery.Id, LotteryStatus.Aborted);
+                _lotteryService.EditLotteryStatus(lottery.Id, LotteryStatus.Aborted, userOrg);
             }
             catch (Exception e)
             {
                 _logger.Error(e);
-                _asyncRunner.Run<ILotteryService>(n => n.EditLotteryStatus(lottery.Id, LotteryStatus.RefundFailed), _uow.ConnectionName);
+                _asyncRunner.Run<ILotteryService>(n => n.EditLotteryStatus(lottery.Id, LotteryStatus.RefundFailed, userOrg), _uow.ConnectionName);
             }
         }
 

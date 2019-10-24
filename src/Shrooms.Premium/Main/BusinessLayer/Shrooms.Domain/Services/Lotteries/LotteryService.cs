@@ -123,17 +123,17 @@ namespace Shrooms.Domain.Services.Lotteries
 
             if (lottery != null)
             {
-                if (lottery.Status == (int)LotteryStatus.Started)
+                if (lottery.Status == (int) LotteryStatus.Started)
                 {
                     _asyncRunner.Run<ILotteryAbortJob>(n => n.RefundLottery(lottery, userOrg), _uow.ConnectionName);
-                    lottery.Status = (int)LotteryStatus.RefundStarted;
+                    lottery.Status = (int) LotteryStatus.RefundStarted;
                 }
                 else
                 {
-                    lottery.Status = (int)LotteryStatus.Aborted;
+                    lottery.Status = (int) LotteryStatus.Aborted;
                 }
 
-                _uow.SaveChanges();
+                _uow.SaveChanges(userOrg.UserId);
             }
         }
 
@@ -143,7 +143,7 @@ namespace Shrooms.Domain.Services.Lotteries
 
             if (lottery != null)
             {
-                if (lottery.Status == (int)LotteryStatus.RefundFailed)
+                if (lottery.Status == (int) LotteryStatus.RefundFailed)
                 {
                     _asyncRunner.Run<ILotteryAbortJob>(n => n.RefundLottery(lottery, userOrg), _uow.ConnectionName);
                 }
@@ -197,7 +197,9 @@ namespace Shrooms.Domain.Services.Lotteries
                 .Where(x => x.OrganizationId == userOrg.OrganizationId)
                 .Where(x => x.Title.Contains(filter))
                 .Select(MapLotteriesToListItemDto)
-                .OrderByDescending(ByEndDate);
+                .OrderByDescending(x => x.Status == (int) LotteryStatus.RefundFailed)
+                .ThenByDescending(x => x.Status == (int) LotteryStatus.Started || x.Status == (int) LotteryStatus.Drafted)
+                .ThenByDescending(ByEndDate);
         }
 
         public IPagedList<LotteryDetailsDTO> GetPagedLotteries(GetPagedLotteriesArgs args)
@@ -211,13 +213,13 @@ namespace Shrooms.Domain.Services.Lotteries
             return _lotteriesDbSet.Find(id).Status;
         }
 
-        public void EditLotteryStatus(int id, LotteryStatus status)
+        public void EditLotteryStatus(int id, LotteryStatus status, UserAndOrganizationDTO userOrg)
         {
             var lottery = _lotteriesDbSet.Find(id);
 
-            lottery.Status = (int)status;
+            lottery.Status = (int) status;
 
-            _uow.SaveChanges(false);
+            _uow.SaveChanges(userOrg.UserId);
         }
 
         public async Task BuyLotteryTicketAsync(BuyLotteryTicketDTO lotteryTicketDTO, UserAndOrganizationDTO userOrg)

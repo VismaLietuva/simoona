@@ -41,6 +41,6 @@ namespace Shrooms.Domain.Services.Lotteries
 
         int GetLotteryStatus(int id);
 
-        void EditLotteryStatus(int id, LotteryStatus status);
+        void EditLotteryStatus(int id, LotteryStatus status, UserAndOrganizationDTO userOrg);
     }
 }
