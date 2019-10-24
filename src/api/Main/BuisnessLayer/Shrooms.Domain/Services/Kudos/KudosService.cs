@@ -508,14 +508,14 @@ namespace Shrooms.Domain.Services.Kudos
                 InsertKudosLog(kudosDto, KudosStatus.Approved);
             }
 
-            _uow.SaveChanges();
+            _uow.SaveChanges(userOrg.UserId);
 
             foreach (var user in users)
             {
                 SetKudosToUserProfile(user, userOrg);
             }
 
-            _uow.SaveChanges();
+            _uow.SaveChanges(userOrg.UserId);
         }
 
         private bool UserHasPermission(AddKudosLogDTO kudosDto)
