@@ -29,7 +29,7 @@ namespace Shrooms.API.Controllers.Lotteries
         }
         
         [HttpGet]
-        [PermissionAwareCacheOutputFilter(BasicPermissions.Lottery, ServerTimeSpan = ConstWebApi.FiveMinutes)]
+        [PermissionAwareCacheOutputFilter(BasicPermissions.Lottery, ServerTimeSpan = ConstWebApi.OneHour)]
         public IEnumerable<LotteryWidgetViewModel> Get()
         {
             var lotteriesDTO = _lotteryService.GetRunningLotteries(GetUserAndOrganization());
