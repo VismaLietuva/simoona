@@ -219,6 +219,11 @@ namespace Shrooms.API.Controllers.Lotteries
         {
             var lotteryStats = _lotteryService.GetLotteryStats(id);
 
+            if(lotteryStats == null)
+            {
+                return Content((HttpStatusCode)422, "Lottery with such ID was not found");
+            }
+          
             return Ok(lotteryStats);
         }
     }

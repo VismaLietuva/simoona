@@ -74,7 +74,7 @@ namespace Shrooms.Domain.Services.Lotteries
             return newLotteryDTO;
         }
 
-        public void EditDraftedLottery(EditDraftedLotteryDTO lotteryDTO)
+        public async Task EditDraftedLottery(EditDraftedLotteryDTO lotteryDTO)
         {
             var lottery = _lotteriesDbSet.Find(lotteryDTO.Id);
 
@@ -85,10 +85,10 @@ namespace Shrooms.Domain.Services.Lotteries
 
             UpdateDraftedLottery(lottery, lotteryDTO);
 
-            _uow.SaveChanges(false);
+            await _uow.SaveChangesAsync(false);
         }
 
-        public void EditStartedLottery(EditStartedLotteryDTO lotteryDTO)
+        public async Task EditStartedLottery(EditStartedLotteryDTO lotteryDTO)
         {
             var lottery = _lotteriesDbSet.Find(lotteryDTO.Id);
 
@@ -99,7 +99,7 @@ namespace Shrooms.Domain.Services.Lotteries
 
             lottery.Description = lotteryDTO.Description;
 
-            _uow.SaveChanges();
+            await _uow.SaveChangesAsync(false);
         }
 
         public LotteryDetailsDTO GetLotteryDetails(int id)

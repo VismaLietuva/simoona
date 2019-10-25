@@ -261,7 +261,7 @@ namespace Shrooms.Premium.UnitTests.Controllers.WebApi
             _mapper.Map<BuyLotteryTicketViewModel, BuyLotteryTicketDTO>(ticketViewModel)
                 .Returns(ticketDTOModel);
 
-            _lotteryService.BuyLotteryTicketAsync(ticketDTOModel, GetUserAndOrganization()).Returns(x => { throw new LotteryException("yeet");  });
+            _lotteryService.BuyLotteryTicketAsync(ticketDTOModel, GetUserAndOrganization()).Throws(new LotteryException("Exception"));
           
             //
             var response = await _lotteryController.BuyLotteryTicket(ticketViewModel);
@@ -328,7 +328,7 @@ namespace Shrooms.Premium.UnitTests.Controllers.WebApi
         public async Task FinishLottery_Should_Return_Bad_Request()
         {
             //
-            _lotteryService.FinishLotteryAsync(37).Throws(new LotteryException("Yeet"));
+            _lotteryService.FinishLotteryAsync(37).Throws(new LotteryException("Exception"));
             //
             var response = await _lotteryController.FinishLottery(37);
 
@@ -336,6 +336,160 @@ namespace Shrooms.Premium.UnitTests.Controllers.WebApi
             Assert.IsNotNull(response);
             Assert.IsInstanceOf<BadRequestErrorMessageResult>(response);
             await _lotteryService.Received(1).FinishLotteryAsync(37);
+        }
+
+        [TestCase]
+        public void UpdateDrafted_Should_Return_Ok()
+        {
+            //
+            var lotteryViewModel = new EditDraftedLotteryViewModel
+            {
+                Id = 31,
+                Title = "Hello"
+            };
+
+            var lotteryDto = new EditDraftedLotteryDTO
+            {
+                Id = 31,
+                Title = "Hello"
+            };
+            _mapper.Map<EditDraftedLotteryViewModel, EditDraftedLotteryDTO>(lotteryViewModel)
+                .Returns(lotteryDto);
+
+            //
+            var response = _lotteryController.UpdateDrafted(lotteryViewModel);
+
+            //
+            Assert.IsNotNull(response);
+            Assert.IsInstanceOf<OkResult>(response);
+            _lotteryService.Received(1).EditDraftedLottery(lotteryDto);
+
+        }
+
+        [TestCase]
+        public void UpdateDrafted_Should_Return_Bad_Request()
+        {
+            //
+            var lotteryViewModel = new EditDraftedLotteryViewModel
+            {
+                Id = 31,
+                Title = "Hello"
+            };
+
+            var lotteryDto = new EditDraftedLotteryDTO
+            {
+                Id = 31,
+                Title = "Hello"
+            };
+            _mapper.Map<EditDraftedLotteryViewModel, EditDraftedLotteryDTO>(lotteryViewModel)
+                .Returns(lotteryDto);
+
+            _lotteryService.EditDraftedLottery(lotteryDto).Throws(new LotteryException("Exception"));
+
+            //
+            var response = _lotteryController.UpdateDrafted(lotteryViewModel);
+
+            //
+            Assert.IsNotNull(response);
+            Assert.IsInstanceOf<BadRequestErrorMessageResult>(response);
+            _lotteryService.Received(1).EditDraftedLottery(lotteryDto);
+
+        }
+
+        [TestCase]
+        public void UpdateStarted_Should_Return_Ok()
+        {
+            //
+            var lotteryViewModel = new EditStartedLotteryViewModel
+            {
+                Id = 31,
+            };
+
+            var lotteryDto = new EditStartedLotteryDTO
+            {
+                Id = 31,
+            };
+            _mapper.Map<EditStartedLotteryViewModel, EditStartedLotteryDTO>(lotteryViewModel)
+                .Returns(lotteryDto);
+
+            //
+            var response = _lotteryController.UpdateStarted(lotteryViewModel);
+
+            //
+            Assert.IsNotNull(response);
+            Assert.IsInstanceOf<OkResult>(response);
+            _lotteryService.Received(1).EditStartedLottery(lotteryDto);
+
+        }
+
+        [TestCase]
+        public void UpdateStarted_Should_Return_Bad_Request()
+        {
+            //
+            var lotteryViewModel = new EditStartedLotteryViewModel
+            {
+                Id = 31,
+            };
+
+            var lotteryDto = new EditStartedLotteryDTO
+            {
+                Id = 31,
+            };
+            _mapper.Map<EditStartedLotteryViewModel, EditStartedLotteryDTO>(lotteryViewModel)
+                .Returns(lotteryDto);
+            _lotteryService.EditStartedLottery(lotteryDto).Throws(new LotteryException("Exception"));
+            //
+            var response = _lotteryController.UpdateStarted(lotteryViewModel);
+
+            //
+            Assert.IsNotNull(response);
+            Assert.IsInstanceOf<BadRequestErrorMessageResult>(response);
+            _lotteryService.Received(1).EditStartedLottery(lotteryDto);
+
+        }
+        
+        [TestCase]
+        public void LotteryStats_Should_Return_Ok()
+        {
+            //
+            var lotteryStats = new LotteryStatsDTO()
+            {
+                KudosSpent = 60,
+                TicketsSold = 30,
+                TotalParticipants = 15
+            };
+            _lotteryService.GetLotteryStats(13).Returns(lotteryStats);
+
+            //
+            var response = _lotteryController.LotteryStats(13);
+
+            //
+            Assert.IsNotNull(response);
+            Assert.IsInstanceOf<OkNegotiatedContentResult<LotteryStatsDTO>>(response);
+            _lotteryService.Received(1).GetLotteryStats(13);
+
+        }
+
+        [TestCase]
+        public void LotteryStats_Should_Return_Unprocessable_Entity_Error()
+        {
+            //
+            var lotteryStats = new LotteryStatsDTO()
+            {
+                KudosSpent = 60,
+                TicketsSold = 30,
+                TotalParticipants = 15
+            };
+            _lotteryService.GetLotteryStats(13).Returns(x => null);
+
+            //
+            var response = _lotteryController.LotteryStats(13);
+
+            //
+            Assert.IsNotNull(response);
+            Assert.IsInstanceOf<NegotiatedContentResult<string>>(response);
+            _lotteryService.Received(1).GetLotteryStats(13);
+
         }
 
         private IEnumerable<LotteryDetailsDTO> LotteryDetailsDTO => new List<LotteryDetailsDTO>
