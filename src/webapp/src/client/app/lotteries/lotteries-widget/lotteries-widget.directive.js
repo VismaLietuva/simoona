@@ -42,7 +42,16 @@
                 function getLotteryWidgetInfo(){
                     lotteryRepository.getLotteryWidgetInfo().then(function(result) {
                         scope.latestLotteries = result;
+                        filterEndedLotteries();
                     })
+                }
+                function filterEndedLotteries(){
+                    angular.forEach(scope.latestLotteries, (lottery) => {
+                        if(moment.utc(lottery.endDate)-moment() < 0)
+                        {
+                            scope.latestLotteries.remove(lottery);
+                        }
+                    });
                 }
             }
             function getRemainingTime(input){
