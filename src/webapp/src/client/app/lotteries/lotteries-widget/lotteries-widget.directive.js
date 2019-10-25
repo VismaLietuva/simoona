@@ -86,7 +86,7 @@
                 }  
                 else if(days < 30) {
                     timeRemaining = Math.round(days);
-                    unitOfTime = "months";
+                    unitOfTime = "days";
                 }  
                 else if(days < 45) {
                     unitOfTime = "month";
