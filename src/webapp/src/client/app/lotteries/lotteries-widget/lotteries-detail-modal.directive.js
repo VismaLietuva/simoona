@@ -91,9 +91,8 @@
         function buyTickets(){
             if(vm.ticketCount > 0)
             {
-                var lotteryTickets = {};
-                lotteryTickets.lotteryId = currentLottery;
-                lotteryTickets.tickets = vm.ticketCount;
+                var lotteryTickets = {lotteryId: currentLottery, tickets: vm.ticketCount};
+
                 lotteryRepository.buyTickets(lotteryTickets)
                 .then(function(){
                     vm.notifySrv.success(vm.localeSrv.formatTranslation('lotteries.hasBeenBought', { one: vm.ticketCount, two: vm.lottery.title }));
