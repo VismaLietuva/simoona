@@ -36,20 +36,20 @@ namespace Shrooms.API.Controllers.Lotteries
 
         [HttpGet]
         [Route("{id}/Participants")]
-        public IHttpActionResult GetParticipants(int id)
+        public IHttpActionResult GetParticipantsCounted(int id)
         {
             var participants = _participantService.GetParticipantsCounted(id);
             var viewModel = _mapper.Map<IEnumerable<LotteryParticipantDTO>, IEnumerable<LotteryParticipantViewModel>>(participants);
+
             return Ok(viewModel);
         }
 
         [HttpGet]
         [Route("Participants/Paged")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Lottery)]
-        public PagedViewModel<LotteryParticipantDTO> GetPagedParticipants(int id, int page = 1, int pageSize = ConstWebApi.DefaultPageSize)
+        public IHttpActionResult GetPagedParticipants(int id, int page = 1, int pageSize = ConstWebApi.DefaultPageSize)
         {
             var pagedParticipants = _participantService.GetPagedParticipants(id, page, pageSize);
-
             var pagedModel = new PagedViewModel<LotteryParticipantDTO>
             {
                 PagedList = pagedParticipants,
@@ -58,8 +58,7 @@ namespace Shrooms.API.Controllers.Lotteries
                 PageSize = pagedParticipants.PageSize
             };
 
-            return pagedModel;
+            return Ok(pagedModel);
         }
-
     }
 }

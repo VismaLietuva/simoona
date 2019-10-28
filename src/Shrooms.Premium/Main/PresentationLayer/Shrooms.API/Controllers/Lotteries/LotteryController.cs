@@ -63,7 +63,7 @@ namespace Shrooms.API.Controllers.Lotteries
         }
 
         [HttpGet]
-        [Route("Details")]
+        [Route("{id}/Details")]
         public IHttpActionResult GetLottery(int id)
         {
 
@@ -104,8 +104,8 @@ namespace Shrooms.API.Controllers.Lotteries
             return Ok();
         }
 
-        [HttpGet]
-        [Route("Abort")]
+        [HttpPatch]
+        [Route("{id}/Abort")]
         [InvalidateCacheOutput("Get", typeof(LotteryWidgetController))]
         public IHttpActionResult Abort(int id)
         {
@@ -189,7 +189,7 @@ namespace Shrooms.API.Controllers.Lotteries
         }
 
         [HttpPatch]
-        [Route("Finish")]
+        [Route("{id}/Finish")]
         [InvalidateCacheOutput("Get", typeof(LotteryWidgetController))]
         public async Task<IHttpActionResult> FinishLottery(int id)
         {
