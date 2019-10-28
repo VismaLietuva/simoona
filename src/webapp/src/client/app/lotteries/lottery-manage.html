@@ -193,12 +193,14 @@
                         </div>
                         <ace-lotter-stats-modal></ace-lotter-stats-modal>
     
-                        <!--revoke button left -->
+                        <!--abort button left -->
                         <div class="pull-left">
                             <div class="pull-left">
                                 <button ng-if="vm.states.isEdit"
                                         class="btn btn-danger"
-                                        ace-confirmation-modal="vm.revokeLottery(vm.lottery.id)">
+                                        ace-confirmation-modal="vm.abortLottery(vm.lottery.id)"
+                                        confirmation-modal-confirm="lotteries.revoke"
+                                        confirmation-modal-message="lotteries.abortConfirmationMessage">
                                     <span translate="lotteries.revoke"></span>
                                 </button>
                             </div>

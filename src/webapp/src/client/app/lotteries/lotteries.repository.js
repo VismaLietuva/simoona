@@ -21,7 +21,7 @@
             create: create,
             updateDrafted: updateDrafted,
             updateStarted: updateStarted,
-            revokeLottery: revokeLottery,
+            abortLottery: abortLottery,
             getLotteryListPaged: getLotteryListPaged,
             finishLottery: finishLottery,
             getLotteryStatus: getLotteryStatus,
@@ -40,7 +40,7 @@
         }
 
         function getLottery(id) {
-            return $resource(url + 'Details' + `?id=${id}`).get().$promise;
+            return $resource(url + `${id}/Details`).get().$promise;
         }
 
         function create(lottery) {
@@ -63,10 +63,13 @@
             }).patch(lottery).$promise;
         }
 
-        function revokeLottery(id) {
-            return $resource(url + 'Abort').get({id}).$promise;
+        function abortLottery(id) {
+            return $resource(url + `${id}/Abort`, '', {
+                patch: {
+                    method: 'PATCH'
+                }
+            }).patch().$promise;
         }
-
         
         function getLotteryListPaged(filters) {
             return $resource(url + 'Paged', '', {
@@ -79,7 +82,7 @@
         }
         
         function finishLottery(id) {
-            return $resource(url + 'Finish' + `?id=${id}`, '', {
+            return $resource(url + `${id}/Finish`, '', {
                 patch: {
                     method: 'PATCH'
                 }
@@ -100,8 +103,7 @@
 
         function getLotteryWidgetInfo(){
             return $resource(lotteryWidgetUrl + 'Get')
-                .query()
-                .$promise;
+                .query().$promise;
         }
 
         function buyTickets(lotteryTickets) {

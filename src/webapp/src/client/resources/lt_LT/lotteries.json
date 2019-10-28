@@ -31,7 +31,7 @@
     "start": "Pradėti",
     "save": "Išsaugoti",
     "update": "Atnaujinti",
-    "revoke": "Atšaukti",
+    "revoke": "Nutraukti",
     "hasStarted": "{{ one }} \"{{ two }}\" prasidejo!",
     "hasBeenSaved": "{{ one }} \"{{ two }}\" išsaugota!",
     "photos": "Nuotraukos",
@@ -55,5 +55,6 @@
     "ticketsSold": "Parduota bilietų: ",
     "kudosSpent": "Išleista 'Kudos': ",
     "userNameSurname": "Vardas, Pavardė",
-    "ticketsBougth": "Nupirko bilietų"
+    "ticketsBougth": "Nupirko bilietų",
+    "abortConfirmationMessage": "Ar jūs tikrai norite nutraukti šią loteriją?"
 }

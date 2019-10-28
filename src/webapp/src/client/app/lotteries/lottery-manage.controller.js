@@ -27,7 +27,7 @@
         vm.startLottery = startLottery;
         vm.createLottery = createLottery;
         vm.updateLottery = updateLottery;
-        vm.revokeLottery = revokeLottery;
+        vm.abortLottery = abortLottery;
         vm.finishLottery = finishLottery;
         vm.removeImage = removeImage;
         vm.lotteryCroppedImages = [];
@@ -90,7 +90,7 @@
                     vm.lottery.status = lotteryStatus.Drafted;
                     vm.lottery.images = results;
                     lotteryRepository.create(vm.lottery)
-                        .then(updateSucess('lotteries.hasStarted'))
+                        .then(updateSucess('lotteries.hasBeenSaved'))
                 });
         }
 
@@ -129,11 +129,10 @@
                         .then(newImages => {
                             vm.lottery.images = vm.lottery.images.concat(newImages);
                             lotteryRepository.updateDrafted(vm.lottery)
-                            .then(updateSucess('lotteries.haveBeenSaved'))
                         })
                 } else {
                     lotteryRepository.updateDrafted(vm.lottery)
-                    .then(updateSucess('lotteries.haveBeenSaved'))
+                    .then(updateSucess('lotteries.hasBeenSaved'))
                 }
             } else if (vm.isStarted) {
                 lotteryRepository.updateStarted({ description: vm.lottery.description, id: vm.lottery.id })
@@ -141,8 +140,8 @@
             }
         }
 
-        function revokeLottery(id) {
-            lotteryRepository.revokeLottery(id).then(function() {
+        function abortLottery(id) {
+            lotteryRepository.abortLottery(id).then(function() {
                 notifySrv.success('lotteries.successDelete');
                 $state.go('Root.WithOrg.Admin.Lotteries.List');
             }, errorHandler.handleErrorMessage);

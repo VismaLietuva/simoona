@@ -635,7 +635,7 @@ namespace Shrooms.Domain.Services.Kudos
                 .Sum(x => (decimal?)x.Points);
             var refundedKudos = allUserKudosLogs
                 .Where(x => x.KudosSystemType == ConstBusinessLayer.KudosTypeEnum.Refund && x.KudosBasketId == null)
-                .Sum(x => (decimal?)x.Points);
+                .Sum(x => (decimal?)x.Points) ?? 0;
             spentKudos -= refundedKudos;
 
             user.SpentKudos = spentKudos ?? 0;
