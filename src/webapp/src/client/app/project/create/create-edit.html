@@ -106,17 +106,17 @@
                         </div>
                     </div>
                     <!--project logo-->
-                    <div class="form-group" ng-class="{'has-error': projectForm.image-file-input.$invalid && projectForm.image-file-input.$dirty}">
+                    <div class="form-group" >
                         <label for="image-file-input" class="control-label col-xs-12 col-sm-4" translate="projects.projectLogo"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
                             <ace-photo-crop-upload 
-                                image="vm.projectLogo" 
+                                images="vm.projectLogo" 
                                 is-crop-visible="vm.states.isCreate || !!vm.projectLogo || !vm.project.logo" 
                                 aspect-ratio="1.7" 
                                 result-image="vm.projectCroppedLogo" 
                                 image-size="vm.projectLogoSize">
                             </ace-photo-crop-upload>
-                            <img ng-if="vm.states.isEdit && !vm.projectCroppedLogo && !vm.projectLogo && vm.project.logo" src="{{vm.project.logo | imageThumb:vm.projectLogoSize:'crop'}}" />
+                            <img ng-if="vm.states.isEdit && !vm.projectCroppedLogo && vm.projectLogo.length < 1 && vm.project.logo" src="{{vm.project.logo | imageThumb:vm.projectLogoSize:'crop'}}" />
                         </div>
                     </div>
                     <!--delete project button-->
@@ -133,7 +133,7 @@
                         <button class="btn btn-primary" 
                                 ng-if="vm.states.isCreate"
                                 ng-click="vm.submitProjectForm(vm.createProject, true)"
-                                ng-disabled="projectForm.$invalid || !vm.project.owner" 
+                                ng-disabled="projectForm.$invalid || !vm.project.owner || !vm.projectCroppedLogo" 
                                 data-test-id="project-form-save-button">
                             <span translate="common.save"></span>
                         </button>

@@ -96,14 +96,12 @@
         }
 
         function saveimages() {
-            var uploads = [];
-            vm.lotteryImages.forEach((image, index) => {
+            var uploads = vm.lotteryImages.map((image, index) => {
                 var lotteryImageBlob = dataHandler.dataURItoBlob(vm.lotteryCroppedImages[index], image.type);
                 lotteryImageBlob.lastModifiedDate = new Date();
                 lotteryImageBlob.name = image.name;
-                uploads.push(pictureRepository.upload([lotteryImageBlob]));
+                return pictureRepository.upload([lotteryImageBlob]);
             })
-
 
             return $q.all(uploads)
                 .then(function(data) {
@@ -111,7 +109,7 @@
                     data.forEach(result => {
                         images.push(result.data);
                     })
-                    return images;
+                    return data.map(result => result.data);
             });
         }
 

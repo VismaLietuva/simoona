@@ -11,7 +11,6 @@
             replace: true,
             templateUrl: 'app/common/directives/photo-crop-upload/photo-crop-upload.html',
             scope: {
-                image: '=',
                 isCropVisible: '=',
                 aspectRatio: '=',
                 resultImage: '=',
@@ -44,29 +43,22 @@
 
         function handleFileSelect(files) {
             if (imageAttached(files)) {
-                if (files.length > 1 || $scope.vm.multiple) {
+                if (!$scope.multiple) {
                     vm.images = [];
-                    Object.keys(files).forEach(function(photo, index) {
-                        vm.images.push(files[photo]);
-                        var reader = new FileReader();
-                        reader.onload = function (files) {
-                            $scope.$apply();
-                        };
-                        reader.readAsDataURL(vm.images[index]);
-                    });
-
-                } else {
-                    vm.image = files[0];
-                    if (vm.image) {
-                        var reader = new FileReader();
-                        reader.onload = function (files) {
-                            $scope.$apply();
-                        };
-
-                        reader.readAsDataURL(vm.image);
-                    }
                 }
+                Object.keys(files).forEach((photo, index) => {
+                    vm.images.push(files[photo]);
+                });
+
+                vm.images.forEach((image) => {
+                    var reader = new FileReader();
+                    reader.onload = function (files) {
+                        $scope.$apply();
+                    };
+                    reader.readAsDataURL(image)
+                });
             }
+
         }
 
         function imageAttached(input) {

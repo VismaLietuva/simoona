@@ -149,28 +149,28 @@
                             <button class="btn btn-primary" 
                                     ng-if="vm.states.isCreate" 
                                     ng-click="vm.startLottery()" 
-                                    ng-disabled="lotteryForm.$invalid || !(vm.lotteryCroppedImages.length > 0 || vm.lottery.images.length > 0)">
+                                    ng-disabled="lotteryForm.$invalid || !(!!vm.lotteryCroppedImages.length || !!vm.lottery.images.length)">
                                 <span translate="lotteries.start"></span>
                             </button>
 
                             <button class="btn btn-primary" 
                                     ng-if="vm.isDrafted" 
                                     ng-click="vm.updateLottery(true)" 
-                                    ng-disabled="lotteryForm.$invalid || !(vm.lotteryCroppedImages.length > 0 || vm.lottery.images.length > 0)">
+                                    ng-disabled="lotteryForm.$invalid || !(!!vm.lotteryCroppedImages.length || !!vm.lottery.images.length)">
                                 <span translate="lotteries.start"></span>
                             </button>
 
                             <button class="btn btn-primary" 
                                     ng-if="vm.states.isCreate" 
                                     ng-click="vm.createLottery()" 
-                                    ng-disabled="lotteryForm.$invalid || vm.lotteryCroppedImages.length < 1">
+                                    ng-disabled="lotteryForm.$invalid || !vm.lotteryCroppedImages.length">
                                 <span translate="lotteries.save"></span>
                             </button>
 
                             <button class="btn btn-primary" 
                                     ng-if="vm.isDrafted || vm.isStarted" 
                                     ng-click="vm.updateLottery()" 
-                                    ng-disabled="lotteryForm.$invalid || !(vm.lotteryCroppedImages.length > 0 || vm.lottery.images.length > 0)">
+                                    ng-disabled="lotteryForm.$invalid || !(!!vm.lotteryCroppedImages.length || !!vm.lottery.images.length)">
                                 <span translate="lotteries.update"></span>
                             </button>
 
