@@ -68,8 +68,6 @@
 
         init();
         
-        //////
-
         function init() {
 
             lotteryRepository.getLottery(currentLottery)

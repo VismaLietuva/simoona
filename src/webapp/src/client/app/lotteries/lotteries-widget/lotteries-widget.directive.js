@@ -37,8 +37,6 @@
 
                 getLotteryWidgetInfo();
 
-                ////////
-
                 function getLotteryWidgetInfo(){
                     lotteryRepository.getLotteryWidgetInfo().then(function(result) {
                         scope.latestLotteries = result;
