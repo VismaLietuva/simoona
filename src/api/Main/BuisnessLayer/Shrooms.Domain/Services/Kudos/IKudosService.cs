@@ -14,13 +14,15 @@ namespace Shrooms.Domain.Services.Kudos
 
         Task RemoveKudosType(int id, UserAndOrganizationDTO userOrg);
 
-        Task<KudosTypeDTO> GetKudosType(int id, UserAndOrganizationDTO userOrg);
+        KudosTypeDTO GetSendKudosType(UserAndOrganizationDTO userOrg);
 
         WelcomeKudosDTO GetWelcomeKudos();
 
         IEnumerable<KudosPieChartSliceDto> GetKudosPieChartData(int organizationId, string userId);
 
         IEnumerable<KudosTypeDTO> GetKudosTypes(UserAndOrganizationDTO userAndOrg);
+
+        Task<KudosTypeDTO> GetKudosType(int id, UserAndOrganizationDTO userOrg);
 
         IEnumerable<UserKudosInformationDTO> GetApprovedKudosList(string id, int organizationId);
 

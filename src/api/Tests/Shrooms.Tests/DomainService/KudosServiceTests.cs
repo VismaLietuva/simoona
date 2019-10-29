@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -213,7 +214,7 @@ namespace Shrooms.API.Tests.DomainService
             };
 
             var types = _kudosService.GetKudosTypes(userAndOrg);
-            Assert.AreEqual(3, types.Count());
+            Assert.AreEqual(4, types.Count());
         }
 
         [Test]
@@ -225,7 +226,7 @@ namespace Shrooms.API.Tests.DomainService
             };
 
             var types = _kudosService.GetKudosTypes(userAndOrg);
-            Assert.AreEqual(2, types.Count());
+            Assert.AreEqual(3, types.Count());
         }
 
         [Test]
@@ -537,6 +538,21 @@ namespace Shrooms.API.Tests.DomainService
 
         #endregion
 
+        #region GetKudosTypeSend
+        [Test]
+        public void GetKudosTypeSend_FromKudosTypes_ReturnsOnlySendType()
+        {
+            var userAndOrg = new UserAndOrganizationDTO
+            {
+                UserId = "testUserId2"
+            };
+
+            var result = _kudosService.GetSendKudosType(userAndOrg);
+
+            Assert.AreEqual(result.Type, ConstBusinessLayer.KudosTypeEnum.Send);
+        }
+        #endregion
+
         #region MockData
 
         private static void MockRoleService(IRoleService roleService)
@@ -682,6 +698,13 @@ namespace Shrooms.API.Tests.DomainService
                     Value = 2,
                     Type = ConstBusinessLayer.KudosTypeEnum.Ordinary,
                     IsActive = false
+                },
+                new KudosType
+                {
+                    Id = 4,
+                    Name = "Other",
+                    Value = 3,
+                    Type = ConstBusinessLayer.KudosTypeEnum.Other
                 },
             }.AsQueryable();
         }

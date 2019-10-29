@@ -42,8 +42,8 @@ namespace Shrooms.Domain.Services.Kudos
         private readonly IRepository<KudosLog> _kudosLogRepository;
         private readonly IRepository<ApplicationUser> _applicationUserRepository;
         private Expression<Func<KudosType, bool>> _excludeNecessaryKudosTypes = x => x.Type != ConstBusinessLayer.KudosTypeEnum.Send &&
-                              x.Type != ConstBusinessLayer.KudosTypeEnum.Minus &&
-                              x.Type != ConstBusinessLayer.KudosTypeEnum.Other;
+                                x.Type != ConstBusinessLayer.KudosTypeEnum.Minus &&
+                                x.Type != ConstBusinessLayer.KudosTypeEnum.Other;
 
         private readonly ResourceManager _resourceManager;
 
@@ -126,6 +126,23 @@ namespace Shrooms.Domain.Services.Kudos
             _kudosTypesDbSet.Remove(type);
 
             await _uow.SaveChangesAsync(userOrg.UserId);
+        }
+
+        public KudosTypeDTO GetSendKudosType(UserAndOrganizationDTO userOrg)
+        {
+            var hasKudosAdminPermission = HasKudosAdministratorPermission(userOrg);
+
+            var sendType = _kudosTypesDbSet
+                .Where(x => x.Type == ConstBusinessLayer.KudosTypeEnum.Send)
+                .Select(MapKudosTypesToDTO)
+                .FirstOrDefault();
+
+            if (sendType == null)
+            {
+                throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Types not found");
+            }
+
+            return sendType;
         }
 
         public async Task<KudosTypeDTO> GetKudosType(int id, UserAndOrganizationDTO userOrg)
