@@ -94,6 +94,7 @@
                 lotteryRepository.buyTickets(lotteryTickets)
                 .then(function(){
                     vm.notifySrv.success(vm.localeSrv.formatTranslation('lotteries.hasBeenBought', { one: vm.ticketCount, two: vm.lottery.title }));
+                    $uibModalInstance.close();
                 }, function (error) {
                     errorHandler.handleErrorMessage(error);
                 });
@@ -102,7 +103,6 @@
             {
                 vm.notifySrv.error(vm.localeSrv.formatTranslation('lotteries.invalidTicketNumber'));
             }
-            
         }
     }
 })();

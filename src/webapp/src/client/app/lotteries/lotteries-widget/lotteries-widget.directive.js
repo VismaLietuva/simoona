@@ -24,7 +24,7 @@
         function lotteriesWallWidget(authService, lotteryRepository, lotteryStatus, localeSrv){
             var directive = {
                 restrict: 'E',
-                templateUrl: 'app/lotteries/lotteries-widget/lottery-widget.html',
+                templateUrl: 'app/lotteries/lotteries-widget/lotteries-widget.html',
                 link: linkFunc
             };
             return directive;
