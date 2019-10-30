@@ -147,7 +147,7 @@ namespace Shrooms.API.Controllers.Lotteries
         {
             var status = _lotteryService.GetLotteryStatus(id);
 
-            return Ok(new { status });
+            return Ok(status);
         }
 
         [HttpPut]

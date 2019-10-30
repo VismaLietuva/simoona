@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading.Tasks;
+using System.Linq;
+using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Kudos;
@@ -22,8 +22,13 @@ namespace Shrooms.Domain.Services.Lotteries
         private readonly ILogger _logger;
         private readonly IUnitOfWork2 _uow;
 
-        public LotteryAbortJob(IKudosService kudosService, IParticipantService participantService,
-            ILogger logger, ILotteryService lotteryService, IAsyncRunner asyncRunner, IUnitOfWork2 uow)
+        public LotteryAbortJob(
+            IKudosService kudosService,
+            IParticipantService participantService,
+            ILogger logger,
+            ILotteryService lotteryService,
+            IAsyncRunner asyncRunner,
+            IUnitOfWork2 uow)
         {
             _kudosService = kudosService;
             _participantService = participantService;
@@ -35,6 +40,47 @@ namespace Shrooms.Domain.Services.Lotteries
 
         public void RefundLottery(Lottery lottery, UserAndOrganizationDTO userOrg)
         {
+            try
+            {
+                var refundLogs = CreateKudosLogs(lottery, userOrg);
+
+                AddKudosLogs(lottery, refundLogs, userOrg);
+
+                UpdateUserProfiles(lottery, refundLogs, userOrg);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                _asyncRunner.Run<ILotteryService>(n =>
+                    n.UpdateRefundFailedFlag(lottery.Id, isFailed: true, userOrg), _uow.ConnectionName);
+            }
+        }
+
+        private void UpdateUserProfiles(Lottery lottery, IEnumerable<AddKudosLogDTO> kudosLogs, UserAndOrganizationDTO userOrg)
+        {
+            if (lottery.Status == (int)LotteryStatus.RefundLogsCreated)
+            {
+                var userIds = kudosLogs.Select(x => x.ReceivingUserIds.First());
+
+                _kudosService.UpdateProfilesFromUserIds(userIds, userOrg);
+                _lotteryService.UpdateLotteryStatus(lottery.Id, LotteryStatus.Aborted);
+                _lotteryService.UpdateRefundFailedFlag(lottery.Id, isFailed: false, userOrg);
+            }
+        }
+
+        private void AddKudosLogs(Lottery lottery, IEnumerable<AddKudosLogDTO> kudosLogs, UserAndOrganizationDTO userOrg)
+        {
+            if (lottery.Status == (int)LotteryStatus.RefundStarted)
+            {
+                _kudosService.AddRefundKudosLogs(kudosLogs);
+                lottery.Status = (int)LotteryStatus.RefundLogsCreated;
+                _lotteryService.UpdateLotteryStatusAndSave(lottery.Id, LotteryStatus.RefundLogsCreated, userOrg);
+            }
+        }
+
+        private IList<AddKudosLogDTO> CreateKudosLogs(Lottery lottery, UserAndOrganizationDTO userOrg)
+        {
+            var kudosTypeId = _kudosService.GetKudosTypeId(ConstBusinessLayer.KudosTypeEnum.Refund);
             var usersToRefund = _participantService.GetParticipantsCounted(lottery.Id);
             var usersToSendKudos = new List<AddKudosLogDTO>();
 
@@ -44,28 +90,19 @@ namespace Shrooms.Domain.Services.Lotteries
                 var kudosLog = new AddKudosLogDTO
                 {
                     ReceivingUserIds = new List<string> { user.UserId },
-                    PointsTypeId = 5,
+                    PointsTypeId = kudosTypeId,
                     MultiplyBy = totalReturn,
-                    Comment = FormatComment(lottery, totalReturn),
+                    Comment = CreateComment(lottery, totalReturn),
                     UserId = userOrg.UserId,
                     OrganizationId = userOrg.OrganizationId
                 };
                 usersToSendKudos.Add(kudosLog);
             }
 
-            try
-            {
-                _kudosService.RefundLotteryTickets(usersToSendKudos, userOrg);
-                _lotteryService.EditLotteryStatus(lottery.Id, LotteryStatus.Aborted, userOrg);
-            }
-            catch (Exception e)
-            {
-                _logger.Error(e);
-                _asyncRunner.Run<ILotteryService>(n => n.EditLotteryStatus(lottery.Id, LotteryStatus.RefundFailed, userOrg), _uow.ConnectionName);
-            }
+            return usersToSendKudos;
         }
 
-        private string FormatComment(Lottery lottery, int total)
+        private static string CreateComment(Lottery lottery, int total)
         {
             return $"Refund for lottery {lottery.Title}. Returned {total} kudos.";
         }
