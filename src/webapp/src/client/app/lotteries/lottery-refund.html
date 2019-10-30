@@ -4,12 +4,12 @@
             <div class="panel-heading" translate="lotteries.refundPageName"></div>
             <div class="panel-body">
                 <div class="well">
-                    <span ng-if="vm.refundStatus" translate="lotteries.refundCompletedMessage"></span>
-                    <span ng-if="!vm.refundStatus" translate="lotteries.refundFailedMessage"></span>
+                    <span ng-if="!vm.refundFailed" translate="lotteries.refundCompletedMessage"></span>
+                    <span ng-if="vm.refundFailed" translate="lotteries.refundFailedMessage"></span>
                 </div>
 
                 <div class="pull-right">
-                    <button ng-if="!vm.refundStatus" class="btn btn-primary" ng-click="vm.refundLottery()">
+                    <button ng-if="vm.refundFailed" class="btn btn-primary" ng-click="vm.refundLottery()">
                         <span translate="lotteries.refund"></span>
                     </button>
                     <button class="btn btn-default" ui-sref="Root.WithOrg.Admin.Lotteries.List">

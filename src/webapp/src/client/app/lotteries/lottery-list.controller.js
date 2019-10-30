@@ -76,7 +76,7 @@
         }
 
         function showRefundPage(lottery) {
-            return lottery.status === vm.lotteryStatuses.refundFailed || lottery.status === vm.lotteryStatuses.aborted;
+            return lottery.refundFailed || lottery.status === lotteryStatuses.aborted;
         }
     }
 

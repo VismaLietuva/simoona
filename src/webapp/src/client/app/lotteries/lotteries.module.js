@@ -14,7 +14,7 @@
             aborted: 3,
             ended: 4,
             refundStarted: 5,
-            refundFailed: 6
+            refundLogsCreated: 6
         })
         .config(config);
 

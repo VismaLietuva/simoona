@@ -42,7 +42,7 @@
     "aborted": "Aborted",
     "ended": "Ended",
     "refundStarted": "Refunding",
-    "refundFailed": "Refund failed",
+    "refundLogsCreated": "Refund logs created",
     "refundPageName": "Lottery refund information",
     "refund": "Refund",
     "refundCompletedMessage": "Everyone is refunded, you shouldn't worry about it anymore!",
