@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using PagedList;
-using Shrooms.Constants.WebApi;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Lotteries;
 using Shrooms.Domain.Services.Args;
@@ -33,14 +29,15 @@ namespace Shrooms.Domain.Services.Lotteries
         IEnumerable<LotteryDetailsDTO> GetLotteries(UserAndOrganizationDTO userOrganization);
 
         IEnumerable<LotteryDetailsDTO> GetRunningLotteries(UserAndOrganizationDTO userAndOrganization);
+
         IEnumerable<LotteryDetailsDTO> GetFilteredLotteries(string filter, UserAndOrganizationDTO userOrg);
 
         IPagedList<LotteryDetailsDTO> GetPagedLotteries(GetPagedLotteriesArgs args);
 
         LotteryDetailsDTO GetLotteryDetails(int id);
 
-        int GetLotteryStatus(int id);
+        LotteryStatusDTO GetLotteryStatus(int id);
 
-        void EditLotteryStatus(int id, LotteryStatus status, UserAndOrganizationDTO userOrg);
+        void UpdateRefundFailedFlag(int id, bool isFailed, UserAndOrganizationDTO userOrg);
     }
 }

@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using PagedList;
-using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Kudos;
@@ -9,7 +8,6 @@ using Shrooms.Domain.Services.Args;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.UserService;
 using Shrooms.DomainExceptions.Exceptions.Lotteries;
-using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Lotteries;
 using Shrooms.Infrastructure.FireAndForget;
 using System;
@@ -125,15 +123,16 @@ namespace Shrooms.Domain.Services.Lotteries
             {
                 if (lottery.Status == (int) LotteryStatus.Started)
                 {
-                    _asyncRunner.Run<ILotteryAbortJob>(n => n.RefundLottery(lottery, userOrg), _uow.ConnectionName);
-                    lottery.Status = (int) LotteryStatus.RefundStarted;
-                }
-                else
-                {
-                    lottery.Status = (int) LotteryStatus.Aborted;
-                }
+                    lottery.Status = (int)LotteryStatus.RefundStarted;
+                    _uow.SaveChanges();
 
-                _uow.SaveChanges(userOrg.UserId);
+                    _asyncRunner.Run<ILotteryAbortJob>(n => n.RefundLottery(lottery.Id, userOrg), _uow.ConnectionName);
+                }
+                else if (lottery.Status == (int) LotteryStatus.Drafted)
+                {
+                    lottery.Status = (int)LotteryStatus.Deleted;
+                    _uow.SaveChanges();
+                }
             }
         }
 
@@ -143,11 +142,22 @@ namespace Shrooms.Domain.Services.Lotteries
 
             if (lottery != null)
             {
-                if (lottery.Status == (int) LotteryStatus.RefundFailed)
+                if (lottery.IsRefundFailed)
                 {
-                    _asyncRunner.Run<ILotteryAbortJob>(n => n.RefundLottery(lottery, userOrg), _uow.ConnectionName);
+                    lottery.IsRefundFailed = false;
+                    _uow.SaveChanges();
+
+                    _asyncRunner.Run<ILotteryAbortJob>(n => n.RefundLottery(lottery.Id, userOrg), _uow.ConnectionName);
                 }
             }
+        }
+
+        public void UpdateRefundFailedFlag(int id, bool isFailed, UserAndOrganizationDTO userOrg)
+        {
+            var lottery = _lotteriesDbSet.Find(id);
+            lottery.IsRefundFailed = isFailed;
+
+            _uow.SaveChanges(userOrg.UserId);
         }
 
         public async Task FinishLotteryAsync(int lotteryId)
@@ -188,7 +198,7 @@ namespace Shrooms.Domain.Services.Lotteries
             return _lotteriesDbSet
                 .Where(p => p.OrganizationId == userOrganization.OrganizationId)
                 .Select(MapLotteriesToListItemDto)
-                .OrderByDescending(ByEndDate);
+                .OrderByDescending(_byEndDate);
         }
 
         public IEnumerable<LotteryDetailsDTO> GetFilteredLotteries(string filter, UserAndOrganizationDTO userOrg)
@@ -197,9 +207,9 @@ namespace Shrooms.Domain.Services.Lotteries
                 .Where(x => x.OrganizationId == userOrg.OrganizationId)
                 .Where(x => x.Title.Contains(filter))
                 .Select(MapLotteriesToListItemDto)
-                .OrderByDescending(x => x.Status == (int) LotteryStatus.RefundFailed)
+                .OrderByDescending(x => x.RefundFailed)
                 .ThenByDescending(x => x.Status == (int) LotteryStatus.Started || x.Status == (int) LotteryStatus.Drafted)
-                .ThenByDescending(ByEndDate);
+                .ThenByDescending(_byEndDate);
         }
 
         public IPagedList<LotteryDetailsDTO> GetPagedLotteries(GetPagedLotteriesArgs args)
@@ -208,18 +218,15 @@ namespace Shrooms.Domain.Services.Lotteries
             return filteredLotteries.ToPagedList(args.PageNumber, args.PageSize);
         }
 
-        public int GetLotteryStatus(int id)
-        {
-            return _lotteriesDbSet.Find(id).Status;
-        }
-
-        public void EditLotteryStatus(int id, LotteryStatus status, UserAndOrganizationDTO userOrg)
+        public LotteryStatusDTO GetLotteryStatus(int id)
         {
             var lottery = _lotteriesDbSet.Find(id);
 
-            lottery.Status = (int) status;
-
-            _uow.SaveChanges(userOrg.UserId);
+            return new LotteryStatusDTO
+            {
+                LotteryStatus = lottery.Status,
+                RefundFailed = lottery.IsRefundFailed
+            };
         }
 
         public async Task BuyLotteryTicketAsync(BuyLotteryTicketDTO lotteryTicketDTO, UserAndOrganizationDTO userOrg)
@@ -233,7 +240,7 @@ namespace Shrooms.Domain.Services.Lotteries
                 throw new LotteryException("User does not have enough kudos for the purchase.");
             }
 
-            for (int i = 0; i < lotteryTicketDTO.Tickets; i++)
+            for (var i = 0; i < lotteryTicketDTO.Tickets; i++)
             {
                 _participantsDbSet.Add(MapNewLotteryParticipant(lotteryTicketDTO, userOrg));
             }
@@ -261,12 +268,12 @@ namespace Shrooms.Domain.Services.Lotteries
                     p.Status == (int)LotteryStatus.Started &&
                     p.EndDate > DateTime.UtcNow)
                 .Select(MapLotteriesToListItemDto)
-                .OrderBy(ByEndDate);
+                .OrderBy(_byEndDate);
         }
 
-        private readonly Expression<Func<LotteryDetailsDTO, DateTime>> ByEndDate = e => e.EndDate;
+        private readonly Expression<Func<LotteryDetailsDTO, DateTime>> _byEndDate = e => e.EndDate;
 
-        private Expression<Func<Lottery, LotteryDetailsDTO>> MapLotteriesToListItemDto =>
+        private static Expression<Func<Lottery, LotteryDetailsDTO>> MapLotteriesToListItemDto =>
          e => new LotteryDetailsDTO
          {
              Id = e.Id,
@@ -274,7 +281,8 @@ namespace Shrooms.Domain.Services.Lotteries
              Description = e.Description,
              EntryFee = e.EntryFee,
              EndDate = e.EndDate,
-             Status = e.Status
+             Status = e.Status,
+             RefundFailed = e.IsRefundFailed
          };
 
         private Lottery MapNewLottery(CreateLotteryDTO newLotteryDTO)
@@ -284,6 +292,7 @@ namespace Shrooms.Domain.Services.Lotteries
             newLottery.CreatedBy = newLotteryDTO.UserId;
             newLottery.Modified = DateTime.UtcNow;
             newLottery.ModifiedBy = newLotteryDTO.UserId;
+            newLottery.IsRefundFailed = false;
 
             return newLottery;
         }

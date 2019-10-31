@@ -39,8 +39,8 @@ namespace Shrooms.Premium.UnitTests.DomainService.LotteryServices
         public void TestInitializers()
         {
             _unitOfWork = Substitute.For<IUnitOfWork2>();
-            
-            _lotteriesDbSet = _unitOfWork.MockDbSet<Lottery>(GetLotteries().AsEnumerable());
+
+            _lotteriesDbSet = _unitOfWork.MockDbSet(GetLotteries().AsEnumerable());
 
             _unitOfWork.GetDbSet<Lottery>().Returns(_lotteriesDbSet);
 

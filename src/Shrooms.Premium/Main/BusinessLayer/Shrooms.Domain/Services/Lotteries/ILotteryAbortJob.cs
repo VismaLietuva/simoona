@@ -6,6 +6,6 @@ namespace Shrooms.Domain.Services.Lotteries
 {
     public interface ILotteryAbortJob
     {
-        void RefundLottery(Lottery lottery, UserAndOrganizationDTO userOrg);
+        void RefundLottery(int lotteryId, UserAndOrganizationDTO userOrg);
     }
 }
