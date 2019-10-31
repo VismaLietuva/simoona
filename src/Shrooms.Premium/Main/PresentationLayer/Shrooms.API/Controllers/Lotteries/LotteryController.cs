@@ -13,6 +13,7 @@ using Shrooms.WebViewModels.Models.Lotteries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -48,18 +49,21 @@ namespace Shrooms.API.Controllers.Lotteries
         [HttpGet]
         [Route("Paged")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Lottery)]
-        public PagedViewModel<LotteryDetailsDTO> GetPagedLotteries(string filter = "", int page = 1, int pageSize = ConstWebApi.DefaultPageSize)
+        public IHttpActionResult GetPagedLotteries(string filter = "", int page = 1, int pageSize = ConstWebApi.DefaultPageSize)
         {
             var args = new GetPagedLotteriesArgs { Filter = filter, PageNumber = page, PageSize = pageSize, UserOrg = GetUserAndOrganization() };
-            var pagedLotteries = _lotteryService.GetPagedLotteries(args);
+            var pagedLotteriesDTO = _lotteryService.GetPagedLotteries(args);
 
-            return new PagedViewModel<LotteryDetailsDTO>
+            var pagedLotteriesViewModel = new PagedViewModel<LotteryDetailsDTO>
             {
-                PagedList = pagedLotteries,
-                PageCount = pagedLotteries.PageCount,
-                ItemCount = pagedLotteries.TotalItemCount,
+                PagedList = pagedLotteriesDTO,
+                PageCount = pagedLotteriesDTO.PageCount,
+                ItemCount = pagedLotteriesDTO.TotalItemCount,
                 PageSize = pageSize
             };
+
+            return Ok(pagedLotteriesViewModel);
+
         }
 
         [HttpGet]
@@ -71,7 +75,7 @@ namespace Shrooms.API.Controllers.Lotteries
 
             if (lotteryDTO == null)
             {
-                return Ok(lotteryDTO);
+                return Content((HttpStatusCode)422, "Lottery with such ID was not found");
             }
 
             var lotteryViewModel = _mapper.Map<LotteryDetailsDTO, LotteryDetailsViewModel>(lotteryDTO);
@@ -109,7 +113,11 @@ namespace Shrooms.API.Controllers.Lotteries
         [InvalidateCacheOutput("Get", typeof(LotteryWidgetController))]
         public IHttpActionResult Abort(int id)
         {
-            _lotteryService.AbortLottery(id, GetUserAndOrganization());
+            var success = _lotteryService.AbortLottery(id, GetUserAndOrganization());
+            if(!success)
+            {
+                return Content((HttpStatusCode)422, "Lottery with such ID was not found");
+            }
 
             return Ok();
         }
@@ -199,9 +207,9 @@ namespace Shrooms.API.Controllers.Lotteries
 
                 return Ok();
             }
-            catch (LotteryException)
+            catch (LotteryException e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
         }
 
@@ -211,6 +219,11 @@ namespace Shrooms.API.Controllers.Lotteries
         {
             var lotteryStats = _lotteryService.GetLotteryStats(id);
 
+            if(lotteryStats == null)
+            {
+                return Content((HttpStatusCode)422, "Lottery with such ID was not found");
+            }
+          
             return Ok(lotteryStats);
         }
     }
