@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
-using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Kudos;
@@ -17,35 +17,34 @@ namespace Shrooms.Domain.Services.Lotteries
     {
         private readonly IParticipantService _participantService;
         private readonly IKudosService _kudosService;
-        private readonly ILotteryService _lotteryService;
         private readonly IAsyncRunner _asyncRunner;
         private readonly ILogger _logger;
         private readonly IUnitOfWork2 _uow;
+        private readonly IDbSet<Lottery> _lotteriesDbSet;
 
         public LotteryAbortJob(
             IKudosService kudosService,
             IParticipantService participantService,
             ILogger logger,
-            ILotteryService lotteryService,
             IAsyncRunner asyncRunner,
             IUnitOfWork2 uow)
         {
             _kudosService = kudosService;
             _participantService = participantService;
             _logger = logger;
-            _lotteryService = lotteryService;
             _asyncRunner = asyncRunner;
             _uow = uow;
+            _lotteriesDbSet = _uow.GetDbSet<Lottery>();
         }
 
-        public void RefundLottery(Lottery lottery, UserAndOrganizationDTO userOrg)
+        public void RefundLottery(int lotteryId, UserAndOrganizationDTO userOrg)
         {
+            var lottery = _lotteriesDbSet.Find(lotteryId);
+
             try
             {
                 var refundLogs = CreateKudosLogs(lottery, userOrg);
-
                 AddKudosLogs(lottery, refundLogs, userOrg);
-
                 UpdateUserProfiles(lottery, refundLogs, userOrg);
             }
             catch (Exception e)
@@ -63,8 +62,9 @@ namespace Shrooms.Domain.Services.Lotteries
                 var userIds = kudosLogs.Select(x => x.ReceivingUserIds.First());
 
                 _kudosService.UpdateProfilesFromUserIds(userIds, userOrg);
-                _lotteryService.UpdateLotteryStatus(lottery.Id, LotteryStatus.Aborted);
-                _lotteryService.UpdateRefundFailedFlag(lottery.Id, isFailed: false, userOrg);
+                lottery.Status = (int)LotteryStatus.Refunded;
+
+                _uow.SaveChanges(userOrg.UserId);
             }
         }
 
@@ -74,13 +74,14 @@ namespace Shrooms.Domain.Services.Lotteries
             {
                 _kudosService.AddRefundKudosLogs(kudosLogs);
                 lottery.Status = (int)LotteryStatus.RefundLogsCreated;
-                _lotteryService.UpdateLotteryStatusAndSave(lottery.Id, LotteryStatus.RefundLogsCreated, userOrg);
+
+                _uow.SaveChanges(userOrg.UserId);
             }
         }
 
         private IList<AddKudosLogDTO> CreateKudosLogs(Lottery lottery, UserAndOrganizationDTO userOrg)
         {
-            var kudosTypeId = _kudosService.GetKudosTypeId(ConstBusinessLayer.KudosTypeEnum.Refund);
+            var kudosTypeId = _kudosService.GetKudosTypeId(KudosTypeEnum.Refund);
             var usersToRefund = _participantService.GetParticipantsCounted(lottery.Id);
             var usersToSendKudos = new List<AddKudosLogDTO>();
 

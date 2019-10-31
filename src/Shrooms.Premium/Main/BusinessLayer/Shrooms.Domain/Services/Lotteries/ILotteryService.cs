@@ -38,10 +38,6 @@ namespace Shrooms.Domain.Services.Lotteries
 
         LotteryStatusDTO GetLotteryStatus(int id);
 
-        void UpdateLotteryStatusAndSave(int id, LotteryStatus status, UserAndOrganizationDTO userOrg);
-
-        void UpdateLotteryStatus(int id, LotteryStatus status);
-
         void UpdateRefundFailedFlag(int id, bool isFailed, UserAndOrganizationDTO userOrg);
     }
 }
