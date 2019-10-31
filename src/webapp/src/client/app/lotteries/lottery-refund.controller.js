@@ -27,7 +27,6 @@
 
         function init() {
             lotteryRepository.getLotteryStatus(vm.lotteryId).then(function (response) {
-                console.log(response);
                 vm.refundFailed = response.refundFailed;
                 vm.lotteryStatus = response.lotteryStatus;
             });

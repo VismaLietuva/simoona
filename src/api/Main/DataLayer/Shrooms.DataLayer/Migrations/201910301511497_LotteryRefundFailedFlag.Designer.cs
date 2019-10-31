@@ -13,7 +13,7 @@ namespace Shrooms.DataLayer.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201910301227236_LotteryRefundFailedFlag"; }
+            get { return "201910301511497_LotteryRefundFailedFlag"; }
         }
         
         string IMigrationMetadata.Source

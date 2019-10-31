@@ -7,12 +7,12 @@ namespace Shrooms.DataLayer.Migrations
     {
         public override void Up()
         {
-            AddColumn("dbo.Lotteries", "RefundFailed", c => c.Boolean(nullable: false));
+            AddColumn("dbo.Lotteries", "IsRefundFailed", c => c.Boolean(nullable: false));
         }
         
         public override void Down()
         {
-            DropColumn("dbo.Lotteries", "RefundFailed");
+            DropColumn("dbo.Lotteries", "IsRefundFailed");
         }
     }
 }

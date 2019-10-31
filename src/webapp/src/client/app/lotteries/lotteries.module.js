@@ -11,10 +11,11 @@
         .constant('lotteryStatuses', {
             drafted: 1,
             started: 2,
-            aborted: 3,
+            deleted: 3,
             ended: 4,
             refundStarted: 5,
-            refundLogsCreated: 6
+            refundLogsCreated: 6,
+            refunded: 7
         })
         .config(config);
 

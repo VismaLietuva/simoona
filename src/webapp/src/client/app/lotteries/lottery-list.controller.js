@@ -76,7 +76,7 @@
         }
 
         function showRefundPage(lottery) {
-            return lottery.refundFailed || lottery.status === lotteryStatuses.aborted;
+            return lottery.refundFailed;
         }
     }
 
