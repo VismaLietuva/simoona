@@ -6,6 +6,7 @@ using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.Domain.Services.Kudos;
+using Shrooms.DomainExceptions.Exceptions.Lotteries;
 using Shrooms.EntityModels.Models.Lotteries;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Infrastructure.Logger;
@@ -40,6 +41,11 @@ namespace Shrooms.Domain.Services.Lotteries
         public void RefundLottery(int lotteryId, UserAndOrganizationDTO userOrg)
         {
             var lottery = _lotteriesDbSet.Find(lotteryId);
+            if (lottery is null ||
+                lottery.OrganizationId != userOrg.OrganizationId)
+            {
+                return;
+            }
 
             try
             {
