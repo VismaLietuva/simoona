@@ -14,12 +14,12 @@
         })
         .controller('lotteryManageController', lotteryManageController);
 
-    lotteryManageController.$inject = ['$scope', '$state', 'lotteryRepository', '$rootScope',
+    lotteryManageController.$inject = ['$state', 'lotteryRepository', '$rootScope',
     'notifySrv', '$q', 'localeSrv', 'errorHandler', 'lotteryStatus', 'lottery', 'pictureRepository', 'dataHandler', 'lotteryImageSettings', '$timeout'
     ];
 
     function lotteryManageController(
-        $scope, $state, lotteryRepository, $rootScope, notifySrv, $q, localeSrv, errorHandler,
+        $state, lotteryRepository, $rootScope, notifySrv, $q, localeSrv, errorHandler,
         lotteryStatus, lottery, pictureRepository, dataHandler, lotteryImageSettings, $timeout) {
         
         var vm = this;
