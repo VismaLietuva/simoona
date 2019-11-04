@@ -15,11 +15,12 @@
         'impersonate',
         'Analytics',
         'leftMenuService',
-        'notificationFactory'
+        'notificationFactory',
+        '$window'
     ];
 
     function navigationBarController($state, $uibModal, authService, wallService,
-        appConfig, menuNavigationFactory, impersonate, Analytics, leftMenuService, notificationFactory) {
+        appConfig, menuNavigationFactory, impersonate, Analytics, leftMenuService, notificationFactory, $window) {
         /* jshint validthis: true */
         var vm = this;
         vm.topMenuItemsList = menuNavigationFactory.getTopMenuItems();
@@ -39,6 +40,7 @@
         vm.isSearchVisible = false;
         vm.isPopupOpen = false;
         vm.closeNotificationsPopup = closeNotificationsPopup;
+        vm.lotteriesEnabled = $window.lotteriesEnabled;
 
         vm.notifications = notificationFactory.notification;
 

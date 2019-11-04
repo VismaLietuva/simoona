@@ -231,10 +231,10 @@
 
         function saveEvent(method, isImageChanged) {
             if (isImageChanged) {
-                var eventImageBlob = dataHandler.dataURItoBlob(vm.eventCroppedImage, vm.eventImage.type);
+                var eventImageBlob = dataHandler.dataURItoBlob(vm.eventCroppedImage[0], vm.eventImage[0].type);
 
                 eventImageBlob.lastModifiedDate = new Date();
-                eventImageBlob.name = vm.eventImage.name;
+                eventImageBlob.name = vm.eventImage[0].name;
                 var eventImage = eventImageBlob;
 
                 pictureRepository.upload([eventImageBlob]).then(function(result) {

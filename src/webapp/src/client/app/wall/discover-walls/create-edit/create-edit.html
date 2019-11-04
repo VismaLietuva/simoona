@@ -90,13 +90,13 @@
                         	   class="control-label col-xs-4"
                         	   translate="wall.wallLogo"></label>
                         <div class="col-xs-7 col-md-6 col-lg-5">
-                            <ace-photo-crop-upload image="vm.wallLogo"
+                            <ace-photo-crop-upload images="vm.wallLogo"
                             					   is-crop-visible="vm.states.isCreate || !!vm.wallLogo"
                             					   aspect-ratio="1.5"
                             					   result-image="vm.wallCroppedLogo"
                             					   image-size="vm.wallLogoSize">
                             </ace-photo-crop-upload>
-                            <img ng-if="vm.states.isEdit && !vm.wallCroppedLogo && !vm.wallLogo" src="{{vm.wall.logo | imageThumb:vm.wallLogoSize:'crop'}}" />
+                            <img ng-if="vm.states.isEdit && !vm.wallCroppedLogo && vm.wallLogo.length < 1" src="{{vm.wall.logo | imageThumb:vm.wallLogoSize:'crop'}}" />
                         </div>
                     </div>
 
