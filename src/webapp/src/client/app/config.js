@@ -46,7 +46,6 @@
     window.isPremium = false; // Enable/disable premium modules
     window.lotteriesEnabled = false;
     window.usingAnimatedGifs = false; // Used to determine if back-end uses AnimatedGifs plugin
-    window.kudosSendImproved = false;
     window.usePostWatching = true; // Used to show/hide post watching feature
 
     angular.module('simoonaApp', window.modules)
@@ -96,12 +95,6 @@
             'active': window.usingAnimatedGifs,
             'name': 'AnimatedGifs',
             'description': 'Used to set if back-end uses AnimatedGifs plugin'
-        },
-        {
-            'key': 'kudosSendImproved',
-            'active': window.kudosSendImproved,
-            'name': 'Improved Kudos Send',
-            'description': 'Adds more clear functionality to send your own Kudos to other'
         },
         {
             'key': 'usePostWatching',
