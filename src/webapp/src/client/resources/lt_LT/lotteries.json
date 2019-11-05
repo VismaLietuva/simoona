@@ -25,5 +25,9 @@
     "ticketsSold": "Parduota bilietų: ",
     "kudosSpent": "Išleista 'Kudos': ",
     "userNameSurname": "Vardas, Pavardė",
-    "ticketsBougth": "Nupirko bilietų"
+    "ticketsBougth": "Nupirko bilietų",
+    "drafted": "Parengta",
+    "started": "Pradėta",
+    "aborted": "Atšaukta",
+    "ended": "Pasibaigusi"
 }

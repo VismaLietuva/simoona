@@ -12,6 +12,10 @@
             'chart.js',
             'simoonaApp.Common'
         ])
+        .constant('modalTypes', {
+            submit: 1,
+            send: 2
+        })
         .config(route)
         .run(init);
 

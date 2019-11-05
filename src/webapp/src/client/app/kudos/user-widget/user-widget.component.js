@@ -16,15 +16,16 @@
 
     kudosUserWidgetController.$inject = [
         '$state',
-        'authService'
+        'authService',
+        'modalTypes'
     ];
 
-    function kudosUserWidgetController($state, authService) {
+    function kudosUserWidgetController($state, authService, modalTypes) {
         /*jshint validthis: true */
         var vm = this;
 
         vm.userId = $state.params.userId || authService.identity.userId;
-
+        vm.modalTypes = modalTypes;
         init();
 
         ////////

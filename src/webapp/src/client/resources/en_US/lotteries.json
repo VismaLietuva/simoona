@@ -25,5 +25,9 @@
     "ticketsSold": "Tickets sold: ",
     "kudosSpent": "Kudos spent: ",
     "userNameSurname": "Name, Surname",
-    "ticketsBougth": "Tickets bought"
+    "ticketsBougth": "Tickets bought",
+    "drafted": "Drafted",
+    "started": "Started",
+    "aborted": "Aborted",
+    "ended": "Ended"
 }
