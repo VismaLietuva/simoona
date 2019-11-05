@@ -24,7 +24,7 @@
                                        ng-model="vm.lottery.title" 
                                        ng-maxlength="30" 
                                        required
-                                       ng-disabled="vm.states.isEdit && vm.isStarted"/>
+                                       ng-disabled="(vm.states.isEdit && vm.isStarted) || vm.isEnded"/>
                                 <p class="text-danger help-block" 
                                    ng-if="lotteryForm.title.$error.required && lotteryForm.title.$dirty" 
                                    translate="common.messageFieldIsRequired"></p>
@@ -54,7 +54,7 @@
                                        translate
                                        translate-attr-placeholder="common.onlyWholeNumbers"
                                        required
-                                       ng-disabled="vm.states.isEdit && vm.isStarted"/>
+                                       ng-disabled="(vm.states.isEdit && vm.isStarted) || vm.isEnded"/>
 
                                 <p class="text-danger help-block" 
                                    ng-show="lotteryForm.entryFee.$invalid && lotteryForm.entryFee.$dirty || lotteryForm.entryFee.$error.pattern">
@@ -83,7 +83,7 @@
                                            is-open="vm.datePicker.isOpen" 
                                            ng-required="true" 
                                            ng-click="vm.openDatePicker($event, 'isOpen')"
-                                           ng-disabled="vm.states.isEdit && vm.isStarted"/>
+                                           ng-disabled="(vm.states.isEdit && vm.isStarted) || vm.isEnded"/>
                                 </div>
                                 <p class="text-danger help-block" ng-if="lotteryForm.endDateInput.$invalid && lotteryForm.endDateInput.$dirty" translate="common.messageFieldIsRequired"></p>
                             </div>
@@ -98,7 +98,7 @@
                                     hour-step="1" minute-step="1"
                                     show-meridian="false"
                                     data-test-id="end-time-input"
-                                    ng-disabled="vm.states.isEdit && vm.isStarted">
+                                    ng-disabled="(vm.states.isEdit && vm.isStarted) || vm.isEnded">
                                 </div>
                                  <p class="text-danger help-block" ng-if="lotteryForm.endDateInput.$invalid && lotteryForm.endDateInput.$dirty" translate="common.messageFieldIsRequired"></p>
                             </div>
@@ -108,7 +108,7 @@
                         <div class="form-group required" ng-class="{'has-error': lotteryForm.image-file-input.$invalid}">
                             <label for="image-file-input" class="control-label col-xs-12 col-sm-4" translate="lotteries.photos"></label>
                             <div class="col-xs-12 col-sm-6 col-md-4">
-                                <ace-photo-crop-upload ng-if="!vm.isStarted" multiple="true" images="vm.lotteryImages" is-crop-visible="vm.isCreate || !!vm.lotteryImage" aspect-ratio="1.7" result-image="vm.lotteryCroppedImages" image-size="vm.lotteryImageSize">
+                                <ace-photo-crop-upload ng-if="!vm.isStarted && !vm.isEnded" multiple="true" images="vm.lotteryImages" is-crop-visible="vm.isCreate || !!vm.lotteryImage" aspect-ratio="1.7" result-image="vm.lotteryCroppedImages" image-size="vm.lotteryImageSize">
                                 </ace-photo-crop-upload>
                                 <br/>
                                 <div ng-if="vm.states.isEdit && !vm.lotteryCroppedImage && !vm.lotteryImage" ng-repeat="lotteryImage in vm.lottery.images">
@@ -149,28 +149,28 @@
                             <button class="btn btn-primary" 
                                     ng-if="vm.states.isCreate" 
                                     ng-click="vm.startLottery()" 
-                                    ng-disabled="lotteryForm.$invalid || !(vm.lotteryCroppedImages.length > 0 || vm.lottery.images.length > 0)">
+                                    ng-disabled="lotteryForm.$invalid || !(!!vm.lotteryCroppedImages.length || !!vm.lottery.images.length)">
                                 <span translate="lotteries.start"></span>
                             </button>
 
                             <button class="btn btn-primary" 
                                     ng-if="vm.isDrafted" 
                                     ng-click="vm.updateLottery(true)" 
-                                    ng-disabled="lotteryForm.$invalid || !(vm.lotteryCroppedImages.length > 0 || vm.lottery.images.length > 0)">
+                                    ng-disabled="lotteryForm.$invalid || !(!!vm.lotteryCroppedImages.length || !!vm.lottery.images.length)">
                                 <span translate="lotteries.start"></span>
                             </button>
 
                             <button class="btn btn-primary" 
                                     ng-if="vm.states.isCreate" 
                                     ng-click="vm.createLottery()" 
-                                    ng-disabled="lotteryForm.$invalid || vm.lotteryCroppedImages.length < 1">
+                                    ng-disabled="lotteryForm.$invalid || !vm.lotteryCroppedImages.length">
                                 <span translate="lotteries.save"></span>
                             </button>
 
                             <button class="btn btn-primary" 
                                     ng-if="vm.isDrafted || vm.isStarted" 
                                     ng-click="vm.updateLottery()" 
-                                    ng-disabled="lotteryForm.$invalid || !(vm.lotteryCroppedImages.length > 0 || vm.lottery.images.length > 0)">
+                                    ng-disabled="lotteryForm.$invalid || !(!!vm.lotteryCroppedImages.length || !!vm.lottery.images.length)">
                                 <span translate="lotteries.update"></span>
                             </button>
 
@@ -190,7 +190,7 @@
                         <div class="pull-left">
                             
                             <div class="pull-left">
-                                <button ng-if="vm.states.isEdit"
+                                <button ng-if="vm.isStarted"
                                         class="btn btn-danger"
                                         ace-confirmation-modal="vm.revokeLottery(vm.lottery.id)">
                                     <span translate="lotteries.revoke"></span>

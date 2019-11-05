@@ -18,10 +18,11 @@
             'authService',
             'lotteryRepository',
             'lotteryStatus',
-            'localeSrv'
+            'localeSrv',
+            '$window'
         ];
 
-        function lotteriesWallWidget(authService, lotteryRepository, lotteryStatus, localeSrv){
+        function lotteriesWallWidget(authService, lotteryRepository, lotteryStatus, localeSrv, $window){
             var directive = {
                 restrict: 'E',
                 templateUrl: 'app/lotteries/lotteries-widget/lotteries-widget.html',
@@ -30,6 +31,10 @@
             return directive;
 
             function linkFunc(scope) {
+                if(!$window.lotteriesEnabled)
+                {
+                    return;
+                }
                 scope.lotteryStatus = lotteryStatus;
                 scope.latestLotteries = [];
                 scope.getRemainingTime = getRemainingTime;

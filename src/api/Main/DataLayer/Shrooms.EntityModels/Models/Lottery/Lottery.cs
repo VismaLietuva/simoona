@@ -4,7 +4,7 @@ using Shrooms.Constants.EntityValidationValues;
 
 namespace Shrooms.EntityModels.Models.Lotteries
 {
-    public class Lottery : ImageBaseModel
+    public class Lottery : BaseModelWithOrg
     {
         public string Title { get; set; }
 
@@ -17,6 +17,6 @@ namespace Shrooms.EntityModels.Models.Lotteries
 
         public int EntryFee { get; set; }
 
-
+        public virtual ImagesCollection Images { get; set; }
     }
 }

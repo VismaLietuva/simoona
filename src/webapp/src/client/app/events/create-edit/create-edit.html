@@ -190,9 +190,9 @@
                     <div class="form-group required" ng-class="{'has-error': eventForm.image-file-input.$invalid && eventForm.image-file-input.$dirty}">
                         <label for="image-file-input" class="control-label col-xs-12 col-sm-4" translate="events.eventPhoto"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
-                            <ace-photo-crop-upload image="vm.eventImage" is-crop-visible="vm.states.isAdd || !!vm.eventImage" aspect-ratio="1.7" result-image="vm.eventCroppedImage" image-size="vm.eventImageSize">
+                            <ace-photo-crop-upload images="vm.eventImage" is-crop-visible="vm.states.isAdd" aspect-ratio="1.7" result-image="vm.eventCroppedImage" image-size="vm.eventImageSize">
                             </ace-photo-crop-upload>
-                            <img ng-if="vm.states.isEdit && !vm.eventCroppedImage && !vm.eventImage" src="{{vm.event.imageName | imageThumb:vm.eventImageSize:'crop'}}" />
+                            <img ng-if="vm.states.isEdit && !vm.eventCroppedImage && !!vm.eventImage" src="{{vm.event.imageName | imageThumb:vm.eventImageSize:'crop'}}" />
                         </div>
                     </div>
                     <!--event isOptions -->

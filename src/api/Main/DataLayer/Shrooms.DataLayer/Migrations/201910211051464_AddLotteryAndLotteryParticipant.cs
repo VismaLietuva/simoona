@@ -35,7 +35,7 @@ namespace Shrooms.DataLayer.Migrations
                         Id = c.Int(nullable: false, identity: true),
                         LotteryId = c.Int(nullable: false),
                         UserId = c.String(maxLength: 128),
-                        Entered = c.DateTime(nullable: false),
+                        Joined = c.DateTime(nullable: false),
                         Created = c.DateTime(nullable: false),
                         CreatedBy = c.String(),
                         Modified = c.DateTime(nullable: false),

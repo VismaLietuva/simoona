@@ -89,7 +89,6 @@
     <Compile Include="Models\ILikeable.cs" />
     <Compile Include="Models\JobPosition.cs" />
     <Compile Include="Models\Kudos\KudosShopItem.cs" />
-    <Compile Include="Models\Lottery\ImageBaseModel.cs" />
     <Compile Include="Models\Lottery\ImagesCollection.cs" />
     <Compile Include="Models\Lottery\Lottery.cs" />
     <Compile Include="Models\Lottery\LotteryParticipant.cs" />

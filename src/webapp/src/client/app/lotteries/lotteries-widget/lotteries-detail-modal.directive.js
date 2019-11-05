@@ -46,10 +46,11 @@
         'lotteryImageSettings',
         'notifySrv',
         'localeSrv',
-        'errorHandler'
+        'errorHandler',
+        '$window'
     ];
 
-    function lotteriesDetailController($uibModalInstance, lotteryRepository, currentLottery, lotteryImageSettings, notifySrv, localeSrv, errorHandler) {
+    function lotteriesDetailController($uibModalInstance, lotteryRepository, currentLottery, lotteryImageSettings, notifySrv, localeSrv, errorHandler, $window) {
         var vm = this;
         vm.lotteryImageSize = {
             w: lotteryImageSettings.width,
@@ -65,8 +66,13 @@
         vm.ticketUp = ticketUp;
         vm.ticketDown = ticketDown;
         vm.buyTickets = buyTickets;
-
-        init();
+        if($window.lotteriesEnabled)
+        {
+            init();
+        }
+        
+ 
+       
         
         function init() {
 
