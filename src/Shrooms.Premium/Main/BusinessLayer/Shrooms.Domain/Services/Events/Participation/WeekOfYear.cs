@@ -1,0 +1,13 @@
+﻿using System;
+using System.Globalization;
+
+namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Participation
+{
+    public static class WeekOfYear
+    {
+        public static int GetNumber(DateTime time)
+        {
+            return CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(time, CalendarWeekRule.FirstFullWeek, DayOfWeek.Monday);
+        }
+    }
+}

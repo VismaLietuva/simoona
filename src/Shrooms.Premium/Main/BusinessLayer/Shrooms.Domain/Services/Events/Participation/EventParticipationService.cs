@@ -16,8 +16,10 @@ using Shrooms.Infrastructure.FireAndForget;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Participation;
 using ISystemClock = Shrooms.Infrastructure.SystemClock.ISystemClock;
 
 namespace Shrooms.Domain.Services.Events.Participation
@@ -135,7 +137,7 @@ namespace Shrooms.Domain.Services.Events.Participation
                     var alreadyParticipates = @event.Participants.Any(p => p == userId);
                     _eventValidationService.CheckIfUserAlreadyJoinedSameEvent(alreadyParticipates);
 
-                    ValidateSingleJoin(@event.EventTypeId, @event.IsSingleJoin, joinDto.OrganizationId, userId);
+                    ValidateSingleJoin(@event, joinDto.OrganizationId, userId);
                     AddParticipant(userId, @event.Id, eventOptions);
 
                     JoinLeaveEventWall(@event.ResponsibleUserId, userId, @event.WallId, joinDto);
@@ -344,18 +346,21 @@ namespace Shrooms.Domain.Services.Events.Participation
             };
         }
 
-        private void ValidateSingleJoin(int eventTypeId, bool isSingleJoin, int organizationId, string userId)
+        private void ValidateSingleJoin(EventJoinValidationDTO @event, int organizationId, string userId)
         {
-            if (isSingleJoin)
+            if (@event.IsSingleJoin)
             {
-                var eventToLeave = _eventsDbSet
+                var events = _eventsDbSet
                     .Include(e => e.EventParticipants)
                     .Where(x =>
-                        x.EventTypeId == eventTypeId &&
+                        x.EventTypeId == @event.EventTypeId &&
                         x.OrganizationId == organizationId &&
                         x.StartDate > _systemClock.UtcNow &&
                         x.EventParticipants.Any(p => p.ApplicationUserId == userId))
-                    .SingleOrDefault();
+                    .ToList();
+
+                var eventWeekNumber = WeekOfYear.GetNumber(@event.StartDate);
+                var eventToLeave = events.FirstOrDefault(x => WeekOfYear.GetNumber(x.StartDate) == eventWeekNumber);
 
                 _eventValidationService.CheckIfUserExistsInOtherSingleJoinEvent(eventToLeave);
             }
