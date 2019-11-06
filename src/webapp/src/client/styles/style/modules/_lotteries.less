@@ -90,7 +90,7 @@
 .lottery-activity-ticket-image{ 
     background: #4D8400;
     width: 80px;
-    padding: 4%;
+    padding: 13px;
     background-repeat: no-repeat;
     background-image: url(../images/new-vismaicons/tickets_white.svg); 
     background-size: cover;
@@ -122,6 +122,18 @@
     max-width: 100%;
     padding: 8px;
     margin-left: -1px;
+  }
+.lottery-stats-button {
+    float: right;
+}
+
+.lotteries-modal-body {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+}
+.lottery-image {
     position: relative;
     border-radius: 0;
   }
@@ -212,11 +224,26 @@
         cursor: pointer;
         background-color: whitesmoke;
         padding: 3% 3%;
+        transform: translate(-50%, -50%);
+        z-index: 1;
         position: absolute;
         left: 92%;
         top: 85%;
-        transform: translate(-50%, -50%);
-        z-index: 1;
+        float: left;
+    }
+}
+
+.lotteries-modal-body-sales {
+    width: 100%;
+}
+
+.lotteries-modal-list {
+    list-style-type: none;
+    width: 100%;
+    padding-inline-start: 0px;
+    padding-bottom: 5%;
+    > li {
+        border-bottom: 1px solid rgb(221,221,221);
     }
 }
 .vertical-center {
@@ -242,4 +269,15 @@
 .lottery-detail-modal-counter{
   padding-left: 20%;
   margin-bottom: 5px;
+}
+
+.lotteries-modal-table {
+    text-align: center;
+    th, td > {
+        text-align: center;
+    }
+    width: 90%;
+    margin-top: 5%;
+    margin-right: 5%;
+    margin-left: 5%;
 }

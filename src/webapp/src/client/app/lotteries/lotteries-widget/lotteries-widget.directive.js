@@ -89,16 +89,16 @@
                 else if(hours < 1.5) {
                     unitOfTime = "hour";
                 }   
-                else if(hours < 60) {
+                else if(hours < 24) {
                     timeRemaining = Math.round(hours);
                     unitOfTime = "hours";
                 }
-                else if(hours < 42) {
+                else if(hours < 48) {
                     unitOfTime = "tomorrow";
                 }  
                 else if(days < 30) {
                     timeRemaining = Math.round(days);
-                    unitOfTime = "months";
+                    unitOfTime = "days";
                 }  
                 else if(days < 45) {
                     unitOfTime = "month";
@@ -114,9 +114,9 @@
                     timeRemaining = Math.round(years);
                     unitOfTime = "years";
                 } 
-
+                
                 if(timeRemaining) {
-                    return `${timeRemaining} ${localeSrv.translate('lotteries.' + unitOfTime)}`
+                    return `${localeSrv.translate('lotteries.preposition')} ${timeRemaining} ${localeSrv.translate('lotteries.' + unitOfTime)}`
                 }
                 else {
                     return localeSrv.translate('lotteries.' + unitOfTime);

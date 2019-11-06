@@ -6,6 +6,12 @@
                           translate="lotteries.editLottery"></span>
                     <span ng-if="vm.states.isCreate" 
                           translate="lotteries.createLottery"></span>
+                    <button
+                          ng-if="vm.isStarted"
+                          class="btn btn-primary lottery-stats-button"
+                          ace-lottery-stats-modal>
+                    <span translate="lotteries.lotteryStatsModalName"></span>
+                    </button>
                 </div>
                 <div class="panel-body">
                     <form name="lotteryForm" class="form-horizontal" autocomplete="off">
@@ -185,10 +191,9 @@
                             </button>
     
                         </div>
-    
+                        
                         <!--revoke button left -->
                         <div class="pull-left">
-                            
                             <div class="pull-left">
                                 <button ng-if="vm.isStarted"
                                         class="btn btn-danger"
