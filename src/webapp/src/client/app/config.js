@@ -43,8 +43,8 @@
     ];
 
     window.modules = modulesList;
-    window.isPremium = true; // Enable/disable premium modules
-    window.lotteriesEnabled = true;
+    window.isPremium = false; // Enable/disable premium modules
+    window.lotteriesEnabled = false;
     window.usingAnimatedGifs = false; // Used to determine if back-end uses AnimatedGifs plugin
     window.usePostWatching = true; // Used to show/hide post watching feature
 
