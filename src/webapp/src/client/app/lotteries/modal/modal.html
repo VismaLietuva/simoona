@@ -1,0 +1,39 @@
+<div class="modal-header">
+    <button type="button" class="close" ng-click="vm.closeModal()">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <h2 class="modal-title" translate="lotteries.lotteryStatsModalName"></h2>
+</div>
+<div class="lotteries-modal-body">
+    <ul class="lotteries-modal-list">
+        <li><h3><span translate="lotteries.totalParticipants"></span> <b>{{vm.lotteryData.totalParticipants}}</b></h3></li>
+        <li><h3><span translate="lotteries.ticketsSold"></span> <b>{{vm.lotteryData.ticketsSold}}</b></h3></li>
+        <li><h3><span translate="lotteries.kudosSpent"></span> <b>{{vm.lotteryData.kudosSpent}}</b></h3></li>
+    </ul>
+    <table class="table table-grey table-hover table-active lotteries-modal-table" ng-if="vm.participants.itemCount > 0">
+        <thead>
+            <tr>
+                <th class="col-xs-5">
+                    <span>{{"lotteries.userNameSurname" | translate}}</span>
+                </th>
+                <th class="col-xs-3" >
+                    {{"lotteries.ticketsBougth" | translate}}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+                <tr ng-repeat="lotteryParticipant in vm.participants.pagedList">
+                <td>
+                    <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: lotteryParticipant.userId })">{{lotteryParticipant.fullName}}</a>
+                </td>
+                <td>
+                    {{lotteryParticipant.tickets}}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <ace-item-list-pagination total-item-count="vm.participants.itemCount" page-size="vm.participants.pageSize" current-page="vm.filters" on-changed="vm.onPageChange">
+    </ace-item-list-pagination>
+</div>
+<div class="modal-footer">
+</div>
