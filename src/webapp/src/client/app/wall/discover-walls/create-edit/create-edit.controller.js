@@ -81,10 +81,10 @@
 
         function saveWall(method, isImageChanged) {
             if (isImageChanged) {
-                var wallImageBlob = dataHandler.dataURItoBlob(vm.wallCroppedLogo, vm.wallLogo.type);
+                var wallImageBlob = dataHandler.dataURItoBlob(vm.wallCroppedLogo[0], vm.wallLogo[0].type);
 
                 wallImageBlob.lastModifiedDate = new Date();
-                wallImageBlob.name = vm.wallLogo.name;
+                wallImageBlob.name = vm.wallLogo[0].name;
                 var wallLogo = wallImageBlob;
 
                 pictureRepository.upload([wallImageBlob]).then(function(result) {

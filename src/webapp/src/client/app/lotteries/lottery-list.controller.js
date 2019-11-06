@@ -11,7 +11,6 @@
 
     lotteryListController.$inject = [
         '$rootScope',
-        '$scope',
         'authService',
         '$location',
         'lotteryRepository',
@@ -20,7 +19,7 @@
         'editableLotteries'
     ];    
 
-    function lotteryListController($rootScope, $scope, authService, $location, lotteryRepository, lotteryStatuses, lotteryPageSettings, editableLotteries) {
+    function lotteryListController($rootScope, authService, $location, lotteryRepository, lotteryStatuses, lotteryPageSettings, editableLotteries) {
     	/* jshint validthis: true */
         var vm = this;
         vm.lotteryStatuses = lotteryStatuses;

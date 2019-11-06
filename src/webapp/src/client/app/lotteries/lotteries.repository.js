@@ -7,11 +7,10 @@
 
     lotteryRepository.$inject = [
         '$resource',
-        '$http',
         'endPoint'
     ];
 
-    function lotteryRepository($resource, $http, endPoint) {
+    function lotteryRepository($resource, endPoint) {
         var url = endPoint + '/Lottery/';
         var lotteryWidgetUrl = endPoint + '/LotteryWidget/';
 
@@ -29,11 +28,11 @@
             getLotteryWidgetInfo: getLotteryWidgetInfo,
             buyTickets: buyTickets,
             getLotteryStatistics: getLotteryStatistics,
-            exportParticipants: exportParticipants
+            exportParticipants: exportParticipants,
+            getLotteryParticipants: getLotteryParticipants
         };
         return service;
 
-        /////
 
         function getAllLotteries() {
             return $resource(url + 'All').query().$promise;
@@ -100,7 +99,10 @@
                 }
             }).patch().$promise;
         }
+<<<<<<< HEAD
 
+=======
+>>>>>>> master
         function getLotteryWidgetInfo(){
             return $resource(lotteryWidgetUrl + 'Get')
                 .query().$promise;
@@ -113,11 +115,22 @@
         function getLotteryStatistics(id) {
             return $resource(url + `${id}/Stats`).get().$promise;
         }
+<<<<<<< HEAD
         
         function exportParticipants(lotteryId) {
             return $http.get(url + 'Export?lotteryId=' + lotteryId, {
                 responseType: 'arraybuffer'
             });
+=======
+
+        function getLotteryParticipants(filters) {
+            return $resource(url + `Participants/Paged`, '', {
+                'query': {
+                    method: 'GET',
+                    isArray: false
+                }
+            }).query(filters).$promise;
+>>>>>>> master
         }
     }
 })();

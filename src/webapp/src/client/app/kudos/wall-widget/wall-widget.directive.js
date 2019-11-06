@@ -23,7 +23,7 @@
             scope: {
                 lastApprovedKudos: '=?'
             },
-            controller: function(modalTypes){
+            controller: function(){
                 var vm = this;
                 vm.modalTypes = modalTypes;
             },

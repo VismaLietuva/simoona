@@ -120,10 +120,10 @@
 
         function submitProjectForm(method, isImageChanged) {
             if (isImageChanged && vm.projectLogo && vm.projectCroppedLogo) {
-                var projectLogoBlob = dataHandler.dataURItoBlob(vm.projectCroppedLogo, vm.projectLogo.type);
+                var projectLogoBlob = dataHandler.dataURItoBlob(vm.projectCroppedLogo[0], vm.projectLogo[0].type);
 
                 projectLogoBlob.lastModifiedDate = new Date();
-                projectLogoBlob.name = vm.projectLogo.name;
+                projectLogoBlob.name = vm.projectLogo[0].name;
                 var projectLogo = projectLogoBlob;
 
                 pictureRepository.upload([projectLogoBlob]).then(function(result) {

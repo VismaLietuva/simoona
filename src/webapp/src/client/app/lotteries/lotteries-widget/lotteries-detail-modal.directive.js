@@ -46,10 +46,11 @@
         'lotteryImageSettings',
         'notifySrv',
         'localeSrv',
-        'errorHandler'
+        'errorHandler',
+        '$window'
     ];
 
-    function lotteriesDetailController($uibModalInstance, lotteryRepository, currentLottery, lotteryImageSettings, notifySrv, localeSrv, errorHandler) {
+    function lotteriesDetailController($uibModalInstance, lotteryRepository, currentLottery, lotteryImageSettings, notifySrv, localeSrv, errorHandler, $window) {
         var vm = this;
         vm.lotteryImageSize = {
             w: lotteryImageSettings.width,
@@ -65,11 +66,14 @@
         vm.ticketUp = ticketUp;
         vm.ticketDown = ticketDown;
         vm.buyTickets = buyTickets;
-
-        init();
+        if($window.lotteriesEnabled)
+        {
+            init();
+        }
         
-        //////
-
+ 
+       
+        
         function init() {
 
             lotteryRepository.getLottery(currentLottery)
@@ -91,12 +95,12 @@
         function buyTickets(){
             if(vm.ticketCount > 0)
             {
-                var lotteryTickets = {};
-                lotteryTickets.lotteryId = currentLottery;
-                lotteryTickets.tickets = vm.ticketCount;
+                var lotteryTickets = {lotteryId: currentLottery, tickets: vm.ticketCount};
+
                 lotteryRepository.buyTickets(lotteryTickets)
                 .then(function(){
                     vm.notifySrv.success(vm.localeSrv.formatTranslation('lotteries.hasBeenBought', { one: vm.ticketCount, two: vm.lottery.title }));
+                    $uibModalInstance.close();
                 }, function (error) {
                     errorHandler.handleErrorMessage(error);
                 });
@@ -105,7 +109,6 @@
             {
                 vm.notifySrv.error(vm.localeSrv.formatTranslation('lotteries.invalidTicketNumber'));
             }
-            
         }
     }
 })();

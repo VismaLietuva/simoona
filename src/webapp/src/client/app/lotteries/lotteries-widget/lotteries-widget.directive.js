@@ -18,26 +18,29 @@
             'authService',
             'lotteryRepository',
             'lotteryStatus',
-            'localeSrv'
+            'localeSrv',
+            '$window'
         ];
 
-        function lotteriesWallWidget(authService, lotteryRepository, lotteryStatus, localeSrv){
+        function lotteriesWallWidget(authService, lotteryRepository, lotteryStatus, localeSrv, $window){
             var directive = {
                 restrict: 'E',
-                templateUrl: 'app/lotteries/lotteries-widget/lottery-widget.html',
+                templateUrl: 'app/lotteries/lotteries-widget/lotteries-widget.html',
                 link: linkFunc
             };
             return directive;
 
             function linkFunc(scope) {
+                if(!$window.lotteriesEnabled)
+                {
+                    return;
+                }
                 scope.lotteryStatus = lotteryStatus;
                 scope.latestLotteries = [];
                 scope.getRemainingTime = getRemainingTime;
                 scope.hasLotteryPermisions = authService.hasPermissions(['LOTTERY_BASIC']);
 
                 getLotteryWidgetInfo();
-
-                ////////
 
                 function getLotteryWidgetInfo(){
                     lotteryRepository.getLotteryWidgetInfo().then(function(result) {
@@ -86,11 +89,11 @@
                 else if(hours < 1.5) {
                     unitOfTime = "hour";
                 }   
-                else if(hours < 60) {
+                else if(hours < 24) {
                     timeRemaining = Math.round(hours);
                     unitOfTime = "hours";
                 }
-                else if(hours < 42) {
+                else if(hours < 48) {
                     unitOfTime = "tomorrow";
                 }  
                 else if(days < 30) {
@@ -111,9 +114,9 @@
                     timeRemaining = Math.round(years);
                     unitOfTime = "years";
                 } 
-
+                
                 if(timeRemaining) {
-                    return `${timeRemaining} ${localeSrv.translate('lotteries.' + unitOfTime)}`
+                    return `${localeSrv.translate('lotteries.preposition')} ${timeRemaining} ${localeSrv.translate('lotteries.' + unitOfTime)}`
                 }
                 else {
                     return localeSrv.translate('lotteries.' + unitOfTime);

@@ -1,7 +1,7 @@
 <div class="row">
         <div class="col-xs-12">
             <h3><span>{{"lotteries.entityNamePlural" | translate}}</span></h3>
-            <ace-item-list-filter filter-value="vm.filters.ssearchString" on-filtering="vm.onSearch"></ace-item-list-filter>
+            <ace-item-list-filter filter-value="vm.filters.searchString" on-filtering="vm.onSearch"></ace-item-list-filter>
             <div class="btn-group pull-right" ng-if="vm.allowEdit">
                 <a ui-sref="Root.WithOrg.Admin.Lotteries.Create" class="btn btn-primary" title="{{'common.createNew' | translate}}"><span class="glyphicon glyphicon-plus"></span> <span>{{"common.createNew" | translate}}</span></a>
             </div>
@@ -34,7 +34,7 @@
                             {{lottery.endDate | convertToCurrentTimezone | date:'yyyy-MM-dd, HH:mm'}}
                         </td>  
                         <td ng-if="vm.allowEdit " class="text-center">
-                            <a ng-if="vm.isLotteryEditable(lottery)" ui-sref="Root.WithOrg.Admin.Lotteries.Edit({ lotteryId : lottery.id})" class="btn btn-default glyphicon glyphicon-pencil" title="{{'common.edit' | translate}}"></a>
+                            <a ui-sref="Root.WithOrg.Admin.Lotteries.Edit({ lotteryId : lottery.id})" class="btn btn-default glyphicon glyphicon-pencil" title="{{'common.edit' | translate}}"></a>
                             <a ng-if="vm.showRefundPage(lottery)" ui-sref="Root.WithOrg.Admin.Lotteries.Refund({ lotteryId : lottery.id})" class="btn btn-default glyphicon glyphicon-eye-open"></a>
                         </td>
                     </tr>

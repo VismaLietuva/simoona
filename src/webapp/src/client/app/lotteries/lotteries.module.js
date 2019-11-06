@@ -19,9 +19,12 @@
         })
         .config(config);
 
-    config.$inject = ['$stateProvider'];
+    config.$inject = ['$stateProvider', '$windowProvider'];
 
-    function config($stateProvider) {
+    function config($stateProvider, $windowProvider) {
+        if (!$windowProvider.$get().lotteriesEnabled) {
+            return;
+        }
         $stateProvider
             .state('Root.WithOrg.Admin.Lotteries', {
                 abstract: true,

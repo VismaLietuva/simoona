@@ -23,8 +23,16 @@
     height: 80px;
 }
 .lottery-detail-modal-carousel{
-  width:300px;
+  width:291px;
   margin:auto;
+  >ol{
+    >li{
+      margin-left:10px !important;
+    }
+    .others{
+      margin-left:13px !important;
+    }
+  }
 }
 .lottery-detail-modal-form{
   .carousel-indicators{
@@ -85,7 +93,7 @@
 .lottery-activity-ticket-image{ 
     background: #4D8400;
     width: 80px;
-    padding: 4%;
+    padding: 13px;
     background-repeat: no-repeat;
     background-image: url(../images/new-vismaicons/tickets_white.svg); 
     background-size: cover;
@@ -116,6 +124,18 @@
     max-width: 100%;
     padding: 8px;
     margin-left: -1px;
+  }
+.lottery-stats-button {
+    float: right;
+}
+
+.lotteries-modal-body {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+}
+.lottery-image {
     position: relative;
     border-radius: 0;
   }
@@ -215,6 +235,31 @@
   width: 103.5%;
   border-bottom: 1px solid #e5e5e5;
 
+    > span {
+        cursor: pointer;
+        background-color: whitesmoke;
+        padding: 3% 3%;
+        transform: translate(-50%, -50%);
+        z-index: 1;
+        position: absolute;
+        left: 92%;
+        top: 85%;
+        float: left;
+    }
+}
+
+.lotteries-modal-body-sales {
+    width: 100%;
+}
+
+.lotteries-modal-list {
+    list-style-type: none;
+    width: 100%;
+    padding-inline-start: 0px;
+    padding-bottom: 5%;
+    > li {
+        border-bottom: 1px solid rgb(221,221,221);
+    }
 }
 .vertical-center {
   widows: 100%;
@@ -226,12 +271,12 @@
 }
 .lottery-detail-modal-right-panel{
   padding:0px;
+  text-align: center;
   height: 165px;
   padding-right: 0px !important;
   position: relative;
   .lottery-detail-modal-total-cost{
     width: 100%;
-    text-align: center;
     position: absolute;
     bottom: 0px
   }
@@ -240,3 +285,17 @@
   padding-left: 20%;
   margin-bottom: 5px;
 }
+<<<<<<< HEAD
+=======
+
+.lotteries-modal-table {
+    text-align: center;
+    th, td > {
+        text-align: center;
+    }
+    width: 90%;
+    margin-top: 5%;
+    margin-right: 5%;
+    margin-left: 5%;
+}
+>>>>>>> master

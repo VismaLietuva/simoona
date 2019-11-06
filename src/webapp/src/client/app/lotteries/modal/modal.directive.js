@@ -42,9 +42,13 @@
         /* jshint validthis: true */
         var vm = this;
         vm.lotteryId = $rootScope.$stateParams.lotteryId;
-
+        vm.filters = {
+            id: vm.lotteryId,
+            page: 1
+        }
         vm.closeModal = closeModal;
         vm.exportParticipantsData = exportParticipantsData;
+        vm.onPageChange = onPageChange;
         init();
         ////////////
 
@@ -57,6 +61,15 @@
                         vm.lotteryData = response;
                     }
                 });
+        
+            lotteryRepository.getLotteryParticipants(vm.filters).then(function(response) {
+                if (response && response.Message) {
+                    notifySrv.error(response.Message);
+                    closeModal();
+                } else {
+                    vm.participants = response;
+                }
+            })
         }
 
         function closeModal() {
@@ -73,5 +86,15 @@
             });
         }
 
+        function onPageChange () {
+            lotteryRepository.getLotteryParticipants(vm.filters).then(function(response) {
+                if (response && response.Message) {
+                    notifySrv.error(response.Message);
+                    closeModal();
+                } else {
+                    vm.participants = response;
+                }
+            });
+        }
     }
 })();
