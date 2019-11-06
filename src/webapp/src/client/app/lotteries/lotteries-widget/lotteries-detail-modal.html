@@ -1,0 +1,97 @@
+<div class="modal-header">
+    <button type="button" class="close" ng-click="vm.cancel()">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <h3 class="modal-title">{{vm.lottery.title}}</h3>
+</div>
+<div class="modal-body">
+    <form role="form">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sm-6">
+                        <div id="lottery-pics" class="carousel slide lottery-detail-modal-carousel"
+                            data-ride="carousel">
+                            <!-- Indicators -->
+                            <ol class="carousel-indicators">
+                                <li data-target="#lottery-pics" data-slide-to="0" class="active"></li>
+                                <li ng-repeat="lottery in vm.lottery.images" class="others" ng-if="$index > 0"
+                                    data-target="#lottery-pics" data-slide-to="{{$index}}"></li>
+                            </ol>
+
+                            <!-- Content -->
+                            <div class="carousel-inner" role="listbox">
+
+                                <!-- Slide 1 -->
+                                <div class="item active">
+                                    <img src="{{vm.lottery.images[0] | imageThumb:vm.lotteryImageSize:'crop'}}">
+                                </div>
+
+                                <!-- Other slides -->
+                                <div class="item" ng-repeat="lottery in vm.lottery.images" ng-if="$index > 0">
+                                    <img src="{{lottery | imageThumb:vm.lotteryImageSize:'crop'}}">
+                                </div>
+                            </div>
+
+                            <!-- Previous/Next controls -->
+                            <a class="left carousel-control" data-target="#lottery-pics" role="button"
+                                data-slide="prev">
+                                <span class="icon-prev" aria-hidden="true"></span>
+                                <span class="sr-only"></span>
+                            </a>
+                            <a class="right carousel-control" data-target="#lottery-pics" role="button"
+                                data-slide="next">
+                                <span class="icon-next" aria-hidden="true"></span>
+                                <span class="sr-only"></span>
+                            </a>
+
+                        </div>
+                </div>
+                <div class="col-sm-6 lottery-detail-modal-right-panel">
+                    <div class="vertical-center">
+                        <div class="col-xs-10 lottery-detail-modal-counter">
+                            <div class="input-group">
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-default btn-number" ng-click="vm.ticketDown()"
+                                        data-type="minus" data-field="quant[1]">
+                                        <span class="glyphicon glyphicon-minus"></span>
+                                    </button>
+                                </span>
+                                <input type="number" name="quant[1]" class="form-control input-number"
+                                    ng-model="vm.ticketCount" min="1" max="100">
+                                <span class="input-group-btn">
+                                    <button type="button" ng-click="vm.ticketUp()" class="btn btn-default btn-number"
+                                        data-type="plus" data-field="quant[1]">
+                                        <span class="glyphicon glyphicon-plus"></span>
+                                    </button>
+                                </span>
+                            </div>                                    
+                        </div>
+                            <button type="button" ng-click="vm.buyTickets()" ng-disabled="vm.ticketCount < 1"
+                                class="btn btn-primary"><span translate="lotteries.buy"></span></button>
+                    </div>
+                    <div class="lottery-detail-modal-total-cost">
+                                <label class><span translate="lotteries.totalCost"></span>
+                                    <b>{{vm.lottery.entryFee * vm.ticketCount}}</b></label>
+                        </div>
+                </div>
+                
+            </div>
+            <div class="lotteries-detail-modal-description-seperator hidden-xs">
+            </div>
+        </div>
+            <div class="lottery-end-date-component">
+                <label><span translate="lotteries.endDate"></span>
+                    <b>{{vm.lottery.endDate | convertToCurrentTimezone | date:'yyyy-MM-dd, HH:mm'}}</b></label>
+            </div>
+            <div class="card lotteries-detail-modal-description">
+                <div class="card-body">
+                    {{vm.lottery.description}}
+                </div>
+            </div>
+</div>
+</form>
+<div class="lottery-details-modal-footer">
+    <button class="btn btn-default" ng-click="vm.cancel()" data-test-id="cancel-button-yellow">
+        <span translate="common.cancel"></span>
+    </button>
+</div>

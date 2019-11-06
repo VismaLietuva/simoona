@@ -1,4 +1,22 @@
 {
+    "totalCost": "Total cost",
+    "preposition": "in",
+    "hours": "hours",
+    "hour": "hour",
+    "minutes": "minutes",
+    "minute": "a minute",
+    "tomorrow": "tomorrow",
+    "days": "days",
+    "months": "months",
+    "month": "month",
+    "year": "year",
+    "years": "years",
+    "seconds": "seconds",
+    "fewSeconds": "a few seconds",
+    "buy": "Buy",
+    "lotteryCancel": "Cancel",
+    "endsIn": "Ends",
+    "kudosPerTicket": "kudos/ticket",
     "entityNamePlural": "Lotteries",
     "entityNameSingular": "Lottery",
     "lotteriesPanelHeader": "Lotteries",
@@ -29,5 +47,8 @@
     "drafted": "Drafted",
     "started": "Started",
     "aborted": "Aborted",
-    "ended": "Ended"
+    "ended": "Ended",
+    "hasBeenBought": "Successfully bought {{ one }} tickets for \"{{ two }}\" lottery!",
+    "invalidTicketNumber": "Invalid ticket count!"
+
 }
