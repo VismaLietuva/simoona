@@ -1,141 +1,177 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using AutoMapper;
 using NSubstitute;
+using NSubstitute.ReturnsExtensions;
 using NUnit.Framework;
 using Shrooms.DataLayer.DAL;
+using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Lotteries;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.Lotteries;
 using Shrooms.Domain.Services.UserService;
-using Shrooms.EntityModels.Models.Lotteries;
-using Shrooms.UnitTests.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Data.Entity;
 using Shrooms.DomainExceptions.Exceptions.Lotteries;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Shrooms.Premium.UnitTests.ModelMappings;
-using Shrooms.DataTransferObjects.Models;
+using Shrooms.EntityModels.Models.Lotteries;
 using Shrooms.Infrastructure.FireAndForget;
+using static Shrooms.Constants.BusinessLayer.ConstBusinessLayer;
 
 namespace Shrooms.Premium.UnitTests.DomainService.LotteryServices
 {
     [TestFixture]
     public class LotteryServiceTests
     {
-        private ILotteryService _lotteryService;
-
-
+        private ILotteryService _sut;
         private IUnitOfWork2 _unitOfWork;
-        private IDbSet<Lottery> _lotteriesDbSet;
-
-        private IParticipantService _participantSercice;
-        private IUserService _userService;
-        private IKudosService _kudosService;
-
+        private IDbSet<Lottery> _lotteriesDb;
+        private IMapper _mapper;
 
         [SetUp]
-        public void TestInitializers()
+        public void SetUp()
         {
             _unitOfWork = Substitute.For<IUnitOfWork2>();
+            _lotteriesDb = Substitute.For<IDbSet<Lottery>>();
+            _unitOfWork.GetDbSet<Lottery>().Returns(_lotteriesDb);
 
-            _lotteriesDbSet = _unitOfWork.MockDbSet(GetLotteries().AsEnumerable());
+            var asyncRunner = Substitute.For<IAsyncRunner>();
+            var participantService = Substitute.For<IParticipantService>();
+            var userService = Substitute.For<IUserService>();
+            var kudosService = Substitute.For<IKudosService>();
+            _mapper = Substitute.For<IMapper>();
 
-            _unitOfWork.GetDbSet<Lottery>().Returns(_lotteriesDbSet);
-
-            _participantSercice = Substitute.For<IParticipantService>();
-            _userService = Substitute.For<IUserService>();
-            _kudosService = Substitute.For<IKudosService>();
-
-            var mapper = ModelMapper.Create();
-
-            IAsyncRunner asyncRunner = Substitute.For<IAsyncRunner>();
-
-            _lotteryService = new LotteryService(_unitOfWork, mapper, _participantSercice, _userService, _kudosService, asyncRunner);
+            _sut = new LotteryService(_unitOfWork, _mapper, participantService, userService, kudosService, asyncRunner);
         }
 
-        [TestCase]
-        public void CreateLottery_Should_Throw_Exception_When_Given_Lotter_With_Negative_Entry_Fee()
+        [TestCase(0, "Invalid entry fee.")]
+        [TestCase(1, "Lottery can't start in the past.")]
+        [TestCase(2, "Invalid status of created lottery.")]
+        [TestCase(5, "Invalid status of created lottery.")]
+        [TestCase(6, "Invalid entry fee.")]
+        public void CreateLottery_IncorrectFieldValues_ThrowsException(int index, string message)
         {
-            var lottery = GetCreateLotteryDTOList()[0];
+            var lotteryDTO = GetCreateLotteryDTOList()[index];
 
-            Assert.ThrowsAsync<LotteryException>(async () => await _lotteryService.CreateLottery(lottery));
+            var result = Assert.ThrowsAsync<LotteryException>(async () => await _sut.CreateLottery(lotteryDTO));
+
+            Assert.That(result.Message, Is.EqualTo(message));
         }
 
-        [TestCase]
-        public void CreateLottery_Should_Throw_Exception_When_Given_Lotter_With_Past_End_Date()
+        [Test]
+        public void CreateLottery_CorrectLotteryDTO_CreatesLottery()
         {
-            var lottery = GetCreateLotteryDTOList()[1];
+            var lotteryDTO = GetCreateLotteryDTOList()[3];
+            _mapper.Map<CreateLotteryDTO, Lottery>(lotteryDTO).Returns(GetLottery());
 
-            Assert.ThrowsAsync<LotteryException>(async () => await _lotteryService.CreateLottery(lottery));
+            _sut.CreateLottery(lotteryDTO);
+
+            _lotteriesDb.ReceivedWithAnyArgs().Add(default);
+            _unitOfWork.Received().SaveChangesAsync(lotteryDTO.UserId);
         }
 
-        [TestCase]
-        public void CreateLottery_Should_Throw_Exception_When_Given_Lotter_With_Status_Of_Aborted()
+        [Test]
+        public void EditDraftedLottery_IncorrectLotteryStatus_ThrowsException()
         {
-            var lottery = GetCreateLotteryDTOList()[2];
+            _lotteriesDb.Find().ReturnsForAnyArgs(GetLottery());
 
-            Assert.ThrowsAsync<LotteryException>(async () => await _lotteryService.CreateLottery(lottery));
+            var result = Assert.ThrowsAsync<LotteryException>(async () =>
+                await _sut.EditDraftedLottery(new EditDraftedLotteryDTO()));
+
+            Assert.That(result.Message, Is.EqualTo("Editing is forbidden for not drafted lottery."));
         }
 
-        private List<Lottery> GetLotteries()
+        [Test]
+        public void EditDraftedLottery_CorrectLotteryDTO_EditsLotterySuccessfully()
         {
-            return new List<Lottery>
-            {
-                new Lottery() { Id = 1, OrganizationId = 1, Status = 2, EndDate = DateTime.Now.AddDays(2),  Title = "Monitor",  EntryFee = -5 },
-                new Lottery() { Id = 2, OrganizationId = 1, Status = 2, EndDate = DateTime.Now.AddDays(-5),  Title = "Computer", EntryFee = 2 },
-                new Lottery() { Id = 3, OrganizationId = 1, Status = 3, EndDate = DateTime.Now.AddDays(4), Title = "Table", EntryFee = 2 },
-                new Lottery() { Id = 4, OrganizationId = 1, Status = 2, EndDate = DateTime.Now.AddDays(5), Title = "1000 kudos", EntryFee = 5 },
-                new Lottery() { Id = 5, OrganizationId = 1, Status = 3, EndDate = DateTime.Now.AddDays(5), Title = "100 kudos", EntryFee = 5 },
-                new Lottery() { Id = 6, OrganizationId = 1, Status = 4, EndDate = DateTime.Now.AddDays(5), Title = "10 kudos", EntryFee = 5 },
-                new Lottery() { Id = 7, OrganizationId = 1, Status = 1, EndDate = DateTime.Now.AddDays(5), Title = "10000 kudos", EntryFee = 5 },
-                new Lottery() { Id = 8, OrganizationId = 1, Status = 1, EndDate = DateTime.Now.AddDays(5), Title = "10 000 kudos", EntryFee = 5 },
-            };
+            _lotteriesDb.Find().ReturnsForAnyArgs(GetLottery(LotteryStatus.Drafted));
+
+            _sut.EditDraftedLottery(new EditDraftedLotteryDTO());
+
+            _unitOfWork.Received().SaveChangesAsync(false);
         }
 
-        private List<CreateLotteryDTO> GetCreateLotteryDTOList()
+        [Test]
+        public void EditStartedLottery_IncorrectLotteryStatus_ThrowsException()
+        {
+            _lotteriesDb.Find().ReturnsForAnyArgs(GetLottery(LotteryStatus.Refunded));
+
+            var result = Assert.ThrowsAsync<LotteryException>(async () =>
+                await _sut.EditStartedLottery(new EditStartedLotteryDTO()));
+
+            Assert.That(result.Message, Is.EqualTo("Lottery is not running."));
+        }
+
+        [Test]
+        public void EditStartedLottery_CorrectLotteryDTO_EditsLotterySuccessfully()
+        {
+            _lotteriesDb.Find().ReturnsForAnyArgs(GetLottery());
+
+            _sut.EditStartedLottery(new EditStartedLotteryDTO());
+
+            _unitOfWork.Received().SaveChangesAsync(false);
+        }
+
+        [Test]
+        public void GetLotteryDetails_NonExistentLottery_ReturnsNull()
+        {
+            _lotteriesDb.Find().ReturnsNullForAnyArgs();
+
+            var result = _sut.GetLotteryDetails(default);
+
+            Assert.IsNull(result);
+        }
+
+        [Test]
+        public void AbortLottery_NonExistentLottery_ReturnsFalse()
+        {
+            _lotteriesDb.Find().ReturnsNullForAnyArgs();
+
+            var result = _sut.AbortLottery(default, default);
+
+            Assert.AreEqual(false, result);
+        }
+
+        [Test]
+        public void AbortLottery_StartedLottery_AbortedSuccessfully()
+        {
+            _lotteriesDb.Find().ReturnsForAnyArgs(GetLottery());
+
+            _sut.AbortLottery(4, GetUserOrg());
+        }
+
+        private static IList<CreateLotteryDTO> GetCreateLotteryDTOList()
         {
             return new List<CreateLotteryDTO>
             {
-                new CreateLotteryDTO() { Id = 1, OrganizationId = 1, Status = 2, EndDate = DateTime.Now.AddDays(2),  Title = "Monitor", UserId = "5", EntryFee = -5 },
-                new CreateLotteryDTO() { Id = 2, OrganizationId = 1, Status = 2, EndDate = DateTime.Now.AddDays(-5),  Title = "Computer", UserId = "5", EntryFee = 2 },
-                new CreateLotteryDTO() { Id = 3, OrganizationId = 1, Status = 3, EndDate = DateTime.Now.AddDays(4), Title = "Table", UserId = "5", EntryFee = 2 },
-                new CreateLotteryDTO() { Id = 4, OrganizationId = 1, Status = 2, EndDate = DateTime.Now.AddDays(5), Title = "1000 kudos", UserId = "5", EntryFee = 5 },
-                new CreateLotteryDTO() { Id = 5, OrganizationId = 1, Status = 3, EndDate = DateTime.Now.AddDays(5), Title = "100 kudos", UserId = "5", EntryFee = 5 },
-                new CreateLotteryDTO() { Id = 6, OrganizationId = 1, Status = 4, EndDate = DateTime.Now.AddDays(5), Title = "10 kudos", UserId = "5", EntryFee = 5 },
+                new CreateLotteryDTO { Id = 1, OrganizationId = 1, Status = (int) LotteryStatus.Started, EndDate = DateTime.Now.AddDays(2),  Title = "Monitor", UserId = "5", EntryFee = -5 },
+                new CreateLotteryDTO { Id = 2, OrganizationId = 1, Status = (int) LotteryStatus.Started, EndDate = DateTime.Now.AddDays(-5),  Title = "Computer", UserId = "5", EntryFee = 2 },
+                new CreateLotteryDTO { Id = 3, OrganizationId = 1, Status = (int) LotteryStatus.Deleted, EndDate = DateTime.Now.AddDays(4), Title = "Table", UserId = "5", EntryFee = 2 },
+                new CreateLotteryDTO { Id = 4, OrganizationId = 1, Status = (int) LotteryStatus.Started, EndDate = DateTime.Now.AddDays(5), Title = "1000 kudos", UserId = "5", EntryFee = 5 },
+                new CreateLotteryDTO { Id = 5, OrganizationId = 1, Status = (int) LotteryStatus.Deleted, EndDate = DateTime.Now.AddDays(5), Title = "100 kudos", UserId = "5", EntryFee = 5 },
+                new CreateLotteryDTO { Id = 6, OrganizationId = 1, Status = (int) LotteryStatus.Ended, EndDate = DateTime.Now.AddDays(5), Title = "10 kudos", UserId = "5", EntryFee = 5 },
+                new CreateLotteryDTO { Id = 7, OrganizationId = 1, Status = (int) LotteryStatus.Ended, EndDate = DateTime.Now.AddDays(5), Title = "10 kudos", UserId = "5", EntryFee = -5 }
             };
         }
 
-        private List<EditDraftedLotteryDTO> GetEditDraftedLotteryDTOList()
+        private static Lottery GetLottery(LotteryStatus status = LotteryStatus.Started)
         {
-            return new List<EditDraftedLotteryDTO>
+            return  new Lottery
             {
-                new EditDraftedLotteryDTO() { Id = 1, OrganizationId = 1, Status = 1, EndDate = DateTime.Now.AddDays(2),  Title = "Monitor", UserId = "5", EntryFee = 5 },
-                new EditDraftedLotteryDTO() { Id = 2, OrganizationId = 1, Status = 1, EndDate = DateTime.Now.AddDays(-5),  Title = "Computer", UserId = "5", EntryFee = 2 },
-                new EditDraftedLotteryDTO() { Id = 3, OrganizationId = 1, Status = 1, EndDate = DateTime.Now.AddDays(4), Title = "Table", UserId = "5", EntryFee = 2 },
-                new EditDraftedLotteryDTO() { Id = 4, OrganizationId = 1, Status = 2, EndDate = DateTime.Now.AddDays(5), Title = "1000 kudos", UserId = "5", EntryFee = 5 },
-                new EditDraftedLotteryDTO() { Id = 5, OrganizationId = 1, Status = 3, EndDate = DateTime.Now.AddDays(5), Title = "100 kudos", UserId = "5", EntryFee = 5 },
-                new EditDraftedLotteryDTO() { Id = 6, OrganizationId = 1, Status = 4, EndDate = DateTime.Now.AddDays(5), Title = "10 kudos", UserId = "5", EntryFee = 5 },
-                new EditDraftedLotteryDTO() { Id = 7, OrganizationId = 1, Status = 2, EndDate = DateTime.Now.AddDays(5), Title = "10000 kudos", EntryFee = 5 },
-                new EditDraftedLotteryDTO() { Id = 8, OrganizationId = 1, Status = 2, EndDate = DateTime.Now.AddDays(5), Title = "10 000 kudos", EntryFee = 5 },
-
+                Id = 4,
+                OrganizationId = 1,
+                Status = (int)status,
+                EndDate = DateTime.Now.AddDays(5),
+                Title = "1000 kudos",
+                EntryFee = 5
             };
         }
 
-        private List<EditStartedLotteryDTO> GetEditStartedLotteryDTOList()
+        private static UserAndOrganizationDTO GetUserOrg()
         {
-            return new List<EditStartedLotteryDTO>
+            return new UserAndOrganizationDTO
             {
-                new EditStartedLotteryDTO() { Id = 3, Description = "updating", OrganizationId = 1},
-                new EditStartedLotteryDTO() { Id = 5, Description = "updating", OrganizationId = 1},
-                new EditStartedLotteryDTO() { Id = 6, Description = "updating", OrganizationId = 1},
-                new EditStartedLotteryDTO() { Id = 1, Description = "new description", OrganizationId = 1},
-                new EditStartedLotteryDTO() { Id = 2, Description = "changed", OrganizationId = 1},
-                new EditStartedLotteryDTO() { Id = 4, Description = "updated", OrganizationId = 1},
-
+                UserId = "5",
+                OrganizationId = 1
             };
-
         }
     }
 }

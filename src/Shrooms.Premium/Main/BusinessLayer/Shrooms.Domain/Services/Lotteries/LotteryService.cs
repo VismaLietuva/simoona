@@ -53,13 +53,13 @@ namespace Shrooms.Domain.Services.Lotteries
 
             if (newLotteryDTO.EntryFee < 1)
             {
-                throw new LotteryException("Invalid entry fee");
+                throw new LotteryException("Invalid entry fee.");
             }
 
             if (newLotteryDTO.Status != (int)LotteryStatus.Started &&
                 newLotteryDTO.Status != (int)LotteryStatus.Drafted)
             {
-                throw new LotteryException("Invalid status of created lottery");
+                throw new LotteryException("Invalid status of created lottery.");
             }
 
             var newLottery = MapNewLottery(newLotteryDTO);
@@ -78,7 +78,7 @@ namespace Shrooms.Domain.Services.Lotteries
 
             if (lottery.Status != (int)LotteryStatus.Drafted)
             {
-                throw new LotteryException("Editing forbidden, non drafted lottery.");
+                throw new LotteryException("Editing is forbidden for not drafted lottery.");
             }
 
             UpdateDraftedLottery(lottery, lotteryDTO);
@@ -92,7 +92,7 @@ namespace Shrooms.Domain.Services.Lotteries
 
             if (lottery.Status != (int)LotteryStatus.Started)
             {
-                throw new LotteryException("Lottery is not running");
+                throw new LotteryException("Lottery is not running.");
             }
 
             lottery.Description = lotteryDTO.Description;
