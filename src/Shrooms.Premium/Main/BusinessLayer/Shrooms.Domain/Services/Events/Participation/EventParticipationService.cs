@@ -19,7 +19,6 @@ using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Events.Participation;
 using ISystemClock = Shrooms.Infrastructure.SystemClock.ISystemClock;
 
 namespace Shrooms.Domain.Services.Events.Participation
@@ -359,8 +358,8 @@ namespace Shrooms.Domain.Services.Events.Participation
                         x.EventParticipants.Any(p => p.ApplicationUserId == userId))
                     .ToList();
 
-                var eventWeekNumber = WeekOfYear.GetNumber(@event.StartDate);
-                var eventToLeave = events.FirstOrDefault(x => WeekOfYear.GetNumber(x.StartDate) == eventWeekNumber);
+                var eventWeekNumber = GetWeekOfYear(@event.StartDate);
+                var eventToLeave = events.FirstOrDefault(x => GetWeekOfYear(x.StartDate) == eventWeekNumber);
 
                 _eventValidationService.CheckIfUserExistsInOtherSingleJoinEvent(eventToLeave);
             }
@@ -380,6 +379,11 @@ namespace Shrooms.Domain.Services.Events.Participation
                 EventOptions = eventOptions
             };
             _eventParticipantsDbSet.Add(newParticipant);
+        }
+
+        public static int GetWeekOfYear(DateTime time)
+        {
+            return CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(time, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
         }
     }
 }

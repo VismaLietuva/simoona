@@ -369,7 +369,6 @@
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Events\List\IEventListingService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Events\Participation\EventParticipationService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Events\Participation\IEventParticipationService.cs" />
-    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Events\Participation\WeekOfYear.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Events\Utilities\EventUtilitiesService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Events\Utilities\IEventUtilitiesService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\KudosShop\IKudosShopService.cs" />
