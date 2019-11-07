@@ -12,9 +12,9 @@ namespace Shrooms.Domain.Services.Lotteries
     {
         Task<CreateLotteryDTO> CreateLottery(CreateLotteryDTO newLotteryDTO);
 
-        Task EditDraftedLottery(EditDraftedLotteryDTO lotteryDTO);
+        void EditDraftedLottery(EditDraftedLotteryDTO lotteryDTO);
 
-        Task EditStartedLottery(EditStartedLotteryDTO lotteryDTO);
+        void EditStartedLottery(EditStartedLotteryDTO lotteryDTO);
 
         bool AbortLottery(int id, UserAndOrganizationDTO userOrg);
 

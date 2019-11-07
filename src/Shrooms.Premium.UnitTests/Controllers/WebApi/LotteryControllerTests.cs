@@ -2,7 +2,6 @@
 using NUnit.Framework;
 using Shrooms.DataTransferObjects.Models.Lotteries;
 using Shrooms.Domain.Services.Lotteries;
-using Shrooms.EntityModels.Models.Lotteries;
 using System;
 using System.Collections.Generic;
 using Shrooms.DomainExceptions.Exceptions.Lotteries;
@@ -13,13 +12,10 @@ using System.Net.Http;
 using System.Web.Http.Hosting;
 using System.Web.Http;
 using System.Security.Claims;
-using System.Net;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.WebViewModels.Models.Lotteries;
 using System.Web.Http.Results;
 using Shrooms.Domain.Services.Args;
-using Shrooms.Constants.WebApi;
-using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute.ExceptionExtensions;
 using PagedList;
@@ -384,7 +380,8 @@ namespace Shrooms.Premium.UnitTests.Controllers.WebApi
             _mapper.Map<EditDraftedLotteryViewModel, EditDraftedLotteryDTO>(lotteryViewModel)
                 .Returns(lotteryDto);
 
-            _lotteryService.EditDraftedLottery(lotteryDto).Throws(new LotteryException("Exception"));
+            _lotteryService.When(x => x.EditDraftedLottery(lotteryDto))
+                .Do(x => throw new LotteryException("Exception"));
 
             //
             var response = _lotteryController.UpdateDrafted(lotteryViewModel);
@@ -437,7 +434,9 @@ namespace Shrooms.Premium.UnitTests.Controllers.WebApi
             };
             _mapper.Map<EditStartedLotteryViewModel, EditStartedLotteryDTO>(lotteryViewModel)
                 .Returns(lotteryDto);
-            _lotteryService.EditStartedLottery(lotteryDto).Throws(new LotteryException("Exception"));
+            _lotteryService.When(x => x.EditStartedLottery(lotteryDto))
+                .Do(x => throw new LotteryException("Exception"));
+
             //
             var response = _lotteryController.UpdateStarted(lotteryViewModel);
 
@@ -445,9 +444,8 @@ namespace Shrooms.Premium.UnitTests.Controllers.WebApi
             Assert.IsNotNull(response);
             Assert.IsInstanceOf<BadRequestErrorMessageResult>(response);
             _lotteryService.Received(1).EditStartedLottery(lotteryDto);
-
         }
-        
+
         [TestCase]
         public void LotteryStats_Should_Return_Ok()
         {
