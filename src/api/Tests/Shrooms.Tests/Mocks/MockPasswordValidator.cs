@@ -29,7 +29,7 @@ namespace Shrooms.UnitTests.Mocks
             }
             else
             {
-                return Task.FromResult(IdentityResult.Failed("RefundFailed"));
+                return Task.FromResult(IdentityResult.Failed("Failed"));
             }
         }
     }

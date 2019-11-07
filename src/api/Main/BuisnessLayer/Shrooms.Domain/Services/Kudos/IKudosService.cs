@@ -73,6 +73,5 @@ namespace Shrooms.Domain.Services.Kudos
         void UpdateProfileKudos(ApplicationUser user, UserAndOrganizationDTO userOrg);
 
         bool HasPendingKudos(string employeeId);
-
     }
 }
