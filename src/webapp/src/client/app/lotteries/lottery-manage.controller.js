@@ -121,10 +121,7 @@
                         .then(newImages => {
                             vm.lottery.images = vm.lottery.images.concat(newImages);
                             lotteryRepository.updateDrafted(vm.lottery)
-<<<<<<< HEAD
-=======
-                            .then(updateSucess('lotteries.hasBeenSaved'))
->>>>>>> master
+                                .then(updateSucess('lotteries.hasBeenSaved'))
                         })
                 } else {
                     lotteryRepository.updateDrafted(vm.lottery)
