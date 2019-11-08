@@ -1,4 +1,22 @@
 {
+    "totalCost": "Bendra suma",
+    "preposition": "po",
+    "hours": "valandų",
+    "hour": "valandos",
+    "minutes": "minučių",
+    "minute": "minutės",
+    "tomorrow": "rytoj",
+    "days": "dienų",
+    "months": "mėnesių",
+    "month": "mėnesio",
+    "year": "metų",
+    "years": "metų",
+    "seconds": "sekundžių",
+    "fewSeconds": "už kelių sekundžių",
+    "buy": "Pirkti",
+    "lotteryCancel": "Atšaukti",
+    "endsIn": "Pasibaigs",
+    "kudosPerTicket": "kudos/bilietas",
     "entityNamePlural": "Loterijos",
     "entityNameSingular": "Loterija",
     "lotteriesPanelHeader": "Loterijos",
@@ -29,5 +47,7 @@
     "drafted": "Parengta",
     "started": "Pradėta",
     "aborted": "Atšaukta",
-    "ended": "Pasibaigusi"
+    "ended": "Pasibaigusi",
+    "hasBeenBought": "Sėkmingai nusipirkti {{ one }} bilietai \"{{ two }}\" loterijoje!",
+    "invalidTicketNumber": "Neteisingas bilietų skaičius!"
 }

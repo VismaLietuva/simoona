@@ -1,11 +1,13 @@
 <div class="row body-container" has-permissions="['POST_BASIC']">
     <div class="hidden-lg hidden-md">
         <ace-kudos-wall-widget last-approved-kudos="vm.widgetsInfo.lastKudosLogRecords"></ace-kudos-wall-widget>
+        <ace-lotteries-wall-widget latest-lotteries="vm.latestLotteries"></ace-lotteries-wall-widget>
     </div>
     <div class="col-xs-12 col-md-8 wall-body">
         <ui-view></ui-view>
     </div>
     <div class="col-xs-4 wall-widgets hidden-xs hidden-sm">
+        <ace-lotteries-wall-widget latest-lotteries="vm.latestLotteries"></ace-lotteries-wall-widget>
         <ace-kudos-wall-widget last-approved-kudos="vm.widgetsInfo.lastKudosLogRecords"></ace-kudos-wall-widget>
         <ace-kudos-basket-widget kudos-basket-data="vm.widgetsInfo.kudosBasketWidget"></ace-kudos-basket-widget>
         <ace-kudos-achievement-board-widget tabs="vm.widgetsInfo.kudosWidgetStats" tabOneMonths="3" tabOneAmount="3" tabTwoMonths="12" tabTwoAmount="3"></ace-kudos-achievement-board-widget>
