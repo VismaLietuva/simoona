@@ -50,14 +50,8 @@ namespace Shrooms.Domain.Services.Kudos
         /// <param name="points">requested points</param>
         void AddKudosLog(AddKudosLogDTO kudosDto, decimal points);
 
-        /// <summary>
-        /// Must not call SaveChanges inside.
-        /// </summary>
         void AddRefundKudosLogs(IEnumerable<AddKudosLogDTO> kudosLogs);
 
-        /// <summary>
-        /// Must not call SaveChanges inside.
-        /// </summary>
         void UpdateProfilesFromUserIds(IEnumerable<string> usersId, UserAndOrganizationDTO userOrg);
 
         KudosLogsEntriesDto<MainKudosLogDTO> GetKudosLogs(KudosLogsFilterDTO options);
