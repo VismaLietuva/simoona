@@ -296,6 +296,7 @@
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BookMobilePostDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BookMobileReturnDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BookMobileTakeSpecificDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BookRemindDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\MobileUserDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Calendar\CalendarAttendeeAction.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Calendar\CalendarEventDTO.cs" />
@@ -348,7 +349,9 @@
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Badges\BadgesService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Badges\IBadgesService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Books\BookMobileService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Books\BookRemindService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Books\IBookMobileService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Books\IBookRemindService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Committees\CommitteesService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Committees\ICommitteesService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Email\Committee\CommitteeNotificationService.cs" />
