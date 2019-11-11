@@ -40,6 +40,13 @@
         }
 
         function responseError(rejection) {
+            if(!location.href.contains("/Login"))
+            {
+                    if(sessionStorage.getItem("redirectAfterFailedLogin") === null)
+                    {
+                        sessionStorage.setItem("redirectAfterFailedLogin", location.href); 
+                    }
+            }
             service.redirectIfResponseUnauthorized(rejection);
             return $q.reject(rejection);
         }
