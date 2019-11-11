@@ -71,7 +71,7 @@ namespace Shrooms.API.Controllers.Lotteries
         public IHttpActionResult GetLottery(int id)
         {
 
-            var lotteryDTO = _lotteryService.GetLotteryDetails(id);
+            var lotteryDTO = _lotteryService.GetLotteryDetails(id, GetUserAndOrganization());
 
             if (lotteryDTO == null)
             {
@@ -153,7 +153,7 @@ namespace Shrooms.API.Controllers.Lotteries
         [Route("{id}/Status")]
         public IHttpActionResult GetStatus(int id)
         {
-            var status = _lotteryService.GetLotteryStatus(id);
+            var status = _lotteryService.GetLotteryStatus(id, GetUserAndOrganization());
 
             return Ok(status);
         }
@@ -203,7 +203,7 @@ namespace Shrooms.API.Controllers.Lotteries
         {
             try
             {
-                await _lotteryService.FinishLotteryAsync(id);
+                await _lotteryService.FinishLotteryAsync(id, GetUserAndOrganization());
 
                 return Ok();
             }
@@ -217,13 +217,13 @@ namespace Shrooms.API.Controllers.Lotteries
         [Route("{id}/Stats")]
         public IHttpActionResult LotteryStats(int id)
         {
-            var lotteryStats = _lotteryService.GetLotteryStats(id);
+            var lotteryStats = _lotteryService.GetLotteryStats(id, GetUserAndOrganization());
 
             if(lotteryStats == null)
             {
                 return Content((HttpStatusCode)422, "Lottery with such ID was not found");
             }
-          
+
             return Ok(lotteryStats);
         }
     }

@@ -16,13 +16,13 @@ namespace Shrooms.Domain.Services.Lotteries
 
         Task EditStartedLottery(EditStartedLotteryDTO lotteryDTO);
 
-        bool AbortLottery(int id, UserAndOrganizationDTO userOrg);
+        bool AbortLottery(int lotteryId, UserAndOrganizationDTO userOrg);
 
-        void RefundParticipants(int id, UserAndOrganizationDTO userOrg);
+        void RefundParticipants(int lotteryId, UserAndOrganizationDTO userOrg);
 
-        Task FinishLotteryAsync(int lotteryId);
+        Task FinishLotteryAsync(int lotteryId, UserAndOrganizationDTO userOrg);
 
-        LotteryStatsDTO GetLotteryStats (int lotteryId);
+        LotteryStatsDTO GetLotteryStats (int lotteryId, UserAndOrganizationDTO userOrg);
 
         Task BuyLotteryTicketAsync(BuyLotteryTicketDTO lotteryTicketDTO, UserAndOrganizationDTO userOrg);
 
@@ -34,10 +34,10 @@ namespace Shrooms.Domain.Services.Lotteries
 
         IPagedList<LotteryDetailsDTO> GetPagedLotteries(GetPagedLotteriesArgs args);
 
-        LotteryDetailsDTO GetLotteryDetails(int id);
+        LotteryDetailsDTO GetLotteryDetails(int lotteryId, UserAndOrganizationDTO userOrg);
 
-        LotteryStatusDTO GetLotteryStatus(int id);
+        LotteryStatusDTO GetLotteryStatus(int lotteryId, UserAndOrganizationDTO userOrg);
 
-        void UpdateRefundFailedFlag(int id, bool isFailed, UserAndOrganizationDTO userOrg);
+        void UpdateRefundFailedFlag(int lotteryId, bool isFailed, UserAndOrganizationDTO userOrg);
     }
 }

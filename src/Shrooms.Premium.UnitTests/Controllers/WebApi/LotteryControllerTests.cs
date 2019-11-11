@@ -90,7 +90,9 @@ namespace Shrooms.Premium.UnitTests.Controllers.WebApi
             _mapper.Map<LotteryDetailsDTO, LotteryDetailsViewModel>(lotteryDTO)
                   .Returns(lotteryViewModel);
 
-            _lotteryService.GetLotteryDetails(2).Returns(lotteryDTO);
+            var userOrg = GetUserAndOrganization();
+
+            _lotteryService.GetLotteryDetails(2, userOrg).Returns(lotteryDTO);
 
             //
             var response = _lotteryController.GetLottery(2);
@@ -98,14 +100,15 @@ namespace Shrooms.Premium.UnitTests.Controllers.WebApi
             //
             Assert.IsNotNull(response);
             Assert.IsInstanceOf<OkNegotiatedContentResult<LotteryDetailsViewModel>>(response);
-            _lotteryService.Received(1).GetLotteryDetails(2);
+            _lotteryService.Received(1).GetLotteryDetails(2, userOrg);
         }
 
         [TestCase]
         public void GetLottery_Should_Return_Unprocessable_Entity_Error()
         {
             //
-            _lotteryService.GetLotteryDetails(3000).Returns(a => null);
+            var userOrg = GetUserAndOrganization();
+            _lotteryService.GetLotteryDetails(3000, userOrg).Returns(a => null);
 
             //
             var response = _lotteryController.GetLottery(3000);
@@ -113,7 +116,7 @@ namespace Shrooms.Premium.UnitTests.Controllers.WebApi
             //
             Assert.IsNotNull(response);
             Assert.IsInstanceOf<NegotiatedContentResult<string>>(response);
-            _lotteryService.Received(1).GetLotteryDetails(3000);
+            _lotteryService.Received(1).GetLotteryDetails(3000, userOrg);
 
         }
 
@@ -321,21 +324,21 @@ namespace Shrooms.Premium.UnitTests.Controllers.WebApi
             //
             Assert.IsNotNull(response);
             Assert.IsInstanceOf<OkResult>(response);
-            await _lotteryService.Received(1).FinishLotteryAsync(37);
+            await _lotteryService.Received(1).FinishLotteryAsync(37, GetUserAndOrganization());
         }
 
         [TestCase]
         public async Task FinishLottery_Should_Return_Bad_Request()
         {
             //
-            _lotteryService.FinishLotteryAsync(37).Throws(new LotteryException("Exception"));
+            _lotteryService.FinishLotteryAsync(37, GetUserAndOrganization()).Throws(new LotteryException("Exception"));
             //
             var response = await _lotteryController.FinishLottery(37);
 
             //
             Assert.IsNotNull(response);
             Assert.IsInstanceOf<BadRequestErrorMessageResult>(response);
-            await _lotteryService.Received(1).FinishLotteryAsync(37);
+            await _lotteryService.Received(1).FinishLotteryAsync(37, GetUserAndOrganization());
         }
 
         [TestCase]
@@ -458,7 +461,7 @@ namespace Shrooms.Premium.UnitTests.Controllers.WebApi
                 TicketsSold = 30,
                 TotalParticipants = 15
             };
-            _lotteryService.GetLotteryStats(13).Returns(lotteryStats);
+            _lotteryService.GetLotteryStats(13, GetUserAndOrganization()).Returns(lotteryStats);
 
             //
             var response = _lotteryController.LotteryStats(13);
@@ -466,7 +469,7 @@ namespace Shrooms.Premium.UnitTests.Controllers.WebApi
             //
             Assert.IsNotNull(response);
             Assert.IsInstanceOf<OkNegotiatedContentResult<LotteryStatsDTO>>(response);
-            _lotteryService.Received(1).GetLotteryStats(13);
+            _lotteryService.Received(1).GetLotteryStats(13, GetUserAndOrganization());
 
         }
 
@@ -480,7 +483,7 @@ namespace Shrooms.Premium.UnitTests.Controllers.WebApi
                 TicketsSold = 30,
                 TotalParticipants = 15
             };
-            _lotteryService.GetLotteryStats(13).Returns(x => null);
+            _lotteryService.GetLotteryStats(13, GetUserAndOrganization()).Returns(x => null);
 
             //
             var response = _lotteryController.LotteryStats(13);
@@ -488,7 +491,7 @@ namespace Shrooms.Premium.UnitTests.Controllers.WebApi
             //
             Assert.IsNotNull(response);
             Assert.IsInstanceOf<NegotiatedContentResult<string>>(response);
-            _lotteryService.Received(1).GetLotteryStats(13);
+            _lotteryService.Received(1).GetLotteryStats(13, GetUserAndOrganization());
 
         }
 
