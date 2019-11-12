@@ -141,6 +141,11 @@
                     if (redirect) {
                         $window.location.href = redirect;
                     }
+                    if(sessionStorage.getItem("redirectAfterFailedLogin"))
+                    {
+                        $window.location.href = sessionStorage.getItem("redirectAfterFailedLogin");
+                        sessionStorage.removeItem("redirectAfterFailedLogin");
+                    }
                     authService.redirectToHome();
                 });
             }).catch(function(error) {

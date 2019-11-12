@@ -3,6 +3,7 @@
     public static class EmailTemplateCacheKeys
     {
         public const string NewWallPost = nameof(NewWallPost);
+        public const string BookRemind = nameof(BookRemind);
         public const string HeaderFooterLayout = nameof(HeaderFooterLayout);
         public const string EventParticipantExpelled = nameof(EventParticipantExpelled);
         public const string BirthdaysNotification = nameof(BirthdaysNotification);
