@@ -29,6 +29,13 @@ namespace Shrooms.Premium.Main.PresentationLayer.Shrooms.API.Controllers
         }
 
         [HttpPost]
+        [Route("RemindBooks")]
+        public void RemindBooks()
+        {
+            _webHookService.Books.RemindAboutBooks();
+        }
+
+        [HttpPost]
         [Route("GiveLoyaltyKudos")]
         public void GiveLoyaltyKudos()
         {
