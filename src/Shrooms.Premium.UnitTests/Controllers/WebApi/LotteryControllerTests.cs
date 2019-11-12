@@ -29,14 +29,16 @@ namespace Shrooms.Premium.UnitTests.Controllers.WebApi
 
         private IMapper _mapper;
         private ILotteryService _lotteryService;
+        private ILotteryExportService _lotteryExportService;
 
         [SetUp]
         public void TestInitializers()
         {
             _mapper = Substitute.For<IMapper>();
             _lotteryService = Substitute.For<ILotteryService>();
+            _lotteryExportService = Substitute.For<ILotteryExportService>();
 
-            _lotteryController = new LotteryController(_mapper, _lotteryService);
+            _lotteryController = new LotteryController(_mapper, _lotteryService, _lotteryExportService);
 
             _lotteryController.ControllerContext = Substitute.For<HttpControllerContext>();
             _lotteryController.Request = new HttpRequestMessage();

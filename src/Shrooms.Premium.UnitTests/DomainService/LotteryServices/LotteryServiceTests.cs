@@ -96,7 +96,7 @@ namespace Shrooms.Premium.UnitTests.DomainService.LotteryServices
 
             _sut.EditDraftedLottery(new EditDraftedLotteryDTO());
 
-            _unitOfWork.Received().SaveChangesAsync(false);
+            _unitOfWork.Received().SaveChanges(false);
         }
 
         [Test]
@@ -117,7 +117,7 @@ namespace Shrooms.Premium.UnitTests.DomainService.LotteryServices
 
             _sut.EditStartedLottery(new EditStartedLotteryDTO());
 
-            _unitOfWork.Received().SaveChangesAsync(false);
+            _unitOfWork.Received().SaveChanges(false);
         }
 
         [Test]
