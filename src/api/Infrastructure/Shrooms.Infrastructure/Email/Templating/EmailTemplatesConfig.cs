@@ -18,6 +18,7 @@ namespace Shrooms.Infrastructure.Email.Templating
             Engine.Razor.AddTemplate(EmailTemplateCacheKeys.HeaderFooterLayout, File.ReadAllText(Path.Combine(_baseDir, @"EmailTemplates\HeaderFooter.cshtml")));
 
             AddAndCompile(EmailTemplateCacheKeys.NewWallPost, @"EmailTemplates\Wall\NewPost.cshtml", typeof(NewWallPostEmailTemplateViewModel));
+            AddAndCompile(EmailTemplateCacheKeys.BookRemind, @"EmailTemplates\Books\BookRemind.cshtml", typeof(BookReminderEmailTemplateViewModel));
             AddAndCompile(EmailTemplateCacheKeys.EventParticipantExpelled, @"EmailTemplates\Events\ParticipantExpelled.cshtml", typeof(EventParticipantExpelledEmailTemplateViewModel));
             AddAndCompile(EmailTemplateCacheKeys.BookTaken, @"EmailTemplates\Books\BookTaken.cshtml", typeof(BookTakenEmailTemplateViewModel));
             AddAndCompile(EmailTemplateCacheKeys.KudosRejected, @"EmailTemplates\Kudos\KudosRejected.cshtml", typeof(KudosRejectedEmailTemplateViewModel));
