@@ -34,5 +34,8 @@
 	"messageNameAlreadyExists": "Toks pavadinimas jau egzistuoja",
 	"messageShopItemAlreadyExists": "Tokia prekė jau egzistuoja",
 	"messageAllFieldsAreRequired": "Visi laukai yra privalomi",
-	"userHasPendingKudos": "Naudotojas turi nepatvirtintų kudosų."
+	"userHasPendingKudos": "Naudotojas turi nepatvirtintų kudosų.",
+	"oops": "Oi!",
+	"404notFound": "404 Puslapis nerastas",
+	"requestedPageNotFound": "Atsiprašome, įvyko klaida, ieškomas puslapis nerastas!"
 }

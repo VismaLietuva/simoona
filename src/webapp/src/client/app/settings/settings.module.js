@@ -40,6 +40,10 @@
                 controllerAs: 'vm'
             });
         $urlRouterProvider
-            .when('/:organizationName/Settings', '/:organizationName/Settings/General');
+            .when('/:organizationName/Settings', '/:organizationName/Settings/General')
+            .otherwise(function ($injector, $location) {
+                var authService = $injector.get('authService');
+                authService.redirectToPageNotFound();
+            });
     }
 })();

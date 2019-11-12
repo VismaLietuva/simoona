@@ -34,6 +34,9 @@
 	"messageNameAlreadyExists": "Name already exists",
 	"messageShopItemAlreadyExists": "This item already exists",
 	"messageAllFieldsAreRequired": "All fields are required",
-	"userHasPendingKudos" : "User has pending kudos"
+	"userHasPendingKudos" : "User has pending kudos",
+	"oops": "Oops!",
+	"404notFound": "404 Not Found",
+	"requestedPageNotFound": "Sorry, an error has occured, Requested page not found!"
 
 }
