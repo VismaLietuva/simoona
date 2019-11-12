@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -29,11 +30,13 @@ namespace Shrooms.API.Controllers.Lotteries
         private readonly IMapper _mapper;
 
         private readonly ILotteryService _lotteryService;
+        private readonly ILotteryExportService _lotteryExportService;
 
-        public LotteryController(IMapper mapper, ILotteryService lotteryService)
+        public LotteryController(IMapper mapper, ILotteryService lotteryService, ILotteryExportService lotteryExportService)
         {
             _mapper = mapper;
             _lotteryService = lotteryService;
+            _lotteryExportService = lotteryExportService;
         }
 
         [Route("All")]
@@ -227,6 +230,23 @@ namespace Shrooms.API.Controllers.Lotteries
             }
 
             return Ok(lotteryStats);
+        }
+
+        [HttpGet]
+        [PermissionAuthorize(Permission = AdministrationPermissions.Lottery)]
+        [Route("Export")]
+        public IHttpActionResult Export(int lotteryId)
+        {
+            try
+            {
+                var stream = new ByteArrayContent(_lotteryExportService.ExportParticipants(lotteryId, GetUserAndOrganization()));
+                var result = new HttpResponseMessage(HttpStatusCode.OK) { Content = stream };
+                return ResponseMessage(result);
+            }
+            catch (LotteryException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
     }
 }

@@ -388,6 +388,8 @@
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Lotteries\ILotteryService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Lotteries\IParticipantService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Lotteries\LotteryAbortJob.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Lotteries\ILotteryExportService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Lotteries\LotteryExportService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Lotteries\LotteryService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Lotteries\ParticipantService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Notifications\INotificationService.cs" />

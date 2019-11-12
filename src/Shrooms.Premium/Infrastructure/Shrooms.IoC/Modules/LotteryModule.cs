@@ -20,6 +20,11 @@ namespace Shrooms.IoC.Modules
                 .InstancePerRequest()
                 .EnableInterfaceTelemetryInterceptor();
 
+            builder.RegisterType<LotteryExportService>()
+                 .As<ILotteryExportService>()
+                 .InstancePerRequest()
+                 .EnableInterfaceTelemetryInterceptor();
+
             builder.RegisterType<LotteryAbortJob>()
                 .As<ILotteryAbortJob>()
                 .EnableInterfaceTelemetryInterceptor();
