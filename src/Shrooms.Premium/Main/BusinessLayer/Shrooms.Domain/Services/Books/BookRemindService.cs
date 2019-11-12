@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -48,16 +49,7 @@ namespace Shrooms.Domain.Services.Books
             var booksToRemind = _booksDbSet
                 .Include(p => p.BookOffice)
                 .Where(p => p.TakenFrom < monthAgo && p.Returned == null)
-                .Select(p => new BookRemindDTO 
-                { 
-                    ApplicationUserId = p.ApplicationUserId, 
-                    OrganizationId = p.OrganizationId, 
-                    BookOfficeId = p.BookOfficeId,
-                    OfficeId = p.BookOffice.OfficeId,
-                    Title = p.BookOffice.Book.Title,
-                    Author = p.BookOffice.Book.Author,
-                    TakenFrom = p.TakenFrom
-                })
+                .Select(MapBookLogToBookRemindDto())
                 .ToList();
 
             foreach (var bookToRemind in booksToRemind)
@@ -76,6 +68,19 @@ namespace Shrooms.Domain.Services.Books
                 _mailingService.SendEmail(emailData);
 
             }
+        }
+        private Expression<Func<BookLog, BookRemindDTO>> MapBookLogToBookRemindDto()
+        {
+            return book => new BookRemindDTO
+            {
+                ApplicationUserId = book.ApplicationUserId,
+                OrganizationId = book.OrganizationId,
+                BookOfficeId = book.BookOfficeId,
+                OfficeId = book.BookOffice.OfficeId,
+                Title = book.BookOffice.Book.Title,
+                Author = book.BookOffice.Book.Author,
+                TakenFrom = book.TakenFrom
+            };
         }
     }
 }
