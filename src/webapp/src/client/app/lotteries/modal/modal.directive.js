@@ -33,11 +33,12 @@
         '$scope',
         '$uibModalInstance',
         'notifySrv',
-        'lotteryRepository'
+        'lotteryRepository',
+        'Analytics'
     ];
 
     function lotteryStatsController($rootScope, $scope, $uibModalInstance,
-        notifySrv, lotteryRepository) {
+        notifySrv, lotteryRepository ,Analytics) {
         /* jshint validthis: true */
         var vm = this;
         vm.lotteryId = $rootScope.$stateParams.lotteryId;
@@ -46,6 +47,7 @@
             page: 1
         }
         vm.closeModal = closeModal;
+        vm.exportParticipantsData = exportParticipantsData;
         vm.onPageChange = onPageChange;
         init();
         ////////////
@@ -72,6 +74,16 @@
 
         function closeModal() {
             $uibModalInstance.close();
+        }
+        function exportParticipantsData()
+        {
+            Analytics.trackEvent('Lotteries', 'Export participant list', 'lottery: ' + vm.lotteryId);
+            lotteryRepository.exportParticipants(vm.lotteryId).then(function(response) {
+                var file = new Blob([response.data], {
+                    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;'
+                });
+                saveAs(file, 'participants.xlsx');
+            });
         }
 
         function onPageChange () {

@@ -40,7 +40,8 @@ namespace Shrooms.Constants.BusinessLayer
             Send,
             Minus,
             Other,
-            Welcome
+            Welcome,
+            Refund
         }
         #endregion
 
@@ -84,9 +85,15 @@ namespace Shrooms.Constants.BusinessLayer
         {
             Drafted = 1,
             Started,
-            Aborted,
-            Ended
+            Deleted,
+            Ended,
+            RefundStarted,
+            RefundLogsCreated,
+            Refunded
         }
+
+        public const string LotteryParticipantsExcelTableName = "Lottery Participants";
+        public const int LotteryParticipantsInRow = 4;
         #endregion
 
         #region Organization

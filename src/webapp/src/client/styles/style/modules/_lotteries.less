@@ -44,6 +44,9 @@
     }
   }
 }
+.lotteries-detail-modal-ticket-counter{
+  margin-left: 10px;
+}
 .lottery-activity-log-count-lg {
     font-size: 20px;
 }
@@ -97,7 +100,6 @@
     background-origin: content-box;
 
 }
-
 .spinner {
     width: 100px;
     margin-bottom: 13px;
@@ -167,7 +169,7 @@
     border-top: 1px solid #e5e5e5;
     padding: 5px 20px 5px 20px;
     text-align: right;
-	.btn { margin-bottom: 0px; }
+	    .btn { margin-bottom: 0px; }
   }
   .lotteries-detail-modal-description{
     padding-top: 5px;
@@ -178,21 +180,35 @@
       margin-bottom: 0px; padding-bottom: 0px;
     }
   }
+.lottery-stats-button {
+    float: right;
+}
+.lottery-participants-container-actions {
+  padding: 0 5px;
+  height: 30px;
+  *.lottery-participants-export {
+      width: 50%;
+      float: left;
+  }
+  *.no-reset {
+      width: 100%;
+  }
+}
+.lottery-detail-modal-main-screen{
+  border-bottom: 1px solid #e5e5e5;
+}
 .lottery-detail-modal-buy-button{
   padding-left: 2px;
 }
-
 .lotteries-modal-body {
     display: flex;
     justify-content: center;
     flex-direction: column;
     text-align: center;
 }
-
 .lotteries-modal-body-sales {
     width: 100%;
 }
-
 .lotteries-modal-list {
     list-style-type: none;
     width: 100%;
@@ -202,7 +218,6 @@
         border-bottom: 1px solid rgb(221,221,221);
     }
 }
-
 .lotteries-modal-table {
     text-align: center;
     th, td > {

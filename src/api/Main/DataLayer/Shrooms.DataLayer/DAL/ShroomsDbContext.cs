@@ -129,10 +129,15 @@ namespace Shrooms.DataLayer.DAL
         public virtual DbSet<Notification> Notifications { get; set; }
 
         public virtual DbSet<BadgeCategory> BadgeCategories { get; set; }
+
         public virtual DbSet<BadgeType> BadgeTypes { get; set; }
+
         public virtual DbSet<BadgeCategoryKudosType> BadgeCategoryKudosType { get; set; }
+
         public virtual DbSet<BadgeLog> BadgeLogs { get; set; }
+
         public virtual DbSet<Lottery> Lotteries { get; set; }
+
         public virtual DbSet<LotteryParticipant> LotteryParticipants { get; set; }
 
         public string ConnectionName { get; }

@@ -3,12 +3,6 @@
 
     angular
         .module('simoonaApp.Lotteries')
-        .constant('lotteryStatuses', {
-            drafted: 1,
-            started: 2,
-            aborted: 3,
-            ended: 4
-        })
         .constant('editableLotteries', ['drafted', 'started'])
         .constant('lotteryPageSettings', {
             'pageSize': 10
@@ -37,6 +31,7 @@
         vm.isLotteryEditable = isLotteryEditable;
         $rootScope.pageTitle = 'lotteries.lotteriesPanelHeader';
         vm.allowEdit = authService.hasPermissions(["LOTTERY_ADMINISTRATION"]);
+        vm.showRefundPage = showRefundPage;
 
         init();
 
@@ -77,6 +72,10 @@
 
         function isLotteryEditable(lottery) {
             return vm.editableLotteries.some(status => vm.lotteryStatuses[status] === lottery.status);
+        }
+
+        function showRefundPage(lottery) {
+            return lottery.refundFailed;
         }
     }
 

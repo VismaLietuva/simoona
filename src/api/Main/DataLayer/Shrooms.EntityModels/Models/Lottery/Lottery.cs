@@ -17,6 +17,8 @@ namespace Shrooms.EntityModels.Models.Lotteries
 
         public int EntryFee { get; set; }
 
+        public bool IsRefundFailed { get; set; }
+
         public virtual ImagesCollection Images { get; set; }
     }
 }

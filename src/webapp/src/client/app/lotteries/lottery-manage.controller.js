@@ -2,12 +2,6 @@
     'use strict';
 
     angular.module('simoonaApp.Lotteries')
-        .constant('lotteryStatus', {
-            Drafted: 1,
-            Started: 2,
-            Aborted: 3,
-            Ended: 4
-        })
         .constant('lotteryImageSettings', {
             height: 720,
             width: 1224,
@@ -15,19 +9,18 @@
         .controller('lotteryManageController', lotteryManageController);
 
     lotteryManageController.$inject = ['$state', 'lotteryRepository', '$rootScope',
-    'notifySrv', '$q', 'localeSrv', 'errorHandler', 'lotteryStatus', 'lottery', 'pictureRepository', 'dataHandler', 'lotteryImageSettings', '$timeout'
+    'notifySrv', '$q', 'localeSrv', 'errorHandler', 'lotteryStatuses', 'lottery', 'pictureRepository', 'dataHandler', 'lotteryImageSettings', '$timeout'
     ];
 
-    function lotteryManageController(
-        $state, lotteryRepository, $rootScope, notifySrv, $q, localeSrv, errorHandler,
-        lotteryStatus, lottery, pictureRepository, dataHandler, lotteryImageSettings, $timeout) {
+    function lotteryManageController($state, lotteryRepository, $rootScope, notifySrv, $q, localeSrv, errorHandler,
+        lotteryStatuses, lottery, pictureRepository, dataHandler, lotteryImageSettings, $timeout) {
         
         var vm = this;
         vm.openDatePicker = openDatePicker;
         vm.startLottery = startLottery;
         vm.createLottery = createLottery;
         vm.updateLottery = updateLottery;
-        vm.revokeLottery = revokeLottery;
+        vm.abortLottery = abortLottery;
         vm.finishLottery = finishLottery;
         vm.removeImage = removeImage;
         vm.lotteryCroppedImages = [];
@@ -52,9 +45,9 @@
             if (states.isEdit) {
                 vm.lottery = lottery;
                 vm.lottery.endDate = moment.utc(vm.lottery.endDate).local().startOf('minute').toDate();
-                vm.isStarted = vm.lottery.status === lotteryStatus.Started;
-                vm.isDrafted = vm.lottery.status === lotteryStatus.Drafted;
-                vm.isEnded = (vm.lottery.status === lotteryStatus.Aborted) || (vm.lottery.status === lotteryStatus.Ended);
+                vm.isStarted = vm.lottery.status === lotteryStatuses.started;
+                vm.isDrafted = vm.lottery.status === lotteryStatuses.drafted;
+                vm.isEnded = (vm.lottery.status === lotteryStatuses.deleted) || (vm.lottery.status === lotteryStatuses.ended);
                 $rootScope.pageTitle = 'lotteries.editLottery';
             } else if (states.isCreate) {
                 $rootScope.pageTitle = 'lotteries.createLottery';
@@ -75,7 +68,7 @@
             saveimages()
                 .then(results => {
                     vm.lottery.images = results;
-                    vm.lottery.status = lotteryStatus.Started;
+                    vm.lottery.status = lotteryStatuses.started;
                     lotteryRepository.create(vm.lottery)
                     .then(function() {
                         notifySrv.success(localeSrv.formatTranslation('lotteries.hasStarted', { one: 'lotteries.entityNameSingular', two: vm.lottery.title }));
@@ -88,10 +81,10 @@
         function createLottery() {
             saveimages()
                 .then(results => {
-                    vm.lottery.status = lotteryStatus.Drafted;
+                    vm.lottery.status = lotteryStatuses.drafted;
                     vm.lottery.images = results;
                     lotteryRepository.create(vm.lottery)
-                        .then(updateSucess('lotteries.hasStarted'))
+                        .then(updateSucess('lotteries.hasBeenSaved'))
                 });
         }
 
@@ -122,13 +115,13 @@
 
         function updateLottery(start) {
             if (vm.isDrafted) {
-                vm.lottery.status = start ? lotteryStatus.Started : lotteryStatus.Drafted;
+                vm.lottery.status = start ? lotteryStatuses.started : lotteryStatuses.drafted;
                 if (vm.lotteryCroppedImages) {
                     saveimages()
                         .then(newImages => {
                             vm.lottery.images = vm.lottery.images.concat(newImages);
                             lotteryRepository.updateDrafted(vm.lottery)
-                            .then(updateSucess('lotteries.hasBeenSaved'))
+                                .then(updateSucess('lotteries.hasBeenSaved'))
                         })
                 } else {
                     lotteryRepository.updateDrafted(vm.lottery)
@@ -140,8 +133,8 @@
             }
         }
 
-        function revokeLottery(id) {
-            lotteryRepository.revokeLottery(id).then(function() {
+        function abortLottery(id) {
+            lotteryRepository.abortLottery(id).then(function() {
                 notifySrv.success('lotteries.successDelete');
                 $state.go('Root.WithOrg.Admin.Lotteries.List');
             }, errorHandler.handleErrorMessage);

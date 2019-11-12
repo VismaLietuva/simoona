@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.EntityModels.Models;
+using static Shrooms.Constants.BusinessLayer.ConstBusinessLayer;
 
 namespace Shrooms.Domain.Services.Kudos
 {
@@ -49,11 +50,17 @@ namespace Shrooms.Domain.Services.Kudos
         /// <param name="points">requested points</param>
         void AddKudosLog(AddKudosLogDTO kudosDto, decimal points);
 
+        void AddRefundKudosLogs(IEnumerable<AddKudosLogDTO> kudosLogs);
+
+        void UpdateProfilesFromUserIds(IEnumerable<string> usersId, UserAndOrganizationDTO userOrg);
+
         KudosLogsEntriesDto<MainKudosLogDTO> GetKudosLogs(KudosLogsFilterDTO options);
 
         KudosLogsEntriesDto<KudosUserLogDTO> GetUserKudosLogs(string userId, int page, int organizationId);
 
         int GetKudosTypeId(string kudosTypeName);
+
+        int GetKudosTypeId(KudosTypeEnum kudosType);
 
         IEnumerable<KudosBasicDataDTO> GetKudosStats(int months, int amount, int organizationId);
 
