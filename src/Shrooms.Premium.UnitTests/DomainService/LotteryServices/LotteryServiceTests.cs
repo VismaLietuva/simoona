@@ -83,8 +83,8 @@ namespace Shrooms.Premium.UnitTests.DomainService.LotteryServices
         {
             _lotteriesDb.Find().ReturnsForAnyArgs(GetLottery());
 
-            var result = Assert.ThrowsAsync<LotteryException>(async () =>
-                await _sut.EditDraftedLottery(new EditDraftedLotteryDTO()));
+            var result = Assert.Throws<LotteryException>(() =>
+                _sut.EditDraftedLottery(new EditDraftedLotteryDTO()));
 
             Assert.That(result.Message, Is.EqualTo("Editing is forbidden for not drafted lottery."));
         }
@@ -104,8 +104,8 @@ namespace Shrooms.Premium.UnitTests.DomainService.LotteryServices
         {
             _lotteriesDb.Find().ReturnsForAnyArgs(GetLottery(LotteryStatus.Refunded));
 
-            var result = Assert.ThrowsAsync<LotteryException>(async () =>
-                await _sut.EditStartedLottery(new EditStartedLotteryDTO()));
+            var result = Assert.Throws<LotteryException>(() =>
+                _sut.EditStartedLottery(new EditStartedLotteryDTO()));
 
             Assert.That(result.Message, Is.EqualTo("Lottery is not running."));
         }

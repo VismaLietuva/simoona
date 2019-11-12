@@ -160,6 +160,7 @@ namespace Shrooms.API.Controllers.Lotteries
 
         [HttpPut]
         [Route("UpdateDrafted")]
+        [InvalidateCacheOutput("Get", typeof(LotteryWidgetController))]
         public IHttpActionResult UpdateDrafted(EditDraftedLotteryViewModel editLotteryViewModel)
         {
             try
@@ -179,6 +180,7 @@ namespace Shrooms.API.Controllers.Lotteries
 
         [HttpPatch]
         [Route("UpdateStarted")]
+        [InvalidateCacheOutput("Get", typeof(LotteryWidgetController))]
         public IHttpActionResult UpdateStarted(EditStartedLotteryViewModel editLotteryViewModel)
         {
             try
