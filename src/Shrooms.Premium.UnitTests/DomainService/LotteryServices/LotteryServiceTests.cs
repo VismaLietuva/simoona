@@ -70,7 +70,7 @@ namespace Shrooms.Premium.UnitTests.DomainService.LotteryServices
         public void CreateLottery_CorrectLotteryDTO_CreatesLottery()
         {
             var lotteryDTO = GetCreateLotteryDTOList()[3];
-            _mapper.Map<CreateLotteryDTO, Lottery>(lotteryDTO).Returns(GetLottery());
+            _mapper.Map<LotteryDTO, Lottery>(lotteryDTO).Returns(GetLottery());
 
             _sut.CreateLottery(lotteryDTO);
 
@@ -84,7 +84,7 @@ namespace Shrooms.Premium.UnitTests.DomainService.LotteryServices
             _lotteriesDb.Find().ReturnsForAnyArgs(GetLottery());
 
             var result = Assert.Throws<LotteryException>(() =>
-                _sut.EditDraftedLottery(new EditDraftedLotteryDTO()));
+                _sut.EditDraftedLottery(new LotteryDTO()));
 
             Assert.That(result.Message, Is.EqualTo("Editing is forbidden for not drafted lottery."));
         }
@@ -94,7 +94,7 @@ namespace Shrooms.Premium.UnitTests.DomainService.LotteryServices
         {
             _lotteriesDb.Find().ReturnsForAnyArgs(GetLottery(LotteryStatus.Drafted));
 
-            _sut.EditDraftedLottery(new EditDraftedLotteryDTO());
+            _sut.EditDraftedLottery(new LotteryDTO());
 
             _unitOfWork.Received().SaveChanges(false);
         }
@@ -319,17 +319,17 @@ namespace Shrooms.Premium.UnitTests.DomainService.LotteryServices
             Assert.AreEqual(2, result.Count());
         }
 
-        private static IList<CreateLotteryDTO> GetCreateLotteryDTOList()
+        private static IList<LotteryDTO> GetCreateLotteryDTOList()
         {
-            return new List<CreateLotteryDTO>
+            return new List<LotteryDTO>
             {
-                new CreateLotteryDTO { Id = 1, OrganizationId = 1, Status = (int) LotteryStatus.Started, EndDate = DateTime.Now.AddDays(2),  Title = "Monitor", UserId = "5", EntryFee = -5 },
-                new CreateLotteryDTO { Id = 2, OrganizationId = 1, Status = (int) LotteryStatus.Started, EndDate = DateTime.Now.AddDays(-5),  Title = "Computer", UserId = "5", EntryFee = 2 },
-                new CreateLotteryDTO { Id = 3, OrganizationId = 1, Status = (int) LotteryStatus.Deleted, EndDate = DateTime.Now.AddDays(4), Title = "Table", UserId = "5", EntryFee = 2 },
-                new CreateLotteryDTO { Id = 4, OrganizationId = 1, Status = (int) LotteryStatus.Started, EndDate = DateTime.Now.AddDays(5), Title = "1000 kudos", UserId = "5", EntryFee = 5 },
-                new CreateLotteryDTO { Id = 5, OrganizationId = 1, Status = (int) LotteryStatus.Deleted, EndDate = DateTime.Now.AddDays(5), Title = "100 kudos", UserId = "5", EntryFee = 5 },
-                new CreateLotteryDTO { Id = 6, OrganizationId = 1, Status = (int) LotteryStatus.Ended, EndDate = DateTime.Now.AddDays(5), Title = "10 kudos", UserId = "5", EntryFee = 5 },
-                new CreateLotteryDTO { Id = 7, OrganizationId = 1, Status = (int) LotteryStatus.Ended, EndDate = DateTime.Now.AddDays(5), Title = "10 kudos", UserId = "5", EntryFee = -5 }
+                new LotteryDTO { Id = 1, OrganizationId = 1, Status = (int) LotteryStatus.Started, EndDate = DateTime.Now.AddDays(2),  Title = "Monitor", UserId = "5", EntryFee = -5 },
+                new LotteryDTO { Id = 2, OrganizationId = 1, Status = (int) LotteryStatus.Started, EndDate = DateTime.Now.AddDays(-5),  Title = "Computer", UserId = "5", EntryFee = 2 },
+                new LotteryDTO { Id = 3, OrganizationId = 1, Status = (int) LotteryStatus.Deleted, EndDate = DateTime.Now.AddDays(4), Title = "Table", UserId = "5", EntryFee = 2 },
+                new LotteryDTO { Id = 4, OrganizationId = 1, Status = (int) LotteryStatus.Started, EndDate = DateTime.Now.AddDays(5), Title = "1000 kudos", UserId = "5", EntryFee = 5 },
+                new LotteryDTO { Id = 5, OrganizationId = 1, Status = (int) LotteryStatus.Deleted, EndDate = DateTime.Now.AddDays(5), Title = "100 kudos", UserId = "5", EntryFee = 5 },
+                new LotteryDTO { Id = 6, OrganizationId = 1, Status = (int) LotteryStatus.Ended, EndDate = DateTime.Now.AddDays(5), Title = "10 kudos", UserId = "5", EntryFee = 5 },
+                new LotteryDTO { Id = 7, OrganizationId = 1, Status = (int) LotteryStatus.Ended, EndDate = DateTime.Now.AddDays(5), Title = "10 kudos", UserId = "5", EntryFee = -5 }
             };
         }
 

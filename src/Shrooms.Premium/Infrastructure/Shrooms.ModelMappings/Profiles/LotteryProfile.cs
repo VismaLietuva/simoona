@@ -20,14 +20,14 @@ namespace Shrooms.ModelMappings.Profiles
         }
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<CreateLotteryDTO, CreateLotteryViewModel>();
-            CreateMap<CreateLotteryViewModel, CreateLotteryDTO>();
+            CreateMap<LotteryDTO, CreateLotteryViewModel>();
+            CreateMap<CreateLotteryViewModel, LotteryDTO>();
 
             CreateMap<LotteryDetailsDTO, LotteryDetailsViewModel>();
             CreateMap<LotteryDetailsViewModel, LotteryDetailsDTO>();
 
-            CreateMap<EditDraftedLotteryViewModel, EditDraftedLotteryDTO>();
-            CreateMap<EditDraftedLotteryDTO, EditDraftedLotteryViewModel>();
+            CreateMap<EditDraftedLotteryViewModel, LotteryDTO>();
+            CreateMap<LotteryDTO, EditDraftedLotteryViewModel>();
 
             CreateMap<EditStartedLotteryViewModel, EditStartedLotteryDTO>();
             CreateMap<EditStartedLotteryDTO, EditStartedLotteryViewModel>();
@@ -44,13 +44,13 @@ namespace Shrooms.ModelMappings.Profiles
 
         private void CreateDtoMappings()
         {
-            CreateMap<CreateLotteryDTO, Lottery>()
+            CreateMap<LotteryDTO, Lottery>()
                 .Ignore(x => x.Id);
-            CreateMap<Lottery, CreateLotteryDTO>()
+            CreateMap<Lottery, LotteryDTO>()
                 .Ignore(x => x.Id);
 
-            CreateMap<EditDraftedLotteryDTO, Lottery>();
-            CreateMap<Lottery, EditDraftedLotteryDTO>();
+            CreateMap<LotteryDTO, Lottery>();
+            CreateMap<Lottery, LotteryDTO>();
         }
 
         public void CreateLotteryToLotteryDetailDTOMappings()

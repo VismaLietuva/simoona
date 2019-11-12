@@ -96,7 +96,7 @@ namespace Shrooms.API.Controllers.Lotteries
                 return BadRequest(ModelState);
             }
 
-            var createLotteryDTO = _mapper.Map<CreateLotteryViewModel, CreateLotteryDTO>(lotteryViewModel);
+            var createLotteryDTO = _mapper.Map<CreateLotteryViewModel, LotteryDTO>(lotteryViewModel);
             SetOrganizationAndUser(createLotteryDTO);
 
             try
@@ -168,7 +168,7 @@ namespace Shrooms.API.Controllers.Lotteries
         {
             try
             {
-                var editDraftedLotteryDTO = _mapper.Map<EditDraftedLotteryViewModel, EditDraftedLotteryDTO>(editLotteryViewModel);
+                var editDraftedLotteryDTO = _mapper.Map<EditDraftedLotteryViewModel, LotteryDTO>(editLotteryViewModel);
                 SetOrganizationAndUser(editDraftedLotteryDTO);
 
                 _lotteryService.EditDraftedLottery(editDraftedLotteryDTO);

@@ -3,7 +3,7 @@ using System;
 
 namespace Shrooms.DataTransferObjects.Models.Lotteries
 {
-    public class CreateLotteryDTO : UserAndOrganizationDTO
+    public class LotteryDTO : UserAndOrganizationDTO
     {
         public int Id { get; set; }
         public int Status { get; set; }

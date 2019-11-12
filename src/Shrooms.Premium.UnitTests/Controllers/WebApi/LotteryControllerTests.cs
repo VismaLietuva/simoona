@@ -156,11 +156,11 @@ namespace Shrooms.Premium.UnitTests.Controllers.WebApi
             {
                 Title = "test"
             };
-            var lotteryDTO = new CreateLotteryDTO
+            var lotteryDTO = new LotteryDTO
             {
                 Title = "test"
             };
-            _mapper.Map<CreateLotteryViewModel, CreateLotteryDTO>(lotteryViewModel)
+            _mapper.Map<CreateLotteryViewModel, LotteryDTO>(lotteryViewModel)
                .Returns(lotteryDTO);
             //
             _lotteryController.ModelState.AddModelError("model", "error");
@@ -180,11 +180,11 @@ namespace Shrooms.Premium.UnitTests.Controllers.WebApi
             {
                 Title = "test"
             };
-            var lotteryDTO = new CreateLotteryDTO
+            var lotteryDTO = new LotteryDTO
             {
                 Title = "test"
             };
-            _mapper.Map<CreateLotteryViewModel, CreateLotteryDTO>(lotteryViewModel)
+            _mapper.Map<CreateLotteryViewModel, LotteryDTO>(lotteryViewModel)
                .Returns(lotteryDTO);
             //
             var response = await _lotteryController.CreateLottery(lotteryViewModel);
@@ -203,11 +203,11 @@ namespace Shrooms.Premium.UnitTests.Controllers.WebApi
             {
                 Title = "test"
             };
-            var lotteryDTO = new CreateLotteryDTO
+            var lotteryDTO = new LotteryDTO
             {
                 Title = "test"
             };
-            _mapper.Map<CreateLotteryViewModel, CreateLotteryDTO>(lotteryViewModel)
+            _mapper.Map<CreateLotteryViewModel, LotteryDTO>(lotteryViewModel)
                .Returns(lotteryDTO);
             _lotteryService.CreateLottery(lotteryDTO).Throws(new LotteryException("Exception"));
             //
@@ -349,12 +349,12 @@ namespace Shrooms.Premium.UnitTests.Controllers.WebApi
                 Title = "Hello"
             };
 
-            var lotteryDto = new EditDraftedLotteryDTO
+            var lotteryDto = new LotteryDTO
             {
                 Id = 31,
                 Title = "Hello"
             };
-            _mapper.Map<EditDraftedLotteryViewModel, EditDraftedLotteryDTO>(lotteryViewModel)
+            _mapper.Map<EditDraftedLotteryViewModel, LotteryDTO>(lotteryViewModel)
                 .Returns(lotteryDto);
 
             //
@@ -377,12 +377,12 @@ namespace Shrooms.Premium.UnitTests.Controllers.WebApi
                 Title = "Hello"
             };
 
-            var lotteryDto = new EditDraftedLotteryDTO
+            var lotteryDto = new LotteryDTO
             {
                 Id = 31,
                 Title = "Hello"
             };
-            _mapper.Map<EditDraftedLotteryViewModel, EditDraftedLotteryDTO>(lotteryViewModel)
+            _mapper.Map<EditDraftedLotteryViewModel, LotteryDTO>(lotteryViewModel)
                 .Returns(lotteryDto);
 
             _lotteryService.When(x => x.EditDraftedLottery(lotteryDto))

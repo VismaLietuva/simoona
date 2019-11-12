@@ -44,7 +44,7 @@ namespace Shrooms.Domain.Services.Lotteries
             _kudosService = kudosService;
         }
 
-        public async Task<CreateLotteryDTO> CreateLottery(CreateLotteryDTO newLotteryDTO)
+        public async Task<LotteryDTO> CreateLottery(LotteryDTO newLotteryDTO)
         {
             if (newLotteryDTO.EndDate < DateTime.UtcNow)
             {
@@ -72,7 +72,7 @@ namespace Shrooms.Domain.Services.Lotteries
             return newLotteryDTO;
         }
 
-        public void EditDraftedLottery(EditDraftedLotteryDTO lotteryDTO)
+        public void EditDraftedLottery(LotteryDTO lotteryDTO)
         {
             var lottery = _lotteriesDbSet.Find(lotteryDTO.Id);
 
@@ -317,9 +317,9 @@ namespace Shrooms.Domain.Services.Lotteries
              RefundFailed = e.IsRefundFailed
          };
 
-        private Lottery MapNewLottery(CreateLotteryDTO newLotteryDTO)
+        private Lottery MapNewLottery(LotteryDTO newLotteryDTO)
         {
-            var newLottery = _mapper.Map<CreateLotteryDTO, Lottery>(newLotteryDTO);
+            var newLottery = _mapper.Map<LotteryDTO, Lottery>(newLotteryDTO);
 
             newLottery.CreatedBy = newLotteryDTO.UserId;
             newLottery.Modified = DateTime.UtcNow;
@@ -329,7 +329,7 @@ namespace Shrooms.Domain.Services.Lotteries
             return newLottery;
         }
 
-        private static void UpdateDraftedLottery(Lottery lottery, EditDraftedLotteryDTO draftedLotteryDTO)
+        private static void UpdateDraftedLottery(Lottery lottery, LotteryDTO draftedLotteryDTO)
         {
             lottery.EntryFee = draftedLotteryDTO.EntryFee;
             lottery.EndDate = draftedLotteryDTO.EndDate;

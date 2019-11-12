@@ -10,9 +10,9 @@ namespace Shrooms.Domain.Services.Lotteries
 {
     public interface ILotteryService
     {
-        Task<CreateLotteryDTO> CreateLottery(CreateLotteryDTO newLotteryDTO);
+        Task<LotteryDTO> CreateLottery(LotteryDTO newLotteryDTO);
 
-        void EditDraftedLottery(EditDraftedLotteryDTO lotteryDTO);
+        void EditDraftedLottery(LotteryDTO lotteryDTO);
 
         void EditStartedLottery(EditStartedLotteryDTO lotteryDTO);
 
