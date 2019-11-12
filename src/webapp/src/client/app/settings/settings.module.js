@@ -41,7 +41,7 @@
             });
         $urlRouterProvider
             .when('/:organizationName/Settings', '/:organizationName/Settings/General')
-            .otherwise(function ($injector, $location) {
+            .otherwise(function ($injector) {
                 var authService = $injector.get('authService');
                 authService.redirectToPageNotFound();
             });
