@@ -104,6 +104,10 @@
                 url: '/AccessDenied',
                 templateUrl: 'app/access-denied.html'
             })
+            .state('Root.WithOrg.PageNotFound',{
+                url: '/PageNotFound',
+                templateUrl: 'app/page-not-found.html'
+            })
             .state('Root.WithOrg.Client', {
                 abstract: true,
                 url: '',
