@@ -36,6 +36,5 @@
 	"messageAllFieldsAreRequired": "Visi laukai yra privalomi",
 	"userHasPendingKudos": "Naudotojas turi nepatvirtintų kudosų.",
 	"oops": "Oi!",
-	"404notFound": "404 Puslapis nerastas",
-	"requestedPageNotFound": "Atsiprašome, įvyko klaida, ieškomas puslapis nerastas!"
+	"requestedPageNotFound": "Atsiprašome, puslapis nerastas."
 }
