@@ -35,7 +35,6 @@
 	"messageShopItemAlreadyExists": "This item already exists",
 	"messageAllFieldsAreRequired": "All fields are required",
 	"userHasPendingKudos" : "User has pending kudos",
-	"oops": "Oops!",
 	"requestedPageNotFound": "Sorry, page not found."
 
 }
