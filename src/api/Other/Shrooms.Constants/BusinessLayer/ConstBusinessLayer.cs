@@ -21,6 +21,15 @@ namespace Shrooms.Constants.BusinessLayer
         public const string DeletedUserFirstName = "Deleted";
         public const string DeletedUserLastName = "Account";
 
+        #region Walls
+        public enum WallPreference
+        {
+            MyWalls = 1,
+            AllWalls
+        }
+
+        #endregion
+
         #region kudos
         public const string KudosServiceCategory = "Kudos";
         public const string KudosServiceStatusDone = "Done";
