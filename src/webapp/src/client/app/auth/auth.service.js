@@ -75,6 +75,7 @@
             redirectToRegister: redirectToRegister,
             redirectToForgotPassword: redirectToForgotPassword,
             redirectToAccessDenied: redirectToAccessDenied,
+            redirectToPageNotFound: redirectToPageNotFound,
             redirectToHome: redirectToHome,
             redirectToEvents: redirectToEvents,
             setOrganizationName: setOrganizationName,
@@ -390,6 +391,14 @@
 
         function redirectToAccessDenied() {
             $state.go('Root.WithOrg.AccessDenied', {
+                organizationName: authorizationData.organizationName
+            }, {
+                reload: true
+            });
+        }
+
+        function redirectToPageNotFound(){
+            $state.go('Root.WithOrg.PageNotFound', {
                 organizationName: authorizationData.organizationName
             }, {
                 reload: true
