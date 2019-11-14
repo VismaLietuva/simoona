@@ -29,7 +29,7 @@
         $scope.minusKudosModel = {
                 comment: $scope.serviceRequest.title,
                 multiplyBy: $scope.serviceRequest.kudosAmmount,
-                pointsType: { name: 'Minus', value: 1 },
+                pointsType: { name: 'Minus', value: 1, isActive:true },
                 id: $scope.serviceRequest.employee.id
             };
 
