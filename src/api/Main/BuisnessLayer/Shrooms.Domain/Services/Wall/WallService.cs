@@ -204,9 +204,9 @@ namespace Shrooms.Domain.Services.Wall
             return await QueryForPosts(userOrg, pageNumber, pageSize, wallId, null, null);
         }
 
-        public async Task<IEnumerable<PostDTO>> GetAllPosts(int pageNumber, int pageSize, UserAndOrganizationDTO userOrg, int wallPreference)
+        public async Task<IEnumerable<PostDTO>> GetAllPosts(int pageNumber, int pageSize, UserAndOrganizationDTO userOrg, int wallsType)
         {
-            return await QueryForPosts(userOrg, pageNumber, pageSize, null, null, wallPreference);
+            return await QueryForPosts(userOrg, pageNumber, pageSize, null, null, wallsType);
         }
 
         public async Task<PostDTO> GetWallPost(UserAndOrganizationDTO userOrg, int postId)
@@ -591,7 +591,7 @@ namespace Shrooms.Domain.Services.Wall
             _wallUsersDbSet.Remove(member);
         }
 
-        private async Task<IEnumerable<PostDTO>> QueryForPosts(UserAndOrganizationDTO userOrg, int pageNumber, int pageSize, int? wallId, Expression<Func<Post, bool>> filter, int? wallPreference)
+        private async Task<IEnumerable<PostDTO>> QueryForPosts(UserAndOrganizationDTO userOrg, int pageNumber, int pageSize, int? wallId, Expression<Func<Post, bool>> filter, int? wallsType)
         {
             if (filter == null)
             {
@@ -607,7 +607,7 @@ namespace Shrooms.Domain.Services.Wall
             else
             {
                 
-                wallsIds = wallPreference == (int)ConstBusinessLayer.WallPreference.MyWalls ? 
+                wallsIds = wallsType == (int)ConstBusinessLayer.WallPreference.MyWalls ? 
                                             (await GetWallsList(userOrg, WallsListFilter.Followed)).Select(w => w.Id).ToList() :
                                             (await GetWallsList(userOrg, WallsListFilter.All)).Select(w => w.Id).ToList();
             }
