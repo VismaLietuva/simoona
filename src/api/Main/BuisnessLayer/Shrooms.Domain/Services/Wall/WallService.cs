@@ -607,7 +607,7 @@ namespace Shrooms.Domain.Services.Wall
             else
             {
                 
-                wallsIds = wallsType == (int)ConstBusinessLayer.WallPreference.MyWalls ? 
+                wallsIds = wallsType == (int)ConstBusinessLayer.WallsType.MyWalls ? 
                                             (await GetWallsList(userOrg, WallsListFilter.Followed)).Select(w => w.Id).ToList() :
                                             (await GetWallsList(userOrg, WallsListFilter.All)).Select(w => w.Id).ToList();
             }

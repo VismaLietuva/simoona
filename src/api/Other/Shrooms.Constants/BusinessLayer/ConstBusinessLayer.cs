@@ -22,7 +22,7 @@ namespace Shrooms.Constants.BusinessLayer
         public const string DeletedUserLastName = "Account";
 
         #region Walls
-        public enum WallPreference
+        public enum WallsType
         {
             MyWalls = 1,
             AllWalls
