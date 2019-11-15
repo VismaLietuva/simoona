@@ -251,13 +251,13 @@
                     </div>
                     <!--event buttons right -->
                     <div class="pull-right">
-                        <button class="btn btn-primary" ng-if="vm.states.isAdd" ng-click="vm.saveEvent(vm.createEvent, true)" ng-disabled="eventForm.$invalid ||  !vm.eventImage || !vm.responsibleUser.id ||
+                        <button class="btn btn-primary" ng-if="vm.states.isAdd" ng-click="vm.saveEvent(vm.createEvent, vm.eventImage)" ng-disabled="eventForm.$invalid ||  !vm.eventImage || !vm.responsibleUser.id ||
                                          !vm.isEndDateValid() || vm.isDeadlineDateValid() || !vm.isStartDateValid() ||
                                          !vm.isOptionsUnique() || !vm.eventCroppedImage" data-test-id="event-form-save-button">
                             <span translate="common.save"></span>
                         </button>
-                        <button class="btn btn-primary" ng-if="vm.states.isEdit" ng-click="vm.saveEvent(vm.updateEvent, !!vm.eventImage)" ng-disabled="eventForm.$invalid || !vm.responsibleUser.id || !vm.isEndDateValid() ||
-                                         vm.isDeadlineDateValid() || !vm.isOptionsUnique() || (!!vm.eventImage && !vm.eventCroppedImage)" data-test-id="event-form-update-button">
+                        <button class="btn btn-primary" ng-if="vm.states.isEdit" ng-click="vm.saveEvent(vm.updateEvent, vm.eventImage)" ng-disabled="eventForm.$invalid || !vm.responsibleUser.id || !vm.isEndDateValid() ||
+                                         vm.isDeadlineDateValid() || !vm.isOptionsUnique()" data-test-id="event-form-update-button">
                             <span translate="common.update"></span>
                         </button>
                         <button class="btn btn-default" ui-sref="Root.WithOrg.Client.Events.List.Type({type: 'all'})" data-test-id="event-form-cancel-button">

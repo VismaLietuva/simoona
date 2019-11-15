@@ -229,8 +229,9 @@
             }
         }
 
-        function saveEvent(method, isImageChanged) {
-            if (isImageChanged) {
+        function saveEvent(method, NewImage) {
+            
+            if (NewImage.length) {
                 var eventImageBlob = dataHandler.dataURItoBlob(vm.eventCroppedImage[0], vm.eventImage[0].type);
 
                 eventImageBlob.lastModifiedDate = new Date();
