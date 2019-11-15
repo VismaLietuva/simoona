@@ -13,10 +13,10 @@
       </li>
 
       <li ng-if="vm.wallServiceData.wallList.length > 0">
-        <a ng-click="vm.filterWall(null)"
+        <a ng-click="vm.getAllWalls()"
            ui-sref="Root.WithOrg.Client.Wall.All"
            ng-class="{active: !vm.state.params.wall && vm.state.includes('Root.WithOrg.Client.Wall.All')}"
-           translate="All walls">
+           translate="wall.allWalls">
         </a>
       </li>
 

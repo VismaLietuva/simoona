@@ -10,6 +10,10 @@
             wallLogoHeight: 100,
             wallLogoWidth: 150
         })
+        .constant('WallsType', {
+            MyWalls: 1,
+            AllWalls: 2
+        })
         .factory('wallService', wallService);
 
     wallService.$inject = [
@@ -25,12 +29,13 @@
         'lodash',
         'notifySrv',
         'appConfig',
-        'SmoothScroll'
+        'SmoothScroll',
+        'WallsType'
     ];
 
     function wallService($location, $timeout, $state, authService, wallMenuNavigationRepository,
-        wallSettings, errorHandler, wallPostRepository, wallRepository, lodash, notifySrv, appConfig, SmoothScroll) {
-
+        wallSettings, errorHandler, wallPostRepository, wallRepository, lodash, notifySrv, appConfig, SmoothScroll, WallsType) {
+        
         var wallServiceData = {
             posts: [],
             isScrollingEnabled: true,
@@ -249,6 +254,7 @@
                 }, errorHandler.handleErrorMessage);
             } else {
                 if (!settings.wallId) {
+                    settings.wallsType = $state.current.url.contains('All') ? WallsType.AllWalls : WallsType.MyWalls;
                     wallPostRepository.getAllPosts(settings).then(function (response) {
                         addPostsToWall(response, true);
                         busy = false;

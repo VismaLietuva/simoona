@@ -43,10 +43,7 @@
             })
             .state('Root.WithOrg.Client.Wall.All', {
                 url: '/All',
-                reloadOnSearch: false,
                 templateUrl: 'app/wall/item/feed/feed.html',
-                controller: 'wallFeedController',
-                controllerAs: 'vm'
             })
             .state('Root.WithOrg.Client.Wall.List', {
                 url: '/List',
