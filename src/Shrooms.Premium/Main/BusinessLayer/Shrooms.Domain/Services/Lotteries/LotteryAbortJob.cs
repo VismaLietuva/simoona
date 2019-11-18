@@ -56,7 +56,7 @@ namespace Shrooms.Domain.Services.Lotteries
             {
                 _logger.Error(e);
                 _asyncRunner.Run<ILotteryService>(n =>
-                    n.UpdateRefundFailedFlag(lottery.Id, isFailed: true, userOrg), _uow.ConnectionName);
+                    n.UpdateRefundFailedFlag(lottery.Id, true, userOrg), _uow.ConnectionName);
             }
         }
 
