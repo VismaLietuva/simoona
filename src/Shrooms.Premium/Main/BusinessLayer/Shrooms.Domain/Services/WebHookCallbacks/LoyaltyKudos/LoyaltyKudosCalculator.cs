@@ -3,19 +3,15 @@ using Shrooms.EntityModels.Models.Kudos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.Kudos;
 
 namespace Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos
 {
-    public class LoyaltyKudos
+    public class LoyaltyKudosCalculator : ILoyaltyKudosCalculator
     {
         private const string LoyaltyKudosBotName = "KudosLoyaltyBot";
 
-        private static string LoyaltyKudosComment(int yearAwardedFor) => $"Kudos for {yearAwardedFor} year loyalty";
-
-        private LoyaltyKudos()
-        { }
-
-        public static KudosLog CreateLoyaltyKudosLog(ApplicationUser recipient, KudosType loyaltyKudosType, int organizationId, int[] kudosYearlyMultipliers, int yearOfEmployment)
+        public KudosLog CreateLoyaltyKudosLog(ApplicationUser recipient, KudosType loyaltyKudosType, int organizationId, int[] kudosYearlyMultipliers, int yearOfEmployment)
         {
             if (yearOfEmployment <= 0)
             {
@@ -51,10 +47,10 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos
 
             var loyaltyLog = new KudosLog
             {
-                Created = timestamp,
+                Created = recipient.EmploymentDate.Value.AddYears(yearOfEmployment),
                 Modified = timestamp,
                 CreatedBy = LoyaltyKudosBotName,
-                Comments = LoyaltyKudosComment(yearOfEmployment),
+                Comments = CreateLoyaltyKudosComment(yearOfEmployment),
                 EmployeeId = recipient.Id,
                 KudosTypeName = loyaltyKudosType.Name,
                 KudosTypeValue = loyaltyKudosType.Value,
@@ -68,12 +64,47 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.LoyaltyKudos
             return loyaltyLog;
         }
 
-        public static IEnumerable<int> CalculateYearsToAwardFor(int yearsEmployed, int loyaltyAwardsAlreadyReceived)
+        public IEnumerable<int> CalculateYearsToAwardFor(int yearsEmployed, int loyaltyAwardsAlreadyReceived)
         {
             var yearsToAwardCount = yearsEmployed - loyaltyAwardsAlreadyReceived;
-            var yearsToAwardFor = Enumerable.Range(loyaltyAwardsAlreadyReceived + 1, yearsToAwardCount);
+            var yearsToAwardFor = Enumerable.Empty<int>();
+            if (yearsToAwardCount >= 0)
+            {
+                yearsToAwardFor = Enumerable.Range(loyaltyAwardsAlreadyReceived + 1, yearsToAwardCount);
+            }
 
             return yearsToAwardFor;
+        }
+
+        public List<KudosLog> GetEmployeeLoyaltyKudosLog(EmployeeLoyaltyKudosDTO employeeLoyaltyKudos,
+                                                         KudosType loyaltyType,
+                                                         int organizationId,
+                                                         int[] kudosYearlyMultipliers)
+        {
+            var receivedLoyaltiesCount = employeeLoyaltyKudos.AwardedLoyaltyKudosCount;
+            var yearsToAwardFor = CalculateYearsToAwardFor(employeeLoyaltyKudos.Employee.YearsEmployed, receivedLoyaltiesCount);
+            var loyaltyKudosLogList = new List<KudosLog>();
+
+            foreach (var year in yearsToAwardFor)
+            {
+                if (employeeLoyaltyKudos.AwardedEmploymentYears.Any(y => y == year))
+                {
+                    continue;
+                }
+
+                var loyaltyKudosLog = CreateLoyaltyKudosLog(employeeLoyaltyKudos.Employee, loyaltyType, organizationId, kudosYearlyMultipliers, year);
+                if (loyaltyKudosLog != null)
+                {
+                    loyaltyKudosLogList.Add(loyaltyKudosLog);
+                }
+            }
+
+            return loyaltyKudosLogList;
+        }
+
+        private static string CreateLoyaltyKudosComment(int yearAwardedFor)
+        {
+            return $"Kudos for {yearAwardedFor} year loyalty";
         }
 
         private static int CalculateYearlyMultiplier(int yearOfEmployment, IReadOnlyList<int> multipliers)

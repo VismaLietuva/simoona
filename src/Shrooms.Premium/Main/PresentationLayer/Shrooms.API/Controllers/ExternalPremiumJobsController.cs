@@ -29,11 +29,18 @@ namespace Shrooms.Premium.Main.PresentationLayer.Shrooms.API.Controllers
         }
 
         [HttpPost]
+        [Route("RemindBooks")]
+        public void RemindBooks()
+        {
+            _webHookService.Books.RemindAboutBooks();
+        }
+
+        [HttpPost]
         [Route("GiveLoyaltyKudos")]
         public void GiveLoyaltyKudos()
         {
-            string orgName = GetOrganizationName();
-            _webHookService.LoyaltyKudos.AwardEmployeesWithKudos(orgName);
+            var organizationName = GetOrganizationName();
+            _webHookService.LoyaltyKudos.AwardEmployeesWithKudos(organizationName);
 
             var cache = Configuration.CacheOutputConfiguration().GetCacheOutputProvider(Request);
             cache.RemoveStartsWith(Configuration.CacheOutputConfiguration().MakeBaseCachekey((KudosController t) => t.GetLastKudosLogRecords()));

@@ -14,6 +14,7 @@ namespace Shrooms.Premium.UnitTests.ModelMappings
                 cfg.AddProfile<ServiceRequestProfile>();
                 cfg.AddProfile<CommitteeProfile>();
                 cfg.AddProfile<KudosShopProfile>();
+                cfg.AddProfile<LoyaltyKudosProfile>();
                 cfg.AddProfile<EventsProfile>();
                 cfg.AddProfile<VacationsProfile>();
                 cfg.AddProfile<LotteryProfile>();

@@ -19,6 +19,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Shrooms.Domain.Helpers;
 
 namespace Shrooms.Domain.Services.Events
 {
@@ -33,19 +34,20 @@ namespace Shrooms.Domain.Services.Events
         private readonly IEventParticipationService _eventParticipationService;
         private readonly IEventCalendarService _calendarService;
         private readonly IWallService _wallService;
+        private readonly IMarkdownConverter _markdownConverter;
         private readonly IDbSet<Event> _eventsDbSet;
         private readonly IDbSet<EventType> _eventTypesDbSet;
         private readonly IDbSet<ApplicationUser> _usersDbSet;
         private readonly IDbSet<EventOption> _eventOptionsDbSet;
 
-        public EventService(
-            IUnitOfWork2 uow,
-            IPermissionService permissionService,
-            IEventUtilitiesService eventUtilitiesService,
-            IEventValidationService eventValidationService,
-            IEventParticipationService eventParticipationService,
-            IEventCalendarService calendarService,
-            IWallService wallService)
+        public EventService(IUnitOfWork2 uow,
+                            IPermissionService permissionService,
+                            IEventUtilitiesService eventUtilitiesService,
+                            IEventValidationService eventValidationService,
+                            IEventParticipationService eventParticipationService,
+                            IEventCalendarService calendarService,
+                            IWallService wallService,
+                            IMarkdownConverter markdownConverter)
         {
             _uow = uow;
             _eventsDbSet = uow.GetDbSet<Event>();
@@ -59,6 +61,7 @@ namespace Shrooms.Domain.Services.Events
             _eventParticipationService = eventParticipationService;
             _calendarService = calendarService;
             _wallService = wallService;
+            _markdownConverter = markdownConverter;
         }
 
         public void Delete(Guid id, UserAndOrganizationDTO userOrg)
@@ -140,6 +143,7 @@ namespace Shrooms.Domain.Services.Events
             MapNewOptions(newEventDto, newEvent);
             await _uow.SaveChangesAsync(newEventDto.UserId);
 
+            newEvent.Description = _markdownConverter.ConvertToHtml(newEvent.Description);
             _calendarService.CreateEvent(newEvent, newEventDto.OrganizationId);
 
             newEventDto.Id = newEvent.Id.ToString();
@@ -156,11 +160,16 @@ namespace Shrooms.Domain.Services.Events
             var eventToUpdate = _eventsDbSet
                 .Include(e => e.EventOptions)
                 .Include(e => e.EventParticipants)
-                .FirstOrDefault(e => e.Id == eventDto.Id
-                    && e.OrganizationId == eventDto.OrganizationId);
+                .FirstOrDefault(e => e.Id == eventDto.Id && e.OrganizationId == eventDto.OrganizationId);
 
             var hasPermission = _permissionService.UserHasPermission(eventDto, AdministrationPermissions.Event);
             _eventValidationService.CheckIfEventExists(eventToUpdate);
+
+            if (eventToUpdate == null)
+            {
+                return;
+            }
+
             _eventValidationService.CheckIfUserHasPermission(eventDto.UserId, eventToUpdate.ResponsibleUserId, hasPermission);
             _eventValidationService.CheckIfCreatingEventHasInsufficientOptions(eventDto.MaxOptions, totalOptionsProvided);
             _eventValidationService.CheckIfCreatingEventHasNoChoices(eventDto.MaxOptions, totalOptionsProvided);
@@ -176,6 +185,8 @@ namespace Shrooms.Domain.Services.Events
             UpdateEventOptions(eventDto, eventToUpdate);
 
             _uow.SaveChanges(false);
+
+            eventToUpdate.Description = _markdownConverter.ConvertToHtml(eventToUpdate.Description);
             _calendarService.UpdateEvent(eventToUpdate, eventDto.OrganizationId);
         }
 

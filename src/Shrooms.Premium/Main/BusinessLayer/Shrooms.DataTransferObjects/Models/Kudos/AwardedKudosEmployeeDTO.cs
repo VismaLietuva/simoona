@@ -12,6 +12,6 @@ namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.DataTransferObjects.Models.
         public int OrganizationId { get; set; }
         public decimal Points { get; set; }
         public string KudosTypeName { get; set; }
-        public string KudosComments { get; set; }
+        public string Comments { get; set; }
     }
 }

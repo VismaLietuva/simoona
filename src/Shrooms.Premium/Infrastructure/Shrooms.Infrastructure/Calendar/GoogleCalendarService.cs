@@ -289,7 +289,7 @@ namespace Shrooms.Infrastructure.Calendar
                 credential = new ServiceAccountCredential(new ServiceAccountCredential
                     .Initializer(_appSettings.GoogleCalendarServiceId)
                     {
-                        Scopes = new string[1] { CalendarService.Scope.Calendar }
+                        Scopes = new[] { CalendarService.Scope.Calendar }
                     }.FromCertificate(cert));
             }
             catch (CryptographicException e)
