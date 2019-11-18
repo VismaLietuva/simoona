@@ -86,6 +86,10 @@
     <Reference Include="nunit.framework, Version=3.11.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>..\..\open-source\src\api\packages\NUnit.3.11.0\lib\net45\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="PagedList, Version=1.17.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\open-source\src\api\packages\PagedList.1.17.0.0\lib\net40\PagedList.dll</HintPath>
+    </Reference>
     <Reference Include="Shrooms.API, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(SimoonaCoreLocation)\src\api\Main\PresentationLayer\Shrooms.API\bin\Shrooms.API.dll</HintPath>
@@ -148,8 +152,11 @@
     <Reference Include="System.Linq.Dynamic, Version=1.0.5840.25917, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\open-source\src\api\packages\System.Linq.Dynamic.1.0.6\lib\net40\System.Linq.Dynamic.dll</HintPath>
     </Reference>
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\WebApi\LotteryControllerTests.cs" />
     <Compile Include="DomainService\BadgesServiceTests.cs" />
     <Compile Include="DomainService\BookMobileServiceTests.cs" />
     <Compile Include="DomainService\EventCrudServiceTests.cs" />
@@ -157,6 +164,9 @@
     <Compile Include="DomainService\EventServices\EventExportServiceTests.cs" />
     <Compile Include="DomainService\EventServices\EventParticipantServiceTests.cs" />
     <Compile Include="DomainService\EventUtilitiesServiceTests.cs" />
+    <Compile Include="DomainService\LotteryServices\LotteryAbortJobTests.cs" />
+    <Compile Include="DomainService\LotteryServices\LotteryServiceTests.cs" />
+    <Compile Include="DomainService\LotteryServices\ParticipantServiceTests.cs" />
     <Compile Include="DomainService\LoyaltyKudosTests.cs" />
     <Compile Include="DomainService\OfficeMapServiceTests.cs" />
     <Compile Include="DomainService\OrganizationalStructureTests.cs" />
