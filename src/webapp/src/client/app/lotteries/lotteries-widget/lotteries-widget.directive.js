@@ -35,16 +35,12 @@
                 scope.latestLotteries = [];
                 scope.hasLotteryPermisions = authService.hasPermissions(['LOTTERY_BASIC']);
 
-                if(!scope.$root.lottery)
-                {
+                if(!scope.$root.lottery) {
                     getLotteryWidgetInfo();
                 }
-                else
-                {
+                else {
                     scope.$root.lottery = false;
                 }
-                
-
 
                 function getLotteryWidgetInfo(){
                     lotteryRepository.getLotteryWidgetInfo().then(function(result) {
