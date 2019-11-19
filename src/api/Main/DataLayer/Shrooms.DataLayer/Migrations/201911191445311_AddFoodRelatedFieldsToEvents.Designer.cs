@@ -13,7 +13,7 @@ namespace Shrooms.DataLayer.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201911191207363_AddFoodRelatedFieldsToEvents"; }
+            get { return "201911191445311_AddFoodRelatedFieldsToEvents"; }
         }
         
         string IMigrationMetadata.Source
