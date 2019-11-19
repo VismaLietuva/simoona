@@ -132,7 +132,8 @@ namespace Shrooms.Domain.Services.Events.List
                 ParticipantsCount = e.EventParticipants.Count,
                 IsCreator = e.ResponsibleUserId == userId,
                 IsParticipating = e.EventParticipants.Any(p => p.ApplicationUserId == userId),
-                MaxChoices = e.MaxChoices
+                MaxChoices = e.MaxChoices,
+                FoodOption = e.FoodOption
             };
         }
 

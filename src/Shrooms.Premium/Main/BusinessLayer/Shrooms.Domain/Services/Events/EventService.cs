@@ -225,6 +225,7 @@ namespace Shrooms.Domain.Services.Events
                 HostUserId = e.ResponsibleUserId,
                 HostUserFullName = e.ResponsibleUser.FirstName + " " + e.ResponsibleUser.LastName,
                 TypeId = e.EventTypeId,
+                FoodOption = e.FoodOption,
                 Options = e.EventOptions.Select(o => new EventOptionDTO
                 {
                     Id = o.Id,
@@ -379,6 +380,7 @@ namespace Shrooms.Domain.Services.Events
             newEvent.StartDate = newEventDto.StartDate;
             newEvent.Name = newEventDto.Name;
             newEvent.RegistrationDeadline = newEventDto.RegistrationDeadlineDate.Value;
+            newEvent.FoodOption = newEventDto.FoodOption;
         }
 
         private Expression<Func<Event, EventDetailsDTO>> MapToEventDetailsDto(Guid eventId)
@@ -399,6 +401,7 @@ namespace Shrooms.Domain.Services.Events
                 MaxOptions = e.MaxChoices,
                 HostUserId = e.ResponsibleUserId,
                 WallId = e.WallId,
+                FoodOption = e.FoodOption,
                 HostUserFullName = e.ResponsibleUser.FirstName + " " + e.ResponsibleUser.LastName,
                 Options = e.EventOptions.Select(o => new EventDetailsOptionDTO
                 {

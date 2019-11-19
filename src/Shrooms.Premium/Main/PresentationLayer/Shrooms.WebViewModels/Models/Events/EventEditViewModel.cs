@@ -26,6 +26,8 @@ namespace Shrooms.WebViewModels.Models.Events
 
         public int TypeId { get; set; }
 
+        public int? FoodOption { get; set; }
+
         public string Description { get; set; }
 
         public int MaxParticipants { get; set; }
