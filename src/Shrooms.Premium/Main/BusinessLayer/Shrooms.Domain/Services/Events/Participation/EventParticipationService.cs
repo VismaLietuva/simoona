@@ -350,7 +350,7 @@ namespace Shrooms.Domain.Services.Events.Participation
             if (@event.IsSingleJoin)
             {
                 var events = _eventsDbSet
-                    .Include(e => e.EventParticipants)
+                    .Include(e => e.EventParticipants.Select(x => x.EventOptions))
                     .Where(x =>
                         x.EventTypeId == @event.EventTypeId &&
                         x.OrganizationId == organizationId &&
@@ -358,11 +358,23 @@ namespace Shrooms.Domain.Services.Events.Participation
                         x.EventParticipants.Any(p => p.ApplicationUserId == userId))
                     .ToList();
 
+                var filteredEvents = RemoveEventsWithoutFood(events, userId);
+
                 var eventWeekNumber = GetWeekOfYear(@event.StartDate);
-                var eventToLeave = events.FirstOrDefault(x => GetWeekOfYear(x.StartDate) == eventWeekNumber);
+                var eventToLeave = filteredEvents.FirstOrDefault(x => GetWeekOfYear(x.StartDate) == eventWeekNumber);
 
                 _eventValidationService.CheckIfUserExistsInOtherSingleJoinEvent(eventToLeave);
             }
+        }
+
+        private IEnumerable<Event> RemoveEventsWithoutFood(IList<Event> events, string userId)
+        {
+            var foodOptionalEvents = events.Where(x => x.FoodOption == (int)FoodOptions.Optional);
+            var eventsToRemove = foodOptionalEvents.Where(x =>
+                x.EventParticipants.First(y => y.ApplicationUserId == userId)
+                    .EventOptions.Any(z => z.Option == "test"));
+
+            return events.Except(eventsToRemove);
         }
 
         private void AddParticipant(string userId, Guid eventId, List<EventOption> eventOptions)
