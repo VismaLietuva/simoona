@@ -46,7 +46,6 @@ namespace Shrooms.WebViewModels.Models.Events
         [Required]
         public int TypeId { get; set; }
 
-        [Required]
         public int? FoodOption { get; set; }
 
         [Required]
