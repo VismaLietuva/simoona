@@ -28,6 +28,7 @@
         vm.state = $state;
 
         vm.filterWall = filterWall;
+        vm.getAllWalls = getAllWalls;
 
         init();
         
@@ -64,9 +65,19 @@
                     search: null,
                     post: null,
                     wall: wallId
-                });
+                 });
             }
-
+            leftMenuService.setStatus(false);
+            document.getElementsByTagName('body')[0].classList.toggle('overflow');
+            
+        }
+        
+        function getAllWalls() {
+            if($state.includes('Root.WithOrg.Client.Wall.All')) {
+                wallService.initWall(true, null);
+            } else {
+                $state.go('Root.WithOrg.Client.Wall.All');
+            }
             leftMenuService.setStatus(false);
             document.getElementsByTagName('body')[0].classList.toggle('overflow');
             
