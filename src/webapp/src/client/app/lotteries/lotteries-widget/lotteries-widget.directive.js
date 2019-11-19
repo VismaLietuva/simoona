@@ -22,14 +22,7 @@
             var directive = {
                 restrict: 'E',
                 templateUrl: 'app/lotteries/lotteries-widget/lotteries-widget.html',
-                link: linkFunc,
-                scope: {
-                    latestLotteries: '=?',
-                },
-                controller: function(){
-                    var vm = this;
-                },
-                controllerAs: 'vm'
+                link: linkFunc
             };
             return directive;
 
@@ -42,16 +35,23 @@
                 scope.latestLotteries = [];
                 scope.hasLotteryPermisions = authService.hasPermissions(['LOTTERY_BASIC']);
 
-                if(scope.$$prevSibling.hasLotteryPermisions)
+                if(!scope.$root.lottery)
                 {
                     getLotteryWidgetInfo();
                 }
+                else
+                {
+                    scope.$root.lottery = false;
+                }
+                
+
 
                 function getLotteryWidgetInfo(){
                     lotteryRepository.getLotteryWidgetInfo().then(function(result) {
                         scope.latestLotteries = result;
                         filterEndedLotteries();
                     })
+                    scope.$root.lottery = true;
                 }
                 function filterEndedLotteries(){
                     angular.forEach(scope.latestLotteries, (lottery) => {
