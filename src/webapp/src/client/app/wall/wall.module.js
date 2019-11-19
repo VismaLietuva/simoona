@@ -41,6 +41,10 @@
                 controller: 'wallMembersController',
                 controllerAs: 'vm'
             })
+            .state('Root.WithOrg.Client.Wall.All', {
+                url: '/All',
+                templateUrl: 'app/wall/item/feed/feed.html',
+            })
             .state('Root.WithOrg.Client.Wall.List', {
                 url: '/List',
                 templateUrl: 'app/wall/discover-walls/list/list.html',
