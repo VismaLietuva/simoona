@@ -104,8 +104,6 @@ namespace Shrooms.Domain.Services.Events.Utilities
 
         public void UpdateEventType(UpdateEventTypeDTO eventType)
         {
-            ValidateEventTypeName(eventType.Name, eventType.OrganizationId);
-
             var orgEventType = _eventTypesDbSet
                 .SingleOrDefault(x => x.OrganizationId == eventType.OrganizationId && x.Id == eventType.Id);
 

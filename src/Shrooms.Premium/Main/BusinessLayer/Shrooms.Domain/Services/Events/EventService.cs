@@ -20,12 +20,20 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Shrooms.Domain.Helpers;
+using Shrooms.Resources.Models.Events;
+using Shrooms.Domain.Services.UserService;
+using System.Threading;
+using System.Resources;
+using Shrooms.Resources;
+using System.Globalization;
 
 namespace Shrooms.Domain.Services.Events
 {
     public class EventService : IEventService
     {
         private const int NoOptions = 0;
+
+
 
         private readonly IUnitOfWork2 _uow;
         private readonly IPermissionService _permissionService;
@@ -34,11 +42,14 @@ namespace Shrooms.Domain.Services.Events
         private readonly IEventParticipationService _eventParticipationService;
         private readonly IEventCalendarService _calendarService;
         private readonly IWallService _wallService;
+        private readonly IUserService _userService;
         private readonly IMarkdownConverter _markdownConverter;
         private readonly IDbSet<Event> _eventsDbSet;
         private readonly IDbSet<EventType> _eventTypesDbSet;
         private readonly IDbSet<ApplicationUser> _usersDbSet;
         private readonly IDbSet<EventOption> _eventOptionsDbSet;
+        private readonly ResourceManager _resourceManager;
+
 
         public EventService(IUnitOfWork2 uow,
                             IPermissionService permissionService,
@@ -47,6 +58,7 @@ namespace Shrooms.Domain.Services.Events
                             IEventParticipationService eventParticipationService,
                             IEventCalendarService calendarService,
                             IWallService wallService,
+                            IUserService userService,
                             IMarkdownConverter markdownConverter)
         {
             _uow = uow;
@@ -61,7 +73,9 @@ namespace Shrooms.Domain.Services.Events
             _eventParticipationService = eventParticipationService;
             _calendarService = calendarService;
             _wallService = wallService;
+            _userService = userService;
             _markdownConverter = markdownConverter;
+            _resourceManager = new ResourceManager("Shrooms.Resources.Models.Events.Events", typeof(ResourceUtilities).Assembly);
         }
 
         public void Delete(Guid id, UserAndOrganizationDTO userOrg)
@@ -137,7 +151,20 @@ namespace Shrooms.Domain.Services.Events
             _eventValidationService.CheckIfCreatingEventHasInsufficientOptions(newEventDto.MaxOptions, newEventDto.NewOptions.Count());
             _eventValidationService.CheckIfCreatingEventHasNoChoices(newEventDto.MaxOptions, newEventDto.NewOptions.Count());
 
+
+            if (newEventDto.FoodOption == (int)FoodOptions.Optional)
+            {
+                var usersCultureCode = _userService.GetApplicationUser(newEventDto.ResponsibleUserId).CultureCode;
+
+                var willEatOption = TranslateEventOptions("WillEat", usersCultureCode);
+                var willNotEatOption = TranslateEventOptions("WillNotEat", usersCultureCode);
+
+                newEventDto.NewOptions = new List<string>() { willEatOption, willNotEatOption };
+                newEventDto.MaxOptions = 1;
+            }
+
             var newEvent = await MapNewEvent(newEventDto);
+
             _eventsDbSet.Add(newEvent);
 
             MapNewOptions(newEventDto, newEvent);
@@ -333,6 +360,12 @@ namespace Shrooms.Domain.Services.Events
                     }
                 }
             }
+        }
+
+        private string TranslateEventOptions(string eventOption, string cultureCode)
+        {
+            var culture = new CultureInfo(cultureCode);
+            return ResourceUtilities.GetResourceValue(_resourceManager, eventOption, culture);
         }
 
         private async Task<Event> MapNewEvent(CreateEventDto newEventDto)
