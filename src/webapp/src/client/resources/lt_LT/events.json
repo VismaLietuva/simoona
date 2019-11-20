@@ -161,5 +161,6 @@
   "deleteUserConfirmationMessage": "Ar tikrai norite pašalinti šį vartotoją iš renginio?",
   "eventAddColleaguesButton": "+ Pridėti kolegas",
   "eventAddColleaguesTitle": "Pridėti kolegas",
-  "eventAdd": "Pridėti"
+  "eventAdd": "Pridėti",
+  "foodOptionalSelect": "Valgymas neprivalomas"
 }
