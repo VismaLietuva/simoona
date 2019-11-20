@@ -367,14 +367,23 @@ namespace Shrooms.Domain.Services.Events.Participation
             }
         }
 
-        private IEnumerable<Event> RemoveEventsWithoutFood(IList<Event> events, string userId)
+        private static IEnumerable<Event> RemoveEventsWithoutFood(IList<Event> events, string userId)
         {
-            var foodOptionalEvents = events.Where(x => x.FoodOption == (int)FoodOptions.Optional);
-            var eventsToRemove = foodOptionalEvents.Where(x =>
-                x.EventParticipants.First(y => y.ApplicationUserId == userId)
-                    .EventOptions.Any(z => z.Option == "test"));
+            try
+            {
+                var foodOptionalEvents = events.Where(x => x.FoodOption == (int)FoodOptions.Optional);
 
-            return events.Except(eventsToRemove);
+                var eventsToRemove = foodOptionalEvents
+                    .Where(x => x.EventParticipants
+                        .First(y => y.ApplicationUserId == userId).EventOptions
+                        .Any(z => z.Option == "test"));
+
+                return events.Except(eventsToRemove);
+            }
+            catch (ArgumentNullException)
+            {
+                return events;
+            }
         }
 
         private void AddParticipant(string userId, Guid eventId, List<EventOption> eventOptions)
