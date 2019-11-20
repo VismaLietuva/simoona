@@ -201,12 +201,12 @@ namespace Shrooms.Domain.Services.Wall
 
         public async Task<IEnumerable<PostDTO>> GetWallPosts(int pageNumber, int pageSize, UserAndOrganizationDTO userOrg, int? wallId)
         {
-            return await QueryForPosts(userOrg, pageNumber, pageSize, wallId, null);
+            return await QueryForPosts(userOrg, pageNumber, pageSize, wallId, null, null);
         }
 
-        public async Task<IEnumerable<PostDTO>> GetAllPosts(int pageNumber, int pageSize, UserAndOrganizationDTO userOrg)
+        public async Task<IEnumerable<PostDTO>> GetAllPosts(int pageNumber, int pageSize, UserAndOrganizationDTO userOrg, int wallsType)
         {
-            return await QueryForPosts(userOrg, pageNumber, pageSize, null, null);
+            return await QueryForPosts(userOrg, pageNumber, pageSize, null, null, wallsType);
         }
 
         public async Task<PostDTO> GetWallPost(UserAndOrganizationDTO userOrg, int postId)
@@ -241,7 +241,7 @@ namespace Shrooms.Domain.Services.Wall
                     comment.MessageBody.Contains(searchString) &&
                     comment.AuthorId != null);
 
-            return await QueryForPosts(userOrg, pageNumber, pageSize, null, exp);
+            return await QueryForPosts(userOrg, pageNumber, pageSize, null, exp, null);
         }
 
         public async Task<IEnumerable<WallMemberDto>> GetWallMembers(int wallId, UserAndOrganizationDTO userOrg)
@@ -591,18 +591,27 @@ namespace Shrooms.Domain.Services.Wall
             _wallUsersDbSet.Remove(member);
         }
 
-        private async Task<IEnumerable<PostDTO>> QueryForPosts(UserAndOrganizationDTO userOrg, int pageNumber, int pageSize, int? wallId, Expression<Func<Post, bool>> filter)
+        private async Task<IEnumerable<PostDTO>> QueryForPosts(UserAndOrganizationDTO userOrg, int pageNumber, int pageSize, int? wallId, Expression<Func<Post, bool>> filter, int? wallsType)
         {
             if (filter == null)
             {
                 filter = post => true;
             }
 
-            var wallsIds = wallId.HasValue && WallIsValid(userOrg, wallId.Value) ?
-                new List<int> { wallId.Value } :
-                (await GetWallsList(userOrg, WallsListFilter.Followed))
-                    .Select(w => w.Id).ToList();
+            List<int> wallsIds;
 
+            if (wallId.HasValue && WallIsValid(userOrg, wallId.Value))
+            {
+                wallsIds = new List<int> { wallId.Value };
+            }
+            else
+            {
+                
+                wallsIds = wallsType == (int)ConstBusinessLayer.WallsType.MyWalls ? 
+                                            (await GetWallsList(userOrg, WallsListFilter.Followed)).Select(w => w.Id).ToList() :
+                                            (await GetWallsList(userOrg, WallsListFilter.All)).Select(w => w.Id).ToList();
+            }
+           
             int entriesCountToSkip = (pageNumber - 1) * pageSize;
             var posts = await _postsDbSet
                 .Include(post => post.Wall)

@@ -12,6 +12,14 @@
         </a>
       </li>
 
+      <li ng-if="vm.wallServiceData.wallList.length > 0">
+        <a ng-click="vm.getAllWalls()"
+           ui-sref="Root.WithOrg.Client.Wall.All"
+           ng-class="{active: !vm.state.params.wall && vm.state.includes('Root.WithOrg.Client.Wall.All')}"
+           translate="wall.allWalls">
+        </a>
+      </li>
+
       <li ng-repeat="wall in vm.wallServiceData.wallList">
         <a ng-click="vm.filterWall(wall.id)"
            ui-sref="Root.WithOrg.Client.Wall.Item.Feed({wall: wall.id, search: null, post: null})"

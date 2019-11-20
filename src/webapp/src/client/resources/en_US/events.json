@@ -160,5 +160,6 @@
   "deleteUserConfirmationMessage": "Are you sure you want to remove this user from current event?",
   "eventAddColleaguesButton": "+ Add colleagues",
   "eventAddColleaguesTitle": "Add colleagues",
-  "eventAdd": "Add"
+  "eventAdd": "Add",
+  "foodOptionalSelect": "Eating is optional"
 }
