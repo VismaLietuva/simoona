@@ -280,6 +280,7 @@ namespace Shrooms.Domain.Services.Events
             _eventValidationService.CheckIfResponsibleUserNotExists(userExists);
             _eventValidationService.CheckIfOptionsAreDifferent(eventDto.NewOptions);
             _eventValidationService.CheckIfTypeDoesNotExist(eventTypeExists);
+            _eventValidationService.CheckIfFoodOptionalAndOptionsNonExistent(eventDto.NewOptions, eventDto.FoodOption);
         }
 
         private void UpdateEventOptions(EditEventDTO editedEvent, Event @event)

@@ -234,5 +234,13 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
                 throw new EventException(EventParticipantsNotFound);
             }
         }
+
+        public void CheckIfFoodOptionalAndOptionsNonExistent(IEnumerable<string> options, int? foodOption)
+        {
+            if (options.Any() && foodOption == (int)FoodOptions.Optional)
+            {
+                throw new EventException("Event cannot have options and Food Optional flag enabled.");
+            }
+        }
     }
 }
