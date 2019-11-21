@@ -54,6 +54,9 @@
             if (!vm.eventType.isSingleJoin) {
                 vm.eventType.isSingleJoin = false;
             }
+            if (!vm.eventType.isFoodRelated) {
+                vm.eventType.isFoodRelated = false;
+            }
 
             return eventTypesRepository.createEventType(vm.eventType);
         }

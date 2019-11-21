@@ -803,6 +803,10 @@
     <Compile Include="Migrations\201910301511497_LotteryRefundFailedFlag.Designer.cs">
       <DependentUpon>201910301511497_LotteryRefundFailedFlag.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201911191445311_AddFoodRelatedFieldsToEvents.cs" />
+    <Compile Include="Migrations\201911191445311_AddFoodRelatedFieldsToEvents.Designer.cs">
+      <DependentUpon>201911191445311_AddFoodRelatedFieldsToEvents.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
@@ -1321,6 +1325,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201910301511497_LotteryRefundFailedFlag.resx">
       <DependentUpon>201910301511497_LotteryRefundFailedFlag.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201911191445311_AddFoodRelatedFieldsToEvents.resx">
+      <DependentUpon>201911191445311_AddFoodRelatedFieldsToEvents.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
