@@ -22,6 +22,10 @@ namespace Shrooms.EntityModels.Models.Notifications
 
         public bool FollowingPostsEmailNotifications { get; set; }
 
+        public bool EventWeeklyReminderAppNotifications { get; set; }
+
+        public bool EventWeeklyReminderEmailNotifications { get; set; }
+
         public virtual ApplicationUser ApplicationUser { get; set; }
     }
 }
