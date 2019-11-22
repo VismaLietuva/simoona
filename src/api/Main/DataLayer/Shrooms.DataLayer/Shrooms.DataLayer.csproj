@@ -807,6 +807,10 @@
     <Compile Include="Migrations\201911191445311_AddFoodRelatedFieldsToEvents.Designer.cs">
       <DependentUpon>201911191445311_AddFoodRelatedFieldsToEvents.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201911211513536_EventContainsMultipleOffices.cs" />
+    <Compile Include="Migrations\201911211513536_EventContainsMultipleOffices.Designer.cs">
+      <DependentUpon>201911211513536_EventContainsMultipleOffices.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
@@ -1328,6 +1332,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201911191445311_AddFoodRelatedFieldsToEvents.resx">
       <DependentUpon>201911191445311_AddFoodRelatedFieldsToEvents.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201911211513536_EventContainsMultipleOffices.resx">
+      <DependentUpon>201911211513536_EventContainsMultipleOffices.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

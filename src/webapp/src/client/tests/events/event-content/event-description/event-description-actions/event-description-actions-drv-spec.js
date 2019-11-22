@@ -33,6 +33,7 @@ describe('aceEventDescriptionActions', function () {
 
         scope.isDetails = false;
         scope.event = eventsMocks.events[0];
+        console.log(scope.event);
 
         $templateCache.put('app/events/content/description/description-actions/description-actions.html', '<div></div>');
         element = angular.element('<ace-event-description-actions event="event"></ace-event-description-actions>');

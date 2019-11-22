@@ -11,7 +11,7 @@
     eventsByTypeController.$inject = [
         '$stateParams',
         'eventRepository',
-        'eventsSettings'
+        'eventsSettings',
     ];
 
     function eventsByTypeController($stateParams, eventRepository, eventsSettings) {

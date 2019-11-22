@@ -75,7 +75,10 @@
         vm.eventImage = '';
         vm.eventCroppedImage = '';
         vm.minStartDate = moment().local().startOf('minute').toDate();
+        vm.otherOfficesDisabled = false;
 
+        vm.toggleOfficeSelection = toggleOfficeSelection;
+        vm.toggleAllOffices = toggleAllOffices;
         vm.searchUsers = searchUsers;
         vm.addOption = addOption;
         vm.deleteOption = deleteOption;
@@ -159,7 +162,7 @@
                 vm.event = {
                     name: '',
                     typeId: null,
-                    officeId: null,
+                    offices: [],
                     startDate: moment().add(1, 'hours').local().startOf('minute').toDate(),
                     endDate: moment().add(3, 'hours').local().startOf('minute').toDate(),
                     recurrence: 0,
@@ -188,6 +191,30 @@
                 }
             }, true);
         }
+
+        function toggleOfficeSelection(office) {
+            var idx = vm.event.offices.indexOf(office.id);
+
+            if(idx > -1) {
+                vm.event.offices.splice(idx,1);
+            }
+            else {
+                vm.event.offices.push(office.id);
+            }
+        }
+
+        function toggleAllOffices() {
+            if(vm.event.offices.length == vm.eventOffices.length) {
+                vm.event.offices = [];
+            }
+            else {
+                vm.event.offices = [];
+                angular.forEach(vm.eventOffices, function(office) {
+                    vm.event.offices.push(office.id);
+                })
+            }
+        }
+
 
         function searchUsers(search) {
             return eventRepository.getUserForAutoCompleteResponsiblePerson(search);
