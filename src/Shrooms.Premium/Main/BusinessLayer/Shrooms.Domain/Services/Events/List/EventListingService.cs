@@ -3,6 +3,7 @@ using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Events;
 using Shrooms.DomainServiceValidators.Validators.Events;
+using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Events;
 using System;
 using System.Collections.Generic;
@@ -24,11 +25,13 @@ namespace Shrooms.Domain.Services.Events.List
         private readonly IEventValidationService _eventValidationService;
 
         private readonly IDbSet<Event> _eventsDbSet;
+        private readonly IDbSet<Office> _officeDbSet;
 
         public EventListingService(IUnitOfWork2 uow, IEventValidationService eventValidationService)
         {
             _eventValidationService = eventValidationService;
             _eventsDbSet = uow.GetDbSet<Event>();
+            _officeDbSet = uow.GetDbSet<Office>();
         }
 
         public EventOptionsDTO GetEventOptions(Guid eventId, UserAndOrganizationDTO userOrg)
@@ -49,7 +52,7 @@ namespace Shrooms.Domain.Services.Events.List
         {
             var events = _eventsDbSet
                 .Include(x => x.EventParticipants)
-                .Include(x => x.Office)
+                .Include(x => x.Offices)
                 .Where(t =>
                     t.OrganizationId == userOrganization.OrganizationId &
                     t.EndDate > DateTime.UtcNow)
@@ -57,23 +60,34 @@ namespace Shrooms.Domain.Services.Events.List
                 .Select(MapEventToListItemDto(userOrganization.UserId))
                 .OrderBy(e => e.StartDate)
                 .ToList();
-            return events;
+
+            var filteredByOfficeEvents = events
+             .Select(x => { x.OfficeNames = _officeDbSet.Where(p => x.Offices.Contains(p.Id)).Select(q => q.Name); return x; })
+             .ToList();
+
+            return filteredByOfficeEvents;
         }
 
         public IEnumerable<EventListItemDTO> GetEventsByTypeAndOffice(UserAndOrganizationDTO userOrganization, int? typeId = null, int? officeId = null)
         {
-            var events = _eventsDbSet
+            var office = officeId.ToString();
+
+            IList<EventListItemDTO> events = _eventsDbSet
                 .Include(x => x.EventParticipants)
-                .Include(x => x.Office)
                 .Where(t =>
                     t.OrganizationId == userOrganization.OrganizationId &
                     t.EndDate > DateTime.UtcNow)
                 .Where(EventTypeFilter(typeId))
-                .Where(EventOfficeFilter(officeId))
                 .Select(MapEventToListItemDto(userOrganization.UserId))
                 .OrderBy(e => e.StartDate)
                 .ToList();
-            return events;
+
+            var filteredByOfficeEvents = events
+                .Where(x => x.Offices.Any(o => o == officeId) || x.Offices == null)
+                .Select(x => { x.OfficeNames = _officeDbSet.Where(p => x.Offices.Contains(p.Id)).Select(q => q.Name); return x; })
+                .ToList();
+            
+            return filteredByOfficeEvents;
         }
 
         public IEnumerable<EventListItemDTO> GetMyEvents(MyEventsOptionsDTO options, int? officeId = null)
@@ -81,7 +95,7 @@ namespace Shrooms.Domain.Services.Events.List
             var myEventFilter = EventFilters[options.Filter](options.UserId);
             var events = _eventsDbSet
                 .Include(x => x.EventParticipants)
-                .Include(x => x.Office)
+                .Include(x => x.Offices)
                 .Where(t => t.OrganizationId == options.OrganizationId)
                 .Where(SearchFilter(options.SearchString))
                 .Where(myEventFilter)
@@ -123,8 +137,8 @@ namespace Shrooms.Domain.Services.Events.List
                 Id = e.Id,
                 ImageName = e.ImageName,
                 MaxParticipants = e.MaxParticipants,
+                Offices = e.Offices,
                 Name = e.Name,
-                Office = e.Office.Name,
                 Place = e.Place,
                 StartDate = e.StartDate,
                 EndDate = e.EndDate,
@@ -166,7 +180,7 @@ namespace Shrooms.Domain.Services.Events.List
                 return x => true;
             }
 
-            return x => x.OfficeId == officeId || x.OfficeId == null;
+            return x => x.Offices.Any(o => o == officeId) || x.Offices == null;
         }
 
         private static Expression<Func<Event, bool>> SearchFilter(string searchString)

@@ -886,7 +886,6 @@ namespace Shrooms.UnitTests.DomainService
                     RegistrationDeadline = DateTime.UtcNow,
                     MaxChoices = 1,
                     MaxParticipants = 3,
-                    Office = new Office { Name = "office" },
                     Name = "name",
                     OrganizationId = 2,
                     ResponsibleUser = responsibleUser1,

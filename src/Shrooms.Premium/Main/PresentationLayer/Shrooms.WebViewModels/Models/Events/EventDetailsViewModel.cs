@@ -19,7 +19,7 @@ namespace Shrooms.WebViewModels.Models.Events
 
         public int? OfficeId { get; set; }
         
-        public string OfficeName { get; set; }
+        public IList<string> OfficeNames { get; set; }
 
         public string Location { get; set; }
 

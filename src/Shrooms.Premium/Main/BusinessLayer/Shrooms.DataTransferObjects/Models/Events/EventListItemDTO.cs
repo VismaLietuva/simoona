@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Shrooms.EntityModels.Models;
+using System;
+using System.Collections.Generic;
 
 namespace Shrooms.DataTransferObjects.Models.Events
 {
@@ -16,7 +18,9 @@ namespace Shrooms.DataTransferObjects.Models.Events
 
         public DateTime RegistrationDeadlineDate { get; set; }
 
-        public string Office { get; set; }
+        public OfficesCollection Offices { get; set; }
+
+        public IEnumerable<string> OfficeNames { get; set; }
 
         public string Place { get; set; }
 

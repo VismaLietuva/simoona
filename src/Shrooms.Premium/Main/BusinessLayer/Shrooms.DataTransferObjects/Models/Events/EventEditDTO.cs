@@ -1,4 +1,5 @@
-﻿using Shrooms.EntityModels.Models.Events;
+﻿using Shrooms.EntityModels.Models;
+using Shrooms.EntityModels.Models.Events;
 using System;
 using System.Collections.Generic;
 
@@ -20,7 +21,7 @@ namespace Shrooms.DataTransferObjects.Models.Events
 
         public EventRecurrenceOptions Recurrence { get; set; }
 
-        public int? OfficeId { get; set; }
+        public OfficesCollection Offices { get; set; }
 
         public string Location { get; set; }
 
