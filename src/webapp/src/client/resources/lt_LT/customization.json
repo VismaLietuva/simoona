@@ -12,6 +12,7 @@
     "eventTypesDescription": "Tvarkyti renginių tipus",
     "eventTypeName": "Pavadinimas",
     "eventTypeSingleJoin": "Tik vienas dalyvavimas",
+    "eventTypeIsFoodRelated": "Su maistu",
     "editEventType": "Renginio tipo redagavimas",
     "createEventType": "Naujas renginio tipas",
     "eventTypeWarning": "Šis renginio tipas turi nepasibaigusių arba pasikartojančių renginių",

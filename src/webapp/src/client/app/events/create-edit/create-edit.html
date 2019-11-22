@@ -20,7 +20,7 @@
                     <div class="form-group required" ng-class="{'has-error': eventForm.typeId.$invalid && eventForm.typeId.$dirty}">
                         <label for="typeId" class="control-label col-xs-12 col-sm-4" translate="events.eventType"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
-                            <select id="typeId" name="typeId" class="form-control" ng-model="vm.event.typeId" ng-options="type.id as type.name for type in vm.eventTypes" data-test-id="event-form-event-type-input" required translate-cloak>
+                            <select id="typeId" name="typeId" class="form-control" ng-model="vm.selectedType" ng-change="vm.event.typeId=vm.selectedType.id" ng-options="type as type.name for type in vm.eventTypes" data-test-id="event-form-event-type-input" required translate-cloak>
                             </select>
                             <p class="text-danger help-block" ng-if="eventForm.typeId.$invalid && eventForm.typeId.$dirty" translate="common.messageFieldIsRequired"></p>
                         </div>
@@ -195,11 +195,19 @@
                             <img ng-if="vm.states.isEdit && !vm.eventCroppedImage && !!vm.eventImage" src="{{vm.event.imageName | imageThumb:vm.eventImageSize:'crop'}}" />
                         </div>
                     </div>
+                    <!--event isFoodOptional -->
+                    <div class="form-group" ng-show="vm.selectedType.isFoodRelated">
+                        <label class="control-label col-xs-12 col-sm-4"></label>
+                        <div class="col-xs-12 col-sm-6 col-md-4">
+                            <input id="foodOptional" type="checkbox" class="event-form-checkbox" ng-model="vm.isFoodOptional" ng-change="vm.isOptions=false" />
+                            <label for="foodOptional" class="control-label" translate="events.foodOptionalSelect"></label>
+                        </div>
+                    </div>
                     <!--event isOptions -->
                     <div class="form-group">
                         <label class="control-label col-xs-12 col-sm-4"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
-                            <input id="moreOptions" type="checkbox" class="event-form-checkbox" ng-model="vm.isOptions" data-test-id="event-form-is-options-input" />
+                            <input id="moreOptions" type="checkbox" class="event-form-checkbox" ng-model="vm.isOptions" ng-change="vm.isFoodOptional=false" data-test-id="event-form-is-options-input" />
                             <label for="moreOptions" class="control-label" translate="events.eventOptionsSelect"></label>
                         </div>
                     </div>

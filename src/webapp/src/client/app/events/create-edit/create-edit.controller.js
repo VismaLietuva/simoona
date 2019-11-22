@@ -19,6 +19,11 @@
             3: 'everyTwoWeeks',
             4: 'everyMonth'
         })
+        .constant('foodOptions', {
+            'none': 0,
+            'required': 1,
+            'optional': 2
+        })
         .controller('addNewEventController', addNewEventController);
 
     addNewEventController.$inject = [
@@ -33,6 +38,7 @@
         'pictureRepository',
         'eventSettings',
         'recurringTypesResources',
+        'foodOptions',
         '$translate',
         'notifySrv',
         'localeSrv',
@@ -42,7 +48,7 @@
 
     function addNewEventController($rootScope, $scope, $stateParams, $state, $timeout, dataHandler,
         authService, eventRepository, pictureRepository, eventSettings,
-        recurringTypesResources, $translate, notifySrv, localeSrv, lodash, errorHandler) {
+        recurringTypesResources, foodOptions, $translate, notifySrv, localeSrv, lodash, errorHandler) {
         /* jshint validthis: true */
         var vm = this;
 
@@ -94,6 +100,7 @@
 
         function init() {
             vm.isOptions = false;
+            vm.isFoodOptional = false;
 
             vm.datePickers = {
                 isOpenEventStartDatePicker: false,
@@ -325,7 +332,9 @@
                 vm.event.editedOptions = lodash.filter(vm.event.options, function(element) {
                     return !!element.id;
                 });
-
+            } 
+            else if (vm.isFoodOptional) {
+                 vm.event.foodOption = foodOptions.optional;
             } else {
                 vm.event.options = [];
                 vm.event.editedOptions = [];
