@@ -280,7 +280,7 @@ namespace Shrooms.Domain.Services.Lotteries
             var kudosLogDTO = new AddKudosLogDTO
             {
                 ReceivingUserIds = new List<string> { userOrg.UserId },
-                PointsTypeId = 2,
+                PointsTypeId = _kudosService.GetKudosTypeId(KudosTypeEnum.Minus),
                 MultiplyBy = lotteryTicketDTO.Tickets * lotteryDetails.EntryFee,
                 Comment = $"For {lotteryTicketDTO.Tickets} tickets",
                 UserId = userOrg.UserId,
