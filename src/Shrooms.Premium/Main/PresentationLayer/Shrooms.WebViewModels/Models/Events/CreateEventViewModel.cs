@@ -3,7 +3,7 @@ using Shrooms.EntityModels.Models.Events;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Shrooms.Constants.BusinessLayer;
+using Shrooms.Premium.Other.Shrooms.Constants.BusinessLayer;
 
 namespace Shrooms.WebViewModels.Models.Events
 {
@@ -47,7 +47,7 @@ namespace Shrooms.WebViewModels.Models.Events
         [Required]
         public int TypeId { get; set; }
 
-        [Range((int)FoodOptions.None, (int)FoodOptions.Optional)]
+        [Range((int)EventConstants.FoodOptions.None, (int)EventConstants.FoodOptions.Optional)]
         public int? FoodOption { get; set; }
 
         [Required]

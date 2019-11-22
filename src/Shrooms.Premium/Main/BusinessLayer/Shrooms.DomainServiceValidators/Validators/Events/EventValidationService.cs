@@ -2,6 +2,7 @@
 using Shrooms.DomainExceptions.Exceptions.Event;
 using Shrooms.EntityModels.Models.Events;
 using Shrooms.Infrastructure.SystemClock;
+using Shrooms.Premium.Other.Shrooms.Constants.BusinessLayer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -237,7 +238,7 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
 
         public void CheckIfFoodOptionalAndOptionsNonExistent(IEnumerable<string> options, int? foodOption)
         {
-            if (options.Any() && foodOption == (int)FoodOptions.Optional)
+            if (options.Any() && foodOption == (int)EventConstants.FoodOptions.Optional)
             {
                 throw new EventException("Event cannot have options and Food Optional flag enabled.");
             }

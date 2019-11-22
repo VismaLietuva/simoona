@@ -488,6 +488,7 @@
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Wall\Posts\EventPostViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\ValidationAttributes\ValidEndDateAttribute.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\ValidationAttributes\ValidRegistrationDeadlineDateAttribute.cs" />
+    <Compile Include="Other\Shrooms.Constants\BusinessLayer\Events.cs" />
     <Compile Include="Other\Shrooms.Constants\ErrorCodes\ErrorCodes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Infrastructure\Shrooms.IoC\Modules\KudosShopModule.cs" />

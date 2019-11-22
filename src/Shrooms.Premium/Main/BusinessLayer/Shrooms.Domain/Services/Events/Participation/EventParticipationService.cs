@@ -1,5 +1,6 @@
 ﻿using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.BusinessLayer;
+using Shrooms.Premium.Other.Shrooms.Constants.BusinessLayer;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Events;
@@ -349,7 +350,7 @@ namespace Shrooms.Domain.Services.Events.Participation
         {
             if(!@event.Options
                 .Where(option => options.Contains(option.Id))
-                .Any(selectedOption => selectedOption.Option == ConstBusinessLayer.WillNotEatOptionEN || selectedOption.Option == ConstBusinessLayer.WillEatOptionLT)
+                .Any(selectedOption => selectedOption.Option == EventConstants.WillNotEatOptionEN || selectedOption.Option == EventConstants.WillEatOptionLT)
                 )
             {
                 if (@event.IsSingleJoin)
@@ -378,12 +379,12 @@ namespace Shrooms.Domain.Services.Events.Participation
         {
             try
             {
-                var foodOptionalEvents = events.Where(x => x.FoodOption == (int)FoodOptions.Optional);
+                var foodOptionalEvents = events.Where(x => x.FoodOption == (int)EventConstants.FoodOptions.Optional);
 
                 var eventsToRemove = foodOptionalEvents
                     .Where(x => x.EventParticipants
                         .First(y => y.ApplicationUserId == userId).EventOptions
-                        .Any(z => z.Option == ConstBusinessLayer.WillNotEatOptionLT || z.Option == ConstBusinessLayer.WillNotEatOptionEN));
+                        .Any(z => z.Option == EventConstants.WillNotEatOptionLT || z.Option == EventConstants.WillNotEatOptionEN));
 
                 return events.Except(eventsToRemove);
             }
