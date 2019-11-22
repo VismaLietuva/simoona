@@ -74,10 +74,6 @@ namespace Shrooms.Constants.BusinessLayer
         public const int EventOptionsMinimumCount = 2;
         public const string EventParticipantsExcelTableName = "Event Participants";
         public const string EventOptionsExcelTableName = "Event Options";
-        public const string WillEatOptionLT = "Valgysiu šiame renginyje";
-        public const string WillEatOptionEN = "I will eat at this event";
-        public const string WillNotEatOptionLT = "Nevalgysiu šiame renginyje";
-        public const string WillNotEatOptionEN = "I will not eat at this event";
 
         public enum MyEventsOptions
         {
