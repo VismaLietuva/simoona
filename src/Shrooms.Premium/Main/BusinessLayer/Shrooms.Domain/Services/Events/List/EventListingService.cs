@@ -8,6 +8,7 @@ using Shrooms.EntityModels.Models.Events;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -52,7 +53,6 @@ namespace Shrooms.Domain.Services.Events.List
         {
             var events = _eventsDbSet
                 .Include(x => x.EventParticipants)
-                .Include(x => x.Offices)
                 .Where(t =>
                     t.OrganizationId == userOrganization.OrganizationId &
                     t.EndDate > DateTime.UtcNow)
@@ -61,16 +61,23 @@ namespace Shrooms.Domain.Services.Events.List
                 .OrderBy(e => e.StartDate)
                 .ToList();
 
-            var filteredByOfficeEvents = events
-             .Select(x => { x.OfficeNames = _officeDbSet.Where(p => x.Offices.Contains(p.Id)).Select(q => q.Name); return x; })
-             .ToList();
 
-            return filteredByOfficeEvents;
+            return events;
         }
 
         public IEnumerable<EventListItemDTO> GetEventsByTypeAndOffice(UserAndOrganizationDTO userOrganization, int? typeId = null, int? officeId = null)
         {
-            var office = officeId.ToString();
+            var officeString = $"\"{officeId.ToString()}\"";
+
+            using (var context = new ShroomsDbContext(@"Data Source=localhost\SQLEXPRESS;Initial Catalog=SimoonaDB;Integrated Security=True;MultipleActiveResultSets=True;Connect Timeout=60"))
+            {
+                using (var sqlLogFile = new StreamWriter("C:\\temp\\LogFile.txt"))
+                {
+                    context.Database.Log = sqlLogFile.Write;
+                    context.Events.Where(p => p.Offices.Contains(officeString)).ToList();
+                }
+            }
+
 
             IList<EventListItemDTO> events = _eventsDbSet
                 .Include(x => x.EventParticipants)
@@ -78,20 +85,18 @@ namespace Shrooms.Domain.Services.Events.List
                     t.OrganizationId == userOrganization.OrganizationId &
                     t.EndDate > DateTime.UtcNow)
                 .Where(EventTypeFilter(typeId))
+                .Where(EventOfficeFilter(officeString))
                 .Select(MapEventToListItemDto(userOrganization.UserId))
                 .OrderBy(e => e.StartDate)
                 .ToList();
 
-            var filteredByOfficeEvents = events
-                .Where(x => x.Offices.Any(o => o == officeId) || x.Offices == null)
-                .Select(x => { x.OfficeNames = _officeDbSet.Where(p => x.Offices.Contains(p.Id)).Select(q => q.Name); return x; })
-                .ToList();
-            
-            return filteredByOfficeEvents;
+            return events;
         }
 
         public IEnumerable<EventListItemDTO> GetMyEvents(MyEventsOptionsDTO options, int? officeId = null)
         {
+            var officeString = $"\"{officeId.ToString()}\"";
+
             var myEventFilter = EventFilters[options.Filter](options.UserId);
             var events = _eventsDbSet
                 .Include(x => x.EventParticipants)
@@ -99,7 +104,7 @@ namespace Shrooms.Domain.Services.Events.List
                 .Where(t => t.OrganizationId == options.OrganizationId)
                 .Where(SearchFilter(options.SearchString))
                 .Where(myEventFilter)
-                .Where(EventOfficeFilter(officeId))
+                .Where(EventOfficeFilter(officeString))
                 .Select(MapEventToListItemDto(options.UserId))
                 .OrderBy(e => e.StartDate)
                 .ToList();
@@ -137,7 +142,6 @@ namespace Shrooms.Domain.Services.Events.List
                 Id = e.Id,
                 ImageName = e.ImageName,
                 MaxParticipants = e.MaxParticipants,
-                Offices = e.Offices,
                 Name = e.Name,
                 Place = e.Place,
                 StartDate = e.StartDate,
@@ -173,14 +177,13 @@ namespace Shrooms.Domain.Services.Events.List
             return x => x.EventTypeId == typeId;
         }
 
-        private static Expression<Func<Event, bool>> EventOfficeFilter(int? officeId)
+        private static Expression<Func<Event, bool>> EventOfficeFilter(string office)
         {
-            if (officeId == null)
+            if (office == null)
             {
                 return x => true;
             }
-
-            return x => x.Offices.Any(o => o == officeId) || x.Offices == null;
+            return x => x.Offices.Contains(office) || x.Offices == null;
         }
 
         private static Expression<Func<Event, bool>> SearchFilter(string searchString)

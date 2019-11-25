@@ -124,7 +124,6 @@ namespace Shrooms.Domain.Services.Events
             _eventValidationService.CheckIfEventExists(@event);
             @event.IsFull = @event.Participants.Count() >= @event.MaxParticipants;
             @event.IsParticipating = @event.Participants.Any(p => p.UserId == userOrg.UserId);
-            @event.OfficeNames = _officeDbSet.Where(p => @event.Offices.Contains(p.Id)).Select(q => q.Name).ToList();
             return @event;
         }
 
@@ -215,7 +214,7 @@ namespace Shrooms.Domain.Services.Events
                 Id = e.Id,
                 Description = e.Description,
                 ImageName = e.ImageName,
-                Offices = e.Offices,
+                Offices = e.OfficeIds,
                 Location = e.Place,
                 Name = e.Name,
                 MaxOptions = e.MaxChoices,
@@ -342,7 +341,8 @@ namespace Shrooms.Domain.Services.Events
             {
                 Created = DateTime.UtcNow,
                 CreatedBy = newEventDto.UserId,
-                OrganizationId = newEventDto.OrganizationId
+                OrganizationId = newEventDto.OrganizationId,
+                OfficeIds = newEventDto.Offices.Select(p => p.ToString()).ToList()
             };
 
             var newWall = new CreateWallDto()
@@ -375,7 +375,6 @@ namespace Shrooms.Domain.Services.Events
             newEvent.ImageName = newEventDto.ImageName;
             newEvent.MaxChoices = newEventDto.MaxOptions;
             newEvent.MaxParticipants = newEventDto.MaxParticipants;
-            newEvent.Offices = newEventDto.Offices;
             newEvent.Place = newEventDto.Location;
             newEvent.ResponsibleUserId = newEventDto.ResponsibleUserId;
             newEvent.StartDate = newEventDto.StartDate;
@@ -391,7 +390,6 @@ namespace Shrooms.Domain.Services.Events
                 Description = e.Description,
                 ImageName = e.ImageName,
                 Name = e.Name,
-                Offices = e.Offices,
                 Location = e.Place,
                 RegistrationDeadlineDate = e.RegistrationDeadline,
                 StartDate = e.StartDate,
