@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using Newtonsoft.Json;
 using Shrooms.EntityModels.Models.Multiwall;
 
 namespace Shrooms.EntityModels.Models.Events
@@ -24,6 +25,9 @@ namespace Shrooms.EntityModels.Models.Events
         public DateTime EndDate { get; set; }
         public DateTime RegistrationDeadline { get; set; }
         public EventRecurrenceOptions EventRecurring { get; set; }
+        [ForeignKey("Office")]
+        public int? OfficeId { get; set; }
+        public virtual Office Office { get; set; }
         public string Place { get; set; }
         public string Description { get; set; }
         [Range(0, short.MaxValue)]
@@ -40,7 +44,16 @@ namespace Shrooms.EntityModels.Models.Events
         public int? FoodOption { get; set; }
         public virtual ICollection<EventParticipant> EventParticipants { get; set; }
         public virtual ICollection<EventOption> EventOptions { get; set; }
-        public virtual OfficesCollection Offices { get; set; }
+
+        public string Offices { get; set; }
+
+        [NotMapped]
+        public IEnumerable<string> OfficeIds
+        {
+            get { return Offices == null ? null : JsonConvert.DeserializeObject<string[]>(Offices); }
+            set { Offices = JsonConvert.SerializeObject(value); }
+        }
+
         [NotMapped]
         public DateTime LocalStartDate
         {

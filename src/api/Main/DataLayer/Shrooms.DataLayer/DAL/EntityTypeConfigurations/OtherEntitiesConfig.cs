@@ -61,9 +61,6 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
             _modelBuilder.ComplexType<ImagesCollection>()
                 .Property(x => x.Serialized)
                 .HasColumnName("Images");
-            _modelBuilder.ComplexType<OfficesCollection>()
-                .Property(x => x.Serialized)
-                .HasColumnName("Offices");
             _modelBuilder.ComplexType<Sources>()
                 .Property(x => x.Serialized)
                 .HasColumnName("Sources");
