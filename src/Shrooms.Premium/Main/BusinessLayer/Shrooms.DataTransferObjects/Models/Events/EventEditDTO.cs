@@ -21,7 +21,7 @@ namespace Shrooms.DataTransferObjects.Models.Events
 
         public EventRecurrenceOptions Recurrence { get; set; }
 
-        public IEnumerable<string> Offices { get; set; }
+        public EventOfficesDTO Offices { get; set; }
 
         public string Location { get; set; }
 

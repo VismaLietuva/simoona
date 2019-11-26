@@ -29,6 +29,7 @@ using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Notifications;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.API.BackgroundWorkers;
 using Shrooms.Premium.Main.PresentationLayer.Shrooms.API.BackgroundWorkers;
+using System.Linq;
 
 namespace Shrooms.API.Controllers.WebApi.EventControllers
 {
@@ -131,6 +132,7 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
             }
 
             var createEventDTO = _mapper.Map<CreateEventDto>(eventViewModel);
+            createEventDTO.Offices = new EventOfficesDTO { OfficeIds = eventViewModel.Offices.Select(p => p.ToString()).ToList() };
             SetOrganizationAndUser(createEventDTO);
             var userHubDto = GetUserAndOrganizationHub();
             try
@@ -160,6 +162,8 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
                 return BadRequest(ModelState);
             }
             var eventDTO = _mapper.Map<UpdateEventViewModel, EditEventDTO>(eventViewModel);
+            eventDTO.Offices = new EventOfficesDTO { OfficeIds = eventViewModel.Offices.Select(p => p.ToString()).ToList() };
+
             SetOrganizationAndUser(eventDTO);
 
             try

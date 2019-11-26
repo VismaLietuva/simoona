@@ -20,6 +20,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Shrooms.Domain.Helpers;
+using System.Data.Entity.SqlServer;
 
 namespace Shrooms.Domain.Services.Events
 {
@@ -121,6 +122,10 @@ namespace Shrooms.Domain.Services.Events
                 .Select(MapToEventDetailsDto(id))
                 .SingleOrDefault();
 
+            @event.Offices.OfficeNames = _officeDbSet
+                .Where(p => @event.Offices.Offices.Contains(SqlFunctions.StringConvert((double)p.Id).Trim()))
+                .Select(p => p.Name)
+                .ToList();
             _eventValidationService.CheckIfEventExists(@event);
             @event.IsFull = @event.Participants.Count() >= @event.MaxParticipants;
             @event.IsParticipating = @event.Participants.Any(p => p.UserId == userOrg.UserId);
@@ -214,8 +219,8 @@ namespace Shrooms.Domain.Services.Events
                 Id = e.Id,
                 Description = e.Description,
                 ImageName = e.ImageName,
-                Offices = e.OfficeIds,
                 Location = e.Place,
+                Offices = new EventOfficesDTO { Offices = e.Offices },
                 Name = e.Name,
                 MaxOptions = e.MaxChoices,
                 MaxParticipants = e.MaxParticipants,
@@ -342,7 +347,7 @@ namespace Shrooms.Domain.Services.Events
                 Created = DateTime.UtcNow,
                 CreatedBy = newEventDto.UserId,
                 OrganizationId = newEventDto.OrganizationId,
-                OfficeIds = newEventDto.Offices.Select(p => p.ToString()).ToList()
+                OfficeIds = newEventDto.Offices.OfficeIds
             };
 
             var newWall = new CreateWallDto()
@@ -369,6 +374,7 @@ namespace Shrooms.Domain.Services.Events
             newEvent.Modified = DateTime.UtcNow;
             newEvent.ModifiedBy = newEventDto.UserId;
             newEvent.Description = newEventDto.Description;
+            newEvent.Offices = newEventDto.Offices.Offices;
             newEvent.EndDate = newEventDto.EndDate;
             newEvent.EventRecurring = newEventDto.Recurrence;
             newEvent.EventTypeId = newEventDto.TypeId;
@@ -390,6 +396,7 @@ namespace Shrooms.Domain.Services.Events
                 Description = e.Description,
                 ImageName = e.ImageName,
                 Name = e.Name,
+                Offices = new EventOfficesDTO { Offices = e.Offices },
                 Location = e.Place,
                 RegistrationDeadlineDate = e.RegistrationDeadline,
                 StartDate = e.StartDate,

@@ -17,9 +17,8 @@ namespace Shrooms.DataTransferObjects.Models.Events
         public DateTime EndDate { get; set; }
 
         public DateTime RegistrationDeadlineDate { get; set; }
-        public IEnumerable<string> OfficeIds { get; set; }
 
-        public IEnumerable<string> OfficeNames { get; set; }
+        public EventOfficesDTO Offices { get; set; }
 
         public string Place { get; set; }
 

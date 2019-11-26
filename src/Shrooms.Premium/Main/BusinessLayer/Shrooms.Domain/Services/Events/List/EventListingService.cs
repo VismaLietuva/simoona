@@ -1,4 +1,5 @@
-﻿using Shrooms.Constants.BusinessLayer;
+﻿using Newtonsoft.Json;
+using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Events;
@@ -8,6 +9,7 @@ using Shrooms.EntityModels.Models.Events;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.SqlServer;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -69,17 +71,7 @@ namespace Shrooms.Domain.Services.Events.List
         {
             var officeString = $"\"{officeId.ToString()}\"";
 
-            using (var context = new ShroomsDbContext(@"Data Source=localhost\SQLEXPRESS;Initial Catalog=SimoonaDB;Integrated Security=True;MultipleActiveResultSets=True;Connect Timeout=60"))
-            {
-                using (var sqlLogFile = new StreamWriter("C:\\temp\\LogFile.txt"))
-                {
-                    context.Database.Log = sqlLogFile.Write;
-                    context.Events.Where(p => p.Offices.Contains(officeString)).ToList();
-                }
-            }
-
-
-            IList<EventListItemDTO> events = _eventsDbSet
+            IList < EventListItemDTO > events = _eventsDbSet
                 .Include(x => x.EventParticipants)
                 .Where(t =>
                     t.OrganizationId == userOrganization.OrganizationId &
@@ -89,7 +81,7 @@ namespace Shrooms.Domain.Services.Events.List
                 .Select(MapEventToListItemDto(userOrganization.UserId))
                 .OrderBy(e => e.StartDate)
                 .ToList();
-
+            
             return events;
         }
 
@@ -141,6 +133,7 @@ namespace Shrooms.Domain.Services.Events.List
             {
                 Id = e.Id,
                 ImageName = e.ImageName,
+                Offices = new EventOfficesDTO { Offices = e.Offices},
                 MaxParticipants = e.MaxParticipants,
                 Name = e.Name,
                 Place = e.Place,
