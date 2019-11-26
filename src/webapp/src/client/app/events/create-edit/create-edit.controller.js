@@ -136,7 +136,11 @@
                         if (vm.event.startDate !== vm.event.registrationDeadlineDate) {
                             vm.isRegistrationDeadlineEnabled = true;
                         }
-
+                        vm.event.offices = [];
+                        angular.forEach(vm.event.officeIds, function(value) {
+                            vm.event.offices.push(value);
+                        })
+                        console.log(vm.event.offices);
                         vm.event.registrationDeadlineDate = moment.utc(vm.event.registrationDeadlineDate).local().startOf('minute').toDate();
                         vm.event.startDate = moment.utc(vm.event.startDate).local().startOf('minute').toDate();
                         vm.event.endDate = moment.utc(vm.event.endDate).local().startOf('minute').toDate();
@@ -203,15 +207,18 @@
             }
         }
 
-        function toggleAllOffices() {
-            if(vm.event.offices.length == vm.eventOffices.length) {
+        function toggleAllOffices(turnedOn) {
+            if(vm.event.offices.length == vm.eventOffices.length && turnedOn) {
                 vm.event.offices = [];
             }
-            else {
+            else if(turnedOn) {
                 vm.event.offices = [];
                 angular.forEach(vm.eventOffices, function(office) {
                     vm.event.offices.push(office.id);
                 })
+            }
+            else {
+                vm.event.offices = [];
             }
         }
 

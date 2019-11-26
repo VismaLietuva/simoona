@@ -24,10 +24,11 @@
         '$timeout',
         'eventRepository',
         'defaultEventTabs',
-        'defaultOfficeTabs'
+        'defaultOfficeTabs',
+        'eventOfficeFactory'
     ];
 
-    function eventsListTabsController($stateParams, $translate, $timeout, eventRepository, defaultEventTabs, defaultOfficeTabs) {
+    function eventsListTabsController($stateParams, $translate, $timeout, eventRepository, defaultEventTabs, defaultOfficeTabs, eventOfficeFactory) {
         /* jshint validthis: true */
         var vm = this;
 
@@ -47,12 +48,11 @@
 
                 $timeout(addDefaultEventTabs, 100);
             });
-
+            
             eventRepository.getEventOffices().then(function(result) {
                 if (result) {
                     vm.eventOffices = result;
                 }
-
                 $timeout(addDefaultOfficeTabs, 100);
             });
         }

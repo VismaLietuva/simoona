@@ -46,9 +46,12 @@
                 </div>
                 <div class="col-xs-12">
                     <span class="glyphicon glyphicon-map-marker"></span>
-                    <b><span translate="events.eventOffice"></span>:</b>
-                    <span data-test-id="event-office" ng-cloak ng-if="vm.event.officeNames">{{vm.event.officeNames}}</span>
-                    <span data-test-id="event-office" ng-cloak ng-if="!vm.event.officeNames">{{"events.all" | translate}}</span>
+                    <b><span ng-if="vm.event.officesName.length < 2" translate="events.eventOffice"></span>
+                        <span ng-if="vm.event.officesName.length > 1" translate="events.eventOffices"></span>
+                        :</b>
+                    <span data-test-id="event-office" ng-cloak ng-if="vm.event.officesName" ng-repeat="officeName in vm.event.officesName">
+                        {{officeName}}{{$last ? '' :', '}}</span>
+                    <span data-test-id="event-office" ng-cloak ng-if="!vm.event.officesName.length">{{"events.eventOutside" | translate}}</span>
                 </div>
                 <div class="col-xs-12">
                     <span class="glyphicon glyphicon-map-marker"></span>

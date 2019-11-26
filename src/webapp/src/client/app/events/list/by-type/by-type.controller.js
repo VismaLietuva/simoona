@@ -12,9 +12,10 @@
         '$stateParams',
         'eventRepository',
         'eventsSettings',
+        'eventOfficeFactory'
     ];
 
-    function eventsByTypeController($stateParams, eventRepository, eventsSettings) {
+    function eventsByTypeController($stateParams, eventRepository, eventsSettings, eventOfficeFactory) {
         /*jshint validthis: true */
         var vm = this;
 
@@ -33,6 +34,18 @@
             if ($stateParams.type === 'all' && $stateParams.office === 'all') {
                 eventRepository.getAllEvents().then(function (result) {
                     vm.eventsList = result;
+                    vm.eventsList.forEach(function(event) {
+                        if(event.officeIds.length == eventOfficeFactory.offices.data.length)
+                        {
+                            event.officesName = ["Visi"];
+                        }
+                        else if (event.officeIds.length) {
+                            mapOfficesNameToEvent(event);
+                        }         
+                        else {
+                            event.officesName = ["Outside office"];
+                        }    
+                    })
                     setResponseUtilities(result);
                 });
             } else if ($stateParams.type === 'host' || $stateParams.type === 'participant') {
@@ -43,6 +56,18 @@
                     setResponseUtilities(result);
                 });
             }
+        }
+
+        function mapOfficesNameToEvent(event) {
+            event.officesName = [];
+            event.officeIds.forEach(function(id) {
+                eventOfficeFactory.offices.data.forEach(function(office) {
+                    if(id == office.id)
+                    {
+                        event.officesName.push(office.name);                              
+                    }
+            })
+        })
         }
 
         function getMyEvents(typeId, officeId) {

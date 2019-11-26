@@ -24,6 +24,8 @@
   "eventParticipants": "Dalyviai",
   "eventPhoto": "Nuotrauka",
   "eventOffice": "Ofisas",
+  "eventOffices": "Ofisai",
+  "eventOutside": "Už ofiso teritorijos",
   "eventOfficeAll": "Visi ofisai",
   "eventLocation": "Miestas/kambarys/vieta",
   "eventRecurring": "Pasikartojantis",
