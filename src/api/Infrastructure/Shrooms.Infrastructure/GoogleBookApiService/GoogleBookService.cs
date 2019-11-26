@@ -33,7 +33,8 @@ namespace Shrooms.Infrastructure.GoogleBookService
             {
                 Author = volume.Authors == null ? "Authors not set" : string.Join(", ", volume.Authors),
                 Title = volume?.Title,
-                Url = volume?.InfoLink
+                Url = volume?.InfoLink,
+                CoverImageUrl = volume?.ImageLinks.Thumbnail.Replace("zoom=1", "zoom=3")
             };
         }
     }

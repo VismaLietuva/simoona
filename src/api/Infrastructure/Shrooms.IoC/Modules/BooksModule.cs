@@ -2,10 +2,12 @@
 using DomainServiceValidators.Validators.Books;
 using Shrooms.Domain.Services.Books;
 using Shrooms.Domain.Services.Email.Book;
+using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Infrastructure.Interceptors;
 
 namespace Shrooms.IoC.Modules
 {
+
     public class BooksModule : Module
     {
         protected override void Load(ContainerBuilder builder)
@@ -14,6 +16,7 @@ namespace Shrooms.IoC.Modules
             builder.RegisterType<BookServiceValidator>().As<IBookServiceValidator>().InstancePerRequest();
             builder.RegisterType<BookMobileServiceValidator>().As<IBookMobileServiceValidator>().InstancePerRequest();
             builder.RegisterType<BooksNotificationService>().As<IBooksNotificationService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            builder.RegisterType<BookCoverService>().As<IBookCoverService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
         }
     }
 }

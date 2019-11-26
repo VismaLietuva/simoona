@@ -189,6 +189,7 @@
     <Compile Include="ServiceExceptions\ServiceException.cs" />
     <Compile Include="Services\Administration\IAdministrationUsersService.cs" />
     <Compile Include="Services\Administration\AdministrationUsersService.cs" />
+    <Compile Include="Services\Books\BookCoverService.cs" />
     <Compile Include="Services\Email\AdministrationUsers\AdministrationUsersNotificationService.cs" />
     <Compile Include="Services\Email\Book\BooksNotificationService.cs" />
     <Compile Include="Services\Email\Book\IBooksNotificationService.cs" />

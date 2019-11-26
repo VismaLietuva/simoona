@@ -228,6 +228,16 @@ namespace Shrooms.API.Controllers.Book
             }
         }
 
+        [HttpPatch]
+        [Route("Covers")]
+        [PermissionAuthorize(Permission = AdministrationPermissions.Book)]
+        public IHttpActionResult UpdateBookCovers()
+        {
+            _bookService.UpdateBookCovers();
+            return Ok();
+        }
+
+
         [HttpGet]
         [Route("FindByIsbn")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Book)]

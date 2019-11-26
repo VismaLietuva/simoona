@@ -267,6 +267,11 @@ namespace Shrooms.Domain.Services.Books
             _uow.SaveChanges(false);
         }
 
+        public void UpdateBookCovers()
+        {
+            _asyncRunner.Run<IBookCoverService>(service => service.UpdateBookCovers(), _uow.ConnectionName);
+        }
+
         private static Expression<Func<BookOffice, bool>> SearchFilter(string searchString)
         {
             if (string.IsNullOrEmpty(searchString))

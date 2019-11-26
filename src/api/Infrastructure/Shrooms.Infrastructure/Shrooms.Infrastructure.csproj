@@ -182,6 +182,7 @@
     <Compile Include="ExcelGenerator\IExcelBuilder.cs" />
     <Compile Include="FeatureToggle\Feature.cs" />
     <Compile Include="FireAndForget\AsyncRunner.cs" />
+    <Compile Include="FireAndForget\IBookCoverService.cs" />
     <Compile Include="FireAndForget\HangFireScheduler.cs" />
     <Compile Include="FireAndForget\IBackgroundWorker.cs" />
     <Compile Include="FireAndForget\IJobScheduler.cs" />
