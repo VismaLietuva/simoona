@@ -63,5 +63,7 @@
   "whenPlansToReturn": "Return date",
   "whenTookIt": "Taken date",
   "notFoundFromExternalProvider": "Sorry, your book was not found. Have you entered the ISBN number correctly?",
-  "bookCannotBeReturned": "Book cannot be returned."
+  "bookCannotBeReturned": "Book cannot be returned.",
+  "coversWillBeUpdatedSoon": "Cover pictures of books will be automatically updated.",
+  "updateCoverPictures": "Update cover pictures"
 }
