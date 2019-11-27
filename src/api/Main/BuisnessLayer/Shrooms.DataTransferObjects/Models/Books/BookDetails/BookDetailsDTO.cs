@@ -15,5 +15,6 @@ namespace Shrooms.DataTransferObjects.Models.Books.BookDetails
         public string OwnerId { get; set; }
         public string OwnerFullName { get; set; }
         public string Note { get; set; }
+        public string CoverUrl { get; set; }
     }
 }

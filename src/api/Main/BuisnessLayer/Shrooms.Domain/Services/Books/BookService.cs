@@ -392,6 +392,7 @@ namespace Shrooms.Domain.Services.Books
                 OwnerId = x.Book.ApplicationUserId,
                 OwnerFullName = (x.Book.ApplicationUserId != null) ? x.Book.ApplicationUser.FirstName + " " + x.Book.ApplicationUser.LastName : null,
                 Note = x.Book.Note,
+                CoverUrl = x.Book.BookCoverUrl,
                 BookLogs = x.BookLogs.Select(v => new BookDetailsLogDTO
                 {
                     UserId = v.ApplicationUserId,

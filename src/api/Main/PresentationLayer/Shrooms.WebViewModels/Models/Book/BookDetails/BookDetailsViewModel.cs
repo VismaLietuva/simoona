@@ -25,5 +25,7 @@ namespace Shrooms.WebViewModels.Models.Book.BookDetails
         public string OwnerFullName { get; set; }
 
         public string Note { get; set; }
+
+        public string CoverUrl { get; set; }
     }
 }
