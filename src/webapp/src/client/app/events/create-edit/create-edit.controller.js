@@ -126,6 +126,11 @@
             if ($stateParams.id) {
                 eventRepository.getEventUpdate($stateParams.id).then(function(event) {
                         vm.event = event;
+                        vm.eventTypes.forEach(function(type) {
+                            if(type.id == vm.event.typeId) {
+                                vm.selectedType = type;
+                            }
+                        })
                         vm.responsibleUser = {
                             id: vm.event.hostUserId,
                             fullName: vm.event.hostUserFullName
@@ -140,7 +145,6 @@
                         angular.forEach(vm.event.officeIds, function(value) {
                             vm.event.offices.push(value);
                         })
-                        console.log(vm.event.offices);
                         vm.event.registrationDeadlineDate = moment.utc(vm.event.registrationDeadlineDate).local().startOf('minute').toDate();
                         vm.event.startDate = moment.utc(vm.event.startDate).local().startOf('minute').toDate();
                         vm.event.endDate = moment.utc(vm.event.endDate).local().startOf('minute').toDate();

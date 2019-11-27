@@ -35,16 +35,9 @@
                 eventRepository.getAllEvents().then(function (result) {
                     vm.eventsList = result;
                     vm.eventsList.forEach(function(event) {
-                        if(event.officeIds.length == eventOfficeFactory.offices.data.length)
-                        {
-                            event.officesName = ["Visi"];
-                        }
-                        else if (event.officeIds.length) {
+                        if (event.officeIds.length) {
                             mapOfficesNameToEvent(event);
                         }         
-                        else {
-                            event.officesName = ["Outside office"];
-                        }    
                     })
                     setResponseUtilities(result);
                 });
@@ -53,9 +46,15 @@
             } else {
                 eventRepository.getEventsByTypeAndOffice($stateParams.type, $stateParams.office).then(function (result) {
                     vm.eventsList = result;
+                    vm.eventsList.forEach(function(event) {
+                        if (event.officeIds.length) {
+                            mapOfficesNameToEvent(event);
+                        }         
+                    })
                     setResponseUtilities(result);
                 });
             }
+            
         }
 
         function mapOfficesNameToEvent(event) {
@@ -73,6 +72,11 @@
         function getMyEvents(typeId, officeId) {
             eventRepository.getMyEvents(typeId, officeId).then(function (result) {
                 vm.eventsList = result;
+                vm.eventsList.forEach(function(event) {
+                        if (event.officeIds.length) {
+                            mapOfficesNameToEvent(event);
+                        }         
+                    })
                 setResponseUtilities(result);
             });
         }
