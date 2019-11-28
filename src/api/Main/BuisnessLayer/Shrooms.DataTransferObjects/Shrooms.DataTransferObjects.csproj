@@ -76,6 +76,7 @@
     <Compile Include="EmailTemplateViewModels\BookReminderEmailTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\BookTakenEmailTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\CommitteeSuggestionEmailTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\EventJoinRemindEmailTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\EventParticipantExpelledEmailTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\KudosReceivedDecreasedEmailTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\KudosRejectedEmailTemplateViewModel.cs" />
