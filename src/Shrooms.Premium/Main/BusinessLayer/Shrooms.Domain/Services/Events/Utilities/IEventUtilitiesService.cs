@@ -23,6 +23,10 @@ namespace Shrooms.Domain.Services.Events.Utilities
 
         EventTypeDTO GetEventType(int organizationId, int eventTypeId);
 
+        IEnumerable<EventTypeDTO> GetEventTypesToRemind(int organizationId);
+
         IEnumerable<EventOptionCountDTO> GetEventChosenOptions(Guid eventId, UserAndOrganizationDTO userAndOrg);
+
+        bool AnyEventsThisWeekByType(int eventTypeId);
     }
 }

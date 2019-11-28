@@ -6,7 +6,11 @@ using Shrooms.EntityModels.Models.Events;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.SqlServer;
 using System.Linq;
+using System.Linq.Expressions;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services;
+using Shrooms.Domain.Services.Events;
 using Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes;
 using static Shrooms.Constants.ErrorCodes.ErrorCodes;
 
@@ -91,6 +95,17 @@ namespace Shrooms.Domain.Services.Events.Utilities
             return eventType;
         }
 
+        public IEnumerable<EventTypeDTO> GetEventTypesToRemind(int organizationId)
+        {
+            return _eventTypesDbSet
+                .Where(x => x.SendWeeklyReminders && x.OrganizationId == organizationId)
+                .Select(x => new EventTypeDTO
+                {
+                    Id = x.Id,
+                    Name = x.Name
+                });
+        }
+
         public void CreateEventType(CreateEventTypeDTO eventType)
         {
             ValidateEventTypeName(eventType.Name, eventType.OrganizationId);
@@ -171,6 +186,17 @@ namespace Shrooms.Domain.Services.Events.Utilities
 
             return eventOptions;
         }
+
+        public bool AnyEventsThisWeekByType(int eventTypeId)
+        {
+            return _eventsDbSet
+                .HappeningThisWeek()
+                .Any(x => x.EventType.Id == eventTypeId &&
+                          x.RegistrationDeadline > DateTime.UtcNow);
+        }
+
+        private static Expression<Func<Event, bool>> AnyEventsThisWeek =>
+            e => SqlFunctions.DatePart("wk", e.StartDate) == SqlFunctions.DatePart("wk", DateTime.UtcNow);
 
         private void ValidateEventTypeName(string eventTypeName, int organizationId)
         {

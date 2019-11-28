@@ -1,26 +1,25 @@
 ﻿using System.Web.Http;
 using Shrooms.API.Controllers;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Notifications;
+using Shrooms.Domain.Services.WebHookCallbacks;
 
-namespace Shrooms.Premium.Main.PresentationLayer.Shrooms.API.Controllers
+namespace Shrooms.API.Controllers
 {
     [RoutePrefix("EventType")]
     //[IdentityBasicAuthentication]
     public class EventTypeRemindController : BaseController
     {
-        private readonly INotificationService _notificationService;
+        private readonly IEventJoinRemindService _remindService;
 
-        public EventTypeRemindController(INotificationService notificationService)
+        public EventTypeRemindController(IEventJoinRemindService remindService)
         {
-            _notificationService = notificationService;
+            _remindService = remindService;
         }
 
         [HttpPost]
         [Route("Test")]
         public IHttpActionResult TestEndpoint()
         {
-            _notificationService.CreateForEventJoinReminder(GetUserAndOrganization());
-
+            _remindService.Notify(GetUserAndOrganization());
             return Ok();
         }
     }

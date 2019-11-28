@@ -1,7 +1,9 @@
-﻿using Shrooms.DataTransferObjects.Models;
+﻿using System.Collections.Generic;
+using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Events;
 using Shrooms.DataTransferObjects.Models.Notification;
 using System.Threading.Tasks;
+using Shrooms.EntityModels.Models.Events;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Notifications
 {
@@ -9,6 +11,6 @@ namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Notificatio
     {
         Task<NotificationDto> CreateForEvent(UserAndOrganizationDTO userOrg, CreateEventDto eventDto);
 
-        void CreateForEventJoinReminder(UserAndOrganizationDTO userOrg);
+        void CreateForEventJoinReminder(EventTypeDTO eventType, IEnumerable<string> usersToNotify, UserAndOrganizationDTO userOrg);
     }
 }
