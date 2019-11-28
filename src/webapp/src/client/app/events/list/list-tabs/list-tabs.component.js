@@ -25,9 +25,10 @@
         'eventRepository',
         'defaultEventTabs',
         'defaultOfficeTabs',
+        'eventOfficeFactory'
     ];
 
-    function eventsListTabsController($stateParams, $translate, $timeout, eventRepository, defaultEventTabs, defaultOfficeTabs) {
+    function eventsListTabsController($stateParams, $translate, $timeout, eventRepository, defaultEventTabs, defaultOfficeTabs, eventOfficeFactory) {
         /* jshint validthis: true */
         var vm = this;
 
@@ -44,15 +45,8 @@
                 if (result) {
                     vm.eventsTabs = result;
                 }
-
                 $timeout(addDefaultEventTabs, 100);
-            });
-            
-            eventRepository.getEventOffices().then(function(result) {
-                if (result) {
-                    vm.eventOffices = result;
-                }
-                $timeout(addDefaultOfficeTabs, 100);
+                vm.eventOffices = eventOfficeFactory.offices.data;
             });
         }
 
