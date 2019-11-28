@@ -807,9 +807,13 @@
     <Compile Include="Migrations\201911191445311_AddFoodRelatedFieldsToEvents.Designer.cs">
       <DependentUpon>201911191445311_AddFoodRelatedFieldsToEvents.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201911251615242_EventContainsMultipleOffices.cs" />
-    <Compile Include="Migrations\201911251615242_EventContainsMultipleOffices.Designer.cs">
-      <DependentUpon>201911251615242_EventContainsMultipleOffices.cs</DependentUpon>
+    <Compile Include="Migrations\201911281059238_EventsWithMultipleOffices.cs" />
+    <Compile Include="Migrations\201911281059238_EventsWithMultipleOffices.Designer.cs">
+      <DependentUpon>201911281059238_EventsWithMultipleOffices.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201911281150187_EventsOfficeData.cs" />
+    <Compile Include="Migrations\201911281150187_EventsOfficeData.Designer.cs">
+      <DependentUpon>201911281150187_EventsOfficeData.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
@@ -1333,8 +1337,11 @@
     <EmbeddedResource Include="Migrations\201911191445311_AddFoodRelatedFieldsToEvents.resx">
       <DependentUpon>201911191445311_AddFoodRelatedFieldsToEvents.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201911251615242_EventContainsMultipleOffices.resx">
-      <DependentUpon>201911251615242_EventContainsMultipleOffices.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201911281059238_EventsWithMultipleOffices.resx">
+      <DependentUpon>201911281059238_EventsWithMultipleOffices.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201911281150187_EventsOfficeData.resx">
+      <DependentUpon>201911281150187_EventsOfficeData.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

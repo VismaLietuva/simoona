@@ -44,7 +44,7 @@ namespace Shrooms.EntityModels.Models.Events
         public int? FoodOption { get; set; }
         public virtual ICollection<EventParticipant> EventParticipants { get; set; }
         public virtual ICollection<EventOption> EventOptions { get; set; }
-
+        [Required]
         public string Offices { get; set; }
 
         [NotMapped]
