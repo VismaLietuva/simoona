@@ -75,7 +75,6 @@
         vm.eventImage = '';
         vm.eventCroppedImage = '';
         vm.minStartDate = moment().local().startOf('minute').toDate();
-        vm.otherOfficesDisabled = false;
 
         vm.toggleOfficeSelection = toggleOfficeSelection;
         vm.toggleAllOffices = toggleAllOffices;

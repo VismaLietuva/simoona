@@ -107,7 +107,6 @@
     <Compile Include="Models\Notifications\NotificationType.cs" />
     <Compile Include="Models\Notifications\NotificationUser.cs" />
     <Compile Include="Models\Notifications\Sources.cs" />
-    <Compile Include="Models\OfficesCollection.cs" />
     <Compile Include="Models\Project.cs" />
     <Compile Include="Models\SupportType.cs" />
     <Compile Include="Models\Floor.cs" />
