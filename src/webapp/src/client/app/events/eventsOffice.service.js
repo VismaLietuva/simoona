@@ -14,7 +14,7 @@
         
         var offices = {
             data: [],
-            isBusy: false
+            isBusy: true
         };
 
         var service = {
@@ -23,16 +23,17 @@
             getOffices: getOffices,
         };
 
-        getOffices();
-
         return service;
 
 
         ////////
 
-        function getOffices() {
-            eventRepository.getEventOffices().then(function (response){
-                offices.data = response;
+        function getOffices() {   
+            offices.isBusy = true;
+            return eventRepository.getEventOffices().then(function (response){
+                offices.data = response;   
+                offices.isBusy = false; 
+                return response;
             }, errorHandler.handleErrorMessage);
         }
         
