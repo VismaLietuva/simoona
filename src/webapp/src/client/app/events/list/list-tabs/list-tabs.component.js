@@ -25,10 +25,9 @@
         'eventRepository',
         'defaultEventTabs',
         'defaultOfficeTabs',
-        'eventOfficeFactory'
     ];
 
-    function eventsListTabsController($stateParams, $translate, $timeout, eventRepository, defaultEventTabs, defaultOfficeTabs, eventOfficeFactory) {
+    function eventsListTabsController($stateParams, $translate, $timeout, eventRepository, defaultEventTabs, defaultOfficeTabs) {
         /* jshint validthis: true */
         var vm = this;
 
