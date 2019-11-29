@@ -147,8 +147,8 @@
                                     <span translate="events.eventOfficeAll"></span>
                                 </label>
                             </div>
-                        <div style="line-height: 10px;">&nbsp;</div>
-                                <div class="checkbox" style="line-height: 5px;" ng-repeat="office in vm.eventOffices">
+                            <div class="event-office-list-item-seperator">&nbsp;</div>
+                                <div class="checkbox event-office-list-item" ng-repeat="office in vm.eventOffices">
                                     <label><input type="checkbox" ng-disabled="outsideOffice"
                                         ng-checked="vm.event.offices.indexOf(office.id) != -1" ng-click="vm.toggleOfficeSelection(office)">{{office.name}}
                                     </label>
