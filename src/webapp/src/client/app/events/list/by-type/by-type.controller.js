@@ -16,25 +16,13 @@
         'eventOfficeFactory'
     ];
 
-    function eventsByTypeController($scope,$stateParams, eventRepository, eventsSettings, eventOfficeFactory) {
+    function eventsByTypeController($scope, $stateParams, eventRepository, eventsSettings, eventOfficeFactory) {
         /*jshint validthis: true */
         var vm = this;
 
         vm.addMoreEvents = addMoreEvents;
 
-        $scope.$watch(function() {return eventOfficeFactory.offices.data},
-         function() {
-             if(!eventOfficeFactory.offices.isBusy) 
-             {
-                 vm.offices = eventOfficeFactory.offices.data;
-                 vm.eventsList.forEach(function(event) {
-                    if (event.officeIds.length) {
-                        mapOfficesNameToEvent(event);
-                    }         
-                })
-             }
-            });
-        
+
         vm.isEventsFound = true;
         vm.isEventsLoading = true;
         vm.eventsList = [];
@@ -47,6 +35,7 @@
             if ($stateParams.type === 'all' && $stateParams.office === 'all') {
                 eventRepository.getAllEvents().then(function (result) {
                     vm.eventsList = result;
+                    setEventOffices();
                     setResponseUtilities(result);
                 });
             } else if ($stateParams.type === 'host' || $stateParams.type === 'participant') {
@@ -54,37 +43,42 @@
             } else {
                 eventRepository.getEventsByTypeAndOffice($stateParams.type, $stateParams.office).then(function (result) {
                     vm.eventsList = result;
-                    vm.eventsList.forEach(function(event) {
-                        if (event.officeIds.length) {
-                            mapOfficesNameToEvent(event);
-                        }         
-                    })
+                    setEventOffices();
                     setResponseUtilities(result);
                 });
             }
-            
+
+        }
+
+        function setEventOffices() {
+            $scope.$watch(function () { return eventOfficeFactory.offices.data },
+                function () {
+                    if (!eventOfficeFactory.offices.isBusy) {
+                        vm.offices = eventOfficeFactory.offices.data;
+                        vm.eventsList.forEach(function (event) {
+                            if (event.officeIds.length) {
+                                mapOfficesNameToEvent(event);
+                            }
+                        })
+                    }
+                });
         }
 
         function mapOfficesNameToEvent(event) {
             event.officesName = [];
-            event.officeIds.forEach(function(id) {
-                vm.offices.forEach(function(office) {
-                    if(id == office.id)
-                    {
-                        event.officesName.push(office.name);                              
+            event.officeIds.forEach(function (id) {
+                vm.offices.forEach(function (office) {
+                    if (id == office.id) {
+                        event.officesName.push(office.name);
                     }
+                })
             })
-        })
         }
 
         function getMyEvents(typeId, officeId) {
             eventRepository.getMyEvents(typeId, officeId).then(function (result) {
                 vm.eventsList = result;
-                vm.eventsList.forEach(function(event) {
-                        if (event.officeIds.length) {
-                            mapOfficesNameToEvent(event);
-                        }         
-                    })
+                setEventOffices();
                 setResponseUtilities(result);
             });
         }

@@ -50,8 +50,9 @@
             });               
             eventOfficeFactory.getOffices().then(function(result) {
                 vm.eventOffices = result;
-            });
                 $timeout(addDefaultOfficeTabs, 100);
+            });
+                
         }
 
         function addDefaultEventTabs() {
