@@ -17,9 +17,7 @@ namespace Shrooms.WebViewModels.Models.Events
 
         public DateTime RegistrationDeadlineDate { get; set; }
 
-        public int? OfficeId { get; set; }
-        
-        public string OfficeName { get; set; }
+        public IEnumerable<string> OfficesName { get; set; }
 
         public string Location { get; set; }
 

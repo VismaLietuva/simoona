@@ -20,6 +20,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Shrooms.Domain.Helpers;
+using System.Data.Entity.SqlServer;
+using Newtonsoft.Json;
 
 namespace Shrooms.Domain.Services.Events
 {
@@ -39,6 +41,7 @@ namespace Shrooms.Domain.Services.Events
         private readonly IDbSet<EventType> _eventTypesDbSet;
         private readonly IDbSet<ApplicationUser> _usersDbSet;
         private readonly IDbSet<EventOption> _eventOptionsDbSet;
+        private readonly IDbSet<Office> _officeDbSet;
 
         public EventService(IUnitOfWork2 uow,
                             IPermissionService permissionService,
@@ -54,6 +57,7 @@ namespace Shrooms.Domain.Services.Events
             _eventTypesDbSet = uow.GetDbSet<EventType>();
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
             _eventOptionsDbSet = uow.GetDbSet<EventOption>();
+            _officeDbSet = uow.GetDbSet<Office>();
 
             _permissionService = permissionService;
             _eventUtilitiesService = eventUtilitiesService;
@@ -112,7 +116,6 @@ namespace Shrooms.Domain.Services.Events
         {
             var @event = _eventsDbSet
                 .Include(e => e.ResponsibleUser)
-                .Include(e => e.Office)
                 .Include(e => e.EventParticipants.Select(v => v.EventOptions))
                 .Where(e =>
                     e.Id == id &&
@@ -120,6 +123,10 @@ namespace Shrooms.Domain.Services.Events
                 .Select(MapToEventDetailsDto(id))
                 .SingleOrDefault();
 
+            @event.Offices.OfficeNames = _officeDbSet
+                .Where(p => @event.Offices.Value.Contains(SqlFunctions.StringConvert((double)p.Id).Trim()))
+                .Select(p => p.Name)
+                .ToList();
             _eventValidationService.CheckIfEventExists(@event);
             @event.IsFull = @event.Participants.Count() >= @event.MaxParticipants;
             @event.IsParticipating = @event.Participants.Any(p => p.UserId == userOrg.UserId);
@@ -213,8 +220,8 @@ namespace Shrooms.Domain.Services.Events
                 Id = e.Id,
                 Description = e.Description,
                 ImageName = e.ImageName,
-                OfficeId = e.OfficeId,
                 Location = e.Place,
+                Offices = new EventOfficesDTO { Value = e.Offices },
                 Name = e.Name,
                 MaxOptions = e.MaxChoices,
                 MaxParticipants = e.MaxParticipants,
@@ -340,7 +347,8 @@ namespace Shrooms.Domain.Services.Events
             {
                 Created = DateTime.UtcNow,
                 CreatedBy = newEventDto.UserId,
-                OrganizationId = newEventDto.OrganizationId
+                OrganizationId = newEventDto.OrganizationId,
+                OfficeIds = JsonConvert.DeserializeObject<string[]>(newEventDto.Offices.Value)
             };
 
             var newWall = new CreateWallDto()
@@ -367,13 +375,13 @@ namespace Shrooms.Domain.Services.Events
             newEvent.Modified = DateTime.UtcNow;
             newEvent.ModifiedBy = newEventDto.UserId;
             newEvent.Description = newEventDto.Description;
+            newEvent.Offices = newEventDto.Offices.Value;
             newEvent.EndDate = newEventDto.EndDate;
             newEvent.EventRecurring = newEventDto.Recurrence;
             newEvent.EventTypeId = newEventDto.TypeId;
             newEvent.ImageName = newEventDto.ImageName;
             newEvent.MaxChoices = newEventDto.MaxOptions;
             newEvent.MaxParticipants = newEventDto.MaxParticipants;
-            newEvent.OfficeId = newEventDto.OfficeId;
             newEvent.Place = newEventDto.Location;
             newEvent.ResponsibleUserId = newEventDto.ResponsibleUserId;
             newEvent.StartDate = newEventDto.StartDate;
@@ -389,8 +397,7 @@ namespace Shrooms.Domain.Services.Events
                 Description = e.Description,
                 ImageName = e.ImageName,
                 Name = e.Name,
-                OfficeId = e.OfficeId,
-                OfficeName = e.Office.Name,
+                Offices = new EventOfficesDTO { Value = e.Offices },
                 Location = e.Place,
                 RegistrationDeadlineDate = e.RegistrationDeadline,
                 StartDate = e.StartDate,
