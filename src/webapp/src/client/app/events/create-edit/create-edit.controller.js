@@ -76,6 +76,8 @@
         vm.eventCroppedImage = '';
         vm.minStartDate = moment().local().startOf('minute').toDate();
 
+        vm.toggleOfficeSelection = toggleOfficeSelection;
+        vm.toggleAllOffices = toggleAllOffices;
         vm.searchUsers = searchUsers;
         vm.addOption = addOption;
         vm.deleteOption = deleteOption;
@@ -123,6 +125,11 @@
             if ($stateParams.id) {
                 eventRepository.getEventUpdate($stateParams.id).then(function(event) {
                         vm.event = event;
+                        vm.eventTypes.forEach(function(type) {
+                            if(type.id == vm.event.typeId) {
+                                vm.selectedType = type;
+                            }
+                        })
                         vm.responsibleUser = {
                             id: vm.event.hostUserId,
                             fullName: vm.event.hostUserFullName
@@ -133,7 +140,10 @@
                         if (vm.event.startDate !== vm.event.registrationDeadlineDate) {
                             vm.isRegistrationDeadlineEnabled = true;
                         }
-
+                        vm.event.offices = [];
+                        angular.forEach(vm.event.officeIds, function(value) {
+                            vm.event.offices.push(value);
+                        })
                         vm.event.registrationDeadlineDate = moment.utc(vm.event.registrationDeadlineDate).local().startOf('minute').toDate();
                         vm.event.startDate = moment.utc(vm.event.startDate).local().startOf('minute').toDate();
                         vm.event.endDate = moment.utc(vm.event.endDate).local().startOf('minute').toDate();
@@ -159,7 +169,7 @@
                 vm.event = {
                     name: '',
                     typeId: null,
-                    officeId: null,
+                    offices: [],
                     startDate: moment().add(1, 'hours').local().startOf('minute').toDate(),
                     endDate: moment().add(3, 'hours').local().startOf('minute').toDate(),
                     recurrence: 0,
@@ -188,6 +198,33 @@
                 }
             }, true);
         }
+
+        function toggleOfficeSelection(office) {
+            var idx = vm.event.offices.indexOf(office.id);
+
+            if(idx > -1) {
+                vm.event.offices.splice(idx,1);
+            }
+            else {
+                vm.event.offices.push(office.id);
+            }
+        }
+
+        function toggleAllOffices(turnedOn) {
+            if(vm.event.offices.length == vm.eventOffices.length && turnedOn) {
+                vm.event.offices = [];
+            }
+            else if(turnedOn) {
+                vm.event.offices = [];
+                angular.forEach(vm.eventOffices, function(office) {
+                    vm.event.offices.push(office.id);
+                })
+            }
+            else {
+                vm.event.offices = [];
+            }
+        }
+
 
         function searchUsers(search) {
             return eventRepository.getUserForAutoCompleteResponsiblePerson(search);

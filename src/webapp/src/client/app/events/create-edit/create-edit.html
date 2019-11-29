@@ -134,10 +134,26 @@
                     <!--event office-->
                     <div class="form-group" ng-class="{'has-error': eventForm.officeId.$invalid && eventForm.officeId.$dirty}">
                         <label for="officeId" class="control-label col-xs-12 col-sm-4" translate="events.eventOffice"></label>
+
                         <div class="col-xs-12 col-sm-6 col-md-4">
-                            <select id="officeId" name="officeId" class="form-control" ng-model="vm.event.officeId" ng-options="office.id as office.name for office in vm.eventOffices" data-test-id="event-form-event-type-input" translate-cloak>
-                                <option selected value="">{{"events.all" | translate}}</option>
-                            </select>
+                            <div class="checkbox">
+                                <label><input type="checkbox" ng-model="outsideOffice" ng-click="vm.toggleAllOffices(false)">
+                                    <span translate="events.eventOutside"></span>
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label><input type="checkbox" ng-disabled="outsideOffice"
+                                        ng-checked="vm.event.offices.length == vm.eventOffices.length" ng-click="vm.toggleAllOffices(true)">
+                                    <span translate="events.eventOfficeAll"></span>
+                                </label>
+                            </div>
+                            <div class="event-office-list-item-seperator">&nbsp;</div>
+                                <div class="checkbox event-office-list-item" ng-repeat="office in vm.eventOffices">
+                                    <label><input type="checkbox" ng-disabled="outsideOffice"
+                                        ng-checked="vm.event.offices.indexOf(office.id) != -1" ng-click="vm.toggleOfficeSelection(office)">{{office.name}}
+                                    </label>
+                                </div>
+
                             <p class="text-danger help-block" ng-if="eventForm.officeId.$invalid && eventForm.officeId.$dirty" translate="common.messageFieldIsRequired"></p>
                         </div>
                     </div>
