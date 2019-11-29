@@ -1,5 +1,4 @@
-﻿using Shrooms.EntityModels.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Shrooms.WebViewModels.Models.Events
