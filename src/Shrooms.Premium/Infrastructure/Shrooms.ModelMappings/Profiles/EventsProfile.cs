@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Newtonsoft.Json;
 using Shrooms.DataTransferObjects.Models.Events;
 using Shrooms.DataTransferObjects.Models.OfficeMap;
 using Shrooms.EntityModels.Models.Events;
@@ -21,7 +22,7 @@ namespace Shrooms.ModelMappings.Profiles
             CreateMap<OfficeDTO, EventOfficeViewModel>();
             CreateMap<EventTypeDTO, EventTypeViewModel>();
             CreateMap<EventListItemDTO, EventListItemViewModel>()
-                .ForMember(dest => dest.OfficeIds, opt => opt.MapFrom(u => u.Offices.OfficeIds));
+                .ForMember(dest => dest.OfficeIds, opt => opt.MapFrom(u => JsonConvert.DeserializeObject<string[]>(u.Offices.Value)));
             CreateMap<EventOptionDTO, EventOptionViewModel>();
             CreateMap<EventDetailsDTO, EventDetailsViewModel>()
                 .Ignore(x => x.Comments)
@@ -30,7 +31,7 @@ namespace Shrooms.ModelMappings.Profiles
             CreateMap<EventDetailsOptionDTO, EventDetailsOptionViewModel>();
             CreateMap<EventDetailsParticipantDTO, EventDetailsParticipantViewModel>();
             CreateMap<EventEditDTO, EventEditViewModel>()
-                .ForMember(dest => dest.OfficeIds, opt => opt.MapFrom(u => u.Offices.OfficeIds));
+                .ForMember(dest => dest.OfficeIds, opt => opt.MapFrom(u => JsonConvert.DeserializeObject<string[]>(u.Offices.Value)));
             CreateMap<EventOptionsDTO, EventOptionsViewModel>();
         }
 

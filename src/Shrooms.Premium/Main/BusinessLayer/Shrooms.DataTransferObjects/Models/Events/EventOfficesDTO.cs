@@ -9,14 +9,8 @@ namespace Shrooms.DataTransferObjects.Models.Events
 {
     public class EventOfficesDTO
     {
-        public string Offices { get; set; }
+        public string Value { get; set; }
 
         public IEnumerable<string> OfficeNames { get; set; }
-
-        public IEnumerable<string> OfficeIds
-        {
-            get { return Offices == null ? null : JsonConvert.DeserializeObject<string[]>(Offices); }
-            set { Offices = JsonConvert.SerializeObject(value); }
-        }
     }
 }
