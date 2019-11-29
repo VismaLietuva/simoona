@@ -28,13 +28,11 @@ namespace Shrooms.Domain.Services.Events.List
         private readonly IEventValidationService _eventValidationService;
 
         private readonly IDbSet<Event> _eventsDbSet;
-        private readonly IDbSet<Office> _officeDbSet;
 
         public EventListingService(IUnitOfWork2 uow, IEventValidationService eventValidationService)
         {
             _eventValidationService = eventValidationService;
             _eventsDbSet = uow.GetDbSet<Event>();
-            _officeDbSet = uow.GetDbSet<Office>();
         }
 
         public EventOptionsDTO GetEventOptions(Guid eventId, UserAndOrganizationDTO userOrg)
