@@ -70,6 +70,8 @@
 
         $rootScope.pageTitle = vm.states.isAdd ? 'events.addTitle' : 'events.editTitle';
 
+        vm.eventOffices = [];
+        vm.eventTypes = [];
         vm.event = {};
         vm.event.options = [];
         vm.eventImage = '';
@@ -122,14 +124,23 @@
                 vm.recurringTypes = response;
             });
 
+            function setEventTypes() {
+                $scope.$watch(function () { return vm.eventTypes },
+                    function () {
+                        if (vm.eventTypes.length) {
+                            vm.eventTypes.forEach(function(type) {
+                                if(type.id == vm.event.typeId) {
+                                    vm.selectedType = type;
+                                }
+                            })
+                        }
+                    });
+            }
+
             if ($stateParams.id) {
                 eventRepository.getEventUpdate($stateParams.id).then(function(event) {
                         vm.event = event;
-                        vm.eventTypes.forEach(function(type) {
-                            if(type.id == vm.event.typeId) {
-                                vm.selectedType = type;
-                            }
-                        })
+                        setEventTypes();
                         vm.responsibleUser = {
                             id: vm.event.hostUserId,
                             fullName: vm.event.hostUserFullName
@@ -141,7 +152,7 @@
                             vm.isRegistrationDeadlineEnabled = true;
                         }
                         vm.event.offices = [];
-                        angular.forEach(vm.event.officeIds, function(value) {
+                        vm.event.officeIds.forEach(function(value) {
                             vm.event.offices.push(value);
                         })
                         vm.event.registrationDeadlineDate = moment.utc(vm.event.registrationDeadlineDate).local().startOf('minute').toDate();
