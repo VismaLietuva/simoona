@@ -182,15 +182,14 @@
     <Compile Include="ExcelGenerator\IExcelBuilder.cs" />
     <Compile Include="FeatureToggle\Feature.cs" />
     <Compile Include="FireAndForget\AsyncRunner.cs" />
-    <Compile Include="FireAndForget\IBookCoverService.cs" />
     <Compile Include="FireAndForget\HangFireScheduler.cs" />
     <Compile Include="FireAndForget\IBackgroundWorker.cs" />
     <Compile Include="FireAndForget\IJobScheduler.cs" />
     <Compile Include="FireAndForget\TenantNameContainer.cs" />
+    <Compile Include="ExcelGenerator\ExcelGenerator.cs" />
+    <Compile Include="GoogleBookApiService\ExternalBookInfo.cs" />
     <Compile Include="GoogleBookApiService\GoogleBookService.cs" />
     <Compile Include="GoogleBookApiService\IBookInfoService.cs" />
-    <Compile Include="GoogleBookApiService\ExternalBookInfo.cs" />
-    <Compile Include="ExcelGenerator\ExcelGenerator.cs" />
     <Compile Include="Interceptors\TelemetryLoggingInterceptor.cs" />
     <Compile Include="Interceptors\TelemetryLoggingInterceptorExtensions.cs" />
     <Compile Include="Logger\ILogger.cs" />

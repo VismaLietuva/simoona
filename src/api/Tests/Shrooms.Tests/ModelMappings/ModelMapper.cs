@@ -14,7 +14,6 @@ namespace Shrooms.UnitTests.ModelMappings
                 cfg.AddProfile<KudosBasket>();
                 cfg.AddProfile<Kudos>();
                 cfg.AddProfile<Birthdays>();
-                cfg.AddProfile<Books>();
                 cfg.AddProfile<Comments>();
                 cfg.AddProfile<Users>();
                 cfg.AddProfile<Walls>();

@@ -189,10 +189,7 @@
     <Compile Include="ServiceExceptions\ServiceException.cs" />
     <Compile Include="Services\Administration\IAdministrationUsersService.cs" />
     <Compile Include="Services\Administration\AdministrationUsersService.cs" />
-    <Compile Include="Services\Books\BookCoverService.cs" />
     <Compile Include="Services\Email\AdministrationUsers\AdministrationUsersNotificationService.cs" />
-    <Compile Include="Services\Email\Book\BooksNotificationService.cs" />
-    <Compile Include="Services\Email\Book\IBooksNotificationService.cs" />
     <Compile Include="Services\Email\Kudos\IKudosNotificationService.cs" />
     <Compile Include="Services\Email\Kudos\KudosNotificationService.cs" />
     <Compile Include="Services\Email\AdministrationUsers\IAdministrationNotificationService.cs" />
@@ -220,8 +217,6 @@
     <Compile Include="Services\UserService\IUserService.cs" />
     <Compile Include="Services\Birthday\BirthdayService.cs" />
     <Compile Include="Services\Birthday\IBirthdayService.cs" />
-    <Compile Include="Services\Books\BookService.cs" />
-    <Compile Include="Services\Books\IBookService.cs" />
     <Compile Include="Services\Email\Posting\IPostNotificationService.cs" />
     <Compile Include="Services\Email\Posting\PostNotificationService.cs" />
     <Compile Include="Services\KudosBaskets\IKudosBasketService.cs" />

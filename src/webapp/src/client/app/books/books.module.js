@@ -59,7 +59,7 @@
         '$window'
     ];
 
-    function init($window, menuNavigationFactory, leftMenuGroups) {
+    function init(menuNavigationFactory, leftMenuGroups, $window) {
         if (!$window.isPremium) {
             return;
         }

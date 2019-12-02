@@ -428,7 +428,6 @@
     <Compile Include="Controllers\UserDeprecatedController.cs" />
     <Compile Include="Controllers\UserDeprecatedController.Impersonation.cs" />
     <Compile Include="Controllers\BaseController.cs" />
-    <Compile Include="Controllers\Book\BookController.cs" />
     <Compile Include="Controllers\CertificateController.cs" />
     <Compile Include="Controllers\CommentController.cs" />
     <Compile Include="Controllers\DefaultController.cs" />

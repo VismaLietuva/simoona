@@ -158,7 +158,6 @@
   <ItemGroup>
     <Compile Include="IocBootstrapper.cs" />
     <Compile Include="Modules\AdministrationUsers.cs" />
-    <Compile Include="Modules\BooksModule.cs" />
     <Compile Include="Modules\ExternalLinksModule.cs" />
     <Compile Include="Modules\JobModule.cs" />
     <Compile Include="Modules\SupportModule.cs" />
