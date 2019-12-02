@@ -13,7 +13,7 @@ namespace Shrooms.DataLayer.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201911251120289_AddBookCoverUrlToBook"; }
+            get { return "201912021646387_AddBookCoverUrlToBook"; }
         }
         
         string IMigrationMetadata.Source
