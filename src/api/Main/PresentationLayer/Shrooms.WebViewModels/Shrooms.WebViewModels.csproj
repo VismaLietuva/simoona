@@ -106,7 +106,6 @@
     <Compile Include="Models\Users\Kudos\KudosListBasicDataViewModel.cs" />
     <Compile Include="Models\Users\Kudos\WelcomeKudosViewModel.cs" />
     <Compile Include="Models\User\ChangeUserLocalizationSettingsViewModel.cs" />
-    <Compile Include="Models\Book\BookDetails\RetrievedBookInfoViewModel.cs" />
     <Compile Include="Models\User\LanguageViewModel.cs" />
     <Compile Include="Models\User\UserNotificationsSettingsViewModel.cs" />
     <Compile Include="Models\User\WallNotificationsViewModel.cs" />
@@ -156,17 +155,6 @@
     <Compile Include="Models\User\ApplicationUserShroomsInfoViewModel.cs" />
     <Compile Include="Models\User\ApplicationUserViewModel.cs" />
     <Compile Include="Models\Birthday\BirthdayViewModel.cs" />
-    <Compile Include="Models\Book\BookDetails\BookDetailsAdministrationViewModel.cs" />
-    <Compile Include="Models\Book\BookDetails\BookDetailsLogViewModel.cs" />
-    <Compile Include="Models\Book\BookDetails\BookDetailsViewModel.cs" />
-    <Compile Include="Models\Book\BookDetails\BookQuantityByOfficeViewModel.cs" />
-    <Compile Include="Models\Book\BookDetails\EditBookViewModel.cs" />
-    <Compile Include="Models\Book\BookDetails\NewBookQuantityViewModel.cs" />
-    <Compile Include="Models\Book\BookDetails\NewBookViewModel.cs" />
-    <Compile Include="Models\Book\BooksByOffice\BasicBookUserViewModel.cs" />
-    <Compile Include="Models\Book\BooksByOffice\BooksByOfficeViewModel.cs" />
-    <Compile Include="Models\Book\OfficeBookViewModel.cs" />
-    <Compile Include="Models\Book\RetrievedBookForPostViewModel.cs" />
     <Compile Include="Models\Certificate\CertificateAutoCompleteViewModel.cs" />
     <Compile Include="Models\Certificate\CertificateMiniViewModel.cs" />
     <Compile Include="Models\Certificate\CertificatePostViewModel.cs" />

@@ -28,6 +28,7 @@
             getFilteredBooks: getFilteredBooks,
             getBookDetailsForAdministrator: getBookDetailsForAdministrator,
             getUserForAutoCompleteResponsiblePerson: getUserForAutoCompleteResponsiblePerson,
+            updateBooksCovers: updateBooksCovers
         };
         return service;
 
@@ -107,6 +108,14 @@
             return $resource(applicationUrl + 'GetForAutoComplete').query({
                 s: params
             }).$promise;
+        }
+
+        function updateBooksCovers() {
+            return $resource(bookUrl + 'covers', '', {
+                patch: {
+                    method: 'PATCH'
+                }
+            }).patch().$promise;
         }
     }
 })();

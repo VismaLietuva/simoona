@@ -807,6 +807,10 @@
     <Compile Include="Migrations\201911191445311_AddFoodRelatedFieldsToEvents.Designer.cs">
       <DependentUpon>201911191445311_AddFoodRelatedFieldsToEvents.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201911251120289_AddBookCoverUrlToBook.cs" />
+    <Compile Include="Migrations\201911251120289_AddBookCoverUrlToBook.Designer.cs">
+      <DependentUpon>201911251120289_AddBookCoverUrlToBook.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\201911281059238_EventsWithMultipleOffices.cs" />
     <Compile Include="Migrations\201911281059238_EventsWithMultipleOffices.Designer.cs">
       <DependentUpon>201911281059238_EventsWithMultipleOffices.cs</DependentUpon>
@@ -1336,6 +1340,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201911191445311_AddFoodRelatedFieldsToEvents.resx">
       <DependentUpon>201911191445311_AddFoodRelatedFieldsToEvents.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201911251120289_AddBookCoverUrlToBook.resx">
+      <DependentUpon>201911251120289_AddBookCoverUrlToBook.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201911281059238_EventsWithMultipleOffices.resx">
       <DependentUpon>201911281059238_EventsWithMultipleOffices.cs</DependentUpon>

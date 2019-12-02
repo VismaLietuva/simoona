@@ -22,5 +22,7 @@ namespace Shrooms.EntityModels.Models
         public ApplicationUser ApplicationUser { get; set; }
         
         public string Note { get; set; }
+
+        public string BookCoverUrl { get; set; }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Shrooms.Infrastructure.GoogleBookApiService
+﻿using System.Collections.Generic;
+
+namespace Shrooms.Infrastructure.GoogleBookApiService
 {
     public class ExternalBookInfo
     {
@@ -11,5 +13,7 @@
         public string OwnerId { get; set; }
 
         public string Note { get; set; }
+
+        public string CoverImageUrl { get; set; }
     }
 }
