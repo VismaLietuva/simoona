@@ -218,6 +218,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Diagnostics.DiagnosticSource, Version=4.0.3.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\..\open-source\src\api\packages\System.Diagnostics.DiagnosticSource.4.5.1\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
@@ -263,6 +264,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Infrastructure\Shrooms.Infrastructure\Books\IBookCoverService.cs" />
     <Compile Include="Infrastructure\Shrooms.Infrastructure\Calendar\GoogleCalendarService.cs" />
     <Compile Include="Infrastructure\Shrooms.Infrastructure\Calendar\ICalendarService.cs" />
     <Compile Include="Infrastructure\Shrooms.Infrastructure\VacationBot\IVacationBotService.cs" />
@@ -281,6 +283,7 @@
     <Compile Include="Infrastructure\Shrooms.IoC\Modules\VacationModule.cs" />
     <Compile Include="Infrastructure\Shrooms.IoC\Modules\WebHookCallbacksPremiumModule.cs" />
     <Compile Include="Infrastructure\Shrooms.ModelMappings\Helpers.cs" />
+    <Compile Include="Infrastructure\Shrooms.ModelMappings\Profiles\Books.cs" />
     <Compile Include="Infrastructure\Shrooms.ModelMappings\Profiles\BooksProfile.cs" />
     <Compile Include="Infrastructure\Shrooms.ModelMappings\Profiles\CommitteeProfile.cs" />
     <Compile Include="Infrastructure\Shrooms.ModelMappings\Profiles\EventsProfile.cs" />
@@ -293,6 +296,16 @@
     <Compile Include="Infrastructure\Shrooms.ModelMappings\Profiles\ServiceRequestProfile.cs" />
     <Compile Include="Infrastructure\Shrooms.ModelMappings\Profiles\UsersProfile.cs" />
     <Compile Include="Infrastructure\Shrooms.ModelMappings\Profiles\VacationsProfile.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BasicBookDto.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BookDetails\BookDetailsAdministrationDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BookDetails\BookDetailsDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BookDetails\BookDetailsLogDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BookDetails\BookQuantityByOfficeDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BookDetails\EditBookDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BookDetails\NewBookDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BookDetails\NewBookQuantityDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BookDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BookLogDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BookMobileDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BookMobileGetDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BookMobileLogDTO.cs" />
@@ -300,7 +313,14 @@
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BookMobileReturnDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BookMobileTakeSpecificDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BookRemindDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BooksByOffice\BasicBookUserDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BooksByOffice\BooksByOfficeDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BooksByOffice\BooksByOfficeOptionsDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BookTakeDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\MobileUserDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\OfficeBookDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\RetrievedBookInfoDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\TakenBookDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Calendar\CalendarAttendeeAction.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Calendar\CalendarEventDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Committees\CommitteeSuggestionCreatedDto.cs" />
@@ -339,6 +359,7 @@
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Lotteries\LotteryParticipantDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Lotteries\LotteryStatsDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Lotteries\LotteryStatusDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\MobileBookOfficeLogsDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\OfficeMap\OfficeDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\OfficeMap\OfficeRoomDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\OfficeMap\OfficeUserDTO.cs" />
@@ -355,18 +376,27 @@
     <Compile Include="Main\BusinessLayer\Shrooms.DomainExceptions\Exceptions\Event\EventException.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DomainExceptions\Exceptions\Lotteries\LotteryException.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DomainExceptions\Exceptions\Vacation\VacationImportException.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DomainServiceValidators\Validators\Books\BookMobileServiceValidator.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DomainServiceValidators\Validators\Books\BookServiceValidator.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DomainServiceValidators\Validators\Books\IBookMobileServiceValidator.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DomainServiceValidators\Validators\Books\IBookServiceValidator.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DomainServiceValidators\Validators\Events\EventValidationService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DomainServiceValidators\Validators\Events\IEventValidationService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\EmployeeComparer.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Args\GetPagedLotteriesArgs.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Badges\BadgesService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Badges\IBadgesService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Books\BookCoverService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Books\BookMobileService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Books\BookRemindService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Books\BookService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Books\IBookMobileService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Books\IBookRemindService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Books\IBookService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Committees\CommitteesService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Committees\ICommitteesService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Email\Book\BooksNotificationService.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Email\Book\IBooksNotificationService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Email\Committee\CommitteeNotificationService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Email\Committee\ICommitteeNotificationService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Email\Event\EventNotificationService.cs" />
@@ -423,6 +453,7 @@
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\WebHookCallbacks\WebHookCallbackPremiumServices.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\BackgroundWorkers\NewEventNotifier.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\BackgroundWorkers\SharedEventNotifier.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\Book\BookController.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\Book\BookMobileController.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\CommitteesController.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\EventController.cs" />
@@ -431,6 +462,18 @@
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\Lotteries\LotteryController.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\Lotteries\LotteryParticipantController.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\Lotteries\LotteryWidgetController.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Book\BookDetails\BookDetailsAdministrationViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Book\BookDetails\BookDetailsLogViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Book\BookDetails\BookDetailsViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Book\BookDetails\BookQuantityByOfficeViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Book\BookDetails\EditBookViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Book\BookDetails\NewBookQuantityViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Book\BookDetails\NewBookViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Book\BookDetails\RetrievedBookInfoViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Book\BooksByOffice\BasicBookUserViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Book\BooksByOffice\BooksByOfficeViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Book\OfficeBookViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Book\RetrievedBookForPostViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Lotteries\LotteryWidgetViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\MapController.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\OrganizationalStructureController.cs" />
