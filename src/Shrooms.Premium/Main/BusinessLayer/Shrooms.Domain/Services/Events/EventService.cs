@@ -188,14 +188,17 @@ namespace Shrooms.Domain.Services.Events
 
         public void UpdateEvent(EditEventDTO eventDto)
         {
-            var totalOptionsProvided = eventDto.NewOptions.Count() + eventDto.EditedOptions.Count();
-            eventDto.MaxOptions = FindOutMaxChoices(totalOptionsProvided, eventDto.MaxOptions);
-            eventDto.RegistrationDeadlineDate = SetRegistrationDeadline(eventDto);
-
             var eventToUpdate = _eventsDbSet
                 .Include(e => e.EventOptions)
                 .Include(e => e.EventParticipants)
                 .FirstOrDefault(e => e.Id == eventDto.Id && e.OrganizationId == eventDto.OrganizationId);
+
+            var totalOptionsProvided = eventDto.NewOptions.Count() + eventDto.EditedOptions.Count();
+            eventDto.MaxOptions = FindOutMaxChoices(totalOptionsProvided, eventDto.MaxOptions);
+            eventDto.RegistrationDeadlineDate = SetRegistrationDeadline(eventDto);
+
+
+
 
             var hasPermission = _permissionService.UserHasPermission(eventDto, AdministrationPermissions.Event);
             _eventValidationService.CheckIfEventExists(eventToUpdate);
@@ -213,6 +216,17 @@ namespace Shrooms.Domain.Services.Events
             if (eventDto.ResetParticipantList)
             {
                 _eventParticipationService.ResetAttendees(eventDto.Id, eventDto);
+            }
+
+            if (eventDto.FoodOption == (int)EventConstants.FoodOptions.Optional && (eventToUpdate.FoodOption == (int)EventConstants.FoodOptions.None || eventToUpdate.FoodOption == null))
+            {
+                var usersCultureCode = _userService.GetApplicationUser(eventDto.ResponsibleUserId).CultureCode;
+
+                var willEatOption = TranslateEventOptions("WillEat", usersCultureCode);
+                var willNotEatOption = TranslateEventOptions("WillNotEat", usersCultureCode);
+
+                eventDto.NewOptions = new List<string>() { willEatOption, willNotEatOption };
+                eventDto.MaxOptions = 1;
             }
 
             UpdateWall(eventToUpdate, eventDto);
