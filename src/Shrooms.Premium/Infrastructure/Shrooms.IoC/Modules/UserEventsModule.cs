@@ -1,6 +1,6 @@
 ﻿using Autofac;
 using Shrooms.Domain.Services.Users;
-using Shrooms.Domain.Services.WebHookCallbacks;
+using Shrooms.Domain.Services.WebHookCallbacks.Events;
 using Shrooms.Infrastructure.Interceptors;
 
 namespace Shrooms.IoC.Modules

@@ -5,16 +5,13 @@ using Shrooms.Domain.Services.Events.Utilities;
 using Shrooms.Domain.Services.Users;
 using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Notifications;
 
-namespace Shrooms.Domain.Services.WebHookCallbacks
+namespace Shrooms.Domain.Services.WebHookCallbacks.Events
 {
     public class EventJoinRemindService : IEventJoinRemindService
     {
         private readonly INotificationService _notificationService;
-
         private readonly IEventUtilitiesService _eventUtilitiesService;
-
         private readonly IUserEventsService _userEventsService;
-
         private readonly IEventNotificationService _eventNotificationService;
 
         public EventJoinRemindService(
@@ -29,7 +26,7 @@ namespace Shrooms.Domain.Services.WebHookCallbacks
             _eventNotificationService = eventNotificationService;
         }
 
-        public void Notify(UserAndOrganizationDTO userOrg)
+        public void SendNotifications(UserAndOrganizationDTO userOrg)
         {
             var typesToNotifyAbout = _eventUtilitiesService.GetEventTypesToRemind(userOrg.OrganizationId);
 
@@ -43,8 +40,11 @@ namespace Shrooms.Domain.Services.WebHookCallbacks
 
                 var usersToNotify = _userEventsService.GetUsersWithoutEventThisWeek(eventType.Id).ToList();
 
-                _notificationService.CreateForEventJoinReminder(eventType, usersToNotify, userOrg);
-                _eventNotificationService.RemindUsersToJoinEvent(eventType, usersToNotify, userOrg.OrganizationId);
+                if (usersToNotify.Any())
+                {
+                    _notificationService.CreateForEventJoinReminder(eventType, usersToNotify, userOrg);
+                    _eventNotificationService.RemindUsersToJoinEvent(eventType, usersToNotify, userOrg.OrganizationId);
+                }
             }
         }
     }

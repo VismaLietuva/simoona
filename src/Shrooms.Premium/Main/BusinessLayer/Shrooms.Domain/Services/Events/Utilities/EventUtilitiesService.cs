@@ -195,9 +195,6 @@ namespace Shrooms.Domain.Services.Events.Utilities
                           x.RegistrationDeadline > DateTime.UtcNow);
         }
 
-        private static Expression<Func<Event, bool>> AnyEventsThisWeek =>
-            e => SqlFunctions.DatePart("wk", e.StartDate) == SqlFunctions.DatePart("wk", DateTime.UtcNow);
-
         private void ValidateEventTypeName(string eventTypeName, int organizationId)
         {
             var nameAlreadyExists = _eventTypesDbSet

@@ -65,7 +65,8 @@ namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Notificatio
         {
             var newNotification = new Notification
             {
-                Title = $"Join {eventType.Name}",
+                Title = $"{eventType.Name} event type reminder",
+                Description = $"{eventType.Name}",
                 Type = NotificationType.EventReminder,
                 OrganizationId = userOrg.OrganizationId,
                 Sources = new Sources(),

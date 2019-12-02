@@ -52,5 +52,12 @@ namespace Shrooms.Premium.Main.PresentationLayer.Shrooms.API.Controllers
         {
             await _webHookService.BadgesService.AssignBadgesAsync();
         }
+
+        [HttpPost]
+        [Route("RemindEvents")]
+        public void RemindEvents()
+        {
+            _webHookService.EventJoinRemindService.SendNotifications(GetUserAndOrganization());
+        }
     }
 }

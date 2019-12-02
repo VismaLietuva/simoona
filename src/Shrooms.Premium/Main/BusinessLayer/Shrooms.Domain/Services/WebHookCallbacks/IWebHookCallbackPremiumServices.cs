@@ -14,5 +14,8 @@ namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.WebHookCall
         ILoyaltyKudosService LoyaltyKudos { get; set; }
 
         IBadgesService BadgesService { get; set; }
+
+        IEventJoinRemindService EventJoinRemindService { get; set; }
+
     }
 }
