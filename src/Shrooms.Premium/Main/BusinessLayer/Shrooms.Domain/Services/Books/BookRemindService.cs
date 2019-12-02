@@ -58,7 +58,7 @@ namespace Shrooms.Domain.Services.Books
                 var organization = _organizationService.GetOrganizationById(bookToRemind.OrganizationId);
                 var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
                 var subject = string.Format("Book reminder: \"{0}\"", bookToRemind.Title);
-                var bookUrl = "fdsfds";
+                var bookUrl = _appSettings.BookUrl(organization.Name, bookToRemind.BookOfficeId, bookToRemind.OfficeId);
                 var formattedDate = string.Format("{0:D}", bookToRemind.TakenFrom);
 
                 var bookRemindTemplateViewModel = new BookReminderEmailTemplateViewModel(bookToRemind.Title, bookToRemind.Author, formattedDate, bookUrl, user.FullName, userNotificationSettingsUrl);
