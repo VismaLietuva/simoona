@@ -1,5 +1,6 @@
 ﻿using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.BusinessLayer;
+using Shrooms.Premium.Other.Shrooms.Constants.BusinessLayer;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Events;
@@ -97,7 +98,7 @@ namespace Shrooms.Domain.Services.Events.Participation
 
             _uow.SaveChanges(false);
 
-            _asyncRunner.Run<IEventNotificationService>(n=>n.NotifyRemovedEventParticipants(@event.Name,@event.Id, userOrg.OrganizationId,users), _uow.ConnectionName);
+            _asyncRunner.Run<IEventNotificationService>(n => n.NotifyRemovedEventParticipants(@event.Name, @event.Id, userOrg.OrganizationId, users), _uow.ConnectionName);
             _asyncRunner.Run<IEventCalendarService>(n => n.ResetParticipants(@event.Id, userOrg.OrganizationId), _uow.ConnectionName);
         }
 
@@ -136,7 +137,7 @@ namespace Shrooms.Domain.Services.Events.Participation
                     var alreadyParticipates = @event.Participants.Any(p => p == userId);
                     _eventValidationService.CheckIfUserAlreadyJoinedSameEvent(alreadyParticipates);
 
-                    ValidateSingleJoin(@event, joinDto.OrganizationId, userId);
+                    ValidateSingleJoin(@event, joinDto.OrganizationId, userId, joinDto.ChosenOptions);
                     AddParticipant(userId, @event.Id, eventOptions);
 
                     JoinLeaveEventWall(@event.ResponsibleUserId, userId, @event.WallId, joinDto);
@@ -235,8 +236,8 @@ namespace Shrooms.Domain.Services.Events.Participation
 
             JoinLeaveEventWall(@event.ResponsibleUserId, userId, @event.WallId, userOrg);
 
-            _asyncRunner.Run<IEventCalendarService>(n => n.RemoveParticipants(@event.Id, userOrg.OrganizationId, new [] { userId }), _uow.ConnectionName);
-            _asyncRunner.Run<IEventNotificationService>(n=>n.NotifyRemovedEventParticipants(@event.Name,@event.Id, userOrg.OrganizationId,new[] { userId}),_uow.ConnectionName);
+            _asyncRunner.Run<IEventCalendarService>(n => n.RemoveParticipants(@event.Id, userOrg.OrganizationId, new[] { userId }), _uow.ConnectionName);
+            _asyncRunner.Run<IEventNotificationService>(n => n.NotifyRemovedEventParticipants(@event.Name, @event.Id, userOrg.OrganizationId, new[] { userId }), _uow.ConnectionName);
         }
 
         public void Leave(Guid eventId, UserAndOrganizationDTO userOrg)
@@ -345,23 +346,51 @@ namespace Shrooms.Domain.Services.Events.Participation
             };
         }
 
-        private void ValidateSingleJoin(EventJoinValidationDTO @event, int organizationId, string userId)
+        private void ValidateSingleJoin(EventJoinValidationDTO @event, int organizationId, string userId, IEnumerable<int> options)
         {
-            if (@event.IsSingleJoin)
+            if(!@event.Options
+                .Where(option => options.Contains(option.Id))
+                .Any(selectedOption => selectedOption.Option == EventConstants.WillNotEatOptionEN || selectedOption.Option == EventConstants.WillEatOptionLT)
+                )
             {
-                var events = _eventsDbSet
-                    .Include(e => e.EventParticipants)
-                    .Where(x =>
-                        x.EventTypeId == @event.EventTypeId &&
-                        x.OrganizationId == organizationId &&
-                        x.StartDate > _systemClock.UtcNow &&
-                        x.EventParticipants.Any(p => p.ApplicationUserId == userId))
-                    .ToList();
+                if (@event.IsSingleJoin)
+                {
+                    var events = _eventsDbSet
+                        .Include(e => e.EventParticipants.Select(x => x.EventOptions))
+                        .Where(x =>
+                            x.EventTypeId == @event.EventTypeId &&
+                            x.OrganizationId == organizationId &&
+                            x.StartDate > _systemClock.UtcNow &&
+                            x.EventParticipants.Any(p => p.ApplicationUserId == userId))
+                        .ToList();
 
-                var eventWeekNumber = GetWeekOfYear(@event.StartDate);
-                var eventToLeave = events.FirstOrDefault(x => GetWeekOfYear(x.StartDate) == eventWeekNumber);
+                    var filteredEvents = RemoveEventsWithoutFood(events, userId);
 
-                _eventValidationService.CheckIfUserExistsInOtherSingleJoinEvent(eventToLeave);
+                    var eventWeekNumber = GetWeekOfYear(@event.StartDate);
+                    var eventToLeave = filteredEvents.FirstOrDefault(x => GetWeekOfYear(x.StartDate) == eventWeekNumber);
+
+                    _eventValidationService.CheckIfUserExistsInOtherSingleJoinEvent(eventToLeave);
+                }
+            }
+
+        }
+
+        private static IEnumerable<Event> RemoveEventsWithoutFood(IList<Event> events, string userId)
+        {
+            try
+            {
+                var foodOptionalEvents = events.Where(x => x.FoodOption == (int)EventConstants.FoodOptions.Optional);
+
+                var eventsToRemove = foodOptionalEvents
+                    .Where(x => x.EventParticipants
+                        .First(y => y.ApplicationUserId == userId).EventOptions
+                        .Any(z => z.Option == EventConstants.WillNotEatOptionLT || z.Option == EventConstants.WillNotEatOptionEN));
+
+                return events.Except(eventsToRemove);
+            }
+            catch (ArgumentNullException)
+            {
+                return events;
             }
         }
 

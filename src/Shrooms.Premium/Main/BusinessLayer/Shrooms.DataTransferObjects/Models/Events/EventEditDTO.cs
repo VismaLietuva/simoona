@@ -29,6 +29,8 @@ namespace Shrooms.DataTransferObjects.Models.Events
 
         public int TypeId { get; set; }
 
+        public int? FoodOption { get; set; }
+
         public int MaxParticipants { get; set; }
 
         public int MaxOptions { get; set; }

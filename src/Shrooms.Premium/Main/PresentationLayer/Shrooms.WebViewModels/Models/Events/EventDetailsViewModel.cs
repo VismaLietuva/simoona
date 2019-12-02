@@ -37,6 +37,8 @@ namespace Shrooms.WebViewModels.Models.Events
 
         public int WallId { get; set; }
 
+        public int? FoodOption { get; set; }
+
         public IEnumerable<EventDetailsCommentViewModel> Comments { get; set; }
 
         public IEnumerable<EventDetailsOptionViewModel> Options { get; set; }

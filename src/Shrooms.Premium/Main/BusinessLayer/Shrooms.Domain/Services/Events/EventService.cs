@@ -10,6 +10,7 @@ using Shrooms.Domain.Services.Events.Utilities;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.DomainServiceValidators.Validators.Events;
+using Shrooms.Premium.Other.Shrooms.Constants.BusinessLayer;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Events;
 using Shrooms.EntityModels.Models.Multiwall;
@@ -20,6 +21,12 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Shrooms.Domain.Helpers;
+using Shrooms.Resources.Models.Events;
+using Shrooms.Domain.Services.UserService;
+using System.Threading;
+using System.Resources;
+using Shrooms.Resources;
+using System.Globalization;
 using System.Data.Entity.SqlServer;
 using Newtonsoft.Json;
 
@@ -29,6 +36,8 @@ namespace Shrooms.Domain.Services.Events
     {
         private const int NoOptions = 0;
 
+
+
         private readonly IUnitOfWork2 _uow;
         private readonly IPermissionService _permissionService;
         private readonly IEventUtilitiesService _eventUtilitiesService;
@@ -36,11 +45,14 @@ namespace Shrooms.Domain.Services.Events
         private readonly IEventParticipationService _eventParticipationService;
         private readonly IEventCalendarService _calendarService;
         private readonly IWallService _wallService;
+        private readonly IUserService _userService;
         private readonly IMarkdownConverter _markdownConverter;
         private readonly IDbSet<Event> _eventsDbSet;
         private readonly IDbSet<EventType> _eventTypesDbSet;
         private readonly IDbSet<ApplicationUser> _usersDbSet;
         private readonly IDbSet<EventOption> _eventOptionsDbSet;
+        private readonly ResourceManager _resourceManager;
+
         private readonly IDbSet<Office> _officeDbSet;
 
         public EventService(IUnitOfWork2 uow,
@@ -50,6 +62,7 @@ namespace Shrooms.Domain.Services.Events
                             IEventParticipationService eventParticipationService,
                             IEventCalendarService calendarService,
                             IWallService wallService,
+                            IUserService userService,
                             IMarkdownConverter markdownConverter)
         {
             _uow = uow;
@@ -65,7 +78,9 @@ namespace Shrooms.Domain.Services.Events
             _eventParticipationService = eventParticipationService;
             _calendarService = calendarService;
             _wallService = wallService;
+            _userService = userService;
             _markdownConverter = markdownConverter;
+            _resourceManager = new ResourceManager("Shrooms.Resources.Models.Events.Events", typeof(ResourceUtilities).Assembly);
         }
 
         public void Delete(Guid id, UserAndOrganizationDTO userOrg)
@@ -144,7 +159,20 @@ namespace Shrooms.Domain.Services.Events
             _eventValidationService.CheckIfCreatingEventHasInsufficientOptions(newEventDto.MaxOptions, newEventDto.NewOptions.Count());
             _eventValidationService.CheckIfCreatingEventHasNoChoices(newEventDto.MaxOptions, newEventDto.NewOptions.Count());
 
+
+            if (newEventDto.FoodOption == (int)EventConstants.FoodOptions.Optional)
+            {
+                var usersCultureCode = _userService.GetApplicationUser(newEventDto.ResponsibleUserId).CultureCode;
+
+                var willEatOption = TranslateEventOptions("WillEat", usersCultureCode);
+                var willNotEatOption = TranslateEventOptions("WillNotEat", usersCultureCode);
+
+                newEventDto.NewOptions = new List<string>() { willEatOption, willNotEatOption };
+                newEventDto.MaxOptions = 1;
+            }
+
             var newEvent = await MapNewEvent(newEventDto);
+
             _eventsDbSet.Add(newEvent);
 
             MapNewOptions(newEventDto, newEvent);
@@ -160,14 +188,17 @@ namespace Shrooms.Domain.Services.Events
 
         public void UpdateEvent(EditEventDTO eventDto)
         {
-            var totalOptionsProvided = eventDto.NewOptions.Count() + eventDto.EditedOptions.Count();
-            eventDto.MaxOptions = FindOutMaxChoices(totalOptionsProvided, eventDto.MaxOptions);
-            eventDto.RegistrationDeadlineDate = SetRegistrationDeadline(eventDto);
-
             var eventToUpdate = _eventsDbSet
                 .Include(e => e.EventOptions)
                 .Include(e => e.EventParticipants)
                 .FirstOrDefault(e => e.Id == eventDto.Id && e.OrganizationId == eventDto.OrganizationId);
+
+            var totalOptionsProvided = eventDto.NewOptions.Count() + eventDto.EditedOptions.Count();
+            eventDto.MaxOptions = FindOutMaxChoices(totalOptionsProvided, eventDto.MaxOptions);
+            eventDto.RegistrationDeadlineDate = SetRegistrationDeadline(eventDto);
+
+
+
 
             var hasPermission = _permissionService.UserHasPermission(eventDto, AdministrationPermissions.Event);
             _eventValidationService.CheckIfEventExists(eventToUpdate);
@@ -185,6 +216,17 @@ namespace Shrooms.Domain.Services.Events
             if (eventDto.ResetParticipantList)
             {
                 _eventParticipationService.ResetAttendees(eventDto.Id, eventDto);
+            }
+
+            if (eventDto.FoodOption == (int)EventConstants.FoodOptions.Optional && (eventToUpdate.FoodOption == (int)EventConstants.FoodOptions.None || eventToUpdate.FoodOption == null))
+            {
+                var usersCultureCode = _userService.GetApplicationUser(eventDto.ResponsibleUserId).CultureCode;
+
+                var willEatOption = TranslateEventOptions("WillEat", usersCultureCode);
+                var willNotEatOption = TranslateEventOptions("WillNotEat", usersCultureCode);
+
+                eventDto.NewOptions = new List<string>() { willEatOption, willNotEatOption };
+                eventDto.MaxOptions = 1;
             }
 
             UpdateWall(eventToUpdate, eventDto);
@@ -232,6 +274,7 @@ namespace Shrooms.Domain.Services.Events
                 HostUserId = e.ResponsibleUserId,
                 HostUserFullName = e.ResponsibleUser.FirstName + " " + e.ResponsibleUser.LastName,
                 TypeId = e.EventTypeId,
+                FoodOption = e.FoodOption,
                 Options = e.EventOptions.Select(o => new EventOptionDTO
                 {
                     Id = o.Id,
@@ -286,6 +329,7 @@ namespace Shrooms.Domain.Services.Events
             _eventValidationService.CheckIfResponsibleUserNotExists(userExists);
             _eventValidationService.CheckIfOptionsAreDifferent(eventDto.NewOptions);
             _eventValidationService.CheckIfTypeDoesNotExist(eventTypeExists);
+            _eventValidationService.CheckIfFoodOptionalAndOptionsNonExistent(eventDto.NewOptions, eventDto.FoodOption);
         }
 
         private void UpdateEventOptions(EditEventDTO editedEvent, Event @event)
@@ -341,6 +385,12 @@ namespace Shrooms.Domain.Services.Events
             }
         }
 
+        private string TranslateEventOptions(string eventOption, string cultureCode)
+        {
+            var culture = new CultureInfo(cultureCode);
+            return ResourceUtilities.GetResourceValue(_resourceManager, eventOption, culture);
+        }
+
         private async Task<Event> MapNewEvent(CreateEventDto newEventDto)
         {
             var newEvent = new Event()
@@ -387,6 +437,7 @@ namespace Shrooms.Domain.Services.Events
             newEvent.StartDate = newEventDto.StartDate;
             newEvent.Name = newEventDto.Name;
             newEvent.RegistrationDeadline = newEventDto.RegistrationDeadlineDate.Value;
+            newEvent.FoodOption = newEventDto.FoodOption;
         }
 
         private Expression<Func<Event, EventDetailsDTO>> MapToEventDetailsDto(Guid eventId)
@@ -406,6 +457,7 @@ namespace Shrooms.Domain.Services.Events
                 MaxOptions = e.MaxChoices,
                 HostUserId = e.ResponsibleUserId,
                 WallId = e.WallId,
+                FoodOption = e.FoodOption,
                 HostUserFullName = e.ResponsibleUser.FirstName + " " + e.ResponsibleUser.LastName,
                 Options = e.EventOptions.Select(o => new EventDetailsOptionDTO
                 {

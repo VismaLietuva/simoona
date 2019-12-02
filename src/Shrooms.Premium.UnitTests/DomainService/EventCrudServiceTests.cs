@@ -23,6 +23,7 @@ using System.Data.Entity;
 using System.Linq;
 using Shrooms.Domain.Helpers;
 using static Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes.ErrorCodes;
+using Shrooms.Domain.Services.UserService;
 
 namespace Shrooms.UnitTests.DomainService
 {
@@ -60,8 +61,9 @@ namespace Shrooms.UnitTests.DomainService
             var calendarService = Substitute.For<IEventCalendarService>();
             var eventValidationService = new EventValidationService(_systemClockMock);
             var markdownConverter = Substitute.For<IMarkdownConverter>();
+            var userService = Substitute.For<IUserService>();
 
-            _eventService = new EventService(_uow, _permissionService, eventUtilitiesService, eventValidationService, eventParticipationService, calendarService, _wallService, markdownConverter);
+            _eventService = new EventService(_uow, _permissionService, eventUtilitiesService, eventValidationService, eventParticipationService, calendarService, _wallService, userService, markdownConverter);
         }
 
         [Test]
