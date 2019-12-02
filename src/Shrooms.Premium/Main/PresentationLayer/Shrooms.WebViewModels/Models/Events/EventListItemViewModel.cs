@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Shrooms.WebViewModels.Models.Events
 {
@@ -16,7 +17,7 @@ namespace Shrooms.WebViewModels.Models.Events
 
         public DateTime RegistrationDeadlineDate { get; set; }
 
-        public string Office { get; set; }
+        public IList<string> OfficeIds { get; set; }
 
         public string Place { get; set; }
 
