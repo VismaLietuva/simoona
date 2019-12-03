@@ -275,7 +275,6 @@ namespace Shrooms.Domain.Services.Lotteries
             if(DateTime.UtcNow > lotteryDetails.EndDate)
             {
                 throw new LotteryException("Lottery has already ended.");
-
             }
 
             for (var i = 0; i < lotteryTicketDTO.Tickets; i++)
