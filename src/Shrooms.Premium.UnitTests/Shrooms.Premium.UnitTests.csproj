@@ -172,6 +172,7 @@
     <Compile Include="DomainService\OrganizationalStructureTests.cs" />
     <Compile Include="DomainService\ServiceRequestExportServiceTests.cs" />
     <Compile Include="DomainService\ServiceRequestServiceTests.cs" />
+    <Compile Include="DomainService\EventServices\EventJoinRemindServiceTests.cs" />
     <Compile Include="DomainService\VacationService\VacationDomainServiceTests.cs" />
     <Compile Include="ModelMappings\AutoMapperTests.cs" />
     <Compile Include="ModelMappings\ModelMapper.cs" />
