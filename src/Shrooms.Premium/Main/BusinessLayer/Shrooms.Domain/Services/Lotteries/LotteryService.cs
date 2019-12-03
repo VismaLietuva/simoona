@@ -272,6 +272,12 @@ namespace Shrooms.Domain.Services.Lotteries
                 throw new LotteryException("User does not have enough kudos for the purchase.");
             }
 
+            if(DateTime.UtcNow > lotteryDetails.EndDate)
+            {
+                throw new LotteryException("Lottery has already ended.");
+
+            }
+
             for (var i = 0; i < lotteryTicketDTO.Tickets; i++)
             {
                 _participantsDbSet.Add(MapNewLotteryParticipant(lotteryTicketDTO, userOrg));
