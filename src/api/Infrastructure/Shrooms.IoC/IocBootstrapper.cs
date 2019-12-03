@@ -74,7 +74,6 @@ namespace Shrooms.IoC
             builder.RegisterModule(new IdentityModule());
             builder.RegisterModule(new ServicesModule());
             builder.RegisterModule(new InfrastructureModule());
-            builder.RegisterModule(new BooksModule());
             builder.RegisterModule(new WallModule());
             builder.RegisterModule(new KudosModule());
             builder.RegisterModule(new KudosBasketModule());

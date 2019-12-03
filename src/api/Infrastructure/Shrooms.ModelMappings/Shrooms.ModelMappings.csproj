@@ -83,7 +83,6 @@
     <Compile Include="Profiles\Walls.cs" />
     <Compile Include="Resolvers\AdministrationUserRoomResolver.cs" />
     <Compile Include="Profiles\Birthdays.cs" />
-    <Compile Include="Profiles\Books.cs" />
     <Compile Include="Profiles\Comments.cs" />
     <Compile Include="Profiles\KudosBasket.cs" />
     <Compile Include="Profiles\Kudos.cs" />

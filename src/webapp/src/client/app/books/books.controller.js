@@ -32,6 +32,7 @@
         vm.changePage = changePage;
         vm.searchFilter = searchFilter;
         vm.toggleOffice = toggleOffice;
+        vm.updateBooksCovers = updateBooksCovers;
         vm.isLoading = true;
 
         init();
@@ -108,6 +109,17 @@
             vm.filter.officeId = office.id;
 
             getFilteredBooks(vm.filter);
+        }
+
+        function updateBooksCovers() {
+            console.log(localeSrv)
+        var successMessage = localeSrv.translate('books.coversWillBeUpdatedSoon');
+        console.log(localeSrv)
+            bookRepository.updateBooksCovers().then(function () {
+                notifySrv.success(successMessage);
+            }, function (response) {
+                notifySrv.error(response.data.message);
+            });
         }
     }
 })();

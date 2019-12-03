@@ -23,6 +23,8 @@
   "eventParticipants": "Participants",
   "eventPhoto": "Photo",
   "eventOffice": "Office",
+  "eventOffices": "Offices",
+  "eventOutside": "Outside office",
   "eventOfficeAll": "All offices",
   "eventLocation": "City/room/venue",
   "eventRecurring": "Recurring",

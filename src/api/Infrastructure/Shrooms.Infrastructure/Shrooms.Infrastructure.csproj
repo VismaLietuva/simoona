@@ -186,10 +186,10 @@
     <Compile Include="FireAndForget\IBackgroundWorker.cs" />
     <Compile Include="FireAndForget\IJobScheduler.cs" />
     <Compile Include="FireAndForget\TenantNameContainer.cs" />
+    <Compile Include="ExcelGenerator\ExcelGenerator.cs" />
+    <Compile Include="GoogleBookApiService\ExternalBookInfo.cs" />
     <Compile Include="GoogleBookApiService\GoogleBookService.cs" />
     <Compile Include="GoogleBookApiService\IBookInfoService.cs" />
-    <Compile Include="GoogleBookApiService\ExternalBookInfo.cs" />
-    <Compile Include="ExcelGenerator\ExcelGenerator.cs" />
     <Compile Include="Interceptors\TelemetryLoggingInterceptor.cs" />
     <Compile Include="Interceptors\TelemetryLoggingInterceptorExtensions.cs" />
     <Compile Include="Logger\ILogger.cs" />

@@ -126,4 +126,10 @@
   <data name="Option" xml:space="preserve">
     <value>Option</value>
   </data>
+  <data name="WillEat" xml:space="preserve">
+    <value>I will eat at this event</value>
+  </data>
+  <data name="WillNotEat" xml:space="preserve">
+    <value>I will not eat at this event</value>
+  </data>
 </root>
