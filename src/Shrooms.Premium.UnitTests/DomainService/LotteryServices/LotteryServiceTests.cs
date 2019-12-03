@@ -301,7 +301,7 @@ namespace Shrooms.Premium.UnitTests.DomainService.LotteryServices
         {
             MockParticipants();
             MockLotteries();
-            _mapper.Map<Lottery, LotteryDetailsDTO>(default).ReturnsForAnyArgs(new LotteryDetailsDTO { EntryFee = 1 });
+            _mapper.Map<Lottery, LotteryDetailsDTO>(default).ReturnsForAnyArgs(new LotteryDetailsDTO { EntryFee = 1, EndDate = DateTime.UtcNow.AddDays(10) });
             _userService.GetApplicationUser(default).ReturnsForAnyArgs(new ApplicationUser { RemainingKudos = 100 });
 
             await _sut.BuyLotteryTicketAsync(new BuyLotteryTicketDTO { LotteryId = lotteryId, Tickets = 10 }, GetUserOrg());
