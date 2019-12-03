@@ -74,7 +74,7 @@
                                     <b>{{vm.lottery.entryFee * vm.ticketCount}}</b></label>
                         </div>
                 </div>
-                
+                <wave-spinner ng-if="!vm.lotteryLoaded"></wave-spinner>
             </div>
             <div class="lotteries-detail-modal-description-seperator hidden-xs">
             </div>
