@@ -81,6 +81,7 @@ namespace Shrooms.Domain.Services.Events.Utilities
                 {
                     Id = x.Id,
                     IsSingleJoin = x.IsSingleJoin,
+                    SendWeeklyReminders = x.SendWeeklyReminders,
                     Name = x.Name,
                     HasActiveEvents = x.Events.Any(e => e.EndDate > DateTime.UtcNow 
                                                      || e.EventRecurring != EventRecurrenceOptions.None)
@@ -117,8 +118,6 @@ namespace Shrooms.Domain.Services.Events.Utilities
 
         public void UpdateEventType(UpdateEventTypeDTO eventType)
         {
-            ValidateEventTypeName(eventType.Name, eventType.OrganizationId);
-
             var orgEventType = _eventTypesDbSet
                 .SingleOrDefault(x => x.OrganizationId == eventType.OrganizationId && x.Id == eventType.Id);
 
@@ -131,6 +130,7 @@ namespace Shrooms.Domain.Services.Events.Utilities
             orgEventType.Name = eventType.Name;
             orgEventType.ModifiedBy = eventType.UserId;
             orgEventType.Modified = DateTime.UtcNow;
+            orgEventType.SendWeeklyReminders = eventType.SendWeeklyReminders;
 
             _uow.SaveChanges(eventType.UserId);
         }
@@ -190,8 +190,8 @@ namespace Shrooms.Domain.Services.Events.Utilities
         public bool AnyEventsThisWeekByType(int eventTypeId)
         {
             return _eventsDbSet
-                .HappeningThisWeek()
-                .Any(x => x.EventType.Id == eventTypeId &&
+                .Any(x => SqlFunctions.DatePart("wk", x.StartDate) == SqlFunctions.DatePart("wk", DateTime.UtcNow) &&
+                          x.EventType.Id == eventTypeId &&
                           x.RegistrationDeadline > DateTime.UtcNow);
         }
 
@@ -216,6 +216,7 @@ namespace Shrooms.Domain.Services.Events.Utilities
                 CreatedBy = eventTypeDto.UserId,
                 OrganizationId = eventTypeDto.OrganizationId,
                 IsSingleJoin = eventTypeDto.IsSingleJoin,
+                SendWeeklyReminders = eventTypeDto.SendWeeklyReminders,
                 Name = eventTypeDto.Name
             };
 

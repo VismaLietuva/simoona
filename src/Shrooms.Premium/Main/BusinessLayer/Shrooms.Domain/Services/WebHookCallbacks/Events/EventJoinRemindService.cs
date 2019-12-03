@@ -38,12 +38,17 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.Events
                     continue;
                 }
 
-                var usersToNotify = _userEventsService.GetUsersWithoutEventThisWeek(eventType.Id).ToList();
+                var usersToNotifyInApp = _userEventsService.GetUsersWithAppReminders(eventType.Id).ToList();
+                var usersToNotifyEmail = _userEventsService.GetUsersWithEmailReminders(eventType.Id).ToList();
 
-                if (usersToNotify.Any())
+                if (usersToNotifyInApp.Any())
                 {
-                    _notificationService.CreateForEventJoinReminder(eventType, usersToNotify, userOrg);
-                    _eventNotificationService.RemindUsersToJoinEvent(eventType, usersToNotify, userOrg.OrganizationId);
+                    _notificationService.CreateForEventJoinReminder(eventType, usersToNotifyInApp, userOrg);
+                }
+
+                if (usersToNotifyEmail.Any())
+                {
+                    _eventNotificationService.RemindUsersToJoinEvent(eventType, usersToNotifyEmail, userOrg.OrganizationId);
                 }
             }
         }

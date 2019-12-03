@@ -387,7 +387,6 @@
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Events\Participation\IEventParticipationService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Events\Utilities\EventUtilitiesService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Events\Utilities\IEventUtilitiesService.cs" />
-    <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Events\EventExtensions.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\KudosShop\IKudosShopService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\KudosShop\KudosShopService.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.Domain\Services\Lotteries\ILotteryAbortJob.cs" />

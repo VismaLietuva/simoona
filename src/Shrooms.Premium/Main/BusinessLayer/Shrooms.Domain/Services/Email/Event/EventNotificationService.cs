@@ -56,13 +56,9 @@ namespace Shrooms.Domain.Services.Email.Event
             _mailingService.SendEmail(new EmailDto(emails, Resources.Models.Events.Events.ResetParticipantListEmailSubject, emailBody));
         }
 
-        public void RemindUsersToJoinEvent(EventTypeDTO eventType, IEnumerable<string> users, int orgId)
+        public void RemindUsersToJoinEvent(EventTypeDTO eventType, IEnumerable<string> emails, int orgId)
         {
             var organization = _organizationService.GetOrganizationById(orgId);
-            var emails = _usersDbSet
-                .Where(u => users.Contains(u.Id))
-                .Select(u => u.Email)
-                .ToList();
 
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
             var eventUrl = _appSettings.EventListByTypeUrl(organization.ShortName, eventType.Id.ToString());
