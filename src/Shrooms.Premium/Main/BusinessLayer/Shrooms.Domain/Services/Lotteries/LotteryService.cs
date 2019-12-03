@@ -272,6 +272,11 @@ namespace Shrooms.Domain.Services.Lotteries
                 throw new LotteryException("User does not have enough kudos for the purchase.");
             }
 
+            if(DateTime.UtcNow > lotteryDetails.EndDate)
+            {
+                throw new LotteryException("Lottery has already ended.");
+            }
+
             for (var i = 0; i < lotteryTicketDTO.Tickets; i++)
             {
                 _participantsDbSet.Add(MapNewLotteryParticipant(lotteryTicketDTO, userOrg));
@@ -280,7 +285,7 @@ namespace Shrooms.Domain.Services.Lotteries
             var kudosLogDTO = new AddKudosLogDTO
             {
                 ReceivingUserIds = new List<string> { userOrg.UserId },
-                PointsTypeId = 2,
+                PointsTypeId = _kudosService.GetKudosTypeId(KudosTypeEnum.Minus),
                 MultiplyBy = lotteryTicketDTO.Tickets * lotteryDetails.EntryFee,
                 Comment = $"For {lotteryTicketDTO.Tickets} tickets",
                 UserId = userOrg.UserId,

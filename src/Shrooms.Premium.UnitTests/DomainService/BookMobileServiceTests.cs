@@ -1,4 +1,4 @@
-﻿using DomainServiceValidators.Validators.Books;
+﻿using Shrooms.DomainServiceValidators.Validators.Books;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.DataLayer.DAL;

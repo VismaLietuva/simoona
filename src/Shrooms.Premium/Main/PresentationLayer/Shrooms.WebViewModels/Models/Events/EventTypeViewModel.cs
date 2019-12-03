@@ -8,6 +8,7 @@
 
         public bool SendWeeklyReminders { get; set; }
 
+        public bool IsFoodRelated { get; set; }
 
         public string Name { get; set; }
 

@@ -1,8 +1,10 @@
 ﻿using Shrooms.Constants.WebApi;
+using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Events;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Shrooms.Premium.Other.Shrooms.Constants.BusinessLayer;
 
 namespace Shrooms.WebViewModels.Models.Events
 {
@@ -27,7 +29,7 @@ namespace Shrooms.WebViewModels.Models.Events
         [Required]
         public EventRecurrenceOptions Recurrence { get; set; }
 
-        public int? OfficeId { get; set; }
+        public List<int> Offices { get; set; }
 
         [Required]
         [StringLength(ConstWebApi.EventLocationMaxLength)]
@@ -45,6 +47,9 @@ namespace Shrooms.WebViewModels.Models.Events
 
         [Required]
         public int TypeId { get; set; }
+
+        [Range((int)EventConstants.FoodOptions.None, (int)EventConstants.FoodOptions.Optional)]
+        public int? FoodOption { get; set; }
 
         [Required]
         public string ResponsibleUserId { get; set; }

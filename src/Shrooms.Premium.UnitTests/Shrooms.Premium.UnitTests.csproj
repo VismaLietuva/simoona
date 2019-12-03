@@ -159,6 +159,7 @@
     <Compile Include="Controllers\WebApi\LotteryControllerTests.cs" />
     <Compile Include="DomainService\BadgesServiceTests.cs" />
     <Compile Include="DomainService\BookMobileServiceTests.cs" />
+    <Compile Include="DomainService\BookServiceTests.cs" />
     <Compile Include="DomainService\EventCrudServiceTests.cs" />
     <Compile Include="DomainService\EventListingServiceTests.cs" />
     <Compile Include="DomainService\EventServices\EventExportServiceTests.cs" />
@@ -174,9 +175,17 @@
     <Compile Include="DomainService\ServiceRequestServiceTests.cs" />
     <Compile Include="DomainService\EventServices\EventJoinRemindServiceTests.cs" />
     <Compile Include="DomainService\VacationService\VacationDomainServiceTests.cs" />
+    <Compile Include="Mocks\MockDbContext.cs" />
+    <Compile Include="Mocks\MockIdentity.cs" />
+    <Compile Include="Mocks\MockPasswordHasher.cs" />
+    <Compile Include="Mocks\MockPasswordValidator.cs" />
+    <Compile Include="Mocks\MockUnitOfWork.cs" />
+    <Compile Include="Mocks\NewMockRepository.cs" />
+    <Compile Include="Mocks\TestDbAsyncQueryProvider{TEntity}.cs" />
     <Compile Include="ModelMappings\AutoMapperTests.cs" />
     <Compile Include="ModelMappings\ModelMapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestConstants.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
