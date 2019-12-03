@@ -4,7 +4,8 @@
     </button>
     <h3 class="modal-title">{{vm.lottery.title}}</h3>
 </div>
-<div class="modal-body">
+<wave-spinner ng-show="!vm.lotteryLoaded"></wave-spinner>
+<div class="modal-body" ng-show="vm.lotteryLoaded">
     <form role="form">
         <div class="form-group">
             <div class="row">
@@ -74,7 +75,6 @@
                                     <b>{{vm.lottery.entryFee * vm.ticketCount}}</b></label>
                         </div>
                 </div>
-                <wave-spinner ng-if="!vm.lotteryLoaded"></wave-spinner>
             </div>
             <div class="lotteries-detail-modal-description-seperator hidden-xs">
             </div>
