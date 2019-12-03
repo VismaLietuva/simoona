@@ -7,13 +7,13 @@ namespace Shrooms.DataLayer.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class EventTypeWeeklyReminders : IMigrationMetadata
+    public sealed partial class EventTypeWeeklyReminder : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(EventTypeWeeklyReminders));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(EventTypeWeeklyReminder));
         
         string IMigrationMetadata.Id
         {
-            get { return "201911210935387_EventTypeWeeklyReminders"; }
+            get { return "201912031425135_EventTypeWeeklyReminder"; }
         }
         
         string IMigrationMetadata.Source

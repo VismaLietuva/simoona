@@ -807,10 +807,6 @@
     <Compile Include="Migrations\201911191445311_AddFoodRelatedFieldsToEvents.Designer.cs">
       <DependentUpon>201911191445311_AddFoodRelatedFieldsToEvents.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201911210935387_EventTypeWeeklyReminders.cs" />
-    <Compile Include="Migrations\201911210935387_EventTypeWeeklyReminders.Designer.cs">
-      <DependentUpon>201911210935387_EventTypeWeeklyReminders.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\201911281059238_EventsWithMultipleOffices.cs" />
     <Compile Include="Migrations\201911281059238_EventsWithMultipleOffices.Designer.cs">
       <DependentUpon>201911281059238_EventsWithMultipleOffices.cs</DependentUpon>
@@ -822,6 +818,10 @@
     <Compile Include="Migrations\201912021646387_AddBookCoverUrlToBook.cs" />
     <Compile Include="Migrations\201912021646387_AddBookCoverUrlToBook.Designer.cs">
       <DependentUpon>201912021646387_AddBookCoverUrlToBook.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201912031425135_EventTypeWeeklyReminder.cs" />
+    <Compile Include="Migrations\201912031425135_EventTypeWeeklyReminder.Designer.cs">
+      <DependentUpon>201912031425135_EventTypeWeeklyReminder.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
@@ -1345,10 +1345,6 @@
     <EmbeddedResource Include="Migrations\201911191445311_AddFoodRelatedFieldsToEvents.resx">
       <DependentUpon>201911191445311_AddFoodRelatedFieldsToEvents.cs</DependentUpon>
     </EmbeddedResource>
-
-    <EmbeddedResource Include="Migrations\201911210935387_EventTypeWeeklyReminders.resx">
-      <DependentUpon>201911210935387_EventTypeWeeklyReminders.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201911281059238_EventsWithMultipleOffices.resx">
       <DependentUpon>201911281059238_EventsWithMultipleOffices.cs</DependentUpon>
     </EmbeddedResource>
@@ -1357,6 +1353,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201912021646387_AddBookCoverUrlToBook.resx">
       <DependentUpon>201912021646387_AddBookCoverUrlToBook.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201912031425135_EventTypeWeeklyReminder.resx">
+      <DependentUpon>201912031425135_EventTypeWeeklyReminder.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
