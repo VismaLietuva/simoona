@@ -1,6 +1,6 @@
 **Note:** *this is draft version of README, meaning that some parts need more input, suggestions and day-to-day experience working with this solution.*
 
-# Simoona Premium (draft)
+# Simoona Premium
 
 This repository contains Simoona Premium features part.
 
