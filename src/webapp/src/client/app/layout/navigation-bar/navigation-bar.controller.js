@@ -56,7 +56,8 @@
             'JOB_ADMINISTRATION',
             'KUDOSSHOP_ADMINISTRATION',
             'KUDOS_ADMINISTRATION',
-            'EXTERNALLINK_ADMINISTRATION'
+            'EXTERNALLINK_ADMINISTRATION',
+            'LOTTERY_ADMINISTRATION'
         ]);
 
         vm.showCustomizationLink = authService.hasOneOfPermissions([
