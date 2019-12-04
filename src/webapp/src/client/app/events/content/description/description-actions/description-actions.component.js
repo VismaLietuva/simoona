@@ -41,7 +41,12 @@
         function togglePin(event) {
             eventRepository.pinEvent(event.id)
             .then(function(){
-                vm.notifySrv.success(vm.localeSrv.formatTranslation('lotteries.hasBeenBought'));
+                if(vm.isPinned) {
+                    vm.notifySrv.success(vm.localeSrv.formatTranslation('events.eventUnpinned'));
+                }
+                else {
+                    vm.notifySrv.success(vm.localeSrv.formatTranslation('events.eventPinned'));
+                }
                 vm.isPinned = !vm.isPinned
             }, function (error) {
                 errorHandler.handleErrorMessage(error);

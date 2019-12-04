@@ -1,6 +1,6 @@
 <div class="pull-right">
       <a type="button"
-      ng-if="vm.hasDatePassed(vm.event.endDate) && (vm.event.hostUserId === vm.currentUserId || vm.hasEventAdminPermissions)"
+      ng-if="vm.hasDatePassed(vm.event.endDate) && vm.hasEventAdminPermissions"
       ng-class="{'vismaicon-unpin':vm.isPinned,'vismaicon-pin':!vm.isPinned}"
       class="vismaicon event-description-title-button"
       ng-click="vm.togglePin(vm.event)"

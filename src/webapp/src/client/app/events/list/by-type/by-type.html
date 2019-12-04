@@ -9,6 +9,8 @@
             <div class="event-list-item-inner-container" ng-class="{'super-event' : event.id === 'ec159920-e97b-4be9-a225-6a1f20cc1d51'}">
                 <!-- title -->
                 <div class="col-xs-12">
+                    <span class="glyphicon glyphicon-bookmark event-bookmark-icon" ng-if="event.isPinned">
+                    </span>
                     <a class="event-item-title" 
                        title="{{:: event.name}}" 
                        ui-sref="Root.WithOrg.Client.Events.EventContent({id:{{'event.id'}}})"
