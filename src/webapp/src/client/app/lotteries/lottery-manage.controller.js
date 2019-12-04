@@ -39,6 +39,9 @@
             isEdit: $state.includes('Root.WithOrg.Admin.Lotteries.Edit')
         };
 
+        vm.isPrimaryEditDisabled = isPrimaryEditDisabled();
+        vm.lotteryStatuses = lotteryStatuses;
+
         setTitleScope(vm.states);
 
         function setTitleScope(states) {
@@ -47,7 +50,7 @@
                 vm.lottery.endDate = moment.utc(vm.lottery.endDate).local().startOf('minute').toDate();
                 vm.isStarted = vm.lottery.status === lotteryStatuses.started;
                 vm.isDrafted = vm.lottery.status === lotteryStatuses.drafted;
-                vm.isEnded = (vm.lottery.status === lotteryStatuses.deleted) || (vm.lottery.status === lotteryStatuses.ended);
+                vm.isEnded = (vm.lottery.status !== lotteryStatuses.drafted) && (vm.lottery.status !== lotteryStatuses.started);
                 $rootScope.pageTitle = 'lotteries.editLottery';
             } else if (states.isCreate) {
                 $rootScope.pageTitle = 'lotteries.createLottery';
@@ -151,6 +154,11 @@
         function updateSucess(translation) {
             notifySrv.success(localeSrv.formatTranslation(translation, { one: 'lotteries.entityNameSingular', two: vm.lottery.title }));
             $state.go('^.List');
+        }
+
+        function isPrimaryEditDisabled() {
+            return vm.states.isCreate === false && 
+                   (vm.states.isEdit && lottery.status === lotteryStatuses.drafted) === false;
         }
     };
 })();

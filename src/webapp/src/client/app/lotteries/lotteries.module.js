@@ -40,13 +40,7 @@
                                 data: {
                     authorizeRole: 'Admin',
                     authorizeOneOfPermissions: [
-                        'EVENT_ADMINISTRATION',
-                        'SERVICEREQUESTS_ADMINISTRATION',
-                        'ORGANIZATION_ADMINISTRATION',
-                        'JOB_ADMINISTRATION',
-                        'KUDOSSHOP_ADMINISTRATION',
-                        'KUDOS_ADMINISTRATION',
-                        'EXTERNALLINK_ADMINISTRATION'
+                        'LOTTERY_ADMINISTRATION'
                     ]
                 }
             })
@@ -62,7 +56,10 @@
                     }
                 },
                 data: {
-                    authorizeRole: 'Admin'
+                    authorizeRole: 'Admin',
+                    authorizeOneOfPermissions: [
+                        'LOTTERY_ADMINISTRATION'
+                    ]
                 }
             })
             .state('Root.WithOrg.Admin.Lotteries.Edit', {
@@ -79,7 +76,10 @@
                     ]
                 },
                 data: {
-                    authorizeRole: 'Admin'
+                    authorizeRole: 'Admin',
+                    authorizeOneOfPermissions: [
+                        'LOTTERY_ADMINISTRATION'
+                    ]
                 }
             })
             .state('Root.WithOrg.Admin.Lotteries.Refund', {
@@ -96,7 +96,10 @@
                     ]
                 },
                 data: {
-                    authorizeRole: 'Admin'
+                    authorizeRole: 'Admin',
+                    authorizeOneOfPermissions: [
+                        'LOTTERY_ADMINISTRATION'
+                    ]
                 }
             })
     }

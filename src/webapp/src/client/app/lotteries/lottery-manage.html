@@ -8,7 +8,8 @@
                           translate="lotteries.createLottery"></span>
                     <button
                           class="btn btn-primary lottery-stats-button"
-                          ace-lottery-stats-modal>
+                          ace-lottery-stats-modal
+                          ng-if="!vm.states.isCreate && vm.lottery.status !== vm.lotteryStatuses.drafted">
                     <span translate="lotteries.lotteryStatsModalName"></span>
                     </button>
                 </div>
@@ -29,7 +30,7 @@
                                        ng-model="vm.lottery.title" 
                                        ng-maxlength="30" 
                                        required
-                                       ng-disabled="(vm.states.isEdit && vm.isStarted) || vm.isEnded"/>
+                                       ng-disabled="vm.isPrimaryEditDisabled">
                                 <p class="text-danger help-block" 
                                    ng-if="lotteryForm.title.$error.required && lotteryForm.title.$dirty" 
                                    translate="common.messageFieldIsRequired"></p>
@@ -59,7 +60,7 @@
                                        translate
                                        translate-attr-placeholder="common.onlyWholeNumbers"
                                        required
-                                       ng-disabled="(vm.states.isEdit && vm.isStarted) || vm.isEnded"/>
+                                       ng-disabled="vm.isPrimaryEditDisabled"/>
 
                                 <p class="text-danger help-block" 
                                    ng-show="lotteryForm.entryFee.$invalid && lotteryForm.entryFee.$dirty || lotteryForm.entryFee.$error.pattern">
@@ -88,7 +89,7 @@
                                            is-open="vm.datePicker.isOpen" 
                                            ng-required="true" 
                                            ng-click="vm.openDatePicker($event, 'isOpen')"
-                                           ng-disabled="(vm.states.isEdit && vm.isStarted) || vm.isEnded"/>
+                                           ng-disabled="vm.isPrimaryEditDisabled"/>
                                 </div>
                                 <p class="text-danger help-block" ng-if="lotteryForm.endDateInput.$invalid && lotteryForm.endDateInput.$dirty" translate="common.messageFieldIsRequired"></p>
                             </div>
@@ -103,7 +104,7 @@
                                     hour-step="1" minute-step="1"
                                     show-meridian="false"
                                     data-test-id="end-time-input"
-                                    ng-disabled="(vm.states.isEdit && vm.isStarted) || vm.isEnded">
+                                    ng-disabled="vm.isPrimaryEditDisabled">
                                 </div>
                                  <p class="text-danger help-block" ng-if="lotteryForm.endDateInput.$invalid && lotteryForm.endDateInput.$dirty" translate="common.messageFieldIsRequired"></p>
                             </div>
@@ -113,7 +114,7 @@
                         <div class="form-group required" ng-class="{'has-error': lotteryForm.image-file-input.$invalid}">
                             <label for="image-file-input" class="control-label col-xs-12 col-sm-4" translate="lotteries.photos"></label>
                             <div class="col-xs-12 col-sm-6 col-md-4">
-                                <ace-photo-crop-upload ng-if="!vm.isStarted && !vm.isEnded" multiple="true" images="vm.lotteryImages" is-crop-visible="vm.isCreate || !!vm.lotteryImage" aspect-ratio="1.7" result-image="vm.lotteryCroppedImages" image-size="vm.lotteryImageSize">
+                                <ace-photo-crop-upload ng-if="!vm.isPrimaryEditDisabled" multiple="true" images="vm.lotteryImages" is-crop-visible="vm.isCreate || !!vm.lotteryImage" aspect-ratio="1.7" result-image="vm.lotteryCroppedImages" image-size="vm.lotteryImageSize">
                                 </ace-photo-crop-upload>
                                 <br/>
                                 <div ng-if="vm.states.isEdit && !vm.lotteryCroppedImage && !vm.lotteryImage" ng-repeat="lotteryImage in vm.lottery.images">
@@ -139,7 +140,8 @@
                                     name="description"
                                     rows="5"
                                     ng-model="vm.lottery.description"
-                                    ng-maxlength="300">
+                                    ng-maxlength="300"
+                                    ng-disabled="vm.isEnded">
                                 </textarea>
                                 <p class="text-danger help-block" 
                                    ng-show="lotteryForm.description.$error.maxlength && lotteryForm.description.$dirty"
