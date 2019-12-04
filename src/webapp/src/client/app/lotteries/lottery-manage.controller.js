@@ -40,6 +40,7 @@
         };
 
         vm.isPrimaryEditDisabled = isPrimaryEditDisabled();
+        vm.lotteryStatuses = lotteryStatuses;
 
         setTitleScope(vm.states);
 
