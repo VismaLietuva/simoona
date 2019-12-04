@@ -8,7 +8,8 @@
                           translate="lotteries.createLottery"></span>
                     <button
                           class="btn btn-primary lottery-stats-button"
-                          ace-lottery-stats-modal>
+                          ace-lottery-stats-modal
+                          ng-if="!vm.states.isCreate && vm.lottery.status !== vm.lotteryStatuses.drafted">
                     <span translate="lotteries.lotteryStatsModalName"></span>
                     </button>
                 </div>
