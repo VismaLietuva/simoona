@@ -2,7 +2,7 @@
 
     angular.module('simoonaApp.Customization.KudosTypes')
         .constant('kudosTypesSettings', {
-            nonDeletableTypes: [2, 3, 4, 5]
+            nonDeletableTypes: [2, 3, 4, 5, 6]
         })
         .controller('createEditKudosTypesController', createEditKudosTypesController);
 
@@ -43,8 +43,8 @@
                         vm.kudosType.multiplier = parseInt(type.value);
                         vm.kudosType.description = type.description;
                         vm.kudosType.isActive = type.isActive;
-                        vm.isLoading = false;
                         vm.allowDelete = !kudosTypesSettings.nonDeletableTypes.includes(type.type);
+                        vm.isLoading = false;
                     }, function (error) {
                     errorHandler.handleErrorMessage(error);
                     $state.go(listState);

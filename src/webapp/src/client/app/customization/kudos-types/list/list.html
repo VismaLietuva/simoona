@@ -31,7 +31,7 @@
                             <td>{{type.name}}</td>
                             <td class="text-center hidden-xs">{{type.value}}</td>
                             <td class="text-center">
-                                <a ui-sref="Root.WithOrg.Admin.Customization.KudosTypes.Edit({ id : {{type.id}}})" 
+<!--                                 <a ui-sref="Root.WithOrg.Admin.Customization.KudosTypes.Edit({ id : {{type.id}}})" 
                                    ng-if="!type.isNecessary"
                                    class="link"
                                    translate-attr-title="common.edit"
@@ -43,6 +43,12 @@
                                    translate-attr-title="common.edit"
                                    translate>
                                    <span class="vismaicon vismaicon-edit disabled" aria-hidden="true"></span>
+                                </a> -->
+                                <a ui-sref="Root.WithOrg.Admin.Customization.KudosTypes.Edit({ id : {{type.id}}})"
+                                    class="link"
+                                    translate-attr-title="common.edit"
+                                    translate>
+                                    <span class="vismaicon vismaicon-edit" aria-hidden="true"></span>
                                 </a>
                             </td>
                         </tr>

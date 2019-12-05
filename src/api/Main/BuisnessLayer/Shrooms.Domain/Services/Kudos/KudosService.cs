@@ -44,7 +44,9 @@ namespace Shrooms.Domain.Services.Kudos
         private readonly IRepository<ApplicationUser> _applicationUserRepository;
         private Expression<Func<KudosType, bool>> _excludeNecessaryKudosTypes = x => x.Type != KudosTypeEnum.Send &&
                                 x.Type != KudosTypeEnum.Minus &&
-                                x.Type != KudosTypeEnum.Other;
+                                x.Type != KudosTypeEnum.Other &&
+                                x.Type != KudosTypeEnum.Welcome &&
+                                x.Type != KudosTypeEnum.Refund;
 
         private readonly ResourceManager _resourceManager;
 
@@ -97,7 +99,6 @@ namespace Shrooms.Domain.Services.Kudos
         public async Task UpdateKudosType(KudosTypeDTO dto)
         {
             var type = await _kudosTypesDbSet
-                .Where(_excludeNecessaryKudosTypes)
                 .FirstOrDefaultAsync(t => t.Id == dto.Id);
 
             if (type == null)
@@ -105,9 +106,13 @@ namespace Shrooms.Domain.Services.Kudos
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Type not found");
             }
 
-            type.Name = dto.Name;
-            type.Value = dto.Value;
-            type.Description = dto.Description;
+            if (type.Type == KudosTypeEnum.Ordinary)
+            {
+                type.Name = dto.Name;
+                type.Value = dto.Value;
+                type.Description = dto.Description;
+            }
+
             type.IsActive = dto.IsActive;
 
             await _uow.SaveChangesAsync(dto.UserId);
@@ -150,7 +155,6 @@ namespace Shrooms.Domain.Services.Kudos
         {
             var type = await _kudosTypesDbSet
                 .Where(t => t.Id == id)
-                .Where(_excludeNecessaryKudosTypes)
                 .Select(t => new KudosTypeDTO
                 {
                     Id = t.Id,
