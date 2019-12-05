@@ -43,7 +43,7 @@
                         vm.kudosType.multiplier = parseInt(type.value);
                         vm.kudosType.description = type.description;
                         vm.kudosType.isActive = type.isActive;
-                        vm.allowDelete = !kudosTypesSettings.nonDeletableTypes.includes(type.type);
+                        vm.editable = !kudosTypesSettings.nonDeletableTypes.includes(type.type);
                         vm.isLoading = false;
                     }, function (error) {
                     errorHandler.handleErrorMessage(error);

@@ -26,6 +26,7 @@
                                    ng-model="vm.kudosType.name" 
                                    ng-maxlength="30" 
                                    data-test-id="kudos-type-form-name-input" 
+                                   ng-disabled="!vm.editable"
                                    required/>
                             <p class="text-danger help-block" 
                                ng-if="kudosTypeForm.name.$error.required && kudosTypeForm.name.$dirty" 
@@ -56,6 +57,7 @@
                                    translate
                                    translate-attr-placeholder="common.onlyWholeNumbers"
                                    data-test-id="kudos-type-form-multiplier-input"
+                                   ng-disabled="!vm.editable"
                                    required/>
                             
                             <p class="text-danger help-block" 
@@ -86,7 +88,8 @@
                                 rows="5"
                                 ng-model="vm.kudosType.description"
                                 ng-maxlength="300" 
-                                data-test-id="kudos-type-form-description">
+                                data-test-id="kudos-type-form-description"
+                                ng-disabled="!vm.editable">
                             </textarea>
                             <p class="text-danger help-block" 
                                ng-show="kudosTypeForm.description.$error.maxlength && kudosTypeForm.description.$dirty"
@@ -144,7 +147,7 @@
                     <div class="pull-left">
                         
                         <div class="pull-left">
-                            <button ng-if="vm.states.isEdit && vm.allowDelete"
+                            <button ng-if="vm.states.isEdit && vm.editable"
                                     class="btn btn-danger"
                                     ace-confirmation-modal="vm.removeKudosType()"
                                     data-test-id="kudos-type-disable-button">
