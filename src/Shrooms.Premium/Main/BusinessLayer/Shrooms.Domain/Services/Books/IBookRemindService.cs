@@ -8,6 +8,6 @@ namespace Shrooms.Domain.Services.Books
 {
     public interface IBookRemindService
     {
-        void RemindAboutBooks(int daysAfter);
+        void RemindAboutBooks(int daysBefore);
     }
 }

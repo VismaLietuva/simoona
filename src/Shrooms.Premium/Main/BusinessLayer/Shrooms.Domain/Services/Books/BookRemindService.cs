@@ -43,9 +43,9 @@ namespace Shrooms.Domain.Services.Books
             _booksDbSet = _uow.GetDbSet<BookLog>();
             _bookOfficesDbSet = _uow.GetDbSet<BookOffice>();
         }
-        public void RemindAboutBooks(int daysAfter)
+        public void RemindAboutBooks(int daysBefore)
         {
-            var bookTookBefore = DateTime.UtcNow.AddDays(-daysAfter);
+            var bookTookBefore = DateTime.UtcNow.AddDays(-daysBefore);
             var booksToRemind = _booksDbSet
                 .Include(p => p.BookOffice)
                 .Where(p => p.TakenFrom < bookTookBefore && p.Returned == null)
