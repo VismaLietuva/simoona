@@ -4,6 +4,14 @@
             <div class="panel-heading">
                 <span ng-if="vm.states.isAdd" data-test-id="create-event-header" translate="events.addNewEvent"></span>
                 <span ng-if="vm.states.isEdit" data-test-id="edit-event-header" translate="events.editEvent"></span>
+                <div class="pull-right" has-permissions="['EVENT_ADMINISTRATION']" ng-show="vm.event.isPinned !== undefined">
+                        <a type="button"
+                        ng-class="{'vismaicon-unpin':vm.event.isPinned,'vismaicon-pin':!vm.event.isPinned}"
+                        class="vismaicon"
+                        ng-click="vm.togglePin()"
+                        translate-attr-title="common.pin" translate>
+                     </a>
+                </div>
             </div>
             <div class="panel-body">
                 <form name="eventForm" class="form-horizontal" autocomplete="off">

@@ -85,6 +85,7 @@
         vm.deleteOption = deleteOption;
         vm.isValidOption = isValidOption;
         vm.isOptionsUnique = isOptionsUnique;
+        vm.togglePin = togglePin;
         vm.saveEvent = saveEvent;
         vm.deleteEvent = deleteEvent;
         vm.createEvent = createEvent;
@@ -183,6 +184,7 @@
                     offices: [],
                     startDate: moment().add(1, 'hours').local().startOf('minute').toDate(),
                     endDate: moment().add(3, 'hours').local().startOf('minute').toDate(),
+                    isPinned: false,
                     recurrence: 0,
                     location: '',
                     description: '',
@@ -282,6 +284,10 @@
                 vm.isOptions = false;
                 addOption();
             }
+        }
+        
+        function togglePin() {
+            vm.event.isPinned = !vm.event.isPinned;
         }
 
         function saveEvent(method, newImage) {
