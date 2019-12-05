@@ -815,10 +815,6 @@
     <Compile Include="Migrations\201911281150187_EventsOfficeData.Designer.cs">
       <DependentUpon>201911281150187_EventsOfficeData.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201912021417171_EventPinFlag.cs" />
-    <Compile Include="Migrations\201912021417171_EventPinFlag.Designer.cs">
-      <DependentUpon>201912021417171_EventPinFlag.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
@@ -1346,9 +1342,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201911281150187_EventsOfficeData.resx">
       <DependentUpon>201911281150187_EventsOfficeData.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201912021417171_EventPinFlag.resx">
-      <DependentUpon>201912021417171_EventPinFlag.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
