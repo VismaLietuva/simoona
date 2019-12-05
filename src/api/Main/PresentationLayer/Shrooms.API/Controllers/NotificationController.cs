@@ -7,6 +7,7 @@
     using AutoMapper;
     using Shrooms.DataTransferObjects.Models.Notification;
     using Shrooms.Domain.Services.Notifications;
+    using Shrooms.EntityModels.Models.Notifications;
     using Shrooms.WebViewModels.Models.Notifications;
 
     [Authorize]
@@ -46,11 +47,14 @@
 
         private IEnumerable<NotificationViewModel> MakeCommentsStacked(IEnumerable<NotificationDto> comments)
         {
-            List<NotificationViewModel> stackedList = new List<NotificationViewModel>();
+            var stackedList = new List<NotificationViewModel>();
 
             foreach (var item in comments)
             {
-                var parentComment = stackedList.Where(x => CompareSourcesIds(x.sourceIds, item.SourceIds)).FirstOrDefault();
+                var parentComment = stackedList
+                    .Where(x => CompareSourcesIds(x.sourceIds, item.SourceIds) && 
+                                item.Type != NotificationType.EventReminder)
+                    .FirstOrDefault();
                 if (parentComment == null)
                 {
                     stackedList.Add(_mapper.Map<NotificationViewModel>(item));
@@ -65,7 +69,7 @@
                 }
             }
 
-            return stackedList.AsEnumerable();
+            return stackedList;
         }
 
         private bool CompareSourcesIds(SourcesViewModel viewModel, SourcesDto dtoModel)

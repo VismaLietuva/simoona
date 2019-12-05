@@ -12,6 +12,7 @@
     "eventTypesDescription": "Manage event types",
     "eventTypeName": "Name",
     "eventTypeSingleJoin": "Single join",
+    "sendWeeklyReminders": "Send weekly reminders",
     "eventTypeIsFoodRelated": "Food related",
     "editEventType": "Event type edit",
     "createEventType": "Create event type",

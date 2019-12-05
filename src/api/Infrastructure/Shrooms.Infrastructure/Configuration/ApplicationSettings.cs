@@ -61,6 +61,8 @@ namespace Shrooms.Infrastructure.Configuration
 
         public string EventUrl(string tenant, string eventId) => GetClientPath($"{tenant}/Events/EventContent/{eventId}");
 
+        public string EventListByTypeUrl(string tenant, string eventTypeId) => GetClientPath($"{tenant}/Events/List/{eventTypeId}/office/all");
+
         public string ProjectUrl(string tenant, string projectId) => GetClientPath($"{tenant}/Projects/Details/{projectId}");
 
         public string CommitteeSugestionUrl(string tenant) => GetClientPath($"{tenant}/Committees/List");

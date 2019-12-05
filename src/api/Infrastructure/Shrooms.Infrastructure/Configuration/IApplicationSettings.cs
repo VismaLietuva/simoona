@@ -57,6 +57,8 @@ namespace Shrooms.Infrastructure.Configuration
 
         string EventUrl(string tenant, string eventId);
 
+        string EventListByTypeUrl(string tenant, string eventId);
+
         string ProjectUrl(string tenant, string projectId);
 
         string CommitteeSugestionUrl(string tenant);

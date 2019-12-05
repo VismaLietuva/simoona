@@ -98,6 +98,8 @@ namespace Shrooms.Domain.Services.UserService
             settings.ModifiedBy = userOrg.UserId;
             settings.EventsAppNotifications = settingsDto.EventsAppNotifications;
             settings.EventsEmailNotifications = settingsDto.EventsEmailNotifications;
+            settings.EventWeeklyReminderAppNotifications = settingsDto.EventWeeklyReminderAppNotifications;
+            settings.EventWeeklyReminderEmailNotifications = settingsDto.EventWeeklyReminderEmailNotifications;
             settings.ProjectsAppNotifications = settingsDto.ProjectsAppNotifications;
             settings.ProjectsEmailNotifications = settingsDto.ProjectsEmailNotifications;
             settings.MyPostsAppNotifications = settingsDto.MyPostsAppNotifications;
@@ -230,6 +232,8 @@ namespace Shrooms.Domain.Services.UserService
             {
                 EventsAppNotifications = settings?.EventsAppNotifications ?? true,
                 EventsEmailNotifications = settings?.EventsEmailNotifications ?? true,
+                EventWeeklyReminderAppNotifications = settings?.EventWeeklyReminderAppNotifications ?? true,
+                EventWeeklyReminderEmailNotifications = settings?.EventWeeklyReminderEmailNotifications ?? true,
                 ProjectsAppNotifications = settings?.ProjectsAppNotifications ?? true,
                 ProjectsEmailNotifications = settings?.ProjectsEmailNotifications ?? true,
                 MyPostsAppNotifications = settings?.MyPostsAppNotifications ?? true,

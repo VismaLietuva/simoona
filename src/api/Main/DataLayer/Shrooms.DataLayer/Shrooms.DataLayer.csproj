@@ -815,6 +815,14 @@
     <Compile Include="Migrations\201911281150187_EventsOfficeData.Designer.cs">
       <DependentUpon>201911281150187_EventsOfficeData.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201912021646387_AddBookCoverUrlToBook.cs" />
+    <Compile Include="Migrations\201912021646387_AddBookCoverUrlToBook.Designer.cs">
+      <DependentUpon>201912021646387_AddBookCoverUrlToBook.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201912031425135_EventTypeWeeklyReminder.cs" />
+    <Compile Include="Migrations\201912031425135_EventTypeWeeklyReminder.Designer.cs">
+      <DependentUpon>201912031425135_EventTypeWeeklyReminder.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
@@ -1342,6 +1350,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201911281150187_EventsOfficeData.resx">
       <DependentUpon>201911281150187_EventsOfficeData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201912021646387_AddBookCoverUrlToBook.resx">
+      <DependentUpon>201912021646387_AddBookCoverUrlToBook.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201912031425135_EventTypeWeeklyReminder.resx">
+      <DependentUpon>201912031425135_EventTypeWeeklyReminder.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

@@ -1,5 +1,5 @@
 <div class="popup-notification" ng-click="vm.openNotification($event, vm.notification.id)" ng-attr-title="{{:: vm.notification.fullName}}">
-    <div class="popup-notification-image loading-image-placeholder">
+    <div class="popup-notification-image loading-image-placeholder" ng-if="!!vm.notification.pictureId">
         <div>
             <img class="media-object notification-image"
                 ng-if="!!vm.notification.pictureId"

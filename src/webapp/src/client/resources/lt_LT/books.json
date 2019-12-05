@@ -63,5 +63,7 @@
   "whenPlansToReturn": "Grąžinimo data",
   "whenTookIt": "Paėmimo data",
   "notFoundFromExternalProvider": "Atsiprašome, bet tokia knyga nebuvo rasta. Ar įvedėte teisingą ISBN numerį?",
-  "bookCannotBeReturned": "Knyga negali būti grąžinta."
+  "bookCannotBeReturned": "Knyga negali būti grąžinta.",
+  "coversWillBeUpdatedSoon": "Knygų viršelių nuotraukos bus automatiškai atnaujintos.",
+  "updateCoverPictures": "Atnaujinti knygų viršelius"
 }

@@ -17,7 +17,8 @@
             WallComment: 5,
             EventComment: 6,
             ProjectComment: 7,
-            FollowingComment: 8
+            FollowingComment: 8,
+            EventReminder: 9
         })
         .component('acePopupNotification', {
             replace: true,
@@ -93,6 +94,10 @@
                 break;
                 case notificationTypes.FollowingComment:
                     vm.notificationType = $translate.instant('navbar.followingPostCommentNotification');
+                break;
+                case notificationTypes.EventReminder:
+                    vm.notificationType = $translate.instant('navbar.eventReminderNotification', {name: vm.notification.description}); 
+                    vm.notification.title = $translate.instant('navbar.eventReminderNotifcationName');
                 break;
                 default:
                     vm.notificationType = '';
@@ -180,6 +185,14 @@
                                 $state.go("Root.WithOrg.Client.Projects.ProjectContent", {id: vm.notification.sourceIds.projectId, postNotification: vm.notification.sourceIds.postId}, {reload: true});
                             }
                             
+                        }
+                    }
+                break;
+                case notificationTypes.EventReminder:
+                    vm.openNotification = function(event, notificationId) {
+                        if(!isDeleteButton(event.target)) {
+                            markAsRead(notificationId);
+                            $state.go("Root.WithOrg.Client.Events.List.Type", {reload: true}); 
                         }
                     }
                 break;

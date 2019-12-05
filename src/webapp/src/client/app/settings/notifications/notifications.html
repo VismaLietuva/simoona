@@ -54,6 +54,21 @@
 					</tr>
 					<tr>
 						<td class="col-xs-3 word-break"
+							translate-attr-title="settings.eventsRemind"
+							translate="settings.eventsRemind"
+							ng-cloak>
+						</td>
+						<td class="col-xs-4 notifications-item"
+							ng-cloak>
+							<input type="checkbox" ng-model="vm.settings.eventWeeklyReminderAppNotifications">
+						</td>
+						<td class="col-xs-4 notifications-item"
+							ng-cloak>
+							<input type="checkbox" ng-model="vm.settings.eventWeeklyReminderEmailNotifications">
+						</td>
+					</tr>
+					<tr>
+						<td class="col-xs-3 word-break"
 							translate-attr-title="settings.projects"
 							translate="settings.projects"
 							data-test-id="all-projects"

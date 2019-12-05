@@ -71,10 +71,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Validators\Books\BookServiceValidator.cs" />
-    <Compile Include="Validators\Books\IBookMobileServiceValidator.cs" />
-    <Compile Include="Validators\Books\BookMobileServiceValidator.cs" />
-    <Compile Include="Validators\Books\IBookServiceValidator.cs" />
     <Compile Include="Validators\KudosBaskets\IKudosBasketValidator.cs" />
     <Compile Include="Validators\KudosBaskets\KudosBasketValidator.cs" />
     <Compile Include="Validators\RefreshTokens\RefreshTokenException.cs" />

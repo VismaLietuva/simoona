@@ -60,6 +60,7 @@
         vm.ticketCount = 0;
         vm.currentLottery = currentLottery;
         
+        vm.lotteryLoaded = false;
         vm.localeSrv = localeSrv;
         vm.notifySrv = notifySrv;
         vm.cancel = cancel;
@@ -79,6 +80,7 @@
             lotteryRepository.getLottery(currentLottery)
             .then(function(lottery){
                 vm.lottery = lottery;
+                vm.lotteryLoaded = true;
             });
         }
         function cancel() {
