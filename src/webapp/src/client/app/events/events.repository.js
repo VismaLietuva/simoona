@@ -150,7 +150,6 @@
             }).patch().$promise;
         }
 
-
         function expelUserFromEvent(eventId, userId) {
             return $resource(eventUrl + 'Expel').delete({
                 eventId: eventId,
