@@ -7,6 +7,14 @@
             maxMinus: 99999,
             hiddeKudosTypes: [3, 5]
         })
+        .constant('definedKudosTypes', {
+            ordinary: 1,
+            send: 2,
+            minus: 3,
+            other: 4,
+            welcome: 5,
+            refund: 6
+        })
         .directive('aceKudosifyModal', kudosifyModal);
 
     kudosifyModal.$inject = [
@@ -58,12 +66,13 @@
         'pictureRepository',
         'lodash',
         'dataHandler',
-        'errorHandler'
+        'errorHandler',
+        'definedKudosTypes'
     ];
 
     function kudosifyModalController($scope, $uibModalInstance, authService, kudosifyModalFactory, kudosFactory,
         notifySrv, kudosifySettings, modalTypes, currentUser, context, imageValidationSettings, shroomsFileUploader,
-        pictureRepository, lodash, dataHandler, errorHandler) {
+        pictureRepository, lodash, dataHandler, errorHandler, definedKudosTypes) {
         /*jshint validthis: true */
 
         var vm = this;
@@ -95,6 +104,8 @@
         vm.isSubmitModal = isSubmitModal;
         vm.isSendModal = isSendModal;
 
+        vm.isVisibleKudosType = isVisibleKudosType;
+
         vm.hiddenKudosTypes = kudosifySettings.hiddeKudosTypes;
 
         init();
@@ -105,7 +116,7 @@
             if (vm.isSubmitModal())
             {
                 kudosifyModalFactory.getPointsTypes().then(function (result) {
-                    vm.kudosTypes = result.filter(kudos => kudos.type !== vm.modalTypes.send);
+                    vm.kudosTypes = result.filter(kudos => kudos.type !== definedKudosTypes.send);
                 });
             }
             else if (vm.isSendModal())
@@ -237,8 +248,21 @@
         function isSubmitModal() {
             return vm.context == vm.modalTypes.submit;
         }
+
         function isSendModal() {
             return vm.context == vm.modalTypes.send;
+        }
+
+        function isVisibleKudosType(kudosType)
+        {
+            if (vm.isAdmin) {
+                return true;
+            }
+            else if (kudosType.isActive) {
+                return true;
+            }
+
+            return false;
         }
     }
 })();
