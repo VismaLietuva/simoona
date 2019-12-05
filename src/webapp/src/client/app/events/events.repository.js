@@ -31,6 +31,7 @@
             addColleagues: addColleagues,
             joinEvent: joinEvent,
             leaveEvent: leaveEvent,
+            pinEvent: pinEvent,
             expelUserFromEvent: expelUserFromEvent,
             resetParticipantList: resetParticipantList,
             getUserForAutoComplete: getUserForAutoComplete,
@@ -136,6 +137,17 @@
                 eventId: eventId,
                 userId: userId
             }).$promise;
+        }
+
+        function pinEvent(eventId) {
+            return $resource(eventUrl + 'Pin', '', {
+                patch: {
+                    method: 'PATCH',
+                    params: {
+                        eventId: eventId
+                    }
+                }
+            }).patch().$promise;
         }
 
         function expelUserFromEvent(eventId, userId) {

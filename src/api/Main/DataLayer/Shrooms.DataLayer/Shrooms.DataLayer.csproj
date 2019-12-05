@@ -823,6 +823,10 @@
     <Compile Include="Migrations\201912031425135_EventTypeWeeklyReminder.Designer.cs">
       <DependentUpon>201912031425135_EventTypeWeeklyReminder.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201912051449578_EventIsPinnedFlag.cs" />
+    <Compile Include="Migrations\201912051449578_EventIsPinnedFlag.Designer.cs">
+      <DependentUpon>201912051449578_EventIsPinnedFlag.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
@@ -1356,6 +1360,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201912031425135_EventTypeWeeklyReminder.resx">
       <DependentUpon>201912031425135_EventTypeWeeklyReminder.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201912051449578_EventIsPinnedFlag.resx">
+      <DependentUpon>201912051449578_EventIsPinnedFlag.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
