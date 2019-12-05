@@ -8,6 +8,10 @@ namespace Shrooms.DataTransferObjects.Models.Users
 
         public bool EventsEmailNotifications;
 
+        public bool EventWeeklyReminderAppNotifications;
+
+        public bool EventWeeklyReminderEmailNotifications;
+
         public bool ProjectsAppNotifications;
 
         public bool ProjectsEmailNotifications;

@@ -11,6 +11,8 @@ namespace Shrooms.Domain.Services.Roles
     {
         Expression<Func<ApplicationUser, bool>> ExcludeUsersWithRole(string roleName);
 
+        IEnumerable<string> GetRoleIdsByNames(params string[] names);
+
         IEnumerable<RoleDTO> GetRolesForAutocomplete(string search, UserAndOrganizationDTO userAndOrg);
 
         RoleDetailsDTO GetRoleById(UserAndOrganizationDTO userAndOrganizationDTO, string roleId);

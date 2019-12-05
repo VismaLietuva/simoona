@@ -526,6 +526,7 @@
     <Content Include="EmailTemplates\AdministrationUsers\UserVerifyEmail.cshtml" />
     <Content Include="Service References\Application Insights\ConnectedService.json" />
     <Content Include="EmailTemplates\Books\BookRemind.cshtml" />
+    <Content Include="EmailTemplates\Events\RemindToJoin.cshtml" />
     <None Include="Shrooms.API.ruleset" />
   </ItemGroup>
   <ItemGroup>

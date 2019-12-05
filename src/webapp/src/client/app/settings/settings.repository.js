@@ -52,6 +52,8 @@
             var dtObj = {
                 eventsAppNotifications : data.eventsAppNotifications,
                 eventsEmailNotifications : data.eventsEmailNotifications,
+                eventWeeklyReminderAppNotifications : data.eventWeeklyReminderAppNotifications,
+                eventWeeklyReminderEmailNotifications : data.eventWeeklyReminderEmailNotifications,
                 projectsAppNotifications : data.projectsAppNotifications,
                 projectsEmailNotifications : data.projectsEmailNotifications,
                 myPostsAppNotifications : data.myPostsAppNotifications,
