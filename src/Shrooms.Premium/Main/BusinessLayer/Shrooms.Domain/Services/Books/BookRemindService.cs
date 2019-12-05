@@ -43,12 +43,12 @@ namespace Shrooms.Domain.Services.Books
             _booksDbSet = _uow.GetDbSet<BookLog>();
             _bookOfficesDbSet = _uow.GetDbSet<BookOffice>();
         }
-        public void RemindAboutBooks()
+        public void RemindAboutBooks(int daysAfter)
         {
-            var monthAgo = DateTime.UtcNow.AddMonths(-1);
+            var bookTookBefore = DateTime.UtcNow.AddDays(-daysAfter);
             var booksToRemind = _booksDbSet
                 .Include(p => p.BookOffice)
-                .Where(p => p.TakenFrom < monthAgo && p.Returned == null)
+                .Where(p => p.TakenFrom < bookTookBefore && p.Returned == null)
                 .Select(MapBookLogToBookRemindDto())
                 .ToList();
 
