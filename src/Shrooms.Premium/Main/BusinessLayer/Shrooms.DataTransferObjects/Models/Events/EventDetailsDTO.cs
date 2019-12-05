@@ -13,6 +13,7 @@ namespace Shrooms.DataTransferObjects.Models.Events
         public DateTime EndDate { get; set; }
         public DateTime RegistrationDeadlineDate { get; set; }
         public EventOfficesDTO Offices { get; set; }
+        public bool IsPinned { get; set; }
         public string Location { get; set; }
         public string Description { get; set; }
         public int MaxParticipants { get; set; }

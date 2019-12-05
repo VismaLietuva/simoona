@@ -20,6 +20,8 @@ namespace Shrooms.DataTransferObjects.Models.Events
 
         public EventOfficesDTO Offices { get; set; }
 
+        public bool IsPinned { get; set; }
+
         public string Place { get; set; }
 
         public int MaxParticipants { get; set; }

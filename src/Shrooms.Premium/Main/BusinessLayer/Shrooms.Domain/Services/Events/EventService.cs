@@ -153,6 +153,9 @@ namespace Shrooms.Domain.Services.Events
             newEventDto.MaxOptions = FindOutMaxChoices(newEventDto.NewOptions.Count(), newEventDto.MaxOptions);
             newEventDto.RegistrationDeadlineDate = SetRegistrationDeadline(newEventDto);
 
+            var hasPermissionToPin = _permissionService.UserHasPermission(newEventDto, AdministrationPermissions.Event);
+            _eventValidationService.CheckIfUserHasPermissionToPin(newEventDto.IsPinned, hasPermissionToPin);
+
             _eventValidationService.CheckIfEventStartDateIsExpired(newEventDto.StartDate);
             _eventValidationService.CheckIfRegistrationDeadlineIsExpired(newEventDto.RegistrationDeadlineDate.Value);
             ValidateEvent(newEventDto);
@@ -197,9 +200,6 @@ namespace Shrooms.Domain.Services.Events
             eventDto.MaxOptions = FindOutMaxChoices(totalOptionsProvided, eventDto.MaxOptions);
             eventDto.RegistrationDeadlineDate = SetRegistrationDeadline(eventDto);
 
-
-
-
             var hasPermission = _permissionService.UserHasPermission(eventDto, AdministrationPermissions.Event);
             _eventValidationService.CheckIfEventExists(eventToUpdate);
 
@@ -209,6 +209,7 @@ namespace Shrooms.Domain.Services.Events
             }
 
             _eventValidationService.CheckIfUserHasPermission(eventDto.UserId, eventToUpdate.ResponsibleUserId, hasPermission);
+            _eventValidationService.CheckIfUserHasPermissionToPin(eventDto.IsPinned, eventToUpdate.IsPinned, hasPermission);
             _eventValidationService.CheckIfCreatingEventHasInsufficientOptions(eventDto.MaxOptions, totalOptionsProvided);
             _eventValidationService.CheckIfCreatingEventHasNoChoices(eventDto.MaxOptions, totalOptionsProvided);
             ValidateEvent(eventDto);
@@ -239,6 +240,13 @@ namespace Shrooms.Domain.Services.Events
             _calendarService.UpdateEvent(eventToUpdate, eventDto.OrganizationId);
         }
 
+        public void ToggleEventPin(Guid id)
+        {
+            var @event = _eventsDbSet.Find(id);
+            @event.IsPinned = !@event.IsPinned;
+            _uow.SaveChanges();
+        }
+
         public void CheckIfEventExists(string eventId, int organizationId)
         {
             var @event = _eventsDbSet.FirstOrDefault(e => e.Id.ToString() == eventId && e.OrganizationId == organizationId);
@@ -264,6 +272,7 @@ namespace Shrooms.Domain.Services.Events
                 ImageName = e.ImageName,
                 Location = e.Place,
                 Offices = new EventOfficesDTO { Value = e.Offices },
+                IsPinned = e.IsPinned,
                 Name = e.Name,
                 MaxOptions = e.MaxChoices,
                 MaxParticipants = e.MaxParticipants,
@@ -398,7 +407,8 @@ namespace Shrooms.Domain.Services.Events
                 Created = DateTime.UtcNow,
                 CreatedBy = newEventDto.UserId,
                 OrganizationId = newEventDto.OrganizationId,
-                OfficeIds = JsonConvert.DeserializeObject<string[]>(newEventDto.Offices.Value)
+                OfficeIds = JsonConvert.DeserializeObject<string[]>(newEventDto.Offices.Value),
+                IsPinned = newEventDto.IsPinned
             };
 
             var newWall = new CreateWallDto()
@@ -438,6 +448,7 @@ namespace Shrooms.Domain.Services.Events
             newEvent.Name = newEventDto.Name;
             newEvent.RegistrationDeadline = newEventDto.RegistrationDeadlineDate.Value;
             newEvent.FoodOption = newEventDto.FoodOption;
+            newEvent.IsPinned = newEventDto.IsPinned;
         }
 
         private Expression<Func<Event, EventDetailsDTO>> MapToEventDetailsDto(Guid eventId)
@@ -449,6 +460,7 @@ namespace Shrooms.Domain.Services.Events
                 ImageName = e.ImageName,
                 Name = e.Name,
                 Offices = new EventOfficesDTO { Value = e.Offices },
+                IsPinned = e.IsPinned,
                 Location = e.Place,
                 RegistrationDeadlineDate = e.RegistrationDeadline,
                 StartDate = e.StartDate,

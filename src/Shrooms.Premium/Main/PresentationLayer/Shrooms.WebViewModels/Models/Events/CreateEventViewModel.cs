@@ -29,7 +29,11 @@ namespace Shrooms.WebViewModels.Models.Events
         [Required]
         public EventRecurrenceOptions Recurrence { get; set; }
 
+        [Required]
         public List<int> Offices { get; set; }
+
+        [Required]
+        public bool IsPinned { get; set; }
 
         [Required]
         [StringLength(ConstWebApi.EventLocationMaxLength)]
