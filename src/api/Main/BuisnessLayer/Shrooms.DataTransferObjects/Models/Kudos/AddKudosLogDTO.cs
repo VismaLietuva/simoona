@@ -4,7 +4,6 @@ namespace Shrooms.DataTransferObjects.Models.Kudos
 {
     public class AddKudosLogDTO : UserAndOrganizationDTO
     {
-        //changeName to RecievingUserId
         public IEnumerable<string> ReceivingUserIds { get; set; }
         public int PointsTypeId { get; set; }
         public int MultiplyBy { get; set; }

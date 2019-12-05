@@ -506,17 +506,6 @@ namespace Shrooms.Domain.Services.Kudos
             }
         }
 
-        public void AddRefundKudosLogs(IEnumerable<AddKudosLogDTO> kudosLogs)
-        {
-            foreach (var log in kudosLogs)
-            {
-                var kudosDto = MapInitialInfoToDTO(log);
-
-                kudosDto.ReceivingUser = _usersDbSet.Find(log.ReceivingUserIds.First());
-
-                InsertKudosLog(kudosDto, KudosStatus.Approved);
-            }
-        }
 
         private bool UserHasPermission(AddKudosLogDTO kudosDto)
         {
@@ -526,7 +515,6 @@ namespace Shrooms.Domain.Services.Kudos
             }
 
             var authorizedRoles = new List<string>() { Constants.Authorization.Roles.Admin, Constants.Authorization.Roles.KudosAdmin };
-
             if (authorizedRoles.Any(role => _roleService.HasRole(kudosDto.UserId, role)))
             {
                 return true;
@@ -534,6 +522,18 @@ namespace Shrooms.Domain.Services.Kudos
             else
             {
                 return false;
+            }
+        }
+
+        public void AddRefundKudosLogs(IEnumerable<AddKudosLogDTO> kudosLogs)
+        {
+            foreach (var log in kudosLogs)
+            {
+                var kudosDto = MapInitialInfoToDTO(log);
+
+                kudosDto.ReceivingUser = _usersDbSet.Find(log.ReceivingUserIds.First());
+
+                InsertKudosLog(kudosDto, KudosStatus.Approved);
             }
         }
 

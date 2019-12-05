@@ -255,14 +255,7 @@
 
         function isVisibleKudosType(kudosType)
         {
-            if (vm.isAdmin) {
-                return true;
-            }
-            else if (kudosType.isActive) {
-                return true;
-            }
-
-            return false;
+            return vm.isAdmin || kudosType.isActive;
         }
     }
 })();
