@@ -180,6 +180,28 @@ namespace Shrooms.API.Controllers.Book
         }
 
         [HttpPut]
+        [Route("Report")]
+        [PermissionAuthorize(Permission = BasicPermissions.Book)]
+        public IHttpActionResult ReportMissingBook(int bookOfficeId)
+        {
+            if (bookOfficeId < 1)
+            {
+                return BadRequest();
+            }
+
+            var userAndOrg = GetUserAndOrganization();
+            try
+            {
+                _bookService.ReportBook(bookOfficeId, userAndOrg);
+                return Ok();
+            }
+            catch (BookException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPut]
         [Route(template: "ReturnForAdmin")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Book)]
         public IHttpActionResult ReturnBookForAdmin(int bookOfficeId, string userId)

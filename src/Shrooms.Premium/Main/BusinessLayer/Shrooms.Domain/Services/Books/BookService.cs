@@ -217,6 +217,10 @@ namespace Shrooms.Domain.Services.Books
             _uow.SaveChanges(false);
         }
 
+        public void ReportBook(int bookOfficeId, UserAndOrganizationDTO userAndOrg)
+        {
+        }
+
         public void AddBook(NewBookDTO bookDto)
         {
             bool bookAlreadyExists;
