@@ -277,11 +277,6 @@ namespace Shrooms.Domain.Services.Lotteries
                 throw new LotteryException("Lottery has already ended.");
             }
 
-            for (var i = 0; i < lotteryTicketDTO.Tickets; i++)
-            {
-                _participantsDbSet.Add(MapNewLotteryParticipant(lotteryTicketDTO, userOrg));
-            }
-
             var kudosLogDTO = new AddKudosLogDTO
             {
                 ReceivingUserIds = new List<string> { userOrg.UserId },
@@ -293,8 +288,22 @@ namespace Shrooms.Domain.Services.Lotteries
             };
 
             await _kudosService.AddLotteryKudosLog(kudosLogDTO, userOrg);
+            
+            if (applicationUser.RemainingKudos < 0)
+            {
+                kudosLogDTO.PointsTypeId = _kudosService.GetKudosTypeId(KudosTypeEnum.Refund);
+                _kudosService.AddRefundKudosLogs(new List<AddKudosLogDTO> { kudosLogDTO });
+            }
+            else
+            {
+                for (var i = 0; i < lotteryTicketDTO.Tickets; i++)
+                {
+                    _participantsDbSet.Add(MapNewLotteryParticipant(lotteryTicketDTO, userOrg));
+                }
+            }
 
             await _uow.SaveChangesAsync(applicationUser.Id);
+            _kudosService.UpdateProfileKudos(applicationUser, userOrg);
         }
 
         public IEnumerable<LotteryDetailsDTO> GetRunningLotteries(UserAndOrganizationDTO userAndOrganization)
