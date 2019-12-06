@@ -22,6 +22,7 @@
             createBook: createBook,
             updateBook: updateBook,
             deleteBook: deleteBook,
+            reportBook: reportBook,
             getAllOffices: getAllOffices,
             findBookByIsbn: findBookByIsbn,
             getBookDetails: getBookDetails,
@@ -80,6 +81,14 @@
 
         function returnBookAdmin(bookOfficeId, userId) {
             return $resource(bookUrl + 'ReturnForAdmin?bookOfficeId=' + bookOfficeId +'&userId=' + userId, '', {
+                put: {
+                    method: 'PUT'
+                }
+            }).put().$promise;
+        }
+
+        function reportBook(bookOfficeId) {
+            return $resource(bookUrl + 'Report?bookOfficeId=' + bookOfficeId, '', {
                 put: {
                     method: 'PUT'
                 }

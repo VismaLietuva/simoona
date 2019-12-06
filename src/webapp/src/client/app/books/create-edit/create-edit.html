@@ -253,6 +253,12 @@
                         </button>
                     </div>
                     <div class="pull-right book-button">
+                        <button class="btn btn-warning"
+                                ace-books-report-modal book="vm.book">
+                                <span translate="books.report"></span>
+                        </button>
+                    </div>
+                    <div class="pull-right book-button">
                         <button ng-if="vm.state.edit && vm.book.canBeTaken"
                                 class="btn btn-primary"
                                 has-permissions="['BOOK_BASIC']"
