@@ -223,6 +223,22 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
             }
         }
 
+        [HttpPatch]
+        [Route("Pin")]
+        [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
+        public IHttpActionResult ToggleEventPin(Guid eventId)
+        {
+            try
+            {
+                _eventService.ToggleEventPin(eventId);
+                return Ok();
+            }
+            catch (EventException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
         [HttpPost]
         [Route("AddColleague")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]

@@ -58,7 +58,8 @@ namespace Shrooms.Domain.Services.Events.List
                     t.EndDate > DateTime.UtcNow)
                 .Where(EventTypeFilter(typeId))
                 .Select(MapEventToListItemDto(userOrganization.UserId))
-                .OrderBy(e => e.StartDate)
+                .OrderByDescending(e => e.IsPinned)
+                .ThenBy(e => e.StartDate)
                 .ToList();
 
 
@@ -76,7 +77,8 @@ namespace Shrooms.Domain.Services.Events.List
                 .Where(EventTypeFilter(typeId))
                 .Where(EventOfficeFilter(officeSearchString))
                 .Select(MapEventToListItemDto(userOrganization.UserId))
-                .OrderBy(e => e.StartDate)
+                .OrderByDescending(e => e.IsPinned)
+                .ThenBy(e => e.StartDate)
                 .ToList();
             
             return events;
@@ -94,7 +96,8 @@ namespace Shrooms.Domain.Services.Events.List
                 .Where(myEventFilter)
                 .Where(EventOfficeFilter(officeSearchString))
                 .Select(MapEventToListItemDto(options.UserId))
-                .OrderBy(e => e.StartDate)
+                .OrderByDescending(e => e.IsPinned)
+                .ThenBy(e => e.StartDate)
                 .ToList();
 
             var orderedEvents = OrderEvents(events);
@@ -115,7 +118,8 @@ namespace Shrooms.Domain.Services.Events.List
         {
             var orderedFutureEvents = events
                 .Where(e => e.StartDate > DateTime.UtcNow)
-                .OrderBy(e => e.StartDate);
+                .OrderByDescending(e => e.IsPinned)
+                .ThenBy(e => e.StartDate);
 
             var orderedPastEvents = events
                 .Where(e => e.StartDate < DateTime.UtcNow)
@@ -131,6 +135,7 @@ namespace Shrooms.Domain.Services.Events.List
                 ImageName = e.ImageName,
                 Offices = new EventOfficesDTO { Value = e.Offices},
                 MaxParticipants = e.MaxParticipants,
+                IsPinned = e.IsPinned,
                 Name = e.Name,
                 Place = e.Place,
                 StartDate = e.StartDate,

@@ -272,14 +272,9 @@ namespace Shrooms.Domain.Services.Lotteries
                 throw new LotteryException("User does not have enough kudos for the purchase.");
             }
 
-            if(DateTime.UtcNow > lotteryDetails.EndDate)
+            if (DateTime.UtcNow > lotteryDetails.EndDate)
             {
                 throw new LotteryException("Lottery has already ended.");
-            }
-
-            for (var i = 0; i < lotteryTicketDTO.Tickets; i++)
-            {
-                _participantsDbSet.Add(MapNewLotteryParticipant(lotteryTicketDTO, userOrg));
             }
 
             var kudosLogDTO = new AddKudosLogDTO
@@ -287,14 +282,28 @@ namespace Shrooms.Domain.Services.Lotteries
                 ReceivingUserIds = new List<string> { userOrg.UserId },
                 PointsTypeId = _kudosService.GetKudosTypeId(KudosTypeEnum.Minus),
                 MultiplyBy = lotteryTicketDTO.Tickets * lotteryDetails.EntryFee,
-                Comment = $"For {lotteryTicketDTO.Tickets} tickets",
+                Comment = $"{lotteryTicketDTO.Tickets} ticket(s) for lottery {lotteryDetails.Title}",
                 UserId = userOrg.UserId,
                 OrganizationId = userOrg.OrganizationId
             };
 
             await _kudosService.AddLotteryKudosLog(kudosLogDTO, userOrg);
+            
+            if (applicationUser.RemainingKudos < 0)
+            {
+                kudosLogDTO.PointsTypeId = _kudosService.GetKudosTypeId(KudosTypeEnum.Refund);
+                _kudosService.AddRefundKudosLogs(new List<AddKudosLogDTO> { kudosLogDTO });
+            }
+            else
+            {
+                for (var i = 0; i < lotteryTicketDTO.Tickets; i++)
+                {
+                    _participantsDbSet.Add(MapNewLotteryParticipant(lotteryTicketDTO, userOrg));
+                }
+            }
 
             await _uow.SaveChangesAsync(applicationUser.Id);
+            _kudosService.UpdateProfileKudos(applicationUser, userOrg);
         }
 
         public IEnumerable<LotteryDetailsDTO> GetRunningLotteries(UserAndOrganizationDTO userAndOrganization)

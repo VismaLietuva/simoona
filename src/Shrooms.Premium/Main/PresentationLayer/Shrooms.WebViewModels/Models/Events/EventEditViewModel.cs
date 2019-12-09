@@ -22,6 +22,8 @@ namespace Shrooms.WebViewModels.Models.Events
         
         public IEnumerable<int> OfficeIds { get; set; }
 
+        public bool IsPinned { get; set; }
+
         public string Location { get; set; }
 
         public int TypeId { get; set; }
