@@ -15,8 +15,7 @@ namespace Shrooms.Domain.Services.Books
         void DeleteBook(int bookOfficeId, UserAndOrganizationDTO userOrg);
         void TakeBook(int bookOfficeId, UserAndOrganizationDTO userAndOrg);
         void ReturnBook(int bookOfficeId, UserAndOrganizationDTO userAndOrg);
-        void ReportBook(int bookOfficeId, UserAndOrganizationDTO userAndOrg);
-
+        void ReportBook(BookReportDTO bookReport, UserAndOrganizationDTO userAndOrg);
         void UpdateBookCovers();
         Task<RetrievedBookInfoDTO> FindBookByIsbn(string isbn, int organizationId);
         ILazyPaged<BooksByOfficeDTO> GetBooksByOffice(BooksByOfficeOptionsDTO options);

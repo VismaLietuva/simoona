@@ -217,7 +217,7 @@ namespace Shrooms.Domain.Services.Books
             _uow.SaveChanges(false);
         }
 
-        public void ReportBook(int bookOfficeId, UserAndOrganizationDTO userAndOrg)
+        public void ReportBook(BookReportDTO bookReport, UserAndOrganizationDTO userAndOrg)
         {
         }
 

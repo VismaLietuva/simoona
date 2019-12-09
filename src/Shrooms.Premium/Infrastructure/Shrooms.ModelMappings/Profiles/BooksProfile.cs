@@ -29,6 +29,7 @@ namespace Shrooms.Premium.Infrastructure.Shrooms.ModelMappings.Profiles
             CreateMap<MobileUserDTO, MobileUserViewModel>();
             CreateMap<BookMobileLogDTO, BookMobileLogViewModel>();
             CreateMap<RetrievedBookInfoDTO, RetrievedMobileBookInfoViewModel>();
+            CreateMap<BookReportDTO, BookReportViewModel>();
         }
         private void CreateViewModelToDtoMappings()
         {
@@ -37,6 +38,7 @@ namespace Shrooms.Premium.Infrastructure.Shrooms.ModelMappings.Profiles
             CreateMap<BookMobileTakeViewModel, BookTakeDTO>();
             CreateMap<BookMobileTakeSpecificViewModel, BookMobileTakeSpecificDTO>();
             CreateMap<BookMobileGetViewModel, BookMobileGetDTO>();
+            CreateMap<BookReportViewModel, BookReportDTO>();
         }
     }
 }
