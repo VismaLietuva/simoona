@@ -87,12 +87,12 @@
             }).put().$promise;
         }
 
-        function reportBook(bookOfficeId) {
-            return $resource(bookUrl + 'Report?bookOfficeId=' + bookOfficeId, '', {
+        function reportBook(bookReport) {
+            return $resource(bookUrl + 'Report', '', {
                 put: {
-                    method: 'PUT'
+                    method: 'PUT',
                 }
-            }).put().$promise;
+            }).put(bookReport).$promise;
         }
 
         function takeBook(bookOfficeId) {

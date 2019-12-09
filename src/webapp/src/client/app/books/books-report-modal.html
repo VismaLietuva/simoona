@@ -8,24 +8,22 @@
     <form name="eventForm" class="form-horizontal" autocomplete="off">
         <div class="form-group required"">
     <label for=" typeId" class="control-label col-xs-12 col-sm-4" translate="books.reportReason"></label>
-            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+            <div class="col-xs-12 col-sm-6 col-md-8">
                 <select id="typeId" name="typeId" class="form-control" ng-model="vm.selectedReport" ng-init="vm.selectedReport = vm.reports[0]" 
-                ng-options="item as item.name for item in vm.reports" required translate-cloak>
+                ng-options="item as item for item in vm.reports" required translate-cloak>
                 </select>
-                <p class="text-danger help-block" ng-if="eventForm.typeId.$invalid && eventForm.typeId.$dirty"
-                    translate="common.messageFieldIsRequired"></p>
             </div>
         </div>
         <div class="form-group"">
-                <label for="description" class="control-label col-xs-12 col-sm-4" translate="events.eventDescription"></label>
-                <div class="col-xs-12 col-sm-6 col-md-4">
-                    <textarea id="description" name="description" class="form-control" rows="3"></textarea>
+                <label for="description" class="control-label col-xs-12 col-sm-4" translate="books.comment"></label>
+                <div class="col-xs-12 col-sm-6 col-md-8">
+                    <textarea id="description" name="description" class="form-control" rows="3" ng-model="vm.comment"></textarea>
                 </div>
             </div>
     </form>
 </div>
 <div class="lottery-details-modal-footer">
-        <button class="btn btn-warning" ng-click="vm.report()">
+        <button class="btn btn-warning" ng-click="vm.reportBook()">
                 <span translate="books.report"></span>
             </button>
     <button class="btn btn-default" ng-click="vm.cancel()" data-test-id="cancel-button-yellow">

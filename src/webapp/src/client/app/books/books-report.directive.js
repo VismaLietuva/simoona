@@ -4,13 +4,8 @@
     angular
         .module('simoonaApp.Books')
         .directive('aceBooksReportModal', booksReportModal)
-        .constant('reports', [
-            {name: 'Did not find this book', id: 1},
-            {name: 'Lost this book', id: 2},
-            {name: 'Other', id: 3},
-        ])
         booksReportModal.$inject = [
-        '$uibModal'
+        '$uibModal',
     ];
 
     function booksReportModal($uibModal) {
@@ -47,28 +42,30 @@
         'errorHandler',
         '$window',
         'currentBook',
-        'reports'
+        '$translate',
+        'bookRepository'
     ];
 
-    function booksReportController($scope, $uibModalInstance, notifySrv, localeSrv, errorHandler, $window, currentBook, reports) {
+    function booksReportController($scope, $uibModalInstance, notifySrv, localeSrv, errorHandler, $window, currentBook, $translate, bookRepository) {
         var vm = this;
-        
         vm.book = currentBook;
-        vm.reports = reports
-        
-        vm.report = report;
+
+        vm.reports = [];
+        vm.reports.push($translate.instant('books.notFound'));
+        vm.reports.push($translate.instant('books.lost'));
+        vm.reports.push($translate.instant('books.other'));
+
+        vm.reportBook = reportBook;
         vm.cancel = cancel;
-
-        function init() {
-
-        }
-
         
-        function report(book) {
-            
-             console.log(vm.selectedReport);
-            bookRepository.reportBook(book.bookOfficeId).then(function () {
-                var message = localeSrv.formatTranslation('books.successReported', {one: book.title, two: book.author});
+        function reportBook() {
+            vm.report = {
+                bookOfficeId: vm.book.bookOfficeId,
+                report: vm.selectedReport, 
+                comment: vm.comment
+            };
+            bookRepository.reportBook(vm.report).then(function () {
+                var message = localeSrv.formatTranslation('books.successReported', {one: vm.book.title, two: vm.book.author});
                 notifySrv.success(message);
             }, function (response) {
                 notifySrv.error(response.data.message);
