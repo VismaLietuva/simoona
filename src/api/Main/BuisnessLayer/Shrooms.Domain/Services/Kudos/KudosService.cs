@@ -490,39 +490,32 @@ namespace Shrooms.Domain.Services.Kudos
             return new[] { sentThisMonth, available < 0 ? 0 : available };
         }
 
-        public void AddKudosLog(AddKudosLogDTO kudosLog)
+        public void AddKudosLog(AddKudosLogDTO kudosDto, decimal? points = null)
         {
-            if (UserHasPermission(kudosLog))
+            if (!UserHasPermission(kudosDto))
             {
-                AddKudosRequest(kudosLog);
+                throw new ValidationException(ErrorCodes.KudosTypeNotFound);
             }
-        }
 
-        public void AddKudosLog(AddKudosLogDTO kudosDto, decimal points)
-        {
-            if (UserHasPermission(kudosDto))
-            {
-                AddKudosRequest(kudosDto, points);
-            }
+            AddKudosRequest(kudosDto, points);
         }
-
 
         private bool UserHasPermission(AddKudosLogDTO kudosDto)
         {
-            if (kudosDto.IsActive)
+            var kudosType = _kudosTypesDbSet.Find(kudosDto.PointsTypeId);
+            if (kudosType is null)
+            {
+                return false;
+            }
+            else if (kudosType.IsActive)
             {
                 return true;
             }
 
-            var authorizedRoles = new List<string>() { Constants.Authorization.Roles.Admin, Constants.Authorization.Roles.KudosAdmin };
-            if (authorizedRoles.Any(role => _roleService.HasRole(kudosDto.UserId, role)))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            var authorizedRoles = new List<string> { Constants.Authorization.Roles.Admin, Constants.Authorization.Roles.KudosAdmin };
+            var isAuthorized = authorizedRoles.Any(role => _roleService.HasRole(kudosDto.UserId, role));
+
+            return isAuthorized ? true : false;
         }
 
         public void AddRefundKudosLogs(IEnumerable<AddKudosLogDTO> kudosLogs)
