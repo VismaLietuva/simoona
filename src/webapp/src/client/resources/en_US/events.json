@@ -19,6 +19,8 @@
   "eventMore": "Add one more",
   "eventName": "Title",
   "eventNo": "No",
+  "eventPinned": "Event successfully pinned!",
+  "eventUnpinned": "Event successfully unpinned!",
   "eventOptionsSelect": "Need options for participant to select",
   "eventParticipants": "Participants",
   "eventPhoto": "Photo",

@@ -10,6 +10,7 @@
         WallComment,
         EventComment,
         ProjectComment,
-        FollowingComment
+        FollowingComment,
+        EventReminder
     }
 }
