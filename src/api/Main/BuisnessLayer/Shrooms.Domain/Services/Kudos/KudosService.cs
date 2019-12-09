@@ -512,10 +512,7 @@ namespace Shrooms.Domain.Services.Kudos
                 return true;
             }
 
-            var authorizedRoles = new List<string> { Constants.Authorization.Roles.Admin, Constants.Authorization.Roles.KudosAdmin };
-            var isAuthorized = authorizedRoles.Any(role => _roleService.HasRole(kudosDto.UserId, role));
-
-            return isAuthorized ? true : false;
+            return HasKudosAdministratorPermission(kudosDto) ? true : false;
         }
 
         public void AddRefundKudosLogs(IEnumerable<AddKudosLogDTO> kudosLogs)

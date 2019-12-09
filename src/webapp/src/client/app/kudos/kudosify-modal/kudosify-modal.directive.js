@@ -82,8 +82,8 @@
         vm.getUsers = getUsersForAutocomplete;
         vm.attachImage = attachImage;
         vm.recalculateTotalPoints = recalculateTotalPoints;
-
-        vm.isAdmin = authService.identity.roles.contains("Admin") || authService.identity.roles.contains("KudosAdmin");
+        
+        vm.isAdmin = authService.hasPermissions(['KUDOS_ADMINISTRATION']);
 
         vm.userId = authService.identity.userId;
         vm.context = context;
