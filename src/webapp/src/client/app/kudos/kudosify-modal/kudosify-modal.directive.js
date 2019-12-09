@@ -41,7 +41,7 @@
                         currentUser: function () {
                             return scope.aceKudosifyModal;
                         },
-                        context: function() {
+                        context: function () {
                             return attrs.kudosifyType;
                         }
                     }
@@ -82,7 +82,7 @@
         vm.getUsers = getUsersForAutocomplete;
         vm.attachImage = attachImage;
         vm.recalculateTotalPoints = recalculateTotalPoints;
-        
+
         vm.isAdmin = authService.hasPermissions(['KUDOS_ADMINISTRATION']);
 
         vm.userId = authService.identity.userId;
@@ -112,15 +112,12 @@
 
         //////
         function init() {
-            
-            if (vm.isSubmitModal())
-            {
+
+            if (vm.isSubmitModal()) {
                 kudosifyModalFactory.getPointsTypes().then(function (result) {
                     vm.kudosTypes = result.filter(kudos => kudos.type !== definedKudosTypes.send);
                 });
-            }
-            else if (vm.isSendModal())
-            {
+            } else if (vm.isSendModal()) {
                 kudosifyModalFactory.getSendKudosType().then(function (result) {
                     vm.pointsType = result;
                 });
@@ -131,7 +128,7 @@
 
             kudosFactory.getUserInformation(vm.userId).then(function (response) {
                 vm.user = response;
-                
+
                 vm.kudosifyUser = {
                     formattedName: response.firstName + ' ' + response.lastName,
                     id: vm.userId
@@ -145,7 +142,7 @@
         }
 
         function chooseKudosType(type, dom) {
-           
+
             if (vm.isSubmitModal() && isSelectedSameType(dom)) {
                 vm.kudosifyInfo.multiplyBy++;
             } else {
@@ -162,12 +159,11 @@
             }
         }
 
-        function isSelectedSameType(dom)
-        {
+        function isSelectedSameType(dom) {
             return !dom.target.classList.contains('kudosify-modal-buttons-inactive') && vm.isButtonSelected;
         }
 
-        function recalculateTotalPoints(){
+        function recalculateTotalPoints() {
             vm.kudosifyInfo.totalPoints = vm.kudosifyInfo.multiplyBy * vm.pointsType.value;
         }
 
@@ -180,18 +176,17 @@
             kudosReceivers = lodash.map(kudosReceivers, 'id');
 
             if (vm.attachedFiles.length) {
-                pictureRepository.upload(vm.attachedFiles).then(function(result) {
+                pictureRepository.upload(vm.attachedFiles).then(function (result) {
                     kudosifyInfo.imageName = result.data;
                     postKudos(kudosReceivers, kudosifyInfo, pointsType);
                 });
-            }
-            else{
+            } else {
                 kudosifyInfo.imageName = null;
                 postKudos(kudosReceivers, kudosifyInfo, pointsType);
             }
         }
 
-        function postKudos(kudosReceivers, kudosifyInfo, pointsType){
+        function postKudos(kudosReceivers, kudosifyInfo, pointsType) {
             kudosifyModalFactory.postKudos(kudosReceivers, kudosifyInfo, pointsType).then(function (result) {
                 notifySrv.success('common.successfullySaved');
                 $uibModalInstance.close();
@@ -202,15 +197,15 @@
         }
 
         function attachImage(input) {
-            var options = { 
+            var options = {
                 canvas: true
             };
 
             if (input.value) {
                 if (shroomsFileUploader.validate(input.files, imageValidationSettings, showUploadAlert)) {
                     vm.attachedFiles = shroomsFileUploader.fileListToArray(input.files);
-                    var displayImg = function(img) {
-                        $scope.$apply(function($scope) {
+                    var displayImg = function (img) {
+                        $scope.$apply(function ($scope) {
                             var fileName = vm.attachedFiles[0].name;
 
                             vm.imageSource = img.toDataURL(vm.attachedFiles[0].type);
@@ -253,8 +248,7 @@
             return vm.context == vm.modalTypes.send;
         }
 
-        function isVisibleKudosType(kudosType)
-        {
+        function isVisibleKudosType(kudosType) {
             return vm.isAdmin || kudosType.isActive;
         }
     }
