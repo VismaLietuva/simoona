@@ -244,18 +244,18 @@
                         </button>
                     </div>
                     <div class="pull-right book-button">
+                        <button class="btn btn-warning"
+                                ace-books-report-modal book="vm.book">
+                                <span translate="books.report"></span>
+                        </button>
+                    </div>
+                    <div class="pull-right book-button">
                         <button ng-if="vm.isBookAdministrator"
                                 class="btn btn-primary"
                                 ng-click="vm.saveBook(vm.book)"
                                 ng-disabled="bookForm.$invalid"
                                 data-test-id="book-save-button">
                                 <span translate="common.save"></span>
-                        </button>
-                    </div>
-                    <div class="pull-right book-button">
-                        <button class="btn btn-warning"
-                                ace-books-report-modal book="vm.book">
-                                <span translate="books.report"></span>
                         </button>
                     </div>
                     <div class="pull-right book-button">
