@@ -14,6 +14,7 @@
         vm.saveKudosBasket = saveKudosBasket;
         vm.cancelKudosBasket = cancelKudosBasket;
         vm.deleteKudosBasket = deleteKudosBasket;
+        vm.toggleKudosBasketSwitch = toggleKudosBasketSwitch;
 
         init();
 
@@ -69,6 +70,10 @@
             function(response) {
                 notifySrv.error(response.data.message);
             });
+        }
+
+        function toggleKudosBasketSwitch() {
+            vm.kudosBasketData.isActive = !vm.kudosBasketData.isActive;
         }
     }
 })();
