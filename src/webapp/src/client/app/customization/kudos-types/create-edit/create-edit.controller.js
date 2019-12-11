@@ -27,6 +27,8 @@
 
         vm.kudosType = {};
 
+        vm.toggleVisibility = toggleVisibility;
+
         vm.createKudosType = createKudosType;
         vm.updateKudosType = updateKudosType;
         vm.removeKudosType = removeKudosType;
@@ -77,6 +79,10 @@
                 .then(function() {
                     $state.go(listState);
                 }, errorHandler.handleErrorMessage);
+        }
+
+        function toggleVisibility() {
+            vm.kudosType.isActive = !vm.kudosType.isActive;
         }
     }
 })();

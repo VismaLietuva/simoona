@@ -1,143 +1,103 @@
 <div class="row body-container">
     <div class="col-xs-12" has-permissions="['KUDOS_ADMINISTRATION']">
         <wave-spinner ng-if="vm.isLoading"></wave-spinner>
-        <div class="panel panel-default"
-             ng-if="!vm.isLoading">
+        <div class="panel panel-default" ng-if="!vm.isLoading">
             <div class="panel-heading">
-                <span ng-if="vm.states.isEdit" 
-                      translate="customization.editKudosTypes"></span>
-                <span ng-if="vm.states.isCreate" 
-                      translate="customization.createKudosType"></span>
+                <span ng-if="vm.states.isEdit" translate="customization.editKudosTypes"></span>
+                <span ng-if="vm.states.isCreate" translate="customization.createKudosType"></span>
             </div>
             <div class="panel-body">
                 <form name="kudosTypeForm" class="form-horizontal" autocomplete="off">
 
                     <!--kudos type name-->
-                    <div class="form-group required" 
-                         ng-class="{'has-error': kudosTypeForm.name.$invalid && kudosTypeForm.name.$dirty}">
-                        <label for="kudosTypeName" 
-                               class="control-label col-xs-12 col-sm-4" 
-                               translate="customization.kudosTypeName"></label>
+                    <div class="form-group required"
+                        ng-class="{'has-error': kudosTypeForm.name.$invalid && kudosTypeForm.name.$dirty}">
+                        <label for="kudosTypeName" class="control-label col-xs-12 col-sm-4"
+                            translate="customization.kudosTypeName"></label>
                         <div class="col-xs-12 col-sm-4">
-                            <input id="kudosTypeName" 
-                                   type="text" 
-                                   class="form-control" 
-                                   name="name" 
-                                   ng-model="vm.kudosType.name" 
-                                   ng-maxlength="30" 
-                                   data-test-id="kudos-type-form-name-input" 
-                                   ng-disabled="!vm.editable"
-                                   required/>
-                            <p class="text-danger help-block" 
-                               ng-if="kudosTypeForm.name.$error.required && kudosTypeForm.name.$dirty" 
-                               translate="common.messageFieldIsRequired"></p>
-                            <p class="text-danger help-block" 
-                               ng-if="kudosTypeForm.name.$error.maxlength && kudosTypeForm.name.$dirty" 
-                               translate="common.messageInvalidLength" 
-                               translate-values="{ one: 30 }"></p>
+                            <input id="kudosTypeName" type="text" class="form-control" name="name"
+                                ng-model="vm.kudosType.name" ng-maxlength="30" data-test-id="kudos-type-form-name-input"
+                                ng-disabled="!vm.editable" required />
+                            <p class="text-danger help-block"
+                                ng-if="kudosTypeForm.name.$error.required && kudosTypeForm.name.$dirty"
+                                translate="common.messageFieldIsRequired"></p>
+                            <p class="text-danger help-block"
+                                ng-if="kudosTypeForm.name.$error.maxlength && kudosTypeForm.name.$dirty"
+                                translate="common.messageInvalidLength" translate-values="{ one: 30 }"></p>
                         </div>
                     </div>
-                    
+
                     <!--kudos type multiplier -->
                     <div class="form-group required"
-                         ng-class="{'has-error': kudosTypeForm.multiplier.$invalid && kudosTypeForm.multiplier.$dirty}">
-                        <label for="kudosTypeMultiplier" 
-                               class="control-label col-xs-12 col-sm-4" 
-                               translate="customization.kudosTypeMultiplier">
+                        ng-class="{'has-error': kudosTypeForm.multiplier.$invalid && kudosTypeForm.multiplier.$dirty}">
+                        <label for="kudosTypeMultiplier" class="control-label col-xs-12 col-sm-4"
+                            translate="customization.kudosTypeMultiplier">
                         </label>
                         <div class="col-xs-12 col-sm-4">
-                            <input id="kudosTypeMultiplier"
-                                   type="number"
-                                   class="form-control"
-                                   name="multiplier"
-                                   ng-model="vm.kudosType.multiplier"
-                                   min="0" 
-                                   ng-pattern="/^([0-9]|10){1,10}$/"
-                                   ng-maxlength="10"
-                                   translate
-                                   translate-attr-placeholder="common.onlyWholeNumbers"
-                                   data-test-id="kudos-type-form-multiplier-input"
-                                   ng-disabled="!vm.editable"
-                                   required/>
-                            
-                            <p class="text-danger help-block" 
-                               ng-show="kudosTypeForm.multiplier.$invalid && kudosTypeForm.multiplier.$dirty || kudosTypeForm.multiplier.$error.pattern">
-                            </p>
-                            
-                            <p class="text-danger help-block" 
-                               ng-show="kudosTypeForm.multiplier.$error.required && kudosTypeForm.multiplier.$dirty" translate="common.messageFieldIsRequired"></p>
-                            
+                            <input id="kudosTypeMultiplier" type="number" class="form-control" name="multiplier"
+                                ng-model="vm.kudosType.multiplier" min="0" ng-pattern="/^([0-9]|10){1,10}$/"
+                                ng-maxlength="10" translate translate-attr-placeholder="common.onlyWholeNumbers"
+                                data-test-id="kudos-type-form-multiplier-input" ng-disabled="!vm.editable" required />
+
                             <p class="text-danger help-block"
-                               ng-show="kudosTypeForm.multiplier.$error.maxlength && kudosTypeForm.multiplier.$dirty" translate="common.messageInvalidLength" 
-                               translate-values="{ one: 10 }"></p>
+                                ng-show="kudosTypeForm.multiplier.$invalid && kudosTypeForm.multiplier.$dirty || kudosTypeForm.multiplier.$error.pattern">
+                            </p>
+
+                            <p class="text-danger help-block"
+                                ng-show="kudosTypeForm.multiplier.$error.required && kudosTypeForm.multiplier.$dirty"
+                                translate="common.messageFieldIsRequired"></p>
+
+                            <p class="text-danger help-block"
+                                ng-show="kudosTypeForm.multiplier.$error.maxlength && kudosTypeForm.multiplier.$dirty"
+                                translate="common.messageInvalidLength" translate-values="{ one: 10 }"></p>
                         </div>
                     </div>
-                    
+
                     <!--kudos type description -->
                     <div class="form-group"
-                         ng-class="{'has-error': kudosTypeForm.description.$invalid && kudosTypeForm.description.$dirty}">
-                        <label 
-                            for="kudosTypeDescription" 
-                            class="control-label col-xs-12 col-sm-4" 
+                        ng-class="{'has-error': kudosTypeForm.description.$invalid && kudosTypeForm.description.$dirty}">
+                        <label for="kudosTypeDescription" class="control-label col-xs-12 col-sm-4"
                             translate="customization.kudosTypeDescription">
                         </label>
                         <div class="col-xs-12 col-sm-4">
-                            <textarea class="form-control"
-                                id="kudosTypeDescription"
-                                name="description"
-                                rows="5"
-                                ng-model="vm.kudosType.description"
-                                ng-maxlength="300" 
-                                data-test-id="kudos-type-form-description"
-                                ng-disabled="!vm.editable">
+                            <textarea class="form-control" id="kudosTypeDescription" name="description" rows="5"
+                                ng-model="vm.kudosType.description" ng-maxlength="300"
+                                data-test-id="kudos-type-form-description" ng-disabled="!vm.editable">
                             </textarea>
-                            <p class="text-danger help-block" 
-                               ng-show="kudosTypeForm.description.$error.maxlength && kudosTypeForm.description.$dirty"
-                               translate="common.messageInvalidLength" 
-                               translate-values="{ one: 300 }"></p>
+                            <p class="text-danger help-block"
+                                ng-show="kudosTypeForm.description.$error.maxlength && kudosTypeForm.description.$dirty"
+                                translate="common.messageInvalidLength" translate-values="{ one: 300 }"></p>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label 
-                            for="isActiveSwitch" 
-                            class="control-label col-xs-12 col-sm-4" 
-                            translate="kudos.visible">
+                        <label for="isActiveSwitch" class="control-label col-xs-12 col-sm-4" translate="kudos.visible">
                         </label>
                         <div class="col-xs-12 col-sm-4">
-                            <div class="onoffswitch" id="isActiveSwitch">
-                                <input type="checkbox" name="notification" class="onoffswitch-checkbox" id="notification" ng-model="vm.kudosType.isActive">
-                                <label class="onoffswitch-label" for="notification">
-                                <span on-switch-attr="{{'kudosBasket.widgetIsOn' | translate }}" off-switch-attr="{{'kudosBasket.widgetIsOff' | translate }}" class="onoffswitch-inner" translate-cloak></span>
-                                <span class="onoffswitch-switch"></span>
+                            <div class="btn-group btn-group-checkbox" data-toggle="buttons">
+                                <label class="btn btn-primary" ng-class="{'active':vm.kudosType.isActive}"
+                                    ng-click="vm.toggleVisibility()">
+                                    <input type="checkbox" autocomplete="off">
                                 </label>
                             </div>
                         </div>
                     </div>
 
-                
                     <!--kudos type buttons right -->
                     <div class="pull-right">
 
-                        <button class="btn btn-primary" 
-                                ng-if="vm.states.isCreate" 
-                                ng-click="vm.createKudosType()" 
-                                ng-disabled="kudosTypeForm.$invalid" 
-                                data-test-id="kudos-type-form-save-button">
+                        <button class="btn btn-primary" ng-if="vm.states.isCreate" ng-click="vm.createKudosType()"
+                            ng-disabled="kudosTypeForm.$invalid" data-test-id="kudos-type-form-save-button">
                             <span translate="common.save"></span>
                         </button>
 
-                        <button class="btn btn-primary" 
-                                ng-if="vm.states.isEdit" 
-                                ng-click="vm.updateKudosType()" 
-                                ng-disabled="kudosTypeForm.$invalid"
-                                data-test-id="kudos-type-form-update-button">
+                        <button class="btn btn-primary" ng-if="vm.states.isEdit" ng-click="vm.updateKudosType()"
+                            ng-disabled="kudosTypeForm.$invalid" data-test-id="kudos-type-form-update-button">
                             <span translate="common.update"></span>
                         </button>
 
-                        <button class="btn btn-default" 
-                                ui-sref="Root.WithOrg.Admin.Customization.KudosTypes.List" 
-                                data-test-id="kudos-form-cancel-button">
+                        <button class="btn btn-default" ui-sref="Root.WithOrg.Admin.Customization.KudosTypes.List"
+                            data-test-id="kudos-form-cancel-button">
                             <span translate="common.cancel"></span>
                         </button>
 
@@ -145,12 +105,10 @@
 
                     <!--kudos type delete button left -->
                     <div class="pull-left">
-                        
+
                         <div class="pull-left">
-                            <button ng-if="vm.states.isEdit && vm.editable"
-                                    class="btn btn-danger"
-                                    ace-confirmation-modal="vm.removeKudosType()"
-                                    data-test-id="kudos-type-disable-button">
+                            <button ng-if="vm.states.isEdit && vm.editable" class="btn btn-danger"
+                                ace-confirmation-modal="vm.removeKudosType()" data-test-id="kudos-type-disable-button">
                                 <span translate="common.delete"></span>
                             </button>
                         </div>
