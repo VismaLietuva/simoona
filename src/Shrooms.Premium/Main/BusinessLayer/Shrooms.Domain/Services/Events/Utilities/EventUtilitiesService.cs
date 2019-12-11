@@ -6,7 +6,11 @@ using Shrooms.EntityModels.Models.Events;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.SqlServer;
 using System.Linq;
+using System.Linq.Expressions;
+using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services;
+using Shrooms.Domain.Services.Events;
 using Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes;
 using static Shrooms.Constants.ErrorCodes.ErrorCodes;
 
@@ -78,6 +82,7 @@ namespace Shrooms.Domain.Services.Events.Utilities
                 {
                     Id = x.Id,
                     IsSingleJoin = x.IsSingleJoin,
+                    SendWeeklyReminders = x.SendWeeklyReminders,
                     IsFoodRelated = x.IsFoodRelated,
                     Name = x.Name,
                     HasActiveEvents = x.Events.Any(e => e.EndDate > DateTime.UtcNow 
@@ -91,6 +96,17 @@ namespace Shrooms.Domain.Services.Events.Utilities
             }
 
             return eventType;
+        }
+
+        public IEnumerable<EventTypeDTO> GetEventTypesToRemind(int organizationId)
+        {
+            return _eventTypesDbSet
+                .Where(x => x.SendWeeklyReminders && x.OrganizationId == organizationId)
+                .Select(x => new EventTypeDTO
+                {
+                    Id = x.Id,
+                    Name = x.Name
+                });
         }
 
         public void CreateEventType(CreateEventTypeDTO eventType)
@@ -117,6 +133,7 @@ namespace Shrooms.Domain.Services.Events.Utilities
             orgEventType.Name = eventType.Name;
             orgEventType.ModifiedBy = eventType.UserId;
             orgEventType.Modified = DateTime.UtcNow;
+            orgEventType.SendWeeklyReminders = eventType.SendWeeklyReminders;
 
             _uow.SaveChanges(eventType.UserId);
         }
@@ -173,6 +190,14 @@ namespace Shrooms.Domain.Services.Events.Utilities
             return eventOptions;
         }
 
+        public bool AnyEventsThisWeekByType(int eventTypeId)
+        {
+            return _eventsDbSet
+                .Any(x => SqlFunctions.DatePart("wk", x.StartDate) == SqlFunctions.DatePart("wk", DateTime.UtcNow) &&
+                          x.EventType.Id == eventTypeId &&
+                          x.RegistrationDeadline > DateTime.UtcNow);
+        }
+
         private void ValidateEventTypeName(string eventTypeName, int organizationId)
         {
             var nameAlreadyExists = _eventTypesDbSet
@@ -194,6 +219,7 @@ namespace Shrooms.Domain.Services.Events.Utilities
                 CreatedBy = eventTypeDto.UserId,
                 OrganizationId = eventTypeDto.OrganizationId,
                 IsSingleJoin = eventTypeDto.IsSingleJoin,
+                SendWeeklyReminders = eventTypeDto.SendWeeklyReminders,
                 IsFoodRelated = eventTypeDto.IsFoodRelated,
                 Name = eventTypeDto.Name
             };

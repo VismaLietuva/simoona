@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using Shrooms.DataTransferObjects.Models.Events;
 
 namespace Shrooms.Domain.Services.Email.Event
 {
@@ -53,6 +54,23 @@ namespace Shrooms.Domain.Services.Email.Event
             var emailBody = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.EventParticipantExpelled);
 
             _mailingService.SendEmail(new EmailDto(emails, Resources.Models.Events.Events.ResetParticipantListEmailSubject, emailBody));
+        }
+
+        public void RemindUsersToJoinEvent(EventTypeDTO eventType, IEnumerable<string> emails, int orgId)
+        {
+            var organization = _organizationService.GetOrganizationById(orgId);
+
+            var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
+            var eventUrl = _appSettings.EventListByTypeUrl(organization.ShortName, eventType.Id.ToString());
+
+            var emailTemplateViewModel = new EventJoinRemindEmailTemplateViewModel(userNotificationSettingsUrl)
+            {
+                EventPageUrl = eventUrl,
+                EventTypeName = eventType.Name
+            };
+            var emailBody = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.EventJoinRemind);
+
+            _mailingService.SendEmail(new EmailDto(emails, $"Join {eventType.Name} event now", emailBody));
         }
     }
 }

@@ -173,6 +173,7 @@
     <Compile Include="DomainService\OrganizationalStructureTests.cs" />
     <Compile Include="DomainService\ServiceRequestExportServiceTests.cs" />
     <Compile Include="DomainService\ServiceRequestServiceTests.cs" />
+    <Compile Include="DomainService\EventServices\EventJoinRemindServiceTests.cs" />
     <Compile Include="DomainService\VacationService\VacationDomainServiceTests.cs" />
     <Compile Include="Mocks\MockDbContext.cs" />
     <Compile Include="Mocks\MockIdentity.cs" />
