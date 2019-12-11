@@ -20,6 +20,15 @@ using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Infrastructure.Books;
 using Shrooms.Infrastructure.GoogleBookApiService;
 using Shrooms.Infrastructure.GoogleBookService;
+using Shrooms.Domain.Services.Roles;
+using Shrooms.Infrastructure.Email;
+using Shrooms.DataTransferObjects.EmailTemplateViewModels;
+using Shrooms.Infrastructure.Configuration;
+using Shrooms.Domain.Services.Organizations;
+using Shrooms.Domain.Services.UserService;
+using Shrooms.Infrastructure.Email.Templating;
+using Shrooms.Constants;
+using Shrooms.DataTransferObjects.Models.Emails;
 
 namespace Shrooms.Domain.Services.Books
 {
@@ -31,6 +40,12 @@ namespace Shrooms.Domain.Services.Books
         private static object takeBookLock = new object();
 
         private readonly IUnitOfWork2 _uow;
+        private readonly IApplicationSettings _appSettings;
+        private readonly IRoleService _roleService;
+        private readonly IUserService _userService;
+        private readonly IMailingService _mailingService;
+        private readonly IMailTemplate _mailTemplate;
+        private readonly IOrganizationService _organizationService;
         private readonly IBookInfoService _bookInfoService;
         private readonly IBookServiceValidator _bookServiceValidator;
         private readonly IBookMobileServiceValidator _serviceValidator;
@@ -43,12 +58,24 @@ namespace Shrooms.Domain.Services.Books
 
         public BookService(
             IUnitOfWork2 uow,
+            IApplicationSettings appSettings,
+            IRoleService roleService,
+            IUserService userService,
+            IMailingService mailingService,
+            IMailTemplate mailTemplate,
+            IOrganizationService organizationService,
             IBookInfoService bookInfoService,
             IBookServiceValidator bookServiceValidator,
             IBookMobileServiceValidator bookMobileServiceValidator,
             IAsyncRunner asyncRunner)
         {
             _uow = uow;
+            _appSettings = appSettings;
+            _roleService = roleService;
+            _userService = userService;
+            _mailingService = mailingService;
+            _mailTemplate = mailTemplate;
+            _organizationService = organizationService;
             _booksDbSet = uow.GetDbSet<Book>();
             _officesDbSet = uow.GetDbSet<Office>();
             _bookLogsDbSet = uow.GetDbSet<BookLog>();
@@ -219,6 +246,25 @@ namespace Shrooms.Domain.Services.Books
 
         public void ReportBook(BookReportDTO bookReport, UserAndOrganizationDTO userAndOrg)
         {
+            var reportedOfficeBook = _bookOfficesDbSet
+                .Include(p => p.Book)
+                .FirstOrDefault(p => p.Id == bookReport.BookOfficeId);
+
+            var user = _userService.GetApplicationUser(userAndOrg.UserId);
+            var receivers = _roleService.GetAdministrationRoleEmails(userAndOrg.OrganizationId);
+
+            var organization = _organizationService.GetOrganizationById(userAndOrg.OrganizationId);
+            var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
+            var bookUrl = _appSettings.BookUrl(organization.Name, bookReport.BookOfficeId, reportedOfficeBook.OfficeId);
+            var subject = $"Reported book: {reportedOfficeBook.Book.Title}";
+             var bookReportTemplateViewModel = new BookReportEmailTemplateViewModel(reportedOfficeBook.Book.Title, reportedOfficeBook.Book.Author,
+                 bookReport.Report, bookReport.Comment, bookUrl, user.FullName, userNotificationSettingsUrl);
+
+            var content = _mailTemplate.Generate(bookReportTemplateViewModel, EmailTemplateCacheKeys.BookReport);
+               var emailData = new EmailDto(receivers, subject, content);
+
+              _mailingService.SendEmail(emailData);
+
         }
 
         public void AddBook(NewBookDTO bookDto)
