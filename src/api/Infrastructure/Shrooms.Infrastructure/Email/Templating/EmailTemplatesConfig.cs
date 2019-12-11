@@ -19,6 +19,7 @@ namespace Shrooms.Infrastructure.Email.Templating
 
             AddAndCompile(EmailTemplateCacheKeys.NewWallPost, @"EmailTemplates\Wall\NewPost.cshtml", typeof(NewWallPostEmailTemplateViewModel));
             AddAndCompile(EmailTemplateCacheKeys.BookRemind, @"EmailTemplates\Books\BookRemind.cshtml", typeof(BookReminderEmailTemplateViewModel));
+            AddAndCompile(EmailTemplateCacheKeys.BookReport, @"EmailTemplates\Books\BookReport.cshtml", typeof(BookReportEmailTemplateViewModel));
             AddAndCompile(EmailTemplateCacheKeys.EventParticipantExpelled, @"EmailTemplates\Events\ParticipantExpelled.cshtml", typeof(EventParticipantExpelledEmailTemplateViewModel));
             AddAndCompile(EmailTemplateCacheKeys.EventJoinRemind, @"EmailTemplates\Events\RemindToJoin.cshtml", typeof(EventJoinRemindEmailTemplateViewModel));
             AddAndCompile(EmailTemplateCacheKeys.BookTaken, @"EmailTemplates\Books\BookTaken.cshtml", typeof(BookTakenEmailTemplateViewModel));

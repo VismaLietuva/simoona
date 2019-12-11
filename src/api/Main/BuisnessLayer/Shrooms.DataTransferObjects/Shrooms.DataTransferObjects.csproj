@@ -74,6 +74,7 @@
     <Compile Include="EmailTemplateViewModels\BirthdaysNotificationEmployeeViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\BirthdaysNotificationTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\BookReminderEmailTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\BookReportEmailTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\BookTakenEmailTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\CommitteeSuggestionEmailTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\EventJoinRemindEmailTemplateViewModel.cs" />
