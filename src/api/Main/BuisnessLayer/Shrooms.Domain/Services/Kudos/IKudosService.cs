@@ -41,14 +41,12 @@ namespace Shrooms.Domain.Services.Kudos
 
         decimal[] GetMonthlyKudosStatistics(string id);
 
-        void AddKudosLog(AddKudosLogDTO kudosLog);
-
         /// <summary>
         /// Adds kudos request where points are not calculated
         /// </summary>
         /// <param name="kudosDto">add kudos request</param>
         /// <param name="points">requested points</param>
-        void AddKudosLog(AddKudosLogDTO kudosDto, decimal points);
+        void AddKudosLog(AddKudosLogDTO kudosDto, decimal? points = null);
 
         void AddRefundKudosLogs(IEnumerable<AddKudosLogDTO> kudosLogs);
 

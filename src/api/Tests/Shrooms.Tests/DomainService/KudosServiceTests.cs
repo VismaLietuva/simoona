@@ -214,7 +214,7 @@ namespace Shrooms.API.Tests.DomainService
             };
 
             var types = _kudosService.GetKudosTypes(userAndOrg);
-            Assert.AreEqual(4, types.Count());
+            Assert.AreEqual(5, types.Count());
         }
 
         [Test]
@@ -226,7 +226,7 @@ namespace Shrooms.API.Tests.DomainService
             };
 
             var types = _kudosService.GetKudosTypes(userAndOrg);
-            Assert.AreEqual(3, types.Count());
+            Assert.AreEqual(4, types.Count());
         }
 
         [Test]
@@ -360,7 +360,7 @@ namespace Shrooms.API.Tests.DomainService
             var kudosLog = new AddKudosLogDTO
             {
                 OrganizationId = 2,
-                PointsTypeId = 1,
+                PointsTypeId = 5,
                 UserId = "testUserId2",
                 ReceivingUserIds = new List<string>() { "testUserId3", "testUserId4" },
                 MultiplyBy = 2,
@@ -597,6 +597,7 @@ namespace Shrooms.API.Tests.DomainService
             _kudosTypesDbSet.Find(1).Returns(MockKudosTypes().FirstOrDefault(x => x.Id == 1));
             _kudosTypesDbSet.Find(2).Returns(MockKudosTypes().FirstOrDefault(x => x.Id == 2));
             _kudosTypesDbSet.Find(3).Returns(MockKudosTypes().FirstOrDefault(x => x.Id == 3));
+            _kudosTypesDbSet.Find(5).Returns(MockKudosTypes().FirstOrDefault(x => x.Id == 5));
 
             _usersDbSet.Find("testUserId").Returns(MockUsers().FirstOrDefault(x => x.Id == "testUserId"));
             _usersDbSet.Find("testUserId2").Returns(MockUsers().FirstOrDefault(x => x.Id == "testUserId2"));
@@ -681,7 +682,7 @@ namespace Shrooms.API.Tests.DomainService
                     Name = "Minus",
                     Value = 1,
                     Type = ConstBusinessLayer.KudosTypeEnum.Minus,
-                    IsActive = false
+                    IsActive = true
                 },
                 new KudosType
                 {
@@ -697,7 +698,7 @@ namespace Shrooms.API.Tests.DomainService
                     Name = "AnythingElse",
                     Value = 2,
                     Type = ConstBusinessLayer.KudosTypeEnum.Ordinary,
-                    IsActive = false
+                    IsActive = true
                 },
                 new KudosType
                 {
@@ -706,6 +707,14 @@ namespace Shrooms.API.Tests.DomainService
                     Value = 3,
                     Type = ConstBusinessLayer.KudosTypeEnum.Other
                 },
+                new KudosType
+                {
+                    Id = 5,
+                    Name = "Active",
+                    Value = 1,
+                    Type = ConstBusinessLayer.KudosTypeEnum.Ordinary,
+                    IsActive = true
+                }
             }.AsQueryable();
         }
 
