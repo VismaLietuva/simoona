@@ -10,6 +10,7 @@ using Shrooms.EntityModels.Models.Books;
 using Shrooms.Infrastructure.Configuration;
 using Shrooms.Infrastructure.Email;
 using Shrooms.Infrastructure.Email.Templating;
+using Shrooms.Infrastructure.Logger;
 using Shrooms.Resources.Emails;
 using System;
 using System.Collections.Generic;
@@ -30,9 +31,9 @@ namespace Shrooms.Domain.Services.Books
         private IMailingService _mailingService;
         private IOrganizationService _organizationService;
         private readonly IDbSet<BookLog> _booksDbSet;
-        private readonly IDbSet<BookOffice> _bookOfficesDbSet;
+        private readonly ILogger _logger;
 
-        public BookRemindService(IUnitOfWork2 uow, IOrganizationService organizationService, IApplicationSettings appSettings, IUserService userService, IMailTemplate mailTemplate, IMailingService mailingService)
+        public BookRemindService(IUnitOfWork2 uow, IOrganizationService organizationService, IApplicationSettings appSettings, IUserService userService, IMailTemplate mailTemplate, IMailingService mailingService, ILogger logger)
         {
             _uow = uow;
             _userService = userService;
@@ -41,7 +42,7 @@ namespace Shrooms.Domain.Services.Books
             _mailTemplate = mailTemplate;
             _mailingService = mailingService;
             _booksDbSet = _uow.GetDbSet<BookLog>();
-            _bookOfficesDbSet = _uow.GetDbSet<BookOffice>();
+            _logger = logger;
         }
         public void RemindAboutBooks(int daysBefore)
         {
@@ -54,18 +55,25 @@ namespace Shrooms.Domain.Services.Books
 
             foreach (var bookToRemind in booksToRemind)
             {
-                var user = _userService.GetApplicationUser(bookToRemind.ApplicationUserId);
-                var organization = _organizationService.GetOrganizationById(bookToRemind.OrganizationId);
-                var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
-                var subject = string.Format("Book reminder: \"{0}\"", bookToRemind.Title);
-                var bookUrl = _appSettings.BookUrl(organization.Name, bookToRemind.BookOfficeId, bookToRemind.OfficeId);
-                var formattedDate = string.Format("{0:D}", bookToRemind.TakenFrom);
+                try
+                {
+                    var user = _userService.GetApplicationUser(bookToRemind.ApplicationUserId);
+                    var organization = _organizationService.GetOrganizationById(bookToRemind.OrganizationId);
+                    var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
+                    var subject = string.Format("Book reminder: \"{0}\"", bookToRemind.Title);
+                    var bookUrl = _appSettings.BookUrl(organization.Name, bookToRemind.BookOfficeId, bookToRemind.OfficeId);
+                    var formattedDate = string.Format("{0:D}", bookToRemind.TakenFrom);
 
-                var bookRemindTemplateViewModel = new BookReminderEmailTemplateViewModel(bookToRemind.Title, bookToRemind.Author, formattedDate, bookUrl, user.FullName, userNotificationSettingsUrl);
-                var content = _mailTemplate.Generate(bookRemindTemplateViewModel, EmailTemplateCacheKeys.BookRemind);
+                    var bookRemindTemplateViewModel = new BookReminderEmailTemplateViewModel(bookToRemind.Title, bookToRemind.Author, formattedDate, bookUrl, user.FullName, userNotificationSettingsUrl);
+                    var content = _mailTemplate.Generate(bookRemindTemplateViewModel, EmailTemplateCacheKeys.BookRemind);
 
-                var emailData = new EmailDto(user.Email, subject, content);
-                _mailingService.SendEmail(emailData);
+                    var emailData = new EmailDto(user.Email, subject, content);
+                    _mailingService.SendEmail(emailData);
+                }
+                catch(Exception e)
+                {
+                    _logger.Error(e);
+                }
 
             }
         }
