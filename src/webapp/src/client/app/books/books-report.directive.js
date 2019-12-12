@@ -35,18 +35,15 @@
     }
 
     booksReportController.$inject = [
-        '$scope',
         '$uibModalInstance',
         'notifySrv',
         'localeSrv',
-        'errorHandler',
-        '$window',
         'currentBook',
         '$translate',
         'bookRepository'
     ];
 
-    function booksReportController($scope, $uibModalInstance, notifySrv, localeSrv, errorHandler, $window, currentBook, $translate, bookRepository) {
+    function booksReportController($uibModalInstance, notifySrv, localeSrv, currentBook, $translate, bookRepository) {
         var vm = this;
         vm.book = currentBook;
 
