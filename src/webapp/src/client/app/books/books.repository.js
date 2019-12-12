@@ -22,6 +22,7 @@
             createBook: createBook,
             updateBook: updateBook,
             deleteBook: deleteBook,
+            reportBook: reportBook,
             getAllOffices: getAllOffices,
             findBookByIsbn: findBookByIsbn,
             getBookDetails: getBookDetails,
@@ -84,6 +85,14 @@
                     method: 'PUT'
                 }
             }).put().$promise;
+        }
+
+        function reportBook(bookReport) {
+            return $resource(bookUrl + 'Report', '', {
+                put: {
+                    method: 'PUT',
+                }
+            }).put(bookReport).$promise;
         }
 
         function takeBook(bookOfficeId) {

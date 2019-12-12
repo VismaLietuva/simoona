@@ -1,5 +1,5 @@
 ﻿@using Shrooms.Constants
-@model Shrooms.DataTransferObjects.EmailTemplateViewModels.BookReminderEmailTemplateViewModel
+@model Shrooms.DataTransferObjects.EmailTemplateViewModels.BookReportEmailTemplateViewModel
 @{
     Layout = EmailTemplateCacheKeys.HeaderFooterLayout;
 }
@@ -9,9 +9,9 @@
         <table align="center" border="0" cellpadding="0" cellspacing="0">
             <tbody>
                 <tr>
-                    <td align="center" style="text-align:center;padding-left: 10px;padding-right:10px;padding-top: 20px;padding-bottom: 5px;border-bottom: 2px solid #0974B3;width: 280px;">
+                    <td align="center" style="text-align:center;padding-left: 10px;padding-right:10px;padding-top: 20px;padding-bottom: 5px;border-bottom: 2px solid #0974B3;width: 380px;">
                         <font style="font-family: 'Segoe UI',Helvetica,Arial,sans-serif; text-align: center;font-size: 18px;color: #0974B3;">
-                            Hello, @Model.FullName
+                            New book report by @Model.FullName
                         </font>
                     </td>
                 </tr>
@@ -28,16 +28,16 @@
             <tbody>
                 <tr>
                     <td style="padding-top: 15px; max-width: 600px; padding-left:20px; padding-right:20px; font-family: 'Segoe UI',Helvetica,Arial,sans-serif;font-size: 15px;font-weight: 400; text-align: center;">
-                        <p style="color: #282828;padding-bottom: 15px;overflow-wrap: break-word; margin: 0 0 0 0;">Are you still reading this book?</p>
                         <p style="color: #282828;padding-bottom: 0;overflow-wrap: break-word; margin: 0 0 0 0;text-transform:uppercase;  font-weight: 600;">@Model.Title</p>
-                        <p style="color: #282828;padding-bottom: 0;overflow-wrap: break-word; margin: 0 0 0 0;font-style:italic;">by @Model.Author</p>
+                        <p style="color: #282828;padding-bottom: 5px;overflow-wrap: break-word; margin: 0 0 0 0;font-style:italic;">by @Model.Author</p>
+                        <p style="color: #282828;padding-bottom: 15px;overflow-wrap: break-word; margin: 0 0 0 0;">has been reported.</p>
+
                         <br />
-                        <p style="color: #282828;padding-bottom: 15px;overflow-wrap: break-word; margin: 0 0 0 0;">
-                            You took this book
-                            <span style="font-weight:600">
-                                @Model.TakenFrom
-                            </span>
-                        </p>
+                        <p style="color: #282828;padding-bottom: 10px;overflow-wrap: break-word; margin: 0 0 0 0;">Report reason: <span style="font-weight: 600;">@Model.Report</span></p>
+                        @if (!string.IsNullOrWhiteSpace(Model.Comment))
+                        {
+                            <p style="color: #282828;padding-bottom: 0;overflow-wrap: break-word; margin: 0 0 0 0;">Report comment: @Model.Comment</p>
+                        }
                     </td>
                 </tr>
                 <tr>
