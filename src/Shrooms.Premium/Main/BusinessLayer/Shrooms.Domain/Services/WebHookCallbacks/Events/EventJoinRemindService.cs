@@ -2,6 +2,7 @@
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.Domain.Services.Email.Event;
 using Shrooms.Domain.Services.Events.Utilities;
+using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.Users;
 using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Notifications;
 
@@ -13,22 +14,27 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.Events
         private readonly IEventUtilitiesService _eventUtilitiesService;
         private readonly IUserEventsService _userEventsService;
         private readonly IEventNotificationService _eventNotificationService;
+        private readonly IOrganizationService _organizationService;
 
         public EventJoinRemindService(
             INotificationService notificationService,
             IEventUtilitiesService eventUtilitiesService,
             IUserEventsService userEventsService,
-            IEventNotificationService eventNotificationService)
+            IEventNotificationService eventNotificationService,
+            IOrganizationService organizationService)
         {
             _notificationService = notificationService;
             _eventUtilitiesService = eventUtilitiesService;
             _userEventsService = userEventsService;
             _eventNotificationService = eventNotificationService;
+            _organizationService = organizationService;
         }
 
-        public void SendNotifications(UserAndOrganizationDTO userOrg)
+        public void SendNotifications(string orgName)
         {
-            var typesToNotifyAbout = _eventUtilitiesService.GetEventTypesToRemind(userOrg.OrganizationId);
+            var userOrg = _organizationService.GetOrganizationByName(orgName);
+
+            var typesToNotifyAbout = _eventUtilitiesService.GetEventTypesToRemind(userOrg.Id);
 
             foreach (var eventType in typesToNotifyAbout)
             {
@@ -43,12 +49,12 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.Events
 
                 if (usersToNotifyInApp.Any())
                 {
-                    _notificationService.CreateForEventJoinReminder(eventType, usersToNotifyInApp, userOrg);
+                    _notificationService.CreateForEventJoinReminder(eventType, usersToNotifyInApp, userOrg.Id);
                 }
 
                 if (usersToNotifyEmail.Any())
                 {
-                    _eventNotificationService.RemindUsersToJoinEvent(eventType, usersToNotifyEmail, userOrg.OrganizationId);
+                    _eventNotificationService.RemindUsersToJoinEvent(eventType, usersToNotifyEmail, userOrg.Id);
                 }
             }
         }

@@ -4,6 +4,6 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.Events
 {
     public interface IEventJoinRemindService
     {
-        void SendNotifications(UserAndOrganizationDTO userOrg);
+        void SendNotifications(string orgName);
     }
 }
