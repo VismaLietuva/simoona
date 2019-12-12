@@ -67,6 +67,7 @@
             bookRepository.reportBook(vm.report).then(function () {
                 var message = localeSrv.formatTranslation('books.successReported', {one: vm.book.title, two: vm.book.author});
                 notifySrv.success(message);
+                $uibModalInstance.close();
             }, function (response) {
                 notifySrv.error(response.data.message);
             });

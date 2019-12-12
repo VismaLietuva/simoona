@@ -30,11 +30,14 @@
                     <td style="padding-top: 15px; max-width: 600px; padding-left:20px; padding-right:20px; font-family: 'Segoe UI',Helvetica,Arial,sans-serif;font-size: 15px;font-weight: 400; text-align: center;">
                         <p style="color: #282828;padding-bottom: 0;overflow-wrap: break-word; margin: 0 0 0 0;text-transform:uppercase;  font-weight: 600;">@Model.Title</p>
                         <p style="color: #282828;padding-bottom: 5px;overflow-wrap: break-word; margin: 0 0 0 0;font-style:italic;">by @Model.Author</p>
-                        <p style="color: #282828;padding-bottom: 15px;overflow-wrap: break-word; margin: 0 0 0 0;">has been reported</p>
+                        <p style="color: #282828;padding-bottom: 15px;overflow-wrap: break-word; margin: 0 0 0 0;">has been reported.</p>
 
                         <br />
                         <p style="color: #282828;padding-bottom: 10px;overflow-wrap: break-word; margin: 0 0 0 0;">Report reason: <span style="font-weight: 600;">@Model.Report</span></p>
-                        <p style="color: #282828;padding-bottom: 0;overflow-wrap: break-word; margin: 0 0 0 0;">Report comment: @Model.Comment</p>
+                        @if (!string.IsNullOrWhiteSpace(Model.Comment))
+                        {
+                            <p style="color: #282828;padding-bottom: 0;overflow-wrap: break-word; margin: 0 0 0 0;">Report comment: @Model.Comment</p>
+                        }
                     </td>
                 </tr>
                 <tr>

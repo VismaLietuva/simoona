@@ -7,8 +7,7 @@
                     <span translate="books.books"></span>: {{:: vm.currentOffice.name}}
                 </span>
             </div>
-            <div class="container">
-                <div class="row">
+                <div class="row book-body">
                     <div ng-if="vm.book.coverUrl" class="col-xs-4 book-cover">
                         <img class="resize" src={{vm.book.coverUrl}}/>
                     </div>
@@ -158,7 +157,7 @@
                         </ng-form>
                         <br/>
                         <!-- Book taken log table -->
-                        <table class="nc-table nc-table-active book-log-list-table" 
+                        <table class="nc-table nc-table-active book-log-list-table"
                             ng-if="vm.book.bookLogs.length">
                             <thead>
                                 <tr>
@@ -217,57 +216,50 @@
                             </tbody>
                         </table>
                         <div class="clearfix"></div>
-
-
-                        <div class="clearfix"></div>
+                        <div>
+                                <!-- Buttons left -->
+                                <div class="pull-left book-button" 
+                                    ng-if="vm.isBookAdministrator">
+                                    <button ng-if="vm.state.edit"
+                                            class="btn btn-danger"
+                                            ace-confirmation-modal="vm.deleteBook(vm.book)"
+                                            data-test-id="book-delete-button">
+                                            <span translate="common.delete"></span>
+                                    </button>
+                                </div>
+                                <!-- Buttons right -->
+                                <div class="pull-right book-button">
+                                    <button class="btn btn-default"
+                                            ui-sref="Root.WithOrg.Client.Books.List"
+                                            data-test-id="book-cancel-button">
+                                            <span translate="common.cancel"></span>
+                                    </button>
+                                </div>
+                                <div class="pull-right book-button">
+                                    <button class="btn btn-warning" ng-if="vm.state.edit" ace-books-report-modal>
+                                            <span translate="books.report"></span>
+                                    </button>
+                                </div>
+                                <div class="pull-right book-button">
+                                    <button ng-if="vm.isBookAdministrator"
+                                            class="btn btn-primary"
+                                            ng-click="vm.saveBook(vm.book)"
+                                            ng-disabled="bookForm.$invalid"
+                                            data-test-id="book-save-button">
+                                            <span translate="common.save"></span>
+                                    </button>
+                                </div>
+                                <div class="pull-right book-button">
+                                    <button ng-if="vm.state.edit && vm.book.canBeTaken"
+                                            class="btn btn-primary"
+                                            has-permissions="['BOOK_BASIC']"
+                                            ng-click="vm.takeBook(vm.book)"
+                                            data-test-id="book-take-button">
+                                            <span translate="books.takeBook"></span>
+                                    </button>
+                                </div>
+                            </div>
                     </form>
-                </div>
-            </div>
-            <div class="row book-buttons">
-                    <div clas="col-xs-12">
-                    <!-- Buttons left -->
-                    <div class="pull-left book-button" 
-                        ng-if="vm.isBookAdministrator">
-                        <button ng-if="vm.state.edit"
-                                class="btn btn-danger"
-                                ace-confirmation-modal="vm.deleteBook(vm.book)"
-                                data-test-id="book-delete-button">
-                                <span translate="common.delete"></span>
-                        </button>
-                    </div>
-                    <!-- Buttons right -->
-                    <div class="pull-right book-button">
-                        <button class="btn btn-default"
-                                ui-sref="Root.WithOrg.Client.Books.List"
-                                data-test-id="book-cancel-button">
-                                <span translate="common.cancel"></span>
-                        </button>
-                    </div>
-                    <div class="pull-right book-button">
-                        <button class="btn btn-warning"
-                                ace-books-report-modal book="vm.book">
-                                <span translate="books.report"></span>
-                        </button>
-                    </div>
-                    <div class="pull-right book-button">
-                        <button ng-if="vm.isBookAdministrator"
-                                class="btn btn-primary"
-                                ng-click="vm.saveBook(vm.book)"
-                                ng-disabled="bookForm.$invalid"
-                                data-test-id="book-save-button">
-                                <span translate="common.save"></span>
-                        </button>
-                    </div>
-                    <div class="pull-right book-button">
-                        <button ng-if="vm.state.edit && vm.book.canBeTaken"
-                                class="btn btn-primary"
-                                has-permissions="['BOOK_BASIC']"
-                                ng-click="vm.takeBook(vm.book)"
-                                data-test-id="book-take-button">
-                                <span translate="books.takeBook"></span>
-                        </button>
-                    </div>
-                </div>
                 </div>
             </div>
         </div>
