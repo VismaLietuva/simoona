@@ -263,7 +263,7 @@ namespace Shrooms.Domain.Services.Books
             var content = _mailTemplate.Generate(bookReportTemplateViewModel, EmailTemplateCacheKeys.BookReport);
             var emailData = new EmailDto(receivers, subject, content);
 
-              _mailingService.SendEmail(emailData);
+            _mailingService.SendEmail(emailData);
 
         }
 
