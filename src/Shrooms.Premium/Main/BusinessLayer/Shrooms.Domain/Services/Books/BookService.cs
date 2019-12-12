@@ -257,11 +257,11 @@ namespace Shrooms.Domain.Services.Books
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
             var bookUrl = _appSettings.BookUrl(organization.Name, bookReport.BookOfficeId, reportedOfficeBook.OfficeId);
             var subject = $"Reported book: {reportedOfficeBook.Book.Title}";
-             var bookReportTemplateViewModel = new BookReportEmailTemplateViewModel(reportedOfficeBook.Book.Title, reportedOfficeBook.Book.Author,
+            var bookReportTemplateViewModel = new BookReportEmailTemplateViewModel(reportedOfficeBook.Book.Title, reportedOfficeBook.Book.Author,
                  bookReport.Report, bookReport.Comment, bookUrl, user.FullName, userNotificationSettingsUrl);
 
             var content = _mailTemplate.Generate(bookReportTemplateViewModel, EmailTemplateCacheKeys.BookReport);
-               var emailData = new EmailDto(receivers, subject, content);
+            var emailData = new EmailDto(receivers, subject, content);
 
               _mailingService.SendEmail(emailData);
 
