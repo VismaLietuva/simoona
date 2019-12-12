@@ -17,5 +17,19 @@
     function eventParticipantListController() {
         /* jshint validthis: true */
         var vm = this;
+        vm.isExpanded = true;
+        
+        vm.expandCollapseText = 'events.expand';
+        vm.toggleExpandCollapse = toggleExpandCollapse;
+
+        function toggleExpandCollapse() {
+            if(vm.isExpanded) {
+                vm.expandCollapseText = 'events.collapse';
+            }
+            else {
+                vm.expandCollapseText = 'events.expand';
+            }
+            vm.isExpanded = !vm.isExpanded;
+        }
     }
 })();

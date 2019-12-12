@@ -36,6 +36,8 @@
   "eventYes": "Yes",
   "firstName": "First name",
   "lastName": "Last name",
+  "expand": "Expand",
+  "collapse": "Collapse",
   "oneTimeEvents": "Onetime events",
   "recuringEvents": "Recurring events",
   "responsiblePerson": "Responsible person",
