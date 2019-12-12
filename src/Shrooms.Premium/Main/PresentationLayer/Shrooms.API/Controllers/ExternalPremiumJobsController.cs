@@ -57,7 +57,8 @@ namespace Shrooms.Premium.Main.PresentationLayer.Shrooms.API.Controllers
         [Route("RemindEvents")]
         public void RemindEvents()
         {
-            _webHookService.EventJoinRemindService.SendNotifications(GetUserAndOrganization());
+            var organizationName = GetOrganizationName();
+            _webHookService.EventJoinRemindService.SendNotifications(organizationName);
         }
     }
 }
