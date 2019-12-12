@@ -12,10 +12,16 @@ using Shrooms.DataTransferObjects.Models.Books.BookDetails;
 using Shrooms.DataTransferObjects.Models.Books.BooksByOffice;
 using Shrooms.Domain.Services.Books;
 using Shrooms.Domain.Services.Email.Book;
+using Shrooms.Domain.Services.Organizations;
+using Shrooms.Domain.Services.Roles;
+using Shrooms.Domain.Services.UserService;
 using Shrooms.DomainExceptions.Exceptions.Book;
 using Shrooms.DomainServiceValidators.Validators.Books;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Books;
+using Shrooms.Infrastructure.Configuration;
+using Shrooms.Infrastructure.Email;
+using Shrooms.Infrastructure.Email.Templating;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Infrastructure.GoogleBookApiService;
 using Shrooms.Infrastructure.GoogleBookService;
@@ -27,6 +33,12 @@ namespace Shrooms.UnitTests.DomainService
     public class BookServiceTests
     {
         private IBookService _bookService;
+        private IApplicationSettings _appSettings;
+        private IRoleService _roleService;
+        private IUserService _userService;
+        private IMailingService _mailingService;
+        private IMailTemplate _mailTemplate;
+        private IOrganizationService _organizationService;
         private IBookInfoService _bookInfoService;
         private IDbSet<BookOffice> _bookOfficesDbSet;
         private IDbSet<BookLog> _bookLogsDbSet;
@@ -55,11 +67,17 @@ namespace Shrooms.UnitTests.DomainService
             _userDbSet = Substitute.For<IDbSet<ApplicationUser>>();
             uow.GetDbSet<ApplicationUser>().Returns(_userDbSet);
 
+            _appSettings = Substitute.For<IApplicationSettings>();
             _validationService = Substitute.For<IBookMobileServiceValidator>();
             _bookInfoService = Substitute.For<IBookInfoService>();
+            _roleService = Substitute.For<IRoleService>();
+            _userService = Substitute.For<IUserService>();
+            _mailingService = Substitute.For<IMailingService>();
+            _mailTemplate = Substitute.For<IMailTemplate>();
+            _organizationService = Substitute.For<IOrganizationService>();
             _bookServiceValidator = new BookServiceValidator();
             var asyncRunner = Substitute.For<IAsyncRunner>();
-            _bookService = new BookService(uow, _bookInfoService, _bookServiceValidator, _validationService, asyncRunner);
+            _bookService = new BookService(uow, _appSettings, _roleService, _userService, _mailingService, _mailTemplate, _organizationService, _bookInfoService, _bookServiceValidator, _validationService, asyncRunner);
         }
 
         [Test]

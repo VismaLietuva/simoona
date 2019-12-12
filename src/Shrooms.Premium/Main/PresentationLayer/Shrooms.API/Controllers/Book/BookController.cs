@@ -14,6 +14,7 @@ using Shrooms.DataTransferObjects.Models.LazyPaged;
 using Shrooms.Domain.Services.Books;
 using Shrooms.DomainExceptions.Exceptions.Book;
 using Shrooms.Infrastructure.FireAndForget;
+using Shrooms.WebViewModels.Models.Book;
 using Shrooms.WebViewModels.Models.Book.BookDetails;
 using Shrooms.WebViewModels.Models.Book.BooksByOffice;
 
@@ -171,6 +172,29 @@ namespace Shrooms.API.Controllers.Book
             try
             {
                 _bookService.ReturnBook(bookOfficeId, userAndOrg);
+                return Ok();
+            }
+            catch (BookException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPut]
+        [Route("Report")]
+        [PermissionAuthorize(Permission = BasicPermissions.Book)]
+        public IHttpActionResult ReportMissingBook(BookReportViewModel bookReport)
+        {
+            if (bookReport.BookOfficeId < 1)
+            {
+                return BadRequest();
+            }
+
+            var userAndOrg = GetUserAndOrganization();
+            try
+            {
+                var bookReportDto = _mapper.Map<BookReportViewModel, BookReportDTO>(bookReport);
+                _bookService.ReportBook(bookReportDto, userAndOrg);
                 return Ok();
             }
             catch (BookException e)

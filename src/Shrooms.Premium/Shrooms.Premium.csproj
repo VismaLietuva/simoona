@@ -314,6 +314,7 @@
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BookMobileReturnDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BookMobileTakeSpecificDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BookRemindDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BookReportDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BooksByOffice\BasicBookUserDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BooksByOffice\BooksByOfficeDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Books\BooksByOffice\BooksByOfficeOptionsDTO.cs" />
@@ -475,6 +476,7 @@
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Book\BookDetails\NewBookQuantityViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Book\BookDetails\NewBookViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Book\BookDetails\RetrievedBookInfoViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Book\BookReportViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Book\BooksByOffice\BasicBookUserViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Book\BooksByOffice\BooksByOfficeViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Book\OfficeBookViewModel.cs" />
