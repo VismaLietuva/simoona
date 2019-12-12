@@ -61,20 +61,22 @@ namespace Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Notificatio
             return _mapper.Map<NotificationDto>(newNotification);
         }
 
-        public void CreateForEventJoinReminder(EventTypeDTO eventType, IEnumerable<string> usersToNotify, UserAndOrganizationDTO userOrg)
+        public void CreateForEventJoinReminder(EventTypeDTO eventType, IEnumerable<string> usersToNotify, int orgId)
         {
             var newNotification = new Notification
             {
                 Title = $"{eventType.Name} event type reminder",
                 Description = $"{eventType.Name}",
                 Type = NotificationType.EventReminder,
-                OrganizationId = userOrg.OrganizationId,
+                OrganizationId = orgId,
                 Sources = new Sources(),
-                NotificationUsers = MapNotificationUsersFromIds(usersToNotify)
+                NotificationUsers = MapNotificationUsersFromIds(usersToNotify),
+                Created = DateTime.UtcNow,
+                Modified = DateTime.UtcNow
             };
 
             _notificationDbSet.Add(newNotification);
-            _uow.SaveChanges(userOrg.UserId);
+            _uow.SaveChanges(false);
         }
 
         private static IList<NotificationUser> MapNotificationUsersFromIds(IEnumerable<string> userIds)
