@@ -37,6 +37,8 @@
   "eventYes": "Taip",
   "firstName": "Vardas",
   "lastName": "Pavardė",
+  "expand": "Išskleisti",
+  "collapse": "Suskleisti",
   "oneTimeEvents": "Vienkartiniai renginiai",
   "recuringEvents": "Pasikartojantys renginiai",
   "responsiblePerson": "Atsakingas asmuo",
