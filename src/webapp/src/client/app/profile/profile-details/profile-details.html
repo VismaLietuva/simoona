@@ -124,7 +124,9 @@
                     <div class="col-xs-12 col-md-8 nopadding">
                         <ul class="panel-form-body profile-details-list" data-test-id="profileProjects">
                             <li ng-repeat="project in model.projects | limitTo: projectsLength">
-                                {{ project.name }}
+                                <a ui-sref="Root.WithOrg.Client.Projects.ProjectContent({ id: project.id })">
+                                    {{ project.name }}
+                                </a>
                             </li>
                         </ul>
                         <show-more-btn show-array="model.projects"
