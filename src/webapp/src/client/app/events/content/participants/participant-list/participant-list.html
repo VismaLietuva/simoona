@@ -19,10 +19,11 @@
     <div class="hidden-lg hidden-md">
         <ul ng-if="!!vm.participants.length" class="event-participant-list">
             <button class="btn btn-info event-participant-list-expand-collapse-button" ng-click="vm.toggleExpandCollapse()"
-                type="button" ng-model="vm.isExpanded">{{vm.expandCollapseText | translate}}
-                <span class="vismaicon" ng-class="{'collapse-icon':!vm.isExpanded, 'expand-icon':vm.isExpanded}"></span>
+                type="button" ng-model="vm.isExpanded">
+                <span class="expand-collapse-text">{{vm.expandCollapseText | translate}}</span>
+                <span class="vismaicon" ng-class="{'collapse-icon':vm.isExpanded, 'expand-icon':!vm.isExpanded}"></span>
             </button>
-            <li ng-repeat="participant in vm.participants" ng-show="!vm.isExpanded">
+            <li ng-repeat="participant in vm.participants" ng-show="vm.isExpanded">
                 <ace-event-participant participant="participant">
                     <wave-spinner class="event-participant-spinner" ng-if="participant.isLoading"></wave-spinner>
     
