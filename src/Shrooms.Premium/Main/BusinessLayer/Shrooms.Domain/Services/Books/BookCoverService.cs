@@ -6,6 +6,8 @@ using Shrooms.EntityModels.Models;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Infrastructure.GoogleBookService;
 using Shrooms.Infrastructure.Books;
+using System;
+using Shrooms.Infrastructure.Logger;
 
 namespace Shrooms.Domain.Services.Books
 {
@@ -14,12 +16,14 @@ namespace Shrooms.Domain.Services.Books
         private readonly IDbSet<Book> _booksDbSet;
         private readonly IUnitOfWork2 _uow;
         private readonly IBookInfoService _bookService;
+        private readonly ILogger _logger;
 
-        public BookCoverService(IUnitOfWork2 uow, IBookInfoService bookService)
+        public BookCoverService(IUnitOfWork2 uow, IBookInfoService bookService, ILogger logger)
         {
             _uow = uow;
             _bookService = bookService;
             _booksDbSet = _uow.GetDbSet<Book>();
+            _logger = logger;
         }
 
 
@@ -29,15 +33,27 @@ namespace Shrooms.Domain.Services.Books
 
             foreach (var book in booksWithoutCover)
             {
-               var bookInfo = _bookService.FindBookByIsbnAsync(book.Code).Result;
+                try
+                {
+                    var bookInfo = _bookService.FindBookByIsbnAsync(book.Code).Result;
 
-               if (bookInfo?.CoverImageUrl != null)
-               {
-                    book.BookCoverUrl = bookInfo.CoverImageUrl;
-               }
+                    if (bookInfo != null)
+                    {
+                        if (bookInfo.CoverImageUrl != null)
+                        {
+                            book.BookCoverUrl = bookInfo.CoverImageUrl;
+                        }
+
+                        _uow.SaveChanges();
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex);
+                }
+
             }
-
-            _uow.SaveChanges();
         }
     }
 }
