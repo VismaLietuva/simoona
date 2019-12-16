@@ -336,10 +336,7 @@ namespace Shrooms.Domain.Services.Kudos
 
         public IEnumerable<KudosTypeDTO> GetKudosTypes(UserAndOrganizationDTO userAndOrg)
         {
-            var hasKudosAdminPermission = HasKudosAdministratorPermission(userAndOrg);
-
             var kudosTypesDTO = _kudosTypesDbSet
-                .Where(GetKudosTypeQuery(hasKudosAdminPermission))
                 .Select(MapKudosTypesToDTO)
                 .ToList();
 
@@ -507,7 +504,7 @@ namespace Shrooms.Domain.Services.Kudos
             {
                 return false;
             }
-            else if (kudosType.IsActive)
+            else if (kudosType.IsActive || kudosType.Type == KudosTypeEnum.Send)
             {
                 return true;
             }
@@ -717,16 +714,6 @@ namespace Shrooms.Domain.Services.Kudos
                               kudosType.Type == KudosTypeEnum.Other,
                 IsActive = kudosType.IsActive
             };
-        }
-
-        private Expression<Func<KudosType, bool>> GetKudosTypeQuery(bool hasKudosAdminPermission)
-        {
-            if (hasKudosAdminPermission)
-            {
-                return x => true;
-            }
-
-            return type => type.Type != KudosTypeEnum.Minus;
         }
 
         private Expression<Func<KudosLog, ApplicationUser, WallKudosLogDTO>> MapKudosLogToWallKudosLogDTO()

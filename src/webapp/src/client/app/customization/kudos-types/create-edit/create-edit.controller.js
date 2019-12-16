@@ -1,14 +1,11 @@
 (function() {
 
     angular.module('simoonaApp.Customization.KudosTypes')
-        .constant('kudosTypesSettings', {
-            nonDeletableTypes: [2, 3, 4, 5, 6]
-        })
         .controller('createEditKudosTypesController', createEditKudosTypesController);
 
-    createEditKudosTypesController.$inject = ['$rootScope', '$stateParams', '$state', 'kudosTypesRepository', 'errorHandler', 'kudosTypesSettings'];
+    createEditKudosTypesController.$inject = ['$rootScope', '$stateParams', '$state', 'kudosTypesRepository', 'errorHandler', 'definedKudosTypes'];
 
-    function createEditKudosTypesController($rootScope, $stateParams, $state, kudosTypesRepository, errorHandler, kudosTypesSettings) {
+    function createEditKudosTypesController($rootScope, $stateParams, $state, kudosTypesRepository, errorHandler, definedKudosTypes) {
         var vm = this;
         var listState = 'Root.WithOrg.Admin.Customization.KudosTypes.List';
 
@@ -45,7 +42,9 @@
                         vm.kudosType.multiplier = parseInt(type.value);
                         vm.kudosType.description = type.description;
                         vm.kudosType.isActive = type.isActive;
-                        vm.editable = !kudosTypesSettings.nonDeletableTypes.includes(type.type);
+                        
+                        vm.isEditable = type.type === definedKudosTypes.ordinary ? true : false;
+                        vm.isVisibilityToggleable = type.type !== definedKudosTypes.send ? true : false;
                         vm.isLoading = false;
                     }, function (error) {
                     errorHandler.handleErrorMessage(error);

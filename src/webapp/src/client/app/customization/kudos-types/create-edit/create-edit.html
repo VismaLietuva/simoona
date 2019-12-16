@@ -17,7 +17,7 @@
                         <div class="col-xs-12 col-sm-4">
                             <input id="kudosTypeName" type="text" class="form-control" name="name"
                                 ng-model="vm.kudosType.name" ng-maxlength="30" data-test-id="kudos-type-form-name-input"
-                                ng-disabled="!vm.editable" required />
+                                ng-disabled="!vm.isEditable" required />
                             <p class="text-danger help-block"
                                 ng-if="kudosTypeForm.name.$error.required && kudosTypeForm.name.$dirty"
                                 translate="common.messageFieldIsRequired"></p>
@@ -37,7 +37,7 @@
                             <input id="kudosTypeMultiplier" type="number" class="form-control" name="multiplier"
                                 ng-model="vm.kudosType.multiplier" min="0" ng-pattern="/^([0-9]|10){1,10}$/"
                                 ng-maxlength="10" translate translate-attr-placeholder="common.onlyWholeNumbers"
-                                data-test-id="kudos-type-form-multiplier-input" ng-disabled="!vm.editable" required />
+                                data-test-id="kudos-type-form-multiplier-input" ng-disabled="!vm.isEditable" required />
 
                             <p class="text-danger help-block"
                                 ng-show="kudosTypeForm.multiplier.$invalid && kudosTypeForm.multiplier.$dirty || kudosTypeForm.multiplier.$error.pattern">
@@ -62,7 +62,7 @@
                         <div class="col-xs-12 col-sm-4">
                             <textarea class="form-control" id="kudosTypeDescription" name="description" rows="5"
                                 ng-model="vm.kudosType.description" ng-maxlength="300"
-                                data-test-id="kudos-type-form-description" ng-disabled="!vm.editable">
+                                data-test-id="kudos-type-form-description" ng-disabled="!vm.isEditable">
                             </textarea>
                             <p class="text-danger help-block"
                                 ng-show="kudosTypeForm.description.$error.maxlength && kudosTypeForm.description.$dirty"
@@ -70,7 +70,7 @@
                         </div>
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group" ng-if="vm.isVisibilityToggleable">
                         <label for="isActiveSwitch" class="control-label col-xs-12 col-sm-4" translate="kudos.visible">
                         </label>
                         <div class="col-xs-12 col-sm-4">
@@ -107,7 +107,7 @@
                     <div class="pull-left">
 
                         <div class="pull-left">
-                            <button ng-if="vm.states.isEdit && vm.editable" class="btn btn-danger"
+                            <button ng-if="vm.states.isEdit && vm.isEditable" class="btn btn-danger"
                                 ace-confirmation-modal="vm.removeKudosType()" data-test-id="kudos-type-disable-button">
                                 <span translate="common.delete"></span>
                             </button>
