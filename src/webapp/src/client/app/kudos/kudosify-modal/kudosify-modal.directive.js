@@ -4,16 +4,7 @@
     angular
         .module('simoonaApp.Kudos')
         .constant('kudosifySettings', {
-            maxMinus: 99999,
-            hiddeKudosTypes: [3, 5]
-        })
-        .constant('definedKudosTypes', {
-            ordinary: 1,
-            send: 2,
-            minus: 3,
-            other: 4,
-            welcome: 5,
-            refund: 6
+            maxMinus: 99999
         })
         .directive('aceKudosifyModal', kudosifyModal);
 
@@ -105,8 +96,6 @@
         vm.isSendModal = isSendModal;
 
         vm.isVisibleKudosType = isVisibleKudosType;
-
-        vm.hiddenKudosTypes = kudosifySettings.hiddeKudosTypes;
 
         init();
 
