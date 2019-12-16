@@ -507,7 +507,7 @@ namespace Shrooms.Domain.Services.Kudos
             {
                 return false;
             }
-            else if (kudosType.IsActive)
+            else if (kudosType.IsActive || kudosType.Type == KudosTypeEnum.Send)
             {
                 return true;
             }
