@@ -8,7 +8,7 @@
                 </span>
             </div>
                 <div class="row book-body">
-                    <div ng-if="vm.book.coverUrl" class="col-xs-4 book-cover">
+                    <div ng-if="vm.book.coverUrl" class="hidden-xs col-xs-4 book-cover">
                         <img class="resize" src={{vm.book.coverUrl}}/>
                     </div>
                     <div ng-class="{'col-xs-12 panel-body': !vm.book.coverUrl, 'col-xs-8 panel-body float-left': vm.book.coverUrl}">
@@ -156,112 +156,118 @@
                             </div>
                         </ng-form>
                         <br/>
-                        <!-- Book taken log table -->
-                        <table class="nc-table nc-table-active book-log-list-table"
-                            ng-if="vm.book.bookLogs.length">
-                            <thead>
-                                <tr>
-                                    <th class="book-log-list-table-small-column" 
-                                        translate="books.whoHasIt"></th>
-                                    <th class="book-log-list-table-small-column" 
-                                        translate="books.whenTookIt"></th>
-                                    <th class="book-log-list-table-small-column" 
-                                        translate="books.whenPlansToReturn"></th>
-                                    <th class="text-right book-log-list-table-small-column" 
-                                        ng-if="vm.isActionColumn || vm.isBookAdministrator" 
-                                        translate="books.actions"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr ng-repeat="book in vm.book.bookLogs">
-                                    <td th="{{ 'books.whoHasIt' | translate }}" 
-                                        class="book-log-list-table-small-column"                                 
-                                        ng-class="{'col-sm-5': vm.isActionColumn, 'col-sm-6': !vm.isActionColumn}" 
-                                        data-test-id="reader-full-name" 
-                                        ng-cloak>
-                                        {{book.fullName}}
-                                    </td>
-                                    <td th="{{ 'books.whenTookIt' | translate }}" 
-                                        class="col-sm-3 book-log-list-table-small-column" 
-                                        data-test-id="taken-date" 
-                                        ng-cloak>
-                                        {{book.takenFrom | date : 'yyyy-MM-dd' }}
-                                    </td>
-                                    <td th="{{ 'books.whenPlansToReturn' | translate }}" 
-                                        class="col-sm-3 book-log-list-table-small-column" 
-                                        data-test-id="return-date" 
-                                        ng-cloak>
-                                        <span ng-if="book.returned">
-                                            {{book.returned | date : 'yyyy-MM-dd' }}
-                                        </span>
-                                    </td>
-                                    <td class="col-sm-1 book-actions-nowrap hidden-xs" 
-                                        ng-if="vm.isActionColumn || vm.isBookAdministrator">
-                                        <a class="btn btn-default margin-right"
-                                        ng-if="(book.userId === vm.identity.userId || vm.isBookAdministrator) && !book.returned"
-                                        ng-click="(vm.isBookAdministrator) ? vm.returnBookAdmin(vm.book, book.userId) : vm.returnBook(vm.book)"
-                                        data-test-id="book-return-button" 
-                                        translate="books.returnBook"></a>
-                                    </td>
-                                    <td class="book-actions-nowrap no-responsive-title book-actions-container hidden-sm hidden-md hidden-lg" 
-                                        ng-if="(vm.isActionColumn || vm.isBookAdministrator) && !book.returned ">
-
-                                        <a class="btn btn-default"
-                                        ng-if="(book.userId === vm.identity.userId || vm.isBookAdministrator) && !book.returned"
-                                        ng-click="(vm.isBookAdministrator) ? vm.returnBookAdmin(vm.book, book.userId) : vm.returnBook(vm.book)"
-                                        data-test-id="book-return-button" 
-                                        translate="books.returnBook"></a>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div class="clearfix"></div>
-                        <div>
-                                <!-- Buttons left -->
-                                <div class="pull-left book-button" 
-                                    ng-if="vm.isBookAdministrator">
-                                    <button ng-if="vm.state.edit"
-                                            class="btn btn-danger"
-                                            ace-confirmation-modal="vm.deleteBook(vm.book)"
-                                            data-test-id="book-delete-button">
-                                            <span translate="common.delete"></span>
-                                    </button>
-                                </div>
-                                <!-- Buttons right -->
-                                <div class="pull-right book-button">
-                                    <button class="btn btn-default"
-                                            ui-sref="Root.WithOrg.Client.Books.List"
-                                            data-test-id="book-cancel-button">
-                                            <span translate="common.cancel"></span>
-                                    </button>
-                                </div>
-                                <div class="pull-right book-button">
-                                    <button class="btn btn-warning" ng-if="vm.state.edit" ace-books-report-modal>
-                                            <span translate="books.report"></span>
-                                    </button>
-                                </div>
-                                <div class="pull-right book-button">
-                                    <button ng-if="vm.isBookAdministrator"
-                                            class="btn btn-primary"
-                                            ng-click="vm.saveBook(vm.book)"
-                                            ng-disabled="bookForm.$invalid"
-                                            data-test-id="book-save-button">
-                                            <span translate="common.save"></span>
-                                    </button>
-                                </div>
-                                <div class="pull-right book-button">
-                                    <button ng-if="vm.state.edit && vm.book.canBeTaken"
-                                            class="btn btn-primary"
-                                            has-permissions="['BOOK_BASIC']"
-                                            ng-click="vm.takeBook(vm.book)"
-                                            data-test-id="book-take-button">
-                                            <span translate="books.takeBook"></span>
-                                    </button>
-                                </div>
-                            </div>
                     </form>
                 </div>
             </div>
+            <div class="row books-taken">
+                <div class="col-xs-12">
+                    <!-- Book taken log table -->
+                    <table class="nc-table nc-table-active book-log-list-table"
+                    ng-if="vm.book.bookLogs.length">
+                    <thead>
+                        <tr>
+                            <th class="book-log-list-table-small-column" 
+                                translate="books.whoHasIt"></th>
+                            <th class="book-log-list-table-small-column" 
+                                translate="books.whenTookIt"></th>
+                            <th class="book-log-list-table-small-column" 
+                                translate="books.whenPlansToReturn"></th>
+                            <th class="text-right book-log-list-table-small-column" 
+                                ng-if="vm.isActionColumn || vm.isBookAdministrator" 
+                                translate="books.actions"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="book in vm.book.bookLogs">
+                            <td th="{{ 'books.whoHasIt' | translate }}" 
+                                class="book-log-list-table-small-column"                                 
+                                ng-class="{'col-sm-5': vm.isActionColumn, 'col-sm-6': !vm.isActionColumn}" 
+                                data-test-id="reader-full-name" 
+                                ng-cloak>
+                                {{book.fullName}}
+                            </td>
+                            <td th="{{ 'books.whenTookIt' | translate }}" 
+                                class="col-sm-3 book-log-list-table-small-column" 
+                                data-test-id="taken-date" 
+                                ng-cloak>
+                                {{book.takenFrom | date : 'yyyy-MM-dd' }}
+                            </td>
+                            <td th="{{ 'books.whenPlansToReturn' | translate }}" 
+                                class="col-sm-3 book-log-list-table-small-column" 
+                                data-test-id="return-date" 
+                                ng-cloak>
+                                <span ng-if="book.returned">
+                                    {{book.returned | date : 'yyyy-MM-dd' }}
+                                </span>
+                            </td>
+                            <td class="col-sm-1 book-actions-nowrap hidden-xs" 
+                                ng-if="vm.isActionColumn || vm.isBookAdministrator">
+                                <a class="btn btn-default margin-right"
+                                ng-if="(book.userId === vm.identity.userId || vm.isBookAdministrator) && !book.returned"
+                                ng-click="(vm.isBookAdministrator) ? vm.returnBookAdmin(vm.book, book.userId) : vm.returnBook(vm.book)"
+                                data-test-id="book-return-button" 
+                                translate="books.returnBook"></a>
+                            </td>
+                            <td class="book-actions-nowrap no-responsive-title book-actions-container hidden-sm hidden-md hidden-lg" 
+                                ng-if="(vm.isActionColumn || vm.isBookAdministrator) && !book.returned ">
+                
+                                <a class="btn btn-default"
+                                ng-if="(book.userId === vm.identity.userId || vm.isBookAdministrator) && !book.returned"
+                                ng-click="(vm.isBookAdministrator) ? vm.returnBookAdmin(vm.book, book.userId) : vm.returnBook(vm.book)"
+                                data-test-id="book-return-button" 
+                                translate="books.returnBook"></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="row book-buttons">
+            <div class="col-xs-12">
+                <!-- Buttons left -->
+                <div class="pull-left book-button" 
+                    ng-if="vm.isBookAdministrator">
+                    <button ng-if="vm.state.edit"
+                            class="btn btn-danger"
+                            ace-confirmation-modal="vm.deleteBook(vm.book)"
+                            data-test-id="book-delete-button">
+                            <span translate="common.delete"></span>
+                    </button>
+                </div>
+                <!-- Buttons right -->
+                <div class="pull-right book-button">
+                    <button class="btn btn-default"
+                            ui-sref="Root.WithOrg.Client.Books.List"
+                            data-test-id="book-cancel-button">
+                            <span translate="common.cancel"></span>
+                    </button>
+                </div>
+                <div class="pull-right book-button">
+                    <button class="btn btn-warning" ng-if="vm.state.edit" ace-books-report-modal>
+                            <span translate="books.report"></span>
+                    </button>
+                </div>
+                <div class="pull-right book-button">
+                    <button ng-if="vm.isBookAdministrator"
+                            class="btn btn-primary"
+                            ng-click="vm.saveBook(vm.book)"
+                            ng-disabled="bookForm.$invalid"
+                            data-test-id="book-save-button">
+                            <span translate="common.save"></span>
+                    </button>
+                </div>
+                <div class="pull-right book-button">
+                    <button ng-if="vm.state.edit && vm.book.canBeTaken"
+                            class="btn btn-primary"
+                            has-permissions="['BOOK_BASIC']"
+                            ng-click="vm.takeBook(vm.book)"
+                            data-test-id="book-take-button">
+                            <span translate="books.takeBook"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
         </div>
     </div>
 </div>
