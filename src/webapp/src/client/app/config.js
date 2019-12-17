@@ -74,6 +74,14 @@
             height: 35,
             mode: 'crop'
         })
+        .constant('definedKudosTypes', {
+            ordinary: 1,
+            send: 2,
+            minus: 3,
+            other: 4,
+            welcome: 5,
+            refund: 6
+        })
         .config(localesTranslations)
         .config(dynamicLocale);
 

@@ -226,7 +226,7 @@ namespace Shrooms.API.Tests.DomainService
             };
 
             var types = _kudosService.GetKudosTypes(userAndOrg);
-            Assert.AreEqual(4, types.Count());
+            Assert.AreEqual(5, types.Count());
         }
 
         [Test]
