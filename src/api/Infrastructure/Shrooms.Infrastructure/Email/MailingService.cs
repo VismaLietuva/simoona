@@ -108,6 +108,11 @@ namespace Shrooms.Infrastructure.Email
                 mailMessage.To.Add(receiver);
             }
 
+            if (email.Attachment != null)
+            {
+                mailMessage.Attachments.Add(email.Attachment);
+            }
+
             mailMessage.Subject = email.Subject;
             mailMessage.Body = email.Body;
             mailMessage.IsBodyHtml = true;
