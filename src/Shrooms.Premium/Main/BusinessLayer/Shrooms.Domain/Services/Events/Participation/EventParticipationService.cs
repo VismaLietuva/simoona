@@ -110,6 +110,7 @@ namespace Shrooms.Domain.Services.Events.Participation
                     .Include(x => x.EventParticipants)
                     .Include(x => x.EventOptions)
                     .Include(x => x.EventType)
+                    .Include(x => x.ResponsibleUser)
                     .Where(x => x.Id == joinDto.EventId
                         && x.OrganizationId == joinDto.OrganizationId)
                     .Select(MapEventToJoinValidationDto())
@@ -145,7 +146,12 @@ namespace Shrooms.Domain.Services.Events.Participation
 
                 _uow.SaveChanges(false);
                 var choices = eventOptions.Select(x => x.Option);
-                _calendarService.AddParticipants(@event.Id, joinDto.OrganizationId, joinDto.ParticipantIds, choices);
+
+                _calendarService.SendInvitation(@event, joinDto.ParticipantIds);
+
+             // _calendarService.AddParticipants(@event.Id, joinDto.OrganizationId, joinDto.ParticipantIds, choices);
+             //  Commented due to Google Api Calendar 403 error "quotaExceeded: Calendar usage limits exceeded"
+             //  https://issuetracker.google.com/issues/141704931
             }
         }
 
@@ -249,7 +255,9 @@ namespace Shrooms.Domain.Services.Events.Participation
 
             RemoveParticipant(userOrg.UserId, participant);
 
-            _calendarService.RemoveParticipants(eventId, userOrg.OrganizationId, new List<string> { userOrg.UserId });
+         // _calendarService.RemoveParticipants(eventId, userOrg.OrganizationId, new List<string> { userOrg.UserId });
+         // Commented due to Google Api Calendar 403 error "quotaExceeded: Calendar usage limits exceeded"
+         // https://issuetracker.google.com/issues/141704931
         }
 
         public IEnumerable<EventParticipantDTO> GetEventParticipants(Guid eventId, UserAndOrganizationDTO userAndOrg)
@@ -340,6 +348,9 @@ namespace Shrooms.Domain.Services.Events.Participation
                 EventTypeId = e.EventTypeId,
                 Name = e.Name,
                 EndDate = e.EndDate,
+                Description = e.Description,
+                ReponsiblePersonEmail = e.ResponsibleUser.Email,
+                Location = e.Place,
                 RegistrationDeadline = e.RegistrationDeadline,
                 ResponsibleUserId = e.ResponsibleUserId,
                 WallId = e.WallId

@@ -1,4 +1,5 @@
-﻿using Shrooms.EntityModels.Models.Events;
+﻿using Shrooms.DataTransferObjects.Models.Events;
+using Shrooms.EntityModels.Models.Events;
 using System;
 using System.Collections.Generic;
 
@@ -17,5 +18,7 @@ namespace Shrooms.Domain.Services.Events.Calendar
         void RemoveParticipants(Guid eventId, int orgId, IEnumerable<string> userIds);
 
         void AddParticipants(Guid eventId, int orgId, IEnumerable<string> userIds, IEnumerable<string> choices);
+
+        void SendInvitation(EventJoinValidationDTO @event, IEnumerable<string> userIds);
     }
 }

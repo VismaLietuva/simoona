@@ -1,13 +1,24 @@
-﻿using Shrooms.DataLayer.DAL;
+﻿using Ical.Net;
+using Ical.Net.CalendarComponents;
+using Ical.Net.DataTypes;
+using Ical.Net.Serialization;
+using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models.CalendarEvent;
+using Shrooms.DataTransferObjects.Models.Emails;
+using Shrooms.DataTransferObjects.Models.Events;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Events;
 using Shrooms.Infrastructure.Calendar;
+using Shrooms.Infrastructure.Email;
 using Shrooms.Infrastructure.FireAndForget;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
+using System.Text;
 
 namespace Shrooms.Domain.Services.Events.Calendar
 {
@@ -17,11 +28,13 @@ namespace Shrooms.Domain.Services.Events.Calendar
 
         private readonly IJobScheduler _scheduler;
         private readonly IDbSet<Organization> _organizationsDbSet;
+        private readonly IMailingService _mailingService;
 
-        public EventCalendarService(IUnitOfWork2 uow, IJobScheduler scheduler)
+        public EventCalendarService(IUnitOfWork2 uow, IJobScheduler scheduler, IMailingService mailingService)
         {
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
             _organizationsDbSet = uow.GetDbSet<Organization>();
+            _mailingService = mailingService;
             _scheduler = scheduler;
         }
 
@@ -43,6 +56,38 @@ namespace Shrooms.Domain.Services.Events.Calendar
             var calendarId = GetOrgCalendarId(orgId);
             var calendarEvent = MapToCalendarEventDto(@event);
             _scheduler.Enqueue<GoogleCalendarService>(x => x.CreateEvent(calendarEvent, calendarId));
+        }
+        public void SendInvitation(EventJoinValidationDTO @event, IEnumerable<string> userIds)
+        {
+            var emails = _usersDbSet
+                .Where(u => userIds.Contains(u.Id))
+                .Select(u => u.Email)
+                .ToList();
+
+            var calEvent = new CalendarEvent
+            {
+                Uid = @event.Id.ToString(),
+                Location = @event.Location,
+                Summary = @event.Name,
+                Description = @event.Description,
+                Organizer = new Organizer { CommonName = "simoonaApp", Value = new Uri($"mailto:{@event.ReponsiblePersonEmail}")},
+                Start = new CalDateTime(@event.StartDate),
+                End = new CalDateTime(@event.EndDate),
+                Status = EventStatus.Confirmed
+            };
+
+            var cal = new Ical.Net.Calendar();
+            cal.Events.Add(calEvent);
+            var serializedCalendar = new CalendarSerializer().SerializeToString(cal);
+            byte[] byteArray = Encoding.ASCII.GetBytes(serializedCalendar);
+
+            var email = new EmailDto(emails, $"Invitation: {@event.Name} @ {@event.StartDate}", "");
+            using (MemoryStream stream = new MemoryStream(byteArray))
+            {
+                email.Attachment = new System.Net.Mail.Attachment(stream, "invite.ics");
+                _mailingService.SendEmail(email);
+            }
+
         }
 
         public void AddParticipants(Guid eventId, int orgId, IEnumerable<string> userIds, IEnumerable<string> choices)

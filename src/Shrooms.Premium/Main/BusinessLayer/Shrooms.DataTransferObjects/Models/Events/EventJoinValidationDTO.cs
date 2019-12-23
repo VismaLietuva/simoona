@@ -14,6 +14,9 @@ namespace Shrooms.DataTransferObjects.Models.Events
         public int MaxChoices { get; set; }
         public int MaxParticipants { get; set; }
         public string Name { get; set; }
+        public string Description { get; set; }
+        public string ReponsiblePersonEmail { get; set; }
+        public string Location { get; set; }
         public ICollection<EventOption> Options { get; set; }
         public DateTime RegistrationDeadline { get; set; }
         public DateTime StartDate { get; set; }
