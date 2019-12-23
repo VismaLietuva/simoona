@@ -41,6 +41,13 @@ namespace Shrooms.Domain.Services.Picture
             return pictureName;
         }
 
+        public async Task RemoveImage(string blobKey, int orgId)
+        {
+            var tenantPicturesContainer = _organizationsDbSet.Where(o => o.Id == orgId).Select(o => o.ShortName).First().ToLowerInvariant();
+
+            await _storage.RemovePicture(blobKey, tenantPicturesContainer);
+        }
+
         private static string GetNewPictureName(string fileName)
         {
             var id = Guid.NewGuid().ToString();

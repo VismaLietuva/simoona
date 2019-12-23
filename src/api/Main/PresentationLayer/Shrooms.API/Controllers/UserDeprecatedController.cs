@@ -110,7 +110,7 @@ namespace Shrooms.API.Controllers.WebApi
         [Route("Delete")]
         [PermissionAuthorize(Permission = AdministrationPermissions.ApplicationUser)]
         [InvalidateCacheOutput("GetKudosStats", typeof(KudosController))]
-        public IHttpActionResult DeleteUser(string id)
+        public async Task<IHttpActionResult> DeleteUser(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -124,7 +124,7 @@ namespace Shrooms.API.Controllers.WebApi
                 return Content(HttpStatusCode.MethodNotAllowed, "Employee has pending kudos");
             }
 
-            _userService.Delete(id, GetUserAndOrganization());
+            await _userService.Delete(id, GetUserAndOrganization());
             return Ok();
         }
 

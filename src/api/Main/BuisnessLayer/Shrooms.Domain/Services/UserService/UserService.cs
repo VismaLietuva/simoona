@@ -13,6 +13,7 @@ using Shrooms.Constants.ErrorCodes;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Users;
+using Shrooms.Domain.Services.Picture;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Multiwall;
@@ -32,8 +33,9 @@ namespace Shrooms.Domain.Services.UserService
 
         private readonly IUnitOfWork2 _uow;
         private readonly ShroomsUserManager _userManager;
+        private readonly IPictureService _pictureService;
 
-        public UserService(IUnitOfWork2 uow, ShroomsUserManager userManager)
+        public UserService(IUnitOfWork2 uow, ShroomsUserManager userManager, IPictureService pictureService)
         {
             _rolesDbSet = uow.GetDbSet<ApplicationRole>();
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
@@ -44,6 +46,7 @@ namespace Shrooms.Domain.Services.UserService
 
             _uow = uow;
             _userManager = userManager;
+            _pictureService = pictureService;
         }
 
         public async Task ChangeUserLocalizationSettings(ChangeUserLocalizationSettingsDto settingsDto)
@@ -139,7 +142,7 @@ namespace Shrooms.Domain.Services.UserService
             return settingsDto;
         }
 
-        public void Delete(string userToDelete, UserAndOrganizationDTO userOrg)
+        public async Task Delete(string userToDelete, UserAndOrganizationDTO userOrg)
         {
             var user = _usersDbSet
                 .Single(u =>
@@ -150,7 +153,27 @@ namespace Shrooms.Domain.Services.UserService
             UnassignUserFromWalls(userToDelete, userOrg.OrganizationId);
             _userManager.RemoveLogins(userToDelete);
 
+            await Anonymize(user, userOrg);
+
             _usersDbSet.Remove(user);
+            _uow.SaveChanges(userOrg.UserId);
+        }
+
+        private async Task Anonymize(ApplicationUser user, UserAndOrganizationDTO userOrg)
+        {
+            await _pictureService.RemoveImage(user.PictureId, userOrg.OrganizationId);
+
+            user.Email = string.Empty;
+            user.FirstName = string.Empty;
+            user.LastName = string.Empty;
+            user.Bio = string.Empty;
+            user.PhoneNumber = string.Empty;
+            user.UserName = string.Empty;
+            user.FacebookEmail = string.Empty;
+            user.GoogleEmail = string.Empty;
+            user.PictureId = string.Empty;
+            user.BirthDay = DateTime.UtcNow;
+
             _uow.SaveChanges(userOrg.UserId);
         }
 
