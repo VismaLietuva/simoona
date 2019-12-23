@@ -29,6 +29,7 @@ using Shrooms.Domain.Services.Impersonate;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.Permissions;
+using Shrooms.Domain.Services.Picture;
 using Shrooms.Domain.Services.Projects;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.Domain.Services.UserService;
@@ -66,6 +67,7 @@ namespace Shrooms.API.Controllers.WebApi
         private readonly IDbSet<JobPosition> _jobPositionsDbSet;
         private readonly IProjectsService _projectService;
         private readonly IKudosService _kudosService;
+        private readonly IPictureService _pictureService;
 
         public UserDeprecatedController(
             IMapper mapper,
@@ -80,7 +82,8 @@ namespace Shrooms.API.Controllers.WebApi
             ICustomCache<string, IEnumerable<string>> permissionsCache,
             IRoleService roleService,
             IProjectsService projectService,
-            IKudosService kudosService)
+            IKudosService kudosService,
+            IPictureService pictureService)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -101,6 +104,7 @@ namespace Shrooms.API.Controllers.WebApi
             _roleService = roleService;
             _projectService = projectService;
             _kudosService = kudosService;
+            _pictureService = pictureService;
         }
 
         private bool HasPermission(UserAndOrganizationDTO userOrg, string permission)
@@ -657,6 +661,8 @@ namespace Shrooms.API.Controllers.WebApi
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, new[] { string.Format(Resources.Models.ApplicationUser.ApplicationUser.EmailAlreadyExsists) });
             }
+
+            await _pictureService.RemoveImage(user.PictureId, userOrg.OrganizationId);
 
             _mapper.Map(model, user);
             _applicationUserRepository.Update(user);
