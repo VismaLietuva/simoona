@@ -386,15 +386,16 @@
                 vm.event.editedOptions = lodash.filter(vm.event.options, function(element) {
                     return !!element.id;
                 });
-            } 
-            else if (vm.isFoodOptional) {
-                 vm.event.foodOption = foodOptions.optional;
             } else {
                 vm.event.options = [];
                 vm.event.editedOptions = [];
                 vm.event.newOptions = [];
 
                 vm.event.maxOptions = 0;
+            }
+
+            if (vm.isFoodOptional) {
+                vm.event.foodOption = foodOptions.optional;
             }
 
             vm.event.responsibleUserId = vm.responsibleUser.id;

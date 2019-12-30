@@ -223,7 +223,7 @@
                     <div class="form-group" ng-show="vm.selectedType.isFoodRelated">
                         <label class="control-label col-xs-12 col-sm-4"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
-                            <input id="foodOptional" type="checkbox" class="event-form-checkbox" ng-model="vm.isFoodOptional" ng-change="vm.isOptions=false" />
+                            <input id="foodOptional" type="checkbox" class="event-form-checkbox" ng-model="vm.isFoodOptional"/>
                             <label for="foodOptional" class="control-label" translate="events.foodOptionalSelect"></label>
                         </div>
                     </div>
@@ -231,7 +231,7 @@
                     <div class="form-group">
                         <label class="control-label col-xs-12 col-sm-4"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
-                            <input id="moreOptions" type="checkbox" class="event-form-checkbox" ng-model="vm.isOptions" ng-change="vm.isFoodOptional=false" data-test-id="event-form-is-options-input" />
+                            <input id="moreOptions" type="checkbox" class="event-form-checkbox" ng-model="vm.isOptions" data-test-id="event-form-is-options-input" />
                             <label for="moreOptions" class="control-label" translate="events.eventOptionsSelect"></label>
                         </div>
                     </div>
