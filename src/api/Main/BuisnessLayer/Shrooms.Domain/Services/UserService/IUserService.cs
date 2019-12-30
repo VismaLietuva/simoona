@@ -14,7 +14,7 @@ namespace Shrooms.Domain.Services.UserService
 
         Task ChangeUserNotificationSettings(UserNotificationsSettingsDto settingsDto, UserAndOrganizationDTO userOrg);
 
-        void Delete(string userToDelete, UserAndOrganizationDTO userOrg);
+        Task Delete(string userToDelete, UserAndOrganizationDTO userOrg);
 
         Task<LocalizationSettingsDto> GetUserLocalizationSettings(UserAndOrganizationDTO userOrg);
 
