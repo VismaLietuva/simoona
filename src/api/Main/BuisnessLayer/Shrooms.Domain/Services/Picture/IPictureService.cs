@@ -9,5 +9,7 @@ namespace Shrooms.Domain.Services.Picture
         Task<string> UploadFromImage(Image image, string mimeType, string fileName, int orgId);
 
         Task<string> UploadFromStream(Stream stream, string mimeType, string fileName, int orgId);
+
+        Task RemoveImage(string blobKey, int orgId);
     }
 }
