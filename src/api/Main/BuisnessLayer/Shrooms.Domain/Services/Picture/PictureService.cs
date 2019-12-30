@@ -24,7 +24,7 @@ namespace Shrooms.Domain.Services.Picture
         public async Task<string> UploadFromImage(Image image, string mimeType, string fileName, int orgId)
         {
             var pictureName = GetNewPictureName(fileName);
-            var tenantPicturesContainer = _organizationsDbSet.Where(o => o.Id == orgId).Select(o => o.ShortName).First().ToLowerInvariant();
+            var tenantPicturesContainer = await GetPictureContainer(orgId);
 
             await _storage.UploadPicture(image, pictureName, mimeType, tenantPicturesContainer);
 
@@ -34,7 +34,7 @@ namespace Shrooms.Domain.Services.Picture
         public async Task<string> UploadFromStream(Stream stream, string mimeType, string fileName, int orgId)
         {
             var pictureName = GetNewPictureName(fileName);
-            var tenantPicturesContainer = _organizationsDbSet.Where(o => o.Id == orgId).Select(o => o.ShortName).First().ToLowerInvariant();
+            var tenantPicturesContainer = await GetPictureContainer(orgId);
 
             await _storage.UploadPicture(stream, pictureName, mimeType, tenantPicturesContainer);
 
@@ -43,7 +43,7 @@ namespace Shrooms.Domain.Services.Picture
 
         public async Task RemoveImage(string blobKey, int orgId)
         {
-            var tenantPicturesContainer = _organizationsDbSet.Where(o => o.Id == orgId).Select(o => o.ShortName).First().ToLowerInvariant();
+            var tenantPicturesContainer = await GetPictureContainer(orgId);
 
             await _storage.RemovePicture(blobKey, tenantPicturesContainer);
         }
@@ -54,6 +54,13 @@ namespace Shrooms.Domain.Services.Picture
             var extension = Path.GetExtension(fileName).ToLowerInvariant();
 
             return $"{id}{extension}";
+        }
+
+        private async Task<string> GetPictureContainer(int id)
+        {
+            var organization = await _organizationsDbSet.FirstAsync(x => x.Id == id);
+
+            return organization.ShortName.ToLowerInvariant();
         }
     }
 }
