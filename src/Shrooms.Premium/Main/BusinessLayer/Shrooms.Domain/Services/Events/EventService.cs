@@ -167,10 +167,17 @@ namespace Shrooms.Domain.Services.Events
             {
                 var usersCultureCode = _userService.GetApplicationUser(newEventDto.ResponsibleUserId).CultureCode;
 
-                var willEatOption = TranslateEventOptions("WillEat", usersCultureCode);
-                var willNotEatOption = TranslateEventOptions("WillNotEat", usersCultureCode);
+                var willNotEatOption = new List<string> { TranslateEventOptions("WillNotEat", usersCultureCode) };
 
-                newEventDto.NewOptions = new List<string>() { willEatOption, willNotEatOption };
+                if (newEventDto.NewOptions is null)
+                {
+                    newEventDto.NewOptions = willNotEatOption;
+                }
+                else
+                {
+                    newEventDto.NewOptions = newEventDto.NewOptions.Concat(willNotEatOption);
+                }
+
                 newEventDto.MaxOptions = 1;
             }
 
@@ -338,7 +345,6 @@ namespace Shrooms.Domain.Services.Events
             _eventValidationService.CheckIfResponsibleUserNotExists(userExists);
             _eventValidationService.CheckIfOptionsAreDifferent(eventDto.NewOptions);
             _eventValidationService.CheckIfTypeDoesNotExist(eventTypeExists);
-            _eventValidationService.CheckIfFoodOptionalAndOptionsNonExistent(eventDto.NewOptions, eventDto.FoodOption);
         }
 
         private void UpdateEventOptions(EditEventDTO editedEvent, Event @event)

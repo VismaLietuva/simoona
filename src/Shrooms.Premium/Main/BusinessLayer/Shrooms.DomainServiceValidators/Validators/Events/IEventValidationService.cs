@@ -33,6 +33,5 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
         void CheckIfRegistrationDeadlineExceedsStartDate(DateTime registrationDeadline, DateTime startDate);
         void CheckIfProvidedOptionsAreValid(IEnumerable<int> providedOptionsCount, IEnumerable<EventOption> foundOptionsCount);
         void CheckIfEventHasParticipants(IEnumerable<EventParticipantDTO> eventParticipants);
-        void CheckIfFoodOptionalAndOptionsNonExistent(IEnumerable<string> options, int? foodOption);
     }
 }
