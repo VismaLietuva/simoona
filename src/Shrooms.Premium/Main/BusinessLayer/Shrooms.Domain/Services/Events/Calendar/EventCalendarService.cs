@@ -2,6 +2,7 @@
 using Ical.Net.CalendarComponents;
 using Ical.Net.DataTypes;
 using Ical.Net.Serialization;
+using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models.CalendarEvent;
 using Shrooms.DataTransferObjects.Models.Emails;
@@ -70,7 +71,7 @@ namespace Shrooms.Domain.Services.Events.Calendar
                 Location = @event.Location,
                 Summary = @event.Name,
                 Description = @event.Description,
-                Organizer = new Organizer { CommonName = "simoonaApp", Value = new Uri($"mailto:{@event.ReponsiblePersonEmail}")},
+                Organizer = new Organizer { CommonName = "simoonaApp", Value = new Uri($"mailto:{ConstBusinessLayer.FromEmailAddress}")},
                 Start = new CalDateTime(@event.StartDate),
                 End = new CalDateTime(@event.EndDate),
                 Status = EventStatus.Confirmed

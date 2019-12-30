@@ -110,7 +110,6 @@ namespace Shrooms.Domain.Services.Events.Participation
                     .Include(x => x.EventParticipants)
                     .Include(x => x.EventOptions)
                     .Include(x => x.EventType)
-                    .Include(x => x.ResponsibleUser)
                     .Where(x => x.Id == joinDto.EventId
                         && x.OrganizationId == joinDto.OrganizationId)
                     .Select(MapEventToJoinValidationDto())
@@ -349,7 +348,6 @@ namespace Shrooms.Domain.Services.Events.Participation
                 Name = e.Name,
                 EndDate = e.EndDate,
                 Description = e.Description,
-                ReponsiblePersonEmail = e.ResponsibleUser.Email,
                 Location = e.Place,
                 RegistrationDeadline = e.RegistrationDeadline,
                 ResponsibleUserId = e.ResponsibleUserId,
