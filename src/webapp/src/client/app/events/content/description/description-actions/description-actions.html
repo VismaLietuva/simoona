@@ -1,5 +1,11 @@
 <div class="pull-right">
-      <a type="button"
+   <a type="button"
+      class="vismaicon vismaicon-add-schedule"
+      href="{{vm.googleCalendarRedirect}}"
+      target="_blank"
+      translate-attr-title="events.eventAddToCalendar" translate>
+   </a>
+   <a type="button"
       ng-if="vm.hasDatePassed(vm.event.endDate) && vm.hasEventAdminPermissions"
       ng-class="{'vismaicon-unpin':vm.isPinned,'vismaicon-pin':!vm.isPinned}"
       class="vismaicon"

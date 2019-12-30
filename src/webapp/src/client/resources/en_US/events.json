@@ -14,6 +14,7 @@
   "eventInfo": "Information",
   "eventJoin": "Join",
   "eventHost": "Host",
+  "eventAddToCalendar": "Add to calendar",
   "eventMaxAmountOfOptions": "Number of options participant can select",
   "eventMaxParticipants": "Max participants",
   "eventMore": "Add one more",
