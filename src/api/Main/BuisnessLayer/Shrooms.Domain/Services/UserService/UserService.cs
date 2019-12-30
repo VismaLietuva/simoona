@@ -163,14 +163,15 @@ namespace Shrooms.Domain.Services.UserService
         {
             await _pictureService.RemoveImage(user.PictureId, userOrg.OrganizationId);
 
-            user.Email = Guid.NewGuid().ToString();
-            user.FirstName = string.Empty;
-            user.LastName = string.Empty;
+            var randomString = Guid.NewGuid().ToString();
+            user.Email = randomString;
+            user.FirstName = randomString;
+            user.LastName = randomString;
+            user.PhoneNumber = randomString;
+            user.UserName = randomString;
+            user.FacebookEmail = randomString;
+            user.GoogleEmail = randomString;
             user.Bio = string.Empty;
-            user.PhoneNumber = string.Empty;
-            user.UserName = string.Empty;
-            user.FacebookEmail = string.Empty;
-            user.GoogleEmail = string.Empty;
             user.PictureId = string.Empty;
             user.BirthDay = DateTime.UtcNow;
 
