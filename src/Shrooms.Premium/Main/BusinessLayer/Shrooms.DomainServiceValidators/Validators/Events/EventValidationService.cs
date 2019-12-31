@@ -2,7 +2,6 @@
 using Shrooms.DomainExceptions.Exceptions.Event;
 using Shrooms.EntityModels.Models.Events;
 using Shrooms.Infrastructure.SystemClock;
-using Shrooms.Premium.Other.Shrooms.Constants.BusinessLayer;
 using System;
 using System.Collections.Generic;
 using System.Linq;

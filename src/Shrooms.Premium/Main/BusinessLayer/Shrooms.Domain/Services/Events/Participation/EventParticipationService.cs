@@ -1,6 +1,5 @@
 ﻿using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.BusinessLayer;
-using Shrooms.Premium.Other.Shrooms.Constants.BusinessLayer;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Events;
@@ -348,38 +347,39 @@ namespace Shrooms.Domain.Services.Events.Participation
 
         private void ValidateSingleJoin(EventJoinValidationDTO @event, int organizationId, string userId, IEnumerable<int> options)
         {
-            if(!@event.Options
+            if(@event.Options
                 .Where(option => options.Contains(option.Id))
-                .Any(selectedOption => selectedOption.Option == EventConstants.WillNotEatOptionEN || selectedOption.Option == EventConstants.WillEatOptionLT)
-                )
+                    .Any(selectedOption => selectedOption.Option == EventConstants.WillNotEatOptionEN || 
+                                           selectedOption.Option == EventConstants.WillNotEatOptionLT))
             {
-                if (@event.IsSingleJoin)
-                {
-                    var events = _eventsDbSet
-                        .Include(e => e.EventParticipants.Select(x => x.EventOptions))
-                        .Where(x =>
-                            x.EventTypeId == @event.EventTypeId &&
-                            x.OrganizationId == organizationId &&
-                            x.StartDate > _systemClock.UtcNow &&
-                            x.EventParticipants.Any(p => p.ApplicationUserId == userId))
-                        .ToList();
-
-                    var filteredEvents = RemoveEventsWithoutFood(events, userId);
-
-                    var eventWeekNumber = GetWeekOfYear(@event.StartDate);
-                    var eventToLeave = filteredEvents.FirstOrDefault(x => GetWeekOfYear(x.StartDate) == eventWeekNumber);
-
-                    _eventValidationService.CheckIfUserExistsInOtherSingleJoinEvent(eventToLeave);
-                }
+                return;
             }
+            
+            if (@event.IsSingleJoin)
+            {
+                var events = _eventsDbSet
+                    .Include(e => e.EventParticipants.Select(x => x.EventOptions))
+                    .Where(x =>
+                        x.EventTypeId == @event.EventTypeId &&
+                        x.OrganizationId == organizationId &&
+                        x.StartDate > _systemClock.UtcNow &&
+                        x.EventParticipants.Any(p => p.ApplicationUserId == userId))
+                    .ToList();
 
+                var filteredEvents = RemoveEventsWithoutFood(events, userId);
+
+                var eventWeekNumber = GetWeekOfYear(@event.StartDate);
+                var eventToLeave = filteredEvents.FirstOrDefault(x => GetWeekOfYear(x.StartDate) == eventWeekNumber);
+
+                _eventValidationService.CheckIfUserExistsInOtherSingleJoinEvent(eventToLeave);
+            }
         }
 
         private static IEnumerable<Event> RemoveEventsWithoutFood(IList<Event> events, string userId)
         {
             try
             {
-                var foodOptionalEvents = events.Where(x => x.FoodOption == (int)EventConstants.FoodOptions.Optional);
+                var foodOptionalEvents = events.Where(x => x.FoodOption == (int)FoodOptions.Optional);
 
                 var eventsToRemove = foodOptionalEvents
                     .Where(x => x.EventParticipants

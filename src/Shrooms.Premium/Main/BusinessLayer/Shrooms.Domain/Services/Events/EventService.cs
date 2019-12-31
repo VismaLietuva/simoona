@@ -10,7 +10,6 @@ using Shrooms.Domain.Services.Events.Utilities;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.DomainServiceValidators.Validators.Events;
-using Shrooms.Premium.Other.Shrooms.Constants.BusinessLayer;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Events;
 using Shrooms.EntityModels.Models.Multiwall;
@@ -163,7 +162,7 @@ namespace Shrooms.Domain.Services.Events
             _eventValidationService.CheckIfCreatingEventHasNoChoices(newEventDto.MaxOptions, newEventDto.NewOptions.Count());
 
 
-            if (newEventDto.FoodOption == (int)EventConstants.FoodOptions.Optional)
+            if (newEventDto.FoodOption == (int)FoodOptions.Optional)
             {
                 var usersCultureCode = _userService.GetApplicationUser(newEventDto.ResponsibleUserId).CultureCode;
 
@@ -226,7 +225,7 @@ namespace Shrooms.Domain.Services.Events
                 _eventParticipationService.ResetAttendees(eventDto.Id, eventDto);
             }
 
-            if (eventDto.FoodOption == (int)EventConstants.FoodOptions.Optional && (eventToUpdate.FoodOption == (int)EventConstants.FoodOptions.None || eventToUpdate.FoodOption == null))
+            if (eventDto.FoodOption == (int)FoodOptions.Optional && (eventToUpdate.FoodOption == (int)FoodOptions.None || eventToUpdate.FoodOption == null))
             {
                 var usersCultureCode = _userService.GetApplicationUser(eventDto.ResponsibleUserId).CultureCode;
 
