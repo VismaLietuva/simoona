@@ -1,11 +1,5 @@
 <div class="pull-right">
    <a type="button"
-      class="vismaicon vismaicon-add-schedule"
-      href="{{vm.googleCalendarRedirect}}"
-      target="_blank"
-      translate-attr-title="events.eventAddToCalendar" translate>
-   </a>
-   <a type="button"
       ng-if="vm.hasDatePassed(vm.event.endDate) && vm.hasEventAdminPermissions"
       ng-class="{'vismaicon-unpin':vm.isPinned,'vismaicon-pin':!vm.isPinned}"
       class="vismaicon"
@@ -19,6 +13,8 @@
        translate-attr-title="common.edit"
        data-test-id="event-description-edit-event" translate>
     </a>
+    <ace-calendar-btn ng-if="vm.hasDatePassed(vm.event.endDate)"
+                      calendar-item='vm.event'></ace-calendar-btn>
     <ace-share-btn ng-if="vm.hasDatePassed(vm.event.endDate)"
                    share-item-category="event"
                    share-item-id="{{vm.event.id}}"></ace-share-btn>

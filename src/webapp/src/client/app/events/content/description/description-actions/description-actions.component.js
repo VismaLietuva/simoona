@@ -23,10 +23,7 @@
     function eventDescriptionActionsController(authService, eventRepository, notifySrv , localeSrv, errorHandler) {
         /* jshint validthis: true */
         var vm = this;
-                
-        var googleCalendarStartDate = vm.event.startDate.replace(/-|:|\.\d\d\d/g,"");
-        var googleCalendarEndDate = vm.event.endDate.replace(/-|:|\.\d\d\d/g,"");
-
+            
         vm.hasDatePassed = hasDatePassed;
         vm.togglePin = togglePin;
         vm.localeSrv = localeSrv;
@@ -34,9 +31,7 @@
         vm.isPinned = vm.event.isPinned;
         vm.currentUserId = authService.identity.userId;
         vm.hasEventAdminPermissions = authService.hasPermissions(['EVENT_ADMINISTRATION']);
-
-        vm.googleCalendarRedirect = `https://calendar.google.com/calendar/r/eventedit?&text=${vm.event.name}&location=${vm.event.location}&dates=${googleCalendarStartDate}Z/${googleCalendarEndDate}Z`;
-        
+      
         ///////
 
         function hasDatePassed(date) {
