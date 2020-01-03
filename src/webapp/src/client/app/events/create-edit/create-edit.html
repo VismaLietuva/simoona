@@ -219,14 +219,6 @@
                             <img ng-if="vm.states.isEdit && !vm.eventCroppedImage && !!vm.eventImage" src="{{vm.event.imageName | imageThumb:vm.eventImageSize:'crop'}}" />
                         </div>
                     </div>
-                    <!--event isFoodOptional -->
-                    <div class="form-group" ng-show="vm.selectedType.isFoodRelated">
-                        <label class="control-label col-xs-12 col-sm-4"></label>
-                        <div class="col-xs-12 col-sm-6 col-md-4">
-                            <input id="foodOptional" type="checkbox" class="event-form-checkbox" ng-model="vm.isFoodOptional"/>
-                            <label for="foodOptional" class="control-label" translate="events.foodOptionalSelect"></label>
-                        </div>
-                    </div>
                     <!--event isOptions -->
                     <div class="form-group">
                         <label class="control-label col-xs-12 col-sm-4"></label>
