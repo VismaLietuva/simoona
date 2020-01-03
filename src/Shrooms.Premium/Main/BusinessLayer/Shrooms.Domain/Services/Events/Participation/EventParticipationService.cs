@@ -356,7 +356,6 @@ namespace Shrooms.Domain.Services.Events.Participation
                         .Where(x =>
                             x.EventTypeId == eventDto.EventTypeId &&
                             x.OrganizationId == userOrg.OrganizationId &&
-                            x.StartDate > _systemClock.UtcNow &&
                             x.EventParticipants.Any(p => p.ApplicationUserId == userOrg.UserId) &&
                             SqlFunctions.DatePart("wk", x.StartDate) == SqlFunctions.DatePart("wk", eventDto.StartDate))
                         .ToList();
