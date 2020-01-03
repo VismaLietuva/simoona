@@ -37,9 +37,9 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
             }
         }
 
-        public void CheckIfUserExistsInOtherSingleJoinEvent(Event userParticipationEvent)
+        public void CheckIfUserExistsInOtherSingleJoinEvent(IEnumerable<Event> userParticipationEvent)
         {
-            if (userParticipationEvent != null)
+            if (userParticipationEvent.Count() > 0)
             {
                 throw new EventException(EventCannotJoinMultipleSingleJoinEventsCode);
             }
