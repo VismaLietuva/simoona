@@ -65,7 +65,6 @@ namespace Shrooms.Domain.Services.Events.Utilities
                 {
                     Id = type.Id,
                     IsSingleJoin = type.IsSingleJoin,
-                    IsFoodRelated = type.IsFoodRelated,
                     Name = type.Name
                 })
                 .OrderByDescending(t => t.Name)
@@ -83,7 +82,6 @@ namespace Shrooms.Domain.Services.Events.Utilities
                     Id = x.Id,
                     IsSingleJoin = x.IsSingleJoin,
                     SendWeeklyReminders = x.SendWeeklyReminders,
-                    IsFoodRelated = x.IsFoodRelated,
                     Name = x.Name,
                     HasActiveEvents = x.Events.Any(e => e.EndDate > DateTime.UtcNow 
                                                      || e.EventRecurring != EventRecurrenceOptions.None)
@@ -129,7 +127,6 @@ namespace Shrooms.Domain.Services.Events.Utilities
             }
 
             orgEventType.IsSingleJoin = eventType.IsSingleJoin;
-            orgEventType.IsFoodRelated = eventType.IsFoodRelated;
             orgEventType.Name = eventType.Name;
             orgEventType.ModifiedBy = eventType.UserId;
             orgEventType.Modified = DateTime.UtcNow;
@@ -220,7 +217,6 @@ namespace Shrooms.Domain.Services.Events.Utilities
                 OrganizationId = eventTypeDto.OrganizationId,
                 IsSingleJoin = eventTypeDto.IsSingleJoin,
                 SendWeeklyReminders = eventTypeDto.SendWeeklyReminders,
-                IsFoodRelated = eventTypeDto.IsFoodRelated,
                 Name = eventTypeDto.Name
             };
 

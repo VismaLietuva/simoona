@@ -52,9 +52,6 @@ namespace Shrooms.WebViewModels.Models.Events
         [Required]
         public int TypeId { get; set; }
 
-        [Range((int)FoodOptions.None, (int)FoodOptions.Optional)]
-        public int? FoodOption { get; set; }
-
         [Required]
         public string ResponsibleUserId { get; set; }
 

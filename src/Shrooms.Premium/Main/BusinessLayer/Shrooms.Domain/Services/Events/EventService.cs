@@ -161,25 +161,6 @@ namespace Shrooms.Domain.Services.Events
             _eventValidationService.CheckIfCreatingEventHasInsufficientOptions(newEventDto.MaxOptions, newEventDto.NewOptions.Count());
             _eventValidationService.CheckIfCreatingEventHasNoChoices(newEventDto.MaxOptions, newEventDto.NewOptions.Count());
 
-
-            if (newEventDto.FoodOption == (int)FoodOptions.Optional)
-            {
-                var usersCultureCode = _userService.GetApplicationUser(newEventDto.ResponsibleUserId).CultureCode;
-
-                var willNotEatOption = new List<string> { TranslateEventOptions("WillNotEat", usersCultureCode) };
-
-                if (newEventDto.NewOptions is null)
-                {
-                    newEventDto.NewOptions = willNotEatOption;
-                }
-                else
-                {
-                    newEventDto.NewOptions = newEventDto.NewOptions.Concat(willNotEatOption);
-                }
-
-                newEventDto.MaxOptions = 1;
-            }
-
             var newEvent = await MapNewEvent(newEventDto);
 
             _eventsDbSet.Add(newEvent);
@@ -223,17 +204,6 @@ namespace Shrooms.Domain.Services.Events
             if (eventDto.ResetParticipantList)
             {
                 _eventParticipationService.ResetAttendees(eventDto.Id, eventDto);
-            }
-
-            if (eventDto.FoodOption == (int)FoodOptions.Optional && (eventToUpdate.FoodOption == (int)FoodOptions.None || eventToUpdate.FoodOption == null))
-            {
-                var usersCultureCode = _userService.GetApplicationUser(eventDto.ResponsibleUserId).CultureCode;
-
-                var willEatOption = TranslateEventOptions("WillEat", usersCultureCode);
-                var willNotEatOption = TranslateEventOptions("WillNotEat", usersCultureCode);
-
-                eventDto.NewOptions = new List<string>() { willEatOption, willNotEatOption };
-                eventDto.MaxOptions = 1;
             }
 
             UpdateWall(eventToUpdate, eventDto);
@@ -289,7 +259,6 @@ namespace Shrooms.Domain.Services.Events
                 HostUserId = e.ResponsibleUserId,
                 HostUserFullName = e.ResponsibleUser.FirstName + " " + e.ResponsibleUser.LastName,
                 TypeId = e.EventTypeId,
-                FoodOption = e.FoodOption,
                 Options = e.EventOptions.Select(o => new EventOptionDTO
                 {
                     Id = o.Id,
@@ -452,7 +421,6 @@ namespace Shrooms.Domain.Services.Events
             newEvent.StartDate = newEventDto.StartDate;
             newEvent.Name = newEventDto.Name;
             newEvent.RegistrationDeadline = newEventDto.RegistrationDeadlineDate.Value;
-            newEvent.FoodOption = newEventDto.FoodOption;
             newEvent.IsPinned = newEventDto.IsPinned;
         }
 
@@ -474,7 +442,6 @@ namespace Shrooms.Domain.Services.Events
                 MaxOptions = e.MaxChoices,
                 HostUserId = e.ResponsibleUserId,
                 WallId = e.WallId,
-                FoodOption = e.FoodOption,
                 HostUserFullName = e.ResponsibleUser.FirstName + " " + e.ResponsibleUser.LastName,
                 Options = e.EventOptions.Select(o => new EventDetailsOptionDTO
                 {
