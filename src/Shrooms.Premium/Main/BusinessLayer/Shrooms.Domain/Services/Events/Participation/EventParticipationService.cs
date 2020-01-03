@@ -1,5 +1,6 @@
 ﻿using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.BusinessLayer;
+using Shrooms.Constants.BusinessLayer.Events;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Events;
@@ -116,12 +117,12 @@ namespace Shrooms.Domain.Services.Events.Participation
 
                 _eventValidationService.CheckIfEventExists(@event);
 
-                var eventOptions = @event.Options
+                var eventOptionsSelected = @event.Options
                     .Where(option => joinDto.ChosenOptions.Contains(option.Id))
                     .ToList();
 
                 _eventValidationService.CheckIfRegistrationDeadlineIsExpired(@event.RegistrationDeadline);
-                _eventValidationService.CheckIfProvidedOptionsAreValid(joinDto.ChosenOptions, eventOptions);
+                _eventValidationService.CheckIfProvidedOptionsAreValid(joinDto.ChosenOptions, eventOptionsSelected);
                 _eventValidationService.CheckIfJoiningNotEnoughChoicesProvided(@event.MaxChoices, joinDto.ChosenOptions.Count());
                 _eventValidationService.CheckIfJoiningTooManyChoicesProvided(@event.MaxChoices, joinDto.ChosenOptions.Count());
                 _eventValidationService.CheckIfEventHasEnoughPlaces(@event.MaxParticipants, @event.Participants.Count + joinDto.ParticipantIds.Count);
@@ -136,14 +137,14 @@ namespace Shrooms.Domain.Services.Events.Participation
                     var alreadyParticipates = @event.Participants.Any(p => p == userId);
                     _eventValidationService.CheckIfUserAlreadyJoinedSameEvent(alreadyParticipates);
 
-                    ValidateSingleJoin(@event, joinDto.OrganizationId, userId, joinDto.ChosenOptions);
-                    AddParticipant(userId, @event.Id, eventOptions);
+                    ValidateSingleJoin(@event, joinDto.OrganizationId, userId, eventOptionsSelected);
+                    AddParticipant(userId, @event.Id, eventOptionsSelected);
 
                     JoinLeaveEventWall(@event.ResponsibleUserId, userId, @event.WallId, joinDto);
                 }
 
                 _uow.SaveChanges(false);
-                var choices = eventOptions.Select(x => x.Option);
+                var choices = eventOptionsSelected.Select(x => x.Option);
                 _calendarService.AddParticipants(@event.Id, joinDto.OrganizationId, joinDto.ParticipantIds, choices);
             }
         }
@@ -345,12 +346,9 @@ namespace Shrooms.Domain.Services.Events.Participation
             };
         }
 
-        private void ValidateSingleJoin(EventJoinValidationDTO @event, int organizationId, string userId, IEnumerable<int> options)
+        private void ValidateSingleJoin(EventJoinValidationDTO @event, int organizationId, string userId, IEnumerable<EventOption> selectedOptions)
         {
-            if(@event.Options
-                .Where(option => options.Contains(option.Id))
-                    .Any(selectedOption => selectedOption.Option == EventConstants.WillNotEatOptionEN || 
-                                           selectedOption.Option == EventConstants.WillNotEatOptionLT))
+            if (selectedOptions.Count() == 1 && selectedOptions.First().Rule == OptionRules.IgnoreSingleJoin)
             {
                 return;
             }
