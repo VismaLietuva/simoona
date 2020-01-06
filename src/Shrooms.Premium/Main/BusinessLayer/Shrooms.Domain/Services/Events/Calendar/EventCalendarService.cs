@@ -72,18 +72,18 @@ namespace Shrooms.Domain.Services.Events.Calendar
                 Summary = @event.Name,
                 Description = @event.Description,
                 Organizer = new Organizer { CommonName = "simoonaApp", Value = new Uri($"mailto:{ConstBusinessLayer.FromEmailAddress}")},
-                Start = new CalDateTime(@event.StartDate),
-                End = new CalDateTime(@event.EndDate),
+                Start = new CalDateTime(@event.StartDate, "UTC"),
+                End = new CalDateTime(@event.EndDate, "UTC"),
                 Status = EventStatus.Confirmed
             };
 
             var cal = new Ical.Net.Calendar();
             cal.Events.Add(calEvent);
             var serializedCalendar = new CalendarSerializer().SerializeToString(cal);
-            byte[] byteArray = Encoding.ASCII.GetBytes(serializedCalendar);
+            byte[] calByteArray = Encoding.ASCII.GetBytes(serializedCalendar);
 
             var email = new EmailDto(emails, $"Invitation: {@event.Name} @ {@event.StartDate}", "");
-            using (MemoryStream stream = new MemoryStream(byteArray))
+            using (MemoryStream stream = new MemoryStream(calByteArray))
             {
                 email.Attachment = new System.Net.Mail.Attachment(stream, "invite.ics");
                 _mailingService.SendEmail(email);
