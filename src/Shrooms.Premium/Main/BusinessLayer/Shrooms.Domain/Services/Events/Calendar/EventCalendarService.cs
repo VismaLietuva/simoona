@@ -71,7 +71,7 @@ namespace Shrooms.Domain.Services.Events.Calendar
                 Location = @event.Location,
                 Summary = @event.Name,
                 Description = @event.Description,
-                Organizer = new Organizer { CommonName = "simoonaApp", Value = new Uri($"mailto:{ConstBusinessLayer.FromEmailAddress}")},
+                Organizer = new Organizer { CommonName = ConstBusinessLayer.DefaultEmailLinkName, Value = new Uri($"mailto:{ConstBusinessLayer.FromEmailAddress}")},
                 Start = new CalDateTime(@event.StartDate, "UTC"),
                 End = new CalDateTime(@event.EndDate, "UTC"),
                 Status = EventStatus.Confirmed
