@@ -98,7 +98,7 @@ namespace Shrooms.Domain.Services.Events.Calendar
             var calendar = new Ical.Net.Calendar();
             calendar.Events.Add(calendarEvent);
             var serializedCalendar = new CalendarSerializer().SerializeToString(calendar);
-            byte[] calByteArray = Encoding.ASCII.GetBytes(serializedCalendar);
+            byte[] calByteArray = Encoding.UTF8.GetBytes(serializedCalendar);
             var emailDto = new EmailDto(emails, $"Invitation: {@event.Name} @ {@event.StartDate}", "");
 
             using (MemoryStream stream = new MemoryStream(calByteArray))
