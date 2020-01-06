@@ -31,6 +31,8 @@ using Shrooms.API.BackgroundWorkers;
 using Shrooms.Premium.Main.PresentationLayer.Shrooms.API.BackgroundWorkers;
 using System.Linq;
 using Newtonsoft.Json;
+using System.IO;
+using System.Net.Http.Headers;
 
 namespace Shrooms.API.Controllers.WebApi.EventControllers
 {
@@ -232,6 +234,22 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
             {
                 _eventService.ToggleEventPin(eventId);
                 return Ok();
+            }
+            catch (EventException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("Download")]
+        public IHttpActionResult DownloadEvent(Guid eventId)
+        {
+            try
+            {
+                var stream = new ByteArrayContent(_eventService.DownloadEvent(eventId));
+                var result = new HttpResponseMessage(HttpStatusCode.OK) { Content = stream };
+                return ResponseMessage(result);
             }
             catch (EventException e)
             {
