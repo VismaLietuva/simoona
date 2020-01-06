@@ -146,7 +146,7 @@ namespace Shrooms.Domain.Services.Events.Participation
                 _uow.SaveChanges(false);
                 var choices = eventOptions.Select(x => x.Option);
 
-                _calendarService.SendInvitation(@event, joinDto.ParticipantIds);
+                _asyncRunner.Run<IEventCalendarService>(n => n.SendInvitation(@event, joinDto.ParticipantIds), _uow.ConnectionName);
 
              // _calendarService.AddParticipants(@event.Id, joinDto.OrganizationId, joinDto.ParticipantIds, choices);
              //  Commented due to Google Api Calendar 403 error "quotaExceeded: Calendar usage limits exceeded"

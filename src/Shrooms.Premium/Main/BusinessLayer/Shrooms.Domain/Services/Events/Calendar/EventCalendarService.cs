@@ -35,8 +35,8 @@ namespace Shrooms.Domain.Services.Events.Calendar
         {
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
             _organizationsDbSet = uow.GetDbSet<Organization>();
-            _mailingService = mailingService;
             _scheduler = scheduler;
+            _mailingService = mailingService;
         }
 
         public void DeleteEvent(Guid eventId, int orgId)
@@ -57,38 +57,6 @@ namespace Shrooms.Domain.Services.Events.Calendar
             var calendarId = GetOrgCalendarId(orgId);
             var calendarEvent = MapToCalendarEventDto(@event);
             _scheduler.Enqueue<GoogleCalendarService>(x => x.CreateEvent(calendarEvent, calendarId));
-        }
-        public void SendInvitation(EventJoinValidationDTO @event, IEnumerable<string> userIds)
-        {
-            var emails = _usersDbSet
-                .Where(u => userIds.Contains(u.Id))
-                .Select(u => u.Email)
-                .ToList();
-
-            var calEvent = new CalendarEvent
-            {
-                Uid = @event.Id.ToString(),
-                Location = @event.Location,
-                Summary = @event.Name,
-                Description = @event.Description,
-                Organizer = new Organizer { CommonName = ConstBusinessLayer.DefaultEmailLinkName, Value = new Uri($"mailto:{ConstBusinessLayer.FromEmailAddress}")},
-                Start = new CalDateTime(@event.StartDate, "UTC"),
-                End = new CalDateTime(@event.EndDate, "UTC"),
-                Status = EventStatus.Confirmed
-            };
-
-            var cal = new Ical.Net.Calendar();
-            cal.Events.Add(calEvent);
-            var serializedCalendar = new CalendarSerializer().SerializeToString(cal);
-            byte[] calByteArray = Encoding.ASCII.GetBytes(serializedCalendar);
-
-            var email = new EmailDto(emails, $"Invitation: {@event.Name} @ {@event.StartDate}", "");
-            using (MemoryStream stream = new MemoryStream(calByteArray))
-            {
-                email.Attachment = new System.Net.Mail.Attachment(stream, "invite.ics");
-                _mailingService.SendEmail(email);
-            }
-
         }
 
         public void AddParticipants(Guid eventId, int orgId, IEnumerable<string> userIds, IEnumerable<string> choices)
@@ -119,6 +87,27 @@ namespace Shrooms.Domain.Services.Events.Calendar
             _scheduler.Enqueue<GoogleCalendarService>(x => x.ResetParticipants(eventId, calendarId));
         }
 
+        public void SendInvitation(EventJoinValidationDTO @event, IEnumerable<string> userIds)
+        {
+            var emails = _usersDbSet
+                .Where(u => userIds.Contains(u.Id))
+                .Select(u => u.Email)
+                .ToList();
+
+            var calendarEvent = MapToCalendarEvent(@event);
+            var calendar = new Ical.Net.Calendar();
+            calendar.Events.Add(calendarEvent);
+            var serializedCalendar = new CalendarSerializer().SerializeToString(calendar);
+            byte[] calByteArray = Encoding.ASCII.GetBytes(serializedCalendar);
+            var emailDto = new EmailDto(emails, $"Invitation: {@event.Name} @ {@event.StartDate}", "");
+
+            using (MemoryStream stream = new MemoryStream(calByteArray))
+            {
+                emailDto.Attachment = new System.Net.Mail.Attachment(stream, "invite.ics");
+                _mailingService.SendEmail(emailDto);
+            }
+        }
+
         private CalendarEventDTO MapToCalendarEventDto(Event @event)
         {
             var calendarEvent = new CalendarEventDTO()
@@ -132,6 +121,23 @@ namespace Shrooms.Domain.Services.Events.Calendar
             };
 
             return calendarEvent;
+        }
+
+        private CalendarEvent MapToCalendarEvent(EventJoinValidationDTO @event)
+        {
+            var calEvent = new CalendarEvent
+            {
+                Uid = @event.Id.ToString(),
+                Location = @event.Location,
+                Summary = @event.Name,
+                Description = @event.Description,
+                Organizer = new Organizer { CommonName = ConstBusinessLayer.DefaultEmailLinkName, Value = new Uri($"mailto:{ConstBusinessLayer.FromEmailAddress}") },
+                Start = new CalDateTime(@event.StartDate, "UTC"),
+                End = new CalDateTime(@event.EndDate, "UTC"),
+                Status = EventStatus.Confirmed
+            };
+
+            return calEvent;
         }
 
         private string GetOrgCalendarId(int orgId)
