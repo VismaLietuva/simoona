@@ -99,6 +99,7 @@
 
         function init() {
             vm.isOptions = false;
+            vm.isIgnoreSingleJoinEnabled = false;
 
             vm.datePickers = {
                 isOpenEventStartDatePicker: false,

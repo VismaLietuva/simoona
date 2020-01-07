@@ -4,253 +4,363 @@
             <div class="panel-heading">
                 <span ng-if="vm.states.isAdd" data-test-id="create-event-header" translate="events.addNewEvent"></span>
                 <span ng-if="vm.states.isEdit" data-test-id="edit-event-header" translate="events.editEvent"></span>
-                <div class="pull-right" has-permissions="['EVENT_ADMINISTRATION']" ng-show="vm.event.isPinned !== undefined">
-                        <a type="button"
-                        ng-class="{'vismaicon-unpin':vm.event.isPinned,'vismaicon-pin':!vm.event.isPinned}"
-                        class="vismaicon"
-                        ng-click="vm.togglePin()"
-                        translate-attr-title="common.pin" translate>
-                     </a>
+                <div class="pull-right" has-permissions="['EVENT_ADMINISTRATION']"
+                    ng-show="vm.event.isPinned !== undefined">
+                    <a type="button" ng-class="{'vismaicon-unpin':vm.event.isPinned,'vismaicon-pin':!vm.event.isPinned}"
+                        class="vismaicon" ng-click="vm.togglePin()" translate-attr-title="common.pin" translate>
+                    </a>
                 </div>
             </div>
             <div class="panel-body">
                 <form name="eventForm" class="form-horizontal" autocomplete="off">
                     <!--event name-->
-                    <div class="form-group required" ng-class="{'has-error': eventForm.name.$invalid && eventForm.name.$dirty}">
-                        <label for="eventName" class="control-label col-xs-12 col-sm-4" translate="events.eventName"></label>
+                    <div class="form-group required"
+                        ng-class="{'has-error': eventForm.name.$invalid && eventForm.name.$dirty}">
+                        <label for="eventName" class="control-label col-xs-12 col-sm-4"
+                            translate="events.eventName"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
-                            <input id="eventName" type="text" class="form-control" name="name" ng-model="vm.event.name" ng-maxlength="vm.eventSettings.nameLength" data-test-id="event-form-name-input" required/>
-                            <p class="text-danger help-block" ng-if="eventForm.name.$error.required && eventForm.name.$dirty" translate="common.messageFieldIsRequired"></p>
-                            <p class="text-danger help-block" ng-if="eventForm.name.$error.maxlength && eventForm.name.$dirty" translate="common.messageInvalidLength" translate-values="{ one: vm.eventSettings.nameLength }"></p>
+                            <input id="eventName" type="text" class="form-control" name="name" ng-model="vm.event.name"
+                                ng-maxlength="vm.eventSettings.nameLength" data-test-id="event-form-name-input"
+                                required />
+                            <p class="text-danger help-block"
+                                ng-if="eventForm.name.$error.required && eventForm.name.$dirty"
+                                translate="common.messageFieldIsRequired"></p>
+                            <p class="text-danger help-block"
+                                ng-if="eventForm.name.$error.maxlength && eventForm.name.$dirty"
+                                translate="common.messageInvalidLength"
+                                translate-values="{ one: vm.eventSettings.nameLength }"></p>
                         </div>
                     </div>
                     <!--event type-->
-                    <div class="form-group required" ng-class="{'has-error': eventForm.typeId.$invalid && eventForm.typeId.$dirty}">
-                        <label for="typeId" class="control-label col-xs-12 col-sm-4" translate="events.eventType"></label>
+                    <div class="form-group required"
+                        ng-class="{'has-error': eventForm.typeId.$invalid && eventForm.typeId.$dirty}">
+                        <label for="typeId" class="control-label col-xs-12 col-sm-4"
+                            translate="events.eventType"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
-                            <select id="typeId" name="typeId" class="form-control" ng-model="vm.selectedType" ng-change="vm.event.typeId=vm.selectedType.id" ng-options="type as type.name for type in vm.eventTypes" data-test-id="event-form-event-type-input" required translate-cloak>
+                            <select id="typeId" name="typeId" class="form-control" ng-model="vm.selectedType"
+                                ng-change="vm.event.typeId=vm.selectedType.id"
+                                ng-options="type as type.name for type in vm.eventTypes"
+                                data-test-id="event-form-event-type-input" required translate-cloak>
                             </select>
-                            <p class="text-danger help-block" ng-if="eventForm.typeId.$invalid && eventForm.typeId.$dirty" translate="common.messageFieldIsRequired"></p>
+                            <p class="text-danger help-block"
+                                ng-if="eventForm.typeId.$invalid && eventForm.typeId.$dirty"
+                                translate="common.messageFieldIsRequired"></p>
                         </div>
                     </div>
                     <!--event start date-->
-                    <div class="form-group required" ng-class="{'has-error': eventForm.startDateInput.$invalid && eventForm.startDateInput.$dirty || !vm.isStartDateValid()}">
-                        <label for="startDateInput" class="control-label col-xs-12 col-sm-4" translate="events.eventStartDate"></label>
+                    <div class="form-group required"
+                        ng-class="{'has-error': eventForm.startDateInput.$invalid && eventForm.startDateInput.$dirty || !vm.isStartDateValid()}">
+                        <label for="startDateInput" class="control-label col-xs-12 col-sm-4"
+                            translate="events.eventStartDate"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
                             <div class="date-field">
-                                <input type="text" 
-                                       name="startDateInput" 
-                                       id="startDateInput" 
-                                       class="hasDatepicker" 
-                                       uib-datepicker-popup="yyyy-MM-dd" 
-                                       popup-placement="bottom"
-                                       ng-model="vm.event.startDate" 
-                                       is-open="vm.datePickers.isOpenEventStartDatePicker" 
-                                       ng-required="true" 
-                                       ng-click="vm.openDatePicker($event, 'isOpenEventStartDatePicker')" />
+                                <input type="text" name="startDateInput" id="startDateInput" class="hasDatepicker"
+                                    uib-datepicker-popup="yyyy-MM-dd" popup-placement="bottom"
+                                    ng-model="vm.event.startDate" is-open="vm.datePickers.isOpenEventStartDatePicker"
+                                    ng-required="true"
+                                    ng-click="vm.openDatePicker($event, 'isOpenEventStartDatePicker')" />
                             </div>
-                            <p class="text-danger help-block" ng-if="!vm.event.startDate || eventForm.startDateInput.$invalid && eventForm.startDateInput.$dirty" translate="common.messageFieldIsRequired"></p>
-                            <p class="text-danger help-block" ng-if="!!vm.event.startDate && !vm.isStartDateValid()" translate="events.fieldEventDatePast"></p>
+                            <p class="text-danger help-block"
+                                ng-if="!vm.event.startDate || eventForm.startDateInput.$invalid && eventForm.startDateInput.$dirty"
+                                translate="common.messageFieldIsRequired"></p>
+                            <p class="text-danger help-block" ng-if="!!vm.event.startDate && !vm.isStartDateValid()"
+                                translate="events.fieldEventDatePast"></p>
                         </div>
                     </div>
                     <!--event start time-->
-                    <div class="form-group required" ng-class="{'has-error': eventForm.startDateInput.$invalid && eventForm.startDateInput.$dirty || !vm.isStartDateValid()}">
-                        <label class="control-label col-xs-4 col-sm-4 event-timepicker-label" translate="events.eventStartTime"></label>
+                    <div class="form-group required"
+                        ng-class="{'has-error': eventForm.startDateInput.$invalid && eventForm.startDateInput.$dirty || !vm.isStartDateValid()}">
+                        <label class="control-label col-xs-4 col-sm-4 event-timepicker-label"
+                            translate="events.eventStartTime"></label>
                         <div class="col-xs-8 col-sm-6 col-md-4">
-                            <div uib-timepicker ng-model="vm.event.startDate" hour-step="1" minute-step="1" show-meridian="false" data-test-id="start-time-input"></div>
-                            <p class="text-danger help-block" ng-if="!vm.event.startDate" translate="common.messageFieldIsRequired"></p>
-                            <p class="text-danger help-block" ng-if="!!vm.event.startDate && !vm.isStartDateValid()" translate="events.fieldEventTimePast"></p>
+                            <div uib-timepicker ng-model="vm.event.startDate" hour-step="1" minute-step="1"
+                                show-meridian="false" data-test-id="start-time-input"></div>
+                            <p class="text-danger help-block" ng-if="!vm.event.startDate"
+                                translate="common.messageFieldIsRequired"></p>
+                            <p class="text-danger help-block" ng-if="!!vm.event.startDate && !vm.isStartDateValid()"
+                                translate="events.fieldEventTimePast"></p>
                         </div>
                     </div>
                     <!--event isRegistrationDeadline -->
                     <div class="form-group">
                         <label class="control-label col-xs-12 col-sm-4"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
-                            <input id="isRegistrationDeadline" type="checkbox" class="event-form-checkbox" ng-model="vm.isRegistrationDeadlineEnabled" ng-click="vm.showRegistrationDeadline()" data-test-id="event-form-is-registration-deadline-input" />
-                            <label for="isRegistrationDeadline" class="control-label" translate="events.eventRegistrationDeadline"></label>
+                            <input id="isRegistrationDeadline" type="checkbox" class="event-form-checkbox"
+                                ng-model="vm.isRegistrationDeadlineEnabled" ng-click="vm.showRegistrationDeadline()"
+                                data-test-id="event-form-is-registration-deadline-input" />
+                            <label for="isRegistrationDeadline" class="control-label"
+                                translate="events.eventRegistrationDeadline"></label>
                         </div>
                     </div>
                     <!--event registration deadline date-->
                     <div ng-if="vm.isRegistrationDeadlineEnabled">
-                        <div class="form-group required" ng-class="{'has-error': (eventForm.registrationDeadlineDateInput.$invalid && eventForm.registrationDeadlineDateInput.$dirty) || vm.isDeadlineDateValid()}">
-                            <label for="registrationDeadlineDateInput" class="control-label col-xs-12 col-sm-4" translate="events.eventDeadlineDate"></label>
+                        <div class="form-group required"
+                            ng-class="{'has-error': (eventForm.registrationDeadlineDateInput.$invalid && eventForm.registrationDeadlineDateInput.$dirty) || vm.isDeadlineDateValid()}">
+                            <label for="registrationDeadlineDateInput" class="control-label col-xs-12 col-sm-4"
+                                translate="events.eventDeadlineDate"></label>
                             <div class="col-xs-12 col-sm-6 col-md-4">
                                 <div class="date-field">
-                                    <input type="text" 
-                                           name="registrationDeadlineDateInput" 
-                                           id="registrationDeadlineDateInput" 
-                                           class="hasDatepicker" 
-                                           uib-datepicker-popup="yyyy-MM-dd" 
-                                           popup-placement="bottom"
-                                           ng-model="vm.event.registrationDeadlineDate" 
-                                           is-open="vm.datePickers.isOpenEventDeadlineDatePicker" 
-                                           ng-required="true" 
-                                           ng-click="vm.openDatePicker($event, 'isOpenEventDeadlineDatePicker')" />
+                                    <input type="text" name="registrationDeadlineDateInput"
+                                        id="registrationDeadlineDateInput" class="hasDatepicker"
+                                        uib-datepicker-popup="yyyy-MM-dd" popup-placement="bottom"
+                                        ng-model="vm.event.registrationDeadlineDate"
+                                        is-open="vm.datePickers.isOpenEventDeadlineDatePicker" ng-required="true"
+                                        ng-click="vm.openDatePicker($event, 'isOpenEventDeadlineDatePicker')" />
                                 </div>
-                                <p class="text-danger help-block" ng-if="eventForm.registrationDeadlineDateInput.$invalid && eventForm.registrationDeadlineDateInput.$dirty || !vm.event.registrationDeadlineDate" translate="common.messageFieldIsRequired"></p>
-                                <p class="text-danger help-block" ng-if="!!vm.event.registrationDeadlineDate && (vm.states.isAdd && vm.minStartDate > vm.event.registrationDeadlineDate)" translate="events.fieldEventDeadlinePast"></p>
-                                <p class="text-danger help-block" ng-if="vm.event.registrationDeadlineDate > vm.event.startDate" translate="errorCodeMessages.messageEventDeadlineAfterStartDate"></p>
+                                <p class="text-danger help-block"
+                                    ng-if="eventForm.registrationDeadlineDateInput.$invalid && eventForm.registrationDeadlineDateInput.$dirty || !vm.event.registrationDeadlineDate"
+                                    translate="common.messageFieldIsRequired"></p>
+                                <p class="text-danger help-block"
+                                    ng-if="!!vm.event.registrationDeadlineDate && (vm.states.isAdd && vm.minStartDate > vm.event.registrationDeadlineDate)"
+                                    translate="events.fieldEventDeadlinePast"></p>
+                                <p class="text-danger help-block"
+                                    ng-if="vm.event.registrationDeadlineDate > vm.event.startDate"
+                                    translate="errorCodeMessages.messageEventDeadlineAfterStartDate"></p>
                             </div>
                         </div>
                         <!--event registration deadline time-->
-                        <div class="form-group required" ng-class="{'has-error': (eventForm.registrationDeadlineDateInput.$invalid && eventForm.registrationDeadlineDateInput.$dirty) || vm.isDeadlineDateValid()}">
-                            <label class="control-label col-xs-4 col-sm-4 event-timepicker-label" translate="events.eventDeadlineTime"></label>
+                        <div class="form-group required"
+                            ng-class="{'has-error': (eventForm.registrationDeadlineDateInput.$invalid && eventForm.registrationDeadlineDateInput.$dirty) || vm.isDeadlineDateValid()}">
+                            <label class="control-label col-xs-4 col-sm-4 event-timepicker-label"
+                                translate="events.eventDeadlineTime"></label>
                             <div class="col-xs-8 col-sm-6 col-md-4">
-                                <div uib-timepicker ng-model="vm.event.registrationDeadlineDate" hour-step="1" minute-step="1" show-meridian="false" data-test-id="deadline-time-input"></div>
-                                <p class="text-danger help-block" ng-if="!vm.event.registrationDeadlineDate" translate="common.messageFieldIsRequired"></p>
-                                <p class="text-danger help-block" ng-if="!!vm.event.registrationDeadlineDate && (vm.event.registrationDeadlineDate > vm.event.startDate)" translate="errorCodeMessages.messageEventDeadlineAfterStartDate"></p>
-                                <p class="text-danger help-block" ng-if="!!vm.event.registrationDeadlineDate && (vm.states.isAdd && vm.minStartDate > vm.event.registrationDeadlineDate)" translate="events.fieldEventDeadlinePast"></p>
+                                <div uib-timepicker ng-model="vm.event.registrationDeadlineDate" hour-step="1"
+                                    minute-step="1" show-meridian="false" data-test-id="deadline-time-input"></div>
+                                <p class="text-danger help-block" ng-if="!vm.event.registrationDeadlineDate"
+                                    translate="common.messageFieldIsRequired"></p>
+                                <p class="text-danger help-block"
+                                    ng-if="!!vm.event.registrationDeadlineDate && (vm.event.registrationDeadlineDate > vm.event.startDate)"
+                                    translate="errorCodeMessages.messageEventDeadlineAfterStartDate"></p>
+                                <p class="text-danger help-block"
+                                    ng-if="!!vm.event.registrationDeadlineDate && (vm.states.isAdd && vm.minStartDate > vm.event.registrationDeadlineDate)"
+                                    translate="events.fieldEventDeadlinePast"></p>
                             </div>
                         </div>
                     </div>
                     <!--event endDate date-->
-                    <div class="form-group required" ng-class="{'has-error': eventForm.endDateInput.$invalid && eventForm.endDateInput.$dirty || !vm.isEndDateValid()}">
-                        <label for="endDateInput" class="control-label col-xs-12 col-sm-4" translate="events.eventFinishDate"></label>
+                    <div class="form-group required"
+                        ng-class="{'has-error': eventForm.endDateInput.$invalid && eventForm.endDateInput.$dirty || !vm.isEndDateValid()}">
+                        <label for="endDateInput" class="control-label col-xs-12 col-sm-4"
+                            translate="events.eventFinishDate"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
                             <div class="date-field">
-                                <input type="text" 
-                                       name="endDateInput" 
-                                       id="endDateInput" 
-                                       class="hasDatepicker" 
-                                       uib-datepicker-popup="yyyy-MM-dd" 
-                                       popup-placement="bottom"
-                                       ng-model="vm.event.endDate" 
-                                       is-open="vm.datePickers.isOpenEventFinishDatePicker" 
-                                       ng-required="true" 
-                                       ng-click="vm.openDatePicker($event, 'isOpenEventFinishDatePicker')" />
+                                <input type="text" name="endDateInput" id="endDateInput" class="hasDatepicker"
+                                    uib-datepicker-popup="yyyy-MM-dd" popup-placement="bottom"
+                                    ng-model="vm.event.endDate" is-open="vm.datePickers.isOpenEventFinishDatePicker"
+                                    ng-required="true"
+                                    ng-click="vm.openDatePicker($event, 'isOpenEventFinishDatePicker')" />
                             </div>
-                            <p class="text-danger help-block" ng-if="eventForm.endDateInput.$invalid && eventForm.endDateInput.$dirty" translate="common.messageFieldIsRequired"></p>
-                            <p class="text-danger help-block" ng-if="vm.event.startDate >= vm.event.endDate" translate="events.fieldEventEndBeforeStartDate"></p>
+                            <p class="text-danger help-block"
+                                ng-if="eventForm.endDateInput.$invalid && eventForm.endDateInput.$dirty"
+                                translate="common.messageFieldIsRequired"></p>
+                            <p class="text-danger help-block" ng-if="vm.event.startDate >= vm.event.endDate"
+                                translate="events.fieldEventEndBeforeStartDate"></p>
                         </div>
                     </div>
                     <!--event endDate time-->
-                    <div class="form-group required" ng-class="{'has-error': eventForm.endDateInput.$invalid && eventForm.endDateInput.$dirty || !vm.isEndDateValid()}">
-                        <label class="control-label col-xs-4 col-sm-4 event-timepicker-label" translate="events.eventFinishTime"></label>
+                    <div class="form-group required"
+                        ng-class="{'has-error': eventForm.endDateInput.$invalid && eventForm.endDateInput.$dirty || !vm.isEndDateValid()}">
+                        <label class="control-label col-xs-4 col-sm-4 event-timepicker-label"
+                            translate="events.eventFinishTime"></label>
                         <div class="col-xs-8 col-sm-6 col-md-4">
-                            <div uib-timepicker ng-model="vm.event.endDate" hour-step="1" minute-step="1" show-meridian="false" data-test-id="end-time-input"></div>
-                            <p class="text-danger help-block" ng-if="eventForm.endDateInput.$invalid && eventForm.endDateInput.$dirty" translate="common.messageFieldIsRequired"></p>
-                            <p class="text-danger help-block" ng-if="vm.event.startDate >= vm.event.endDate" translate="events.fieldEventEndBeforeStartDate"></p>
+                            <div uib-timepicker ng-model="vm.event.endDate" hour-step="1" minute-step="1"
+                                show-meridian="false" data-test-id="end-time-input"></div>
+                            <p class="text-danger help-block"
+                                ng-if="eventForm.endDateInput.$invalid && eventForm.endDateInput.$dirty"
+                                translate="common.messageFieldIsRequired"></p>
+                            <p class="text-danger help-block" ng-if="vm.event.startDate >= vm.event.endDate"
+                                translate="events.fieldEventEndBeforeStartDate"></p>
                         </div>
                     </div>
                     <!--event recurring-->
-                    <div class="form-group required" ng-class="{'has-error': eventForm.recurring.$invalid && eventForm.recurrence.$dirty}">
-                        <label for="recurrence" class="control-label col-xs-12 col-sm-4" translate="events.eventRecurring"></label>
+                    <div class="form-group required"
+                        ng-class="{'has-error': eventForm.recurring.$invalid && eventForm.recurrence.$dirty}">
+                        <label for="recurrence" class="control-label col-xs-12 col-sm-4"
+                            translate="events.eventRecurring"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
-                            <select id="recurrence" name="recurrence" class="form-control" ng-model="vm.event.recurrence" ng-options="type.value as 'events.' + vm.recurringTypesResources[type.value] | translate for type in vm.recurringTypes" data-test-id="event-form-recurring-input" translate-cloak></select>
+                            <select id="recurrence" name="recurrence" class="form-control"
+                                ng-model="vm.event.recurrence"
+                                ng-options="type.value as 'events.' + vm.recurringTypesResources[type.value] | translate for type in vm.recurringTypes"
+                                data-test-id="event-form-recurring-input" translate-cloak></select>
                         </div>
                     </div>
                     <!--event office-->
-                    <div class="form-group" ng-class="{'has-error': eventForm.officeId.$invalid && eventForm.officeId.$dirty}">
-                        <label for="officeId" class="control-label col-xs-12 col-sm-4" translate="events.eventOffice"></label>
+                    <div class="form-group"
+                        ng-class="{'has-error': eventForm.officeId.$invalid && eventForm.officeId.$dirty}">
+                        <label for="officeId" class="control-label col-xs-12 col-sm-4"
+                            translate="events.eventOffice"></label>
 
                         <div class="col-xs-12 col-sm-6 col-md-4">
                             <div class="checkbox">
-                                <label><input type="checkbox" ng-model="outsideOffice" ng-click="vm.toggleAllOffices(false)">
+                                <label><input type="checkbox" ng-model="outsideOffice"
+                                        ng-click="vm.toggleAllOffices(false)">
                                     <span translate="events.eventOutside"></span>
                                 </label>
                             </div>
                             <div class="checkbox">
                                 <label><input type="checkbox" ng-disabled="outsideOffice"
-                                        ng-checked="vm.event.offices.length == vm.eventOffices.length" ng-click="vm.toggleAllOffices(true)">
+                                        ng-checked="vm.event.offices.length == vm.eventOffices.length"
+                                        ng-click="vm.toggleAllOffices(true)">
                                     <span translate="events.eventOfficeAll"></span>
                                 </label>
                             </div>
                             <div class="event-office-list-item-seperator">&nbsp;</div>
-                                <div class="checkbox event-office-list-item" ng-repeat="office in vm.eventOffices">
-                                    <label><input type="checkbox" ng-disabled="outsideOffice"
-                                        ng-checked="vm.event.offices.indexOf(office.id) != -1" ng-click="vm.toggleOfficeSelection(office)">{{office.name}}
-                                    </label>
-                                </div>
+                            <div class="checkbox event-office-list-item" ng-repeat="office in vm.eventOffices">
+                                <label><input type="checkbox" ng-disabled="outsideOffice"
+                                        ng-checked="vm.event.offices.indexOf(office.id) != -1"
+                                        ng-click="vm.toggleOfficeSelection(office)">{{office.name}}
+                                </label>
+                            </div>
 
-                            <p class="text-danger help-block" ng-if="eventForm.officeId.$invalid && eventForm.officeId.$dirty" translate="common.messageFieldIsRequired"></p>
+                            <p class="text-danger help-block"
+                                ng-if="eventForm.officeId.$invalid && eventForm.officeId.$dirty"
+                                translate="common.messageFieldIsRequired"></p>
                         </div>
                     </div>
                     <!--event location-->
-                    <div class="form-group required" ng-class="{'has-error': eventForm.location.$invalid && eventForm.location.$dirty}">
-                        <label for="location" class="control-label col-xs-12 col-sm-4" translate="events.eventLocation"></label>
+                    <div class="form-group required"
+                        ng-class="{'has-error': eventForm.location.$invalid && eventForm.location.$dirty}">
+                        <label for="location" class="control-label col-xs-12 col-sm-4"
+                            translate="events.eventLocation"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
-                            <input id="location" type="text" class="form-control" name="location" ng-model="vm.event.location" ng-maxlength="vm.eventSettings.locationLength" data-test-id="event-form-location-input" required/>
-                            <p class="text-danger help-block" ng-if="eventForm.location.$error.required && eventForm.location.$dirty" translate="common.messageFieldIsRequired"></p>
-                            <p class="text-danger help-block" ng-if="eventForm.location.$error.maxlength && eventForm.location.$dirty" ng-cloak translate="common.messageInvalidLength" translate-values="{ one: vm.eventSettings.locationLength }"></p>
+                            <input id="location" type="text" class="form-control" name="location"
+                                ng-model="vm.event.location" ng-maxlength="vm.eventSettings.locationLength"
+                                data-test-id="event-form-location-input" required />
+                            <p class="text-danger help-block"
+                                ng-if="eventForm.location.$error.required && eventForm.location.$dirty"
+                                translate="common.messageFieldIsRequired"></p>
+                            <p class="text-danger help-block"
+                                ng-if="eventForm.location.$error.maxlength && eventForm.location.$dirty" ng-cloak
+                                translate="common.messageInvalidLength"
+                                translate-values="{ one: vm.eventSettings.locationLength }"></p>
                         </div>
                     </div>
                     <!--event max participants-->
-                    <div class="form-group required" ng-class="{'has-error': eventForm.maxParticipants.$invalid && eventForm.maxParticipants.$dirty}">
-                        <label for="maxParticipants" class="control-label col-xs-12 col-sm-4" translate="events.eventMaxParticipants"></label>
+                    <div class="form-group required"
+                        ng-class="{'has-error': eventForm.maxParticipants.$invalid && eventForm.maxParticipants.$dirty}">
+                        <label for="maxParticipants" class="control-label col-xs-12 col-sm-4"
+                            translate="events.eventMaxParticipants"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
-                            <input id="maxParticipants" type="number" class="form-control" name="maxParticipants" ng-model="vm.event.maxParticipants" ng-pattern="/^(0|\-?[1-9][0-9]*)$/" min="0" steps="1" max="{{:: vm.eventSettings.participantsLength}}" data-test-id="event-form-max-participants-input" ignore-mouse-wheel required/>
+                            <input id="maxParticipants" type="number" class="form-control" name="maxParticipants"
+                                ng-model="vm.event.maxParticipants" ng-pattern="/^(0|\-?[1-9][0-9]*)$/" min="0"
+                                steps="1" max="{{:: vm.eventSettings.participantsLength}}"
+                                data-test-id="event-form-max-participants-input" ignore-mouse-wheel required />
                             <div ng-if="vm.states.isEdit" ng-show="vm.event.maxParticipants < vm.minParticipants">
                                 <label for="resetParticipantList" translate="events.resetParticipantList"></label>
-                                <input id="resetParticipantList" type="checkbox" class="event-form-checkbox" ng-model="vm.resetParticipantList" data-test-id="event-reset-participant-list-checkbox" />
+                                <input id="resetParticipantList" type="checkbox" class="event-form-checkbox"
+                                    ng-model="vm.resetParticipantList"
+                                    data-test-id="event-reset-participant-list-checkbox" />
                             </div>
-                            <p class="text-danger help-block" ng-if="eventForm.maxParticipants.$error.required && eventForm.maxParticipants.$dirty" translate="common.messageFieldIsRequired"></p>
-                            <p class="text-danger help-block" ng-if="eventForm.maxParticipants.$error.pattern || eventForm.maxParticipants.$error.number" translate="events.wrongNumber"></p>
-                            <p class="text-danger help-block" ng-if="eventForm.maxParticipants.$error.min && eventForm.maxParticipants.$dirty">
+                            <p class="text-danger help-block"
+                                ng-if="eventForm.maxParticipants.$error.required && eventForm.maxParticipants.$dirty"
+                                translate="common.messageFieldIsRequired"></p>
+                            <p class="text-danger help-block"
+                                ng-if="eventForm.maxParticipants.$error.pattern || eventForm.maxParticipants.$error.number"
+                                translate="events.wrongNumber"></p>
+                            <p class="text-danger help-block"
+                                ng-if="eventForm.maxParticipants.$error.min && eventForm.maxParticipants.$dirty">
                                 <span translate="events.tooLittle"></span>0
                             </p>
-                            <p class="text-danger help-block" ng-if="eventForm.maxParticipants.$error.max && eventForm.maxParticipants.$dirty" ng-cloak>
+                            <p class="text-danger help-block"
+                                ng-if="eventForm.maxParticipants.$error.max && eventForm.maxParticipants.$dirty"
+                                ng-cloak>
                                 <span translate="events.tooMuch"></span> {{:: vm.eventSettings.participantsLength}}
                             </p>
                         </div>
                     </div>
                     <!--event host-->
                     <div class="form-group required" ng-class="{'has-error': vm.isResponsibleUserError}">
-                        <label for="responsibleUser" class="control-label col-xs-12 col-sm-4" translate="events.eventHost"></label>
+                        <label for="responsibleUser" class="control-label col-xs-12 col-sm-4"
+                            translate="events.eventHost"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
-                            <autocomplete id="responsibleUser" load-data="vm.searchUsers" shown="fullName" bound-model="vm.responsibleUser" with-image="true" data-test-id="event-form-event-host-autocomplete-input">
+                            <autocomplete id="responsibleUser" load-data="vm.searchUsers" shown="fullName"
+                                bound-model="vm.responsibleUser" with-image="true"
+                                data-test-id="event-form-event-host-autocomplete-input">
                             </autocomplete>
-                            <p class="text-danger help-block" ng-if="vm.isResponsibleUserError" translate="common.messageFieldIsRequired"></p>
+                            <p class="text-danger help-block" ng-if="vm.isResponsibleUserError"
+                                translate="common.messageFieldIsRequired"></p>
                         </div>
                     </div>
                     <!--event description-->
-                    <div class="form-group" ng-class="{'has-error': eventForm.description.$error.maxlength && eventForm.description.$dirty}">
-                        <label for="description" class="control-label col-xs-12 col-sm-4" translate="events.eventDescription"></label>
+                    <div class="form-group"
+                        ng-class="{'has-error': eventForm.description.$error.maxlength && eventForm.description.$dirty}">
+                        <label for="description" class="control-label col-xs-12 col-sm-4"
+                            translate="events.eventDescription"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
-                            <textarea id="description" name="description" class="form-control" ng-model="vm.event.description" ng-maxlength="vm.eventSettings.descriptionLength" rows="3" data-test-id="event-form-event-description-input"></textarea>
-                            <p class="text-danger help-block" ng-if="eventForm.description.$error.maxlength && eventForm.description.$dirty" translate="common.messageInvalidLength" translate-values="{ one: vm.eventSettings.descriptionLength }"></p>
+                            <textarea id="description" name="description" class="form-control"
+                                ng-model="vm.event.description" ng-maxlength="vm.eventSettings.descriptionLength"
+                                rows="3" data-test-id="event-form-event-description-input"></textarea>
+                            <p class="text-danger help-block"
+                                ng-if="eventForm.description.$error.maxlength && eventForm.description.$dirty"
+                                translate="common.messageInvalidLength"
+                                translate-values="{ one: vm.eventSettings.descriptionLength }"></p>
                         </div>
                     </div>
                     <!--event photo-->
-                    <div class="form-group required" ng-class="{'has-error': eventForm.image-file-input.$invalid && eventForm.image-file-input.$dirty}">
-                        <label for="image-file-input" class="control-label col-xs-12 col-sm-4" translate="events.eventPhoto"></label>
+                    <div class="form-group required"
+                        ng-class="{'has-error': eventForm.image-file-input.$invalid && eventForm.image-file-input.$dirty}">
+                        <label for="image-file-input" class="control-label col-xs-12 col-sm-4"
+                            translate="events.eventPhoto"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
-                            <ace-photo-crop-upload images="vm.eventImage" is-crop-visible="vm.states.isAdd" aspect-ratio="1.7" result-image="vm.eventCroppedImage" image-size="vm.eventImageSize">
+                            <ace-photo-crop-upload images="vm.eventImage" is-crop-visible="vm.states.isAdd"
+                                aspect-ratio="1.7" result-image="vm.eventCroppedImage" image-size="vm.eventImageSize">
                             </ace-photo-crop-upload>
-                            <img ng-if="vm.states.isEdit && !vm.eventCroppedImage && !!vm.eventImage" src="{{vm.event.imageName | imageThumb:vm.eventImageSize:'crop'}}" />
+                            <img ng-if="vm.states.isEdit && !vm.eventCroppedImage && !!vm.eventImage"
+                                src="{{vm.event.imageName | imageThumb:vm.eventImageSize:'crop'}}" />
                         </div>
                     </div>
                     <!--event isOptions -->
                     <div class="form-group">
                         <label class="control-label col-xs-12 col-sm-4"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
-                            <input id="moreOptions" type="checkbox" class="event-form-checkbox" ng-model="vm.isOptions" data-test-id="event-form-is-options-input" />
-                            <label for="moreOptions" class="control-label" translate="events.eventOptionsSelect"></label>
+                            <input id="moreOptions" type="checkbox" class="event-form-checkbox" ng-model="vm.isOptions"
+                                data-test-id="event-form-is-options-input" />
+                            <label for="moreOptions" class="control-label"
+                                translate="events.eventOptionsSelect"></label>
                         </div>
                     </div>
                     <div ng-if="vm.isOptions">
                         <!--event maxOptions -->
                         <div class="form-group required" ng-class="{'has-error': eventForm.maxOptions.$invalid}">
-                            <label for="maxOptions" class="control-label col-xs-12 col-sm-4" translate="events.eventMaxAmountOfOptions"></label>
+                            <label for="maxOptions" class="control-label col-xs-12 col-sm-4"
+                                translate="events.eventMaxAmountOfOptions"></label>
                             <div class="col-xs-12 col-sm-6 col-md-4">
-                                <input id="maxOptions" type="number" name="maxOptions" class="form-control" ng-model="vm.event.maxOptions" ng-pattern="/^(0|\-?[1-9][0-9]*)$/" min="1" step="1" ng-max="vm.event.options.length" data-test-id="event-form-max-options-input" ignore-mouse-wheel required/>
+                                <input id="maxOptions" type="number" name="maxOptions" class="form-control"
+                                    ng-model="vm.event.maxOptions" ng-pattern="/^(0|\-?[1-9][0-9]*)$/" min="1" step="1"
+                                    ng-max="vm.event.options.length" data-test-id="event-form-max-options-input"
+                                    ignore-mouse-wheel required />
                                 <p class="text-danger help-block" ng-if="eventForm.maxOptions.$error.min">
                                     <span translate="events.tooLittle"></span> 1
                                 </p>
-                                <p class="text-danger help-block" ng-if="eventForm.maxOptions.$error.max" translate="events.messageMaxOptionsIsBiggerThanOptions"></p>
-                                <p class="text-danger help-block" ng-if="eventForm.maxOptions.$error.number || eventForm.maxOptions.$error.pattern" translate="events.wrongNumber"></p>
-                                <p class="text-danger help-block" ng-if="eventForm.maxOptions.$error.required && eventForm.maxOptions.$dirty" translate="common.messageFieldIsRequired"></p>
+                                <p class="text-danger help-block" ng-if="eventForm.maxOptions.$error.max"
+                                    translate="events.messageMaxOptionsIsBiggerThanOptions"></p>
+                                <p class="text-danger help-block"
+                                    ng-if="eventForm.maxOptions.$error.number || eventForm.maxOptions.$error.pattern"
+                                    translate="events.wrongNumber"></p>
+                                <p class="text-danger help-block"
+                                    ng-if="eventForm.maxOptions.$error.required && eventForm.maxOptions.$dirty"
+                                    translate="common.messageFieldIsRequired"></p>
                             </div>
                         </div>
                         <!--event options-->
-                        <div ng-form name="optionsForm" class="form-group" ng-repeat="option in vm.event.options track by $index" ng-class="{'has-error': !vm.isValidOption(vm.event.options, option) || (optionsForm.option.$error.required && optionsForm.option.$dirty), 'required': $index === 0}">
-                            <label class="control-label col-xs-12 col-sm-4" ng-if="!$index" translate="events.eventAvailableOptions"></label>
+                        <div ng-form name="optionsForm" class="form-group"
+                            ng-repeat="option in vm.event.options track by $index"
+                            ng-class="{'has-error': !vm.isValidOption(vm.event.options, option) || (optionsForm.option.$error.required && optionsForm.option.$dirty), 'required': $index === 0}">
+                            <label class="control-label col-xs-12 col-sm-4" ng-if="!$index"
+                                translate="events.eventAvailableOptions"></label>
                             <label class="control-label col-xs-12 col-sm-4" ng-if="!!$index"></label>
                             <div class="participant-option-input">
-                                <input id="option{{$index}}" name="option" type="text" class="form-control" ng-model="option.option" data-test-id="event-form-option{{$index}}" required/>
-                                <p class="text-danger help-block" ng-if="optionsForm.option.$error.required && optionsForm.option.$dirty" translate="common.messageFieldIsRequired"></p>
-                                <p class="text-danger help-block" ng-if="!vm.isValidOption(vm.event.options, option)" translate="events.nonUniqueOptions"></p>
+                                <input id="option{{$index}}" name="option" type="text" class="form-control"
+                                    ng-model="option.option" data-test-id="event-form-option{{$index}}" required />
+                                <p class="text-danger help-block"
+                                    ng-if="optionsForm.option.$error.required && optionsForm.option.$dirty"
+                                    translate="common.messageFieldIsRequired"></p>
+                                <p class="text-danger help-block" ng-if="!vm.isValidOption(vm.event.options, option)"
+                                    translate="events.nonUniqueOptions"></p>
                             </div>
-                            <a class="nc-btn nc-btn-default" ng-click="vm.deleteOption($index)" translate-attr-title="events.eventDeleteOption" data-test-id="event-form-delete-option" translate>
+                            <a class="nc-btn nc-btn-default" ng-click="vm.deleteOption($index)"
+                                translate-attr-title="events.eventDeleteOption" data-test-id="event-form-delete-option"
+                                translate>
                                 <span class="vismaicon vismaicon-delete vismaicon-form-group"></span>
                             </a>
                         </div>
@@ -258,33 +368,64 @@
                         <div class="form-group">
                             <label class="control-label col-xs-12 col-sm-4"></label>
                             <div class="col-xs-12 col-sm-6 col-md-4">
-                                <a class="nc-btn nc-btn-default" ng-click="vm.addOption()" translate-attr-title="events.addOption" data-test-id="event-form-add-option" translate>
-                                    <span class="vismaicon vismaicon-add2-circle"></span><span translate="events.addOption"></span>
+                                <a class="nc-btn nc-btn-default" ng-click="vm.addOption()"
+                                    translate-attr-title="events.addOption" data-test-id="event-form-add-option"
+                                    translate>
+                                    <span class="vismaicon vismaicon-add2-circle"></span><span
+                                        translate="events.addOption"></span>
                                 </a>
+                            </div>
+                        </div>
+                        <!-- event ignore single join checkbox -->
+                        <div class="form-group" ng-if="vm.selectedType.isSingleJoin">
+                            <label class="control-label col-xs-12 col-sm-4"></label>
+                            <div class="col-xs-12 col-sm-6 col-md-4">
+                                <input id="ignoreOption" type="checkbox" class="event-form-checkbox"
+                                    ng-model="vm.isIgnoreSingleJoinEnabled" />
+                                <label for="ignoreOption" class="label-word-break">
+                                    {{'events.ignoreSingleJoinSelect' | translate}}
+                                    <span class="glyphicon glyphicon-info-sign"
+                                        uib-tooltip-template="'tooltipTemplate.html'" tooltip-placement="right"
+                                        tooltip-append-to-body="true" tooltip-class="service-request-status-tooltip"
+                                        style="font-size: 16px; color: #006fb0;"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <!-- event ignore single join input -->
+                        <div ng-if="vm.isIgnoreSingleJoinEnabled">
+                            <div class="form-group">
+                                <label class="control-label col-xs-12 col-sm-4"></label>
+                                <div class="col-xs-12 col-sm-6 col-md-4">
+                                    <input type="text" class="form-control" translate
+                                        translate-attr-placeholder="events.ignoreSingleJoinPlaceHolder" />
+                                </div>
                             </div>
                         </div>
                     </div>
                     <!-- event buttons left -->
                     <div class="pull-left">
-                        <button ng-if="vm.states.isEdit"
-                                class="btn btn-danger"
-                                ace-confirmation-modal="vm.deleteEvent(vm.event.id)"
-                                data-test-id="event-delete-button">
-                                <span translate="common.delete"></span>
+                        <button ng-if="vm.states.isEdit" class="btn btn-danger"
+                            ace-confirmation-modal="vm.deleteEvent(vm.event.id)" data-test-id="event-delete-button">
+                            <span translate="common.delete"></span>
                         </button>
                     </div>
                     <!--event buttons right -->
                     <div class="pull-right">
-                        <button class="btn btn-primary" ng-if="vm.states.isAdd" ng-click="vm.saveEvent(vm.createEvent, vm.eventImage)" ng-disabled="eventForm.$invalid ||  !vm.eventImage || !vm.responsibleUser.id ||
+                        <button class="btn btn-primary" ng-if="vm.states.isAdd"
+                            ng-click="vm.saveEvent(vm.createEvent, vm.eventImage)" ng-disabled="eventForm.$invalid ||  !vm.eventImage || !vm.responsibleUser.id ||
                                          !vm.isEndDateValid() || vm.isDeadlineDateValid() || !vm.isStartDateValid() ||
-                                         !vm.isOptionsUnique() || !vm.eventCroppedImage" data-test-id="event-form-save-button">
+                                         !vm.isOptionsUnique() || !vm.eventCroppedImage"
+                            data-test-id="event-form-save-button">
                             <span translate="common.save"></span>
                         </button>
-                        <button class="btn btn-primary" ng-if="vm.states.isEdit" ng-click="vm.saveEvent(vm.updateEvent, vm.eventImage)" ng-disabled="eventForm.$invalid || !vm.responsibleUser.id || !vm.isEndDateValid() ||
-                                         vm.isDeadlineDateValid() || !vm.isOptionsUnique()" data-test-id="event-form-update-button">
+                        <button class="btn btn-primary" ng-if="vm.states.isEdit"
+                            ng-click="vm.saveEvent(vm.updateEvent, vm.eventImage)" ng-disabled="eventForm.$invalid || !vm.responsibleUser.id || !vm.isEndDateValid() ||
+                                         vm.isDeadlineDateValid() || !vm.isOptionsUnique()"
+                            data-test-id="event-form-update-button">
                             <span translate="common.update"></span>
                         </button>
-                        <button class="btn btn-default" ui-sref="Root.WithOrg.Client.Events.List.Type({type: 'all'})" data-test-id="event-form-cancel-button">
+                        <button class="btn btn-default" ui-sref="Root.WithOrg.Client.Events.List.Type({type: 'all'})"
+                            data-test-id="event-form-cancel-button">
                             <span translate="common.cancel"></span>
                         </button>
                     </div>
@@ -293,3 +434,10 @@
         </div>
     </div>
 </div>
+
+<script type="text/ng-template" id="tooltipTemplate.html">
+    <div>
+        <p>{{'events.ignoreSingleJoinTooltipParagraphOne' | translate}}</p>
+        <p>{{'events.ignoreSingleJoinTooltipParagraphTwo' | translate}}</p>
+    </div>
+</script>
