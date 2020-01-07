@@ -255,7 +255,7 @@ namespace Shrooms.Domain.Services.Books
 
             var organization = _organizationService.GetOrganizationById(userAndOrg.OrganizationId);
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
-            var bookUrl = _appSettings.BookUrl(organization.Name, bookReport.BookOfficeId, reportedOfficeBook.OfficeId);
+            var bookUrl = _appSettings.BookUrl(organization.ShortName, bookReport.BookOfficeId, reportedOfficeBook.OfficeId);
             var subject = $"Reported book: {reportedOfficeBook.Book.Title}";
             var bookReportTemplateViewModel = new BookReportEmailTemplateViewModel(reportedOfficeBook.Book.Title, reportedOfficeBook.Book.Author,
                  bookReport.Report, bookReport.Comment, bookUrl, user.FullName, userNotificationSettingsUrl);
