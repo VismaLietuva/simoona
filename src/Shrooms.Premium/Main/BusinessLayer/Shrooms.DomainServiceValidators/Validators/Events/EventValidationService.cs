@@ -9,6 +9,7 @@ using Shrooms.DataTransferObjects.Models.Events;
 using static Shrooms.Constants.ErrorCodes.ErrorCodes;
 using static Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes.ErrorCodes;
 using Shrooms.DomainExceptions.Exceptions;
+using Shrooms.Constants.BusinessLayer.Events;
 
 namespace Shrooms.DomainServiceValidators.Validators.Events
 {
@@ -34,6 +35,14 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
             if (providedOptions.Count() != foundOptions.Count())
             {
                 throw new EventException(EventNoSuchOptionsCode);
+            }
+        }
+
+        public void CheckIfSingleChoiceSelectedWithRule(IEnumerable<EventOption> options, OptionRules rule)
+        {
+            if (options.Any(op => op.Rule == rule) && options.Count() > 1)
+            {
+                throw new EventException(EventChoiceCanBeSingleOnly);
             }
         }
 

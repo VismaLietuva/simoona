@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Shrooms.DataTransferObjects.Models.Events;
+using Shrooms.Constants.BusinessLayer.Events;
 
 namespace Shrooms.DomainServiceValidators.Validators.Events
 {
@@ -16,6 +17,7 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
         void CheckIfEventEndDateIsExpired(DateTime endDate);
         void CheckIfEventStartDateIsExpired(DateTime startDate);
         void CheckIfOptionsAreDifferent(IEnumerable<NewEventOptionDTO> options);
+        void CheckIfSingleChoiceSelectedWithRule(IEnumerable<EventOption> options, OptionRules rule);
         void CheckIfUserAlreadyJoinedSameEvent(bool isParticipating);
         void CheckIfJoiningEventStartDateHasPassed(DateTime startDate);
         void CheckIfEventIsFull(int maxParticipants, int participantsCount);
