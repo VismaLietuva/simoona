@@ -33,15 +33,11 @@ namespace Shrooms.Azure
 
         public async Task RemovePicture(string blobKey, string tenantPicturesContainer)
         {
-            try
-            {
-                var blockBlob = GetBlockBlob(blobKey, tenantPicturesContainer);
+            var blockBlob = GetBlockBlob(blobKey, tenantPicturesContainer);
 
-                await blockBlob.DeleteAsync(DeleteSnapshotsOption.None, null, _blobRequestOptions, null);
-            }
-            catch (WebException ex)
+            if (blockBlob.Exists())
             {
-                _logger.Error(ex);
+                await blockBlob.DeleteAsync(DeleteSnapshotsOption.None, null, _blobRequestOptions, null);
             }
         }
 
