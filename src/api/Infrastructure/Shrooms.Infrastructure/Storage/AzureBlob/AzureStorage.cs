@@ -17,12 +17,9 @@ namespace Shrooms.Azure
 
         private readonly IApplicationSettings _settings;
 
-        private readonly ILogger _logger;
-
-        public AzureStorage(IApplicationSettings settings, ILogger logger)
+        public AzureStorage(IApplicationSettings settings)
         {
             _settings = settings;
-            _logger = logger;
 
             _blobRequestOptions = new BlobRequestOptions
             {
