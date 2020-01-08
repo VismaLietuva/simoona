@@ -376,7 +376,13 @@
                 tempArray = lodash.filter(vm.event.options, function (element) {
                     return !element.id;
                 });
-                vm.event.newOptions = lodash.map(tempArray, 'option');
+
+                vm.event.newOptions = lodash.map(tempArray, (obj) => {
+                    return {
+                        option: obj.option,
+                        rule: optionRules.default
+                    }
+                });
 
                 vm.event.editedOptions = lodash.filter(vm.event.options, function (element) {
                     return !!element.id;
@@ -384,13 +390,16 @@
 
                 if (vm.isIgnoreSingleJoinEnabled) {
                     if (vm.ignoreSingleJoinOption.id) {
-                        vm.event.editedOptions.push(vm.ignoreSingleJoinOption);
-                        console.log('1');
-                        
+                        vm.event.editedOptions.push({
+                            id: vm.ignoreSingleJoinOption.id,
+                            option: vm.ignoreSingleJoinOption.option,
+                            rule: optionRules.default
+                        });
                     } else {
-                        vm.event.newOptions.push({option: vm.ignoreSingleJoinOption, rule: optionRules.ignoreSingleJoin});
-                        console.log('2');
-
+                        vm.event.newOptions.push({
+                            option: vm.ignoreSingleJoinOption.option,
+                            rule: optionRules.ignoreSingleJoin
+                        });
                     }
                 }
             } else {
