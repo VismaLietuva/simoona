@@ -196,6 +196,7 @@ namespace Shrooms.API.Controllers.Kudos
             }
 
             var dto = _mapper.Map<KudosTypeViewModel, KudosTypeDTO>(model);
+            SetOrganizationAndUser(dto);
 
             try
             {
