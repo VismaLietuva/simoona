@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Drawing;
 using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
 using Shrooms.Infrastructure.Configuration;
+using Shrooms.Infrastructure.Logger;
 
 namespace Shrooms.Azure
 {
@@ -15,9 +17,12 @@ namespace Shrooms.Azure
 
         private readonly IApplicationSettings _settings;
 
-        public AzureStorage(IApplicationSettings settings)
+        private readonly ILogger _logger;
+
+        public AzureStorage(IApplicationSettings settings, ILogger logger)
         {
             _settings = settings;
+            _logger = logger;
 
             _blobRequestOptions = new BlobRequestOptions
             {
@@ -28,9 +33,16 @@ namespace Shrooms.Azure
 
         public async Task RemovePicture(string blobKey, string tenantPicturesContainer)
         {
-            var blockBlob = GetBlockBlob(blobKey, tenantPicturesContainer);
+            try
+            {
+                var blockBlob = GetBlockBlob(blobKey, tenantPicturesContainer);
 
-            await blockBlob.DeleteAsync(DeleteSnapshotsOption.None, null, _blobRequestOptions, null);
+                await blockBlob.DeleteAsync(DeleteSnapshotsOption.None, null, _blobRequestOptions, null);
+            }
+            catch (WebException ex)
+            {
+                _logger.Error(ex);
+            }
         }
 
         public async Task UploadPicture(Image image, string blobKey, string mimeType, string tenantPicturesContainer)
