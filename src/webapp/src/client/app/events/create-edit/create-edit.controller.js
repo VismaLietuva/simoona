@@ -1,4 +1,4 @@
-(function() {
+(function () {
     'use strict';
 
     angular
@@ -37,12 +37,13 @@
         'notifySrv',
         'localeSrv',
         'lodash',
-        'errorHandler'
+        'errorHandler',
+        'optionRules'
     ];
 
     function addNewEventController($rootScope, $scope, $stateParams, $state, $timeout, dataHandler,
         authService, eventRepository, pictureRepository, eventSettings,
-        recurringTypesResources, $translate, notifySrv, localeSrv, lodash, errorHandler) {
+        recurringTypesResources, $translate, notifySrv, localeSrv, lodash, errorHandler, optionRules) {
         /* jshint validthis: true */
         var vm = this;
 
@@ -107,24 +108,26 @@
                 isOpenEventDeadlineDatePicker: false
             };
 
-            eventRepository.getEventOffices().then(function(response) {
+            eventRepository.getEventOffices().then(function (response) {
                 vm.eventOffices = response;
             });
 
-            eventRepository.getEventTypes().then(function(response) {
+            eventRepository.getEventTypes().then(function (response) {
                 vm.eventTypes = response;
             });
 
-            eventRepository.getEventRecurringTypes().then(function(response) {
+            eventRepository.getEventRecurringTypes().then(function (response) {
                 vm.recurringTypes = response;
             });
 
             function setEventTypes() {
-                $scope.$watch(function () { return vm.eventTypes },
+                $scope.$watch(function () {
+                        return vm.eventTypes
+                    },
                     function () {
                         if (vm.eventTypes.length) {
-                            vm.eventTypes.forEach(function(type) {
-                                if(type.id == vm.event.typeId) {
+                            vm.eventTypes.forEach(function (type) {
+                                if (type.id == vm.event.typeId) {
                                     vm.selectedType = type;
                                 }
                             })
@@ -133,7 +136,9 @@
             }
 
             if ($stateParams.id) {
-                eventRepository.getEventUpdate($stateParams.id).then(function(event) {
+                eventRepository.getEventUpdate($stateParams.id).then(function (event) {
+                        console.log(event);
+
                         vm.event = event;
                         setEventTypes();
                         vm.responsibleUser = {
@@ -147,7 +152,7 @@
                             vm.isRegistrationDeadlineEnabled = true;
                         }
                         vm.event.offices = [];
-                        vm.event.officeIds.forEach(function(value) {
+                        vm.event.officeIds.forEach(function (value) {
                             vm.event.offices.push(value);
                         })
                         vm.event.registrationDeadlineDate = moment.utc(vm.event.registrationDeadlineDate).local().startOf('minute').toDate();
@@ -156,13 +161,14 @@
 
                         if (!!vm.event.options.length) {
                             vm.isOptions = true;
+                            setIgnoreSingleJoinOption(vm.event.options);
                         } else {
                             vm.event.maxOptions = 1;
                             addOption();
                             addOption();
                         }
                     },
-                    function(error) {
+                    function (error) {
                         errorHandler.handleErrorMessage(error);
 
                         $state.go('Root.WithOrg.Client.Events.List.Type', {
@@ -188,8 +194,7 @@
                     registrationDeadlineDate: null
                 };
 
-                eventRepository.getMaxEventParticipants().query(function(response)
-                {
+                eventRepository.getMaxEventParticipants().query(function (response) {
                     vm.event.maxParticipants = response.value;
                 });
 
@@ -197,7 +202,7 @@
                 addOption();
             }
 
-            $scope.$watch('vm.responsibleUser', function(newVal) {
+            $scope.$watch('vm.responsibleUser', function (newVal) {
                 if (newVal && !newVal.id) {
                     vm.isResponsibleUserError = true;
                 } else {
@@ -209,36 +214,32 @@
         function toggleOfficeSelection(office) {
             var idx = vm.event.offices.indexOf(office.id);
 
-            if(idx > -1) {
-                vm.event.offices.splice(idx,1);
-            }
-            else {
+            if (idx > -1) {
+                vm.event.offices.splice(idx, 1);
+            } else {
                 vm.event.offices.push(office.id);
             }
         }
 
         function toggleAllOffices(turnedOn) {
-            if(vm.event.offices.length == vm.eventOffices.length && turnedOn) {
+            if (vm.event.offices.length == vm.eventOffices.length && turnedOn) {
                 vm.event.offices = [];
-            }
-            else if(turnedOn) {
+            } else if (turnedOn) {
                 vm.event.offices = [];
-                angular.forEach(vm.eventOffices, function(office) {
+                angular.forEach(vm.eventOffices, function (office) {
                     vm.event.offices.push(office.id);
                 })
-            }
-            else {
+            } else {
                 vm.event.offices = [];
             }
         }
-
 
         function searchUsers(search) {
             return eventRepository.getUserForAutoCompleteResponsiblePerson(search);
         }
 
         function getResponsiblePerson(userId) {
-            eventRepository.getUserResponsiblePersonById(userId).then(function(data) {
+            eventRepository.getUserResponsiblePersonById(userId).then(function (data) {
                 vm.responsibleUser = data;
             });
         }
@@ -279,7 +280,7 @@
                 addOption();
             }
         }
-        
+
         function togglePin() {
             vm.event.isPinned = !vm.event.isPinned;
         }
@@ -292,19 +293,21 @@
                 eventImageBlob.name = vm.eventImage[0].name;
                 var eventImage = eventImageBlob;
 
-                pictureRepository.upload([eventImageBlob]).then(function(result) {
+                pictureRepository.upload([eventImageBlob]).then(function (result) {
                     method(result.data);
                 });
             } else {
                 method();
             }
         }
-        
+
         function deleteEvent(id) {
-            eventRepository.deleteEvent(id).then(function(result) {
+            eventRepository.deleteEvent(id).then(function (result) {
                 notifySrv.success('events.successDelete');
 
-                $state.go('Root.WithOrg.Client.Events.List.Type', {type: 'all'});
+                $state.go('Root.WithOrg.Client.Events.List.Type', {
+                    type: 'all'
+                });
             }, errorHandler.handleErrorMessage);
         }
 
@@ -318,14 +321,14 @@
                     vm.event.imageName = image;
                 }
 
-                eventRepository.createEvent(vm.event).then(function(result) {
+                eventRepository.createEvent(vm.event).then(function (result) {
                         notifySrv.success('common.successfullySaved');
 
                         $state.go('Root.WithOrg.Client.Events.List.Type', {
                             type: 'all'
                         });
                     },
-                    function(error) {
+                    function (error) {
                         vm.isSaveButtonEnabled = true;
                         errorHandler.handleErrorMessage(error);
                     });
@@ -342,14 +345,14 @@
                     vm.event.imageName = image;
                 }
 
-                eventRepository.updateEvent(vm.event).then(function(result) {
+                eventRepository.updateEvent(vm.event).then(function (result) {
                         notifySrv.success('common.successfullySaved');
 
                         $state.go('Root.WithOrg.Client.Events.List.Type', {
                             type: 'all'
                         });
                     },
-                    function(error) {
+                    function (error) {
                         vm.isSaveButtonEnabled = true;
                         errorHandler.handleErrorMessage(error);
                     });
@@ -366,20 +369,30 @@
             }
 
             if (vm.isOptions) {
-
                 var tempArray = [];
                 vm.event.editedOptions = [];
                 vm.event.newOptions = [];
 
-                tempArray = lodash.filter(vm.event.options, function(element) {
+                tempArray = lodash.filter(vm.event.options, function (element) {
                     return !element.id;
                 });
+                vm.event.newOptions = lodash.map(tempArray, 'option');
 
-                vm.event.newOptions = lodash.map(tempArray,'option');
-
-                vm.event.editedOptions = lodash.filter(vm.event.options, function(element) {
+                vm.event.editedOptions = lodash.filter(vm.event.options, function (element) {
                     return !!element.id;
                 });
+
+                if (vm.isIgnoreSingleJoinEnabled) {
+                    if (vm.ignoreSingleJoinOption.id) {
+                        vm.event.editedOptions.push(vm.ignoreSingleJoinOption);
+                        console.log('1');
+                        
+                    } else {
+                        vm.event.newOptions.push({option: vm.ignoreSingleJoinOption, rule: optionRules.ignoreSingleJoin});
+                        console.log('2');
+
+                    }
+                }
             } else {
                 vm.event.options = [];
                 vm.event.editedOptions = [];
@@ -404,7 +417,7 @@
 
             vm.closeAllDatePickers(datePicker);
 
-            $timeout(function() {
+            $timeout(function () {
                 $event.target.focus();
             }, 100);
         }
@@ -444,6 +457,17 @@
                 return vm.isRegistrationDeadlineEnabled &&
                     (vm.event.registrationDeadlineDate > vm.event.startDate ||
                         !vm.event.registrationDeadlineDate);
+            }
+        }
+
+        function setIgnoreSingleJoinOption(options) {
+            var index = options.findIndex(o => o.rule == optionRules.ignoreSingleJoin);
+
+            if (index > -1) {
+                vm.isIgnoreSingleJoinEnabled = true;
+                vm.ignoreSingleJoinOption = options[index];
+
+                vm.event.options.splice(index, 1);
             }
         }
     }
