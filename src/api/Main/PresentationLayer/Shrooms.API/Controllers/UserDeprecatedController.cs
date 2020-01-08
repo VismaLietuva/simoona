@@ -662,7 +662,8 @@ namespace Shrooms.API.Controllers.WebApi
                 return Request.CreateResponse(HttpStatusCode.BadRequest, new[] { string.Format(Resources.Models.ApplicationUser.ApplicationUser.EmailAlreadyExsists) });
             }
 
-            if (user.PictureId != model.PictureId)
+            if (user.PictureId != model.PictureId &&
+                !string.IsNullOrEmpty(user.PictureId))
             {
                 await _pictureService.RemoveImage(user.PictureId, userOrg.OrganizationId);
             }
