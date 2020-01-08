@@ -28,6 +28,7 @@ using Shrooms.Resources;
 using System.Globalization;
 using System.Data.Entity.SqlServer;
 using Newtonsoft.Json;
+using Shrooms.Constants.BusinessLayer.Events;
 
 namespace Shrooms.Domain.Services.Events
 {
@@ -262,7 +263,8 @@ namespace Shrooms.Domain.Services.Events
                 Options = e.EventOptions.Select(o => new EventOptionDTO
                 {
                     Id = o.Id,
-                    Option = o.Option
+                    Option = o.Option,
+                    Rule = o.Rule
                 })
             };
         }
@@ -334,7 +336,8 @@ namespace Shrooms.Domain.Services.Events
             {
                 var option = new EventOption
                 {
-                    Option = newOption,
+                    Option = newOption.Option,
+                    Rule = newOption.Rule,
                     EventId = editedEvent.Id,
                     Created = DateTime.UtcNow,
                     CreatedBy = editedEvent.UserId,
@@ -349,9 +352,9 @@ namespace Shrooms.Domain.Services.Events
         {
             if (newEventDto.NewOptions != null)
             {
-                foreach (var optionName in newEventDto.NewOptions)
+                foreach (var option in newEventDto.NewOptions)
                 {
-                    if (optionName != null)
+                    if (option != null)
                     {
                         var newOption = new EventOption()
                         {
@@ -359,7 +362,8 @@ namespace Shrooms.Domain.Services.Events
                             CreatedBy = newEventDto.UserId,
                             Modified = DateTime.UtcNow,
                             ModifiedBy = newEventDto.UserId,
-                            Option = optionName,
+                            Option = option.Option,
+                            Rule = option.Rule,
                             Event = newEvent
                         };
                         _eventOptionsDbSet.Add(newOption);

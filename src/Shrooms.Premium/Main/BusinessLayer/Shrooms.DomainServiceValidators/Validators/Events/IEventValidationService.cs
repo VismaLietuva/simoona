@@ -15,7 +15,7 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
         void CheckIfResponsibleUserNotExists(bool userExists);
         void CheckIfEventEndDateIsExpired(DateTime endDate);
         void CheckIfEventStartDateIsExpired(DateTime startDate);
-        void CheckIfOptionsAreDifferent(IEnumerable<string> options);
+        void CheckIfOptionsAreDifferent(IEnumerable<NewEventOptionDTO> options);
         void CheckIfUserAlreadyJoinedSameEvent(bool isParticipating);
         void CheckIfJoiningEventStartDateHasPassed(DateTime startDate);
         void CheckIfEventIsFull(int maxParticipants, int participantsCount);

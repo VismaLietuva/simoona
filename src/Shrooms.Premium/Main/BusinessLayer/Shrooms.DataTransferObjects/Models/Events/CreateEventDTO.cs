@@ -33,13 +33,11 @@ namespace Shrooms.DataTransferObjects.Models.Events
 
         public int TypeId { get; set; }
 
-        public int? FoodOption { get; set; }
-
         public string ResponsibleUserId { get; set; }
 
         public bool ResetParticipantList { get; set; }
 
-        public IEnumerable<string> NewOptions { get; set; }
+        public IEnumerable<NewEventOptionDTO> NewOptions { get; set; }
 
         public string Id { get; set; }
     }

@@ -55,6 +55,6 @@ namespace Shrooms.WebViewModels.Models.Events
         [Required]
         public string ResponsibleUserId { get; set; }
 
-        public IEnumerable<string> NewOptions { get; set; }
+        public IEnumerable<NewEventOptionViewModel> NewOptions { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Shrooms.Constants.BusinessLayer.Events;
+using System.Collections.Generic;
 
 namespace Shrooms.WebViewModels.Models.Events
 {

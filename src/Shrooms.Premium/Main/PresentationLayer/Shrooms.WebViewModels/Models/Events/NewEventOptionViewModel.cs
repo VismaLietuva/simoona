@@ -1,11 +1,9 @@
 ﻿using Shrooms.Constants.BusinessLayer.Events;
 
-namespace Shrooms.DataTransferObjects.Models.Events
+namespace Shrooms.WebViewModels.Models.Events
 {
-    public class EventOptionDTO
+    public class NewEventOptionViewModel
     {
-        public int Id { get; set; }
-
         public string Option { get; set; }
 
         public OptionRules Rule { get; set; }

@@ -234,11 +234,11 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
             }
         }
 
-        public void CheckIfOptionsAreDifferent(IEnumerable<string> options)
+        public void CheckIfOptionsAreDifferent(IEnumerable<NewEventOptionDTO> options)
         {
             if (options != null)
             {
-                var duplicateKeys = options.GroupBy(x => x)
+                var duplicateKeys = options.GroupBy(x => x.Option)
                         .Where(group => group.Count() > 1)
                         .Select(group => group.Key);
                 if (duplicateKeys.Count() > 0)

@@ -28,6 +28,9 @@ namespace Shrooms.ModelMappings.Profiles
                 .Ignore(x => x.Comments)
                 .ForMember(dest => dest.OfficesName, opt => opt.MapFrom(u => u.Offices.OfficeNames));
 
+            CreateMap<NewEventOptionDTO, NewEventOptionViewModel>();
+            CreateMap<NewEventOptionViewModel, NewEventOptionDTO>();
+
             CreateMap<EventDetailsOptionDTO, EventDetailsOptionViewModel>();
             CreateMap<EventDetailsParticipantDTO, EventDetailsParticipantViewModel>();
             CreateMap<EventEditDTO, EventEditViewModel>()
