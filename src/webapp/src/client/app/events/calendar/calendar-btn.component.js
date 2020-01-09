@@ -32,7 +32,7 @@
             var googleCalendarEndDate = vm.calendarItem.endDate.replace(/-|:|\.\d\d\d/g,"");
 
             var title = encodeURIComponent(vm.calendarItem.name);
-            var details = encodeURIComponent(`${vm.calendarItem.description} \n\n ${$location.absUrl()}`);
+            var details = encodeURIComponent(`${vm.calendarItem.description}\n\n${$location.absUrl()}`);
             var location = encodeURIComponent(vm.calendarItem.location);
             
             vm.googleCalendarRedirect = `${googleCalendarBaseUrl}&text=${title}&location=${location}&dates=${googleCalendarStartDate}Z/${googleCalendarEndDate}Z&details=${details}`;    
