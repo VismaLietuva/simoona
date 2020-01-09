@@ -15,10 +15,11 @@
 
     calendarButtonController.$inject = [
             'googleCalendarBaseUrl',
-            'eventRepository'
+            'eventRepository',
+            '$location'
         ];
 
-    function calendarButtonController(googleCalendarBaseUrl, eventRepository) {
+    function calendarButtonController(googleCalendarBaseUrl, eventRepository, $location) {
         /*jshint validthis: true */
         var vm = this;
 
@@ -29,7 +30,12 @@
         function setupRedirectLinks() {
             var googleCalendarStartDate = vm.calendarItem.startDate.replace(/-|:|\.\d\d\d/g,"");
             var googleCalendarEndDate = vm.calendarItem.endDate.replace(/-|:|\.\d\d\d/g,"");
-            vm.googleCalendarRedirect = `${googleCalendarBaseUrl}&text=${vm.calendarItem.name}&location=${vm.calendarItem.location}&dates=${googleCalendarStartDate}Z/${googleCalendarEndDate}Z`;    
+
+            var title = encodeURIComponent(vm.calendarItem.name);
+            var details = encodeURIComponent(`${vm.calendarItem.description}\n\n${$location.absUrl()}`);
+            var location = encodeURIComponent(vm.calendarItem.location);
+            
+            vm.googleCalendarRedirect = `${googleCalendarBaseUrl}&text=${title}&location=${location}&dates=${googleCalendarStartDate}Z/${googleCalendarEndDate}Z&details=${details}`;    
         }
 
         function downloadEvent() {
