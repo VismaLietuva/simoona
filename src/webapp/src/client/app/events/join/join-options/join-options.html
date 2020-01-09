@@ -22,7 +22,7 @@
                 <label for="selectedOption{{option.id}}" uib-tooltip="{{option.option}}" tooltip-placement="bottom"
                     tooltip-append-to-body="true" data-test-id="option-to-select">
                     <input id="selectedOption{{option.id}}" type="{{vm.inputType}}" name="option"
-                        ng-click="vm.selectOption(option.id)" data-test-id="option-check-box"
+                        ng-click="vm.selectOption(option)" data-test-id="option-check-box"
                         ng-checked="vm.isOptionSelected(option.id)">
                     {{option.option}}
                 </label>
