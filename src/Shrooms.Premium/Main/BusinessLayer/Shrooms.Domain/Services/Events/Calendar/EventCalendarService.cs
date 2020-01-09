@@ -10,6 +10,7 @@ using Shrooms.DataTransferObjects.Models.Events;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Events;
 using Shrooms.Infrastructure.Calendar;
+using Shrooms.Infrastructure.Configuration;
 using Shrooms.Infrastructure.Email;
 using Shrooms.Infrastructure.FireAndForget;
 using System;
@@ -28,15 +29,19 @@ namespace Shrooms.Domain.Services.Events.Calendar
         private readonly IDbSet<ApplicationUser> _usersDbSet;
 
         private readonly IJobScheduler _scheduler;
+        private readonly IDbSet<Event> _eventsDbSet;
         private readonly IDbSet<Organization> _organizationsDbSet;
         private readonly IMailingService _mailingService;
+        private readonly IApplicationSettings _appSettings;
 
-        public EventCalendarService(IUnitOfWork2 uow, IJobScheduler scheduler, IMailingService mailingService)
+        public EventCalendarService(IUnitOfWork2 uow, IJobScheduler scheduler, IMailingService mailingService, IApplicationSettings appSettings)
         {
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
+            _eventsDbSet = uow.GetDbSet<Event>();
             _organizationsDbSet = uow.GetDbSet<Organization>();
             _scheduler = scheduler;
             _mailingService = mailingService;
+            _appSettings = appSettings;
         }
 
         public void DeleteEvent(Guid eventId, int orgId)
@@ -87,7 +92,32 @@ namespace Shrooms.Domain.Services.Events.Calendar
             _scheduler.Enqueue<GoogleCalendarService>(x => x.ResetParticipants(eventId, calendarId));
         }
 
-        public void SendInvitation(EventJoinValidationDTO @event, IEnumerable<string> userIds)
+        public byte[] DownloadEvent(Guid eventId, int orgId)
+        {
+            var @event = _eventsDbSet.Find(eventId);
+
+            var calEvent = new CalendarEvent
+            {
+                Uid = @event.Id.ToString(),
+                Location = @event.Place,
+                Summary = @event.Name,
+                Description = @event.Description,
+                Organizer = new Organizer { CommonName = ConstBusinessLayer.EmailSenderName, Value = new Uri($"mailto:{ConstBusinessLayer.FromEmailAddress}") },
+                Start = new CalDateTime(@event.StartDate, "UTC"),
+                End = new CalDateTime(@event.EndDate, "UTC"),
+                Status = EventStatus.Confirmed
+            };
+
+            AddEventLinkToDescription(calEvent, eventId, orgId);
+            var cal = new Ical.Net.Calendar();
+            cal.Events.Add(calEvent);
+            var serializedCalendar = new CalendarSerializer().SerializeToString(cal);
+            byte[] calByteArray = Encoding.UTF8.GetBytes(serializedCalendar);
+
+            return calByteArray;
+        }
+
+        public void SendInvitation(EventJoinValidationDTO @event, IEnumerable<string> userIds, int orgId)
         {
             var emails = _usersDbSet
                 .Where(u => userIds.Contains(u.Id))
@@ -95,6 +125,7 @@ namespace Shrooms.Domain.Services.Events.Calendar
                 .ToList();
 
             var calendarEvent = MapToCalendarEvent(@event);
+            AddEventLinkToDescription(calendarEvent, @event.Id, orgId);
             var calendar = new Ical.Net.Calendar();
             calendar.Events.Add(calendarEvent);
             var serializedCalendar = new CalendarSerializer().SerializeToString(calendar);
@@ -106,6 +137,13 @@ namespace Shrooms.Domain.Services.Events.Calendar
                 emailDto.Attachment = new System.Net.Mail.Attachment(stream, "invite.ics");
                 _mailingService.SendEmail(emailDto);
             }
+        }
+
+        private void AddEventLinkToDescription(CalendarEvent calEvent, Guid eventId, int orgId)
+        {
+            var orgShortName = _organizationsDbSet.Find(orgId).ShortName;
+            var eventUrl = _appSettings.EventUrl(orgShortName, eventId.ToString());
+            calEvent.Description += $"\n\n{eventUrl}";
         }
 
         private CalendarEventDTO MapToCalendarEventDto(Event @event)
@@ -134,7 +172,7 @@ namespace Shrooms.Domain.Services.Events.Calendar
                 Organizer = new Organizer { CommonName = ConstBusinessLayer.DefaultEmailLinkName, Value = new Uri($"mailto:{ConstBusinessLayer.FromEmailAddress}") },
                 Start = new CalDateTime(@event.StartDate, "UTC"),
                 End = new CalDateTime(@event.EndDate, "UTC"),
-                Status = EventStatus.Confirmed
+                Status = EventStatus.Confirmed,
             };
 
             return calEvent;

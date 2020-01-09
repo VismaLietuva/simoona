@@ -251,29 +251,6 @@ namespace Shrooms.Domain.Services.Events
             @event.IsPinned = !@event.IsPinned;
             _uow.SaveChanges();
         }
-        public byte[] DownloadEvent(Guid eventId)
-        {
-            var @event = _eventsDbSet.Find(eventId);
-
-            var calEvent = new CalendarEvent
-            {
-                Uid = @event.Id.ToString(),
-                Location = @event.Place,
-                Summary = @event.Name,
-                Description = @event.Description,
-                Organizer = new Organizer { CommonName = ConstBusinessLayer.EmailSenderName, Value = new Uri($"mailto:{ConstBusinessLayer.FromEmailAddress}") },
-                Start = new CalDateTime(@event.StartDate, "UTC"),
-                End = new CalDateTime(@event.EndDate, "UTC"),
-                Status = EventStatus.Confirmed
-            };
-
-            var cal = new Ical.Net.Calendar();
-            cal.Events.Add(calEvent);
-            var serializedCalendar = new CalendarSerializer().SerializeToString(cal);
-            byte[] calByteArray = Encoding.UTF8.GetBytes(serializedCalendar);
-
-            return calByteArray;
-        }
 
         public void CheckIfEventExists(string eventId, int organizationId)
         {

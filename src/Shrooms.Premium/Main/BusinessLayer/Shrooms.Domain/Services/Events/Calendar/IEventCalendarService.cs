@@ -19,6 +19,8 @@ namespace Shrooms.Domain.Services.Events.Calendar
 
         void AddParticipants(Guid eventId, int orgId, IEnumerable<string> userIds, IEnumerable<string> choices);
 
-        void SendInvitation(EventJoinValidationDTO @event, IEnumerable<string> userIds);
+        void SendInvitation(EventJoinValidationDTO @event, IEnumerable<string> userIds, int orgId);
+
+        byte[] DownloadEvent(Guid eventId, int orgId);
     }
 }

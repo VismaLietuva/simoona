@@ -33,6 +33,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using System.IO;
 using System.Net.Http.Headers;
+using Shrooms.Domain.Services.Events.Calendar;
 
 namespace Shrooms.API.Controllers.WebApi.EventControllers
 {
@@ -45,6 +46,7 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
         private readonly IEventListingService _eventListingService;
         private readonly IEventUtilitiesService _eventUtilitiesService;
         private readonly IEventParticipationService _eventParticipationService;
+        private readonly IEventCalendarService _calendarService;
         private readonly IEventExportService _eventExportService;
         private readonly IPostService _postService;
         private readonly IOfficeMapService _officeMapService;
@@ -57,6 +59,7 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
             IEventListingService eventListingService,
             IEventUtilitiesService eventUtilitiesService,
             IEventParticipationService eventParticipationService,
+            IEventCalendarService calendarService,
             IEventExportService eventExportService,
             IPostService postService,
             IOfficeMapService officeMapService,
@@ -67,6 +70,7 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
             _eventListingService = eventListingService;
             _eventUtilitiesService = eventUtilitiesService;
             _eventParticipationService = eventParticipationService;
+            _calendarService = calendarService;
             _eventExportService = eventExportService;
             _postService = postService;
             _officeMapService = officeMapService;
@@ -247,7 +251,8 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
         {
             try
             {
-                var stream = new ByteArrayContent(_eventService.DownloadEvent(eventId));
+                var userOrg = GetUserAndOrganization();
+                var stream = new ByteArrayContent(_calendarService.DownloadEvent(eventId, userOrg.OrganizationId));
                 var result = new HttpResponseMessage(HttpStatusCode.OK) { Content = stream };
                 return ResponseMessage(result);
             }
