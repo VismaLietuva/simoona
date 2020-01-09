@@ -18,6 +18,7 @@
 
         if(vm.states.isCreate) {
             $rootScope.pageTitle = 'customization.createKudosType';
+            vm.isEditable = true;
         } else {
             $rootScope.pageTitle = 'customization.editKudosTypes';
         }
@@ -42,10 +43,9 @@
                         vm.kudosType.multiplier = parseInt(type.value);
                         vm.kudosType.description = type.description;
                         vm.kudosType.isActive = type.isActive;
-                        
-                        vm.isEditable = type.type === definedKudosTypes.ordinary ? true : false;
-                        vm.isVisibilityToggleable = type.type !== definedKudosTypes.send ? true : false;
                         vm.isLoading = false;
+                        if(vm.states.isEdit) {vm.isEditable = type.type === definedKudosTypes.ordinary ? true : false;}
+                        vm.isVisibilityToggleable = type.type !== definedKudosTypes.send ? true : false;
                     }, function (error) {
                     errorHandler.handleErrorMessage(error);
                     $state.go(listState);
