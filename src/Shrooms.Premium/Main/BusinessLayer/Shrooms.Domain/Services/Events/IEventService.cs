@@ -11,7 +11,6 @@ namespace Shrooms.Domain.Services.Events
         Task<CreateEventDto> CreateEvent(CreateEventDto newEventDto);
         void Delete(Guid id, UserAndOrganizationDTO userOrg);
         void ToggleEventPin(Guid id);
-        byte[] DownloadEvent(Guid eventId);
         EventDetailsDTO GetEventDetails(Guid id, UserAndOrganizationDTO userOrg);
         EventEditDTO GetEventForEditing(Guid id, UserAndOrganizationDTO userOrg);
         void CheckIfEventExists(string eventId, int organizationId);
