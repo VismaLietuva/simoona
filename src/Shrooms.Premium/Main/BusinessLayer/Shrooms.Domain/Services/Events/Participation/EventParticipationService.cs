@@ -139,7 +139,7 @@ namespace Shrooms.Domain.Services.Events.Participation
                     var alreadyParticipates = @event.Participants.Any(p => p == userId);
                     _eventValidationService.CheckIfUserAlreadyJoinedSameEvent(alreadyParticipates);
 
-                    ValidateSingleJoin(@event, userOrg: joinDto);
+                    ValidateSingleJoin(@event, joinDto.OrganizationId, userId);
                     AddParticipant(userId, @event.Id, @event.SelectedOptions);
 
                     JoinLeaveEventWall(@event.ResponsibleUserId, userId, @event.WallId, joinDto);
@@ -346,7 +346,7 @@ namespace Shrooms.Domain.Services.Events.Participation
                 WallId = e.WallId
             };
 
-        private void ValidateSingleJoin(EventJoinValidationDTO eventDto, UserAndOrganizationDTO userOrg)
+        private void ValidateSingleJoin(EventJoinValidationDTO eventDto, int orgId, string userId)
         {
             if (!eventDto.SelectedOptions.Any(x => x.Rule == OptionRules.IgnoreSingleJoin))
             {
@@ -356,8 +356,8 @@ namespace Shrooms.Domain.Services.Events.Participation
                         .Include(e => e.EventParticipants.Select(x => x.EventOptions))
                         .Where(x =>
                             x.EventTypeId == eventDto.EventTypeId &&
-                            x.OrganizationId == userOrg.OrganizationId &&
-                            x.EventParticipants.Any(p => p.ApplicationUserId == userOrg.UserId) &&
+                            x.OrganizationId == orgId &&
+                            x.EventParticipants.Any(p => p.ApplicationUserId == userId) &&
                             SqlFunctions.DatePart("wk", x.StartDate) == SqlFunctions.DatePart("wk", eventDto.StartDate))
                         .ToList();
 
