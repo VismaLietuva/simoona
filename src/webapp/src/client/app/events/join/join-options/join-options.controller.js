@@ -22,11 +22,12 @@
         'isDetails',
         'isAddColleague',
         'localeSrv',
-        'lodash'
+        'lodash',
+        'optionRules'
     ];
 
     function eventJoinOptionsController($state, $uibModalInstance, inputTypes, authService, errorHandler,
-        eventRepository, $translate, notifySrv, event, isDetails, isAddColleague, localeSrv, lodash) {
+        eventRepository, $translate, notifySrv, event, isDetails, isAddColleague, localeSrv, lodash, optionRules) {
         /* jshint validthis: true */
         var vm = this;
 
@@ -44,6 +45,7 @@
         vm.isOptionsJoinAvailable = isOptionsJoinAvailable;
         vm.getUserForAutoComplete = getUserForAutoComplete;
         vm.isTooManyOptionsSelected = isTooManyOptionsSelected;
+        vm.isOptionSelected = isOptionSelected;
 
         init();
 
@@ -73,13 +75,37 @@
             if (vm.inputType === inputTypes.checkbox) {
                 var index = vm.selectedOptions.indexOf(optionId);
                 if (index > -1) {
-                    vm.selectedOptions.splice(index, 1);
+                    vm.selectedOptions.splice(index, 1); 
                 } else {
+                    if (isOnlySingleSelectable(optionId)) {
+                        vm.selectedOptions.length = 0;
+                    } else {
+                        uncheckSingleSelectable();
+                    }
                     vm.selectedOptions.push(optionId);
                 }
             } else {
                 vm.selectedOptions = [optionId];
             }
+        }
+
+        function isOnlySingleSelectable(selectedOptionId) {
+            var option = vm.options.find(x => x.id === selectedOptionId);
+
+            return option.rule === optionRules.ignoreSingleJoin;
+        }
+
+        function uncheckSingleSelectable() {
+            var single = vm.options.find(op => op.rule === optionRules.ignoreSingleJoin);
+            var index = vm.selectedOptions.findIndex(op => single.id === op);
+            
+            if (index > -1) {
+                vm.selectedOptions.splice(index, 1);
+            }
+        }
+
+        function isOptionSelected(optionId) {
+            return vm.selectedOptions.indexOf(optionId) > -1;
         }
 
         function joinEvent() {
