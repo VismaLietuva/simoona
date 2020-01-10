@@ -12,6 +12,11 @@
             templateUrl: 'app/events/join/join.html',
             controller: eventJoinController,
             controllerAs: 'vm'
+        })
+        .constant("attendStatus", {
+            NotAttending: 0,
+            Attending: 1,
+            MaybeAttending: 2,
         });
 
     eventJoinController.$inject = [
@@ -22,11 +27,12 @@
         'errorHandler',
         'authService',
         'eventParticipantsService',
-        'Analytics'
+        'Analytics',
+        'attendStatus'
     ];
 
     function eventJoinController($state, $uibModal, eventRepository, notifySrv, errorHandler,
-        authService, eventParticipantsService, Analytics) {
+        authService, eventParticipantsService, Analytics, attendStatus) {
         /* jshint validthis: true */
         var vm = this;
 
@@ -34,6 +40,7 @@
         vm.joinEvent = joinEvent;
         vm.leaveEvent = leaveEvent;
         vm.hasDatePassed = hasDatePassed;
+        vm.addLeaveComment = addLeaveComment;
 
         ////////
         function joinEvent(eventId) {
@@ -48,7 +55,8 @@
                         if (!vm.event.availableOptions.length && !vm.isAddColleague) {
                             var selectedOptions = [];
 
-                            eventRepository.joinEvent(eventId, selectedOptions).then(function() {
+                            var comment = "";
+                            eventRepository.joinEvent(eventId, selectedOptions, attendStatus.Attending, comment).then(function() {
                                 handleEventJoin();
                             }, function(error) {
                                 vm.enableAction = true;
@@ -66,8 +74,8 @@
             if (vm.enableAction) {
                 if (canLeaveEvent()) {
                     vm.enableAction = false;
-
-                    eventRepository.leaveEvent(eventId, authService.identity.userId).then(function() {
+                    addLeaveComment();
+                    eventRepository.leaveEvent(eventId, authService.identity.userId, "leave comment").then(function() {
                         removeCurrentUser();
                     }, function(error) {
                         var errorActions = {
@@ -80,6 +88,9 @@
                     });
                 }
             }
+        }
+
+        function addLeaveComment() {
         }
 
         function removeCurrentUser() {
@@ -104,6 +115,7 @@
 
                     vm.event.options = response.options;
                     vm.event.participants = response.participants;
+                    vm.event.participantsCount = recalculateJoinedParticipants();
                 });
             } else {
                 vm.event.isParticipating = true;
@@ -113,6 +125,16 @@
             vm.enableAction = true;
 
             notifySrv.success('events.joinedEvent');
+        }
+
+        function recalculateJoinedParticipants() {
+            var participantsCount = 0;
+            vm.event.participants.forEach(function(participant){
+                if (participant.attendStatus == 1) {
+                    participantsCount++;
+                }
+            });
+            return participantsCount;
         }
 
         function openOptionsModal() {

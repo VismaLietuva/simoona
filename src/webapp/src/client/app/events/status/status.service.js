@@ -31,12 +31,10 @@
         function getEventStatus(event, isParticipantsList) {
             if (event) {
                 var participantsCount;
-
                 if (!!event.participantsCount) {
                     participantsCount = event.participantsCount;
-                } else if (!!event.participants) {
-                    participantsCount = event.participants.length;
-                } else {
+                }
+                else {
                     participantsCount = 0;
                 }
 

@@ -80,6 +80,13 @@ namespace Shrooms.Constants.BusinessLayer
             Host,
             Participant
         }
+
+        public enum AttendingStatus
+        {
+            Leave = 0,
+            Join,
+            Maybe
+        }
         #endregion
 
         #region Books

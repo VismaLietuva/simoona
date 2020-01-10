@@ -126,17 +126,20 @@
             }).$promise;
         }
 
-        function joinEvent(eventId, chosenOptions) {
+        function joinEvent(eventId, chosenOptions, attendStatus, attendComment) {
             return $resource(eventUrl + 'Join').save({
                 eventId: eventId,
-                chosenOptions: chosenOptions
+                chosenOptions: chosenOptions,
+                attendStatus: attendStatus,
+                attendComment: attendComment
             }).$promise;
         }
 
-        function leaveEvent(eventId, userId) {
+        function leaveEvent(eventId, userId, leaveComment) {
             return $resource(eventUrl + 'Leave').delete({
                 eventId: eventId,
-                userId: userId
+                userId: userId,
+                leaveComment: leaveComment
             }).$promise;
         }
 

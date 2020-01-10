@@ -19,7 +19,7 @@
                 <input type="radio" />
                 <span translate="events.eventParticipants"></span>
                 <span class="badge badge-default" data-test-id="participants-count">
-                    {{vm.event.participants.length}}/{{vm.event.maxParticipants}}
+                    {{vm.event.participantsCount}}/{{vm.event.maxParticipants}}
                 </span>
             </div>
             <div class="clearfix"></div>
@@ -27,7 +27,7 @@
         <div ng-if="!vm.event.options.length" class="event-participants-title">
             <span translate="events.eventParticipants"></span>
             <span class="badge badge-default" data-test-id="participants-count">
-                {{vm.event.participants.length}}/{{vm.event.maxParticipants}}
+                {{vm.event.participantsCount}}/{{vm.event.maxParticipants}}
             </span>
         </div>
     </div>

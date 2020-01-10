@@ -20,7 +20,7 @@
 
         function removeParticipant(participantList, userId) {
             lodash.remove(participantList, function(participant) {
-                return participant.userId === userId;
+                return participant.userId === userId && participant.attendStatus == 1;
             });
         }
 
