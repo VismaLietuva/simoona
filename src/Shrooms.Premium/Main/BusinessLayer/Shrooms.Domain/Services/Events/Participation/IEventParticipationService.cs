@@ -11,7 +11,7 @@ namespace Shrooms.Domain.Services.Events.Participation
 
         void DeleteByEvent(Guid eventId, string userId);
 
-        void Leave(Guid eventId, UserAndOrganizationDTO userOrg);
+        void Leave(Guid eventId, UserAndOrganizationDTO userOrg, string leaveComment);
 
         void ResetAttendees(Guid eventId, UserAndOrganizationDTO userOrg);
 

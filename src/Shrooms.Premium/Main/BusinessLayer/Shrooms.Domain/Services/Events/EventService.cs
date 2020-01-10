@@ -149,7 +149,7 @@ namespace Shrooms.Domain.Services.Events
                 .ToList();
             _eventValidationService.CheckIfEventExists(@event);
             @event.IsFull = @event.Participants.Count() >= @event.MaxParticipants;
-            @event.IsParticipating = @event.Participants.Any(p => p.UserId == userOrg.UserId);
+            @event.IsParticipating = @event.Participants.Any(p => p.UserId == userOrg.UserId && p.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.Join);
             return @event;
         }
 
@@ -488,6 +488,8 @@ namespace Shrooms.Domain.Services.Events
                             UserId = p.ApplicationUser == null ? ConstBusinessLayer.EmptyUserId : p.ApplicationUserId,
                             FullName = p.ApplicationUser.FirstName + " " + p.ApplicationUser.LastName,
                             ImageName = p.ApplicationUser.PictureId,
+                            AttendStatus = p.AttendStatus,
+                            AttendComment = p.AttendComment
                         })
                 }),
                 Participants = e.EventParticipants.Select(p => new EventDetailsParticipantDTO
@@ -496,6 +498,8 @@ namespace Shrooms.Domain.Services.Events
                     UserId = p.ApplicationUser == null ? ConstBusinessLayer.EmptyUserId : p.ApplicationUserId,
                     FullName = p.ApplicationUser.FirstName + " " + p.ApplicationUser.LastName,
                     ImageName = p.ApplicationUser.PictureId,
+                    AttendStatus = p.AttendStatus,
+                    AttendComment = p.AttendComment
                 })
             };
         }

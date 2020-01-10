@@ -138,7 +138,7 @@ namespace Shrooms.Domain.Services.Events.Participation
                     _eventValidationService.CheckIfUserAlreadyJoinedSameEvent(alreadyParticipates);
 
                     ValidateSingleJoin(@event, joinDto.OrganizationId, userId, joinDto.ChosenOptions);
-                    AddParticipant(userId, @event.Id, eventOptions);
+                    AddParticipant(userId, joinDto, eventOptions);
 
                     JoinLeaveEventWall(@event.ResponsibleUserId, userId, @event.WallId, joinDto);
                 }
@@ -237,7 +237,7 @@ namespace Shrooms.Domain.Services.Events.Participation
             _eventValidationService.CheckIfUserHasPermission(userOrg.UserId, @event.ResponsibleUserId, isAdmin);
             _eventValidationService.CheckIfEventEndDateIsExpired(@event.EndDate);
 
-            RemoveParticipant(userId, participant);
+            RemoveParticipant(userId, participant, "Expelled");
 
             JoinLeaveEventWall(@event.ResponsibleUserId, userId, @event.WallId, userOrg);
 
@@ -245,14 +245,14 @@ namespace Shrooms.Domain.Services.Events.Participation
             _asyncRunner.Run<IEventNotificationService>(n => n.NotifyRemovedEventParticipants(@event.Name, @event.Id, userOrg.OrganizationId, new[] { userId }), _uow.ConnectionName);
         }
 
-        public void Leave(Guid eventId, UserAndOrganizationDTO userOrg)
+        public void Leave(Guid eventId, UserAndOrganizationDTO userOrg, string leaveComment)
         {
             var participant = GetParticipant(eventId, userOrg.OrganizationId, userOrg.UserId);
             _eventValidationService.CheckIfRegistrationDeadlineIsExpired(participant.Event.RegistrationDeadline);
 
             JoinLeaveEventWall(participant.Event.ResponsibleUserId, userOrg.UserId, participant.Event.WallId, userOrg);
 
-            RemoveParticipant(userOrg.UserId, participant);
+            RemoveParticipant(userOrg.UserId, participant, leaveComment);
 
          // _calendarService.RemoveParticipants(eventId, userOrg.OrganizationId, new List<string> { userOrg.UserId });
          // Commented due to Google Api Calendar 403 error "quotaExceeded: Calendar usage limits exceeded"
@@ -292,14 +292,16 @@ namespace Shrooms.Domain.Services.Events.Participation
             }
         }
 
-        private void RemoveParticipant(string userId, EventParticipant participant)
+        private void RemoveParticipant(string userId, EventParticipant participant, string leaveComment)
         {
             var timestamp = DateTime.UtcNow;
+            participant.AttendStatus = (int)ConstBusinessLayer.AttendingStatus.Leave;
+            participant.AttendComment = leaveComment;
             participant.UpdateMetadata(userId, timestamp);
             _uow.SaveChanges(false);
 
-            _eventParticipantsDbSet.Remove(participant);
-            _uow.SaveChanges(false);
+         //   _eventParticipantsDbSet.Remove(participant);
+         //   _uow.SaveChanges(false);
         }
 
         private EventParticipant GetParticipant(Guid eventId, int userOrg, string userId)
@@ -310,7 +312,8 @@ namespace Shrooms.Domain.Services.Events.Participation
                             .Where(p =>
                                 p.EventId == eventId &&
                                 p.Event.OrganizationId == userOrg &&
-                                p.ApplicationUserId == userId)
+                                p.ApplicationUserId == userId &&
+                                p.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.Join)
                             .SingleOrDefault();
 
             _eventValidationService.CheckIfEventExists(participant);
@@ -337,7 +340,7 @@ namespace Shrooms.Domain.Services.Events.Participation
         {
             return e => new EventJoinValidationDTO
             {
-                Participants = e.EventParticipants.Select(x => x.ApplicationUserId).ToList(),
+                Participants = e.EventParticipants.Where(x => x.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.Join).Select(x => x.ApplicationUserId).ToList(),
                 MaxParticipants = e.MaxParticipants,
                 StartDate = e.StartDate,
                 MaxChoices = e.MaxChoices,
@@ -370,7 +373,7 @@ namespace Shrooms.Domain.Services.Events.Participation
                             x.EventTypeId == @event.EventTypeId &&
                             x.OrganizationId == organizationId &&
                             x.StartDate > _systemClock.UtcNow &&
-                            x.EventParticipants.Any(p => p.ApplicationUserId == userId))
+                            x.EventParticipants.Any(p => p.ApplicationUserId == userId && p.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.Join))
                         .ToList();
 
                     var filteredEvents = RemoveEventsWithoutFood(events, userId);
@@ -403,7 +406,7 @@ namespace Shrooms.Domain.Services.Events.Participation
             }
         }
 
-        private void AddParticipant(string userId, Guid eventId, List<EventOption> eventOptions)
+        private void AddParticipant(string userId, EventJoinDTO joinDto, List<EventOption> eventOptions)
         {
             var timeStamp = _systemClock.UtcNow;
             var newParticipant = new EventParticipant
@@ -411,10 +414,12 @@ namespace Shrooms.Domain.Services.Events.Participation
                 ApplicationUserId = userId,
                 Created = timeStamp,
                 CreatedBy = userId,
-                EventId = eventId,
+                EventId = joinDto.EventId,
                 Modified = timeStamp,
                 ModifiedBy = userId,
-                EventOptions = eventOptions
+                EventOptions = eventOptions,
+                AttendComment = joinDto.AttendComment,
+                AttendStatus = joinDto.AttendStatus
             };
             _eventParticipantsDbSet.Add(newParticipant);
         }

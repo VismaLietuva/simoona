@@ -210,7 +210,7 @@ namespace Shrooms.UnitTests.DomainService.EventServices
                 OrganizationId = 2,
                 UserId = "user"
             };
-            Assert.Throws<EventException>(() => _eventParticipationService.Leave(eventId, userOrg));
+            Assert.Throws<EventException>(() => _eventParticipationService.Leave(eventId, userOrg, "leave comment"));
         }
 
         [Test]
@@ -222,7 +222,7 @@ namespace Shrooms.UnitTests.DomainService.EventServices
                 OrganizationId = 2,
                 UserId = "user"
             };
-            _eventParticipationService.Leave(eventId, userOrg);
+            _eventParticipationService.Leave(eventId, userOrg, "leave comment");
             _eventParticipantsDbSet.Received(1).Remove(Arg.Any<EventParticipant>());
         }
 

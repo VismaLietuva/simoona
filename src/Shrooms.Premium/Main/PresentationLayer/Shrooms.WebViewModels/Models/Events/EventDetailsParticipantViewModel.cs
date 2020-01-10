@@ -9,5 +9,9 @@
         public string FullName { get; set; }
 
         public string ImageName { get; set; }
+
+        public int AttendStatus { get; set; }
+        
+        public string AttendComment { get; set; }
     }
 }

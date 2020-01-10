@@ -358,11 +358,11 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
         [HttpDelete]
         [Route("Leave")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult Leave(Guid eventId)
+        public IHttpActionResult Leave(Guid eventId, string leaveComment)
         {
             try
             {
-                _eventParticipationService.Leave(eventId, GetUserAndOrganization());
+                _eventParticipationService.Leave(eventId, GetUserAndOrganization(), leaveComment);
                 return Ok();
             }
             catch (EventException e)
