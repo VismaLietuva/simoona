@@ -6,7 +6,6 @@ namespace Shrooms.WebViewModels.Models.Events
     public class CreateEventTypeViewModel
     {
         public bool IsSingleJoin { get; set; }
-        public bool IsFoodRelated { get; set; }
 
         public bool SendWeeklyReminders { get; set; }
 
