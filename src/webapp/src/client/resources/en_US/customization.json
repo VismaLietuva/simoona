@@ -13,7 +13,6 @@
     "eventTypeName": "Name",
     "eventTypeSingleJoin": "Single join",
     "sendWeeklyReminders": "Send weekly reminders",
-    "eventTypeIsFoodRelated": "Food related",
     "editEventType": "Event type edit",
     "createEventType": "Create event type",
     "eventTypeWarning": "This event type has ongoing or recurring events",

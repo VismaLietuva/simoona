@@ -137,8 +137,6 @@
 
             if ($stateParams.id) {
                 eventRepository.getEventUpdate($stateParams.id).then(function (event) {
-                        console.log(event);
-
                         vm.event = event;
                         setEventTypes();
                         vm.responsibleUser = {
