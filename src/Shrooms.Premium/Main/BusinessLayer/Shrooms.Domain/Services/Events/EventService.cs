@@ -10,7 +10,6 @@ using Shrooms.Domain.Services.Events.Utilities;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.DomainServiceValidators.Validators.Events;
-using Shrooms.Premium.Other.Shrooms.Constants.BusinessLayer;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Events;
 using Shrooms.EntityModels.Models.Multiwall;
@@ -21,28 +20,18 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Shrooms.Domain.Helpers;
-using Shrooms.Resources.Models.Events;
 using Shrooms.Domain.Services.UserService;
-using System.Threading;
 using System.Resources;
 using Shrooms.Resources;
 using System.Globalization;
 using System.Data.Entity.SqlServer;
 using Newtonsoft.Json;
-using Ical.Net.CalendarComponents;
-using Ical.Net.DataTypes;
-using Ical.Net;
-using Ical.Net.Serialization;
-using System.Text;
 
 namespace Shrooms.Domain.Services.Events
 {
     public class EventService : IEventService
     {
         private const int NoOptions = 0;
-
-
-
         private readonly IUnitOfWork2 _uow;
         private readonly IPermissionService _permissionService;
         private readonly IEventUtilitiesService _eventUtilitiesService;
@@ -167,18 +156,6 @@ namespace Shrooms.Domain.Services.Events
             _eventValidationService.CheckIfCreatingEventHasInsufficientOptions(newEventDto.MaxOptions, newEventDto.NewOptions.Count());
             _eventValidationService.CheckIfCreatingEventHasNoChoices(newEventDto.MaxOptions, newEventDto.NewOptions.Count());
 
-
-            if (newEventDto.FoodOption == (int)EventConstants.FoodOptions.Optional)
-            {
-                var usersCultureCode = _userService.GetApplicationUser(newEventDto.ResponsibleUserId).CultureCode;
-
-                var willEatOption = TranslateEventOptions("WillEat", usersCultureCode);
-                var willNotEatOption = TranslateEventOptions("WillNotEat", usersCultureCode);
-
-                newEventDto.NewOptions = new List<string>() { willEatOption, willNotEatOption };
-                newEventDto.MaxOptions = 1;
-            }
-
             var newEvent = await MapNewEvent(newEventDto);
 
             _eventsDbSet.Add(newEvent);
@@ -222,17 +199,6 @@ namespace Shrooms.Domain.Services.Events
             if (eventDto.ResetParticipantList)
             {
                 _eventParticipationService.ResetAttendees(eventDto.Id, eventDto);
-            }
-
-            if (eventDto.FoodOption == (int)EventConstants.FoodOptions.Optional && (eventToUpdate.FoodOption == (int)EventConstants.FoodOptions.None || eventToUpdate.FoodOption == null))
-            {
-                var usersCultureCode = _userService.GetApplicationUser(eventDto.ResponsibleUserId).CultureCode;
-
-                var willEatOption = TranslateEventOptions("WillEat", usersCultureCode);
-                var willNotEatOption = TranslateEventOptions("WillNotEat", usersCultureCode);
-
-                eventDto.NewOptions = new List<string>() { willEatOption, willNotEatOption };
-                eventDto.MaxOptions = 1;
             }
 
             UpdateWall(eventToUpdate, eventDto);
@@ -288,11 +254,11 @@ namespace Shrooms.Domain.Services.Events
                 HostUserId = e.ResponsibleUserId,
                 HostUserFullName = e.ResponsibleUser.FirstName + " " + e.ResponsibleUser.LastName,
                 TypeId = e.EventTypeId,
-                FoodOption = e.FoodOption,
                 Options = e.EventOptions.Select(o => new EventOptionDTO
                 {
                     Id = o.Id,
-                    Option = o.Option
+                    Option = o.Option,
+                    Rule = o.Rule
                 })
             };
         }
@@ -343,7 +309,6 @@ namespace Shrooms.Domain.Services.Events
             _eventValidationService.CheckIfResponsibleUserNotExists(userExists);
             _eventValidationService.CheckIfOptionsAreDifferent(eventDto.NewOptions);
             _eventValidationService.CheckIfTypeDoesNotExist(eventTypeExists);
-            _eventValidationService.CheckIfFoodOptionalAndOptionsNonExistent(eventDto.NewOptions, eventDto.FoodOption);
         }
 
         private void UpdateEventOptions(EditEventDTO editedEvent, Event @event)
@@ -365,7 +330,8 @@ namespace Shrooms.Domain.Services.Events
             {
                 var option = new EventOption
                 {
-                    Option = newOption,
+                    Option = newOption.Option,
+                    Rule = newOption.Rule,
                     EventId = editedEvent.Id,
                     Created = DateTime.UtcNow,
                     CreatedBy = editedEvent.UserId,
@@ -380,9 +346,9 @@ namespace Shrooms.Domain.Services.Events
         {
             if (newEventDto.NewOptions != null)
             {
-                foreach (var optionName in newEventDto.NewOptions)
+                foreach (var option in newEventDto.NewOptions)
                 {
-                    if (optionName != null)
+                    if (option != null)
                     {
                         var newOption = new EventOption()
                         {
@@ -390,7 +356,8 @@ namespace Shrooms.Domain.Services.Events
                             CreatedBy = newEventDto.UserId,
                             Modified = DateTime.UtcNow,
                             ModifiedBy = newEventDto.UserId,
-                            Option = optionName,
+                            Option = option.Option,
+                            Rule = option.Rule,
                             Event = newEvent
                         };
                         _eventOptionsDbSet.Add(newOption);
@@ -452,7 +419,6 @@ namespace Shrooms.Domain.Services.Events
             newEvent.StartDate = newEventDto.StartDate;
             newEvent.Name = newEventDto.Name;
             newEvent.RegistrationDeadline = newEventDto.RegistrationDeadlineDate.Value;
-            newEvent.FoodOption = newEventDto.FoodOption;
             newEvent.IsPinned = newEventDto.IsPinned;
         }
 
@@ -474,7 +440,6 @@ namespace Shrooms.Domain.Services.Events
                 MaxOptions = e.MaxChoices,
                 HostUserId = e.ResponsibleUserId,
                 WallId = e.WallId,
-                FoodOption = e.FoodOption,
                 HostUserFullName = e.ResponsibleUser.FirstName + " " + e.ResponsibleUser.LastName,
                 Options = e.EventOptions.Select(o => new EventDetailsOptionDTO
                 {

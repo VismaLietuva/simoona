@@ -6,6 +6,5 @@
         public bool IsSingleJoin { get; set; }
         public bool SendWeeklyReminders { get; set; }
         public string Name { get; set; }
-        public bool IsFoodRelated { get; set; }
     }
 }

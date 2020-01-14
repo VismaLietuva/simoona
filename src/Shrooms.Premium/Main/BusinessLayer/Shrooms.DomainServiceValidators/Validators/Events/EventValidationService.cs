@@ -2,7 +2,6 @@
 using Shrooms.DomainExceptions.Exceptions.Event;
 using Shrooms.EntityModels.Models.Events;
 using Shrooms.Infrastructure.SystemClock;
-using Shrooms.Premium.Other.Shrooms.Constants.BusinessLayer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +9,7 @@ using Shrooms.DataTransferObjects.Models.Events;
 using static Shrooms.Constants.ErrorCodes.ErrorCodes;
 using static Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes.ErrorCodes;
 using Shrooms.DomainExceptions.Exceptions;
+using Shrooms.Constants.BusinessLayer.Events;
 
 namespace Shrooms.DomainServiceValidators.Validators.Events
 {
@@ -38,9 +38,17 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
             }
         }
 
-        public void CheckIfUserExistsInOtherSingleJoinEvent(Event userParticipationEvent)
+        public void CheckIfSingleChoiceSelectedWithRule(IEnumerable<EventOption> options, OptionRules rule)
         {
-            if (userParticipationEvent != null)
+            if (options.Any(op => op.Rule == rule) && options.Count() > 1)
+            {
+                throw new EventException(EventChoiceCanBeSingleOnly);
+            }
+        }
+
+        public void CheckIfUserExistsInOtherSingleJoinEvent(IEnumerable<Event> userParticipationEvent)
+        {
+            if (userParticipationEvent.Count() > 0)
             {
                 throw new EventException(EventCannotJoinMultipleSingleJoinEventsCode);
             }
@@ -235,11 +243,11 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
             }
         }
 
-        public void CheckIfOptionsAreDifferent(IEnumerable<string> options)
+        public void CheckIfOptionsAreDifferent(IEnumerable<NewEventOptionDTO> options)
         {
             if (options != null)
             {
-                var duplicateKeys = options.GroupBy(x => x)
+                var duplicateKeys = options.GroupBy(x => x.Option)
                         .Where(group => group.Count() > 1)
                         .Select(group => group.Key);
                 if (duplicateKeys.Count() > 0)
@@ -254,14 +262,6 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
             if (eventParticipants.Count() == 0)
             {
                 throw new EventException(EventParticipantsNotFound);
-            }
-        }
-
-        public void CheckIfFoodOptionalAndOptionsNonExistent(IEnumerable<string> options, int? foodOption)
-        {
-            if (options.Any() && foodOption == (int)EventConstants.FoodOptions.Optional)
-            {
-                throw new EventException("Event cannot have options and Food Optional flag enabled.");
             }
         }
     }
