@@ -348,7 +348,7 @@ namespace Shrooms.Domain.Services.Events.Participation
 
         private void ValidateSingleJoin(EventJoinValidationDTO eventDto, int orgId, string userId)
         {
-            if (!eventDto.SelectedOptions.Any(x => x.Rule == OptionRules.IgnoreSingleJoin))
+            if (eventDto.SelectedOptions.Any(x => x.Rule != OptionRules.IgnoreSingleJoin) || eventDto.SelectedOptions.Count == 0)
             {
                 if (eventDto.IsSingleJoin)
                 {
@@ -361,17 +361,19 @@ namespace Shrooms.Domain.Services.Events.Participation
                             SqlFunctions.DatePart("wk", x.StartDate) == SqlFunctions.DatePart("wk", eventDto.StartDate))
                         .ToList();
 
-                    var filteredEvents = RemoveEventsWithOptionRule(events, OptionRules.IgnoreSingleJoin);
+                    var filteredEvents = RemoveEventsWithOptionRule(events, OptionRules.IgnoreSingleJoin, userId);
 
                     _eventValidationService.CheckIfUserExistsInOtherSingleJoinEvent(filteredEvents);
                 }
             }
         }
 
-        private static IEnumerable<Event> RemoveEventsWithOptionRule(IList<Event> events, OptionRules rule)
+        private static IEnumerable<Event> RemoveEventsWithOptionRule(IList<Event> events, OptionRules rule, string userId)
         {
             var eventsToRemove = events.Where(x =>
-                x.EventParticipants.Any(y => y.EventOptions.Any(z => z.Rule == rule)));
+                x.EventParticipants.Any(y => y.ApplicationUserId == userId &&
+                                             y.EventOptions.All(z => z.Rule == rule) &&
+                                             y.EventOptions.Count > 0));
 
             return events.Except(eventsToRemove);
         }
