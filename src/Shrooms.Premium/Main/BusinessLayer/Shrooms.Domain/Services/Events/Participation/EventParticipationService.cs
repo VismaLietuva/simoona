@@ -348,7 +348,8 @@ namespace Shrooms.Domain.Services.Events.Participation
 
         private void ValidateSingleJoin(EventJoinValidationDTO eventDto, int orgId, string userId)
         {
-            if (eventDto.SelectedOptions.Any(x => x.Rule != OptionRules.IgnoreSingleJoin) || eventDto.SelectedOptions.Count == 0)
+            if (eventDto.SelectedOptions.Any(x => x.Rule != OptionRules.IgnoreSingleJoin) ||
+                eventDto.SelectedOptions.Count == 0)
             {
                 if (eventDto.IsSingleJoin)
                 {
