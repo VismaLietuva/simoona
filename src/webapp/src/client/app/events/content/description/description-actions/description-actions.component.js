@@ -23,7 +23,7 @@
     function eventDescriptionActionsController(authService, eventRepository, notifySrv , localeSrv, errorHandler) {
         /* jshint validthis: true */
         var vm = this;
-
+            
         vm.hasDatePassed = hasDatePassed;
         vm.togglePin = togglePin;
         vm.localeSrv = localeSrv;
@@ -31,7 +31,7 @@
         vm.isPinned = vm.event.isPinned;
         vm.currentUserId = authService.identity.userId;
         vm.hasEventAdminPermissions = authService.hasPermissions(['EVENT_ADMINISTRATION']);
-
+      
         ///////
 
         function hasDatePassed(date) {

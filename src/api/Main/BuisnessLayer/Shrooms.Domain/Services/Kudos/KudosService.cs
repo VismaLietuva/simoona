@@ -499,7 +499,7 @@ namespace Shrooms.Domain.Services.Kudos
 
         private bool UserHasPermission(AddKudosLogDTO kudosDto)
         {
-            var kudosType = _kudosTypesDbSet.Find(kudosDto.PointsTypeId);
+            var kudosType = _kudosTypesDbSet.AsNoTracking().FirstOrDefault(p => p.Id == kudosDto.PointsTypeId);
             if (kudosType is null)
             {
                 return false;
@@ -742,7 +742,7 @@ namespace Shrooms.Domain.Services.Kudos
             var sendingUser = _usersDbSet.Find(kudosLog.UserId);
             _kudosServiceValidator.ValidateUser(sendingUser);
 
-            var kudosType = _kudosTypesDbSet.Find(kudosLog.PointsTypeId);
+            var kudosType = _kudosTypesDbSet.AsNoTracking().FirstOrDefault(p => p.Id == kudosLog.PointsTypeId);
             _kudosServiceValidator.ValidateKudosType(kudosType);
 
             return new AddKudosDTO
@@ -835,8 +835,7 @@ namespace Shrooms.Domain.Services.Kudos
 
         private AddKudosDTO GenerateLogForKudosMinusOperation(AddKudosDTO kudosDTO)
         {
-            var minusKudosType = _kudosTypesDbSet
-                    .FirstOrDefault(n => n.Type == KudosTypeEnum.Minus);
+            var minusKudosType = _kudosTypesDbSet.AsNoTracking().FirstOrDefault(n => n.Type == KudosTypeEnum.Minus);
 
             var kudosLogForMinusKudos = new AddKudosLogDTO
             {

@@ -32,6 +32,7 @@
             joinEvent: joinEvent,
             leaveEvent: leaveEvent,
             pinEvent: pinEvent,
+            downloadEvent: downloadEvent,
             expelUserFromEvent: expelUserFromEvent,
             resetParticipantList: resetParticipantList,
             getUserForAutoComplete: getUserForAutoComplete,
@@ -148,6 +149,12 @@
                     }
                 }
             }).patch().$promise;
+        }
+
+        function downloadEvent(eventId) {
+            return $http.get(eventUrl + 'Download?eventId=' + eventId, {
+                responseType: 'arraybuffer'
+            });
         }
 
         function expelUserFromEvent(eventId, userId) {

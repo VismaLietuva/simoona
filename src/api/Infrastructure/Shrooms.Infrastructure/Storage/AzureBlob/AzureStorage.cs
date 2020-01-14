@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Drawing;
 using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
 using Shrooms.Infrastructure.Configuration;
+using Shrooms.Infrastructure.Logger;
 
 namespace Shrooms.Azure
 {
@@ -30,7 +32,10 @@ namespace Shrooms.Azure
         {
             var blockBlob = GetBlockBlob(blobKey, tenantPicturesContainer);
 
-            await blockBlob.DeleteAsync(DeleteSnapshotsOption.None, null, _blobRequestOptions, null);
+            if (blockBlob.Exists())
+            {
+                await blockBlob.DeleteAsync(DeleteSnapshotsOption.None, null, _blobRequestOptions, null);
+            }
         }
 
         public async Task UploadPicture(Image image, string blobKey, string mimeType, string tenantPicturesContainer)
