@@ -18,7 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.SqlServer;
-using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using ISystemClock = Shrooms.Infrastructure.SystemClock.ISystemClock;
@@ -146,8 +145,15 @@ namespace Shrooms.Domain.Services.Events.Participation
                 }
 
                 _uow.SaveChanges(false);
+
                 var choices = @event.SelectedOptions.Select(x => x.Option);
                 _calendarService.AddParticipants(@event.Id, joinDto.OrganizationId, joinDto.ParticipantIds, choices);
+
+                _asyncRunner.Run<IEventCalendarService>(n => n.SendInvitation(@event, joinDto.ParticipantIds, joinDto.OrganizationId), _uow.ConnectionName);
+
+             // _calendarService.AddParticipants(@event.Id, joinDto.OrganizationId, joinDto.ParticipantIds, choices);
+             //  Commented due to Google Api Calendar 403 error "quotaExceeded: Calendar usage limits exceeded"
+             //  https://issuetracker.google.com/issues/141704931
             }
         }
 
@@ -251,7 +257,9 @@ namespace Shrooms.Domain.Services.Events.Participation
 
             RemoveParticipant(userOrg.UserId, participant);
 
-            _calendarService.RemoveParticipants(eventId, userOrg.OrganizationId, new List<string> { userOrg.UserId });
+         // _calendarService.RemoveParticipants(eventId, userOrg.OrganizationId, new List<string> { userOrg.UserId });
+         // Commented due to Google Api Calendar 403 error "quotaExceeded: Calendar usage limits exceeded"
+         // https://issuetracker.google.com/issues/141704931
         }
 
         public IEnumerable<EventParticipantDTO> GetEventParticipants(Guid eventId, UserAndOrganizationDTO userAndOrg)
@@ -341,6 +349,8 @@ namespace Shrooms.Domain.Services.Events.Participation
                 EventTypeId = e.EventTypeId,
                 Name = e.Name,
                 EndDate = e.EndDate,
+                Description = e.Description,
+                Location = e.Place,
                 RegistrationDeadline = e.RegistrationDeadline,
                 ResponsibleUserId = e.ResponsibleUserId,
                 WallId = e.WallId

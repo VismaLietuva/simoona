@@ -20,24 +20,18 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Shrooms.Domain.Helpers;
-using Shrooms.Resources.Models.Events;
 using Shrooms.Domain.Services.UserService;
-using System.Threading;
 using System.Resources;
 using Shrooms.Resources;
 using System.Globalization;
 using System.Data.Entity.SqlServer;
 using Newtonsoft.Json;
-using Shrooms.Constants.BusinessLayer.Events;
 
 namespace Shrooms.Domain.Services.Events
 {
     public class EventService : IEventService
     {
         private const int NoOptions = 0;
-
-
-
         private readonly IUnitOfWork2 _uow;
         private readonly IPermissionService _permissionService;
         private readonly IEventUtilitiesService _eventUtilitiesService;
