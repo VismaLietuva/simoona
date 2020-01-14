@@ -63,6 +63,7 @@
     <Compile Include="Authorization\Permissions\Scopes.cs" />
     <Compile Include="Authorization\Roles.cs" />
     <Compile Include="BusinessLayer\ConstBusinessLayer.cs" />
+    <Compile Include="BusinessLayer\Events\OptionRules.cs" />
     <Compile Include="BusinessLayer\Templates.cs" />
     <Compile Include="DataLayer\ConstDataLayer.cs" />
     <Compile Include="EmailTemplateCacheKeys.cs" />

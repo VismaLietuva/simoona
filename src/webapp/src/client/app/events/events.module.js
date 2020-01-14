@@ -15,6 +15,10 @@
             'simoonaApp.Common',
             'simoonaApp.Layout.LeftMenu'
         ])
+        .constant('optionRules', {
+            default: 0,
+            ignoreSingleJoin: 1
+        })
         .config(route)
         .run(init);
 

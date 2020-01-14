@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Shrooms.Constants.BusinessLayer.Events;
 
 namespace Shrooms.EntityModels.Models.Events
 {
@@ -8,6 +9,7 @@ namespace Shrooms.EntityModels.Models.Events
         public Guid EventId { get; set; }
         public virtual Event Event { get; set; }
         public string Option { get; set; }
+        public OptionRules Rule { get; set; }
         public virtual ICollection<EventParticipant> EventParticipants { get; set; }
     }
 }

@@ -171,5 +171,8 @@
   "eventAddColleaguesButton": "+ Pridėti kolegas",
   "eventAddColleaguesTitle": "Pridėti kolegas",
   "eventAdd": "Pridėti",
-  "foodOptionalSelect": "Valgymas neprivalomas"
+  "ignoreSingleJoinPlaceHolder": "Pvz., nevalgysiu",
+  "ignoreSingleJoinSelect": "Reikia pasirinkimo prisijungti kaip stebėtojui",
+  "ignoreSingleJoinTooltipParagraphOne": "Šis funkcionalumas skirtas renginių tipams, kuriuose leidžiama dalyvauti kartą per savaitę.",
+  "ignoreSingleJoinTooltipParagraphTwo": "Tai suteiks vartotojams galimybę prisijungti kaip stebėtojams be jokių šio renginio privalumų, pavyzdžiui, maisto."
 }
