@@ -210,7 +210,7 @@ namespace Shrooms.UnitTests.DomainService.EventServices
                 OrganizationId = 2,
                 UserId = "user"
             };
-            Assert.Throws<EventException>(() => _eventParticipationService.Leave(eventId, userOrg));
+            Assert.Throws<EventException>(() => _eventParticipationService.Leave(eventId, userOrg, "leave comment"));
         }
 
         [Test]
@@ -222,8 +222,8 @@ namespace Shrooms.UnitTests.DomainService.EventServices
                 OrganizationId = 2,
                 UserId = "user"
             };
-            _eventParticipationService.Leave(eventId, userOrg);
-            _eventParticipantsDbSet.Received(1).Remove(Arg.Any<EventParticipant>());
+            _eventParticipationService.Leave(eventId, userOrg, "leave comment");
+            _eventParticipantsDbSet.DidNotReceive().Remove(Arg.Any<EventParticipant>());
         }
 
         [Test]
@@ -237,7 +237,7 @@ namespace Shrooms.UnitTests.DomainService.EventServices
             };
 
             _eventParticipationService.Expel(eventId, userOrg, "user2");
-            _eventParticipantsDbSet.Received(1).Remove(Arg.Any<EventParticipant>());
+            _eventParticipantsDbSet.DidNotReceive().Remove(Arg.Any<EventParticipant>());
         }
 
         [Test]
@@ -418,7 +418,8 @@ namespace Shrooms.UnitTests.DomainService.EventServices
                             {
                                 FirstName = "Name",
                                 LastName = "Surname"
-                            }
+                            },
+                            AttendStatus = 1
                         },
                         new EventParticipant
                         {
@@ -426,7 +427,8 @@ namespace Shrooms.UnitTests.DomainService.EventServices
                             {
                                 FirstName = "Name1",
                                 LastName = "Surname1"
-                            }
+                            },
+                            AttendStatus = 1
                         },
                     },
                 }
@@ -670,7 +672,8 @@ namespace Shrooms.UnitTests.DomainService.EventServices
                     Event = @event,
                     EventOptions = eventOptions,
                     EventId = eventId,
-                    ApplicationUserId = "user"
+                    ApplicationUserId = "user",
+                    AttendStatus = 1,
                 }
             };
 
@@ -699,7 +702,8 @@ namespace Shrooms.UnitTests.DomainService.EventServices
                     Event = @event,
                     EventOptions = new List<EventOption>(),
                     EventId = eventId,
-                    ApplicationUserId = "user"
+                    ApplicationUserId = "user",
+                    AttendStatus = 1
                 },
                 new EventParticipant
                 {
@@ -707,7 +711,8 @@ namespace Shrooms.UnitTests.DomainService.EventServices
                     Event = @event,
                     EventOptions = new List<EventOption>(),
                     EventId = eventId,
-                    ApplicationUserId = "user2"
+                    ApplicationUserId = "user2",
+                    AttendStatus = 1
                 }
             };
 
@@ -735,7 +740,8 @@ namespace Shrooms.UnitTests.DomainService.EventServices
                     Event = @event,
                     EventOptions = new List<EventOption>(),
                     EventId = eventId,
-                    ApplicationUserId = "user"
+                    ApplicationUserId = "user",
+                    AttendStatus = 1
                 },
                 new EventParticipant
                 {
@@ -743,7 +749,8 @@ namespace Shrooms.UnitTests.DomainService.EventServices
                     Event = @event,
                     EventOptions = new List<EventOption>(),
                     EventId = eventId,
-                    ApplicationUserId = "user2"
+                    ApplicationUserId = "user2",
+                    AttendStatus = 1
                 }
             };
 
@@ -777,6 +784,30 @@ namespace Shrooms.UnitTests.DomainService.EventServices
                     EventTypeId = 1
                 }
             };
+
+            var participants = new List<EventParticipant>
+            {
+                new EventParticipant
+                {
+                    Id = 1,
+                    Event = eventt.FirstOrDefault(),
+                    EventOptions = new List<EventOption>(),
+                    EventId = eventt.FirstOrDefault().Id,
+                    ApplicationUserId = "user",
+                    AttendStatus = 1
+                },
+                new EventParticipant
+                {
+                    Id = 2,
+                    Event = eventt.FirstOrDefault(),
+                    EventOptions = new List<EventOption>(),
+                    EventId = eventt.FirstOrDefault().Id,
+                    ApplicationUserId = "user2",
+                    AttendStatus = 1
+                }
+            };
+
+            _eventParticipantsDbSet.SetDbSetData(participants.AsQueryable());
             _eventsDbSet.SetDbSetData(eventt.AsQueryable());
             return guid;
         }
@@ -784,6 +815,9 @@ namespace Shrooms.UnitTests.DomainService.EventServices
         private Guid MockEventWithOptions()
         {
             var guid = Guid.NewGuid();
+
+           
+
             var eventt = new List<Event>
             {
                 new Event
@@ -823,10 +857,38 @@ namespace Shrooms.UnitTests.DomainService.EventServices
                         IsSingleJoin = false,
                         Id = 1
                     },
-                    EventParticipants = new List<EventParticipant>(),
                     EventTypeId = 1
                 }
             };
+
+            var participants = new List<EventParticipant>
+            {
+                new EventParticipant
+                {
+                    Id = 1,
+                    Event = eventt.FirstOrDefault(),
+                    EventOptions = new List<EventOption>(),
+                    EventId = eventt.FirstOrDefault().Id,
+                    ApplicationUserId = "user",
+                    AttendStatus = 1
+                },
+                new EventParticipant
+                {
+                    Id = 2,
+                    Event = eventt.FirstOrDefault(),
+                    EventOptions = new List<EventOption>(),
+                    EventId = eventt.FirstOrDefault().Id,
+                    ApplicationUserId = "user2",
+                    AttendStatus = 1
+                }
+            };
+
+            foreach(var @event in eventt)
+            {
+                @event.EventParticipants = participants;
+            }
+
+            _eventParticipantsDbSet.SetDbSetData(participants.AsQueryable());
             _eventsDbSet.SetDbSetData(eventt.AsQueryable());
             return guid;
         }

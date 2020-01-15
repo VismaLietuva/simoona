@@ -31,7 +31,6 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
         void CheckIfCreatingEventHasInsufficientOptions(int maxChoices, int optionsCount);
         void CheckIfUserHasPermission(string userId, string responsibleUserId, bool isAdmin);
         void CheckIfUserHasPermissionToPin(bool newPinStatus, bool currentPinStatus, bool isAdmin);
-        void CheckIfUserHasPermissionToPin(bool pinStatus, bool isAdmin);
         void CheckIfRegistrationDeadlineExceedsStartDate(DateTime registrationDeadline, DateTime startDate);
         void CheckIfProvidedOptionsAreValid(IEnumerable<int> providedOptionsCount, IEnumerable<EventOption> foundOptionsCount);
         void CheckIfEventHasParticipants(IEnumerable<EventParticipantDTO> eventParticipants);

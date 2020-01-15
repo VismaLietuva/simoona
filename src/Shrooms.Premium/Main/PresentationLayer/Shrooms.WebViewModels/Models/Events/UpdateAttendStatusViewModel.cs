@@ -1,19 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Shrooms.WebViewModels.Models.Events
 {
-    public class EventJoinViewModel
+    public class UpdateAttendStatusViewModel
     {
-        [Required]
         public Guid EventId { get; set; }
-
-        [Required]
         public int AttendStatus { get; set; }
-
         public string AttendComment { get; set; }
-
-        public IEnumerable<int> ChosenOptions { get; set; }
     }
 }

@@ -35,7 +35,7 @@ namespace Shrooms.WebViewModels.Models.Events
 
         public bool IsFull { get; set; }
 
-        public bool IsParticipating { get; set; }
+        public int ParticipatingStatus { get; set; }
 
         public int WallId { get; set; }
 

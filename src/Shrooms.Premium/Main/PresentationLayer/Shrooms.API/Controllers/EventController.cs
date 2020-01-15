@@ -305,6 +305,28 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
             }
         }
 
+        [HttpPost]
+        [Route("UpdateAttendStatus")]
+        [PermissionAuthorize(Permission = BasicPermissions.Event)]
+        public IHttpActionResult UpdateAttendStatus(UpdateAttendStatusViewModel updateStatusViewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var updateAttendStatusDTO = _mapper.Map<UpdateAttendStatusViewModel, UpdateAttendStatusDTO>(updateStatusViewModel);
+            SetOrganizationAndUser(updateAttendStatusDTO);
+            try
+            {
+                _eventParticipationService.AddOrChangeAttendStatus(updateAttendStatusDTO);
+                return Ok();
+            }
+            catch (EventException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
         [HttpGet]
         [Route("Details")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
@@ -358,11 +380,11 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
         [HttpDelete]
         [Route("Leave")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult Leave(Guid eventId)
+        public IHttpActionResult Leave(Guid eventId, string leaveComment)
         {
             try
             {
-                _eventParticipationService.Leave(eventId, GetUserAndOrganization());
+                _eventParticipationService.Leave(eventId, GetUserAndOrganization(), leaveComment);
                 return Ok();
             }
             catch (EventException e)

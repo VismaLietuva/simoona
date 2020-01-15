@@ -29,7 +29,7 @@ namespace Shrooms.WebViewModels.Models.Events
 
         public bool IsCreator { get; set; }
 
-        public bool IsParticipating { get; set; }
+        public int ParticipatingStatus { get; set; }
 
         public int MaxChoices { get; set; }
     }
