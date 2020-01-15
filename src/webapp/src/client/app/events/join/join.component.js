@@ -12,28 +12,40 @@
             templateUrl: 'app/events/join/join.html',
             controller: eventJoinController,
             controllerAs: 'vm'
+        })
+        .constant("attendStatus", {
+            NotAttending: 0,
+            Attending: 1,
+            MaybeAttending: 2,
+            Idle: 3
         });
 
     eventJoinController.$inject = [
-        '$state',
         '$uibModal',
         'eventRepository',
         'notifySrv',
         'errorHandler',
         'authService',
         'eventParticipantsService',
-        'Analytics'
+        'Analytics',
+        'attendStatus'
     ];
 
-    function eventJoinController($state, $uibModal, eventRepository, notifySrv, errorHandler,
-        authService, eventParticipantsService, Analytics) {
+    function eventJoinController($uibModal, eventRepository, notifySrv, errorHandler,
+        authService, eventParticipantsService, Analytics, attendStatus) {
         /* jshint validthis: true */
         var vm = this;
 
+        vm.attendStatus = attendStatus;
         vm.enableAction = true;
         vm.joinEvent = joinEvent;
         vm.leaveEvent = leaveEvent;
+        vm.maybeParticipating = maybeParticipating;
+        vm.notParticipating = notParticipating;
         vm.hasDatePassed = hasDatePassed;
+        vm.openLeaveCommentModal = openLeaveCommentModal;
+        vm.closeModal = closeModal;
+
 
         ////////
         function joinEvent(eventId) {
@@ -48,7 +60,8 @@
                         if (!vm.event.availableOptions.length && !vm.isAddColleague) {
                             var selectedOptions = [];
 
-                            eventRepository.joinEvent(eventId, selectedOptions).then(function() {
+                            var comment = "";
+                            eventRepository.joinEvent(eventId, selectedOptions, attendStatus.Attending, comment).then(function() {
                                 handleEventJoin();
                             }, function(error) {
                                 vm.enableAction = true;
@@ -62,18 +75,16 @@
             }
         }
 
-        function leaveEvent(eventId) {
+        function leaveEvent(eventId, comment) {
             if (vm.enableAction) {
                 if (canLeaveEvent()) {
                     vm.enableAction = false;
-
-                    eventRepository.leaveEvent(eventId, authService.identity.userId).then(function() {
+                    eventRepository.leaveEvent(eventId, authService.identity.userId, comment).then(function() {
                         removeCurrentUser();
                     }, function(error) {
                         var errorActions = {
                             repeat: removeCurrentUser
                         };
-
                         vm.enableAction = true;
 
                         errorHandler.handleError(error, errorActions);
@@ -82,10 +93,56 @@
             }
         }
 
+        function maybeParticipating(eventId) {
+            if (vm.enableAction) {
+                var comment = "";
+                eventRepository.updateAttendStatus(attendStatus.MaybeAttending, comment, eventId).then(function() {
+                    handleEventJoin();
+                }, function(error) {
+                    vm.enableAction = true;
+                    errorHandler.handleErrorMessage(error);
+                });
+            }
+        }
+
+        function notParticipating(eventId, comment) {
+            if (vm.enableAction) {
+                eventRepository.updateAttendStatus(attendStatus.NotAttending, comment, eventId).then(function() {
+                    handleEventJoin();
+                }, function(error) {
+                    vm.enableAction = true;
+                    errorHandler.handleErrorMessage(error);
+                });
+            }
+        }
+
+        function openLeaveCommentModal() {
+            $uibModal.open({
+                templateUrl: 'app/events/leave/leave-event.html',
+                controller: 'eventLeaveController',
+                controllerAs: 'vm',
+                resolve: {
+                    event: function() {
+                        return vm.event;
+                    },
+                    leaveEvent: function() {
+                        return vm.leaveEvent;
+                    },
+                    notInterested: function() {
+                        return vm.notParticipating;
+                    }
+                }
+              });
+        }
+
+        function closeModal() {
+            $uibModalInstance.close();
+        }
+
         function removeCurrentUser() {
             vm.enableAction = true;
             vm.event.participantsCount--;
-            vm.event.isParticipating = false;
+            vm.event.participatingStatus = attendStatus.NotAttending;
 
             if (vm.isDetails || vm.isAddColleague) {
                 var currentUserId = authService.identity.userId;
@@ -104,15 +161,26 @@
 
                     vm.event.options = response.options;
                     vm.event.participants = response.participants;
+                    vm.event.participantsCount = recalculateJoinedParticipants();
                 });
             } else {
-                vm.event.isParticipating = true;
+                vm.event.participatingStatus = attendStatus.Attending;
                 vm.event.participantsCount++;
             }
 
             vm.enableAction = true;
 
             notifySrv.success('events.joinedEvent');
+        }
+
+        function recalculateJoinedParticipants() {
+            var participantsCount = 0;
+            vm.event.participants.forEach(function(participant){
+                if (participant.attendStatus == attendStatus.Attending) {
+                    participantsCount++;
+                }
+            });
+            return participantsCount;
         }
 
         function openOptionsModal() {

@@ -118,7 +118,7 @@ describe('aceEventParticipants', function () {
             ctrl.expelUserFromEvent(participant);
             scope.$digest();
 
-            expect(ctrl.event.isParticipating).toEqual(false);
+            expect(ctrl.event.participatingStatus).toEqual(0);
         });
 
         it('should remove user from event participant list', function() {

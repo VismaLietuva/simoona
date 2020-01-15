@@ -39,7 +39,8 @@
             getUserResponsiblePersonById: getUserResponsiblePersonById,
             getUserForAutoCompleteResponsiblePerson: getUserForAutoCompleteResponsiblePerson,
             exportParticipants: exportParticipants,
-            getMaxEventParticipants: getMaxEventParticipants
+            getMaxEventParticipants: getMaxEventParticipants,
+            updateAttendStatus: updateAttendStatus
         };
         return service;
 
@@ -126,17 +127,20 @@
             }).$promise;
         }
 
-        function joinEvent(eventId, chosenOptions) {
+        function joinEvent(eventId, chosenOptions, attendStatus, attendComment) {
             return $resource(eventUrl + 'Join').save({
                 eventId: eventId,
-                chosenOptions: chosenOptions
+                chosenOptions: chosenOptions,
+                attendStatus: attendStatus,
+                attendComment: attendComment
             }).$promise;
         }
 
-        function leaveEvent(eventId, userId) {
+        function leaveEvent(eventId, userId, leaveComment) {
             return $resource(eventUrl + 'Leave').delete({
                 eventId: eventId,
-                userId: userId
+                userId: userId,
+                leaveComment: leaveComment
             }).$promise;
         }
 
@@ -188,6 +192,14 @@
                     method: 'GET'
                 }
             });
+        }
+
+        function updateAttendStatus(attendStatus, attendComment, eventId) {
+            return $resource(eventUrl + 'UpdateAttendStatus').save({
+                attendStatus: attendStatus,
+                attendComment: attendComment,
+                eventId: eventId
+            }).$promise;
         }
     }
 })();

@@ -6,10 +6,10 @@
         .service('eventParticipantsService', eventParticipantsService);
 
     eventParticipantsService.$inject = [
-        'lodash'
+        'attendStatus'
     ];
 
-    function eventParticipantsService(lodash) {
+    function eventParticipantsService(attendStatus) {
         var service = {
             removeParticipant: removeParticipant,
             removeParticipantFromOptions: removeParticipantFromOptions
@@ -19,8 +19,11 @@
         /////////
 
         function removeParticipant(participantList, userId) {
-            lodash.remove(participantList, function(participant) {
-                return participant.userId === userId;
+            participantList.forEach(function(participant) {
+                if (userId == participant.userId && participant.attendStatus == attendStatus.Attending)
+                {
+                    participant.attendStatus = attendStatus.NotAttending;
+                }
             });
         }
 

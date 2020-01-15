@@ -40,7 +40,7 @@ describe('aceEventParticipantsActions', function () {
     }));
 
     it('should reset participant list on method call resetParticipantList', function () {
-        ctrl.event.isParticipating = true;
+        ctrl.event.participatingStatus = 1;
         ctrl.resetParticipantList();
         scope.$digest();
 
@@ -48,7 +48,7 @@ describe('aceEventParticipantsActions', function () {
         expect(eventsMocks.eventRepository.resetParticipantList).toHaveBeenCalledWith(ctrl.event.id);
 
         expect(ctrl.event.participants.length).toBeFalsy();
-        expect(ctrl.event.isParticipating).toBeFalsy();
+        expect(ctrl.event.participatingStatus).toBeFalsy();
     });
 
 });

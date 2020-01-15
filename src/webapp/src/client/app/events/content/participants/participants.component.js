@@ -22,11 +22,12 @@
         'eventStatus',
         'errorHandler',
         'lodash',
-        'Analytics'
+        'Analytics',
+        'attendStatus'
     ];
 
     function eventParticipantsController(eventRepository, authService, eventParticipantsService,
-        eventStatusService, eventStatus, errorHandler, lodash, Analytics) {
+        eventStatusService, eventStatus, errorHandler, lodash, Analytics, attendStatus) {
         /* jshint validthis: true */
         var vm = this;
 
@@ -46,6 +47,8 @@
         vm.expelUserFromEvent = expelUserFromEvent;
         vm.isDeleteVisible = isDeleteVisible;
         vm.isActiveTab = isActiveTab;
+        vm.isExportVisible = isExportVisible;
+
 
         /////////
 
@@ -69,6 +72,17 @@
             return vm.isAdmin && eventStatusService.getEventStatus(vm.event) !== eventStatus.Finished;
         }
 
+        function isExportVisible() {
+            var participantCount = 0;
+            vm.event.participants.forEach(function(participant) {
+                if (participant.attendStatus == attendStatus.Attending) {
+                    participantCount++;
+                }
+            })
+           
+            return participantCount > 0 ? true : false;
+        }
+
         function expelUserFromEvent(participant) {
             Analytics.trackEvent('Events', 'expelUserFromEvent: ' + participant.userId, 'Event: ' + vm.event.id);
             if (!participant.isLoading) {
@@ -81,7 +95,7 @@
                     eventParticipantsService.removeParticipantFromOptions(vm.event.options, participant.userId);
 
                     if (authService.identity.userId === participant.userId) {
-                        vm.event.isParticipating = false;
+                        vm.event.participatingStatus = attendStatus.NotAttending;
                     }
 
                     if (vm.event.maxParticipants > vm.event.participants.length) {

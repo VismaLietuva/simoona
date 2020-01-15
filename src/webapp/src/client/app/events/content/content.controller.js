@@ -42,7 +42,8 @@
             eventRepository.getEventDetails(eventId).then(function(response) {
                 vm.event = response;
                 $rootScope.pageTitle = $translate.instant('events.eventTitle') + ' - ' + vm.event.name;
-                vm.event.participantsCount = vm.event.participants.length;
+                vm.event.participantsCount = calculateJoinedParticipants();
+
                 vm.isEventAdmin = vm.hasAdministrationPermission || vm.event.hostUserId === vm.currentUser;
                 vm.isEventLoading = false;
             },
@@ -53,6 +54,17 @@
                     type: 'all'
                 });
             });
+        }
+
+        function calculateJoinedParticipants() {
+            var joinedParticipants = 0;
+            vm.event.participants.forEach(function(item) {
+                if (item.attendStatus == 1) {
+                    joinedParticipants++;
+                    }
+                });
+
+            return joinedParticipants;
         }
 
         function hasDatePassed(date) {

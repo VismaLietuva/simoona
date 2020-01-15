@@ -45,7 +45,7 @@ beforeEach(function () {
         fullEvent: {
             maxParticipants : 10,
             participantsCount: 10,
-            isParticipating: false,
+            participatingStatus: 0,
             registrationDeadlineDate: eventsMocks.afterOneHour,
             startDate: eventsMocks.afterTwoHours,
             endDate: eventsMocks.afterThreeHours
@@ -53,7 +53,7 @@ beforeEach(function () {
         joinEvent: {
             maxParticipants : 10,
             participantsCount: 0,
-            isParticipating: false,
+            participatingStatus: 0,
             registrationDeadlineDate: eventsMocks.afterOneHour,
             startDate: eventsMocks.afterTwoHours,
             endDate: eventsMocks.afterThreeHours
@@ -145,7 +145,7 @@ beforeEach(function () {
                 }
         ],
         events: [
-            {id: 1, typeId: 1, name: '5a Picos', startDate: '2999-05-06T09:34:15.147', registrationDeadlineDate: '2998-05-06T09:34:15.147', isParticipating: false, participantsCount: 5, responsibleUser: {id: 1}, maxChoices: 2,
+            {id: 1, typeId: 1, name: '5a Picos', startDate: '2999-05-06T09:34:15.147', registrationDeadlineDate: '2998-05-06T09:34:15.147', participatingStatus: 0, participantsCount: 5, responsibleUser: {id: 1}, maxChoices: 2,
                 participants: [{}], options: [{id: 1, option: 'a'}, {id: 2, option: 'b'}, {id: 3, option: 'c'}]},
             {id: 2, typeId: 1, name: '6a Picos', options: [{name: 'First option'}, {name: 'Second option'}]},
             {id: 3, typeId: 1, name: '6a Chikens', options: []},
