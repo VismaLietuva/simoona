@@ -40,7 +40,6 @@ namespace Shrooms.EntityModels.Models.Events
         [ForeignKey("Wall")]
         public int WallId { get; set; }
         public virtual Wall Wall { get; set; }
-        public int? FoodOption { get; set; }
         public virtual ICollection<EventParticipant> EventParticipants { get; set; }
         public virtual ICollection<EventOption> EventOptions { get; set; }
         public bool IsPinned { get; set; }

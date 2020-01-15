@@ -13,7 +13,6 @@
     "eventTypeName": "Pavadinimas",
     "eventTypeSingleJoin": "Tik vienas dalyvavimas",
     "sendWeeklyReminders": "Siųsti savaitinius priminimus",
-    "eventTypeIsFoodRelated": "Su maistu",
     "editEventType": "Renginio tipo redagavimas",
     "createEventType": "Naujas renginio tipas",
     "eventTypeWarning": "Šis renginio tipas turi nepasibaigusių arba pasikartojančių renginių",
