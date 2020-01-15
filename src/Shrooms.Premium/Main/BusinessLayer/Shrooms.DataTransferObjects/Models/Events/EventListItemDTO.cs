@@ -1,6 +1,4 @@
-﻿using Shrooms.EntityModels.Models;
-using System;
-using System.Collections.Generic;
+﻿using System;
 
 namespace Shrooms.DataTransferObjects.Models.Events
 {
@@ -33,7 +31,5 @@ namespace Shrooms.DataTransferObjects.Models.Events
         public int ParticipatingStatus { get; set; }
 
         public int MaxChoices { get; set; }
-
-        public int? FoodOption { get; set; }
     }
 }

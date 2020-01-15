@@ -1,6 +1,6 @@
 ﻿using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.BusinessLayer;
-using Shrooms.Premium.Other.Shrooms.Constants.BusinessLayer;
+using Shrooms.Constants.BusinessLayer.Events;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Events;
@@ -17,7 +17,7 @@ using Shrooms.Infrastructure.FireAndForget;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.Globalization;
+using System.Data.Entity.SqlServer;
 using System.Linq;
 using System.Linq.Expressions;
 using ISystemClock = Shrooms.Infrastructure.SystemClock.ISystemClock;
@@ -112,19 +112,20 @@ namespace Shrooms.Domain.Services.Events.Participation
                     .Include(x => x.EventType)
                     .Where(x => x.Id == joinDto.EventId
                         && x.OrganizationId == joinDto.OrganizationId)
-                    .Select(MapEventToJoinValidationDto())
+                    .Select(MapEventToJoinValidationDto)
                     .FirstOrDefault();
 
                 _eventValidationService.CheckIfEventExists(@event);
 
-                var eventOptions = @event.Options
+                @event.SelectedOptions = @event.Options
                     .Where(option => joinDto.ChosenOptions.Contains(option.Id))
                     .ToList();
 
                 _eventValidationService.CheckIfRegistrationDeadlineIsExpired(@event.RegistrationDeadline);
-                _eventValidationService.CheckIfProvidedOptionsAreValid(joinDto.ChosenOptions, eventOptions);
+                _eventValidationService.CheckIfProvidedOptionsAreValid(joinDto.ChosenOptions, @event.SelectedOptions);
                 _eventValidationService.CheckIfJoiningNotEnoughChoicesProvided(@event.MaxChoices, joinDto.ChosenOptions.Count());
                 _eventValidationService.CheckIfJoiningTooManyChoicesProvided(@event.MaxChoices, joinDto.ChosenOptions.Count());
+                _eventValidationService.CheckIfSingleChoiceSelectedWithRule(@event.SelectedOptions, OptionRules.IgnoreSingleJoin);
                 _eventValidationService.CheckIfEventHasEnoughPlaces(@event.MaxParticipants, @event.Participants.Count + joinDto.ParticipantIds.Count);
 
                 foreach (var userId in joinDto.ParticipantIds)
@@ -137,14 +138,16 @@ namespace Shrooms.Domain.Services.Events.Participation
                     var alreadyParticipates = @event.Participants.Any(p => p == userId);
                     _eventValidationService.CheckIfUserAlreadyJoinedSameEvent(alreadyParticipates);
 
-                    ValidateSingleJoin(@event, joinDto.OrganizationId, userId, joinDto.ChosenOptions);
-                    AddParticipant(userId, joinDto, eventOptions);
+                    ValidateSingleJoin(@event, joinDto.OrganizationId, userId);
+                    AddParticipant(userId, @event.Id, @event.SelectedOptions);
 
                     JoinLeaveEventWall(@event.ResponsibleUserId, userId, @event.WallId, joinDto);
                 }
 
                 _uow.SaveChanges(false);
-                var choices = eventOptions.Select(x => x.Option);
+
+                var choices = @event.SelectedOptions.Select(x => x.Option);
+                _calendarService.AddParticipants(@event.Id, joinDto.OrganizationId, joinDto.ParticipantIds, choices);
 
                 _asyncRunner.Run<IEventCalendarService>(n => n.SendInvitation(@event, joinDto.ParticipantIds, joinDto.OrganizationId), _uow.ConnectionName);
 
@@ -360,9 +363,8 @@ namespace Shrooms.Domain.Services.Events.Participation
             });
         }
 
-        private Expression<Func<Event, EventJoinValidationDTO>> MapEventToJoinValidationDto()
-        {
-            return e => new EventJoinValidationDTO
+        private Expression<Func<Event, EventJoinValidationDTO>> MapEventToJoinValidationDto =>
+            e => new EventJoinValidationDTO
             {
                 Participants = e.EventParticipants.Where(x => x.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.Attending).Select(x => x.ApplicationUserId).ToList(),
                 MaxParticipants = e.MaxParticipants,
@@ -380,60 +382,44 @@ namespace Shrooms.Domain.Services.Events.Participation
                 ResponsibleUserId = e.ResponsibleUserId,
                 WallId = e.WallId
             };
-        }
 
-        private void ValidateSingleJoin(EventJoinValidationDTO @event, int organizationId, string userId, IEnumerable<int> options)
+        private void ValidateSingleJoin(EventJoinValidationDTO eventDto, int orgId, string userId)
         {
-            if(!@event.Options
-                .Where(option => options.Contains(option.Id))
-                .Any(selectedOption => selectedOption.Option == EventConstants.WillNotEatOptionEN || selectedOption.Option == EventConstants.WillEatOptionLT)
-                )
+            if (eventDto.SelectedOptions.Any(x => x.Rule != OptionRules.IgnoreSingleJoin) ||
+                eventDto.SelectedOptions.Count == 0)
             {
-                if (@event.IsSingleJoin)
+                if (eventDto.IsSingleJoin)
                 {
                     var events = _eventsDbSet
                         .Include(e => e.EventParticipants.Select(x => x.EventOptions))
                         .Where(x =>
-                            x.EventTypeId == @event.EventTypeId &&
-                            x.OrganizationId == organizationId &&
-                            x.StartDate > _systemClock.UtcNow &&
-                            x.EventParticipants.Any(p => p.ApplicationUserId == userId && p.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.Attending))
+                            x.EventTypeId == eventDto.EventTypeId &&
+                            x.OrganizationId == orgId &&
+                            x.EventParticipants.Any(p => p.ApplicationUserId == userId && p.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.Attending) &&
+                            SqlFunctions.DatePart("wk", x.StartDate) == SqlFunctions.DatePart("wk", eventDto.StartDate))
                         .ToList();
 
-                    var filteredEvents = RemoveEventsWithoutFood(events, userId);
+                    var filteredEvents = RemoveEventsWithOptionRule(events, OptionRules.IgnoreSingleJoin, userId);
 
-                    var eventWeekNumber = GetWeekOfYear(@event.StartDate);
-                    var eventToLeave = filteredEvents.FirstOrDefault(x => GetWeekOfYear(x.StartDate) == eventWeekNumber);
-
-                    _eventValidationService.CheckIfUserExistsInOtherSingleJoinEvent(eventToLeave);
+                    _eventValidationService.CheckIfUserExistsInOtherSingleJoinEvent(filteredEvents);
                 }
             }
-
         }
 
-        private static IEnumerable<Event> RemoveEventsWithoutFood(IList<Event> events, string userId)
+        private static IEnumerable<Event> RemoveEventsWithOptionRule(IList<Event> events, OptionRules rule, string userId)
         {
-            try
-            {
-                var foodOptionalEvents = events.Where(x => x.FoodOption == (int)EventConstants.FoodOptions.Optional);
+            var eventsToRemove = events.Where(x =>
+                x.EventParticipants.Any(y => y.ApplicationUserId == userId &&
+                                             y.EventOptions.All(z => z.Rule == rule) &&
+                                             y.EventOptions.Count > 0));
 
-                var eventsToRemove = foodOptionalEvents
-                    .Where(x => x.EventParticipants
-                        .First(y => y.ApplicationUserId == userId).EventOptions
-                        .Any(z => z.Option == EventConstants.WillNotEatOptionLT || z.Option == EventConstants.WillNotEatOptionEN));
-
-                return events.Except(eventsToRemove);
-            }
-            catch (ArgumentNullException)
-            {
-                return events;
-            }
+            return events.Except(eventsToRemove);
         }
 
-        private void AddParticipant(string userId, EventJoinDTO joinDto, List<EventOption> eventOptions)
+        private void AddParticipant(string userId, Guid eventId, ICollection<EventOption> eventOptions)
         {
             var timeStamp = _systemClock.UtcNow;
-            var participant = _eventParticipantsDbSet.FirstOrDefault(p => p.EventId == joinDto.EventId && p.ApplicationUserId == userId);
+            var participant = _eventParticipantsDbSet.FirstOrDefault(p => p.EventId == eventId && p.ApplicationUserId == userId);
             if (participant == null)
             {
                 var newParticipant = new EventParticipant
@@ -441,7 +427,7 @@ namespace Shrooms.Domain.Services.Events.Participation
                     ApplicationUserId = userId,
                     Created = timeStamp,
                     CreatedBy = userId,
-                    EventId = joinDto.EventId,
+                    EventId = eventId,
                     Modified = timeStamp,
                     ModifiedBy = userId,
                     EventOptions = eventOptions,
@@ -506,11 +492,6 @@ namespace Shrooms.Domain.Services.Events.Participation
                 };
                 _eventParticipantsDbSet.Add(newParticipant);
             }
-        }
-
-        public static int GetWeekOfYear(DateTime time)
-        {
-            return CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(time, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
         }
     }
 }

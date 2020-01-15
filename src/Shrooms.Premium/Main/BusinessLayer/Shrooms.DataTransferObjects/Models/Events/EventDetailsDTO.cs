@@ -1,5 +1,4 @@
-﻿using Shrooms.EntityModels.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Shrooms.DataTransferObjects.Models.Events
@@ -23,7 +22,6 @@ namespace Shrooms.DataTransferObjects.Models.Events
         public bool IsFull { get; set; }
         public int ParticipatingStatus { get; set; }
         public int WallId { get; set; }
-        public int? FoodOption { get; set; }
         public IEnumerable<EventDetailsOptionDTO> Options { get; set; }
         public IEnumerable<EventDetailsParticipantDTO> Participants { get; set; }
     }

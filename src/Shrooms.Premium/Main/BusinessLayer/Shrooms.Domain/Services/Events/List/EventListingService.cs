@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Shrooms.Constants.BusinessLayer;
+using Shrooms.Constants.BusinessLayer.Events;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Events;
@@ -145,7 +146,6 @@ namespace Shrooms.Domain.Services.Events.List
                 IsCreator = e.ResponsibleUserId == userId,
                 ParticipatingStatus = e.EventParticipants.FirstOrDefault(p => p.ApplicationUserId == userId) != null ? e.EventParticipants.FirstOrDefault(p => p.ApplicationUserId == userId).AttendStatus : (int)ConstBusinessLayer.AttendingStatus.Idle,
                 MaxChoices = e.MaxChoices,
-                FoodOption = e.FoodOption
             };
         }
 
@@ -157,8 +157,10 @@ namespace Shrooms.Domain.Services.Events.List
                 Options = e.EventOptions.Select(o => new EventOptionDTO
                 {
                     Id = o.Id,
-                    Option = o.Option
+                    Option = o.Option,
+                    Rule = o.Rule
                 })
+                .OrderByDescending(o => o.Rule == OptionRules.Default)
             };
         }
 

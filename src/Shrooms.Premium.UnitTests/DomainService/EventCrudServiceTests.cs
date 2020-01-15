@@ -133,7 +133,7 @@ namespace Shrooms.UnitTests.DomainService
                 OrganizationId = 1,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<string>()
+                NewOptions = new List<NewEventOptionDTO>()
             };
             _eventService.CreateEvent(newEvent);
             _eventsDbSet.Received(1).Add(Arg.Any<Event>());
@@ -159,7 +159,7 @@ namespace Shrooms.UnitTests.DomainService
                 OrganizationId = 1,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<string>()
+                NewOptions = new List<NewEventOptionDTO>()
             };
             _eventService.CreateEvent(newEvent);
             _wallService.Received(1)
@@ -191,10 +191,16 @@ namespace Shrooms.UnitTests.DomainService
                 OrganizationId = 1,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<string>()
+                NewOptions = new List<NewEventOptionDTO>()
                 {
-                    "Type1",
-                    "Type2"
+                    new NewEventOptionDTO
+                    {
+                        Option = "Type1"
+                    },
+                    new NewEventOptionDTO
+                    {
+                        Option = "Type2"
+                    }
                 }
             };
             _eventService.CreateEvent(newEvent);
@@ -220,10 +226,16 @@ namespace Shrooms.UnitTests.DomainService
                 OrganizationId = 1,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<string>()
+                NewOptions = new List<NewEventOptionDTO>()
                 {
-                    "Type1",
-                    "Type1"
+                    new NewEventOptionDTO
+                    {
+                        Option = "Type1"
+                    },
+                    new NewEventOptionDTO
+                    {
+                        Option = "Type1"
+                    }
                 }
             };
             var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
@@ -248,10 +260,16 @@ namespace Shrooms.UnitTests.DomainService
                 OrganizationId = 1,
                 ResponsibleUserId = "2",
                 Location = "place",
-                NewOptions = new List<string>()
+                NewOptions = new List<NewEventOptionDTO>()
                 {
-                    "Type1",
-                    "Type2"
+                    new NewEventOptionDTO
+                    {
+                        Option = "Type1"
+                    },
+                    new NewEventOptionDTO
+                    {
+                        Option = "Type2"
+                    }
                 }
             };
             var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
@@ -276,10 +294,16 @@ namespace Shrooms.UnitTests.DomainService
                 OrganizationId = 1,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<string>()
+                NewOptions = new List<NewEventOptionDTO>()
                 {
-                    "Type1",
-                    "Type2"
+                    new NewEventOptionDTO
+                    {
+                        Option = "Type1"
+                    },
+                    new NewEventOptionDTO
+                    {
+                        Option = "Type2"
+                    }
                 }
             };
 
@@ -307,10 +331,16 @@ namespace Shrooms.UnitTests.DomainService
                 OrganizationId = 1,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<string>()
+                NewOptions = new List<NewEventOptionDTO>()
                 {
-                    "Type1",
-                    "Type2"
+                    new NewEventOptionDTO
+                    {
+                        Option = "Type1"
+                    },
+                    new NewEventOptionDTO
+                    {
+                        Option = "Type2"
+                    }
                 }
             };
             var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
@@ -337,10 +367,16 @@ namespace Shrooms.UnitTests.DomainService
                 OrganizationId = 1,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<string>()
+                NewOptions = new List<NewEventOptionDTO>()
                 {
-                    "Type1",
-                    "Type2"
+                    new NewEventOptionDTO
+                    {
+                        Option = "Type1"
+                    },
+                    new NewEventOptionDTO
+                    {
+                        Option = "Type2"
+                    }
                 }
             };
             var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
@@ -365,10 +401,16 @@ namespace Shrooms.UnitTests.DomainService
                 OrganizationId = 1,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<string>()
+                NewOptions = new List<NewEventOptionDTO>()
                 {
-                    "Type1",
-                    "Type2"
+                    new NewEventOptionDTO
+                    {
+                        Option = "Type1"
+                    },
+                    new NewEventOptionDTO
+                    {
+                        Option = "Type2"
+                    }
                 }
             };
             var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
@@ -393,10 +435,16 @@ namespace Shrooms.UnitTests.DomainService
                 OrganizationId = 1,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<string>()
+                NewOptions = new List<NewEventOptionDTO>()
                 {
-                    "Type1",
-                    "Type2"
+                    new NewEventOptionDTO
+                    {
+                        Option = "Type1"
+                    },
+                    new NewEventOptionDTO
+                    {
+                        Option = "Type2"
+                    }
                 }
             };
             var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
@@ -424,7 +472,7 @@ namespace Shrooms.UnitTests.DomainService
                 OrganizationId = 1,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<string>(),
+                NewOptions = new List<NewEventOptionDTO>(),
                 EditedOptions = new List<EventOptionDTO>
                 {
                     new EventOptionDTO
@@ -466,7 +514,7 @@ namespace Shrooms.UnitTests.DomainService
                 OrganizationId = 2,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<string>(),
+                NewOptions = new List<NewEventOptionDTO>(),
                 EditedOptions = new List<EventOptionDTO>
                 {
                     new EventOptionDTO
@@ -510,10 +558,16 @@ namespace Shrooms.UnitTests.DomainService
                 OrganizationId = 2,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<string>()
+                NewOptions = new List<NewEventOptionDTO>()
                 {
-                    "Type1",
-                    "Type2"
+                    new NewEventOptionDTO
+                    {
+                        Option = "Type1"
+                    },
+                    new NewEventOptionDTO
+                    {
+                        Option = "Type2"
+                    }
                 },
                 EditedOptions = new List<EventOptionDTO>
                 {
