@@ -13,7 +13,6 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using Shrooms.EntityModels.Models;
 using static Shrooms.Constants.BusinessLayer.ConstBusinessLayer;
 using static Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes.ErrorCodes;
 
@@ -53,7 +52,7 @@ namespace Shrooms.UnitTests.DomainService
             Assert.AreEqual(result.First().Id, eventsGuids[0]);
             Assert.IsTrue(result.First().IsCreator);
             Assert.AreEqual(result.First().ParticipantsCount, 2);
-            Assert.AreEqual(result.First().ParticipatingStatus, 3);
+            Assert.AreEqual(result.First().ParticipatingStatus, 1);
         }
 
         [Test]
@@ -101,8 +100,8 @@ namespace Shrooms.UnitTests.DomainService
             };
             var result = _eventListingService.GetMyEvents(myEventsOptions);
             Assert.AreEqual(result.Count(), 3);
-            Assert.AreEqual(result.First(x => x.Id == eventGuids[2]).ParticipatingStatus, 3);
-            Assert.AreEqual(result.First(x => x.Id == eventGuids[0]).ParticipatingStatus, 3);
+            Assert.AreEqual(result.First(x => x.Id == eventGuids[2]).ParticipatingStatus, 1);
+            Assert.AreEqual(result.First(x => x.Id == eventGuids[0]).ParticipatingStatus, 1);
             Assert.IsTrue(result.First(x => x.Id == eventGuids[2]).StartDate < result.First(x => x.Id == eventGuids[0]).StartDate);
         }
 
@@ -274,7 +273,7 @@ namespace Shrooms.UnitTests.DomainService
                 Created = DateTime.UtcNow.AddDays(-2),
                 Id = 1,
                 EventId = guids[0],
-                AttendStatus = 3
+                AttendStatus = 1
             };
 
             var participant2 = new EventParticipant
@@ -283,7 +282,7 @@ namespace Shrooms.UnitTests.DomainService
                 Created = DateTime.UtcNow.AddDays(-2),
                 Id = 2,
                 EventId = guids[0],
-                AttendStatus = 3
+                AttendStatus = 1
             };
 
             var participant3 = new EventParticipant
