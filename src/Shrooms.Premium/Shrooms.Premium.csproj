@@ -93,7 +93,7 @@
     <Reference Include="Ical.Net, Version=4.1.8.0, Culture=neutral, PublicKeyToken=65c0446cd019ea53, processorArchitecture=MSIL">
       <HintPath>..\..\open-source\src\api\packages\Ical.Net.4.1.11\lib\net46\Ical.Net.dll</HintPath>
       <Private>False</Private>
-	</Reference>
+    </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\..\open-source\src\api\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
       <Private>False</Private>
@@ -157,7 +157,7 @@
     <Reference Include="NodaTime, Version=2.0.2.0, Culture=neutral, PublicKeyToken=4226afe0d9b296d1, processorArchitecture=MSIL">
       <HintPath>..\..\open-source\src\api\packages\NodaTime.2.0.2\lib\net45\NodaTime.dll</HintPath>
       <Private>False</Private>
-	</Reference>
+    </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\..\open-source\src\api\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
       <Private>False</Private>
@@ -247,7 +247,7 @@
     <Reference Include="System.Reflection.TypeExtensions, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\open-source\src\api\packages\System.Reflection.TypeExtensions.4.1.0\lib\net462\System.Reflection.TypeExtensions.dll</HintPath>
       <Private>False</Private>
-	</Reference>
+    </Reference>
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Runtime.Serialization.Primitives, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -371,6 +371,7 @@
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\EventTypeDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\EventUserSearchResultDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\MyEventsOptionsDTO.cs" />
+    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\UpdateAttendStatusDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\UpdateEventTypeDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Kudos\AwardedKudosEmployeeDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Kudos\EmployeeLoyaltyKudosDTO.cs" />
@@ -502,6 +503,7 @@
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Book\BooksByOffice\BooksByOfficeViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Book\OfficeBookViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Book\RetrievedBookForPostViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Events\UpdateAttendStatusViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.WebViewModels\Models\Lotteries\LotteryWidgetViewModel.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\MapController.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\OrganizationalStructureController.cs" />

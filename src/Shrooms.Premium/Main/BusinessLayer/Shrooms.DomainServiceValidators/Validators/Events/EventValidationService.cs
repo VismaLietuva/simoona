@@ -185,16 +185,6 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
                 }
             }
         }
-        public void CheckIfUserHasPermissionToPin(bool pinStatus, bool hasPermission)
-        {
-            if (pinStatus)
-            {
-                if (!hasPermission)
-                {
-                    throw new EventException(EventDontHavePermissionCode);
-                }
-            }
-        }
 
         public void CheckIfEventExists(object @event)
         {

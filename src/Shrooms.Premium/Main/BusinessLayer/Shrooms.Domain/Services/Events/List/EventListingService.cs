@@ -141,9 +141,9 @@ namespace Shrooms.Domain.Services.Events.List
                 StartDate = e.StartDate,
                 EndDate = e.EndDate,
                 RegistrationDeadlineDate = e.RegistrationDeadline,
-                ParticipantsCount = e.EventParticipants.Count,
+                ParticipantsCount = e.EventParticipants.Where(p => p.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.Attending).Count(),
                 IsCreator = e.ResponsibleUserId == userId,
-                IsParticipating = e.EventParticipants.Any(p => p.ApplicationUserId == userId),
+                ParticipatingStatus = e.EventParticipants.FirstOrDefault(p => p.ApplicationUserId == userId) != null ? e.EventParticipants.FirstOrDefault(p => p.ApplicationUserId == userId).AttendStatus : (int)ConstBusinessLayer.AttendingStatus.Idle,
                 MaxChoices = e.MaxChoices,
                 FoodOption = e.FoodOption
             };

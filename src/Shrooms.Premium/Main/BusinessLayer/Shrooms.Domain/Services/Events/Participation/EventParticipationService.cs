@@ -154,6 +154,32 @@ namespace Shrooms.Domain.Services.Events.Participation
             }
         }
 
+        public void AddOrChangeAttendStatus(UpdateAttendStatusDTO updateAttendStatusDTO)
+        {
+            var @event = _eventsDbSet
+                    .Include(x => x.EventParticipants)
+                    .Include(x => x.EventOptions)
+                    .Include(x => x.EventType)
+                    .Where(x => x.Id == updateAttendStatusDTO.EventId
+                        && x.OrganizationId == updateAttendStatusDTO.OrganizationId)
+                    .Select(MapEventToJoinValidationDto())
+                    .FirstOrDefault();
+
+            _eventValidationService.CheckIfEventExists(@event);
+            _eventValidationService.CheckIfRegistrationDeadlineIsExpired(@event.RegistrationDeadline);
+
+            if (updateAttendStatusDTO.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.MaybeAttending)
+            {
+                AddMaybeGoingParticipant(updateAttendStatusDTO.UserId, @event);
+            }
+            else if (updateAttendStatusDTO.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.NotAttending)
+            {
+                AddNotGoingParticipant(updateAttendStatusDTO.UserId, updateAttendStatusDTO.AttendComment, @event);
+            }
+
+            _uow.SaveChanges(false);
+        }
+
         public void DeleteByEvent(Guid eventId, string userId)
         {
             var participants = _eventParticipantsDbSet
@@ -264,7 +290,8 @@ namespace Shrooms.Domain.Services.Events.Participation
             var eventParticipants = _eventsDbSet
                 .Include(e => e.EventParticipants.Select(x => x.ApplicationUser))
                 .Where(e => e.Id == eventId
-                    && e.OrganizationId == userAndOrg.OrganizationId)
+                    && e.OrganizationId == userAndOrg.OrganizationId
+                    && e.EventParticipants.Any(p => p.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.Attending && p.ApplicationUserId == userAndOrg.UserId))
                 .Select(MapEventToParticipantDto())
                 .SingleOrDefault();
 
@@ -295,13 +322,10 @@ namespace Shrooms.Domain.Services.Events.Participation
         private void RemoveParticipant(string userId, EventParticipant participant, string leaveComment)
         {
             var timestamp = DateTime.UtcNow;
-            participant.AttendStatus = (int)ConstBusinessLayer.AttendingStatus.Leave;
+            participant.AttendStatus = (int)ConstBusinessLayer.AttendingStatus.NotAttending;
             participant.AttendComment = leaveComment;
             participant.UpdateMetadata(userId, timestamp);
             _uow.SaveChanges(false);
-
-         //   _eventParticipantsDbSet.Remove(participant);
-         //   _uow.SaveChanges(false);
         }
 
         private EventParticipant GetParticipant(Guid eventId, int userOrg, string userId)
@@ -313,7 +337,7 @@ namespace Shrooms.Domain.Services.Events.Participation
                                 p.EventId == eventId &&
                                 p.Event.OrganizationId == userOrg &&
                                 p.ApplicationUserId == userId &&
-                                p.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.Join)
+                                p.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.Attending)
                             .SingleOrDefault();
 
             _eventValidationService.CheckIfEventExists(participant);
@@ -340,7 +364,7 @@ namespace Shrooms.Domain.Services.Events.Participation
         {
             return e => new EventJoinValidationDTO
             {
-                Participants = e.EventParticipants.Where(x => x.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.Join).Select(x => x.ApplicationUserId).ToList(),
+                Participants = e.EventParticipants.Where(x => x.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.Attending).Select(x => x.ApplicationUserId).ToList(),
                 MaxParticipants = e.MaxParticipants,
                 StartDate = e.StartDate,
                 MaxChoices = e.MaxChoices,
@@ -373,7 +397,7 @@ namespace Shrooms.Domain.Services.Events.Participation
                             x.EventTypeId == @event.EventTypeId &&
                             x.OrganizationId == organizationId &&
                             x.StartDate > _systemClock.UtcNow &&
-                            x.EventParticipants.Any(p => p.ApplicationUserId == userId && p.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.Join))
+                            x.EventParticipants.Any(p => p.ApplicationUserId == userId && p.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.Attending))
                         .ToList();
 
                     var filteredEvents = RemoveEventsWithoutFood(events, userId);
@@ -409,19 +433,79 @@ namespace Shrooms.Domain.Services.Events.Participation
         private void AddParticipant(string userId, EventJoinDTO joinDto, List<EventOption> eventOptions)
         {
             var timeStamp = _systemClock.UtcNow;
-            var newParticipant = new EventParticipant
+            var participant = _eventParticipantsDbSet.FirstOrDefault(p => p.EventId == joinDto.EventId && p.ApplicationUserId == userId);
+            if (participant == null)
             {
-                ApplicationUserId = userId,
-                Created = timeStamp,
-                CreatedBy = userId,
-                EventId = joinDto.EventId,
-                Modified = timeStamp,
-                ModifiedBy = userId,
-                EventOptions = eventOptions,
-                AttendComment = joinDto.AttendComment,
-                AttendStatus = joinDto.AttendStatus
-            };
-            _eventParticipantsDbSet.Add(newParticipant);
+                var newParticipant = new EventParticipant
+                {
+                    ApplicationUserId = userId,
+                    Created = timeStamp,
+                    CreatedBy = userId,
+                    EventId = joinDto.EventId,
+                    Modified = timeStamp,
+                    ModifiedBy = userId,
+                    EventOptions = eventOptions,
+                    AttendComment = string.Empty,
+                    AttendStatus = (int)ConstBusinessLayer.AttendingStatus.Attending
+                };
+                _eventParticipantsDbSet.Add(newParticipant);
+            }
+            else
+            {
+                participant.AttendStatus = (int)ConstBusinessLayer.AttendingStatus.Attending;
+                participant.AttendComment = string.Empty;
+            }
+        }
+
+        private void AddMaybeGoingParticipant(string userId, EventJoinValidationDTO eventDto)
+        {
+            var participant = _eventParticipantsDbSet.FirstOrDefault(p => p.EventId == eventDto.Id && p.ApplicationUserId == userId);
+            if (participant != null)
+            {
+                participant.AttendStatus = (int)ConstBusinessLayer.AttendingStatus.MaybeAttending;
+                participant.AttendComment = string.Empty;
+            }
+            else
+            {
+                var timeStamp = _systemClock.UtcNow;
+                var newParticipant = new EventParticipant
+                {
+                    ApplicationUserId = userId,
+                    Created = timeStamp,
+                    CreatedBy = userId,
+                    EventId = eventDto.Id,
+                    Modified = timeStamp,
+                    ModifiedBy = userId,
+                    AttendComment = string.Empty,
+                    AttendStatus = (int)ConstBusinessLayer.AttendingStatus.MaybeAttending
+                };
+                _eventParticipantsDbSet.Add(newParticipant);
+            }
+        }
+
+        private void AddNotGoingParticipant(string userId, string attendComment, EventJoinValidationDTO eventDto)
+        {
+            var participant = _eventParticipantsDbSet.FirstOrDefault(p => p.EventId == eventDto.Id && p.ApplicationUserId == userId);
+            if (participant != null)
+            {
+                participant.AttendStatus = (int)ConstBusinessLayer.AttendingStatus.NotAttending;
+            }
+            else
+            {
+                var timeStamp = _systemClock.UtcNow;
+                var newParticipant = new EventParticipant
+                {
+                    ApplicationUserId = userId,
+                    Created = timeStamp,
+                    CreatedBy = userId,
+                    EventId = eventDto.Id,
+                    Modified = timeStamp,
+                    ModifiedBy = userId,
+                    AttendComment = attendComment,
+                    AttendStatus = (int)ConstBusinessLayer.AttendingStatus.NotAttending
+                };
+                _eventParticipantsDbSet.Add(newParticipant);
+            }
         }
 
         public static int GetWeekOfYear(DateTime time)

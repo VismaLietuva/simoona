@@ -21,7 +21,7 @@ namespace Shrooms.DataTransferObjects.Models.Events
         public string HostUserFullName { get; set; }
         public string HostUserId { get; set; }
         public bool IsFull { get; set; }
-        public bool IsParticipating { get; set; }
+        public int ParticipatingStatus { get; set; }
         public int WallId { get; set; }
         public int? FoodOption { get; set; }
         public IEnumerable<EventDetailsOptionDTO> Options { get; set; }

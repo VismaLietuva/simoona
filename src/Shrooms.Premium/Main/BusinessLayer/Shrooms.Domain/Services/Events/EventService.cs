@@ -148,8 +148,9 @@ namespace Shrooms.Domain.Services.Events
                 .Select(p => p.Name)
                 .ToList();
             _eventValidationService.CheckIfEventExists(@event);
-            @event.IsFull = @event.Participants.Count() >= @event.MaxParticipants;
-            @event.IsParticipating = @event.Participants.Any(p => p.UserId == userOrg.UserId && p.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.Join);
+            @event.IsFull = @event.Participants.Where(p => p.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.Attending).Count() >= @event.MaxParticipants;
+            var participating = @event.Participants.FirstOrDefault(p => p.UserId == userOrg.UserId);
+            @event.ParticipatingStatus = participating != null ? participating.AttendStatus : (int)ConstBusinessLayer.AttendingStatus.Idle;
             return @event;
         }
 
@@ -159,7 +160,7 @@ namespace Shrooms.Domain.Services.Events
             newEventDto.RegistrationDeadlineDate = SetRegistrationDeadline(newEventDto);
 
             var hasPermissionToPin = _permissionService.UserHasPermission(newEventDto, AdministrationPermissions.Event);
-            _eventValidationService.CheckIfUserHasPermissionToPin(newEventDto.IsPinned, hasPermissionToPin);
+            _eventValidationService.CheckIfUserHasPermissionToPin(newEventDto.IsPinned, currentPinStatus: false, hasPermissionToPin);
 
             _eventValidationService.CheckIfEventStartDateIsExpired(newEventDto.StartDate);
             _eventValidationService.CheckIfRegistrationDeadlineIsExpired(newEventDto.RegistrationDeadlineDate.Value);
@@ -481,7 +482,7 @@ namespace Shrooms.Domain.Services.Events
                     Id = o.Id,
                     Name = o.Option,
                     Participants = o.EventParticipants
-                        .Where(x => x.EventId == eventId)
+                        .Where(x => x.EventId == eventId && x.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.Attending)
                         .Select(p => new EventDetailsParticipantDTO
                         {
                             Id = p.Id,

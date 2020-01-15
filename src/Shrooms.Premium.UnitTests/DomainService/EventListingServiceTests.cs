@@ -53,7 +53,7 @@ namespace Shrooms.UnitTests.DomainService
             Assert.AreEqual(result.First().Id, eventsGuids[0]);
             Assert.IsTrue(result.First().IsCreator);
             Assert.AreEqual(result.First().ParticipantsCount, 2);
-            Assert.IsTrue(result.First().IsParticipating);
+            Assert.AreEqual(result.First().ParticipatingStatus, 3);
         }
 
         [Test]
@@ -69,7 +69,7 @@ namespace Shrooms.UnitTests.DomainService
             Assert.AreEqual(result.First().Id, eventsGuids[0]);
             Assert.IsFalse(result.First().IsCreator);
             Assert.AreEqual(result.First().ParticipantsCount, 2);
-            Assert.IsFalse(result.First().IsParticipating);
+            Assert.AreEqual(result.First().ParticipatingStatus, 3);
         }
 
 
@@ -101,8 +101,8 @@ namespace Shrooms.UnitTests.DomainService
             };
             var result = _eventListingService.GetMyEvents(myEventsOptions);
             Assert.AreEqual(result.Count(), 3);
-            Assert.IsTrue(result.First(x => x.Id == eventGuids[2]).IsParticipating);
-            Assert.IsTrue(result.First(x => x.Id == eventGuids[0]).IsParticipating);
+            Assert.AreEqual(result.First(x => x.Id == eventGuids[2]).ParticipatingStatus, 3);
+            Assert.AreEqual(result.First(x => x.Id == eventGuids[0]).ParticipatingStatus, 3);
             Assert.IsTrue(result.First(x => x.Id == eventGuids[2]).StartDate < result.First(x => x.Id == eventGuids[0]).StartDate);
         }
 
@@ -273,7 +273,8 @@ namespace Shrooms.UnitTests.DomainService
                 ApplicationUserId = "responsibleUserId",
                 Created = DateTime.UtcNow.AddDays(-2),
                 Id = 1,
-                EventId = guids[0]
+                EventId = guids[0],
+                AttendStatus = 3
             };
 
             var participant2 = new EventParticipant
@@ -281,7 +282,8 @@ namespace Shrooms.UnitTests.DomainService
                 ApplicationUserId = "testUser1",
                 Created = DateTime.UtcNow.AddDays(-2),
                 Id = 2,
-                EventId = guids[0]
+                EventId = guids[0],
+                AttendStatus = 3
             };
 
             var participant3 = new EventParticipant
@@ -289,7 +291,8 @@ namespace Shrooms.UnitTests.DomainService
                 ApplicationUserId = "testUser2",
                 Created = DateTime.UtcNow.AddDays(-2),
                 Id = 3,
-                EventId = guids[1]
+                EventId = guids[1],
+                AttendStatus = 3
             };
 
             var events = new List<Event>
