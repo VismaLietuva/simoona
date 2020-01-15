@@ -165,7 +165,7 @@ namespace Shrooms.Domain.Services.Events.Participation
                     .Include(x => x.EventType)
                     .Where(x => x.Id == updateAttendStatusDTO.EventId
                         && x.OrganizationId == updateAttendStatusDTO.OrganizationId)
-                    .Select(MapEventToJoinValidationDto())
+                    .Select(MapEventToJoinValidationDto)
                     .FirstOrDefault();
 
             _eventValidationService.CheckIfEventExists(@event);
