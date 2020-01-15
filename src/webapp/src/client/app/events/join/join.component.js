@@ -17,10 +17,10 @@
             NotAttending: 0,
             Attending: 1,
             MaybeAttending: 2,
+            Idle: 3
         });
 
     eventJoinController.$inject = [
-        '$state',
         '$uibModal',
         'eventRepository',
         'notifySrv',
@@ -31,16 +31,21 @@
         'attendStatus'
     ];
 
-    function eventJoinController($state, $uibModal, eventRepository, notifySrv, errorHandler,
+    function eventJoinController($uibModal, eventRepository, notifySrv, errorHandler,
         authService, eventParticipantsService, Analytics, attendStatus) {
         /* jshint validthis: true */
         var vm = this;
 
+        vm.attendStatus = attendStatus;
         vm.enableAction = true;
         vm.joinEvent = joinEvent;
         vm.leaveEvent = leaveEvent;
+        vm.maybeParticipating = maybeParticipating;
+        vm.notParticipating = notParticipating;
         vm.hasDatePassed = hasDatePassed;
-        vm.addLeaveComment = addLeaveComment;
+        vm.openLeaveCommentModal = openLeaveCommentModal;
+        vm.closeModal = closeModal;
+
 
         ////////
         function joinEvent(eventId) {
@@ -70,18 +75,16 @@
             }
         }
 
-        function leaveEvent(eventId) {
+        function leaveEvent(eventId, comment) {
             if (vm.enableAction) {
                 if (canLeaveEvent()) {
                     vm.enableAction = false;
-                    addLeaveComment();
-                    eventRepository.leaveEvent(eventId, authService.identity.userId, "leave comment").then(function() {
+                    eventRepository.leaveEvent(eventId, authService.identity.userId, comment).then(function() {
                         removeCurrentUser();
                     }, function(error) {
                         var errorActions = {
                             repeat: removeCurrentUser
                         };
-
                         vm.enableAction = true;
 
                         errorHandler.handleError(error, errorActions);
@@ -90,13 +93,56 @@
             }
         }
 
-        function addLeaveComment() {
+        function maybeParticipating(eventId) {
+            if (vm.enableAction) {
+                var comment = "";
+                eventRepository.updateAttendStatus(attendStatus.MaybeAttending, comment, eventId).then(function() {
+                    handleEventJoin();
+                }, function(error) {
+                    vm.enableAction = true;
+                    errorHandler.handleErrorMessage(error);
+                });
+            }
+        }
+
+        function notParticipating(eventId, comment) {
+            if (vm.enableAction) {
+                eventRepository.updateAttendStatus(attendStatus.NotAttending, comment, eventId).then(function() {
+                    handleEventJoin();
+                }, function(error) {
+                    vm.enableAction = true;
+                    errorHandler.handleErrorMessage(error);
+                });
+            }
+        }
+
+        function openLeaveCommentModal() {
+            $uibModal.open({
+                templateUrl: 'app/events/leave/leave-event.html',
+                controller: 'eventLeaveController',
+                controllerAs: 'vm',
+                resolve: {
+                    event: function() {
+                        return vm.event;
+                    },
+                    leaveEvent: function() {
+                        return vm.leaveEvent;
+                    },
+                    notInterested: function() {
+                        return vm.notParticipating;
+                    }
+                }
+              });
+        }
+
+        function closeModal() {
+            $uibModalInstance.close();
         }
 
         function removeCurrentUser() {
             vm.enableAction = true;
             vm.event.participantsCount--;
-            vm.event.isParticipating = false;
+            vm.event.participatingStatus = attendStatus.NotAttending;
 
             if (vm.isDetails || vm.isAddColleague) {
                 var currentUserId = authService.identity.userId;
@@ -118,7 +164,7 @@
                     vm.event.participantsCount = recalculateJoinedParticipants();
                 });
             } else {
-                vm.event.isParticipating = true;
+                vm.event.participatingStatus = attendStatus.Attending;
                 vm.event.participantsCount++;
             }
 
@@ -130,7 +176,7 @@
         function recalculateJoinedParticipants() {
             var participantsCount = 0;
             vm.event.participants.forEach(function(participant){
-                if (participant.attendStatus == 1) {
+                if (participant.attendStatus == attendStatus.Attending) {
                     participantsCount++;
                 }
             });

@@ -22,11 +22,12 @@
         'isDetails',
         'isAddColleague',
         'localeSrv',
-        'lodash'
+        'lodash',
+        'attendStatus'
     ];
 
     function eventJoinOptionsController($state, $uibModalInstance, inputTypes, authService, errorHandler,
-        eventRepository, $translate, notifySrv, event, isDetails, isAddColleague, localeSrv, lodash) {
+        eventRepository, $translate, notifySrv, event, isDetails, isAddColleague, localeSrv, lodash, attendStatus) {
         /* jshint validthis: true */
         var vm = this;
 
@@ -125,7 +126,7 @@
             }
 
             vm.isActionDisabled = false;
-            event.isParticipating = true;
+            event.participatingStatus = attendStatus.Attending;
             $uibModalInstance.close();
 
             notifySrv.success('events.joinedEvent');

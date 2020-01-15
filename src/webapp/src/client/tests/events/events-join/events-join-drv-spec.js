@@ -123,7 +123,7 @@ describe('aceEventJoin', function() {
             scope.$digest();
 
             expect(eventsMocks.eventRepository.leaveEvent).toHaveBeenCalled();
-            expect(scope.event.isParticipating).toEqual(false);
+            expect(scope.event.participatingStatus).toEqual(0);
             expect(scope.event.participantsCount).toEqual(oldParticipantsCount - 1);
         });
 

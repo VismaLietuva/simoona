@@ -85,7 +85,8 @@ namespace Shrooms.Constants.BusinessLayer
         {
             Leave = 0,
             Join,
-            Maybe
+            Maybe,
+            Idle
         }
         #endregion
 

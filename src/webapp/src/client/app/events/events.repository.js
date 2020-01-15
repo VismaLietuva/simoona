@@ -39,7 +39,8 @@
             getUserResponsiblePersonById: getUserResponsiblePersonById,
             getUserForAutoCompleteResponsiblePerson: getUserForAutoCompleteResponsiblePerson,
             exportParticipants: exportParticipants,
-            getMaxEventParticipants: getMaxEventParticipants
+            getMaxEventParticipants: getMaxEventParticipants,
+            updateAttendStatus: updateAttendStatus
         };
         return service;
 
@@ -191,6 +192,14 @@
                     method: 'GET'
                 }
             });
+        }
+
+        function updateAttendStatus(attendStatus, attendComment, eventId) {
+            return $resource(eventUrl + 'UpdateAttendStatus').save({
+                attendStatus: attendStatus,
+                attendComment: attendComment,
+                eventId: eventId
+            }).$promise;
         }
     }
 })();
