@@ -33,7 +33,7 @@ namespace Shrooms.Domain.Services.Users
         {
             var usersToDiscard = _eventParticipantsDb
                 .Where(x => x.Event.EventTypeId == eventTypeId &&
-                            SqlFunctions.DatePart("wk", x.Event.StartDate) == SqlFunctions.DatePart("wk", DateTime.Now))
+                            SqlFunctions.DatePart("wk", x.Event.StartDate) == SqlFunctions.DatePart("wk", DateTime.UtcNow))
                 .Select(x => x.ApplicationUserId);
 
             return _usersDb
