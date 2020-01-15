@@ -83,9 +83,9 @@ namespace Shrooms.Constants.BusinessLayer
 
         public enum AttendingStatus
         {
-            Leave = 0,
-            Join,
-            Maybe,
+            NotAttending = 0,
+            Attending,
+            MaybeAttending,
             Idle
         }
         #endregion
