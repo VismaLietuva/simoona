@@ -835,6 +835,10 @@
     <Compile Include="Migrations\202001031116555_RemoveFoodRelatedFieldsFromEvents.Designer.cs">
       <DependentUpon>202001031116555_RemoveFoodRelatedFieldsFromEvents.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202001151900409_EventAttendChoice.cs" />
+    <Compile Include="Migrations\202001151900409_EventAttendChoice.Designer.cs">
+      <DependentUpon>202001151900409_EventAttendChoice.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
@@ -1377,6 +1381,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202001031116555_RemoveFoodRelatedFieldsFromEvents.resx">
       <DependentUpon>202001031116555_RemoveFoodRelatedFieldsFromEvents.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001151900409_EventAttendChoice.resx">
+      <DependentUpon>202001151900409_EventAttendChoice.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
