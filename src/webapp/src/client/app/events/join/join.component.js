@@ -63,6 +63,7 @@
                             var comment = "";
                             eventRepository.joinEvent(eventId, selectedOptions, attendStatus.Attending, comment).then(function() {
                                 handleEventJoin();
+                                notifySrv.success('events.joinedEvent');
                             }, function(error) {
                                 vm.enableAction = true;
                                 errorHandler.handleErrorMessage(error);
@@ -98,6 +99,7 @@
                 var comment = "";
                 eventRepository.updateAttendStatus(attendStatus.MaybeAttending, comment, eventId).then(function() {
                     handleEventJoin();
+                    notifySrv.success('events.maybeJoiningEvent');
                 }, function(error) {
                     vm.enableAction = true;
                     errorHandler.handleErrorMessage(error);
@@ -109,6 +111,7 @@
             if (vm.enableAction) {
                 eventRepository.updateAttendStatus(attendStatus.NotAttending, comment, eventId).then(function() {
                     handleEventJoin();
+                    notifySrv.success('events.notJoiningEvent');
                 }, function(error) {
                     vm.enableAction = true;
                     errorHandler.handleErrorMessage(error);
@@ -139,7 +142,7 @@
             $uibModalInstance.close();
         }
 
-        function removeCurrentUser() {
+        function removeCurrentUser(comment) {
             vm.enableAction = true;
             vm.event.participantsCount--;
             vm.event.participatingStatus = attendStatus.NotAttending;
@@ -147,8 +150,8 @@
             if (vm.isDetails || vm.isAddColleague) {
                 var currentUserId = authService.identity.userId;
 
-                eventParticipantsService.removeParticipant(vm.event.participants, currentUserId);
-                eventParticipantsService.removeParticipantFromOptions(vm.event.options, currentUserId);
+                eventParticipantsService.removeParticipant(vm.event.participants, comment, currentUserId);
+                eventParticipantsService.removeParticipantFromOptions(vm.event.options, comment, currentUserId);
             }
 
             notifySrv.success('events.leaveEvent');
@@ -169,8 +172,6 @@
             }
 
             vm.enableAction = true;
-
-            notifySrv.success('events.joinedEvent');
         }
 
         function recalculateJoinedParticipants() {

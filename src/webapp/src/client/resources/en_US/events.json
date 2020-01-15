@@ -136,6 +136,8 @@
   "eventType": "Type",
   "eventEnded": "Finished",
   "joinedEvent": "You have successfully joined an event",
+  "maybeJoiningEvent": "You have successfully reported that you may join this event",
+  "notJoiningEvent": "You have successfully reported that you will not join this event",
   "eventIsHappening": "Happening now",
   "messageConfirmOptions": "Please select options",
   "noEventsHere": "one",
