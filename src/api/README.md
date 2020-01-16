@@ -175,6 +175,12 @@ AddColumn("dbo.ServiceRequests", "PictureId", c => c.String());
 update-database -verbose -ConnectionString "ConnectionString" -ConnectionProviderName "System.Data.SqlClient" -StartUpProjectName Shrooms.API -ProjectName Shrooms.DataLayer
 ```
 
+4.1 To rollback to previous migration, execute following command:
+
+```
+update-database  -verbose -ConnectionString "ConnectionString" -ConnectionProviderName "System.Data.SqlClient" -StartUpProjectName Shrooms.API -ProjectName Shrooms.DataLayer –TargetMigration "202001021211276_MigrationName"
+```
+
 5. Migration is done
 
 For more details, please reffer to
