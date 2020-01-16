@@ -78,6 +78,7 @@
         vm.searchUsers = searchUsers;
         vm.addOption = addOption;
         vm.deleteOption = deleteOption;
+        vm.handleOptions = handleOptions;
         vm.isValidOption = isValidOption;
         vm.isOptionsUnique = isOptionsUnique;
         vm.togglePin = togglePin;
@@ -272,8 +273,14 @@
 
         function deleteOption(index) {
             vm.event.options.splice(index, 1);
+            handleOptions();
+        }
 
-            if (vm.event.options.length === 1) {
+        function handleOptions() {
+            var optionsSum = vm.isIgnoreSingleJoinEnabled ?
+                vm.event.options.length + 1 : vm.event.options.length;
+
+            if (optionsSum === 1) {
                 vm.isOptions = false;
                 addOption();
             }
