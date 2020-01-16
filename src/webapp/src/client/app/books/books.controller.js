@@ -112,9 +112,7 @@
         }
 
         function updateBooksCovers() {
-            console.log(localeSrv)
         var successMessage = localeSrv.translate('books.coversWillBeUpdatedSoon');
-        console.log(localeSrv)
             bookRepository.updateBooksCovers().then(function () {
                 notifySrv.success(successMessage);
             }, function (response) {

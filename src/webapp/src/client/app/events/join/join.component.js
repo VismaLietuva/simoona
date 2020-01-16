@@ -81,10 +81,10 @@
                 if (canLeaveEvent()) {
                     vm.enableAction = false;
                     eventRepository.leaveEvent(eventId, authService.identity.userId, comment).then(function() {
-                        removeCurrentUser();
+                        handleEventLeave();
                     }, function(error) {
                         var errorActions = {
-                            repeat: removeCurrentUser
+                            repeat: handleEventLeave
                         };
                         vm.enableAction = true;
 
@@ -142,18 +142,15 @@
             $uibModalInstance.close();
         }
 
-        function removeCurrentUser(comment) {
+        function handleEventLeave() {
+            eventRepository.getEventDetails(vm.event.id).then(function(response) {
+                angular.copy(response, vm.event);
+
+                vm.event.options = response.options;
+                vm.event.participants = response.participants;
+                vm.event.participantsCount = recalculateJoinedParticipants();
+            });
             vm.enableAction = true;
-            vm.event.participantsCount--;
-            vm.event.participatingStatus = attendStatus.NotAttending;
-
-            if (vm.isDetails || vm.isAddColleague) {
-                var currentUserId = authService.identity.userId;
-
-                eventParticipantsService.removeParticipant(vm.event.participants, comment, currentUserId);
-                eventParticipantsService.removeParticipantFromOptions(vm.event.options, comment, currentUserId);
-            }
-
             notifySrv.success('events.leaveEvent');
         }
 

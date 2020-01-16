@@ -32,7 +32,8 @@
         var vm = this;
 
         vm.isParticipantsLoading = false;
-
+        vm.isMainParticipantList = true;
+        
         vm.eventStatus = eventStatus;
         vm.eventStatusService = eventStatusService;
         vm.participantsTabs = [{
@@ -48,7 +49,7 @@
         vm.isDeleteVisible = isDeleteVisible;
         vm.isActiveTab = isActiveTab;
         vm.isExportVisible = isExportVisible;
-
+        vm.participantCount = participantCount;
 
         /////////
 
@@ -60,6 +61,17 @@
                     item.isOpen = false;
                 }
             });
+        }
+
+        function participantCount() {
+            var participantCount = 0;
+            vm.event.participants.forEach(function(participant) {
+                if (participant.attendStatus == attendStatus.Attending)
+                {
+                    participantCount++;
+                }
+            })
+            return participantCount;
         }
 
         function isActiveTab(tab) {
