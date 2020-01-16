@@ -1,7 +1,7 @@
 <div>
     <div class="hidden-xs hidden-sm">
         <ul ng-if="!!vm.participants.length" class="event-participant-list">
-            <span class="participant-list-title" ng-show="!!vm.AttendingParticipants().length"
+            <span class="participant-list-title" ng-show="!!vm.AttendingParticipants().length && vm.isMainParticipantList"
                 translate="events.willBeGoing"></span>
             <li ng-repeat="participant in vm.AttendingParticipants()">
                 <ace-event-participant participant="participant">
@@ -17,20 +17,20 @@
             </li>
             <br>
             <div>
-                <span class="participant-list-title" ng-show="!!vm.NotAttendingParticipants().length"
+                <span class="participant-list-title" ng-show="!!vm.NotAttendingParticipants().length && vm.isMainParticipantList"
                     translate="events.wontBeGoing"></span>
                 <li ng-repeat="participant in vm.NotAttendingParticipants()">
                     <ace-event-participant participant="participant">
                         <wave-spinner class="event-participant-spinner" ng-if="participant.isLoading"></wave-spinner>
                         <span class="event-participant-delete-button vismaicon vismaicon-comment"
                             uib-tooltip="{{participant.attendComment}}" tooltip-placement="bottom"
-                            tooltip-title="{{ participant.attendComment }}" tooltip-append-to-body="true">
+                            tooltip-append-to-body="true">
                         </span>
                     </ace-event-participant>
                 </li>
             </div>
             <div>
-                <span class="participant-list-title" ng-show="!!vm.MaybeAttendingParticipants().length"
+                <span class="participant-list-title" ng-show="!!vm.MaybeAttendingParticipants().length && vm.isMainParticipantList"
                     translate="events.maybeGoing"></span>
                 <li ng-repeat="participant in vm.MaybeAttendingParticipants()">
                     <ace-event-participant participant="participant">
@@ -49,7 +49,7 @@
         </button>
         <span ng-show="vm.isExpanded">
             <ul ng-if="!!vm.participants.length" class="event-participant-list">
-                <span class="participant-list-title" ng-show="!!vm.AttendingParticipants().length"
+                <span class="participant-list-title" ng-show="!!vm.AttendingParticipants().length && vm.isMainParticipantList"
                     translate="events.willBeGoing"></span>
                 <li ng-repeat="participant in vm.AttendingParticipants()">
                     <ace-event-participant participant="participant">
@@ -65,7 +65,7 @@
                 </li>
                 <br>
                 <div>
-                    <span class="participant-list-title" ng-show="!!vm.NotAttendingParticipants().length"
+                    <span class="participant-list-title" ng-show="!!vm.NotAttendingParticipants().length && vm.isMainParticipantList"
                         translate="events.wontBeGoing"></span>
                     <li ng-repeat="participant in vm.NotAttendingParticipants()">
                         <ace-event-participant participant="participant">
@@ -74,14 +74,14 @@
                             <span class="event-participant-delete-button vismaicon vismaicon-comment"
                                 uib-tooltip="{{participant.attendComment}}" tooltip-placement="bottom"
                                 tooltip-append-to-body="true"
-                                tooltip-title="{{ participant.attendComment }}">
+                                >
                             </span>
 
                         </ace-event-participant>
                     </li>
                 </div>
                 <div>
-                    <span class="participant-list-title" ng-show="!!vm.MaybeAttendingParticipants().length"
+                    <span class="participant-list-title" ng-show="!!vm.MaybeAttendingParticipants().length && vm.isMainParticipantList"
                         translate="events.maybeGoing"></span>
                     <li ng-repeat="participant in vm.MaybeAttendingParticipants()">
                         <ace-event-participant participant="participant">

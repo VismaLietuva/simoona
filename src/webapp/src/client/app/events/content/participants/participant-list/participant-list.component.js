@@ -7,7 +7,8 @@
             bindings: {
                 participants: '=',
                 onLeaveEvent: '&',
-                isDeleteVisible: '='
+                isDeleteVisible: '=',
+                isMainParticipantList: '='
             },
             templateUrl: 'app/events/content/participants/participant-list/participant-list.html',
             controller: eventParticipantListController,
