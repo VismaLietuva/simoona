@@ -29,7 +29,6 @@
         vm.AttendingParticipants = AttendingParticipants;
         vm.MaybeAttendingParticipants = MaybeAttendingParticipants;
         vm.NotAttendingParticipants = NotAttendingParticipants;
-        vm.showComment = showComment;
 
         function toggleExpandCollapse() {
             if(vm.isExpanded) {
@@ -39,10 +38,6 @@
                 vm.expandCollapseText = 'events.collapse';
             }
             vm.isExpanded = !vm.isExpanded;
-        }
-
-        function showComment(comment) {
-            console.log(comment);
         }
 
         function AttendingParticipants() {

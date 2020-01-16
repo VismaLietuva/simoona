@@ -24,12 +24,8 @@
                         <wave-spinner class="event-participant-spinner" ng-if="participant.isLoading"></wave-spinner>
                         <span class="event-participant-delete-button vismaicon vismaicon-comment"
                             uib-tooltip="{{participant.attendComment}}" tooltip-placement="bottom"
-                            tooltip-append-to-body="true"
-                            confirmation-modal-message="events.deleteUserConfirmationMessage"
-                            data-test-id="event-participant-delete-user" title="{{'common.comment' | translate}}"
-                            translate-cloak>
+                            tooltip-title="{{ participant.attendComment }}" tooltip-append-to-body="true">
                         </span>
-
                     </ace-event-participant>
                 </li>
             </div>
@@ -39,12 +35,6 @@
                 <li ng-repeat="participant in vm.MaybeAttendingParticipants()">
                     <ace-event-participant participant="participant">
                         <wave-spinner class="event-participant-spinner" ng-if="participant.isLoading"></wave-spinner>
-                        <span class="event-participant-delete-button vismaicon vismaicon-comment"
-                            ace-confirmation-modal="vm.onLeaveEvent({participant: participant})"
-                            confirmation-modal-message="events.deleteUserConfirmationMessage"
-                            data-test-id="event-participant-delete-user" title="{{'common.comment' | translate}}"
-                            translate-cloak>
-                        </span>
                     </ace-event-participant>
                 </li>
             </div>
@@ -84,9 +74,7 @@
                             <span class="event-participant-delete-button vismaicon vismaicon-comment"
                                 uib-tooltip="{{participant.attendComment}}" tooltip-placement="bottom"
                                 tooltip-append-to-body="true"
-                                confirmation-modal-message="events.deleteUserConfirmationMessage"
-                                data-test-id="event-participant-delete-user" title="{{'common.comment' | translate}}"
-                                translate-cloak>
+                                tooltip-title="{{ participant.attendComment }}">
                             </span>
 
                         </ace-event-participant>
@@ -99,12 +87,6 @@
                         <ace-event-participant participant="participant">
                             <wave-spinner class="event-participant-spinner" ng-if="participant.isLoading">
                             </wave-spinner>
-                            <span class="event-participant-delete-button vismaicon vismaicon-comment"
-                                ace-confirmation-modal="vm.onLeaveEvent({participant: participant})"
-                                confirmation-modal-message="events.deleteUserConfirmationMessage"
-                                data-test-id="event-participant-delete-user" title="{{'common.comment' | translate}}"
-                                translate-cloak>
-                            </span>
                         </ace-event-participant>
                     </li>
                 </div>

@@ -138,6 +138,8 @@
   "eventType": "Tipas",
   "eventEnded": "Pasibaigė",
   "joinedEvent": "Sėkmingai prisijungėte prie renginio",
+  "maybeJoiningEvent": "Sėkmingai pažymėjote, kad galbūt dalyvausite renginyje",
+  "notJoiningEvent": "Sėkmingai pažymėjote, kad nedalyvausite renginyje",
   "eventIsHappening": "Vyksta dabar",
   "messageConfirmOptions": "Prašome pažymėti pasirinkimą(-us)",
   "noEventsHere": "čia",
