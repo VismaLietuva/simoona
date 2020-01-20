@@ -79,6 +79,7 @@
         vm.addOption = addOption;
         vm.deleteOption = deleteOption;
         vm.handleOptions = handleOptions;
+        vm.countOptions = countOptions;
         vm.isValidOption = isValidOption;
         vm.isOptionsUnique = isOptionsUnique;
         vm.togglePin = togglePin;
@@ -277,13 +278,19 @@
         }
 
         function handleOptions() {
-            var optionsSum = vm.isIgnoreSingleJoinEnabled ?
-                vm.event.options.length + 1 : vm.event.options.length;
+            const minOptions = 2;
+            var optionsSum = countOptions();
 
-            if (optionsSum === 1) {
+            if (optionsSum < minOptions) {
                 vm.isOptions = false;
+                vm.isIgnoreSingleJoinEnabled = false;
                 addOption();
             }
+        }
+
+        function countOptions() {
+            return vm.isIgnoreSingleJoinEnabled && vm.selectedType.isSingleJoin ?
+                vm.event.options.length + 1 : vm.event.options.length;
         }
 
         function togglePin() {
@@ -393,7 +400,7 @@
                     return !!element.id;
                 });
 
-                if (vm.isIgnoreSingleJoinEnabled) {
+                if (vm.isIgnoreSingleJoinEnabled && vm.selectedType.isSingleJoin) {
                     if (vm.ignoreSingleJoinOption.id) {
                         vm.event.editedOptions.push({
                             id: vm.ignoreSingleJoinOption.id,

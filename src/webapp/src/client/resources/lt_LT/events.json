@@ -186,5 +186,6 @@
   "ignoreSingleJoinPlaceHolder": "Pvz., nevalgysiu",
   "ignoreSingleJoinSelect": "Reikia pasirinkimo prisijungti kaip stebėtojui",
   "ignoreSingleJoinTooltipParagraphOne": "Šis funkcionalumas skirtas renginių tipams, kuriuose leidžiama dalyvauti kartą per savaitę.",
-  "ignoreSingleJoinTooltipParagraphTwo": "Tai suteiks vartotojams galimybę prisijungti kaip stebėtojams be jokių šio renginio privalumų, pavyzdžiui, maisto."
+  "ignoreSingleJoinTooltipParagraphTwo": "Tai suteiks vartotojams galimybę prisijungti kaip stebėtojams be jokių šio renginio privalumų, pavyzdžiui, maisto.",
+  "twoOptionsRequired": "Bent du pasirinkimo variantai yra būtini"
 }
