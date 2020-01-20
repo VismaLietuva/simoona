@@ -10,7 +10,8 @@
             descriptionLength: 5000,
             thumbHeight: 165,
             thumbWidth: 291,
-            endDateHoursAddition: 2
+            endDateHoursAddition: 2,
+            minOptions: 2
         })
         .constant('recurringTypesResources', {
             0: 'none',
@@ -78,6 +79,7 @@
         vm.searchUsers = searchUsers;
         vm.addOption = addOption;
         vm.deleteOption = deleteOption;
+        vm.countOptions = countOptions;
         vm.isValidOption = isValidOption;
         vm.isOptionsUnique = isOptionsUnique;
         vm.togglePin = togglePin;
@@ -272,11 +274,22 @@
 
         function deleteOption(index) {
             vm.event.options.splice(index, 1);
+            handleOptions();
+        }
 
-            if (vm.event.options.length === 1) {
+        function handleOptions() {
+            var optionsSum = countOptions();
+
+            if (optionsSum < eventSettings.minOptions) {
                 vm.isOptions = false;
+                vm.isIgnoreSingleJoinEnabled = false;
                 addOption();
             }
+        }
+
+        function countOptions() {
+            return vm.isIgnoreSingleJoinEnabled && vm.selectedType.isSingleJoin ?
+                vm.event.options.length + 1 : vm.event.options.length;
         }
 
         function togglePin() {
@@ -386,7 +399,7 @@
                     return !!element.id;
                 });
 
-                if (vm.isIgnoreSingleJoinEnabled) {
+                if (vm.isIgnoreSingleJoinEnabled && vm.selectedType.isSingleJoin) {
                     if (vm.ignoreSingleJoinOption.id) {
                         vm.event.editedOptions.push({
                             id: vm.ignoreSingleJoinOption.id,

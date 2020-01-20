@@ -185,5 +185,6 @@
   "ignoreSingleJoinPlaceHolder": "e.g., I won't eat",
   "ignoreSingleJoinSelect": "Need an option to join as a spectator",
   "ignoreSingleJoinTooltipParagraphOne": "This feature is present for event types which allow joining once a week.",
-  "ignoreSingleJoinTooltipParagraphTwo": "This choice will enable an option for users to join as spectators without any benefits of this event, e.g., food."
+  "ignoreSingleJoinTooltipParagraphTwo": "This choice will enable an option for users to join as spectators without any benefits of this event, e.g., food.",
+  "twoOptionsRequired": "At least two options are required"
 }
