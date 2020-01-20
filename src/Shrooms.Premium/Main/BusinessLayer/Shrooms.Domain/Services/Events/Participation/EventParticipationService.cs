@@ -421,7 +421,9 @@ namespace Shrooms.Domain.Services.Events.Participation
         private void AddParticipant(string userId, Guid eventId, ICollection<EventOption> eventOptions)
         {
             var timeStamp = _systemClock.UtcNow;
-            var participant = _eventParticipantsDbSet.Include(x => x.EventOptions).FirstOrDefault(p => p.EventId == eventId && p.ApplicationUserId == userId);
+            var participant = _eventParticipantsDbSet
+                .Include(x => x.EventOptions)
+                .FirstOrDefault(p => p.EventId == eventId && p.ApplicationUserId == userId);
             if (participant == null)
             {
                 var newParticipant = new EventParticipant
