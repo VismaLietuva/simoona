@@ -9,7 +9,6 @@ namespace Shrooms.WebViewModels.Models.Events
         [Required]
         public Guid EventId { get; set; }
 
-        [Required]
         public int AttendStatus { get; set; }
 
         public string AttendComment { get; set; }

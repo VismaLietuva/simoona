@@ -421,7 +421,7 @@ namespace Shrooms.Domain.Services.Events.Participation
         private void AddParticipant(string userId, Guid eventId, ICollection<EventOption> eventOptions)
         {
             var timeStamp = _systemClock.UtcNow;
-            var participant = _eventParticipantsDbSet.FirstOrDefault(p => p.EventId == eventId && p.ApplicationUserId == userId);
+            var participant = _eventParticipantsDbSet.Include(x => x.EventOptions).FirstOrDefault(p => p.EventId == eventId && p.ApplicationUserId == userId);
             if (participant == null)
             {
                 var newParticipant = new EventParticipant
@@ -440,6 +440,9 @@ namespace Shrooms.Domain.Services.Events.Participation
             }
             else
             {
+                participant.Modified = timeStamp;
+                participant.ModifiedBy = userId;
+                participant.EventOptions = eventOptions;
                 participant.AttendStatus = (int)ConstBusinessLayer.AttendingStatus.Attending;
                 participant.AttendComment = string.Empty;
             }
@@ -447,15 +450,17 @@ namespace Shrooms.Domain.Services.Events.Participation
 
         private void AddMaybeGoingParticipant(string userId, EventJoinValidationDTO eventDto)
         {
+            var timeStamp = _systemClock.UtcNow;
             var participant = _eventParticipantsDbSet.FirstOrDefault(p => p.EventId == eventDto.Id && p.ApplicationUserId == userId);
             if (participant != null)
             {
                 participant.AttendStatus = (int)ConstBusinessLayer.AttendingStatus.MaybeAttending;
                 participant.AttendComment = string.Empty;
+                participant.Modified = timeStamp;
+                participant.ModifiedBy = userId;
             }
             else
             {
-                var timeStamp = _systemClock.UtcNow;
                 var newParticipant = new EventParticipant
                 {
                     ApplicationUserId = userId,
@@ -473,14 +478,16 @@ namespace Shrooms.Domain.Services.Events.Participation
 
         private void AddNotGoingParticipant(string userId, string attendComment, EventJoinValidationDTO eventDto)
         {
+            var timeStamp = _systemClock.UtcNow;
             var participant = _eventParticipantsDbSet.FirstOrDefault(p => p.EventId == eventDto.Id && p.ApplicationUserId == userId);
             if (participant != null)
             {
                 participant.AttendStatus = (int)ConstBusinessLayer.AttendingStatus.NotAttending;
+                participant.Modified = timeStamp;
+                participant.ModifiedBy = userId;
             }
             else
             {
-                var timeStamp = _systemClock.UtcNow;
                 var newParticipant = new EventParticipant
                 {
                     ApplicationUserId = userId,
