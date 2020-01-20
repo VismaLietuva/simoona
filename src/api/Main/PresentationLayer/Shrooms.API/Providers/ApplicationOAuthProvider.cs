@@ -36,35 +36,36 @@ namespace Shrooms.API.Providers
         {
             using (var requestScope = _ioc.BeginLifetimeScope("AutofacWebRequest"))
             {
-                var userManager = requestScope.Resolve(typeof(ShroomsUserManager)) as ShroomsUserManager;
-
                 if (context.ClientId != _mobileAppClientId && context.ClientId != _jsAppClientId)
                 {
                     context.SetError("unsupported_client");
                     return;
                 }
 
-                var user = await userManager.FindAsync(context.UserName, context.Password);
-
-                if (user == null)
+                if (requestScope.Resolve(typeof(ShroomsUserManager)) is ShroomsUserManager userManager)
                 {
-                    context.SetError("invalid_grant", "The user name or password is incorrect");
+                    var user = await userManager.FindAsync(context.UserName, context.Password);
 
-                    return;
+                    if (user == null)
+                    {
+                        context.SetError("invalid_grant", "The user name or password is incorrect");
+
+                        return;
+                    }
+
+                    if (!user.EmailConfirmed)
+                    {
+                        context.SetError("not_verified", "E-mail address is not verified");
+
+                        return;
+                    }
+
+                    var identity = await userManager.CreateIdentityAsync(user, context.Options.AuthenticationType);
+                    var properties = CreateProperties(user.Id, context.ClientId);
+                    var ticket = new AuthenticationTicket(identity, properties);
+
+                    context.Validated(ticket);
                 }
-
-                if (!user.EmailConfirmed)
-                {
-                    context.SetError("not_verified", "E-mail address is not verified");
-
-                    return;
-                }
-
-                var identity = await userManager.CreateIdentityAsync(user, context.Options.AuthenticationType);
-                var properties = CreateProperties(user.Id, context.ClientId);
-                var ticket = new AuthenticationTicket(identity, properties);
-
-                context.Validated(ticket);
             }
         }
 
@@ -80,17 +81,19 @@ namespace Shrooms.API.Providers
 
         public override Task ValidateClientRedirectUri(OAuthValidateClientRedirectUriContext context)
         {
-            if (context.ClientId == _jsAppClientId)
+            if (context.ClientId != _jsAppClientId)
             {
-                var redirectUriAuthority = new Uri(context.RedirectUri).GetLeftPart(UriPartial.Authority);
-                var tenant = context.Request.Get<string>("tenantName");
-                var authorizedUris = _appSettings.OAuthRedirectUris;
+                return Task.FromResult<object>(null);
+            }
 
-                var isValid = authorizedUris.Any(uri => new Uri(uri).GetLeftPart(UriPartial.Authority) == redirectUriAuthority);
-                if (isValid || !_appSettings.IsProductionBuild)
-                {
-                    context.Validated();
-                }
+            var redirectUriAuthority = new Uri(context.RedirectUri).GetLeftPart(UriPartial.Authority);
+            var tenant = context.Request.Get<string>("tenantName");
+            var authorizedUris = _appSettings.OAuthRedirectUris;
+
+            var isValid = authorizedUris.Any(uri => new Uri(uri).GetLeftPart(UriPartial.Authority) == redirectUriAuthority);
+            if (isValid || !_appSettings.IsProductionBuild)
+            {
+                context.Validated();
             }
 
             return Task.FromResult<object>(null);
@@ -98,8 +101,7 @@ namespace Shrooms.API.Providers
 
         public override Task AuthorizationEndpointResponse(OAuthAuthorizationEndpointResponseContext context)
         {
-            string refreshToken = string.Empty;
-            context.OwinContext.Authentication.AuthenticationResponseGrant.Properties.Dictionary.TryGetValue("refresh_token", out refreshToken);
+            context.OwinContext.Authentication.AuthenticationResponseGrant.Properties.Dictionary.TryGetValue("refresh_token", out var refreshToken);
 
             if (!string.IsNullOrEmpty(refreshToken))
             {
@@ -128,13 +130,10 @@ namespace Shrooms.API.Providers
         }
 
         public override Task ValidateClientAuthentication(OAuthValidateClientAuthenticationContext context)
-        {      
-            string clientId = string.Empty;
-            string clientSecret = string.Empty;
-
-            if (!context.TryGetBasicCredentials(out clientId, out clientSecret))
+        {
+            if (!context.TryGetBasicCredentials(out var clientId, out _))
             {
-                context.TryGetFormCredentials(out clientId, out clientSecret);
+                context.TryGetFormCredentials(out clientId, out _);
             }
 
             if (clientId != _jsAppClientId && clientId != _mobileAppClientId)

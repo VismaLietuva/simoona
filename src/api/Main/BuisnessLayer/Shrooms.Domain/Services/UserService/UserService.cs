@@ -29,7 +29,6 @@ namespace Shrooms.Domain.Services.UserService
         private readonly IDbSet<WallMember> _wallMembersDbSet;
         private readonly IDbSet<WallModerator> _wallModeratorsDbSet;
         private readonly IDbSet<WallModel> _wallDbSet;
-        private readonly IDbSet<NotificationsSettings> _notificationsDbSet;
 
         private readonly IUnitOfWork2 _uow;
         private readonly ShroomsUserManager _userManager;
@@ -42,7 +41,6 @@ namespace Shrooms.Domain.Services.UserService
             _wallModeratorsDbSet = uow.GetDbSet<WallModerator>();
             _wallMembersDbSet = uow.GetDbSet<WallMember>();
             _wallDbSet = uow.GetDbSet<WallModel>();
-            _notificationsDbSet = uow.GetDbSet<NotificationsSettings>();
 
             _uow = uow;
             _userManager = userManager;

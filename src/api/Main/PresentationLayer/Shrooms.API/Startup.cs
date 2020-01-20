@@ -49,7 +49,7 @@ namespace Shrooms.API
 
             app.UseCors(SetupCorsOptions());
             app.Use<ImageResizerMiddleware>();
-            app.Use<MultitenancyMiddleware>();
+            app.Use<MultiTenancyMiddleware>();
 
             var container = IocBootstrapper.Bootstrap(app, ExtractConnString, config);
             config.DependencyResolver = new AutofacWebApiDependencyResolver(container);

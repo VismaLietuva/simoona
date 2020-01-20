@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
 using Microsoft.AspNet.Identity;
@@ -72,21 +73,23 @@ namespace Shrooms.API
                 app.UseGoogleAuthentication(googleOAuthOptions);
             }
 
-            if (HasProviderSettings("FacebookAccountAppId", "FacebookAccountAppSecret"))
+            if (!HasProviderSettings("FacebookAccountAppId", "FacebookAccountAppSecret"))
             {
-                var facebookOAuthOptions = new FacebookAuthenticationOptions
-                {
-                    Provider = new CustomFacebookAuthProvider(container),
-                    AppId = ConfigurationManager.AppSettings["FacebookAccountAppId"].ToString(),
-                    AppSecret = ConfigurationManager.AppSettings["FacebookAccountAppSecret"].ToString(),
-                    Scope = { "public_profile", "email" },
-                    Fields = { "email", "name", "first_name", "last_name", "picture.width(800).height(800)" }
-                };
-                app.UseFacebookAuthentication(facebookOAuthOptions);
-            }         
+                return;
+            }
+
+            var facebookOAuthOptions = new FacebookAuthenticationOptions
+            {
+                Provider = new CustomFacebookAuthProvider(container),
+                AppId = ConfigurationManager.AppSettings["FacebookAccountAppId"].ToString(),
+                AppSecret = ConfigurationManager.AppSettings["FacebookAccountAppSecret"].ToString(),
+                Scope = { "public_profile", "email" },
+                Fields = { "email", "name", "first_name", "last_name", "picture.width(800).height(800)" }
+            };
+            app.UseFacebookAuthentication(facebookOAuthOptions);
         }
 
-        private bool HasProviderSettings(string idKey, string secretKey)
+        private static bool HasProviderSettings(string idKey, string secretKey)
         {
             return !string.IsNullOrEmpty(ConfigurationManager.AppSettings[idKey].ToString()) &&
                 !string.IsNullOrEmpty(ConfigurationManager.AppSettings[secretKey].ToString());
