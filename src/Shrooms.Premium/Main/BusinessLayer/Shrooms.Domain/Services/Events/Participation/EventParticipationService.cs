@@ -395,8 +395,10 @@ namespace Shrooms.Domain.Services.Events.Participation
                         .Where(x =>
                             x.EventTypeId == eventDto.EventTypeId &&
                             x.OrganizationId == orgId &&
-                            x.EventParticipants.Any(p => p.ApplicationUserId == userId && p.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.Attending) &&
-                            SqlFunctions.DatePart("wk", x.StartDate) == SqlFunctions.DatePart("wk", eventDto.StartDate))
+                            x.EventParticipants.Any(p => p.ApplicationUserId == userId &&
+                                                         p.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.Attending) &&
+                            SqlFunctions.DatePart("wk", x.StartDate) == SqlFunctions.DatePart("wk", eventDto.StartDate) &&
+                            x.StartDate.Year == eventDto.StartDate.Year)
                         .ToList();
 
                     var filteredEvents = RemoveEventsWithOptionRule(events, OptionRules.IgnoreSingleJoin, userId);
@@ -419,7 +421,9 @@ namespace Shrooms.Domain.Services.Events.Participation
         private void AddParticipant(string userId, Guid eventId, ICollection<EventOption> eventOptions)
         {
             var timeStamp = _systemClock.UtcNow;
-            var participant = _eventParticipantsDbSet.Include(x => x.EventOptions).FirstOrDefault(p => p.EventId == eventId && p.ApplicationUserId == userId);
+            var participant = _eventParticipantsDbSet
+                .Include(x => x.EventOptions)
+                .FirstOrDefault(p => p.EventId == eventId && p.ApplicationUserId == userId);
             if (participant == null)
             {
                 var newParticipant = new EventParticipant
