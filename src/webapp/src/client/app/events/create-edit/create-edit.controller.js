@@ -10,7 +10,8 @@
             descriptionLength: 5000,
             thumbHeight: 165,
             thumbWidth: 291,
-            endDateHoursAddition: 2
+            endDateHoursAddition: 2,
+            minOptions: 2
         })
         .constant('recurringTypesResources', {
             0: 'none',
@@ -78,7 +79,6 @@
         vm.searchUsers = searchUsers;
         vm.addOption = addOption;
         vm.deleteOption = deleteOption;
-        vm.handleOptions = handleOptions;
         vm.countOptions = countOptions;
         vm.isValidOption = isValidOption;
         vm.isOptionsUnique = isOptionsUnique;
@@ -278,10 +278,9 @@
         }
 
         function handleOptions() {
-            const minOptions = 2;
             var optionsSum = countOptions();
 
-            if (optionsSum < minOptions) {
+            if (optionsSum < eventSettings.minOptions) {
                 vm.isOptions = false;
                 vm.isIgnoreSingleJoinEnabled = false;
                 addOption();
