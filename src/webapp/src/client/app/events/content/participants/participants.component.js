@@ -103,11 +103,11 @@
                 eventRepository.expelUserFromEvent(vm.event.id, participant.userId).then(function() {
                     participant.isLoading = false;
 
-                    eventParticipantsService.removeParticipant(vm.event.participants, "Expelled", participant.userId);
-                    eventParticipantsService.removeParticipantFromOptions(vm.event.options, "Expelled", participant.userId);
+                    eventParticipantsService.removeParticipant(vm.event.participants, participant.userId);
+                    eventParticipantsService.removeParticipantFromOptions(vm.event.options, participant.userId);
 
                     if (authService.identity.userId === participant.userId) {
-                        vm.event.participatingStatus = attendStatus.NotAttending;
+                        vm.event.isParticipating = false;
                     }
 
                     if (vm.event.maxParticipants > vm.event.participants.length) {

@@ -280,8 +280,7 @@ namespace Shrooms.Domain.Services.Projects
         {
             var project = await _projectsDbSet
                 .Include(x => x.Members)
-                .FirstOrDefaultAsync(x => x.Id == projectId && 
-                                     x.OrganizationId == userAndOrg.OrganizationId);
+                .FirstOrDefaultAsync(x => x.Id == projectId && x.OrganizationId == userAndOrg.OrganizationId);
 
             ValidateExpelMember(project, userAndOrg, expelUserId);
 

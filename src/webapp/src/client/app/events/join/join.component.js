@@ -92,15 +92,15 @@
             }
         }
 
-        function updateEventStatus(eventId, attendStatus, comment) {
+        function updateEventStatus(eventId, changeToAttendStatus, comment) {
             if (vm.enableAction) {
-                eventRepository.updateAttendStatus(attendStatus, comment, eventId).then(function() {
+                eventRepository.updateAttendStatus(changeToAttendStatus, comment, eventId).then(function() {
                     handleEventJoin();
 
-                    if (attendStatus == attendStatus.Attending) {
+                    if (changeToAttendStatus == attendStatus.MaybeAttending) {
                         notifySrv.success('events.maybeJoiningEvent');
                     }
-                    else if (attendStatus == attendStatus.NotAttending) {
+                    else if (changeToAttendStatus == attendStatus.NotAttending) {
                         notifySrv.success('events.notJoiningEvent');
                     }
 

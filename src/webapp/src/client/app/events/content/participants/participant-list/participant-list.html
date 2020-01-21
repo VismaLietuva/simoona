@@ -12,7 +12,6 @@
                 <div class="panel-body">
                     <li ng-repeat="participant in vm.AttendingParticipants()">
                         <ace-event-participant participant="participant">
-                            <wave-spinner class="event-participant-spinner" ng-if="participant.isLoading"></wave-spinner>
                             <span ng-if="!!participant.userId && !participant.isLoading && vm.isDeleteVisible"
                                 class="event-participant-delete-button vismaicon vismaicon-cancel-circle"
                                 ace-confirmation-modal="vm.onLeaveEvent({participant: participant})"
@@ -30,11 +29,18 @@
                 <div class="panel-body">
                     <li ng-repeat="participant in vm.MaybeAttendingParticipants()">
                         <ace-event-participant participant="participant">
-                            <wave-spinner class="event-participant-spinner" ng-if="participant.isLoading"></wave-spinner>
+                            <span ng-if="!!participant.userId && !participant.isLoading && vm.isDeleteVisible"
+                                class="event-participant-delete-button vismaicon vismaicon-cancel-circle"
+                                ace-confirmation-modal="vm.onLeaveEvent({participant: participant})"
+                                confirmation-modal-message="events.deleteUserConfirmationMessage"
+                                data-test-id="event-participant-delete-user" title="{{'common.delete' | translate}}"
+                                translate-cloak>
+                            </span>
                             <span ng-if="participant.attendComment"
                                 class="event-participant-delete-button vismaicon vismaicon-comment"
                                 uib-tooltip="{{participant.attendComment}}" tooltip-placement="bottom"
                                 tooltip-append-to-body="true">
+                            </span>
                         </ace-event-participant>
                     </li>
                 </div>
@@ -45,7 +51,13 @@
                 <div class="panel-body">
                     <li ng-repeat="participant in vm.NotAttendingParticipants()">
                         <ace-event-participant participant="participant">
-                            <wave-spinner class="event-participant-spinner" ng-if="participant.isLoading"></wave-spinner>
+                            <span ng-if="!!participant.userId && !participant.isLoading && vm.isDeleteVisible"
+                                class="event-participant-delete-button vismaicon vismaicon-cancel-circle"
+                                ace-confirmation-modal="vm.onLeaveEvent({participant: participant})"
+                                confirmation-modal-message="events.deleteUserConfirmationMessage"
+                                data-test-id="event-participant-delete-user" title="{{'common.delete' | translate}}"
+                                translate-cloak>
+                            </span>
                             <span ng-if="participant.attendComment"
                                 class="event-participant-delete-button vismaicon vismaicon-comment"
                                 uib-tooltip="{{participant.attendComment}}" tooltip-placement="bottom"
