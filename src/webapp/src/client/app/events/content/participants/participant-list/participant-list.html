@@ -1,14 +1,26 @@
 <div>
     <div>
-        <button class="hidden-lg hidden-md btn btn-default event-participant-list-expand-collapse-button" ng-click="vm.toggleExpandCollapse()"
-            type="button" ng-model="vm.isExpanded">
-            <span class="expand-collapse-text">{{vm.expandCollapseText | translate}}</span>
-            <span class="vismaicon" ng-class="{'collapse-icon':vm.isExpanded, 'expand-icon':!vm.isExpanded}"></span>
-        </button>
+        <div class="hidden-lg hidden-md event-participant-list-accordion" ng-show="vm.isMainParticipantList">
+            <div class="panel-group">
+                <div class="panel">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a role="button" class="accordion-toggle" ng-click="vm.toggleExpandCollapse()" ng-model="vm.isExpanded">
+                                <span>
+                                    <div class="event-participants-list-option noselect" data-test-id="event-participants-option-name">{{vm.expandCollapseText | translate}}</div>
+                                    <i class="event-participant-heading-toggle glyphicon glyphicon-chevron-down" ng-class="{'glyphicon-chevron-down': vm.isExpanded, 'glyphicon-chevron-right': !vm.isExpanded}"></i>
+                                    <div class="clearfix"></div>
+                                </span>
+                            </a>
+                        </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <ul ng-if="!!vm.participants.length && vm.isExpanded" class="event-participant-list">
-            <div ng-show="!!vm.AttendingParticipants().length && vm.isMainParticipantList" class="panel panel-info" >
-                <div class="panel-heading">{{'events.eventParticipantStatus_Attending' | translate}} ({{vm.AttendingParticipants().length}})</div>
+            <div ng-show="!!vm.AttendingParticipants().length" class="panel panel-info" >
+                <div ng-show="vm.isMainParticipantList" class="panel-heading">{{'events.eventParticipantStatus_Attending' | translate}} ({{vm.AttendingParticipants().length}})</div>
                 <div class="panel-body">
                     <li ng-repeat="participant in vm.AttendingParticipants()">
                         <ace-event-participant participant="participant">

@@ -385,7 +385,7 @@
 .event-participant-list,
 .event-participant-options {
     list-style: none;
-    padding-top: 20px;
+    padding-top: 5px;
     padding-left: 5px;
     li {
         margin-top: 5px;
@@ -794,6 +794,47 @@
 .event-participant-options-accordion {
     > .panel-group {
         border: 0;
+        > .panel {
+            > .panel-heading {
+                > .panel-title {
+                    > a:first-child {
+                        border: 0;
+                        padding: 12px 20px;
+                        margin: 0;
+                        &:hover {
+                            padding: 12px 20px;
+                        }
+                    }
+                    /*  /a:first-child */
+                }
+                /* /.panel-title */
+            }
+            /* /.panel-heading */
+            > .panel-collapse .panel-body {
+                padding: 5px;
+            }
+            .panel-collapse {
+                &.collapsing {
+                    padding: 0;
+                }
+                &.in {
+                    padding: 0;
+                }
+            }
+            .event-participant-list, .event-participant-options {
+                padding-top: 0;
+            }
+        }
+        /* /.panel */
+    }
+    /* /.panel-group */
+}
+
+.event-participant-list-accordion {
+    > .panel-group {
+        border: 0;
+        padding-top: 5px;
+        margin-bottom: 3px;
         > .panel {
             > .panel-heading {
                 > .panel-title {
