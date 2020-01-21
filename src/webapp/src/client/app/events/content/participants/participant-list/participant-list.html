@@ -7,8 +7,8 @@
         </button>
 
         <ul ng-if="!!vm.participants.length && vm.isExpanded" class="event-participant-list">
-            <div class="panel panel-info">
-                <div ng-show="!!vm.AttendingParticipants().length && vm.isMainParticipantList" class="panel-heading">{{'events.eventParticipantStatus_Attending' | translate}} ({{vm.AttendingParticipants().length}})</div>
+            <div ng-show="!!vm.AttendingParticipants().length && vm.isMainParticipantList" class="panel panel-info" >
+                <div class="panel-heading">{{'events.eventParticipantStatus_Attending' | translate}} ({{vm.AttendingParticipants().length}})</div>
                 <div class="panel-body">
                     <li ng-repeat="participant in vm.AttendingParticipants()">
                         <ace-event-participant participant="participant">

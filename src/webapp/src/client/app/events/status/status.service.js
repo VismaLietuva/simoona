@@ -45,7 +45,7 @@
                     return eventStatus.Finished;
                 } else if (!!event.registrationDeadlineDate && !hasDatePassed(event.registrationDeadlineDate)) {
                     return eventStatus.RegistrationIsClosed;
-                } else if (event.maxParticipants <= participantsCount && (event.participatingStatus == attendStatus.NotAttending || !!isParticipantsList)) {
+                } else if (event.maxParticipants <= participantsCount && (event.participatingStatus == attendStatus.NotAttending || event.participatingStatus == attendStatus.Idle || !!isParticipantsList)) {
                     return eventStatus.Full;
                 } else {
                     return eventStatus.Join;
