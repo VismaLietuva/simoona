@@ -170,6 +170,7 @@ namespace Shrooms.Domain.Services.Events.Participation
 
             _eventValidationService.CheckIfEventExists(@event);
             _eventValidationService.CheckIfRegistrationDeadlineIsExpired(@event.RegistrationDeadline);
+            _eventValidationService.CheckIfAttendStatusIsValid(updateAttendStatusDTO.AttendStatus);
 
             AddParticipantWithStatus(updateAttendStatusDTO.UserId, updateAttendStatusDTO.AttendStatus, updateAttendStatusDTO.AttendComment, @event);
 
