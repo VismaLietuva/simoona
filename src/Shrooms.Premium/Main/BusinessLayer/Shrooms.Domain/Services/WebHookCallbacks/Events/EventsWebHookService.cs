@@ -68,8 +68,6 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.Events
             }
 
             await _uow.SaveChangesAsync(false);
-
-            newEvents.ForEach(x => _calendarService.CreateEvent(x, x.OrganizationId.Value));
         }
 
         private static Event CreateNewEvent(Event @event, int wallId)

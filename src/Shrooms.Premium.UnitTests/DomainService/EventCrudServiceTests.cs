@@ -58,12 +58,10 @@ namespace Shrooms.UnitTests.DomainService
 
             var eventParticipationService = Substitute.For<IEventParticipationService>();
             var eventUtilitiesService = Substitute.For<IEventUtilitiesService>();
-            var calendarService = Substitute.For<IEventCalendarService>();
             var eventValidationService = new EventValidationService(_systemClockMock);
             var markdownConverter = Substitute.For<IMarkdownConverter>();
-            var userService = Substitute.For<IUserService>();
 
-            _eventService = new EventService(_uow, _permissionService, eventUtilitiesService, eventValidationService, eventParticipationService, calendarService, _wallService, userService, markdownConverter);
+            _eventService = new EventService(_uow, _permissionService, eventUtilitiesService, eventValidationService, eventParticipationService, _wallService, markdownConverter);
         }
 
         [Test]

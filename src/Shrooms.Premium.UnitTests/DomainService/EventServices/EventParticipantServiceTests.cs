@@ -59,7 +59,6 @@ namespace Shrooms.UnitTests.DomainService.EventServices
             _uow2.GetDbSet<EventOption>().Returns(_eventOptionsDbSet);
 
             _systemClockMock = Substitute.For<ISystemClock>();
-            var calendarService = Substitute.For<IEventCalendarService>();
             var permissionService = Substitute.For<IPermissionService>();
             _eventValidationServiceMock = Substitute.For<IEventValidationService>();
             _eventValidationService = new EventValidationService(_systemClockMock);
@@ -67,13 +66,12 @@ namespace Shrooms.UnitTests.DomainService.EventServices
             MockRoleService(roleService);
             _wallService = Substitute.For<IWallService>();
             var asyncRunner = Substitute.For<IAsyncRunner>();
-            _eventParticipationService = 
+            _eventParticipationService =
                 new EventParticipationService(
                     _uow2,
                     _systemClockMock,
                     roleService,
                     permissionService,
-                    calendarService,
                     _eventValidationServiceMock,
                     _wallService,
                     asyncRunner);
