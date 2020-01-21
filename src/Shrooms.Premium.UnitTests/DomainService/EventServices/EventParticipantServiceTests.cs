@@ -223,7 +223,7 @@ namespace Shrooms.UnitTests.DomainService.EventServices
                 UserId = "user"
             };
             _eventParticipationService.Leave(eventId, userOrg, "leave comment");
-            _eventParticipantsDbSet.DidNotReceive().Remove(Arg.Any<EventParticipant>());
+            _eventParticipantsDbSet.Received(1).Remove(Arg.Any<EventParticipant>());
         }
 
         [Test]
@@ -237,7 +237,7 @@ namespace Shrooms.UnitTests.DomainService.EventServices
             };
 
             _eventParticipationService.Expel(eventId, userOrg, "user2");
-            _eventParticipantsDbSet.DidNotReceive().Remove(Arg.Any<EventParticipant>());
+            _eventParticipantsDbSet.Received(1).Remove(Arg.Any<EventParticipant>());
         }
 
         [Test]
