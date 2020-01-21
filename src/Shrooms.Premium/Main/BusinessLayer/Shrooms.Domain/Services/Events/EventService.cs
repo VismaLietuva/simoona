@@ -4,7 +4,6 @@ using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Events;
 using Shrooms.DataTransferObjects.Models.Wall;
-using Shrooms.Domain.Services.Events.Calendar;
 using Shrooms.Domain.Services.Events.Participation;
 using Shrooms.Domain.Services.Events.Utilities;
 using Shrooms.Domain.Services.Permissions;
@@ -20,7 +19,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Shrooms.Domain.Helpers;
-using Shrooms.Domain.Services.UserService;
 using System.Resources;
 using Shrooms.Resources;
 using System.Globalization;
@@ -37,9 +35,7 @@ namespace Shrooms.Domain.Services.Events
         private readonly IEventUtilitiesService _eventUtilitiesService;
         private readonly IEventValidationService _eventValidationService;
         private readonly IEventParticipationService _eventParticipationService;
-        private readonly IEventCalendarService _calendarService;
         private readonly IWallService _wallService;
-        private readonly IUserService _userService;
         private readonly IMarkdownConverter _markdownConverter;
         private readonly IDbSet<Event> _eventsDbSet;
         private readonly IDbSet<EventType> _eventTypesDbSet;
@@ -54,9 +50,7 @@ namespace Shrooms.Domain.Services.Events
                             IEventUtilitiesService eventUtilitiesService,
                             IEventValidationService eventValidationService,
                             IEventParticipationService eventParticipationService,
-                            IEventCalendarService calendarService,
                             IWallService wallService,
-                            IUserService userService,
                             IMarkdownConverter markdownConverter)
         {
             _uow = uow;
@@ -70,9 +64,7 @@ namespace Shrooms.Domain.Services.Events
             _eventUtilitiesService = eventUtilitiesService;
             _eventValidationService = eventValidationService;
             _eventParticipationService = eventParticipationService;
-            _calendarService = calendarService;
             _wallService = wallService;
-            _userService = userService;
             _markdownConverter = markdownConverter;
             _resourceManager = new ResourceManager("Shrooms.Resources.Models.Events.Events", typeof(ResourceUtilities).Assembly);
         }
@@ -103,8 +95,6 @@ namespace Shrooms.Domain.Services.Events
             _uow.SaveChanges(false);
 
             _wallService.DeleteWall(@event.WallId, userOrg, WallType.Events);
-
-            _calendarService.DeleteEvent(id, userOrg.OrganizationId);
         }
 
         public EventEditDTO GetEventForEditing(Guid id, UserAndOrganizationDTO userOrg)
@@ -165,7 +155,6 @@ namespace Shrooms.Domain.Services.Events
             await _uow.SaveChangesAsync(newEventDto.UserId);
 
             newEvent.Description = _markdownConverter.ConvertToHtml(newEvent.Description);
-            _calendarService.CreateEvent(newEvent, newEventDto.OrganizationId);
 
             newEventDto.Id = newEvent.Id.ToString();
 
@@ -209,7 +198,6 @@ namespace Shrooms.Domain.Services.Events
             _uow.SaveChanges(false);
 
             eventToUpdate.Description = _markdownConverter.ConvertToHtml(eventToUpdate.Description);
-            _calendarService.UpdateEvent(eventToUpdate, eventDto.OrganizationId);
         }
 
         public void ToggleEventPin(Guid id)

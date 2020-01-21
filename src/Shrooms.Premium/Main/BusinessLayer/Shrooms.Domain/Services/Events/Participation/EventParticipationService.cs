@@ -37,7 +37,6 @@ namespace Shrooms.Domain.Services.Events.Participation
         private readonly IRoleService _roleService;
         private readonly ISystemClock _systemClock;
         private readonly IPermissionService _permissionService;
-        private readonly IEventCalendarService _calendarService;
         private readonly IEventValidationService _eventValidationService;
         private readonly IWallService _wallService;
         private readonly IAsyncRunner _asyncRunner;
@@ -47,7 +46,6 @@ namespace Shrooms.Domain.Services.Events.Participation
             ISystemClock systemClock,
             IRoleService roleService,
             IPermissionService permissionService,
-            IEventCalendarService calendarService,
             IEventValidationService eventValidationService,
             IWallService wallService,
             IAsyncRunner asyncRunner)
@@ -58,7 +56,6 @@ namespace Shrooms.Domain.Services.Events.Participation
             _eventParticipantsDbSet = _uow.GetDbSet<EventParticipant>();
 
             _systemClock = systemClock;
-            _calendarService = calendarService;
             _permissionService = permissionService;
             _eventValidationService = eventValidationService;
             _roleService = roleService;
@@ -99,7 +96,6 @@ namespace Shrooms.Domain.Services.Events.Participation
             _uow.SaveChanges(false);
 
             _asyncRunner.Run<IEventNotificationService>(n => n.NotifyRemovedEventParticipants(@event.Name, @event.Id, userOrg.OrganizationId, users), _uow.ConnectionName);
-            _asyncRunner.Run<IEventCalendarService>(n => n.ResetParticipants(@event.Id, userOrg.OrganizationId), _uow.ConnectionName);
         }
 
         public void Join(EventJoinDTO joinDto)
@@ -146,14 +142,7 @@ namespace Shrooms.Domain.Services.Events.Participation
 
                 _uow.SaveChanges(false);
 
-                var choices = @event.SelectedOptions.Select(x => x.Option);
-                _calendarService.AddParticipants(@event.Id, joinDto.OrganizationId, joinDto.ParticipantIds, choices);
-
                 _asyncRunner.Run<IEventCalendarService>(n => n.SendInvitation(@event, joinDto.ParticipantIds, joinDto.OrganizationId), _uow.ConnectionName);
-
-                // _calendarService.AddParticipants(@event.Id, joinDto.OrganizationId, joinDto.ParticipantIds, choices);
-                //  Commented due to Google Api Calendar 403 error "quotaExceeded: Calendar usage limits exceeded"
-                //  https://issuetracker.google.com/issues/141704931
             }
         }
 
@@ -208,7 +197,7 @@ namespace Shrooms.Domain.Services.Events.Participation
                 })
                 .Single();
 
-            List<string> result = emailsObj.Participants.ToList();
+            var result = emailsObj.Participants.ToList();
             if (!result.Contains(emailsObj.HostEmail))
             {
                 result.Add(emailsObj.HostEmail);
@@ -260,11 +249,10 @@ namespace Shrooms.Domain.Services.Events.Participation
             _eventValidationService.CheckIfUserHasPermission(userOrg.UserId, @event.ResponsibleUserId, isAdmin);
             _eventValidationService.CheckIfEventEndDateIsExpired(@event.EndDate);
 
-            RemoveParticipant(userId, participant, "Expelled");
+            RemoveParticipant(userId, participant);
 
             JoinLeaveEventWall(@event.ResponsibleUserId, userId, @event.WallId, userOrg);
 
-            _asyncRunner.Run<IEventCalendarService>(n => n.RemoveParticipants(@event.Id, userOrg.OrganizationId, new[] { userId }), _uow.ConnectionName);
             _asyncRunner.Run<IEventNotificationService>(n => n.NotifyRemovedEventParticipants(@event.Name, @event.Id, userOrg.OrganizationId, new[] { userId }), _uow.ConnectionName);
         }
 
@@ -275,11 +263,7 @@ namespace Shrooms.Domain.Services.Events.Participation
 
             JoinLeaveEventWall(participant.Event.ResponsibleUserId, userOrg.UserId, participant.Event.WallId, userOrg);
 
-            RemoveParticipant(userOrg.UserId, participant, leaveComment);
-
-            // _calendarService.RemoveParticipants(eventId, userOrg.OrganizationId, new List<string> { userOrg.UserId });
-            // Commented due to Google Api Calendar 403 error "quotaExceeded: Calendar usage limits exceeded"
-            // https://issuetracker.google.com/issues/141704931
+            RemoveParticipant(userOrg.UserId, participant);
         }
 
         public IEnumerable<EventParticipantDTO> GetEventParticipants(Guid eventId, UserAndOrganizationDTO userAndOrg)
@@ -315,7 +299,7 @@ namespace Shrooms.Domain.Services.Events.Participation
             }
         }
 
-        private void RemoveParticipant(string userId, EventParticipant participant, string leaveComment)
+        private void RemoveParticipant(string userId, EventParticipant participant)
         {
             var timestamp = DateTime.UtcNow;
             participant.UpdateMetadata(userId, timestamp);
