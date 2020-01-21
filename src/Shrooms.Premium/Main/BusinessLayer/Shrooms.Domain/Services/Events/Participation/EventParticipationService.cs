@@ -317,9 +317,10 @@ namespace Shrooms.Domain.Services.Events.Participation
         private void RemoveParticipant(string userId, EventParticipant participant, string leaveComment)
         {
             var timestamp = DateTime.UtcNow;
-            participant.AttendStatus = (int)ConstBusinessLayer.AttendingStatus.NotAttending;
-            participant.AttendComment = leaveComment;
             participant.UpdateMetadata(userId, timestamp);
+            _uow.SaveChanges(false);
+
+            _eventParticipantsDbSet.Remove(participant);
             _uow.SaveChanges(false);
         }
 
@@ -330,8 +331,7 @@ namespace Shrooms.Domain.Services.Events.Participation
                 .Include(p => p.EventOptions)
                 .SingleOrDefault(p => p.EventId == eventId &&
                                       p.Event.OrganizationId == userOrg &&
-                                      p.ApplicationUserId == userId &&
-                                      p.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.Attending);
+                                      p.ApplicationUserId == userId);
 
             _eventValidationService.CheckIfEventExists(participant);
             _eventValidationService.CheckIfParticipantExists(participant);
@@ -460,7 +460,7 @@ namespace Shrooms.Domain.Services.Events.Participation
                     Modified = timeStamp,
                     ModifiedBy = userId,
                     AttendComment = attendComment,
-                    AttendStatus = (int)ConstBusinessLayer.AttendingStatus.NotAttending
+                    AttendStatus = attendingStatus
                 };
 
                 _eventParticipantsDbSet.Add(newParticipant);
