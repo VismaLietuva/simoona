@@ -60,7 +60,6 @@ namespace Shrooms.ModelMappings.Profiles
             CreateMap<EventOptionViewModel, EventOptionDTO>();
 
             CreateMap<UpdateAttendStatusViewModel, UpdateAttendStatusDTO>()
-                .ForMember(dest => dest.AttendComment, opt => opt.NullSubstitute("None"))
                 .IgnoreUserOrgDto();
 
             CreateMap<CreateEventTypeViewModel, CreateEventTypeDTO>().IgnoreUserOrgDto();

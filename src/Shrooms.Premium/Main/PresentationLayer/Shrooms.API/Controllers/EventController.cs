@@ -318,7 +318,7 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
             SetOrganizationAndUser(updateAttendStatusDTO);
             try
             {
-                _eventParticipationService.AddOrChangeAttendStatus(updateAttendStatusDTO);
+                _eventParticipationService.UpdateAttendStatus(updateAttendStatusDTO);
                 return Ok();
             }
             catch (EventException e)

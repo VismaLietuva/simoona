@@ -279,6 +279,11 @@ namespace Shrooms.Infrastructure.Calendar
 
         private CalendarService CreateCalendarService()
         {
+            if (string.IsNullOrEmpty(_appSettings.GoogleCalendarServiceCertRelativePath) || string.IsNullOrEmpty(_appSettings.GoogleCalendarServiceCertPassword))
+            {
+                return null;
+            }
+
             var certPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _appSettings.GoogleCalendarServiceCertRelativePath);
 
             ServiceAccountCredential credential;

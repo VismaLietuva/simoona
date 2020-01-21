@@ -9,7 +9,7 @@ namespace Shrooms.Domain.Services.Events.Participation
     {
         void Join(EventJoinDTO joinDto);
 
-        void AddOrChangeAttendStatus(UpdateAttendStatusDTO updateAttendStatusDTO);
+        void UpdateAttendStatus(UpdateAttendStatusDTO updateAttendStatusDTO);
 
         void DeleteByEvent(Guid eventId, string userId);
 
