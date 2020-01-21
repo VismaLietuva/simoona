@@ -19,16 +19,6 @@ namespace Shrooms.Infrastructure.Configuration
 
         string BasicPassword { get; }
 
-        string GoogleCalendarServiceId { get; }
-
-        string GoogleCalendarServiceCertThumb { get; }
-
-        StoreLocation GoogleCalendarCertStore { get; }
-
-        string GoogleCalendarServiceCertPassword { get; }
-
-        string GoogleCalendarServiceCertRelativePath { get; }
-
         string CorsOriginsSetting { get; }
 
         string SupportEmail { get; }

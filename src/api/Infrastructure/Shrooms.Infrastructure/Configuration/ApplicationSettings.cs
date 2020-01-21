@@ -27,16 +27,6 @@ namespace Shrooms.Infrastructure.Configuration
 
         public string BasicPassword => ConfigurationManager.AppSettings["BasicPassword"];
 
-        public string GoogleCalendarServiceId => ConfigurationManager.AppSettings["GoogleCalendarServiceId"];
-
-        public string GoogleCalendarServiceCertThumb => ConfigurationManager.AppSettings["GoogleCalendarServiceCertThumb"];
-
-        public StoreLocation GoogleCalendarCertStore => (StoreLocation)Enum.Parse(typeof(StoreLocation), ConfigurationManager.AppSettings["GoogleCalendarCertStore"]);
-
-        public string GoogleCalendarServiceCertPassword => ConfigurationManager.AppSettings["GoogleCalendarServiceCertPassword"];
-
-        public string GoogleCalendarServiceCertRelativePath => ConfigurationManager.AppSettings["GoogleCalendarServiceCertRelativePath"];
-
         public string CorsOriginsSetting => ConfigurationManager.AppSettings["CorsOriginsSettingKey"];
 
         public string SupportEmail => ConfigurationManager.AppSettings["SupportEmail"];
