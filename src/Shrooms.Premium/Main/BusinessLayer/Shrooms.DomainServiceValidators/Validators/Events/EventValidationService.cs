@@ -172,6 +172,15 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
             }
         }
 
+        public void CheckIfAttendStatusIsValid(int status)
+        {
+            if (!Enum.IsDefined(typeof(ConstBusinessLayer.AttendingStatus), status))
+            {
+                throw new EventException(EventWrongAttendStatus);
+
+            }
+        }
+
         public void CheckIfUserHasPermission(string userId, string responsibleUserId, bool hasPermission)
         {
             if (userId != responsibleUserId)
