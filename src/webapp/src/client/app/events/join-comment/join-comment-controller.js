@@ -3,22 +3,24 @@
 
     angular
         .module('simoonaApp.Events')
-        .controller('eventLeaveController', eventLeaveController);
+        .controller('joinCommentController', joinCommentController);
 
-        eventLeaveController.$inject = [
+        joinCommentController.$inject = [
             '$uibModalInstance',
             'event',
-            'leaveEvent',
-            'notInterested',
+            'updateEventStatus',
+            'changeToAttendStatus',
             'attendStatus'
     ];
 
-    function eventLeaveController($uibModalInstance, event, leaveEvent, notInterested, attendStatus) {
+    function joinCommentController($uibModalInstance, event, updateEventStatus, changeToAttendStatus, attendStatus) {
         /* jshint validthis: true */
         var vm = this;
 
         vm.event = event;
-        vm.leave = leave;
+        vm.updateStatus = updateStatus;
+        vm.changeToAttendStatus = changeToAttendStatus;
+        vm.attendStatus = attendStatus
         vm.closeModal = closeModal;
 
         init();
@@ -28,12 +30,13 @@
         function init() {
         }
 
-        function leave() {
+        function updateStatus() {
             if (!vm.comment)
             {
                 vm.comment = "";
             }
-            vm.event.participatingStatus == attendStatus.Attending ? leaveEvent(event.id, vm.comment) : notInterested(event.id, vm.comment);
+
+            updateEventStatus(vm.event.id, vm.changeToAttendStatus, vm.comment);
             $uibModalInstance.close();
         }
 

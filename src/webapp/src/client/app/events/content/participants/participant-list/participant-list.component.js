@@ -22,10 +22,10 @@
     function eventParticipantListController(attendStatus) {
         /* jshint validthis: true */
         var vm = this;
-        vm.isExpanded = false;
+        vm.isExpanded = true;
         
         vm.attendStatus = attendStatus;
-        vm.expandCollapseText = 'events.expand';
+        vm.expandCollapseText = 'events.collapse';
         vm.toggleExpandCollapse = toggleExpandCollapse;
         vm.AttendingParticipants = AttendingParticipants;
         vm.MaybeAttendingParticipants = MaybeAttendingParticipants;

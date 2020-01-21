@@ -26,13 +26,12 @@
         'notifySrv',
         'errorHandler',
         'authService',
-        'eventParticipantsService',
         'Analytics',
         'attendStatus'
     ];
 
     function eventJoinController($uibModal, eventRepository, notifySrv, errorHandler,
-        authService, eventParticipantsService, Analytics, attendStatus) {
+        authService, Analytics, attendStatus) {
         /* jshint validthis: true */
         var vm = this;
 
@@ -40,12 +39,10 @@
         vm.enableAction = true;
         vm.joinEvent = joinEvent;
         vm.leaveEvent = leaveEvent;
-        vm.maybeParticipating = maybeParticipating;
-        vm.notParticipating = notParticipating;
+        vm.updateEventStatus = updateEventStatus;
         vm.hasDatePassed = hasDatePassed;
-        vm.openLeaveCommentModal = openLeaveCommentModal;
+        vm.openJoinCommentModal = openJoinCommentModal;
         vm.closeModal = closeModal;
-
 
         ////////
         function joinEvent(eventId) {
@@ -76,10 +73,11 @@
             }
         }
 
-        function leaveEvent(eventId, comment) {
+        function leaveEvent(eventId) {
             if (vm.enableAction) {
                 if (canLeaveEvent()) {
                     vm.enableAction = false;
+                    var comment = "";
                     eventRepository.leaveEvent(eventId, authService.identity.userId, comment).then(function() {
                         handleEventLeave();
                     }, function(error) {
@@ -94,12 +92,18 @@
             }
         }
 
-        function maybeParticipating(eventId) {
+        function updateEventStatus(eventId, attendStatus, comment) {
             if (vm.enableAction) {
-                var comment = "";
-                eventRepository.updateAttendStatus(attendStatus.MaybeAttending, comment, eventId).then(function() {
+                eventRepository.updateAttendStatus(attendStatus, comment, eventId).then(function() {
                     handleEventJoin();
-                    notifySrv.success('events.maybeJoiningEvent');
+
+                    if (attendStatus == attendStatus.Attending) {
+                        notifySrv.success('events.maybeJoiningEvent');
+                    }
+                    else if (attendStatus == attendStatus.NotAttending) {
+                        notifySrv.success('events.notJoiningEvent');
+                    }
+
                 }, function(error) {
                     vm.enableAction = true;
                     errorHandler.handleErrorMessage(error);
@@ -107,32 +111,20 @@
             }
         }
 
-        function notParticipating(eventId, comment) {
-            if (vm.enableAction) {
-                eventRepository.updateAttendStatus(attendStatus.NotAttending, comment, eventId).then(function() {
-                    handleEventJoin();
-                    notifySrv.success('events.notJoiningEvent');
-                }, function(error) {
-                    vm.enableAction = true;
-                    errorHandler.handleErrorMessage(error);
-                });
-            }
-        }
-
-        function openLeaveCommentModal() {
+        function openJoinCommentModal(changeToAttendStatus) {
             $uibModal.open({
-                templateUrl: 'app/events/leave/leave-event.html',
-                controller: 'eventLeaveController',
+                templateUrl: 'app/events/join-comment/join-comment.html',
+                controller: 'joinCommentController',
                 controllerAs: 'vm',
                 resolve: {
                     event: function() {
                         return vm.event;
                     },
-                    leaveEvent: function() {
-                        return vm.leaveEvent;
+                    updateEventStatus: function() {
+                        return vm.updateEventStatus;
                     },
-                    notInterested: function() {
-                        return vm.notParticipating;
+                    changeToAttendStatus: function() {
+                        return changeToAttendStatus;
                     }
                 }
               });
