@@ -7,7 +7,7 @@
     {
         public override void Up()
         {
-            AddColumn("dbo.EventTypes", "SingleJoinGroupName", c => c.String(maxLength: 100));
+            AddColumn("dbo.EventTypes", "SingleJoinGroupName", c => c.String(maxLength: 100, defaultValue: null));
         }
         
         public override void Down()
