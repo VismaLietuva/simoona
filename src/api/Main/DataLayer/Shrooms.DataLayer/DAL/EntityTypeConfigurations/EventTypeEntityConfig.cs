@@ -17,6 +17,8 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
             HasRequired(x => x.Organization)
                 .WithMany()
                 .WillCascadeOnDelete(false);
+
+            Property(e => e.SingleJoinGroupName).HasMaxLength(value: 100);
         }
     }
 }
