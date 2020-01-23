@@ -4,6 +4,7 @@ using System.Data.Entity;
 using System.Data.Entity.SqlServer;
 using System.Linq;
 using System.Linq.Expressions;
+using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataLayer.DAL;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Events;
@@ -39,7 +40,8 @@ namespace Shrooms.Domain.Services.Users
             var weekAfter = now.AddDays(7);
 
             var usersToDiscard = _eventParticipantsDb
-                .Where(x => x.Event.EventTypeId == eventTypeId &&
+                .Where(x => x.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.Attending &&
+                            x.Event.EventTypeId == eventTypeId &&
                             SqlFunctions.DatePart("wk", x.Event.StartDate) == SqlFunctions.DatePart("wk", now) &&
                             x.Event.StartDate > now && x.Event.StartDate < weekAfter)
                 .Select(x => x.ApplicationUserId);
