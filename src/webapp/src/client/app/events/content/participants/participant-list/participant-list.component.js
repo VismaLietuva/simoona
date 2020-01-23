@@ -27,9 +27,9 @@
         vm.attendStatus = attendStatus;
         vm.expandCollapseText = 'events.collapse';
         vm.toggleExpandCollapse = toggleExpandCollapse;
-        vm.AttendingParticipants = AttendingParticipants;
-        vm.MaybeAttendingParticipants = MaybeAttendingParticipants;
-        vm.NotAttendingParticipants = NotAttendingParticipants;
+        vm.attendingParticipants = getAttendingParticipants;
+        vm.maybeAttendingParticipants = getMaybeAttendingParticipants;
+        vm.notAttendingParticipants = getNotAttendingParticipants;
 
         function toggleExpandCollapse() {
             if(vm.isExpanded) {
@@ -41,15 +41,15 @@
             vm.isExpanded = !vm.isExpanded;
         }
 
-        function AttendingParticipants() {
+        function getAttendingParticipants() {
             return getParticipantsByStatus(attendStatus.Attending);
         }
 
-        function MaybeAttendingParticipants() {
+        function getMaybeAttendingParticipants() {
             return getParticipantsByStatus(attendStatus.MaybeAttending);
         }
 
-        function NotAttendingParticipants() {
+        function getNotAttendingParticipants() {
             return getParticipantsByStatus(attendStatus.NotAttending);
         }
 
