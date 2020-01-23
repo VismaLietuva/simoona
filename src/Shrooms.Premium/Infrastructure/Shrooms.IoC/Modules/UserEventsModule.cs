@@ -9,16 +9,8 @@ namespace Shrooms.IoC.Modules
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<EventJoinRemindService>()
-                .As<IEventJoinRemindService>()
-                .InstancePerRequest()
-                .EnableInterfaceTelemetryInterceptor();
-
-
-            builder.RegisterType<UserEventsService>()
-                .As<IUserEventsService>()
-                .InstancePerRequest()
-                .EnableInterfaceTelemetryInterceptor();
+            builder.RegisterType<EventJoinRemindService>().As<IEventJoinRemindService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            builder.RegisterType<UserEventsService>().As<IUserEventsService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
         }
     }
 }
