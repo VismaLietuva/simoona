@@ -18,6 +18,8 @@
         var vm = this;
         var listState = 'Root.WithOrg.Admin.Customization.EventTypes.List';
 
+        vm.singleJoinGroups = ['Maistas', 'Sportas'];
+
         vm.eventType = {};
         vm.onEditOriginalName = '';
         vm.states = {
