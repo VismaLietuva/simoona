@@ -39,31 +39,27 @@ namespace Shrooms.API.Controllers
                 return BadRequest("File is too large");
             }
 
-            Image imgObj;
+            Image image;
             var imageStream = await provider.Contents[0].ReadAsStreamAsync();
 
             try
             {
-                imgObj = Image.FromStream(imageStream);
+                image = Image.FromStream(imageStream);
             }
             catch (ArgumentException)
             {
                 return UnsupportedMediaType();
             }
 
-            if (imgObj.RawFormat.Guid != ImageFormat.Png.Guid &&
-                imgObj.RawFormat.Guid != ImageFormat.Gif.Guid &&
-                imgObj.RawFormat.Guid != ImageFormat.Jpeg.Guid &&
-                imgObj.RawFormat.Guid != ImageFormat.Bmp.Guid)
+            if (image.RawFormat.Guid != ImageFormat.Png.Guid && image.RawFormat.Guid != ImageFormat.Gif.Guid
+                    && image.RawFormat.Guid != ImageFormat.Jpeg.Guid && image.RawFormat.Guid != ImageFormat.Bmp.Guid)
             {
                 return UnsupportedMediaType();
             }
 
             imageStream.Position = 0;
 
-            var pictureName = await _pictureService
-                .UploadFromStream(
-                    imageStream,
+            var pictureName = await _pictureService.UploadFromImage(image,
                     imageContent.Headers.ContentType.ToString(),
                     imageContent.Headers.ContentDisposition.FileName.Replace("\"", string.Empty),
                     GetUserAndOrganization().OrganizationId);

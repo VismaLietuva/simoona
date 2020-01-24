@@ -8,57 +8,53 @@
                         <label class="col-xs-3 control-label" for="title">
                             <span translate="kudosBasket.title"></span><span class="text-danger">*</span>
                         </label>
-                        <div class="col-xs-9" ng-class="{ 'has-error' : kudosBasketForm.title.$invalid && !kudosBasketForm.title.$pristine }">
-                            <input class="form-control"
-                                   type="text"
-                                   name="title"
-                                   ng-maxlength="25"
-                                   ng-model="vm.kudosBasketData.title"
-                                   translate-attr-placeholder="kudosBasket.title"
-                                   data-test-id="kudos-basket-title-input-field" required translate/>
+                        <div class="col-xs-9"
+                            ng-class="{ 'has-error' : kudosBasketForm.title.$invalid && !kudosBasketForm.title.$pristine }">
+                            <input class="form-control" type="text" name="title" ng-maxlength="25"
+                                ng-model="vm.kudosBasketData.title" translate-attr-placeholder="kudosBasket.title"
+                                data-test-id="kudos-basket-title-input-field" required translate />
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-xs-3 control-label" for="description" translate="kudosBasket.description"></label>
-                        <div class="col-xs-9" ng-class="{ 'has-error' : kudosBasketForm.description.$invalid && !kudosBasketForm.description.$pristine }">
-                            <textarea class="form-control"
-                                      name="description"
-                                      msd-elastic
-                                      ng-model="vm.kudosBasketData.description"
-                                      ng-maxlength="5000"
-                                      translate-attr-placeholder="kudosBasket.description"
-                                      data-test-id="kudos-basket-description-input-field" translate>
+                        <label class="col-xs-3 control-label" for="description"
+                            translate="kudosBasket.description"></label>
+                        <div class="col-xs-9"
+                            ng-class="{ 'has-error' : kudosBasketForm.description.$invalid && !kudosBasketForm.description.$pristine }">
+                            <textarea class="form-control" name="description" msd-elastic
+                                ng-model="vm.kudosBasketData.description" ng-maxlength="5000"
+                                translate-attr-placeholder="kudosBasket.description"
+                                data-test-id="kudos-basket-description-input-field" translate>
                             </textarea>
                         </div>
                     </div>
                     <div class="form-group" ng-if="vm.kudosBasketData.id">
-                        <label class="col-xs-3 control-label" for="notification" translate="kudosBasket.widgetIs"></label>
+                        <label class="col-xs-3 control-label" for="notification"
+                            translate="kudosBasket.widgetIs"></label>
                         <div class="col-xs-9">
-                            <div class="onoffswitch">
-                                <input type="checkbox" name="notification" class="onoffswitch-checkbox" id="notification" ng-model="vm.kudosBasketData.isActive">
-                                <label class="onoffswitch-label" for="notification">
-                                    <span on-switch-attr="{{'kudosBasket.widgetIsOn' | translate }}" off-switch-attr="{{'kudosBasket.widgetIsOff' | translate }}" class="onoffswitch-inner" translate-cloak></span>
-                                    <span class="onoffswitch-switch"></span>
+                            <div class="btn-group btn-group-checkbox" data-toggle="buttons">
+                                <label class="btn btn-primary" ng-class="{'active':vm.kudosBasketData.isActive}"
+                                    ng-click="vm.toggleKudosBasketSwitch()">
+                                    <input type="checkbox" autocomplete="off">
                                 </label>
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label class="col-xs-3"></label>
-                        <div class="col-xs-9">
-                            <button class="btn btn-primary" type="button" ng-click="vm.saveKudosBasket()" ng-disabled="kudosBasketForm.$invalid">
-                                <span translate="common.save"></span>
-                            </button>
-                            <button class="btn btn-orange" type="button" ng-click="vm.cancelKudosBasket()">
-                                <span translate="common.cancel"></span>
-                            </button>
-                            <button class="btn btn-danger" type="button" ace-confirmation-modal="vm.deleteKudosBasket()" ng-if="vm.kudosBasketData.id">
-                                <span translate="common.delete"></span>
-                            </button>
-                        </div>
+                    <div class="pull-right">
+                        <button class="btn btn-primary" type="button" ng-click="vm.saveKudosBasket()"
+                            ng-disabled="kudosBasketForm.$invalid">
+                            <span translate="common.save"></span>
+                        </button>
+                        <button class="btn btn-danger" type="button" ace-confirmation-modal="vm.deleteKudosBasket()"
+                            ng-if="vm.kudosBasketData.id">
+                            <span translate="common.delete"></span>
+                        </button>
+                        <button class="btn btn-default" type="button" ng-click="vm.cancelKudosBasket()">
+                            <span translate="common.cancel"></span>
+                        </button>
                     </div>
                 </form>
-                <table class="table table-grey table-hover table-active kudos-basket-administration-table" ng-if="vm.donatorsUsersList.length">
+                <table class="table table-grey table-hover table-active kudos-basket-administration-table"
+                    ng-if="vm.donatorsUsersList.length">
                     <thead>
                         <tr>
                             <th class="col-xs-6" translate="kudosBasket.nameSurname"></th>

@@ -9,6 +9,7 @@
 	"app": "Application",
 	"email": "Email",
 	"events": "Events",
+	"eventsRemind": "Events reminding",
 	"projects": "Projects",
 	"providers": "Login providers",
 	"removeProvider": "Remove",
@@ -19,6 +20,6 @@
 	"linked": "Linked",
 	"comments": "Comments",
 	"myPosts": "My posts",
-	"iCommented": "Posts I commented",
+	"iCommented": "Posts I'm watching",
 	"providerEmail": "Linked email"
 }

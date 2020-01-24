@@ -1,0 +1,32 @@
+<div class="modal-header">
+        <button type="button" class="close" ng-click="vm.cancel()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <h3 class="modal-title">{{vm.book.title}}: {{vm.book.author}}</h3>
+    </div>
+<div class="panel-body">
+    <form name="bookForm" class="form-horizontal" autocomplete="off">
+        <div class="form-group required"">
+    <label for=" typeId" class="control-label col-xs-12 col-sm-4" translate="books.reportReason"></label>
+            <div class="col-xs-12 col-sm-6 col-md-8">
+                <select id="typeId" name="typeId" class="form-control" ng-model="vm.selectedReport" ng-init="vm.selectedReport = vm.reports[0]" 
+                ng-options="item as item for item in vm.reports" required translate-cloak>
+                </select>
+            </div>
+        </div>
+        <div class="form-group"">
+                <label for="description" class="control-label col-xs-12 col-sm-4" translate="books.comment"></label>
+                <div class="col-xs-12 col-sm-6 col-md-8">
+                    <textarea id="description" name="description" class="form-control" rows="3" ng-model="vm.comment"></textarea>
+                </div>
+            </div>
+    </form>
+</div>
+<div class="lottery-details-modal-footer">
+        <button class="btn btn-warning" ng-click="vm.reportBook()">
+                <span translate="books.report"></span>
+            </button>
+    <button class="btn btn-default" ng-click="vm.cancel()" data-test-id="cancel-button-yellow">
+        <span translate="common.cancel"></span>
+    </button>
+</div>

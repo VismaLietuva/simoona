@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
 using Shrooms.EntityModels.Models.Multiwall;
 
 namespace Shrooms.EntityModels.Models.Events
@@ -41,6 +42,16 @@ namespace Shrooms.EntityModels.Models.Events
         public virtual Wall Wall { get; set; }
         public virtual ICollection<EventParticipant> EventParticipants { get; set; }
         public virtual ICollection<EventOption> EventOptions { get; set; }
+        public bool IsPinned { get; set; }
+        [Required]
+        public string Offices { get; set; }
+
+        [NotMapped]
+        public IEnumerable<string> OfficeIds
+        {
+            get { return Offices == null ? null : JsonConvert.DeserializeObject<string[]>(Offices); }
+            set { Offices = JsonConvert.SerializeObject(value); }
+        }
 
         [NotMapped]
         public DateTime LocalStartDate

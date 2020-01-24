@@ -12,7 +12,8 @@
 
         var service = {
             postKudos: postKudos,
-            getPointsTypes: getPointsTypes
+            getPointsTypes: getPointsTypes,
+            getSendKudosType: getSendKudosType
         };
         return service;
 
@@ -25,12 +26,17 @@
                 Comment: kudosifyInfo.comment,
                 TotalPointsPerReceiver: kudosifyInfo.totalPoints,
                 PointsTypeId: pointsType.id,
-                PictureId: kudosifyInfo.imageName
+                PictureId: kudosifyInfo.imageName,
+                IsActive: pointsType.isActive
             }).$promise;
         }
 
         function getPointsTypes() {
             return $resource(url + 'GetKudosTypes').query().$promise;
+        }
+
+        function getSendKudosType() {
+            return $resource(url + 'GetSendKudosType').get().$promise;
         }
     }
 })();

@@ -44,6 +44,8 @@
                     vm.settings.walls = response.walls;
                     vm.settings.eventsAppNotifications = response.eventsAppNotifications;
                     vm.settings.eventsEmailNotifications = response.eventsEmailNotifications;
+                    vm.settings.eventWeeklyReminderAppNotifications = response.eventWeeklyReminderAppNotifications;
+                    vm.settings.eventWeeklyReminderEmailNotifications = response.eventWeeklyReminderEmailNotifications;
                     vm.settings.projectsAppNotifications = response.projectsAppNotifications;
                     vm.settings.projectsEmailNotifications = response.projectsEmailNotifications;
                     vm.settings.myPostsAppNotifications = response.myPostsAppNotifications;

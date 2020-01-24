@@ -22,16 +22,18 @@
         'eventStatus',
         'errorHandler',
         'lodash',
-        'Analytics'
+        'Analytics',
+        'attendStatus'
     ];
 
     function eventParticipantsController(eventRepository, authService, eventParticipantsService,
-        eventStatusService, eventStatus, errorHandler, lodash, Analytics) {
+        eventStatusService, eventStatus, errorHandler, lodash, Analytics, attendStatus) {
         /* jshint validthis: true */
         var vm = this;
 
         vm.isParticipantsLoading = false;
-
+        vm.isMainParticipantList = true;
+        
         vm.eventStatus = eventStatus;
         vm.eventStatusService = eventStatusService;
         vm.participantsTabs = [{
@@ -46,6 +48,8 @@
         vm.expelUserFromEvent = expelUserFromEvent;
         vm.isDeleteVisible = isDeleteVisible;
         vm.isActiveTab = isActiveTab;
+        vm.isExportVisible = isExportVisible;
+        vm.participantCount = participantCount;
 
         /////////
 
@@ -59,6 +63,18 @@
             });
         }
 
+        function participantCount() {
+            var participantCount = 0;
+            vm.event.participants.forEach(function(participant) {
+                if (participant.attendStatus == attendStatus.Attending)
+                {
+                    participantCount++;
+                }
+            })
+
+            return participantCount;
+        }
+
         function isActiveTab(tab) {
             return !!lodash.find(vm.participantsTabs, function(obj) {
                 return !!obj.isOpen && obj.name === tab;
@@ -67,6 +83,17 @@
 
         function isDeleteVisible() {
             return vm.isAdmin && eventStatusService.getEventStatus(vm.event) !== eventStatus.Finished;
+        }
+
+        function isExportVisible() {
+            var participantCount = 0;
+            vm.event.participants.forEach(function(participant) {
+                if (participant.attendStatus == attendStatus.Attending) {
+                    participantCount++;
+                }
+            })
+           
+            return participantCount > 0 ? true : false;
         }
 
         function expelUserFromEvent(participant) {
@@ -81,7 +108,7 @@
                     eventParticipantsService.removeParticipantFromOptions(vm.event.options, participant.userId);
 
                     if (authService.identity.userId === participant.userId) {
-                        vm.event.isParticipating = false;
+                        vm.event.participatingStatus = attendStatus.Idle;
                     }
 
                     if (vm.event.maxParticipants > vm.event.participants.length) {

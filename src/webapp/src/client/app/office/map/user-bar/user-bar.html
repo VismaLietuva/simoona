@@ -1,6 +1,6 @@
 <div class="users-bar navbar navbar-default navbar-fixed-bottom">
     <div class="container col-md-12">
-        <ul class="users-bar-container" ace-infinite-scroll="" onget="onInfiniteScrollGet" items-to-add="5" default-element-width="135" immediate-check="true">
+        <ul class="users-bar-container" ace-infinite-scroll="" onget="onInfiniteScrollGet" items-to-add="5" default-element-width="135" immediate-check="false">
             <li class="users-bar-block animate" ng-class="{absent: item.isAbsent}" ng-repeat="item in currentItems" ng-click="onBlockClick(item)" ng-mouseover="onBlockMouseOver(item)" id="users-bar-{{item.id}}">
                 <div class="users-bar-block-img" ns-popover ns-popover-template="app/office/map/user-bar/user-bar-popover.html" ns-popover-timeout="0.1" ns-popover-trigger="click || mouseenter" ns-popover-placement="top" ng-style="{{ item.pictureId | userBackgroundThumb }}" >
                 </div>
@@ -13,6 +13,4 @@
             </li>
         </ul>
     </div>
-
 </div>
-

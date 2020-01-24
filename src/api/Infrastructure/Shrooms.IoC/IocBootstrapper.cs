@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Web;
 using System.Web.Http;
 using Autofac;
 using Autofac.Integration.SignalR;
@@ -23,6 +24,7 @@ using Shrooms.Host.Contracts.DAL;
 using Shrooms.Host.Contracts.Infrastructure;
 using Shrooms.Host.Contracts.Infrastructure.Email;
 using Shrooms.Infrastructure.Email;
+using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Infrastructure.Interceptors;
 using Shrooms.Infrastructure.Logger;
 using Shrooms.IoC.Modules;
@@ -40,6 +42,9 @@ namespace Shrooms.IoC
 
             builder.RegisterApiControllers(shroomsApi);
             builder.RegisterHubs(shroomsApi);
+            builder.RegisterAssemblyTypes(shroomsApi).
+                Where(t => typeof(IBackgroundWorker).IsAssignableFrom(t)).InstancePerDependency().AsSelf();
+            builder.RegisterType<AsyncRunner>().As<IAsyncRunner>().SingleInstance();
             builder.RegisterWebApiModelBinderProvider();
             builder.RegisterWebApiFilterProvider(config);
             builder.RegisterAssemblyTypes(dataLayer);
@@ -49,16 +54,19 @@ namespace Shrooms.IoC
             builder.Register(c => new TelemetryLoggingInterceptor());
 
             builder.RegisterType(typeof(UnitOfWork2)).As(typeof(IUnitOfWork2)).InstancePerRequest();
-            builder.Register(c => new ShroomsDbContext(GetConnectionStringName())).As<IDbContext>().InstancePerRequest();
+            builder.Register(c => HttpContext.Current == null ?
+                    new ShroomsDbContext(c.Resolve<ITenantNameContainer>().TenantName) :
+                    new ShroomsDbContext(GetConnectionStringName())
+                    ).As<IDbContext>().InstancePerRequest();
             builder.RegisterType(typeof(EFUnitOfWork)).As(typeof(IUnitOfWork)).InstancePerRequest();
             builder.RegisterGeneric(typeof(EfRepository<>)).As(typeof(IRepository<>));
 
             // Authorization types
             builder.RegisterType<MailingService>().As<IMailingService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<PostNotificationService>().As<IPostNotificationService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<CommentNotificationService>().As<ICommentNotificationService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            builder.RegisterType<CommentEmailNotificationService>().As<ICommentEmailNotificationService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.Register(c => app.GetDataProtectionProvider()).InstancePerRequest();
-            builder.RegisterType<PermissionService>().As<IPermissionService>().PropertiesAutowired().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            builder.RegisterType<PermissionService>().As<IPermissionService>().PropertiesAutowired().InstancePerRequest(); //.EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<SyncTokenService>().As<ISyncTokenService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<ImpersonateService>().As<IImpersonateService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<UserAdministrationValidator>().As<IUserAdministrationValidator>().InstancePerRequest();
@@ -68,7 +76,6 @@ namespace Shrooms.IoC
             builder.RegisterModule(new IdentityModule());
             builder.RegisterModule(new ServicesModule());
             builder.RegisterModule(new InfrastructureModule());
-            builder.RegisterModule(new BooksModule());
             builder.RegisterModule(new WallModule());
             builder.RegisterModule(new KudosModule());
             builder.RegisterModule(new KudosBasketModule());

@@ -17,10 +17,11 @@
         'eventRepository',
         'notifySrv',
         'errorHandler',
-        'Analytics'
+        'Analytics',
+        'attendStatus'
     ];
 
-    function eventParticipantsActionsController(eventRepository, notifySrv, errorHandler, Analytics) {
+    function eventParticipantsActionsController(eventRepository, notifySrv, errorHandler, Analytics, attendStatus) {
         /* jshint validthis: true */
         var vm = this;
         vm.isEventFinished = !hasDatePassed(vm.event.endDate);
@@ -35,7 +36,7 @@
             eventRepository.resetParticipantList(vm.event.id).then(function() {
                 vm.event.participants = [];
                 vm.event.participantsCount = 0;
-                vm.event.isParticipating = false;
+                vm.event.participatingStatus = attendStatus.NotAttending;
                 if (!!vm.event.options.length) {
                     angular.forEach(vm.event.options, function(option) {
                         option.participants = [];

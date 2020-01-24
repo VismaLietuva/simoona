@@ -53,6 +53,8 @@ namespace Shrooms.UnitTests.Mocks
 
         public List<Skill> Skills { get; set; }
 
+        public string ConnectionName => "SimoonaTest";
+
         public MockDbContext()
         {
             CreateOrganizations();

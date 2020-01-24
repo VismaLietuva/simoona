@@ -86,7 +86,7 @@ namespace Shrooms.API
             }
         }
 
-        private bool HasProviderSettings(string idKey, string secretKey)
+        private static bool HasProviderSettings(string idKey, string secretKey)
         {
             return !string.IsNullOrEmpty(ConfigurationManager.AppSettings[idKey]) &&
                 !string.IsNullOrEmpty(ConfigurationManager.AppSettings[secretKey]);
@@ -96,13 +96,15 @@ namespace Shrooms.API
         {
             public override Task RequestToken(OAuthRequestTokenContext context)
             {
-                if (context.Request.Path.Value.StartsWith("/signalr"))
+                if (!context.Request.Path.Value.StartsWith("/signalr"))
                 {
-                    var token = context.Request.Query.Get("token");
-                    if (token != null)
-                    {
-                        context.Token = token;
-                    }
+                    return Task.FromResult(context);
+                }
+
+                var token = context.Request.Query.Get("token");
+                if (token != null)
+                {
+                    context.Token = token;
                 }
 
                 return Task.FromResult(context);

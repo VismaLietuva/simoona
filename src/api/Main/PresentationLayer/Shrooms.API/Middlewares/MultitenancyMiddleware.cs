@@ -9,9 +9,9 @@ using Shrooms.Resources.Helpers;
 
 namespace Shrooms.API.Middlewares
 {
-    public class MultitenancyMiddleware : OwinMiddleware
+    public class MultiTenancyMiddleware : OwinMiddleware
     {
-        public MultitenancyMiddleware(OwinMiddleware next)
+        public MultiTenancyMiddleware(OwinMiddleware next)
             : base(next)
         {
         }
@@ -28,12 +28,11 @@ namespace Shrooms.API.Middlewares
             {
                 var tenantKey = ExtractTenant(context);
 
-                string tenantName;
                 if (string.IsNullOrEmpty(tenantKey))
                 {
                     Unauthorized(context);
                 }
-                else if (!TryFindTenant(out tenantName, tenantKey))
+                else if (!TryFindTenant(out var tenantName, tenantKey))
                 {
                     await ReturnInvalidOrganizationResponse(context);
                 }
@@ -46,7 +45,8 @@ namespace Shrooms.API.Middlewares
                         await Next.Invoke(context);
                     }
                     catch (OperationCanceledException)
-                    { }
+                    {
+                    }
                 }
             }
         }

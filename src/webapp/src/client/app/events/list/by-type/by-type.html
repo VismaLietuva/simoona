@@ -9,6 +9,8 @@
             <div class="event-list-item-inner-container">
                 <!-- title -->
                 <div class="col-xs-12">
+                    <span class="glyphicon glyphicon-bookmark event-bookmark-icon" ng-if="event.isPinned">
+                    </span>
                     <a class="event-item-title" 
                        title="{{:: event.name}}" 
                        ui-sref="Root.WithOrg.Client.Events.EventContent({id:{{'event.id'}}})"
@@ -19,7 +21,9 @@
                 <!-- office/location -->
                 <div class="col-xs-12">
                     <p class="event-list-item-place" data-test-id="event-list-item-place" ng-cloak>
-                        <span ng-if="event.office">{{:: event.office}}</span><span ng-if="!event.office">{{ :: "events.all" | translate }}</span>/{{:: event.place}}
+                        <span ng-if="event.officesName.length == vm.offices.length-1">{{ :: "events.eventOfficeAll" | translate }}</span>
+                        <span ng-if="event.officesName.length != vm.offices.length-1 && event.officesName" ng-repeat="officeName in event.officesName">{{:: officeName}}{{$last ? '' : ', '}}</span>
+                        <span ng-if="!event.officesName">{{ :: "events.eventOutside" | translate }} </span>({{:: event.place}})
                     </p>
                 </div>
                 <!-- date/time -->

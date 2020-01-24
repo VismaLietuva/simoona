@@ -10,6 +10,13 @@
             wallLogoHeight: 100,
             wallLogoWidth: 150
         })
+        .constant('WallsType', {
+            MyWalls: 1,
+            AllWalls: 2
+        })
+        .constant('WallsCount', {
+            Min: 1
+        })
         .factory('wallService', wallService);
 
     wallService.$inject = [
@@ -25,12 +32,14 @@
         'lodash',
         'notifySrv',
         'appConfig',
-        'SmoothScroll'
+        'SmoothScroll',
+        'WallsType',
+        'WallsCount'
     ];
 
     function wallService($location, $timeout, $state, authService, wallMenuNavigationRepository,
-        wallSettings, errorHandler, wallPostRepository, wallRepository, lodash, notifySrv, appConfig, SmoothScroll) {
-
+        wallSettings, errorHandler, wallPostRepository, wallRepository, lodash, notifySrv, appConfig, SmoothScroll, WallsType, WallsCount) {
+        
         var wallServiceData = {
             posts: [],
             isScrollingEnabled: true,
@@ -113,7 +122,7 @@
             if (!wallServiceData.wallList.length) {
                 getChosenWallList(isWallModule);
             } else {
-                if (wallServiceData.wallList.length === 1) {
+                if (wallServiceData.wallList.length === WallsCount.Min) {
                     getWallDetails(wallId || wallServiceData.wallList[0].id);
                 }
 
@@ -174,9 +183,9 @@
                 return wall.type === 'Main';
             });
 
-            if (!$state.params.wall && wallList.length > 1) {
+            if (!$state.params.wall && wallList.length > WallsCount.Min) {
                 settings.wallId = null;
-            } else if (isWallModule && !$state.params.wall && wallList.length === 1) {
+            } else if (isWallModule && !$state.params.wall && !$state.current.url.contains('/All') && wallList.length === WallsCount.Min) {
                 if (!isValidPostId($state.params.post)) {
                     $location.search('wall', mainWall.id);
                 }
@@ -249,6 +258,7 @@
                 }, errorHandler.handleErrorMessage);
             } else {
                 if (!settings.wallId) {
+                    settings.wallsType = $state.current.url.contains('All') ? WallsType.AllWalls : WallsType.MyWalls;
                     wallPostRepository.getAllPosts(settings).then(function (response) {
                         addPostsToWall(response, true);
                         busy = false;

@@ -1,21 +1,87 @@
 <div>
-    <ul ng-if="!!vm.participants.length" class="event-participant-list">
-        <li ng-repeat="participant in vm.participants">
-            <ace-event-participant participant="participant">
-                <wave-spinner class="event-participant-spinner" ng-if="participant.isLoading"></wave-spinner>
+    <div>
+        <div class="hidden-lg hidden-md event-participant-list-accordion" ng-show="vm.isMainParticipantList">
+            <div class="panel-group">
+                <div class="panel">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a role="button" class="accordion-toggle" ng-click="vm.toggleExpandCollapse()" ng-model="vm.isExpanded">
+                                <span>
+                                    <div class="event-participants-list-option noselect" data-test-id="event-participants-option-name">{{vm.expandCollapseText | translate}}</div>
+                                    <i class="event-participant-heading-toggle glyphicon glyphicon-chevron-down" ng-class="{'glyphicon-chevron-down': vm.isExpanded, 'glyphicon-chevron-right': !vm.isExpanded}"></i>
+                                    <div class="clearfix"></div>
+                                </span>
+                            </a>
+                        </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                <span ng-if="!!participant.userId && !participant.isLoading && vm.isDeleteVisible"
-                      class="event-participant-delete-button vismaicon vismaicon-cancel-circle"
-                      ace-confirmation-modal="vm.onLeaveEvent({participant: participant})"
-                      confirmation-modal-message="events.deleteUserConfirmationMessage"
-                      data-test-id="event-participant-delete-user"
-                      title="{{'common.delete' | translate}}" translate-cloak>
-                </span>
-            </ace-event-participant>
-        </li>
-    </ul>
+        <ul ng-if="!!vm.participants.length && vm.isExpanded" class="event-participant-list">
+            <div ng-show="!!vm.attendingParticipants().length" class="panel panel-info" >
+                <div ng-show="vm.isMainParticipantList" class="panel-heading">{{'events.eventParticipantStatus_Attending' | translate}} ({{vm.attendingParticipants().length}})</div>
+                <div class="panel-body">
+                    <li ng-repeat="participant in vm.attendingParticipants()">
+                        <ace-event-participant participant="participant">
+                            <span ng-if="!!participant.userId && !participant.isLoading && vm.isDeleteVisible"
+                                class="event-participant-delete-button vismaicon vismaicon-cancel-circle"
+                                ace-confirmation-modal="vm.onLeaveEvent({participant: participant})"
+                                confirmation-modal-message="events.deleteUserConfirmationMessage"
+                                data-test-id="event-participant-delete-user" title="{{'common.delete' | translate}}"
+                                translate-cloak>
+                            </span>
+                        </ace-event-participant>
+                    </li>
+                </div>
+            </div>
 
-    <div ng-if="!vm.participants.length"
-    	 class="event-no-participants text-center"
-    	 translate="events.eventNoParticipants"></div>
+            <div ng-show="!!vm.maybeAttendingParticipants().length && vm.isMainParticipantList" class="panel panel-info">
+                <div class="panel-heading">{{'events.eventParticipantStatus_MaybeAttending' | translate}} ({{vm.maybeAttendingParticipants().length}})</div>
+                <div class="panel-body">
+                    <li ng-repeat="participant in vm.maybeAttendingParticipants()">
+                        <ace-event-participant participant="participant">
+                            <span ng-if="!!participant.userId && !participant.isLoading && vm.isDeleteVisible"
+                                class="event-participant-delete-button vismaicon vismaicon-cancel-circle"
+                                ace-confirmation-modal="vm.onLeaveEvent({participant: participant})"
+                                confirmation-modal-message="events.deleteUserConfirmationMessage"
+                                data-test-id="event-participant-delete-user" title="{{'common.delete' | translate}}"
+                                translate-cloak>
+                            </span>
+                            <span ng-if="participant.attendComment"
+                                class="event-participant-delete-button vismaicon vismaicon-comment"
+                                uib-tooltip="{{participant.attendComment}}" tooltip-placement="bottom"
+                                tooltip-append-to-body="true">
+                            </span>
+                        </ace-event-participant>
+                    </li>
+                </div>
+            </div>
+
+            <div ng-show="!!vm.notAttendingParticipants().length && vm.isMainParticipantList" class="panel panel-info">
+                <div class="panel-heading">{{'events.eventParticipantStatus_NotAttending' | translate}} ({{vm.notAttendingParticipants().length}})</div>
+                <div class="panel-body">
+                    <li ng-repeat="participant in vm.notAttendingParticipants()">
+                        <ace-event-participant participant="participant">
+                            <span ng-if="!!participant.userId && !participant.isLoading && vm.isDeleteVisible"
+                                class="event-participant-delete-button vismaicon vismaicon-cancel-circle"
+                                ace-confirmation-modal="vm.onLeaveEvent({participant: participant})"
+                                confirmation-modal-message="events.deleteUserConfirmationMessage"
+                                data-test-id="event-participant-delete-user" title="{{'common.delete' | translate}}"
+                                translate-cloak>
+                            </span>
+                            <span ng-if="participant.attendComment"
+                                class="event-participant-delete-button vismaicon vismaicon-comment"
+                                uib-tooltip="{{participant.attendComment}}" tooltip-placement="bottom"
+                                tooltip-append-to-body="true">
+                            </span>
+                        </ace-event-participant>
+                    </li>
+                </div>
+            </div>
+        </ul>
+    </div>    
+
+    <div ng-if="!vm.participants.length" class="event-no-participants text-center"
+        translate="events.eventNoParticipants"></div>
 </div>

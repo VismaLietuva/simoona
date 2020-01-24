@@ -35,7 +35,7 @@ namespace Shrooms.Domain.Services.Wall
 
         void AddModerator(int wallId, string responsibleUserId, UserAndOrganizationDTO userId);
 
-        Task<IEnumerable<PostDTO>> GetAllPosts(int page, int defaultPageSize, UserAndOrganizationDTO userAndOrg);
+        Task<IEnumerable<PostDTO>> GetAllPosts(int page, int defaultPageSize, UserAndOrganizationDTO userAndOrg, int wallsType);
 
         void AddMemberToWalls(string userId, List<int> wallIds);
 

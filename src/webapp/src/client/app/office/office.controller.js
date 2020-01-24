@@ -8,7 +8,6 @@
         '$scope',
         '$rootScope',
         '$state',
-        '$cookies',
         '$location',
         'mapRepository',
         '$advancedLocation',
@@ -18,7 +17,7 @@
         '$translate'
     ];
 
-    function officeController($scope, $rootScope, $state, $cookies, $location, mapRepository, $advancedLocation, roomRepository, userRepository, authService, $translate) {
+    function officeController($scope, $rootScope, $state, $location, mapRepository, $advancedLocation, roomRepository, userRepository, authService) {
 
         $scope.resetStateParams = resetStateParams;
         $scope.setScopeParams = setScopeParams;
@@ -37,6 +36,7 @@
         activate();
 
         function activate() {
+
 
             $rootScope.$on('floorChange', function (e, floor) {
                 resetStateParams();
@@ -101,7 +101,7 @@
             });
 
             $scope.$on('usersBarItemHiglighted', function (e, roomId) {
-                var rooms = $.grep($scope.floor.rooms, function (e) { return e.id == roomId; });
+                var rooms = $.grep($scope.floor.rooms, function (e) { return e.id === roomId; });
 
                 if (rooms.length > 0) {
                     $scope.params.room = rooms[0];
@@ -112,7 +112,6 @@
 
             $scope.initialize();
         }
-
 
         function loadData() {
             if ($scope.params.floorId === 'default') {
@@ -178,7 +177,7 @@
                     $scope.loadData();
                 });
             } else {
-                $scope.params.floorId = $state.params.floorId || $cookies.SelectedFloorId || 'default';
+                $scope.params.floorId = $state.params.floorId || 'default';
                 $scope.loadData();
             }
         }
@@ -188,11 +187,9 @@
                 return;
             }
 
-            $cookies.SelectedFloorId = floor.id;
-
             if ($scope.params.roomId) {
                 angular.forEach($scope.floor.rooms, function (value, key) {
-                    if (value.id == $scope.params.roomId && authService.identity.isAuthenticated) {
+                    if (value.id === $scope.params.roomId && authService.identity.isAuthenticated) {
                         value.selected = true;
                     }
                 });
@@ -204,5 +201,5 @@
                 $scope.floor.pinCoords = coords;
             }
         }
-    };
+    }
 })();

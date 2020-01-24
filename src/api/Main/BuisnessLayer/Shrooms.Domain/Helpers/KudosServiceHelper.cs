@@ -62,5 +62,14 @@ namespace Shrooms.Domain.Helpers
                 PictureId = log.PictureId
             };
         }
+
+    internal static Expression<Func<KudosLog, bool>> TypeFilter(string filteringType)
+    {
+      if (string.IsNullOrEmpty(filteringType) || filteringType.Equals("All", StringComparison.OrdinalIgnoreCase))
+      {
+        return x => true;
+      }
+      return x => x.KudosTypeName == filteringType;
     }
+  }
 }

@@ -19,7 +19,7 @@
                 <input type="radio" />
                 <span translate="events.eventParticipants"></span>
                 <span class="badge badge-default" data-test-id="participants-count">
-                    {{vm.event.participants.length}}/{{vm.event.maxParticipants}}
+                    {{vm.participantCount()}}/{{vm.event.maxParticipants}}
                 </span>
             </div>
             <div class="clearfix"></div>
@@ -27,11 +27,11 @@
         <div ng-if="!vm.event.options.length" class="event-participants-title">
             <span translate="events.eventParticipants"></span>
             <span class="badge badge-default" data-test-id="participants-count">
-                {{vm.event.participants.length}}/{{vm.event.maxParticipants}}
+                {{vm.participantCount()}}/{{vm.event.maxParticipants}}
             </span>
         </div>
     </div>
-    <div class="event-participants-container-actions" ng-if="!vm.isLoading && !!vm.event.participants.length">
+    <div class="event-participants-container-actions" ng-if="!vm.isLoading && vm.isExportVisible()">
         <ace-event-participants-actions event="vm.event" is-admin="vm.isAdmin"></ace-event-participants-actions>
     </div>
     <div class="event-participants-container-body" ng-if="!vm.isLoading">
@@ -41,7 +41,7 @@
                             is-details="true"
                             is-add-colleague="true"></ace-event-join>
 
-            <ace-event-participant-list participants="vm.event.participants" on-leave-event="vm.expelUserFromEvent(participant)" is-delete-visible="vm.isDeleteVisible()"></ace-event-participant-list>
+            <ace-event-participant-list participants="vm.event.participants" on-leave-event="vm.expelUserFromEvent(participant)" is-delete-visible="vm.isDeleteVisible()" is-main-participant-list="vm.isMainParticipantList"></ace-event-participant-list>
         </div>
         <div class="event-tab-content-show" ng-show="vm.isActiveTab('OptionsList')">
             <ace-event-participant-options participants="vm.event.participants" options="vm.event.options"></ace-event-participant-options>

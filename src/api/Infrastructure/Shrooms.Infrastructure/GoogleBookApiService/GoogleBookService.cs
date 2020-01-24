@@ -3,8 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Google.Apis.Books.v1;
 using Google.Apis.Services;
-using Shrooms.DataTransferObjects.Models.GoogleBookApiService;
-using Shrooms.Host.Contracts.Infrastructure;
 
 namespace Shrooms.Infrastructure.GoogleBookApiService
 {
@@ -34,7 +32,8 @@ namespace Shrooms.Infrastructure.GoogleBookApiService
             {
                 Author = volume.Authors == null ? "Authors not set" : string.Join(", ", volume.Authors),
                 Title = volume?.Title,
-                Url = volume?.InfoLink
+                Url = volume?.InfoLink,
+                CoverImageUrl = volume?.ImageLinks.Thumbnail.Replace("zoom=1", "zoom=3")
             };
         }
     }

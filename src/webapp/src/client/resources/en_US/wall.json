@@ -11,6 +11,7 @@
   "imageSizeExceeded": "The selected file is too big to upload! Maximum file size is 5MB.",
   "imageUploadError": "Failed to upload an image! File is invalid.",
   "like": "Like",
+  "markAsRead": "Mark as Read",
   "message": "Comment",
   "multipleImageUploadError": "You can not upload multiple images to a single post.",
   "newPostsAvailable": "New wall content available!",
@@ -34,6 +35,7 @@
   "postDoesNotExist": "Post not found",
   "wallList": "Walls",
   "all": "My walls",
+  "allWalls": "All walls",
   "discoverWalls": "Discover walls",
   "follow": "Follow",
   "unfollow": "Unfollow",
@@ -55,5 +57,7 @@
   "wallModerators": "Moderators",
   "addModerators": "Add moderators",
   "successToClipboard": "Successfully copied to clipboard!",
-  "markdownSuggestions": "**bold** __underlined__ *italics* ~~strikethrough~~ `code`"
+  "markdownSuggestions": "**bold** __underlined__ *italics* ~~strikethrough~~ `code`",
+  "watch": "Watch",
+  "unwatch": "Unwatch"
 }

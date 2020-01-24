@@ -2,7 +2,19 @@
     <button type="button" class="close" ng-click="vm.cancelKudos()">
         <span aria-hidden="true">&times;</span>
     </button>
-    <h3 class="modal-title" translate="kudos.submitKudosForAchievement"></h3>
+    <h3 class="modal-title" ng-if="vm.isSubmitModal()" translate="kudos.submitKudosForAchievement"></h3>
+    <h3 class="modal-title" ng-if="vm.isSendModal()" translate="kudos.sayThankYouAndSendYourKudos"></h3>
+</div>
+<div class="modal-body" ng-if="vm.isSendModal()">
+    <p class="kudos-remaining-points kudos-bold">
+        <b><span translate="kudos.remainingKudos"></span>: <span data-test-id="kudos-user-widget-remaining-kudos">{{vm.user.remainingKudos}}</span></b>
+    </p>
+    <p>
+        <span translate="kudos.sentKudos"></span>: <span class="kudos-bold" data-test-id="kudos-user-widget-sent-kudos"><b>{{vm.user.sentKudos}}</b></span>
+    </p>
+    <p>
+        <span translate="kudos.availableKudos"></span>: <span class="kudos-bold" data-test-id="kudos-user-widget-available-kudos"><b>{{vm.user.availableKudos}}</b></span>
+    </p>
 </div>
 <div class="modal-body">
     <form role="form" name="kudosifyForm">
@@ -24,33 +36,35 @@
                     <auto-complete source="vm.getUsers($query)" min-length="2" max-results-to-show="5" debounce-delay="500"></auto-complete>
                 </tags-input>
         </div>
-
-        <div class="form-group required-right">
+        <div class="form-group required-right" ng-if="vm.isSubmitModal()">
             <label for="choose-type" translate="kudos.chooseType"></label>
             <div class="kudos-modal-buttons-group kudos-points-type">
                 <button class="btn btn-sm btn-info kudos-type-button kudos-points-type kudosify-modal-buttons-inactive"
+                        ng-repeat="kudosType in vm.kudosTypes"
+                        ng-if=":: vm.isVisibleKudosType(kudosType)"
                         type="button"
-                        uib-tooltip="{{kudosType.description | translate }}"
+                        uib-tooltip="{{kudosType.description}}"
                         tooltip-placement="bottom"
                         tooltip-class="word-break"
                         tooltip-append-to-body="true"
                         ng-model="vm.pointsType"
-                        ng-click="vm.setModalType(kudosType, $event)"
-                        ng-repeat="kudosType in vm.kudosTypes"
-                        data-test-id="{{kudosType.name}}" ng-cloak>
+                        ng-click="vm.chooseKudosType(kudosType, $event)"
+                        data-test-id="{{kudosType.name}}" 
+                        ng-cloak>
                     {{:: kudosType.name}} ({{:: kudosType.value}})
                 </button>
             </div>
         </div>
 
         <div class="form-group required-right" ng-class="{ 'has-error' : kudosifyForm.multiplyBy.$invalid && !kudosifyForm.multiplyBy.$pristine }">
-            <label for="multiply" translate="kudos.multiplyBy"></label>
+            <label for="multiply" ng-if="vm.isSubmitModal()" translate="kudos.multiplyBy"></label>
+            <label for="multiply" ng-if="vm.isSendModal()" translate="kudos.amountOfKudos"></label>
             <input class="form-control"
                    type="number"
                    name="multiplyBy"
                    ng-pattern="/^[0-9]{1,9}$/"
                    ng-model="vm.kudosifyInfo.multiplyBy"
-                   ng-change="vm.onMultiplierValueChanged()"
+                   ng-change="vm.recalculateTotalPoints()"
                    min="1" max="{{vm.maxMinus}}"
                    required
                    ignore-mouse-wheel
@@ -63,7 +77,7 @@
             </p>
         </div>
 
-        <div class="form-group required-right" has-permissions="['KUDOS_ADMINISTRATION']" ng-class="{ 'has-error' : kudosifyForm.totalPoints.$invalid && !kudosifyForm.totalPoints.$pristine }">
+        <div class="form-group required-right" ng-if="vm.isSubmitModal()" has-permissions="['KUDOS_ADMINISTRATION']" ng-class="{ 'has-error' : kudosifyForm.totalPoints.$invalid && !kudosifyForm.totalPoints.$pristine }">
             <label for="totalPoints" translate="kudos.points"></label>
             <input class="form-control"
                    type="number"
@@ -102,17 +116,17 @@
 
         <div class="kudos-image-upload-component" has-permissions="['PICTURE_BASIC']">
             <span for="kudos-image" translate="kudos.kudosPhoto"></span>
-            <input 
+            <input
                 name="kudos-image"
                 type="file"
                 accept="image/*"
                 onchange="angular.element(this).scope().vm.attachImage(this)"
                 data-test-id="image-upload-input-field">
         </div>
-    
+
         <div image-preview-thumb
             ng-if="vm.imageSource"
-            source="vm.imageSource" 
+            source="vm.imageSource"
             sources="vm.attachedFiles">
         </div>
 
@@ -124,7 +138,8 @@
             ng-disabled="vm.isBusy || kudosifyForm.$invalid || !vm.pointsType.id || !vm.kudosReceivers.length"
             ng-click="vm.submitKudos(vm.kudosReceivers, vm.kudosifyInfo, vm.pointsType)"
             data-test-id="ok-button-green">
-            <span translate="common.submit"></span>
+            <span ng-if="vm.isSubmitModal()" translate="common.submit"></span>
+            <span ng-if="vm.isSendModal()" translate="common.send"></span>
     </button>
     <button class="btn btn-default"
             ng-click="vm.cancelKudos()"

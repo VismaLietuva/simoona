@@ -14,5 +14,6 @@ namespace Shrooms.EntityModels.Models.Kudos
 
         [MaxLength(BusinessLayerConstants.MaxKudosDescriptionLength)]
         public string Description { get; set; }
+        public bool IsActive { get; set; }
     }
 }

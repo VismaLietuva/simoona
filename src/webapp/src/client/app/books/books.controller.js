@@ -32,6 +32,7 @@
         vm.changePage = changePage;
         vm.searchFilter = searchFilter;
         vm.toggleOffice = toggleOffice;
+        vm.updateBooksCovers = updateBooksCovers;
         vm.isLoading = true;
 
         init();
@@ -42,11 +43,12 @@
             bookRepository.getAllOffices().then(function (response) {
                 vm.offices = response;
 
-                if (!!response) {
-                    vm.filter.officeId = response[0].id;
+                if (vm.offices.length !== 0) {
+                    vm.filter.officeId = vm.offices[0].id;
+                    getFilteredBooks(vm.filter);
                 }
 
-                getFilteredBooks(vm.filter);
+                    vm.isLoading = false;              
             });
         }
 
@@ -107,6 +109,15 @@
             vm.filter.officeId = office.id;
 
             getFilteredBooks(vm.filter);
+        }
+
+        function updateBooksCovers() {
+        var successMessage = localeSrv.translate('books.coversWillBeUpdatedSoon');
+            bookRepository.updateBooksCovers().then(function () {
+                notifySrv.success(successMessage);
+            }, function (response) {
+                notifySrv.error(response.data.message);
+            });
         }
     }
 })();

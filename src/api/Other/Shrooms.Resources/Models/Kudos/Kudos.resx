@@ -168,4 +168,13 @@
   <data name="ExportColumnStatus" xml:space="preserve">
     <value>Status</value>
   </data>
+  <data name="KudosTypeMinusDescription" xml:space="preserve">
+    <value>Use Minus to deduct any Kudos amount from a user’s Kudos account</value>
+  </data>
+  <data name="KudosTypeOtherDescription" xml:space="preserve">
+    <value>Use Other, if you want to give Kudos for something that is not listed in the Kudos type list</value>
+  </data>
+  <data name="KudosTypeSendDescription" xml:space="preserve">
+    <value>Use Send, to instantly give Kudos to your colleague from your own Kudos account. No Admin approval is needed</value>
+  </data>
 </root>

@@ -38,7 +38,7 @@
                 enableZoom: true,
                 maxZoom: 5,
                 minZoom: 0.5,
-                aspectRatio: 1,
+                aspectRatio: 1
             };
 
             return {
@@ -48,7 +48,7 @@
                 setOptions: function(options) {
                     angular.extend(settings, options);
 
-                   
+
 
                     this.container = settings.container;
                     this.paper = settings.paper;
@@ -241,7 +241,7 @@
                         e.preventDefault();
                     });
 
-                    setOptionsDeferrer = $q.defer(),
+                    setOptionsDeferrer = $q.defer();
                     setOptionsPromise = setOptionsDeferrer.promise;
                 },
                 resetZoom: function(animationDelay) {
@@ -361,7 +361,7 @@
                         y: 0
                     };
                     for (var i = 0; i < coords.length; i++) {
-                        if ((i + 1) % 2 == 0) {
+                        if ((i + 1) % 2 === 0) {
                             center.y += (coords[i] * this.aspectRatio);
                         } else {
                             center.x += (coords[i] * this.aspectRatio);

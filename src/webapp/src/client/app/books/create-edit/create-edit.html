@@ -7,250 +7,267 @@
                     <span translate="books.books"></span>: {{:: vm.currentOffice.name}}
                 </span>
             </div>
-            <div class="panel-body">
-                <form name="bookForm" class="form-horizontal">
-                    <!-- ISBN code input -->
-                    <div class="form-group" ng-class="{'has-error': bookForm.isbn ? bookForm.isbn.$invalid && bookForm.isbn.$dirty : false}">
-                        <label for="inputIsbn" class="control-label col-xs-12 col-sm-4" ng-if="(vm.isBookAdministrator && vm.state.add) || vm.book.isbn" translate="books.isbn"></label>
-                        <div class="col-xs-12 col-sm-6 col-md-4" ng-if="vm.isBookAdministrator && vm.state.add">
-                            <input id="inputIsbn"
-                                   type="text"
-                                   class="form-control"
-                                   name="isbn"
-                                   ng-model="vm.book.isbn"
-                                   ng-maxlength="20"
-                                   data-test-id="book-form-isbn-input"/>
+                <div class="row book-body">
+                    <div ng-if="vm.book.coverUrl" class="hidden-xs col-xs-4 book-cover">
+                        <img class="resize" src={{vm.book.coverUrl}}/>
+                    </div>
+                    <div ng-class="{'col-xs-12 panel-body': !vm.book.coverUrl, 'col-xs-8 panel-body float-left': vm.book.coverUrl}">
+                        <form name="bookForm" class="form-horizontal book-form">
 
-                            <p class="text-danger help-block" ng-if="bookForm.isbn.$error.maxlength && bookForm.isbn.$dirty" ng-cloak>
-                                {{:: vm.isbnInvalid}}
-                            </p>
-                        </div>
-                        <div class="col-xs-12 col-sm-6 col-md-4" ng-if="vm.state.edit && vm.book.isbn">
-                            <p data-test-id="book-isbn" class="form-control-static" ng-cloak>
-                                {{:: vm.book.isbn}}
-                            </p>
-                        </div>
-
-                        <div ng-if="vm.isBookAdministrator && vm.state.add" 
-                             class="col-xs-12 col-sm-4 col-sm-offset-4 col-md-offset-0 col-md-4">
-                            <a class="btn btn-default find-book-btn"
-                               ng-disabled="!vm.book.isbn || bookForm.isbn.$error.maxlength"
-                               ng-click="vm.findBookByIsbn(bookForm.isbn.$viewValue)"
-                               data-test-id="find-book-by-isbn-button"
-                               translate="books.findThisBook"></a>
-                        </div>
-                    </div>
-                    <!-- Book title input -->
-                    <div class="form-group" ng-class="{'required': vm.isBookAdministrator, 'has-error': bookForm.title ? bookForm.title.$invalid && bookForm.title.$dirty : false}">
-                        <label for="textareaTitle" class="control-label col-xs-12 col-sm-4" translate="books.title"></label>
-                        <div class="col-xs-12 col-sm-6 col-md-4" ng-if="vm.isBookAdministrator">
-                            <textarea id="textareaTitle"
-                                     type="text"
-                                     class="form-control"
-                                     name="title"
-                                     ng-model="vm.book.title"
-                                     required
-                                     rows="3"
-                                     data-test-id="book-form-title-input"></textarea>
-
-                            <p class="text-danger help-block" ng-if="bookForm.title.$invalid && bookForm.title.$dirty" translate="common.messageFieldIsRequired"></p>
-                        </div>
-                        <div class="col-xs-12 col-sm-6 col-md-4" ng-if="!vm.isBookAdministrator">
-                            <p ng-if="vm.book.url" class="form-control-static word-break">
-                                <a href="{{ vm.normalizeUrl(vm.book.url) }}" target="_blank" data-test-id="book-url">
-                                    {{:: vm.book.title}}
-                                </a>
-                            </p>
-                            <p ng-if="!vm.book.url" class="form-control-static word-break" data-test-id="book-title">
-                                {{:: vm.book.title}}
-                            </p>
-                        </div>
-                    </div>
-                    <!-- Book author input -->
-                    <div class="form-group" ng-class="{'required': vm.isBookAdministrator, 'has-error': bookForm.author ? bookForm.author.$invalid && bookForm.author.$dirty : false}">
-                        <label for="inputAuthor" class="control-label col-xs-12 col-sm-4" translate="books.author"></label>
-                        <div class="col-xs-12 col-sm-6 col-md-4" ng-if="vm.isBookAdministrator">
-                            <input id="inputAuthor"
-                                   type="text"
-                                   class="form-control"
-                                   name="author"
-                                   ng-model="vm.book.author"
-                                   data-test-id="book-form-author-input" required/>
-
-                           <p class="text-danger help-block" ng-if="bookForm.author.$invalid && bookForm.author.$dirty" translate="common.messageFieldIsRequired"></p>
-                        </div>
-                        <div class="col-xs-12 col-sm-6 col-md-4" ng-if="!vm.isBookAdministrator">
-                            <p class="form-control-static word-break" data-test-id="book-author" ng-cloak>
-                                {{:: vm.book.author}}
-                            </p>
-                        </div>
-                    </div>
-                    <!-- Book url input -->
-                    <div ng-if="vm.isBookAdministrator" class="form-group" ng-class="{'has-error': bookForm.url ? bookForm.url.$invalid && bookForm.url.$dirty : false}">
-                        <label for="inputUrl" class="control-label col-xs-12 col-sm-4" translate="books.bookUrl"></label>
-                        <div class="col-xs-12 col-sm-6 col-md-4" ng-if="vm.isBookAdministrator">
-                            <input id="inputUrl"
-                                   type="text"
-                                   class="form-control"
-                                   name="url"
-                                   ng-model="vm.book.url"
-                                   data-test-id="book-form-url-input" />
-                           <p class="text-danger help-block" ng-if="bookForm.url.$invalid && bookForm.url.$dirty" translate="common.messageFieldIsRequired"></p>
-                        </div>
-                    </div>
-                    <!-- Book owner input-->
-                    <div class="form-group" ng-class="{'has-error': bookForm.owner ? bookForm.owner.$invalid && bookForm.owner.$dirty : false}">
-                        <label for="bookOwner" class="control-label col-xs-12 col-sm-4" translate="books.owner" ng-if="vm.isBookAdministrator || vm.book.ownerId"></label>
-                        <div class="col-xs-12 col-sm-6 col-md-4" ng-if="vm.isBookAdministrator">
-                            <autocomplete id="bookOwner" load-data="vm.searchUsers" shown="fullName" bound-model="vm.owner" with-image="true" data-test-id="book-form-book-owner-autocomplete-input">
-                            </autocomplete>
-                            <p class="text-danger help-block" ng-if="bookForm.owner.$invalid && bookForm.owner.$dirty" translate="common.messageFieldIsRequired"></p>
-                        </div>
-                        <div class="col-xs-12 col-sm-6 col-md-4" ng-if="!vm.isBookAdministrator">
-                            <p class="form-control-static word-break" data-test-id="book-owner" ng-cloak>
-                                {{:: vm.book.ownerFullName}}
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <!-- Book note input -->
-                    <div class="form-group" ng-class="{'has-error': bookForm.note ? bookForm.note.$invalid && bookForm.note.$dirty : false}">
-                        <label for="inputNote" class="control-label col-xs-12 col-sm-4" ng-if="vm.isBookAdministrator || vm.book.note" translate="books.note"></label>
-                        <div class="col-xs-12 col-sm-6 col-md-4" ng-if="vm.isBookAdministrator">
-                            <textarea id="inputNote"
+                        <!-- ISBN code input -->
+                        <div class="form-group" ng-class="{'has-error': bookForm.isbn ? bookForm.isbn.$invalid && bookForm.isbn.$dirty : false}">
+                            <label for="inputIsbn" class="control-label col-xs-12 col-sm-4" ng-if="(vm.isBookAdministrator && vm.state.add) || vm.book.isbn" translate="books.isbn"></label>
+                            <div class="col-xs-12 col-sm-6 col-md-4" ng-if="vm.isBookAdministrator && vm.state.add">
+                                <input id="inputIsbn"
                                     type="text"
                                     class="form-control"
-                                    name="note"
-                                    ng-model="vm.book.note"
-                                    rows="3"
-                                    data-test-id="book-form-note-input"></textarea>
-                           <p class="text-danger help-block" ng-if="bookForm.note.$invalid && bookForm.note.$dirty" translate="common.messageFieldIsRequired"></p>
-                        </div>
-                        <div class="col-xs-12 col-sm-6 col-md-4" ng-if="!vm.isBookAdministrator">
-                            <p class="form-control-static word-break" data-test-id="book-owner" ng-cloak>
-                                {{:: vm.book.note}}
-                            </p>
-                        </div>
-                    </div>
-                    <!-- Book quantities inputs -->
-                    <ng-form name="quantityFieldForm" ng-repeat="office in vm.book.quantityByOffice track by office.officeId" ng-if="vm.isBookAdministrator">
-                        <div class="form-group required" ng-class="{'has-error': quantityFieldForm.inputQuantity ? quantityFieldForm.inputQuantity.$invalid && quantityFieldForm.inputQuantity.$dirty : false}">
-                            <label for="inputQuantity{{office.officeId}}" class="control-label col-xs-12 col-sm-4" ng-cloak><span translate="books.quantity"></span> {{:: office.officeName}}</label>
-                            <div class="col-xs-12 col-sm-6 col-md-4">
-                                <input id="inputQuantity{{office.officeId}}"
-                                       type="number"
-                                       class="form-control"
-                                       name="inputQuantity"
-                                       ng-model="vm.book.quantityByOffice[$index].bookQuantity"
-                                       ng-disabled="!vm.isBookAdministrator"
-                                       min="0"
-                                       data-test-id="book-form-quantity-input" required/>
+                                    name="isbn"
+                                    ng-model="vm.book.isbn"
+                                    ng-maxlength="20"
+                                    data-test-id="book-form-isbn-input"/>
 
-                                <p class="text-danger help-block" ng-show="quantityFieldForm.inputQuantity.$invalid && quantityFieldForm.inputQuantity.$dirty" translate="common.fieldValueOneSymbol"></p>
+                                <p class="text-danger help-block" ng-if="bookForm.isbn.$error.maxlength && bookForm.isbn.$dirty" ng-cloak>
+                                    {{:: vm.isbnInvalid}}
+                                </p>
+                            </div>
+                            <div class="col-xs-12 col-sm-6 col-md-4" ng-if="vm.state.edit && vm.book.isbn">
+                                <p data-test-id="book-isbn" class="form-control-static" ng-cloak>
+                                    {{:: vm.book.isbn}}
+                                </p>
+                            </div>
+
+                            <div ng-if="vm.isBookAdministrator && vm.state.add" 
+                                class="col-xs-12 col-sm-4 col-sm-offset-4 col-md-offset-0 col-md-4">
+                                <a class="btn btn-default find-book-btn"
+                                ng-disabled="!vm.book.isbn || bookForm.isbn.$error.maxlength"
+                                ng-click="vm.findBookByIsbn(bookForm.isbn.$viewValue)"
+                                data-test-id="find-book-by-isbn-button"
+                                translate="books.findThisBook"></a>
                             </div>
                         </div>
-                    </ng-form>
-                    <br/>
-                    <!-- Book taken log table -->
-                    <table class="nc-table nc-table-active book-log-list-table" 
-                           ng-if="vm.book.bookLogs.length">
-                        <thead>
-                            <tr>
-                                <th class="book-log-list-table-small-column" 
-                                    translate="books.whoHasIt"></th>
-                                <th class="book-log-list-table-small-column" 
-                                    translate="books.whenTookIt"></th>
-                                <th class="book-log-list-table-small-column" 
-                                    translate="books.whenPlansToReturn"></th>
-                                <th class="text-right book-log-list-table-small-column" 
-                                    ng-if="vm.isActionColumn || vm.isBookAdministrator" 
-                                    translate="books.actions"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr ng-repeat="book in vm.book.bookLogs">
-                                <td th="{{ 'books.whoHasIt' | translate }}" 
-                                    class="book-log-list-table-small-column"                                 
-                                    ng-class="{'col-sm-5': vm.isActionColumn, 'col-sm-6': !vm.isActionColumn}" 
-                                    data-test-id="reader-full-name" 
-                                    ng-cloak>
-                                    {{book.fullName}}
-                                </td>
-                                <td th="{{ 'books.whenTookIt' | translate }}" 
-                                    class="col-sm-3 book-log-list-table-small-column" 
-                                    data-test-id="taken-date" 
-                                    ng-cloak>
-                                    {{book.takenFrom | date : 'yyyy-MM-dd' }}
-                                </td>
-                                <td th="{{ 'books.whenPlansToReturn' | translate }}" 
-                                    class="col-sm-3 book-log-list-table-small-column" 
-                                    data-test-id="return-date" 
-                                    ng-cloak>
-                                    <span ng-if="book.returned">
-                                        {{book.returned | date : 'yyyy-MM-dd' }}
-                                    </span>
-                                </td>
-                                <td class="col-sm-1 book-actions-nowrap hidden-xs" 
-                                    ng-if="vm.isActionColumn || vm.isBookAdministrator">
-                                    <a class="btn btn-default margin-right"
-                                       ng-if="(book.userId === vm.identity.userId || vm.isBookAdministrator) && !book.returned"
-                                       ng-click="(vm.isBookAdministrator) ? vm.returnBookAdmin(vm.book, book.userId) : vm.returnBook(vm.book)"
-                                       data-test-id="book-return-button" 
-                                       translate="books.returnBook"></a>
-                                </td>
-                                <td class="book-actions-nowrap no-responsive-title book-actions-container hidden-sm hidden-md hidden-lg" 
-                                    ng-if="(vm.isActionColumn || vm.isBookAdministrator) && !book.returned ">
+                        <!-- Book title input -->
+                        <div class="form-group" ng-class="{'required': vm.isBookAdministrator, 'has-error': bookForm.title ? bookForm.title.$invalid && bookForm.title.$dirty : false}">
+                            <label for="textareaTitle" class="control-label col-xs-12 col-sm-4" translate="books.title"></label>
+                            <div class="col-xs-12 col-sm-6 col-md-4" ng-if="vm.isBookAdministrator">
+                                <textarea id="textareaTitle"
+                                        type="text"
+                                        class="form-control"
+                                        name="title"
+                                        ng-model="vm.book.title"
+                                        required
+                                        rows="3"
+                                        data-test-id="book-form-title-input"></textarea>
 
-                                    <a class="btn btn-default"
-                                       ng-if="(book.userId === vm.identity.userId || vm.isBookAdministrator) && !book.returned"
-                                       ng-click="(vm.isBookAdministrator) ? vm.returnBookAdmin(vm.book, book.userId) : vm.returnBook(vm.book)"
-                                       data-test-id="book-return-button" 
-                                       translate="books.returnBook"></a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="clearfix"></div>
-                    <!-- Buttons left -->
-                    <div class="pull-left book-button" 
-                         ng-if="vm.isBookAdministrator">
-                        <button ng-if="vm.state.edit"
-                                class="btn btn-danger"
-                                ace-confirmation-modal="vm.deleteBook(vm.book)"
-                                data-test-id="book-delete-button">
-                                <span translate="common.delete"></span>
-                        </button>
-                    </div>
-                    <!-- Buttons right -->
-                    <div class="pull-right book-button">
-                        <button class="btn btn-default"
-                                ui-sref="Root.WithOrg.Client.Books.List"
-                                data-test-id="book-cancel-button">
-                                <span translate="common.cancel"></span>
-                        </button>
-                    </div>
-                    <div class="pull-right book-button">
-                        <button ng-if="vm.isBookAdministrator"
-                                class="btn btn-primary"
-                                ng-click="vm.saveBook(vm.book)"
-                                ng-disabled="bookForm.$invalid"
-                                data-test-id="book-save-button">
-                                <span translate="common.save"></span>
-                        </button>
-                    </div>
-                    <div class="pull-right book-button">
-                        <button ng-if="vm.state.edit && vm.book.canBeTaken"
-                                class="btn btn-primary"
-                                has-permissions="['BOOK_BASIC']"
-                                ng-click="vm.takeBook(vm.book)"
-                                data-test-id="book-take-button">
-                                <span translate="books.takeBook"></span>
-                        </button>
-                    </div>
+                                <p class="text-danger help-block" ng-if="bookForm.title.$invalid && bookForm.title.$dirty" translate="common.messageFieldIsRequired"></p>
+                            </div>
+                            <div class="col-xs-12 col-sm-6 col-md-4" ng-if="!vm.isBookAdministrator">
+                                <p ng-if="vm.book.url" class="form-control-static word-break">
+                                    <a href="{{ vm.normalizeUrl(vm.book.url) }}" target="_blank" data-test-id="book-url">
+                                        {{:: vm.book.title}}
+                                    </a>
+                                </p>
+                                <p ng-if="!vm.book.url" class="form-control-static word-break" data-test-id="book-title">
+                                    {{:: vm.book.title}}
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Book author input -->
+                        <div class="form-group" ng-class="{'required': vm.isBookAdministrator, 'has-error': bookForm.author ? bookForm.author.$invalid && bookForm.author.$dirty : false}">
+                            <label for="inputAuthor" class="control-label col-xs-12 col-sm-4" translate="books.author"></label>
+                            <div class="col-xs-12 col-sm-6 col-md-4" ng-if="vm.isBookAdministrator">
+                                <input id="inputAuthor"
+                                    type="text"
+                                    class="form-control"
+                                    name="author"
+                                    ng-model="vm.book.author"
+                                    data-test-id="book-form-author-input" required/>
 
-                    <div class="clearfix"></div>
-                </form>
+                            <p class="text-danger help-block" ng-if="bookForm.author.$invalid && bookForm.author.$dirty" translate="common.messageFieldIsRequired"></p>
+                            </div>
+                            <div class="col-xs-12 col-sm-6 col-md-4" ng-if="!vm.isBookAdministrator">
+                                <p class="form-control-static word-break" data-test-id="book-author" ng-cloak>
+                                    {{:: vm.book.author}}
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Book url input -->
+                        <div ng-if="vm.isBookAdministrator" class="form-group" ng-class="{'has-error': bookForm.url ? bookForm.url.$invalid && bookForm.url.$dirty : false}">
+                            <label for="inputUrl" class="control-label col-xs-12 col-sm-4" translate="books.bookUrl"></label>
+                            <div class="col-xs-12 col-sm-6 col-md-4" ng-if="vm.isBookAdministrator">
+                                <input id="inputUrl"
+                                    type="text"
+                                    class="form-control"
+                                    name="url"
+                                    ng-model="vm.book.url"
+                                    data-test-id="book-form-url-input" />
+                            <p class="text-danger help-block" ng-if="bookForm.url.$invalid && bookForm.url.$dirty" translate="common.messageFieldIsRequired"></p>
+                            </div>
+                        </div>
+                        <!-- Book owner input-->
+                        <div ng-if="vm.isBookAdministrator || (!vm.isBookAdministrator && !!vm.book.ownerFullName)" class="form-group" ng-class="{'has-error': bookForm.owner ? bookForm.owner.$invalid && bookForm.owner.$dirty : false}">
+                            <label for="bookOwner" class="control-label col-xs-12 col-sm-4" translate="books.owner" ng-if="vm.isBookAdministrator || vm.book.ownerId"></label>
+                            <div class="col-xs-12 col-sm-6 col-md-4" ng-if="vm.isBookAdministrator">
+                                <autocomplete id="bookOwner" load-data="vm.searchUsers" shown="fullName" bound-model="vm.owner" with-image="true" data-test-id="book-form-book-owner-autocomplete-input">
+                                </autocomplete>
+                                <p class="text-danger help-block" ng-if="bookForm.owner.$invalid && bookForm.owner.$dirty" translate="common.messageFieldIsRequired"></p>
+                            </div>
+                            <div class="col-xs-12 col-sm-6 col-md-4" ng-if="!vm.isBookAdministrator && !!vm.book.ownerFullName">
+                                <p class="form-control-static word-break" data-test-id="book-owner" ng-cloak>
+                                    {{:: vm.book.ownerFullName}}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- Book note input -->
+                        <div ng-if="vm.isBookAdministrator || (!vm.isBookAdministrator && !!vm.book.note)" class="form-group" ng-class="{'has-error': bookForm.note ? bookForm.note.$invalid && bookForm.note.$dirty : false}">
+                            <label for="inputNote" class="control-label col-xs-12 col-sm-4" ng-if="vm.isBookAdministrator || vm.book.note" translate="books.note"></label>
+                            <div class="col-xs-12 col-sm-6 col-md-4" ng-if="vm.isBookAdministrator">
+                                <textarea id="inputNote"
+                                        type="text"
+                                        class="form-control"
+                                        name="note"
+                                        ng-model="vm.book.note"
+                                        rows="3"
+                                        data-test-id="book-form-note-input"></textarea>
+                            <p class="text-danger help-block" ng-if="bookForm.note.$invalid && bookForm.note.$dirty" translate="common.messageFieldIsRequired"></p>
+                            </div>
+                            <div class="col-xs-12 col-sm-6 col-md-4" ng-if="!vm.isBookAdministrator">
+                                <p class="form-control-static word-break" data-test-id="book-owner" ng-cloak>
+                                    {{:: vm.book.note}}
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Book quantities inputs -->
+                        <ng-form name="quantityFieldForm" ng-repeat="office in vm.book.quantityByOffice track by office.officeId" ng-if="vm.isBookAdministrator">
+                            <div class="form-group required" ng-class="{'has-error': quantityFieldForm.inputQuantity ? quantityFieldForm.inputQuantity.$invalid && quantityFieldForm.inputQuantity.$dirty : false}">
+                                <label for="inputQuantity{{office.officeId}}" class="control-label col-xs-12 col-sm-4" ng-cloak><span translate="books.quantity"></span> {{:: office.officeName}}</label>
+                                <div class="col-xs-12 col-sm-6 col-md-4">
+                                    <input id="inputQuantity{{office.officeId}}"
+                                        type="number"
+                                        class="form-control"
+                                        name="inputQuantity"
+                                        ng-model="vm.book.quantityByOffice[$index].bookQuantity"
+                                        ng-disabled="!vm.isBookAdministrator"
+                                        min="0"
+                                        data-test-id="book-form-quantity-input" required/>
+
+                                    <p class="text-danger help-block" ng-show="quantityFieldForm.inputQuantity.$invalid && quantityFieldForm.inputQuantity.$dirty" translate="common.fieldValueOneSymbol"></p>
+                                </div>
+                            </div>
+                        </ng-form>
+                        <br/>
+                    </form>
+                </div>
             </div>
+            <div class="row books-taken">
+                <div class="col-xs-12">
+                    <!-- Book taken log table -->
+                    <table class="nc-table nc-table-active book-log-list-table"
+                    ng-if="vm.book.bookLogs.length">
+                    <thead>
+                        <tr>
+                            <th class="book-log-list-table-small-column" 
+                                translate="books.whoHasIt"></th>
+                            <th class="book-log-list-table-small-column" 
+                                translate="books.whenTookIt"></th>
+                            <th class="book-log-list-table-small-column" 
+                                translate="books.whenPlansToReturn"></th>
+                            <th class="text-right book-log-list-table-small-column" 
+                                ng-if="vm.isActionColumn || vm.isBookAdministrator" 
+                                translate="books.actions"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="book in vm.book.bookLogs">
+                            <td th="{{ 'books.whoHasIt' | translate }}" 
+                                class="book-log-list-table-small-column"                                 
+                                ng-class="{'col-sm-5': vm.isActionColumn, 'col-sm-6': !vm.isActionColumn}" 
+                                data-test-id="reader-full-name" 
+                                ng-cloak>
+                                {{book.fullName}}
+                            </td>
+                            <td th="{{ 'books.whenTookIt' | translate }}" 
+                                class="col-sm-3 book-log-list-table-small-column" 
+                                data-test-id="taken-date" 
+                                ng-cloak>
+                                {{book.takenFrom | date : 'yyyy-MM-dd' }}
+                            </td>
+                            <td th="{{ 'books.whenPlansToReturn' | translate }}" 
+                                class="col-sm-3 book-log-list-table-small-column" 
+                                data-test-id="return-date" 
+                                ng-cloak>
+                                <span ng-if="book.returned">
+                                    {{book.returned | date : 'yyyy-MM-dd' }}
+                                </span>
+                            </td>
+                            <td class="col-sm-1 book-actions-nowrap hidden-xs" 
+                                ng-if="vm.isActionColumn || vm.isBookAdministrator">
+                                <a class="btn btn-default margin-right"
+                                ng-if="(book.userId === vm.identity.userId || vm.isBookAdministrator) && !book.returned"
+                                ng-click="(vm.isBookAdministrator) ? vm.returnBookAdmin(vm.book, book.userId) : vm.returnBook(vm.book)"
+                                data-test-id="book-return-button" 
+                                translate="books.returnBook"></a>
+                            </td>
+                            <td class="book-actions-nowrap no-responsive-title book-actions-container hidden-sm hidden-md hidden-lg" 
+                                ng-if="(vm.isActionColumn || vm.isBookAdministrator) && !book.returned ">
+                
+                                <a class="btn btn-default"
+                                ng-if="(book.userId === vm.identity.userId || vm.isBookAdministrator) && !book.returned"
+                                ng-click="(vm.isBookAdministrator) ? vm.returnBookAdmin(vm.book, book.userId) : vm.returnBook(vm.book)"
+                                data-test-id="book-return-button" 
+                                translate="books.returnBook"></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="row book-buttons">
+            <div class="col-xs-12">
+                <!-- Buttons left -->
+                <div class="pull-left book-button" 
+                    ng-if="vm.isBookAdministrator">
+                    <button ng-if="vm.state.edit"
+                            class="btn btn-danger"
+                            ace-confirmation-modal="vm.deleteBook(vm.book)"
+                            data-test-id="book-delete-button">
+                            <span translate="common.delete"></span>
+                    </button>
+                </div>
+                <!-- Buttons right -->
+                <div class="pull-right book-button">
+                    <button class="btn btn-default"
+                            ui-sref="Root.WithOrg.Client.Books.List"
+                            data-test-id="book-cancel-button">
+                            <span translate="common.cancel"></span>
+                    </button>
+                </div>
+                <div class="pull-right book-button">
+                    <button class="btn btn-warning" ng-if="vm.state.edit" ace-books-report-modal>
+                            <span translate="books.report"></span>
+                    </button>
+                </div>
+                <div class="pull-right book-button">
+                    <button ng-if="vm.isBookAdministrator"
+                            class="btn btn-primary"
+                            ng-click="vm.saveBook(vm.book)"
+                            ng-disabled="bookForm.$invalid"
+                            data-test-id="book-save-button">
+                            <span translate="common.save"></span>
+                    </button>
+                </div>
+                <div class="pull-right book-button">
+                    <button ng-if="vm.state.edit && vm.book.canBeTaken"
+                            class="btn btn-primary"
+                            has-permissions="['BOOK_BASIC']"
+                            ng-click="vm.takeBook(vm.book)"
+                            data-test-id="book-take-button">
+                            <span translate="books.takeBook"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
         </div>
     </div>
 </div>

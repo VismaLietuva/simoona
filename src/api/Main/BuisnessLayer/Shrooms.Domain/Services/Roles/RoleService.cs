@@ -34,6 +34,11 @@ namespace Shrooms.Domain.Services.Roles
             return x => x.Roles.All(y => y.RoleId != roleId);
         }
 
+        public IEnumerable<string> GetRoleIdsByNames(params string[] names)
+        {
+            return _roleDbSet.Where(x => names.Any(n => n == x.Name)).Select(x => x.Id);
+        }
+
         public IEnumerable<RoleDTO> GetRolesForAutocomplete(string search, UserAndOrganizationDTO userOrg)
         {
             return _roleDbSet

@@ -12,28 +12,37 @@
             templateUrl: 'app/events/join/join.html',
             controller: eventJoinController,
             controllerAs: 'vm'
+        })
+        .constant("attendStatus", {
+            NotAttending: 0,
+            Attending: 1,
+            MaybeAttending: 2,
+            Idle: 3
         });
 
     eventJoinController.$inject = [
-        '$state',
         '$uibModal',
         'eventRepository',
         'notifySrv',
         'errorHandler',
         'authService',
-        'eventParticipantsService',
-        'Analytics'
+        'Analytics',
+        'attendStatus'
     ];
 
-    function eventJoinController($state, $uibModal, eventRepository, notifySrv, errorHandler,
-        authService, eventParticipantsService, Analytics) {
+    function eventJoinController($uibModal, eventRepository, notifySrv, errorHandler,
+        authService, Analytics, attendStatus) {
         /* jshint validthis: true */
         var vm = this;
 
+        vm.attendStatus = attendStatus;
         vm.enableAction = true;
         vm.joinEvent = joinEvent;
         vm.leaveEvent = leaveEvent;
+        vm.updateEventStatus = updateEventStatus;
         vm.hasDatePassed = hasDatePassed;
+        vm.openJoinCommentModal = openJoinCommentModal;
+        vm.closeModal = closeModal;
 
         ////////
         function joinEvent(eventId) {
@@ -48,8 +57,10 @@
                         if (!vm.event.availableOptions.length && !vm.isAddColleague) {
                             var selectedOptions = [];
 
-                            eventRepository.joinEvent(eventId, selectedOptions).then(function() {
+                            var comment = "";
+                            eventRepository.joinEvent(eventId, selectedOptions, attendStatus.Attending, comment).then(function() {
                                 handleEventJoin();
+                                notifySrv.success('events.joinedEvent');
                             }, function(error) {
                                 vm.enableAction = true;
                                 errorHandler.handleErrorMessage(error);
@@ -66,14 +77,13 @@
             if (vm.enableAction) {
                 if (canLeaveEvent()) {
                     vm.enableAction = false;
-
-                    eventRepository.leaveEvent(eventId, authService.identity.userId).then(function() {
-                        removeCurrentUser();
+                    var comment = "";
+                    eventRepository.leaveEvent(eventId, authService.identity.userId, comment).then(function() {
+                        handleEventLeave();
                     }, function(error) {
                         var errorActions = {
-                            repeat: removeCurrentUser
+                            repeat: handleEventLeave
                         };
-
                         vm.enableAction = true;
 
                         errorHandler.handleError(error, errorActions);
@@ -82,18 +92,57 @@
             }
         }
 
-        function removeCurrentUser() {
-            vm.enableAction = true;
-            vm.event.participantsCount--;
-            vm.event.isParticipating = false;
+        function updateEventStatus(eventId, changeToAttendStatus, comment) {
+            if (vm.enableAction) {
+                eventRepository.updateAttendStatus(changeToAttendStatus, comment, eventId).then(function() {
+                    handleEventJoin();
 
-            if (vm.isDetails || vm.isAddColleague) {
-                var currentUserId = authService.identity.userId;
+                    if (changeToAttendStatus == attendStatus.MaybeAttending) {
+                        notifySrv.success('events.maybeJoiningEvent');
+                    }
+                    else if (changeToAttendStatus == attendStatus.NotAttending) {
+                        notifySrv.success('events.notJoiningEvent');
+                    }
 
-                eventParticipantsService.removeParticipant(vm.event.participants, currentUserId);
-                eventParticipantsService.removeParticipantFromOptions(vm.event.options, currentUserId);
+                }, function(error) {
+                    vm.enableAction = true;
+                    errorHandler.handleErrorMessage(error);
+                });
             }
+        }
 
+        function openJoinCommentModal(changeToAttendStatus) {
+            $uibModal.open({
+                templateUrl: 'app/events/join-comment/join-comment.html',
+                controller: 'joinCommentController',
+                controllerAs: 'vm',
+                resolve: {
+                    event: function() {
+                        return vm.event;
+                    },
+                    updateEventStatus: function() {
+                        return vm.updateEventStatus;
+                    },
+                    changeToAttendStatus: function() {
+                        return changeToAttendStatus;
+                    }
+                }
+              });
+        }
+
+        function closeModal() {
+            $uibModalInstance.close();
+        }
+
+        function handleEventLeave() {
+            eventRepository.getEventDetails(vm.event.id).then(function(response) {
+                angular.copy(response, vm.event);
+
+                vm.event.options = response.options;
+                vm.event.participants = response.participants;
+                vm.event.participantsCount = recalculateJoinedParticipants();
+            });
+            vm.enableAction = true;
             notifySrv.success('events.leaveEvent');
         }
 
@@ -104,15 +153,24 @@
 
                     vm.event.options = response.options;
                     vm.event.participants = response.participants;
+                    vm.event.participantsCount = recalculateJoinedParticipants();
                 });
             } else {
-                vm.event.isParticipating = true;
+                vm.event.participatingStatus = attendStatus.Attending;
                 vm.event.participantsCount++;
             }
 
             vm.enableAction = true;
+        }
 
-            notifySrv.success('events.joinedEvent');
+        function recalculateJoinedParticipants() {
+            var participantsCount = 0;
+            vm.event.participants.forEach(function(participant){
+                if (participant.attendStatus == attendStatus.Attending) {
+                    participantsCount++;
+                }
+            });
+            return participantsCount;
         }
 
         function openOptionsModal() {

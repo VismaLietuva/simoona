@@ -12,7 +12,7 @@
   	"messageEventIsFull": "Renginys pilnas",
   	"messageUserAlreadyParticipates": "Renginyje jau dalyvaujate",
   	"messageEventJoinStartedOrFinished": "Negalite dalyvauti prasidėjusiame arba pasibaigusiame renginyje",
-  	"messageEventCannotJoinMultipleSingleJoinEventsCode": "Negalite dalyvauti keliuose tokio pačio tipo renginiuose",
+  	"messageEventCannotJoinMultipleSingleJoinEventsCode": "Negalite dalyvauti keliuose tokio pačio tipo renginiuose, nebent dalyvausit kaip žiūrovas",
 	"messageEventNoSuchOptionsCode": "Tokio pasirinkimo nėra",
 	"messageEventOptionsUnique": "Pasirinkimai turi būti unikalūs",
 	"messageEventDeadlineAfterStartDate": "Renginio registracijos pabaiga negali būti vėlesnė nei renginio pradžia",
@@ -34,5 +34,6 @@
 	"messageNameAlreadyExists": "Toks pavadinimas jau egzistuoja",
 	"messageShopItemAlreadyExists": "Tokia prekė jau egzistuoja",
 	"messageAllFieldsAreRequired": "Visi laukai yra privalomi",
-	"userHasPendingKudos": "Naudotojas turi nepatvirtintų kudosų."
+	"userHasPendingKudos": "Naudotojas turi nepatvirtintų kudosų.",
+	"requestedPageNotFound": "Atsiprašome, puslapis nerastas."
 }

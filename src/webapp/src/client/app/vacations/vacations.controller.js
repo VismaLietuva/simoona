@@ -26,7 +26,6 @@
 
         $rootScope.pageTitle = 'common.vacations';
 
-        //vm.vacationList = [];
         vm.availableDays = {};
         vm.isLoading = false;
 
@@ -38,15 +37,6 @@
         //////////
 
         function init() {
-            // vacationsRepository.getVacationHistory().then(function (response) {
-            //     vm.vacationList = response;
-            //     vm.isLoading = false;
-            // }, function(error) {
-            //     vm.isLoading = false;
-            //     errorHandler.handleErrorMessage(error);
-            // });
-
-            getAvailableDays();
         }
 
         function fileAttached(input) {

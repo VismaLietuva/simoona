@@ -1,4 +1,4 @@
-<ul id="walls-sidebar-nav" ng-if="vm.wallServiceData.wallList.length && !vm.wallServiceData.isWallListLoading" 
+<ul id="walls-sidebar-nav" ng-if="!vm.wallServiceData.isWallListLoading" 
     class="nav nav-sidebar first-level wall-menu-navigation-container">
   <li data-test-id="sidebar-group-walls">
      <span class="glyphicon glyphicon-show-thumbnails"></span><span translate="wall.wallList"></span>
@@ -9,6 +9,14 @@
            ui-sref="Root.WithOrg.Client.Wall.Item.Feed({wall: null, search: null, post: null})"
            ng-class="{active: !vm.state.params.wall && vm.state.includes('Root.WithOrg.Client.Wall.Item.Feed')}"
            translate="wall.all">
+        </a>
+      </li>
+
+      <li ng-if="vm.wallServiceData.wallList.length > 0">
+        <a ng-click="vm.getAllWalls()"
+           ui-sref="Root.WithOrg.Client.Wall.All"
+           ng-class="{active: !vm.state.params.wall && vm.state.includes('Root.WithOrg.Client.Wall.All')}"
+           translate="wall.allWalls">
         </a>
       </li>
 

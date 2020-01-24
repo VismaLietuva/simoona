@@ -8,6 +8,10 @@ namespace Shrooms.WebViewModels.Models.User
 
         public bool EventsEmailNotifications;
 
+        public bool EventWeeklyReminderAppNotifications;
+
+        public bool EventWeeklyReminderEmailNotifications;
+
         public bool ProjectsAppNotifications;
 
         public bool ProjectsEmailNotifications;

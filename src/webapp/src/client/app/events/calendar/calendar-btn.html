@@ -1,0 +1,26 @@
+<span class="dropdown hidden-xs">
+    <a type="button" class="vismaicon vismaicon-add-schedule dropdown-toggle" data-toggle="dropdown" target="_blank"
+        translate-attr-title="events.eventCalendar" translate>
+    </a>
+    <ul class="dropdown-menu event-calendar-dropdown-large-screen">
+        <li><a href="{{vm.googleCalendarRedirect}}" target="_blank">
+                <span class="vismaicon vismaicon-google"></span>
+                <span class="event-calendar-text" translate="events.eventAddToCalendar"></span></a></li>
+        <li><a ng-click="vm.downloadEvent()" target="_blank">
+                <span class="vismaicon vismaicon-download"></span>
+                <span class="event-calendar-text" translate="events.eventDownload"></span></a></li>
+    </ul>
+</span>
+<span class="dropdown hidden-sm hidden-md hidden-lg">
+    <a type="button" class="vismaicon vismaicon-add-schedule dropdown-toggle" data-toggle="dropdown" target="_blank"
+        translate-attr-title="events.eventCalendar" translate>
+    </a>
+    <ul class="dropdown-menu event-calendar-dropdown-small-screen">
+        <li><a href="{{vm.googleCalendarRedirect}}" target="_blank">
+                <span class="vismaicon vismaicon-google"></span>
+                <span class="event-calendar-text" translate="events.eventAddToCalendar"></span></a></li>
+        <li><a ng-click="vm.downloadEvent()" target="_blank">
+                <span class="vismaicon vismaicon-download"></span>
+                <span class="event-calendar-text" translate="events.eventDownload"></span></a></li>
+    </ul>
+</span>

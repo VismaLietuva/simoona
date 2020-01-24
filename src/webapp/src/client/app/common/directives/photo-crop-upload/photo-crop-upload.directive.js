@@ -11,11 +11,12 @@
             replace: true,
             templateUrl: 'app/common/directives/photo-crop-upload/photo-crop-upload.html',
             scope: {
-                image: '=',
                 isCropVisible: '=',
                 aspectRatio: '=',
                 resultImage: '=',
-                imageSize: '='
+                imageSize: '=',
+                multiple: '=',
+                images: "=?"
             },
             controller: photoCropUploadController,
             controllerAs: 'vm',
@@ -36,23 +37,28 @@
     function photoCropUploadController($scope, shroomsFileUploader, imageValidationSettings, notifySrv) {
         /* jshint validthis: true */
         var vm = this;
-
+        vm.images = [];
         $scope.handleFileSelect = handleFileSelect;
-
         ///////
 
         function handleFileSelect(files) {
             if (imageAttached(files)) {
-                vm.image = files[0];
-                if (vm.image) {
+                if (!$scope.multiple) {
+                    vm.images = [];
+                }
+                Object.keys(files).forEach((photo, index) => {
+                    vm.images.push(files[photo]);
+                });
+
+                vm.images.forEach((image) => {
                     var reader = new FileReader();
                     reader.onload = function (files) {
                         $scope.$apply();
                     };
-
-                    reader.readAsDataURL(vm.image);
-                }
+                    reader.readAsDataURL(image)
+                });
             }
+
         }
 
         function imageAttached(input) {

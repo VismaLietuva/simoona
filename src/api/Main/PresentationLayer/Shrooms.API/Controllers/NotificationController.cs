@@ -50,7 +50,9 @@ namespace Shrooms.API.Controllers
 
             foreach (var item in comments)
             {
-                var parentComment = stackedList.Where(x => CompareSourcesIds(x.sourceIds, item.SourceIds)).FirstOrDefault();
+                var parentComment = stackedList
+                    .FirstOrDefault(x => CompareSourcesIds(x.sourceIds, item.SourceIds) && item.Type != NotificationType.EventReminder);
+
                 if (parentComment == null)
                 {
                     stackedList.Add(_mapper.Map<NotificationViewModel>(item));
@@ -65,7 +67,7 @@ namespace Shrooms.API.Controllers
                 }
             }
 
-            return stackedList.AsEnumerable();
+            return stackedList;
         }
 
         private bool CompareSourcesIds(SourcesViewModel viewModel, SourcesDto dtoModel)

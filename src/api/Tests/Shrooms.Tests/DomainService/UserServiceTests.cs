@@ -12,6 +12,7 @@ using Shrooms.Authentification.Membership;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Users;
 using Shrooms.DataTransferObjects.Models.Wall;
+using Shrooms.Domain.Services.Picture;
 using Shrooms.Domain.Services.UserService;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
@@ -47,9 +48,10 @@ namespace Shrooms.UnitTests.DomainService
 
             var dbContext = Substitute.For<IDbContext>();
             var userStore = Substitute.For<IUserStore<ApplicationUser>>();
+            var pictureService = Substitute.For<IPictureService>();
             _userManager = MockIdentity.MockUserManager(userStore, dbContext);
 
-            _userService = new UserService(uow, _userManager);
+            _userService = new UserService(uow, _userManager, pictureService);
         }
 
         [Test]

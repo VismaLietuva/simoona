@@ -1,30 +1,24 @@
 <div>
-    <div ng-if="!vm.participants.length"
-         class="event-no-participants text-center"
-         data-test-id="event-no-participants-options"
-         translate="events.eventNoParticipantsOptions"></div>
-
-    <uib-accordion ng-if="!!vm.participants.length"
-                   class="event-participant-options-accordion"
-                   close-others="false">
-
+    <div ng-if="!vm.attendingParticipants(vm.participants).length" class="event-no-participants text-center"
+        data-test-id="event-no-participants-options" translate="events.eventNoParticipantsOptions"></div>
+    <uib-accordion ng-if="!!vm.participants.length" class="event-participant-options-accordion" close-others="false">
         <div uib-accordion-group ng-repeat="option in vm.options track by option.id"
-                             ng-init="vm.accordionOptionArray[option.id].isOpen = vm.hasCurrentUserSelectedOption(option.participants)"
-                             ng-if="!!option.participants.length"
-                             is-open="vm.accordionOptionArray[option.id].isOpen"
-                             data-test-id="event-participants-option">
+            ng-init="vm.accordionOptionArray[option.id].isOpen = vm.hasCurrentUserSelectedOption(option.participants)"
+            ng-if="!!option.participants.length" is-open="vm.accordionOptionArray[option.id].isOpen"
+            data-test-id="event-participants-option">
 
             <uib-accordion-heading>
-                <div class="event-participants-list-option noselect"
-                     data-test-id="event-participants-option-name" ng-cloak>{{:: option.name}}</div>
+                <div class="event-participants-list-option noselect" data-test-id="event-participants-option-name"
+                    ng-cloak>{{:: option.name}}</div>
                 <i class="event-participant-heading-toggle glyphicon"
-                   ng-class="{'glyphicon-chevron-down': vm.accordionOptionArray[option.id].isOpen, 'glyphicon-chevron-right': !vm.accordionOptionArray[option.id].isOpen}">
+                    ng-class="{'glyphicon-chevron-down': vm.accordionOptionArray[option.id].isOpen, 'glyphicon-chevron-right': !vm.accordionOptionArray[option.id].isOpen}">
                 </i>
                 <div class="clearfix"></div>
             </uib-accordion-heading>
 
             <div class="event-participant-options">
-                <ace-event-participant-list participants="option.participants"></ace-event-participant-list>
+                <ace-event-participant-list participants="option.participants"
+                    is-main-participantList="vm.isMainParticipantList"></ace-event-participant-list>
             </div>
         </div>
     </uib-accordion>

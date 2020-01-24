@@ -26,5 +26,7 @@ namespace Shrooms.WebViewModels.Models.Users.Kudos
         public string Comment { get; set; }
 
         public string PictureId { get; set; }
+        public bool IsActive { get; set; }
+
     }
 }

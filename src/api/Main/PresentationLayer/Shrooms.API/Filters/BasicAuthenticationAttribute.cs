@@ -45,17 +45,17 @@ namespace Shrooms.API.Filters
                 return;
             }
 
-            Tuple<string, string> userNameAndPasword = ExtractUserNameAndPassword(authorization.Parameter);
+            var userNameAndPassword = ExtractUserNameAndPassword(authorization.Parameter);
 
-            if (userNameAndPasword == null)
+            if (userNameAndPassword == null)
             {
                 // Authentication was attempted but failed. Set ErrorResult to indicate an error.
                 context.ErrorResult = new AuthenticationFailureResult("Invalid credentials", request);
                 return;
             }
 
-            string userName = userNameAndPasword.Item1;
-            string password = userNameAndPasword.Item2;
+            var userName = userNameAndPassword.Item1;
+            var password = userNameAndPassword.Item2;
 
             var principal = await AuthenticateAsync(userName, password, cancellationToken);
 
@@ -113,15 +113,15 @@ namespace Shrooms.API.Filters
                 return null;
             }
 
-            int colonIndex = decodedCredentials.IndexOf(':');
+            var colonIndex = decodedCredentials.IndexOf(':');
 
             if (colonIndex == -1)
             {
                 return null;
             }
 
-            string userName = decodedCredentials.Substring(0, colonIndex);
-            string password = decodedCredentials.Substring(colonIndex + 1);
+            var userName = decodedCredentials.Substring(0, colonIndex);
+            var password = decodedCredentials.Substring(colonIndex + 1);
             return new Tuple<string, string>(userName, password);
         }
 
@@ -152,7 +152,7 @@ namespace Shrooms.API.Filters
 
         private HttpResponseMessage Execute()
         {
-            HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.Unauthorized);
+            var response = new HttpResponseMessage(HttpStatusCode.Unauthorized);
             response.RequestMessage = Request;
             response.ReasonPhrase = ReasonPhrase;
             return response;

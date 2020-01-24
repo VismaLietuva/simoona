@@ -51,7 +51,7 @@
             <div class="col-xs-4 col-lg-3 discover-walls-card-action nopadding"
                  ng-init="isWallOwner = vm.isCurrentUserWallOwner(wall.moderators)">
 
-                <a ng-if="wall.type === 'Main' || isWallOwner"
+                <a ng-if="(wall.type === 'Main' && wall.isFollowing)|| isWallOwner"
                    class="nc-btn nc-btn-danger wall-unfollow-disabled" 
                    ng-click="vm.toggleFollowWall(wall)" 
                    translate-attr-title="wall.unfollow" 
@@ -70,6 +70,18 @@
                     <span ng-if="!wall.isLoading" 
                           class="glyphicon glyphicon-plus"></span><span translate="wall.follow"></span>
                 </a>
+
+                <a ng-if="!wall.isFollowing && wall.type === 'Main' && !isWallOwner" 
+                    class="nc-btn nc-btn-default" 
+                    ng-click="vm.toggleFollowWall(wall)" 
+                    translate-attr-title="wall.follow" 
+                    data-test-id="follow-wall-button" 
+                    translate>
+                 <circle-spinner ng-if="wall.isLoading"></circle-spinner>
+                 <span ng-if="!wall.isLoading" 
+                       class="glyphicon glyphicon-plus"></span><span translate="wall.follow"></span>
+                </a>
+
                 <a ng-if="wall.isFollowing && wall.type !== 'Main' && !isWallOwner" 
                    class="nc-btn nc-btn-danger" 
                    ng-click="vm.toggleFollowWall(wall)" 

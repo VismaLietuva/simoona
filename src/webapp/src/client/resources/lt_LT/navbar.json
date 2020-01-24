@@ -57,6 +57,8 @@
   "newWallPostNotification": "Naujas pranešimas {{ name }} sienoje",
   "newProjectPostNotification": "Naujas pranešimas {{ name }} projekte",
   "newEventPostNotification": "Naujas pranešimas {{ name }} renginyje",
+  "eventReminderNotification": "Prisijunk prie {{ name }} renginio šią savaitę",
+  "eventReminderNotifcationName": "Priminimas",
   "wallPostCommentNotification": "Pakomentavo jūsų pranešimą",
   "followingPostCommentNotification": "Pakomentavo jūsų prenumeruojamą pranešimą",
   "newWallNotification": "Sukurta nauja siena",

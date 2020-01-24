@@ -4,6 +4,8 @@
     {
         public const int DefaultPageSize = 10;
         public const int OneHour = 3600;
+        public const int OneDay = 3600 * 24;
+        public const int FiveMinutes = 60 * 5;
         public const string PropertiesForUserDetails = "Manager,Room,Room.RoomType,Room.Floor,Room.Floor.Office,Projects,Certificates,WorkingHours,Skills,QualificationLevel,Exams,JobPosition";
         public const string PropertiesForUserJobInfo = "Manager,Projects,Certificates,Certificates.Exams,WorkingHours,Skills,QualificationLevel,Exams";
         public const string PropertiesForUserOfficeInfo = "Room,Room.Floor";

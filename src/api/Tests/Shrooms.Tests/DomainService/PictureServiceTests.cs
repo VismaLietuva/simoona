@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Domain.Services.Picture;
@@ -21,46 +22,46 @@ namespace Shrooms.UnitTests.DomainService
         public void Init()
         {
             var uow = Substitute.For<IUnitOfWork2>();
-            _organizationsDbSet = uow.MockDbSet<Organization>();
+            _organizationsDbSet = uow.MockDbSetForAsync<Organization>();
 
             var azureStorage = Substitute.For<IStorage>();
             _pictureService = new PictureService(azureStorage, uow);
         }
 
         [Test]
-        public void UploadFromStream_ShouldReturnCorrectName_WhenJpg()
+        public async Task UploadFromStream_ShouldReturnCorrectName_WhenJpg()
         {
             // Arrange
-            _organizationsDbSet.SetDbSetData(new List<Organization> { new Organization { Id = 2, ShortName = "pictures" } }.AsQueryable());
+            _organizationsDbSet.SetDbSetDataForAsync(new List<Organization> { new Organization { Id = 2, ShortName = "pictures" } }.AsQueryable());
 
             // Act
-            var result = _pictureService.UploadFromStream(null, null, "test.jpg", 2).Result;
+            var result = await _pictureService.UploadFromStream(null, null, "test.jpg", 2);
 
             // Assert
             Assert.That(result, Does.EndWith(".jpg"));
         }
 
         [Test]
-        public void UploadFromStream_ShouldReturnCorrectName_WhenPng()
+        public async Task UploadFromStream_ShouldReturnCorrectName_WhenPng()
         {
             // Arrange
-            _organizationsDbSet.SetDbSetData(new List<Organization> { new Organization { Id = 2, ShortName = "pictures" } }.AsQueryable());
+            _organizationsDbSet.SetDbSetDataForAsync(new List<Organization> { new Organization { Id = 2, ShortName = "pictures" } }.AsQueryable());
 
             // Act
-            var result = _pictureService.UploadFromStream(null, null, "test.png", 2).Result;
+            var result = await _pictureService.UploadFromStream(null, null, "test.png", 2);
 
             // Assert
             Assert.That(result, Does.EndWith(".png"));
         }
 
         [Test]
-        public void UploadFromStream_ShouldReturnCorrectName_WhenGif()
+        public async Task UploadFromStream_ShouldReturnCorrectName_WhenGif()
         {
             // Arrange
-            _organizationsDbSet.SetDbSetData(new List<Organization> { new Organization { Id = 2, ShortName = "pictures" } }.AsQueryable());
+            _organizationsDbSet.SetDbSetDataForAsync(new List<Organization> { new Organization { Id = 2, ShortName = "pictures" } }.AsQueryable());
 
             // Act
-            var result = _pictureService.UploadFromStream(null, null, "test.gif", 2).Result;
+            var result = await _pictureService.UploadFromStream(null, null, "test.gif", 2);
 
             // Assert
             Assert.That(result, Does.EndWith(".gif"));

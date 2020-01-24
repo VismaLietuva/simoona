@@ -12,7 +12,7 @@
 	"messageEventIsFull": "Event is full",
 	"messageUserAlreadyParticipates": "You already participate in event",
 	"messageEventJoinStartedOrFinished": "You cannot join an event that has already started or finished",
-	"messageEventCannotJoinMultipleSingleJoinEventsCode": "Events with this type cannot be joined multiple times",
+	"messageEventCannotJoinMultipleSingleJoinEventsCode": "Events with this type cannot be joined multiple times unless you are joining as spectator",
   	"messageEventNoSuchOptionsCode": "There is no such option",
   	"messageEventOptionsUnique": "Options must be unique",
   	"messageEventDeadlineAfterStartDate": "Event deadline cannot be greater than start date",
@@ -34,6 +34,7 @@
 	"messageNameAlreadyExists": "Name already exists",
 	"messageShopItemAlreadyExists": "This item already exists",
 	"messageAllFieldsAreRequired": "All fields are required",
-	"userHasPendingKudos" : "User has pending kudos"
+	"userHasPendingKudos" : "User has pending kudos",
+	"requestedPageNotFound": "Sorry, page not found."
 
 }

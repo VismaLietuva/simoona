@@ -13,10 +13,11 @@
         .service('eventStatusService', eventStatusService);
 
     eventStatusService.$inject = [
-        'eventStatus'
+        'eventStatus',
+        'attendStatus'
     ];
 
-    function eventStatusService(eventStatus) {
+    function eventStatusService(eventStatus, attendStatus) {
         var service = {
             getEventStatus: getEventStatus
         };
@@ -31,12 +32,10 @@
         function getEventStatus(event, isParticipantsList) {
             if (event) {
                 var participantsCount;
-
                 if (!!event.participantsCount) {
                     participantsCount = event.participantsCount;
-                } else if (!!event.participants) {
-                    participantsCount = event.participants.length;
-                } else {
+                }
+                else {
                     participantsCount = 0;
                 }
 
@@ -46,7 +45,7 @@
                     return eventStatus.Finished;
                 } else if (!!event.registrationDeadlineDate && !hasDatePassed(event.registrationDeadlineDate)) {
                     return eventStatus.RegistrationIsClosed;
-                } else if (event.maxParticipants <= participantsCount && (!event.isParticipating || !!isParticipantsList)) {
+                } else if (event.maxParticipants <= participantsCount && (event.participatingStatus == attendStatus.NotAttending || event.participatingStatus == attendStatus.Idle || !!isParticipantsList)) {
                     return eventStatus.Full;
                 } else {
                     return eventStatus.Join;

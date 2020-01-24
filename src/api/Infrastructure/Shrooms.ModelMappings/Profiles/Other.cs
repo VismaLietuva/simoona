@@ -1,11 +1,9 @@
 ﻿using AutoMapper;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Administration;
-using Shrooms.DataTransferObjects.Models.Books;
 using Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.DataTransferObjects.Models.Support;
 using Shrooms.EntityModels.Models;
-using Shrooms.EntityModels.Models.Books;
 using Shrooms.EntityModels.Models.Kudos;
 using Shrooms.ModelMappings.Resolvers;
 using Shrooms.WebViewModels.Models;
@@ -32,6 +30,7 @@ namespace Shrooms.ModelMappings.Profiles
             CreateKudosViewModel();
             CreateAdministrationMappings();
             CreateKudosLogDtoMappings();
+            CreateWelcomeKudosMappings();
             CreateMiscDtoMappings();
         }
 
@@ -48,6 +47,13 @@ namespace Shrooms.ModelMappings.Profiles
             CreateMap<KudosType, KudosTypeDTO>();
 
             CreateMap<KudosLog, UserKudosInformationDTO>();
+        }
+
+        private void CreateWelcomeKudosMappings()
+        {
+            CreateMap<WelcomeKudosDTO, WelcomeKudosViewModel>();
+            CreateMap<WelcomeKudosViewModel, WelcomeKudosDTO>();
+
         }
 
         private void CreateAdministrationMappings()
@@ -185,12 +191,6 @@ namespace Shrooms.ModelMappings.Profiles
                 .ConvertUsing(src => src.Id);
             CreateMap<Certificate, CertificatePostViewModel>();
 
-            //Books mappings
-            CreateMap<BookDTO, Book>();
-            CreateMap<BookLog, BookLogDTO>()
-                .ForMember(dest => dest.ApplicationUserFirstName, opt => opt.MapFrom(src => src.ApplicationUser != null ? src.ApplicationUser.FirstName : null))
-                .ForMember(dest => dest.ApplicationUserLastName, opt => opt.MapFrom(src => src.ApplicationUser != null ? src.ApplicationUser.LastName : null));
-            CreateMap<BookLogDTO, BookLog>();
 
             CreateMap<OfficePostViewModel, Office>()
                 .ForMember(dest => dest.Floors, src => src.Ignore());

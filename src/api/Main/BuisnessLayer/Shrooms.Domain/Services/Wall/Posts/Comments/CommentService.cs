@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Wall.Posts.Comments;
-using Shrooms.Domain.Services.Email.Posting;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.DomainExceptions.Exceptions;
-using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.EntityModels.Models.Notifications;
 using Shrooms.Host.Contracts.Constants;
@@ -21,19 +18,14 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
         private readonly IUnitOfWork2 _uow;
         private readonly ISystemClock _systemClock;
         private readonly IPermissionService _permissionService;
-        private readonly ICommentNotificationService _commentNotificationService;
 
         private readonly IDbSet<Post> _postsDbSet;
         private readonly IDbSet<Comment> _commentsDbSet;
         private readonly IDbSet<WallModerator> _wallModeratorsDbSet;
-        private readonly IDbSet<ApplicationUser> _usersDbSet;
         private readonly IDbSet<NotificationsSettings> _notificationsDbSet;
+        private readonly IDbSet<PostWatcher> _postWatchers;
 
-        public CommentService(
-            IUnitOfWork2 uow,
-            ISystemClock systemClock,
-            IPermissionService permissionService,
-            ICommentNotificationService commentNotificationService)
+        public CommentService(IUnitOfWork2 uow, ISystemClock systemClock, IPermissionService permissionService)
         {
             _uow = uow;
             _systemClock = systemClock;
@@ -42,9 +34,8 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             _postsDbSet = uow.GetDbSet<Post>();
             _commentsDbSet = uow.GetDbSet<Comment>();
             _wallModeratorsDbSet = uow.GetDbSet<WallModerator>();
-            _usersDbSet = uow.GetDbSet<ApplicationUser>();
             _notificationsDbSet = uow.GetDbSet<NotificationsSettings>();
-            _commentNotificationService = commentNotificationService;
+            _postWatchers = uow.GetDbSet<PostWatcher>();
         }
 
         public void ToggleLike(int commentId, UserAndOrganizationDTO userOrg)
@@ -73,32 +64,18 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             _uow.SaveChanges(userOrg.UserId);
         }
 
-        public IList<string> GetCommentsAuthorsToNotify(int postId, IEnumerable<string> excludeUsers)
-        {
-            var comments = _commentsDbSet
-                .Where(comment => postId == comment.PostId && comment.AuthorId != null)
-                .OrderBy(o => o.Created)
-                .ToList();
-
-            var commentsAuthorsToNotify = comments
-                    .Where(c => excludeUsers.Contains(c.AuthorId) == false && c.Author != null)
-                    .Where(c => FollowingPostsAppNotificationsEnabled(c.Author.Id))
-                    .Select(c => c.AuthorId).Distinct().ToList();
-
-            return commentsAuthorsToNotify;
-        }
-
         public CommentCreatedDTO CreateComment(NewCommentDTO commentDto)
         {
             var post = _postsDbSet
                 .Include(x => x.Wall)
-                .FirstOrDefault(p =>
-                    p.Id == commentDto.PostId && p.Wall.OrganizationId == commentDto.OrganizationId);
+                .FirstOrDefault(p => p.Id == commentDto.PostId && p.Wall.OrganizationId == commentDto.OrganizationId);
 
             if (post == null)
             {
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Post does not exist");
             }
+
+            var watchEntity = _postWatchers.Find(commentDto.PostId, commentDto.UserId);
 
             var comment = new Comment
             {
@@ -109,14 +86,26 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
                 Likes = new LikesCollection(),
                 LastEdit = DateTime.UtcNow
             };
+
             _commentsDbSet.Add(comment);
 
             post.LastActivity = _systemClock.UtcNow;
+
+            if (watchEntity == null)
+            {
+                _postWatchers.Add(new PostWatcher
+                {
+                    PostId = post.Id,
+                    UserId = commentDto.UserId
+                });
+            }
+
             _uow.SaveChanges(commentDto.UserId);
 
-            _commentNotificationService.NotifyAboutNewComment(comment, _usersDbSet.SingleOrDefault(user => user.Id == commentDto.UserId));
-
-            return new CommentCreatedDTO { WallId = post.WallId, CommentId = comment.Id, WallType = post.Wall.Type, CommentCreator = comment.AuthorId, PostCreator = post.AuthorId, PostId = post.Id };
+            return new CommentCreatedDTO
+            {
+                WallId = post.WallId, CommentId = comment.Id, WallType = post.Wall.Type, CommentCreator = comment.AuthorId, PostCreator = post.AuthorId, PostId = post.Id
+            };
         }
 
         public void EditComment(EditCommentDTO commentDto)
@@ -133,7 +122,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             }
 
             var isWallModerator = _wallModeratorsDbSet
-                .Any(x => x.UserId == commentDto.UserId && x.WallId == comment.Post.WallId) || commentDto.UserId == comment.CreatedBy;
+                                      .Any(x => x.UserId == commentDto.UserId && x.WallId == comment.Post.WallId) || commentDto.UserId == comment.CreatedBy;
 
             var isAdministrator = _permissionService.UserHasPermission(commentDto, AdministrationPermissions.Post);
 
@@ -162,7 +151,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             }
 
             var isWallModerator = _wallModeratorsDbSet
-                .Any(x => x.UserId == userOrg.UserId && x.WallId == comment.Post.WallId) || comment.CreatedBy == userOrg.UserId;
+                                      .Any(x => x.UserId == userOrg.UserId && x.WallId == comment.Post.WallId) || comment.CreatedBy == userOrg.UserId;
 
             var isAdministrator = _permissionService.UserHasPermission(userOrg, AdministrationPermissions.Post);
 
@@ -189,7 +178,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             }
 
             var isWallModerator = _wallModeratorsDbSet
-                .Any(x => x.UserId == userOrg.UserId && x.WallId == comment.Post.WallId) || comment.CreatedBy == userOrg.UserId;
+                                      .Any(x => x.UserId == userOrg.UserId && x.WallId == comment.Post.WallId) || comment.CreatedBy == userOrg.UserId;
 
             var isAdministrator = _permissionService.UserHasPermission(userOrg, AdministrationPermissions.Post);
 
@@ -204,31 +193,13 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             _uow.SaveChanges(userOrg.UserId);
         }
 
-        public void DeleteCommentsByPost(int postId, UserAndOrganizationDTO userAndOrg)
+        public void DeleteCommentsByPost(int postId)
         {
             var comments = _commentsDbSet
                 .Where(x => x.PostId == postId)
                 .ToList();
 
             comments.ForEach(x => _commentsDbSet.Remove(x));
-        }
-
-        public bool IsPostAuthorAppNotificationsEnabled(string userId)
-        {
-            return _notificationsDbSet
-                .Where(x => x.ApplicationUser.Id == userId)
-                .Select(x => x.MyPostsAppNotifications)
-                .DefaultIfEmpty(true)
-                .SingleOrDefault();
-        }
-
-        private bool FollowingPostsAppNotificationsEnabled(string userId)
-        {
-            return _notificationsDbSet
-                .Where(x => x.ApplicationUser.Id == userId)
-                .Select(x => x.FollowingPostsAppNotifications)
-                .DefaultIfEmpty(true)
-                .SingleOrDefault();
         }
     }
 }

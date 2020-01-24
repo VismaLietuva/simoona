@@ -27,6 +27,13 @@
         padding: 20px 40px 20px 60px;
     }
 }
+.event-office-list-item-seperator {
+    line-height: 10px;
+}
+
+.event-office-list-item {
+    line-height: 5px;
+}
 
 .event-list-item,
 .event-description-title,
@@ -121,6 +128,13 @@
     }
 }
 
+.event-bookmark-icon {
+    font-size: 200% !important;
+    color: #337ab7 !important; 
+    float:right !important; 
+    margin-top: -20px !important;
+}
+
 .event-item-title {
     color: #0089D9 !important;
     font-size: 20px;
@@ -152,7 +166,54 @@
 
 .event-list-item-place {
     color: #787878;
-    height: 40px;
+}
+.event-attend-button {
+    width: 167px !important;
+}
+
+.event-attend-idle-button {
+    padding-left: 20px !important;
+}
+
+.event-list-dropdown-big-screen {
+    left: 10px !important;
+}
+
+.event-list-dropdown-small-screen {
+    right: 65px !important;
+}
+
+.event-attend-dropdown-button {
+    margin-top: 10px;
+}
+
+.event-participant-list-expand-collapse-button {
+    width: 100%; 
+    margin-top: 10px;
+    background-color: #337ab7 !important;
+    padding-top: 8px !important;
+    outline: none !important;
+    box-shadow: none;
+
+    .expand-collapse-text{
+        margin-left: 24px;
+    }
+    .collapse-icon {
+        background-image: url(../images/new-vismaicons/24_arrow_up.svg);
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-origin: content-box;
+        background-position-x: 0;
+        float: right;
+    }
+    .expand-icon {
+        background-image: url(../images/new-vismaicons/24_arrow_down.svg);
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-origin: content-box;
+        background-position-x: 0;
+        float: right;
+    }
 }
 
 .event-add-event-button {
@@ -324,19 +385,17 @@
 .event-participant-list,
 .event-participant-options {
     list-style: none;
+    padding-top: 5px;
     padding-left: 5px;
     li {
         margin-top: 5px;
         &:hover {
             background-color: #CCEBFF;
-            .event-participant-delete-button {
-                display: inline;
-                cursor: pointer;
-            }
         }
         .event-participant-delete-button {
             float: right;
-            display: none;
+            display: inline;
+            cursor: pointer;
             margin-top: 5px;
             margin-right: 5px;
         }
@@ -351,18 +410,18 @@
         }
     }
     .event-participant {
-        height: 35px;
+        height: 37px;
         > .current-user {
             font-weight: 600;
         }
     }
     .event-participant-image {
-        width: 35px;
-        height: 35px;
+        width: 37px;
+        height: 37px;
         display: inline-block;
     }
     .event-participant-user {
-        padding-left: 10px;
+        padding-left: 5px;
         line-height: 35px;
         display: inline-block;
         overflow: hidden;
@@ -370,18 +429,25 @@
         text-overflow: ellipsis;
         cursor: default;
     }
+    .panel-heading {
+        padding: 5px 10px;
+        font-size: 18px;
+    }
+    .panel-body {
+        padding: 5px;
+    }
 }
 
 .event-participant-list .event-participant-user {
-    width: ~'calc(100% - 80px)';
-    width: ~'-moz-calc(100% - 80px)';
-    width: ~'-webkit-calc(100% - 80px)';
+    width: ~'calc(100% - 100px)';
+    width: ~'-moz-calc(100% - 100px)';
+    width: ~'-webkit-calc(100% - 100px)';
 }
 
 .event-participant-options .event-participant-user {
-    width: ~'calc(100% - 40px)';
-    width: ~'-moz-calc(100% - 40px)';
-    width: ~'-webkit-calc(100% - 40px)';
+    width: ~'calc(100% - 42px)';
+    width: ~'-moz-calc(100% - 42px)';
+    width: ~'-webkit-calc(100% - 42px)';
 }
 
 .event-content-module-body {
@@ -557,12 +623,26 @@
 }
 
 .event-description-title {
-    width: ~'-moz-calc(100% - 66px)';
-    width: ~'-webkit-calc(100% - 66px)';
-    width: ~'calc(100% - 66px)';
+    width: ~'-moz-calc(100% - 132px)';
+    width: ~'-webkit-calc(100% - 132px)';
+    width: ~'calc(100% - 132px)';
     display: inline-block;
     overflow-wrap: break-word;
     word-wrap: break-word;
+}
+
+.event-calendar-dropdown-large-screen {
+    left: 0px;
+}
+
+.event-calendar-dropdown-small-screen {
+    right: 5px;
+}
+
+.event-calendar-text {
+    position: relative;
+    bottom: 5px !important; 
+    padding-left: 5px;
 }
 
 //event participants container
@@ -731,7 +811,7 @@
             }
             /* /.panel-heading */
             > .panel-collapse .panel-body {
-                padding: 10px 30px;
+                padding: 5px;
             }
             .panel-collapse {
                 &.collapsing {
@@ -740,6 +820,50 @@
                 &.in {
                     padding: 0;
                 }
+            }
+            .event-participant-list, .event-participant-options {
+                padding-top: 0;
+            }
+        }
+        /* /.panel */
+    }
+    /* /.panel-group */
+}
+
+.event-participant-list-accordion {
+    > .panel-group {
+        border: 0;
+        padding-top: 5px;
+        margin-bottom: 3px;
+        > .panel {
+            > .panel-heading {
+                > .panel-title {
+                    > a:first-child {
+                        border: 0;
+                        padding: 12px 20px;
+                        margin: 0;
+                        &:hover {
+                            padding: 12px 20px;
+                        }
+                    }
+                    /*  /a:first-child */
+                }
+                /* /.panel-title */
+            }
+            /* /.panel-heading */
+            > .panel-collapse .panel-body {
+                padding: 5px;
+            }
+            .panel-collapse {
+                &.collapsing {
+                    padding: 0;
+                }
+                &.in {
+                    padding: 0;
+                }
+            }
+            .event-participant-list, .event-participant-options {
+                padding-top: 0;
             }
         }
         /* /.panel */
@@ -790,3 +914,7 @@
                                   not supported by any browser */
 }
 
+.label-word-break {
+    overflow: hidden !important;
+    white-space: initial !important;
+}

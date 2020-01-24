@@ -16,9 +16,9 @@ namespace Shrooms.IoC.Modules
             builder.RegisterType<MailingService>().As<IIdentityMessageService>().EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<ShroomsRoleStore>().As<IRoleStore<ApplicationRole, string>>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<ShroomsRoleManager>().InstancePerRequest();
-            builder.RegisterType<RoleManager<ApplicationRole, string>>().AsSelf().InstancePerRequest().EnableClassTelemetryInterceptor();
+            builder.RegisterType<RoleManager<ApplicationRole, string>>().AsSelf().InstancePerRequest();
             builder.RegisterType<ShroomsUserStore>().As<IUserStore<ApplicationUser>>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<ShroomsUserManager>().AsSelf().InstancePerRequest().EnableClassTelemetryInterceptor();
+            builder.RegisterType<ShroomsUserManager>().AsSelf().InstancePerRequest();
             builder.RegisterType<ShroomsClaimsIdentityFactory>().AsSelf().InstancePerRequest();
             builder.RegisterType<BasicAuthValidator>().As<IBasicAuthValidator>();
         }

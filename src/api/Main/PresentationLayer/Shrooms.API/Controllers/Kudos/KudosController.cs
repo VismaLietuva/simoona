@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -116,6 +117,14 @@ namespace Shrooms.API.Controllers.Kudos
             return statuses;
         }
 
+        [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
+        public IEnumerable<string> GetKudosFilteringTypes()
+        {
+            var statuses = new List<string> { BusinessLayerConstants.KudosFilteringTypeAllFilter };
+            var kudosTypeDto = _kudosService.GetKudosTypes(GetUserAndOrganization());
+            return statuses.Concat(kudosTypeDto.Select(s => s.Name));
+        }
+
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
         public IEnumerable<KudosPieChartSliceViewModel> KudosPieChartData(string userId = null)
@@ -139,6 +148,14 @@ namespace Shrooms.API.Controllers.Kudos
             var kudosTypeViewModel = _mapper.Map<IEnumerable<KudosTypeDTO>, IEnumerable<KudosTypeViewModel>>(kudosTypeDto);
 
             return kudosTypeViewModel;
+        }
+
+        [HttpGet]
+        [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
+        public KudosTypeViewModel GetSendKudosType()
+        {
+            var kudosTypeDto = _kudosService.GetSendKudosType(GetUserAndOrganization());
+            return _mapper.Map<KudosTypeDTO, KudosTypeViewModel>(kudosTypeDto);
         }
 
         [HttpGet]
@@ -177,6 +194,7 @@ namespace Shrooms.API.Controllers.Kudos
             }
 
             var dto = _mapper.Map<KudosTypeViewModel, KudosTypeDTO>(model);
+            SetOrganizationAndUser(dto);
 
             try
             {
@@ -408,6 +426,17 @@ namespace Shrooms.API.Controllers.Kudos
             {
                 return BadRequest(e.Message);
             }
+        }
+
+        [HttpGet]
+        [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
+        public async Task<IHttpActionResult> GetWelcomeKudos()
+        {
+            var welcomeKudosDTO = _kudosService.GetWelcomeKudos();
+
+            var result = _mapper.Map<WelcomeKudosDTO, WelcomeKudosViewModel>(welcomeKudosDTO);
+
+            return Ok(result);
         }
 
         private KudosListBasicDataViewModel CalculateStats(int months, int amount)

@@ -18,9 +18,10 @@
 
         //init
         vm.widgetsInfo = {};
+
         wallRepository.getWidgetsInfo()
             .then(function(widgetsInfo) { 
                 vm.widgetsInfo = widgetsInfo;
-            });
+            }); 
     }
 }());

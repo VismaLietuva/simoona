@@ -70,34 +70,20 @@
     <Reference Include="Microsoft.AspNet.Identity.Owin, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\Microsoft.AspNet.Identity.Owin.2.2.2\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Owin, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Microsoft.Owin.3.1.0\lib\net45\Microsoft.Owin.dll</HintPath>
+    <Reference Include="Microsoft.Owin, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.Owin.4.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Owin.Security, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Microsoft.Owin.Security.3.1.0\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+    <Reference Include="Microsoft.Owin.Security, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.Owin.Security.4.0.1\lib\net45\Microsoft.Owin.Security.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Owin.Security.Cookies, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Microsoft.Owin.Security.Cookies.3.0.1\lib\net45\Microsoft.Owin.Security.Cookies.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Microsoft.Owin.Security.Cookies, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.Owin.Security.Cookies.4.0.1\lib\net45\Microsoft.Owin.Security.Cookies.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Owin.Security.OAuth, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Microsoft.Owin.Security.OAuth.3.0.1\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Microsoft.Owin.Security.OAuth, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.Owin.Security.OAuth.4.0.1\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Threading.Tasks, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Threading.Tasks.Extensions, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Threading.Tasks.Extensions.Desktop, Version=1.0.168.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.Desktop.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
+      <HintPath>..\..\..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
@@ -122,14 +108,6 @@
     </Reference>
     <Reference Include="System.Net" />
     <Reference Include="System.Net.Http" />
-    <Reference Include="System.Net.Http.Extensions, Version=2.2.29.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Microsoft.Net.Http.2.2.29\lib\net45\System.Net.Http.Extensions.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Net.Http.Primitives, Version=4.2.29.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Microsoft.Net.Http.2.2.29\lib\net45\System.Net.Http.Primitives.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.Net.Http.WebRequest" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
@@ -167,6 +145,7 @@
     <Compile Include="DAL\EntityTypeConfigurations\PageEntityConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\PermissionEntityConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\PostEntityConfig.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\PostWatcherConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\RefreshTokenConfiguration.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\RoomEntityConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\WallConfiguration.cs" />
@@ -788,6 +767,74 @@
     <Compile Include="Migrations\201907201330177_AddKudosWelcomeColumns.Designer.cs">
       <DependentUpon>201907201330177_AddKudosWelcomeColumns.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201909072124268_PostWatchers.cs" />
+    <Compile Include="Migrations\201909072124268_PostWatchers.Designer.cs">
+      <DependentUpon>201909072124268_PostWatchers.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201909201038299_AddIsActiveColumnToKudoType.cs" />
+    <Compile Include="Migrations\201909201038299_AddIsActiveColumnToKudoType.Designer.cs">
+      <DependentUpon>201909201038299_AddIsActiveColumnToKudoType.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201909261209583_SeedWelcomeKudos.cs" />
+    <Compile Include="Migrations\201909261209583_SeedWelcomeKudos.Designer.cs">
+      <DependentUpon>201909261209583_SeedWelcomeKudos.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201910011943144_DummyMigration.cs" />
+    <Compile Include="Migrations\201910011943144_DummyMigration.Designer.cs">
+      <DependentUpon>201910011943144_DummyMigration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201910021146410_RemoveWelcomeKudosFromOrganizationEntity.cs" />
+    <Compile Include="Migrations\201910021146410_RemoveWelcomeKudosFromOrganizationEntity.Designer.cs">
+      <DependentUpon>201910021146410_RemoveWelcomeKudosFromOrganizationEntity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201910211051464_AddLotteryAndLotteryParticipant.cs" />
+    <Compile Include="Migrations\201910211051464_AddLotteryAndLotteryParticipant.Designer.cs">
+      <DependentUpon>201910211051464_AddLotteryAndLotteryParticipant.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201910221426483_SeedRefundKudos.cs" />
+    <Compile Include="Migrations\201910221426483_SeedRefundKudos.Designer.cs">
+      <DependentUpon>201910221426483_SeedRefundKudos.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201910301511497_LotteryRefundFailedFlag.cs" />
+    <Compile Include="Migrations\201910301511497_LotteryRefundFailedFlag.Designer.cs">
+      <DependentUpon>201910301511497_LotteryRefundFailedFlag.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201911191445311_AddFoodRelatedFieldsToEvents.cs" />
+    <Compile Include="Migrations\201911191445311_AddFoodRelatedFieldsToEvents.Designer.cs">
+      <DependentUpon>201911191445311_AddFoodRelatedFieldsToEvents.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201911281059238_EventsWithMultipleOffices.cs" />
+    <Compile Include="Migrations\201911281059238_EventsWithMultipleOffices.Designer.cs">
+      <DependentUpon>201911281059238_EventsWithMultipleOffices.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201911281150187_EventsOfficeData.cs" />
+    <Compile Include="Migrations\201911281150187_EventsOfficeData.Designer.cs">
+      <DependentUpon>201911281150187_EventsOfficeData.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201912021646387_AddBookCoverUrlToBook.cs" />
+    <Compile Include="Migrations\201912021646387_AddBookCoverUrlToBook.Designer.cs">
+      <DependentUpon>201912021646387_AddBookCoverUrlToBook.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201912031425135_EventTypeWeeklyReminder.cs" />
+    <Compile Include="Migrations\201912031425135_EventTypeWeeklyReminder.Designer.cs">
+      <DependentUpon>201912031425135_EventTypeWeeklyReminder.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201912051449578_EventIsPinnedFlag.cs" />
+    <Compile Include="Migrations\201912051449578_EventIsPinnedFlag.Designer.cs">
+      <DependentUpon>201912051449578_EventIsPinnedFlag.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202001021211276_AddEventOptionRulesToAnEntity.cs" />
+    <Compile Include="Migrations\202001021211276_AddEventOptionRulesToAnEntity.Designer.cs">
+      <DependentUpon>202001021211276_AddEventOptionRulesToAnEntity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202001031116555_RemoveFoodRelatedFieldsFromEvents.cs" />
+    <Compile Include="Migrations\202001031116555_RemoveFoodRelatedFieldsFromEvents.Designer.cs">
+      <DependentUpon>202001031116555_RemoveFoodRelatedFieldsFromEvents.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202001151900409_EventAttendChoice.cs" />
+    <Compile Include="Migrations\202001151900409_EventAttendChoice.Designer.cs">
+      <DependentUpon>202001151900409_EventAttendChoice.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
@@ -1291,6 +1338,57 @@
     <EmbeddedResource Include="Migrations\201907201330177_AddKudosWelcomeColumns.resx">
       <DependentUpon>201907201330177_AddKudosWelcomeColumns.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201909072124268_PostWatchers.resx">
+      <DependentUpon>201909072124268_PostWatchers.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201909201038299_AddIsActiveColumnToKudoType.resx">
+      <DependentUpon>201909201038299_AddIsActiveColumnToKudoType.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201909261209583_SeedWelcomeKudos.resx">
+      <DependentUpon>201909261209583_SeedWelcomeKudos.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201910011943144_DummyMigration.resx">
+      <DependentUpon>201910011943144_DummyMigration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201910021146410_RemoveWelcomeKudosFromOrganizationEntity.resx">
+      <DependentUpon>201910021146410_RemoveWelcomeKudosFromOrganizationEntity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201910211051464_AddLotteryAndLotteryParticipant.resx">
+      <DependentUpon>201910211051464_AddLotteryAndLotteryParticipant.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201910221426483_SeedRefundKudos.resx">
+      <DependentUpon>201910221426483_SeedRefundKudos.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201910301511497_LotteryRefundFailedFlag.resx">
+      <DependentUpon>201910301511497_LotteryRefundFailedFlag.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201911191445311_AddFoodRelatedFieldsToEvents.resx">
+      <DependentUpon>201911191445311_AddFoodRelatedFieldsToEvents.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201911281059238_EventsWithMultipleOffices.resx">
+      <DependentUpon>201911281059238_EventsWithMultipleOffices.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201911281150187_EventsOfficeData.resx">
+      <DependentUpon>201911281150187_EventsOfficeData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201912021646387_AddBookCoverUrlToBook.resx">
+      <DependentUpon>201912021646387_AddBookCoverUrlToBook.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201912031425135_EventTypeWeeklyReminder.resx">
+      <DependentUpon>201912031425135_EventTypeWeeklyReminder.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201912051449578_EventIsPinnedFlag.resx">
+      <DependentUpon>201912051449578_EventIsPinnedFlag.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001021211276_AddEventOptionRulesToAnEntity.resx">
+      <DependentUpon>202001021211276_AddEventOptionRulesToAnEntity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001031116555_RemoveFoodRelatedFieldsFromEvents.resx">
+      <DependentUpon>202001031116555_RemoveFoodRelatedFieldsFromEvents.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001151900409_EventAttendChoice.resx">
+      <DependentUpon>202001151900409_EventAttendChoice.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -1301,13 +1399,6 @@
     <Analyzer Include="..\..\..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
-  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

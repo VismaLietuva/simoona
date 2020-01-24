@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
-using System.Security.Cryptography.X509Certificates;
 using System.Web;
 using Shrooms.Host.Contracts.Infrastructure;
 
@@ -28,16 +26,6 @@ namespace Shrooms.Infrastructure.Configuration
 
         public string BasicPassword => ConfigurationManager.AppSettings["BasicPassword"];
 
-        public string GoogleCalendarServiceId => ConfigurationManager.AppSettings["GoogleCalendarServiceId"];
-
-        public string GoogleCalendarServiceCertThumb => ConfigurationManager.AppSettings["GoogleCalendarServiceCertThumb"];
-
-        public StoreLocation GoogleCalendarCertStore => (StoreLocation)Enum.Parse(typeof(StoreLocation), ConfigurationManager.AppSettings["GoogleCalendarCertStore"]);
-
-        public string GoogleCalendarServiceCertPassword => ConfigurationManager.AppSettings["GoogleCalendarServiceCertPassword"];
-
-        public string GoogleCalendarServiceCertRelativePath => ConfigurationManager.AppSettings["GoogleCalendarServiceCertRelativePath"];
-
         public string CorsOriginsSetting => ConfigurationManager.AppSettings["CorsOriginsSettingKey"];
 
         public string SupportEmail => ConfigurationManager.AppSettings["SupportEmail"];
@@ -61,6 +49,8 @@ namespace Shrooms.Infrastructure.Configuration
         public string KudosProfileUrl(string tenant, string userId) => GetClientPath($"{tenant}/Kudos/KudosUserInformation/{userId}");
 
         public string EventUrl(string tenant, string eventId) => GetClientPath($"{tenant}/Events/EventContent/{eventId}");
+
+        public string EventListByTypeUrl(string tenant, string eventTypeId) => GetClientPath($"{tenant}/Events/List/{eventTypeId}/office/all");
 
         public string ProjectUrl(string tenant, string projectId) => GetClientPath($"{tenant}/Projects/Details/{projectId}");
 

@@ -18,6 +18,8 @@ namespace Shrooms.DataTransferObjects.Models.Kudos
 
         public string Description { get; set; }
 
+        public bool IsActive { get; set; }
+
         public override int GetHashCode()
         {
             return Id.GetHashCode();

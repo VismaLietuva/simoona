@@ -26,6 +26,7 @@ using Shrooms.Domain.Services.Impersonate;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.Permissions;
+using Shrooms.Domain.Services.Picture;
 using Shrooms.Domain.Services.Projects;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.Domain.Services.UserService;
@@ -65,6 +66,7 @@ namespace Shrooms.API.Controllers
         private readonly IDbSet<JobPosition> _jobPositionsDbSet;
         private readonly IProjectsService _projectService;
         private readonly IKudosService _kudosService;
+        private readonly IPictureService _pictureService;
 
         public UserDeprecatedController(
             IMapper mapper,
@@ -79,7 +81,8 @@ namespace Shrooms.API.Controllers
             ICustomCache<string, IEnumerable<string>> permissionsCache,
             IRoleService roleService,
             IProjectsService projectService,
-            IKudosService kudosService)
+            IKudosService kudosService,
+            IPictureService pictureService)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -100,6 +103,7 @@ namespace Shrooms.API.Controllers
             _roleService = roleService;
             _projectService = projectService;
             _kudosService = kudosService;
+            _pictureService = pictureService;
         }
 
         private bool HasPermission(UserAndOrganizationDTO userOrg, string permission)
@@ -109,7 +113,7 @@ namespace Shrooms.API.Controllers
         [Route("Delete")]
         [PermissionAuthorize(Permission = AdministrationPermissions.ApplicationUser)]
         [InvalidateCacheOutput("GetKudosStats", typeof(KudosController))]
-        public IHttpActionResult DeleteUser(string id)
+        public async Task<IHttpActionResult> DeleteUser(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -123,7 +127,7 @@ namespace Shrooms.API.Controllers
                 return Content(HttpStatusCode.MethodNotAllowed, "Employee has pending kudos");
             }
 
-            _userService.Delete(id, GetUserAndOrganization());
+            await _userService.Delete(id, GetUserAndOrganization());
             return Ok();
         }
 
@@ -655,6 +659,12 @@ namespace Shrooms.API.Controllers
             if (_applicationUserRepository.Get(u => u.Email == model.Email && u.Id != user.Id).Any())
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, new[] { string.Format(Resources.Models.ApplicationUser.ApplicationUser.EmailAlreadyExsists) });
+            }
+
+            if (user.PictureId != model.PictureId &&
+                !string.IsNullOrEmpty(user.PictureId))
+            {
+                await _pictureService.RemoveImage(user.PictureId, userOrg.OrganizationId);
             }
 
             _mapper.Map(model, user);

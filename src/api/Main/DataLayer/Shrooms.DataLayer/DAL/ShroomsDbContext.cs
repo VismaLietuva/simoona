@@ -15,6 +15,7 @@ using Shrooms.EntityModels.Models.Books;
 using Shrooms.EntityModels.Models.Committee;
 using Shrooms.EntityModels.Models.Events;
 using Shrooms.EntityModels.Models.Kudos;
+using Shrooms.EntityModels.Models.Lottery;
 using Shrooms.EntityModels.Models.Monitors;
 using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.EntityModels.Models.Notifications;
@@ -32,6 +33,7 @@ namespace Shrooms.DataLayer.DAL
         public ShroomsDbContext(string connectionStringName)
             : base(connectionStringName)
         {
+            ConnectionName = connectionStringName;
             Configuration.LazyLoadingEnabled = false;
             Configuration.ProxyCreationEnabled = false;
             Database.SetInitializer<ShroomsDbContext>(null);
@@ -128,9 +130,18 @@ namespace Shrooms.DataLayer.DAL
         public virtual DbSet<Notification> Notifications { get; set; }
 
         public virtual DbSet<BadgeCategory> BadgeCategories { get; set; }
+
         public virtual DbSet<BadgeType> BadgeTypes { get; set; }
+
         public virtual DbSet<BadgeCategoryKudosType> BadgeCategoryKudosType { get; set; }
+
         public virtual DbSet<BadgeLog> BadgeLogs { get; set; }
+
+        public virtual DbSet<Lottery> Lotteries { get; set; }
+
+        public virtual DbSet<LotteryParticipant> LotteryParticipants { get; set; }
+
+        public string ConnectionName { get; }
 
         public int SaveChanges(string userId)
         {
@@ -203,6 +214,7 @@ namespace Shrooms.DataLayer.DAL
             modelBuilder.Configurations.Add(new MonitorConfig());
             modelBuilder.Configurations.Add(new NotificationConfig());
             modelBuilder.Configurations.Add(new NotifiationUserConfig());
+            modelBuilder.Configurations.Add(new PostWatcherConfig());
 
             var convention = new AttributeToColumnAnnotationConvention<SqlDefaultValueAttribute, string>("SqlDefaultValue", (p, attributes) => attributes.Single().DefaultValue);
             modelBuilder.Conventions.Add(convention);
@@ -210,7 +222,7 @@ namespace Shrooms.DataLayer.DAL
             new OtherEntitiesConfig(modelBuilder).Add();
         }
 
-        private void UpdateEntityMetadata(IEnumerable<DbEntityEntry> entries, string userId)
+        private static void UpdateEntityMetadata(IEnumerable<DbEntityEntry> entries, string userId)
         {
             var now = DateTime.UtcNow;
             var items = entries
@@ -225,18 +237,13 @@ namespace Shrooms.DataLayer.DAL
 
             foreach (var item in items)
             {
-                if (item == null)
-                {
-                    continue;
-                }
-
                 if (item.State == EntityState.Added)
                 {
                     item.Entity.Created = now;
                     item.Entity.Modified = now;
                     item.Entity.CreatedBy = userId;
                 }
-                else
+                else if (item.State == EntityState.Deleted || item.State == EntityState.Modified)
                 {
                     item.Entity.Modified = now;
                     item.Entity.ModifiedBy = userId;
@@ -244,14 +251,14 @@ namespace Shrooms.DataLayer.DAL
             }
         }
 
-        private void UpdateEntityMetadata(IEnumerable<DbEntityEntry> entries)
+        private static void UpdateEntityMetadata(IEnumerable<DbEntityEntry> entries)
         {
             var trackableItems = entries.Where(p => p.Entity is ITrackable);
             foreach (var entry in trackableItems)
             {
                 if (entry.Entity is ITrackable trackableEntry)
                 {
-                    string userId = string.Empty;
+                    var userId = string.Empty;
                     if (HttpContext.Current != null && HttpContext.Current.User != null)
                     {
                         userId = HttpContext.Current.User.Identity.GetUserId();
@@ -262,9 +269,11 @@ namespace Shrooms.DataLayer.DAL
                         trackableEntry.Created = DateTime.UtcNow;
                         trackableEntry.CreatedBy = userId;
                     }
-
-                    trackableEntry.Modified = DateTime.UtcNow;
-                    trackableEntry.ModifiedBy = userId;
+                    else if (entry.State == EntityState.Deleted || entry.State == EntityState.Modified)
+                    {
+                        trackableEntry.Modified = DateTime.UtcNow;
+                        trackableEntry.ModifiedBy = userId;
+                    }
                 }
             }
         }

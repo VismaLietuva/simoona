@@ -20,6 +20,7 @@ using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Administration;
 using Shrooms.DataTransferObjects.Models.Wall;
 using Shrooms.Domain.Services.Email.AdministrationUsers;
+using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.Picture;
 using Shrooms.DomainServiceValidators.Validators.UserAdministration;
@@ -47,6 +48,7 @@ namespace Shrooms.Domain.Services.Administration
         private readonly IDbContext _context;
         private readonly IMapper _mapper;
         private readonly IAdministrationNotificationService _notificationService;
+        private readonly IKudosService _kudosService;
         private readonly IUnitOfWork2 _uow;
 
         public AdministrationUsersService(
@@ -58,7 +60,8 @@ namespace Shrooms.Domain.Services.Administration
             IOrganizationService organizationService,
             IPictureService pictureService,
             IDbContext context,
-            IAdministrationNotificationService notificationService)
+            IAdministrationNotificationService notificationService,
+            IKudosService kudosService)
         {
             _uow = uow;
             _mapper = mapper;
@@ -75,6 +78,7 @@ namespace Shrooms.Domain.Services.Administration
             _pictureService = pictureService;
             _context = context;
             _notificationService = notificationService;
+            _kudosService = kudosService;
         }
 
         public byte[] GetAllUsersExcel()
@@ -209,7 +213,8 @@ namespace Shrooms.Domain.Services.Administration
             if (externalIdentity.FindFirst("picture") != null)
             {
                 byte[] data = data = await new WebClient().DownloadDataTaskAsync(externalIdentity.FindFirst("picture").Value);
-                user.PictureId = await _pictureService.UploadFromStream(new MemoryStream(data), "image/jpeg", Guid.NewGuid() + ".jpg", user.OrganizationId);
+                var picture = await _pictureService.UploadFromStream(new MemoryStream(data), "image/jpeg", $"{Guid.NewGuid()}.jpg", user.OrganizationId);
+                user.PictureId = picture;
             }
 
             var result = _userManager.Create(user);
@@ -328,16 +333,17 @@ namespace Shrooms.Domain.Services.Administration
 
         private void SetWelcomeKudos(ApplicationUser applicationUser)
         {
-            var organizationDb = _organizationService.GetOrganizationById(applicationUser.OrganizationId);
 
-            if (organizationDb.KudosWelcomeEnabled)
+            var welcomeKudosDTO = _kudosService.GetWelcomeKudos();
+
+            if (welcomeKudosDTO.WelcomeKudosAmount > 0)
             {
                 KudosLog welcomeKudos = new KudosLog
                 {
                     EmployeeId = applicationUser.Id,
                     OrganizationId = applicationUser.OrganizationId,
-                    Comments = organizationDb.KudosWelcomeComment,
-                    Points = organizationDb.KudosWelcomeAmount,
+                    Comments = welcomeKudosDTO.WelcomeKudosComment,
+                    Points = welcomeKudosDTO.WelcomeKudosAmount,
                     Created = DateTime.UtcNow,
                     Modified = DateTime.UtcNow,
                     Status = KudosStatus.Pending,

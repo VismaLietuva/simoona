@@ -1,17 +1,17 @@
 <div class="col-md-6 col-xs-12">
     <div class="form-group search-group search-group-lg padding-bot-10">
         <input type="text"
-        	   id="search-block"
-        	   class="form-control"
-        	   data-test-id="kudos-search-box"
-        	   ng-model="vm.user"
-        	   placeholder="{{vm.userFullName}}"
-        	   uib-typeahead="user as user.formattedName for user in vm.getUsersForAutocomplete($viewValue)"
-        	   typeahead-on-select="vm.selectUser($model)"
-        	   typeahead-template-url="app/kudos/user-autocomplete/user-autocomplete.html"
-        	   typeahead-min-length="1"
-        	   typeahead-wait-ms="500"
-        	   autocomplete="off"
-        	   ng-cloak>
+               id="search-block"
+               class="form-control"
+               data-test-id="kudos-search-box"
+               ng-model="vm.user"
+               placeholder="{{vm.userFullName}}"
+               uib-typeahead="user as user.formattedName for user in vm.getUsersForAutocomplete($viewValue)"
+               typeahead-on-select="vm.selectUser($model)"
+               typeahead-template-url="app/kudos/user-autocomplete/user-autocomplete.html"
+               typeahead-min-length="1"
+               typeahead-wait-ms="500"
+               autocomplete="off"
+               ng-cloak>
     </div>
 </div>

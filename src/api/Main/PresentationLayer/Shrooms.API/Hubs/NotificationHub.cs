@@ -51,10 +51,12 @@ namespace Shrooms.API.Hubs
             notificationHub.Clients.Clients(connectionIds).newNotification(notification);
         }
 
-        public static void SendNotificationToParticularUsers(
-            NotificationViewModel notification,
-            UserAndOrganizationHubDto userOrg,
-            IEnumerable<string> membersIds)
+        public static void SendNotificationToParticularUsers(NotificationViewModel notification, UserAndOrganizationHubDto userOrg, string memberId)
+        {
+            SendNotificationToParticularUsers(notification, userOrg, new List<string> { memberId });
+        }
+
+        public static void SendNotificationToParticularUsers(NotificationViewModel notification, UserAndOrganizationHubDto userOrg, IEnumerable<string> membersIds)
         {
             var notificationHub = GlobalHost.ConnectionManager.GetHubContext<NotificationHub>();
 
@@ -86,8 +88,7 @@ namespace Shrooms.API.Hubs
 
         private void RemoveUserConnections(UserAndOrganizationHubDto userOrg)
         {
-            HubUser user;
-            _notificationHubUsers.TryGetValue(userOrg, out user);
+            _notificationHubUsers.TryGetValue(userOrg, out var user);
 
             if (user == null)
             {
@@ -103,8 +104,7 @@ namespace Shrooms.API.Hubs
                     return;
                 }
 
-                HubUser removedUser;
-                _notificationHubUsers.TryRemove(userOrg, out removedUser);
+                _notificationHubUsers.TryRemove(userOrg, out _);
             }
         }
 

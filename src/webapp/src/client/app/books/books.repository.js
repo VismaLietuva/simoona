@@ -22,12 +22,14 @@
             createBook: createBook,
             updateBook: updateBook,
             deleteBook: deleteBook,
+            reportBook: reportBook,
             getAllOffices: getAllOffices,
             findBookByIsbn: findBookByIsbn,
             getBookDetails: getBookDetails,
             getFilteredBooks: getFilteredBooks,
             getBookDetailsForAdministrator: getBookDetailsForAdministrator,
             getUserForAutoCompleteResponsiblePerson: getUserForAutoCompleteResponsiblePerson,
+            updateBooksCovers: updateBooksCovers
         };
         return service;
 
@@ -85,6 +87,14 @@
             }).put().$promise;
         }
 
+        function reportBook(bookReport) {
+            return $resource(bookUrl + 'Report', '', {
+                put: {
+                    method: 'PUT',
+                }
+            }).put(bookReport).$promise;
+        }
+
         function takeBook(bookOfficeId) {
             return $resource(bookUrl + 'Take?bookOfficeId=' + bookOfficeId, '', {
                 put: {
@@ -107,6 +117,14 @@
             return $resource(applicationUrl + 'GetForAutoComplete').query({
                 s: params
             }).$promise;
+        }
+
+        function updateBooksCovers() {
+            return $resource(bookUrl + 'covers', '', {
+                patch: {
+                    method: 'PATCH'
+                }
+            }).patch().$promise;
         }
     }
 })();

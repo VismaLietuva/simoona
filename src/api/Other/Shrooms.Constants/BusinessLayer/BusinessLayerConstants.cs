@@ -20,11 +20,21 @@ namespace Shrooms.Constants.BusinessLayer
         public const string DeletedUserFirstName = "Deleted";
         public const string DeletedUserLastName = "Account";
 
+        #region Walls
+        public enum WallsType
+        {
+            MyWalls = 1,
+            AllWalls
+        }
+
+        #endregion
+
         #region kudos
         public const string KudosServiceCategory = "Kudos";
         public const string KudosServiceStatusDone = "Done";
         public const string KudosServiceStatusCancelled = "Cancelled";
         public const string KudosStatusAllFilter = "All";
+        public const string KudosFilteringTypeAllFilter = "All";
         public const int KudosAvailableToSendThisMonth = 20;
         public const int MaxKudosLogsPerPage = 50;
 
@@ -37,7 +47,9 @@ namespace Shrooms.Constants.BusinessLayer
             Ordinary = 1,
             Send,
             Minus,
-            Other
+            Other,
+            Welcome,
+            Refund
         }
         #endregion
 
@@ -61,6 +73,22 @@ namespace Shrooms.Constants.BusinessLayer
         public const int MinCharactersInBookSearch = 2;
         public const string LoyaltyBotName = "Loyalty bot";
 
+        #endregion
+
+        #region Lotteries
+        public enum LotteryStatus
+        {
+            Drafted = 1,
+            Started,
+            Deleted,
+            Ended,
+            RefundStarted,
+            RefundLogsCreated,
+            Refunded
+        }
+
+        public const string LotteryParticipantsExcelTableName = "Lottery Participants";
+        public const int LotteryParticipantsInRow = 4;
         #endregion
 
         #region Organization

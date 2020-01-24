@@ -4,6 +4,9 @@
     angular
         .module('simoonaApp.Kudos')
         .component('aceKudosUserSearchWidget', {
+            bindings: {
+                userFullName: '='
+            },
             templateUrl: 'app/kudos/user-search-widget/user-search-widget.html',
             controller: kudosUserSearchWidgetController,
             controllerAs: 'vm'
@@ -23,7 +26,6 @@
         vm.selectUser = selectUser;
 
         vm.user = '';
-        vm.userFullName = '';
         var userId = $state.params.userId || authService.identity.userId;
 
         init();
@@ -31,9 +33,6 @@
         /////////
 
         function init() {
-            kudosFactory.getUserInformation(userId).then(function (response) {
-                vm.userFullName = response.firstName + ' ' + response.lastName;
-            });
         }
 
         function getUsersForAutocomplete(query) {

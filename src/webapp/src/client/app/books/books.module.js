@@ -16,10 +16,14 @@
         .run(init);
 
     route.$inject = [
-        '$stateProvider'
+        '$stateProvider',
+        '$windowProvider'
     ];
 
-    function route($stateProvider) {
+    function route($stateProvider, $windowProvider) {
+        if (!$windowProvider.$get().isPremium) {
+            return;
+        }
         $stateProvider
             .state('Root.WithOrg.Client.Books', {
                 abstract: true,
@@ -51,10 +55,14 @@
 
     init.$inject = [
         'menuNavigationFactory',
-        'leftMenuGroups'
+        'leftMenuGroups',
+        '$window'
     ];
 
-    function init(menuNavigationFactory, leftMenuGroups) {
+    function init(menuNavigationFactory, leftMenuGroups, $window) {
+        if (!$window.isPremium) {
+            return;
+        }
         menuNavigationFactory.defineLeftMenuItem({
             permission: 'BOOK_BASIC',
             url: 'Root.WithOrg.Client.Books.List',

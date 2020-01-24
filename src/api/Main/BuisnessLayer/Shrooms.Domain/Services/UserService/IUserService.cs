@@ -14,7 +14,7 @@ namespace Shrooms.Domain.Services.UserService
 
         Task ChangeUserNotificationSettings(UserNotificationsSettingsDto settingsDto, UserAndOrganizationDTO userOrg);
 
-        void Delete(string userToDelete, UserAndOrganizationDTO userOrg);
+        Task Delete(string userToDelete, UserAndOrganizationDTO userOrg);
 
         Task<LocalizationSettingsDto> GetUserLocalizationSettings(UserAndOrganizationDTO userOrg);
 
@@ -23,10 +23,6 @@ namespace Shrooms.Domain.Services.UserService
         IEnumerable<string> GetWallUserAppNotificationEnabledIds(string posterId, int wallId);
 
         IList<string> GetWallUsersEmails(string senderEmail, EntityModels.Models.Multiwall.Wall wall);
-
-        IList<string> GetPostCommentersEmails(string senderEmail, int postId);
-
-        string GetPostAuthorEmail(string userId);
 
         Task<UserNotificationsSettingsDto> GetWallNotificationSettings(UserAndOrganizationDTO userOrg);
 

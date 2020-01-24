@@ -40,7 +40,7 @@
                         <!-- DYNAMIC WALL POST USER DISPLAY END -->
 
                         <p style="color: #282828;text-align: left;font-size: 14px;padding-left: 10px;padding-bottom: 15px;font-weight: 400;word-wrap: break-word;word-break: break-all; word-break: break-word;overflow-wrap: break-word; font-family: 'Segoe UI',Helvetica,Arial,sans-serif;margin: 0 0 0 0;">
-                            @Raw(HtmlSanitizerHelper.Sanitize(Model.MessageBody).Replace("\n", "<br>"))
+                            @Raw(HtmlSanitizerHelper.Sanitize(Model.MessageBody))
                         </p>
                     </td>
                 </tr>

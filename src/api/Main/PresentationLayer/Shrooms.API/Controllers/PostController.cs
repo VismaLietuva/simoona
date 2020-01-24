@@ -1,16 +1,14 @@
 using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
+using Shrooms.API.BackgroundWorkers;
 using Shrooms.API.Filters;
-using Shrooms.API.Hubs;
 using Shrooms.DataTransferObjects.Models.Wall.Posts;
-using Shrooms.Domain.Services.Notifications;
-using Shrooms.Domain.Services.UserService;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.Host.Contracts.Constants;
-using Shrooms.WebViewModels.Models.Notifications;
+using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.WebViewModels.Models.Wall.Posts;
 
 namespace Shrooms.API.Controllers
@@ -22,16 +20,14 @@ namespace Shrooms.API.Controllers
         private readonly IMapper _mapper;
         private readonly IWallService _wallService;
         private readonly IPostService _postService;
-        private readonly INotificationService _notificationService;
-        private readonly IUserService _userService;
+        private readonly IAsyncRunner _asyncRunner;
 
-        public PostController(IMapper mapper, IWallService wallService, IPostService postService, INotificationService notificationService, IUserService userService)
+        public PostController(IMapper mapper, IWallService wallService, IPostService postService, IAsyncRunner asyncRunner)
         {
             _mapper = mapper;
             _wallService = wallService;
             _postService = postService;
-            _notificationService = notificationService;
-            _userService = userService;
+            _asyncRunner = asyncRunner;
         }
 
         [HttpGet]
@@ -55,7 +51,7 @@ namespace Shrooms.API.Controllers
         [HttpPost]
         [Route("Create")]
         [PermissionAuthorize(Permission = BasicPermissions.Post)]
-        public async Task<IHttpActionResult> CreatePost(CreateWallPostViewModel wallPostViewModel)
+        public IHttpActionResult CreatePost(CreateWallPostViewModel wallPostViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -64,17 +60,14 @@ namespace Shrooms.API.Controllers
 
             var postModel = _mapper.Map<CreateWallPostViewModel, NewPostDTO>(wallPostViewModel);
             SetOrganizationAndUser(postModel);
-
+            var userHubDto = GetUserAndOrganizationHub();
             try
             {
                 var createdPost = _postService.CreateNewPost(postModel);
-
-                var membersToNotify = _userService.GetWallUserAppNotificationEnabledIds(postModel.UserId, postModel.WallId);
-
-                var notificationDto = await _notificationService.CreateForPost(GetUserAndOrganization(), createdPost, postModel.WallId, membersToNotify);
-
-                NotificationHub.SendNotificationToParticularUsers(_mapper.Map<NotificationViewModel>(notificationDto), GetUserAndOrganizationHub(), membersToNotify);
-                NotificationHub.SendWallNotification(wallPostViewModel.WallId, membersToNotify, createdPost.WallType, GetUserAndOrganizationHub());
+                _asyncRunner.Run<NewPostNotifier>(notif =>
+                {
+                    notif.Notify(createdPost, userHubDto);
+                }, GetOrganizationName());
 
                 return Ok(_mapper.Map<WallPostViewModel>(createdPost));
             }
@@ -183,6 +176,51 @@ namespace Shrooms.API.Controllers
             {
                 return BadRequestWithError(e);
             }
+        }
+
+        [HttpPut]
+        [Route("Watch")]
+        [PermissionAuthorize(Permission = BasicPermissions.Post)]
+        public IHttpActionResult WatchPost(HidePostViewModel post)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var userAndOrg = GetUserAndOrganization();
+            try
+            {
+                _postService.ToggleWatch(post.Id, userAndOrg,true);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequestWithError(e);
+            }
+
+            return Ok();
+        }
+
+        [HttpPut]
+        [Route("Unwatch")]
+        [PermissionAuthorize(Permission = BasicPermissions.Post)]
+        public IHttpActionResult UnwatchPost(HidePostViewModel post)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var userAndOrg = GetUserAndOrganization();
+            try
+            {
+                _postService.ToggleWatch(post.Id, userAndOrg, false);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequestWithError(e);
+            }
+            return Ok();
         }
     }
 }

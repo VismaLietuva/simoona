@@ -6,6 +6,11 @@
   "dateError": "Taken from date can not be later that taken till date.",
   "description": "Description",
   "location": "Office",
+  "reportReason": "Reason for report",
+  "lost": "Lost this book",
+  "notFound": "Did not find this book",
+  "other": "Other",
+  "comment": "Comment",
   "noBook": "Book was not found.",
   "noBookDTO": "Book DTO was not received.",
   "noBookId": "Book id was not received.",
@@ -17,6 +22,7 @@
   "noTakenFromDate": "Taken from date is required.",
   "noTakenTillDate": "Taken till date is required.",
   "noUserOrDates": "Employee, taken from and taken till dates are required.",
+  "report": "Report",
   "quantity": "Quantity",
   "returnBook": "Return",
   "sameBookId": "Book with same id already exists.",
@@ -25,6 +31,7 @@
   "successReturned": "Book \"{{ one }}\" by {{ two }} successfully returned",
   "successTaken": "Book \"{{ one }}\" by {{ two }} successfully taken",
   "successUpdated": "Book \"{{ one }}\" by {{ two }} successfully updated",
+  "successReported": "Book \"{{ one }}\" by {{ two }} successfully reported to administration",
   "takeBook": "Take",
   "takenFrom": "Taken from",
   "takenTill": "Taken till",
@@ -63,5 +70,7 @@
   "whenPlansToReturn": "Return date",
   "whenTookIt": "Taken date",
   "notFoundFromExternalProvider": "Sorry, your book was not found. Have you entered the ISBN number correctly?",
-  "bookCannotBeReturned": "Book cannot be returned."
+  "bookCannotBeReturned": "Book cannot be returned.",
+  "coversWillBeUpdatedSoon": "Cover pictures of books will be automatically updated.",
+  "updateCoverPictures": "Update cover pictures"
 }

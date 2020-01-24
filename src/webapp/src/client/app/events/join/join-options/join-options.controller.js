@@ -22,11 +22,13 @@
         'isDetails',
         'isAddColleague',
         'localeSrv',
-        'lodash'
+        'lodash',
+        'attendStatus',
+        'optionRules'
     ];
 
     function eventJoinOptionsController($state, $uibModalInstance, inputTypes, authService, errorHandler,
-        eventRepository, $translate, notifySrv, event, isDetails, isAddColleague, localeSrv, lodash) {
+        eventRepository, $translate, notifySrv, event, isDetails, isAddColleague, localeSrv, lodash, attendStatus, optionRules) {
         /* jshint validthis: true */
         var vm = this;
 
@@ -35,7 +37,9 @@
         vm.isAddColleague = isAddColleague;
         vm.participants = [];
         vm.selectedOptions = [];
-        vm.messageMaximumOptions = localeSrv.formatTranslation('events.eventMaximumOptions', {one: event.maxChoices});
+        vm.messageMaximumOptions = localeSrv.formatTranslation('events.eventMaximumOptions', {
+            one: event.maxChoices
+        });
         vm.isActionDisabled = false;
 
         vm.joinEvent = joinEvent;
@@ -44,6 +48,7 @@
         vm.isOptionsJoinAvailable = isOptionsJoinAvailable;
         vm.getUserForAutoComplete = getUserForAutoComplete;
         vm.isTooManyOptionsSelected = isTooManyOptionsSelected;
+        vm.isOptionSelected = isOptionSelected;
 
         init();
 
@@ -56,7 +61,7 @@
                 vm.inputType = inputTypes.radio;
             }
 
-            eventRepository.getUserForAutoComplete(authService.identity.userName, event.id).then(function(response) {
+            eventRepository.getUserForAutoComplete(authService.identity.userName, event.id).then(function (response) {
                 for (var i = 0; response.length > i; i++) {
                     if (response[i].id === authService.identity.userId) {
                         vm.participants.push(response[i]);
@@ -69,17 +74,30 @@
             return eventRepository.getUserForAutoComplete(search, event.id);
         }
 
-        function selectOption(optionId) {
+        function isOptionSelected(optionId) {
+            return vm.selectedOptions.findIndex(op => op.id === optionId) > -1;
+        }
+
+        function selectOption(option) {
             if (vm.inputType === inputTypes.checkbox) {
-                var index = vm.selectedOptions.indexOf(optionId);
+                var index = vm.selectedOptions.findIndex(op => op.id === option.id);
                 if (index > -1) {
                     vm.selectedOptions.splice(index, 1);
                 } else {
-                    vm.selectedOptions.push(optionId);
+                    handleSelectedOption(option);
                 }
             } else {
-                vm.selectedOptions = [optionId];
+                vm.selectedOptions = [option];
             }
+        }
+
+        function handleSelectedOption(option) {
+            if (option.rule === optionRules.ignoreSingleJoin) {
+                vm.selectedOptions.length = 0;
+            } else {
+                vm.selectedOptions = vm.selectedOptions.filter(op => op.rule != optionRules.ignoreSingleJoin);
+            }
+            vm.selectedOptions.push(option);
         }
 
         function joinEvent() {
@@ -101,12 +119,13 @@
                 handleErrorMessage('', 'events.eventJoinRegistrationDeadlinePassed');
                 $uibModalInstance.close();
             } else {
+                var selectedOptionsId = lodash.map(vm.selectedOptions, 'id');
                 if (vm.isAddColleague) {
                     var participantIds = lodash.map(vm.participants, 'id');
-                    eventRepository.addColleagues(event.id, vm.selectedOptions, participantIds)
+                    eventRepository.addColleagues(event.id, selectedOptionsId, participantIds)
                         .then(handleSuccessPromise, handleErrorPromise);
                 } else {
-                    eventRepository.joinEvent(event.id, vm.selectedOptions)
+                    eventRepository.joinEvent(event.id, selectedOptionsId)
                         .then(handleSuccessPromise, handleErrorPromise);
                 }
             }
@@ -114,7 +133,7 @@
 
         function handleSuccessPromise() {
             if (isDetails || vm.isAddColleague) {
-                eventRepository.getEventDetails(event.id).then(function(response) {
+                eventRepository.getEventDetails(event.id).then(function (response) {
                     angular.copy(response, event);
 
                     event.options = response.options;
@@ -125,7 +144,7 @@
             }
 
             vm.isActionDisabled = false;
-            event.isParticipating = true;
+            event.participatingStatus = attendStatus.Attending;
             $uibModalInstance.close();
 
             notifySrv.success('events.joinedEvent');

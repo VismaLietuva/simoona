@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -10,7 +11,6 @@ using NUnit.Framework;
 using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Kudos;
-using Shrooms.Domain.Services.Email.Kudos;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Roles;
@@ -20,11 +20,13 @@ using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.UnitTests.Extensions;
 using Shrooms.UnitTests.ModelMappings;
 
 namespace Shrooms.UnitTests.DomainService
 {
+    [SuppressMessage("ReSharper", "PossibleMultipleEnumeration", Justification = "Acceptable for tests")]
     public class KudosServiceTests
     {
         private IKudosService _kudosService;
@@ -59,13 +61,13 @@ namespace Shrooms.UnitTests.DomainService
 
             var uow2 = Substitute.For<IUnitOfWork>();
 
-            var kudosNotificationService = Substitute.For<IKudosNotificationService>();
             var kudosServiceValidation = MockServiceValidator();
             var permissionService = MockPermissionService();
             var roleService = Substitute.For<IRoleService>();
+            var asyncRunner = Substitute.For<IAsyncRunner>();
             MockRoleService(roleService);
 
-            _kudosService = new KudosService(_uow, uow2, _mapper, roleService, permissionService, kudosServiceValidation, kudosNotificationService);
+            _kudosService = new KudosService(_uow, uow2, _mapper, roleService, permissionService, kudosServiceValidation, asyncRunner);
         }
 
         #region GetKudosLogs
@@ -183,6 +185,8 @@ namespace Shrooms.UnitTests.DomainService
         [Test]
         public void Should_Return_Approved_Kudos_Logs_With_Organization_Filter()
         {
+            var test = _usersDbSet.Find("CreatedUserId");
+
             MockKudosLogsForApprovedList();
             var result = _kudosService.GetApprovedKudosList("UserId", 1).ToList();
             Assert.AreEqual(1, result.Count);
@@ -213,7 +217,7 @@ namespace Shrooms.UnitTests.DomainService
             };
 
             var types = _kudosService.GetKudosTypes(userAndOrg);
-            Assert.AreEqual(3, types.Count());
+            Assert.AreEqual(5, types.Count());
         }
 
         [Test]
@@ -225,7 +229,19 @@ namespace Shrooms.UnitTests.DomainService
             };
 
             var types = _kudosService.GetKudosTypes(userAndOrg);
-            Assert.AreEqual(2, types.Count());
+            Assert.AreEqual(5, types.Count());
+        }
+
+        [Test]
+        public void Should_Return_Active_Kudos_Types()
+        {
+            var userAndOrg = new UserAndOrganizationDTO
+            {
+                UserId = "testUserId"
+            };
+
+            var types = _kudosService.GetKudosTypes(userAndOrg);
+            Assert.IsTrue(types.Any(type => type.IsActive));
         }
         #endregion
 
@@ -333,7 +349,8 @@ namespace Shrooms.UnitTests.DomainService
                 UserId = "testUserId",
                 ReceivingUserIds = new List<string> { "testUserId" },
                 MultiplyBy = 2,
-                Comment = "Comment"
+                Comment = "Comment",
+                IsActive = true
             };
 
             Assert.Throws<KudosException>(() => _kudosService.AddKudosLog(kudosLog));
@@ -346,11 +363,12 @@ namespace Shrooms.UnitTests.DomainService
             var kudosLog = new AddKudosLogDTO
             {
                 OrganizationId = 2,
-                PointsTypeId = 1,
+                PointsTypeId = 5,
                 UserId = "testUserId2",
                 ReceivingUserIds = new List<string> { "testUserId3", "testUserId4" },
                 MultiplyBy = 2,
-                Comment = "Comment"
+                Comment = "Comment",
+                IsActive = true
             };
 
             _kudosService.AddKudosLog(kudosLog);
@@ -370,7 +388,8 @@ namespace Shrooms.UnitTests.DomainService
                 UserId = "testUserId2",
                 ReceivingUserIds = new List<string> { "testUserId3", "testUserId4" },
                 MultiplyBy = 2,
-                Comment = "Comment"
+                Comment = "Comment",
+                IsActive = true
             };
 
             // Act
@@ -395,7 +414,8 @@ namespace Shrooms.UnitTests.DomainService
                 UserId = "testUserId2",
                 ReceivingUserIds = new List<string> { "testUserId3", "testUserId4" },
                 MultiplyBy = 2,
-                Comment = "Comment"
+                Comment = "Comment",
+                IsActive = true
             };
 
             _kudosService.AddKudosLog(kudosLog);
@@ -417,7 +437,8 @@ namespace Shrooms.UnitTests.DomainService
                 UserId = "testUserId2",
                 ReceivingUserIds = new List<string> { "testUserId3", "testUserId4", "testUserId" },
                 MultiplyBy = 2,
-                Comment = "Comment"
+                Comment = "Comment",
+                IsActive = true
             };
 
             Assert.Throws<KudosException>(() => _kudosService.AddKudosLog(kudosLog));
@@ -434,7 +455,8 @@ namespace Shrooms.UnitTests.DomainService
                 UserId = "testUserId2",
                 ReceivingUserIds = new List<string> { "testUserId3", "testUserId2" },
                 MultiplyBy = 1,
-                Comment = "Comment"
+                Comment = "Comment",
+                IsActive = true
             };
 
             Assert.Throws<KudosException>(() => _kudosService.AddKudosLog(kudosLog));
@@ -452,7 +474,8 @@ namespace Shrooms.UnitTests.DomainService
                 UserId = "testUserId5",
                 ReceivingUserIds = new List<string> { "testUserId3", "testUserId4", "testUserId" },
                 MultiplyBy = 2,
-                Comment = "Comment"
+                Comment = "Comment",
+                IsActive = true
             };
 
             Assert.Throws<KudosException>(() => _kudosService.AddKudosLog(kudosLog));
@@ -469,7 +492,8 @@ namespace Shrooms.UnitTests.DomainService
                 UserId = "testUserId2",
                 ReceivingUserIds = new List<string> { "testUserId3", "testUserId4" },
                 MultiplyBy = 2,
-                Comment = "Comment"
+                Comment = "Comment",
+                IsActive = true
             };
 
             _kudosService.AddKudosLog(kudosLog);
@@ -517,6 +541,21 @@ namespace Shrooms.UnitTests.DomainService
 
         #endregion
 
+        #region GetKudosTypeSend
+        [Test]
+        public void GetKudosTypeSend_FromKudosTypes_ReturnsOnlySendType()
+        {
+            var userAndOrg = new UserAndOrganizationDTO
+            {
+                UserId = "testUserId2"
+            };
+
+            var result = _kudosService.GetSendKudosType(userAndOrg);
+
+            Assert.AreEqual(result.Type, BusinessLayerConstants.KudosTypeEnum.Send);
+        }
+        #endregion
+
         #region MockData
 
         private static void MockRoleService(IRoleService roleService)
@@ -561,12 +600,14 @@ namespace Shrooms.UnitTests.DomainService
             _kudosTypesDbSet.Find(1).Returns(MockKudosTypes().FirstOrDefault(x => x.Id == 1));
             _kudosTypesDbSet.Find(2).Returns(MockKudosTypes().FirstOrDefault(x => x.Id == 2));
             _kudosTypesDbSet.Find(3).Returns(MockKudosTypes().FirstOrDefault(x => x.Id == 3));
+            _kudosTypesDbSet.Find(5).Returns(MockKudosTypes().FirstOrDefault(x => x.Id == 5));
 
             _usersDbSet.Find("testUserId").Returns(MockUsers().FirstOrDefault(x => x.Id == "testUserId"));
             _usersDbSet.Find("testUserId2").Returns(MockUsers().FirstOrDefault(x => x.Id == "testUserId2"));
             _usersDbSet.Find("testUserId3").Returns(MockUsers().FirstOrDefault(x => x.Id == "testUserId3"));
             _usersDbSet.Find("testUserId4").Returns(MockUsers().FirstOrDefault(x => x.Id == "testUserId4"));
             _usersDbSet.Find("testUserId5").Returns(MockUsers().FirstOrDefault(x => x.Id == "testUserId5"));
+            _usersDbSet.Find("CreatedUserId").Returns(MockUsers().FirstOrDefault(x => x.Id == "CreatedUserId"));
         }
 
         private IQueryable<Organization> MockOrganization()
@@ -625,6 +666,11 @@ namespace Shrooms.UnitTests.DomainService
                     SpentKudos = 2,
                     RemainingKudos = 10,
                     OrganizationId = 2
+                },
+                new ApplicationUser
+                {
+                    Id = "CreatedUserId",
+                    OrganizationId = 2
                 }
             }.AsQueryable();
         }
@@ -638,22 +684,40 @@ namespace Shrooms.UnitTests.DomainService
                     Id = 1,
                     Name = "Minus",
                     Value = 1,
-                    Type = BusinessLayerConstants.KudosTypeEnum.Minus
+                    Type = BusinessLayerConstants.KudosTypeEnum.Minus,
+                    IsActive = true
                 },
                 new KudosType
                 {
                     Id = 2,
                     Name = "Send",
                     Value = 1,
-                    Type = BusinessLayerConstants.KudosTypeEnum.Send
+                    Type = BusinessLayerConstants.KudosTypeEnum.Send,
+                    IsActive = true
                 },
                 new KudosType
                 {
                     Id = 3,
                     Name = "AnythingElse",
                     Value = 2,
-                    Type = BusinessLayerConstants.KudosTypeEnum.Ordinary
+                    Type = BusinessLayerConstants.KudosTypeEnum.Ordinary,
+                    IsActive = true
                 },
+                new KudosType
+                {
+                    Id = 4,
+                    Name = "Other",
+                    Value = 3,
+                    Type = BusinessLayerConstants.KudosTypeEnum.Other
+                },
+                new KudosType
+                {
+                    Id = 5,
+                    Name = "Active",
+                    Value = 1,
+                    Type = BusinessLayerConstants.KudosTypeEnum.Ordinary,
+                    IsActive = true
+                }
             }.AsQueryable();
         }
 
@@ -755,6 +819,7 @@ namespace Shrooms.UnitTests.DomainService
                     Comments = "Comment1",
                     MultiplyBy = 1,
                     Points = 2,
+                    CreatedBy = "CreatedUserId",
                     Status = KudosStatus.Approved,
                     Created = DateTime.UtcNow
                 },
@@ -774,10 +839,21 @@ namespace Shrooms.UnitTests.DomainService
                     Comments = "Comment2",
                     MultiplyBy = 1,
                     Points = 2,
+                    CreatedBy = "CreatedUserId",
                     Status = KudosStatus.Approved,
                     Created = DateTime.UtcNow
                 }
             };
+
+            var users = new List<ApplicationUser>
+            {
+                new ApplicationUser
+                {
+                    Id = "CreatedUserId"
+                }
+            };
+
+            _usersDbSet.SetDbSetData(users.AsQueryable());
             _kudosLogsDbSet.SetDbSetData(kudosLogs.AsQueryable());
         }
 

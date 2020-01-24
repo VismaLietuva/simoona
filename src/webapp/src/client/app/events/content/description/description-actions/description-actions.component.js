@@ -13,22 +13,44 @@
         });
 
     eventDescriptionActionsController.$inject = [
-        'authService'
+        'authService',
+        'eventRepository',
+        'notifySrv',
+        'localeSrv',
+        'errorHandler'
     ];
 
-    function eventDescriptionActionsController(authService) {
+    function eventDescriptionActionsController(authService, eventRepository, notifySrv , localeSrv, errorHandler) {
         /* jshint validthis: true */
         var vm = this;
-
+            
         vm.hasDatePassed = hasDatePassed;
-
+        vm.togglePin = togglePin;
+        vm.localeSrv = localeSrv;
+        vm.notifySrv = notifySrv;
+        vm.isPinned = vm.event.isPinned;
         vm.currentUserId = authService.identity.userId;
         vm.hasEventAdminPermissions = authService.hasPermissions(['EVENT_ADMINISTRATION']);
-
+      
         ///////
 
         function hasDatePassed(date) {
             return moment.utc(date).local().isAfter();
+        }
+        
+        function togglePin(event) {
+            eventRepository.pinEvent(event.id)
+            .then(function(){
+                if(vm.isPinned) {
+                    vm.notifySrv.success(vm.localeSrv.formatTranslation('events.eventUnpinned'));
+                }
+                else {
+                    vm.notifySrv.success(vm.localeSrv.formatTranslation('events.eventPinned'));
+                }
+                vm.isPinned = !vm.isPinned
+            }, function (error) {
+                errorHandler.handleErrorMessage(error);
+            });
         }
 
     }

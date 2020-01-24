@@ -93,9 +93,10 @@ namespace Shrooms.Domain.Services.Email.Kudos
                 userNotificationSettingsUrl,
                 kudosLog.Points,
                 kudosLog.KudosTypeName,
-                sendingUserFullName == null ? BusinessLayerConstants.DeletedUserName : sendingUserFullName,
+                sendingUserFullName ?? BusinessLayerConstants.DeletedUserName,
                 kudosLog.Comments,
                 kudosProfileUrl);
+
             var body = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.KudosReceived);
 
             _mailingService.SendEmail(new EmailDto(kudosLog.Employee.Email, subject, body));
@@ -121,12 +122,17 @@ namespace Shrooms.Domain.Services.Email.Kudos
             _mailingService.SendEmail(new EmailDto(kudosLog.Employee.Email, subject, body));
         }
 
-        private Organization GetOrganizationName(int orgId) => _organizationsDbSet
-                .Single(x => x.Id == orgId);
+        private Organization GetOrganizationName(int orgId)
+        {
+            return _organizationsDbSet.Single(x => x.Id == orgId);
+        }
 
-        private string GetUserFullName(string userId) => _usersDbSet
+        private string GetUserFullName(string userId)
+        {
+            return _usersDbSet
                 .Where(x => x.Id == userId)
                 .Select(x => x.FirstName + " " + x.LastName)
                 .SingleOrDefault();
+        }
     }
 }

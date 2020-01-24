@@ -20,7 +20,6 @@
     function eventDescriptionController(eventSettings) {
         /* jshint validthis: true */
         var vm = this;
-
         vm.eventImageSize = {
             w: eventSettings.thumbWidth,
             h: eventSettings.thumbHeight

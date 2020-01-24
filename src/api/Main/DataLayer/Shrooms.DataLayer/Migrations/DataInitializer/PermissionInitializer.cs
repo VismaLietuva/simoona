@@ -40,7 +40,8 @@ namespace Shrooms.DataLayer.Migrations.DataInitializer
                 .AddBasicPermission(permissionName: BasicPermissions.Certificate, withRoleNames: Roles.NewUser)
                 .AddBasicPermission(permissionName: BasicPermissions.ApplicationUser, withRoleNames: Roles.NewUser)
                 .AddBasicPermission(permissionName: BasicPermissions.QualificationLevel, withRoleNames: Roles.NewUser)
-                .AddBasicPermission(permissionName: BasicPermissions.Project, withRoleNames: Roles.NewUser, module: Modules.Projects);
+                .AddBasicPermission(permissionName: BasicPermissions.Project, withRoleNames: Roles.NewUser, module: Modules.Projects)
+                .AddBasicPermission(permissionName: BasicPermissions.Lottery);
 
             //admin permissions
             permissionBuilder
@@ -69,7 +70,8 @@ namespace Shrooms.DataLayer.Migrations.DataInitializer
                 .AddAdminPermission(permissionName: AdministrationPermissions.ServiceRequest, withRoleNames: new[] { Roles.ServiceRequest, Roles.ServiceRequestNotification }, module: Modules.ServiceRequest)
                 .AddAdminPermission(permissionName: AdministrationPermissions.Monitor, withRoleNames: new[] { Roles.Administration }, module: Modules.Monitor)
                 .AddAdminPermission(permissionName: AdministrationPermissions.KudosShop, withRoleNames: Roles.Administration)
-                .AddAdminPermission(permissionName: AdministrationPermissions.Job, withRoleNames: Roles.Administration);
+                .AddAdminPermission(permissionName: AdministrationPermissions.Job, withRoleNames: Roles.Administration)
+                .AddAdminPermission(permissionName: AdministrationPermissions.Lottery, withRoleNames: new[] { Roles.LotteryAdmin, Roles.Administration });
 
             permissionBuilder.UpdatePermissions();
         }

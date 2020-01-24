@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
 
 namespace Shrooms.Host.Contracts.Infrastructure
 {
@@ -18,16 +17,6 @@ namespace Shrooms.Host.Contracts.Infrastructure
         string BasicUsername { get; }
 
         string BasicPassword { get; }
-
-        string GoogleCalendarServiceId { get; }
-
-        string GoogleCalendarServiceCertThumb { get; }
-
-        StoreLocation GoogleCalendarCertStore { get; }
-
-        string GoogleCalendarServiceCertPassword { get; }
-
-        string GoogleCalendarServiceCertRelativePath { get; }
 
         string CorsOriginsSetting { get; }
 
@@ -56,6 +45,8 @@ namespace Shrooms.Host.Contracts.Infrastructure
         string KudosProfileUrl(string tenant, string userId);
 
         string EventUrl(string tenant, string eventId);
+
+        string EventListByTypeUrl(string tenant, string eventId);
 
         string ProjectUrl(string tenant, string projectId);
 

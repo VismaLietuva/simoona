@@ -126,4 +126,10 @@
   <data name="Option" xml:space="preserve">
     <value>Pasirinkimas</value>
   </data>
+  <data name="WillEat" xml:space="preserve">
+    <value>Valgysiu šiame renginyje</value>
+  </data>
+  <data name="WillNotEat" xml:space="preserve">
+    <value>Nevalgysiu šiame renginyje</value>
+  </data>
 </root>

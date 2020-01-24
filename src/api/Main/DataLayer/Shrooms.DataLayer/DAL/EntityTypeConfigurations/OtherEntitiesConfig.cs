@@ -2,6 +2,7 @@
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Committee;
 using Shrooms.EntityModels.Models.Kudos;
+using Shrooms.EntityModels.Models.Lottery;
 using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.EntityModels.Models.Notifications;
 
@@ -57,6 +58,9 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
             _modelBuilder.ComplexType<LikesCollection>()
                 .Property(x => x.Serialized)
                 .HasColumnName("Likes");
+            _modelBuilder.ComplexType<ImagesCollection>()
+                .Property(x => x.Serialized)
+                .HasColumnName("Images");
             _modelBuilder.ComplexType<Sources>()
                 .Property(x => x.Serialized)
                 .HasColumnName("Sources");

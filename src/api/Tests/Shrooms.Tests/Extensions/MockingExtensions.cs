@@ -109,7 +109,7 @@ namespace Shrooms.UnitTests.Extensions
             where TEntity : class
         {
             var context = unitOfWork.DbContext;
-            DbSet<TEntity> dbSet = context.Set<TEntity>() ?? Substitute.For<DbSet<TEntity>, IQueryable<TEntity>>();
+            var dbSet = context.Set<TEntity>() ?? Substitute.For<DbSet<TEntity>, IQueryable<TEntity>>();
             dbSet.SetDbSetData(data.AsQueryable());
             context.Set<TEntity>().Returns(dbSet);
         }
