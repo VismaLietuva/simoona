@@ -3,13 +3,13 @@ using System.Data.Entity;
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Constants.ErrorCodes;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Monitors;
 using Shrooms.Domain.Services.Monitors;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models.Monitors;
+using Shrooms.Host.Contracts.Constants;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.UnitTests.Extensions;
 
 namespace Shrooms.UnitTests.DomainService
@@ -38,7 +38,7 @@ namespace Shrooms.UnitTests.DomainService
         {
             MockExternalLinks();
 
-            var result = _monitorService.GetMonitorList(2);
+            var result = _monitorService.GetMonitorList(2).ToList();
             Assert.AreEqual(2, result.Count());
             Assert.AreEqual("Test1", result.First().Name);
         }
@@ -149,7 +149,7 @@ namespace Shrooms.UnitTests.DomainService
         {
             var monitors = new List<Monitor>()
             {
-                new Monitor 
+                new Monitor
                 {
                     Id = 1,
                     Name = "Test1",

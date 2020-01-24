@@ -1,5 +1,6 @@
 ﻿using System;
 using NLog;
+using ILogger = Shrooms.Host.Contracts.Infrastructure.ILogger;
 
 namespace Shrooms.Infrastructure.Logger
 {

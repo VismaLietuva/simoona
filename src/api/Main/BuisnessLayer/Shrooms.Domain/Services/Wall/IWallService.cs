@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Wall;
 using Shrooms.DataTransferObjects.Models.Wall.Posts;
 using Shrooms.EntityModels.Models;
-using Shrooms.EntityModels.Models.Multiwall;
 
 namespace Shrooms.Domain.Services.Wall
 {

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace Shrooms.EntityModels.Models

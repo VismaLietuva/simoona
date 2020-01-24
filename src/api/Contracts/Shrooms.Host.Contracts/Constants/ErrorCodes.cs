@@ -1,4 +1,4 @@
-﻿namespace Shrooms.Constants.ErrorCodes
+﻿namespace Shrooms.Host.Contracts.Constants
 {
     public static class ErrorCodes
     {

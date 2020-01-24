@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using Shrooms.EntityModels.Models.Books;
 
-namespace Shrooms.EntityModels.Models
+namespace Shrooms.EntityModels.Models.Books
 {
     public class Book : BaseModelWithOrg
     {
@@ -20,7 +19,7 @@ namespace Shrooms.EntityModels.Models
         public string ApplicationUserId { get; set; }
 
         public ApplicationUser ApplicationUser { get; set; }
-        
+
         public string Note { get; set; }
     }
 }

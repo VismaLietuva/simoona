@@ -1,17 +1,17 @@
 ﻿using System.Data.Entity;
 using System.Linq;
-using Shrooms.Constants;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.DataTransferObjects.Models.Emails;
+using Shrooms.DataTransferObjects.Models.Wall;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.UserService;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Multiwall;
-using Shrooms.Infrastructure.Configuration;
-using Shrooms.Infrastructure.Email;
-using Shrooms.Infrastructure.Email.Templating;
+using Shrooms.Host.Contracts.Constants;
+using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Infrastructure;
+using Shrooms.Host.Contracts.Infrastructure.Email;
 using Shrooms.Resources.Emails;
 
 namespace Shrooms.Domain.Services.Email.Posting

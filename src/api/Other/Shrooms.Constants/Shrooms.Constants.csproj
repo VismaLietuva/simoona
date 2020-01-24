@@ -78,19 +78,14 @@
   <ItemGroup>
     <Compile Include="Authentication\AuthenticationConstants.cs" />
     <Compile Include="Authorization\Modules.cs" />
-    <Compile Include="Authorization\Permissions\AdministrationPermissions.cs" />
-    <Compile Include="Authorization\Permissions\BasicPermissions.cs" />
     <Compile Include="Authorization\Permissions\Scopes.cs" />
-    <Compile Include="Authorization\Roles.cs" />
-    <Compile Include="BusinessLayer\ConstBusinessLayer.cs" />
+    <Compile Include="BusinessLayer\BusinessLayerConstants.cs" />
     <Compile Include="BusinessLayer\Templates.cs" />
     <Compile Include="DataLayer\ConstDataLayer.cs" />
-    <Compile Include="EmailTemplateCacheKeys.cs" />
     <Compile Include="EntityValidationValues\ValidationConstants.cs" />
-    <Compile Include="ErrorCodes\ErrorCodes.cs" />
     <Compile Include="WebApi\KudosBasketConstants.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WebApi\ConstWebApi.cs" />
+    <Compile Include="WebApi\WebApiConstants.cs" />
   </ItemGroup>
   <ItemGroup>
     <AdditionalFiles Include="..\..\stylecop.json">

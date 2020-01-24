@@ -1,6 +1,6 @@
 ﻿using Shrooms.DataTransferObjects.Models.Emails;
 
-namespace Shrooms.Infrastructure.Email
+namespace Shrooms.Host.Contracts.Infrastructure.Email
 {
     public interface IMailingService
     {

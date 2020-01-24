@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 
-namespace Shrooms.Azure
+namespace Shrooms.Infrastructure.Storage
 {
     public interface IStorage
     {

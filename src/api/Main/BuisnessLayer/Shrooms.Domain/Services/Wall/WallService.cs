@@ -5,10 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AutoMapper;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.BusinessLayer;
-using Shrooms.Constants.ErrorCodes;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Users;
 using Shrooms.DataTransferObjects.Models.Wall;
@@ -19,12 +16,14 @@ using Shrooms.Domain.Services.Permissions;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Multiwall;
+using Shrooms.Host.Contracts.Constants;
+using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.Domain.Services.Wall
 {
     public class WallService : IWallService
     {
-        private static object joinWallLock = new object();
+        private static object _joinWallLock = new object();
 
         private readonly IMapper _mapper;
         private readonly IUnitOfWork2 _uow;
@@ -301,7 +300,7 @@ namespace Shrooms.Domain.Services.Wall
 
         public ApplicationUserMinimalViewModelDto JoinLeaveWall(int wallId, string attendeeId, string actorId, int tenantId, bool isEventWall)
         {
-            lock (joinWallLock)
+            lock (_joinWallLock)
             {
                 var wallTypeFilter = isEventWall
                     ? (Expression<Func<EntityModels.Models.Multiwall.Wall, bool>>)(w => w.Type == WallType.Events)
@@ -451,18 +450,20 @@ namespace Shrooms.Domain.Services.Wall
 
                 foreach (var wallId in wallIds)
                 {
-                    if (!wallMembers.Any(x => x.WallId == wallId))
+                    if (wallMembers.Any(x => x.WallId == wallId))
                     {
-                        var wallMember = new WallMember()
-                        {
-                            AppNotificationsEnabled = true,
-                            EmailNotificationsEnabled = true,
-                            UserId = userId,
-                            WallId = wallId,
-                        };
-
-                        _wallUsersDbSet.Add(wallMember);
+                        continue;
                     }
+
+                    var wallMember = new WallMember()
+                    {
+                        AppNotificationsEnabled = true,
+                        EmailNotificationsEnabled = true,
+                        UserId = userId,
+                        WallId = wallId,
+                    };
+
+                    _wallUsersDbSet.Add(wallMember);
                 }
             }
         }
@@ -600,7 +601,7 @@ namespace Shrooms.Domain.Services.Wall
                 (await GetWallsList(userOrg, WallsListFilter.Followed))
                     .Select(w => w.Id).ToList();
 
-            int entriesCountToSkip = (pageNumber - 1) * pageSize;
+            var entriesCountToSkip = (pageNumber - 1) * pageSize;
             var posts = await _postsDbSet
                 .Include(post => post.Wall)
                 .Include(post => post.Comments)
@@ -612,7 +613,7 @@ namespace Shrooms.Domain.Services.Wall
                 .ToListAsync();
 
             IEnumerable<WallModerator> moderators = await _moderatorsDbSet.Where(x => wallsIds.Contains(x.WallId)).ToListAsync();
-            IEnumerable<ApplicationUser> users = await GetUsers(posts);
+            var users = await GetUsers(posts);
 
             return MapPostsWithChildEntitiesToDto(userOrg.UserId, posts, users, moderators);
         }
@@ -689,7 +690,7 @@ namespace Shrooms.Domain.Services.Wall
         {
             var user = users.FirstOrDefault(u => u.Id == userId);
 
-            return user == null ? new UserDto { FullName = ConstBusinessLayer.DeletedUserName } : _mapper.Map<UserDto>(user);
+            return user == null ? new UserDto { FullName = BusinessLayerConstants.DeletedUserName } : _mapper.Map<UserDto>(user);
         }
 
         private IEnumerable<UserDto> MapLikesToDto(LikesCollection likes, IEnumerable<ApplicationUser> users)

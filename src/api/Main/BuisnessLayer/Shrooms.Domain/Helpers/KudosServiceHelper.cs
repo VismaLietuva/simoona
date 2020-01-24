@@ -13,7 +13,7 @@ namespace Shrooms.Domain.Helpers
     {
         public static Expression<Func<KudosLog, bool>> StatusFilter(string kudosLogStatus)
         {
-            if (string.Equals(kudosLogStatus, ConstBusinessLayer.KudosStatusAllFilter, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(kudosLogStatus, BusinessLayerConstants.KudosStatusAllFilter, StringComparison.OrdinalIgnoreCase))
             {
                 return log => true;
             }

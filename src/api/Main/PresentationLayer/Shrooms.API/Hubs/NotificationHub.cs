@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 using Shrooms.DataTransferObjects.Models;
-using Shrooms.EntityModels.Models.Multiwall;
+using Shrooms.DataTransferObjects.Models.Wall;
 using Shrooms.WebViewModels.Models.Notifications;
 
 namespace Shrooms.API.Hubs
@@ -13,7 +13,7 @@ namespace Shrooms.API.Hubs
     [HubName("Notification")]
     public class NotificationHub : BaseHub
     {
-        private static readonly ConcurrentDictionary<UserAndOrganizationHubDto, HubUser> NotificationHubUsers =
+        private static readonly ConcurrentDictionary<UserAndOrganizationHubDto, HubUser> _notificationHubUsers =
             new ConcurrentDictionary<UserAndOrganizationHubDto, HubUser>();
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace Shrooms.API.Hubs
         {
             var notificationHub = GlobalHost.ConnectionManager.GetHubContext<NotificationHub>();
 
-            var connectionIds = NotificationHubUsers
+            var connectionIds = _notificationHubUsers
                 .Where(u => membersIds.Contains(u.Key.UserId) &&
                             u.Key.OrganizationName == userOrg.OrganizationName &&
                             u.Key.OrganizationId == userOrg.OrganizationId)
@@ -41,8 +41,8 @@ namespace Shrooms.API.Hubs
         {
             var notificationHub = GlobalHost.ConnectionManager.GetHubContext<NotificationHub>();
 
-            var connectionIds = NotificationHubUsers
-                .Where(x => x.Key.UserId != userOrg.UserId && 
+            var connectionIds = _notificationHubUsers
+                .Where(x => x.Key.UserId != userOrg.UserId &&
                             x.Key.OrganizationId == userOrg.OrganizationId &&
                             x.Key.OrganizationName == userOrg.OrganizationName)
                 .SelectMany(u => u.Value.ConnectionIds)
@@ -52,19 +52,19 @@ namespace Shrooms.API.Hubs
         }
 
         public static void SendNotificationToParticularUsers(
-            NotificationViewModel notification, 
+            NotificationViewModel notification,
             UserAndOrganizationHubDto userOrg,
             IEnumerable<string> membersIds)
         {
             var notificationHub = GlobalHost.ConnectionManager.GetHubContext<NotificationHub>();
 
-            var connectionIds = NotificationHubUsers
+            var connectionIds = _notificationHubUsers
                 .Where(u => membersIds.Contains(u.Key.UserId) &&
                             u.Key.OrganizationId == userOrg.OrganizationId &&
                             u.Key.OrganizationName == userOrg.OrganizationName)
                 .SelectMany(u => u.Value.ConnectionIds)
                 .ToList();
-             
+
             notificationHub.Clients.Clients(connectionIds).newNotification(notification);
         }
 
@@ -87,7 +87,7 @@ namespace Shrooms.API.Hubs
         private void RemoveUserConnections(UserAndOrganizationHubDto userOrg)
         {
             HubUser user;
-            NotificationHubUsers.TryGetValue(userOrg, out user);
+            _notificationHubUsers.TryGetValue(userOrg, out user);
 
             if (user == null)
             {
@@ -104,13 +104,13 @@ namespace Shrooms.API.Hubs
                 }
 
                 HubUser removedUser;
-                NotificationHubUsers.TryRemove(userOrg, out removedUser);
+                _notificationHubUsers.TryRemove(userOrg, out removedUser);
             }
         }
 
         private void MapUserWithConnection(UserAndOrganizationHubDto userOrg)
         {
-            var user = NotificationHubUsers.GetOrAdd(userOrg, _ => new HubUser
+            var user = _notificationHubUsers.GetOrAdd(userOrg, _ => new HubUser
             {
                 Id = userOrg.UserId,
                 OrganizationId = userOrg.OrganizationId,

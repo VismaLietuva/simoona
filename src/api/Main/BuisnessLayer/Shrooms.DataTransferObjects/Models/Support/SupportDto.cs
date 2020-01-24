@@ -1,5 +1,4 @@
-﻿using Shrooms.EntityModels.Models;
-
+﻿
 namespace Shrooms.DataTransferObjects.Models.Support
 {
     public class SupportDto

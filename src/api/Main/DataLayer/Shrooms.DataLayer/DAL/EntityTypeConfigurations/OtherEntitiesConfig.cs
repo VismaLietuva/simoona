@@ -1,6 +1,6 @@
 ﻿using System.Data.Entity;
-using DataLayer.Models;
 using Shrooms.EntityModels.Models;
+using Shrooms.EntityModels.Models.Committee;
 using Shrooms.EntityModels.Models.Kudos;
 using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.EntityModels.Models.Notifications;
@@ -13,7 +13,7 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 
         public OtherEntitiesConfig(DbModelBuilder modelBuilder)
         {
-            this._modelBuilder = modelBuilder;
+            _modelBuilder = modelBuilder;
         }
 
         public void Add()

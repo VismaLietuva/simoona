@@ -34,8 +34,8 @@ namespace Shrooms.DataTransferObjects.Models.Emails
             Body = body;
             Subject = subject;
             Receivers = receivers;
-            SenderEmail = ConstBusinessLayer.FromEmailAddress;
-            SenderFullName = ConstBusinessLayer.EmailSenderName;
+            SenderEmail = BusinessLayerConstants.FromEmailAddress;
+            SenderFullName = BusinessLayerConstants.EmailSenderName;
         }
 
         public EmailDto(string receiver, string subject, string body)
@@ -43,8 +43,8 @@ namespace Shrooms.DataTransferObjects.Models.Emails
             Body = body;
             Subject = subject;
             Receivers = new List<string> { receiver };
-            SenderEmail = ConstBusinessLayer.FromEmailAddress;
-            SenderFullName = ConstBusinessLayer.EmailSenderName;
+            SenderEmail = BusinessLayerConstants.FromEmailAddress;
+            SenderFullName = BusinessLayerConstants.EmailSenderName;
         }
     }
 }

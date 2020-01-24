@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using Shrooms.Constants.ErrorCodes;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
+using Shrooms.Host.Contracts.Constants;
 
-namespace DomainServiceValidators.Validators.Kudos
+namespace Shrooms.DomainServiceValidators.Validators.Kudos
 {
     public class KudosServiceValidator : IKudosServiceValidator
     {

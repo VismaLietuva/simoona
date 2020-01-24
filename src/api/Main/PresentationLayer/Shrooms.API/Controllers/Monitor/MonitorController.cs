@@ -2,9 +2,9 @@
 using System.Web.Http;
 using AutoMapper;
 using Shrooms.API.Filters;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.DataTransferObjects.Models.Monitors;
 using Shrooms.Domain.Services.Monitors;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.WebViewModels.Models.Monitors;
 
 namespace Shrooms.API.Controllers.Monitor

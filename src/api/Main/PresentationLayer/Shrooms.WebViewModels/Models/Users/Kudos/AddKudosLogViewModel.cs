@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using Shrooms.Constants.EntityValidationValues;
 
-namespace Shrooms.WebViewModels.Models.Kudos
+namespace Shrooms.WebViewModels.Models.Users.Kudos
 {
     public class AddKudosLogViewModel
     {
@@ -15,7 +15,7 @@ namespace Shrooms.WebViewModels.Models.Kudos
         [Required]
         [Range(ValidationConstants.KudosMultiplyByMinValue, ValidationConstants.KudosMultiplyByMaxValue)]
         public int MultiplyBy { get; set; }
-        
+
         /// <summary>
         /// Explicit number of points each receiver should get. If null, amount will be calculated.
         /// </summary>

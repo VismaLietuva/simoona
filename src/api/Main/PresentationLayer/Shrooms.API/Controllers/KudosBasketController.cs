@@ -2,17 +2,18 @@
 using System.Web.Http;
 using AutoMapper;
 using Shrooms.API.Controllers.Kudos;
+using Shrooms.API.Controllers.Wall;
 using Shrooms.API.Filters;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.WebApi;
 using Shrooms.DataTransferObjects.Models.KudosBasket;
 using Shrooms.Domain.Services.KudosBaskets;
 using Shrooms.DomainExceptions.Exceptions.KudosBaskets;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.WebViewModels.Models.KudosBaskets;
 using Shrooms.WebViewModels.Models.Wall.Widgets;
 using WebApi.OutputCache.V2;
 
-namespace Shrooms.API.Controllers.WebApi
+namespace Shrooms.API.Controllers
 {
     [Authorize]
     [AutoInvalidateCacheOutput]
@@ -57,7 +58,7 @@ namespace Shrooms.API.Controllers.WebApi
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.KudosBasket)]
-        [CacheOutput(ServerTimeSpan = ConstWebApi.OneHour)]
+        [CacheOutput(ServerTimeSpan = WebApiConstants.OneHour)]
         public IHttpActionResult GetKudosBasketWidget()
         {
             var basket = _kudosBasketService.GetKudosBasketWidget(GetUserAndOrganization());

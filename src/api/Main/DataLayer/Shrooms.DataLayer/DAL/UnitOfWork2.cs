@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.Entity;
 using System.Threading.Tasks;
+using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.DataLayer.DAL
 {

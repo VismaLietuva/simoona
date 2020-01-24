@@ -5,12 +5,12 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Constants.Authorization.Permissions;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Permissions;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.UnitTests.Extensions;
 
 namespace Shrooms.UnitTests.DomainService

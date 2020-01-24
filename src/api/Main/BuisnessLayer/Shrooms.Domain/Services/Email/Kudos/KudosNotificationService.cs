@@ -1,16 +1,15 @@
 ﻿using System.Data.Entity;
 using System.Linq;
-using Shrooms.Constants;
 using Shrooms.Constants.BusinessLayer;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.DataTransferObjects.Models.Emails;
 using Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
-using Shrooms.Infrastructure.Configuration;
-using Shrooms.Infrastructure.Email;
-using Shrooms.Infrastructure.Email.Templating;
+using Shrooms.Host.Contracts.Constants;
+using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Infrastructure;
+using Shrooms.Host.Contracts.Infrastructure.Email;
 
 namespace Shrooms.Domain.Services.Email.Kudos
 {
@@ -94,7 +93,7 @@ namespace Shrooms.Domain.Services.Email.Kudos
                 userNotificationSettingsUrl,
                 kudosLog.Points,
                 kudosLog.KudosTypeName,
-                sendingUserFullName == null ? ConstBusinessLayer.DeletedUserName : sendingUserFullName,
+                sendingUserFullName == null ? BusinessLayerConstants.DeletedUserName : sendingUserFullName,
                 kudosLog.Comments,
                 kudosProfileUrl);
             var body = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.KudosReceived);
@@ -114,7 +113,7 @@ namespace Shrooms.Domain.Services.Email.Kudos
                 userNotificationSettingsUrl,
                 kudosLog.Points,
                 kudosLog.KudosTypeName,
-                sendingUserFullName == null ? ConstBusinessLayer.DeletedUserName : sendingUserFullName,
+                sendingUserFullName == null ? BusinessLayerConstants.DeletedUserName : sendingUserFullName,
                 kudosLog.Comments,
                 kudosProfileUrl);
             var body = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.KudosDecreased);

@@ -3,9 +3,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Google.Apis.Books.v1;
 using Google.Apis.Services;
-using Shrooms.Infrastructure.GoogleBookApiService;
+using Shrooms.DataTransferObjects.Models.GoogleBookApiService;
+using Shrooms.Host.Contracts.Infrastructure;
 
-namespace Shrooms.Infrastructure.GoogleBookService
+namespace Shrooms.Infrastructure.GoogleBookApiService
 {
     public class GoogleBookService : IBookInfoService
     {

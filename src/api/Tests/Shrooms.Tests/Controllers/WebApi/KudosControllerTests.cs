@@ -11,13 +11,13 @@ using AutoMapper;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.API.Controllers.Kudos;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.Permissions;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.WebViewModels.Models;
-using Shrooms.WebViewModels.Models.Kudos;
+using Shrooms.WebViewModels.Models.Users.Kudos;
 
 namespace Shrooms.UnitTests.Controllers.WebApi
 {

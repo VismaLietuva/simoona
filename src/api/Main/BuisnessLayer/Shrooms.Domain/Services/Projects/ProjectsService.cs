@@ -3,10 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.DataLayer;
-using Shrooms.Constants.ErrorCodes;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Projects;
 using Shrooms.DataTransferObjects.Models.Users;
@@ -15,7 +12,8 @@ using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
-using Shrooms.EntityModels.Models.Multiwall;
+using Shrooms.Host.Contracts.Constants;
+using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.Domain.Services.Projects
 {
@@ -280,7 +278,7 @@ namespace Shrooms.Domain.Services.Projects
         {
             var project = await _projectsDbSet
                 .Include(x => x.Members)
-                .FirstOrDefaultAsync(x => x.Id == projectId && 
+                .FirstOrDefaultAsync(x => x.Id == projectId &&
                                      x.OrganizationId == userAndOrg.OrganizationId);
 
             ValidateExpelMember(project, userAndOrg, expelUserId);
@@ -296,7 +294,7 @@ namespace Shrooms.Domain.Services.Projects
         {
             var user = _usersDbSet
                 .Include(x => x.Projects)
-                .First(x => x.Id == userId && 
+                .First(x => x.Id == userId &&
                             x.OrganizationId == userOrg.OrganizationId);
 
             var wallsThatShouldBeRemovedFromUser = user.Projects

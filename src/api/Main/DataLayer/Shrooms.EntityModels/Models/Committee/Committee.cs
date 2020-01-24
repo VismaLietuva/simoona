@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Shrooms.EntityModels.Models
+namespace Shrooms.EntityModels.Models.Committee
 {
     public class Committee : BaseModelWithOrg
     {

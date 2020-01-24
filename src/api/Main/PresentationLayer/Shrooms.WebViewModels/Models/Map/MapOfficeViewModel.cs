@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Shrooms.WebViewModels.Models
+namespace Shrooms.WebViewModels.Models.Map
 {
     public class MapOfficeViewModel : AbstractViewModel
     {

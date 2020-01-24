@@ -1,6 +1,4 @@
-﻿using Shrooms.EntityModels.Models.Multiwall;
-
-namespace Shrooms.DataTransferObjects.Models.Wall.Posts.Comments
+﻿namespace Shrooms.DataTransferObjects.Models.Wall.Posts.Comments
 {
     public class CommentCreatedDTO
     {

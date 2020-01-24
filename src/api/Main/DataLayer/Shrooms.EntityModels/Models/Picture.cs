@@ -21,7 +21,7 @@
         public int? ThumbHeight { get; set; }
 
         public int? MiniThumbWidth { get; set; }
-                    
+
         public int? MiniThumbHeight { get; set; }
     }
 }

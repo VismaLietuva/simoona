@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Shrooms.EntityModels.Models.Notifications
 {
-    public class NotificationUser 
+    public class NotificationUser
     {
         [ForeignKey("Notification")]
         public int NotificationId { get; set; }

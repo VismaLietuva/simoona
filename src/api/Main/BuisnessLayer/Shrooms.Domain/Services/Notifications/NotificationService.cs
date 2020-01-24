@@ -3,7 +3,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using Shrooms.DataLayer.DAL;
+using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Notification;
 using Shrooms.DataTransferObjects.Models.Wall;
@@ -12,9 +12,8 @@ using Shrooms.DataTransferObjects.Models.Wall.Posts.Comments;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Events;
-using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.EntityModels.Models.Notifications;
-using BusinessConstants = Shrooms.Constants.BusinessLayer.ConstBusinessLayer;
+using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.Domain.Services.Notifications
 {
@@ -57,11 +56,11 @@ namespace Shrooms.Domain.Services.Notifications
             {
                 case WallType.Events:
                     postType = NotificationType.EventPost;
-                    sources.EventId = _eventDbSet.Where(x => x.WallId == wallId).FirstOrDefault().Id.ToString();
+                    sources.EventId = _eventDbSet.FirstOrDefault(x => x.WallId == wallId)?.Id.ToString();
                     break;
                 case WallType.Project:
                     postType = NotificationType.ProjectPost;
-                    sources.ProjectId = _projectDbSet.Where(x => x.WallId == wallId).FirstOrDefault().Id.ToString();
+                    sources.ProjectId = _projectDbSet.FirstOrDefault(x => x.WallId == wallId)?.Id.ToString();
                     break;
             }
 
@@ -130,7 +129,7 @@ namespace Shrooms.Domain.Services.Notifications
                             .Where(w => !w.IsAlreadySeen && w.UserId == userOrg.UserId)
                             .Select(s => s.Notification)
                             .OrderByDescending(o => o.Created)
-                            .Take(() => BusinessConstants.MaxNotificationsToShow)
+                            .Take(() => BusinessLayerConstants.MaxNotificationsToShow)
                             .ToListAsync();
 
             return _mapper.Map<IEnumerable<NotificationDto>>(result);

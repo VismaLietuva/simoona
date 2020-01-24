@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Shrooms.DataLayer;
+using Shrooms.DataLayer.DAL;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.Configuration;
 using Shrooms.UnitTests.Extensions;
 
 namespace Shrooms.UnitTests.Mocks
 {
-    public class NewMockRepository<TEntity> : EFRepository<TEntity>
+    public class NewMockRepository<TEntity> : EfRepository<TEntity>
         where TEntity : class
     {
         private readonly List<TEntity> _listContext;
@@ -41,7 +42,7 @@ namespace Shrooms.UnitTests.Mocks
                 return false;
             });
 
-            DbSet.SetDbSetData(_listContext.AsQueryable());
+            _dbSet.SetDbSetData(_listContext.AsQueryable());
 
             return entity;
         }
@@ -49,13 +50,13 @@ namespace Shrooms.UnitTests.Mocks
         public override void Insert(TEntity entity)
         {
             _listContext.Add(entity);
-            DbSet.SetDbSetData(_listContext.AsQueryable());
+            _dbSet.SetDbSetData(_listContext.AsQueryable());
         }
 
         public override void Delete(TEntity entityToDelete)
         {
             this._listContext.Remove(entityToDelete);
-            DbSet.SetDbSetData(_listContext.AsQueryable());
+            _dbSet.SetDbSetData(_listContext.AsQueryable());
         }
 
         public override void Update(TEntity entity)
@@ -72,7 +73,7 @@ namespace Shrooms.UnitTests.Mocks
                 _listContext.Add(entity);
             }
 
-            DbSet.SetDbSetData(_listContext.AsQueryable());
+            _dbSet.SetDbSetData(_listContext.AsQueryable());
         }
     }
 }

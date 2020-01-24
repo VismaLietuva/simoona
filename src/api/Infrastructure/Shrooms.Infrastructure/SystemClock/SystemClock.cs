@@ -1,4 +1,5 @@
 ﻿using System;
+using Shrooms.Host.Contracts.Infrastructure;
 
 namespace Shrooms.Infrastructure.SystemClock
 {

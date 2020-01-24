@@ -7,16 +7,17 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
-using Shrooms.Authentification;
+using Shrooms.Authentification.Membership;
 using Shrooms.Constants.BusinessLayer;
-using Shrooms.Constants.ErrorCodes;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Users;
+using Shrooms.DataTransferObjects.Models.Wall;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.EntityModels.Models.Notifications;
+using Shrooms.Host.Contracts.Constants;
+using Shrooms.Host.Contracts.DAL;
 using WallModel = Shrooms.EntityModels.Models.Multiwall.Wall;
 
 namespace Shrooms.Domain.Services.UserService
@@ -62,7 +63,7 @@ namespace Shrooms.Domain.Services.UserService
                 throw new ValidationException(ErrorCodes.CultureUnsupported, "Unsupported culture");
             }
 
-            var isLanguageSupported = ConstBusinessLayer.SupportedLanguages.Any(x => x.LCID == culture.LCID);
+            var isLanguageSupported = BusinessLayerConstants.SupportedLanguages.Any(x => x.LCID == culture.LCID);
             if (!isLanguageSupported)
             {
                 throw new ValidationException(ErrorCodes.CultureUnsupported, "Unsupported culture");
@@ -121,7 +122,7 @@ namespace Shrooms.Domain.Services.UserService
 
             var settingsDto = new LocalizationSettingsDto
             {
-                Languages = ConstBusinessLayer.SupportedLanguages
+                Languages = BusinessLayerConstants.SupportedLanguages
                     .Select(c => new LanguageDto { DisplayName = c.DisplayName, Name = c.Name, IsSelected = userCulture.LCID == c.LCID })
                     .OrderBy(l => l.DisplayName)
                     .ToList(),
@@ -157,12 +158,12 @@ namespace Shrooms.Domain.Services.UserService
         public IEnumerable<string> GetWallUserAppNotificationEnabledIds(string posterId, int wallId)
         {
             var newUserAndExternalRoles = _rolesDbSet
-                .Where(r => r.Name == Shrooms.Constants.Authorization.Roles.NewUser ||
-                            r.Name == Shrooms.Constants.Authorization.Roles.External)
+                .Where(r => r.Name == Host.Contracts.Constants.Roles.NewUser ||
+                            r.Name == Host.Contracts.Constants.Roles.External)
                 .ToList();
 
-            var newUserRoleId = newUserAndExternalRoles.First(r => r.Name == Shrooms.Constants.Authorization.Roles.NewUser).Id;
-            var externalRoleId = newUserAndExternalRoles.First(r => r.Name == Shrooms.Constants.Authorization.Roles.External).Id;
+            var newUserRoleId = newUserAndExternalRoles.First(r => r.Name == Host.Contracts.Constants.Roles.NewUser).Id;
+            var externalRoleId = newUserAndExternalRoles.First(r => r.Name == Host.Contracts.Constants.Roles.External).Id;
 
             var wall = _wallDbSet.Single(w => w.Id == wallId);
 
@@ -170,7 +171,7 @@ namespace Shrooms.Domain.Services.UserService
                 .Include(u => u.WallUsers)
                 .Include(u => u.Roles)
                 .Where(user => user.WallUsers.Any(x => x.WallId == wall.Id && x.AppNotificationsEnabled == true) &&
-                               !user.Roles.Any(r => r.RoleId == newUserRoleId) &&
+                               user.Roles.All(r => r.RoleId != newUserRoleId) &&
                                user.Id != posterId)
                 .Where(ExternalRoleFilter(wall, externalRoleId))
                 .Select(u => u.Id)
@@ -183,18 +184,18 @@ namespace Shrooms.Domain.Services.UserService
         public IList<string> GetWallUsersEmails(string senderEmail, EntityModels.Models.Multiwall.Wall wall)
         {
             var newUserAndExternalRoles = _rolesDbSet
-                .Where(r => r.Name == Shrooms.Constants.Authorization.Roles.NewUser ||
-                            r.Name == Shrooms.Constants.Authorization.Roles.External)
+                .Where(r => r.Name == Host.Contracts.Constants.Roles.NewUser ||
+                            r.Name == Host.Contracts.Constants.Roles.External)
                 .ToList();
 
-            var newUserRoleId = newUserAndExternalRoles.First(r => r.Name == Shrooms.Constants.Authorization.Roles.NewUser).Id;
-            var externalRoleId = newUserAndExternalRoles.First(r => r.Name == Shrooms.Constants.Authorization.Roles.External).Id;
+            var newUserRoleId = newUserAndExternalRoles.First(r => r.Name == Host.Contracts.Constants.Roles.NewUser).Id;
+            var externalRoleId = newUserAndExternalRoles.First(r => r.Name == Host.Contracts.Constants.Roles.External).Id;
 
             var emails = _usersDbSet
                 .Include(u => u.WallUsers)
                 .Include(u => u.Roles)
                 .Where(user => user.WallUsers.Any(x => x.WallId == wall.Id && x.EmailNotificationsEnabled == true) &&
-                               !user.Roles.Any(r => r.RoleId == newUserRoleId) &&
+                               user.Roles.All(r => r.RoleId != newUserRoleId) &&
                                user.Email != senderEmail)
                 .Where(ExternalRoleFilter(wall, externalRoleId))
                 .Select(u => u.Email)
@@ -260,32 +261,31 @@ namespace Shrooms.Domain.Services.UserService
                 .Select(u => u.NotificationsSettings)
                 .FirstOrDefaultAsync();
 
-            var settingsDto = new UserNotificationsSettingsDto
-            {
-                EventsAppNotifications = (settings != null) ? settings.EventsAppNotifications : true,
-                EventsEmailNotifications = (settings != null) ? settings.EventsEmailNotifications : true,
-                ProjectsAppNotifications = (settings != null) ? settings.ProjectsAppNotifications : true,
-                ProjectsEmailNotifications = (settings != null) ? settings.ProjectsEmailNotifications : true,
-                MyPostsAppNotifications = (settings != null) ? settings.MyPostsAppNotifications : true,
-                MyPostsEmailNotifications = (settings != null) ? settings.MyPostsEmailNotifications : true,
-                FollowingPostsAppNotifications = (settings != null) ? settings.FollowingPostsAppNotifications : true,
-                FollowingPostsEmailNotifications = (settings != null) ? settings.FollowingPostsEmailNotifications : true,
-
-                Walls = _wallMembersDbSet
+            var walls = _wallMembersDbSet
                 .Include(x => x.Wall)
-                .Where(x => x.UserId == userOrg.UserId &&
-                    x.Wall != null &&
-                    x.Wall.OrganizationId == userOrg.OrganizationId)
-                .Where(x => x.Wall.Type == WallType.UserCreated ||
-                    x.Wall.Type == WallType.Main)
-                .Select(x => new WallNotificationsDto()
+                .Where(x => x.UserId == userOrg.UserId && x.Wall != null && x.Wall.OrganizationId == userOrg.OrganizationId)
+                .Where(x => x.Wall.Type == WallType.UserCreated || x.Wall.Type == WallType.Main)
+                .Select(x => new WallNotificationsDto
                 {
                     WallName = x.Wall.Name,
                     WallId = x.WallId,
                     IsMainWall = x.Wall.Type == WallType.Main,
                     IsAppNotificationEnabled = x.AppNotificationsEnabled,
                     IsEmailNotificationEnabled = x.EmailNotificationsEnabled
-                })
+                });
+
+            var settingsDto = new UserNotificationsSettingsDto
+            {
+                EventsAppNotifications = (settings == null) || settings.EventsAppNotifications,
+                EventsEmailNotifications = (settings == null) || settings.EventsEmailNotifications,
+                ProjectsAppNotifications = (settings == null) || settings.ProjectsAppNotifications,
+                ProjectsEmailNotifications = (settings == null) || settings.ProjectsEmailNotifications,
+                MyPostsAppNotifications = (settings == null) || settings.MyPostsAppNotifications,
+                MyPostsEmailNotifications = (settings == null) || settings.MyPostsEmailNotifications,
+                FollowingPostsAppNotifications = (settings == null) || settings.FollowingPostsAppNotifications,
+                FollowingPostsEmailNotifications = (settings == null) || settings.FollowingPostsEmailNotifications,
+
+                Walls = walls
             };
 
             return settingsDto;

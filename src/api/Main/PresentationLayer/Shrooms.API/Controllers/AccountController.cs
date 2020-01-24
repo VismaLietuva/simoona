@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Http;
 using AutoMapper;
 using Microsoft.AspNet.Identity;
@@ -15,8 +14,8 @@ using Microsoft.Owin.Security.OAuth;
 using Shrooms.API.Helpers;
 using Shrooms.API.Providers;
 using Shrooms.API.Results;
-using Shrooms.Authentification;
 using Shrooms.Authentification.ExternalLoginInfrastructure;
+using Shrooms.Authentification.Membership;
 using Shrooms.Constants.Authentication;
 using Shrooms.Constants.WebApi;
 using Shrooms.DataTransferObjects.Models;
@@ -28,7 +27,7 @@ using Shrooms.EntityModels.Models;
 using Shrooms.WebViewModels.Models;
 using Shrooms.WebViewModels.Models.AccountModels;
 
-namespace Shrooms.API.Controllers.WebApi
+namespace Shrooms.API.Controllers
 {
     [Authorize]
     [RoutePrefix("Account")]
@@ -102,7 +101,7 @@ namespace Shrooms.API.Controllers.WebApi
             if (_administrationService.UserEmailExists(model.Email))
             {
                 var user = await _userManager.FindByEmailAsync(model.Email);
-                
+
                 if (user != null && !user.EmailConfirmed && _administrationService.HasExistingExternalLogin(model.Email, AuthenticationConstants.InternalLoginProvider))
                 {
                     await _userManager.RemovePasswordAsync(user.Id);
@@ -227,7 +226,7 @@ namespace Shrooms.API.Controllers.WebApi
             }
 
             return Ok();
-        }    
+        }
 
         [AllowAnonymous]
         [Route("InternalLogins")]
@@ -440,7 +439,7 @@ namespace Shrooms.API.Controllers.WebApi
             properties.Dictionary.Add("refresh_token", context.Token);
             return properties;
         }
-    
+
         private async Task<LoggedInUserInfoViewModel> GetLoggedInUserInfo()
         {
             var userId = User.Identity.GetUserId();
@@ -453,11 +452,11 @@ namespace Shrooms.API.Controllers.WebApi
                 Roles = await _userManager.GetRolesAsync(userId),
                 UserName = User.Identity.Name,
                 UserId = userId,
-                OrganizationName = claimsIdentity.FindFirstValue(ConstWebApi.ClaimOrganizationName),
-                OrganizationId = claimsIdentity.FindFirstValue(ConstWebApi.ClaimOrganizationId),
+                OrganizationName = claimsIdentity.FindFirstValue(WebApiConstants.ClaimOrganizationName),
+                OrganizationId = claimsIdentity.FindFirstValue(WebApiConstants.ClaimOrganizationId),
                 FullName = claimsIdentity.FindFirstValue(ClaimTypes.GivenName),
                 Permissions = _permissionService.GetUserPermissions(userId, organizationId),
-                Impersonated = claimsIdentity?.Claims.Any(c => c.Type == ConstWebApi.ClaimUserImpersonation && c.Value == true.ToString()) ?? false,
+                Impersonated = claimsIdentity?.Claims.Any(c => c.Type == WebApiConstants.ClaimUserImpersonation && c.Value == true.ToString()) ?? false,
                 CultureCode = user.CultureCode,
                 TimeZone = user.TimeZone
             };

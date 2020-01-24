@@ -7,13 +7,13 @@ using AutoMapper;
 using MoreLinq;
 using PagedList;
 using Shrooms.API.Filters;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.WebApi;
-using Shrooms.DataLayer;
 using Shrooms.EntityModels.Models;
-using Shrooms.WebViewModels.Models;
+using Shrooms.Host.Contracts.Constants;
+using Shrooms.Host.Contracts.DAL;
+using Shrooms.WebViewModels.Models.Exam;
 
-namespace Shrooms.API.Controllers.WebApi
+namespace Shrooms.API.Controllers
 {
     [Authorize]
     public class ExamController : ApiController
@@ -21,14 +21,12 @@ namespace Shrooms.API.Controllers.WebApi
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IRepository<Exam> _examRepository;
-        private readonly IRepository<Certificate> _certificateRepository;
 
         public ExamController(IMapper mapper, IUnitOfWork unitOfWork)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _examRepository = unitOfWork.GetRepository<Exam>();
-            _certificateRepository = unitOfWork.GetRepository<Certificate>();
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Exam)]
@@ -61,7 +59,7 @@ namespace Shrooms.API.Controllers.WebApi
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Exam)]
-        public IEnumerable<ExamAutoCompleteViewModel> GetExamForAutoComplete(string s, int pageSize = ConstWebApi.DefaultAutocompleteListSize)
+        public IEnumerable<ExamAutoCompleteViewModel> GetExamForAutoComplete(string s, int pageSize = WebApiConstants.DefaultAutocompleteListSize)
         {
             var start = s.ToLower();
             var exams = _examRepository.Get(e => e.Title.Contains(start))
@@ -74,7 +72,7 @@ namespace Shrooms.API.Controllers.WebApi
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Exam)]
-        public IEnumerable<ExamAutoCompleteViewModel> GetExamNumbersForAutoComplete(string title, string s, int pageSize = ConstWebApi.DefaultAutocompleteListSize)
+        public IEnumerable<ExamAutoCompleteViewModel> GetExamNumbersForAutoComplete(string title, string s, int pageSize = WebApiConstants.DefaultAutocompleteListSize)
         {
             var start = s.ToLower();
             var exams = _examRepository.Get(e => e.Title == title && e.Number.ToLower().Contains(start))
@@ -87,7 +85,7 @@ namespace Shrooms.API.Controllers.WebApi
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Exam)]
-        public IEnumerable<ExamAutoCompleteViewModel> GetExamForAutoCompleteByTitleAndNumber(string title, string number, int pageSize = ConstWebApi.DefaultAutocompleteListSize)
+        public IEnumerable<ExamAutoCompleteViewModel> GetExamForAutoCompleteByTitleAndNumber(string title, string number, int pageSize = WebApiConstants.DefaultAutocompleteListSize)
         {
             number = number ?? string.Empty;
             title = title ?? string.Empty;

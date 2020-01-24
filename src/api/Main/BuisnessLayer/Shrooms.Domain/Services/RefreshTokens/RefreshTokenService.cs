@@ -2,10 +2,10 @@
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.RefreshTokens;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.Domain.Services.RefreshTokens
 {

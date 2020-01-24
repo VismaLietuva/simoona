@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using NUnit.Framework;
-using Shrooms.ModelMappings;
 using Shrooms.ModelMappings.Profiles;
 
 namespace Shrooms.UnitTests.ModelMappings

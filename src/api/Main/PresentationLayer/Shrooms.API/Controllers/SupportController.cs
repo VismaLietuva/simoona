@@ -6,10 +6,9 @@ using System.Net.Http;
 using System.Web.Http;
 using AutoMapper;
 using Shrooms.API.Filters;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.DataTransferObjects.Models.Support;
 using Shrooms.Domain.Services.Support;
-using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.WebViewModels.Models.Support;
 
 namespace Shrooms.API.Controllers

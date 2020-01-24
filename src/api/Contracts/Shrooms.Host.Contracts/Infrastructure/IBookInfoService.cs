@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
-using Shrooms.Infrastructure.GoogleBookApiService;
+using Shrooms.DataTransferObjects.Models.GoogleBookApiService;
 
-namespace Shrooms.Infrastructure.GoogleBookService
+namespace Shrooms.Host.Contracts.Infrastructure
 {
     public interface IBookInfoService
     {

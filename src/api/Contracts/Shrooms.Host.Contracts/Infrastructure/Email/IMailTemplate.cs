@@ -1,6 +1,6 @@
 ﻿using Shrooms.DataTransferObjects.EmailTemplateViewModels;
 
-namespace Shrooms.Infrastructure.Email.Templating
+namespace Shrooms.Host.Contracts.Infrastructure.Email
 {
     public interface IMailTemplate
     {

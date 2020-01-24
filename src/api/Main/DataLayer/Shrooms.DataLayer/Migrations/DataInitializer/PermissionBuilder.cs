@@ -5,6 +5,7 @@ using Shrooms.Constants.Authorization;
 using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.DataLayer.DAL;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.Constants;
 
 namespace Shrooms.DataLayer.Migrations.DataInitializer
 {

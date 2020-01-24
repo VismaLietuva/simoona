@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DomainServiceValidators.Validators.UserAdministration
+namespace Shrooms.DomainServiceValidators.Validators.UserAdministration
 {
     public interface IUserAdministrationValidator
     {

@@ -5,11 +5,11 @@ using System.Security.Principal;
 using System.Threading;
 using Microsoft.Owin;
 using Shrooms.Constants.WebApi;
-using Shrooms.DataLayer;
 using Shrooms.EntityModels.Models;
-using Shrooms.Infrastructure.Configuration;
+using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Infrastructure;
 
-namespace Shrooms.Authorization.BasicAuth
+namespace Shrooms.Authentification.BasicAuth
 {
     public class BasicAuthValidator : IBasicAuthValidator
     {
@@ -40,7 +40,7 @@ namespace Shrooms.Authorization.BasicAuth
             {
                 new Claim("name", "app"),
                 new Claim("role", "scheduler-webhook"),
-                new Claim(ConstWebApi.ClaimOrganizationName, tenantName)
+                new Claim(WebApiConstants.ClaimOrganizationName, tenantName)
             };
 
             var identity = new ClaimsIdentity(claims, "Basic", "name", "role");

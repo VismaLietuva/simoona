@@ -1,4 +1,4 @@
-﻿namespace Shrooms.Azure
+﻿namespace Shrooms.Infrastructure.Storage.AzureBlob
 {
     public static class AzureSettings
     {

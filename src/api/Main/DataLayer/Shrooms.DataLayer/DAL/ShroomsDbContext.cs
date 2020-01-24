@@ -8,16 +8,17 @@ using System.Threading.Tasks;
 using System.Web;
 using Microsoft.AspNet.Identity;
 using Shrooms.DataLayer.DAL.EntityTypeConfigurations;
-using Shrooms.EntityModels;
 using Shrooms.EntityModels.Attributes;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Badges;
 using Shrooms.EntityModels.Models.Books;
+using Shrooms.EntityModels.Models.Committee;
 using Shrooms.EntityModels.Models.Events;
 using Shrooms.EntityModels.Models.Kudos;
 using Shrooms.EntityModels.Models.Monitors;
 using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.EntityModels.Models.Notifications;
+using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.DataLayer.DAL
 {
@@ -248,8 +249,7 @@ namespace Shrooms.DataLayer.DAL
             var trackableItems = entries.Where(p => p.Entity is ITrackable);
             foreach (var entry in trackableItems)
             {
-                var trackableEntry = entry.Entity as ITrackable;
-                if (trackableEntry != null)
+                if (entry.Entity is ITrackable trackableEntry)
                 {
                     string userId = string.Empty;
                     if (HttpContext.Current != null && HttpContext.Current.User != null)

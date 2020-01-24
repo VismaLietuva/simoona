@@ -1,4 +1,4 @@
-﻿namespace Shrooms.DataLayer
+﻿namespace Shrooms.Host.Contracts.DAL
 {
     public interface IUnitOfWork
     {

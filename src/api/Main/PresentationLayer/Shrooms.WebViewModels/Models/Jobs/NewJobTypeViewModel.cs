@@ -6,7 +6,7 @@ namespace Shrooms.WebViewModels.Models.Jobs
     public class NewJobTypeViewModel
     {
         [Required]
-        [StringLength(ConstWebApi.JobTitleMaxLength, MinimumLength = 1)]
+        [StringLength(WebApiConstants.JobTitleMaxLength, MinimumLength = 1)]
         public string Title { get; set; }
     }
 }

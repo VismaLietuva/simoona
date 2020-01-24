@@ -9,11 +9,10 @@ using System.Web.Http.Controllers;
 using System.Web.Http.Hosting;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.API.Controllers.WebApi;
-using Shrooms.DataLayer;
+using Shrooms.API.Controllers;
 using Shrooms.EntityModels.Models;
-using Shrooms.Infrastructure.Email;
-using Shrooms.ModelMappings;
+using Shrooms.Host.Contracts.DAL;
+using Shrooms.UnitTests.Mocks;
 using Shrooms.UnitTests.ModelMappings;
 using Shrooms.WebViewModels.Models;
 using Shrooms.WebViewModels.Models.PostModels;
@@ -30,8 +29,6 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         public void TestInitializer()
         {
             _unitOfWork = new MockUnitOfWork();
-
-            var emailService = Substitute.For<IMailingService>();
 
             _floorController = new FloorController(ModelMapper.Create(), _unitOfWork);
             _floorController.ControllerContext = Substitute.For<HttpControllerContext>();
@@ -90,7 +87,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         public void Floor_GetByOffice_Should_Return_Correct_Floors()
         {
             var floor = _floorController.GetByOffice(1);
-            Assert.AreEqual(1, floor.FirstOrDefault().Id);
+            Assert.AreEqual(1, floor.FirstOrDefault()?.Id);
         }
 
         [Test]

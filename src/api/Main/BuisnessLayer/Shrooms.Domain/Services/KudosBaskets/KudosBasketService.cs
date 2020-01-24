@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
-using DomainServiceValidators.Validators.KudosBaskets;
 using Shrooms.Constants.BusinessLayer;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.KudosBasket;
 using Shrooms.Domain.Services.Kudos;
+using Shrooms.DomainServiceValidators.Validators.KudosBaskets;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
+using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.Domain.Services.KudosBaskets
 {
@@ -18,7 +18,7 @@ namespace Shrooms.Domain.Services.KudosBaskets
     {
         private const int KudosMultiplier = 1;
 
-        private static object donateLock = new object();
+        private static object _donateLock = new object();
 
         private readonly IDbSet<KudosLog> _kudosLogsDbSet;
         private readonly IDbSet<ApplicationUser> _usersDbSet;
@@ -130,7 +130,7 @@ namespace Shrooms.Domain.Services.KudosBaskets
 
         public void MakeDonation(KudosBasketDonationDTO donation)
         {
-            lock (donateLock)
+            lock (_donateLock)
             {
                 var user = _usersDbSet
                     .First(usr => usr.Id == donation.UserId);
@@ -142,9 +142,9 @@ namespace Shrooms.Domain.Services.KudosBaskets
                 _kudosBasketValidator.CheckIfUserHasEnoughKudos(user.RemainingKudos, donation.DonationAmount);
 
                 var otherType = _kudosTypesDbSet
-                    .First(type => type.Type == ConstBusinessLayer.KudosTypeEnum.Other);
+                    .First(type => type.Type == BusinessLayerConstants.KudosTypeEnum.Other);
                 var minusType = _kudosTypesDbSet
-                    .First(type => type.Type == ConstBusinessLayer.KudosTypeEnum.Minus);
+                    .First(type => type.Type == BusinessLayerConstants.KudosTypeEnum.Minus);
 
                 var logComment = string.Format(Resources.Widgets.KudosBasket.KudosBasket.KudosBasketDonationComment, basket.Title);
                 var noUser = default(string);
@@ -216,7 +216,7 @@ namespace Shrooms.Domain.Services.KudosBaskets
             {
                 userDto = new KudosBasketLogUserDTO
                 {
-                    FullName = ConstBusinessLayer.DeletedUserName
+                    FullName = BusinessLayerConstants.DeletedUserName
                 };
             }
             else

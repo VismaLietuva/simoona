@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Shrooms.EntityModels.Models;
+using Shrooms.WebViewModels.Models.Certificate;
 
-namespace Shrooms.WebViewModels.Models
+namespace Shrooms.WebViewModels.Models.ChangeProfile
 {
     public class ChangeProfileInfoViewModel : ChangeProfileBaseModel
     {

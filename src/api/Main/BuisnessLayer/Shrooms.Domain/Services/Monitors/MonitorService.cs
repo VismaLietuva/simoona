@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using Shrooms.Constants.ErrorCodes;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Monitors;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models.Monitors;
+using Shrooms.Host.Contracts.Constants;
+using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.Domain.Services.Monitors
 {
@@ -87,7 +87,7 @@ namespace Shrooms.Domain.Services.Monitors
 
             monitor.Name = monitorDTO.Name;
             monitor.Modified = DateTime.UtcNow;
-            monitor.ModifiedBy = userAndOrganizationDTO.UserId; 
+            monitor.ModifiedBy = userAndOrganizationDTO.UserId;
             _uow.SaveChanges(false);
         }
     }

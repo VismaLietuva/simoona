@@ -6,12 +6,11 @@ using Excel;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Constants.BusinessLayer;
-using Shrooms.DataLayer.DAL;
-using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.ExcelGenerator;
 using Shrooms.UnitTests.Extensions;
 
@@ -51,7 +50,7 @@ namespace Shrooms.UnitTests.DomainService
             {
                 OrganizationId = 2,
                 SearchUserId = null,
-                Status = ConstBusinessLayer.KudosStatusAllFilter,
+                Status = BusinessLayerConstants.KudosStatusAllFilter,
                 SortBy = "Created",
                 SortOrder = "desc"
             };
@@ -84,7 +83,7 @@ namespace Shrooms.UnitTests.DomainService
             {
                 OrganizationId = 2,
                 SearchUserId = "testUserId3",
-                Status = ConstBusinessLayer.KudosStatusAllFilter,
+                Status = BusinessLayerConstants.KudosStatusAllFilter,
                 SortBy = "Created",
                 SortOrder = "desc"
             };

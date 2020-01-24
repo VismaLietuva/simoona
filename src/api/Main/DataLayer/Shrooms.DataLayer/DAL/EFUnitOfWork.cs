@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Infrastructure;
 using Shrooms.Infrastructure.Configuration;
 
-namespace Shrooms.DataLayer
+namespace Shrooms.DataLayer.DAL
 {
     public class EFUnitOfWork : IUnitOfWork
     {
@@ -30,7 +32,7 @@ namespace Shrooms.DataLayer
 
             IApplicationSettings appSettings = new ApplicationSettings();
 
-            repository = new EFRepository<TEntity>(DbContext, appSettings);
+            repository = new EfRepository<TEntity>(DbContext, appSettings);
             _repositories.Add(typeof(TEntity), repository);
             return repository;
         }

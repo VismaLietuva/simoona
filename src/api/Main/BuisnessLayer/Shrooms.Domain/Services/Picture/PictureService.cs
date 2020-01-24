@@ -3,9 +3,9 @@ using System.Data.Entity;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Shrooms.Azure;
-using Shrooms.DataLayer.DAL;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.DAL;
+using Shrooms.Infrastructure.Storage;
 
 namespace Shrooms.Domain.Services.Picture
 {
@@ -33,7 +33,7 @@ namespace Shrooms.Domain.Services.Picture
         private static string GetNewPictureName(string fileName)
         {
             var id = Guid.NewGuid().ToString();
-            var extension = Path.GetExtension(fileName).ToLowerInvariant();
+            var extension = Path.GetExtension(fileName)?.ToLowerInvariant();
 
             return $"{id}{extension}";
         }

@@ -8,10 +8,10 @@ using System.Web.Http;
 using AutoMapper;
 using PagedList;
 using Shrooms.API.Filters;
-using Shrooms.Authentification;
+using Shrooms.Authentification.Membership;
 using Shrooms.Constants.WebApi;
-using Shrooms.DataLayer;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.WebViewModels.Models;
 
 namespace Shrooms.API.Controllers
@@ -21,37 +21,37 @@ namespace Shrooms.API.Controllers
         where TViewModel : AbstractViewModel
         where TPostViewModel : AbstractViewModel
     {
-        protected readonly IUnitOfWork UnitOfWork;
-        protected readonly IRepository<TModel> Repository;
+        protected readonly IUnitOfWork _unitOfWork;
+        protected readonly IRepository<TModel> _repository;
 
         protected ShroomsUserManager UserManager { get; set; }
         protected ShroomsRoleManager RoleManager { get; set; }
 
-        protected readonly string DefaultOrderByProperty;
+        protected readonly string _defaultOrderByProperty;
         protected readonly IMapper _mapper;
 
         protected AbstractWebApiController(IMapper mapper, IUnitOfWork unitOfWork, ShroomsUserManager userManager, ShroomsRoleManager roleManager, string defaultOrderByProperty = null)
         {
             _mapper = mapper;
-            UnitOfWork = unitOfWork;
-            Repository = UnitOfWork.GetRepository<TModel>();
+            _unitOfWork = unitOfWork;
+            _repository = _unitOfWork.GetRepository<TModel>();
             UserManager = userManager;
             RoleManager = roleManager;
-            DefaultOrderByProperty = defaultOrderByProperty;
+            _defaultOrderByProperty = defaultOrderByProperty;
         }
 
         protected AbstractWebApiController(IMapper mapper, IUnitOfWork unitOfWork, string defaultOrderByProperty = null)
         {
             _mapper = mapper;
-            UnitOfWork = unitOfWork;
-            Repository = UnitOfWork.GetRepository<TModel>();
-            DefaultOrderByProperty = defaultOrderByProperty;
+            _unitOfWork = unitOfWork;
+            _repository = _unitOfWork.GetRepository<TModel>();
+            _defaultOrderByProperty = defaultOrderByProperty;
         }
 
         [HttpGet]
         public virtual HttpResponseMessage Get(int id, string includeProperties = "")
         {
-            var model = Repository.Get(f => f.Id == id, includeProperties: includeProperties).FirstOrDefault();
+            var model = _repository.Get(f => f.Id == id, includeProperties: includeProperties).FirstOrDefault();
             if (model == null)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Resources.Common.NotFound);
@@ -63,34 +63,34 @@ namespace Shrooms.API.Controllers
         [HttpGet]
         public virtual IEnumerable<TViewModel> GetAll(int maxResults = 0, string orderBy = null, string includeProperties = null)
         {
-            var model = Repository.Get(maxResults: maxResults, orderBy: orderBy ?? DefaultOrderByProperty, includeProperties: includeProperties);
+            var model = _repository.Get(maxResults: maxResults, orderBy: orderBy ?? _defaultOrderByProperty, includeProperties: includeProperties);
             return _mapper.Map<IEnumerable<TModel>, IEnumerable<TViewModel>>(model);
         }
 
         [HttpGet]
         public virtual PagedViewModel<TViewModel> GetPaged(string includeProperties = null, int page = 1,
-            int pageSize = ConstWebApi.DefaultPageSize, string sort = null, string dir = "", string s = "")
+            int pageSize = WebApiConstants.DefaultPageSize, string sort = null, string dir = "", string s = "")
         {
             return GetFilteredPaged(includeProperties, page, pageSize, sort, dir);
         }
 
         protected virtual PagedViewModel<TViewModel> GetFilteredPaged(
-            string includeProperties = null, int page = 1, int pageSize = ConstWebApi.DefaultPageSize,
+            string includeProperties = null, int page = 1, int pageSize = WebApiConstants.DefaultPageSize,
             string sort = null, string dir = "", Expression<Func<TModel, bool>> filter = null)
         {
             var sortQuery = string.IsNullOrEmpty(sort) ? null : $"{sort} {dir}";
 
-            IPagedList<TModel> models = Repository.Get(
-                includeProperties: includeProperties, filter: filter, orderBy: sortQuery ?? DefaultOrderByProperty)
+            IPagedList<TModel> models = _repository.Get(
+                includeProperties: includeProperties, filter: filter, orderBy: sortQuery ?? _defaultOrderByProperty)
                 .ToPagedList(page, pageSize);
 
-            var pagedVM = new StaticPagedList<TViewModel>(_mapper.Map<IEnumerable<TModel>, IEnumerable<TViewModel>>(models), models.PageNumber, models.PageSize, models.TotalItemCount);
+            var pagedVm = new StaticPagedList<TViewModel>(_mapper.Map<IEnumerable<TModel>, IEnumerable<TViewModel>>(models), models.PageNumber, models.PageSize, models.TotalItemCount);
 
             var result = new PagedViewModel<TViewModel>
             {
-                PagedList = pagedVM,
-                PageCount = pagedVM.PageCount,
-                ItemCount = pagedVM.TotalItemCount,
+                PagedList = pagedVm,
+                PageCount = pagedVm.PageCount,
+                ItemCount = pagedVm.TotalItemCount,
                 PageSize = pageSize
             };
 
@@ -107,14 +107,14 @@ namespace Shrooms.API.Controllers
             }
 
             // can not create new item with same id
-            if (Repository.GetByID(crudViewModel.Id) != null)
+            if (_repository.GetByID(crudViewModel.Id) != null)
             {
                 return Request.CreateResponse(HttpStatusCode.Conflict);
             }
 
             var model = _mapper.Map<TPostViewModel, TModel>(crudViewModel);
-            Repository.Insert(model);
-            UnitOfWork.Save();
+            _repository.Insert(model);
+            _unitOfWork.Save();
             crudViewModel.Id = model.Id;
 
             return Request.CreateResponse(HttpStatusCode.Created);
@@ -129,7 +129,7 @@ namespace Shrooms.API.Controllers
                 return Request.CreateResponse(HttpStatusCode.BadRequest);
             }
 
-            var model = Repository.GetByID(crudViewModel.Id);
+            var model = _repository.GetByID(crudViewModel.Id);
 
             if (model == null)
             {
@@ -137,8 +137,8 @@ namespace Shrooms.API.Controllers
             }
 
             _mapper.Map(crudViewModel, model);
-            Repository.Update(model);
-            UnitOfWork.Save();
+            _repository.Update(model);
+            _unitOfWork.Save();
 
             return Request.CreateResponse(HttpStatusCode.Created);
         }
@@ -146,15 +146,15 @@ namespace Shrooms.API.Controllers
         [HttpDelete]
         public virtual HttpResponseMessage Delete(int id)
         {
-            var model = Repository.GetByID(id);
+            var model = _repository.GetByID(id);
 
             if (model == null)
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound);
             }
 
-            Repository.Delete(model);
-            UnitOfWork.Save();
+            _repository.Delete(model);
+            _unitOfWork.Save();
             return Request.CreateResponse(HttpStatusCode.OK);
         }
     }

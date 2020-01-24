@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
-using Shrooms.DataLayer;
 using Shrooms.DataLayer.DAL;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.DAL;
 
-namespace Shrooms.Authentification
+namespace Shrooms.Authentification.Membership
 {
     public class ShroomsRoleStore : RoleStore<ApplicationRole>, IRoleStore<ApplicationRole, string>
     {

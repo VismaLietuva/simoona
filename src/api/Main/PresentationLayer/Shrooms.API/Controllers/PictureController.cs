@@ -6,11 +6,11 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Shrooms.API.Filters;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.WebApi;
 using Shrooms.Domain.Services.Picture;
+using Shrooms.Host.Contracts.Constants;
 
-namespace Shrooms.API.Controllers.WebApi
+namespace Shrooms.API.Controllers
 {
     [Authorize]
     public class PictureController : BaseController
@@ -34,7 +34,7 @@ namespace Shrooms.API.Controllers.WebApi
             await Request.Content.ReadAsMultipartAsync(provider);
             var imageContent = provider.Contents[0];
 
-            if (imageContent.Headers.ContentLength >= ConstWebApi.MaximumPictureSizeInBytes)
+            if (imageContent.Headers.ContentLength >= WebApiConstants.MaximumPictureSizeInBytes)
             {
                 return BadRequest("File is too large");
             }

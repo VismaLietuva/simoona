@@ -1,9 +1,8 @@
 ﻿using System;
 using Shrooms.DomainExceptions.Exceptions.Book;
-using static Shrooms.Constants.ErrorCodes.ErrorCodes;
-using Resources = Shrooms.Resources.Models.Books;
+using Shrooms.Host.Contracts.Constants;
 
-namespace DomainServiceValidators.Validators.Books
+namespace Shrooms.DomainServiceValidators.Validators.Books
 {
     public class BookServiceValidator : IBookServiceValidator
     {
@@ -11,7 +10,7 @@ namespace DomainServiceValidators.Validators.Books
         {
             if (alreadyExists)
             {
-                throw new BookException(BookAlreadyExistsCode);
+                throw new BookException(ErrorCodes.BookAlreadyExistsCode);
             }
         }
 
@@ -19,7 +18,7 @@ namespace DomainServiceValidators.Validators.Books
         {
             if (allQuantitiesNotZero == false)
             {
-                throw new BookException(BoolAllQuantitiesAreZeroCode);
+                throw new BookException(ErrorCodes.BoolAllQuantitiesAreZeroCode);
             }
         }
 
@@ -43,7 +42,7 @@ namespace DomainServiceValidators.Validators.Books
         {
             if (book == null)
             {
-                throw new BookException(BookNotFoundByExternalProviderCode);
+                throw new BookException(ErrorCodes.BookNotFoundByExternalProviderCode);
             }
         }
 
@@ -51,7 +50,7 @@ namespace DomainServiceValidators.Validators.Books
         {
             if (!bookExists)
             {
-                throw new BookException(Resources.Books.BookCannotBeReturned);
+                throw new BookException(Resources.Models.Books.Books.BookCannotBeReturned);
             }
         }
     }

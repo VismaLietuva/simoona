@@ -7,10 +7,10 @@ using AutoMapper;
 using MoreLinq;
 using PagedList;
 using Shrooms.API.Filters;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.WebApi;
-using Shrooms.DataLayer;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.Constants;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.WebViewModels.Models;
 using Shrooms.WebViewModels.Models.PostModels;
 
@@ -33,10 +33,10 @@ namespace Shrooms.API.Controllers
         [PermissionAuthorize(Permission = BasicPermissions.Office)]
         public OfficeViewModel GetDefault()
         {
-            var office = _mapper.Map<Office, OfficeViewModel>(Repository.Get(o => o.IsDefault).FirstOrDefault());
+            var office = _mapper.Map<Office, OfficeViewModel>(_repository.Get(o => o.IsDefault).FirstOrDefault());
             if (office == null)
             {
-                office = _mapper.Map<Office, OfficeViewModel>(Repository.Get().FirstOrDefault());
+                office = _mapper.Map<Office, OfficeViewModel>(_repository.Get().FirstOrDefault());
             }
 
             return office ?? new OfficeViewModel();
@@ -45,7 +45,7 @@ namespace Shrooms.API.Controllers
         [PermissionAuthorize(Permission = BasicPermissions.Office)]
         public IEnumerable<OfficeDropdownViewModel> GetAllOfficesForDropdown()
         {
-            var offices = Repository.Get().ToList();
+            var offices = _repository.Get().ToList();
             var defaultOffice = offices.FirstOrDefault(x => x.Name == "Vilniaus ofisas" && x.OrganizationId == 2);
             if (defaultOffice != null)
             {
@@ -59,7 +59,7 @@ namespace Shrooms.API.Controllers
         }
 
         [PermissionAuthorize(Permission = AdministrationPermissions.Office)]
-        public override PagedViewModel<OfficeViewModel> GetPaged(string includeProperties = null, int page = 1, int pageSize = ConstWebApi.DefaultPageSize,
+        public override PagedViewModel<OfficeViewModel> GetPaged(string includeProperties = null, int page = 1, int pageSize = WebApiConstants.DefaultPageSize,
             string sort = null, string dir = "", string s = "")
         {
             if (sort == "City" || sort == "Country" || sort == "Street" || sort == "Building")
@@ -77,11 +77,11 @@ namespace Shrooms.API.Controllers
             IQueryable<Office> offices;
             if (string.IsNullOrEmpty(s))
             {
-                offices = Repository.Get(orderBy: sortString, includeProperties: includeProperties);
+                offices = _repository.Get(orderBy: sortString, includeProperties: includeProperties);
             }
             else
             {
-                offices = Repository.Get(filter: o => o.Address.City.Contains(s) || o.Address.Country.Contains(s)
+                offices = _repository.Get(filter: o => o.Address.City.Contains(s) || o.Address.Country.Contains(s)
                                                     || o.Address.Street.Contains(s) || o.Address.Building.Contains(s)
                                                     || o.Name.Contains(s),
                                                   orderBy: sortString, includeProperties: includeProperties);
@@ -127,8 +127,8 @@ namespace Shrooms.API.Controllers
                 ResetDefaultOffice();
             }
 
-            Repository.Insert(office);
-            UnitOfWork.Save();
+            _repository.Insert(office);
+            _unitOfWork.Save();
 
             return Request.CreateResponse(HttpStatusCode.Created);
         }
@@ -141,7 +141,7 @@ namespace Shrooms.API.Controllers
                 return Request.CreateResponse(HttpStatusCode.BadRequest);
             }
 
-            var model = Repository.GetByID(viewModel.Id);
+            var model = _repository.GetByID(viewModel.Id);
             _mapper.Map(viewModel, model);
 
             if (model.IsDefault)
@@ -150,8 +150,8 @@ namespace Shrooms.API.Controllers
                 model.IsDefault = true; // ResetDefaultOffice() in tests case also resets model.IsDefault
             }
 
-            Repository.Update(model);
-            UnitOfWork.Save();
+            _repository.Update(model);
+            _unitOfWork.Save();
 
             return Request.CreateResponse(HttpStatusCode.Created);
         }
@@ -159,7 +159,7 @@ namespace Shrooms.API.Controllers
         [PermissionAuthorize(Permission = AdministrationPermissions.Office)]
         public override HttpResponseMessage Delete(int id)
         {
-            var office = Repository.Get(filter: of => of.Id == id, includeProperties: "Floors,Floors.Rooms,Floors.Rooms.ApplicationUsers").FirstOrDefault();
+            var office = _repository.Get(filter: of => of.Id == id, includeProperties: "Floors,Floors.Rooms,Floors.Rooms.ApplicationUsers").FirstOrDefault();
 
             if (office == null)
             {
@@ -176,14 +176,14 @@ namespace Shrooms.API.Controllers
                 f.OfficeId = null;
             });
 
-            Repository.Delete(office);
-            UnitOfWork.Save();
+            _repository.Delete(office);
+            _unitOfWork.Save();
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         private void ResetDefaultOffice()
         {
-            Repository.Get(o => o.IsDefault).ForEach(o => o.IsDefault = false);
+            _repository.Get(o => o.IsDefault).ForEach(o => o.IsDefault = false);
         }
     }
 }

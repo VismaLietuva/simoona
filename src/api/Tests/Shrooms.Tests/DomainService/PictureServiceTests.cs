@@ -3,10 +3,10 @@ using System.Data.Entity;
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Azure;
-using Shrooms.DataLayer.DAL;
 using Shrooms.Domain.Services.Picture;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.DAL;
+using Shrooms.Infrastructure.Storage;
 using Shrooms.UnitTests.Extensions;
 
 namespace Shrooms.UnitTests.DomainService

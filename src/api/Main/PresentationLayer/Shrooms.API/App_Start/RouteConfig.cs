@@ -1,6 +1,6 @@
 ﻿using System.Web.Http;
 
-namespace Shrooms.API.App_Start
+namespace Shrooms.API
 {
     public static class RouteConfig
     {

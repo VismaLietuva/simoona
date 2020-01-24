@@ -2,7 +2,8 @@
 using Shrooms.Domain.Services.Notifications;
 using Shrooms.Domain.Services.Picture;
 using Shrooms.Domain.Services.UserService;
-using Shrooms.Infrastructure.GoogleBookService;
+using Shrooms.Host.Contracts.Infrastructure;
+using Shrooms.Infrastructure.GoogleBookApiService;
 using Shrooms.Infrastructure.Interceptors;
 
 namespace Shrooms.IoC.Modules

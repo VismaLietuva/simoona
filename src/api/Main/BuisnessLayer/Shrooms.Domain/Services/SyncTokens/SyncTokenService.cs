@@ -1,6 +1,6 @@
 ﻿using System.Linq;
-using Shrooms.DataLayer;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.Domain.Services.SyncTokens
 {

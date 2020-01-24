@@ -172,14 +172,10 @@
     <Compile Include="DAL\EntityTypeConfigurations\WallConfiguration.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\WallMembersConfiguration.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\WallModeratorsConfiguration.cs" />
-    <Compile Include="DAL\IUnitOfWork2.cs" />
     <Compile Include="DAL\ShroomsContextConfiguration.cs" />
     <Compile Include="DAL\SoftDeleteHandler.cs" />
     <Compile Include="DAL\UnitOfWork2.cs" />
     <Compile Include="DAL\EFRepository.cs" />
-    <Compile Include="DAL\IDbContext.cs" />
-    <Compile Include="DAL\IRepository.cs" />
-    <Compile Include="DAL\IUnitOfWork.cs" />
     <Compile Include="Migrations\201512301053272_InitialEmpty.cs" />
     <Compile Include="Migrations\201512301053272_InitialEmpty.Designer.cs">
       <DependentUpon>201512301053272_InitialEmpty.cs</DependentUpon>
@@ -811,6 +807,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Contracts\Shrooms.Host.Contracts\Shrooms.Host.Contracts.csproj">
+      <Project>{E690CEB8-F266-441F-8A80-5A3440B3445A}</Project>
+      <Name>Shrooms.Host.Contracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Infrastructure\Shrooms.Infrastructure\Shrooms.Infrastructure.csproj">
       <Project>{d9c5606d-3855-44a0-bdb3-98d963d63fcf}</Project>
       <Name>Shrooms.Infrastructure</Name>
@@ -818,6 +818,10 @@
     <ProjectReference Include="..\..\..\Other\Shrooms.Constants\Shrooms.Constants.csproj">
       <Project>{e07394b9-558c-4a70-9926-6400abb0fb5d}</Project>
       <Name>Shrooms.Constants</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BuisnessLayer\Shrooms.DataTransferObjects\Shrooms.DataTransferObjects.csproj">
+      <Project>{6611930D-880E-455C-8681-E0E2A33CF5A9}</Project>
+      <Name>Shrooms.DataTransferObjects</Name>
     </ProjectReference>
     <ProjectReference Include="..\Shrooms.EntityModels\Shrooms.EntityModels.csproj">
       <Project>{8ad6f857-708c-4b5e-98bc-b3206e7dd918}</Project>

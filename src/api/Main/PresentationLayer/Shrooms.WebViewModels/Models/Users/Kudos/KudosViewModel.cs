@@ -1,6 +1,6 @@
 ﻿using Shrooms.WebViewModels.Models.User;
 
-namespace Shrooms.WebViewModels.Models.Kudos
+namespace Shrooms.WebViewModels.Models.Users.Kudos
 {
     public class KudosViewModel
     {

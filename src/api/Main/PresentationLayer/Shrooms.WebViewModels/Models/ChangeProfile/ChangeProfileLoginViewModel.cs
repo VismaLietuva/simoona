@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
-namespace Shrooms.WebViewModels.Models
+namespace Shrooms.WebViewModels.Models.ChangeProfile
 {
     public class ChangeProfileLoginViewModel : ChangeProfileBaseModel
     {

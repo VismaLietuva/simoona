@@ -1,5 +1,5 @@
 using System.Data.Entity.Migrations;
-using Shrooms.EntityModels.Models.Multiwall;
+using Shrooms.DataTransferObjects.Models.Wall;
 
 namespace Shrooms.DataLayer.Migrations
 {

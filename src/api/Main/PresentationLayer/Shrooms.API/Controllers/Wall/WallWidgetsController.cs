@@ -4,21 +4,21 @@ using System.Web.Http;
 using AutoMapper;
 using Shrooms.API.Filters;
 using Shrooms.API.Helpers;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.WebApi;
 using Shrooms.DataTransferObjects.Models;
+using Shrooms.DataTransferObjects.Models.Birthdays;
 using Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.DataTransferObjects.Models.KudosBasket;
 using Shrooms.Domain.Services.Birthday;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.KudosBaskets;
 using Shrooms.Domain.Services.Permissions;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.WebViewModels.Models.Birthday;
-using Shrooms.WebViewModels.Models.Kudos;
 using Shrooms.WebViewModels.Models.Users.Kudos;
 using Shrooms.WebViewModels.Models.Wall.Widgets;
 
-namespace Shrooms.API.Controllers.Kudos
+namespace Shrooms.API.Controllers.Wall
 {
     [Authorize]
     [RoutePrefix("WallWidgets")]
@@ -45,25 +45,25 @@ namespace Shrooms.API.Controllers.Kudos
         }
 
         [HttpGet]
-        [PermissionAwareCacheOutputFilter(BasicPermissions.Kudos, BasicPermissions.Birthday, BasicPermissions.KudosBasket, ServerTimeSpan = ConstWebApi.OneHour)]
+        [PermissionAwareCacheOutputFilter(BasicPermissions.Kudos, BasicPermissions.Birthday, BasicPermissions.KudosBasket, ServerTimeSpan = WebApiConstants.OneHour)]
         public WidgetsViewModel Get([FromUri]GetWidgetsViewModel getWidgetsViewModel)
         {
             var userAndOrganization = GetUserAndOrganization();
             return new WidgetsViewModel
             {
-                KudosWidgetStats = DefaultIfNotAuthorized(userAndOrganization, BasicPermissions.Kudos,
+                KudosWidgetStats = DefaultIfNotAuthrorized(userAndOrganization, BasicPermissions.Kudos,
                     () => GetKudosWidgetStats(
                         getWidgetsViewModel.KudosTabOneMonths,
                         getWidgetsViewModel.KudosTabOneAmount,
                         getWidgetsViewModel.KudosTabTwoMonths,
                         getWidgetsViewModel.KudosTabTwoAmount)),
-                LastKudosLogRecords = DefaultIfNotAuthorized(userAndOrganization, BasicPermissions.Kudos, GetLastKudosLogRecords),
-                WeeklyBirthdays = DefaultIfNotAuthorized(userAndOrganization, BasicPermissions.Birthday, GetWeeklyBirthdays),
-                KudosBasketWidget = DefaultIfNotAuthorized(userAndOrganization, BasicPermissions.KudosBasket, GetKudosBasketWidget)
+                LastKudosLogRecords = DefaultIfNotAuthrorized(userAndOrganization, BasicPermissions.Kudos, GetLastKudosLogRecords),
+                WeeklyBirthdays = DefaultIfNotAuthrorized(userAndOrganization, BasicPermissions.Birthday, GetWeeklyBirthdays),
+                KudosBasketWidget = DefaultIfNotAuthrorized(userAndOrganization, BasicPermissions.KudosBasket, GetKudosBasketWidget)
             };
         }
 
-        private T DefaultIfNotAuthorized<T>(UserAndOrganizationDTO userAndOrganization, string permission, Func<T> valueFactory)
+        private T DefaultIfNotAuthrorized<T>(UserAndOrganizationDTO userAndOrganization, string permission, Func<T> valueFactory)
         {
             return _permissionService.UserHasPermission(userAndOrganization, permission) ? valueFactory() : default;
         }
@@ -91,9 +91,11 @@ namespace Shrooms.API.Controllers.Kudos
 
         private IEnumerable<KudosListBasicDataViewModel> GetKudosWidgetStats(int tabOneMonths, int tabOneAmount, int tabTwoMonths, int tabTwoAmount)
         {
-            var result = new List<KudosListBasicDataViewModel>();
-            result.Add(CalculateStats(tabOneMonths, tabOneAmount));
-            result.Add(CalculateStats(tabTwoMonths, tabTwoAmount));
+            var result = new List<KudosListBasicDataViewModel>
+            {
+                CalculateStats(tabOneMonths, tabOneAmount),
+                CalculateStats(tabTwoMonths, tabTwoAmount)
+            };
             return result;
         }
 

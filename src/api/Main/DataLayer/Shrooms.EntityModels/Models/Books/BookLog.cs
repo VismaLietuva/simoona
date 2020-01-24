@@ -1,8 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations.Schema;
-using Shrooms.EntityModels.Models.Books;
 
-namespace Shrooms.EntityModels.Models
+namespace Shrooms.EntityModels.Models.Books
 {
     public class BookLog : BaseModelWithOrg
     {

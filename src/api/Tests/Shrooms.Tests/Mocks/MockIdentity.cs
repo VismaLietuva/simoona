@@ -6,17 +6,16 @@ using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security.DataProtection;
 using NSubstitute;
-using Shrooms.Authentification;
-using Shrooms.Constants.Authorization;
-using Shrooms.Constants.Authorization.Permissions;
+using Shrooms.Authentification.Membership;
 using Shrooms.Constants.WebApi;
-using Shrooms.DataLayer;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.Constants;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.CustomCache;
 
-namespace Shrooms.UnitTests
+namespace Shrooms.UnitTests.Mocks
 {
     public static class MockIdentity
     {
@@ -73,11 +72,11 @@ namespace Shrooms.UnitTests
         public static IPrincipal GetPrincipalMock()
         {
             var claim = new Claim("Id", "1");
-            var orgClaim = new Claim(ConstWebApi.ClaimOrganizationId, "1");
+            var orgClaim = new Claim(WebApiConstants.ClaimOrganizationId, "1");
 
             var mockIdentity = Substitute.For<ClaimsIdentity>();
             mockIdentity.FindFirst(Arg.Any<string>()).Returns(claim);
-            mockIdentity.FindFirst(ConstWebApi.ClaimOrganizationId).Returns(orgClaim);
+            mockIdentity.FindFirst(WebApiConstants.ClaimOrganizationId).Returns(orgClaim);
 
             var mockPrincipal = Substitute.For<IPrincipal>();
             mockPrincipal.Identity.Returns(mockIdentity);
@@ -91,7 +90,7 @@ namespace Shrooms.UnitTests
             {
                             new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name", name),
                             new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", id),
-                            new Claim(ConstWebApi.ClaimOrganizationId, "1")
+                            new Claim(WebApiConstants.ClaimOrganizationId, "1")
             };
             var genericIdentity = new GenericIdentity(string.Empty);
             genericIdentity.AddClaims(claims);

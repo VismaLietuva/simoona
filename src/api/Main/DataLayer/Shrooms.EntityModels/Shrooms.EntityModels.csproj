@@ -120,11 +120,9 @@
     <Compile Include="Models\Exam.cs" />
     <Compile Include="Models\ExternalLink.cs" />
     <Compile Include="Models\Notifications\Notification.cs" />
-    <Compile Include="Models\Notifications\NotificationType.cs" />
     <Compile Include="Models\Notifications\NotificationUser.cs" />
     <Compile Include="Models\Notifications\Sources.cs" />
     <Compile Include="Models\Project.cs" />
-    <Compile Include="Models\SupportType.cs" />
     <Compile Include="Models\Floor.cs" />
     <Compile Include="Models\IOrganization.cs" />
     <Compile Include="Models\ISoftDelete.cs" />
@@ -138,9 +136,7 @@
     <Compile Include="Models\Monitors\Monitor.cs" />
     <Compile Include="Models\Multiwall\LikesCollection.cs" />
     <Compile Include="Models\Multiwall\Wall.cs" />
-    <Compile Include="Models\Multiwall\WallAccess.cs" />
     <Compile Include="Models\Multiwall\WallModerator.cs" />
-    <Compile Include="Models\Multiwall\WallType.cs" />
     <Compile Include="Models\Multiwall\WallMember.cs" />
     <Compile Include="Models\Office.cs" />
     <Compile Include="Models\Organization.cs" />
@@ -173,6 +169,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Contracts\Shrooms.Host.Contracts\Shrooms.Host.Contracts.csproj">
+      <Project>{E690CEB8-F266-441F-8A80-5A3440B3445A}</Project>
+      <Name>Shrooms.Host.Contracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Other\Shrooms.Constants\Shrooms.Constants.csproj">
       <Project>{e07394b9-558c-4a70-9926-6400abb0fb5d}</Project>
       <Name>Shrooms.Constants</Name>
@@ -180,6 +180,10 @@
     <ProjectReference Include="..\..\..\Other\Shrooms.Resources\Shrooms.Resources.csproj">
       <Project>{c6fc692b-dfad-4ed5-86d5-8000dbd06b02}</Project>
       <Name>Shrooms.Resources</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BuisnessLayer\Shrooms.DataTransferObjects\Shrooms.DataTransferObjects.csproj">
+      <Project>{6611930D-880E-455C-8681-E0E2A33CF5A9}</Project>
+      <Name>Shrooms.DataTransferObjects</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\BuisnessLayer\Shrooms.DomainExceptions\Shrooms.DomainExceptions.csproj">
       <Project>{8b48f02f-79e6-45cf-8de3-bf9085d4c3a2}</Project>

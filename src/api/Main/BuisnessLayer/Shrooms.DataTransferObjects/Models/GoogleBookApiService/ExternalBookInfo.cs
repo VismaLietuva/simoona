@@ -1,4 +1,4 @@
-﻿namespace Shrooms.Infrastructure.GoogleBookApiService
+﻿namespace Shrooms.DataTransferObjects.Models.GoogleBookApiService
 {
     public class ExternalBookInfo
     {

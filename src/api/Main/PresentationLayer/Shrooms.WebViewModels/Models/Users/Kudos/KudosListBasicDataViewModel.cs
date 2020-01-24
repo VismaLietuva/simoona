@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Shrooms.WebViewModels.Models.Kudos;
 
 namespace Shrooms.WebViewModels.Models.Users.Kudos
 {

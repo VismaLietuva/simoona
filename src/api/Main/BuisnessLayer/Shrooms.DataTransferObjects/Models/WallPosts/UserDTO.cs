@@ -1,6 +1,4 @@
-﻿using Shrooms.EntityModels.Models;
-
-namespace Shrooms.DataTransferObjects.Models.WallPosts
+﻿namespace Shrooms.DataTransferObjects.Models.WallPosts
 {
     public class UserDto
     {
@@ -11,7 +9,7 @@ namespace Shrooms.DataTransferObjects.Models.WallPosts
         public string PictureId { get; set; }
         public string Email { get; set; }
 
-        public UserDto(ApplicationUser user)
+        public UserDto(ApplicationUserDTO user)
         {
             Id = user.Id;
             FullName = user.FirstName + ' ' + user.LastName;

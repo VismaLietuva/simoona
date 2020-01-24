@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web;
+using Shrooms.WebViewModels.Models.Skill;
 
 namespace Shrooms.WebViewModels.Models.User
 {

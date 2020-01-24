@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 
-namespace Shrooms.Infrastructure.FireAndForget
+namespace Shrooms.Host.Contracts.Infrastructure
 {
     public interface IJobScheduler
     {

@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using OfficeOpenXml;
+using Shrooms.Host.Contracts.Infrastructure;
 
 namespace Shrooms.Infrastructure.ExcelGenerator
 {
-    public class ExcelBuilder : IDisposable, IExcelBuilder
+    public class ExcelBuilder : IExcelBuilder
     {
-        private ExcelPackage _package;
+        private readonly ExcelPackage _package;
 
         public ExcelBuilder()
         {

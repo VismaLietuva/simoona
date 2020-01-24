@@ -6,11 +6,11 @@ namespace Shrooms.WebViewModels.Models.PostModels
     public class OrganizationPostViewModel : AbstractViewModel
     {
         [Required]
-        [StringLength(ConstBusinessLayer.MaxOrganizationNameLength, MinimumLength = ConstBusinessLayer.MinOrganizationNameLength)]
+        [StringLength(BusinessLayerConstants.MaxOrganizationNameLength, MinimumLength = BusinessLayerConstants.MinOrganizationNameLength)]
         public string Name { get; set; }
 
         [Required]
-        [StringLength(ConstBusinessLayer.MaxOrganizationShortNameLength, MinimumLength = ConstBusinessLayer.MinOrganizationNameLength)]
+        [StringLength(BusinessLayerConstants.MaxOrganizationShortNameLength, MinimumLength = BusinessLayerConstants.MinOrganizationNameLength)]
         public string ShortName { get; set; }
     }
 }

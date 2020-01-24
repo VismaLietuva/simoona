@@ -7,7 +7,7 @@ using Shrooms.API.Filters;
 using Shrooms.API.Helpers;
 using Shrooms.Constants.WebApi;
 
-namespace Shrooms.API.Controllers.WebApi
+namespace Shrooms.API.Controllers
 {
     public partial class UserDeprecatedController : BaseController
     {
@@ -40,7 +40,7 @@ namespace Shrooms.API.Controllers.WebApi
         [AllowAnonymous]
         public HttpResponseMessage ImpersonateEnabled()
         {
-            var key = System.Configuration.ConfigurationManager.AppSettings[ConstWebApi.ClaimUserImpersonation];
+            var key = System.Configuration.ConfigurationManager.AppSettings[WebApiConstants.ClaimUserImpersonation];
 
             var enabled = key != null ? bool.Parse(key) : false;
 

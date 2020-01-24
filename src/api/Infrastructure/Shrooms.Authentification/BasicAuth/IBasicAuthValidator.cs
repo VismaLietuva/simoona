@@ -2,7 +2,7 @@
 using System.Threading;
 using Microsoft.Owin;
 
-namespace Shrooms.Authorization.BasicAuth
+namespace Shrooms.Authentification.BasicAuth
 {
     public interface IBasicAuthValidator
     {

@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Projects;
-using Shrooms.EntityModels.Models;
 
 namespace Shrooms.Domain.Services.Projects
 {
@@ -11,11 +10,11 @@ namespace Shrooms.Domain.Services.Projects
         Task<IEnumerable<ProjectsListItemDto>> GetProjects(UserAndOrganizationDTO userOrg);
 
         Task<IEnumerable<ProjectsAutoCompleteDto>> GetProjectsForAutocomplete(string name, int organizationId);
-        
+
         Task NewProject(NewProjectDto dto);
 
         Task<ProjectDetailsDto> GetProjectDetails(int projectId, UserAndOrganizationDTO userAndOrganizationDTO);
-        
+
         Task EditProject(EditProjectDto dto);
 
         Task Delete(int id, UserAndOrganizationDTO userOrg);

@@ -4,7 +4,6 @@ using System.Web.Http;
 using AutoMapper;
 using Shrooms.API.Filters;
 using Shrooms.API.Helpers;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Books;
@@ -13,6 +12,7 @@ using Shrooms.DataTransferObjects.Models.Books.BooksByOffice;
 using Shrooms.DataTransferObjects.Models.LazyPaged;
 using Shrooms.Domain.Services.Books;
 using Shrooms.DomainExceptions.Exceptions.Book;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.WebViewModels.Models.Book.BookDetails;
 using Shrooms.WebViewModels.Models.Book.BooksByOffice;
 
@@ -105,7 +105,7 @@ namespace Shrooms.API.Controllers.Book
         public IHttpActionResult GetBooksByOffice(int officeId, int page = 1, string searchString = null)
         {
             if (!string.IsNullOrEmpty(searchString) &&
-                searchString.Length < ConstBusinessLayer.MinCharactersInBookSearch ||
+                searchString.Length < BusinessLayerConstants.MinCharactersInBookSearch ||
                 officeId < 1)
             {
                 return BadRequest();

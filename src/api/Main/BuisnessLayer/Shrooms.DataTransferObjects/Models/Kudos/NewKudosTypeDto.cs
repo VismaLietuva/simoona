@@ -8,8 +8,8 @@ namespace Shrooms.DataTransferObjects.Models.Kudos
 
         public int Multiplier { get; set; }
 
-        public ConstBusinessLayer.KudosTypeEnum Type { get; set; }
-        
+        public BusinessLayerConstants.KudosTypeEnum Type { get; set; }
+
         public string Description { get; set; }
     }
 }

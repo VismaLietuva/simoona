@@ -1,7 +1,4 @@
-﻿using Shrooms.DataTransferObjects.Models.Wall.Posts;
-using Shrooms.EntityModels.Models;
-
-namespace DomainServiceValidators.Validators.Wall
+﻿namespace Shrooms.DomainServiceValidators.Validators.Wall
 {
     public interface IWallValidator
     {

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Constants.Authorization;
-using Shrooms.DataLayer.DAL;
 using Shrooms.Domain.Services.Birthday;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.Constants;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.UnitTests.Extensions;
 
 namespace Shrooms.UnitTests.DomainService
@@ -117,7 +117,7 @@ namespace Shrooms.UnitTests.DomainService
         {
             var time = new DateTime(2015, 11, 29);
             var birthdays = _birthdayService.GetWeeklyBirthdays(time).ToArray();
-            Assert.AreEqual(3, birthdays.Count());
+            Assert.AreEqual(3, birthdays.Length);
             Assert.AreEqual("testUserId2", birthdays[0].Id);
             Assert.AreEqual("Saturday", birthdays[0].DayOfWeek);
             Assert.AreEqual("2015-12-05", birthdays[0].DateString);
@@ -128,7 +128,7 @@ namespace Shrooms.UnitTests.DomainService
         {
             var time = new DateTime(2015, 12, 05);
             var birthdays = _birthdayService.GetWeeklyBirthdays(time).ToArray();
-            Assert.AreEqual(2, birthdays.Count());
+            Assert.AreEqual(2, birthdays.Length);
             Assert.AreEqual("testUserId3", birthdays[1].Id);
             Assert.AreEqual("Sunday", birthdays[1].DayOfWeek);
             Assert.AreEqual("2015-12-06", birthdays[1].DateString);
@@ -139,7 +139,7 @@ namespace Shrooms.UnitTests.DomainService
         {
             var time = new DateTime(2015, 12, 28);
             var birthdays = _birthdayService.GetWeeklyBirthdays(time).ToArray();
-            Assert.AreEqual(2, birthdays.Count());
+            Assert.AreEqual(2, birthdays.Length);
             Assert.AreEqual("christmasBirthdayUser", birthdays[0].Id);
             Assert.AreEqual("2015-12-27", birthdays[0].DateString);
             Assert.AreEqual("Sunday", birthdays[0].DayOfWeek);
@@ -153,7 +153,7 @@ namespace Shrooms.UnitTests.DomainService
         {
             var time = new DateTime(2017, 02, 28);
             var birthdays = _birthdayService.GetWeeklyBirthdays(time).ToArray();
-            Assert.AreEqual(3, birthdays.Count());
+            Assert.AreEqual(3, birthdays.Length);
             Assert.AreEqual("februaryBirthdayUser3", birthdays[0].Id);
             Assert.AreEqual("februaryBirthdayUser1", birthdays[1].Id);
             Assert.AreEqual("2017-03-01", birthdays[1].DateString);
@@ -165,7 +165,7 @@ namespace Shrooms.UnitTests.DomainService
         {
             var time = new DateTime(2016, 02, 28);
             var birthdays = _birthdayService.GetWeeklyBirthdays(time).ToArray();
-            Assert.AreEqual(3, birthdays.Count());
+            Assert.AreEqual(3, birthdays.Length);
             Assert.AreEqual("februaryBirthdayUser3", birthdays[0].Id);
             Assert.AreEqual("februaryBirthdayUser1", birthdays[1].Id);
             Assert.AreEqual("2016-02-29", birthdays[1].DateString);

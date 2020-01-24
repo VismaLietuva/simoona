@@ -10,9 +10,9 @@ namespace Shrooms.EntityModels.Models.Kudos
 
         public decimal Value { get; set; }
 
-        public ConstBusinessLayer.KudosTypeEnum Type { get; set; }
-        
-        [MaxLength(ConstBusinessLayer.MaxKudosDescriptionLength)]
+        public BusinessLayerConstants.KudosTypeEnum Type { get; set; }
+
+        [MaxLength(BusinessLayerConstants.MaxKudosDescriptionLength)]
         public string Description { get; set; }
     }
 }

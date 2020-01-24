@@ -1,9 +1,9 @@
 ﻿using Autofac;
-using DomainServiceValidators.Validators.Wall;
 using Shrooms.Domain.Services.Birthday;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.Domain.Services.Wall.Posts.Comments;
+using Shrooms.DomainServiceValidators.Validators.Wall;
 using Shrooms.Infrastructure.Interceptors;
 
 namespace Shrooms.IoC.Modules

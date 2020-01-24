@@ -2,7 +2,7 @@ namespace Shrooms.DataLayer.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
-    using EntityModels.Models.Notifications;
+    using Shrooms.DataTransferObjects.Models.Notification;
 
     public partial class ChangingNotifiationSourceToSerializedObject : DbMigration
     {

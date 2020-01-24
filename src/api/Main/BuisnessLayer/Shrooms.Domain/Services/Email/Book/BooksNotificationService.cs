@@ -1,14 +1,14 @@
 ﻿using System.Data.Entity;
 using System.Linq;
-using Shrooms.Constants;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.DataTransferObjects.Models.Books;
 using Shrooms.DataTransferObjects.Models.Emails;
 using Shrooms.EntityModels.Models;
-using Shrooms.Infrastructure.Configuration;
-using Shrooms.Infrastructure.Email;
-using Shrooms.Infrastructure.Email.Templating;
+using Shrooms.EntityModels.Models.Books;
+using Shrooms.Host.Contracts.Constants;
+using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Infrastructure;
+using Shrooms.Host.Contracts.Infrastructure.Email;
 
 namespace Shrooms.Domain.Services.Email.Book
 {

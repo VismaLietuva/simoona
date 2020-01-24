@@ -1,6 +1,4 @@
 ﻿using System;
-using Shrooms.EntityModels.Models;
-using Shrooms.EntityModels.Models.Kudos;
 
 namespace Shrooms.DataTransferObjects.Models.Kudos
 {
@@ -14,7 +12,7 @@ namespace Shrooms.DataTransferObjects.Models.Kudos
 
         public int MultiplyBy { get; set; }
 
-        public ApplicationUser Sender { get; set; }
+        public ApplicationUserDTO Sender { get; set; }
 
         public DateTime Created { get; set; }
     }

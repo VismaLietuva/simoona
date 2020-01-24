@@ -1,4 +1,4 @@
-﻿namespace Shrooms.DataTransferObjects.Models
+﻿namespace Shrooms.DataTransferObjects.Models.Birthdays
 {
     public class BirthdayDTO
     {

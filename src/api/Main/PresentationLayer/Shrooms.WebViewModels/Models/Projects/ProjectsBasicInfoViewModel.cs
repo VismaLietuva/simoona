@@ -1,6 +1,6 @@
 ﻿namespace Shrooms.WebViewModels.Models.Projects
 {
-    public class ProjectsBasicInfoViewModel 
+    public class ProjectsBasicInfoViewModel
     {
         public int Id { get; set; }
 

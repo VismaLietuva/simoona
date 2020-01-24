@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Shrooms.EntityModels.Models.Multiwall;
+using Shrooms.DataTransferObjects.Models.Wall;
 using Shrooms.WebViewModels.Models.Wall.Moderator;
 
 namespace Shrooms.WebViewModels.Models.Wall

@@ -5,13 +5,13 @@ using AutoMapper;
 using PagedList;
 using Shrooms.API.Filters;
 using Shrooms.API.Hubs;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.WebApi;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Wall;
 using Shrooms.Domain.Services.Notifications;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.DomainExceptions.Exceptions;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.WebViewModels.Models.Notifications;
 using Shrooms.WebViewModels.Models.User;
 using Shrooms.WebViewModels.Models.Wall;
@@ -153,13 +153,13 @@ namespace Shrooms.API.Controllers.Wall
             try
             {
                 var userAndOrg = GetUserAndOrganization();
-                var wallPosts = await _wallService.GetWallPosts(page, ConstWebApi.DefaultPageSize, userAndOrg, wallId);
+                var wallPosts = await _wallService.GetWallPosts(page, WebApiConstants.DefaultPageSize, userAndOrg, wallId);
 
                 var mappedPosts = _mapper.Map<IEnumerable<WallPostViewModel>>(wallPosts);
                 var pagedViewModel = new PagedWallViewModel<WallPostViewModel>
                 {
-                    PagedList = mappedPosts.ToPagedList(1, ConstWebApi.DefaultPageSize),
-                    PageSize = ConstWebApi.DefaultPageSize
+                    PagedList = mappedPosts.ToPagedList(1, WebApiConstants.DefaultPageSize),
+                    PageSize = WebApiConstants.DefaultPageSize
                 };
                 return Ok(pagedViewModel);
             }
@@ -175,13 +175,13 @@ namespace Shrooms.API.Controllers.Wall
         public async Task<IHttpActionResult> GetPagedWall(int page = 1)
         {
             var userAndOrg = GetUserAndOrganization();
-            var wallPosts = await _wallService.GetAllPosts(page, ConstWebApi.DefaultPageSize, userAndOrg);
+            var wallPosts = await _wallService.GetAllPosts(page, WebApiConstants.DefaultPageSize, userAndOrg);
 
             var mappedPosts = _mapper.Map<IEnumerable<WallPostViewModel>>(wallPosts);
             var pagedViewModel = new PagedWallViewModel<WallPostViewModel>
             {
-                PagedList = mappedPosts.ToPagedList(1, ConstWebApi.DefaultPageSize),
-                PageSize = ConstWebApi.DefaultPageSize
+                PagedList = mappedPosts.ToPagedList(1, WebApiConstants.DefaultPageSize),
+                PageSize = WebApiConstants.DefaultPageSize
             };
             return Ok(pagedViewModel);
         }
@@ -197,13 +197,13 @@ namespace Shrooms.API.Controllers.Wall
             }
 
             var userAndOrganization = GetUserAndOrganization();
-            var foundWallPosts = await _wallService.SearchWall(searchString, userAndOrganization, page, ConstWebApi.DefaultPageSize);
+            var foundWallPosts = await _wallService.SearchWall(searchString, userAndOrganization, page, WebApiConstants.DefaultPageSize);
 
             var mappedPosts = _mapper.Map<IList<WallPostViewModel>>(foundWallPosts);
             var pagedViewModel = new PagedWallViewModel<WallPostViewModel>
             {
-                PagedList = mappedPosts.ToPagedList(1, ConstWebApi.DefaultPageSize),
-                PageSize = ConstWebApi.DefaultPageSize
+                PagedList = mappedPosts.ToPagedList(1, WebApiConstants.DefaultPageSize),
+                PageSize = WebApiConstants.DefaultPageSize
             };
             return Ok(pagedViewModel);
         }
@@ -277,7 +277,7 @@ namespace Shrooms.API.Controllers.Wall
 
             try
             {
-                _wallService.DeleteWall(wallId, GetUserAndOrganization(), EntityModels.Models.Multiwall.WallType.UserCreated);
+                _wallService.DeleteWall(wallId, GetUserAndOrganization(), WallType.UserCreated);
                 return Ok();
             }
             catch (ValidationException e)

@@ -8,10 +8,10 @@ using System.Web.Http.Controllers;
 using System.Web.Http.Hosting;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.API.Controllers.WebApi;
+using Shrooms.API.Controllers;
 using Shrooms.Constants.WebApi;
-using Shrooms.DataLayer;
-using Shrooms.ModelMappings;
+using Shrooms.Host.Contracts.DAL;
+using Shrooms.UnitTests.Mocks;
 using Shrooms.UnitTests.ModelMappings;
 using Shrooms.WebViewModels.Models;
 using Shrooms.WebViewModels.Models.PostModels;
@@ -209,8 +209,8 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         }
 
         [Test]
-        [TestCase("name", ConstWebApi.DefaultPageSize, "Kitchen", "#00FF00")]
-        [TestCase("color", ConstWebApi.DefaultPageSize, "Unknown", "#000000")]
+        [TestCase("name", WebApiConstants.DefaultPageSize, "Kitchen", "#00FF00")]
+        [TestCase("color", WebApiConstants.DefaultPageSize, "Unknown", "#000000")]
         public void RoomType_GetPaged_Should_Return_Sorted_And_Paged_Room_Types(string sort, int pageSize, string firstName, string firstColor)
         {
             var model = _roomController.GetPaged(sort: sort, pageSize: pageSize);

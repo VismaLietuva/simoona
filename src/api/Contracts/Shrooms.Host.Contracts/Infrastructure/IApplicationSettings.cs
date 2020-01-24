@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 
-namespace Shrooms.Infrastructure.Configuration
+namespace Shrooms.Host.Contracts.Infrastructure
 {
     public interface IApplicationSettings
     {

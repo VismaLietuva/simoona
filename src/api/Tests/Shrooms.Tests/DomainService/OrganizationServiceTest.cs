@@ -3,14 +3,14 @@ using System.Data.Entity;
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Constants.Authorization;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.DomainExceptions.Exceptions.Organization;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.Constants;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.UnitTests.Extensions;
 
 namespace Shrooms.UnitTests.DomainService

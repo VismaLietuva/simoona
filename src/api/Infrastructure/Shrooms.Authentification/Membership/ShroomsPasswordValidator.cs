@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 
-namespace Shrooms.Authentification
+namespace Shrooms.Authentification.Membership
 {
     public class ShroomsPasswordValidator : PasswordValidator
     {

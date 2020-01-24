@@ -2,7 +2,7 @@
 using Shrooms.DataTransferObjects.Models.Books;
 using Shrooms.EntityModels.Models;
 
-namespace DomainServiceValidators.Validators.Books
+namespace Shrooms.DomainServiceValidators.Validators.Books
 {
     public interface IBookMobileServiceValidator
     {

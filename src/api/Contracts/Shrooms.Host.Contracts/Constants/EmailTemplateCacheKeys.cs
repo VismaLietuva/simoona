@@ -1,4 +1,4 @@
-﻿namespace Shrooms.Constants
+﻿namespace Shrooms.Host.Contracts.Constants
 {
     public static class EmailTemplateCacheKeys
     {

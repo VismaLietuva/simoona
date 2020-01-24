@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Dynamic;
-using System.Text;
-using System.Threading.Tasks;
 using Shrooms.Constants.BusinessLayer;
-using Shrooms.DataLayer.DAL;
-using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.Domain.Helpers;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
-using Shrooms.Infrastructure.ExcelGenerator;
+using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Infrastructure;
 
 namespace Shrooms.Domain.Services.Kudos
 {
@@ -23,9 +19,7 @@ namespace Shrooms.Domain.Services.Kudos
         private readonly IDbSet<ApplicationUser> _userDbSet;
         private readonly IExcelBuilder _excelBuilder;
 
-        public KudosExportService(
-            IUnitOfWork2 uow,
-            IExcelBuilder excelBuilder)
+        public KudosExportService(IUnitOfWork2 uow, IExcelBuilder excelBuilder)
         {
             _uow = uow;
             _kudosLogsDbSet = _uow.GetDbSet<KudosLog>();
@@ -74,7 +68,7 @@ namespace Shrooms.Domain.Services.Kudos
             };
 
             _excelBuilder.AddNewWorksheet(
-                ConstBusinessLayer.KudosLogExcelSheetName,
+                BusinessLayerConstants.KudosLogExcelSheetName,
                 header,
                 kudosLogs);
 

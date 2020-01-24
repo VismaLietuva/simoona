@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Shrooms.EntityModels.Models;
 
-namespace Shrooms.Authentification
+namespace Shrooms.Authentification.Membership
 {
     public class ShroomsUserValidator : UserValidator<ApplicationUser>
     {

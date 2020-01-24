@@ -6,13 +6,13 @@ using System.Web.Http;
 using AutoMapper;
 using PagedList;
 using Shrooms.API.Filters;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.WebApi;
-using Shrooms.DataLayer;
 using Shrooms.EntityModels.Models;
-using Shrooms.WebViewModels.Models;
+using Shrooms.Host.Contracts.Constants;
+using Shrooms.Host.Contracts.DAL;
+using Shrooms.WebViewModels.Models.Skill;
 
-namespace Shrooms.API.Controllers.WebApi
+namespace Shrooms.API.Controllers
 {
     [Authorize]
     [RoutePrefix("Skill")]
@@ -46,7 +46,7 @@ namespace Shrooms.API.Controllers.WebApi
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Skill)]
-        public IEnumerable<SkillAutoCompleteViewModel> GetForAutoComplete(string s, int pageSize = ConstWebApi.DefaultAutocompleteListSize)
+        public IEnumerable<SkillAutoCompleteViewModel> GetForAutoComplete(string s, int pageSize = WebApiConstants.DefaultAutocompleteListSize)
         {
             if (string.IsNullOrWhiteSpace(s))
             {

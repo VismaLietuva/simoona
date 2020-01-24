@@ -3,9 +3,8 @@ using System.Linq;
 using Shrooms.DataTransferObjects.Models.Books;
 using Shrooms.DomainExceptions.Exceptions.Book;
 using Shrooms.EntityModels.Models;
-using Resources = Shrooms.Resources.Models.Books;
 
-namespace DomainServiceValidators.Validators.Books
+namespace Shrooms.DomainServiceValidators.Validators.Books
 {
     public class BookMobileServiceValidator : IBookMobileServiceValidator
     {
@@ -13,7 +12,7 @@ namespace DomainServiceValidators.Validators.Books
         {
             if (bookExists)
             {
-                throw new BookException(Resources.Books.BookAlreadyExist);
+                throw new BookException(Resources.Models.Books.Books.BookAlreadyExist);
             }
         }
 
@@ -21,7 +20,7 @@ namespace DomainServiceValidators.Validators.Books
         {
             if (!bookExists)
             {
-                throw new BookException(Resources.Books.NoBook);
+                throw new BookException(Resources.Models.Books.Books.NoBook);
             }
         }
 
@@ -29,7 +28,7 @@ namespace DomainServiceValidators.Validators.Books
         {
             if (!bookExists)
             {
-                throw new BookException(Resources.Books.NoBooksToReturn);
+                throw new BookException(Resources.Models.Books.Books.NoBooksToReturn);
             }
         }
 
@@ -40,7 +39,7 @@ namespace DomainServiceValidators.Validators.Books
                 var bookAlreadyBorrowed = borrowedBookUserIds.Contains(applicationUserId);
                 if (bookAlreadyBorrowed)
                 {
-                    throw new BookException(Resources.Books.UserAlreadyHasSameBook);
+                    throw new BookException(Resources.Models.Books.Books.UserAlreadyHasSameBook);
                 }
             }
         }
@@ -49,7 +48,7 @@ namespace DomainServiceValidators.Validators.Books
         {
             if (!officeExists)
             {
-                throw new BookException(Resources.Books.NoOffice);
+                throw new BookException(Resources.Models.Books.Books.NoOffice);
             }
         }
 
@@ -61,7 +60,7 @@ namespace DomainServiceValidators.Validators.Books
 
                 if (availableBooks < 1)
                 {
-                    throw new BookException(Resources.Books.NoAvailableBooks);
+                    throw new BookException(Resources.Models.Books.Books.NoAvailableBooks);
                 }
             }
         }
@@ -70,7 +69,7 @@ namespace DomainServiceValidators.Validators.Books
         {
             if (applicationUser == null)
             {
-                throw new BookException(Resources.Books.UserDoesNotExist);
+                throw new BookException(Resources.Models.Books.Books.UserDoesNotExist);
             }
         }
 
@@ -78,7 +77,7 @@ namespace DomainServiceValidators.Validators.Books
         {
             if (!bookExists)
             {
-                throw new BookException(Resources.Books.NoBooksInGoogleApi);
+                throw new BookException(Resources.Models.Books.Books.NoBooksInGoogleApi);
             }
         }
     }

@@ -1,8 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Shrooms.EntityModels.Models;
-
-namespace Shrooms.EntityModels.Models.Notifications
+﻿namespace Shrooms.EntityModels.Models.Notifications
 {
     public class NotificationsSettings : BaseModelWithOrg
     {

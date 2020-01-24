@@ -1,5 +1,5 @@
 ﻿using Shrooms.DataTransferObjects.Models.Books;
-using Shrooms.EntityModels.Models;
+using Shrooms.EntityModels.Models.Books;
 
 namespace Shrooms.Domain.Services.Email.Book
 {

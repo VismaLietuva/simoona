@@ -10,22 +10,23 @@ using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AutoMapper;
-using DomainServiceValidators.Validators.UserAdministration;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
-using Shrooms.Authentification;
+using Shrooms.Authentification.Membership;
 using Shrooms.Constants.Authentication;
 using Shrooms.Constants.BusinessLayer;
-using Shrooms.DataLayer;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Administration;
+using Shrooms.DataTransferObjects.Models.Wall;
 using Shrooms.Domain.Services.Email.AdministrationUsers;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.Picture;
+using Shrooms.DomainServiceValidators.Validators.UserAdministration;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
 using Shrooms.EntityModels.Models.Multiwall;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.ExcelGenerator;
 using userRes = Shrooms.Resources.Models.ApplicationUser.ApplicationUser;
 
@@ -138,7 +139,7 @@ namespace Shrooms.Domain.Services.Administration
             if (user.PictureId == null && externalIdentity.FindFirst("picture") != null)
             {
                 byte[] data = data = await new WebClient().DownloadDataTaskAsync(externalIdentity.FindFirst("picture").Value);
-                user.PictureId = await _pictureService.UploadFromStream(new MemoryStream(data), "image/jpeg", Guid.NewGuid().ToString() + ".jpg", user.OrganizationId);
+                user.PictureId = await _pictureService.UploadFromStream(new MemoryStream(data), "image/jpeg", Guid.NewGuid() + ".jpg", user.OrganizationId);
                 _uow.SaveChanges(userId);
             }
         }
@@ -167,11 +168,11 @@ namespace Shrooms.Domain.Services.Administration
             var applicationUser = _usersDbSet.First(user => user.Id == userId);
             _userAdministrationValidator.CheckIfEmploymentDateIsSet(applicationUser.EmploymentDate);
 
-            var hasRole = _userManager.IsInRole(userId, Constants.Authorization.Roles.FirstLogin);
+            var hasRole = _userManager.IsInRole(userId, Host.Contracts.Constants.Roles.FirstLogin);
             _userAdministrationValidator.CheckIfUserHasFirstLoginRole(hasRole);
 
-            var addRoleResult = _userManager.AddToRole(userId, Constants.Authorization.Roles.User);
-            var removeRoleResult = _userManager.RemoveFromRole(userId, Constants.Authorization.Roles.NewUser);
+            var addRoleResult = _userManager.AddToRole(userId, Host.Contracts.Constants.Roles.User);
+            var removeRoleResult = _userManager.RemoveFromRole(userId, Host.Contracts.Constants.Roles.NewUser);
 
             _userAdministrationValidator.CheckForAddingRemovingRoleErrors(addRoleResult.Errors, removeRoleResult.Errors);
             _notificationService.SendConfirmedNotificationEmail(applicationUser.Email, userAndOrg);
@@ -200,7 +201,7 @@ namespace Shrooms.Domain.Services.Administration
                 LastName = externalIdentity.FindFirst(ClaimTypes.Surname).Value,
                 OrganizationId = _organizationService.GetOrganizationByName(requestedOrganization).Id,
                 EmploymentDate = DateTime.UtcNow,
-                CultureCode = userSettings.CultureCode ?? ConstBusinessLayer.DefaultCulture,
+                CultureCode = userSettings.CultureCode ?? BusinessLayerConstants.DefaultCulture,
                 TimeZone = userSettings.TimeZone,
                 NotificationsSettings = null
             };
@@ -208,7 +209,7 @@ namespace Shrooms.Domain.Services.Administration
             if (externalIdentity.FindFirst("picture") != null)
             {
                 byte[] data = data = await new WebClient().DownloadDataTaskAsync(externalIdentity.FindFirst("picture").Value);
-                user.PictureId = await _pictureService.UploadFromStream(new MemoryStream(data), "image/jpeg", Guid.NewGuid().ToString() + ".jpg", user.OrganizationId);
+                user.PictureId = await _pictureService.UploadFromStream(new MemoryStream(data), "image/jpeg", Guid.NewGuid() + ".jpg", user.OrganizationId);
             }
 
             var result = _userManager.Create(user);
@@ -230,7 +231,7 @@ namespace Shrooms.Domain.Services.Administration
 
             user.OrganizationId = _organizationService.GetOrganizationByName(requestedOrganization).Id;
             user.EmploymentDate = DateTime.UtcNow;
-            user.CultureCode = userSettings.CultureCode ?? ConstBusinessLayer.DefaultCulture;
+            user.CultureCode = userSettings.CultureCode ?? BusinessLayerConstants.DefaultCulture;
             user.TimeZone = userSettings.TimeZone;
             user.NotificationsSettings = null;
 
@@ -276,7 +277,7 @@ namespace Shrooms.Domain.Services.Administration
         {
             includeProperties += (includeProperties != string.Empty ? "," : string.Empty) + "Roles,Skills,JobPosition,Projects";
             var applicationUsers = _applicationUserRepository
-                .Get(GenerateQuery(search), orderBy: sortQuery.Contains(Constants.Authorization.Roles.NewUser) ? string.Empty : sortQuery, includeProperties: includeProperties)
+                .Get(GenerateQuery(search), orderBy: sortQuery.Contains(Host.Contracts.Constants.Roles.NewUser) ? string.Empty : sortQuery, includeProperties: includeProperties)
                 .ToList();
 
             var administrationUserDto = _mapper.Map<IEnumerable<ApplicationUser>, IEnumerable<AdministrationUserDTO>>(applicationUsers);
@@ -288,7 +289,7 @@ namespace Shrooms.Domain.Services.Administration
                 administrationUserDto = GetFilteredResults(filterModel, administrationUserDto);
             }
 
-            if (sortQuery.StartsWith(Constants.Authorization.Roles.NewUser))
+            if (sortQuery.StartsWith(Host.Contracts.Constants.Roles.NewUser))
             {
                 administrationUserDto = sortQuery.EndsWith("asc") ? administrationUserDto.OrderBy(u => u.IsNewUser) :
                     administrationUserDto.OrderByDescending(u => u.IsNewUser);
@@ -341,9 +342,9 @@ namespace Shrooms.Domain.Services.Administration
                     Modified = DateTime.UtcNow,
                     Status = KudosStatus.Pending,
                     MultiplyBy = 1,
-                    KudosSystemType = ConstBusinessLayer.KudosTypeEnum.Other,
-                    KudosTypeValue = (short)ConstBusinessLayer.KudosTypeEnum.Other,
-                    KudosTypeName = ConstBusinessLayer.KudosTypeEnum.Other.ToString()
+                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Other,
+                    KudosTypeValue = (short)BusinessLayerConstants.KudosTypeEnum.Other,
+                    KudosTypeName = BusinessLayerConstants.KudosTypeEnum.Other.ToString()
                 };
 
                 _uow.GetDbSet<KudosLog>().Add(welcomeKudos);
@@ -357,7 +358,7 @@ namespace Shrooms.Domain.Services.Administration
                 return null;
             }
 
-            var searchKeyWords = s.Split(ConstBusinessLayer.SearchSplitter).Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
+            var searchKeyWords = s.Split(BusinessLayerConstants.SearchSplitter).Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
             return e => searchKeyWords.Count(n =>
                 e.UserName.Contains(n) ||
                 e.FirstName.Contains(n) ||
@@ -433,13 +434,13 @@ namespace Shrooms.Domain.Services.Administration
 
         private void AddNewUserRoles(string id)
         {
-            _userManager.AddToRole(id, Constants.Authorization.Roles.NewUser);
-            _userManager.AddToRole(id, Constants.Authorization.Roles.FirstLogin);
+            _userManager.AddToRole(id, Host.Contracts.Constants.Roles.NewUser);
+            _userManager.AddToRole(id, Host.Contracts.Constants.Roles.FirstLogin);
         }
 
         private void SetNewUsersValues(IEnumerable<AdministrationUserDTO> administrationUserDto, IEnumerable<ApplicationUser> applicationUsers)
         {
-            var newUserRole = _rolesRepository.Get(x => x.Name == Constants.Authorization.Roles.NewUser).Select(x => x.Id).FirstOrDefault();
+            var newUserRole = _rolesRepository.Get(x => x.Name == Host.Contracts.Constants.Roles.NewUser).Select(x => x.Id).FirstOrDefault();
 
             var usersWaitingForConfirmationIds =
                 applicationUsers.Where(x => x.Roles.Any(y => y.RoleId == newUserRole)).Select(x => x.Id).ToList();

@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using Microsoft.AspNet.Identity.EntityFramework;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Constants.Authorization.Permissions;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.EntityModels.Models;
 using Shrooms.Infrastructure.CustomCache;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.UnitTests.Extensions;
 
 namespace Shrooms.UnitTests.DomainService

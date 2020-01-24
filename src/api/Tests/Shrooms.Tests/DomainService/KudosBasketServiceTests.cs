@@ -2,21 +2,21 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using DomainServiceValidators.Validators.KudosBaskets;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Constants.BusinessLayer;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.KudosBasket;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.KudosBaskets;
 using Shrooms.DomainExceptions.Exceptions.KudosBaskets;
+using Shrooms.DomainServiceValidators.Validators.KudosBaskets;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.UnitTests.Extensions;
 
-namespace Shrooms.API.Tests.DomainService
+namespace Shrooms.UnitTests.DomainService
 {
     public class KudosBasketServiceTests
     {
@@ -59,14 +59,14 @@ namespace Shrooms.API.Tests.DomainService
                 {
                     Id = 1,
                     Name = "Other",
-                    Type = ConstBusinessLayer.KudosTypeEnum.Other
+                    Type = BusinessLayerConstants.KudosTypeEnum.Other
                 },
 
                 new KudosType
                 {
                     Id = 2,
                     Name = "Minus",
-                    Type = ConstBusinessLayer.KudosTypeEnum.Minus
+                    Type = BusinessLayerConstants.KudosTypeEnum.Minus
                 }
             }.AsQueryable();
             return types;

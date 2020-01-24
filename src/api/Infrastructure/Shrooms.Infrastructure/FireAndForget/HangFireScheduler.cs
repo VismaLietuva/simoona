@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 using Hangfire;
+using Shrooms.Host.Contracts.Infrastructure;
 
 namespace Shrooms.Infrastructure.FireAndForget
 {

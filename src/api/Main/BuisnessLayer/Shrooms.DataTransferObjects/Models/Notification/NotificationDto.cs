@@ -1,5 +1,4 @@
-﻿using Shrooms.EntityModels.Models.Notifications;
-
+﻿
 namespace Shrooms.DataTransferObjects.Models.Notification
 {
     public class NotificationDto

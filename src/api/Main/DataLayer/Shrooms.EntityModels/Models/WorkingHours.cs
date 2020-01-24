@@ -1,7 +1,6 @@
 using System;
-using Shrooms.EntityModels.Models;
 
-namespace DataLayer.Models
+namespace Shrooms.EntityModels.Models
 {
     public class WorkingHours : BaseModelWithOrg
     {

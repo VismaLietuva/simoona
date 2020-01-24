@@ -4,6 +4,7 @@ using System.Configuration;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Web;
+using Shrooms.Host.Contracts.Infrastructure;
 
 namespace Shrooms.Infrastructure.Configuration
 {

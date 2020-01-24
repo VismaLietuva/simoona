@@ -1,8 +1,6 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
 using System.Web.Hosting;
-using Shrooms.Azure;
 
 namespace Shrooms.Infrastructure.Storage.FileSystem
 {

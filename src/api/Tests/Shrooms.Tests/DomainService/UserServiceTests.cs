@@ -8,17 +8,18 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Authentification;
-using Shrooms.Constants.ErrorCodes;
-using Shrooms.DataLayer;
-using Shrooms.DataLayer.DAL;
+using Shrooms.Authentification.Membership;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Users;
+using Shrooms.DataTransferObjects.Models.Wall;
 using Shrooms.Domain.Services.UserService;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Multiwall;
+using Shrooms.Host.Contracts.Constants;
+using Shrooms.Host.Contracts.DAL;
 using Shrooms.UnitTests.Extensions;
+using Shrooms.UnitTests.Mocks;
 
 namespace Shrooms.UnitTests.DomainService
 {
@@ -187,36 +188,10 @@ namespace Shrooms.UnitTests.DomainService
         {
             MockRolesAndUsersForPermissionValidation();
 
-            var userEmails = _userService.GetUserEmailsWithPermission("TEST1_BASIC", 2);
+            var userEmails = _userService.GetUserEmailsWithPermission("TEST1_BASIC", 2).ToList();
 
-            Assert.AreEqual(1, userEmails.Count());
+            Assert.AreEqual(1, userEmails.Count);
             Assert.AreEqual("user1", userEmails.First());
-        }
-
-        [Test]
-        public void Should_Return_User_Wall_Notification_Settings()
-        {
-            /* Commented cause of "source IQueryable doesn't implement IDbAsyncQueryProvider".
-            MockUserWallNotifications();
-
-            var userAndOrg = new UserAndOrganizationDTO()
-            {
-                OrganizationId = 1,
-                UserId = "UserId"
-            };
-
-            var userWallNotifications = _userService.GetWallNotificationSettings(userAndOrg).Result;
-
-            Assert.AreEqual(3, userWallNotifications.Walls.Count());
-            Assert.AreEqual(true, userWallNotifications.Walls.Where(x => x.WallName == "MainWall").First().IsMainWall);
-            Assert.AreEqual(true, userWallNotifications.Walls.Where(x => x.WallName == "MainWall").First().IsAppNotificationEnabled);
-            Assert.AreEqual(true, userWallNotifications.Walls.Where(x => x.WallName == "MainWall").First().IsEmailNotificationEnabled);
-            Assert.AreEqual(true, userWallNotifications.Walls.Where(x => x.WallName == "Wall1").First().IsAppNotificationEnabled);
-            Assert.AreEqual(true, userWallNotifications.Walls.Where(x => x.WallName == "Wall1").First().IsEmailNotificationEnabled);
-            Assert.AreEqual(false, userWallNotifications.Walls.Where(x => x.WallName == "Wall2").First().IsAppNotificationEnabled);
-            Assert.AreEqual(false, userWallNotifications.Walls.Where(x => x.WallName == "Wall2").First().IsEmailNotificationEnabled);
-            Assert.AreEqual(false, userWallNotifications.Walls.Where(x => x.WallName == "Wall2").First().IsMainWall);
-            */
         }
 
         [Test]
@@ -390,13 +365,13 @@ namespace Shrooms.UnitTests.DomainService
             {
                 new ApplicationRole
                 {
-                    Name = Constants.Authorization.Roles.NewUser,
+                    Name = Roles.NewUser,
                     Id = "role1",
                     OrganizationId = 2
                 },
                 new ApplicationRole
                 {
-                    Name = Constants.Authorization.Roles.External,
+                    Name = Roles.External,
                     Id = "role2",
                     OrganizationId = 2
                 }

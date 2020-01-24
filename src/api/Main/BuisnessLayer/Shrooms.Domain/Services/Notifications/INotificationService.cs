@@ -5,7 +5,6 @@ using Shrooms.DataTransferObjects.Models.Notification;
 using Shrooms.DataTransferObjects.Models.Wall;
 using Shrooms.DataTransferObjects.Models.Wall.Posts;
 using Shrooms.DataTransferObjects.Models.Wall.Posts.Comments;
-using Shrooms.EntityModels.Models.Notifications;
 
 namespace Shrooms.Domain.Services.Notifications
 {

@@ -1,6 +1,6 @@
 ﻿using Autofac;
-using DomainServiceValidators.Validators.KudosBaskets;
 using Shrooms.Domain.Services.KudosBaskets;
+using Shrooms.DomainServiceValidators.Validators.KudosBaskets;
 using Shrooms.Infrastructure.Interceptors;
 
 namespace Shrooms.IoC.Modules

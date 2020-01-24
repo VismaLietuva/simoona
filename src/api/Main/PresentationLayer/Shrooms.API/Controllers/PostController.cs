@@ -1,16 +1,15 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
 using Shrooms.API.Filters;
 using Shrooms.API.Hubs;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.DataTransferObjects.Models.Wall.Posts;
 using Shrooms.Domain.Services.Notifications;
 using Shrooms.Domain.Services.UserService;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.DomainExceptions.Exceptions;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.WebViewModels.Models.Notifications;
 using Shrooms.WebViewModels.Models.Wall.Posts;
 

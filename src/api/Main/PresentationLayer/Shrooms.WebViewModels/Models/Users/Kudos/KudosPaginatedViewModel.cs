@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Shrooms.WebViewModels.Models.Kudos
+namespace Shrooms.WebViewModels.Models.Users.Kudos
 {
     public class KudosPaginatedViewModel
     {

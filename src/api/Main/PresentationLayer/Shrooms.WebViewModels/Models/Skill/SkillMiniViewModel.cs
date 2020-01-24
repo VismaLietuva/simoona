@@ -1,4 +1,4 @@
-﻿namespace Shrooms.WebViewModels.Models
+﻿namespace Shrooms.WebViewModels.Models.Skill
 {
     public class SkillMiniViewModel : AbstractViewModel
     {

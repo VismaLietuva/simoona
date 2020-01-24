@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Shrooms.DomainExceptions.Exceptions.UserAdministration;
 
-namespace DomainServiceValidators.Validators.UserAdministration
+namespace Shrooms.DomainServiceValidators.Validators.UserAdministration
 {
     public class UserAdministrationValidator : IUserAdministrationValidator
     {

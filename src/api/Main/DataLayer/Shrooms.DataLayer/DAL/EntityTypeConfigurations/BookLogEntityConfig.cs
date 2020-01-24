@@ -1,5 +1,5 @@
 ﻿using System.Data.Entity.ModelConfiguration;
-using Shrooms.EntityModels.Models;
+using Shrooms.EntityModels.Models.Books;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 {

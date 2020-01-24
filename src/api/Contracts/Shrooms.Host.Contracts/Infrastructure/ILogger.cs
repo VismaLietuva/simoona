@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Shrooms.Infrastructure.Logger
+namespace Shrooms.Host.Contracts.Infrastructure
 {
     public interface ILogger
     {

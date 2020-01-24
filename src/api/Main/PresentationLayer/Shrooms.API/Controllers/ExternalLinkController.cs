@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Web.Http;
 using AutoMapper;
-using Shrooms.API.Controllers.WebApi;
 using Shrooms.API.Filters;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.WebApi;
 using Shrooms.DataTransferObjects.Models.ExternalLinks;
 using Shrooms.Domain.Services.ExternalLinks;
 using Shrooms.DomainExceptions.Exceptions;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.WebViewModels.Models.ExternalLink;
 using WebApi.OutputCache.V2;
 
@@ -30,7 +29,7 @@ namespace Shrooms.API.Controllers
         [HttpGet]
         [Route("List")]
         [PermissionAuthorize(Permission = BasicPermissions.ExternalLink)]
-        [CacheOutput(ServerTimeSpan = ConstWebApi.OneHour)]
+        [CacheOutput(ServerTimeSpan = WebApiConstants.OneHour)]
         public IHttpActionResult GetAll()
         {
             var externalLinks = _externalLinkService.GetAll(GetUserAndOrganization().OrganizationId);

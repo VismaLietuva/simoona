@@ -7,8 +7,8 @@ using System.Web.Http;
 using AutoMapper;
 using Microsoft.AspNet.Identity;
 using PagedList;
+using Shrooms.API.Controllers.Wall;
 using Shrooms.API.Filters;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.Constants.BusinessLayer;
 using Shrooms.Constants.WebApi;
 using Shrooms.DataTransferObjects.Models.Kudos;
@@ -16,8 +16,8 @@ using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models.Kudos;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.WebViewModels.Models;
-using Shrooms.WebViewModels.Models.Kudos;
 using Shrooms.WebViewModels.Models.KudosTypes;
 using Shrooms.WebViewModels.Models.Users.Kudos;
 using WebApi.OutputCache.V2;
@@ -53,9 +53,9 @@ namespace Shrooms.API.Controllers.Kudos
             var kudosLogsViewModel = _mapper.Map<IEnumerable<MainKudosLogDTO>, IEnumerable<KudosLogViewModel>>(kudosLogsEntriesDto.KudosLogs);
             var pagedKudosLogs = new PagedViewModel<KudosLogViewModel>
             {
-                PagedList = kudosLogsViewModel.ToPagedList(FirstPage, ConstBusinessLayer.MaxKudosLogsPerPage),
+                PagedList = kudosLogsViewModel.ToPagedList(FirstPage, BusinessLayerConstants.MaxKudosLogsPerPage),
                 ItemCount = kudosLogsEntriesDto.TotalKudosCount,
-                PageSize = ConstBusinessLayer.MaxKudosLogsPerPage
+                PageSize = BusinessLayerConstants.MaxKudosLogsPerPage
             };
             return pagedKudosLogs;
         }
@@ -73,15 +73,15 @@ namespace Shrooms.API.Controllers.Kudos
             var userKudosLogsViewModel = _mapper.Map<IEnumerable<KudosUserLogDTO>, IEnumerable<KudosUserLogViewModel>>(kudosLogsEntriesDto.KudosLogs);
             var pagedKudosLogs = new PagedViewModel<KudosUserLogViewModel>
             {
-                PagedList = userKudosLogsViewModel.ToPagedList(FirstPage, ConstBusinessLayer.MaxKudosLogsPerPage),
+                PagedList = userKudosLogsViewModel.ToPagedList(FirstPage, BusinessLayerConstants.MaxKudosLogsPerPage),
                 ItemCount = kudosLogsEntriesDto.TotalKudosCount,
-                PageSize = ConstBusinessLayer.MaxKudosLogsPerPage
+                PageSize = BusinessLayerConstants.MaxKudosLogsPerPage
             };
             return Ok(pagedKudosLogs);
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
-        [CacheOutput(ServerTimeSpan = ConstWebApi.OneHour)]
+        [CacheOutput(ServerTimeSpan = WebApiConstants.OneHour)]
         public IEnumerable<KudosTypeViewModel> GetKudosTypesForFilter()
         {
             var types = new List<KudosTypeViewModel>()
@@ -90,7 +90,7 @@ namespace Shrooms.API.Controllers.Kudos
                 {
                     Hidden = false,
                     Id = 0,
-                    Name = ConstBusinessLayer.KudosStatusAllFilter,
+                    Name = BusinessLayerConstants.KudosStatusAllFilter,
                     Value = 0
                 }
             };
@@ -106,7 +106,7 @@ namespace Shrooms.API.Controllers.Kudos
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
         public IEnumerable<string> GetKudosStatuses()
         {
-            var statuses = new List<string> { ConstBusinessLayer.KudosStatusAllFilter };
+            var statuses = new List<string> { BusinessLayerConstants.KudosStatusAllFilter };
 
             foreach (var status in Enum.GetNames(typeof(KudosStatus)))
             {
@@ -132,7 +132,7 @@ namespace Shrooms.API.Controllers.Kudos
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
-        [CacheOutput(ServerTimeSpan = ConstWebApi.OneHour)]
+        [CacheOutput(ServerTimeSpan = WebApiConstants.OneHour)]
         public IEnumerable<KudosTypeViewModel> GetKudosTypes()
         {
             var kudosTypeDto = _kudosService.GetKudosTypes(GetUserAndOrganization());
@@ -353,7 +353,7 @@ namespace Shrooms.API.Controllers.Kudos
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
-        [CacheOutput(ServerTimeSpan = ConstWebApi.OneHour)]
+        [CacheOutput(ServerTimeSpan = WebApiConstants.OneHour)]
         public IEnumerable<WallKudosLogViewModel> GetLastKudosLogRecords()
         {
             var userAndOrg = GetUserAndOrganization();
@@ -363,7 +363,7 @@ namespace Shrooms.API.Controllers.Kudos
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
-        [CacheOutput(ServerTimeSpan = ConstWebApi.OneHour)]
+        [CacheOutput(ServerTimeSpan = WebApiConstants.OneHour)]
         public IEnumerable<KudosBasicDataViewModel> GetKudosStats(int months, int amount)
         {
             if (months <= 0 || amount <= 0)
@@ -378,7 +378,7 @@ namespace Shrooms.API.Controllers.Kudos
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
-        [CacheOutput(ServerTimeSpan = ConstWebApi.OneHour)]
+        [CacheOutput(ServerTimeSpan = WebApiConstants.OneHour)]
         public IEnumerable<KudosListBasicDataViewModel> GetKudosWidgetStats(int tabOneMonths, int tabOneAmount, int tabTwoMonths, int tabTwoAmount)
         {
             var result = new List<KudosListBasicDataViewModel>();

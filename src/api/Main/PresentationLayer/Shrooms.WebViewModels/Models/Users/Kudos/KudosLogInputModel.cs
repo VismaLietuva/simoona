@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Shrooms.EntityModels.Models.Kudos;
 
-namespace Shrooms.WebViewModels.Models.Kudos
+namespace Shrooms.WebViewModels.Models.Users.Kudos
 {
     public class KudosLogInputModel
     {

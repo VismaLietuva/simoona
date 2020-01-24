@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using Shrooms.Constants.ErrorCodes;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models.ExternalLinks;
 using Shrooms.Domain.Helpers;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.Constants;
+using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.Domain.Services.ExternalLinks
 {
