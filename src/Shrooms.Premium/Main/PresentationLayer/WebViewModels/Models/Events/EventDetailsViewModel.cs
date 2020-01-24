@@ -17,9 +17,9 @@ namespace Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Events
 
         public DateTime RegistrationDeadlineDate { get; set; }
 
-        public int? OfficeId { get; set; }
+        public IEnumerable<string> OfficesName { get; set; }
 
-        public string OfficeName { get; set; }
+        public bool IsPinned { get; set; }
 
         public string Location { get; set; }
 
@@ -35,7 +35,7 @@ namespace Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Events
 
         public bool IsFull { get; set; }
 
-        public bool IsParticipating { get; set; }
+        public int ParticipatingStatus { get; set; }
 
         public int WallId { get; set; }
 

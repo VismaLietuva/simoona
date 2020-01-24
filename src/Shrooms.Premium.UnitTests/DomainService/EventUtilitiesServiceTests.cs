@@ -14,7 +14,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
 {
     public class EventUtilitiesServiceTests
     {
-        private EventUtilitiesService _eventUtilitiesService;
+        private IEventUtilitiesService _eventUtilitiesService;
         private IDbSet<EventType> _eventTypesDbSet;
         private IDbSet<EventOption> _eventOptionsDbSet;
         private IDbSet<Event> _eventDbSet;
@@ -92,6 +92,29 @@ namespace Shrooms.Premium.UnitTests.DomainService
             //Assert
             Assert.AreEqual(false, eventType.HasActiveEvents);
             Assert.AreEqual("type3", eventType.Name);
+        }
+
+        [TestCase(2, 1)]
+        [TestCase(2111, 0)]
+        public void GetEventTypesToRemind_DifferentOrganizations_ReturnsCorrectAmountEventTypes(int orgId, int amount)
+        {
+            MockEventTypes();
+
+            var eventTypes = _eventUtilitiesService.GetEventTypesToRemind(orgId);
+
+            Assert.AreEqual(amount, eventTypes.Count());
+        }
+
+        [Test]
+        public void GetEventTypesToRemind_OrganizationIdFour_ReturnsCorrectEventType()
+        {
+            MockEventTypes();
+
+            var eventTypes = _eventUtilitiesService.GetEventTypesToRemind(4);
+
+            Assert.AreEqual(1, eventTypes.Count());
+            Assert.AreEqual(5, eventTypes.First().Id);
+            Assert.AreEqual("type5", eventTypes.First().Name);
         }
 
         private Guid MockParticipantsWithOptionsForExport()
@@ -196,7 +219,8 @@ namespace Shrooms.Premium.UnitTests.DomainService
                 {
                     Id = 1,
                     Name = "type1",
-                    OrganizationId = 2
+                    OrganizationId = 2,
+                    SendWeeklyReminders = true
                 },
                 new EventType
                 {
@@ -229,6 +253,13 @@ namespace Shrooms.Premium.UnitTests.DomainService
                             EndDate = DateTime.UtcNow.AddHours(1)
                         }
                     }
+                },
+                new EventType
+                {
+                    Id = 5,
+                    Name = "type5",
+                    OrganizationId = 4,
+                    SendWeeklyReminders = true
                 }
             };
             _eventTypesDbSet.SetDbSetData(types.AsQueryable());

@@ -20,7 +20,9 @@ namespace Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Events
 
         public EventRecurrenceOptions Recurrence { get; set; }
 
-        public int? OfficeId { get; set; }
+        public IEnumerable<int> OfficeIds { get; set; }
+
+        public bool IsPinned { get; set; }
 
         public string Location { get; set; }
 

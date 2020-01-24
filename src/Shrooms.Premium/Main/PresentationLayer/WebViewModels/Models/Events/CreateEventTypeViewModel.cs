@@ -7,6 +7,8 @@ namespace Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Events
     {
         public bool IsSingleJoin { get; set; }
 
+        public bool SendWeeklyReminders { get; set; }
+
         [Required]
         [StringLength(WebApiConstants.EventTypeNameMaxLength)]
         public string Name { get; set; }

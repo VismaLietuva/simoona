@@ -8,6 +8,7 @@ using Shrooms.Domain.Services.Permissions;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.Constants;
+using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.ServiceRequest;
@@ -27,13 +28,13 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.ServiceRequests
         private readonly IDbSet<ServiceRequestPriority> _serviceRequestPriorityDbSet;
         private readonly IDbSet<ServiceRequestStatus> _serviceRequestStatusDbSet;
         private readonly IDbSet<ApplicationUser> _userDbSet;
-        private readonly IServiceRequestNotificationService _notificationService;
         private readonly IPermissionService _permissionService;
+        private readonly IAsyncRunner _asyncRunner;
 
         public ServiceRequestService(
             IUnitOfWork2 uow,
-            IServiceRequestNotificationService notificationService,
-            IPermissionService permissionService)
+            IPermissionService permissionService,
+            IAsyncRunner asyncRunner)
         {
             _uow = uow;
             _serviceRequestsDbSet = _uow.GetDbSet<ServiceRequest>();
@@ -42,8 +43,8 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.ServiceRequests
             _serviceRequestPriorityDbSet = _uow.GetDbSet<ServiceRequestPriority>();
             _serviceRequestStatusDbSet = _uow.GetDbSet<ServiceRequestStatus>();
             _userDbSet = _uow.GetDbSet<ApplicationUser>();
-            _notificationService = notificationService;
             _permissionService = permissionService;
+            _asyncRunner = asyncRunner;
         }
 
         public void CreateNewServiceRequest(ServiceRequestDTO newServiceRequestDTO, UserAndOrganizationDTO userAndOrganizationDTO)
@@ -90,7 +91,8 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.ServiceRequests
             _serviceRequestsDbSet.Add(serviceRequest);
             _uow.SaveChanges(false);
 
-            _notificationService.NotifyAboutNewServiceRequest(serviceRequest, userAndOrganizationDTO);
+            var srqDto = new CreatedServiceRequestDTO { ServiceRequestId = serviceRequest.Id };
+            _asyncRunner.Run<IServiceRequestNotificationService>(n => n.NotifyAboutNewServiceRequest(srqDto), _uow.ConnectionName);
         }
 
         public void MoveRequestToDone(int requestId, UserAndOrganizationDTO userAndOrganizationDTO)
@@ -120,11 +122,8 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.ServiceRequests
 
             _uow.SaveChanges(false);
 
-            var newStatusName = _serviceRequestStatusDbSet
-                .Where(x => x.Id == serviceRequest.StatusId)
-                .Select(x => x.Title)
-                .First();
-            _notificationService.NotifyAboutServiceRequestStatusUpdate(serviceRequest, userAndOrganizationDTO, newStatusName);
+            var statusDto = new UpdatedServiceRequestDTO { ServiceRequestId = requestId, NewStatusId = serviceRequest.StatusId };
+            _asyncRunner.Run<IServiceRequestNotificationService>(n => n.NotifyAboutServiceRequestStatusUpdate(statusDto, userAndOrganizationDTO), _uow.ConnectionName);
         }
 
         public void UpdateServiceRequest(ServiceRequestDTO serviceRequestDTO, UserAndOrganizationDTO userAndOrganizationDTO)
@@ -170,11 +169,12 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.ServiceRequests
 
             if (statusHasBeenChanged)
             {
-                var newStatusName = _serviceRequestStatusDbSet
-                    .Where(x => x.Id == serviceRequest.StatusId)
-                    .Select(x => x.Title)
-                    .First();
-                _notificationService.NotifyAboutServiceRequestStatusUpdate(serviceRequest, userAndOrganizationDTO, newStatusName);
+                var statusDto = new UpdatedServiceRequestDTO
+                {
+                    ServiceRequestId = serviceRequestDTO.Id,
+                    NewStatusId = serviceRequest.StatusId
+                };
+                _asyncRunner.Run<IServiceRequestNotificationService>(n => n.NotifyAboutServiceRequestStatusUpdate(statusDto, userAndOrganizationDTO), _uow.ConnectionName);
             }
         }
 
@@ -206,7 +206,13 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.ServiceRequests
             _serviceRequestCommentsDbSet.Add(serviceRequestComment);
             _uow.SaveChanges(false);
 
-            _notificationService.NotifyAboutNewComment(serviceRequest, serviceRequestComment);
+            var createdComment = new ServiceRequestCreatedCommentDTO
+            {
+                ServiceRequestId = comment.ServiceRequestId,
+                CommentedEmployeeId = serviceRequestComment.EmployeeId,
+                CommentContent = serviceRequestComment.Content
+            };
+            _asyncRunner.Run<IServiceRequestNotificationService>(n => n.NotifyAboutNewComment(createdComment), _uow.ConnectionName);
         }
 
         public IEnumerable<ServiceRequestCategoryDTO> GetCategories()

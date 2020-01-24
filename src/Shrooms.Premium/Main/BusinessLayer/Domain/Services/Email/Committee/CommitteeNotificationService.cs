@@ -3,12 +3,15 @@ using System.Data.Entity;
 using System.Linq;
 using Shrooms.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.DataTransferObjects.Models.Emails;
+using Shrooms.Domain.ServiceExceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Committee;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.Host.Contracts.Infrastructure;
 using Shrooms.Host.Contracts.Infrastructure.Email;
+using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Committees;
+using CommitteeEntity = Shrooms.EntityModels.Models.Committee.Committee;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.Committee
 {
@@ -18,6 +21,8 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.Committee
         private readonly IMailTemplate _mailTemplate;
         private readonly IApplicationSettings _appSettings;
         private readonly IMailingService _mailingService;
+        private readonly IDbSet<CommitteeEntity> _committeeDbSet;
+        private readonly IDbSet<CommitteeSuggestion> _suggestionDbSet;
 
         public CommitteeNotificationService(IUnitOfWork2 uow,
             IMailTemplate mailTemplate,
@@ -28,9 +33,28 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.Committee
             _mailTemplate = mailTemplate;
             _appSettings = appSettings;
             _mailingService = mailingService;
+            _committeeDbSet = uow.GetDbSet<CommitteeEntity>();
+            _suggestionDbSet = uow.GetDbSet<CommitteeSuggestion>();
         }
 
-        public void NotifyCommitteeMembersAboutNewSuggestion(EntityModels.Models.Committee.Committee committee, CommitteeSuggestion suggestion)
+        public void NotifyCommitteeMembersAboutNewSuggestion(CommitteeSuggestionCreatedDto createdDto)
+        {
+            var committee = _committeeDbSet.Include(inc => inc.Members).FirstOrDefault(wh => wh.Id == createdDto.CommitteeId);
+            if (committee == null)
+            {
+                throw new ServiceException(Resources.Models.Committee.Committee.SuggestionCommiteNotFound);
+            }
+
+            var suggestion = _suggestionDbSet.Find(createdDto.SuggestionId);
+            if(suggestion==null)
+            {
+                throw new ServiceException($"Suggestion {createdDto.SuggestionId} for committee {createdDto.CommitteeId} not found");
+            }
+
+            NotifyCommitteeMembersAboutNewSuggestion(committee, suggestion);
+        }
+
+        private void NotifyCommitteeMembersAboutNewSuggestion(CommitteeEntity committee, CommitteeSuggestion suggestion)
         {
             if (committee.Members != null && committee.Members.Any())
             {

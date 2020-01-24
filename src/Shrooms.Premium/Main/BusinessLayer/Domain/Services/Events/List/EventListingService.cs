@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Shrooms.Constants.BusinessLayer.Events;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -49,45 +50,51 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.List
         {
             var events = _eventsDbSet
                 .Include(x => x.EventParticipants)
-                .Include(x => x.Office)
                 .Where(t =>
                     t.OrganizationId == userOrganization.OrganizationId &
                     t.EndDate > DateTime.UtcNow)
                 .Where(EventTypeFilter(typeId))
                 .Select(MapEventToListItemDto(userOrganization.UserId))
-                .OrderBy(e => e.StartDate)
+                .OrderByDescending(e => e.IsPinned)
+                .ThenBy(e => e.StartDate)
                 .ToList();
+
+
             return events;
         }
 
         public IEnumerable<EventListItemDTO> GetEventsByTypeAndOffice(UserAndOrganizationDTO userOrganization, int? typeId = null, int? officeId = null)
         {
-            var events = _eventsDbSet
+            string officeSearchString = officeId != null ? $"\"{officeId.ToString()}\"" : "[]";
+            IList < EventListItemDTO > events = _eventsDbSet
                 .Include(x => x.EventParticipants)
-                .Include(x => x.Office)
                 .Where(t =>
                     t.OrganizationId == userOrganization.OrganizationId &
                     t.EndDate > DateTime.UtcNow)
                 .Where(EventTypeFilter(typeId))
-                .Where(EventOfficeFilter(officeId))
+                .Where(EventOfficeFilter(officeSearchString))
                 .Select(MapEventToListItemDto(userOrganization.UserId))
-                .OrderBy(e => e.StartDate)
+                .OrderByDescending(e => e.IsPinned)
+                .ThenBy(e => e.StartDate)
                 .ToList();
+
             return events;
         }
 
         public IEnumerable<EventListItemDTO> GetMyEvents(MyEventsOptionsDTO options, int? officeId = null)
         {
+            string officeSearchString = officeId != null ? $"\"{officeId.ToString()}\"" : "[]";
             var myEventFilter = EventFilters[options.Filter](options.UserId);
             var events = _eventsDbSet
                 .Include(x => x.EventParticipants)
-                .Include(x => x.Office)
+                .Include(x => x.Offices)
                 .Where(t => t.OrganizationId == options.OrganizationId)
                 .Where(SearchFilter(options.SearchString))
                 .Where(myEventFilter)
-                .Where(EventOfficeFilter(officeId))
+                .Where(EventOfficeFilter(officeSearchString))
                 .Select(MapEventToListItemDto(options.UserId))
-                .OrderBy(e => e.StartDate)
+                .OrderByDescending(e => e.IsPinned)
+                .ThenBy(e => e.StartDate)
                 .ToList();
 
             var orderedEvents = OrderEvents(events);
@@ -108,7 +115,8 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.List
         {
             var orderedFutureEvents = events
                 .Where(e => e.StartDate > DateTime.UtcNow)
-                .OrderBy(e => e.StartDate);
+                .OrderByDescending(e => e.IsPinned)
+                .ThenBy(e => e.StartDate);
 
             var orderedPastEvents = events
                 .Where(e => e.StartDate < DateTime.UtcNow)
@@ -122,17 +130,20 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.List
             {
                 Id = e.Id,
                 ImageName = e.ImageName,
+                Offices = new EventOfficesDTO { Value = e.Offices},
                 MaxParticipants = e.MaxParticipants,
+                IsPinned = e.IsPinned,
                 Name = e.Name,
-                Office = e.Office.Name,
                 Place = e.Place,
                 StartDate = e.StartDate,
                 EndDate = e.EndDate,
                 RegistrationDeadlineDate = e.RegistrationDeadline,
-                ParticipantsCount = e.EventParticipants.Count,
+                ParticipantsCount = e.EventParticipants.Count(p => p.AttendStatus == (int)BusinessLayerConstants.AttendingStatus.Attending),
                 IsCreator = e.ResponsibleUserId == userId,
-                IsParticipating = e.EventParticipants.Any(p => p.ApplicationUserId == userId),
-                MaxChoices = e.MaxChoices
+                ParticipatingStatus = e.EventParticipants.FirstOrDefault(p => p.ApplicationUserId == userId) != null
+                                          ? e.EventParticipants.FirstOrDefault(p => p.ApplicationUserId == userId).AttendStatus
+                                          : (int)BusinessLayerConstants.AttendingStatus.Idle,
+                MaxChoices = e.MaxChoices,
             };
         }
 
@@ -144,8 +155,10 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.List
                 Options = e.EventOptions.Select(o => new EventOptionDTO
                 {
                     Id = o.Id,
-                    Option = o.Option
+                    Option = o.Option,
+                    Rule = o.Rule
                 })
+                .OrderByDescending(o => o.Rule == OptionRules.Default)
             };
         }
 
@@ -159,14 +172,13 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.List
             return x => x.EventTypeId == typeId;
         }
 
-        private static Expression<Func<Event, bool>> EventOfficeFilter(int? officeId)
+        private static Expression<Func<Event, bool>> EventOfficeFilter(string office)
         {
-            if (officeId == null)
+            if (office == "[]")
             {
                 return x => true;
             }
-
-            return x => x.OfficeId == officeId || x.OfficeId == null;
+            return x => x.Offices.Contains(office) || x.Offices == "[]";
         }
 
         private static Expression<Func<Event, bool>> SearchFilter(string searchString)

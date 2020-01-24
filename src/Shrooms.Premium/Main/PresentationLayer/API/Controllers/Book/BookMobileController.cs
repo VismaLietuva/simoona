@@ -3,14 +3,11 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
 using Shrooms.API.Filters;
-using Shrooms.DataTransferObjects.Models.Books;
-using Shrooms.Domain.Services.Books;
 using Shrooms.DomainExceptions.Exceptions.Book;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Books;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Books;
 using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Book;
 using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Book.BookDetails;
-using Shrooms.WebViewModels.Models.Book;
 
 namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers.Book
 {

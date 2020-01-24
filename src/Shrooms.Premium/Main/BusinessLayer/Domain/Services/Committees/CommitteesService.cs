@@ -6,6 +6,7 @@ using AutoMapper;
 using MoreLinq;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.Domain.ServiceExceptions;
+using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Committee;
@@ -20,25 +21,25 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Committees
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUnitOfWork2 _uow;
+        private readonly IAsyncRunner _asyncRunner;
         private readonly IDbSet<ApplicationUser> _usersDbSet;
         private readonly IDbSet<Committee> _committteeDbSet;
         private readonly IRepository<ApplicationUser> _applicationUserRepository;
         private readonly IRepository<Committee> _committeeRepository;
         private readonly IMapper _mapper;
-        private readonly ICommitteeNotificationService _committeeNotificationService;
 
         public CommitteesService(
             IMapper mapper,
             IUnitOfWork unitOfWork,
             IUnitOfWork2 uow,
-            ICommitteeNotificationService notificationService)
+            IAsyncRunner asyncRunner)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _applicationUserRepository = _unitOfWork.GetRepository<ApplicationUser>();
             _committeeRepository = _unitOfWork.GetRepository<Committee>();
-            _committeeNotificationService = notificationService;
             _uow = uow;
+            _asyncRunner = asyncRunner;
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
             _committteeDbSet = uow.GetDbSet<Committee>();
         }
@@ -167,7 +168,12 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Committees
             _committeeRepository.Update(committee);
             _unitOfWork.Save();
 
-            _committeeNotificationService.NotifyCommitteeMembersAboutNewSuggestion(committee, suggestion);
+            var suggestionDto= new CommitteeSuggestionCreatedDto
+            {
+                CommitteeId = committee.Id,
+                SuggestionId = suggestion.Id
+            };
+            _asyncRunner.Run<ICommitteeNotificationService>(n=>n.NotifyCommitteeMembersAboutNewSuggestion(suggestionDto), _uow.ConnectionName);
         }
 
         public IEnumerable<CommitteeSuggestionViewDTO> GetCommitteeSuggestions(int id)

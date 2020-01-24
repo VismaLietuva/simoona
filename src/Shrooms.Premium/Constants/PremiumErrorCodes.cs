@@ -29,6 +29,9 @@
         public const string EventParticipantNotFound = "220";
         public const string EventParticipantsNotFound = "221";
         public const int EventTypeNameAlreadyExists = 222;
+        public const string EventChoiceCanBeSingleOnly = "223";
+        public const string EventWrongAttendStatus = "224";
+
 
         // Service Request, 7**
         public const int ServiceRequestIsClosed = 700;

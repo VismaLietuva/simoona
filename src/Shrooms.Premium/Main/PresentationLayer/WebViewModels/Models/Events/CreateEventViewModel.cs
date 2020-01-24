@@ -27,7 +27,11 @@ namespace Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Events
         [Required]
         public EventRecurrenceOptions Recurrence { get; set; }
 
-        public int? OfficeId { get; set; }
+        [Required]
+        public List<int> Offices { get; set; }
+
+        [Required]
+        public bool IsPinned { get; set; }
 
         [Required]
         [StringLength(WebApiConstants.EventLocationMaxLength)]
@@ -49,6 +53,6 @@ namespace Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Events
         [Required]
         public string ResponsibleUserId { get; set; }
 
-        public IEnumerable<string> NewOptions { get; set; }
+        public IEnumerable<NewEventOptionViewModel> NewOptions { get; set; }
     }
 }

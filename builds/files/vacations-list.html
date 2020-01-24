@@ -2,50 +2,44 @@
 
     <h3 class="col-xs-12" translate="common.vacations"></h3>
 
-    <div class="pull-right">
-        <label class="btn btn-warning" 
-               has-permissions="['VACATIONS_ADMINISTRATION']">
-            <input id="xlsSelect" 
-                   data-test-id="xlsSelect" 
-                   type="file" 
-                   accept=".xls" 
-                   onchange="angular.element(this).scope().fileAttached(this)" 
-                   ng-hide="true" 
-                   ng-required="true" /> 
-            <span translate="vacations.chooseFile"></span>
-        </label>
-    </div>
-
     <wave-spinner ng-if="vm.isLoading"></wave-spinner>
-
-    <div class="col-xs-12 text-center"
-         ng-if="!vm.isLoading">
-        <strong translate="vacations.youHaveAvailableDays"
-                translate-values="{ one : vm.availableDays.availableDays }">
-        </strong>
-        <br />
-        <strong ng-if="!!vm.availableDays.lastTimeUpdated">
-            <span translate="vacations.lastTimeUpdated"></span> {{vm.availableDays.lastTimeUpdated | date:'yyyy-MM-dd'}}
-        </strong>
-        <strong ng-if="!vm.availableDays.lastTimeUpdated" 
-                translate="vacations.neverBeenUpdated"></strong>
-    </div>
 
     <div class="col-xs-12 text-left padding-top-bottom"
          ng-if="!vm.isLoading">
         <strong>
-            If you want to take a vacation:
-            <br /><br />
-            Email at: vacations.lt@visma.com<br />
-            Email subject: vacations or “atostogos”<br />
-            Email body: prašau suteikti man kasmetines atostogas nuo YYYY-MM-DD iki YYYY-MM-DD imtinai<br />
-            <br />
-            Once your coach approves your vacations, you will receive an email from vacations.lt@visma.com with a subject line that says, "jusu atostogu prasymas PATVIRTINTAS." If you haven't received such an email - don't go on vacation. Ask your coach to process your request first.<br />
-            <br />
-            This is valid for annual vacations only. Ask your coach for more info about any other type of vacations, or if you need a day off.
-            <br /><br />
-            You will receive a vacation payment at the end of month together with your salary payment. If you need money in advance, please, request your vacation in writing using a paper template that can be found and printed within Important Docs site on Simoona.
+            Amount of your vacation days are visible in your payslip on monthly basis.
         </strong>
+        <h3>To take a vacation</h3>
+        <p>
+            Email at: <strong>vacations.lt@visma.com</strong><br />
+            Email subject: <strong>Vacations</strong> or <strong>Atostogos</strong><br />
+            Email body: <strong>Prašau suteikti man kasmetines atostogas nuo YYYY-MM-DD iki YYYY-MM-DD imtinai</strong>
+        </p>
+        <h3>To take a parental leave (mamadienis/tėvadienis)</h3>
+        <p>
+            Email at: <strong>vacations.lt@visma.com</strong><br />
+            Email subject: <strong>Tevadienis</strong> or <strong>Tėvadienis</strong><br />
+            Email body: <strong>Prašau suteikti man mamadienį/tėvadienį YYYY-MM-DD</strong>
+        </p>
+        <h3>To take unpaid leave</h3>
+        <p>
+            Email at: <strong>vacations.lt@visma.com</strong><br />
+            Email subject: <strong>Neapmokamos atostogos</strong><br />
+            Email body: <strong>Prašau suteikti man neapmokamas atostogas nuo YYYY-MM-DD iki YYYY-MM-DD</strong>
+        </p>
+        <h3>To cancel your vacation request</h3>
+        <p>
+            In your “Sent” folder find the request which you want to cancel, then press “Reply” and type “cancel” in the email body.<br />
+            Note: it only works for regular vacations!
+        </p>
+        <h3>What happens next?</h3>
+        <p>
+            Once your coach approves your vacations, you will receive an email from vacations.lt@visma.com with a subject line that says - "jusu atostogu prasymas PATVIRTINTAS." If you haven't received such an email - don't go on vacation. Ask your coach to process your request first.
+        </p>
+        <h3>Vacation compensation</h3>
+        <p>
+            You will receive a vacation payment at the end of month together with your salary payment. If you need money in advance, please, request your vacation in writing using a paper template that can be found and printed within Important Docs site on Simoona.
+        </p>
     </div>
 
     <div class="col-xs-12"

@@ -1,4 +1,4 @@
-﻿namespace Shrooms.WebViewModels.Models.Events
+﻿namespace Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Events
 {
     public class EventListViewModel
     {

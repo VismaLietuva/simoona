@@ -17,6 +17,14 @@
             Host,
             Participant
         }
+
+        public enum AttendingStatus
+        {
+            NotAttending = 0,
+            Attending,
+            MaybeAttending,
+            Idle
+        }
         #endregion
 
         #region ServiceRequests

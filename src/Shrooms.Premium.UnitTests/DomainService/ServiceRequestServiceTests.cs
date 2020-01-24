@@ -10,6 +10,7 @@ using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.ServiceRequest;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.ServiceRequest;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.ServiceRequests;
@@ -56,8 +57,8 @@ namespace Shrooms.Premium.UnitTests.DomainService
 
             _notificationService = Substitute.For<IServiceRequestNotificationService>();
             _permissionService = Substitute.For<IPermissionService>();
-
-            _serviceRequestService = new ServiceRequestService(_uow, _notificationService, _permissionService);
+            var asyncRunner = Substitute.For<IAsyncRunner>();
+            _serviceRequestService = new ServiceRequestService(_uow, _permissionService, asyncRunner);
         }
 
         [Test]
@@ -125,7 +126,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
                 UserId = "UserId"
             };
 
-            _serviceRequestService.CreateNewServiceRequest(serviceRequestDTO ,userAndOrg);
+            _serviceRequestService.CreateNewServiceRequest(serviceRequestDTO, userAndOrg);
             _serviceRequestsDbSet
                 .Received(1)
                 .Add(Arg.Any<ServiceRequest>());
@@ -215,10 +216,6 @@ namespace Shrooms.Premium.UnitTests.DomainService
             Assert.AreEqual(serviceRequestDTO.PriorityId, updatedServiceRequest.PriorityId);
             Assert.AreEqual(serviceRequestDTO.KudosAmmount, updatedServiceRequest.KudosAmmount);
 
-            _notificationService
-                .Received(0)
-                .NotifyAboutServiceRequestStatusUpdate(Arg.Any<ServiceRequest>(), Arg.Any<UserAndOrganizationDTO>(), Arg.Any<string>());
-
             _uow.Received(1).SaveChanges(false);
         }
 
@@ -257,10 +254,6 @@ namespace Shrooms.Premium.UnitTests.DomainService
             Assert.AreEqual(null, updatedServiceRequest.KudosAmmount);
             Assert.AreEqual(1, updatedServiceRequest.StatusId);
 
-            _notificationService
-                .Received(0)
-                .NotifyAboutServiceRequestStatusUpdate(Arg.Any<ServiceRequest>(), Arg.Any<UserAndOrganizationDTO>(), Arg.Any<string>());
-
             _uow.Received(1).SaveChanges(false);
         }
 
@@ -294,10 +287,6 @@ namespace Shrooms.Premium.UnitTests.DomainService
             var updatedServiceRequest = _serviceRequestsDbSet.First(x => x.Id == serviceRequestDTO.Id);
 
             Assert.AreEqual(serviceRequestDTO.StatusId, updatedServiceRequest.StatusId);
-
-            _notificationService
-                .Received(1)
-                .NotifyAboutServiceRequestStatusUpdate(Arg.Any<ServiceRequest>(), Arg.Any<UserAndOrganizationDTO>(), Arg.Any<string>());
 
             _uow.Received(1).SaveChanges(false);
         }
@@ -361,7 +350,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
         private void MockPermissioService()
         {
             _permissionService
-                .UserHasPermission(Arg.Is<UserAndOrganizationDTO>(x => x.UserId == "AdminId" && x.OrganizationId == 1 ), AdministrationPermissions.ServiceRequest)
+                .UserHasPermission(Arg.Is<UserAndOrganizationDTO>(x => x.UserId == "AdminId" && x.OrganizationId == 1), AdministrationPermissions.ServiceRequest)
                 .Returns(true);
 
             _permissionService

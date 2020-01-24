@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Newtonsoft.Json;
 using Shrooms.EntityModels.Models.Events;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.OfficeMap;
@@ -19,13 +20,20 @@ namespace Shrooms.Premium.Infrastructure.ModelMappings.Profiles
         {
             CreateMap<OfficeDTO, EventOfficeViewModel>();
             CreateMap<EventTypeDTO, EventTypeViewModel>();
-            CreateMap<EventListItemDTO, EventListItemViewModel>();
+            CreateMap<EventListItemDTO, EventListItemViewModel>()
+                .ForMember(dest => dest.OfficeIds, opt => opt.MapFrom(u => JsonConvert.DeserializeObject<string[]>(u.Offices.Value)));
             CreateMap<EventOptionDTO, EventOptionViewModel>();
             CreateMap<EventDetailsDTO, EventDetailsViewModel>()
-                .Ignore(x => x.Comments);
+                .Ignore(x => x.Comments)
+                .ForMember(dest => dest.OfficesName, opt => opt.MapFrom(u => u.Offices.OfficeNames));
+
+            CreateMap<NewEventOptionDTO, NewEventOptionViewModel>();
+            CreateMap<NewEventOptionViewModel, NewEventOptionDTO>();
+
             CreateMap<EventDetailsOptionDTO, EventDetailsOptionViewModel>();
             CreateMap<EventDetailsParticipantDTO, EventDetailsParticipantViewModel>();
-            CreateMap<EventEditDTO, EventEditViewModel>();
+            CreateMap<EventEditDTO, EventEditViewModel>()
+                .ForMember(dest => dest.OfficeIds, opt => opt.MapFrom(u => JsonConvert.DeserializeObject<string[]>(u.Offices.Value)));
             CreateMap<EventOptionsDTO, EventOptionsViewModel>();
         }
 
@@ -34,17 +42,24 @@ namespace Shrooms.Premium.Infrastructure.ModelMappings.Profiles
             CreateMap<CreateEventViewModel, CreateEventDto>()
                 .Ignore(d => d.ResetParticipantList)
                 .Ignore(d => d.Id)
+                .Ignore(d => d.Offices)
                 .IgnoreUserOrgDto();
             CreateMap<UpdateEventViewModel, EditEventDTO>()
-                .IgnoreUserOrgDto();
+                .IgnoreUserOrgDto()
+                .Ignore(d => d.Offices);
             CreateMap<MyEventsOptionsViewModel, MyEventsOptionsDTO>()
                 .IgnoreUserOrgDto();
             CreateMap<EventJoinViewModel, EventJoinDTO>()
                 .Ignore(d => d.ParticipantIds)
                 .IgnoreUserOrgDto();
             CreateMap<EventJoinMultipleViewModel, EventJoinDTO>()
+                .Ignore(d => d.AttendStatus)
+                .Ignore(d => d.AttendComment)
                 .IgnoreUserOrgDto();
             CreateMap<EventOptionViewModel, EventOptionDTO>();
+
+            CreateMap<UpdateAttendStatusViewModel, UpdateAttendStatusDTO>()
+                .IgnoreUserOrgDto();
 
             CreateMap<CreateEventTypeViewModel, CreateEventTypeDTO>().IgnoreUserOrgDto();
             CreateMap<UpdateEventTypeViewModel, UpdateEventTypeDTO>().IgnoreUserOrgDto();

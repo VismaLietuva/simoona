@@ -14,7 +14,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.WebHookCallbacks.Ev
 {
     public class EventsWebHookService : IEventsWebHookService
     {
-        private static readonly Dictionary<EventRecurrenceOptions, Func<DateTime, DateTime>> _recurrancePeriods = new Dictionary<EventRecurrenceOptions, Func<DateTime, DateTime>>
+        private static readonly Dictionary<EventRecurrenceOptions, Func<DateTime, DateTime>> _recurrencePeriods = new Dictionary<EventRecurrenceOptions, Func<DateTime, DateTime>>
         {
             { EventRecurrenceOptions.EveryDay, e => e.AddDays(1) },
             { EventRecurrenceOptions.EveryWeek, e => e.AddDays(7) },
@@ -68,8 +68,6 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.WebHookCallbacks.Ev
             }
 
             await _uow.SaveChangesAsync(false);
-
-            newEvents.ForEach(x => _calendarService.CreateEvent(x, x.OrganizationId.Value));
         }
 
         private static Event CreateNewEvent(Event @event, int wallId)
@@ -84,16 +82,16 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.WebHookCallbacks.Ev
                 ImageName = @event.ImageName,
                 MaxChoices = @event.MaxChoices,
                 MaxParticipants = @event.MaxParticipants,
-                OfficeId = @event.OfficeId,
+                Offices = @event.Offices,
                 OrganizationId = @event.OrganizationId,
                 Name = @event.Name,
                 Modified = @event.Modified,
                 ModifiedBy = @event.ModifiedBy,
                 Place = @event.Place,
                 Created = @event.Created,
-                LocalStartDate = _recurrancePeriods[@event.EventRecurring](@event.LocalStartDate),
-                LocalEndDate = _recurrancePeriods[@event.EventRecurring](@event.LocalEndDate),
-                LocalRegistrationDeadline = _recurrancePeriods[@event.EventRecurring](@event.LocalRegistrationDeadline),
+                LocalStartDate = _recurrencePeriods[@event.EventRecurring](@event.LocalStartDate),
+                LocalEndDate = _recurrencePeriods[@event.EventRecurring](@event.LocalEndDate),
+                LocalRegistrationDeadline = _recurrencePeriods[@event.EventRecurring](@event.LocalRegistrationDeadline),
                 WallId = wallId
             };
         }

@@ -11,8 +11,8 @@ namespace Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public DateTime RegistrationDeadlineDate { get; set; }
-        public int? OfficeId { get; set; }
-        public string OfficeName { get; set; }
+        public EventOfficesDTO Offices { get; set; }
+        public bool IsPinned { get; set; }
         public string Location { get; set; }
         public string Description { get; set; }
         public int MaxParticipants { get; set; }
@@ -20,7 +20,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events
         public string HostUserFullName { get; set; }
         public string HostUserId { get; set; }
         public bool IsFull { get; set; }
-        public bool IsParticipating { get; set; }
+        public int ParticipatingStatus { get; set; }
         public int WallId { get; set; }
         public IEnumerable<EventDetailsOptionDTO> Options { get; set; }
         public IEnumerable<EventDetailsParticipantDTO> Participants { get; set; }

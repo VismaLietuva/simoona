@@ -5,7 +5,6 @@ using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.DataTransferObjects.Models;
-using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Events;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.Host.Contracts.Infrastructure;
@@ -53,7 +52,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
             Assert.AreEqual(result.First().Id, eventsGuids[0]);
             Assert.IsTrue(result.First().IsCreator);
             Assert.AreEqual(result.First().ParticipantsCount, 2);
-            Assert.IsTrue(result.First().IsParticipating);
+            Assert.AreEqual(result.First().ParticipatingStatus, 1);
         }
 
         [Test]
@@ -70,7 +69,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
             Assert.AreEqual(result.First().Id, eventsGuids[0]);
             Assert.IsFalse(result.First().IsCreator);
             Assert.AreEqual(result.First().ParticipantsCount, 2);
-            Assert.IsFalse(result.First().IsParticipating);
+            Assert.AreEqual(result.First().ParticipatingStatus, 3);
         }
 
         [Test]
@@ -101,8 +100,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
 
             var result = _eventListingService.GetMyEvents(myEventsOptions).ToList();
             Assert.AreEqual(result.Count, 3);
-            Assert.IsTrue(result.First(x => x.Id == eventGuids[2]).IsParticipating);
-            Assert.IsTrue(result.First(x => x.Id == eventGuids[0]).IsParticipating);
+            Assert.AreEqual(result.First(x => x.Id == eventGuids[0]).ParticipatingStatus, 1);
             Assert.IsTrue(result.First(x => x.Id == eventGuids[2]).StartDate < result.First(x => x.Id == eventGuids[0]).StartDate);
         }
 
@@ -275,7 +273,8 @@ namespace Shrooms.Premium.UnitTests.DomainService
                 ApplicationUserId = "responsibleUserId",
                 Created = DateTime.UtcNow.AddDays(-2),
                 Id = 1,
-                EventId = guids[0]
+                EventId = guids[0],
+                AttendStatus = 1
             };
 
             var participant2 = new EventParticipant
@@ -283,7 +282,8 @@ namespace Shrooms.Premium.UnitTests.DomainService
                 ApplicationUserId = "testUser1",
                 Created = DateTime.UtcNow.AddDays(-2),
                 Id = 2,
-                EventId = guids[0]
+                EventId = guids[0],
+                AttendStatus = 1
             };
 
             var participant3 = new EventParticipant
@@ -291,7 +291,8 @@ namespace Shrooms.Premium.UnitTests.DomainService
                 ApplicationUserId = "testUser2",
                 Created = DateTime.UtcNow.AddDays(-2),
                 Id = 3,
-                EventId = guids[1]
+                EventId = guids[1],
+                AttendStatus = 3
             };
 
             var events = new List<Event>
@@ -305,7 +306,6 @@ namespace Shrooms.Premium.UnitTests.DomainService
                     EventTypeId = 1,
                     ResponsibleUserId = "responsibleUserId",
                     ImageName = "imageUrl",
-                    Office = new Office { Name = "office" },
                     Name = "Drinking event",
                     Place = "City",
                     MaxParticipants = 15,
@@ -322,7 +322,6 @@ namespace Shrooms.Premium.UnitTests.DomainService
                     EventTypeId = 2,
                     ResponsibleUserId = "responsibleUserId",
                     ImageName = "imageUrl",
-                    Office = new Office { Name = "office" },
                     Name = "Drinking event",
                     Place = "City",
                     MaxParticipants = 15,
@@ -339,7 +338,6 @@ namespace Shrooms.Premium.UnitTests.DomainService
                     EventTypeId = 3,
                     ResponsibleUserId = "responsibleUserId",
                     ImageName = "imageUrl",
-                    Office = new Office { Name = "office" },
                     Name = "Some event",
                     Place = "Some place",
                     MaxParticipants = 10,
@@ -356,7 +354,6 @@ namespace Shrooms.Premium.UnitTests.DomainService
                     EventTypeId = 3,
                     ResponsibleUserId = "responsibleUserId2",
                     ImageName = "imageUrl",
-                    Office = new Office { Name = "office" },
                     Name = "Some event",
                     Place = "Some place",
                     MaxParticipants = 10,

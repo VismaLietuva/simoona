@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Shrooms.Constants.BusinessLayer.Events;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models.Events;
 using Shrooms.Host.Contracts.Constants;
@@ -36,9 +37,17 @@ namespace Shrooms.Premium.Main.BusinessLayer.DomainServiceValidators.Events
             }
         }
 
-        public void CheckIfUserExistsInOtherSingleJoinEvent(Event userParticipationEvent)
+        public void CheckIfSingleChoiceSelectedWithRule(IEnumerable<EventOption> options, OptionRules rule)
         {
-            if (userParticipationEvent != null)
+            if (options.Any(op => op.Rule == rule) && options.Count() > 1)
+            {
+                throw new EventException(PremiumErrorCodes.EventChoiceCanBeSingleOnly);
+            }
+        }
+
+        public void CheckIfUserExistsInOtherSingleJoinEvent(IEnumerable<Event> userParticipationEvent)
+        {
+            if (userParticipationEvent.Any())
             {
                 throw new EventException(PremiumErrorCodes.EventCannotJoinMultipleSingleJoinEventsCode);
             }
@@ -162,9 +171,29 @@ namespace Shrooms.Premium.Main.BusinessLayer.DomainServiceValidators.Events
             }
         }
 
+        public void CheckIfAttendStatusIsValid(int status)
+        {
+            if (!Enum.IsDefined(typeof(BusinessLayerConstants.AttendingStatus), status))
+            {
+                throw new EventException(PremiumErrorCodes.EventWrongAttendStatus);
+
+            }
+        }
+
         public void CheckIfUserHasPermission(string userId, string responsibleUserId, bool hasPermission)
         {
             if (userId != responsibleUserId)
+            {
+                if (!hasPermission)
+                {
+                    throw new EventException(PremiumErrorCodes.EventDontHavePermissionCode);
+                }
+            }
+        }
+
+        public void CheckIfUserHasPermissionToPin(bool newPinStatus, bool currentPinStatus, bool hasPermission)
+        {
+            if (newPinStatus != currentPinStatus)
             {
                 if (!hasPermission)
                 {
@@ -212,20 +241,18 @@ namespace Shrooms.Premium.Main.BusinessLayer.DomainServiceValidators.Events
             }
         }
 
-        public void CheckIfOptionsAreDifferent(IEnumerable<string> options)
+        public void CheckIfOptionsAreDifferent(IEnumerable<NewEventOptionDTO> options)
         {
-            if (options == null)
+            if (options != null)
             {
-                return;
-            }
+                var duplicateKeys = options.GroupBy(x => x.Option)
+                        .Where(group => group.Count() > 1)
+                        .Select(group => group.Key);
 
-            var duplicateKeys = options.GroupBy(x => x)
-                .Where(group => @group.Count() > 1)
-                .Select(group => @group.Key);
-
-            if (duplicateKeys.Any())
-            {
-                throw new EventException(PremiumErrorCodes.EventOptionsCantDuplicate);
+                if (duplicateKeys.Any())
+                {
+                    throw new EventException(PremiumErrorCodes.EventOptionsCantDuplicate);
+                }
             }
         }
 

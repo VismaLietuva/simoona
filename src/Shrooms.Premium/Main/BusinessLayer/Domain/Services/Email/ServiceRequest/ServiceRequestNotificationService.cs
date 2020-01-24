@@ -8,6 +8,7 @@ using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.Host.Contracts.Infrastructure;
 using Shrooms.Host.Contracts.Infrastructure.Email;
+using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.ServiceRequest;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.ServiceRequest
 {
@@ -16,6 +17,8 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.ServiceReques
         private readonly IDbSet<Organization> _organizationsDbSet;
         private readonly IDbSet<ApplicationUser> _usersDbSet;
         private readonly IDbSet<ApplicationRole> _rolesDbSet;
+        private readonly IDbSet<ServiceRequestStatus> _serviceRequestStatusDbSet;
+        private readonly IDbSet<EntityModels.Models.ServiceRequest> _serviceRequestDbSet;
         private readonly IApplicationSettings _appSettings;
         private readonly IMailingService _mailingService;
         private readonly IMailTemplate _mailTemplate;
@@ -29,13 +32,17 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.ServiceReques
             _organizationsDbSet = uow.GetDbSet<Organization>();
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
             _rolesDbSet = uow.GetDbSet<ApplicationRole>();
+            _serviceRequestStatusDbSet = uow.GetDbSet<ServiceRequestStatus>();
+            _serviceRequestDbSet = uow.GetDbSet<EntityModels.Models.ServiceRequest>();
             _mailingService = mailingService;
             _mailTemplate = mailTemplate;
             _appSettings = appSettings;
+
         }
 
-        public void NotifyAboutNewServiceRequest(EntityModels.Models.ServiceRequest newServiceRequest, UserAndOrganizationDTO userAndOrg)
+        public void NotifyAboutNewServiceRequest(CreatedServiceRequestDTO createdServiceRequest)
         {
+            var newServiceRequest = _serviceRequestDbSet.Single(s => s.Id == createdServiceRequest.ServiceRequestId);
             var organizationName = GetOrganizationName(newServiceRequest.OrganizationId);
 
             var emails = _usersDbSet
@@ -59,8 +66,9 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.ServiceReques
             _mailingService.SendEmail(new EmailDto(emails, subject, body));
         }
 
-        public void NotifyAboutNewComment(EntityModels.Models.ServiceRequest serviceRequest, ServiceRequestComment serviceRequestComment)
+        public void NotifyAboutNewComment(ServiceRequestCreatedCommentDTO createdComment)
         {
+            var serviceRequest = _serviceRequestDbSet.Single(s => s.Id == createdComment.ServiceRequestId);
             var organizationName = GetOrganizationName(serviceRequest.OrganizationId);
 
             var serviceRequestNotificationRoleId = GetUserNotificationRoleId();
@@ -68,7 +76,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.ServiceReques
             var emails = _usersDbSet
                 .Where(x => x.Roles.Any(y => y.RoleId == serviceRequestNotificationRoleId) ||
                     x.Id == serviceRequest.EmployeeId)
-                .Where(x => x.Id != serviceRequestComment.EmployeeId)
+                .Where(x => x.Id != createdComment.CommentedEmployeeId)
                 .Select(x => x.Email)
                 .ToList();
 
@@ -79,8 +87,8 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.ServiceReques
             var emailTemplateViewModel = new ServiceRequestCommentEmailTemplateViewModel(
                 userNotificationSettingsUrl,
                 serviceRequest.Title,
-                GetUserFullName(serviceRequestComment.EmployeeId),
-                serviceRequestComment.Content,
+                GetUserFullName(createdComment.CommentedEmployeeId),
+                createdComment.CommentContent,
                 serviceRequestUrl);
 
             var body = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.ServiceRequestComment);
@@ -89,10 +97,12 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.ServiceReques
         }
 
         public void NotifyAboutServiceRequestStatusUpdate(
-            EntityModels.Models.ServiceRequest serviceRequest,
-            UserAndOrganizationDTO userAndOrganizationDTO,
-            string newStatusName)
+            UpdatedServiceRequestDTO updatedRequest,
+            UserAndOrganizationDTO userAndOrganizationDTO)
         {
+            var serviceRequest = _serviceRequestDbSet.Single(s => s.Id == updatedRequest.ServiceRequestId);
+            var newStatusName = _serviceRequestStatusDbSet.Where(x => x.Id == serviceRequest.StatusId).Select(x => x.Title).First();
+
             var organizationName = GetOrganizationName(serviceRequest.OrganizationId);
 
             var email = _usersDbSet

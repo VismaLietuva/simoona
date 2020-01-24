@@ -6,6 +6,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events
     {
         public int Id { get; set; }
         public bool IsSingleJoin { get; set; }
+        public bool SendWeeklyReminders { get; set; }
         public string Name { get; set; }
     }
 }

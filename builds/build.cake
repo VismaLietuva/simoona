@@ -1,5 +1,6 @@
 ﻿#addin "nuget:?package=Cake.FileHelpers&version=3.2.0"
 #addin "nuget:?package=Cake.PinNuGetDependency&version=3.3.0"
+#tool "nuget:?package=vswhere&version=2.6.7"
 
 using System.Xml;
 using Path = System.IO.Path;
@@ -27,6 +28,8 @@ var packagesInnerPath = @"src\api\packages";
 var packagesPathOriginal = Path.Combine(ossRelativePathToCsprojOriginal, packagesInnerPath);
 var packagesPathForked = Path.Combine(ossRelativePathToCsprojForked, packagesInnerPath);
 
+var ossApiSlnPath = Path.Combine(ossRelativePathToSlnOriginal, @"src\api\Shrooms.sln");
+
 Information("Current directory: {0}", IODirectory.GetCurrentDirectory());
 Information("Root solution relative path: {0}", rootPath);
 Information("Simoona OSS relative path to *.sln (original): {0}", ossRelativePathToSlnOriginal);
@@ -42,6 +45,7 @@ Information("Packages path: {0}", packagesPathOriginal);
 Information("Packages path (forked): {0}", packagesPathForked);
 
 Task("Default")
+    .IsDependentOn("BuildOssPart")
     .Does(() =>
 {
     if (!FileExists(projectPropsPath))
@@ -71,6 +75,36 @@ Task("Default")
 
     UpdateNugetConfig(nugetConfigPath, packagesPathForked);
     UpdateCustomSln(slnPath, slnPathForked, ossRelativePathToSlnOriginal, ossRelativePathToSlnForked);
+});
+
+Task("BuildOssPart")
+    .Does(ctx => 
+{
+    var nugetRestoreSettings = new NuGetRestoreSettings
+    {
+        Verbosity = NuGetVerbosity.Quiet
+    };
+
+    Information("Restoring NuGet packages...");
+    NuGetRestore(ossApiSlnPath, nugetRestoreSettings);
+    Information("NuGet packages restored");
+
+    var msBuildSettings = new MSBuildSettings
+    {
+        Verbosity = Verbosity.Quiet,
+        Configuration = "Debug"
+    };
+
+    var msbuildPath = GetMSBuildPath(ctx.FileSystem, ctx.Environment, MSBuildPlatform.Automatic);
+
+    if (msbuildPath != null) 
+    {
+        msBuildSettings.ToolPath = msbuildPath;
+    }
+
+    Information("Building open-source solution...");
+    MSBuild(ossApiSlnPath, msBuildSettings);
+    Information("Open-source solution was built sucessfully");
 });
 
 void CreateCsprojProps(string projectPropsPath, string simoonaCoreLocationValue)
@@ -241,6 +275,40 @@ private String MakeRelativePath(string fromPath, string toPath)
     }
 
     return relativePath;
+}
+
+private FilePath GetMSBuildPath(IFileSystem fileSystem, ICakeEnvironment environment, MSBuildPlatform buildPlatform)
+{
+    var visualStudioPath = VSWhereLatest();
+
+    if (visualStudioPath == null)
+    {
+        return null;
+    }
+
+    var binPath = visualStudioPath.Combine("MSBuild/Current/Bin");
+    Information("MSBuild path: {0}", binPath);
+
+    if (fileSystem.Exist(binPath))
+    {
+        if (buildPlatform == MSBuildPlatform.Automatic)
+        {
+            if (environment.Platform.Is64Bit)
+            {
+                binPath = binPath.Combine("amd64");
+            }
+        }
+        if (buildPlatform == MSBuildPlatform.x64)
+        {
+            binPath = binPath.Combine("amd64");
+        }
+    }
+    else
+    {
+        binPath = visualStudioPath.Combine("Microsoft Visual Studio/2019/Professional/MSBuild/16.0/Bin");
+    }
+
+    return binPath.CombineWithFilePath("MSBuild.exe");
 }
 
 RunTarget(target);

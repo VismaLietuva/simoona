@@ -16,7 +16,9 @@ namespace Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events
 
         public DateTime RegistrationDeadlineDate { get; set; }
 
-        public string Office { get; set; }
+        public EventOfficesDTO Offices { get; set; }
+
+        public bool IsPinned { get; set; }
 
         public string Place { get; set; }
 
@@ -26,7 +28,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events
 
         public bool IsCreator { get; set; }
 
-        public bool IsParticipating { get; set; }
+        public int ParticipatingStatus { get; set; }
 
         public int MaxChoices { get; set; }
     }

@@ -7,9 +7,7 @@ using System.Web.Http;
 using AutoMapper;
 using Shrooms.API.Controllers;
 using Shrooms.API.Filters;
-using Shrooms.API.Hubs;
 using Shrooms.DataTransferObjects.Models.Wall.Posts;
-using Shrooms.Domain.Services.Wall;
 using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.Host.Contracts.Constants;
@@ -20,13 +18,16 @@ using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Export;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.List;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Participation;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Utilities;
-using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Notifications;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.OfficeMap;
 using Shrooms.Premium.Main.BusinessLayer.DomainExceptions.Event;
 using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Events;
 using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.User;
-using Shrooms.WebViewModels.Models.Notifications;
 using Shrooms.WebViewModels.Models.Wall.Posts;
+using Shrooms.Infrastructure.FireAndForget;
+using System.Linq;
+using Newtonsoft.Json;
+using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Calendar;
+using Shrooms.Premium.Main.PresentationLayer.API.BackgroundWorkers;
 
 namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers
 {
@@ -39,11 +40,11 @@ namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers
         private readonly IEventListingService _eventListingService;
         private readonly IEventUtilitiesService _eventUtilitiesService;
         private readonly IEventParticipationService _eventParticipationService;
+        private readonly IEventCalendarService _calendarService;
         private readonly IEventExportService _eventExportService;
-        private readonly INotificationService _notificationService;
         private readonly IPostService _postService;
-        private readonly IWallService _wallService;
         private readonly IOfficeMapService _officeMapService;
+        private readonly IAsyncRunner _asyncRunner;
 
         public EventController(
             IMapper mapper,
@@ -51,22 +52,22 @@ namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers
             IEventListingService eventListingService,
             IEventUtilitiesService eventUtilitiesService,
             IEventParticipationService eventParticipationService,
+            IEventCalendarService calendarService,
             IEventExportService eventExportService,
-            INotificationService notificationService,
             IPostService postService,
-            IWallService wallService,
-            IOfficeMapService officeMapService)
+            IOfficeMapService officeMapService,
+            IAsyncRunner asyncRunner)
         {
             _mapper = mapper;
             _eventService = eventService;
             _eventListingService = eventListingService;
             _eventUtilitiesService = eventUtilitiesService;
             _eventParticipationService = eventParticipationService;
+            _calendarService = calendarService;
             _eventExportService = eventExportService;
-            _notificationService = notificationService;
             _postService = postService;
-            _wallService = wallService;
             _officeMapService = officeMapService;
+            _asyncRunner = asyncRunner;
         }
 
         [Route("Recurrences")]
@@ -131,22 +132,26 @@ namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers
             }
 
             var createEventDTO = _mapper.Map<CreateEventDto>(eventViewModel);
+            createEventDTO.Offices = new EventOfficesDTO { Value = JsonConvert.SerializeObject(eventViewModel.Offices.Select(p => p.ToString()).ToList()) };
             SetOrganizationAndUser(createEventDTO);
+            CreateEventDto createdEvent;
 
+            var userHubDto = GetUserAndOrganizationHub();
             try
             {
-                var createdEvent = await _eventService.CreateEvent(createEventDTO);
+                createdEvent = await _eventService.CreateEvent(createEventDTO);
 
-                var notification = await _notificationService.CreateForEvent(GetUserAndOrganization(), createdEvent);
-
-                NotificationHub.SendNotificationToAllUsers(_mapper.Map<NotificationViewModel>(notification), GetUserAndOrganizationHub());
+                _asyncRunner.Run<NewEventNotifier>(notif =>
+                {
+                    notif.Notify(createdEvent, userHubDto);
+                }, GetOrganizationName());
             }
             catch (EventException e)
             {
                 return BadRequest(e.Message);
             }
 
-            return Ok();
+            return Ok(new { createdEvent.Id });
         }
 
         [HttpPut]
@@ -158,9 +163,10 @@ namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var eventDTO = _mapper.Map<UpdateEventViewModel, EditEventDTO>(eventViewModel);
-            SetOrganizationAndUser(eventDTO);
 
+            var eventDTO = _mapper.Map<UpdateEventViewModel, EditEventDTO>(eventViewModel);
+            eventDTO.Offices = new EventOfficesDTO { Value = JsonConvert.SerializeObject(eventViewModel.Offices.Select(p => p.ToString()).ToList()) };
+            SetOrganizationAndUser(eventDTO);
             try
             {
                 _eventService.UpdateEvent(eventDTO);
@@ -169,6 +175,7 @@ namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers
             {
                 return BadRequest(e.Message);
             }
+
             return Ok();
         }
 
@@ -185,7 +192,7 @@ namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers
         [HttpGet]
         [Route("MyEvents")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult GetMyEvents([FromUri]MyEventsOptionsViewModel options, string officeId)
+        public IHttpActionResult GetMyEvents([FromUri] MyEventsOptionsViewModel options, string officeId)
         {
             int? officeIdNullable = null;
 
@@ -211,6 +218,39 @@ namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers
                 var eventOptionsDto = _eventListingService.GetEventOptions(eventId, GetUserAndOrganization());
                 var result = _mapper.Map<EventOptionsDTO, EventOptionsViewModel>(eventOptionsDto);
                 return Ok(result);
+            }
+            catch (EventException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPatch]
+        [Route("Pin")]
+        [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
+        public IHttpActionResult ToggleEventPin(Guid eventId)
+        {
+            try
+            {
+                _eventService.ToggleEventPin(eventId);
+                return Ok();
+            }
+            catch (EventException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("Download")]
+        public IHttpActionResult DownloadEvent(Guid eventId)
+        {
+            try
+            {
+                var userOrg = GetUserAndOrganization();
+                var stream = new ByteArrayContent(_calendarService.DownloadEvent(eventId, userOrg.OrganizationId));
+                var result = new HttpResponseMessage(HttpStatusCode.OK) { Content = stream };
+                return ResponseMessage(result);
             }
             catch (EventException e)
             {
@@ -253,6 +293,29 @@ namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers
             try
             {
                 _eventParticipationService.Join(optionsDto);
+                return Ok();
+            }
+            catch (EventException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("UpdateAttendStatus")]
+        [PermissionAuthorize(Permission = BasicPermissions.Event)]
+        public IHttpActionResult UpdateAttendStatus(UpdateAttendStatusViewModel updateStatusViewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var updateAttendStatusDTO = _mapper.Map<UpdateAttendStatusViewModel, UpdateAttendStatusDTO>(updateStatusViewModel);
+            SetOrganizationAndUser(updateAttendStatusDTO);
+            try
+            {
+                _eventParticipationService.UpdateAttendStatus(updateAttendStatusDTO);
                 return Ok();
             }
             catch (EventException e)
@@ -314,11 +377,11 @@ namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers
         [HttpDelete]
         [Route("Leave")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult Leave(Guid eventId)
+        public IHttpActionResult Leave(Guid eventId, string leaveComment)
         {
             try
             {
-                _eventParticipationService.Leave(eventId, GetUserAndOrganization());
+                _eventParticipationService.Leave(eventId, GetUserAndOrganization(), leaveComment);
                 return Ok();
             }
             catch (EventException e)
@@ -424,14 +487,17 @@ namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers
 
             var postModel = _mapper.Map<ShareEventViewModel, NewPostDTO>(shareEventViewModel);
             SetOrganizationAndUser(postModel);
-
+            var userHubDto = GetUserAndOrganizationHub();
             try
             {
                 var createdPost = _postService.CreateNewPost(postModel);
-                var newPostViewModel = _mapper.Map<WallPostViewModel>(createdPost);
+                _asyncRunner.Run<SharedEventNotifier>(notif =>
+                {
+                    notif.Notify(postModel, createdPost, userHubDto);
+                }, GetOrganizationName());
 
-                var membersToNotify = _wallService.GetWallMembersIds(postModel.WallId, postModel);
-                NotificationHub.SendWallNotification(postModel.WallId, membersToNotify, createdPost.WallType, GetUserAndOrganizationHub());
+
+                var newPostViewModel = _mapper.Map<WallPostViewModel>(createdPost);
 
                 return Ok(newPostViewModel);
             }

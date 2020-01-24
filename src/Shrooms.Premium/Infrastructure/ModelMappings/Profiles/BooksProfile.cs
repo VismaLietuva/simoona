@@ -1,11 +1,9 @@
 ﻿using AutoMapper;
-using Shrooms.DataTransferObjects.Models.Books;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Books;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Books;
 using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Book;
 using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Book.BookDetails;
-using Shrooms.WebViewModels.Models.Book;
 
 namespace Shrooms.Premium.Infrastructure.ModelMappings.Profiles
 {
@@ -32,6 +30,7 @@ namespace Shrooms.Premium.Infrastructure.ModelMappings.Profiles
             CreateMap<MobileUserDTO, MobileUserViewModel>();
             CreateMap<BookMobileLogDTO, BookMobileLogViewModel>();
             CreateMap<RetrievedBookInfoDTO, RetrievedMobileBookInfoViewModel>();
+            CreateMap<BookReportDTO, BookReportViewModel>();
         }
         private void CreateViewModelToDtoMappings()
         {
@@ -40,6 +39,7 @@ namespace Shrooms.Premium.Infrastructure.ModelMappings.Profiles
             CreateMap<BookMobileTakeViewModel, BookTakeDTO>();
             CreateMap<BookMobileTakeSpecificViewModel, BookMobileTakeSpecificDTO>();
             CreateMap<BookMobileGetViewModel, BookMobileGetDTO>();
+            CreateMap<BookReportViewModel, BookReportDTO>();
         }
     }
 }

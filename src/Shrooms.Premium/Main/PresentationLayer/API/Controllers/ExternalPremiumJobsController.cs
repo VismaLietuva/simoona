@@ -27,10 +27,18 @@ namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers
         }
 
         [HttpPost]
+        [Route("RemindBooks")]
+        public void RemindBooks(int daysBefore)
+        {
+            _webHookService.Books.RemindAboutBooks(daysBefore);
+        }
+
+        [HttpPost]
         [Route("GiveLoyaltyKudos")]
         public void GiveLoyaltyKudos()
         {
-            _webHookService.LoyaltyKudos.AwardEmployeesWithKudos(GetOrganizationName());
+            var organizationName = GetOrganizationName();
+            _webHookService.LoyaltyKudos.AwardEmployeesWithKudos(organizationName);
 
             var cache = Configuration.CacheOutputConfiguration().GetCacheOutputProvider(Request);
             cache.RemoveStartsWith(Configuration.CacheOutputConfiguration().MakeBaseCachekey((KudosController t) => t.GetLastKudosLogRecords()));
@@ -41,6 +49,14 @@ namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers
         public async Task AssignBadges()
         {
             await _webHookService.BadgesService.AssignBadgesAsync();
+        }
+
+        [HttpPost]
+        [Route("RemindEvents")]
+        public void RemindEvents()
+        {
+            var organizationName = GetOrganizationName();
+            _webHookService.EventJoinRemindService.SendNotifications(organizationName);
         }
     }
 }

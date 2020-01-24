@@ -9,6 +9,10 @@ namespace Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Events
         [Required]
         public Guid EventId { get; set; }
 
+        public int AttendStatus { get; set; }
+
+        public string AttendComment { get; set; }
+
         public IEnumerable<int> ChosenOptions { get; set; }
     }
 }

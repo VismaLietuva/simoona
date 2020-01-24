@@ -5,13 +5,13 @@ using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.DomainExceptions.Exceptions.Book;
-using Shrooms.DomainServiceValidators.Validators.Books;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Books;
 using Shrooms.Host.Contracts.DAL;
-using Shrooms.Host.Contracts.Infrastructure;
+using Shrooms.Infrastructure.GoogleBookApiService;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Books;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Books;
+using Shrooms.Premium.Main.BusinessLayer.DomainServiceValidators.Books;
 using Shrooms.UnitTests.Extensions;
 
 namespace Shrooms.Premium.UnitTests.DomainService

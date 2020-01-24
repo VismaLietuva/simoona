@@ -7,6 +7,8 @@ namespace Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events
 {
     public class CreateEventDto : UserAndOrganizationDTO
     {
+        public string Id { get; set; }
+
         public string Name { get; set; }
 
         public string ImageName { get; set; }
@@ -19,7 +21,9 @@ namespace Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events
 
         public EventRecurrenceOptions Recurrence { get; set; }
 
-        public int? OfficeId { get; set; }
+        public EventOfficesDTO Offices { get; set; }
+
+        public bool IsPinned { get; set; }
 
         public string Location { get; set; }
 
@@ -35,8 +39,6 @@ namespace Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events
 
         public bool ResetParticipantList { get; set; }
 
-        public IEnumerable<string> NewOptions { get; set; }
-
-        public string Id { get; set; }
+        public IEnumerable<NewEventOptionDTO> NewOptions { get; set; }
     }
 }
