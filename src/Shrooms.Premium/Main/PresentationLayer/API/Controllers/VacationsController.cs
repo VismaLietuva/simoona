@@ -7,7 +7,6 @@ using Shrooms.API.Controllers;
 using Shrooms.API.Filters;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.Host.Contracts.Constants;
-using Shrooms.Host.Contracts.DAL;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Vacations;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Vacations;
@@ -22,11 +21,7 @@ namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers
         private readonly IVacationService _vacationService;
         private readonly IVacationHistoryService _vacationHistoryService;
 
-        public VacationsController(
-            IMapper mapper,
-            IUnitOfWork unitOfWork,
-            IVacationService vacationService,
-            IVacationHistoryService vacationHistoryService)
+        public VacationsController(IMapper mapper, IVacationService vacationService, IVacationHistoryService vacationHistoryService)
         {
             _mapper = mapper;
 

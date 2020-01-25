@@ -110,7 +110,6 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.ServiceRequests
             }
 
             var isServiceRequestAdmin = _permissionService.UserHasPermission(userAndOrganizationDTO, AdministrationPermissions.ServiceRequest);
-            var isServiceRequestCreator = serviceRequest.EmployeeId == userAndOrganizationDTO.UserId;
             var isServiceRequestCategoryAssignee = GetCategoryAssignees(serviceRequest.CategoryName).Contains(userAndOrganizationDTO.UserId);
 
             if ((!isServiceRequestAdmin && !isServiceRequestCategoryAssignee) || serviceRequest.StatusId == doneStatus.Id)

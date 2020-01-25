@@ -480,12 +480,6 @@ namespace Shrooms.Premium.UnitTests.Controllers.WebApi
         public void LotteryStats_Should_Return_Unprocessable_Entity_Error()
         {
             //
-            var lotteryStats = new LotteryStatsDTO()
-            {
-                KudosSpent = 60,
-                TicketsSold = 30,
-                TotalParticipants = 15
-            };
             _lotteryService.GetLotteryStats(13, GetUserAndOrganization()).Returns(x => null);
 
             //

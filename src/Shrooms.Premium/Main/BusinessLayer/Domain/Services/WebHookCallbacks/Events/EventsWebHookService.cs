@@ -8,7 +8,6 @@ using Shrooms.Domain.Services.Wall;
 using Shrooms.EntityModels.Models.Events;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.Host.Contracts.Infrastructure;
-using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Calendar;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.WebHookCallbacks.Events
 {
@@ -25,15 +24,10 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.WebHookCallbacks.Ev
         private readonly IDbSet<Event> _eventsDbSet;
         private readonly IDbSet<EventOption> _eventOptionsDbSet;
         private readonly IUnitOfWork2 _uow;
-        private readonly IEventCalendarService _calendarService;
         private readonly ISystemClock _systemClock;
         private readonly IWallService _wallService;
 
-        public EventsWebHookService(
-            IUnitOfWork2 uow,
-            ISystemClock systemClock,
-            IEventCalendarService calendarService,
-            IWallService wallService)
+        public EventsWebHookService(IUnitOfWork2 uow, ISystemClock systemClock, IWallService wallService)
         {
             _uow = uow;
             _eventsDbSet = uow.GetDbSet<Event>();
@@ -41,7 +35,6 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.WebHookCallbacks.Ev
 
             _systemClock = systemClock;
 
-            _calendarService = calendarService;
             _wallService = wallService;
         }
 
@@ -52,9 +45,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.WebHookCallbacks.Ev
             var eventsToUpdate = await _eventsDbSet
                 .Include(e => e.EventOptions)
                 .Include(u => u.ResponsibleUser)
-                .Where(e =>
-                    e.EventRecurring != EventRecurrenceOptions.None &&
-                    e.EndDate < _systemClock.UtcNow)
+                .Where(e => e.EventRecurring != EventRecurrenceOptions.None && e.EndDate < _systemClock.UtcNow)
                 .ToListAsync();
 
             foreach (var @event in eventsToUpdate)

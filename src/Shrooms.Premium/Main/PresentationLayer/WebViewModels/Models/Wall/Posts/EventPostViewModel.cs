@@ -20,7 +20,7 @@ namespace Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Wall.Posts
 
         public UserViewModel User { get; set; }
 
-        public ICollection<global::Shrooms.WebViewModels.Models.Wall.Posts.Comments.CommentViewModel> Comments { get; set; }
+        public ICollection<CommentViewModel> Comments { get; set; }
 
         public string PictureId { get; set; }
     }

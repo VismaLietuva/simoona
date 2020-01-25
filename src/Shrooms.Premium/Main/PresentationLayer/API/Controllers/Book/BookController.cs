@@ -10,7 +10,6 @@ using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.LazyPaged;
 using Shrooms.DomainExceptions.Exceptions.Book;
 using Shrooms.Host.Contracts.Constants;
-using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Books;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Books.BookDetails;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Books.BooksByOffice;
@@ -27,13 +26,11 @@ namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers.Book
     {
         private readonly IMapper _mapper;
         private readonly IBookService _bookService;
-        private readonly IAsyncRunner _asyncRunner;
 
-        public BookController(IMapper mapper, IBookService bookService, IAsyncRunner asyncRunner)
+        public BookController(IMapper mapper, IBookService bookService)
         {
             _mapper = mapper;
             _bookService = bookService;
-            _asyncRunner = asyncRunner;
         }
 
         [HttpPost]

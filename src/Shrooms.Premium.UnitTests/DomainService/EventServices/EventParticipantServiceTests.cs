@@ -813,7 +813,7 @@ namespace Shrooms.Premium.UnitTests.DomainService.EventServices
         {
             var guid = Guid.NewGuid();
 
-            var eventt = new List<Event>
+            var events = new List<Event>
             {
                 new Event
                 {
@@ -861,187 +861,31 @@ namespace Shrooms.Premium.UnitTests.DomainService.EventServices
                 new EventParticipant
                 {
                     Id = 1,
-                    Event = eventt.FirstOrDefault(),
+                    Event = events.FirstOrDefault(),
                     EventOptions = new List<EventOption>(),
-                    EventId = eventt.FirstOrDefault().Id,
+                    EventId = events.FirstOrDefault().Id,
                     ApplicationUserId = "user",
                     AttendStatus = 1
                 },
                 new EventParticipant
                 {
                     Id = 2,
-                    Event = eventt.FirstOrDefault(),
+                    Event = events.FirstOrDefault(),
                     EventOptions = new List<EventOption>(),
-                    EventId = eventt.FirstOrDefault().Id,
+                    EventId = events.FirstOrDefault().Id,
                     ApplicationUserId = "user2",
                     AttendStatus = 1
                 }
             };
 
-            foreach(var @event in eventt)
+            foreach(var @event in events)
             {
                 @event.EventParticipants = participants;
             }
 
             _eventParticipantsDbSet.SetDbSetData(participants.AsQueryable());
-            _eventsDbSet.SetDbSetData(eventt.AsQueryable());
+            _eventsDbSet.SetDbSetData(events.AsQueryable());
             return guid;
-        }
-
-        private Guid MockEventWithOptionsAndParticipant()
-        {
-            var guid = Guid.NewGuid();
-            var eventt = new List<Event>
-            {
-                new Event
-                {
-                    StartDate = DateTime.Parse("2016-04-05"),
-                    EndDate = DateTime.Parse("2016-04-06"),
-                    RegistrationDeadline = DateTime.Parse("2016-04-05"),
-                    EventOptions = new List<EventOption>
-                    {
-                        new EventOption
-                        {
-                            Id = 1,
-                            EventId = guid,
-                            Option = "Option1"
-                        },
-                        new EventOption
-                        {
-                            Id = 2,
-                            EventId = guid,
-                            Option = "Option2"
-                        },
-                        new EventOption
-                        {
-                            Id = 3,
-                            EventId = guid,
-                            Option = "Option3"
-                        }
-                    },
-                    Id = guid,
-                    MaxChoices = 1,
-                    MaxParticipants = 20,
-                    OrganizationId = 2,
-                    Name = "Test event",
-                    EventType = new EventType
-                    {
-                        Name = "test type",
-                        IsSingleJoin = false,
-                        Id = 1
-                    },
-                    EventParticipants = new List<EventParticipant>
-                    {
-                        new EventParticipant
-                        {
-                            Id = 1,
-                            ApplicationUserId = "testUserId",
-                            EventId = guid
-                        }
-                    },
-                    EventTypeId = 1
-                }
-            };
-            _eventsDbSet.SetDbSetData(eventt.AsQueryable());
-            return guid;
-        }
-
-        private Guid MockFullEvent()
-        {
-            var guid = Guid.NewGuid();
-            var eventt = new List<Event>
-            {
-                new Event
-                {
-                    StartDate = DateTime.Parse("2016-04-05"),
-                    EndDate = DateTime.Parse("2016-04-06"),
-                    RegistrationDeadline = DateTime.Parse("2016-04-05"),
-                    EventOptions = new List<EventOption>(),
-                    Id = guid,
-                    MaxChoices = 0,
-                    MaxParticipants = 3,
-                    OrganizationId = 2,
-                    Name = "Test event",
-                    EventType = new EventType
-                    {
-                        Name = "test type",
-                        IsSingleJoin = false,
-                        Id = 1
-                    },
-                    EventParticipants = new List<EventParticipant>
-                    {
-                        new EventParticipant
-                        {
-                            Id = 1,
-                            ApplicationUserId = "testUserId1",
-                            EventId = guid
-                        },
-                        new EventParticipant
-                        {
-                            Id = 2,
-                            ApplicationUserId = "testUserId2",
-                            EventId = guid
-                        },
-                        new EventParticipant
-                        {
-                            Id = 3,
-                            ApplicationUserId = "testUserId3",
-                            EventId = guid
-                        }
-                    },
-                    EventTypeId = 1
-                }
-            };
-            _eventsDbSet.SetDbSetData(eventt.AsQueryable());
-            return guid;
-        }
-
-        private void MockExpiredEvent()
-        {
-            var eventt = new List<Event>
-            {
-                new Event
-                {
-                    StartDate = DateTime.Parse("2016-04-05"),
-                    EndDate = DateTime.Parse("2016-04-07"),
-                    RegistrationDeadline = DateTime.Parse("2016-04-05"),
-                    EventOptions = new List<EventOption>
-                    {
-                        new EventOption
-                        {
-                            Id = 1,
-                            EventId = Guid.Parse("1"),
-                            Option = "Option1"
-                        },
-                        new EventOption
-                        {
-                            Id = 2,
-                            EventId = Guid.Parse("1"),
-                            Option = "Option2"
-                        },
-                        new EventOption
-                        {
-                            Id = 3,
-                            EventId = Guid.Parse("1"),
-                            Option = "Option3"
-                        }
-                    },
-                    Id = Guid.Parse("1"),
-                    MaxChoices = 1,
-                    MaxParticipants = 20,
-                    OrganizationId = 2,
-                    Name = "Test event",
-                    EventType = new EventType
-                    {
-                        Name = "test type",
-                        IsSingleJoin = false,
-                        Id = 1
-                    },
-                    EventParticipants = new List<EventParticipant>(),
-                    EventTypeId = 1
-                }
-            };
-            _eventsDbSet.SetDbSetData(eventt.AsQueryable());
         }
 
         private void MockUsers()

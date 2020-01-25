@@ -1,6 +1,5 @@
 ﻿using NSubstitute;
 using NUnit.Framework;
-using Shrooms.DataTransferObjects.Models;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.EntityModels.Models;
 using System.Collections.Generic;
@@ -101,15 +100,6 @@ namespace Shrooms.Premium.UnitTests.DomainService.EventServices
 
             _notificationService.ReceivedWithAnyArgs().CreateForEventJoinReminder(eventType, users, 1);
             _eventNotificationService.ReceivedWithAnyArgs().RemindUsersToJoinEvent(eventType, users, 1);
-        }
-
-        private static UserAndOrganizationDTO GetUserOrg()
-        {
-            return new UserAndOrganizationDTO
-            {
-                OrganizationId = 1,
-                UserId = "1"
-            };
         }
 
         private static Organization GetOrganization()

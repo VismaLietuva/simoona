@@ -14,7 +14,7 @@ namespace Shrooms.Premium.Infrastructure.VacationBot
         private readonly IApplicationSettings _appSettings;
         private readonly ILogger _logger;
 
-        public VacationBotService(IApplicationSettings appSettings, global::Shrooms.Host.Contracts.Infrastructure.ILogger logger)
+        public VacationBotService(IApplicationSettings appSettings, ILogger logger)
         {
             _appSettings = appSettings;
             _logger = logger;

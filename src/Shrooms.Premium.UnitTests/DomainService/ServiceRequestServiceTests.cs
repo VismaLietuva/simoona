@@ -12,7 +12,6 @@ using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.ServiceRequest;
-using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.ServiceRequest;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.ServiceRequests;
 using Shrooms.UnitTests.Extensions;
 
@@ -30,7 +29,6 @@ namespace Shrooms.Premium.UnitTests.DomainService
         private IDbSet<ServiceRequestStatus> _serviceRequestStatusDbSet;
         private IDbSet<ApplicationUser> _usersDbSet;
         private IPermissionService _permissionService;
-        private IServiceRequestNotificationService _notificationService;
 
         [SetUp]
         public void Init()
@@ -55,7 +53,6 @@ namespace Shrooms.Premium.UnitTests.DomainService
             _serviceRequestStatusDbSet = Substitute.For<IDbSet<ServiceRequestStatus>>();
             _uow.GetDbSet<ServiceRequestStatus>().Returns(_serviceRequestStatusDbSet);
 
-            _notificationService = Substitute.For<IServiceRequestNotificationService>();
             _permissionService = Substitute.For<IPermissionService>();
             var asyncRunner = Substitute.For<IAsyncRunner>();
             _serviceRequestService = new ServiceRequestService(_uow, _permissionService, asyncRunner);

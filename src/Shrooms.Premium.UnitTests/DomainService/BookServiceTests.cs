@@ -532,13 +532,6 @@ namespace Shrooms.Premium.UnitTests.DomainService
                 OrganizationId = 2
             };
 
-            var office2 = new Office
-            {
-                Id = 2,
-                Name = "Office2",
-                OrganizationId = 2,
-            };
-
             var book1 = new Book
             {
                 Author = "test1",

@@ -329,11 +329,11 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Participatio
             return e => e.EventParticipants.Select(p => new EventParticipantDTO
             {
                 FirstName = string.IsNullOrEmpty(p.ApplicationUser.FirstName)
-                        	? BusinessLayerConstants.DeletedUserFirstName
+                                ? BusinessLayerConstants.DeletedUserFirstName
                                 : p.ApplicationUser.FirstName,
 
                 LastName = string.IsNullOrEmpty(p.ApplicationUser.LastName)
-                        	? BusinessLayerConstants.DeletedUserLastName
+                               ? BusinessLayerConstants.DeletedUserLastName
                                : p.ApplicationUser.LastName
             });
         }
