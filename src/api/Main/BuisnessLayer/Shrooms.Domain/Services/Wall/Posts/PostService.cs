@@ -122,9 +122,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Post not found");
             }
 
-            var isWallModerator = _moderatorsDbSet
-                .Any(x => x.UserId == editPostDto.UserId && x.WallId == post.WallId) || post.CreatedBy == editPostDto.UserId;
-
+            var isWallModerator = _moderatorsDbSet.Any(x => x.UserId == editPostDto.UserId && x.WallId == post.WallId) || post.CreatedBy == editPostDto.UserId;
             var isAdministrator = _permissionService.UserHasPermission(editPostDto, AdministrationPermissions.Post);
 
             if (!isAdministrator && !isWallModerator)

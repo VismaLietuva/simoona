@@ -164,7 +164,7 @@ namespace Shrooms.API.Controllers
             {
                 var projectDto = await _projectsService.GetProjectDetails(projectId, GetUserAndOrganization());
                 var result = _mapper.Map<ProjectDetailsDto, ProjectDetailsViewModel>(projectDto);
-                return Ok(projectDto);
+                return Ok(result);
             }
             catch (ValidationException e)
             {

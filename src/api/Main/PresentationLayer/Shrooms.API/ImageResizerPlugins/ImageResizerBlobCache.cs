@@ -156,11 +156,6 @@ namespace Shrooms.API.ImageResizerPlugins
             context.RemapHandler(new NoCacheAsyncHandler(e));
         }
 
-        private ICloudBlob GetBlobRef(string virtualPath)
-        {
-            return AsyncUtils.RunSync(() => GetBlobRefAsync(virtualPath));
-        }
-
         private Task<ICloudBlob> GetBlobRefAsync(string virtualPath)
         {
             var subPath = StripPrefixWithTenant(virtualPath);

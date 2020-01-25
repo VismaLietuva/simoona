@@ -9,7 +9,6 @@ using Shrooms.Domain.Services.Email.Posting;
 using Shrooms.Domain.Services.Notifications;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.Domain.Services.Wall.Posts;
-using Shrooms.Domain.Services.Wall.Posts.Comments;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.WebViewModels.Models.Notifications;
 
@@ -21,21 +20,18 @@ namespace Shrooms.API.BackgroundWorkers
         private readonly IWallService _wallService;
         private readonly INotificationService _notificationService;
         private readonly ICommentEmailNotificationService _commentEmailNotificationService;
-        private readonly ICommentService _commentService;
         private readonly IPostService _postService;
 
         public NewCommentNotifier(IMapper mapper,
                                   IWallService wallService,
                                   INotificationService notificationService,
                                   ICommentEmailNotificationService commentEmailNotificationService,
-                                  ICommentService commentService,
                                   IPostService postService)
         {
             _mapper = mapper;
             _wallService = wallService;
             _notificationService = notificationService;
             _commentEmailNotificationService = commentEmailNotificationService;
-            _commentService = commentService;
             _postService = postService;
         }
 
@@ -56,11 +52,6 @@ namespace Shrooms.API.BackgroundWorkers
             {
                 SendNotification(commentDto, userHubDto, NotificationType.FollowingComment, postWatchers);
             }
-        }
-
-        private void SendNotification(CommentCreatedDTO commentDto, UserAndOrganizationHubDto userHubDto, NotificationType notificationType, string commentDtoPostCreator)
-        {
-            SendNotification(commentDto, userHubDto, notificationType, new List<string> { commentDtoPostCreator });
         }
 
         private void SendNotification(CommentCreatedDTO commentDto, UserAndOrganizationHubDto userHubDto, NotificationType notificationType, IList<string> watchers)

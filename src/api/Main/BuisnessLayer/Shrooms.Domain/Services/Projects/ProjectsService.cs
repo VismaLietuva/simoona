@@ -280,7 +280,7 @@ namespace Shrooms.Domain.Services.Projects
                 .Include(x => x.Members)
                 .FirstOrDefaultAsync(x => x.Id == projectId && x.OrganizationId == userAndOrg.OrganizationId);
 
-            ValidateExpelMember(project, userAndOrg, expelUserId);
+            ValidateExpelMember(project, userAndOrg);
 
             project.Members.Remove(project.Members.FirstOrDefault(x => x.Id == expelUserId));
 
@@ -408,7 +408,7 @@ namespace Shrooms.Domain.Services.Projects
             return projectAttributes.Union(existingAttributes);
         }
 
-        private void ValidateExpelMember(Project project, UserAndOrganizationDTO userAndOrg, string expelUserId)
+        private void ValidateExpelMember(Project project, UserAndOrganizationDTO userAndOrg)
         {
             if (project == null)
             {

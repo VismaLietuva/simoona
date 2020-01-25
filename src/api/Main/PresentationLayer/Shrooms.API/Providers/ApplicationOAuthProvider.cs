@@ -11,7 +11,7 @@ using Shrooms.Host.Contracts.Infrastructure;
 
 namespace Shrooms.API.Providers
 {
-    public class ApplicationOAuthProvider : OAuthAuthorizationServerProvider, IOAuthAuthorizationServerProvider
+    public class ApplicationOAuthProvider : OAuthAuthorizationServerProvider
     {
         private readonly string _jsAppClientId;
         private readonly string _mobileAppClientId;
@@ -87,7 +87,6 @@ namespace Shrooms.API.Providers
             }
 
             var redirectUriAuthority = new Uri(context.RedirectUri).GetLeftPart(UriPartial.Authority);
-            var tenant = context.Request.Get<string>("tenantName");
             var authorizedUris = _appSettings.OAuthRedirectUris;
 
             var isValid = authorizedUris.Any(uri => new Uri(uri).GetLeftPart(UriPartial.Authority) == redirectUriAuthority);

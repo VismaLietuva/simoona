@@ -1,5 +1,4 @@
 ﻿using System.Data.Entity.ModelConfiguration;
-using Microsoft.AspNet.Identity.EntityFramework;
 using Shrooms.EntityModels.Models;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
@@ -15,9 +14,9 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
                 .IsRequired()
                 .HasMaxLength(256);
 
-            HasMany<IdentityUserRole>(r => r.Users)
+            HasMany(r => r.Users)
                 .WithRequired()
-                .HasForeignKey<string>(ur => ur.RoleId);
+                .HasForeignKey(ur => ur.RoleId);
 
             HasRequired(r => r.Organization)
                 .WithMany()

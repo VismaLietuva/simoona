@@ -41,23 +41,12 @@ namespace Shrooms.API.Controllers
         private readonly IRefreshTokenService _refreshTokenService;
         private readonly IAdministrationUsersService _administrationService;
 
-        private IAuthenticationManager Authentication
-        {
-            get { return Request.GetOwinContext().Authentication; }
-        }
+        private IAuthenticationManager Authentication => Request.GetOwinContext().Authentication;
 
-        private string RequestedOrganization
-        {
-            get { return Request.GetRequestedTenant(); }
-        }
+        private string RequestedOrganization => Request.GetRequestedTenant();
 
-        public AccountController(
-            IMapper mapper,
-            ShroomsUserManager userManager,
-            IPermissionService permissionService,
-            IOrganizationService organizationService,
-            IRefreshTokenService refreshTokenService,
-            IAdministrationUsersService administrationService)
+        public AccountController(IMapper mapper, ShroomsUserManager userManager, IPermissionService permissionService,
+            IOrganizationService organizationService, IRefreshTokenService refreshTokenService, IAdministrationUsersService administrationService)
         {
             _mapper = mapper;
             _userManager = userManager;
@@ -218,7 +207,7 @@ namespace Shrooms.API.Controllers
                 return BadRequest();
             }
 
-            var result = await _userManager.ResetPasswordAsync(user.Id.ToString(), model.Code, model.Password);
+            var result = await _userManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
 
             if (!result.Succeeded)
             {

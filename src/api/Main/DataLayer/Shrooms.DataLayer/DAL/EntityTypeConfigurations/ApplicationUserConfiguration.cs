@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.Infrastructure.Annotations;
 using System.Data.Entity.ModelConfiguration;
-using Microsoft.AspNet.Identity.EntityFramework;
 using Shrooms.EntityModels.Models;
 
 namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
@@ -10,96 +9,96 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
     {
         public ApplicationUserConfiguration()
         {
-            Map(entityMappingConfigurationAction: e => e.Requires(discriminator: "IsDeleted").HasValue(value: false))
-                .ToTable(tableName: "AspNetUsers");
+            Map(e => e.Requires("IsDeleted").HasValue(value: false))
+                .ToTable("AspNetUsers");
 
-            Property(propertyExpression: u => u.BirthDay)
+            Property(u => u.BirthDay)
                 .IsOptional();
 
-            HasMany(navigationPropertyExpression: u => u.Exams)
-                .WithMany(navigationPropertyExpression: e => e.ApplicationUsers)
-                .Map(configurationAction: t => t.MapLeftKey("ApplicationUserId")
+            HasMany(u => u.Exams)
+                .WithMany(e => e.ApplicationUsers)
+                .Map(t => t.MapLeftKey("ApplicationUserId")
                         .MapRightKey("ExamId")
-                        .ToTable(tableName: "ApplicationUserExams"));
+                        .ToTable("ApplicationUserExams"));
 
-            HasMany(navigationPropertyExpression: u => u.Skills)
-                .WithMany(navigationPropertyExpression: s => s.ApplicationUsers)
-                .Map(configurationAction: t => t.MapLeftKey("ApplicationUserId")
+            HasMany(u => u.Skills)
+                .WithMany(s => s.ApplicationUsers)
+                .Map(t => t.MapLeftKey("ApplicationUserId")
                     .MapRightKey("SkillId")
-                    .ToTable(tableName: "ApplicationUserSkills"));
+                    .ToTable("ApplicationUserSkills"));
 
-            HasMany(navigationPropertyExpression: u => u.ManagedUsers)
+            HasMany(u => u.ManagedUsers)
                 .WithOptional()
-                .HasForeignKey(foreignKeyExpression: u => u.ManagerId);
+                .HasForeignKey(u => u.ManagerId);
 
-            HasMany<IdentityUserRole>(navigationPropertyExpression: u => u.Roles)
+            HasMany(u => u.Roles)
                 .WithRequired()
-                .HasForeignKey<string>(foreignKeyExpression: ur => ur.UserId);
+                .HasForeignKey(ur => ur.UserId);
 
-            HasMany<IdentityUserClaim>(navigationPropertyExpression: u => u.Claims)
+            HasMany(u => u.Claims)
                 .WithRequired()
-                .HasForeignKey<string>(foreignKeyExpression: uc => uc.UserId);
+                .HasForeignKey(uc => uc.UserId);
 
-            HasMany<IdentityUserLogin>(navigationPropertyExpression: u => u.Logins)
+            HasMany(u => u.Logins)
                 .WithRequired()
-                .HasForeignKey<string>(foreignKeyExpression: ul => ul.UserId);
+                .HasForeignKey(ul => ul.UserId);
 
-            Property(propertyExpression: u => u.UserName)
+            Property(u => u.UserName)
                 .IsRequired()
                 .HasMaxLength(value: 256);
 
-            Property(propertyExpression: u => u.Email)
+            Property(u => u.Email)
                 .HasMaxLength(value: 256)
                 .HasColumnAnnotation(
                     name: IndexAnnotation.AnnotationName,
                     value: new IndexAnnotation(
-                        indexAttribute: new IndexAttribute(name: "Email") { IsUnique = true }));
+                        indexAttribute: new IndexAttribute("Email") { IsUnique = true }));
 
-            HasOptional(navigationPropertyExpression: u => u.WorkingHours)
-                .WithRequired(navigationPropertyExpression: w => w.ApplicationUser)
-                .Map(configurationAction: m => m.MapKey("ApplicationUserId"));
+            HasOptional(u => u.WorkingHours)
+                .WithRequired(w => w.ApplicationUser)
+                .Map(m => m.MapKey("ApplicationUserId"));
 
-            Property(propertyExpression: u => u.IsManagingDirector)
+            Property(u => u.IsManagingDirector)
                 .IsRequired();
 
-            HasMany(navigationPropertyExpression: e => e.Events)
+            HasMany(e => e.Events)
                 .WithRequired()
-                .HasForeignKey(foreignKeyExpression: e => e.ResponsibleUserId)
+                .HasForeignKey(e => e.ResponsibleUserId)
                 .WillCascadeOnDelete(value: false);
 
-            HasRequired(navigationPropertyExpression: u => u.Organization)
+            HasRequired(u => u.Organization)
                 .WithMany()
-                .HasForeignKey(foreignKeyExpression: u => u.OrganizationId)
+                .HasForeignKey(u => u.OrganizationId)
                 .WillCascadeOnDelete(value: false);
 
-            HasMany(navigationPropertyExpression: u => u.OwnedProjects)
+            HasMany(u => u.OwnedProjects)
                 .WithRequired()
-                .HasForeignKey(foreignKeyExpression: p => p.OwnerId)
+                .HasForeignKey(p => p.OwnerId)
                 .WillCascadeOnDelete(value: false);
 
-            HasMany(navigationPropertyExpression: u => u.Committees)
-                .WithMany(navigationPropertyExpression: c => c.Members)
-                .Map(configurationAction: x =>
+            HasMany(u => u.Committees)
+                .WithMany(c => c.Members)
+                .Map(x =>
                 {
-                    x.ToTable(tableName: "CommitteesUsersMembership");
+                    x.ToTable("CommitteesUsersMembership");
                 });
 
-            HasMany(navigationPropertyExpression: u => u.DelegatingCommittees)
-                .WithMany(navigationPropertyExpression: c => c.Delegates)
-                .Map(configurationAction: x =>
+            HasMany(u => u.DelegatingCommittees)
+                .WithMany(c => c.Delegates)
+                .Map(x =>
                 {
-                    x.ToTable(tableName: "CommitteesUsersDelegates");
+                    x.ToTable("CommitteesUsersDelegates");
                 });
 
-            HasMany(navigationPropertyExpression: u => u.LeadingCommittees)
-                .WithMany(navigationPropertyExpression: c => c.Leads)
-                .Map(configurationAction: x =>
+            HasMany(u => u.LeadingCommittees)
+                .WithMany(c => c.Leads)
+                .Map(x =>
                 {
-                    x.ToTable(tableName: "CommitteesUsersLeadership");
+                    x.ToTable("CommitteesUsersLeadership");
                 });
 
-            HasOptional(navigationPropertyExpression: u => u.NotificationsSettings)
-                .WithOptionalPrincipal(navigationPropertyExpression: s => s.ApplicationUser);
+            HasOptional(u => u.NotificationsSettings)
+                .WithOptionalPrincipal(s => s.ApplicationUser);
         }
     }
 }

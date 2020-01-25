@@ -10,7 +10,7 @@ using WebApi.OutputCache.V2;
 
 namespace Shrooms.API
 {
-    public static partial class WebApiConfig
+    public static class WebApiConfig
     {
         public static void Register(HttpConfiguration config)
         {

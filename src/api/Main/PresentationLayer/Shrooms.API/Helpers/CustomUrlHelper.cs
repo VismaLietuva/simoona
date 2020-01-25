@@ -6,9 +6,9 @@ namespace Shrooms.API.Helpers
     {
         public static string RouteFromController(this UrlHelper helper, string route, string controllerName, object routeData)
         {
-            string urlPath = helper.Route(route, routeData);
+            var urlPath = helper.Route(route, routeData);
 
-            int pos = urlPath.IndexOf(controllerName ?? "");
+            var pos = urlPath.IndexOf(controllerName ?? "");
 
             return pos < 2 ? urlPath : urlPath.Substring(pos - 1);
         }

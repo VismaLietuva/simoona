@@ -219,7 +219,7 @@ namespace Shrooms.UnitTests.DomainService
         }
 
         [Test]
-        public async Task Should_Throw_Validation_Exception_If_Wall_Name_Already_Exists_In_UserCreated_Walls()
+        public void Should_Throw_Validation_Exception_If_Wall_Name_Already_Exists_In_UserCreated_Walls()
         {
             // Arrange
             _wallsDbSet.SetDbSetDataForAsync(new List<Wall> { new Wall { Id = 1, Name = "wall1", OrganizationId = 2, Type = WallType.UserCreated } }.AsQueryable());

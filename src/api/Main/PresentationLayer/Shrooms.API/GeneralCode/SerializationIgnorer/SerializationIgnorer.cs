@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace Shrooms.API.GeneralCode.SerializationIgnorer
 {
@@ -39,8 +38,7 @@ namespace Shrooms.API.GeneralCode.SerializationIgnorer
             }
 
             // If viewModel is IEnumerable then modify every array item
-            var viewModelList = viewModel as IEnumerable;
-            if (viewModelList != null)
+            if (viewModel is IEnumerable viewModelList)
             {
                 foreach (var viewModelIterator in viewModelList)
                 {
@@ -50,13 +48,13 @@ namespace Shrooms.API.GeneralCode.SerializationIgnorer
                 return;
             }
 
-            Dictionary<Type, List<string>> propertiesToIgnore = GetIgnores(viewModel.GetType());
+            var propertiesToIgnore = GetIgnores(viewModel.GetType());
             if (propertiesToIgnore == null)
             {
                 return;
             }
 
-            int depthCounter = 0;
+            var depthCounter = 0;
             ModifyObject(propertiesToIgnore, viewModel, ref depthCounter);
         }
 
@@ -69,10 +67,10 @@ namespace Shrooms.API.GeneralCode.SerializationIgnorer
                 return;
             }
 
-            PropertyInfo[] properties = viewModel.GetType().GetProperties();
-            foreach (PropertyInfo propertyInfo in properties)
+            var properties = viewModel.GetType().GetProperties();
+            foreach (var propertyInfo in properties)
             {
-                object propertyValue = propertyInfo.GetValue(viewModel);
+                var propertyValue = propertyInfo.GetValue(viewModel);
 
                 // If it's ignored or max depth reached
                 if (propertiesToIgnore.ContainsKey(viewModel.GetType()) && propertiesToIgnore[viewModel.GetType()].Contains(propertyInfo.Name) && propertyInfo.CanWrite)
@@ -82,7 +80,7 @@ namespace Shrooms.API.GeneralCode.SerializationIgnorer
                 }
 
                 // If it's an array
-                if (propertyValue as IEnumerable != null && !(propertyValue is string))
+                if (propertyValue is IEnumerable && !(propertyValue is string))
                 {
                     depthCounter++;
                     ModifyArray(propertiesToIgnore, propertyValue, ref depthCounter);
@@ -94,7 +92,6 @@ namespace Shrooms.API.GeneralCode.SerializationIgnorer
                 {
                     depthCounter++;
                     ModifyObject(propertiesToIgnore, propertyValue, ref depthCounter);
-                    continue;
                 }
             }
 

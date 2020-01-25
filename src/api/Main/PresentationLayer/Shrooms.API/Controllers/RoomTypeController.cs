@@ -103,7 +103,6 @@ namespace Shrooms.API.Controllers
 
         private RoomType GetByIdOrName(string name, int id = -1, string includeProperties = "")
         {
-            var test = _repository.Get();
             var res = _repository.Get(f => f.Name.Equals(name, StringComparison.OrdinalIgnoreCase) || f.Id.Equals(id), 1, includeProperties: includeProperties).FirstOrDefault();
 
             return res;

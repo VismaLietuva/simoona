@@ -6,7 +6,6 @@ using NSubstitute;
 using NUnit.Framework;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Wall.Posts;
-using Shrooms.Domain.Services.Email.Posting;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.Domain.Services.Wall.Posts.Comments;
@@ -41,10 +40,7 @@ namespace Shrooms.UnitTests.DomainService
             _wallModeratorsDbSet = uow.MockDbSet<WallModerator>();
 
             _permissionService = Substitute.For<IPermissionService>();
-            var postNotificationService = Substitute.For<IPostNotificationService>();
-
             var commentService = Substitute.For<ICommentService>();
-
             _postService = new PostService(uow, _permissionService, commentService);
         }
 

@@ -133,7 +133,7 @@ namespace Shrooms.API.Controllers
         {
             var roleGroups = _permissionService.GetGroupNames(GetUserAndOrganization().OrganizationId);
             var roleGroupsViewModel = _mapper.Map<IEnumerable<PermissionGroupDTO>, IEnumerable<PermissionGroupViewModel>>(roleGroups);
-            return Ok(roleGroups);
+            return Ok(roleGroupsViewModel);
         }
 
         [HttpGet]

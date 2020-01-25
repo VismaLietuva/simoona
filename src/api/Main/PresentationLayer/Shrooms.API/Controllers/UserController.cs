@@ -148,8 +148,8 @@ namespace Shrooms.API.Controllers
         public IHttpActionResult LoginsUnlink(string providerName)
         {
             var userId = GetUserAndOrganization().UserId;
-            var user = _userService.GetApplicationUser(userId);
             var logins = _userService.GetUserLogins(userId).ToList();
+
             if (logins.Count > 1)
             {
                 try

@@ -48,7 +48,7 @@ namespace Shrooms.UnitTests.DomainService
             MockExternalLinksForCrud();
             var updateDto = new AddEditDeleteExternalLinkDTO
             {
-                LinksToDelete = new int[] { 1, 2 },
+                LinksToDelete = new[] { 1, 2 },
                 LinksToCreate = new List<NewExternalLinkDTO>
                 {
                     new NewExternalLinkDTO
@@ -84,7 +84,7 @@ namespace Shrooms.UnitTests.DomainService
             MockExternalLinks();
             var updateDto = new AddEditDeleteExternalLinkDTO
             {
-                LinksToDelete = new int[] { 1, 2 },
+                LinksToDelete = new[] { 1, 2 },
                 LinksToCreate = new List<NewExternalLinkDTO>
                 {
                     new NewExternalLinkDTO
@@ -108,7 +108,7 @@ namespace Shrooms.UnitTests.DomainService
             MockExternalLinks();
             var updateDto = new AddEditDeleteExternalLinkDTO
             {
-                LinksToDelete = new int[] { 1, 2 },
+                LinksToDelete = new[] { 1, 2 },
                 LinksToCreate = new List<NewExternalLinkDTO>(),
                 LinksToUpdate = new List<ExternalLinkDTO>
                 {

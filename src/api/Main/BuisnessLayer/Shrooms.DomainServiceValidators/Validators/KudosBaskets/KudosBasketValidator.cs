@@ -11,7 +11,7 @@ namespace Shrooms.DomainServiceValidators.Validators.KudosBaskets
         {
             if (basket == null)
             {
-                throw new KudosBasketException(Shrooms.Resources.Widgets.KudosBasket.KudosBasket.KudosBasketNotExists);
+                throw new KudosBasketException(Resources.Widgets.KudosBasket.KudosBasket.KudosBasketNotExists);
             }
         }
 
@@ -19,7 +19,7 @@ namespace Shrooms.DomainServiceValidators.Validators.KudosBaskets
         {
             if (remainingKudos < donationAmount)
             {
-                throw new KudosBasketException(Shrooms.Resources.Widgets.KudosBasket.KudosBasket.KudosBasketNotEnoughKudos);
+                throw new KudosBasketException(Resources.Widgets.KudosBasket.KudosBasket.KudosBasketNotEnoughKudos);
             }
         }
 
@@ -27,7 +27,7 @@ namespace Shrooms.DomainServiceValidators.Validators.KudosBaskets
         {
             if (!basket.IsActive)
             {
-                throw new KudosBasketException(Shrooms.Resources.Widgets.KudosBasket.KudosBasket.KudosBasketInactive);
+                throw new KudosBasketException(Resources.Widgets.KudosBasket.KudosBasket.KudosBasketInactive);
             }
         }
 

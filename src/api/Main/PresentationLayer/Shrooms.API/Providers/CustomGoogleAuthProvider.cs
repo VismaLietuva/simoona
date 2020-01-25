@@ -15,9 +15,8 @@ namespace Shrooms.API.Providers
                 {
                     if (claim.Key.Equals("image"))
                     {
-                        JObject json = JObject.Parse(claim.Value.ToString());
-                        bool isDefaultImage;
-                        bool.TryParse(json.SelectToken("isDefault").ToString(), out isDefaultImage);
+                        var json = JObject.Parse(claim.Value.ToString());
+                        bool.TryParse(json.SelectToken("isDefault").ToString(), out var isDefaultImage);
                         if (isDefaultImage == false)
                         {
                             var plainUri = json.SelectToken("url").ToString().Split('?')[0];
@@ -26,7 +25,7 @@ namespace Shrooms.API.Providers
                     }
                 }
             };
-            OnApplyRedirect = (GoogleOAuth2ApplyRedirectContext context) =>
+            OnApplyRedirect = context =>
             {
                 using (var webReq = ioc.BeginLifetimeScope("AutofacWebRequest"))
                 {

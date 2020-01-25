@@ -18,8 +18,7 @@ namespace Shrooms.DataTransferObjects.Models.Jobs
 
         public bool Equals(JobTypeDTO jobTypeDto)
         {
-            if (jobTypeDto != null &&
-                Id == jobTypeDto.Id)
+            if (jobTypeDto != null && Id == jobTypeDto.Id)
             {
                 return true;
             }

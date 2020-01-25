@@ -1,8 +1,8 @@
-﻿namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
-{
-    using System.Data.Entity.ModelConfiguration;
-    using Shrooms.EntityModels.Models.Multiwall;
+﻿using System.Data.Entity.ModelConfiguration;
+using Shrooms.EntityModels.Models.Multiwall;
 
+namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
+{
     internal class WallMembersConfiguration : EntityTypeConfiguration<WallMember>
     {
         public WallMembersConfiguration()

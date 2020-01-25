@@ -18,7 +18,7 @@ namespace Shrooms.Infrastructure.GoogleBookApiService
         {
             var service = new BooksService(new BaseClientService.Initializer
             {
-                ApiKey = ConfigurationManager.AppSettings["GoogleAccountApiKey"].ToString()
+                ApiKey = ConfigurationManager.AppSettings["GoogleAccountApiKey"]
             });
 
             var result = await service.Volumes.List(query).ExecuteAsync();

@@ -12,7 +12,7 @@ namespace Shrooms.API.Filters
         {
             var basicAuthValidator = Request.GetDependencyScope().GetService(typeof(IBasicAuthValidator)) as IBasicAuthValidator;
 
-            return basicAuthValidator.Validate(userName, password, cancellationToken, Request.GetOwinContext());
+            return await Task.FromResult(basicAuthValidator.Validate(userName, password, cancellationToken, Request.GetOwinContext()));
         }
     }
 }

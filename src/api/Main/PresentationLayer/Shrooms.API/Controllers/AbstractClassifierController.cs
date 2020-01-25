@@ -75,12 +75,12 @@ namespace Shrooms.API.Controllers
 
         public IEnumerable<AbstractClassifierTypeViewModel> GetAbstractClassifierTypes()
         {
-            List<AbstractClassifierTypeViewModel> abstractClassifierTypes = new List<AbstractClassifierTypeViewModel>();
+            var abstractClassifierTypes = new List<AbstractClassifierTypeViewModel>();
             var values = WebApiConstants.AbstractClassifierTypes;
 
             foreach (var value in values)
             {
-                AbstractClassifierTypeViewModel abstractClassifierTypeModel = new AbstractClassifierTypeViewModel();
+                var abstractClassifierTypeModel = new AbstractClassifierTypeViewModel();
 
                 abstractClassifierTypeModel.AbstractClassifierType = value;
 

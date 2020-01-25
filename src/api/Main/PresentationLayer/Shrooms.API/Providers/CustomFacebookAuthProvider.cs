@@ -16,19 +16,18 @@ namespace Shrooms.API.Providers
                 {
                     if (claim.Key.Equals("first_name"))
                     {
-                        string claimValue = claim.Value.ToString();
+                        var claimValue = claim.Value.ToString();
                         context.Identity.AddClaim(new System.Security.Claims.Claim(ClaimTypes.GivenName, claimValue));
                     }
                     else if (claim.Key.Equals("last_name"))
                     {
-                        string claimValue = claim.Value.ToString();
+                        var claimValue = claim.Value.ToString();
                         context.Identity.AddClaim(new System.Security.Claims.Claim(ClaimTypes.Surname, claimValue));
                     }
                     else if (claim.Key.Equals("picture"))
                     {
-                        JObject json = JObject.Parse(claim.Value.ToString());
-                        bool isDefaultImage;
-                        bool.TryParse(json.SelectToken("data.is_silhouette").ToString(), out isDefaultImage);
+                        var json = JObject.Parse(claim.Value.ToString());
+                        bool.TryParse(json.SelectToken("data.is_silhouette").ToString(), out var isDefaultImage);
                         if (isDefaultImage == false)
                         {
                             context.Identity.AddClaim(new System.Security.Claims.Claim("picture", json.SelectToken("data.url").ToString()));
@@ -36,7 +35,7 @@ namespace Shrooms.API.Providers
                     }
                 }
             };
-            OnApplyRedirect = (FacebookApplyRedirectContext context) =>
+            OnApplyRedirect = context =>
             {
                 using (var webReq = ioc.BeginLifetimeScope("AutofacWebRequest"))
                 {

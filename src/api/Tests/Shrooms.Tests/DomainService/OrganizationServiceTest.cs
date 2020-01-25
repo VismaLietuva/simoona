@@ -179,7 +179,6 @@ namespace Shrooms.UnitTests.DomainService
         [Test]
         public void Should_Throw_Exception_If_User_Has_No_Permission_To_Set_Managing_Director()
         {
-            var user = new ApplicationUser { Id = "user1", IsManagingDirector = true, FirstName = "John", LastName = "Doe", OrganizationId = 1 };
             var userAndOrg = new UserAndOrganizationDTO { OrganizationId = 1, UserId = "user1" };
             _roleService.HasRole("user1", Roles.Manager).Returns(false);
 

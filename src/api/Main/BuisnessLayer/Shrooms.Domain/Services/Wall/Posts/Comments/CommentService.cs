@@ -6,7 +6,6 @@ using Shrooms.DataTransferObjects.Models.Wall.Posts.Comments;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models.Multiwall;
-using Shrooms.EntityModels.Models.Notifications;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.Host.Contracts.Infrastructure;
@@ -22,7 +21,6 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
         private readonly IDbSet<Post> _postsDbSet;
         private readonly IDbSet<Comment> _commentsDbSet;
         private readonly IDbSet<WallModerator> _wallModeratorsDbSet;
-        private readonly IDbSet<NotificationsSettings> _notificationsDbSet;
         private readonly IDbSet<PostWatcher> _postWatchers;
 
         public CommentService(IUnitOfWork2 uow, ISystemClock systemClock, IPermissionService permissionService)
@@ -34,7 +32,6 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             _postsDbSet = uow.GetDbSet<Post>();
             _commentsDbSet = uow.GetDbSet<Comment>();
             _wallModeratorsDbSet = uow.GetDbSet<WallModerator>();
-            _notificationsDbSet = uow.GetDbSet<NotificationsSettings>();
             _postWatchers = uow.GetDbSet<PostWatcher>();
         }
 

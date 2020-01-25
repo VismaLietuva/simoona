@@ -6,20 +6,16 @@ namespace Shrooms.WebViewModels.ValidationAttributes
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
     public class DateTimeNotExpiredAttribute : ValidationAttribute
     {
-        private DateTime _dateTime;
-
         public DateTime DateTime
         {
-            get
-            {
-                return _dateTime;
-            }
+            get;
+            private set;
         }
 
         public override bool IsValid(object value)
         {
-            _dateTime = (DateTime)value;
-            bool result = DateTime > DateTime.UtcNow ? true : false;
+            DateTime = (DateTime)value;
+            var result = DateTime > DateTime.UtcNow;
             return result;
         }
 

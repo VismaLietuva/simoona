@@ -173,11 +173,6 @@ namespace Shrooms.API.Controllers
             }
         }
 
-        private IEnumerable<string> GetPostErrorMesages()
-        {
-            return ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage));
-        }
-
         #endregion
 
         [Route("GetAll")]

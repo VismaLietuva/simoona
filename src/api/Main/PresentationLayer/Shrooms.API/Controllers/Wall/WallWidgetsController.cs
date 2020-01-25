@@ -51,19 +51,19 @@ namespace Shrooms.API.Controllers.Wall
             var userAndOrganization = GetUserAndOrganization();
             return new WidgetsViewModel
             {
-                KudosWidgetStats = DefaultIfNotAuthrorized(userAndOrganization, BasicPermissions.Kudos,
+                KudosWidgetStats = DefaultIfNotAuthorized(userAndOrganization, BasicPermissions.Kudos,
                     () => GetKudosWidgetStats(
                         getWidgetsViewModel.KudosTabOneMonths,
                         getWidgetsViewModel.KudosTabOneAmount,
                         getWidgetsViewModel.KudosTabTwoMonths,
                         getWidgetsViewModel.KudosTabTwoAmount)),
-                LastKudosLogRecords = DefaultIfNotAuthrorized(userAndOrganization, BasicPermissions.Kudos, GetLastKudosLogRecords),
-                WeeklyBirthdays = DefaultIfNotAuthrorized(userAndOrganization, BasicPermissions.Birthday, GetWeeklyBirthdays),
-                KudosBasketWidget = DefaultIfNotAuthrorized(userAndOrganization, BasicPermissions.KudosBasket, GetKudosBasketWidget)
+                LastKudosLogRecords = DefaultIfNotAuthorized(userAndOrganization, BasicPermissions.Kudos, GetLastKudosLogRecords),
+                WeeklyBirthdays = DefaultIfNotAuthorized(userAndOrganization, BasicPermissions.Birthday, GetWeeklyBirthdays),
+                KudosBasketWidget = DefaultIfNotAuthorized(userAndOrganization, BasicPermissions.KudosBasket, GetKudosBasketWidget)
             };
         }
 
-        private T DefaultIfNotAuthrorized<T>(UserAndOrganizationDTO userAndOrganization, string permission, Func<T> valueFactory)
+        private T DefaultIfNotAuthorized<T>(UserAndOrganizationDTO userAndOrganization, string permission, Func<T> valueFactory)
         {
             return _permissionService.UserHasPermission(userAndOrganization, permission) ? valueFactory() : default;
         }
