@@ -509,5 +509,29 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
                 return BadRequestWithError(e);
             }
         }
+
+        [HttpPost]
+        [Route("Options")]
+        [PermissionAuthorize(Permission = BasicPermissions.Event)]
+        public IHttpActionResult UpdateSelectedOptions(EventChangeOptionViewModel viewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var changeOptionsDto = _mapper.Map<EventChangeOptionViewModel, EventChangeOptionsDTO>(viewModel);
+            SetOrganizationAndUser(changeOptionsDto);
+
+            try
+            {
+                _eventParticipationService.UpdateSelectedOptions(changeOptionsDto);
+                return Ok();
+            }
+            catch (EventException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
     }
 }

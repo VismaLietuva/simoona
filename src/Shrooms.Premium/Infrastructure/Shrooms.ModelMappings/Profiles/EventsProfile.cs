@@ -36,6 +36,8 @@ namespace Shrooms.ModelMappings.Profiles
             CreateMap<EventEditDTO, EventEditViewModel>()
                 .ForMember(dest => dest.OfficeIds, opt => opt.MapFrom(u => JsonConvert.DeserializeObject<string[]>(u.Offices.Value)));
             CreateMap<EventOptionsDTO, EventOptionsViewModel>();
+
+            CreateMap<EventChangeOptionViewModel, EventChangeOptionsDTO>();
         }
 
         private void CreateViewModelToDtoMappings()
