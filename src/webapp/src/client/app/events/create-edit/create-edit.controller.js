@@ -302,7 +302,6 @@
 
                 eventImageBlob.lastModifiedDate = new Date();
                 eventImageBlob.name = vm.eventImage[0].name;
-                var eventImage = eventImageBlob;
 
                 pictureRepository.upload([eventImageBlob]).then(function (result) {
                     method(result.data);
@@ -335,8 +334,8 @@
                 eventRepository.createEvent(vm.event).then(function (result) {
                         notifySrv.success('common.successfullySaved');
 
-                        $state.go('Root.WithOrg.Client.Events.List.Type', {
-                            type: 'all'
+                        $state.go('Root.WithOrg.Client.Events.EventContent', {
+                            id: result.id
                         });
                     },
                     function (error) {
@@ -359,8 +358,8 @@
                 eventRepository.updateEvent(vm.event).then(function (result) {
                         notifySrv.success('common.successfullySaved');
 
-                        $state.go('Root.WithOrg.Client.Events.List.Type', {
-                            type: 'all'
+                        $state.go('Root.WithOrg.Client.Events.EventContent', {
+                            id: result.id
                         });
                     },
                     function (error) {

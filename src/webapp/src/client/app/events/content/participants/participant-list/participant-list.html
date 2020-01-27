@@ -19,10 +19,10 @@
         </div>
 
         <ul ng-if="!!vm.participants.length && vm.isExpanded" class="event-participant-list">
-            <div ng-show="!!vm.AttendingParticipants().length" class="panel panel-info" >
-                <div ng-show="vm.isMainParticipantList" class="panel-heading">{{'events.eventParticipantStatus_Attending' | translate}} ({{vm.AttendingParticipants().length}})</div>
+            <div ng-show="!!vm.attendingParticipants().length" class="panel panel-info" >
+                <div ng-show="vm.isMainParticipantList" class="panel-heading">{{'events.eventParticipantStatus_Attending' | translate}} ({{vm.attendingParticipants().length}})</div>
                 <div class="panel-body">
-                    <li ng-repeat="participant in vm.AttendingParticipants()">
+                    <li ng-repeat="participant in vm.attendingParticipants()">
                         <ace-event-participant participant="participant">
                             <span ng-if="!!participant.userId && !participant.isLoading && vm.isDeleteVisible"
                                 class="event-participant-delete-button vismaicon vismaicon-cancel-circle"
@@ -36,10 +36,10 @@
                 </div>
             </div>
 
-            <div ng-show="!!vm.MaybeAttendingParticipants().length && vm.isMainParticipantList" class="panel panel-info">
-                <div class="panel-heading">{{'events.eventParticipantStatus_MaybeAttending' | translate}} ({{vm.MaybeAttendingParticipants().length}})</div>
+            <div ng-show="!!vm.maybeAttendingParticipants().length && vm.isMainParticipantList" class="panel panel-info">
+                <div class="panel-heading">{{'events.eventParticipantStatus_MaybeAttending' | translate}} ({{vm.maybeAttendingParticipants().length}})</div>
                 <div class="panel-body">
-                    <li ng-repeat="participant in vm.MaybeAttendingParticipants()">
+                    <li ng-repeat="participant in vm.maybeAttendingParticipants()">
                         <ace-event-participant participant="participant">
                             <span ng-if="!!participant.userId && !participant.isLoading && vm.isDeleteVisible"
                                 class="event-participant-delete-button vismaicon vismaicon-cancel-circle"
@@ -58,10 +58,10 @@
                 </div>
             </div>
 
-            <div ng-show="!!vm.NotAttendingParticipants().length && vm.isMainParticipantList" class="panel panel-info">
-                <div class="panel-heading">{{'events.eventParticipantStatus_NotAttending' | translate}} ({{vm.NotAttendingParticipants().length}})</div>
+            <div ng-show="!!vm.notAttendingParticipants().length && vm.isMainParticipantList" class="panel panel-info">
+                <div class="panel-heading">{{'events.eventParticipantStatus_NotAttending' | translate}} ({{vm.notAttendingParticipants().length}})</div>
                 <div class="panel-body">
-                    <li ng-repeat="participant in vm.NotAttendingParticipants()">
+                    <li ng-repeat="participant in vm.notAttendingParticipants()">
                         <ace-event-participant participant="participant">
                             <span ng-if="!!participant.userId && !participant.isLoading && vm.isDeleteVisible"
                                 class="event-participant-delete-button vismaicon vismaicon-cancel-circle"

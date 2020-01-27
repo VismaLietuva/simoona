@@ -71,6 +71,7 @@
                     participantCount++;
                 }
             })
+
             return participantCount;
         }
 
@@ -107,7 +108,7 @@
                     eventParticipantsService.removeParticipantFromOptions(vm.event.options, participant.userId);
 
                     if (authService.identity.userId === participant.userId) {
-                        vm.event.isParticipating = false;
+                        vm.event.participatingStatus = attendStatus.Idle;
                     }
 
                     if (vm.event.maxParticipants > vm.event.participants.length) {

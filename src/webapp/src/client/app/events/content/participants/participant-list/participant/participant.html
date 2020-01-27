@@ -1,15 +1,15 @@
 <div class="event-participant" ng-attr-title="{{:: !!vm.participant.userId ? vm.participant.fullName : undefined}}">
     <div class="event-participant-image loading-image-placeholder">
-        <a ng-if="!!vm.participant.userId" ui-sref="Root.WithOrg.Client.Profiles.Details({ id: vm.participant.userId })">
+          <a ng-if="!!vm.participant.userId" ui-sref="Root.WithOrg.Client.Profiles.Details({ id: vm.participant.userId })">
             <img class="media-object"
                  width="{{:: vm.participantThumbSettings.width}}"
                  height="{{:: vm.participantThumbSettings.height}}"
                  ng-src="{{:: vm.participant.imageName | participantThumb: vm.participantThumbSettings}}"
                  alt="{{:: vm.participant.fullName}}"
                  data-test-id="event-participant-image" image-loading ng-cloak/>
-         </a>
+          </a>
 
-         <div ng-if="!vm.participant.userId">
+          <div ng-if="!vm.participant.userId">
              <img class="media-object"
                   width="{{:: vm.participantThumbSettings.width}}"
                   height="{{:: vm.participantThumbSettings.height}}"
