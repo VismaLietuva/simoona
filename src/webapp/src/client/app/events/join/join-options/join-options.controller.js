@@ -21,6 +21,7 @@
         'event',
         'isDetails',
         'isAddColleague',
+        'isChangeOptions',
         'localeSrv',
         'lodash',
         'attendStatus',
@@ -28,13 +29,14 @@
     ];
 
     function eventJoinOptionsController($state, $uibModalInstance, inputTypes, authService, errorHandler,
-        eventRepository, $translate, notifySrv, event, isDetails, isAddColleague, localeSrv, lodash, attendStatus, optionRules) {
+        eventRepository, $translate, notifySrv, event, isDetails, isAddColleague, isChangeOptions, localeSrv, lodash, attendStatus, optionRules) {
         /* jshint validthis: true */
         var vm = this;
 
         vm.options = event.availableOptions;
         vm.inputType = null;
         vm.isAddColleague = isAddColleague;
+        vm.isChangeOptions = isChangeOptions;
         vm.participants = [];
         vm.selectedOptions = [];
         vm.messageMaximumOptions = localeSrv.formatTranslation('events.eventMaximumOptions', {
