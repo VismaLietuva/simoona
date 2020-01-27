@@ -45,6 +45,7 @@
         vm.isActionDisabled = false;
 
         vm.joinEvent = joinEvent;
+        vm.updateOptions = updateOptions;
         vm.closeModal = closeModal;
         vm.selectOption = selectOption;
         vm.isOptionsJoinAvailable = isOptionsJoinAvailable;
@@ -131,6 +132,14 @@
                         .then(handleSuccessPromise, handleErrorPromise);
                 }
             }
+        }
+
+        function updateOptions() {
+            vm.isActionDisabled = true;
+
+            var selectedOptionsId = lodash.map(vm.selectedOptions, 'id');
+
+            eventRepository.updateEventOptions(event.id, selectedOptionsId).then(handleSuccessPromise, handleErrorMessage);
         }
 
         function handleSuccessPromise() {

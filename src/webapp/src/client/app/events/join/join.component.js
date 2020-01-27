@@ -190,7 +190,7 @@
                         return vm.isAddColleague;
                     },
                     isChangeOptions: function () {
-                        return true;
+                        return false;
                     }
                 }
             });

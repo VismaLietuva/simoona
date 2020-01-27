@@ -25,6 +25,7 @@
             getEventDetails: getEventDetails,
             getEventUpdate: getEventUpdate,
             getEventOptions: getEventOptions,
+            updateEventOptions: updateEventOptions,
             deleteEvent: deleteEvent,
             createEvent: createEvent,
             updateEvent: updateEvent,
@@ -98,6 +99,13 @@
             return $resource(eventUrl + 'Options?eventId=:eventId', {
                 eventId: eventId
             }).get().$promise;
+        }
+
+        function updateEventOptions(eventId, chosenOptions) {
+            return $resource(eventUrl + 'Options').save({
+                eventId: eventId,
+                chosenOptions: chosenOptions
+            }).$promise;
         }
 
         function getUserForAutoCompleteResponsiblePerson(params) {

@@ -46,9 +46,8 @@
             <span ng-if="!vm.isAddColleague" translate="events.eventJoin"></span>
             <span ng-if="vm.isAddColleague" translate="events.eventAdd"></span>
         </button>
-        <button class="btn btn-primary" ng-if="vm.isChangeOptions" translate="common.save">
+        <button class="btn btn-primary" ng-if="vm.isChangeOptions" translate="common.save" ng-click="vm.updateOptions()">
         </button>
-
         <button class="btn btn-default" ng-click="vm.closeModal()" data-test-id="close-event-modal-button">
             <span translate="common.cancel"></span>
         </button>

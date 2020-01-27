@@ -34,6 +34,7 @@
             <span class="glyphicon glyphicon-ok">&nbsp;</span><span translate="events.eventAction_Attending"></span>
             <span class="caret"></span>
         </button>
+        <ace-event-options-change ng-if="vm.event.participatingStatus == vm.attendStatus.Attending" event="vm.event"></ace-event-options-change>
         <ul class="dropdown-menu dropdown-menu-right dropdown-menu-wide">
             <li> <a ng-if="vm.event.participatingStatus != vm.attendStatus.Attending" class="nc-btn nc-btn-default"
                     ng-click="vm.joinEvent(vm.event.id)" translate-attr-title="events.eventJoin"
@@ -54,7 +55,6 @@
                         translate="events.eventAction_NotAttending"></span></a></li>
         </ul>
     </div>
-    <ace-event-options-change event="vm.event"></ace-event-options-change>
 </div>
 
 <div class="dropdown text-nowrap" ng-if="!vm.isAddColleague && !vm.isDetails">
