@@ -139,11 +139,12 @@
 
             var selectedOptionsId = lodash.map(vm.selectedOptions, 'id');
 
-            eventRepository.updateEventOptions(event.id, selectedOptionsId).then(handleSuccessPromise, handleErrorMessage);
+            eventRepository.updateEventOptions(event.id, selectedOptionsId)
+                .then(handleSuccessPromise, handleErrorPromise);
         }
 
         function handleSuccessPromise() {
-            if (isDetails || vm.isAddColleague) {
+            if (isDetails || vm.isAddColleague || isChangeOptions) {
                 eventRepository.getEventDetails(event.id).then(function (response) {
                     angular.copy(response, event);
 
@@ -158,7 +159,12 @@
             event.participatingStatus = attendStatus.Attending;
             $uibModalInstance.close();
 
-            notifySrv.success('events.joinedEvent');
+            notifySuccess();
+        }
+
+        function notifySuccess() {
+            var message = isChangeOptions ? 'events.changedEventOptions' : 'events.joinedEvent';
+            notifySrv.success(message);
         }
 
         function handleErrorPromise(error) {
