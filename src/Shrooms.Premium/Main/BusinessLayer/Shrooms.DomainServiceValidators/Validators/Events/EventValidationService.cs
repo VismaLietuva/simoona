@@ -263,5 +263,13 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
                 throw new EventException(EventParticipantsNotFound);
             }
         }
+
+        public void CheckIfUserParticipatesInEvent(string userId, IEnumerable<string> participantIds)
+        {
+            if (participantIds.All(p => p != userId))
+            {
+                throw new EventException(EventUserNotParticipating);
+            }
+        }
     }
 }

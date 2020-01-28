@@ -298,16 +298,7 @@ namespace Shrooms.Domain.Services.Events.Participation
                 .Include(x => x.EventParticipants)
                 .Where(x => x.Id == changeOptionsDTO.EventId
                             && x.OrganizationId == changeOptionsDTO.OrganizationId)
-                .Select(e => new
-                {
-                    e.RegistrationDeadline,
-                    e.EventOptions,
-                    e.MaxChoices,
-                    Participants = e.EventParticipants
-                        .Where(x => x.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.Attending)
-                        .Select(x => x.ApplicationUserId)
-                        .ToList(),
-                })
+                .Select(MapEventToChangeOptionsValidation)
                 .FirstOrDefault();
 
             _eventValidationService.CheckIfEventExists(eventEntity);
@@ -321,24 +312,17 @@ namespace Shrooms.Domain.Services.Events.Participation
             _eventValidationService.CheckIfJoiningNotEnoughChoicesProvided(eventEntity.MaxChoices, changeOptionsDTO.ChosenOptions.Count());
             _eventValidationService.CheckIfJoiningTooManyChoicesProvided(eventEntity.MaxChoices, changeOptionsDTO.ChosenOptions.Count());
             _eventValidationService.CheckIfSingleChoiceSelectedWithRule(selectedOptions, OptionRules.IgnoreSingleJoin);
+            _eventValidationService.CheckIfUserParticipatesInEvent(changeOptionsDTO.UserId, eventEntity.Participants);
 
-            var userExists = _usersDbSet
-                .Any(x => x.Id == changeOptionsDTO.UserId
-                          && x.OrganizationId == changeOptionsDTO.OrganizationId);
-            _eventValidationService.CheckIfUserExists(userExists);
+            var participant = _eventParticipantsDbSet
+                .First(p =>
+                    p.EventId == changeOptionsDTO.EventId &&
+                    p.ApplicationUserId == changeOptionsDTO.UserId);
 
-            var isParticipating = eventEntity.Participants.Any(p => p == changeOptionsDTO.UserId);
-            if (isParticipating)
-            {
-                var participant = _eventParticipantsDbSet
-                    .Include(x => x.EventOptions)
-                    .First(p => p.EventId == changeOptionsDTO.EventId && p.ApplicationUserId == changeOptionsDTO.UserId);
+            participant.EventOptions = null;
+            participant.EventOptions = selectedOptions;
 
-                participant.EventOptions = null;
-                participant.EventOptions = selectedOptions;
-                
-                _uow.SaveChanges(changeOptionsDTO.UserId);
-            }
+            _uow.SaveChanges(changeOptionsDTO.UserId);
         }
 
         private void JoinLeaveEventWall(string responsibleUserId, string wallParticipantId, int wallId, UserAndOrganizationDTO userOrg)
@@ -409,6 +393,18 @@ namespace Shrooms.Domain.Services.Events.Participation
                 RegistrationDeadline = e.RegistrationDeadline,
                 ResponsibleUserId = e.ResponsibleUserId,
                 WallId = e.WallId
+            };
+
+        private Expression<Func<Event, EventChangeOptionsValidationDTO>> MapEventToChangeOptionsValidation =>
+            e => new EventChangeOptionsValidationDTO
+            {
+                RegistrationDeadline = e.RegistrationDeadline,
+                EventOptions = e.EventOptions.ToList(),
+                MaxChoices = e.MaxChoices,
+                Participants = e.EventParticipants
+                    .Where(x => x.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.Attending)
+                    .Select(x => x.ApplicationUserId)
+                    .ToList()
             };
 
         private void ValidateSingleJoin(EventJoinValidationDTO eventDto, int orgId, string userId)
