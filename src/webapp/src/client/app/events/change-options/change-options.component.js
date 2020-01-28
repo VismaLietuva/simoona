@@ -19,10 +19,10 @@
 
     function eventOptionsChangeController(eventRepository, $uibModal) {
         var vm = this;
-        
 
         vm.changeSelectedOptions = changeSelectedOptions;
-        vm.isRegistrationFinished = isRegistrationFinished;
+        vm.isDeadline = isDeadline;
+        
 
         function changeSelectedOptions() {
             eventRepository.getEventOptions(vm.event.id).then(function (responseEvent) {
@@ -54,7 +54,7 @@
             });
         }
 
-        function isRegistrationFinished() {
+        function isDeadline() {
             return moment.utc(vm.registrationDeadlineDate).local().isAfter();
         }
     }
