@@ -353,7 +353,6 @@
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\CreateEventTypeDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\EditEventDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\EventChangeOptionsDTO.cs" />
-    <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\EventChangeOptionsValidationDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\EventDetailsDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\EventDetailsOptionDTO.cs" />
     <Compile Include="Main\BusinessLayer\Shrooms.DataTransferObjects\Models\Events\EventDetailsParticipantDTO.cs" />
