@@ -315,11 +315,12 @@ namespace Shrooms.Domain.Services.Events.Participation
             _eventValidationService.CheckIfUserParticipatesInEvent(changeOptionsDTO.UserId, eventEntity.Participants);
 
             var participant = _eventParticipantsDbSet
+                .Include(x => x.EventOptions)
                 .First(p =>
                     p.EventId == changeOptionsDTO.EventId &&
                     p.ApplicationUserId == changeOptionsDTO.UserId);
 
-            participant.EventOptions = null;
+            participant.EventOptions.Clear();
             participant.EventOptions = selectedOptions;
 
             _uow.SaveChanges(changeOptionsDTO.UserId);
