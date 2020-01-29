@@ -37,7 +37,8 @@
                 translate="events.eventAction_NotAttending"></span>
             <span class="caret"></span>
         </button>
-        <ul class="dropdown-menu dropdown-menu-right dropdown-menu-wide">
+
+        <ul class="dropdown-menu dropdown-menu-right dropdown-menu-wide participate-dropdown-menu">
             <li><a ng-if="vm.event.participatingStatus != vm.attendStatus.Attending" class="nc-btn nc-btn-default"
                     ng-click="vm.joinEvent(vm.event.id)" translate-attr-title="events.eventJoin"
                     data-test-id="join-event-attending-button" translate>
@@ -57,6 +58,7 @@
                     <span class="vismaicon vismaicon-cancel-circle"></span><span
                         translate="events.eventAction_NotAttending"></span></a>
             </li>
+            <li><hr class="event-participate-dropdown-hr-line" ng-if="vm.event.participatingStatus != vm.attendStatus.Idle"/></li>
             <li><a ng-if="vm.event.participatingStatus != vm.attendStatus.Idle" class="nc-btn nc-btn-danger"
                     ng-click="vm.leaveEvent(vm.event.id, '')" translate-attr-title="events.eventLeave"
                     data-test-id="join-event-leave-button" translate>
