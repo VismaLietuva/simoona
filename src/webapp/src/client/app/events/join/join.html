@@ -1,8 +1,7 @@
 <div class="text-center" ng-if="vm.isAddColleague">
-    <a class="nc-btn nc-btn-default"
-        ng-click="vm.joinEvent(vm.event.id)" 
-        title="{{'events.eventAddColleaguesButton' | translate}}"
-        data-test-id="event-add-colleagues-button" ng-cloak translate-cloak>
+    <a class="nc-btn nc-btn-default" ng-click="vm.joinEvent(vm.event.id)"
+        title="{{'events.eventAddColleaguesButton' | translate}}" data-test-id="event-add-colleagues-button" ng-cloak
+        translate-cloak>
         <span class="vismaicon vismaicon-add2-circle"></span><span translate="events.eventAddColleaguesButton"></span>
     </a>
 </div>
@@ -11,7 +10,8 @@
     <div class="btn-group" role="group">
         <button ng-if="vm.event.participatingStatus == vm.attendStatus.Idle"
             class="btn btn-primary dropdown-toggle event-attend-button event-attend-idle-button" type="button"
-            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span translate="events.areYouGoing"></span>
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span
+                translate="events.areYouGoing"></span>
             <span class="caret"></span>
         </button>
 
@@ -25,14 +25,16 @@
         <button ng-if="vm.event.participatingStatus == vm.attendStatus.MaybeAttending"
             class="btn btn-primary dropdown-toggle event-attend-button" type="button" data-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false">
-            <span class="glyphicon glyphicon-question-sign">&nbsp;</span><span translate="events.eventAction_MaybeAttending"></span>
+            <span class="glyphicon glyphicon-question-sign">&nbsp;</span><span
+                translate="events.eventAction_MaybeAttending"></span>
             <span class="caret"></span>
         </button>
-        
-        <button ng-if="vm.event.participatingStatus == vm.attendStatus.NotAttending" 
+
+        <button ng-if="vm.event.participatingStatus == vm.attendStatus.NotAttending"
             class="btn btn-danger dropdown-toggle event-attend-button" type="button" data-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false">
-            <span class="glyphicon glyphicon-remove">&nbsp;</span><span translate="events.eventAction_NotAttending"></span>
+            <span class="glyphicon glyphicon-remove">&nbsp;</span><span
+                translate="events.eventAction_NotAttending"></span>
             <span class="caret"></span>
         </button>
 
@@ -40,37 +42,47 @@
             <li><a ng-if="vm.event.participatingStatus != vm.attendStatus.Attending" class="nc-btn nc-btn-default"
                     ng-click="vm.joinEvent(vm.event.id)" translate-attr-title="events.eventJoin"
                     data-test-id="join-event-attending-button" translate>
-                    <span class="vismaicon vismaicon-add2-circle"></span><span translate="events.eventAction_Attending"></span></a>
+                    <span class="vismaicon vismaicon-add2-circle"></span><span
+                        translate="events.eventAction_Attending"></span></a>
             </li>
             <li><a ng-if="vm.event.participatingStatus != vm.attendStatus.MaybeAttending" class="nc-btn nc-btn-default"
-                    ng-click="vm.openJoinCommentModal(vm.attendStatus.MaybeAttending)" translate-attr-title="events.eventJoin"
-                    data-test-id="join-event-maybeattending-button" translate>
-                    <span class="vismaicon vismaicon-help2"></span><span translate="events.eventAction_MaybeAttending"></span></a>
+                    ng-click="vm.openJoinCommentModal(vm.attendStatus.MaybeAttending)"
+                    translate-attr-title="events.eventJoin" data-test-id="join-event-maybeattending-button" translate>
+                    <span class="vismaicon vismaicon-help2"></span><span
+                        translate="events.eventAction_MaybeAttending"></span></a>
             </li>
             <li><a ng-if="vm.event.participatingStatus != vm.attendStatus.NotAttending" class="nc-btn nc-btn-danger"
-                    ng-click="vm.openJoinCommentModal(vm.attendStatus.NotAttending)" translate-attr-title="events.eventAction_NotAttending"
-                    data-test-id="join-event-notattending-button" translate>
-                    <span class="vismaicon vismaicon-cancel-circle"></span><span translate="events.eventAction_NotAttending"></span></a>
+                    ng-click="vm.openJoinCommentModal(vm.attendStatus.NotAttending)"
+                    translate-attr-title="events.eventAction_NotAttending" data-test-id="join-event-notattending-button"
+                    translate>
+                    <span class="vismaicon vismaicon-cancel-circle"></span><span
+                        translate="events.eventAction_NotAttending"></span></a>
             </li>
             <li><hr class="event-participate-dropdown-hr-line" ng-if="vm.event.participatingStatus != vm.attendStatus.Idle"/></li>
             <li><a ng-if="vm.event.participatingStatus != vm.attendStatus.Idle" class="nc-btn nc-btn-danger"
                     ng-click="vm.leaveEvent(vm.event.id, '')" translate-attr-title="events.eventLeave"
                     data-test-id="join-event-leave-button" translate>
-                    <span class="vismaicon vismaicon-cancel-circle"></span><span translate="events.eventLeave"></span></a>
+                    <span class="vismaicon vismaicon-cancel-circle"></span><span
+                        translate="events.eventLeave"></span></a>
             </li>
         </ul>
     </div>
 </div>
 
+<ace-event-options-change
+    ng-if="vm.event.participatingStatus === vm.attendStatus.Attending && !vm.isAddColleague && vm.isDetails"
+    event="vm.event">
+</ace-event-options-change>
+
 <div class="dropdown text-nowrap" ng-if="!vm.isAddColleague && !vm.isDetails">
-    <a ng-if="vm.event.participatingStatus != vm.attendStatus.Attending || vm.event.participatingStatus == vm.attendStatus.Idle" class="nc-btn nc-btn-default"
-    ng-click="vm.joinEvent(vm.event.id)" translate-attr-title="events.eventJoin"
-    data-test-id="join-event-button" translate>
+    <a ng-if="vm.event.participatingStatus != vm.attendStatus.Attending || vm.event.participatingStatus == vm.attendStatus.Idle"
+        class="nc-btn nc-btn-default" ng-click="vm.joinEvent(vm.event.id)" translate-attr-title="events.eventJoin"
+        data-test-id="join-event-button" translate>
         <span class="vismaicon vismaicon-add2-circle"></span><span translate="events.attend"></span>
     </a>
     <a ng-if="vm.event.participatingStatus == vm.attendStatus.Attending" class="nc-btn nc-btn-danger"
-    ng-click="vm.leaveEvent(vm.event.id, '')" translate-attr-title="events.eventLeave"
-    data-test-id="leave-event-button" translate>
+        ng-click="vm.leaveEvent(vm.event.id, '')" translate-attr-title="events.eventLeave"
+        data-test-id="leave-event-button" translate>
         <span class="vismaicon vismaicon-cancel-circle"></span><span translate="events.eventLeave"></span>
     </a>
 </div>
