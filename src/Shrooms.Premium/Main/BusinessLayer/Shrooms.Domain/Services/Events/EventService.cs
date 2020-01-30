@@ -19,9 +19,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Shrooms.Domain.Helpers;
-using System.Resources;
-using Shrooms.Resources;
-using System.Globalization;
 using System.Data.Entity.SqlServer;
 using Newtonsoft.Json;
 
@@ -41,7 +38,6 @@ namespace Shrooms.Domain.Services.Events
         private readonly IDbSet<EventType> _eventTypesDbSet;
         private readonly IDbSet<ApplicationUser> _usersDbSet;
         private readonly IDbSet<EventOption> _eventOptionsDbSet;
-        private readonly ResourceManager _resourceManager;
 
         private readonly IDbSet<Office> _officeDbSet;
 
@@ -66,7 +62,6 @@ namespace Shrooms.Domain.Services.Events
             _eventParticipationService = eventParticipationService;
             _wallService = wallService;
             _markdownConverter = markdownConverter;
-            _resourceManager = new ResourceManager("Shrooms.Resources.Models.Events.Events", typeof(ResourceUtilities).Assembly);
         }
 
         public void Delete(Guid id, UserAndOrganizationDTO userOrg)
@@ -101,9 +96,7 @@ namespace Shrooms.Domain.Services.Events
         {
             var @event = _eventsDbSet
                 .Include(e => e.ResponsibleUser)
-                .Where(e =>
-                    e.Id == id &&
-                    e.OrganizationId == userOrg.OrganizationId)
+                .Where(e => e.Id == id && e.OrganizationId == userOrg.OrganizationId)
                 .Select(MapToEventEditDto())
                 .SingleOrDefault();
 
@@ -116,9 +109,7 @@ namespace Shrooms.Domain.Services.Events
             var @event = _eventsDbSet
                 .Include(e => e.ResponsibleUser)
                 .Include(e => e.EventParticipants.Select(v => v.EventOptions))
-                .Where(e =>
-                    e.Id == id &&
-                    e.OrganizationId == userOrg.OrganizationId)
+                .Where(e => e.Id == id && e.OrganizationId == userOrg.OrganizationId)
                 .Select(MapToEventDetailsDto(id))
                 .SingleOrDefault();
 
@@ -127,9 +118,9 @@ namespace Shrooms.Domain.Services.Events
                 .Select(p => p.Name)
                 .ToList();
             _eventValidationService.CheckIfEventExists(@event);
-            @event.IsFull = @event.Participants.Where(p => p.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.Attending).Count() >= @event.MaxParticipants;
+            @event.IsFull = @event.Participants.Count(p => p.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.Attending) >= @event.MaxParticipants;
             var participating = @event.Participants.FirstOrDefault(p => p.UserId == userOrg.UserId);
-            @event.ParticipatingStatus = participating != null ? participating.AttendStatus : (int)ConstBusinessLayer.AttendingStatus.Idle;
+            @event.ParticipatingStatus = participating?.AttendStatus ?? (int)ConstBusinessLayer.AttendingStatus.Idle;
             return @event;
         }
 
@@ -353,12 +344,6 @@ namespace Shrooms.Domain.Services.Events
                     }
                 }
             }
-        }
-
-        private string TranslateEventOptions(string eventOption, string cultureCode)
-        {
-            var culture = new CultureInfo(cultureCode);
-            return ResourceUtilities.GetResourceValue(_resourceManager, eventOption, culture);
         }
 
         private async Task<Event> MapNewEvent(CreateEventDto newEventDto)

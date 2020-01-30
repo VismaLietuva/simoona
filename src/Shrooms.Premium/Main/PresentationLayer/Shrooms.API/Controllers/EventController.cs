@@ -52,7 +52,6 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
         private readonly IOfficeMapService _officeMapService;
         private readonly IAsyncRunner _asyncRunner;
 
-
         public EventController(
             IMapper mapper,
             IEventService eventService,
@@ -139,24 +138,26 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
             }
 
             var createEventDTO = _mapper.Map<CreateEventDto>(eventViewModel);
-            createEventDTO.Offices = new EventOfficesDTO { Value = JsonConvert.SerializeObject(eventViewModel.Offices.Select(p => p.ToString()).ToList())};
+            createEventDTO.Offices = new EventOfficesDTO { Value = JsonConvert.SerializeObject(eventViewModel.Offices.Select(p => p.ToString()).ToList()) };
             SetOrganizationAndUser(createEventDTO);
+            CreateEventDto createdEvent;
+
             var userHubDto = GetUserAndOrganizationHub();
             try
             {
-                var createdEvent = await _eventService.CreateEvent(createEventDTO);
+                createdEvent = await _eventService.CreateEvent(createEventDTO);
+
                 _asyncRunner.Run<NewEventNotifier>(notif =>
                 {
                     notif.Notify(createdEvent, userHubDto);
                 }, GetOrganizationName());
-
             }
             catch (EventException e)
             {
                 return BadRequest(e.Message);
             }
 
-            return Ok();
+            return Ok(new { createdEvent.Id });
         }
 
         [HttpPut]
@@ -170,7 +171,7 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
             }
 
             var eventDTO = _mapper.Map<UpdateEventViewModel, EditEventDTO>(eventViewModel);
-            eventDTO.Offices = new EventOfficesDTO { Value = JsonConvert.SerializeObject(eventViewModel.Offices.Select(p => p.ToString()).ToList())};
+            eventDTO.Offices = new EventOfficesDTO { Value = JsonConvert.SerializeObject(eventViewModel.Offices.Select(p => p.ToString()).ToList()) };
             SetOrganizationAndUser(eventDTO);
             try
             {
@@ -180,6 +181,7 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
             {
                 return BadRequest(e.Message);
             }
+
             return Ok();
         }
 
@@ -196,7 +198,7 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
         [HttpGet]
         [Route("MyEvents")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult GetMyEvents([FromUri]MyEventsOptionsViewModel options, string officeId)
+        public IHttpActionResult GetMyEvents([FromUri] MyEventsOptionsViewModel options, string officeId)
         {
             int? officeIdNullable = null;
 
@@ -314,6 +316,7 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
             {
                 return BadRequest(ModelState);
             }
+
             var updateAttendStatusDTO = _mapper.Map<UpdateAttendStatusViewModel, UpdateAttendStatusDTO>(updateStatusViewModel);
             SetOrganizationAndUser(updateAttendStatusDTO);
             try

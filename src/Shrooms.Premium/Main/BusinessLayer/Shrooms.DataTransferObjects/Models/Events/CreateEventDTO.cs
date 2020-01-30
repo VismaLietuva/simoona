@@ -7,6 +7,8 @@ namespace Shrooms.DataTransferObjects.Models.Events
 {
     public class CreateEventDto : UserAndOrganizationDTO
     {
+        public string Id { get; set; }
+
         public string Name { get; set; }
 
         public string ImageName { get; set; }
@@ -18,7 +20,7 @@ namespace Shrooms.DataTransferObjects.Models.Events
         public DateTime? RegistrationDeadlineDate { get; set; }
 
         public EventRecurrenceOptions Recurrence { get; set; }
-        
+
         public EventOfficesDTO Offices { get; set; }
 
         public bool IsPinned { get; set; }
@@ -38,7 +40,5 @@ namespace Shrooms.DataTransferObjects.Models.Events
         public bool ResetParticipantList { get; set; }
 
         public IEnumerable<NewEventOptionDTO> NewOptions { get; set; }
-
-        public string Id { get; set; }
     }
 }
