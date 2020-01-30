@@ -1,4 +1,4 @@
-(function() {
+(function () {
     'use strict';
 
     angular
@@ -51,17 +51,17 @@
                     vm.enableAction = false;
                     Analytics.trackEvent('Events join', 'isAddColleague: ' + vm.isAddColleague, 'isDetails: ' + vm.isDetails);
 
-                    eventRepository.getEventOptions(eventId).then(function(responseEvent) {
+                    eventRepository.getEventOptions(eventId).then(function (responseEvent) {
                         vm.event.maxChoices = responseEvent.maxOptions;
                         vm.event.availableOptions = responseEvent.options;
                         if (!vm.event.availableOptions.length && !vm.isAddColleague) {
                             var selectedOptions = [];
 
                             var comment = "";
-                            eventRepository.joinEvent(eventId, selectedOptions, attendStatus.Attending, comment).then(function() {
+                            eventRepository.joinEvent(eventId, selectedOptions, attendStatus.Attending, comment).then(function () {
                                 handleEventJoin();
                                 notifySrv.success('events.joinedEvent');
-                            }, function(error) {
+                            }, function (error) {
                                 vm.enableAction = true;
                                 errorHandler.handleErrorMessage(error);
                             });
@@ -78,9 +78,9 @@
                 if (canLeaveEvent()) {
                     vm.enableAction = false;
                     var comment = "";
-                    eventRepository.leaveEvent(eventId, authService.identity.userId, comment).then(function() {
+                    eventRepository.leaveEvent(eventId, authService.identity.userId, comment).then(function () {
                         handleEventLeave();
-                    }, function(error) {
+                    }, function (error) {
                         var errorActions = {
                             repeat: handleEventLeave
                         };
@@ -94,17 +94,16 @@
 
         function updateEventStatus(eventId, changeToAttendStatus, comment) {
             if (vm.enableAction) {
-                eventRepository.updateAttendStatus(changeToAttendStatus, comment, eventId).then(function() {
+                eventRepository.updateAttendStatus(changeToAttendStatus, comment, eventId).then(function () {
                     handleEventJoin();
 
                     if (changeToAttendStatus == attendStatus.MaybeAttending) {
                         notifySrv.success('events.maybeJoiningEvent');
-                    }
-                    else if (changeToAttendStatus == attendStatus.NotAttending) {
+                    } else if (changeToAttendStatus == attendStatus.NotAttending) {
                         notifySrv.success('events.notJoiningEvent');
                     }
 
-                }, function(error) {
+                }, function (error) {
                     vm.enableAction = true;
                     errorHandler.handleErrorMessage(error);
                 });
@@ -117,17 +116,17 @@
                 controller: 'joinCommentController',
                 controllerAs: 'vm',
                 resolve: {
-                    event: function() {
+                    event: function () {
                         return vm.event;
                     },
-                    updateEventStatus: function() {
+                    updateEventStatus: function () {
                         return vm.updateEventStatus;
                     },
-                    changeToAttendStatus: function() {
+                    changeToAttendStatus: function () {
                         return changeToAttendStatus;
                     }
                 }
-              });
+            });
         }
 
         function closeModal() {
@@ -135,7 +134,7 @@
         }
 
         function handleEventLeave() {
-            eventRepository.getEventDetails(vm.event.id).then(function(response) {
+            eventRepository.getEventDetails(vm.event.id).then(function (response) {
                 angular.copy(response, vm.event);
 
                 vm.event.options = response.options;
@@ -148,7 +147,7 @@
 
         function handleEventJoin() {
             if (vm.isDetails) {
-                eventRepository.getEventDetails(vm.event.id).then(function(response) {
+                eventRepository.getEventDetails(vm.event.id).then(function (response) {
                     angular.copy(response, vm.event);
 
                     vm.event.options = response.options;
@@ -165,7 +164,7 @@
 
         function recalculateJoinedParticipants() {
             var participantsCount = 0;
-            vm.event.participants.forEach(function(participant){
+            vm.event.participants.forEach(function (participant) {
                 if (participant.attendStatus == attendStatus.Attending) {
                     participantsCount++;
                 }
@@ -181,14 +180,17 @@
                 controller: 'eventJoinOptionsController',
                 controllerAs: 'vm',
                 resolve: {
-                    event: function() {
+                    event: function () {
                         return vm.event;
                     },
-                    isDetails: function() {
+                    isDetails: function () {
                         return vm.isDetails;
                     },
-                    isAddColleague: function() {
+                    isAddColleague: function () {
                         return vm.isAddColleague;
+                    },
+                    isChangeOptions: function () {
+                        return false;
                     }
                 }
             });
@@ -222,6 +224,5 @@
         function hasDatePassed(date) {
             return moment.utc(date).local().isAfter();
         }
-
     }
 })();
