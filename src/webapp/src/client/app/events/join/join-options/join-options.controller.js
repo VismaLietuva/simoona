@@ -21,6 +21,7 @@
         'event',
         'isDetails',
         'isAddColleague',
+        'isChangeOptions',
         'localeSrv',
         'lodash',
         'attendStatus',
@@ -28,13 +29,14 @@
     ];
 
     function eventJoinOptionsController($state, $uibModalInstance, inputTypes, authService, errorHandler,
-        eventRepository, $translate, notifySrv, event, isDetails, isAddColleague, localeSrv, lodash, attendStatus, optionRules) {
+        eventRepository, $translate, notifySrv, event, isDetails, isAddColleague, isChangeOptions, localeSrv, lodash, attendStatus, optionRules) {
         /* jshint validthis: true */
         var vm = this;
 
         vm.options = event.availableOptions;
         vm.inputType = null;
         vm.isAddColleague = isAddColleague;
+        vm.isChangeOptions = isChangeOptions;
         vm.participants = [];
         vm.selectedOptions = [];
         vm.messageMaximumOptions = localeSrv.formatTranslation('events.eventMaximumOptions', {
@@ -43,6 +45,7 @@
         vm.isActionDisabled = false;
 
         vm.joinEvent = joinEvent;
+        vm.updateOptions = updateOptions;
         vm.closeModal = closeModal;
         vm.selectOption = selectOption;
         vm.isOptionsJoinAvailable = isOptionsJoinAvailable;
@@ -131,8 +134,17 @@
             }
         }
 
+        function updateOptions() {
+            vm.isActionDisabled = true;
+
+            var selectedOptionsId = lodash.map(vm.selectedOptions, 'id');
+
+            eventRepository.updateEventOptions(event.id, selectedOptionsId)
+                .then(handleSuccessPromise, handleErrorPromise);
+        }
+
         function handleSuccessPromise() {
-            if (isDetails || vm.isAddColleague) {
+            if (isDetails || vm.isAddColleague || isChangeOptions) {
                 eventRepository.getEventDetails(event.id).then(function (response) {
                     angular.copy(response, event);
 
@@ -147,7 +159,12 @@
             event.participatingStatus = attendStatus.Attending;
             $uibModalInstance.close();
 
-            notifySrv.success('events.joinedEvent');
+            notifySuccess();
+        }
+
+        function notifySuccess() {
+            var message = isChangeOptions ? 'events.changedEventOptions' : 'events.joinedEvent';
+            notifySrv.success(message);
         }
 
         function handleErrorPromise(error) {

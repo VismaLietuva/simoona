@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Configuration;
-using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
 using Microsoft.AspNet.Identity;
@@ -19,9 +18,9 @@ namespace Shrooms.API
     {
         public static OAuthAuthorizationServerOptions OAuthServerOptions { get; set; }
 
-        public static string JsAppClientId { get; } = ConfigurationManager.AppSettings["AngularClientId"].ToString();
+        public static string JsAppClientId { get; } = ConfigurationManager.AppSettings["AngularClientId"];
 
-        public static string MobileAppClientId { get; } = ConfigurationManager.AppSettings["MobileAppClientId"].ToString();
+        public static string MobileAppClientId { get; } = ConfigurationManager.AppSettings["MobileAppClientId"];
 
         public void ConfigureAuthMiddleware(IAppBuilder app)
         {
@@ -67,45 +66,45 @@ namespace Shrooms.API
                 var googleOAuthOptions = new GoogleOAuth2AuthenticationOptions
                 {
                     Provider = new CustomGoogleAuthProvider(container),
-                    ClientId = ConfigurationManager.AppSettings["GoogleAccountClientId"].ToString(),
-                    ClientSecret = ConfigurationManager.AppSettings["GoogleAccountClientSecret"].ToString()
+                    ClientId = ConfigurationManager.AppSettings["GoogleAccountClientId"],
+                    ClientSecret = ConfigurationManager.AppSettings["GoogleAccountClientSecret"]
                 };
                 app.UseGoogleAuthentication(googleOAuthOptions);
             }
 
-            if (!HasProviderSettings("FacebookAccountAppId", "FacebookAccountAppSecret"))
+            if (HasProviderSettings("FacebookAccountAppId", "FacebookAccountAppSecret"))
             {
-                return;
+                var facebookOAuthOptions = new FacebookAuthenticationOptions
+                {
+                    Provider = new CustomFacebookAuthProvider(container),
+                    AppId = ConfigurationManager.AppSettings["FacebookAccountAppId"],
+                    AppSecret = ConfigurationManager.AppSettings["FacebookAccountAppSecret"],
+                    Scope = { "public_profile", "email" },
+                    Fields = { "email", "name", "first_name", "last_name", "picture.width(800).height(800)" }
+                };
+                app.UseFacebookAuthentication(facebookOAuthOptions);
             }
-
-            var facebookOAuthOptions = new FacebookAuthenticationOptions
-            {
-                Provider = new CustomFacebookAuthProvider(container),
-                AppId = ConfigurationManager.AppSettings["FacebookAccountAppId"].ToString(),
-                AppSecret = ConfigurationManager.AppSettings["FacebookAccountAppSecret"].ToString(),
-                Scope = { "public_profile", "email" },
-                Fields = { "email", "name", "first_name", "last_name", "picture.width(800).height(800)" }
-            };
-            app.UseFacebookAuthentication(facebookOAuthOptions);
         }
 
         private static bool HasProviderSettings(string idKey, string secretKey)
         {
-            return !string.IsNullOrEmpty(ConfigurationManager.AppSettings[idKey].ToString()) &&
-                !string.IsNullOrEmpty(ConfigurationManager.AppSettings[secretKey].ToString());
+            return !string.IsNullOrEmpty(ConfigurationManager.AppSettings[idKey]) &&
+                !string.IsNullOrEmpty(ConfigurationManager.AppSettings[secretKey]);
         }
 
         public class QueryStringBearerAuthProvider : OAuthBearerAuthenticationProvider
         {
             public override Task RequestToken(OAuthRequestTokenContext context)
             {
-                if (context.Request.Path.Value.StartsWith("/signalr"))
+                if (!context.Request.Path.Value.StartsWith("/signalr"))
                 {
-                    var token = context.Request.Query.Get("token");
-                    if (token != null)
-                    {
-                        context.Token = token;
-                    }
+                    return Task.FromResult(context);
+                }
+
+                var token = context.Request.Query.Get("token");
+                if (token != null)
+                {
+                    context.Token = token;
                 }
 
                 return Task.FromResult(context);

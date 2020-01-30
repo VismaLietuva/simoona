@@ -1,5 +1,5 @@
 <div>
-    <div ng-if="!vm.AttendingParticipants.length" class="event-no-participants text-center"
+    <div ng-if="!vm.attendingParticipants(vm.participants).length" class="event-no-participants text-center"
         data-test-id="event-no-participants-options" translate="events.eventNoParticipantsOptions"></div>
     <uib-accordion ng-if="!!vm.participants.length" class="event-participant-options-accordion" close-others="false">
         <div uib-accordion-group ng-repeat="option in vm.options track by option.id"
