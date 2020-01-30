@@ -413,7 +413,8 @@ namespace Shrooms.Domain.Services.Events.Participation
                     x.EventParticipants.Any(p => p.ApplicationUserId == userId &&
                                                  p.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.Attending) &&
                     SqlFunctions.DatePart("wk", x.StartDate) == SqlFunctions.DatePart("wk", validationDTO.StartDate) &&
-                    x.StartDate.Year == validationDTO.StartDate.Year)
+                    x.StartDate.Year == validationDTO.StartDate.Year &&
+                    x.Id != validationDTO.Id)
                 .ToList();
 
             var filteredEvents = RemoveEventsWithOptionRule(events, OptionRules.IgnoreSingleJoin, userId);
