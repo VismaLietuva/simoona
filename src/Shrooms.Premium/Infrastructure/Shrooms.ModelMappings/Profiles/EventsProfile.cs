@@ -37,7 +37,9 @@ namespace Shrooms.ModelMappings.Profiles
                 .ForMember(dest => dest.OfficeIds, opt => opt.MapFrom(u => JsonConvert.DeserializeObject<string[]>(u.Offices.Value)));
             CreateMap<EventOptionsDTO, EventOptionsViewModel>();
 
-            CreateMap<EventChangeOptionViewModel, EventChangeOptionsDTO>();
+            CreateMap<EventChangeOptionViewModel, EventChangeOptionsDTO>()
+                .Ignore(x => x.OrganizationId)
+                .Ignore(x => x.UserId);
         }
 
         private void CreateViewModelToDtoMappings()
