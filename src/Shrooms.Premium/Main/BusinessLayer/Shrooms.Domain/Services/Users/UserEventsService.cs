@@ -24,13 +24,13 @@ namespace Shrooms.Domain.Services.Users
 
         public IEnumerable<string> GetUsersWithAppReminders(int eventTypeId)
         {
-            return GetUserWithoutEventThisWeek(eventTypeId, x => x.NotificationsSettings.EventWeeklyReminderAppNotifications)
+            return GetUserWithoutEventThisWeek(eventTypeId, x => x.NotificationsSettings == null || x.NotificationsSettings.EventWeeklyReminderAppNotifications)
                 .Select(x => x.Id);
         }
 
         public IEnumerable<string> GetUsersWithEmailReminders(int eventTypeId)
         {
-            return GetUserWithoutEventThisWeek(eventTypeId, x => x.NotificationsSettings.EventWeeklyReminderEmailNotifications)
+            return GetUserWithoutEventThisWeek(eventTypeId, x => x.NotificationsSettings == null || x.NotificationsSettings.EventWeeklyReminderEmailNotifications)
                 .Select(x => x.Email);
         }
 

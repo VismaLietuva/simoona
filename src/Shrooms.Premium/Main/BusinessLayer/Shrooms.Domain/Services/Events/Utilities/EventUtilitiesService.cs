@@ -83,7 +83,7 @@ namespace Shrooms.Domain.Services.Events.Utilities
                     IsSingleJoin = x.IsSingleJoin,
                     SendWeeklyReminders = x.SendWeeklyReminders,
                     Name = x.Name,
-                    HasActiveEvents = x.Events.Any(e => e.EndDate > DateTime.UtcNow 
+                    HasActiveEvents = x.Events.Any(e => e.EndDate > DateTime.UtcNow
                                                      || e.EventRecurring != EventRecurrenceOptions.None)
                 })
                 .SingleOrDefault();
