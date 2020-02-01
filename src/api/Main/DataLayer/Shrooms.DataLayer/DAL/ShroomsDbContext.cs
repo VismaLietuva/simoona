@@ -252,7 +252,9 @@ namespace Shrooms.DataLayer.DAL
 
         private static void UpdateEntityMetadata(IEnumerable<DbEntityEntry> entries)
         {
+            var now = DateTime.UtcNow;
             var trackableItems = entries.Where(p => p.Entity is ITrackable);
+
             foreach (var entry in trackableItems)
             {
                 if (entry.Entity is ITrackable trackableEntry)
@@ -265,12 +267,13 @@ namespace Shrooms.DataLayer.DAL
 
                     if (entry.State == EntityState.Added)
                     {
-                        trackableEntry.Created = DateTime.UtcNow;
+                        trackableEntry.Created = now;
+                        trackableEntry.Modified = now;
                         trackableEntry.CreatedBy = userId;
                     }
                     else if (entry.State == EntityState.Deleted || entry.State == EntityState.Modified)
                     {
-                        trackableEntry.Modified = DateTime.UtcNow;
+                        trackableEntry.Modified = now;
                         trackableEntry.ModifiedBy = userId;
                     }
                 }
