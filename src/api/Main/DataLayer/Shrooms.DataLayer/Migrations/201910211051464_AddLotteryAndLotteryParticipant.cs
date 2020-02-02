@@ -46,9 +46,8 @@ namespace Shrooms.DataLayer.Migrations
                 .ForeignKey("dbo.AspNetUsers", t => t.UserId)
                 .Index(t => t.LotteryId)
                 .Index(t => t.UserId);
-            
         }
-        
+
         public override void Down()
         {
             DropForeignKey("dbo.LotteryParticipants", "UserId", "dbo.AspNetUsers");

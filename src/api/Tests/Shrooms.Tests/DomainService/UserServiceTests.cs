@@ -382,35 +382,6 @@ namespace Shrooms.UnitTests.DomainService
             return roles;
         }
 
-        //        UserId = "userToDelete",
-        //                    Wall = new Wall()
-        //                    UserId = "userToDelete",
-        //                    Wall = new Wall()
-        //                    UserId = "userToDelete2",
-        //                    Wall = new Wall()
-        //                }
-        //};
-
-        //var wallModerators = new List<WallModerator>
-        //            {
-        //                new WallModerator
-        //                {
-        //                    WallId = 1,
-        //                    UserId = "userToDelete",
-        //                    Wall = new Wall()
-        //                },
-        //                new WallModerator
-        //                {
-        //                    WallId = 2,
-        //                    UserId = "userToDelete",
-        //                    Wall = new Wall()
-        //                },
-        //                new WallModerator
-        //                {
-        //                    WallId = 3,
-        //                    UserId = "userToDelete",
-        //                    Wall = new Wall()
-        //            _wallModeratorsDbSet.SetDbSetData(wallModerators.AsQueryable());
         private IEnumerable<ApplicationUser> MockUsers()
         {
             return new List<ApplicationUser>
@@ -425,7 +396,7 @@ namespace Shrooms.UnitTests.DomainService
                         {
                             WallId = 1,
                             UserId = "1"
-                        },
+                        }
                     }
                 },
                 new ApplicationUser
@@ -438,7 +409,7 @@ namespace Shrooms.UnitTests.DomainService
                         {
                             WallId = 1,
                             UserId = "2"
-                        },
+                        }
                     }
                 },
                 new ApplicationUser
@@ -452,11 +423,11 @@ namespace Shrooms.UnitTests.DomainService
                             WallId = 1,
                             UserId = "3"
                         },
-                         new WallMember
+                        new WallMember
                         {
                             WallId = 2,
                             UserId = "3"
-                        },
+                        }
                     }
                 }
             };
@@ -569,7 +540,7 @@ namespace Shrooms.UnitTests.DomainService
                             UserId = "3",
                             EmailNotificationsEnabled = true
                         },
-                         new WallMember
+                        new WallMember
                         {
                             WallId = 2,
                             UserId = "3",

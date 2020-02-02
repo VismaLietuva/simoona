@@ -77,9 +77,8 @@ namespace Shrooms.DataLayer.Migrations
                 .Index(t => t.EmployeeId)
                 .Index(t => t.BadgeTypeId)
                 .Index(t => t.OrganizationId);
-            
         }
-        
+
         public override void Down()
         {
             DropForeignKey("dbo.BadgeLogs", "OrganizationId", "dbo.Organizations");

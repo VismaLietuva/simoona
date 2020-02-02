@@ -191,7 +191,7 @@ namespace Shrooms.API.Controllers
             var userAndOrg = GetUserAndOrganization();
             try
             {
-                _postService.ToggleWatch(post.Id, userAndOrg,true);
+                _postService.ToggleWatch(post.Id, userAndOrg, true);
             }
             catch (ValidationException e)
             {

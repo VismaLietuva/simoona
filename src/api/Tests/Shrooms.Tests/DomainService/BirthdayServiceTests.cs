@@ -30,79 +30,79 @@ namespace Shrooms.UnitTests.DomainService
 
         private IQueryable<ApplicationUser> MockUsers()
         {
-            return new List<ApplicationUser>()
+            return new List<ApplicationUser>
             {
-                new ApplicationUser()
+                new ApplicationUser
                 {
                     Id = "testUserId",
                     FirstName = "Name",
                     LastName = "Surname",
                     BirthDay = new DateTime(1993, 11, 30),
                 },
-                new ApplicationUser()
+                new ApplicationUser
                 {
                     Id = "testUserId2",
                     FirstName = "Name",
                     LastName = "Surname",
                     BirthDay = new DateTime(1988, 12, 05),
                 },
-                new ApplicationUser()
+                new ApplicationUser
                 {
                     Id = "testUserId3",
                     FirstName = "Name",
                     LastName = "Surname",
                     BirthDay = new DateTime(2000, 12, 06),
                 },
-                new ApplicationUser()
+                new ApplicationUser
                 {
                     Id = "testUserId4",
                     FirstName = "Name",
                     LastName = "Surname",
                     BirthDay = new DateTime(2015, 11, 28),
                 },
-                 new ApplicationUser()
+                new ApplicationUser
                 {
                     Id = "testUserId5",
                     FirstName = "Name",
                     LastName = "Surname",
                     BirthDay = new DateTime(2015, 11, 29),
                 },
-                new ApplicationUser()
+                new ApplicationUser
                 {
                     Id = "testUserId6",
                     FirstName = "Name",
                     LastName = "Surname",
                     BirthDay = new DateTime(1930, 12, 11),
                 },
-                new ApplicationUser()
+                new ApplicationUser
                 {
                     Id = "christmasBirthdayUser",
                     FirstName = "Name",
                     LastName = "Surname",
                     BirthDay = new DateTime(1985, 12, 27),
                 },
-                new ApplicationUser()
+                new ApplicationUser
                 {
                     Id = "newYearBirthdayUser",
                     FirstName = "Name",
                     LastName = "Surname",
                     BirthDay = new DateTime(1985, 01, 01),
                 },
-                new ApplicationUser()
+                new ApplicationUser
                 {
                     Id = "februaryBirthdayUser1",
                     FirstName = "Name",
                     LastName = "Surname",
                     BirthDay = new DateTime(2012, 02, 29),
                 },
-                new ApplicationUser()
+                new ApplicationUser
                 {
                     Id = "februaryBirthdayUser2",
                     FirstName = "Name",
                     LastName = "Surname",
                     BirthDay = new DateTime(1985, 02, 28),
                 },
-                new ApplicationUser()
+                new ApplicationUser
                 {
                     Id = "februaryBirthdayUser3",
                     FirstName = "Name",

@@ -50,7 +50,7 @@ namespace Shrooms.API.Controllers
         }
 
         /// <summary>
-        /// Change user localization settings (Language, Timezone)
+        /// Change user localization settings (Language, Timezone).
         /// </summary>
         /// <param name="localizationSettings">Pass languageCode and timeZoneId</param>
         /// <response code="200">Settings updated</response>
