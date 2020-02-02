@@ -112,7 +112,9 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.ServiceReques
                 .FirstOrDefault();
 
             if (email == null)
+            {
                 return;
+            }
 
             var subject = Resources.Common.ServiceRequestAdminChangedStatusSubject;
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organizationName);

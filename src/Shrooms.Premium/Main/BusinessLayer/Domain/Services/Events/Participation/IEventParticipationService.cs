@@ -26,5 +26,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Participatio
         IEnumerable<EventUserSearchResultDTO> SearchForEventJoinAutocomplete(Guid eventId, string searchString, UserAndOrganizationDTO userOrg);
 
         int GetMaxParticipantsCount(UserAndOrganizationDTO userAndOrganizationDTO);
+
+        void UpdateSelectedOptions(EventChangeOptionsDTO changeOptionsDTO);
     }
 }

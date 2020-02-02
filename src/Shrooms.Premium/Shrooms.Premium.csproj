@@ -345,6 +345,7 @@
     <Compile Include="Main\BusinessLayer\DataTransferObjects\Models\Committees\CommitteePostDTO.cs" />
     <Compile Include="Main\BusinessLayer\DataTransferObjects\Models\Committees\CommitteeSuggestionCreatedDto.cs" />
     <Compile Include="Main\BusinessLayer\DataTransferObjects\Models\Committees\CommitteeSuggestionPostDTO.cs" />
+    <Compile Include="Main\BusinessLayer\DataTransferObjects\Models\Events\EventChangeOptionsDTO.cs" />
     <Compile Include="Main\BusinessLayer\DataTransferObjects\Models\Events\EventOfficesDTO.cs" />
     <Compile Include="Main\BusinessLayer\DataTransferObjects\Models\Events\NewEventOptionDTO.cs" />
     <Compile Include="Main\BusinessLayer\DataTransferObjects\Models\Events\UpdateAttendStatusDTO.cs" />
@@ -519,6 +520,7 @@
     <Compile Include="Main\PresentationLayer\WebViewModels\Models\Committees\CommitteeViewModel.cs" />
     <Compile Include="Main\PresentationLayer\WebViewModels\Models\Events\CreateEventTypeViewModel.cs" />
     <Compile Include="Main\PresentationLayer\WebViewModels\Models\Events\CreateEventViewModel.cs" />
+    <Compile Include="Main\PresentationLayer\WebViewModels\Models\Events\EventChangeOptionViewModel.cs" />
     <Compile Include="Main\PresentationLayer\WebViewModels\Models\Events\EventDetailsCommentViewModel.cs" />
     <Compile Include="Main\PresentationLayer\WebViewModels\Models\Events\EventDetailsOptionViewModel.cs" />
     <Compile Include="Main\PresentationLayer\WebViewModels\Models\Events\EventDetailsParticipantViewModel.cs" />
@@ -570,6 +572,7 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="RecycleWebapp" BeforeTargets="Clean" Condition=" '$(Configuration)|$(Platform)' != 'Release|AnyCPU' ">
     <Message Text="Recycling web app..." Importance="High" />

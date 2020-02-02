@@ -20,6 +20,7 @@ using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Participation;
 using Shrooms.Premium.Main.BusinessLayer.DomainExceptions.Event;
 using Shrooms.Premium.Main.BusinessLayer.DomainServiceValidators.Events;
 using Shrooms.UnitTests.Extensions;
+using Shrooms.Constants.BusinessLayer.Events;
 
 namespace Shrooms.Premium.UnitTests.DomainService.EventServices
 {
@@ -388,6 +389,100 @@ namespace Shrooms.Premium.UnitTests.DomainService.EventServices
             var result = _eventParticipationService.SearchForEventJoinAutocomplete(eventId, searchString, userOrg).ToList();
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual("user1", result.First().Id);
+        }
+
+        [Test]
+        public void Should_Throw_When_Event_Not_Found()
+        {
+            var dto = new EventChangeOptionsDTO { EventId = Guid.Empty, OrganizationId = 1 };
+            _eventsDbSet.SetDbSetData(new List<Event> { new Event { Id = Guid.NewGuid(), OrganizationId = 1} }.AsQueryable());
+            _eventValidationServiceMock
+                .When(x => x.CheckIfEventExists((object) null))
+                .Do(x => throw new EventException(PremiumErrorCodes.EventDoesNotExistCode));
+
+            Assert.Throws<EventException>(() => _eventParticipationService.UpdateSelectedOptions(dto), PremiumErrorCodes.EventDoesNotExistCode);
+        }
+
+        [Test]
+        public void Should_Throw_When_Registration_Deadline_Expired()
+        {
+            var guid = MockEventWithOptions();
+            var dto = new EventChangeOptionsDTO { EventId = guid, OrganizationId = 2, ChosenOptions = new List<int> { 1 }};
+            _eventValidationServiceMock
+                .When(x => x.CheckIfRegistrationDeadlineIsExpired(DateTime.Parse("2016-04-05")))
+                .Do(x => throw new EventException(PremiumErrorCodes.EventRegistrationDeadlineIsExpired));
+
+            Assert.Throws<EventException>(() => _eventParticipationService.UpdateSelectedOptions(dto), PremiumErrorCodes.EventRegistrationDeadlineIsExpired);
+        }
+
+        [Test]
+        public void Should_Throw_When_Chosen_Options_Invalid()
+        {
+            var guid = MockEventWithOptions();
+            var chosenOptionIds = new List<int> { -9999 };
+            var dto = new EventChangeOptionsDTO { EventId = guid, OrganizationId = 2, ChosenOptions = chosenOptionIds};
+            _eventValidationServiceMock
+                .When(x =>
+                    x.CheckIfProvidedOptionsAreValid(chosenOptionIds,
+                        Arg.Is<ICollection<EventOption>>(a => a.Count == 0)))
+                .Do(x => throw new EventException(PremiumErrorCodes.EventRegistrationDeadlineIsExpired));
+
+            Assert.Throws<EventException>(() => _eventParticipationService.UpdateSelectedOptions(dto), PremiumErrorCodes.EventNoSuchOptionsCode);
+        }
+
+        [Test]
+        public void Should_Throw_When_Not_Enough_Options_Chosen()
+        {
+            var guid = MockEventWithOptions();
+            var chosenOptionIds = new List<int>();
+            var dto = new EventChangeOptionsDTO { EventId = guid, OrganizationId = 2, ChosenOptions = chosenOptionIds};
+            _eventValidationServiceMock
+                .When(x => x.CheckIfJoiningNotEnoughChoicesProvided(1, 0))
+                .Do(x => throw new EventException(PremiumErrorCodes.EventNotEnoughChoicesProvidedCode));
+
+            Assert.Throws<EventException>(() => _eventParticipationService.UpdateSelectedOptions(dto), PremiumErrorCodes.EventNotEnoughChoicesProvidedCode);
+        }
+
+        [Test]
+        public void Should_Throw_When_Too_Many_Options_Chosen()
+        {
+            var guid = MockEventWithOptions();
+            var chosenOptionIds = new List<int> { 1, 2, 3 };
+            var dto = new EventChangeOptionsDTO { EventId = guid, OrganizationId = 2, ChosenOptions = chosenOptionIds};
+            _eventValidationServiceMock
+                .When(x => x.CheckIfJoiningTooManyChoicesProvided(1, 3))
+                .Do(x => throw new EventException(PremiumErrorCodes.EventTooManyChoicesProvidedCode));
+
+            Assert.Throws<EventException>(() => _eventParticipationService.UpdateSelectedOptions(dto), PremiumErrorCodes.EventTooManyChoicesProvidedCode);
+        }
+
+        [Test]
+        public void Should_Throw_When_Single_Join_Rule_Chosen_With_More_Options()
+        {
+            var guid = MockEventWithOptions();
+            var chosenOptionIds = new List<int> { 1, 4 };
+            var dto = new EventChangeOptionsDTO { EventId = guid, OrganizationId = 2, ChosenOptions = chosenOptionIds};
+            _eventValidationServiceMock
+                .When(x => x.CheckIfSingleChoiceSelectedWithRule(
+                        Arg.Is<ICollection<EventOption>>(a =>
+                            a.Any(e => e.Rule == OptionRules.IgnoreSingleJoin) && a.Count > 1), OptionRules.IgnoreSingleJoin))
+                .Do(x => throw new EventException(PremiumErrorCodes.EventChoiceCanBeSingleOnly));
+
+            Assert.Throws<EventException>(() => _eventParticipationService.UpdateSelectedOptions(dto), PremiumErrorCodes.EventChoiceCanBeSingleOnly);
+        }
+
+        [Test]
+        public void Should_Throw_When_User_Is_Not_Participating_In_Event()
+        {
+            var guid = MockEventWithOptions();
+            var chosenOptionIds = new List<int> { 1 };
+            var dto = new EventChangeOptionsDTO { EventId = guid, OrganizationId = 2, ChosenOptions = chosenOptionIds, UserId = "1foo2bar"};
+            _eventValidationServiceMock
+                .When(x => x.CheckIfUserParticipatesInEvent("1foo2bar",
+                    Arg.Is<List<string>>(a => a.All(p => p == "user" || p == "user2"))))
+                .Do(x => throw new EventException(PremiumErrorCodes.EventUserNotParticipating));
+
+            Assert.Throws<EventException>(() => _eventParticipationService.UpdateSelectedOptions(dto), PremiumErrorCodes.EventUserNotParticipating);
         }
 
         #region Mocks
@@ -839,6 +934,13 @@ namespace Shrooms.Premium.UnitTests.DomainService.EventServices
                             Id = 3,
                             EventId = guid,
                             Option = "Option3"
+                        },
+                        new EventOption
+                        {
+                            Id = 4,
+                            EventId = guid,
+                            Option = "Option4",
+                            Rule = OptionRules.IgnoreSingleJoin
                         }
                     },
                     Id = guid,

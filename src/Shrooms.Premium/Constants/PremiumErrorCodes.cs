@@ -31,6 +31,7 @@
         public const int EventTypeNameAlreadyExists = 222;
         public const string EventChoiceCanBeSingleOnly = "223";
         public const string EventWrongAttendStatus = "224";
+        public const string EventUserNotParticipating = "225";
 
 
         // Service Request, 7**
