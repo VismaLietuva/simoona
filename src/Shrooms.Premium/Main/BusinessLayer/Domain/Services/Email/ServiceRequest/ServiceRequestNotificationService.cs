@@ -23,11 +23,10 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.ServiceReques
         private readonly IMailingService _mailingService;
         private readonly IMailTemplate _mailTemplate;
 
-        public ServiceRequestNotificationService(
-            IUnitOfWork2 uow,
-            IMailingService mailingService,
-            IMailTemplate mailTemplate,
-            IApplicationSettings appSettings)
+        public ServiceRequestNotificationService(IUnitOfWork2 uow,
+                                                 IMailingService mailingService,
+                                                 IMailTemplate mailTemplate,
+                                                 IApplicationSettings appSettings)
         {
             _organizationsDbSet = uow.GetDbSet<Organization>();
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
@@ -37,7 +36,6 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.ServiceReques
             _mailingService = mailingService;
             _mailTemplate = mailTemplate;
             _appSettings = appSettings;
-
         }
 
         public void NotifyAboutNewServiceRequest(CreatedServiceRequestDTO createdServiceRequest)

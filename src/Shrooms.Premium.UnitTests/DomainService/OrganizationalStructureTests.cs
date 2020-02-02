@@ -36,7 +36,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
         [Test]
         public void Should_Return_If_Result_Has_Incorrect_Info()
         {
-            var userAndOrg = new UserAndOrganizationDTO()
+            var userAndOrg = new UserAndOrganizationDTO
             {
                 OrganizationId = 1,
                 UserId = "0"
@@ -57,9 +57,9 @@ namespace Shrooms.Premium.UnitTests.DomainService
 
         private IQueryable<ApplicationUser> MockUsers()
         {
-            return new List<ApplicationUser>()
+            return new List<ApplicationUser>
             {
-                new ApplicationUser()
+                new ApplicationUser
                 {
                     Id = "1",
                     FirstName = "Name1",
@@ -67,7 +67,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
                     IsManagingDirector = true,
                     OrganizationId = 1
                 },
-                new ApplicationUser()
+                new ApplicationUser
                 {
                     Id = "2",
                     FirstName = "Name2",
@@ -76,7 +76,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
                     ManagerId = "1",
                     OrganizationId = 1
                 },
-                new ApplicationUser()
+                new ApplicationUser
                 {
                     Id = "3",
                     FirstName = "Name3",
@@ -85,7 +85,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
                     ManagerId = "1",
                     OrganizationId = 1
                 },
-                new ApplicationUser()
+                new ApplicationUser
                 {
                     Id = "4",
                     FirstName = "Name4",
@@ -94,7 +94,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
                     ManagerId = "2",
                     OrganizationId = 1
                 },
-                 new ApplicationUser()
+                new ApplicationUser
                 {
                     Id = "5",
                     FirstName = "Name5",
@@ -103,7 +103,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
                     ManagerId = "4",
                     OrganizationId = 1
                 },
-                new ApplicationUser()
+                new ApplicationUser
                 {
                     Id = "6",
                     FirstName = "Name6",

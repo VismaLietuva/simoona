@@ -1,8 +1,8 @@
-﻿using NSubstitute;
+﻿using System.Collections.Generic;
+using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.EntityModels.Models;
-using System.Collections.Generic;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.Event;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Utilities;
@@ -89,7 +89,7 @@ namespace Shrooms.Premium.UnitTests.DomainService.EventServices
             {
                 Id = 1
             };
-            var users = (IEnumerable<string>) new List<string> { "" };
+            var users = (IEnumerable<string>)new List<string> { "" };
             _eventUtilitiesService.GetEventTypesToRemind(1).Returns(new List<EventTypeDTO> { eventType });
             _eventUtilitiesService.AnyEventsThisWeekByType(eventType.Id).Returns(true);
             _userEventsService.GetUsersWithAppReminders(eventType.Id).Returns(users);

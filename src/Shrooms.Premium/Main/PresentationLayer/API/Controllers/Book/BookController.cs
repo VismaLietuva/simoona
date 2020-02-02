@@ -241,7 +241,7 @@ namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers.Book
             var userAndOrg = GetUserAndOrganization();
             try
             {
-                 _bookService.TakeBook(bookOfficeId, userAndOrg);
+                _bookService.TakeBook(bookOfficeId, userAndOrg);
                 return Ok();
             }
             catch (BookException e)

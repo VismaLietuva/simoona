@@ -51,7 +51,5 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.Book
 
             _mailingService.SendEmail(new EmailDto(userEmail, subject, body));
         }
-
-
     }
 }

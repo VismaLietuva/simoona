@@ -472,7 +472,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
                         LastName = "user"
                     }
                 },
-                 new BookLog()
+                new BookLog()
                 {
                     Id = 6,
                     Returned = null,

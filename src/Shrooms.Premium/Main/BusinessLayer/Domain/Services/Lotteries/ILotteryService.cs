@@ -21,7 +21,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Lotteries
 
         Task FinishLotteryAsync(int lotteryId, UserAndOrganizationDTO userOrg);
 
-        LotteryStatsDTO GetLotteryStats (int lotteryId, UserAndOrganizationDTO userOrg);
+        LotteryStatsDTO GetLotteryStats(int lotteryId, UserAndOrganizationDTO userOrg);
 
         Task BuyLotteryTicketAsync(BuyLotteryTicketDTO lotteryTicketDTO, UserAndOrganizationDTO userOrg);
 

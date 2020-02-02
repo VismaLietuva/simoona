@@ -23,6 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>3</WarningLevel>
+    <CodeAnalysisRuleSet>$(SimoonaCoreLocation)\src\api\shared.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,7 +32,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>$(SimoonaCoreLocation)\src\api\Main\PresentationLayer\Shrooms.API\Shrooms.API.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>$(SimoonaCoreLocation)\src\api\shared.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Autofac, Version=4.9.2.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
@@ -569,7 +570,7 @@
     <Compile Include="Infrastructure\IoC\Modules\ServiceRequestModule.cs" />
   </ItemGroup>
   <ItemGroup>
-    <AdditionalFiles Include="..\..\open-source\src\api\stylecop.json">
+    <AdditionalFiles Include="$(SimoonaCoreLocation)\src\api\stylecop.json">
       <Link>stylecop.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </AdditionalFiles>
@@ -578,7 +579,10 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Analyzer Include="..\..\open-source\src\api\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
+    <Analyzer Include="..\..\open-source\src\api\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="RecycleWebapp" BeforeTargets="Clean" Condition=" '$(Configuration)|$(Platform)' != 'Release|AnyCPU' ">
     <Message Text="Recycling web app..." Importance="High" />

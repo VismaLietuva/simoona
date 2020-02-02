@@ -9,7 +9,9 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain
             ApplicationUser y)
         {
             if (x == null || y == null)
+            {
                 return false;
+            }
 
             return x.Id.Equals(y.Id);
         }

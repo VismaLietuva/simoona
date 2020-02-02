@@ -21,6 +21,5 @@ namespace Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Committees
         public ICollection<ApplicationUserViewModel> Leads { get; set; }
 
         public ICollection<ApplicationUserViewModel> Delegates { get; set; }
-
     }
 }

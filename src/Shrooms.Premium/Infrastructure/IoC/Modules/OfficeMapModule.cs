@@ -4,7 +4,7 @@ using Shrooms.Infrastructure.Interceptors;
 
 namespace Shrooms.Premium.Infrastructure.IoC.Modules
 {
-    class OfficeMapModule : Module
+    public class OfficeMapModule : Module
     {
         protected override void Load(ContainerBuilder builder)
         {

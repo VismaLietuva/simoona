@@ -61,14 +61,12 @@ namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers.Lotteries
             };
 
             return Ok(pagedLotteriesViewModel);
-
         }
 
         [HttpGet]
         [Route("{id}/Details")]
         public IHttpActionResult GetLottery(int id)
         {
-
             var lotteryDTO = _lotteryService.GetLotteryDetails(id, GetUserAndOrganization());
 
             if (lotteryDTO == null)
@@ -112,7 +110,7 @@ namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers.Lotteries
         public IHttpActionResult Abort(int id)
         {
             var success = _lotteryService.AbortLottery(id, GetUserAndOrganization());
-            if(!success)
+            if (!success)
             {
                 return Content((HttpStatusCode)422, "Lottery with such ID was not found");
             }
@@ -219,7 +217,7 @@ namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers.Lotteries
         {
             var lotteryStats = _lotteryService.GetLotteryStats(id, GetUserAndOrganization());
 
-            if(lotteryStats == null)
+            if (lotteryStats == null)
             {
                 return Content((HttpStatusCode)422, "Lottery with such ID was not found");
             }

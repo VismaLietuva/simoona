@@ -16,7 +16,6 @@ namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers.Kudos
     [RoutePrefix("KudosShop")]
     public class KudosShopController : BaseController
     {
-
         private readonly IMapper _mapper;
         private readonly IKudosShopService _kudosShopService;
 

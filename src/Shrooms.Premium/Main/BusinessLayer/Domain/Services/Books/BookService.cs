@@ -262,7 +262,6 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Books
             var emailData = new EmailDto(receivers, subject, content);
 
             _mailingService.SendEmail(emailData);
-
         }
 
         public void AddBook(NewBookDTO bookDto)

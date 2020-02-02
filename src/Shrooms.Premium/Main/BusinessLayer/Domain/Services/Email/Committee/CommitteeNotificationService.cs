@@ -46,7 +46,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.Committee
             }
 
             var suggestion = _suggestionDbSet.Find(createdDto.SuggestionId);
-            if(suggestion==null)
+            if (suggestion == null)
             {
                 throw new ServiceException($"Suggestion {createdDto.SuggestionId} for committee {createdDto.CommitteeId} not found");
             }

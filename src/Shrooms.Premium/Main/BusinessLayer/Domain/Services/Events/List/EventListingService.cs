@@ -65,8 +65,8 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.List
 
         public IEnumerable<EventListItemDTO> GetEventsByTypeAndOffice(UserAndOrganizationDTO userOrganization, int? typeId = null, int? officeId = null)
         {
-            string officeSearchString = officeId != null ? $"\"{officeId.ToString()}\"" : "[]";
-            IList < EventListItemDTO > events = _eventsDbSet
+            var officeSearchString = officeId != null ? $"\"{officeId.ToString()}\"" : "[]";
+            IList<EventListItemDTO> events = _eventsDbSet
                 .Include(x => x.EventParticipants)
                 .Where(t =>
                     t.OrganizationId == userOrganization.OrganizationId &
@@ -83,7 +83,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.List
 
         public IEnumerable<EventListItemDTO> GetMyEvents(MyEventsOptionsDTO options, int? officeId = null)
         {
-            string officeSearchString = officeId != null ? $"\"{officeId.ToString()}\"" : "[]";
+            var officeSearchString = officeId != null ? $"\"{officeId.ToString()}\"" : "[]";
             var myEventFilter = EventFilters[options.Filter](options.UserId);
             var events = _eventsDbSet
                 .Include(x => x.EventParticipants)
@@ -130,7 +130,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.List
             {
                 Id = e.Id,
                 ImageName = e.ImageName,
-                Offices = new EventOfficesDTO { Value = e.Offices},
+                Offices = new EventOfficesDTO { Value = e.Offices },
                 MaxParticipants = e.MaxParticipants,
                 IsPinned = e.IsPinned,
                 Name = e.Name,

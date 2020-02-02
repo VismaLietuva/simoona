@@ -25,13 +25,13 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Lotteries
 
             foreach (var participant in participantsDTO)
             {
-                for(int i = 0; i < participant.Tickets; i++)
+                for (int i = 0; i < participant.Tickets; i++)
                 {
                     participantTickets.Add(participant.FullName);
 
                     numberOfTicketsAdded++;
 
-                    if(numberOfTicketsAdded % BusinessLayerConstants.LotteryParticipantsInRow == 0)
+                    if (numberOfTicketsAdded % BusinessLayerConstants.LotteryParticipantsInRow == 0)
                     {
                         tickets.Add(participantTickets);
                         participantTickets = new List<string>();

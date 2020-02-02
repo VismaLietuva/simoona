@@ -44,13 +44,11 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Books
 
                         _uow.SaveChanges();
                     }
-
                 }
                 catch (Exception ex)
                 {
                     _logger.Error(ex);
                 }
-
             }
         }
     }

@@ -22,7 +22,8 @@ namespace Shrooms.Premium.UnitTests.DomainService.VacationService
         {
             const string fullName = "x y z";
 
-            IList<ApplicationUser> users = new List<ApplicationUser> {
+            IList<ApplicationUser> users = new List<ApplicationUser>
+            {
                 new ApplicationUser { Id = "1", FirstName = "x", LastName = "x" },
                 new ApplicationUser { Id = "2", FirstName = "y", LastName = "y" },
                 new ApplicationUser { Id = "3", FirstName = "z", LastName = "z" },
@@ -47,7 +48,8 @@ namespace Shrooms.Premium.UnitTests.DomainService.VacationService
         {
             const string fullName = "LastName von FirstName";
 
-            IList<ApplicationUser> users = new List<ApplicationUser> {
+            IList<ApplicationUser> users = new List<ApplicationUser>
+            {
                 new ApplicationUser { Id = "1", FirstName = "John", LastName = "Armstrong" },
                 new ApplicationUser { Id = "2", FirstName = "John", LastName = "Lennon" },
                 new ApplicationUser { Id = "3", FirstName = "FirstName", LastName = "von LastName" },
@@ -65,7 +67,8 @@ namespace Shrooms.Premium.UnitTests.DomainService.VacationService
         {
             const string fullName = "LastName von FirstName";
 
-            IList<ApplicationUser> users = new List<ApplicationUser> {
+            IList<ApplicationUser> users = new List<ApplicationUser>
+            {
                 new ApplicationUser { Id = "1", FirstName = "John", LastName = "Armstrong" },
                 new ApplicationUser { Id = "2", FirstName = "John", LastName = "Lennon" },
                 new ApplicationUser { Id = "3", FirstName = "FirstName", LastName = "LastName" },

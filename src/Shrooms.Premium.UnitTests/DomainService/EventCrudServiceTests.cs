@@ -122,7 +122,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
                 Name = "Name",
                 TypeId = 1,
                 ImageName = "qwer",
-                Offices = new EventOfficesDTO { Value = "[\"1\"]",OfficeNames = new List<string> { "office" } },
+                Offices = new EventOfficesDTO { Value = "[\"1\"]", OfficeNames = new List<string> { "office" } },
                 Recurrence = EventRecurrenceOptions.EveryDay,
                 MaxOptions = 0,
                 MaxParticipants = 1,
@@ -183,7 +183,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
                 Recurrence = EventRecurrenceOptions.EveryDay,
                 MaxOptions = 1,
                 MaxParticipants = 1,
-                Offices = new EventOfficesDTO { Value = "[\"1\"]",OfficeNames = new List<string> { "office" } },
+                Offices = new EventOfficesDTO { Value = "[\"1\"]", OfficeNames = new List<string> { "office" } },
                 OrganizationId = 1,
                 ResponsibleUserId = "1",
                 Location = "place",
@@ -901,7 +901,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
                 new Office
                 {
                     Id = 1,
-                    Address = new Address {City = "Vilnius", Building = "Ofisas", Country="Lithuania", Street="Lvovo"},
+                    Address = new Address { City = "Vilnius", Building = "Ofisas", Country="Lithuania", Street="Lvovo" },
                     Name = "office1",
                     OrganizationId = 1
                 }

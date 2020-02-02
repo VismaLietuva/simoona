@@ -211,7 +211,6 @@ namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers
         {
             var model = _commentRepository.Get(includeProperties: "Employee", filter: c => c.ServiceRequestId == requestId);
             return _mapper.Map<IEnumerable<ServiceRequestComment>, IEnumerable<ServiceRequestCommentViewModel>>(model);
-
         }
 
         [HttpPost]

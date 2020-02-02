@@ -176,7 +176,6 @@ namespace Shrooms.Premium.Main.BusinessLayer.DomainServiceValidators.Events
             if (!Enum.IsDefined(typeof(BusinessLayerConstants.AttendingStatus), status))
             {
                 throw new EventException(PremiumErrorCodes.EventWrongAttendStatus);
-
             }
         }
 

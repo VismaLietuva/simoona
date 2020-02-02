@@ -13,6 +13,5 @@ namespace Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Lotteries
         public DateTime StartDate { get; set; }
         public int EntryFee { get; set; }
         public ImagesCollection Images { get; set; }
-
     }
 }

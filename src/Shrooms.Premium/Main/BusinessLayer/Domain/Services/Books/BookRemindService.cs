@@ -51,9 +51,9 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Books
                     var user = _userService.GetApplicationUser(bookToRemind.ApplicationUserId);
                     var organization = _organizationService.GetOrganizationById(bookToRemind.OrganizationId);
                     var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
-                    var subject = string.Format("Book reminder: \"{0}\"", bookToRemind.Title);
+                    var subject = $"Book reminder: \"{bookToRemind.Title}\"";
                     var bookUrl = _appSettings.BookUrl(organization.ShortName, bookToRemind.BookOfficeId, bookToRemind.OfficeId);
-                    var formattedDate = string.Format("{0:D}", bookToRemind.TakenFrom);
+                    var formattedDate = $"{bookToRemind.TakenFrom:D}";
 
                     var bookRemindTemplateViewModel = new BookReminderEmailTemplateViewModel(bookToRemind.Title, bookToRemind.Author, formattedDate, bookUrl, user.FullName, userNotificationSettingsUrl);
                     var content = _mailTemplate.Generate(bookRemindTemplateViewModel, EmailTemplateCacheKeys.BookRemind);
@@ -61,11 +61,10 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Books
                     var emailData = new EmailDto(user.Email, subject, content);
                     _mailingService.SendEmail(emailData);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     _logger.Error(e);
                 }
-
             }
         }
         private Expression<Func<BookLog, BookRemindDTO>> MapBookLogToBookRemindDto()

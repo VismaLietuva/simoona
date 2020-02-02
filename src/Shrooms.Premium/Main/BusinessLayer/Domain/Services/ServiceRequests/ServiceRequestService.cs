@@ -149,7 +149,9 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.ServiceRequests
             var statusHasBeenChanged = serviceRequest.StatusId != serviceRequestDTO.StatusId && isServiceRequestAdmin;
 
             if (!isServiceRequestAdmin && !isServiceRequestCreator && !isServiceRequestCategoryAssignee)
+            {
                 throw new UnauthorizedAccessException();
+            }
 
             if (isServiceRequestAdmin || isServiceRequestCategoryAssignee)
             {

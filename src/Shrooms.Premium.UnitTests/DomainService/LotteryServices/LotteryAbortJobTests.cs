@@ -72,7 +72,7 @@ namespace Shrooms.Premium.UnitTests.DomainService.LotteryServices
                 {
                     Id = 1,
                     OrganizationId = 1,
-                    Status = (int) status
+                    Status = (int)status
                 });
 
             _sut.RefundLottery(default, GetUserOrg());
@@ -89,7 +89,7 @@ namespace Shrooms.Premium.UnitTests.DomainService.LotteryServices
                 {
                     Id = 1,
                     OrganizationId = 1,
-                    Status = (int) BusinessLayerConstants.LotteryStatus.RefundStarted
+                    Status = (int)BusinessLayerConstants.LotteryStatus.RefundStarted
                 });
 
             _sut.RefundLottery(default, GetUserOrg());

@@ -223,6 +223,5 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Committees
 
             return kudosCommittee.Id;
         }
-
     }
 }

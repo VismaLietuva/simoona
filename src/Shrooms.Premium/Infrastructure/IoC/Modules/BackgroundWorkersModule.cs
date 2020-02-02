@@ -4,7 +4,7 @@ using Shrooms.Premium.Main.PresentationLayer.API.BackgroundWorkers;
 
 namespace Shrooms.Premium.Infrastructure.IoC.Modules
 {
-    public class BackgroundWorkersModule: Module
+    public class BackgroundWorkersModule : Module
     {
         protected override void Load(ContainerBuilder builder)
         {

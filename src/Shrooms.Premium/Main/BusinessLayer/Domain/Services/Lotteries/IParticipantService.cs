@@ -11,6 +11,5 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Lotteries
         IEnumerable<LotteryParticipantDTO> GetParticipantsCounted(int lotteryId);
 
         IPagedList<LotteryParticipantDTO> GetPagedParticipants(int id, int page, int pageSize);
-
     }
 }

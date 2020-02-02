@@ -127,7 +127,6 @@ namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers.Book
                     ? null
                     : _mapper.Map<IEnumerable<BookMobileLogDTO>, IEnumerable<BookMobileLogViewModel>>(bookLogsDTO);
                 return Ok(bookLogsViewModel);
-
             }
             catch (BookException e)
             {
