@@ -268,7 +268,7 @@ namespace Shrooms.Domain.Services.UserService
                     .Include(x => x.Wall)
                     .Where(x => x.UserId == userOrg.UserId && x.Wall != null && x.Wall.OrganizationId == userOrg.OrganizationId)
                     .Where(x => x.Wall.Type == WallType.UserCreated || x.Wall.Type == WallType.Main)
-                    .Select(x => new WallNotificationsDto()
+                    .Select(x => new WallNotificationsDto
                     {
                         WallName = x.Wall.Name,
                         WallId = x.WallId,

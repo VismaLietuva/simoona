@@ -41,11 +41,13 @@
     </div>
     <div class="modal-footer">
         <button class="btn btn-primary" ng-click="vm.joinEvent()"
-            ng-disabled="vm.isOptionsJoinAvailable() || vm.isActionDisabled" data-test-id="join-event-modal-button">
+            ng-disabled="vm.isOptionsJoinAvailable() || vm.isActionDisabled" data-test-id="join-event-modal-button"
+            ng-if="!vm.isChangeOptions">
             <span ng-if="!vm.isAddColleague" translate="events.eventJoin"></span>
             <span ng-if="vm.isAddColleague" translate="events.eventAdd"></span>
         </button>
-
+        <button class="btn btn-primary" ng-if="vm.isChangeOptions" translate="common.save" ng-click="vm.updateOptions()">
+        </button>
         <button class="btn btn-default" ng-click="vm.closeModal()" data-test-id="close-event-modal-button">
             <span translate="common.cancel"></span>
         </button>

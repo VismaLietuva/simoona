@@ -63,7 +63,7 @@
   "wrongNumber": "Netinkamas skaičius",
   "export": "Eksportuoti",
   "attend": "Dalyvausiu",
-  "eventLeave": "Nedalyvausiu",
+  "eventLeave": "Palikti",
   "areYouGoing": "Dalyvausi?",  
   "eventAction_Attending": "Dalyvausiu",
   "eventAction_MaybeAttending": "Gal dalyvausiu",
@@ -186,5 +186,6 @@
   "ignoreSingleJoinSelect": "Reikia pasirinkimo prisijungti kaip stebėtojui",
   "ignoreSingleJoinTooltipParagraphOne": "Šis funkcionalumas skirtas renginių tipams, kuriuose leidžiama dalyvauti kartą per savaitę.",
   "ignoreSingleJoinTooltipParagraphTwo": "Tai suteiks vartotojams galimybę prisijungti kaip stebėtojams be jokių šio renginio privalumų, pavyzdžiui, maisto.",
-  "twoOptionsRequired": "Bent du pasirinkimo variantai yra būtini"
+  "twoOptionsRequired": "Bent du pasirinkimo variantai yra būtini",
+  "changedEventOptions": "Sėkmingai pakeitėte renginio pasirinkimo variantus"
 }

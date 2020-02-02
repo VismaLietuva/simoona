@@ -5,6 +5,7 @@ using System.Web.Http;
 using AutoMapper;
 using Shrooms.DataTransferObjects.Models.Notification;
 using Shrooms.Domain.Services.Notifications;
+using Shrooms.EntityModels.Models.Notifications;
 using Shrooms.WebViewModels.Models.Notifications;
 
 namespace Shrooms.API.Controllers
@@ -70,7 +71,7 @@ namespace Shrooms.API.Controllers
             return stackedList;
         }
 
-        private bool CompareSourcesIds(SourcesViewModel viewModel, SourcesDto dtoModel)
+        private static bool CompareSourcesIds(SourcesViewModel viewModel, SourcesDto dtoModel)
         {
             if (viewModel.postId != dtoModel.PostId || viewModel.eventId != dtoModel.EventId || viewModel.projectId != dtoModel.ProjectId || viewModel.wallId != dtoModel.WallId)
             {
