@@ -15,7 +15,7 @@
     <RootNamespace>Shrooms.API</RootNamespace>
     <AssemblyName>Shrooms.API</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <UseIISExpress>true</UseIISExpress>
+    <UseIISExpress>false</UseIISExpress>
     <IISExpressSSLPort>44388</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication>enabled</IISExpressAnonymousAuthentication>
     <IISExpressWindowsAuthentication>enabled</IISExpressWindowsAuthentication>
@@ -36,7 +36,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Shrooms.API.XML</DocumentationFile>
-    <CodeAnalysisRuleSet>Shrooms.API.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>..\..\..\shared.ruleset</CodeAnalysisRuleSet>
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -46,7 +46,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>Shrooms.API.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>..\..\..\shared.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Autofac, Version=4.9.2.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
@@ -548,7 +548,6 @@
     <Content Include="EmailTemplates\Books\BookRemind.cshtml" />
     <Content Include="EmailTemplates\Events\RemindToJoin.cshtml" />
     <Content Include="EmailTemplates\Books\BookReport.cshtml" />
-    <None Include="Shrooms.API.ruleset" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Contracts\Shrooms.Host.Contracts\Shrooms.Host.Contracts.csproj">

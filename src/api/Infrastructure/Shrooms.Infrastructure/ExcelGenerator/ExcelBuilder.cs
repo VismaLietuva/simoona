@@ -18,10 +18,10 @@ namespace Shrooms.Infrastructure.ExcelGenerator
             var worksheet = _package.Workbook.Worksheets.Add(sheetName);
             var worksheetBuilder = new ExcelWorksheetBuilder(worksheet);
 
-                worksheetBuilder
-                    .WithHeader(headerItems)
-                    .WithRows(rows)
-                    .Build();
+            worksheetBuilder
+                .WithHeader(headerItems)
+                .WithRows(rows)
+                .Build();
 
             return this;
         }
