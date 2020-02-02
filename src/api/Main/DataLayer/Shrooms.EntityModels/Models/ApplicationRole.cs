@@ -10,10 +10,6 @@ namespace Shrooms.EntityModels.Models
         {
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="roleName">Role name</param>
-        /// <param name="organizationId">Organization to which this role belongs (if null - role is global)</param>
         public ApplicationRole(string roleName, int organizationId)
             : base(roleName)
         {
@@ -21,27 +17,18 @@ namespace Shrooms.EntityModels.Models
             this.CreatedTime = DateTime.UtcNow;
         }
 
-        /// <summary>
-        /// Role Name
-        /// </summary>
         public new string Name
         {
-            get { return base.Name; }
-            set { base.Name = value; }
+            get => base.Name;
+            set => base.Name = value;
         }
 
         public int OrganizationId { get; set; }
 
         public Organization Organization { get; set; }
 
-        /// <summary>
-        /// Role allowable permissions
-        /// </summary>
         public virtual ICollection<Permission> Permissions { get; set; }
 
-        /// <summary>
-        /// Role create time
-        /// </summary>
         public DateTime CreatedTime { get; set; }
     }
 }

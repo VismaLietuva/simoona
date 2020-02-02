@@ -185,7 +185,7 @@ namespace Shrooms.UnitTests.DomainService
         [Test]
         public void Should_Return_Approved_Kudos_Logs_With_Organization_Filter()
         {
-            var test = _usersDbSet.Find("CreatedUserId");
+            _usersDbSet.Find("CreatedUserId");
 
             MockKudosLogsForApprovedList();
             var result = _kudosService.GetApprovedKudosList("UserId", 1).ToList();
@@ -284,8 +284,8 @@ namespace Shrooms.UnitTests.DomainService
             {
                 OrganizationId = 2,
                 UserId = "testUserId",
-                id = 1,
-                kudosRejectionMessage = "testMessage"
+                Id = 1,
+                KudosRejectionMessage = "testMessage"
             };
 
             _kudosService.RejectKudos(kudosRejectDTO);
@@ -304,8 +304,8 @@ namespace Shrooms.UnitTests.DomainService
             {
                 OrganizationId = 1,
                 UserId = "testUserId",
-                id = 1,
-                kudosRejectionMessage = "testMessage"
+                Id = 1,
+                KudosRejectionMessage = "testMessage"
             };
 
             Assert.Throws<InvalidOperationException>(() => _kudosService.RejectKudos(kudosRejectDTO));

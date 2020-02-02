@@ -5,11 +5,11 @@ namespace Shrooms.API.GeneralCode
 {
     public class NLogExceptionLogger : ExceptionLogger
     {
-        private static readonly Logger NLog = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         public override void Log(ExceptionLoggerContext context)
         {
-            NLog.Log(LogLevel.Error, context.Exception);
+            _logger.Log(LogLevel.Error, context.Exception);
         }
     }
 }

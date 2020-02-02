@@ -10,6 +10,5 @@ namespace Shrooms.WebViewModels.Models.Users.Kudos
         public bool WelcomeKudosIsActive { get; set; }
 
         public string WelcomeKudosComment { get; set; }
-
     }
 }

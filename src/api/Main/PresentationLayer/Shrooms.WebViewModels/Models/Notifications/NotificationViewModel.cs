@@ -4,6 +4,7 @@ namespace Shrooms.WebViewModels.Models.Notifications
 {
     public class NotificationViewModel
     {
+#pragma warning disable SA1300 // Element should begin with upper-case letter
         public int id { get; set; }
 
         public string title { get; set; }
@@ -19,5 +20,6 @@ namespace Shrooms.WebViewModels.Models.Notifications
         public List<int> stackedIds { get; set; }
 
         public int? others { get; set; }
+#pragma warning restore SA1300 // Element should begin with upper-case letter
     }
 }

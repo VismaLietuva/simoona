@@ -1,4 +1,5 @@
-﻿using System.Web.Http.Routing;
+﻿using System;
+using System.Web.Http.Routing;
 
 namespace Shrooms.API.Helpers
 {
@@ -8,7 +9,7 @@ namespace Shrooms.API.Helpers
         {
             var urlPath = helper.Route(route, routeData);
 
-            var pos = urlPath.IndexOf(controllerName ?? "");
+            var pos = urlPath.IndexOf(controllerName ?? "", StringComparison.Ordinal);
 
             return pos < 2 ? urlPath : urlPath.Substring(pos - 1);
         }

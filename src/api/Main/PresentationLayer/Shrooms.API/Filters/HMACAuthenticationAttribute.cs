@@ -11,7 +11,7 @@ using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.API.Filters
 {
-    public class HMACAuthenticationAttribute : Attribute, IAuthenticationFilter
+    public class HmacAuthenticationAttribute : Attribute, IAuthenticationFilter
     {
         private const string OrganizationHeaderName = "Organization";
 

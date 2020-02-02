@@ -10,14 +10,8 @@ namespace Shrooms.UnitTests.Mocks
             ValidateSuccessfully = validateSuccessfully;
         }
 
-        /// <summary>
-        /// If true, then ValidateAsync will return IdentityResult.Success.
-        /// </summary>
         public bool ValidateSuccessfully { get; set; }
 
-        /// <summary>
-        /// True if ValidateAsync was called.
-        /// </summary>
         public bool Validated { get; set; }
 
         public Task<IdentityResult> ValidateAsync(T item)
@@ -27,10 +21,8 @@ namespace Shrooms.UnitTests.Mocks
             {
                 return Task.FromResult(IdentityResult.Success);
             }
-            else
-            {
-                return Task.FromResult(IdentityResult.Failed("Failed"));
-            }
+
+            return Task.FromResult(IdentityResult.Failed("Failed"));
         }
     }
 }

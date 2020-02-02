@@ -23,7 +23,7 @@ namespace Shrooms.API.Providers
         {
             if (jsAppClientId == null || mobileAppClientId == null)
             {
-                throw new ArgumentNullException("no client id provided");
+                throw new ArgumentNullException(nameof(jsAppClientId), "no client id provided");
             }
 
             _ioc = ioc;

@@ -8,8 +8,8 @@ using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.EntityModels.Models;
-using Shrooms.Infrastructure.CustomCache;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Infrastructure.CustomCache;
 using Shrooms.UnitTests.Extensions;
 
 namespace Shrooms.UnitTests.DomainService
@@ -42,7 +42,7 @@ namespace Shrooms.UnitTests.DomainService
         public void Should_Get_Permissions_Separated_To_Groups()
         {
             MockPermissions();
-            var permissionGroups = _permissionService.GetGroupNames(1);
+            var permissionGroups = _permissionService.GetGroupNames(1).ToList();
 
             Assert.AreEqual(2, permissionGroups.Count());
             Assert.AreEqual("test1", permissionGroups.ToArray()[0].Name);
@@ -53,7 +53,7 @@ namespace Shrooms.UnitTests.DomainService
         public void Should_Get_Permissions_Separated_To_Groups_Filtered_By_Organization()
         {
             MockPermissions();
-            var permissionGroups = _permissionService.GetGroupNames(2);
+            var permissionGroups = _permissionService.GetGroupNames(2).ToList();
 
             Assert.AreEqual(2, permissionGroups.Count());
             Assert.AreEqual("test2", permissionGroups.ToArray()[0].Name);
@@ -64,7 +64,7 @@ namespace Shrooms.UnitTests.DomainService
         public void Should_Get_Admin_User_Permissions()
         {
             MockPermissions();
-            var permissionGroups = _permissionService.GetUserPermissions("UserId1", 1);
+            var permissionGroups = _permissionService.GetUserPermissions("UserId1", 1).ToList();
 
             Assert.AreEqual(4, permissionGroups.Count());
             Assert.AreEqual("TEST1_BASIC", permissionGroups.ToArray()[0]);
@@ -74,8 +74,7 @@ namespace Shrooms.UnitTests.DomainService
         [Test]
         public void Should_Get_Admin_User_Permissions_From_Cache()
         {
-            IEnumerable<string> permissions;
-            _permissionCache.TryGetValue("UserId1", out permissions).Returns(x =>
+            _permissionCache.TryGetValue("UserId1", out _).Returns(x =>
             {
                 x[1] = new List<string>()
                 {
@@ -85,7 +84,7 @@ namespace Shrooms.UnitTests.DomainService
                 return true;
             });
 
-            var permissionGroups = _permissionService.GetUserPermissions("UserId1", 1);
+            var permissionGroups = _permissionService.GetUserPermissions("UserId1", 1).ToList();
 
             Assert.AreEqual(2, permissionGroups.Count());
             Assert.AreEqual("TEST1_BASIC", permissionGroups.ToArray()[0]);
@@ -104,7 +103,7 @@ namespace Shrooms.UnitTests.DomainService
         public void Should_Get_Simple_User_Permissions()
         {
             MockPermissions();
-            var permissionGroups = _permissionService.GetUserPermissions("UserId2", 1);
+            var permissionGroups = _permissionService.GetUserPermissions("UserId2", 1).ToList();
 
             Assert.AreEqual(2, permissionGroups.Count());
             Assert.AreEqual("TEST1_BASIC", permissionGroups.ToArray()[0]);
@@ -115,7 +114,7 @@ namespace Shrooms.UnitTests.DomainService
         public void Should_Get_Admin_Role_Permissions()
         {
             MockPermissions();
-            var permissionGroups = _permissionService.GetRolePermissions("AdminId", 1);
+            var permissionGroups = _permissionService.GetRolePermissions("AdminId", 1).ToList();
 
             Assert.AreEqual(4, permissionGroups.Count());
             Assert.AreEqual("TEST1_BASIC", permissionGroups.ToArray()[0].Name);
@@ -126,7 +125,7 @@ namespace Shrooms.UnitTests.DomainService
         public void Should_Get_User_Role_Permissions()
         {
             MockPermissions();
-            var permissionGroups = _permissionService.GetRolePermissions("UserId", 1);
+            var permissionGroups = _permissionService.GetRolePermissions("UserId", 1).ToList();
 
             Assert.AreEqual(2, permissionGroups.Count());
             Assert.AreEqual("TEST1_BASIC", permissionGroups.ToArray()[0].Name);

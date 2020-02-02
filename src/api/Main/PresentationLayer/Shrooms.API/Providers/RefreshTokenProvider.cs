@@ -34,7 +34,7 @@ namespace Shrooms.API.Providers
 
                 if (string.IsNullOrEmpty(clientId))
                 {
-                    return;
+                    await Task.CompletedTask;
                 }
 
                 var refreshTokenId = Guid.NewGuid().ToString("n");
@@ -59,11 +59,13 @@ namespace Shrooms.API.Providers
                     UserId = context.Ticket.Identity.GetUserId()
                 };
 
-                tokenService.RemoveTokenBySubject(userOrg);
-                tokenService.AddNewToken(token);
+                tokenService?.RemoveTokenBySubject(userOrg);
+                tokenService?.AddNewToken(token);
 
                 context.SetToken(refreshTokenId);
             }
+
+            await Task.CompletedTask;
         }
 
         public void Receive(AuthenticationTokenReceiveContext context)
@@ -76,15 +78,15 @@ namespace Shrooms.API.Providers
             using (var requestScope = _ioc.BeginLifetimeScope("AutofacWebRequest"))
             {
                 var tokenService = requestScope.Resolve(typeof(IRefreshTokenService)) as IRefreshTokenService;
-                var corsHeaderName = "Access-Control-Allow-Origin";
+                const string corsHeaderName = "Access-Control-Allow-Origin";
                 var allowedOrigin = context.OwinContext.Get<string>("as:clientAllowedOrigin");
                 if (!context.OwinContext.Response.Headers.ContainsKey(corsHeaderName))
                 {
                     context.OwinContext.Response.Headers.Add(corsHeaderName, new[] { allowedOrigin });
                 }
 
-                string hashedTokenId = CryptoHelper.GetHash(context.Token);
-                var refreshToken = tokenService.GetTokenTicketById(hashedTokenId);
+                var hashedTokenId = CryptoHelper.GetHash(context.Token);
+                var refreshToken = tokenService?.GetTokenTicketById(hashedTokenId);
 
                 if (refreshToken != null)
                 {
@@ -92,6 +94,8 @@ namespace Shrooms.API.Providers
                     tokenService.RemoveTokenById(hashedTokenId);
                 }
             }
+
+            await Task.CompletedTask;
         }
     }
 }

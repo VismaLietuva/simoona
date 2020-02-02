@@ -2,7 +2,7 @@
 
 namespace Shrooms.Resources.Helpers
 {
-    public static partial class LocalizationHelper
+    public static class LocalizationHelper
     {
         private static readonly JavaScriptSerializer _javaScriptSerializer = new JavaScriptSerializer();
 

@@ -45,96 +45,102 @@ namespace Shrooms.Domain.Services.Wall.Posts
 
         public NewlyCreatedPostDTO CreateNewPost(NewPostDTO newPostDto)
         {
-            var wall = _wallsDbSet.
-                FirstOrDefault(x => x.Id == newPostDto.WallId && x.OrganizationId == newPostDto.OrganizationId);
-
-            if (wall == null)
+            lock (_postDeleteLock)
             {
-                throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Wall not found");
-            }
+                var wall = _wallsDbSet.FirstOrDefault(x => x.Id == newPostDto.WallId && x.OrganizationId == newPostDto.OrganizationId);
 
-            var post = new Post
-            {
-                AuthorId = newPostDto.UserId,
-                Created = DateTime.UtcNow,
-                LastEdit = DateTime.UtcNow,
-                CreatedBy = newPostDto.UserId,
-                MessageBody = newPostDto.MessageBody,
-                PictureId = newPostDto.PictureId,
-                SharedEventId = newPostDto.SharedEventId,
-                LastActivity = DateTime.UtcNow,
-                WallId = newPostDto.WallId,
-                Likes = new LikesCollection()
-            };
-            _postsDbSet.Add(post);
-            _uow.SaveChanges(newPostDto.UserId);
-            _postWatchers.Add(
-                new PostWatcher
+                if (wall == null)
+                {
+                    throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Wall not found");
+                }
+
+                var post = new Post
+                {
+                    AuthorId = newPostDto.UserId,
+                    Created = DateTime.UtcNow,
+                    LastEdit = DateTime.UtcNow,
+                    CreatedBy = newPostDto.UserId,
+                    MessageBody = newPostDto.MessageBody,
+                    PictureId = newPostDto.PictureId,
+                    SharedEventId = newPostDto.SharedEventId,
+                    LastActivity = DateTime.UtcNow,
+                    WallId = newPostDto.WallId,
+                    Likes = new LikesCollection()
+                };
+
+                _postsDbSet.Add(post);
+                _uow.SaveChanges(newPostDto.UserId);
+                _postWatchers.Add(new PostWatcher
                 {
                     PostId = post.Id,
                     UserId = newPostDto.UserId
                 });
-            _uow.SaveChanges(newPostDto.UserId);
+                _uow.SaveChanges(newPostDto.UserId);
 
-            var postCreator = _usersDbSet.Single(user => user.Id == newPostDto.UserId);
-            var postCreatorDto = MapUserToDto(postCreator);
-            var newlyCreatedPostDto = MapNewlyCreatedPostToDto(post, postCreatorDto, wall.Type);
+                var postCreator = _usersDbSet.Single(user => user.Id == newPostDto.UserId);
+                var postCreatorDto = MapUserToDto(postCreator);
+                var newlyCreatedPostDto = MapNewlyCreatedPostToDto(post, postCreatorDto, wall.Type);
 
-            return newlyCreatedPostDto;
+                return newlyCreatedPostDto;
+            }
         }
 
         public void ToggleLike(int postId, UserAndOrganizationDTO userOrg)
         {
-            var post = _postsDbSet
-                .Include(x => x.Wall)
-                .FirstOrDefault(x =>
-                        x.Id == postId &&
-                        x.Wall.OrganizationId == userOrg.OrganizationId);
-
-            if (post == null)
+            lock (_postDeleteLock)
             {
-                throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Post does not exist");
-            }
+                var post = _postsDbSet
+                    .Include(x => x.Wall)
+                    .FirstOrDefault(x => x.Id == postId && x.Wall.OrganizationId == userOrg.OrganizationId);
 
-            var like = post.Likes.FirstOrDefault(x => x.UserId == userOrg.UserId);
-            if (like == null)
-            {
-                post.Likes.Add(new Like(userOrg.UserId));
-            }
-            else
-            {
-                post.Likes.Remove(like);
-            }
+                if (post == null)
+                {
+                    throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Post does not exist");
+                }
 
-            _uow.SaveChanges(userOrg.UserId);
+                var like = post.Likes.FirstOrDefault(x => x.UserId == userOrg.UserId);
+                if (like == null)
+                {
+                    post.Likes.Add(new Like(userOrg.UserId));
+                }
+                else
+                {
+                    post.Likes.Remove(like);
+                }
+
+                _uow.SaveChanges(userOrg.UserId);
+            }
         }
 
         public void EditPost(EditPostDTO editPostDto)
         {
-            var post = _postsDbSet
-                .Include(x => x.Wall)
-                .FirstOrDefault(x =>
+            lock (_postDeleteLock)
+            {
+                var post = _postsDbSet
+                    .Include(x => x.Wall)
+                    .FirstOrDefault(x =>
                         x.Id == editPostDto.Id &&
                         x.Wall.OrganizationId == editPostDto.OrganizationId);
 
-            if (post == null)
-            {
-                throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Post not found");
+                if (post == null)
+                {
+                    throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Post not found");
+                }
+
+                var isWallModerator = _moderatorsDbSet.Any(x => x.UserId == editPostDto.UserId && x.WallId == post.WallId) || post.CreatedBy == editPostDto.UserId;
+                var isAdministrator = _permissionService.UserHasPermission(editPostDto, AdministrationPermissions.Post);
+
+                if (!isAdministrator && !isWallModerator)
+                {
+                    throw new UnauthorizedException();
+                }
+
+                post.MessageBody = editPostDto.MessageBody;
+                post.PictureId = editPostDto.PictureId;
+                post.LastEdit = DateTime.UtcNow;
+
+                _uow.SaveChanges(editPostDto.UserId);
             }
-
-            var isWallModerator = _moderatorsDbSet.Any(x => x.UserId == editPostDto.UserId && x.WallId == post.WallId) || post.CreatedBy == editPostDto.UserId;
-            var isAdministrator = _permissionService.UserHasPermission(editPostDto, AdministrationPermissions.Post);
-
-            if (!isAdministrator && !isWallModerator)
-            {
-                throw new UnauthorizedException();
-            }
-
-            post.MessageBody = editPostDto.MessageBody;
-            post.PictureId = editPostDto.PictureId;
-            post.LastEdit = DateTime.UtcNow;
-
-            _uow.SaveChanges(editPostDto.UserId);
         }
 
         public void DeleteWallPost(int postId, UserAndOrganizationDTO userOrg)
@@ -144,8 +150,8 @@ namespace Shrooms.Domain.Services.Wall.Posts
                 var post = _postsDbSet
                     .Include(x => x.Wall)
                     .FirstOrDefault(s =>
-                            s.Id == postId &&
-                            s.Wall.OrganizationId == userOrg.OrganizationId);
+                        s.Id == postId &&
+                        s.Wall.OrganizationId == userOrg.OrganizationId);
 
                 if (post == null)
                 {
@@ -175,8 +181,8 @@ namespace Shrooms.Domain.Services.Wall.Posts
                 var post = _postsDbSet
                     .Include(x => x.Wall)
                     .FirstOrDefault(s =>
-                            s.Id == postId &&
-                            s.Wall.OrganizationId == userOrg.OrganizationId);
+                        s.Id == postId &&
+                        s.Wall.OrganizationId == userOrg.OrganizationId);
 
                 if (post == null)
                 {
@@ -184,7 +190,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
                 }
 
                 var isWallModerator = _moderatorsDbSet
-                    .Any(x => x.UserId == userOrg.UserId && x.WallId == post.WallId) || post.AuthorId == userOrg.UserId;
+                                          .Any(x => x.UserId == userOrg.UserId && x.WallId == post.WallId) || post.AuthorId == userOrg.UserId;
 
                 var isAdministrator = _permissionService.UserHasPermission(userOrg, AdministrationPermissions.Post);
                 if (!isAdministrator && !isWallModerator)
@@ -228,23 +234,26 @@ namespace Shrooms.Domain.Services.Wall.Posts
 
         public void ToggleWatch(int postId, UserAndOrganizationDTO userAndOrg, bool shouldWatch)
         {
-            var entity = _postWatchers.Find(postId, userAndOrg.UserId);
-            if (shouldWatch && entity == null)
+            lock (_postDeleteLock)
             {
-                entity = new PostWatcher
+                var entity = _postWatchers.Find(postId, userAndOrg.UserId);
+                if (shouldWatch && entity == null)
                 {
-                    PostId = postId,
-                    UserId = userAndOrg.UserId
-                };
-                _postWatchers.Add(entity);
-            }
+                    entity = new PostWatcher
+                    {
+                        PostId = postId,
+                        UserId = userAndOrg.UserId
+                    };
+                    _postWatchers.Add(entity);
+                }
 
-            if (!shouldWatch && entity != null)
-            {
-                _postWatchers.Remove(entity);
-            }
+                if (!shouldWatch && entity != null)
+                {
+                    _postWatchers.Remove(entity);
+                }
 
-            _uow.SaveChanges();
+                _uow.SaveChanges();
+            }
         }
 
         public IEnumerable<string> GetPostWatchersForAppNotifications(int postId)

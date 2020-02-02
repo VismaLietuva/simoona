@@ -1,5 +1,4 @@
-﻿
-namespace Shrooms.DataTransferObjects.Models.Support
+﻿namespace Shrooms.DataTransferObjects.Models.Support
 {
     public class SupportDto
     {

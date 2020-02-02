@@ -24,6 +24,6 @@ namespace Shrooms.WebViewModels.Models
 
         public virtual AbstractClassifierViewModel Parent { get; set; }
 
-        public IEnumerable<AbstractClassifierViewModel> Childs { get; set; }
+        public IEnumerable<AbstractClassifierViewModel> Children { get; set; }
     }
 }

@@ -138,8 +138,6 @@ namespace Shrooms.Domain.Services.Kudos
 
         public KudosTypeDTO GetSendKudosType(UserAndOrganizationDTO userOrg)
         {
-            var hasKudosAdminPermission = HasKudosAdministratorPermission(userOrg);
-
             var sendType = _kudosTypesDbSet
                 .Where(x => x.Type == BusinessLayerConstants.KudosTypeEnum.Send)
                 .Select(MapKudosTypesToDTO)
@@ -437,10 +435,10 @@ namespace Shrooms.Domain.Services.Kudos
             var kudosLog = _kudosLogsDbSet
                 .Include(x => x.Employee)
                 .First(x =>
-                    x.Id == kudosRejectDto.id &&
+                    x.Id == kudosRejectDto.Id &&
                     x.OrganizationId == kudosRejectDto.OrganizationId);
 
-            kudosLog.Reject(kudosRejectDto.UserId, kudosRejectDto.kudosRejectionMessage);
+            kudosLog.Reject(kudosRejectDto.UserId, kudosRejectDto.KudosRejectionMessage);
 
             if (!kudosLog.IsRecipientDeleted())
             {

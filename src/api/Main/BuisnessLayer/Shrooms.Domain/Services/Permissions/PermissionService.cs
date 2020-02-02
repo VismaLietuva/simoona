@@ -8,8 +8,8 @@ using Shrooms.Constants.DataLayer;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Permissions;
 using Shrooms.EntityModels.Models;
-using Shrooms.Infrastructure.CustomCache;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Infrastructure.CustomCache;
 
 namespace Shrooms.Domain.Services.Permissions
 {

@@ -147,10 +147,9 @@ namespace Shrooms.Domain.Services.KudosBaskets
                     .First(type => type.Type == BusinessLayerConstants.KudosTypeEnum.Minus);
 
                 var logComment = string.Format(Resources.Widgets.KudosBasket.KudosBasket.KudosBasketDonationComment, basket.Title);
-                var noUser = default(string);
 
                 var plusLog = CreateKudosLogForBasket(donation, otherType, logComment, user.Id);
-                var minusLog = CreateKudosLogForBasket(donation, minusType, logComment, noUser);
+                var minusLog = CreateKudosLogForBasket(donation, minusType, logComment, null);
 
                 _kudosLogsDbSet.Add(minusLog);
                 basket.KudosLogs.Add(plusLog);

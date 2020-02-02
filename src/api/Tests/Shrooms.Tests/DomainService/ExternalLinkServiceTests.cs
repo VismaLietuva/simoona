@@ -37,7 +37,7 @@ namespace Shrooms.UnitTests.DomainService
         {
             MockExternalLinks();
 
-            var result = _externalLinkService.GetAll(2);
+            var result = _externalLinkService.GetAll(2).ToList();
             Assert.AreEqual(2, result.Count());
             Assert.AreEqual("Test1", result.First().Name);
         }

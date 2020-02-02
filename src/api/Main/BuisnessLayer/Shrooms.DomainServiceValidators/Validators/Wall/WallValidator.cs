@@ -27,31 +27,24 @@ namespace Shrooms.DomainServiceValidators.Validators.Wall
             ValidateWallAccessibility(userId, postWallId, CheckIfUserIsPartOfSubwall);
         }
 
-        private void ValidateWallAccessibility(string userId, int? postWallId, Func<string, int, bool> HasUserAccessToWall)
+        private static void ValidateWallAccessibility(string userId, int? postWallId, Func<string, int, bool> HasUserAccessToWall)
         {
             //Check if post belongs to wall
-            if (postWallId.HasValue)
+            if (postWallId.HasValue && !HasUserAccessToWall(userId, postWallId.Value))
             {
-                if (!HasUserAccessToWall(userId, postWallId.Value))
-                {
-                    throw new ValidationException(ErrorCodes.UserIsNotAMemberOfWall, "Not permitted");
-                }
+                throw new ValidationException(ErrorCodes.UserIsNotAMemberOfWall, "Not permitted");
             }
         }
 
         private bool CheckIfUserIsPartOfSubwall(string userId, int postWallId)
         {
-            return _wallUsersDbSet
-                                .Include(x => x.Wall)
-                                .Any(x => x.WallId == postWallId &&
-                                    x.UserId == userId);
+            return _wallUsersDbSet.Include(x => x.Wall)
+                                .Any(x => x.WallId == postWallId && x.UserId == userId);
         }
 
         private bool CheckIfUserIsPartOfAnyWall(string userId, int postWallId)
         {
-            return _wallUsersDbSet
-                                .Any(x => x.WallId == postWallId
-                                    && x.UserId == userId);
+            return _wallUsersDbSet.Any(x => x.WallId == postWallId && x.UserId == userId);
         }
     }
 }

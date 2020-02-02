@@ -117,4 +117,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="CheckDateEmpty" xml:space="preserve">
+    <value>Please provide medical check date</value>
+  </data>
+  <data name="DateValidTillTooEarly" xml:space="preserve">
+    <value>Medical check date validation error</value>
+  </data>
+  <data name="DateCheckedTooLate" xml:space="preserve">
+    <value>Medical check date should not be later than today date</value>
+  </data>
 </root>

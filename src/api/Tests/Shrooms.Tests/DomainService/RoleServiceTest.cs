@@ -49,7 +49,7 @@ namespace Shrooms.UnitTests.DomainService
                 OrganizationId = 2
             };
 
-            var roles = _roleService.GetRolesForAutocomplete("Test1", userOrg);
+            var roles = _roleService.GetRolesForAutocomplete("Test1", userOrg).ToList();
 
             Assert.AreEqual(2, roles.Count());
             Assert.AreEqual("roleId1", roles.ToArray()[0].Id);

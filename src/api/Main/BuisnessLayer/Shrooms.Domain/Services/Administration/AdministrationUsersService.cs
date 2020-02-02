@@ -333,7 +333,6 @@ namespace Shrooms.Domain.Services.Administration
 
         private void SetWelcomeKudos(ApplicationUser applicationUser)
         {
-
             var welcomeKudosDTO = _kudosService.GetWelcomeKudos();
 
             if (welcomeKudosDTO.WelcomeKudosAmount > 0)
@@ -465,36 +464,28 @@ namespace Shrooms.Domain.Services.Administration
                 {
                     case "jobtitle":
                         applicationUsersViewModel =
-                            applicationUsersViewModel.Where(
-                                e =>
-                                filterViewModel.Values.Any(
-                                    v =>
+                            applicationUsersViewModel.Where(e =>
+                                filterViewModel.Values.Any(v =>
                                     !string.IsNullOrWhiteSpace(e.JobTitle)
                                     && e.JobTitle.IndexOf(v, StringComparison.OrdinalIgnoreCase) >= 0));
                         break;
 
                     case "projects":
                         applicationUsersViewModel =
-                            applicationUsersViewModel.Where(
-                                e =>
-                                filterViewModel.Values.Any(
-                                    v =>
+                            applicationUsersViewModel.Where(e =>
+                                filterViewModel.Values.Any(v =>
                                     e.Projects != null
-                                    && e.Projects.Any(
-                                        p =>
+                                    && e.Projects.Any(p =>
                                         !string.IsNullOrWhiteSpace(p.Name)
                                         && (p.Name.IndexOf(v, StringComparison.OrdinalIgnoreCase) >= 0))));
                         break;
 
                     case "skills":
                         applicationUsersViewModel =
-                            applicationUsersViewModel.Where(
-                                e =>
-                                filterViewModel.Values.Any(
-                                    v =>
+                            applicationUsersViewModel.Where(e =>
+                                filterViewModel.Values.Any(v =>
                                     e.Skills != null
-                                    && e.Skills.Any(
-                                        s =>
+                                    && e.Skills.Any(s =>
                                             !string.IsNullOrWhiteSpace(s.Title)
                                             && s.Title.IndexOf(v, StringComparison.OrdinalIgnoreCase) >= 0)));
                         break;

@@ -54,11 +54,13 @@ namespace Shrooms.IoC
             builder.Register(c => new TelemetryLoggingInterceptor());
 
             builder.RegisterType(typeof(UnitOfWork2)).As(typeof(IUnitOfWork2)).InstancePerRequest();
+
             builder.Register(c => HttpContext.Current == null ?
                     new ShroomsDbContext(c.Resolve<ITenantNameContainer>().TenantName) :
-                    new ShroomsDbContext(GetConnectionStringName())
-                    ).As<IDbContext>().InstancePerRequest();
-            builder.RegisterType(typeof(EFUnitOfWork)).As(typeof(IUnitOfWork)).InstancePerRequest();
+                    new ShroomsDbContext(GetConnectionStringName()))
+                .As<IDbContext>().InstancePerRequest();
+
+            builder.RegisterType(typeof(EfUnitOfWork)).As(typeof(IUnitOfWork)).InstancePerRequest();
             builder.RegisterGeneric(typeof(EfRepository<>)).As(typeof(IRepository<>));
 
             // Authorization types

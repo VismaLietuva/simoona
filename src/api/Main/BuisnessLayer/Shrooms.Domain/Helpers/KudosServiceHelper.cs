@@ -69,6 +69,7 @@ namespace Shrooms.Domain.Helpers
       {
         return x => true;
       }
+
       return x => x.KudosTypeName == filteringType;
     }
   }

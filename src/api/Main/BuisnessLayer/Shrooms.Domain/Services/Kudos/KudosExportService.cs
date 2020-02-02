@@ -14,16 +14,14 @@ namespace Shrooms.Domain.Services.Kudos
 {
     public class KudosExportService : IKudosExportService
     {
-        private readonly IUnitOfWork2 _uow;
         private readonly IDbSet<KudosLog> _kudosLogsDbSet;
         private readonly IDbSet<ApplicationUser> _userDbSet;
         private readonly IExcelBuilder _excelBuilder;
 
         public KudosExportService(IUnitOfWork2 uow, IExcelBuilder excelBuilder)
         {
-            _uow = uow;
-            _kudosLogsDbSet = _uow.GetDbSet<KudosLog>();
-            _userDbSet = _uow.GetDbSet<ApplicationUser>();
+            _kudosLogsDbSet = uow.GetDbSet<KudosLog>();
+            _userDbSet = uow.GetDbSet<ApplicationUser>();
             _excelBuilder = excelBuilder;
         }
 

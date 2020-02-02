@@ -218,6 +218,7 @@ namespace Shrooms.UnitTests.DomainService
         public void Should_Throw_Exception_If_Basket_Exists()
         {
             var basketExists = true;
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             Assert.Throws<Exception>(() => _kudosBasketValidator.CheckIfBasketAlreadyExists(basketExists));
         }
 
@@ -225,6 +226,7 @@ namespace Shrooms.UnitTests.DomainService
         public void Should_Not_Throw_Exception_If_There_Are_No_Baskets()
         {
             var basketExists = false;
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             Assert.DoesNotThrow(() => _kudosBasketValidator.CheckIfBasketAlreadyExists(basketExists));
         }
 

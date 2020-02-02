@@ -12,6 +12,6 @@ namespace Shrooms.WebViewModels.Models
     {
         public Organization Organization { get; set; }
 
-        public virtual ICollection<AbstractClassifier> Childs { get; set; }
+        public virtual ICollection<AbstractClassifier> Children { get; set; }
     }
 }

@@ -31,7 +31,7 @@ namespace Shrooms.API.Controllers
 {
     [Authorize]
     [RoutePrefix("Account")]
-    public partial class AccountController : BaseController
+    public class AccountController : BaseController
     {
         private const int StateStrengthInBits = 256;
         private readonly ShroomsUserManager _userManager;

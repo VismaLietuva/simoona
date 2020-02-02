@@ -53,7 +53,6 @@ namespace Shrooms.ModelMappings.Profiles
         {
             CreateMap<WelcomeKudosDTO, WelcomeKudosViewModel>();
             CreateMap<WelcomeKudosViewModel, WelcomeKudosDTO>();
-
         }
 
         private void CreateAdministrationMappings()
@@ -191,7 +190,6 @@ namespace Shrooms.ModelMappings.Profiles
                 .ConvertUsing(src => src.Id);
             CreateMap<Certificate, CertificatePostViewModel>();
 
-
             CreateMap<OfficePostViewModel, Office>()
                 .ForMember(dest => dest.Floors, src => src.Ignore());
             CreateMap<Office, OfficeViewModel>();
@@ -264,7 +262,7 @@ namespace Shrooms.ModelMappings.Profiles
             CreateMap<AbstractClassifierAbstractViewModel, Language>()
                 .ForMember(dest => dest.Organization, src => src.Ignore())
                 .ForMember(dest => dest.Parent, src => src.Ignore())
-                .ForMember(dest => dest.Childs, src => src.Ignore());
+                .ForMember(dest => dest.Children, src => src.Ignore());
 
             CreateMap<AbstractClassifier, AbstractClassifierViewModel>()
                 .ForMember(dest => dest.AbstractClassifierType, src => src.MapFrom(c => c.GetType().Name));

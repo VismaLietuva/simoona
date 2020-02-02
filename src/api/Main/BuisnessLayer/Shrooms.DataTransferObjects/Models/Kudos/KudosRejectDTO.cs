@@ -2,7 +2,7 @@
 {
     public class KudosRejectDTO : UserAndOrganizationDTO
     {
-        public int id { get; set; }
-        public string kudosRejectionMessage { get; set; }
+        public int Id { get; set; }
+        public string KudosRejectionMessage { get; set; }
     }
 }

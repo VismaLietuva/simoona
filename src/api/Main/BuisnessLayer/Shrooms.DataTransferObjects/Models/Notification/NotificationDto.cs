@@ -1,5 +1,4 @@
-﻿
-namespace Shrooms.DataTransferObjects.Models.Notification
+﻿namespace Shrooms.DataTransferObjects.Models.Notification
 {
     public class NotificationDto
     {

@@ -52,18 +52,18 @@ namespace Shrooms.API.Controllers
         {
             var isAdmin = _permissionService.UserHasPermission(GetUserAndOrganization(), AdministrationPermissions.ApplicationUser);
 
-            string sortQuery = string.IsNullOrEmpty(sort) ? null : $"{sort} {dir}";
+            var sortQuery = string.IsNullOrEmpty(sort) ? null : $"{sort} {dir}";
 
-            IPagedList<ApplicationUser> models = _applicationUserRepository.Get(
-                includeProperties: includeProperties, filter: filter, orderBy: sortQuery ?? null)
+            var models = _applicationUserRepository.Get(
+                includeProperties: includeProperties, filter: filter, orderBy: sortQuery)
                 .Where(_roleService.ExcludeUsersWithRole(Roles.NewUser))
                 .ToPagedList(page, pageSize);
 
-            var pagedVM = new StaticPagedList<EmployeeListViewModel>(_mapper.Map<IEnumerable<ApplicationUser>, IEnumerable<EmployeeListViewModel>>(models), models.PageNumber, models.PageSize, models.TotalItemCount);
+            var pagedModel = new StaticPagedList<EmployeeListViewModel>(_mapper.Map<IEnumerable<ApplicationUser>, IEnumerable<EmployeeListViewModel>>(models), models.PageNumber, models.PageSize, models.TotalItemCount);
 
             if (!isAdmin)
             {
-                foreach (var model in pagedVM)
+                foreach (var model in pagedModel)
                 {
                     model.BirthDay = BirthdayDateTimeHelper.RemoveYear(model.BirthDay);
                     model.PhoneNumber = null;
@@ -72,9 +72,9 @@ namespace Shrooms.API.Controllers
 
             var result = new PagedViewModel<EmployeeListViewModel>
             {
-                PagedList = pagedVM,
-                PageCount = pagedVM.PageCount,
-                ItemCount = pagedVM.TotalItemCount,
+                PagedList = pagedModel,
+                PageCount = pagedModel.PageCount,
+                ItemCount = pagedModel.TotalItemCount,
                 PageSize = pageSize
             };
 

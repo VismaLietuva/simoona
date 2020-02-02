@@ -14,8 +14,7 @@ namespace Shrooms.Resources
             var culture = new CultureInfo(language);
             var resourceSet = resourceManager.GetResourceSet(culture, true, true);
             return resourceSet.Cast<DictionaryEntry>()
-                                    .ToDictionary(r => r.Key.ToString(),
-                                                  r => r.Value.ToString());
+                              .ToDictionary(r => r.Key.ToString(), r => r.Value.ToString());
         }
 
         public static string GetResourceValue(string resource, string name, CultureInfo culture)

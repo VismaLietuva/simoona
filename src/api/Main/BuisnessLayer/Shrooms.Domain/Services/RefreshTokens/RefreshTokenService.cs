@@ -63,8 +63,7 @@ namespace Shrooms.Domain.Services.RefreshTokens
 
         private void RemoveToken(Expression<Func<RefreshToken, bool>> filter)
         {
-            var refreshToken = _refreshTokensDbSet
-                .FirstOrDefault(filter);
+            var refreshToken = _refreshTokensDbSet.FirstOrDefault(filter);
 
             if (refreshToken != null)
             {

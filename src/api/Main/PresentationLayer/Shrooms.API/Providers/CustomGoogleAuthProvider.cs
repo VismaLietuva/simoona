@@ -1,4 +1,5 @@
-﻿using Autofac;
+﻿using System.Threading.Tasks;
+using Autofac;
 using Microsoft.Owin.Security.Google;
 using Newtonsoft.Json.Linq;
 using Shrooms.Domain.Services.Organizations;
@@ -13,17 +14,23 @@ namespace Shrooms.API.Providers
             {
                 foreach (var claim in context.User)
                 {
-                    if (claim.Key.Equals("image"))
+                    if (!claim.Key.Equals("image"))
                     {
-                        var json = JObject.Parse(claim.Value.ToString());
-                        bool.TryParse(json.SelectToken("isDefault").ToString(), out var isDefaultImage);
-                        if (isDefaultImage == false)
-                        {
-                            var plainUri = json.SelectToken("url").ToString().Split('?')[0];
-                            context.Identity.AddClaim(new System.Security.Claims.Claim("picture", plainUri));
-                        }
+                        continue;
                     }
+
+                    var json = JObject.Parse(claim.Value.ToString());
+                    bool.TryParse(json.SelectToken("isDefault").ToString(), out var isDefaultImage);
+                    if (isDefaultImage != false)
+                    {
+                        continue;
+                    }
+
+                    var plainUri = json.SelectToken("url").ToString().Split('?')[0];
+                    context.Identity.AddClaim(new System.Security.Claims.Claim("picture", plainUri));
                 }
+
+                await Task.CompletedTask;
             };
             OnApplyRedirect = context =>
             {

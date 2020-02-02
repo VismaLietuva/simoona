@@ -17,7 +17,7 @@ namespace Shrooms.WebViewModels.Models.Users.Kudos
         public int MultiplyBy { get; set; }
 
         /// <summary>
-        /// Explicit number of points each receiver should get. If null, amount will be calculated.
+        /// Gets or sets explicit number of points each receiver should get. If null, amount will be calculated.
         /// </summary>
         public long? TotalPointsPerReceiver { get; set; }
 
@@ -27,6 +27,5 @@ namespace Shrooms.WebViewModels.Models.Users.Kudos
 
         public string PictureId { get; set; }
         public bool IsActive { get; set; }
-
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Shrooms.API
 {
+    // ReSharper disable once SA1649
     public class WebApiApplication : System.Web.HttpApplication
     {
         protected void Application_Start()

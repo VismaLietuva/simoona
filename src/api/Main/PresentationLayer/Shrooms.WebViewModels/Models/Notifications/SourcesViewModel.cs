@@ -2,12 +2,12 @@
 {
     public class SourcesViewModel
     {
-        public int postId { get; set; }
+        public int PostId { get; set; }
 
-        public string eventId { get; set; }
+        public string EventId { get; set; }
 
-        public string projectId { get; set; }
+        public string ProjectId { get; set; }
 
-        public int wallId { get; set; }
+        public int WallId { get; set; }
     }
 }

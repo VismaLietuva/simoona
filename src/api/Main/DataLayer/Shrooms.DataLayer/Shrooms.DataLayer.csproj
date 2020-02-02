@@ -154,7 +154,7 @@
     <Compile Include="DAL\ShroomsContextConfiguration.cs" />
     <Compile Include="DAL\SoftDeleteHandler.cs" />
     <Compile Include="DAL\UnitOfWork2.cs" />
-    <Compile Include="DAL\EFRepository.cs" />
+    <Compile Include="DAL\EfRepository.cs" />
     <Compile Include="Migrations\201512301053272_InitialEmpty.cs" />
     <Compile Include="Migrations\201512301053272_InitialEmpty.Designer.cs">
       <DependentUpon>201512301053272_InitialEmpty.cs</DependentUpon>
@@ -843,7 +843,7 @@
     <Compile Include="Migrations\DefaultValueSqlServerMigrationSqlGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DAL\ShroomsDbContext.cs" />
-    <Compile Include="DAL\EFUnitOfWork.cs" />
+    <Compile Include="DAL\EfUnitOfWork.cs" />
   </ItemGroup>
   <ItemGroup>
     <AdditionalFiles Include="..\..\..\stylecop.json">
@@ -1394,9 +1394,8 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Analyzer Include="..\..\..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\Newtonsoft.Json.dll" />
-    <Analyzer Include="..\..\..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
-    <Analyzer Include="..\..\..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
+    <Analyzer Include="..\..\..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
+    <Analyzer Include="..\..\..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

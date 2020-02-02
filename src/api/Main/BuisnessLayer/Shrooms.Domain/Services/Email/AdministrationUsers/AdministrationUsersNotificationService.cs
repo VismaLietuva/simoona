@@ -61,26 +61,28 @@ namespace Shrooms.Domain.Services.Email.AdministrationUsers
         {
             var userAdministrationEmails = _userService.GetUserEmailsWithPermission(AdministrationPermissions.ApplicationUser, orgId);
 
-            if (userAdministrationEmails.Any())
+            if (!userAdministrationEmails.Any())
             {
-                var organizationName = _organizationDbSet
-                    .Where(organization => organization.Id == orgId)
-                    .Select(organization => organization.ShortName)
-                    .FirstOrDefault();
-
-                var newUserProfileUrl = _appSettings.UserProfileUrl(organizationName, newUser.Id);
-                var userSettingsUrl = _appSettings.UserNotificationSettingsUrl(organizationName);
-                var subject = string.Format(Resources.Common.NewUserConfirmEmailSubject);
-
-                var emailTemplateViewModel = new NotificationAboutNewUserEmailTemplateViewModel(
-                    userSettingsUrl,
-                    newUserProfileUrl,
-                    newUser.FullName);
-
-                var body = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.NotificationAboutNewUser);
-
-                _mailingService.SendEmail(new EmailDto(userAdministrationEmails, subject, body));
+                return;
             }
+
+            var organizationName = _organizationDbSet
+                .Where(organization => organization.Id == orgId)
+                .Select(organization => organization.ShortName)
+                .FirstOrDefault();
+
+            var newUserProfileUrl = _appSettings.UserProfileUrl(organizationName, newUser.Id);
+            var userSettingsUrl = _appSettings.UserNotificationSettingsUrl(organizationName);
+            var subject = string.Format(Resources.Common.NewUserConfirmEmailSubject);
+
+            var emailTemplateViewModel = new NotificationAboutNewUserEmailTemplateViewModel(
+                userSettingsUrl,
+                newUserProfileUrl,
+                newUser.FullName);
+
+            var body = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.NotificationAboutNewUser);
+
+            _mailingService.SendEmail(new EmailDto(userAdministrationEmails, subject, body));
         }
 
         public void SendUserResetPasswordEmail(ApplicationUser user, string token, string organizationName)

@@ -1,4 +1,5 @@
 ﻿using System.IdentityModel.Claims;
+using System.Threading.Tasks;
 using Autofac;
 using Microsoft.Owin.Security.Facebook;
 using Newtonsoft.Json.Linq;
@@ -34,7 +35,10 @@ namespace Shrooms.API.Providers
                         }
                     }
                 }
+
+                await Task.CompletedTask;
             };
+
             OnApplyRedirect = context =>
             {
                 using (var webReq = ioc.BeginLifetimeScope("AutofacWebRequest"))
@@ -42,7 +46,8 @@ namespace Shrooms.API.Providers
                     var org = webReq.Resolve(typeof(IOrganizationService)) as IOrganizationService;
                     var newRedirectUri = context.RedirectUri;
                     var organizationName = context.OwinContext.Get<string>("tenantName");
-                    if (org.HasOrganizationEmailDomainRestriction(organizationName))
+
+                    if (org?.HasOrganizationEmailDomainRestriction(organizationName) == true)
                     {
                         var validHostName = org.GetOrganizationHostName(organizationName);
                         var hostDomainParameter = CreateHostDomainParameter(validHostName);

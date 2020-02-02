@@ -47,6 +47,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         public void Office_GetAll_Should_Return_All_Offices()
         {
             var result = _officeController.GetAll() as List<OfficeViewModel>;
+            Assert.IsNotNull(result);
             Assert.AreEqual(result.Count, 4);
         }
 
@@ -85,7 +86,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         public void Office_GetPaged_Should_Return_Sorted_List(string sort, int amountResult, string officeNameResult)
         {
             var result = _officeController.GetPaged(sort: sort);
-            Assert.AreEqual(result.PagedList.FirstOrDefault().Name, officeNameResult);
+            Assert.AreEqual(result.PagedList.FirstOrDefault()?.Name, officeNameResult);
         }
 
         [Test]
@@ -93,7 +94,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         {
             var result = _officeController.GetPaged(s: "B-Office");
             Assert.AreEqual(result.PagedList.Count, 1);
-            Assert.AreEqual(result.PagedList.FirstOrDefault().Name, "B-Office");
+            Assert.AreEqual(result.PagedList.FirstOrDefault()?.Name, "B-Office");
         }
 
         [Test]
@@ -114,7 +115,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         [Test]
         public void Office_Delete_Should_Return_Not_Found_If_Office_Was_Deleted()
         {
-            var result = _officeController.Delete(new int());
+            var result = _officeController.Delete(default);
             Assert.AreEqual(result.StatusCode, HttpStatusCode.NotFound);
         }
 
@@ -157,7 +158,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
             };
 
             var newDefaultOfficePostModel = _mapper.Map<Office, OfficePostViewModel>(newDefaultOffice);
-            var result = _officeController.Post(newDefaultOfficePostModel);
+            _officeController.Post(newDefaultOfficePostModel);
             var changedDefaultOffice = _officeController.GetDefault();
 
             Assert.AreNotEqual(previousDefaultOffice.Id, changedDefaultOffice.Id);

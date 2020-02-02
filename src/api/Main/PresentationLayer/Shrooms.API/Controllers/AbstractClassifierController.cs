@@ -36,9 +36,9 @@ namespace Shrooms.API.Controllers
             var specificType = Type.GetType("DataLayer.Models." + crudViewModel.AbstractClassifierType + ",DataLayer");
             _classifierModel = _mapper.Map(crudViewModel, _classifierModel, crudViewModel.GetType(), specificType) as AbstractClassifier;
 
-            //TODO Need to fix Child saving issue when saving abstract classifier after removing childs
-            RemoveAllChilds(_classifierModel);
-            UpdateChilds(crudViewModel, _classifierModel, specificType);
+            //TODO Need to fix Child saving issue when saving abstract classifier after removing children
+            RemoveAllChildren(_classifierModel);
+            UpdateChildren(crudViewModel, _classifierModel, specificType);
 
             _repository.Insert(_classifierModel);
             _unitOfWork.Save();
@@ -58,9 +58,9 @@ namespace Shrooms.API.Controllers
             var specificType = Type.GetType("DataLayer.Models." + crudViewModel.AbstractClassifierType + ",DataLayer");
             model = _mapper.Map(crudViewModel, model, crudViewModel.GetType(), specificType) as AbstractClassifier;
 
-            //TODO Need to fix Child saving issue when saving abstract classifier after removing childs
-            RemoveAllChilds(model);
-            UpdateChilds(crudViewModel, model, specificType);
+            //TODO Need to fix Child saving issue when saving abstract classifier after removing children
+            RemoveAllChildren(model);
+            UpdateChildren(crudViewModel, model, specificType);
 
             _repository.Update(model);
             _unitOfWork.Save();
@@ -91,32 +91,31 @@ namespace Shrooms.API.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<AbstractClassifierViewModel> GetChildsForAutoComplete(string search, int id = 0)
+        public IEnumerable<AbstractClassifierViewModel> GetChildrenForAutoComplete(string search, int id = 0)
         {
-            IEnumerable<AbstractClassifierViewModel> childsViewModel;
+            IEnumerable<AbstractClassifierViewModel> childrenViewModel;
 
             if (!string.IsNullOrEmpty(search))
             {
-                var childs = _classifierRepository.Get(o => o.Name.Contains(search) && o.Id != id);
-                childsViewModel = _mapper.Map<IEnumerable<AbstractClassifier>, IEnumerable<AbstractClassifierViewModel>>(childs);
+                var children = _classifierRepository.Get(o => o.Name.Contains(search) && o.Id != id);
+                childrenViewModel = _mapper.Map<IEnumerable<AbstractClassifier>, IEnumerable<AbstractClassifierViewModel>>(children);
             }
             else
             {
                 return null;
             }
 
-            return childsViewModel;
+            return childrenViewModel;
         }
 
         public IEnumerable<AbstractClassifierViewModel> GetClassifiersWithoutMe()
         {
-            IEnumerable<AbstractClassifierViewModel> childsViewModel;
-            var childs = _classifierRepository.Get();
-            childsViewModel = _mapper.Map<IEnumerable<AbstractClassifier>, IEnumerable<AbstractClassifierViewModel>>(childs);
-            return childsViewModel;
+            var children = _classifierRepository.Get();
+            var childrenViewModel = _mapper.Map<IEnumerable<AbstractClassifier>, IEnumerable<AbstractClassifierViewModel>>(children);
+            return childrenViewModel;
         }
 
-        private void UpdateChilds(AbstractClassifierAbstractViewModel crudViewModel, AbstractClassifier classifierModel, Type specificType)
+        private void UpdateChildren(AbstractClassifierAbstractViewModel crudViewModel, AbstractClassifier classifierModel, Type specificType)
         {
             _repository.Update(classifierModel);
 
@@ -125,18 +124,18 @@ namespace Shrooms.API.Controllers
                 return;
             }
 
-            foreach (AbstractClassifierAbstractViewModel childViewModel in crudViewModel.Childs)
+            foreach (var childViewModel in crudViewModel.Children)
             {
-                AbstractClassifier model = _mapper.Map(childViewModel, childViewModel.GetType(), specificType) as AbstractClassifier;
+                var model = _mapper.Map(childViewModel, childViewModel.GetType(), specificType) as AbstractClassifier;
                 model.ParentId = classifierModel.Id;
                 _repository.Update(model);
             }
         }
 
-        private void RemoveAllChilds(AbstractClassifier classifierModel)
+        private void RemoveAllChildren(AbstractClassifier classifierModel)
         {
-            classifierModel = _repository.Get(f => f.Id == classifierModel.Id, includeProperties: "Childs").FirstOrDefault();
-            classifierModel.Childs = null;
+            classifierModel = _repository.Get(f => f.Id == classifierModel.Id, includeProperties: "Children").FirstOrDefault();
+            classifierModel.Children = null;
             _repository.Update(classifierModel);
         }
     }

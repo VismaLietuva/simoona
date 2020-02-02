@@ -7,13 +7,13 @@ using Shrooms.Infrastructure.Configuration;
 
 namespace Shrooms.DataLayer.DAL
 {
-    public class EFUnitOfWork : IUnitOfWork
+    public class EfUnitOfWork : IUnitOfWork
     {
         private readonly Dictionary<Type, object> _repositories;
 
         public IDbContext DbContext { get; }
 
-        public EFUnitOfWork(IDbContext context)
+        public EfUnitOfWork(IDbContext context)
         {
             DbContext = context;
             _repositories = new Dictionary<Type, object>();

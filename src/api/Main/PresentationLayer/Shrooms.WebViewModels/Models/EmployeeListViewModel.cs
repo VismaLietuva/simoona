@@ -1,5 +1,5 @@
-﻿
-using System;
+﻿using System;
+
 namespace Shrooms.WebViewModels.Models
 {
     public class EmployeeListViewModel

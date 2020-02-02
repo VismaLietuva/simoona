@@ -72,7 +72,7 @@ namespace Shrooms.API.Controllers
 
         private static bool CompareSourcesIds(SourcesViewModel viewModel, SourcesDto dtoModel)
         {
-            if (viewModel.postId != dtoModel.PostId || viewModel.eventId != dtoModel.EventId || viewModel.projectId != dtoModel.ProjectId || viewModel.wallId != dtoModel.WallId)
+            if (viewModel.PostId != dtoModel.PostId || viewModel.EventId != dtoModel.EventId || viewModel.ProjectId != dtoModel.ProjectId || viewModel.WallId != dtoModel.WallId)
             {
                 return false;
             }

@@ -3,6 +3,7 @@ using Shrooms.Resources.Models.Account;
 
 namespace Shrooms.WebViewModels.Models
 {
+    // ReSharper disable once UnusedType.Global
     public class ExternalLoginConfirmationViewModel
     {
         [Required]

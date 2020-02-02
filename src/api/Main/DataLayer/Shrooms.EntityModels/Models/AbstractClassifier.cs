@@ -17,6 +17,6 @@ namespace Shrooms.EntityModels.Models
         public virtual string SortOrder { get; set; }
 
         [InverseProperty("Parent")]
-        public virtual ICollection<AbstractClassifier> Childs { get; set; }
+        public virtual ICollection<AbstractClassifier> Children { get; set; }
     }
 }

@@ -125,8 +125,7 @@ namespace Shrooms.Domain.Services.Roles
                     ActiveScope = rolePermissions.Any(y => y.Name.StartsWith(x.Name, StringComparison.OrdinalIgnoreCase) && y.Scope == Scopes.Administration)
                                   ? Scopes.Administration
                                   : (rolePermissions.Any(y => y.Name.StartsWith(x.Name, StringComparison.OrdinalIgnoreCase) && y.Scope == Scopes.Basic)
-                                        ? Scopes.Basic
-                                        : string.Empty)
+                                        ? Scopes.Basic  : string.Empty)
                 })
                 .ToList();
 

@@ -100,6 +100,7 @@ namespace Shrooms.UnitTests.DomainService
             };
             _wallsDbSet.SetDbSetData(walls.AsQueryable());
 
+            // ReSharper disable once CollectionNeverUpdated.Local
             var posts = new List<Post>();
             _postsDbSet.SetDbSetData(posts.AsQueryable());
 
@@ -133,9 +134,11 @@ namespace Shrooms.UnitTests.DomainService
         public void Should_Throw_If_There_Is_No_Wall_To_Add_Posts_To()
         {
             // Setup
+            // ReSharper disable once CollectionNeverUpdated.Local
             var walls = new List<Wall>();
             _wallsDbSet.SetDbSetData(walls.AsQueryable());
 
+            // ReSharper disable once CollectionNeverUpdated.Local
             var posts = new List<Post>();
             _postsDbSet.SetDbSetData(posts.AsQueryable());
 
@@ -351,6 +354,7 @@ namespace Shrooms.UnitTests.DomainService
         public void Should_Throw_If_Post_To_Be_Edited_Does_Not_Exist()
         {
             // Setup
+            // ReSharper disable once CollectionNeverUpdated.Local
             var posts = new List<Post>();
             _postsDbSet.SetDbSetData(posts.AsQueryable());
 
@@ -372,6 +376,7 @@ namespace Shrooms.UnitTests.DomainService
         public void Should_Throw_If_Post_To_Be_Deleted_Does_Not_Exist()
         {
             // Setup
+            // ReSharper disable once CollectionNeverUpdated.Local
             var posts = new List<Post>();
             _postsDbSet.SetDbSetData(posts.AsQueryable());
 

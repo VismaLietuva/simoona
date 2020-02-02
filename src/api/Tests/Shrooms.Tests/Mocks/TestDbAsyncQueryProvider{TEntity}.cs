@@ -51,11 +51,13 @@ namespace Shrooms.UnitTests.Mocks
     {
         public TestDbAsyncEnumerable(IEnumerable<T> enumerable)
             : base(enumerable)
-        { }
+        {
+        }
 
         public TestDbAsyncEnumerable(Expression expression)
             : base(expression)
-        { }
+        {
+        }
 
         IQueryProvider IQueryable.Provider => new TestDbAsyncQueryProvider<T>(this);
 
