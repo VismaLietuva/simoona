@@ -13,6 +13,6 @@ namespace Shrooms.Premium.Main.BusinessLayer.DomainServiceValidators.Books
         void ThrowIfOfficeDoesNotExist(bool officeExists);
         void ThrowIfBookIsAlreadyBorrowed(MobileBookOfficeLogsDTO officeBookWithLogs);
         void ThrowIfUserDoesNotExist(ApplicationUser applicationUser);
-        void ThrowIfBookDoesNotExistGoogleAPI(bool bookExist);
+        void ThrowIfBookDoesNotExistGoogleApi(bool bookExist);
     }
 }

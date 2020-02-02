@@ -17,24 +17,22 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Books
 {
     public class BookRemindService : IBookRemindService
     {
-        private readonly IUnitOfWork2 _uow;
-        private IApplicationSettings _appSettings;
-        private IUserService _userService;
-        private IMailTemplate _mailTemplate;
-        private IMailingService _mailingService;
-        private IOrganizationService _organizationService;
+        private readonly IApplicationSettings _appSettings;
+        private readonly IUserService _userService;
+        private readonly IMailTemplate _mailTemplate;
+        private readonly IMailingService _mailingService;
+        private readonly IOrganizationService _organizationService;
         private readonly IDbSet<BookLog> _booksDbSet;
         private readonly ILogger _logger;
 
         public BookRemindService(IUnitOfWork2 uow, IOrganizationService organizationService, IApplicationSettings appSettings, IUserService userService, IMailTemplate mailTemplate, IMailingService mailingService, ILogger logger)
         {
-            _uow = uow;
             _userService = userService;
             _organizationService = organizationService;
             _appSettings = appSettings;
             _mailTemplate = mailTemplate;
             _mailingService = mailingService;
-            _booksDbSet = _uow.GetDbSet<BookLog>();
+            _booksDbSet = uow.GetDbSet<BookLog>();
             _logger = logger;
         }
         public void RemindAboutBooks(int daysBefore)

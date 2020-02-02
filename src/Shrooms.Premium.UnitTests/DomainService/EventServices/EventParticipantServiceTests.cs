@@ -4,23 +4,23 @@ using System.Data.Entity;
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
+using Shrooms.Constants.BusinessLayer.Events;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Events;
-using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.Host.Contracts.Infrastructure;
+using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Participation;
 using Shrooms.Premium.Main.BusinessLayer.DomainExceptions.Event;
 using Shrooms.Premium.Main.BusinessLayer.DomainServiceValidators.Events;
 using Shrooms.UnitTests.Extensions;
-using Shrooms.Constants.BusinessLayer.Events;
 
 namespace Shrooms.Premium.UnitTests.DomainService.EventServices
 {

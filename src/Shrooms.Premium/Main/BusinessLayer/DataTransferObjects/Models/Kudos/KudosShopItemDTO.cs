@@ -26,8 +26,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Kudos
 
         public bool Equals(KudosShopItemDTO kudosShopItemDto)
         {
-            if (kudosShopItemDto != null &&
-                Id == kudosShopItemDto.Id)
+            if (kudosShopItemDto != null && Id == kudosShopItemDto.Id)
             {
                 return true;
             }

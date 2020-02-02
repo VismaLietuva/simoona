@@ -156,6 +156,7 @@ namespace Shrooms.Premium.UnitTests.DomainService.EventServices
                 }
             };
 
+            // ReSharper disable once CollectionNeverUpdated.Local
             var options = new List<EventOptionCountDTO>();
 
             _eventParticipationService.GetEventParticipants(eventId, userAndOrg).Returns(users);

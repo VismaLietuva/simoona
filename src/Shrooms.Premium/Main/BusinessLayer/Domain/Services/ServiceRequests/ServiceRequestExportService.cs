@@ -13,14 +13,12 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.ServiceRequests
 {
     public class ServiceRequestExportService : IServiceRequestExportService
     {
-        private readonly IUnitOfWork2 _uow;
         private readonly IDbSet<ServiceRequest> _serviceRequestsDbSet;
         private readonly IExcelBuilder _excelBuilder;
 
         public ServiceRequestExportService(IUnitOfWork2 uow, IExcelBuilder excelBuilder)
         {
-            _uow = uow;
-            _serviceRequestsDbSet = _uow.GetDbSet<ServiceRequest>();
+            _serviceRequestsDbSet = uow.GetDbSet<ServiceRequest>();
             _excelBuilder = excelBuilder;
         }
 

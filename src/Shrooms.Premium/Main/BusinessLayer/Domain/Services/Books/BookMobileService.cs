@@ -179,7 +179,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Books
         private async Task<RetrievedBookInfoDTO> GetInfoFromExternalApiAsync(string code)
         {
             var bookInfo = await _bookInfoService.FindBookByIsbnAsync(code);
-            _serviceValidator.ThrowIfBookDoesNotExistGoogleAPI(bookInfo != null);
+            _serviceValidator.ThrowIfBookDoesNotExistGoogleApi(bookInfo != null);
             return MapGoogleApiBookToDTO(bookInfo);
         }
 

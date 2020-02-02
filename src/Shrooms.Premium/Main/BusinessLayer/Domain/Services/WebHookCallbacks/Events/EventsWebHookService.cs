@@ -40,13 +40,12 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.WebHookCallbacks.Ev
 
         public async Task UpdateRecurringEvents()
         {
-            var newEvents = new List<Event>();
-
-            var eventsToUpdate = await _eventsDbSet
-                .Include(e => e.EventOptions)
-                .Include(u => u.ResponsibleUser)
-                .Where(e => e.EventRecurring != EventRecurrenceOptions.None && e.EndDate < _systemClock.UtcNow)
-                .ToListAsync();
+            var eventsToUpdate =
+                await _eventsDbSet
+                    .Include(e => e.EventOptions)
+                    .Include(u => u.ResponsibleUser)
+                    .Where(e => e.EventRecurring != EventRecurrenceOptions.None && e.EndDate < _systemClock.UtcNow)
+                    .ToListAsync();
 
             foreach (var @event in eventsToUpdate)
             {
@@ -55,7 +54,6 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.WebHookCallbacks.Ev
                 _eventsDbSet.Add(newEvent);
                 @event.EventRecurring = EventRecurrenceOptions.None;
                 CreateNewOptions(@event.EventOptions, newEvent);
-                newEvents.Add(newEvent);
             }
 
             await _uow.SaveChangesAsync(false);

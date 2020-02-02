@@ -12,7 +12,7 @@ using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Book.BookDetai
 namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers.Book
 {
     [AllowAnonymous]
-    [HMACAuthentication]
+    [HmacAuthentication]
     public class BookMobileController : ApiController
     {
         private readonly IMapper _mapper;

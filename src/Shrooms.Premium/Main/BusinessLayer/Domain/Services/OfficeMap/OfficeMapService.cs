@@ -12,8 +12,6 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.OfficeMap
 {
     public class OfficeMapService : IOfficeMapService
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IUnitOfWork2 _uow;
         private readonly IRepository<ApplicationUser> _applicationUserRepository;
         private readonly IDbSet<Office> _officeDbSet;
         private readonly IDbSet<ApplicationUser> _usersDbSet;
@@ -23,11 +21,9 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.OfficeMap
         public OfficeMapService(IMapper mapper, IUnitOfWork unitOfWork, IUnitOfWork2 uow, IRoleService roleService)
         {
             _mapper = mapper;
-            _unitOfWork = unitOfWork;
-            _uow = uow;
-            _applicationUserRepository = _unitOfWork.GetRepository<ApplicationUser>();
-            _usersDbSet = _uow.GetDbSet<ApplicationUser>();
-            _officeDbSet = _uow.GetDbSet<Office>();
+            _applicationUserRepository = unitOfWork.GetRepository<ApplicationUser>();
+            _usersDbSet = uow.GetDbSet<ApplicationUser>();
+            _officeDbSet = uow.GetDbSet<Office>();
             _roleService = roleService;
         }
 

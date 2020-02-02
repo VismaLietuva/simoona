@@ -73,7 +73,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.DomainServiceValidators.Books
             }
         }
 
-        public void ThrowIfBookDoesNotExistGoogleAPI(bool bookExists)
+        public void ThrowIfBookDoesNotExistGoogleApi(bool bookExists)
         {
             if (!bookExists)
             {

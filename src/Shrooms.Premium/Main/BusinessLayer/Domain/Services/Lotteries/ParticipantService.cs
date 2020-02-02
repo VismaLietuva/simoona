@@ -13,13 +13,11 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Lotteries
 {
     public class ParticipantService : IParticipantService
     {
-        private readonly IUnitOfWork2 _unitOfWork;
         private readonly IDbSet<LotteryParticipant> _participantsDbSet;
 
         public ParticipantService(IUnitOfWork2 unitOfWork)
         {
-            _unitOfWork = unitOfWork;
-            _participantsDbSet = _unitOfWork.GetDbSet<LotteryParticipant>();
+            _participantsDbSet = unitOfWork.GetDbSet<LotteryParticipant>();
         }
 
         public IEnumerable<string> GetParticipantsId(int lotteryId)

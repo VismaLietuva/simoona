@@ -569,6 +569,12 @@
     <Compile Include="Infrastructure\IoC\Modules\ServiceRequestModule.cs" />
   </ItemGroup>
   <ItemGroup>
+    <AdditionalFiles Include="..\..\open-source\src\api\stylecop.json">
+      <Link>stylecop.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </AdditionalFiles>
+  </ItemGroup>
+  <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>

@@ -69,13 +69,13 @@ namespace Shrooms.Premium.UnitTests.DomainService
         [Test]
         public void Should_Return_Event_Type_With_Active_Event()
         {
-            //Arange
+            // Arrange
             MockEventTypes();
 
-            //Act
+            // Act
             var eventType = _eventUtilitiesService.GetEventType(3, 4);
 
-            //Assert
+            // Assert
             Assert.AreEqual(true, eventType.HasActiveEvents);
             Assert.AreEqual("type4", eventType.Name);
         }
@@ -83,13 +83,13 @@ namespace Shrooms.Premium.UnitTests.DomainService
         [Test]
         public void Should_Return_Event_Type_With_Inactive_Event()
         {
-            //Arange
+            // Arrange
             MockEventTypes();
 
-            //Act
+            // Act
             var eventType = _eventUtilitiesService.GetEventType(2, 3);
 
-            //Assert
+            // Assert
             Assert.AreEqual(false, eventType.HasActiveEvents);
             Assert.AreEqual("type3", eventType.Name);
         }
@@ -100,7 +100,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
         {
             MockEventTypes();
 
-            var eventTypes = _eventUtilitiesService.GetEventTypesToRemind(orgId);
+            var eventTypes = _eventUtilitiesService.GetEventTypesToRemind(orgId).ToList();
 
             Assert.AreEqual(amount, eventTypes.Count());
         }
@@ -110,7 +110,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
         {
             MockEventTypes();
 
-            var eventTypes = _eventUtilitiesService.GetEventTypesToRemind(4);
+            var eventTypes = _eventUtilitiesService.GetEventTypesToRemind(4).ToList();
 
             Assert.AreEqual(1, eventTypes.Count());
             Assert.AreEqual(5, eventTypes.First().Id);
