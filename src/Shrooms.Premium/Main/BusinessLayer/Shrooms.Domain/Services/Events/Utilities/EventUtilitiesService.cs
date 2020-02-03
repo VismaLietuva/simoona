@@ -127,6 +127,8 @@ namespace Shrooms.Domain.Services.Events.Utilities
                 throw new ValidationException(ContentDoesNotExist, "Event type does not exist");
             }
 
+            ValidateEventTypeName(eventType.Name, eventType.OrganizationId);
+
             orgEventType.IsSingleJoin = eventType.IsSingleJoin;
             orgEventType.Name = eventType.Name;
             orgEventType.SingleJoinGroupName = SetSingleJoinGroupName(eventType.IsSingleJoin, eventType.SingleJoinGroupName);
