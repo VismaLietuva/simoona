@@ -18,7 +18,8 @@
             getEventType: getEventType,
             createEventType: createEventType,
             updateEventType: updateEventType,
-            deleteEventType: deleteEventType
+            deleteEventType: deleteEventType,
+            getSingleJoinGroups: getSingleJoinGroups
         };
         return service;
 
@@ -46,6 +47,10 @@
 
         function deleteEventType(id) {
             return $resource(eventTypesUrl + 'Delete').delete({ id: id }).$promise;
+        }
+
+        function getSingleJoinGroups() {
+            return $resource(eventTypesUrl + 'Groups').query().$promise;
         }
     }
 })();

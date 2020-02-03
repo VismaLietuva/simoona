@@ -43,7 +43,7 @@
                         <label class="control-label col-xs-12 col-sm-4"></label>
                         <div class="col-xs-12 col-sm-4">
                             <input id="single-join" type="checkbox" class="event-form-checkbox"
-                                ng-model="vm.eventType.isSingleJoin"
+                                ng-model="vm.eventType.isSingleJoin" ng-change="vm.eventType.singleJoinGroupName = '' "
                                 data-test-id="event-type-form-is-single-join-input" />
                             <label for="single-join" class="control-label"
                                 translate="customization.eventTypeSingleJoin"></label>
@@ -56,10 +56,11 @@
                             translate="customization.singleJoinGroupLabel"></label>
                         <div class="col-xs-12 col-sm-4">
                             <input id="groupName" type="text" class="form-control" list="groupList"
-                                ng-disabled="!vm.eventType.isSingleJoin" />
+                                ng-disabled="!vm.eventType.isSingleJoin" ng-model="vm.eventType.singleJoinGroupName" />
                             <datalist id="groupList">
-                                <optgroup label="cmon">
-                                    <option ng-repeat="name in vm.singleJoinGroups" value="{{name}}">{{name}}</option>
+                                <optgroup>
+                                    <option ng-repeat="groupName in vm.singleJoinGroups" value="{{groupName}}">
+                                        {{groupName}}</option>
                                 </optgroup>
                             </datalist>
                         </div>

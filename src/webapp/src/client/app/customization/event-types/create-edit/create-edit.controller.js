@@ -18,7 +18,7 @@
         var vm = this;
         var listState = 'Root.WithOrg.Admin.Customization.EventTypes.List';
 
-        vm.singleJoinGroups = ['Maistas', 'Sportas'];
+        vm.singleJoinGroups = [];
 
         vm.eventType = {};
         vm.onEditOriginalName = '';
@@ -50,6 +50,10 @@
                     $state.go(listState);
                 });
             }
+
+            eventTypesRepository.getSingleJoinGroups().then(function(response) {
+                vm.singleJoinGroups = response;
+            });
         }
 
         function createEventType() {
@@ -75,6 +79,5 @@
                 $state.go(listState);
             }, errorHandler.handleErrorMessage);
         }
-
     }
 })();
