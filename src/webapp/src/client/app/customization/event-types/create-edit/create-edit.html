@@ -59,8 +59,8 @@
                                 ng-disabled="!vm.eventType.isSingleJoin" ng-model="vm.eventType.singleJoinGroupName" />
                             <datalist id="groupList">
                                 <optgroup>
-                                    <option ng-repeat="groupName in vm.singleJoinGroups" value="{{groupName}}">
-                                        {{groupName}}</option>
+                                    <option ng-repeat="group in vm.singleJoinGroups" value="{{group}}">
+                                        {{group}}</option>
                                 </optgroup>
                             </datalist>
                         </div>
