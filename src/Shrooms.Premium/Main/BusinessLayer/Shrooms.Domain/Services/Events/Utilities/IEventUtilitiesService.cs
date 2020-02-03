@@ -29,6 +29,6 @@ namespace Shrooms.Domain.Services.Events.Utilities
 
         bool AnyEventsThisWeekByType(int eventTypeId);
 
-        IEnumerable<string> GetSingleJoinGroupNames(int organizationId);
+        IEnumerable<string> GetEventTypesSingleJoinGroups(int organizationId);
     }
 }

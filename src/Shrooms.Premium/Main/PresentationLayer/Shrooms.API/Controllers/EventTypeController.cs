@@ -140,7 +140,7 @@ namespace Shrooms.API.Controllers.WebApi.EventTypeController
         {
             try
             {
-                var groups = _eventUtilitiesService.GetSingleJoinGroupNames(GetOrganizationId());
+                var groups = _eventUtilitiesService.GetEventTypesSingleJoinGroups(GetOrganizationId());
 
                 return Ok(groups);
             }

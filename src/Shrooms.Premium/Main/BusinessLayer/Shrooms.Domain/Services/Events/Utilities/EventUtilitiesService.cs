@@ -202,7 +202,7 @@ namespace Shrooms.Domain.Services.Events.Utilities
                           x.RegistrationDeadline > DateTime.UtcNow);
         }
 
-        public IEnumerable<string> GetSingleJoinGroupNames(int organizationId)
+        public IEnumerable<string> GetEventTypesSingleJoinGroups(int organizationId)
         {
             return _eventTypesDbSet
                 .Where(x => x.OrganizationId == organizationId &&
