@@ -10,6 +10,7 @@ namespace Shrooms.DataTransferObjects.Models.Events
         public bool AlreadyParticipates { get; set; }
         public DateTime EndDate { get; set; }
         public int EventTypeId { get; set; }
+        public string SingleJoinGroupName { get; set; }
         public bool IsSingleJoin { get; set; }
         public int MaxChoices { get; set; }
         public int MaxParticipants { get; set; }
