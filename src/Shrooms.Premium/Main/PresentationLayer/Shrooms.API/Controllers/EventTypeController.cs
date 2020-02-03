@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System;
+using AutoMapper;
 using Shrooms.API.Filters;
 using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.DataTransferObjects.Models.Events;
@@ -129,6 +130,23 @@ namespace Shrooms.API.Controllers.WebApi.EventTypeController
             catch (ValidationException e)
             {
                 return BadRequestWithError(e);
+            }
+        }
+
+        [HttpGet]
+        [Route("Groups")]
+        [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
+        public IHttpActionResult GetSingleJoinGroupNames()
+        {
+            try
+            {
+                var groups = _eventUtilitiesService.GetSingleJoinGroupNames(GetOrganizationId());
+
+                return Ok(groups);
+            }
+            catch (ArgumentNullException e)
+            {
+                return BadRequest(e.Message);
             }
         }
     }
