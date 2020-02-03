@@ -432,7 +432,7 @@ namespace Shrooms.API.Controllers.Kudos
 
         [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
-        public async Task<IHttpActionResult> GetWelcomeKudos()
+        public IHttpActionResult GetWelcomeKudos()
         {
             var welcomeKudosDTO = _kudosService.GetWelcomeKudos();
 
