@@ -1,20 +1,20 @@
-﻿namespace Shrooms.API.Controllers
-{
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using System.Web.Http;
-    using AutoMapper;
-    using Shrooms.DataTransferObjects.Models.Notification;
-    using Shrooms.Domain.Services.Notifications;
-    using Shrooms.EntityModels.Models.Notifications;
-    using Shrooms.WebViewModels.Models.Notifications;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Web.Http;
+using AutoMapper;
+using Shrooms.DataTransferObjects.Models.Notification;
+using Shrooms.Domain.Services.Notifications;
+using Shrooms.EntityModels.Models.Notifications;
+using Shrooms.WebViewModels.Models.Notifications;
 
+namespace Shrooms.API.Controllers
+{
     [Authorize]
     public class NotificationController : BaseController
     {
-        private INotificationService _notificationService;
-        private IMapper _mapper;
+        private readonly INotificationService _notificationService;
+        private readonly IMapper _mapper;
 
         public NotificationController(INotificationService notificationService, IMapper mapper)
         {
@@ -52,9 +52,8 @@
             foreach (var item in comments)
             {
                 var parentComment = stackedList
-                    .Where(x => CompareSourcesIds(x.sourceIds, item.SourceIds) && 
-                                item.Type != NotificationType.EventReminder)
-                    .FirstOrDefault();
+                    .FirstOrDefault(x => CompareSourcesIds(x.sourceIds, item.SourceIds) && item.Type != NotificationType.EventReminder);
+
                 if (parentComment == null)
                 {
                     stackedList.Add(_mapper.Map<NotificationViewModel>(item));
@@ -72,7 +71,7 @@
             return stackedList;
         }
 
-        private bool CompareSourcesIds(SourcesViewModel viewModel, SourcesDto dtoModel)
+        private static bool CompareSourcesIds(SourcesViewModel viewModel, SourcesDto dtoModel)
         {
             if (viewModel.postId != dtoModel.PostId || viewModel.eventId != dtoModel.EventId || viewModel.projectId != dtoModel.ProjectId || viewModel.wallId != dtoModel.WallId)
             {
