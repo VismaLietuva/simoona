@@ -45,7 +45,7 @@ namespace Shrooms.Domain.Services.Email.ServiceRequest
         {
             var newServiceRequest = _serviceRequestDbSet.Single(s => s.Id == createdServiceRequest.ServiceRequestId);
             var organizationName = GetOrganizationName(newServiceRequest.OrganizationId);
-            
+
             var emails = _usersDbSet
                 .Where(x => x.ServiceRequestCategoriesAssigned.Any(y => y.Name == newServiceRequest.CategoryName))
                 .Where(x => x.Id != newServiceRequest.EmployeeId)
@@ -113,7 +113,9 @@ namespace Shrooms.Domain.Services.Email.ServiceRequest
                 .FirstOrDefault();
 
             if (email == null)
+            {
                 return;
+            }
 
             var subject = Resources.Common.ServiceRequestAdminChangedStatusSubject;
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organizationName);
