@@ -28,5 +28,7 @@ namespace Shrooms.Domain.Services.Events.Utilities
         IEnumerable<EventOptionCountDTO> GetEventChosenOptions(Guid eventId, UserAndOrganizationDTO userAndOrg);
 
         bool AnyEventsThisWeekByType(int eventTypeId);
+
+        IEnumerable<string> GetEventTypesSingleJoinGroups(int organizationId);
     }
 }

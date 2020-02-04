@@ -83,6 +83,7 @@ namespace Shrooms.Domain.Services.Events.Utilities
                     IsSingleJoin = x.IsSingleJoin,
                     SendWeeklyReminders = x.SendWeeklyReminders,
                     Name = x.Name,
+                    SingleJoinGroupName = x.SingleJoinGroupName,
                     HasActiveEvents = x.Events.Any(e => e.EndDate > DateTime.UtcNow
                                                      || e.EventRecurring != EventRecurrenceOptions.None)
                 })
@@ -126,8 +127,14 @@ namespace Shrooms.Domain.Services.Events.Utilities
                 throw new ValidationException(ContentDoesNotExist, "Event type does not exist");
             }
 
+            if (eventType.Name != orgEventType.Name)
+            {
+                ValidateEventTypeName(eventType.Name, eventType.OrganizationId);
+            }
+
             orgEventType.IsSingleJoin = eventType.IsSingleJoin;
             orgEventType.Name = eventType.Name;
+            orgEventType.SingleJoinGroupName = SetSingleJoinGroupName(eventType.IsSingleJoin, eventType.SingleJoinGroupName);
             orgEventType.ModifiedBy = eventType.UserId;
             orgEventType.Modified = DateTime.UtcNow;
             orgEventType.SendWeeklyReminders = eventType.SendWeeklyReminders;
@@ -195,6 +202,15 @@ namespace Shrooms.Domain.Services.Events.Utilities
                           x.RegistrationDeadline > DateTime.UtcNow);
         }
 
+        public IEnumerable<string> GetEventTypesSingleJoinGroups(int organizationId)
+        {
+            return _eventTypesDbSet
+                .Where(x => x.OrganizationId == organizationId &&
+                            !string.IsNullOrEmpty(x.SingleJoinGroupName))
+                .Select(x => x.SingleJoinGroupName)
+                .Distinct();
+        }
+
         private void ValidateEventTypeName(string eventTypeName, int organizationId)
         {
             var nameAlreadyExists = _eventTypesDbSet
@@ -207,9 +223,9 @@ namespace Shrooms.Domain.Services.Events.Utilities
             }
         }
 
-        private EventType MapNewEventType(CreateEventTypeDTO eventTypeDto)
+        private static EventType MapNewEventType(CreateEventTypeDTO eventTypeDto)
         {
-            var eventType = new EventType()
+            var eventType = new EventType
             {
                 Created = DateTime.UtcNow,
                 Modified = DateTime.UtcNow,
@@ -217,10 +233,16 @@ namespace Shrooms.Domain.Services.Events.Utilities
                 OrganizationId = eventTypeDto.OrganizationId,
                 IsSingleJoin = eventTypeDto.IsSingleJoin,
                 SendWeeklyReminders = eventTypeDto.SendWeeklyReminders,
-                Name = eventTypeDto.Name
+                Name = eventTypeDto.Name,
+                SingleJoinGroupName = SetSingleJoinGroupName(eventTypeDto.IsSingleJoin, eventTypeDto.SingleJoinGroupName)
             };
 
             return eventType;
+        }
+
+        private static string SetSingleJoinGroupName(bool isSingleJoin, string groupName)
+        {
+            return isSingleJoin && !string.IsNullOrEmpty(groupName) ? groupName : null;
         }
     }
 }
