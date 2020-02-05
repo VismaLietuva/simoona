@@ -12,6 +12,8 @@ namespace Shrooms.EntityModels.Models.Events
 
         public bool SendWeeklyReminders { get; set; }
 
+        public bool IsShownWithAllEvents { get; set; }
+
         public virtual ICollection<Event> Events { get; set; }
     }
 }
