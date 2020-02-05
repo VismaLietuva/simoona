@@ -49,6 +49,8 @@
                     errorHandler.handleErrorMessage(error);
                     $state.go(listState);
                 });
+            } else {
+                vm.eventType.isShownWithAllEvents = true;
             }
 
             eventTypesRepository.getSingleJoinGroups().then(function(response) {
