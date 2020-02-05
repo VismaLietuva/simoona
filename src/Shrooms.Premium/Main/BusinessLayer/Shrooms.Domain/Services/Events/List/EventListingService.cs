@@ -54,15 +54,16 @@ namespace Shrooms.Domain.Services.Events.List
         {
             var events = _eventsDbSet
                 .Include(x => x.EventParticipants)
+                .Include(x => x.EventType)
                 .Where(t =>
-                    t.OrganizationId == userOrganization.OrganizationId &
-                    t.EndDate > DateTime.UtcNow)
+                    t.OrganizationId == userOrganization.OrganizationId &&
+                    t.EndDate > DateTime.UtcNow &&
+                    t.EventType.IsShownWithAllEvents)
                 .Where(EventTypeFilter(typeId))
                 .Select(MapEventToListItemDto(userOrganization.UserId))
                 .OrderByDescending(e => e.IsPinned)
                 .ThenBy(e => e.StartDate)
                 .ToList();
-
 
             return events;
         }

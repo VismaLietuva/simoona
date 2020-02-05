@@ -7,5 +7,6 @@
         public bool SendWeeklyReminders { get; set; }
         public string Name { get; set; }
         public string SingleJoinGroupName { get; set; }
+        public bool IsShownWithAllEvents { get; set; }
     }
 }
