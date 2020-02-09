@@ -25,6 +25,7 @@
             searchWall: searchWall,
             watchPost: watchPost,
             unwatchPost: unwatchPost,
+
             getEventPosts: getEventPosts,
             getEventPost: getEventPost,
             createEventPost: createEventPost

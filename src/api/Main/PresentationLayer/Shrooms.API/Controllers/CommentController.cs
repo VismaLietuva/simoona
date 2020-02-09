@@ -61,7 +61,7 @@ namespace Shrooms.API.Controllers
 
         [HttpPut]
         [Route("Edit")]
-        [PermissionAuthorize(Permission = BasicPermissions.Comment)]
+        [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Comment, BasicPermissions.EventWall)]
         public IHttpActionResult EditComment(EditCommentViewModel commentViewModel)
         {
             if (!ModelState.IsValid)
@@ -89,7 +89,7 @@ namespace Shrooms.API.Controllers
 
         [HttpDelete]
         [Route("Delete")]
-        [PermissionAuthorize(Permission = BasicPermissions.Comment)]
+        [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Comment, BasicPermissions.EventWall)]
         public IHttpActionResult DeleteComment(int id)
         {
             if (!ModelState.IsValid)
@@ -114,7 +114,7 @@ namespace Shrooms.API.Controllers
 
         [HttpPut]
         [Route("Hide")]
-        [PermissionAuthorize(Permission = BasicPermissions.Comment)]
+        [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Comment, BasicPermissions.EventWall)]
         public IHttpActionResult HideComment(HideCommentViewModel comment)
         {
             if (!ModelState.IsValid)

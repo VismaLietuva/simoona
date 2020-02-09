@@ -10,6 +10,7 @@
                 isAdmin: '=',
                 wallId: '=',
                 isWallModule: '=',
+                isEventsWall: '=',
                 hasHashtagify: '=',
                 isHidden: '<'
             },
@@ -19,8 +20,6 @@
         });
 
     wallCommentController.$inject = [
-        'authService',
-        'notifySrv',
         'wallSettings',
         'errorHandler',
         'youtubeSettings',
@@ -28,8 +27,7 @@
         'wallService'
     ];
 
-    function wallCommentController(authService, notifySrv, wallSettings, errorHandler,
-        youtubeSettings, wallCommentRepository, wallService) {
+    function wallCommentController(wallSettings, errorHandler, youtubeSettings, wallCommentRepository, wallService) {
         /*jshint validthis: true */
         var vm = this;
 
@@ -58,7 +56,7 @@
 
                 wallCommentRepository.editComment(vm.comment).then(function() {
                     vm.isActionsEnabled = true;
-                    wallService.initWall(vm.isWallModule, vm.wallId);
+                    wallService.initWall(vm.isWallModule, vm.wallId, vm.isEventsWall);
                 }, vm.handleErrorMessage);
             }
         }
@@ -71,7 +69,7 @@
 
                 wallCommentRepository.deleteComment(vm.comment).then(function() {
                     vm.isActionsEnabled = true;
-                    wallService.initWall(vm.isWallModule, vm.wallId);
+                    wallService.initWall(vm.isWallModule, vm.wallId, vm.isEventsWall);
                 }, vm.handleErrorMessage);
             }
         }

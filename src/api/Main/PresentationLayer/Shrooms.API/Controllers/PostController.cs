@@ -80,7 +80,7 @@ namespace Shrooms.API.Controllers
 
         [HttpPut]
         [Route("Edit")]
-        [PermissionAuthorize(Permission = BasicPermissions.Post)]
+        [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Post, BasicPermissions.EventWall)]
         public IHttpActionResult EditPost(EditPostViewModel editedPost)
         {
             if (!ModelState.IsValid)
@@ -107,7 +107,7 @@ namespace Shrooms.API.Controllers
 
         [HttpDelete]
         [Route("Delete")]
-        [PermissionAuthorize(Permission = BasicPermissions.Post)]
+        [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Post, BasicPermissions.EventWall)]
         public IHttpActionResult DeletePost(int id)
         {
             if (id <= 0)
@@ -133,7 +133,7 @@ namespace Shrooms.API.Controllers
 
         [HttpPut]
         [Route("Hide")]
-        [PermissionAuthorize(Permission = BasicPermissions.Post)]
+        [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Post, BasicPermissions.EventWall)]
         public IHttpActionResult HidePost(HidePostViewModel post)
         {
             if (!ModelState.IsValid)
@@ -159,7 +159,7 @@ namespace Shrooms.API.Controllers
 
         [HttpPut]
         [Route("Like")]
-        [PermissionAuthorize(Permission = BasicPermissions.Post)]
+        [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Post, BasicPermissions.EventWall)]
         public IHttpActionResult ToggleLike(int id)
         {
             if (id <= 0)

@@ -1,4 +1,4 @@
-<div id="wall-post-create" class="panel panel-body" has-permissions="['POST_BASIC']">
+<div id="wall-post-create" class="panel panel-body" has-one-of-permissions="['POST_BASIC','EVENTWALL_BASIC']">
 
     <form name="postForm">
 
@@ -43,14 +43,14 @@
                 <length-counter max-length="vm.maxLength"
                                 current-length="postForm.messageBody.$viewValue.length"
                                 class="pull-right">
-                </length-counter>   
+                </length-counter>
                 <div class="image-upload-component" has-permissions="['PICTURE_BASIC']">
                     <span class="glyphicon glyphicon-camera media-icons"></span>
                     <input type="file"
                            accept="image/*"
                            onchange="angular.element(this).scope().vm.attachImage(this)"
                            data-test-id="image-upload-input-field">
-                </div>             
+                </div>
             </div>
 
             <div class="col-xs-12 pull-left nopadding">
@@ -66,7 +66,7 @@
                 </div>
 
             </div>
-            
+
             <div class="clearfix"></div>
         </div>
     </form>

@@ -12,12 +12,12 @@
 
     function wallCommentRepository($resource, endPoint) {
         var commentUrl = endPoint + '/Comment/';
-        var wallUrl = endPoint + '/Wall/';
 
         var service = {
             createComment: createComment,
             editComment: editComment,
             deleteComment: deleteComment,
+
             createEventComment: createEventComment
         };
         return service;

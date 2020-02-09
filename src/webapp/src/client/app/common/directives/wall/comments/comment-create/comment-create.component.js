@@ -7,6 +7,7 @@
             bindings: {
                 wallId: '=',
                 isWallModule: '=',
+                isEventsWall: '=',
                 post: '='
             },
             templateUrl: 'app/common/directives/wall/comments/comment-create/comment-create.html',
@@ -83,9 +84,16 @@
             vm.commentForm.postId = vm.post.id;
             vm.commentForm.pictureId = pictureId;
 
-            wallCommentRepository.createComment(vm.commentForm).then(function() {
-                wallService.initWall(vm.isWallModule, vm.wallId);
-            }, errorHandler.handleErrorMessage);
+            if (vm.isEventsWall) {
+                wallCommentRepository.createEventComment(vm.commentForm).then(function() {
+                    wallService.initWall(vm.isWallModule, vm.wallId, vm.isEventsWall);
+                }, errorHandler.handleErrorMessage);
+            }
+            else {
+                wallCommentRepository.createComment(vm.commentForm).then(function() {
+                    wallService.initWall(vm.isWallModule, vm.wallId, vm.isEventsWall);
+                }, errorHandler.handleErrorMessage);
+            }
 
             clearComment();
         }
