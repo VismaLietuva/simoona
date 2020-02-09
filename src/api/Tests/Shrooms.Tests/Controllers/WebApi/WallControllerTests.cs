@@ -91,7 +91,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
                 Id = wallId
             };
 
-            _wallService.WallDetails(0, null).ReturnsForAnyArgs(Task.Run(() => wall));
+            _wallService.GetWallDetails(0, null).ReturnsForAnyArgs(Task.Run(() => wall));
 
             var response = await _wallController.GetWall(wallId);
 

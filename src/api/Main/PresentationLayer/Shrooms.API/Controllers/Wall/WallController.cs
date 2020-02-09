@@ -63,9 +63,9 @@ namespace Shrooms.API.Controllers.Wall
 
             try
             {
-                UserAndOrganizationDTO userInfo = GetUserAndOrganization();
+                var userAndOrg = GetUserAndOrganization();
 
-                var wall = await _wallService.WallDetails(wallId, userInfo);
+                var wall = await _wallService.GetWallDetails(wallId, userAndOrg);
                 var mappedWall = _mapper.Map<WallDto, WallListViewModel>(wall);
                 return Ok(mappedWall);
             }
@@ -93,15 +93,15 @@ namespace Shrooms.API.Controllers.Wall
                 return BadRequest();
             }
 
-            var userOrg = GetUserAndOrganization();
+            var userAndOrg = GetUserAndOrganization();
             if (string.IsNullOrEmpty(attendeeId))
             {
-                attendeeId = userOrg.UserId;
+                attendeeId = userAndOrg.UserId;
             }
 
             try
             {
-                var userDto = _wallService.JoinLeaveWall(wallId, attendeeId, userOrg.UserId, userOrg.OrganizationId, false);
+                var userDto = _wallService.JoinLeaveWall(wallId, attendeeId, userAndOrg.UserId, userAndOrg.OrganizationId, false);
                 var result = _mapper.Map<ApplicationUserMinimalViewModelDto, ApplicationUserMinimalViewModel>(userDto);
 
                 return Ok(result);
@@ -130,7 +130,8 @@ namespace Shrooms.API.Controllers.Wall
         {
             try
             {
-                var wallMembersDto = await _wallService.GetWallMembers(wallId, GetUserAndOrganization());
+                var userAndOrg = GetUserAndOrganization();
+                var wallMembersDto = await _wallService.GetWallMembers(wallId, userAndOrg);
                 var result = _mapper.Map<IEnumerable<WallMemberDto>, IEnumerable<WallMemberViewModel>>(wallMembersDto);
                 return Ok(result);
             }
@@ -196,8 +197,8 @@ namespace Shrooms.API.Controllers.Wall
                 return BadRequest();
             }
 
-            var userAndOrganization = GetUserAndOrganization();
-            var foundWallPosts = await _wallService.SearchWall(searchString, userAndOrganization, page, ConstWebApi.DefaultPageSize);
+            var userAndOrg = GetUserAndOrganization();
+            var foundWallPosts = await _wallService.SearchWall(searchString, userAndOrg, page, ConstWebApi.DefaultPageSize);
 
             var mappedPosts = _mapper.Map<IList<WallPostViewModel>>(foundWallPosts);
             var pagedViewModel = new PagedWallViewModel<WallPostViewModel>
@@ -224,8 +225,8 @@ namespace Shrooms.API.Controllers.Wall
             try
             {
                 var wallId = await _wallService.CreateNewWall(wallDto);
-
-                var notificationDto = await _notificationService.CreateForWall(GetUserAndOrganization(), wallDto, wallId);
+                var userAndOrg = GetUserAndOrganization();
+                var notificationDto = await _notificationService.CreateForWall(userAndOrg, wallDto, wallId);
 
                 NotificationHub.SendNotificationToAllUsers(_mapper.Map<NotificationViewModel>(notificationDto), GetUserAndOrganizationHub());
 
@@ -277,7 +278,8 @@ namespace Shrooms.API.Controllers.Wall
 
             try
             {
-                _wallService.DeleteWall(wallId, GetUserAndOrganization(), EntityModels.Models.Multiwall.WallType.UserCreated);
+                var userAndOrg = GetUserAndOrganization();
+                _wallService.DeleteWall(wallId, userAndOrg, EntityModels.Models.Multiwall.WallType.UserCreated);
                 return Ok();
             }
             catch (ValidationException e)

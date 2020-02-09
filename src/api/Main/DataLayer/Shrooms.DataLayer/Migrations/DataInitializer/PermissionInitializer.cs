@@ -34,7 +34,8 @@ namespace Shrooms.DataLayer.Migrations.DataInitializer
                 .AddBasicPermission(permissionName: BasicPermissions.Room, withRoleNames: Roles.NewUser)
                 .AddBasicPermission(permissionName: BasicPermissions.Floor, withRoleNames: Roles.NewUser)
                 .AddBasicPermission(permissionName: BasicPermissions.Skill, withRoleNames: Roles.NewUser)
-                .AddBasicPermission(permissionName: BasicPermissions.Event, withRoleNames: Roles.External)
+                .AddBasicPermission(permissionName: BasicPermissions.Event, withRoleNames: new[] { Roles.External, Roles.Intern })
+                .AddBasicPermission(permissionName: BasicPermissions.EventWall, withRoleNames: new[] { Roles.External, Roles.Intern })
                 .AddBasicPermission(permissionName: BasicPermissions.Office, withRoleNames: Roles.NewUser)
                 .AddBasicPermission(permissionName: BasicPermissions.Picture, withRoleNames: Roles.NewUser)
                 .AddBasicPermission(permissionName: BasicPermissions.Certificate, withRoleNames: Roles.NewUser)
@@ -46,6 +47,7 @@ namespace Shrooms.DataLayer.Migrations.DataInitializer
             //admin permissions
             permissionBuilder
                 .AddAdminPermission(permissionName: AdministrationPermissions.Wall, withRoleNames: Roles.Administration)
+                .AddAdminPermission(permissionName: AdministrationPermissions.EventWall, withRoleNames: Roles.Administration)
                 .AddAdminPermission(permissionName: AdministrationPermissions.Post, withRoleNames: Roles.Administration)
                 .AddAdminPermission(permissionName: AdministrationPermissions.Book, withRoleNames: Roles.Administration, module: Modules.Books)
                 .AddAdminPermission(permissionName: AdministrationPermissions.Role, withRoleNames: Roles.Administration)

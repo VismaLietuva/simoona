@@ -25,7 +25,6 @@
         '$state',
         'authService',
         'wallMenuNavigationRepository',
-        'wallSettings',
         'errorHandler',
         'wallPostRepository',
         'wallRepository',
@@ -38,8 +37,8 @@
     ];
 
     function wallService($location, $timeout, $state, authService, wallMenuNavigationRepository,
-        wallSettings, errorHandler, wallPostRepository, wallRepository, lodash, notifySrv, appConfig, SmoothScroll, WallsType, WallsCount) {
-        
+        errorHandler, wallPostRepository, wallRepository, lodash, notifySrv, appConfig, SmoothScroll, WallsType, WallsCount) {
+
         var wallServiceData = {
             posts: [],
             isScrollingEnabled: true,
@@ -52,7 +51,8 @@
             wallMembers: [],
             isNewContentAvailable: false,
             wallId: null,
-            isWallModule: false
+            isWallModule: false,
+            isEventsWall: false
         };
         var busy = false;
         var settings = {
@@ -92,9 +92,10 @@
 
         ///////
 
-        function initWall(isWallModule, wallId) {
+        function initWall(isWallModule, wallId, isEventsWall) {
             wallServiceData.wallId = wallId;
             wallServiceData.isWallModule = isWallModule;
+            wallServiceData.isEventsWall = isEventsWall;
             wallServiceData.isNewContentAvailable = false;
             wallServiceData.wallMembers = [];
 
@@ -215,10 +216,17 @@
             scrollTop();
         }
 
-        function createPost(post, isWallModule) {
-            wallPostRepository.createPost(post, settings.wallId).then(function () {
-                initWall(isWallModule, settings.wallId);
-            }, errorHandler.handleErrorMessage);
+        function createPost(post, isWallModule, isEventsWall) {
+            if (isEventsWall) {
+                wallPostRepository.createEventPost(post, settings.wallId).then(function () {
+                    initWall(isWallModule, settings.wallId);
+                }, errorHandler.handleErrorMessage);
+            }
+            else {
+                wallPostRepository.createPost(post, settings.wallId).then(function () {
+                    initWall(isWallModule, settings.wallId);
+                }, errorHandler.handleErrorMessage);
+            }
         }
 
         function isValidPostId(postId) {
@@ -264,17 +272,31 @@
                         busy = false;
                     }, errorHandler.handleErrorMessage);
                 } else {
-                    wallPostRepository.getPosts(settings).then(function (response) {
-                        addPostsToWall(response, true);
-                        busy = false;
-                        scrollToPostNotification();
-                    }, function (error) {
-                        if ($state.includes(appConfig.homeStateName) && !!$state.params.wall) {
-                            redirectToHomeState();
-                        } else {
-                            errorHandler.handleErrorMessage(error);
-                        }
-                    });
+                    if (wallServiceData.isEventsWall) {
+                        wallPostRepository.getEventPosts(settings).then(function (response) {
+                            addPostsToWall(response, true);
+                            busy = false;
+                            scrollToPostNotification();
+                        }, function (error) {
+                            if ($state.includes(appConfig.homeStateName) && !!$state.params.wall) {
+                                redirectToHomeState();
+                            } else {
+                                errorHandler.handleErrorMessage(error);
+                            }
+                        });
+                    } else {
+                        wallPostRepository.getPosts(settings).then(function (response) {
+                            addPostsToWall(response, true);
+                            busy = false;
+                            scrollToPostNotification();
+                        }, function (error) {
+                            if ($state.includes(appConfig.homeStateName) && !!$state.params.wall) {
+                                redirectToHomeState();
+                            } else {
+                                errorHandler.handleErrorMessage(error);
+                            }
+                        });
+                    }
                 }
             }
         }
@@ -290,16 +312,29 @@
 
             busy = true;
 
-            wallPostRepository.getPost(postId).then(function (response) {
-                wallServiceData.isScrollingEnabled = false;
-                wallServiceData.isWallLoading = false;
-                wallServiceData.isWallPostsLoading = false;
-                addPostToWall(response);
-                busy = false;
-            }, function () {
-                notifySrv.error('wall.postDoesNotExist');
-                redirectToHomeState();
-            });
+            if (wallServiceData.isEventsWall) {
+                wallPostRepository.getEventPost(postId).then(function (response) {
+                    wallServiceData.isScrollingEnabled = false;
+                    wallServiceData.isWallLoading = false;
+                    wallServiceData.isWallPostsLoading = false;
+                    addPostToWall(response);
+                    busy = false;
+                }, function () {
+                    notifySrv.error('wall.postDoesNotExist');
+                    redirectToHomeState();
+                });
+            } else {
+                wallPostRepository.getPost(postId).then(function (response) {
+                    wallServiceData.isScrollingEnabled = false;
+                    wallServiceData.isWallLoading = false;
+                    wallServiceData.isWallPostsLoading = false;
+                    addPostToWall(response);
+                    busy = false;
+                }, function () {
+                    notifySrv.error('wall.postDoesNotExist');
+                    redirectToHomeState();
+                });
+            }
         }
 
         function addPostsToWall(response, append) {

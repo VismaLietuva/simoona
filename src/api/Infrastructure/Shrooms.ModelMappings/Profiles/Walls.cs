@@ -52,6 +52,7 @@ namespace Shrooms.ModelMappings.Profiles
                 .ForMember(m => m.IsEdited, opt => opt.Ignore())
                 .ForMember(m => m.CanModerate, opt => opt.Ignore())
                 .ForMember(m => m.Comments, opt => opt.UseValue(new List<CommentDto>()))
+                .ForMember(m => m.WallType, opt => opt.MapFrom(s => s.Wall.Type))
                 .ForMember(m => m.WallName, opt => opt.MapFrom(s => s.Wall.Name))
                 .ForMember(m => m.IsWatched, opt => opt.Ignore());
 

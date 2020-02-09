@@ -16,6 +16,7 @@
              ng-if="!!vm.event.wallId">
             <!-- event wall container -->
             <ace-wall is-wall-module="false"
+                      is-events-wall="true"
                       wall-id="vm.event.wallId"
                       is-admin="vm.isEventAdmin"
                       has-hashtagify="false">

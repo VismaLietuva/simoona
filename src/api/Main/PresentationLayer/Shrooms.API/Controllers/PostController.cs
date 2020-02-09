@@ -8,6 +8,7 @@ using Shrooms.DataTransferObjects.Models.Wall.Posts;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.DomainExceptions.Exceptions;
+using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.WebViewModels.Models.Wall.Posts;
 
@@ -221,6 +222,69 @@ namespace Shrooms.API.Controllers
                 return BadRequestWithError(e);
             }
             return Ok();
+        }
+
+        [HttpGet]
+        [Route("GetEventPost")]
+        [PermissionAuthorize(Permission = BasicPermissions.EventWall)]
+        public async Task<IHttpActionResult> GetEventPost(int postId)
+        {
+            try
+            {
+                var userAndOrg = GetUserAndOrganization();
+                var wallPost = await _wallService.GetWallPost(userAndOrg, postId);
+
+                if (wallPost.WallType != WallType.Events)
+                {
+                    return Forbidden();
+                }
+
+                var mappedPost = _mapper.Map<WallPostViewModel>(wallPost);
+                return Ok(mappedPost);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequestWithError(e);
+            }
+        }
+
+        [HttpPost]
+        [Route("CreateEventPost")]
+        [PermissionAuthorize(Permission = BasicPermissions.EventWall)]
+        public async Task<IHttpActionResult> CreateEventPost(CreateWallPostViewModel wallPostViewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var userAndOrg = GetUserAndOrganization();
+            var wall = await _wallService.GetWall(wallPostViewModel.WallId, userAndOrg);
+
+            if (wall.Type != WallType.Events)
+            {
+                return Forbidden();
+            }
+
+            var postModel = _mapper.Map<CreateWallPostViewModel, NewPostDTO>(wallPostViewModel);
+            SetOrganizationAndUser(postModel);
+
+            var userHubDto = GetUserAndOrganizationHub();
+
+            try
+            {
+                var createdPost = _postService.CreateNewPost(postModel);
+                _asyncRunner.Run<NewPostNotifier>(notif =>
+                {
+                    notif.Notify(createdPost, userHubDto);
+                }, GetOrganizationName());
+
+                return Ok(_mapper.Map<WallPostViewModel>(createdPost));
+            }
+            catch (ValidationException e)
+            {
+                return BadRequestWithError(e);
+            }
         }
     }
 }
