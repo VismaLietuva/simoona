@@ -489,25 +489,24 @@
         }
 
         .kudos-activity-log-comment {
-            //width: 200px;
+            max-width: 275px;
             font-size: 13px;
             flex: 1 1 100%;
             height: 37px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            word-wrap: break-word;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
-            display: inline-block;
-            display: -webkit-box;
+        }
+
+        .kudos-activity-log-comment > span {
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            display: block;
         }
 
         .kudos-activity-log-comment-with-sender {
             font-size: 13px;
             height: 38px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            word-wrap: break-word;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             display: inline-block;

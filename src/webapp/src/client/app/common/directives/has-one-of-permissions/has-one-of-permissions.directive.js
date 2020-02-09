@@ -3,14 +3,14 @@
 
     angular
         .module('simoonaApp.Common')
-        .directive('hasOneOfPermissions', hasOneOffPermissions);
+        .directive('hasOneOfPermissions', hasOneOfPermissions);
 
-    hasPermissions.$inject = ['authService'];
+    hasOneOfPermissions.$inject = ['authService'];
 
-    function hasPermissions(authService) {
+    function hasOneOfPermissions(authService) {
         var directive = {
             scope: {
-                hasOneOffPermissions: '='
+                hasOneOfPermissions: '='
             },
             link: linkFunc,
             restrict: 'A'
@@ -18,7 +18,7 @@
         return directive;
 
         function linkFunc(scope, element, attrs) {
-            if (scope.hasOneOffPermissions && authService.hasOneOfPermissions(scope.hasOneOffPermissions)) {
+            if (scope.hasOneOfPermissions && authService.hasOneOfPermissions(scope.hasOneOfPermissions)) {
                 element.show();
             } else {
                 element.hide();
