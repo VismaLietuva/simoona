@@ -37,10 +37,7 @@ namespace Shrooms.Domain.Services.Wall
         private readonly IDbSet<EntityModels.Models.Multiwall.Wall> _wallsDbSet;
         private readonly IDbSet<PostWatcher> _postWatchers;
 
-        public WallService(
-            IMapper mapper,
-            IUnitOfWork2 uow,
-            IPermissionService permissionService)
+        public WallService(IMapper mapper, IUnitOfWork2 uow, IPermissionService permissionService)
         {
             _uow = uow;
             _mapper = mapper;
@@ -159,7 +156,24 @@ namespace Shrooms.Domain.Services.Wall
             _uow.SaveChanges(updateWallDto.UserId);
         }
 
-        public async Task<WallDto> WallDetails(int wallId, UserAndOrganizationDTO userOrg)
+        public async Task<WallDto> GetWall(int wallId, UserAndOrganizationDTO userOrg)
+        {
+            var wall = await _wallsDbSet
+                           .Where(x => x.Id == wallId && x.OrganizationId == userOrg.OrganizationId)
+                           .Select(x => new WallDto
+                           {
+                               Id = x.Id,
+                               Name = x.Name,
+                               Description = x.Description,
+                               Type = x.Type,
+                               Logo = x.Logo
+                           })
+                           .SingleOrDefaultAsync();
+
+            return wall;
+        }
+
+        public async Task<WallDto> GetWallDetails(int wallId, UserAndOrganizationDTO userOrg)
         {
             var wall = await _wallsDbSet
                 .Include(w => w.Members)
@@ -171,7 +185,7 @@ namespace Shrooms.Domain.Services.Wall
                     Name = x.Name,
                     Description = x.Description,
                     Type = x.Type,
-                    IsFollowing = x.Type == WallType.Main ? true : x.Members.Any(m => m.UserId == userOrg.UserId),
+                    IsFollowing = x.Type == WallType.Main || x.Members.Any(m => m.UserId == userOrg.UserId),
                     Logo = x.Logo,
                     TotalMembers = x.Members.Count
                 })
@@ -225,7 +239,7 @@ namespace Shrooms.Domain.Services.Wall
             }
 
             var moderators = await _moderatorsDbSet.Where(x => x.WallId == post.WallId).ToListAsync();
-            var postInList = new List<Post>() { post };
+            var postInList = new List<Post> { post };
             var watchedPosts = await RetrieveWatchedPosts(userOrg.UserId, postInList);
             var users = await GetUsers(postInList);
             var posts = MapPostsWithChildEntitiesToDto(userOrg.UserId, postInList, users, moderators, watchedPosts);
@@ -456,7 +470,7 @@ namespace Shrooms.Domain.Services.Wall
                 {
                     if (!wallMembers.Any(x => x.WallId == wallId))
                     {
-                        var wallMember = new WallMember()
+                        var wallMember = new WallMember
                         {
                             AppNotificationsEnabled = true,
                             EmailNotificationsEnabled = true,
@@ -516,7 +530,7 @@ namespace Shrooms.Domain.Services.Wall
 
             foreach (var member in membersToAdd)
             {
-                var newMember = new WallMember()
+                var newMember = new WallMember
                 {
                     UserId = member.Id,
                     WallId = wallId,
@@ -606,12 +620,11 @@ namespace Shrooms.Domain.Services.Wall
             }
             else
             {
-                
-                wallsIds = wallsType == (int)ConstBusinessLayer.WallsType.MyWalls ? 
+                wallsIds = wallsType == (int)ConstBusinessLayer.WallsType.MyWalls ?
                                             (await GetWallsList(userOrg, WallsListFilter.Followed)).Select(w => w.Id).ToList() :
                                             (await GetWallsList(userOrg, WallsListFilter.All)).Select(w => w.Id).ToList();
             }
-           
+
             int entriesCountToSkip = (pageNumber - 1) * pageSize;
             var posts = await _postsDbSet
                 .Include(post => post.Wall)

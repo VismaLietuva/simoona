@@ -15,5 +15,6 @@
         public const string FirstLogin = "FirstLogin";
         public const string EventsManagement = "EventsManagement";
         public const string External = "External";
+        public const string Intern = "Intern";
     }
 }

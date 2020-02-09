@@ -12,12 +12,13 @@
 
     function wallCommentRepository($resource, endPoint) {
         var commentUrl = endPoint + '/Comment/';
-        var wallUrl = endPoint + '/Wall/';
 
         var service = {
             createComment: createComment,
             editComment: editComment,
-            deleteComment: deleteComment
+            deleteComment: deleteComment,
+
+            createEventComment: createEventComment
         };
         return service;
 
@@ -50,6 +51,14 @@
                 }
             }).put({
                 id: comment.id
+            }).$promise;
+        }
+
+        function createEventComment(comment) {
+            return $resource(commentUrl + 'CreateEventComment').save({
+                postId: comment.postId,
+                messageBody: comment.messageBody,
+                pictureId: comment.pictureId
             }).$promise;
         }
     }

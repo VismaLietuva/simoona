@@ -11,22 +11,19 @@ using Shrooms.Domain.Services.Permissions;
 
 namespace Shrooms.API.Filters
 {
-    public class PermissionAuthorizeAttribute : AuthorizeAttribute
+    public class PermissionAnyOfAuthorizeAttribute : AuthorizeAttribute
     {
-        private List<string> _permisions;
+        private List<string> _permisions = new List<string>();
 
-        public string Permission { get; set; }
-
-        public PermissionAuthorizeAttribute(string permission = null)
+        public PermissionAnyOfAuthorizeAttribute(string permission = null)
         {
-            _permisions = new List<string>();
             if (permission != null)
             {
                 _permisions.Add(permission);
             }
         }
 
-        public PermissionAuthorizeAttribute(params string[] permissions)
+        public PermissionAnyOfAuthorizeAttribute(params string[] permissions)
         {
             _permisions = permissions.ToList();
         }
@@ -41,8 +38,7 @@ namespace Shrooms.API.Filters
                 OrganizationId = actionContext.Request.GetRequestContext().Principal.Identity.GetOrganizationId()
             };
 
-            var isPermitted = _permisions.All(p => permissionService.UserHasPermission(userAndOrg, p))
-                && (Permission != null && permissionService.UserHasPermission(userAndOrg, Permission) || Permission == null);
+            var isPermitted = _permisions.Any(p => permissionService.UserHasPermission(userAndOrg, p));
             return isPermitted;
         }
 

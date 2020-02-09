@@ -12,6 +12,7 @@
                 isCollapsed: '=',
                 wallId: '=',
                 isWallModule: '=',
+                isEventsWall: '=',
                 index: '='
             },
             templateUrl: 'app/common/directives/wall/posts/post.html',
@@ -43,7 +44,7 @@
         vm.editPost = editPost;
         vm.deletePost = deletePost;
         vm.enableEditor = enableEditor;
-        vm.disableEditor = disableEditor;    
+        vm.disableEditor = disableEditor;
         vm.showCommentForm = showCommentForm;
         vm.handleErrorMessage = handleErrorMessage;
 
@@ -98,7 +99,7 @@
 
                 wallPostRepository.editPost(vm.post).then(function() {
                     vm.isActionsEnabled = true;
-                    wallService.initWall(vm.isWallModule, vm.wallId);
+                    wallService.initWall(vm.isWallModule, vm.wallId, vm.isEventsWall);
                 }, vm.handleErrorMessage);
             }
         }
@@ -111,7 +112,7 @@
 
                 wallPostRepository.deletePost(vm.post).then(function() {
                     vm.isActionsEnabled = true;
-                    wallService.initWall(vm.isWallModule, vm.wallId);
+                    wallService.initWall(vm.isWallModule, vm.wallId, vm.isEventsWall);
                 }, vm.handleErrorMessage);
             }
         }

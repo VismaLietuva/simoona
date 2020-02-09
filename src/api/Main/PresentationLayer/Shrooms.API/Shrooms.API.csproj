@@ -131,7 +131,7 @@
     <Reference Include="Ical.Net, Version=4.1.8.0, Culture=neutral, PublicKeyToken=65c0446cd019ea53, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\Ical.Net.4.1.11\lib\net46\Ical.Net.dll</HintPath>
       <Private>True</Private>
-	</Reference>
+    </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
@@ -283,7 +283,7 @@
     <Reference Include="NodaTime, Version=2.0.2.0, Culture=neutral, PublicKeyToken=4226afe0d9b296d1, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\NodaTime.2.0.2\lib\net45\NodaTime.dll</HintPath>
       <Private>True</Private>
-	</Reference>
+    </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
       <Private>True</Private>
@@ -333,8 +333,8 @@
     </Reference>
     <Reference Include="System.Reflection.TypeExtensions, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\System.Reflection.TypeExtensions.4.1.0\lib\net462\System.Reflection.TypeExtensions.dll</HintPath>
-      <Private>True</Private>    
-	</Reference>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Runtime.Serialization.Primitives, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -431,6 +431,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="BackgroundWorkers\NewCommentNotifier.cs" />
     <Compile Include="BackgroundWorkers\NewPostNotifier.cs" />
+    <Compile Include="Filters\PermissionAnyOfAuthorizeAttribute.cs" />
     <Compile Include="GeneralCode\UnwantedTelemetryFilter.cs" />
     <Compile Include="GeneralCode\NLogExceptionLogger.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />

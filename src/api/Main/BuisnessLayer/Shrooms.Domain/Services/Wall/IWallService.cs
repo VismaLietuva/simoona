@@ -17,7 +17,9 @@ namespace Shrooms.Domain.Services.Wall
 
         Task<IEnumerable<WallMemberDto>> GetWallMembers(int wallId, UserAndOrganizationDTO userOrg);
 
-        Task<WallDto> WallDetails(int wallId, UserAndOrganizationDTO userOrg);
+        Task<WallDto> GetWall(int wallId, UserAndOrganizationDTO userOrg);
+
+        Task<WallDto> GetWallDetails(int wallId, UserAndOrganizationDTO userOrg);
 
         Task<IEnumerable<WallDto>> GetWallsList(UserAndOrganizationDTO userOrg, WallsListFilter filter);
 
