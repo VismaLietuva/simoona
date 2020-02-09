@@ -16,6 +16,7 @@ using Shrooms.DataTransferObjects.Models.Wall.Posts;
 using Shrooms.Domain.Services.Notifications;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
+using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.UnitTests.ModelMappings;
 using Shrooms.WebViewModels.Models.User;
 using Shrooms.WebViewModels.Models.Wall;
@@ -38,6 +39,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
             _wallService = Substitute.For<IWallService>();
             _notificationService = Substitute.For<INotificationService>();
             var permissionService = Substitute.For<IPermissionService>();
+            permissionService.UserHasPermission(Arg.Any<UserAndOrganizationDTO>(), Arg.Any<string>()).Returns(true);
 
             _wallController = new WallController(ModelMapper.Create(), _wallService, _notificationService, permissionService);
             _wallController.ControllerContext = Substitute.For<HttpControllerContext>();
@@ -65,12 +67,12 @@ namespace Shrooms.UnitTests.Controllers.WebApi
                     Description = "Description",
                     IsFollowing = false
                 }
-            };  
+            };
 
             _wallService.GetWallsList(null, WallsListFilter.All).ReturnsForAnyArgs(Task.Run(() => walls));
 
             var response = await _wallController.GetWallList(WallsListFilter.All);
-         
+
             Assert.IsInstanceOf<OkNegotiatedContentResult<IEnumerable<WallListViewModel>>>(response);
         }
 
@@ -93,6 +95,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
                 Id = wallId
             };
 
+            _wallService.GetWall(wallId, null).Returns(new WallDto { Type = WallType.UserCreated });
             _wallService.GetWallDetails(0, null).ReturnsForAnyArgs(Task.Run(() => wall));
 
             var response = await _wallController.GetWall(wallId);
@@ -178,6 +181,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
                 }
             };
 
+            _wallService.GetWall(wallId, null).Returns(new WallDto { Type = WallType.UserCreated });
             _wallService.GetWallPosts(page, ConstWebApi.DefaultPageSize, null, wallId).ReturnsForAnyArgs(Task.Run(() => posts));
 
             var response = await _wallController.GetPagedWall(wallId, page);
