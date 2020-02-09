@@ -485,6 +485,7 @@
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\CommitteesController.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\EventController.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\EventTypeController.cs" />
+    <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\EventWallController.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\ExternalPremiumJobsController.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\Lotteries\LotteryController.cs" />
     <Compile Include="Main\PresentationLayer\Shrooms.API\Controllers\Lotteries\LotteryParticipantController.cs" />
