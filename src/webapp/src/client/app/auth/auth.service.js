@@ -413,6 +413,12 @@
                 }, {
                     reload: true
                 });
+            } else if(!authService.hasPermissions(['WALL_BASIC'])) {
+                $state.go('Root.WithOrg.Client.Events.List', {
+                    organizationName: authorizationData.organizationName
+                }, {
+                    reload: true
+                });
             } else {
                 $state.go(appConfig.homeStateName, {
                     organizationName: authorizationData.organizationName

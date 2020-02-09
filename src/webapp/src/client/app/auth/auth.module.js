@@ -31,7 +31,7 @@
                 $window.location.href = 'https://' + location.host + '/' + toParams.organizationName;
             }
 
-            if (authService.identity.isAuthenticated 
+            if (authService.identity.isAuthenticated
                 && authService.isInRole(roles.external) 
                 && (!toState.name.contains('Root.WithOrg.Client.Events') && !toState.name.contains('Root.WithOrg.LogOff'))) {
                 event.preventDefault();
