@@ -14,6 +14,7 @@ using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Wall;
 using Shrooms.DataTransferObjects.Models.Wall.Posts;
 using Shrooms.Domain.Services.Notifications;
+using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.UnitTests.ModelMappings;
 using Shrooms.WebViewModels.Models.User;
@@ -36,8 +37,9 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         {
             _wallService = Substitute.For<IWallService>();
             _notificationService = Substitute.For<INotificationService>();
+            var permissionService = Substitute.For<IPermissionService>();
 
-            _wallController = new WallController(ModelMapper.Create(), _wallService, _notificationService);
+            _wallController = new WallController(ModelMapper.Create(), _wallService, _notificationService, permissionService);
             _wallController.ControllerContext = Substitute.For<HttpControllerContext>();
             _wallController.Request = new HttpRequestMessage();
             _wallController.Request.Properties.Add(HttpPropertyKeys.HttpConfigurationKey, new HttpConfiguration());

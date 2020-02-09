@@ -13,7 +13,6 @@
     function wallPostRepository($resource, endPoint) {
         var postUrl = endPoint + '/Post/';
         var wallUrl = endPoint + '/Wall/';
-        var eventWallUrl = endPoint + '/EventWall/';
 
         var service = {
             getPosts: getPosts,
@@ -24,11 +23,7 @@
             deletePost: deletePost,
             searchWall: searchWall,
             watchPost: watchPost,
-            unwatchPost: unwatchPost,
-
-            getEventPosts: getEventPosts,
-            getEventPost: getEventPost,
-            createEventPost: createEventPost
+            unwatchPost: unwatchPost
         };
         return service;
 
@@ -99,24 +94,6 @@
                 }
             }).put({
                 id: post.id
-            }).$promise;
-        }
-
-        function getEventPosts(params) {
-            return $resource(eventWallUrl + 'Posts').get(params).$promise;
-        }
-
-        function getEventPost(postId) {
-            return $resource(postUrl + 'GetEventPost').get({
-                postId: postId
-            }).$promise;
-        }
-
-        function createEventPost(post, wallId) {
-            return $resource(postUrl + 'CreateEventPost').save({
-                wallId: wallId,
-                messageBody: post.messageBody,
-                pictureId: post.pictureId
             }).$promise;
         }
     }

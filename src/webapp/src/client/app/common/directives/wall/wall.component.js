@@ -9,7 +9,6 @@
         .component('aceWall', {
             bindings: {
                 isWallModule: '=',
-                isEventsWall: '=',
                 wallId: '=',
                 isAdmin: '=',
                 hasHashtagify: '='
@@ -43,7 +42,7 @@
         ////////
 
         function init() {
-            wallService.initWall(vm.isWallModule, vm.wallId, vm.isEventsWall);
+            wallService.initWall(vm.isWallModule, vm.wallId);
 
             $scope.$on('$destroy', function () {
                 $window.onscroll = null;
@@ -51,7 +50,7 @@
         }
 
         function createPost(post) {
-            wallService.createPost(post, vm.isWallModule, vm.isEventsWall);
+            wallService.createPost(post, vm.isWallModule);
         }
 
         function reloadWall() {

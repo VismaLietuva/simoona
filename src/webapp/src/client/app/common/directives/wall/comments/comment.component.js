@@ -10,7 +10,6 @@
                 isAdmin: '=',
                 wallId: '=',
                 isWallModule: '=',
-                isEventsWall: '=',
                 hasHashtagify: '=',
                 isHidden: '<'
             },
@@ -56,7 +55,7 @@
 
                 wallCommentRepository.editComment(vm.comment).then(function() {
                     vm.isActionsEnabled = true;
-                    wallService.initWall(vm.isWallModule, vm.wallId, vm.isEventsWall);
+                    wallService.initWall(vm.isWallModule, vm.wallId);
                 }, vm.handleErrorMessage);
             }
         }
@@ -69,7 +68,7 @@
 
                 wallCommentRepository.deleteComment(vm.comment).then(function() {
                     vm.isActionsEnabled = true;
-                    wallService.initWall(vm.isWallModule, vm.wallId, vm.isEventsWall);
+                    wallService.initWall(vm.isWallModule, vm.wallId);
                 }, vm.handleErrorMessage);
             }
         }

@@ -12,7 +12,6 @@
                 isCollapsed: '=',
                 wallId: '=',
                 isWallModule: '=',
-                isEventsWall: '=',
                 index: '='
             },
             templateUrl: 'app/common/directives/wall/posts/post.html',
@@ -99,7 +98,7 @@
 
                 wallPostRepository.editPost(vm.post).then(function() {
                     vm.isActionsEnabled = true;
-                    wallService.initWall(vm.isWallModule, vm.wallId, vm.isEventsWall);
+                    wallService.initWall(vm.isWallModule, vm.wallId);
                 }, vm.handleErrorMessage);
             }
         }
@@ -112,7 +111,7 @@
 
                 wallPostRepository.deletePost(vm.post).then(function() {
                     vm.isActionsEnabled = true;
-                    wallService.initWall(vm.isWallModule, vm.wallId, vm.isEventsWall);
+                    wallService.initWall(vm.isWallModule, vm.wallId);
                 }, vm.handleErrorMessage);
             }
         }

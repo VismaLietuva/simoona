@@ -31,7 +31,6 @@
                            is-collapsed="isCollapsed"
                            wall-id="vm.wallId"
                            is-wall-module="vm.isWallModule"
-                           is-events-wall="vm.isEventsWall"
                            index="$index"
                            id="{{post.id}}">
             </ace-wall-post>
@@ -51,7 +50,6 @@
                                           is-admin="vm.isAdmin"
                                           wall-id="vm.wallId"
                                           is-wall-module="vm.isWallModule"
-                                          is-events-wall="vm.isEventsWall"
                                           has-hashtagify="vm.hasHashtagify">
                         </ace-wall-comment>
 
@@ -66,8 +64,7 @@
                     <ace-wall-comment-create post="post"
                                              ng-if="!post.isHidden"
                                              wall-id="vm.wallId"
-                                             is-wall-module="vm.isWallModule"
-                                             is-events-wall="vm.isEventsWall">
+                                             is-wall-module="vm.isWallModule">
                     </ace-wall-comment-create>
 
                 </div>

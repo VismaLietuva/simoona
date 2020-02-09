@@ -51,8 +51,7 @@
             wallMembers: [],
             isNewContentAvailable: false,
             wallId: null,
-            isWallModule: false,
-            isEventsWall: false
+            isWallModule: false
         };
         var busy = false;
         var settings = {
@@ -92,10 +91,9 @@
 
         ///////
 
-        function initWall(isWallModule, wallId, isEventsWall) {
+        function initWall(isWallModule, wallId) {
             wallServiceData.wallId = wallId;
             wallServiceData.isWallModule = isWallModule;
-            wallServiceData.isEventsWall = isEventsWall;
             wallServiceData.isNewContentAvailable = false;
             wallServiceData.wallMembers = [];
 
@@ -216,17 +214,10 @@
             scrollTop();
         }
 
-        function createPost(post, isWallModule, isEventsWall) {
-            if (isEventsWall) {
-                wallPostRepository.createEventPost(post, settings.wallId).then(function () {
-                    initWall(isWallModule, settings.wallId, isEventsWall);
-                }, errorHandler.handleErrorMessage);
-            }
-            else {
-                wallPostRepository.createPost(post, settings.wallId).then(function () {
-                    initWall(isWallModule, settings.wallId, isEventsWall);
-                }, errorHandler.handleErrorMessage);
-            }
+        function createPost(post, isWallModule) {
+            wallPostRepository.createPost(post, settings.wallId).then(function () {
+                initWall(isWallModule, settings.wallId);
+            }, errorHandler.handleErrorMessage);
         }
 
         function isValidPostId(postId) {
@@ -271,18 +262,6 @@
                         addPostsToWall(response, true);
                         busy = false;
                     }, errorHandler.handleErrorMessage);
-                } else if (wallServiceData.isEventsWall) {
-                        wallPostRepository.getEventPosts(settings).then(function (response) {
-                            addPostsToWall(response, true);
-                            busy = false;
-                            scrollToPostNotification();
-                        }, function (error) {
-                            if ($state.includes(appConfig.homeStateName) && !!$state.params.wall) {
-                                redirectToHomeState();
-                            } else {
-                                errorHandler.handleErrorMessage(error);
-                            }
-                        });
                 } else {
                         wallPostRepository.getPosts(settings).then(function (response) {
                             addPostsToWall(response, true);
@@ -310,29 +289,16 @@
 
             busy = true;
 
-            if (wallServiceData.isEventsWall) {
-                wallPostRepository.getEventPost(postId).then(function (response) {
-                    wallServiceData.isScrollingEnabled = false;
-                    wallServiceData.isWallLoading = false;
-                    wallServiceData.isWallPostsLoading = false;
-                    addPostToWall(response);
-                    busy = false;
-                }, function () {
-                    notifySrv.error('wall.postDoesNotExist');
-                    redirectToHomeState();
-                });
-            } else {
-                wallPostRepository.getPost(postId).then(function (response) {
-                    wallServiceData.isScrollingEnabled = false;
-                    wallServiceData.isWallLoading = false;
-                    wallServiceData.isWallPostsLoading = false;
-                    addPostToWall(response);
-                    busy = false;
-                }, function () {
-                    notifySrv.error('wall.postDoesNotExist');
-                    redirectToHomeState();
-                });
-            }
+            wallPostRepository.getPost(postId).then(function (response) {
+                wallServiceData.isScrollingEnabled = false;
+                wallServiceData.isWallLoading = false;
+                wallServiceData.isWallPostsLoading = false;
+                addPostToWall(response);
+                busy = false;
+            }, function () {
+                notifySrv.error('wall.postDoesNotExist');
+                redirectToHomeState();
+            });
         }
 
         function addPostsToWall(response, append) {

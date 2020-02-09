@@ -10,8 +10,10 @@ using Shrooms.Constants.WebApi;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Wall;
 using Shrooms.Domain.Services.Notifications;
+using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.DomainExceptions.Exceptions;
+using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.WebViewModels.Models.Notifications;
 using Shrooms.WebViewModels.Models.User;
 using Shrooms.WebViewModels.Models.Wall;
@@ -26,12 +28,14 @@ namespace Shrooms.API.Controllers.Wall
         private readonly IWallService _wallService;
         private readonly IMapper _mapper;
         private readonly INotificationService _notificationService;
+        private readonly IPermissionService _permissionService;
 
-        public WallController(IMapper mapper, IWallService wallService, INotificationService notificationService)
+        public WallController(IMapper mapper, IWallService wallService, INotificationService notificationService, IPermissionService permissionService)
         {
             _wallService = wallService;
             _mapper = mapper;
             _notificationService = notificationService;
+            _permissionService = permissionService;
         }
 
         [HttpGet]
@@ -53,7 +57,7 @@ namespace Shrooms.API.Controllers.Wall
         /// <returns>Wall details in HTTP response</returns>
         [HttpGet]
         [Route("Details")]
-        [PermissionAuthorize(Permission = BasicPermissions.Post)]
+        [PermissionAnyOfAuthorize(BasicPermissions.Post, BasicPermissions.EventWall)]
         public async Task<IHttpActionResult> GetWall(int wallId)
         {
             if (wallId <= 0)
@@ -66,6 +70,12 @@ namespace Shrooms.API.Controllers.Wall
                 var userAndOrg = GetUserAndOrganization();
 
                 var wall = await _wallService.GetWallDetails(wallId, userAndOrg);
+
+                if (!_permissionService.UserHasPermission(userAndOrg, BasicPermissions.Post) && wall.Type != WallType.Events)
+                {
+                    return Forbidden();
+                }
+
                 var mappedWall = _mapper.Map<WallDto, WallListViewModel>(wall);
                 return Ok(mappedWall);
             }
@@ -143,7 +153,7 @@ namespace Shrooms.API.Controllers.Wall
 
         [HttpGet]
         [Route("Posts")]
-        [PermissionAuthorize(Permission = BasicPermissions.Post)]
+        [PermissionAnyOfAuthorize(BasicPermissions.Post, BasicPermissions.EventWall)]
         public async Task<IHttpActionResult> GetPagedWall(int wallId, int page = 1)
         {
             if (wallId <= 0)
@@ -154,6 +164,13 @@ namespace Shrooms.API.Controllers.Wall
             try
             {
                 var userAndOrg = GetUserAndOrganization();
+                var wall = await _wallService.GetWall(wallId, userAndOrg);
+
+                if (!_permissionService.UserHasPermission(userAndOrg, BasicPermissions.Post) && wall.Type != WallType.Events)
+                {
+                    return Forbidden();
+                }
+
                 var wallPosts = await _wallService.GetWallPosts(page, ConstWebApi.DefaultPageSize, userAndOrg, wallId);
 
                 var mappedPosts = _mapper.Map<IEnumerable<WallPostViewModel>>(wallPosts);

@@ -5,6 +5,7 @@ using Shrooms.API.BackgroundWorkers;
 using Shrooms.API.Filters;
 using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.DataTransferObjects.Models.Wall.Posts;
+using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.DomainExceptions.Exceptions;
@@ -21,24 +22,31 @@ namespace Shrooms.API.Controllers
         private readonly IMapper _mapper;
         private readonly IWallService _wallService;
         private readonly IPostService _postService;
+        private readonly IPermissionService _permissionService;
         private readonly IAsyncRunner _asyncRunner;
 
-        public PostController(IMapper mapper, IWallService wallService, IPostService postService, IAsyncRunner asyncRunner)
+        public PostController(IMapper mapper, IWallService wallService, IPostService postService, IPermissionService permissionService, IAsyncRunner asyncRunner)
         {
             _mapper = mapper;
             _wallService = wallService;
             _postService = postService;
+            _permissionService = permissionService;
             _asyncRunner = asyncRunner;
         }
 
         [HttpGet]
-        [PermissionAuthorize(Permission = BasicPermissions.Post)]
+        [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Post, BasicPermissions.EventWall)]
         public async Task<IHttpActionResult> GetPost(int postId)
         {
             try
             {
                 var userAndOrg = GetUserAndOrganization();
                 var wallPost = await _wallService.GetWallPost(userAndOrg, postId);
+
+                if (!_permissionService.UserHasPermission(userAndOrg, BasicPermissions.Post) && wallPost.WallType != WallType.Events)
+                {
+                    return Forbidden();
+                }
 
                 var mappedPost = _mapper.Map<WallPostViewModel>(wallPost);
                 return Ok(mappedPost);
@@ -51,12 +59,23 @@ namespace Shrooms.API.Controllers
 
         [HttpPost]
         [Route("Create")]
-        [PermissionAuthorize(Permission = BasicPermissions.Post)]
-        public IHttpActionResult CreatePost(CreateWallPostViewModel wallPostViewModel)
+        [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Post, BasicPermissions.EventWall)]
+        public async Task<IHttpActionResult> CreatePost(CreateWallPostViewModel wallPostViewModel)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            var userAndOrg = GetUserAndOrganization();
+
+            if (!_permissionService.UserHasPermission(userAndOrg, BasicPermissions.Post))
+            {
+                var wall = await _wallService.GetWall(wallPostViewModel.WallId, userAndOrg);
+                if (wall.Type != WallType.Events)
+                {
+                    return Forbidden();
+                }
             }
 
             var postModel = _mapper.Map<CreateWallPostViewModel, NewPostDTO>(wallPostViewModel);
@@ -222,69 +241,6 @@ namespace Shrooms.API.Controllers
                 return BadRequestWithError(e);
             }
             return Ok();
-        }
-
-        [HttpGet]
-        [Route("GetEventPost")]
-        [PermissionAuthorize(Permission = BasicPermissions.EventWall)]
-        public async Task<IHttpActionResult> GetEventPost(int postId)
-        {
-            try
-            {
-                var userAndOrg = GetUserAndOrganization();
-                var wallPost = await _wallService.GetWallPost(userAndOrg, postId);
-
-                if (wallPost.WallType != WallType.Events)
-                {
-                    return Forbidden();
-                }
-
-                var mappedPost = _mapper.Map<WallPostViewModel>(wallPost);
-                return Ok(mappedPost);
-            }
-            catch (ValidationException e)
-            {
-                return BadRequestWithError(e);
-            }
-        }
-
-        [HttpPost]
-        [Route("CreateEventPost")]
-        [PermissionAuthorize(Permission = BasicPermissions.EventWall)]
-        public async Task<IHttpActionResult> CreateEventPost(CreateWallPostViewModel wallPostViewModel)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var userAndOrg = GetUserAndOrganization();
-            var wall = await _wallService.GetWall(wallPostViewModel.WallId, userAndOrg);
-
-            if (wall.Type != WallType.Events)
-            {
-                return Forbidden();
-            }
-
-            var postModel = _mapper.Map<CreateWallPostViewModel, NewPostDTO>(wallPostViewModel);
-            SetOrganizationAndUser(postModel);
-
-            var userHubDto = GetUserAndOrganizationHub();
-
-            try
-            {
-                var createdPost = _postService.CreateNewPost(postModel);
-                _asyncRunner.Run<NewPostNotifier>(notif =>
-                {
-                    notif.Notify(createdPost, userHubDto);
-                }, GetOrganizationName());
-
-                return Ok(_mapper.Map<WallPostViewModel>(createdPost));
-            }
-            catch (ValidationException e)
-            {
-                return BadRequestWithError(e);
-            }
         }
     }
 }
