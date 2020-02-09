@@ -63,6 +63,11 @@
                 authService.redirectToHome();
             }
 
+            if (authService.identity.isAuthenticated && toState.name.contains(appConfig.homeStateName) && !authService.hasPermissions(['WALL_BASIC'])) {
+                event.preventDefault();
+                authService.redirectToEvents();
+            }
+
             if (toState.data && toState.data.authorizePermission && !authService.hasPermissions([toState.data.authorizePermission])) {
                 event.preventDefault();
                 authService.redirectToAccessDenied();

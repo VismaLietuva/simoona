@@ -130,7 +130,9 @@
         }
 
         function reloadLeftMenuItems() {
-            wallService.getChosenWallList(true);
+            if (authService.hasPermissions(['WALL_BASIC'])) {
+                wallService.getChosenWallList(true);
+            }
         }
 
         function toggleSidebar() {
