@@ -99,7 +99,12 @@ namespace Shrooms.Domain.Services.Events.Participation
             _asyncRunner.Run<IEventNotificationService>(n => n.NotifyRemovedEventParticipants(@event.Name, @event.Id, userOrg.OrganizationId, users), _uow.ConnectionName);
         }
 
-        public void Join(EventJoinDTO joinDto)
+        public void AddColleague(EventJoinDTO joinDto)
+        {
+            Join(joinDto, true);
+        }
+
+        public void Join(EventJoinDTO joinDto, bool addedByColleague = false)
         {
             lock (multiUserJoinLock)
             {
@@ -113,6 +118,12 @@ namespace Shrooms.Domain.Services.Events.Participation
                     .FirstOrDefault();
 
                 _eventValidationService.CheckIfEventExists(@event);
+
+                if (addedByColleague)
+                {
+                    var hasPermission = _permissionService.UserHasPermission(joinDto, AdministrationPermissions.Event);
+                    _eventValidationService.CheckIfUserHasPermission(joinDto.UserId, @event.ResponsibleUserId, hasPermission);
+                }
 
                 @event.SelectedOptions = @event.Options
                     .Where(option => joinDto.ChosenOptions.Contains(option.Id))
@@ -420,14 +431,12 @@ namespace Shrooms.Domain.Services.Events.Participation
                     e.EventParticipants.Any(p => p.ApplicationUserId == userId &&
                                                  p.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.Attending));
 
-            query = string.IsNullOrEmpty(validationDTO.SingleJoinGroupName) ?
-                        query.Where(x => x.EventType.Id == validationDTO.EventTypeId) :
-                        query.Where(x => x.EventType.SingleJoinGroupName == validationDTO.SingleJoinGroupName);
+            query = string.IsNullOrEmpty(validationDTO.SingleJoinGroupName) ? query.Where(x => x.EventType.Id == validationDTO.EventTypeId) : query.Where(x => x.EventType.SingleJoinGroupName == validationDTO.SingleJoinGroupName);
 
             var anyEventsAlreadyJoined = query.Any(x => !x.EventParticipants.Any(y =>
-                                         y.ApplicationUserId == userId &&
-                                         y.EventOptions.All(z => z.Rule == OptionRules.IgnoreSingleJoin) &&
-                                         y.EventOptions.Count > 0));
+                                                            y.ApplicationUserId == userId &&
+                                                            y.EventOptions.All(z => z.Rule == OptionRules.IgnoreSingleJoin) &&
+                                                            y.EventOptions.Count > 0));
 
             _eventValidationService.CheckIfUserExistsInOtherSingleJoinEvent(anyEventsAlreadyJoined);
         }

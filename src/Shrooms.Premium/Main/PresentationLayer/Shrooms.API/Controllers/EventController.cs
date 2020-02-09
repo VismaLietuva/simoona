@@ -34,6 +34,8 @@ using Newtonsoft.Json;
 using System.IO;
 using System.Net.Http.Headers;
 using Shrooms.Domain.Services.Events.Calendar;
+using Shrooms.Domain.Services.Permissions;
+using Shrooms.DomainServiceValidators.Validators.Events;
 
 namespace Shrooms.API.Controllers.WebApi.EventControllers
 {
@@ -271,9 +273,10 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
         {
             var eventJoinDTO = _mapper.Map<EventJoinMultipleViewModel, EventJoinDTO>(eventJoinModel);
             SetOrganizationAndUser(eventJoinDTO);
+
             try
             {
-                _eventParticipationService.Join(eventJoinDTO);
+                _eventParticipationService.AddColleague(eventJoinDTO);
                 return Ok();
             }
             catch (EventException e)

@@ -144,23 +144,17 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
 
         public void CheckIfCreatingEventHasInsufficientOptions(int maxChoices, int optionsCount)
         {
-            if (optionsCount != 0)
+            if (optionsCount != 0 && (maxChoices > optionsCount || optionsCount < ConstBusinessLayer.EventOptionsMinimumCount))
             {
-                if (maxChoices > optionsCount || optionsCount < ConstBusinessLayer.EventOptionsMinimumCount)
-                {
-                    throw new EventException(EventInsufficientOptionsCode);
-                }
+                throw new EventException(EventInsufficientOptionsCode);
             }
         }
 
         public void CheckIfCreatingEventHasNoChoices(int maxChoices, int eventOptionsCount)
         {
-            if (eventOptionsCount != 0)
+            if (eventOptionsCount != 0 && maxChoices < 1)
             {
-                if (maxChoices < 1)
-                {
-                    throw new EventException(EventNeedTohaveMaxChoiceCode);
-                }
+                throw new EventException(EventNeedTohaveMaxChoiceCode);
             }
         }
 
@@ -183,23 +177,17 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
 
         public void CheckIfUserHasPermission(string userId, string responsibleUserId, bool hasPermission)
         {
-            if (userId != responsibleUserId)
+            if (userId != responsibleUserId && !hasPermission)
             {
-                if (!hasPermission)
-                {
-                    throw new EventException(EventDontHavePermissionCode);
-                }
+                throw new EventException(EventDontHavePermissionCode);
             }
         }
 
         public void CheckIfUserHasPermissionToPin(bool newPinStatus, bool currentPinStatus, bool hasPermission)
         {
-            if (newPinStatus != currentPinStatus)
+            if (newPinStatus != currentPinStatus && !hasPermission)
             {
-                if (!hasPermission)
-                {
-                    throw new EventException(EventDontHavePermissionCode);
-                }
+                throw new EventException(EventDontHavePermissionCode);
             }
         }
 
@@ -217,12 +205,10 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
             {
                 throw new ValidationException(ContentDoesNotExist, "Event does not exist");
             }
-            else
+
+            if (participant.Event == null)
             {
-                if (participant.Event == null)
-                {
-                    throw new ValidationException(ContentDoesNotExist, "Event does not exist");
-                }
+                throw new ValidationException(ContentDoesNotExist, "Event does not exist");
             }
         }
 
@@ -244,21 +230,23 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
 
         public void CheckIfOptionsAreDifferent(IEnumerable<NewEventOptionDTO> options)
         {
-            if (options != null)
+            if (options == null)
             {
-                var duplicateKeys = options.GroupBy(x => x.Option)
-                        .Where(group => group.Count() > 1)
-                        .Select(group => group.Key);
-                if (duplicateKeys.Count() > 0)
-                {
-                    throw new EventException(EventOptionsCantDuplicate);
-                }
+                return;
+            }
+
+            var duplicateKeys = options.GroupBy(x => x.Option)
+                .Where(group => @group.Count() > 1)
+                .Select(group => @group.Key);
+            if (duplicateKeys.Any())
+            {
+                throw new EventException(EventOptionsCantDuplicate);
             }
         }
 
         public void CheckIfEventHasParticipants(IEnumerable<EventParticipantDTO> eventParticipants)
         {
-            if (eventParticipants.Count() == 0)
+            if (!eventParticipants.Any())
             {
                 throw new EventException(EventParticipantsNotFound);
             }
