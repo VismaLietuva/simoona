@@ -1,4 +1,4 @@
-﻿using Shrooms.EntityModels.Models.Events;
+﻿using System.Collections.Generic;
 
 namespace Shrooms.DataTransferObjects.EmailTemplateViewModels
 {
@@ -9,8 +9,6 @@ namespace Shrooms.DataTransferObjects.EmailTemplateViewModels
         {
         }
 
-        public string EventTypeName { get; set; }
-
-        public string EventPageUrl { get; set; }
+        public IDictionary<string, string> EventTypes { get; set; } = new Dictionary<string, string>();
     }
 }
