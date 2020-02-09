@@ -13,14 +13,13 @@
         'appConfig',
         'menuNavigationFactory',
         'impersonate',
-        'Analytics',
         'leftMenuService',
         'notificationFactory',
         '$window'
     ];
 
     function navigationBarController($state, $uibModal, authService, wallService,
-        appConfig, menuNavigationFactory, impersonate, Analytics, leftMenuService, notificationFactory, $window) {
+        appConfig, menuNavigationFactory, impersonate, leftMenuService, notificationFactory, $window) {
         /* jshint validthis: true */
         var vm = this;
         vm.topMenuItemsList = menuNavigationFactory.getTopMenuItems();

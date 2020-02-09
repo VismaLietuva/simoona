@@ -59,7 +59,7 @@
             'preferredLocale': 'en_US'
         })
         .constant('appConfig', {
-            homeStateName: 'Root.WithOrg.Client.Wall.Item.Feed',
+            homeStateName: 'Root.WithOrg.Client.Wall.Item.Feed', //'Root.WithOrg.Client.Events.List'
             adminRole: 'Admin',
             allowedStatesForNewUser: ['Root.WithOrg.Client.Profiles.Edit', 'Root.WithOrg.LogOff'],
             defaultOrganization: 'Organization',

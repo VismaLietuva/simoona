@@ -24,7 +24,7 @@
         var vm = this;
 
         vm.wallServiceData = wallService.wallServiceData;
-    
+
         vm.state = $state;
 
         vm.filterWall = filterWall;
@@ -39,10 +39,10 @@
 
             if (!$state.includes(appConfig.homeStateName)) {
                 wallService.getChosenWallList(false);
-            }       
+            }
         }
 
-        
+
         function filterWall(wallId) {
             Analytics.trackEvent('Filter wall', 'Wall id: ' + wallId, 'From state: ' + $state.current.name);
             wallService.wallServiceData.wallHeader = null;
