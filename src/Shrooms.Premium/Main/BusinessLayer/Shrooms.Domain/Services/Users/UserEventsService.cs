@@ -6,6 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataLayer.DAL;
+using Shrooms.DataTransferObjects.Models.Events;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Events;
 
@@ -22,26 +23,26 @@ namespace Shrooms.Domain.Services.Users
             _eventParticipantsDb = uow.GetDbSet<EventParticipant>();
         }
 
-        public IEnumerable<string> GetUsersWithAppReminders(int eventTypeId)
+        public IEnumerable<string> GetUsersWithAppReminders(IEnumerable<int> eventTypeIds)
         {
-            return GetUserWithoutEventThisWeek(eventTypeId, x => x.NotificationsSettings == null || x.NotificationsSettings.EventWeeklyReminderAppNotifications)
+            return GetUserWithoutEventThisWeek(eventTypeIds, x => x.NotificationsSettings == null || x.NotificationsSettings.EventWeeklyReminderAppNotifications)
                 .Select(x => x.Id);
         }
 
-        public IEnumerable<string> GetUsersWithEmailReminders(int eventTypeId)
+        public IEnumerable<string> GetUsersWithEmailReminders(IEnumerable<int> eventTypeIds)
         {
-            return GetUserWithoutEventThisWeek(eventTypeId, x => x.NotificationsSettings == null || x.NotificationsSettings.EventWeeklyReminderEmailNotifications)
+            return GetUserWithoutEventThisWeek(eventTypeIds, x => x.NotificationsSettings == null || x.NotificationsSettings.EventWeeklyReminderEmailNotifications)
                 .Select(x => x.Email);
         }
 
-        private IQueryable<ApplicationUser> GetUserWithoutEventThisWeek(int eventTypeId, Expression<Func<ApplicationUser, bool>> userPredicate)
+        private IQueryable<ApplicationUser> GetUserWithoutEventThisWeek(IEnumerable<int> eventTypeIds, Expression<Func<ApplicationUser, bool>> userPredicate)
         {
             var now = DateTime.UtcNow;
             var weekAfter = now.AddDays(7);
 
             var usersToDiscard = _eventParticipantsDb
                 .Where(x => x.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.Attending &&
-                            x.Event.EventTypeId == eventTypeId &&
+                            eventTypeIds.Contains(x.Event.EventTypeId) &&
                             SqlFunctions.DatePart("wk", x.Event.StartDate) == SqlFunctions.DatePart("wk", now) &&
                             x.Event.StartDate > now && x.Event.StartDate < weekAfter)
                 .Select(x => x.ApplicationUserId);
