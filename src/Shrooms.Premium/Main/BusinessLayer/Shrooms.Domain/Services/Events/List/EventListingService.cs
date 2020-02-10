@@ -19,6 +19,8 @@ namespace Shrooms.Domain.Services.Events.List
 {
     public class EventListingService : IEventListingService
     {
+        private const string OutsideOffice = "[]";
+
         private static readonly Dictionary<ConstBusinessLayer.MyEventsOptions, Func<string, Expression<Func<Event, bool>>>>
             EventFilters = new Dictionary<ConstBusinessLayer.MyEventsOptions, Func<string, Expression<Func<Event, bool>>>>
         {
@@ -69,7 +71,7 @@ namespace Shrooms.Domain.Services.Events.List
 
         public IEnumerable<EventListItemDTO> GetEventsByTypeAndOffice(UserAndOrganizationDTO userOrganization, int? typeId = null, int? officeId = null)
         {
-            var officeSearchString = officeId != null ? $"\"{officeId.ToString()}\"" : "[]";
+            var officeSearchString = OfficeIdToString(officeId) ?? OutsideOffice;
             IList < EventListItemDTO > events = _eventsDbSet
                 .Include(x => x.EventParticipants)
                 .Where(t =>
@@ -87,7 +89,7 @@ namespace Shrooms.Domain.Services.Events.List
 
         public IEnumerable<EventListItemDTO> GetMyEvents(MyEventsOptionsDTO options, int? officeId = null)
         {
-            var officeSearchString = officeId != null ? $"\"{officeId.ToString()}\"" : "[]";
+            var officeSearchString = OfficeIdToString(officeId) ?? OutsideOffice;
             var myEventFilter = EventFilters[options.Filter](options.UserId);
             var events = _eventsDbSet
                 .Include(x => x.EventParticipants)
@@ -176,11 +178,11 @@ namespace Shrooms.Domain.Services.Events.List
 
         private static Expression<Func<Event, bool>> EventOfficeFilter(string office)
         {
-            if (office == "[]")
+            if (office == OutsideOffice)
             {
                 return x => true;
             }
-            return x => x.Offices.Contains(office) || x.Offices == "[]";
+            return x => x.Offices.Contains(office) || x.Offices == OutsideOffice;
         }
 
         private static Expression<Func<Event, bool>> SearchFilter(string searchString)
@@ -192,5 +194,8 @@ namespace Shrooms.Domain.Services.Events.List
 
             return e => e.Name.Contains(searchString) || e.Place.Contains(searchString);
         }
+
+        private static string OfficeIdToString(int? officeId) =>
+            officeId != null ? $@"""{officeId.ToString()}""" : null;
     }
 }
