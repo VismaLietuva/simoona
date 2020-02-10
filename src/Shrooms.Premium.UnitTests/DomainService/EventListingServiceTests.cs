@@ -314,7 +314,7 @@ namespace Shrooms.UnitTests.DomainService
                     EventType = new EventType
                     {
                         Id = 1,
-                        IsShownWithAllEvents = true
+                        IsShownWithMainEvents = true
                     }
                 },
                 new Event
@@ -335,7 +335,7 @@ namespace Shrooms.UnitTests.DomainService
                     EventType = new EventType
                     {
                         Id = 2,
-                        IsShownWithAllEvents = true
+                        IsShownWithMainEvents = true
                     }
                 },
                 new Event
@@ -356,7 +356,7 @@ namespace Shrooms.UnitTests.DomainService
                     EventType = new EventType
                     {
                         Id = 3,
-                        IsShownWithAllEvents = true
+                        IsShownWithMainEvents = true
                     }
                 },
                 new Event
@@ -377,7 +377,7 @@ namespace Shrooms.UnitTests.DomainService
                     EventType = new EventType
                     {
                         Id = 3,
-                        IsShownWithAllEvents = true
+                        IsShownWithMainEvents = true
                     }
                 }
             };

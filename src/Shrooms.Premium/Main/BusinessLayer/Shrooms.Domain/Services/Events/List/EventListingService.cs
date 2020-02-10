@@ -168,7 +168,7 @@ namespace Shrooms.Domain.Services.Events.List
         {
             if (typeId == null || typeId == 0)
             {
-                return x => x.EventType.IsShownWithAllEvents;
+                return x => x.EventType.IsShownWithMainEvents;
             }
 
             return x => x.EventTypeId == typeId;

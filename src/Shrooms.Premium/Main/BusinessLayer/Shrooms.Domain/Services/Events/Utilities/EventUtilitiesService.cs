@@ -66,7 +66,7 @@ namespace Shrooms.Domain.Services.Events.Utilities
                     Id = type.Id,
                     IsSingleJoin = type.IsSingleJoin,
                     Name = type.Name,
-                    IsShownWithAllEvents = type.IsShownWithAllEvents
+                    IsShownWithMainEvents = type.IsShownWithMainEvents
                 })
                 .OrderByDescending(t => t.Name)
                 .ToList();
@@ -85,7 +85,7 @@ namespace Shrooms.Domain.Services.Events.Utilities
                     SendWeeklyReminders = x.SendWeeklyReminders,
                     Name = x.Name,
                     SingleJoinGroupName = x.SingleJoinGroupName,
-                    IsShownWithAllEvents = x.IsShownWithAllEvents,
+                    IsShownWithMainEvents = x.IsShownWithMainEvents,
                     HasActiveEvents = x.Events.Any(e => e.EndDate > DateTime.UtcNow
                                                      || e.EventRecurring != EventRecurrenceOptions.None)
                 })
@@ -140,7 +140,7 @@ namespace Shrooms.Domain.Services.Events.Utilities
             orgEventType.ModifiedBy = eventType.UserId;
             orgEventType.Modified = DateTime.UtcNow;
             orgEventType.SendWeeklyReminders = eventType.SendWeeklyReminders;
-            orgEventType.IsShownWithAllEvents = eventType.IsShownWithAllEvents;
+            orgEventType.IsShownWithMainEvents = eventType.IsShownWithMainEvents;
 
             _uow.SaveChanges(eventType.UserId);
         }
@@ -238,7 +238,7 @@ namespace Shrooms.Domain.Services.Events.Utilities
                 SendWeeklyReminders = eventTypeDto.SendWeeklyReminders,
                 Name = eventTypeDto.Name,
                 SingleJoinGroupName = SetSingleJoinGroupName(eventTypeDto.IsSingleJoin, eventTypeDto.SingleJoinGroupName),
-                IsShownWithAllEvents = eventTypeDto.IsShownWithAllEvents
+                IsShownWithMainEvents = eventTypeDto.IsShownWithMainEvents
             };
 
             return eventType;

@@ -12,7 +12,7 @@
 
         public string SingleJoinGroupName { get; set; }
 
-        public bool IsShownWithAllEvents { get; set; }
+        public bool IsShownWithMainEvents { get; set; }
 
         public bool HasActiveEvents { get; set; }
     }
