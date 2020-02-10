@@ -1,17 +1,13 @@
-﻿using Newtonsoft.Json;
-using Shrooms.Constants.BusinessLayer;
+﻿using Shrooms.Constants.BusinessLayer;
 using Shrooms.Constants.BusinessLayer.Events;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Events;
 using Shrooms.DomainServiceValidators.Validators.Events;
-using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Events;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.Data.Entity.SqlServer;
-using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -22,7 +18,7 @@ namespace Shrooms.Domain.Services.Events.List
         private const string OutsideOffice = "[]";
 
         private static readonly Dictionary<ConstBusinessLayer.MyEventsOptions, Func<string, Expression<Func<Event, bool>>>>
-            EventFilters = new Dictionary<ConstBusinessLayer.MyEventsOptions, Func<string, Expression<Func<Event, bool>>>>
+            _eventFilters = new Dictionary<ConstBusinessLayer.MyEventsOptions, Func<string, Expression<Func<Event, bool>>>>
         {
             { ConstBusinessLayer.MyEventsOptions.Host, MyEventsAsMasterFilter },
             { ConstBusinessLayer.MyEventsOptions.Participant, MyEventsAsParticipantFilter }
@@ -90,7 +86,7 @@ namespace Shrooms.Domain.Services.Events.List
         public IEnumerable<EventListItemDTO> GetMyEvents(MyEventsOptionsDTO options, int? officeId = null)
         {
             var officeSearchString = OfficeIdToString(officeId) ?? OutsideOffice;
-            var myEventFilter = EventFilters[options.Filter](options.UserId);
+            var myEventFilter = _eventFilters[options.Filter](options.UserId);
             var events = _eventsDbSet
                 .Include(x => x.EventParticipants)
                 .Include(x => x.Offices)
@@ -144,9 +140,11 @@ namespace Shrooms.Domain.Services.Events.List
                 StartDate = e.StartDate,
                 EndDate = e.EndDate,
                 RegistrationDeadlineDate = e.RegistrationDeadline,
-                ParticipantsCount = e.EventParticipants.Where(p => p.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.Attending).Count(),
+                ParticipantsCount = e.EventParticipants.Count(p => p.AttendStatus == (int)ConstBusinessLayer.AttendingStatus.Attending),
                 IsCreator = e.ResponsibleUserId == userId,
-                ParticipatingStatus = e.EventParticipants.FirstOrDefault(p => p.ApplicationUserId == userId) != null ? e.EventParticipants.FirstOrDefault(p => p.ApplicationUserId == userId).AttendStatus : (int)ConstBusinessLayer.AttendingStatus.Idle,
+                ParticipatingStatus = e.EventParticipants.FirstOrDefault(p => p.ApplicationUserId == userId) != null ?
+                                          e.EventParticipants.FirstOrDefault(p => p.ApplicationUserId == userId).AttendStatus :
+                                          (int)ConstBusinessLayer.AttendingStatus.Idle,
                 MaxChoices = e.MaxChoices,
             };
         }
