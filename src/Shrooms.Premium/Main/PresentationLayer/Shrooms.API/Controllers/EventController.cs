@@ -109,10 +109,11 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
         public IHttpActionResult GetEventsByTypeAndOffice(string typeId, string officeId)
         {
+            var includeOnlyMain = typeId == "main";
             int? typeIdNullable = null;
             int? officeIdNullable = null;
 
-            if (typeId != "all" && int.TryParse(typeId, out var typeIdParsed))
+            if (typeId != "all" && typeId != "main" && int.TryParse(typeId, out var typeIdParsed))
             {
                 typeIdNullable = typeIdParsed;
             }
@@ -123,7 +124,7 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
             }
 
             var userOrganization = GetUserAndOrganization();
-            var eventsListDto = _eventListingService.GetEventsByTypeAndOffice(userOrganization, typeIdNullable, officeIdNullable);
+            var eventsListDto = _eventListingService.GetEventsByTypeAndOffice(userOrganization, typeIdNullable, officeIdNullable, includeOnlyMain);
 
             var result = _mapper.Map<IEnumerable<EventListItemDTO>, IEnumerable<EventListItemViewModel>>(eventsListDto);
             return Ok(result);
