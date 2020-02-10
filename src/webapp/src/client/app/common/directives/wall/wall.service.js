@@ -25,7 +25,6 @@
         '$state',
         'authService',
         'wallMenuNavigationRepository',
-        'wallSettings',
         'errorHandler',
         'wallPostRepository',
         'wallRepository',
@@ -38,8 +37,8 @@
     ];
 
     function wallService($location, $timeout, $state, authService, wallMenuNavigationRepository,
-        wallSettings, errorHandler, wallPostRepository, wallRepository, lodash, notifySrv, appConfig, SmoothScroll, WallsType, WallsCount) {
-        
+        errorHandler, wallPostRepository, wallRepository, lodash, notifySrv, appConfig, SmoothScroll, WallsType, WallsCount) {
+
         var wallServiceData = {
             posts: [],
             isScrollingEnabled: true,
@@ -264,17 +263,17 @@
                         busy = false;
                     }, errorHandler.handleErrorMessage);
                 } else {
-                    wallPostRepository.getPosts(settings).then(function (response) {
-                        addPostsToWall(response, true);
-                        busy = false;
-                        scrollToPostNotification();
-                    }, function (error) {
-                        if ($state.includes(appConfig.homeStateName) && !!$state.params.wall) {
-                            redirectToHomeState();
-                        } else {
-                            errorHandler.handleErrorMessage(error);
-                        }
-                    });
+                        wallPostRepository.getPosts(settings).then(function (response) {
+                            addPostsToWall(response, true);
+                            busy = false;
+                            scrollToPostNotification();
+                        }, function (error) {
+                            if ($state.includes(appConfig.homeStateName) && !!$state.params.wall) {
+                                redirectToHomeState();
+                            } else {
+                                errorHandler.handleErrorMessage(error);
+                            }
+                        });
                 }
             }
         }

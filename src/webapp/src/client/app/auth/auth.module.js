@@ -31,7 +31,7 @@
                 $window.location.href = 'https://' + location.host + '/' + toParams.organizationName;
             }
 
-            if (authService.identity.isAuthenticated 
+            if (authService.identity.isAuthenticated
                 && authService.isInRole(roles.external) 
                 && (!toState.name.contains('Root.WithOrg.Client.Events') && !toState.name.contains('Root.WithOrg.LogOff'))) {
                 event.preventDefault();
@@ -61,6 +61,11 @@
             if (toState.name.contains('Root.WithOrg.Login') && authService.identity.isAuthenticated && authService.identity.organizationName && toParams.organizationName === authService.identity.organizationName) {
                 event.preventDefault();
                 authService.redirectToHome();
+            }
+
+            if (authService.identity.isAuthenticated && toState.name.contains(appConfig.homeStateName) && !authService.hasPermissions(['WALL_BASIC'])) {
+                event.preventDefault();
+                authService.redirectToEvents();
             }
 
             if (toState.data && toState.data.authorizePermission && !authService.hasPermissions([toState.data.authorizePermission])) {

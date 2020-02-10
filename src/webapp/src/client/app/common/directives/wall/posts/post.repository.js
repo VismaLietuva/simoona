@@ -96,6 +96,5 @@
                 id: post.id
             }).$promise;
         }
-
     }
 })();

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataTransferObjects.Models.Users;
 using Shrooms.DataTransferObjects.Models.Wall.Posts.Comments;
+using Shrooms.EntityModels.Models.Multiwall;
 
 namespace Shrooms.DataTransferObjects.Models.Wall.Posts
 {
@@ -18,6 +20,7 @@ namespace Shrooms.DataTransferObjects.Models.Wall.Posts
         public IEnumerable<UserDto> Likes { get; set; }
         public int WallId { get; set; }
         public string WallName { get; set; }
+        public WallType WallType { get; set; }
         public DateTime LastActivity { get; set; }
         public bool CanModerate { get; set; }
         public bool IsEdited { get; set; }

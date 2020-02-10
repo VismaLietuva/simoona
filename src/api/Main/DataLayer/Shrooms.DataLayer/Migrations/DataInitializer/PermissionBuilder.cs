@@ -31,14 +31,15 @@ namespace Shrooms.DataLayer.Migrations.DataInitializer
 
         public PermissionBuilder AddAdminPermission(string permissionName, string module = null, params string[] withRoleNames)
         {
-            var roles = withRoleNames != null ?
-                _roles.Where(x =>
-                            withRoleNames.Any(y => y == x.Name) ||
-                            x.Name == Roles.Admin)
-                        .ToList() :
-                _roles.Where(x =>
-                            x.Name == Roles.Admin)
-                        .ToList();
+            List<ApplicationRole> roles;
+            if (withRoleNames == null)
+            {
+                roles = _roles.Where(x => x.Name == Roles.Admin).ToList();
+            }
+            else
+            {
+                roles = _roles.Where(x => withRoleNames.Any(y => y == x.Name) || x.Name == Roles.Admin).ToList();
+            }
 
             var permission = new Permission()
             {
@@ -56,16 +57,15 @@ namespace Shrooms.DataLayer.Migrations.DataInitializer
 
         public PermissionBuilder AddBasicPermission(string permissionName, string module = null, params string[] withRoleNames)
         {
-            var roles = withRoleNames != null ?
-                _roles.Where(x =>
-                                withRoleNames.Any(y => y == x.Name) ||
-                                x.Name == Roles.User ||
-                                x.Name == Roles.Admin)
-                            .ToList() :
-                _roles.Where(x =>
-                            x.Name == Roles.User ||
-                            x.Name == Roles.Admin)
-                        .ToList();
+            List<ApplicationRole> roles;
+            if (withRoleNames == null)
+            {
+                roles = _roles.Where(x => x.Name == Roles.User || x.Name == Roles.Admin).ToList();
+            }
+            else
+            {
+                roles = _roles.Where(x => withRoleNames.Any(y => y == x.Name) || x.Name == Roles.User || x.Name == Roles.Admin).ToList();
+            }
 
             var permission = new Permission()
             {

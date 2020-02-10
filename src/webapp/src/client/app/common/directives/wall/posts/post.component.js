@@ -43,7 +43,7 @@
         vm.editPost = editPost;
         vm.deletePost = deletePost;
         vm.enableEditor = enableEditor;
-        vm.disableEditor = disableEditor;    
+        vm.disableEditor = disableEditor;
         vm.showCommentForm = showCommentForm;
         vm.handleErrorMessage = handleErrorMessage;
 
