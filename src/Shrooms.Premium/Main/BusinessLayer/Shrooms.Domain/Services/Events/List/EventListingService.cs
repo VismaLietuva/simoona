@@ -67,7 +67,7 @@ namespace Shrooms.Domain.Services.Events.List
 
         public IEnumerable<EventListItemDTO> GetEventsByTypeAndOffice(UserAndOrganizationDTO userOrganization, int? typeId = null, int? officeId = null)
         {
-            var officeSearchString = OfficeIdToString(officeId) ?? OutsideOffice;
+            var officeSearchString = OfficeIdToString(officeId);
             IList < EventListItemDTO > events = _eventsDbSet
                 .Include(x => x.EventParticipants)
                 .Where(t =>
@@ -85,7 +85,7 @@ namespace Shrooms.Domain.Services.Events.List
 
         public IEnumerable<EventListItemDTO> GetMyEvents(MyEventsOptionsDTO options, int? officeId = null)
         {
-            var officeSearchString = OfficeIdToString(officeId) ?? OutsideOffice;
+            var officeSearchString = OfficeIdToString(officeId);
             var myEventFilter = _eventFilters[options.Filter](options.UserId);
             var events = _eventsDbSet
                 .Include(x => x.EventParticipants)
@@ -194,6 +194,6 @@ namespace Shrooms.Domain.Services.Events.List
         }
 
         private static string OfficeIdToString(int? officeId) =>
-            officeId != null ? $@"""{officeId.ToString()}""" : null;
+            officeId != null ? $@"""{officeId.ToString()}""" : OutsideOffice;
     }
 }
