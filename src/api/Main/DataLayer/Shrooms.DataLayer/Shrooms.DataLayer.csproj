@@ -847,9 +847,9 @@
     <Compile Include="Migrations\202002091606025_InitEventWallsPermissions.Designer.cs">
       <DependentUpon>202002091606025_InitEventWallsPermissions.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202002100809248_AddIsShownWithAllEventsField.cs" />
-    <Compile Include="Migrations\202002100809248_AddIsShownWithAllEventsField.Designer.cs">
-      <DependentUpon>202002100809248_AddIsShownWithAllEventsField.cs</DependentUpon>
+    <Compile Include="Migrations\202002101044528_AddIsShownWithMainEventsField.cs" />
+    <Compile Include="Migrations\202002101044528_AddIsShownWithMainEventsField.Designer.cs">
+      <DependentUpon>202002101044528_AddIsShownWithMainEventsField.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
@@ -1403,8 +1403,8 @@
     <EmbeddedResource Include="Migrations\202002091606025_InitEventWallsPermissions.resx">
       <DependentUpon>202002091606025_InitEventWallsPermissions.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202002100809248_AddIsShownWithAllEventsField.resx">
-      <DependentUpon>202002100809248_AddIsShownWithAllEventsField.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202002101044528_AddIsShownWithMainEventsField.resx">
+      <DependentUpon>202002101044528_AddIsShownWithMainEventsField.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

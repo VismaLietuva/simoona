@@ -50,7 +50,7 @@
                     $state.go(listState);
                 });
             } else {
-                vm.eventType.isShownWithAllEvents = true;
+                vm.eventType.isShownWithMainEvents = true;
             }
 
             eventTypesRepository.getSingleJoinGroups().then(function(response) {

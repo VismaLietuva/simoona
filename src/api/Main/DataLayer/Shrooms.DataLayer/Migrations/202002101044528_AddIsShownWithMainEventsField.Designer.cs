@@ -7,13 +7,13 @@ namespace Shrooms.DataLayer.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class AddIsShownWithAllEventsField : IMigrationMetadata
+    public sealed partial class AddIsShownWithMainEventsField : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddIsShownWithAllEventsField));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddIsShownWithMainEventsField));
         
         string IMigrationMetadata.Id
         {
-            get { return "202002100809248_AddIsShownWithAllEventsField"; }
+            get { return "202002101044528_AddIsShownWithMainEventsField"; }
         }
         
         string IMigrationMetadata.Source

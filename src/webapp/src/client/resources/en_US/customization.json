@@ -41,5 +41,5 @@
     "assignees": "Assignees",
     "assigneesPlaceHolder": "Add assignees...",
     "singleJoinGroupLabel": "Single join group",
-    "isShownWithAllEvents": "Shown in all events list"
+    "isShownWithMainEvents": "Shown with main events"
 }

@@ -41,5 +41,5 @@
     "assignees": "Atsakingi asmenys",
     "assigneesPlaceHolder": "Pridėkite atsakingus asmenis...",
     "singleJoinGroupLabel": "Vieno dalyvavimo grupė",
-    "isShownWithAllEvents": "Rodoma visų renginių sąraše"
+    "isShownWithMainEvents": "Rodoma tarp pagrindinių renginių"
 }

@@ -3,17 +3,17 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class AddIsShownWithAllEventsField : DbMigration
+    public partial class AddIsShownWithMainEventsField : DbMigration
     {
         public override void Up()
         {
-            AddColumn("dbo.EventTypes", "IsShownWithAllEvents", 
+            AddColumn("dbo.EventTypes", "IsShownWithMainEvents", 
                 c => c.Boolean(nullable: false, defaultValue: true));
         }
         
         public override void Down()
         {
-            DropColumn("dbo.EventTypes", "IsShownWithAllEvents");
+            DropColumn("dbo.EventTypes", "IsShownWithMainEvents");
         }
     }
 }

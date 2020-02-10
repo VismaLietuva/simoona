@@ -27,7 +27,7 @@
                                 translate="customization.eventTypeSingleJoin"></th>
 
                             <th class="col-xs-3 text-center hidden-xs" 
-                                translate="customization.isShownWithAllEvents"></th>
+                                translate="customization.isShownWithMainEvents"></th>
 
                             <th class="col-xs-3 text-center" 
                                 translate="common.action"></th>
@@ -42,7 +42,7 @@
                                 {{eventType.isSingleJoin ? ('common.yes'|translate) : ('common.no'|translate)}}
                             </td>
                             <td class="text-center hidden-xs">
-                                {{eventType.isShownWithAllEvents ? ('common.yes'|translate) : ('common.no'|translate)}}
+                                {{eventType.isShownWithMainEvents ? ('common.yes'|translate) : ('common.no'|translate)}}
                             </td>
                             <td class="text-center">
                                 <a ui-sref="Root.WithOrg.Admin.Customization.EventTypes.Edit({ id : {{eventType.id}}})" 
