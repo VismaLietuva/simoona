@@ -57,8 +57,7 @@ namespace Shrooms.Domain.Services.Events.List
                 .Include(x => x.EventType)
                 .Where(t =>
                     t.OrganizationId == userOrganization.OrganizationId &&
-                    t.EndDate > DateTime.UtcNow &&
-                    t.EventType.IsShownWithAllEvents)
+                    t.EndDate > DateTime.UtcNow)
                 .Where(EventTypeFilter(typeId))
                 .Select(MapEventToListItemDto(userOrganization.UserId))
                 .OrderByDescending(e => e.IsPinned)
@@ -70,7 +69,7 @@ namespace Shrooms.Domain.Services.Events.List
 
         public IEnumerable<EventListItemDTO> GetEventsByTypeAndOffice(UserAndOrganizationDTO userOrganization, int? typeId = null, int? officeId = null)
         {
-            string officeSearchString = officeId != null ? $"\"{officeId.ToString()}\"" : "[]";
+            var officeSearchString = officeId != null ? $"\"{officeId.ToString()}\"" : "[]";
             IList < EventListItemDTO > events = _eventsDbSet
                 .Include(x => x.EventParticipants)
                 .Where(t =>
@@ -82,13 +81,13 @@ namespace Shrooms.Domain.Services.Events.List
                 .OrderByDescending(e => e.IsPinned)
                 .ThenBy(e => e.StartDate)
                 .ToList();
-            
+
             return events;
         }
 
         public IEnumerable<EventListItemDTO> GetMyEvents(MyEventsOptionsDTO options, int? officeId = null)
         {
-            string officeSearchString = officeId != null ? $"\"{officeId.ToString()}\"" : "[]";
+            var officeSearchString = officeId != null ? $"\"{officeId.ToString()}\"" : "[]";
             var myEventFilter = EventFilters[options.Filter](options.UserId);
             var events = _eventsDbSet
                 .Include(x => x.EventParticipants)
@@ -169,7 +168,7 @@ namespace Shrooms.Domain.Services.Events.List
         {
             if (typeId == null || typeId == 0)
             {
-                return x => true;
+                return x => x.EventType.IsShownWithAllEvents;
             }
 
             return x => x.EventTypeId == typeId;
