@@ -5,6 +5,7 @@
         .module('simoonaApp.Events')
         .constant('defaultEventTabs', [
             { id: 'all' },
+            { id: 'main' },
             { id: 'participant' },
             { id: 'host' }
         ])
@@ -19,7 +20,6 @@
         });
 
     eventsListTabsController.$inject = [
-        '$scope',
         '$stateParams',
         '$translate',
         '$timeout',
@@ -29,7 +29,7 @@
         'eventOfficeFactory'
     ];
 
-    function eventsListTabsController($scope, $stateParams, $translate, $timeout, eventRepository, defaultEventTabs, defaultOfficeTabs, eventOfficeFactory) {
+    function eventsListTabsController($stateParams, $translate, $timeout, eventRepository, defaultEventTabs, defaultOfficeTabs, eventOfficeFactory) {
         /* jshint validthis: true */
         var vm = this;
         vm.eventsTabs = [];
@@ -47,7 +47,7 @@
                     vm.eventsTabs = result;
                 }
                 $timeout(addDefaultEventTabs, 100);
-            });               
+            });
             eventOfficeFactory.getOffices().then(function(result) {
                 vm.eventOffices = result;
                 $timeout(addDefaultOfficeTabs, 100);
@@ -58,9 +58,9 @@
         function addDefaultEventTabs() {
             for (var i = 0; i < defaultEventTabs.length; i++) {
                 var tabId = defaultEventTabs[i].id;
-                if (tabId === 'all') {
-                    var allEvents = $translate.instant('events.' + tabId);
-                    vm.eventsTabs.unshift({ id: tabId, name: allEvents });
+                if (tabId === 'all' || tabId === 'main') {
+                    var translatedTabName = $translate.instant('events.' + tabId + 'Events');
+                    vm.eventsTabs.unshift({ id: tabId, name: translatedTabName });
                 } else {
                     var translatedType = $translate.instant('events.' + tabId);
                     vm.eventsTabs.push({ id: tabId, name: translatedType });
@@ -74,8 +74,8 @@
             for (var i = 0; i < defaultOfficeTabs.length; i++) {
                 var tabId = defaultOfficeTabs[i].id;
                 if (tabId === 'all') {
-                    var allOffices = $translate.instant('events.eventOfficeAll');
-                    vm.eventOffices.unshift({ id: tabId, name: allOffices });
+                    var translatedTabName = $translate.instant('events.eventOfficeAll');
+                    vm.eventOffices.unshift({ id: tabId, name: translatedTabName });
                 } else {
                     vm.eventOffices.push({ id: tabId, name: tabId });
                 }

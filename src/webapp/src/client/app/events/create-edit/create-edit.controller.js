@@ -165,7 +165,6 @@
                         } else {
                             vm.event.maxOptions = 1;
                             addOption();
-                            addOption();
                         }
                     },
                     function (error) {
@@ -198,7 +197,6 @@
                     vm.event.maxParticipants = response.value;
                 });
 
-                addOption();
                 addOption();
             }
 

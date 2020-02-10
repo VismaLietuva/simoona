@@ -46,7 +46,7 @@
                 controller: 'eventsByTypeController',
                 controllerAs: 'vm',
                 params: {
-                    type: 'all',
+                    type: 'main',
                     office: 'all'
                 }
             })
