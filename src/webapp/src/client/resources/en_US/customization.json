@@ -40,5 +40,6 @@
 	"jobTitlesDescription": "Manage job titles",
     "assignees": "Assignees",
     "assigneesPlaceHolder": "Add assignees...",
-    "singleJoinGroupLabel": "Single join group"
+    "singleJoinGroupLabel": "Single join group",
+    "isShownWithMainEvents": "Shown with main events"
 }

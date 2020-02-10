@@ -40,5 +40,6 @@
 	"jobTitlesDescription": "Tvarkyti darbo pozicijas",
     "assignees": "Atsakingi asmenys",
     "assigneesPlaceHolder": "Pridėkite atsakingus asmenis...",
-    "singleJoinGroupLabel": "Vieno dalyvavimo grupė"
+    "singleJoinGroupLabel": "Vieno dalyvavimo grupė",
+    "isShownWithMainEvents": "Rodoma tarp pagrindinių renginių"
 }

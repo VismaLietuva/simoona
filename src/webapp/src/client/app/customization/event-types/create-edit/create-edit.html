@@ -27,17 +27,6 @@
                         </div>
                     </div>
 
-                    <!--event type with weekly reminders -->
-                    <div class="form-group">
-                        <label class="control-label col-xs-12 col-sm-4"></label>
-                        <div class="col-xs-12 col-sm-4">
-                            <input id="weeklyReminders" type="checkbox" class="event-form-checkbox"
-                                ng-model="vm.eventType.sendWeeklyReminders" />
-                            <label for="weeklyReminders" class="control-label"
-                                translate="customization.sendWeeklyReminders"></label>
-                        </div>
-                    </div>
-
                     <!--event type is single join -->
                     <div class="form-group">
                         <label class="control-label col-xs-12 col-sm-4"></label>
@@ -63,6 +52,28 @@
                                         {{group}}</option>
                                 </optgroup>
                             </datalist>
+                        </div>
+                    </div>
+
+                    <!--event type with weekly reminders -->
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-4"></label>
+                        <div class="col-xs-12 col-sm-4">
+                            <input id="weeklyReminders" type="checkbox" class="event-form-checkbox"
+                                ng-model="vm.eventType.sendWeeklyReminders" />
+                            <label for="weeklyReminders" class="control-label"
+                                translate="customization.sendWeeklyReminders"></label>
+                        </div>
+                    </div>
+
+                    <!--is shown will all events in a list -->
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-4"></label>
+                        <div class="col-xs-12 col-sm-4">
+                            <input id="shownWithAll" type="checkbox" class="event-form-checkbox"
+                                ng-model="vm.eventType.isShownWithMainEvents" />
+                            <label for="shownWithAll" class="control-label"
+                                translate="customization.isShownWithMainEvents"></label>
                         </div>
                     </div>
 
