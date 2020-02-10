@@ -14,5 +14,7 @@ namespace Shrooms.WebViewModels.Models.Events
         public string Name { get; set; }
 
         public string SingleJoinGroupName { get; set; }
+
+        public bool IsShownWithMainEvents { get; set; }
     }
 }
