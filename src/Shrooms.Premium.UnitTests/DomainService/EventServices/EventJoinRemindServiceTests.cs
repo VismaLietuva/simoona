@@ -56,13 +56,13 @@ namespace Shrooms.Premium.UnitTests.DomainService.EventServices
                 Id = 1
             };
             _eventUtilitiesService.GetEventTypesToRemind(1).Returns(new List<EventTypeDTO> { eventType });
-            _eventUtilitiesService.AnyEventsThisWeekByType(eventType.Id).Returns(false);
+            _eventUtilitiesService.AnyEventsThisWeekByType(Arg.Is<IEnumerable<int>>(e => e.FirstOrDefault() == eventType.Id)).Returns(false);
             _organizationService.GetOrganizationByName("visma").Returns(GetOrganization());
 
             _sut.SendNotifications("visma");
 
-            _eventUtilitiesService.Received().AnyEventsThisWeekByType(eventType.Id);
-            _userEventsService.DidNotReceive().GetUsersWithAppReminders(eventType.Id);
+            _eventUtilitiesService.Received().AnyEventsThisWeekByType(Arg.Is<IEnumerable<int>>(e => e.FirstOrDefault() == eventType.Id));
+            _userEventsService.DidNotReceive().GetUsersWithAppReminders(Arg.Is<IEnumerable<int>>(e => e.FirstOrDefault() == eventType.Id));
         }
 
         [Test]
@@ -72,16 +72,17 @@ namespace Shrooms.Premium.UnitTests.DomainService.EventServices
             {
                 Id = 1
             };
+
             _eventUtilitiesService.GetEventTypesToRemind(1).Returns(new List<EventTypeDTO> { eventType });
-            _eventUtilitiesService.AnyEventsThisWeekByType(eventType.Id).Returns(true);
-            _userEventsService.GetUsersWithAppReminders(eventType.Id).Returns(new List<string>());
+            _eventUtilitiesService.AnyEventsThisWeekByType(Arg.Is<IEnumerable<int>>(e => e.FirstOrDefault() == eventType.Id)).Returns(true);
+            _userEventsService.GetUsersWithAppReminders(Arg.Is<IEnumerable<int>>(e => e.FirstOrDefault() == eventType.Id)).Returns(new List<string>());
             _organizationService.GetOrganizationByName("visma").Returns(GetOrganization());
 
             _sut.SendNotifications("visma");
 
-            _userEventsService.Received().GetUsersWithAppReminders(eventType.Id);
-            _userEventsService.Received().GetUsersWithEmailReminders(eventType.Id);
-            _notificationService.DidNotReceiveWithAnyArgs().CreateForEventJoinReminder(default, default, default);
+            _userEventsService.Received().GetUsersWithAppReminders(Arg.Is<IEnumerable<int>>(e => e.FirstOrDefault() == eventType.Id));
+            _userEventsService.Received().GetUsersWithEmailReminders(Arg.Is<IEnumerable<int>>(e => e.FirstOrDefault() == eventType.Id));
+            _notificationService.DidNotReceiveWithAnyArgs().CreateForEventJoinReminder(default, default);
         }
 
         [Test]
@@ -91,17 +92,18 @@ namespace Shrooms.Premium.UnitTests.DomainService.EventServices
             {
                 Id = 1
             };
+
             var users = (IEnumerable<string>) new List<string> { "" };
             _eventUtilitiesService.GetEventTypesToRemind(1).Returns(new List<EventTypeDTO> { eventType });
-            _eventUtilitiesService.AnyEventsThisWeekByType(eventType.Id).Returns(true);
-            _userEventsService.GetUsersWithAppReminders(eventType.Id).Returns(users);
-            _userEventsService.GetUsersWithEmailReminders(eventType.Id).Returns(users);
+            _eventUtilitiesService.AnyEventsThisWeekByType(Arg.Is<IEnumerable<int>>(e => e.FirstOrDefault() == eventType.Id)).Returns(true);
+            _userEventsService.GetUsersWithAppReminders(Arg.Is<IEnumerable<int>>(e => e.FirstOrDefault() == eventType.Id)).Returns(users);
+            _userEventsService.GetUsersWithEmailReminders(Arg.Is<IEnumerable<int>>(e => e.FirstOrDefault() == eventType.Id)).Returns(users);
             _organizationService.GetOrganizationByName("visma").Returns(GetOrganization());
 
             _sut.SendNotifications("visma");
 
-            _notificationService.ReceivedWithAnyArgs().CreateForEventJoinReminder(eventType, users, 1);
-            _eventNotificationService.ReceivedWithAnyArgs().RemindUsersToJoinEvent(eventType, users, 1);
+            _notificationService.ReceivedWithAnyArgs().CreateForEventJoinReminder(users, 1);
+            _eventNotificationService.ReceivedWithAnyArgs().RemindUsersToJoinEvent(Arg.Is<IEnumerable<EventTypeDTO>>(e => e.FirstOrDefault().Id == eventType.Id), users, 1);
         }
 
         private static UserAndOrganizationDTO GetUserOrg()

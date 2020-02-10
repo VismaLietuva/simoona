@@ -197,11 +197,11 @@ namespace Shrooms.Domain.Services.Events.Utilities
             return eventOptions;
         }
 
-        public bool AnyEventsThisWeekByType(int eventTypeId)
+        public bool AnyEventsThisWeekByType(IEnumerable<int> eventTypeIds)
         {
             return _eventsDbSet
                 .Any(x => SqlFunctions.DatePart("wk", x.StartDate) == SqlFunctions.DatePart("wk", DateTime.UtcNow) &&
-                          x.EventType.Id == eventTypeId &&
+                          eventTypeIds.Contains(x.EventType.Id) &&
                           x.RegistrationDeadline > DateTime.UtcNow);
         }
 

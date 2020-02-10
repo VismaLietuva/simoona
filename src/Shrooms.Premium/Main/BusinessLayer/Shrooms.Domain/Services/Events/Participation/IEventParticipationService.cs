@@ -7,7 +7,9 @@ namespace Shrooms.Domain.Services.Events.Participation
 {
     public interface IEventParticipationService
     {
-        void Join(EventJoinDTO joinDto);
+        void AddColleague(EventJoinDTO joinDto);
+
+        void Join(EventJoinDTO joinDto, bool addedByColleague = false);
 
         void UpdateAttendStatus(UpdateAttendStatusDTO updateAttendStatusDTO);
 
