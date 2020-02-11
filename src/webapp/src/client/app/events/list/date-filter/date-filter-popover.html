@@ -1,0 +1,17 @@
+<div style="display: flex; flex-direction: column; justify-content: space-between;">
+    <div class="date-field" style="display: block; margin-bottom: 5px;">
+        <input type="text" name="startDateInput" id="startDateInput" class="hasDatepicker"
+            uib-datepicker-popup="yyyy-MM-dd" popup-placement="bottom" ng-model="vm.startDate"
+            ng-click="vm.openDatePicker($event, 'startDate')" is-open="vm.isDatePickerOpen.startDate" />
+    </div>
+    <div class="date-field" style="display: block; margin-bottom: 5px;">
+        <input type="text" name="startDateInput" id="startDateInput" class="hasDatepicker"
+            uib-datepicker-popup="yyyy-MM-dd" popup-placement="bottom" ng-model="vm.endDate"
+            ng-click="vm.openDatePicker($event, 'endDate')" is-open="vm.isDatePickerOpen.endDate"/>
+    </div>
+    <div style="display: block; margin-bottom: 5px;">
+        <button class="btn btn-default">
+            <span translate="common.apply"></span>
+        </button>
+    </div>
+</div>

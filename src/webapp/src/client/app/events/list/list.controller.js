@@ -13,6 +13,5 @@
         /*jshint validthis: true */
         var vm = this;
         $rootScope.pageTitle = 'events.eventsTitle';
-
     }
 })();

@@ -4,11 +4,10 @@
             <div class="panel-heading">
                 <span translate="events.eventsTitle"></span>
                 <div class="pull-right event-add-event-button">
-                    <a class="nc-btn nc-btn-default"
-                       ui-sref="Root.WithOrg.Client.Events.AddEvents"
-                       translate-attr-title="events.addNewEvent"
-                       data-test-id="create-event-button" translate>
-                        <span class="vismaicon vismaicon-add2-circle"></span><span class="hidden-xs hidden-sm" translate="events.addNewEvent"></span>
+                    <a class="nc-btn nc-btn-default" ui-sref="Root.WithOrg.Client.Events.AddEvents"
+                        translate-attr-title="events.addNewEvent" data-test-id="create-event-button" translate>
+                        <span class="vismaicon vismaicon-add2-circle"></span><span class="hidden-xs hidden-sm"
+                            translate="events.addNewEvent"></span>
                     </a>
                 </div>
             </div>
@@ -16,6 +15,11 @@
             <div class="panel-body">
                 <ace-events-list-tabs></ace-events-list-tabs>
             </div>
+
+            <div class="panel-footer">
+                <ace-events-list-date-filter></ace-events-list-date-filter>
+            </div>
+
         </div>
         <ui-view></ui-view>
     </div>
