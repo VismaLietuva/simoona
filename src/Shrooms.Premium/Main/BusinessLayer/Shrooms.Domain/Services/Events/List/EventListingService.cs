@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
+using Shrooms.Domain.Services.Args;
 
 namespace Shrooms.Domain.Services.Events.List
 {
@@ -65,16 +66,23 @@ namespace Shrooms.Domain.Services.Events.List
             return events;
         }
 
-        public IEnumerable<EventListItemDTO> GetEventsByTypeAndOffice(UserAndOrganizationDTO userOrganization, int? typeId = null, int? officeId = null, bool includeOnlyMain = false)
+        public IEnumerable<EventListItemDTO> GetEventsByTypeAndOffice(
+            EventsListingFilterArgs args, UserAndOrganizationDTO userOrganization)
         {
-            var officeSearchString = OfficeIdToString(officeId);
-            var events = _eventsDbSet
+            var officeSearchString = OfficeIdToString(args.OfficeId);
+
+            var query = _eventsDbSet
                 .Include(x => x.EventParticipants)
-                .Where(t =>
-                    t.OrganizationId == userOrganization.OrganizationId &
-                    t.EndDate > DateTime.UtcNow)
-                .Where(EventTypeFilter(typeId, includeOnlyMain))
-                .Where(EventOfficeFilter(officeSearchString))
+                .Include(x => x.EventType)
+                .Where(e => e.OrganizationId == userOrganization.OrganizationId)
+                .Where(EventTypeFilter(args.TypeId, args.IsOnlyMainEvents))
+                .Where(EventOfficeFilter(officeSearchString));
+
+            query = args.StartDate is null && args.EndDate is null ?
+                        query.Where(e => e.EndDate > DateTime.UtcNow) :
+                        query.Where(e => e.StartDate >= args.StartDate && e.EndDate <= args.EndDate);
+
+            var events = query
                 .Select(MapEventToListItemDto(userOrganization.UserId))
                 .OrderByDescending(e => e.IsPinned)
                 .ThenBy(e => e.StartDate)

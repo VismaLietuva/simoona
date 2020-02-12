@@ -33,6 +33,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using System.IO;
 using System.Net.Http.Headers;
+using Shrooms.Domain.Services.Args;
 using Shrooms.Domain.Services.Events.Calendar;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.DomainServiceValidators.Validators.Events;
@@ -105,26 +106,41 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
             return Ok(result);
         }
 
+        [Route("All")]
+        [PermissionAuthorize(Permission = BasicPermissions.Event)]
+        public IHttpActionResult GetAllEvents(int page = 1)
+        {
+            var userOrganization = GetUserAndOrganization();
+            var allListDto = _eventListingService.GetEventsByType(userOrganization);
+            var result = _mapper.Map<IEnumerable<EventListItemDTO>, IEnumerable<EventListItemViewModel>>(allListDto);
+            return Ok(result);
+        }
+
         [Route("ByTypeAndOffice")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult GetEventsByTypeAndOffice(string typeId, string officeId)
+        public IHttpActionResult GetEventsByTypeAndOffice(
+            string typeId, string officeId, int page = 1,
+            DateTime? startDate = null, DateTime? endDate = null)
         {
-            var includeOnlyMain = typeId == "main";
-            int? typeIdNullable = null;
-            int? officeIdNullable = null;
+            var args = new EventsListingFilterArgs
+            {
+                StartDate = startDate,
+                EndDate = endDate,
+                IsOnlyMainEvents = typeId == "main"
+            };
 
             if (typeId != "all" && typeId != "main" && int.TryParse(typeId, out var typeIdParsed))
             {
-                typeIdNullable = typeIdParsed;
+                args.TypeId = typeIdParsed;
             }
 
             if (officeId != "all" && int.TryParse(officeId, out var officeIdParsed))
             {
-                officeIdNullable = officeIdParsed;
+                args.OfficeId = officeIdParsed;
             }
 
             var userOrganization = GetUserAndOrganization();
-            var eventsListDto = _eventListingService.GetEventsByTypeAndOffice(userOrganization, typeIdNullable, officeIdNullable, includeOnlyMain);
+            var eventsListDto = _eventListingService.GetEventsByTypeAndOffice(args, userOrganization);
 
             var result = _mapper.Map<IEnumerable<EventListItemDTO>, IEnumerable<EventListItemViewModel>>(eventsListDto);
             return Ok(result);
@@ -186,16 +202,6 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
             }
 
             return Ok();
-        }
-
-        [Route("All")]
-        [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult GetAllEvents()
-        {
-            var userOrganization = GetUserAndOrganization();
-            var allListDto = _eventListingService.GetEventsByType(userOrganization);
-            var result = _mapper.Map<IEnumerable<EventListItemDTO>, IEnumerable<EventListItemViewModel>>(allListDto);
-            return Ok(result);
         }
 
         [HttpGet]
