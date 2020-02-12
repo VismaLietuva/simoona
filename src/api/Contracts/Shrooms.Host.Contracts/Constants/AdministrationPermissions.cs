@@ -26,6 +26,7 @@
         public const string Project = "PROJECT_ADMINISTRATION";
         public const string Monitor = "MONITOR_ADMINISTRATION";
         public const string Wall = "WALL_ADMINISTRATION";
+        public const string EventWall = "EVENTWALL_ADMINISTRATION";
         public const string Lottery = "LOTTERY_ADMINISTRATION";
 
         //used only in webApp

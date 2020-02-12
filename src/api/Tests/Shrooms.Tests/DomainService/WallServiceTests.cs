@@ -546,7 +546,7 @@ namespace Shrooms.UnitTests.DomainService
                 UserId = "userId"
             };
 
-            var wall = await _wallService.WallDetails(1, userOrg);
+            var wall = await _wallService.GetWallDetails(1, userOrg);
 
             Assert.AreEqual(1, wall.Id);
             Assert.AreEqual("Wall", wall.Name);
@@ -569,7 +569,7 @@ namespace Shrooms.UnitTests.DomainService
                 UserId = "userId"
             };
 
-            var wall = await _wallService.WallDetails(2, userOrg);
+            var wall = await _wallService.GetWallDetails(2, userOrg);
 
             Assert.AreEqual(2, wall.Id);
             Assert.AreEqual("Wall2", wall.Name);

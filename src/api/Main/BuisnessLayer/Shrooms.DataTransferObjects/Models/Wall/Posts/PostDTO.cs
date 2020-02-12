@@ -18,6 +18,7 @@ namespace Shrooms.DataTransferObjects.Models.Wall.Posts
         public IEnumerable<UserDto> Likes { get; set; }
         public int WallId { get; set; }
         public string WallName { get; set; }
+        public WallType WallType { get; set; }
         public DateTime LastActivity { get; set; }
         public bool CanModerate { get; set; }
         public bool IsEdited { get; set; }

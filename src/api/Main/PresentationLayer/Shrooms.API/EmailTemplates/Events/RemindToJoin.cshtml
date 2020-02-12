@@ -33,9 +33,7 @@
                         </p>
                         <br />
                         <p style="color: #282828; font-family: 'Segoe UI',Helvetica,Arial,sans-serif; text-align: center; font-size:14px; font-weight: 400; margin: 0 0 0 0;">
-                            We see you did not join any
-                            <span style="font-size:14px; font-weight:bold; color: #006199;">@Model.EventTypeName</span>
-                            event this week.
+                            We see you did not join any weekly event this week.
                         </p>
                     </td>
                 </tr>
@@ -44,11 +42,14 @@
                         <table align="center" style="text-align:center;" cellpadding="10">
                             <tbody>
                                 <tr>
-                                    <td align="center" style="display:inline-block;background:#006199;">
-                                        <a href="@Model.EventPageUrl" style="color:#ffffff;font-family:'Segoe UI',Helvetica,Arial,sans-serif; font-size:15px; line-height:15px; font-weight: 400; white-space:nowrap; text-decoration:none;" target="_blank">
-                                            See @Model.EventTypeName events now
-                                        </a>
-                                    </td>
+                                    @foreach (var eventType in @Model.EventTypes)
+                                    {
+                                        <td align="center" style="display:inline-block;background:#006199;margin-right: 3px;">
+                                            <a href="@eventType.Value" style="color:#ffffff;font-family:'Segoe UI',Helvetica,Arial,sans-serif; font-size:15px; line-height:15px; font-weight: 400; white-space:nowrap; text-decoration:none;" target="_blank">
+                                                @eventType.Key events
+                                            </a>
+                                        </td>
+                                    }
                                 </tr>
                             </tbody>
                         </table>

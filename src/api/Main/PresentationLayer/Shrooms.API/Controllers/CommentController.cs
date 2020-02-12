@@ -1,8 +1,12 @@
-﻿using System.Web.Http;
+﻿using System.Threading.Tasks;
+using System.Web.Http;
 using AutoMapper;
 using Shrooms.API.BackgroundWorkers;
 using Shrooms.API.Filters;
+using Shrooms.DataTransferObjects.Models.Wall;
 using Shrooms.DataTransferObjects.Models.Wall.Posts.Comments;
+using Shrooms.Domain.Services.Permissions;
+using Shrooms.Domain.Services.Wall;
 using Shrooms.Domain.Services.Wall.Posts.Comments;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.Host.Contracts.Constants;
@@ -16,23 +20,35 @@ namespace Shrooms.API.Controllers
     {
         private readonly IMapper _mapper;
         private readonly ICommentService _commentService;
+        private readonly IWallService _wallService;
+        private readonly IPermissionService _permissionService;
         private readonly IAsyncRunner _asyncRunner;
 
-        public CommentController(IMapper mapper, ICommentService commentService, IAsyncRunner asyncRunner)
+        public CommentController(IMapper mapper, ICommentService commentService, IWallService wallService, IPermissionService permissionService, IAsyncRunner asyncRunner)
         {
             _mapper = mapper;
             _commentService = commentService;
+            _wallService = wallService;
+            _permissionService = permissionService;
             _asyncRunner = asyncRunner;
         }
 
         [HttpPost]
         [Route("Create")]
-        [PermissionAuthorize(Permission = BasicPermissions.Comment)]
-        public IHttpActionResult CreateComment(NewCommentViewModel comment)
+        [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Comment, BasicPermissions.EventWall)]
+        public async Task<IHttpActionResult> CreateComment(NewCommentViewModel comment)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            var userAndOrg = GetUserAndOrganization();
+
+            var wallPost = await _wallService.GetWallPost(userAndOrg, comment.PostId);
+            if (!_permissionService.UserHasPermission(userAndOrg, BasicPermissions.Comment) && wallPost.WallType != WallType.Events)
+            {
+                return Forbidden();
             }
 
             var commentDto = _mapper.Map<NewCommentViewModel, NewCommentDTO>(comment);
@@ -56,7 +72,7 @@ namespace Shrooms.API.Controllers
 
         [HttpPut]
         [Route("Edit")]
-        [PermissionAuthorize(Permission = BasicPermissions.Comment)]
+        [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Comment, BasicPermissions.EventWall)]
         public IHttpActionResult EditComment(EditCommentViewModel commentViewModel)
         {
             if (!ModelState.IsValid)
@@ -84,7 +100,7 @@ namespace Shrooms.API.Controllers
 
         [HttpDelete]
         [Route("Delete")]
-        [PermissionAuthorize(Permission = BasicPermissions.Comment)]
+        [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Comment, BasicPermissions.EventWall)]
         public IHttpActionResult DeleteComment(int id)
         {
             if (!ModelState.IsValid)
@@ -109,7 +125,7 @@ namespace Shrooms.API.Controllers
 
         [HttpPut]
         [Route("Hide")]
-        [PermissionAuthorize(Permission = BasicPermissions.Comment)]
+        [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Comment, BasicPermissions.EventWall)]
         public IHttpActionResult HideComment(HideCommentViewModel comment)
         {
             if (!ModelState.IsValid)

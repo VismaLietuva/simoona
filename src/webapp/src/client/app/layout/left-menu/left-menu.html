@@ -1,10 +1,11 @@
 <div class="sidebar-overlay-container app-overlay" ace-sidebar ng-class="{visible: vm.isSidebarOpen()}" ng-click="vm.overlayDismiss($event)">
 <div ng-if="vm.isAuthenticated && vm.sidebarOpen" class="sidebar" data-test-id="sidebar-menu" id="sidebar-menu">
     <span class="vismaicon vismaicon-arrow-left-circle sidebar-close-btn" ng-click="vm.closeSidebar()"></span>
-    <wave-spinner ng-if="vm.isLoading || vm.isTranslating || vm.wallData.isWallListLoading"></wave-spinner>
-    <ace-wall-menu-navigation ng-if="!vm.isLoading && !vm.isTranslating"></ace-wall-menu-navigation>
+    <wave-spinner ng-if="vm.isAuthenticatedForWalls && (vm.isLoading || vm.isTranslating || vm.wallData.isWallListLoading)"></wave-spinner>
+
+    <ace-wall-menu-navigation ng-if="vm.isAuthenticatedForWalls && !vm.isLoading && !vm.isTranslating"></ace-wall-menu-navigation>
     
-    <ul ng-if="!vm.isLoading && !vm.isTranslating && !vm.wallData.isWallListLoading" 
+    <ul ng-if="!vm.isLoading && !vm.isTranslating && (!vm.wallData.isWallListLoading || !vm.isAuthenticatedForWalls)"
         class="nav nav-sidebar first-level">
         <li ng-if="!!group.menuItems.length" 
         ng-repeat="(groupName, group) in vm.menuNavigationFactory.leftMenuList" data-test-id="sidebar-group-{{groupName}}" id="{{groupName}}-sidebar-nav">

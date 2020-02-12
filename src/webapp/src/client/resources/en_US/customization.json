@@ -39,5 +39,7 @@
 	"editJobTitle": "Job title edit",
 	"jobTitlesDescription": "Manage job titles",
     "assignees": "Assignees",
-    "assigneesPlaceHolder": "Add assignees..."
+    "assigneesPlaceHolder": "Add assignees...",
+    "singleJoinGroupLabel": "Single join group",
+    "isShownWithMainEvents": "Shown with main events"
 }

@@ -1,4 +1,5 @@
-﻿namespace Shrooms.DataTransferObjects.EmailTemplateViewModels
+﻿using System.Collections.Generic;
+namespace Shrooms.DataTransferObjects.EmailTemplateViewModels
 {
     public class EventJoinRemindEmailTemplateViewModel : BaseEmailTemplateViewModel
     {
@@ -7,8 +8,6 @@
         {
         }
 
-        public string EventTypeName { get; set; }
-
-        public string EventPageUrl { get; set; }
+        public IDictionary<string, string> EventTypes { get; set; } = new Dictionary<string, string>();
     }
 }

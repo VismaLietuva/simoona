@@ -3,7 +3,9 @@ using System.Web.Http;
 using AutoMapper;
 using Shrooms.API.BackgroundWorkers;
 using Shrooms.API.Filters;
+using Shrooms.DataTransferObjects.Models.Wall;
 using Shrooms.DataTransferObjects.Models.Wall.Posts;
+using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.DomainExceptions.Exceptions;
@@ -20,24 +22,31 @@ namespace Shrooms.API.Controllers
         private readonly IMapper _mapper;
         private readonly IWallService _wallService;
         private readonly IPostService _postService;
+        private readonly IPermissionService _permissionService;
         private readonly IAsyncRunner _asyncRunner;
 
-        public PostController(IMapper mapper, IWallService wallService, IPostService postService, IAsyncRunner asyncRunner)
+        public PostController(IMapper mapper, IWallService wallService, IPostService postService, IPermissionService permissionService, IAsyncRunner asyncRunner)
         {
             _mapper = mapper;
             _wallService = wallService;
             _postService = postService;
+            _permissionService = permissionService;
             _asyncRunner = asyncRunner;
         }
 
         [HttpGet]
-        [PermissionAuthorize(Permission = BasicPermissions.Post)]
+        [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Post, BasicPermissions.EventWall)]
         public async Task<IHttpActionResult> GetPost(int postId)
         {
             try
             {
                 var userAndOrg = GetUserAndOrganization();
                 var wallPost = await _wallService.GetWallPost(userAndOrg, postId);
+
+                if (!_permissionService.UserHasPermission(userAndOrg, BasicPermissions.Post) && wallPost.WallType != WallType.Events)
+                {
+                    return Forbidden();
+                }
 
                 var mappedPost = _mapper.Map<WallPostViewModel>(wallPost);
                 return Ok(mappedPost);
@@ -50,12 +59,23 @@ namespace Shrooms.API.Controllers
 
         [HttpPost]
         [Route("Create")]
-        [PermissionAuthorize(Permission = BasicPermissions.Post)]
-        public IHttpActionResult CreatePost(CreateWallPostViewModel wallPostViewModel)
+        [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Post, BasicPermissions.EventWall)]
+        public async Task<IHttpActionResult> CreatePost(CreateWallPostViewModel wallPostViewModel)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            var userAndOrg = GetUserAndOrganization();
+
+            if (!_permissionService.UserHasPermission(userAndOrg, BasicPermissions.Post))
+            {
+                var wall = await _wallService.GetWall(wallPostViewModel.WallId, userAndOrg);
+                if (wall.Type != WallType.Events)
+                {
+                    return Forbidden();
+                }
             }
 
             var postModel = _mapper.Map<CreateWallPostViewModel, NewPostDTO>(wallPostViewModel);
@@ -79,7 +99,7 @@ namespace Shrooms.API.Controllers
 
         [HttpPut]
         [Route("Edit")]
-        [PermissionAuthorize(Permission = BasicPermissions.Post)]
+        [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Post, BasicPermissions.EventWall)]
         public IHttpActionResult EditPost(EditPostViewModel editedPost)
         {
             if (!ModelState.IsValid)
@@ -106,7 +126,7 @@ namespace Shrooms.API.Controllers
 
         [HttpDelete]
         [Route("Delete")]
-        [PermissionAuthorize(Permission = BasicPermissions.Post)]
+        [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Post, BasicPermissions.EventWall)]
         public IHttpActionResult DeletePost(int id)
         {
             if (id <= 0)
@@ -132,7 +152,7 @@ namespace Shrooms.API.Controllers
 
         [HttpPut]
         [Route("Hide")]
-        [PermissionAuthorize(Permission = BasicPermissions.Post)]
+        [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Post, BasicPermissions.EventWall)]
         public IHttpActionResult HidePost(HidePostViewModel post)
         {
             if (!ModelState.IsValid)
@@ -158,7 +178,7 @@ namespace Shrooms.API.Controllers
 
         [HttpPut]
         [Route("Like")]
-        [PermissionAuthorize(Permission = BasicPermissions.Post)]
+        [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Post, BasicPermissions.EventWall)]
         public IHttpActionResult ToggleLike(int id)
         {
             if (id <= 0)

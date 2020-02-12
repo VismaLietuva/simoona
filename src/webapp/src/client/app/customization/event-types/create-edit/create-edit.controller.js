@@ -18,6 +18,8 @@
         var vm = this;
         var listState = 'Root.WithOrg.Admin.Customization.EventTypes.List';
 
+        vm.singleJoinGroups = [];
+
         vm.eventType = {};
         vm.onEditOriginalName = '';
         vm.states = {
@@ -47,7 +49,13 @@
                     errorHandler.handleErrorMessage(error);
                     $state.go(listState);
                 });
+            } else {
+                vm.eventType.isShownWithMainEvents = true;
             }
+
+            eventTypesRepository.getSingleJoinGroups().then(function(response) {
+                vm.singleJoinGroups = response;
+            });
         }
 
         function createEventType() {
@@ -73,6 +81,5 @@
                 $state.go(listState);
             }, errorHandler.handleErrorMessage);
         }
-
     }
 })();

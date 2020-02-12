@@ -19,8 +19,6 @@
         });
 
     wallCommentController.$inject = [
-        'authService',
-        'notifySrv',
         'wallSettings',
         'errorHandler',
         'youtubeSettings',
@@ -28,8 +26,7 @@
         'wallService'
     ];
 
-    function wallCommentController(authService, notifySrv, wallSettings, errorHandler,
-        youtubeSettings, wallCommentRepository, wallService) {
+    function wallCommentController(wallSettings, errorHandler, youtubeSettings, wallCommentRepository, wallService) {
         /*jshint validthis: true */
         var vm = this;
 
