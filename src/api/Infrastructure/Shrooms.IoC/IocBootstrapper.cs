@@ -33,7 +33,7 @@ namespace Shrooms.IoC
 {
     public static class IocBootstrapper
     {
-        public static IContainer Bootstrap(IAppBuilder app, Func<string> GetConnectionStringName, HttpConfiguration config)
+        public static IContainer Bootstrap(IAppBuilder app, Func<string> getConnectionStringName, HttpConfiguration config)
         {
             var builder = new ContainerBuilder();
             var shroomsApi = Assembly.Load("Shrooms.API");
@@ -57,7 +57,7 @@ namespace Shrooms.IoC
 
             builder.Register(c => HttpContext.Current == null ?
                     new ShroomsDbContext(c.Resolve<ITenantNameContainer>().TenantName) :
-                    new ShroomsDbContext(GetConnectionStringName()))
+                    new ShroomsDbContext(getConnectionStringName()))
                 .As<IDbContext>().InstancePerRequest();
 
             builder.RegisterType(typeof(EfUnitOfWork)).As(typeof(IUnitOfWork)).InstancePerRequest();

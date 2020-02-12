@@ -348,6 +348,7 @@ namespace Shrooms.API.Controllers
         [HostAuthentication(DefaultAuthenticationTypes.ExternalCookie)]
         [AllowAnonymous]
         [Route("ExternalLogin", Name = "ExternalLogin")]
+        // ReSharper disable once InconsistentNaming
         public async Task<IHttpActionResult> GetExternalLogin(string provider, string client_Id = null, string userId = null, bool isRegistration = false, string error = null)
         {
             if (string.IsNullOrEmpty(client_Id) || error != null)
@@ -410,7 +411,7 @@ namespace Shrooms.API.Controllers
             return providerList.ToLower().Contains(providerName.ToLower());
         }
 
-        private async Task<AuthenticationProperties> CreateInitialRefreshToken(string client_Id, ApplicationUser user, ClaimsIdentity oAuthIdentity)
+        private async Task<AuthenticationProperties> CreateInitialRefreshToken(string clientId, ApplicationUser user, ClaimsIdentity oAuthIdentity)
         {
             var userOrganization = new UserAndOrganizationDTO
             {
@@ -419,7 +420,7 @@ namespace Shrooms.API.Controllers
             };
             _refreshTokenService.RemoveTokenBySubject(userOrganization);
 
-            AuthenticationProperties properties = ApplicationOAuthProvider.CreateProperties(user.Id, client_Id);
+            AuthenticationProperties properties = ApplicationOAuthProvider.CreateProperties(user.Id, clientId);
 
             var ticket = new AuthenticationTicket(oAuthIdentity, properties);
             var context = new AuthenticationTokenCreateContext(Request.GetOwinContext(), Startup.OAuthServerOptions.RefreshTokenFormat, ticket);
@@ -515,11 +516,11 @@ namespace Shrooms.API.Controllers
             return Ok();
         }
 
-        private async Task<IHttpActionResult> RegisterOrLogin(ApplicationUser user, ExternalLoginData externalLogin, string client_Id, bool hasLogin)
+        private async Task<IHttpActionResult> RegisterOrLogin(ApplicationUser user, ExternalLoginData externalLogin, string clientId, bool hasLogin)
         {
             if (hasLogin)
             {
-                await UpdateCookiesAndLogin(user, externalLogin, client_Id);
+                await UpdateCookiesAndLogin(user, externalLogin, clientId);
             }
             else if (_administrationService.UserEmailExists(externalLogin.Email))
             {
@@ -551,11 +552,11 @@ namespace Shrooms.API.Controllers
             return Ok();
         }
 
-        private async Task<IHttpActionResult> Login(ApplicationUser user, ExternalLoginData externalLogin, string client_Id, bool hasLogin)
+        private async Task<IHttpActionResult> Login(ApplicationUser user, ExternalLoginData externalLogin, string clientId, bool hasLogin)
         {
             if (hasLogin)
             {
-                await UpdateCookiesAndLogin(user, externalLogin, client_Id);
+                await UpdateCookiesAndLogin(user, externalLogin, clientId);
             }
             else
             {
@@ -587,12 +588,12 @@ namespace Shrooms.API.Controllers
             return $"{hostUri}#{tag}={encodedError}";
         }
 
-        private async Task UpdateCookiesAndLogin(ApplicationUser user, ExternalLoginData externalLogin, string client_Id)
+        private async Task UpdateCookiesAndLogin(ApplicationUser user, ExternalLoginData externalLogin, string clientId)
         {
             Authentication.SignOut(DefaultAuthenticationTypes.ExternalCookie);
             ClaimsIdentity oAuthIdentity = await _userManager.CreateIdentityAsync(user, OAuthDefaults.AuthenticationType);
             ClaimsIdentity cookieIdentity = await _userManager.CreateIdentityAsync(user, CookieAuthenticationDefaults.AuthenticationType);
-            AuthenticationProperties properties = await CreateInitialRefreshToken(client_Id, user, oAuthIdentity);
+            AuthenticationProperties properties = await CreateInitialRefreshToken(clientId, user, oAuthIdentity);
             if ((externalLogin.LoginProvider == "Google" && user.GoogleEmail == null) || (externalLogin.LoginProvider == "Facebook" && user.FacebookEmail == null))
             {
                 _administrationService.AddProviderEmail(user.Id, externalLogin.LoginProvider, externalLogin.Email);

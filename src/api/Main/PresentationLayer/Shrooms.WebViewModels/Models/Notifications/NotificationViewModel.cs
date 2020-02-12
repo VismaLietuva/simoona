@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Shrooms.WebViewModels.Models.Notifications
 {
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class NotificationViewModel
     {
 #pragma warning disable SA1300 // Element should begin with upper-case letter

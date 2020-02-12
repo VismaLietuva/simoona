@@ -18,9 +18,9 @@ namespace Shrooms.API.Controllers
         public async Task<HttpResponseMessage> Impersonate(string username)
         {
             var principal = User as ClaimsPrincipal;
-            var access_token = await _impersonateService.ImpersonateUserAsync(username, Startup.OAuthServerOptions, principal);
+            var accessToken = await _impersonateService.ImpersonateUserAsync(username, Startup.OAuthServerOptions, principal);
 
-            return Request.CreateResponse(HttpStatusCode.OK, new { access_token });
+            return Request.CreateResponse(HttpStatusCode.OK, new { access_token = accessToken });
         }
 
         [HttpGet]
@@ -29,9 +29,9 @@ namespace Shrooms.API.Controllers
         [AllowAnonymous]
         public async Task<HttpResponseMessage> RevertImpersonate()
         {
-            var access_token = await _impersonateService.RevertImpersonationAsync(User.GetOriginalUsername(), Startup.OAuthServerOptions);
+            var accessToken = await _impersonateService.RevertImpersonationAsync(User.GetOriginalUsername(), Startup.OAuthServerOptions);
 
-            return Request.CreateResponse(HttpStatusCode.OK, new { access_token });
+            return Request.CreateResponse(HttpStatusCode.OK, new { access_token = accessToken });
         }
 
         [HttpGet]
@@ -41,8 +41,7 @@ namespace Shrooms.API.Controllers
         public HttpResponseMessage ImpersonateEnabled()
         {
             var key = System.Configuration.ConfigurationManager.AppSettings[WebApiConstants.ClaimUserImpersonation];
-
-            var enabled = key != null ? bool.Parse(key) : false;
+            var enabled = key != null && bool.Parse(key);
 
             return Request.CreateResponse(HttpStatusCode.OK, new { enabled });
         }

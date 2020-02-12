@@ -16,7 +16,6 @@ using Shrooms.DataTransferObjects.Models.Wall.Posts;
 using Shrooms.Domain.Services.Notifications;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
-using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.UnitTests.ModelMappings;
 using Shrooms.WebViewModels.Models.User;
 using Shrooms.WebViewModels.Models.Wall;

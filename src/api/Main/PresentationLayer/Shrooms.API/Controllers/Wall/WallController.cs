@@ -13,7 +13,6 @@ using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.Host.Contracts.Constants;
-using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.WebViewModels.Models.Notifications;
 using Shrooms.WebViewModels.Models.User;
 using Shrooms.WebViewModels.Models.Wall;
