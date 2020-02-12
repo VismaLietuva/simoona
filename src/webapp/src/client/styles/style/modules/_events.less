@@ -929,5 +929,30 @@
 }
 
 .popover-date-filter {
-    min-width: 150px;
+    min-width: 250px;
+}
+
+.btn-date-filter {
+    background: linear-gradient(to bottom, #ffffff 10%, #f0f0f0 75%);
+        border-color: #d7d7d7 #cacaca #afafaf;
+        box-shadow: -1px -1px 0 #f8f8f8 inset, 1px -1px 0 #f8f8f8 inset, 0 1px 0 rgba(0, 0, 0, 0.05);
+        border-width: 1px;
+        border-style: solid;
+        border-radius: 3px;
+        height: 26px;
+        line-height: 145%;
+        padding: 2px 20px;
+        margin-right: 10px;
+        min-width: 120px;
+        color: #282828;
+        text-decoration: none;
+        text-align: center;
+        cursor: pointer;
+        &.selected,
+        &.selected:focus {
+            color: #fff;
+            background: #4d8400;
+            border-color: #3f6b01 #4c7e06 #497d00 !important;
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+        }
 }

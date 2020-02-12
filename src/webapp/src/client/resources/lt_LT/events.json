@@ -188,5 +188,10 @@
   "ignoreSingleJoinTooltipParagraphOne": "Šis funkcionalumas skirtas renginių tipams, kuriuose leidžiama dalyvauti kartą per savaitę.",
   "ignoreSingleJoinTooltipParagraphTwo": "Tai suteiks vartotojams galimybę prisijungti kaip stebėtojams be jokių šio renginio privalumų, pavyzdžiui, maisto.",
   "twoOptionsRequired": "Bent du pasirinkimo variantai yra būtini",
-  "changedEventOptions": "Sėkmingai pakeitėte renginio pasirinkimo variantus"
+  "changedEventOptions": "Sėkmingai pakeitėte renginio pasirinkimo variantus",
+  "pastWeek": "Praeita savaitė",
+  "pastMonth": "Praeitas mėnuo",
+  "pastYear": "Praeiti metai",
+  "customRange": "Pasirinkimas",
+  "selectDate": "Pasirinkti datą"
 }

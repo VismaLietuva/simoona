@@ -42,7 +42,8 @@
             } else if ($stateParams.type === 'host' || $stateParams.type === 'participant') {
                 getMyEvents($stateParams.type, $stateParams.office);
             } else {
-                eventRepository.getEventsByTypeAndOffice($stateParams.type, $stateParams.office, $stateParams.startDate, $stateParams.endDate).then(function (result) {
+                eventRepository.getEventsByTypeAndOffice($stateParams.type, $stateParams.office, $stateParams.startDate, $stateParams.endDate)
+                .then(function (result) {
                     vm.eventsList = result;
                     setEventOffices();
                     setResponseUtilities(result);
