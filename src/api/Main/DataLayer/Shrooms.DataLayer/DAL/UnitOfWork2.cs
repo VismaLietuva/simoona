@@ -1,5 +1,4 @@
-﻿using System;
-using System.Data.Entity;
+﻿using System.Data.Entity;
 using System.Threading.Tasks;
 using Shrooms.Host.Contracts.DAL;
 
@@ -22,7 +21,6 @@ namespace Shrooms.DataLayer.DAL
             return _context.Set<T>();
         }
 
-        [Obsolete("Use SaveChanges(string userId) or SaveChangesAsync(string userId) instead")]
         public void SaveChanges(bool useMetaTracking)
         {
             _context.SaveChanges(useMetaTracking);

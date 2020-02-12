@@ -71,10 +71,6 @@
       <HintPath>..\..\packages\Google.Apis.Books.v1.1.10.0.800\lib\portable-net40+sl50+win+wpa81+wp80\Google.Apis.Books.v1.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Google.Apis.Calendar.v3, Version=1.41.1.1727, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab">
-      <HintPath>..\..\packages\Google.Apis.Calendar.v3.1.41.1.1727\lib\net45\Google.Apis.Calendar.v3.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Google.Apis.Core, Version=1.41.1.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab">
       <HintPath>..\..\packages\Google.Apis.Core.1.41.1\lib\net45\Google.Apis.Core.dll</HintPath>
       <Private>True</Private>

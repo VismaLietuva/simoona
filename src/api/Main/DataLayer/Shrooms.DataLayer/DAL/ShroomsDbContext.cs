@@ -169,7 +169,6 @@ namespace Shrooms.DataLayer.DAL
             return await base.SaveChangesAsync();
         }
 
-        [Obsolete("Use SaveChanges(string userId) or SaveChangesAsync(string userId) instead")]
         public int SaveChanges(bool useMetaTracking = true)
         {
             if (useMetaTracking)

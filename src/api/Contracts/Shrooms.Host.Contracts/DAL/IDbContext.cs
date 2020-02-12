@@ -1,5 +1,4 @@
-﻿using System;
-using System.Data.Entity;
+﻿using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Threading.Tasks;
 
@@ -14,7 +13,6 @@ namespace Shrooms.Host.Contracts.DAL
         DbEntityEntry<T> Entry<T>(T entity)
             where T : class;
 
-        [Obsolete("Use SaveChanges(string userId) or SaveChangesAsync(string userId) instead")]
         int SaveChanges(bool useMetaTracking = true);
 
         int SaveChanges(string userId);

@@ -6,6 +6,7 @@ namespace Shrooms.Host.Contracts.DAL
     public interface IUnitOfWork2
     {
         string ConnectionName { get; }
+
         IDbSet<T> GetDbSet<T>()
             where T : class;
 

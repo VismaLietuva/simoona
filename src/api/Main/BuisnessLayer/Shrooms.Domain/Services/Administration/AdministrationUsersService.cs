@@ -71,7 +71,6 @@ namespace Shrooms.Domain.Services.Administration
             _organizationDbSet = uow.GetDbSet<Organization>();
             _wallsDbSet = uow.GetDbSet<EntityModels.Models.Multiwall.Wall>();
             _wallUsersDbSet = uow.GetDbSet<WallMember>();
-            _organizationDbSet = uow.GetDbSet<Organization>();
             _userManager = userManager;
             _userAdministrationValidator = userAdministrationValidator;
             _organizationService = organizationService;
