@@ -63,8 +63,14 @@
             return $resource(eventUrl + 'Recurrences').query().$promise;
         }
 
-        function getEventsByTypeAndOffice(typeId, officeId) {
-            return $resource(eventUrl + 'ByTypeAndOffice').query({ typeId: typeId, officeId: officeId }).$promise;
+        function getEventsByTypeAndOffice(typeId, officeId, startDate = null, endDate = null) {
+            return $resource(eventUrl + 'ByTypeAndOffice')
+            .query({
+                 typeId: typeId,
+                 officeId: officeId,
+                 startDate: startDate,
+                 endDate: endDate
+            }).$promise;
         }
 
         function getMyEvents(filter, officeId) {

@@ -47,7 +47,9 @@
                 controllerAs: 'vm',
                 params: {
                     type: 'main',
-                    office: 'all'
+                    office: 'all',
+                    startDate: {squash: true, value: null},
+                    endDate: {squash: true, value: null}
                 }
             })
             .state('Root.WithOrg.Client.Events.EventContent', {

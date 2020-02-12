@@ -10,23 +10,40 @@
         });
 
     eventsListDateFilterController.$inject = [
-        '$timeout'
+        '$timeout',
+        '$state',
+        '$stateParams'
     ];
 
-    function eventsListDateFilterController($timeout) {
+    function eventsListDateFilterController($timeout, $state, $stateParams) {
         var vm = this;
 
         vm.popoverTemplateUrl = 'app/events/list/date-filter/date-filter-popover.html';
         vm.openDatePicker = openDatePicker;
-        vm.isDatePickerOpen = {
-            startDate: false,
-            endDate: false
+        vm.getFilteredEvents = getFilteredEvents;
+
+        init();
+
+        ///////////
+
+        function init() {
+            vm.dateFilterStart = new Date(moment.utc().subtract(7, 'd').format('LL'));
+            vm.dateFilterEnd = new Date(moment.utc().format('LL'));
+
+            vm.isDatePickerOpen = {
+                startDate: false,
+                endDate: false
+            }
         }
 
-        vm.startDate = new Date();
-        vm.endDate = new Date();
-        vm.endDate.setDate(vm.startDate.getDate() + 7);
-        ///
+        function getFilteredEvents() {
+            $state.go('Root.WithOrg.Client.Events.List.Type', {
+                type: $stateParams.type,
+                office: $stateParams.office,
+                startDate: vm.dateFilterStart,
+                endDate: vm.dateFilterEnd
+            });
+        }
 
         function openDatePicker($event, datepicker) {
             $event.preventDefault();
