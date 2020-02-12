@@ -311,7 +311,12 @@ namespace Shrooms.Premium.UnitTests.DomainService
                     MaxParticipants = 15,
                     OrganizationId = 2,
                     EventParticipants = new List<EventParticipant> { participant1, participant2 },
-                    EventOptions = new List<EventOption>()
+                    EventOptions = new List<EventOption>(),
+                    EventType = new EventType
+                    {
+                        Id = 1,
+                        IsShownWithMainEvents = true
+                    }
                 },
                 new Event
                 {
@@ -327,7 +332,12 @@ namespace Shrooms.Premium.UnitTests.DomainService
                     MaxParticipants = 15,
                     OrganizationId = 3,
                     EventParticipants = new List<EventParticipant> { participant3 },
-                    EventOptions = new List<EventOption>()
+                    EventOptions = new List<EventOption>(),
+                    EventType = new EventType
+                    {
+                        Id = 2,
+                        IsShownWithMainEvents = true
+                    }
                 },
                 new Event
                 {
@@ -343,7 +353,12 @@ namespace Shrooms.Premium.UnitTests.DomainService
                     MaxParticipants = 10,
                     OrganizationId = 2,
                     EventParticipants = new List<EventParticipant> { participant2 },
-                    EventOptions = new List<EventOption>()
+                    EventOptions = new List<EventOption>(),
+                    EventType = new EventType
+                    {
+                        Id = 3,
+                        IsShownWithMainEvents = true
+                    }
                 },
                 new Event
                 {
@@ -359,7 +374,12 @@ namespace Shrooms.Premium.UnitTests.DomainService
                     MaxParticipants = 10,
                     OrganizationId = 2,
                     EventParticipants = new List<EventParticipant> { participant2 },
-                    EventOptions = new List<EventOption>()
+                    EventOptions = new List<EventOption>(),
+                    EventType = new EventType
+                    {
+                        Id = 3,
+                        IsShownWithMainEvents = true
+                    }
                 }
             };
             _eventsDbSet.SetDbSetData(events.AsQueryable());

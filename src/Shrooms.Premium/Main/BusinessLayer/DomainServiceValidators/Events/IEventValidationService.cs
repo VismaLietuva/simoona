@@ -23,7 +23,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.DomainServiceValidators.Events
         void CheckIfEventIsFull(int maxParticipants, int participantsCount);
         void CheckIfAttendStatusIsValid(int status);
         void CheckIfRegistrationDeadlineIsExpired(DateTime registrationDeadline);
-        void CheckIfUserExistsInOtherSingleJoinEvent(IEnumerable<Event> userParticipationEvent);
+        void CheckIfUserExistsInOtherSingleJoinEvent(bool anyEvents);
         void CheckIfEventHasEnoughPlaces(int maxParticipants, int participantCount);
         void CheckIfJoiningTooManyChoicesProvided(int maxChoices, int choicesTaken);
         void CheckIfCreatingEventHasNoChoices(int maxChoices, int eventOptionsCount);

@@ -12,5 +12,9 @@ namespace Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Events
         [Required]
         [StringLength(WebApiConstants.EventTypeNameMaxLength)]
         public string Name { get; set; }
+
+        public string SingleJoinGroupName { get; set; }
+
+        public bool IsShownWithMainEvents { get; set; }
     }
 }

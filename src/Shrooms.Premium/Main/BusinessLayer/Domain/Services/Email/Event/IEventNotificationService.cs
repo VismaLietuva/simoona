@@ -8,6 +8,6 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.Event
     {
         void NotifyRemovedEventParticipants(string eventName, Guid eventId, int orgId, IEnumerable<string> users);
 
-        void RemindUsersToJoinEvent(EventTypeDTO eventType, IEnumerable<string> users, int orgId);
+        void RemindUsersToJoinEvent(IEnumerable<EventTypeDTO> eventType, IEnumerable<string> users, int orgId);
     }
 }

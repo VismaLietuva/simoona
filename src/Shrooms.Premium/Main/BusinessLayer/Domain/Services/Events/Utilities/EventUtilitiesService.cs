@@ -62,7 +62,8 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Utilities
                 {
                     Id = type.Id,
                     IsSingleJoin = type.IsSingleJoin,
-                    Name = type.Name
+                    Name = type.Name,
+                    IsShownWithMainEvents = type.IsShownWithMainEvents
                 })
                 .OrderByDescending(t => t.Name)
                 .ToList();
@@ -80,6 +81,8 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Utilities
                     IsSingleJoin = x.IsSingleJoin,
                     SendWeeklyReminders = x.SendWeeklyReminders,
                     Name = x.Name,
+                    SingleJoinGroupName = x.SingleJoinGroupName,
+                    IsShownWithMainEvents = x.IsShownWithMainEvents,
                     HasActiveEvents = x.Events.Any(e => e.EndDate > DateTime.UtcNow
                                                      || e.EventRecurring != EventRecurrenceOptions.None)
                 })
@@ -123,11 +126,18 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Utilities
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Event type does not exist");
             }
 
+            if (eventType.Name != orgEventType.Name)
+            {
+                ValidateEventTypeName(eventType.Name, eventType.OrganizationId);
+            }
+
             orgEventType.IsSingleJoin = eventType.IsSingleJoin;
             orgEventType.Name = eventType.Name;
+            orgEventType.SingleJoinGroupName = SetSingleJoinGroupName(eventType.IsSingleJoin, eventType.SingleJoinGroupName);
             orgEventType.ModifiedBy = eventType.UserId;
             orgEventType.Modified = DateTime.UtcNow;
             orgEventType.SendWeeklyReminders = eventType.SendWeeklyReminders;
+            orgEventType.IsShownWithMainEvents = eventType.IsShownWithMainEvents;
 
             _uow.SaveChanges(eventType.UserId);
         }
@@ -184,12 +194,21 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Utilities
             return eventOptions;
         }
 
-        public bool AnyEventsThisWeekByType(int eventTypeId)
+        public bool AnyEventsThisWeekByType(IEnumerable<int> eventTypeIds)
         {
             return _eventsDbSet
                 .Any(x => SqlFunctions.DatePart("wk", x.StartDate) == SqlFunctions.DatePart("wk", DateTime.UtcNow) &&
-                          x.EventType.Id == eventTypeId &&
+                          eventTypeIds.Contains(x.EventType.Id) &&
                           x.RegistrationDeadline > DateTime.UtcNow);
+        }
+
+        public IEnumerable<string> GetEventTypesSingleJoinGroups(int organizationId)
+        {
+            return _eventTypesDbSet
+                .Where(x => x.OrganizationId == organizationId &&
+                            !string.IsNullOrEmpty(x.SingleJoinGroupName))
+                .Select(x => x.SingleJoinGroupName)
+                .Distinct();
         }
 
         private void ValidateEventTypeName(string eventTypeName, int organizationId)
@@ -204,9 +223,9 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Utilities
             }
         }
 
-        private EventType MapNewEventType(CreateEventTypeDTO eventTypeDto)
+        private static EventType MapNewEventType(CreateEventTypeDTO eventTypeDto)
         {
-            var eventType = new EventType()
+            var eventType = new EventType
             {
                 Created = DateTime.UtcNow,
                 Modified = DateTime.UtcNow,
@@ -214,10 +233,17 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Utilities
                 OrganizationId = eventTypeDto.OrganizationId,
                 IsSingleJoin = eventTypeDto.IsSingleJoin,
                 SendWeeklyReminders = eventTypeDto.SendWeeklyReminders,
-                Name = eventTypeDto.Name
+                Name = eventTypeDto.Name,
+                SingleJoinGroupName = SetSingleJoinGroupName(eventTypeDto.IsSingleJoin, eventTypeDto.SingleJoinGroupName),
+                IsShownWithMainEvents = eventTypeDto.IsShownWithMainEvents
             };
 
             return eventType;
+        }
+
+        private static string SetSingleJoinGroupName(bool isSingleJoin, string groupName)
+        {
+            return isSingleJoin && !string.IsNullOrEmpty(groupName) ? groupName : null;
         }
     }
 }

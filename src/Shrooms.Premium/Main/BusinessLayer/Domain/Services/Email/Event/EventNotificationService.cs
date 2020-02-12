@@ -55,21 +55,20 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.Event
             _mailingService.SendEmail(new EmailDto(emails, Resources.Models.Events.Events.ResetParticipantListEmailSubject, emailBody));
         }
 
-        public void RemindUsersToJoinEvent(EventTypeDTO eventType, IEnumerable<string> emails, int orgId)
+        public void RemindUsersToJoinEvent(IEnumerable<EventTypeDTO> eventTypes, IEnumerable<string> emails, int orgId)
         {
             var organization = _organizationService.GetOrganizationById(orgId);
 
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
-            var eventUrl = _appSettings.EventListByTypeUrl(organization.ShortName, eventType.Id.ToString());
+            var emailTemplateViewModel = new EventJoinRemindEmailTemplateViewModel(userNotificationSettingsUrl);
 
-            var emailTemplateViewModel = new EventJoinRemindEmailTemplateViewModel(userNotificationSettingsUrl)
+            foreach (var eventType in eventTypes)
             {
-                EventPageUrl = eventUrl,
-                EventTypeName = eventType.Name
-            };
-            var emailBody = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.EventJoinRemind);
+                emailTemplateViewModel.EventTypes.Add(eventType.Name, _appSettings.EventListByTypeUrl(organization.ShortName, eventType.Id.ToString()));
+            }
 
-            _mailingService.SendEmail(new EmailDto(emails, $"Join {eventType.Name} event now", emailBody));
+            var emailBody = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.EventJoinRemind);
+            _mailingService.SendEmail(new EmailDto(emails, $"Join weekly event now", emailBody));
         }
     }
 }

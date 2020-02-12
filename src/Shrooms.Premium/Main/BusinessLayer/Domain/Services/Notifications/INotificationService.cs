@@ -9,6 +9,6 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Notifications
     public interface INotificationService
     {
         Task<NotificationDto> CreateForEvent(UserAndOrganizationDTO userOrg, CreateEventDto eventDto);
-        void CreateForEventJoinReminder(EventTypeDTO eventType, IEnumerable<string> usersToNotify, int orgId);
+        void CreateForEventJoinReminder(IEnumerable<string> usersToNotify, int orgId);
     }
 }

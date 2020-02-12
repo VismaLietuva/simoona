@@ -119,6 +119,7 @@ namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers
                     .GetCategories()
                     .Where(x => x.Assignees.Select(y => y.Id).Contains(id))
                     .Select(x => x.Name);
+
             Expression<Func<ServiceRequest, bool>> filterForCurrentUser = u =>
                 (u.EmployeeId == id &&
                 u.Title.Contains(search) &&
@@ -126,13 +127,13 @@ namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers
                 u.Status.Title.Contains(status) &&
                 (string.IsNullOrEmpty(serviceRequestCategory) || u.CategoryName == serviceRequestCategory))
                 ||
-                ((u.Title.Contains(search) ||
-                u.Employee.FirstName.Contains(search) ||
-                u.Employee.LastName.Contains(search)) &&
-                u.Priority.Title.Contains(priority) &&
-                u.Status.Title.Contains(status) &&
-                (string.IsNullOrEmpty(serviceRequestCategory) || u.CategoryName == serviceRequestCategory) &&
-                assigneeCategoriesNames.Contains(u.CategoryName));
+                    ((u.Title.Contains(search) ||
+                    u.Employee.FirstName.Contains(search) ||
+                    u.Employee.LastName.Contains(search)) &&
+                    u.Priority.Title.Contains(priority) &&
+                    u.Status.Title.Contains(status) &&
+                    (string.IsNullOrEmpty(serviceRequestCategory) || u.CategoryName == serviceRequestCategory) &&
+                    assigneeCategoriesNames.Contains(u.CategoryName));
 
             var serviceRequestPage = GetFilteredPaged(includeProperties, page, pageSize, sortBy, sortOrder, filterForCurrentUser);
             foreach (var serviceRequest in serviceRequestPage.PagedList)

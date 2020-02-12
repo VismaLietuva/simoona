@@ -45,9 +45,9 @@ namespace Shrooms.Premium.Main.BusinessLayer.DomainServiceValidators.Events
             }
         }
 
-        public void CheckIfUserExistsInOtherSingleJoinEvent(IEnumerable<Event> userParticipationEvent)
+        public void CheckIfUserExistsInOtherSingleJoinEvent(bool anyEvents)
         {
-            if (userParticipationEvent.Any())
+            if (anyEvents)
             {
                 throw new EventException(PremiumErrorCodes.EventCannotJoinMultipleSingleJoinEventsCode);
             }
@@ -143,23 +143,17 @@ namespace Shrooms.Premium.Main.BusinessLayer.DomainServiceValidators.Events
 
         public void CheckIfCreatingEventHasInsufficientOptions(int maxChoices, int optionsCount)
         {
-            if (optionsCount != 0)
+            if (optionsCount != 0 && (maxChoices > optionsCount || optionsCount < BusinessLayerConstants.EventOptionsMinimumCount))
             {
-                if (maxChoices > optionsCount || optionsCount < BusinessLayerConstants.EventOptionsMinimumCount)
-                {
-                    throw new EventException(PremiumErrorCodes.EventInsufficientOptionsCode);
-                }
+                throw new EventException(PremiumErrorCodes.EventInsufficientOptionsCode);
             }
         }
 
         public void CheckIfCreatingEventHasNoChoices(int maxChoices, int eventOptionsCount)
         {
-            if (eventOptionsCount != 0)
+            if (eventOptionsCount != 0 && maxChoices < 1)
             {
-                if (maxChoices < 1)
-                {
-                    throw new EventException(PremiumErrorCodes.EventNeedToHaveMaxChoiceCode);
-                }
+                throw new EventException(PremiumErrorCodes.EventNeedToHaveMaxChoiceCode);
             }
         }
 
@@ -181,23 +175,17 @@ namespace Shrooms.Premium.Main.BusinessLayer.DomainServiceValidators.Events
 
         public void CheckIfUserHasPermission(string userId, string responsibleUserId, bool hasPermission)
         {
-            if (userId != responsibleUserId)
+            if (userId != responsibleUserId && !hasPermission)
             {
-                if (!hasPermission)
-                {
-                    throw new EventException(PremiumErrorCodes.EventDontHavePermissionCode);
-                }
+                throw new EventException(PremiumErrorCodes.EventDontHavePermissionCode);
             }
         }
 
         public void CheckIfUserHasPermissionToPin(bool newPinStatus, bool currentPinStatus, bool hasPermission)
         {
-            if (newPinStatus != currentPinStatus)
+            if (newPinStatus != currentPinStatus && !hasPermission)
             {
-                if (!hasPermission)
-                {
-                    throw new EventException(PremiumErrorCodes.EventDontHavePermissionCode);
-                }
+                throw new EventException(PremiumErrorCodes.EventDontHavePermissionCode);
             }
         }
 
@@ -215,12 +203,10 @@ namespace Shrooms.Premium.Main.BusinessLayer.DomainServiceValidators.Events
             {
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Event does not exist");
             }
-            else
+
+            if (participant.Event == null)
             {
-                if (participant.Event == null)
-                {
-                    throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Event does not exist");
-                }
+                throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Event does not exist");
             }
         }
 
@@ -242,16 +228,18 @@ namespace Shrooms.Premium.Main.BusinessLayer.DomainServiceValidators.Events
 
         public void CheckIfOptionsAreDifferent(IEnumerable<NewEventOptionDTO> options)
         {
-            if (options != null)
+            if (options == null)
             {
-                var duplicateKeys = options.GroupBy(x => x.Option)
-                        .Where(group => group.Count() > 1)
-                        .Select(group => group.Key);
+                return;
+            }
 
-                if (duplicateKeys.Any())
-                {
-                    throw new EventException(PremiumErrorCodes.EventOptionsCantDuplicate);
-                }
+            var duplicateKeys = options.GroupBy(x => x.Option)
+                .Where(group => @group.Count() > 1)
+                .Select(group => @group.Key);
+
+            if (duplicateKeys.Any())
+            {
+                throw new EventException(PremiumErrorCodes.EventOptionsCantDuplicate);
             }
         }
 

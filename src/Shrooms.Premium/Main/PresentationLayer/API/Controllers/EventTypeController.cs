@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Web.Http;
 using AutoMapper;
 using Shrooms.API.Controllers;
@@ -130,6 +131,23 @@ namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers
             catch (ValidationException e)
             {
                 return BadRequestWithError(e);
+            }
+        }
+
+        [HttpGet]
+        [Route("Groups")]
+        [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
+        public IHttpActionResult GetSingleJoinGroupNames()
+        {
+            try
+            {
+                var groups = _eventUtilitiesService.GetEventTypesSingleJoinGroups(GetOrganizationId());
+
+                return Ok(groups);
+            }
+            catch (ArgumentNullException e)
+            {
+                return BadRequest(e.Message);
             }
         }
     }

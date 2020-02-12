@@ -33,28 +33,31 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.WebHookCallbacks.Ev
         {
             var userOrg = _organizationService.GetOrganizationByName(orgName);
 
-            var typesToNotifyAbout = _eventUtilitiesService.GetEventTypesToRemind(userOrg.Id);
+            var typesToNotifyAbout = _eventUtilitiesService.GetEventTypesToRemind(userOrg.Id).ToList();
+            var typeIdsToNotifyAbout = typesToNotifyAbout.Select(e => e.Id).ToList();
 
-            foreach (var eventType in typesToNotifyAbout)
+            if (!typesToNotifyAbout.Any())
             {
-                var anythingToJoin = _eventUtilitiesService.AnyEventsThisWeekByType(eventType.Id);
-                if (!anythingToJoin)
-                {
-                    continue;
-                }
+                return;
+            }
 
-                var usersToNotifyInApp = _userEventsService.GetUsersWithAppReminders(eventType.Id).ToList();
-                var usersToNotifyEmail = _userEventsService.GetUsersWithEmailReminders(eventType.Id).ToList();
+            var anythingToJoin = _eventUtilitiesService.AnyEventsThisWeekByType(typeIdsToNotifyAbout);
+            if (!anythingToJoin)
+            {
+                return;
+            }
 
-                if (usersToNotifyInApp.Any())
-                {
-                    _notificationService.CreateForEventJoinReminder(eventType, usersToNotifyInApp, userOrg.Id);
-                }
+            var usersToNotifyInApp = _userEventsService.GetUsersWithAppReminders(typeIdsToNotifyAbout).ToList();
+            var usersToNotifyEmail = _userEventsService.GetUsersWithEmailReminders(typeIdsToNotifyAbout).ToList();
 
-                if (usersToNotifyEmail.Any())
-                {
-                    _eventNotificationService.RemindUsersToJoinEvent(eventType, usersToNotifyEmail, userOrg.Id);
-                }
+            if (usersToNotifyInApp.Any())
+            {
+                _notificationService.CreateForEventJoinReminder(usersToNotifyInApp, userOrg.Id);
+            }
+
+            if (usersToNotifyEmail.Any())
+            {
+                _eventNotificationService.RemindUsersToJoinEvent(typesToNotifyAbout, usersToNotifyEmail, userOrg.Id);
             }
         }
     }

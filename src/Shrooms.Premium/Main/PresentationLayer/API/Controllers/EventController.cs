@@ -101,10 +101,11 @@ namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
         public IHttpActionResult GetEventsByTypeAndOffice(string typeId, string officeId)
         {
+            var includeOnlyMain = typeId == "main";
             int? typeIdNullable = null;
             int? officeIdNullable = null;
 
-            if (typeId != "all" && int.TryParse(typeId, out var typeIdParsed))
+            if (typeId != "all" && typeId != "main" && int.TryParse(typeId, out var typeIdParsed))
             {
                 typeIdNullable = typeIdParsed;
             }
@@ -115,7 +116,7 @@ namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers
             }
 
             var userOrganization = GetUserAndOrganization();
-            var eventsListDto = _eventListingService.GetEventsByTypeAndOffice(userOrganization, typeIdNullable, officeIdNullable);
+            var eventsListDto = _eventListingService.GetEventsByTypeAndOffice(userOrganization, typeIdNullable, officeIdNullable, includeOnlyMain);
 
             var result = _mapper.Map<IEnumerable<EventListItemDTO>, IEnumerable<EventListItemViewModel>>(eventsListDto);
             return Ok(result);
@@ -265,9 +266,10 @@ namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers
         {
             var eventJoinDTO = _mapper.Map<EventJoinMultipleViewModel, EventJoinDTO>(eventJoinModel);
             SetOrganizationAndUser(eventJoinDTO);
+
             try
             {
-                _eventParticipationService.Join(eventJoinDTO);
+                _eventParticipationService.AddColleague(eventJoinDTO);
                 return Ok();
             }
             catch (EventException e)
