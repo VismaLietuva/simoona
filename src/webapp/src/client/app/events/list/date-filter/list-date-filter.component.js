@@ -28,6 +28,7 @@
 
         vm.popoverTemplateUrl = 'app/events/list/date-filter/date-filter-popover.html';
         vm.buttonTitle = $translate.instant('events.selectDate');
+        vm.isPopoverOpen = false;
 
         vm.getFilteredEvents = getFilteredEvents;
         vm.clearFilter = clearFilter;
@@ -50,7 +51,7 @@
         }
 
         function getFilteredEvents() {
-            var options = getSelectedDates();
+            var options = getSelectedOptions();
 
             $state.go('Root.WithOrg.Client.Events.List.Type', {
                 type: $stateParams.type,
@@ -60,6 +61,7 @@
             });
 
             vm.buttonTitle = options.title;
+            vm.isPopoverOpen = false;
         }
 
         function clearFilter() {
@@ -72,9 +74,10 @@
 
             vm.buttonTitle = $translate.instant('events.selectDate');
             vm.selectedRange = vm.dateRanges.none;
+            vm.isPopoverOpen = false;
         }
 
-        function getSelectedDates() {
+        function getSelectedOptions() {
             var options = {
                 startDate: new Date(),
                 endDate: new Date(),

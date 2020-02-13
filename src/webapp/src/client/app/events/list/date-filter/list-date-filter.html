@@ -1,4 +1,4 @@
 <button class="btn-date-filter" ng-class="{selected: vm.isDateFilterSelected()}" type="button"
-    popover-placement="bottom-left" popover-class="popover-date-filter"
-    uib-popover-template="vm.popoverTemplateUrl">{{vm.buttonTitle}}
+    popover-placement="bottom-left" popover-class="popover-date-filter" uib-popover-template="vm.popoverTemplateUrl"
+    popover-is-open="vm.isPopoverOpen" ng-change="vm.isPopoverOpen = !vm.isPopoverOpen">{{vm.buttonTitle}}
 </button> <!-- add [ popover-trigger="'outsideClick'" ] property to dismiss popover when clicked outside it -->
