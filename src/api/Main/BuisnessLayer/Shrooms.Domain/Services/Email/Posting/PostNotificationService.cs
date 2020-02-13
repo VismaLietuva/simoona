@@ -1,8 +1,6 @@
 ﻿using System.Data.Entity;
 using System.Linq;
 using Shrooms.DataTransferObjects.EmailTemplateViewModels;
-using Shrooms.DataTransferObjects.Models.Emails;
-using Shrooms.DataTransferObjects.Models.Wall;
 using Shrooms.DataTransferObjects.Models.Wall.Posts;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Organizations;
@@ -11,6 +9,8 @@ using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.DataTransferObjects;
+using Shrooms.Host.Contracts.Enums;
 using Shrooms.Host.Contracts.Infrastructure;
 using Shrooms.Host.Contracts.Infrastructure.Email;
 using Shrooms.Resources.Emails;
@@ -110,11 +110,11 @@ namespace Shrooms.Domain.Services.Email.Posting
             switch (wall.Type)
             {
                 case WallType.Events:
-                    return Constants.BusinessLayer.Templates.EventActionButtonTitle;
+                    return EmailTemplates.EventActionButtonTitle;
                 case WallType.Project:
-                    return Constants.BusinessLayer.Templates.ProjectActionButtonTitle;
+                    return EmailTemplates.ProjectActionButtonTitle;
                 default:
-                    return Constants.BusinessLayer.Templates.DefautlActionButtonTitle;
+                    return EmailTemplates.DefaultActionButtonTitle;
             }
         }
 
@@ -123,11 +123,11 @@ namespace Shrooms.Domain.Services.Email.Posting
             switch (wall.Type)
             {
                 case WallType.Events:
-                    return string.Format(Constants.BusinessLayer.Templates.EventPostTitle, wall.Name);
+                    return string.Format(EmailTemplates.EventPostTitle, wall.Name);
                 case WallType.Project:
-                    return string.Format(Constants.BusinessLayer.Templates.ProjectPostTitle, wall.Name);
+                    return string.Format(EmailTemplates.ProjectPostTitle, wall.Name);
                 default:
-                    return string.Format(Constants.BusinessLayer.Templates.DefaultPostTitle, wall.Name);
+                    return string.Format(EmailTemplates.DefaultPostTitle, wall.Name);
             }
         }
 

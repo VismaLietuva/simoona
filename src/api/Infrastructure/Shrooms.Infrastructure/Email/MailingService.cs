@@ -7,7 +7,7 @@ using System.Web.Configuration;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.AspNet.Identity;
-using Shrooms.DataTransferObjects.Models.Emails;
+using Shrooms.Host.Contracts.DataTransferObjects;
 using Shrooms.Host.Contracts.Infrastructure.Email;
 
 namespace Shrooms.Infrastructure.Email

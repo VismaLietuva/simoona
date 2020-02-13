@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Data.Entity;
 using System.Linq;
-using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Exceptions;
 
 namespace Shrooms.DomainServiceValidators.Validators.Wall
 {

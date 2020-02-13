@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Shrooms.DataTransferObjects.Models.Wall;
+using Shrooms.Host.Contracts.Enums;
 
 namespace Shrooms.EntityModels.Models.Multiwall
 {

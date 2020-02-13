@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Shrooms.Constants.Authorization;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.DataLayer.DAL;
 using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.Constants;
@@ -44,7 +42,7 @@ namespace Shrooms.DataLayer.Migrations.DataInitializer
 
             var permission = new Permission()
             {
-                Scope = Scopes.Administration,
+                Scope = PermissionScopes.Administration,
                 Name = permissionName,
                 Created = _timestamp,
                 Modified = _timestamp,
@@ -70,7 +68,7 @@ namespace Shrooms.DataLayer.Migrations.DataInitializer
 
             var permission = new Permission()
             {
-                Scope = Scopes.Basic,
+                Scope = PermissionScopes.Basic,
                 Name = permissionName,
                 Created = _timestamp,
                 Modified = _timestamp,

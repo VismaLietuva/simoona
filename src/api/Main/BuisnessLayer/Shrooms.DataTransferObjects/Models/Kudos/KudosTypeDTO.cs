@@ -1,4 +1,4 @@
-﻿using Shrooms.Constants.BusinessLayer;
+﻿using Shrooms.Host.Contracts.Enums;
 
 namespace Shrooms.DataTransferObjects.Models.Kudos
 {
@@ -14,7 +14,7 @@ namespace Shrooms.DataTransferObjects.Models.Kudos
 
         public bool IsNecessary { get; set; }
 
-        public BusinessLayerConstants.KudosTypeEnum Type { get; set; }
+        public KudosTypeEnum Type { get; set; }
 
         public string Description { get; set; }
 

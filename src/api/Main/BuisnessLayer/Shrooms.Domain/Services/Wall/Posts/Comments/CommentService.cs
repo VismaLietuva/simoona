@@ -8,6 +8,7 @@ using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Exceptions;
 using Shrooms.Host.Contracts.Infrastructure;
 
 namespace Shrooms.Domain.Services.Wall.Posts.Comments

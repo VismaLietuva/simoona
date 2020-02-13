@@ -11,8 +11,6 @@ using Microsoft.AspNet.Identity;
 using PagedList;
 using Shrooms.API.Filters;
 using Shrooms.Authentification.Membership;
-using Shrooms.Constants.Authorization.Permissions;
-using Shrooms.Constants.WebApi;
 using Shrooms.DataTransferObjects.Models.Permissions;
 using Shrooms.DataTransferObjects.Models.Roles;
 using Shrooms.Domain.Services.Permissions;
@@ -20,7 +18,7 @@ using Shrooms.Domain.Services.Roles;
 using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
-using Shrooms.Infrastructure.CustomCache;
+using Shrooms.Host.Contracts.Infrastructure;
 using Shrooms.WebViewModels.Models;
 using Shrooms.WebViewModels.Models.Roles;
 using Shrooms.WebViewModels.Models.User;
@@ -77,10 +75,10 @@ namespace Shrooms.API.Controllers
 
         private Expression<Func<Permission, bool>> GetFilter(IEnumerable<PermissionGroupViewModel> permissions)
         {
-            var adminControllers = permissions.Where(p => p.ActiveScope == Scopes.Administration).Select(p => p.Name);
-            var basicControllers = permissions.Where(p => p.ActiveScope == Scopes.Basic).Select(p => p.Name);
+            var adminControllers = permissions.Where(p => p.ActiveScope == PermissionScopes.Administration).Select(p => p.Name);
+            var basicControllers = permissions.Where(p => p.ActiveScope == PermissionScopes.Basic).Select(p => p.Name);
 
-            return p => adminControllers.Any(a => p.Name.StartsWith(a + "_")) || (basicControllers.Any(b => p.Name.StartsWith(b + "_")) && p.Scope == Scopes.Basic);
+            return p => adminControllers.Any(a => p.Name.StartsWith(a + "_")) || (basicControllers.Any(b => p.Name.StartsWith(b + "_")) && p.Scope == PermissionScopes.Basic);
         }
 
         private void AssignUsersToRole(RoleMiniViewModel roleViewModel)

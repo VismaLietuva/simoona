@@ -5,13 +5,13 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security.DataProtection;
 using Shrooms.EntityModels.Models;
-using Shrooms.Infrastructure.CustomCache;
+using Shrooms.Host.Contracts.Infrastructure;
 
 namespace Shrooms.Authentification.Membership
 {
     public class ShroomsUserManager : UserManager<ApplicationUser>
     {
-        private ICustomCache<string, IEnumerable<string>> _permissionsCache;
+        private readonly ICustomCache<string, IEnumerable<string>> _permissionsCache;
 
         public ShroomsUserManager(
             IUserStore<ApplicationUser> store,

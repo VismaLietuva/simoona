@@ -1,8 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations.Schema;
-using Shrooms.Constants.BusinessLayer;
-using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.Host.Contracts.Constants;
+using Shrooms.Host.Contracts.Enums;
+using Shrooms.Host.Contracts.Exceptions;
 
 namespace Shrooms.EntityModels.Models.Kudos
 {
@@ -17,7 +17,7 @@ namespace Shrooms.EntityModels.Models.Kudos
 
         public decimal KudosTypeValue { get; set; }
 
-        public BusinessLayerConstants.KudosTypeEnum KudosSystemType { get; set; }
+        public KudosTypeEnum KudosSystemType { get; set; }
 
         public KudosStatus Status { get; set; }
 
@@ -36,7 +36,7 @@ namespace Shrooms.EntityModels.Models.Kudos
 
         public bool IsRecipientDeleted() => !string.IsNullOrEmpty(EmployeeId) && Employee == null;
 
-        public bool IsMinus() => KudosSystemType == BusinessLayerConstants.KudosTypeEnum.Minus;
+        public bool IsMinus() => KudosSystemType == KudosTypeEnum.Minus;
 
         public string PictureId { get; set; }
 

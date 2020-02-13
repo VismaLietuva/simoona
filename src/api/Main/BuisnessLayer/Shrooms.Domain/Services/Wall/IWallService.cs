@@ -4,6 +4,7 @@ using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Wall;
 using Shrooms.DataTransferObjects.Models.Wall.Posts;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.Enums;
 
 namespace Shrooms.Domain.Services.Wall
 {

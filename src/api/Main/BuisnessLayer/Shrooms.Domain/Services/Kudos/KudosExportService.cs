@@ -2,11 +2,11 @@
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Dynamic;
-using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.Domain.Helpers;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.Host.Contracts.Infrastructure;
 

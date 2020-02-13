@@ -5,6 +5,7 @@ using System.Web.Http;
 using AutoMapper;
 using Shrooms.DataTransferObjects.Models.Notification;
 using Shrooms.Domain.Services.Notifications;
+using Shrooms.Host.Contracts.Enums;
 using Shrooms.WebViewModels.Models.Notifications;
 
 namespace Shrooms.API.Controllers

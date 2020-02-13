@@ -7,13 +7,12 @@ using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security.DataProtection;
 using NSubstitute;
 using Shrooms.Authentification.Membership;
-using Shrooms.Constants.WebApi;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
-using Shrooms.Infrastructure.CustomCache;
+using Shrooms.Host.Contracts.Infrastructure;
 
 namespace Shrooms.UnitTests.Mocks
 {

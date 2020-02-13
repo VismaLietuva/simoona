@@ -1,4 +1,4 @@
-﻿namespace Shrooms.Constants.Authentication
+﻿namespace Shrooms.Host.Contracts.Constants
 {
     public static class AuthenticationConstants
     {

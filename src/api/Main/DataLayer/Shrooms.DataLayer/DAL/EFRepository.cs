@@ -13,11 +13,11 @@ namespace Shrooms.DataLayer.DAL
     public class EfRepository<TEntity> : IRepository<TEntity>
         where TEntity : class
     {
-        protected IDbContext _context;
-        private readonly IApplicationSettings _appSettings;
+        private const string ClaimOrganizationId = "OrganizationId";
 
-        protected DbSet<TEntity> _dbSet;
-        public const string ClaimOrganizationId = "OrganizationId";
+        private readonly IDbContext _context;
+        private readonly IApplicationSettings _appSettings;
+        protected readonly DbSet<TEntity> _dbSet;
 
         public int OrganizationId
         {

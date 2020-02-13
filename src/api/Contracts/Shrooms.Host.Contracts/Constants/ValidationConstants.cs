@@ -1,4 +1,4 @@
-﻿namespace Shrooms.Constants.EntityValidationValues
+﻿namespace Shrooms.Host.Contracts.Constants
 {
     public static class ValidationConstants
     {
@@ -10,5 +10,8 @@
         public const int KudosMultiplyByMaxValue = int.MaxValue;
         public const int KudosMultiplyByMinValue = 1;
         public const int KudosCommentMaxLength = 500;
+
+        public const int ExamMaxTitleLength = 255;
+        public const int ExamMaxNumberLength = 255;
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Shrooms.DataTransferObjects.EmailTemplateViewModels
+﻿using Shrooms.Host.Contracts.DataTransferObjects;
+
+namespace Shrooms.DataTransferObjects.EmailTemplateViewModels
 {
     public class KudosRejectedEmailTemplateViewModel : BaseEmailTemplateViewModel
     {

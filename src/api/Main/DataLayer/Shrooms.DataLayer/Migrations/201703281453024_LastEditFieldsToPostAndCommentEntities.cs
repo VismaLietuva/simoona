@@ -14,7 +14,7 @@ namespace Shrooms.DataLayer.Migrations
         public override void Down()
         {
             DropColumn("dbo.Comments", "LastEdit");
-            DropColumn("dbo.Posts", "LastEdit");            
+            DropColumn("dbo.Posts", "LastEdit");
         }
     }
 }

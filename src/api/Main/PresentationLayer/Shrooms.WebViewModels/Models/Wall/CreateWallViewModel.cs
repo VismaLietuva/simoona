@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Shrooms.Constants.WebApi;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.WebViewModels.Models.Wall.Moderator;
 
 namespace Shrooms.WebViewModels.Models.Wall

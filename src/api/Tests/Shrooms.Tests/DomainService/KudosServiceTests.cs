@@ -8,7 +8,6 @@ using System.Web;
 using AutoMapper;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.Domain.Services.Kudos;
@@ -20,6 +19,7 @@ using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Enums;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.UnitTests.Extensions;
 using Shrooms.UnitTests.ModelMappings;
@@ -552,7 +552,7 @@ namespace Shrooms.UnitTests.DomainService
 
             var result = _kudosService.GetSendKudosType(userAndOrg);
 
-            Assert.AreEqual(result.Type, BusinessLayerConstants.KudosTypeEnum.Send);
+            Assert.AreEqual(result.Type, KudosTypeEnum.Send);
         }
         #endregion
 
@@ -684,7 +684,7 @@ namespace Shrooms.UnitTests.DomainService
                     Id = 1,
                     Name = "Minus",
                     Value = 1,
-                    Type = BusinessLayerConstants.KudosTypeEnum.Minus,
+                    Type = KudosTypeEnum.Minus,
                     IsActive = true
                 },
                 new KudosType
@@ -692,7 +692,7 @@ namespace Shrooms.UnitTests.DomainService
                     Id = 2,
                     Name = "Send",
                     Value = 1,
-                    Type = BusinessLayerConstants.KudosTypeEnum.Send,
+                    Type = KudosTypeEnum.Send,
                     IsActive = true
                 },
                 new KudosType
@@ -700,7 +700,7 @@ namespace Shrooms.UnitTests.DomainService
                     Id = 3,
                     Name = "AnythingElse",
                     Value = 2,
-                    Type = BusinessLayerConstants.KudosTypeEnum.Ordinary,
+                    Type = KudosTypeEnum.Ordinary,
                     IsActive = true
                 },
                 new KudosType
@@ -708,14 +708,14 @@ namespace Shrooms.UnitTests.DomainService
                     Id = 4,
                     Name = "Other",
                     Value = 3,
-                    Type = BusinessLayerConstants.KudosTypeEnum.Other
+                    Type = KudosTypeEnum.Other
                 },
                 new KudosType
                 {
                     Id = 5,
                     Name = "Active",
                     Value = 1,
-                    Type = BusinessLayerConstants.KudosTypeEnum.Ordinary,
+                    Type = KudosTypeEnum.Ordinary,
                     IsActive = true
                 }
             }.AsQueryable();
@@ -737,7 +737,7 @@ namespace Shrooms.UnitTests.DomainService
                         LastName = "surname"
                     },
                     KudosTypeName = "Type1",
-                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
+                    KudosSystemType = KudosTypeEnum.Ordinary,
                     OrganizationId = 2,
                     CreatedBy = "testUserId"
                 },
@@ -753,7 +753,7 @@ namespace Shrooms.UnitTests.DomainService
                         LastName = "surname"
                     },
                     KudosTypeName = "Type1",
-                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
+                    KudosSystemType = KudosTypeEnum.Ordinary,
                     OrganizationId = 2,
                     CreatedBy = "testUserId"
                 },
@@ -769,7 +769,7 @@ namespace Shrooms.UnitTests.DomainService
                         LastName = "surname"
                     },
                     KudosTypeName = "Type2",
-                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
+                    KudosSystemType = KudosTypeEnum.Ordinary,
                     OrganizationId = 2,
                     CreatedBy = "testUserId",
                     Points = 0,
@@ -781,7 +781,7 @@ namespace Shrooms.UnitTests.DomainService
                     Id = 4,
                     EmployeeId = "testUserId3",
                     KudosTypeName = "Send",
-                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Send,
+                    KudosSystemType = KudosTypeEnum.Send,
                     Employee = new ApplicationUser
                     {
                         Id = "testUserId",
@@ -1009,7 +1009,7 @@ namespace Shrooms.UnitTests.DomainService
                 {
                     KudosTypeName = "Type1",
                     KudosTypeValue = 1,
-                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
+                    KudosSystemType = KudosTypeEnum.Ordinary,
                     Employee = new ApplicationUser
                     {
                         Id = "User1",
@@ -1028,7 +1028,7 @@ namespace Shrooms.UnitTests.DomainService
                 {
                     KudosTypeName = "Type1",
                     KudosTypeValue = 1,
-                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
+                    KudosSystemType = KudosTypeEnum.Ordinary,
                     Employee = new ApplicationUser
                     {
                         Id = "User1",
@@ -1047,7 +1047,7 @@ namespace Shrooms.UnitTests.DomainService
                 {
                     KudosTypeName = "Type2",
                     KudosTypeValue = 2,
-                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
+                    KudosSystemType = KudosTypeEnum.Ordinary,
                     Employee = new ApplicationUser
                     {
                         Id = "User1",
@@ -1066,7 +1066,7 @@ namespace Shrooms.UnitTests.DomainService
                 {
                     KudosTypeName = "Minus",
                     KudosTypeValue = 2,
-                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Minus,
+                    KudosSystemType = KudosTypeEnum.Minus,
                     Employee = new ApplicationUser
                     {
                         Id = "User1",
@@ -1085,7 +1085,7 @@ namespace Shrooms.UnitTests.DomainService
                 {
                     KudosTypeName = "Type2",
                     KudosTypeValue = 2,
-                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
+                    KudosSystemType = KudosTypeEnum.Ordinary,
                     Employee = new ApplicationUser
                     {
                         Id = "User1",
@@ -1104,7 +1104,7 @@ namespace Shrooms.UnitTests.DomainService
                 {
                     KudosTypeName = "Type2",
                     KudosTypeValue = 2,
-                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
+                    KudosSystemType = KudosTypeEnum.Ordinary,
                     Employee = new ApplicationUser
                     {
                         Id = "User1",
@@ -1125,7 +1125,7 @@ namespace Shrooms.UnitTests.DomainService
                 {
                     KudosTypeName = "Type2",
                     KudosTypeValue = 2,
-                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
+                    KudosSystemType = KudosTypeEnum.Ordinary,
                     Employee = new ApplicationUser
                     {
                         Id = "User2",
@@ -1144,7 +1144,7 @@ namespace Shrooms.UnitTests.DomainService
                 {
                     KudosTypeName = "Type2",
                     KudosTypeValue = 2,
-                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
+                    KudosSystemType = KudosTypeEnum.Ordinary,
                     Employee = new ApplicationUser
                     {
                         Id = "User2",
@@ -1165,7 +1165,7 @@ namespace Shrooms.UnitTests.DomainService
                 {
                     KudosTypeName = "Type2",
                     KudosTypeValue = 2,
-                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
+                    KudosSystemType = KudosTypeEnum.Ordinary,
                     Employee = new ApplicationUser
                     {
                         Id = "User3",
@@ -1186,7 +1186,7 @@ namespace Shrooms.UnitTests.DomainService
                 {
                     KudosTypeName = "Type2",
                     KudosTypeValue = 2,
-                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
+                    KudosSystemType = KudosTypeEnum.Ordinary,
                     Employee = new ApplicationUser
                     {
                         Id = "User4",
@@ -1205,7 +1205,7 @@ namespace Shrooms.UnitTests.DomainService
                 {
                     KudosTypeName = "Type2",
                     KudosTypeValue = 2,
-                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
+                    KudosSystemType = KudosTypeEnum.Ordinary,
                     Employee = new ApplicationUser
                     {
                         Id = "User4",
@@ -1269,7 +1269,7 @@ namespace Shrooms.UnitTests.DomainService
                     Id = 1,
                     EmployeeId = "Id",
                     KudosTypeName = "Type1",
-                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
+                    KudosSystemType = KudosTypeEnum.Ordinary,
                     OrganizationId = 1,
                     Created = DateTime.UtcNow,
                     CreatedBy = "testUserId"
@@ -1282,7 +1282,7 @@ namespace Shrooms.UnitTests.DomainService
                     Id = 2,
                     EmployeeId = "Id",
                     KudosTypeName = "Type1",
-                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
+                    KudosSystemType = KudosTypeEnum.Ordinary,
                     OrganizationId = 2,
                     Created = DateTime.UtcNow,
                     Points = 1
@@ -1295,7 +1295,7 @@ namespace Shrooms.UnitTests.DomainService
                     Id = 3,
                     EmployeeId = "Id",
                     KudosTypeName = "Type2",
-                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
+                    KudosSystemType = KudosTypeEnum.Ordinary,
                     KudosTypeValue = 2,
                     OrganizationId = 1,
                     Created = DateTime.UtcNow.AddDays(-11),
@@ -1307,7 +1307,7 @@ namespace Shrooms.UnitTests.DomainService
                     Id = 4,
                     EmployeeId = "Id",
                     KudosTypeName = "Type2",
-                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
+                    KudosSystemType = KudosTypeEnum.Ordinary,
                     OrganizationId = 1,
                     Created = DateTime.UtcNow,
                     Points = 10
@@ -1318,7 +1318,7 @@ namespace Shrooms.UnitTests.DomainService
                     Id = 5,
                     EmployeeId = "Id",
                     KudosTypeName = "Type2",
-                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary,
+                    KudosSystemType = KudosTypeEnum.Ordinary,
                     OrganizationId = 1,
                     Created = DateTime.UtcNow,
                     Points = 1
@@ -1329,7 +1329,7 @@ namespace Shrooms.UnitTests.DomainService
                     Id = 6,
                     EmployeeId = "Id",
                     KudosTypeName = "Minus",
-                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Minus,
+                    KudosSystemType = KudosTypeEnum.Minus,
                     OrganizationId = 1,
                     Created = DateTime.UtcNow,
                     Points = 1
@@ -1340,7 +1340,7 @@ namespace Shrooms.UnitTests.DomainService
                     Id = 6,
                     EmployeeId = "Id",
                     KudosTypeName = "Other",
-                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Other,
+                    KudosSystemType = KudosTypeEnum.Other,
                     OrganizationId = 1,
                     Created = DateTime.UtcNow,
                     Points = 1,

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Shrooms.Host.Contracts.Enums;
 
 namespace Shrooms.DataTransferObjects.Models.Wall
 {

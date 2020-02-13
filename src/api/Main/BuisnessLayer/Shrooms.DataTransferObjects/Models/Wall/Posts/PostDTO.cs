@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Shrooms.DataTransferObjects.Models.Users;
 using Shrooms.DataTransferObjects.Models.Wall.Posts.Comments;
+using Shrooms.Host.Contracts.Enums;
 
 namespace Shrooms.DataTransferObjects.Models.Wall.Posts
 {

@@ -870,18 +870,6 @@
       <Project>{e690ceb8-f266-441f-8a80-5a3440b3445a}</Project>
       <Name>Shrooms.Host.Contracts</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Infrastructure\Shrooms.Infrastructure\Shrooms.Infrastructure.csproj">
-      <Project>{d9c5606d-3855-44a0-bdb3-98d963d63fcf}</Project>
-      <Name>Shrooms.Infrastructure</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Other\Shrooms.Constants\Shrooms.Constants.csproj">
-      <Project>{e07394b9-558c-4a70-9926-6400abb0fb5d}</Project>
-      <Name>Shrooms.Constants</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\BuisnessLayer\Shrooms.DataTransferObjects\Shrooms.DataTransferObjects.csproj">
-      <Project>{6611930D-880E-455C-8681-E0E2A33CF5A9}</Project>
-      <Name>Shrooms.DataTransferObjects</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Shrooms.EntityModels\Shrooms.EntityModels.csproj">
       <Project>{8ad6f857-708c-4b5e-98bc-b3206e7dd918}</Project>
       <Name>Shrooms.EntityModels</Name>

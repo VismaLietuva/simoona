@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
+using Shrooms.Host.Contracts.Constants;
 
 namespace Shrooms.Domain.Helpers
 {

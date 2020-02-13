@@ -1,4 +1,4 @@
-﻿namespace Shrooms.Constants.WebApi
+﻿namespace Shrooms.Host.Contracts.Constants
 {
     public static class KudosBasketConstants
     {

@@ -1,13 +1,12 @@
 ﻿using System.Data.Entity;
 using System.Linq;
-using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataTransferObjects.EmailTemplateViewModels;
-using Shrooms.DataTransferObjects.Models.Emails;
 using Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.DataTransferObjects;
 using Shrooms.Host.Contracts.Infrastructure;
 using Shrooms.Host.Contracts.Infrastructure.Email;
 

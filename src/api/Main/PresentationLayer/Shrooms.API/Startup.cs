@@ -20,8 +20,7 @@ using Shrooms.API.Filters;
 using Shrooms.API.GeneralCode;
 using Shrooms.API.GeneralCode.SerializationIgnorer;
 using Shrooms.API.Middlewares;
-using Shrooms.Constants.DataLayer;
-using Shrooms.Constants.WebApi;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Infrastructure.Configuration;
 using Shrooms.Infrastructure.Email.Templating;
 using Shrooms.IoC;
@@ -85,7 +84,7 @@ namespace Shrooms.API
             var interval = ConfigurationManager.AppSettings["BackgroundWorkerSqlPollingIntervalInSeconds"];
             var options = new SqlServerStorageOptions { QueuePollInterval = TimeSpan.FromSeconds(Convert.ToInt16(interval)) };
 
-            Hangfire.GlobalConfiguration.Configuration.UseSqlServerStorage(ConstDataLayer.ConnectionStringNameBackgroundJobs, options);
+            Hangfire.GlobalConfiguration.Configuration.UseSqlServerStorage(DataLayerConstants.ConnectionStringNameBackgroundJobs, options);
 
             app.UseHangfireDashboard();
             app.UseHangfireServer();

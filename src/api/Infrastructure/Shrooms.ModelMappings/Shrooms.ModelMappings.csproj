@@ -101,6 +101,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Contracts\Shrooms.Host.Contracts\Shrooms.Host.Contracts.csproj">
+      <Project>{e690ceb8-f266-441f-8a80-5a3440b3445a}</Project>
+      <Name>Shrooms.Host.Contracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Main\BuisnessLayer\Shrooms.DataTransferObjects\Shrooms.DataTransferObjects.csproj">
       <Project>{6611930d-880e-455c-8681-e0e2a33cf5a9}</Project>
       <Name>Shrooms.DataTransferObjects</Name>
@@ -113,21 +117,10 @@
       <Project>{1f63d29f-e593-47f0-a304-54d62cc1ad2b}</Project>
       <Name>Shrooms.WebViewModels</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Other\Shrooms.Constants\Shrooms.Constants.csproj">
-      <Project>{E07394B9-558C-4A70-9926-6400ABB0FB5D}</Project>
-      <Name>Shrooms.Constants</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
     <Analyzer Include="..\..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

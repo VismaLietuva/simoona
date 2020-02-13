@@ -31,7 +31,7 @@
     <WarningLevel>4</WarningLevel>
     <StyleCopEnabled>True</StyleCopEnabled>
     <StyleCopTreatErrorsAsWarnings>False</StyleCopTreatErrorsAsWarnings>
-    <CodeAnalysisRuleSet>..\..\shared.ruleset</CodeAnalysisRuleSet>	
+    <CodeAnalysisRuleSet>..\..\shared.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <OutputPath>bin\Debug\</OutputPath>
@@ -264,10 +264,6 @@
     <ProjectReference Include="..\..\Main\DataLayer\Shrooms.DataLayer\Shrooms.DataLayer.csproj">
       <Project>{affe7b8b-3294-4dd3-990d-7da5e256c987}</Project>
       <Name>Shrooms.DataLayer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Other\Shrooms.Constants\Shrooms.Constants.csproj">
-      <Project>{e07394b9-558c-4a70-9926-6400abb0fb5d}</Project>
-      <Name>Shrooms.Constants</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Other\Shrooms.Resources\Shrooms.Resources.csproj">
       <Project>{c6fc692b-dfad-4ed5-86d5-8000dbd06b02}</Project>

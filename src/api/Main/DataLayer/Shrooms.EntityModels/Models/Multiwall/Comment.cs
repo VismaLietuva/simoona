@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Shrooms.Host.Contracts.Constants;
 
 namespace Shrooms.EntityModels.Models.Multiwall
 {
     public class Comment : LikeBaseModel
     {
-        public const int MaxMessageBodyLength = 5000;
-
-        [StringLength(MaxMessageBodyLength)]
+        [StringLength(ValidationConstants.MaxCommentMessageBodyLength)]
         public string MessageBody { get; set; }
 
         [ForeignKey("Author")]
@@ -32,7 +31,7 @@ namespace Shrooms.EntityModels.Models.Multiwall
         {
             if (string.IsNullOrWhiteSpace(MessageBody) && PictureId == null)
             {
-                yield return new ValidationResult(Resources.Common.EmptyMessageError, new[] { "MessageBody", "PictureId" });
+                yield return new ValidationResult("Message cannot be empty", new[] { "MessageBody", "PictureId" });
             }
 
             foreach (var error in base.Validate(validationContext))

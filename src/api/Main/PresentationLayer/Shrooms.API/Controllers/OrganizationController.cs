@@ -6,12 +6,11 @@ using System.Web.Http;
 using AutoMapper;
 using Shrooms.API.Filters;
 using Shrooms.Authentification.Membership;
-using Shrooms.Constants.WebApi;
 using Shrooms.Domain.Services.Organizations;
-using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Exceptions;
 using Shrooms.WebViewModels.Models;
 using Shrooms.WebViewModels.Models.PostModels;
 

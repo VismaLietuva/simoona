@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Shrooms.Constants.BusinessLayer;
+using Shrooms.Host.Contracts.Constants;
+using Shrooms.Host.Contracts.Enums;
 
 namespace Shrooms.EntityModels.Models.Kudos
 {
@@ -10,7 +11,7 @@ namespace Shrooms.EntityModels.Models.Kudos
 
         public decimal Value { get; set; }
 
-        public BusinessLayerConstants.KudosTypeEnum Type { get; set; }
+        public KudosTypeEnum Type { get; set; }
 
         [MaxLength(BusinessLayerConstants.MaxKudosDescriptionLength)]
         public string Description { get; set; }

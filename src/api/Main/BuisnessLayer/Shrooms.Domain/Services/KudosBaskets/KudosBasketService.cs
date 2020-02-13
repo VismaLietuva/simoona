@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
-using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.KudosBasket;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.DomainServiceValidators.Validators.KudosBaskets;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Enums;
 
 namespace Shrooms.Domain.Services.KudosBaskets
 {
@@ -142,9 +143,9 @@ namespace Shrooms.Domain.Services.KudosBaskets
                 _kudosBasketValidator.CheckIfUserHasEnoughKudos(user.RemainingKudos, donation.DonationAmount);
 
                 var otherType = _kudosTypesDbSet
-                    .First(type => type.Type == BusinessLayerConstants.KudosTypeEnum.Other);
+                    .First(type => type.Type == KudosTypeEnum.Other);
                 var minusType = _kudosTypesDbSet
-                    .First(type => type.Type == BusinessLayerConstants.KudosTypeEnum.Minus);
+                    .First(type => type.Type == KudosTypeEnum.Minus);
 
                 var logComment = string.Format(Resources.Widgets.KudosBasket.KudosBasket.KudosBasketDonationComment, basket.Title);
 

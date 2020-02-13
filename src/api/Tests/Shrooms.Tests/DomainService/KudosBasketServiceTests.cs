@@ -4,7 +4,6 @@ using System.Data.Entity;
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.KudosBasket;
 using Shrooms.Domain.Services.Kudos;
@@ -14,6 +13,7 @@ using Shrooms.DomainServiceValidators.Validators.KudosBaskets;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Enums;
 using Shrooms.UnitTests.Extensions;
 
 namespace Shrooms.UnitTests.DomainService
@@ -59,14 +59,14 @@ namespace Shrooms.UnitTests.DomainService
                 {
                     Id = 1,
                     Name = "Other",
-                    Type = BusinessLayerConstants.KudosTypeEnum.Other
+                    Type = KudosTypeEnum.Other
                 },
 
                 new KudosType
                 {
                     Id = 2,
                     Name = "Minus",
-                    Type = BusinessLayerConstants.KudosTypeEnum.Minus
+                    Type = KudosTypeEnum.Minus
                 }
             }.AsQueryable();
             return types;

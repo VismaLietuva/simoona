@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Shrooms.Constants.BusinessLayer.Events;
+using Shrooms.Host.Contracts.Enums;
 
 namespace Shrooms.EntityModels.Models.Events
 {

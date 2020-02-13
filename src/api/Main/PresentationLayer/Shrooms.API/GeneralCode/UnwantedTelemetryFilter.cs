@@ -3,7 +3,7 @@ using Hangfire.Annotations;
 using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
-using Shrooms.Constants.DataLayer;
+using Shrooms.Host.Contracts.Constants;
 
 namespace Shrooms.API.GeneralCode
 {
@@ -30,7 +30,7 @@ namespace Shrooms.API.GeneralCode
 
                 if (ConfigurationManager.ConnectionStrings.Count > 0)
                 {
-                    var connectionString = ConfigurationManager.ConnectionStrings[ConstDataLayer.ConnectionStringNameBackgroundJobs].ConnectionString;
+                    var connectionString = ConfigurationManager.ConnectionStrings[DataLayerConstants.ConnectionStringNameBackgroundJobs].ConnectionString;
 
                     if (connectionString != null)
                     {

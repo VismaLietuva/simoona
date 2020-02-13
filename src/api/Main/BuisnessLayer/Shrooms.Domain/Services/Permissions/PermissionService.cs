@@ -4,12 +4,12 @@ using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using MoreLinq;
-using Shrooms.Constants.DataLayer;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Permissions;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
-using Shrooms.Infrastructure.CustomCache;
+using Shrooms.Host.Contracts.Infrastructure;
 
 namespace Shrooms.Domain.Services.Permissions
 {
@@ -47,7 +47,7 @@ namespace Shrooms.Domain.Services.Permissions
             return allPermissions
                 .Select(x => new PermissionGroupDTO
                 {
-                    Name = x.Name.Split(ConstDataLayer.PermissionSplitter).First().ToLower()
+                    Name = x.Name.Split(DataLayerConstants.PermissionSplitter).First().ToLower()
                 })
                 .DistinctBy(x => x.Name)
                 .OrderBy(x => x.Name)

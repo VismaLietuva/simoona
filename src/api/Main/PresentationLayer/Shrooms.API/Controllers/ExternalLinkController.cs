@@ -2,11 +2,10 @@
 using System.Web.Http;
 using AutoMapper;
 using Shrooms.API.Filters;
-using Shrooms.Constants.WebApi;
 using Shrooms.DataTransferObjects.Models.ExternalLinks;
 using Shrooms.Domain.Services.ExternalLinks;
-using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.Host.Contracts.Constants;
+using Shrooms.Host.Contracts.Exceptions;
 using Shrooms.WebViewModels.Models.ExternalLink;
 using WebApi.OutputCache.V2;
 

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Shrooms.EntityModels.Models.Multiwall;
+using Shrooms.Host.Contracts.Constants;
 
 namespace Shrooms.WebViewModels.Models.PostModels
 {
     public class CommentPostViewModel : AbstractViewModel
     {
-        [MaxLength(Comment.MaxMessageBodyLength, ErrorMessageResourceType = typeof(Resources.Common), ErrorMessageResourceName = "MaxLengthError")]
+        [MaxLength(ValidationConstants.MaxCommentMessageBodyLength, ErrorMessageResourceType = typeof(Resources.Common), ErrorMessageResourceName = "MaxLengthError")]
         [Display(Name = "CommentMessageBody", ResourceType = typeof(Resources.Common))]
         public string MessageBody { get; set; }
 

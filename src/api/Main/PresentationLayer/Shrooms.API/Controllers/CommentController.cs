@@ -3,13 +3,14 @@ using System.Web.Http;
 using AutoMapper;
 using Shrooms.API.BackgroundWorkers;
 using Shrooms.API.Filters;
-using Shrooms.DataTransferObjects.Models.Wall;
 using Shrooms.DataTransferObjects.Models.Wall.Posts.Comments;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.Domain.Services.Wall.Posts.Comments;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.Host.Contracts.Constants;
+using Shrooms.Host.Contracts.Enums;
+using Shrooms.Host.Contracts.Exceptions;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.WebViewModels.Models.Wall.Posts.Comments;
 

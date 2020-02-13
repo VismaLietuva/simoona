@@ -1,4 +1,6 @@
-﻿namespace Shrooms.DataTransferObjects.Models.Notification
+﻿using Shrooms.Host.Contracts.Enums;
+
+namespace Shrooms.DataTransferObjects.Models.Notification
 {
     public class NotificationDto
     {

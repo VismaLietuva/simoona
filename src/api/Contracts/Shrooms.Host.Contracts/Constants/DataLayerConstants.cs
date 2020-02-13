@@ -1,6 +1,6 @@
-﻿namespace Shrooms.Constants.DataLayer
+﻿namespace Shrooms.Host.Contracts.Constants
 {
-    public static class ConstDataLayer
+    public static class DataLayerConstants
     {
         public const string ClaimUserImpersonation = "UserImpersonation";
         public const string ClaimOriginalUsername = "OriginalUsername";

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AutoMapper;
-using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Users;
 using Shrooms.DataTransferObjects.Models.Wall;
@@ -18,6 +17,8 @@ using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Enums;
+using Shrooms.Host.Contracts.Exceptions;
 
 namespace Shrooms.Domain.Services.Wall
 {
@@ -621,7 +622,7 @@ namespace Shrooms.Domain.Services.Wall
             }
             else
             {
-                wallsIds = wallsType == (int)BusinessLayerConstants.WallsType.MyWalls ?
+                wallsIds = wallsType == (int)WallsType.MyWalls ?
                                             (await GetWallsList(userOrg, WallsListFilter.Followed)).Select(w => w.Id).ToList() :
                                             (await GetWallsList(userOrg, WallsListFilter.All)).Select(w => w.Id).ToList();
             }

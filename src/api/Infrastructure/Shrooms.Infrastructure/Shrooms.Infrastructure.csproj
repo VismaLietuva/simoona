@@ -166,7 +166,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\ApplicationSettings.cs" />
-    <Compile Include="CustomCache\ICustomCache.cs" />
     <Compile Include="Email\Templating\EmailTemplatesConfig.cs" />
     <Compile Include="Email\MailingService.cs" />
     <Compile Include="Email\Templating\MailTemplate.cs" />
@@ -211,14 +210,6 @@
     <ProjectReference Include="..\..\Main\BuisnessLayer\Shrooms.DataTransferObjects\Shrooms.DataTransferObjects.csproj">
       <Project>{6611930d-880e-455c-8681-e0e2a33cf5a9}</Project>
       <Name>Shrooms.DataTransferObjects</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Main\BuisnessLayer\Shrooms.DomainExceptions\Shrooms.DomainExceptions.csproj">
-      <Project>{8b48f02f-79e6-45cf-8de3-bf9085d4c3a2}</Project>
-      <Name>Shrooms.DomainExceptions</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Other\Shrooms.Constants\Shrooms.Constants.csproj">
-      <Project>{e07394b9-558c-4a70-9926-6400abb0fb5d}</Project>
-      <Name>Shrooms.Constants</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

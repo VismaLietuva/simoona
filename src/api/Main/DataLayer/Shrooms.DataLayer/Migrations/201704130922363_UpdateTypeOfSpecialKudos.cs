@@ -1,5 +1,4 @@
 using System.Data.Entity.Migrations;
-using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataLayer.DAL;
 using Shrooms.EntityModels.Models.Kudos;
 

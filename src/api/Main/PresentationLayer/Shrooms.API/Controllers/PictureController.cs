@@ -6,7 +6,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Shrooms.API.Filters;
-using Shrooms.Constants.WebApi;
 using Shrooms.Domain.Services.Picture;
 using Shrooms.Host.Contracts.Constants;
 

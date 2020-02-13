@@ -3,7 +3,6 @@ using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Notification;
 using Shrooms.DataTransferObjects.Models.Wall;
@@ -13,7 +12,9 @@ using Shrooms.Domain.Services.Wall;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Events;
 using Shrooms.EntityModels.Models.Notifications;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Enums;
 
 namespace Shrooms.Domain.Services.Notifications
 {

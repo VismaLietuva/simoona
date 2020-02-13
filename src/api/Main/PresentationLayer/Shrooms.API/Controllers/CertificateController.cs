@@ -5,7 +5,6 @@ using AutoMapper;
 using MoreLinq;
 using PagedList;
 using Shrooms.API.Filters;
-using Shrooms.Constants.WebApi;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.Constants;

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using Shrooms.API.Filters;
 using Shrooms.API.Helpers;
-using Shrooms.Constants.WebApi;
+using Shrooms.Host.Contracts.Constants;
 
 namespace Shrooms.API.Controllers
 {

@@ -7,6 +7,7 @@ using Shrooms.DataTransferObjects.Models.Projects;
 using Shrooms.Domain.Services.Projects;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.Host.Contracts.Constants;
+using Shrooms.Host.Contracts.Exceptions;
 using Shrooms.WebViewModels.Models.Projects;
 
 namespace Shrooms.API.Controllers

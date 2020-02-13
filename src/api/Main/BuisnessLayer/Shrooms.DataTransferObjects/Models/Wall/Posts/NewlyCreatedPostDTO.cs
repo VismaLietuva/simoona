@@ -1,5 +1,6 @@
 ﻿using System;
 using Shrooms.DataTransferObjects.Models.Users;
+using Shrooms.Host.Contracts.Enums;
 
 namespace Shrooms.DataTransferObjects.Models.Wall.Posts
 {

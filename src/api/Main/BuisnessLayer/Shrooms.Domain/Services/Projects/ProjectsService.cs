@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
-using Shrooms.Constants.DataLayer;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Projects;
 using Shrooms.DataTransferObjects.Models.Users;
@@ -14,6 +13,8 @@ using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Enums;
+using Shrooms.Host.Contracts.Exceptions;
 
 namespace Shrooms.Domain.Services.Projects
 {
@@ -316,7 +317,7 @@ namespace Shrooms.Domain.Services.Projects
             var user = _usersDbSet.Find(userId);
             var manager = _usersDbSet.Find(managerId);
 
-            if (ConstDataLayer.OrganizationManagerUsername.Equals(user.UserName, StringComparison.InvariantCultureIgnoreCase) && user.Id == manager.Id)
+            if (DataLayerConstants.OrganizationManagerUsername.Equals(user.UserName, StringComparison.InvariantCultureIgnoreCase) && user.Id == manager.Id)
             {
                 return true;
             }
@@ -331,7 +332,7 @@ namespace Shrooms.Domain.Services.Projects
                 return false;
             }
 
-            if (manager.ManagerId == null || (manager.Id == manager.ManagerId && manager.UserName == ConstDataLayer.OrganizationManagerUsername))
+            if (manager.ManagerId == null || (manager.Id == manager.ManagerId && manager.UserName == DataLayerConstants.OrganizationManagerUsername))
             {
                 return true;
             }

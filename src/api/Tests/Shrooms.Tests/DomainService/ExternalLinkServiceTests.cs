@@ -6,10 +6,10 @@ using NSubstitute;
 using NUnit.Framework;
 using Shrooms.DataTransferObjects.Models.ExternalLinks;
 using Shrooms.Domain.Services.ExternalLinks;
-using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Exceptions;
 using Shrooms.UnitTests.Extensions;
 
 namespace Shrooms.UnitTests.DomainService

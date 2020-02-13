@@ -1,3 +1,5 @@
+using Shrooms.Host.Contracts.DataTransferObjects;
+
 namespace Shrooms.DataTransferObjects.EmailTemplateViewModels
 {
     public class KudosReceivedDecreasedEmailTemplateViewModel : BaseEmailTemplateViewModel

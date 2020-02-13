@@ -3,19 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.Host.Contracts.Infrastructure;
-using Shrooms.Infrastructure.Configuration;
 
 namespace Shrooms.DataLayer.DAL
 {
     public class EfUnitOfWork : IUnitOfWork
     {
         private readonly Dictionary<Type, object> _repositories;
+        private readonly IApplicationSettings _appSettings;
 
         public IDbContext DbContext { get; }
 
-        public EfUnitOfWork(IDbContext context)
+        public EfUnitOfWork(IDbContext context, IApplicationSettings appSettings)
         {
             DbContext = context;
+            _appSettings = appSettings;
             _repositories = new Dictionary<Type, object>();
         }
 
@@ -30,9 +31,7 @@ namespace Shrooms.DataLayer.DAL
                 return repository;
             }
 
-            IApplicationSettings appSettings = new ApplicationSettings();
-
-            repository = new EfRepository<TEntity>(DbContext, appSettings);
+            repository = new EfRepository<TEntity>(DbContext, _appSettings);
             _repositories.Add(typeof(TEntity), repository);
             return repository;
         }

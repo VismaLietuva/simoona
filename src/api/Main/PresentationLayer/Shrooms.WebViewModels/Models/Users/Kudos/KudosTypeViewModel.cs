@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Shrooms.Constants.BusinessLayer;
-using Shrooms.Constants.WebApi;
+using Shrooms.Host.Contracts.Constants;
+using Shrooms.Host.Contracts.Enums;
 
 namespace Shrooms.WebViewModels.Models.Users.Kudos
 {
@@ -16,7 +16,7 @@ namespace Shrooms.WebViewModels.Models.Users.Kudos
         [Required]
         public decimal Value { get; set; }
 
-        public BusinessLayerConstants.KudosTypeEnum Type { get; set; }
+        public KudosTypeEnum Type { get; set; }
 
         public bool Hidden { get; set; }
 

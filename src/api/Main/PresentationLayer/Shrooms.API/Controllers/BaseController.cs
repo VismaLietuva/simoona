@@ -3,7 +3,7 @@ using System.Web.Http.Results;
 using Microsoft.AspNet.Identity;
 using Shrooms.API.Helpers;
 using Shrooms.DataTransferObjects.Models;
-using Shrooms.DomainExceptions.Exceptions;
+using Shrooms.Host.Contracts.Exceptions;
 
 namespace Shrooms.API.Controllers
 {

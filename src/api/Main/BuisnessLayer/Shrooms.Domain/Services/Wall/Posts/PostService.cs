@@ -4,7 +4,6 @@ using System.Data.Entity;
 using System.Linq;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Users;
-using Shrooms.DataTransferObjects.Models.Wall;
 using Shrooms.DataTransferObjects.Models.Wall.Posts;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall.Posts.Comments;
@@ -13,6 +12,8 @@ using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Enums;
+using Shrooms.Host.Contracts.Exceptions;
 
 namespace Shrooms.Domain.Services.Wall.Posts
 {

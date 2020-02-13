@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Net.Mail;
-using Shrooms.Constants.BusinessLayer;
+using Shrooms.Host.Contracts.Constants;
 
-namespace Shrooms.DataTransferObjects.Models.Emails
+namespace Shrooms.Host.Contracts.DataTransferObjects
 {
     public class EmailDto
     {

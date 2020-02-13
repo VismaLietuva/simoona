@@ -13,12 +13,9 @@ using AutoMapper;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Shrooms.Authentification.Membership;
-using Shrooms.Constants.Authentication;
-using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Administration;
-using Shrooms.DataTransferObjects.Models.Wall;
 using Shrooms.Domain.Services.Email.AdministrationUsers;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.Organizations;
@@ -27,7 +24,9 @@ using Shrooms.DomainServiceValidators.Validators.UserAdministration;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
 using Shrooms.EntityModels.Models.Multiwall;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Enums;
 using Shrooms.Infrastructure.ExcelGenerator;
 using userRes = Shrooms.Resources.Models.ApplicationUser.ApplicationUser;
 
@@ -346,9 +345,9 @@ namespace Shrooms.Domain.Services.Administration
                     Modified = DateTime.UtcNow,
                     Status = KudosStatus.Pending,
                     MultiplyBy = 1,
-                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Other,
-                    KudosTypeValue = (short)BusinessLayerConstants.KudosTypeEnum.Other,
-                    KudosTypeName = BusinessLayerConstants.KudosTypeEnum.Other.ToString()
+                    KudosSystemType = KudosTypeEnum.Other,
+                    KudosTypeValue = (short)KudosTypeEnum.Other,
+                    KudosTypeName = KudosTypeEnum.Other.ToString()
                 };
 
                 _uow.GetDbSet<KudosLog>().Add(welcomeKudos);

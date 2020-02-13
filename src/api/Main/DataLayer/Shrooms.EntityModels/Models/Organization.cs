@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Shrooms.Constants.BusinessLayer;
+using Shrooms.Host.Contracts.Constants;
 
 namespace Shrooms.EntityModels.Models
 {

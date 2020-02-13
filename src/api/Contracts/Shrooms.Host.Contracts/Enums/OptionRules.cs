@@ -1,4 +1,4 @@
-﻿namespace Shrooms.Constants.BusinessLayer.Events
+﻿namespace Shrooms.Host.Contracts.Enums
 {
     public enum OptionRules
     {

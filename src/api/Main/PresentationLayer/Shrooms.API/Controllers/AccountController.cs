@@ -16,14 +16,13 @@ using Shrooms.API.Providers;
 using Shrooms.API.Results;
 using Shrooms.Authentification.ExternalLoginInfrastructure;
 using Shrooms.Authentification.Membership;
-using Shrooms.Constants.Authentication;
-using Shrooms.Constants.WebApi;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.Domain.Services.Administration;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.RefreshTokens;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.WebViewModels.Models;
 using Shrooms.WebViewModels.Models.AccountModels;
 

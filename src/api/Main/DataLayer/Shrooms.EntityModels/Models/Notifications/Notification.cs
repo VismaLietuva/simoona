@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Shrooms.DataTransferObjects.Models.Notification;
+using Shrooms.Host.Contracts.Enums;
 
 namespace Shrooms.EntityModels.Models.Notifications
 {

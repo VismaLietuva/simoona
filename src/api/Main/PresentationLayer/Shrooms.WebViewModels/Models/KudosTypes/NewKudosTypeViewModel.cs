@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Shrooms.Constants.BusinessLayer;
-using Shrooms.Constants.WebApi;
+using Shrooms.Host.Contracts.Constants;
 
 namespace Shrooms.WebViewModels.Models.KudosTypes
 {

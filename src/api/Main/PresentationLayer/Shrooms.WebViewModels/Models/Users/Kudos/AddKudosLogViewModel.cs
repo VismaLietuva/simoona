@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Shrooms.Constants.EntityValidationValues;
+using Shrooms.Host.Contracts.Constants;
 
 namespace Shrooms.WebViewModels.Models.Users.Kudos
 {

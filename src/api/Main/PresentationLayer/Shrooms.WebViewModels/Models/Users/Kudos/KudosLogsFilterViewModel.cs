@@ -1,4 +1,4 @@
-﻿using Shrooms.Constants.BusinessLayer;
+﻿using Shrooms.Host.Contracts.Constants;
 
 namespace Shrooms.WebViewModels.Models.Users.Kudos
 {

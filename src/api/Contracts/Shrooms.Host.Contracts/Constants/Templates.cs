@@ -1,8 +1,8 @@
-﻿namespace Shrooms.Constants.BusinessLayer
+﻿namespace Shrooms.Host.Contracts.Constants
 {
-    public static class Templates
+    public static class EmailTemplates
     {
-        public const string DefautlActionButtonTitle = "Check out in Simoona";
+        public const string DefaultActionButtonTitle = "Check out in Simoona";
         public const string EventActionButtonTitle = "Visit event page";
         public const string ProjectActionButtonTitle = "Visit project page";
 

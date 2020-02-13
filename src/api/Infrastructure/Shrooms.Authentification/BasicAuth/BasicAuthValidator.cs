@@ -4,8 +4,8 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading;
 using Microsoft.Owin;
-using Shrooms.Constants.WebApi;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.Host.Contracts.Infrastructure;
 

@@ -1,8 +1,7 @@
 ﻿using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
-using Shrooms.Constants.DataLayer;
-using Shrooms.Constants.WebApi;
+using Shrooms.Host.Contracts.Constants;
 
 namespace Shrooms.API.Helpers
 {
@@ -51,12 +50,12 @@ namespace Shrooms.API.Helpers
                 return string.Empty;
             }
 
-            if (!claimsPrincipal.HasClaim(ConstDataLayer.ClaimUserImpersonation, true.ToString()))
+            if (!claimsPrincipal.HasClaim(DataLayerConstants.ClaimUserImpersonation, true.ToString()))
             {
                 return string.Empty;
             }
 
-            var originalUsernameClaim = claimsPrincipal.Claims.SingleOrDefault(c => c.Type == ConstDataLayer.ClaimOriginalUsername);
+            var originalUsernameClaim = claimsPrincipal.Claims.SingleOrDefault(c => c.Type == DataLayerConstants.ClaimOriginalUsername);
 
             if (originalUsernameClaim == null)
             {

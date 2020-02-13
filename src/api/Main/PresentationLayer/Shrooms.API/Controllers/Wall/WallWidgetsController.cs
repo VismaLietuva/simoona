@@ -4,7 +4,6 @@ using System.Web.Http;
 using AutoMapper;
 using Shrooms.API.Filters;
 using Shrooms.API.Helpers;
-using Shrooms.Constants.WebApi;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Birthdays;
 using Shrooms.DataTransferObjects.Models.Kudos;

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 
-namespace Shrooms.Constants.BusinessLayer
+namespace Shrooms.Host.Contracts.Constants
 {
     public static class BusinessLayerConstants
     {
@@ -21,15 +21,10 @@ namespace Shrooms.Constants.BusinessLayer
         public const string DeletedUserLastName = "Account";
 
         #region Walls
-        public enum WallsType
-        {
-            MyWalls = 1,
-            AllWalls
-        }
 
         #endregion
 
-        #region kudos
+        #region Kudos
         public const string KudosServiceCategory = "Kudos";
         public const string KudosServiceStatusDone = "Done";
         public const string KudosServiceStatusCancelled = "Cancelled";
@@ -42,15 +37,6 @@ namespace Shrooms.Constants.BusinessLayer
 
         public const string KudosLogExcelSheetName = "Kudos logs";
 
-        public enum KudosTypeEnum
-        {
-            Ordinary = 1,
-            Send,
-            Minus,
-            Other,
-            Welcome,
-            Refund
-        }
         #endregion
 
         #region ShroomsInfo
@@ -76,16 +62,6 @@ namespace Shrooms.Constants.BusinessLayer
         #endregion
 
         #region Lotteries
-        public enum LotteryStatus
-        {
-            Drafted = 1,
-            Started,
-            Deleted,
-            Ended,
-            RefundStarted,
-            RefundLogsCreated,
-            Refunded
-        }
 
         public const string LotteryParticipantsExcelTableName = "Lottery Participants";
         public const int LotteryParticipantsInRow = 4;

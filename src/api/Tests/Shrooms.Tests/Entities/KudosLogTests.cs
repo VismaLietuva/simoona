@@ -1,7 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
-using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models.Kudos;
+using Shrooms.Host.Contracts.Exceptions;
 
 namespace Shrooms.UnitTests.Entities
 {

@@ -6,10 +6,10 @@ using NUnit.Framework;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Monitors;
 using Shrooms.Domain.Services.Monitors;
-using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models.Monitors;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Exceptions;
 using Shrooms.UnitTests.Extensions;
 
 namespace Shrooms.UnitTests.DomainService

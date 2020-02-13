@@ -1,4 +1,6 @@
-﻿namespace Shrooms.DataTransferObjects.Models.Wall.Posts.Comments
+﻿using Shrooms.Host.Contracts.Enums;
+
+namespace Shrooms.DataTransferObjects.Models.Wall.Posts.Comments
 {
     public class CommentCreatedDTO
     {

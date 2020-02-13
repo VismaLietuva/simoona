@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Shrooms.DataTransferObjects.Models.Wall.Moderator;
+using Shrooms.Host.Contracts.Enums;
 
 namespace Shrooms.DataTransferObjects.Models.Wall
 {

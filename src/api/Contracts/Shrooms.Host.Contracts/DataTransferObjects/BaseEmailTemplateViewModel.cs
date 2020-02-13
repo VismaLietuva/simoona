@@ -1,4 +1,4 @@
-﻿namespace Shrooms.DataTransferObjects.EmailTemplateViewModels
+﻿namespace Shrooms.Host.Contracts.DataTransferObjects
 {
     public abstract class BaseEmailTemplateViewModel
     {

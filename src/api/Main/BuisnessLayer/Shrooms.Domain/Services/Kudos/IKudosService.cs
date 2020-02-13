@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.Enums;
 
 namespace Shrooms.Domain.Services.Kudos
 {
@@ -58,7 +58,7 @@ namespace Shrooms.Domain.Services.Kudos
 
         int GetKudosTypeId(string kudosTypeName);
 
-        int GetKudosTypeId(BusinessLayerConstants.KudosTypeEnum kudosType);
+        int GetKudosTypeId(KudosTypeEnum kudosType);
 
         IEnumerable<KudosBasicDataDTO> GetKudosStats(int months, int amount, int organizationId);
 

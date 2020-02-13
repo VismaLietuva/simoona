@@ -1,20 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Shrooms.Host.Contracts.Constants;
 
 namespace Shrooms.EntityModels.Models
 {
     public class Exam : BaseModelWithOrg
     {
-        public const int MaxTitleLength = 255;
-        public const int MaxNumberLength = 255;
-
         [Required]
-        [StringLength(MaxTitleLength)]
+        [StringLength(ValidationConstants.ExamMaxTitleLength)]
         [Index]
         public string Title { get; set; }
 
-        [StringLength(MaxNumberLength)]
+        [StringLength(ValidationConstants.ExamMaxNumberLength)]
         [Index]
         public string Number { get; set; }
 

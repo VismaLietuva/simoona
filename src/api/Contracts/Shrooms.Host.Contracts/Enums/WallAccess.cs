@@ -1,4 +1,4 @@
-﻿namespace Shrooms.DataTransferObjects.Models.Wall
+﻿namespace Shrooms.Host.Contracts.Enums
 {
     public enum WallAccess
     {

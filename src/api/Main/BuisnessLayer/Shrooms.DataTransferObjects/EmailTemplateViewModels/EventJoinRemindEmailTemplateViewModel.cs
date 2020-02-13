@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Shrooms.Host.Contracts.DataTransferObjects;
+
 namespace Shrooms.DataTransferObjects.EmailTemplateViewModels
 {
     public class EventJoinRemindEmailTemplateViewModel : BaseEmailTemplateViewModel

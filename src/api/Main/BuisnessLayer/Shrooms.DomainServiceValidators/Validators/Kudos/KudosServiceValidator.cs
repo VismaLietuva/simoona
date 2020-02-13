@@ -3,6 +3,7 @@ using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Kudos;
 using Shrooms.Host.Contracts.Constants;
+using Shrooms.Host.Contracts.Exceptions;
 
 namespace Shrooms.DomainServiceValidators.Validators.Kudos
 {

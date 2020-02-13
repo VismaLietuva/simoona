@@ -7,7 +7,6 @@ using System.Web.Http;
 using AutoMapper;
 using PagedList;
 using Shrooms.API.Filters;
-using Shrooms.Constants.WebApi;
 using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Shrooms.Constants.EntityValidationValues;
+using Shrooms.Host.Contracts.Constants;
 
 namespace Shrooms.EntityModels.Models.Multiwall
 {

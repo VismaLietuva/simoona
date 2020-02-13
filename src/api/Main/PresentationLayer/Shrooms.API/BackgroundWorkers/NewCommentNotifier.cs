@@ -3,12 +3,12 @@ using System.Linq;
 using AutoMapper;
 using Shrooms.API.Hubs;
 using Shrooms.DataTransferObjects.Models;
-using Shrooms.DataTransferObjects.Models.Notification;
 using Shrooms.DataTransferObjects.Models.Wall.Posts.Comments;
 using Shrooms.Domain.Services.Email.Posting;
 using Shrooms.Domain.Services.Notifications;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.Domain.Services.Wall.Posts;
+using Shrooms.Host.Contracts.Enums;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.WebViewModels.Models.Notifications;
 

@@ -268,10 +268,6 @@
       <Project>{d9c5606d-3855-44a0-bdb3-98d963d63fcf}</Project>
       <Name>Shrooms.Infrastructure</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Other\Shrooms.Constants\Shrooms.Constants.csproj">
-      <Project>{e07394b9-558c-4a70-9926-6400abb0fb5d}</Project>
-      <Name>Shrooms.Constants</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\Other\Shrooms.Resources\Shrooms.Resources.csproj">
       <Project>{c6fc692b-dfad-4ed5-86d5-8000dbd06b02}</Project>
       <Name>Shrooms.Resources</Name>

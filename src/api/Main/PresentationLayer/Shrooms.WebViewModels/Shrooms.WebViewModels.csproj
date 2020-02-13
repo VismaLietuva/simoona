@@ -32,7 +32,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>..\..\..\shared.ruleset</CodeAnalysisRuleSet>	
+    <CodeAnalysisRuleSet>..\..\..\shared.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DataAnnotationsExtensions, Version=5.0.1.16, Culture=neutral, processorArchitecture=MSIL">
@@ -250,21 +250,13 @@
     <Analyzer Include="..\..\..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Other\Shrooms.Constants\Shrooms.Constants.csproj">
-      <Project>{e07394b9-558c-4a70-9926-6400abb0fb5d}</Project>
-      <Name>Shrooms.Constants</Name>
+    <ProjectReference Include="..\..\..\Contracts\Shrooms.Host.Contracts\Shrooms.Host.Contracts.csproj">
+      <Project>{e690ceb8-f266-441f-8a80-5a3440b3445a}</Project>
+      <Name>Shrooms.Host.Contracts</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Other\Shrooms.Resources\Shrooms.Resources.csproj">
       <Project>{c6fc692b-dfad-4ed5-86d5-8000dbd06b02}</Project>
       <Name>Shrooms.Resources</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\BuisnessLayer\Shrooms.DataTransferObjects\Shrooms.DataTransferObjects.csproj">
-      <Project>{6611930D-880E-455C-8681-E0E2A33CF5A9}</Project>
-      <Name>Shrooms.DataTransferObjects</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\DataLayer\Shrooms.DataLayer\Shrooms.DataLayer.csproj">
-      <Project>{affe7b8b-3294-4dd3-990d-7da5e256c987}</Project>
-      <Name>Shrooms.DataLayer</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\DataLayer\Shrooms.EntityModels\Shrooms.EntityModels.csproj">
       <Project>{8ad6f857-708c-4b5e-98bc-b3206e7dd918}</Project>

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using Shrooms.Constants.WebApi;
+using Shrooms.Host.Contracts.Constants;
 
 namespace Shrooms.WebViewModels.Models.User
 {

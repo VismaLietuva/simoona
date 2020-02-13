@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using Shrooms.DataTransferObjects.EmailTemplateViewModels;
-using Shrooms.DataTransferObjects.Models.Emails;
-using Shrooms.DataTransferObjects.Models.Wall;
 using Shrooms.DataTransferObjects.Models.Wall.Posts.Comments;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.UserService;
 using Shrooms.Domain.Services.Wall.Posts;
-using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.DataTransferObjects;
+using Shrooms.Host.Contracts.Enums;
+using Shrooms.Host.Contracts.Exceptions;
 using Shrooms.Host.Contracts.Infrastructure;
 using Shrooms.Host.Contracts.Infrastructure.Email;
 using Shrooms.Resources.Emails;
@@ -77,13 +77,13 @@ namespace Shrooms.Domain.Services.Email.Posting
             var body = _markdownConverter.ConvertToHtml(comment.MessageBody);
 
             var emailTemplateViewModel = new NewCommentEmailTemplateViewModel(
-                string.Format(Constants.BusinessLayer.Templates.PostCommentTitle, CutMessage(comment.Post.MessageBody)),
+                string.Format(EmailTemplates.PostCommentTitle, CutMessage(comment.Post.MessageBody)),
                 authorPictureUrl,
                 commentCreator.FullName,
                 postLink,
                 body,
                 userNotificationSettingsUrl,
-                Constants.BusinessLayer.Templates.DefautlActionButtonTitle);
+                EmailTemplates.DefaultActionButtonTitle);
 
             var content = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.NewPostComment);
             var emailData = new EmailDto(destinationEmails, subject, content);

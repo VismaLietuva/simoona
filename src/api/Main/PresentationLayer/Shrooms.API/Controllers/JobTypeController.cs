@@ -5,8 +5,8 @@ using AutoMapper;
 using Shrooms.API.Filters;
 using Shrooms.DataTransferObjects.Models.Jobs;
 using Shrooms.Domain.Services.Jobs;
-using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.Host.Contracts.Constants;
+using Shrooms.Host.Contracts.Exceptions;
 using Shrooms.WebViewModels.Models.Jobs;
 
 namespace Shrooms.API.Controllers

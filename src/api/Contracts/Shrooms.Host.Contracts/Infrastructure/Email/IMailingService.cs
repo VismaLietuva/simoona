@@ -1,4 +1,4 @@
-﻿using Shrooms.DataTransferObjects.Models.Emails;
+﻿using Shrooms.Host.Contracts.DataTransferObjects;
 
 namespace Shrooms.Host.Contracts.Infrastructure.Email
 {

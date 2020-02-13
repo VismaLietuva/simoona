@@ -9,7 +9,7 @@ using System.Web.Http.Hosting;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.API.Controllers;
-using Shrooms.Constants.WebApi;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.UnitTests.Mocks;
 using Shrooms.UnitTests.ModelMappings;

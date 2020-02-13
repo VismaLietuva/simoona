@@ -1,5 +1,4 @@
-﻿using Shrooms.Constants.Authorization;
-using Shrooms.DataLayer.DAL;
+﻿using Shrooms.DataLayer.DAL;
 using Shrooms.Host.Contracts.Constants;
 
 namespace Shrooms.DataLayer.Migrations.DataInitializer

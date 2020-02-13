@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Shrooms.Constants.EntityValidationValues;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.WebViewModels.ValidationAttributes;
 
 namespace Shrooms.WebViewModels.Models.Wall.Posts.Comments

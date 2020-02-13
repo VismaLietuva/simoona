@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 using Shrooms.DataTransferObjects.Models;
-using Shrooms.DataTransferObjects.Models.Wall;
+using Shrooms.Host.Contracts.Enums;
 using Shrooms.WebViewModels.Models.Notifications;
 
 namespace Shrooms.API.Hubs

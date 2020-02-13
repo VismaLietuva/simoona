@@ -55,7 +55,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Exceptions\ValidationException.cs" />
     <Compile Include="Exceptions\Book\BookException.cs" />
     <Compile Include="Exceptions\KudosBaskets\KudosBasketException.cs" />
     <Compile Include="Exceptions\Likes\LikeException.cs" />

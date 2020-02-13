@@ -1,4 +1,4 @@
-﻿namespace Shrooms.Infrastructure.CustomCache
+﻿namespace Shrooms.Host.Contracts.Infrastructure
 {
     public interface ICustomCache<TKey, TValue>
     {

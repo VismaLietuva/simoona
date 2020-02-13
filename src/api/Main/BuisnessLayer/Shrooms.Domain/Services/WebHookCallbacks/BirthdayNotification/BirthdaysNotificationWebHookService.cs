@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using Shrooms.DataTransferObjects.EmailTemplateViewModels;
-using Shrooms.DataTransferObjects.Models.Emails;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.DataTransferObjects;
 using Shrooms.Host.Contracts.Infrastructure;
 using Shrooms.Host.Contracts.Infrastructure.Email;
 

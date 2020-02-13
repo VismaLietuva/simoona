@@ -5,6 +5,7 @@ using Shrooms.API.Filters;
 using Shrooms.DataTransferObjects.Models.Monitors;
 using Shrooms.Domain.Services.Monitors;
 using Shrooms.Host.Contracts.Constants;
+using Shrooms.Host.Contracts.Exceptions;
 using Shrooms.WebViewModels.Models.Monitors;
 
 namespace Shrooms.API.Controllers.Monitor
@@ -44,7 +45,7 @@ namespace Shrooms.API.Controllers.Monitor
                 var monitorViewModel = _mapper.Map<MonitorDTO, MonitorViewModel>(monitorDTO);
                 return Ok(monitorViewModel);
             }
-            catch (DomainExceptions.Exceptions.ValidationException e)
+            catch (ValidationException e)
             {
                 return BadRequestWithError(e);
             }
@@ -65,7 +66,7 @@ namespace Shrooms.API.Controllers.Monitor
             {
                 _monitorService.CreateMonitor(newMonitorDTO, GetUserAndOrganization());
             }
-            catch (DomainExceptions.Exceptions.ValidationException e)
+            catch (ValidationException e)
             {
                 return BadRequestWithError(e);
             }
@@ -88,7 +89,7 @@ namespace Shrooms.API.Controllers.Monitor
             {
                 _monitorService.UpdateMonitor(monitorDTO, GetUserAndOrganization());
             }
-            catch (DomainExceptions.Exceptions.ValidationException e)
+            catch (ValidationException e)
             {
                 return BadRequestWithError(e);
             }

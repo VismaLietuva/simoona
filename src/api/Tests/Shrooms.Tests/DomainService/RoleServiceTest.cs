@@ -4,12 +4,12 @@ using System.Linq;
 using Microsoft.AspNet.Identity.EntityFramework;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Permissions;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
 using Shrooms.UnitTests.Extensions;
 
@@ -70,8 +70,8 @@ namespace Shrooms.UnitTests.DomainService
 
             Assert.AreEqual("Test1", roles.Name);
             Assert.AreEqual(3, roles.Permissions.Count());
-            Assert.AreEqual(Scopes.Basic, roles.Permissions.ToArray()[0].ActiveScope);
-            Assert.AreEqual(Scopes.Administration, roles.Permissions.ToArray()[1].ActiveScope);
+            Assert.AreEqual(PermissionScopes.Basic, roles.Permissions.ToArray()[0].ActiveScope);
+            Assert.AreEqual(PermissionScopes.Administration, roles.Permissions.ToArray()[1].ActiveScope);
             Assert.AreEqual("", roles.Permissions.ToArray()[2].ActiveScope);
             Assert.AreEqual(2, roles.Users.Count());
             Assert.AreEqual("first1 last1", roles.Users.ToArray()[0].FullName);
@@ -155,12 +155,12 @@ namespace Shrooms.UnitTests.DomainService
                     new PermissionDTO
                     {
                         Name = "PERMISSION1_BASIC",
-                        Scope = Scopes.Basic
+                        Scope = PermissionScopes.Basic
                     },
                     new PermissionDTO
                     {
                         Name = "PERMISSION2_ADMIN",
-                        Scope = Scopes.Administration
+                        Scope = PermissionScopes.Administration
                     }
                 });
 

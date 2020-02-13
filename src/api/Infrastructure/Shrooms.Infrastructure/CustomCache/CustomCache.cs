@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using Shrooms.Host.Contracts.Infrastructure;
 
 namespace Shrooms.Infrastructure.CustomCache
 {

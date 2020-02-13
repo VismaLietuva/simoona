@@ -4,12 +4,12 @@ using System.Linq;
 using Microsoft.AspNet.Identity.EntityFramework;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
-using Shrooms.Infrastructure.CustomCache;
+using Shrooms.Host.Contracts.Infrastructure;
 using Shrooms.UnitTests.Extensions;
 
 namespace Shrooms.UnitTests.DomainService
@@ -189,7 +189,7 @@ namespace Shrooms.UnitTests.DomainService
                 {
                     Id = 1,
                     Name = "TEST1_BASIC",
-                    Scope = Scopes.Basic,
+                    Scope = PermissionScopes.Basic,
                     ModuleId = 1,
                     Module = new Module()
                     {
@@ -251,7 +251,7 @@ namespace Shrooms.UnitTests.DomainService
                 {
                     Id = 1,
                     Name = "TEST1_BASIC",
-                    Scope = Scopes.Basic,
+                    Scope = PermissionScopes.Basic,
                     ModuleId = 1,
                     Module = new Module()
                     {
@@ -267,7 +267,7 @@ namespace Shrooms.UnitTests.DomainService
                 {
                     Id = 2,
                     Name = "TEST1_ADMIN",
-                    Scope = Scopes.Administration,
+                    Scope = PermissionScopes.Administration,
                     ModuleId = 1,
                     Module = new Module()
                     {
@@ -282,7 +282,7 @@ namespace Shrooms.UnitTests.DomainService
                 {
                     Id = 3,
                     Name = "TEST2_BASIC",
-                    Scope = Scopes.Basic,
+                    Scope = PermissionScopes.Basic,
                     Roles = new List<ApplicationRole>
                     {
                         adminRole,
@@ -293,7 +293,7 @@ namespace Shrooms.UnitTests.DomainService
                 {
                     Id = 4,
                     Name = "TEST2_ADMIN",
-                    Scope = Scopes.Administration,
+                    Scope = PermissionScopes.Administration,
                     Roles = new List<ApplicationRole>
                     {
                         adminRole
@@ -303,7 +303,7 @@ namespace Shrooms.UnitTests.DomainService
                 {
                     Id = 5,
                     Name = "TEST3_BASIC",
-                    Scope = Scopes.Basic,
+                    Scope = PermissionScopes.Basic,
                     ModuleId = 1,
                     Module = new Module()
                     {
@@ -319,7 +319,7 @@ namespace Shrooms.UnitTests.DomainService
                 {
                     Id = 6,
                     Name = "TEST3_ADMIN",
-                    Scope = Scopes.Administration,
+                    Scope = PermissionScopes.Administration,
                     ModuleId = 1,
                     Module = new Module()
                     {

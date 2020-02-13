@@ -3,10 +3,10 @@ using System.Data.Entity;
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.DomainServiceValidators.Validators.Wall;
 using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Exceptions;
 using Shrooms.UnitTests.Extensions;
 
 namespace Shrooms.UnitTests.DomainService

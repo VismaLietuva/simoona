@@ -70,7 +70,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EmailTemplateViewModels\BaseEmailTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\BirthdaysNotificationEmployeeViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\BirthdaysNotificationTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\BookReminderEmailTemplateViewModel.cs" />
@@ -99,7 +98,6 @@
     <Compile Include="Models\ApplicationUserMinimalViewModelDto.cs" />
     <Compile Include="Models\Birthdays\BirthdayDTO.cs" />
     <Compile Include="Models\Birthdays\UserBirthdayInfoDTO.cs" />
-    <Compile Include="Models\Emails\EmailDto.cs" />
     <Compile Include="Models\Emails\EmailSendingDTO.cs" />
     <Compile Include="Models\ExternalLinks\AddEditDeleteExternalLinkDTO.cs" />
     <Compile Include="Models\ExternalLinks\ExternalLinkDTO.cs" />
@@ -107,7 +105,6 @@
     <Compile Include="Models\Jobs\JobTypeDTO.cs" />
     <Compile Include="Models\Kudos\WelcomeKudosDTO.cs" />
     <Compile Include="Models\Notification\NotificationDto.cs" />
-    <Compile Include="Models\Notification\NotificationType.cs" />
     <Compile Include="Models\Notification\SourcesDto.cs" />
     <Compile Include="Models\Projects\ProjectDetailsDto.cs" />
     <Compile Include="Models\Kudos\NewKudosTypeDto.cs" />
@@ -164,9 +161,7 @@
     <Compile Include="Models\WallPosts\UserDTO.cs" />
     <Compile Include="Models\Wall\Moderator\ModeratorDto.cs" />
     <Compile Include="Models\Wall\UpdateWallDto.cs" />
-    <Compile Include="Models\Wall\WallAccess.cs" />
     <Compile Include="Models\Wall\WallsListFilter.cs" />
-    <Compile Include="Models\Wall\WallType.cs" />
     <Compile Include="Models\Wall\WallUserAction.cs" />
     <Compile Include="Models\Wall\Posts\Comments\CommentCreatedDTO.cs" />
     <Compile Include="Models\Wall\CreateWallDto.cs" />
@@ -193,9 +188,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Other\Shrooms.Constants\Shrooms.Constants.csproj">
-      <Project>{e07394b9-558c-4a70-9926-6400abb0fb5d}</Project>
-      <Name>Shrooms.Constants</Name>
+    <ProjectReference Include="..\..\..\Contracts\Shrooms.Host.Contracts\Shrooms.Host.Contracts.csproj">
+      <Project>{e690ceb8-f266-441f-8a80-5a3440b3445a}</Project>
+      <Name>Shrooms.Host.Contracts</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

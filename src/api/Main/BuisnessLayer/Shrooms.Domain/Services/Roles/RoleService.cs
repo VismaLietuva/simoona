@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
-using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Permissions;
 using Shrooms.DataTransferObjects.Models.Roles;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.EntityModels.Models;
+using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
 
 namespace Shrooms.Domain.Services.Roles
@@ -122,10 +122,10 @@ namespace Shrooms.Domain.Services.Roles
                 .Select(x => new PermissionGroupDTO
                 {
                     Name = x.Name,
-                    ActiveScope = rolePermissions.Any(y => y.Name.StartsWith(x.Name, StringComparison.OrdinalIgnoreCase) && y.Scope == Scopes.Administration)
-                                  ? Scopes.Administration
-                                  : (rolePermissions.Any(y => y.Name.StartsWith(x.Name, StringComparison.OrdinalIgnoreCase) && y.Scope == Scopes.Basic)
-                                        ? Scopes.Basic : string.Empty)
+                    ActiveScope = rolePermissions.Any(y => y.Name.StartsWith(x.Name, StringComparison.OrdinalIgnoreCase) && y.Scope == PermissionScopes.Administration)
+                                  ? PermissionScopes.Administration
+                                  : (rolePermissions.Any(y => y.Name.StartsWith(x.Name, StringComparison.OrdinalIgnoreCase) && y.Scope == PermissionScopes.Basic)
+                                        ? PermissionScopes.Basic : string.Empty)
                 })
                 .ToList();
 

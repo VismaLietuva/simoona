@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using Shrooms.Constants.EntityValidationValues;
+using Shrooms.Host.Contracts.Constants;
 
 namespace Shrooms.EntityModels.Models.Lottery
 {
