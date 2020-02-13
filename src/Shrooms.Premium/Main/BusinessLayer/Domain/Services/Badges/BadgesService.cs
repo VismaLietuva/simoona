@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
-using Shrooms.Constants.BusinessLayer;
-using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Badges;
 using Shrooms.EntityModels.Models.Kudos;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Enums;
+using Shrooms.Host.Contracts.Exceptions;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Badges
 {
@@ -226,7 +226,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Badges
                 users = await _kudosLogsDbSet.Where(x => x.Status == KudosStatus.Approved
                                                          && x.Modified > oneDayAgo
                                                          && !string.IsNullOrEmpty(x.EmployeeId)
-                                                         && x.KudosSystemType != BusinessLayerConstants.KudosTypeEnum.Minus)
+                                                         && x.KudosSystemType != KudosTypeEnum.Minus)
                                              .Select(x => x.Employee)
                                              .Include(x => x.BadgeLogs.Select(y => y.BadgeType))
                                              .Distinct(new EmployeeComparer())
@@ -239,7 +239,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Badges
                 var userId = user.Id;
                 var userKudosLogs = await _kudosLogsDbSet.Where(x => x.EmployeeId == userId
                                                                   && x.Status == KudosStatus.Approved
-                                                                  && x.KudosSystemType != BusinessLayerConstants.KudosTypeEnum.Minus)
+                                                                  && x.KudosSystemType != KudosTypeEnum.Minus)
                                                          .AsNoTracking()
                                                          .ToListAsync();
 

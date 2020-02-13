@@ -24,6 +24,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Export
             _eventUtilitiesService = eventUtilitiesService;
             _excelBuilder = excelBuilder;
         }
+
         public byte[] ExportOptionsAndParticipants(Guid eventId, UserAndOrganizationDTO userAndOrg)
         {
             var participants = _eventParticipationService
@@ -51,10 +52,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Export
                 Resources.Models.Events.Events.Count
             };
 
-            _excelBuilder.AddNewWorksheet(
-                BusinessLayerConstants.EventOptionsExcelTableName,
-                header,
-                options);
+            _excelBuilder.AddNewWorksheet(EventsConstants.EventOptionsExcelTableName, header, options);
         }
 
         private void AddParticipants(IEnumerable<List<string>> participants)
@@ -65,10 +63,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Export
                 Resources.Models.ApplicationUser.ApplicationUser.LastName
             };
 
-            _excelBuilder.AddNewWorksheet(
-                BusinessLayerConstants.EventParticipantsExcelTableName,
-                header,
-                participants);
+            _excelBuilder.AddNewWorksheet(EventsConstants.EventParticipantsExcelTableName, header, participants);
         }
     }
 }

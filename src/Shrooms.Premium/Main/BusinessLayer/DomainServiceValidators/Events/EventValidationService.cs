@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Shrooms.Constants.BusinessLayer.Events;
-using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models.Events;
 using Shrooms.Host.Contracts.Constants;
+using Shrooms.Host.Contracts.Enums;
+using Shrooms.Host.Contracts.Exceptions;
 using Shrooms.Host.Contracts.Infrastructure;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events;
@@ -143,7 +143,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.DomainServiceValidators.Events
 
         public void CheckIfCreatingEventHasInsufficientOptions(int maxChoices, int optionsCount)
         {
-            if (optionsCount != 0 && (maxChoices > optionsCount || optionsCount < BusinessLayerConstants.EventOptionsMinimumCount))
+            if (optionsCount != 0 && (maxChoices > optionsCount || optionsCount < EventsConstants.EventOptionsMinimumCount))
             {
                 throw new EventException(PremiumErrorCodes.EventInsufficientOptionsCode);
             }
@@ -167,7 +167,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.DomainServiceValidators.Events
 
         public void CheckIfAttendStatusIsValid(int status)
         {
-            if (!Enum.IsDefined(typeof(BusinessLayerConstants.AttendingStatus), status))
+            if (!Enum.IsDefined(typeof(AttendingStatus), status))
             {
                 throw new EventException(PremiumErrorCodes.EventWrongAttendStatus);
             }

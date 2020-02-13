@@ -9,7 +9,6 @@ using Shrooms.API.Controllers;
 using Shrooms.API.Filters;
 using Shrooms.DataTransferObjects.Models.Wall.Posts;
 using Shrooms.Domain.Services.Wall.Posts;
-using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.OfficeMap;
@@ -26,6 +25,7 @@ using Shrooms.WebViewModels.Models.Wall.Posts;
 using Shrooms.Infrastructure.FireAndForget;
 using System.Linq;
 using Newtonsoft.Json;
+using Shrooms.Host.Contracts.Exceptions;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Calendar;
 using Shrooms.Premium.Main.PresentationLayer.API.BackgroundWorkers;
 

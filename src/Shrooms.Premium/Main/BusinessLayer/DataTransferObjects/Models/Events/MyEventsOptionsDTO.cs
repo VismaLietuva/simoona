@@ -6,6 +6,6 @@ namespace Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events
     public class MyEventsOptionsDTO : UserAndOrganizationDTO
     {
         public string SearchString { get; set; }
-        public BusinessLayerConstants.MyEventsOptions Filter { get; set; }
+        public MyEventsOptions Filter { get; set; }
     }
 }

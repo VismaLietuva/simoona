@@ -6,13 +6,13 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AutoMapper;
 using PagedList;
-using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.UserService;
 using Shrooms.EntityModels.Models.Lottery;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Enums;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Lotteries;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Args;
@@ -56,8 +56,8 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Lotteries
                 throw new LotteryException("Invalid entry fee.");
             }
 
-            if (newLotteryDTO.Status != (int)BusinessLayerConstants.LotteryStatus.Started &&
-                newLotteryDTO.Status != (int)BusinessLayerConstants.LotteryStatus.Drafted)
+            if (newLotteryDTO.Status != (int)LotteryStatus.Started &&
+                newLotteryDTO.Status != (int)LotteryStatus.Drafted)
             {
                 throw new LotteryException("Invalid status of created lottery.");
             }
@@ -76,7 +76,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Lotteries
         {
             var lottery = _lotteriesDbSet.Find(lotteryDTO.Id);
 
-            if (lottery.Status != (int)BusinessLayerConstants.LotteryStatus.Drafted)
+            if (lottery.Status != (int)LotteryStatus.Drafted)
             {
                 throw new LotteryException("Editing is forbidden for not drafted lottery.");
             }
@@ -90,7 +90,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Lotteries
         {
             var lottery = _lotteriesDbSet.Find(lotteryDTO.Id);
 
-            if (lottery.Status != (int)BusinessLayerConstants.LotteryStatus.Started)
+            if (lottery.Status != (int)LotteryStatus.Started)
             {
                 throw new LotteryException("Lottery is not running.");
             }
@@ -126,21 +126,21 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Lotteries
                 return false;
             }
 
-            if (lottery.Status == (int)BusinessLayerConstants.LotteryStatus.Started)
+            if (lottery.Status == (int)LotteryStatus.Started)
             {
-                lottery.Status = (int)BusinessLayerConstants.LotteryStatus.RefundStarted;
+                lottery.Status = (int)LotteryStatus.RefundStarted;
                 _uow.SaveChanges();
 
                 _asyncRunner.Run<ILotteryAbortJob>(n => n.RefundLottery(lottery.Id, userOrg), _uow.ConnectionName);
             }
-            else if (lottery.Status == (int)BusinessLayerConstants.LotteryStatus.Drafted)
+            else if (lottery.Status == (int)LotteryStatus.Drafted)
             {
-                lottery.Status = (int)BusinessLayerConstants.LotteryStatus.Deleted;
+                lottery.Status = (int)LotteryStatus.Deleted;
                 _uow.SaveChanges();
             }
 
-            return lottery.Status == (int)BusinessLayerConstants.LotteryStatus.Deleted ||
-                   lottery.Status == (int)BusinessLayerConstants.LotteryStatus.RefundStarted;
+            return lottery.Status == (int)LotteryStatus.Deleted ||
+                   lottery.Status == (int)LotteryStatus.RefundStarted;
         }
 
         public void RefundParticipants(int lotteryId, UserAndOrganizationDTO userOrg)
@@ -187,7 +187,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Lotteries
                 return;
             }
 
-            lottery.Status = (int)BusinessLayerConstants.LotteryStatus.Ended;
+            lottery.Status = (int)LotteryStatus.Ended;
 
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
@@ -229,7 +229,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Lotteries
                 .Where(x => x.Title.Contains(filter))
                 .Select(MapLotteriesToListItemDto)
                 .OrderByDescending(x => x.RefundFailed)
-                .ThenByDescending(x => x.Status == (int)BusinessLayerConstants.LotteryStatus.Started || x.Status == (int)BusinessLayerConstants.LotteryStatus.Drafted)
+                .ThenByDescending(x => x.Status == (int)LotteryStatus.Started || x.Status == (int)LotteryStatus.Drafted)
                 .ThenByDescending(_byEndDate);
         }
 
@@ -280,7 +280,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Lotteries
             var kudosLogDTO = new AddKudosLogDTO
             {
                 ReceivingUserIds = new List<string> { userOrg.UserId },
-                PointsTypeId = _kudosService.GetKudosTypeId(BusinessLayerConstants.KudosTypeEnum.Minus),
+                PointsTypeId = _kudosService.GetKudosTypeId(KudosTypeEnum.Minus),
                 MultiplyBy = lotteryTicketDTO.Tickets * lotteryDetails.EntryFee,
                 Comment = $"{lotteryTicketDTO.Tickets} ticket(s) for lottery {lotteryDetails.Title}",
                 UserId = userOrg.UserId,
@@ -291,7 +291,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Lotteries
 
             if (applicationUser.RemainingKudos < 0)
             {
-                kudosLogDTO.PointsTypeId = _kudosService.GetKudosTypeId(BusinessLayerConstants.KudosTypeEnum.Refund);
+                kudosLogDTO.PointsTypeId = _kudosService.GetKudosTypeId(KudosTypeEnum.Refund);
                 _kudosService.AddRefundKudosLogs(new List<AddKudosLogDTO> { kudosLogDTO });
             }
             else
@@ -311,7 +311,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Lotteries
             return _lotteriesDbSet.
                 Where(p =>
                     p.OrganizationId == userAndOrganization.OrganizationId &&
-                    p.Status == (int)BusinessLayerConstants.LotteryStatus.Started &&
+                    p.Status == (int)LotteryStatus.Started &&
                     p.EndDate > DateTime.UtcNow)
                 .Select(MapLotteriesToListItemDto)
                 .OrderBy(_byEndDate);

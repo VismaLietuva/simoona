@@ -15,6 +15,7 @@ using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Events;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Enums;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Participation;
@@ -117,9 +118,9 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events
                 .Select(p => p.Name)
                 .ToList();
             _eventValidationService.CheckIfEventExists(@event);
-            @event.IsFull = @event.Participants.Count(p => p.AttendStatus == (int)BusinessLayerConstants.AttendingStatus.Attending) >= @event.MaxParticipants;
+            @event.IsFull = @event.Participants.Count(p => p.AttendStatus == (int)AttendingStatus.Attending) >= @event.MaxParticipants;
             var participating = @event.Participants.FirstOrDefault(p => p.UserId == userOrg.UserId);
-            @event.ParticipatingStatus = participating?.AttendStatus ?? (int)BusinessLayerConstants.AttendingStatus.Idle;
+            @event.ParticipatingStatus = participating?.AttendStatus ?? (int)AttendingStatus.Idle;
             return @event;
         }
 
@@ -419,7 +420,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events
                     Id = o.Id,
                     Name = o.Option,
                     Participants = o.EventParticipants
-                        .Where(x => x.EventId == eventId && x.AttendStatus == (int)BusinessLayerConstants.AttendingStatus.Attending)
+                        .Where(x => x.EventId == eventId && x.AttendStatus == (int)AttendingStatus.Attending)
                         .Select(p => new EventDetailsParticipantDTO
                         {
                             Id = p.Id,

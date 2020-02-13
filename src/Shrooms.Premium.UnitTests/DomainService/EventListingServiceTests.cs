@@ -95,7 +95,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
                 OrganizationId = 2,
                 UserId = "testUser1",
                 SearchString = null,
-                Filter = BusinessLayerConstants.MyEventsOptions.Participant
+                Filter = MyEventsOptions.Participant
             };
 
             var result = _eventListingService.GetMyEvents(myEventsOptions).ToList();
@@ -113,7 +113,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
                 OrganizationId = 2,
                 UserId = "responsibleUserId2",
                 SearchString = null,
-                Filter = BusinessLayerConstants.MyEventsOptions.Host
+                Filter = MyEventsOptions.Host
             };
 
             var result = _eventListingService.GetMyEvents(myEventsOptions).ToList();

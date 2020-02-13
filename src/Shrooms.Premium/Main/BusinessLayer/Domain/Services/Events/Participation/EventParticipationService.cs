@@ -4,7 +4,6 @@ using System.Data.Entity;
 using System.Data.Entity.SqlServer;
 using System.Linq;
 using System.Linq.Expressions;
-using Shrooms.Constants.BusinessLayer.Events;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Permissions;
@@ -14,6 +13,7 @@ using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Events;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Enums;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events;
@@ -26,7 +26,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Participatio
 {
     public class EventParticipationService : IEventParticipationService
     {
-        private static object _multiUserJoinLock = new object();
+        private static readonly object _multiUserJoinLock = new object();
         private const string WeekOfYear = "wk";
 
         private readonly IUnitOfWork2 _uow;
@@ -284,7 +284,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Participatio
                 .Include(e => e.EventParticipants.Select(x => x.ApplicationUser))
                 .Where(e => e.Id == eventId
                             && e.OrganizationId == userAndOrg.OrganizationId
-                            && e.EventParticipants.Any(p => p.AttendStatus == (int)BusinessLayerConstants.AttendingStatus.Attending && p.ApplicationUserId == userAndOrg.UserId))
+                            && e.EventParticipants.Any(p => p.AttendStatus == (int)AttendingStatus.Attending && p.ApplicationUserId == userAndOrg.UserId))
                 .Select(MapEventToParticipantDto())
                 .SingleOrDefault();
 
@@ -391,7 +391,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Participatio
             e => new EventJoinValidationDTO
             {
                 Participants = e.EventParticipants
-                    .Where(x => x.AttendStatus == (int)BusinessLayerConstants.AttendingStatus.Attending)
+                    .Where(x => x.AttendStatus == (int)AttendingStatus.Attending)
                     .Select(x => x.ApplicationUserId)
                     .ToList(),
                 MaxParticipants = e.MaxParticipants,
@@ -429,7 +429,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Participatio
                     SqlFunctions.DatePart(WeekOfYear, e.StartDate) == SqlFunctions.DatePart(WeekOfYear, validationDTO.StartDate) &&
                     e.StartDate.Year == validationDTO.StartDate.Year &&
                     e.EventParticipants.Any(p => p.ApplicationUserId == userId &&
-                                                 p.AttendStatus == (int)BusinessLayerConstants.AttendingStatus.Attending));
+                                                 p.AttendStatus == (int)AttendingStatus.Attending));
 
             query = string.IsNullOrEmpty(validationDTO.SingleJoinGroupName) ?
                         query.Where(x => x.EventType.Id == validationDTO.EventTypeId) :
@@ -461,7 +461,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Participatio
                     ModifiedBy = userId,
                     EventOptions = eventOptions,
                     AttendComment = string.Empty,
-                    AttendStatus = (int)BusinessLayerConstants.AttendingStatus.Attending
+                    AttendStatus = (int)AttendingStatus.Attending
                 };
                 _eventParticipantsDbSet.Add(newParticipant);
             }
@@ -470,7 +470,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Participatio
                 participant.Modified = timeStamp;
                 participant.ModifiedBy = userId;
                 participant.EventOptions = eventOptions;
-                participant.AttendStatus = (int)BusinessLayerConstants.AttendingStatus.Attending;
+                participant.AttendStatus = (int)AttendingStatus.Attending;
                 participant.AttendComment = string.Empty;
             }
         }

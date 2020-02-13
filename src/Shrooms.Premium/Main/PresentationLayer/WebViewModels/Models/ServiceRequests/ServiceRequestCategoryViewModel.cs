@@ -11,7 +11,7 @@ namespace Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.ServiceReq
         public int Id { get; set; }
 
         [Required]
-        [StringLength(WebApiConstants.ServiceRequestCategoryNameMaxLength, MinimumLength = 1)]
+        [StringLength(ServiceRequestConstants.ServiceRequestCategoryNameMaxLength, MinimumLength = 1)]
         public string Name { get; set; }
 
         public bool IsNecessary { get; set; }

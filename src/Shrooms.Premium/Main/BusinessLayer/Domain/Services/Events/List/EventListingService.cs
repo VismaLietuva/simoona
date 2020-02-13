@@ -1,5 +1,4 @@
-﻿using Shrooms.Constants.BusinessLayer.Events;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -7,6 +6,7 @@ using System.Linq.Expressions;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.EntityModels.Models.Events;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Enums;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Main.BusinessLayer.DomainServiceValidators.Events;
@@ -17,11 +17,11 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.List
     {
         private const string OutsideOffice = "[]";
 
-        private static readonly Dictionary<BusinessLayerConstants.MyEventsOptions, Func<string, Expression<Func<Event, bool>>>>
-            _eventFilters = new Dictionary<BusinessLayerConstants.MyEventsOptions, Func<string, Expression<Func<Event, bool>>>>
+        private static readonly Dictionary<MyEventsOptions, Func<string, Expression<Func<Event, bool>>>>
+            _eventFilters = new Dictionary<MyEventsOptions, Func<string, Expression<Func<Event, bool>>>>
             {
-                { BusinessLayerConstants.MyEventsOptions.Host, MyEventsAsMasterFilter },
-                { BusinessLayerConstants.MyEventsOptions.Participant, MyEventsAsParticipantFilter }
+                { MyEventsOptions.Host, MyEventsAsMasterFilter },
+                { MyEventsOptions.Participant, MyEventsAsParticipantFilter }
             };
 
         private readonly IEventValidationService _eventValidationService;
@@ -140,11 +140,11 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.List
                 StartDate = e.StartDate,
                 EndDate = e.EndDate,
                 RegistrationDeadlineDate = e.RegistrationDeadline,
-                ParticipantsCount = e.EventParticipants.Count(p => p.AttendStatus == (int)BusinessLayerConstants.AttendingStatus.Attending),
+                ParticipantsCount = e.EventParticipants.Count(p => p.AttendStatus == (int)AttendingStatus.Attending),
                 IsCreator = e.ResponsibleUserId == userId,
                 ParticipatingStatus = e.EventParticipants.FirstOrDefault(p => p.ApplicationUserId == userId) != null ?
                                           e.EventParticipants.FirstOrDefault(p => p.ApplicationUserId == userId).AttendStatus :
-                                          (int)BusinessLayerConstants.AttendingStatus.Idle,
+                                          (int)AttendingStatus.Idle,
                 MaxChoices = e.MaxChoices,
             };
         }

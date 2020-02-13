@@ -7,11 +7,11 @@ using MoreLinq;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.Domain.ServiceExceptions;
 using Shrooms.Infrastructure.FireAndForget;
-using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Committee;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Exceptions;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Committees;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.Committee;
 

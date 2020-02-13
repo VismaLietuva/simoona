@@ -7,6 +7,7 @@ using Shrooms.DataTransferObjects.Models.Wall;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.EntityModels.Models.Events;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Enums;
 using Shrooms.Host.Contracts.Infrastructure;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.WebHookCallbacks.Events

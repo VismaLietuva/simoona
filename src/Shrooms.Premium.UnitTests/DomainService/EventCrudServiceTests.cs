@@ -22,6 +22,7 @@ using Shrooms.Premium.Main.BusinessLayer.DomainExceptions.Event;
 using Shrooms.Premium.Main.BusinessLayer.DomainServiceValidators.Events;
 using Shrooms.UnitTests.Extensions;
 using Shrooms.Domain.Helpers;
+using Shrooms.Host.Contracts.Enums;
 
 namespace Shrooms.Premium.UnitTests.DomainService
 {

@@ -5,7 +5,6 @@ using AutoMapper;
 using Shrooms.API.Controllers;
 using Shrooms.API.Filters;
 using Shrooms.API.Helpers;
-using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.LazyPaged;
 using Shrooms.DomainExceptions.Exceptions.Book;

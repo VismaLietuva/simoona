@@ -8,7 +8,7 @@ namespace Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.ServiceReq
     public class ServiceRequestCategoryCreateViewModel
     {
         [Required]
-        [StringLength(WebApiConstants.ServiceRequestCategoryNameMaxLength, MinimumLength = 1)]
+        [StringLength(ServiceRequestConstants.ServiceRequestCategoryNameMaxLength, MinimumLength = 1)]
         public string Name { get; set; }
 
         public ICollection<ApplicationUserViewModel> Assignees { get; set; }

@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Notification;
-using Shrooms.DataTransferObjects.Models.Wall;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.EntityModels.Models.Multiwall;
 using Shrooms.EntityModels.Models.Notifications;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Enums;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Notifications

@@ -9,7 +9,7 @@ namespace Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.KudosShop
         public int Id { get; set; }
 
         [Required]
-        [StringLength(WebApiConstants.KudosTypeNameMaxLength, MinimumLength = 1)]
+        [StringLength(KudosShopConstants.KudosTypeNameMaxLength, MinimumLength = 1)]
         public string Name { get; set; }
 
         [Required]

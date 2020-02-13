@@ -40,7 +40,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Users
             var weekAfter = now.AddDays(7);
 
             var usersToDiscard = _eventParticipantsDb
-                .Where(x => x.AttendStatus == (int)BusinessLayerConstants.AttendingStatus.Attending &&
+                .Where(x => x.AttendStatus == (int)AttendingStatus.Attending &&
                             eventTypeIds.Contains(x.Event.EventTypeId) &&
                             SqlFunctions.DatePart("wk", x.Event.StartDate) == SqlFunctions.DatePart("wk", now) &&
                             x.Event.StartDate > now && x.Event.StartDate < weekAfter)

@@ -9,7 +9,7 @@ namespace Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Events
     public class CreateEventViewModel
     {
         [Required]
-        [StringLength(WebApiConstants.EventNameMaxLength)]
+        [StringLength(EventsConstants.EventNameMaxLength)]
         public string Name { get; set; }
 
         [Required]
@@ -34,17 +34,17 @@ namespace Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Events
         public bool IsPinned { get; set; }
 
         [Required]
-        [StringLength(WebApiConstants.EventLocationMaxLength)]
+        [StringLength(EventsConstants.EventLocationMaxLength)]
         public string Location { get; set; }
 
-        [StringLength(WebApiConstants.EventDescriptionMaxLength)]
+        [StringLength(EventsConstants.EventDescriptionMaxLength)]
         public string Description { get; set; }
 
         [Required]
-        [Range(WebApiConstants.EventMinimumParticipants, WebApiConstants.EventMaxParticipants)]
+        [Range(EventsConstants.EventMinimumParticipants, EventsConstants.EventMaxParticipants)]
         public int MaxParticipants { get; set; }
 
-        [Range(WebApiConstants.EventMinimumOptions, short.MaxValue)]
+        [Range(EventsConstants.EventMinimumOptions, short.MaxValue)]
         public int MaxOptions { get; set; }
 
         [Required]

@@ -66,7 +66,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.ServiceRequests
                 Resources.Models.ServiceRequest.ServiceRequest.ExportColumnNameModified
             };
 
-            _excelBuilder.AddNewWorksheet(BusinessLayerConstants.ServiceRequestsExcelSheetName, header, serviceRequests);
+            _excelBuilder.AddNewWorksheet(ServiceRequestConstants.ServiceRequestsExcelSheetName, header, serviceRequests);
 
             return _excelBuilder.GenerateByteArray();
         }

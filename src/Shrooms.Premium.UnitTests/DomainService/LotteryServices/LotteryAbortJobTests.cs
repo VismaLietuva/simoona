@@ -3,11 +3,11 @@ using System.Data.Entity;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
 using NUnit.Framework;
-using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.EntityModels.Models.Lottery;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Enums;
 using Shrooms.Host.Contracts.Infrastructure;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Lotteries;
@@ -60,12 +60,12 @@ namespace Shrooms.Premium.UnitTests.DomainService.LotteryServices
             _participantService.DidNotReceiveWithAnyArgs().GetParticipantsCounted(default);
         }
 
-        [TestCase(BusinessLayerConstants.LotteryStatus.Refunded)]
-        [TestCase(BusinessLayerConstants.LotteryStatus.Deleted)]
-        [TestCase(BusinessLayerConstants.LotteryStatus.Drafted)]
-        [TestCase(BusinessLayerConstants.LotteryStatus.Ended)]
-        [TestCase(BusinessLayerConstants.LotteryStatus.Started)]
-        public void RefundLottery_IncorrectLotteryStatuses_DoesNotAddKudos(BusinessLayerConstants.LotteryStatus status)
+        [TestCase(LotteryStatus.Refunded)]
+        [TestCase(LotteryStatus.Deleted)]
+        [TestCase(LotteryStatus.Drafted)]
+        [TestCase(LotteryStatus.Ended)]
+        [TestCase(LotteryStatus.Started)]
+        public void RefundLottery_IncorrectLotteryStatuses_DoesNotAddKudos(LotteryStatus status)
         {
             _lotteriesDb.Find().ReturnsForAnyArgs(
                 new Lottery
@@ -89,7 +89,7 @@ namespace Shrooms.Premium.UnitTests.DomainService.LotteryServices
                 {
                     Id = 1,
                     OrganizationId = 1,
-                    Status = (int)BusinessLayerConstants.LotteryStatus.RefundStarted
+                    Status = (int)LotteryStatus.RefundStarted
                 });
 
             _sut.RefundLottery(default, GetUserOrg());
@@ -103,7 +103,7 @@ namespace Shrooms.Premium.UnitTests.DomainService.LotteryServices
         {
             _lotteriesDb.Find().ReturnsForAnyArgs(GetLottery());
             _kudosService
-                .When(x => x.GetKudosTypeId(BusinessLayerConstants.KudosTypeEnum.Refund))
+                .When(x => x.GetKudosTypeId(KudosTypeEnum.Refund))
                 .Do(x => throw new ArgumentNullException());
 
             _sut.RefundLottery(default, GetUserOrg());
@@ -130,7 +130,7 @@ namespace Shrooms.Premium.UnitTests.DomainService.LotteryServices
             {
                 Id = 1,
                 OrganizationId = 1,
-                Status = (int)BusinessLayerConstants.LotteryStatus.RefundStarted,
+                Status = (int)LotteryStatus.RefundStarted,
                 EndDate = DateTime.Now.AddDays(value: 2),
                 Title = "Monitor",
                 EntryFee = -5

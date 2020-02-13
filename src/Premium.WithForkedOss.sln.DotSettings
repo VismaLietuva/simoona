@@ -6,9 +6,14 @@
 	<s:Boolean x:Key="/Default/CodeEditing/Intellisense/LookupWindow/ShowSummary/@EntryValue">False</s:Boolean>
 	<s:String x:Key="/Default/CodeInspection/Browsers/Browsers/@EntryValue">C27+,E12+,FF21+,IE9+,O12+,S8+</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=AFFE7B8B_002D3294_002D4DD3_002D990D_002D7DA5E256C987_002Fd_003AMigrations/@EntryIndexedValue">ExplicitlyExcluded</s:String>
+	
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=C6FC692B_002DDFAD_002D4ED5_002D86D5_002D8000DBD06B02_002Ff_003AT4ResX_002Ett/@EntryIndexedValue">ExplicitlyExcluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=open_002Dsource_005Csrc_005Capi_005CMain_005CDataLayer_005CShrooms_002EDataLayer_005CMigrations/@EntryIndexedValue">ExplicitlyExcluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/GeneratedFilesAndFolders/=AFFE7B8B_002D3294_002D4DD3_002D990D_002D7DA5E256C987_002Fd_003AMigrations/@EntryIndexedValue">AFFE7B8B-3294-4DD3-990D-7DA5E256C987/d:Migrations</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/GeneratedFilesAndFolders/=AFFE7B8B_002D3294_002D4DD3_002D990D_002D7DA5E256C987_002Fd_003AMigrations_002Ff_003A201612061541109_005Fsync_002Ecs/@EntryIndexedValue"></s:String>
+	<s:Boolean x:Key="/Default/CodeInspection/ExcludedFiles/GeneratedFilesAndFolders/=AFFE7B8B_002D3294_002D4DD3_002D990D_002D7DA5E256C987_002Fd_003AMigrations_002Ff_003A201612061541109_005Fsync_002Ecs/@EntryIndexRemoved">True</s:Boolean>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/GeneratedFilesAndFolders/=AFFE7B8B_002D3294_002D4DD3_002D990D_002D7DA5E256C987_002Fd_003AMigrations_002Ff_003A201706011241211_005FChangingNotifiationSourceToSerializedObject_002Ecs/@EntryIndexedValue"></s:String>
+	<s:Boolean x:Key="/Default/CodeInspection/ExcludedFiles/GeneratedFilesAndFolders/=AFFE7B8B_002D3294_002D4DD3_002D990D_002D7DA5E256C987_002Fd_003AMigrations_002Ff_003A201706011241211_005FChangingNotifiationSourceToSerializedObject_002Ecs/@EntryIndexRemoved">True</s:Boolean>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/GeneratedFilesAndFolders/=C6FC692B_002DDFAD_002D4ED5_002D86D5_002D8000DBD06B02_002Ff_003AT4ResX_002Ett/@EntryIndexedValue">C6FC692B-DFAD-4ED5-86D5-8000DBD06B02/f:T4ResX.tt</s:String>
 	
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/GeneratedFilesAndFolders/=open_002Dsource_005Csrc_005Capi_005CMain_005CDataLayer_005CShrooms_002EDataLayer_005CMigrations/@EntryIndexedValue">open-source\src\api\Main\DataLayer\Shrooms.DataLayer\Migrations</s:String>

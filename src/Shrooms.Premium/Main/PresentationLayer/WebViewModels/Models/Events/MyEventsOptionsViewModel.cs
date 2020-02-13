@@ -6,6 +6,6 @@ namespace Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Events
     {
         public string SearchString { get; set; }
 
-        public BusinessLayerConstants.MyEventsOptions Filter { get; set; }
+        public MyEventsOptions Filter { get; set; }
     }
 }

@@ -163,58 +163,45 @@
       <HintPath>..\..\open-source\src\api\packages\PagedList.1.17.0.0\lib\net40\PagedList.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Shrooms.API, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Shrooms.Presentation.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SimoonaCoreLocation)\src\api\Main\PresentationLayer\Shrooms.API\bin\Shrooms.API.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Presentation.Api\bin\Shrooms.Presentation.Api.dll</HintPath>
     </Reference>
-    <Reference Include="Shrooms.DataTransferObjects, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Shrooms.Contracts.DataTransferObjects, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SimoonaCoreLocation)\src\api\Main\BuisnessLayer\Shrooms.DataTransferObjects\bin\$(Configuration)\Shrooms.DataTransferObjects.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Contracts.DataTransferObjects\bin\$(Configuration)\Shrooms.Contracts.DataTransferObjects.dll</HintPath>
     </Reference>
     <Reference Include="Shrooms.Domain, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SimoonaCoreLocation)\src\api\Main\BuisnessLayer\Shrooms.Domain\bin\$(Configuration)\Shrooms.Domain.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Domain\bin\$(Configuration)\Shrooms.Domain.dll</HintPath>
     </Reference>
-    <Reference Include="Shrooms.DomainExceptions, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Shrooms.Domain.Exceptions, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SimoonaCoreLocation)\src\api\Main\BuisnessLayer\Shrooms.DomainExceptions\bin\$(Configuration)\Shrooms.DomainExceptions.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Domain.Exceptions\bin\$(Configuration)\Shrooms.Domain.Exceptions.dll</HintPath>
     </Reference>
-    <Reference Include="Shrooms.DomainServiceValidators">
-      <HintPath>$(SimoonaCoreLocation)\src\api\Main\BuisnessLayer\Shrooms.DomainServiceValidators\bin\$(Configuration)\Shrooms.DomainServiceValidators.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Shrooms.EntityModels, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Shrooms.Domain.ServiceValidators, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SimoonaCoreLocation)\src\api\Main\DataLayer\Shrooms.EntityModels\bin\$(Configuration)\Shrooms.EntityModels.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Domain.ServiceValidators\bin\$(Configuration)\Shrooms.Domain.ServiceValidators.dll</HintPath>
+    </Reference>
+    <Reference Include="Shrooms.DataLayer.EntityModels, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.DataLayer.EntityModels\bin\$(Configuration)\Shrooms.DataLayer.EntityModels.dll</HintPath>
     </Reference>
     <Reference Include="Shrooms.Resources, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SimoonaCoreLocation)\src\api\Other\Shrooms.Resources\bin\$(Configuration)\Shrooms.Resources.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Resources\bin\$(Configuration)\Shrooms.Resources.dll</HintPath>
     </Reference>
-    <Reference Include="Shrooms.WebViewModels, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Shrooms.Presentation.WebViewModels, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SimoonaCoreLocation)\src\api\Main\PresentationLayer\Shrooms.WebViewModels\bin\$(Configuration)\Shrooms.WebViewModels.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Presentation.WebViewModels\bin\$(Configuration)\Shrooms.Presentation.WebViewModels.dll</HintPath>
     </Reference>
-    <Reference Include="Shrooms.Host.Contracts, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Shrooms.Contracts, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SimoonaCoreLocation)\src\api\Contracts\Shrooms.Host.Contracts\bin\$(Configuration)\Shrooms.Host.Contracts.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Contracts\bin\$(Configuration)\Shrooms.Contracts.dll</HintPath>
     </Reference>
     <Reference Include="Shrooms.Infrastructure, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SimoonaCoreLocation)\src\api\Infrastructure\Shrooms.Infrastructure\bin\$(Configuration)\Shrooms.Infrastructure.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Shrooms.Constants, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SimoonaCoreLocation)\src\api\Other\Shrooms.Constants\bin\$(Configuration)\Shrooms.Constants.dll</HintPath>
+      <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Infrastructure\bin\$(Configuration)\Shrooms.Infrastructure.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -278,8 +265,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Constants\BusinessLayerConstants.cs" />
-    <Compile Include="Constants\WebApiConstants.cs" />
+    <Compile Include="Constants\KudosShopConstants.cs" />
+    <Compile Include="Constants\ServiceRequestConstants.cs" />
+    <Compile Include="Constants\EventsConstants.cs" />
     <Compile Include="Infrastructure\IoC\Modules\BackgroundWorkersModule.cs" />
     <Compile Include="Infrastructure\IoC\Modules\LotteryModule.cs" />
     <Compile Include="Infrastructure\IoC\Modules\UserEventsModule.cs" />

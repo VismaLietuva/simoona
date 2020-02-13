@@ -4,11 +4,11 @@ using System.Data.Entity;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Constants.BusinessLayer;
 using Shrooms.EntityModels.Models;
 using Shrooms.EntityModels.Models.Badges;
 using Shrooms.EntityModels.Models.Kudos;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Enums;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Badges;
 using Shrooms.UnitTests.Extensions;
 
@@ -186,7 +186,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
                     KudosTypeName = "Choco",
                     Status = KudosStatus.Approved,
                     Modified = someTimeAgo,
-                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary
+                    KudosSystemType = KudosTypeEnum.Ordinary
                 },
                 new KudosLog
                 {
@@ -197,7 +197,7 @@ namespace Shrooms.Premium.UnitTests.DomainService
                     KudosTypeName = "Choco two kudos type",
                     Status = KudosStatus.Approved,
                     Modified = someTimeAgo,
-                    KudosSystemType = BusinessLayerConstants.KudosTypeEnum.Ordinary
+                    KudosSystemType = KudosTypeEnum.Ordinary
                 }
             };
         }

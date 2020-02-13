@@ -12,8 +12,7 @@ using Shrooms.Domain.Services.Permissions;
 using Shrooms.EntityModels.Models;
 using Shrooms.Host.Contracts.Constants;
 using Shrooms.Host.Contracts.DAL;
-using Shrooms.Infrastructure.CustomCache;
-using Shrooms.Premium.Constants;
+using Shrooms.Host.Contracts.Infrastructure;
 
 namespace Shrooms.Premium.UnitTests.Mocks
 {

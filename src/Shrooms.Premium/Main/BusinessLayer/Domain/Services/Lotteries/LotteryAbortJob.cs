@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using Shrooms.Constants.BusinessLayer;
 using Shrooms.DataTransferObjects.Models;
 using Shrooms.DataTransferObjects.Models.Kudos;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.EntityModels.Models.Lottery;
 using Shrooms.Host.Contracts.DAL;
+using Shrooms.Host.Contracts.Enums;
 using Shrooms.Host.Contracts.Infrastructure;
 using Shrooms.Infrastructure.FireAndForget;
 
@@ -62,12 +62,12 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Lotteries
 
         private void UpdateUserProfiles(Lottery lottery, IEnumerable<AddKudosLogDTO> kudosLogs, UserAndOrganizationDTO userOrg)
         {
-            if (lottery.Status == (int)BusinessLayerConstants.LotteryStatus.RefundLogsCreated)
+            if (lottery.Status == (int)LotteryStatus.RefundLogsCreated)
             {
                 var userIds = kudosLogs.Select(x => x.ReceivingUserIds.First());
 
                 _kudosService.UpdateProfilesFromUserIds(userIds, userOrg);
-                lottery.Status = (int)BusinessLayerConstants.LotteryStatus.Refunded;
+                lottery.Status = (int)LotteryStatus.Refunded;
 
                 _uow.SaveChanges(userOrg.UserId);
             }
@@ -75,10 +75,10 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Lotteries
 
         private void AddKudosLogs(Lottery lottery, IEnumerable<AddKudosLogDTO> kudosLogs, UserAndOrganizationDTO userOrg)
         {
-            if (lottery.Status == (int)BusinessLayerConstants.LotteryStatus.RefundStarted)
+            if (lottery.Status == (int)LotteryStatus.RefundStarted)
             {
                 _kudosService.AddRefundKudosLogs(kudosLogs);
-                lottery.Status = (int)BusinessLayerConstants.LotteryStatus.RefundLogsCreated;
+                lottery.Status = (int)LotteryStatus.RefundLogsCreated;
 
                 _uow.SaveChanges(userOrg.UserId);
             }
@@ -86,7 +86,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Lotteries
 
         private IList<AddKudosLogDTO> CreateKudosLogs(Lottery lottery, UserAndOrganizationDTO userOrg)
         {
-            var kudosTypeId = _kudosService.GetKudosTypeId(BusinessLayerConstants.KudosTypeEnum.Refund);
+            var kudosTypeId = _kudosService.GetKudosTypeId(KudosTypeEnum.Refund);
             var usersToRefund = _participantService.GetParticipantsCounted(lottery.Id);
             var usersToSendKudos = new List<AddKudosLogDTO>();
 
