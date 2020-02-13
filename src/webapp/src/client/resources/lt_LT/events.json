@@ -193,5 +193,6 @@
   "pastMonth": "Praeitas mėnuo",
   "pastYear": "Praeiti metai",
   "customRange": "Pasirinkimas",
-  "selectDate": "Pasirinkti datą"
+  "selectDate": "Pasirinkti datą",
+  "dateFilterInvalidRange": "Pradžios data turi būti anksčiau nei pabaigos"
 }

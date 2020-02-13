@@ -1,5 +1,5 @@
 <!-- SHORTCUTS -->
-<form name="myForm" style="display: flex; flex-direction: column; justify-content: space-between;">
+<div name="myForm" style="display: flex; flex-direction: column; justify-content: space-between;">
     <div style="display: block; margin-bottom: 5px;">
         <input id="pastWeek" type="radio" ng-model="vm.selectedRange" ng-value="vm.dateRanges.pastWeek">
         <label for="pastWeek" translate="events.pastWeek"></label>
@@ -12,34 +12,41 @@
         <input id="pastYear" type="radio" ng-model="vm.selectedRange" ng-value="vm.dateRanges.pastYear">
         <label for="pastYear" translate="events.pastYear"></label>
     </div>
-    </div>
     <div style="display: block; margin-bottom: 5px;">
         <input id="custom" type="radio" ng-model="vm.selectedRange" ng-value="vm.dateRanges.custom">
         <label for="custom" translate="events.customRange"></label>
     </div>
-</form>
 
-<!-- CUSTOM DATE RANGE -->
-<div style="display: flex; flex-direction: column; justify-content: space-between;"
-    ng-if="vm.selectedRange === vm.dateRanges.custom">
-    <!-- START DATE -->
-    <div class="date-field" style="display: block; margin-bottom: 5px;">
-        <input type="text" class="hasDatepicker" uib-datepicker-popup="yyyy-MM-dd" popup-placement="bottom"
-            ng-model="vm.dateFilterStart" ng-click="vm.openDatePicker($event, 'startDate')"
-            is-open="vm.isDatePickerOpen.startDate" />
-    </div>
-    <!-- END DATE -->
-    <div class="date-field" style="display: block; margin-bottom: 5px;">
-        <input type="text" class="hasDatepicker" uib-datepicker-popup="yyyy-MM-dd" popup-placement="bottom"
-            ng-model="vm.dateFilterEnd" ng-click="vm.openDatePicker($event, 'endDate')"
-            is-open="vm.isDatePickerOpen.endDate" />
+
+    <!-- CUSTOM DATE RANGE -->
+    <div ng-if="vm.selectedRange === vm.dateRanges.custom">
+        <!-- START DATE -->
+        <div class="date-field" style="display: block; margin-bottom: 5px;"
+            ng-class="{'has-error': vm.isCustomRangeInvalid()}">
+            <label translate="events.eventStartDate"></label>
+            <input type="text" class="hasDatepicker" uib-datepicker-popup="yyyy-MM-dd" popup-placement="bottom"
+                ng-model="vm.dateFilterStart" ng-click="vm.openDatePicker($event, 'startDate')"
+                is-open="vm.isDatePickerOpen.startDate" />
+        </div>
+        <!-- END DATE -->
+        <div class="date-field" style="display: block; margin-bottom: 5px;"
+            ng-class="{'has-error': vm.isCustomRangeInvalid()}">
+            <label translate="events.eventFinishDate"></label>
+            <input type="text" class="hasDatepicker" uib-datepicker-popup="yyyy-MM-dd" popup-placement="bottom"
+                ng-model="vm.dateFilterEnd" ng-click="vm.openDatePicker($event, 'endDate')"
+                is-open="vm.isDatePickerOpen.endDate" />
+        </div>
+        <p ng-if="vm.isCustomRangeInvalid()" translate="events.dateFilterInvalidRange"></p>
     </div>
 </div>
 
-<!-- APPLY BUTTON -->
-<div style="display: block;">
-    <button class="btn btn-default" ng-click="vm.getFilteredEvents()"
-        ng-disabled="vm.selectedRange === vm.dateRanges.none">
+<!-- BUTTONS -->
+<div class="btn-group">
+    <button class="btn btn-default" ng-click="vm.getFilteredEvents(); "
+        ng-disabled="vm.selectedRange === vm.dateRanges.none || vm.isCustomRangeInvalid()">
         <span translate="common.apply"></span>
+    </button>
+    <button class="btn btn-default" ng-if="vm.isDateFilterSelected()" ng-click="vm.clearFilter()">
+        <span translate="common.clear"></span>
     </button>
 </div>

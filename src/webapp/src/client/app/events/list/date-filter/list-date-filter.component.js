@@ -17,25 +17,25 @@
         });
 
     eventsListDateFilterController.$inject = [
-        '$timeout',
         '$state',
         '$stateParams',
         'dateRanges',
         '$translate'
     ];
 
-    function eventsListDateFilterController($timeout, $state, $stateParams, dateRanges, $translate) {
+    function eventsListDateFilterController($state, $stateParams, dateRanges, $translate) {
         var vm = this;
 
         vm.popoverTemplateUrl = 'app/events/list/date-filter/date-filter-popover.html';
-        vm.isDateFilterSelected = isDateFilterSelected;
-        vm.openDatePicker = openDatePicker;
-        vm.getFilteredEvents = getFilteredEvents;
         vm.buttonTitle = $translate.instant('events.selectDate');
 
-        vm.dateRanges = dateRanges;
-        vm.selectedRange = vm.dateRanges.none;
+        vm.getFilteredEvents = getFilteredEvents;
+        vm.clearFilter = clearFilter;
+        vm.openDatePicker = openDatePicker;
+        vm.isDateFilterSelected = isDateFilterSelected;
+        vm.isCustomRangeInvalid = isCustomRangeInvalid;
 
+        vm.dateRanges = dateRanges;
 
         init();
 
@@ -46,6 +46,7 @@
                 startDate: false,
                 endDate: false
             }
+            vm.selectedRange = vm.dateRanges.none;
         }
 
         function getFilteredEvents() {
@@ -59,6 +60,18 @@
             });
 
             vm.buttonTitle = options.title;
+        }
+
+        function clearFilter() {
+            $state.go('Root.WithOrg.Client.Events.List.Type', {
+                type: $stateParams.type,
+                office: $stateParams.office,
+                startDate: null,
+                endDate: null
+            });
+
+            vm.buttonTitle = $translate.instant('events.selectDate');
+            vm.selectedRange = vm.dateRanges.none;
         }
 
         function getSelectedDates() {
@@ -91,6 +104,10 @@
             return options;
         }
 
+        function isDateFilterSelected() {
+            return $stateParams.startDate && $stateParams.endDate;
+        }
+
         function openDatePicker($event, datepicker) {
             $event.preventDefault();
             $event.stopPropagation();
@@ -98,14 +115,11 @@
             vm.isDatePickerOpen.startDate = false;
             vm.isDatePickerOpen.endDate = false;
             vm.isDatePickerOpen[datepicker] = true;
-
-            $timeout(function () {
-                $event.target.focus();
-            }, 100);
         }
 
-        function isDateFilterSelected() {
-            return $stateParams.startDate && $stateParams.endDate;
+        function isCustomRangeInvalid() {
+            return vm.dateFilterStart > vm.dateFilterEnd &&
+                vm.selectedRange === vm.dateRanges.custom;
         }
     }
 })();

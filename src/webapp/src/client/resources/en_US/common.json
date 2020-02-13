@@ -189,5 +189,6 @@
   "url": "Url",
   "manager": "Manager",
   "onlyWholeNumbers": "Whole numbers only",
-  "apply": "Apply"
+  "apply": "Apply",
+  "clear": "Clear"
 }

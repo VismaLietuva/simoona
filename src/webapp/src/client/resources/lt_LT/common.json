@@ -189,5 +189,6 @@
   "url": "Nuoroda",
   "manager": "Vadovas",
   "onlyWholeNumbers": "Leidžiami tik sveikieji skaičiai",
-  "apply": "Taikyti"
+  "apply": "Taikyti",
+  "clear": "Valyti"
 }
