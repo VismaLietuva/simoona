@@ -31,6 +31,7 @@ namespace Shrooms.IoC.Modules
             builder.RegisterType<MailingService>().As<IMailingService>()
                 .InstancePerMatchingLifetimeScope(AutofacJobActivator.LifetimeScopeTag, MatchingScopeLifetimeTags.RequestLifetimeScopeTag)
                 .EnableInterfaceTelemetryInterceptor();
+
             builder.RegisterGeneric(typeof(CustomCache<,>)).As(typeof(ICustomCache<,>)).SingleInstance();
             builder.RegisterType<ApplicationSettings>().As<IApplicationSettings>().InstancePerRequest();
             builder.RegisterType<ApplicationSettings>().As<IApplicationSettings>().InstancePerBackgroundJob();

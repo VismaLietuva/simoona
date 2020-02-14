@@ -8,9 +8,9 @@ using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Services.Picture;
 using Shrooms.Infrastructure.Storage;
-using Shrooms.UnitTests.Extensions;
+using Shrooms.Tests.Extensions;
 
-namespace Shrooms.UnitTests.DomainService
+namespace Shrooms.Tests.DomainService
 {
     [TestFixture]
     public class PictureServiceTests

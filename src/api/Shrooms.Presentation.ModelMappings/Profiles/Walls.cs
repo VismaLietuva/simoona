@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
-using Shrooms.Contracts.DataTransferObjects.Models.Users;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall.Moderator;
-using Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts;
-using Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts.Comments;
+using Shrooms.Contracts.DataTransferObjects.Users;
+using Shrooms.Contracts.DataTransferObjects.Wall;
+using Shrooms.Contracts.DataTransferObjects.Wall.Comments;
+using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.Presentation.WebViewModels.Models.Wall;

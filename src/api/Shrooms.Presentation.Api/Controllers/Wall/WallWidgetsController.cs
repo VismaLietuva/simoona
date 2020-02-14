@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Web.Http;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
-using Shrooms.Contracts.DataTransferObjects.Models;
+using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Birthdays;
 using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
 using Shrooms.Contracts.DataTransferObjects.Models.KudosBasket;

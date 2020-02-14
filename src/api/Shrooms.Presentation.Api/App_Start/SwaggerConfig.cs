@@ -7,7 +7,7 @@ using System.Web.Http;
 using Swashbuckle.Application;
 
 // ReSharper disable once CheckNamespace
-namespace Shrooms.API.App_Start
+namespace Shrooms.Presentation.Api.App_Start
 {
     public static class SwaggerConfig
     {

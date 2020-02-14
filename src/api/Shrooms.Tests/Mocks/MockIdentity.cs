@@ -9,12 +9,12 @@ using NSubstitute;
 using Shrooms.Authentification.Membership;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
-using Shrooms.Contracts.DataTransferObjects.Models;
+using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Services.Permissions;
 
-namespace Shrooms.UnitTests.Mocks
+namespace Shrooms.Tests.Mocks
 {
     public static class MockIdentity
     {

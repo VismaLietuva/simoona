@@ -1,4 +1,4 @@
-﻿namespace Shrooms.Contracts.DataTransferObjects.Models.Users
+﻿namespace Shrooms.Contracts.DataTransferObjects.Users
 {
     public class UserDto
     {

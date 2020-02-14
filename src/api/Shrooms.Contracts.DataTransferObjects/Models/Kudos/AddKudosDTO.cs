@@ -1,4 +1,6 @@
-﻿namespace Shrooms.Contracts.DataTransferObjects.Models.Kudos
+﻿using Shrooms.Contracts.DataTransferObjects.Kudos;
+
+namespace Shrooms.Contracts.DataTransferObjects.Models.Kudos
 {
     public class AddKudosDTO
     {

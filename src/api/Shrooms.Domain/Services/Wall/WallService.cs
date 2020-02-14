@@ -7,12 +7,13 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
-using Shrooms.Contracts.DataTransferObjects.Models;
-using Shrooms.Contracts.DataTransferObjects.Models.Users;
+using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall.Moderator;
-using Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts;
-using Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts.Comments;
+using Shrooms.Contracts.DataTransferObjects.Users;
+using Shrooms.Contracts.DataTransferObjects.Wall;
+using Shrooms.Contracts.DataTransferObjects.Wall.Comments;
+using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -316,7 +317,7 @@ namespace Shrooms.Domain.Services.Wall
             return wallMembers;
         }
 
-        public ApplicationUserMinimalViewModelDto JoinLeaveWall(int wallId, string attendeeId, string actorId, int tenantId, bool isEventWall)
+        public ApplicationUserMinimalDto JoinLeaveWall(int wallId, string attendeeId, string actorId, int tenantId, bool isEventWall)
         {
             lock (_joinWallLock)
             {
@@ -375,7 +376,7 @@ namespace Shrooms.Domain.Services.Wall
                 var userInfo = _usersDbSet
                     .Include(u => u.JobPosition)
                     .Where(u => u.Id == attendeeId && u.OrganizationId == tenantId)
-                    .Select(u => new ApplicationUserMinimalViewModelDto
+                    .Select(u => new ApplicationUserMinimalDto
                     {
                         Id = u.Id,
                         FirstName = u.FirstName,

@@ -2,7 +2,7 @@ using System;
 using AutoMapper;
 using Shrooms.Presentation.ModelMappings.Profiles;
 
-namespace Shrooms.UnitTests.ModelMappings
+namespace Shrooms.Tests.ModelMappings
 {
     public class ModelMapper
     {

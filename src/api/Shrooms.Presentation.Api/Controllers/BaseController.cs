@@ -1,7 +1,7 @@
 ﻿using System.Web.Http;
 using System.Web.Http.Results;
 using Microsoft.AspNet.Identity;
-using Shrooms.Contracts.DataTransferObjects.Models;
+using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Presentation.Api.Helpers;
 

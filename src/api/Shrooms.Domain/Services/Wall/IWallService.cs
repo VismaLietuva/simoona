@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Shrooms.Contracts.DataTransferObjects.Models;
+using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall;
-using Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts;
+using Shrooms.Contracts.DataTransferObjects.Wall;
+using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models;
 
@@ -10,7 +11,7 @@ namespace Shrooms.Domain.Services.Wall
 {
     public interface IWallService
     {
-        ApplicationUserMinimalViewModelDto JoinLeaveWall(int wallId, string attendeeId, string actorId, int tenantId, bool isEventWall);
+        ApplicationUserMinimalDto JoinLeaveWall(int wallId, string attendeeId, string actorId, int tenantId, bool isEventWall);
 
         void UpdateWall(UpdateWallDto updateWallDto);
 

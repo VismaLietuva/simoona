@@ -1,4 +1,4 @@
-﻿using Shrooms.Contracts.DataTransferObjects.Models;
+﻿using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.DataLayer.EntityModels.Models;
 
 namespace Shrooms.Domain.Services.Email.AdministrationUsers

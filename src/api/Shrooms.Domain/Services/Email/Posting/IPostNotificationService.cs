@@ -1,4 +1,4 @@
-﻿using Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts;
+﻿using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 

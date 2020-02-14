@@ -9,6 +9,7 @@ using AutoMapper;
 using Microsoft.AspNet.Identity;
 using PagedList;
 using Shrooms.Contracts.Constants;
+using Shrooms.Contracts.DataTransferObjects.Kudos;
 using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;

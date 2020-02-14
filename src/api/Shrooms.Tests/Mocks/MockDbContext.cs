@@ -9,7 +9,7 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 
-namespace Shrooms.UnitTests.Mocks
+namespace Shrooms.Tests.Mocks
 {
     public class MockDbContext : DbContext, IDbContext
     {

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Shrooms.Contracts.DataTransferObjects.Models;
+using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Monitors;
 
 namespace Shrooms.Domain.Services.Monitors

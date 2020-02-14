@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Shrooms.Contracts.Enums;
 
-namespace Shrooms.Contracts.DataTransferObjects.Models.Wall
+namespace Shrooms.Contracts.DataTransferObjects.Wall
 {
     public class CreateWallDto : UserAndOrganizationDTO
     {

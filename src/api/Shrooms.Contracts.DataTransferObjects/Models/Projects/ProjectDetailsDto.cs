@@ -10,9 +10,9 @@ namespace Shrooms.Contracts.DataTransferObjects.Models.Projects
 
         public string LogoId { get; set; }
 
-        public virtual ApplicationUserMinimalViewModelDto Owner { get; set; }
+        public virtual ApplicationUserMinimalDto Owner { get; set; }
 
-        public virtual IEnumerable<ApplicationUserMinimalViewModelDto> Members { get; set; }
+        public virtual IEnumerable<ApplicationUserMinimalDto> Members { get; set; }
 
         public virtual IEnumerable<string> Attributes { get; set; }
 

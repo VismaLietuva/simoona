@@ -3,9 +3,9 @@ using System.Linq;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.DAL;
 using Shrooms.Infrastructure.Configuration;
-using Shrooms.UnitTests.Extensions;
+using Shrooms.Tests.Extensions;
 
-namespace Shrooms.UnitTests.Mocks
+namespace Shrooms.Tests.Mocks
 {
     public class NewMockRepository<TEntity> : EfRepository<TEntity>
         where TEntity : class

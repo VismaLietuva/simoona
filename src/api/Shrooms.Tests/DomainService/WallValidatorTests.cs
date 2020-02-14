@@ -7,9 +7,9 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.Domain.ServiceValidators.Validators.Wall;
-using Shrooms.UnitTests.Extensions;
+using Shrooms.Tests.Extensions;
 
-namespace Shrooms.UnitTests.DomainService
+namespace Shrooms.Tests.DomainService
 {
     [TestFixture]
     public class WallValidatorTests

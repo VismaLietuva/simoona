@@ -15,11 +15,11 @@ using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.Picture;
 using Shrooms.Domain.ServiceValidators.Validators.UserAdministration;
-using Shrooms.UnitTests.Extensions;
-using Shrooms.UnitTests.Mocks;
-using Shrooms.UnitTests.ModelMappings;
+using Shrooms.Tests.Extensions;
+using Shrooms.Tests.Mocks;
+using Shrooms.Tests.ModelMappings;
 
-namespace Shrooms.UnitTests.DomainService
+namespace Shrooms.Tests.DomainService
 {
     public class AdministrationUsersServiceTests
     {

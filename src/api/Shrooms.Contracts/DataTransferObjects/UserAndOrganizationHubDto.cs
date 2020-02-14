@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Shrooms.Contracts.DataTransferObjects.Models
+namespace Shrooms.Contracts.DataTransferObjects
 {
     public class UserAndOrganizationHubDto : UserAndOrganizationDTO
     {

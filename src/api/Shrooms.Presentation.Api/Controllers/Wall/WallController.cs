@@ -4,8 +4,9 @@ using System.Web.Http;
 using AutoMapper;
 using PagedList;
 using Shrooms.Contracts.Constants;
-using Shrooms.Contracts.DataTransferObjects.Models;
+using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall;
+using Shrooms.Contracts.DataTransferObjects.Wall;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Domain.Exceptions.Exceptions;
@@ -112,7 +113,7 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
             try
             {
                 var userDto = _wallService.JoinLeaveWall(wallId, attendeeId, userAndOrg.UserId, userAndOrg.OrganizationId, false);
-                var result = _mapper.Map<ApplicationUserMinimalViewModelDto, ApplicationUserMinimalViewModel>(userDto);
+                var result = _mapper.Map<ApplicationUserMinimalDto, ApplicationUserMinimalViewModel>(userDto);
 
                 return Ok(result);
             }

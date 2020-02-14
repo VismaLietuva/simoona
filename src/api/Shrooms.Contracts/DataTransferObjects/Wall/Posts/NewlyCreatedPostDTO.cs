@@ -1,8 +1,8 @@
 ﻿using System;
-using Shrooms.Contracts.DataTransferObjects.Models.Users;
+using Shrooms.Contracts.DataTransferObjects.Users;
 using Shrooms.Contracts.Enums;
 
-namespace Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts
+namespace Shrooms.Contracts.DataTransferObjects.Wall.Posts
 {
     public class NewlyCreatedPostDTO
     {
@@ -19,6 +19,7 @@ namespace Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts
         public UserDto User { get; set; }
 
         public WallType WallType { get; set; }
+
         public int WallId { get; set; }
     }
 }

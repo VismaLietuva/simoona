@@ -1,4 +1,4 @@
-﻿using Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts.Comments;
+﻿using Shrooms.Contracts.DataTransferObjects.Models.Wall.Comments;
 
 namespace Shrooms.Domain.Services.Email.Posting
 {

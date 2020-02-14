@@ -1,4 +1,4 @@
-﻿namespace Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts.Comments
+﻿namespace Shrooms.Contracts.DataTransferObjects.Models.Wall.Comments
 {
     public class EditCommentDTO : UserAndOrganizationDTO
     {

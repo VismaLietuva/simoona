@@ -1,6 +1,6 @@
-﻿namespace Shrooms.Contracts.DataTransferObjects.Models
+﻿namespace Shrooms.Contracts.DataTransferObjects
 {
-    public class ApplicationUserMinimalViewModelDto
+    public class ApplicationUserMinimalDto
     {
         public string Id { get; set; }
 

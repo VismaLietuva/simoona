@@ -9,9 +9,9 @@ using System.Web.Http.Results;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.Constants;
-using Shrooms.Contracts.DataTransferObjects.Models;
+using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall;
-using Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts;
+using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Contracts.Enums;
 using Shrooms.Domain.Services.Notifications;
 using Shrooms.Domain.Services.Permissions;
@@ -21,9 +21,9 @@ using Shrooms.Presentation.WebViewModels.Models.User;
 using Shrooms.Presentation.WebViewModels.Models.Wall;
 using Shrooms.Presentation.WebViewModels.Models.Wall.Moderator;
 using Shrooms.Presentation.WebViewModels.Models.Wall.Posts;
-using Shrooms.UnitTests.ModelMappings;
+using Shrooms.Tests.ModelMappings;
 
-namespace Shrooms.UnitTests.Controllers.WebApi
+namespace Shrooms.Tests.Controllers.WebApi
 {
     [TestFixture]
     public class WallControllerTests
@@ -117,7 +117,7 @@ namespace Shrooms.UnitTests.Controllers.WebApi
         public void Wall_JoinWall_Should_Return_View_Model()
         {
             var wallId = 1;
-            var userDto = new ApplicationUserMinimalViewModelDto
+            var userDto = new ApplicationUserMinimalDto
             {
                 Id = "Id"
             };

@@ -36,9 +36,9 @@ namespace Shrooms.IoC
         public static IContainer Bootstrap(IAppBuilder app, Func<string> getConnectionStringName, HttpConfiguration config)
         {
             var builder = new ContainerBuilder();
-            var shroomsApi = Assembly.Load("Shrooms.API");
-            var dataLayer = Assembly.Load("Shrooms.DataLayer");
-            var modelMappings = Assembly.Load("Shrooms.ModelMappings");
+            var shroomsApi = Assembly.Load("Shrooms.Presentation.Api");
+            var dataLayer = Assembly.Load("Shrooms.Contracts.DataLayer");
+            var modelMappings = Assembly.Load("Shrooms.Presentation.ModelMappings");
 
             builder.RegisterApiControllers(shroomsApi);
             builder.RegisterHubs(shroomsApi);

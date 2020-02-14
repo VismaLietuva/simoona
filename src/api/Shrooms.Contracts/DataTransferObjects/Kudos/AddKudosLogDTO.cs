@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Shrooms.Contracts.DataTransferObjects.Models.Kudos
+namespace Shrooms.Contracts.DataTransferObjects.Kudos
 {
     public class AddKudosLogDTO : UserAndOrganizationDTO
     {

@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using Shrooms.DataLayer.EntityModels.Models;
 
-namespace Shrooms.UnitTests.DomainService
+namespace Shrooms.Tests.DomainService
 {
     internal class ApplicationUserTests
     {

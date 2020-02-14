@@ -3,7 +3,7 @@ using NUnit.Framework;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 
-namespace Shrooms.UnitTests.Entities
+namespace Shrooms.Tests.Entities
 {
     [TestFixture]
     public class KudosLogTests

@@ -1,4 +1,4 @@
-﻿namespace Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts
+﻿namespace Shrooms.Contracts.DataTransferObjects.Wall.Posts
 {
     public class NewPostDTO : UserAndOrganizationDTO
     {

@@ -12,9 +12,9 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Infrastructure.ExcelGenerator;
-using Shrooms.UnitTests.Extensions;
+using Shrooms.Tests.Extensions;
 
-namespace Shrooms.UnitTests.DomainService
+namespace Shrooms.Tests.DomainService
 {
     public class KudosExportServiceTests
     {

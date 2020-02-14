@@ -11,7 +11,8 @@ using AutoMapper;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.Constants;
-using Shrooms.Contracts.DataTransferObjects.Models;
+using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.DataTransferObjects.Kudos;
 using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.Permissions;
@@ -19,7 +20,7 @@ using Shrooms.Presentation.Api.Controllers.Kudos;
 using Shrooms.Presentation.WebViewModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.Users.Kudos;
 
-namespace Shrooms.UnitTests.Controllers.WebApi
+namespace Shrooms.Tests.Controllers.WebApi
 {
     [TestFixture]
     public class KudosControllerTests

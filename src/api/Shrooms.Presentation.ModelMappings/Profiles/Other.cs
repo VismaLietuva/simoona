@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models;
 using Shrooms.Contracts.DataTransferObjects.Models.Administration;
 using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
@@ -160,8 +161,8 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
             CreateMap<ApplicationUser, EmployeeListViewModel>()
                 .ForMember(dest => dest.JobTitle, src => src.MapFrom(d => d.JobPosition.Title));
 
-            CreateMap<ApplicationUser, ApplicationUserMinimalViewModelDto>();
-            CreateMap<ApplicationUserMinimalViewModelDto, ApplicationUserMinimalViewModel>();
+            CreateMap<ApplicationUser, ApplicationUserMinimalDto>();
+            CreateMap<ApplicationUserMinimalDto, ApplicationUserMinimalViewModel>();
             CreateMap<ApplicationUser, ApplicationUserMinimalViewModel>();
         }
 

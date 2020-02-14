@@ -8,9 +8,9 @@ using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Services.Birthday;
 using Shrooms.Domain.Services.Roles;
-using Shrooms.UnitTests.Extensions;
+using Shrooms.Tests.Extensions;
 
-namespace Shrooms.UnitTests.DomainService
+namespace Shrooms.Tests.DomainService
 {
     public class BirthdayServiceTests
     {

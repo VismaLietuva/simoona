@@ -5,7 +5,7 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using Microsoft.AspNet.Identity;
-using Shrooms.Contracts.DataTransferObjects.Models;
+using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Presentation.Api.Helpers;
 

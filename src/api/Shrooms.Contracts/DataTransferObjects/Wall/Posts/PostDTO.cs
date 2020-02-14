@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using Shrooms.Contracts.DataTransferObjects.Models.Users;
-using Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts.Comments;
+using Shrooms.Contracts.DataTransferObjects.Users;
+using Shrooms.Contracts.DataTransferObjects.Wall.Comments;
 using Shrooms.Contracts.Enums;
 
-namespace Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts
+namespace Shrooms.Contracts.DataTransferObjects.Wall.Posts
 {
     public class PostDTO
     {

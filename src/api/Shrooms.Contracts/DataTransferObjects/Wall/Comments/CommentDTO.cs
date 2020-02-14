@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Shrooms.Contracts.DataTransferObjects.Models.Users;
+using Shrooms.Contracts.DataTransferObjects.Users;
 
-namespace Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts.Comments
+namespace Shrooms.Contracts.DataTransferObjects.Wall.Comments
 {
     public class CommentDto
     {

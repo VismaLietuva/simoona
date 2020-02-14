@@ -1,4 +1,4 @@
-﻿using Shrooms.Contracts.DataTransferObjects.Models.Users;
+﻿using Shrooms.Contracts.DataTransferObjects.Users;
 
 namespace Shrooms.Contracts.DataTransferObjects.Models.Wall.Likes
 {

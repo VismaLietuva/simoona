@@ -10,7 +10,8 @@ using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
-using Shrooms.Contracts.DataTransferObjects.Models;
+using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.DataTransferObjects.Kudos;
 using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
 using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -21,10 +22,10 @@ using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.Domain.ServiceValidators.Validators.Kudos;
 using Shrooms.Infrastructure.FireAndForget;
-using Shrooms.UnitTests.Extensions;
-using Shrooms.UnitTests.ModelMappings;
+using Shrooms.Tests.Extensions;
+using Shrooms.Tests.ModelMappings;
 
-namespace Shrooms.UnitTests.DomainService
+namespace Shrooms.Tests.DomainService
 {
     [SuppressMessage("ReSharper", "PossibleMultipleEnumeration", Justification = "Acceptable for tests")]
     public class KudosServiceTests

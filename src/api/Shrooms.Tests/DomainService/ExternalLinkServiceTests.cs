@@ -10,9 +10,9 @@ using Shrooms.Contracts.DataTransferObjects.Models.ExternalLinks;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Services.ExternalLinks;
-using Shrooms.UnitTests.Extensions;
+using Shrooms.Tests.Extensions;
 
-namespace Shrooms.UnitTests.DomainService
+namespace Shrooms.Tests.DomainService
 {
     [TestFixture]
     public class ExternalLinkServiceTests

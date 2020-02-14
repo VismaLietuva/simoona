@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Shrooms.Contracts.DataTransferObjects.Kudos;
 using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
 using Shrooms.Presentation.WebViewModels.Models.KudosTypes;
 using Shrooms.Presentation.WebViewModels.Models.Users.Kudos;

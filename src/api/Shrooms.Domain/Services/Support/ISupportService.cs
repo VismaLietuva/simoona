@@ -1,4 +1,4 @@
-﻿using Shrooms.Contracts.DataTransferObjects.Models;
+﻿using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Support;
 
 namespace Shrooms.Domain.Services.Support

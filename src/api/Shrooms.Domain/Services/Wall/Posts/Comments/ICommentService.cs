@@ -1,5 +1,5 @@
-﻿using Shrooms.Contracts.DataTransferObjects.Models;
-using Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts.Comments;
+﻿using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.DataTransferObjects.Models.Wall.Comments;
 
 namespace Shrooms.Domain.Services.Wall.Posts.Comments
 {

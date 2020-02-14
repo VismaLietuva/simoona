@@ -3,7 +3,7 @@ using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Presentation.Api.Helpers;
 
-namespace Shrooms.UnitTests.Helpers
+namespace Shrooms.Tests.Helpers
 {
     [TestFixture]
     public class CustomUrlHelperTest

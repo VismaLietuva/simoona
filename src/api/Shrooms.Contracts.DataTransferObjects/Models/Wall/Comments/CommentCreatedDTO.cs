@@ -1,6 +1,6 @@
 ﻿using Shrooms.Contracts.Enums;
 
-namespace Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts.Comments
+namespace Shrooms.Contracts.DataTransferObjects.Models.Wall.Comments
 {
     public class CommentCreatedDTO
     {

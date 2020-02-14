@@ -14,10 +14,10 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.WebViewModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.PostModels;
-using Shrooms.UnitTests.Mocks;
-using Shrooms.UnitTests.ModelMappings;
+using Shrooms.Tests.Mocks;
+using Shrooms.Tests.ModelMappings;
 
-namespace Shrooms.UnitTests.Controllers.WebApi
+namespace Shrooms.Tests.Controllers.WebApi
 {
     [TestFixture]
     public class FloorControllerTests

@@ -212,4 +212,5 @@ src/webapp/node_modules
 src/webapp/src/client/resources/locale-lt_LT.json
 src/webapp/src/client/resources/locale-en_US.json
 src/webapp/src/client/app/build-config.js
-/src/api/Main/PresentationLayer/Shrooms.API/Extensions/**
+/src/api/Shrooms.Presentation.Api/Extensions/**
+/src/api/Shrooms.Presentation.Api/Extensions/**

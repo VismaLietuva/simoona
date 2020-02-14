@@ -1,5 +1,5 @@
-﻿using Shrooms.Contracts.DataTransferObjects.Models;
-using Shrooms.Contracts.DataTransferObjects.Models.Users;
+﻿using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.DataTransferObjects.Users;
 using Shrooms.DataLayer.EntityModels.Models;
 
 namespace Shrooms.Domain.Services.Organizations

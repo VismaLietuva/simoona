@@ -5,7 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
-using Shrooms.Contracts.DataTransferObjects.Models;
+using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.KudosBasket;
 using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models;

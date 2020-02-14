@@ -6,8 +6,8 @@ using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
-using Shrooms.Contracts.DataTransferObjects.Models;
-using Shrooms.Contracts.DataTransferObjects.Models.Wall;
+using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.DataTransferObjects.Wall;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -16,10 +16,10 @@ using Shrooms.Domain.Exceptions.Exceptions;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.Domain.Services.Wall;
-using Shrooms.UnitTests.Extensions;
-using Shrooms.UnitTests.ModelMappings;
+using Shrooms.Tests.Extensions;
+using Shrooms.Tests.ModelMappings;
 
-namespace Shrooms.UnitTests.DomainService
+namespace Shrooms.Tests.DomainService
 {
     [TestFixture]
     public class WallServiceTests

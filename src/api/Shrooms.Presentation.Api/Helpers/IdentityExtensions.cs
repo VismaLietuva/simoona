@@ -1,6 +1,6 @@
 ﻿using System.Security.Principal;
 using Microsoft.AspNet.Identity;
-using Shrooms.Contracts.DataTransferObjects.Models;
+using Shrooms.Contracts.DataTransferObjects;
 
 namespace Shrooms.Presentation.Api.Helpers
 {

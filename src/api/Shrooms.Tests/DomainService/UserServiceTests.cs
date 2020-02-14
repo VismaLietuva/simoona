@@ -11,7 +11,7 @@ using NUnit.Framework;
 using Shrooms.Authentification.Membership;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
-using Shrooms.Contracts.DataTransferObjects.Models;
+using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Users;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
@@ -19,10 +19,10 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.Domain.Services.Picture;
 using Shrooms.Domain.Services.UserService;
-using Shrooms.UnitTests.Extensions;
-using Shrooms.UnitTests.Mocks;
+using Shrooms.Tests.Extensions;
+using Shrooms.Tests.Mocks;
 
-namespace Shrooms.UnitTests.DomainService
+namespace Shrooms.Tests.DomainService
 {
     [TestFixture]
     public class UserServiceTests

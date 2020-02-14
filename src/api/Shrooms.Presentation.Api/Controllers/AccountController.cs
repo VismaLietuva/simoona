@@ -16,7 +16,7 @@ using Shrooms.Presentation.Api.Providers;
 using Shrooms.Presentation.Api.Results;
 using Shrooms.Authentification.ExternalLoginInfrastructure;
 using Shrooms.Authentification.Membership;
-using Shrooms.Contracts.DataTransferObjects.Models;
+using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Constants;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Services.Administration;

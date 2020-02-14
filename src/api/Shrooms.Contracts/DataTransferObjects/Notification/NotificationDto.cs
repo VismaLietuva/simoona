@@ -1,6 +1,6 @@
 ﻿using Shrooms.Contracts.Enums;
 
-namespace Shrooms.Contracts.DataTransferObjects.Models.Notification
+namespace Shrooms.Contracts.DataTransferObjects.Notification
 {
     public class NotificationDto
     {

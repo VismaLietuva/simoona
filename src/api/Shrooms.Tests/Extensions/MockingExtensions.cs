@@ -5,9 +5,9 @@ using System.Linq;
 using NSubstitute;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
-using Shrooms.UnitTests.Mocks;
+using Shrooms.Tests.Mocks;
 
-namespace Shrooms.UnitTests.Extensions
+namespace Shrooms.Tests.Extensions
 {
     public static class MockingExtensions
     {

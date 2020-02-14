@@ -95,7 +95,6 @@
     <Compile Include="Models\Administration\AdministrationUserDTO.cs" />
     <Compile Include="Models\Administration\FilterDTO.cs" />
     <Compile Include="Models\ApplicationUserDTO.cs" />
-    <Compile Include="Models\ApplicationUserMinimalViewModelDto.cs" />
     <Compile Include="Models\Birthdays\BirthdayDTO.cs" />
     <Compile Include="Models\Birthdays\UserBirthdayInfoDTO.cs" />
     <Compile Include="Models\Emails\EmailSendingDTO.cs" />
@@ -104,8 +103,6 @@
     <Compile Include="Models\ExternalLinks\NewExternalLinkDTO.cs" />
     <Compile Include="Models\Jobs\JobTypeDTO.cs" />
     <Compile Include="Models\Kudos\WelcomeKudosDTO.cs" />
-    <Compile Include="Models\Notification\NotificationDto.cs" />
-    <Compile Include="Models\Notification\SourcesDto.cs" />
     <Compile Include="Models\Projects\ProjectDetailsDto.cs" />
     <Compile Include="Models\Kudos\NewKudosTypeDto.cs" />
     <Compile Include="Models\Projects\ProjectsAutoCompleteDto.cs" />
@@ -123,7 +120,6 @@
     <Compile Include="Models\KudosBasket\KudosBasketLogDTO.cs" />
     <Compile Include="Models\KudosBasket\KudosBasketLogUserDTO.cs" />
     <Compile Include="Models\Kudos\AddKudosDTO.cs" />
-    <Compile Include="Models\Kudos\AddKudosLogDTO.cs" />
     <Compile Include="Models\Kudos\KudosBasicDataDTO.cs" />
     <Compile Include="Models\Kudos\MainKudosLogDTO.cs" />
     <Compile Include="Models\Kudos\KudosLogInputDTO.cs" />
@@ -139,8 +135,6 @@
     <Compile Include="Models\Kudos\UserKudosDTO.cs" />
     <Compile Include="Models\Kudos\UserKudosInformationDTO.cs" />
     <Compile Include="Models\Kudos\WallKudosLogDTO.cs" />
-    <Compile Include="Models\LazyPaged\ILazyPaged.cs" />
-    <Compile Include="Models\LazyPaged\LazyPaged.cs" />
     <Compile Include="Models\Monitors\MonitorDTO.cs" />
     <Compile Include="Models\Organizations\OrganizationDTO.cs" />
     <Compile Include="Models\Permissions\PermissionDTO.cs" />
@@ -150,8 +144,6 @@
     <Compile Include="Models\Roles\RoleDTO.cs" />
     <Compile Include="Models\Roles\RoleUserDTO.cs" />
     <Compile Include="Models\Support\SupportType.cs" />
-    <Compile Include="Models\UserAndOrganizationDTO.cs" />
-    <Compile Include="Models\UserAndOrganizationHubDto.cs" />
     <Compile Include="Models\Users\ChangeUserLocalizationSettingsDto.cs" />
     <Compile Include="Models\Users\LanguageDto.cs" />
     <Compile Include="Models\Users\UserNotificationsSettingsDto.cs" />
@@ -159,21 +151,14 @@
     <Compile Include="Models\Users\LocalizationSettingsDto.cs" />
     <Compile Include="Models\Users\TimeZoneDto.cs" />
     <Compile Include="Models\WallPosts\UserDTO.cs" />
+    <Compile Include="Models\Wall\Comments\CommentCreatedDTO.cs" />
+    <Compile Include="Models\Wall\Comments\EditCommentDTO.cs" />
+    <Compile Include="Models\Wall\Comments\NewCommentDTO.cs" />
     <Compile Include="Models\Wall\Moderator\ModeratorDto.cs" />
-    <Compile Include="Models\Wall\UpdateWallDto.cs" />
     <Compile Include="Models\Wall\WallsListFilter.cs" />
     <Compile Include="Models\Wall\WallUserAction.cs" />
-    <Compile Include="Models\Wall\Posts\Comments\CommentCreatedDTO.cs" />
-    <Compile Include="Models\Wall\CreateWallDto.cs" />
-    <Compile Include="Models\Wall\Posts\Comments\CommentDTO.cs" />
-    <Compile Include="Models\Wall\Posts\Comments\EditCommentDTO.cs" />
-    <Compile Include="Models\Wall\Posts\Comments\NewCommentDTO.cs" />
     <Compile Include="Models\Wall\Posts\EditPostDTO.cs" />
     <Compile Include="Models\Wall\Likes\LikeDTO.cs" />
-    <Compile Include="Models\Wall\Posts\NewlyCreatedPostDTO.cs" />
-    <Compile Include="Models\Wall\Posts\NewPostDTO.cs" />
-    <Compile Include="Models\Wall\Posts\PostDTO.cs" />
-    <Compile Include="Models\Users\UserDTO.cs" />
     <Compile Include="Models\Wall\UserWallDTO.cs" />
     <Compile Include="Models\Wall\WallDto.cs" />
     <Compile Include="Models\Wall\WallMemberDto.cs" />

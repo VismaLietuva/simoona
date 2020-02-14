@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
-using Shrooms.Contracts.DataTransferObjects.Models.Notification;
+using Shrooms.Contracts.DataTransferObjects.Notification;
 using Shrooms.Contracts.Enums;
 using Shrooms.Domain.Services.Notifications;
 using Shrooms.Presentation.WebViewModels.Models.Notifications;

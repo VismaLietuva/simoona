@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 using AutoMapper;
-using Shrooms.Contracts.DataTransferObjects.Models;
+using Shrooms.Contracts.DataTransferObjects;
 
 namespace Shrooms.Presentation.ModelMappings
 {

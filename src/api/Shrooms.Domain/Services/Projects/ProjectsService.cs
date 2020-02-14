@@ -5,10 +5,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
-using Shrooms.Contracts.DataTransferObjects.Models;
+using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Projects;
-using Shrooms.Contracts.DataTransferObjects.Models.Users;
-using Shrooms.Contracts.DataTransferObjects.Models.Wall;
+using Shrooms.Contracts.DataTransferObjects.Users;
+using Shrooms.Contracts.DataTransferObjects.Wall;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -65,7 +65,7 @@ namespace Shrooms.Domain.Services.Projects
             var projects = await _projectsDbSet
                 .Where(x => x.OrganizationId == organizationId &&
                             x.Name.ToLower().StartsWith(nameInLowerCase))
-                .Select(x => new ProjectsAutoCompleteDto()
+                .Select(x => new ProjectsAutoCompleteDto
                 {
                     Id = x.Id,
                     Name = x.Name
@@ -83,13 +83,13 @@ namespace Shrooms.Domain.Services.Projects
                 .Include(x => x.Attributes)
                 .Where(x => x.OrganizationId == userAndOrganizationDTO.OrganizationId &&
                             x.Id == projectId)
-                .Select(x => new ProjectDetailsDto()
+                .Select(x => new ProjectDetailsDto
                 {
                     Name = x.Name,
                     Desc = x.Desc,
                     WallId = x.WallId,
                     LogoId = x.Logo,
-                    Owner = new ApplicationUserMinimalViewModelDto()
+                    Owner = new ApplicationUserMinimalDto
                     {
                         Id = x.Owner.Id,
                         FirstName = x.Owner.FirstName,
@@ -98,7 +98,7 @@ namespace Shrooms.Domain.Services.Projects
                     },
                     Attributes = x.Attributes.Select(t => t.Title),
                     Members = x.Members
-                        .Select(m => new ApplicationUserMinimalViewModelDto()
+                        .Select(m => new ApplicationUserMinimalDto
                         {
                             Id = m.Id,
                             FirstName = m.FirstName,
@@ -342,7 +342,7 @@ namespace Shrooms.Domain.Services.Projects
 
         private void UpdateWall(EditProjectDto dto, int wallId)
         {
-            var updateWallDto = new UpdateWallDto()
+            var updateWallDto = new UpdateWallDto
             {
                 Id = wallId,
                 Description = dto.Description,

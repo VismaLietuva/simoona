@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Shrooms.Contracts.DataTransferObjects.Models.Users;
+using Shrooms.Contracts.DataTransferObjects.Users;
 
 namespace Shrooms.Contracts.DataTransferObjects.Models.Projects
 {

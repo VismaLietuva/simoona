@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Shrooms.Contracts.DataTransferObjects.Models.Wall
+namespace Shrooms.Contracts.DataTransferObjects.Wall
 {
     public class UpdateWallDto : UserAndOrganizationDTO
     {
