@@ -4,13 +4,13 @@ using System.IO;
 using Excel;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Contracts.DataTransferObjects.Models;
+using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Infrastructure.ExcelGenerator;
-using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events;
-using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Export;
-using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Participation;
-using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Utilities;
+using Shrooms.Premium.DataTransferObjects.Models.Events;
+using Shrooms.Premium.Domain.Services.Events.Export;
+using Shrooms.Premium.Domain.Services.Events.Participation;
+using Shrooms.Premium.Domain.Services.Events.Utilities;
 
 namespace Shrooms.Premium.UnitTests.DomainService.EventServices
 {

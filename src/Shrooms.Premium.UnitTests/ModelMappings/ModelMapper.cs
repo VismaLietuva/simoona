@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using System;
-using Shrooms.Premium.Infrastructure.ModelMappings.Profiles;
+using Shrooms.Premium.Presentation.ModelMappings.Profiles;
 
 namespace Shrooms.Premium.UnitTests.ModelMappings
 {

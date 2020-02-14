@@ -8,8 +8,8 @@ using Shrooms.Domain.Services.Roles;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
-using Shrooms.Premium.Main.BusinessLayer.Domain.Services.OfficeMap;
-using Shrooms.UnitTests.Extensions;
+using Shrooms.Premium.Domain.Services.OfficeMap;
+using Shrooms.Tests.Extensions;
 
 namespace Shrooms.Premium.UnitTests.DomainService
 {

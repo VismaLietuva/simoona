@@ -3,7 +3,7 @@ using System.Linq;
 using Shrooms.DataLayer.DAL;
 using Shrooms.Contracts.DAL;
 using Shrooms.Infrastructure.Configuration;
-using Shrooms.UnitTests.Extensions;
+using Shrooms.Tests.Extensions;
 
 namespace Shrooms.Premium.UnitTests.Mocks
 {

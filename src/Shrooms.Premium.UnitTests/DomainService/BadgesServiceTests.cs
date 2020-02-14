@@ -9,8 +9,8 @@ using Shrooms.DataLayer.EntityModels.Models.Badges;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Enums;
-using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Badges;
-using Shrooms.UnitTests.Extensions;
+using Shrooms.Premium.Domain.Services.Badges;
+using Shrooms.Tests.Extensions;
 
 namespace Shrooms.Premium.UnitTests.DomainService
 {

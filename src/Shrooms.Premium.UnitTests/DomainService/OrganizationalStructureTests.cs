@@ -3,13 +3,13 @@ using System.Data.Entity;
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Contracts.DataTransferObjects.Models;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
-using Shrooms.Premium.Main.BusinessLayer.Domain.Services.OrganizationalStructure;
-using Shrooms.UnitTests.Extensions;
+using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Premium.Domain.Services.OrganizationalStructure;
+using Shrooms.Tests.Extensions;
 
 namespace Shrooms.Premium.UnitTests.DomainService
 {

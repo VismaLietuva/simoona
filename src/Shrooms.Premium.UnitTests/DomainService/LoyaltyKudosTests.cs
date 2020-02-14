@@ -9,9 +9,9 @@ using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Infrastructure.FireAndForget;
-using Shrooms.Premium.Main.BusinessLayer.Domain.Services.WebHookCallbacks.LoyaltyKudos;
+using Shrooms.Premium.Domain.Services.WebHookCallbacks.LoyaltyKudos;
 using Shrooms.Premium.UnitTests.ModelMappings;
-using Shrooms.UnitTests.Extensions;
+using Shrooms.Tests.Extensions;
 
 namespace Shrooms.Premium.UnitTests.DomainService
 {

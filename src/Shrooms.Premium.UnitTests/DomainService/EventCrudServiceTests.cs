@@ -4,7 +4,6 @@ using System.Data.Entity;
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Contracts.DataTransferObjects.Models;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
@@ -12,17 +11,18 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
-using Shrooms.Premium.Constants;
-using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events;
-using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events;
-using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Participation;
-using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Utilities;
-using Shrooms.Premium.Main.BusinessLayer.DomainExceptions.Event;
-using Shrooms.Premium.Main.BusinessLayer.DomainServiceValidators.Events;
-using Shrooms.UnitTests.Extensions;
 using Shrooms.Domain.Helpers;
 using Shrooms.Contracts.Enums;
+using Shrooms.Premium.Constants;
+using Shrooms.Premium.DataTransferObjects.Models.Events;
+using Shrooms.Premium.Domain.DomainExceptions.Event;
+using Shrooms.Premium.Domain.DomainServiceValidators.Events;
+using Shrooms.Premium.Domain.Services.Events;
+using Shrooms.Premium.Domain.Services.Events.Participation;
+using Shrooms.Premium.Domain.Services.Events.Utilities;
+using Shrooms.Tests.Extensions;
 
 namespace Shrooms.Premium.UnitTests.DomainService
 {

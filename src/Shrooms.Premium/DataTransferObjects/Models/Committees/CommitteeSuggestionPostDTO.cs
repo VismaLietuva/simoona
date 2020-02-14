@@ -1,0 +1,11 @@
+﻿namespace Shrooms.Premium.DataTransferObjects.Models.Committees
+{
+    public class CommitteeSuggestionPostDTO
+    {
+        public int CommitteeId { get; set; }
+
+        public string Title { get; set; }
+
+        public string Description { get; set; }
+    }
+}

@@ -9,10 +9,10 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Books;
 using Shrooms.Contracts.DAL;
 using Shrooms.Infrastructure.GoogleBookApiService;
-using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Books;
-using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Books;
-using Shrooms.Premium.Main.BusinessLayer.DomainServiceValidators.Books;
-using Shrooms.UnitTests.Extensions;
+using Shrooms.Premium.DataTransferObjects.Models.Books;
+using Shrooms.Premium.Domain.DomainServiceValidators.Books;
+using Shrooms.Premium.Domain.Services.Books;
+using Shrooms.Tests.Extensions;
 
 namespace Shrooms.Premium.UnitTests.DomainService
 {

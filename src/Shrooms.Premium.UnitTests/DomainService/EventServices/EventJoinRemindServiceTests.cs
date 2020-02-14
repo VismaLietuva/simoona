@@ -4,12 +4,12 @@ using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.DataLayer.EntityModels.Models;
-using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events;
-using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.Event;
-using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Utilities;
-using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Notifications;
-using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Users;
-using Shrooms.Premium.Main.BusinessLayer.Domain.Services.WebHookCallbacks.Events;
+using Shrooms.Premium.DataTransferObjects.Models.Events;
+using Shrooms.Premium.Domain.Services.Email.Event;
+using Shrooms.Premium.Domain.Services.Events.Utilities;
+using Shrooms.Premium.Domain.Services.Notifications;
+using Shrooms.Premium.Domain.Services.Users;
+using Shrooms.Premium.Domain.Services.WebHookCallbacks.Events;
 
 namespace Shrooms.Premium.UnitTests.DomainService.EventServices
 {

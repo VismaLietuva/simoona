@@ -1,14 +1,14 @@
 ﻿using NSubstitute;
 using NUnit.Framework;
 using Shrooms.DataLayer.EntityModels.Models;
-using Shrooms.UnitTests.Extensions;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using Shrooms.DataLayer.EntityModels.Models.Lottery;
 using Shrooms.Contracts.DAL;
-using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Lotteries;
-using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Lotteries;
+using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
+using Shrooms.Premium.Domain.Services.Lotteries;
+using Shrooms.Tests.Extensions;
 
 namespace Shrooms.Premium.UnitTests.DomainService.LotteryServices
 {

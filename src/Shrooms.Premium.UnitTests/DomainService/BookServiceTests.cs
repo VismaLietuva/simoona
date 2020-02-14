@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Contracts.DataTransferObjects.Models;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.Domain.Services.UserService;
@@ -13,16 +12,17 @@ using Shrooms.Domain.Exceptions.Exceptions.Book;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Books;
 using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Infrastructure.GoogleBookApiService;
-using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Books;
-using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Books.BookDetails;
-using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Books.BooksByOffice;
-using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Books;
-using Shrooms.Premium.Main.BusinessLayer.DomainServiceValidators.Books;
-using Shrooms.UnitTests.Extensions;
+using Shrooms.Premium.DataTransferObjects.Models.Books;
+using Shrooms.Premium.DataTransferObjects.Models.Books.BookDetails;
+using Shrooms.Premium.DataTransferObjects.Models.Books.BooksByOffice;
+using Shrooms.Premium.Domain.DomainServiceValidators.Books;
+using Shrooms.Premium.Domain.Services.Books;
+using Shrooms.Tests.Extensions;
 
 namespace Shrooms.Premium.UnitTests.DomainService
 {

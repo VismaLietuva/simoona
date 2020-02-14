@@ -4,16 +4,16 @@ using System.Data.Entity;
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Contracts.DataTransferObjects.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Premium.Constants;
-using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events;
-using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.List;
-using Shrooms.Premium.Main.BusinessLayer.DomainExceptions.Event;
-using Shrooms.Premium.Main.BusinessLayer.DomainServiceValidators.Events;
-using Shrooms.UnitTests.Extensions;
+using Shrooms.Premium.DataTransferObjects.Models.Events;
+using Shrooms.Premium.Domain.DomainExceptions.Event;
+using Shrooms.Premium.Domain.DomainServiceValidators.Events;
+using Shrooms.Premium.Domain.Services.Events.List;
+using Shrooms.Tests.Extensions;
 
 namespace Shrooms.Premium.UnitTests.DomainService
 {
