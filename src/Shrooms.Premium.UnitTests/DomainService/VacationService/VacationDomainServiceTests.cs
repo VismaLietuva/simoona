@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using Shrooms.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Vacations;
 
 namespace Shrooms.Premium.UnitTests.DomainService.VacationService

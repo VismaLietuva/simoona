@@ -1,7 +1,7 @@
 using System;
 using System.Linq.Expressions;
-using Shrooms.DataTransferObjects.Models;
-using Shrooms.EntityModels.Models;
+using Shrooms.Contracts.DataTransferObjects.Models;
+using Shrooms.DataLayer.EntityModels.Models;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.ServiceRequests
 {

@@ -1,14 +1,15 @@
 ﻿using System.Data.Entity;
 using System.Linq;
-using Shrooms.DataTransferObjects.EmailTemplateViewModels;
-using Shrooms.DataTransferObjects.Models;
-using Shrooms.EntityModels.Models;
-using Shrooms.Host.Contracts.Constants;
-using Shrooms.Host.Contracts.DAL;
-using Shrooms.Host.Contracts.DataTransferObjects;
-using Shrooms.Host.Contracts.Infrastructure;
-using Shrooms.Host.Contracts.Infrastructure.Email;
+using Shrooms.Contracts.DataTransferObjects.Models;
+using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.Contracts.Constants;
+using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels;
+using Shrooms.Contracts.Infrastructure;
+using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.ServiceRequest;
+using ServiceRequestModel = Shrooms.DataLayer.EntityModels.Models.ServiceRequest;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.ServiceRequest
 {
@@ -18,7 +19,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.ServiceReques
         private readonly IDbSet<ApplicationUser> _usersDbSet;
         private readonly IDbSet<ApplicationRole> _rolesDbSet;
         private readonly IDbSet<ServiceRequestStatus> _serviceRequestStatusDbSet;
-        private readonly IDbSet<EntityModels.Models.ServiceRequest> _serviceRequestDbSet;
+        private readonly IDbSet<ServiceRequestModel> _serviceRequestDbSet;
         private readonly IApplicationSettings _appSettings;
         private readonly IMailingService _mailingService;
         private readonly IMailTemplate _mailTemplate;
@@ -32,7 +33,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.ServiceReques
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
             _rolesDbSet = uow.GetDbSet<ApplicationRole>();
             _serviceRequestStatusDbSet = uow.GetDbSet<ServiceRequestStatus>();
-            _serviceRequestDbSet = uow.GetDbSet<EntityModels.Models.ServiceRequest>();
+            _serviceRequestDbSet = uow.GetDbSet<ServiceRequestModel>();
             _mailingService = mailingService;
             _mailTemplate = mailTemplate;
             _appSettings = appSettings;

@@ -5,19 +5,19 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using MoreLinq;
-using Shrooms.DataTransferObjects.EmailTemplateViewModels;
-using Shrooms.DataTransferObjects.Models;
-using Shrooms.DataTransferObjects.Models.LazyPaged;
+using Shrooms.Contracts.DataTransferObjects.Models;
+using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels;
+using Shrooms.Contracts.DataTransferObjects.Models.LazyPaged;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.Domain.Services.UserService;
-using Shrooms.EntityModels.Models;
-using Shrooms.EntityModels.Models.Books;
-using Shrooms.Host.Contracts.Constants;
-using Shrooms.Host.Contracts.DAL;
-using Shrooms.Host.Contracts.DataTransferObjects;
-using Shrooms.Host.Contracts.Infrastructure;
-using Shrooms.Host.Contracts.Infrastructure.Email;
+using Shrooms.DataLayer.EntityModels.Models.Books;
+using Shrooms.Contracts.Constants;
+using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.Infrastructure;
+using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Infrastructure.GoogleBookApiService;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models;
@@ -458,7 +458,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Books
                 Author = bookOffice.Book.Author,
                 Title = bookOffice.Book.Title,
                 Url = bookOffice.Book.Url,
-                QuantityLeft = bookOffice.Quantity - bookOffice.BookLogs.Where(x => x.Returned == null).Count(),
+                QuantityLeft = bookOffice.Quantity - bookOffice.BookLogs.Count(x => x.Returned == null),
                 OwnerId = bookOffice.Book.ApplicationUserId,
                 Note = bookOffice.Book.Note,
                 Readers = bookOffice.BookLogs.Where(x => x.Returned == null).Select(x => new BasicBookUserDTO

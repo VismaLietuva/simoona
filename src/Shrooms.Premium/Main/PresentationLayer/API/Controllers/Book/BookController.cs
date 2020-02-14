@@ -2,13 +2,10 @@
 using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
-using Shrooms.API.Controllers;
-using Shrooms.API.Filters;
-using Shrooms.API.Helpers;
-using Shrooms.DataTransferObjects.Models;
-using Shrooms.DataTransferObjects.Models.LazyPaged;
-using Shrooms.DomainExceptions.Exceptions.Book;
-using Shrooms.Host.Contracts.Constants;
+using Shrooms.Contracts.DataTransferObjects.Models;
+using Shrooms.Contracts.DataTransferObjects.Models.LazyPaged;
+using Shrooms.Contracts.Constants;
+using Shrooms.Domain.Exceptions.Exceptions.Book;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Books;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Books.BookDetails;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Books.BooksByOffice;
@@ -16,6 +13,9 @@ using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Books;
 using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Book;
 using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Book.BookDetails;
 using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Book.BooksByOffice;
+using Shrooms.Presentation.Api.Controllers;
+using Shrooms.Presentation.Api.Filters;
+using Shrooms.Presentation.Api.Helpers;
 
 namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers.Book
 {

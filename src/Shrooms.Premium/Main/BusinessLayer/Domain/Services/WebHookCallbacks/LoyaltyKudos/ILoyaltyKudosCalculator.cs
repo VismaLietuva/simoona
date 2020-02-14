@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using Shrooms.EntityModels.Models;
-using Shrooms.EntityModels.Models.Kudos;
+using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Kudos;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.WebHookCallbacks.LoyaltyKudos

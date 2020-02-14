@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Shrooms.EntityModels.Models.Kudos;
+using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Kudos;
 
 namespace Shrooms.Premium.Infrastructure.ModelMappings.Profiles

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Shrooms.WebViewModels.Models;
+using Shrooms.Presentation.WebViewModels.Models;
 
 namespace Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Wall.Posts
 {

@@ -4,11 +4,11 @@ using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Shrooms.DataTransferObjects.Models;
-using Shrooms.EntityModels.Models.Kudos;
-using Shrooms.Host.Contracts.Constants;
-using Shrooms.Host.Contracts.DAL;
-using Shrooms.Host.Contracts.Exceptions;
+using Shrooms.Contracts.DataTransferObjects.Models;
+using Shrooms.DataLayer.EntityModels.Models.Kudos;
+using Shrooms.Contracts.Constants;
+using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.Exceptions;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Kudos;
 

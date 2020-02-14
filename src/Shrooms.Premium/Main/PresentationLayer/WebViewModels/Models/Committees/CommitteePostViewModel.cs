@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using Shrooms.WebViewModels.Models;
-using Shrooms.WebViewModels.Models.User;
+using Shrooms.Presentation.WebViewModels.Models;
+using Shrooms.Presentation.WebViewModels.Models.User;
 
 namespace Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Committees
 {

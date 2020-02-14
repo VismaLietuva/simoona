@@ -3,15 +3,15 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using AutoMapper;
-using Shrooms.API.Controllers;
-using Shrooms.API.Filters;
 using Shrooms.Domain.ServiceExceptions;
-using Shrooms.EntityModels.Models.Committee;
-using Shrooms.Host.Contracts.Constants;
-using Shrooms.Host.Contracts.DAL;
+using Shrooms.DataLayer.EntityModels.Models.Committee;
+using Shrooms.Contracts.Constants;
+using Shrooms.Contracts.DAL;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Committees;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Committees;
 using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Committees;
+using Shrooms.Presentation.Api.Controllers;
+using Shrooms.Presentation.Api.Filters;
 
 namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers
 {

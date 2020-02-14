@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Shrooms.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Domain
 {

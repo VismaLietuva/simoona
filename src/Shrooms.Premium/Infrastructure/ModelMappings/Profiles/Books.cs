@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Shrooms.DataTransferObjects.Models.LazyPaged;
+using Shrooms.Contracts.DataTransferObjects.Models.LazyPaged;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Books;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Books.BookDetails;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Books.BooksByOffice;

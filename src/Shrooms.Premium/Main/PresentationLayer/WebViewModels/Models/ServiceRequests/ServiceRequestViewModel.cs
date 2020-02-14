@@ -1,6 +1,6 @@
 ﻿using System;
-using Shrooms.EntityModels.Models;
-using Shrooms.WebViewModels.Models;
+using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.Presentation.WebViewModels.Models;
 
 namespace Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.ServiceRequests
 {

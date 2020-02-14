@@ -4,15 +4,15 @@ using System.Data.Entity;
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.DataTransferObjects.Models;
-using Shrooms.DataTransferObjects.Models.Wall;
+using Shrooms.Contracts.DataTransferObjects.Models;
+using Shrooms.Contracts.DataTransferObjects.Models.Wall;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
-using Shrooms.EntityModels.Models;
-using Shrooms.EntityModels.Models.Events;
-using Shrooms.Host.Contracts.Constants;
-using Shrooms.Host.Contracts.DAL;
-using Shrooms.Host.Contracts.Infrastructure;
+using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models.Events;
+using Shrooms.Contracts.Constants;
+using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events;
@@ -22,7 +22,7 @@ using Shrooms.Premium.Main.BusinessLayer.DomainExceptions.Event;
 using Shrooms.Premium.Main.BusinessLayer.DomainServiceValidators.Events;
 using Shrooms.UnitTests.Extensions;
 using Shrooms.Domain.Helpers;
-using Shrooms.Host.Contracts.Enums;
+using Shrooms.Contracts.Enums;
 
 namespace Shrooms.Premium.UnitTests.DomainService
 {

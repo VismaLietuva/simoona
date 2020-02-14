@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
-using Shrooms.DataTransferObjects.Models.Wall;
+using Shrooms.Contracts.DataTransferObjects.Models.Wall;
 using Shrooms.Domain.Services.Wall;
-using Shrooms.EntityModels.Models.Events;
-using Shrooms.Host.Contracts.DAL;
-using Shrooms.Host.Contracts.Enums;
-using Shrooms.Host.Contracts.Infrastructure;
+using Shrooms.DataLayer.EntityModels.Models.Events;
+using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.Enums;
+using Shrooms.Contracts.Infrastructure;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.WebHookCallbacks.Events
 {

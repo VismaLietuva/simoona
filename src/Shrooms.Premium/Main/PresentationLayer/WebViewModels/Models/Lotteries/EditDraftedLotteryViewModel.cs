@@ -1,5 +1,5 @@
 ﻿using System;
-using Shrooms.EntityModels.Models.Lottery;
+using Shrooms.DataLayer.EntityModels.Models.Lottery;
 
 namespace Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Lotteries
 {

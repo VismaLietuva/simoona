@@ -4,11 +4,11 @@ using System.Data.Entity;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.EntityModels.Models;
-using Shrooms.EntityModels.Models.Badges;
-using Shrooms.EntityModels.Models.Kudos;
-using Shrooms.Host.Contracts.DAL;
-using Shrooms.Host.Contracts.Enums;
+using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models.Badges;
+using Shrooms.DataLayer.EntityModels.Models.Kudos;
+using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.Enums;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Badges;
 using Shrooms.UnitTests.Extensions;
 

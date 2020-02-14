@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using Shrooms.EntityModels.Models.Lottery;
-using Shrooms.Host.Contracts.Constants;
+using Shrooms.DataLayer.EntityModels.Models.Lottery;
+using Shrooms.Contracts.Constants;
 
 namespace Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Lotteries
 {

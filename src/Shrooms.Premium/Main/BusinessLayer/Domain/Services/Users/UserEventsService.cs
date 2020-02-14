@@ -4,9 +4,9 @@ using System.Data.Entity;
 using System.Data.Entity.SqlServer;
 using System.Linq;
 using System.Linq.Expressions;
-using Shrooms.EntityModels.Models;
-using Shrooms.EntityModels.Models.Events;
-using Shrooms.Host.Contracts.DAL;
+using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models.Events;
+using Shrooms.Contracts.DAL;
 using Shrooms.Premium.Constants;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Users

@@ -1,4 +1,4 @@
-﻿using Shrooms.Host.Contracts.Enums;
+﻿using Shrooms.Contracts.Enums;
 
 namespace Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events
 {

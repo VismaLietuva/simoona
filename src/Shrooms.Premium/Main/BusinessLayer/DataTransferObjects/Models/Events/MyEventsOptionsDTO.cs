@@ -1,4 +1,4 @@
-﻿using Shrooms.DataTransferObjects.Models;
+﻿using Shrooms.Contracts.DataTransferObjects.Models;
 using Shrooms.Premium.Constants;
 
 namespace Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Shrooms.EntityModels.Models.Events;
-using Shrooms.Host.Contracts.Enums;
+using Shrooms.DataLayer.EntityModels.Models.Events;
+using Shrooms.Contracts.Enums;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events;
 
 namespace Shrooms.Premium.Main.BusinessLayer.DomainServiceValidators.Events

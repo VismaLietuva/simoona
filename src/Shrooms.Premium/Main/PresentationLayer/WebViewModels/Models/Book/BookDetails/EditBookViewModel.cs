@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Shrooms.WebViewModels.ValidationAttributes;
+using Shrooms.Presentation.WebViewModels.ValidationAttributes;
 
 namespace Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Book.BookDetails
 {

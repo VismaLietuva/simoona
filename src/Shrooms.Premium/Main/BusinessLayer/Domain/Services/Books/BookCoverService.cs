@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Data.Entity;
 using System.Linq;
-using Shrooms.EntityModels.Models.Books;
-using Shrooms.Host.Contracts.DAL;
-using Shrooms.Host.Contracts.Infrastructure;
+using Shrooms.DataLayer.EntityModels.Models.Books;
+using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Infrastructure.GoogleBookApiService;
 

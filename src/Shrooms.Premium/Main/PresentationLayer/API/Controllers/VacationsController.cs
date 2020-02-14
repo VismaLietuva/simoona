@@ -3,13 +3,13 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
 using Microsoft.AspNet.Identity;
-using Shrooms.API.Controllers;
-using Shrooms.API.Filters;
-using Shrooms.Host.Contracts.Constants;
-using Shrooms.Host.Contracts.Exceptions;
+using Shrooms.Contracts.Constants;
+using Shrooms.Contracts.Exceptions;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Vacations;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Vacations;
 using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Vacations;
+using Shrooms.Presentation.Api.Controllers;
+using Shrooms.Presentation.Api.Filters;
 
 namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers
 {

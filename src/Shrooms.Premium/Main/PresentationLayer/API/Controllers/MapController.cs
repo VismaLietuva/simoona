@@ -3,15 +3,15 @@ using System.Linq;
 using System.Web.Http;
 using AutoMapper;
 using PagedList;
-using Shrooms.API.Controllers;
-using Shrooms.API.Filters;
-using Shrooms.EntityModels.Models;
-using Shrooms.Host.Contracts.Constants;
-using Shrooms.Host.Contracts.DAL;
+using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.Contracts.Constants;
+using Shrooms.Contracts.DAL;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.OfficeMap;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.OfficeMap;
-using Shrooms.WebViewModels.Models;
-using Shrooms.WebViewModels.Models.Map;
+using Shrooms.Presentation.Api.Controllers;
+using Shrooms.Presentation.Api.Filters;
+using Shrooms.Presentation.WebViewModels.Models;
+using Shrooms.Presentation.WebViewModels.Models.Map;
 
 namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers
 {

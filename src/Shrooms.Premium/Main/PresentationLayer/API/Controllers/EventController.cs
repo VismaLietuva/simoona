@@ -5,11 +5,9 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
-using Shrooms.API.Controllers;
-using Shrooms.API.Filters;
-using Shrooms.DataTransferObjects.Models.Wall.Posts;
+using Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts;
 using Shrooms.Domain.Services.Wall.Posts;
-using Shrooms.Host.Contracts.Constants;
+using Shrooms.Contracts.Constants;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.OfficeMap;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events;
@@ -21,13 +19,15 @@ using Shrooms.Premium.Main.BusinessLayer.Domain.Services.OfficeMap;
 using Shrooms.Premium.Main.BusinessLayer.DomainExceptions.Event;
 using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Events;
 using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.User;
-using Shrooms.WebViewModels.Models.Wall.Posts;
 using Shrooms.Infrastructure.FireAndForget;
 using System.Linq;
 using Newtonsoft.Json;
-using Shrooms.Host.Contracts.Exceptions;
+using Shrooms.Contracts.Exceptions;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Calendar;
 using Shrooms.Premium.Main.PresentationLayer.API.BackgroundWorkers;
+using Shrooms.Presentation.Api.Controllers;
+using Shrooms.Presentation.Api.Filters;
+using Shrooms.Presentation.WebViewModels.Models.Wall.Posts;
 
 namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers
 {

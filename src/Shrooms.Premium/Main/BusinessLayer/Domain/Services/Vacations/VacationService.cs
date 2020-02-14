@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 using Excel;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
-using Shrooms.DataTransferObjects.Models;
-using Shrooms.EntityModels.Models;
-using Shrooms.Host.Contracts.DAL;
+using Shrooms.Contracts.DataTransferObjects.Models;
+using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.Contracts.DAL;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Vacations;
 using Shrooms.Premium.Main.BusinessLayer.DomainExceptions.Vacation;
 

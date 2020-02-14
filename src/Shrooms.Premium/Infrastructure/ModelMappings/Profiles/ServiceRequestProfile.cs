@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Shrooms.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.ServiceRequest;
 using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.ServiceRequests;
 

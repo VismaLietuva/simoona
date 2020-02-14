@@ -1,4 +1,4 @@
-﻿using Shrooms.DataTransferObjects.Models;
+﻿using Shrooms.Contracts.DataTransferObjects.Models;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Args
 {

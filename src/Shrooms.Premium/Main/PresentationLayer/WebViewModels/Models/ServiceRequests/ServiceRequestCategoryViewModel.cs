@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Shrooms.Premium.Constants;
-using Shrooms.WebViewModels.Models.User;
+using Shrooms.Presentation.WebViewModels.Models.User;
 
 namespace Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.ServiceRequests
 {

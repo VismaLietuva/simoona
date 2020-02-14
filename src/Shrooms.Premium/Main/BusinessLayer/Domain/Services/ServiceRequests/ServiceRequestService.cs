@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using Shrooms.DataTransferObjects.Models;
+using Shrooms.Contracts.DataTransferObjects.Models;
+using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Permissions;
-using Shrooms.EntityModels.Models;
-using Shrooms.Host.Contracts.Constants;
+using Shrooms.Contracts.Constants;
 using Shrooms.Infrastructure.FireAndForget;
-using Shrooms.Host.Contracts.DAL;
-using Shrooms.Host.Contracts.Exceptions;
+using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.Exceptions;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.ServiceRequest;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.ServiceRequest;
@@ -57,8 +57,7 @@ namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.ServiceRequests
                     .First();
 
             var serviceRequestCategory = _serviceRequestCategoryDbSet
-                    .Where(x => x.Id == newServiceRequestDTO.ServiceRequestCategoryId)
-                    .FirstOrDefault();
+                .FirstOrDefault(x => x.Id == newServiceRequestDTO.ServiceRequestCategoryId);
 
             if (serviceRequestCategory == null)
             {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Shrooms.EntityModels.Models.Events;
+using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Premium.Constants;
 
 namespace Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Events

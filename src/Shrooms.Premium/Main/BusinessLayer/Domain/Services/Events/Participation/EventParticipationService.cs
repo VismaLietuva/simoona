@@ -4,23 +4,23 @@ using System.Data.Entity;
 using System.Data.Entity.SqlServer;
 using System.Linq;
 using System.Linq.Expressions;
-using Shrooms.DataTransferObjects.Models;
+using Shrooms.Contracts.Constants;
+using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.DataTransferObjects.Models;
+using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.Contracts.Enums;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.Domain.Services.Wall;
-using Shrooms.EntityModels.Models;
-using Shrooms.EntityModels.Models.Events;
-using Shrooms.Host.Contracts.Constants;
-using Shrooms.Host.Contracts.DAL;
-using Shrooms.Host.Contracts.Enums;
+using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.Event;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Calendar;
 using Shrooms.Premium.Main.BusinessLayer.DomainServiceValidators.Events;
-using ISystemClock = Shrooms.Host.Contracts.Infrastructure.ISystemClock;
+using ISystemClock = Shrooms.Contracts.Infrastructure.ISystemClock;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Participation
 {

@@ -3,7 +3,7 @@ using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Domain.Services.Organizations;
-using Shrooms.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.Event;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Utilities;

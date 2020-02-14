@@ -7,12 +7,12 @@ using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security.DataProtection;
 using NSubstitute;
 using Shrooms.Authentification.Membership;
-using Shrooms.DataTransferObjects.Models;
+using Shrooms.Contracts.DataTransferObjects.Models;
 using Shrooms.Domain.Services.Permissions;
-using Shrooms.EntityModels.Models;
-using Shrooms.Host.Contracts.Constants;
-using Shrooms.Host.Contracts.DAL;
-using Shrooms.Host.Contracts.Infrastructure;
+using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.Contracts.Constants;
+using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.Infrastructure;
 
 namespace Shrooms.Premium.UnitTests.Mocks
 {

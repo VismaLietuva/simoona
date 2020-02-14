@@ -1,6 +1,6 @@
 ﻿using System;
-using Shrooms.DataTransferObjects.Models;
-using Shrooms.EntityModels.Models.Lottery;
+using Shrooms.Contracts.DataTransferObjects.Models;
+using Shrooms.DataLayer.EntityModels.Models.Lottery;
 
 namespace Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Lotteries
 {

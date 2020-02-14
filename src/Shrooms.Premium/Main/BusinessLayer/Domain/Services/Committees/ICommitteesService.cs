@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Shrooms.DataTransferObjects.Models;
+using Shrooms.Contracts.DataTransferObjects.Models;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Committees;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Committees

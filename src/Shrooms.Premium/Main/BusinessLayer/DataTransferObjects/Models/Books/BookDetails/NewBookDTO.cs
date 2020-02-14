@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Shrooms.DataTransferObjects.Models;
+using Shrooms.Contracts.DataTransferObjects.Models;
 
 namespace Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Books.BookDetails
 {

@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Web.Http;
 using AutoMapper;
-using Shrooms.API.Controllers;
-using Shrooms.API.Filters;
-using Shrooms.Host.Contracts.Constants;
+using Shrooms.Contracts.Constants;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Lotteries;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Lotteries;
 using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Lotteries;
+using Shrooms.Presentation.Api.Controllers;
+using Shrooms.Presentation.Api.Filters;
 
 namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers.Lotteries
 {

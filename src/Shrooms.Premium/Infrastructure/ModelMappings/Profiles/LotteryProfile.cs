@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Shrooms.EntityModels.Models.Lottery;
+using Shrooms.DataLayer.EntityModels.Models.Lottery;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Lotteries;
 using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Lotteries;
 

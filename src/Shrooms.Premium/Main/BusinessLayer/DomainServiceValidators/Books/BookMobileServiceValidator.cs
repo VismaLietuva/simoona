@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Shrooms.DomainExceptions.Exceptions.Book;
-using Shrooms.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.Domain.Exceptions.Exceptions.Book;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models;
 
 namespace Shrooms.Premium.Main.BusinessLayer.DomainServiceValidators.Books

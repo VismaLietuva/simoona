@@ -3,12 +3,12 @@ using System.Data.Entity;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
 using NUnit.Framework;
-using Shrooms.DataTransferObjects.Models;
+using Shrooms.Contracts.DataTransferObjects.Models;
 using Shrooms.Domain.Services.Kudos;
-using Shrooms.EntityModels.Models.Lottery;
-using Shrooms.Host.Contracts.DAL;
-using Shrooms.Host.Contracts.Enums;
-using Shrooms.Host.Contracts.Infrastructure;
+using Shrooms.DataLayer.EntityModels.Models.Lottery;
+using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.Enums;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Lotteries;
 

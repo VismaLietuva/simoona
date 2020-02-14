@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Shrooms.EntityModels.Models.Events;
+using Shrooms.DataLayer.EntityModels.Models.Events;
 
 namespace Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events
 {

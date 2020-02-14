@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Shrooms.EntityModels.Models.Badges;
+using Shrooms.DataLayer.EntityModels.Models.Badges;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Badges
 {

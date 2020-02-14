@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Shrooms.EntityModels.Models.Events;
-using Shrooms.Host.Contracts.Constants;
-using Shrooms.Host.Contracts.Enums;
-using Shrooms.Host.Contracts.Exceptions;
-using Shrooms.Host.Contracts.Infrastructure;
+using Shrooms.DataLayer.EntityModels.Models.Events;
+using Shrooms.Contracts.Constants;
+using Shrooms.Contracts.Enums;
+using Shrooms.Contracts.Exceptions;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Main.BusinessLayer.DomainExceptions.Event;

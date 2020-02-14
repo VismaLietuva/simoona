@@ -4,9 +4,9 @@ using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using PagedList;
-using Shrooms.EntityModels.Models;
-using Shrooms.EntityModels.Models.Lottery;
-using Shrooms.Host.Contracts.DAL;
+using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models.Lottery;
+using Shrooms.Contracts.DAL;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Lotteries;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Lotteries

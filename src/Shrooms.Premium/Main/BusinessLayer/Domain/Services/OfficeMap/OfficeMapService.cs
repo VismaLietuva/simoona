@@ -2,10 +2,10 @@
 using System.Data.Entity;
 using System.Linq;
 using AutoMapper;
+using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Services.Roles;
-using Shrooms.EntityModels.Models;
-using Shrooms.Host.Contracts.Constants;
-using Shrooms.Host.Contracts.DAL;
+using Shrooms.Contracts.Constants;
+using Shrooms.Contracts.DAL;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.OfficeMap;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.OfficeMap

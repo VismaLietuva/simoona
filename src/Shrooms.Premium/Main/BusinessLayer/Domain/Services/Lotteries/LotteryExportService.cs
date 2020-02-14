@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Shrooms.DataTransferObjects.Models;
-using Shrooms.Host.Contracts.Constants;
-using Shrooms.Host.Contracts.Infrastructure;
+using Shrooms.Contracts.DataTransferObjects.Models;
+using Shrooms.Contracts.Constants;
+using Shrooms.Contracts.Infrastructure;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Lotteries
 {

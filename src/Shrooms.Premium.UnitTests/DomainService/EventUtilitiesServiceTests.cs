@@ -4,9 +4,9 @@ using System.Data.Entity;
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.DataTransferObjects.Models;
-using Shrooms.EntityModels.Models.Events;
-using Shrooms.Host.Contracts.DAL;
+using Shrooms.Contracts.DataTransferObjects.Models;
+using Shrooms.DataLayer.EntityModels.Models.Events;
+using Shrooms.Contracts.DAL;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Events.Utilities;
 using Shrooms.UnitTests.Extensions;
 

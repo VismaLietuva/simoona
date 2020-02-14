@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Newtonsoft.Json;
-using Shrooms.EntityModels.Models.Events;
+using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.OfficeMap;
 using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Events;

@@ -4,13 +4,13 @@ using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using Shrooms.DataTransferObjects.Models;
-using Shrooms.DataTransferObjects.Models.Notification;
+using Shrooms.Contracts.DataTransferObjects.Models;
+using Shrooms.Contracts.DataTransferObjects.Models.Notification;
 using Shrooms.Domain.Services.Wall;
-using Shrooms.EntityModels.Models.Multiwall;
-using Shrooms.EntityModels.Models.Notifications;
-using Shrooms.Host.Contracts.DAL;
-using Shrooms.Host.Contracts.Enums;
+using Shrooms.DataLayer.EntityModels.Models.Multiwall;
+using Shrooms.DataLayer.EntityModels.Models.Notifications;
+using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.Enums;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Notifications

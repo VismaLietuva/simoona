@@ -2,13 +2,13 @@
 using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
-using Shrooms.API.Controllers;
-using Shrooms.API.Filters;
-using Shrooms.Host.Contracts.Constants;
-using Shrooms.Host.Contracts.Exceptions;
+using Shrooms.Contracts.Constants;
+using Shrooms.Contracts.Exceptions;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Kudos;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.KudosShop;
 using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.KudosShop;
+using Shrooms.Presentation.Api.Controllers;
+using Shrooms.Presentation.Api.Filters;
 
 namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers.Kudos
 {

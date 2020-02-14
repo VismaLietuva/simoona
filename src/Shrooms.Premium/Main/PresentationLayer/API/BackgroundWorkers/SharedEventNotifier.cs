@@ -1,9 +1,9 @@
-﻿using Shrooms.API.Hubs;
-using Shrooms.DataTransferObjects.Models;
-using Shrooms.DataTransferObjects.Models.Wall.Posts;
+﻿using Shrooms.Contracts.DataTransferObjects.Models;
+using Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts;
 using Shrooms.Domain.Services.Email.Posting;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.Infrastructure.FireAndForget;
+using Shrooms.Presentation.Api.Hubs;
 
 namespace Shrooms.Premium.Main.PresentationLayer.API.BackgroundWorkers
 {

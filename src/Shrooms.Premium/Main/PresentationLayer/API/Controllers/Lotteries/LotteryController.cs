@@ -4,15 +4,15 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
-using Shrooms.API.Controllers;
-using Shrooms.API.Filters;
-using Shrooms.Host.Contracts.Constants;
+using Shrooms.Contracts.Constants;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Lotteries;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Args;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Lotteries;
 using Shrooms.Premium.Main.BusinessLayer.DomainExceptions.Lotteries;
 using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Lotteries;
-using Shrooms.WebViewModels.Models;
+using Shrooms.Presentation.Api.Controllers;
+using Shrooms.Presentation.Api.Filters;
+using Shrooms.Presentation.WebViewModels.Models;
 using WebApi.OutputCache.V2;
 
 namespace Shrooms.Premium.Main.PresentationLayer.API.Controllers.Lotteries

@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
-using Shrooms.EntityModels.Models;
-using Shrooms.EntityModels.Models.Badges;
-using Shrooms.EntityModels.Models.Kudos;
-using Shrooms.Host.Contracts.Constants;
-using Shrooms.Host.Contracts.DAL;
-using Shrooms.Host.Contracts.Enums;
-using Shrooms.Host.Contracts.Exceptions;
+using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models.Badges;
+using Shrooms.DataLayer.EntityModels.Models.Kudos;
+using Shrooms.Contracts.Constants;
+using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.Enums;
+using Shrooms.Contracts.Exceptions;
 
 namespace Shrooms.Premium.Main.BusinessLayer.Domain.Services.Badges
 {

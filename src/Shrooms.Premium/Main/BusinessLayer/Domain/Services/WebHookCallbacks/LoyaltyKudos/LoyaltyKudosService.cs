@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using AutoMapper;
-using Shrooms.EntityModels.Models;
-using Shrooms.EntityModels.Models.Kudos;
-using Shrooms.Host.Contracts.DAL;
-using Shrooms.Host.Contracts.Infrastructure;
+using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models.Kudos;
+using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Kudos;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Email.Kudos;
 

@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
-using Shrooms.API.Hubs;
-using Shrooms.DataTransferObjects.Models;
+using Shrooms.Contracts.DataTransferObjects.Models;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Notifications;
-using Shrooms.WebViewModels.Models.Notifications;
+using Shrooms.Presentation.Api.Hubs;
+using Shrooms.Presentation.WebViewModels.Models.Notifications;
 
 namespace Shrooms.Premium.Main.PresentationLayer.API.BackgroundWorkers
 {

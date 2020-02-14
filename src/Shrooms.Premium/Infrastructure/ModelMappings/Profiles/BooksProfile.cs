@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Shrooms.EntityModels.Models;
-using Shrooms.EntityModels.Models.Books;
+using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models.Books;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Books;
 using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Book;
 using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Book.BookDetails;

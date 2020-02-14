@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Shrooms.EntityModels.Models;
-using Shrooms.EntityModels.Models.Committee;
+using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models.Committee;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Committees;
 using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Committees;
 

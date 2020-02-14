@@ -3,8 +3,8 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
-using Shrooms.Host.Contracts.Exceptions;
-using Shrooms.Host.Contracts.Infrastructure;
+using Shrooms.Contracts.Exceptions;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.Premium.Constants;
 
 namespace Shrooms.Premium.Infrastructure.VacationBot

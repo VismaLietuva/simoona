@@ -8,18 +8,18 @@ using System.Net.Http;
 using System.Web.Http.Hosting;
 using System.Web.Http;
 using System.Security.Claims;
-using Shrooms.DataTransferObjects.Models;
 using System.Web.Http.Results;
 using System.Threading.Tasks;
 using NSubstitute.ExceptionExtensions;
 using PagedList;
+using Shrooms.Contracts.DataTransferObjects.Models;
 using Shrooms.Premium.Main.BusinessLayer.DataTransferObjects.Models.Lotteries;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Args;
 using Shrooms.Premium.Main.BusinessLayer.Domain.Services.Lotteries;
 using Shrooms.Premium.Main.BusinessLayer.DomainExceptions.Lotteries;
 using Shrooms.Premium.Main.PresentationLayer.API.Controllers.Lotteries;
 using Shrooms.Premium.Main.PresentationLayer.WebViewModels.Models.Lotteries;
-using Shrooms.WebViewModels.Models;
+using Shrooms.Presentation.WebViewModels.Models;
 
 namespace Shrooms.Premium.UnitTests.Controllers.WebApi
 {
