@@ -184,14 +184,7 @@ $RECYCLE.BIN/
 # Mac desktop service store files
 .DS_Store
 
-#log files
-Main/Ace.Shrooms/App_Logs*/
-
-.vs/config/applicationhost.config
-
 imagecache*/
-Main/PresentationLayer/Shrooms.API/storage*/
-Tests/Shrooms.Tests/Shrooms.UnitTests.csproj.VisualState.xml
 .idea/.idea.Shrooms/.idea/.name
 .idea/.idea.Shrooms/.idea/modules.xml
 .idea/.idea.Shrooms/.idea/workspace.xml
@@ -200,6 +193,8 @@ Tests/Shrooms.Tests/Shrooms.UnitTests.csproj.VisualState.xml
 .idea/
 .vs/slnx.sqlite
 .vs/
+.vscode/settings.json
+.vs/config/applicationhost.config
 
 build/tools/*
 build/local-setup/tools/*
@@ -208,8 +203,8 @@ build/local-setup/tools/*
 build/node_modules/
 build/generator-simoona/node_modules
 
-src/api/Main/PresentationLayer/Shrooms.API/storage*/
-src/api/Tests/Shrooms.Tests/Shrooms.UnitTests.csproj.VisualState.xml
+src/api/Shrooms.Presentation.Api/storage/*
+src/api/Shrooms.Tests/Shrooms.Tests.csproj.VisualState.xml
 
 src/webapp/coverage/
 src/webapp/bower_components
@@ -217,5 +212,5 @@ src/webapp/node_modules
 src/webapp/src/client/resources/locale-lt_LT.json
 src/webapp/src/client/resources/locale-en_US.json
 src/webapp/src/client/app/build-config.js
-.vscode/settings.json
-/src/api/Main/PresentationLayer/Shrooms.API/Extensions/**
+/src/api/Shrooms.Presentation.Api/Extensions/**
+/src/api/Shrooms.Presentation.Api/Extensions/**

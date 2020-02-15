@@ -46,7 +46,7 @@
             }
         }
 
-        function allUsers(search){           
+        function allUsers(search){
            return serviceRequestsTypesRepository.getUsers(search);
         }
 

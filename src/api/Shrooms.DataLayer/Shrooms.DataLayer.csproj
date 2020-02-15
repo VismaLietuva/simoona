@@ -1,0 +1,1401 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{AFFE7B8B-3294-4DD3-990D-7DA5E256C987}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Shrooms.DataLayer</RootNamespace>
+    <AssemblyName>Shrooms.DataLayer</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <StyleCopEnabled>True</StyleCopEnabled>
+    <CodeAnalysisRuleSet>..\shared.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;CODE_ANALYSIS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <StyleCopEnabled>True</StyleCopEnabled>
+    <StyleCopTreatErrorsAsWarnings>False</StyleCopTreatErrorsAsWarnings>
+    <CodeAnalysisRuleSet>..\shared.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.2\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.EntityFramework, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.EntityFramework.2.2.2\lib\net45\Microsoft.AspNet.Identity.EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.4.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.4.0.1\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Cookies, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.Cookies.4.0.1\lib\net45\Microsoft.Owin.Security.Cookies.dll</HintPath>
+    </Reference>
+    <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
+      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PagedList, Version=1.17.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
+      <HintPath>..\packages\PagedList.1.17.0.0\lib\net40\PagedList.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PagedList.Mvc, Version=4.5.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
+      <HintPath>..\packages\PagedList.Mvc.4.5.0.0\lib\net40\PagedList.Mvc.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Linq.Dynamic, Version=1.0.5840.25917, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Linq.Dynamic.1.0.6\lib\net40\System.Linq.Dynamic.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Net" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Net.Http.WebRequest" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Web" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DAL\EntityTypeConfigurations\AbstractClassifierConfiguration.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\ApplicationRoleConfiguration.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\Badges\BadgeCategoryEntityConfiguration.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\Badges\BadgeCategoryKudosTypeEntityConfiguration.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\Badges\BadgeLogEntityConfiguration.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\Badges\BadgeTypeEntityConfiguration.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\BookEntityConfig.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\BookLogEntityConfig.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\BookOfficeEntityConfig.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\EventOptionEntityConfig.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\EventTypeEntityConfig.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\ExternalLinkConfig.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\IdentityUserClaimEntityConfig.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\IdentityUserLoginEntityConfig.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\IdentityUserRoleEntityConfig.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\ApplicationUserConfiguration.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\CommitteeEntityConfig.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\EventEntityConfig.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\EventParticipantEntityConfig.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\KudosBasketEntityConfig.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\KudosLogEntityConfig.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\MonitorConfig.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\NotifiationUserConfig.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\NotificationConfig.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\OrganizationEntityConfig.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\OfficeEntityConfig.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\OtherEntitiesConfig.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\PageEntityConfig.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\PermissionEntityConfig.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\PostEntityConfig.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\PostWatcherConfig.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\RefreshTokenConfiguration.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\RoomEntityConfig.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\WallConfiguration.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\WallMembersConfiguration.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\WallModeratorsConfiguration.cs" />
+    <Compile Include="DAL\ShroomsContextConfiguration.cs" />
+    <Compile Include="DAL\SoftDeleteHandler.cs" />
+    <Compile Include="DAL\UnitOfWork2.cs" />
+    <Compile Include="DAL\EfRepository.cs" />
+    <Compile Include="Migrations\201512301053272_InitialEmpty.cs" />
+    <Compile Include="Migrations\201512301053272_InitialEmpty.Designer.cs">
+      <DependentUpon>201512301053272_InitialEmpty.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201601251323314_PhoneNumberConfirmationAndDomainsTableRemoval.cs" />
+    <Compile Include="Migrations\201601251323314_PhoneNumberConfirmationAndDomainsTableRemoval.Designer.cs">
+      <DependentUpon>201601251323314_PhoneNumberConfirmationAndDomainsTableRemoval.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201601261448278_SetEmailAsUniqueField.cs" />
+    <Compile Include="Migrations\201601261448278_SetEmailAsUniqueField.Designer.cs">
+      <DependentUpon>201601261448278_SetEmailAsUniqueField.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201601291253155_ShowBirthdayColumnRemoved.cs" />
+    <Compile Include="Migrations\201601291253155_ShowBirthdayColumnRemoved.Designer.cs">
+      <DependentUpon>201601291253155_ShowBirthdayColumnRemoved.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201602011320097_RoomToConfirmRemoval.cs" />
+    <Compile Include="Migrations\201602011320097_RoomToConfirmRemoval.Designer.cs">
+      <DependentUpon>201602011320097_RoomToConfirmRemoval.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201603081249152_AddColumnIsManagingUserToApplicationUser.cs" />
+    <Compile Include="Migrations\201603081249152_AddColumnIsManagingUserToApplicationUser.Designer.cs">
+      <DependentUpon>201603081249152_AddColumnIsManagingUserToApplicationUser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201602220932060_CreateTableBookOffice.cs" />
+    <Compile Include="Migrations\201602220932060_CreateTableBookOffice.Designer.cs">
+      <DependentUpon>201602220932060_CreateTableBookOffice.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201602221133269_RemoveUnnusedConnectionsWithBookLogs.cs" />
+    <Compile Include="Migrations\201602221133269_RemoveUnnusedConnectionsWithBookLogs.Designer.cs">
+      <DependentUpon>201602221133269_RemoveUnnusedConnectionsWithBookLogs.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201603170927199_MergeOrganizationalStructure.cs" />
+    <Compile Include="Migrations\201603170927199_MergeOrganizationalStructure.Designer.cs">
+      <DependentUpon>201603170927199_MergeOrganizationalStructure.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201604060739511_AddEventTypesTable.cs" />
+    <Compile Include="Migrations\201604060739511_AddEventTypesTable.Designer.cs">
+      <DependentUpon>201604060739511_AddEventTypesTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201604071205204_AddRestrictionsToEventTable.cs" />
+    <Compile Include="Migrations\201604071205204_AddRestrictionsToEventTable.Designer.cs">
+      <DependentUpon>201604071205204_AddRestrictionsToEventTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201604071426027_RemoveEventParticipantOptionTable.cs" />
+    <Compile Include="Migrations\201604071426027_RemoveEventParticipantOptionTable.Designer.cs">
+      <DependentUpon>201604071426027_RemoveEventParticipantOptionTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201604121229538_RemoveBookDescription_RemoveIndexFromEventParticipant.cs" />
+    <Compile Include="Migrations\201604121229538_RemoveBookDescription_RemoveIndexFromEventParticipant.Designer.cs">
+      <DependentUpon>201604121229538_RemoveBookDescription_RemoveIndexFromEventParticipant.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201604190932300_Events_MaxChoices_DataMigration.cs" />
+    <Compile Include="Migrations\201604190932300_Events_MaxChoices_DataMigration.Designer.cs">
+      <DependentUpon>201604190932300_Events_MaxChoices_DataMigration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201604280802570_Remove_EventIsRecurringFlag_Migrate_RecurrenceOptionsData.cs" />
+    <Compile Include="Migrations\201604280802570_Remove_EventIsRecurringFlag_Migrate_RecurrenceOptionsData.Designer.cs">
+      <DependentUpon>201604280802570_Remove_EventIsRecurringFlag_Migrate_RecurrenceOptionsData.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201604281135177_CreateBackgroundJobsTable.cs" />
+    <Compile Include="Migrations\201604281135177_CreateBackgroundJobsTable.Designer.cs">
+      <DependentUpon>201604281135177_CreateBackgroundJobsTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201604291012075_RenameBackgroundJobColumn.cs" />
+    <Compile Include="Migrations\201604291012075_RenameBackgroundJobColumn.Designer.cs">
+      <DependentUpon>201604291012075_RenameBackgroundJobColumn.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201605031126072_Remove_BackgroundJobsEntity.cs" />
+    <Compile Include="Migrations\201605031126072_Remove_BackgroundJobsEntity.Designer.cs">
+      <DependentUpon>201605031126072_Remove_BackgroundJobsEntity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201605031137178_Rename_EventsImageUrlColumn.cs" />
+    <Compile Include="Migrations\201605031137178_Rename_EventsImageUrlColumn.Designer.cs">
+      <DependentUpon>201605031137178_Rename_EventsImageUrlColumn.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201605091250584_Add_EventsRegistrationDeadlineDate.cs" />
+    <Compile Include="Migrations\201605091250584_Add_EventsRegistrationDeadlineDate.Designer.cs">
+      <DependentUpon>201605091250584_Add_EventsRegistrationDeadlineDate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201605121152281_EventIdToGuid.cs" />
+    <Compile Include="Migrations\201605121152281_EventIdToGuid.Designer.cs">
+      <DependentUpon>201605121152281_EventIdToGuid.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201605181205190_Add_RefreshTokenEntity.cs" />
+    <Compile Include="Migrations\201605181205190_Add_RefreshTokenEntity.Designer.cs">
+      <DependentUpon>201605181205190_Add_RefreshTokenEntity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201605241403252_IgnoreModelChanges.cs" />
+    <Compile Include="Migrations\201605241403252_IgnoreModelChanges.Designer.cs">
+      <DependentUpon>201605241403252_IgnoreModelChanges.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201606071348376_Remove_CodeMonkeys.cs" />
+    <Compile Include="Migrations\201606071348376_Remove_CodeMonkeys.Designer.cs">
+      <DependentUpon>201606071348376_Remove_CodeMonkeys.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201605311120156_Add_EventIdToPosts.cs" />
+    <Compile Include="Migrations\201605311120156_Add_EventIdToPosts.Designer.cs">
+      <DependentUpon>201605311120156_Add_EventIdToPosts.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201606031259305_RemoveEventCommentsTable.cs" />
+    <Compile Include="Migrations\201606031259305_RemoveEventCommentsTable.Designer.cs">
+      <DependentUpon>201606031259305_RemoveEventCommentsTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201606071405198_IgnoreModelChanges1.cs" />
+    <Compile Include="Migrations\201606071405198_IgnoreModelChanges1.Designer.cs">
+      <DependentUpon>201606071405198_IgnoreModelChanges1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201606221052211_UpdateKudosLogsOrganizationId.cs" />
+    <Compile Include="Migrations\201606221052211_UpdateKudosLogsOrganizationId.Designer.cs">
+      <DependentUpon>201606221052211_UpdateKudosLogsOrganizationId.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201606300715367_ClearDeletedUsersKudos.cs" />
+    <Compile Include="Migrations\201606300715367_ClearDeletedUsersKudos.Designer.cs">
+      <DependentUpon>201606300715367_ClearDeletedUsersKudos.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607050931004_AddWallAndWallUsersTables.cs" />
+    <Compile Include="Migrations\201607050931004_AddWallAndWallUsersTables.Designer.cs">
+      <DependentUpon>201607050931004_AddWallAndWallUsersTables.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607051145480_RandomUserDistributionToWalls.cs" />
+    <Compile Include="Migrations\201607051145480_RandomUserDistributionToWalls.Designer.cs">
+      <DependentUpon>201607051145480_RandomUserDistributionToWalls.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607071643079_RoleRenaming.cs" />
+    <Compile Include="Migrations\201607071643079_RoleRenaming.Designer.cs">
+      <DependentUpon>201607071643079_RoleRenaming.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607121035514_MergeMigrations.cs" />
+    <Compile Include="Migrations\201607121035514_MergeMigrations.Designer.cs">
+      <DependentUpon>201607121035514_MergeMigrations.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607191240256_AddTableUpvote.cs" />
+    <Compile Include="Migrations\201607191240256_AddTableUpvote.Designer.cs">
+      <DependentUpon>201607191240256_AddTableUpvote.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607211133592_AddDescriptionsForWalls.cs" />
+    <Compile Include="Migrations\201607211133592_AddDescriptionsForWalls.Designer.cs">
+      <DependentUpon>201607211133592_AddDescriptionsForWalls.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607191312440_RenamePostPropertyLastCommentCreatedToLastActivity.cs" />
+    <Compile Include="Migrations\201607191312440_RenamePostPropertyLastCommentCreatedToLastActivity.Designer.cs">
+      <DependentUpon>201607191312440_RenamePostPropertyLastCommentCreatedToLastActivity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607211440289_MergeMigrations1.cs" />
+    <Compile Include="Migrations\201607211440289_MergeMigrations1.Designer.cs">
+      <DependentUpon>201607211440289_MergeMigrations1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607280945139_AddIsDeletedToUpvoteTable.cs" />
+    <Compile Include="Migrations\201607280945139_AddIsDeletedToUpvoteTable.Designer.cs">
+      <DependentUpon>201607280945139_AddIsDeletedToUpvoteTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201608171207099_KudosLogsStats.cs" />
+    <Compile Include="Migrations\201608171207099_KudosLogsStats.Designer.cs">
+      <DependentUpon>201608171207099_KudosLogsStats.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201608221039467_LastActivityToDateTime2.cs" />
+    <Compile Include="Migrations\201608221039467_LastActivityToDateTime2.Designer.cs">
+      <DependentUpon>201608221039467_LastActivityToDateTime2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201608251049305_RemoveUnusedEntities.cs" />
+    <Compile Include="Migrations\201608251049305_RemoveUnusedEntities.Designer.cs">
+      <DependentUpon>201608251049305_RemoveUnusedEntities.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201608230629115_AddExternalLinksTable.cs" />
+    <Compile Include="Migrations\201608230629115_AddExternalLinksTable.Designer.cs">
+      <DependentUpon>201608230629115_AddExternalLinksTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201608240644526_ConvertDateTimeToDateTime2.cs" />
+    <Compile Include="Migrations\201608240644526_ConvertDateTimeToDateTime2.Designer.cs">
+      <DependentUpon>201608240644526_ConvertDateTimeToDateTime2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201608251438294_ModelSyncMigr.cs" />
+    <Compile Include="Migrations\201608251438294_ModelSyncMigr.Designer.cs">
+      <DependentUpon>201608251438294_ModelSyncMigr.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201609131306216_PermissionAndModulesRelation.cs" />
+    <Compile Include="Migrations\201609131306216_PermissionAndModulesRelation.Designer.cs">
+      <DependentUpon>201609131306216_PermissionAndModulesRelation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201609131325532_ShroomsModuleRename.cs" />
+    <Compile Include="Migrations\201609131325532_ShroomsModuleRename.Designer.cs">
+      <DependentUpon>201609131325532_ShroomsModuleRename.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201609230914093_DropColumnIsRequiredForBundleFromModules.cs" />
+    <Compile Include="Migrations\201609230914093_DropColumnIsRequiredForBundleFromModules.Designer.cs">
+      <DependentUpon>201609230914093_DropColumnIsRequiredForBundleFromModules.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201609291018367_ResetDailyMailingHourTimes.cs" />
+    <Compile Include="Migrations\201609291018367_ResetDailyMailingHourTimes.Designer.cs">
+      <DependentUpon>201609291018367_ResetDailyMailingHourTimes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201609301409275_RemoveDisabledHashtagsFromUser.cs" />
+    <Compile Include="Migrations\201609301409275_RemoveDisabledHashtagsFromUser.Designer.cs">
+      <DependentUpon>201609301409275_RemoveDisabledHashtagsFromUser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610110858483_RemovedUnnusedFeedbackColumns.cs" />
+    <Compile Include="Migrations\201610110858483_RemovedUnnusedFeedbackColumns.Designer.cs">
+      <DependentUpon>201610110858483_RemovedUnnusedFeedbackColumns.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610061210279_CreateMonitorTable.cs" />
+    <Compile Include="Migrations\201610061210279_CreateMonitorTable.Designer.cs">
+      <DependentUpon>201610061210279_CreateMonitorTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610131310484_MergeMigrations2.cs" />
+    <Compile Include="Migrations\201610131310484_MergeMigrations2.Designer.cs">
+      <DependentUpon>201610131310484_MergeMigrations2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610191030424_OrganizationWelcomeEmail.cs" />
+    <Compile Include="Migrations\201610191030424_OrganizationWelcomeEmail.Designer.cs">
+      <DependentUpon>201610191030424_OrganizationWelcomeEmail.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610241151164_RemovedUpvote.cs" />
+    <Compile Include="Migrations\201610241151164_RemovedUpvote.Designer.cs">
+      <DependentUpon>201610241151164_RemovedUpvote.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610250844395_MultiwallEntitiesUpdates.cs" />
+    <Compile Include="Migrations\201610250844395_MultiwallEntitiesUpdates.Designer.cs">
+      <DependentUpon>201610250844395_MultiwallEntitiesUpdates.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610251419548_AddedWallsForEvents.cs" />
+    <Compile Include="Migrations\201610251419548_AddedWallsForEvents.Designer.cs">
+      <DependentUpon>201610251419548_AddedWallsForEvents.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610251131488_MigrateLikeEntityToJsonFields.cs" />
+    <Compile Include="Migrations\201610251131488_MigrateLikeEntityToJsonFields.Designer.cs">
+      <DependentUpon>201610251131488_MigrateLikeEntityToJsonFields.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610251454455_RemovedPostEventReferenceAndAddedRestrictions.cs" />
+    <Compile Include="Migrations\201610251454455_RemovedPostEventReferenceAndAddedRestrictions.Designer.cs">
+      <DependentUpon>201610251454455_RemovedPostEventReferenceAndAddedRestrictions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610270826006_AddedIsDeletedToWallModerators.cs" />
+    <Compile Include="Migrations\201610270826006_AddedIsDeletedToWallModerators.Designer.cs">
+      <DependentUpon>201610270826006_AddedIsDeletedToWallModerators.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610271139208_ModelSyncMigr1.cs" />
+    <Compile Include="Migrations\201610271139208_ModelSyncMigr1.Designer.cs">
+      <DependentUpon>201610271139208_ModelSyncMigr1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610271530368_ModelSyncMigr2.cs" />
+    <Compile Include="Migrations\201610271530368_ModelSyncMigr2.Designer.cs">
+      <DependentUpon>201610271530368_ModelSyncMigr2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610271532442_RemovedOrganizationFromComment.cs" />
+    <Compile Include="Migrations\201610271532442_RemovedOrganizationFromComment.Designer.cs">
+      <DependentUpon>201610271532442_RemovedOrganizationFromComment.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610311212520_RemoveHashtags.cs" />
+    <Compile Include="Migrations\201610311212520_RemoveHashtags.Designer.cs">
+      <DependentUpon>201610311212520_RemoveHashtags.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611091125571_AddKnowYourSpeakerLogAndPlayer.cs" />
+    <Compile Include="Migrations\201611091125571_AddKnowYourSpeakerLogAndPlayer.Designer.cs">
+      <DependentUpon>201611091125571_AddKnowYourSpeakerLogAndPlayer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611100929313_AddSpeakersTable.cs" />
+    <Compile Include="Migrations\201611100929313_AddSpeakersTable.Designer.cs">
+      <DependentUpon>201611100929313_AddSpeakersTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611151443599_KnowYourSpeaker_Logs.cs" />
+    <Compile Include="Migrations\201611151443599_KnowYourSpeaker_Logs.Designer.cs">
+      <DependentUpon>201611151443599_KnowYourSpeaker_Logs.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611151612544_EmptyMigration.cs" />
+    <Compile Include="Migrations\201611151612544_EmptyMigration.Designer.cs">
+      <DependentUpon>201611151612544_EmptyMigration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611171000596_RemovingFeedbackEntity.cs" />
+    <Compile Include="Migrations\201611171000596_RemovingFeedbackEntity.Designer.cs">
+      <DependentUpon>201611171000596_RemovingFeedbackEntity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611181443590_FeedbackRoleEvolution.cs" />
+    <Compile Include="Migrations\201611181443590_FeedbackRoleEvolution.Designer.cs">
+      <DependentUpon>201611181443590_FeedbackRoleEvolution.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611221411275_NewEventTypeMigrateTypesNames.cs" />
+    <Compile Include="Migrations\201611221411275_NewEventTypeMigrateTypesNames.Designer.cs">
+      <DependentUpon>201611221411275_NewEventTypeMigrateTypesNames.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611231018400_MigrateSimoonaWallName.cs" />
+    <Compile Include="Migrations\201611231018400_MigrateSimoonaWallName.Designer.cs">
+      <DependentUpon>201611231018400_MigrateSimoonaWallName.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611231125104_MigrateMainWallNameAsOrganization.cs" />
+    <Compile Include="Migrations\201611231125104_MigrateMainWallNameAsOrganization.Designer.cs">
+      <DependentUpon>201611231125104_MigrateMainWallNameAsOrganization.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611290905138_AddLogoToWall.cs" />
+    <Compile Include="Migrations\201611290905138_AddLogoToWall.Designer.cs">
+      <DependentUpon>201611290905138_AddLogoToWall.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611241541055_RequiredUserConfirmationFlagAdded.cs" />
+    <Compile Include="Migrations\201611241541055_RequiredUserConfirmationFlagAdded.Designer.cs">
+      <DependentUpon>201611241541055_RequiredUserConfirmationFlagAdded.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611281100087_AddCalendarForTenant.cs" />
+    <Compile Include="Migrations\201611281100087_AddCalendarForTenant.Designer.cs">
+      <DependentUpon>201611281100087_AddCalendarForTenant.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201612061541109_sync.cs" />
+    <Compile Include="Migrations\201612061541109_sync.Designer.cs">
+      <DependentUpon>201612061541109_sync.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201612121332456_AddCultureCodeToUser.cs" />
+    <Compile Include="Migrations\201612121332456_AddCultureCodeToUser.Designer.cs">
+      <DependentUpon>201612121332456_AddCultureCodeToUser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201612191516299_AddEmailNotificationsEnabledColumnToWallMember.cs" />
+    <Compile Include="Migrations\201612191516299_AddEmailNotificationsEnabledColumnToWallMember.Designer.cs">
+      <DependentUpon>201612191516299_AddEmailNotificationsEnabledColumnToWallMember.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201612211113315_AddTimeZoneToUser.cs" />
+    <Compile Include="Migrations\201612211113315_AddTimeZoneToUser.Designer.cs">
+      <DependentUpon>201612211113315_AddTimeZoneToUser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201612211154387_RemovedNotificationFlagFromUser.cs" />
+    <Compile Include="Migrations\201612211154387_RemovedNotificationFlagFromUser.Designer.cs">
+      <DependentUpon>201612211154387_RemovedNotificationFlagFromUser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201612221138360_MergeMigrations3.cs" />
+    <Compile Include="Migrations\201612221138360_MergeMigrations3.Designer.cs">
+      <DependentUpon>201612221138360_MergeMigrations3.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201612271117109_RemoveBlitzQuiz.cs" />
+    <Compile Include="Migrations\201612271117109_RemoveBlitzQuiz.Designer.cs">
+      <DependentUpon>201612271117109_RemoveBlitzQuiz.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201612280805086_AddJobPositionTable.cs" />
+    <Compile Include="Migrations\201612280805086_AddJobPositionTable.Designer.cs">
+      <DependentUpon>201612280805086_AddJobPositionTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201612271442159_RemoveKnowYourColleagueGames.cs" />
+    <Compile Include="Migrations\201612271442159_RemoveKnowYourColleagueGames.Designer.cs">
+      <DependentUpon>201612271442159_RemoveKnowYourColleagueGames.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201701021414135_RemoveVacationModuleTables.cs" />
+    <Compile Include="Migrations\201701021414135_RemoveVacationModuleTables.Designer.cs">
+      <DependentUpon>201701021414135_RemoveVacationModuleTables.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201701091038239_MergeMigration.cs" />
+    <Compile Include="Migrations\201701091038239_MergeMigration.Designer.cs">
+      <DependentUpon>201701091038239_MergeMigration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201701160853120_RemoveWallMembers.cs" />
+    <Compile Include="Migrations\201701160853120_RemoveWallMembers.Designer.cs">
+      <DependentUpon>201701160853120_RemoveWallMembers.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201701180912404_MigrateOrganizationAsMandatoryField.cs" />
+    <Compile Include="Migrations\201701180912404_MigrateOrganizationAsMandatoryField.Designer.cs">
+      <DependentUpon>201701180912404_MigrateOrganizationAsMandatoryField.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201701160940507_SyncModel.cs" />
+    <Compile Include="Migrations\201701160940507_SyncModel.Designer.cs">
+      <DependentUpon>201701160940507_SyncModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201701161542336_SeedAndMapJobPositions.cs" />
+    <Compile Include="Migrations\201701161542336_SeedAndMapJobPositions.Designer.cs">
+      <DependentUpon>201701161542336_SeedAndMapJobPositions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201701161609432_RemoveJobTitleFromAppUser.cs" />
+    <Compile Include="Migrations\201701161609432_RemoveJobTitleFromAppUser.Designer.cs">
+      <DependentUpon>201701161609432_RemoveJobTitleFromAppUser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201701181158033_sync1.cs" />
+    <Compile Include="Migrations\201701181158033_sync1.Designer.cs">
+      <DependentUpon>201701181158033_sync1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201701181159387_RemoveHRSpecialist.cs" />
+    <Compile Include="Migrations\201701181159387_RemoveHRSpecialist.Designer.cs">
+      <DependentUpon>201701181159387_RemoveHRSpecialist.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201701181354297_mergeMigrationsAfterOrganizationIdRestrictions.cs" />
+    <Compile Include="Migrations\201701181354297_mergeMigrationsAfterOrganizationIdRestrictions.Designer.cs">
+      <DependentUpon>201701181354297_mergeMigrationsAfterOrganizationIdRestrictions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201701231037568_AddProjectEntity.cs" />
+    <Compile Include="Migrations\201701231037568_AddProjectEntity.Designer.cs">
+      <DependentUpon>201701231037568_AddProjectEntity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201701271131533_AddProjectLogo.cs" />
+    <Compile Include="Migrations\201701271131533_AddProjectLogo.Designer.cs">
+      <DependentUpon>201701271131533_AddProjectLogo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201702071112232_RemoveLegacyProjectTable.cs" />
+    <Compile Include="Migrations\201702071112232_RemoveLegacyProjectTable.Designer.cs">
+      <DependentUpon>201702071112232_RemoveLegacyProjectTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201702071127545_RenameProject2TableToProject.cs" />
+    <Compile Include="Migrations\201702071127545_RenameProject2TableToProject.Designer.cs">
+      <DependentUpon>201702071127545_RenameProject2TableToProject.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201702071201518_AddIndexesForIsDeletedField.cs" />
+    <Compile Include="Migrations\201702071201518_AddIndexesForIsDeletedField.Designer.cs">
+      <DependentUpon>201702071201518_AddIndexesForIsDeletedField.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201702090927209_AddKudosTypeInfoToKudosLogs.cs" />
+    <Compile Include="Migrations\201702090927209_AddKudosTypeInfoToKudosLogs.Designer.cs">
+      <DependentUpon>201702090927209_AddKudosTypeInfoToKudosLogs.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201702091320238_RemoveForeignKeyFromKudosLogsToKudosType.cs" />
+    <Compile Include="Migrations\201702091320238_RemoveForeignKeyFromKudosLogsToKudosType.Designer.cs">
+      <DependentUpon>201702091320238_RemoveForeignKeyFromKudosLogsToKudosType.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201702091547524_RemovedHiddenColumnFromKudosTypes.cs" />
+    <Compile Include="Migrations\201702091547524_RemovedHiddenColumnFromKudosTypes.Designer.cs">
+      <DependentUpon>201702091547524_RemovedHiddenColumnFromKudosTypes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201702100815515_AddIsDeletedToKudosType.cs" />
+    <Compile Include="Migrations\201702100815515_AddIsDeletedToKudosType.Designer.cs">
+      <DependentUpon>201702100815515_AddIsDeletedToKudosType.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201702100824590_AddCategoryNameToServiceRequest.cs" />
+    <Compile Include="Migrations\201702100824590_AddCategoryNameToServiceRequest.Designer.cs">
+      <DependentUpon>201702100824590_AddCategoryNameToServiceRequest.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201702100925116_RemoveForeignKeyFromServiceRequestToCategory.cs" />
+    <Compile Include="Migrations\201702100925116_RemoveForeignKeyFromServiceRequestToCategory.Designer.cs">
+      <DependentUpon>201702100925116_RemoveForeignKeyFromServiceRequestToCategory.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201703020909426_AddBookAppGuidToOrganization.cs" />
+    <Compile Include="Migrations\201703020909426_AddBookAppGuidToOrganization.Designer.cs">
+      <DependentUpon>201703020909426_AddBookAppGuidToOrganization.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201703031223129_AddLeadsAndDelegatesToCommittee.cs" />
+    <Compile Include="Migrations\201703031223129_AddLeadsAndDelegatesToCommittee.Designer.cs">
+      <DependentUpon>201703031223129_AddLeadsAndDelegatesToCommittee.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201703132001163_NoMoreMedBooks.cs" />
+    <Compile Include="Migrations\201703132001163_NoMoreMedBooks.Designer.cs">
+      <DependentUpon>201703132001163_NoMoreMedBooks.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201703281453024_LastEditFieldsToPostAndCommentEntities.cs" />
+    <Compile Include="Migrations\201703281453024_LastEditFieldsToPostAndCommentEntities.Designer.cs">
+      <DependentUpon>201703281453024_LastEditFieldsToPostAndCommentEntities.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201704121139501_AddKudosTypeColumn.cs" />
+    <Compile Include="Migrations\201704121139501_AddKudosTypeColumn.Designer.cs">
+      <DependentUpon>201704121139501_AddKudosTypeColumn.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201703301247368_AddAssigneesToServiceRequestCategories.cs" />
+    <Compile Include="Migrations\201703301247368_AddAssigneesToServiceRequestCategories.Designer.cs">
+      <DependentUpon>201703301247368_AddAssigneesToServiceRequestCategories.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201704110751129_addDescriptionToKudosType.cs" />
+    <Compile Include="Migrations\201704110751129_addDescriptionToKudosType.Designer.cs">
+      <DependentUpon>201704110751129_addDescriptionToKudosType.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201704070943374_AddEventIdColumnToPosts.cs" />
+    <Compile Include="Migrations\201704070943374_AddEventIdColumnToPosts.Designer.cs">
+      <DependentUpon>201704070943374_AddEventIdColumnToPosts.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201704130818008_AddKudoTypeToLog.cs" />
+    <Compile Include="Migrations\201704130818008_AddKudoTypeToLog.Designer.cs">
+      <DependentUpon>201704130818008_AddKudoTypeToLog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201704050659179_addingKudosShopItemId.cs" />
+    <Compile Include="Migrations\201704050659179_addingKudosShopItemId.Designer.cs">
+      <DependentUpon>201704050659179_addingKudosShopItemId.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201704130922363_UpdateTypeOfSpecialKudos.cs" />
+    <Compile Include="Migrations\201704130922363_UpdateTypeOfSpecialKudos.Designer.cs">
+      <DependentUpon>201704130922363_UpdateTypeOfSpecialKudos.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201704240714445_AddNotifiationsTable.cs" />
+    <Compile Include="Migrations\201704240714445_AddNotifiationsTable.Designer.cs">
+      <DependentUpon>201704240714445_AddNotifiationsTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201704241243542_NotificationsUpdate.cs" />
+    <Compile Include="Migrations\201704241243542_NotificationsUpdate.Designer.cs">
+      <DependentUpon>201704241243542_NotificationsUpdate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201704251506182_Renamings2.cs" />
+    <Compile Include="Migrations\201704251506182_Renamings2.Designer.cs">
+      <DependentUpon>201704251506182_Renamings2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201704250924423_RenameKudosLofFieldType.cs" />
+    <Compile Include="Migrations\201704250924423_RenameKudosLofFieldType.Designer.cs">
+      <DependentUpon>201704250924423_RenameKudosLofFieldType.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201704060832407_AddIsHiddenColumnToPostsAndComments.cs" />
+    <Compile Include="Migrations\201704060832407_AddIsHiddenColumnToPostsAndComments.Designer.cs">
+      <DependentUpon>201704060832407_AddIsHiddenColumnToPostsAndComments.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201704251440354_AddedIsDeletedToKudosShopItem.cs" />
+    <Compile Include="Migrations\201704251440354_AddedIsDeletedToKudosShopItem.Designer.cs">
+      <DependentUpon>201704251440354_AddedIsDeletedToKudosShopItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201704260859527_Merge.cs" />
+    <Compile Include="Migrations\201704260859527_Merge.Designer.cs">
+      <DependentUpon>201704260859527_Merge.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201704251459203_MergeMigrationsForIsDeleted.cs" />
+    <Compile Include="Migrations\201704251459203_MergeMigrationsForIsDeleted.Designer.cs">
+      <DependentUpon>201704251459203_MergeMigrationsForIsDeleted.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201704281003085_MergeShareEventMigration.cs" />
+    <Compile Include="Migrations\201704281003085_MergeShareEventMigration.Designer.cs">
+      <DependentUpon>201704281003085_MergeShareEventMigration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201705091531395_FixingMigration.cs" />
+    <Compile Include="Migrations\201705091531395_FixingMigration.Designer.cs">
+      <DependentUpon>201705091531395_FixingMigration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201705181509358_Fixies.cs" />
+    <Compile Include="Migrations\201705181509358_Fixies.Designer.cs">
+      <DependentUpon>201705181509358_Fixies.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201705121237504_MergeNotifications.cs" />
+    <Compile Include="Migrations\201705121237504_MergeNotifications.Designer.cs">
+      <DependentUpon>201705121237504_MergeNotifications.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201705250738319_Merging.cs" />
+    <Compile Include="Migrations\201705250738319_Merging.Designer.cs">
+      <DependentUpon>201705250738319_Merging.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201705301332270_Merge1.cs" />
+    <Compile Include="Migrations\201705301332270_Merge1.Designer.cs">
+      <DependentUpon>201705301332270_Merge1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201705301206305_AddingDescriptionsToNecessaryKudosTypes.cs" />
+    <Compile Include="Migrations\201705301206305_AddingDescriptionsToNecessaryKudosTypes.Designer.cs">
+      <DependentUpon>201705301206305_AddingDescriptionsToNecessaryKudosTypes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201706011241211_ChangingNotifiationSourceToSerializedObject.cs" />
+    <Compile Include="Migrations\201706011241211_ChangingNotifiationSourceToSerializedObject.Designer.cs">
+      <DependentUpon>201706011241211_ChangingNotifiationSourceToSerializedObject.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201706060544071_MergingNotificationSourceChange.cs" />
+    <Compile Include="Migrations\201706060544071_MergingNotificationSourceChange.Designer.cs">
+      <DependentUpon>201706060544071_MergingNotificationSourceChange.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201706051401264_MergingWallModerators.cs" />
+    <Compile Include="Migrations\201706051401264_MergingWallModerators.Designer.cs">
+      <DependentUpon>201706051401264_MergingWallModerators.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201706091312530_MergingSpecificKudosDescriptions.cs" />
+    <Compile Include="Migrations\201706091312530_MergingSpecificKudosDescriptions.Designer.cs">
+      <DependentUpon>201706091312530_MergingSpecificKudosDescriptions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201706151055376_AddTutorialStatusToUser.cs" />
+    <Compile Include="Migrations\201706151055376_AddTutorialStatusToUser.Designer.cs">
+      <DependentUpon>201706151055376_AddTutorialStatusToUser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201707100840197_MergeMigrations4.cs" />
+    <Compile Include="Migrations\201707100840197_MergeMigrations4.Designer.cs">
+      <DependentUpon>201707100840197_MergeMigrations4.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201710240838008_AddOwnerAndNoteToBook.cs" />
+    <Compile Include="Migrations\201710240838008_AddOwnerAndNoteToBook.Designer.cs">
+      <DependentUpon>201710240838008_AddOwnerAndNoteToBook.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201711221340282_RemoveEventTimezoneColumn.cs" />
+    <Compile Include="Migrations\201711221340282_RemoveEventTimezoneColumn.Designer.cs">
+      <DependentUpon>201711221340282_RemoveEventTimezoneColumn.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712121403357_CultureCodeForOrganization.cs" />
+    <Compile Include="Migrations\201712121403357_CultureCodeForOrganization.Designer.cs">
+      <DependentUpon>201712121403357_CultureCodeForOrganization.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712281332425_AddAuthProvidersToOrganization.cs" />
+    <Compile Include="Migrations\201712281332425_AddAuthProvidersToOrganization.Designer.cs">
+      <DependentUpon>201712281332425_AddAuthProvidersToOrganization.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801080820253_AddAppEmailNotificationsColumns.cs" />
+    <Compile Include="Migrations\201801080820253_AddAppEmailNotificationsColumns.Designer.cs">
+      <DependentUpon>201801080820253_AddAppEmailNotificationsColumns.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801101300540_AddFKtoNotificationsSettings.cs" />
+    <Compile Include="Migrations\201801101300540_AddFKtoNotificationsSettings.Designer.cs">
+      <DependentUpon>201801101300540_AddFKtoNotificationsSettings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802070759572_AddCommentsNotificationsSettings.cs" />
+    <Compile Include="Migrations\201802070759572_AddCommentsNotificationsSettings.Designer.cs">
+      <DependentUpon>201802070759572_AddCommentsNotificationsSettings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802091000474_AddProvidersEmailsToAppUser.cs" />
+    <Compile Include="Migrations\201802091000474_AddProvidersEmailsToAppUser.Designer.cs">
+      <DependentUpon>201802091000474_AddProvidersEmailsToAppUser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802280824384_AddPictureIdToServiceRequest.cs" />
+    <Compile Include="Migrations\201802280824384_AddPictureIdToServiceRequest.Designer.cs">
+      <DependentUpon>201802280824384_AddPictureIdToServiceRequest.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803051331355_RemoveBookTakenTill.cs" />
+    <Compile Include="Migrations\201803051331355_RemoveBookTakenTill.Designer.cs">
+      <DependentUpon>201803051331355_RemoveBookTakenTill.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803082007410_AddPictureIdToServiceRequest1.cs" />
+    <Compile Include="Migrations\201803082007410_AddPictureIdToServiceRequest1.Designer.cs">
+      <DependentUpon>201803082007410_AddPictureIdToServiceRequest1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803082027364_AddPictureIdToKudosShopItems.cs" />
+    <Compile Include="Migrations\201803082027364_AddPictureIdToKudosShopItems.Designer.cs">
+      <DependentUpon>201803082027364_AddPictureIdToKudosShopItems.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201804261017590_AddKudosYearlyMultipliersColumn.cs" />
+    <Compile Include="Migrations\201804261017590_AddKudosYearlyMultipliersColumn.Designer.cs">
+      <DependentUpon>201804261017590_AddKudosYearlyMultipliersColumn.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201904131234290_AddOfficeIdToEvents.cs" />
+    <Compile Include="Migrations\201904131234290_AddOfficeIdToEvents.Designer.cs">
+      <DependentUpon>201904131234290_AddOfficeIdToEvents.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201904180838055_AddedBadgesEntities.cs" />
+    <Compile Include="Migrations\201904180838055_AddedBadgesEntities.Designer.cs">
+      <DependentUpon>201904180838055_AddedBadgesEntities.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201907201330177_AddKudosWelcomeColumns.cs" />
+    <Compile Include="Migrations\201907201330177_AddKudosWelcomeColumns.Designer.cs">
+      <DependentUpon>201907201330177_AddKudosWelcomeColumns.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201909072124268_PostWatchers.cs" />
+    <Compile Include="Migrations\201909072124268_PostWatchers.Designer.cs">
+      <DependentUpon>201909072124268_PostWatchers.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201909201038299_AddIsActiveColumnToKudoType.cs" />
+    <Compile Include="Migrations\201909201038299_AddIsActiveColumnToKudoType.Designer.cs">
+      <DependentUpon>201909201038299_AddIsActiveColumnToKudoType.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201909261209583_SeedWelcomeKudos.cs" />
+    <Compile Include="Migrations\201909261209583_SeedWelcomeKudos.Designer.cs">
+      <DependentUpon>201909261209583_SeedWelcomeKudos.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201910011943144_DummyMigration.cs" />
+    <Compile Include="Migrations\201910011943144_DummyMigration.Designer.cs">
+      <DependentUpon>201910011943144_DummyMigration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201910021146410_RemoveWelcomeKudosFromOrganizationEntity.cs" />
+    <Compile Include="Migrations\201910021146410_RemoveWelcomeKudosFromOrganizationEntity.Designer.cs">
+      <DependentUpon>201910021146410_RemoveWelcomeKudosFromOrganizationEntity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201910211051464_AddLotteryAndLotteryParticipant.cs" />
+    <Compile Include="Migrations\201910211051464_AddLotteryAndLotteryParticipant.Designer.cs">
+      <DependentUpon>201910211051464_AddLotteryAndLotteryParticipant.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201910221426483_SeedRefundKudos.cs" />
+    <Compile Include="Migrations\201910221426483_SeedRefundKudos.Designer.cs">
+      <DependentUpon>201910221426483_SeedRefundKudos.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201910301511497_LotteryRefundFailedFlag.cs" />
+    <Compile Include="Migrations\201910301511497_LotteryRefundFailedFlag.Designer.cs">
+      <DependentUpon>201910301511497_LotteryRefundFailedFlag.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201911191445311_AddFoodRelatedFieldsToEvents.cs" />
+    <Compile Include="Migrations\201911191445311_AddFoodRelatedFieldsToEvents.Designer.cs">
+      <DependentUpon>201911191445311_AddFoodRelatedFieldsToEvents.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201911281059238_EventsWithMultipleOffices.cs" />
+    <Compile Include="Migrations\201911281059238_EventsWithMultipleOffices.Designer.cs">
+      <DependentUpon>201911281059238_EventsWithMultipleOffices.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201911281150187_EventsOfficeData.cs" />
+    <Compile Include="Migrations\201911281150187_EventsOfficeData.Designer.cs">
+      <DependentUpon>201911281150187_EventsOfficeData.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201912021646387_AddBookCoverUrlToBook.cs" />
+    <Compile Include="Migrations\201912021646387_AddBookCoverUrlToBook.Designer.cs">
+      <DependentUpon>201912021646387_AddBookCoverUrlToBook.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201912031425135_EventTypeWeeklyReminder.cs" />
+    <Compile Include="Migrations\201912031425135_EventTypeWeeklyReminder.Designer.cs">
+      <DependentUpon>201912031425135_EventTypeWeeklyReminder.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201912051449578_EventIsPinnedFlag.cs" />
+    <Compile Include="Migrations\201912051449578_EventIsPinnedFlag.Designer.cs">
+      <DependentUpon>201912051449578_EventIsPinnedFlag.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202001021211276_AddEventOptionRulesToAnEntity.cs" />
+    <Compile Include="Migrations\202001021211276_AddEventOptionRulesToAnEntity.Designer.cs">
+      <DependentUpon>202001021211276_AddEventOptionRulesToAnEntity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202001031116555_RemoveFoodRelatedFieldsFromEvents.cs" />
+    <Compile Include="Migrations\202001031116555_RemoveFoodRelatedFieldsFromEvents.Designer.cs">
+      <DependentUpon>202001031116555_RemoveFoodRelatedFieldsFromEvents.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202001151900409_EventAttendChoice.cs" />
+    <Compile Include="Migrations\202001151900409_EventAttendChoice.Designer.cs">
+      <DependentUpon>202001151900409_EventAttendChoice.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202001221423251_AddGroupFieldToEventType.cs" />
+    <Compile Include="Migrations\202001221423251_AddGroupFieldToEventType.Designer.cs">
+      <DependentUpon>202001221423251_AddGroupFieldToEventType.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202002091606025_InitEventWallsPermissions.cs" />
+    <Compile Include="Migrations\202002091606025_InitEventWallsPermissions.Designer.cs">
+      <DependentUpon>202002091606025_InitEventWallsPermissions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202002101044528_AddIsShownWithMainEventsField.cs" />
+    <Compile Include="Migrations\202002101044528_AddIsShownWithMainEventsField.Designer.cs">
+      <DependentUpon>202002101044528_AddIsShownWithMainEventsField.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
+    <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
+    <Compile Include="Migrations\DataInitializer\PermissionInitializer.cs" />
+    <Compile Include="Migrations\DataInitializer\RoleInitializer.cs" />
+    <Compile Include="Migrations\DefaultValueSqlServerMigrationSqlGenerator.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="DAL\ShroomsDbContext.cs" />
+    <Compile Include="DAL\EfUnitOfWork.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <AdditionalFiles Include="..\stylecop.json">
+      <Link>stylecop.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </AdditionalFiles>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Shrooms.Contracts\Shrooms.Contracts.csproj">
+      <Project>{e690ceb8-f266-441f-8a80-5a3440b3445a}</Project>
+      <Name>Shrooms.Contracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Shrooms.DataLayer.EntityModels\Shrooms.DataLayer.EntityModels.csproj">
+      <Project>{8ad6f857-708c-4b5e-98bc-b3206e7dd918}</Project>
+      <Name>Shrooms.DataLayer.EntityModels</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201512301053272_InitialEmpty.resx">
+      <DependentUpon>201512301053272_InitialEmpty.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201601251323314_PhoneNumberConfirmationAndDomainsTableRemoval.resx">
+      <DependentUpon>201601251323314_PhoneNumberConfirmationAndDomainsTableRemoval.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201601261448278_SetEmailAsUniqueField.resx">
+      <DependentUpon>201601261448278_SetEmailAsUniqueField.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201601291253155_ShowBirthdayColumnRemoved.resx">
+      <DependentUpon>201601291253155_ShowBirthdayColumnRemoved.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201602011320097_RoomToConfirmRemoval.resx">
+      <DependentUpon>201602011320097_RoomToConfirmRemoval.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201603081249152_AddColumnIsManagingUserToApplicationUser.resx">
+      <DependentUpon>201603081249152_AddColumnIsManagingUserToApplicationUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201602220932060_CreateTableBookOffice.resx">
+      <DependentUpon>201602220932060_CreateTableBookOffice.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201602221133269_RemoveUnnusedConnectionsWithBookLogs.resx">
+      <DependentUpon>201602221133269_RemoveUnnusedConnectionsWithBookLogs.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201603170927199_MergeOrganizationalStructure.resx">
+      <DependentUpon>201603170927199_MergeOrganizationalStructure.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201604060739511_AddEventTypesTable.resx">
+      <DependentUpon>201604060739511_AddEventTypesTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201604071205204_AddRestrictionsToEventTable.resx">
+      <DependentUpon>201604071205204_AddRestrictionsToEventTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201604071426027_RemoveEventParticipantOptionTable.resx">
+      <DependentUpon>201604071426027_RemoveEventParticipantOptionTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201604121229538_RemoveBookDescription_RemoveIndexFromEventParticipant.resx">
+      <DependentUpon>201604121229538_RemoveBookDescription_RemoveIndexFromEventParticipant.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201604190932300_Events_MaxChoices_DataMigration.resx">
+      <DependentUpon>201604190932300_Events_MaxChoices_DataMigration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201604280802570_Remove_EventIsRecurringFlag_Migrate_RecurrenceOptionsData.resx">
+      <DependentUpon>201604280802570_Remove_EventIsRecurringFlag_Migrate_RecurrenceOptionsData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201604281135177_CreateBackgroundJobsTable.resx">
+      <DependentUpon>201604281135177_CreateBackgroundJobsTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201604291012075_RenameBackgroundJobColumn.resx">
+      <DependentUpon>201604291012075_RenameBackgroundJobColumn.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201605031126072_Remove_BackgroundJobsEntity.resx">
+      <DependentUpon>201605031126072_Remove_BackgroundJobsEntity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201605031137178_Rename_EventsImageUrlColumn.resx">
+      <DependentUpon>201605031137178_Rename_EventsImageUrlColumn.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201605091250584_Add_EventsRegistrationDeadlineDate.resx">
+      <DependentUpon>201605091250584_Add_EventsRegistrationDeadlineDate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201605121152281_EventIdToGuid.resx">
+      <DependentUpon>201605121152281_EventIdToGuid.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201605181205190_Add_RefreshTokenEntity.resx">
+      <DependentUpon>201605181205190_Add_RefreshTokenEntity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201605241403252_IgnoreModelChanges.resx">
+      <DependentUpon>201605241403252_IgnoreModelChanges.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201606071348376_Remove_CodeMonkeys.resx">
+      <DependentUpon>201606071348376_Remove_CodeMonkeys.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201605311120156_Add_EventIdToPosts.resx">
+      <DependentUpon>201605311120156_Add_EventIdToPosts.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201606031259305_RemoveEventCommentsTable.resx">
+      <DependentUpon>201606031259305_RemoveEventCommentsTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201606071405198_IgnoreModelChanges1.resx">
+      <DependentUpon>201606071405198_IgnoreModelChanges1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201606221052211_UpdateKudosLogsOrganizationId.resx">
+      <DependentUpon>201606221052211_UpdateKudosLogsOrganizationId.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201606300715367_ClearDeletedUsersKudos.resx">
+      <DependentUpon>201606300715367_ClearDeletedUsersKudos.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607050931004_AddWallAndWallUsersTables.resx">
+      <DependentUpon>201607050931004_AddWallAndWallUsersTables.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607051145480_RandomUserDistributionToWalls.resx">
+      <DependentUpon>201607051145480_RandomUserDistributionToWalls.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607071643079_RoleRenaming.resx">
+      <DependentUpon>201607071643079_RoleRenaming.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607121035514_MergeMigrations.resx">
+      <DependentUpon>201607121035514_MergeMigrations.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607191240256_AddTableUpvote.resx">
+      <DependentUpon>201607191240256_AddTableUpvote.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607211133592_AddDescriptionsForWalls.resx">
+      <DependentUpon>201607211133592_AddDescriptionsForWalls.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607191312440_RenamePostPropertyLastCommentCreatedToLastActivity.resx">
+      <DependentUpon>201607191312440_RenamePostPropertyLastCommentCreatedToLastActivity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607211440289_MergeMigrations1.resx">
+      <DependentUpon>201607211440289_MergeMigrations1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607280945139_AddIsDeletedToUpvoteTable.resx">
+      <DependentUpon>201607280945139_AddIsDeletedToUpvoteTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608171207099_KudosLogsStats.resx">
+      <DependentUpon>201608171207099_KudosLogsStats.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608221039467_LastActivityToDateTime2.resx">
+      <DependentUpon>201608221039467_LastActivityToDateTime2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608251049305_RemoveUnusedEntities.resx">
+      <DependentUpon>201608251049305_RemoveUnusedEntities.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608230629115_AddExternalLinksTable.resx">
+      <DependentUpon>201608230629115_AddExternalLinksTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608240644526_ConvertDateTimeToDateTime2.resx">
+      <DependentUpon>201608240644526_ConvertDateTimeToDateTime2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608251438294_ModelSyncMigr.resx">
+      <DependentUpon>201608251438294_ModelSyncMigr.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201609131306216_PermissionAndModulesRelation.resx">
+      <DependentUpon>201609131306216_PermissionAndModulesRelation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201609131325532_ShroomsModuleRename.resx">
+      <DependentUpon>201609131325532_ShroomsModuleRename.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201609230914093_DropColumnIsRequiredForBundleFromModules.resx">
+      <DependentUpon>201609230914093_DropColumnIsRequiredForBundleFromModules.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201609291018367_ResetDailyMailingHourTimes.resx">
+      <DependentUpon>201609291018367_ResetDailyMailingHourTimes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201609301409275_RemoveDisabledHashtagsFromUser.resx">
+      <DependentUpon>201609301409275_RemoveDisabledHashtagsFromUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610110858483_RemovedUnnusedFeedbackColumns.resx">
+      <DependentUpon>201610110858483_RemovedUnnusedFeedbackColumns.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610061210279_CreateMonitorTable.resx">
+      <DependentUpon>201610061210279_CreateMonitorTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610131310484_MergeMigrations2.resx">
+      <DependentUpon>201610131310484_MergeMigrations2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610191030424_OrganizationWelcomeEmail.resx">
+      <DependentUpon>201610191030424_OrganizationWelcomeEmail.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610241151164_RemovedUpvote.resx">
+      <DependentUpon>201610241151164_RemovedUpvote.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610250844395_MultiwallEntitiesUpdates.resx">
+      <DependentUpon>201610250844395_MultiwallEntitiesUpdates.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610251419548_AddedWallsForEvents.resx">
+      <DependentUpon>201610251419548_AddedWallsForEvents.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610251131488_MigrateLikeEntityToJsonFields.resx">
+      <DependentUpon>201610251131488_MigrateLikeEntityToJsonFields.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610251454455_RemovedPostEventReferenceAndAddedRestrictions.resx">
+      <DependentUpon>201610251454455_RemovedPostEventReferenceAndAddedRestrictions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610270826006_AddedIsDeletedToWallModerators.resx">
+      <DependentUpon>201610270826006_AddedIsDeletedToWallModerators.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610271139208_ModelSyncMigr1.resx">
+      <DependentUpon>201610271139208_ModelSyncMigr1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610271530368_ModelSyncMigr2.resx">
+      <DependentUpon>201610271530368_ModelSyncMigr2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610271532442_RemovedOrganizationFromComment.resx">
+      <DependentUpon>201610271532442_RemovedOrganizationFromComment.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610311212520_RemoveHashtags.resx">
+      <DependentUpon>201610311212520_RemoveHashtags.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611091125571_AddKnowYourSpeakerLogAndPlayer.resx">
+      <DependentUpon>201611091125571_AddKnowYourSpeakerLogAndPlayer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611100929313_AddSpeakersTable.resx">
+      <DependentUpon>201611100929313_AddSpeakersTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611151443599_KnowYourSpeaker_Logs.resx">
+      <DependentUpon>201611151443599_KnowYourSpeaker_Logs.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611151612544_EmptyMigration.resx">
+      <DependentUpon>201611151612544_EmptyMigration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611171000596_RemovingFeedbackEntity.resx">
+      <DependentUpon>201611171000596_RemovingFeedbackEntity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611181443590_FeedbackRoleEvolution.resx">
+      <DependentUpon>201611181443590_FeedbackRoleEvolution.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611221411275_NewEventTypeMigrateTypesNames.resx">
+      <DependentUpon>201611221411275_NewEventTypeMigrateTypesNames.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611231018400_MigrateSimoonaWallName.resx">
+      <DependentUpon>201611231018400_MigrateSimoonaWallName.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611231125104_MigrateMainWallNameAsOrganization.resx">
+      <DependentUpon>201611231125104_MigrateMainWallNameAsOrganization.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611290905138_AddLogoToWall.resx">
+      <DependentUpon>201611290905138_AddLogoToWall.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611241541055_RequiredUserConfirmationFlagAdded.resx">
+      <DependentUpon>201611241541055_RequiredUserConfirmationFlagAdded.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611281100087_AddCalendarForTenant.resx">
+      <DependentUpon>201611281100087_AddCalendarForTenant.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612061541109_sync.resx">
+      <DependentUpon>201612061541109_sync.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612121332456_AddCultureCodeToUser.resx">
+      <DependentUpon>201612121332456_AddCultureCodeToUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612191516299_AddEmailNotificationsEnabledColumnToWallMember.resx">
+      <DependentUpon>201612191516299_AddEmailNotificationsEnabledColumnToWallMember.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612211113315_AddTimeZoneToUser.resx">
+      <DependentUpon>201612211113315_AddTimeZoneToUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612211154387_RemovedNotificationFlagFromUser.resx">
+      <DependentUpon>201612211154387_RemovedNotificationFlagFromUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612221138360_MergeMigrations3.resx">
+      <DependentUpon>201612221138360_MergeMigrations3.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612271117109_RemoveBlitzQuiz.resx">
+      <DependentUpon>201612271117109_RemoveBlitzQuiz.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612280805086_AddJobPositionTable.resx">
+      <DependentUpon>201612280805086_AddJobPositionTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612271442159_RemoveKnowYourColleagueGames.resx">
+      <DependentUpon>201612271442159_RemoveKnowYourColleagueGames.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201701021414135_RemoveVacationModuleTables.resx">
+      <DependentUpon>201701021414135_RemoveVacationModuleTables.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201701091038239_MergeMigration.resx">
+      <DependentUpon>201701091038239_MergeMigration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201701160853120_RemoveWallMembers.resx">
+      <DependentUpon>201701160853120_RemoveWallMembers.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201701180912404_MigrateOrganizationAsMandatoryField.resx">
+      <DependentUpon>201701180912404_MigrateOrganizationAsMandatoryField.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201701160940507_SyncModel.resx">
+      <DependentUpon>201701160940507_SyncModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201701161542336_SeedAndMapJobPositions.resx">
+      <DependentUpon>201701161542336_SeedAndMapJobPositions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201701161609432_RemoveJobTitleFromAppUser.resx">
+      <DependentUpon>201701161609432_RemoveJobTitleFromAppUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201701181158033_sync1.resx">
+      <DependentUpon>201701181158033_sync1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201701181159387_RemoveHRSpecialist.resx">
+      <DependentUpon>201701181159387_RemoveHRSpecialist.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201701181354297_mergeMigrationsAfterOrganizationIdRestrictions.resx">
+      <DependentUpon>201701181354297_mergeMigrationsAfterOrganizationIdRestrictions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201701231037568_AddProjectEntity.resx">
+      <DependentUpon>201701231037568_AddProjectEntity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201701271131533_AddProjectLogo.resx">
+      <DependentUpon>201701271131533_AddProjectLogo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201702071112232_RemoveLegacyProjectTable.resx">
+      <DependentUpon>201702071112232_RemoveLegacyProjectTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201702071127545_RenameProject2TableToProject.resx">
+      <DependentUpon>201702071127545_RenameProject2TableToProject.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201702071201518_AddIndexesForIsDeletedField.resx">
+      <DependentUpon>201702071201518_AddIndexesForIsDeletedField.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201702090927209_AddKudosTypeInfoToKudosLogs.resx">
+      <DependentUpon>201702090927209_AddKudosTypeInfoToKudosLogs.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201702091320238_RemoveForeignKeyFromKudosLogsToKudosType.resx">
+      <DependentUpon>201702091320238_RemoveForeignKeyFromKudosLogsToKudosType.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201702091547524_RemovedHiddenColumnFromKudosTypes.resx">
+      <DependentUpon>201702091547524_RemovedHiddenColumnFromKudosTypes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201702100815515_AddIsDeletedToKudosType.resx">
+      <DependentUpon>201702100815515_AddIsDeletedToKudosType.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201702100824590_AddCategoryNameToServiceRequest.resx">
+      <DependentUpon>201702100824590_AddCategoryNameToServiceRequest.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201702100925116_RemoveForeignKeyFromServiceRequestToCategory.resx">
+      <DependentUpon>201702100925116_RemoveForeignKeyFromServiceRequestToCategory.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201703020909426_AddBookAppGuidToOrganization.resx">
+      <DependentUpon>201703020909426_AddBookAppGuidToOrganization.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201703031223129_AddLeadsAndDelegatesToCommittee.resx">
+      <DependentUpon>201703031223129_AddLeadsAndDelegatesToCommittee.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201703132001163_NoMoreMedBooks.resx">
+      <DependentUpon>201703132001163_NoMoreMedBooks.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201703281453024_LastEditFieldsToPostAndCommentEntities.resx">
+      <DependentUpon>201703281453024_LastEditFieldsToPostAndCommentEntities.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201703301247368_AddAssigneesToServiceRequestCategories.resx">
+      <DependentUpon>201703301247368_AddAssigneesToServiceRequestCategories.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201704110751129_addDescriptionToKudosType.resx">
+      <DependentUpon>201704110751129_addDescriptionToKudosType.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201704121139501_AddKudosTypeColumn.resx">
+      <DependentUpon>201704121139501_AddKudosTypeColumn.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201704070943374_AddEventIdColumnToPosts.resx">
+      <DependentUpon>201704070943374_AddEventIdColumnToPosts.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201704130818008_AddKudoTypeToLog.resx">
+      <DependentUpon>201704130818008_AddKudoTypeToLog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201704050659179_addingKudosShopItemId.resx">
+      <DependentUpon>201704050659179_addingKudosShopItemId.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201704130922363_UpdateTypeOfSpecialKudos.resx">
+      <DependentUpon>201704130922363_UpdateTypeOfSpecialKudos.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201704240714445_AddNotifiationsTable.resx">
+      <DependentUpon>201704240714445_AddNotifiationsTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201704241243542_NotificationsUpdate.resx">
+      <DependentUpon>201704241243542_NotificationsUpdate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201704251506182_Renamings2.resx">
+      <DependentUpon>201704251506182_Renamings2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201704060832407_AddIsHiddenColumnToPostsAndComments.resx">
+      <DependentUpon>201704060832407_AddIsHiddenColumnToPostsAndComments.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201704250924423_RenameKudosLofFieldType.resx">
+      <DependentUpon>201704250924423_RenameKudosLofFieldType.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201704251440354_AddedIsDeletedToKudosShopItem.resx">
+      <DependentUpon>201704251440354_AddedIsDeletedToKudosShopItem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201704260859527_Merge.resx">
+      <DependentUpon>201704260859527_Merge.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201704251459203_MergeMigrationsForIsDeleted.resx">
+      <DependentUpon>201704251459203_MergeMigrationsForIsDeleted.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201704281003085_MergeShareEventMigration.resx">
+      <DependentUpon>201704281003085_MergeShareEventMigration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705091531395_FixingMigration.resx">
+      <DependentUpon>201705091531395_FixingMigration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705181509358_Fixies.resx">
+      <DependentUpon>201705181509358_Fixies.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705121237504_MergeNotifications.resx">
+      <DependentUpon>201705121237504_MergeNotifications.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705250738319_Merging.resx">
+      <DependentUpon>201705250738319_Merging.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705301332270_Merge1.resx">
+      <DependentUpon>201705301332270_Merge1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705301206305_AddingDescriptionsToNecessaryKudosTypes.resx">
+      <DependentUpon>201705301206305_AddingDescriptionsToNecessaryKudosTypes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201706011241211_ChangingNotifiationSourceToSerializedObject.resx">
+      <DependentUpon>201706011241211_ChangingNotifiationSourceToSerializedObject.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201706060544071_MergingNotificationSourceChange.resx">
+      <DependentUpon>201706060544071_MergingNotificationSourceChange.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201706051401264_MergingWallModerators.resx">
+      <DependentUpon>201706051401264_MergingWallModerators.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201706091312530_MergingSpecificKudosDescriptions.resx">
+      <DependentUpon>201706091312530_MergingSpecificKudosDescriptions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201706151055376_AddTutorialStatusToUser.resx">
+      <DependentUpon>201706151055376_AddTutorialStatusToUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201707100840197_MergeMigrations4.resx">
+      <DependentUpon>201707100840197_MergeMigrations4.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710240838008_AddOwnerAndNoteToBook.resx">
+      <DependentUpon>201710240838008_AddOwnerAndNoteToBook.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201711221340282_RemoveEventTimezoneColumn.resx">
+      <DependentUpon>201711221340282_RemoveEventTimezoneColumn.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712121403357_CultureCodeForOrganization.resx">
+      <DependentUpon>201712121403357_CultureCodeForOrganization.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712281332425_AddAuthProvidersToOrganization.resx">
+      <DependentUpon>201712281332425_AddAuthProvidersToOrganization.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801080820253_AddAppEmailNotificationsColumns.resx">
+      <DependentUpon>201801080820253_AddAppEmailNotificationsColumns.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801101300540_AddFKtoNotificationsSettings.resx">
+      <DependentUpon>201801101300540_AddFKtoNotificationsSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802070759572_AddCommentsNotificationsSettings.resx">
+      <DependentUpon>201802070759572_AddCommentsNotificationsSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802091000474_AddProvidersEmailsToAppUser.resx">
+      <DependentUpon>201802091000474_AddProvidersEmailsToAppUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802280824384_AddPictureIdToServiceRequest.resx">
+      <DependentUpon>201802280824384_AddPictureIdToServiceRequest.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803051331355_RemoveBookTakenTill.resx">
+      <DependentUpon>201803051331355_RemoveBookTakenTill.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803082007410_AddPictureIdToServiceRequest1.resx">
+      <DependentUpon>201803082007410_AddPictureIdToServiceRequest1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803082027364_AddPictureIdToKudosShopItems.resx">
+      <DependentUpon>201803082027364_AddPictureIdToKudosShopItems.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201804261017590_AddKudosYearlyMultipliersColumn.resx">
+      <DependentUpon>201804261017590_AddKudosYearlyMultipliersColumn.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201904131234290_AddOfficeIdToEvents.resx">
+      <DependentUpon>201904131234290_AddOfficeIdToEvents.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201904180838055_AddedBadgesEntities.resx">
+      <DependentUpon>201904180838055_AddedBadgesEntities.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201907201330177_AddKudosWelcomeColumns.resx">
+      <DependentUpon>201907201330177_AddKudosWelcomeColumns.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201909072124268_PostWatchers.resx">
+      <DependentUpon>201909072124268_PostWatchers.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201909201038299_AddIsActiveColumnToKudoType.resx">
+      <DependentUpon>201909201038299_AddIsActiveColumnToKudoType.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201909261209583_SeedWelcomeKudos.resx">
+      <DependentUpon>201909261209583_SeedWelcomeKudos.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201910011943144_DummyMigration.resx">
+      <DependentUpon>201910011943144_DummyMigration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201910021146410_RemoveWelcomeKudosFromOrganizationEntity.resx">
+      <DependentUpon>201910021146410_RemoveWelcomeKudosFromOrganizationEntity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201910211051464_AddLotteryAndLotteryParticipant.resx">
+      <DependentUpon>201910211051464_AddLotteryAndLotteryParticipant.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201910221426483_SeedRefundKudos.resx">
+      <DependentUpon>201910221426483_SeedRefundKudos.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201910301511497_LotteryRefundFailedFlag.resx">
+      <DependentUpon>201910301511497_LotteryRefundFailedFlag.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201911191445311_AddFoodRelatedFieldsToEvents.resx">
+      <DependentUpon>201911191445311_AddFoodRelatedFieldsToEvents.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201911281059238_EventsWithMultipleOffices.resx">
+      <DependentUpon>201911281059238_EventsWithMultipleOffices.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201911281150187_EventsOfficeData.resx">
+      <DependentUpon>201911281150187_EventsOfficeData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201912021646387_AddBookCoverUrlToBook.resx">
+      <DependentUpon>201912021646387_AddBookCoverUrlToBook.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201912031425135_EventTypeWeeklyReminder.resx">
+      <DependentUpon>201912031425135_EventTypeWeeklyReminder.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201912051449578_EventIsPinnedFlag.resx">
+      <DependentUpon>201912051449578_EventIsPinnedFlag.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001021211276_AddEventOptionRulesToAnEntity.resx">
+      <DependentUpon>202001021211276_AddEventOptionRulesToAnEntity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001031116555_RemoveFoodRelatedFieldsFromEvents.resx">
+      <DependentUpon>202001031116555_RemoveFoodRelatedFieldsFromEvents.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001151900409_EventAttendChoice.resx">
+      <DependentUpon>202001151900409_EventAttendChoice.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001221423251_AddGroupFieldToEventType.resx">
+      <DependentUpon>202001221423251_AddGroupFieldToEventType.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002091606025_InitEventWallsPermissions.resx">
+      <DependentUpon>202002091606025_InitEventWallsPermissions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002101044528_AddIsShownWithMainEventsField.resx">
+      <DependentUpon>202002101044528_AddIsShownWithMainEventsField.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="sql_scripts\likes_migration.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
+    <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
