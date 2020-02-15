@@ -8,10 +8,10 @@ using Shrooms.Domain.Exceptions.Exceptions.Book;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Books;
 using Shrooms.Contracts.DAL;
-using Shrooms.Infrastructure.GoogleBookApiService;
 using Shrooms.Premium.DataTransferObjects.Models.Books;
 using Shrooms.Premium.Domain.DomainServiceValidators.Books;
 using Shrooms.Premium.Domain.Services.Books;
+using Shrooms.Premium.Infrastructure.GoogleBookApiService;
 using Shrooms.Tests.Extensions;
 
 namespace Shrooms.Premium.UnitTests.DomainService

@@ -8,7 +8,6 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Infrastructure;
-using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Premium.Domain.Services.WebHookCallbacks.LoyaltyKudos;
 using Shrooms.Premium.UnitTests.ModelMappings;
 using Shrooms.Tests.Extensions;

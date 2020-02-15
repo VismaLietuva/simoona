@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Shrooms.Contracts.DataTransferObjects;
-using Shrooms.Infrastructure.FireAndForget;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Domain.Services.Notifications;
 using Shrooms.Presentation.Api.Hubs;

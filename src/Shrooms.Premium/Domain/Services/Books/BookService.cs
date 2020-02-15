@@ -15,8 +15,6 @@ using Shrooms.DataLayer.EntityModels.Models.Books;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.Domain.Services.UserService;
-using Shrooms.Infrastructure.FireAndForget;
-using Shrooms.Infrastructure.GoogleBookApiService;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Premium.DataTransferObjects.Models;
@@ -26,6 +24,7 @@ using Shrooms.Premium.DataTransferObjects.Models.Books.BooksByOffice;
 using Shrooms.Premium.DataTransferObjects.Models.LazyPaged;
 using Shrooms.Premium.Domain.DomainServiceValidators.Books;
 using Shrooms.Premium.Domain.Services.Email.Book;
+using Shrooms.Premium.Infrastructure.GoogleBookApiService;
 
 namespace Shrooms.Premium.Domain.Services.Books
 {

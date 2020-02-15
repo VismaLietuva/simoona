@@ -6,10 +6,10 @@ using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Exceptions;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Permissions;
-using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.ServiceRequest;
 using Shrooms.Premium.Domain.Services.Email.ServiceRequest;
@@ -31,10 +31,7 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
         private readonly IPermissionService _permissionService;
         private readonly IAsyncRunner _asyncRunner;
 
-        public ServiceRequestService(
-            IUnitOfWork2 uow,
-            IPermissionService permissionService,
-            IAsyncRunner asyncRunner)
+        public ServiceRequestService(IUnitOfWork2 uow, IPermissionService permissionService, IAsyncRunner asyncRunner)
         {
             _uow = uow;
             _serviceRequestsDbSet = _uow.GetDbSet<ServiceRequest>();

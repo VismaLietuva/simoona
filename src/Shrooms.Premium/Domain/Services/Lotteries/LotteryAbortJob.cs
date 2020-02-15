@@ -9,7 +9,6 @@ using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models.Lottery;
 using Shrooms.Domain.Services.Kudos;
-using Shrooms.Infrastructure.FireAndForget;
 
 namespace Shrooms.Premium.Domain.Services.Lotteries
 {

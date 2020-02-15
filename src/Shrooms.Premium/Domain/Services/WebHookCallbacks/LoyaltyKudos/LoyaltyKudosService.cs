@@ -7,7 +7,6 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
-using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Premium.DataTransferObjects.Models.Kudos;
 using Shrooms.Premium.Domain.Services.Email.Kudos;
 

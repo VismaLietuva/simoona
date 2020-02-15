@@ -1,5 +1,5 @@
 ﻿using Autofac;
-using Shrooms.Infrastructure.FireAndForget;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.Premium.Presentation.Api.BackgroundWorkers;
 
 namespace Shrooms.Premium.IoC.Modules

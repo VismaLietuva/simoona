@@ -71,6 +71,10 @@
       <HintPath>..\..\open-source\src\api\packages\Google.Apis.Auth.1.41.1\lib\net45\Google.Apis.Auth.PlatformServices.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Google.Apis.Books.v1, Version=1.10.0.80, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab">
+      <HintPath>..\..\open-source\src\api\packages\Google.Apis.Books.v1.1.10.0.800\lib\portable-net40+sl50+win+wpa81+wp80\Google.Apis.Books.v1.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Google.Apis.Core, Version=1.41.1.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab">
       <HintPath>..\..\open-source\src\api\packages\Google.Apis.Core.1.41.1\lib\net45\Google.Apis.Core.dll</HintPath>
       <Private>False</Private>
@@ -293,6 +297,7 @@
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\ServiceRequestCommentEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\ServiceRequestEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\ServiceRequestUpdateEmailTemplateViewModel.cs" />
+    <Compile Include="DataTransferObjects\ExternalBookInfo.cs" />
     <Compile Include="DataTransferObjects\Models\Books\BasicBookDto.cs" />
     <Compile Include="DataTransferObjects\Models\Books\BookDetails\BookDetailsAdministrationDTO.cs" />
     <Compile Include="DataTransferObjects\Models\Books\BookDetails\BookDetailsDTO.cs" />
@@ -460,6 +465,8 @@
     <Compile Include="Domain\Services\WebHookCallbacks\LoyaltyKudos\LoyaltyKudosService.cs" />
     <Compile Include="Domain\Services\WebHookCallbacks\WebHookCallbackPremiumServices.cs" />
     <Compile Include="EmailTemplates\EmailPremiumTemplatesCompiler.cs" />
+    <Compile Include="Infrastructure\GoogleBookApiService\GoogleBookService.cs" />
+    <Compile Include="Infrastructure\GoogleBookApiService\IBookInfoService.cs" />
     <Compile Include="Infrastructure\VacationBot\IVacationBotService.cs" />
     <Compile Include="Infrastructure\VacationBot\VacationBotService.cs" />
     <Compile Include="Infrastructure\VacationBot\VacationInfo.cs" />

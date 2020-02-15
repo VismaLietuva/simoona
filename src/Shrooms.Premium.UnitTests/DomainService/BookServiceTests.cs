@@ -15,13 +15,12 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
-using Shrooms.Infrastructure.FireAndForget;
-using Shrooms.Infrastructure.GoogleBookApiService;
 using Shrooms.Premium.DataTransferObjects.Models.Books;
 using Shrooms.Premium.DataTransferObjects.Models.Books.BookDetails;
 using Shrooms.Premium.DataTransferObjects.Models.Books.BooksByOffice;
 using Shrooms.Premium.Domain.DomainServiceValidators.Books;
 using Shrooms.Premium.Domain.Services.Books;
+using Shrooms.Premium.Infrastructure.GoogleBookApiService;
 using Shrooms.Tests.Extensions;
 
 namespace Shrooms.Premium.UnitTests.DomainService

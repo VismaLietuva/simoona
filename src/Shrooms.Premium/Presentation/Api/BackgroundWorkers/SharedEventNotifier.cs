@@ -1,8 +1,8 @@
 ﻿using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.Domain.Services.Email.Posting;
 using Shrooms.Domain.Services.Wall;
-using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Presentation.Api.Hubs;
 
 namespace Shrooms.Premium.Presentation.Api.BackgroundWorkers

@@ -9,7 +9,6 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
-using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Premium.Domain.Services.Lotteries;
 
 namespace Shrooms.Premium.UnitTests.DomainService.LotteryServices

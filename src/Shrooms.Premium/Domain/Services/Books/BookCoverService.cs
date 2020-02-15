@@ -4,8 +4,7 @@ using System.Linq;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models.Books;
-using Shrooms.Infrastructure.FireAndForget;
-using Shrooms.Infrastructure.GoogleBookApiService;
+using Shrooms.Premium.Infrastructure.GoogleBookApiService;
 
 namespace Shrooms.Premium.Domain.Services.Books
 {

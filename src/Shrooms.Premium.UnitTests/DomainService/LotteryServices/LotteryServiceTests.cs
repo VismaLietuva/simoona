@@ -14,7 +14,7 @@ using Shrooms.DataLayer.EntityModels.Models.Lottery;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Enums;
-using Shrooms.Infrastructure.FireAndForget;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
 using Shrooms.Premium.Domain.DomainExceptions.Lotteries;
 using Shrooms.Premium.Domain.Services.Lotteries;

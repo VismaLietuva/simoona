@@ -8,10 +8,10 @@ using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Exceptions;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Committee;
 using Shrooms.Domain.ServiceExceptions;
-using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Premium.DataTransferObjects.Models.Committees;
 using Shrooms.Premium.Domain.Services.Email.Committee;
 
@@ -28,11 +28,7 @@ namespace Shrooms.Premium.Domain.Services.Committees
         private readonly IRepository<Committee> _committeeRepository;
         private readonly IMapper _mapper;
 
-        public CommitteesService(
-            IMapper mapper,
-            IUnitOfWork unitOfWork,
-            IUnitOfWork2 uow,
-            IAsyncRunner asyncRunner)
+        public CommitteesService(IMapper mapper, IUnitOfWork unitOfWork, IUnitOfWork2 uow, IAsyncRunner asyncRunner)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
