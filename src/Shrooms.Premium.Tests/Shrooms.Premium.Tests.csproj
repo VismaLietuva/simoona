@@ -4,7 +4,7 @@
   <Import Project="..\..\open-source\src\api\packages\Microsoft.CodeCoverage.16.5.0\build\netstandard1.0\Microsoft.CodeCoverage.props" Condition="Exists('..\..\open-source\src\api\packages\Microsoft.CodeCoverage.16.5.0\build\netstandard1.0\Microsoft.CodeCoverage.props')" />
   <Import Project="..\..\open-source\src\api\packages\NUnit.3.12.0\build\NUnit.props" Condition="Exists('..\..\open-source\src\api\packages\NUnit.3.12.0\build\NUnit.props')" />
   <Import Project="..\..\open-source\src\api\packages\NUnit3TestAdapter.3.16.1\build\net35\NUnit3TestAdapter.props" Condition="Exists('..\..\open-source\src\api\packages\NUnit3TestAdapter.3.16.1\build\net35\NUnit3TestAdapter.props')" />
-  <Import Project="Shrooms.Premium.UnitTests.props" Condition="Exists('Shrooms.Premium.UnitTests.props')" />
+  <Import Project="Shrooms.Premium.Tests.props" Condition="Exists('Shrooms.Premium.UnitTests.props')" />
   <PropertyGroup>
     <SimoonaCoreLocation Condition=" '$(SimoonaCoreLocation)' == '' ">..\..\open-source</SimoonaCoreLocation>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -12,8 +12,8 @@
     <ProjectGuid>{BF77FA0D-51D3-4DB6-9ADE-D5AAD70E2625}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Shrooms.Premium.UnitTests</RootNamespace>
-    <AssemblyName>Shrooms.Premium.UnitTests</AssemblyName>
+    <RootNamespace>Shrooms.Premium.Tests</RootNamespace>
+    <AssemblyName>Shrooms.Premium.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>

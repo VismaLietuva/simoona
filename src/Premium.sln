@@ -42,7 +42,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shrooms.Premium", "Shrooms.
 		{3D4343C8-1CF9-4AAB-B458-C2AC52E4A47A} = {3D4343C8-1CF9-4AAB-B458-C2AC52E4A47A}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shrooms.Premium.UnitTests", "Shrooms.Premium.UnitTests\Shrooms.Premium.UnitTests.csproj", "{BF77FA0D-51D3-4DB6-9ADE-D5AAD70E2625}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shrooms.Premium.Tests", "Shrooms.Premium.Tests\Shrooms.Premium.Tests.csproj", "{BF77FA0D-51D3-4DB6-9ADE-D5AAD70E2625}"
 	ProjectSection(ProjectDependencies) = postProject
 		{093FE583-996B-435C-A4D2-201C94AA71E0} = {093FE583-996B-435C-A4D2-201C94AA71E0}
 	EndProjectSection

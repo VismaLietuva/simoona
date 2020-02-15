@@ -7,7 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Premium", "Premium", "{F559
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shrooms.Premium", "Shrooms.Premium\Shrooms.Premium.csproj", "{CE5546D3-8819-4B25-8DDC-B02769BAB42F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shrooms.Premium.UnitTests", "Shrooms.Premium.UnitTests\Shrooms.Premium.UnitTests.csproj", "{BF77FA0D-51D3-4DB6-9ADE-D5AAD70E2625}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shrooms.Premium.Tests", "Shrooms.Premium.Tests\Shrooms.Premium.Tests.csproj", "{BF77FA0D-51D3-4DB6-9ADE-D5AAD70E2625}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

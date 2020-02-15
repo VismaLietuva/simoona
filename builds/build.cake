@@ -18,7 +18,7 @@ var ossRelativePathToSlnForked = MakeRelativePath(IODirectory.GetCurrentDirector
 var ossRelativePathToCsprojForked = MakeRelativePath(IODirectory.GetCurrentDirectory() + "\\src\\", ossPathForked);
 
 var projectPropsPath = Path.Combine(rootPath, @"Shrooms.Premium\Shrooms.Premium.props");
-var testsProjectPropsPath = Path.Combine(rootPath, @"Shrooms.Premium.UnitTests\Shrooms.Premium.UnitTests.props");
+var testsProjectPropsPath = Path.Combine(rootPath, @"Shrooms.Premium.Tests\Shrooms.Premium.Tests.props");
 var projectPath = Path.Combine(rootPath, @"Shrooms.Premium\Shrooms.Premium.csproj");
 var slnPath = Path.Combine(rootPath, @"Premium.sln");
 var slnPathForked = Path.Combine(rootPath, @"Premium.WithForkedOss.sln");
