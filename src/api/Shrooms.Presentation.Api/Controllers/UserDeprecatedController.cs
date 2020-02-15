@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -55,6 +54,7 @@ namespace Shrooms.Presentation.Api.Controllers
         private readonly IRepository<ApplicationRole> _rolesRepository;
         private readonly IRepository<Exam> _examsRepository;
         private readonly IRepository<Skill> _skillsRepository;
+        private readonly IRepository<JobPosition> _jobPositionsRepository;
         private readonly IImpersonateService _impersonateService;
         private readonly IAdministrationUsersService _administrationUsersService;
         private readonly IPermissionService _permissionService;
@@ -63,7 +63,6 @@ namespace Shrooms.Presentation.Api.Controllers
         private readonly IRoleService _roleService;
         private readonly ShroomsUserManager _userManager;
         private readonly ICustomCache<string, IEnumerable<string>> _permissionsCache;
-        private readonly IDbSet<JobPosition> _jobPositionsDbSet;
         private readonly IProjectsService _projectService;
         private readonly IKudosService _kudosService;
         private readonly IPictureService _pictureService;
@@ -91,7 +90,7 @@ namespace Shrooms.Presentation.Api.Controllers
             _rolesRepository = unitOfWork.GetRepository<ApplicationRole>();
             _examsRepository = _unitOfWork.GetRepository<Exam>();
             _skillsRepository = _unitOfWork.GetRepository<Skill>();
-            _jobPositionsDbSet = uow.GetDbSet<JobPosition>();
+            _jobPositionsRepository = _unitOfWork.GetRepository<JobPosition>();
             _qualificationLevelRepository = _unitOfWork.GetRepository<QualificationLevel>();
             _impersonateService = impersonateService;
             _administrationUsersService = administrationUsersService;
@@ -275,11 +274,8 @@ namespace Shrooms.Presentation.Api.Controllers
             var userOrg = GetUserAndOrganization();
             var q = query.ToLowerInvariant();
 
-            var jobPositions =
-                _jobPositionsDbSet
-                    .Where(p =>
-                        p.OrganizationId == userOrg.OrganizationId &&
-                        p.Title.ToLower().Contains(q))
+            var jobPositions = _jobPositionsRepository
+                    .Get(p => p.OrganizationId == userOrg.OrganizationId && p.Title.ToLower().Contains(q))
                     .Select(p => p.Title)
                     .OrderBy(p => p)
                     .ToList();
@@ -414,8 +410,8 @@ namespace Shrooms.Presentation.Api.Controllers
             var model = MapJobInfo(user);
             var orgId = GetUserAndOrganization().OrganizationId;
 
-            model.JobPositions = _jobPositionsDbSet
-                .Where(p => p.OrganizationId == orgId)
+            model.JobPositions = _jobPositionsRepository
+                .Get(p => p.OrganizationId == orgId)
                 .Select(p => new JobPositionViewModel
                 {
                     Id = p.Id,

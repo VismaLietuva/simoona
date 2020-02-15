@@ -19,10 +19,10 @@ namespace Shrooms.Presentation.Api.Filters
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
             var configuration = actionContext.Request.GetDependencyScope().GetService(typeof(IFeatureConfiguration)) as IFeatureConfiguration;
-            if (!configuration.IsAvailable(_feature))
+
+            if (configuration != null && !configuration.IsAvailable(_feature))
             {
-                actionContext.Response = actionContext.Request.CreateResponse(
-                    HttpStatusCode.NotFound);
+                actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.NotFound);
             }
         }
     }

@@ -17,10 +17,7 @@ namespace Shrooms.DataLayer.EntityModels.Models.Lottery
         [JsonIgnore]
         public string Serialized
         {
-            get
-            {
-                return JsonConvert.SerializeObject(this);
-            }
+            get => JsonConvert.SerializeObject(this);
             set
             {
                 if (string.IsNullOrEmpty(value))
