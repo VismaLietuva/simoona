@@ -17,11 +17,13 @@ using Shrooms.Domain.Services.Roles;
 using Shrooms.Domain.Services.UserService;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Infrastructure.GoogleBookApiService;
+using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Premium.DataTransferObjects.Models;
 using Shrooms.Premium.DataTransferObjects.Models.Books;
 using Shrooms.Premium.DataTransferObjects.Models.Books.BookDetails;
 using Shrooms.Premium.DataTransferObjects.Models.Books.BooksByOffice;
+using Shrooms.Premium.DataTransferObjects.Models.LazyPaged;
 using Shrooms.Premium.Domain.DomainServiceValidators.Books;
 using Shrooms.Premium.Domain.Services.Email.Book;
 
@@ -255,7 +257,7 @@ namespace Shrooms.Premium.Domain.Services.Books
             var bookReportTemplateViewModel = new BookReportEmailTemplateViewModel(reportedOfficeBook.Book.Title, reportedOfficeBook.Book.Author,
                  bookReport.Report, bookReport.Comment, bookUrl, user.FullName, userNotificationSettingsUrl);
 
-            var content = _mailTemplate.Generate(bookReportTemplateViewModel, EmailTemplateCacheKeys.BookReport);
+            var content = _mailTemplate.Generate(bookReportTemplateViewModel, EmailPremiumTemplateCacheKeys.BookReport);
             var emailData = new EmailDto(receivers, subject, content);
 
             _mailingService.SendEmail(emailData);

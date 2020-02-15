@@ -19,7 +19,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>$(SimoonaCoreLocation)\src\api\Main\PresentationLayer\Shrooms.API\Extensions\</OutputPath>
+    <OutputPath>$(SimoonaCoreLocation)\src\api\Shrooms.Presentation.Api\Extensions\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>3</WarningLevel>
@@ -28,7 +28,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>$(SimoonaCoreLocation)\src\api\Main\PresentationLayer\Shrooms.API\Extensions\</OutputPath>
+    <OutputPath>$(SimoonaCoreLocation)\src\api\Shrooms.Presentation.Api\Extensions\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -163,36 +163,49 @@
       <HintPath>..\..\open-source\src\api\packages\PagedList.1.17.0.0\lib\net40\PagedList.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="RazorEngine, Version=3.9.0.0, Culture=neutral, PublicKeyToken=9ee697374c7e744a">
+      <HintPath>..\..\open-source\src\api\packages\RazorEngine.3.9.0\lib\net45\RazorEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Shrooms.Contracts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Contracts\bin\$(Configuration)\Shrooms.Contracts.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Shrooms.Presentation.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Presentation.Api\bin\Shrooms.Presentation.Api.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Shrooms.Domain, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Domain\bin\$(Configuration)\Shrooms.Domain.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Shrooms.Domain.Exceptions, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Domain.Exceptions\bin\$(Configuration)\Shrooms.Domain.Exceptions.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Shrooms.Domain.ServiceValidators, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Domain.ServiceValidators\bin\$(Configuration)\Shrooms.Domain.ServiceValidators.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Shrooms.DataLayer.EntityModels, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.DataLayer.EntityModels\bin\$(Configuration)\Shrooms.DataLayer.EntityModels.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Shrooms.Resources, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Resources\bin\$(Configuration)\Shrooms.Resources.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Shrooms.Presentation.WebViewModels, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Presentation.WebViewModels\bin\$(Configuration)\Shrooms.Presentation.WebViewModels.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Shrooms.Infrastructure, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -240,6 +253,10 @@
       <HintPath>..\..\open-source\src\api\packages\Microsoft.AspNet.WebApi.Owin.5.2.3\lib\net45\System.Web.Http.Owin.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <HintPath>..\..\open-source\src\api\packages\Microsoft.AspNet.Razor.3.0.0\lib\net45\System.Web.Razor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -260,6 +277,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants\EmailPremiumTemplateCacheKeys.cs" />
     <Compile Include="Constants\EventsConstants.cs" />
     <Compile Include="Constants\KudosShopConstants.cs" />
     <Compile Include="Constants\PremiumErrorCodes.cs" />
@@ -268,8 +286,13 @@
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\BookReminderEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\BookReportEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\BookTakenEmailTemplateViewModel.cs" />
+    <Compile Include="DataTransferObjects\EmailTemplateViewModels\CommitteeSuggestionEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\EventJoinRemindEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\EventParticipantExpelledEmailTemplateViewModel.cs" />
+    <Compile Include="DataTransferObjects\EmailTemplateViewModels\KudosReceivedDecreasedEmailTemplateViewModel.cs" />
+    <Compile Include="DataTransferObjects\EmailTemplateViewModels\ServiceRequestCommentEmailTemplateViewModel.cs" />
+    <Compile Include="DataTransferObjects\EmailTemplateViewModels\ServiceRequestEmailTemplateViewModel.cs" />
+    <Compile Include="DataTransferObjects\EmailTemplateViewModels\ServiceRequestUpdateEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\Models\Books\BasicBookDto.cs" />
     <Compile Include="DataTransferObjects\Models\Books\BookDetails\BookDetailsAdministrationDTO.cs" />
     <Compile Include="DataTransferObjects\Models\Books\BookDetails\BookDetailsDTO.cs" />
@@ -298,7 +321,6 @@
     <Compile Include="DataTransferObjects\Models\Books\TakenBookDTO.cs" />
     <Compile Include="DataTransferObjects\Models\Calendar\CalendarAttendeeAction.cs" />
     <Compile Include="DataTransferObjects\Models\Calendar\CalendarEventDTO.cs" />
-    <Compile Include="DataTransferObjects\Models\Committees\ApplicationUserMinimalDto.cs" />
     <Compile Include="DataTransferObjects\Models\Committees\CommitteeMembersDTO.cs" />
     <Compile Include="DataTransferObjects\Models\Committees\CommitteePostDTO.cs" />
     <Compile Include="DataTransferObjects\Models\Committees\CommitteeSuggestionCreatedDto.cs" />
@@ -331,6 +353,8 @@
     <Compile Include="DataTransferObjects\Models\Kudos\AwardedKudosEmployeeDTO.cs" />
     <Compile Include="DataTransferObjects\Models\Kudos\EmployeeLoyaltyKudosDTO.cs" />
     <Compile Include="DataTransferObjects\Models\Kudos\KudosShopItemDTO.cs" />
+    <Compile Include="DataTransferObjects\Models\LazyPaged\ILazyPaged.cs" />
+    <Compile Include="DataTransferObjects\Models\LazyPaged\LazyPaged.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\BuyLotteryTicketDTO.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\CreateLotteryDTO.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\EditStartedLotteryDTO.cs" />
@@ -435,6 +459,7 @@
     <Compile Include="Domain\Services\WebHookCallbacks\LoyaltyKudos\LoyaltyKudosCalculator.cs" />
     <Compile Include="Domain\Services\WebHookCallbacks\LoyaltyKudos\LoyaltyKudosService.cs" />
     <Compile Include="Domain\Services\WebHookCallbacks\WebHookCallbackPremiumServices.cs" />
+    <Compile Include="EmailTemplates\EmailPremiumTemplatesCompiler.cs" />
     <Compile Include="Infrastructure\VacationBot\IVacationBotService.cs" />
     <Compile Include="Infrastructure\VacationBot\VacationBotService.cs" />
     <Compile Include="Infrastructure\VacationBot\VacationInfo.cs" />
@@ -567,6 +592,41 @@
   <ItemGroup>
     <Analyzer Include="..\..\open-source\src\api\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
     <Analyzer Include="..\..\open-source\src\api\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="EmailTemplates\Books\BookRemind.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="EmailTemplates\Books\BookReport.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="EmailTemplates\Books\BookTaken.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="EmailTemplates\Committees\CommitteesSuggestion.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="EmailTemplates\Events\ParticipantExpelled.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="EmailTemplates\Events\RemindToJoin.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="EmailTemplates\LoyaltyKudos\LoyaltyKudosDecreased.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="EmailTemplates\LoyaltyKudos\LoyaltyKudosReceived.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="EmailTemplates\ServiceRequests\NewServiceRequest.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="EmailTemplates\ServiceRequests\ServiceRequestComment.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="EmailTemplates\ServiceRequests\UpdateServiceRequest.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="RecycleWebapp" BeforeTargets="Clean" Condition=" '$(Configuration)|$(Platform)' != 'Release|AnyCPU' ">

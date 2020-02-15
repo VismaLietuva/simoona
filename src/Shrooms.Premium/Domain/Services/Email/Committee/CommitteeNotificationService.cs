@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
@@ -9,6 +8,8 @@ using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Committee;
 using Shrooms.Domain.ServiceExceptions;
+using Shrooms.Premium.Constants;
+using Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Premium.DataTransferObjects.Models.Committees;
 using CommitteeEntity = Shrooms.DataLayer.EntityModels.Models.Committee.Committee;
 
@@ -75,7 +76,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Committee
                     suggestion.Description,
                     committeesListUrl);
 
-                var body = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.CommitteeSuggestion);
+                var body = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.CommitteeSuggestion);
 
                 _mailingService.SendEmail(new EmailDto(membersEmails, subject, body));
             }

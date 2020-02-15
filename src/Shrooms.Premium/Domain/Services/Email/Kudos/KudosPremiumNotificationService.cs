@@ -7,6 +7,7 @@ using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Premium.DataTransferObjects.Models.Kudos;
 
 namespace Shrooms.Premium.Domain.Services.Email.Kudos
@@ -38,7 +39,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Kudos
             var kudosProfileUrl = _appSettings.KudosProfileUrl(organization.ShortName, kudosLog.EmployeeId);
             var subject = Resources.Models.Kudos.Kudos.EmailSubject;
 
-            var emailTemplateViewModel = new KudosReceivedDecreasedEmailTemplateViewModel(
+            var emailTemplateViewModel = new LoyaltyKudosReceivedDecreasedEmailTemplateViewModel(
                 userNotificationSettingsUrl,
                 kudosLog.Points,
                 kudosLog.KudosTypeName,

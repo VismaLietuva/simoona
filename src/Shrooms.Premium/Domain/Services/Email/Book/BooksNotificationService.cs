@@ -1,11 +1,11 @@
 ﻿using System.Data.Entity;
 using System.Linq;
-using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Premium.DataTransferObjects.Models.Books;
 
@@ -47,7 +47,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Book
             var bookUrl = "sd";
 
             var emailTemplateViewModel = new BookTakenEmailTemplateViewModel(userNotificationSettingsUrl, takenBook.Title, takenBook.Author, bookUrl);
-            var body = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.BookTaken);
+            var body = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.BookTaken);
 
             _mailingService.SendEmail(new EmailDto(userEmail, subject, body));
         }

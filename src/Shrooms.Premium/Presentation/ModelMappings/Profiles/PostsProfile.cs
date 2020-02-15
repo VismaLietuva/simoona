@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts;
+using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Premium.Presentation.WebViewModels.Models.Events;
 using Shrooms.Premium.Presentation.WebViewModels.Models.Wall.Posts;
 

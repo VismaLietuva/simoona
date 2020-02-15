@@ -6,6 +6,8 @@ using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.Premium.Constants;
+using Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Premium.DataTransferObjects.Models.ServiceRequest;
 using ServiceRequestModel = Shrooms.DataLayer.EntityModels.Models.ServiceRequest;
 
@@ -58,7 +60,7 @@ namespace Shrooms.Premium.Domain.Services.Email.ServiceRequest
                 GetUserFullName(newServiceRequest.EmployeeId),
                 serviceRequestUrl);
 
-            var body = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.ServiceRequest);
+            var body = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.ServiceRequest);
 
             _mailingService.SendEmail(new EmailDto(emails, subject, body));
         }
@@ -88,7 +90,7 @@ namespace Shrooms.Premium.Domain.Services.Email.ServiceRequest
                 createdComment.CommentContent,
                 serviceRequestUrl);
 
-            var body = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.ServiceRequestComment);
+            var body = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.ServiceRequestComment);
 
             _mailingService.SendEmail(new EmailDto(emails, subject, body));
         }
@@ -124,7 +126,7 @@ namespace Shrooms.Premium.Domain.Services.Email.ServiceRequest
                 newStatusName,
                 serviceRequestUrl);
 
-            var body = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.ServiceRequestUpdate);
+            var body = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.ServiceRequestUpdate);
 
             _mailingService.SendEmail(new EmailDto(email, subject, body));
         }

@@ -37,7 +37,6 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 
             CreateMap<Committee, CommitteeViewDTO>();
             CreateMap<ApplicationUser, CommitteeMembersDTO>();
-            CreateMap<ApplicationUser, ApplicationUserMinimalDto>();
             CreateMap<CommitteeSuggestion, CommitteeSuggestionDto>();
         }
     }

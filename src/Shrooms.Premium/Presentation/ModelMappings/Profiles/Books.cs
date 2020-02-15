@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Premium.DataTransferObjects.Models.Books;
 using Shrooms.Premium.DataTransferObjects.Models.Books.BookDetails;
 using Shrooms.Premium.DataTransferObjects.Models.Books.BooksByOffice;
+using Shrooms.Premium.DataTransferObjects.Models.LazyPaged;
 using Shrooms.Premium.Presentation.WebViewModels.Models.Book;
 using Shrooms.Premium.Presentation.WebViewModels.Models.Book.BookDetails;
 using Shrooms.Premium.Presentation.WebViewModels.Models.Book.BooksByOffice;

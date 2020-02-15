@@ -3,6 +3,7 @@ using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Premium.DataTransferObjects.Models.Books;
 using Shrooms.Premium.DataTransferObjects.Models.Books.BookDetails;
 using Shrooms.Premium.DataTransferObjects.Models.Books.BooksByOffice;
+using Shrooms.Premium.DataTransferObjects.Models.LazyPaged;
 
 namespace Shrooms.Premium.Domain.Services.Books
 {

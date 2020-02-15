@@ -8,6 +8,7 @@ using Shrooms.Domain.Exceptions.Exceptions.Book;
 using Shrooms.Premium.DataTransferObjects.Models.Books;
 using Shrooms.Premium.DataTransferObjects.Models.Books.BookDetails;
 using Shrooms.Premium.DataTransferObjects.Models.Books.BooksByOffice;
+using Shrooms.Premium.DataTransferObjects.Models.LazyPaged;
 using Shrooms.Premium.Domain.Services.Books;
 using Shrooms.Premium.Presentation.WebViewModels.Models.Book;
 using Shrooms.Premium.Presentation.WebViewModels.Models.Book.BookDetails;
