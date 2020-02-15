@@ -166,7 +166,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\ApplicationSettings.cs" />
-    <Compile Include="Email\Templating\EmailTemplatesConfig.cs" />
+    <Compile Include="Email\Templating\EmailTemplatesCompiler.cs" />
     <Compile Include="Email\MailingService.cs" />
     <Compile Include="Email\Templating\MailTemplate.cs" />
     <Compile Include="ExcelGenerator\ExcelBuilder.cs" />

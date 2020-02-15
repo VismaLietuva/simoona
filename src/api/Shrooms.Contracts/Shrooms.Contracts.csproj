@@ -96,6 +96,7 @@
     <Compile Include="Enums\WallsType.cs" />
     <Compile Include="Enums\WallType.cs" />
     <Compile Include="Exceptions\ValidationException.cs" />
+    <Compile Include="Infrastructure\Email\IEmailTemplateCompiler.cs" />
     <Compile Include="Infrastructure\Email\IMailingService.cs" />
     <Compile Include="Infrastructure\Email\IMailTemplate.cs" />
     <Compile Include="Infrastructure\IApplicationSettings.cs" />

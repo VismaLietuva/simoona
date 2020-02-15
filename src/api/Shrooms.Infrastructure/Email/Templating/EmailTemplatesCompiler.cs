@@ -4,36 +4,28 @@ using RazorEngine;
 using RazorEngine.Templating;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels;
+using Shrooms.Contracts.Infrastructure.Email;
 
 namespace Shrooms.Infrastructure.Email.Templating
 {
-    public static class EmailTemplatesConfig
+    public class EmailTemplatesCompiler : IEmailTemplateCompiler
     {
         private static string _baseDir;
 
-        public static void Register(string baseDir)
+        public void Register(string baseDir)
         {
             _baseDir = baseDir;
 
             Engine.Razor.AddTemplate(EmailTemplateCacheKeys.HeaderFooterLayout, File.ReadAllText(Path.Combine(_baseDir, @"EmailTemplates\HeaderFooter.cshtml")));
 
             AddAndCompile(EmailTemplateCacheKeys.NewWallPost, @"EmailTemplates\Wall\NewPost.cshtml", typeof(NewWallPostEmailTemplateViewModel));
-            AddAndCompile(EmailTemplateCacheKeys.BookRemind, @"EmailTemplates\Books\BookRemind.cshtml", typeof(BookReminderEmailTemplateViewModel));
-            AddAndCompile(EmailTemplateCacheKeys.BookReport, @"EmailTemplates\Books\BookReport.cshtml", typeof(BookReportEmailTemplateViewModel));
-            AddAndCompile(EmailTemplateCacheKeys.EventParticipantExpelled, @"EmailTemplates\Events\ParticipantExpelled.cshtml", typeof(EventParticipantExpelledEmailTemplateViewModel));
-            AddAndCompile(EmailTemplateCacheKeys.EventJoinRemind, @"EmailTemplates\Events\RemindToJoin.cshtml", typeof(EventJoinRemindEmailTemplateViewModel));
-            AddAndCompile(EmailTemplateCacheKeys.BookTaken, @"EmailTemplates\Books\BookTaken.cshtml", typeof(BookTakenEmailTemplateViewModel));
             AddAndCompile(EmailTemplateCacheKeys.KudosRejected, @"EmailTemplates\Kudos\KudosRejected.cshtml", typeof(KudosRejectedEmailTemplateViewModel));
             AddAndCompile(EmailTemplateCacheKeys.KudosSent, @"EmailTemplates\Kudos\KudosSent.cshtml", typeof(KudosSentEmailTemplateViewModel));
             AddAndCompile(EmailTemplateCacheKeys.KudosReceived, @"EmailTemplates\Kudos\KudosReceived.cshtml", typeof(KudosReceivedDecreasedEmailTemplateViewModel));
             AddAndCompile(EmailTemplateCacheKeys.KudosDecreased, @"EmailTemplates\Kudos\KudosDecreased.cshtml", typeof(KudosReceivedDecreasedEmailTemplateViewModel));
             AddAndCompile(EmailTemplateCacheKeys.BirthdaysNotification, @"EmailTemplates\BirthdaysNotification.cshtml", typeof(BirthdaysNotificationTemplateViewModel));
-            AddAndCompile(EmailTemplateCacheKeys.CommitteeSuggestion, @"EmailTemplates\Committees\CommitteesSuggestion.cshtml", typeof(CommitteeSuggestionEmailTemplateViewModel));
             AddAndCompile(EmailTemplateCacheKeys.UserConfirmation, @"EmailTemplates\AdministrationUsers\UserConfirmation.cshtml", typeof(UserConfirmationEmailTemplateViewModel));
             AddAndCompile(EmailTemplateCacheKeys.NotificationAboutNewUser, @"EmailTemplates\AdministrationUsers\NotificationAboutNewUser.cshtml", typeof(NotificationAboutNewUserEmailTemplateViewModel));
-            AddAndCompile(EmailTemplateCacheKeys.ServiceRequestComment, @"EmailTemplates\ServiceRequests\ServiceRequestComment.cshtml", typeof(ServiceRequestCommentEmailTemplateViewModel));
-            AddAndCompile(EmailTemplateCacheKeys.ServiceRequest, @"EmailTemplates\ServiceRequests\NewServiceRequest.cshtml", typeof(ServiceRequestEmailTemplateViewModel));
-            AddAndCompile(EmailTemplateCacheKeys.ServiceRequestUpdate, @"EmailTemplates\ServiceRequests\UpdateServiceRequest.cshtml", typeof(ServiceRequestUpdateEmailTemplateViewModel));
             AddAndCompile(EmailTemplateCacheKeys.NewPostComment, @"EmailTemplates\Wall\NewComment.cshtml", typeof(NewCommentEmailTemplateViewModel));
             AddAndCompile(EmailTemplateCacheKeys.ResetPassword, @"EmailTemplates\AdministrationUsers\UserResetPassword.cshtml", typeof(ResetPasswordTemplateViewModel));
             AddAndCompile(EmailTemplateCacheKeys.VerifyEmail, @"EmailTemplates\AdministrationUsers\UserVerifyEmail.cshtml", typeof(VerifyEmailTemplateViewModel));

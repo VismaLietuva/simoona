@@ -37,7 +37,7 @@ namespace Shrooms.IoC
         {
             var builder = new ContainerBuilder();
             var shroomsApi = Assembly.Load("Shrooms.Presentation.Api");
-            var dataLayer = Assembly.Load("Shrooms.Contracts.DataLayer");
+            var dataLayer = Assembly.Load("Shrooms.DataLayer");
             var modelMappings = Assembly.Load("Shrooms.Presentation.ModelMappings");
 
             builder.RegisterApiControllers(shroomsApi);

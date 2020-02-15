@@ -22,7 +22,8 @@ namespace Shrooms.Tests.Infrastructure
             Assembly.Load("Shrooms.Contracts.DataTransferObjects");
             Assembly.Load("Shrooms.Domain");
 
-            EmailTemplatesConfig.Register(AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\Shrooms.Presentation.Api");
+            var emailTemplatesConfig = new EmailTemplatesCompiler();
+            emailTemplatesConfig.Register(AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\Shrooms.Presentation.Api");
 
             _stopWatch.Stop();
             TestContext.Progress.WriteLine("Finished templates compilation.");

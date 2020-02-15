@@ -72,12 +72,6 @@
   <ItemGroup>
     <Compile Include="EmailTemplateViewModels\BirthdaysNotificationEmployeeViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\BirthdaysNotificationTemplateViewModel.cs" />
-    <Compile Include="EmailTemplateViewModels\BookReminderEmailTemplateViewModel.cs" />
-    <Compile Include="EmailTemplateViewModels\BookReportEmailTemplateViewModel.cs" />
-    <Compile Include="EmailTemplateViewModels\BookTakenEmailTemplateViewModel.cs" />
-    <Compile Include="EmailTemplateViewModels\CommitteeSuggestionEmailTemplateViewModel.cs" />
-    <Compile Include="EmailTemplateViewModels\EventJoinRemindEmailTemplateViewModel.cs" />
-    <Compile Include="EmailTemplateViewModels\EventParticipantExpelledEmailTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\KudosReceivedDecreasedEmailTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\KudosRejectedEmailTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\KudosSentEmailTemplateViewModel.cs" />
@@ -85,9 +79,6 @@
     <Compile Include="EmailTemplateViewModels\NewWallPostEmailTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\NotificationAboutNewUserEmailTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\ResetPasswordTemplateViewModel.cs" />
-    <Compile Include="EmailTemplateViewModels\ServiceRequestCommentEmailTemplateViewModel.cs" />
-    <Compile Include="EmailTemplateViewModels\ServiceRequestEmailTemplateViewModel.cs" />
-    <Compile Include="EmailTemplateViewModels\ServiceRequestUpdateEmailTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\UserConfirmationEmailTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\VerifyEmailTemplateViewModel.cs" />
     <Compile Include="Models\Administration\AdministrationProjectDTO.cs" />

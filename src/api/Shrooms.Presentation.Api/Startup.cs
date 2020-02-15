@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Cors;
@@ -16,8 +17,8 @@ using Microsoft.Owin.Cors;
 using MVCControlsToolkit.Owin.Globalization;
 using Owin;
 using Shrooms.Contracts.Constants;
+using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.Infrastructure.Configuration;
-using Shrooms.Infrastructure.Email.Templating;
 using Shrooms.IoC;
 using Shrooms.Presentation.Api;
 using Shrooms.Presentation.Api.App_Start;
@@ -37,7 +38,6 @@ namespace Shrooms.Presentation.Api
             var config = new HttpConfiguration();
 
             ConfigureTelemetry();
-            EmailTemplatesConfig.Register(AppDomain.CurrentDomain.BaseDirectory);
             SwaggerConfig.Setup(config);
             SerializationIgnoreConfigs.Configure();
             RouteConfig.Register(config);
@@ -54,6 +54,8 @@ namespace Shrooms.Presentation.Api
             var container = IocBootstrapper.Bootstrap(app, ExtractConnString, config);
             config.DependencyResolver = new AutofacWebApiDependencyResolver(container);
             GlobalHost.DependencyResolver = new Autofac.Integration.SignalR.AutofacDependencyResolver(container);
+
+            ConfigureEmailTemplates();
 
             StartBackgroundWorker(app);
 
@@ -134,6 +136,20 @@ namespace Shrooms.Presentation.Api
             }
 
             app.UseGlobalization(globalizationOptions);
+        }
+
+        private void ConfigureEmailTemplates()
+        {
+            var type = typeof(IEmailTemplateCompiler);
+            var templateCompilerTypes = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(s => s.GetTypes())
+                .Where(p => p.IsClass && type.IsAssignableFrom(p));
+
+            foreach (var templateCompilerType in templateCompilerTypes)
+            {
+                var templateCompiler = Activator.CreateInstance(templateCompilerType) as IEmailTemplateCompiler;
+                templateCompiler?.Register(AppDomain.CurrentDomain.BaseDirectory);
+            }
         }
 
         private static void ConfigureTelemetry()

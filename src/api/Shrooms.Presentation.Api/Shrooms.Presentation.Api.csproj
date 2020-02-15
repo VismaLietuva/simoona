@@ -522,9 +522,7 @@
     </Content>
     <Content Include="EmailTemplates\HeaderFooter.cshtml" />
     <Content Include="EmailTemplates\Wall\NewPost.cshtml" />
-    <Content Include="EmailTemplates\Events\ParticipantExpelled.cshtml" />
     <Content Include="EmailTemplates\BirthdaysNotification.cshtml" />
-    <Content Include="EmailTemplates\Books\BookTaken.cshtml" />
     <Content Include="EmailTemplates\Kudos\KudosRejected.cshtml" />
     <Content Include="EmailTemplates\Kudos\KudosSent.cshtml" />
     <Content Include="EmailTemplates\Kudos\KudosReceived.cshtml" />
@@ -532,19 +530,12 @@
     <Content Include="packages.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="EmailTemplates\Committees\CommitteesSuggestion.cshtml" />
     <Content Include="EmailTemplates\AdministrationUsers\UserConfirmation.cshtml" />
     <Content Include="EmailTemplates\AdministrationUsers\NotificationAboutNewUser.cshtml" />
-    <Content Include="EmailTemplates\ServiceRequests\ServiceRequestComment.cshtml" />
-    <Content Include="EmailTemplates\ServiceRequests\NewServiceRequest.cshtml" />
-    <Content Include="EmailTemplates\ServiceRequests\UpdateServiceRequest.cshtml" />
     <Content Include="EmailTemplates\Wall\NewComment.cshtml" />
     <Content Include="EmailTemplates\AdministrationUsers\UserResetPassword.cshtml" />
     <Content Include="EmailTemplates\AdministrationUsers\UserVerifyEmail.cshtml" />
     <Content Include="Service References\Application Insights\ConnectedService.json" />
-    <Content Include="EmailTemplates\Books\BookRemind.cshtml" />
-    <Content Include="EmailTemplates\Events\RemindToJoin.cshtml" />
-    <Content Include="EmailTemplates\Books\BookReport.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Shrooms.Contracts\Shrooms.Contracts.csproj">
