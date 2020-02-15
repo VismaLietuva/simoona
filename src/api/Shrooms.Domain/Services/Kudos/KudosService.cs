@@ -16,6 +16,7 @@ using Shrooms.Contracts.DataTransferObjects.Models;
 using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Domain.Helpers;
@@ -23,7 +24,6 @@ using Shrooms.Domain.Services.Email.Kudos;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.Domain.ServiceValidators.Validators.Kudos;
-using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Resources;
 using ConstantsRoles = Shrooms.Contracts.Constants.Roles;
 

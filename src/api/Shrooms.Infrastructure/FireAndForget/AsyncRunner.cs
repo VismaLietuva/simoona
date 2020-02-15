@@ -38,9 +38,4 @@ namespace Shrooms.Infrastructure.FireAndForget
             });
         }
     }
-
-    public interface IAsyncRunner
-    {
-        void Run<T>(Action<T> action, string tenantName);
-    }
 }

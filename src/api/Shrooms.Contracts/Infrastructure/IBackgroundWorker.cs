@@ -1,4 +1,4 @@
-﻿namespace Shrooms.Infrastructure.FireAndForget
+﻿namespace Shrooms.Contracts.Infrastructure
 {
     public interface IBackgroundWorker
     {

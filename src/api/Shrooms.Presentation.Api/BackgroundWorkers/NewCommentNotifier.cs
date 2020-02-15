@@ -4,11 +4,11 @@ using AutoMapper;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall.Comments;
 using Shrooms.Contracts.Enums;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.Domain.Services.Email.Posting;
 using Shrooms.Domain.Services.Notifications;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.Domain.Services.Wall.Posts;
-using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Presentation.Api.Hubs;
 using Shrooms.Presentation.WebViewModels.Models.Notifications;
 

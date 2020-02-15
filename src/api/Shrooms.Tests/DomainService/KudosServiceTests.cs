@@ -14,6 +14,7 @@ using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Kudos;
 using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
 using Shrooms.Contracts.Enums;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Domain.Exceptions.Exceptions.Kudos;
@@ -21,7 +22,6 @@ using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.Domain.ServiceValidators.Validators.Kudos;
-using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Tests.Extensions;
 using Shrooms.Tests.ModelMappings;
 

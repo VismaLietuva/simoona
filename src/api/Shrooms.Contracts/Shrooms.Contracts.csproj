@@ -102,6 +102,8 @@
     <Compile Include="Infrastructure\Email\IMailingService.cs" />
     <Compile Include="Infrastructure\Email\IMailTemplate.cs" />
     <Compile Include="Infrastructure\IApplicationSettings.cs" />
+    <Compile Include="Infrastructure\IAsyncRunner.cs" />
+    <Compile Include="Infrastructure\IBackgroundWorker.cs" />
     <Compile Include="Infrastructure\ICustomCache.cs" />
     <Compile Include="Infrastructure\IExcelBuilder.cs" />
     <Compile Include="Infrastructure\IJobScheduler.cs" />
