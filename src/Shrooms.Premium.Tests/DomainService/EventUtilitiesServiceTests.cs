@@ -4,13 +4,13 @@ using System.Data.Entity;
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Premium.Domain.Services.Events.Utilities;
 using Shrooms.Tests.Extensions;
 
-namespace Shrooms.Premium.UnitTests.DomainService
+namespace Shrooms.Premium.Tests.DomainService
 {
     public class EventUtilitiesServiceTests
     {

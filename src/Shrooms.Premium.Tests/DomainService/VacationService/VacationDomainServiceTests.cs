@@ -4,7 +4,7 @@ using NUnit.Framework;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Premium.Domain.Services.Vacations;
 
-namespace Shrooms.Premium.UnitTests.DomainService.VacationService
+namespace Shrooms.Premium.Tests.DomainService.VacationService
 {
     [TestFixture]
     public class VacationDomainServiceTests

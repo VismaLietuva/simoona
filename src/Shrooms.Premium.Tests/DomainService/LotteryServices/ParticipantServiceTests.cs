@@ -1,16 +1,16 @@
-﻿using NSubstitute;
-using NUnit.Framework;
-using Shrooms.DataLayer.EntityModels.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using Shrooms.DataLayer.EntityModels.Models.Lottery;
+using NSubstitute;
+using NUnit.Framework;
 using Shrooms.Contracts.DAL;
+using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models.Lottery;
 using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
 using Shrooms.Premium.Domain.Services.Lotteries;
 using Shrooms.Tests.Extensions;
 
-namespace Shrooms.Premium.UnitTests.DomainService.LotteryServices
+namespace Shrooms.Premium.Tests.DomainService.LotteryServices
 {
     [TestFixture]
     public class ParticipantServiceTests

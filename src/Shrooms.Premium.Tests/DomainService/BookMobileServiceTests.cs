@@ -4,17 +4,17 @@ using System.Data.Entity;
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Domain.Exceptions.Exceptions.Book;
+using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Books;
-using Shrooms.Contracts.DAL;
 using Shrooms.Premium.DataTransferObjects.Models.Books;
+using Shrooms.Premium.Domain.DomainExceptions.Book;
 using Shrooms.Premium.Domain.DomainServiceValidators.Books;
 using Shrooms.Premium.Domain.Services.Books;
 using Shrooms.Premium.Infrastructure.GoogleBookApiService;
 using Shrooms.Tests.Extensions;
 
-namespace Shrooms.Premium.UnitTests.DomainService
+namespace Shrooms.Premium.Tests.DomainService
 {
     [TestFixture]
     public class BookMobileServiceTests

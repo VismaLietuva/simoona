@@ -4,7 +4,7 @@
   <Import Project="..\..\open-source\src\api\packages\Microsoft.CodeCoverage.16.5.0\build\netstandard1.0\Microsoft.CodeCoverage.props" Condition="Exists('..\..\open-source\src\api\packages\Microsoft.CodeCoverage.16.5.0\build\netstandard1.0\Microsoft.CodeCoverage.props')" />
   <Import Project="..\..\open-source\src\api\packages\NUnit.3.12.0\build\NUnit.props" Condition="Exists('..\..\open-source\src\api\packages\NUnit.3.12.0\build\NUnit.props')" />
   <Import Project="..\..\open-source\src\api\packages\NUnit3TestAdapter.3.16.1\build\net35\NUnit3TestAdapter.props" Condition="Exists('..\..\open-source\src\api\packages\NUnit3TestAdapter.3.16.1\build\net35\NUnit3TestAdapter.props')" />
-  <Import Project="Shrooms.Premium.Tests.props" Condition="Exists('Shrooms.Premium.UnitTests.props')" />
+  <Import Project="Shrooms.Premium.Tests.props" Condition="Exists('Shrooms.Premium.Tests.props')" />
   <PropertyGroup>
     <SimoonaCoreLocation Condition=" '$(SimoonaCoreLocation)' == '' ">..\..\open-source</SimoonaCoreLocation>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>

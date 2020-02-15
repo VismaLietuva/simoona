@@ -1,16 +1,16 @@
-﻿using NSubstitute;
-using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using AutoMapper;
-using System.Web.Http.Controllers;
 using System.Net.Http;
-using System.Web.Http.Hosting;
-using System.Web.Http;
 using System.Security.Claims;
-using System.Web.Http.Results;
 using System.Threading.Tasks;
+using System.Web.Http;
+using System.Web.Http.Controllers;
+using System.Web.Http.Hosting;
+using System.Web.Http.Results;
+using AutoMapper;
+using NSubstitute;
 using NSubstitute.ExceptionExtensions;
+using NUnit.Framework;
 using PagedList;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
@@ -21,7 +21,7 @@ using Shrooms.Premium.Presentation.Api.Controllers.Lotteries;
 using Shrooms.Premium.Presentation.WebViewModels.Models.Lotteries;
 using Shrooms.Presentation.WebViewModels.Models;
 
-namespace Shrooms.Premium.UnitTests.Controllers.WebApi
+namespace Shrooms.Premium.Tests.Controllers.WebApi
 {
     public class LotteryControllerTests
     {

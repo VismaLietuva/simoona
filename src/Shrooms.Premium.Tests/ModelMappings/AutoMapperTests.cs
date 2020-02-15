@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using Shrooms.Premium.Presentation.ModelMappings.Profiles;
 
-namespace Shrooms.Premium.UnitTests.ModelMappings
+namespace Shrooms.Premium.Tests.ModelMappings
 {
     [TestFixture]
     public class AutoMapperTests

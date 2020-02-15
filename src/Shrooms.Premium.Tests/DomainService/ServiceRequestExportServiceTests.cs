@@ -6,15 +6,15 @@ using System.Linq.Expressions;
 using Excel;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
+using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Infrastructure.ExcelGenerator;
 using Shrooms.Premium.Domain.Services.ServiceRequests;
 using Shrooms.Tests.Extensions;
 
-namespace Shrooms.Premium.UnitTests.DomainService
+namespace Shrooms.Premium.Tests.DomainService
 {
     public class ServiceRequestExportServiceTests
     {

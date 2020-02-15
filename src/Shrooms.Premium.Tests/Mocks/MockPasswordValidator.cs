@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 
-namespace Shrooms.Premium.UnitTests.Mocks
+namespace Shrooms.Premium.Tests.Mocks
 {
     public class MockPasswordValidator<T> : IIdentityValidator<T>
     {

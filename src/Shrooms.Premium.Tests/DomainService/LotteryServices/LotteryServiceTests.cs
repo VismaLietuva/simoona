@@ -7,20 +7,20 @@ using AutoMapper;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
 using NUnit.Framework;
-using Shrooms.Domain.Services.Kudos;
-using Shrooms.Domain.Services.UserService;
-using Shrooms.DataLayer.EntityModels.Models;
-using Shrooms.DataLayer.EntityModels.Models.Lottery;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
+using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models.Lottery;
+using Shrooms.Domain.Services.Kudos;
+using Shrooms.Domain.Services.UserService;
 using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
 using Shrooms.Premium.Domain.DomainExceptions.Lotteries;
 using Shrooms.Premium.Domain.Services.Lotteries;
 using Shrooms.Tests.Extensions;
 
-namespace Shrooms.Premium.UnitTests.DomainService.LotteryServices
+namespace Shrooms.Premium.Tests.DomainService.LotteryServices
 {
     [TestFixture]
     public class LotteryServiceTests

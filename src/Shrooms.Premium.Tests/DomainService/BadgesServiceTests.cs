@@ -4,15 +4,15 @@ using System.Data.Entity;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
+using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Badges;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
-using Shrooms.Contracts.DAL;
-using Shrooms.Contracts.Enums;
 using Shrooms.Premium.Domain.Services.Badges;
 using Shrooms.Tests.Extensions;
 
-namespace Shrooms.Premium.UnitTests.DomainService
+namespace Shrooms.Premium.Tests.DomainService
 {
     [TestFixture]
     public class BadgesServiceTests

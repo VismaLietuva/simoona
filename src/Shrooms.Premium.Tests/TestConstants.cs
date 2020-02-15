@@ -1,4 +1,4 @@
-﻿namespace Shrooms.Premium.UnitTests
+﻿namespace Shrooms.Premium.Tests
 {
     internal static class TestConstants
     {

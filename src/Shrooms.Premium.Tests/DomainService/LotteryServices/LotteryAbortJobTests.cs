@@ -3,15 +3,15 @@ using System.Data.Entity;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
 using NUnit.Framework;
-using Shrooms.Domain.Services.Kudos;
-using Shrooms.DataLayer.EntityModels.Models.Lottery;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
+using Shrooms.DataLayer.EntityModels.Models.Lottery;
+using Shrooms.Domain.Services.Kudos;
 using Shrooms.Premium.Domain.Services.Lotteries;
 
-namespace Shrooms.Premium.UnitTests.DomainService.LotteryServices
+namespace Shrooms.Premium.Tests.DomainService.LotteryServices
 {
     [TestFixture]
     public class LotteryAbortJobTests

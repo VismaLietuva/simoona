@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNet.Identity;
 
-namespace Shrooms.Premium.UnitTests.Mocks
+namespace Shrooms.Premium.Tests.Mocks
 {
     public class MockPasswordHasher : IPasswordHasher
     {

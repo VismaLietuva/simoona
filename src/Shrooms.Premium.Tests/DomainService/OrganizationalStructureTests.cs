@@ -3,15 +3,15 @@ using System.Data.Entity;
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Domain.Services.Roles;
-using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.Domain.Services.Roles;
 using Shrooms.Premium.Domain.Services.OrganizationalStructure;
 using Shrooms.Tests.Extensions;
 
-namespace Shrooms.Premium.UnitTests.DomainService
+namespace Shrooms.Premium.Tests.DomainService
 {
     [TestFixture]
     public class OrganizationalStructureTests

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Shrooms.Contracts.DAL;
 
-namespace Shrooms.Premium.UnitTests.Mocks
+namespace Shrooms.Premium.Tests.Mocks
 {
     public class MockUnitOfWork : IUnitOfWork
     {

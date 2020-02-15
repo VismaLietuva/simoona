@@ -5,25 +5,25 @@ using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Domain.Services.Organizations;
-using Shrooms.Domain.Services.Roles;
-using Shrooms.Domain.Services.UserService;
-using Shrooms.Domain.Exceptions.Exceptions.Book;
-using Shrooms.DataLayer.EntityModels.Models;
-using Shrooms.DataLayer.EntityModels.Models.Books;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
+using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models.Books;
+using Shrooms.Domain.Services.Organizations;
+using Shrooms.Domain.Services.Roles;
+using Shrooms.Domain.Services.UserService;
 using Shrooms.Premium.DataTransferObjects.Models.Books;
 using Shrooms.Premium.DataTransferObjects.Models.Books.BookDetails;
 using Shrooms.Premium.DataTransferObjects.Models.Books.BooksByOffice;
+using Shrooms.Premium.Domain.DomainExceptions.Book;
 using Shrooms.Premium.Domain.DomainServiceValidators.Books;
 using Shrooms.Premium.Domain.Services.Books;
 using Shrooms.Premium.Infrastructure.GoogleBookApiService;
 using Shrooms.Tests.Extensions;
 
-namespace Shrooms.Premium.UnitTests.DomainService
+namespace Shrooms.Premium.Tests.DomainService
 {
     [TestFixture]
     public class BookServiceTests

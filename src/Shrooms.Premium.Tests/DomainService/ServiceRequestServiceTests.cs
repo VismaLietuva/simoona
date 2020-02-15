@@ -4,18 +4,18 @@ using System.Data.Entity;
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Domain.Services.Permissions;
-using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.Infrastructure;
+using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.Domain.Services.Permissions;
 using Shrooms.Premium.DataTransferObjects.Models.ServiceRequest;
 using Shrooms.Premium.Domain.Services.ServiceRequests;
 using Shrooms.Tests.Extensions;
 
-namespace Shrooms.Premium.UnitTests.DomainService
+namespace Shrooms.Premium.Tests.DomainService
 {
     [TestFixture]
     public class ServiceRequestServiceTests

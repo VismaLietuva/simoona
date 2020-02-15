@@ -4,17 +4,17 @@ using System.Data.Entity;
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Domain.Services.Permissions;
-using Shrooms.Domain.Services.Wall;
-using Shrooms.DataLayer.EntityModels.Models;
-using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Wall;
-using Shrooms.Contracts.Infrastructure;
-using Shrooms.Domain.Helpers;
 using Shrooms.Contracts.Enums;
+using Shrooms.Contracts.Infrastructure;
+using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models.Events;
+using Shrooms.Domain.Helpers;
+using Shrooms.Domain.Services.Permissions;
+using Shrooms.Domain.Services.Wall;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Domain.DomainExceptions.Event;
@@ -24,7 +24,7 @@ using Shrooms.Premium.Domain.Services.Events.Participation;
 using Shrooms.Premium.Domain.Services.Events.Utilities;
 using Shrooms.Tests.Extensions;
 
-namespace Shrooms.Premium.UnitTests.DomainService
+namespace Shrooms.Premium.Tests.DomainService
 {
     public class EventCrudServiceTests
     {

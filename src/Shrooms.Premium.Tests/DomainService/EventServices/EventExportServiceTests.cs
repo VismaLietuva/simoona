@@ -12,7 +12,7 @@ using Shrooms.Premium.Domain.Services.Events.Export;
 using Shrooms.Premium.Domain.Services.Events.Participation;
 using Shrooms.Premium.Domain.Services.Events.Utilities;
 
-namespace Shrooms.Premium.UnitTests.DomainService.EventServices
+namespace Shrooms.Premium.Tests.DomainService.EventServices
 {
     public class EventExportServiceTests
     {

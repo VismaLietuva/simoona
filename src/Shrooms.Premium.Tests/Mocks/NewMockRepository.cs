@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Shrooms.DataLayer.DAL;
 using Shrooms.Contracts.DAL;
+using Shrooms.DataLayer.DAL;
 using Shrooms.Infrastructure.Configuration;
 using Shrooms.Tests.Extensions;
 
-namespace Shrooms.Premium.UnitTests.Mocks
+namespace Shrooms.Premium.Tests.Mocks
 {
     public class NewMockRepository<TEntity> : EfRepository<TEntity>
         where TEntity : class

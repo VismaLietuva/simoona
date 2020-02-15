@@ -1,8 +1,8 @@
-﻿using AutoMapper;
-using System;
+﻿using System;
+using AutoMapper;
 using Shrooms.Premium.Presentation.ModelMappings.Profiles;
 
-namespace Shrooms.Premium.UnitTests.ModelMappings
+namespace Shrooms.Premium.Tests.ModelMappings
 {
     public static class ModelMapper
     {

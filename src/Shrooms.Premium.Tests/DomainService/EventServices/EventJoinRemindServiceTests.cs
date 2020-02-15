@@ -2,8 +2,8 @@
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Domain.Services.Organizations;
 using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.Domain.Services.Organizations;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Domain.Services.Email.Event;
 using Shrooms.Premium.Domain.Services.Events.Utilities;
@@ -11,7 +11,7 @@ using Shrooms.Premium.Domain.Services.Notifications;
 using Shrooms.Premium.Domain.Services.Users;
 using Shrooms.Premium.Domain.Services.WebHookCallbacks.Events;
 
-namespace Shrooms.Premium.UnitTests.DomainService.EventServices
+namespace Shrooms.Premium.Tests.DomainService.EventServices
 {
     [TestFixture]
     public class EventJoinRemindServiceTests
