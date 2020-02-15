@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.Contracts.DataTransferObjects;
 
 namespace Shrooms.Premium.DataTransferObjects.Models.Committees
 {
@@ -17,10 +17,10 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Committees
 
         public bool IsKudosCommittee { get; set; }
 
-        public ICollection<ApplicationUser> Members { get; set; }
+        public ICollection<ApplicationUserMinimalDto> Members { get; set; }
 
-        public ICollection<ApplicationUser> Leads { get; set; }
+        public ICollection<ApplicationUserMinimalDto> Leads { get; set; }
 
-        public ICollection<ApplicationUser> Delegates { get; set; }
+        public ICollection<ApplicationUserMinimalDto> Delegates { get; set; }
     }
 }

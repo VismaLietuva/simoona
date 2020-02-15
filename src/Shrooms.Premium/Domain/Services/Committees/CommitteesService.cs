@@ -71,7 +71,7 @@ namespace Shrooms.Premium.Domain.Services.Committees
 
         private void AddRemoveCommitteeMembers(CommitteePostDTO modelDTO, Committee committeeModel)
         {
-            var membersInModelIds = _mapper.Map<IEnumerable<ApplicationUser>, string[]>(modelDTO.Members);
+            var membersInModelIds = _mapper.Map<IEnumerable<ApplicationUserMinimalDto>, string[]>(modelDTO.Members);
             if (committeeModel.Members != null)
             {
                 var membersInCommitteeIds = _mapper.Map<IEnumerable<ApplicationUser>, string[]>(committeeModel.Members);

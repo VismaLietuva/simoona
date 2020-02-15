@@ -16,6 +16,6 @@ namespace Shrooms.Premium.Presentation.WebViewModels.ServiceRequests
 
         public bool IsNecessary { get; set; }
 
-        public IEnumerable<UserViewModel> Assignees { get; set; }
+        public IEnumerable<ApplicationUserMinimalViewModel> Assignees { get; set; }
     }
 }

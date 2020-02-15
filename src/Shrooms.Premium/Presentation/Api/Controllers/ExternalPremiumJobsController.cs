@@ -35,13 +35,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpPost]
         [Route("GiveLoyaltyKudos")]
+        [InvalidateCacheOutput("GetLastKudosLogRecords", typeof(KudosController))]
         public void GiveLoyaltyKudos()
         {
             var organizationName = GetOrganizationName();
             _webHookService.LoyaltyKudos.AwardEmployeesWithKudos(organizationName);
-
-            var cache = Configuration.CacheOutputConfiguration().GetCacheOutputProvider(Request);
-            cache.RemoveStartsWith(Configuration.CacheOutputConfiguration().MakeBaseCachekey((KudosController t) => t.GetLastKudosLogRecords()));
         }
 
         [HttpPost]

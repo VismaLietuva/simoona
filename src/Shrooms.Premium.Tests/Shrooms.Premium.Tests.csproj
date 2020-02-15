@@ -120,10 +120,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Resources\bin\$(Configuration)\Shrooms.Resources.dll</HintPath>
     </Reference>
-    <Reference Include="Shrooms.Presentation.WebViewModels, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Presentation.WebViewModels\bin\$(Configuration)\Shrooms.Presentation.WebViewModels.dll</HintPath>
-    </Reference>
     <Reference Include="Shrooms.Contracts, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Contracts\bin\$(Configuration)\Shrooms.Contracts.dll</HintPath>

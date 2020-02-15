@@ -5,7 +5,6 @@ using System.Linq;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
-using Shrooms.Contracts.DataTransferObjects.Users;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -222,10 +221,11 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
                     Id = x.Id,
                     Name = x.Name,
                     IsNecessary = x.Name == ServiceRequestCategoryKudos,
-                    Assignees = x.Assignees.Select(u => new UserDto
+                    Assignees = x.Assignees.Select(u => new ApplicationUserMinimalDto
                     {
-                        UserId = u.Id,
-                        FullName = u.FirstName + " " + u.LastName,
+                        Id = u.Id,
+                        FirstName = u.FirstName,
+                        LastName = u.LastName,
                         PictureId = u.PictureId
                     })
                 })
@@ -237,7 +237,7 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
         public void CreateCategory(ServiceRequestCategoryDTO category, string userId)
         {
             ValidateCategoryName(category.Name);
-            var assignees = category.Assignees.Select(x => x.UserId).ToList();
+            var assignees = category.Assignees.Select(x => x.Id).ToList();
             var serviceCategory = new ServiceRequestCategory
             {
                 Name = category.Name,
@@ -259,10 +259,11 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
                     Id = x.Id,
                     Name = x.Name,
                     IsNecessary = x.Name == ServiceRequestCategoryKudos,
-                    Assignees = x.Assignees.Select(u => new UserDto
+                    Assignees = x.Assignees.Select(u => new ApplicationUserMinimalDto
                     {
-                        UserId = u.Id,
-                        FullName = u.FirstName + " " + u.LastName,
+                        Id = u.Id,
+                        FirstName = u.FirstName,
+                        LastName = u.LastName,
                         PictureId = u.PictureId
                     })
                 })
@@ -293,7 +294,7 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
             {
                 category.Name = modelDto.Name;
             }
-            var assigneeIds = modelDto.Assignees.Select(y => y.UserId).ToList();
+            var assigneeIds = modelDto.Assignees.Select(y => y.Id).ToList();
             category.Assignees = _userDbSet.Where(x => assigneeIds.Contains(x.Id)).ToList();
 
             _uow.SaveChanges(userId);

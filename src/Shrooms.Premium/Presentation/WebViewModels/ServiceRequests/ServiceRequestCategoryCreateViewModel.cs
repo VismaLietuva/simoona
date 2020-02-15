@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Shrooms.Contracts.ViewModels.User;
 using Shrooms.Premium.Constants;
-using Shrooms.Presentation.WebViewModels.Models;
 
 namespace Shrooms.Premium.Presentation.WebViewModels.ServiceRequests
 {
@@ -11,6 +11,6 @@ namespace Shrooms.Premium.Presentation.WebViewModels.ServiceRequests
         [StringLength(ServiceRequestConstants.ServiceRequestCategoryNameMaxLength, MinimumLength = 1)]
         public string Name { get; set; }
 
-        public ICollection<ApplicationUserViewModel> Assignees { get; set; }
+        public ICollection<ApplicationUserMinimalViewModel> Assignees { get; set; }
     }
 }

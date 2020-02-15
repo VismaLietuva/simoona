@@ -1,5 +1,5 @@
 ﻿using System;
-using Shrooms.Presentation.WebViewModels.Models.User;
+using Shrooms.Contracts.ViewModels.User;
 
 namespace Shrooms.Premium.Presentation.WebViewModels.Committees
 {

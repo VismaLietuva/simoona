@@ -116,7 +116,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             var id = User.Identity.GetUserId();
             var assigneeCategoriesNames = _serviceRequestService
                     .GetCategories()
-                    .Where(x => x.Assignees.Select(y => y.UserId).Contains(id))
+                    .Where(x => x.Assignees.Select(y => y.Id).Contains(id))
                     .Select(x => x.Name);
 
             Expression<Func<ServiceRequest, bool>> filterForCurrentUser = u =>
@@ -417,7 +417,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             {
                 var assigneeCategoriesNames = _serviceRequestService
                         .GetCategories()
-                        .Where(x => x.Assignees.Select(y => y.UserId).Contains(userId))
+                        .Where(x => x.Assignees.Select(y => y.Id).Contains(userId))
                         .Select(x => x.Name);
                 filter = u =>
                     u.EmployeeId == userId || assigneeCategoriesNames.Contains(u.CategoryName);

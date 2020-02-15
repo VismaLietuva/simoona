@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Shrooms.Contracts.ViewModels;
-using Shrooms.Presentation.WebViewModels.Models;
+using Shrooms.Contracts.ViewModels.User;
 
 namespace Shrooms.Premium.Presentation.WebViewModels.Committees
 {
@@ -16,10 +16,10 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Committees
 
         public bool IsKudosCommittee { get; set; }
 
-        public ICollection<ApplicationUserViewModel> Members { get; set; }
+        public ICollection<ApplicationUserMinimalViewModel> Members { get; set; }
 
-        public ICollection<ApplicationUserViewModel> Leads { get; set; }
+        public ICollection<ApplicationUserMinimalViewModel> Leads { get; set; }
 
-        public ICollection<ApplicationUserViewModel> Delegates { get; set; }
+        public ICollection<ApplicationUserMinimalViewModel> Delegates { get; set; }
     }
 }

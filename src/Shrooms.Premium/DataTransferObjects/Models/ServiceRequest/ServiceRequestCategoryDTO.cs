@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Shrooms.Contracts.DataTransferObjects.Users;
+using Shrooms.Contracts.DataTransferObjects;
 
 namespace Shrooms.Premium.DataTransferObjects.Models.ServiceRequest
 {
@@ -11,6 +11,6 @@ namespace Shrooms.Premium.DataTransferObjects.Models.ServiceRequest
 
         public bool IsNecessary { get; set; }
 
-        public IEnumerable<UserDto> Assignees { get; set; }
+        public IEnumerable<ApplicationUserMinimalDto> Assignees { get; set; }
     }
 }
