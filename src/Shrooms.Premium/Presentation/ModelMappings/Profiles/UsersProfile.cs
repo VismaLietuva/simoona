@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
-using Shrooms.Premium.Presentation.WebViewModels.Models.User;
+using Shrooms.Premium.Presentation.WebViewModels.User;
 
 namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 {

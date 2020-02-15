@@ -2,8 +2,8 @@
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Books;
 using Shrooms.Premium.DataTransferObjects.Models.Books;
-using Shrooms.Premium.Presentation.WebViewModels.Models.Book;
-using Shrooms.Premium.Presentation.WebViewModels.Models.Book.BookDetails;
+using Shrooms.Premium.Presentation.WebViewModels.Book;
+using Shrooms.Premium.Presentation.WebViewModels.Book.BookDetails;
 
 namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 {

@@ -7,7 +7,7 @@ using Shrooms.Contracts.Exceptions;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Domain.DomainExceptions.Event;
 using Shrooms.Premium.Domain.Services.Events.Utilities;
-using Shrooms.Premium.Presentation.WebViewModels.Models.Events;
+using Shrooms.Premium.Presentation.WebViewModels.Events;
 using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.Api.Filters;
 

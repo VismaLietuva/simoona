@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Shrooms.DataLayer.EntityModels.Models.Lottery;
 using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
-using Shrooms.Premium.Presentation.WebViewModels.Models.Lotteries;
+using Shrooms.Premium.Presentation.WebViewModels.Lotteries;
 
 namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 {

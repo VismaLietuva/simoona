@@ -20,7 +20,7 @@ namespace Shrooms.Premium.Tests.Mocks
 
         public override TEntity GetByID(object id)
         {
-            TEntity entity = _listContext.Find(t =>
+            var entity = _listContext.Find(t =>
             {
                 var idProperty = t.GetType().GetProperty("Id");
 
@@ -28,9 +28,9 @@ namespace Shrooms.Premium.Tests.Mocks
                 {
                     var idValue = idProperty.GetValue(t, null);
 
-                    if (idValue is int)
+                    if (idValue is int value)
                     {
-                        return (int)idValue == (int)id;
+                        return value == (int)id;
                     }
 
                     if (idValue is string)
@@ -55,7 +55,7 @@ namespace Shrooms.Premium.Tests.Mocks
 
         public override void Delete(TEntity entityToDelete)
         {
-            this._listContext.Remove(entityToDelete);
+            _listContext.Remove(entityToDelete);
             _dbSet.SetDbSetData(_listContext.AsQueryable());
         }
 

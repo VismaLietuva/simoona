@@ -2,7 +2,7 @@
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Committee;
 using Shrooms.Premium.DataTransferObjects.Models.Committees;
-using Shrooms.Premium.Presentation.WebViewModels.Models.Committees;
+using Shrooms.Premium.Presentation.WebViewModels.Committees;
 
 namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 {

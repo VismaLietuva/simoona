@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
-using Shrooms.Premium.Presentation.WebViewModels.Models.Events;
-using Shrooms.Premium.Presentation.WebViewModels.Models.Wall.Posts;
+using Shrooms.Premium.Presentation.WebViewModels.Events;
+using Shrooms.Premium.Presentation.WebViewModels.Wall.Posts;
 
 namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 {

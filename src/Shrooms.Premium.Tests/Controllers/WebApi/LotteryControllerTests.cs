@@ -13,13 +13,13 @@ using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 using PagedList;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.ViewModels;
 using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
 using Shrooms.Premium.Domain.DomainExceptions.Lotteries;
 using Shrooms.Premium.Domain.Services.Args;
 using Shrooms.Premium.Domain.Services.Lotteries;
 using Shrooms.Premium.Presentation.Api.Controllers.Lotteries;
-using Shrooms.Premium.Presentation.WebViewModels.Models.Lotteries;
-using Shrooms.Presentation.WebViewModels.Models;
+using Shrooms.Premium.Presentation.WebViewModels.Lotteries;
 
 namespace Shrooms.Premium.Tests.Controllers.WebApi
 {

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Premium.DataTransferObjects.Models.ServiceRequest;
-using Shrooms.Premium.Presentation.WebViewModels.Models.ServiceRequests;
+using Shrooms.Premium.Presentation.WebViewModels.ServiceRequests;
 
 namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 {

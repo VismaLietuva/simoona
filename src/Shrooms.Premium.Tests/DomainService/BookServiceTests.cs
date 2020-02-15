@@ -14,6 +14,7 @@ using Shrooms.DataLayer.EntityModels.Models.Books;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.Domain.Services.UserService;
+using Shrooms.Premium.DataTransferObjects;
 using Shrooms.Premium.DataTransferObjects.Models.Books;
 using Shrooms.Premium.DataTransferObjects.Models.Books.BookDetails;
 using Shrooms.Premium.DataTransferObjects.Models.Books.BooksByOffice;

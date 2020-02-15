@@ -7,7 +7,7 @@ using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Premium.DataTransferObjects.Models.Vacations;
 using Shrooms.Premium.Domain.Services.Vacations;
-using Shrooms.Premium.Presentation.WebViewModels.Models.Vacations;
+using Shrooms.Premium.Presentation.WebViewModels.Vacations;
 using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.Api.Filters;
 

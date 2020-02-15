@@ -11,6 +11,7 @@ using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.Infrastructure;
+using Shrooms.Contracts.ViewModels.Wall.Posts;
 using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.DataTransferObjects.Models.OfficeMap;
@@ -23,11 +24,10 @@ using Shrooms.Premium.Domain.Services.Events.Participation;
 using Shrooms.Premium.Domain.Services.Events.Utilities;
 using Shrooms.Premium.Domain.Services.OfficeMap;
 using Shrooms.Premium.Presentation.Api.BackgroundWorkers;
-using Shrooms.Premium.Presentation.WebViewModels.Models.Events;
-using Shrooms.Premium.Presentation.WebViewModels.Models.User;
+using Shrooms.Premium.Presentation.WebViewModels.Events;
+using Shrooms.Premium.Presentation.WebViewModels.User;
 using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.Api.Filters;
-using Shrooms.Presentation.WebViewModels.Models.Wall.Posts;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers
 {

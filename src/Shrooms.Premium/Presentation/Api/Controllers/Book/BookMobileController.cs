@@ -2,11 +2,11 @@
 using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
-using Shrooms.Domain.Exceptions.Exceptions.Book;
 using Shrooms.Premium.DataTransferObjects.Models.Books;
+using Shrooms.Premium.Domain.DomainExceptions.Book;
 using Shrooms.Premium.Domain.Services.Books;
-using Shrooms.Premium.Presentation.WebViewModels.Models.Book;
-using Shrooms.Premium.Presentation.WebViewModels.Models.Book.BookDetails;
+using Shrooms.Premium.Presentation.WebViewModels.Book;
+using Shrooms.Premium.Presentation.WebViewModels.Book.BookDetails;
 using Shrooms.Presentation.Api.Filters;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers.Book

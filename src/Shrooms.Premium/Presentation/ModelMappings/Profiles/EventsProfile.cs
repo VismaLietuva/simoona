@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.DataTransferObjects.Models.OfficeMap;
-using Shrooms.Premium.Presentation.WebViewModels.Models.Events;
+using Shrooms.Premium.Presentation.WebViewModels.Events;
 
 namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 {

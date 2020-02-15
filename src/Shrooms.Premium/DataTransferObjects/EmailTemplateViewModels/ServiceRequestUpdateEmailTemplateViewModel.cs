@@ -3,6 +3,7 @@
     public class ServiceRequestUpdateEmailTemplateViewModel : ServiceRequestEmailTemplateViewModel
     {
         public string StatusName { get; set; }
+
         public ServiceRequestUpdateEmailTemplateViewModel(
             string userNotificationSettingsUrl,
             string serviceRequestTitle,
@@ -11,7 +12,7 @@
             string url)
             : base(userNotificationSettingsUrl, serviceRequestTitle, fullName, url)
         {
-            this.StatusName = statusName;
+            StatusName = statusName;
         }
     }
 }

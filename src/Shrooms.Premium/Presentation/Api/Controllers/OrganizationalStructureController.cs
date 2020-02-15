@@ -3,7 +3,7 @@ using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.OrganizationalStructure;
 using Shrooms.Premium.Domain.Services.OrganizationalStructure;
-using Shrooms.Premium.Presentation.WebViewModels.Models.OrganizationalStructure;
+using Shrooms.Premium.Presentation.WebViewModels.OrganizationalStructure;
 using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.Api.Filters;
 

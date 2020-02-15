@@ -5,6 +5,7 @@ using System.Linq;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.DataTransferObjects.Users;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -63,7 +64,7 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
 
             var timestamp = DateTime.UtcNow;
 
-            var serviceRequest = new ServiceRequest()
+            var serviceRequest = new ServiceRequest
             {
                 Description = newServiceRequestDTO.Description,
                 Title = newServiceRequestDTO.Title,
@@ -188,7 +189,7 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
 
             var timestamp = DateTime.UtcNow;
 
-            var serviceRequestComment = new ServiceRequestComment()
+            var serviceRequestComment = new ServiceRequestComment
             {
                 Content = comment.Content,
                 EmployeeId = userAndOrganizationDTO.UserId,
@@ -216,12 +217,17 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
         {
             var categories = _serviceRequestCategoryDbSet
                 .Include(x => x.Assignees)
-                .Select(x => new ServiceRequestCategoryDTO()
+                .Select(x => new ServiceRequestCategoryDTO
                 {
                     Id = x.Id,
                     Name = x.Name,
                     IsNecessary = x.Name == ServiceRequestCategoryKudos,
-                    Assignees = x.Assignees
+                    Assignees = x.Assignees.Select(u => new UserDto
+                    {
+                        UserId = u.Id,
+                        FullName = u.FirstName + " " + u.LastName,
+                        PictureId = u.PictureId
+                    })
                 })
                 .ToList();
 
@@ -231,8 +237,8 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
         public void CreateCategory(ServiceRequestCategoryDTO category, string userId)
         {
             ValidateCategoryName(category.Name);
-            var assignees = category.Assignees.Select(x => x.Id).ToList();
-            var serviceCategory = new ServiceRequestCategory()
+            var assignees = category.Assignees.Select(x => x.UserId).ToList();
+            var serviceCategory = new ServiceRequestCategory
             {
                 Name = category.Name,
                 Assignees = _userDbSet.Where(u => assignees.Contains(u.Id)).ToList()
@@ -248,12 +254,17 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
             var category = _serviceRequestCategoryDbSet
                 .Where(x => x.Id == categoryId)
                 .Include(x => x.Assignees)
-                .Select(x => new ServiceRequestCategoryDTO()
+                .Select(x => new ServiceRequestCategoryDTO
                 {
                     Id = x.Id,
                     Name = x.Name,
                     IsNecessary = x.Name == ServiceRequestCategoryKudos,
-                    Assignees = x.Assignees
+                    Assignees = x.Assignees.Select(u => new UserDto
+                    {
+                        UserId = u.Id,
+                        FullName = u.FirstName + " " + u.LastName,
+                        PictureId = u.PictureId
+                    })
                 })
                 .FirstOrDefault();
 
@@ -282,7 +293,7 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
             {
                 category.Name = modelDto.Name;
             }
-            var assigneeIds = modelDto.Assignees.Select(y => y.Id).ToList();
+            var assigneeIds = modelDto.Assignees.Select(y => y.UserId).ToList();
             category.Assignees = _userDbSet.Where(x => assigneeIds.Contains(x.Id)).ToList();
 
             _uow.SaveChanges(userId);
@@ -316,10 +327,8 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
             {
                 return new List<string>();
             }
-            else
-            {
-                return assignees.Select(x => x.Id).ToList();
-            }
+
+            return assignees.Select(x => x.Id).ToList();
         }
 
         private void ValidateServiceRequestForUpdate(ServiceRequest currentServiceRequest, ServiceRequestDTO serviceRequestDTO)
@@ -358,8 +367,7 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
 
         private void ValidateCategoryName(string categoryName, int id = 0)
         {
-            var isNameAlreadyUsed = _serviceRequestCategoryDbSet
-                                .Any(x => x.Name == categoryName && x.Id != id);
+            var isNameAlreadyUsed = _serviceRequestCategoryDbSet.Any(x => x.Name == categoryName && x.Id != id);
 
             if (isNameAlreadyUsed)
             {

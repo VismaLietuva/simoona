@@ -15,9 +15,9 @@ namespace Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels
             string url)
             : base(userNotificationSettingsUrl)
         {
-            this.ServiceRequestTitle = serviceRequestTitle;
-            this.FullName = fullName;
-            this.Url = url;
+            ServiceRequestTitle = serviceRequestTitle;
+            FullName = fullName;
+            Url = url;
         }
     }
 }

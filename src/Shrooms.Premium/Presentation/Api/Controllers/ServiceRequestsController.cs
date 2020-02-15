@@ -12,17 +12,17 @@ using PagedList;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Exceptions;
+using Shrooms.Contracts.ViewModels;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Premium.DataTransferObjects.Models.Kudos;
 using Shrooms.Premium.DataTransferObjects.Models.ServiceRequest;
 using Shrooms.Premium.Domain.Services.KudosShop;
 using Shrooms.Premium.Domain.Services.ServiceRequests;
-using Shrooms.Premium.Presentation.WebViewModels.Models.KudosShop;
-using Shrooms.Premium.Presentation.WebViewModels.Models.ServiceRequests;
+using Shrooms.Premium.Presentation.WebViewModels.KudosShop;
+using Shrooms.Premium.Presentation.WebViewModels.ServiceRequests;
 using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.Api.Filters;
-using Shrooms.Presentation.WebViewModels.Models;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers
 {
@@ -116,7 +116,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             var id = User.Identity.GetUserId();
             var assigneeCategoriesNames = _serviceRequestService
                     .GetCategories()
-                    .Where(x => x.Assignees.Select(y => y.Id).Contains(id))
+                    .Where(x => x.Assignees.Select(y => y.UserId).Contains(id))
                     .Select(x => x.Name);
 
             Expression<Func<ServiceRequest, bool>> filterForCurrentUser = u =>
@@ -417,7 +417,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             {
                 var assigneeCategoriesNames = _serviceRequestService
                         .GetCategories()
-                        .Where(x => x.Assignees.Select(y => y.Id).Contains(userId))
+                        .Where(x => x.Assignees.Select(y => y.UserId).Contains(userId))
                         .Select(x => x.Name);
                 filter = u =>
                     u.EmployeeId == userId || assigneeCategoriesNames.Contains(u.CategoryName);

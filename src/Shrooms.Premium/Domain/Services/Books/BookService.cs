@@ -16,6 +16,7 @@ using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.Domain.Services.UserService;
 using Shrooms.Premium.Constants;
+using Shrooms.Premium.DataTransferObjects;
 using Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Premium.DataTransferObjects.Models;
 using Shrooms.Premium.DataTransferObjects.Models.Books;
@@ -81,7 +82,7 @@ namespace Shrooms.Premium.Domain.Services.Books
             _bookInfoService = bookInfoService;
             _bookServiceValidator = bookServiceValidator;
             _serviceValidator = bookMobileServiceValidator;
-            this._asyncRunner = asyncRunner;
+            _asyncRunner = asyncRunner;
         }
 
         public ILazyPaged<BooksByOfficeDTO> GetBooksByOffice(BooksByOfficeOptionsDTO options)

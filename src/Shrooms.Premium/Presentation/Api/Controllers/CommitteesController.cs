@@ -9,7 +9,7 @@ using Shrooms.DataLayer.EntityModels.Models.Committee;
 using Shrooms.Domain.ServiceExceptions;
 using Shrooms.Premium.DataTransferObjects.Models.Committees;
 using Shrooms.Premium.Domain.Services.Committees;
-using Shrooms.Premium.Presentation.WebViewModels.Models.Committees;
+using Shrooms.Premium.Presentation.WebViewModels.Committees;
 using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.Api.Filters;
 

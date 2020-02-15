@@ -1,4 +1,4 @@
-﻿namespace Shrooms.Contracts.DataTransferObjects
+﻿namespace Shrooms.Premium.DataTransferObjects
 {
     public class ExternalBookInfo
     {

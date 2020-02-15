@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Shrooms.Premium.DataTransferObjects.Models.Vacations;
-using Shrooms.Premium.Presentation.WebViewModels.Models.Vacations;
+using Shrooms.Premium.Presentation.WebViewModels.Vacations;
 
 namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 {

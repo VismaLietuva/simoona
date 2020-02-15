@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Shrooms.DataLayer.EntityModels.Models;
-using Shrooms.Domain.Exceptions.Exceptions.Book;
 using Shrooms.Premium.DataTransferObjects.Models;
+using Shrooms.Premium.Domain.DomainExceptions.Book;
 
 namespace Shrooms.Premium.Domain.DomainServiceValidators.Books
 {

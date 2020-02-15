@@ -5,13 +5,13 @@ using AutoMapper;
 using PagedList;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.ViewModels;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Premium.DataTransferObjects.Models.OfficeMap;
 using Shrooms.Premium.Domain.Services.OfficeMap;
+using Shrooms.Premium.Presentation.WebViewModels.Map;
 using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.Api.Filters;
-using Shrooms.Presentation.WebViewModels.Models;
-using Shrooms.Presentation.WebViewModels.Models.Map;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers
 {

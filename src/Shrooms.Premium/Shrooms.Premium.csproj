@@ -43,10 +43,6 @@
       <HintPath>..\..\open-source\src\api\packages\AutoMapper.4.2.1\lib\net45\AutoMapper.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="BouncyCastle.Crypto, Version=1.7.4137.9688, Culture=neutral, PublicKeyToken=a4292a325f69b123, processorArchitecture=MSIL">
-      <HintPath>..\..\open-source\src\api\packages\BouncyCastle.1.7.0\lib\Net40-Client\BouncyCastle.Crypto.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\..\open-source\src\api\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
       <Private>False</Private>
@@ -59,28 +55,28 @@
       <HintPath>..\..\open-source\src\api\packages\ExcelDataReader.2.1.2.3\lib\net45\Excel.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Google.Apis, Version=1.41.1.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab">
-      <HintPath>..\..\open-source\src\api\packages\Google.Apis.1.41.1\lib\net45\Google.Apis.dll</HintPath>
+    <Reference Include="Google.Apis, Version=1.43.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab">
+      <HintPath>..\..\open-source\src\api\packages\Google.Apis.1.43.0\lib\net45\Google.Apis.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Google.Apis.Auth, Version=1.41.1.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab">
-      <HintPath>..\..\open-source\src\api\packages\Google.Apis.Auth.1.41.1\lib\net45\Google.Apis.Auth.dll</HintPath>
+    <Reference Include="Google.Apis.Auth, Version=1.43.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab">
+      <HintPath>..\..\open-source\src\api\packages\Google.Apis.Auth.1.43.0\lib\net45\Google.Apis.Auth.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Google.Apis.Auth.PlatformServices, Version=1.41.1.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab">
-      <HintPath>..\..\open-source\src\api\packages\Google.Apis.Auth.1.41.1\lib\net45\Google.Apis.Auth.PlatformServices.dll</HintPath>
+    <Reference Include="Google.Apis.Auth.PlatformServices, Version=1.43.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab">
+      <HintPath>..\..\open-source\src\api\packages\Google.Apis.Auth.1.43.0\lib\net45\Google.Apis.Auth.PlatformServices.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Google.Apis.Books.v1, Version=1.10.0.80, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab">
-      <HintPath>..\..\open-source\src\api\packages\Google.Apis.Books.v1.1.10.0.800\lib\portable-net40+sl50+win+wpa81+wp80\Google.Apis.Books.v1.dll</HintPath>
+    <Reference Include="Google.Apis.Books.v1, Version=1.43.0.1768, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab">
+      <HintPath>..\..\open-source\src\api\packages\Google.Apis.Books.v1.1.43.0.1768\lib\net45\Google.Apis.Books.v1.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Google.Apis.Core, Version=1.41.1.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab">
-      <HintPath>..\..\open-source\src\api\packages\Google.Apis.Core.1.41.1\lib\net45\Google.Apis.Core.dll</HintPath>
+    <Reference Include="Google.Apis.Core, Version=1.43.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab">
+      <HintPath>..\..\open-source\src\api\packages\Google.Apis.Core.1.43.0\lib\net45\Google.Apis.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Google.Apis.PlatformServices, Version=1.41.1.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab">
-      <HintPath>..\..\open-source\src\api\packages\Google.Apis.1.41.1\lib\net45\Google.Apis.PlatformServices.dll</HintPath>
+    <Reference Include="Google.Apis.PlatformServices, Version=1.43.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab">
+      <HintPath>..\..\open-source\src\api\packages\Google.Apis.1.43.0\lib\net45\Google.Apis.PlatformServices.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Hangfire.Autofac, Version=2.3.1.0, Culture=neutral, processorArchitecture=MSIL">
@@ -186,16 +182,6 @@
       <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Domain\bin\$(Configuration)\Shrooms.Domain.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Shrooms.Domain.Exceptions, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Domain.Exceptions\bin\$(Configuration)\Shrooms.Domain.Exceptions.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Shrooms.Domain.ServiceValidators, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Domain.ServiceValidators\bin\$(Configuration)\Shrooms.Domain.ServiceValidators.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Shrooms.DataLayer.EntityModels, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.DataLayer.EntityModels\bin\$(Configuration)\Shrooms.DataLayer.EntityModels.dll</HintPath>
@@ -222,10 +208,6 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Diagnostics.DiagnosticSource, Version=4.0.3.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\..\open-source\src\api\packages\System.Diagnostics.DiagnosticSource.4.5.1\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Linq.Dynamic, Version=1.0.5840.25917, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\open-source\src\api\packages\System.Linq.Dynamic.1.0.6\lib\net40\System.Linq.Dynamic.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -258,7 +240,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <HintPath>..\..\open-source\src\api\packages\Microsoft.AspNet.Razor.3.0.0\lib\net45\System.Web.Razor.dll</HintPath>
+      <HintPath>..\..\open-source\src\api\packages\Microsoft.AspNet.Razor.3.2.3\lib\net45\System.Web.Razor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Xml.Linq" />
@@ -274,11 +256,7 @@
     <Reference Include="WebApi.OutputCache.V2, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\open-source\src\api\packages\Strathweb.CacheOutput.WebApi2.0.10.0\lib\net45\WebApi.OutputCache.V2.dll</HintPath>
       <Private>False</Private>
-    </Reference>
-    <Reference Include="Zlib.Portable, Version=1.11.0.0, Culture=neutral, PublicKeyToken=431cba815f6a8b5b, processorArchitecture=MSIL">
-      <HintPath>..\..\open-source\src\api\packages\Zlib.Portable.Signed.1.11.0\lib\portable-net4+sl5+wp8+win8+wpa81+MonoTouch+MonoAndroid\Zlib.Portable.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
+    </Reference> 
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants\EmailPremiumTemplateCacheKeys.cs" />
@@ -381,6 +359,7 @@
     <Compile Include="DataTransferObjects\Models\Vacations\VacationAvailableDaysDTO.cs" />
     <Compile Include="DataTransferObjects\Models\Vacations\VacationDTO.cs" />
     <Compile Include="DataTransferObjects\Models\Vacations\VacationImportStatusDTO.cs" />
+    <Compile Include="Domain\DomainExceptions\Book\BookException.cs" />
     <Compile Include="Domain\DomainExceptions\Event\EventException.cs" />
     <Compile Include="Domain\DomainExceptions\Lotteries\LotteryException.cs" />
     <Compile Include="Domain\DomainExceptions\Vacation\VacationImportException.cs" />
@@ -514,76 +493,84 @@
     <Compile Include="Presentation\ModelMappings\Profiles\ServiceRequestProfile.cs" />
     <Compile Include="Presentation\ModelMappings\Profiles\UsersProfile.cs" />
     <Compile Include="Presentation\ModelMappings\Profiles\VacationsProfile.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Book\BookDetails\BookDetailsAdministrationViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Book\BookDetails\BookDetailsLogViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Book\BookDetails\BookDetailsViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Book\BookDetails\BookQuantityByOfficeViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Book\BookDetails\EditBookViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Book\BookDetails\NewBookQuantityViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Book\BookDetails\NewBookViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Book\BookDetails\RetrievedBookInfoViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Book\BookDetails\RetrievedMobileBookInfoViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Book\BookMobileGetViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Book\BookMobileLogViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Book\BookMobilePostViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Book\BookMobileReturnViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Book\BookMobileTakeSpecificViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Book\BookMobileTakeViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Book\BookReportViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Book\BooksByOffice\BasicBookUserViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Book\BooksByOffice\BooksByOfficeViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Book\MobileUserViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Book\OfficeBookViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Book\RetrievedBookForPostViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Committees\CommitteePostViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Committees\CommitteeSuggestionPostViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Committees\CommitteeSuggestionViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Committees\CommitteeViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Events\CreateEventTypeViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Events\CreateEventViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Events\EventChangeOptionViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Events\EventDetailsCommentViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Events\EventDetailsOptionViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Events\EventDetailsParticipantViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Events\EventDetailsViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Events\EventEditViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Events\EventJoinMultipleViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Events\EventJoinViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Events\EventListItemViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Events\EventListViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Events\EventOfficeViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Events\EventOptionsViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Events\EventOptionViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Events\EventTypeViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Events\MyEventsOptionsViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Events\NewEventOptionViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Events\ShareEventViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Events\UpdateAttendStatusViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Events\UpdateEventTypeViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Events\UpdateEventViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\KudosShop\KudosShopItemViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Lotteries\BuyLotteryTicketViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Lotteries\CreateLotteryViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Lotteries\EditDraftedLotteryViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Lotteries\EditStartedLotteryViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Lotteries\LotteryDetailsViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Lotteries\LotteryParticipantViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Lotteries\LotteryWidgetViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\OrganizationalStructure\OrganizationalStructureViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\ServiceRequests\ServiceRequestCategoryCreateViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\ServiceRequests\ServiceRequestCategoryViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\ServiceRequests\ServiceRequestCommentPostViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\ServiceRequests\ServiceRequestCommentViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\ServiceRequests\ServiceRequestCreateViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\ServiceRequests\ServiceRequestPostViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\ServiceRequests\ServiceRequestUpdateViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\ServiceRequests\ServiceRequestViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\User\EventUserSearchResultViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Vacations\VacationAvailableDaysViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Vacations\VacationViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Models\Wall\Posts\EventPostViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Book\BookDetails\BookDetailsAdministrationViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Book\BookDetails\BookDetailsLogViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Book\BookDetails\BookDetailsViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Book\BookDetails\BookQuantityByOfficeViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Book\BookDetails\EditBookViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Book\BookDetails\NewBookQuantityViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Book\BookDetails\NewBookViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Book\BookDetails\RetrievedBookInfoViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Book\BookDetails\RetrievedMobileBookInfoViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Book\BookMobileGetViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Book\BookMobileLogViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Book\BookMobilePostViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Book\BookMobileReturnViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Book\BookMobileTakeSpecificViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Book\BookMobileTakeViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Book\BookReportViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Book\BooksByOffice\BasicBookUserViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Book\BooksByOffice\BooksByOfficeViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Book\MobileUserViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Book\OfficeBookViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Book\RetrievedBookForPostViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Committees\CommitteePostViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Committees\CommitteeSuggestionPostViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Committees\CommitteeSuggestionViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Committees\CommitteeViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\CreateEventTypeViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\CreateEventViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\EventChangeOptionViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\EventDetailsCommentViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\EventDetailsOptionViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\EventDetailsParticipantViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\EventDetailsViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\EventEditViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\EventJoinMultipleViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\EventJoinViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\EventListItemViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\EventListViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\EventOfficeViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\EventOptionsViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\EventOptionViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\EventTypeViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\MyEventsOptionsViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\NewEventOptionViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\ShareEventViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\UpdateAttendStatusViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\UpdateEventTypeViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\UpdateEventViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\KudosShop\KudosShopItemViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Lotteries\BuyLotteryTicketViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Lotteries\CreateLotteryViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Lotteries\EditDraftedLotteryViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Lotteries\EditStartedLotteryViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Lotteries\LotteryDetailsViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Lotteries\LotteryParticipantViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Lotteries\LotteryWidgetViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Map\MapAllFloorsViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Map\MapApplicationUserViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Map\MapFloorViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Map\MapOfficeViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Map\MapRoomTypeViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Map\MapRoomViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Map\MapViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\OrganizationalStructure\OrganizationalStructureViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\ServiceRequests\ServiceRequestCategoryCreateViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\ServiceRequests\ServiceRequestCategoryViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\ServiceRequests\ServiceRequestCommentPostViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\ServiceRequests\ServiceRequestCommentViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\ServiceRequests\ServiceRequestCreateViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\ServiceRequests\ServiceRequestPostViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\ServiceRequests\ServiceRequestUpdateViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\ServiceRequests\ServiceRequestViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\User\EventUserSearchResultViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Vacations\VacationAvailableDaysViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Vacations\VacationViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\ValidationAttributes\MinValueAttribute.cs" />
     <Compile Include="Presentation\WebViewModels\ValidationAttributes\ValidEndDateAttribute.cs" />
     <Compile Include="Presentation\WebViewModels\ValidationAttributes\ValidRegistrationDeadlineDateAttribute.cs" />
+    <Compile Include="Presentation\WebViewModels\Wall\Posts\EventPostViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

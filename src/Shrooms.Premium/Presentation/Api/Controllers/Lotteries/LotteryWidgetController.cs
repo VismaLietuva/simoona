@@ -4,7 +4,7 @@ using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
 using Shrooms.Premium.Domain.Services.Lotteries;
-using Shrooms.Premium.Presentation.WebViewModels.Models.Lotteries;
+using Shrooms.Premium.Presentation.WebViewModels.Lotteries;
 using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.Api.Filters;
 

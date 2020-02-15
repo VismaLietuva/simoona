@@ -6,7 +6,7 @@ using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Premium.DataTransferObjects.Models.Kudos;
 using Shrooms.Premium.Domain.Services.KudosShop;
-using Shrooms.Premium.Presentation.WebViewModels.Models.KudosShop;
+using Shrooms.Premium.Presentation.WebViewModels.KudosShop;
 using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.Api.Filters;
 

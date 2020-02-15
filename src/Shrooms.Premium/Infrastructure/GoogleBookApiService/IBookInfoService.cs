@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Premium.DataTransferObjects;
 
 namespace Shrooms.Premium.Infrastructure.GoogleBookApiService
 {
