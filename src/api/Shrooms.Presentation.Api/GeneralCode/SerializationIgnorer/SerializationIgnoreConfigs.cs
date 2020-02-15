@@ -1,5 +1,4 @@
 ﻿using Shrooms.Presentation.WebViewModels.Models;
-using Shrooms.Presentation.WebViewModels.Models.User;
 
 namespace Shrooms.Presentation.Api.GeneralCode.SerializationIgnorer
 {

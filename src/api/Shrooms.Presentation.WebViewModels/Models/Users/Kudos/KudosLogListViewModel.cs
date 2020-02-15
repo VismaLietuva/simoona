@@ -1,5 +1,4 @@
 ﻿using System;
-using Shrooms.Presentation.WebViewModels.Models.User;
 
 namespace Shrooms.Presentation.WebViewModels.Models.Users.Kudos
 {

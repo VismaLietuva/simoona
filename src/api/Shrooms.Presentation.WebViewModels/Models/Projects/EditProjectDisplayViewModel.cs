@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Shrooms.Contracts.ViewModels.User;
 
 namespace Shrooms.Presentation.WebViewModels.Models.Projects
 {

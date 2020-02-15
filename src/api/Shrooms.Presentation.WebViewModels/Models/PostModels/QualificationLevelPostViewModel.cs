@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
+using Shrooms.Contracts.ViewModels;
 
 namespace Shrooms.Presentation.WebViewModels.Models.PostModels
 {

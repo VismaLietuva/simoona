@@ -30,6 +30,7 @@
         vm.createServiceRequestsType = createServiceRequestsType;
         vm.updateServiceRequestsType = updateServiceRequestsType;
         vm.disableServiceRequestsType = disableServiceRequestsType;
+        vm.mapModel = mapModel;
 
         init();
         //////////
@@ -46,7 +47,7 @@
             }
         }
 
-        function allUsers(search){           
+        function allUsers(search){
            return serviceRequestsTypesRepository.getUsers(search);
         }
 
@@ -67,6 +68,10 @@
                 .then(function () {
                     $state.go(listState);
                 }, errorHandler.handleErrorMessage);
+        }
+
+        function mapModel(tag) {
+            tag.userId = tag.id;
         }
     }
 })();

@@ -13,11 +13,11 @@ using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Authentification.Membership;
 using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.ViewModels;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.WebViewModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.PostModels;
-using Shrooms.Presentation.WebViewModels.Models.User;
 using Shrooms.Tests.Mocks;
 using Shrooms.Tests.ModelMappings;
 

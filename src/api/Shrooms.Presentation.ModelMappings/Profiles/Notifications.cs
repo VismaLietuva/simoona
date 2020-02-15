@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using AutoMapper;
 using Shrooms.Contracts.DataTransferObjects.Notification;
+using Shrooms.Contracts.ViewModels.Notifications;
+using Shrooms.Contracts.ViewModels.Wall.Posts;
 using Shrooms.DataLayer.EntityModels.Models.Notifications;
-using Shrooms.Presentation.WebViewModels.Models.Notifications;
-using Shrooms.Presentation.WebViewModels.Models.Wall.Posts;
 
 namespace Shrooms.Presentation.ModelMappings.Profiles
 {

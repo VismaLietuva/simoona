@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Shrooms.Contracts.ViewModels;
 
 namespace Shrooms.Presentation.WebViewModels.Models
 {
@@ -13,13 +14,7 @@ namespace Shrooms.Presentation.WebViewModels.Models
 
         public virtual IEnumerable<FloorViewModel> Floors { get; set; }
 
-        public int FloorsCount
-        {
-            get
-            {
-                return this.Floors?.Count() ?? 0;
-            }
-        }
+        public int FloorsCount => Floors?.Count() ?? 0;
 
         public int RoomsCount { get; set; }
 

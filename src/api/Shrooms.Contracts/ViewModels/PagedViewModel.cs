@@ -1,6 +1,6 @@
 ﻿using PagedList;
 
-namespace Shrooms.Presentation.WebViewModels.Models
+namespace Shrooms.Contracts.ViewModels
 {
     public class PagedViewModel<T>
         where T : class

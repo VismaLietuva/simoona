@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Cors;
@@ -138,17 +139,30 @@ namespace Shrooms.Presentation.Api
             app.UseGlobalization(globalizationOptions);
         }
 
-        private void ConfigureEmailTemplates()
+        private static void ConfigureEmailTemplates()
         {
-            var type = typeof(IEmailTemplateCompiler);
-            var templateCompilerTypes = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(s => s.GetTypes())
-                .Where(p => p.IsClass && type.IsAssignableFrom(p));
-
-            foreach (var templateCompilerType in templateCompilerTypes)
+            try
             {
-                var templateCompiler = Activator.CreateInstance(templateCompilerType) as IEmailTemplateCompiler;
-                templateCompiler?.Register(AppDomain.CurrentDomain.BaseDirectory);
+                var type = typeof(IEmailTemplateCompiler);
+                var templateCompilerTypes = AppDomain.CurrentDomain.GetAssemblies()
+                    .SelectMany(s => s.GetTypes())
+                    .Where(p => p.IsClass && type.IsAssignableFrom(p));
+
+                foreach (var templateCompilerType in templateCompilerTypes)
+                {
+                    var templateCompiler = Activator.CreateInstance(templateCompilerType) as IEmailTemplateCompiler;
+                    templateCompiler?.Register(AppDomain.CurrentDomain.BaseDirectory);
+                }
+            }
+            catch (ReflectionTypeLoadException ex)
+            {
+                var exceptions = ex.LoaderExceptions
+                    .Select(x => x.ToString())
+                    .Distinct()
+                    .Select(x => $"{x}");
+
+                var message = $"Failed to load assemblies.{Environment.NewLine}{string.Join(Environment.NewLine, exceptions)}";
+                throw new Exception(message);
             }
         }
 

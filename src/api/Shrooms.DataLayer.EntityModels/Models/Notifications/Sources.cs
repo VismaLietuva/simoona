@@ -15,10 +15,7 @@ namespace Shrooms.DataLayer.EntityModels.Models.Notifications
         [JsonIgnore]
         public string Serialized
         {
-            get
-            {
-                return JsonConvert.SerializeObject(this);
-            }
+            get => JsonConvert.SerializeObject(this);
 
             set
             {
@@ -28,10 +25,10 @@ namespace Shrooms.DataLayer.EntityModels.Models.Notifications
                 }
 
                 var jsonData = JsonConvert.DeserializeObject<Sources>(value);
-                this.PostId = jsonData.PostId;
-                this.EventId = jsonData.EventId;
-                this.ProjectId = jsonData.ProjectId;
-                this.WallId = jsonData.WallId;
+                PostId = jsonData.PostId;
+                EventId = jsonData.EventId;
+                ProjectId = jsonData.ProjectId;
+                WallId = jsonData.WallId;
             }
         }
     }

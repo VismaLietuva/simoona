@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Shrooms.Contracts.ViewModels;
 using Shrooms.DataLayer.EntityModels.Models;
 
 namespace Shrooms.Presentation.WebViewModels.Models

@@ -107,7 +107,7 @@ namespace Shrooms.DataLayer.DAL
         public virtual IPagedList<TEntity> GetPaged(Expression<Func<TEntity, bool>> filter = null, int maxResults = 0, string orderBy = null, string includeProperties = "",
             int? page = null, int pageSize = 30)
         {
-            var queryableSet = this.Get(filter, maxResults, orderBy, includeProperties);
+            var queryableSet = Get(filter, maxResults, orderBy, includeProperties);
 
             page = page ?? 1;
 
@@ -139,7 +139,7 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual void DeleteById(object id)
         {
-            TEntity entityToDelete = this.GetByID(id);
+            TEntity entityToDelete = GetByID(id);
             Delete(entityToDelete);
         }
 

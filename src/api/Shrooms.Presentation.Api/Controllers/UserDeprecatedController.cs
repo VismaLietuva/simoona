@@ -18,6 +18,7 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Administration;
 using Shrooms.Contracts.Infrastructure;
+using Shrooms.Contracts.ViewModels;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Exceptions.Exceptions.UserAdministration;
 using Shrooms.Domain.Helpers;

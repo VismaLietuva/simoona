@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using Shrooms.Contracts.ViewModels.User;
 
-namespace Shrooms.Presentation.WebViewModels.Models.Wall.Posts
+namespace Shrooms.Contracts.ViewModels.Wall.Posts
 {
     public class WallPostViewModel
     {
@@ -19,7 +20,7 @@ namespace Shrooms.Presentation.WebViewModels.Models.Wall.Posts
 
         public UserViewModel Author { get; set; }
 
-        public IEnumerable<Comments.CommentViewModel> Comments { get; set; }
+        public IEnumerable<CommentViewModel> Comments { get; set; }
 
         public string PictureId { get; set; }
 
@@ -40,6 +41,7 @@ namespace Shrooms.Presentation.WebViewModels.Models.Wall.Posts
         public DateTime Modified { get; set; }
 
         public DateTime LastEdit { get; set; }
+
         public bool IsWatched { get; set; }
     }
 }

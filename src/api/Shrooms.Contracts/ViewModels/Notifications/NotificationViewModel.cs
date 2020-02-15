@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Shrooms.Presentation.WebViewModels.Models.Notifications
+namespace Shrooms.Contracts.ViewModels.Notifications
 {
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class NotificationViewModel

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Shrooms.Presentation.WebViewModels.Models.User;
+using Shrooms.Contracts.ViewModels;
 
 namespace Shrooms.Presentation.WebViewModels.Models
 {
@@ -20,13 +20,7 @@ namespace Shrooms.Presentation.WebViewModels.Models
 
         public OfficeViewModel Office { get; set; }
 
-        public int ApplicationUsersCount
-        {
-            get
-            {
-                return this.ApplicationUsers != null ? this.ApplicationUsers.Count() : 0;
-            }
-        }
+        public int ApplicationUsersCount => ApplicationUsers?.Count() ?? 0;
 
         public int? RoomTypeId { get; set; }
 

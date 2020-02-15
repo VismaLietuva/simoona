@@ -4,6 +4,7 @@ using Shrooms.Contracts.DataTransferObjects.Models;
 using Shrooms.Contracts.DataTransferObjects.Models.Administration;
 using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
 using Shrooms.Contracts.DataTransferObjects.Models.Support;
+using Shrooms.Contracts.ViewModels;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Presentation.ModelMappings.Resolvers;
@@ -11,7 +12,6 @@ using Shrooms.Presentation.WebViewModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.Certificate;
 using Shrooms.Presentation.WebViewModels.Models.ChangeProfile;
 using Shrooms.Presentation.WebViewModels.Models.Exam;
-using Shrooms.Presentation.WebViewModels.Models.Map;
 using Shrooms.Presentation.WebViewModels.Models.PostModels;
 using Shrooms.Presentation.WebViewModels.Models.Roles;
 using Shrooms.Presentation.WebViewModels.Models.Skill;
@@ -294,13 +294,6 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
         private void CreateMapViewModelMappings()
         {
-            CreateMap<Room, MapRoomViewModel>();
-            CreateMap<Floor, MapFloorViewModel>()
-                .ForMember(dest => dest.OrganizationName, src => src.MapFrom(f => f.Organization.ShortName));
-            CreateMap<Floor, MapAllFloorsViewModel>();
-            CreateMap<Office, MapOfficeViewModel>();
-            CreateMap<RoomType, MapRoomTypeViewModel>();
-            CreateMap<ApplicationUser, MapApplicationUserViewModel>();
             CreateMap<Floor, FloorMiniViewModel>();
         }
     }

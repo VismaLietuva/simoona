@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Shrooms.Contracts.Constants;
+using Shrooms.Contracts.ViewModels;
 
 namespace Shrooms.Presentation.WebViewModels.Models.Support
 {

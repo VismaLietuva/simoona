@@ -9,7 +9,7 @@ namespace Shrooms.Presentation.WebViewModels.Models
 
         public RoomTypeViewModel()
         {
-            this.Color = "#FFFFFF";
+            Color = "#FFFFFF";
         }
     }
 }

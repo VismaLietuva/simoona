@@ -1,5 +1,5 @@
 ﻿using System;
-using Shrooms.Presentation.WebViewModels.Models.User;
+using Shrooms.Contracts.ViewModels;
 
 namespace Shrooms.Presentation.WebViewModels.Models.Exam
 {

@@ -7,7 +7,7 @@ using Microsoft.AspNet.SignalR.Hubs;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models;
 using Shrooms.Contracts.Enums;
-using Shrooms.Presentation.WebViewModels.Models.Notifications;
+using Shrooms.Contracts.ViewModels.Notifications;
 
 namespace Shrooms.Presentation.Api.Hubs
 {

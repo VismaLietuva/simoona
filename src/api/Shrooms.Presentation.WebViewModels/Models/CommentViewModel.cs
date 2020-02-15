@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Shrooms.Contracts.ViewModels;
+using Shrooms.Contracts.ViewModels.User;
 using Shrooms.Presentation.WebViewModels.Models.Like;
 
 namespace Shrooms.Presentation.WebViewModels.Models

@@ -13,6 +13,7 @@ using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall;
 using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Contracts.Enums;
+using Shrooms.Contracts.ViewModels.Wall.Posts;
 using Shrooms.Domain.Services.Notifications;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
@@ -20,7 +21,6 @@ using Shrooms.Presentation.Api.Controllers.Wall;
 using Shrooms.Presentation.WebViewModels.Models.User;
 using Shrooms.Presentation.WebViewModels.Models.Wall;
 using Shrooms.Presentation.WebViewModels.Models.Wall.Moderator;
-using Shrooms.Presentation.WebViewModels.Models.Wall.Posts;
 using Shrooms.Tests.ModelMappings;
 
 namespace Shrooms.Tests.Controllers.WebApi

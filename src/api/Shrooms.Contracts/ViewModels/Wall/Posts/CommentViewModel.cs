@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Shrooms.Contracts.ViewModels.User;
 
-namespace Shrooms.Presentation.WebViewModels.Models.Wall.Posts.Comments
+namespace Shrooms.Contracts.ViewModels.Wall.Posts
 {
     public class CommentViewModel
     {

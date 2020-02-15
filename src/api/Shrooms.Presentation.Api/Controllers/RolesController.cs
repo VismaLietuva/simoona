@@ -15,13 +15,13 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects.Models.Permissions;
 using Shrooms.Contracts.DataTransferObjects.Models.Roles;
 using Shrooms.Contracts.Infrastructure;
+using Shrooms.Contracts.ViewModels;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.Presentation.Api.Filters;
 using Shrooms.Presentation.WebViewModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.Roles;
-using Shrooms.Presentation.WebViewModels.Models.User;
 
 namespace Shrooms.Presentation.Api.Controllers
 {

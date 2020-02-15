@@ -7,6 +7,7 @@ using AutoMapper;
 using PagedList;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.ViewModels;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Permissions;

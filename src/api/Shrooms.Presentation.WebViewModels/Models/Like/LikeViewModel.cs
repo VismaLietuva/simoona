@@ -1,5 +1,5 @@
-﻿using Shrooms.Presentation.WebViewModels.Models.User;
-using Shrooms.Presentation.WebViewModels.Models.Wall.Posts;
+﻿using Shrooms.Contracts.ViewModels;
+using Shrooms.Contracts.ViewModels.Wall.Posts;
 
 namespace Shrooms.Presentation.WebViewModels.Models.Like
 {

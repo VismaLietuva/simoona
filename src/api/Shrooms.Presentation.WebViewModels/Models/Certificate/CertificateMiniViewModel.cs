@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Shrooms.Contracts.ViewModels;
 using Shrooms.Presentation.WebViewModels.Models.Exam;
 
 namespace Shrooms.Presentation.WebViewModels.Models.Certificate

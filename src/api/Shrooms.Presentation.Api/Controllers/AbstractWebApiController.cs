@@ -11,9 +11,9 @@ using Shrooms.Authentification.Membership;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.ViewModels;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Presentation.Api.Filters;
-using Shrooms.Presentation.WebViewModels.Models;
 
 namespace Shrooms.Presentation.Api.Controllers
 {

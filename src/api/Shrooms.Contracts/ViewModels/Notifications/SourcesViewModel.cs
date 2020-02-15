@@ -1,4 +1,4 @@
-﻿namespace Shrooms.Presentation.WebViewModels.Models.Notifications
+﻿namespace Shrooms.Contracts.ViewModels.Notifications
 {
     public class SourcesViewModel
     {

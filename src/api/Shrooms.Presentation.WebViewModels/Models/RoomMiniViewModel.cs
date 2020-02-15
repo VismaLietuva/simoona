@@ -1,4 +1,6 @@
-﻿namespace Shrooms.Presentation.WebViewModels.Models
+﻿using Shrooms.Contracts.ViewModels;
+
+namespace Shrooms.Presentation.WebViewModels.Models
 {
     public class RoomMiniViewModel : AbstractViewModel
     {

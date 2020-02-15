@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall.Comments;
 using Shrooms.Contracts.DataTransferObjects.Wall.Comments;
+using Shrooms.Contracts.ViewModels.Wall.Posts;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.Presentation.WebViewModels.Models.PostModels;
 using Shrooms.Presentation.WebViewModels.Models.Wall.Posts.Comments;

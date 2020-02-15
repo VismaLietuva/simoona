@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Shrooms.Presentation.WebViewModels.Models
+namespace Shrooms.Contracts.ViewModels
 {
     public class AbstractViewModel : IValidatableObject
     {

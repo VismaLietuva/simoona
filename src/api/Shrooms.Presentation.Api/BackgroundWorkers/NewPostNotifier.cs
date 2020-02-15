@@ -2,11 +2,11 @@
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Contracts.Infrastructure;
+using Shrooms.Contracts.ViewModels.Notifications;
 using Shrooms.Domain.Services.Email.Posting;
 using Shrooms.Domain.Services.Notifications;
 using Shrooms.Domain.Services.UserService;
 using Shrooms.Presentation.Api.Hubs;
-using Shrooms.Presentation.WebViewModels.Models.Notifications;
 
 namespace Shrooms.Presentation.Api.BackgroundWorkers
 {

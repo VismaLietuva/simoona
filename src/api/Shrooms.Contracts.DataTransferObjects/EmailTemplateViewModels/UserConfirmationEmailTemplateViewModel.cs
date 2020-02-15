@@ -8,8 +8,8 @@
         public UserConfirmationEmailTemplateViewModel(string userNotificationSettingsUrl, string mainPageUrl, string content)
             : base(userNotificationSettingsUrl)
         {
-            this.MainPageUrl = mainPageUrl;
-            this.Content = content;
+            MainPageUrl = mainPageUrl;
+            Content = content;
         }
     }
 }

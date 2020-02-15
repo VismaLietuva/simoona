@@ -57,10 +57,6 @@
       <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
-      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="PagedList, Version=1.17.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
       <HintPath>..\packages\PagedList.1.17.0.0\lib\net40\PagedList.dll</HintPath>
       <Private>True</Private>
@@ -82,6 +78,7 @@
   <ItemGroup>
     <Compile Include="Models\AccountModels\ProviderViewModel.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\ApplicationUserViewModel.cs" />
     <Compile Include="Models\ExternalLink\AddEditDeleteExternalLinkViewModel.cs" />
     <Compile Include="Models\ExternalLink\ExternalLinkViewModel.cs" />
     <Compile Include="Models\ExternalLink\NewExternalLinkViewModel.cs" />
@@ -91,8 +88,6 @@
     <Compile Include="Models\KudosTypes\NewKudosTypeViewModel.cs" />
     <Compile Include="Models\Monitors\CreateMonitorViewModel.cs" />
     <Compile Include="Models\Monitors\MonitorViewModel.cs" />
-    <Compile Include="Models\Notifications\NotificationViewModel.cs" />
-    <Compile Include="Models\Notifications\SourcesViewModel.cs" />
     <Compile Include="Models\Profile\JobPosition\JobPositionViewModel.cs" />
     <Compile Include="Models\Projects\ProjectDetailsViewModel.cs" />
     <Compile Include="Models\Projects\ProjectsBasicInfoViewModel.cs" />
@@ -131,7 +126,6 @@
     <Compile Include="Models\AbstractClassifierAbstractViewModel.cs" />
     <Compile Include="Models\AbstractClassifierTypeViewModel.cs" />
     <Compile Include="Models\AbstractClassifierViewModel.cs" />
-    <Compile Include="Models\AbstractViewModel.cs" />
     <Compile Include="Models\AddressPostViewModel.cs" />
     <Compile Include="Models\AddressViewModel.cs" />
     <Compile Include="Models\ApplicationRoleMiniViewModel.cs" />
@@ -153,7 +147,6 @@
     <Compile Include="Models\User\ApplicationUserPutOfficeInfoViewModel.cs" />
     <Compile Include="Models\User\ApplicationUserPutPersonalInfoViewModel.cs" />
     <Compile Include="Models\User\ApplicationUserShroomsInfoViewModel.cs" />
-    <Compile Include="Models\User\ApplicationUserViewModel.cs" />
     <Compile Include="Models\Birthday\BirthdayViewModel.cs" />
     <Compile Include="Models\Certificate\CertificateAutoCompleteViewModel.cs" />
     <Compile Include="Models\Certificate\CertificateMiniViewModel.cs" />
@@ -200,19 +193,11 @@
     <Compile Include="Models\AccountModels\LoggedInUserInfoViewModel.cs" />
     <Compile Include="Models\Like\LikeViewModel.cs" />
     <Compile Include="Models\ManagerMiniViewModel.cs" />
-    <Compile Include="Models\Map\MapAllFloorsViewModel.cs" />
-    <Compile Include="Models\Map\MapApplicationUserViewModel.cs" />
-    <Compile Include="Models\Map\MapFloorViewModel.cs" />
-    <Compile Include="Models\Map\MapOfficeViewModel.cs" />
-    <Compile Include="Models\Map\MapRoomTypeViewModel.cs" />
-    <Compile Include="Models\Map\MapRoomViewModel.cs" />
-    <Compile Include="Models\Map\MapViewModel.cs" />
     <Compile Include="Models\OfficeDropdownViewModel.cs" />
     <Compile Include="Models\OfficeMiniViewModel.cs" />
     <Compile Include="Models\OfficeViewModel.cs" />
     <Compile Include="Models\OrganizationNameCheckResultModel.cs" />
     <Compile Include="Models\OrganizationViewModel.cs" />
-    <Compile Include="Models\PagedViewModel.cs" />
     <Compile Include="Models\PartTimeHoursOptions.cs" />
     <Compile Include="Models\PermissionGroupViewModel.cs" />
     <Compile Include="Models\PostModels\AbstractClassifierPostViewModel.cs" />
@@ -237,11 +222,8 @@
     <Compile Include="Models\Skill\SkillMiniViewModel.cs" />
     <Compile Include="Models\Skill\SkillPostViewModel.cs" />
     <Compile Include="Models\AccountModels\ExternalUserInfoViewModel.cs" />
-    <Compile Include="Models\UserViewModel.cs" />
     <Compile Include="Models\Wall\PagedWallViewModel.cs" />
-    <Compile Include="Models\Wall\Posts\Comments\CommentViewModel.cs" />
     <Compile Include="Models\Wall\Posts\EditPostViewModel.cs" />
-    <Compile Include="Models\Wall\Posts\WallPostViewModel.cs" />
     <Compile Include="Models\WorkingHoursViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

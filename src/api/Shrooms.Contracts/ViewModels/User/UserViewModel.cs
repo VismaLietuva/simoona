@@ -1,4 +1,4 @@
-﻿namespace Shrooms.Presentation.WebViewModels.Models
+﻿namespace Shrooms.Contracts.ViewModels.User
 {
     public class UserViewModel
     {

@@ -14,8 +14,8 @@ namespace Shrooms.DataLayer.EntityModels.Models
         public ApplicationRole(string roleName, int organizationId)
             : base(roleName)
         {
-            this.OrganizationId = organizationId;
-            this.CreatedTime = DateTime.UtcNow;
+            OrganizationId = organizationId;
+            CreatedTime = DateTime.UtcNow;
         }
 
         public new string Name

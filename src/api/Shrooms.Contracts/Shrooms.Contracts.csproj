@@ -110,6 +110,13 @@
     <Compile Include="Infrastructure\ILogger.cs" />
     <Compile Include="Infrastructure\ISystemClock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModels\AbstractViewModel.cs" />
+    <Compile Include="ViewModels\Notifications\NotificationViewModel.cs" />
+    <Compile Include="ViewModels\Notifications\SourcesViewModel.cs" />
+    <Compile Include="ViewModels\PagedViewModel.cs" />
+    <Compile Include="ViewModels\User\UserViewModel.cs" />
+    <Compile Include="ViewModels\Wall\Posts\CommentViewModel.cs" />
+    <Compile Include="ViewModels\Wall\Posts\WallPostViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Shrooms.Presentation.WebViewModels.ValidationAttributes
 {
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     public class MinValueAttribute : ValidationAttribute
     {
         private readonly int _minValue;

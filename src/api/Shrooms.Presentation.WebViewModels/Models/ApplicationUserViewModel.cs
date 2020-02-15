@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web;
+using Shrooms.Contracts.ViewModels;
 using Shrooms.Presentation.WebViewModels.Models.Skill;
 
-namespace Shrooms.Presentation.WebViewModels.Models.User
+namespace Shrooms.Presentation.WebViewModels.Models
 {
     public class ApplicationUserViewModel
     {
@@ -51,32 +52,17 @@ namespace Shrooms.Presentation.WebViewModels.Models.User
 
         public QualificationLevelViewModel QualificationLevel { get; set; }
 
-        public string QualificationLevelName
-        {
-            get
-            {
-                return QualificationLevel == null ? null : QualificationLevel.Name;
-            }
-        }
+        public string QualificationLevelName => QualificationLevel?.Name;
 
         public IEnumerable<ApplicationRoleViewModel> Roles { get; set; }
 
-        public string FullName
-        {
-            get
-            {
-                return FirstName + " " + LastName;
-            }
-        }
+        public string FullName => FirstName + " " + LastName;
 
         public bool IsAdmin { get; set; }
 
         public bool IsNewUser { get; set; }
 
-        public bool HasRoom
-        {
-            get { return Room != null || RoomId != null; }
-        }
+        public bool HasRoom => Room != null || RoomId != null;
     }
 
     public class ApplicationUserViewPagedModel : PagedViewModel<ApplicationUserViewModel>

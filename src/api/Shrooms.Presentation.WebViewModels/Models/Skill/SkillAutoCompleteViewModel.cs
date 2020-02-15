@@ -1,4 +1,6 @@
-﻿namespace Shrooms.Presentation.WebViewModels.Models.Skill
+﻿using Shrooms.Contracts.ViewModels;
+
+namespace Shrooms.Presentation.WebViewModels.Models.Skill
 {
     public class SkillAutoCompleteViewModel : AbstractViewModel
     {
