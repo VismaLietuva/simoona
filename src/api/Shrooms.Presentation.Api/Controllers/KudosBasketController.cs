@@ -111,6 +111,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPost]
         [PermissionAuthorize(Permission = BasicPermissions.KudosBasket)]
         [InvalidateCacheOutput("Get", typeof(WallWidgetsController))]
+        [InvalidateCacheOutput("GetLastKudosLogRecords", typeof(KudosController))]
         public IHttpActionResult MakeDonation(KudosBasketDonateViewModel donation)
         {
             if (!ModelState.IsValid)
@@ -128,9 +129,6 @@ namespace Shrooms.Presentation.Api.Controllers
             {
                 return BadRequest(e.Message);
             }
-
-            var cache = Configuration.CacheOutputConfiguration().GetCacheOutputProvider(Request);
-            cache.RemoveStartsWith(Configuration.CacheOutputConfiguration().MakeBaseCachekey((KudosController t) => t.GetLastKudosLogRecords()));
 
             return Ok();
         }

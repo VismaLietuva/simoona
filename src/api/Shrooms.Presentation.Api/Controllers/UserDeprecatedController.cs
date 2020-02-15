@@ -69,7 +69,6 @@ namespace Shrooms.Presentation.Api.Controllers
 
         public UserDeprecatedController(
             IMapper mapper,
-            IUnitOfWork2 uow,
             IUnitOfWork unitOfWork,
             ShroomsUserManager userManager,
             IImpersonateService impersonateService,

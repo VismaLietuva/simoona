@@ -5,6 +5,7 @@ using Shrooms.Contracts.DataTransferObjects.Models.Administration;
 using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
 using Shrooms.Contracts.DataTransferObjects.Models.Support;
 using Shrooms.Contracts.ViewModels;
+using Shrooms.Contracts.ViewModels.User;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Presentation.ModelMappings.Resolvers;
@@ -90,6 +91,8 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
                 .ForMember(dest => dest.JobTitle, src => src.MapFrom(d => d.JobPosition.Title))
                 .ForMember(dest => dest.Projects, src => src.MapFrom(d => d.Projects));
 
+            CreateMap<ApplicationUserMinimalDto, string>()
+                .ConvertUsing(src => src.Id);
             CreateMap<ApplicationUserViewModel, string>()
                 .ConvertUsing(src => src.Id);
             CreateMap<ApplicationUser, string>()
@@ -162,7 +165,11 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
                 .ForMember(dest => dest.JobTitle, src => src.MapFrom(d => d.JobPosition.Title));
 
             CreateMap<ApplicationUser, ApplicationUserMinimalDto>();
+            CreateMap<ApplicationUserMinimalDto, ApplicationUser>()
+                .ForMember(dest => dest.JobPosition, cfg => cfg.Ignore());
+
             CreateMap<ApplicationUserMinimalDto, ApplicationUserMinimalViewModel>();
+            CreateMap<ApplicationUserMinimalViewModel, ApplicationUserMinimalDto>();
             CreateMap<ApplicationUser, ApplicationUserMinimalViewModel>();
         }
 

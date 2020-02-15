@@ -10,6 +10,7 @@ using Shrooms.Contracts.DataTransferObjects.Wall;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.ViewModels.Notifications;
+using Shrooms.Contracts.ViewModels.User;
 using Shrooms.Contracts.ViewModels.Wall.Posts;
 using Shrooms.Domain.Exceptions.Exceptions;
 using Shrooms.Domain.Services.Notifications;
@@ -17,7 +18,6 @@ using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.Presentation.Api.Filters;
 using Shrooms.Presentation.Api.Hubs;
-using Shrooms.Presentation.WebViewModels.Models.User;
 using Shrooms.Presentation.WebViewModels.Models.Wall;
 
 namespace Shrooms.Presentation.Api.Controllers.Wall

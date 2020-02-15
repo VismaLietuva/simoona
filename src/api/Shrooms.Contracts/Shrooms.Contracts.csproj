@@ -114,6 +114,7 @@
     <Compile Include="ViewModels\Notifications\NotificationViewModel.cs" />
     <Compile Include="ViewModels\Notifications\SourcesViewModel.cs" />
     <Compile Include="ViewModels\PagedViewModel.cs" />
+    <Compile Include="ViewModels\User\ApplicationUserMinimalViewModel.cs" />
     <Compile Include="ViewModels\User\UserViewModel.cs" />
     <Compile Include="ViewModels\Wall\Posts\CommentViewModel.cs" />
     <Compile Include="ViewModels\Wall\Posts\WallPostViewModel.cs" />

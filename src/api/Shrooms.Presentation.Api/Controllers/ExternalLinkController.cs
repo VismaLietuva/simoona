@@ -39,6 +39,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPost]
         [Route("Update")]
         [PermissionAuthorize(Permission = AdministrationPermissions.ExternalLink)]
+        [InvalidateCacheOutput(nameof(GetAll))]
         public IHttpActionResult UpdateLinks(AddEditDeleteExternalLinkViewModel updateLinksViewModel)
         {
             if (!ModelState.IsValid)
@@ -57,9 +58,6 @@ namespace Shrooms.Presentation.Api.Controllers
             {
                 return BadRequestWithError(e);
             }
-
-            var cache = Configuration.CacheOutputConfiguration().GetCacheOutputProvider(Request);
-            cache.RemoveStartsWith(Configuration.CacheOutputConfiguration().MakeBaseCachekey((ExternalLinkController t) => t.GetAll()));
 
             return Ok();
         }

@@ -131,7 +131,6 @@
     <Compile Include="Models\User\ApplicationUserExamsPostModel.cs" />
     <Compile Include="Models\User\ApplicationUserJobInfoViewModel.cs" />
     <Compile Include="Models\User\ApplicationUserLoginInfoViewModel.cs" />
-    <Compile Include="Models\User\ApplicationUserMinimalViewModel.cs" />
     <Compile Include="Models\User\ApplicationUserOfficeInfoViewModel.cs" />
     <Compile Include="Models\User\ApplicationUserPasswordModel.cs" />
     <Compile Include="Models\User\ApplicationUserPersonalInfoViewModel.cs" />

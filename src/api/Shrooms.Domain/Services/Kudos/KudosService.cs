@@ -286,9 +286,7 @@ namespace Shrooms.Domain.Services.Kudos
                     log.KudosSystemType != KudosTypeEnum.Minus &&
                     log.KudosSystemType != KudosTypeEnum.Refund &&
                     log.OrganizationId == userAndOrg.OrganizationId)
-                .Join(_usersDbSet,
-                    l => l.CreatedBy,
-                    s => s.Id,
+                .Join(_usersDbSet, l => l.CreatedBy, s => s.Id,
                     MapKudosLogToWallKudosLogDTO())
                 .OrderByDescending(log => log.Created)
                 .Take(() => BusinessLayerConstants.WallKudosLogCount)
@@ -301,8 +299,7 @@ namespace Shrooms.Domain.Services.Kudos
         {
             ValidateUser(organizationId, userId);
 
-            var kudosLogs =
-                _kudosLogsDbSet
+            var kudosLogs = _kudosLogsDbSet
                     .Where(kudos =>
                         kudos.EmployeeId == userId &&
                         kudos.Status == KudosStatus.Approved &&
@@ -344,17 +341,19 @@ namespace Shrooms.Domain.Services.Kudos
 
             var user = _usersDbSet.Find(userAndOrg.UserId);
 
-            if (user != null)
+            if (user == null)
             {
-                var culture = CultureInfo.GetCultureInfo(user.CultureCode);
+                return kudosTypesDTO;
+            }
 
-                foreach (var kudosType in kudosTypesDTO)
+            var culture = CultureInfo.GetCultureInfo(user.CultureCode);
+
+            foreach (var kudosType in kudosTypesDTO)
+            {
+                if (IsTranslatableKudosType(kudosType.Type))
                 {
-                    if (IsTranslatableKudosType(kudosType.Type))
-                    {
-                        kudosType.Name = TranslateKudos($"KudosType{kudosType.Name}", culture);
-                        kudosType.Description = TranslateKudos($"KudosType{kudosType.Name}Description", culture);
-                    }
+                    kudosType.Name = TranslateKudos($"KudosType{kudosType.Name}", culture);
+                    kudosType.Description = TranslateKudos($"KudosType{kudosType.Name}Description", culture);
                 }
             }
 
