@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Shrooms.DataLayer.EntityModels.Models
+namespace Shrooms.Contracts.DataTransferObjects
 {
     public interface ITrackable
     {

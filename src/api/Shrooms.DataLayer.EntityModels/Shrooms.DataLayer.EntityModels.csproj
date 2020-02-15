@@ -89,6 +89,7 @@
     <Compile Include="Models\ILikeable.cs" />
     <Compile Include="Models\JobPosition.cs" />
     <Compile Include="Models\Kudos\KudosShopItem.cs" />
+    <Compile Include="Models\LikeBaseModel.cs" />
     <Compile Include="Models\Lottery\ImagesCollection.cs" />
     <Compile Include="Models\Lottery\Lottery.cs" />
     <Compile Include="Models\Lottery\LotteryParticipant.cs" />
@@ -109,8 +110,6 @@
     <Compile Include="Models\Project.cs" />
     <Compile Include="Models\Floor.cs" />
     <Compile Include="Models\IOrganization.cs" />
-    <Compile Include="Models\ISoftDelete.cs" />
-    <Compile Include="Models\ITrackable.cs" />
     <Compile Include="Models\KudosBasket.cs" />
     <Compile Include="Models\Kudos\KudosLog.cs" />
     <Compile Include="Models\Kudos\KudosStatus.cs" />

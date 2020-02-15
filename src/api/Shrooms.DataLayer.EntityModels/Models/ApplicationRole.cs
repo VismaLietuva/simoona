@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.AspNet.Identity.EntityFramework;
+using Shrooms.Contracts.DataTransferObjects;
 
 namespace Shrooms.DataLayer.EntityModels.Models
 {

@@ -76,6 +76,8 @@
     <Compile Include="DataTransferObjects\ApplicationUserMinimalDto.cs" />
     <Compile Include="DataTransferObjects\BaseEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailDto.cs" />
+    <Compile Include="DataTransferObjects\ISoftDelete.cs" />
+    <Compile Include="DataTransferObjects\ITrackable.cs" />
     <Compile Include="DataTransferObjects\Kudos\AddKudosLogDTO.cs" />
     <Compile Include="DataTransferObjects\Notification\NotificationDto.cs" />
     <Compile Include="DataTransferObjects\Notification\SourcesDto.cs" />

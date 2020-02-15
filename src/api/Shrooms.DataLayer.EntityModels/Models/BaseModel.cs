@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using Shrooms.DataLayer.EntityModels.Models.Multiwall;
+using Shrooms.Contracts.DataTransferObjects;
 
 namespace Shrooms.DataLayer.EntityModels.Models
 {
@@ -22,16 +21,6 @@ namespace Shrooms.DataLayer.EntityModels.Models
         public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             yield break;
-        }
-    }
-
-    public abstract class LikeBaseModel : BaseModel, ILikeable
-    {
-        public virtual LikesCollection Likes { get; set; }
-
-        public bool IsLikedByUser(string userId)
-        {
-            return Likes.Any(a => a.UserId == userId);
         }
     }
 }

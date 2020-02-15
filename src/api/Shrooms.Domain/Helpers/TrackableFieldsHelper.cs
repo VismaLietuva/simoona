@@ -1,5 +1,5 @@
 ﻿using System;
-using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.Contracts.DataTransferObjects;
 
 namespace Shrooms.Domain.Helpers
 {

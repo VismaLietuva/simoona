@@ -4,7 +4,7 @@ using System.Data.Entity.Infrastructure;
 using System.Linq;
 using NSubstitute;
 using Shrooms.Contracts.DAL;
-using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Tests.Mocks;
 
 namespace Shrooms.Tests.Extensions
@@ -27,16 +27,16 @@ namespace Shrooms.Tests.Extensions
         /// <summary>
         /// This mehtod fakes repository that unit of work creates to NewMockRepository
         /// </summary>
-        /// <typeparam name="TEnity">Type of entity</typeparam>
+        /// <typeparam name="TEntity">Type of entity</typeparam>
         /// <param name="unitOfWork">Mock of unit of work</param>
-        /// <param name="data">Collection of entity that rapository will operate on</param>
-        public static void MockRepositoryWithEntities<TEnity>(this IUnitOfWork unitOfWork, IEnumerable<TEnity> data)
-            where TEnity : class, ISoftDelete
+        /// <param name="data">Collection of entity that repository will operate on</param>
+        public static void MockRepositoryWithEntities<TEntity>(this IUnitOfWork unitOfWork, IEnumerable<TEntity> data)
+            where TEntity : class, ISoftDelete
         {
             var dataList = data.ToList();
             unitOfWork.MockSetWithData(dataList);
-            IRepository<TEnity> repository = new NewMockRepository<TEnity>(unitOfWork.DbContext);
-            unitOfWork.GetRepository<TEnity>().Returns(repository);
+            IRepository<TEntity> repository = new NewMockRepository<TEntity>(unitOfWork.DbContext);
+            unitOfWork.GetRepository<TEntity>().Returns(repository);
         }
 
         public static void SetDbSetData<T>(this IQueryable<T> dbSet, IQueryable<T> data)
