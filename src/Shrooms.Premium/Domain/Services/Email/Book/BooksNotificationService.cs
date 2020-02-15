@@ -44,7 +44,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Book
 
             var subject = Resources.Models.Books.Books.EmailSubject;
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organizationName);
-            var bookUrl = "sd";
+            var bookUrl = _appSettings.BookUrl(organizationName, takenBook.BookOfficeId, takenBook.OfficeId);
 
             var emailTemplateViewModel = new BookTakenEmailTemplateViewModel(userNotificationSettingsUrl, takenBook.Title, takenBook.Author, bookUrl);
             var body = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.BookTaken);

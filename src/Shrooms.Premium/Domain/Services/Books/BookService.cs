@@ -413,7 +413,7 @@ namespace Shrooms.Premium.Domain.Services.Books
             });
         }
 
-        private void RemoveBookRelatedEntities(IEnumerable<BookOffice> bookOffices)
+        private void RemoveBookRelatedEntities(IList<BookOffice> bookOffices)
         {
             var bookToRemove = bookOffices.First().Book;
             bookOffices.ToList().ForEach(bookOffice =>
@@ -516,12 +516,11 @@ namespace Shrooms.Premium.Domain.Services.Books
 
         private void ValidateTakeBook(BookTakeDTO bookDTO, MobileBookOfficeLogsDTO officeBookWithLogs)
         {
-            var applicationUser = _userDbSet
-                .FirstOrDefault(u => u.Id == bookDTO.ApplicationUserId);
+            var applicationUser = _userDbSet.FirstOrDefault(u => u.Id == bookDTO.ApplicationUserId);
 
             _serviceValidator.ThrowIfUserDoesNotExist(applicationUser);
             _serviceValidator.ThrowIfBookDoesNotExist(officeBookWithLogs != null);
-            _serviceValidator.ChecksIfUserHasAlreadyBorrowedSameBook(officeBookWithLogs.LogsUserIDs, bookDTO.ApplicationUserId);
+            _serviceValidator.ChecksIfUserHasAlreadyBorrowedSameBook(officeBookWithLogs?.LogsUserIDs, bookDTO.ApplicationUserId);
             _serviceValidator.ThrowIfBookIsAlreadyBorrowed(officeBookWithLogs);
         }
 
