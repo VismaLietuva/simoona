@@ -32,8 +32,8 @@
         <tags-input ng-if="vm.isAddColleague" id="participants" name="participants" ng-model="vm.participants"
             add-from-autocomplete-only="true" display-property="fullName"
             ng-attr-placeholder="{{'events.addFriends' | translate}}" add-on-enter="true" add-on-space="true"
-            add-on-comma="true" add-on-blur="true" wrapped translate-cloak>
-            <auto-complete source="vm.getUserForAutoComplete($query)" min-length="0" max-results-to-show="5"
+            add-on-comma="true" add-on-blur="true" replace-spaces-with-dashes="false" wrapped translate-cloak>
+            <auto-complete source="vm.getUserForAutoComplete($query)" min-length="1" max-results-to-show="5"
                 debounce-delay="500"></auto-complete>
         </tags-input>
 

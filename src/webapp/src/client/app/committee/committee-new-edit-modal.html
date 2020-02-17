@@ -58,9 +58,10 @@
                             add-on-space="true"
                             add-on-comma="true"
                             placeholder="{{'committee.leadsPlaceHolder' | translate}}"
+                            replace-spaces-with-dashes="false"
                             add-on-blur="true"
                             wrapped>
-                    <auto-complete source="allUsers($query)" min-length="0" max-results-to-show="5" debounce-delay="500"></auto-complete>
+                    <auto-complete source="allUsers($query)" min-length="1" max-results-to-show="5" debounce-delay="500"></auto-complete>
                 </tags-input>
                 <p data-test-id="newCommitteeLeadsError"
                    ng-show="!committee.leads.length && !newCommittee.leads.$pristine"
@@ -82,7 +83,7 @@
                             replace-spaces-with-dashes="false"
                             add-on-blur="true"
                             wrapped>
-                    <auto-complete source="allUsers($query)" min-length="0" max-results-to-show="5" debounce-delay="500"></auto-complete>
+                    <auto-complete source="allUsers($query)" min-length="1" max-results-to-show="5" debounce-delay="500"></auto-complete>
                 </tags-input>
                 <p data-test-id="newCommitteeMembersError"
                    ng-show="!committee.members.length && !newCommittee.members.$pristine"
@@ -101,9 +102,10 @@
                             add-on-space="true"
                             add-on-comma="true"
                             placeholder="{{'committee.delegatesPlaceHolder' | translate}}"
+                            replace-spaces-with-dashes="false"
                             add-on-blur="true"
                             wrapped>
-                    <auto-complete source="allUsers($query)" min-length="0" max-results-to-show="5" debounce-delay="500"></auto-complete>
+                    <auto-complete source="allUsers($query)" min-length="1" max-results-to-show="5" debounce-delay="500"></auto-complete>
                 </tags-input>
                 <p data-test-id="newCommitteeDelegatesError"
                    ng-show="!committee.delegates.length && !newCommittee.delegates.$pristine"

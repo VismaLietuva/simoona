@@ -479,8 +479,9 @@ namespace Shrooms.Domain.Services.Kudos
 
             if (sentThisMonth < BusinessLayerConstants.KudosAvailableToSendThisMonth)
             {
-                available = BusinessLayerConstants.KudosAvailableToSendThisMonth - sentThisMonth < remaining ?
-                                BusinessLayerConstants.KudosAvailableToSendThisMonth - sentThisMonth : remaining;
+                available = BusinessLayerConstants.KudosAvailableToSendThisMonth - sentThisMonth < remaining
+                                ? BusinessLayerConstants.KudosAvailableToSendThisMonth - sentThisMonth
+                                : remaining;
             }
 
             return new[] { sentThisMonth, available < 0 ? 0 : available };
@@ -532,6 +533,9 @@ namespace Shrooms.Domain.Services.Kudos
                 .Where(x => kudosLog.ReceivingUserIds.Contains(x.Id) && x.OrganizationId == kudosLog.OrganizationId)
                 .ToList();
 
+            var sendingUser = _usersDbSet
+                .FirstOrDefault(x => x.Id == kudosDto.SendingUser.Id && x.OrganizationId == kudosLog.OrganizationId);
+
             _kudosServiceValidator.CheckForEmptyUserList(receivingUsers);
 
             foreach (var receivingUser in receivingUsers)
@@ -550,12 +554,10 @@ namespace Shrooms.Domain.Services.Kudos
 
             foreach (var receivingUser in receivingUsers)
             {
-                kudosDto.ReceivingUser = _mapper.Map<ApplicationUserDTO>(receivingUser);
                 _asyncRunner.Run<IKudosNotificationService>(n => n.NotifyAboutKudosSent(kudosDto), _uow.ConnectionName);
                 UpdateProfileKudos(receivingUser, kudosLog);
             }
 
-            var sendingUser = _mapper.Map<ApplicationUser>(kudosDto.SendingUser);
             UpdateProfileKudos(sendingUser, kudosLog);
         }
 
@@ -595,7 +597,7 @@ namespace Shrooms.Domain.Services.Kudos
         public void UpdateProfileKudos(ApplicationUser user, UserAndOrganizationDTO userOrg)
         {
             SetKudosToUserProfile(user, userOrg);
-            _uow.SaveChanges();
+            _uow.SaveChanges(userOrg.UserId);
         }
 
         public void UpdateProfilesFromUserIds(IEnumerable<string> usersId, UserAndOrganizationDTO userOrg)
@@ -640,7 +642,7 @@ namespace Shrooms.Domain.Services.Kudos
         public bool HasPendingKudos(string employeeId)
         {
             IList<KudosLog> kudosLogs = _kudosLogsDbSet.Where(e => e.EmployeeId == employeeId &&
-                                                                    e.Status == KudosStatus.Pending).ToList();
+                                                                   e.Status == KudosStatus.Pending).ToList();
 
             return kudosLogs.Any();
         }

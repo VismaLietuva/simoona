@@ -77,9 +77,10 @@
                                         add-on-enter="true"
                                         add-on-space="true"
                                         add-on-comma="true"
+                                        replace-spaces-with-dashes="false"
                                         add-on-blur="true"
                                         wrapped>
-                                <auto-complete debounce-delay="500" source="vm.autocompleteUser($query)" min-length="0" max-results-to-show="5"></auto-complete>
+                                <auto-complete debounce-delay="500" source="vm.autocompleteUser($query)" min-length="1" max-results-to-show="5"></auto-complete>
                             </tags-input>
                         </div>
                     </div>

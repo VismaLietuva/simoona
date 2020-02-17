@@ -38,9 +38,10 @@
                                             add-on-enter="true"
                                             add-on-space="true"
                                             add-on-comma="true"
+                                            replace-spaces-with-dashes="false"
                                             add-on-blur="true"
                                             wrapped>
-                                    <auto-complete source="allProjects($query)" min-length="0" max-results-to-show="5" debounce-delay="500"></auto-complete>
+                                    <auto-complete source="allProjects($query)" min-length="1" max-results-to-show="5" debounce-delay="500"></auto-complete>
                                 </tags-input>
                             </input-wrapper>
                         </div>
@@ -73,6 +74,7 @@
                                             replace-spaces-with-dashes="false"
                                             add-on-enter="true"
                                             add-on-comma="false"
+                                            replace-spaces-with-dashes="false"
                                             add-on-blur="true"
                                             min-length="1"
                                             wrapped>
@@ -302,9 +304,10 @@
                                         add-on-enter="true"
                                         add-on-space="true"
                                         add-on-comma="true"
+                                        replace-spaces-with-dashes="false"
                                         add-on-blur="true"
                                         wrapped>
-                                <auto-complete source="allRoles($query)" min-length="0" max-results-to-show="5" debounce-delay="500"></auto-complete>
+                                <auto-complete source="allRoles($query)" min-length="1" max-results-to-show="5" debounce-delay="500"></auto-complete>
                             </tags-input>
                         </input-wrapper>
 

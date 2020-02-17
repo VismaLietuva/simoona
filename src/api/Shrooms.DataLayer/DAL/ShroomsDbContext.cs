@@ -222,13 +222,16 @@ namespace Shrooms.DataLayer.DAL
             new OtherEntitiesConfig(modelBuilder).Add();
         }
 
-        private static void UpdateEntityMetadata(IEnumerable<DbEntityEntry> entries, string userId)
+        private static void UpdateEntityMetadata(IEnumerable<DbEntityEntry> entries, string userId = "")
         {
+            if (string.IsNullOrEmpty(userId) && HttpContext.Current != null && HttpContext.Current.User != null)
+            {
+                userId = HttpContext.Current.User.Identity.GetUserId();
+            }
+
             var now = DateTime.UtcNow;
             var items = entries
-                .Where(p =>
-                    p.Entity is ITrackable &&
-                    p.Entity is ISoftDelete)
+                .Where(p => p.Entity is ITrackable && p.Entity is ISoftDelete)
                 .Select(x => new
                 {
                     x.State,
@@ -247,36 +250,6 @@ namespace Shrooms.DataLayer.DAL
                 {
                     item.Entity.Modified = now;
                     item.Entity.ModifiedBy = userId;
-                }
-            }
-        }
-
-        private static void UpdateEntityMetadata(IEnumerable<DbEntityEntry> entries)
-        {
-            var now = DateTime.UtcNow;
-            var trackableItems = entries.Where(p => p.Entity is ITrackable);
-
-            foreach (var entry in trackableItems)
-            {
-                if (entry.Entity is ITrackable trackableEntry)
-                {
-                    var userId = string.Empty;
-                    if (HttpContext.Current != null && HttpContext.Current.User != null)
-                    {
-                        userId = HttpContext.Current.User.Identity.GetUserId();
-                    }
-
-                    if (entry.State == EntityState.Added)
-                    {
-                        trackableEntry.Created = now;
-                        trackableEntry.Modified = now;
-                        trackableEntry.CreatedBy = userId;
-                    }
-                    else if (entry.State == EntityState.Deleted || entry.State == EntityState.Modified)
-                    {
-                        trackableEntry.Modified = now;
-                        trackableEntry.ModifiedBy = userId;
-                    }
                 }
             }
         }
