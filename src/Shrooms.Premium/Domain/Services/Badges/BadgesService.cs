@@ -140,10 +140,11 @@ namespace Shrooms.Premium.Domain.Services.Badges
         #region Get
         public async Task<IList<BadgeCategory>> GetAllBadgeCategoriesAsync()
         {
-            return await _badgeCategoriesDbSet.Include(x => x.RelationshipsWithKudosTypes.Select(y => y.KudosType))
-                                              .Include(x => x.BadgeTypes)
-                                              .AsNoTracking()
-                                              .ToListAsync();
+            return await _badgeCategoriesDbSet
+                       .Include(x => x.RelationshipsWithKudosTypes.Select(y => y.KudosType))
+                       .Include(x => x.BadgeTypes)
+                       .AsNoTracking()
+                       .ToListAsync();
         }
 
         #endregion
@@ -209,20 +210,22 @@ namespace Shrooms.Premium.Domain.Services.Badges
                 return;
             }
 
-            // TODO with any open-source check-in add configuration key to set how many days ago we should check for changes here.
+            // TODO: with any open-source check-in add configuration key to set how many days ago we should check for changes here.
             var oneDayAgo = DateTime.UtcNow.Date.AddDays(-1).Date;
 
             List<ApplicationUser> users;
             if (categories.Any(x => x.Created >= oneDayAgo || x.Modified >= oneDayAgo
                                     || x.BadgeTypes.Any(y => y.IsActive && (y.Created >= oneDayAgo || y.Modified >= oneDayAgo))))
-            { // We might have a new category or type, that means we have to take all users.
+            {
+                // We might have a new category or type, that means we have to take all users.
                 users = await _usersDbSet.Where(x => x.TotalKudos > 0)
                                          .Include(x => x.BadgeLogs.Select(y => y.BadgeType))
                                          .AsNoTracking()
                                          .ToListAsync();
             }
             else
-            { // We have no new badges, thus recalculate only for those that received new kudos
+            {
+                // We have no new badges, thus recalculate only for those that received new kudos
                 users = await _kudosLogsDbSet.Where(x => x.Status == KudosStatus.Approved
                                                          && x.Modified > oneDayAgo
                                                          && !string.IsNullOrEmpty(x.EmployeeId)
