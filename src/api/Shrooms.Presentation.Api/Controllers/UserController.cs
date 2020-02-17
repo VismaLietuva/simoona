@@ -122,7 +122,7 @@ namespace Shrooms.Presentation.Api.Controllers
         {
             var id = GetUserAndOrganization().UserId;
             var user = _userService.GetApplicationUser(id);
-            var logins = _userService.GetUserLogins(id).ToList();
+            var logins = _userService.GetUserLogins(id);
             if (logins == null)
             {
                 return BadRequest();

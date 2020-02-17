@@ -9,7 +9,7 @@ namespace Shrooms.Infrastructure.Storage.FileSystem
     {
         public Task RemovePicture(string blobKey, string tenantPicturesContainer)
         {
-            var filePath = HostingEnvironment.MapPath("~/storage/" + tenantPicturesContainer + "/" + blobKey);
+            var filePath = HostingEnvironment.MapPath($"~/storage/{tenantPicturesContainer}/{blobKey}");
             var fileInfo = new FileInfo(filePath);
 
             if (fileInfo.Exists)
@@ -22,7 +22,7 @@ namespace Shrooms.Infrastructure.Storage.FileSystem
 
         public Task UploadPicture(Image image, string blobKey, string mimeType, string tenantPicturesContainer)
         {
-            var filePath = HostingEnvironment.MapPath("~/storage/" + tenantPicturesContainer + "/");
+            var filePath = HostingEnvironment.MapPath($"~/storage/{tenantPicturesContainer}/");
             var fullPath = Path.Combine(filePath, blobKey);
             Directory.CreateDirectory(filePath);
 
@@ -33,7 +33,7 @@ namespace Shrooms.Infrastructure.Storage.FileSystem
 
         public async Task UploadPicture(Stream stream, string blobKey, string mimeType, string tenantPicturesContainer)
         {
-            var filePath = HostingEnvironment.MapPath("~/storage/" + tenantPicturesContainer + "/");
+            var filePath = HostingEnvironment.MapPath($"~/storage/{tenantPicturesContainer}/");
             var fullPath = Path.Combine(filePath, blobKey);
             Directory.CreateDirectory(filePath);
 

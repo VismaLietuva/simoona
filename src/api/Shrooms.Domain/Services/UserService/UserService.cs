@@ -335,7 +335,7 @@ namespace Shrooms.Domain.Services.UserService
             _uow.SaveChanges(userOrg.UserId);
         }
 
-        public IEnumerable<IdentityUserLogin> GetUserLogins(string id)
+        public IList<IdentityUserLogin> GetUserLogins(string id)
         {
             return _userManager.FindById(id).Logins.ToList();
         }

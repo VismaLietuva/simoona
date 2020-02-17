@@ -408,9 +408,7 @@ namespace Shrooms.Domain.Services.Kudos
         {
             var kudosLog = _kudosLogsDbSet
                 .Include(x => x.Employee)
-                .First(x =>
-                    x.Id == kudosLogId &&
-                    x.OrganizationId == userOrg.OrganizationId);
+                .First(x => x.Id == kudosLogId && x.OrganizationId == userOrg.OrganizationId);
 
             kudosLog.Approve(userOrg.UserId);
 
@@ -505,7 +503,8 @@ namespace Shrooms.Domain.Services.Kudos
             {
                 return false;
             }
-            else if (kudosType.IsActive || kudosType.Type == KudosTypeEnum.Send)
+
+            if (kudosType.IsActive || kudosType.Type == KudosTypeEnum.Send)
             {
                 return true;
             }
@@ -530,8 +529,7 @@ namespace Shrooms.Domain.Services.Kudos
             var kudosDto = MapInitialInfoToDTO(kudosLog, points);
 
             var receivingUsers = _usersDbSet
-                .Where(x => kudosLog.ReceivingUserIds.Contains(x.Id) &&
-                            x.OrganizationId == kudosLog.OrganizationId)
+                .Where(x => kudosLog.ReceivingUserIds.Contains(x.Id) && x.OrganizationId == kudosLog.OrganizationId)
                 .ToList();
 
             _kudosServiceValidator.CheckForEmptyUserList(receivingUsers);
@@ -545,21 +543,20 @@ namespace Shrooms.Domain.Services.Kudos
 
             _uow.SaveChanges(false);
 
-            foreach (var receivingUser in receivingUsers)
+            if (kudosDto.KudosType.Type != KudosTypeEnum.Send)
             {
-                if (kudosDto.KudosType.Type == KudosTypeEnum.Send)
-                {
-                    kudosDto.ReceivingUser = _mapper.Map<ApplicationUserDTO>(receivingUser);
-                    _asyncRunner.Run<IKudosNotificationService>(n => n.NotifyAboutKudosSent(kudosDto), _uow.ConnectionName);
-                    UpdateProfileKudos(_mapper.Map<ApplicationUser>(kudosDto.ReceivingUser), kudosLog);
-                }
+                return;
             }
 
-            if (kudosDto.KudosType.Type == KudosTypeEnum.Send)
+            foreach (var receivingUser in receivingUsers)
             {
-                var sendingUser = _mapper.Map<ApplicationUser>(kudosDto.SendingUser);
-                UpdateProfileKudos(sendingUser, kudosLog);
+                kudosDto.ReceivingUser = _mapper.Map<ApplicationUserDTO>(receivingUser);
+                _asyncRunner.Run<IKudosNotificationService>(n => n.NotifyAboutKudosSent(kudosDto), _uow.ConnectionName);
+                UpdateProfileKudos(receivingUser, kudosLog);
             }
+
+            var sendingUser = _mapper.Map<ApplicationUser>(kudosDto.SendingUser);
+            UpdateProfileKudos(sendingUser, kudosLog);
         }
 
         public IEnumerable<KudosBasicDataDTO> GetKudosStats(int months, int amount, int organizationId)

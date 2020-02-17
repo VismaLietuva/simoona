@@ -296,8 +296,14 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
 
                 return Ok();
             }
-            catch (UnauthorizedException) { return Unauthorized(); }
-            catch (ValidationException e) { return BadRequestWithError(e); }
+            catch (UnauthorizedException)
+            {
+                return Unauthorized();
+            }
+            catch (ValidationException e)
+            {
+                return BadRequestWithError(e);
+            }
         }
 
         [HttpPost]
@@ -310,7 +316,10 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
                 _kudosService.ApproveKudos(id, GetUserAndOrganization());
                 return Ok();
             }
-            catch (ValidationException e) { return BadRequestWithError(e); }
+            catch (ValidationException e)
+            {
+                return BadRequestWithError(e);
+            }
         }
 
         [HttpPost]
@@ -330,7 +339,10 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
                 _kudosService.RejectKudos(kudosRejectDto);
                 return Ok();
             }
-            catch (ValidationException e) { return BadRequestWithError(e); }
+            catch (ValidationException e)
+            {
+                return BadRequestWithError(e);
+            }
         }
 
         [HttpGet]
@@ -366,7 +378,10 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
                 var result = _mapper.Map<IEnumerable<UserKudosInformationDTO>, IEnumerable<UserKudosInformationViewModel>>(userKudosInformationDto);
                 return Ok(result);
             }
-            catch (ValidationException e) { return BadRequestWithError(e); }
+            catch (ValidationException e)
+            {
+                return BadRequestWithError(e);
+            }
         }
 
         [HttpGet]

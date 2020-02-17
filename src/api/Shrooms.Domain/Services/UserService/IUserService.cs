@@ -28,7 +28,7 @@ namespace Shrooms.Domain.Services.UserService
 
         void ChangeWallNotificationSettings(UserNotificationsSettingsDto wallNotificationsSettingsDto, UserAndOrganizationDTO userOrg);
 
-        IEnumerable<IdentityUserLogin> GetUserLogins(string id);
+        IList<IdentityUserLogin> GetUserLogins(string id);
 
         void RemoveLogin(string id, UserLoginInfo loginInfo);
 

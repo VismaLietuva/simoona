@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data.Entity;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
@@ -22,6 +23,7 @@ using Shrooms.Tests.ModelMappings;
 namespace Shrooms.Tests.DomainService
 {
     [TestFixture]
+    [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalse")]
     public class WallServiceTests
     {
         private IDbSet<Wall> _wallsDbSet;
