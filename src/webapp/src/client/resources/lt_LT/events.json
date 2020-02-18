@@ -188,5 +188,12 @@
   "ignoreSingleJoinTooltipParagraphOne": "Šis funkcionalumas skirtas renginių tipams, kuriuose leidžiama dalyvauti kartą per savaitę.",
   "ignoreSingleJoinTooltipParagraphTwo": "Tai suteiks vartotojams galimybę prisijungti kaip stebėtojams be jokių šio renginio privalumų, pavyzdžiui, maisto.",
   "twoOptionsRequired": "Bent du pasirinkimo variantai yra būtini",
-  "changedEventOptions": "Sėkmingai pakeitėte renginio pasirinkimo variantus"
+  "changedEventOptions": "Sėkmingai pakeitėte renginio pasirinkimo variantus",
+  "pastWeek": "Praeita savaitė",
+  "pastMonth": "Praeitas mėnuo",
+  "pastThreeMonths": "Praeiti 3 mėnesiai",
+  "customRange": "Pasirinkimas",
+  "selectDate": "Pasirinkti datą",
+  "dateFilterInvalidRange": "Pradžios data turi būti anksčiau nei pabaigos",
+  "dateFilterMaxRangeError": "Maksimalus datos diapazonas yra 3 mėnesiai"
 }

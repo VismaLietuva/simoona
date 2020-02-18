@@ -53,6 +53,8 @@
         public const int EventLocationMaxLength = 50;
         public const int EventDescriptionMaxLength = 5000;
         public const int EventMinimumOptions = 0;
+        public const int EventsDefaultPageSize = 10;
+        public const int EventsMaxDateFilterRangeInDays = 100;
         #endregion
 
         #region ApplicationUser

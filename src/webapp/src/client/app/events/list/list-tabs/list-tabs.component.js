@@ -34,9 +34,10 @@
         var vm = this;
         vm.eventsTabs = [];
         vm.isLoading = true;
+        
         vm.stateParams = $stateParams;
         eventOfficeFactory.getOffices = eventOfficeFactory.getOffices;
-
+        
         init();
 
         ///////////
@@ -52,7 +53,6 @@
                 vm.eventOffices = result;
                 $timeout(addDefaultOfficeTabs, 100);
             });
-                
         }
 
         function addDefaultEventTabs() {

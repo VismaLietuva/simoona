@@ -187,5 +187,12 @@
   "ignoreSingleJoinTooltipParagraphOne": "This feature is present for event types which allow joining once a week.",
   "ignoreSingleJoinTooltipParagraphTwo": "This choice will enable an option for users to join as spectators without any benefits of this event, e.g., food.",
   "twoOptionsRequired": "At least two options are required",
-  "changedEventOptions": "You have successfully changed options" 
+  "changedEventOptions": "You have successfully changed options",
+  "pastWeek": "Past week",
+  "pastMonth": "Past month",
+  "pastThreeMonths": "Past 3 months",
+  "customRange": "Custom range",
+  "selectDate": "Select date",
+  "dateFilterInvalidRange": "Start date must be before end date",
+  "dateFilterMaxRangeError": "Maximum date range is 3 months"
 }
