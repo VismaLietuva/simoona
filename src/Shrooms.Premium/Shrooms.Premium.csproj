@@ -365,6 +365,7 @@
     <Compile Include="Domain\DomainServiceValidators\Events\EventValidationService.cs" />
     <Compile Include="Domain\DomainServiceValidators\Events\IEventValidationService.cs" />
     <Compile Include="Domain\EmployeeComparer.cs" />
+    <Compile Include="Domain\Services\Args\EventsListingFilterArgs.cs" />
     <Compile Include="Domain\Services\Args\GetPagedLotteriesArgs.cs" />
     <Compile Include="Domain\Services\Badges\BadgesService.cs" />
     <Compile Include="Domain\Services\Badges\IBadgesService.cs" />

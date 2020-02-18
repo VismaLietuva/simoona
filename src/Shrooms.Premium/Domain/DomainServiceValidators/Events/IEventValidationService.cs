@@ -36,5 +36,6 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
         void CheckIfProvidedOptionsAreValid(IEnumerable<int> providedOptionsCount, IEnumerable<EventOption> foundOptionsCount);
         void CheckIfEventHasParticipants(IEnumerable<EventParticipantDTO> eventParticipants);
         void CheckIfUserParticipatesInEvent(string userId, IEnumerable<string> participantIds);
+        void CheckIfDateRangeExceededLimitOrNull(DateTime? start, DateTime? end);
     }
 }

@@ -10,6 +10,7 @@ using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Domain.DomainServiceValidators.Events;
+using Shrooms.Premium.Domain.Services.Args;
 
 namespace Shrooms.Premium.Domain.Services.Events.List
 {
@@ -48,42 +49,40 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             return eventOptionsDto;
         }
 
-        public IEnumerable<EventListItemDTO> GetEventsByType(UserAndOrganizationDTO userOrganization, int typeId = 0)
+        public IEnumerable<EventListItemDTO> GetEventsFiltered(
+            EventsListingFilterArgs args, UserAndOrganizationDTO userOrganization)
         {
-            var events = _eventsDbSet
+            var officeSearchString = OfficeIdToString(args.OfficeId);
+
+            var query = _eventsDbSet
                 .Include(x => x.EventParticipants)
                 .Include(x => x.EventType)
-                .Where(t =>
-                    t.OrganizationId == userOrganization.OrganizationId &&
-                    t.EndDate > DateTime.UtcNow)
-                .Where(EventTypeFilter(typeId))
+                .Where(e => e.OrganizationId == userOrganization.OrganizationId)
+                .Where(EventTypeFilter(args.TypeId, args.IsOnlyMainEvents))
+                .Where(EventOfficeFilter(officeSearchString));
+
+            if (args.StartDate is null || args.EndDate is null)
+            {
+                query = query.Where(e => e.EndDate > DateTime.UtcNow);
+            }
+            else
+            {
+                _eventValidationService.CheckIfDateRangeExceededLimitOrNull(args.StartDate, args.EndDate);
+                query = query.Where(e => e.StartDate >= args.StartDate && e.EndDate <= args.EndDate);
+            }
+
+            var events = query
                 .Select(MapEventToListItemDto(userOrganization.UserId))
                 .OrderByDescending(e => e.IsPinned)
                 .ThenBy(e => e.StartDate)
+                .Skip((args.Page - 1) * EventsConstants.EventsDefaultPageSize)
+                .Take(EventsConstants.EventsDefaultPageSize)
                 .ToList();
 
             return events;
         }
 
-        public IEnumerable<EventListItemDTO> GetEventsByTypeAndOffice(UserAndOrganizationDTO userOrganization, int? typeId = null, int? officeId = null, bool includeOnlyMain = false)
-        {
-            var officeSearchString = OfficeIdToString(officeId);
-            var events = _eventsDbSet
-                .Include(x => x.EventParticipants)
-                .Where(t =>
-                    t.OrganizationId == userOrganization.OrganizationId &
-                    t.EndDate > DateTime.UtcNow)
-                .Where(EventTypeFilter(typeId, includeOnlyMain))
-                .Where(EventOfficeFilter(officeSearchString))
-                .Select(MapEventToListItemDto(userOrganization.UserId))
-                .OrderByDescending(e => e.IsPinned)
-                .ThenBy(e => e.StartDate)
-                .ToList();
-
-            return events;
-        }
-
-        public IEnumerable<EventListItemDTO> GetMyEvents(MyEventsOptionsDTO options, int? officeId = null)
+        public IEnumerable<EventListItemDTO> GetMyEvents(MyEventsOptionsDTO options, int page, int? officeId = null)
         {
             var officeSearchString = OfficeIdToString(officeId);
             var myEventFilter = _eventFilters[options.Filter](options.UserId);
@@ -95,8 +94,9 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                 .Where(myEventFilter)
                 .Where(EventOfficeFilter(officeSearchString))
                 .Select(MapEventToListItemDto(options.UserId))
-                .OrderByDescending(e => e.IsPinned)
-                .ThenBy(e => e.StartDate)
+                .OrderByDescending(e => e.StartDate)
+                .Skip((page - 1) * EventsConstants.EventsDefaultPageSize)
+                .Take(EventsConstants.EventsDefaultPageSize)
                 .ToList();
 
             var orderedEvents = OrderEvents(events);
@@ -181,7 +181,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
 
         private static Expression<Func<Event, bool>> EventOfficeFilter(string office)
         {
-            if (office == OutsideOffice)
+            if (office == OutsideOffice || office == null)
             {
                 return x => true;
             }

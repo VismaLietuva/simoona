@@ -258,5 +258,14 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
                 throw new EventException(PremiumErrorCodes.EventUserNotParticipating);
             }
         }
+
+        public void CheckIfDateRangeExceededLimitOrNull(DateTime? start, DateTime? end)
+        {
+            var diff = end - start;
+            if (diff is null || diff > TimeSpan.FromDays(EventsConstants.EventsMaxDateFilterRangeInDays))
+            {
+                throw new EventException(PremiumErrorCodes.EventDateFilterRangeInvalid);
+            }
+        }
     }
 }

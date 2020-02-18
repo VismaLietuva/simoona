@@ -39,54 +39,6 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_Events_List_By_Type_For_Creator_And_Participant()
-        {
-            var eventsGuids = MockEventsListTest();
-            var userOrg = new UserAndOrganizationDTO
-            {
-                OrganizationId = 2,
-                UserId = "responsibleUserId"
-            };
-
-            var result = _eventListingService.GetEventsByType(userOrg, 1).ToList();
-            Assert.AreEqual(result.First().Id, eventsGuids[0]);
-            Assert.IsTrue(result.First().IsCreator);
-            Assert.AreEqual(result.First().ParticipantsCount, 2);
-            Assert.AreEqual(result.First().ParticipatingStatus, 1);
-        }
-
-        [Test]
-        public void Should_Return_Events_List_By_Type_For_User()
-        {
-            var eventsGuids = MockEventsListTest();
-            var userOrg = new UserAndOrganizationDTO
-            {
-                OrganizationId = 2,
-                UserId = "notParticipantOrCreatorId"
-            };
-
-            var result = _eventListingService.GetEventsByType(userOrg, 1).ToList();
-            Assert.AreEqual(result.First().Id, eventsGuids[0]);
-            Assert.IsFalse(result.First().IsCreator);
-            Assert.AreEqual(result.First().ParticipantsCount, 2);
-            Assert.AreEqual(result.First().ParticipatingStatus, 3);
-        }
-
-        [Test]
-        public void Should_Return_All_Events()
-        {
-            var eventGuids = MockEventsListTest();
-            var userOrg = new UserAndOrganizationDTO
-            {
-                OrganizationId = 2,
-                UserId = "userId"
-            };
-            var result = _eventListingService.GetEventsByType(userOrg).ToList();
-            Assert.AreEqual(2, result.Count);
-            Assert.AreEqual(eventGuids[2], result.First().Id);
-        }
-
-        [Test]
         public void Should_Return_My_Events_As_A_Participant()
         {
             var eventGuids = MockEventsListTest();
@@ -98,7 +50,8 @@ namespace Shrooms.Premium.Tests.DomainService
                 Filter = MyEventsOptions.Participant
             };
 
-            var result = _eventListingService.GetMyEvents(myEventsOptions).ToList();
+            var result = _eventListingService.GetMyEvents(myEventsOptions, 1).ToList();
+
             Assert.AreEqual(result.Count, 3);
             Assert.AreEqual(result.First(x => x.Id == eventGuids[0]).ParticipatingStatus, 1);
             Assert.IsTrue(result.First(x => x.Id == eventGuids[2]).StartDate < result.First(x => x.Id == eventGuids[0]).StartDate);
@@ -116,8 +69,9 @@ namespace Shrooms.Premium.Tests.DomainService
                 Filter = MyEventsOptions.Host
             };
 
-            var result = _eventListingService.GetMyEvents(myEventsOptions).ToList();
-            Assert.AreEqual(result.Count, 1);
+            var result = _eventListingService.GetMyEvents(myEventsOptions, 1);
+
+            Assert.AreEqual(result.Count(), 1);
             Assert.IsTrue(result.First(x => x.Id == eventGuids[3]).IsCreator);
         }
 

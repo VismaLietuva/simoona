@@ -16,6 +16,7 @@ using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.DataTransferObjects.Models.OfficeMap;
 using Shrooms.Premium.Domain.DomainExceptions.Event;
+using Shrooms.Premium.Domain.Services.Args;
 using Shrooms.Premium.Domain.Services.Events;
 using Shrooms.Premium.Domain.Services.Events.Calendar;
 using Shrooms.Premium.Domain.Services.Events.Export;
@@ -32,7 +33,7 @@ using Shrooms.Presentation.Api.Filters;
 namespace Shrooms.Premium.Presentation.Api.Controllers
 {
     [Authorize]
-    [RoutePrefix("Event")]
+    [RoutePrefix("Events")]
     public class EventController : BaseController
     {
         private readonly IMapper _mapper;
@@ -97,29 +98,44 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             return Ok(result);
         }
 
-        [Route("ByTypeAndOffice")]
+        [HttpGet]
+        [Route("")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult GetEventsByTypeAndOffice(string typeId, string officeId)
+        public IHttpActionResult GetEventsFiltered(
+            string typeId = null, string officeId = null, int page = 1,
+            DateTime? startDate = null, DateTime? endDate = null)
         {
-            var includeOnlyMain = typeId == "main";
-            int? typeIdNullable = null;
-            int? officeIdNullable = null;
-
-            if (typeId != "all" && typeId != "main" && int.TryParse(typeId, out var typeIdParsed))
+            var args = new EventsListingFilterArgs
             {
-                typeIdNullable = typeIdParsed;
+                StartDate = startDate,
+                EndDate = endDate,
+                IsOnlyMainEvents = typeId == "main",
+                Page = page
+            };
+
+            if (int.TryParse(typeId, out var typeIdParsed))
+            {
+                args.TypeId = typeIdParsed;
             }
 
-            if (officeId != "all" && int.TryParse(officeId, out var officeIdParsed))
+            if (int.TryParse(officeId, out var officeIdParsed))
             {
-                officeIdNullable = officeIdParsed;
+                args.OfficeId = officeIdParsed;
             }
 
             var userOrganization = GetUserAndOrganization();
-            var eventsListDto = _eventListingService.GetEventsByTypeAndOffice(userOrganization, typeIdNullable, officeIdNullable, includeOnlyMain);
 
-            var result = _mapper.Map<IEnumerable<EventListItemDTO>, IEnumerable<EventListItemViewModel>>(eventsListDto);
-            return Ok(result);
+            try
+            {
+                var eventsListDto = _eventListingService.GetEventsFiltered(args, userOrganization);
+                var result = _mapper.Map<IEnumerable<EventListItemDTO>, IEnumerable<EventListItemViewModel>>(eventsListDto);
+
+                return Ok(result);
+            }
+            catch (EventException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpPost]
@@ -180,20 +196,10 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             return Ok();
         }
 
-        [Route("All")]
-        [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult GetAllEvents()
-        {
-            var userOrganization = GetUserAndOrganization();
-            var allListDto = _eventListingService.GetEventsByType(userOrganization);
-            var result = _mapper.Map<IEnumerable<EventListItemDTO>, IEnumerable<EventListItemViewModel>>(allListDto);
-            return Ok(result);
-        }
-
         [HttpGet]
         [Route("MyEvents")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult GetMyEvents([FromUri] MyEventsOptionsViewModel options, string officeId)
+        public IHttpActionResult GetMyEvents([FromUri] MyEventsOptionsViewModel options, string officeId, int page = 1)
         {
             int? officeIdNullable = null;
 
@@ -204,7 +210,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             var optionsDto = _mapper.Map<MyEventsOptionsViewModel, MyEventsOptionsDTO>(options);
             SetOrganizationAndUser(optionsDto);
-            var myEventsListDto = _eventListingService.GetMyEvents(optionsDto, officeIdNullable);
+            var myEventsListDto = _eventListingService.GetMyEvents(optionsDto, page, officeIdNullable);
             var result = _mapper.Map<IEnumerable<EventListItemDTO>, IEnumerable<EventListItemViewModel>>(myEventsListDto);
             return Ok(result);
         }
