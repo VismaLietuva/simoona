@@ -1,4 +1,5 @@
 ﻿using System;
+using Shrooms.Constants.WebApi;
 
 namespace Shrooms.Domain.Services.Args
 {
@@ -13,5 +14,7 @@ namespace Shrooms.Domain.Services.Args
         public DateTime? StartDate { get; set; }
 
         public DateTime? EndDate { get; set; }
+
+        public int Page { get; set; }
     }
 }

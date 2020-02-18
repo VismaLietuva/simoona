@@ -98,7 +98,7 @@ namespace Shrooms.UnitTests.DomainService
                 SearchString = null,
                 Filter = MyEventsOptions.Participant
             };
-            var result = _eventListingService.GetMyEvents(myEventsOptions);
+            var result = _eventListingService.GetMyEvents(myEventsOptions, 1);
             Assert.AreEqual(result.Count(), 3);
             Assert.AreEqual(result.First(x => x.Id == eventGuids[2]).ParticipatingStatus, 1);
             Assert.AreEqual(result.First(x => x.Id == eventGuids[0]).ParticipatingStatus, 1);
@@ -116,7 +116,7 @@ namespace Shrooms.UnitTests.DomainService
                 SearchString = null,
                 Filter = MyEventsOptions.Host
             };
-            var result = _eventListingService.GetMyEvents(myEventsOptions);
+            var result = _eventListingService.GetMyEvents(myEventsOptions, 1);
             Assert.AreEqual(result.Count(), 1);
             Assert.IsTrue(result.First(x => x.Id == eventGuids[3]).IsCreator);
         }

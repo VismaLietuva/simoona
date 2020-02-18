@@ -41,7 +41,7 @@ using Shrooms.DomainServiceValidators.Validators.Events;
 namespace Shrooms.API.Controllers.WebApi.EventControllers
 {
     [Authorize]
-    [RoutePrefix("Event")]
+    [RoutePrefix("Events")]
     public class EventController : BaseController
     {
         private readonly IMapper _mapper;
@@ -116,17 +116,19 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
             return Ok(result);
         }
 
-        [Route("ByTypeAndOffice")]
+        [HttpGet]
+        [Route("")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
         public IHttpActionResult GetEventsByTypeAndOffice(
-            string typeId, string officeId, int page = 1,
+            string typeId = null, string officeId = null, int page = 1,
             DateTime? startDate = null, DateTime? endDate = null)
         {
             var args = new EventsListingFilterArgs
             {
                 StartDate = startDate,
                 EndDate = endDate,
-                IsOnlyMainEvents = typeId == "main"
+                IsOnlyMainEvents = typeId == "main",
+                Page = page
             };
 
             if (typeId != "all" && typeId != "main" && int.TryParse(typeId, out var typeIdParsed))
@@ -207,7 +209,7 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
         [HttpGet]
         [Route("MyEvents")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult GetMyEvents([FromUri] MyEventsOptionsViewModel options, string officeId)
+        public IHttpActionResult GetMyEvents([FromUri] MyEventsOptionsViewModel options, string officeId, int page = 1)
         {
             int? officeIdNullable = null;
 
@@ -218,7 +220,7 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
 
             var optionsDto = _mapper.Map<MyEventsOptionsViewModel, MyEventsOptionsDTO>(options);
             SetOrganizationAndUser(optionsDto);
-            var myEventsListDto = _eventListingService.GetMyEvents(optionsDto, officeIdNullable);
+            var myEventsListDto = _eventListingService.GetMyEvents(optionsDto, page, officeIdNullable);
             var result = _mapper.Map<IEnumerable<EventListItemDTO>, IEnumerable<EventListItemViewModel>>(myEventsListDto);
             return Ok(result);
         }

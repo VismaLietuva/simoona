@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
+using Shrooms.Constants.WebApi;
 using Shrooms.Domain.Services.Args;
 
 namespace Shrooms.Domain.Services.Events.List
@@ -78,7 +79,7 @@ namespace Shrooms.Domain.Services.Events.List
                 .Where(EventTypeFilter(args.TypeId, args.IsOnlyMainEvents))
                 .Where(EventOfficeFilter(officeSearchString));
 
-            query = args.StartDate is null && args.EndDate is null ?
+            query = args.StartDate is null || args.EndDate is null ?
                         query.Where(e => e.EndDate > DateTime.UtcNow) :
                         query.Where(e => e.StartDate >= args.StartDate && e.EndDate <= args.EndDate);
 
@@ -86,12 +87,14 @@ namespace Shrooms.Domain.Services.Events.List
                 .Select(MapEventToListItemDto(userOrganization.UserId))
                 .OrderByDescending(e => e.IsPinned)
                 .ThenBy(e => e.StartDate)
+                .Skip((args.Page - 1) * ConstWebApi.EventsDefaultPageSize)
+                .Take(ConstWebApi.EventsDefaultPageSize)
                 .ToList();
 
             return events;
         }
 
-        public IEnumerable<EventListItemDTO> GetMyEvents(MyEventsOptionsDTO options, int? officeId = null)
+        public IEnumerable<EventListItemDTO> GetMyEvents(MyEventsOptionsDTO options, int page, int? officeId = null)
         {
             var officeSearchString = OfficeIdToString(officeId);
             var myEventFilter = _eventFilters[options.Filter](options.UserId);
@@ -103,8 +106,9 @@ namespace Shrooms.Domain.Services.Events.List
                 .Where(myEventFilter)
                 .Where(EventOfficeFilter(officeSearchString))
                 .Select(MapEventToListItemDto(options.UserId))
-                .OrderByDescending(e => e.IsPinned)
-                .ThenBy(e => e.StartDate)
+                .OrderByDescending(e => e.StartDate)
+                .Skip((page - 1) * ConstWebApi.EventsDefaultPageSize)
+                .Take(ConstWebApi.EventsDefaultPageSize)
                 .ToList();
 
             var orderedEvents = OrderEvents(events);
@@ -189,7 +193,7 @@ namespace Shrooms.Domain.Services.Events.List
 
         private static Expression<Func<Event, bool>> EventOfficeFilter(string office)
         {
-            if (office == OutsideOffice)
+            if (office == OutsideOffice || office == null)
             {
                 return x => true;
             }
