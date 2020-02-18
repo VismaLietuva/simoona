@@ -112,12 +112,12 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
                 Page = page
             };
 
-            if (typeId != "all" && typeId != "main" && int.TryParse(typeId, out var typeIdParsed))
+            if (int.TryParse(typeId, out var typeIdParsed))
             {
                 args.TypeId = typeIdParsed;
             }
 
-            if (officeId != "all" && int.TryParse(officeId, out var officeIdParsed))
+            if (int.TryParse(officeId, out var officeIdParsed))
             {
                 args.OfficeId = officeIdParsed;
             }
