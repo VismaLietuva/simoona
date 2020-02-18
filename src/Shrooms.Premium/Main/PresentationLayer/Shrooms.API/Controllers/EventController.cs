@@ -33,6 +33,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using System.IO;
 using System.Net.Http.Headers;
+using Shrooms.Constants.WebApi;
 using Shrooms.Domain.Services.Args;
 using Shrooms.Domain.Services.Events.Calendar;
 using Shrooms.Domain.Services.Permissions;
@@ -142,10 +143,17 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
             }
 
             var userOrganization = GetUserAndOrganization();
-            var eventsListDto = _eventListingService.GetEventsByTypeAndOffice(args, userOrganization);
+            try
+            {
+                var eventsListDto = _eventListingService.GetEventsByTypeAndOffice(args, userOrganization);
+                var result = _mapper.Map<IEnumerable<EventListItemDTO>, IEnumerable<EventListItemViewModel>>(eventsListDto);
 
-            var result = _mapper.Map<IEnumerable<EventListItemDTO>, IEnumerable<EventListItemViewModel>>(eventsListDto);
-            return Ok(result);
+                return Ok(result);
+            }
+            catch (EventException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpPost]

@@ -32,6 +32,7 @@
         public const string EventChoiceCanBeSingleOnly = "223";
         public const string EventWrongAttendStatus = "224";
         public const string EventUserNotParticipating = "225";
+        public const string EventDateFilterRangeInvalid = "226";
 
 
         // Service Request, 7**

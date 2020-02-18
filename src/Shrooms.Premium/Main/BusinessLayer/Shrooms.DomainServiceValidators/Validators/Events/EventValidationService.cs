@@ -10,6 +10,7 @@ using static Shrooms.Constants.ErrorCodes.ErrorCodes;
 using static Shrooms.Premium.Other.Shrooms.Constants.ErrorCodes.ErrorCodes;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.Constants.BusinessLayer.Events;
+using Shrooms.Constants.WebApi;
 
 namespace Shrooms.DomainServiceValidators.Validators.Events
 {
@@ -257,6 +258,15 @@ namespace Shrooms.DomainServiceValidators.Validators.Events
             if (participantIds.All(p => p != userId))
             {
                 throw new EventException(EventUserNotParticipating);
+            }
+        }
+
+        public void CheckIfDateRangeExceededLimitOrNull(DateTime? start, DateTime? end)
+        {
+            var diff = end - start;
+            if (diff is null || diff > TimeSpan.FromDays(ConstWebApi.EventsMaxDateFilterRangeInDays))
+            {
+                throw new EventException(EventDateFilterRangeInvalid);
             }
         }
     }

@@ -79,9 +79,15 @@ namespace Shrooms.Domain.Services.Events.List
                 .Where(EventTypeFilter(args.TypeId, args.IsOnlyMainEvents))
                 .Where(EventOfficeFilter(officeSearchString));
 
-            query = args.StartDate is null || args.EndDate is null ?
-                        query.Where(e => e.EndDate > DateTime.UtcNow) :
-                        query.Where(e => e.StartDate >= args.StartDate && e.EndDate <= args.EndDate);
+            if (args.StartDate is null || args.EndDate is null)
+            {
+                query = query.Where(e => e.EndDate > DateTime.UtcNow);
+            }
+            else
+            {
+                _eventValidationService.CheckIfDateRangeExceededLimitOrNull(args.StartDate, args.EndDate);
+                query = query.Where(e => e.StartDate >= args.StartDate && e.EndDate <= args.EndDate);
+            }
 
             var events = query
                 .Select(MapEventToListItemDto(userOrganization.UserId))
