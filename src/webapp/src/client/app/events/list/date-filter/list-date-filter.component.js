@@ -59,7 +59,7 @@
 
         function getFilteredEvents() {
             let difference = dateDifferenceInDays(vm.dateFilterStart, vm.dateFilterEnd)
-            if (difference > customRangeOptions.allowedDifference) {
+            if (difference > customRangeOptions.allowedDifference && vm.selectedRange === vm.dateRanges.custom) {
                 notifySrv.error('events.dateFilterMaxRangeError');
                 return;
             }
