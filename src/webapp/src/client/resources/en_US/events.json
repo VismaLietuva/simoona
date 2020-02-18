@@ -193,5 +193,6 @@
   "pastThreeMonths": "Past 3 months",
   "customRange": "Custom range",
   "selectDate": "Select date",
-  "dateFilterInvalidRange": "Start date must be before end date"
+  "dateFilterInvalidRange": "Start date must be before end date",
+  "dateFilterMaxRangeError": "Maximum date range is 3 months"
 }

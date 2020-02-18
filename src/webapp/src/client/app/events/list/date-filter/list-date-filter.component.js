@@ -10,6 +10,9 @@
             pastThreeMonths: 3,
             custom: 4
         })
+        .constant('customRangeOptions', {
+            allowedDifference: 100
+        })
         .component('aceEventsListDateFilter', {
             templateUrl: 'app/events/list/date-filter/list-date-filter.html',
             controller: eventsListDateFilterController,
@@ -21,10 +24,12 @@
         '$stateParams',
         'dateRanges',
         '$translate',
-        'defaultEventTabsNames'
+        'defaultEventTabsNames',
+        'customRangeOptions',
+        'notifySrv'
     ];
 
-    function eventsListDateFilterController($state, $stateParams, dateRanges, $translate, defaultEventTabsNames) {
+    function eventsListDateFilterController($state, $stateParams, dateRanges, $translate, defaultEventTabsNames, customRangeOptions, notifySrv) {
         var vm = this;
 
         vm.popoverTemplateUrl = 'app/events/list/date-filter/date-filter-popover.html';
@@ -53,6 +58,12 @@
         }
 
         function getFilteredEvents() {
+            let difference = dateDifferenceInDays(vm.dateFilterStart, vm.dateFilterEnd)
+            if (difference > customRangeOptions.allowedDifference) {
+                notifySrv.error('events.dateFilterMaxRangeError');
+                return;
+            }
+
             var options = getSelectedOptions();
 
             $state.go('Root.WithOrg.Client.Events.List.Type', {
@@ -136,6 +147,11 @@
         function isCustomRangeInvalid() {
             return vm.dateFilterStart > vm.dateFilterEnd &&
                 vm.selectedRange === vm.dateRanges.custom;
+        }
+
+        function dateDifferenceInDays(start, end) {
+            const MS_PER_DAY = 1000 * 60 * 60 * 24;
+            return (end - start) / MS_PER_DAY;
         }
     }
 })();
