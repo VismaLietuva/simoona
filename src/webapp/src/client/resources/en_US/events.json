@@ -197,5 +197,5 @@
   "customRange": "Custom range",
   "selectDate": "Select date",
   "dateFilterInvalidRange": "Start date must be before end date",
-  "dateFilterMaxRangeError": "Maximum date range is 3 months"
+  "dateFilterMaxRangeError": "Maximum date range is 100 days"
 }

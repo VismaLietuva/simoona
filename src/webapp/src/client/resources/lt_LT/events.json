@@ -197,5 +197,5 @@
   "customRange": "Pasirinkimas",
   "selectDate": "Pasirinkti datą",
   "dateFilterInvalidRange": "Pradžios data turi būti anksčiau nei pabaigos",
-  "dateFilterMaxRangeError": "Maksimalus datos diapazonas yra 3 mėnesiai"
+  "dateFilterMaxRangeError": "Maksimalus datos diapazonas yra 100 dienų"
 }
