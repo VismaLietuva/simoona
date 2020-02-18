@@ -101,9 +101,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [Route("")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult GetEventsFiltered(
-            string typeId = null, string officeId = null, int page = 1,
-            DateTime? startDate = null, DateTime? endDate = null)
+        public IHttpActionResult GetEventsFiltered(string typeId = null, string officeId = null, int page = 1,
+                                                   DateTime? startDate = null, DateTime? endDate = null)
         {
             var args = new EventsListingFilterArgs
             {

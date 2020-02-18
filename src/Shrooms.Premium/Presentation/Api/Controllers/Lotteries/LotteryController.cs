@@ -123,9 +123,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
         {
             try
             {
-                var buyLotterTicketDTO = _mapper.Map<BuyLotteryTicketViewModel, BuyLotteryTicketDTO>(lotteryTickets);
-
-                await _lotteryService.BuyLotteryTicketAsync(buyLotterTicketDTO, GetUserAndOrganization());
+                var buyLotteryTicketDTO = _mapper.Map<BuyLotteryTicketViewModel, BuyLotteryTicketDTO>(lotteryTickets);
+                await _lotteryService.BuyLotteryTicketAsync(buyLotteryTicketDTO, GetUserAndOrganization());
 
                 return Ok();
             }

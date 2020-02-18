@@ -11,6 +11,7 @@ using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Kudos;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
+using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Lottery;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.UserService;
@@ -267,6 +268,12 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 return;
             }
 
+            if (lotteryTicketDTO.Tickets <= 0)
+            {
+                await AddKudsLogForCheating(userOrg, lotteryDetails.EntryFee, applicationUser);
+                throw new LotteryException("Thanks for trying - you were charged double Kudos for this without getting a ticket.");
+            }
+
             if (applicationUser.RemainingKudos < lotteryDetails.EntryFee * lotteryTicketDTO.Tickets)
             {
                 throw new LotteryException("User does not have enough kudos for the purchase.");
@@ -302,6 +309,23 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 }
             }
 
+            await _uow.SaveChangesAsync(applicationUser.Id);
+            _kudosService.UpdateProfileKudos(applicationUser, userOrg);
+        }
+
+        private async Task AddKudsLogForCheating(UserAndOrganizationDTO userOrg, int entryFee, ApplicationUser applicationUser)
+        {
+            var kudosLogDTO = new AddKudosLogDTO
+            {
+                ReceivingUserIds = new List<string> { userOrg.UserId },
+                PointsTypeId = _kudosService.GetKudosTypeId(KudosTypeEnum.Minus),
+                MultiplyBy = entryFee * 2,
+                Comment = "Cheating",
+                UserId = userOrg.UserId,
+                OrganizationId = userOrg.OrganizationId
+            };
+
+            await _kudosService.AddLotteryKudosLog(kudosLogDTO, userOrg);
             await _uow.SaveChangesAsync(applicationUser.Id);
             _kudosService.UpdateProfileKudos(applicationUser, userOrg);
         }
