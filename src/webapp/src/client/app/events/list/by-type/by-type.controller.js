@@ -4,7 +4,7 @@
     angular
         .module('simoonaApp.Events')
         .constant('eventsSettings', {
-            eventsListPageSize: 20
+            eventsListPageSize: 10
         })
         .controller('eventsByTypeController', eventsByTypeController);
 
@@ -13,47 +13,32 @@
         '$stateParams',
         'eventRepository',
         'eventsSettings',
-        'eventOfficeFactory'
+        'eventOfficeFactory',
+        'defaultEventTabsNames'
     ];
 
-    function eventsByTypeController($scope, $stateParams, eventRepository, eventsSettings, eventOfficeFactory) {
+    function eventsByTypeController($scope, $stateParams, eventRepository, eventsSettings, eventOfficeFactory, defaultEventTabsNames) {
         /*jshint validthis: true */
         var vm = this;
 
         vm.addMoreEvents = addMoreEvents;
 
-
         vm.isEventsFound = true;
-        vm.isEventsLoading = true;
+        vm.isEventsLoading = false;
+        vm.isScrollingEnabled = true;
         vm.eventsList = [];
-        vm.itemsDisplayedInList = eventsSettings.eventsListPageSize;
+        vm.eventsListPage = 1;
+        vm.itemsDisplayedInList = 0;
         init();
 
         ///////////
 
-        function init() {
-            if ($stateParams.type === 'all' && $stateParams.office === 'all' && 
-                !$stateParams.startDate && !$stateParams.endDate) {
-                eventRepository.getAllEvents().then(function (result) {
-                    vm.eventsList = result;
-                    setEventOffices();
-                    setResponseUtilities(result);
-                });
-            } else if ($stateParams.type === 'host' || $stateParams.type === 'participant') {
-                getMyEvents($stateParams.type, $stateParams.office);
-            } else {
-                eventRepository.getEventsByTypeAndOffice($stateParams.type, $stateParams.office, $stateParams.startDate, $stateParams.endDate)
-                .then(function (result) {
-                    vm.eventsList = result;
-                    setEventOffices();
-                    setResponseUtilities(result);
-                });
-            }
-
-        }
+        function init() {}
 
         function setEventOffices() {
-            $scope.$watch(function () { return eventOfficeFactory.offices.data },
+            $scope.$watch(function () {
+                    return eventOfficeFactory.offices.data
+                },
                 function () {
                     if (!eventOfficeFactory.offices.isBusy) {
                         vm.offices = eventOfficeFactory.offices.data;
@@ -78,8 +63,10 @@
         }
 
         function getMyEvents(typeId, officeId) {
-            eventRepository.getMyEvents(typeId, officeId).then(function (result) {
-                vm.eventsList = result;
+            eventRepository.getMyEvents(typeId, officeId, vm.eventsListPage).then(function (result) {
+                result.forEach(elem => vm.eventsList.push(elem));
+
+                isThereMorePages(result.length);
                 setEventOffices();
                 setResponseUtilities(result);
             });
@@ -88,11 +75,38 @@
         function setResponseUtilities(data) {
             vm.isEventsFound = !!data.length;
             vm.isEventsLoading = false;
+            vm.itemsDisplayedInList += eventsSettings.eventsListPageSize;
         }
 
         function addMoreEvents() {
-            if (vm.itemsDisplayedInList < vm.eventsList.length) {
-                vm.itemsDisplayedInList = vm.itemsDisplayedInList + eventsSettings.eventsListPageSize;
+            vm.isEventsLoading = true;
+
+            if ($stateParams.type === defaultEventTabsNames.host || $stateParams.type === defaultEventTabsNames.participant) {
+                getMyEvents($stateParams.type, $stateParams.office);
+            } else {
+                let params = {
+                    officeId: $stateParams.office,
+                    typeId: $stateParams.type,
+                    startDate: $stateParams.startDate,
+                    endDate: $stateParams.endDate,
+                    page: vm.eventsListPage
+                }
+
+                eventRepository.getEventsByTypeAndOffice(params).then(function (result) {
+                    result.forEach(elem => vm.eventsList.push(elem));
+
+                    isThereMorePages(result.length);
+                    setEventOffices();
+                    setResponseUtilities(result);
+                });
+            }
+        }
+
+        function isThereMorePages(resultLength) {
+            if (resultLength === eventsSettings.eventsListPageSize) {
+                vm.eventsListPage++;
+            } else {
+                vm.isScrollingEnabled = false;
             }
         }
     }

@@ -929,8 +929,8 @@
 }
 
 .popover-date-filter {
-    min-width: 300px;
-    max-width: 300px;
+    min-width: 275px;
+    max-width: 275px;
 }
 
 .btn-date-filter {
@@ -955,6 +955,15 @@
             background: #4d8400;
             border-color: #3f6b01 #4c7e06 #497d00 !important;
             box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+        }
+        &.disabled,
+        &.disabled:focus {
+            background-color: #ffffff;
+            border-color: #cccccc;
+            opacity: 0.65;
+            filter: alpha(opacity=65);
+            -webkit-box-shadow: none;
+            box-shadow: none;
         }
 }
 

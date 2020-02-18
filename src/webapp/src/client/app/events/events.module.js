@@ -19,6 +19,12 @@
             default: 0,
             ignoreSingleJoin: 1
         })
+        .constant('defaultEventTabsNames', {
+            all: 'all',
+            main: 'main',
+            participant: 'participant',
+            host: 'host'
+        })
         .config(route)
         .run(init);
 

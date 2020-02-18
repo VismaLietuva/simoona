@@ -7,7 +7,7 @@
             none: 0,
             pastWeek: 1,
             pastMonth: 2,
-            pastYear: 3,
+            pastThreeMonths: 3,
             custom: 4
         })
         .component('aceEventsListDateFilter', {
@@ -20,10 +20,11 @@
         '$state',
         '$stateParams',
         'dateRanges',
-        '$translate'
+        '$translate',
+        'defaultEventTabsNames'
     ];
 
-    function eventsListDateFilterController($state, $stateParams, dateRanges, $translate) {
+    function eventsListDateFilterController($state, $stateParams, dateRanges, $translate, defaultEventTabsNames) {
         var vm = this;
 
         vm.popoverTemplateUrl = 'app/events/list/date-filter/date-filter-popover.html';
@@ -34,6 +35,7 @@
         vm.clearFilter = clearFilter;
         vm.openDatePicker = openDatePicker;
         vm.isDateFilterSelected = isDateFilterSelected;
+        vm.isDateFilterDisabled = isDateFilterDisabled;
         vm.isCustomRangeInvalid = isCustomRangeInvalid;
 
         vm.dateRanges = dateRanges;
@@ -65,16 +67,18 @@
         }
 
         function clearFilter() {
-            $state.go('Root.WithOrg.Client.Events.List.Type', {
-                type: $stateParams.type,
-                office: $stateParams.office,
-                startDate: null,
-                endDate: null
-            });
+            if ($stateParams.endDate || $stateParams.endDate) {
+                $state.go('Root.WithOrg.Client.Events.List.Type', {
+                    type: $stateParams.type,
+                    office: $stateParams.office,
+                    startDate: null,
+                    endDate: null
+                });
 
-            vm.buttonTitle = $translate.instant('events.selectDate');
-            vm.selectedRange = vm.dateRanges.none;
-            vm.isPopoverOpen = false;
+                vm.buttonTitle = $translate.instant('events.selectDate');
+                vm.selectedRange = vm.dateRanges.none;
+                vm.isPopoverOpen = false;
+            }
         }
 
         function getSelectedOptions() {
@@ -93,9 +97,9 @@
                     options.startDate.setMonth(options.startDate.getMonth() - 1);
                     options.title = $translate.instant('events.pastMonth');
                     break;
-                case vm.dateRanges.pastYear:
-                    options.startDate.setFullYear(options.startDate.getFullYear() - 1);
-                    options.title = $translate.instant('events.pastYear');
+                case vm.dateRanges.pastThreeMonths:
+                    options.startDate.setMonth(options.startDate.getMonth() - 3);
+                    options.title = $translate.instant('events.pastThreeMonths');
                     break;
                 case vm.dateRanges.custom:
                     options.startDate = vm.dateFilterStart;
@@ -109,6 +113,15 @@
 
         function isDateFilterSelected() {
             return $stateParams.startDate && $stateParams.endDate;
+        }
+
+        function isDateFilterDisabled() {
+            if ($stateParams.type == defaultEventTabsNames.host ||
+                $stateParams.type == defaultEventTabsNames.participant) {
+                clearFilter();
+                return true;
+            }
+            return false;
         }
 
         function openDatePicker($event, datepicker) {

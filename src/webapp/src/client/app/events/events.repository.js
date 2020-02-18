@@ -1,4 +1,4 @@
-(function() {
+(function () {
     'use strict';
 
     angular
@@ -12,7 +12,7 @@
     ];
 
     function eventRepository($resource, $http, endPoint) {
-        var eventUrl = endPoint + '/Event/';
+        var eventUrl = endPoint + '/Events/';
         var applicationUrl = endPoint + '/ApplicationUser/';
 
         var service = {
@@ -63,26 +63,28 @@
             return $resource(eventUrl + 'Recurrences').query().$promise;
         }
 
-        function getEventsByTypeAndOffice(typeId, officeId, startDate = null, endDate = null) {
-            return $resource(eventUrl + 'ByTypeAndOffice')
-            .query({
-                 typeId: typeId,
-                 officeId: officeId,
-                 startDate: startDate,
-                 endDate: endDate
+        function getEventsByTypeAndOffice(params) {
+            return $resource(eventUrl).query(params).$promise;
+        }
+
+        function getMyEvents(filter, officeId, page) {
+            return $resource(eventUrl + 'MyEvents').query({
+                filter: filter,
+                officeId: officeId,
+                page: page
             }).$promise;
         }
 
-        function getMyEvents(filter, officeId) {
-            return $resource(eventUrl + 'MyEvents').query({ filter: filter, officeId: officeId }).$promise;
-        }
-
         function getEventUpdate(id) {
-            return $resource(eventUrl + 'Update').get({ eventId: id }).$promise;
+            return $resource(eventUrl + 'Update').get({
+                eventId: id
+            }).$promise;
         }
 
         function getEventDetails(id) {
-            return $resource(eventUrl + 'Details').get({ eventId: id }).$promise;
+            return $resource(eventUrl + 'Details').get({
+                eventId: id
+            }).$promise;
         }
 
         function createEvent(event) {
@@ -98,7 +100,9 @@
         }
 
         function deleteEvent(id) {
-            return $resource(eventUrl + 'Delete').delete({ eventId: id }).$promise;
+            return $resource(eventUrl + 'Delete').delete({
+                eventId: id
+            }).$promise;
         }
 
         function getEventOptions(eventId) {

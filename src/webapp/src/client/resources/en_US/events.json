@@ -190,7 +190,7 @@
   "changedEventOptions": "You have successfully changed options",
   "pastWeek": "Past week",
   "pastMonth": "Past month",
-  "pastYear": "Past year",
+  "pastThreeMonths": "Past 3 months",
   "customRange": "Custom range",
   "selectDate": "Select date",
   "dateFilterInvalidRange": "Start date must be before end date"

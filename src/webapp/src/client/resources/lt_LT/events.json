@@ -191,7 +191,7 @@
   "changedEventOptions": "Sėkmingai pakeitėte renginio pasirinkimo variantus",
   "pastWeek": "Praeita savaitė",
   "pastMonth": "Praeitas mėnuo",
-  "pastYear": "Praeiti metai",
+  "pastThreeMonths": "Praeiti 3 mėnesiai",
   "customRange": "Pasirinkimas",
   "selectDate": "Pasirinkti datą",
   "dateFilterInvalidRange": "Pradžios data turi būti anksčiau nei pabaigos"
