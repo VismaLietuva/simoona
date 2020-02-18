@@ -19,6 +19,12 @@
             default: 0,
             ignoreSingleJoin: 1
         })
+        .constant('defaultEventTabsNames', {
+            all: 'all',
+            main: 'main',
+            participant: 'participant',
+            host: 'host'
+        })
         .config(route)
         .run(init);
 
@@ -47,7 +53,9 @@
                 controllerAs: 'vm',
                 params: {
                     type: 'main',
-                    office: 'all'
+                    office: 'all',
+                    startDate: {squash: true, value: null},
+                    endDate: {squash: true, value: null}
                 }
             })
             .state('Root.WithOrg.Client.Events.EventContent', {

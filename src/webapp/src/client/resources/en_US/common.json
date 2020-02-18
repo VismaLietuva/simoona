@@ -188,5 +188,7 @@
   "watchVideo": "Watch video",
   "url": "Url",
   "manager": "Manager",
-  "onlyWholeNumbers": "Whole numbers only"
+  "onlyWholeNumbers": "Whole numbers only",
+  "apply": "Apply",
+  "clear": "Clear"
 }

@@ -1,0 +1,49 @@
+<div class="popover-date-container">
+    <!-- SHORTCUTS -->
+    <div class="popover-date-item">
+        <input id="pastWeek" type="radio" ng-model="vm.selectedRange" ng-value="vm.dateRanges.pastWeek">
+        <label for="pastWeek" translate="events.pastWeek"></label>
+    </div>
+    <div class="popover-date-item">
+        <input id="pastMonth" type="radio" ng-model="vm.selectedRange" ng-value="vm.dateRanges.pastMonth">
+        <label for="pastMonth" translate="events.pastMonth"></label>
+    </div>
+    <div class="popover-date-item">
+        <input id="pastThreeMonths" type="radio" ng-model="vm.selectedRange" ng-value="vm.dateRanges.pastThreeMonths">
+        <label for="pastThreeMonths" translate="events.pastThreeMonths"></label>
+    </div>
+    <div class="popover-date-item">
+        <input id="custom" type="radio" ng-model="vm.selectedRange" ng-value="vm.dateRanges.custom">
+        <label for="custom" translate="events.customRange"></label>
+    </div>
+
+    <!-- CUSTOM DATE RANGE -->
+    <div ng-if="vm.selectedRange === vm.dateRanges.custom" class="popover-date-item">
+        <!-- START DATE -->
+        <div class="date-field" ng-class="{'has-error': vm.isCustomRangeInvalid()}">
+            <label translate="events.eventStartDate"></label>
+            <input type="text" class="hasDatepicker" uib-datepicker-popup="yyyy-MM-dd" popup-placement="bottom"
+                ng-model="vm.dateFilterStart" ng-click="vm.openDatePicker($event, 'startDate')"
+                is-open="vm.isDatePickerOpen.startDate" />
+        </div>
+        <!-- END DATE -->
+        <div class="date-field" ng-class="{'has-error': vm.isCustomRangeInvalid()}">
+            <label translate="events.eventFinishDate"></label>
+            <input type="text" class="hasDatepicker" uib-datepicker-popup="yyyy-MM-dd" popup-placement="bottom"
+                ng-model="vm.dateFilterEnd" ng-click="vm.openDatePicker($event, 'endDate')"
+                is-open="vm.isDatePickerOpen.endDate" />
+        </div>
+        <p ng-if="vm.isCustomRangeInvalid()" translate="events.dateFilterInvalidRange"></p>
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="btn-group popover-date-item">
+        <button class="btn btn-default" ng-click="vm.getFilteredEvents()"
+            ng-disabled="vm.selectedRange === vm.dateRanges.none || vm.isCustomRangeInvalid()">
+            <span translate="common.apply"></span>
+        </button>
+        <button class="btn btn-default" ng-if="vm.isDateFilterSelected()" ng-click="vm.clearFilter()">
+            <span translate="common.clear"></span>
+        </button>
+    </div>
+</div>

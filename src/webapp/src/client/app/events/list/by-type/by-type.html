@@ -1,12 +1,11 @@
-<wave-spinner ng-if="vm.isEventsLoading"></wave-spinner>
 <div class="event-list-item-container" 
      infinite-scroll="vm.addMoreEvents()" 
-     infinite-scroll-distance="1" 
-     infinite-scroll-disabled="vm.isEventsLoading">
+     infinite-scroll-distance="0"
+     infinite-scroll-disabled="vm.isEventsLoading || !vm.isScrollingEnabled">
     <!-- events list item -->
     <ul class="event-list-items">
         <li class="event-list-item" ng-repeat="event in vm.eventsList | limitTo: vm.itemsDisplayedInList track by event.id">
-            <div class="event-list-item-inner-container">
+            <div id="{{event.id}}" class="event-list-item-inner-container">
                 <!-- title -->
                 <div class="col-xs-12">
                     <span class="glyphicon glyphicon-bookmark event-bookmark-icon" ng-if="event.isPinned">
@@ -62,3 +61,4 @@
                 </ace-list-alert>
     </div>
 </div>
+<wave-spinner ng-if="vm.isEventsLoading"></wave-spinner>
