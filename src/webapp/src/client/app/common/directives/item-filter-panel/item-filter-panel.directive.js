@@ -26,9 +26,9 @@
 
     }
 
-    itemFilterPanelController.$inject = ['$location', '$translate', 'itemFilterPanelFactory'];
+    itemFilterPanelController.$inject = ['$location', 'itemFilterPanelFactory'];
 
-    function itemFilterPanelController($location,$translate, itemFilterPanelFactory) {
+    function itemFilterPanelController($location, itemFilterPanelFactory) {
         /* jshint validthis: true */
         var vm = this;
         vm.executeFilter = executeFilter;

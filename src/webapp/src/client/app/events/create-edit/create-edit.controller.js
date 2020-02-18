@@ -397,15 +397,24 @@
                 });
 
                 if (vm.isIgnoreSingleJoinEnabled && vm.selectedType.isSingleJoin) {
-                    if (vm.ignoreSingleJoinOption.id) {
+                   var optionValue;
+
+                    if (!vm.ignoreSingleJoinOption || !vm.ignoreSingleJoinOption.option) {
+                        optionValue = localeSrv.translate('events.ignoreSingleJoinDefaultOption');
+                    }
+                    else {
+                        optionValue = vm.ignoreSingleJoinOption.option;
+                    }
+
+                    if (vm.ignoreSingleJoinOption && vm.ignoreSingleJoinOption.id) {
                         vm.event.editedOptions.push({
                             id: vm.ignoreSingleJoinOption.id,
-                            option: vm.ignoreSingleJoinOption.option,
+                            option: optionValue,
                             rule: optionRules.default
                         });
                     } else {
                         vm.event.newOptions.push({
-                            option: vm.ignoreSingleJoinOption.option,
+                            option: optionValue,
                             rule: optionRules.ignoreSingleJoin
                         });
                     }
