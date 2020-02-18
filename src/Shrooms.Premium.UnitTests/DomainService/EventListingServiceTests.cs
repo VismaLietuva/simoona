@@ -40,54 +40,6 @@ namespace Shrooms.UnitTests.DomainService
         }
 
         [Test]
-        public void Should_Return_Events_List_By_Type_For_Creator_And_Participant()
-        {
-            var eventsGuids = MockEventsListTest();
-            var userOrg = new UserAndOrganizationDTO
-            {
-                OrganizationId = 2,
-                UserId = "responsibleUserId"
-            };
-            var result = _eventListingService.GetEventsByType(userOrg, 1);
-            Assert.AreEqual(result.First().Id, eventsGuids[0]);
-            Assert.IsTrue(result.First().IsCreator);
-            Assert.AreEqual(result.First().ParticipantsCount, 2);
-            Assert.AreEqual(result.First().ParticipatingStatus, 1);
-        }
-
-        [Test]
-        public void Should_Return_Events_List_By_Type_For_User()
-        {
-            var eventsGuids = MockEventsListTest();
-            var userOrg = new UserAndOrganizationDTO
-            {
-                OrganizationId = 2,
-                UserId = "notParticipantOrCreatorId"
-            };
-            var result = _eventListingService.GetEventsByType(userOrg, 1);
-            Assert.AreEqual(result.First().Id, eventsGuids[0]);
-            Assert.IsFalse(result.First().IsCreator);
-            Assert.AreEqual(result.First().ParticipantsCount, 2);
-            Assert.AreEqual(result.First().ParticipatingStatus, 3);
-        }
-
-
-
-        [Test]
-        public void Should_Return_All_Events()
-        {
-            var eventGuids = MockEventsListTest();
-            var userOrg = new UserAndOrganizationDTO
-            {
-                OrganizationId = 2,
-                UserId = "userId"
-            };
-            var result = _eventListingService.GetEventsByType(userOrg);
-            Assert.AreEqual(2, result.Count());
-            Assert.AreEqual(eventGuids[2], result.First().Id);
-        }
-
-        [Test]
         public void Should_Return_My_Events_As_A_Participant()
         {
             var eventGuids = MockEventsListTest();

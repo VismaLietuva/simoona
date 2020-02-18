@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Shrooms.API.Filters;
-using Shrooms.API.Hubs;
 using Shrooms.Constants.Authorization.Permissions;
 using Shrooms.DataTransferObjects.Models.Events;
 using Shrooms.DataTransferObjects.Models.Wall.Posts;
@@ -9,7 +8,6 @@ using Shrooms.Domain.Services.Events.Export;
 using Shrooms.Domain.Services.Events.List;
 using Shrooms.Domain.Services.Events.Participation;
 using Shrooms.Domain.Services.Events.Utilities;
-using Shrooms.Domain.Services.Wall;
 using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.DomainExceptions.Exceptions;
 using Shrooms.DomainExceptions.Exceptions.Event;
@@ -24,20 +22,12 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using Shrooms.DataTransferObjects.Models.OfficeMap;
 using Shrooms.Domain.Services.OfficeMap;
-using Shrooms.WebViewModels.Models.Notifications;
-using Shrooms.Premium.Main.BusinessLayer.Shrooms.Domain.Services.Notifications;
 using Shrooms.Infrastructure.FireAndForget;
-using Shrooms.API.BackgroundWorkers;
 using Shrooms.Premium.Main.PresentationLayer.Shrooms.API.BackgroundWorkers;
 using System.Linq;
 using Newtonsoft.Json;
-using System.IO;
-using System.Net.Http.Headers;
-using Shrooms.Constants.WebApi;
 using Shrooms.Domain.Services.Args;
 using Shrooms.Domain.Services.Events.Calendar;
-using Shrooms.Domain.Services.Permissions;
-using Shrooms.DomainServiceValidators.Validators.Events;
 
 namespace Shrooms.API.Controllers.WebApi.EventControllers
 {
@@ -107,20 +97,10 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
             return Ok(result);
         }
 
-        [Route("All")]
-        [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult GetAllEvents(int page = 1)
-        {
-            var userOrganization = GetUserAndOrganization();
-            var allListDto = _eventListingService.GetEventsByType(userOrganization);
-            var result = _mapper.Map<IEnumerable<EventListItemDTO>, IEnumerable<EventListItemViewModel>>(allListDto);
-            return Ok(result);
-        }
-
         [HttpGet]
         [Route("")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult GetEventsByTypeAndOffice(
+        public IHttpActionResult GetEventsFiltered(
             string typeId = null, string officeId = null, int page = 1,
             DateTime? startDate = null, DateTime? endDate = null)
         {
@@ -143,9 +123,10 @@ namespace Shrooms.API.Controllers.WebApi.EventControllers
             }
 
             var userOrganization = GetUserAndOrganization();
+
             try
             {
-                var eventsListDto = _eventListingService.GetEventsByTypeAndOffice(args, userOrganization);
+                var eventsListDto = _eventListingService.GetEventsFiltered(args, userOrganization);
                 var result = _mapper.Map<IEnumerable<EventListItemDTO>, IEnumerable<EventListItemViewModel>>(eventsListDto);
 
                 return Ok(result);

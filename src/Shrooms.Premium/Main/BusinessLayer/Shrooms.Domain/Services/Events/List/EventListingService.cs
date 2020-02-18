@@ -50,24 +50,7 @@ namespace Shrooms.Domain.Services.Events.List
             return eventOptionsDto;
         }
 
-        public IEnumerable<EventListItemDTO> GetEventsByType(UserAndOrganizationDTO userOrganization, int typeId = 0)
-        {
-            var events = _eventsDbSet
-                .Include(x => x.EventParticipants)
-                .Include(x => x.EventType)
-                .Where(t =>
-                    t.OrganizationId == userOrganization.OrganizationId &&
-                    t.EndDate > DateTime.UtcNow)
-                .Where(EventTypeFilter(typeId))
-                .Select(MapEventToListItemDto(userOrganization.UserId))
-                .OrderByDescending(e => e.IsPinned)
-                .ThenBy(e => e.StartDate)
-                .ToList();
-
-            return events;
-        }
-
-        public IEnumerable<EventListItemDTO> GetEventsByTypeAndOffice(
+        public IEnumerable<EventListItemDTO> GetEventsFiltered(
             EventsListingFilterArgs args, UserAndOrganizationDTO userOrganization)
         {
             var officeSearchString = OfficeIdToString(args.OfficeId);

@@ -10,7 +10,6 @@ namespace Shrooms.Domain.Services.Events.List
     {
         IEnumerable<EventListItemDTO> GetMyEvents(MyEventsOptionsDTO options, int page, int? officeId = null);
         EventOptionsDTO GetEventOptions(Guid eventId, UserAndOrganizationDTO userOrg);
-        IEnumerable<EventListItemDTO> GetEventsByType(UserAndOrganizationDTO userOrganization, int typeId = 0);
-        IEnumerable<EventListItemDTO> GetEventsByTypeAndOffice(EventsListingFilterArgs args, UserAndOrganizationDTO userOrganization);
+        IEnumerable<EventListItemDTO> GetEventsFiltered(EventsListingFilterArgs args, UserAndOrganizationDTO userOrganization);
     }
 }
