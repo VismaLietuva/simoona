@@ -13,16 +13,13 @@
         '$scope',
         '$rootScope',
         'authService',
-        'mapRepository',
         'officeRepository',
         'notifySrv',
         'mapOptionsSettings',
-        '$translate',
         'Analytics'
     ];
 
-    function mapOptionsController($scope, $rootScope, authService, mapRepository, officeRepository,
-    notifySrv, mapOptionsSettings, $translate, Analytics) {
+    function mapOptionsController($scope, $rootScope, authService, officeRepository, notifySrv, mapOptionsSettings, Analytics) {
         $scope.emailOptions = [{
             optionId: 1,
             optionName: 'floor.emailOptionFloor',
@@ -39,7 +36,11 @@
 
         $scope.currentEmailsList = '';
         $scope.currentSelectedEmailOption = $scope.emailOptions[mapOptionsSettings.defaultEmailOptionIndex]; //default
-        $scope.emailOptions[mapOptionsSettings.defaultEmailOptionIndex].optionFunc();
+
+        if (authService.hasPermissions(['OFFICEUSERS_BASIC'])) {
+            $scope.emailOptions[mapOptionsSettings.defaultEmailOptionIndex].optionFunc();
+        }
+
         $scope.isRoomSelected = false;
 
         $scope.$watch('selectedRoom.id', function (newValue, oldValue) {

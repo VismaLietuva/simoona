@@ -26,7 +26,7 @@
             </button>
         </div>
     </div>
-    <div class="emails-block" ng-if="allOffices">
+    <div class="emails-block" ng-if="allOffices" has-permissions="['OFFICEUSERS_BASIC']">
         <label for="office-emails"><span translate="floor.emails"></span></label>
         <select id="office-emails"
                 ng-model="currentSelectedEmailOption"
@@ -35,7 +35,7 @@
                 data-test-id="select-emails-list">
         </select>
     </div>
-    <div class="no-label" ng-if="allOffices">
+    <div class="no-label" ng-if="allOffices" has-permissions="['OFFICEUSERS_BASIC']">
         <button class="btn btn-default copy-emails"
                 ng-disabled="isRoomSelected"
                 ng-click="addToClipboard()"

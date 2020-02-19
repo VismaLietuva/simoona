@@ -16,5 +16,7 @@
             <map-dir map-control="mapControl" ng-if="floor.pictureId" floor="floor" all-offices="allOffices" office="office" enable-zoom="true" enable-pin="true" params="params" show-floor-change="true" enable-full-screen="true" height-offset="75"></map-dir>
         </div>
     </div>
-    <div data-users-bar="" params="params"></div>
+    <span has-permissions="['OFFICEUSERS_BASIC']">
+        <div data-users-bar="" params="params"></div>
+    </span>
 </div>

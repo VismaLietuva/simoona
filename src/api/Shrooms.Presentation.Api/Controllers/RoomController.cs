@@ -29,22 +29,24 @@ namespace Shrooms.Presentation.Api.Controllers
         private void RemoveRoomForUsers(RoomPostViewModel roomViewModel)
         {
             var model = _repository.Get(r => r.Id == roomViewModel.Id, includeProperties: "ApplicationUsers").FirstOrDefault();
-            if (model.ApplicationUsers.Any())
+            if (model != null && !model.ApplicationUsers.Any())
             {
-                var removedFromRoom = model.ApplicationUsers.Where(applicationUser => roomViewModel.ApplicationUsers.All(u => u.Id != applicationUser.Id)).ToList();
-                if (!removedFromRoom.Any())
-                {
-                    return;
-                }
+                return;
+            }
 
-                foreach (var applicationUser in removedFromRoom)
+            var removedFromRoom = model.ApplicationUsers.Where(applicationUser => roomViewModel.ApplicationUsers.All(u => u.Id != applicationUser.Id)).ToList();
+            if (!removedFromRoom.Any())
+            {
+                return;
+            }
+
+            foreach (var applicationUser in removedFromRoom)
+            {
+                var user = UserManager.FindById(applicationUser.Id);
+                if (user != null)
                 {
-                    var user = UserManager.FindById(applicationUser.Id);
-                    if (user != null)
-                    {
-                        user.RoomId = null;
-                        UserManager.Update(user);
-                    }
+                    user.RoomId = null;
+                    UserManager.Update(user);
                 }
             }
         }

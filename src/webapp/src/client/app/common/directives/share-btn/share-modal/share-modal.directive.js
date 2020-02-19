@@ -75,9 +75,9 @@
         vm.shareModalConfirm = shareModalConfirm ? shareModalConfirm : 'common.share';
         vm.shareModalSelectLabel = 'common.shareModalWallLabel';
         vm.shareModalDescriptionLabel = 'common.shareModalDescriptionLabel';
-        
+
         vm.formSettings = FORM_SETTINGS;
-        
+
         vm.walls = wallService.wallServiceData.wallList;
         vm.selectedWall;
         vm.description;
@@ -85,15 +85,15 @@
 
         vm.share = share;
         vm.closeModal = closeModal;
-        
+
         var shareItemCategory = shareModalItemCategory.toLowerCase();
-        
+
         var itemToShare = {
             wallId: null,
             messageBody: null
         };
-        
-        itemToShare[shareItemCategory + 'Id'] = shareItemId;
+
+        itemToShare['Id'] = shareItemId;
 
         ////////////
 

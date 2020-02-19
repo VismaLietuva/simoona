@@ -49,7 +49,6 @@
         vm.isDeleteVisible = isDeleteVisible;
         vm.isActiveTab = isActiveTab;
         vm.isExportVisible = isExportVisible;
-        vm.participantCount = participantCount;
 
         /////////
 
@@ -63,18 +62,6 @@
             });
         }
 
-        function participantCount() {
-            var participantCount = 0;
-            vm.event.participants.forEach(function(participant) {
-                if (participant.attendStatus == attendStatus.Attending)
-                {
-                    participantCount++;
-                }
-            })
-
-            return participantCount;
-        }
-
         function isActiveTab(tab) {
             return !!lodash.find(vm.participantsTabs, function(obj) {
                 return !!obj.isOpen && obj.name === tab;
@@ -86,14 +73,7 @@
         }
 
         function isExportVisible() {
-            var participantCount = 0;
-            vm.event.participants.forEach(function(participant) {
-                if (participant.attendStatus == attendStatus.Attending) {
-                    participantCount++;
-                }
-            })
-           
-            return participantCount > 0 ? true : false;
+            return vm.event.goingCount > 0;
         }
 
         function expelUserFromEvent(participant) {

@@ -831,6 +831,10 @@
     <Compile Include="Migrations\202002101044528_AddIsShownWithMainEventsField.Designer.cs">
       <DependentUpon>202002101044528_AddIsShownWithMainEventsField.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202002192014258_InitAdditionalUsersPermissions.cs" />
+    <Compile Include="Migrations\202002192014258_InitAdditionalUsersPermissions.Designer.cs">
+      <DependentUpon>202002192014258_InitAdditionalUsersPermissions.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
@@ -1381,6 +1385,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202002101044528_AddIsShownWithMainEventsField.resx">
       <DependentUpon>202002101044528_AddIsShownWithMainEventsField.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002192014258_InitAdditionalUsersPermissions.resx">
+      <DependentUpon>202002192014258_InitAdditionalUsersPermissions.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

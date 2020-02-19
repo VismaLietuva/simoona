@@ -8,15 +8,13 @@
     usersBarController.$inject = [
         '$scope',
         '$q',
-        '$rootScope',
         '$timeout',
-        '$window',
+        'authService',
         'userRepository',
-        'profileHelper',
-        'zoom'
+        'profileHelper'
     ];
 
-    function usersBarController($scope, $q, $rootScope, $timeout, $window, userRepository, profileHelper, zoom) {
+    function usersBarController($scope, $q, $timeout, authService, userRepository, profileHelper) {
 
         var tooltipOffset = 50; // reserve some more space to fit tooltip on screen after scrolling
 
@@ -120,46 +118,50 @@
             filter.floorId = $scope.params.floorId;
 
             // TODO: This request might happen even when $scope.needMore is false,
-            //  because the previous $promise might be still not resolved so quick.
-            userRepository.getPagedByFloor(filter).then(function(applicationUsers) {
-                if (!$scope.needMore) {
-                    return;
-                }
+            //  because the previous $promise might be still not resolved so quickly.
+            if (authService.hasPermissions(['OFFICEUSERS_BASIC'])) {
+                userRepository.getPagedByFloor(filter).then(function(applicationUsers) {
+                    if (!$scope.needMore) {
+                        return;
+                    }
 
-                // If it returns smaller amount than was requested -
-                //  it means all items are loaded and further requests are not needed
-                if (applicationUsers.pagedList.length < filter.pageSize) {
-                    $scope.needMore = false;
-                }
+                    // If it returns smaller amount than was requested -
+                    //  it means all items are loaded and further requests are not needed
+                    if (applicationUsers.pagedList.length < filter.pageSize) {
+                        $scope.needMore = false;
+                    }
 
-                // Merge but exclude duplicates to avoid any accidental duplicated requests
-                angular.forEach(applicationUsers.pagedList, function(item, i) {
-                    var tempArray = $.grep($scope.applicationUsersAll, function(e) {
-                        return e.id === item.id;
+                    // Merge but exclude duplicates to avoid any accidental duplicated requests
+                    angular.forEach(applicationUsers.pagedList, function(item, i) {
+                        var tempArray = $.grep($scope.applicationUsersAll, function(e) {
+                            return e.id === item.id;
+                        });
+
+                        if (tempArray.length === 0) {
+                            $scope.applicationUsersAll.push(item);
+                        }
                     });
 
-                    if (tempArray.length === 0) {
-                        $scope.applicationUsersAll.push(item);
-                    }
+                    $scope.currentMode = showMode.byFloor;
+                    $scope.$broadcast('onItemsUpdated');
                 });
-
-                $scope.currentMode = showMode.byFloor;
-                $scope.$broadcast('onItemsUpdated');
-            });
+            }
         };
 
         $scope.getItemsByRoom = function(roomId, highlightItem) {
-            userRepository.getByRoom({ roomId: roomId }).then(function(usersByRoom) {
-                if (usersByRoom.length === 0) {
-                    $scope.isEmptyRoom = true;
-                } else {
-                    $scope.isEmptyRoom = false;
-                }
+            if (authService.hasPermissions(['OFFICEUSERS_BASIC'])) {
+                userRepository.getByRoom({ roomId: roomId }).then(function(usersByRoom) {
+                    if (usersByRoom.length === 0) {
+                        $scope.isEmptyRoom = true;
+                    } else {
+                        $scope.isEmptyRoom = false;
+                    }
 
-                $scope.applicationUsersByRoom = usersByRoom;
-                $scope.currentMode = showMode.byRoom;
-                $scope.$broadcast('onItemsUpdated', { highlightItem: highlightItem });
-            });
+                    $scope.applicationUsersByRoom = usersByRoom;
+                    $scope.currentMode = showMode.byRoom;
+                    $scope.$broadcast('onItemsUpdated', { highlightItem: highlightItem });
+                });
+            }
         };
 
         $scope.onBlockMouseOver = function(usersBarItem) {

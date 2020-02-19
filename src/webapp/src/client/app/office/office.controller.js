@@ -10,14 +10,13 @@
         '$state',
         '$location',
         'mapRepository',
-        '$advancedLocation',
         'roomRepository',
         'userRepository',
         'authService',
         '$translate'
     ];
 
-    function officeController($scope, $rootScope, $state, $location, mapRepository, $advancedLocation, roomRepository, userRepository, authService) {
+    function officeController($scope, $rootScope, $state, $location, mapRepository, roomRepository, userRepository, authService) {
 
         $scope.resetStateParams = resetStateParams;
         $scope.setScopeParams = setScopeParams;
@@ -68,6 +67,7 @@
                     return;
                 }
                 $scope.params.roomId = $location.search().roomId;
+
                 roomRepository.get({ id: $location.search().roomId, includeProperties: 'Floor,RoomType' }).then(function (room) {
                     $scope.params.floorId = room.floorId;
                     $scope.params.room = room;
