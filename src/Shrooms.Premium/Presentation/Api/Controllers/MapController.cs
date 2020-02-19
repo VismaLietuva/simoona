@@ -126,7 +126,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         }
 
         [HttpGet]
-        [PermissionAuthorize(Permission = BasicPermissions.Office)]
+        [PermissionAuthorize(Permission = BasicPermissions.OfficeUsers)]
         public IEnumerable<string> GetUsersEmailsByOffice(int officeId)
         {
             var emails = _officeMapService.GetEmailsByOffice(officeId);
@@ -134,7 +134,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         }
 
         [HttpGet]
-        [PermissionAuthorize(Permission = BasicPermissions.Office)]
+        [PermissionAuthorize(Permission = BasicPermissions.OfficeUsers)]
         public IEnumerable<string> GetUsersEmailsByFloor(int floorId)
         {
             var emails = _officeMapService.GetEmailsByFloor(floorId);
@@ -142,7 +142,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         }
 
         [HttpGet]
-        [PermissionAuthorize(Permission = BasicPermissions.Office)]
+        [PermissionAuthorize(Permission = BasicPermissions.OfficeUsers)]
         public IEnumerable<string> GetUsersEmailsByRoom(int roomId)
         {
             var emails = _officeMapService.GetEmailsByRoom(roomId);
@@ -150,7 +150,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         }
 
         [HttpGet, HttpPost]
-        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [PermissionAuthorize(Permission = BasicPermissions.OfficeUsers)]
         public PagedViewModel<OfficeUserDTO> GetPagedByFloor(int floorId, int page = 1, int pageSize = WebApiConstants.DefaultPageSize, string includeProperties = "")
         {
             var officeUsersDto = _officeMapService.GetOfficeUsers(floorId, includeProperties);

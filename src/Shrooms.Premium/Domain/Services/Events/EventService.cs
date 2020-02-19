@@ -117,10 +117,22 @@ namespace Shrooms.Premium.Domain.Services.Events
                 .Where(p => @event.Offices.Value.Contains(SqlFunctions.StringConvert((double)p.Id).Trim()))
                 .Select(p => p.Name)
                 .ToList();
+
             _eventValidationService.CheckIfEventExists(@event);
             @event.IsFull = @event.Participants.Count(p => p.AttendStatus == (int)AttendingStatus.Attending) >= @event.MaxParticipants;
+
+            @event.GoingCount = @event.Participants.Count(p => p.AttendStatus == (int)AttendingStatus.Attending);
+            @event.MaybeGoingCount = @event.Participants.Count(p => p.AttendStatus == (int)AttendingStatus.MaybeAttending);
+            @event.NotGoingCount = @event.Participants.Count(p => p.AttendStatus == (int)AttendingStatus.NotAttending);
+
             var participating = @event.Participants.FirstOrDefault(p => p.UserId == userOrg.UserId);
             @event.ParticipatingStatus = participating?.AttendStatus ?? (int)AttendingStatus.Idle;
+
+            if (!_permissionService.UserHasPermission(userOrg, BasicPermissions.EventUsers))
+            {
+                @event.Participants = null;
+            }
+
             return @event;
         }
 

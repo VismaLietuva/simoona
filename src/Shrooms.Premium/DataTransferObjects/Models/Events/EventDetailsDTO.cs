@@ -24,5 +24,9 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
         public int WallId { get; set; }
         public IEnumerable<EventDetailsOptionDTO> Options { get; set; }
         public IEnumerable<EventDetailsParticipantDTO> Participants { get; set; }
+
+        public int GoingCount { get; set; }
+        public int MaybeGoingCount { get; set; }
+        public int NotGoingCount { get; set; }
     }
 }
