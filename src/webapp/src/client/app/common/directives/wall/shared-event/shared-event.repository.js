@@ -11,7 +11,7 @@
     ];
 
     function wallSharedEventRepository($resource, endPoint) {
-        var eventDetailsUrl = endPoint + '/Event/Details';
+        var eventDetailsUrl = endPoint + '/Events/Details';
         
         var service = {
             getEventDetails: getEventDetails
