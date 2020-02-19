@@ -113,8 +113,16 @@
                     options.title = $translate.instant('events.pastThreeMonths');
                     break;
                 case vm.dateRanges.custom:
-                    options.startDate = vm.dateFilterStart;
-                    options.endDate = vm.dateFilterEnd;
+                    var startDate = vm.dateFilterStart;
+                    var endDate = vm.dateFilterEnd;
+                    if (startDate && endDate && startDate.getTime() === endDate.getTime()) {
+                        // To get range from 0:00 to 23:59
+                        endDate = new Date(endDate.setDate(endDate.getDate() + 1));
+                    }
+
+                    options.startDate = toISOStringWithoutTime(startDate);
+                    options.endDate = toISOStringWithoutTime(endDate);
+
                     options.title = $translate.instant('events.customRange');
                     break;
             }
@@ -152,6 +160,17 @@
         function dateDifferenceInDays(start, end) {
             const MS_PER_DAY = 1000 * 60 * 60 * 24;
             return (end - start) / MS_PER_DAY;
+        }
+
+        function toISOStringWithoutTime(date) {
+            return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate());
+        };
+
+        function pad(number) {
+            if (number < 10) {
+              return '0' + number;
+            }
+            return number;
         }
     }
 })();

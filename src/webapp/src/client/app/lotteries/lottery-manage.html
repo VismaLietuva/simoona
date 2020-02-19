@@ -79,15 +79,16 @@
                             <label for="endDateInput" class="control-label col-xs-12 col-sm-4" translate="lotteries.endDate"></label>
                             <div class="col-xs-12 col-sm-6 col-md-4">
                                 <div class="date-field">
-                                    <input type="text" 
-                                           name="endDateInput" 
-                                           id="endDateInput" 
-                                           class="hasDatepicker" 
-                                           uib-datepicker-popup="yyyy-MM-dd" 
+                                    <input type="text"
+                                           name="endDateInput"
+                                           id="endDateInput"
+                                           class="hasDatepicker"
+                                           uib-datepicker-popup="yyyy-MM-dd"
                                            popup-placement="bottom"
+                                           datepicker-options="{ startingDay: 1 }"
                                            ng-model="vm.lottery.endDate"
-                                           is-open="vm.datePicker.isOpen" 
-                                           ng-required="true" 
+                                           is-open="vm.datePicker.isOpen"
+                                           ng-required="true"
                                            ng-click="vm.openDatePicker($event, 'isOpen')"
                                            ng-disabled="vm.isPrimaryEditDisabled"/>
                                 </div>

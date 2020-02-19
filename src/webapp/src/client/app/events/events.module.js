@@ -54,8 +54,8 @@
                 params: {
                     type: 'main',
                     office: 'all',
-                    startDate: {squash: true, value: null},
-                    endDate: {squash: true, value: null}
+                    startDate: { squash: true, value: null },
+                    endDate: { squash: true, value: null }
                 }
             })
             .state('Root.WithOrg.Client.Events.EventContent', {

@@ -38,8 +38,8 @@
                     method: 'PUT'
                 }
             }).put({ 
-                languageCode: data.languageCode, 
-                timeZoneId: data.timeZoneId 
+                languageCode: data.languageCode,
+                timeZoneId: data.timeZoneId
             }).$promise;
         }
 

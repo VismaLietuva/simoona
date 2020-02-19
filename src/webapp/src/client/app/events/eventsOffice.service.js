@@ -28,11 +28,11 @@
 
         ////////
 
-        function getOffices() {   
+        function getOffices() {
             offices.isBusy = true;
             return eventRepository.getEventOffices().then(function (response){
-                offices.data = response;   
-                offices.isBusy = false; 
+                offices.data = response;
+                offices.isBusy = false;
                 return response;
             }, errorHandler.handleErrorMessage);
         }

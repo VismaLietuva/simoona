@@ -57,7 +57,7 @@
                                 <input type="text" name="startDateInput" id="startDateInput" class="hasDatepicker"
                                     uib-datepicker-popup="yyyy-MM-dd" popup-placement="bottom"
                                     ng-model="vm.event.startDate" is-open="vm.datePickers.isOpenEventStartDatePicker"
-                                    ng-required="true"
+                                    ng-required="true" datepicker-options="{ startingDay: 1 }"
                                     ng-click="vm.openDatePicker($event, 'isOpenEventStartDatePicker')" />
                             </div>
                             <p class="text-danger help-block"
@@ -103,6 +103,7 @@
                                     <input type="text" name="registrationDeadlineDateInput"
                                         id="registrationDeadlineDateInput" class="hasDatepicker"
                                         uib-datepicker-popup="yyyy-MM-dd" popup-placement="bottom"
+                                        datepicker-options="{ startingDay: 1 }"
                                         ng-model="vm.event.registrationDeadlineDate"
                                         is-open="vm.datePickers.isOpenEventDeadlineDatePicker" ng-required="true"
                                         ng-click="vm.openDatePicker($event, 'isOpenEventDeadlineDatePicker')" />
@@ -147,7 +148,7 @@
                                 <input type="text" name="endDateInput" id="endDateInput" class="hasDatepicker"
                                     uib-datepicker-popup="yyyy-MM-dd" popup-placement="bottom"
                                     ng-model="vm.event.endDate" is-open="vm.datePickers.isOpenEventFinishDatePicker"
-                                    ng-required="true"
+                                    ng-required="true" datepicker-options="{ startingDay: 1 }"
                                     ng-click="vm.openDatePicker($event, 'isOpenEventFinishDatePicker')" />
                             </div>
                             <p class="text-danger help-block"

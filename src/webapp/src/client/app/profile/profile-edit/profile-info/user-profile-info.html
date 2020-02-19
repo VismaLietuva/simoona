@@ -113,22 +113,22 @@
                            input-value="personalInfo.birthDay"
                            classes="col-xs-12 col-sm-6 nopadding-left" label-classes="control-label col-xs-12 col-sm-4 nopadding-left">
                 <div class="date-field">
-                    <input type="text" 
-                           name="birthDay" 
-                           id="birthDay" 
-                           class="hasDatepicker" 
-                           uib-datepicker-popup="yyyy-MM-dd" 
+                    <input type="text"
+                           name="birthDay"
+                           id="birthDay"
+                           class="hasDatepicker"
+                           uib-datepicker-popup="yyyy-MM-dd"
                            popup-placement="bottom"
-                           ng-model="info.birthDay" 
+                           ng-model="info.birthDay"
                            ng-change="onChangeValidateBirthDay()"
-                           is-open="datePickers.birthDay" 
-                           ng-required="true" 
+                           is-open="datePickers.birthDay"
+                           ng-required="true"
                            ng-click="openDatePicker($event, 'birthDay')"
-                           datepicker-options="{datepickerMode: 'year'}"
+                           datepicker-options="{ startingDay: 1, datepickerMode: 'year' }"
                            required
                            wrapped />
                 </div>
-            </input-wrapper>            
+            </input-wrapper>
 
             <!-- ABOUTME -->
             <input-wrapper label-text="{{'applicationUser.bio' | translate}}"

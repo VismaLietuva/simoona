@@ -24,14 +24,14 @@
             <label translate="events.eventStartDate"></label>
             <input type="text" class="hasDatepicker" uib-datepicker-popup="yyyy-MM-dd" popup-placement="bottom"
                 ng-model="vm.dateFilterStart" ng-click="vm.openDatePicker($event, 'startDate')"
-                is-open="vm.isDatePickerOpen.startDate" />
+                datepicker-options="{ startingDay: 1 }" is-open="vm.isDatePickerOpen.startDate" />
         </div>
         <!-- END DATE -->
         <div class="date-field" ng-class="{'has-error': vm.isCustomRangeInvalid()}">
             <label translate="events.eventFinishDate"></label>
             <input type="text" class="hasDatepicker" uib-datepicker-popup="yyyy-MM-dd" popup-placement="bottom"
                 ng-model="vm.dateFilterEnd" ng-click="vm.openDatePicker($event, 'endDate')"
-                is-open="vm.isDatePickerOpen.endDate" />
+                datepicker-options="{ startingDay: 1 }" is-open="vm.isDatePickerOpen.endDate" />
         </div>
         <p ng-if="vm.isCustomRangeInvalid()" translate="events.dateFilterInvalidRange"></p>
     </div>
