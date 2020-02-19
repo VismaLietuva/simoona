@@ -1,28 +1,29 @@
-<div class="event-list-item-container" 
-     infinite-scroll="vm.addMoreEvents()" 
-     infinite-scroll-distance="0"
-     infinite-scroll-disabled="vm.isEventsLoading || !vm.isScrollingEnabled">
+<div class="event-list-item-container" infinite-scroll="vm.addMoreEvents()" infinite-scroll-distance="1"
+    infinite-scroll-disabled="vm.isEventsLoading || !vm.isScrollingEnabled">
     <!-- events list item -->
     <ul class="event-list-items">
-        <li class="event-list-item" ng-repeat="event in vm.eventsList | limitTo: vm.itemsDisplayedInList track by event.id">
+        <li class="event-list-item"
+            ng-repeat="event in vm.eventsList | limitTo: vm.itemsDisplayedInList track by event.id">
             <div id="{{event.id}}" class="event-list-item-inner-container">
                 <!-- title -->
                 <div class="col-xs-12">
                     <span class="glyphicon glyphicon-bookmark event-bookmark-icon" ng-if="event.isPinned">
                     </span>
-                    <a class="event-item-title" 
-                       title="{{:: event.name}}" 
-                       ui-sref="Root.WithOrg.Client.Events.EventContent({id:{{'event.id'}}})"
-                       data-test-id="event-list-item-title">
+                    <a class="event-item-title" title="{{:: event.name}}"
+                        ui-sref="Root.WithOrg.Client.Events.EventContent({id:{{'event.id'}}})"
+                        data-test-id="event-list-item-title">
                         {{:: event.name}}
                     </a>
                 </div>
                 <!-- office/location -->
                 <div class="col-xs-12">
                     <p class="event-list-item-place" data-test-id="event-list-item-place" ng-cloak>
-                        <span ng-if="event.officesName.length == vm.offices.length-1">{{ :: "events.eventOfficeAll" | translate }}</span>
-                        <span ng-if="event.officesName.length != vm.offices.length-1 && event.officesName" ng-repeat="officeName in event.officesName">{{:: officeName}}{{$last ? '' : ', '}}</span>
-                        <span ng-if="!event.officesName">{{ :: "events.eventOutside" | translate }} </span>({{:: event.place}})
+                        <span
+                            ng-if="event.officesName.length == vm.offices.length-1">{{ :: "events.eventOfficeAll" | translate }}</span>
+                        <span ng-if="event.officesName.length != vm.offices.length-1 && event.officesName"
+                            ng-repeat="officeName in event.officesName">{{:: officeName}}{{$last ? '' : ', '}}</span>
+                        <span ng-if="!event.officesName">{{ :: "events.eventOutside" | translate }}
+                        </span>({{:: event.place}})
                     </p>
                 </div>
                 <!-- date/time -->
@@ -33,13 +34,11 @@
                 </div>
                 <!-- image -->
                 <div class="col-xs-12 no-padding">
-                    <a class="event-loading-image-placeholder" 
-                       ui-sref="Root.WithOrg.Client.Events.EventContent({id:{{'event.id'}}})" 
-                       data-test-id="event-list-item-image">
-                        <img class="event-list-image"
-                             alt="{{:: event.name}}"
-                             title="{{:: event.name}}"
-                             ng-src="{{event.imageName | imageThumb:{w:291,h:165}:'crop'}}" image-loading>
+                    <a class="event-loading-image-placeholder"
+                        ui-sref="Root.WithOrg.Client.Events.EventContent({id:{{'event.id'}}})"
+                        data-test-id="event-list-item-image">
+                        <img class="event-list-image" alt="{{:: event.name}}" title="{{:: event.name}}"
+                            ng-src="{{event.imageName | imageThumb:{w:291,h:165}:'crop'}}" image-loading>
                     </a>
                     <ace-progress-bar value="event.participantsCount" max="event.maxParticipants" full-danger="true">
                     </ace-progress-bar>
@@ -53,12 +52,10 @@
     </ul>
 
     <div class="col-xs-12 nopadding">
-        <ace-list-alert ng-if="!vm.isEventsFound"
-                alert-msg="events.noEvents"
-                link-msg="{{'events.noEventsHere' | translate}}"
-                alert-type="info"
-                state="Root.WithOrg.Client.Events.AddEvents" ng-cloak translate-cloak>
-                </ace-list-alert>
+        <ace-list-alert ng-if="!vm.isEventsFound" alert-msg="events.noEvents"
+            link-msg="{{'events.noEventsHere' | translate}}" alert-type="info"
+            state="Root.WithOrg.Client.Events.AddEvents" ng-cloak translate-cloak>
+        </ace-list-alert>
     </div>
 </div>
 <wave-spinner ng-if="vm.isEventsLoading"></wave-spinner>
