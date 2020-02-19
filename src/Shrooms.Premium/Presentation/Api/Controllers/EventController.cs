@@ -485,7 +485,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             try
             {
-                _eventService.CheckIfEventExists(shareEventViewModel.EventId, GetUserAndOrganization().OrganizationId);
+                _eventService.CheckIfEventExists(shareEventViewModel.EventsId, GetUserAndOrganization().OrganizationId);
             }
             catch (EventException e)
             {

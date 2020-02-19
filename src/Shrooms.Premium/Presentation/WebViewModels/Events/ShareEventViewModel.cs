@@ -13,6 +13,6 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
         public int WallId { get; set; }
 
         [Required]
-        public string EventId { get; set; }
+        public string EventsId { get; set; }
     }
 }

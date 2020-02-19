@@ -22,7 +22,7 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
         private void CreateViewModelToDtoMappings()
         {
             CreateMap<ShareEventViewModel, NewPostDTO>()
-                .ForMember(dest => dest.SharedEventId, opt => opt.MapFrom(u => u.EventId));
+                .ForMember(dest => dest.SharedEventId, opt => opt.MapFrom(u => u.EventsId));
         }
     }
 }
