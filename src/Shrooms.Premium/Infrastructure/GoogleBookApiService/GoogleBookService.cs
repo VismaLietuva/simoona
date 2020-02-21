@@ -9,33 +9,36 @@ namespace Shrooms.Premium.Infrastructure.GoogleBookApiService
 {
     public class GoogleBookService : IBookInfoService
     {
-        public async Task<ExternalBookInfo> FindBookByIsbnAsync(string isbn)
-        {
-            var query = $"isbn={isbn}";
-            return await RequestBookAsync(query);
-        }
+        private BooksService _service;
 
-        private async Task<ExternalBookInfo> RequestBookAsync(string query)
+        public GoogleBookService()
         {
-            var service = new BooksService(new BaseClientService.Initializer
+            _service = new BooksService(new BaseClientService.Initializer
             {
                 ApiKey = ConfigurationManager.AppSettings["GoogleAccountApiKey"]
             });
+        }
 
-            var result = await service.Volumes.List(query).ExecuteAsync();
+        public async Task<ExternalBookInfo> FindBookByIsbnAsync(string isbn)
+        {
+            var query = $"isbn:{isbn}";
+
+            var result = await _service.Volumes.List(query).ExecuteAsync();
             if (result.Items == null)
             {
                 return null;
             }
 
             var volume = result.Items.First().VolumeInfo;
-            return new ExternalBookInfo
+            var bookInfo = new ExternalBookInfo
             {
                 Author = volume.Authors == null ? "Authors not set" : string.Join(", ", volume.Authors),
                 Title = volume.Title,
                 Url = volume.InfoLink,
-                CoverImageUrl = volume.ImageLinks.Thumbnail.Replace("zoom=1", "zoom=3")
+                CoverImageUrl = volume.ImageLinks?.Thumbnail
             };
+
+            return bookInfo;
         }
     }
 }

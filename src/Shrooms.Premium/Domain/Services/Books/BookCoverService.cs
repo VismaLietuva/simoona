@@ -23,7 +23,6 @@ namespace Shrooms.Premium.Domain.Services.Books
             _logger = logger;
         }
 
-
         public void UpdateBookCovers()
         {
             var booksWithoutCover = _booksDbSet.Where(book => book.BookCoverUrl == null);
@@ -34,15 +33,13 @@ namespace Shrooms.Premium.Domain.Services.Books
                 {
                     var bookInfo = _bookService.FindBookByIsbnAsync(book.Code).Result;
 
-                    if (bookInfo != null)
+                    if (bookInfo?.CoverImageUrl == null)
                     {
-                        if (bookInfo.CoverImageUrl != null)
-                        {
-                            book.BookCoverUrl = bookInfo.CoverImageUrl;
-                        }
-
-                        _uow.SaveChanges();
+                        continue;
                     }
+
+                    book.BookCoverUrl = bookInfo.CoverImageUrl;
+                    _uow.SaveChanges();
                 }
                 catch (Exception ex)
                 {
