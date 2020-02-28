@@ -5,7 +5,7 @@
         <div ng-if="!!vm.event.options.length"
              class="event-participants-tabs"
              data-toggle="buttons">
-            <div class="btn event-options-tab" has-permissions="['EVENTUSERS_BASIC']"
+            <div class="btn event-options-tab"
                  ng-class="{active: vm.isActiveTab('OptionsList')}"
                  ng-click="vm.goToTab('OptionsList')"
                  title="{{'events.eventParticipantsOptions' | translate}}" translate-cloak>
@@ -34,7 +34,7 @@
     <div class="event-participants-container-actions" ng-if="!vm.isLoading && vm.isExportVisible()" has-permissions="['EVENTUSERS_BASIC']">
         <ace-event-participants-actions event="vm.event" is-admin="vm.isAdmin"></ace-event-participants-actions>
     </div>
-    <div class="event-participants-container-body" ng-if="!vm.isLoading" has-permissions="['EVENTUSERS_BASIC']">
+    <div class="event-participants-container-body" ng-if="!vm.isLoading">
         <div class="event-tab-content-show" ng-show="vm.isActiveTab('ParticipantsList')">
             <ace-event-join ng-if="vm.eventStatusService.getEventStatus(vm.event, true) === vm.eventStatus.Join"
                             event="vm.event"

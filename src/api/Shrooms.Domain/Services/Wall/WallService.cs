@@ -312,6 +312,7 @@ namespace Shrooms.Domain.Services.Wall
                     u.Wall.OrganizationId == userOrg.OrganizationId)
                 .Where(u => u.UserId != userOrg.UserId)
                 .Select(u => u.UserId)
+                .Distinct()
                 .ToList();
 
             return wallMembers;

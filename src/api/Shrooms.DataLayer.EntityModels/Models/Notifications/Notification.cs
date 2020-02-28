@@ -31,12 +31,12 @@ namespace Shrooms.DataLayer.EntityModels.Models.Notifications
             };
 
             notification.NotificationUsers = membersToNotify
-            .Select(x => new NotificationUser
-            {
-                IsAlreadySeen = false,
-                UserId = x
-            })
-            .ToList();
+                .Select(m => new NotificationUser
+                {
+                    IsAlreadySeen = false,
+                    UserId = m
+                })
+                .ToList();
 
             return notification;
         }

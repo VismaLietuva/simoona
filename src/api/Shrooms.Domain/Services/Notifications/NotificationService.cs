@@ -115,10 +115,8 @@ namespace Shrooms.Domain.Services.Notifications
 
         public async Task<NotificationDto> CreateForWall(UserAndOrganizationDTO userOrg, CreateWallDto wallDto, int wallId)
         {
-            int mainWallId = await _wallDbSet.Where(w => w.Type == WallType.Main).Select(s => s.Id).SingleAsync();
-
+            var mainWallId = await _wallDbSet.Where(w => w.Type == WallType.Main).Select(s => s.Id).SingleAsync();
             var membersToNotify = _wallService.GetWallMembersIds(mainWallId, userOrg);
-
             var newNotification = Notification.Create(wallDto.Name, wallDto.Description, wallDto.Logo, new Sources { WallId = wallId }, NotificationType.NewWall, userOrg.OrganizationId, membersToNotify);
 
             _notificationDbSet.Add(newNotification);
