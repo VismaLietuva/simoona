@@ -113,6 +113,8 @@ namespace Shrooms.Premium.Domain.Services.Events
                 .Select(MapToEventDetailsDto(id))
                 .SingleOrDefault();
 
+            _eventValidationService.CheckIfEventExists(@event);
+
             @event.Offices.OfficeNames = _officeDbSet
                 .Where(p => @event.Offices.Value.Contains(SqlFunctions.StringConvert((double)p.Id).Trim()))
                 .Select(p => p.Name)
@@ -128,9 +130,18 @@ namespace Shrooms.Premium.Domain.Services.Events
             var participating = @event.Participants.FirstOrDefault(p => p.UserId == userOrg.UserId);
             @event.ParticipatingStatus = participating?.AttendStatus ?? (int)AttendingStatus.Idle;
 
-            if (!_permissionService.UserHasPermission(userOrg, BasicPermissions.EventUsers))
+            // If user has permissions - show all participants, otherwise show only current user and his own event options
+            if (_permissionService.UserHasPermission(userOrg, BasicPermissions.EventUsers))
             {
-                @event.Participants = null;
+                return @event;
+            }
+
+            @event.Participants = @event.Participants.Where(p => p.UserId == userOrg.UserId).ToList();
+
+            var userEventOptions = @event.Options.Where(o => o.Participants.Any(p => p.UserId == userOrg.UserId));
+            foreach (var userEventOption in userEventOptions)
+            {
+                userEventOption.Participants = @event.Participants;
             }
 
             return @event;

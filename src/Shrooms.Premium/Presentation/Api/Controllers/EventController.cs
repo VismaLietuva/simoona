@@ -183,6 +183,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             var eventDTO = _mapper.Map<UpdateEventViewModel, EditEventDTO>(eventViewModel);
             eventDTO.Offices = new EventOfficesDTO { Value = JsonConvert.SerializeObject(eventViewModel.Offices.Select(p => p.ToString()).ToList()) };
             SetOrganizationAndUser(eventDTO);
+
             try
             {
                 _eventService.UpdateEvent(eventDTO);
