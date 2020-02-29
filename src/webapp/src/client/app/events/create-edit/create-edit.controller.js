@@ -167,6 +167,8 @@
                             vm.event.maxOptions = 1;
                             addOption();
                         }
+
+                        validateOfficeSelection();
                     },
                     function (error) {
                         errorHandler.handleErrorMessage(error);
