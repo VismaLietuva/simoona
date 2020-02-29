@@ -66,6 +66,7 @@
 
         $rootScope.pageTitle = vm.states.isAdd ? 'events.addTitle' : 'events.editTitle';
 
+        vm.isOfficeSelected = null;
         vm.eventOffices = [];
         vm.eventTypes = [];
         vm.event = {};
@@ -217,18 +218,28 @@
             } else {
                 vm.event.offices.push(office.id);
             }
+
+            validateOfficeSelection();
         }
 
-        function toggleAllOffices(turnedOn) {
-            if (vm.event.offices.length == vm.eventOffices.length && turnedOn) {
+        function toggleAllOffices() {
+            if (vm.event.offices.length == vm.eventOffices.length) {
                 vm.event.offices = [];
-            } else if (turnedOn) {
+            } else {
                 vm.event.offices = [];
                 angular.forEach(vm.eventOffices, function (office) {
                     vm.event.offices.push(office.id);
                 })
+            }
+
+            validateOfficeSelection();
+        }
+
+        function validateOfficeSelection() {
+            if (vm.event.offices.length < 1) {
+                vm.isOfficeSelected = false;
             } else {
-                vm.event.offices = [];
+                vm.isOfficeSelected = true;
             }
         }
 
@@ -286,8 +297,8 @@
         }
 
         function countOptions() {
-            return vm.isIgnoreSingleJoinEnabled && vm.selectedType.isSingleJoin ?
-                vm.event.options.length + 1 : vm.event.options.length;
+            return vm.isIgnoreSingleJoinEnabled && vm.selectedType &&
+                    vm.selectedType.isSingleJoin ? vm.event.options.length + 1 : vm.event.options.length;
         }
 
         function togglePin() {

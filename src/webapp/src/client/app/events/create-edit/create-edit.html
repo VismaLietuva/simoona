@@ -186,33 +186,29 @@
                         </div>
                     </div>
                     <!--event office-->
-                    <div class="form-group"
-                        ng-class="{'has-error': eventForm.officeId.$invalid && eventForm.officeId.$dirty}">
-                        <label for="officeId" class="control-label col-xs-12 col-sm-4" translate="events.eventOffices"></label>
+                    <div class="form-group required"
+                        ng-class="{'has-error': vm.isOfficeSelected != null && !vm.isOfficeSelected}">
+                        <label for="offices" class="control-label col-xs-12 col-sm-4" translate="events.eventOffices"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
                             <div class="checkbox">
-                                <label><input type="checkbox" ng-model="outsideOffice"
-                                        ng-click="vm.toggleAllOffices(false)">
-                                    <span translate="events.eventOutside"></span>
-                                </label>
-                            </div>
-                            <div class="checkbox">
-                                <label><input type="checkbox" ng-disabled="outsideOffice"
+                                <label><input type="checkbox"
+                                        id="allOfficesChk"
                                         ng-checked="vm.event.offices.length == vm.eventOffices.length"
-                                        ng-click="vm.toggleAllOffices(true)">
+                                        ng-click="vm.toggleAllOffices()">
                                     <span translate="events.eventOfficeAll"></span>
                                 </label>
                             </div>
                             <div class="event-office-list-item-seperator">&nbsp;</div>
                             <div class="checkbox event-office-list-item" ng-repeat="office in vm.eventOffices">
-                                <label><input type="checkbox" ng-disabled="outsideOffice"
+                                <label><input type="checkbox"
+                                        id="officeChk_{{office.id}}"
                                         ng-checked="vm.event.offices.indexOf(office.id) != -1"
                                         ng-click="vm.toggleOfficeSelection(office)">{{office.name}}
                                 </label>
                             </div>
 
                             <p class="text-danger help-block"
-                                ng-if="eventForm.officeId.$invalid && eventForm.officeId.$dirty"
+                                ng-if="vm.isOfficeSelected != null && !vm.isOfficeSelected"
                                 translate="common.messageFieldIsRequired"></p>
                         </div>
                     </div>
@@ -417,17 +413,22 @@
                         <button class="btn btn-primary" ng-if="vm.states.isAdd"
                             ng-click="vm.saveEvent(vm.createEvent, vm.eventImage)" ng-disabled="eventForm.$invalid ||  !vm.eventImage || !vm.responsibleUser.id ||
                                          !vm.isEndDateValid() || vm.isDeadlineDateValid() || !vm.isStartDateValid() ||
+                                         !vm.isOfficeSelected ||
                                          !vm.isOptionsUnique() || !vm.eventCroppedImage || (vm.countOptions() < 2 && vm.isOptions)"
                             data-test-id="event-form-save-button">
                             <span translate="common.save"></span>
                         </button>
                         <button class="btn btn-primary" ng-if="vm.states.isEdit"
                             ng-click="vm.saveEvent(vm.updateEvent, vm.eventImage)" ng-disabled="eventForm.$invalid || !vm.responsibleUser.id || !vm.isEndDateValid() ||
-                                         vm.isDeadlineDateValid() || !vm.isOptionsUnique()"
+                                         vm.isDeadlineDateValid() || !vm.isOptionsUnique() || !vm.isOfficeSelected"
                             data-test-id="event-form-update-button">
                             <span translate="common.update"></span>
                         </button>
-                        <button class="btn btn-default" ui-sref="Root.WithOrg.Client.Events.EventContent({id: vm.event.id})"
+                        <button ng-if="!vm.event.id" class="btn btn-default" ui-sref="Root.WithOrg.Client.Events.List.Type"
+                            data-test-id="event-form-cancel-button">
+                            <span translate="common.cancel"></span>
+                        </button>
+                        <button ng-if="vm.event.id" class="btn btn-default" ui-sref="Root.WithOrg.Client.Events.EventContent({id: vm.event.id})"
                             data-test-id="event-form-cancel-button">
                             <span translate="common.cancel"></span>
                         </button>
