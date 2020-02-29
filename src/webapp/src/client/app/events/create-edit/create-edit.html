@@ -197,6 +197,10 @@
                                         ng-click="vm.toggleAllOffices()">
                                     <span translate="events.eventOfficeAll"></span>
                                 </label>
+                                <span class="glyphicon glyphicon-info-sign"
+                                    uib-tooltip-template="'targetOfficeTooltipTemplate.html'" tooltip-placement="right"
+                                    tooltip-append-to-body="true" tooltip-class="service-request-status-tooltip"
+                                    style="font-size: 16px; color: #006fb0;"></span>
                             </div>
                             <div class="event-office-list-item-seperator">&nbsp;</div>
                             <div class="checkbox event-office-list-item" ng-repeat="office in vm.eventOffices">
@@ -313,7 +317,7 @@
                             <label for="ignoreOption" class="label-word-break">
                                 {{'events.ignoreSingleJoinSelect' | translate}}
                                 <span class="glyphicon glyphicon-info-sign"
-                                    uib-tooltip-template="'tooltipTemplate.html'" tooltip-placement="right"
+                                    uib-tooltip-template="'singleJoinTooltipTemplate.html'" tooltip-placement="right"
                                     tooltip-append-to-body="true" tooltip-class="service-request-status-tooltip"
                                     style="font-size: 16px; color: #006fb0;"></span>
                             </label>
@@ -439,9 +443,15 @@
     </div>
 </div>
 
-<script type="text/ng-template" id="tooltipTemplate.html">
+<script type="text/ng-template" id="singleJoinTooltipTemplate.html">
     <div>
         <p>{{'events.ignoreSingleJoinTooltipParagraphOne' | translate}}</p>
         <p>{{'events.ignoreSingleJoinTooltipParagraphTwo' | translate}}</p>
+    </div>
+</script>
+
+<script type="text/ng-template" id="targetOfficeTooltipTemplate.html">
+    <div>
+        <p>{{'events.targetOfficeTooltipParagraphOne' | translate}}</p>
     </div>
 </script>

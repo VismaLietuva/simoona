@@ -189,6 +189,7 @@
   "ignoreSingleJoinOtionLabel": "Option for spectators",
   "ignoreSingleJoinTooltipParagraphOne": "This feature is present for event types which allow joining once a week.",
   "ignoreSingleJoinTooltipParagraphTwo": "This choice will enable an option for users to join as spectators without any benefits of this event, e.g., food.",
+  "targetOfficeTooltipParagraphOne": "This choice should say people from which office(s) is the main audience for the event, it's not a physical location. If it's common event, then the option should be - 'All Offices'.",
   "twoOptionsRequired": "At least two options are required",
   "changedEventOptions": "You have successfully changed options",
   "pastWeek": "Past week",

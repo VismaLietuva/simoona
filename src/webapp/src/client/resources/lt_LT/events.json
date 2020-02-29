@@ -189,6 +189,7 @@
   "ignoreSingleJoinOtionLabel": "Pasirinkimas stebėtojui",
   "ignoreSingleJoinTooltipParagraphOne": "Šis funkcionalumas skirtas renginių tipams, kuriuose leidžiama dalyvauti kartą per savaitę.",
   "ignoreSingleJoinTooltipParagraphTwo": "Tai suteiks vartotojams galimybę prisijungti kaip stebėtojams be jokių šio renginio privalumų, pavyzdžiui, maisto.",
+  "targetOfficeTooltipParagraphOne": "Šis pasirinkimas nusako žmonėms iš kurio ofiso yra skirtas renginis, tai nėra fizinė lokacija. Jei renginys yra bendras ir skirtas visiems, tuomet reikia rinktis - 'Visi ofisai'.",
   "twoOptionsRequired": "Bent du pasirinkimo variantai yra būtini",
   "changedEventOptions": "Sėkmingai pakeitėte renginio pasirinkimo variantus",
   "pastWeek": "Praeita savaitė",
