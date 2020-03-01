@@ -49,9 +49,9 @@
                     <b><span ng-if="vm.event.officesName.length < 2" translate="events.eventOffice"></span>
                         <span ng-if="vm.event.officesName.length > 1" translate="events.eventOffices"></span>
                         :</b>
-                    <span data-test-id="event-office" ng-cloak ng-if="vm.event.officesName" ng-repeat="officeName in vm.event.officesName">
+                    <span data-test-id="event-office" ng-cloak ng-if="!vm.event.isForAllOffices && vm.event.officesName" ng-repeat="officeName in vm.event.officesName">
                         {{officeName}}{{$last ? '' :', '}}</span>
-                    <span data-test-id="event-office" ng-cloak ng-if="!vm.event.officesName.length">{{"events.eventOutside" | translate}}</span>
+                    <span data-test-id="event-office" ng-cloak ng-if="vm.event.isForAllOffices || !vm.event.officesName.length">{{"events.eventForOfficeAll" | translate}}</span>
                 </div>
                 <div class="col-xs-12">
                     <span class="glyphicon glyphicon-map-marker"></span>

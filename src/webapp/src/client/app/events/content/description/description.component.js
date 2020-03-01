@@ -26,7 +26,7 @@
         };
 
         vm.hasDatePassed = hasDatePassed;
-        
+
         ////////
 
         function hasDatePassed(date) {
