@@ -19,6 +19,8 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
 
         public IEnumerable<string> OfficesName { get; set; }
 
+        public bool IsForAllOffices { get; set; }
+
         public bool IsPinned { get; set; }
 
         public string Location { get; set; }

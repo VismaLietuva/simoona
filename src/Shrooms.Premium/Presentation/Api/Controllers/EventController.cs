@@ -341,6 +341,10 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             {
                 var eventDto = _eventService.GetEventDetails(eventId, GetUserAndOrganization());
                 var result = _mapper.Map<EventDetailsDTO, EventDetailsViewModel>(eventDto);
+
+                var officesCount = _officeMapService.GetOffices().Count();
+                result.IsForAllOffices = result.OfficesName.Count() == officesCount;
+
                 return Ok(result);
             }
             catch (EventException e)
