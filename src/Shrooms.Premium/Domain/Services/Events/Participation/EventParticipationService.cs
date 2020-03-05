@@ -158,6 +158,48 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             }
         }
 
+        public void QueueUp(EventQueueDTO queueDto)
+        {
+            var @event = _eventsDbSet
+                    .Include(x => x.EventParticipants)
+                    .Include(x => x.EventOptions)
+                    .Include(x => x.EventType)
+                    .Where(x => x.Id == queueDto.EventId
+                                && x.OrganizationId == queueDto.OrganizationId)
+                    .Select(MapEventToJoinValidationDto)
+                    .FirstOrDefault();
+
+            _eventValidationService.CheckIfEventExists(@event);
+
+            @event.SelectedOptions = @event.Options
+                .Where(option => queueDto.ChosenOptions.Contains(option.Id))
+                .ToList();
+
+            _eventValidationService.CheckIfRegistrationDeadlineIsExpired(@event.RegistrationDeadline);
+            _eventValidationService.CheckIfProvidedOptionsAreValid(queueDto.ChosenOptions, @event.SelectedOptions);
+            _eventValidationService.CheckIfJoiningNotEnoughChoicesProvided(@event.MaxChoices, queueDto.ChosenOptions.Count());
+            _eventValidationService.CheckIfJoiningTooManyChoicesProvided(@event.MaxChoices, queueDto.ChosenOptions.Count());
+            _eventValidationService.CheckIfSingleChoiceSelectedWithRule(@event.SelectedOptions, OptionRules.IgnoreSingleJoin);
+
+            foreach (var userId in queueDto.ParticipantIds)
+            {
+                var userExists = _usersDbSet
+                    .Any(x => x.Id == userId
+                              && x.OrganizationId == queueDto.OrganizationId);
+                _eventValidationService.CheckIfUserExists(userExists);
+
+                var alreadyParticipates = @event.Participants.Any(p => p == userId);
+                _eventValidationService.CheckIfUserAlreadyJoinedSameEvent(alreadyParticipates);
+
+                ValidateSingleJoin(@event, queueDto.OrganizationId, userId);
+                AddParticipantWithStatus(userId, (int)AttendingStatus.QueueUp, string.Empty, @event);
+
+                JoinLeaveEventWall(@event.ResponsibleUserId, userId, @event.WallId, queueDto);
+            }
+
+            _uow.SaveChanges(false);
+        }
+
         public void UpdateAttendStatus(UpdateAttendStatusDTO updateAttendStatusDTO)
         {
             var @event = _eventsDbSet
@@ -276,6 +318,8 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             JoinLeaveEventWall(participant.Event.ResponsibleUserId, userOrg.UserId, participant.Event.WallId, userOrg);
 
             RemoveParticipant(userOrg.UserId, participant);
+
+            AddIfExistsQueuedUser(participant.Event);
         }
 
         public IEnumerable<EventParticipantDTO> GetEventParticipants(Guid eventId, UserAndOrganizationDTO userAndOrg)
@@ -503,5 +547,17 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 _eventParticipantsDbSet.Add(newParticipant);
             }
         }
+
+        private void AddIfExistsQueuedUser(Event @event)
+        {
+            var queuedParticipant = GetIfExistsQueuedParticipant(@event);
+
+            if (queuedParticipant != null)
+            {
+                queuedParticipant.AttendStatus = (int)AttendingStatus.Attending;
+            }
+        }
+
+        private EventParticipant GetIfExistsQueuedParticipant(Event @event) => @event.EventParticipants.OrderByDescending(p => p.Created).FirstOrDefault(p => p.AttendStatus == (int)AttendingStatus.QueueUp);
     }
 }
