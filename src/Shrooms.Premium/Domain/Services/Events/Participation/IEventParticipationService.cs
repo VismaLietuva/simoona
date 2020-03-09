@@ -11,6 +11,8 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
         void Join(EventJoinDTO joinDto, bool addedByColleague = false);
 
+        void QueueUp(EventQueueDTO queueDTO);
+
         void UpdateAttendStatus(UpdateAttendStatusDTO updateAttendStatusDTO);
 
         void DeleteByEvent(Guid eventId, string userId);

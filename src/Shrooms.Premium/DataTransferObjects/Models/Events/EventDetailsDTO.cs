@@ -28,5 +28,6 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
         public int GoingCount { get; set; }
         public int MaybeGoingCount { get; set; }
         public int NotGoingCount { get; set; }
+        public int QueuedCount { get; set; }
     }
 }

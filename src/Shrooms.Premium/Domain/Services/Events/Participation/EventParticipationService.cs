@@ -555,6 +555,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             if (queuedParticipant != null)
             {
                 queuedParticipant.AttendStatus = (int)AttendingStatus.Attending;
+                _uow.SaveChanges();
             }
         }
 

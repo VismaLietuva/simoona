@@ -126,6 +126,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             @event.GoingCount = @event.Participants.Count(p => p.AttendStatus == (int)AttendingStatus.Attending);
             @event.MaybeGoingCount = @event.Participants.Count(p => p.AttendStatus == (int)AttendingStatus.MaybeAttending);
             @event.NotGoingCount = @event.Participants.Count(p => p.AttendStatus == (int)AttendingStatus.NotAttending);
+            @event.QueuedCount = @event.Participants.Count(p => p.AttendStatus == (int)AttendingStatus.QueueUp);
 
             var participating = @event.Participants.FirstOrDefault(p => p.UserId == userOrg.UserId);
             @event.ParticipatingStatus = participating?.AttendStatus ?? (int)AttendingStatus.Idle;

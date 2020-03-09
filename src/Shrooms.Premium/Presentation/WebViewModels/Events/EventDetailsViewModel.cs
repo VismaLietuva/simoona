@@ -50,5 +50,6 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
         public int GoingCount { get; set; }
         public int MaybeGoingCount { get; set; }
         public int NotGoingCount { get; set; }
+        public int QueuedCount { get; set; }
     }
 }

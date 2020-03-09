@@ -310,6 +310,31 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         }
 
         [HttpPost]
+        [Route("Queue")]
+        [PermissionAuthorize(Permission = BasicPermissions.Event)]
+        public IHttpActionResult Queue(EventQueueViewModel queueOptions)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var optionsDto = _mapper.Map<EventQueueViewModel, EventQueueDTO>(queueOptions);
+            SetOrganizationAndUser(optionsDto);
+            optionsDto.ParticipantIds = new List<string>() { optionsDto.UserId };
+
+            try
+            {
+                _eventParticipationService.QueueUp(optionsDto);
+                return Ok();
+            }
+            catch (EventException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPost]
         [Route("UpdateAttendStatus")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
         public IHttpActionResult UpdateAttendStatus(UpdateAttendStatusViewModel updateStatusViewModel)

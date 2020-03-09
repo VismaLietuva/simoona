@@ -322,6 +322,7 @@
     <Compile Include="DataTransferObjects\Models\Events\EventOptionDTO.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventOptionsDTO.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventParticipantDTO.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\EventQueueDTO.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventTypeDTO.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventUserSearchResultDTO.cs" />
     <Compile Include="DataTransferObjects\Models\Events\MyEventsOptionsDTO.cs" />
@@ -529,6 +530,7 @@
     <Compile Include="Presentation\WebViewModels\Events\EventOfficeViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventOptionsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventOptionViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\EventQueueViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventTypeViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\MyEventsOptionsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\NewEventOptionViewModel.cs" />
