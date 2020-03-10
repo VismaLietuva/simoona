@@ -66,6 +66,8 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
             CreateMap<UpdateAttendStatusViewModel, UpdateAttendStatusDTO>()
                 .IgnoreUserOrgDto();
 
+            CreateMap<EventQueueViewModel, EventQueueDTO>();
+
             CreateMap<CreateEventTypeViewModel, CreateEventTypeDTO>().IgnoreUserOrgDto();
             CreateMap<UpdateEventTypeViewModel, UpdateEventTypeDTO>().IgnoreUserOrgDto();
         }
