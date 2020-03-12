@@ -25,6 +25,8 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
 
         public bool IsPinned { get; set; }
 
+        public bool IsQueueEnabled { get; set; }
+
         public string Location { get; set; }
 
         public string Description { get; set; }

@@ -24,5 +24,6 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
         public List<string> Participants { get; set; }
         public string ResponsibleUserId { get; set; }
         public int WallId { get; set; }
+        public bool IsQueueEnabled { get; set; }
     }
 }

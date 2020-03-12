@@ -12,6 +12,7 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
         void CheckIfEventExists(object eventToJoin);
         void CheckIfEventExists(EventParticipant participant);
         void CheckIfParticipantExists(object participant);
+        void CheckIfQueueEnabled(bool isQueueEnabled);
         void CheckIfTypeDoesNotExist(bool eventTypeExists);
         void CheckIfResponsibleUserNotExists(bool userExists);
         void CheckIfEventEndDateIsExpired(DateTime endDate);

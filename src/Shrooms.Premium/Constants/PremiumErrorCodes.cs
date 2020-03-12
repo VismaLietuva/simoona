@@ -33,6 +33,7 @@
         public const string EventWrongAttendStatus = "224";
         public const string EventUserNotParticipating = "225";
         public const string EventDateFilterRangeInvalid = "226";
+        public const string EventIsNotAvailableForQueueing = "227";
 
 
         // Service Request, 7**

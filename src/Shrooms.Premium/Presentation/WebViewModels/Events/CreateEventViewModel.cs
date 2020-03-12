@@ -34,6 +34,9 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
         public bool IsPinned { get; set; }
 
         [Required]
+        public bool IsQueueEnabled { get; set; }
+
+        [Required]
         [StringLength(EventsConstants.EventLocationMaxLength)]
         public string Location { get; set; }
 

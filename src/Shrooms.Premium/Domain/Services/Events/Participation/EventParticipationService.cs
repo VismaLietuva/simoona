@@ -180,6 +180,8 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             _eventValidationService.CheckIfJoiningNotEnoughChoicesProvided(@event.MaxChoices, queueDto.ChosenOptions.Count());
             _eventValidationService.CheckIfJoiningTooManyChoicesProvided(@event.MaxChoices, queueDto.ChosenOptions.Count());
             _eventValidationService.CheckIfSingleChoiceSelectedWithRule(@event.SelectedOptions, OptionRules.IgnoreSingleJoin);
+            _eventValidationService.CheckIfQueueEnabled(@event.IsQueueEnabled);
+
 
             foreach (var userId in queueDto.ParticipantIds)
             {
@@ -452,7 +454,8 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 Location = e.Place,
                 RegistrationDeadline = e.RegistrationDeadline,
                 ResponsibleUserId = e.ResponsibleUserId,
-                WallId = e.WallId
+                WallId = e.WallId,
+                IsQueueEnabled = e.IsQueueEnabled
             };
 
         private void ValidateSingleJoin(EventJoinValidationDTO validationDTO, int orgId, string userId)

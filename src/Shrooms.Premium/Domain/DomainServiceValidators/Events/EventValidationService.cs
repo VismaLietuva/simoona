@@ -45,6 +45,14 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             }
         }
 
+        public void CheckIfQueueEnabled(bool isQueueEnabled)
+        {
+            if (!isQueueEnabled)
+            {
+                throw new EventException(PremiumErrorCodes.EventIsNotAvailableForQueueing);
+            }
+        }
+
         public void CheckIfUserExistsInOtherSingleJoinEvent(bool anyEvents)
         {
             if (anyEvents)

@@ -378,7 +378,8 @@ namespace Shrooms.Premium.Domain.Services.Events
                 CreatedBy = newEventDto.UserId,
                 OrganizationId = newEventDto.OrganizationId,
                 OfficeIds = JsonConvert.DeserializeObject<string[]>(newEventDto.Offices.Value),
-                IsPinned = newEventDto.IsPinned
+                IsPinned = newEventDto.IsPinned,
+                IsQueueEnabled = newEventDto.IsQueueEnabled
             };
 
             var newWall = new CreateWallDto()
