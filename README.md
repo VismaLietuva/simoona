@@ -16,9 +16,9 @@ Open-source part is located in GitHub: https://github.com/VismaLietuva/simoona
 | External links                 | Office map        |
 | Birthdays widget               | Org structure     |
 | Employees list                 | Kudos loyalty bot |
-| Google authentication          | Kudos shop         |
-| Facebook authentication        | Books mobile app   |
-| Form-based authentication      | Committees         |
+| Form-based authentication      | Kudos shop         |
+|                                | Books mobile app   |
+|                                | Committees         |
 
 ## Structure
 
