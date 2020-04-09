@@ -10,16 +10,15 @@ Open-source part is located in GitHub: https://github.com/VismaLietuva/simoona
 
 |Freemium (Open-source) features |Premium features|
 |--------------------------------|----------------|
-| Wall                           | Events         |
+| Walls                          | Events         |
 | Projects                       | Books          |
-| Kudos                          | Service requests |
-| External links                 | Office map       |
-| Birthdays widget               | Org structure    |
-| Employees list                 | Integration with google calendar |
-| Form-based authentication      | Kudos loyalty bot  |
-|                                | Kudos shop         |
-|                                | Books mobile app   |
-|                                | Committees         |
+| Kudos                          | Service requests  |
+| External links                 | Office map        |
+| Birthdays widget               | Org structure     |
+| Employees list                 | Kudos loyalty bot |
+| Google authentication          | Kudos shop         |
+| Facebook authentication        | Books mobile app   |
+| Form-based authentication      | Committees         |
 
 ## Structure
 
