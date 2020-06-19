@@ -363,6 +363,11 @@ namespace Shrooms.Domain.Services.UserService
             return _usersDbSet.First(u => u.Id == id);
         }
 
+        public ApplicationUser GetApplicationUserOrDefault(string id)
+        {
+            return _usersDbSet.FirstOrDefault(u => u.Id == id);
+        }
+
         private void UnassignUserFromWalls(string userId, int tenantId)
         {
             var memberships = _wallMembersDbSet

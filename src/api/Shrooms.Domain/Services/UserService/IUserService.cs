@@ -33,5 +33,6 @@ namespace Shrooms.Domain.Services.UserService
         void RemoveLogin(string id, UserLoginInfo loginInfo);
 
         ApplicationUser GetApplicationUser(string id);
+        ApplicationUser GetApplicationUserOrDefault(string id);
     }
 }
