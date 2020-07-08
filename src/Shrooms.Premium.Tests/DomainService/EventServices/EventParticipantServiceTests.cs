@@ -277,7 +277,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         [Test]
         public void Should_Not_Throw_If_Participant_Exists()
         {
-            EventParticipant participant = new EventParticipant();
+            var participant = new EventParticipant();
             Assert.DoesNotThrow(() => _eventValidationService.CheckIfParticipantExists(participant));
         }
 

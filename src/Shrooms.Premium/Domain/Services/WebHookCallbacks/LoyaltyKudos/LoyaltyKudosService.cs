@@ -69,13 +69,15 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.LoyaltyKudos
 
                 var loyaltyKudosLog = (from u in _usersDbSet
                                        where u.OrganizationId == organization.Id && u.EmploymentDate.HasValue
-                                       join kl in _kudosLogsDbSet on u.Id equals kl.EmployeeId into klx
+                                       join kl in _kudosLogsDbSet
+                                           on new { employeeId = u.Id, orgId = organization.Id, Status = KudosStatus.Approved, KudosTypeName = LoyaltyKudosTypeName }
+                                           equals new { employeeId = kl.EmployeeId, orgId = kl.OrganizationId, kl.Status, kl.KudosTypeName }
+                                           into klx
                                        from kl in klx.DefaultIfEmpty()
-                                       where kl == null || (kl.OrganizationId == organization.Id && kl.Status == KudosStatus.Approved && kl.KudosTypeName == LoyaltyKudosTypeName)
                                        select new
                                        {
                                            Employee = u,
-                                           KudosAddedDate = kl != null ? (DateTime?)(kl.Created) : null
+                                           KudosAddedDate = kl == null ? (DateTime?)null : kl.Created
                                        }).ToList();
 
                 var employeesReceivedLoyaltyKudos = loyaltyKudosLog

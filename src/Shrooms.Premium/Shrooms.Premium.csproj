@@ -251,7 +251,7 @@
     <Reference Include="WebApi.OutputCache.V2, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\open-source\src\api\packages\Strathweb.CacheOutput.WebApi2.0.10.0\lib\net45\WebApi.OutputCache.V2.dll</HintPath>
       <Private>False</Private>
-    </Reference> 
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants\EmailPremiumTemplateCacheKeys.cs" />
