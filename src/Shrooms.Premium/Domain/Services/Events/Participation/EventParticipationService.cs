@@ -321,7 +321,8 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
             RemoveParticipant(userOrg.UserId, participant);
 
-            AddIfExistsQueuedUser(participant.Event);
+            var @event = _eventsDbSet.Include(p => p.EventParticipants).Where(p => p.Id == eventId).FirstOrDefault();
+            AddIfExistsQueuedUser(@event);
         }
 
         public IEnumerable<EventParticipantDTO> GetEventParticipants(Guid eventId, UserAndOrganizationDTO userAndOrg)
