@@ -1,7 +1,6 @@
 <form name="commentForm">
 
     <div class="comment-input-emoji-container">
-
         <textarea class="form-control comment-input-text"
               ng-model="vm.commentForm.messageBody"
               ng-maxlength="vm.maxLength"
@@ -10,6 +9,7 @@
               msd-elastic
               type="text"
               ng-click="vm.showSubmit()"
+              ng-change="vm.onSearch()"
               translate-attr-placeholder="wall.addComment"
               data-test-id="add-comment-text-field" translate>
         </textarea>
@@ -20,6 +20,11 @@
             placement="top"
             output-format="alias"
             on-change-func="vm.emojiText"></span>
+        </div>
+
+        <div ng-show="vm.isSearchingEmployee">
+            <select ng-options="item.firstName + ' ' + item.lastName for item in vm.employeeList" ng-model="vm.selected" ng-change="vm.hasChanged()">
+            </select>
         </div>
     </div>
 

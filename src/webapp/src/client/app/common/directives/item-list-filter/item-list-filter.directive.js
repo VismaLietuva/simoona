@@ -29,7 +29,6 @@
     function itemListFilterController() {
         /* jshint validthis: true */
         var vm = this;
-
         vm.filterValue = vm.filterValue || '';
         vm.executeFilter = executeFilter;
         vm.filterInputReset = filterInputReset;
@@ -37,7 +36,7 @@
         ////////////
 
         function executeFilter() {
-            vm.onFiltering(vm.filterValue);
+                vm.onFiltering(vm.filterValue);
         }
 
         function filterInputReset() {

@@ -26,25 +26,34 @@
         'wallService',
         'errorHandler',
         'notifySrv',
-        'dataHandler'
+        'dataHandler',
+        'employeeListRepository'
     ];
 
     function wallPostCommentCreateController($scope, $element, imageValidationSettings, shroomsFileUploader,
-        pictureRepository, wallImageConfig, wallCommentRepository, wallSettings, wallService, errorHandler, notifySrv, dataHandler) {
+        pictureRepository, wallImageConfig, wallCommentRepository, wallSettings, wallService, errorHandler, notifySrv, dataHandler, employeeListRepository) {
         /*jshint validthis: true */
         var vm = this;
 
+        vm.searchPosition = 0;
+        vm.onSearch = onSearch;
+        vm.getEmployeeList = getEmployeeList;
+        vm.hasChanged = hasChanged;
+        vm.employeeList = [];
         vm.showSubmit = showSubmit;
         vm.attachImage = attachImage;
         vm.submitComment = submitComment;
         vm.isSubmittable = isSubmittable;
         vm.handleFormSubmit = handleFormSubmit;
         vm.handleErrorMessage = handleErrorMessage;
+        vm.employeeListRepository = employeeListRepository;
+        $scope.pagedEmployeeList = {};
 
         vm.commentForm = {};
         vm.attachedFiles = [];
         vm.isFormEnabled = true;
         vm.showSubmitButton = false;
+        vm.isSearchingEmployee = false;
         vm.maxLength = wallSettings.postMaxLength;
         vm.thumbHeight = wallImageConfig.thumbHeight;
 
@@ -145,6 +154,40 @@
                 notifySrv.error('wall.imageInvalidType');
             }
             $scope.$apply();
+        }
+
+        function onSearch () {
+
+            if (vm.commentForm.messageBody[vm.commentForm.messageBody.length - 1] === '@') {
+                vm.isSearchingEmployee = true;
+                vm.searchPosition = vm.commentForm.messageBody.length;
+            }
+
+            if (vm.isSearchingEmployee) {
+                $scope.filter = {
+                    page: 1,
+                    search: vm.commentForm.messageBody.substr(vm.searchPosition)
+                };
+                vm.getEmployeeList();
+            }
+        };
+
+        function getEmployeeList () {
+            employeeListRepository.getPaged($scope.filter).then(function (getPagedResponse) {
+                vm.employeeList = getPagedResponse.pagedList;
+
+                console.log(vm.employeeList);
+                if (vm.employeeList.length > 1) {
+                    vm.selected = vm.employeeList[0];
+                }
+            });
+        };
+
+        function hasChanged() {
+            if (vm.selected) {
+                vm.commentForm.messageBody += vm.selected.firstName + ' ' + vm.selected.lastName + ' ';
+                vm.isSearchingEmployee = false;
+            }
         }
     }
 }());
