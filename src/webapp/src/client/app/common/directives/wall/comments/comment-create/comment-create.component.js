@@ -7,7 +7,8 @@
             bindings: {
                 wallId: '=',
                 isWallModule: '=',
-                post: '='
+                post: '=',
+                employees: '='
             },
             templateUrl: 'app/common/directives/wall/comments/comment-create/comment-create.html',
             controller: wallPostCommentCreateController,
@@ -27,27 +28,19 @@
         'errorHandler',
         'notifySrv',
         'dataHandler',
-        'employeeListRepository'
-    ];
+        '$translate',
+        ];
 
     function wallPostCommentCreateController($scope, $element, imageValidationSettings, shroomsFileUploader,
-        pictureRepository, wallImageConfig, wallCommentRepository, wallSettings, wallService, errorHandler, notifySrv, dataHandler, employeeListRepository) {
+        pictureRepository, wallImageConfig, wallCommentRepository, wallSettings, wallService, errorHandler, notifySrv, dataHandler, translate) {
         /*jshint validthis: true */
         var vm = this;
-
-        vm.searchPosition = 0;
-        vm.onSearch = onSearch;
-        vm.getEmployeeList = getEmployeeList;
-        vm.hasChanged = hasChanged;
-        vm.employeeList = [];
         vm.showSubmit = showSubmit;
         vm.attachImage = attachImage;
         vm.submitComment = submitComment;
         vm.isSubmittable = isSubmittable;
         vm.handleFormSubmit = handleFormSubmit;
         vm.handleErrorMessage = handleErrorMessage;
-        vm.employeeListRepository = employeeListRepository;
-        $scope.pagedEmployeeList = {};
 
         vm.commentForm = {};
         vm.attachedFiles = [];
@@ -66,6 +59,8 @@
                 vm.showSubmitButton = true;
                 $element.find('textarea').focus();
             });
+
+            vm.addComment = translate.instant('wall.addComment');
         }
 
         function isSubmittable() {
@@ -154,40 +149,6 @@
                 notifySrv.error('wall.imageInvalidType');
             }
             $scope.$apply();
-        }
-
-        function onSearch () {
-
-            if (vm.commentForm.messageBody[vm.commentForm.messageBody.length - 1] === '@') {
-                vm.isSearchingEmployee = true;
-                vm.searchPosition = vm.commentForm.messageBody.length;
-            }
-
-            if (vm.isSearchingEmployee) {
-                $scope.filter = {
-                    page: 1,
-                    search: vm.commentForm.messageBody.substr(vm.searchPosition)
-                };
-                vm.getEmployeeList();
-            }
-        };
-
-        function getEmployeeList () {
-            employeeListRepository.getPaged($scope.filter).then(function (getPagedResponse) {
-                vm.employeeList = getPagedResponse.pagedList;
-
-                console.log(vm.employeeList);
-                if (vm.employeeList.length > 1) {
-                    vm.selected = vm.employeeList[0];
-                }
-            });
-        };
-
-        function hasChanged() {
-            if (vm.selected) {
-                vm.commentForm.messageBody += vm.selected.firstName + ' ' + vm.selected.lastName + ' ';
-                vm.isSearchingEmployee = false;
-            }
         }
     }
 }());
