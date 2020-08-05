@@ -54,6 +54,7 @@
     <Compile Include="EmailTemplateViewModels\KudosRejectedEmailTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\KudosSentEmailTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\NewCommentEmailTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\NewMentionTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\NewWallPostEmailTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\NotificationAboutNewUserEmailTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\ResetPasswordTemplateViewModel.cs" />

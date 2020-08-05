@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
@@ -33,5 +34,6 @@ namespace Shrooms.Domain.Services.UserService
         void RemoveLogin(string id, UserLoginInfo loginInfo);
 
         ApplicationUser GetApplicationUser(string id);
+        ApplicationUser GetApplicationUser(string firstName, string lastName);
     }
 }

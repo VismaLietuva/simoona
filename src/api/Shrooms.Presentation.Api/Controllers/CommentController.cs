@@ -63,6 +63,11 @@ namespace Shrooms.Presentation.Api.Controllers
                     notif.Notify(commentCreatedDto, userHubDto);
                 }, GetOrganizationName());
 
+                _asyncRunner.Run<NewMentionNotifier>(notif =>
+                {
+                    notif.NotifyNewMentionInComment(comment.PostId, commentDto.Mentions);
+                }, GetOrganizationName());
+
                 return Ok(new { commentCreatedDto.CommentId });
             }
             catch (ValidationException e)

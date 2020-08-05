@@ -418,6 +418,7 @@
   <ItemGroup>
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="BackgroundWorkers\NewCommentNotifier.cs" />
+    <Compile Include="BackgroundWorkers\NewMentionNotifier.cs" />
     <Compile Include="BackgroundWorkers\NewPostNotifier.cs" />
     <Compile Include="Filters\PermissionAnyOfAuthorizeAttribute.cs" />
     <Compile Include="GeneralCode\UnwantedTelemetryFilter.cs" />
@@ -589,6 +590,9 @@
   <ItemGroup>
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="EmailTemplates\Wall\NewMention.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

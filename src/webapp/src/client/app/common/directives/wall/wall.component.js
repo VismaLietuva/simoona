@@ -77,7 +77,7 @@
             }).then(function (getPagedResponse) {
                 vm.employees = getPagedResponse.pagedList.map(cur => {
                     return {
-                        label: `${cur.firstName} ${cur.lastName}`
+                        label: `${cur.firstName}_${cur.lastName}`
                     };
                 });
             });

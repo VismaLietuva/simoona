@@ -4,6 +4,7 @@ using Shrooms.Contracts.DataTransferObjects.Users;
 using Shrooms.Contracts.ViewModels.User;
 using Shrooms.Presentation.WebViewModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.User;
+using Shrooms.Presentation.WebViewModels.Models.Users;
 
 namespace Shrooms.Presentation.ModelMappings.Profiles
 {
@@ -49,6 +50,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
             CreateMap<UserViewModel, UserDto>()
                 .Ignore(x => x.UserName);
 
+            CreateMap<UserDetailsDto, MentionedUserViewModel>();
             CreateMap<TimeZoneDto, TimeZoneViewModel>();
             CreateMap<LanguageDto, LanguageViewModel>();
             CreateMap<WallNotificationsDto, WallNotificationsViewModel>();
@@ -62,6 +64,8 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
                 .IgnoreUserOrgDto();
 
             CreateMap<WallNotificationsViewModel, WallNotificationsDto>();
+
+            CreateMap<MentionedUserViewModel, UserDetailsDto>();
 
             CreateMap<UserNotificationsSettingsViewModel, UserNotificationsSettingsDto>();
         }

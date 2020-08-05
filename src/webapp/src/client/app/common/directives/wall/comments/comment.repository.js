@@ -26,7 +26,8 @@
             return $resource(commentUrl + 'Create').save({
                 postId: comment.postId,
                 messageBody: comment.messageBody,
-                pictureId: comment.pictureId
+                pictureId: comment.pictureId,
+                mentions: comment.mentions
             }).$promise;
         }
 

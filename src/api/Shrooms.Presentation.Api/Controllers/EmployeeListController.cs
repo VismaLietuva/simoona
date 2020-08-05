@@ -14,6 +14,7 @@ using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.Presentation.Api.Filters;
 using Shrooms.Presentation.WebViewModels.Models;
+using WebApi.OutputCache.V2;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
@@ -35,6 +36,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.EmployeeList)]
+        [CacheOutput(ServerTimeSpan = WebApiConstants.OneDay)]
         public PagedViewModel<EmployeeListViewModel> GetPaged(int page = 1, string filter = "", string search = "", string sortBy = "LastName", string sortOrder = "asc")
         {
             if (!string.IsNullOrEmpty(search))

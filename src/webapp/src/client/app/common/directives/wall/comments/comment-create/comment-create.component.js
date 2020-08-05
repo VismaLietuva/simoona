@@ -86,6 +86,7 @@
         function handleFormSubmit(pictureId) {
             vm.commentForm.postId = vm.post.id;
             vm.commentForm.pictureId = pictureId;
+            vm.commentForm.mentions = parseMentions(vm.commentForm.messageBody);
 
             wallCommentRepository.createComment(vm.commentForm).then(function() {
                 wallService.initWall(vm.isWallModule, vm.wallId);
@@ -149,6 +150,20 @@
                 notifySrv.error('wall.imageInvalidType');
             }
             $scope.$apply();
+        }
+
+        
+        function parseMentions (text) {
+            var pattern = /\B@[a-z0-9_-]+/gi;
+
+            return text.match(pattern).map(cur => {
+                cur = cur.replace('@', '')
+                         .replace('_', ' ');
+                return {
+                    firstName: cur.split(' ')[0],
+                    lastName: cur.split(' ')[1]
+                };
+            });
         }
     }
 }());

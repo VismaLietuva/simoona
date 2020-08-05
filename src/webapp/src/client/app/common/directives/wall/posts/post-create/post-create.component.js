@@ -7,7 +7,8 @@
             bindings: {
                 onCreatePost: '&',
                 wallType: '=',
-                isWallModule: '='
+                isWallModule: '=',
+                employees: '='
             },
             templateUrl: 'app/common/directives/wall/posts/post-create/post-create.html',
             controller: wallPostCreateController,
@@ -23,11 +24,12 @@
         'wallImageConfig',
         'wallSettings',
         'errorHandler',
-        'dataHandler'
+        'dataHandler',
+        '$translate'
     ];
 
     function wallPostCreateController($scope, imageValidationSettings, shroomsFileUploader,
-        notifySrv, pictureRepository, wallImageConfig, wallSettings, errorHandler, dataHandler) {
+        notifySrv, pictureRepository, wallImageConfig, wallSettings, errorHandler, dataHandler, translate) {
         /*jshint validthis: true */
         var vm = this;
 
@@ -44,7 +46,12 @@
         vm.maxLength = wallSettings.postMaxLength;
         vm.thumbHeight = wallImageConfig.thumbHeight;
 
+        init();
         //////////
+
+        function init() {
+            vm.startConversation = translate.instant('wall.startConversation');
+        }
 
         function isSubmittable() {
             if (!!vm.postForm.messageBody) {
@@ -68,7 +75,7 @@
 
         function handleFormSubmit(pictureId) {
             vm.postForm.pictureId = pictureId;
-
+            vm.postForm.mentions = parseMentions(vm.postForm.messageBody);
             vm.onCreatePost({ post: vm.postForm });
 
             clearPost();
@@ -132,6 +139,19 @@
                 notifySrv.error('wall.imageInvalidType');
             }
             $scope.$apply();
+        }
+
+        function parseMentions (text) {
+            var pattern = /\B@[a-z0-9_-]+/gi;
+
+            return text.match(pattern).map(cur => {
+                cur = cur.replace('@', '')
+                         .replace('_', ' ');
+                return {
+                    firstName: cur.split(' ')[0],
+                    lastName: cur.split(' ')[1]
+                };
+            });
         }
     }
 }());

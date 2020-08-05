@@ -22,6 +22,8 @@
 
         public bool EventWeeklyReminderEmailNotifications { get; set; }
 
+        public bool MentionEmailNotifications { get; set; }
+
         public virtual ApplicationUser ApplicationUser { get; set; }
     }
 }

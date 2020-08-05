@@ -107,6 +107,7 @@ namespace Shrooms.Domain.Services.UserService
             settings.MyPostsEmailNotifications = settingsDto.MyPostsEmailNotifications;
             settings.FollowingPostsAppNotifications = settingsDto.FollowingPostsAppNotifications;
             settings.FollowingPostsEmailNotifications = settingsDto.FollowingPostsEmailNotifications;
+            settings.MentionEmailNotifications = settingsDto.MentionEmailNotifications;
 
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
@@ -262,6 +263,7 @@ namespace Shrooms.Domain.Services.UserService
                 MyPostsEmailNotifications = settings?.MyPostsEmailNotifications ?? true,
                 FollowingPostsAppNotifications = settings?.FollowingPostsAppNotifications ?? true,
                 FollowingPostsEmailNotifications = settings?.FollowingPostsEmailNotifications ?? true,
+                MentionEmailNotifications = settings?.MentionEmailNotifications ?? true,
 
                 Walls = _wallMembersDbSet
                     .Include(x => x.Wall)
@@ -403,6 +405,11 @@ namespace Shrooms.Domain.Services.UserService
             user.RemainingKudos = 0;
             user.SpentKudos = 0;
             user.TotalKudos = 0;
+        }
+
+        public ApplicationUser GetApplicationUser(string firstName, string lastName)
+        {
+            return _usersDbSet.Include(x => x.NotificationsSettings).FirstOrDefault(p => p.FirstName == firstName && p.LastName == lastName);
         }
     }
 }

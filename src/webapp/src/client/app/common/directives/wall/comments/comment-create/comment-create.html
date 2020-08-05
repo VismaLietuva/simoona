@@ -10,8 +10,7 @@
               msd-elastic
               type="text"
               ng-click="vm.showSubmit()"
-              ng-change="vm.onSearch()"
-              mentio mentio-typed-text="typedTerm" 
+              mentio mentio-typed-text="typedTerm"
               mentio-items="vm.employees | filter:label:typedTerm"
               placeholder={{vm.addComment}}>
         </textarea>

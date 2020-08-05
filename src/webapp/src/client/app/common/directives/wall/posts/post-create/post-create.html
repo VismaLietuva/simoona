@@ -12,8 +12,9 @@
                 msd-elastic
                 type="text"
                 ng-click="vm.showSubmit()"
-                translate-attr-placeholder="wall.startConversation"
-                data-test-id="add-post-text-field" translate></textarea>
+                mentio mentio-typed-text="typedTerm"
+                mentio-items="vm.employees | filter:label:typedTerm"
+                placeholder={{vm.startConversation}}></textarea>
 
             <div class="emoji-picker-container">
                 <span class="emoji-picker-span"
