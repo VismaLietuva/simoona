@@ -90,7 +90,7 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
 
                     if (mentionedUser.NotificationsSettings.MentionEmailNotifications)
                     {
-                        var messageBody = _markdownConverter.ConvertToHtml(_postService.GetPostTitle(postId));
+                        var messageBody = _markdownConverter.ConvertToHtml(_postService.GetPostBody(postId));
                         var organization = _organizationService.GetOrganizationById(mentionedUser.OrganizationId);
 
                         var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
