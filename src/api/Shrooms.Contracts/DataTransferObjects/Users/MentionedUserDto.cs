@@ -1,6 +1,6 @@
 ﻿namespace Shrooms.Contracts.DataTransferObjects.Users
 {
-    public class UserDetailsDto
+    public class MentionedUserDto
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }

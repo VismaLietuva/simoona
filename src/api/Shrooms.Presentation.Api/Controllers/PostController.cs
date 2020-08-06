@@ -1,3 +1,4 @@
+using System.Linq.Dynamic;
 using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
@@ -91,11 +92,14 @@ namespace Shrooms.Presentation.Api.Controllers
                 {
                     notif.Notify(createdPost, userHubDto);
                 }, GetOrganizationName());
-
-                _asyncRunner.Run<NewMentionNotifier>(notif =>
+                
+                if (postModel.Mentions.Any())
                 {
-                    notif.NotifyNewMentionInPostTitle(createdPost.Id, createdPost.User.FullName, postModel.Mentions);
-                }, GetOrganizationName());
+                    _asyncRunner.Run<NewMentionNotifier>(notif =>
+                    {
+                        notif.NotifyNewMentionInPost(createdPost.Id, createdPost.User.FullName, postModel.Mentions);
+                    }, GetOrganizationName());
+                }
 
                 return Ok(_mapper.Map<WallPostViewModel>(createdPost));
             }

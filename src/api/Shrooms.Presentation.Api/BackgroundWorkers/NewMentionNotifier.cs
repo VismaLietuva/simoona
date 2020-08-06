@@ -39,40 +39,38 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
             _markdownConverter = markdownConverter;
         }
 
-        public void NotifyNewMentionInComment(int postId, IEnumerable<UserDetailsDto> usersToNotify)
+        public void NotifyNewMentionInComment(int postId, IEnumerable<MentionedUserDto> usersToNotify)
         {
             foreach (var userToNotify in usersToNotify)
             {
                 try
                 {
                     var mentionedUser = _userService.GetApplicationUser(userToNotify.FirstName, userToNotify.LastName);
+
                     if (!mentionedUser.NotificationsSettings.MentionEmailNotifications)
-                        continue;
+                    {
+                        var comment = _postService.GetPostLatestComment(postId);
 
-                    var comment = _postService.GetPostLatestComment(postId);
-                    var mentioningUser = comment.Author;
+                        var organization = _organizationService.GetOrganizationById(mentionedUser.OrganizationId);
 
-                    var organization = _organizationService.GetOrganizationById(mentionedUser.OrganizationId);
+                        var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
+                        var postUrl = _appSettings.WallPostUrl(organization.ShortName, postId);
 
-                    var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
-                    var postUrl = _appSettings.WallPostUrl(organization.ShortName, postId);
+                        var subject = $"You have been mentioned in the post";
+                        var messageBody = _markdownConverter.ConvertToHtml(comment.MessageBody);
 
-                    var subject = $"You have been mentioned in post";
-                    var messageBody = _markdownConverter.ConvertToHtml(comment.MessageBody);
+                        var newMentionTemplateViewModel = new NewMentionTemplateViewModel(
+                            mentionedUser.FullName,
+                            comment.Author.FullName,
+                            postUrl,
+                            userNotificationSettingsUrl,
+                            messageBody);
 
-                    var newMentionTemplateViewModel = new NewMentionTemplateViewModel
-                        (
-                        mentionedUser.FullName,
-                        mentioningUser.FullName,
-                        postUrl,
-                        userNotificationSettingsUrl,
-                        messageBody
-                       );
+                        var content = _mailTemplate.Generate(newMentionTemplateViewModel, EmailTemplateCacheKeys.NewMention);
 
-                    var content = _mailTemplate.Generate(newMentionTemplateViewModel, EmailTemplateCacheKeys.NewMention);
-
-                    var emailData = new EmailDto(mentionedUser.Email, subject, content);
-                    _mailingService.SendEmail(emailData);
+                        var emailData = new EmailDto(mentionedUser.Email, subject, content);
+                        _mailingService.SendEmail(emailData);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -82,36 +80,35 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
         }
 
 
-        public void NotifyNewMentionInPostTitle(int postId, string mentioningUser, IEnumerable<UserDetailsDto> usersToNotify)
+        public void NotifyNewMentionInPost(int postId, string mentioningUser, IEnumerable<MentionedUserDto> usersToNotify)
         {
             foreach (var userToNotify in usersToNotify)
             {
                 try
                 {
                     var mentionedUser = _userService.GetApplicationUser(userToNotify.FirstName, userToNotify.LastName);
-                    if (!mentionedUser.NotificationsSettings.MentionEmailNotifications)
-                        continue;
 
-                    var messageBody = _markdownConverter.ConvertToHtml(_postService.GetPostTitle(postId));
-                    var organization = _organizationService.GetOrganizationById(mentionedUser.OrganizationId);
+                    if (mentionedUser.NotificationsSettings.MentionEmailNotifications)
+                    {
+                        var messageBody = _markdownConverter.ConvertToHtml(_postService.GetPostTitle(postId));
+                        var organization = _organizationService.GetOrganizationById(mentionedUser.OrganizationId);
 
-                    var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
-                    var postUrl = _appSettings.WallPostUrl(organization.ShortName, postId);
-                    var subject = $"You have been mentioned in post";
+                        var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
+                        var postUrl = _appSettings.WallPostUrl(organization.ShortName, postId);
+                        var subject = $"You have been mentioned in the post";
 
-                    var newMentionTemplateViewModel = new NewMentionTemplateViewModel
-                        (
-                        mentionedUser.FullName,
-                        mentioningUser,
-                        postUrl,
-                        userNotificationSettingsUrl,
-                        messageBody
-                       );
+                        var newMentionTemplateViewModel = new NewMentionTemplateViewModel(
+                            mentionedUser.FullName,
+                            mentioningUser,
+                            postUrl,
+                            userNotificationSettingsUrl,
+                            messageBody);
 
-                    var content = _mailTemplate.Generate(newMentionTemplateViewModel, EmailTemplateCacheKeys.NewMention);
+                        var content = _mailTemplate.Generate(newMentionTemplateViewModel, EmailTemplateCacheKeys.NewMention);
 
-                    var emailData = new EmailDto(mentionedUser.Email, subject, content);
-                    _mailingService.SendEmail(emailData);
+                        var emailData = new EmailDto(mentionedUser.Email, subject, content);
+                        _mailingService.SendEmail(emailData);
+                    }
                 }
                 catch (Exception e)
                 {

@@ -145,7 +145,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
                 _uow.SaveChanges(editPostDto.UserId);
             }
         }
-        public string GetPostTitle(int postId)
+        public string GetPostBody(int postId)
         {
             return _postsDbSet.FirstOrDefault(p => p.Id == postId).MessageBody;
         }

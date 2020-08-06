@@ -13,7 +13,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
         NewlyCreatedPostDTO CreateNewPost(NewPostDTO newPostDto);
         void ToggleLike(int postId, UserAndOrganizationDTO userOrg);
         CommentDto GetPostLatestComment(int postId);
-        string GetPostTitle(int postId);
+        string GetPostBody(int postId);
         void DeleteWallPost(int postId, UserAndOrganizationDTO userOrg);
         void HideWallPost(int postId, UserAndOrganizationDTO userOrg);
         void ToggleWatch(int postId, UserAndOrganizationDTO userAndOrg, bool shouldWatch);

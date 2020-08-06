@@ -10,6 +10,6 @@ namespace Shrooms.Contracts.DataTransferObjects.Wall.Posts
         public string SharedEventId { get; set; }
         public int WallId { get; set; }
 
-        public IEnumerable<UserDetailsDto> Mentions { get; set; }
+        public IEnumerable<MentionedUserDto> Mentions { get; set; }
     }
 }

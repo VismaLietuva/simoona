@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq.Dynamic;
+using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
@@ -63,10 +64,13 @@ namespace Shrooms.Presentation.Api.Controllers
                     notif.Notify(commentCreatedDto, userHubDto);
                 }, GetOrganizationName());
 
-                _asyncRunner.Run<NewMentionNotifier>(notif =>
+                if (commentDto.Mentions.Any())
                 {
-                    notif.NotifyNewMentionInComment(comment.PostId, commentDto.Mentions);
-                }, GetOrganizationName());
+                    _asyncRunner.Run<NewMentionNotifier>(notif =>
+                    {
+                        notif.NotifyNewMentionInComment(comment.PostId, commentDto.Mentions);
+                    }, GetOrganizationName());
+                }
 
                 return Ok(new { commentCreatedDto.CommentId });
             }
