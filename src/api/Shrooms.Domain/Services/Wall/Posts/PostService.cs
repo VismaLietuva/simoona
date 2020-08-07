@@ -150,24 +150,6 @@ namespace Shrooms.Domain.Services.Wall.Posts
             return _postsDbSet.FirstOrDefault(p => p.Id == postId).MessageBody;
         }
 
-        public CommentDto GetPostLatestComment(int postId)
-        {
-            var comment = _postsDbSet.Include(x => x.Comments.Select(p => p.Author)).FirstOrDefault(p => p.Id == postId).Comments?.LastOrDefault();
-
-            return new CommentDto
-            {
-                Id = comment.Id,
-                Author = new UserDto
-                {
-                    FullName = comment.Author.FullName,
-                    PictureId = comment.Author.PictureId,
-                    UserId = comment.Author.Id,
-                    UserName = comment.Author.UserName
-                },
-                MessageBody = comment.MessageBody
-            };
-        }
-
         public void DeleteWallPost(int postId, UserAndOrganizationDTO userOrg)
         {
             lock (_postDeleteLock)
