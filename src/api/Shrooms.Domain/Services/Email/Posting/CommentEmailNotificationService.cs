@@ -90,28 +90,30 @@ namespace Shrooms.Domain.Services.Email.Posting
             {
                 try
                 {
-                    if (mentionedUser.NotificationsSettings.MentionEmailNotifications)
+                    if (!mentionedUser.NotificationsSettings.MentionEmailNotifications)
                     {
-                        var comment = _commentService.GetCommentBody(commentDto.CommentId);
-
-                        var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
-                        var postUrl = _appSettings.WallPostUrl(organization.ShortName, commentDto.PostId);
-
-                        var subject = $"You have been mentioned in the post";
-                        var messageBody = _markdownConverter.ConvertToHtml(comment);
-
-                        var newMentionTemplateViewModel = new NewMentionTemplateViewModel(
-                            mentionedUser.FullName,
-                            commentCreator.FullName,
-                            postUrl,
-                            userNotificationSettingsUrl,
-                            messageBody);
-
-                        var content = _mailTemplate.Generate(newMentionTemplateViewModel, EmailTemplateCacheKeys.NewMention);
-
-                        var emailData = new EmailDto(mentionedUser.Email, subject, content);
-                        _mailingService.SendEmail(emailData);
+                        continue;
                     }
+
+                    var comment = _commentService.GetCommentBody(commentDto.CommentId);
+
+                    var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
+                    var postUrl = _appSettings.WallPostUrl(organization.ShortName, commentDto.PostId);
+
+                    var subject = $"You have been mentioned in the post";
+                    var messageBody = _markdownConverter.ConvertToHtml(comment);
+
+                    var newMentionTemplateViewModel = new NewMentionTemplateViewModel(
+                        mentionedUser.FullName,
+                        commentCreator.FullName,
+                        postUrl,
+                        userNotificationSettingsUrl,
+                        messageBody);
+
+                    var content = _mailTemplate.Generate(newMentionTemplateViewModel, EmailTemplateCacheKeys.NewMention);
+
+                    var emailData = new EmailDto(mentionedUser.Email, subject, content);
+                    _mailingService.SendEmail(emailData);
                 }
                 catch (Exception e)
                 {
