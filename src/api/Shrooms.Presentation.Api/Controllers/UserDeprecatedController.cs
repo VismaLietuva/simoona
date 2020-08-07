@@ -111,7 +111,6 @@ namespace Shrooms.Presentation.Api.Controllers
         [Route("Delete")]
         [PermissionAuthorize(Permission = AdministrationPermissions.ApplicationUser)]
         [InvalidateCacheOutput("GetKudosStats", typeof(KudosController))]
-        [InvalidateCacheOutput("GetPaged", typeof(EmployeeListController))]
         public async Task<IHttpActionResult> DeleteUser(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -325,7 +324,6 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("ConfirmUser")]
         [PermissionAuthorize(Permission = AdministrationPermissions.ApplicationUser)]
-        [InvalidateCacheOutput("GetPaged", typeof(EmployeeListController))]
         public IHttpActionResult ConfirmUser(string id)
         {
             if (!ModelState.IsValid)
