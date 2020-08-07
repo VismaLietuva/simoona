@@ -22,11 +22,10 @@
         '$state',
         '$scope',
         '$window',
-        'wallService',
-        'employeeListRepository',
+        'wallService'
     ];
 
-    function wallController($state, $scope, $window, wallService, employeeListRepository) {
+    function wallController($state, $scope, $window, wallService) {
         /*jshint validthis: true */
         var vm = this;
         $window.onscroll = scrollHandler;
@@ -36,14 +35,12 @@
 
         vm.createPost = createPost;
         vm.reloadWall = reloadWall;
-        vm.getEmployeeList = getEmployeeList;
 
         init();
         ////////
 
         function init() {
             wallService.initWall(vm.isWallModule, vm.wallId);
-            vm.getEmployeeList();
             $scope.$on('$destroy', function () {
                 $window.onscroll = null;
             });
@@ -69,18 +66,5 @@
                 }
             }
         }
-        
-        function getEmployeeList () {
-            employeeListRepository.getPaged({
-                page: 1,
-                search: ''
-            }).then(function (getPagedResponse) {
-                vm.employees = getPagedResponse.pagedList.map(cur => {
-                    return {
-                        label: `${cur.firstName}_${cur.lastName}`
-                    };
-                });
-            });
-        };
     }
 }());

@@ -7,8 +7,7 @@
             bindings: {
                 onCreatePost: '&',
                 wallType: '=',
-                isWallModule: '=',
-                employees: '='
+                isWallModule: '='
             },
             templateUrl: 'app/common/directives/wall/posts/post-create/post-create.html',
             controller: wallPostCreateController,
@@ -25,11 +24,12 @@
         'wallSettings',
         'errorHandler',
         'dataHandler',
+        'kudosFactory',
         '$translate'
     ];
 
     function wallPostCreateController($scope, imageValidationSettings, shroomsFileUploader,
-        notifySrv, pictureRepository, wallImageConfig, wallSettings, errorHandler, dataHandler, translate) {
+        notifySrv, pictureRepository, wallImageConfig, wallSettings, errorHandler, dataHandler, kudosFactory, translate) {
         /*jshint validthis: true */
         var vm = this;
 
@@ -39,12 +39,16 @@
         vm.isSubmittable = isSubmittable;
         vm.handleErrorMessage = handleErrorMessage;
 
+        vm.selectedMentions = [];
         vm.postForm = {};
         vm.attachedFiles = [];
         vm.isFormEnabled = true;
         vm.showSubmitButton = false;
         vm.maxLength = wallSettings.postMaxLength;
         vm.thumbHeight = wallImageConfig.thumbHeight;
+        vm.getUsersForAutocomplete = getUsersForAutocomplete;
+        vm.invokeMention = invokeMention;
+        vm.selectMention = selectMention;
 
         init();
         //////////
@@ -73,12 +77,41 @@
             }
         }
 
+        function selectMention(item) {
+            vm.selectedMentions.push({id: item.id, fullName: item.label});
+
+            return `**@${item.label.replace(' ', '_')}**`;
+        }
+
+        function invokeMention(term) {
+            if (term) {
+                getUsersForAutocomplete(term).then(function(response) {
+                    vm.employees = response.map(function(cur) {
+                        return {
+                            id: cur.id,
+                            label: cur.formattedName
+                        }
+                    });
+                });
+            }
+        }
+
         function handleFormSubmit(pictureId) {
             vm.postForm.pictureId = pictureId;
-            vm.postForm.mentions = parseMentions(vm.postForm.messageBody);
+            vm.postForm.mentions = compareAndGetMentions();
             vm.onCreatePost({ post: vm.postForm });
 
             clearPost();
+        }
+
+        function compareAndGetMentions() {
+            var parsedNamesFromTextBody = parseMentions(vm.postForm.messageBody);
+
+            return vm.selectedMentions.filter(function(cur) {
+                if(parsedNamesFromTextBody.includes(cur.fullName)) {
+                    return cur;
+                }
+            });
         }
 
         function handleErrorMessage(errorResponse) {
@@ -141,16 +174,16 @@
             $scope.$apply();
         }
 
+        function getUsersForAutocomplete(query) {
+            return kudosFactory.getUsersForAutoComplete(query);
+        }
+        
         function parseMentions (text) {
             var pattern = /\B@[a-z0-9_-]+/gi;
 
             return text.match(pattern).map(cur => {
-                cur = cur.replace('@', '')
+                return cur.replace('@', '')
                          .replace('_', ' ');
-                return {
-                    firstName: cur.split(' ')[0],
-                    lastName: cur.split(' ')[1]
-                };
             });
         }
     }

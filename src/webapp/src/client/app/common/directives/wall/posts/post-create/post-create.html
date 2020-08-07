@@ -13,7 +13,9 @@
                 type="text"
                 ng-click="vm.showSubmit()"
                 mentio mentio-typed-text="typedTerm"
+                mentio-search="vm.invokeMention(term)"
                 mentio-items="vm.employees | filter:label:typedTerm"
+                mentio-select="vm.selectMention(item)"
                 placeholder={{vm.startConversation}}></textarea>
 
             <div class="emoji-picker-container">

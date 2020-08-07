@@ -7,8 +7,7 @@
             bindings: {
                 wallId: '=',
                 isWallModule: '=',
-                post: '=',
-                employees: '='
+                post: '='
             },
             templateUrl: 'app/common/directives/wall/comments/comment-create/comment-create.html',
             controller: wallPostCommentCreateController,
@@ -28,11 +27,12 @@
         'errorHandler',
         'notifySrv',
         'dataHandler',
+        'kudosFactory',
         '$translate',
         ];
 
     function wallPostCommentCreateController($scope, $element, imageValidationSettings, shroomsFileUploader,
-        pictureRepository, wallImageConfig, wallCommentRepository, wallSettings, wallService, errorHandler, notifySrv, dataHandler, translate) {
+        pictureRepository, wallImageConfig, wallCommentRepository, wallSettings, wallService, errorHandler, notifySrv, dataHandler, kudosFactory, translate) {
         /*jshint validthis: true */
         var vm = this;
         vm.showSubmit = showSubmit;
@@ -42,6 +42,7 @@
         vm.handleFormSubmit = handleFormSubmit;
         vm.handleErrorMessage = handleErrorMessage;
 
+        vm.selectedMentions = [];
         vm.commentForm = {};
         vm.attachedFiles = [];
         vm.isFormEnabled = true;
@@ -49,6 +50,9 @@
         vm.isSearchingEmployee = false;
         vm.maxLength = wallSettings.postMaxLength;
         vm.thumbHeight = wallImageConfig.thumbHeight;
+        vm.getUsersForAutocomplete = getUsersForAutocomplete;
+        vm.invokeMention = invokeMention;
+        vm.selectMention = selectMention;
 
         init();
 
@@ -83,16 +87,46 @@
             }
         }
 
+        function selectMention(item) {
+            vm.selectedMentions.push({id: item.id, fullName: item.label});
+
+            return `**@${item.label.replace(' ', '_')}**`;
+        }
+
+        function invokeMention(term) {
+            if (term) {
+                getUsersForAutocomplete(term).then(function(response) {
+                    vm.employees = response.map(function(cur) {
+                        return {
+                            id: cur.id,
+                            label: cur.formattedName
+                        }
+                    });
+                });
+            }
+        }
+
         function handleFormSubmit(pictureId) {
             vm.commentForm.postId = vm.post.id;
             vm.commentForm.pictureId = pictureId;
-            vm.commentForm.mentions = parseMentions(vm.commentForm.messageBody);
+            vm.commentForm.mentions = compareAndGetMentions()
 
             wallCommentRepository.createComment(vm.commentForm).then(function() {
                 wallService.initWall(vm.isWallModule, vm.wallId);
             }, errorHandler.handleErrorMessage);
 
             clearComment();
+        }
+
+
+        function compareAndGetMentions() {
+            var parsedNamesFromTextBody = parseMentions(vm.commentForm.messageBody);
+
+            return vm.selectedMentions.filter(function(cur) {
+                if(parsedNamesFromTextBody.includes(cur.fullName)) {
+                    return cur;
+                }
+            });
         }
 
         function handleErrorMessage(errorResponse) {
@@ -152,17 +186,16 @@
             $scope.$apply();
         }
 
+        function getUsersForAutocomplete(query) {
+            return kudosFactory.getUsersForAutoComplete(query);
+        }
         
         function parseMentions (text) {
             var pattern = /\B@[a-z0-9_-]+/gi;
 
             return text.match(pattern).map(cur => {
-                cur = cur.replace('@', '')
+                return cur.replace('@', '')
                          .replace('_', ' ');
-                return {
-                    firstName: cur.split(' ')[0],
-                    lastName: cur.split(' ')[1]
-                };
             });
         }
     }

@@ -45,9 +45,9 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
             {
                 try
                 {
-                    var mentionedUser = _userService.GetApplicationUser(userToNotify.FirstName, userToNotify.LastName);
+                    var mentionedUser = _userService.GetApplicationUser(userToNotify.Id);
 
-                    if (!mentionedUser.NotificationsSettings.MentionEmailNotifications)
+                    if (mentionedUser.NotificationsSettings.MentionEmailNotifications)
                     {
                         var comment = _postService.GetPostLatestComment(postId);
 
@@ -86,7 +86,7 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
             {
                 try
                 {
-                    var mentionedUser = _userService.GetApplicationUser(userToNotify.FirstName, userToNotify.LastName);
+                    var mentionedUser = _userService.GetApplicationUser(userToNotify.Id);
 
                     if (mentionedUser.NotificationsSettings.MentionEmailNotifications)
                     {

@@ -1,10 +1,11 @@
-﻿namespace Shrooms.Contracts.DataTransferObjects.Users
+﻿using System;
+
+namespace Shrooms.Contracts.DataTransferObjects.Users
 {
     public class MentionedUserDto
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
+        public string Id { get; set; }
 
-        public string FullName { get { return $"{FirstName} {LastName}"; } }
+        public string FullName { get; set; }
     }
 }

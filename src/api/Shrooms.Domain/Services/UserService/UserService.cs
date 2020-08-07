@@ -362,7 +362,7 @@ namespace Shrooms.Domain.Services.UserService
 
         public ApplicationUser GetApplicationUser(string id)
         {
-            return _usersDbSet.First(u => u.Id == id);
+            return _usersDbSet.Include(x => x.NotificationsSettings).First(u => u.Id == id);
         }
 
         private void UnassignUserFromWalls(string userId, int tenantId)
@@ -405,11 +405,6 @@ namespace Shrooms.Domain.Services.UserService
             user.RemainingKudos = 0;
             user.SpentKudos = 0;
             user.TotalKudos = 0;
-        }
-
-        public ApplicationUser GetApplicationUser(string firstName, string lastName)
-        {
-            return _usersDbSet.Include(x => x.NotificationsSettings).FirstOrDefault(p => p.FirstName == firstName && p.LastName == lastName);
         }
     }
 }
