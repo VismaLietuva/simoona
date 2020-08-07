@@ -24,12 +24,12 @@
         'wallSettings',
         'errorHandler',
         'dataHandler',
-        'kudosFactory',
+        'wallPostRepository',
         '$translate'
     ];
 
     function wallPostCreateController($scope, imageValidationSettings, shroomsFileUploader,
-        notifySrv, pictureRepository, wallImageConfig, wallSettings, errorHandler, dataHandler, kudosFactory, translate) {
+        notifySrv, pictureRepository, wallImageConfig, wallSettings, errorHandler, dataHandler, wallPostRepository, translate) {
         /*jshint validthis: true */
         var vm = this;
 
@@ -177,7 +177,7 @@
         }
 
         function getUsersForAutocomplete(query) {
-            return kudosFactory.getUsersForAutoComplete(query);
+            return wallPostRepository.getUsersForAutoComplete(query);
         }
         
         function parseMentions (text) {

@@ -27,12 +27,11 @@
         'errorHandler',
         'notifySrv',
         'dataHandler',
-        'kudosFactory',
         '$translate',
         ];
 
     function wallPostCommentCreateController($scope, $element, imageValidationSettings, shroomsFileUploader,
-        pictureRepository, wallImageConfig, wallCommentRepository, wallSettings, wallService, errorHandler, notifySrv, dataHandler, kudosFactory, translate) {
+        pictureRepository, wallImageConfig, wallCommentRepository, wallSettings, wallService, errorHandler, notifySrv, dataHandler, translate) {
         /*jshint validthis: true */
         var vm = this;
         vm.showSubmit = showSubmit;
@@ -189,7 +188,7 @@
         }
 
         function getUsersForAutocomplete(query) {
-            return kudosFactory.getUsersForAutoComplete(query);
+            return wallCommentRepository.getUsersForAutoComplete(query);
         }
         
         function parseMentions (text) {

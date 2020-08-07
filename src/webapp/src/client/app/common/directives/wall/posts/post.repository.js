@@ -11,6 +11,7 @@
     ];
 
     function wallPostRepository($resource, endPoint) {
+        var kudosUrl = endPoint + '/Kudos/';
         var postUrl = endPoint + '/Post/';
         var wallUrl = endPoint + '/Wall/';
 
@@ -23,7 +24,8 @@
             deletePost: deletePost,
             searchWall: searchWall,
             watchPost: watchPost,
-            unwatchPost: unwatchPost
+            unwatchPost: unwatchPost,
+            getUsersForAutoComplete: getUsersForAutoComplete
         };
         return service;
 
@@ -62,6 +64,12 @@
                 messageBody: post.messageBody,
                 mentions: post.mentions,
                 pictureId: post.pictureId
+            }).$promise;
+        }
+
+        function getUsersForAutoComplete(searchString) {
+            return $resource(kudosUrl + 'GetUsersForAutocomplete').query({
+                s: searchString
             }).$promise;
         }
 

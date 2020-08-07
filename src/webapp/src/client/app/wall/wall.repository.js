@@ -21,7 +21,7 @@
             deleteWall: deleteWall,
             getWallMembers: getWallMembers,
             expelMemberFromWall: expelMemberFromWall,
-            getWidgetsInfo: getWidgetsInfo
+            getWidgetsInfo: getWidgetsInfo,
         };
         return service;
 

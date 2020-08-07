@@ -92,7 +92,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 {
                     notif.Notify(createdPost, userHubDto);
                 }, GetOrganizationName());
-                
+
                 return Ok(_mapper.Map<WallPostViewModel>(createdPost));
             }
             catch (ValidationException e)
