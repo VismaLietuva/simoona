@@ -68,7 +68,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 {
                     _asyncRunner.Run<NewMentionNotifier>(notif =>
                     {
-                        notif.NotifyNewMentionInComment(comment.PostId, commentDto.Mentions);
+                        notif.NotifyNewMentionInComment(commentCreatedDto.PostId, commentCreatedDto.CommentId, commentCreatedDto.CommentCreator, commentDto.Mentions);
                     }, GetOrganizationName());
                 }
 

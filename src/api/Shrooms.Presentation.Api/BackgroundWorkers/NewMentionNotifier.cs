@@ -19,6 +19,7 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
         private readonly IUserService _userService;
         private readonly IOrganizationService _organizationService;
         private readonly IApplicationSettings _appSettings;
+        private readonly ICommentService _commentService;
         private readonly IPostService _postService;
         private readonly IMailingService _mailingService;
         private readonly IMailTemplate _mailTemplate;
@@ -27,9 +28,12 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
 
 
 
-        public NewMentionNotifier(IUserService userService, IMarkdownConverter markdownConverter, IMailTemplate mailTemplate, ILogger logger, IOrganizationService organizationService, IPostService postService, IMailingService mailingService, IApplicationSettings applicationSettings)
+        public NewMentionNotifier(IUserService userService, IMarkdownConverter markdownConverter, 
+            IMailTemplate mailTemplate, ILogger logger, IOrganizationService organizationService, IPostService postService,
+            ICommentService commentService, IMailingService mailingService, IApplicationSettings applicationSettings)
         {
             _userService = userService;
+            _commentService = commentService;
             _postService = postService;
             _mailTemplate = mailTemplate;
             _logger = logger;
@@ -39,7 +43,7 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
             _markdownConverter = markdownConverter;
         }
 
-        public void NotifyNewMentionInComment(int postId, IEnumerable<MentionedUserDto> usersToNotify)
+        public void NotifyNewMentionInComment(int postId, int commentId, string mentioningUser, IEnumerable<MentionedUserDto> usersToNotify)
         {
             foreach (var userToNotify in usersToNotify)
             {
@@ -49,7 +53,7 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
 
                     if (mentionedUser.NotificationsSettings.MentionEmailNotifications)
                     {
-                        var comment = _postService.GetPostLatestComment(postId);
+                        var comment = _commentService.GetCommentBody(commentId);
 
                         var organization = _organizationService.GetOrganizationById(mentionedUser.OrganizationId);
 
@@ -57,11 +61,11 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
                         var postUrl = _appSettings.WallPostUrl(organization.ShortName, postId);
 
                         var subject = $"You have been mentioned in the post";
-                        var messageBody = _markdownConverter.ConvertToHtml(comment.MessageBody);
+                        var messageBody = _markdownConverter.ConvertToHtml(comment);
 
                         var newMentionTemplateViewModel = new NewMentionTemplateViewModel(
                             mentionedUser.FullName,
-                            comment.Author.FullName,
+                            mentioningUser,
                             postUrl,
                             userNotificationSettingsUrl,
                             messageBody);

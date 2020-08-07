@@ -162,6 +162,11 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             _uow.SaveChanges(userOrg.UserId);
         }
 
+        public string GetCommentBody(int commentId)
+        {
+            return _commentsDbSet.FirstOrDefault(x => x.Id == commentId).MessageBody; 
+        }
+
         public void HideComment(int commentId, UserAndOrganizationDTO userOrg)
         {
             var comment = _commentsDbSet
