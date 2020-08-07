@@ -108,7 +108,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
                 CommentCreator = comment.AuthorId, 
                 PostCreator = post.AuthorId, 
                 PostId = post.Id,
-                MentionedUsersIds = commentDto.MentionedUserIds.Distinct()
+                MentionedUsersIds = commentDto.MentionedUserIds?.Distinct()
             };
         }
 
