@@ -6,7 +6,7 @@
                data-test-id="kudos-search-box"
                ng-model="vm.user"
                placeholder="{{vm.userFullName}}"
-               uib-typeahead="user as user.formattedName for user in vm.getUsersForAutocomplete($viewValue)"
+               uib-typeahead="user as user.fullName for user in vm.getUsersForAutocomplete($viewValue)"
                typeahead-on-select="vm.selectUser($model)"
                typeahead-template-url="app/kudos/user-autocomplete/user-autocomplete.html"
                typeahead-min-length="1"

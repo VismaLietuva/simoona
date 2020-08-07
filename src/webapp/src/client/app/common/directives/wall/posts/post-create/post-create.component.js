@@ -89,7 +89,7 @@
                     vm.employees = response.map(function(cur) {
                         return {
                             id: cur.id,
-                            label: cur.formattedName
+                            label: cur.fullName
                         }
                     });
                 });

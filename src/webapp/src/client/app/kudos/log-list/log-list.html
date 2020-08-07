@@ -8,7 +8,7 @@
                    type="text"
                    ng-model="vm.filter.searchUser"
                    translate-attr-placeholder="common.findPerson"
-                   uib-typeahead="user as user.formattedName for user in vm.getUsersForAutocomplete($viewValue)"
+                   uib-typeahead="user as user.fullName for user in vm.getUsersForAutocomplete($viewValue)"
                    typeahead-template-url="app/kudos/user-autocomplete/user-autocomplete.html"
                    typeahead-min-length="1"
                    typeahead-wait-ms="100"

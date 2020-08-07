@@ -7,6 +7,7 @@ using AutoMapper;
 using Microsoft.AspNet.Identity;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.Models.Users;
+using Shrooms.Contracts.DataTransferObjects.Users;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Services.UserService;
@@ -169,6 +170,15 @@ namespace Shrooms.Presentation.Api.Controllers
             }
 
             return Ok();
+        }
+
+        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        [Route("GetUsersForAutocomplete")]
+        public IEnumerable<ApplicationUserAutoCompleteViewModel> GetUsersForAutocomplete(string s)
+        {
+            var userAutoCompleteDto = _userService.GetUsersForAutocomplete(s);
+            var result = _mapper.Map<IEnumerable<UserAutoCompleteDto>, IEnumerable<ApplicationUserAutoCompleteViewModel>>(userAutoCompleteDto);
+            return result;
         }
 
         private string GetEmail(ApplicationUser user, string provider)

@@ -101,7 +101,6 @@
     <Compile Include="Models\Kudos\KudosTypeDTO.cs" />
     <Compile Include="Models\Kudos\KudosLogTypeDTO.cs" />
     <Compile Include="Models\Kudos\KudosUserLogDTO.cs" />
-    <Compile Include="Models\Kudos\UserKudosAutocompleteDTO.cs" />
     <Compile Include="Models\Kudos\UserKudosDTO.cs" />
     <Compile Include="Models\Kudos\UserKudosInformationDTO.cs" />
     <Compile Include="Models\Kudos\WallKudosLogDTO.cs" />

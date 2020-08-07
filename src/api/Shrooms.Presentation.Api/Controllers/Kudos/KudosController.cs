@@ -262,14 +262,6 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
             return Ok(new { kudosTypeId = typeId });
         }
 
-        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public IEnumerable<UserKudosAutocompleteViewModel> GetUsersForAutocomplete(string s)
-        {
-            var userKudosAutoCompleteDto = _kudosService.GetUsersForAutocomplete(s);
-            var result = _mapper.Map<IEnumerable<UserKudosAutocompleteDTO>, IEnumerable<UserKudosAutocompleteViewModel>>(userKudosAutoCompleteDto);
-            return result;
-        }
-
         [HttpPost]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
         [InvalidateCacheOutput("Get", typeof(WallWidgetsController))]

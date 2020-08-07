@@ -1,4 +1,5 @@
 ﻿using Shrooms.DataLayer.EntityModels.Models.Kudos;
+using Shrooms.Presentation.WebViewModels.Models.User;
 
 namespace Shrooms.Presentation.WebViewModels.Models.Users.Kudos
 {
@@ -8,6 +9,6 @@ namespace Shrooms.Presentation.WebViewModels.Models.Users.Kudos
 
         public KudosType Type { get; set; }
 
-        public UserKudosAutocompleteViewModel User { get; set; }
+        public ApplicationUserAutoCompleteViewModel User { get; set; }
     }
 }

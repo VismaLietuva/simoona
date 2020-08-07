@@ -179,7 +179,6 @@
     <Compile Include="Models\Users\Kudos\KudosTypeViewModel.cs" />
     <Compile Include="Models\Users\Kudos\KudosUserLogViewModel.cs" />
     <Compile Include="Models\Users\Kudos\KudosViewModel.cs" />
-    <Compile Include="Models\Users\Kudos\UserKudosAutocompleteViewModel.cs" />
     <Compile Include="Models\Users\Kudos\UserKudosInformationViewModel.cs" />
     <Compile Include="Models\Users\Kudos\UserKudosViewModel.cs" />
     <Compile Include="Models\Users\Kudos\WallKudosLogViewModel.cs" />

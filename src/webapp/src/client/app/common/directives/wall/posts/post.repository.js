@@ -11,7 +11,7 @@
     ];
 
     function wallPostRepository($resource, endPoint) {
-        var kudosUrl = endPoint + '/Kudos/';
+        var userUrl = endPoint + '/User/';
         var postUrl = endPoint + '/Post/';
         var wallUrl = endPoint + '/Wall/';
 
@@ -68,7 +68,7 @@
         }
 
         function getUsersForAutoComplete(searchString) {
-            return $resource(kudosUrl + 'GetUsersForAutocomplete').query({
+            return $resource(userUrl + 'GetUsersForAutocomplete').query({
                 s: searchString
             }).$promise;
         }

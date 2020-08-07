@@ -12,6 +12,7 @@
     ];
 
     function kudosFactory($resource, $http, endPoint) {
+        var userUrl = endPoint + '/User/';
         var url = endPoint + '/Kudos/';
 
         var service = {
@@ -59,7 +60,7 @@
         }
 
         function getUsersForAutoComplete(searchString) {
-            return $resource(url + 'GetUsersForAutocomplete').query({
+            return $resource(userUrl + 'GetUsersForAutocomplete').query({
                 s: searchString
             }).$promise;
         }

@@ -55,6 +55,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
             CreateMap<WallNotificationsDto, WallNotificationsViewModel>();
             CreateMap<LocalizationSettingsDto, LocalizationSettingsViewModel>();
             CreateMap<UserNotificationsSettingsDto, UserNotificationsSettingsViewModel>();
+            CreateMap<UserAutoCompleteDto, ApplicationUserAutoCompleteViewModel>();
         }
 
         private void CreateViewModelToDtoMappings()
