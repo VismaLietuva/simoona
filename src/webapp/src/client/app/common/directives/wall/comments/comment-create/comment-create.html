@@ -1,7 +1,7 @@
 <form name="commentForm">
 
     <div class="comment-input-emoji-container">
-
+        
         <textarea class="form-control comment-input-text"
               ng-model="vm.commentForm.messageBody"
               ng-maxlength="vm.maxLength"
@@ -10,10 +10,13 @@
               msd-elastic
               type="text"
               ng-click="vm.showSubmit()"
-              translate-attr-placeholder="wall.addComment"
-              data-test-id="add-comment-text-field" translate>
+              mentio mentio-typed-text="typedTerm"
+              mentio-search="vm.invokeMention(term)"
+              mentio-items="vm.employees | filter:label:typedTerm"
+              mentio-select="vm.selectMention(item)"
+              placeholder={{vm.addComment}}>
         </textarea>
-
+        
         <div class="emoji-picker-container">
             <span class="emoji-picker-span"
             emoji-picker="vm.commentForm.messageBody"

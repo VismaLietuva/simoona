@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Shrooms.Contracts.Constants;
 using Shrooms.Presentation.WebViewModels.ValidationAttributes;
 

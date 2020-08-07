@@ -7,6 +7,7 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts;
 using Shrooms.Contracts.DataTransferObjects.Users;
+using Shrooms.Contracts.DataTransferObjects.Wall.Comments;
 using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
@@ -81,7 +82,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
 
                 var postCreator = _usersDbSet.Single(user => user.Id == newPostDto.UserId);
                 var postCreatorDto = MapUserToDto(postCreator);
-                var newlyCreatedPostDto = MapNewlyCreatedPostToDto(post, postCreatorDto, wall.Type);
+                var newlyCreatedPostDto = MapNewlyCreatedPostToDto(post, postCreatorDto, wall.Type, newPostDto.MentionedUserIds);
 
                 return newlyCreatedPostDto;
             }
@@ -143,6 +144,10 @@ namespace Shrooms.Domain.Services.Wall.Posts
 
                 _uow.SaveChanges(editPostDto.UserId);
             }
+        }
+        public string GetPostBody(int postId)
+        {
+            return _postsDbSet.FirstOrDefault(p => p.Id == postId).MessageBody;
         }
 
         public void DeleteWallPost(int postId, UserAndOrganizationDTO userOrg)
@@ -218,7 +223,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
             return userDto;
         }
 
-        private NewlyCreatedPostDTO MapNewlyCreatedPostToDto(Post post, UserDto user, WallType wallType)
+        private NewlyCreatedPostDTO MapNewlyCreatedPostToDto(Post post, UserDto user, WallType wallType, IEnumerable<string> mentionedUserIds)
         {
             var newlyCreatedPostDto = new NewlyCreatedPostDTO
             {
@@ -229,7 +234,8 @@ namespace Shrooms.Domain.Services.Wall.Posts
                 CreatedBy = post.CreatedBy,
                 User = user,
                 WallType = wallType,
-                WallId = post.WallId
+                WallId = post.WallId,
+                MentionedUsersIds = mentionedUserIds
             };
             return newlyCreatedPostDto;
         }

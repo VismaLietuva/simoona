@@ -11,6 +11,7 @@
     ];
 
     function wallPostRepository($resource, endPoint) {
+        var userUrl = endPoint + '/User/';
         var postUrl = endPoint + '/Post/';
         var wallUrl = endPoint + '/Wall/';
 
@@ -23,7 +24,8 @@
             deletePost: deletePost,
             searchWall: searchWall,
             watchPost: watchPost,
-            unwatchPost: unwatchPost
+            unwatchPost: unwatchPost,
+            getUsersForAutoComplete: getUsersForAutoComplete
         };
         return service;
 
@@ -47,6 +49,7 @@
             return $resource(postUrl + 'Create').save({
                 wallId: wallId,
                 messageBody: post.messageBody,
+                mentionedUserIds: post.mentionedUserIds,
                 pictureId: post.pictureId
             }).$promise;
         }
@@ -59,7 +62,14 @@
             }).put({
                 id: post.id,
                 messageBody: post.messageBody,
+                mentions: post.mentions,
                 pictureId: post.pictureId
+            }).$promise;
+        }
+
+        function getUsersForAutoComplete(searchString) {
+            return $resource(userUrl + 'GetUsersForAutocomplete').query({
+                s: searchString
             }).$promise;
         }
 

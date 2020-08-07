@@ -393,17 +393,6 @@ namespace Shrooms.Domain.Services.Kudos
             return kudosLogs;
         }
 
-        public IEnumerable<UserKudosAutocompleteDTO> GetUsersForAutocomplete(string s)
-        {
-            var users = _usersDbSet
-                .Where(user => user.UserName.Contains(s) || user.Email.Contains(s) || (user.FirstName + " " + user.LastName).Contains(s))
-                .Where(_roleService.ExcludeUsersWithRole(ConstantsRoles.NewUser))
-                .Select(MapUsersToAutocompleteDTO())
-                .ToList();
-
-            return users;
-        }
-
         public void ApproveKudos(int kudosLogId, UserAndOrganizationDTO userOrg)
         {
             var kudosLog = _kudosLogsDbSet
@@ -645,18 +634,6 @@ namespace Shrooms.Domain.Services.Kudos
                                                                    e.Status == KudosStatus.Pending).ToList();
 
             return kudosLogs.Any();
-        }
-
-        private static Expression<Func<ApplicationUser, UserKudosAutocompleteDTO>> MapUsersToAutocompleteDTO()
-        {
-            return u => new UserKudosAutocompleteDTO
-            {
-                Id = u.Id,
-                FormattedName = u.FirstName + " " + u.LastName,
-                Email = u.Email,
-                UserName = u.UserName,
-                PictureId = u.PictureId
-            };
         }
 
         private static Expression<Func<ApplicationUser, UserKudosDTO>> MapUserToKudosDTO()

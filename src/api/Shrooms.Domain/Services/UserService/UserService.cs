@@ -12,6 +12,7 @@ using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Users;
+using Shrooms.Contracts.DataTransferObjects.Users;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -19,6 +20,8 @@ using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.DataLayer.EntityModels.Models.Notifications;
 using Shrooms.Domain.Services.Picture;
 using WallModel = Shrooms.DataLayer.EntityModels.Models.Multiwall.Wall;
+using ConstantsRoles = Shrooms.Contracts.Constants.Roles;
+using Shrooms.Domain.Services.Roles;
 
 namespace Shrooms.Domain.Services.UserService
 {
@@ -33,8 +36,9 @@ namespace Shrooms.Domain.Services.UserService
         private readonly IUnitOfWork2 _uow;
         private readonly ShroomsUserManager _userManager;
         private readonly IPictureService _pictureService;
+        private readonly IRoleService _roleService;
 
-        public UserService(IUnitOfWork2 uow, ShroomsUserManager userManager, IPictureService pictureService)
+        public UserService(IUnitOfWork2 uow, ShroomsUserManager userManager, IPictureService pictureService, IRoleService roleService)
         {
             _rolesDbSet = uow.GetDbSet<ApplicationRole>();
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
@@ -45,6 +49,7 @@ namespace Shrooms.Domain.Services.UserService
             _uow = uow;
             _userManager = userManager;
             _pictureService = pictureService;
+            _roleService = roleService;
         }
 
         public async Task ChangeUserLocalizationSettings(ChangeUserLocalizationSettingsDto settingsDto)
@@ -107,6 +112,7 @@ namespace Shrooms.Domain.Services.UserService
             settings.MyPostsEmailNotifications = settingsDto.MyPostsEmailNotifications;
             settings.FollowingPostsAppNotifications = settingsDto.FollowingPostsAppNotifications;
             settings.FollowingPostsEmailNotifications = settingsDto.FollowingPostsEmailNotifications;
+            settings.MentionEmailNotifications = settingsDto.MentionEmailNotifications;
 
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
@@ -202,6 +208,17 @@ namespace Shrooms.Domain.Services.UserService
             return userAppNotificationEnabledIds;
         }
 
+        public IEnumerable<UserAutoCompleteDto> GetUsersForAutocomplete(string s)
+        {
+            var users = _usersDbSet
+                .Where(user => user.UserName.Contains(s) || user.Email.Contains(s) || (user.FirstName + " " + user.LastName).Contains(s))
+                .Where(_roleService.ExcludeUsersWithRole(ConstantsRoles.NewUser))
+                .Select(MapUsersToAutocompleteDTO())
+                .ToList();
+
+            return users;
+        }
+
         public IList<string> GetWallUsersEmails(string senderEmail, WallModel wall)
         {
             var newUserAndExternalRoles = _rolesDbSet
@@ -262,6 +279,7 @@ namespace Shrooms.Domain.Services.UserService
                 MyPostsEmailNotifications = settings?.MyPostsEmailNotifications ?? true,
                 FollowingPostsAppNotifications = settings?.FollowingPostsAppNotifications ?? true,
                 FollowingPostsEmailNotifications = settings?.FollowingPostsEmailNotifications ?? true,
+                MentionEmailNotifications = settings?.MentionEmailNotifications ?? true,
 
                 Walls = _wallMembersDbSet
                     .Include(x => x.Wall)
@@ -360,7 +378,7 @@ namespace Shrooms.Domain.Services.UserService
 
         public ApplicationUser GetApplicationUser(string id)
         {
-            return _usersDbSet.First(u => u.Id == id);
+            return _usersDbSet.Include(x => x.NotificationsSettings).First(u => u.Id == id);
         }
 
         private void UnassignUserFromWalls(string userId, int tenantId)
@@ -384,6 +402,20 @@ namespace Shrooms.Domain.Services.UserService
             {
                 _wallModeratorsDbSet.Remove(moderator);
             }
+        }
+
+        private static Expression<Func<ApplicationUser, UserAutoCompleteDto>> MapUsersToAutocompleteDTO()
+        {
+            return u => new UserAutoCompleteDto
+            {
+                Id = u.Id,
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+                FullName = u.FirstName + " " + u.LastName,
+                UserName = u.UserName,
+                PictureId = u.PictureId,
+                Email = u.Email
+            };
         }
 
         private Expression<Func<ApplicationUser, bool>> ExternalRoleFilter(WallModel wall, string externalRoleId)

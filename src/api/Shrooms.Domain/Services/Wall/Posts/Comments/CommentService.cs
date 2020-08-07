@@ -102,7 +102,13 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
 
             return new CommentCreatedDTO
             {
-                WallId = post.WallId, CommentId = comment.Id, WallType = post.Wall.Type, CommentCreator = comment.AuthorId, PostCreator = post.AuthorId, PostId = post.Id
+                WallId = post.WallId, 
+                CommentId = comment.Id,
+                WallType = post.Wall.Type, 
+                CommentCreator = comment.AuthorId, 
+                PostCreator = post.AuthorId, 
+                PostId = post.Id,
+                MentionedUsersIds = commentDto.MentionedUserIds?.Distinct()
             };
         }
 
@@ -160,6 +166,11 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
 
             _commentsDbSet.Remove(comment);
             _uow.SaveChanges(userOrg.UserId);
+        }
+
+        public string GetCommentBody(int commentId)
+        {
+            return _commentsDbSet.FirstOrDefault(x => x.Id == commentId).MessageBody; 
         }
 
         public void HideComment(int commentId, UserAndOrganizationDTO userOrg)

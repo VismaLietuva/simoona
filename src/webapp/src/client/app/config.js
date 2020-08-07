@@ -9,6 +9,7 @@
         'ngAnimate',
         'ngSanitize',
         'toaster',
+        'mentio',
         'timer',
         'bootstrapLightbox',
         'LocalStorageModule',

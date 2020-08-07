@@ -135,6 +135,25 @@
 							<input type="checkbox" ng-model="vm.settings.followingPostsEmailNotifications">
 						</td>
 					</tr>
+					<tr>
+						<td class="col-xs-3 word-break"
+							translate-attr-title="settings.mention"
+							translate="settings.mention"
+							data-test-id="all-comments"
+							ng-cloak>
+						</td>
+						<td class="col-xs-4 notifications-item"
+							data-test-id="comments-app-notification"
+							ng-cloak>
+							<input type="checkbox" ng-disabled="true">
+						</td>
+
+						<td class="col-xs-4 notifications-item"
+							data-test-id="comments-email-notification"
+								ng-cloak>
+							<input type="checkbox" ng-model="vm.settings.mentionEmailNotifications">
+						</td>
+					</tr>
 				</tbody>
 			</table>
 			<div class="pull-right padding-top">

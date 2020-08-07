@@ -83,6 +83,7 @@
     <Compile Include="DataTransferObjects\Notification\SourcesDto.cs" />
     <Compile Include="DataTransferObjects\UserAndOrganizationDTO.cs" />
     <Compile Include="DataTransferObjects\UserAndOrganizationHubDto.cs" />
+    <Compile Include="DataTransferObjects\Users\UserAutoCompleteDto.cs" />
     <Compile Include="DataTransferObjects\Users\UserDto.cs" />
     <Compile Include="DataTransferObjects\Wall\Comments\CommentDTO.cs" />
     <Compile Include="DataTransferObjects\Wall\CreateWallDto.cs" />

@@ -23,11 +23,13 @@
         'wallImageConfig',
         'wallSettings',
         'errorHandler',
-        'dataHandler'
+        'dataHandler',
+        'wallPostRepository',
+        '$translate'
     ];
 
     function wallPostCreateController($scope, imageValidationSettings, shroomsFileUploader,
-        notifySrv, pictureRepository, wallImageConfig, wallSettings, errorHandler, dataHandler) {
+        notifySrv, pictureRepository, wallImageConfig, wallSettings, errorHandler, dataHandler, wallPostRepository, translate) {
         /*jshint validthis: true */
         var vm = this;
 
@@ -37,14 +39,23 @@
         vm.isSubmittable = isSubmittable;
         vm.handleErrorMessage = handleErrorMessage;
 
+        vm.selectedMentions = [];
         vm.postForm = {};
         vm.attachedFiles = [];
         vm.isFormEnabled = true;
         vm.showSubmitButton = false;
         vm.maxLength = wallSettings.postMaxLength;
         vm.thumbHeight = wallImageConfig.thumbHeight;
+        vm.getUsersForAutocomplete = getUsersForAutocomplete;
+        vm.invokeMention = invokeMention;
+        vm.selectMention = selectMention;
 
+        init();
         //////////
+
+        function init() {
+            vm.startConversation = translate.instant('wall.startConversation');
+        }
 
         function isSubmittable() {
             if (!!vm.postForm.messageBody) {
@@ -66,12 +77,43 @@
             }
         }
 
+        function selectMention(item) {
+            vm.selectedMentions.push({id: item.id, fullName: item.label});
+
+            return `**@${item.label.replace(' ', '_')}**`;
+        }
+
+        function invokeMention(term) {
+            if (term) {
+                getUsersForAutocomplete(term).then(function(response) {
+                    vm.employees = response.map(function(cur) {
+                        return {
+                            id: cur.id,
+                            label: cur.fullName
+                        }
+                    });
+                });
+            }
+        }
+
         function handleFormSubmit(pictureId) {
             vm.postForm.pictureId = pictureId;
-
+            vm.postForm.mentionedUserIds = compareAndGetMentions();
             vm.onCreatePost({ post: vm.postForm });
 
             clearPost();
+        }
+
+        function compareAndGetMentions() {
+            var parsedNamesFromTextBody = parseMentions(vm.postForm.messageBody);
+
+            return vm.selectedMentions.filter(function(cur) {
+                if(parsedNamesFromTextBody.includes(cur.fullName)) {
+                    return cur;
+                }
+            }).map(function(cur) {
+                return cur.id;
+            });
         }
 
         function handleErrorMessage(errorResponse) {
@@ -132,6 +174,22 @@
                 notifySrv.error('wall.imageInvalidType');
             }
             $scope.$apply();
+        }
+
+        function getUsersForAutocomplete(query) {
+            return wallPostRepository.getUsersForAutoComplete(query);
+        }
+        
+        function parseMentions (text) {
+            var pattern = /\B@[a-z0-9_-]+/gi;
+            var matches = text.match(pattern);
+            
+            if (matches) {
+                return matches.map(cur => {
+                    return cur.replace('@', '')
+                             .replace('_', ' ');
+                });
+            }
         }
     }
 }());

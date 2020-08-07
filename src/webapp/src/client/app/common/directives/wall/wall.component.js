@@ -28,7 +28,6 @@
     function wallController($state, $scope, $window, wallService) {
         /*jshint validthis: true */
         var vm = this;
-
         $window.onscroll = scrollHandler;
         vm.wallServiceData = wallService.wallServiceData;
         vm.getCurrentWallId = wallService.getCurrentWallId;
@@ -38,12 +37,10 @@
         vm.reloadWall = reloadWall;
 
         init();
-
         ////////
 
         function init() {
             wallService.initWall(vm.isWallModule, vm.wallId);
-
             $scope.$on('$destroy', function () {
                 $window.onscroll = null;
             });

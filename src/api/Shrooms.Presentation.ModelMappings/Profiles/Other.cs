@@ -71,12 +71,10 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
         {
             CreateMap<KudosTypeDTO, KudosTypeViewModel>();
             CreateMap<ApplicationUser, UserKudosViewModel>();
-            CreateMap<ApplicationUser, UserKudosAutocompleteViewModel>();
             CreateMap<KudosLog, UserKudosInformationViewModel>();
             CreateMap<KudosPieChartSliceDto, KudosPieChartSliceViewModel>();
             CreateMap<KudosType, KudosTypeViewModel>();
             CreateMap<UserKudosInformationDTO, UserKudosInformationViewModel>();
-            CreateMap<UserKudosAutocompleteDTO, UserKudosAutocompleteViewModel>();
             CreateMap<KudosLogInputModel, KudosLogInputDTO>();
             CreateMap<UserKudosDTO, UserKudosViewModel>();
         }

@@ -18,6 +18,7 @@ using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.UserService;
 using Shrooms.Domain.Services.Wall.Posts;
+using Shrooms.Domain.Services.Wall.Posts.Comments;
 using Shrooms.Resources.Emails;
 
 namespace Shrooms.Domain.Services.Email.Posting
@@ -25,12 +26,14 @@ namespace Shrooms.Domain.Services.Email.Posting
     public class CommentEmailNotificationService : ICommentEmailNotificationService
     {
         private readonly IUserService _userService;
+        private readonly ICommentService _commentService;
         private readonly IMailTemplate _mailTemplate;
         private readonly IMailingService _mailingService;
         private readonly IApplicationSettings _appSettings;
         private readonly IOrganizationService _organizationService;
         private readonly IPostService _postService;
         private readonly IMarkdownConverter _markdownConverter;
+        private readonly ILogger _logger;
 
         private readonly IDbSet<Event> _eventsDbSet;
         private readonly IDbSet<Project> _projectsDbSet;
@@ -38,20 +41,24 @@ namespace Shrooms.Domain.Services.Email.Posting
 
         public CommentEmailNotificationService(IUnitOfWork2 uow,
                                           IUserService userService,
+                                          ICommentService commentService,
                                           IMailTemplate mailTemplate,
                                           IMailingService mailingService,
                                           IApplicationSettings appSettings,
                                           IOrganizationService organizationService,
                                           IMarkdownConverter markdownConverter,
-                                          IPostService postService)
+                                          IPostService postService,
+                                          ILogger logger)
         {
             _appSettings = appSettings;
             _userService = userService;
+            _commentService = commentService;
             _mailTemplate = mailTemplate;
             _mailingService = mailingService;
             _organizationService = organizationService;
             _markdownConverter = markdownConverter;
             _postService = postService;
+            _logger = logger;
 
             _eventsDbSet = uow.GetDbSet<Event>();
             _projectsDbSet = uow.GetDbSet<Project>();
@@ -63,13 +70,60 @@ namespace Shrooms.Domain.Services.Email.Posting
             var commentCreator = _userService.GetApplicationUser(commentDto.CommentCreator);
             var organization = _organizationService.GetOrganizationById(commentCreator.OrganizationId);
 
-            var destinationEmails = GetPostWatchersEmails(commentCreator.Email, commentDto.PostId, commentCreator.Id);
+            var mentionedUsers = GetMentionedUsers(commentDto.MentionedUsersIds).ToList();
+            var destinationEmails = GetPostWatchersEmails(commentCreator.Email, commentDto.PostId, commentCreator.Id).Except(mentionedUsers.Select(x => x.Email)).ToList();
 
-            if (destinationEmails.Count <= 0)
+            if (destinationEmails.Count > 0)
             {
-                return;
+                SendPostWatcherEmails(commentDto, destinationEmails, commentCreator, organization);
             }
 
+            if (mentionedUsers.Count > 0)
+            {
+                SendMentionEmails(commentDto, mentionedUsers, commentCreator, organization);
+            }
+        }
+
+        private void SendMentionEmails(CommentCreatedDTO commentDto, IList<ApplicationUser> mentionedUsers, ApplicationUser commentCreator, Organization organization)
+        {
+            foreach (var mentionedUser in mentionedUsers)
+            {
+                try
+                {
+                    if (!mentionedUser.NotificationsSettings.MentionEmailNotifications)
+                    {
+                        continue;
+                    }
+
+                    var comment = _commentService.GetCommentBody(commentDto.CommentId);
+
+                    var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
+                    var postUrl = _appSettings.WallPostUrl(organization.ShortName, commentDto.PostId);
+
+                    var subject = $"You have been mentioned in the post";
+                    var messageBody = _markdownConverter.ConvertToHtml(comment);
+
+                    var newMentionTemplateViewModel = new NewMentionTemplateViewModel(
+                        mentionedUser.FullName,
+                        commentCreator.FullName,
+                        postUrl,
+                        userNotificationSettingsUrl,
+                        messageBody);
+
+                    var content = _mailTemplate.Generate(newMentionTemplateViewModel, EmailTemplateCacheKeys.NewMention);
+
+                    var emailData = new EmailDto(mentionedUser.Email, subject, content);
+                    _mailingService.SendEmail(emailData);
+                }
+                catch (Exception e)
+                {
+                    _logger.Debug(e.Message, e);
+                }
+            }
+        }
+
+        private void SendPostWatcherEmails(CommentCreatedDTO commentDto, IList<string> emails, ApplicationUser commentCreator, Organization organization)
+        {
             var comment = LoadComment(commentDto.CommentId);
             var postLink = GetPostLink(commentDto.WallType, commentDto.WallId, organization.ShortName, commentDto.PostId);
             var authorPictureUrl = _appSettings.PictureUrl(organization.ShortName, commentCreator.PictureId);
@@ -87,8 +141,21 @@ namespace Shrooms.Domain.Services.Email.Posting
                 EmailTemplates.DefaultActionButtonTitle);
 
             var content = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.NewPostComment);
-            var emailData = new EmailDto(destinationEmails, subject, content);
+            var emailData = new EmailDto(emails, subject, content);
             _mailingService.SendEmail(emailData);
+        }
+
+        public IEnumerable<ApplicationUser> GetMentionedUsers(IEnumerable<string> mentionIds)
+        {
+            foreach (var mentionId in mentionIds)
+            {
+                var user = _userService.GetApplicationUser(mentionId);
+
+                if (user.NotificationsSettings.MentionEmailNotifications)
+                {
+                    yield return user;
+                }
+            }
         }
 
         private IList<string> GetPostWatchersEmails(string senderEmail, int postId, string commentCreatorId)

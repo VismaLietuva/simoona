@@ -26,14 +26,14 @@
         'wallService',
         'errorHandler',
         'notifySrv',
-        'dataHandler'
-    ];
+        'dataHandler',
+        '$translate',
+        ];
 
     function wallPostCommentCreateController($scope, $element, imageValidationSettings, shroomsFileUploader,
-        pictureRepository, wallImageConfig, wallCommentRepository, wallSettings, wallService, errorHandler, notifySrv, dataHandler) {
+        pictureRepository, wallImageConfig, wallCommentRepository, wallSettings, wallService, errorHandler, notifySrv, dataHandler, translate) {
         /*jshint validthis: true */
         var vm = this;
-
         vm.showSubmit = showSubmit;
         vm.attachImage = attachImage;
         vm.submitComment = submitComment;
@@ -41,12 +41,17 @@
         vm.handleFormSubmit = handleFormSubmit;
         vm.handleErrorMessage = handleErrorMessage;
 
+        vm.selectedMentions = [];
         vm.commentForm = {};
         vm.attachedFiles = [];
         vm.isFormEnabled = true;
         vm.showSubmitButton = false;
+        vm.isSearchingEmployee = false;
         vm.maxLength = wallSettings.postMaxLength;
         vm.thumbHeight = wallImageConfig.thumbHeight;
+        vm.getUsersForAutocomplete = getUsersForAutocomplete;
+        vm.invokeMention = invokeMention;
+        vm.selectMention = selectMention;
 
         init();
 
@@ -57,6 +62,8 @@
                 vm.showSubmitButton = true;
                 $element.find('textarea').focus();
             });
+
+            vm.addComment = translate.instant('wall.addComment');
         }
 
         function isSubmittable() {
@@ -79,15 +86,48 @@
             }
         }
 
+        function selectMention(item) {
+            vm.selectedMentions.push({id: item.id, fullName: item.label});
+
+            return `**@${item.label.replace(' ', '_')}**`;
+        }
+
+        function invokeMention(term) {
+            if (term) {
+                getUsersForAutocomplete(term).then(function(response) {
+                    vm.employees = response.map(function(cur) {
+                        return {
+                            id: cur.id,
+                            label: cur.fullName
+                        }
+                    });
+                });
+            }
+        }
+
         function handleFormSubmit(pictureId) {
             vm.commentForm.postId = vm.post.id;
             vm.commentForm.pictureId = pictureId;
+            vm.commentForm.mentionedUserIds = compareAndGetMentions();
 
             wallCommentRepository.createComment(vm.commentForm).then(function() {
                 wallService.initWall(vm.isWallModule, vm.wallId);
             }, errorHandler.handleErrorMessage);
 
             clearComment();
+        }
+
+
+        function compareAndGetMentions() {
+            var parsedNamesFromTextBody = parseMentions(vm.commentForm.messageBody);
+
+            return vm.selectedMentions.filter(function(cur) {
+                if(parsedNamesFromTextBody.includes(cur.fullName)) {
+                    return cur;
+                }
+            }).map(function(cur) {
+                return cur.id;
+            });
         }
 
         function handleErrorMessage(errorResponse) {
@@ -145,6 +185,22 @@
                 notifySrv.error('wall.imageInvalidType');
             }
             $scope.$apply();
+        }
+
+        function getUsersForAutocomplete(query) {
+            return wallCommentRepository.getUsersForAutoComplete(query);
+        }
+        
+        function parseMentions (text) {
+            var pattern = /\B@[a-z0-9_-]+/gi;
+            var matches = text.match(pattern);
+            
+            if (matches) {
+                return matches.map(cur => {
+                    return cur.replace('@', '')
+                             .replace('_', ' ');
+                });
+            }
         }
     }
 }());

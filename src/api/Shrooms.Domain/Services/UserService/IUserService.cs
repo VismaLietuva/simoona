@@ -4,6 +4,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Users;
+using Shrooms.Contracts.DataTransferObjects.Users;
 using Shrooms.DataLayer.EntityModels.Models;
 
 namespace Shrooms.Domain.Services.UserService
@@ -33,5 +34,6 @@ namespace Shrooms.Domain.Services.UserService
         void RemoveLogin(string id, UserLoginInfo loginInfo);
 
         ApplicationUser GetApplicationUser(string id);
+        IEnumerable<UserAutoCompleteDto> GetUsersForAutocomplete(string s);
     }
 }

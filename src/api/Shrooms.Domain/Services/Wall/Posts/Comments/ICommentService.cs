@@ -13,6 +13,8 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
 
         void DeleteComment(int id, UserAndOrganizationDTO userOrg);
 
+        string GetCommentBody(int id);
+
         void HideComment(int id, UserAndOrganizationDTO userOrg);
 
         void DeleteCommentsByPost(int postId);

@@ -30,6 +30,7 @@
         vm.settings.myPostsEmailNotifications = {};
         vm.settings.followingPostsAppNotifications = {};
         vm.settings.followingPostsEmailNotifications = {};
+        vm.settings.mentionEmailNotifications = {};
 
         vm.save = saveNotifications;
 
@@ -52,6 +53,7 @@
                     vm.settings.myPostsEmailNotifications = response.myPostsEmailNotifications;
                     vm.settings.followingPostsAppNotifications = response.followingPostsAppNotifications;
                     vm.settings.followingPostsEmailNotifications = response.followingPostsEmailNotifications;
+                    vm.settings.mentionEmailNotifications = response.mentionEmailNotifications;
                 }
                 vm.isLoading = false;
             }, errorHandler.handleErrorMessage);

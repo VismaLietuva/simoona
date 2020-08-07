@@ -4,6 +4,7 @@ using Shrooms.Contracts.DataTransferObjects.Users;
 using Shrooms.Contracts.ViewModels.User;
 using Shrooms.Presentation.WebViewModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.User;
+using Shrooms.Presentation.WebViewModels.Models.Users;
 
 namespace Shrooms.Presentation.ModelMappings.Profiles
 {
@@ -54,6 +55,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
             CreateMap<WallNotificationsDto, WallNotificationsViewModel>();
             CreateMap<LocalizationSettingsDto, LocalizationSettingsViewModel>();
             CreateMap<UserNotificationsSettingsDto, UserNotificationsSettingsViewModel>();
+            CreateMap<UserAutoCompleteDto, ApplicationUserAutoCompleteViewModel>();
         }
 
         private void CreateViewModelToDtoMappings()

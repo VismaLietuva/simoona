@@ -11,12 +11,14 @@
     ];
 
     function wallCommentRepository($resource, endPoint) {
+        var userUrl = endPoint + '/User/';
         var commentUrl = endPoint + '/Comment/';
 
         var service = {
             createComment: createComment,
             editComment: editComment,
-            deleteComment: deleteComment
+            deleteComment: deleteComment,
+            getUsersForAutoComplete: getUsersForAutoComplete
         };
         return service;
 
@@ -26,7 +28,8 @@
             return $resource(commentUrl + 'Create').save({
                 postId: comment.postId,
                 messageBody: comment.messageBody,
-                pictureId: comment.pictureId
+                pictureId: comment.pictureId,
+                mentionedUserIds: comment.mentionedUserIds
             }).$promise;
         }
 
@@ -39,6 +42,12 @@
                 id: comment.id,
                 messageBody: comment.messageBody,
                 pictureId: comment.pictureId
+            }).$promise;
+        }
+
+        function getUsersForAutoComplete(searchString) {
+            return $resource(userUrl + 'GetUsersForAutocomplete').query({
+                s: searchString
             }).$promise;
         }
 
