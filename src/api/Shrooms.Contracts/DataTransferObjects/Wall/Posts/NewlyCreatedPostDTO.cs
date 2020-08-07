@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Shrooms.Contracts.DataTransferObjects.Users;
 using Shrooms.Contracts.Enums;
 
@@ -21,5 +22,7 @@ namespace Shrooms.Contracts.DataTransferObjects.Wall.Posts
         public WallType WallType { get; set; }
 
         public int WallId { get; set; }
+
+        public IEnumerable<string> MentionedUsersIds { get; set; }
     }
 }

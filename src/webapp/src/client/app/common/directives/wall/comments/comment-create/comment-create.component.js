@@ -109,7 +109,7 @@
         function handleFormSubmit(pictureId) {
             vm.commentForm.postId = vm.post.id;
             vm.commentForm.pictureId = pictureId;
-            vm.commentForm.mentions = compareAndGetMentions()
+            vm.commentForm.mentionedUserIds = compareAndGetMentions();
 
             wallCommentRepository.createComment(vm.commentForm).then(function() {
                 wallService.initWall(vm.isWallModule, vm.wallId);
@@ -126,6 +126,8 @@
                 if(parsedNamesFromTextBody.includes(cur.fullName)) {
                     return cur;
                 }
+            }).map(function(cur) {
+                return cur.id;
             });
         }
 
@@ -192,11 +194,14 @@
         
         function parseMentions (text) {
             var pattern = /\B@[a-z0-9_-]+/gi;
-
-            return text.match(pattern).map(cur => {
-                return cur.replace('@', '')
-                         .replace('_', ' ');
-            });
+            var matches = text.match(pattern);
+            
+            if (matches) {
+                return matches.map(cur => {
+                    return cur.replace('@', '')
+                             .replace('_', ' ');
+                });
+            }
         }
     }
 }());

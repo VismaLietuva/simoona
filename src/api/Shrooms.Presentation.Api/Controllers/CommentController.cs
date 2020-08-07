@@ -64,14 +64,6 @@ namespace Shrooms.Presentation.Api.Controllers
                     notif.Notify(commentCreatedDto, userHubDto);
                 }, GetOrganizationName());
 
-                if (commentDto.Mentions.Any())
-                {
-                    _asyncRunner.Run<NewMentionNotifier>(notif =>
-                    {
-                        notif.NotifyNewMentionInComment(commentCreatedDto.PostId, commentCreatedDto.CommentId, commentCreatedDto.CommentCreator, commentDto.Mentions);
-                    }, GetOrganizationName());
-                }
-
                 return Ok(new { commentCreatedDto.CommentId });
             }
             catch (ValidationException e)

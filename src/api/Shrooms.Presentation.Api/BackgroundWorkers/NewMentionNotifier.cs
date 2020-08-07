@@ -28,9 +28,12 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
 
 
 
-        public NewMentionNotifier(IUserService userService, IMarkdownConverter markdownConverter, 
-            IMailTemplate mailTemplate, ILogger logger, IOrganizationService organizationService, IPostService postService,
-            ICommentService commentService, IMailingService mailingService, IApplicationSettings applicationSettings)
+        public NewMentionNotifier(IUserService userService, 
+                                  IMarkdownConverter markdownConverter, 
+                                  IMailTemplate mailTemplate, ILogger logger, 
+                                  IOrganizationService organizationService, IPostService postService,
+                                  ICommentService commentService, IMailingService mailingService, 
+                                  IApplicationSettings applicationSettings)
         {
             _userService = userService;
             _commentService = commentService;
@@ -43,54 +46,13 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
             _markdownConverter = markdownConverter;
         }
 
-        public void NotifyNewMentionInComment(int postId, int commentId, string mentioningUser, IEnumerable<MentionedUserDto> usersToNotify)
+        public void NotifyNewMentionInPost(int postId, string mentioningUser, IEnumerable<string> usersToNotify)
         {
             foreach (var userToNotify in usersToNotify)
             {
                 try
                 {
-                    var mentionedUser = _userService.GetApplicationUser(userToNotify.Id);
-
-                    if (mentionedUser.NotificationsSettings.MentionEmailNotifications)
-                    {
-                        var comment = _commentService.GetCommentBody(commentId);
-
-                        var organization = _organizationService.GetOrganizationById(mentionedUser.OrganizationId);
-
-                        var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
-                        var postUrl = _appSettings.WallPostUrl(organization.ShortName, postId);
-
-                        var subject = $"You have been mentioned in the post";
-                        var messageBody = _markdownConverter.ConvertToHtml(comment);
-
-                        var newMentionTemplateViewModel = new NewMentionTemplateViewModel(
-                            mentionedUser.FullName,
-                            mentioningUser,
-                            postUrl,
-                            userNotificationSettingsUrl,
-                            messageBody);
-
-                        var content = _mailTemplate.Generate(newMentionTemplateViewModel, EmailTemplateCacheKeys.NewMention);
-
-                        var emailData = new EmailDto(mentionedUser.Email, subject, content);
-                        _mailingService.SendEmail(emailData);
-                    }
-                }
-                catch (Exception e)
-                {
-                    _logger.Debug(e.Message, e);
-                }
-            }
-        }
-
-
-        public void NotifyNewMentionInPost(int postId, string mentioningUser, IEnumerable<MentionedUserDto> usersToNotify)
-        {
-            foreach (var userToNotify in usersToNotify)
-            {
-                try
-                {
-                    var mentionedUser = _userService.GetApplicationUser(userToNotify.Id);
+                    var mentionedUser = _userService.GetApplicationUser(userToNotify);
 
                     if (mentionedUser.NotificationsSettings.MentionEmailNotifications)
                     {

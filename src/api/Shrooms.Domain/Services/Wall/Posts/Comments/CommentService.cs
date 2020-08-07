@@ -102,7 +102,13 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
 
             return new CommentCreatedDTO
             {
-                WallId = post.WallId, CommentId = comment.Id, WallType = post.Wall.Type, CommentCreator = comment.AuthorId, PostCreator = post.AuthorId, PostId = post.Id
+                WallId = post.WallId, 
+                CommentId = comment.Id,
+                WallType = post.Wall.Type, 
+                CommentCreator = comment.AuthorId, 
+                PostCreator = post.AuthorId, 
+                PostId = post.Id,
+                MentionedUsersIds = commentDto.MentionedUserIds.Distinct()
             };
         }
 

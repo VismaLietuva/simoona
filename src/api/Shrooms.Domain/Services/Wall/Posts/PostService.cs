@@ -82,7 +82,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
 
                 var postCreator = _usersDbSet.Single(user => user.Id == newPostDto.UserId);
                 var postCreatorDto = MapUserToDto(postCreator);
-                var newlyCreatedPostDto = MapNewlyCreatedPostToDto(post, postCreatorDto, wall.Type);
+                var newlyCreatedPostDto = MapNewlyCreatedPostToDto(post, postCreatorDto, wall.Type, newPostDto.MentionedUserIds);
 
                 return newlyCreatedPostDto;
             }
@@ -223,7 +223,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
             return userDto;
         }
 
-        private NewlyCreatedPostDTO MapNewlyCreatedPostToDto(Post post, UserDto user, WallType wallType)
+        private NewlyCreatedPostDTO MapNewlyCreatedPostToDto(Post post, UserDto user, WallType wallType, IEnumerable<string> mentionedUserIds)
         {
             var newlyCreatedPostDto = new NewlyCreatedPostDTO
             {
@@ -234,7 +234,8 @@ namespace Shrooms.Domain.Services.Wall.Posts
                 CreatedBy = post.CreatedBy,
                 User = user,
                 WallType = wallType,
-                WallId = post.WallId
+                WallId = post.WallId,
+                MentionedUsersIds = mentionedUserIds
             };
             return newlyCreatedPostDto;
         }

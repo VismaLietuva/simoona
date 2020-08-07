@@ -1,5 +1,4 @@
-﻿using Shrooms.Contracts.DataTransferObjects.Users;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Shrooms.Contracts.DataTransferObjects.Wall.Posts
 {
@@ -10,6 +9,6 @@ namespace Shrooms.Contracts.DataTransferObjects.Wall.Posts
         public string SharedEventId { get; set; }
         public int WallId { get; set; }
 
-        public IEnumerable<MentionedUserDto> Mentions { get; set; }
+        public IEnumerable<string> MentionedUserIds { get; set; }
     }
 }

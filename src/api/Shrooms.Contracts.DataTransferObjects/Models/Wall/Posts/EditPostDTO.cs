@@ -8,7 +8,5 @@ namespace Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts
         public int Id { get; set; }
         public string MessageBody { get; set; }
         public string PictureId { get; set; }
-
-        public IEnumerable<MentionedUserDto> Mentions { get; set; }
     }
 }

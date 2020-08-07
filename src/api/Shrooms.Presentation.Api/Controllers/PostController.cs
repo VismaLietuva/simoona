@@ -93,14 +93,6 @@ namespace Shrooms.Presentation.Api.Controllers
                     notif.Notify(createdPost, userHubDto);
                 }, GetOrganizationName());
                 
-                if (postModel.Mentions.Any())
-                {
-                    _asyncRunner.Run<NewMentionNotifier>(notif =>
-                    {
-                        notif.NotifyNewMentionInPost(createdPost.Id, createdPost.User.FullName, postModel.Mentions);
-                    }, GetOrganizationName());
-                }
-
                 return Ok(_mapper.Map<WallPostViewModel>(createdPost));
             }
             catch (ValidationException e)

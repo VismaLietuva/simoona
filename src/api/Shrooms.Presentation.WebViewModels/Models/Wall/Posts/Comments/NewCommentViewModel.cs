@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Shrooms.Contracts.Constants;
-using Shrooms.Presentation.WebViewModels.Models.Users;
 using Shrooms.Presentation.WebViewModels.ValidationAttributes;
 
 namespace Shrooms.Presentation.WebViewModels.Models.Wall.Posts.Comments
@@ -19,6 +17,6 @@ namespace Shrooms.Presentation.WebViewModels.Models.Wall.Posts.Comments
 
         public string PictureId { get; set; }
 
-        public IEnumerable<MentionedUserViewModel> Mentions { get; set; }
+        public IEnumerable<string> MentionedUserIds { get; set; }
     }
 }

@@ -47,7 +47,7 @@
             return $resource(postUrl + 'Create').save({
                 wallId: wallId,
                 messageBody: post.messageBody,
-                mentions: post.mentions,
+                mentionedUserIds: post.mentionedUserIds,
                 pictureId: post.pictureId
             }).$promise;
         }

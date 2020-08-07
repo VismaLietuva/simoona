@@ -27,7 +27,7 @@
                 postId: comment.postId,
                 messageBody: comment.messageBody,
                 pictureId: comment.pictureId,
-                mentions: comment.mentions
+                mentionedUserIds: comment.mentionedUserIds
             }).$promise;
         }
 
