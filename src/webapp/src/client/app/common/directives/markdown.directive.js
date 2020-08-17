@@ -15,7 +15,7 @@
 
             scope.$evalAsync(function() {
                 let text = convertMarkdownToHtml(element[0].innerHTML);
-                element[0].innerHTML = formatMentions(text);;
+                element[0].innerHTML = formatMentions(text);
             })
 
             function convertMarkdownToHtml(input) {
