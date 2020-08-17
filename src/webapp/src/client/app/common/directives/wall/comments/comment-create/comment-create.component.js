@@ -89,7 +89,7 @@
         function selectMention(item) {
             vm.selectedMentions.push({id: item.id, fullName: item.label});
 
-            return `**@${item.label.replace(' ', '_')}**`;
+            return `@${item.label.replace(' ', '_')}`;
         }
 
         function invokeMention(term) {
