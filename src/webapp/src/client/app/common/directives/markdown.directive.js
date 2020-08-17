@@ -14,8 +14,8 @@
         function linkFunc (scope, element, attrs) {
 
             scope.$evalAsync(function() {
-                const text = convertMarkdownToHtml(element[0].innerHTML);
-                element[0].innerHTML = text;
+                let text = convertMarkdownToHtml(element[0].innerHTML);
+                element[0].innerHTML = formatMentions(text);;
             })
 
             function convertMarkdownToHtml(input) {
@@ -40,6 +40,19 @@
                     'underline'
                 ];
                 enabledFeatures.forEach(option => converter.setOption(option, true));
+            }
+
+            function formatMentions(text) {
+                var pattern = /\B@[a-z0-9_-]+/gi;
+                var matches = text.match(pattern);
+
+                if (matches) {
+                    matches.forEach(function(cur) {
+                        text = text.replace(cur, `<strong> ${cur} </strong>`);
+                    });
+                }
+
+                return text;
             }
         }
     }
