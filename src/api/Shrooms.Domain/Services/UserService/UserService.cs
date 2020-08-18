@@ -211,8 +211,9 @@ namespace Shrooms.Domain.Services.UserService
         public IEnumerable<UserAutoCompleteDto> GetUsersForAutocomplete(string s)
         {
             var users = _usersDbSet
-                .Where(user => user.UserName.Contains(s) || user.Email.Contains(s) || (user.FirstName + " " + user.LastName).Contains(s))
+                .Where(user => user.UserName.StartsWith(s) || user.Email.StartsWith(s) || (user.FirstName + " " + user.LastName).StartsWith(s))
                 .Where(_roleService.ExcludeUsersWithRole(ConstantsRoles.NewUser))
+                .Take(10)
                 .Select(MapUsersToAutocompleteDTO())
                 .ToList();
 
