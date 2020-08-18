@@ -43,7 +43,7 @@
             }
 
             function formatMentions(text) {
-                var pattern = /\B@[a-z0-9_-]+/gi;
+                var pattern = /\B@[\u00BF-\u1FFF\u2C00-\uD7FF\w]+/gi;
                 var matches = text.match(pattern);
 
                 if (matches) {

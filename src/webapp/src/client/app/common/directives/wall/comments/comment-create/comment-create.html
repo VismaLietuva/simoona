@@ -9,6 +9,7 @@
               name="messageBody"
               msd-elastic
               type="text"
+              ng-model-options="{ debounce: 500 }"
               ng-click="vm.showSubmit()"
               mentio mentio-typed-text="typedTerm"
               mentio-search="vm.invokeMention(term)"
