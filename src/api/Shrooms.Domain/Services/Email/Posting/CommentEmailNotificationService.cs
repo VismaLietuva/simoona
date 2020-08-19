@@ -90,7 +90,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             {
                 try
                 {
-                    if (!mentionedUser.NotificationsSettings.MentionEmailNotifications)
+                    if (mentionedUser.NotificationsSettings != null && !mentionedUser.NotificationsSettings.MentionEmailNotifications)
                     {
                         continue;
                     }
@@ -151,7 +151,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             {
                 var user = _userService.GetApplicationUser(mentionId);
 
-                if (user.NotificationsSettings.MentionEmailNotifications)
+                if (user.NotificationsSettings == null || user.NotificationsSettings.MentionEmailNotifications)
                 {
                     yield return user;
                 }

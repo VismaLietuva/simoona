@@ -48,7 +48,7 @@
 
                 if (matches) {
                     matches.forEach(function(cur) {
-                        text = text.replace(cur, `<strong> ${cur} </strong>`);
+                        text = text.replace(cur, `<strong>${cur}</strong>`);
                     });
                 }
 
