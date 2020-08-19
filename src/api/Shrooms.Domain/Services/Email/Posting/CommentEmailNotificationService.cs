@@ -86,6 +86,12 @@ namespace Shrooms.Domain.Services.Email.Posting
 
         private void SendMentionEmails(CommentCreatedDTO commentDto, IList<ApplicationUser> mentionedUsers, ApplicationUser commentCreator, Organization organization)
         {
+            var comment = _commentService.GetCommentBody(commentDto.CommentId);
+            var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
+            var postUrl = _appSettings.WallPostUrl(organization.ShortName, commentDto.PostId);
+            var subject = $"You have been mentioned in the post";
+            var messageBody = _markdownConverter.ConvertToHtml(comment);
+
             foreach (var mentionedUser in mentionedUsers)
             {
                 try
@@ -94,14 +100,6 @@ namespace Shrooms.Domain.Services.Email.Posting
                     {
                         continue;
                     }
-
-                    var comment = _commentService.GetCommentBody(commentDto.CommentId);
-
-                    var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
-                    var postUrl = _appSettings.WallPostUrl(organization.ShortName, commentDto.PostId);
-
-                    var subject = $"You have been mentioned in the post";
-                    var messageBody = _markdownConverter.ConvertToHtml(comment);
 
                     var newMentionTemplateViewModel = new NewMentionTemplateViewModel(
                         mentionedUser.FullName,
