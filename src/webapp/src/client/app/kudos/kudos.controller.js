@@ -53,7 +53,7 @@
             kudosFactory.getUserInformation(vm.userId).then(function (response) {
                 vm.user = response;
                 vm.kudosifyUser = {
-                    formattedName: response.firstName + ' ' + response.lastName,
+                    fullName: response.firstName + ' ' + response.lastName,
                     id: vm.userId
                 };
                 vm.userInformationIsLoading = false;
