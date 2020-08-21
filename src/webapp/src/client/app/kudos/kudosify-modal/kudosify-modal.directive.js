@@ -119,7 +119,7 @@
                 vm.user = response;
 
                 vm.kudosifyUser = {
-                    fullname: response.firstName + ' ' + response.lastName,
+                    fullName: response.firstName + ' ' + response.lastName,
                     id: vm.userId
                 };
                 vm.isLoading = false;
