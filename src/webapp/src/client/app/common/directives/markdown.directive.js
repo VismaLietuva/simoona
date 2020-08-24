@@ -45,14 +45,20 @@
             function formatMentions(text) {
                 var pattern = /\B@[\u00BF-\u1FFF\u2C00-\uD7FF\w]+/gi;
                 var matches = text.match(pattern);
-
+                
                 if (matches) {
+                    matches = matches.filter(onlyUnique);
+                    
                     matches.forEach(function(cur) {
-                        text = text.replace(cur, `<strong>${cur}</strong>`);
+                        text = text.split(cur).join(`<strong>${cur}</strong>`);
                     });
                 }
 
                 return text;
+            }
+
+            function onlyUnique(value, index, self) { 
+                return self.indexOf(value) === index;
             }
         }
     }

@@ -5,42 +5,63 @@
         .module('simoonaApp.Common')
         .factory('mentionService', mentionService);
 
-    mentionService.$inject = ['wallCommentRepository'];
+    mentionService.$inject = [
+        'authService',
+        'wallCommentRepository'
+    ];
 
-    function mentionService(wallCommentRepository) {
+    function mentionService(authService, wallCommentRepository) {
         var service = {
             getUsersForAutocomplete: getUsersForAutocomplete,
-            compareAndGetMentions : compareAndGetMentions
+            applyMentions: applyMentions
         };
 
         return service;
+
+        function applyMentions(form, selectedMentionsFromList) {
+            form.mentionedUserIds = [];
+
+            var parsedNamesFromTextBody = parseMentions(form.messageBody);
+
+            parsedNamesFromTextBody = removeDuplicates(parsedNamesFromTextBody);
+            selectedMentionsFromList = removeDuplicates(selectedMentionsFromList, 'fullName');
+
+            if (parsedNamesFromTextBody && selectedMentionsFromList) {
+                selectedMentionsFromList.forEach(function(cur) {
+                    if(parsedNamesFromTextBody.includes(cur.fullName)) {
+                        form.mentionedUserIds.push(cur.id);
+                        
+                        var formattedName = `@${cur.fullName.replace(' ', '_')}`;
+                        form.messageBody = form.messageBody.split(`${formattedName}`).join(`[${formattedName}] (/${authService.getOrganizationNameFromUrl()}/Profiles/${cur.id})`);
+                    }
+                });
+            }
+        }
 
         function getUsersForAutocomplete(query) {
             return wallCommentRepository.getUsersForAutoComplete(query);
         }
 
-        function compareAndGetMentions(messageBody, selectedMentions) {
-            var parsedNamesFromTextBody = parseMentions(messageBody);
-
-            if (parsedNamesFromTextBody) {
-                return selectedMentions.filter(function(cur) {
-                    if(parsedNamesFromTextBody.includes(cur.fullName)) {
-                        return cur;
-                    }
-                }).map(function(cur) {
-                    return cur.id;
-                });
-            }
-        }
-        
         function parseMentions (text) {
-            var pattern = /\B@[a-z0-9_-]+/gi;
+            var pattern = /\B@[\u00BF-\u1FFF\u2C00-\uD7FF\w]+/gi;
             var matches = text.match(pattern);
-            
+
             if (matches) {
+                matches = removeDuplicates(matches);
+
                 return matches.map(cur => {
                     return cur.replace('@', '')
                              .replace('_', ' ');
+                });
+            }
+        }
+
+        function removeDuplicates(myArr, prop) {
+            if (myArr) {
+                return myArr.filter((obj, pos, arr) => {
+                    return prop ? 
+                        arr.map(mapObj => mapObj[prop]).indexOf(obj[prop]) === pos : 
+                        arr.map(mapObj => mapObj).indexOf(obj) === pos;
                 });
             }
         }
