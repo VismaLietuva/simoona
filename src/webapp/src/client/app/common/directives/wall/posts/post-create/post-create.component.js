@@ -79,7 +79,7 @@
 
         function handleFormSubmit(pictureId) {
             vm.postForm.pictureId = pictureId;
-            vm.postForm.mentionedUserIds = mentionService.compareAndGetMentions(vm.postForm.messageBody, vm.selectedMentions);
+            mentionService.applyMentions(vm.postForm, vm.selectedMentions);
             vm.onCreatePost({ post: vm.postForm });
 
             clearPost();

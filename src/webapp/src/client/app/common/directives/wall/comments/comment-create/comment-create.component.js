@@ -89,8 +89,7 @@
         function handleFormSubmit(pictureId) {
             vm.commentForm.postId = vm.post.id;
             vm.commentForm.pictureId = pictureId;
-            vm.commentForm.mentionedUserIds = mentionService.compareAndGetMentions(vm.commentForm.messageBody, vm.selectedMentions);
-
+            mentionService.applyMentions(vm.commentForm, vm.selectedMentions);
             wallCommentRepository.createComment(vm.commentForm).then(function() {
                 wallService.initWall(vm.isWallModule, vm.wallId);
             }, errorHandler.handleErrorMessage);
