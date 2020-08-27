@@ -30,9 +30,6 @@
                 selectedMentionsFromList.forEach(function(cur) {
                     if(parsedNamesFromTextBody.includes(cur.fullName)) {
                         form.mentionedUserIds.push(cur.id);
-                        
-                        var formattedName = `@${cur.fullName.replace(' ', '_')}`;
-                        form.messageBody = form.messageBody.split(`${formattedName}`).join(`[${formattedName}] (/${authService.getOrganizationNameFromUrl()}/Profiles/${cur.id})`);
                     }
                 });
             }
