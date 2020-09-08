@@ -120,7 +120,7 @@
                         
                         <!-- Book note input -->
                         <div ng-if="vm.isBookAdministrator || (!vm.isBookAdministrator && !!vm.book.note)" class="form-group" ng-class="{'has-error': bookForm.note ? bookForm.note.$invalid && bookForm.note.$dirty : false}">
-                            <label for="inputNote" class="control-label col-xs-12 col-sm-4" ng-if="vm.isBookAdministrator || vm.book.note" translate="books.note"></label>
+                            <label for="inputNote" class="control-label col-xs-12 col-sm-8" ng-if="vm.isBookAdministrator || vm.book.note" translate="books.note"></label>
                             <div class="col-xs-12 col-sm-6 col-md-4" ng-if="vm.isBookAdministrator">
                                 <textarea id="inputNote"
                                         type="text"
