@@ -141,6 +141,11 @@ namespace Shrooms.Domain.Services.Email.Posting
 
         private IEnumerable<ApplicationUser> GetMentionedUsers(IEnumerable<string> mentionedUsersIds)
         {
+            if (mentionedUsersIds == null)
+            {
+                yield break;
+            }
+
             foreach (var mentionId in mentionedUsersIds)
             {
                 var user = _userService.GetApplicationUser(mentionId);
