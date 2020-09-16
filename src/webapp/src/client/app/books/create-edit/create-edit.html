@@ -17,7 +17,7 @@
                         <!-- ISBN code input -->
                         <div class="form-group" ng-class="{'has-error': bookForm.isbn ? bookForm.isbn.$invalid && bookForm.isbn.$dirty : false}">
                             <label for="inputIsbn" class="control-label col-xs-12 col-sm-4" ng-if="(vm.isBookAdministrator && vm.state.add) || vm.book.isbn" translate="books.isbn"></label>
-                            <div class="col-xs-12 col-sm-6 col-md-4" ng-if="vm.isBookAdministrator && vm.state.add">
+                            <div class="col-xs-12 col-sm-6 col-md-8" ng-if="vm.isBookAdministrator && vm.state.add">
                                 <input id="inputIsbn"
                                     type="text"
                                     class="form-control"
@@ -30,14 +30,14 @@
                                     {{:: vm.isbnInvalid}}
                                 </p>
                             </div>
-                            <div class="col-xs-12 col-sm-6 col-md-4" ng-if="vm.state.edit && vm.book.isbn">
+                            <div class="col-xs-12 col-sm-6 col-md-8" ng-if="vm.state.edit && vm.book.isbn">
                                 <p data-test-id="book-isbn" class="form-control-static" ng-cloak>
                                     {{:: vm.book.isbn}}
                                 </p>
                             </div>
 
                             <div ng-if="vm.isBookAdministrator && vm.state.add" 
-                                class="col-xs-12 col-sm-4 col-sm-offset-4 col-md-offset-0 col-md-4">
+                                class="col-xs-12 col-sm-4 col-sm-offset-4 col-md-offset-0 col-md-8">
                                 <a class="btn btn-default find-book-btn"
                                 ng-disabled="!vm.book.isbn || bookForm.isbn.$error.maxlength"
                                 ng-click="vm.findBookByIsbn(bookForm.isbn.$viewValue)"
@@ -48,7 +48,7 @@
                         <!-- Book title input -->
                         <div class="form-group" ng-class="{'required': vm.isBookAdministrator, 'has-error': bookForm.title ? bookForm.title.$invalid && bookForm.title.$dirty : false}">
                             <label for="textareaTitle" class="control-label col-xs-12 col-sm-4" translate="books.title"></label>
-                            <div class="col-xs-12 col-sm-6 col-md-4" ng-if="vm.isBookAdministrator">
+                            <div class="col-xs-12 col-sm-6 col-md-8" ng-if="vm.isBookAdministrator">
                                 <textarea id="textareaTitle"
                                         type="text"
                                         class="form-control"
@@ -60,7 +60,7 @@
 
                                 <p class="text-danger help-block" ng-if="bookForm.title.$invalid && bookForm.title.$dirty" translate="common.messageFieldIsRequired"></p>
                             </div>
-                            <div class="col-xs-12 col-sm-6 col-md-4" ng-if="!vm.isBookAdministrator">
+                            <div class="col-xs-12 col-sm-6 col-md-8" ng-if="!vm.isBookAdministrator">
                                 <p ng-if="vm.book.url" class="form-control-static word-break">
                                     <a href="{{ vm.normalizeUrl(vm.book.url) }}" target="_blank" data-test-id="book-url">
                                         {{:: vm.book.title}}
@@ -74,7 +74,7 @@
                         <!-- Book author input -->
                         <div class="form-group" ng-class="{'required': vm.isBookAdministrator, 'has-error': bookForm.author ? bookForm.author.$invalid && bookForm.author.$dirty : false}">
                             <label for="inputAuthor" class="control-label col-xs-12 col-sm-4" translate="books.author"></label>
-                            <div class="col-xs-12 col-sm-6 col-md-4" ng-if="vm.isBookAdministrator">
+                            <div class="col-xs-12 col-sm-6 col-md-8" ng-if="vm.isBookAdministrator">
                                 <input id="inputAuthor"
                                     type="text"
                                     class="form-control"
@@ -84,7 +84,7 @@
 
                             <p class="text-danger help-block" ng-if="bookForm.author.$invalid && bookForm.author.$dirty" translate="common.messageFieldIsRequired"></p>
                             </div>
-                            <div class="col-xs-12 col-sm-6 col-md-4" ng-if="!vm.isBookAdministrator">
+                            <div class="col-xs-12 col-sm-6 col-md-8" ng-if="!vm.isBookAdministrator">
                                 <p class="form-control-static word-break" data-test-id="book-author" ng-cloak>
                                     {{:: vm.book.author}}
                                 </p>
@@ -93,7 +93,7 @@
                         <!-- Book url input -->
                         <div ng-if="vm.isBookAdministrator" class="form-group" ng-class="{'has-error': bookForm.url ? bookForm.url.$invalid && bookForm.url.$dirty : false}">
                             <label for="inputUrl" class="control-label col-xs-12 col-sm-4" translate="books.bookUrl"></label>
-                            <div class="col-xs-12 col-sm-6 col-md-4" ng-if="vm.isBookAdministrator">
+                            <div class="col-xs-12 col-sm-6 col-md-8" ng-if="vm.isBookAdministrator">
                                 <input id="inputUrl"
                                     type="text"
                                     class="form-control"
@@ -106,12 +106,12 @@
                         <!-- Book owner input-->
                         <div ng-if="vm.isBookAdministrator || (!vm.isBookAdministrator && !!vm.book.ownerFullName)" class="form-group" ng-class="{'has-error': bookForm.owner ? bookForm.owner.$invalid && bookForm.owner.$dirty : false}">
                             <label for="bookOwner" class="control-label col-xs-12 col-sm-4" translate="books.owner" ng-if="vm.isBookAdministrator || vm.book.ownerId"></label>
-                            <div class="col-xs-12 col-sm-6 col-md-4" ng-if="vm.isBookAdministrator">
+                            <div class="col-xs-12 col-sm-6 col-md-8" ng-if="vm.isBookAdministrator">
                                 <autocomplete id="bookOwner" load-data="vm.searchUsers" shown="fullName" bound-model="vm.owner" with-image="true" data-test-id="book-form-book-owner-autocomplete-input">
                                 </autocomplete>
                                 <p class="text-danger help-block" ng-if="bookForm.owner.$invalid && bookForm.owner.$dirty" translate="common.messageFieldIsRequired"></p>
                             </div>
-                            <div class="col-xs-12 col-sm-6 col-md-4" ng-if="!vm.isBookAdministrator && !!vm.book.ownerFullName">
+                            <div class="col-xs-12 col-sm-6 col-md-8" ng-if="!vm.isBookAdministrator && !!vm.book.ownerFullName">
                                 <p class="form-control-static word-break" data-test-id="book-owner" ng-cloak>
                                     {{:: vm.book.ownerFullName}}
                                 </p>
@@ -120,8 +120,8 @@
                         
                         <!-- Book note input -->
                         <div ng-if="vm.isBookAdministrator || (!vm.isBookAdministrator && !!vm.book.note)" class="form-group" ng-class="{'has-error': bookForm.note ? bookForm.note.$invalid && bookForm.note.$dirty : false}">
-                            <label for="inputNote" class="control-label col-xs-12 col-sm-8" ng-if="vm.isBookAdministrator || vm.book.note" translate="books.note"></label>
-                            <div class="col-xs-12 col-sm-6 col-md-4" ng-if="vm.isBookAdministrator">
+                            <label for="inputNote" class="control-label col-xs-12 col-sm-4" ng-if="vm.isBookAdministrator || vm.book.note" translate="books.note"></label>
+                            <div class="col-xs-12 col-sm-6 col-md-8" ng-if="vm.isBookAdministrator">
                                 <textarea id="inputNote"
                                         type="text"
                                         class="form-control"
@@ -131,7 +131,7 @@
                                         data-test-id="book-form-note-input"></textarea>
                             <p class="text-danger help-block" ng-if="bookForm.note.$invalid && bookForm.note.$dirty" translate="common.messageFieldIsRequired"></p>
                             </div>
-                            <div class="col-xs-12 col-sm-6 col-md-4" ng-if="!vm.isBookAdministrator">
+                            <div class="col-xs-12 col-sm-6 col-md-8" ng-if="!vm.isBookAdministrator">
                                 <p class="form-control-static word-break" data-test-id="book-owner" ng-cloak>
                                     {{:: vm.book.note}}
                                 </p>
