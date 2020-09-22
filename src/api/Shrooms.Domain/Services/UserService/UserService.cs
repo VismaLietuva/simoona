@@ -382,6 +382,11 @@ namespace Shrooms.Domain.Services.UserService
             return _usersDbSet.Include(x => x.NotificationsSettings).First(u => u.Id == id);
         }
 
+        public ApplicationUser GetApplicationUserOrDefault(string id)
+        {
+            return _usersDbSet.Include(x => x.NotificationsSettings).FirstOrDefault(u => u.Id == id);
+        }
+
         private void UnassignUserFromWalls(string userId, int tenantId)
         {
             var memberships = _wallMembersDbSet
