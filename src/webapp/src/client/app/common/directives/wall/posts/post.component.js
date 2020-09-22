@@ -153,6 +153,8 @@
         function getPostUrl(id) {
             if ($state.includes('Root.WithOrg.Client.Events') || $state.includes('Root.WithOrg.Client.Projects')){
                 return $location.absUrl();
+            } else if ($state.includes('Root.WithOrg.Client.Wall.All')){
+                return $location.absUrl().split('?')[0].replace('/All', '/Feed') + '?post=' + id;
             } else {
                 return $location.absUrl().split('?')[0] + '?post=' + id;
             }
