@@ -48,7 +48,12 @@ namespace Shrooms.Premium.Domain.Services.Books
             {
                 try
                 {
-                    var user = _userService.GetApplicationUser(bookToRemind.ApplicationUserId);
+                    var user = _userService.GetApplicationUserOrDefault(bookToRemind.ApplicationUserId);
+                    if (user == null)
+                    {
+                        continue;
+                    }
+
                     var organization = _organizationService.GetOrganizationById(bookToRemind.OrganizationId);
                     var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
                     var subject = $"Book reminder: \"{bookToRemind.Title}\"";
@@ -63,7 +68,7 @@ namespace Shrooms.Premium.Domain.Services.Books
                 }
                 catch (Exception e)
                 {
-                    _logger.Error(e);
+                    _logger.Debug(e.Message, e);
                 }
             }
         }
