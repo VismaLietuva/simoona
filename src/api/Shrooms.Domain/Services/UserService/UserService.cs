@@ -19,9 +19,9 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.DataLayer.EntityModels.Models.Notifications;
 using Shrooms.Domain.Services.Picture;
-using WallModel = Shrooms.DataLayer.EntityModels.Models.Multiwall.Wall;
-using ConstantsRoles = Shrooms.Contracts.Constants.Roles;
 using Shrooms.Domain.Services.Roles;
+using ConstantsRoles = Shrooms.Contracts.Constants.Roles;
+using WallModel = Shrooms.DataLayer.EntityModels.Models.Multiwall.Wall;
 
 namespace Shrooms.Domain.Services.UserService
 {
