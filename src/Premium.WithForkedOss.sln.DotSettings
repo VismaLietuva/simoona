@@ -19,7 +19,7 @@
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/GeneratedFilesAndFolders/=open_002Dsource_005Csrc_005Capi_005CMain_005CDataLayer_005CShrooms_002EDataLayer_005CMigrations/@EntryIndexedValue">open-source\src\api\Main\DataLayer\Shrooms.DataLayer\Migrations</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/CodeIssueFilter/IssueTypesToHide/=_003CConfigurableSeverity_0020Id_003D_0022RedundantElseBlock_0022_0020_002F_003E/@EntryIndexedValue">DoHide</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/CodeIssueFilter/IssueTypesToHide/=_003CConfigurableSeverity_0020Id_003D_0022RedundantLocalFunctionName_0022_0020_002F_003E/@EntryIndexedValue">DoHide</s:String>
-	<s:Boolean x:Key="/Default/CodeInspection/Highlighting/IdentifierHighlightingEnabled/@EntryValue">False</s:Boolean>
+	<s:Boolean x:Key="/Default/CodeInspection/Highlighting/IdentifierHighlightingEnabled/@EntryValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeInspection/Highlighting/IncludeWarningsInSwea/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=ArgumentsStyleLiteral/@EntryIndexedValue">HINT</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=ArgumentsStyleNamedExpression/@EntryIndexedValue">DO_NOT_SHOW</s:String>

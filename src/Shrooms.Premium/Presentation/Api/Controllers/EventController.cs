@@ -73,7 +73,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [Route("Recurrences")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult GetEventRecurranceOptions()
+        public IHttpActionResult GetEventRecurrenceOptions()
         {
             var recurrences = _eventUtilitiesService.GetRecurranceOptions();
             return Ok(recurrences);

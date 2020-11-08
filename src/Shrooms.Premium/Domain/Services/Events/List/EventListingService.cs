@@ -49,8 +49,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             return eventOptionsDto;
         }
 
-        public IEnumerable<EventListItemDTO> GetEventsFiltered(
-            EventsListingFilterArgs args, UserAndOrganizationDTO userOrganization)
+        public IEnumerable<EventListItemDTO> GetEventsFiltered(EventsListingFilterArgs args, UserAndOrganizationDTO userOrganization)
         {
             var officeSearchString = OfficeIdToString(args.OfficeId);
 
