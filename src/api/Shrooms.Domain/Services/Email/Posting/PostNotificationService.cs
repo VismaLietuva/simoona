@@ -12,7 +12,6 @@ using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
-using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.UserService;
@@ -109,7 +108,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             var messageBody = _markdownConverter.ConvertToHtml(_postService.GetPostBody(post.Id));
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
             var postUrl = _appSettings.WallPostUrl(organization.ShortName, post.Id);
-            var subject = $"You have been mentioned in the post";
+            var subject = "You have been mentioned in the post";
 
             foreach (var mentionedUser in mentionedUsers)
             {

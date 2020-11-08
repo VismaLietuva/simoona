@@ -14,7 +14,6 @@ using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.Presentation.Api.Filters;
 using Shrooms.Presentation.WebViewModels.Models;
-using WebApi.OutputCache.V2;
 
 namespace Shrooms.Presentation.Api.Controllers
 {

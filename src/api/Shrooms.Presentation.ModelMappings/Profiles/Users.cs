@@ -4,7 +4,6 @@ using Shrooms.Contracts.DataTransferObjects.Users;
 using Shrooms.Contracts.ViewModels.User;
 using Shrooms.Presentation.WebViewModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.User;
-using Shrooms.Presentation.WebViewModels.Models.Users;
 
 namespace Shrooms.Presentation.ModelMappings.Profiles
 {
