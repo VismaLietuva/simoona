@@ -71,14 +71,13 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             }
 
             var events = query
-                .Select(MapEventToListItemDto(userOrganization.UserId))
                 .OrderByDescending(e => e.IsPinned)
                 .ThenBy(e => e.StartDate)
                 .Skip((args.Page - 1) * EventsConstants.EventsDefaultPageSize)
                 .Take(EventsConstants.EventsDefaultPageSize)
-                .ToList();
+                .Select(MapEventToListItemDto(userOrganization.UserId));
 
-            return events;
+            return events.ToList();
         }
 
         public IEnumerable<EventListItemDTO> GetMyEvents(MyEventsOptionsDTO options, int page, int? officeId = null)
@@ -92,10 +91,10 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                 .Where(SearchFilter(options.SearchString))
                 .Where(myEventFilter)
                 .Where(EventOfficeFilter(officeSearchString))
-                .Select(MapEventToListItemDto(options.UserId))
                 .OrderByDescending(e => e.StartDate)
                 .Skip((page - 1) * EventsConstants.EventsDefaultPageSize)
                 .Take(EventsConstants.EventsDefaultPageSize)
+                .Select(MapEventToListItemDto(options.UserId))
                 .ToList();
 
             var orderedEvents = OrderEvents(events);
@@ -144,7 +143,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                 ParticipatingStatus = e.EventParticipants.FirstOrDefault(p => p.ApplicationUserId == userId) != null ?
                                           e.EventParticipants.FirstOrDefault(p => p.ApplicationUserId == userId).AttendStatus :
                                           (int)AttendingStatus.Idle,
-                MaxChoices = e.MaxChoices,
+                MaxChoices = e.MaxChoices
             };
         }
 
