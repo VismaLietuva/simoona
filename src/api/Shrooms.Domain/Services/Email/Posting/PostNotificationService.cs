@@ -12,7 +12,6 @@ using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
-using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.UserService;
@@ -106,20 +105,19 @@ namespace Shrooms.Domain.Services.Email.Posting
 
         private void SendMentionEmails(NewlyCreatedPostDTO post, List<ApplicationUser> mentionedUsers, ApplicationUser postCreator, Organization organization)
         {
+            var messageBody = _markdownConverter.ConvertToHtml(_postService.GetPostBody(post.Id));
+            var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
+            var postUrl = _appSettings.WallPostUrl(organization.ShortName, post.Id);
+            var subject = "You have been mentioned in the post";
+
             foreach (var mentionedUser in mentionedUsers)
             {
                 try
                 {
-                    if (!mentionedUser.NotificationsSettings.MentionEmailNotifications)
+                    if (mentionedUser.NotificationsSettings != null && !mentionedUser.NotificationsSettings.MentionEmailNotifications)
                     {
                         continue;
                     }
-
-                    var messageBody = _markdownConverter.ConvertToHtml(_postService.GetPostBody(post.Id));
-
-                    var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
-                    var postUrl = _appSettings.WallPostUrl(organization.ShortName, post.Id);
-                    var subject = $"You have been mentioned in the post";
 
                     var newMentionTemplateViewModel = new NewMentionTemplateViewModel(
                         mentionedUser.FullName,
@@ -142,11 +140,16 @@ namespace Shrooms.Domain.Services.Email.Posting
 
         private IEnumerable<ApplicationUser> GetMentionedUsers(IEnumerable<string> mentionedUsersIds)
         {
+            if (mentionedUsersIds == null)
+            {
+                yield break;
+            }
+
             foreach (var mentionId in mentionedUsersIds)
             {
                 var user = _userService.GetApplicationUser(mentionId);
 
-                if (user.NotificationsSettings.MentionEmailNotifications)
+                if (user.NotificationsSettings == null || user.NotificationsSettings.MentionEmailNotifications)
                 {
                     yield return user;
                 }

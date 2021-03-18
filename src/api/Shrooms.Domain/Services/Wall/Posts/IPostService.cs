@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts;
-using Shrooms.Contracts.DataTransferObjects.Wall.Comments;
 using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.DataLayer.EntityModels.Models;
 

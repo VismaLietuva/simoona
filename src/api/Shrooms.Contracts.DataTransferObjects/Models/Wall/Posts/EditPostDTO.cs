@@ -1,7 +1,4 @@
-﻿using Shrooms.Contracts.DataTransferObjects.Users;
-using System.Collections.Generic;
-
-namespace Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts
+﻿namespace Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts
 {
     public class EditPostDTO : UserAndOrganizationDTO
     {

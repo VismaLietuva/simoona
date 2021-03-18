@@ -7,7 +7,6 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts;
 using Shrooms.Contracts.DataTransferObjects.Users;
-using Shrooms.Contracts.DataTransferObjects.Wall.Comments;
 using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
@@ -147,7 +146,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
         }
         public string GetPostBody(int postId)
         {
-            return _postsDbSet.FirstOrDefault(p => p.Id == postId).MessageBody;
+            return _postsDbSet.FirstOrDefault(p => p.Id == postId)?.MessageBody;
         }
 
         public void DeleteWallPost(int postId, UserAndOrganizationDTO userOrg)

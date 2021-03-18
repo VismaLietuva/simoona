@@ -1,5 +1,4 @@
-﻿
-namespace Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels
+﻿namespace Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels
 {
     public class NewMentionTemplateViewModel : BaseEmailTemplateViewModel
     {

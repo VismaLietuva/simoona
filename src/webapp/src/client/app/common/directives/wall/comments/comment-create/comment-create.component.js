@@ -22,6 +22,7 @@
         'pictureRepository',
         'wallImageConfig',
         'wallCommentRepository',
+        'mentionService',
         'wallSettings',
         'wallService',
         'errorHandler',
@@ -31,7 +32,7 @@
         ];
 
     function wallPostCommentCreateController($scope, $element, imageValidationSettings, shroomsFileUploader,
-        pictureRepository, wallImageConfig, wallCommentRepository, wallSettings, wallService, errorHandler, notifySrv, dataHandler, translate) {
+        pictureRepository, wallImageConfig, wallCommentRepository, mentionService, wallSettings, wallService, errorHandler, notifySrv, dataHandler, translate) {
         /*jshint validthis: true */
         var vm = this;
         vm.showSubmit = showSubmit;
@@ -49,7 +50,6 @@
         vm.isSearchingEmployee = false;
         vm.maxLength = wallSettings.postMaxLength;
         vm.thumbHeight = wallImageConfig.thumbHeight;
-        vm.getUsersForAutocomplete = getUsersForAutocomplete;
         vm.invokeMention = invokeMention;
         vm.selectMention = selectMention;
 
@@ -86,48 +86,15 @@
             }
         }
 
-        function selectMention(item) {
-            vm.selectedMentions.push({id: item.id, fullName: item.label});
-
-            return `@${item.label.replace(' ', '_')}`;
-        }
-
-        function invokeMention(term) {
-            if (term) {
-                getUsersForAutocomplete(term).then(function(response) {
-                    vm.employees = response.map(function(cur) {
-                        return {
-                            id: cur.id,
-                            label: cur.fullName
-                        }
-                    });
-                });
-            }
-        }
-
         function handleFormSubmit(pictureId) {
             vm.commentForm.postId = vm.post.id;
             vm.commentForm.pictureId = pictureId;
-            vm.commentForm.mentionedUserIds = compareAndGetMentions();
-
+            mentionService.applyMentions(vm.commentForm, vm.selectedMentions);
             wallCommentRepository.createComment(vm.commentForm).then(function() {
                 wallService.initWall(vm.isWallModule, vm.wallId);
             }, errorHandler.handleErrorMessage);
 
             clearComment();
-        }
-
-
-        function compareAndGetMentions() {
-            var parsedNamesFromTextBody = parseMentions(vm.commentForm.messageBody);
-
-            return vm.selectedMentions.filter(function(cur) {
-                if(parsedNamesFromTextBody.includes(cur.fullName)) {
-                    return cur;
-                }
-            }).map(function(cur) {
-                return cur.id;
-            });
         }
 
         function handleErrorMessage(errorResponse) {
@@ -187,18 +154,22 @@
             $scope.$apply();
         }
 
-        function getUsersForAutocomplete(query) {
-            return wallCommentRepository.getUsersForAutoComplete(query);
-        }
         
-        function parseMentions (text) {
-            var pattern = /\B@[a-z0-9_-]+/gi;
-            var matches = text.match(pattern);
-            
-            if (matches) {
-                return matches.map(cur => {
-                    return cur.replace('@', '')
-                             .replace('_', ' ');
+        function selectMention(item) {
+            vm.selectedMentions.push({id: item.id, fullName: item.label});
+
+            return `@${item.label.replace(' ', '_')}`;
+        }
+
+        function invokeMention(term) {
+            if (term) {
+                mentionService.getUsersForAutocomplete(term).then(function(response) {
+                    vm.employees = response.map(function(cur) {
+                        return {
+                            id: cur.id,
+                            label: cur.fullName
+                        }
+                    });
                 });
             }
         }

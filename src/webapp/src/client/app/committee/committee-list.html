@@ -6,19 +6,13 @@
     <div class="col-xs-12 col-sm-12 col-md-8">
         <div class="col-xs-12 col-sm-6 col-md-4" ng-repeat="committee in committees | orderBy: 'name'">
             <div class="row-no-margin">
-                <div class="committees-list-section pull-left">
+                <div class="committees-list-section pull-left" uib-tooltip="{{committee.name}}" tooltip-placement="bottom" tooltip-append-to-body="true">
                     <div class="col-xs-4 cursorHand committees-list-img img-responsive" ng-click="setFocusedCommittee(committee)" ng-style="{{ committee.pictureId | backgroundThumb }}"></div>
                     <div class="btn-group-vertical btn-group-xs pull-right committee-admin-buttons">
                         <a class="btn btn-default glyphicon glyphicon-pencil" data-ng-click="onEditCommitteeButtonClick(committee)" title="{{'common.edit' | translate}}" has-permissions="['COMMITTEES_ADMINISTRATION']"></a>
                         <span  has-permissions="['COMMITTEES_ADMINISTRATION']">
                             <a class="btn btn-danger glyphicon glyphicon-bin" ace-confirmation-modal="deleteItem(committee)" title="{{'common.delete' | translate}}"></a>
                         </span>
-                    </div>
-                    <div class="committee-body">
-                        <div class="col-xs-12">
-                            <h4 class="text-center" data-test-id="CommitteeName" uib-tooltip="{{committee.name}}" tooltip-placement="bottom" tooltip-append-to-body="true" ng-if="committee.name.length>10">{{committee.name| limitTo: 9}}...</h4>
-                            <h4 class="text-center" data-test-id="CommitteeName" ng-if="committee.name.length<=10">{{committee.name}}</h4>
-                        </div>
                     </div>
                 </div>
             </div>
