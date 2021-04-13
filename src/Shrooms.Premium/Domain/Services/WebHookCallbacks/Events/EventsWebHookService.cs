@@ -45,7 +45,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
                 await _eventsDbSet
                     .Include(e => e.EventOptions)
                     .Include(u => u.ResponsibleUser)
-                    .Where(e => e.EventRecurring != EventRecurrenceOptions.None && e.EndDate < _systemClock.UtcNow)
+                    .Where(e => e.EventRecurring != EventRecurrenceOptions.None && e.EndDate < _systemClock.UtcNow && e.ResponsibleUser != null)
                     .ToListAsync();
 
             foreach (var @event in eventsToUpdate)
