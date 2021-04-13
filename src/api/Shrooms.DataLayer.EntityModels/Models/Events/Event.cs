@@ -50,8 +50,8 @@ namespace Shrooms.DataLayer.EntityModels.Models.Events
         [NotMapped]
         public IEnumerable<string> OfficeIds
         {
-            get { return Offices == null ? null : JsonConvert.DeserializeObject<string[]>(Offices); }
-            set { Offices = JsonConvert.SerializeObject(value); }
+            get => Offices == null ? null : JsonConvert.DeserializeObject<string[]>(Offices);
+            set => Offices = JsonConvert.SerializeObject(value);
         }
 
         [NotMapped]
@@ -76,9 +76,9 @@ namespace Shrooms.DataLayer.EntityModels.Models.Events
         }
 
         private DateTime GetLocalDateFromUtcDate(DateTime utcDateTime) =>
-            TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, TimeZoneInfo.FindSystemTimeZoneById(ResponsibleUser.TimeZone));
+            TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, TimeZoneInfo.FindSystemTimeZoneById(ResponsibleUser == null ? EventsConstants.DefaultTimeZone : ResponsibleUser.TimeZone));
 
         private DateTime GetUtcDateFromLocalDate(DateTime localDateTime) =>
-            TimeZoneInfo.ConvertTimeToUtc(localDateTime, TimeZoneInfo.FindSystemTimeZoneById(ResponsibleUser.TimeZone));
+            TimeZoneInfo.ConvertTimeToUtc(localDateTime, TimeZoneInfo.FindSystemTimeZoneById(ResponsibleUser == null ? EventsConstants.DefaultTimeZone : ResponsibleUser.TimeZone));
     }
 }
