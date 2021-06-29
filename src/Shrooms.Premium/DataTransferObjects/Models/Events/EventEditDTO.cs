@@ -20,6 +20,9 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
 
         public EventRecurrenceOptions Recurrence { get; set; }
 
+        public bool AllowMaybeGoing { get; set; }
+        public bool AllowNotGoing { get; set; }
+
         public EventOfficesDTO Offices { get; set; }
 
         public bool IsPinned { get; set; }

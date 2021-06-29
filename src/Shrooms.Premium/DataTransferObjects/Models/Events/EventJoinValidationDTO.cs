@@ -16,6 +16,10 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
         public int MaxParticipants { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+
+        public bool AllowMaybeGoing { get; set; }
+        public bool AllowNotGoing { get; set; }
+
         public string Location { get; set; }
         public ICollection<EventOption> Options { get; set; }
         public ICollection<EventOption> SelectedOptions { get; set; }

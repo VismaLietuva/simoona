@@ -112,8 +112,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                     .Include(x => x.EventParticipants)
                     .Include(x => x.EventOptions)
                     .Include(x => x.EventType)
-                    .Where(x => x.Id == joinDto.EventId
-                                && x.OrganizationId == joinDto.OrganizationId)
+                    .Where(x => x.Id == joinDto.EventId && x.OrganizationId == joinDto.OrganizationId)
                     .Select(MapEventToJoinValidationDto)
                     .FirstOrDefault();
 
@@ -135,6 +134,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 _eventValidationService.CheckIfJoiningTooManyChoicesProvided(@event.MaxChoices, joinDto.ChosenOptions.Count());
                 _eventValidationService.CheckIfSingleChoiceSelectedWithRule(@event.SelectedOptions, OptionRules.IgnoreSingleJoin);
                 _eventValidationService.CheckIfEventHasEnoughPlaces(@event.MaxParticipants, @event.Participants.Count + joinDto.ParticipantIds.Count);
+                _eventValidationService.CheckIfAttendOptionIsAllowed(joinDto.AttendStatus, @event);
 
                 foreach (var userId in joinDto.ParticipantIds)
                 {
@@ -172,6 +172,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             _eventValidationService.CheckIfEventExists(@event);
             _eventValidationService.CheckIfRegistrationDeadlineIsExpired(@event.RegistrationDeadline);
             _eventValidationService.CheckIfAttendStatusIsValid(updateAttendStatusDTO.AttendStatus);
+            _eventValidationService.CheckIfAttendOptionIsAllowed(updateAttendStatusDTO.AttendStatus, @event);
 
             AddParticipantWithStatus(updateAttendStatusDTO.UserId, updateAttendStatusDTO.AttendStatus, updateAttendStatusDTO.AttendComment, @event);
 
@@ -363,9 +364,9 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             var participant = _eventParticipantsDbSet
                 .Include(p => p.Event)
                 .Include(p => p.EventOptions)
-                            .SingleOrDefault(p => p.EventId == eventId &&
-                                    p.Event.OrganizationId == userOrg &&
-                                    p.ApplicationUserId == userId);
+                .SingleOrDefault(p => p.EventId == eventId &&
+                                      p.Event.OrganizationId == userOrg &&
+                                      p.ApplicationUserId == userId);
 
             _eventValidationService.CheckIfEventExists(participant);
             _eventValidationService.CheckIfParticipantExists(participant);
@@ -405,6 +406,8 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 Name = e.Name,
                 EndDate = e.EndDate,
                 Description = e.Description,
+                AllowMaybeGoing = e.AllowMaybeGoing,
+                AllowNotGoing = e.AllowNotGoing,
                 Location = e.Place,
                 RegistrationDeadline = e.RegistrationDeadline,
                 ResponsibleUserId = e.ResponsibleUserId,
@@ -431,9 +434,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                     e.EventParticipants.Any(p => p.ApplicationUserId == userId &&
                                                  p.AttendStatus == (int)AttendingStatus.Attending));
 
-            query = string.IsNullOrEmpty(validationDTO.SingleJoinGroupName) ?
-                        query.Where(x => x.EventType.Id == validationDTO.EventTypeId) :
-                        query.Where(x => x.EventType.SingleJoinGroupName == validationDTO.SingleJoinGroupName);
+            query = string.IsNullOrEmpty(validationDTO.SingleJoinGroupName) ? query.Where(x => x.EventType.Id == validationDTO.EventTypeId) : query.Where(x => x.EventType.SingleJoinGroupName == validationDTO.SingleJoinGroupName);
 
             var anyEventsAlreadyJoined = query.Any(x => !x.EventParticipants.Any(y =>
                                                             y.ApplicationUserId == userId &&

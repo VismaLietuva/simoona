@@ -11,6 +11,10 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public DateTime RegistrationDeadlineDate { get; set; }
+
+        public bool AllowMaybeGoing { get; set; }
+        public bool AllowNotGoing { get; set; }
+
         public EventOfficesDTO Offices { get; set; }
         public bool IsPinned { get; set; }
         public string Location { get; set; }

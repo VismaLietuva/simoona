@@ -157,9 +157,9 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             {
                 createdEvent = await _eventService.CreateEvent(createEventDTO);
 
-                _asyncRunner.Run<NewEventNotifier>(notif =>
+                _asyncRunner.Run<NewEventNotifier>(notifier =>
                 {
-                    notif.Notify(createdEvent, userHubDto);
+                    notifier.Notify(createdEvent, userHubDto);
                 }, GetOrganizationName());
             }
             catch (EventException e)
@@ -296,7 +296,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             var optionsDto = _mapper.Map<EventJoinViewModel, EventJoinDTO>(joinOptions);
             SetOrganizationAndUser(optionsDto);
-            optionsDto.ParticipantIds = new List<string>() { optionsDto.UserId };
+            optionsDto.ParticipantIds = new List<string> { optionsDto.UserId };
 
             try
             {

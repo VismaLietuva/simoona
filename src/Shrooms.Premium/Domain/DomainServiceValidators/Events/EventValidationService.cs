@@ -173,6 +173,27 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             }
         }
 
+        public void CheckIfAttendOptionIsAllowed(int attendStatus, EventJoinValidationDTO @event)
+        {
+            if (attendStatus == (int)AttendingStatus.MaybeAttending && !@event.AllowMaybeGoing)
+            {
+                throw new EventException(PremiumErrorCodes.EventAttendTypeIsNotAllowed);
+            }
+
+            if (attendStatus == (int)AttendingStatus.NotAttending && !@event.AllowNotGoing)
+            {
+                throw new EventException(PremiumErrorCodes.EventAttendTypeIsNotAllowed);
+            }
+        }
+
+        public void CheckIfAttendOptionsAllowedToUpdate(EditEventDTO eventDto, Event eventToUpdate)
+        {
+            if ((eventDto.AllowMaybeGoing != eventToUpdate.AllowMaybeGoing || eventDto.AllowNotGoing != eventToUpdate.AllowNotGoing) && eventToUpdate.EventParticipants.Count > 0)
+            {
+                throw new EventException(PremiumErrorCodes.EventAttendTypeCannotBeChangedIfParticipantsJoined);
+            }
+        }
+
         public void CheckIfUserHasPermission(string userId, string responsibleUserId, bool hasPermission)
         {
             if (userId != responsibleUserId && !hasPermission)

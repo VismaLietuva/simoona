@@ -198,6 +198,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             _eventValidationService.CheckIfUserHasPermissionToPin(eventDto.IsPinned, eventToUpdate.IsPinned, hasPermission);
             _eventValidationService.CheckIfCreatingEventHasInsufficientOptions(eventDto.MaxOptions, totalOptionsProvided);
             _eventValidationService.CheckIfCreatingEventHasNoChoices(eventDto.MaxOptions, totalOptionsProvided);
+            _eventValidationService.CheckIfAttendOptionsAllowedToUpdate(eventDto, eventToUpdate);
             ValidateEvent(eventDto);
 
             if (eventDto.ResetParticipantList)
@@ -251,10 +252,13 @@ namespace Shrooms.Premium.Domain.Services.Events
                 MaxOptions = e.MaxChoices,
                 MaxParticipants = e.MaxParticipants,
                 Recurrence = e.EventRecurring,
+                AllowMaybeGoing = e.AllowMaybeGoing,
+                AllowNotGoing = e.AllowNotGoing,
                 RegistrationDeadlineDate = e.RegistrationDeadline,
                 StartDate = e.StartDate,
                 EndDate = e.EndDate,
                 HostUserId = e.ResponsibleUserId,
+                // Do not use string interpolation here (EF won't be able to project it to SQL)
                 HostUserFullName = e.ResponsibleUser.FirstName + " " + e.ResponsibleUser.LastName,
                 TypeId = e.EventTypeId,
                 Options = e.EventOptions.Select(o => new EventOptionDTO
@@ -371,7 +375,7 @@ namespace Shrooms.Premium.Domain.Services.Events
 
         private async Task<Event> MapNewEvent(CreateEventDto newEventDto)
         {
-            var newEvent = new Event()
+            var newEvent = new Event
             {
                 Created = DateTime.UtcNow,
                 CreatedBy = newEventDto.UserId,
@@ -399,7 +403,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             return newEvent;
         }
 
-        private void UpdateEventInfo(CreateEventDto newEventDto, Event newEvent)
+        private static void UpdateEventInfo(CreateEventDto newEventDto, Event newEvent)
         {
             newEvent.Modified = DateTime.UtcNow;
             newEvent.ModifiedBy = newEventDto.UserId;
@@ -417,9 +421,11 @@ namespace Shrooms.Premium.Domain.Services.Events
             newEvent.Name = newEventDto.Name;
             newEvent.RegistrationDeadline = newEventDto.RegistrationDeadlineDate.Value;
             newEvent.IsPinned = newEventDto.IsPinned;
+            newEvent.AllowMaybeGoing = newEventDto.AllowMaybeGoing;
+            newEvent.AllowNotGoing = newEventDto.AllowNotGoing;
         }
 
-        private Expression<Func<Event, EventDetailsDTO>> MapToEventDetailsDto(Guid eventId)
+        private static Expression<Func<Event, EventDetailsDTO>> MapToEventDetailsDto(Guid eventId)
         {
             return e => new EventDetailsDTO
             {
@@ -433,6 +439,8 @@ namespace Shrooms.Premium.Domain.Services.Events
                 RegistrationDeadlineDate = e.RegistrationDeadline,
                 StartDate = e.StartDate,
                 EndDate = e.EndDate,
+                AllowMaybeGoing = e.AllowMaybeGoing,
+                AllowNotGoing = e.AllowNotGoing,
                 MaxParticipants = e.MaxParticipants,
                 MaxOptions = e.MaxChoices,
                 HostUserId = e.ResponsibleUserId,

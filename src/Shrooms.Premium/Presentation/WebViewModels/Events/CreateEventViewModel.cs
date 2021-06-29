@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Hangfire.Annotations;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Premium.Constants;
 
 namespace Shrooms.Premium.Presentation.WebViewModels.Events
 {
+    [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     public class CreateEventViewModel
     {
         [Required]
@@ -26,6 +28,9 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
 
         [Required]
         public EventRecurrenceOptions Recurrence { get; set; }
+
+        public bool AllowMaybeGoing { get; set; }
+        public bool AllowNotGoing { get; set; }
 
         [Required]
         public List<int> Offices { get; set; }

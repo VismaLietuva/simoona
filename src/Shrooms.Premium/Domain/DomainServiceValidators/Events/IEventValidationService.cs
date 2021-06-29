@@ -22,6 +22,8 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
         void CheckIfJoiningEventStartDateHasPassed(DateTime startDate);
         void CheckIfEventIsFull(int maxParticipants, int participantsCount);
         void CheckIfAttendStatusIsValid(int status);
+        void CheckIfAttendOptionIsAllowed(int attendStatus, EventJoinValidationDTO @event);
+        void CheckIfAttendOptionsAllowedToUpdate(EditEventDTO eventDto, Event eventToUpdate);
         void CheckIfRegistrationDeadlineIsExpired(DateTime registrationDeadline);
         void CheckIfUserExistsInOtherSingleJoinEvent(bool anyEvents);
         void CheckIfEventHasEnoughPlaces(int maxParticipants, int participantCount);

@@ -17,6 +17,9 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
 
         public DateTime RegistrationDeadlineDate { get; set; }
 
+        public bool AllowMaybeGoing { get; set; }
+        public bool AllowNotGoing { get; set; }
+
         public IEnumerable<string> OfficesName { get; set; }
 
         public bool IsForAllOffices { get; set; }
