@@ -839,6 +839,10 @@
     <Compile Include="Migrations\202008051022364_MentionNotificationsViaMail.Designer.cs">
       <DependentUpon>202008051022364_MentionNotificationsViaMail.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202106290801404_AddedJoinOptionsToEvents.cs" />
+    <Compile Include="Migrations\202106290801404_AddedJoinOptionsToEvents.Designer.cs">
+      <DependentUpon>202106290801404_AddedJoinOptionsToEvents.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
@@ -1395,6 +1399,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202008051022364_MentionNotificationsViaMail.resx">
       <DependentUpon>202008051022364_MentionNotificationsViaMail.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202106290801404_AddedJoinOptionsToEvents.resx">
+      <DependentUpon>202106290801404_AddedJoinOptionsToEvents.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

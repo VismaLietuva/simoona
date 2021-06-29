@@ -185,6 +185,21 @@
                                 data-test-id="event-form-recurring-input" translate-cloak></select>
                         </div>
                     </div>
+                    <!--event join types-->
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-4" translate="events.eventAttendOptions"></label>
+                        <div class="row">
+                            <div class="col-xs-6 col-sm-3 col-md-2">
+                                <input id="allowMaybeGoing" type="checkbox" class="event-form-checkbox" ng-model="vm.event.allowMaybeGoing" data-test-id="event-form-allow-maybe-going-input" />
+                                <label for="allowMaybeGoing" class="control-label" translate="events.eventAttendOptions_MaybeGoing"></label>
+                            </div>
+
+                            <div class="col-xs-6 col-sm-3 col-md-2">
+                                <input id="allowNotGoing" type="checkbox" class="event-form-checkbox" ng-model="vm.event.allowNotGoing" data-test-id="event-form-allow-not-going-input" />
+                                <label for="allowNotGoing" class="control-label" translate="events.eventAttendOptions_NotGoing"></label>
+                            </div>
+                        </div>
+                    </div>
                     <!--event office-->
                     <div class="form-group required"
                         ng-class="{'has-error': vm.isOfficeSelected != null && !vm.isOfficeSelected}">

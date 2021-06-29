@@ -45,13 +45,13 @@
                     <span class="vismaicon vismaicon-add2-circle"></span><span
                         translate="events.eventAction_Attending"></span></a>
             </li>
-            <li><a ng-if="vm.event.participatingStatus != vm.attendStatus.MaybeAttending" class="nc-btn nc-btn-default"
+            <li><a ng-if="vm.event.allowMaybeGoing && vm.event.participatingStatus != vm.attendStatus.MaybeAttending" class="nc-btn nc-btn-default"
                     ng-click="vm.openJoinCommentModal(vm.attendStatus.MaybeAttending)"
                     translate-attr-title="events.eventJoin" data-test-id="join-event-maybeattending-button" translate>
                     <span class="vismaicon vismaicon-help2"></span><span
                         translate="events.eventAction_MaybeAttending"></span></a>
             </li>
-            <li><a ng-if="vm.event.participatingStatus != vm.attendStatus.NotAttending" class="nc-btn nc-btn-danger"
+            <li><a ng-if="vm.event.allowNotGoing && vm.event.participatingStatus != vm.attendStatus.NotAttending" class="nc-btn nc-btn-danger"
                     ng-click="vm.openJoinCommentModal(vm.attendStatus.NotAttending)"
                     translate-attr-title="events.eventAction_NotAttending" data-test-id="join-event-notattending-button"
                     translate>

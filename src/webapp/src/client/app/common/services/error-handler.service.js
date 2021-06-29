@@ -26,6 +26,8 @@
             220: { default: 'messageEventCannotLeaveAlreadyLeft', expelParticipant: 'messageExpelParticipantNotFound' },
             221: 'messageEventParticipantsNotFound',
             222: 'messageEventTypeNameExists',
+            227: 'messageEventAttendTypeIsNotAllowed',
+            228: 'messageEventAttendTypeCannotBeChangedIfParticipantsJoined',
             302: 'messageCannotSendKudosPointsToThisUser',
             303: 'messageKudosTypeNotFound',
             304: 'messageInsufficientKudos',

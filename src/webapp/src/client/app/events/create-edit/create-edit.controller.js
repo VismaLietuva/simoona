@@ -187,6 +187,8 @@
                     startDate: moment().add(1, 'hours').local().startOf('minute').toDate(),
                     endDate: moment().add(3, 'hours').local().startOf('minute').toDate(),
                     isPinned: false,
+                    allowMaybeGoing: true,
+                    allowNotGoing: true,
                     recurrence: 0,
                     location: '',
                     description: '',
@@ -470,10 +472,8 @@
         }
 
         function isStartDateValid() {
-            if (vm.states.isAdd) {
-                if (vm.event.startDate) {
-                    return vm.minStartDate < vm.event.startDate;
-                }
+            if (vm.states.isAdd && vm.event.startDate) {
+                return vm.minStartDate < vm.event.startDate;
             }
 
             return true;

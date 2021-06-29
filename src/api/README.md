@@ -5,7 +5,7 @@ Simoona's back-end is built using ASP.NET with Entity Framework. Project depende
 ## QuickStart
 
 1. Open the solution file `Shrooms.sln` file located in `src\api\Shrooms.sln`.
-2. Set `Shrooms.API` project as StartUp project (located in `src\api\Main\PresentationLayer\Shrooms.API\`).
+2. Set `Shrooms.Presentation.Api` project as StartUp project (located in `src\api\Main\PresentationLayer\Shrooms.Presentation.Api\`).
 3. Start it with debug (F5) or without debug (Ctrl+F5).
 4. Wait for project to build.
 5. If database is set up and Web.config has correct connection string the project should start. To set up the database head over to [build](../../build) folder.
@@ -18,7 +18,7 @@ Follow these steps to configure mail sending service in Simoona:
 
 1. Create a service account using [MailTrap](https://mailtrap.io/), [SendGrid](https://sendgrid.com/) or any other email service
 2. After creating an account find your SMTP server credentials on their website
-3. Open Web.config file located in `src\api\Main\PresentationLayer\Shrooms.API\Web.config`
+3. Open Web.config file located in `src\api\Main\PresentationLayer\Shrooms.Presentation.Api\Web.config`
 4. Locate `<mailSettings>` block in Web.config file and paste your credentials and host to appropriate places inside of `<network>` block as shown in code snippet bellow
 
     ```xml
@@ -47,7 +47,7 @@ You will see all your sent emails in the dedicated application on your local mac
 
 ## Configuration
 
-All configurable properties are located in `src\api\Main\PresentationLayer\Shrooms.API\Web.config` file.
+All configurable properties are located in `src\api\Main\PresentationLayer\Shrooms.Presentation.Api\Web.config` file.
 
 Don't forget to change API and Client urls if running on different addresses:
 
@@ -68,7 +68,7 @@ By default Simoona uses local file system storage, but it's possible to use Azur
 
  1. Head over to [Azure Portal](https://portal.azure.com/) and follow instructions [Azure Quickstart](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-portal)
  2. After creating blob storage get its connection string
- 3. Open `Web.config` file located in `src\api\Main\PresentationLayer\Shrooms.API\`
+ 3. Open `Web.config` file located in `src\api\Main\PresentationLayer\Shrooms.Presentation.Api\`
  4. Locate `<connectionStrings>` block and put your blob storage connection string as a value of `connectionString` inside `<add>` block with `StorageConnectionString` name as shown below
 
     ```xml
@@ -80,7 +80,7 @@ By default Simoona uses local file system storage, but it's possible to use Azur
 
 If you don't use [ImageResizer](http://imageresizing.net/) Performance Edition plugins, but wish to use Azure Blob Storage you will need to follow these extra steps:
 
-1. Open Web.config file located in `src\api\Main\PresentationLayer\Shrooms.API\Web.config`
+1. Open Web.config file located in `src\api\Main\PresentationLayer\Shrooms.Presentation.Api\Web.config`
 2. Inside `<rules>` block in `<system.webServer>` block find `Redirect to Azure Blob Storage` rule, make sure that it is uncommented and paste your blob storage url as `url` value inside `<action>` block as shown bellow (make sure to leave `{R:1}` intact)
 
     ```xml
@@ -101,7 +101,7 @@ If you don't use [ImageResizer](http://imageresizing.net/) Performance Edition p
 Simoona supports sign in with Google and Facebook. To enable this feature follow these steps:
 
 1. Get [Google](https://console.developers.google.com/projectselector/apis/credentials) and/or [Facebook](https://developers.facebook.com/docs/apps/register/#app-settings) application credentials
-2. Open Web.config file located in `src\api\Main\PresentationLayer\Shrooms.API\`
+2. Open Web.config file located in `src\api\Main\PresentationLayer\Shrooms.Presentation.Api\`
 3. Locate `<appSettings>` block and find the lines shown below and just paste your application credentials to appropriate places as `value`
 
   ```xml
@@ -119,7 +119,7 @@ Simoona supports sign in with Google and Facebook. To enable this feature follow
 
 Simoona can also leverage [ImageResizer Performance plugins](http://imageresizing.net/plugins/editions/performance) to make media delivery faster. If you wish to try these plugins in development environment or you have a license to use them follow these steps:
 
-1. Open Web.config file located in `src\api\Main\PresentationLayer\Shrooms.API\`
+1. Open Web.config file located in `src\api\Main\PresentationLayer\Shrooms.Presentation.Api\`
 2. Locate `<resizer>` block and uncomment lines inside of `<plugins>` block as shown bellow
 
     ```xml
@@ -158,7 +158,7 @@ public string PictureId { get; set; }
 2. Open Package Manager Console in Visual Studio and call command:
 
 ```
-add-migration MigrationName -ConnectionString "ConnectionString" -ConnectionProviderName "System.Data.SqlClient" -StartUpProjectName Shrooms.API -ProjectName Shrooms.DataLayer
+add-migration MigrationName -ConnectionString "ConnectionString" -ConnectionProviderName "System.Data.SqlClient" -StartUpProjectName Shrooms.Presentation.Api -ProjectName Shrooms.DataLayer
 ```
 
 Connection string can be found in `Web.config`.
@@ -172,13 +172,13 @@ AddColumn("dbo.ServiceRequests", "PictureId", c => c.String());
 4. To apply migration on the database, execute following command in Package Manager Console:
 
 ```
-update-database -verbose -ConnectionString "ConnectionString" -ConnectionProviderName "System.Data.SqlClient" -StartUpProjectName Shrooms.API -ProjectName Shrooms.DataLayer
+update-database -verbose -ConnectionString "ConnectionString" -ConnectionProviderName "System.Data.SqlClient" -StartUpProjectName Shrooms.Presentation.Api -ProjectName Shrooms.DataLayer
 ```
 
 4.1 To rollback to previous migration, execute following command:
 
 ```
-update-database  -verbose -ConnectionString "ConnectionString" -ConnectionProviderName "System.Data.SqlClient" -StartUpProjectName Shrooms.API -ProjectName Shrooms.DataLayer –TargetMigration "202001021211276_MigrationName"
+update-database  -verbose -ConnectionString "ConnectionString" -ConnectionProviderName "System.Data.SqlClient" -StartUpProjectName Shrooms.Presentation.Api -ProjectName Shrooms.DataLayer –TargetMigration "202001021211276_MigrationName"
 ```
 
 5. Migration is done
