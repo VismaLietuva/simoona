@@ -81,6 +81,8 @@ function MD5HashFile([string] $filePath)
     }
 }
 
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
 function GetProxyEnabledWebClient
 {
     $wc = New-Object System.Net.WebClient

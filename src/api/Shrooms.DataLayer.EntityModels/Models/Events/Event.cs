@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
+using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 
@@ -50,8 +51,8 @@ namespace Shrooms.DataLayer.EntityModels.Models.Events
         [NotMapped]
         public IEnumerable<string> OfficeIds
         {
-            get { return Offices == null ? null : JsonConvert.DeserializeObject<string[]>(Offices); }
-            set { Offices = JsonConvert.SerializeObject(value); }
+            get => Offices == null ? null : JsonConvert.DeserializeObject<string[]>(Offices);
+            set => Offices = JsonConvert.SerializeObject(value);
         }
 
         [NotMapped]
@@ -76,9 +77,9 @@ namespace Shrooms.DataLayer.EntityModels.Models.Events
         }
 
         private DateTime GetLocalDateFromUtcDate(DateTime utcDateTime) =>
-            TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, TimeZoneInfo.FindSystemTimeZoneById(ResponsibleUser.TimeZone));
+            TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, TimeZoneInfo.FindSystemTimeZoneById(ResponsibleUser == null ? DataLayerConstants.DefaultTimeZone : ResponsibleUser.TimeZone));
 
         private DateTime GetUtcDateFromLocalDate(DateTime localDateTime) =>
-            TimeZoneInfo.ConvertTimeToUtc(localDateTime, TimeZoneInfo.FindSystemTimeZoneById(ResponsibleUser.TimeZone));
+            TimeZoneInfo.ConvertTimeToUtc(localDateTime, TimeZoneInfo.FindSystemTimeZoneById(ResponsibleUser == null ? DataLayerConstants.DefaultTimeZone : ResponsibleUser.TimeZone));
     }
 }

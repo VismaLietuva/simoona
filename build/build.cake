@@ -94,7 +94,7 @@ Task("ExecuteMigrations")
     var fullConnectionString = string.Format("{0}Database={1};", connectionString, dbName);
 
     var migrateExePath = Context.Tools.Resolve("migrate.exe");
-    var assemblyBinPath = Path.GetFullPath(Path.Combine(APIpath, @"Main\DataLayer\Shrooms.DataLayer\bin\Debug"));
+    var assemblyBinPath = Path.GetFullPath(Path.Combine(APIpath, @"Shrooms.DataLayer\bin\Debug"));
     var assemblyName = "Shrooms.DataLayer.dll";
 
     Information("Migrate.exe path: {0}", migrateExePath);
@@ -117,7 +117,7 @@ Task("AddOrganization")
     .IsDependentOn("CreateDatabase")
     .Does(() => 
 {
-    string xmlFile = APIpath + "Main/PresentationLayer/Shrooms.API/Web.config";
+    string xmlFile = APIpath + "Shrooms.Presentation.Api/Web.config";
     System.Xml.XmlDocument xmlDoc = new System.Xml.XmlDocument();
     xmlDoc.Load(xmlFile);
 
@@ -234,7 +234,7 @@ Task("CreateAPIWebsite")
     CreateWebsite(new WebsiteSettings()
     {
         Name = "SimoonaAPI",
-        PhysicalDirectory = APIpath + "Main/PresentationLayer/Shrooms.API",
+        PhysicalDirectory = APIpath + "Shrooms.Presentation.Api",
         Binding = IISBindings.Http
                     .SetHostName("")
                     .SetIpAddress("*")

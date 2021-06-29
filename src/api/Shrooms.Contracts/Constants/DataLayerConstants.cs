@@ -8,5 +8,7 @@
         public static readonly char PermissionSplitter = '_';
 
         public const string ConnectionStringNameBackgroundJobs = "BackgroundJobs";
+
+        public const string DefaultTimeZone = "FLE Standard Time";
     }
 }
