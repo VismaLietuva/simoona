@@ -87,7 +87,7 @@
     "method-override": "^3.0.0",
     "minimist": "^1.1.1",
     "natives": "^1.1.6",
-    "node-notifier": "^5.4.0",
+    "node-notifier": "^8.0.1",
     "q": "^1.2.0",
     "wiredep": "^4.0.0",
     "yargs": "^13.3.0"
