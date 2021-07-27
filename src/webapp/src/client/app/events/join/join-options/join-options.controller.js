@@ -128,7 +128,7 @@
                     eventRepository.addColleagues(event.id, selectedOptionsId, participantIds)
                         .then(handleSuccessPromise, handleErrorPromise);
                 } else {
-                    eventRepository.joinEvent(event.id, selectedOptionsId)
+                    eventRepository.joinEvent(event.id, selectedOptionsId, attendStatus.Attending)
                         .then(handleSuccessPromise, handleErrorPromise);
                 }
             }
