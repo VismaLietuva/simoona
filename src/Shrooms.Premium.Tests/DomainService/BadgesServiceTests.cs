@@ -21,20 +21,20 @@ namespace Shrooms.Premium.Tests.DomainService
 
         private IUnitOfWork2 _unitOfWork;
 
-        private IDbSet<BadgeCategory> _badgeCategoriesDbSet;
-        private IDbSet<BadgeLog> _badgeLogsDbSet;
-        private IDbSet<KudosLog> _kudosLogsDbSet;
-        private IDbSet<ApplicationUser> _usersDbSet;
+        private DbSet<BadgeCategory> _badgeCategoriesDbSet;
+        private DbSet<BadgeLog> _badgeLogsDbSet;
+        private DbSet<KudosLog> _kudosLogsDbSet;
+        private DbSet<ApplicationUser> _usersDbSet;
 
         [SetUp]
         public void TestInitializer()
         {
             _unitOfWork = Substitute.For<IUnitOfWork2>();
 
-            _badgeCategoriesDbSet = _unitOfWork.MockDbSet<BadgeCategory>();
-            _badgeLogsDbSet = _unitOfWork.MockDbSet<BadgeLog>();
-            _kudosLogsDbSet = _unitOfWork.MockDbSet<KudosLog>();
-            _usersDbSet = _unitOfWork.MockDbSet<ApplicationUser>();
+            _badgeCategoriesDbSet = _unitOfWork.MockDbSetForAsync<BadgeCategory>();
+            _badgeLogsDbSet = _unitOfWork.MockDbSetForAsync<BadgeLog>();
+            _kudosLogsDbSet = _unitOfWork.MockDbSetForAsync<KudosLog>();
+            _usersDbSet = _unitOfWork.MockDbSetForAsync<ApplicationUser>();
 
             _badgesService = new BadgesService(_unitOfWork);
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 using MoreLinq;
 using Shrooms.Contracts.Constants;
@@ -33,8 +34,8 @@ namespace Shrooms.Premium.Domain.Services.Books
     {
         private const int LastPage = 1;
         private const int BookQuantityZero = 0;
-        private static object _newBookLock = new object();
-        private static object _takeBookLock = new object();
+        private static readonly object _newBookLock = new object();
+        private static readonly SemaphoreSlim _takeBookLock = new SemaphoreSlim(1, 1);
 
         private readonly IUnitOfWork2 _uow;
         private readonly IApplicationSettings _appSettings;
@@ -183,7 +184,7 @@ namespace Shrooms.Premium.Domain.Services.Books
             return retrievedBookDto;
         }
 
-        public void TakeBook(int bookOfficeId, UserAndOrganizationDTO userAndOrg)
+        public async Task TakeBookAsync(int bookOfficeId, UserAndOrganizationDTO userAndOrg)
         {
             var bookDTO = new BookTakeDTO
             {
@@ -191,46 +192,57 @@ namespace Shrooms.Premium.Domain.Services.Books
                 BookOfficeId = bookOfficeId,
                 OrganizationId = userAndOrg.OrganizationId
             };
-            TakeBook(bookDTO);
+
+            await TakeBookAsync(bookDTO);
         }
 
-        public void TakeBook(BookTakeDTO bookDTO)
+        public async Task TakeBookAsync(BookTakeDTO bookDTO)
         {
             MobileBookOfficeLogsDTO officeBookWithLogs;
-            lock (_takeBookLock)
+
+            await _takeBookLock.WaitAsync();
+
+            try
             {
-                officeBookWithLogs = _bookOfficesDbSet
+                officeBookWithLogs = await _bookOfficesDbSet
                     .Include(b => b.Book)
                     .Include(b => b.BookLogs)
-                    .Where(b => b.OrganizationId == bookDTO.OrganizationId
-                        && b.Id == bookDTO.BookOfficeId)
+                    .Where(b => b.OrganizationId == bookDTO.OrganizationId && b.Id == bookDTO.BookOfficeId)
                     .Select(MapOfficebookWithLogsToDTO())
-                    .FirstOrDefault();
+                    .FirstOrDefaultAsync();
 
-                ValidateTakeBook(bookDTO, officeBookWithLogs);
-
-                BorrowBook(officeBookWithLogs, bookDTO);
+                await ValidateTakeBookAsync(bookDTO, officeBookWithLogs);
+                await BorrowBookAsync(officeBookWithLogs, bookDTO);
+            }
+            finally
+            {
+                _takeBookLock.Release();
             }
 
             var book = new TakenBookDTO
             {
                 UserId = bookDTO.ApplicationUserId,
                 OrganizationId = bookDTO.OrganizationId,
-                BookOfficeId = bookDTO.BookOfficeId,
-                OfficeId = officeBookWithLogs.OfficeId,
-                Author = officeBookWithLogs.Author,
-                Title = officeBookWithLogs.Title
+                BookOfficeId = bookDTO.BookOfficeId
             };
-            _asyncRunner.Run<IBooksNotificationService>(n => n.SendEmail(book), _uow.ConnectionName);
+
+            if (officeBookWithLogs != null)
+            {
+                book.OfficeId = officeBookWithLogs.OfficeId;
+                book.Author = officeBookWithLogs.Author;
+                book.Title = officeBookWithLogs.Title;
+            }
+
+            _asyncRunner.Run<IBooksNotificationService>(async notifier => await notifier.SendEmailAsync(book), _uow.ConnectionName);
         }
 
         public void ReturnBook(int bookOfficeId, UserAndOrganizationDTO userAndOrg)
         {
             var log = _bookLogsDbSet
                 .FirstOrDefault(l => l.BookOfficeId == bookOfficeId
-                    && l.ApplicationUserId == userAndOrg.UserId
-                    && l.OrganizationId == userAndOrg.OrganizationId
-                    && l.Returned == null);
+                                     && l.ApplicationUserId == userAndOrg.UserId
+                                     && l.OrganizationId == userAndOrg.OrganizationId
+                                     && l.Returned == null);
 
             _bookServiceValidator.ThrowIfBookCannotBeReturned(log != null);
 
@@ -241,26 +253,27 @@ namespace Shrooms.Premium.Domain.Services.Books
             _uow.SaveChanges(false);
         }
 
-        public void ReportBook(BookReportDTO bookReport, UserAndOrganizationDTO userAndOrg)
+        public async Task ReportBookAsync(BookReportDTO bookReport, UserAndOrganizationDTO userAndOrg)
         {
-            var reportedOfficeBook = _bookOfficesDbSet
+            var reportedOfficeBook = await _bookOfficesDbSet
                 .Include(p => p.Book)
-                .FirstOrDefault(p => p.Id == bookReport.BookOfficeId);
+                .FirstOrDefaultAsync(p => p.Id == bookReport.BookOfficeId);
 
-            var user = _userService.GetApplicationUser(userAndOrg.UserId);
-            var receivers = _roleService.GetAdministrationRoleEmails(userAndOrg.OrganizationId);
+            var user = await _userService.GetApplicationUserAsync(userAndOrg.UserId);
+            var receivers = await _roleService.GetAdministrationRoleEmailsAsync(userAndOrg.OrganizationId);
 
-            var organization = _organizationService.GetOrganizationById(userAndOrg.OrganizationId);
+            var organization = await _organizationService.GetOrganizationByIdAsync(userAndOrg.OrganizationId);
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
             var bookUrl = _appSettings.BookUrl(organization.ShortName, bookReport.BookOfficeId, reportedOfficeBook.OfficeId);
+
             var subject = $"Reported book: {reportedOfficeBook.Book.Title}";
             var bookReportTemplateViewModel = new BookReportEmailTemplateViewModel(reportedOfficeBook.Book.Title, reportedOfficeBook.Book.Author,
-                 bookReport.Report, bookReport.Comment, bookUrl, user.FullName, userNotificationSettingsUrl);
+                bookReport.Report, bookReport.Comment, bookUrl, user.FullName, userNotificationSettingsUrl);
 
             var content = _mailTemplate.Generate(bookReportTemplateViewModel, EmailPremiumTemplateCacheKeys.BookReport);
             var emailData = new EmailDto(receivers, subject, content);
 
-            _mailingService.SendEmail(emailData);
+            await _mailingService.SendEmailAsync(emailData);
         }
 
         public void AddBook(NewBookDTO bookDto)
@@ -315,7 +328,7 @@ namespace Shrooms.Premium.Domain.Services.Books
 
         public void UpdateBookCovers()
         {
-            _asyncRunner.Run<IBookCoverService>(service => service.UpdateBookCovers(), _uow.ConnectionName);
+            _asyncRunner.Run<IBookCoverService>(async service => await service.UpdateBookCoversAsync(), _uow.ConnectionName);
         }
 
         private static Expression<Func<BookOffice, bool>> SearchFilter(string searchString)
@@ -330,7 +343,7 @@ namespace Shrooms.Premium.Domain.Services.Books
                 x.Book.Title.Contains(searchString) ||
                 x.BookLogs.Any(v =>
                     (v.ApplicationUser.FirstName.Contains(searchString) ||
-                    v.ApplicationUser.LastName.Contains(searchString)) &&
+                     v.ApplicationUser.LastName.Contains(searchString)) &&
                     v.Returned == null);
         }
 
@@ -514,9 +527,9 @@ namespace Shrooms.Premium.Domain.Services.Books
             };
         }
 
-        private void ValidateTakeBook(BookTakeDTO bookDTO, MobileBookOfficeLogsDTO officeBookWithLogs)
+        private async Task ValidateTakeBookAsync(BookTakeDTO bookDTO, MobileBookOfficeLogsDTO officeBookWithLogs)
         {
-            var applicationUser = _userDbSet.FirstOrDefault(u => u.Id == bookDTO.ApplicationUserId);
+            var applicationUser = await _userDbSet.FirstOrDefaultAsync(u => u.Id == bookDTO.ApplicationUserId);
 
             _serviceValidator.ThrowIfUserDoesNotExist(applicationUser);
             _serviceValidator.ThrowIfBookDoesNotExist(officeBookWithLogs != null);
@@ -524,7 +537,7 @@ namespace Shrooms.Premium.Domain.Services.Books
             _serviceValidator.ThrowIfBookIsAlreadyBorrowed(officeBookWithLogs);
         }
 
-        private void BorrowBook(MobileBookOfficeLogsDTO officeBookWithLogs, BookTakeDTO bookDTO)
+        private async Task BorrowBookAsync(MobileBookOfficeLogsDTO officeBookWithLogs, BookTakeDTO bookDTO)
         {
             var bookLog = new BookLog
             {
@@ -539,7 +552,7 @@ namespace Shrooms.Premium.Domain.Services.Books
             };
 
             _bookLogsDbSet.Add(bookLog);
-            _uow.SaveChanges(false);
+            await _uow.SaveChangesAsync(false);
         }
     }
 }

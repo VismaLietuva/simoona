@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Excel;
 using NSubstitute;
 using NUnit.Framework;
@@ -14,6 +15,7 @@ using Shrooms.Premium.Domain.Services.Events.Utilities;
 
 namespace Shrooms.Premium.Tests.DomainService.EventServices
 {
+    [TestFixture]
     public class EventExportServiceTests
     {
         private IEventUtilitiesService _eventUtilitiesService;
@@ -32,7 +34,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         }
 
         [Test]
-        public void Should_Return_Excel_File_With_Participants()
+        public async Task Should_Return_Excel_File_With_Participants()
         {
             var userAndOrg = new UserAndOrganizationDTO
             {
@@ -41,7 +43,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
 
             var guid = MockParticipantsWithOptionsForExport(userAndOrg);
 
-            var stream = _eventExportService.ExportOptionsAndParticipants(guid, userAndOrg);
+            var stream = await _eventExportService.ExportOptionsAndParticipantsAsync(guid, userAndOrg);
 
             using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
             {
@@ -57,7 +59,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         }
 
         [Test]
-        public void Should_Return_Excel_File_With_Participants_And_Without_Options()
+        public async Task Should_Return_Excel_File_With_Participants_And_Without_Options()
         {
             var userAndOrg = new UserAndOrganizationDTO
             {
@@ -65,7 +67,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             };
             var guid = MockParticipantsWithoutOptionsForExport(userAndOrg);
 
-            var stream = _eventExportService.ExportOptionsAndParticipants(guid, userAndOrg);
+            var stream = await _eventExportService.ExportOptionsAndParticipantsAsync(guid, userAndOrg);
 
             using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
             {
@@ -78,7 +80,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         }
 
         [Test]
-        public void Should_Return_Excel_File_With_Options()
+        public async Task Should_Return_Excel_File_With_Options()
         {
             var userAndOrg = new UserAndOrganizationDTO
             {
@@ -86,7 +88,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             };
             var guid = MockParticipantsWithOptionsForExport(userAndOrg);
 
-            var stream = _eventExportService.ExportOptionsAndParticipants(guid, userAndOrg);
+            var stream = await _eventExportService.ExportOptionsAndParticipantsAsync(guid, userAndOrg);
 
             using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
             {
@@ -138,8 +140,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 }
             };
 
-            _eventParticipationService.GetEventParticipants(eventId, userAndOrg).Returns(users);
-            _eventUtilitiesService.GetEventChosenOptions(eventId, userAndOrg).Returns(options);
+            _eventParticipationService.GetEventParticipantsAsync(eventId, userAndOrg).Returns(users);
+            _eventUtilitiesService.GetEventChosenOptionsAsync(eventId, userAndOrg).Returns(options);
             return eventId;
         }
 
@@ -159,8 +161,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             // ReSharper disable once CollectionNeverUpdated.Local
             var options = new List<EventOptionCountDTO>();
 
-            _eventParticipationService.GetEventParticipants(eventId, userAndOrg).Returns(users);
-            _eventUtilitiesService.GetEventChosenOptions(eventId, userAndOrg).Returns(options);
+            _eventParticipationService.GetEventParticipantsAsync(eventId, userAndOrg).Returns(users);
+            _eventUtilitiesService.GetEventChosenOptionsAsync(eventId, userAndOrg).Returns(options);
             return eventId;
         }
     }

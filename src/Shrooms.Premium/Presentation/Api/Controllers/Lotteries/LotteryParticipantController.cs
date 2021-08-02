@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
@@ -26,9 +27,9 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
         [HttpGet]
         [Route("{id}/Participants")]
-        public IHttpActionResult GetParticipantsCounted(int id)
+        public async Task<IHttpActionResult> GetParticipantsCounted(int id)
         {
-            var participants = _participantService.GetParticipantsCounted(id);
+            var participants = await _participantService.GetParticipantsCountedAsync(id);
             var viewModel = _mapper.Map<IEnumerable<LotteryParticipantDTO>, IEnumerable<LotteryParticipantViewModel>>(participants);
 
             return Ok(viewModel);
@@ -37,9 +38,9 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
         [HttpGet]
         [Route("Participants/Paged")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Lottery)]
-        public IHttpActionResult GetPagedParticipants(int id, int page = 1, int pageSize = WebApiConstants.DefaultPageSize)
+        public async Task<IHttpActionResult> GetPagedParticipants(int id, int page = 1, int pageSize = WebApiConstants.DefaultPageSize)
         {
-            var pagedParticipants = _participantService.GetPagedParticipants(id, page, pageSize);
+            var pagedParticipants = await _participantService.GetPagedParticipantsAsync(id, page, pageSize);
             var pagedModel = new PagedViewModel<LotteryParticipantDTO>
             {
                 PagedList = pagedParticipants,

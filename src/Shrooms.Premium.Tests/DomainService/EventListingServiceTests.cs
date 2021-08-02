@@ -19,8 +19,8 @@ namespace Shrooms.Premium.Tests.DomainService
 {
     public class EventListingServiceTests
     {
+        private DbSet<Event> _eventsDbSet;
         private IEventListingService _eventListingService;
-        private IDbSet<Event> _eventsDbSet;
         private ISystemClock _systemClockMock;
         private EventValidationService _eventValidationService;
 
@@ -29,7 +29,7 @@ namespace Shrooms.Premium.Tests.DomainService
         {
             var uow = Substitute.For<IUnitOfWork2>();
 
-            _eventsDbSet = uow.MockDbSet<Event>();
+            _eventsDbSet = uow.MockDbSetForAsync<Event>();
 
             _systemClockMock = Substitute.For<ISystemClock>();
             _eventValidationService = new EventValidationService(_systemClockMock);
@@ -213,7 +213,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     EventOptions = options2
                 }
             };
-            _eventsDbSet.SetDbSetData(events.AsQueryable());
+            _eventsDbSet.SetDbSetDataForAsync(events.AsQueryable());
             return guids;
         }
 
@@ -335,7 +335,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     }
                 }
             };
-            _eventsDbSet.SetDbSetData(events.AsQueryable());
+            _eventsDbSet.SetDbSetDataForAsync(events.AsQueryable());
             return guids;
         }
 

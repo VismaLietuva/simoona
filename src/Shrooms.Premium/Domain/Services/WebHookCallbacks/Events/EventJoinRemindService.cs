@@ -57,7 +57,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
 
             if (usersToNotifyEmail.Any())
             {
-                _eventNotificationService.RemindUsersToJoinEvent(typesToNotifyAbout, usersToNotifyEmail, userOrg.Id);
+                _eventNotificationService.RemindUsersToJoinEventAsync(typesToNotifyAbout, usersToNotifyEmail, userOrg.Id);
             }
         }
     }

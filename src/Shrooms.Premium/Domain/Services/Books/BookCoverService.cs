@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models.Books;
@@ -23,7 +24,7 @@ namespace Shrooms.Premium.Domain.Services.Books
             _logger = logger;
         }
 
-        public void UpdateBookCovers()
+        public async Task UpdateBookCoversAsync()
         {
             var booksWithoutCover = _booksDbSet.Where(book => book.BookCoverUrl == null);
 
@@ -31,7 +32,7 @@ namespace Shrooms.Premium.Domain.Services.Books
             {
                 try
                 {
-                    var bookInfo = _bookService.FindBookByIsbnAsync(book.Code).Result;
+                    var bookInfo = await _bookService.FindBookByIsbnAsync(book.Code);
 
                     if (bookInfo?.CoverImageUrl == null)
                     {
@@ -39,7 +40,7 @@ namespace Shrooms.Premium.Domain.Services.Books
                     }
 
                     book.BookCoverUrl = bookInfo.CoverImageUrl;
-                    _uow.SaveChanges();
+                    await _uow.SaveChangesAsync();
                 }
                 catch (Exception ex)
                 {

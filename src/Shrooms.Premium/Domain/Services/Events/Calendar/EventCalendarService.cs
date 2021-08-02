@@ -4,6 +4,7 @@ using System.Data.Entity;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Ical.Net;
 using Ical.Net.CalendarComponents;
 using Ical.Net.DataTypes;
@@ -16,6 +17,7 @@ using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
+using MailAttachment = System.Net.Mail.Attachment;
 
 namespace Shrooms.Premium.Domain.Services.Events.Calendar
 {
@@ -37,25 +39,27 @@ namespace Shrooms.Premium.Domain.Services.Events.Calendar
             _appSettings = appSettings;
         }
 
-        public void SendInvitation(EventJoinValidationDTO @event, IEnumerable<string> userIds, int orgId)
+        public async Task SendInvitationAsync(EventJoinValidationDTO @event, IEnumerable<string> userIds, int orgId)
         {
-            var emails = _usersDbSet
+            var emails = await _usersDbSet
                 .Where(u => userIds.Contains(u.Id))
                 .Select(u => u.Email)
-                .ToList();
+                .ToListAsync();
 
             var calendarEvent = MapToCalendarEvent(@event);
             AddEventLinkToDescription(calendarEvent, @event.Id, orgId);
+
             var calendar = new Ical.Net.Calendar();
             calendar.Events.Add(calendarEvent);
+
             var serializedCalendar = new CalendarSerializer().SerializeToString(calendar);
             var calByteArray = Encoding.UTF8.GetBytes(serializedCalendar);
             var emailDto = new EmailDto(emails, $"Invitation: {@event.Name} @ {@event.StartDate.ToString("d")}", "");
 
             using (var stream = new MemoryStream(calByteArray))
             {
-                emailDto.Attachment = new System.Net.Mail.Attachment(stream, "invite.ics");
-                _mailingService.SendEmail(emailDto);
+                emailDto.Attachment = new MailAttachment(stream, "invite.ics");
+                await _mailingService.SendEmailAsync(emailDto);
             }
         }
 

@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
 using Microsoft.AspNet.Identity;
-using PagedList;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Exceptions;
@@ -23,6 +22,7 @@ using Shrooms.Premium.Presentation.WebViewModels.KudosShop;
 using Shrooms.Premium.Presentation.WebViewModels.ServiceRequests;
 using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.Api.Filters;
+using X.PagedList;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers
 {
@@ -78,29 +78,14 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.ServiceRequest)]
-        public PagedViewModel<ServiceRequestViewModel> GetPagedFiltered(string includeProperties = null, int page = 1, int pageSize = WebApiConstants.DefaultPageSize, string sortBy = null, string sortOrder = "", string search = "", string priority = "", string status = "", string serviceRequestCategory = "")
+        public async Task<PagedViewModel<ServiceRequestViewModel>> GetPagedFiltered(string includeProperties = null, int page = 1, int pageSize = WebApiConstants.DefaultPageSize, string sortBy = null, string sortOrder = "", string search = "", string priority = "", string status = "", string serviceRequestCategory = "")
         {
-            if (search == null)
-            {
-                search = string.Empty;
-            }
+            search ??= string.Empty;
+            priority ??= string.Empty;
+            status ??= string.Empty;
+            serviceRequestCategory ??= string.Empty;
 
-            if (priority == null)
-            {
-                priority = string.Empty;
-            }
-
-            if (status == null)
-            {
-                status = string.Empty;
-            }
-
-            if (serviceRequestCategory == null)
-            {
-                serviceRequestCategory = string.Empty;
-            }
-
-            if (_permissionService.UserHasPermission(GetUserAndOrganization(), AdministrationPermissions.ServiceRequest))
+            if (await _permissionService.UserHasPermissionAsync(GetUserAndOrganization(), AdministrationPermissions.ServiceRequest))
             {
                 Expression<Func<ServiceRequest, bool>> filter = u =>
                     (u.Title.Contains(search) ||
@@ -110,12 +95,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                     u.Status.Title.Contains(status) &&
                     (string.IsNullOrEmpty(serviceRequestCategory) || u.CategoryName == serviceRequestCategory);
 
-                return GetFilteredPaged(includeProperties, page, pageSize, sortBy, sortOrder, filter);
+                return await GetFilteredPagedAsync(includeProperties, page, pageSize, sortBy, sortOrder, filter);
             }
 
             var id = User.Identity.GetUserId();
-            var assigneeCategoriesNames = _serviceRequestService
-                    .GetCategories()
+            var assigneeCategoriesNames = (await _serviceRequestService.GetCategoriesAsync())
                     .Where(x => x.Assignees.Select(y => y.Id).Contains(id))
                     .Select(x => x.Name)
                     .ToList();
@@ -135,7 +119,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                     (string.IsNullOrEmpty(serviceRequestCategory) || u.CategoryName == serviceRequestCategory) &&
                     assigneeCategoriesNames.Contains(u.CategoryName));
 
-            var serviceRequestPage = GetFilteredPaged(includeProperties, page, pageSize, sortBy, sortOrder, filterForCurrentUser);
+            var serviceRequestPage = await GetFilteredPagedAsync(includeProperties, page, pageSize, sortBy, sortOrder, filterForCurrentUser);
 
             foreach (var serviceRequest in serviceRequestPage.PagedList)
             {
@@ -148,13 +132,13 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             return serviceRequestPage;
         }
 
-        private PagedViewModel<ServiceRequestViewModel> GetFilteredPaged(string includeProperties = null, int page = 1, int pageSize = WebApiConstants.DefaultPageSize, string sort = null, string dir = "", Expression<Func<ServiceRequest, bool>> filter = null)
+        private async Task<PagedViewModel<ServiceRequestViewModel>> GetFilteredPagedAsync(string includeProperties = null, int page = 1, int pageSize = WebApiConstants.DefaultPageSize, string sort = null, string dir = "", Expression<Func<ServiceRequest, bool>> filter = null)
         {
             var sortQuery = string.IsNullOrEmpty(sort) ? null : $"{sort} {dir}";
 
-            var models = _serviceRequestRepository.Get(
-                includeProperties: includeProperties, filter: filter, orderBy: sortQuery ?? "Created")
-                .ToPagedList(page, pageSize);
+            var models = await _serviceRequestRepository
+                .Get(includeProperties: includeProperties, filter: filter, orderBy: sortQuery ?? "Created")
+                .ToPagedListAsync(page, pageSize);
 
             var pagedModel = new StaticPagedList<ServiceRequestViewModel>(_mapper.Map<IEnumerable<ServiceRequest>, IEnumerable<ServiceRequestViewModel>>(models), models.PageNumber, models.PageSize, models.TotalItemCount);
 
@@ -228,7 +212,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             try
             {
-                _serviceRequestService.CreateComment(comment, GetUserAndOrganization());
+                _serviceRequestService.CreateCommentAsync(comment, GetUserAndOrganization());
             }
             catch (ValidationException e)
             {
@@ -251,7 +235,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             try
             {
-                _serviceRequestService.CreateNewServiceRequest(newServiceRequestDTO, GetUserAndOrganization());
+                _serviceRequestService.CreateNewServiceRequestAsync(newServiceRequestDTO, GetUserAndOrganization());
             }
             catch (ValidationException e)
             {
@@ -274,7 +258,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             try
             {
-                _serviceRequestService.UpdateServiceRequest(serviceRequestDTO, GetUserAndOrganization());
+                _serviceRequestService.UpdateServiceRequestAsync(serviceRequestDTO, GetUserAndOrganization());
             }
             catch (ValidationException e)
             {
@@ -294,7 +278,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         {
             try
             {
-                _serviceRequestService.MoveRequestToDone(id, GetUserAndOrganization());
+                _serviceRequestService.MoveRequestToDoneAsync(id, GetUserAndOrganization());
             }
             catch (ValidationException e)
             {
@@ -310,9 +294,9 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpDelete]
         [PermissionAuthorize(Permission = AdministrationPermissions.ServiceRequest)]
-        public HttpResponseMessage Delete(int id)
+        public async Task<HttpResponseMessage> Delete(int id)
         {
-            var model = _serviceRequestRepository.GetByID(id);
+            var model = await _serviceRequestRepository.GetByIdAsync(id);
 
             if (model == null)
             {
@@ -320,7 +304,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             }
 
             _serviceRequestRepository.Delete(model);
-            _uow.Save();
+            await _uow.SaveAsync();
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
@@ -328,7 +312,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [PermissionAuthorize(Permission = AdministrationPermissions.ServiceRequest)]
         public IHttpActionResult GetServiceRequestCategories()
         {
-            var serviceRequestCategoriesDto = _serviceRequestService.GetCategories();
+            var serviceRequestCategoriesDto = _serviceRequestService.GetCategoriesAsync();
 
             return Ok(serviceRequestCategoriesDto);
         }
@@ -345,7 +329,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             try
             {
                 var newCategory = _mapper.Map<ServiceRequestCategoryCreateViewModel, ServiceRequestCategoryDTO>(category);
-                _serviceRequestService.CreateCategory(newCategory, GetUserAndOrganization().UserId);
+                _serviceRequestService.CreateCategoryAsync(newCategory, GetUserAndOrganization().UserId);
                 return Ok();
             }
             catch (ValidationException e)
@@ -382,7 +366,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             try
             {
                 var modelDto = _mapper.Map<ServiceRequestCategoryViewModel, ServiceRequestCategoryDTO>(model);
-                _serviceRequestService.EditCategory(modelDto, GetUserAndOrganization().UserId);
+                _serviceRequestService.EditCategoryAsync(modelDto, GetUserAndOrganization().UserId);
 
                 return Ok();
             }
@@ -410,24 +394,25 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.ServiceRequest)]
-        public IHttpActionResult GetServiceRequestsAsExcel()
+        public async Task<IHttpActionResult> GetServiceRequestsAsExcel()
         {
             var userId = GetUserAndOrganization().UserId;
             Expression<Func<ServiceRequest, bool>> filter = null;
-            var isAdmin = _permissionService.UserHasPermission(GetUserAndOrganization(), AdministrationPermissions.ServiceRequest);
+            var isAdmin = await _permissionService.UserHasPermissionAsync(GetUserAndOrganization(), AdministrationPermissions.ServiceRequest);
+
             if (!isAdmin)
             {
-                var assigneeCategoriesNames = _serviceRequestService
-                        .GetCategories()
+                var assigneeCategoriesNames = (await _serviceRequestService.GetCategoriesAsync())
                         .Where(x => x.Assignees.Select(y => y.Id).Contains(userId))
                         .Select(x => x.Name);
+
                 filter = u =>
                     u.EmployeeId == userId || assigneeCategoriesNames.Contains(u.CategoryName);
             }
 
             try
             {
-                var stream = new ByteArrayContent(_serviceRequestExportService.ExportToExcel(GetUserAndOrganization(), filter));
+                var stream = new ByteArrayContent(await _serviceRequestExportService.ExportToExcelAsync(GetUserAndOrganization(), filter));
                 var result = new HttpResponseMessage(HttpStatusCode.OK) { Content = stream };
                 return ResponseMessage(result);
             }

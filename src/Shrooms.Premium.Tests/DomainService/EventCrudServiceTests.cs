@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.Constants;
@@ -28,11 +29,11 @@ namespace Shrooms.Premium.Tests.DomainService
 {
     public class EventCrudServiceTests
     {
-        private IDbSet<Event> _eventsDbSet;
-        private IDbSet<Office> _officeDbSet;
-        private IDbSet<EventType> _eventTypesDbSet;
-        private IDbSet<ApplicationUser> _usersDbSet;
-        private IDbSet<EventOption> _eventOptionsDbSet;
+        private DbSet<Event> _eventsDbSet;
+        private DbSet<Office> _officeDbSet;
+        private DbSet<EventType> _eventTypesDbSet;
+        private DbSet<ApplicationUser> _usersDbSet;
+        private DbSet<EventOption> _eventOptionsDbSet;
 
         private IUnitOfWork2 _uow;
         private IWallService _wallService;
@@ -45,11 +46,11 @@ namespace Shrooms.Premium.Tests.DomainService
         {
             _uow = Substitute.For<IUnitOfWork2>();
 
-            _eventsDbSet = _uow.MockDbSet<Event>();
-            _officeDbSet = _uow.MockDbSet<Office>();
-            _eventOptionsDbSet = _uow.MockDbSet<EventOption>();
-            _usersDbSet = _uow.MockDbSet<ApplicationUser>();
-            _eventTypesDbSet = _uow.MockDbSet<EventType>();
+            _eventsDbSet = _uow.MockDbSetForAsync<Event>();
+            _officeDbSet = _uow.MockDbSetForAsync<Office>();
+            _eventOptionsDbSet = _uow.MockDbSetForAsync<EventOption>();
+            _usersDbSet = _uow.MockDbSetForAsync<ApplicationUser>();
+            _eventTypesDbSet = _uow.MockDbSetForAsync<EventType>();
 
             _permissionService = Substitute.For<IPermissionService>();
             _systemClockMock = Substitute.For<ISystemClock>();
@@ -72,7 +73,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 OrganizationId = 2,
                 UserId = "eventHostId"
             };
-            _eventService.Delete(eventId, userAndOrganization);
+            _eventService.DeleteAsync(eventId, userAndOrganization);
             _eventsDbSet.Received(1).Remove(Arg.Is<Event>(x => x.Id == eventId));
         }
 
@@ -132,7 +133,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 Location = "place",
                 NewOptions = new List<NewEventOptionDTO>()
             };
-            _eventService.CreateEvent(newEvent);
+            _eventService.CreateEventAsync(newEvent);
             _eventsDbSet.Received(1).Add(Arg.Any<Event>());
             _eventOptionsDbSet.Received(0).Add(Arg.Any<EventOption>());
         }
@@ -158,9 +159,9 @@ namespace Shrooms.Premium.Tests.DomainService
                 Location = "place",
                 NewOptions = new List<NewEventOptionDTO>()
             };
-            _eventService.CreateEvent(newEvent);
+            _eventService.CreateEventAsync(newEvent);
             _wallService.Received(1)
-                .CreateNewWall(
+                .CreateNewWallAsync(
                     Arg.Is<CreateWallDto>(x =>
                         x.Name == newEvent.Name &&
                         x.Access == WallAccess.Private &&
@@ -200,7 +201,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     }
                 }
             };
-            _eventService.CreateEvent(newEvent);
+            _eventService.CreateEventAsync(newEvent);
             _eventsDbSet.Received(1).Add(Arg.Any<Event>());
             _eventOptionsDbSet.Received(2).Add(Arg.Any<EventOption>());
         }
@@ -235,7 +236,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     }
                 }
             };
-            var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
+            var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEventAsync(newEvent));
             Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventOptionsCantDuplicate));
         }
 
@@ -269,7 +270,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     }
                 }
             };
-            var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
+            var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEventAsync(newEvent));
             Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventResponsiblePersonDoesNotExistCode));
         }
 
@@ -304,7 +305,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 }
             };
 
-            var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
+            var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEventAsync(newEvent));
             Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventTypeDoesNotExistCode));
         }
 
@@ -340,7 +341,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     }
                 }
             };
-            var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
+            var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEventAsync(newEvent));
             Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventRegistrationDeadlineIsExpired));
         }
 
@@ -376,7 +377,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     }
                 }
             };
-            var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
+            var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEventAsync(newEvent));
             Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventRegistrationDeadlineGreaterThanStartDateCode));
         }
 
@@ -410,7 +411,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     }
                 }
             };
-            var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
+            var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEventAsync(newEvent));
             Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventStartDateGreaterThanEndDateCode));
         }
 
@@ -444,7 +445,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     }
                 }
             };
-            var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEvent(newEvent));
+            var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.CreateEventAsync(newEvent));
             Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventNeedToHaveMaxChoiceCode));
         }
 
@@ -484,7 +485,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     }
                 }
             };
-            var ex = Assert.Throws<EventException>(() => _eventService.UpdateEvent(newEvent));
+            var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.UpdateEventAsync(newEvent));
             Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventDoesNotExistCode));
         }
 
@@ -526,18 +527,19 @@ namespace Shrooms.Premium.Tests.DomainService
                     }
                 }
             };
-            var ex = Assert.Throws<EventException>(() => _eventService.UpdateEvent(newEvent));
+            var ex = Assert.ThrowsAsync<EventException>(async () => await _eventService.UpdateEventAsync(newEvent));
             Assert.That(PremiumErrorCodes.EventDontHavePermissionCode, Is.EqualTo(ex.Message));
         }
 
         [Test]
-        public void Should_Return_Updated_Event()
+        public async Task Should_Return_Updated_Event()
         {
             MockPermissionService(_permissionService);
             MockUsers();
             MockEventTypes();
             var eventsGuids = MockEventsListTest();
             MockEventOptions();
+
             var newEvent = new EditEventDTO
             {
                 Id = eventsGuids[0],
@@ -580,10 +582,12 @@ namespace Shrooms.Premium.Tests.DomainService
                     }
                 }
             };
-            _eventService.UpdateEvent(newEvent);
+
+            await _eventService.UpdateEventAsync(newEvent);
+
             _eventOptionsDbSet.Received(0).Remove(Arg.Any<EventOption>());
             _eventOptionsDbSet.Received(2).Add(Arg.Any<EventOption>());
-            _uow.Received(1).SaveChanges(false);
+            await _uow.Received(1).SaveChangesAsync(false);
         }
 
         private void MockEventTypes()
@@ -615,7 +619,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     OrganizationId = 3
                 }
             };
-            _eventTypesDbSet.SetDbSetData(types.AsQueryable());
+            _eventTypesDbSet.SetDbSetDataForAsync(types.AsQueryable());
         }
 
         private void MockUsers()
@@ -627,7 +631,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     Id = "1"
                 }
             };
-            _usersDbSet.SetDbSetData(types.AsQueryable());
+            _usersDbSet.SetDbSetDataForAsync(types.AsQueryable());
         }
 
         private Guid[] MockEventsListTest()
@@ -736,7 +740,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     EventOptions = new List<EventOption>()
                 }
             };
-            _eventsDbSet.SetDbSetData(events.AsQueryable());
+            _eventsDbSet.SetDbSetDataForAsync(events.AsQueryable());
             return guids;
         }
 
@@ -755,13 +759,13 @@ namespace Shrooms.Premium.Tests.DomainService
                     Option = "test2"
                 }
             };
-            _eventOptionsDbSet.SetDbSetData(types.AsQueryable());
+            _eventOptionsDbSet.SetDbSetDataForAsync(types.AsQueryable());
         }
 
         private void MockPermissionService(IPermissionService permissionService)
         {
-            permissionService.UserHasPermission(Arg.Is<UserAndOrganizationDTO>(x => x.UserId == "1"), AdministrationPermissions.Event).Returns(true);
-            permissionService.UserHasPermission(Arg.Is<UserAndOrganizationDTO>(x => x.UserId == "2"), AdministrationPermissions.Event).Returns(false);
+            permissionService.UserHasPermissionAsync(Arg.Is<UserAndOrganizationDTO>(x => x.UserId == "1"), AdministrationPermissions.Event).Returns(true);
+            permissionService.UserHasPermissionAsync(Arg.Is<UserAndOrganizationDTO>(x => x.UserId == "2"), AdministrationPermissions.Event).Returns(false);
         }
 
         private Guid MockEventDelete()
@@ -781,8 +785,8 @@ namespace Shrooms.Premium.Tests.DomainService
                 }
             };
 
-            _eventOptionsDbSet.SetDbSetData(new List<EventOption>().AsQueryable());
-            _eventsDbSet.SetDbSetData(events.AsQueryable());
+            _eventOptionsDbSet.SetDbSetDataForAsync(new List<EventOption>().AsQueryable());
+            _eventsDbSet.SetDbSetDataForAsync(events.AsQueryable());
             return eventId;
         }
 
@@ -895,7 +899,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 }
             };
 
-            _eventsDbSet.SetDbSetData(events.AsQueryable());
+            _eventsDbSet.SetDbSetDataForAsync(events.AsQueryable());
 
             var offices = new List<Office>
             {
@@ -908,7 +912,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 }
             };
 
-            _officeDbSet.SetDbSetData(offices.AsQueryable());
+            _officeDbSet.SetDbSetDataForAsync(offices.AsQueryable());
 
             return eventId;
         }

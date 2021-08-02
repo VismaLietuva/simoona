@@ -1,7 +1,9 @@
-﻿namespace Shrooms.Premium.Domain.Services.Books
+﻿using System.Threading.Tasks;
+
+namespace Shrooms.Premium.Domain.Services.Books
 {
     public interface IBookRemindService
     {
-        void RemindAboutBooks(int daysBefore);
+        Task RemindAboutBooksAsync(int daysBefore);
     }
 }

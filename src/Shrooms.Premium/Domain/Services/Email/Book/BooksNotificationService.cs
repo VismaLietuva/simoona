@@ -1,5 +1,6 @@
 ﻿using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
@@ -30,17 +31,17 @@ namespace Shrooms.Premium.Domain.Services.Email.Book
             _organizationsDbSet = uow.GetDbSet<Organization>();
         }
 
-        public void SendEmail(TakenBookDTO takenBook)
+        public async Task SendEmailAsync(TakenBookDTO takenBook)
         {
-            var organizationName = _organizationsDbSet
+            var organizationName = await _organizationsDbSet
                 .Where(organization => organization.Id == takenBook.OrganizationId)
                 .Select(organization => organization.ShortName)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
 
-            var userEmail = _usersDbSet
+            var userEmail = await _usersDbSet
                 .Where(u => u.Id == takenBook.UserId)
                 .Select(u => u.Email)
-                .First();
+                .FirstAsync();
 
             var subject = Resources.Models.Books.Books.EmailSubject;
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organizationName);
@@ -49,7 +50,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Book
             var emailTemplateViewModel = new BookTakenEmailTemplateViewModel(userNotificationSettingsUrl, takenBook.Title, takenBook.Author, bookUrl);
             var body = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.BookTaken);
 
-            _mailingService.SendEmail(new EmailDto(userEmail, subject, body));
+            await _mailingService.SendEmailAsync(new EmailDto(userEmail, subject, body));
         }
     }
 }

@@ -39,13 +39,14 @@ namespace Shrooms.Premium.Domain.Services.Notifications
             _wallService = wallService;
         }
 
-        public async Task<NotificationDto> CreateForEvent(UserAndOrganizationDTO userOrg, CreateEventDto eventDto)
+        public async Task<NotificationDto> CreateForEventAsync(UserAndOrganizationDTO userOrg, CreateEventDto eventDto)
         {
             var mainWallId = await _wallDbSet.Where(w => w.Type == WallType.Main).Select(s => s.Id).SingleAsync();
 
-            var membersToNotify = _wallService.GetWallMembersIds(mainWallId, userOrg);
+            var membersToNotify = await _wallService.GetWallMembersIdsAsync(mainWallId, userOrg);
 
-            var newNotification = Notification.Create(eventDto.Name, eventDto.Description, eventDto.ImageName, new Sources { EventId = eventDto.Id }, NotificationType.NewEvent, userOrg.OrganizationId, membersToNotify);
+            var sourceIds = new Sources { EventId = eventDto.Id };
+            var newNotification = Notification.Create(eventDto.Name, eventDto.Description, eventDto.ImageName, sourceIds, NotificationType.NewEvent, userOrg.OrganizationId, membersToNotify);
 
             _notificationDbSet.Add(newNotification);
 

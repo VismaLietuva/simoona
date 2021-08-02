@@ -107,7 +107,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.LoyaltyKudos
                 }
 
                 _uow.SaveChanges(false);
-                _asyncRunner.Run<IKudosPremiumNotificationService>(ntf => ntf.SendLoyaltyBotNotification(awardedEmployees), _uow.ConnectionName);
+                _asyncRunner.Run<IKudosPremiumNotificationService>(async notifier => await notifier.SendLoyaltyBotNotificationAsync(awardedEmployees), _uow.ConnectionName);
             }
         }
 

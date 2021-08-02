@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
@@ -20,34 +21,34 @@ namespace Shrooms.Premium.Tests.DomainService
     public class BookMobileServiceTests
     {
         private IBookMobileService _bookService;
-        private IDbSet<ApplicationUser> _usersDbSet;
-        private IDbSet<Office> _officesDbSet;
-        private IDbSet<BookOffice> _bookOfficesDbSet;
-        private IDbSet<Book> _booksDbSet;
-        private IDbSet<BookLog> _bookLogsDbSet;
+        private DbSet<ApplicationUser> _usersDbSet;
+        private DbSet<Office> _officesDbSet;
+        private DbSet<BookOffice> _bookOfficesDbSet;
+        private DbSet<Book> _booksDbSet;
+        private DbSet<BookLog> _bookLogsDbSet;
 
         [SetUp]
         public void TestInitializer()
         {
             var uow = Substitute.For<IUnitOfWork2>();
-            _usersDbSet = Substitute.For<IDbSet<ApplicationUser>>();
-            _usersDbSet.SetDbSetData(MockUsers());
+            _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IDbAsyncEnumerable<ApplicationUser>>();
+            _usersDbSet.SetDbSetDataForAsync(MockUsers());
             uow.GetDbSet<ApplicationUser>().Returns(_usersDbSet);
 
-            _officesDbSet = Substitute.For<IDbSet<Office>>();
-            _officesDbSet.SetDbSetData(MockOffices());
+            _officesDbSet = Substitute.For<DbSet<Office>, IQueryable<Office>, IDbAsyncEnumerable<Office>>();
+            _officesDbSet.SetDbSetDataForAsync(MockOffices());
             uow.GetDbSet<Office>().Returns(_officesDbSet);
 
-            _bookOfficesDbSet = Substitute.For<IDbSet<BookOffice>>();
-            _bookOfficesDbSet.SetDbSetData(MockBookOffice());
+            _bookOfficesDbSet = Substitute.For<DbSet<BookOffice>, IQueryable<BookOffice>, IDbAsyncEnumerable<BookOffice>>();
+            _bookOfficesDbSet.SetDbSetDataForAsync(MockBookOffice());
             uow.GetDbSet<BookOffice>().Returns(_bookOfficesDbSet);
 
-            _booksDbSet = Substitute.For<IDbSet<Book>>();
-            _booksDbSet.SetDbSetData(MockBook());
+            _booksDbSet = Substitute.For<DbSet<Book>, IQueryable<Book>, IDbAsyncEnumerable<Book>>();
+            _booksDbSet.SetDbSetDataForAsync(MockBook());
             uow.GetDbSet<Book>().Returns(_booksDbSet);
 
-            _bookLogsDbSet = Substitute.For<IDbSet<BookLog>>();
-            _bookLogsDbSet.SetDbSetData(MockBookLog());
+            _bookLogsDbSet = Substitute.For<DbSet<BookLog>, IQueryable<BookLog>, IDbAsyncEnumerable<BookLog>>();
+            _bookLogsDbSet.SetDbSetDataForAsync(MockBookLog());
             uow.GetDbSet<BookLog>().Returns(_bookLogsDbSet);
 
             var validationService = new BookMobileServiceValidator();

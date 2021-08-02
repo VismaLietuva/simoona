@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
@@ -15,9 +15,9 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             _excelBuilder = excelBuilder;
             _participantService = participantService;
         }
-        public byte[] ExportParticipants(int lotteryId, UserAndOrganizationDTO userAndOrg)
+        public async Task<byte[]> ExportParticipantsAsync(int lotteryId, UserAndOrganizationDTO userAndOrg)
         {
-            var participantsDTO = _participantService.GetParticipantsCounted(lotteryId).ToList();
+            var participantsDTO = await _participantService.GetParticipantsCountedAsync(lotteryId);
 
             var numberOfTicketsAdded = 0;
             var participantTickets = new List<string>();
@@ -38,8 +38,8 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                     }
                 }
             }
-            tickets.Add(participantTickets);
 
+            tickets.Add(participantTickets);
             _excelBuilder.AddNewWorksheet(BusinessLayerConstants.LotteryParticipantsExcelTableName, tickets);
 
             return _excelBuilder.GenerateByteArray();

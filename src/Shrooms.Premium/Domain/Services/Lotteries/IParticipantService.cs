@@ -1,15 +1,14 @@
 using System.Collections.Generic;
-using PagedList;
+using System.Threading.Tasks;
 using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
+using X.PagedList;
 
 namespace Shrooms.Premium.Domain.Services.Lotteries
 {
     public interface IParticipantService
     {
-        IEnumerable<string> GetParticipantsId(int lotteryId);
+        Task<IList<LotteryParticipantDTO>> GetParticipantsCountedAsync(int lotteryId);
 
-        IEnumerable<LotteryParticipantDTO> GetParticipantsCounted(int lotteryId);
-
-        IPagedList<LotteryParticipantDTO> GetPagedParticipants(int id, int page, int pageSize);
+        Task<IPagedList<LotteryParticipantDTO>> GetPagedParticipantsAsync(int lotteryId, int page, int pageSize);
     }
 }

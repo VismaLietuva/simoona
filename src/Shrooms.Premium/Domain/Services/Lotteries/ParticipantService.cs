@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
-using PagedList;
+using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Lottery;
 using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
+using X.PagedList;
 
 namespace Shrooms.Premium.Domain.Services.Lotteries
 {
@@ -20,24 +21,25 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             _participantsDbSet = unitOfWork.GetDbSet<LotteryParticipant>();
         }
 
-        public IEnumerable<string> GetParticipantsId(int lotteryId)
+        public async Task<IList<LotteryParticipantDTO>> GetParticipantsCountedAsync(int lotteryId)
         {
-            return _participantsDbSet
+            return await _participantsDbSet
                 .Where(x => x.LotteryId == lotteryId)
-                .Select(x => x.UserId);
+                .GroupBy(l => l.User)
+                .Select(MapToParticipantDto)
+                .OrderBy(p => p.FullName)
+                .ToListAsync();
         }
 
-        public IEnumerable<LotteryParticipantDTO> GetParticipantsCounted(int lotteryId)
+        public async Task<IPagedList<LotteryParticipantDTO>> GetPagedParticipantsAsync(int lotteryId, int page, int pageSize)
         {
-            return _participantsDbSet.Where(x => x.LotteryId == lotteryId)
-              .GroupBy(l => l.User).Select(MapToParticipantDto).OrderBy(p => p.FullName);
-        }
+            var filteredParticipants = _participantsDbSet
+                .Where(x => x.LotteryId == lotteryId)
+                .GroupBy(l => l.User)
+                .Select(MapToParticipantDto)
+                .OrderBy(p => p.FullName);
 
-        public IPagedList<LotteryParticipantDTO> GetPagedParticipants(int id, int page, int pageSize)
-        {
-            var filteredParticipants = GetParticipantsCounted(id);
-
-            return filteredParticipants.ToPagedList(page, pageSize);
+            return await filteredParticipants.ToPagedListAsync(page, pageSize);
         }
 
         private Expression<Func<IGrouping<ApplicationUser, LotteryParticipant>, LotteryParticipantDTO>> MapToParticipantDto =>

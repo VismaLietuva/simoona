@@ -10,12 +10,12 @@ namespace Shrooms.Premium.Domain.Services.Books
     public interface IBookService
     {
         void AddBook(NewBookDTO bookDto);
-        void TakeBook(BookTakeDTO bookDTO);
+        Task TakeBookAsync(BookTakeDTO bookDTO);
         void EditBook(EditBookDTO editedBook);
         void DeleteBook(int bookOfficeId, UserAndOrganizationDTO userOrg);
-        void TakeBook(int bookOfficeId, UserAndOrganizationDTO userAndOrg);
+        Task TakeBookAsync(int bookOfficeId, UserAndOrganizationDTO userAndOrg);
         void ReturnBook(int bookOfficeId, UserAndOrganizationDTO userAndOrg);
-        void ReportBook(BookReportDTO bookReport, UserAndOrganizationDTO userAndOrg);
+        Task ReportBookAsync(BookReportDTO bookReport, UserAndOrganizationDTO userAndOrg);
         void UpdateBookCovers();
         Task<RetrievedBookInfoDTO> FindBookByIsbn(string isbn, int organizationId);
         ILazyPaged<BooksByOfficeDTO> GetBooksByOffice(BooksByOfficeOptionsDTO options);

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data.Entity;
-using System.Linq;
+using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.DAL;
@@ -18,46 +18,35 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
         private IParticipantService _participantService;
 
         private IUnitOfWork2 _unitOfWork;
-        private IDbSet<LotteryParticipant> _lotteryParticipants;
+        private DbSet<LotteryParticipant> _lotteryParticipants;
 
         [SetUp]
         public void TestInitializer()
         {
             _unitOfWork = Substitute.For<IUnitOfWork2>();
-            _lotteryParticipants = _unitOfWork.MockDbSet<LotteryParticipant>();
+            _lotteryParticipants = _unitOfWork.MockDbSetForAsync<LotteryParticipant>();
 
             _participantService = new ParticipantService(_unitOfWork);
         }
 
-        [TestCase(1, 6)]
-        [TestCase(1000, 0)]
-        public void GetParticipantsId_AnyLotteryId_ReturnsParticipantIds(int lotteryId, int participantsCount)
-        {
-            _lotteryParticipants.SetDbSetData(GetParticipants());
-
-            var result = _participantService.GetParticipantsId(lotteryId);
-
-            Assert.AreEqual(result.Count(), participantsCount);
-        }
-
         [TestCase(5, 2)]
         [TestCase(1000, 0)]
-        public void GetParticipantsCounted_AnyLotteryId_ReturnsCorrectTicketsCount(int lotteryId, int tickets)
+        public async Task GetParticipantsCounted_AnyLotteryId_ReturnsCorrectTicketsCount(int lotteryId, int tickets)
         {
-            _lotteryParticipants.SetDbSetData(GetParticipants());
+            _lotteryParticipants.SetDbSetDataForAsync(GetParticipants());
 
-            var result = _participantService.GetParticipantsCounted(lotteryId);
+            var result = await _participantService.GetParticipantsCountedAsync(lotteryId);
 
             Assert.That(result, Is.All.Matches<LotteryParticipantDTO>(x => x.Tickets == tickets));
         }
 
         [TestCase(1, 1, 2)]
         [TestCase(1, 1, 3)]
-        public void GetPagedParticipants_Returns_Requested_Amount_Of_Participants(int lotteryId, int page, int pageSize)
+        public async Task GetPagedParticipants_Returns_Requested_Amount_Of_Participants(int lotteryId, int page, int pageSize)
         {
-            _lotteryParticipants.SetDbSetData(GetParticipants());
+            _lotteryParticipants.SetDbSetDataForAsync(GetParticipants());
 
-            var result = _participantService.GetPagedParticipants(lotteryId, page, pageSize);
+            var result = await _participantService.GetPagedParticipantsAsync(lotteryId, page, pageSize);
 
             Assert.IsTrue(result.Count == pageSize);
         }

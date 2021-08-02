@@ -19,20 +19,20 @@ namespace Shrooms.Premium.Tests.DomainService
         private ILoyaltyKudosService _loyaltyKudosService;
         private ILoyaltyKudosCalculator _loyaltyKudosCalculator;
 
-        private IDbSet<KudosLog> _kudosLogsDbSet;
-        private IDbSet<KudosType> _kudosTypeDbSet;
-        private IDbSet<ApplicationUser> _usersDbSet;
-        private IDbSet<Organization> _organizationsDbSet;
+        private DbSet<KudosLog> _kudosLogsDbSet;
+        private DbSet<KudosType> _kudosTypeDbSet;
+        private DbSet<ApplicationUser> _usersDbSet;
+        private DbSet<Organization> _organizationsDbSet;
 
         [SetUp]
         public void TestInitializer()
         {
             var uow = Substitute.For<IUnitOfWork2>();
 
-            _kudosLogsDbSet = uow.MockDbSet<KudosLog>();
-            _kudosTypeDbSet = uow.MockDbSet<KudosType>();
-            _usersDbSet = uow.MockDbSet<ApplicationUser>();
-            _organizationsDbSet = uow.MockDbSet<Organization>();
+            _kudosLogsDbSet = uow.MockDbSetForAsync<KudosLog>();
+            _kudosTypeDbSet = uow.MockDbSetForAsync<KudosType>();
+            _usersDbSet = uow.MockDbSetForAsync<ApplicationUser>();
+            _organizationsDbSet = uow.MockDbSetForAsync<Organization>();
 
             var loggerMock = Substitute.For<ILogger>();
             var asyncRunner = Substitute.For<IAsyncRunner>();
@@ -477,10 +477,10 @@ namespace Shrooms.Premium.Tests.DomainService
 
             var loyaltyKudosType = new KudosType { Id = 1, Value = 1, Name = "Loyalty" };
 
-            _usersDbSet.SetDbSetData(employees.AsQueryable());
-            _kudosLogsDbSet.SetDbSetData(kudosLogs.AsQueryable());
-            _kudosTypeDbSet.SetDbSetData(new[] { loyaltyKudosType }.AsQueryable());
-            _organizationsDbSet.SetDbSetData(organizations.AsQueryable());
+            _usersDbSet.SetDbSetDataForAsync(employees.AsQueryable());
+            _kudosLogsDbSet.SetDbSetDataForAsync(kudosLogs.AsQueryable());
+            _kudosTypeDbSet.SetDbSetDataForAsync(new[] { loyaltyKudosType }.AsQueryable());
+            _organizationsDbSet.SetDbSetDataForAsync(organizations.AsQueryable());
 
             _loyaltyKudosService.AwardEmployeesWithKudos("tenant2");
 
@@ -519,10 +519,10 @@ namespace Shrooms.Premium.Tests.DomainService
 
             var loyaltyKudosType = new KudosType { Id = 1, Value = 1, Name = "Loyalty" };
 
-            _usersDbSet.SetDbSetData(employees.AsQueryable());
-            _kudosLogsDbSet.SetDbSetData(kudosLogs.AsQueryable());
-            _kudosTypeDbSet.SetDbSetData(new[] { loyaltyKudosType }.AsQueryable());
-            _organizationsDbSet.SetDbSetData(organizations.AsQueryable());
+            _usersDbSet.SetDbSetDataForAsync(employees.AsQueryable());
+            _kudosLogsDbSet.SetDbSetDataForAsync(kudosLogs.AsQueryable());
+            _kudosTypeDbSet.SetDbSetDataForAsync(new[] { loyaltyKudosType }.AsQueryable());
+            _organizationsDbSet.SetDbSetDataForAsync(organizations.AsQueryable());
 
             _loyaltyKudosService.AwardEmployeesWithKudos("tenant2");
 
@@ -565,10 +565,10 @@ namespace Shrooms.Premium.Tests.DomainService
 
             var loyaltyKudosType = new KudosType { Id = 1, Value = 1, Name = "Loyalty" };
 
-            _usersDbSet.SetDbSetData(employees.AsQueryable());
-            _kudosLogsDbSet.SetDbSetData(kudosLogs.AsQueryable());
-            _kudosTypeDbSet.SetDbSetData(new[] { loyaltyKudosType }.AsQueryable());
-            _organizationsDbSet.SetDbSetData(organizations.AsQueryable());
+            _usersDbSet.SetDbSetDataForAsync(employees.AsQueryable());
+            _kudosLogsDbSet.SetDbSetDataForAsync(kudosLogs.AsQueryable());
+            _kudosTypeDbSet.SetDbSetDataForAsync(new[] { loyaltyKudosType }.AsQueryable());
+            _organizationsDbSet.SetDbSetDataForAsync(organizations.AsQueryable());
 
             _loyaltyKudosService.AwardEmployeesWithKudos("tenant2");
 

@@ -2,6 +2,7 @@
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
@@ -35,26 +36,28 @@ namespace Shrooms.Premium.Domain.Services.Books
             _booksDbSet = uow.GetDbSet<BookLog>();
             _logger = logger;
         }
-        public void RemindAboutBooks(int daysBefore)
+
+        public async Task RemindAboutBooksAsync(int daysBefore)
         {
             var bookTookBefore = DateTime.UtcNow.AddDays(-daysBefore);
-            var booksToRemind = _booksDbSet
+
+            var booksToRemind = await _booksDbSet
                 .Include(p => p.BookOffice)
                 .Where(p => p.TakenFrom < bookTookBefore && p.Returned == null)
                 .Select(MapBookLogToBookRemindDto())
-                .ToList();
+                .ToListAsync();
 
             foreach (var bookToRemind in booksToRemind)
             {
                 try
                 {
-                    var user = _userService.GetApplicationUserOrDefault(bookToRemind.ApplicationUserId);
+                    var user = await _userService.GetApplicationUserOrDefaultAsync(bookToRemind.ApplicationUserId);
                     if (user == null)
                     {
                         continue;
                     }
 
-                    var organization = _organizationService.GetOrganizationById(bookToRemind.OrganizationId);
+                    var organization = await _organizationService.GetOrganizationByIdAsync(bookToRemind.OrganizationId);
                     var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
                     var subject = $"Book reminder: \"{bookToRemind.Title}\"";
                     var bookUrl = _appSettings.BookUrl(organization.ShortName, bookToRemind.BookOfficeId, bookToRemind.OfficeId);
@@ -64,7 +67,7 @@ namespace Shrooms.Premium.Domain.Services.Books
                     var content = _mailTemplate.Generate(bookRemindTemplateViewModel, EmailPremiumTemplateCacheKeys.BookRemind);
 
                     var emailData = new EmailDto(user.Email, subject, content);
-                    _mailingService.SendEmail(emailData);
+                    await _mailingService.SendEmailAsync(emailData);
                 }
                 catch (Exception e)
                 {

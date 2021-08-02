@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
 using AutoMapper;
 using NSubstitute;
@@ -17,15 +18,15 @@ namespace Shrooms.Premium.Tests.DomainService
     public class OfficeMapServiceTests
     {
         private IOfficeMapService _officeMapService;
-        private IDbSet<ApplicationUser> _usersDbSet;
+        private DbSet<ApplicationUser> _usersDbSet;
 
         [SetUp]
         public void TestInitializer()
         {
             var uow = Substitute.For<IUnitOfWork2>();
             var unitOfWork = Substitute.For<IUnitOfWork>();
-            _usersDbSet = Substitute.For<IDbSet<ApplicationUser>>();
-            _usersDbSet.SetDbSetData(MockUsers());
+            _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IDbAsyncEnumerable<ApplicationUser>>();
+            _usersDbSet.SetDbSetDataForAsync(MockUsers());
 
             uow.GetDbSet<ApplicationUser>().Returns(_usersDbSet);
             var mapper = Substitute.For<IMapper>();

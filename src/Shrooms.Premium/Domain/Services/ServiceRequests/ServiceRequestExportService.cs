@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
@@ -22,7 +23,7 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
             _excelBuilder = excelBuilder;
         }
 
-        public byte[] ExportToExcel(UserAndOrganizationDTO userAndOrg, Expression<Func<ServiceRequest, bool>> filter)
+        public async Task<byte[]> ExportToExcelAsync(UserAndOrganizationDTO userAndOrg, Expression<Func<ServiceRequest, bool>> filter)
         {
             var query = _serviceRequestsDbSet
                 .Include(x => x.Status)
@@ -35,9 +36,9 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
                 query = query.Where(filter);
             }
 
-            var serviceRequests = query
-                .OrderByDescending(x => x.Created)
-                .AsEnumerable()
+            var serviceRequests = (await query
+                    .OrderByDescending(x => x.Created)
+                    .ToListAsync())
                 .Select(x => new List<object>
                 {
                     x.Title,

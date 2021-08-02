@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 
@@ -7,23 +8,23 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 {
     public interface IEventParticipationService
     {
-        void AddColleague(EventJoinDTO joinDto);
+        Task AddColleagueAsync(EventJoinDTO joinDto);
 
-        void Join(EventJoinDTO joinDto, bool addedByColleague = false);
+        Task JoinAsync(EventJoinDTO joinDto, bool addedByColleague = false);
 
         void UpdateAttendStatus(UpdateAttendStatusDTO updateAttendStatusDTO);
 
-        void DeleteByEvent(Guid eventId, string userId);
+        Task DeleteByEventAsync(Guid eventId, string userId);
 
-        void Leave(Guid eventId, UserAndOrganizationDTO userOrg, string leaveComment);
+        Task LeaveAsync(Guid eventId, UserAndOrganizationDTO userOrg, string leaveComment);
 
-        void ResetAttendees(Guid eventId, UserAndOrganizationDTO userOrg);
+        Task ResetAttendeesAsync(Guid eventId, UserAndOrganizationDTO userOrg);
 
         IEnumerable<string> GetParticipantsEmailsIncludingHost(Guid eventId);
 
-        void Expel(Guid eventId, UserAndOrganizationDTO userOrg, string userId);
+        Task ExpelAsync(Guid eventId, UserAndOrganizationDTO userOrg, string userId);
 
-        IEnumerable<EventParticipantDTO> GetEventParticipants(Guid eventId, UserAndOrganizationDTO userAndOrg);
+        Task<IEnumerable<EventParticipantDTO>> GetEventParticipantsAsync(Guid eventId, UserAndOrganizationDTO userAndOrg);
 
         IEnumerable<EventUserSearchResultDTO> SearchForEventJoinAutocomplete(Guid eventId, string searchString, UserAndOrganizationDTO userOrg);
 

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
+using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.Constants;
@@ -22,12 +24,12 @@ namespace Shrooms.Premium.Tests.DomainService
     {
         private IUnitOfWork2 _uow;
         private IServiceRequestService _serviceRequestService;
-        private IDbSet<ServiceRequest> _serviceRequestsDbSet;
-        private IDbSet<ServiceRequestComment> _serviceRequestCommentsDbSet;
-        private IDbSet<ServiceRequestCategory> _serviceRequestCategoryDbSet;
-        private IDbSet<ServiceRequestPriority> _serviceRequestPriorityDbSet;
-        private IDbSet<ServiceRequestStatus> _serviceRequestStatusDbSet;
-        private IDbSet<ApplicationUser> _usersDbSet;
+        private DbSet<ServiceRequest> _serviceRequestsDbSet;
+        private DbSet<ServiceRequestComment> _serviceRequestCommentsDbSet;
+        private DbSet<ServiceRequestCategory> _serviceRequestCategoryDbSet;
+        private DbSet<ServiceRequestPriority> _serviceRequestPriorityDbSet;
+        private DbSet<ServiceRequestStatus> _serviceRequestStatusDbSet;
+        private DbSet<ApplicationUser> _usersDbSet;
         private IPermissionService _permissionService;
 
         [SetUp]
@@ -35,22 +37,22 @@ namespace Shrooms.Premium.Tests.DomainService
         {
             _uow = Substitute.For<IUnitOfWork2>();
 
-            _usersDbSet = Substitute.For<IDbSet<ApplicationUser>>();
+            _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IDbAsyncEnumerable<ApplicationUser>>();
             _uow.GetDbSet<ApplicationUser>().Returns(_usersDbSet);
 
-            _serviceRequestsDbSet = Substitute.For<IDbSet<ServiceRequest>>();
+            _serviceRequestsDbSet = Substitute.For<DbSet<ServiceRequest>, IQueryable<ServiceRequest>, IDbAsyncEnumerable<ServiceRequest>>();
             _uow.GetDbSet<ServiceRequest>().Returns(_serviceRequestsDbSet);
 
-            _serviceRequestCommentsDbSet = Substitute.For<IDbSet<ServiceRequestComment>>();
+            _serviceRequestCommentsDbSet = Substitute.For<DbSet<ServiceRequestComment>, IQueryable<ServiceRequestComment>, IDbAsyncEnumerable<ServiceRequestComment>>();
             _uow.GetDbSet<ServiceRequestComment>().Returns(_serviceRequestCommentsDbSet);
 
-            _serviceRequestCategoryDbSet = Substitute.For<IDbSet<ServiceRequestCategory>>();
+            _serviceRequestCategoryDbSet = Substitute.For<DbSet<ServiceRequestCategory>, IQueryable<ServiceRequestCategory>, IDbAsyncEnumerable<ServiceRequestCategory>>();
             _uow.GetDbSet<ServiceRequestCategory>().Returns(_serviceRequestCategoryDbSet);
 
-            _serviceRequestPriorityDbSet = Substitute.For<IDbSet<ServiceRequestPriority>>();
+            _serviceRequestPriorityDbSet = Substitute.For<DbSet<ServiceRequestPriority>, IQueryable<ServiceRequestPriority>, IDbAsyncEnumerable<ServiceRequestPriority>>();
             _uow.GetDbSet<ServiceRequestPriority>().Returns(_serviceRequestPriorityDbSet);
 
-            _serviceRequestStatusDbSet = Substitute.For<IDbSet<ServiceRequestStatus>>();
+            _serviceRequestStatusDbSet = Substitute.For<DbSet<ServiceRequestStatus>, IQueryable<ServiceRequestStatus>, IDbAsyncEnumerable<ServiceRequestStatus>>();
             _uow.GetDbSet<ServiceRequestStatus>().Returns(_serviceRequestStatusDbSet);
 
             _permissionService = Substitute.For<IPermissionService>();
@@ -59,7 +61,7 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_Successfully_Created_Service_Request_Comment()
+        public async Task Should_Return_Successfully_Created_Service_Request_Comment()
         {
             MockServiceRequests();
 
@@ -75,11 +77,9 @@ namespace Shrooms.Premium.Tests.DomainService
                 UserId = "UserId"
             };
 
-            _serviceRequestService.CreateComment(comment, userAndOrg);
-            _serviceRequestCommentsDbSet
-                .Received(1)
-                .Add(Arg.Any<ServiceRequestComment>());
-            _uow.Received(1).SaveChanges(false);
+            await _serviceRequestService.CreateCommentAsync(comment, userAndOrg);
+            _serviceRequestCommentsDbSet.Received(1).Add(Arg.Any<ServiceRequestComment>());
+            await _uow.Received(1).SaveChangesAsync(false);
         }
 
         [Test]
@@ -99,11 +99,11 @@ namespace Shrooms.Premium.Tests.DomainService
                 UserId = "UserId"
             };
 
-            Assert.Throws<ValidationException>(() => _serviceRequestService.CreateComment(comment, userAndOrg));
+            Assert.ThrowsAsync<ValidationException>(async () => await _serviceRequestService.CreateCommentAsync(comment, userAndOrg));
         }
 
         [Test]
-        public void Should_Return_Successfully_Created_Service_Request()
+        public async Task Should_Return_Successfully_Created_Service_Request()
         {
             MockServiceRequestCategories();
             MockServiceRequestPriorities();
@@ -123,11 +123,9 @@ namespace Shrooms.Premium.Tests.DomainService
                 UserId = "UserId"
             };
 
-            _serviceRequestService.CreateNewServiceRequest(serviceRequestDTO, userAndOrg);
-            _serviceRequestsDbSet
-                .Received(1)
-                .Add(Arg.Any<ServiceRequest>());
-            _uow.Received(1).SaveChanges(false);
+            await _serviceRequestService.CreateNewServiceRequestAsync(serviceRequestDTO, userAndOrg);
+            _serviceRequestsDbSet.Received(1).Add(Arg.Any<ServiceRequest>());
+            await _uow.Received(1).SaveChangesAsync(false);
         }
 
         [Test]
@@ -151,7 +149,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 UserId = "UserId"
             };
 
-            Assert.Throws<ValidationException>(() => _serviceRequestService.CreateNewServiceRequest(serviceRequestDTO, userAndOrg));
+            Assert.ThrowsAsync<ValidationException>(async () => await _serviceRequestService.CreateNewServiceRequestAsync(serviceRequestDTO, userAndOrg));
         }
 
         [Test]
@@ -175,11 +173,11 @@ namespace Shrooms.Premium.Tests.DomainService
                 UserId = "UserId"
             };
 
-            Assert.Throws<ValidationException>(() => _serviceRequestService.CreateNewServiceRequest(serviceRequestDTO, userAndOrg));
+            Assert.ThrowsAsync<ValidationException>(async () => await _serviceRequestService.CreateNewServiceRequestAsync(serviceRequestDTO, userAndOrg));
         }
 
         [Test]
-        public void Should_Return_Successfully_Updated_Service_Request_As_Admin()
+        public async Task Should_Return_Successfully_Updated_Service_Request_As_Admin()
         {
             MockServiceRequestForUpdate();
             MockServiceRequestCategories();
@@ -204,20 +202,20 @@ namespace Shrooms.Premium.Tests.DomainService
                 UserId = "AdminId"
             };
 
-            _serviceRequestService.UpdateServiceRequest(serviceRequestDTO, userAndOrg);
+            await _serviceRequestService.UpdateServiceRequestAsync(serviceRequestDTO, userAndOrg);
 
-            var updatedServiceRequest = _serviceRequestsDbSet.First(x => x.Id == serviceRequestDTO.Id);
+            var updatedServiceRequest = await _serviceRequestsDbSet.FirstAsync(x => x.Id == serviceRequestDTO.Id);
 
             Assert.AreEqual("test1", updatedServiceRequest.CategoryName);
             Assert.AreEqual(serviceRequestDTO.Title, updatedServiceRequest.Title);
             Assert.AreEqual(serviceRequestDTO.PriorityId, updatedServiceRequest.PriorityId);
             Assert.AreEqual(serviceRequestDTO.KudosAmmount, updatedServiceRequest.KudosAmmount);
 
-            _uow.Received(1).SaveChanges(false);
+            await _uow.Received(1).SaveChangesAsync(false);
         }
 
         [Test]
-        public void Should_Return_Successfully_Updated_Service_Request_As_Request_Creator()
+        public async Task Should_Return_Successfully_Updated_Service_Request_As_Request_Creator()
         {
             MockServiceRequestForUpdate();
             MockServiceRequestCategories();
@@ -241,9 +239,9 @@ namespace Shrooms.Premium.Tests.DomainService
                 UserId = "UserId"
             };
 
-            _serviceRequestService.UpdateServiceRequest(serviceRequestDTO, userAndOrg);
+            await _serviceRequestService.UpdateServiceRequestAsync(serviceRequestDTO, userAndOrg);
 
-            var updatedServiceRequest = _serviceRequestsDbSet.First(x => x.Id == serviceRequestDTO.Id);
+            var updatedServiceRequest = await _serviceRequestsDbSet.FirstAsync(x => x.Id == serviceRequestDTO.Id);
 
             Assert.AreEqual(null, updatedServiceRequest.CategoryName);
             Assert.AreEqual(null, updatedServiceRequest.Title);
@@ -251,11 +249,11 @@ namespace Shrooms.Premium.Tests.DomainService
             Assert.AreEqual(null, updatedServiceRequest.KudosAmmount);
             Assert.AreEqual(1, updatedServiceRequest.StatusId);
 
-            _uow.Received(1).SaveChanges(false);
+            await _uow.Received(1).SaveChangesAsync(false);
         }
 
         [Test]
-        public void Should_Return_Successfully_Updated_Service_Request_Status()
+        public async Task Should_Return_Successfully_Updated_Service_Request_Status()
         {
             MockServiceRequestForUpdate();
             MockServiceRequestCategories();
@@ -279,13 +277,13 @@ namespace Shrooms.Premium.Tests.DomainService
                 UserId = "AdminId"
             };
 
-            _serviceRequestService.UpdateServiceRequest(serviceRequestDTO, userAndOrg);
+            await _serviceRequestService.UpdateServiceRequestAsync(serviceRequestDTO, userAndOrg);
 
-            var updatedServiceRequest = _serviceRequestsDbSet.First(x => x.Id == serviceRequestDTO.Id);
+            var updatedServiceRequest = await _serviceRequestsDbSet.FirstAsync(x => x.Id == serviceRequestDTO.Id);
 
             Assert.AreEqual(serviceRequestDTO.StatusId, updatedServiceRequest.StatusId);
 
-            _uow.Received(1).SaveChanges(false);
+            await _uow.Received(1).SaveChangesAsync(false);
         }
 
         [Test]
@@ -313,7 +311,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 UserId = "AnotherUserId"
             };
 
-            Assert.Throws<UnauthorizedAccessException>(() => _serviceRequestService.UpdateServiceRequest(serviceRequestDTO, userAndOrg));
+            Assert.ThrowsAsync<UnauthorizedAccessException>(async () => await _serviceRequestService.UpdateServiceRequestAsync(serviceRequestDTO, userAndOrg));
         }
 
         [Test]
@@ -341,21 +339,21 @@ namespace Shrooms.Premium.Tests.DomainService
                 UserId = "AdminId"
             };
 
-            Assert.Throws<ValidationException>(() => _serviceRequestService.UpdateServiceRequest(serviceRequestDTO, userAndOrg));
+            Assert.ThrowsAsync<ValidationException>(async () => await _serviceRequestService.UpdateServiceRequestAsync(serviceRequestDTO, userAndOrg));
         }
 
         private void MockPermissioService()
         {
             _permissionService
-                .UserHasPermission(Arg.Is<UserAndOrganizationDTO>(x => x.UserId == "AdminId" && x.OrganizationId == 1), AdministrationPermissions.ServiceRequest)
+                .UserHasPermissionAsync(Arg.Is<UserAndOrganizationDTO>(x => x.UserId == "AdminId" && x.OrganizationId == 1), AdministrationPermissions.ServiceRequest)
                 .Returns(true);
 
             _permissionService
-                .UserHasPermission(Arg.Is<UserAndOrganizationDTO>(x => x.UserId == "UserId" && x.OrganizationId == 1), AdministrationPermissions.ServiceRequest)
+                .UserHasPermissionAsync(Arg.Is<UserAndOrganizationDTO>(x => x.UserId == "UserId" && x.OrganizationId == 1), AdministrationPermissions.ServiceRequest)
                 .Returns(false);
 
             _permissionService
-               .UserHasPermission(Arg.Is<UserAndOrganizationDTO>(x => x.UserId == "AnotherUserId" && x.OrganizationId == 1), AdministrationPermissions.ServiceRequest)
+               .UserHasPermissionAsync(Arg.Is<UserAndOrganizationDTO>(x => x.UserId == "AnotherUserId" && x.OrganizationId == 1), AdministrationPermissions.ServiceRequest)
                .Returns(false);
         }
 
@@ -388,7 +386,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 }
             }.AsQueryable();
 
-            _serviceRequestsDbSet.SetDbSetData(serviceRequests);
+            _serviceRequestsDbSet.SetDbSetDataForAsync(serviceRequests);
         }
 
         private void MockServiceRequests()
@@ -402,7 +400,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 }
             }.AsQueryable();
 
-            _serviceRequestsDbSet.SetDbSetData(serviceRequests);
+            _serviceRequestsDbSet.SetDbSetDataForAsync(serviceRequests);
         }
 
         private void MockServiceRequestCategories()
@@ -421,7 +419,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 }
             }.AsQueryable();
 
-            _serviceRequestCategoryDbSet.SetDbSetData(serviceRequestCategories);
+            _serviceRequestCategoryDbSet.SetDbSetDataForAsync(serviceRequestCategories);
         }
 
         private void MockServiceRequestPriorities()
@@ -435,7 +433,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 }
             }.AsQueryable();
 
-            _serviceRequestPriorityDbSet.SetDbSetData(serviceRequestPrarioty);
+            _serviceRequestPriorityDbSet.SetDbSetDataForAsync(serviceRequestPrarioty);
         }
 
         private void MockServiceRequestStatuses()
@@ -459,7 +457,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 }
             }.AsQueryable();
 
-            _serviceRequestStatusDbSet.SetDbSetData(serviceRequestStatuses);
+            _serviceRequestStatusDbSet.SetDbSetDataForAsync(serviceRequestStatuses);
         }
     }
 }

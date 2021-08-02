@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
-using PagedList;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.ViewModels;
@@ -12,6 +13,7 @@ using Shrooms.Premium.Domain.Services.OfficeMap;
 using Shrooms.Premium.Presentation.WebViewModels.Map;
 using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.Api.Filters;
+using X.PagedList;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers
 {
@@ -36,14 +38,14 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Map)]
-        public MapViewModel GetDefault()
+        public async Task<MapViewModel> GetDefault()
         {
             var userAndOrg = GetUserAndOrganization();
-            var userOfficeAndFloor = _officeMapService.GetUserOfficeAndFloor(userAndOrg.UserId);
+            var userOfficeAndFloor = await _officeMapService.GetUserOfficeAndFloorAsync(userAndOrg.UserId);
 
             if (userOfficeAndFloor.FloorId.HasValue)
             {
-                return GetByFloor(userOfficeAndFloor.FloorId.Value);
+                return await GetByFloor(userOfficeAndFloor.FloorId.Value);
             }
 
             var office = _officeRepository.Get(o => o.IsDefault).FirstOrDefault();
@@ -55,55 +57,55 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             if (office != null)
             {
-                return GetByOffice(office.Id);
+                return await GetByOffice(office.Id);
             }
 
             return new MapViewModel();
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Map)]
-        public MapViewModel GetByOffice(int officeId)
+        public async Task<MapViewModel> GetByOffice(int officeId)
         {
-            var floor = _floorRepository.Get(f => f.OfficeId == officeId, includeProperties: IncludeProperties).FirstOrDefault();
+            var floor = await _floorRepository.Get(f => f.OfficeId == officeId, includeProperties: IncludeProperties).FirstOrDefaultAsync();
 
-            return GetModel(floor);
+            return await GetModelAsync(floor);
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Map)]
-        public MapViewModel GetByRoom(int roomId)
+        public async Task<MapViewModel> GetByRoom(int roomId)
         {
-            var floor = _floorRepository.Get(f => f.Rooms.Any(r => r.Id == roomId)).FirstOrDefault();
+            var floor = await _floorRepository.Get(f => f.Rooms.Any(r => r.Id == roomId)).FirstOrDefaultAsync();
 
-            return GetModel(floor);
+            return await GetModelAsync(floor);
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Map)]
-        public MapViewModel GetByApplicationUser(string userName)
+        public async Task<MapViewModel> GetByApplicationUser(string userName)
         {
-            var floor = _floorRepository.Get(f => f.Rooms.Any(r => r.ApplicationUsers.Any(e => e.UserName == userName))).FirstOrDefault();
+            var floor = await _floorRepository.Get(f => f.Rooms.Any(r => r.ApplicationUsers.Any(e => e.UserName == userName))).FirstOrDefaultAsync();
 
-            return GetModel(floor);
+            return await GetModelAsync(floor);
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Map)]
-        public MapViewModel GetByFloor(int floorId)
+        public async Task<MapViewModel> GetByFloor(int floorId)
         {
-            var floor = _floorRepository.Get(f => f.Id == floorId, includeProperties: IncludeProperties).FirstOrDefault();
+            var floor = await _floorRepository.Get(f => f.Id == floorId, includeProperties: IncludeProperties).FirstOrDefaultAsync();
 
-            return GetModel(floor, true);
+            return await GetModelAsync(floor, true);
         }
 
-        private MapViewModel GetModel(Floor floor, bool includeProperties = false)
+        private async Task<MapViewModel> GetModelAsync(Floor floor, bool includeProperties = false)
         {
             if (floor == null)
             {
                 if (includeProperties)
                 {
-                    floor = _floorRepository.Get(includeProperties: IncludeProperties).FirstOrDefault();
+                    floor = await _floorRepository.Get(includeProperties: IncludeProperties).FirstOrDefaultAsync();
                 }
                 else
                 {
-                    floor = _floorRepository.Get().FirstOrDefault();
+                    floor = await _floorRepository.Get().FirstOrDefaultAsync();
                 }
             }
 
@@ -112,11 +114,14 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                 return null;
             }
 
+            var office = await _officeRepository.GetByIdAsync(floor.OfficeId);
+            var allOffices = await _officeRepository.Get(o => o.Floors.Any(), includeProperties: "Floors").ToListAsync();
+
             var model = new MapViewModel
             {
                 Floor = _mapper.Map<Floor, MapFloorViewModel>(floor),
-                AllOffices = _mapper.Map<IEnumerable<Office>, IEnumerable<MapOfficeViewModel>>(_officeRepository.Get(o => o.Floors.Any(), includeProperties: "Floors")),
-                Office = _mapper.Map<Office, MapOfficeViewModel>(_officeRepository.GetByID(floor.OfficeId))
+                AllOffices = _mapper.Map<IEnumerable<Office>, IEnumerable<MapOfficeViewModel>>(allOffices),
+                Office = _mapper.Map<Office, MapOfficeViewModel>(office)
             };
 
             var roomTypes = _roomTypeRepository.Get(rt => rt.Rooms.Any(r => r.FloorId == floor.Id));
@@ -151,11 +156,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet, HttpPost]
         [PermissionAuthorize(Permission = BasicPermissions.OfficeUsers)]
-        public PagedViewModel<OfficeUserDTO> GetPagedByFloor(int floorId, int page = 1, int pageSize = WebApiConstants.DefaultPageSize, string includeProperties = "")
+        public async Task<PagedViewModel<OfficeUserDTO>> GetPagedByFloor(int floorId, int page = 1, int pageSize = WebApiConstants.DefaultPageSize, string includeProperties = "")
         {
             var officeUsersDto = _officeMapService.GetOfficeUsers(floorId, includeProperties);
 
-            var officeUserPagedViewModel = officeUsersDto.ToPagedList(page, pageSize);
+            var officeUserPagedViewModel = await officeUsersDto.ToPagedListAsync(page, pageSize);
 
             var pagedModel = new PagedViewModel<OfficeUserDTO>
             {

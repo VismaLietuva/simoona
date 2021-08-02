@@ -101,7 +101,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
                 Description = @event.Description
             };
 
-            var wallId = await _wallService.CreateNewWall(wallDto);
+            var wallId = await _wallService.CreateNewWallAsync(wallDto);
             return wallId;
         }
 

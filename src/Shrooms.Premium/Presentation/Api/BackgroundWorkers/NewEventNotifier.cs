@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Threading.Tasks;
+using AutoMapper;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.ViewModels.Notifications;
@@ -19,9 +20,9 @@ namespace Shrooms.Premium.Presentation.Api.BackgroundWorkers
             _mapper = mapper;
         }
 
-        public void Notify(CreateEventDto eventDto, UserAndOrganizationHubDto userAndOrganizationHubDto)
+        public async Task Notify(CreateEventDto eventDto, UserAndOrganizationHubDto userAndOrganizationHubDto)
         {
-            var notification = _notificationService.CreateForEvent(userAndOrganizationHubDto, eventDto).GetAwaiter().GetResult();
+            var notification = await _notificationService.CreateForEventAsync(userAndOrganizationHubDto, eventDto);
 
             NotificationHub.SendNotificationToAllUsers(_mapper.Map<NotificationViewModel>(notification), userAndOrganizationHubDto);
         }

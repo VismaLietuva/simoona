@@ -1,9 +1,10 @@
-﻿using Shrooms.Premium.DataTransferObjects.Models.Committees;
+﻿using System.Threading.Tasks;
+using Shrooms.Premium.DataTransferObjects.Models.Committees;
 
 namespace Shrooms.Premium.Domain.Services.Email.Committee
 {
     public interface ICommitteeNotificationService
     {
-        void NotifyCommitteeMembersAboutNewSuggestion(CommitteeSuggestionCreatedDto createdDto);
+        Task NotifyCommitteeMembersAboutNewSuggestionAsync(CommitteeSuggestionCreatedDto createdDto);
     }
 }

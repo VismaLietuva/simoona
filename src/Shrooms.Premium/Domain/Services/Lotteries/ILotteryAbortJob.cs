@@ -1,9 +1,10 @@
-﻿using Shrooms.Contracts.DataTransferObjects;
+﻿using System.Threading.Tasks;
+using Shrooms.Contracts.DataTransferObjects;
 
 namespace Shrooms.Premium.Domain.Services.Lotteries
 {
     public interface ILotteryAbortJob
     {
-        void RefundLottery(int lotteryId, UserAndOrganizationDTO userOrg);
+        Task RefundLotteryAsync(int lotteryId, UserAndOrganizationDTO userOrg);
     }
 }

@@ -161,7 +161,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
 
             try
             {
-                _bookService.TakeBook(bookDTO);
+                _bookService.TakeBookAsync(bookDTO);
                 return Ok();
             }
             catch (BookException e)

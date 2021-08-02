@@ -30,7 +30,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [Route("RemindBooks")]
         public void RemindBooks(int daysBefore)
         {
-            _webHookService.Books.RemindAboutBooks(daysBefore);
+            _webHookService.Books.RemindAboutBooksAsync(daysBefore);
         }
 
         [HttpPost]

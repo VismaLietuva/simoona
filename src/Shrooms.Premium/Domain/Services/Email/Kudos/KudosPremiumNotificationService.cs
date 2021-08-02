@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data.Entity;
-using System.Linq;
+using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
@@ -31,36 +31,36 @@ namespace Shrooms.Premium.Domain.Services.Email.Kudos
             _employeeDbSet = uow.GetDbSet<ApplicationUser>();
         }
 
-        private void SendLoyaltyBotNotification(AwardedKudosEmployeeDTO kudosLog)
+        private async Task SendLoyaltyBotNotificationAsync(AwardedKudosEmployeeDTO kudosLog)
         {
-            var organization = GetOrganization(kudosLog.OrganizationId);
-            var employee = _employeeDbSet.Single(s => s.Id == kudosLog.EmployeeId);
+            var organization = await GetOrganizationAsync(kudosLog.OrganizationId);
+            var employee = await _employeeDbSet.SingleAsync(s => s.Id == kudosLog.EmployeeId);
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
             var kudosProfileUrl = _appSettings.KudosProfileUrl(organization.ShortName, kudosLog.EmployeeId);
             var subject = Resources.Models.Kudos.Kudos.EmailSubject;
 
-            var emailTemplateViewModel = new LoyaltyKudosReceivedDecreasedEmailTemplateViewModel(
-                userNotificationSettingsUrl,
+            var emailTemplateViewModel = new LoyaltyKudosReceivedDecreasedEmailTemplateViewModel(userNotificationSettingsUrl,
                 kudosLog.Points,
                 kudosLog.KudosTypeName,
                 organization.Name,
                 kudosLog.Comments,
                 kudosProfileUrl);
+
             var body = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.LoyaltyKudosReceived);
 
-            _mailingService.SendEmail(new EmailDto(employee.Email, subject, body));
+            await _mailingService.SendEmailAsync(new EmailDto(employee.Email, subject, body));
         }
 
-        private Organization GetOrganization(int orgId)
+        private async Task<Organization> GetOrganizationAsync(int orgId)
         {
-            return _organizationsDbSet.Single(x => x.Id == orgId);
+            return await _organizationsDbSet.SingleAsync(x => x.Id == orgId);
         }
 
-        public void SendLoyaltyBotNotification(IEnumerable<AwardedKudosEmployeeDTO> awardedEmployees)
+        public async Task SendLoyaltyBotNotificationAsync(IEnumerable<AwardedKudosEmployeeDTO> awardedEmployees)
         {
             foreach (var employee in awardedEmployees)
             {
-                SendLoyaltyBotNotification(employee);
+                await SendLoyaltyBotNotificationAsync(employee);
             }
         }
     }

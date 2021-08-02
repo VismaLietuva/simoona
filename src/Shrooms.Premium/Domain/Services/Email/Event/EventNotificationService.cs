@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
@@ -38,13 +39,13 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
         }
 
-        public void NotifyRemovedEventParticipants(string eventName, Guid eventId, int orgId, IEnumerable<string> users)
+        public async Task NotifyRemovedEventParticipantsAsync(string eventName, Guid eventId, int orgId, IEnumerable<string> users)
         {
-            var organization = _organizationService.GetOrganizationById(orgId);
-            var emails = _usersDbSet
+            var organization = await _organizationService.GetOrganizationByIdAsync(orgId);
+            var emails = await _usersDbSet
                 .Where(u => users.Contains(u.Id))
                 .Select(u => u.Email)
-                .ToList();
+                .ToListAsync();
 
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
             var eventUrl = _appSettings.EventUrl(organization.ShortName, eventId.ToString());
@@ -52,12 +53,12 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             var emailTemplateViewModel = new EventParticipantExpelledEmailTemplateViewModel(userNotificationSettingsUrl, eventName, eventUrl);
             var emailBody = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.EventParticipantExpelled);
 
-            _mailingService.SendEmail(new EmailDto(emails, Resources.Models.Events.Events.ResetParticipantListEmailSubject, emailBody));
+            await _mailingService.SendEmailAsync(new EmailDto(emails, Resources.Models.Events.Events.ResetParticipantListEmailSubject, emailBody));
         }
 
-        public void RemindUsersToJoinEvent(IEnumerable<EventTypeDTO> eventTypes, IEnumerable<string> emails, int orgId)
+        public async Task RemindUsersToJoinEventAsync(IEnumerable<EventTypeDTO> eventTypes, IEnumerable<string> emails, int orgId)
         {
-            var organization = _organizationService.GetOrganizationById(orgId);
+            var organization = await _organizationService.GetOrganizationByIdAsync(orgId);
 
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
             var emailTemplateViewModel = new EventJoinRemindEmailTemplateViewModel(userNotificationSettingsUrl);
@@ -68,7 +69,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             }
 
             var emailBody = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.EventJoinRemind);
-            _mailingService.SendEmail(new EmailDto(emails, $"Join weekly event now", emailBody));
+            await _mailingService.SendEmailAsync(new EmailDto(emails, $"Join weekly event now", emailBody));
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
@@ -27,11 +28,16 @@ namespace Shrooms.Premium.Domain.Services.OfficeMap
             _roleService = roleService;
         }
 
-        public IEnumerable<OfficeDTO> GetOffices()
+        public async Task<IEnumerable<OfficeDTO>> GetOffices()
         {
-            var offices = _officeDbSet.ToList();
+            var offices = await _officeDbSet.ToListAsync();
 
             return _mapper.Map<IEnumerable<Office>, IEnumerable<OfficeDTO>>(offices);
+        }
+
+        public async Task<int> GetOfficesCount()
+        {
+            return await _officeDbSet.CountAsync();
         }
 
         public IEnumerable<OfficeUserDTO> GetOfficeUsers(int floorId, string includeProperties)
@@ -80,14 +86,14 @@ namespace Shrooms.Premium.Domain.Services.OfficeMap
             return usersEmail;
         }
 
-        public UserOfficeAndFloorDto GetUserOfficeAndFloor(string userId)
+        public async Task<UserOfficeAndFloorDto> GetUserOfficeAndFloorAsync(string userId)
         {
-            var userOfficeAndFloor = _usersDbSet.Where(u => u.Id == userId)
+            var userOfficeAndFloor = await _usersDbSet.Where(u => u.Id == userId)
                .Include(u => u.Room)
                .Include(x => x.Room.Floor)
                .Include(x => x.Room.Floor.Office)
                .Select(u => new UserOfficeAndFloorDto { FloorId = u.Room.FloorId, OfficeId = u.Room.Floor.OfficeId })
-               .First();
+               .FirstAsync();
 
             return userOfficeAndFloor;
         }

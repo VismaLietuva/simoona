@@ -75,7 +75,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
         public IHttpActionResult GetEventRecurrenceOptions()
         {
-            var recurrences = _eventUtilitiesService.GetRecurranceOptions();
+            var recurrences = _eventUtilitiesService.GetRecurrenceOptions();
             return Ok(recurrences);
         }
 
@@ -91,18 +91,21 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [Route("Offices")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult GetOffices()
+        public async Task<IHttpActionResult> GetOffices()
         {
-            var officeDtos = _officeMapService.GetOffices();
-            var result = _mapper.Map<IEnumerable<OfficeDTO>, IEnumerable<EventOfficeViewModel>>(officeDtos);
+            var offices = await _officeMapService.GetOffices();
+            var result = _mapper.Map<IEnumerable<OfficeDTO>, IEnumerable<EventOfficeViewModel>>(offices);
             return Ok(result);
         }
 
         [HttpGet]
         [Route("")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult GetEventsFiltered(string typeId = null, string officeId = null, int page = 1,
-                                                   DateTime? startDate = null, DateTime? endDate = null)
+        public IHttpActionResult GetEventsFiltered(string typeId = null,
+            string officeId = null,
+            int page = 1,
+            DateTime? startDate = null,
+            DateTime? endDate = null)
         {
             var args = new EventsListingFilterArgs
             {
@@ -148,19 +151,19 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             }
 
             var createEventDTO = _mapper.Map<CreateEventDto>(eventViewModel);
-            createEventDTO.Offices = new EventOfficesDTO { Value = JsonConvert.SerializeObject(eventViewModel.Offices.Select(p => p.ToString()).ToList()) };
+            var offices = eventViewModel.Offices.Select(p => p.ToString()).ToList();
+
+            createEventDTO.Offices = new EventOfficesDTO { Value = JsonConvert.SerializeObject(offices) };
             SetOrganizationAndUser(createEventDTO);
+
             CreateEventDto createdEvent;
 
             var userHubDto = GetUserAndOrganizationHub();
             try
             {
-                createdEvent = await _eventService.CreateEvent(createEventDTO);
+                createdEvent = await _eventService.CreateEventAsync(createEventDTO);
 
-                _asyncRunner.Run<NewEventNotifier>(notifier =>
-                {
-                    notifier.Notify(createdEvent, userHubDto);
-                }, GetOrganizationName());
+                _asyncRunner.Run<NewEventNotifier>(async notifier => { await notifier.Notify(createdEvent, userHubDto); }, GetOrganizationName());
             }
             catch (EventException e)
             {
@@ -186,7 +189,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             try
             {
-                _eventService.UpdateEvent(eventDTO);
+                _eventService.UpdateEventAsync(eventDTO);
             }
             catch (EventException e)
             {
@@ -268,14 +271,14 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpPost]
         [Route("AddColleague")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult AddColleague(EventJoinMultipleViewModel eventJoinModel)
+        public async Task<IHttpActionResult> AddColleague(EventJoinMultipleViewModel eventJoinModel)
         {
             var eventJoinDTO = _mapper.Map<EventJoinMultipleViewModel, EventJoinDTO>(eventJoinModel);
             SetOrganizationAndUser(eventJoinDTO);
 
             try
             {
-                _eventParticipationService.AddColleague(eventJoinDTO);
+                await _eventParticipationService.AddColleagueAsync(eventJoinDTO);
                 return Ok();
             }
             catch (EventException e)
@@ -300,7 +303,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             try
             {
-                _eventParticipationService.Join(optionsDto);
+                _eventParticipationService.JoinAsync(optionsDto);
                 return Ok();
             }
             catch (EventException e)
@@ -335,14 +338,14 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [Route("Details")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult GetEventDetails(Guid eventId)
+        public async Task<IHttpActionResult> GetEventDetails(Guid eventId)
         {
             try
             {
-                var eventDto = _eventService.GetEventDetails(eventId, GetUserAndOrganization());
+                var eventDto = await _eventService.GetEventDetailsAsync(eventId, GetUserAndOrganization());
                 var result = _mapper.Map<EventDetailsDTO, EventDetailsViewModel>(eventDto);
 
-                var officesCount = _officeMapService.GetOffices().Count();
+                var officesCount = await _officeMapService.GetOfficesCount();
                 result.IsForAllOffices = result.OfficesName.Count() == officesCount;
 
                 return Ok(result);
@@ -377,7 +380,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         {
             try
             {
-                _eventService.Delete(eventId, GetUserAndOrganization());
+                _eventService.DeleteAsync(eventId, GetUserAndOrganization());
                 return Ok();
             }
             catch (EventException e)
@@ -393,7 +396,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         {
             try
             {
-                _eventParticipationService.Leave(eventId, GetUserAndOrganization(), leaveComment);
+                _eventParticipationService.LeaveAsync(eventId, GetUserAndOrganization(), leaveComment);
                 return Ok();
             }
             catch (EventException e)
@@ -413,7 +416,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         {
             try
             {
-                _eventParticipationService.Expel(eventId, GetUserAndOrganization(), userId);
+                _eventParticipationService.ExpelAsync(eventId, GetUserAndOrganization(), userId);
                 return Ok();
             }
             catch (EventException e)
@@ -443,7 +446,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         {
             try
             {
-                _eventParticipationService.ResetAttendees(eventId, GetUserAndOrganization());
+                _eventParticipationService.ResetAttendeesAsync(eventId, GetUserAndOrganization());
                 return Ok();
             }
             catch (EventException e)
@@ -455,11 +458,12 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
         [Route("Export")]
-        public IHttpActionResult Export(Guid eventId)
+        public async Task<IHttpActionResult> Export(Guid eventId)
         {
             try
             {
-                var stream = new ByteArrayContent(_eventExportService.ExportOptionsAndParticipants(eventId, GetUserAndOrganization()));
+                var exportOptions = await _eventExportService.ExportOptionsAndParticipantsAsync(eventId, GetUserAndOrganization());
+                var stream = new ByteArrayContent(exportOptions);
                 var result = new HttpResponseMessage(HttpStatusCode.OK) { Content = stream };
                 return ResponseMessage(result);
             }
@@ -481,7 +485,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpPost]
         [Route("Share")]
         [PermissionAuthorize(Permission = BasicPermissions.Post)]
-        public IHttpActionResult ShareEvent(ShareEventViewModel shareEventViewModel)
+        public async Task<IHttpActionResult> ShareEvent(ShareEventViewModel shareEventViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -490,7 +494,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             try
             {
-                _eventService.CheckIfEventExists(shareEventViewModel.Id, GetUserAndOrganization().OrganizationId);
+                await _eventService.CheckIfEventExistsAsync(shareEventViewModel.Id, GetUserAndOrganization().OrganizationId);
             }
             catch (EventException e)
             {
@@ -500,14 +504,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             var postModel = _mapper.Map<ShareEventViewModel, NewPostDTO>(shareEventViewModel);
             SetOrganizationAndUser(postModel);
             var userHubDto = GetUserAndOrganizationHub();
+
             try
             {
-                var createdPost = _postService.CreateNewPost(postModel);
-                _asyncRunner.Run<SharedEventNotifier>(notif =>
-                {
-                    notif.Notify(postModel, createdPost, userHubDto);
-                }, GetOrganizationName());
-
+                var createdPost = await _postService.CreateNewPostAsync(postModel);
+                _asyncRunner.Run<SharedEventNotifier>(async notifier => { await notifier.NotifyAsync(postModel, createdPost, userHubDto); }, GetOrganizationName());
 
                 var newPostViewModel = _mapper.Map<WallPostViewModel>(createdPost);
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
@@ -29,6 +30,11 @@ namespace Shrooms.Premium.Tests.DomainService
     [TestFixture]
     public class BookServiceTests
     {
+        private DbSet<Book> _booksDbSet;
+        private DbSet<Office> _officesDbSet;
+        private DbSet<ApplicationUser> _userDbSet;
+        private DbSet<BookOffice> _bookOfficesDbSet;
+        private DbSet<BookLog> _bookLogsDbSet;
         private IBookService _bookService;
         private IApplicationSettings _appSettings;
         private IRoleService _roleService;
@@ -37,31 +43,26 @@ namespace Shrooms.Premium.Tests.DomainService
         private IMailTemplate _mailTemplate;
         private IOrganizationService _organizationService;
         private IBookInfoService _bookInfoService;
-        private IDbSet<BookOffice> _bookOfficesDbSet;
-        private IDbSet<BookLog> _bookLogsDbSet;
         private BookServiceValidator _bookServiceValidator;
-        private IDbSet<Book> _booksDbSet;
-        private IDbSet<Office> _officesDbSet;
-        private IDbSet<ApplicationUser> _userDbSet;
         private IBookMobileServiceValidator _validationService;
 
         [SetUp]
         public void TestInitializer()
         {
             var uow = Substitute.For<IUnitOfWork2>();
-            _bookOfficesDbSet = Substitute.For<IDbSet<BookOffice>>();
+            _bookOfficesDbSet = Substitute.For<DbSet<BookOffice>, IQueryable<BookOffice>, IDbAsyncEnumerable<BookOffice>>();
             uow.GetDbSet<BookOffice>().Returns(_bookOfficesDbSet);
 
-            _bookLogsDbSet = Substitute.For<IDbSet<BookLog>>();
+            _bookLogsDbSet = Substitute.For<DbSet<BookLog>, IQueryable<BookLog>, IDbAsyncEnumerable<BookLog>>();
             uow.GetDbSet<BookLog>().Returns(_bookLogsDbSet);
 
-            _booksDbSet = Substitute.For<IDbSet<Book>>();
+            _booksDbSet = Substitute.For<DbSet<Book>, IQueryable<Book>, IDbAsyncEnumerable<Book>>();
             uow.GetDbSet<Book>().Returns(_booksDbSet);
 
-            _officesDbSet = Substitute.For<IDbSet<Office>>();
+            _officesDbSet = Substitute.For<DbSet<Office>, IQueryable<Office>, IDbAsyncEnumerable<Office>>();
             uow.GetDbSet<Office>().Returns(_officesDbSet);
 
-            _userDbSet = Substitute.For<IDbSet<ApplicationUser>>();
+            _userDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IDbAsyncEnumerable<ApplicationUser>>();
             uow.GetDbSet<ApplicationUser>().Returns(_userDbSet);
 
             _appSettings = Substitute.For<IApplicationSettings>();
@@ -196,8 +197,8 @@ namespace Shrooms.Premium.Tests.DomainService
         [Test]
         public void Should_Throw_On_Add_Book_If_Incorrect_Office_Is_Provided()
         {
-            _booksDbSet.SetDbSetData(new List<Book>());
-            _officesDbSet.SetDbSetData(new List<Office>());
+            _booksDbSet.SetDbSetDataForAsync(new List<Book>());
+            _officesDbSet.SetDbSetDataForAsync(new List<Office>());
             var newBookDto = new NewBookDTO
             {
                 Author = "test",
@@ -226,7 +227,7 @@ namespace Shrooms.Premium.Tests.DomainService
         [Test]
         public void Should_Throw_On_Add_Book_If_Quantity_Is_Zero()
         {
-            _booksDbSet.SetDbSetData(new List<Book>());
+            _booksDbSet.SetDbSetDataForAsync(new List<Book>());
 
             var offices = new List<Office>
             {
@@ -235,7 +236,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     Id = 1
                 }
             };
-            _officesDbSet.SetDbSetData(offices);
+            _officesDbSet.SetDbSetDataForAsync(offices);
 
             var newBookDto = new NewBookDTO
             {
@@ -272,7 +273,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 OrganizationId = 2
             };
 
-            _bookService.TakeBook(takeBook);
+            _bookService.TakeBookAsync(takeBook);
 
             _bookLogsDbSet.Received().Add(Arg.Is<BookLog>(b => b.OrganizationId == 2 && b.ApplicationUserId == "testUser1" && b.OrganizationId == 2));
         }
@@ -282,7 +283,7 @@ namespace Shrooms.Premium.Tests.DomainService
         {
             MockBooksByOffice();
 
-            _userDbSet.SetDbSetData(new List<ApplicationUser>());
+            _userDbSet.SetDbSetDataForAsync(new List<ApplicationUser>());
             var bookTake = new BookTakeDTO
             {
                 ApplicationUserId = "testUser1",
@@ -294,7 +295,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 .When(x => x.ThrowIfUserDoesNotExist(null))
                 .Do(_ => { throw new BookException("ThrowIfUserDoesNotExist"); });
 
-            Assert.Throws<BookException>(() => _bookService.TakeBook(bookTake));
+            Assert.ThrowsAsync<BookException>(async () => await _bookService.TakeBookAsync(bookTake));
         }
 
         [Test]
@@ -386,8 +387,8 @@ namespace Shrooms.Premium.Tests.DomainService
                 }
             }.AsQueryable();
 
-            _booksDbSet.SetDbSetData(books);
-            _officesDbSet.SetDbSetData(offices);
+            _booksDbSet.SetDbSetDataForAsync(books);
+            _officesDbSet.SetDbSetDataForAsync(offices);
         }
 
         private void MockApplicationUsers()
@@ -412,7 +413,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 user2
             };
 
-            _userDbSet.SetDbSetData(applicationUsers);
+            _userDbSet.SetDbSetDataForAsync(applicationUsers);
         }
 
         private void MockEditBook()
@@ -453,8 +454,8 @@ namespace Shrooms.Premium.Tests.DomainService
                 }
             }.AsQueryable();
 
-            _booksDbSet.SetDbSetData(books);
-            _officesDbSet.SetDbSetData(offices);
+            _booksDbSet.SetDbSetDataForAsync(books);
+            _officesDbSet.SetDbSetDataForAsync(offices);
         }
 
         private void MockDeleteBookEntities()
@@ -506,7 +507,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 }
             };
 
-            _bookOfficesDbSet.SetDbSetData(bookOffice.AsQueryable());
+            _bookOfficesDbSet.SetDbSetDataForAsync(bookOffice.AsQueryable());
         }
 
         private void MockGetBookDetails()
@@ -587,12 +588,12 @@ namespace Shrooms.Premium.Tests.DomainService
                 }
             };
 
-            _bookOfficesDbSet.SetDbSetData(bookOffice.AsQueryable());
+            _bookOfficesDbSet.SetDbSetDataForAsync(bookOffice.AsQueryable());
         }
 
         private void MockBookRetrieval()
         {
-            _booksDbSet.SetDbSetData(new List<Book>().AsQueryable());
+            _booksDbSet.SetDbSetDataForAsync(new List<Book>().AsQueryable());
             _bookInfoService.FindBookByIsbnAsync("123").Returns(Task.FromResult(new ExternalBookInfo { Author = "test", Url = "test", Title = "asd" }));
         }
 
@@ -704,7 +705,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     OrganizationId = 2
                 }
             };
-            _bookOfficesDbSet.SetDbSetData(booksOfficeList.AsQueryable());
+            _bookOfficesDbSet.SetDbSetDataForAsync(booksOfficeList.AsQueryable());
         }
         #endregion
     }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
@@ -37,9 +38,9 @@ namespace Shrooms.Premium.Domain.Services.Email.Committee
             _suggestionDbSet = uow.GetDbSet<CommitteeSuggestion>();
         }
 
-        public void NotifyCommitteeMembersAboutNewSuggestion(CommitteeSuggestionCreatedDto createdDto)
+        public async Task NotifyCommitteeMembersAboutNewSuggestionAsync(CommitteeSuggestionCreatedDto createdDto)
         {
-            var committee = _committeeDbSet.Include(inc => inc.Members).FirstOrDefault(wh => wh.Id == createdDto.CommitteeId);
+            var committee = await _committeeDbSet.Include(inc => inc.Members).FirstOrDefaultAsync(wh => wh.Id == createdDto.CommitteeId);
             if (committee == null)
             {
                 throw new ServiceException(Resources.Models.Committee.Committee.SuggestionCommiteNotFound);
@@ -51,10 +52,10 @@ namespace Shrooms.Premium.Domain.Services.Email.Committee
                 throw new ServiceException($"Suggestion {createdDto.SuggestionId} for committee {createdDto.CommitteeId} not found");
             }
 
-            NotifyCommitteeMembersAboutNewSuggestion(committee, suggestion);
+            await NotifyCommitteeMembersAboutNewSuggestionAsync(committee, suggestion);
         }
 
-        private void NotifyCommitteeMembersAboutNewSuggestion(CommitteeEntity committee, CommitteeSuggestion suggestion)
+        private async Task NotifyCommitteeMembersAboutNewSuggestionAsync(CommitteeEntity committee, CommitteeSuggestion suggestion)
         {
             if (committee.Members == null || !committee.Members.Any())
             {
@@ -63,17 +64,16 @@ namespace Shrooms.Premium.Domain.Services.Email.Committee
 
             IList<string> membersEmails = committee.Members.Select(s => s.Email).ToList();
 
-            var organizationName = _organizationDbSet
+            var organizationName = await _organizationDbSet
                 .Where(organization => organization.Id == committee.OrganizationId)
                 .Select(organization => organization.ShortName)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
 
             var committeesListUrl = _appSettings.CommitteeSugestionUrl(organizationName);
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organizationName);
             var subject = string.Format(Resources.Common.CommitteeSuggestionEmailSubject, committee.Name);
 
-            var emailTemplateViewModel = new CommitteeSuggestionEmailTemplateViewModel(
-                userNotificationSettingsUrl,
+            var emailTemplateViewModel = new CommitteeSuggestionEmailTemplateViewModel(userNotificationSettingsUrl,
                 committee.Name,
                 suggestion.Title,
                 suggestion.Description,
@@ -81,7 +81,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Committee
 
             var body = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.CommitteeSuggestion);
 
-            _mailingService.SendEmail(new EmailDto(membersEmails, subject, body));
+            await _mailingService.SendEmailAsync(new EmailDto(membersEmails, subject, body));
         }
     }
 }

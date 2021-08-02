@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
@@ -27,27 +28,27 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Committees)]
-        public override IEnumerable<CommitteeViewModel> GetAll(int maxResults = 0, string orderBy = null, string includeProperties = null)
+        public override Task<IEnumerable<CommitteeViewModel>> GetAllAsync(int maxResults = 0, string orderBy = null, string includeProperties = null)
         {
-            return base.GetAll(maxResults, orderBy, includeProperties);
+            return base.GetAllAsync(maxResults, orderBy, includeProperties);
         }
 
         [PermissionAuthorize(Permission = AdministrationPermissions.Committees)]
-        public override HttpResponseMessage Delete(int id)
+        public override Task<HttpResponseMessage> Delete(int id)
         {
             return base.Delete(id);
         }
 
         [HttpPut]
         [PermissionAuthorize(Permission = AdministrationPermissions.Committees)]
-        public override HttpResponseMessage Put(CommitteePostViewModel postViewModel)
+        public override async Task<HttpResponseMessage> Put(CommitteePostViewModel postViewModel)
         {
-            var modelDTO = _mapper.Map<CommitteePostViewModel, CommitteePostDTO>(postViewModel);
+            var dto = _mapper.Map<CommitteePostViewModel, CommitteePostDTO>(postViewModel);
             try
             {
-                if (modelDTO.Name != null && modelDTO.Description != null)
+                if (dto.Name != null && dto.Description != null)
                 {
-                    _committeesService.PutCommittee(modelDTO);
+                    await _committeesService.PutCommitteeAsync(dto);
                 }
                 else
                 {
@@ -65,7 +66,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [PermissionAuthorize(Permission = BasicPermissions.Committees)]
         public HttpResponseMessage KudosCommittee()
         {
-            var kudosCommittee = _committeesService.GetKudosCommittee();
+            var kudosCommittee = _committeesService.GetKudosCommitteeAsync();
 
             return Request.CreateResponse(HttpStatusCode.OK, kudosCommittee);
         }
@@ -74,21 +75,21 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [PermissionAuthorize(Permission = BasicPermissions.Committees)]
         public HttpResponseMessage KudosCommitteeId()
         {
-            var id = _committeesService.GetKudosCommitteeId();
+            var id = _committeesService.GetKudosCommitteeIdAsync();
 
             return Request.CreateResponse(HttpStatusCode.OK, new { id });
         }
 
         [HttpPost]
         [PermissionAuthorize(Permission = AdministrationPermissions.Committees)]
-        public override HttpResponseMessage Post(CommitteePostViewModel postViewModel)
+        public override async Task<HttpResponseMessage> Post(CommitteePostViewModel postViewModel)
         {
-            var modelDTO = _mapper.Map<CommitteePostViewModel, CommitteePostDTO>(postViewModel);
+            var dto = _mapper.Map<CommitteePostViewModel, CommitteePostDTO>(postViewModel);
             try
             {
-                if (modelDTO.Name != null && modelDTO.Description != null)
+                if (dto.Name != null && dto.Description != null)
                 {
-                    _committeesService.PostCommittee(modelDTO);
+                    await _committeesService.PostCommitteeAsync(dto);
                 }
                 else
                 {
@@ -104,7 +105,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpPost]
         [PermissionAuthorize(Permission = BasicPermissions.Committees)]
-        public HttpResponseMessage PostSuggestion(CommitteeSuggestionPostViewModel postViewModel)
+        public async Task<HttpResponseMessage> PostSuggestion(CommitteeSuggestionPostViewModel postViewModel)
         {
             if (string.IsNullOrWhiteSpace(postViewModel.Title))
             {
@@ -125,7 +126,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             try
             {
-                _committeesService.PostSuggestion(modelDTO, GetUserAndOrganization().UserId);
+                await _committeesService.PostSuggestionAsync(modelDTO, GetUserAndOrganization().UserId);
             }
             catch (ServiceException ex)
             {
@@ -135,12 +136,12 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         }
 
         [PermissionAuthorize(Permission = AdministrationPermissions.Committees)]
-        public HttpResponseMessage DeleteSuggestion(int comitteeId, int suggestionId)
+        public HttpResponseMessage DeleteSuggestion(int committeeId, int suggestionId)
         {
             var userAndOrg = GetUserAndOrganization();
             try
             {
-                _committeesService.DeleteComitteeSuggestion(comitteeId, suggestionId, userAndOrg);
+                _committeesService.DeleteCommitteeSuggestion(committeeId, suggestionId, userAndOrg);
             }
             catch (ServiceException ex)
             {

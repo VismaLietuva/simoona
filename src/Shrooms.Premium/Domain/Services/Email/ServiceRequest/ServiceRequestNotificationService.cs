@@ -1,5 +1,6 @@
 ﻿using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
@@ -25,9 +26,9 @@ namespace Shrooms.Premium.Domain.Services.Email.ServiceRequest
         private readonly IMailTemplate _mailTemplate;
 
         public ServiceRequestNotificationService(IUnitOfWork2 uow,
-                                                 IMailingService mailingService,
-                                                 IMailTemplate mailTemplate,
-                                                 IApplicationSettings appSettings)
+            IMailingService mailingService,
+            IMailTemplate mailTemplate,
+            IApplicationSettings appSettings)
         {
             _organizationsDbSet = uow.GetDbSet<Organization>();
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
@@ -39,45 +40,44 @@ namespace Shrooms.Premium.Domain.Services.Email.ServiceRequest
             _appSettings = appSettings;
         }
 
-        public void NotifyAboutNewServiceRequest(CreatedServiceRequestDTO createdServiceRequest)
+        public async Task NotifyAboutNewServiceRequestAsync(CreatedServiceRequestDTO createdServiceRequest)
         {
-            var newServiceRequest = _serviceRequestDbSet.Single(s => s.Id == createdServiceRequest.ServiceRequestId);
-            var organizationName = GetOrganizationName(newServiceRequest.OrganizationId);
+            var newServiceRequest = await _serviceRequestDbSet.SingleAsync(s => s.Id == createdServiceRequest.ServiceRequestId);
+            var organizationName = await GetOrganizationNameAsync(newServiceRequest.OrganizationId);
 
-            var emails = _usersDbSet
+            var emails = await _usersDbSet
                 .Where(x => x.ServiceRequestCategoriesAssigned.Any(y => y.Name == newServiceRequest.CategoryName))
                 .Where(x => x.Id != newServiceRequest.EmployeeId)
                 .Select(x => x.Email)
-                .ToList();
+                .ToListAsync();
 
             var subject = Resources.Models.ServiceRequest.ServiceRequest.EmailMessageSubject;
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organizationName);
             var serviceRequestUrl = _appSettings.ServiceRequestUrl(organizationName, newServiceRequest.Id);
 
-            var emailTemplateViewModel = new ServiceRequestEmailTemplateViewModel(
-                userNotificationSettingsUrl,
+            var emailTemplateViewModel = new ServiceRequestEmailTemplateViewModel(userNotificationSettingsUrl,
                 newServiceRequest.Title,
                 GetUserFullName(newServiceRequest.EmployeeId),
                 serviceRequestUrl);
 
             var body = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.ServiceRequest);
 
-            _mailingService.SendEmail(new EmailDto(emails, subject, body));
+            await _mailingService.SendEmailAsync(new EmailDto(emails, subject, body));
         }
 
-        public void NotifyAboutNewComment(ServiceRequestCreatedCommentDTO createdComment)
+        public async Task NotifyAboutNewCommentAsync(ServiceRequestCreatedCommentDTO createdComment)
         {
-            var serviceRequest = _serviceRequestDbSet.Single(s => s.Id == createdComment.ServiceRequestId);
-            var organizationName = GetOrganizationName(serviceRequest.OrganizationId);
+            var serviceRequest = await _serviceRequestDbSet.SingleAsync(s => s.Id == createdComment.ServiceRequestId);
+            var organizationName = await GetOrganizationNameAsync(serviceRequest.OrganizationId);
 
-            var serviceRequestNotificationRoleId = GetUserNotificationRoleId();
+            var serviceRequestNotificationRoleId = await GetUserNotificationRoleIdAsync();
 
-            var emails = _usersDbSet
+            var emails = await _usersDbSet
                 .Where(x => x.Roles.Any(y => y.RoleId == serviceRequestNotificationRoleId) ||
-                    x.Id == serviceRequest.EmployeeId)
+                            x.Id == serviceRequest.EmployeeId)
                 .Where(x => x.Id != createdComment.CommentedEmployeeId)
                 .Select(x => x.Email)
-                .ToList();
+                .ToListAsync();
 
             var subject = Resources.Common.ServiceRequestAdminCommentedSubject;
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organizationName);
@@ -92,23 +92,21 @@ namespace Shrooms.Premium.Domain.Services.Email.ServiceRequest
 
             var body = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.ServiceRequestComment);
 
-            _mailingService.SendEmail(new EmailDto(emails, subject, body));
+            await _mailingService.SendEmailAsync(new EmailDto(emails, subject, body));
         }
 
-        public void NotifyAboutServiceRequestStatusUpdate(
-            UpdatedServiceRequestDTO updatedRequest,
-            UserAndOrganizationDTO userAndOrganizationDTO)
+        public async Task NotifyAboutServiceRequestStatusUpdateAsync(UpdatedServiceRequestDTO updatedRequest, UserAndOrganizationDTO userAndOrganizationDTO)
         {
             var serviceRequest = _serviceRequestDbSet.Single(s => s.Id == updatedRequest.ServiceRequestId);
             var newStatusName = _serviceRequestStatusDbSet.Where(x => x.Id == serviceRequest.StatusId).Select(x => x.Title).First();
 
-            var organizationName = GetOrganizationName(serviceRequest.OrganizationId);
+            var organizationName = await GetOrganizationNameAsync(serviceRequest.OrganizationId);
 
-            var email = _usersDbSet
+            var email = await _usersDbSet
                 .Where(x => x.Id == serviceRequest.EmployeeId)
                 .Where(x => x.Id != userAndOrganizationDTO.UserId)
                 .Select(x => x.Email)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
 
             if (email == null)
             {
@@ -119,8 +117,7 @@ namespace Shrooms.Premium.Domain.Services.Email.ServiceRequest
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organizationName);
             var serviceRequestUrl = _appSettings.ServiceRequestUrl(organizationName, serviceRequest.Id);
 
-            var emailTemplateViewModel = new ServiceRequestUpdateEmailTemplateViewModel(
-                userNotificationSettingsUrl,
+            var emailTemplateViewModel = new ServiceRequestUpdateEmailTemplateViewModel(userNotificationSettingsUrl,
                 serviceRequest.Title,
                 GetUserFullName(userAndOrganizationDTO.UserId),
                 newStatusName,
@@ -128,22 +125,31 @@ namespace Shrooms.Premium.Domain.Services.Email.ServiceRequest
 
             var body = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.ServiceRequestUpdate);
 
-            _mailingService.SendEmail(new EmailDto(email, subject, body));
+            await _mailingService.SendEmailAsync(new EmailDto(email, subject, body));
         }
 
-        private string GetUserFullName(string userId) => _usersDbSet
-                 .Where(u => u.Id == userId)
-                 .Select(u => u.FirstName + " " + u.LastName)
-                 .First();
+        private string GetUserFullName(string userId)
+        {
+            return _usersDbSet
+                .Where(u => u.Id == userId)
+                .Select(u => u.FirstName + " " + u.LastName)
+                .First();
+        }
 
-        private string GetOrganizationName(int? organizationId) => _organizationsDbSet
+        private async Task<string> GetOrganizationNameAsync(int? organizationId)
+        {
+            return await _organizationsDbSet
                 .Where(organization => organization.Id == organizationId)
                 .Select(organization => organization.ShortName)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
+        }
 
-        private string GetUserNotificationRoleId() => _rolesDbSet
+        private async Task<string> GetUserNotificationRoleIdAsync()
+        {
+            return await _rolesDbSet
                 .Where(x => x.Name == Roles.ServiceRequestNotification)
                 .Select(x => x.Id)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
+        }
     }
 }

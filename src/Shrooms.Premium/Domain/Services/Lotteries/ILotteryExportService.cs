@@ -1,9 +1,10 @@
-﻿using Shrooms.Contracts.DataTransferObjects;
+﻿using System.Threading.Tasks;
+using Shrooms.Contracts.DataTransferObjects;
 
 namespace Shrooms.Premium.Domain.Services.Lotteries
 {
     public interface ILotteryExportService
     {
-        byte[] ExportParticipants(int lotteryId, UserAndOrganizationDTO userAndOrg);
+        Task<byte[]> ExportParticipantsAsync(int lotteryId, UserAndOrganizationDTO userAndOrg);
     }
 }

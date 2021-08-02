@@ -191,7 +191,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
             try
             {
                 var bookReportDto = _mapper.Map<BookReportViewModel, BookReportDTO>(bookReport);
-                _bookService.ReportBook(bookReportDto, userAndOrg);
+                _bookService.ReportBookAsync(bookReportDto, userAndOrg);
                 return Ok();
             }
             catch (BookException e)
@@ -240,7 +240,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
             var userAndOrg = GetUserAndOrganization();
             try
             {
-                _bookService.TakeBook(bookOfficeId, userAndOrg);
+                _bookService.TakeBookAsync(bookOfficeId, userAndOrg);
                 return Ok();
             }
             catch (BookException e)

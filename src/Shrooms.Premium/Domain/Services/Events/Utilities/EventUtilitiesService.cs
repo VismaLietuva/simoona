@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.SqlServer;
 using System.Linq;
+using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
@@ -28,11 +29,11 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
             _eventOptionsDbSet = uow.GetDbSet<EventOption>();
         }
 
-        public void DeleteByEvent(Guid eventId, string userId)
+        public async Task DeleteByEventAsync(Guid eventId, string userId)
         {
-            var options = _eventOptionsDbSet
+            var options = await _eventOptionsDbSet
                 .Where(o => o.EventId == eventId)
-                .ToList();
+                .ToListAsync();
 
             var timestamp = DateTime.UtcNow;
             foreach (var option in options)
@@ -41,10 +42,10 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
                 option.ModifiedBy = userId;
             }
 
-            _uow.SaveChanges(false);
+            await _uow.SaveChangesAsync(false);
 
             options.ForEach(o => _eventOptionsDbSet.Remove(o));
-            _uow.SaveChanges(false);
+            await _uow.SaveChangesAsync(false);
         }
 
         public string GetEventName(Guid eventId)
@@ -167,18 +168,18 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
             _uow.SaveChanges(userAndOrg.UserId);
         }
 
-        public IEnumerable<object> GetRecurranceOptions()
+        public IEnumerable<object> GetRecurrenceOptions()
         {
-            var recurranceOptions = Enum
+            var recurrenceOptions = Enum
                 .GetValues(typeof(EventRecurrenceOptions))
                 .Cast<EventRecurrenceOptions>()
                 .Select(o => new { Key = o.ToString(), Value = o });
-            return recurranceOptions;
+            return recurrenceOptions;
         }
 
-        public IEnumerable<EventOptionCountDTO> GetEventChosenOptions(Guid eventId, UserAndOrganizationDTO userAndOrg)
+        public async Task<IEnumerable<EventOptionCountDTO>> GetEventChosenOptionsAsync(Guid eventId, UserAndOrganizationDTO userAndOrg)
         {
-            var eventOptions = _eventOptionsDbSet
+            var eventOptions = await _eventOptionsDbSet
                 .Include(e => e.EventParticipants)
                 .Include(e => e.Event)
                 .Where(e => e.EventId == eventId
@@ -189,7 +190,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
                     Option = e.Option,
                     Count = e.EventParticipants.Count(x => x.EventId == eventId)
                 })
-                .ToList();
+                .ToListAsync();
 
             return eventOptions;
         }

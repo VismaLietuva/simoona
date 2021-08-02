@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Premium.DataTransferObjects.Models.ServiceRequest;
 
@@ -6,22 +7,22 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
 {
     public interface IServiceRequestService
     {
-        void CreateComment(ServiceRequestCommentDTO comment, UserAndOrganizationDTO userAndOrganizationDTO);
+        Task CreateCommentAsync(ServiceRequestCommentDTO comment, UserAndOrganizationDTO userAndOrganizationDTO);
 
-        void CreateNewServiceRequest(ServiceRequestDTO newServiceRequestDTO, UserAndOrganizationDTO userAndOrganizationDTO);
+        Task CreateNewServiceRequestAsync(ServiceRequestDTO newServiceRequestDTO, UserAndOrganizationDTO userAndOrganizationDTO);
 
-        void UpdateServiceRequest(ServiceRequestDTO serviceRequestDTO, UserAndOrganizationDTO userAndOrganizationDTO);
+        Task UpdateServiceRequestAsync(ServiceRequestDTO serviceRequestDTO, UserAndOrganizationDTO userAndOrganizationDTO);
 
-        IEnumerable<ServiceRequestCategoryDTO> GetCategories();
+        Task<IEnumerable<ServiceRequestCategoryDTO>> GetCategoriesAsync();
 
-        void CreateCategory(ServiceRequestCategoryDTO category, string userId);
+        Task CreateCategoryAsync(ServiceRequestCategoryDTO category, string userId);
 
         ServiceRequestCategoryDTO GetCategory(int categoryId);
 
-        void EditCategory(ServiceRequestCategoryDTO modelDto, string userId);
+        Task EditCategoryAsync(ServiceRequestCategoryDTO modelDto, string userId);
 
         void DeleteCategory(int categoryId, string userId);
 
-        void MoveRequestToDone(int requestId, UserAndOrganizationDTO userAndOrganizationDTO);
+        Task MoveRequestToDoneAsync(int requestId, UserAndOrganizationDTO userAndOrganizationDTO);
     }
 }

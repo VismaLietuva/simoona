@@ -5,7 +5,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AutoMapper;
-using PagedList;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Kudos;
@@ -18,22 +17,27 @@ using Shrooms.Domain.Services.UserService;
 using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
 using Shrooms.Premium.Domain.DomainExceptions.Lotteries;
 using Shrooms.Premium.Domain.Services.Args;
+using X.PagedList;
 
 namespace Shrooms.Premium.Domain.Services.Lotteries
 {
     public class LotteryService : ILotteryService
     {
         private readonly IUnitOfWork2 _uow;
-        private readonly IDbSet<Lottery> _lotteriesDbSet;
+        private readonly DbSet<Lottery> _lotteriesDbSet;
+        private readonly DbSet<LotteryParticipant> _participantsDbSet;
         private readonly IAsyncRunner _asyncRunner;
-        private readonly IDbSet<LotteryParticipant> _participantsDbSet;
         private readonly IMapper _mapper;
         private readonly IParticipantService _participantService;
         private readonly IUserService _userService;
         private readonly IKudosService _kudosService;
 
-        public LotteryService(IUnitOfWork2 uow, IMapper mapper, IParticipantService participantService,
-            IUserService userService, IKudosService kudosService, IAsyncRunner asyncRunner)
+        public LotteryService(IUnitOfWork2 uow,
+            IMapper mapper,
+            IParticipantService participantService,
+            IUserService userService,
+            IKudosService kudosService,
+            IAsyncRunner asyncRunner)
         {
             _uow = uow;
             _lotteriesDbSet = uow.GetDbSet<Lottery>();
@@ -43,6 +47,11 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             _participantService = participantService;
             _userService = userService;
             _kudosService = kudosService;
+        }
+
+        public async Task<Lottery> GetLotteryAsync(int lotteryId)
+        {
+            return await _lotteriesDbSet.FindAsync(lotteryId);
         }
 
         public async Task<LotteryDTO> CreateLottery(LotteryDTO newLotteryDTO)
@@ -73,38 +82,40 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             return newLotteryDTO;
         }
 
-        public void EditDraftedLottery(LotteryDTO lotteryDTO)
+        public async Task EditDraftedLotteryAsync(LotteryDTO lotteryDTO)
         {
-            var lottery = _lotteriesDbSet.Find(lotteryDTO.Id);
+            var lottery = await _lotteriesDbSet.FindAsync(lotteryDTO.Id);
 
-            if (lottery.Status != (int)LotteryStatus.Drafted)
+            if (lottery != null && lottery.Status != (int)LotteryStatus.Drafted)
             {
                 throw new LotteryException("Editing is forbidden for not drafted lottery.");
             }
 
             UpdateDraftedLottery(lottery, lotteryDTO);
 
-            _uow.SaveChanges(false);
+            await _uow.SaveChangesAsync(false);
         }
 
-        public void EditStartedLottery(EditStartedLotteryDTO lotteryDTO)
+        public async Task EditStartedLotteryAsync(EditStartedLotteryDTO lotteryDTO)
         {
-            var lottery = _lotteriesDbSet.Find(lotteryDTO.Id);
+            var lottery = await _lotteriesDbSet.FindAsync(lotteryDTO.Id);
 
-            if (lottery.Status != (int)LotteryStatus.Started)
+            if (lottery != null && lottery.Status != (int)LotteryStatus.Started)
             {
                 throw new LotteryException("Lottery is not running.");
             }
 
-            lottery.Description = lotteryDTO.Description;
-
-            _uow.SaveChanges(false);
+            if (lottery != null)
+            {
+                lottery.Description = lotteryDTO.Description;
+                await _uow.SaveChangesAsync(false);
+            }
         }
 
-        public LotteryDetailsDTO GetLotteryDetails(int lotteryId, UserAndOrganizationDTO userOrg)
+        public async Task<LotteryDetailsDTO> GetLotteryDetailsAsync(int lotteryId, UserAndOrganizationDTO userOrg)
         {
-            var lottery = _lotteriesDbSet
-                .FirstOrDefault(x => x.Id == lotteryId && x.OrganizationId == userOrg.OrganizationId);
+            var lottery = await _lotteriesDbSet
+                .FirstOrDefaultAsync(x => x.Id == lotteryId && x.OrganizationId == userOrg.OrganizationId);
 
             if (lottery is null)
             {
@@ -112,7 +123,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             }
 
             var lotteryDetailsDTO = _mapper.Map<Lottery, LotteryDetailsDTO>(lottery);
-            lotteryDetailsDTO.Participants = _participantsDbSet.Count(p => p.LotteryId == lotteryId);
+            lotteryDetailsDTO.Participants = await _participantsDbSet.CountAsync(p => p.LotteryId == lotteryId);
 
             return lotteryDetailsDTO;
         }
@@ -132,7 +143,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 lottery.Status = (int)LotteryStatus.RefundStarted;
                 _uow.SaveChanges();
 
-                _asyncRunner.Run<ILotteryAbortJob>(n => n.RefundLottery(lottery.Id, userOrg), _uow.ConnectionName);
+                _asyncRunner.Run<ILotteryAbortJob>(async notifier => await notifier.RefundLotteryAsync(lottery.Id, userOrg), _uow.ConnectionName);
             }
             else if (lottery.Status == (int)LotteryStatus.Drafted)
             {
@@ -140,8 +151,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 _uow.SaveChanges();
             }
 
-            return lottery.Status == (int)LotteryStatus.Deleted ||
-                   lottery.Status == (int)LotteryStatus.RefundStarted;
+            return lottery.Status == (int)LotteryStatus.Deleted || lottery.Status == (int)LotteryStatus.RefundStarted;
         }
 
         public void RefundParticipants(int lotteryId, UserAndOrganizationDTO userOrg)
@@ -162,13 +172,12 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             lottery.IsRefundFailed = false;
             _uow.SaveChanges(userOrg.UserId);
 
-            _asyncRunner.Run<ILotteryAbortJob>(n => n.RefundLottery(lottery.Id, userOrg), _uow.ConnectionName);
+            _asyncRunner.Run<ILotteryAbortJob>(notifier => notifier.RefundLotteryAsync(lottery.Id, userOrg), _uow.ConnectionName);
         }
 
-        public void UpdateRefundFailedFlag(int lotteryId, bool isFailed, UserAndOrganizationDTO userOrg)
+        public async Task UpdateRefundFailedFlagAsync(int lotteryId, bool isFailed, UserAndOrganizationDTO userOrg)
         {
-            var lottery = _lotteriesDbSet
-                .FirstOrDefault(x => x.Id == lotteryId && x.OrganizationId == userOrg.OrganizationId);
+            var lottery = await _lotteriesDbSet.FirstOrDefaultAsync(x => x.Id == lotteryId && x.OrganizationId == userOrg.OrganizationId);
 
             if (lottery is null)
             {
@@ -177,13 +186,12 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 
             lottery.IsRefundFailed = isFailed;
 
-            _uow.SaveChanges(userOrg.UserId);
+            await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
         public async Task FinishLotteryAsync(int lotteryId, UserAndOrganizationDTO userOrg)
         {
-            var lottery = _lotteriesDbSet
-                .FirstOrDefault(x => x.Id == lotteryId && x.OrganizationId == userOrg.OrganizationId);
+            var lottery = await _lotteriesDbSet.FirstOrDefaultAsync(x => x.Id == lotteryId && x.OrganizationId == userOrg.OrganizationId);
 
             if (lottery is null)
             {
@@ -195,17 +203,17 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
-        public LotteryStatsDTO GetLotteryStats(int lotteryId, UserAndOrganizationDTO userOrg)
+        public async Task<LotteryStatsDTO> GetLotteryStatsAsync(int lotteryId, UserAndOrganizationDTO userOrg)
         {
-            var lottery = _lotteriesDbSet
-                .FirstOrDefault(x => x.Id == lotteryId && x.OrganizationId == userOrg.OrganizationId);
+            var lottery = await _lotteriesDbSet
+                .FirstOrDefaultAsync(x => x.Id == lotteryId && x.OrganizationId == userOrg.OrganizationId);
 
             if (lottery is null)
             {
                 return null;
             }
 
-            var participants = _participantService.GetParticipantsCounted(lotteryId).ToList();
+            var participants = await _participantService.GetParticipantsCountedAsync(lotteryId);
 
             var ticketsSold = participants.Sum(participant => participant.Tickets);
 
@@ -222,7 +230,8 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             return _lotteriesDbSet
                 .Where(p => p.OrganizationId == userOrganization.OrganizationId)
                 .Select(MapLotteriesToListItemDto)
-                .OrderByDescending(_byEndDate);
+                .OrderByDescending(_byEndDate)
+                .ToList();
         }
 
         public IEnumerable<LotteryDetailsDTO> GetFilteredLotteries(string filter, UserAndOrganizationDTO userOrg)
@@ -236,10 +245,10 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 .ThenByDescending(_byEndDate);
         }
 
-        public IPagedList<LotteryDetailsDTO> GetPagedLotteries(GetPagedLotteriesArgs args)
+        public async Task<IPagedList<LotteryDetailsDTO>> GetPagedLotteriesAsync(GetPagedLotteriesArgs args)
         {
             var filteredLotteries = GetFilteredLotteries(args.Filter, args.UserOrg);
-            return filteredLotteries.ToPagedList(args.PageNumber, args.PageSize);
+            return await filteredLotteries.ToPagedListAsync(args.PageNumber, args.PageSize);
         }
 
         public LotteryStatusDTO GetLotteryStatus(int lotteryId, UserAndOrganizationDTO userOrg)
@@ -261,9 +270,9 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 
         public async Task BuyLotteryTicketAsync(BuyLotteryTicketDTO lotteryTicketDTO, UserAndOrganizationDTO userOrg)
         {
-            var applicationUser = _userService.GetApplicationUser(userOrg.UserId);
+            var applicationUser = await _userService.GetApplicationUserAsync(userOrg.UserId);
 
-            var lotteryDetails = GetLotteryDetails(lotteryTicketDTO.LotteryId, userOrg);
+            var lotteryDetails = await GetLotteryDetailsAsync(lotteryTicketDTO.LotteryId, userOrg);
 
             if (lotteryDetails is null || applicationUser is null)
             {
@@ -272,7 +281,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 
             if (lotteryTicketDTO.Tickets <= 0)
             {
-                await AddKudsLogForCheating(userOrg, lotteryDetails.EntryFee, applicationUser);
+                await AddKudosLogForCheating(userOrg, lotteryDetails.EntryFee, applicationUser);
                 throw new LotteryException("Thanks for trying - you were charged double Kudos for this without getting a ticket.");
             }
 
@@ -289,18 +298,18 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             var kudosLogDTO = new AddKudosLogDTO
             {
                 ReceivingUserIds = new List<string> { userOrg.UserId },
-                PointsTypeId = _kudosService.GetKudosTypeId(KudosTypeEnum.Minus),
+                PointsTypeId = await _kudosService.GetKudosTypeIdAsync(KudosTypeEnum.Minus),
                 MultiplyBy = lotteryTicketDTO.Tickets * lotteryDetails.EntryFee,
                 Comment = $"{lotteryTicketDTO.Tickets} ticket(s) for lottery {lotteryDetails.Title}",
                 UserId = userOrg.UserId,
                 OrganizationId = userOrg.OrganizationId
             };
 
-            await _kudosService.AddLotteryKudosLog(kudosLogDTO, userOrg);
+            await _kudosService.AddLotteryKudosLogAsync(kudosLogDTO, userOrg);
 
             if (applicationUser.RemainingKudos < 0)
             {
-                kudosLogDTO.PointsTypeId = _kudosService.GetKudosTypeId(KudosTypeEnum.Refund);
+                kudosLogDTO.PointsTypeId = await _kudosService.GetKudosTypeIdAsync(KudosTypeEnum.Refund);
                 _kudosService.AddRefundKudosLogs(new List<AddKudosLogDTO> { kudosLogDTO });
             }
             else
@@ -312,50 +321,50 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             }
 
             await _uow.SaveChangesAsync(applicationUser.Id);
-            _kudosService.UpdateProfileKudos(applicationUser, userOrg);
+            await _kudosService.UpdateProfileKudosAsync(applicationUser, userOrg);
         }
 
-        private async Task AddKudsLogForCheating(UserAndOrganizationDTO userOrg, int entryFee, ApplicationUser applicationUser)
+        private async Task AddKudosLogForCheating(UserAndOrganizationDTO userOrg, int entryFee, ApplicationUser applicationUser)
         {
             var kudosLogDTO = new AddKudosLogDTO
             {
                 ReceivingUserIds = new List<string> { userOrg.UserId },
-                PointsTypeId = _kudosService.GetKudosTypeId(KudosTypeEnum.Minus),
+                PointsTypeId = await _kudosService.GetKudosTypeIdAsync(KudosTypeEnum.Minus),
                 MultiplyBy = entryFee * 2,
                 Comment = "Cheating",
                 UserId = userOrg.UserId,
                 OrganizationId = userOrg.OrganizationId
             };
 
-            await _kudosService.AddLotteryKudosLog(kudosLogDTO, userOrg);
+            await _kudosService.AddLotteryKudosLogAsync(kudosLogDTO, userOrg);
             await _uow.SaveChangesAsync(applicationUser.Id);
-            _kudosService.UpdateProfileKudos(applicationUser, userOrg);
+            await _kudosService.UpdateProfileKudosAsync(applicationUser, userOrg);
         }
 
-        public IEnumerable<LotteryDetailsDTO> GetRunningLotteries(UserAndOrganizationDTO userAndOrganization)
+        public async Task<List<LotteryDetailsDTO>> GetRunningLotteriesAsync(UserAndOrganizationDTO userAndOrganization)
         {
-            return _lotteriesDbSet.
-                Where(p =>
+            return await _lotteriesDbSet.Where(p =>
                     p.OrganizationId == userAndOrganization.OrganizationId &&
                     p.Status == (int)LotteryStatus.Started &&
                     p.EndDate > DateTime.UtcNow)
                 .Select(MapLotteriesToListItemDto)
-                .OrderBy(_byEndDate);
+                .OrderBy(_byEndDate)
+                .ToListAsync();
         }
 
         private readonly Expression<Func<LotteryDetailsDTO, DateTime>> _byEndDate = e => e.EndDate;
 
         private static Expression<Func<Lottery, LotteryDetailsDTO>> MapLotteriesToListItemDto =>
-         e => new LotteryDetailsDTO
-         {
-             Id = e.Id,
-             Title = e.Title,
-             Description = e.Description,
-             EntryFee = e.EntryFee,
-             EndDate = e.EndDate,
-             Status = e.Status,
-             RefundFailed = e.IsRefundFailed
-         };
+            e => new LotteryDetailsDTO
+            {
+                Id = e.Id,
+                Title = e.Title,
+                Description = e.Description,
+                EntryFee = e.EntryFee,
+                EndDate = e.EndDate,
+                Status = e.Status,
+                RefundFailed = e.IsRefundFailed
+            };
 
         private Lottery MapNewLottery(LotteryDTO newLotteryDTO)
         {

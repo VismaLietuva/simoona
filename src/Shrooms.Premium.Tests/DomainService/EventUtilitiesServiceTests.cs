@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.DAL;
@@ -15,18 +16,18 @@ namespace Shrooms.Premium.Tests.DomainService
     public class EventUtilitiesServiceTests
     {
         private IEventUtilitiesService _eventUtilitiesService;
-        private IDbSet<EventType> _eventTypesDbSet;
-        private IDbSet<EventOption> _eventOptionsDbSet;
-        private IDbSet<Event> _eventDbSet;
+        private DbSet<EventType> _eventTypesDbSet;
+        private DbSet<EventOption> _eventOptionsDbSet;
+        private DbSet<Event> _eventDbSet;
 
         [SetUp]
         public void TestInitializer()
         {
             var uow = Substitute.For<IUnitOfWork2>();
 
-            _eventOptionsDbSet = uow.MockDbSet<EventOption>();
-            _eventTypesDbSet = uow.MockDbSet<EventType>();
-            _eventDbSet = uow.MockDbSet<Event>();
+            _eventOptionsDbSet = uow.MockDbSetForAsync<EventOption>();
+            _eventTypesDbSet = uow.MockDbSetForAsync<EventType>();
+            _eventDbSet = uow.MockDbSetForAsync<Event>();
 
             _eventUtilitiesService = new EventUtilitiesService(uow);
         }
@@ -35,7 +36,7 @@ namespace Shrooms.Premium.Tests.DomainService
         public void Should_Delete_Event_Options()
         {
             var eventId = MockCommentsForEvent();
-            _eventUtilitiesService.DeleteByEvent(eventId, "testUserId");
+            _eventUtilitiesService.DeleteByEventAsync(eventId, "testUserId");
             _eventOptionsDbSet.Received(3).Remove(Arg.Any<EventOption>());
         }
 
@@ -50,7 +51,7 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_Event_Chosen_Options()
+        public async Task Should_Return_Event_Chosen_Options()
         {
             var userAndOrg = new UserAndOrganizationDTO
             {
@@ -58,7 +59,7 @@ namespace Shrooms.Premium.Tests.DomainService
             };
             var guid = MockParticipantsWithOptionsForExport();
 
-            var options = _eventUtilitiesService.GetEventChosenOptions(guid, userAndOrg).ToList();
+            var options = (await _eventUtilitiesService.GetEventChosenOptionsAsync(guid, userAndOrg)).ToList();
             Assert.AreEqual("Option1", options.ToArray()[0].Option);
             Assert.AreEqual("Option2", options.ToArray()[1].Option);
             Assert.AreEqual(2, options.ToArray()[0].Count);
@@ -176,8 +177,8 @@ namespace Shrooms.Premium.Tests.DomainService
                     EventParticipants = new List<EventParticipant>()
                 }
             };
-            _eventDbSet.SetDbSetData(new List<Event> { @event }.AsQueryable());
-            _eventOptionsDbSet.SetDbSetData(options.AsQueryable());
+            _eventDbSet.SetDbSetDataForAsync(new List<Event> { @event }.AsQueryable());
+            _eventOptionsDbSet.SetDbSetDataForAsync(options.AsQueryable());
             return eventId;
         }
 
@@ -207,7 +208,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     Option = "Option4"
                 }
             };
-            _eventOptionsDbSet.SetDbSetData(options.AsQueryable());
+            _eventOptionsDbSet.SetDbSetDataForAsync(options.AsQueryable());
             return eventId;
         }
 
@@ -262,7 +263,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     SendWeeklyReminders = true
                 }
             };
-            _eventTypesDbSet.SetDbSetData(types.AsQueryable());
+            _eventTypesDbSet.SetDbSetDataForAsync(types.AsQueryable());
         }
     }
 }

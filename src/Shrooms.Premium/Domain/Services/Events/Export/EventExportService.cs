@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Premium.Constants;
@@ -25,13 +26,12 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
             _excelBuilder = excelBuilder;
         }
 
-        public byte[] ExportOptionsAndParticipants(Guid eventId, UserAndOrganizationDTO userAndOrg)
+        public async Task<byte[]> ExportOptionsAndParticipantsAsync(Guid eventId, UserAndOrganizationDTO userAndOrg)
         {
-            var participants = _eventParticipationService
-                .GetEventParticipants(eventId, userAndOrg)
+            var participants = (await _eventParticipationService.GetEventParticipantsAsync(eventId, userAndOrg))
                 .Select(x => new List<string> { x.FirstName, x.LastName });
 
-            var options = _eventUtilitiesService.GetEventChosenOptions(eventId, userAndOrg)
+            var options = (await _eventUtilitiesService.GetEventChosenOptionsAsync(eventId, userAndOrg))
                 .Select(x => new List<string> { x.Option, x.Count.ToString() })
                 .ToList();
 

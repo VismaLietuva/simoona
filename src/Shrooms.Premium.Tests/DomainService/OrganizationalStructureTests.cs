@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
@@ -16,7 +17,7 @@ namespace Shrooms.Premium.Tests.DomainService
     [TestFixture]
     public class OrganizationalStructureTests
     {
-        private IDbSet<ApplicationUser> _usersDbSet;
+        private DbSet<ApplicationUser> _usersDbSet;
         private IOrganizationalStructureService _organizationalStructureService;
 
         [SetUp]
@@ -24,8 +25,8 @@ namespace Shrooms.Premium.Tests.DomainService
         {
             var uow = Substitute.For<IUnitOfWork2>();
 
-            _usersDbSet = Substitute.For<IDbSet<ApplicationUser>>();
-            _usersDbSet.SetDbSetData(MockUsers());
+            _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IDbAsyncEnumerable<ApplicationUser>>();
+            _usersDbSet.SetDbSetDataForAsync(MockUsers());
             uow.GetDbSet<ApplicationUser>().Returns(_usersDbSet);
 
             var roleService = Substitute.For<IRoleService>();

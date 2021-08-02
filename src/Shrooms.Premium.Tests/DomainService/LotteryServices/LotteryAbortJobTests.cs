@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Data.Entity;
+using System.Threading.Tasks;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
 using NUnit.Framework;
@@ -16,47 +16,47 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
     [TestFixture]
     public class LotteryAbortJobTests
     {
+        private ILotteryService _lotteryService;
         private ILotteryAbortJob _sut;
         private IKudosService _kudosService;
         private IParticipantService _participantService;
-        private IDbSet<Lottery> _lotteriesDb;
         private IUnitOfWork2 _unitOfWork;
         private IAsyncRunner _asyncRunner;
 
         [SetUp]
         public void SetUp()
         {
+            _lotteryService = Substitute.For<ILotteryService>();
+
             _unitOfWork = Substitute.For<IUnitOfWork2>();
-            _lotteriesDb = Substitute.For<IDbSet<Lottery>>();
-            _unitOfWork.GetDbSet<Lottery>().Returns(_lotteriesDb);
 
             _kudosService = Substitute.For<IKudosService>();
             _participantService = Substitute.For<IParticipantService>();
             _asyncRunner = Substitute.For<IAsyncRunner>();
             var logger = Substitute.For<ILogger>();
 
-            _sut = new LotteryAbortJob(_kudosService, _participantService, logger, _asyncRunner, _unitOfWork);
+            _sut = new LotteryAbortJob(_kudosService, _participantService, logger, _asyncRunner, _unitOfWork, _lotteryService);
         }
 
         [Test]
-        public void RefundLottery_WrongLotteryId_Exits()
+        public async Task RefundLottery_WrongLotteryId_Exits()
         {
-            _lotteriesDb.Find().ReturnsNull();
+            _lotteryService.GetLotteryAsync(1).ReturnsNull();
 
-            _sut.RefundLottery(default, GetUserOrg());
+            await _sut.RefundLotteryAsync(1, _userAndOrganization);
 
-            _participantService.DidNotReceiveWithAnyArgs().GetParticipantsCounted(default);
+            await _participantService.DidNotReceiveWithAnyArgs().GetParticipantsCountedAsync(default);
         }
 
         [Test]
-        public void RefundLottery_OrganizationIdDoesNotMatch_Exits()
+        public async Task RefundLottery_OrganizationIdDoesNotMatch_Exits()
         {
             var userOrg = new UserAndOrganizationDTO { OrganizationId = 100 };
-            _lotteriesDb.Find().ReturnsForAnyArgs(GetLottery());
+            _lotteryService.GetLotteryAsync(Arg.Any<int>()).ReturnsForAnyArgs(GetLottery());
 
-            _sut.RefundLottery(default, userOrg);
+            await _sut.RefundLotteryAsync(default, userOrg);
 
-            _participantService.DidNotReceiveWithAnyArgs().GetParticipantsCounted(default);
+            await _participantService.DidNotReceiveWithAnyArgs().GetParticipantsCountedAsync(default);
         }
 
         [TestCase(LotteryStatus.Refunded)]
@@ -64,61 +64,61 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
         [TestCase(LotteryStatus.Drafted)]
         [TestCase(LotteryStatus.Ended)]
         [TestCase(LotteryStatus.Started)]
-        public void RefundLottery_IncorrectLotteryStatuses_DoesNotAddKudos(LotteryStatus status)
+        public async Task RefundLottery_IncorrectLotteryStatuses_DoesNotAddKudos(LotteryStatus status)
         {
-            _lotteriesDb.Find().ReturnsForAnyArgs(
-                new Lottery
-                {
-                    Id = 1,
-                    OrganizationId = 1,
-                    Status = (int)status
-                });
+            _lotteryService.GetLotteryAsync(Arg.Any<int>()).ReturnsForAnyArgs(new Lottery
+            {
+                Id = 1,
+                OrganizationId = 1,
+                Status = (int)status
+            });
 
-            _sut.RefundLottery(default, GetUserOrg());
+            await _sut.RefundLotteryAsync(default, _userAndOrganization);
 
             _kudosService.DidNotReceiveWithAnyArgs().AddRefundKudosLogs(default);
             _kudosService.DidNotReceiveWithAnyArgs().UpdateProfilesFromUserIds(default, default);
         }
 
         [Test]
-        public void RefundLottery_RefundableLottery_RefundsSuccessfully()
+        public async Task RefundLottery_RefundableLottery_RefundsSuccessfully()
         {
-            _lotteriesDb.Find().ReturnsForAnyArgs(
-                new Lottery
+            _lotteryService.GetLotteryAsync(Arg.Any<int>()).ReturnsForAnyArgs(new Lottery
                 {
                     Id = 1,
                     OrganizationId = 1,
                     Status = (int)LotteryStatus.RefundStarted
                 });
 
-            _sut.RefundLottery(default, GetUserOrg());
+            await _sut.RefundLotteryAsync(1, _userAndOrganization);
 
             _kudosService.ReceivedWithAnyArgs().UpdateProfilesFromUserIds(default, default);
-            _unitOfWork.ReceivedWithAnyArgs(requiredNumberOfCalls: 2).SaveChanges((string)default);
+            await _unitOfWork.ReceivedWithAnyArgs(requiredNumberOfCalls: 2).SaveChangesAsync((string)default);
         }
 
         [Test]
-        public void RefundLottery_FailsGetKudosType_CatchesException()
+        public async Task RefundLottery_FailsGetKudosType_CatchesException()
         {
-            _lotteriesDb.Find().ReturnsForAnyArgs(GetLottery());
+            _lotteryService.GetLotteryAsync(Arg.Any<int>()).ReturnsForAnyArgs(GetLottery());
             _kudosService
-                .When(x => x.GetKudosTypeId(KudosTypeEnum.Refund))
+                .When(x => x.GetKudosTypeIdAsync(KudosTypeEnum.Refund))
                 .Do(_ => throw new ArgumentNullException());
 
-            _sut.RefundLottery(default, GetUserOrg());
+            await _sut.RefundLotteryAsync(default, _userAndOrganization);
 
             _asyncRunner.ReceivedWithAnyArgs().Run<ILotteryService>(default, default);
         }
 
         [Test]
-        public void RefundLottery_FailsSaveChangesToDatabase_CatchesException()
+        public async Task RefundLottery_FailsSaveChangesToDatabase_CatchesException()
         {
-            _lotteriesDb.Find().ReturnsForAnyArgs(GetLottery());
+            var lottery = GetLottery();
+            _lotteryService.GetLotteryAsync(Arg.Any<int>()).ReturnsForAnyArgs(lottery);
+
             _unitOfWork
-                .When(x => x.SaveChanges(GetUserOrg().UserId))
+                .When(async x => await x.SaveChangesAsync(_userAndOrganization.UserId))
                 .Do(_ => throw new Exception());
 
-            _sut.RefundLottery(default, GetUserOrg());
+            await _sut.RefundLotteryAsync(1, _userAndOrganization);
 
             _asyncRunner.ReceivedWithAnyArgs().Run<ILotteryService>(default, default);
         }
@@ -136,13 +136,10 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             };
         }
 
-        private static UserAndOrganizationDTO GetUserOrg()
+        private readonly UserAndOrganizationDTO _userAndOrganization = new UserAndOrganizationDTO
         {
-            return new UserAndOrganizationDTO
-            {
-                UserId = "1",
-                OrganizationId = 1
-            };
-        }
+            OrganizationId = 1,
+            UserId = "1"
+        };
     }
 }

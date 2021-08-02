@@ -102,7 +102,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             _sut.SendNotifications("visma");
 
             _notificationService.ReceivedWithAnyArgs().CreateForEventJoinReminder(users, 1);
-            _eventNotificationService.ReceivedWithAnyArgs().RemindUsersToJoinEvent(Arg.Is<IEnumerable<EventTypeDTO>>(e => e.FirstOrDefault().Id == eventType.Id), users, 1);
+            _eventNotificationService.ReceivedWithAnyArgs().RemindUsersToJoinEventAsync(Arg.Is<IEnumerable<EventTypeDTO>>(e => e.FirstOrDefault().Id == eventType.Id), users, 1);
         }
 
         private static Organization GetOrganization()

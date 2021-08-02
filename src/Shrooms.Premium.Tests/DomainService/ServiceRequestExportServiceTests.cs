@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.IO;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Excel;
 using NSubstitute;
 using NUnit.Framework;
@@ -19,7 +22,7 @@ namespace Shrooms.Premium.Tests.DomainService
     public class ServiceRequestExportServiceTests
     {
         private IUnitOfWork2 _uow;
-        private IDbSet<ServiceRequest> _serviceRequestsDbSet;
+        private DbSet<ServiceRequest> _serviceRequestsDbSet;
         private IServiceRequestExportService _serviceRequestExportService;
         private IExcelBuilder _excelBuilder;
 
@@ -27,7 +30,7 @@ namespace Shrooms.Premium.Tests.DomainService
         public void TestInitializer()
         {
             _uow = Substitute.For<IUnitOfWork2>();
-            _serviceRequestsDbSet = Substitute.For<IDbSet<ServiceRequest>>();
+            _serviceRequestsDbSet = Substitute.For<DbSet<ServiceRequest>, IQueryable<ServiceRequest>, IDbAsyncEnumerable<ServiceRequest>>();
             _uow.GetDbSet<ServiceRequest>().Returns(_serviceRequestsDbSet);
 
             _excelBuilder = new ExcelBuilder();
@@ -36,7 +39,7 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
-        public void ServiceRequests_Should_Return_Excel_File()
+        public async Task ServiceRequests_Should_Return_Excel_File()
         {
             var userAndOrg = new UserAndOrganizationDTO
             {
@@ -44,7 +47,7 @@ namespace Shrooms.Premium.Tests.DomainService
             };
             MockServiceRequests();
 
-            var stream = _serviceRequestExportService.ExportToExcel(userAndOrg, null);
+            var stream = await _serviceRequestExportService.ExportToExcelAsync(userAndOrg, null);
 
             using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
             {
@@ -64,7 +67,7 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
-        public void ServiceRequests_Should_Return_Excel_File_With_Filtered_Categories()
+        public async Task ServiceRequests_Should_Return_Excel_File_With_Filtered_Categories()
         {
             var userAndOrg = new UserAndOrganizationDTO
             {
@@ -73,9 +76,9 @@ namespace Shrooms.Premium.Tests.DomainService
             MockServiceRequests();
 
             Expression<Func<ServiceRequest, bool>> filter = f => f.CategoryName == "Hardware";
-            var stream = _serviceRequestExportService.ExportToExcel(userAndOrg, filter);
+            var stream = await _serviceRequestExportService.ExportToExcelAsync(userAndOrg, filter);
 
-            using (IExcelDataReader excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
+            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
             {
                 excelReader.IsFirstRowAsColumnNames = true;
                 var excelData = excelReader.AsDataSet();
@@ -131,7 +134,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     OrganizationId = 1
                 }
             };
-            _serviceRequestsDbSet.SetDbSetData(serviceRequests);
+            _serviceRequestsDbSet.SetDbSetDataForAsync(serviceRequests);
         }
     }
 }

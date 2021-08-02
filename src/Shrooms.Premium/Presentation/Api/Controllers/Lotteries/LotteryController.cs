@@ -46,10 +46,10 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
         [HttpGet]
         [Route("Paged")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Lottery)]
-        public IHttpActionResult GetPagedLotteries(string filter = "", int page = 1, int pageSize = WebApiConstants.DefaultPageSize)
+        public async Task<IHttpActionResult> GetPagedLotteries(string filter = "", int page = 1, int pageSize = WebApiConstants.DefaultPageSize)
         {
             var args = new GetPagedLotteriesArgs { Filter = filter, PageNumber = page, PageSize = pageSize, UserOrg = GetUserAndOrganization() };
-            var pagedLotteriesDTO = _lotteryService.GetPagedLotteries(args);
+            var pagedLotteriesDTO = await _lotteryService.GetPagedLotteriesAsync(args);
 
             var pagedLotteriesViewModel = new PagedViewModel<LotteryDetailsDTO>
             {
@@ -64,16 +64,16 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
         [HttpGet]
         [Route("{id}/Details")]
-        public IHttpActionResult GetLottery(int id)
+        public async Task<IHttpActionResult> GetLottery(int id)
         {
-            var lotteryDTO = _lotteryService.GetLotteryDetails(id, GetUserAndOrganization());
+            var lottery = await _lotteryService.GetLotteryDetailsAsync(id, GetUserAndOrganization());
 
-            if (lotteryDTO == null)
+            if (lottery == null)
             {
                 return Content((HttpStatusCode)422, "Lottery with such ID was not found");
             }
 
-            var lotteryViewModel = _mapper.Map<LotteryDetailsDTO, LotteryDetailsViewModel>(lotteryDTO);
+            var lotteryViewModel = _mapper.Map<LotteryDetailsDTO, LotteryDetailsViewModel>(lottery);
 
             return Ok(lotteryViewModel);
         }
@@ -162,7 +162,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
                 var editDraftedLotteryDTO = _mapper.Map<EditDraftedLotteryViewModel, LotteryDTO>(editLotteryViewModel);
                 SetOrganizationAndUser(editDraftedLotteryDTO);
 
-                _lotteryService.EditDraftedLottery(editDraftedLotteryDTO);
+                _lotteryService.EditDraftedLotteryAsync(editDraftedLotteryDTO);
 
                 return Ok();
             }
@@ -182,7 +182,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
                 var editStartedLotteryDTO = _mapper.Map<EditStartedLotteryViewModel, EditStartedLotteryDTO>(editLotteryViewModel);
                 SetOrganizationAndUser(editStartedLotteryDTO);
 
-                _lotteryService.EditStartedLottery(editStartedLotteryDTO);
+                _lotteryService.EditStartedLotteryAsync(editStartedLotteryDTO);
 
                 return Ok();
             }
@@ -211,9 +211,9 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
         [HttpGet]
         [Route("{id}/Stats")]
-        public IHttpActionResult LotteryStats(int id)
+        public async Task<IHttpActionResult> LotteryStats(int id)
         {
-            var lotteryStats = _lotteryService.GetLotteryStats(id, GetUserAndOrganization());
+            var lotteryStats = await _lotteryService.GetLotteryStatsAsync(id, GetUserAndOrganization());
 
             if (lotteryStats == null)
             {
@@ -226,11 +226,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
         [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.Lottery)]
         [Route("Export")]
-        public IHttpActionResult Export(int lotteryId)
+        public async Task<IHttpActionResult> Export(int lotteryId)
         {
             try
             {
-                var stream = new ByteArrayContent(_lotteryExportService.ExportParticipants(lotteryId, GetUserAndOrganization()));
+                var stream = new ByteArrayContent(await _lotteryExportService.ExportParticipantsAsync(lotteryId, GetUserAndOrganization()));
                 var result = new HttpResponseMessage(HttpStatusCode.OK) { Content = stream };
                 return ResponseMessage(result);
             }

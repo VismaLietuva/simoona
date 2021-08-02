@@ -42,12 +42,12 @@ namespace Shrooms.Premium.Domain.Services.Events
         private readonly IDbSet<Office> _officeDbSet;
 
         public EventService(IUnitOfWork2 uow,
-                            IPermissionService permissionService,
-                            IEventUtilitiesService eventUtilitiesService,
-                            IEventValidationService eventValidationService,
-                            IEventParticipationService eventParticipationService,
-                            IWallService wallService,
-                            IMarkdownConverter markdownConverter)
+            IPermissionService permissionService,
+            IEventUtilitiesService eventUtilitiesService,
+            IEventValidationService eventValidationService,
+            IEventParticipationService eventParticipationService,
+            IWallService wallService,
+            IMarkdownConverter markdownConverter)
         {
             _uow = uow;
             _eventsDbSet = uow.GetDbSet<Event>();
@@ -64,17 +64,16 @@ namespace Shrooms.Premium.Domain.Services.Events
             _markdownConverter = markdownConverter;
         }
 
-        public void Delete(Guid id, UserAndOrganizationDTO userOrg)
+        public async Task DeleteAsync(Guid id, UserAndOrganizationDTO userOrg)
         {
-            var @event = _eventsDbSet
+            var @event = await _eventsDbSet
                 .Include(e => e.EventOptions)
                 .Include(e => e.EventParticipants)
-                .SingleOrDefault(e =>
-                    e.Id == id &&
-                    e.OrganizationId == userOrg.OrganizationId);
+                .SingleOrDefaultAsync(e => e.Id == id && e.OrganizationId == userOrg.OrganizationId);
 
             _eventValidationService.CheckIfEventExists(@event);
-            var isAdmin = _permissionService.UserHasPermission(userOrg, AdministrationPermissions.Event);
+            var isAdmin = await _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Event);
+            // ReSharper disable once PossibleNullReferenceException
             _eventValidationService.CheckIfUserHasPermission(userOrg.UserId, @event.ResponsibleUserId, isAdmin);
             _eventValidationService.CheckIfEventEndDateIsExpired(@event.EndDate);
 
@@ -82,14 +81,13 @@ namespace Shrooms.Premium.Domain.Services.Events
             @event.Modified = timestamp;
             @event.ModifiedBy = userOrg.UserId;
 
-            _eventParticipationService.DeleteByEvent(id, userOrg.UserId);
-            _eventUtilitiesService.DeleteByEvent(id, userOrg.UserId);
+            await _eventParticipationService.DeleteByEventAsync(id, userOrg.UserId);
+            await _eventUtilitiesService.DeleteByEventAsync(id, userOrg.UserId);
 
             _eventsDbSet.Remove(@event);
 
-            _uow.SaveChanges(false);
-
-            _wallService.DeleteWall(@event.WallId, userOrg, WallType.Events);
+            await _uow.SaveChangesAsync(false);
+            await _wallService.DeleteWallAsync(@event.WallId, userOrg, WallType.Events);
         }
 
         public EventEditDTO GetEventForEditing(Guid id, UserAndOrganizationDTO userOrg)
@@ -104,21 +102,22 @@ namespace Shrooms.Premium.Domain.Services.Events
             return @event;
         }
 
-        public EventDetailsDTO GetEventDetails(Guid id, UserAndOrganizationDTO userOrg)
+        public async Task<EventDetailsDTO> GetEventDetailsAsync(Guid id, UserAndOrganizationDTO userOrg)
         {
-            var @event = _eventsDbSet
+            var @event = await _eventsDbSet
                 .Include(e => e.ResponsibleUser)
                 .Include(e => e.EventParticipants.Select(v => v.EventOptions))
                 .Where(e => e.Id == id && e.OrganizationId == userOrg.OrganizationId)
                 .Select(MapToEventDetailsDto(id))
-                .SingleOrDefault();
+                .SingleOrDefaultAsync();
 
             _eventValidationService.CheckIfEventExists(@event);
 
-            @event.Offices.OfficeNames = _officeDbSet
+            // ReSharper disable once PossibleNullReferenceException
+            @event.Offices.OfficeNames = await _officeDbSet
                 .Where(p => @event.Offices.Value.Contains(SqlFunctions.StringConvert((double)p.Id).Trim()))
                 .Select(p => p.Name)
-                .ToList();
+                .ToListAsync();
 
             _eventValidationService.CheckIfEventExists(@event);
             @event.IsFull = @event.Participants.Count(p => p.AttendStatus == (int)AttendingStatus.Attending) >= @event.MaxParticipants;
@@ -131,7 +130,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             @event.ParticipatingStatus = participating?.AttendStatus ?? (int)AttendingStatus.Idle;
 
             // If user has permissions - show all participants, otherwise show only current user and his own event options
-            if (_permissionService.UserHasPermission(userOrg, BasicPermissions.EventUsers))
+            if (await _permissionService.UserHasPermissionAsync(userOrg, BasicPermissions.EventUsers))
             {
                 return @event;
             }
@@ -147,12 +146,12 @@ namespace Shrooms.Premium.Domain.Services.Events
             return @event;
         }
 
-        public async Task<CreateEventDto> CreateEvent(CreateEventDto newEventDto)
+        public async Task<CreateEventDto> CreateEventAsync(CreateEventDto newEventDto)
         {
             newEventDto.MaxOptions = FindOutMaxChoices(newEventDto.NewOptions.Count(), newEventDto.MaxOptions);
             newEventDto.RegistrationDeadlineDate = SetRegistrationDeadline(newEventDto);
 
-            var hasPermissionToPin = _permissionService.UserHasPermission(newEventDto, AdministrationPermissions.Event);
+            var hasPermissionToPin = await _permissionService.UserHasPermissionAsync(newEventDto, AdministrationPermissions.Event);
             _eventValidationService.CheckIfUserHasPermissionToPin(newEventDto.IsPinned, currentPinStatus: false, hasPermissionToPin);
 
             _eventValidationService.CheckIfEventStartDateIsExpired(newEventDto.StartDate);
@@ -175,18 +174,18 @@ namespace Shrooms.Premium.Domain.Services.Events
             return newEventDto;
         }
 
-        public void UpdateEvent(EditEventDTO eventDto)
+        public async Task UpdateEventAsync(EditEventDTO eventDto)
         {
-            var eventToUpdate = _eventsDbSet
+            var eventToUpdate = await _eventsDbSet
                 .Include(e => e.EventOptions)
                 .Include(e => e.EventParticipants)
-                .FirstOrDefault(e => e.Id == eventDto.Id && e.OrganizationId == eventDto.OrganizationId);
+                .FirstOrDefaultAsync(e => e.Id == eventDto.Id && e.OrganizationId == eventDto.OrganizationId);
 
             var totalOptionsProvided = eventDto.NewOptions.Count() + eventDto.EditedOptions.Count();
             eventDto.MaxOptions = FindOutMaxChoices(totalOptionsProvided, eventDto.MaxOptions);
             eventDto.RegistrationDeadlineDate = SetRegistrationDeadline(eventDto);
 
-            var hasPermission = _permissionService.UserHasPermission(eventDto, AdministrationPermissions.Event);
+            var hasPermission = await _permissionService.UserHasPermissionAsync(eventDto, AdministrationPermissions.Event);
             _eventValidationService.CheckIfEventExists(eventToUpdate);
 
             if (eventToUpdate == null)
@@ -203,14 +202,14 @@ namespace Shrooms.Premium.Domain.Services.Events
 
             if (eventDto.ResetParticipantList)
             {
-                _eventParticipationService.ResetAttendees(eventDto.Id, eventDto);
+                await _eventParticipationService.ResetAttendeesAsync(eventDto.Id, eventDto);
             }
 
-            UpdateWall(eventToUpdate, eventDto);
+            await UpdateWallAsync(eventToUpdate, eventDto);
             UpdateEventInfo(eventDto, eventToUpdate);
             UpdateEventOptions(eventDto, eventToUpdate);
 
-            _uow.SaveChanges(false);
+            await _uow.SaveChangesAsync(false);
 
             eventToUpdate.Description = _markdownConverter.ConvertToHtml(eventToUpdate.Description);
         }
@@ -222,9 +221,9 @@ namespace Shrooms.Premium.Domain.Services.Events
             _uow.SaveChanges();
         }
 
-        public void CheckIfEventExists(string eventId, int organizationId)
+        public async Task CheckIfEventExistsAsync(string eventId, int organizationId)
         {
-            var @event = _eventsDbSet.FirstOrDefault(e => e.Id.ToString() == eventId && e.OrganizationId == organizationId);
+            var @event = await _eventsDbSet.FirstOrDefaultAsync(e => e.Id.ToString() == eventId && e.OrganizationId == organizationId);
             _eventValidationService.CheckIfEventExists(@event);
         }
 
@@ -270,7 +269,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             };
         }
 
-        private void UpdateWall(Event currentEvent, EditEventDTO updatedEvent)
+        private async Task UpdateWallAsync(Event currentEvent, EditEventDTO updatedEvent)
         {
             var updateWallDto = new UpdateWallDto
             {
@@ -281,7 +280,8 @@ namespace Shrooms.Premium.Domain.Services.Events
                 OrganizationId = updatedEvent.OrganizationId,
                 UserId = updatedEvent.UserId
             };
-            _wallService.UpdateWall(updateWallDto);
+
+            await _wallService.UpdateWallAsync(updateWallDto);
 
             var responsibleUserChanged = currentEvent.ResponsibleUserId != updatedEvent.ResponsibleUserId;
             var currentHostIsParticipating = currentEvent.EventParticipants.Any(x => x.ApplicationUserId == currentEvent.ResponsibleUserId);
@@ -292,17 +292,17 @@ namespace Shrooms.Premium.Domain.Services.Events
                 return;
             }
 
-            _wallService.RemoveModerator(currentEvent.WallId, currentEvent.ResponsibleUserId, updatedEvent);
-            _wallService.AddModerator(currentEvent.WallId, updatedEvent.ResponsibleUserId, updatedEvent);
+            await _wallService.RemoveModeratorAsync(currentEvent.WallId, currentEvent.ResponsibleUserId, updatedEvent);
+            await _wallService.AddModeratorAsync(currentEvent.WallId, updatedEvent.ResponsibleUserId, updatedEvent);
 
             if (!newHostIsParticipating)
             {
-                _wallService.JoinLeaveWall(currentEvent.WallId, updatedEvent.ResponsibleUserId, updatedEvent.ResponsibleUserId, updatedEvent.OrganizationId, true);
+                await _wallService.JoinOrLeaveWallAsync(currentEvent.WallId, updatedEvent.ResponsibleUserId, updatedEvent.ResponsibleUserId, updatedEvent.OrganizationId, true);
             }
 
             if (!currentHostIsParticipating)
             {
-                _wallService.JoinLeaveWall(currentEvent.WallId, currentEvent.ResponsibleUserId, currentEvent.ResponsibleUserId, updatedEvent.OrganizationId, true);
+                await _wallService.JoinOrLeaveWallAsync(currentEvent.WallId, currentEvent.ResponsibleUserId, currentEvent.ResponsibleUserId, updatedEvent.OrganizationId, true);
             }
         }
 
@@ -312,6 +312,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             var eventTypeExists = _eventTypesDbSet.Any(e => e.Id == eventDto.TypeId);
 
             _eventValidationService.CheckIfEndDateIsGreaterThanStartDate(eventDto.StartDate, eventDto.EndDate);
+            // ReSharper disable once PossibleInvalidOperationException
             _eventValidationService.CheckIfRegistrationDeadlineExceedsStartDate(eventDto.RegistrationDeadlineDate.Value, eventDto.StartDate);
             _eventValidationService.CheckIfResponsibleUserNotExists(userExists);
             _eventValidationService.CheckIfOptionsAreDifferent(eventDto.NewOptions);
@@ -345,6 +346,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                     Modified = DateTime.UtcNow,
                     ModifiedBy = editedEvent.UserId
                 };
+
                 _eventOptionsDbSet.Add(option);
             }
         }
@@ -401,7 +403,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                 OrganizationId = newEventDto.OrganizationId
             };
 
-            var wallId = await _wallService.CreateNewWall(newWall);
+            var wallId = await _wallService.CreateNewWallAsync(newWall);
             newEvent.WallId = wallId;
             UpdateEventInfo(newEventDto, newEvent);
 
@@ -424,7 +426,10 @@ namespace Shrooms.Premium.Domain.Services.Events
             newEvent.ResponsibleUserId = newEventDto.ResponsibleUserId;
             newEvent.StartDate = newEventDto.StartDate;
             newEvent.Name = newEventDto.Name;
+
+            // ReSharper disable once PossibleInvalidOperationException
             newEvent.RegistrationDeadline = newEventDto.RegistrationDeadlineDate.Value;
+
             newEvent.IsPinned = newEventDto.IsPinned;
             newEvent.AllowMaybeGoing = newEventDto.AllowMaybeGoing;
             newEvent.AllowNotGoing = newEventDto.AllowNotGoing;

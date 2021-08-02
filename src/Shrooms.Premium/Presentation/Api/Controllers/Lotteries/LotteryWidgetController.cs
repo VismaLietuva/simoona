@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
@@ -24,9 +25,9 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
         [HttpGet]
         [PermissionAwareCacheOutputFilter(BasicPermissions.Lottery, ServerTimeSpan = WebApiConstants.OneHour)]
-        public IEnumerable<LotteryWidgetViewModel> Get()
+        public async Task<IEnumerable<LotteryWidgetViewModel>> Get()
         {
-            var lotteriesDTO = _lotteryService.GetRunningLotteries(GetUserAndOrganization());
+            var lotteriesDTO = await _lotteryService.GetRunningLotteriesAsync(GetUserAndOrganization());
 
             return _mapper.Map<IEnumerable<LotteryDetailsDTO>, IEnumerable<LotteryWidgetViewModel>>(lotteriesDTO);
         }
