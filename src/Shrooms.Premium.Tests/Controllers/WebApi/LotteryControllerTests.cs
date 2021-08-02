@@ -108,7 +108,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
         {
             // Arrange
             var userOrg = GetUserAndOrganization();
-            _lotteryService.GetLotteryDetails(3000, userOrg).Returns(a => null);
+            _lotteryService.GetLotteryDetails(3000, userOrg).Returns(_ => null);
 
             // Act
             var response = _lotteryController.GetLottery(3000);
@@ -387,7 +387,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 .Returns(lotteryDto);
 
             _lotteryService.When(x => x.EditDraftedLottery(lotteryDto))
-                .Do(x => throw new LotteryException("Exception"));
+                .Do(_ => throw new LotteryException("Exception"));
 
             // Act
             var response = _lotteryController.UpdateDrafted(lotteryViewModel);
@@ -439,7 +439,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             _mapper.Map<EditStartedLotteryViewModel, EditStartedLotteryDTO>(lotteryViewModel)
                 .Returns(lotteryDto);
             _lotteryService.When(x => x.EditStartedLottery(lotteryDto))
-                .Do(x => throw new LotteryException("Exception"));
+                .Do(_ => throw new LotteryException("Exception"));
 
             // Act
             var response = _lotteryController.UpdateStarted(lotteryViewModel);
@@ -475,7 +475,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
         public void LotteryStats_Should_Return_Unprocessable_Entity_Error()
         {
             // Arrange
-            _lotteryService.GetLotteryStats(13, GetUserAndOrganization()).Returns(x => null);
+            _lotteryService.GetLotteryStats(13, GetUserAndOrganization()).Returns(_ => null);
 
             // Act
             var response = _lotteryController.LotteryStats(13);

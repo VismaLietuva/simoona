@@ -400,7 +400,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             _eventsDbSet.SetDbSetData(new List<Event> { new Event { Id = Guid.NewGuid(), OrganizationId = 1 } }.AsQueryable());
             _eventValidationServiceMock
                 .When(x => x.CheckIfEventExists((object)null))
-                .Do(x => throw new EventException(PremiumErrorCodes.EventDoesNotExistCode));
+                .Do(_ => throw new EventException(PremiumErrorCodes.EventDoesNotExistCode));
 
             Assert.Throws<EventException>(() => _eventParticipationService.UpdateSelectedOptions(dto), PremiumErrorCodes.EventDoesNotExistCode);
         }
@@ -412,7 +412,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             var dto = new EventChangeOptionsDTO { EventId = guid, OrganizationId = 2, ChosenOptions = new List<int> { 1 } };
             _eventValidationServiceMock
                 .When(x => x.CheckIfRegistrationDeadlineIsExpired(DateTime.Parse("2016-04-05")))
-                .Do(x => throw new EventException(PremiumErrorCodes.EventRegistrationDeadlineIsExpired));
+                .Do(_ => throw new EventException(PremiumErrorCodes.EventRegistrationDeadlineIsExpired));
 
             Assert.Throws<EventException>(() => _eventParticipationService.UpdateSelectedOptions(dto), PremiumErrorCodes.EventRegistrationDeadlineIsExpired);
         }
@@ -423,11 +423,10 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             var guid = MockEventWithOptions();
             var chosenOptionIds = new List<int> { -9999 };
             var dto = new EventChangeOptionsDTO { EventId = guid, OrganizationId = 2, ChosenOptions = chosenOptionIds };
+
             _eventValidationServiceMock
-                .When(x =>
-                    x.CheckIfProvidedOptionsAreValid(chosenOptionIds,
-                        Arg.Is<ICollection<EventOption>>(a => a.Count == 0)))
-                .Do(x => throw new EventException(PremiumErrorCodes.EventRegistrationDeadlineIsExpired));
+                .When(x => x.CheckIfProvidedOptionsAreValid(chosenOptionIds, Arg.Is<ICollection<EventOption>>(a => a.Count == 0)))
+                .Do(_ => throw new EventException(PremiumErrorCodes.EventRegistrationDeadlineIsExpired));
 
             Assert.Throws<EventException>(() => _eventParticipationService.UpdateSelectedOptions(dto), PremiumErrorCodes.EventNoSuchOptionsCode);
         }
@@ -438,9 +437,10 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             var guid = MockEventWithOptions();
             var chosenOptionIds = new List<int>();
             var dto = new EventChangeOptionsDTO { EventId = guid, OrganizationId = 2, ChosenOptions = chosenOptionIds };
+
             _eventValidationServiceMock
                 .When(x => x.CheckIfJoiningNotEnoughChoicesProvided(1, 0))
-                .Do(x => throw new EventException(PremiumErrorCodes.EventNotEnoughChoicesProvidedCode));
+                .Do(_ => throw new EventException(PremiumErrorCodes.EventNotEnoughChoicesProvidedCode));
 
             Assert.Throws<EventException>(() => _eventParticipationService.UpdateSelectedOptions(dto), PremiumErrorCodes.EventNotEnoughChoicesProvidedCode);
         }
@@ -451,9 +451,10 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             var guid = MockEventWithOptions();
             var chosenOptionIds = new List<int> { 1, 2, 3 };
             var dto = new EventChangeOptionsDTO { EventId = guid, OrganizationId = 2, ChosenOptions = chosenOptionIds };
+
             _eventValidationServiceMock
                 .When(x => x.CheckIfJoiningTooManyChoicesProvided(1, 3))
-                .Do(x => throw new EventException(PremiumErrorCodes.EventTooManyChoicesProvidedCode));
+                .Do(_ => throw new EventException(PremiumErrorCodes.EventTooManyChoicesProvidedCode));
 
             Assert.Throws<EventException>(() => _eventParticipationService.UpdateSelectedOptions(dto), PremiumErrorCodes.EventTooManyChoicesProvidedCode);
         }
@@ -464,11 +465,11 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             var guid = MockEventWithOptions();
             var chosenOptionIds = new List<int> { 1, 4 };
             var dto = new EventChangeOptionsDTO { EventId = guid, OrganizationId = 2, ChosenOptions = chosenOptionIds };
+
             _eventValidationServiceMock
-                .When(x => x.CheckIfSingleChoiceSelectedWithRule(
-                        Arg.Is<ICollection<EventOption>>(a =>
-                            a.Any(e => e.Rule == OptionRules.IgnoreSingleJoin) && a.Count > 1), OptionRules.IgnoreSingleJoin))
-                .Do(x => throw new EventException(PremiumErrorCodes.EventChoiceCanBeSingleOnly));
+                .When(x => x.CheckIfSingleChoiceSelectedWithRule(Arg.Is<ICollection<EventOption>>(a =>
+                    a.Any(e => e.Rule == OptionRules.IgnoreSingleJoin) && a.Count > 1), OptionRules.IgnoreSingleJoin))
+                .Do(_ => throw new EventException(PremiumErrorCodes.EventChoiceCanBeSingleOnly));
 
             Assert.Throws<EventException>(() => _eventParticipationService.UpdateSelectedOptions(dto), PremiumErrorCodes.EventChoiceCanBeSingleOnly);
         }
@@ -479,10 +480,11 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             var guid = MockEventWithOptions();
             var chosenOptionIds = new List<int> { 1 };
             var dto = new EventChangeOptionsDTO { EventId = guid, OrganizationId = 2, ChosenOptions = chosenOptionIds, UserId = "1foo2bar" };
+
             _eventValidationServiceMock
                 .When(x => x.CheckIfUserParticipatesInEvent("1foo2bar",
                     Arg.Is<List<string>>(a => a.All(p => p == "user" || p == "user2"))))
-                .Do(x => throw new EventException(PremiumErrorCodes.EventUserNotParticipating));
+                .Do(_ => throw new EventException(PremiumErrorCodes.EventUserNotParticipating));
 
             Assert.Throws<EventException>(() => _eventParticipationService.UpdateSelectedOptions(dto), PremiumErrorCodes.EventUserNotParticipating);
         }
@@ -731,7 +733,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
 
         private Guid MockLeaveEvent()
         {
-            _eventValidationServiceMock.When(x => x.CheckIfParticipantExists(null)).Do(x => throw new EventException("Exception"));
+            _eventValidationServiceMock.When(x => x.CheckIfParticipantExists(null)).Do(_ => throw new EventException("Exception"));
             var eventId = Guid.NewGuid();
             var @event = new Event
             {
@@ -997,19 +999,20 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         {
             var types = new List<ApplicationUser>
             {
-               new ApplicationUser
-               {
-                   Id = "1",
-                   OrganizationId = 2
-               },
-               new ApplicationUser
-               {
-                   Id = "testUserId",
-                   OrganizationId = 2
-               }
+                new ApplicationUser
+                {
+                    Id = "1",
+                    OrganizationId = 2
+                },
+                new ApplicationUser
+                {
+                    Id = "testUserId",
+                    OrganizationId = 2
+                }
             };
             _usersDbSet.SetDbSetData(types.AsQueryable());
         }
+
         #endregion
     }
 }

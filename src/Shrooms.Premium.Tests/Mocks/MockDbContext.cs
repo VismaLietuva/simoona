@@ -492,7 +492,7 @@ namespace Shrooms.Premium.Tests.Mocks
             ((IQueryable<T>)mockSet).Provider.Returns(list.Provider);
             ((IQueryable<T>)mockSet).Expression.Returns(list.Expression);
             ((IQueryable<T>)mockSet).ElementType.Returns(list.ElementType);
-            ((IQueryable<T>)mockSet).GetEnumerator().Returns(e => list.GetEnumerator());
+            ((IQueryable<T>)mockSet).GetEnumerator().Returns(_ => list.GetEnumerator());
             mockSet.Include(Arg.Any<string>()).Returns(mockSet);
 
             return mockSet;

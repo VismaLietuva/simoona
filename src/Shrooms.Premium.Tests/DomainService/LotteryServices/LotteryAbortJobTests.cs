@@ -103,7 +103,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             _lotteriesDb.Find().ReturnsForAnyArgs(GetLottery());
             _kudosService
                 .When(x => x.GetKudosTypeId(KudosTypeEnum.Refund))
-                .Do(x => throw new ArgumentNullException());
+                .Do(_ => throw new ArgumentNullException());
 
             _sut.RefundLottery(default, GetUserOrg());
 
@@ -116,7 +116,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             _lotteriesDb.Find().ReturnsForAnyArgs(GetLottery());
             _unitOfWork
                 .When(x => x.SaveChanges(GetUserOrg().UserId))
-                .Do(x => throw new Exception());
+                .Do(_ => throw new Exception());
 
             _sut.RefundLottery(default, GetUserOrg());
 

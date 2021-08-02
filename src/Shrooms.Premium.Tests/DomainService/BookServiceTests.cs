@@ -292,7 +292,7 @@ namespace Shrooms.Premium.Tests.DomainService
 
             _validationService
                 .When(x => x.ThrowIfUserDoesNotExist(null))
-                .Do(x => { throw new BookException("ThrowIfUserDoesNotExist"); });
+                .Do(_ => { throw new BookException("ThrowIfUserDoesNotExist"); });
 
             Assert.Throws<BookException>(() => _bookService.TakeBook(bookTake));
         }

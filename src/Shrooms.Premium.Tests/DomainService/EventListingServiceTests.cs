@@ -136,7 +136,7 @@ namespace Shrooms.Premium.Tests.DomainService
         #region Mocks
         private Guid[] MockEventOptionsWithEvents()
         {
-            var guids = Enumerable.Repeat(0, 2).Select(x => Guid.NewGuid()).ToArray();
+            var guids = Enumerable.Repeat(0, 2).Select(_ => Guid.NewGuid()).ToArray();
 
             var options1 = new List<EventOption>
             {
@@ -219,7 +219,7 @@ namespace Shrooms.Premium.Tests.DomainService
 
         private Guid[] MockEventsListTest()
         {
-            var guids = Enumerable.Repeat(0, 4).Select(x => Guid.NewGuid()).ToArray();
+            var guids = Enumerable.Repeat(0, 4).Select(_ => Guid.NewGuid()).ToArray();
 
             var participant1 = new EventParticipant
             {
