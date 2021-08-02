@@ -522,10 +522,11 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                                 LastName = "Surname1"
                             },
                             AttendStatus = 1
-                        },
-                    },
+                        }
+                    }
                 }
             };
+
             _eventsDbSet.SetDbSetData(@event.AsQueryable());
             return guid;
         }
@@ -581,7 +582,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     LastName = "user5lname",
                     OrganizationId = 2,
                     UserName = "Sam"
-                },
+                }
             };
 
             _eventsDbSet.SetDbSetData(new List<Event> { @event }.AsQueryable());
@@ -651,7 +652,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     LastName = "user5",
                     OrganizationId = 2,
                     UserName = "Sam"
-                },
+                }
             };
 
             _eventsDbSet.SetDbSetData(new List<Event> { @event }.AsQueryable());
@@ -690,7 +691,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 Id = 3,
                 EventId = eventId,
                 Event = @event,
-                Option = "Option3",
+                Option = "Option3"
             };
 
             var participants = new List<EventParticipant>
@@ -701,7 +702,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     Event = @event,
                     EventOptions = new List<EventOption> { option1 },
                     EventId = eventId,
-                    ApplicationUserId = "user1",
+                    ApplicationUserId = "user1"
                 },
                 new EventParticipant
                 {
@@ -754,7 +755,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     EventId = eventId,
                     Event = @event,
                     Option = "Option2"
-                },
+                }
             };
 
             var participants = new List<EventParticipant>
@@ -766,7 +767,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     EventOptions = eventOptions,
                     EventId = eventId,
                     ApplicationUserId = "user",
-                    AttendStatus = 1,
+                    AttendStatus = 1
                 }
             };
 

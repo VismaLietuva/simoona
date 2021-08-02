@@ -36,7 +36,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         {
             var userAndOrg = new UserAndOrganizationDTO
             {
-                OrganizationId = 2,
+                OrganizationId = 2
             };
 
             var guid = MockParticipantsWithOptionsForExport(userAndOrg);
@@ -61,7 +61,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         {
             var userAndOrg = new UserAndOrganizationDTO
             {
-                OrganizationId = 2,
+                OrganizationId = 2
             };
             var guid = MockParticipantsWithoutOptionsForExport(userAndOrg);
 
@@ -82,7 +82,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         {
             var userAndOrg = new UserAndOrganizationDTO
             {
-                OrganizationId = 2,
+                OrganizationId = 2
             };
             var guid = MockParticipantsWithOptionsForExport(userAndOrg);
 

@@ -188,7 +188,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 OrganizationId = 1,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<NewEventOptionDTO>()
+                NewOptions = new List<NewEventOptionDTO>
                 {
                     new NewEventOptionDTO
                     {
@@ -223,7 +223,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 OrganizationId = 1,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<NewEventOptionDTO>()
+                NewOptions = new List<NewEventOptionDTO>
                 {
                     new NewEventOptionDTO
                     {
@@ -257,7 +257,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 OrganizationId = 1,
                 ResponsibleUserId = "2",
                 Location = "place",
-                NewOptions = new List<NewEventOptionDTO>()
+                NewOptions = new List<NewEventOptionDTO>
                 {
                     new NewEventOptionDTO
                     {
@@ -291,7 +291,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 OrganizationId = 1,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<NewEventOptionDTO>()
+                NewOptions = new List<NewEventOptionDTO>
                 {
                     new NewEventOptionDTO
                     {
@@ -328,7 +328,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 OrganizationId = 1,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<NewEventOptionDTO>()
+                NewOptions = new List<NewEventOptionDTO>
                 {
                     new NewEventOptionDTO
                     {
@@ -364,7 +364,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 OrganizationId = 1,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<NewEventOptionDTO>()
+                NewOptions = new List<NewEventOptionDTO>
                 {
                     new NewEventOptionDTO
                     {
@@ -398,7 +398,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 OrganizationId = 1,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<NewEventOptionDTO>()
+                NewOptions = new List<NewEventOptionDTO>
                 {
                     new NewEventOptionDTO
                     {
@@ -432,7 +432,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 OrganizationId = 1,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<NewEventOptionDTO>()
+                NewOptions = new List<NewEventOptionDTO>
                 {
                     new NewEventOptionDTO
                     {
@@ -555,7 +555,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 OrganizationId = 2,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<NewEventOptionDTO>()
+                NewOptions = new List<NewEventOptionDTO>
                 {
                     new NewEventOptionDTO
                     {
@@ -853,19 +853,19 @@ namespace Shrooms.Premium.Tests.DomainService
                 {
                     Id = 1,
                     Name = "type1",
-                    OrganizationId = 2,
+                    OrganizationId = 2
                 },
                 new EventType
                 {
                     Id = 2,
                     Name = "type2",
-                    OrganizationId = 2,
+                    OrganizationId = 2
                 },
                 new EventType
                 {
                     Id = 3,
                     Name = "type3",
-                    OrganizationId = 2,
+                    OrganizationId = 2
                 }
             };
 

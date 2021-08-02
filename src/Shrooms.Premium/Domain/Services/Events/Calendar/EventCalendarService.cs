@@ -102,7 +102,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Calendar
                 Organizer = new Organizer { CommonName = BusinessLayerConstants.DefaultEmailLinkName, Value = new Uri($"mailto:{BusinessLayerConstants.FromEmailAddress}") },
                 Start = new CalDateTime(@event.StartDate, "UTC"),
                 End = new CalDateTime(@event.EndDate, "UTC"),
-                Status = EventStatus.Confirmed,
+                Status = EventStatus.Confirmed
             };
 
             return calEvent;

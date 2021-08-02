@@ -135,7 +135,7 @@ namespace Shrooms.Premium.Domain.Services.KudosShop
 
         private Expression<Func<KudosShopItem, KudosShopItemDTO>> MapKudosShopItemToKudosShopItemDTO()
         {
-            return kudosShopItem => new KudosShopItemDTO()
+            return kudosShopItem => new KudosShopItemDTO
             {
                 Id = kudosShopItem.Id,
                 Name = kudosShopItem.Name,

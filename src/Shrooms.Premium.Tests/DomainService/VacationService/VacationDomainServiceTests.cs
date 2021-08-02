@@ -71,7 +71,7 @@ namespace Shrooms.Premium.Tests.DomainService.VacationService
             {
                 new ApplicationUser { Id = "1", FirstName = "John", LastName = "Armstrong" },
                 new ApplicationUser { Id = "2", FirstName = "John", LastName = "Lennon" },
-                new ApplicationUser { Id = "3", FirstName = "FirstName", LastName = "LastName" },
+                new ApplicationUser { Id = "3", FirstName = "FirstName", LastName = "LastName" }
             };
 
             var user = _vacationDomainService.FindUser(users, fullName);

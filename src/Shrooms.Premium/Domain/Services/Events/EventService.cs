@@ -343,7 +343,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                     Created = DateTime.UtcNow,
                     CreatedBy = editedEvent.UserId,
                     Modified = DateTime.UtcNow,
-                    ModifiedBy = editedEvent.UserId,
+                    ModifiedBy = editedEvent.UserId
                 };
                 _eventOptionsDbSet.Add(option);
             }
@@ -357,7 +357,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                 {
                     if (option != null)
                     {
-                        var newOption = new EventOption()
+                        var newOption = new EventOption
                         {
                             Created = DateTime.UtcNow,
                             CreatedBy = newEventDto.UserId,
@@ -384,7 +384,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                 IsPinned = newEventDto.IsPinned
             };
 
-            var newWall = new CreateWallDto()
+            var newWall = new CreateWallDto
             {
                 Name = newEventDto.Name,
                 Logo = newEventDto.ImageName,

@@ -54,7 +54,7 @@ namespace Shrooms.Premium.Tests.DomainService
         {
             var userAndOrg = new UserAndOrganizationDTO
             {
-                OrganizationId = 2,
+                OrganizationId = 2
             };
             var guid = MockParticipantsWithOptionsForExport();
 
@@ -149,7 +149,7 @@ namespace Shrooms.Premium.Tests.DomainService
                         {
                             EventId = default
                         }
-                    },
+                    }
                 },
                 new EventOption
                 {
@@ -174,7 +174,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     Option = "Option3",
                     Event = @event,
                     EventParticipants = new List<EventParticipant>()
-                },
+                }
             };
             _eventDbSet.SetDbSetData(new List<Event> { @event }.AsQueryable());
             _eventOptionsDbSet.SetDbSetData(options.AsQueryable());
@@ -226,7 +226,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 {
                     Id = 2,
                     Name = "type2",
-                    OrganizationId = 2,
+                    OrganizationId = 2
                 },
                 new EventType
                 {

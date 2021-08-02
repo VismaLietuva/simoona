@@ -95,7 +95,7 @@ namespace Shrooms.Premium.Tests.DomainService
         [Test]
         public void Should_Return_If_Validation_For_Not_Existing_Book_Fails()
         {
-            var bookMobileGetDTO = new BookMobileGetDTO()
+            var bookMobileGetDTO = new BookMobileGetDTO
             {
                 Code = "0",
                 OfficeId = 1,
@@ -107,7 +107,7 @@ namespace Shrooms.Premium.Tests.DomainService
         [Test]
         public void Should_Return_If_Get_Book_Result_Has_Invalid_Data()
         {
-            var bookMobileGetDTO = new BookMobileGetDTO()
+            var bookMobileGetDTO = new BookMobileGetDTO
             {
                 Code = "1",
                 OfficeId = 1,
@@ -134,10 +134,10 @@ namespace Shrooms.Premium.Tests.DomainService
         [Test]
         public void Should_Return_If_Post_New_Book_Does_Not_Add_New_Book()
         {
-            var bookMobilePostDTO = new BookMobilePostDTO()
+            var bookMobilePostDTO = new BookMobilePostDTO
             {
                 Code = "0",
-                OrganizationId = 1,
+                OrganizationId = 1
             };
 
             _bookService.PostBook(bookMobilePostDTO);
@@ -148,11 +148,11 @@ namespace Shrooms.Premium.Tests.DomainService
         [Test]
         public void Should_Return_If_Post_New_Book_Does_Not_Add_Book_To_Another_Office()
         {
-            var bookMobilePostDTO = new BookMobilePostDTO()
+            var bookMobilePostDTO = new BookMobilePostDTO
             {
                 Code = "1",
                 OrganizationId = 1,
-                OfficeId = 2,
+                OfficeId = 2
             };
 
             _bookService.PostBook(bookMobilePostDTO);
@@ -162,11 +162,11 @@ namespace Shrooms.Premium.Tests.DomainService
         [Test]
         public void Should_Return_If_Post_New_Book_Create_Duplicate_In_Book_Office()
         {
-            var bookMobilePostDTO = new BookMobilePostDTO()
+            var bookMobilePostDTO = new BookMobilePostDTO
             {
                 Code = "1",
                 OrganizationId = 1,
-                OfficeId = 1,
+                OfficeId = 1
             };
 
             Assert.Throws<BookException>(() => _bookService.PostBook(bookMobilePostDTO));
@@ -175,11 +175,11 @@ namespace Shrooms.Premium.Tests.DomainService
         [Test]
         public void Should_Return_If_Adds_Book_To_Not_Existing_Office()
         {
-            var bookMobilePostDTO = new BookMobilePostDTO()
+            var bookMobilePostDTO = new BookMobilePostDTO
             {
                 Code = "1",
                 OrganizationId = 1,
-                OfficeId = 5,
+                OfficeId = 5
             };
 
             Assert.Throws<BookException>(() => _bookService.PostBook(bookMobilePostDTO));
@@ -200,7 +200,7 @@ namespace Shrooms.Premium.Tests.DomainService
         [Test]
         public void Should_Return_When_Gets_Incorrect_List_Of_Already_Borrowed_Books()
         {
-            var bookMobileReturnDTO = new BookMobileReturnDTO()
+            var bookMobileReturnDTO = new BookMobileReturnDTO
             {
                 Code = "99",
                 OrganizationId = 1,
@@ -215,9 +215,9 @@ namespace Shrooms.Premium.Tests.DomainService
         #region dataMock
         private IQueryable<ApplicationUser> MockUsers()
         {
-            return new List<ApplicationUser>()
+            return new List<ApplicationUser>
             {
-            new ApplicationUser()
+            new ApplicationUser
             {
                 FirstName = "FirstName",
                 LastName = "LastName",
@@ -225,7 +225,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 Email = "firstname.lastname@visma.com",
                 OrganizationId = 1
             },
-            new ApplicationUser()
+            new ApplicationUser
             {
                 FirstName = "Name",
                 LastName = "Surname",
@@ -233,7 +233,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 Email = "name.surname@visma.com",
                 OrganizationId = 1
             },
-            new ApplicationUser()
+            new ApplicationUser
             {
                 FirstName = "Name2",
                 LastName = "Surname2",
@@ -241,7 +241,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 Email = "name2.surname2@visma.com",
                 OrganizationId = 1
             },
-            new ApplicationUser()
+            new ApplicationUser
             {
                 FirstName = "Test",
                 LastName = "Again",
@@ -249,34 +249,34 @@ namespace Shrooms.Premium.Tests.DomainService
                 Email = "email",
                 OrganizationId = 1
             },
-            new ApplicationUser()
+            new ApplicationUser
             {
                 FirstName = "Eglė",
                 LastName = "Vąlkyščkytė",
                 UserName = "egle.valkysckyte@visma.com",
                 Email = "egle.valkysckyte@visma.com",
                 OrganizationId = 1
-            },
+            }
             }.AsQueryable();
         }
 
         private IQueryable<Office> MockOffices()
         {
-            return new List<Office>()
+            return new List<Office>
             {
-                new Office()
+                new Office
                 {
                     Name = "Vilnius",
                     Id = 1,
                     OrganizationId = 1
                 },
-                new Office()
+                new Office
                 {
                     Name = "Kaunas",
                     Id = 2,
                     OrganizationId = 1
                 },
-                new Office()
+                new Office
                 {
                     Name = "SmthElse",
                     Id = 3,
@@ -287,73 +287,73 @@ namespace Shrooms.Premium.Tests.DomainService
 
         private IQueryable<BookOffice> MockBookOffice()
         {
-            return new List<BookOffice>()
+            return new List<BookOffice>
             {
-                new BookOffice()
+                new BookOffice
                 {
-                    Book = new Book()
+                    Book = new Book
                     {
                         Code = "1",
                         Author = "Author1",
                         Url = "Url1",
-                        Title = "Title1",
+                        Title = "Title1"
                     },
                     Id = 1,
                     OfficeId = 1,
                     OrganizationId = 1
                 },
 
-                new BookOffice()
+                new BookOffice
                 {
-                    Book = new Book()
+                    Book = new Book
                     {
                         Code = "2",
                         Author = "Author2",
                         Url = "Url2",
-                        Title = "Title2",
+                        Title = "Title2"
                     },
                     Id = 2,
                     OfficeId = 1,
                     OrganizationId = 1
                 },
 
-                new BookOffice()
+                new BookOffice
                 {
-                    Book = new Book()
+                    Book = new Book
                     {
                         Code = "3",
                         Author = "Author3",
                         Url = "Url3",
-                        Title = "Title3",
+                        Title = "Title3"
                     },
                     Id = 3,
                     OfficeId = 1,
                     OrganizationId = 1
-                },
+                }
             }.AsQueryable();
         }
 
         private IQueryable<Book> MockBook()
         {
-            return new List<Book>()
+            return new List<Book>
             {
-                    new Book()
+                    new Book
                     {
                         Code = "1",
                         Author = "Author1",
                         Url = "Url1",
                         Title = "Title1",
                         OrganizationId = 1,
-                        BookOffices = new List<BookOffice>()
+                        BookOffices = new List<BookOffice>
                         {
-                            new BookOffice()
+                            new BookOffice
                             {
                                 OfficeId = 1
                             }
                         }
                     },
 
-                    new Book()
+                    new Book
                     {
                         Code = "2",
                         Author = "Author2",
@@ -361,131 +361,131 @@ namespace Shrooms.Premium.Tests.DomainService
                         Title = "Title2",
                         OrganizationId = 1
                     },
-                    new Book()
+                    new Book
                     {
                         Code = "3",
                         Author = "Author3",
                         Url = "Url3",
                         Title = "Title3",
                         OrganizationId = 1
-                    },
+                    }
             }.AsQueryable();
         }
 
         private IQueryable<BookLog> MockBookLog()
         {
-            return new List<BookLog>()
+            return new List<BookLog>
             {
-                new BookLog()
+                new BookLog
                 {
                     Id = 1,
                     Returned = DateTime.UtcNow,
                     OrganizationId = 1,
-                    BookOffice = new BookOffice()
+                    BookOffice = new BookOffice
                     {
                         OfficeId = 1,
-                        Book = new Book()
+                        Book = new Book
                         {
                             Code = "99"
                         }
                     },
-                    ApplicationUser = new ApplicationUser()
+                    ApplicationUser = new ApplicationUser
                     {
                         FirstName = "user",
                         LastName = "user"
                     }
                 },
 
-                new BookLog()
+                new BookLog
                 {
                     Id = 2,
                     Returned = DateTime.UtcNow,
                     OrganizationId = 1,
-                    BookOffice = new BookOffice()
+                    BookOffice = new BookOffice
                     {
                         OfficeId = 1,
-                        Book = new Book()
+                        Book = new Book
                         {
                             Code = "99"
                         }
                     },
-                    ApplicationUser = new ApplicationUser()
+                    ApplicationUser = new ApplicationUser
                     {
                         FirstName = "user",
                         LastName = "user"
                     }
                 },
-                new BookLog()
+                new BookLog
                 {
                     Id = 3,
                     Returned = null,
                     OrganizationId = 1,
-                    BookOffice = new BookOffice()
+                    BookOffice = new BookOffice
                     {
                         OfficeId = 1,
-                        Book = new Book()
+                        Book = new Book
                         {
                             Code = "99"
                         }
                     },
-                    ApplicationUser = new ApplicationUser()
+                    ApplicationUser = new ApplicationUser
                     {
                         FirstName = "user",
                         LastName = "user"
                     }
                 },
-                new BookLog()
+                new BookLog
                 {
                     Id = 4,
                     Returned = null,
                     OrganizationId = 1,
-                    BookOffice = new BookOffice()
+                    BookOffice = new BookOffice
                     {
                         OfficeId = 1,
-                        Book = new Book()
+                        Book = new Book
                         {
                             Code = "99"
                         }
                     },
-                    ApplicationUser = new ApplicationUser()
+                    ApplicationUser = new ApplicationUser
                     {
                         FirstName = "user",
                         LastName = "user"
                     }
                 },
-                new BookLog()
+                new BookLog
                 {
                     Id = 5,
                     Returned = null,
                     OrganizationId = 2,
-                    BookOffice = new BookOffice()
+                    BookOffice = new BookOffice
                     {
                         OfficeId = 1,
-                        Book = new Book()
+                        Book = new Book
                         {
                             Code = "99"
                         }
                     },
-                    ApplicationUser = new ApplicationUser()
+                    ApplicationUser = new ApplicationUser
                     {
                         FirstName = "user",
                         LastName = "user"
                     }
                 },
-                new BookLog()
+                new BookLog
                 {
                     Id = 6,
                     Returned = null,
                     OrganizationId = 1,
-                    BookOffice = new BookOffice()
+                    BookOffice = new BookOffice
                     {
                         OfficeId = 2,
-                        Book = new Book()
+                        Book = new Book
                         {
                             Code = "99"
                         }
                     },
-                    ApplicationUser = new ApplicationUser()
+                    ApplicationUser = new ApplicationUser
                     {
                         FirstName = "user",
                         LastName = "user"

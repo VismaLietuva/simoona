@@ -116,10 +116,10 @@ namespace Shrooms.Premium.Domain.Services.Vacations
             var user = await _applicationUserDbSet
                 .FirstAsync(u => u.Id == userOrgDto.UserId);
 
-            var availableDaysModel = new VacationAvailableDaysDTO()
+            var availableDaysModel = new VacationAvailableDaysDTO
             {
                 AvailableDays = Math.Truncate(user.VacationUnusedTime ?? 0),
-                LastTimeUpdated = user.VacationLastTimeUpdated,
+                LastTimeUpdated = user.VacationLastTimeUpdated
             };
 
             return availableDaysModel;

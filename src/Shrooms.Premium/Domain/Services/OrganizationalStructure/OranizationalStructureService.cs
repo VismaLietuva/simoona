@@ -39,7 +39,7 @@ namespace Shrooms.Premium.Domain.Services.OrganizationalStructure
 
         private Expression<Func<ApplicationUser, OrganizationalStructureUserDTO>> MapToOrganizationalStructureUserDTO()
         {
-            return user => new OrganizationalStructureUserDTO()
+            return user => new OrganizationalStructureUserDTO
             {
                 FirstName = user.FirstName,
                 IsManagingDirector = user.IsManagingDirector,
@@ -63,7 +63,7 @@ namespace Shrooms.Premium.Domain.Services.OrganizationalStructure
 
         private OrganizationalStructureDTO MapUsersToOrganizationalStructureDTO(OrganizationalStructureUserDTO user, IEnumerable<OrganizationalStructureUserDTO> userList)
         {
-            return new OrganizationalStructureDTO()
+            return new OrganizationalStructureDTO
             {
                 FullName = user.FirstName + " " + user.LastName,
                 PictureId = user.PictureId,

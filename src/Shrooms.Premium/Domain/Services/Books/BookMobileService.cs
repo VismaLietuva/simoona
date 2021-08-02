@@ -168,7 +168,7 @@ namespace Shrooms.Premium.Domain.Services.Books
 
         private Expression<Func<Book, RetrievedBookInfoDTO>> MapBookToBookMobileGetForPostDTO()
         {
-            return book => new RetrievedBookInfoDTO()
+            return book => new RetrievedBookInfoDTO
             {
                 Author = book.Author,
                 Url = book.Url,
@@ -185,7 +185,7 @@ namespace Shrooms.Premium.Domain.Services.Books
 
         private RetrievedBookInfoDTO MapGoogleApiBookToDTO(ExternalBookInfo bookInfo)
         {
-            return new RetrievedBookInfoDTO()
+            return new RetrievedBookInfoDTO
             {
                 Author = bookInfo.Author,
                 Title = bookInfo.Title,
@@ -195,7 +195,7 @@ namespace Shrooms.Premium.Domain.Services.Books
 
         private Expression<Func<BookOffice, RetrievedBookInfoDTO>> MapBookToBookMobileGetDTO()
         {
-            return book => new RetrievedBookInfoDTO()
+            return book => new RetrievedBookInfoDTO
             {
                 Author = book.Book.Author,
                 Url = book.Book.Url,
@@ -219,7 +219,7 @@ namespace Shrooms.Premium.Domain.Services.Books
 
         private void AddNewBook(BookMobilePostDTO bookDTO)
         {
-            var newBook = new Book()
+            var newBook = new Book
             {
                 Title = bookDTO.Title,
                 Author = bookDTO.Author,
@@ -229,12 +229,12 @@ namespace Shrooms.Premium.Domain.Services.Books
                 CreatedBy = bookDTO.ApplicationUserId,
                 ModifiedBy = bookDTO.ApplicationUserId,
                 Created = DateTime.UtcNow,
-                Modified = DateTime.UtcNow,
+                Modified = DateTime.UtcNow
             };
 
             _bookDbSet.Add(newBook);
 
-            var newBookOffice = new BookOffice()
+            var newBookOffice = new BookOffice
             {
                 Book = newBook,
                 OfficeId = bookDTO.OfficeId,
@@ -243,7 +243,7 @@ namespace Shrooms.Premium.Domain.Services.Books
                 Modified = DateTime.UtcNow,
                 CreatedBy = bookDTO.ApplicationUserId,
                 ModifiedBy = bookDTO.ApplicationUserId,
-                Quantity = OneBook,
+                Quantity = OneBook
             };
 
             _bookOfficeDbSet.Add(newBookOffice);
@@ -251,7 +251,7 @@ namespace Shrooms.Premium.Domain.Services.Books
 
         private void AddBookToOtherOffice(BookMobilePostDTO bookDTO, Book book)
         {
-            var newBookOffice = new BookOffice()
+            var newBookOffice = new BookOffice
             {
                 BookId = book.Id,
                 OfficeId = bookDTO.OfficeId,
@@ -268,7 +268,7 @@ namespace Shrooms.Premium.Domain.Services.Books
 
         private Expression<Func<BookLog, BookMobileLogDTO>> MapBookToBookMobileLogDTO()
         {
-            return log => new BookMobileLogDTO()
+            return log => new BookMobileLogDTO
             {
                 LogId = log.Id,
                 UserFullName = log.ApplicationUser.FirstName + " " + log.ApplicationUser.LastName

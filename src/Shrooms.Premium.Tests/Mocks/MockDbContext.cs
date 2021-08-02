@@ -139,7 +139,7 @@ namespace Shrooms.Premium.Tests.Mocks
                 Name = "5-Room",
                 FloorId = 2,
                 OrganizationId = TestConstants.DefaultOrganizationId,
-                Floor = new Floor()
+                Floor = new Floor
                 {
                     Id = 2,
                     Name = "B-Floor",
@@ -378,7 +378,7 @@ namespace Shrooms.Premium.Tests.Mocks
                 LastName = "Aistietis",
                 Skills = new[] { skills[0] },
                 RoomId = 1,
-                OrganizationId = TestConstants.DefaultOrganizationId,
+                OrganizationId = TestConstants.DefaultOrganizationId
             };
 
             var applicationUser2 = new ApplicationUser
@@ -415,13 +415,13 @@ namespace Shrooms.Premium.Tests.Mocks
                 Skills = new[] { skills[2] },
                 RoomId = 1,
                 OrganizationId = TestConstants.DefaultOrganizationId,
-                Room = new Room()
+                Room = new Room
                 {
                     Id = 4,
                     FloorId = 1,
                     Name = "D-Room",
                     OrganizationId = TestConstants.DefaultOrganizationId,
-                    Floor = new Floor()
+                    Floor = new Floor
                     {
                         Id = 1,
                         Name = "A-Floor",

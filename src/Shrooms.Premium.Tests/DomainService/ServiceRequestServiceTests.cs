@@ -63,13 +63,13 @@ namespace Shrooms.Premium.Tests.DomainService
         {
             MockServiceRequests();
 
-            var comment = new ServiceRequestCommentDTO()
+            var comment = new ServiceRequestCommentDTO
             {
                 Content = "test content",
                 ServiceRequestId = 1
             };
 
-            var userAndOrg = new UserAndOrganizationDTO()
+            var userAndOrg = new UserAndOrganizationDTO
             {
                 OrganizationId = 1,
                 UserId = "UserId"
@@ -87,13 +87,13 @@ namespace Shrooms.Premium.Tests.DomainService
         {
             MockServiceRequests();
 
-            var comment = new ServiceRequestCommentDTO()
+            var comment = new ServiceRequestCommentDTO
             {
                 Content = "test content",
                 ServiceRequestId = 1
             };
 
-            var userAndOrg = new UserAndOrganizationDTO()
+            var userAndOrg = new UserAndOrganizationDTO
             {
                 OrganizationId = 2,
                 UserId = "UserId"
@@ -109,7 +109,7 @@ namespace Shrooms.Premium.Tests.DomainService
             MockServiceRequestPriorities();
             MockServiceRequestStatuses();
 
-            var serviceRequestDTO = new ServiceRequestDTO()
+            var serviceRequestDTO = new ServiceRequestDTO
             {
                 Description = "testDescription",
                 PriorityId = 1,
@@ -117,7 +117,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 Title = "tetsTitle"
             };
 
-            var userAndOrg = new UserAndOrganizationDTO()
+            var userAndOrg = new UserAndOrganizationDTO
             {
                 OrganizationId = 2,
                 UserId = "UserId"
@@ -137,7 +137,7 @@ namespace Shrooms.Premium.Tests.DomainService
             MockServiceRequestPriorities();
             MockServiceRequestStatuses();
 
-            var serviceRequestDTO = new ServiceRequestDTO()
+            var serviceRequestDTO = new ServiceRequestDTO
             {
                 Description = "testDescription",
                 PriorityId = 2,
@@ -145,7 +145,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 Title = "tetsTitle"
             };
 
-            var userAndOrg = new UserAndOrganizationDTO()
+            var userAndOrg = new UserAndOrganizationDTO
             {
                 OrganizationId = 2,
                 UserId = "UserId"
@@ -161,7 +161,7 @@ namespace Shrooms.Premium.Tests.DomainService
             MockServiceRequestPriorities();
             MockServiceRequestStatuses();
 
-            var serviceRequestDTO = new ServiceRequestDTO()
+            var serviceRequestDTO = new ServiceRequestDTO
             {
                 Description = "testDescription",
                 PriorityId = 1,
@@ -169,7 +169,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 Title = "tetsTitle"
             };
 
-            var userAndOrg = new UserAndOrganizationDTO()
+            var userAndOrg = new UserAndOrganizationDTO
             {
                 OrganizationId = 2,
                 UserId = "UserId"
@@ -187,7 +187,7 @@ namespace Shrooms.Premium.Tests.DomainService
             MockServiceRequestStatuses();
             MockPermissioService();
 
-            var serviceRequestDTO = new ServiceRequestDTO()
+            var serviceRequestDTO = new ServiceRequestDTO
             {
                 Id = 1,
                 Description = "testDescription",
@@ -198,7 +198,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 KudosAmmount = 1
             };
 
-            var userAndOrg = new UserAndOrganizationDTO()
+            var userAndOrg = new UserAndOrganizationDTO
             {
                 OrganizationId = 1,
                 UserId = "AdminId"
@@ -225,7 +225,7 @@ namespace Shrooms.Premium.Tests.DomainService
             MockServiceRequestStatuses();
             MockPermissioService();
 
-            var serviceRequestDTO = new ServiceRequestDTO()
+            var serviceRequestDTO = new ServiceRequestDTO
             {
                 Id = 1,
                 Description = "testDescription",
@@ -235,7 +235,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 StatusId = 2
             };
 
-            var userAndOrg = new UserAndOrganizationDTO()
+            var userAndOrg = new UserAndOrganizationDTO
             {
                 OrganizationId = 1,
                 UserId = "UserId"
@@ -263,7 +263,7 @@ namespace Shrooms.Premium.Tests.DomainService
             MockServiceRequestStatuses();
             MockPermissioService();
 
-            var serviceRequestDTO = new ServiceRequestDTO()
+            var serviceRequestDTO = new ServiceRequestDTO
             {
                 Id = 1,
                 Description = "testDescription",
@@ -273,7 +273,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 StatusId = 2
             };
 
-            var userAndOrg = new UserAndOrganizationDTO()
+            var userAndOrg = new UserAndOrganizationDTO
             {
                 OrganizationId = 1,
                 UserId = "AdminId"
@@ -297,7 +297,7 @@ namespace Shrooms.Premium.Tests.DomainService
             MockServiceRequestStatuses();
             MockPermissioService();
 
-            var serviceRequestDTO = new ServiceRequestDTO()
+            var serviceRequestDTO = new ServiceRequestDTO
             {
                 Id = 1,
                 Description = "testDescription",
@@ -307,7 +307,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 StatusId = 2
             };
 
-            var userAndOrg = new UserAndOrganizationDTO()
+            var userAndOrg = new UserAndOrganizationDTO
             {
                 OrganizationId = 1,
                 UserId = "AnotherUserId"
@@ -325,7 +325,7 @@ namespace Shrooms.Premium.Tests.DomainService
             MockServiceRequestStatuses();
             MockPermissioService();
 
-            var serviceRequestDTO = new ServiceRequestDTO()
+            var serviceRequestDTO = new ServiceRequestDTO
             {
                 Id = 2,
                 Description = "testDescription",
@@ -335,7 +335,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 StatusId = 1
             };
 
-            var userAndOrg = new UserAndOrganizationDTO()
+            var userAndOrg = new UserAndOrganizationDTO
             {
                 OrganizationId = 1,
                 UserId = "AdminId"
@@ -361,24 +361,24 @@ namespace Shrooms.Premium.Tests.DomainService
 
         private void MockServiceRequestForUpdate()
         {
-            var serviceRequests = new List<ServiceRequest>()
+            var serviceRequests = new List<ServiceRequest>
             {
-                new ServiceRequest()
+                new ServiceRequest
                 {
                     Id = 1,
                     OrganizationId = 1,
-                    Status = new ServiceRequestStatus()
+                    Status = new ServiceRequestStatus
                     {
                         Title = "Open"
                     },
                     StatusId = 1,
                     EmployeeId = "UserId"
                 },
-                new ServiceRequest()
+                new ServiceRequest
                 {
                     Id = 2,
                     OrganizationId = 1,
-                    Status = new ServiceRequestStatus()
+                    Status = new ServiceRequestStatus
                     {
                         Title = "Done"
                     },
@@ -393,9 +393,9 @@ namespace Shrooms.Premium.Tests.DomainService
 
         private void MockServiceRequests()
         {
-            var serviceRequests = new List<ServiceRequest>()
+            var serviceRequests = new List<ServiceRequest>
             {
-                new ServiceRequest()
+                new ServiceRequest
                 {
                     Id = 1,
                     OrganizationId = 1
@@ -407,14 +407,14 @@ namespace Shrooms.Premium.Tests.DomainService
 
         private void MockServiceRequestCategories()
         {
-            var serviceRequestCategories = new List<ServiceRequestCategory>()
+            var serviceRequestCategories = new List<ServiceRequestCategory>
             {
-                new ServiceRequestCategory()
+                new ServiceRequestCategory
                 {
                     Id = 1,
                     Name = "test1"
                 },
-                new ServiceRequestCategory()
+                new ServiceRequestCategory
                 {
                     Id = 2,
                     Name = "Kudos"
@@ -426,9 +426,9 @@ namespace Shrooms.Premium.Tests.DomainService
 
         private void MockServiceRequestPriorities()
         {
-            var serviceRequestPrarioty = new List<ServiceRequestPriority>()
+            var serviceRequestPrarioty = new List<ServiceRequestPriority>
             {
-                new ServiceRequestPriority()
+                new ServiceRequestPriority
                 {
                     Id = 1,
                     Title = "test1"
@@ -440,19 +440,19 @@ namespace Shrooms.Premium.Tests.DomainService
 
         private void MockServiceRequestStatuses()
         {
-            var serviceRequestStatuses = new List<ServiceRequestStatus>()
+            var serviceRequestStatuses = new List<ServiceRequestStatus>
             {
-                new ServiceRequestStatus()
+                new ServiceRequestStatus
                 {
                     Id = 1,
                     Title = "Open"
                 },
-                new ServiceRequestStatus()
+                new ServiceRequestStatus
                 {
                     Id = 2,
                     Title = "InProgress"
                 },
-                new ServiceRequestStatus()
+                new ServiceRequestStatus
                 {
                     Id = 3,
                     Title = "Done"

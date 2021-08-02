@@ -493,7 +493,7 @@ namespace Shrooms.Premium.Domain.Services.Books
                 Url = book.Url,
                 Title = book.Title,
                 OwnerId = book.OwnerId,
-                Note = book.Note,
+                Note = book.Note
             };
             return retrievedBookDto;
         }
@@ -526,7 +526,7 @@ namespace Shrooms.Premium.Domain.Services.Books
 
         private void BorrowBook(MobileBookOfficeLogsDTO officeBookWithLogs, BookTakeDTO bookDTO)
         {
-            var bookLog = new BookLog()
+            var bookLog = new BookLog
             {
                 ApplicationUserId = bookDTO.ApplicationUserId,
                 BookOfficeId = officeBookWithLogs.BookOfficeId,
@@ -535,7 +535,7 @@ namespace Shrooms.Premium.Domain.Services.Books
                 TakenFrom = DateTime.UtcNow,
                 Created = DateTime.UtcNow,
                 CreatedBy = bookDTO.ApplicationUserId,
-                OrganizationId = bookDTO.OrganizationId,
+                OrganizationId = bookDTO.OrganizationId
             };
 
             _bookLogsDbSet.Add(bookLog);

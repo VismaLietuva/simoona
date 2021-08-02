@@ -211,7 +211,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             {
                 TotalParticipants = participants.Count,
                 TicketsSold = ticketsSold,
-                KudosSpent = ticketsSold * lottery.EntryFee,
+                KudosSpent = ticketsSold * lottery.EntryFee
             };
         }
 

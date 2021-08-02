@@ -228,9 +228,9 @@ namespace Shrooms.Premium.Tests.DomainService
         {
             _booksDbSet.SetDbSetData(new List<Book>());
 
-            var offices = new List<Office>()
+            var offices = new List<Office>
             {
-                new Office()
+                new Office
                 {
                     Id = 1
                 }
@@ -265,7 +265,7 @@ namespace Shrooms.Premium.Tests.DomainService
             MockApplicationUsers();
             MockDeleteBookEntities();
 
-            var takeBook = new BookTakeDTO()
+            var takeBook = new BookTakeDTO
             {
                 ApplicationUserId = "testUser1",
                 BookOfficeId = 1,
@@ -283,7 +283,7 @@ namespace Shrooms.Premium.Tests.DomainService
             MockBooksByOffice();
 
             _userDbSet.SetDbSetData(new List<ApplicationUser>());
-            var bookTake = new BookTakeDTO()
+            var bookTake = new BookTakeDTO
             {
                 ApplicationUserId = "testUser1",
                 BookOfficeId = 1,
@@ -406,7 +406,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 LastName = "surname2"
             };
 
-            var applicationUsers = new List<ApplicationUser>()
+            var applicationUsers = new List<ApplicationUser>
             {
                 user1,
                 user2
@@ -474,13 +474,13 @@ namespace Shrooms.Premium.Tests.DomainService
                     OrganizationId = 2,
                     BookOfficeId = 1,
                     Id = 1,
-                    Returned = null,
+                    Returned = null
                 },
                 new BookLog
                 {
                     OrganizationId = 2,
                     BookOfficeId = 2,
-                    Returned = null,
+                    Returned = null
                 }
             };
 

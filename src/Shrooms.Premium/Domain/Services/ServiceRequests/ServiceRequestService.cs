@@ -197,7 +197,7 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
                 CreatedBy = userAndOrganizationDTO.UserId,
                 ModifiedBy = userAndOrganizationDTO.UserId,
                 Modified = timestamp,
-                Created = timestamp,
+                Created = timestamp
             };
 
             _serviceRequestCommentsDbSet.Add(serviceRequestComment);

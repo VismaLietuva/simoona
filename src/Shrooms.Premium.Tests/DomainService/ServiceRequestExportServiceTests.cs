@@ -40,7 +40,7 @@ namespace Shrooms.Premium.Tests.DomainService
         {
             var userAndOrg = new UserAndOrganizationDTO
             {
-                OrganizationId = 2,
+                OrganizationId = 2
             };
             MockServiceRequests();
 
@@ -68,7 +68,7 @@ namespace Shrooms.Premium.Tests.DomainService
         {
             var userAndOrg = new UserAndOrganizationDTO
             {
-                OrganizationId = 2,
+                OrganizationId = 2
             };
             MockServiceRequests();
 

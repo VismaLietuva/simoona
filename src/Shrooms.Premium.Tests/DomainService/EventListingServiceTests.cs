@@ -145,19 +145,19 @@ namespace Shrooms.Premium.Tests.DomainService
                 {
                     Id = 1,
                     EventId = guids[0],
-                    Option = "Option1",
+                    Option = "Option1"
                 },
                 new EventOption
                 {
                     Id = 2,
                     EventId = guids[0],
-                    Option = "Option2",
+                    Option = "Option2"
                 },
                 new EventOption
                 {
                     Id = 3,
                     EventId = guids[0],
-                    Option = "Option3",
+                    Option = "Option3"
                 }
             };
 
@@ -167,13 +167,13 @@ namespace Shrooms.Premium.Tests.DomainService
                 {
                     Id = 4,
                     EventId = guids[1],
-                    Option = "Option1",
+                    Option = "Option1"
                 },
                 new EventOption
                 {
                     Id = 5,
                     EventId = guids[1],
-                    Option = "Option2",
+                    Option = "Option2"
                 }
             };
 
