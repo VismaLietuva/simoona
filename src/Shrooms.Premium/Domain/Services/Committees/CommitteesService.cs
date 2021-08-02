@@ -23,7 +23,7 @@ namespace Shrooms.Premium.Domain.Services.Committees
         private readonly IUnitOfWork2 _uow;
         private readonly IAsyncRunner _asyncRunner;
         private readonly IDbSet<ApplicationUser> _usersDbSet;
-        private readonly IDbSet<Committee> _committteeDbSet;
+        private readonly IDbSet<Committee> _committeeDbSet;
         private readonly IRepository<ApplicationUser> _applicationUserRepository;
         private readonly IRepository<Committee> _committeeRepository;
         private readonly IMapper _mapper;
@@ -37,7 +37,7 @@ namespace Shrooms.Premium.Domain.Services.Committees
             _uow = uow;
             _asyncRunner = asyncRunner;
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
-            _committteeDbSet = uow.GetDbSet<Committee>();
+            _committeeDbSet = uow.GetDbSet<Committee>();
         }
 
         #region private methods
@@ -46,6 +46,7 @@ namespace Shrooms.Premium.Domain.Services.Committees
         {
             committeeModel = _mapper.Map(modelDTO, committeeModel) ?? _mapper.Map<CommitteePostDTO, Committee>(modelDTO);
             AddRemoveCommitteeMembers(modelDTO, committeeModel);
+
             if (committeeModel != null)
             {
                 UpdateCommitteeLeads(modelDTO, committeeModel);
@@ -183,7 +184,7 @@ namespace Shrooms.Premium.Domain.Services.Committees
 
         public void DeleteComitteeSuggestion(int comitteeId, int suggestionId, UserAndOrganizationDTO userAndOrg)
         {
-            var committee = _committteeDbSet
+            var committee = _committeeDbSet
                 .Include(u => u.Suggestions)
                 .FirstOrDefault(u => u.Id == comitteeId);
 

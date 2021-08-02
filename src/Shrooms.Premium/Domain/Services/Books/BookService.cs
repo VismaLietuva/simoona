@@ -97,7 +97,7 @@ namespace Shrooms.Premium.Domain.Services.Books
                 .Select(MapBooksWithReadersToDto(options.UserId));
 
             var totalBooksCount = allBooks.Count();
-            int entriesCountToSkip = EntriesCountToSkip(options.Page);
+            var entriesCountToSkip = EntriesCountToSkip(options.Page);
             var books = allBooks
                 .Skip(() => entriesCountToSkip)
                 .Take(() => BusinessLayerConstants.BooksPerPage)

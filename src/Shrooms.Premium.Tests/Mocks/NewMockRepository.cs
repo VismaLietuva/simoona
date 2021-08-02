@@ -24,19 +24,21 @@ namespace Shrooms.Premium.Tests.Mocks
             {
                 var idProperty = t.GetType().GetProperty("Id");
 
-                if (idProperty != null)
+                if (idProperty == null)
                 {
-                    var idValue = idProperty.GetValue(t, null);
+                    return false;
+                }
 
-                    if (idValue is int value)
-                    {
-                        return value == (int)id;
-                    }
+                var idValue = idProperty.GetValue(t, null);
 
-                    if (idValue is string)
-                    {
-                        return idValue.ToString() == id.ToString();
-                    }
+                if (idValue is int value)
+                {
+                    return value == (int)id;
+                }
+
+                if (idValue is string)
+                {
+                    return idValue.ToString() == id.ToString();
                 }
 
                 return false;

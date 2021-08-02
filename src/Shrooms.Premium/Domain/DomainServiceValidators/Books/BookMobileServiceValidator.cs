@@ -34,13 +34,15 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Books
 
         public void ChecksIfUserHasAlreadyBorrowedSameBook(IEnumerable<string> borrowedBookUserIds, string applicationUserId)
         {
-            if (borrowedBookUserIds != null)
+            if (borrowedBookUserIds == null)
             {
-                var bookAlreadyBorrowed = borrowedBookUserIds.Contains(applicationUserId);
-                if (bookAlreadyBorrowed)
-                {
-                    throw new BookException(Resources.Models.Books.Books.UserAlreadyHasSameBook);
-                }
+                return;
+            }
+
+            var bookAlreadyBorrowed = borrowedBookUserIds.Contains(applicationUserId);
+            if (bookAlreadyBorrowed)
+            {
+                throw new BookException(Resources.Models.Books.Books.UserAlreadyHasSameBook);
             }
         }
 
@@ -54,14 +56,16 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Books
 
         public void ThrowIfBookIsAlreadyBorrowed(MobileBookOfficeLogsDTO officeBookWithLogs)
         {
-            if (officeBookWithLogs.LogsUserIDs != null)
+            if (officeBookWithLogs.LogsUserIDs == null)
             {
-                var availableBooks = officeBookWithLogs.Quantity - officeBookWithLogs.LogsUserIDs.Count();
+                return;
+            }
 
-                if (availableBooks < 1)
-                {
-                    throw new BookException(Resources.Models.Books.Books.NoAvailableBooks);
-                }
+            var availableBooks = officeBookWithLogs.Quantity - officeBookWithLogs.LogsUserIDs.Count();
+
+            if (availableBooks < 1)
+            {
+                throw new BookException(Resources.Models.Books.Books.NoAvailableBooks);
             }
         }
 

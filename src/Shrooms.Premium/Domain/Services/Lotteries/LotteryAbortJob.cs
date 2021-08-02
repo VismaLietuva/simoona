@@ -61,26 +61,30 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 
         private void UpdateUserProfiles(Lottery lottery, IEnumerable<AddKudosLogDTO> kudosLogs, UserAndOrganizationDTO userOrg)
         {
-            if (lottery.Status == (int)LotteryStatus.RefundLogsCreated)
+            if (lottery.Status != (int)LotteryStatus.RefundLogsCreated)
             {
-                var userIds = kudosLogs.Select(x => x.ReceivingUserIds.First());
-
-                _kudosService.UpdateProfilesFromUserIds(userIds, userOrg);
-                lottery.Status = (int)LotteryStatus.Refunded;
-
-                _uow.SaveChanges(userOrg.UserId);
+                return;
             }
+
+            var userIds = kudosLogs.Select(x => x.ReceivingUserIds.First());
+
+            _kudosService.UpdateProfilesFromUserIds(userIds, userOrg);
+            lottery.Status = (int)LotteryStatus.Refunded;
+
+            _uow.SaveChanges(userOrg.UserId);
         }
 
         private void AddKudosLogs(Lottery lottery, IEnumerable<AddKudosLogDTO> kudosLogs, UserAndOrganizationDTO userOrg)
         {
-            if (lottery.Status == (int)LotteryStatus.RefundStarted)
+            if (lottery.Status != (int)LotteryStatus.RefundStarted)
             {
-                _kudosService.AddRefundKudosLogs(kudosLogs);
-                lottery.Status = (int)LotteryStatus.RefundLogsCreated;
-
-                _uow.SaveChanges(userOrg.UserId);
+                return;
             }
+
+            _kudosService.AddRefundKudosLogs(kudosLogs);
+            lottery.Status = (int)LotteryStatus.RefundLogsCreated;
+
+            _uow.SaveChanges(userOrg.UserId);
         }
 
         private IList<AddKudosLogDTO> CreateKudosLogs(Lottery lottery, UserAndOrganizationDTO userOrg)

@@ -56,30 +56,32 @@ namespace Shrooms.Premium.Domain.Services.Email.Committee
 
         private void NotifyCommitteeMembersAboutNewSuggestion(CommitteeEntity committee, CommitteeSuggestion suggestion)
         {
-            if (committee.Members != null && committee.Members.Any())
+            if (committee.Members == null || !committee.Members.Any())
             {
-                IList<string> membersEmails = committee.Members.Select(s => s.Email).ToList();
-
-                var organizationName = _organizationDbSet
-                    .Where(organization => organization.Id == committee.OrganizationId)
-                    .Select(organization => organization.ShortName)
-                    .FirstOrDefault();
-
-                var committeesListUrl = _appSettings.CommitteeSugestionUrl(organizationName);
-                var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organizationName);
-                var subject = string.Format(Resources.Common.CommitteeSuggestionEmailSubject, committee.Name);
-
-                var emailTemplateViewModel = new CommitteeSuggestionEmailTemplateViewModel(
-                    userNotificationSettingsUrl,
-                    committee.Name,
-                    suggestion.Title,
-                    suggestion.Description,
-                    committeesListUrl);
-
-                var body = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.CommitteeSuggestion);
-
-                _mailingService.SendEmail(new EmailDto(membersEmails, subject, body));
+                return;
             }
+
+            IList<string> membersEmails = committee.Members.Select(s => s.Email).ToList();
+
+            var organizationName = _organizationDbSet
+                .Where(organization => organization.Id == committee.OrganizationId)
+                .Select(organization => organization.ShortName)
+                .FirstOrDefault();
+
+            var committeesListUrl = _appSettings.CommitteeSugestionUrl(organizationName);
+            var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organizationName);
+            var subject = string.Format(Resources.Common.CommitteeSuggestionEmailSubject, committee.Name);
+
+            var emailTemplateViewModel = new CommitteeSuggestionEmailTemplateViewModel(
+                userNotificationSettingsUrl,
+                committee.Name,
+                suggestion.Title,
+                suggestion.Description,
+                committeesListUrl);
+
+            var body = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.CommitteeSuggestion);
+
+            _mailingService.SendEmail(new EmailDto(membersEmails, subject, body));
         }
     }
 }

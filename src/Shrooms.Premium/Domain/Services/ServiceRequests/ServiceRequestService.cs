@@ -173,15 +173,18 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
 
             _uow.SaveChanges(false);
 
-            if (statusHasBeenChanged)
+            if (!statusHasBeenChanged)
             {
-                var statusDto = new UpdatedServiceRequestDTO
-                {
-                    ServiceRequestId = serviceRequestDTO.Id,
-                    NewStatusId = serviceRequest.StatusId
-                };
-                _asyncRunner.Run<IServiceRequestNotificationService>(n => n.NotifyAboutServiceRequestStatusUpdate(statusDto, userAndOrganizationDTO), _uow.ConnectionName);
+                return;
             }
+
+            var statusDto = new UpdatedServiceRequestDTO
+            {
+                ServiceRequestId = serviceRequestDTO.Id,
+                NewStatusId = serviceRequest.StatusId
+            };
+
+            _asyncRunner.Run<IServiceRequestNotificationService>(n => n.NotifyAboutServiceRequestStatusUpdate(statusDto, userAndOrganizationDTO), _uow.ConnectionName);
         }
 
         public void CreateComment(ServiceRequestCommentDTO comment, UserAndOrganizationDTO userAndOrganizationDTO)

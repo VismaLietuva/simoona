@@ -19,13 +19,13 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
         {
             var participantsDTO = _participantService.GetParticipantsCounted(lotteryId).ToList();
 
-            int numberOfTicketsAdded = 0;
+            var numberOfTicketsAdded = 0;
             var participantTickets = new List<string>();
             var tickets = new List<List<string>>();
 
             foreach (var participant in participantsDTO)
             {
-                for (int i = 0; i < participant.Tickets; i++)
+                for (var i = 0; i < participant.Tickets; i++)
                 {
                     participantTickets.Add(participant.FullName);
 

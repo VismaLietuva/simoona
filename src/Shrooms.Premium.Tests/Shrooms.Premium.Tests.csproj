@@ -167,7 +167,6 @@
     <Compile Include="DomainService\EventServices\EventJoinRemindServiceTests.cs" />
     <Compile Include="DomainService\VacationService\VacationDomainServiceTests.cs" />
     <Compile Include="Mocks\MockDbContext.cs" />
-    <Compile Include="Mocks\MockIdentity.cs" />
     <Compile Include="Mocks\MockPasswordHasher.cs" />
     <Compile Include="Mocks\MockPasswordValidator.cs" />
     <Compile Include="Mocks\MockUnitOfWork.cs" />

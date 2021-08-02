@@ -351,25 +351,30 @@ namespace Shrooms.Premium.Domain.Services.Events
 
         private void MapNewOptions(CreateEventDto newEventDto, Event newEvent)
         {
-            if (newEventDto.NewOptions != null)
+            if (newEventDto.NewOptions == null)
             {
-                foreach (var option in newEventDto.NewOptions)
+                return;
+            }
+
+            foreach (var option in newEventDto.NewOptions)
+            {
+                if (option == null)
                 {
-                    if (option != null)
-                    {
-                        var newOption = new EventOption
-                        {
-                            Created = DateTime.UtcNow,
-                            CreatedBy = newEventDto.UserId,
-                            Modified = DateTime.UtcNow,
-                            ModifiedBy = newEventDto.UserId,
-                            Option = option.Option,
-                            Rule = option.Rule,
-                            Event = newEvent
-                        };
-                        _eventOptionsDbSet.Add(newOption);
-                    }
+                    continue;
                 }
+
+                var newOption = new EventOption
+                {
+                    Created = DateTime.UtcNow,
+                    CreatedBy = newEventDto.UserId,
+                    Modified = DateTime.UtcNow,
+                    ModifiedBy = newEventDto.UserId,
+                    Option = option.Option,
+                    Rule = option.Rule,
+                    Event = newEvent
+                };
+
+                _eventOptionsDbSet.Add(newOption);
             }
         }
 

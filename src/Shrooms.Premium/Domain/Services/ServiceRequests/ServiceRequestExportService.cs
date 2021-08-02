@@ -24,7 +24,7 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
 
         public byte[] ExportToExcel(UserAndOrganizationDTO userAndOrg, Expression<Func<ServiceRequest, bool>> filter)
         {
-            IQueryable<ServiceRequest> query = _serviceRequestsDbSet
+            var query = _serviceRequestsDbSet
                 .Include(x => x.Status)
                 .Include(x => x.Priority)
                 .Include(x => x.Employee)

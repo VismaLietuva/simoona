@@ -154,13 +154,15 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 return;
             }
 
-            if (lottery.IsRefundFailed)
+            if (!lottery.IsRefundFailed)
             {
-                lottery.IsRefundFailed = false;
-                _uow.SaveChanges(userOrg.UserId);
-
-                _asyncRunner.Run<ILotteryAbortJob>(n => n.RefundLottery(lottery.Id, userOrg), _uow.ConnectionName);
+                return;
             }
+
+            lottery.IsRefundFailed = false;
+            _uow.SaveChanges(userOrg.UserId);
+
+            _asyncRunner.Run<ILotteryAbortJob>(n => n.RefundLottery(lottery.Id, userOrg), _uow.ConnectionName);
         }
 
         public void UpdateRefundFailedFlag(int lotteryId, bool isFailed, UserAndOrganizationDTO userOrg)

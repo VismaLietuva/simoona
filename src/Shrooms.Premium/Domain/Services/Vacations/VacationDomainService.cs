@@ -13,10 +13,9 @@ namespace Shrooms.Premium.Domain.Services.Vacations
         {
             var predicate = PredicateBuilder.False<ApplicationUser>();
 
-            foreach (string name in fullName.Split(' '))
+            foreach (var name in fullName.Split(' '))
             {
-                string temp = name;
-
+                var temp = name;
                 predicate = predicate.Or(p => p.FirstName == temp || p.LastName == temp);
             }
 
@@ -30,7 +29,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
             return users.FirstOrDefault(f => OrderStringAlphabetically(f.FirstName + f.LastName) == fullName);
         }
 
-        private string OrderStringAlphabetically(string input)
+        private static string OrderStringAlphabetically(string input)
         {
             return new string(input.OrderBy(o => o).ToArray()).Trim();
         }
