@@ -50,17 +50,17 @@ namespace Shrooms.Presentation.Api.Filters
         {
             var unitOfWork = context.ActionContext.Request.GetDependencyScope().GetService(typeof(IUnitOfWork2)) as IUnitOfWork2;
 
-            if (context.Request.Headers.Contains(OrganizationHeaderName))
+            if (!context.Request.Headers.Contains(OrganizationHeaderName))
             {
-                var organizationName = context.Request.Headers.GetValues(OrganizationHeaderName).FirstOrDefault();
-
-                return unitOfWork.GetDbSet<Organization>()
-                    .Where(x => x.ShortName == organizationName)
-                    .Select(x => x.BookAppAuthorizationGuid)
-                    .FirstOrDefault();
+                return null;
             }
 
-            return null;
+            var organizationName = context.Request.Headers.GetValues(OrganizationHeaderName).FirstOrDefault();
+
+            return unitOfWork.GetDbSet<Organization>()
+                .Where(x => x.ShortName == organizationName)
+                .Select(x => x.BookAppAuthorizationGuid)
+                .FirstOrDefault();
         }
     }
 }

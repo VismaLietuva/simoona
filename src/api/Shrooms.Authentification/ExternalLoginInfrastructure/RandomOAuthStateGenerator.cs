@@ -6,7 +6,7 @@ namespace Shrooms.Authentification.ExternalLoginInfrastructure
 {
     public static class RandomOAuthStateGenerator
     {
-        private static RandomNumberGenerator _random = new RNGCryptoServiceProvider();
+        private static readonly RandomNumberGenerator _random = new RNGCryptoServiceProvider();
 
         public static string Generate(int strengthInBits)
         {
@@ -17,9 +17,9 @@ namespace Shrooms.Authentification.ExternalLoginInfrastructure
                 throw new ArgumentException("strengthInBits must be evenly divisible by 8.", "strengthInBits");
             }
 
-            int strengthInBytes = strengthInBits / bitsPerByte;
+            var strengthInBytes = strengthInBits / bitsPerByte;
 
-            byte[] data = new byte[strengthInBytes];
+            var data = new byte[strengthInBytes];
             _random.GetBytes(data);
             return HttpServerUtility.UrlTokenEncode(data);
         }

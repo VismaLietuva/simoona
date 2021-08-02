@@ -333,25 +333,27 @@ namespace Shrooms.Domain.Services.Administration
         {
             var welcomeKudosDTO = _kudosService.GetWelcomeKudos();
 
-            if (welcomeKudosDTO.WelcomeKudosAmount > 0)
+            if (welcomeKudosDTO.WelcomeKudosAmount <= 0)
             {
-                KudosLog welcomeKudos = new KudosLog
-                {
-                    EmployeeId = applicationUser.Id,
-                    OrganizationId = applicationUser.OrganizationId,
-                    Comments = welcomeKudosDTO.WelcomeKudosComment,
-                    Points = welcomeKudosDTO.WelcomeKudosAmount,
-                    Created = DateTime.UtcNow,
-                    Modified = DateTime.UtcNow,
-                    Status = KudosStatus.Pending,
-                    MultiplyBy = 1,
-                    KudosSystemType = KudosTypeEnum.Other,
-                    KudosTypeValue = (short)KudosTypeEnum.Other,
-                    KudosTypeName = KudosTypeEnum.Other.ToString()
-                };
-
-                _uow.GetDbSet<KudosLog>().Add(welcomeKudos);
+                return;
             }
+
+            var welcomeKudos = new KudosLog
+            {
+                EmployeeId = applicationUser.Id,
+                OrganizationId = applicationUser.OrganizationId,
+                Comments = welcomeKudosDTO.WelcomeKudosComment,
+                Points = welcomeKudosDTO.WelcomeKudosAmount,
+                Created = DateTime.UtcNow,
+                Modified = DateTime.UtcNow,
+                Status = KudosStatus.Pending,
+                MultiplyBy = 1,
+                KudosSystemType = KudosTypeEnum.Other,
+                KudosTypeValue = (short)KudosTypeEnum.Other,
+                KudosTypeName = KudosTypeEnum.Other.ToString()
+            };
+
+            _uow.GetDbSet<KudosLog>().Add(welcomeKudos);
         }
 
         private static Expression<Func<ApplicationUser, bool>> GenerateQuery(string s)

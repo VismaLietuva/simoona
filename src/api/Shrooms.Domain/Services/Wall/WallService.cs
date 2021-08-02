@@ -462,29 +462,31 @@ namespace Shrooms.Domain.Services.Wall
 
         public void AddMemberToWalls(string userId, List<int> wallIds)
         {
-            if (wallIds.Any())
+            if (!wallIds.Any())
             {
-                var wallMembers = _wallUsersDbSet
-                    .Where(x => wallIds.Contains(x.WallId) && x.UserId == userId)
-                    .ToList();
+                return;
+            }
 
-                foreach (var wallId in wallIds)
+            var wallMembers = _wallUsersDbSet
+                .Where(x => wallIds.Contains(x.WallId) && x.UserId == userId)
+                .ToList();
+
+            foreach (var wallId in wallIds)
+            {
+                if (wallMembers.Any(x => x.WallId == wallId))
                 {
-                    if (wallMembers.Any(x => x.WallId == wallId))
-                    {
-                        continue;
-                    }
-
-                    var wallMember = new WallMember
-                    {
-                        AppNotificationsEnabled = true,
-                        EmailNotificationsEnabled = true,
-                        UserId = userId,
-                        WallId = wallId
-                    };
-
-                    _wallUsersDbSet.Add(wallMember);
+                    continue;
                 }
+
+                var wallMember = new WallMember
+                {
+                    AppNotificationsEnabled = true,
+                    EmailNotificationsEnabled = true,
+                    UserId = userId,
+                    WallId = wallId
+                };
+
+                _wallUsersDbSet.Add(wallMember);
             }
         }
 
@@ -495,22 +497,24 @@ namespace Shrooms.Domain.Services.Wall
 
         public void RemoveMemberFromWalls(string userId, List<int> wallIds)
         {
-            if (wallIds.Any())
+            if (!wallIds.Any())
             {
-                var wallModerators = _moderatorsDbSet
-                    .Where(x => wallIds.Contains(x.WallId) && x.UserId == userId)
-                    .ToList();
+                return;
+            }
 
-                var wallMembers = _wallUsersDbSet
-                    .Where(x => wallIds.Contains(x.WallId) && x.UserId == userId)
-                    .ToList();
+            var wallModerators = _moderatorsDbSet
+                .Where(x => wallIds.Contains(x.WallId) && x.UserId == userId)
+                .ToList();
 
-                foreach (var member in wallMembers)
+            var wallMembers = _wallUsersDbSet
+                .Where(x => wallIds.Contains(x.WallId) && x.UserId == userId)
+                .ToList();
+
+            foreach (var member in wallMembers)
+            {
+                if (!wallModerators.Any(x => x.UserId == member.UserId && x.WallId == member.WallId))
                 {
-                    if (!wallModerators.Any(x => x.UserId == member.UserId && x.WallId == member.WallId))
-                    {
-                        wallMembers.ForEach(x => _wallUsersDbSet.Remove(x));
-                    }
+                    wallMembers.ForEach(x => _wallUsersDbSet.Remove(x));
                 }
             }
         }

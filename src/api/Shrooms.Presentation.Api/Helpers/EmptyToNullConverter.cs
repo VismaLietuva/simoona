@@ -14,7 +14,7 @@ namespace Shrooms.Presentation.Api.Helpers
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            string value = _stringSerializer.Deserialize<string>(reader);
+            var value = _stringSerializer.Deserialize<string>(reader);
 
             if (string.IsNullOrEmpty(value))
             {

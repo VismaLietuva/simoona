@@ -118,7 +118,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 return BadRequest();
             }
 
-            bool canNotBeDeleted = _kudosService.HasPendingKudos(id);
+            var canNotBeDeleted = _kudosService.HasPendingKudos(id);
 
             if (canNotBeDeleted)
             {
@@ -308,6 +308,7 @@ namespace Shrooms.Presentation.Api.Controllers
         {
             var isAdmin = _permissionService.UserHasPermission(GetUserAndOrganization(), AdministrationPermissions.ApplicationUser);
             var usersProfile = User.Identity.GetUserId() == user.Id;
+
             if (isAdmin)
             {
                 var roles = GetUserRoles(user.Id);
@@ -608,13 +609,15 @@ namespace Shrooms.Presentation.Api.Controllers
                 }
             }
 
-            if (model.QualificationLevelId != null)
+            if (model.QualificationLevelId == null)
             {
-                var qualificationLevel = _qualificationLevelRepository.GetByID(model.QualificationLevelId);
-                if (qualificationLevel == null)
-                {
-                    return Request.CreateResponse(HttpStatusCode.NotFound, string.Format(Resources.Common.DoesNotExist + " Id: {1}", Resources.Models.ApplicationUser.ApplicationUser.QualificationLevelName, model.QualificationLevelId));
-                }
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+
+            var qualificationLevel = _qualificationLevelRepository.GetByID(model.QualificationLevelId);
+            if (qualificationLevel == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound, string.Format(Resources.Common.DoesNotExist + " Id: {1}", Resources.Models.ApplicationUser.ApplicationUser.QualificationLevelName, model.QualificationLevelId));
             }
 
             return Request.CreateResponse(HttpStatusCode.OK);
@@ -861,13 +864,11 @@ namespace Shrooms.Presentation.Api.Controllers
             var personalInfo = _mapper.Map<ApplicationUserPersonalInfoViewModel>(user);
 
             var canAccessFullProfile = _permissionService.UserHasPermission(GetUserAndOrganization(), AdministrationPermissions.ApplicationUser) || User.Identity.GetUserId() == user.Id;
-            if (!canAccessFullProfile)
+
+            if (!canAccessFullProfile && !personalInfo.ShowBirthDay)
             {
-                if (!personalInfo.ShowBirthDay)
-                {
-                    personalInfo.ShowableBirthDay = personalInfo.BirthDay != null ? $"****-{personalInfo.BirthDay?.ToString("MM-dd")}" : "";
-                    personalInfo.BirthDay = null;
-                }
+                personalInfo.ShowableBirthDay = personalInfo.BirthDay != null ? $"****-{personalInfo.BirthDay?.ToString("MM-dd")}" : "";
+                personalInfo.BirthDay = null;
             }
 
             return personalInfo;

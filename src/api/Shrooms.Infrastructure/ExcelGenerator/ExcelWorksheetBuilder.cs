@@ -22,7 +22,7 @@ namespace Shrooms.Infrastructure.ExcelGenerator
         public ExcelWorksheetBuilder WithHeader(IEnumerable<string> headerItems)
         {
             _withHeader = true;
-            int index = 1;
+            var index = 1;
             foreach (var item in headerItems)
             {
                 _worksheet.Cells[1, index].Value = item;
@@ -37,7 +37,7 @@ namespace Shrooms.Infrastructure.ExcelGenerator
 
         public ExcelWorksheetBuilder WithRows(IEnumerable<IEnumerable<object>> rows)
         {
-            int rowIndex = _withHeader ? 2 : 1;
+            var rowIndex = _withHeader ? 2 : 1;
 
             foreach (var row in rows)
             {
@@ -49,7 +49,7 @@ namespace Shrooms.Infrastructure.ExcelGenerator
 
         public ExcelWorksheetBuilder WithRow(int rowIndex, IEnumerable<object> row)
         {
-            int columnIndex = 1;
+            var columnIndex = 1;
             foreach (var columnValue in row)
             {
                 if (columnValue == null)
@@ -73,7 +73,7 @@ namespace Shrooms.Infrastructure.ExcelGenerator
                 }
                 else
                 {
-                    string text = columnValue.ToString();
+                    var text = columnValue.ToString();
                     _worksheet.Cells[rowIndex, columnIndex].Value = text;
 
                     // Wrap text if it is too long.

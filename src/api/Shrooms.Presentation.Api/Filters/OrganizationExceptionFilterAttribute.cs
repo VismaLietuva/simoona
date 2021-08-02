@@ -15,6 +15,7 @@ namespace Shrooms.Presentation.Api.Filters
                 {
                     ReasonPhrase = "Invalid organization"
                 };
+
                 actionExecutedContext.Response = response;
             }
         }

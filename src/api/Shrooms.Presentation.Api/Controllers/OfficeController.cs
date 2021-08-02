@@ -72,7 +72,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 sort = "Address.Street";
             }
 
-            string sortString = string.IsNullOrEmpty(sort) ? null : $"{sort} {dir}";
+            var sortString = string.IsNullOrEmpty(sort) ? null : $"{sort} {dir}";
 
             IQueryable<Office> offices;
             if (string.IsNullOrEmpty(s))

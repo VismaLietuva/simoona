@@ -69,13 +69,15 @@ namespace Shrooms.Domain.Services.Organizations
 
         public bool IsOrganizationHostValid(string email, string requestedOrganizationName)
         {
-            if (HasOrganizationEmailDomainRestriction(requestedOrganizationName))
+            if (!HasOrganizationEmailDomainRestriction(requestedOrganizationName))
             {
-                var validEmailHostName = GetOrganizationHostName(requestedOrganizationName);
-                if (GetHostFromEmail(email) != validEmailHostName)
-                {
-                    return false;
-                }
+                return true;
+            }
+
+            var validEmailHostName = GetOrganizationHostName(requestedOrganizationName);
+            if (GetHostFromEmail(email) != validEmailHostName)
+            {
+                return false;
             }
 
             return true;

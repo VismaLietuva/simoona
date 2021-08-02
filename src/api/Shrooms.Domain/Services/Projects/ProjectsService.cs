@@ -118,10 +118,10 @@ namespace Shrooms.Domain.Services.Projects
 
         public async Task<EditProjectDisplayDto> GetProjectById(int projectId, UserAndOrganizationDTO userOrg)
         {
-            string projectOwnerId = await _projectsDbSet.Where(p =>
+            var projectOwnerId = await _projectsDbSet.Where(p =>
                     p.Id == projectId &&
                     p.OrganizationId == userOrg.OrganizationId).Select(s => s.OwnerId)
-                    .SingleAsync();
+                .SingleAsync();
 
             ValidateOwnershipPermissions(projectOwnerId, userOrg);
 
@@ -129,9 +129,7 @@ namespace Shrooms.Domain.Services.Projects
                 .Include(p => p.Members)
                 .Include(p => p.Attributes)
                 .Include(p => p.Owner)
-                .Where(p =>
-                    p.Id == projectId &&
-                    p.OrganizationId == userOrg.OrganizationId)
+                .Where(p => p.Id == projectId && p.OrganizationId == userOrg.OrganizationId)
                 .Select(p => new EditProjectDisplayDto
                 {
                     Id = p.Id,
@@ -283,9 +281,12 @@ namespace Shrooms.Domain.Services.Projects
 
             ValidateExpelMember(project, userAndOrg);
 
-            project.Members.Remove(project.Members.FirstOrDefault(x => x.Id == expelUserId));
+            project?.Members.Remove(project.Members.FirstOrDefault(x => x.Id == expelUserId));
 
-            _wallService.RemoveMemberFromWall(expelUserId, project.WallId);
+            if (project != null)
+            {
+                _wallService.RemoveMemberFromWall(expelUserId, project.WallId);
+            }
 
             await _uow.SaveChangesAsync(userAndOrg.UserId);
         }
@@ -361,16 +362,18 @@ namespace Shrooms.Domain.Services.Projects
             {
                 var currentModeratorId = project.Wall.Moderators.First().UserId;
 
-                if (currentModeratorId != dto.OwningUserId)
+                if (currentModeratorId == dto.OwningUserId)
                 {
-                    if (!dto.MembersIds.Contains(currentModeratorId))
-                    {
-                        _wallService.RemoveMemberFromWall(currentModeratorId, project.WallId);
-                    }
-
-                    _wallService.RemoveModerator(project.WallId, project.Wall.Moderators.First().UserId, dto);
-                    _wallService.AddModerator(project.WallId, dto.OwningUserId, dto);
+                    return;
                 }
+
+                if (!dto.MembersIds.Contains(currentModeratorId))
+                {
+                    _wallService.RemoveMemberFromWall(currentModeratorId, project.WallId);
+                }
+
+                _wallService.RemoveModerator(project.WallId, project.Wall.Moderators.First().UserId, dto);
+                _wallService.AddModerator(project.WallId, dto.OwningUserId, dto);
             }
             else
             {

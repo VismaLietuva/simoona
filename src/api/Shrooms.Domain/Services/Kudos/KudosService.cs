@@ -347,11 +347,13 @@ namespace Shrooms.Domain.Services.Kudos
 
             foreach (var kudosType in kudosTypesDTO)
             {
-                if (IsTranslatableKudosType(kudosType.Type))
+                if (!IsTranslatableKudosType(kudosType.Type))
                 {
-                    kudosType.Name = TranslateKudos($"KudosType{kudosType.Name}", culture);
-                    kudosType.Description = TranslateKudos($"KudosType{kudosType.Name}Description", culture);
+                    continue;
                 }
+
+                kudosType.Name = TranslateKudos($"KudosType{kudosType.Name}", culture);
+                kudosType.Description = TranslateKudos($"KudosType{kudosType.Name}Description", culture);
             }
 
             return kudosTypesDTO;
@@ -725,7 +727,7 @@ namespace Shrooms.Domain.Services.Kudos
                 KudosLog = kudosLog,
                 KudosType = MapKudosTypesToDTO(kudosType),
                 SendingUser = _mapper.Map<ApplicationUserDTO>(sendingUser),
-                TotalKudosPointsInLog = overridenPoints ?? kudosLog.MultiplyBy * kudosType.Value,
+                TotalKudosPointsInLog = overridenPoints ?? kudosLog.MultiplyBy * kudosType?.Value ?? 0,
                 PictureId = kudosLog.PictureId
             };
         }
@@ -810,7 +812,7 @@ namespace Shrooms.Domain.Services.Kudos
 
         private AddKudosDTO GenerateLogForKudosMinusOperation(AddKudosDTO kudosDTO)
         {
-            var minusKudosType = _kudosTypesDbSet.AsNoTracking().FirstOrDefault(n => n.Type == KudosTypeEnum.Minus);
+            var minusKudosType = _kudosTypesDbSet.AsNoTracking().First(n => n.Type == KudosTypeEnum.Minus);
 
             var kudosLogForMinusKudos = new AddKudosLogDTO
             {

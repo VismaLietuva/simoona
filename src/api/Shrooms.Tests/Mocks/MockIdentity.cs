@@ -85,14 +85,16 @@ namespace Shrooms.Tests.Mocks
 
         public static IPrincipal GetPrincipalMock(string id, string name, string[] roles)
         {
-            List<Claim> claims = new List<Claim>
+            var claims = new List<Claim>
             {
-                            new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name", name),
-                            new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", id),
-                            new Claim(WebApiConstants.ClaimOrganizationId, "1")
+                new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name", name),
+                new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", id),
+                new Claim(WebApiConstants.ClaimOrganizationId, "1")
             };
+
             var genericIdentity = new GenericIdentity(string.Empty);
             genericIdentity.AddClaims(claims);
+
             var genericPrincipal = new GenericPrincipal(genericIdentity, roles);
             return genericPrincipal;
         }

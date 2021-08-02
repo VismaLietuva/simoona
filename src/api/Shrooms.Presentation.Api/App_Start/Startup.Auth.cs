@@ -72,18 +72,21 @@ namespace Shrooms.Presentation.Api
                 app.UseGoogleAuthentication(googleOAuthOptions);
             }
 
-            if (HasProviderSettings("FacebookAccountAppId", "FacebookAccountAppSecret"))
+            if (!HasProviderSettings("FacebookAccountAppId", "FacebookAccountAppSecret"))
             {
-                var facebookOAuthOptions = new FacebookAuthenticationOptions
-                {
-                    Provider = new CustomFacebookAuthProvider(container),
-                    AppId = ConfigurationManager.AppSettings["FacebookAccountAppId"],
-                    AppSecret = ConfigurationManager.AppSettings["FacebookAccountAppSecret"],
-                    Scope = { "public_profile", "email" },
-                    Fields = { "email", "name", "first_name", "last_name", "picture.width(800).height(800)" }
-                };
-                app.UseFacebookAuthentication(facebookOAuthOptions);
+                return;
             }
+
+            var facebookOAuthOptions = new FacebookAuthenticationOptions
+            {
+                Provider = new CustomFacebookAuthProvider(container),
+                AppId = ConfigurationManager.AppSettings["FacebookAccountAppId"],
+                AppSecret = ConfigurationManager.AppSettings["FacebookAccountAppSecret"],
+                Scope = { "public_profile", "email" },
+                Fields = { "email", "name", "first_name", "last_name", "picture.width(800).height(800)" }
+            };
+
+            app.UseFacebookAuthentication(facebookOAuthOptions);
         }
 
         private static bool HasProviderSettings(string idKey, string secretKey)

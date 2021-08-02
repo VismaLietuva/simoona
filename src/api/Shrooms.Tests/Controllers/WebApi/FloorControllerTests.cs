@@ -35,8 +35,7 @@ namespace Shrooms.Tests.Controllers.WebApi
             _floorController.Request = new HttpRequestMessage();
             _floorController.Request.Properties.Add(HttpPropertyKeys.HttpConfigurationKey, new HttpConfiguration());
             _floorController.Request.SetConfiguration(new HttpConfiguration());
-            _floorController.RequestContext.Principal =
-                new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, "1") }));
+            _floorController.RequestContext.Principal = new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, "1") }));
         }
 
         [Test]
@@ -51,7 +50,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         [Test]
         public async Task Floor_Get_Should_Return_Correct_Floor()
         {
-            int id = 1;
+            const int id = 1;
 
             var result = _floorController.Get(id);
             var floor = await result.Content.ReadAsAsync<FloorViewModel>();
@@ -62,7 +61,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         [Test]
         public void Floor_GetByRoom_Should_Return_View_Model()
         {
-            int roomId = 1;
+            const int roomId = 1;
             var floor = _floorController.GetByRoom(roomId);
             Assert.IsInstanceOf<FloorViewModel>(floor);
         }
@@ -77,7 +76,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         [Test]
         public void Floor_GetByOffice_Should_Return_Floor_View_Model()
         {
-            int roomId = 1;
+            const int roomId = 1;
 
             var floor = _floorController.GetByOffice(roomId);
             Assert.IsInstanceOf<IEnumerable<FloorViewModel>>(floor);
@@ -100,7 +99,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         [Test]
         public void GetManyReturnPageSizedNumberOfFloors()
         {
-            int pageSize = 2;
+            const int pageSize = 2;
 
             var pagedFloors = _floorController.GetPaged(1, 1, pageSize);
             Assert.AreEqual(pageSize, pagedFloors.PagedList.Count);

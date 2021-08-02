@@ -239,7 +239,7 @@ namespace Shrooms.Presentation.Api.Controllers
         public PagedViewModel<RoleViewModel> GetPaged(int page = 1, int pageSize = WebApiConstants.DefaultPageSize, string s = "",
             string sort = "Name", string dir = "", string includeProperties = "")
         {
-            string sortString = string.IsNullOrEmpty(sort) ? null : $"{sort} {dir}";
+            var sortString = string.IsNullOrEmpty(sort) ? null : $"{sort} {dir}";
 
             var roles = GetRoles(sortString, includeProperties, s);
 
@@ -267,7 +267,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 return _roleRepository.Get(orderBy: sortString, includeProperties: includeProperties);
             }
 
-            return _roleRepository.Get(filter: r => r.Name.Contains(s) || r.Organization.ShortName.Contains(s), orderBy: sortString, includeProperties: includeProperties);
+            return _roleRepository.Get(r => r.Name.Contains(s) || r.Organization.ShortName.Contains(s), orderBy: sortString, includeProperties: includeProperties);
         }
     }
 }
