@@ -210,7 +210,7 @@ namespace Shrooms.Premium.Domain.Services.Badges
                 return;
             }
 
-            // TODO: with any open-source check-in add configuration key to set how many days ago we should check for changes here.
+            // TODO: with any open-source check-in add configuration key to set how many days ago we should check for changes here
             var oneDayAgo = DateTime.UtcNow.Date.AddDays(-1).Date;
 
             List<ApplicationUser> users;

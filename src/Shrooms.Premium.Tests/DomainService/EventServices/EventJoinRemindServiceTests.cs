@@ -92,7 +92,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 Id = 1
             };
 
-            var users = (IEnumerable<string>)new List<string> { "" };
+            var users = new List<string> { "" };
             _eventUtilitiesService.GetEventTypesToRemind(1).Returns(new List<EventTypeDTO> { eventType });
             _eventUtilitiesService.AnyEventsThisWeekByType(Arg.Is<IEnumerable<int>>(e => e.FirstOrDefault() == eventType.Id)).Returns(true);
             _userEventsService.GetUsersWithAppReminders(Arg.Is<IEnumerable<int>>(e => e.FirstOrDefault() == eventType.Id)).Returns(users);
