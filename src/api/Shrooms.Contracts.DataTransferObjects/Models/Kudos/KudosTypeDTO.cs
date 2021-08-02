@@ -19,25 +19,5 @@ namespace Shrooms.Contracts.DataTransferObjects.Models.Kudos
         public string Description { get; set; }
 
         public bool IsActive { get; set; }
-
-        public override int GetHashCode()
-        {
-            return Id.GetHashCode();
-        }
-
-        public override bool Equals(object obj)
-        {
-            return Equals(obj as KudosTypeDTO);
-        }
-
-        public bool Equals(KudosTypeDTO kudosTypeDto)
-        {
-            if (kudosTypeDto != null && Id == kudosTypeDto.Id)
-            {
-                return true;
-            }
-
-            return false;
-        }
     }
 }

@@ -53,14 +53,15 @@ namespace Shrooms.Tests.Controllers.WebApi
         [Test]
         public void GetKudosTypes_Should_Return_IEnumerable_Of_KudosType_ViewModel()
         {
-            var userAndOrganization = new UserAndOrganizationDTO()
+            var userAndOrganization = new UserAndOrganizationDTO
             {
                 OrganizationId = 1,
                 UserId = "fd798623-166c-412d-a060-369d4c7b90eb"
             };
 
             _kudosService.GetKudosTypes(userAndOrganization)
-                .Returns(new List<KudosTypeDTO>() { new KudosTypeDTO() });
+                .Returns(new List<KudosTypeDTO>
+                    { new KudosTypeDTO() });
 
             var response = _kudosController.GetKudosTypes();
 
