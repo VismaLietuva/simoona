@@ -37,77 +37,77 @@ namespace Shrooms.Tests.DomainService
                     Id = "testUserId",
                     FirstName = "Name",
                     LastName = "Surname",
-                    BirthDay = new DateTime(1993, 11, 30),
+                    BirthDay = new DateTime(1993, 11, 30)
                 },
                 new ApplicationUser
                 {
                     Id = "testUserId2",
                     FirstName = "Name",
                     LastName = "Surname",
-                    BirthDay = new DateTime(1988, 12, 05),
+                    BirthDay = new DateTime(1988, 12, 05)
                 },
                 new ApplicationUser
                 {
                     Id = "testUserId3",
                     FirstName = "Name",
                     LastName = "Surname",
-                    BirthDay = new DateTime(2000, 12, 06),
+                    BirthDay = new DateTime(2000, 12, 06)
                 },
                 new ApplicationUser
                 {
                     Id = "testUserId4",
                     FirstName = "Name",
                     LastName = "Surname",
-                    BirthDay = new DateTime(2015, 11, 28),
+                    BirthDay = new DateTime(2015, 11, 28)
                 },
                 new ApplicationUser
                 {
                     Id = "testUserId5",
                     FirstName = "Name",
                     LastName = "Surname",
-                    BirthDay = new DateTime(2015, 11, 29),
+                    BirthDay = new DateTime(2015, 11, 29)
                 },
                 new ApplicationUser
                 {
                     Id = "testUserId6",
                     FirstName = "Name",
                     LastName = "Surname",
-                    BirthDay = new DateTime(1930, 12, 11),
+                    BirthDay = new DateTime(1930, 12, 11)
                 },
                 new ApplicationUser
                 {
                     Id = "christmasBirthdayUser",
                     FirstName = "Name",
                     LastName = "Surname",
-                    BirthDay = new DateTime(1985, 12, 27),
+                    BirthDay = new DateTime(1985, 12, 27)
                 },
                 new ApplicationUser
                 {
                     Id = "newYearBirthdayUser",
                     FirstName = "Name",
                     LastName = "Surname",
-                    BirthDay = new DateTime(1985, 01, 01),
+                    BirthDay = new DateTime(1985, 01, 01)
                 },
                 new ApplicationUser
                 {
                     Id = "februaryBirthdayUser1",
                     FirstName = "Name",
                     LastName = "Surname",
-                    BirthDay = new DateTime(2012, 02, 29),
+                    BirthDay = new DateTime(2012, 02, 29)
                 },
                 new ApplicationUser
                 {
                     Id = "februaryBirthdayUser2",
                     FirstName = "Name",
                     LastName = "Surname",
-                    BirthDay = new DateTime(1985, 02, 28),
+                    BirthDay = new DateTime(1985, 02, 28)
                 },
                 new ApplicationUser
                 {
                     Id = "februaryBirthdayUser3",
                     FirstName = "Name",
                     LastName = "Surname",
-                    BirthDay = new DateTime(1985, 03, 04),
+                    BirthDay = new DateTime(1985, 03, 04)
                 }
             }.AsQueryable();
         }

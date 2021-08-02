@@ -44,7 +44,7 @@ namespace Shrooms.Tests.DomainService
             MockPermissions();
             var permissionGroups = _permissionService.GetGroupNames(1).ToList();
 
-            Assert.AreEqual(2, permissionGroups.Count());
+            Assert.AreEqual(2, permissionGroups.Count);
             Assert.AreEqual("test1", permissionGroups.ToArray()[0].Name);
             Assert.AreEqual("test2", permissionGroups.ToArray()[1].Name);
         }
@@ -55,7 +55,7 @@ namespace Shrooms.Tests.DomainService
             MockPermissions();
             var permissionGroups = _permissionService.GetGroupNames(2).ToList();
 
-            Assert.AreEqual(2, permissionGroups.Count());
+            Assert.AreEqual(2, permissionGroups.Count);
             Assert.AreEqual("test2", permissionGroups.ToArray()[0].Name);
             Assert.AreEqual("test3", permissionGroups.ToArray()[1].Name);
         }
@@ -66,7 +66,7 @@ namespace Shrooms.Tests.DomainService
             MockPermissions();
             var permissionGroups = _permissionService.GetUserPermissions("UserId1", 1).ToList();
 
-            Assert.AreEqual(4, permissionGroups.Count());
+            Assert.AreEqual(4, permissionGroups.Count);
             Assert.AreEqual("TEST1_BASIC", permissionGroups.ToArray()[0]);
             Assert.AreEqual("TEST1_ADMIN", permissionGroups.ToArray()[1]);
         }
@@ -76,7 +76,7 @@ namespace Shrooms.Tests.DomainService
         {
             _permissionCache.TryGetValue("UserId1", out _).Returns(x =>
             {
-                x[1] = new List<string>()
+                x[1] = new List<string>
                 {
                     "TEST1_BASIC",
                     "TEST1_ADMIN"
@@ -86,7 +86,7 @@ namespace Shrooms.Tests.DomainService
 
             var permissionGroups = _permissionService.GetUserPermissions("UserId1", 1).ToList();
 
-            Assert.AreEqual(2, permissionGroups.Count());
+            Assert.AreEqual(2, permissionGroups.Count);
             Assert.AreEqual("TEST1_BASIC", permissionGroups.ToArray()[0]);
             Assert.AreEqual("TEST1_ADMIN", permissionGroups.ToArray()[1]);
         }
@@ -105,7 +105,7 @@ namespace Shrooms.Tests.DomainService
             MockPermissions();
             var permissionGroups = _permissionService.GetUserPermissions("UserId2", 1).ToList();
 
-            Assert.AreEqual(2, permissionGroups.Count());
+            Assert.AreEqual(2, permissionGroups.Count);
             Assert.AreEqual("TEST1_BASIC", permissionGroups.ToArray()[0]);
             Assert.AreEqual("TEST2_BASIC", permissionGroups.ToArray()[1]);
         }
@@ -116,7 +116,7 @@ namespace Shrooms.Tests.DomainService
             MockPermissions();
             var permissionGroups = _permissionService.GetRolePermissions("AdminId", 1).ToList();
 
-            Assert.AreEqual(4, permissionGroups.Count());
+            Assert.AreEqual(4, permissionGroups.Count);
             Assert.AreEqual("TEST1_BASIC", permissionGroups.ToArray()[0].Name);
             Assert.AreEqual("TEST1_ADMIN", permissionGroups.ToArray()[1].Name);
         }
@@ -127,7 +127,7 @@ namespace Shrooms.Tests.DomainService
             MockPermissions();
             var permissionGroups = _permissionService.GetRolePermissions("UserId", 1).ToList();
 
-            Assert.AreEqual(2, permissionGroups.Count());
+            Assert.AreEqual(2, permissionGroups.Count);
             Assert.AreEqual("TEST1_BASIC", permissionGroups.ToArray()[0].Name);
             Assert.AreEqual("TEST2_BASIC", permissionGroups.ToArray()[1].Name);
         }
@@ -135,7 +135,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public void Should_Return_That_User_Is_Permitted()
         {
-            var userAndOrg = new UserAndOrganizationDTO()
+            var userAndOrg = new UserAndOrganizationDTO
             {
                 OrganizationId = 1,
                 UserId = "userId"
@@ -151,7 +151,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public void Should_Return_That_User_Is_Not_Permitted()
         {
-            var userAndOrg = new UserAndOrganizationDTO()
+            var userAndOrg = new UserAndOrganizationDTO
             {
                 OrganizationId = 2,
                 UserId = "userId"
@@ -167,12 +167,12 @@ namespace Shrooms.Tests.DomainService
         private void MockUserPermission()
         {
             var adminRole = Substitute.For<ApplicationRole>();
-            adminRole.Users.Returns(new List<IdentityUserRole>()
+            adminRole.Users.Returns(new List<IdentityUserRole>
             {
                 new IdentityUserRole
                 {
                     UserId = "userId"
-                },
+                }
             });
 
             var organizationId1 = new List<Organization>
@@ -191,7 +191,7 @@ namespace Shrooms.Tests.DomainService
                     Name = "TEST1_BASIC",
                     Scope = PermissionScopes.Basic,
                     ModuleId = 1,
-                    Module = new Module()
+                    Module = new Module
                     {
                         Organizations = organizationId1
                     },
@@ -199,7 +199,7 @@ namespace Shrooms.Tests.DomainService
                     {
                         adminRole
                     }
-                },
+                }
             }.AsQueryable();
 
             _permissionsDbSet.SetDbSetData(permissions);
@@ -209,18 +209,18 @@ namespace Shrooms.Tests.DomainService
         {
             var adminRole = Substitute.For<ApplicationRole>();
             adminRole.Id = "AdminId";
-            adminRole.Users.Returns(new List<IdentityUserRole>()
+            adminRole.Users.Returns(new List<IdentityUserRole>
             {
                 new IdentityUserRole
                 {
                     RoleId = "AdminId",
                     UserId = "UserId1"
-                },
+                }
             });
 
             var userRole = Substitute.For<ApplicationRole>();
             userRole.Id = "UserId";
-            userRole.Users.Returns(new List<IdentityUserRole>()
+            userRole.Users.Returns(new List<IdentityUserRole>
             {
                 new IdentityUserRole
                 {
@@ -253,7 +253,7 @@ namespace Shrooms.Tests.DomainService
                     Name = "TEST1_BASIC",
                     Scope = PermissionScopes.Basic,
                     ModuleId = 1,
-                    Module = new Module()
+                    Module = new Module
                     {
                         Organizations = organizationId1
                     },
@@ -269,7 +269,7 @@ namespace Shrooms.Tests.DomainService
                     Name = "TEST1_ADMIN",
                     Scope = PermissionScopes.Administration,
                     ModuleId = 1,
-                    Module = new Module()
+                    Module = new Module
                     {
                         Organizations = organizationId1
                     },
@@ -305,7 +305,7 @@ namespace Shrooms.Tests.DomainService
                     Name = "TEST3_BASIC",
                     Scope = PermissionScopes.Basic,
                     ModuleId = 1,
-                    Module = new Module()
+                    Module = new Module
                     {
                         Organizations = organizationId2
                     },
@@ -321,7 +321,7 @@ namespace Shrooms.Tests.DomainService
                     Name = "TEST3_ADMIN",
                     Scope = PermissionScopes.Administration,
                     ModuleId = 1,
-                    Module = new Module()
+                    Module = new Module
                     {
                         Organizations = organizationId2
                     },
@@ -329,7 +329,7 @@ namespace Shrooms.Tests.DomainService
                     {
                         adminRole
                     }
-                },
+                }
             }.AsQueryable();
 
             _permissionsDbSet.SetDbSetData(permissions);

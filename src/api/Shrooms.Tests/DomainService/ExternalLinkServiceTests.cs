@@ -170,7 +170,7 @@ namespace Shrooms.Tests.DomainService
 
         private void MockExternalLinks()
         {
-            var externalLinks = new List<ExternalLink>()
+            var externalLinks = new List<ExternalLink>
             {
                 new ExternalLink
                 {

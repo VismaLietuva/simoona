@@ -83,7 +83,7 @@ namespace Shrooms.Tests.DomainService
             var comment = new Comment
             {
                 Id = 1,
-                Likes = new LikesCollection() { new Like("user1") },
+                Likes = new LikesCollection { new Like("user1") },
                 Post = new Post
                 {
                     Wall = new Wall
@@ -109,7 +109,7 @@ namespace Shrooms.Tests.DomainService
             };
             _postsDbSet.SetDbSetData(posts.AsQueryable());
 
-            var users = new List<ApplicationUser>()
+            var users = new List<ApplicationUser>
             {
                 new ApplicationUser
                 {

@@ -71,7 +71,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 {
                     Email = User.Identity.GetUserName(),
                     HasRegistered = externalLogin == null,
-                    LoginProvider = externalLogin?.LoginProvider,
+                    LoginProvider = externalLogin?.LoginProvider
                 };
                 return Ok(externalUserInfo);
             }

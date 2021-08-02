@@ -132,7 +132,7 @@ namespace Shrooms.Presentation.Api.Controllers
             var providers = new List<ProviderViewModel>();
             foreach (var login in logins)
             {
-                providers.Add(new ProviderViewModel()
+                providers.Add(new ProviderViewModel
                 {
                     LoginProvider = login.LoginProvider,
                     Email = GetEmail(user, login.LoginProvider)

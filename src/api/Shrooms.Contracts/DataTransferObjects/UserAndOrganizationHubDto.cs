@@ -18,8 +18,7 @@ namespace Shrooms.Contracts.DataTransferObjects
 
         public bool Equals(UserAndOrganizationHubDto userOrg)
         {
-            if (userOrg != null && UserId == userOrg.UserId &&
-                    OrganizationId == userOrg.OrganizationId && OrganizationName == userOrg.OrganizationName)
+            if (userOrg != null && UserId == userOrg.UserId && OrganizationId == userOrg.OrganizationId && OrganizationName == userOrg.OrganizationName)
             {
                 return true;
             }

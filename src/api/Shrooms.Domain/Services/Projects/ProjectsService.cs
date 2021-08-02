@@ -397,7 +397,7 @@ namespace Shrooms.Domain.Services.Projects
                 .Select(attr => new Skill
                 {
                     Title = attr,
-                    ShowInAutoComplete = true,
+                    ShowInAutoComplete = true
                 });
 
             foreach (var attr in newAttributes)

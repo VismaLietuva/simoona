@@ -104,7 +104,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         [Test]
         public void Room_Post_Should_Return_Ok_Response_If()
         {
-            var testRoom = new RoomPostViewModel()
+            var testRoom = new RoomPostViewModel
             {
                 Id = 7,
                 Name = "testName",
@@ -145,7 +145,7 @@ namespace Shrooms.Tests.Controllers.WebApi
             var applicationUser = _applicationUserRepository.Get().FirstOrDefault();
             var applicationUserViewModel = _mapper.Map<ApplicationUser, ApplicationUserViewModel>(applicationUser);
 
-            var testRoom = new RoomPostViewModel()
+            var testRoom = new RoomPostViewModel
             {
                 Id = 1,
                 Name = "testName",
@@ -169,7 +169,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         [Test]
         public void Room_Put_Should_Return_Not_Found_If_Updating_Invalid_Room()
         {
-            var testRoom = new RoomPostViewModel()
+            var testRoom = new RoomPostViewModel
             {
                 Id = 100,
                 Name = "testName",

@@ -253,7 +253,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         [Test]
         public void Wall_EditWall_Should_Return_Ok()
         {
-            IEnumerable<ModeratorViewModel> moderators = new List<ModeratorViewModel>()
+            IEnumerable<ModeratorViewModel> moderators = new List<ModeratorViewModel>
             {
                 new ModeratorViewModel
                 {

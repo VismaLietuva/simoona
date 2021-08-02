@@ -85,9 +85,9 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
         [CacheOutput(ServerTimeSpan = WebApiConstants.OneHour)]
         public IEnumerable<KudosTypeViewModel> GetKudosTypesForFilter()
         {
-            var types = new List<KudosTypeViewModel>()
+            var types = new List<KudosTypeViewModel>
             {
-                new KudosTypeViewModel()
+                new KudosTypeViewModel
                 {
                     Hidden = false,
                     Id = 0,
@@ -450,7 +450,7 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
         {
             var kudosStatsDto = _kudosService.GetKudosStats(months, amount, GetUserAndOrganization().OrganizationId);
             var stats = _mapper.Map<IEnumerable<KudosBasicDataDTO>, IEnumerable<KudosBasicDataViewModel>>(kudosStatsDto);
-            return new KudosListBasicDataViewModel()
+            return new KudosListBasicDataViewModel
             {
                 Users = stats,
                 Months = months

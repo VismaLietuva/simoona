@@ -71,7 +71,7 @@ namespace Shrooms.Tests.DomainService
             var post = new Post
             {
                 Id = 1,
-                Likes = new LikesCollection() { new Like("user1") },
+                Likes = new LikesCollection { new Like("user1") },
                 Wall = new Wall
                 {
                     OrganizationId = 2

@@ -44,7 +44,7 @@ namespace Shrooms.Tests.DomainService
         {
             MockRolesForAutocomplete();
 
-            var userOrg = new UserAndOrganizationDTO()
+            var userOrg = new UserAndOrganizationDTO
             {
                 OrganizationId = 2
             };
@@ -63,7 +63,7 @@ namespace Shrooms.Tests.DomainService
 
             var userAndOrg = new UserAndOrganizationDTO
             {
-                OrganizationId = 1,
+                OrganizationId = 1
             };
 
             var roles = _roleService.GetRoleById(userAndOrg, "roleId1");
@@ -88,7 +88,7 @@ namespace Shrooms.Tests.DomainService
             {
                 new IdentityUserRole
                 {
-                    RoleId = "roleId1",
+                    RoleId = "roleId1"
                 }
             });
 
@@ -100,7 +100,7 @@ namespace Shrooms.Tests.DomainService
             {
                 new IdentityUserRole
                 {
-                    RoleId = "roleId1",
+                    RoleId = "roleId1"
                 }
             });
 
@@ -112,7 +112,7 @@ namespace Shrooms.Tests.DomainService
             {
                 new IdentityUserRole
                 {
-                    RoleId = "roleId2",
+                    RoleId = "roleId2"
                 }
             });
 
@@ -137,15 +137,15 @@ namespace Shrooms.Tests.DomainService
                 {
                     new PermissionGroupDTO
                     {
-                        Name = "permission1",
+                        Name = "permission1"
                     },
                     new PermissionGroupDTO
                     {
-                        Name = "permission2",
+                        Name = "permission2"
                     },
                     new PermissionGroupDTO
                     {
-                        Name = "permission3",
+                        Name = "permission3"
                     }
                 });
 

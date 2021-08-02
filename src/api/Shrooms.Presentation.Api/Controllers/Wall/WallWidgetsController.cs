@@ -102,7 +102,7 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
         {
             var kudosStatsDto = _kudosService.GetKudosStats(months, amount, User.Identity.GetOrganizationId());
             var stats = _mapper.Map<IEnumerable<KudosBasicDataDTO>, IEnumerable<KudosBasicDataViewModel>>(kudosStatsDto);
-            return new KudosListBasicDataViewModel()
+            return new KudosListBasicDataViewModel
             {
                 Users = stats,
                 Months = months

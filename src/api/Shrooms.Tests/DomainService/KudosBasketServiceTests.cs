@@ -89,10 +89,10 @@ namespace Shrooms.Tests.DomainService
                 {
                     Id = 11,
                     Description = "test",
-                    KudosLogs = new List<KudosLog> { new KudosLog() { Points = 5, Employee = MockDonator().First() } },
+                    KudosLogs = new List<KudosLog> { new KudosLog { Points = 5, Employee = MockDonator().First() } },
                     OrganizationId = 2,
                     Title = "test",
-                    IsActive = false,
+                    IsActive = false
                 }
             };
             return kudosBaskets.AsQueryable();
@@ -177,16 +177,16 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 2
             };
 
-            _kudosBasketDbSet.SetDbSetData(new List<KudosBasket>()
+            _kudosBasketDbSet.SetDbSetData(new List<KudosBasket>
             {
                 new KudosBasket
                 {
                     Id = 11,
                     Description = "test",
-                    KudosLogs = new List<KudosLog> { new KudosLog() { Points = 5, Employee = null } },
+                    KudosLogs = new List<KudosLog> { new KudosLog { Points = 5, Employee = null } },
                     OrganizationId = 2,
                     Title = "test",
-                    IsActive = false,
+                    IsActive = false
                 }
             });
 

@@ -245,7 +245,7 @@ namespace Shrooms.Tests.DomainService
         {
             // Arrange
             var member = new WallMember { Id = 2, UserId = "user1", WallId = 2 };
-            var jobPosition = new JobPosition() { Title = "jobpos" };
+            var jobPosition = new JobPosition { Title = "jobpos" };
 
             var walls = new List<Wall>
             {
@@ -702,7 +702,7 @@ namespace Shrooms.Tests.DomainService
                             UserId = "userId",
                             WallId = 2
                         }
-                    },
+                    }
                 },
                 new Wall
                 {
@@ -717,7 +717,7 @@ namespace Shrooms.Tests.DomainService
                             UserId = "userId",
                             WallId = 3
                         }
-                    },
+                    }
                 }
             };
 
@@ -797,8 +797,8 @@ namespace Shrooms.Tests.DomainService
                             WallId = 1
                         }
                     },
-                    OrganizationId = 2,
-                },
+                    OrganizationId = 2
+                }
             };
 
             _wallsDbSet.SetDbSetData(walls.AsQueryable());
@@ -839,7 +839,7 @@ namespace Shrooms.Tests.DomainService
                     Members = new List<WallMember> { member3 },
                     OrganizationId = 2,
                     Type = WallType.UserCreated,
-                    Moderators = new List<WallModerator>()
+                    Moderators = new List<WallModerator>
                     {
                         new WallModerator
                         {

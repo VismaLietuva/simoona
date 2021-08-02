@@ -68,7 +68,7 @@ namespace Shrooms.Tests.DomainService
             var asyncRunner = Substitute.For<IAsyncRunner>();
             MockRoleService(roleService);
 
-            _kudosService = new KudosService(_uow, uow2, _mapper, roleService, permissionService, kudosServiceValidation, asyncRunner);
+            _kudosService = new KudosService(_uow, uow2, _mapper, permissionService, kudosServiceValidation, asyncRunner);
         }
 
         #region GetKudosLogs
@@ -870,7 +870,7 @@ namespace Shrooms.Tests.DomainService
                     OrganizationId = 2,
                     MultiplyBy = 1,
                     Points = 2,
-                    Status = KudosStatus.Approved,
+                    Status = KudosStatus.Approved
                 },
                 new KudosLog
                 {
@@ -879,7 +879,7 @@ namespace Shrooms.Tests.DomainService
                     EmployeeId = "UserId",
                     OrganizationId = 1,
                     Points = 3,
-                    Status = KudosStatus.Approved,
+                    Status = KudosStatus.Approved
                 },
                 new KudosLog
                 {
@@ -888,7 +888,7 @@ namespace Shrooms.Tests.DomainService
                     EmployeeId = "UserId",
                     OrganizationId = 2,
                     Points = 10,
-                    Status = KudosStatus.Approved,
+                    Status = KudosStatus.Approved
                 }
             };
             _kudosLogsDbSet.SetDbSetData(kudosLogs.AsQueryable());
@@ -1252,7 +1252,7 @@ namespace Shrooms.Tests.DomainService
                     FirstName = "User",
                     LastName = "4",
                     EmploymentDate = DateTime.UtcNow
-                },
+                }
             };
 
             _usersDbSet.SetDbSetData(users.AsQueryable());
@@ -1346,7 +1346,7 @@ namespace Shrooms.Tests.DomainService
                     Created = DateTime.UtcNow,
                     Points = 1,
                     KudosBasketId = 1
-                },
+                }
             };
             _kudosLogsDbSet.SetDbSetData(kudosLogs.AsQueryable());
         }

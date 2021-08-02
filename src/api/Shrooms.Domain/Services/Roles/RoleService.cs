@@ -79,7 +79,7 @@ namespace Shrooms.Domain.Services.Roles
                 .Select(x => new RoleDetailsDTO
                 {
                     Id = x.Id,
-                    Name = x.Name,
+                    Name = x.Name
                 })
                 .Single();
 
@@ -96,9 +96,9 @@ namespace Shrooms.Domain.Services.Roles
         private string GetRoleIdByName(string roleName)
         {
             return _roleDbSet
-                            .Where(x => x.Name == roleName)
-                            .Select(x => x.Id)
-                            .FirstOrDefault();
+                .Where(x => x.Name == roleName)
+                .Select(x => x.Id)
+                .FirstOrDefault();
         }
 
         private IEnumerable<RoleUserDTO> GetUsersWithRole(string roleId)
@@ -123,9 +123,10 @@ namespace Shrooms.Domain.Services.Roles
                 {
                     Name = x.Name,
                     ActiveScope = rolePermissions.Any(y => y.Name.StartsWith(x.Name, StringComparison.OrdinalIgnoreCase) && y.Scope == PermissionScopes.Administration)
-                                  ? PermissionScopes.Administration
-                                  : (rolePermissions.Any(y => y.Name.StartsWith(x.Name, StringComparison.OrdinalIgnoreCase) && y.Scope == PermissionScopes.Basic)
-                                        ? PermissionScopes.Basic : string.Empty)
+                                      ? PermissionScopes.Administration
+                                      : (rolePermissions.Any(y => y.Name.StartsWith(x.Name, StringComparison.OrdinalIgnoreCase) && y.Scope == PermissionScopes.Basic)
+                                             ? PermissionScopes.Basic
+                                             : string.Empty)
                 })
                 .ToList();
 

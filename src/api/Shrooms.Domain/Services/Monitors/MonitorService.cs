@@ -39,7 +39,7 @@ namespace Shrooms.Domain.Services.Monitors
             }
 
             var timestamp = DateTime.UtcNow;
-            var monitor = new Monitor()
+            var monitor = new Monitor
             {
                 Created = timestamp,
                 Modified = timestamp,

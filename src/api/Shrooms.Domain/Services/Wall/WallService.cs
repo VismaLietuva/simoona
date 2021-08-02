@@ -85,7 +85,7 @@ namespace Shrooms.Domain.Services.Wall
                 Description = newWallDto.Description,
                 Moderators = newWallDto.ModeratorsIds.Select(x => new WallModerator
                 {
-                    UserId = x,
+                    UserId = x
                 }).ToList(),
                 Members = newWallDto.MembersIds.Select(x => new WallMember
                 {
@@ -475,12 +475,12 @@ namespace Shrooms.Domain.Services.Wall
                         continue;
                     }
 
-                    var wallMember = new WallMember()
+                    var wallMember = new WallMember
                     {
                         AppNotificationsEnabled = true,
                         EmailNotificationsEnabled = true,
                         UserId = userId,
-                        WallId = wallId,
+                        WallId = wallId
                     };
 
                     _wallUsersDbSet.Add(wallMember);

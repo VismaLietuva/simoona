@@ -22,7 +22,6 @@ using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Email.Kudos;
 using Shrooms.Domain.Services.Permissions;
-using Shrooms.Domain.Services.Roles;
 using Shrooms.Domain.ServiceValidators.Validators.Kudos;
 using Shrooms.Resources;
 using ConstantsRoles = Shrooms.Contracts.Constants.Roles;
@@ -35,7 +34,6 @@ namespace Shrooms.Domain.Services.Kudos
 
         private readonly IUnitOfWork2 _uow;
         private readonly IMapper _mapper;
-        private readonly IRoleService _roleService;
         private readonly IPermissionService _permissionService;
         private readonly IKudosServiceValidator _kudosServiceValidator;
         private readonly IAsyncRunner _asyncRunner;
@@ -44,11 +42,12 @@ namespace Shrooms.Domain.Services.Kudos
         private readonly IDbSet<ApplicationUser> _usersDbSet;
         private readonly IRepository<KudosLog> _kudosLogRepository;
         private readonly IRepository<ApplicationUser> _applicationUserRepository;
+
         private Expression<Func<KudosType, bool>> _excludeNecessaryKudosTypes = x => x.Type != KudosTypeEnum.Send &&
-                                x.Type != KudosTypeEnum.Minus &&
-                                x.Type != KudosTypeEnum.Other &&
-                                x.Type != KudosTypeEnum.Welcome &&
-                                x.Type != KudosTypeEnum.Refund;
+                                                                                     x.Type != KudosTypeEnum.Minus &&
+                                                                                     x.Type != KudosTypeEnum.Other &&
+                                                                                     x.Type != KudosTypeEnum.Welcome &&
+                                                                                     x.Type != KudosTypeEnum.Refund;
 
         private readonly ResourceManager _resourceManager;
 
@@ -56,14 +55,12 @@ namespace Shrooms.Domain.Services.Kudos
             IUnitOfWork2 uow,
             IUnitOfWork unitOfWork,
             IMapper mapper,
-            IRoleService roleService,
             IPermissionService permissionService,
             IKudosServiceValidator kudosServiceValidator,
             IAsyncRunner asyncRunner)
         {
             _uow = uow;
             _mapper = mapper;
-            _roleService = roleService;
             _permissionService = permissionService;
             _kudosServiceValidator = kudosServiceValidator;
             _asyncRunner = asyncRunner;
@@ -79,7 +76,7 @@ namespace Shrooms.Domain.Services.Kudos
         public async Task CreateKudosType(NewKudosTypeDto dto)
         {
             var alreadyExists = await _kudosTypesDbSet
-                .AnyAsync(t => t.Name == dto.Name);
+                                    .AnyAsync(t => t.Name == dto.Name);
 
             if (alreadyExists)
             {
@@ -103,7 +100,7 @@ namespace Shrooms.Domain.Services.Kudos
         public async Task UpdateKudosType(KudosTypeDTO dto)
         {
             var type = await _kudosTypesDbSet
-                .FirstOrDefaultAsync(t => t.Id == dto.Id);
+                           .FirstOrDefaultAsync(t => t.Id == dto.Id);
 
             if (type == null)
             {
@@ -125,8 +122,8 @@ namespace Shrooms.Domain.Services.Kudos
         public async Task RemoveKudosType(int id, UserAndOrganizationDTO userOrg)
         {
             var type = await _kudosTypesDbSet
-                .Where(_excludeNecessaryKudosTypes)
-                .FirstOrDefaultAsync(t => t.Id == id);
+                           .Where(_excludeNecessaryKudosTypes)
+                           .FirstOrDefaultAsync(t => t.Id == id);
 
             if (type == null)
             {
@@ -156,17 +153,17 @@ namespace Shrooms.Domain.Services.Kudos
         public async Task<KudosTypeDTO> GetKudosType(int id, UserAndOrganizationDTO userOrg)
         {
             var type = await _kudosTypesDbSet
-                .Where(t => t.Id == id)
-                .Select(t => new KudosTypeDTO
-                {
-                    Id = t.Id,
-                    Name = t.Name,
-                    Value = t.Value,
-                    Description = t.Description,
-                    IsActive = t.IsActive,
-                    Type = t.Type
-                })
-                .FirstOrDefaultAsync();
+                           .Where(t => t.Id == id)
+                           .Select(t => new KudosTypeDTO
+                           {
+                               Id = t.Id,
+                               Name = t.Name,
+                               Value = t.Value,
+                               Description = t.Description,
+                               IsActive = t.IsActive,
+                               Type = t.Type
+                           })
+                           .FirstOrDefaultAsync();
 
             if (type == null)
             {
@@ -300,12 +297,12 @@ namespace Shrooms.Domain.Services.Kudos
             ValidateUser(organizationId, userId);
 
             var kudosLogs = _kudosLogsDbSet
-                    .Where(kudos =>
-                        kudos.EmployeeId == userId &&
-                        kudos.Status == KudosStatus.Approved &&
-                        kudos.KudosSystemType != KudosTypeEnum.Minus &&
-                        kudos.OrganizationId == organizationId)
-                    .ToList();
+                .Where(kudos =>
+                    kudos.EmployeeId == userId &&
+                    kudos.Status == KudosStatus.Approved &&
+                    kudos.KudosSystemType != KudosTypeEnum.Minus &&
+                    kudos.OrganizationId == organizationId)
+                .ToList();
 
             var user = _usersDbSet.Find(userId);
 
@@ -458,9 +455,9 @@ namespace Shrooms.Domain.Services.Kudos
 
             var currentMonthLogs = _kudosLogRepository
                 .Get(l => l.CreatedBy == id &&
-                    l.Created.Month == now.Month &&
-                    l.Created.Year == now.Year &&
-                    l.KudosSystemType == KudosTypeEnum.Send)
+                          l.Created.Month == now.Month &&
+                          l.Created.Year == now.Year &&
+                          l.KudosSystemType == KudosTypeEnum.Send)
                 .ToList();
 
             var sentThisMonth = currentMonthLogs.Sum(log => log.Points);
@@ -557,11 +554,11 @@ namespace Shrooms.Domain.Services.Kudos
             var kudosLogsStats = _kudosLogsDbSet
                 .Include(log => log.Employee)
                 .Where(log => log.OrganizationId == organizationId
-                    && log.KudosBasketId == null
-                    && log.Status == KudosStatus.Approved
-                    && log.KudosSystemType != KudosTypeEnum.Minus
-                    && log.Created >= date
-                    && log.Employee != null)
+                              && log.KudosBasketId == null
+                              && log.Status == KudosStatus.Approved
+                              && log.KudosSystemType != KudosTypeEnum.Minus
+                              && log.Created >= date
+                              && log.Employee != null)
                 .GroupBy(log => log.Employee.Id)
                 .Select(log => new KudosBasicDataDTO
                 {
@@ -601,10 +598,10 @@ namespace Shrooms.Domain.Services.Kudos
         private void SetKudosToUserProfile(ApplicationUser user, UserAndOrganizationDTO userOrg)
         {
             var allUserKudosLogs = _kudosLogsDbSet.Where(x =>
-                    x.EmployeeId == user.Id &&
-                    x.Status == KudosStatus.Approved &&
-                    x.Created >= user.EmploymentDate &&
-                    x.OrganizationId == userOrg.OrganizationId);
+                x.EmployeeId == user.Id &&
+                x.Status == KudosStatus.Approved &&
+                x.Created >= user.EmploymentDate &&
+                x.OrganizationId == userOrg.OrganizationId);
 
             var kudosTotal = allUserKudosLogs
                 .Where(x => x.KudosSystemType != KudosTypeEnum.Minus &&
@@ -619,9 +616,9 @@ namespace Shrooms.Domain.Services.Kudos
                             x.KudosBasketId != null)
                 .Sum(x => (decimal?)x.Points);
             var refundedKudos = allUserKudosLogs
-                .Where(x => x.KudosSystemType == KudosTypeEnum.Refund &&
-                            x.KudosBasketId == null)
-                .Sum(x => (decimal?)x.Points) ?? 0;
+                                    .Where(x => x.KudosSystemType == KudosTypeEnum.Refund &&
+                                                x.KudosBasketId == null)
+                                    .Sum(x => (decimal?)x.Points) ?? 0;
             spentKudos -= refundedKudos;
 
             user.SpentKudos = spentKudos ?? 0;
@@ -757,7 +754,7 @@ namespace Shrooms.Domain.Services.Kudos
 
             var receivingUser = _usersDbSet
                 .FirstOrDefault(x => x.Id == kudosLogDTO.UserId &&
-                            x.OrganizationId == kudosLogDTO.OrganizationId);
+                                     x.OrganizationId == kudosLogDTO.OrganizationId);
 
             if (receivingUser == null)
             {
@@ -847,14 +844,14 @@ namespace Shrooms.Domain.Services.Kudos
             var timestaps = DateTime.UtcNow;
 
             var currentMonthSum = _kudosLogsDbSet
-                            .Where(l => l.CreatedBy == kudosDTO.SendingUser.Id &&
-                                l.Created.Month == timestaps.Month &&
-                                l.Created.Year == timestaps.Year &&
-                                l.KudosSystemType == KudosTypeEnum.Send &&
-                                l.OrganizationId == kudosDTO.KudosLog.OrganizationId)
-                            .Select(p => p.Points)
-                            .DefaultIfEmpty(0)
-                            .Sum();
+                .Where(l => l.CreatedBy == kudosDTO.SendingUser.Id &&
+                            l.Created.Month == timestaps.Month &&
+                            l.Created.Year == timestaps.Year &&
+                            l.KudosSystemType == KudosTypeEnum.Send &&
+                            l.OrganizationId == kudosDTO.KudosLog.OrganizationId)
+                .Select(p => p.Points)
+                .DefaultIfEmpty(0)
+                .Sum();
 
             currentMonthSum += kudosDTO.TotalPointsSent;
 
@@ -915,7 +912,7 @@ namespace Shrooms.Domain.Services.Kudos
         {
             var welcomeKudos = _kudosTypesDbSet
                 .Where(kudosType => kudosType.Type == KudosTypeEnum.Welcome)
-                .Select(kudosType => new WelcomeKudosDTO()
+                .Select(kudosType => new WelcomeKudosDTO
                 {
                     WelcomeKudosAmount = kudosType.Value,
                     WelcomeKudosComment = kudosType.Description,

@@ -140,7 +140,7 @@ namespace Shrooms.Presentation.Api.Controllers
             result.Content.Headers.ContentDisposition =
                 new ContentDispositionHeaderValue("attachment")
                 {
-                    FileName = "Users.xlsx",
+                    FileName = "Users.xlsx"
                 };
 
             result.Content.Headers.ContentType = new MediaTypeHeaderValue(
@@ -361,7 +361,7 @@ namespace Shrooms.Presentation.Api.Controllers
                     });
             }
 
-            var model = new ApplicationUserProfileViewModel() { Id = user.Id };
+            var model = new ApplicationUserProfileViewModel { Id = user.Id };
 
             model.PersonalInfo = MapPersonalInfo(user);
             model.JobInfo = MapJobInfo(user);

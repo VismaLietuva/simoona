@@ -105,9 +105,9 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public void Should_Set_User_Tutorial_Status_To_Completed()
         {
-            var users = new List<ApplicationUser>()
+            var users = new List<ApplicationUser>
             {
-                new ApplicationUser() { Id = "user1", EmploymentDate = new DateTime(2018, 5, 15) }
+                new ApplicationUser { Id = "user1", EmploymentDate = new DateTime(2018, 5, 15) }
             };
 
             _userDbSet.SetDbSetData(users);

@@ -124,7 +124,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         {
             var testOffice = new OfficePostViewModel
             {
-                Name = "NewOffice",
+                Name = "NewOffice"
             };
 
             var result = _officeController.Post(testOffice);

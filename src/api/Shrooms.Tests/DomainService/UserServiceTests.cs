@@ -204,32 +204,32 @@ namespace Shrooms.Tests.DomainService
             // Arrange
             MockUserWallNotifications();
 
-            var userAndOrg = new UserAndOrganizationDTO()
+            var userAndOrg = new UserAndOrganizationDTO
             {
                 OrganizationId = 1,
                 UserId = "UserId"
             };
 
-            var notificationSettings = new List<WallNotificationsDto>()
+            var notificationSettings = new List<WallNotificationsDto>
             {
-                new WallNotificationsDto()
+                new WallNotificationsDto
                 {
                     WallId = 1,
                     IsAppNotificationEnabled = false,
                     IsEmailNotificationEnabled = false
                 },
-                new WallNotificationsDto()
+                new WallNotificationsDto
                 {
                     WallId = 3,
                     IsAppNotificationEnabled = true,
-                    IsEmailNotificationEnabled = true,
+                    IsEmailNotificationEnabled = true
                 },
-                new WallNotificationsDto()
+                new WallNotificationsDto
                 {
                     WallId = 4,
                     IsAppNotificationEnabled = false,
                     IsEmailNotificationEnabled = false
-                },
+                }
             };
 
             UserNotificationsSettingsDto userSettings = new UserNotificationsSettingsDto
@@ -263,7 +263,7 @@ namespace Shrooms.Tests.DomainService
         {
             MockWallMembersForNotifications();
 
-            var wall = new Wall()
+            var wall = new Wall
             {
                 Id = 2,
                 Type = WallType.UserCreated
@@ -278,9 +278,9 @@ namespace Shrooms.Tests.DomainService
         #region Mocks
         private void MockRolesAndUsersForPermissionValidation()
         {
-            var roles = new List<ApplicationRole>()
+            var roles = new List<ApplicationRole>
             {
-                new ApplicationRole()
+                new ApplicationRole
                 {
                     Id = "roleId1",
                     OrganizationId = 2,
@@ -292,7 +292,7 @@ namespace Shrooms.Tests.DomainService
                         }
                     }
                 },
-                new ApplicationRole()
+                new ApplicationRole
                 {
                     Id = "roleId2",
                     OrganizationId = 2,
@@ -304,7 +304,7 @@ namespace Shrooms.Tests.DomainService
                         }
                     }
                 },
-                new ApplicationRole()
+                new ApplicationRole
                 {
                     Id = "roleId3",
                     OrganizationId = 1,
@@ -323,9 +323,9 @@ namespace Shrooms.Tests.DomainService
             var user1 = Substitute.For<ApplicationUser>();
             user1.Email = "user1";
             user1.Roles.Returns(
-                new List<IdentityUserRole>()
+                new List<IdentityUserRole>
                 {
-                    new IdentityUserRole()
+                    new IdentityUserRole
                     {
                         RoleId = "roleId1"
                     }
@@ -334,9 +334,9 @@ namespace Shrooms.Tests.DomainService
             var user2 = Substitute.For<ApplicationUser>();
             user2.Email = "user2";
             user2.Roles.Returns(
-                new List<IdentityUserRole>()
+                new List<IdentityUserRole>
                 {
-                    new IdentityUserRole()
+                    new IdentityUserRole
                     {
                         RoleId = "roleId2"
                     }
@@ -345,9 +345,9 @@ namespace Shrooms.Tests.DomainService
             var user3 = Substitute.For<ApplicationUser>();
             user3.Email = "user3";
             user3.Roles.Returns(
-                new List<IdentityUserRole>()
+                new List<IdentityUserRole>
                 {
-                    new IdentityUserRole()
+                    new IdentityUserRole
                     {
                         RoleId = "roleId3"
                     }
@@ -439,48 +439,48 @@ namespace Shrooms.Tests.DomainService
         {
             var wallUsers = new List<WallMember>
             {
-                new WallMember()
+                new WallMember
                 {
                     UserId = "UserId",
                     EmailNotificationsEnabled = true,
                     WallId = 1,
-                    Wall = new Wall()
+                    Wall = new Wall
                     {
                         OrganizationId = 1,
                         Name = "MainWall",
                         Type = WallType.Main
                     }
                 },
-                new WallMember()
+                new WallMember
                 {
                     UserId = "UserId",
                     EmailNotificationsEnabled = true,
                     WallId = 2,
-                    Wall = new Wall()
+                    Wall = new Wall
                     {
                         OrganizationId = 1,
                         Name = "Wall1",
                         Type = WallType.UserCreated
                     }
                 },
-                new WallMember()
+                new WallMember
                 {
                     UserId = "UserId",
                     EmailNotificationsEnabled = false,
                     WallId = 3,
-                    Wall = new Wall()
+                    Wall = new Wall
                     {
                         OrganizationId = 1,
                         Name = "Wall2",
                         Type = WallType.UserCreated
                     }
                 },
-                new WallMember()
+                new WallMember
                 {
                     UserId = "UserId",
                     EmailNotificationsEnabled = true,
                     WallId = 4,
-                    Wall = new Wall()
+                    Wall = new Wall
                     {
                         OrganizationId = 1,
                         Name = "EventWall",
@@ -507,7 +507,7 @@ namespace Shrooms.Tests.DomainService
                             WallId = 1,
                             UserId = "1",
                             EmailNotificationsEnabled = true
-                        },
+                        }
                     }
                 },
                 new ApplicationUser
@@ -527,7 +527,7 @@ namespace Shrooms.Tests.DomainService
                             WallId = 2,
                             UserId = "2",
                             EmailNotificationsEnabled = false
-                        },
+                        }
                     }
                 },
                 new ApplicationUser
@@ -547,7 +547,7 @@ namespace Shrooms.Tests.DomainService
                             WallId = 2,
                             UserId = "3",
                             EmailNotificationsEnabled = true
-                        },
+                        }
                     }
                 }
             }.AsQueryable();
