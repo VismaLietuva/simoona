@@ -117,15 +117,16 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             var mappedRequest = new AddKudosLogDTO();
             _mapper.Map<AddKudosLogViewModel, AddKudosLogDTO>(request).Returns(mappedRequest);
-            _permissionService.UserHasPermission(Arg.Any<UserAndOrganizationDTO>(), AdministrationPermissions.Kudos)
+            _permissionService.UserHasPermissionAsync(Arg.Any<UserAndOrganizationDTO>(), AdministrationPermissions.Kudos)
                 .Returns(true);
 
             // Act
-            var result = await _kudosController.AddKudosLog(request).ExecuteAsync(CancellationToken.None);
+            var httpActionResult = await _kudosController.AddKudosLog(request);
+            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
-            _kudosService.Received(1).AddKudosLog(mappedRequest, explicitAmount);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            await _kudosService.Received(1).AddKudosLogAsync(mappedRequest, explicitAmount);
         }
 
         [Test]
@@ -139,16 +140,17 @@ namespace Shrooms.Tests.Controllers.WebApi
             };
             var mappedRequest = new AddKudosLogDTO();
             _mapper.Map<AddKudosLogViewModel, AddKudosLogDTO>(request).Returns(mappedRequest);
-            _permissionService.UserHasPermission(Arg.Any<UserAndOrganizationDTO>(), AdministrationPermissions.Kudos)
+            _permissionService.UserHasPermissionAsync(Arg.Any<UserAndOrganizationDTO>(), AdministrationPermissions.Kudos)
                 .Returns(true);
 
             // Act
-            var result = await _kudosController.AddKudosLog(request).ExecuteAsync(CancellationToken.None);
+            var response = await _kudosController.AddKudosLog(request);
+            var result = await response.ExecuteAsync(CancellationToken.None);
 
             // Assert
             Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
-            _kudosService.DidNotReceive().AddKudosLog(mappedRequest, explicitAmount);
-            _kudosService.Received(1).AddKudosLog(mappedRequest);
+            await _kudosService.DidNotReceive().AddKudosLogAsync(mappedRequest, explicitAmount);
+            await _kudosService.Received(1).AddKudosLogAsync(mappedRequest);
         }
 
         [Test]
@@ -163,16 +165,17 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             var mappedRequest = new AddKudosLogDTO();
             _mapper.Map<AddKudosLogViewModel, AddKudosLogDTO>(request).Returns(mappedRequest);
-            _permissionService.UserHasPermission(Arg.Any<UserAndOrganizationDTO>(), AdministrationPermissions.Kudos)
+            _permissionService.UserHasPermissionAsync(Arg.Any<UserAndOrganizationDTO>(), AdministrationPermissions.Kudos)
                 .Returns(false);
 
             // Act
-            var result = await _kudosController.AddKudosLog(request).ExecuteAsync(CancellationToken.None);
+            var response = await _kudosController.AddKudosLog(request);
+            var result = await response.ExecuteAsync(CancellationToken.None);
 
             // Assert
             Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
-            _kudosService.DidNotReceive().AddKudosLog(mappedRequest, explicitAmount);
-            _kudosService.Received(1).AddKudosLog(mappedRequest);
+            await _kudosService.DidNotReceive().AddKudosLogAsync(mappedRequest, explicitAmount);
+            await _kudosService.Received(1).AddKudosLogAsync(mappedRequest);
         }
     }
 }

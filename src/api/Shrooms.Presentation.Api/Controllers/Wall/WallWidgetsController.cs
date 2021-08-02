@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
@@ -45,26 +46,25 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
 
         [HttpGet]
         [PermissionAwareCacheOutputFilter(BasicPermissions.Kudos, BasicPermissions.Birthday, BasicPermissions.KudosBasket, ServerTimeSpan = WebApiConstants.OneHour)]
-        public WidgetsViewModel Get([FromUri]GetWidgetsViewModel getWidgetsViewModel)
+        public async Task<WidgetsViewModel> Get([FromUri] GetWidgetsViewModel getWidgetsViewModel)
         {
             var userAndOrganization = GetUserAndOrganization();
             return new WidgetsViewModel
             {
-                KudosWidgetStats = DefaultIfNotAuthorized(userAndOrganization, BasicPermissions.Kudos,
-                    () => GetKudosWidgetStats(
-                        getWidgetsViewModel.KudosTabOneMonths,
+                KudosWidgetStats = await DefaultIfNotAuthorizedAsync(userAndOrganization, BasicPermissions.Kudos,
+                    () => GetKudosWidgetStats(getWidgetsViewModel.KudosTabOneMonths,
                         getWidgetsViewModel.KudosTabOneAmount,
                         getWidgetsViewModel.KudosTabTwoMonths,
                         getWidgetsViewModel.KudosTabTwoAmount)),
-                LastKudosLogRecords = DefaultIfNotAuthorized(userAndOrganization, BasicPermissions.Kudos, GetLastKudosLogRecords),
-                WeeklyBirthdays = DefaultIfNotAuthorized(userAndOrganization, BasicPermissions.Birthday, GetWeeklyBirthdays),
-                KudosBasketWidget = DefaultIfNotAuthorized(userAndOrganization, BasicPermissions.KudosBasket, GetKudosBasketWidget)
+                LastKudosLogRecords = await DefaultIfNotAuthorizedAsync(userAndOrganization, BasicPermissions.Kudos, GetLastKudosLogRecords),
+                WeeklyBirthdays = await DefaultIfNotAuthorizedAsync(userAndOrganization, BasicPermissions.Birthday, GetWeeklyBirthdays),
+                KudosBasketWidget = await DefaultIfNotAuthorizedAsync(userAndOrganization, BasicPermissions.KudosBasket, GetKudosBasketWidget)
             };
         }
 
-        private T DefaultIfNotAuthorized<T>(UserAndOrganizationDTO userAndOrganization, string permission, Func<T> valueFactory)
+        private async Task<T> DefaultIfNotAuthorizedAsync<T>(UserAndOrganizationDTO userAndOrganization, string permission, Func<T> valueFactory)
         {
-            return _permissionService.UserHasPermission(userAndOrganization, permission) ? valueFactory() : default;
+            return await _permissionService.UserHasPermissionAsync(userAndOrganization, permission) ? valueFactory() : default;
         }
 
         private IEnumerable<WallKudosLogViewModel> GetLastKudosLogRecords()

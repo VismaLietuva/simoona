@@ -17,7 +17,6 @@ namespace Shrooms.Domain.Helpers
             return settings;
         }
 
-        public string ConvertToHtml(string markdown)
-            => CommonMarkConverter.Convert(markdown, _settings);
+        public string ConvertToHtml(string markdown) => CommonMarkConverter.Convert(markdown, _settings);
     }
 }

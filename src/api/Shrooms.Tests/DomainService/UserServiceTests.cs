@@ -259,7 +259,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_Wall_Members_Emails()
+        public async Task Should_Return_Wall_Members_Emails()
         {
             MockWallMembersForNotifications();
 
@@ -269,7 +269,7 @@ namespace Shrooms.Tests.DomainService
                 Type = WallType.UserCreated
             };
 
-            var emails = _userService.GetWallUsersEmails(SendUserEmail, wall);
+            var emails = await _userService.GetWallUsersEmailsAsync(SendUserEmail, wall);
 
             Assert.That(emails.Count, Is.EqualTo(1));
             Assert.That(emails.First().Contains("test3@shrooms.com"), Is.True);

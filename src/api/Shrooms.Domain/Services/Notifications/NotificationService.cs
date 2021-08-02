@@ -48,7 +48,7 @@ namespace Shrooms.Domain.Services.Notifications
             _wallService = wallService;
         }
 
-        public async Task<NotificationDto> CreateForPost(UserAndOrganizationDTO userOrg, NewlyCreatedPostDTO post, int wallId, IEnumerable<string> membersToNotify)
+        public async Task<NotificationDto> CreateForPostAsync(UserAndOrganizationDTO userOrg, NewlyCreatedPostDTO post, int wallId, IEnumerable<string> membersToNotify)
         {
             var postType = NotificationType.WallPost;
             var sources = new Sources { PostId = post.Id };
@@ -80,12 +80,7 @@ namespace Shrooms.Domain.Services.Notifications
             return _mapper.Map<NotificationDto>(newNotification);
         }
 
-        public async Task<NotificationDto> CreateForComment(UserAndOrganizationDTO userOrg, CommentCreatedDTO comment, NotificationType type, string memberToNotify)
-        {
-            return await CreateForComment(userOrg, comment, type, new List<string> { memberToNotify });
-        }
-
-        public async Task<NotificationDto> CreateForComment(UserAndOrganizationDTO userOrg, CommentCreatedDTO comment, NotificationType type, IEnumerable<string> membersToNotify)
+        public async Task<NotificationDto> CreateForCommentAsync(UserAndOrganizationDTO userOrg, CommentCreatedDTO comment, NotificationType type, IEnumerable<string> membersToNotify)
         {
             var sources = new Sources { PostId = comment.PostId };
 
@@ -114,10 +109,10 @@ namespace Shrooms.Domain.Services.Notifications
             return _mapper.Map<NotificationDto>(newNotification);
         }
 
-        public async Task<NotificationDto> CreateForWall(UserAndOrganizationDTO userOrg, CreateWallDto wallDto, int wallId)
+        public async Task<NotificationDto> CreateForWallAsync(UserAndOrganizationDTO userOrg, CreateWallDto wallDto, int wallId)
         {
             var mainWallId = await _wallDbSet.Where(w => w.Type == WallType.Main).Select(s => s.Id).SingleAsync();
-            var membersToNotify = _wallService.GetWallMembersIds(mainWallId, userOrg);
+            var membersToNotify = await _wallService.GetWallMembersIdsAsync(mainWallId, userOrg);
             var newNotification = Notification.Create(wallDto.Name, wallDto.Description, wallDto.Logo, new Sources { WallId = wallId }, NotificationType.NewWall, userOrg.OrganizationId, membersToNotify);
 
             _notificationDbSet.Add(newNotification);
@@ -127,7 +122,7 @@ namespace Shrooms.Domain.Services.Notifications
             return _mapper.Map<NotificationDto>(newNotification);
         }
 
-        public async Task<IEnumerable<NotificationDto>> GetAll(UserAndOrganizationDTO userOrg)
+        public async Task<IEnumerable<NotificationDto>> GetAllAsync(UserAndOrganizationDTO userOrg)
         {
             var result = await _notificationUserDbSet
                              .Include(x => x.Notification)
@@ -140,7 +135,7 @@ namespace Shrooms.Domain.Services.Notifications
             return _mapper.Map<IEnumerable<NotificationDto>>(result);
         }
 
-        public async Task MarkAsRead(UserAndOrganizationDTO userOrg, IEnumerable<int> notificationIds)
+        public async Task MarkAsReadAsync(UserAndOrganizationDTO userOrg, IEnumerable<int> notificationIds)
         {
             var notificationUsers = _notificationUserDbSet
                 .Include(i => i.Notification)
@@ -162,7 +157,7 @@ namespace Shrooms.Domain.Services.Notifications
             await _uow.SaveChangesAsync();
         }
 
-        public async Task MarkAllAsRead(UserAndOrganizationDTO userOrg)
+        public async Task MarkAllAsReadAsync(UserAndOrganizationDTO userOrg)
         {
             var notificationUsers = await _notificationUserDbSet
                                         .Include(i => i.Notification)

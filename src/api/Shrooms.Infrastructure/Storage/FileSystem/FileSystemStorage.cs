@@ -7,7 +7,7 @@ namespace Shrooms.Infrastructure.Storage.FileSystem
 {
     public class FileSystemStorage : IStorage
     {
-        public Task RemovePicture(string blobKey, string tenantPicturesContainer)
+        public Task RemovePictureAsync(string blobKey, string tenantPicturesContainer)
         {
             var filePath = HostingEnvironment.MapPath($"~/storage/{tenantPicturesContainer}/{blobKey}");
             var fileInfo = new FileInfo(filePath);
@@ -20,7 +20,7 @@ namespace Shrooms.Infrastructure.Storage.FileSystem
             return Task.FromResult<object>(null);
         }
 
-        public Task UploadPicture(Image image, string blobKey, string mimeType, string tenantPicturesContainer)
+        public Task UploadPictureAsync(Image image, string blobKey, string mimeType, string tenantPicturesContainer)
         {
             var filePath = HostingEnvironment.MapPath($"~/storage/{tenantPicturesContainer}/");
             var fullPath = Path.Combine(filePath, blobKey);
@@ -31,7 +31,7 @@ namespace Shrooms.Infrastructure.Storage.FileSystem
             return Task.CompletedTask;
         }
 
-        public async Task UploadPicture(Stream stream, string blobKey, string mimeType, string tenantPicturesContainer)
+        public async Task UploadPictureAsync(Stream stream, string blobKey, string mimeType, string tenantPicturesContainer)
         {
             var filePath = HostingEnvironment.MapPath($"~/storage/{tenantPicturesContainer}/");
             var fullPath = Path.Combine(filePath, blobKey);

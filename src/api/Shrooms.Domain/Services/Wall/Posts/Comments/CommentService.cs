@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
@@ -62,11 +63,11 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             _uow.SaveChanges(userOrg.UserId);
         }
 
-        public CommentCreatedDTO CreateComment(NewCommentDTO commentDto)
+        public async Task<CommentCreatedDTO> CreateCommentAsync(NewCommentDTO commentDto)
         {
-            var post = _postsDbSet
+            var post = await _postsDbSet
                 .Include(x => x.Wall)
-                .FirstOrDefault(p => p.Id == commentDto.PostId && p.Wall.OrganizationId == commentDto.OrganizationId);
+                .FirstOrDefaultAsync(p => p.Id == commentDto.PostId && p.Wall.OrganizationId == commentDto.OrganizationId);
 
             if (post == null)
             {
@@ -98,7 +99,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
                 });
             }
 
-            _uow.SaveChanges(commentDto.UserId);
+            await _uow.SaveChangesAsync(commentDto.UserId);
 
             return new CommentCreatedDTO
             {
@@ -112,23 +113,21 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             };
         }
 
-        public void EditComment(EditCommentDTO commentDto)
+        public async Task EditCommentAsync(EditCommentDTO commentDto)
         {
-            var comment = _commentsDbSet
+            var comment = await _commentsDbSet
                 .Include(x => x.Post.Wall)
-                .FirstOrDefault(c =>
-                    c.Id == commentDto.Id &&
-                    c.Post.Wall.OrganizationId == commentDto.OrganizationId);
+                .FirstOrDefaultAsync(c => c.Id == commentDto.Id && c.Post.Wall.OrganizationId == commentDto.OrganizationId);
 
             if (comment == null)
             {
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Comment does not exist");
             }
 
-            var isWallModerator = _wallModeratorsDbSet
-                                      .Any(x => x.UserId == commentDto.UserId && x.WallId == comment.Post.WallId) || commentDto.UserId == comment.CreatedBy;
+            var isWallModerator = await _wallModeratorsDbSet
+                                      .AnyAsync(x => x.UserId == commentDto.UserId && x.WallId == comment.Post.WallId) || commentDto.UserId == comment.CreatedBy;
 
-            var isAdministrator = _permissionService.UserHasPermission(commentDto, AdministrationPermissions.Post);
+            var isAdministrator = await _permissionService.UserHasPermissionAsync(commentDto, AdministrationPermissions.Post);
 
             if (!isAdministrator && !isWallModerator)
             {
@@ -138,14 +137,15 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             comment.MessageBody = commentDto.MessageBody;
             comment.PictureId = commentDto.PictureId;
             comment.LastEdit = DateTime.UtcNow;
-            _uow.SaveChanges(commentDto.UserId);
+
+            await _uow.SaveChangesAsync(commentDto.UserId);
         }
 
-        public void DeleteComment(int commentId, UserAndOrganizationDTO userOrg)
+        public async Task DeleteCommentAsync(int commentId, UserAndOrganizationDTO userOrg)
         {
-            var comment = _commentsDbSet
+            var comment = await _commentsDbSet
                 .Include(x => x.Post.Wall)
-                .FirstOrDefault(c =>
+                .FirstOrDefaultAsync(c =>
                     c.Id == commentId &&
                     c.Post.Wall.OrganizationId == userOrg.OrganizationId);
 
@@ -154,10 +154,10 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Comment does not exist");
             }
 
-            var isWallModerator = _wallModeratorsDbSet
-                                      .Any(x => x.UserId == userOrg.UserId && x.WallId == comment.Post.WallId) || comment.CreatedBy == userOrg.UserId;
+            var isWallModerator = await _wallModeratorsDbSet
+                                      .AnyAsync(x => x.UserId == userOrg.UserId && x.WallId == comment.Post.WallId) || comment.CreatedBy == userOrg.UserId;
 
-            var isAdministrator = _permissionService.UserHasPermission(userOrg, AdministrationPermissions.Post);
+            var isAdministrator = await _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Post);
 
             if (!isAdministrator && !isWallModerator)
             {
@@ -165,31 +165,30 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             }
 
             _commentsDbSet.Remove(comment);
-            _uow.SaveChanges(userOrg.UserId);
+
+            await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
-        public string GetCommentBody(int commentId)
+        public async Task<string> GetCommentBodyAsync(int commentId)
         {
-            return _commentsDbSet.FirstOrDefault(x => x.Id == commentId)?.MessageBody;
+            return (await _commentsDbSet.FirstOrDefaultAsync(x => x.Id == commentId))?.MessageBody;
         }
 
-        public void HideComment(int commentId, UserAndOrganizationDTO userOrg)
+        public async Task HideCommentAsync(int commentId, UserAndOrganizationDTO userOrg)
         {
-            var comment = _commentsDbSet
+            var comment = await _commentsDbSet
                 .Include(x => x.Post.Wall)
-                .FirstOrDefault(c =>
-                    c.Id == commentId &&
-                    c.Post.Wall.OrganizationId == userOrg.OrganizationId);
+                .FirstOrDefaultAsync(c => c.Id == commentId && c.Post.Wall.OrganizationId == userOrg.OrganizationId);
 
             if (comment == null)
             {
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Comment does not exist");
             }
 
-            var isWallModerator = _wallModeratorsDbSet
-                                      .Any(x => x.UserId == userOrg.UserId && x.WallId == comment.Post.WallId) || comment.CreatedBy == userOrg.UserId;
+            var isWallModerator = await _wallModeratorsDbSet
+                                      .AnyAsync(x => x.UserId == userOrg.UserId && x.WallId == comment.Post.WallId) || comment.CreatedBy == userOrg.UserId;
 
-            var isAdministrator = _permissionService.UserHasPermission(userOrg, AdministrationPermissions.Post);
+            var isAdministrator = await _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Post);
 
             if (!isAdministrator && !isWallModerator)
             {
@@ -199,14 +198,14 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             comment.IsHidden = true;
             comment.LastEdit = DateTime.UtcNow;
 
-            _uow.SaveChanges(userOrg.UserId);
+            await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
-        public void DeleteCommentsByPost(int postId)
+        public async Task DeleteCommentsByPostAsync(int postId)
         {
-            var comments = _commentsDbSet
+            var comments = await _commentsDbSet
                 .Where(x => x.PostId == postId)
-                .ToList();
+                .ToListAsync();
 
             comments.ForEach(x => _commentsDbSet.Remove(x));
         }

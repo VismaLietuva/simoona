@@ -26,7 +26,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [Route("SendBirthdaysNotifications")]
         public void SendBirthdaysNotifications()
         {
-            _webHookService.BirthdaysNotification.SendNotifications(GetOrganizationName());
+            _webHookService.BirthdaysNotification.SendNotificationsAsync(GetOrganizationName());
         }
     }
 }

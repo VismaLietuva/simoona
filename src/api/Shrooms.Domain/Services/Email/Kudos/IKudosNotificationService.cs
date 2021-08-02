@@ -1,13 +1,14 @@
-﻿using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
+﻿using System.Threading.Tasks;
+using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 
 namespace Shrooms.Domain.Services.Email.Kudos
 {
     public interface IKudosNotificationService
     {
-        void NotifyRejectedKudosLogSender(KudosLog kudosLog);
-        void NotifyAboutKudosSent(AddKudosDTO kudosDto);
-        void NotifyApprovedKudosRecipient(KudosLog kudosLog);
-        void NotifyApprovedKudosDecreaseRecipient(KudosLog kudosLog);
+        Task NotifyRejectedKudosLogSenderAsync(KudosLog kudosLog);
+        Task NotifyAboutKudosSentAsync(AddKudosDTO kudosDto);
+        Task NotifyApprovedKudosRecipientAsync(KudosLog kudosLog);
+        Task NotifyApprovedKudosDecreaseRecipientAsync(KudosLog kudosLog);
     }
 }

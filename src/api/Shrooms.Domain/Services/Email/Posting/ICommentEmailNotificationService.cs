@@ -1,9 +1,10 @@
-﻿using Shrooms.Contracts.DataTransferObjects.Models.Wall.Comments;
+﻿using System.Threading.Tasks;
+using Shrooms.Contracts.DataTransferObjects.Models.Wall.Comments;
 
 namespace Shrooms.Domain.Services.Email.Posting
 {
     public interface ICommentEmailNotificationService
     {
-        void SendEmailNotification(CommentCreatedDTO commentDto);
+        Task SendEmailNotificationAsync(CommentCreatedDTO commentDto);
     }
 }

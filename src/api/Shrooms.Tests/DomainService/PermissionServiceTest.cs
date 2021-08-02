@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNet.Identity.EntityFramework;
 using NSubstitute;
 using NUnit.Framework;
@@ -39,10 +40,10 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Get_Permissions_Separated_To_Groups()
+        public async Task Should_Get_Permissions_Separated_To_Groups()
         {
             MockPermissions();
-            var permissionGroups = _permissionService.GetGroupNames(1).ToList();
+            var permissionGroups = (await _permissionService.GetGroupNamesAsync(1)).ToList();
 
             Assert.AreEqual(2, permissionGroups.Count);
             Assert.AreEqual("test1", permissionGroups.ToArray()[0].Name);
@@ -50,10 +51,10 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Get_Permissions_Separated_To_Groups_Filtered_By_Organization()
+        public async Task Should_Get_Permissions_Separated_To_Groups_Filtered_By_Organization()
         {
             MockPermissions();
-            var permissionGroups = _permissionService.GetGroupNames(2).ToList();
+            var permissionGroups = (await _permissionService.GetGroupNamesAsync(2)).ToList();
 
             Assert.AreEqual(2, permissionGroups.Count);
             Assert.AreEqual("test2", permissionGroups.ToArray()[0].Name);
@@ -61,10 +62,10 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Get_Admin_User_Permissions()
+        public async Task Should_Get_Admin_User_Permissions()
         {
             MockPermissions();
-            var permissionGroups = _permissionService.GetUserPermissions("UserId1", 1).ToList();
+            var permissionGroups = (await _permissionService.GetUserPermissionsAsync("UserId1", 1)).ToList();
 
             Assert.AreEqual(4, permissionGroups.Count);
             Assert.AreEqual("TEST1_BASIC", permissionGroups.ToArray()[0]);
@@ -72,7 +73,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Get_Admin_User_Permissions_From_Cache()
+        public async Task Should_Get_Admin_User_Permissions_From_Cache()
         {
             _permissionCache.TryGetValue("UserId1", out _).Returns(x =>
             {
@@ -84,7 +85,7 @@ namespace Shrooms.Tests.DomainService
                 return true;
             });
 
-            var permissionGroups = _permissionService.GetUserPermissions("UserId1", 1).ToList();
+            var permissionGroups = (await _permissionService.GetUserPermissionsAsync("UserId1", 1)).ToList();
 
             Assert.AreEqual(2, permissionGroups.Count);
             Assert.AreEqual("TEST1_BASIC", permissionGroups.ToArray()[0]);
@@ -100,10 +101,10 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Get_Simple_User_Permissions()
+        public async Task Should_Get_Simple_User_Permissions()
         {
             MockPermissions();
-            var permissionGroups = _permissionService.GetUserPermissions("UserId2", 1).ToList();
+            var permissionGroups = (await _permissionService.GetUserPermissionsAsync("UserId2", 1)).ToList();
 
             Assert.AreEqual(2, permissionGroups.Count);
             Assert.AreEqual("TEST1_BASIC", permissionGroups.ToArray()[0]);
@@ -111,10 +112,10 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Get_Admin_Role_Permissions()
+        public async Task Should_Get_Admin_Role_Permissions()
         {
             MockPermissions();
-            var permissionGroups = _permissionService.GetRolePermissions("AdminId", 1).ToList();
+            var permissionGroups = (await _permissionService.GetRolePermissionsAsync("AdminId", 1)).ToList();
 
             Assert.AreEqual(4, permissionGroups.Count);
             Assert.AreEqual("TEST1_BASIC", permissionGroups.ToArray()[0].Name);
@@ -122,10 +123,10 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Get_User_Role_Permissions()
+        public async Task Should_Get_User_Role_Permissions()
         {
             MockPermissions();
-            var permissionGroups = _permissionService.GetRolePermissions("UserId", 1).ToList();
+            var permissionGroups = (await _permissionService.GetRolePermissionsAsync("UserId", 1)).ToList();
 
             Assert.AreEqual(2, permissionGroups.Count);
             Assert.AreEqual("TEST1_BASIC", permissionGroups.ToArray()[0].Name);
@@ -143,7 +144,7 @@ namespace Shrooms.Tests.DomainService
 
             MockUserPermission();
 
-            var hasPermission = _permissionService.UserHasPermission(userAndOrg, "TEST1_BASIC");
+            var hasPermission = _permissionService.UserHasPermissionAsync(userAndOrg, "TEST1_BASIC");
 
             Assert.AreEqual(true, hasPermission);
         }
@@ -159,7 +160,7 @@ namespace Shrooms.Tests.DomainService
 
             MockUserPermission();
 
-            var hasPermission = _permissionService.UserHasPermission(userAndOrg, "TEST1_BASIC");
+            var hasPermission = _permissionService.UserHasPermissionAsync(userAndOrg, "TEST1_BASIC");
 
             Assert.AreEqual(false, hasPermission);
         }

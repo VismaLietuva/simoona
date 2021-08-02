@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
@@ -40,15 +41,15 @@ namespace Shrooms.Domain.Services.Email.Posting
         private readonly IDbSet<Comment> _commentsDbSet;
 
         public CommentEmailNotificationService(IUnitOfWork2 uow,
-                                          IUserService userService,
-                                          ICommentService commentService,
-                                          IMailTemplate mailTemplate,
-                                          IMailingService mailingService,
-                                          IApplicationSettings appSettings,
-                                          IOrganizationService organizationService,
-                                          IMarkdownConverter markdownConverter,
-                                          IPostService postService,
-                                          ILogger logger)
+            IUserService userService,
+            ICommentService commentService,
+            IMailTemplate mailTemplate,
+            IMailingService mailingService,
+            IApplicationSettings appSettings,
+            IOrganizationService organizationService,
+            IMarkdownConverter markdownConverter,
+            IPostService postService,
+            ILogger logger)
         {
             _appSettings = appSettings;
             _userService = userService;
@@ -65,38 +66,40 @@ namespace Shrooms.Domain.Services.Email.Posting
             _commentsDbSet = uow.GetDbSet<Comment>();
         }
 
-        public void SendEmailNotification(CommentCreatedDTO commentDto)
+        public async Task SendEmailNotificationAsync(CommentCreatedDTO commentDto)
         {
-            var commentCreator = _userService.GetApplicationUser(commentDto.CommentCreator);
+            var commentCreator = await _userService.GetApplicationUserAsync(commentDto.CommentCreator);
             var organization = _organizationService.GetOrganizationById(commentCreator.OrganizationId);
 
-            var mentionedUsers = GetMentionedUsers(commentDto.MentionedUsersIds).ToList();
-            var destinationEmails = GetPostWatchersEmails(commentCreator.Email, commentDto.PostId, commentCreator.Id).Except(mentionedUsers.Select(x => x.Email)).ToList();
+            var mentionedUsers = (await GetMentionedUsersAsync(commentDto.MentionedUsersIds)).ToList();
+            var destinationEmails = (await GetPostWatchersEmailsAsync(commentCreator.Email, commentDto.PostId, commentCreator.Id))
+                .Except(mentionedUsers.Select(x => x.Email))
+                .ToList();
 
             if (destinationEmails.Count > 0)
             {
-                SendPostWatcherEmails(commentDto, destinationEmails, commentCreator, organization);
+                await SendPostWatcherEmailsAsync(commentDto, destinationEmails, commentCreator, organization);
             }
 
             if (mentionedUsers.Count > 0)
             {
-                SendMentionEmails(commentDto, mentionedUsers, commentCreator, organization);
+                await SendMentionEmailsAsync(commentDto, mentionedUsers, commentCreator, organization);
             }
         }
 
-        private void SendMentionEmails(CommentCreatedDTO commentDto, IList<ApplicationUser> mentionedUsers, ApplicationUser commentCreator, Organization organization)
+        private async Task SendMentionEmailsAsync(CommentCreatedDTO commentDto, IList<ApplicationUser> mentionedUsers, ApplicationUser commentCreator, Organization organization)
         {
-            var comment = _commentService.GetCommentBody(commentDto.CommentId);
+            var comment = await _commentService.GetCommentBodyAsync(commentDto.CommentId);
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
             var postUrl = _appSettings.WallPostUrl(organization.ShortName, commentDto.PostId);
-            var subject = $"You have been mentioned in the post";
+            const string subject = "You have been mentioned in the post";
             var messageBody = _markdownConverter.ConvertToHtml(comment);
 
             foreach (var mentionedUser in mentionedUsers)
             {
                 try
                 {
-                    if (mentionedUser.NotificationsSettings != null && !mentionedUser.NotificationsSettings.MentionEmailNotifications)
+                    if (mentionedUser.NotificationsSettings?.MentionEmailNotifications == false)
                     {
                         continue;
                     }
@@ -111,7 +114,7 @@ namespace Shrooms.Domain.Services.Email.Posting
                     var content = _mailTemplate.Generate(newMentionTemplateViewModel, EmailTemplateCacheKeys.NewMention);
 
                     var emailData = new EmailDto(mentionedUser.Email, subject, content);
-                    _mailingService.SendEmail(emailData);
+                    await _mailingService.SendEmailAsync(emailData);
                 }
                 catch (Exception e)
                 {
@@ -120,17 +123,18 @@ namespace Shrooms.Domain.Services.Email.Posting
             }
         }
 
-        private void SendPostWatcherEmails(CommentCreatedDTO commentDto, IList<string> emails, ApplicationUser commentCreator, Organization organization)
+        private async Task SendPostWatcherEmailsAsync(CommentCreatedDTO commentDto, IList<string> emails, ApplicationUser commentCreator, Organization organization)
         {
-            var comment = LoadComment(commentDto.CommentId);
-            var postLink = GetPostLink(commentDto.WallType, commentDto.WallId, organization.ShortName, commentDto.PostId);
+            var comment = await LoadCommentAsync(commentDto.CommentId);
+            var postLink = await GetPostLinkAsync(commentDto.WallType, commentDto.WallId, organization.ShortName, commentDto.PostId);
+
             var authorPictureUrl = _appSettings.PictureUrl(organization.ShortName, commentCreator.PictureId);
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
+
             var subject = string.Format(Templates.NewPostCommentEmailSubject, CutMessage(comment.Post.MessageBody), commentCreator.FullName);
             var body = _markdownConverter.ConvertToHtml(comment.MessageBody);
 
-            var emailTemplateViewModel = new NewCommentEmailTemplateViewModel(
-                string.Format(EmailTemplates.PostCommentTitle, CutMessage(comment.Post.MessageBody)),
+            var emailTemplateViewModel = new NewCommentEmailTemplateViewModel(string.Format(EmailTemplates.PostCommentTitle, CutMessage(comment.Post.MessageBody)),
                 authorPictureUrl,
                 commentCreator.FullName,
                 postLink,
@@ -140,25 +144,17 @@ namespace Shrooms.Domain.Services.Email.Posting
 
             var content = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.NewPostComment);
             var emailData = new EmailDto(emails, subject, content);
-            _mailingService.SendEmail(emailData);
+            await _mailingService.SendEmailAsync(emailData);
         }
 
-        public IEnumerable<ApplicationUser> GetMentionedUsers(IEnumerable<string> mentionIds)
+        public async Task<IEnumerable<ApplicationUser>> GetMentionedUsersAsync(IEnumerable<string> mentionIds)
         {
-            foreach (var mentionId in mentionIds)
-            {
-                var user = _userService.GetApplicationUser(mentionId);
-
-                if (user.NotificationsSettings == null || user.NotificationsSettings.MentionEmailNotifications)
-                {
-                    yield return user;
-                }
-            }
+            return await _userService.GetUsersWithMentionNotificationsAsync(mentionIds);
         }
 
-        private IList<string> GetPostWatchersEmails(string senderEmail, int postId, string commentCreatorId)
+        private async Task<IList<string>> GetPostWatchersEmailsAsync(string senderEmail, int postId, string commentCreatorId)
         {
-            var postWatchers = _postService.GetPostWatchersForEmailNotifications(postId).ToList();
+            var postWatchers = await _postService.GetPostWatchersForEmailNotificationsAsync(postId);
 
             return postWatchers
                 .Where(u => u.Email != senderEmail && u.Id != commentCreatorId)
@@ -167,7 +163,7 @@ namespace Shrooms.Domain.Services.Email.Posting
                 .ToList();
         }
 
-        private string CutMessage(string value)
+        private static string CutMessage(string value)
         {
             var newLine = value.IndexOf("\n", StringComparison.Ordinal);
             if (newLine > 0 && newLine <= 30)
@@ -183,22 +179,24 @@ namespace Shrooms.Domain.Services.Email.Posting
             return value;
         }
 
-        private string GetPostLink(WallType wallType, int wallId, string orgName, int postId)
+        private async Task<string> GetPostLinkAsync(WallType wallType, int wallId, string orgName, int postId)
         {
             switch (wallType)
             {
                 case WallType.Events:
-                    var eventId = _eventsDbSet
+                    var eventId = await _eventsDbSet
                         .Where(x => x.WallId == wallId)
                         .Select(x => x.Id)
-                        .First();
+                        .FirstAsync();
+
                     return _appSettings.EventUrl(orgName, eventId.ToString());
 
                 case WallType.Project:
-                    var projectId = _projectsDbSet
+                    var projectId = await _projectsDbSet
                         .Where(x => x.WallId == wallId)
                         .Select(x => x.Id)
-                        .First();
+                        .FirstAsync();
+
                     return _appSettings.ProjectUrl(orgName, projectId.ToString());
 
                 case WallType.Main:
@@ -208,11 +206,11 @@ namespace Shrooms.Domain.Services.Email.Posting
             }
         }
 
-        private Comment LoadComment(int commentId)
+        private async Task<Comment> LoadCommentAsync(int commentId)
         {
-            var comment = _commentsDbSet
+            var comment = await _commentsDbSet
                 .Include(x => x.Post)
-                .FirstOrDefault(c => c.Id == commentId);
+                .FirstOrDefaultAsync(c => c.Id == commentId);
 
             if (comment == null)
             {

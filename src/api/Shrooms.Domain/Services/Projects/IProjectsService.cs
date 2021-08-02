@@ -15,15 +15,15 @@ namespace Shrooms.Domain.Services.Projects
 
         Task<ProjectDetailsDto> GetProjectDetails(int projectId, UserAndOrganizationDTO userAndOrganizationDTO);
 
-        Task EditProject(EditProjectDto dto);
+        Task EditProjectAsync(EditProjectDto dto);
 
-        Task Delete(int id, UserAndOrganizationDTO userOrg);
+        Task DeleteAsync(int id, UserAndOrganizationDTO userOrg);
 
-        Task<EditProjectDisplayDto> GetProjectById(int projectId, UserAndOrganizationDTO userOrg);
+        Task<EditProjectDisplayDto> GetProjectByIdAsync(int projectId, UserAndOrganizationDTO userOrg);
 
-        Task ExpelMember(UserAndOrganizationDTO userAndOrganizationDTO, int projectId, string userId);
+        Task ExpelMemberAsync(UserAndOrganizationDTO userAndOrganizationDTO, int projectId, string userId);
 
-        void AddProjectsToUser(string userId, IEnumerable<int> projectIds, UserAndOrganizationDTO userOrg);
+        Task AddProjectsToUserAsync(string userId, IEnumerable<int> projectIds, UserAndOrganizationDTO userOrg);
 
         bool ValidateManagerId(string userId, string managerId);
     }

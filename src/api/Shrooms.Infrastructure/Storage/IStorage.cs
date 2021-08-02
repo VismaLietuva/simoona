@@ -6,10 +6,10 @@ namespace Shrooms.Infrastructure.Storage
 {
     public interface IStorage
     {
-        Task UploadPicture(Image image, string blobKey, string mimeType, string tenantPicturesContainer);
+        Task UploadPictureAsync(Image image, string blobKey, string mimeType, string tenantPicturesContainer);
 
-        Task UploadPicture(Stream stream, string blobKey, string mimeType, string tenantPicturesContainer);
+        Task UploadPictureAsync(Stream stream, string blobKey, string mimeType, string tenantPicturesContainer);
 
-        Task RemovePicture(string blobKey, string tenantPicturesContainer);
+        Task RemovePictureAsync(string blobKey, string tenantPicturesContainer);
     }
 }

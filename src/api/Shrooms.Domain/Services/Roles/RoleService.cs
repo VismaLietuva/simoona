@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
@@ -48,9 +49,9 @@ namespace Shrooms.Domain.Services.Roles
                 .ToList();
         }
 
-        public IList<string> GetAdministrationRoleEmails(int orgId)
+        public async Task<IList<string>> GetAdministrationRoleEmailsAsync(int orgId)
         {
-            var administrationRole = GetRole(role => role.Name == Contracts.Constants.Roles.Administration && role.OrganizationId == orgId, orgId, true);
+            var administrationRole = await GetRoleAsync(role => role.Name == Contracts.Constants.Roles.Administration && role.OrganizationId == orgId, orgId, true);
 
             if (administrationRole == null || !administrationRole.Users.Any())
             {
@@ -60,9 +61,9 @@ namespace Shrooms.Domain.Services.Roles
             return administrationRole.Users.Select(s => s.Email).ToList();
         }
 
-        public RoleDetailsDTO GetRoleById(UserAndOrganizationDTO userAndOrganizationDTO, string roleId)
+        public async Task<RoleDetailsDTO> GetRoleByIdAsync(UserAndOrganizationDTO userAndOrganizationDTO, string roleId)
         {
-            return GetRole(role => role.Id == roleId, userAndOrganizationDTO.OrganizationId);
+            return await GetRoleAsync(role => role.Id == roleId, userAndOrganizationDTO.OrganizationId);
         }
 
         public bool HasRole(string userId, string roleName)
@@ -72,22 +73,22 @@ namespace Shrooms.Domain.Services.Roles
                 .Any(x => x.Name == roleName && x.Users.Any(u => u.UserId == userId));
         }
 
-        private RoleDetailsDTO GetRole(Expression<Func<ApplicationRole, bool>> roleFilter, int orgId, bool skipPermission = false)
+        private async Task<RoleDetailsDTO> GetRoleAsync(Expression<Func<ApplicationRole, bool>> roleFilter, int orgId, bool skipPermission = false)
         {
-            var role = _roleDbSet
+            var role = await _roleDbSet
                 .Where(roleFilter)
                 .Select(x => new RoleDetailsDTO
                 {
                     Id = x.Id,
                     Name = x.Name
                 })
-                .Single();
+                .SingleAsync();
 
-            role.Users = GetUsersWithRole(role.Id);
+            role.Users = await GetUsersWithRoleAsync(role.Id);
 
             if (!skipPermission)
             {
-                role.Permissions = GetGroupNamesByRole(orgId, role.Id);
+                role.Permissions = await GetGroupNamesByRoleAsync(orgId, role.Id);
             }
 
             return role;
@@ -101,9 +102,9 @@ namespace Shrooms.Domain.Services.Roles
                 .FirstOrDefault();
         }
 
-        private IEnumerable<RoleUserDTO> GetUsersWithRole(string roleId)
+        private async Task<IEnumerable<RoleUserDTO>> GetUsersWithRoleAsync(string roleId)
         {
-            return _userDbSet
+            return await _userDbSet
                 .Where(x => x.Roles.Any(y => y.RoleId == roleId))
                 .Select(x => new RoleUserDTO
                 {
@@ -111,13 +112,14 @@ namespace Shrooms.Domain.Services.Roles
                     Email = x.Email,
                     FullName = x.FirstName + " " + x.LastName
                 })
-                .ToList();
+                .ToListAsync();
         }
 
-        private IEnumerable<PermissionGroupDTO> GetGroupNamesByRole(int orgId, string roleId)
+        private async Task<IEnumerable<PermissionGroupDTO>> GetGroupNamesByRoleAsync(int orgId, string roleId)
         {
-            var groupNames = _permissionService.GetGroupNames(orgId);
-            var rolePermissions = _permissionService.GetRolePermissions(roleId, orgId);
+            var groupNames = await _permissionService.GetGroupNamesAsync(orgId);
+            var rolePermissions = (await _permissionService.GetRolePermissionsAsync(roleId, orgId)).ToList();
+
             var groupNamesWithScopes = groupNames
                 .Select(x => new PermissionGroupDTO
                 {

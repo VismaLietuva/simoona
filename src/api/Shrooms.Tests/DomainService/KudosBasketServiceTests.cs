@@ -362,7 +362,7 @@ namespace Shrooms.Tests.DomainService
             };
             _kudosBasketService.MakeDonation(donationDto);
             var user = _usersDbSet.First(u => u.Id == "testUserId");
-            _kudosService.Received(1).UpdateProfileKudos(user, donationDto);
+            _kudosService.Received(1).UpdateProfileKudosAsync(user, donationDto);
         }
 
         [Test]

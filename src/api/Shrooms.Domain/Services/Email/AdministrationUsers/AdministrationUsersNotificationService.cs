@@ -53,7 +53,7 @@ namespace Shrooms.Domain.Services.Email.AdministrationUsers
 
             var body = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.UserConfirmation);
 
-            _mailingService.SendEmail(new EmailDto(userEmail, subject, body));
+            _mailingService.SendEmailAsync(new EmailDto(userEmail, subject, body));
         }
 
         public void NotifyAboutNewUser(ApplicationUser newUser, int orgId)
@@ -82,7 +82,7 @@ namespace Shrooms.Domain.Services.Email.AdministrationUsers
             var body = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.NotificationAboutNewUser);
 
             var emailDto = new EmailDto(userAdministrationEmails, subject, body);
-            _mailingService.SendEmail(emailDto);
+            _mailingService.SendEmailAsync(emailDto);
         }
 
         public void SendUserResetPasswordEmail(ApplicationUser user, string token, string organizationName)
@@ -94,7 +94,7 @@ namespace Shrooms.Domain.Services.Email.AdministrationUsers
             var subject = string.Format(Resources.Common.UserResetPasswordEmailSubject);
             var content = _mailTemplate.Generate(resetPasswordTemplateViewModel, EmailTemplateCacheKeys.ResetPassword);
 
-            _mailingService.SendEmail(new EmailDto(user.Email, subject, content));
+            _mailingService.SendEmailAsync(new EmailDto(user.Email, subject, content));
         }
 
         public void SendUserVerificationEmail(ApplicationUser user, string token, string organizationName)
@@ -106,7 +106,7 @@ namespace Shrooms.Domain.Services.Email.AdministrationUsers
             var subject = string.Format(Resources.Common.UserVerifyEmailSubject);
             var content = _mailTemplate.Generate(verifyEmailTemplateViewModel, EmailTemplateCacheKeys.VerifyEmail);
 
-            _mailingService.SendEmail(new EmailDto(user.Email, subject, content));
+            _mailingService.SendEmailAsync(new EmailDto(user.Email, subject, content));
         }
     }
 }

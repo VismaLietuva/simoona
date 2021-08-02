@@ -27,15 +27,16 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
             _mapper = mapper;
         }
 
-        public async Task Notify(NewlyCreatedPostDTO createdPost, UserAndOrganizationHubDto userAndOrganizationHubDto)
+        public async Task NotifyAsync(NewlyCreatedPostDTO createdPost, UserAndOrganizationHubDto userAndOrganizationHubDto)
         {
-            _postNotificationService.NotifyAboutNewPost(createdPost);
+            await _postNotificationService.NotifyAboutNewPostAsync(createdPost);
 
-            var membersToNotify = _userService.GetWallUserAppNotificationEnabledIds(createdPost.User.UserId, createdPost.WallId).ToList();
+            var membersToNotify = (await _userService.GetWallUserAppNotificationEnabledIdsAsync(createdPost.User.UserId, createdPost.WallId)).ToList();
 
-            var notificationDto = await _notificationService.CreateForPost(userAndOrganizationHubDto, createdPost, createdPost.WallId, membersToNotify);
+            var notificationDto = await _notificationService.CreateForPostAsync(userAndOrganizationHubDto, createdPost, createdPost.WallId, membersToNotify);
 
-            NotificationHub.SendNotificationToParticularUsers(_mapper.Map<NotificationViewModel>(notificationDto), userAndOrganizationHubDto, membersToNotify);
+            var notificationViewModel = _mapper.Map<NotificationViewModel>(notificationDto);
+            NotificationHub.SendNotificationToParticularUsers(notificationViewModel, userAndOrganizationHubDto, membersToNotify);
             NotificationHub.SendWallNotification(createdPost.WallId, membersToNotify, createdPost.WallType, userAndOrganizationHubDto);
         }
     }

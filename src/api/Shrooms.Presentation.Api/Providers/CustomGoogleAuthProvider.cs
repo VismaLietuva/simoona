@@ -32,16 +32,16 @@ namespace Shrooms.Presentation.Api.Providers
 
                 await Task.CompletedTask;
             };
-            OnApplyRedirect = context =>
+            OnApplyRedirect = async context =>
             {
                 using (var webReq = ioc.BeginLifetimeScope("AutofacWebRequest"))
                 {
                     var org = webReq.Resolve(typeof(IOrganizationService)) as IOrganizationService;
                     var newRedirectUri = context.RedirectUri;
                     var organizationName = context.OwinContext.Get<string>("tenantName");
-                    if (org.HasOrganizationEmailDomainRestriction(organizationName))
+                    if (org != null && await org.HasOrganizationEmailDomainRestrictionAsync(organizationName))
                     {
-                        var validHostName = org.GetOrganizationHostName(organizationName);
+                        var validHostName = await org.GetOrganizationHostNameAsync(organizationName);
                         var hostDomainParameter = CreateHostDomainParameter(validHostName);
                         newRedirectUri = $"{newRedirectUri}{hostDomainParameter}&organization={organizationName}";
                     }

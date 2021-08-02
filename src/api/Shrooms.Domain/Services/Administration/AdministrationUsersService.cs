@@ -141,7 +141,7 @@ namespace Shrooms.Domain.Services.Administration
             if (user.PictureId == null && externalIdentity.FindFirst("picture") != null)
             {
                 byte[] data = data = await new WebClient().DownloadDataTaskAsync(externalIdentity.FindFirst("picture").Value);
-                user.PictureId = await _pictureService.UploadFromStream(new MemoryStream(data), "image/jpeg", Guid.NewGuid() + ".jpg", user.OrganizationId);
+                user.PictureId = await _pictureService.UploadFromStreamAsync(new MemoryStream(data), "image/jpeg", Guid.NewGuid() + ".jpg", user.OrganizationId);
                 _uow.SaveChanges(userId);
             }
         }
@@ -211,7 +211,7 @@ namespace Shrooms.Domain.Services.Administration
             if (externalIdentity.FindFirst("picture") != null)
             {
                 byte[] data = data = await new WebClient().DownloadDataTaskAsync(externalIdentity.FindFirst("picture").Value);
-                var picture = await _pictureService.UploadFromStream(new MemoryStream(data), "image/jpeg", $"{Guid.NewGuid()}.jpg", user.OrganizationId);
+                var picture = await _pictureService.UploadFromStreamAsync(new MemoryStream(data), "image/jpeg", $"{Guid.NewGuid()}.jpg", user.OrganizationId);
                 user.PictureId = picture;
             }
 

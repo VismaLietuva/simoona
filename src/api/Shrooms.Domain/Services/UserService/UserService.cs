@@ -165,7 +165,7 @@ namespace Shrooms.Domain.Services.UserService
 
         private async Task Anonymize(ApplicationUser user, UserAndOrganizationDTO userOrg)
         {
-            await _pictureService.RemoveImage(user.PictureId, userOrg.OrganizationId);
+            await _pictureService.RemoveImageAsync(user.PictureId, userOrg.OrganizationId);
 
             var randomString = Guid.NewGuid().ToString();
             user.Email = randomString;
@@ -182,19 +182,19 @@ namespace Shrooms.Domain.Services.UserService
             _uow.SaveChanges(userOrg.UserId);
         }
 
-        public IEnumerable<string> GetWallUserAppNotificationEnabledIds(string posterId, int wallId)
+        public async Task<IEnumerable<string>> GetWallUserAppNotificationEnabledIdsAsync(string posterId, int wallId)
         {
-            var newUserAndExternalRoles = _rolesDbSet
+            var newUserAndExternalRoles = await _rolesDbSet
                 .Where(r => r.Name == Contracts.Constants.Roles.NewUser ||
                             r.Name == Contracts.Constants.Roles.External)
-                .ToList();
+                .ToListAsync();
 
             var newUserRoleId = newUserAndExternalRoles.First(r => r.Name == Contracts.Constants.Roles.NewUser).Id;
             var externalRoleId = newUserAndExternalRoles.First(r => r.Name == Contracts.Constants.Roles.External).Id;
 
-            var wall = _wallDbSet.Single(w => w.Id == wallId);
+            var wall = await _wallDbSet.SingleAsync(w => w.Id == wallId);
 
-            var userAppNotificationEnabledIds = _usersDbSet
+            var userAppNotificationEnabledIds = await _usersDbSet
                 .Include(u => u.WallUsers)
                 .Include(u => u.Roles)
                 .Where(user => user.WallUsers.Any(x => x.WallId == wall.Id && x.AppNotificationsEnabled) &&
@@ -203,7 +203,7 @@ namespace Shrooms.Domain.Services.UserService
                 .Where(ExternalRoleFilter(wall, externalRoleId))
                 .Select(u => u.Id)
                 .Distinct()
-                .ToList();
+                .ToListAsync();
 
             return userAppNotificationEnabledIds;
         }
@@ -220,17 +220,17 @@ namespace Shrooms.Domain.Services.UserService
             return users;
         }
 
-        public IList<string> GetWallUsersEmails(string senderEmail, WallModel wall)
+        public async Task<IList<string>> GetWallUsersEmailsAsync(string senderEmail, WallModel wall)
         {
-            var newUserAndExternalRoles = _rolesDbSet
+            var newUserAndExternalRoles = await _rolesDbSet
                 .Where(r => r.Name == Contracts.Constants.Roles.NewUser ||
                             r.Name == Contracts.Constants.Roles.External)
-                .ToList();
+                .ToListAsync();
 
             var newUserRoleId = newUserAndExternalRoles.First(r => r.Name == Contracts.Constants.Roles.NewUser).Id;
             var externalRoleId = newUserAndExternalRoles.First(r => r.Name == Contracts.Constants.Roles.External).Id;
 
-            var emails = _usersDbSet
+            var emails = await _usersDbSet
                 .Include(u => u.WallUsers)
                 .Include(u => u.Roles)
                 .Where(user => user.WallUsers.Any(x => x.WallId == wall.Id && x.EmailNotificationsEnabled) &&
@@ -239,7 +239,7 @@ namespace Shrooms.Domain.Services.UserService
                 .Where(ExternalRoleFilter(wall, externalRoleId))
                 .Select(u => u.Email)
                 .Distinct()
-                .ToList();
+                .ToListAsync();
 
             return emails;
         }
@@ -377,9 +377,16 @@ namespace Shrooms.Domain.Services.UserService
             _uow.SaveChanges(id);
         }
 
-        public ApplicationUser GetApplicationUser(string id)
+        public async Task<ApplicationUser> GetApplicationUserAsync(string id)
         {
-            return _usersDbSet.Include(x => x.NotificationsSettings).First(u => u.Id == id);
+            return await _usersDbSet.Include(x => x.NotificationsSettings).FirstAsync(u => u.Id == id);
+        }
+
+        public async Task<IEnumerable<ApplicationUser>> GetUsersWithMentionNotificationsAsync(IEnumerable<string> ids)
+        {
+            return await _usersDbSet.Include(x => x.NotificationsSettings)
+                .Where(u => (u.NotificationsSettings == null || u.NotificationsSettings.MentionEmailNotifications) && ids.Contains(u.Id))
+                .ToListAsync();
         }
 
         public ApplicationUser GetApplicationUserOrDefault(string id)
@@ -424,7 +431,7 @@ namespace Shrooms.Domain.Services.UserService
             };
         }
 
-        private Expression<Func<ApplicationUser, bool>> ExternalRoleFilter(WallModel wall, string externalRoleId)
+        private static Expression<Func<ApplicationUser, bool>> ExternalRoleFilter(WallModel wall, string externalRoleId)
         {
             if (wall.Type != WallType.Events)
             {

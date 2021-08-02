@@ -1,4 +1,5 @@
-﻿using Shrooms.Contracts.DataTransferObjects;
+﻿using System.Threading.Tasks;
+using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Users;
 using Shrooms.DataLayer.EntityModels.Models;
 
@@ -14,11 +15,11 @@ namespace Shrooms.Domain.Services.Organizations
 
         Organization GetUserOrganization(ApplicationUser user);
 
-        string GetOrganizationHostName(string organizationName);
+        Task<string> GetOrganizationHostNameAsync(string organizationName);
 
-        bool HasOrganizationEmailDomainRestriction(string organizationName);
+        Task<bool> HasOrganizationEmailDomainRestrictionAsync(string organizationName);
 
-        bool IsOrganizationHostValid(string email, string organizationName);
+        Task<bool> IsOrganizationHostValidAsync(string email, string organizationName);
 
         UserDto GetManagingDirector(int organizationId);
         void SetManagingDirector(string userId, UserAndOrganizationDTO userAndOrganizationDTO);

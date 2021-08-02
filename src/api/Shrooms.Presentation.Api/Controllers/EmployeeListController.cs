@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
 using PagedList;
@@ -35,26 +36,26 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.EmployeeList)]
-        public PagedViewModel<EmployeeListViewModel> GetPaged(int page = 1, string filter = "", string search = "", string sortBy = "LastName", string sortOrder = "asc")
+        public async Task<PagedViewModel<EmployeeListViewModel>> GetPaged(int page = 1, string filter = "", string search = "", string sortBy = "LastName", string sortOrder = "asc")
         {
             if (!string.IsNullOrEmpty(search))
             {
                 var searchWords = search.Split(WebApiConstants.SearchSplitter);
-                return GetFilteredPaged("WorkingHours,JobPosition", page, WebApiConstants.DefaultPageSize, sortBy, sortOrder,
-                    s => searchWords.Count(sw => s.FirstName.Contains(sw) || s.LastName.Contains(sw) || s.JobPosition.Title.Contains(sw)) == searchWords.Count());
+                return await GetFilteredPaged("WorkingHours,JobPosition", page, WebApiConstants.DefaultPageSize, sortBy, sortOrder,
+                    s => searchWords.Count(sw => s.FirstName.Contains(sw) || s.LastName.Contains(sw) || s.JobPosition.Title.Contains(sw)) == searchWords.Length);
             }
 
-            return GetFilteredPaged("WorkingHours,JobPosition", page, WebApiConstants.DefaultPageSize, sortBy, sortOrder);
+            return await GetFilteredPaged("WorkingHours,JobPosition", page, WebApiConstants.DefaultPageSize, sortBy, sortOrder);
         }
 
-        protected PagedViewModel<EmployeeListViewModel> GetFilteredPaged(string includeProperties = null,
+        protected async Task<PagedViewModel<EmployeeListViewModel>> GetFilteredPaged(string includeProperties = null,
             int page = 1,
             int pageSize = WebApiConstants.DefaultPageSize,
             string sort = null,
             string dir = "",
             Expression<Func<ApplicationUser, bool>> filter = null)
         {
-            var isAdmin = _permissionService.UserHasPermission(GetUserAndOrganization(), AdministrationPermissions.ApplicationUser);
+            var isAdmin = await _permissionService.UserHasPermissionAsync(GetUserAndOrganization(), AdministrationPermissions.ApplicationUser);
 
             var sortQuery = string.IsNullOrEmpty(sort) ? null : $"{sort} {dir}";
 
@@ -63,7 +64,8 @@ namespace Shrooms.Presentation.Api.Controllers
                 .Where(_roleService.ExcludeUsersWithRole(Roles.NewUser))
                 .ToPagedList(page, pageSize);
 
-            var pagedModel = new StaticPagedList<EmployeeListViewModel>(_mapper.Map<IEnumerable<ApplicationUser>, IEnumerable<EmployeeListViewModel>>(models), models.PageNumber, models.PageSize,
+            var employeeListViewModels = _mapper.Map<IEnumerable<ApplicationUser>, IEnumerable<EmployeeListViewModel>>(models);
+            var pagedModel = new StaticPagedList<EmployeeListViewModel>(employeeListViewModels, models.PageNumber, models.PageSize,
                 models.TotalItemCount);
 
             if (!isAdmin)

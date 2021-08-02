@@ -26,17 +26,17 @@ namespace Shrooms.Infrastructure.Storage.AzureBlob
             };
         }
 
-        public async Task RemovePicture(string blobKey, string tenantPicturesContainer)
+        public async Task RemovePictureAsync(string blobKey, string tenantPicturesContainer)
         {
             var blockBlob = GetBlockBlob(blobKey, tenantPicturesContainer);
 
-            if (blockBlob.Exists())
+            if (await blockBlob.ExistsAsync())
             {
                 await blockBlob.DeleteAsync(DeleteSnapshotsOption.None, null, _blobRequestOptions, null);
             }
         }
 
-        public async Task UploadPicture(Image image, string blobKey, string mimeType, string tenantPicturesContainer)
+        public async Task UploadPictureAsync(Image image, string blobKey, string mimeType, string tenantPicturesContainer)
         {
             var blockBlob = GetBlockBlob(blobKey, tenantPicturesContainer);
             blockBlob.Properties.ContentType = mimeType;
@@ -49,7 +49,7 @@ namespace Shrooms.Infrastructure.Storage.AzureBlob
             }
         }
 
-        public async Task UploadPicture(Stream stream, string blobKey, string mimeType, string tenantPicturesContainer)
+        public async Task UploadPictureAsync(Stream stream, string blobKey, string mimeType, string tenantPicturesContainer)
         {
             var blockBlob = GetBlockBlob(blobKey, tenantPicturesContainer);
             blockBlob.Properties.ContentType = mimeType;

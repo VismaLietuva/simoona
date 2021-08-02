@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
 using MoreLinq;
@@ -54,7 +56,7 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Certificate)]
-        public IHttpActionResult Post(CertificatePostViewModel crudViewModel)
+        public async Task<IHttpActionResult> Post(CertificatePostViewModel crudViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -62,14 +64,16 @@ namespace Shrooms.Presentation.Api.Controllers
             }
 
             var currentUserId = GetUserAndOrganization().UserId;
-            var isAdministrator = _permissionService.UserHasPermission(GetUserAndOrganization(), AdministrationPermissions.Certificate);
+            var isAdministrator = await _permissionService.UserHasPermissionAsync(GetUserAndOrganization(), AdministrationPermissions.Certificate);
             if (!isAdministrator && crudViewModel.ApplicationUserId != currentUserId)
             {
                 return BadRequest();
             }
 
-            var certificate = _certificateRepository.Get(c => c.Name == crudViewModel.Name && c.ApplicationUserId == crudViewModel.ApplicationUserId,
-                includeProperties: "Exams").FirstOrDefault();
+            var certificate = await _certificateRepository
+                .Get(c => c.Name == crudViewModel.Name && c.ApplicationUserId == crudViewModel.ApplicationUserId, includeProperties: "Exams")
+                .FirstOrDefaultAsync();
+
             if (certificate == null)
             {
                 certificate = _mapper.Map<Certificate>(crudViewModel);
@@ -84,7 +88,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 _certificateRepository.Update(certificate);
             }
 
-            _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
             return Ok(_mapper.Map<CertificateMiniViewModel>(certificate));
         }
 
@@ -96,10 +100,10 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpDelete]
         [PermissionAuthorize(Permission = BasicPermissions.Certificate)]
-        public IHttpActionResult Delete(int id)
+        public async Task<IHttpActionResult> Delete(int id)
         {
             var currentUserId = GetUserAndOrganization().UserId;
-            var isAdmin = _permissionService.UserHasPermission(GetUserAndOrganization(), AdministrationPermissions.Certificate);
+            var isAdmin = await _permissionService.UserHasPermissionAsync(GetUserAndOrganization(), AdministrationPermissions.Certificate);
             if (id <= 0)
             {
                 return BadRequest();
@@ -117,13 +121,13 @@ namespace Shrooms.Presentation.Api.Controllers
             }
 
             _certificateRepository.Delete(model);
-            _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
 
             return Ok();
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Certificate)]
-        public IHttpActionResult Put(CertificatePostViewModel crudViewModel)
+        public async Task<IHttpActionResult> Put(CertificatePostViewModel crudViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -131,13 +135,13 @@ namespace Shrooms.Presentation.Api.Controllers
             }
 
             var currentUserId = GetUserAndOrganization().UserId;
-            var isAdministrator = _permissionService.UserHasPermission(GetUserAndOrganization(), AdministrationPermissions.Certificate);
+            var isAdministrator = await _permissionService.UserHasPermissionAsync(GetUserAndOrganization(), AdministrationPermissions.Certificate);
             if (!isAdministrator && crudViewModel.ApplicationUserId != currentUserId)
             {
                 return BadRequest();
             }
 
-            var certificate = _certificateRepository.Get(c => c.Id == crudViewModel.Id, includeProperties: "Exams").FirstOrDefault();
+            var certificate = await _certificateRepository.Get(c => c.Id == crudViewModel.Id, includeProperties: "Exams").FirstOrDefaultAsync();
             if (certificate == null)
             {
                 return NotFound();
@@ -146,7 +150,8 @@ namespace Shrooms.Presentation.Api.Controllers
             certificate.Exams = MapExams(crudViewModel);
             certificate.InProgress = crudViewModel.InProgress;
             _certificateRepository.Update(certificate);
-            _unitOfWork.Save();
+
+            await _unitOfWork.SaveAsync();
 
             return Ok(_mapper.Map<CertificateMiniViewModel>(certificate));
         }

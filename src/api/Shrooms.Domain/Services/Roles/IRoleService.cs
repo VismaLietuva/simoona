@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Roles;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -15,9 +16,9 @@ namespace Shrooms.Domain.Services.Roles
 
         IEnumerable<RoleDTO> GetRolesForAutocomplete(string search, UserAndOrganizationDTO userAndOrg);
 
-        RoleDetailsDTO GetRoleById(UserAndOrganizationDTO userAndOrganizationDTO, string roleId);
+        Task<RoleDetailsDTO> GetRoleByIdAsync(UserAndOrganizationDTO userAndOrganizationDTO, string roleId);
 
-        IList<string> GetAdministrationRoleEmails(int orgId);
+        Task<IList<string>> GetAdministrationRoleEmailsAsync(int orgId);
 
         bool HasRole(string userId, string roleName);
     }

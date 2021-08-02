@@ -131,7 +131,7 @@ namespace Shrooms.Tests.DomainService
             };
 
             // Act
-            _commentService.CreateComment(newCommentDto);
+            _commentService.CreateCommentAsync(newCommentDto);
 
             // Assert
             _commentsDbSet.Received(1)
@@ -168,11 +168,11 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 2
             };
 
-            _permissionService.UserHasPermission(editCommentDto, AdministrationPermissions.Post).Returns(false);
+            _permissionService.UserHasPermissionAsync(editCommentDto, AdministrationPermissions.Post).Returns(false);
 
             // Act
             // Assert
-            Assert.DoesNotThrow(() => _commentService.EditComment(editCommentDto));
+            Assert.DoesNotThrow(() => _commentService.EditCommentAsync(editCommentDto));
         }
 
         [Test]
@@ -201,11 +201,11 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 2
             };
 
-            _permissionService.UserHasPermission(editCommentDto, AdministrationPermissions.Post).Returns(true);
+            _permissionService.UserHasPermissionAsync(editCommentDto, AdministrationPermissions.Post).Returns(true);
 
             // Act
             // Assert
-            Assert.DoesNotThrow(() => _commentService.EditComment(editCommentDto));
+            Assert.DoesNotThrow(() => _commentService.EditCommentAsync(editCommentDto));
         }
 
         [Test]
@@ -234,11 +234,11 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 2
             };
 
-            _permissionService.UserHasPermission(editCommentDto, AdministrationPermissions.Post).Returns(false);
+            _permissionService.UserHasPermissionAsync(editCommentDto, AdministrationPermissions.Post).Returns(false);
 
             // Act
             // Assert
-            Assert.Throws<UnauthorizedException>(() => _commentService.EditComment(editCommentDto));
+            Assert.Throws<UnauthorizedException>(() => _commentService.EditCommentAsync(editCommentDto));
         }
 
         [Test]
@@ -263,7 +263,7 @@ namespace Shrooms.Tests.DomainService
 
             // Act
             // Assert
-            var ex = Assert.Throws<ValidationException>(() => _commentService.EditComment(editCommentDto));
+            var ex = Assert.Throws<ValidationException>(() => _commentService.EditCommentAsync(editCommentDto));
             Assert.AreEqual(ErrorCodes.ContentDoesNotExist, ex.ErrorCode);
         }
 
@@ -287,7 +287,7 @@ namespace Shrooms.Tests.DomainService
 
             // Act
             // Assert
-            var ex = Assert.Throws<ValidationException>(() => _commentService.DeleteComment(2, userOrg));
+            var ex = Assert.Throws<ValidationException>(() => _commentService.DeleteCommentAsync(2, userOrg));
             Assert.AreEqual(ErrorCodes.ContentDoesNotExist, ex.ErrorCode);
         }
 
@@ -315,11 +315,11 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 2
             };
 
-            _permissionService.UserHasPermission(userOrg, AdministrationPermissions.Post).Returns(false);
+            _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Post).Returns(false);
 
             // Act
             // Assert
-            Assert.Throws<UnauthorizedException>(() => _commentService.DeleteComment(1, userOrg));
+            Assert.Throws<UnauthorizedException>(() => _commentService.DeleteCommentAsync(1, userOrg));
         }
 
         [Test]
@@ -346,11 +346,11 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 2
             };
 
-            _permissionService.UserHasPermission(userOrg, AdministrationPermissions.Post).Returns(true);
+            _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Post).Returns(true);
 
             // Act
             // Assert
-            Assert.DoesNotThrow(() => _commentService.DeleteComment(1, userOrg));
+            Assert.DoesNotThrow(() => _commentService.DeleteCommentAsync(1, userOrg));
         }
 
         [Test]
@@ -377,11 +377,11 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 2
             };
 
-            _permissionService.UserHasPermission(userOrg, AdministrationPermissions.Post).Returns(false);
+            _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Post).Returns(false);
 
             // Act
             // Assert
-            Assert.DoesNotThrow(() => _commentService.DeleteComment(1, userOrg));
+            Assert.DoesNotThrow(() => _commentService.DeleteCommentAsync(1, userOrg));
         }
     }
 }

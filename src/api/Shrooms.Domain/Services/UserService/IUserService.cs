@@ -21,9 +21,9 @@ namespace Shrooms.Domain.Services.UserService
 
         IEnumerable<string> GetUserEmailsWithPermission(string permissionName, int orgId);
 
-        IEnumerable<string> GetWallUserAppNotificationEnabledIds(string posterId, int wallId);
+        Task<IEnumerable<string>> GetWallUserAppNotificationEnabledIdsAsync(string posterId, int wallId);
 
-        IList<string> GetWallUsersEmails(string senderEmail, DataLayer.EntityModels.Models.Multiwall.Wall wall);
+        Task<IList<string>> GetWallUsersEmailsAsync(string senderEmail, DataLayer.EntityModels.Models.Multiwall.Wall wall);
 
         Task<UserNotificationsSettingsDto> GetWallNotificationSettings(UserAndOrganizationDTO userOrg);
 
@@ -33,7 +33,10 @@ namespace Shrooms.Domain.Services.UserService
 
         void RemoveLogin(string id, UserLoginInfo loginInfo);
 
-        ApplicationUser GetApplicationUser(string id);
+        Task<ApplicationUser> GetApplicationUserAsync(string id);
+
+        Task<IEnumerable<ApplicationUser>> GetUsersWithMentionNotificationsAsync(IEnumerable<string> mentionedUsersIds);
+
         ApplicationUser GetApplicationUserOrDefault(string id);
         IEnumerable<UserAutoCompleteDto> GetUsersForAutocomplete(string s);
     }

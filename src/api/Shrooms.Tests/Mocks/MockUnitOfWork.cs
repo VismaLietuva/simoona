@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 
 namespace Shrooms.Tests.Mocks
@@ -33,6 +34,11 @@ namespace Shrooms.Tests.Mocks
 
         public void Save()
         {
+        }
+
+        public Task SaveAsync()
+        {
+            return Task.CompletedTask;
         }
 
         public T GetDbContextAs<T>()

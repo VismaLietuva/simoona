@@ -44,9 +44,9 @@ namespace Shrooms.Presentation.Api.Controllers
             try
             {
                 var userAndOrg = GetUserAndOrganization();
-                var wallPost = await _wallService.GetWallPost(userAndOrg, postId);
+                var wallPost = await _wallService.GetWallPostAsync(userAndOrg, postId);
 
-                if (!_permissionService.UserHasPermission(userAndOrg, BasicPermissions.Post) && wallPost.WallType != WallType.Events)
+                if (!await _permissionService.UserHasPermissionAsync(userAndOrg, BasicPermissions.Post) && wallPost.WallType != WallType.Events)
                 {
                     return Forbidden();
                 }
@@ -72,9 +72,9 @@ namespace Shrooms.Presentation.Api.Controllers
 
             var userAndOrg = GetUserAndOrganization();
 
-            if (!_permissionService.UserHasPermission(userAndOrg, BasicPermissions.Post))
+            if (!await _permissionService.UserHasPermissionAsync(userAndOrg, BasicPermissions.Post))
             {
-                var wall = await _wallService.GetWall(wallPostViewModel.WallId, userAndOrg);
+                var wall = await _wallService.GetWallAsync(wallPostViewModel.WallId, userAndOrg);
                 if (wall.Type != WallType.Events)
                 {
                     return Forbidden();
@@ -87,10 +87,10 @@ namespace Shrooms.Presentation.Api.Controllers
 
             try
             {
-                var createdPost = _postService.CreateNewPost(postModel);
+                var createdPost = await _postService.CreateNewPostAsync(postModel);
                 _asyncRunner.Run<NewPostNotifier>(async notifier =>
                 {
-                    await notifier.Notify(createdPost, userHubDto);
+                    await notifier.NotifyAsync(createdPost, userHubDto);
                 }, GetOrganizationName());
 
                 return Ok(_mapper.Map<WallPostViewModel>(createdPost));
@@ -115,7 +115,7 @@ namespace Shrooms.Presentation.Api.Controllers
             SetOrganizationAndUser(editPostDto);
             try
             {
-                _postService.EditPost(editPostDto);
+                _postService.EditPostAsync(editPostDto);
                 return Ok();
             }
             catch (UnauthorizedException)
@@ -141,7 +141,7 @@ namespace Shrooms.Presentation.Api.Controllers
             var userAndOrg = GetUserAndOrganization();
             try
             {
-                _postService.DeleteWallPost(id, userAndOrg);
+                _postService.DeleteWallPostAsync(id, userAndOrg);
                 return Ok();
             }
             catch (UnauthorizedException)
@@ -167,7 +167,7 @@ namespace Shrooms.Presentation.Api.Controllers
             var userAndOrg = GetUserAndOrganization();
             try
             {
-                _postService.HideWallPost(post.Id, userAndOrg);
+                _postService.HideWallPostAsync(post.Id, userAndOrg);
                 return Ok();
             }
             catch (UnauthorizedException)
@@ -193,7 +193,7 @@ namespace Shrooms.Presentation.Api.Controllers
             var userAndOrg = GetUserAndOrganization();
             try
             {
-                _postService.ToggleLike(id, userAndOrg);
+                _postService.ToggleLikeAsync(id, userAndOrg);
                 return Ok();
             }
             catch (ValidationException e)
@@ -215,7 +215,7 @@ namespace Shrooms.Presentation.Api.Controllers
             var userAndOrg = GetUserAndOrganization();
             try
             {
-                _postService.ToggleWatch(post.Id, userAndOrg, true);
+                _postService.ToggleWatchAsync(post.Id, userAndOrg, true);
             }
             catch (ValidationException e)
             {
@@ -238,7 +238,7 @@ namespace Shrooms.Presentation.Api.Controllers
             var userAndOrg = GetUserAndOrganization();
             try
             {
-                _postService.ToggleWatch(post.Id, userAndOrg, false);
+                _postService.ToggleWatchAsync(post.Id, userAndOrg, false);
             }
             catch (ValidationException e)
             {

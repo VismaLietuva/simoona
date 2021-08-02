@@ -25,7 +25,7 @@ namespace Shrooms.Presentation.Api.GeneralCode
             var dependencyScope = context.Request.GetDependencyScope();
             var permissionService = dependencyScope.GetService(typeof(IPermissionService)) as IPermissionService;
             var userAndOrganization = context.RequestContext.Principal.Identity.GetUserAndOrganization();
-            var userPermissions = permissions.Where(p => permissionService.UserHasPermission(userAndOrganization, p));
+            var userPermissions = permissions.Where(p => permissionService != null && permissionService.UserHasPermission(userAndOrganization, p));
             var permissionKey = string.Join(",", userPermissions);
             return $"{baseKey};{permissionKey};";
         }

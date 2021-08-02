@@ -1,4 +1,6 @@
-﻿namespace Shrooms.Contracts.DAL
+﻿using System.Threading.Tasks;
+
+namespace Shrooms.Contracts.DAL
 {
     public interface IUnitOfWork
     {
@@ -11,5 +13,7 @@
             where T : class, IDbContext;
 
         void Save();
+
+        Task SaveAsync();
     }
 }

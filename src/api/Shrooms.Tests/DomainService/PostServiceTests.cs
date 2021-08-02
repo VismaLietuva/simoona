@@ -60,7 +60,7 @@ namespace Shrooms.Tests.DomainService
             };
 
             _postsDbSet.SetDbSetData(new List<Post> { post }.AsQueryable());
-            _postService.ToggleLike(1, new UserAndOrganizationDTO { UserId = "user1", OrganizationId = 2 });
+            _postService.ToggleLikeAsync(1, new UserAndOrganizationDTO { UserId = "user1", OrganizationId = 2 });
 
             Assert.AreEqual("user1", _postsDbSet.First().Likes.First().UserId);
         }
@@ -79,7 +79,7 @@ namespace Shrooms.Tests.DomainService
             };
 
             _postsDbSet.SetDbSetData(new List<Post> { post }.AsQueryable());
-            _postService.ToggleLike(1, new UserAndOrganizationDTO { UserId = "user1", OrganizationId = 2 });
+            _postService.ToggleLikeAsync(1, new UserAndOrganizationDTO { UserId = "user1", OrganizationId = 2 });
 
             Assert.AreEqual(0, _postsDbSet.First().Likes.Count);
         }
@@ -88,7 +88,7 @@ namespace Shrooms.Tests.DomainService
         public void Should_Throw_If_There_Is_No_Post_To_Be_Liked()
         {
             _postsDbSet.SetDbSetData(new List<Post>().AsQueryable());
-            var ex = Assert.Throws<ValidationException>(() => _postService.ToggleLike(1, new UserAndOrganizationDTO { UserId = "user1", OrganizationId = 2 }));
+            var ex = Assert.Throws<ValidationException>(() => _postService.ToggleLikeAsync(1, new UserAndOrganizationDTO { UserId = "user1", OrganizationId = 2 }));
             Assert.AreEqual(ErrorCodes.ContentDoesNotExist, ex.ErrorCode);
         }
 
@@ -122,7 +122,7 @@ namespace Shrooms.Tests.DomainService
             };
 
             // Act
-            _postService.CreateNewPost(newPostDto);
+            _postService.CreateNewPostAsync(newPostDto);
 
             // Assert
             _postsDbSet.Received().Add(
@@ -161,7 +161,7 @@ namespace Shrooms.Tests.DomainService
 
             // Act
             // Assert
-            var ex = Assert.Throws<ValidationException>(() => _postService.CreateNewPost(newPostDto));
+            var ex = Assert.Throws<ValidationException>(() => _postService.CreateNewPostAsync(newPostDto));
             Assert.AreEqual(ErrorCodes.ContentDoesNotExist, ex.ErrorCode);
         }
 
@@ -175,7 +175,7 @@ namespace Shrooms.Tests.DomainService
             };
 
             _postsDbSet.SetDbSetData(new List<Post>().AsQueryable());
-            var ex = Assert.Throws<ValidationException>(() => _postService.HideWallPost(1, userOrg));
+            var ex = Assert.Throws<ValidationException>(() => _postService.HideWallPostAsync(1, userOrg));
             Assert.AreEqual(ErrorCodes.ContentDoesNotExist, ex.ErrorCode);
         }
 
@@ -196,7 +196,7 @@ namespace Shrooms.Tests.DomainService
             };
 
             _wallModeratorsDbSet.SetDbSetData(wallModerators.AsQueryable());
-            _permissionService.UserHasPermission(userOrg, AdministrationPermissions.Post).Returns(false);
+            _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Post).Returns(false);
 
             var posts = new List<Post>
             {
@@ -214,7 +214,7 @@ namespace Shrooms.Tests.DomainService
 
             _usersDbSet.SetDbSetData(users.AsQueryable());
 
-            Assert.Throws<UnauthorizedException>(() => _postService.HideWallPost(1, userOrg));
+            Assert.Throws<UnauthorizedException>(() => _postService.HideWallPostAsync(1, userOrg));
         }
 
         [Test]
@@ -234,7 +234,7 @@ namespace Shrooms.Tests.DomainService
             };
 
             _wallModeratorsDbSet.SetDbSetData(wallModerators.AsQueryable());
-            _permissionService.UserHasPermission(userOrg, AdministrationPermissions.Post).Returns(true);
+            _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Post).Returns(true);
 
             var posts = new List<Post>
             {
@@ -250,7 +250,7 @@ namespace Shrooms.Tests.DomainService
             };
             _usersDbSet.SetDbSetData(users.AsQueryable());
 
-            _postService.HideWallPost(1, userOrg);
+            _postService.HideWallPostAsync(1, userOrg);
 
             Assert.AreEqual(posts[0].IsHidden, true);
             Assert.AreEqual(posts[1].IsHidden, false);
@@ -281,11 +281,11 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 2
             };
 
-            _permissionService.UserHasPermission(editPostDto, AdministrationPermissions.Post).Returns(false);
+            _permissionService.UserHasPermissionAsync(editPostDto, AdministrationPermissions.Post).Returns(false);
 
             // Act
             // Assert
-            Assert.DoesNotThrow(() => _postService.EditPost(editPostDto));
+            Assert.DoesNotThrow(() => _postService.EditPostAsync(editPostDto));
         }
 
         [Test]
@@ -313,11 +313,11 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 2
             };
 
-            _permissionService.UserHasPermission(editPostDto, AdministrationPermissions.Post).Returns(true);
+            _permissionService.UserHasPermissionAsync(editPostDto, AdministrationPermissions.Post).Returns(true);
 
             // Act
             // Assert
-            Assert.DoesNotThrow(() => _postService.EditPost(editPostDto));
+            Assert.DoesNotThrow(() => _postService.EditPostAsync(editPostDto));
         }
 
         [Test]
@@ -345,11 +345,11 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 2
             };
 
-            _permissionService.UserHasPermission(editPostDto, AdministrationPermissions.Post).Returns(false);
+            _permissionService.UserHasPermissionAsync(editPostDto, AdministrationPermissions.Post).Returns(false);
 
             // Act
             // Assert
-            Assert.Throws<UnauthorizedException>(() => _postService.EditPost(editPostDto));
+            Assert.Throws<UnauthorizedException>(() => _postService.EditPostAsync(editPostDto));
         }
 
         [Test]
@@ -370,7 +370,7 @@ namespace Shrooms.Tests.DomainService
 
             // Act
             // Assert
-            var ex = Assert.Throws<ValidationException>(() => _postService.EditPost(editPostDto));
+            var ex = Assert.Throws<ValidationException>(() => _postService.EditPostAsync(editPostDto));
             Assert.AreEqual(ErrorCodes.ContentDoesNotExist, ex.ErrorCode);
         }
 
@@ -390,7 +390,7 @@ namespace Shrooms.Tests.DomainService
 
             // Act
             // Assert
-            var ex = Assert.Throws<ValidationException>(() => _postService.DeleteWallPost(1, userOrg));
+            var ex = Assert.Throws<ValidationException>(() => _postService.DeleteWallPostAsync(1, userOrg));
             Assert.AreEqual(ErrorCodes.ContentDoesNotExist, ex.ErrorCode);
         }
 
@@ -417,11 +417,11 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 2
             };
 
-            _permissionService.UserHasPermission(userOrg, AdministrationPermissions.Post).Returns(false);
+            _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Post).Returns(false);
 
             // Act
             // Assert
-            Assert.Throws<UnauthorizedException>(() => _postService.DeleteWallPost(1, userOrg));
+            Assert.Throws<UnauthorizedException>(() => _postService.DeleteWallPostAsync(1, userOrg));
         }
 
         [Test]
@@ -447,11 +447,11 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 2
             };
 
-            _permissionService.UserHasPermission(userOrg, AdministrationPermissions.Post).Returns(true);
+            _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Post).Returns(true);
 
             // Act
             // Assert
-            Assert.DoesNotThrow(() => _postService.DeleteWallPost(1, userOrg));
+            Assert.DoesNotThrow(() => _postService.DeleteWallPostAsync(1, userOrg));
         }
 
         [Test]
@@ -477,11 +477,11 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 2
             };
 
-            _permissionService.UserHasPermission(userOrg, AdministrationPermissions.Post).Returns(false);
+            _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Post).Returns(false);
 
             // Act
             // Assert
-            Assert.DoesNotThrow(() => _postService.DeleteWallPost(1, userOrg));
+            Assert.DoesNotThrow(() => _postService.DeleteWallPostAsync(1, userOrg));
         }
     }
 }

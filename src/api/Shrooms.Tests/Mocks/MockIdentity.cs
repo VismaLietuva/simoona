@@ -35,7 +35,7 @@ namespace Shrooms.Tests.Mocks
             mockShroomsUserStore.FindByNameAsync("user").Returns(Task.FromResult(new ApplicationUser { UserName = "user", Email = "user@test.lt" }));
             mockShroomsUserStore.FindByNameAsync("admin").Returns(Task.FromResult(new ApplicationUser { UserName = "admin", Email = "admin@test.lt" }));
             mockShroomsUserStore.FindByIdAsync(string.Empty).Returns(Task.FromResult(new ApplicationUser { UserName = "test", Email = "test@test.lt" }));
-            mockPermissionService.UserHasPermission(new UserAndOrganizationDTO { UserId = string.Empty }, AdministrationPermissions.ApplicationUser).Returns(true);
+            mockPermissionService.UserHasPermissionAsync(new UserAndOrganizationDTO { UserId = string.Empty }, AdministrationPermissions.ApplicationUser).Returns(true);
             return mockShroomsUserStore;
         }
 

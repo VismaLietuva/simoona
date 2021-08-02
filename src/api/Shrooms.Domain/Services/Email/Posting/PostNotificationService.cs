@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
@@ -17,6 +18,7 @@ using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.UserService;
 using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.Resources.Emails;
+using MultiwallWall = Shrooms.DataLayer.EntityModels.Models.Multiwall.Wall;
 
 namespace Shrooms.Domain.Services.Email.Posting
 {
@@ -31,12 +33,11 @@ namespace Shrooms.Domain.Services.Email.Posting
         private readonly IMarkdownConverter _markdownConverter;
         private readonly ILogger _logger;
 
-        private readonly IDbSet<DataLayer.EntityModels.Models.Multiwall.Wall> _wallsDbSet;
+        private readonly IDbSet<MultiwallWall> _wallsDbSet;
         private readonly IDbSet<Event> _eventsDbSet;
         private readonly IDbSet<Project> _projectsDbSet;
 
-        public PostNotificationService(
-            IUnitOfWork2 uow,
+        public PostNotificationService(IUnitOfWork2 uow,
             IUserService userService,
             IPostService postService,
             IMailTemplate mailTemplate,
@@ -60,67 +61,71 @@ namespace Shrooms.Domain.Services.Email.Posting
             _projectsDbSet = uow.GetDbSet<Project>();
         }
 
-        public void NotifyAboutNewPost(NewlyCreatedPostDTO post)
+        public async Task NotifyAboutNewPostAsync(NewlyCreatedPostDTO post)
         {
-            var postCreator = _userService.GetApplicationUser(post.User.UserId);
+            var postCreator = await _userService.GetApplicationUserAsync(post.User.UserId);
 
             var organization = _organizationService.GetOrganizationById(postCreator.OrganizationId);
-            var wall = _wallsDbSet.Single(w => w.Id == post.WallId);
+            var wall = await _wallsDbSet.SingleAsync(w => w.Id == post.WallId);
 
-            var mentionedUsers = GetMentionedUsers(post.MentionedUsersIds).ToList();
-            var destinationEmails = _userService.GetWallUsersEmails(postCreator.Email, wall).Except(mentionedUsers.Select(x => x.Email)).ToList();
+            var mentionedUsers = (await GetMentionedUsersAsync(post.MentionedUsersIds)).ToList();
+            var destinationEmails = (await _userService.GetWallUsersEmailsAsync(postCreator.Email, wall))
+                .Except(mentionedUsers.Select(x => x.Email)).ToList();
 
             if (destinationEmails.Count > 0)
             {
-                SendWallSubscriberEmails(post, destinationEmails, postCreator, organization, wall);
+                await SendWallSubscriberEmailsAsync(post, destinationEmails, postCreator, organization, wall);
             }
 
             if (mentionedUsers.Count > 0)
             {
-                SendMentionEmails(post, mentionedUsers, postCreator, organization);
+                await SendMentionEmailsAsync(post, mentionedUsers, postCreator, organization);
             }
         }
 
-        private void SendWallSubscriberEmails(NewlyCreatedPostDTO post, List<string> destinationEmails, ApplicationUser postCreator, Organization organization, DataLayer.EntityModels.Models.Multiwall.Wall wall)
+        private async Task SendWallSubscriberEmailsAsync(NewlyCreatedPostDTO post,
+            IEnumerable<string> destinationEmails,
+            ApplicationUser postCreator,
+            Organization organization,
+            DataLayer.EntityModels.Models.Multiwall.Wall wall)
         {
-            var postLink = GetPostLink(post.WallType, post.WallId, organization.ShortName, post.Id);
+            var postLink = await GetPostLinkAsync(post.WallType, post.WallId, organization.ShortName, post.Id);
             var authorPictureUrl = _appSettings.PictureUrl(organization.ShortName, postCreator.PictureId);
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
             var subject = string.Format(Templates.NewWallPostEmailSubject, wall.Name, postCreator.FullName);
             var body = _markdownConverter.ConvertToHtml(post.MessageBody);
 
-            var emailTemplateViewModel = new NewWallPostEmailTemplateViewModel(
-                GetWallTitle(wall),
+            var emailTemplateViewModel = new NewWallPostEmailTemplateViewModel(GetWallTitle(wall),
                 authorPictureUrl,
                 postCreator.FullName,
                 postLink,
                 body,
                 userNotificationSettingsUrl,
                 GetActionButtonTitle(wall));
+
             var content = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.NewWallPost);
 
             var emailData = new EmailDto(destinationEmails, subject, content);
-            _mailingService.SendEmail(emailData);
+            await _mailingService.SendEmailAsync(emailData);
         }
 
-        private void SendMentionEmails(NewlyCreatedPostDTO post, List<ApplicationUser> mentionedUsers, ApplicationUser postCreator, Organization organization)
+        private async Task SendMentionEmailsAsync(NewlyCreatedPostDTO post, IEnumerable<ApplicationUser> mentionedUsers, ApplicationUser postCreator, Organization organization)
         {
             var messageBody = _markdownConverter.ConvertToHtml(_postService.GetPostBody(post.Id));
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
             var postUrl = _appSettings.WallPostUrl(organization.ShortName, post.Id);
-            var subject = "You have been mentioned in the post";
+            const string subject = "You have been mentioned in the post";
 
             foreach (var mentionedUser in mentionedUsers)
             {
                 try
                 {
-                    if (mentionedUser.NotificationsSettings != null && !mentionedUser.NotificationsSettings.MentionEmailNotifications)
+                    if (mentionedUser.NotificationsSettings?.MentionEmailNotifications == false)
                     {
                         continue;
                     }
 
-                    var newMentionTemplateViewModel = new NewMentionTemplateViewModel(
-                        mentionedUser.FullName,
+                    var newMentionTemplateViewModel = new NewMentionTemplateViewModel(mentionedUser.FullName,
                         postCreator.FacebookEmail,
                         postUrl,
                         userNotificationSettingsUrl,
@@ -129,7 +134,7 @@ namespace Shrooms.Domain.Services.Email.Posting
                     var content = _mailTemplate.Generate(newMentionTemplateViewModel, EmailTemplateCacheKeys.NewMention);
 
                     var emailData = new EmailDto(mentionedUser.Email, subject, content);
-                    _mailingService.SendEmail(emailData);
+                    await _mailingService.SendEmailAsync(emailData);
                 }
                 catch (Exception e)
                 {
@@ -138,22 +143,15 @@ namespace Shrooms.Domain.Services.Email.Posting
             }
         }
 
-        private IEnumerable<ApplicationUser> GetMentionedUsers(IEnumerable<string> mentionedUsersIds)
+        private async Task<IEnumerable<ApplicationUser>> GetMentionedUsersAsync(IEnumerable<string> mentionedUsersIds)
         {
             if (mentionedUsersIds == null)
             {
-                yield break;
+                return Enumerable.Empty<ApplicationUser>();
             }
 
-            foreach (var mentionId in mentionedUsersIds)
-            {
-                var user = _userService.GetApplicationUser(mentionId);
-
-                if (user.NotificationsSettings == null || user.NotificationsSettings.MentionEmailNotifications)
-                {
-                    yield return user;
-                }
-            }
+            var users = await _userService.GetUsersWithMentionNotificationsAsync(mentionedUsersIds);
+            return users;
         }
 
         private static string GetActionButtonTitle(DataLayer.EntityModels.Models.Multiwall.Wall wall)
@@ -182,22 +180,25 @@ namespace Shrooms.Domain.Services.Email.Posting
             }
         }
 
-        private string GetPostLink(WallType wallType, int wallId, string orgName, int postId)
+        private async Task<string> GetPostLinkAsync(WallType wallType, int wallId, string orgName, int postId)
         {
             switch (wallType)
             {
                 case WallType.Events:
-                    var eventId = _eventsDbSet
+                    var eventId = await _eventsDbSet
                         .Where(x => x.WallId == wallId)
                         .Select(x => x.Id)
-                        .First();
+                        .FirstAsync();
                     return _appSettings.EventUrl(orgName, eventId.ToString());
+
                 case WallType.Project:
-                    var projectId = _projectsDbSet
+                    var projectId = await _projectsDbSet
                         .Where(x => x.WallId == wallId)
                         .Select(x => x.Id)
-                        .First();
+                        .FirstAsync();
+
                     return _appSettings.ProjectUrl(orgName, projectId.ToString());
+
                 default:
                     return _appSettings.WallPostUrl(orgName, postId);
             }

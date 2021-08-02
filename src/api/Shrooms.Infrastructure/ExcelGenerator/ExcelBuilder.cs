@@ -31,9 +31,7 @@ namespace Shrooms.Infrastructure.ExcelGenerator
             var worksheet = _package.Workbook.Worksheets.Add(sheetName);
             var worksheetBuilder = new ExcelWorksheetBuilder(worksheet);
 
-            worksheetBuilder
-                .WithRows(rows)
-                .Build();
+            worksheetBuilder.WithRows(rows).Build();
 
             return this;
         }

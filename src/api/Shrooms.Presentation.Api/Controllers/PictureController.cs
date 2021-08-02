@@ -58,7 +58,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             imageStream.Position = 0;
 
-            var pictureName = await _pictureService.UploadFromImage(image,
+            var pictureName = await _pictureService.UploadFromImageAsync(image,
                     imageContent.Headers.ContentType.ToString(),
                     imageContent.Headers.ContentDisposition.FileName.Replace("\"", string.Empty),
                     GetUserAndOrganization().OrganizationId);

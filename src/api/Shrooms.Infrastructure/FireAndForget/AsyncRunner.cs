@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Web.Hosting;
 using Autofac;
 using Autofac.Core.Lifetime;
@@ -15,9 +16,9 @@ namespace Shrooms.Infrastructure.FireAndForget
             LifetimeScope = lifetimeScope;
         }
 
-        public void Run<T>(Action<T> action, string tenantName)
+        public void Run<T>(Func<T, Task> action, string tenantName)
         {
-            HostingEnvironment.QueueBackgroundWorkItem(_ =>
+            HostingEnvironment.QueueBackgroundWorkItem(async _ =>
             {
                 using (var container = LifetimeScope.BeginLifetimeScope(MatchingScopeLifetimeTags.RequestLifetimeScopeTag,
                     builder => { builder.RegisterInstance(new TenantNameContainer(tenantName)).As<ITenantNameContainer>().SingleInstance(); }))
@@ -26,7 +27,7 @@ namespace Shrooms.Infrastructure.FireAndForget
                     var service = container.Resolve<T>();
                     try
                     {
-                        action(service);
+                        await action(service);
                     }
                     catch (Exception ex)
                     {

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
 using Microsoft.AspNet.Identity;
@@ -66,13 +68,13 @@ namespace Shrooms.Presentation.Api.Controllers
 
         #region private methods
 
-        private void AssignPermissionsToRole(RoleMiniViewModel roleViewModel, ApplicationRole role)
+        private async Task AssignPermissionsToRoleAsync(RoleMiniViewModel roleViewModel, ApplicationRole role)
         {
             var filteredPermissions = GetFilter(roleViewModel.Permissions.ToList());
-            role.Permissions = _permissionRepository.Get(filteredPermissions).ToList();
+            role.Permissions = await _permissionRepository.Get(filteredPermissions).ToListAsync();
 
             _roleRepository.Update(role);
-            _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
         }
 
         private static Expression<Func<Permission, bool>> GetFilter(IList<PermissionGroupViewModel> permissions)
@@ -83,25 +85,25 @@ namespace Shrooms.Presentation.Api.Controllers
             return p => adminControllers.Any(a => p.Name.StartsWith(a + "_")) || (basicControllers.Any(b => p.Name.StartsWith(b + "_")) && p.Scope == PermissionScopes.Basic);
         }
 
-        private void AssignUsersToRole(RoleMiniViewModel roleViewModel)
+        private async Task AssignUsersToRole(RoleMiniViewModel roleViewModel)
         {
             var usersInModelIds = _mapper.Map<IEnumerable<ApplicationUserViewModel>, string[]>(roleViewModel.Users);
-            var usersToAdd = _applicationUserRepository.Get(u => u.Roles.Count(r => r.RoleId.Contains(roleViewModel.Id)) == 0 && usersInModelIds.Contains(u.Id)).ToList();
+            var usersToAdd = await _applicationUserRepository.Get(u => u.Roles.Count(r => r.RoleId.Contains(roleViewModel.Id)) == 0 && usersInModelIds.Contains(u.Id)).ToListAsync();
 
-            usersToAdd.ForEach(u =>
+            usersToAdd.ForEach(async u =>
             {
-                var state = UserManager.AddToRole(u.Id, roleViewModel.Name);
+                var state = await UserManager.AddToRoleAsync(u.Id, roleViewModel.Name);
                 if (!state.Succeeded)
                 {
                     throw new SystemException(state.Errors.Aggregate(new StringBuilder(), (sb, a) => sb.AppendLine(string.Join(", ", a)), sb => sb.ToString()));
                 }
             });
 
-            var usersToRemove = _applicationUserRepository.Get(u => u.Roles.Count(r => r.RoleId.Contains(roleViewModel.Id)) == 1 && !usersInModelIds.Contains(u.Id)).ToList();
+            var usersToRemove = await _applicationUserRepository.Get(u => u.Roles.Count(r => r.RoleId.Contains(roleViewModel.Id)) == 1 && !usersInModelIds.Contains(u.Id)).ToListAsync();
 
-            usersToRemove.ForEach(u =>
+            usersToRemove.ForEach(async u =>
             {
-                var state = UserManager.RemoveFromRole(u.Id, roleViewModel.Name);
+                var state = await UserManager.RemoveFromRoleAsync(u.Id, roleViewModel.Name);
                 if (!state.Succeeded)
                 {
                     throw new SystemException(state.Errors.Aggregate(new StringBuilder(), (sb, a) => sb.AppendLine(string.Join(", ", a)), sb => sb.ToString()));
@@ -129,9 +131,9 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [Route("GetPermissionGroups")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Role)]
-        public IHttpActionResult GetPermissionGroups()
+        public async Task<IHttpActionResult> GetPermissionGroups()
         {
-            var roleGroups = _permissionService.GetGroupNames(GetUserAndOrganization().OrganizationId);
+            var roleGroups = await _permissionService.GetGroupNamesAsync(GetUserAndOrganization().OrganizationId);
             var roleGroupsViewModel = _mapper.Map<IEnumerable<PermissionGroupDTO>, IEnumerable<PermissionGroupViewModel>>(roleGroups);
             return Ok(roleGroupsViewModel);
         }
@@ -139,14 +141,14 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.Role)]
         [Route("Get")]
-        public IHttpActionResult Get(string roleId)
+        public async Task<IHttpActionResult> Get(string roleId)
         {
             if (string.IsNullOrEmpty(roleId))
             {
                 return BadRequest("roleId can't be empty");
             }
 
-            var roleDetailsDTO = _roleService.GetRoleById(GetUserAndOrganization(), roleId);
+            var roleDetailsDTO = await _roleService.GetRoleByIdAsync(GetUserAndOrganization(), roleId);
             var roleDetailsViewModel = _mapper.Map<RoleDetailsDTO, RoleDetailsViewModel>(roleDetailsDTO);
             return Ok(roleDetailsViewModel);
         }
@@ -175,9 +177,9 @@ namespace Shrooms.Presentation.Api.Controllers
         [ValidationFilter]
         [Route("Post")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Role)]
-        public HttpResponseMessage Post([FromBody] RoleMiniViewModel roleViewModel)
+        public async Task<HttpResponseMessage> Post([FromBody] RoleMiniViewModel roleViewModel)
         {
-            if (_roleRepository.Get(r => r.Name == roleViewModel.Name).Any())
+            if (await _roleRepository.Get(r => r.Name == roleViewModel.Name).AnyAsync())
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Resources.Models.Role.Role.RoleNameExistsError);
             }
@@ -188,9 +190,9 @@ namespace Shrooms.Presentation.Api.Controllers
             role.CreatedTime = DateTime.UtcNow;
             role.OrganizationId = GetUserAndOrganization().OrganizationId;
 
-            RoleManager.Create(role);
-            AssignPermissionsToRole(roleViewModel, role);
-            AssignUsersToRole(roleViewModel);
+            await RoleManager.CreateAsync(role);
+            await AssignPermissionsToRoleAsync(roleViewModel, role);
+            await AssignUsersToRole(roleViewModel);
             _permissionsCache.Clear();
 
             return Request.CreateResponse(HttpStatusCode.OK, role.Id);
@@ -199,18 +201,18 @@ namespace Shrooms.Presentation.Api.Controllers
         [ValidationFilter]
         [Route("Put")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Role)]
-        public HttpResponseMessage Put([FromBody] RoleMiniViewModel roleViewModel)
+        public async Task<HttpResponseMessage> Put([FromBody] RoleMiniViewModel roleViewModel)
         {
             if (_roleRepository.Get(r => r.Name == roleViewModel.Name && r.Id != roleViewModel.Id).Any())
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Resources.Models.Role.Role.RoleNameExistsError);
             }
 
-            var role = _roleRepository.Get(r => r.Id == roleViewModel.Id, includeProperties: "Permissions").FirstOrDefault();
+            var role = await _roleRepository.Get(r => r.Id == roleViewModel.Id, includeProperties: "Permissions").FirstOrDefaultAsync();
             _mapper.Map(roleViewModel, role);
 
-            AssignPermissionsToRole(roleViewModel, role);
-            AssignUsersToRole(roleViewModel);
+            await AssignPermissionsToRoleAsync(roleViewModel, role);
+            await AssignUsersToRole(roleViewModel);
             _permissionsCache.Clear();
 
             return Request.CreateResponse(HttpStatusCode.OK, role.Id);
@@ -236,8 +238,12 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [Route("GetPaged")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Role)]
-        public PagedViewModel<RoleViewModel> GetPaged(int page = 1, int pageSize = WebApiConstants.DefaultPageSize, string s = "",
-            string sort = "Name", string dir = "", string includeProperties = "")
+        public PagedViewModel<RoleViewModel> GetPaged(int page = 1,
+            int pageSize = WebApiConstants.DefaultPageSize,
+            string s = "",
+            string sort = "Name",
+            string dir = "",
+            string includeProperties = "")
         {
             var sortString = string.IsNullOrEmpty(sort) ? null : $"{sort} {dir}";
 

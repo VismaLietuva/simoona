@@ -70,9 +70,9 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
             {
                 var userAndOrg = GetUserAndOrganization();
 
-                var wall = await _wallService.GetWallDetails(wallId, userAndOrg);
+                var wall = await _wallService.GetWallDetailsAsync(wallId, userAndOrg);
 
-                if (!_permissionService.UserHasPermission(userAndOrg, BasicPermissions.Post) && wall.Type != WallType.Events)
+                if (!await _permissionService.UserHasPermissionAsync(userAndOrg, BasicPermissions.Post) && wall.Type != WallType.Events)
                 {
                     return Forbidden();
                 }
@@ -97,7 +97,7 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
         [HttpPut]
         [Route("Follow")]
         [PermissionAuthorize(Permission = BasicPermissions.Wall)]
-        public IHttpActionResult JoinWall(int wallId, string attendeeId = null)
+        public async Task<IHttpActionResult> JoinWall(int wallId, string attendeeId = null)
         {
             if (wallId <= 0)
             {
@@ -112,7 +112,7 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
 
             try
             {
-                var userDto = _wallService.JoinLeaveWall(wallId, attendeeId, userAndOrg.UserId, userAndOrg.OrganizationId, false);
+                var userDto = await _wallService.JoinOrLeaveWallAsync(wallId, attendeeId, userAndOrg.UserId, userAndOrg.OrganizationId, false);
                 var result = _mapper.Map<ApplicationUserMinimalDto, ApplicationUserMinimalViewModel>(userDto);
 
                 return Ok(result);
@@ -165,14 +165,14 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
             try
             {
                 var userAndOrg = GetUserAndOrganization();
-                var wall = await _wallService.GetWall(wallId, userAndOrg);
+                var wall = await _wallService.GetWallAsync(wallId, userAndOrg);
 
-                if (!_permissionService.UserHasPermission(userAndOrg, BasicPermissions.Post) && wall.Type != WallType.Events)
+                if (!await _permissionService.UserHasPermissionAsync(userAndOrg, BasicPermissions.Post) && wall.Type != WallType.Events)
                 {
                     return Forbidden();
                 }
 
-                var wallPosts = await _wallService.GetWallPosts(page, WebApiConstants.DefaultPageSize, userAndOrg, wallId);
+                var wallPosts = await _wallService.GetWallPostsAsync(page, WebApiConstants.DefaultPageSize, userAndOrg, wallId);
 
                 var mappedPosts = _mapper.Map<IEnumerable<WallPostViewModel>>(wallPosts);
                 var pagedViewModel = new PagedWallViewModel<WallPostViewModel>
@@ -242,9 +242,9 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
 
             try
             {
-                var wallId = await _wallService.CreateNewWall(wallDto);
+                var wallId = await _wallService.CreateNewWallAsync(wallDto);
                 var userAndOrg = GetUserAndOrganization();
-                var notificationDto = await _notificationService.CreateForWall(userAndOrg, wallDto, wallId);
+                var notificationDto = await _notificationService.CreateForWallAsync(userAndOrg, wallDto, wallId);
 
                 NotificationHub.SendNotificationToAllUsers(_mapper.Map<NotificationViewModel>(notificationDto), GetUserAndOrganizationHub());
 
@@ -271,7 +271,7 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
 
             try
             {
-                _wallService.UpdateWall(updateWallDto);
+                _wallService.UpdateWallAsync(updateWallDto);
                 return Ok();
             }
             catch (ValidationException e)
@@ -297,7 +297,7 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
             try
             {
                 var userAndOrg = GetUserAndOrganization();
-                _wallService.DeleteWall(wallId, userAndOrg, WallType.UserCreated);
+                _wallService.DeleteWallAsync(wallId, userAndOrg, WallType.UserCreated);
                 return Ok();
             }
             catch (ValidationException e)

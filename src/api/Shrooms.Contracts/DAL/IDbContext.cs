@@ -19,7 +19,7 @@ namespace Shrooms.Contracts.DAL
 
         Task<int> SaveChangesAsync(string userId);
 
-        Task<int> SaveChangesAsync(bool useMetaTracking);
+        Task<int> SaveChangesAsync(bool useMetaTracking = true);
 
         void Dispose();
     }

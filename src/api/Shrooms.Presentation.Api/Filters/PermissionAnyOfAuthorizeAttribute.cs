@@ -13,19 +13,19 @@ namespace Shrooms.Presentation.Api.Filters
 {
     public class PermissionAnyOfAuthorizeAttribute : AuthorizeAttribute
     {
-        private List<string> _permisions = new List<string>();
+        private readonly List<string> _permissions = new List<string>();
 
         public PermissionAnyOfAuthorizeAttribute(string permission = null)
         {
             if (permission != null)
             {
-                _permisions.Add(permission);
+                _permissions.Add(permission);
             }
         }
 
         public PermissionAnyOfAuthorizeAttribute(params string[] permissions)
         {
-            _permisions = permissions.ToList();
+            _permissions = permissions.ToList();
         }
 
         protected override bool IsAuthorized(HttpActionContext actionContext)
@@ -38,7 +38,7 @@ namespace Shrooms.Presentation.Api.Filters
                 OrganizationId = actionContext.Request.GetRequestContext().Principal.Identity.GetOrganizationId()
             };
 
-            var isPermitted = _permisions.Any(p => permissionService.UserHasPermission(userAndOrg, p));
+            var isPermitted = _permissions.Any(p => permissionService != null && permissionService.UserHasPermission(userAndOrg, p));
             return isPermitted;
         }
 

@@ -13,27 +13,32 @@ namespace Shrooms.Presentation.Api.Filters
 {
     public class PermissionAuthorizeAttribute : AuthorizeAttribute
     {
-        private List<string> _permisions;
+        private readonly List<string> _permissions;
 
         public string Permission { get; set; }
 
         public PermissionAuthorizeAttribute(string permission = null)
         {
-            _permisions = new List<string>();
+            _permissions = new List<string>();
             if (permission != null)
             {
-                _permisions.Add(permission);
+                _permissions.Add(permission);
             }
         }
 
         public PermissionAuthorizeAttribute(params string[] permissions)
         {
-            _permisions = permissions.ToList();
+            _permissions = permissions.ToList();
         }
 
         protected override bool IsAuthorized(HttpActionContext actionContext)
         {
             var permissionService = actionContext.Request.GetDependencyScope().GetService(typeof(IPermissionService)) as IPermissionService;
+
+            if (permissionService == null)
+            {
+                return false;
+            }
 
             var userAndOrg = new UserAndOrganizationDTO
             {
@@ -41,7 +46,7 @@ namespace Shrooms.Presentation.Api.Filters
                 OrganizationId = actionContext.Request.GetRequestContext().Principal.Identity.GetOrganizationId()
             };
 
-            var isPermitted = _permisions.All(p => permissionService.UserHasPermission(userAndOrg, p))
+            var isPermitted = _permissions.All(p => permissionService.UserHasPermission(userAndOrg, p))
                 && (Permission != null && permissionService.UserHasPermission(userAndOrg, Permission) || Permission == null);
             return isPermitted;
         }

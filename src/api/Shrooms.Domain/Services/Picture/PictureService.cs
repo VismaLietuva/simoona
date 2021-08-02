@@ -21,31 +21,31 @@ namespace Shrooms.Domain.Services.Picture
             _organizationsDbSet = uow.GetDbSet<Organization>();
         }
 
-        public async Task<string> UploadFromImage(Image image, string mimeType, string fileName, int orgId)
+        public async Task<string> UploadFromImageAsync(Image image, string mimeType, string fileName, int orgId)
         {
             var pictureName = GetNewPictureName(fileName);
             var tenantPicturesContainer = GetPictureContainer(orgId);
 
-            await _storage.UploadPicture(image, pictureName, mimeType, tenantPicturesContainer);
+            await _storage.UploadPictureAsync(image, pictureName, mimeType, tenantPicturesContainer);
 
             return pictureName;
         }
 
-        public async Task<string> UploadFromStream(Stream stream, string mimeType, string fileName, int orgId)
+        public async Task<string> UploadFromStreamAsync(Stream stream, string mimeType, string fileName, int orgId)
         {
             var pictureName = GetNewPictureName(fileName);
             var tenantPicturesContainer = GetPictureContainer(orgId);
 
-            await _storage.UploadPicture(stream, pictureName, mimeType, tenantPicturesContainer);
+            await _storage.UploadPictureAsync(stream, pictureName, mimeType, tenantPicturesContainer);
 
             return pictureName;
         }
 
-        public async Task RemoveImage(string blobKey, int orgId)
+        public async Task RemoveImageAsync(string blobKey, int orgId)
         {
             var tenantPicturesContainer = GetPictureContainer(orgId);
 
-            await _storage.RemovePicture(blobKey, tenantPicturesContainer);
+            await _storage.RemovePictureAsync(blobKey, tenantPicturesContainer);
         }
 
         private static string GetNewPictureName(string fileName)

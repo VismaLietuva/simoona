@@ -116,14 +116,14 @@ namespace Shrooms.Domain.Services.Projects
             return project;
         }
 
-        public async Task<EditProjectDisplayDto> GetProjectById(int projectId, UserAndOrganizationDTO userOrg)
+        public async Task<EditProjectDisplayDto> GetProjectByIdAsync(int projectId, UserAndOrganizationDTO userOrg)
         {
             var projectOwnerId = await _projectsDbSet.Where(p =>
                     p.Id == projectId &&
                     p.OrganizationId == userOrg.OrganizationId).Select(s => s.OwnerId)
                 .SingleAsync();
 
-            ValidateOwnershipPermissions(projectOwnerId, userOrg);
+            await ValidateOwnershipPermissionsAsync(projectOwnerId, userOrg);
 
             var project = await _projectsDbSet
                 .Include(p => p.Members)
@@ -199,12 +199,12 @@ namespace Shrooms.Domain.Services.Projects
             };
 
             _projectsDbSet.Add(project);
-            await _wallService.CreateNewWall(wall);
+            await _wallService.CreateNewWallAsync(wall);
 
             await _uow.SaveChangesAsync(dto.UserId);
         }
 
-        public async Task EditProject(EditProjectDto dto)
+        public async Task EditProjectAsync(EditProjectDto dto)
         {
             var project = await _projectsDbSet
                 .Include(p => p.Members)
@@ -220,7 +220,7 @@ namespace Shrooms.Domain.Services.Projects
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Project not found");
             }
 
-            ValidateOwnershipPermissions(project.OwnerId, dto);
+            await ValidateOwnershipPermissionsAsync(project.OwnerId, dto);
 
             if (project.OwnerId != dto.OwningUserId)
             {
@@ -233,7 +233,7 @@ namespace Shrooms.Domain.Services.Projects
 
             project.Members = await _usersDbSet.Where(x => dto.MembersIds.Contains(x.Id)).ToListAsync();
 
-            _wallService.ReplaceMembersInWall(project.Members.ToList(), project.WallId, dto.UserId);
+            await _wallService.ReplaceMembersInWallAsync(project.Members.ToList(), project.WallId, dto.UserId);
 
             var completeListOfAttributes = await ManageProjectAttributes(dto.Attributes);
 
@@ -244,12 +244,12 @@ namespace Shrooms.Domain.Services.Projects
             project.Attributes = completeListOfAttributes.ToList();
             UpdateProjectWallModerator(dto, project);
 
-            UpdateWall(dto, project.WallId);
+            await UpdateWallAsync(dto, project.WallId);
 
             await _uow.SaveChangesAsync(dto.UserId);
         }
 
-        public async Task Delete(int id, UserAndOrganizationDTO userOrg)
+        public async Task DeleteAsync(int id, UserAndOrganizationDTO userOrg)
         {
             var project = await _projectsDbSet
                 .Include(p => p.Members)
@@ -265,52 +265,51 @@ namespace Shrooms.Domain.Services.Projects
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Project not found");
             }
 
-            ValidateOwnershipPermissions(project.OwnerId, userOrg);
+            await ValidateOwnershipPermissionsAsync(project.OwnerId, userOrg);
 
             _projectsDbSet.Remove(project);
-            _wallService.DeleteWall(project.WallId, userOrg, WallType.Project);
+            await _wallService.DeleteWallAsync(project.WallId, userOrg, WallType.Project);
 
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
-        public async Task ExpelMember(UserAndOrganizationDTO userAndOrg, int projectId, string expelUserId)
+        public async Task ExpelMemberAsync(UserAndOrganizationDTO userAndOrg, int projectId, string expelUserId)
         {
             var project = await _projectsDbSet
                 .Include(x => x.Members)
                 .FirstOrDefaultAsync(x => x.Id == projectId && x.OrganizationId == userAndOrg.OrganizationId);
 
-            ValidateExpelMember(project, userAndOrg);
+            await ValidateExpelMemberAsync(project, userAndOrg);
 
             project?.Members.Remove(project.Members.FirstOrDefault(x => x.Id == expelUserId));
 
             if (project != null)
             {
-                _wallService.RemoveMemberFromWall(expelUserId, project.WallId);
+                await _wallService.RemoveMemberFromWallAsync(expelUserId, project.WallId);
             }
 
             await _uow.SaveChangesAsync(userAndOrg.UserId);
         }
 
-        public void AddProjectsToUser(string userId, IEnumerable<int> newProjectIds, UserAndOrganizationDTO userOrg)
+        public async Task AddProjectsToUserAsync(string userId, IEnumerable<int> newProjectIds, UserAndOrganizationDTO userOrg)
         {
-            var user = _usersDbSet
+            var user = await _usersDbSet
                 .Include(x => x.Projects)
-                .First(x => x.Id == userId &&
-                            x.OrganizationId == userOrg.OrganizationId);
+                .FirstAsync(x => x.Id == userId && x.OrganizationId == userOrg.OrganizationId);
 
             var wallsThatShouldBeRemovedFromUser = user.Projects
                 .Where(x => !newProjectIds.Contains(x.Id))
                 .Select(x => x.WallId)
                 .ToList();
 
-            var wallsThatShouldBeAddedToUser = _projectsDbSet.Where(x => newProjectIds.Contains(x.Id)).Select(x => x.WallId).ToList();
+            var wallsThatShouldBeAddedToUser = await _projectsDbSet.Where(x => newProjectIds.Contains(x.Id)).Select(x => x.WallId).ToListAsync();
 
-            _wallService.AddMemberToWalls(userId, wallsThatShouldBeAddedToUser);
-            _wallService.RemoveMemberFromWalls(userId, wallsThatShouldBeRemovedFromUser);
+            await _wallService.AddMemberToWallsAsync(userId, wallsThatShouldBeAddedToUser);
+            await _wallService.RemoveMemberFromWallsAsync(userId, wallsThatShouldBeRemovedFromUser);
 
-            user.Projects = _projectsDbSet.Where(p => newProjectIds.Contains(p.Id)).ToList();
+            user.Projects = await _projectsDbSet.Where(p => newProjectIds.Contains(p.Id)).ToListAsync();
 
-            _uow.SaveChanges(userOrg.UserId);
+            await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
         public bool ValidateManagerId(string userId, string managerId)
@@ -341,7 +340,7 @@ namespace Shrooms.Domain.Services.Projects
             return false;
         }
 
-        private void UpdateWall(EditProjectDto dto, int wallId)
+        private async Task UpdateWallAsync(EditProjectDto dto, int wallId)
         {
             var updateWallDto = new UpdateWallDto
             {
@@ -353,7 +352,7 @@ namespace Shrooms.Domain.Services.Projects
                 UserId = dto.UserId
             };
 
-            _wallService.UpdateWall(updateWallDto);
+            await _wallService.UpdateWallAsync(updateWallDto);
         }
 
         private void UpdateProjectWallModerator(EditProjectDto dto, Project project)
@@ -369,15 +368,15 @@ namespace Shrooms.Domain.Services.Projects
 
                 if (!dto.MembersIds.Contains(currentModeratorId))
                 {
-                    _wallService.RemoveMemberFromWall(currentModeratorId, project.WallId);
+                    _wallService.RemoveMemberFromWallAsync(currentModeratorId, project.WallId);
                 }
 
-                _wallService.RemoveModerator(project.WallId, project.Wall.Moderators.First().UserId, dto);
-                _wallService.AddModerator(project.WallId, dto.OwningUserId, dto);
+                _wallService.RemoveModeratorAsync(project.WallId, project.Wall.Moderators.First().UserId, dto);
+                _wallService.AddModeratorAsync(project.WallId, dto.OwningUserId, dto);
             }
             else
             {
-                _wallService.AddModerator(project.WallId, dto.OwningUserId, dto);
+                _wallService.AddModeratorAsync(project.WallId, dto.OwningUserId, dto);
             }
         }
 
@@ -412,14 +411,14 @@ namespace Shrooms.Domain.Services.Projects
             return projectAttributes.Union(existingAttributes);
         }
 
-        private void ValidateExpelMember(Project project, UserAndOrganizationDTO userAndOrg)
+        private async Task ValidateExpelMemberAsync(Project project, UserAndOrganizationDTO userAndOrg)
         {
             if (project == null)
             {
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Project does not exist");
             }
 
-            var hasProjectAdminPermission = _permissionService.UserHasPermission(userAndOrg, AdministrationPermissions.Project);
+            var hasProjectAdminPermission = await _permissionService.UserHasPermissionAsync(userAndOrg, AdministrationPermissions.Project);
             var isProjectOwner = project.OwnerId == userAndOrg.UserId;
 
             if (!(isProjectOwner || hasProjectAdminPermission))
@@ -428,9 +427,9 @@ namespace Shrooms.Domain.Services.Projects
             }
         }
 
-        private void ValidateOwnershipPermissions(string ownerId, UserAndOrganizationDTO userOrg)
+        private async Task ValidateOwnershipPermissionsAsync(string ownerId, UserAndOrganizationDTO userOrg)
         {
-            var isAdministrator = _permissionService.UserHasPermission(userOrg, AdministrationPermissions.Project);
+            var isAdministrator = await _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Project);
 
             if (ownerId != userOrg.UserId && !isAdministrator)
             {

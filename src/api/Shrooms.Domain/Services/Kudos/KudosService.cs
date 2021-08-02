@@ -76,7 +76,7 @@ namespace Shrooms.Domain.Services.Kudos
         public async Task CreateKudosType(NewKudosTypeDto dto)
         {
             var alreadyExists = await _kudosTypesDbSet
-                                    .AnyAsync(t => t.Name == dto.Name);
+                .AnyAsync(t => t.Name == dto.Name);
 
             if (alreadyExists)
             {
@@ -100,7 +100,7 @@ namespace Shrooms.Domain.Services.Kudos
         public async Task UpdateKudosType(KudosTypeDTO dto)
         {
             var type = await _kudosTypesDbSet
-                           .FirstOrDefaultAsync(t => t.Id == dto.Id);
+                .FirstOrDefaultAsync(t => t.Id == dto.Id);
 
             if (type == null)
             {
@@ -122,8 +122,8 @@ namespace Shrooms.Domain.Services.Kudos
         public async Task RemoveKudosType(int id, UserAndOrganizationDTO userOrg)
         {
             var type = await _kudosTypesDbSet
-                           .Where(_excludeNecessaryKudosTypes)
-                           .FirstOrDefaultAsync(t => t.Id == id);
+                .Where(_excludeNecessaryKudosTypes)
+                .FirstOrDefaultAsync(t => t.Id == id);
 
             if (type == null)
             {
@@ -153,17 +153,17 @@ namespace Shrooms.Domain.Services.Kudos
         public async Task<KudosTypeDTO> GetKudosType(int id, UserAndOrganizationDTO userOrg)
         {
             var type = await _kudosTypesDbSet
-                           .Where(t => t.Id == id)
-                           .Select(t => new KudosTypeDTO
-                           {
-                               Id = t.Id,
-                               Name = t.Name,
-                               Value = t.Value,
-                               Description = t.Description,
-                               IsActive = t.IsActive,
-                               Type = t.Type
-                           })
-                           .FirstOrDefaultAsync();
+                .Where(t => t.Id == id)
+                .Select(t => new KudosTypeDTO
+                {
+                    Id = t.Id,
+                    Name = t.Name,
+                    Value = t.Value,
+                    Description = t.Description,
+                    IsActive = t.IsActive,
+                    Type = t.Type
+                })
+                .FirstOrDefaultAsync();
 
             if (type == null)
             {
@@ -369,12 +369,12 @@ namespace Shrooms.Domain.Services.Kudos
             return kudosTypeId;
         }
 
-        public int GetKudosTypeId(KudosTypeEnum kudosType)
+        public async Task<int> GetKudosTypeIdAsync(KudosTypeEnum kudosType)
         {
-            return _kudosTypesDbSet
+            return await _kudosTypesDbSet
                 .Where(t => t.Type == kudosType)
                 .Select(t => t.Id)
-                .First();
+                .FirstAsync();
         }
 
         public IEnumerable<UserKudosInformationDTO> GetApprovedKudosList(string id, int organizationId)
@@ -392,7 +392,7 @@ namespace Shrooms.Domain.Services.Kudos
             return kudosLogs;
         }
 
-        public void ApproveKudos(int kudosLogId, UserAndOrganizationDTO userOrg)
+        public async Task ApproveKudosAsync(int kudosLogId, UserAndOrganizationDTO userOrg)
         {
             var kudosLog = _kudosLogsDbSet
                 .Include(x => x.Employee)
@@ -404,35 +404,33 @@ namespace Shrooms.Domain.Services.Kudos
             {
                 if (kudosLog.IsMinus())
                 {
-                    _asyncRunner.Run<IKudosNotificationService>(n => n.NotifyApprovedKudosDecreaseRecipient(kudosLog), _uow.ConnectionName);
+                    _asyncRunner.Run<IKudosNotificationService>(async notifier => await notifier.NotifyApprovedKudosDecreaseRecipientAsync(kudosLog), _uow.ConnectionName);
                 }
                 else
                 {
-                    _asyncRunner.Run<IKudosNotificationService>(n => n.NotifyApprovedKudosRecipient(kudosLog), _uow.ConnectionName);
+                    _asyncRunner.Run<IKudosNotificationService>(async notifier => await notifier.NotifyApprovedKudosRecipientAsync(kudosLog), _uow.ConnectionName);
                 }
             }
 
             _uow.SaveChanges(false);
 
-            UpdateProfileKudos(kudosLog.Employee, userOrg);
+            await UpdateProfileKudosAsync(kudosLog.Employee, userOrg);
         }
 
-        public void RejectKudos(KudosRejectDTO kudosRejectDto)
+        public async Task RejectKudosAsync(KudosRejectDTO kudosRejectDto)
         {
-            var kudosLog = _kudosLogsDbSet
+            var kudosLog = await _kudosLogsDbSet
                 .Include(x => x.Employee)
-                .First(x =>
-                    x.Id == kudosRejectDto.Id &&
-                    x.OrganizationId == kudosRejectDto.OrganizationId);
+                .FirstAsync(x => x.Id == kudosRejectDto.Id && x.OrganizationId == kudosRejectDto.OrganizationId);
 
             kudosLog.Reject(kudosRejectDto.UserId, kudosRejectDto.KudosRejectionMessage);
 
             if (!kudosLog.IsRecipientDeleted())
             {
-                _asyncRunner.Run<IKudosNotificationService>(n => n.NotifyRejectedKudosLogSender(kudosLog), _uow.ConnectionName);
+                _asyncRunner.Run<IKudosNotificationService>(async notifier => await notifier.NotifyRejectedKudosLogSenderAsync(kudosLog), _uow.ConnectionName);
             }
 
-            _uow.SaveChanges(false);
+            await _uow.SaveChangesAsync(false);
         }
 
         public UserKudosDTO GetUserKudosInformationById(string id, int organizationId)
@@ -468,24 +466,24 @@ namespace Shrooms.Domain.Services.Kudos
             if (sentThisMonth < BusinessLayerConstants.KudosAvailableToSendThisMonth)
             {
                 available = BusinessLayerConstants.KudosAvailableToSendThisMonth - sentThisMonth < remaining
-                                ? BusinessLayerConstants.KudosAvailableToSendThisMonth - sentThisMonth
-                                : remaining;
+                    ? BusinessLayerConstants.KudosAvailableToSendThisMonth - sentThisMonth
+                    : remaining;
             }
 
             return new[] { sentThisMonth, available < 0 ? 0 : available };
         }
 
-        public void AddKudosLog(AddKudosLogDTO kudosDto, decimal? points = null)
+        public async Task AddKudosLogAsync(AddKudosLogDTO kudosDto, decimal? points = null)
         {
-            if (!UserHasPermission(kudosDto))
+            if (!await UserHasPermissionAsync(kudosDto))
             {
                 throw new ValidationException(ErrorCodes.KudosTypeNotFound);
             }
 
-            AddKudosRequest(kudosDto, points);
+            await AddKudosRequestAsync(kudosDto, points);
         }
 
-        private bool UserHasPermission(AddKudosLogDTO kudosDto)
+        private async Task<bool> UserHasPermissionAsync(AddKudosLogDTO kudosDto)
         {
             var kudosType = _kudosTypesDbSet.AsNoTracking().FirstOrDefault(p => p.Id == kudosDto.PointsTypeId);
             if (kudosType is null)
@@ -498,7 +496,7 @@ namespace Shrooms.Domain.Services.Kudos
                 return true;
             }
 
-            return HasKudosAdministratorPermission(kudosDto);
+            return await HasKudosAdministratorPermissionAsync(kudosDto);
         }
 
         public void AddRefundKudosLogs(IEnumerable<AddKudosLogDTO> kudosLogs)
@@ -513,16 +511,16 @@ namespace Shrooms.Domain.Services.Kudos
             }
         }
 
-        private void AddKudosRequest(AddKudosLogDTO kudosLog, decimal? points = null)
+        private async Task AddKudosRequestAsync(AddKudosLogDTO kudosLog, decimal? points = null)
         {
             var kudosDto = MapInitialInfoToDTO(kudosLog, points);
 
-            var receivingUsers = _usersDbSet
+            var receivingUsers = await _usersDbSet
                 .Where(x => kudosLog.ReceivingUserIds.Contains(x.Id) && x.OrganizationId == kudosLog.OrganizationId)
-                .ToList();
+                .ToListAsync();
 
-            var sendingUser = _usersDbSet
-                .FirstOrDefault(x => x.Id == kudosDto.SendingUser.Id && x.OrganizationId == kudosLog.OrganizationId);
+            var sendingUser = await _usersDbSet
+                .FirstOrDefaultAsync(x => x.Id == kudosDto.SendingUser.Id && x.OrganizationId == kudosLog.OrganizationId);
 
             _kudosServiceValidator.CheckForEmptyUserList(receivingUsers);
 
@@ -530,10 +528,10 @@ namespace Shrooms.Domain.Services.Kudos
             {
                 _kudosServiceValidator.ValidateUser(receivingUser);
                 kudosDto.ReceivingUser = _mapper.Map<ApplicationUserDTO>(receivingUser);
-                ChooseKudosifyType(kudosDto);
+                await ChooseKudosifyTypeAsync(kudosDto);
             }
 
-            _uow.SaveChanges(false);
+            await _uow.SaveChangesAsync(false);
 
             if (kudosDto.KudosType.Type != KudosTypeEnum.Send)
             {
@@ -542,11 +540,11 @@ namespace Shrooms.Domain.Services.Kudos
 
             foreach (var receivingUser in receivingUsers)
             {
-                _asyncRunner.Run<IKudosNotificationService>(n => n.NotifyAboutKudosSent(kudosDto), _uow.ConnectionName);
-                UpdateProfileKudos(receivingUser, kudosLog);
+                _asyncRunner.Run<IKudosNotificationService>(async notifier => await notifier.NotifyAboutKudosSentAsync(kudosDto), _uow.ConnectionName);
+                await UpdateProfileKudosAsync(receivingUser, kudosLog);
             }
 
-            UpdateProfileKudos(sendingUser, kudosLog);
+            await UpdateProfileKudosAsync(sendingUser, kudosLog);
         }
 
         public IEnumerable<KudosBasicDataDTO> GetKudosStats(int months, int amount, int organizationId)
@@ -582,10 +580,10 @@ namespace Shrooms.Domain.Services.Kudos
             return kudosLogsStats;
         }
 
-        public void UpdateProfileKudos(ApplicationUser user, UserAndOrganizationDTO userOrg)
+        public async Task UpdateProfileKudosAsync(ApplicationUser user, UserAndOrganizationDTO userOrg)
         {
             SetKudosToUserProfile(user, userOrg);
-            _uow.SaveChanges(userOrg.UserId);
+            await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
         public void UpdateProfilesFromUserIds(IEnumerable<string> usersId, UserAndOrganizationDTO userOrg)
@@ -618,9 +616,9 @@ namespace Shrooms.Domain.Services.Kudos
                             x.KudosBasketId != null)
                 .Sum(x => (decimal?)x.Points);
             var refundedKudos = allUserKudosLogs
-                                    .Where(x => x.KudosSystemType == KudosTypeEnum.Refund &&
-                                                x.KudosBasketId == null)
-                                    .Sum(x => (decimal?)x.Points) ?? 0;
+                .Where(x => x.KudosSystemType == KudosTypeEnum.Refund &&
+                            x.KudosBasketId == null)
+                .Sum(x => (decimal?)x.Points) ?? 0;
             spentKudos -= refundedKudos;
 
             user.SpentKudos = spentKudos ?? 0;
@@ -732,12 +730,12 @@ namespace Shrooms.Domain.Services.Kudos
             };
         }
 
-        private void ChooseKudosifyType(AddKudosDTO kudosDTO)
+        private async Task ChooseKudosifyTypeAsync(AddKudosDTO kudosDTO)
         {
             switch (kudosDTO.KudosType.Type)
             {
                 case KudosTypeEnum.Minus:
-                    MinusKudos(kudosDTO);
+                    await MinusKudosAsync(kudosDTO);
                     break;
 
                 case KudosTypeEnum.Send:
@@ -750,13 +748,12 @@ namespace Shrooms.Domain.Services.Kudos
             }
         }
 
-        public async Task AddLotteryKudosLog(AddKudosLogDTO kudosLogDTO, UserAndOrganizationDTO userOrg)
+        public async Task AddLotteryKudosLogAsync(AddKudosLogDTO kudosLogDTO, UserAndOrganizationDTO userOrg)
         {
             var kudosDto = MapInitialInfoToDTO(kudosLogDTO);
 
-            var receivingUser = _usersDbSet
-                .FirstOrDefault(x => x.Id == kudosLogDTO.UserId &&
-                                     x.OrganizationId == kudosLogDTO.OrganizationId);
+            var receivingUser = await _usersDbSet
+                .FirstOrDefaultAsync(x => x.Id == kudosLogDTO.UserId && x.OrganizationId == kudosLogDTO.OrganizationId);
 
             if (receivingUser == null)
             {
@@ -769,13 +766,13 @@ namespace Shrooms.Domain.Services.Kudos
 
             await _uow.SaveChangesAsync(false);
 
-            UpdateProfileKudos(_mapper.Map<ApplicationUser>(kudosDto.SendingUser), userOrg);
+            await UpdateProfileKudosAsync(_mapper.Map<ApplicationUser>(kudosDto.SendingUser), userOrg);
         }
 
-        private void MinusKudos(AddKudosDTO kudosDTO)
+        private async Task MinusKudosAsync(AddKudosDTO kudosDTO)
         {
-            var hasKudosAdminPermission = HasKudosAdministratorPermission(kudosDTO.KudosLog);
-            var hasKudosServiceRequestCategoryPermission = HasKudosServiceRequestCategoryPermissions();
+            var hasKudosAdminPermission = await HasKudosAdministratorPermissionAsync(kudosDTO.KudosLog);
+            var hasKudosServiceRequestCategoryPermission = await HasKudosServiceRequestCategoryPermissionsAsync();
             _kudosServiceValidator.ValidateKudosMinusPermission(hasKudosAdminPermission || hasKudosServiceRequestCategoryPermission);
 
             InsertKudosLog(kudosDTO, KudosStatus.Pending);
@@ -879,23 +876,24 @@ namespace Shrooms.Domain.Services.Kudos
                 Points = kudosDTO.TotalKudosPointsInLog,
                 PictureId = kudosDTO.PictureId
             };
+
             _kudosLogsDbSet.Add(log);
         }
 
-        private bool HasKudosAdministratorPermission(UserAndOrganizationDTO userAndOrg)
+        private async Task<bool> HasKudosAdministratorPermissionAsync(UserAndOrganizationDTO userAndOrg)
         {
-            return _permissionService.UserHasPermission(userAndOrg, AdministrationPermissions.Kudos);
+            return await _permissionService.UserHasPermissionAsync(userAndOrg, AdministrationPermissions.Kudos);
         }
 
-        private bool HasKudosServiceRequestCategoryPermissions()
+        private async Task<bool> HasKudosServiceRequestCategoryPermissionsAsync()
         {
             ApplicationUser kudosServiceRequestCategory;
 
             try
             {
-                kudosServiceRequestCategory = _usersDbSet
+                kudosServiceRequestCategory = await _usersDbSet
                     .Include(x => x.ServiceRequestCategoriesAssigned)
-                    .FirstOrDefault(x => x.ServiceRequestCategoriesAssigned.Any(y => y.Name == "Kudos"));
+                    .FirstOrDefaultAsync(x => x.ServiceRequestCategoriesAssigned.Any(y => y.Name == "Kudos"));
             }
             catch (ArgumentNullException)
             {

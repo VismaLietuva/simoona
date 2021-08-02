@@ -73,7 +73,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             try
             {
-                var resultDto = await _projectsService.GetProjectById(id, GetUserAndOrganization());
+                var resultDto = await _projectsService.GetProjectByIdAsync(id, GetUserAndOrganization());
                 var viewModel = _mapper.Map<EditProjectDisplayDto, EditProjectDisplayViewModel>(resultDto);
                 return Ok(viewModel);
             }
@@ -102,7 +102,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             try
             {
-                await _projectsService.EditProject(dto);
+                await _projectsService.EditProjectAsync(dto);
                 return Ok();
             }
             catch (ValidationException e)
@@ -143,7 +143,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             try
             {
-                await _projectsService.Delete(id, GetUserAndOrganization());
+                await _projectsService.DeleteAsync(id, GetUserAndOrganization());
                 return Ok();
             }
             catch (ValidationException e)
@@ -180,7 +180,7 @@ namespace Shrooms.Presentation.Api.Controllers
         {
             try
             {
-                await _projectsService.ExpelMember(GetUserAndOrganization(), projectId, userId);
+                await _projectsService.ExpelMemberAsync(GetUserAndOrganization(), projectId, userId);
                 return Ok();
             }
             catch (ValidationException e)

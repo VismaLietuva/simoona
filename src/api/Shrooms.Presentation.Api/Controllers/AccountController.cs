@@ -62,7 +62,7 @@ namespace Shrooms.Presentation.Api.Controllers
             var externalLogin = ExternalLoginData.FromIdentity(User.Identity as ClaimsIdentity);
             if (externalLogin == null && User.Identity.IsAuthenticated)
             {
-                var loggedUser = await GetLoggedInUserInfo();
+                var loggedUser = await GetLoggedInUserInfoAsync();
                 return Ok(loggedUser);
             }
             else
@@ -371,7 +371,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 return new ChallengeResult(provider, this);
             }
 
-            ExternalLoginData externalLogin = ExternalLoginData.FromIdentity(User.Identity as ClaimsIdentity);
+            var externalLogin = ExternalLoginData.FromIdentity(User.Identity as ClaimsIdentity);
             if (externalLogin.Email == null)
             {
                 var uri = CreateErrorUri("emailError");
@@ -388,9 +388,9 @@ namespace Shrooms.Presentation.Api.Controllers
             var user = await _userManager.FindAsync(new UserLoginInfo(externalLogin.LoginProvider, externalLogin.ProviderKey));
             var hasLogin = user != null;
 
-            if (isRegistration == true && hasLogin == false)
+            if (isRegistration && hasLogin == false)
             {
-                var isEmailHostValid = _organizationService.IsOrganizationHostValid(externalLogin.Email, RequestedOrganization);
+                var isEmailHostValid = await _organizationService.IsOrganizationHostValidAsync(externalLogin.Email, RequestedOrganization);
                 if (!isEmailHostValid)
                 {
                     var uri = CreateErrorUri("error");
@@ -415,7 +415,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return await Login(user, externalLogin, client_Id, hasLogin);
         }
 
-        private bool ContainsProvider(string providerList, string providerName)
+        private static bool ContainsProvider(string providerList, string providerName)
         {
             return providerList.ToLower().Contains(providerName.ToLower());
         }
@@ -439,7 +439,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return properties;
         }
 
-        private async Task<LoggedInUserInfoViewModel> GetLoggedInUserInfo()
+        private async Task<LoggedInUserInfoViewModel> GetLoggedInUserInfoAsync()
         {
             var userId = User.Identity.GetUserId();
             var organizationId = User.Identity.GetOrganizationId();
@@ -454,7 +454,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 OrganizationName = claimsIdentity.FindFirstValue(WebApiConstants.ClaimOrganizationName),
                 OrganizationId = claimsIdentity.FindFirstValue(WebApiConstants.ClaimOrganizationId),
                 FullName = claimsIdentity.FindFirstValue(ClaimTypes.GivenName),
-                Permissions = _permissionService.GetUserPermissions(userId, organizationId),
+                Permissions = await _permissionService.GetUserPermissionsAsync(userId, organizationId),
                 Impersonated = claimsIdentity?.Claims.Any(c => c.Type == WebApiConstants.ClaimUserImpersonation && c.Value == true.ToString()) ?? false,
                 CultureCode = user.CultureCode,
                 TimeZone = user.TimeZone

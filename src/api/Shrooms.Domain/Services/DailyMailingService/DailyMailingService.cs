@@ -85,7 +85,7 @@ namespace Shrooms.Domain.Services.DailyMailingService
 
             var emailDTO = new EmailDto(userEmail, messageSubject, messageBody);
 
-            _emailService.SendEmail(emailDTO);
+            _emailService.SendEmailAsync(emailDTO);
         }
 
         private string GetMessageBody(IEnumerable<Post> wallPosts, string organizationShortName)

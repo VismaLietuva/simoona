@@ -1,22 +1,23 @@
-﻿using Shrooms.Contracts.DataTransferObjects;
+﻿using System.Threading.Tasks;
+using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall.Comments;
 
 namespace Shrooms.Domain.Services.Wall.Posts.Comments
 {
     public interface ICommentService
     {
-        void EditComment(EditCommentDTO commentDto);
+        Task EditCommentAsync(EditCommentDTO commentDto);
 
-        CommentCreatedDTO CreateComment(NewCommentDTO commentDto);
+        Task<CommentCreatedDTO> CreateCommentAsync(NewCommentDTO commentDto);
 
         void ToggleLike(int commentId, UserAndOrganizationDTO userOrg);
 
-        void DeleteComment(int id, UserAndOrganizationDTO userOrg);
+        Task DeleteCommentAsync(int id, UserAndOrganizationDTO userOrg);
 
-        string GetCommentBody(int id);
+        Task<string> GetCommentBodyAsync(int id);
 
-        void HideComment(int id, UserAndOrganizationDTO userOrg);
+        Task HideCommentAsync(int id, UserAndOrganizationDTO userOrg);
 
-        void DeleteCommentsByPost(int postId);
+        Task DeleteCommentsByPostAsync(int postId);
     }
 }

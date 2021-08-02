@@ -63,7 +63,7 @@ namespace Shrooms.Infrastructure.Email
             }
         }
 
-        public void SendEmail(EmailDto email, bool skipDomainChange = false)
+        public async Task SendEmailAsync(EmailDto email, bool skipDomainChange = false)
         {
             if (!HasSmtpServerConfigured(HttpRuntime.AppDomainAppVirtualPath))
             {
@@ -79,7 +79,8 @@ namespace Shrooms.Infrastructure.Email
             {
                 try
                 {
-                    client.Send(BuildMessage(email, skipDomainChange));
+                    var message = BuildMessage(email, skipDomainChange);
+                    await client.SendMailAsync(message);
                 }
                 catch (SmtpException ex)
                 {

@@ -119,15 +119,16 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [Route("Logins")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public IHttpActionResult GetUserLogins()
+        public async Task<IHttpActionResult> GetUserLogins()
         {
             var id = GetUserAndOrganization().UserId;
-            var user = _userService.GetApplicationUser(id);
+            var user = await _userService.GetApplicationUserAsync(id);
             var logins = _userService.GetUserLogins(id);
             if (logins == null)
             {
                 return BadRequest();
             }
+
 
             var providers = new List<ProviderViewModel>();
             foreach (var login in logins)

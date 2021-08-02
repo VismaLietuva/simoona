@@ -28,7 +28,7 @@ namespace Shrooms.Domain.Services.Support
 
             var email = new EmailDto(currentApplicationUser.FullName, currentApplicationUser.Email, _applicationSettings.SupportEmail, $"{support.Type}: {support.Subject}", support.Message);
 
-            _mailingService.SendEmail(email, true);
+            _mailingService.SendEmailAsync(email, true);
         }
     }
 }

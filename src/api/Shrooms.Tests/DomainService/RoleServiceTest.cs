@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNet.Identity.EntityFramework;
 using NSubstitute;
 using NUnit.Framework;
@@ -57,7 +58,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Get_Role_With_All_Permissions_And_Users()
+        public async Task Should_Get_Role_With_All_Permissions_And_Users()
         {
             MockRoles();
 
@@ -66,7 +67,7 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 1
             };
 
-            var roles = _roleService.GetRoleById(userAndOrg, "roleId1");
+            var roles = await _roleService.GetRoleByIdAsync(userAndOrg, "roleId1");
 
             Assert.AreEqual("Test1", roles.Name);
             Assert.AreEqual(3, roles.Permissions.Count());
@@ -132,7 +133,7 @@ namespace Shrooms.Tests.DomainService
                 }
             }.AsQueryable();
 
-            _permissionService.GetGroupNames(1).Returns(
+            _permissionService.GetGroupNamesAsync(1).Returns(
                 new List<PermissionGroupDTO>
                 {
                     new PermissionGroupDTO
@@ -149,7 +150,7 @@ namespace Shrooms.Tests.DomainService
                     }
                 });
 
-            _permissionService.GetRolePermissions("roleId1", 1).Returns(
+            _permissionService.GetRolePermissionsAsync("roleId1", 1).Returns(
                 new List<PermissionDTO>
                 {
                     new PermissionDTO

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
@@ -20,7 +22,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
 {
     public class PostService : IPostService
     {
-        private static object _postDeleteLock = new object();
+        private static readonly SemaphoreSlim _postDeleteLock = new SemaphoreSlim(1, 1);
 
         private readonly IPermissionService _permissionService;
         private readonly ICommentService _commentService;
@@ -45,11 +47,13 @@ namespace Shrooms.Domain.Services.Wall.Posts
             _postWatchers = uow.GetDbSet<PostWatcher>();
         }
 
-        public NewlyCreatedPostDTO CreateNewPost(NewPostDTO newPostDto)
+        public async Task<NewlyCreatedPostDTO> CreateNewPostAsync(NewPostDTO newPostDto)
         {
-            lock (_postDeleteLock)
+            await _postDeleteLock.WaitAsync();
+
+            try
             {
-                var wall = _wallsDbSet.FirstOrDefault(x => x.Id == newPostDto.WallId && x.OrganizationId == newPostDto.OrganizationId);
+                var wall = await _wallsDbSet.FirstOrDefaultAsync(x => x.Id == newPostDto.WallId && x.OrganizationId == newPostDto.OrganizationId);
 
                 if (wall == null)
                 {
@@ -71,29 +75,37 @@ namespace Shrooms.Domain.Services.Wall.Posts
                 };
 
                 _postsDbSet.Add(post);
-                _uow.SaveChanges(newPostDto.UserId);
+                await _uow.SaveChangesAsync(newPostDto.UserId);
+
                 _postWatchers.Add(new PostWatcher
                 {
                     PostId = post.Id,
                     UserId = newPostDto.UserId
                 });
-                _uow.SaveChanges(newPostDto.UserId);
 
-                var postCreator = _usersDbSet.Single(user => user.Id == newPostDto.UserId);
+                await _uow.SaveChangesAsync(newPostDto.UserId);
+
+                var postCreator = await _usersDbSet.SingleAsync(user => user.Id == newPostDto.UserId);
                 var postCreatorDto = MapUserToDto(postCreator);
                 var newlyCreatedPostDto = MapNewlyCreatedPostToDto(post, postCreatorDto, wall.Type, newPostDto.MentionedUserIds);
 
                 return newlyCreatedPostDto;
             }
+            finally
+            {
+                _postDeleteLock.Release();
+            }
         }
 
-        public void ToggleLike(int postId, UserAndOrganizationDTO userOrg)
+        public async Task ToggleLikeAsync(int postId, UserAndOrganizationDTO userOrg)
         {
-            lock (_postDeleteLock)
+            await _postDeleteLock.WaitAsync();
+
+            try
             {
-                var post = _postsDbSet
+                var post = await _postsDbSet
                     .Include(x => x.Wall)
-                    .FirstOrDefault(x => x.Id == postId && x.Wall.OrganizationId == userOrg.OrganizationId);
+                    .FirstOrDefaultAsync(x => x.Id == postId && x.Wall.OrganizationId == userOrg.OrganizationId);
 
                 if (post == null)
                 {
@@ -110,17 +122,23 @@ namespace Shrooms.Domain.Services.Wall.Posts
                     post.Likes.Remove(like);
                 }
 
-                _uow.SaveChanges(userOrg.UserId);
+                await _uow.SaveChangesAsync(userOrg.UserId);
+            }
+            finally
+            {
+                _postDeleteLock.Release();
             }
         }
 
-        public void EditPost(EditPostDTO editPostDto)
+        public async Task EditPostAsync(EditPostDTO editPostDto)
         {
-            lock (_postDeleteLock)
+            await _postDeleteLock.WaitAsync();
+
+            try
             {
-                var post = _postsDbSet
+                var post = await _postsDbSet
                     .Include(x => x.Wall)
-                    .FirstOrDefault(x =>
+                    .FirstOrDefaultAsync(x =>
                         x.Id == editPostDto.Id &&
                         x.Wall.OrganizationId == editPostDto.OrganizationId);
 
@@ -129,8 +147,8 @@ namespace Shrooms.Domain.Services.Wall.Posts
                     throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Post not found");
                 }
 
-                var isWallModerator = _moderatorsDbSet.Any(x => x.UserId == editPostDto.UserId && x.WallId == post.WallId) || post.CreatedBy == editPostDto.UserId;
-                var isAdministrator = _permissionService.UserHasPermission(editPostDto, AdministrationPermissions.Post);
+                var isWallModerator = await _moderatorsDbSet.AnyAsync(x => x.UserId == editPostDto.UserId && x.WallId == post.WallId) || post.CreatedBy == editPostDto.UserId;
+                var isAdministrator = await _permissionService.UserHasPermissionAsync(editPostDto, AdministrationPermissions.Post);
 
                 if (!isAdministrator && !isWallModerator)
                 {
@@ -141,21 +159,28 @@ namespace Shrooms.Domain.Services.Wall.Posts
                 post.PictureId = editPostDto.PictureId;
                 post.LastEdit = DateTime.UtcNow;
 
-                _uow.SaveChanges(editPostDto.UserId);
+                await _uow.SaveChangesAsync(editPostDto.UserId);
+            }
+            finally
+            {
+                _postDeleteLock.Release();
             }
         }
+
         public string GetPostBody(int postId)
         {
             return _postsDbSet.FirstOrDefault(p => p.Id == postId)?.MessageBody;
         }
 
-        public void DeleteWallPost(int postId, UserAndOrganizationDTO userOrg)
+        public async Task DeleteWallPostAsync(int postId, UserAndOrganizationDTO userOrg)
         {
-            lock (_postDeleteLock)
+            await _postDeleteLock.WaitAsync();
+
+            try
             {
-                var post = _postsDbSet
+                var post = await _postsDbSet
                     .Include(x => x.Wall)
-                    .FirstOrDefault(s =>
+                    .FirstOrDefaultAsync(s =>
                         s.Id == postId &&
                         s.Wall.OrganizationId == userOrg.OrganizationId);
 
@@ -164,41 +189,45 @@ namespace Shrooms.Domain.Services.Wall.Posts
                     throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Post not found");
                 }
 
-                var isWallModerator = _moderatorsDbSet
-                    .Any(x => x.UserId == userOrg.UserId && x.WallId == post.WallId);
+                var isWallModerator = await _moderatorsDbSet
+                    .AnyAsync(x => x.UserId == userOrg.UserId && x.WallId == post.WallId);
 
-                var isAdministrator = _permissionService.UserHasPermission(userOrg, AdministrationPermissions.Post);
+                var isAdministrator = await _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Post);
                 if (!isAdministrator && !isWallModerator)
                 {
                     throw new UnauthorizedException();
                 }
 
-                _commentService.DeleteCommentsByPost(post.Id);
+                await _commentService.DeleteCommentsByPostAsync(post.Id);
                 _postsDbSet.Remove(post);
 
-                _uow.SaveChanges(userOrg.UserId);
+                await _uow.SaveChangesAsync(userOrg.UserId);
+            }
+            finally
+            {
+                _postDeleteLock.Release();
             }
         }
 
-        public void HideWallPost(int postId, UserAndOrganizationDTO userOrg)
+        public async Task HideWallPostAsync(int postId, UserAndOrganizationDTO userOrg)
         {
-            lock (_postDeleteLock)
+            await _postDeleteLock.WaitAsync();
+
+            try
             {
-                var post = _postsDbSet
+                var post = await _postsDbSet
                     .Include(x => x.Wall)
-                    .FirstOrDefault(s =>
-                        s.Id == postId &&
-                        s.Wall.OrganizationId == userOrg.OrganizationId);
+                    .FirstOrDefaultAsync(s => s.Id == postId && s.Wall.OrganizationId == userOrg.OrganizationId);
 
                 if (post == null)
                 {
                     throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Post not found");
                 }
 
-                var isWallModerator = _moderatorsDbSet
-                                          .Any(x => x.UserId == userOrg.UserId && x.WallId == post.WallId) || post.AuthorId == userOrg.UserId;
+                var isWallModerator = await _moderatorsDbSet
+                    .AnyAsync(x => x.UserId == userOrg.UserId && x.WallId == post.WallId) || post.AuthorId == userOrg.UserId;
 
-                var isAdministrator = _permissionService.UserHasPermission(userOrg, AdministrationPermissions.Post);
+                var isAdministrator = await _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Post);
                 if (!isAdministrator && !isWallModerator)
                 {
                     throw new UnauthorizedException();
@@ -207,7 +236,11 @@ namespace Shrooms.Domain.Services.Wall.Posts
                 post.IsHidden = true;
                 post.LastEdit = DateTime.UtcNow;
 
-                _uow.SaveChanges(userOrg.UserId);
+                await _uow.SaveChangesAsync(userOrg.UserId);
+            }
+            finally
+            {
+                _postDeleteLock.Release();
             }
         }
 
@@ -220,10 +253,11 @@ namespace Shrooms.Domain.Services.Wall.Posts
                 FullName = user.FirstName + ' ' + user.LastName,
                 PictureId = user.PictureId
             };
+
             return userDto;
         }
 
-        private NewlyCreatedPostDTO MapNewlyCreatedPostToDto(Post post, UserDto user, WallType wallType, IEnumerable<string> mentionedUserIds)
+        private static NewlyCreatedPostDTO MapNewlyCreatedPostToDto(Post post, UserDto user, WallType wallType, IEnumerable<string> mentionedUserIds)
         {
             var newlyCreatedPostDto = new NewlyCreatedPostDTO
             {
@@ -237,14 +271,18 @@ namespace Shrooms.Domain.Services.Wall.Posts
                 WallId = post.WallId,
                 MentionedUsersIds = mentionedUserIds
             };
+
             return newlyCreatedPostDto;
         }
 
-        public void ToggleWatch(int postId, UserAndOrganizationDTO userAndOrg, bool shouldWatch)
+        public async Task ToggleWatchAsync(int postId, UserAndOrganizationDTO userAndOrg, bool shouldWatch)
         {
-            lock (_postDeleteLock)
+            await _postDeleteLock.WaitAsync();
+
+            try
             {
                 var entity = _postWatchers.Find(postId, userAndOrg.UserId);
+
                 if (shouldWatch && entity == null)
                 {
                     entity = new PostWatcher
@@ -260,25 +298,30 @@ namespace Shrooms.Domain.Services.Wall.Posts
                     _postWatchers.Remove(entity);
                 }
 
-                _uow.SaveChanges();
+                await _uow.SaveChangesAsync();
+            }
+            finally
+            {
+                _postDeleteLock.Release();
             }
         }
 
-        public IEnumerable<string> GetPostWatchersForAppNotifications(int postId)
+        public async Task<IList<string>> GetPostWatchersForAppNotificationsAsync(int postId)
         {
-            return _postWatchers
+            return await _postWatchers
                 .Where(w => w.PostId == postId && (w.User.NotificationsSettings == null || w.User.NotificationsSettings.FollowingPostsAppNotifications))
-                .Select(s => s.UserId).ToList()
-                .Select(s => s.ToString());
+                .Select(s => s.UserId)
+                .ToListAsync();
         }
 
-        public IEnumerable<ApplicationUser> GetPostWatchersForEmailNotifications(int postId)
+        public async Task<IList<ApplicationUser>> GetPostWatchersForEmailNotificationsAsync(int postId)
         {
-            return _postWatchers
+            return await _postWatchers
                 .Where(w => w.PostId == postId && (w.User.NotificationsSettings == null || w.User.NotificationsSettings.FollowingPostsEmailNotifications))
                 .Include(w => w.User)
                 .Where(w => w.User != null)
-                .Select(w => w.User).ToList();
+                .Select(w => w.User)
+                .ToListAsync();
         }
     }
 }

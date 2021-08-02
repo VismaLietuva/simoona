@@ -28,11 +28,11 @@ namespace Shrooms.Domain.Services.Kudos
 
         IEnumerable<UserKudosInformationDTO> GetApprovedKudosList(string id, int organizationId);
 
-        Task AddLotteryKudosLog(AddKudosLogDTO kudosLogDTO, UserAndOrganizationDTO userOrg);
+        Task AddLotteryKudosLogAsync(AddKudosLogDTO kudosLogDTO, UserAndOrganizationDTO userOrg);
 
-        void ApproveKudos(int kudosLogId, UserAndOrganizationDTO userOrg);
+        Task ApproveKudosAsync(int kudosLogId, UserAndOrganizationDTO userOrg);
 
-        void RejectKudos(KudosRejectDTO kudosRejectDTO);
+        Task RejectKudosAsync(KudosRejectDTO kudosRejectDTO);
 
         UserKudosDTO GetUserKudosInformationById(string id, int organizationId);
 
@@ -45,7 +45,7 @@ namespace Shrooms.Domain.Services.Kudos
         /// </summary>
         /// <param name="kudosDto">add kudos request</param>
         /// <param name="points">requested points</param>
-        void AddKudosLog(AddKudosLogDTO kudosDto, decimal? points = null);
+        Task AddKudosLogAsync(AddKudosLogDTO kudosDto, decimal? points = null);
 
         void AddRefundKudosLogs(IEnumerable<AddKudosLogDTO> kudosLogs);
 
@@ -57,11 +57,11 @@ namespace Shrooms.Domain.Services.Kudos
 
         int GetKudosTypeId(string kudosTypeName);
 
-        int GetKudosTypeId(KudosTypeEnum kudosType);
+        Task<int> GetKudosTypeIdAsync(KudosTypeEnum kudosType);
 
         IEnumerable<KudosBasicDataDTO> GetKudosStats(int months, int amount, int organizationId);
 
-        void UpdateProfileKudos(ApplicationUser user, UserAndOrganizationDTO userOrg);
+        Task UpdateProfileKudosAsync(ApplicationUser user, UserAndOrganizationDTO userOrg);
 
         bool HasPendingKudos(string employeeId);
     }

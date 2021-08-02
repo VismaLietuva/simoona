@@ -24,7 +24,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         public async Task<IEnumerable<NotificationViewModel>> GetAll()
         {
-            var result = await _notificationService.GetAll(GetUserAndOrganization());
+            var result = await _notificationService.GetAllAsync(GetUserAndOrganization());
 
             return MakeCommentsStacked(result);
         }
@@ -32,7 +32,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         public async Task<IHttpActionResult> MarkAsRead(IEnumerable<int> ids)
         {
-            await _notificationService.MarkAsRead(GetUserAndOrganization(), ids);
+            await _notificationService.MarkAsReadAsync(GetUserAndOrganization(), ids);
 
             return Ok();
         }
@@ -40,7 +40,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         public async Task<IHttpActionResult> MarkAllAsRead()
         {
-            await _notificationService.MarkAllAsRead(GetUserAndOrganization());
+            await _notificationService.MarkAllAsReadAsync(GetUserAndOrganization());
 
             return Ok();
         }

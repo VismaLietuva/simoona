@@ -7,8 +7,7 @@ namespace Shrooms.Infrastructure.CustomCache
     {
         public bool TryRemoveEntry(TKey key)
         {
-            TValue removedValue;
-            return TryRemove(key, out removedValue);
+            return TryRemove(key, out _);
         }
     }
 }

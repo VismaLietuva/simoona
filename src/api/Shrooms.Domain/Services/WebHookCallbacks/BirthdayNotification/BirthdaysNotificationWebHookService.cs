@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
@@ -40,33 +41,33 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.BirthdayNotification
             _appSettings = appSettings;
         }
 
-        public void SendNotifications(string organizationName)
+        public async Task SendNotificationsAsync(string organizationName)
         {
-            var todaysBirthdayUsers = _usersDbSet
+            var todaysBirthdayUsers = await _usersDbSet
                 .Where(w =>
                     w.BirthDay.HasValue &&
                     w.BirthDay.Value.Month == _date.Month &&
-                    w.BirthDay.Value.Day == _date.Day).ToList();
+                    w.BirthDay.Value.Day == _date.Day)
+                .ToListAsync();
 
             if (!todaysBirthdayUsers.Any())
             {
                 return;
             }
 
-            SendBirthdayReminder(todaysBirthdayUsers, organizationName);
+            await SendBirthdayReminderAsync(todaysBirthdayUsers, organizationName);
         }
 
-        private void SendBirthdayReminder(IEnumerable<ApplicationUser> employees, string organizationName)
+        private async Task SendBirthdayReminderAsync(IEnumerable<ApplicationUser> employees, string organizationName)
         {
-            var currentOrganization = _organizationsDbSet
-                .First(name => name.ShortName == organizationName);
+            var currentOrganization = await _organizationsDbSet.FirstAsync(name => name.ShortName == organizationName);
 
-            var receivers = _roleService.GetAdministrationRoleEmails(currentOrganization.Id);
+            var receivers = await _roleService.GetAdministrationRoleEmailsAsync(currentOrganization.Id);
             var model = new BirthdaysNotificationTemplateViewModel(GetFormattedEmployeesList(employees, organizationName, currentOrganization.ShortName), _appSettings.UserNotificationSettingsUrl(organizationName));
             var content = _mailTemplate.Generate(model, EmailTemplateCacheKeys.BirthdaysNotification);
             var emailData = new EmailDto(receivers, Resources.Emails.Templates.BirthdaysNotificationEmailSubject, content);
 
-            _mailingService.SendEmail(emailData);
+            await _mailingService.SendEmailAsync(emailData);
         }
 
         private IList<BirthdaysNotificationEmployeeViewModel> GetFormattedEmployeesList(IEnumerable<ApplicationUser> employees, string organizationName, string tenantPicturesContainer)

@@ -259,7 +259,7 @@ namespace Shrooms.Tests.DomainService
                 UserId = "UserId"
             };
 
-            Assert.Throws<InvalidOperationException>(() => _kudosService.ApproveKudos(1, userAndOrg));
+            Assert.Throws<InvalidOperationException>(() => _kudosService.ApproveKudosAsync(1, userAndOrg));
         }
 
         [Test]
@@ -273,7 +273,7 @@ namespace Shrooms.Tests.DomainService
                 UserId = "UserId2"
             };
 
-            _kudosService.ApproveKudos(1, userAndOrg);
+            _kudosService.ApproveKudosAsync(1, userAndOrg);
             Assert.AreEqual(_kudosLogsDbSet.First().Points, _kudosLogsDbSet.First().Employee.RemainingKudos);
             Assert.AreEqual(KudosStatus.Approved, _kudosLogsDbSet.First().Status);
         }
@@ -289,7 +289,7 @@ namespace Shrooms.Tests.DomainService
                 KudosRejectionMessage = "testMessage"
             };
 
-            _kudosService.RejectKudos(kudosRejectDTO);
+            _kudosService.RejectKudosAsync(kudosRejectDTO);
 
             var log = _kudosLogsDbSet.First(x => x.Id == 1);
             Assert.AreEqual(KudosStatus.Rejected, log.Status);
@@ -309,7 +309,7 @@ namespace Shrooms.Tests.DomainService
                 KudosRejectionMessage = "testMessage"
             };
 
-            Assert.Throws<InvalidOperationException>(() => _kudosService.RejectKudos(kudosRejectDTO));
+            Assert.Throws<InvalidOperationException>(() => _kudosService.RejectKudosAsync(kudosRejectDTO));
         }
 
         [Test]
@@ -329,7 +329,7 @@ namespace Shrooms.Tests.DomainService
 
             MockKudosLogsForProfileUpdate();
 
-            _kudosService.UpdateProfileKudos(user, userOrg);
+            _kudosService.UpdateProfileKudosAsync(user, userOrg);
             Assert.AreEqual(11, user.TotalKudos);
             Assert.AreEqual(9, user.RemainingKudos);
             Assert.AreEqual(2, user.SpentKudos);
@@ -354,7 +354,7 @@ namespace Shrooms.Tests.DomainService
                 IsActive = true
             };
 
-            Assert.Throws<KudosException>(() => _kudosService.AddKudosLog(kudosLog));
+            Assert.Throws<KudosException>(() => _kudosService.AddKudosLogAsync(kudosLog));
         }
 
         //Checks if kudos logs has been saved for kudos minus operation.
@@ -372,7 +372,7 @@ namespace Shrooms.Tests.DomainService
                 IsActive = true
             };
 
-            _kudosService.AddKudosLog(kudosLog);
+            _kudosService.AddKudosLogAsync(kudosLog);
             _kudosLogsDbSet.Received(2).Add(Arg.Any<KudosLog>());
             _uow.Received(1).SaveChanges(false);
         }
@@ -394,7 +394,7 @@ namespace Shrooms.Tests.DomainService
             };
 
             // Act
-            _kudosService.AddKudosLog(kudosLog, explicitAmount);
+            _kudosService.AddKudosLogAsync(kudosLog, explicitAmount);
 
             // Assert
             _kudosLogsDbSet.Received(4).Add(Arg.Is<KudosLog>(l => l.Points == explicitAmount));
@@ -419,7 +419,7 @@ namespace Shrooms.Tests.DomainService
                 IsActive = true
             };
 
-            _kudosService.AddKudosLog(kudosLog);
+            _kudosService.AddKudosLogAsync(kudosLog);
             _kudosLogsDbSet.Received(4).Add(Arg.Any<KudosLog>());
             _uow.Received(1).SaveChanges(false);
         }
@@ -442,7 +442,7 @@ namespace Shrooms.Tests.DomainService
                 IsActive = true
             };
 
-            Assert.Throws<KudosException>(() => _kudosService.AddKudosLog(kudosLog));
+            Assert.Throws<KudosException>(() => _kudosService.AddKudosLogAsync(kudosLog));
         }
 
         //Checks if validation for send kudos to same user workd properly.
@@ -460,7 +460,7 @@ namespace Shrooms.Tests.DomainService
                 IsActive = true
             };
 
-            Assert.Throws<KudosException>(() => _kudosService.AddKudosLog(kudosLog));
+            Assert.Throws<KudosException>(() => _kudosService.AddKudosLogAsync(kudosLog));
         }
 
         //User can send limited amount of kudos per month, so this test
@@ -479,7 +479,7 @@ namespace Shrooms.Tests.DomainService
                 IsActive = true
             };
 
-            Assert.Throws<KudosException>(() => _kudosService.AddKudosLog(kudosLog));
+            Assert.Throws<KudosException>(() => _kudosService.AddKudosLogAsync(kudosLog));
         }
 
         //Checks if kudos logs has been saved for kudos add operation.
@@ -497,7 +497,7 @@ namespace Shrooms.Tests.DomainService
                 IsActive = true
             };
 
-            _kudosService.AddKudosLog(kudosLog);
+            _kudosService.AddKudosLogAsync(kudosLog);
             _kudosLogsDbSet.Received(2).Add(Arg.Any<KudosLog>());
             _uow.Received(1).SaveChanges(false);
         }
@@ -568,8 +568,8 @@ namespace Shrooms.Tests.DomainService
         {
             var permissionService = Substitute.For<IPermissionService>();
 
-            permissionService.UserHasPermission(Arg.Is<UserAndOrganizationDTO>(x => x.UserId == "testUserId"), Arg.Any<string>()).Returns(false);
-            permissionService.UserHasPermission(Arg.Is<UserAndOrganizationDTO>(x => x.UserId == "testUserId2"), Arg.Any<string>()).Returns(true);
+            permissionService.UserHasPermissionAsync(Arg.Is<UserAndOrganizationDTO>(x => x.UserId == "testUserId"), Arg.Any<string>()).Returns(false);
+            permissionService.UserHasPermissionAsync(Arg.Is<UserAndOrganizationDTO>(x => x.UserId == "testUserId2"), Arg.Any<string>()).Returns(true);
             return permissionService;
         }
 

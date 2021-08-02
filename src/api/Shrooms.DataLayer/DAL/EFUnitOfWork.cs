@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Infrastructure;
 
@@ -39,6 +40,11 @@ namespace Shrooms.DataLayer.DAL
         public void Save()
         {
             DbContext.SaveChanges();
+        }
+
+        public async Task SaveAsync()
+        {
+            await DbContext.SaveChangesAsync();
         }
 
         public T GetDbContextAs<T>()

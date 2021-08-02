@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall.Comments;
@@ -35,14 +35,14 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
             _postService = postService;
         }
 
-        public void Notify(CommentCreatedDTO commentDto, UserAndOrganizationHubDto userHubDto)
+        public async Task NotifyAsync(CommentCreatedDTO commentDto, UserAndOrganizationHubDto userHubDto)
         {
-            _commentEmailNotificationService.SendEmailNotification(commentDto);
+            await _commentEmailNotificationService.SendEmailNotificationAsync(commentDto);
 
-            var membersToNotify = _wallService.GetWallMembersIds(commentDto.WallId, userHubDto);
+            var membersToNotify = await _wallService.GetWallMembersIdsAsync(commentDto.WallId, userHubDto);
             NotificationHub.SendWallNotification(commentDto.WallId, membersToNotify, commentDto.WallType, userHubDto);
 
-            var postWatchers = _postService.GetPostWatchersForAppNotifications(commentDto.PostId).ToList();
+            var postWatchers = await _postService.GetPostWatchersForAppNotificationsAsync(commentDto.PostId);
 
             // Comment author doesn't need to receive notification about his own comment
             postWatchers.Remove(commentDto.CommentCreator);
@@ -50,13 +50,13 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
             // Send notification to other users
             if (postWatchers.Count > 0)
             {
-                SendNotification(commentDto, userHubDto, NotificationType.FollowingComment, postWatchers);
+                await SendNotificationAsync(commentDto, userHubDto, NotificationType.FollowingComment, postWatchers);
             }
         }
 
-        private void SendNotification(CommentCreatedDTO commentDto, UserAndOrganizationHubDto userHubDto, NotificationType notificationType, IList<string> watchers)
+        private async Task SendNotificationAsync(CommentCreatedDTO commentDto, UserAndOrganizationHubDto userHubDto, NotificationType notificationType, IList<string> watchers)
         {
-            var notificationAuthorDto = _notificationService.CreateForComment(userHubDto, commentDto, notificationType, watchers).GetAwaiter().GetResult();
+            var notificationAuthorDto = await _notificationService.CreateForCommentAsync(userHubDto, commentDto, notificationType, watchers);
 
             if (notificationAuthorDto == null)
             {

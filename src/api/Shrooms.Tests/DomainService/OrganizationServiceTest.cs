@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.Constants;
@@ -72,7 +73,7 @@ namespace Shrooms.Tests.DomainService
             };
             _organizationsDbSet.SetDbSetData(organizations);
 
-            var response = _organizationService.GetOrganizationHostName("Organization2");
+            var response = _organizationService.GetOrganizationHostNameAsync("Organization2");
 
             Assert.AreEqual(response, "Host2");
         }
@@ -87,7 +88,7 @@ namespace Shrooms.Tests.DomainService
             };
             _organizationsDbSet.SetDbSetData(organizations);
 
-            var response = _organizationService.GetOrganizationHostName("Organization2");
+            var response = _organizationService.GetOrganizationHostNameAsync("Organization2");
 
             Assert.AreEqual(response, "Host2");
         }
@@ -102,7 +103,7 @@ namespace Shrooms.Tests.DomainService
 
             _organizationsDbSet.SetDbSetData(organizations);
 
-            Assert.Throws<InvalidOrganizationException>(() => _organizationService.HasOrganizationEmailDomainRestriction("Organization2"));
+            Assert.Throws<InvalidOrganizationException>(() => _organizationService.HasOrganizationEmailDomainRestrictionAsync("Organization2"));
         }
 
         [Test]
@@ -119,22 +120,23 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_Invalid_Organization_Host()
+        public async Task Should_Return_Invalid_Organization_Host()
         {
             var organizations = new List<Organization>
             {
                 new Organization { Id = 1, ShortName = "Organization1", HostName = "host1.com", HasRestrictedAccess = true },
                 new Organization { Id = 2, ShortName = "Organization2", HostName = "host2.com" }
             };
+
             _organizationsDbSet.SetDbSetData(organizations);
 
-            var response = _organizationService.IsOrganizationHostValid("organization1@host1c.om", "Organization1");
+            var response = await _organizationService.IsOrganizationHostValidAsync("organization1@host1c.om", "Organization1");
 
             Assert.IsFalse(response);
         }
 
         [Test]
-        public void Should_Return_Valid_Organization_Host()
+        public async Task Should_Return_Valid_Organization_Host()
         {
             var organizations = new List<Organization>
             {
@@ -143,7 +145,7 @@ namespace Shrooms.Tests.DomainService
             };
             _organizationsDbSet.SetDbSetData(organizations);
 
-            var response = _organizationService.IsOrganizationHostValid("organization1@host1.com", "Organization1");
+            var response = await _organizationService.IsOrganizationHostValidAsync("organization1@host1.com", "Organization1");
 
             Assert.IsTrue(response);
         }

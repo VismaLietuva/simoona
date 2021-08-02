@@ -46,8 +46,8 @@ namespace Shrooms.Presentation.Api.Controllers
 
             var userAndOrg = GetUserAndOrganization();
 
-            var wallPost = await _wallService.GetWallPost(userAndOrg, comment.PostId);
-            if (!_permissionService.UserHasPermission(userAndOrg, BasicPermissions.Comment) && wallPost.WallType != WallType.Events)
+            var wallPost = await _wallService.GetWallPostAsync(userAndOrg, comment.PostId);
+            if (!await _permissionService.UserHasPermissionAsync(userAndOrg, BasicPermissions.Comment) && wallPost.WallType != WallType.Events)
             {
                 return Forbidden();
             }
@@ -55,12 +55,13 @@ namespace Shrooms.Presentation.Api.Controllers
             var commentDto = _mapper.Map<NewCommentViewModel, NewCommentDTO>(comment);
             SetOrganizationAndUser(commentDto);
             var userHubDto = GetUserAndOrganizationHub();
+
             try
             {
-                var commentCreatedDto = _commentService.CreateComment(commentDto);
-                _asyncRunner.Run<NewCommentNotifier>(notif =>
+                var commentCreatedDto = await _commentService.CreateCommentAsync(commentDto);
+                _asyncRunner.Run<NewCommentNotifier>(async notifier =>
                 {
-                    notif.Notify(commentCreatedDto, userHubDto);
+                    await notifier.NotifyAsync(commentCreatedDto, userHubDto);
                 }, GetOrganizationName());
 
                 return Ok(new { commentCreatedDto.CommentId });
@@ -86,7 +87,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             try
             {
-                _commentService.EditComment(editCommentDto);
+                _commentService.EditCommentAsync(editCommentDto);
                 return Ok();
             }
             catch (UnauthorizedException)
@@ -111,7 +112,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             try
             {
-                _commentService.DeleteComment(id, GetUserAndOrganization());
+                _commentService.DeleteCommentAsync(id, GetUserAndOrganization());
                 return Ok();
             }
             catch (UnauthorizedException)
@@ -136,7 +137,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             try
             {
-                _commentService.HideComment(comment.Id, GetUserAndOrganization());
+                _commentService.HideCommentAsync(comment.Id, GetUserAndOrganization());
                 return Ok();
             }
             catch (UnauthorizedException)

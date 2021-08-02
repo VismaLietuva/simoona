@@ -1,6 +1,7 @@
 ﻿using System.Data.Entity;
 using System.Linq;
 using System.Net.Mail;
+using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
@@ -39,18 +40,16 @@ namespace Shrooms.Domain.Services.Organizations
                 .Single(organization => organization.ShortName.ToLower() == organizationName.ToLower());
         }
 
-        public string GetOrganizationHostName(string organizationName)
+        public async Task<string> GetOrganizationHostNameAsync(string organizationName)
         {
-            var hostName = _organizationsDbSet
-                .Single(organization => organization.ShortName.ToLower() == organizationName.ToLower())
-                .HostName;
+            var hostName = (await _organizationsDbSet.SingleAsync(organization => organization.ShortName.ToLower() == organizationName.ToLower())).HostName;
             return hostName;
         }
 
-        public bool HasOrganizationEmailDomainRestriction(string organizationName)
+        public async Task<bool> HasOrganizationEmailDomainRestrictionAsync(string organizationName)
         {
-            var organization = _organizationsDbSet
-                .SingleOrDefault(o => o.ShortName.ToLower() == organizationName.ToLower());
+            var organization = await _organizationsDbSet
+                .SingleOrDefaultAsync(o => o.ShortName.ToLower() == organizationName.ToLower());
 
             if (organization == null)
             {
@@ -67,14 +66,14 @@ namespace Shrooms.Domain.Services.Organizations
                 .Find(user.Id).Organization;
         }
 
-        public bool IsOrganizationHostValid(string email, string requestedOrganizationName)
+        public async Task<bool> IsOrganizationHostValidAsync(string email, string requestedOrganizationName)
         {
-            if (!HasOrganizationEmailDomainRestriction(requestedOrganizationName))
+            if (!await HasOrganizationEmailDomainRestrictionAsync(requestedOrganizationName))
             {
                 return true;
             }
 
-            var validEmailHostName = GetOrganizationHostName(requestedOrganizationName);
+            var validEmailHostName = await GetOrganizationHostNameAsync(requestedOrganizationName);
             if (GetHostFromEmail(email) != validEmailHostName)
             {
                 return false;
@@ -126,7 +125,7 @@ namespace Shrooms.Domain.Services.Organizations
                 currentDirector.IsManagingDirector = false;
             }
 
-            var newManagingDirector = managingDirectors.Where(x => x.Id == userId).First();
+            var newManagingDirector = managingDirectors.First(x => x.Id == userId);
 
             newManagingDirector.IsManagingDirector = true;
 

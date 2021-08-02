@@ -6,10 +6,10 @@ namespace Shrooms.Domain.Services.Picture
 {
     public interface IPictureService
     {
-        Task<string> UploadFromImage(Image image, string mimeType, string fileName, int orgId);
+        Task<string> UploadFromImageAsync(Image image, string mimeType, string fileName, int orgId);
 
-        Task<string> UploadFromStream(Stream stream, string mimeType, string fileName, int orgId);
+        Task<string> UploadFromStreamAsync(Stream stream, string mimeType, string fileName, int orgId);
 
-        Task RemoveImage(string blobKey, int orgId);
+        Task RemoveImageAsync(string blobKey, int orgId);
     }
 }

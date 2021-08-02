@@ -157,7 +157,7 @@ namespace Shrooms.Domain.Services.KudosBaskets
 
                 _uow.SaveChanges(false);
 
-                _kudosService.UpdateProfileKudos(user, donation);
+                _kudosService.UpdateProfileKudosAsync(user, donation);
             }
         }
 
