@@ -37,9 +37,9 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             }
         }
 
-        public void CheckIfSingleChoiceSelectedWithRule(IEnumerable<EventOption> options, OptionRules rule)
+        public void CheckIfSingleChoiceSelectedWithRule(ICollection<EventOption> options, OptionRules rule)
         {
-            if (options.Any(op => op.Rule == rule) && options.Count() > 1)
+            if (options.Any(op => op.Rule == rule) && options.Count > 1)
             {
                 throw new EventException(PremiumErrorCodes.EventChoiceCanBeSingleOnly);
             }

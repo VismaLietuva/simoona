@@ -271,6 +271,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         public void Should_Throw_If_Participant_Does_Not_Exist()
         {
             EventParticipant noParticipant = null;
+            // ReSharper disable once ExpressionIsAlwaysNull
             Assert.Throws<EventException>(() => _eventValidationService.CheckIfParticipantExists(noParticipant));
         }
 

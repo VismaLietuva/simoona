@@ -117,7 +117,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             var assigneeCategoriesNames = _serviceRequestService
                     .GetCategories()
                     .Where(x => x.Assignees.Select(y => y.Id).Contains(id))
-                    .Select(x => x.Name);
+                    .Select(x => x.Name)
+                    .ToList();
 
             Expression<Func<ServiceRequest, bool>> filterForCurrentUser = u =>
                 (u.EmployeeId == id &&
@@ -135,6 +136,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                     assigneeCategoriesNames.Contains(u.CategoryName));
 
             var serviceRequestPage = GetFilteredPaged(includeProperties, page, pageSize, sortBy, sortOrder, filterForCurrentUser);
+
             foreach (var serviceRequest in serviceRequestPage.PagedList)
             {
                 if (assigneeCategoriesNames.Contains(serviceRequest.CategoryName))

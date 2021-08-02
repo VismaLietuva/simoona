@@ -287,7 +287,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                             && e.OrganizationId == userAndOrg.OrganizationId
                             && e.EventParticipants.Any(p => p.AttendStatus == (int)AttendingStatus.Attending && p.ApplicationUserId == userAndOrg.UserId))
                 .Select(MapEventToParticipantDto())
-                .SingleOrDefault();
+                .SingleOrDefault()?.ToList();
 
             _eventValidationService.CheckIfEventExists(eventParticipants);
             _eventValidationService.CheckIfEventHasParticipants(eventParticipants);

@@ -32,7 +32,8 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
                 .Select(x => new List<string> { x.FirstName, x.LastName });
 
             var options = _eventUtilitiesService.GetEventChosenOptions(eventId, userAndOrg)
-                .Select(x => new List<string> { x.Option, x.Count.ToString() });
+                .Select(x => new List<string> { x.Option, x.Count.ToString() })
+                .ToList();
 
             AddParticipants(participants);
 

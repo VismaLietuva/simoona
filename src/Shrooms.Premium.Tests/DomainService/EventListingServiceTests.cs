@@ -69,9 +69,9 @@ namespace Shrooms.Premium.Tests.DomainService
                 Filter = MyEventsOptions.Host
             };
 
-            var result = _eventListingService.GetMyEvents(myEventsOptions, 1);
+            var result = _eventListingService.GetMyEvents(myEventsOptions, 1).ToList();
 
-            Assert.AreEqual(result.Count(), 1);
+            Assert.AreEqual(result.Count, 1);
             Assert.IsTrue(result.First(x => x.Id == eventGuids[3]).IsCreator);
         }
 

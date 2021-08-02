@@ -125,13 +125,22 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
         {
             var serviceRequest = _serviceRequestsDbSet
                 .Include(x => x.Status)
-                .FirstOrDefault(x => x.Id == serviceRequestDTO.Id &&
-                        x.OrganizationId == userAndOrganizationDTO.OrganizationId);
+                .FirstOrDefault(x => x.Id == serviceRequestDTO.Id && x.OrganizationId == userAndOrganizationDTO.OrganizationId);
 
-            ValidateServiceRequestForUpdate(serviceRequest, serviceRequestDTO);
+            if (serviceRequest == null)
+            {
+                throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Service request does not exist");
+            }
 
-            var serviceRequestCategory = _serviceRequestCategoryDbSet
-                    .FirstOrDefault(x => x.Id == serviceRequestDTO.ServiceRequestCategoryId);
+            if (serviceRequest.Status.Title == ServiceRequestStatusDone && serviceRequest.CategoryName == ServiceRequestCategoryKudos)
+            {
+                throw new ValidationException(PremiumErrorCodes.ServiceRequestIsClosed, "Kudos request status is done");
+            }
+
+            ValidateServiceRequestForCreate(serviceRequestDTO);
+            ValidateServiceRequestForUpdate(serviceRequestDTO);
+
+            var serviceRequestCategory = _serviceRequestCategoryDbSet.FirstOrDefault(x => x.Id == serviceRequestDTO.ServiceRequestCategoryId);
 
             if (serviceRequestCategory == null)
             {
@@ -332,33 +341,19 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
             return assignees.Select(x => x.Id).ToList();
         }
 
-        private void ValidateServiceRequestForUpdate(ServiceRequest currentServiceRequest, ServiceRequestDTO serviceRequestDTO)
+        private void ValidateServiceRequestForUpdate(ServiceRequestDTO serviceRequestDTO)
         {
-            ValidateServiceRequestForCreate(serviceRequestDTO);
-
-            var isServiceRequestStatusIdCorrect = _serviceRequestStatusDbSet
-                                .FirstOrDefault(x => x.Id == serviceRequestDTO.StatusId);
+            var isServiceRequestStatusIdCorrect = _serviceRequestStatusDbSet.FirstOrDefault(x => x.Id == serviceRequestDTO.StatusId);
 
             if (isServiceRequestStatusIdCorrect == null)
             {
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Service request status does not exist");
             }
-
-            if (currentServiceRequest == null)
-            {
-                throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Service request does not exist");
-            }
-
-            if (currentServiceRequest.Status.Title == ServiceRequestStatusDone && currentServiceRequest.CategoryName == ServiceRequestCategoryKudos)
-            {
-                throw new ValidationException(PremiumErrorCodes.ServiceRequestIsClosed, "Kudos request status is done");
-            }
         }
 
         private void ValidateServiceRequestForCreate(ServiceRequestDTO newServiceRequestDTO)
         {
-            var isServiceRequestPriorityIdCorrect = _serviceRequestPriorityDbSet
-                    .Any(x => x.Id == newServiceRequestDTO.PriorityId);
+            var isServiceRequestPriorityIdCorrect = _serviceRequestPriorityDbSet.Any(x => x.Id == newServiceRequestDTO.PriorityId);
 
             if (!isServiceRequestPriorityIdCorrect)
             {
