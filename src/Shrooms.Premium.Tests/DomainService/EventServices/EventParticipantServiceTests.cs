@@ -143,8 +143,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         [Test]
         public void Should_Throw_If_Joining_User_Provided_Too_Many_Choices()
         {
-            var maxChoices = 2;
-            var choicesProvided = 3;
+            const int maxChoices = 2;
+            const int choicesProvided = 3;
             var ex = Assert.Throws<EventException>(() => _eventValidationService.CheckIfJoiningTooManyChoicesProvided(maxChoices, choicesProvided));
             Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventTooManyChoicesProvidedCode));
         }
@@ -152,7 +152,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         [Test]
         public void Should_Throw_If_Joining_Event_Is_Already_Full()
         {
-            var maxParticipants = 5;
+            const int maxParticipants = 5;
             var participantsCount = 6;
             var ex = Assert.Throws<EventException>(() => _eventValidationService.CheckIfEventHasEnoughPlaces(maxParticipants, participantsCount));
             Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventIsFullCode));
