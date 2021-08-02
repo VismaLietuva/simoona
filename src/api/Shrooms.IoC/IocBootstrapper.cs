@@ -51,7 +51,7 @@ namespace Shrooms.IoC
             builder.RegisterAssemblyTypes(modelMappings).AssignableTo(typeof(Profile)).As<Profile>();
 
             // Interceptor
-            builder.Register(c => new TelemetryLoggingInterceptor());
+            builder.Register(_ => new TelemetryLoggingInterceptor());
 
             builder.RegisterType(typeof(UnitOfWork2)).As(typeof(IUnitOfWork2)).InstancePerRequest();
 
@@ -67,7 +67,7 @@ namespace Shrooms.IoC
             builder.RegisterType<MailingService>().As<IMailingService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<PostNotificationService>().As<IPostNotificationService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<CommentEmailNotificationService>().As<ICommentEmailNotificationService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.Register(c => app.GetDataProtectionProvider()).InstancePerRequest();
+            builder.Register(_ => app.GetDataProtectionProvider()).InstancePerRequest();
             builder.RegisterType<PermissionService>().As<IPermissionService>().PropertiesAutowired().InstancePerRequest(); //.EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<SyncTokenService>().As<ISyncTokenService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<ImpersonateService>().As<IImpersonateService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
@@ -138,7 +138,7 @@ namespace Shrooms.IoC
             }
 
             // Needed for Hangfire to process jobs from extension assemblies
-            AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
+            AppDomain.CurrentDomain.AssemblyResolve += (_, args) =>
             {
                 var assemblyName = new AssemblyName(args.Name);
                 var existing = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(c => c.FullName == assemblyName.FullName);

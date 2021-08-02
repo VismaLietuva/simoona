@@ -121,7 +121,7 @@ namespace Shrooms.Presentation.Api
                 corsPolicy.AllowAnyOrigin = true;
             }
 
-            var corsOptions = new CorsOptions { PolicyProvider = new CorsPolicyProvider { PolicyResolver = context => Task.FromResult(corsPolicy) } };
+            var corsOptions = new CorsOptions { PolicyProvider = new CorsPolicyProvider { PolicyResolver = _ => Task.FromResult(corsPolicy) } };
             return corsOptions;
         }
 

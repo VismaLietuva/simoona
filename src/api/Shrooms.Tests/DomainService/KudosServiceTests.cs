@@ -578,19 +578,20 @@ namespace Shrooms.Tests.DomainService
             var kudosServiceValidation = Substitute.For<IKudosServiceValidator>();
             kudosServiceValidation
                 .When(x => x.ValidateKudosMinusPermission(false))
-                .Do(x => throw new KudosException(""));
+                .Do(_ => throw new KudosException(""));
 
             kudosServiceValidation
                 .When(x => x.ValidateUserAvailableKudos(4, 6))
-                .Do(x => throw new KudosException(""));
+                .Do(_ => throw new KudosException(""));
 
             kudosServiceValidation
                 .When(x => x.ValidateUserAvailableKudosToSendPerMonth(2, 0))
-                .Do(x => throw new KudosException(""));
+                .Do(_ => throw new KudosException(""));
 
             kudosServiceValidation
                .When(x => x.ValidateSendingToSameUserAsReceiving("testUserId2", "testUserId2"))
-               .Do(x => throw new KudosException(""));
+               .Do(_ => throw new KudosException(""));
+
             return kudosServiceValidation;
         }
 

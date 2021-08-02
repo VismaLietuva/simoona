@@ -485,14 +485,14 @@ namespace Shrooms.Tests.Mocks
             return list;
         }
 
-        private DbSet<T> CreateMock<T>(IQueryable<T> list)
+        private static DbSet<T> CreateMock<T>(IQueryable<T> list)
             where T : class
         {
             var mockSet = Substitute.For<DbSet<T>, IQueryable<T>>();
             ((IQueryable<T>)mockSet).Provider.Returns(list.Provider);
             ((IQueryable<T>)mockSet).Expression.Returns(list.Expression);
             ((IQueryable<T>)mockSet).ElementType.Returns(list.ElementType);
-            ((IQueryable<T>)mockSet).GetEnumerator().Returns(e => list.GetEnumerator());
+            ((IQueryable<T>)mockSet).GetEnumerator().Returns(_ => list.GetEnumerator());
             mockSet.Include(Arg.Any<string>()).Returns(mockSet);
 
             return mockSet;

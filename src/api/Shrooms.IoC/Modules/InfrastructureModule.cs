@@ -42,7 +42,7 @@ namespace Shrooms.IoC.Modules
             builder.RegisterType<MailTemplate>().As<IMailTemplate>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<DailyMailingService>().As<IDailyMailingService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<HangFireScheduler>().As<IJobScheduler>().InstancePerRequest();
-            builder.Register(c => ReallySimpleFeature.Toggles.GetFeatureConfiguration()).As<IFeatureConfiguration>().SingleInstance();
+            builder.Register(_ => ReallySimpleFeature.Toggles.GetFeatureConfiguration()).As<IFeatureConfiguration>().SingleInstance();
 
             RegisterStorage(builder);
         }
