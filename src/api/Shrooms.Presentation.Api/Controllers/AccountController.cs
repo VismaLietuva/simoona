@@ -90,16 +90,16 @@ namespace Shrooms.Presentation.Api.Controllers
             {
                 var user = await _userManager.FindByEmailAsync(model.Email);
 
-                if (user != null && !user.EmailConfirmed && _administrationService.HasExistingExternalLogin(model.Email, AuthenticationConstants.InternalLoginProvider))
+                if (user == null || user.EmailConfirmed || !_administrationService.HasExistingExternalLogin(model.Email, AuthenticationConstants.InternalLoginProvider))
                 {
-                    await _userManager.RemovePasswordAsync(user.Id);
-                    await _userManager.AddPasswordAsync(user.Id, model.Password);
-                    await _administrationService.SendUserVerificationEmail(user, RequestedOrganization);
-
-                    return Ok();
+                    return BadRequest("User already exists");
                 }
 
-                return BadRequest("User already exists");
+                await _userManager.RemovePasswordAsync(user.Id);
+                await _userManager.AddPasswordAsync(user.Id, model.Password);
+                await _administrationService.SendUserVerificationEmail(user, RequestedOrganization);
+
+                return Ok();
             }
 
             if (_administrationService.UserIsSoftDeleted(model.Email))
@@ -225,14 +225,17 @@ namespace Shrooms.Presentation.Api.Controllers
                 .GetOrganizationByName(RequestedOrganization)
                 .AuthenticationProviders;
 
-            if (ContainsProvider(organizationProviders, AuthenticationConstants.InternalLoginProvider))
+            if (!ContainsProvider(organizationProviders, AuthenticationConstants.InternalLoginProvider))
             {
-                var internalLogin = new ExternalLoginViewModel
-                {
-                    Name = AuthenticationConstants.InternalLoginProvider
-                };
-                logins.Add(internalLogin);
+                return Ok(logins);
             }
+
+            var internalLogin = new ExternalLoginViewModel
+            {
+                Name = AuthenticationConstants.InternalLoginProvider
+            };
+
+            logins.Add(internalLogin);
 
             return Ok(logins);
         }
@@ -240,13 +243,15 @@ namespace Shrooms.Presentation.Api.Controllers
         [Route("Logout")]
         public IHttpActionResult Logout()
         {
-            if (User.Identity.IsAuthenticated)
+            if (!User.Identity.IsAuthenticated)
             {
-                var userAndOrganization = GetUserAndOrganization();
-                _refreshTokenService.RemoveTokenBySubject(userAndOrganization);
-                _permissionService.RemoveCache(userAndOrganization.UserId);
-                Authentication.SignOut();
+                return Ok();
             }
+
+            var userAndOrganization = GetUserAndOrganization();
+            _refreshTokenService.RemoveTokenBySubject(userAndOrganization);
+            _permissionService.RemoveCache(userAndOrganization.UserId);
+            Authentication.SignOut();
 
             return Ok();
         }
@@ -255,34 +260,39 @@ namespace Shrooms.Presentation.Api.Controllers
         [Route("ExternalLogins")]
         public IHttpActionResult GetExternalLogins(string returnUrl, bool isLinkable = false)
         {
-            IEnumerable<AuthenticationDescription> descriptions = Authentication.GetExternalAuthenticationTypes();
+            var descriptions = Authentication.GetExternalAuthenticationTypes();
             var logins = new List<ExternalLoginViewModel>();
+
             var organizationProviders = _organizationService
                 .GetOrganizationByName(RequestedOrganization)
                 .AuthenticationProviders;
 
-            foreach (AuthenticationDescription description in descriptions)
+            foreach (var description in descriptions)
             {
-                if (ContainsProvider(organizationProviders, description.Caption))
+                if (!ContainsProvider(organizationProviders, description.Caption))
                 {
-                    var state = RandomOAuthStateGenerator.Generate(StateStrengthInBits);
-                    ExternalLoginViewModel login = new ExternalLoginViewModel
-                    {
-                        Name = description.Caption,
-                        Url = CreateUrl(description, returnUrl, state, isLinkable, false),
-                        State = state
-                    };
-                    logins.Add(login);
-
-                    state = RandomOAuthStateGenerator.Generate(StateStrengthInBits);
-                    login = new ExternalLoginViewModel
-                    {
-                        Name = description.Caption + "Registration",
-                        Url = CreateUrl(description, returnUrl, state, isLinkable, true),
-                        State = state
-                    };
-                    logins.Add(login);
+                    continue;
                 }
+                var state = RandomOAuthStateGenerator.Generate(StateStrengthInBits);
+
+                var login = new ExternalLoginViewModel
+                {
+                    Name = description.Caption,
+                    Url = CreateUrl(description, returnUrl, state, isLinkable, false),
+                    State = state
+                };
+
+                logins.Add(login);
+
+                state = RandomOAuthStateGenerator.Generate(StateStrengthInBits);
+                login = new ExternalLoginViewModel
+                {
+                    Name = description.Caption + "Registration",
+                    Url = CreateUrl(description, returnUrl, state, isLinkable, true),
+                    State = state
+                };
+
+                logins.Add(login);
             }
 
             return Ok(logins);
@@ -459,26 +469,26 @@ namespace Shrooms.Presentation.Api.Controllers
                 return InternalServerError();
             }
 
-            if (!result.Succeeded)
+            if (result.Succeeded)
             {
-                if (result.Errors != null)
-                {
-                    foreach (string error in result.Errors)
-                    {
-                        ModelState.AddModelError("", error);
-                    }
-                }
-
-                if (ModelState.IsValid)
-                {
-                    // No ModelState errors are available to send, so just return an empty BadRequest.
-                    return BadRequest();
-                }
-
-                return BadRequest(ModelState);
+                return null;
             }
 
-            return null;
+            if (result.Errors != null)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error);
+                }
+            }
+
+            if (ModelState.IsValid)
+            {
+                // No ModelState errors are available to send, so just return an empty BadRequest.
+                return BadRequest();
+            }
+
+            return BadRequest(ModelState);
         }
 
         private string CreateUrl(AuthenticationDescription description, string returnUrl, string state, bool isLinkable, bool isRegistration)
@@ -509,9 +519,10 @@ namespace Shrooms.Presentation.Api.Controllers
             }
 
             Authentication.SignOut(DefaultAuthenticationTypes.ExternalCookie);
-            ClaimsIdentity identity = new ClaimsIdentity(externalLogin.GetClaims(), OAuthDefaults.AuthenticationType);
+            var identity = new ClaimsIdentity(externalLogin.GetClaims(), OAuthDefaults.AuthenticationType);
             Authentication.SignIn(identity);
             _administrationService.AddProviderEmail(userId, info.Login.LoginProvider, info.Email);
+
             return Ok();
         }
 

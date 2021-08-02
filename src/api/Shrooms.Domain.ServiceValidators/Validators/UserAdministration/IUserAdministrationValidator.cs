@@ -7,6 +7,6 @@ namespace Shrooms.Domain.ServiceValidators.Validators.UserAdministration
     {
         void CheckIfEmploymentDateIsSet(DateTime? employmentDate);
         void CheckIfUserHasFirstLoginRole(bool hasRole);
-        void CheckForAddingRemovingRoleErrors(IEnumerable<string> addRoleErrors, IEnumerable<string> removeRoleErrors);
+        void CheckForAddingRemovingRoleErrors(IList<string> addRoleErrors, IList<string> removeRoleErrors);
     }
 }

@@ -58,7 +58,7 @@ namespace Shrooms.Domain.Services.Email.AdministrationUsers
 
         public void NotifyAboutNewUser(ApplicationUser newUser, int orgId)
         {
-            var userAdministrationEmails = _userService.GetUserEmailsWithPermission(AdministrationPermissions.ApplicationUser, orgId);
+            var userAdministrationEmails = _userService.GetUserEmailsWithPermission(AdministrationPermissions.ApplicationUser, orgId).ToList();
 
             if (!userAdministrationEmails.Any())
             {
@@ -81,7 +81,8 @@ namespace Shrooms.Domain.Services.Email.AdministrationUsers
 
             var body = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.NotificationAboutNewUser);
 
-            _mailingService.SendEmail(new EmailDto(userAdministrationEmails, subject, body));
+            var emailDto = new EmailDto(userAdministrationEmails, subject, body);
+            _mailingService.SendEmail(emailDto);
         }
 
         public void SendUserResetPasswordEmail(ApplicationUser user, string token, string organizationName)

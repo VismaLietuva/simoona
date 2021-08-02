@@ -211,13 +211,14 @@ namespace Shrooms.Domain.Services.Wall.Posts
             }
         }
 
-        private UserDto MapUserToDto(ApplicationUser user)
+        private static UserDto MapUserToDto(ApplicationUser user)
         {
             var userDto = new UserDto
             {
                 UserId = user.Id,
+                // ReSharper disable once HeapView.BoxingAllocation (Don't change to string interpolation, since EF won't handle project it to SQL)
                 FullName = user.FirstName + ' ' + user.LastName,
-                PictureId = user.PictureId,
+                PictureId = user.PictureId
             };
             return userDto;
         }

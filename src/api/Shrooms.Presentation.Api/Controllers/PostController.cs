@@ -84,12 +84,13 @@ namespace Shrooms.Presentation.Api.Controllers
             var postModel = _mapper.Map<CreateWallPostViewModel, NewPostDTO>(wallPostViewModel);
             SetOrganizationAndUser(postModel);
             var userHubDto = GetUserAndOrganizationHub();
+
             try
             {
                 var createdPost = _postService.CreateNewPost(postModel);
-                _asyncRunner.Run<NewPostNotifier>(notif =>
+                _asyncRunner.Run<NewPostNotifier>(async notifier =>
                 {
-                    notif.Notify(createdPost, userHubDto);
+                    await notifier.Notify(createdPost, userHubDto);
                 }, GetOrganizationName());
 
                 return Ok(_mapper.Map<WallPostViewModel>(createdPost));

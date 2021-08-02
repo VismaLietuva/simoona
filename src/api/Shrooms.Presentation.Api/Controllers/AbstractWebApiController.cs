@@ -69,23 +69,31 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [HttpGet]
-        public virtual PagedViewModel<TViewModel> GetPaged(string includeProperties = null, int page = 1,
-            int pageSize = WebApiConstants.DefaultPageSize, string sort = null, string dir = "", string s = "")
+        public virtual PagedViewModel<TViewModel> GetPaged(string includeProperties = null,
+            int page = 1,
+            int pageSize = WebApiConstants.DefaultPageSize,
+            string sort = null,
+            string dir = "",
+            string s = "")
         {
             return GetFilteredPaged(includeProperties, page, pageSize, sort, dir);
         }
 
-        protected virtual PagedViewModel<TViewModel> GetFilteredPaged(
-            string includeProperties = null, int page = 1, int pageSize = WebApiConstants.DefaultPageSize,
-            string sort = null, string dir = "", Expression<Func<TModel, bool>> filter = null)
+        protected virtual PagedViewModel<TViewModel> GetFilteredPaged(string includeProperties = null,
+            int page = 1,
+            int pageSize = WebApiConstants.DefaultPageSize,
+            string sort = null,
+            string dir = "",
+            Expression<Func<TModel, bool>> filter = null)
         {
             var sortQuery = string.IsNullOrEmpty(sort) ? null : $"{sort} {dir}";
 
-            IPagedList<TModel> models = _repository.Get(
-                includeProperties: includeProperties, filter: filter, orderBy: sortQuery ?? _defaultOrderByProperty)
+            var models = _repository
+                .Get(includeProperties: includeProperties, filter: filter, orderBy: sortQuery ?? _defaultOrderByProperty)
                 .ToPagedList(page, pageSize);
 
-            var pagedVm = new StaticPagedList<TViewModel>(_mapper.Map<IEnumerable<TModel>, IEnumerable<TViewModel>>(models), models.PageNumber, models.PageSize, models.TotalItemCount);
+            var abstractViewModels = _mapper.Map<IEnumerable<TModel>, IEnumerable<TViewModel>>(models);
+            var pagedVm = new StaticPagedList<TViewModel>(abstractViewModels, models.PageNumber, models.PageSize, models.TotalItemCount);
 
             var result = new PagedViewModel<TViewModel>
             {

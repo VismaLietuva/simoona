@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Contracts.Infrastructure;
@@ -25,13 +27,13 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
             _mapper = mapper;
         }
 
-        public void Notify(NewlyCreatedPostDTO createdPost, UserAndOrganizationHubDto userAndOrganizationHubDto)
+        public async Task Notify(NewlyCreatedPostDTO createdPost, UserAndOrganizationHubDto userAndOrganizationHubDto)
         {
             _postNotificationService.NotifyAboutNewPost(createdPost);
 
-            var membersToNotify = _userService.GetWallUserAppNotificationEnabledIds(createdPost.User.UserId, createdPost.WallId);
+            var membersToNotify = _userService.GetWallUserAppNotificationEnabledIds(createdPost.User.UserId, createdPost.WallId).ToList();
 
-            var notificationDto = _notificationService.CreateForPost(userAndOrganizationHubDto, createdPost, createdPost.WallId, membersToNotify).GetAwaiter().GetResult();
+            var notificationDto = await _notificationService.CreateForPost(userAndOrganizationHubDto, createdPost, createdPost.WallId, membersToNotify);
 
             NotificationHub.SendNotificationToParticularUsers(_mapper.Map<NotificationViewModel>(notificationDto), userAndOrganizationHubDto, membersToNotify);
             NotificationHub.SendWallNotification(createdPost.WallId, membersToNotify, createdPost.WallType, userAndOrganizationHubDto);

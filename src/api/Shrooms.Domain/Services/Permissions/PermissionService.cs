@@ -16,9 +16,9 @@ namespace Shrooms.Domain.Services.Permissions
     public class PermissionService : IPermissionService
     {
         private readonly IDbSet<Permission> _permissionsDbSet;
-        private readonly ICustomCache<string, IEnumerable<string>> _permissionsCache;
+        private readonly ICustomCache<string, IList<string>> _permissionsCache;
 
-        public PermissionService(IUnitOfWork2 unitOfWork, ICustomCache<string, IEnumerable<string>> permissionsCache)
+        public PermissionService(IUnitOfWork2 unitOfWork, ICustomCache<string, IList<string>> permissionsCache)
         {
             _permissionsDbSet = unitOfWork.GetDbSet<Permission>();
             _permissionsCache = permissionsCache;
@@ -33,6 +33,7 @@ namespace Shrooms.Domain.Services.Permissions
                     .Where(FilterActiveModules(userAndOrg.OrganizationId))
                     .Select(x => x.Name)
                     .ToList();
+
                 _permissionsCache.TryAdd(userAndOrg.UserId, permissions);
             }
 
@@ -56,8 +57,7 @@ namespace Shrooms.Domain.Services.Permissions
 
         public IEnumerable<string> GetUserPermissions(string userId, int organizationId)
         {
-            IEnumerable<string> permissions;
-            if (_permissionsCache.TryGetValue(userId, out permissions))
+            if (_permissionsCache.TryGetValue(userId, out var permissions))
             {
                 return permissions;
             }

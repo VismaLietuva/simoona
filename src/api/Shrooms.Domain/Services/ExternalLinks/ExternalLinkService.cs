@@ -49,24 +49,18 @@ namespace Shrooms.Domain.Services.ExternalLinks
 
         private void DuplicateValuesValidation(AddEditDeleteExternalLinkDTO updateLinksDto)
         {
-            var hasDuplicate = new List<bool>();
-            var orgLinks = GetAll(updateLinksDto.OrganizationId);
+            var externalLinks = _externalLinkDbSet
+                .Where(x => x.OrganizationId == updateLinksDto.OrganizationId)
+                .Select(x => new ExternalLinkDTO
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Url = x.Url
+                })
+                .ToList();
 
-            foreach (var link in updateLinksDto.LinksToCreate)
-            {
-                hasDuplicate.Add(orgLinks.Any(x =>
-                    x.Name == link.Name ||
-                    x.Url == link.Url));
-            }
-
-            foreach (var link in updateLinksDto.LinksToUpdate)
-            {
-                hasDuplicate.Add(orgLinks.Any(x =>
-                    (x.Name == link.Name || x.Url == link.Url) &&
-                    x.Id != link.Id));
-            }
-
-            if (hasDuplicate.Any(x => x))
+            if (updateLinksDto.LinksToCreate.Any(c => externalLinks.Any(l => l.Name == c.Name || l.Url == c.Url)) ||
+                updateLinksDto.LinksToUpdate.Any(c => externalLinks.Any(l => l.Name == c.Name || l.Url == c.Url)))
             {
                 throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "Provided values must be unique");
             }

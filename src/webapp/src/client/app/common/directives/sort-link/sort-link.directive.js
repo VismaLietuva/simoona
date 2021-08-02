@@ -6,7 +6,7 @@
         .directive('aceSortLink', sortLink);
 
     function sortLink() {
-        var directive = {
+        const directive = {
             templateUrl: 'app/common/directives/sort-link/sort-link.html',
             restrict: 'E',
             transclude: true,
@@ -27,7 +27,7 @@
 
     function sortLinkController() {
         /* jshint validthis: true */
-        var vm = this;
+        const vm = this;
 
         vm.sortColumn = sortColumn;
 
@@ -35,7 +35,7 @@
 
         function sortColumn() {
             if (vm.sortField === vm.sortValue) {
-                vm.sortDir = vm.sortDir === 'asc' ? 'desc' : 'asc';
+                vm.sortDir = (!vm.sortDir || vm.sortDir === 'asc') ? 'desc' : 'asc';
             } else {
                 vm.sortField = vm.sortValue;
                 vm.sortDir = 'asc';

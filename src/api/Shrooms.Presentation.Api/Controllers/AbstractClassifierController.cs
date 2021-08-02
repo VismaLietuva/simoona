@@ -21,7 +21,7 @@ namespace Shrooms.Presentation.Api.Controllers
         private readonly IRepository<AbstractClassifier> _classifierRepository;
 
         public AbstractClassifierController(IMapper mapper, IUnitOfWork unitOfWork, ShroomsUserManager userManager, ShroomsRoleManager roleManager)
-            : base(mapper, unitOfWork, userManager, roleManager, null)
+            : base(mapper, unitOfWork, userManager, roleManager)
         {
             _classifierRepository = unitOfWork.GetRepository<AbstractClassifier>();
         }
@@ -69,8 +69,13 @@ namespace Shrooms.Presentation.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.Created);
         }
 
-        public override PagedViewModel<AbstractClassifierViewModel> GetPaged(string includeProperties = null, int page = 1, int pageSize = WebApiConstants.DefaultPageSize, string sort = "Name Asc, OrganizationId Asc", string dir = "", string s = "")
+        public override PagedViewModel<AbstractClassifierViewModel> GetPaged(string includeProperties = null, int page = 1, int pageSize = WebApiConstants.DefaultPageSize, string sort = null, string dir = "", string s = "")
         {
+            if (sort == null)
+            {
+                sort = "Name Asc, OrganizationId Asc";
+            }
+
             return GetFilteredPaged(includeProperties, page, pageSize, sort, dir, f => f.Name.Contains(s));
         }
 
@@ -128,16 +133,25 @@ namespace Shrooms.Presentation.Api.Controllers
             foreach (var childViewModel in crudViewModel.Children)
             {
                 var model = _mapper.Map(childViewModel, childViewModel.GetType(), specificType) as AbstractClassifier;
-                model.ParentId = classifierModel.Id;
-                _repository.Update(model);
+
+                if (model != null)
+                {
+                    model.ParentId = classifierModel.Id;
+                    _repository.Update(model);
+                }
             }
         }
 
         private void RemoveAllChildren(AbstractClassifier classifierModel)
         {
-            classifierModel = _repository.Get(f => f.Id == classifierModel.Id, includeProperties: "Children").FirstOrDefault();
-            classifierModel.Children = null;
-            _repository.Update(classifierModel);
+            var classifierModelId = classifierModel.Id;
+            classifierModel = _repository.Get(f => f.Id == classifierModelId, includeProperties: "Children").FirstOrDefault();
+
+            if (classifierModel != null)
+            {
+                classifierModel.Children = null;
+                _repository.Update(classifierModel);
+            }
         }
     }
 }

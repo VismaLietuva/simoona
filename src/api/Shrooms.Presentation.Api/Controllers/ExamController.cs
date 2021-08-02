@@ -38,7 +38,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [ValidationFilter]
         [PermissionAuthorize(Permission = BasicPermissions.Exam)]
-        public HttpResponseMessage Post(IEnumerable<ExamPostViewModel> models)
+        public HttpResponseMessage Post(IList<ExamPostViewModel> models)
         {
             foreach (var model in models)
             {

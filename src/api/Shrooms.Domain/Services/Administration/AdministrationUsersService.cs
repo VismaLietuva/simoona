@@ -112,7 +112,7 @@ namespace Shrooms.Domain.Services.Administration
 
             var user = shroomsContext
                 .Users
-                .SqlQuery("Select * From [dbo].[AspNetUsers] Where Email = @email", new SqlParameter("@email", email))
+                .SqlQuery("SELECT * FROM [dbo].[AspNetUsers] WHERE Email = @email", new SqlParameter("@email", email))
                 .SingleOrDefault();
 
             return user != null;
@@ -176,7 +176,7 @@ namespace Shrooms.Domain.Services.Administration
             var addRoleResult = _userManager.AddToRole(userId, Contracts.Constants.Roles.User);
             var removeRoleResult = _userManager.RemoveFromRole(userId, Contracts.Constants.Roles.NewUser);
 
-            _userAdministrationValidator.CheckForAddingRemovingRoleErrors(addRoleResult.Errors, removeRoleResult.Errors);
+            _userAdministrationValidator.CheckForAddingRemovingRoleErrors(addRoleResult.Errors.ToList(), removeRoleResult.Errors.ToList());
             _notificationService.SendConfirmedNotificationEmail(applicationUser.Email, userAndOrg);
 
             SetTutorialStatus(applicationUser, false);
@@ -192,8 +192,8 @@ namespace Shrooms.Domain.Services.Administration
             var externalIdentity = info.ExternalIdentity;
             var userSettings =
                 _organizationDbSet.Where(o => o.ShortName == requestedOrganization)
-                .Select(u => new { u.CultureCode, u.TimeZone })
-                .First();
+                    .Select(u => new { u.CultureCode, u.TimeZone })
+                    .First();
 
             var user = new ApplicationUser
             {
@@ -229,8 +229,8 @@ namespace Shrooms.Domain.Services.Administration
         {
             var userSettings =
                 _organizationDbSet.Where(o => o.ShortName == requestedOrganization)
-                .Select(u => new { u.CultureCode, u.TimeZone })
-                .First();
+                    .Select(u => new { u.CultureCode, u.TimeZone })
+                    .First();
 
             user.OrganizationId = _organizationService.GetOrganizationByName(requestedOrganization).Id;
             user.EmploymentDate = DateTime.UtcNow;
@@ -278,27 +278,27 @@ namespace Shrooms.Domain.Services.Administration
 
         public IEnumerable<AdministrationUserDTO> GetAllUsers(string sortQuery, string search, FilterDTO[] filterModel, string includeProperties)
         {
-            includeProperties += (includeProperties != string.Empty ? "," : string.Empty) + "Roles,Skills,JobPosition,Projects";
+            includeProperties = $"{includeProperties}{(includeProperties != string.Empty ? "," : string.Empty)}Roles,Skills,JobPosition,Projects";
+
             var applicationUsers = _applicationUserRepository
                 .Get(GenerateQuery(search), orderBy: sortQuery.Contains(Contracts.Constants.Roles.NewUser) ? string.Empty : sortQuery, includeProperties: includeProperties)
                 .ToList();
 
-            var administrationUserDto = _mapper.Map<IEnumerable<ApplicationUser>, IEnumerable<AdministrationUserDTO>>(applicationUsers);
+            var administrationUsers = _mapper.Map<IList<ApplicationUser>, IList<AdministrationUserDTO>>(applicationUsers);
 
-            SetNewUsersValues(administrationUserDto, applicationUsers);
+            SetNewUsersValues(administrationUsers, applicationUsers);
 
             if (filterModel != null)
             {
-                administrationUserDto = GetFilteredResults(filterModel, administrationUserDto);
+                administrationUsers = FilterResults(filterModel, administrationUsers);
             }
 
             if (sortQuery.StartsWith(Contracts.Constants.Roles.NewUser))
             {
-                administrationUserDto = sortQuery.EndsWith("asc") ? administrationUserDto.OrderBy(u => u.IsNewUser) :
-                    administrationUserDto.OrderByDescending(u => u.IsNewUser);
+                administrationUsers = (sortQuery.EndsWith("asc") ? administrationUsers.OrderBy(u => u.IsNewUser) : administrationUsers.OrderByDescending(u => u.IsNewUser)).ToList();
             }
 
-            return administrationUserDto;
+            return administrationUsers;
         }
 
         public void SetUserTutorialStatusToComplete(string userId)
@@ -441,7 +441,7 @@ namespace Shrooms.Domain.Services.Administration
             _userManager.AddToRole(id, Contracts.Constants.Roles.FirstLogin);
         }
 
-        private void SetNewUsersValues(IEnumerable<AdministrationUserDTO> administrationUserDto, IEnumerable<ApplicationUser> applicationUsers)
+        private void SetNewUsersValues(IList<AdministrationUserDTO> administrationUserDto, IEnumerable<ApplicationUser> applicationUsers)
         {
             var newUserRole = _rolesRepository.Get(x => x.Name == Contracts.Constants.Roles.NewUser).Select(x => x.Id).FirstOrDefault();
 
@@ -450,27 +450,29 @@ namespace Shrooms.Domain.Services.Administration
 
             foreach (var user in usersWaitingForConfirmationIds)
             {
-                administrationUserDto.FirstOrDefault(x => x.Id == user).IsNewUser = true;
+                administrationUserDto.First(x => x.Id == user).IsNewUser = true;
             }
         }
 
-        private IEnumerable<AdministrationUserDTO> GetFilteredResults(IEnumerable<FilterDTO> filterModel, IEnumerable<AdministrationUserDTO> applicationUsersViewModel)
+        private static IList<AdministrationUserDTO> FilterResults(IEnumerable<FilterDTO> filterModel, IList<AdministrationUserDTO> administrationUsers)
         {
+            IEnumerable<AdministrationUserDTO> filteredUsers = null;
+
             foreach (var filterViewModel in filterModel)
             {
                 switch (filterViewModel.Key.ToLowerInvariant())
                 {
                     case "jobtitle":
-                        applicationUsersViewModel =
-                            applicationUsersViewModel.Where(e =>
+                        filteredUsers = administrationUsers
+                            .Where(e =>
                                 filterViewModel.Values.Any(v =>
                                     !string.IsNullOrWhiteSpace(e.JobTitle)
                                     && e.JobTitle.IndexOf(v, StringComparison.OrdinalIgnoreCase) >= 0));
                         break;
 
                     case "projects":
-                        applicationUsersViewModel =
-                            applicationUsersViewModel.Where(e =>
+                        filteredUsers = administrationUsers
+                            .Where(e =>
                                 filterViewModel.Values.Any(v =>
                                     e.Projects != null
                                     && e.Projects.Any(p =>
@@ -479,18 +481,18 @@ namespace Shrooms.Domain.Services.Administration
                         break;
 
                     case "skills":
-                        applicationUsersViewModel =
-                            applicationUsersViewModel.Where(e =>
+                        filteredUsers = administrationUsers
+                            .Where(e =>
                                 filterViewModel.Values.Any(v =>
                                     e.Skills != null
                                     && e.Skills.Any(s =>
-                                            !string.IsNullOrWhiteSpace(s.Title)
-                                            && s.Title.IndexOf(v, StringComparison.OrdinalIgnoreCase) >= 0)));
+                                        !string.IsNullOrWhiteSpace(s.Title)
+                                        && s.Title.IndexOf(v, StringComparison.OrdinalIgnoreCase) >= 0)));
                         break;
                 }
             }
 
-            return applicationUsersViewModel;
+            return filteredUsers?.ToList() ?? administrationUsers;
         }
 
         private void AddUserToMainWall(string userId)

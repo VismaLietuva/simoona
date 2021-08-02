@@ -1,14 +1,14 @@
 ﻿(function () {
     'use strict';
 
-    var simoonaApp = angular.module('simoonaApp.Skill');
+    const simoonaApp = angular.module('simoonaApp.Skill');
 
     simoonaApp.factory('skillRepository', skillRepository);
 
     skillRepository.$inject = ['$resource', 'endPoint'];
 
     function skillRepository($resource, endPoint) {
-        var skillUrl = endPoint + '/Skill/';
+        const skillUrl = endPoint + '/Skill/';
 
         return {
             getForAutoComplete: function (s) {

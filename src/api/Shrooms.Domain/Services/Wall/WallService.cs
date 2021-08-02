@@ -547,7 +547,7 @@ namespace Shrooms.Domain.Services.Wall
             _uow.SaveChanges(currentUserId);
         }
 
-        private async Task MapModeratorsToWalls(IEnumerable<WallDto> walls)
+        private async Task MapModeratorsToWalls(IList<WallDto> walls)
         {
             var wallsIds = walls.Select(w => w.Id).ToList();
 
@@ -748,7 +748,7 @@ namespace Shrooms.Domain.Services.Wall
             return true;
         }
 
-        private async Task<IEnumerable<WallDto>> GetAllOrNotFollowedWalls(UserAndOrganizationDTO userOrg, WallsListFilter filter)
+        private async Task<IList<WallDto>> GetAllOrNotFollowedWalls(UserAndOrganizationDTO userOrg, WallsListFilter filter)
         {
             var wallFilters = new Dictionary<WallsListFilter, Expression<Func<DataLayer.EntityModels.Models.Multiwall.Wall, bool>>>
             {
@@ -768,6 +768,7 @@ namespace Shrooms.Domain.Services.Wall
                     Id = w.Id,
                     Name = w.Name,
                     Description = w.Description,
+                    // Don't simplify, since it's EF projection
                     IsFollowing = w.Type == WallType.Main ? true : w.Members.Any(m => m.UserId == userOrg.UserId),
                     Type = w.Type,
                     Logo = w.Logo
@@ -776,7 +777,7 @@ namespace Shrooms.Domain.Services.Wall
             return walls;
         }
 
-        private async Task<IEnumerable<WallDto>> GetUserFollowedWalls(UserAndOrganizationDTO userOrg)
+        private async Task<IList<WallDto>> GetUserFollowedWalls(UserAndOrganizationDTO userOrg)
         {
             var followedWalls = await _wallsDbSet
                .Include(w => w.Members)

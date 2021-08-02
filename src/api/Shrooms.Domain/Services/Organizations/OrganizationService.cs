@@ -94,7 +94,9 @@ namespace Shrooms.Domain.Services.Organizations
             var managingDirector = _usersDbSet
                 .Where(x => x.OrganizationId == organizationId &&
                             x.IsManagingDirector)
-                .Select(x => new UserDto()
+
+                // Don't change to string interpolation, since EF won't handle project it to SQL
+                .Select(x => new UserDto
                 {
                     UserId = x.Id,
                     FullName = x.FirstName + " " + x.LastName

@@ -24,9 +24,9 @@
     function applicationUserListController($rootScope, $state, $advancedLocation, $window, userRepository,
         skillRepository, projectRepository, usersModel, authService, $translate, notifySrv, localeSrv, endPoint) {
         /*jshint validthis: true */
-        var vm = this;
+        const vm = this;
 
-        var filterObject = !!$state.params.filter ? JSON.parse($state.params.filter) : [];
+        const filterObject = !!$state.params.filter ? JSON.parse($state.params.filter) : [];
 
         vm.currentUser = authService.identity.userName;
         vm.usersModel = usersModel;
@@ -82,7 +82,7 @@
         vm.filter = {
             page: $state.params.page,
             dir: $state.params.dir,
-            sort: $state.params.sort,
+            sort: $state.params.sort ?? 'userName',
             s: $state.params.s,
             filter: filterObject
         };
@@ -154,7 +154,7 @@
         }
 
         function changeState() {
-            var filterParams = {};
+            const filterParams = {};
 
             if (!!vm.filter.sort) {
                 filterParams.sort = vm.filter.sort;
@@ -182,9 +182,10 @@
 
         function getExcel() {
             userRepository.getUsersExcel().success(function (response) {
-                var file = new Blob([response], {
+                const file = new Blob([response], {
                     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;'
                 });
+
                 saveAs(file, 'Users.xlsx');
             });
         }

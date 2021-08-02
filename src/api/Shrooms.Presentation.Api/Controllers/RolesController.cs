@@ -66,14 +66,16 @@ namespace Shrooms.Presentation.Api.Controllers
 
         #region private methods
 
-        private void AssignPermissionsToARole(RoleMiniViewModel roleViewModel, ApplicationRole role)
+        private void AssignPermissionsToRole(RoleMiniViewModel roleViewModel, ApplicationRole role)
         {
-            role.Permissions = _permissionRepository.Get(GetFilter(roleViewModel.Permissions)).ToList();
+            var filteredPermissions = GetFilter(roleViewModel.Permissions.ToList());
+            role.Permissions = _permissionRepository.Get(filteredPermissions).ToList();
+
             _roleRepository.Update(role);
             _unitOfWork.Save();
         }
 
-        private Expression<Func<Permission, bool>> GetFilter(IEnumerable<PermissionGroupViewModel> permissions)
+        private static Expression<Func<Permission, bool>> GetFilter(IList<PermissionGroupViewModel> permissions)
         {
             var adminControllers = permissions.Where(p => p.ActiveScope == PermissionScopes.Administration).Select(p => p.Name);
             var basicControllers = permissions.Where(p => p.ActiveScope == PermissionScopes.Basic).Select(p => p.Name);
@@ -187,7 +189,7 @@ namespace Shrooms.Presentation.Api.Controllers
             role.OrganizationId = GetUserAndOrganization().OrganizationId;
 
             RoleManager.Create(role);
-            AssignPermissionsToARole(roleViewModel, role);
+            AssignPermissionsToRole(roleViewModel, role);
             AssignUsersToRole(roleViewModel);
             _permissionsCache.Clear();
 
@@ -207,7 +209,7 @@ namespace Shrooms.Presentation.Api.Controllers
             var role = _roleRepository.Get(r => r.Id == roleViewModel.Id, includeProperties: "Permissions").FirstOrDefault();
             _mapper.Map(roleViewModel, role);
 
-            AssignPermissionsToARole(roleViewModel, role);
+            AssignPermissionsToRole(roleViewModel, role);
             AssignUsersToRole(roleViewModel);
             _permissionsCache.Clear();
 

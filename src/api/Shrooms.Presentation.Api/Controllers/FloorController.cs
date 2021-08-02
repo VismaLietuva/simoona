@@ -67,11 +67,15 @@ namespace Shrooms.Presentation.Api.Controllers
 
             var floorId = floors.Where(n => n != null).Select(n => n.Id).FirstOrDefault();
 
-            var floorOrganizationId = _applicationUserRepository.Get(n => n.Room != null && n.Room.FloorId == floorId).Select(n => n.OrganizationId).FirstOrDefault();
+            var floorOrganizationId = _applicationUserRepository
+                .Get(n => n.Room != null && n.Room.FloorId == floorId)
+                .Select(n => n.OrganizationId).FirstOrDefault();
 
-            var floorsViewModel = _mapper.Map<IEnumerable<Floor>, IEnumerable<FloorViewModel>>(floors);
+            var floorsViewModel = _mapper.Map<IEnumerable<Floor>, IEnumerable<FloorViewModel>>(floors).ToList();
 
-            var organizationName = _organizationRepository.Get(n => n.Id == floorOrganizationId).Select(n => n.ShortName).SingleOrDefault();
+            var organizationName = _organizationRepository
+                .Get(n => n.Id == floorOrganizationId)
+                .Select(n => n.ShortName).SingleOrDefault();
 
             foreach (var floorViewModel in floorsViewModel)
             {
@@ -115,7 +119,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             var floorOrganizationId = _applicationUserRepository.Get(n => n.Room != null && n.Room.FloorId == floorId).Select(n => n.OrganizationId).FirstOrDefault();
 
-            var floorsViewModel = _mapper.Map<IEnumerable<Floor>, IEnumerable<FloorViewModel>>(floors);
+            var floorsViewModel = _mapper.Map<IEnumerable<Floor>, IEnumerable<FloorViewModel>>(floors).ToList();
 
             var organizationName = _organizationRepository.Get(n => n.Id == floorOrganizationId).Select(n => n.ShortName).SingleOrDefault();
 
