@@ -25,11 +25,13 @@ namespace Shrooms.Domain.ServiceValidators.Validators.UserAdministration
 
         public void CheckForAddingRemovingRoleErrors(IList<string> addRoleErrors, IList<string> removeRoleErrors)
         {
-            if (addRoleErrors.Any() || removeRoleErrors.Any())
+            if (!addRoleErrors.Any() && !removeRoleErrors.Any())
             {
-                var errors = addRoleErrors.Concat(removeRoleErrors).Distinct();
-                throw new UserAdministrationException(errors);
+                return;
             }
+
+            var errors = addRoleErrors.Concat(removeRoleErrors).Distinct();
+            throw new UserAdministrationException(errors);
         }
     }
 }

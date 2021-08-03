@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Data.Entity;
+using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 
@@ -15,44 +16,44 @@ namespace Shrooms.Domain.Services.SyncTokens
             _syncTokenRepository = _unitOfWork.GetRepository<SyncToken>();
         }
 
-        public string GetToken(string name)
+        public async Task<string> GetToken(string name)
         {
-            var syncToken = _syncTokenRepository.Get(n => n.Name == name).FirstOrDefault();
+            var syncToken = await _syncTokenRepository.Get(n => n.Name == name).FirstOrDefaultAsync();
 
             if (syncToken == null)
             {
-                return Create(name);
+                return await CreateAsync(name);
             }
 
             return syncToken.Token;
         }
 
-        public string Update(string name, string syncToken)
+        public async Task<string> UpdateAsync(string name, string syncToken)
         {
-            var syncTokenToUpdate = _syncTokenRepository.Get(n => n.Name == name).FirstOrDefault();
+            var syncTokenToUpdate = await _syncTokenRepository.Get(n => n.Name == name).FirstOrDefaultAsync();
 
             if (syncTokenToUpdate == null)
             {
-                return "No synch token found with provided name";
+                return "No sync token found with provided name";
             }
 
             syncTokenToUpdate.Token = syncToken;
 
             _syncTokenRepository.Update(syncTokenToUpdate);
-            _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
 
             return string.Empty;
         }
 
-        public string Create(string name, string syncToken = "")
+        public async Task<string> CreateAsync(string name, string syncToken = "")
         {
-            if (_syncTokenRepository.Get(n => n.Name == name).Any())
+            if (await _syncTokenRepository.Get(n => n.Name == name).AnyAsync())
             {
                 return "Synch token already exsists with provided name";
             }
 
             _syncTokenRepository.Insert(new SyncToken { Name = name, Token = syncToken });
-            _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
 
             return string.Empty;
         }

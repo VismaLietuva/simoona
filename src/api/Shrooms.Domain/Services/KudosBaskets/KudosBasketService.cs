@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
+using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
@@ -19,12 +21,12 @@ namespace Shrooms.Domain.Services.KudosBaskets
     {
         private const int KudosMultiplier = 1;
 
-        private static object _donateLock = new object();
+        private static readonly SemaphoreSlim _donateLock = new SemaphoreSlim(1, 1);
 
-        private readonly IDbSet<KudosLog> _kudosLogsDbSet;
-        private readonly IDbSet<ApplicationUser> _usersDbSet;
-        private readonly IDbSet<KudosBasket> _kudosBasketsDbSet;
-        private readonly IDbSet<KudosType> _kudosTypesDbSet;
+        private readonly DbSet<KudosLog> _kudosLogsDbSet;
+        private readonly DbSet<ApplicationUser> _usersDbSet;
+        private readonly DbSet<KudosBasket> _kudosBasketsDbSet;
+        private readonly DbSet<KudosType> _kudosTypesDbSet;
         private readonly IKudosBasketValidator _kudosBasketValidator;
         private readonly IUnitOfWork2 _uow;
         private readonly IKudosService _kudosService;
@@ -40,14 +42,13 @@ namespace Shrooms.Domain.Services.KudosBaskets
             _kudosService = kudosService;
         }
 
-        public IList<KudosBasketLogDTO> GetDonations(UserAndOrganizationDTO userAndOrg)
+        public async Task<IList<KudosBasketLogDTO>> GetDonationsAsync(UserAndOrganizationDTO userAndOrg)
         {
-            var kudosBasket = _kudosBasketsDbSet
+            var kudosBasket = await _kudosBasketsDbSet
                 .Include(basket => basket.KudosLogs.Select(log => log.Employee))
-                .FirstOrDefault(basket => basket.OrganizationId == userAndOrg.OrganizationId);
+                .FirstOrDefaultAsync(basket => basket.OrganizationId == userAndOrg.OrganizationId);
 
-            var kudosLogs = kudosBasket.KudosLogs
-                .OrderByDescending(log => log.Created);
+            var kudosLogs = kudosBasket?.KudosLogs.OrderByDescending(log => log.Created);
 
             var kudosLogDtos = MapKudosLogsToDto(kudosLogs);
             return kudosLogDtos;
@@ -79,32 +80,31 @@ namespace Shrooms.Domain.Services.KudosBaskets
             return newBasket;
         }
 
-        public KudosBasketDTO GetKudosBasketWidget(UserAndOrganizationDTO userAndOrganization)
+        public async Task<KudosBasketDTO> GetKudosBasketWidgetAsync(UserAndOrganizationDTO userAndOrganization)
         {
-            return _kudosBasketsDbSet
+            return await _kudosBasketsDbSet
                 .Include(b => b.KudosLogs)
-                .Where(b => b.OrganizationId == userAndOrganization.OrganizationId
-                    && b.IsActive)
+                .Where(b => b.OrganizationId == userAndOrganization.OrganizationId && b.IsActive)
                 .Select(MapKudosBasketToDto())
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
         }
 
-        public KudosBasketDTO GetKudosBasket(UserAndOrganizationDTO userAndOrganization)
+        public async Task<KudosBasketDTO> GetKudosBasketAsync(UserAndOrganizationDTO userAndOrganization)
         {
-            var kudosBasket = _kudosBasketsDbSet
+            var kudosBasket = await _kudosBasketsDbSet
                 .Include(b => b.KudosLogs)
                 .Where(b => b.OrganizationId == userAndOrganization.OrganizationId)
                 .Select(MapKudosBasketToDto())
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
 
             _kudosBasketValidator.CheckIfThereIsNoBasketYet(kudosBasket);
 
             return kudosBasket;
         }
 
-        public void DeleteKudosBasket(UserAndOrganizationDTO userAndOrganization)
+        public async Task DeleteKudosBasketAsync(UserAndOrganizationDTO userAndOrganization)
         {
-            var foundBasket = _kudosBasketsDbSet.First(basket => basket.OrganizationId == userAndOrganization.OrganizationId);
+            var foundBasket = await _kudosBasketsDbSet.FirstAsync(basket => basket.OrganizationId == userAndOrganization.OrganizationId);
 
             foundBasket.IsActive = false;
             foundBasket.Modified = DateTime.UtcNow;
@@ -112,13 +112,12 @@ namespace Shrooms.Domain.Services.KudosBaskets
             _uow.SaveChanges(false);
 
             _kudosBasketsDbSet.Remove(foundBasket);
-            _uow.SaveChanges(false);
+            await _uow.SaveChangesAsync(false);
         }
 
-        public void EditKudosBasket(KudosBasketEditDTO editedBasket)
+        public async void EditKudosBasketAsync(KudosBasketEditDTO editedBasket)
         {
-            var basketToEdit = _kudosBasketsDbSet
-                .First(basket => basket.Id == editedBasket.Id);
+            var basketToEdit = await _kudosBasketsDbSet.FirstAsync(basket => basket.Id == editedBasket.Id);
 
             basketToEdit.Title = editedBasket.Title;
             basketToEdit.Description = editedBasket.Description;
@@ -126,26 +125,27 @@ namespace Shrooms.Domain.Services.KudosBaskets
             basketToEdit.Modified = DateTime.UtcNow;
             basketToEdit.ModifiedBy = editedBasket.UserId;
 
-            _uow.SaveChanges();
+            await _uow.SaveChangesAsync();
         }
 
-        public void MakeDonation(KudosBasketDonationDTO donation)
+        public async Task MakeDonationAsync(KudosBasketDonationDTO donation)
         {
-            lock (_donateLock)
+            await _donateLock.WaitAsync();
+
+            try
             {
-                var user = _usersDbSet
-                    .First(usr => usr.Id == donation.UserId);
-                var basket = _kudosBasketsDbSet
+                var user = await _usersDbSet.FirstAsync(usr => usr.Id == donation.UserId);
+
+                var basket = await _kudosBasketsDbSet
                     .Include(b => b.KudosLogs)
-                    .First(b => b.OrganizationId == donation.OrganizationId);
+                    .FirstAsync(b => b.OrganizationId == donation.OrganizationId);
 
                 _kudosBasketValidator.CheckIfBasketIsActive(basket);
                 _kudosBasketValidator.CheckIfUserHasEnoughKudos(user.RemainingKudos, donation.DonationAmount);
 
-                var otherType = _kudosTypesDbSet
-                    .First(type => type.Type == KudosTypeEnum.Other);
-                var minusType = _kudosTypesDbSet
-                    .First(type => type.Type == KudosTypeEnum.Minus);
+                var otherType = await _kudosTypesDbSet.FirstAsync(type => type.Type == KudosTypeEnum.Other);
+
+                var minusType = await _kudosTypesDbSet.FirstAsync(type => type.Type == KudosTypeEnum.Minus);
 
                 var logComment = string.Format(Resources.Widgets.KudosBasket.KudosBasket.KudosBasketDonationComment, basket.Title);
 
@@ -155,13 +155,17 @@ namespace Shrooms.Domain.Services.KudosBaskets
                 _kudosLogsDbSet.Add(minusLog);
                 basket.KudosLogs.Add(plusLog);
 
-                _uow.SaveChanges(false);
+                await _uow.SaveChangesAsync(false);
 
-                _kudosService.UpdateProfileKudosAsync(user, donation);
+                await _kudosService.UpdateProfileKudosAsync(user, donation);
+            }
+            finally
+            {
+                _donateLock.Release();
             }
         }
 
-        private KudosLog CreateKudosLogForBasket(KudosBasketDonationDTO donation, KudosType kudosType, string logComment, string userId)
+        private static KudosLog CreateKudosLogForBasket(KudosBasketDonationDTO donation, KudosType kudosType, string logComment, string userId)
         {
             var timestamp = DateTime.UtcNow;
             var kudosLog = new KudosLog
@@ -184,13 +188,14 @@ namespace Shrooms.Domain.Services.KudosBaskets
 
         private List<KudosBasketLogDTO> MapKudosLogsToDto(IOrderedEnumerable<KudosLog> kudosLogs)
         {
-            var kudosLogsDto = kudosLogs.Select(log => new KudosBasketLogDTO
+            var kudosLogsDto = kudosLogs?.Select(log => new KudosBasketLogDTO
             {
                 DonationAmount = log.Points,
                 DonationDate = log.Created,
                 Donator = MapUserToDto(log.Employee)
             })
             .ToList();
+
             return kudosLogsDto;
         }
 

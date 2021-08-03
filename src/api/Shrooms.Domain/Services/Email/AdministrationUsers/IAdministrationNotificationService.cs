@@ -1,13 +1,14 @@
-﻿using Shrooms.Contracts.DataTransferObjects;
+﻿using System.Threading.Tasks;
+using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.DataLayer.EntityModels.Models;
 
 namespace Shrooms.Domain.Services.Email.AdministrationUsers
 {
     public interface IAdministrationNotificationService
     {
-        void SendConfirmedNotificationEmail(string userEmail, UserAndOrganizationDTO userAndOrg);
+        Task SendConfirmedNotificationEmailAsync(string userEmail, UserAndOrganizationDTO userAndOrg);
 
-        void NotifyAboutNewUser(ApplicationUser newUser, int orgId);
+        Task NotifyAboutNewUserAsync(ApplicationUser newUser, int orgId);
 
         void SendUserResetPasswordEmail(ApplicationUser user, string token, string organizationName);
 

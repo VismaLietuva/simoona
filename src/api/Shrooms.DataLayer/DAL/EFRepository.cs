@@ -3,10 +3,11 @@ using System.Data.Entity;
 using System.Linq;
 using System.Linq.Dynamic;
 using System.Linq.Expressions;
-using PagedList;
+using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
+using X.PagedList;
 
 namespace Shrooms.DataLayer.DAL
 {
@@ -104,19 +105,23 @@ namespace Shrooms.DataLayer.DAL
             return queryableSet;
         }
 
-        public virtual IPagedList<TEntity> GetPaged(Expression<Func<TEntity, bool>> filter = null, int maxResults = 0, string orderBy = null, string includeProperties = "",
-            int? page = null, int pageSize = 30)
+        public virtual Task<IPagedList<TEntity>> GetPagedAsync(Expression<Func<TEntity, bool>> filter = null,
+            int maxResults = 0,
+            string orderBy = null,
+            string includeProperties = "",
+            int? page = null,
+            int pageSize = 30)
         {
             var queryableSet = Get(filter, maxResults, orderBy, includeProperties);
 
             page = page ?? 1;
 
-            return queryableSet.ToPagedList(page.Value, pageSize);
+            return queryableSet.ToPagedListAsync(page.Value, pageSize);
         }
 
-        public virtual TEntity GetByID(object id)
+        public virtual async Task<TEntity> GetByIdAsync(object id)
         {
-            return _dbSet.Find(id);
+            return await _dbSet.FindAsync(id);
         }
 
         public virtual void Insert(TEntity entity)
@@ -125,7 +130,7 @@ namespace Shrooms.DataLayer.DAL
             {
                 var type = entity.GetType();
                 var property = type.GetProperty(ClaimOrganizationId);
-                property.SetValue(entity, OrganizationId);
+                property?.SetValue(entity, OrganizationId);
             }
 
             _dbSet.Add(entity);
@@ -137,9 +142,9 @@ namespace Shrooms.DataLayer.DAL
             _context.Entry(entity).State = EntityState.Modified;
         }
 
-        public virtual void DeleteById(object id)
+        public virtual async Task DeleteByIdAsync(object id)
         {
-            TEntity entityToDelete = GetByID(id);
+            var entityToDelete = await GetByIdAsync(id);
             Delete(entityToDelete);
         }
 

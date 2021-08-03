@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using NSubstitute;
 using NUnit.Framework;
@@ -30,8 +33,8 @@ namespace Shrooms.Tests.DomainService
         private IPictureService _pictureService;
         private IAdministrationNotificationService _administrationUsersNotificationService;
         private IKudosService _kudosService;
-        private IDbSet<ApplicationUser> _userDbSet;
-        private IDbSet<Wall> _wallsDbSet;
+        private DbSet<ApplicationUser> _userDbSet;
+        private DbSet<Wall> _wallsDbSet;
 
         [SetUp]
         public void TestInitializer()
@@ -48,10 +51,10 @@ namespace Shrooms.Tests.DomainService
             _administrationUsersNotificationService = Substitute.For<IAdministrationNotificationService>();
             _kudosService = Substitute.For<IKudosService>();
 
-            _userDbSet = Substitute.For<IDbSet<ApplicationUser>>();
+            _userDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IDbAsyncEnumerable<ApplicationUser>>();
             uow2.GetDbSet<ApplicationUser>().Returns(_userDbSet);
 
-            _wallsDbSet = Substitute.For<IDbSet<Wall>>();
+            _wallsDbSet = Substitute.For<DbSet<Wall>>();
             uow2.GetDbSet<Wall>().Returns(_wallsDbSet);
 
             _userAdministrationValidator = new UserAdministrationValidator();
@@ -103,16 +106,16 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Set_User_Tutorial_Status_To_Completed()
+        public async Task Should_Set_User_Tutorial_Status_To_Completed()
         {
             var users = new List<ApplicationUser>
             {
                 new ApplicationUser { Id = "user1", EmploymentDate = new DateTime(2018, 5, 15) }
             };
 
-            _userDbSet.SetDbSetData(users);
+            _userDbSet.SetDbSetDataForAsync(users);
 
-            _administrationUsersService.SetUserTutorialStatusToComplete("user1");
+            await _administrationUsersService.SetUserTutorialStatusToCompleteAsync("user1");
 
             Assert.IsTrue(users[0].IsTutorialComplete);
         }

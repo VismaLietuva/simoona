@@ -15,8 +15,8 @@ namespace Shrooms.Domain.Services.Organizations
 {
     public class OrganizationService : IOrganizationService
     {
-        private readonly IDbSet<Organization> _organizationsDbSet;
-        private readonly IDbSet<ApplicationUser> _usersDbSet;
+        private readonly DbSet<Organization> _organizationsDbSet;
+        private readonly DbSet<ApplicationUser> _usersDbSet;
         private readonly IRoleService _roleService;
         private readonly IUnitOfWork2 _uow;
 
@@ -28,12 +28,12 @@ namespace Shrooms.Domain.Services.Organizations
             _uow = uow;
         }
 
-        public Organization GetOrganizationById(int id)
+        public async Task<Organization> GetOrganizationByIdAsync(int id)
         {
-            return _organizationsDbSet.Find(id);
+            return await _organizationsDbSet.FindAsync(id);
         }
 
-#pragma warning disable S1449 //EF does does not understand Equals(invarient) or ToLowerInvarient()
+#pragma warning disable S1449 //EF does does not understand Equals(invariant) or ToLowerInvariant()
         public Organization GetOrganizationByName(string organizationName)
         {
             return _organizationsDbSet
@@ -60,10 +60,9 @@ namespace Shrooms.Domain.Services.Organizations
         }
 #pragma warning restore S1449
 
-        public Organization GetUserOrganization(ApplicationUser user)
+        public async Task<Organization> GetUserOrganizationAsync(ApplicationUser user)
         {
-            return _usersDbSet
-                .Find(user.Id).Organization;
+            return (await _usersDbSet.FindAsync(user.Id))?.Organization;
         }
 
         public async Task<bool> IsOrganizationHostValidAsync(string email, string requestedOrganizationName)
@@ -82,43 +81,41 @@ namespace Shrooms.Domain.Services.Organizations
             return true;
         }
 
-        public bool RequiresUserConfirmation(int organizationId)
+        public async Task<bool> RequiresUserConfirmationAsync(int organizationId)
         {
-            return _organizationsDbSet
+            return await _organizationsDbSet
                 .Where(o => o.Id == organizationId)
                 .Select(o => o.RequiresUserConfirmation)
-                .First();
+                .FirstAsync();
         }
 
-        public UserDto GetManagingDirector(int organizationId)
+        public async Task<UserDto> GetManagingDirectorAsync(int organizationId)
         {
-            var managingDirector = _usersDbSet
-                .Where(x => x.OrganizationId == organizationId &&
-                            x.IsManagingDirector)
-
-                // Don't change to string interpolation, since EF won't handle project it to SQL
+            var managingDirector = await _usersDbSet
+                .Where(x => x.OrganizationId == organizationId && x.IsManagingDirector)
                 .Select(x => new UserDto
                 {
                     UserId = x.Id,
+                    // Don't change to string interpolation, since EF won't handle project it to SQL
                     FullName = x.FirstName + " " + x.LastName
                 })
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
 
             return managingDirector;
         }
 
-        public void SetManagingDirector(string userId, UserAndOrganizationDTO userAndOrganizationDTO)
+        public async Task SetManagingDirectorAsync(string userId, UserAndOrganizationDTO userAndOrganizationDTO)
         {
-            if (!_roleService.HasRole(userId, Contracts.Constants.Roles.Manager))
+            if (!await _roleService.HasRoleAsync(userId, Contracts.Constants.Roles.Manager))
             {
                 throw new ValidationException(ErrorCodes.UserIsNotAManager, "User need to have manager role to become a managing director");
             }
 
-            var managingDirectors = _usersDbSet
+            var managingDirectors = await _usersDbSet
                 .Include(x => x.Roles)
                 .Where(x => x.OrganizationId == userAndOrganizationDTO.OrganizationId)
                 .Where(x => x.IsManagingDirector || x.Id == userId)
-                .ToList();
+                .ToListAsync();
 
             foreach (var currentDirector in managingDirectors.Where(x => x.IsManagingDirector))
             {
@@ -129,7 +126,7 @@ namespace Shrooms.Domain.Services.Organizations
 
             newManagingDirector.IsManagingDirector = true;
 
-            _uow.SaveChanges(userAndOrganizationDTO.UserId);
+            await _uow.SaveChangesAsync(userAndOrganizationDTO.UserId);
         }
 
         private static string GetHostFromEmail(string email)

@@ -66,11 +66,11 @@ namespace Shrooms.Domain.Services.Roles
             return await GetRoleAsync(role => role.Id == roleId, userAndOrganizationDTO.OrganizationId);
         }
 
-        public bool HasRole(string userId, string roleName)
+        public async Task<bool> HasRoleAsync(string userId, string roleName)
         {
-            return _roleDbSet
+            return await _roleDbSet
                 .Include(x => x.Users)
-                .Any(x => x.Name == roleName && x.Users.Any(u => u.UserId == userId));
+                .AnyAsync(x => x.Name == roleName && x.Users.Any(u => u.UserId == userId));
         }
 
         private async Task<RoleDetailsDTO> GetRoleAsync(Expression<Func<ApplicationRole, bool>> roleFilter, int orgId, bool skipPermission = false)

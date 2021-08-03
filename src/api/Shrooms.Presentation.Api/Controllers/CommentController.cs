@@ -163,7 +163,7 @@ namespace Shrooms.Presentation.Api.Controllers
             var userAndOrg = GetUserAndOrganization();
             try
             {
-                _commentService.ToggleLike(id, userAndOrg);
+                _commentService.ToggleLikeAsync(id, userAndOrg);
                 return Ok();
             }
             catch (ValidationException e)

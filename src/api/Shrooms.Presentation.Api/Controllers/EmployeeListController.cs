@@ -5,7 +5,6 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
-using PagedList;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.ViewModels;
@@ -15,6 +14,7 @@ using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.Presentation.Api.Filters;
 using Shrooms.Presentation.WebViewModels.Models;
+using X.PagedList;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
@@ -59,10 +59,9 @@ namespace Shrooms.Presentation.Api.Controllers
 
             var sortQuery = string.IsNullOrEmpty(sort) ? null : $"{sort} {dir}";
 
-            var models = _applicationUserRepository.Get(
-                    includeProperties: includeProperties, filter: filter, orderBy: sortQuery)
+            var models = await _applicationUserRepository.Get(includeProperties: includeProperties, filter: filter, orderBy: sortQuery)
                 .Where(_roleService.ExcludeUsersWithRole(Roles.NewUser))
-                .ToPagedList(page, pageSize);
+                .ToPagedListAsync(page, pageSize);
 
             var employeeListViewModels = _mapper.Map<IEnumerable<ApplicationUser>, IEnumerable<EmployeeListViewModel>>(models);
             var pagedModel = new StaticPagedList<EmployeeListViewModel>(employeeListViewModels, models.PageNumber, models.PageSize,

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.Constants;
@@ -21,24 +22,26 @@ namespace Shrooms.Tests.DomainService
 {
     internal class CommentServiceTests
     {
-        private IDbSet<Post> _postsDbSet;
-        private IDbSet<ApplicationUser> _usersDbSet;
+        private DbSet<Post> _postsDbSet;
+        private DbSet<ApplicationUser> _usersDbSet;
+        private DbSet<Comment> _commentsDbSet;
+        private DbSet<WallModerator> _wallModeratorsDbSet;
         private ISystemClock _systemClock;
-        private IDbSet<Comment> _commentsDbSet;
-        private CommentService _commentService;
         private IPermissionService _permissionService;
-        private IDbSet<WallModerator> _wallModeratorsDbSet;
-        private string _userId = Guid.NewGuid().ToString();
+        private ICommentService _commentService;
+
+        private readonly string _userId = Guid.NewGuid().ToString();
 
         [SetUp]
         public void TestInitializer()
         {
             var uow = Substitute.For<IUnitOfWork2>();
 
-            _postsDbSet = uow.MockDbSet<Post>();
-            _usersDbSet = uow.MockDbSet<ApplicationUser>();
-            _commentsDbSet = uow.MockDbSet<Comment>();
-            _wallModeratorsDbSet = uow.MockDbSet<WallModerator>();
+            _postsDbSet = uow.MockDbSetForAsync<Post>();
+            _usersDbSet = uow.MockDbSetForAsync<ApplicationUser>();
+            _commentsDbSet = uow.MockDbSetForAsync<Comment>();
+            _wallModeratorsDbSet = uow.MockDbSetForAsync<WallModerator>();
+            _ = uow.MockDbSetForAsync<PostWatcher>();
 
             _systemClock = Substitute.For<ISystemClock>();
             _permissionService = Substitute.For<IPermissionService>();
@@ -62,8 +65,8 @@ namespace Shrooms.Tests.DomainService
                 }
             };
 
-            _commentsDbSet.SetDbSetData(new List<Comment> { comment }.AsQueryable());
-            _commentService.ToggleLike(1, new UserAndOrganizationDTO { UserId = "user1", OrganizationId = 2 });
+            _commentsDbSet.SetDbSetDataForAsync(new List<Comment> { comment }.AsQueryable());
+            _commentService.ToggleLikeAsync(1, new UserAndOrganizationDTO { UserId = "user1", OrganizationId = 2 });
 
             Assert.AreEqual("user1", _commentsDbSet.First().Likes.First().UserId);
         }
@@ -71,14 +74,14 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public void Should_Throw_If_There_Is_No_Comment_To_Be_Liked()
         {
-            _commentsDbSet.SetDbSetData(new List<Comment>().AsQueryable());
+            _commentsDbSet.SetDbSetDataForAsync(new List<Comment>().AsQueryable());
 
-            var ex = Assert.Throws<ValidationException>(() => _commentService.ToggleLike(1, new UserAndOrganizationDTO { UserId = "user1", OrganizationId = 2 }));
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _commentService.ToggleLikeAsync(1, new UserAndOrganizationDTO { UserId = "user1", OrganizationId = 2 }));
             Assert.AreEqual(ErrorCodes.ContentDoesNotExist, ex.ErrorCode);
         }
 
         [Test]
-        public void Should_Unlike_Post()
+        public async Task Should_Unlike_Post()
         {
             var comment = new Comment
             {
@@ -93,21 +96,21 @@ namespace Shrooms.Tests.DomainService
                 }
             };
 
-            _commentsDbSet.SetDbSetData(new List<Comment> { comment }.AsQueryable());
-            _commentService.ToggleLike(1, new UserAndOrganizationDTO { UserId = "user1", OrganizationId = 2 });
+            _commentsDbSet.SetDbSetDataForAsync(new List<Comment> { comment }.AsQueryable());
+            await _commentService.ToggleLikeAsync(1, new UserAndOrganizationDTO { UserId = "user1", OrganizationId = 2 });
 
-            Assert.AreEqual(0, _commentsDbSet.First().Likes.Count);
+            Assert.AreEqual(0, (await _commentsDbSet.FirstAsync()).Likes.Count);
         }
 
         [Test]
-        public void Should_Create_New_Comment()
+        public async Task Should_Create_New_Comment()
         {
             // Setup
             var posts = new List<Post>
             {
                 new Post { Id = 1, Wall = new Wall { OrganizationId = 2 } }
             };
-            _postsDbSet.SetDbSetData(posts.AsQueryable());
+            _postsDbSet.SetDbSetDataForAsync(posts.AsQueryable());
 
             var users = new List<ApplicationUser>
             {
@@ -116,7 +119,7 @@ namespace Shrooms.Tests.DomainService
                     Id = _userId
                 }
             };
-            _usersDbSet.SetDbSetData(users.AsQueryable());
+            _usersDbSet.SetDbSetDataForAsync(users.AsQueryable());
 
             var expectedDateTime = DateTime.UtcNow;
             _systemClock.UtcNow.Returns(expectedDateTime);
@@ -131,15 +134,13 @@ namespace Shrooms.Tests.DomainService
             };
 
             // Act
-            _commentService.CreateCommentAsync(newCommentDto);
+            await _commentService.CreateCommentAsync(newCommentDto);
 
             // Assert
             _commentsDbSet.Received(1)
-                .Add(Arg.Is<Comment>(c =>
-                    c.AuthorId == _userId &&
-                    c.MessageBody == "test" &&
-                    c.PostId == 1));
-            Assert.AreEqual(_postsDbSet.First().LastActivity, expectedDateTime);
+                .Add(Arg.Is<Comment>(c => c.AuthorId == _userId && c.MessageBody == "test" && c.PostId == 1));
+
+            Assert.AreEqual((await _postsDbSet.FirstAsync()).LastActivity, expectedDateTime);
         }
 
         [Test]
@@ -152,13 +153,13 @@ namespace Shrooms.Tests.DomainService
             {
                 new Comment { Id = 1, AuthorId = "user1", Post = post }
             };
-            _commentsDbSet.SetDbSetData(comments.AsQueryable());
+            _commentsDbSet.SetDbSetDataForAsync(comments.AsQueryable());
 
             var wallModerators = new List<WallModerator>
             {
                 new WallModerator { WallId = wall.Id, UserId = "user2" }
             };
-            _wallModeratorsDbSet.SetDbSetData(wallModerators.AsQueryable());
+            _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
             var editCommentDto = new EditCommentDTO
             {
@@ -172,7 +173,7 @@ namespace Shrooms.Tests.DomainService
 
             // Act
             // Assert
-            Assert.DoesNotThrow(() => _commentService.EditCommentAsync(editCommentDto));
+            Assert.DoesNotThrowAsync(async () => await _commentService.EditCommentAsync(editCommentDto));
         }
 
         [Test]
@@ -185,13 +186,13 @@ namespace Shrooms.Tests.DomainService
             {
                 new Comment { Id = 1, AuthorId = "user1", Post = post }
             };
-            _commentsDbSet.SetDbSetData(comments.AsQueryable());
+            _commentsDbSet.SetDbSetDataForAsync(comments.AsQueryable());
 
             var wallModerators = new List<WallModerator>
             {
                 new WallModerator { WallId = wall.Id, UserId = "user2" }
             };
-            _wallModeratorsDbSet.SetDbSetData(wallModerators.AsQueryable());
+            _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
             var editCommentDto = new EditCommentDTO
             {
@@ -205,7 +206,7 @@ namespace Shrooms.Tests.DomainService
 
             // Act
             // Assert
-            Assert.DoesNotThrow(() => _commentService.EditCommentAsync(editCommentDto));
+            Assert.DoesNotThrowAsync(async () => await _commentService.EditCommentAsync(editCommentDto));
         }
 
         [Test]
@@ -218,13 +219,13 @@ namespace Shrooms.Tests.DomainService
             {
                 new Comment { Id = 1, AuthorId = "user1", Post = post }
             };
-            _commentsDbSet.SetDbSetData(comments.AsQueryable());
+            _commentsDbSet.SetDbSetDataForAsync(comments.AsQueryable());
 
             var wallModerators = new List<WallModerator>
             {
                 new WallModerator { WallId = wall.Id, UserId = "user2" }
             };
-            _wallModeratorsDbSet.SetDbSetData(wallModerators.AsQueryable());
+            _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
             var editCommentDto = new EditCommentDTO
             {
@@ -238,7 +239,7 @@ namespace Shrooms.Tests.DomainService
 
             // Act
             // Assert
-            Assert.Throws<UnauthorizedException>(() => _commentService.EditCommentAsync(editCommentDto));
+            Assert.ThrowsAsync<UnauthorizedException>(async () => await _commentService.EditCommentAsync(editCommentDto));
         }
 
         [Test]
@@ -251,7 +252,8 @@ namespace Shrooms.Tests.DomainService
             {
                 new Comment { Id = 1, AuthorId = "user1", Post = post }
             };
-            _commentsDbSet.SetDbSetData(comments.AsQueryable());
+
+            _commentsDbSet.SetDbSetDataForAsync(comments.AsQueryable());
 
             var editCommentDto = new EditCommentDTO
             {
@@ -263,7 +265,7 @@ namespace Shrooms.Tests.DomainService
 
             // Act
             // Assert
-            var ex = Assert.Throws<ValidationException>(() => _commentService.EditCommentAsync(editCommentDto));
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _commentService.EditCommentAsync(editCommentDto));
             Assert.AreEqual(ErrorCodes.ContentDoesNotExist, ex.ErrorCode);
         }
 
@@ -277,7 +279,8 @@ namespace Shrooms.Tests.DomainService
             {
                 new Comment { Id = 1, AuthorId = "user1", Post = post }
             };
-            _commentsDbSet.SetDbSetData(comments.AsQueryable());
+
+            _commentsDbSet.SetDbSetDataForAsync(comments.AsQueryable());
 
             var userOrg = new UserAndOrganizationDTO
             {
@@ -287,7 +290,7 @@ namespace Shrooms.Tests.DomainService
 
             // Act
             // Assert
-            var ex = Assert.Throws<ValidationException>(() => _commentService.DeleteCommentAsync(2, userOrg));
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _commentService.DeleteCommentAsync(2, userOrg));
             Assert.AreEqual(ErrorCodes.ContentDoesNotExist, ex.ErrorCode);
         }
 
@@ -301,13 +304,13 @@ namespace Shrooms.Tests.DomainService
             {
                 new Comment { Id = 1, AuthorId = "user1", Post = post }
             };
-            _commentsDbSet.SetDbSetData(comments.AsQueryable());
+            _commentsDbSet.SetDbSetDataForAsync(comments.AsQueryable());
 
             var wallModerators = new List<WallModerator>
             {
                 new WallModerator { WallId = wall.Id, UserId = "user2" }
             };
-            _wallModeratorsDbSet.SetDbSetData(wallModerators.AsQueryable());
+            _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
             var userOrg = new UserAndOrganizationDTO
             {
@@ -319,7 +322,7 @@ namespace Shrooms.Tests.DomainService
 
             // Act
             // Assert
-            Assert.Throws<UnauthorizedException>(() => _commentService.DeleteCommentAsync(1, userOrg));
+            Assert.ThrowsAsync<UnauthorizedException>(async () => await _commentService.DeleteCommentAsync(1, userOrg));
         }
 
         [Test]
@@ -332,13 +335,13 @@ namespace Shrooms.Tests.DomainService
             {
                 new Comment { Id = 1, AuthorId = "user1", Post = post }
             };
-            _commentsDbSet.SetDbSetData(comments.AsQueryable());
+            _commentsDbSet.SetDbSetDataForAsync(comments.AsQueryable());
 
             var wallModerators = new List<WallModerator>
             {
                 new WallModerator { WallId = wall.Id, UserId = "user2" }
             };
-            _wallModeratorsDbSet.SetDbSetData(wallModerators.AsQueryable());
+            _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
             var userOrg = new UserAndOrganizationDTO
             {
@@ -350,7 +353,7 @@ namespace Shrooms.Tests.DomainService
 
             // Act
             // Assert
-            Assert.DoesNotThrow(() => _commentService.DeleteCommentAsync(1, userOrg));
+            Assert.DoesNotThrowAsync(async () => await _commentService.DeleteCommentAsync(1, userOrg));
         }
 
         [Test]
@@ -363,13 +366,13 @@ namespace Shrooms.Tests.DomainService
             {
                 new Comment { Id = 1, AuthorId = "user1", Post = post }
             };
-            _commentsDbSet.SetDbSetData(comments.AsQueryable());
+            _commentsDbSet.SetDbSetDataForAsync(comments.AsQueryable());
 
             var wallModerators = new List<WallModerator>
             {
                 new WallModerator { WallId = wall.Id, UserId = "user2" }
             };
-            _wallModeratorsDbSet.SetDbSetData(wallModerators.AsQueryable());
+            _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
             var userOrg = new UserAndOrganizationDTO
             {
@@ -381,7 +384,7 @@ namespace Shrooms.Tests.DomainService
 
             // Act
             // Assert
-            Assert.DoesNotThrow(() => _commentService.DeleteCommentAsync(1, userOrg));
+            Assert.DoesNotThrowAsync(async () => await _commentService.DeleteCommentAsync(1, userOrg));
         }
     }
 }

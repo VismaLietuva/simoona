@@ -7,13 +7,13 @@ namespace Shrooms.Domain.Services.Organizations
 {
     public interface IOrganizationService
     {
-        Organization GetOrganizationById(int id);
+        Task<Organization> GetOrganizationByIdAsync(int id);
 
-        bool RequiresUserConfirmation(int organizationId);
+        Task<bool> RequiresUserConfirmationAsync(int organizationId);
 
         Organization GetOrganizationByName(string organizationName);
 
-        Organization GetUserOrganization(ApplicationUser user);
+        Task<Organization> GetUserOrganizationAsync(ApplicationUser user);
 
         Task<string> GetOrganizationHostNameAsync(string organizationName);
 
@@ -21,7 +21,7 @@ namespace Shrooms.Domain.Services.Organizations
 
         Task<bool> IsOrganizationHostValidAsync(string email, string organizationName);
 
-        UserDto GetManagingDirector(int organizationId);
-        void SetManagingDirector(string userId, UserAndOrganizationDTO userAndOrganizationDTO);
+        Task<UserDto> GetManagingDirectorAsync(int organizationId);
+        Task SetManagingDirectorAsync(string userId, UserAndOrganizationDTO userAndOrganizationDTO);
     }
 }

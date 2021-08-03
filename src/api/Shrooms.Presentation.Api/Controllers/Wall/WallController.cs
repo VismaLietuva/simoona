@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
-using PagedList;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall;
@@ -19,6 +18,7 @@ using Shrooms.Domain.Services.Wall;
 using Shrooms.Presentation.Api.Filters;
 using Shrooms.Presentation.Api.Hubs;
 using Shrooms.Presentation.WebViewModels.Models.Wall;
+using X.PagedList;
 
 namespace Shrooms.Presentation.Api.Controllers.Wall
 {
@@ -177,7 +177,7 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
                 var mappedPosts = _mapper.Map<IEnumerable<WallPostViewModel>>(wallPosts);
                 var pagedViewModel = new PagedWallViewModel<WallPostViewModel>
                 {
-                    PagedList = mappedPosts.ToPagedList(1, WebApiConstants.DefaultPageSize),
+                    PagedList = await mappedPosts.ToPagedListAsync(1, WebApiConstants.DefaultPageSize),
                     PageSize = WebApiConstants.DefaultPageSize
                 };
                 return Ok(pagedViewModel);
@@ -199,7 +199,7 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
             var mappedPosts = _mapper.Map<IEnumerable<WallPostViewModel>>(wallPosts);
             var pagedViewModel = new PagedWallViewModel<WallPostViewModel>
             {
-                PagedList = mappedPosts.ToPagedList(1, WebApiConstants.DefaultPageSize),
+                PagedList = await mappedPosts.ToPagedListAsync(1, WebApiConstants.DefaultPageSize),
                 PageSize = WebApiConstants.DefaultPageSize
             };
             return Ok(pagedViewModel);
@@ -221,7 +221,7 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
             var mappedPosts = _mapper.Map<IList<WallPostViewModel>>(foundWallPosts);
             var pagedViewModel = new PagedWallViewModel<WallPostViewModel>
             {
-                PagedList = mappedPosts.ToPagedList(1, WebApiConstants.DefaultPageSize),
+                PagedList = await mappedPosts.ToPagedListAsync(1, WebApiConstants.DefaultPageSize),
                 PageSize = WebApiConstants.DefaultPageSize
             };
             return Ok(pagedViewModel);

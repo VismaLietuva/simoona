@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
@@ -27,14 +29,14 @@ namespace Shrooms.Presentation.Api.Controllers
         #region CRUD
 
         [PermissionAuthorize(Permission = AdministrationPermissions.RoomType)]
-        public override HttpResponseMessage Post([FromBody] RoomTypePostViewModel crudViewModel)
+        public override async Task<HttpResponseMessage> Post([FromBody] RoomTypePostViewModel crudViewModel)
         {
             if (crudViewModel == null)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest);
             }
 
-            var foundRoomType = GetByIdOrName(crudViewModel.Name, crudViewModel.Id);
+            var foundRoomType = await GetByIdOrNameAsync(crudViewModel.Name, crudViewModel.Id);
 
             if (foundRoomType != null)
             {
@@ -44,15 +46,15 @@ namespace Shrooms.Presentation.Api.Controllers
             var roomType = _mapper.Map<RoomTypePostViewModel, RoomType>(crudViewModel);
 
             _repository.Insert(roomType);
-            _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
 
             return Request.CreateResponse(HttpStatusCode.Created);
         }
 
         [PermissionAuthorize(Permission = AdministrationPermissions.RoomType)]
-        public override HttpResponseMessage Put([FromBody] RoomTypePostViewModel crudViewModel)
+        public override async Task<HttpResponseMessage> Put([FromBody] RoomTypePostViewModel crudViewModel)
         {
-            var roomTypeModel = GetByIdOrName(crudViewModel.Name, crudViewModel.Id, "Rooms");
+            var roomTypeModel = await GetByIdOrNameAsync(crudViewModel.Name, crudViewModel.Id, "Rooms");
 
             if (roomTypeModel == null)
             {
@@ -62,15 +64,15 @@ namespace Shrooms.Presentation.Api.Controllers
             _mapper.Map(crudViewModel, roomTypeModel);
 
             _repository.Update(roomTypeModel);
-            _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
 
             return Request.CreateResponse(HttpStatusCode.Created);
         }
 
         [PermissionAuthorize(Permission = AdministrationPermissions.RoomType)]
-        public override HttpResponseMessage Delete(int id)
+        public override async Task<HttpResponseMessage> Delete(int id)
         {
-            var roomType = _repository.Get(maxResults: 1, filter: r => r.Id.Equals(id), includeProperties: "Rooms").FirstOrDefault();
+            var roomType = await _repository.Get(maxResults: 1, filter: r => r.Id.Equals(id), includeProperties: "Rooms").FirstOrDefaultAsync();
 
             if (roomType == null)
             {
@@ -79,39 +81,43 @@ namespace Shrooms.Presentation.Api.Controllers
 
             if (roomType.Rooms != null)
             {
-                foreach (Room r in roomType.Rooms)
+                foreach (var r in roomType.Rooms)
                 {
                     r.RoomType = null;
                     r.RoomTypeId = null;
                 }
             }
 
-            _repository.DeleteById(roomType.Id);
-            _unitOfWork.Save();
+            await _repository.DeleteByIdAsync(roomType.Id);
+            await _unitOfWork.SaveAsync();
 
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         [PermissionAuthorize(Permission = AdministrationPermissions.RoomType)]
-        public override PagedViewModel<RoomTypeViewModel> GetPaged(string includeProperties = null, int page = 1, int pageSize = WebApiConstants.DefaultPageSize,
-            string sort = null, string dir = "", string s = "")
+        public override Task<PagedViewModel<RoomTypeViewModel>> GetPaged(string includeProperties = null,
+            int page = 1,
+            int pageSize = WebApiConstants.DefaultPageSize,
+            string sort = null,
+            string dir = "",
+            string s = "")
         {
-            return GetFilteredPaged(includeProperties, page, pageSize, sort, dir, p => p.Name.Contains(s));
+            return GetFilteredPagedAsync(includeProperties, page, pageSize, sort, dir, p => p.Name.Contains(s));
         }
 
         #endregion CRUD
 
-        private RoomType GetByIdOrName(string name, int id = -1, string includeProperties = "")
+        private async Task<RoomType> GetByIdOrNameAsync(string name, int id = -1, string includeProperties = "")
         {
-            var res = _repository.Get(f => f.Name.Equals(name, StringComparison.OrdinalIgnoreCase) || f.Id.Equals(id), 1, includeProperties: includeProperties).FirstOrDefault();
+            var result = await _repository.Get(f => f.Name.Equals(name, StringComparison.OrdinalIgnoreCase) || f.Id.Equals(id), 1, includeProperties: includeProperties).FirstOrDefaultAsync();
 
-            return res;
+            return result;
         }
 
         [PermissionAuthorize(Permission = AdministrationPermissions.RoomType)]
-        public IEnumerable<RoomTypeViewModel> GetByFloor(int floorId, string includeProperties = "")
+        public async Task<IEnumerable<RoomTypeViewModel>> GetByFloor(int floorId, string includeProperties = "")
         {
-            var model = _repository.Get(t => t.Rooms.Any(r => r.FloorId == floorId), includeProperties: includeProperties);
+            var model = await _repository.Get(t => t.Rooms.Any(r => r.FloorId == floorId), includeProperties: includeProperties).ToListAsync();
             return _mapper.Map<IEnumerable<RoomType>, IEnumerable<RoomTypeViewModel>>(model);
         }
     }

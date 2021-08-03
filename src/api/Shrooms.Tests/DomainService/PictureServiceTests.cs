@@ -16,7 +16,7 @@ namespace Shrooms.Tests.DomainService
     public class PictureServiceTests
     {
         private IPictureService _pictureService;
-        private IDbSet<Organization> _organizationsDbSet;
+        private DbSet<Organization> _organizationsDbSet;
 
         [SetUp]
         public void Init()

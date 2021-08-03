@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity.EntityFramework;
@@ -20,16 +21,16 @@ namespace Shrooms.Tests.DomainService
     {
         private IPermissionService _permissionService;
         private ICustomCache<string, IList<string>> _permissionCache;
-        private IDbSet<ApplicationUser> _usersDbSet;
-        private IDbSet<Permission> _permissionsDbSet;
+        private DbSet<ApplicationUser> _usersDbSet;
+        private DbSet<Permission> _permissionsDbSet;
 
         [SetUp]
         public void TestInitializer()
         {
             var uow = Substitute.For<IUnitOfWork2>();
 
-            _usersDbSet = Substitute.For<IDbSet<ApplicationUser>>();
-            _permissionsDbSet = Substitute.For<IDbSet<Permission>>();
+            _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IDbAsyncEnumerable<ApplicationUser>>();
+            _permissionsDbSet = Substitute.For<DbSet<Permission>, IQueryable<Permission>, IDbAsyncEnumerable<Permission>>();
 
             uow.GetDbSet<ApplicationUser>().Returns(_usersDbSet);
             uow.GetDbSet<Permission>().Returns(_permissionsDbSet);
@@ -134,7 +135,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_That_User_Is_Permitted()
+        public async Task Should_Return_That_User_Is_Permitted()
         {
             var userAndOrg = new UserAndOrganizationDTO
             {
@@ -144,13 +145,13 @@ namespace Shrooms.Tests.DomainService
 
             MockUserPermission();
 
-            var hasPermission = _permissionService.UserHasPermissionAsync(userAndOrg, "TEST1_BASIC");
+            var hasPermission = await _permissionService.UserHasPermissionAsync(userAndOrg, "TEST1_BASIC");
 
             Assert.AreEqual(true, hasPermission);
         }
 
         [Test]
-        public void Should_Return_That_User_Is_Not_Permitted()
+        public async Task Should_Return_That_User_Is_Not_Permitted()
         {
             var userAndOrg = new UserAndOrganizationDTO
             {
@@ -160,7 +161,7 @@ namespace Shrooms.Tests.DomainService
 
             MockUserPermission();
 
-            var hasPermission = _permissionService.UserHasPermissionAsync(userAndOrg, "TEST1_BASIC");
+            var hasPermission = await _permissionService.UserHasPermissionAsync(userAndOrg, "TEST1_BASIC");
 
             Assert.AreEqual(false, hasPermission);
         }
@@ -203,7 +204,7 @@ namespace Shrooms.Tests.DomainService
                 }
             }.AsQueryable();
 
-            _permissionsDbSet.SetDbSetData(permissions);
+            _permissionsDbSet.SetDbSetDataForAsync(permissions);
         }
 
         private void MockPermissions()
@@ -333,7 +334,7 @@ namespace Shrooms.Tests.DomainService
                 }
             }.AsQueryable();
 
-            _permissionsDbSet.SetDbSetData(permissions);
+            _permissionsDbSet.SetDbSetDataForAsync(permissions);
         }
     }
 }

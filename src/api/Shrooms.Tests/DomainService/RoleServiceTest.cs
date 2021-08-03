@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity.EntityFramework;
@@ -21,16 +22,16 @@ namespace Shrooms.Tests.DomainService
     {
         private IRoleService _roleService;
         private IPermissionService _permissionService;
-        private IDbSet<ApplicationUser> _usersDbSet;
-        private IDbSet<ApplicationRole> _roleDbSet;
+        private DbSet<ApplicationUser> _usersDbSet;
+        private DbSet<ApplicationRole> _roleDbSet;
 
         [SetUp]
         public void TestInitializer()
         {
             var uow = Substitute.For<IUnitOfWork2>();
 
-            _usersDbSet = Substitute.For<IDbSet<ApplicationUser>>();
-            _roleDbSet = Substitute.For<IDbSet<ApplicationRole>>();
+            _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IDbAsyncEnumerable<ApplicationUser>>();
+            _roleDbSet = Substitute.For<DbSet<ApplicationRole>, IQueryable<ApplicationRole>, IDbAsyncEnumerable<ApplicationRole>>();
 
             uow.GetDbSet<ApplicationUser>().Returns(_usersDbSet);
             uow.GetDbSet<ApplicationRole>().Returns(_roleDbSet);
@@ -165,8 +166,8 @@ namespace Shrooms.Tests.DomainService
                     }
                 });
 
-            _roleDbSet.SetDbSetData(roles);
-            _usersDbSet.SetDbSetData(users);
+            _roleDbSet.SetDbSetDataForAsync(roles);
+            _usersDbSet.SetDbSetDataForAsync(users);
         }
 
         private void MockRolesForAutocomplete()
@@ -193,7 +194,7 @@ namespace Shrooms.Tests.DomainService
                 }
             }.AsQueryable();
 
-            _roleDbSet.SetDbSetData(roles);
+            _roleDbSet.SetDbSetDataForAsync(roles);
         }
     }
 }

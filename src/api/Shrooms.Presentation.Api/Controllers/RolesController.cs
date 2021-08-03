@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
 using Microsoft.AspNet.Identity;
-using PagedList;
 using Shrooms.Authentification.Membership;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
@@ -24,6 +23,7 @@ using Shrooms.Domain.Services.Roles;
 using Shrooms.Presentation.Api.Filters;
 using Shrooms.Presentation.WebViewModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.Roles;
+using X.PagedList;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
@@ -238,7 +238,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [Route("GetPaged")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Role)]
-        public PagedViewModel<RoleViewModel> GetPaged(int page = 1,
+        public async Task<PagedViewModel<RoleViewModel>> GetPaged(int page = 1,
             int pageSize = WebApiConstants.DefaultPageSize,
             string s = "",
             string sort = "Name",
@@ -251,7 +251,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             var rolesViewModel = _mapper.Map<IEnumerable<ApplicationRole>, IEnumerable<RoleViewModel>>(roles);
 
-            var pagedList = rolesViewModel.ToPagedList(page, pageSize);
+            var pagedList = await rolesViewModel.ToPagedListAsync(page, pageSize);
 
             var pagedModel = new PagedViewModel<RoleViewModel>
             {
@@ -264,8 +264,6 @@ namespace Shrooms.Presentation.Api.Controllers
             return pagedModel;
         }
 
-        [Route("GetRoles")]
-        [PermissionAuthorize(Permission = AdministrationPermissions.Role)]
         private IEnumerable<ApplicationRole> GetRoles(string sortString, string includeProperties, string s)
         {
             if (string.IsNullOrEmpty(s))

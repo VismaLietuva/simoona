@@ -20,6 +20,6 @@ namespace Shrooms.Domain.Services.Roles
 
         Task<IList<string>> GetAdministrationRoleEmailsAsync(int orgId);
 
-        bool HasRole(string userId, string roleName);
+        Task<bool> HasRoleAsync(string userId, string roleName);
     }
 }

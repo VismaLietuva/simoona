@@ -12,8 +12,6 @@ namespace Shrooms.Contracts.DAL
         T GetDbContextAs<T>()
             where T : class, IDbContext;
 
-        void Save();
-
         Task SaveAsync();
     }
 }

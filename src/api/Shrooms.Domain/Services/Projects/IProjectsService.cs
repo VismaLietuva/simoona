@@ -25,6 +25,6 @@ namespace Shrooms.Domain.Services.Projects
 
         Task AddProjectsToUserAsync(string userId, IEnumerable<int> projectIds, UserAndOrganizationDTO userOrg);
 
-        bool ValidateManagerId(string userId, string managerId);
+        Task<bool> ValidateManagerIdAsync(string userId, string managerId);
     }
 }

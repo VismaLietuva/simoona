@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
@@ -18,13 +19,13 @@ namespace Shrooms.Tests.DomainService
     public class MonitorServiceTests
     {
         private IMonitorService _monitorService;
-        private IDbSet<Monitor> _monitorsDbSet;
+        private DbSet<Monitor> _monitorsDbSet;
         private IUnitOfWork2 _uow;
 
         [SetUp]
         public void TestInitializer()
         {
-            _monitorsDbSet = Substitute.For<IDbSet<Monitor>>();
+            _monitorsDbSet = Substitute.For<DbSet<Monitor>, IQueryable<Monitor>, IDbAsyncEnumerable<Monitor>>();
 
             _uow = Substitute.For<IUnitOfWork2>();
 
@@ -39,7 +40,7 @@ namespace Shrooms.Tests.DomainService
             MockExternalLinks();
 
             var result = _monitorService.GetMonitorList(2).ToList();
-            Assert.AreEqual(2, result.Count());
+            Assert.AreEqual(2, result.Count);
             Assert.AreEqual("Test1", result.First().Name);
         }
 
@@ -169,7 +170,7 @@ namespace Shrooms.Tests.DomainService
                 }
             }.AsQueryable();
 
-            _monitorsDbSet.SetDbSetData(monitors);
+            _monitorsDbSet.SetDbSetDataForAsync(monitors);
         }
     }
 }

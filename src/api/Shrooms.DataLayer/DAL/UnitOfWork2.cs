@@ -15,7 +15,7 @@ namespace Shrooms.DataLayer.DAL
 
         public string ConnectionName => _context.ConnectionName;
 
-        public IDbSet<T> GetDbSet<T>()
+        public DbSet<T> GetDbSet<T>()
             where T : class
         {
             return _context.Set<T>();

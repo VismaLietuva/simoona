@@ -104,19 +104,19 @@ namespace Shrooms.Tests.Controllers.WebApi
         }
 
         [Test]
-        public void Wall_JoinWall_Should_Return_Bad_Request()
+        public async Task Wall_JoinWall_Should_Return_Bad_Request()
         {
-            var wallId = -1;
+            const int wallId = -1;
 
-            var response = _wallController.JoinWall(wallId);
+            var response = await _wallController.JoinWall(wallId);
 
             Assert.IsInstanceOf<BadRequestResult>(response);
         }
 
         [Test]
-        public void Wall_JoinWall_Should_Return_View_Model()
+        public async Task Wall_JoinWall_Should_Return_View_Model()
         {
-            var wallId = 1;
+            const int wallId = 1;
             var userDto = new ApplicationUserMinimalDto
             {
                 Id = "Id"
@@ -124,7 +124,7 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             _wallService.JoinOrLeaveWallAsync(wallId, null, null, 0, false).ReturnsForAnyArgs(userDto);
 
-            var response = _wallController.JoinWall(wallId);
+            var response = await _wallController.JoinWall(wallId);
 
             Assert.IsInstanceOf<OkNegotiatedContentResult<ApplicationUserMinimalViewModel>>(response);
         }

@@ -1,16 +1,18 @@
 ﻿using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
 using MoreLinq;
-using PagedList;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Presentation.Api.Filters;
 using Shrooms.Presentation.WebViewModels.Models.Exam;
+using X.PagedList;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
@@ -29,25 +31,25 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Exam)]
-        public ExamViewModel Get(int id, string includeProperties = "")
+        public async Task<ExamViewModel> Get(int id, string includeProperties = "")
         {
-            var examModel = _examRepository.Get(e => e.Id == id, includeProperties: includeProperties).FirstOrDefault();
+            var examModel = await _examRepository.Get(e => e.Id == id, includeProperties: includeProperties).FirstOrDefaultAsync();
             var examViewModel = _mapper.Map<Exam, ExamViewModel>(examModel);
             return examViewModel;
         }
 
         [ValidationFilter]
         [PermissionAuthorize(Permission = BasicPermissions.Exam)]
-        public HttpResponseMessage Post(IList<ExamPostViewModel> models)
+        public async Task<HttpResponseMessage> Post(IList<ExamPostViewModel> models)
         {
             foreach (var model in models)
             {
-                var exam = _examRepository.Get(e => model.Number == e.Number && model.Title == e.Title).FirstOrDefault();
+                var exam = await _examRepository.Get(e => model.Number == e.Number && model.Title == e.Title).FirstOrDefaultAsync();
                 if (exam == null)
                 {
                     exam = _mapper.Map<Exam>(model);
                     _examRepository.Insert(exam);
-                    _unitOfWork.Save();
+                    await _unitOfWork.SaveAsync();
                 }
 
                 model.Id = exam.Id;
@@ -58,41 +60,41 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Exam)]
-        public IEnumerable<ExamAutoCompleteViewModel> GetExamForAutoComplete(string s, int pageSize = WebApiConstants.DefaultAutocompleteListSize)
+        public async Task<IEnumerable<ExamAutoCompleteViewModel>> GetExamForAutoComplete(string s, int pageSize = WebApiConstants.DefaultAutocompleteListSize)
         {
             var start = s.ToLower();
-            var exams = _examRepository.Get(e => e.Title.Contains(start))
+            var exams = await _examRepository.Get(e => e.Title.Contains(start))
                    .OrderBy(e => e.Title)
                    .DistinctBy(d => d.Title)
-                   .ToPagedList(1, pageSize);
+                   .ToPagedListAsync(1, pageSize);
 
             return _mapper.Map<IEnumerable<ExamAutoCompleteViewModel>>(exams);
         }
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Exam)]
-        public IEnumerable<ExamAutoCompleteViewModel> GetExamNumbersForAutoComplete(string title, string s, int pageSize = WebApiConstants.DefaultAutocompleteListSize)
+        public async Task<IEnumerable<ExamAutoCompleteViewModel>> GetExamNumbersForAutoComplete(string title, string s, int pageSize = WebApiConstants.DefaultAutocompleteListSize)
         {
             var start = s.ToLower();
-            var exams = _examRepository.Get(e => e.Title == title && e.Number.ToLower().Contains(start))
+            var exams = await _examRepository.Get(e => e.Title == title && e.Number.ToLower().Contains(start))
                   .OrderBy(e => e.Number)
                   .DistinctBy(e => e.Number)
-                  .ToPagedList(1, pageSize);
+                  .ToPagedListAsync(1, pageSize);
 
             return _mapper.Map<IEnumerable<ExamAutoCompleteViewModel>>(exams);
         }
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Exam)]
-        public IEnumerable<ExamAutoCompleteViewModel> GetExamForAutoCompleteByTitleAndNumber(string title, string number, int pageSize = WebApiConstants.DefaultAutocompleteListSize)
+        public async Task<IEnumerable<ExamAutoCompleteViewModel>> GetExamForAutoCompleteByTitleAndNumber(string title, string number, int pageSize = WebApiConstants.DefaultAutocompleteListSize)
         {
-            number = number ?? string.Empty;
-            title = title ?? string.Empty;
+            number ??= string.Empty;
+            title ??= string.Empty;
 
-            var exams = _examRepository.Get(e => e.Title.Contains(title) && e.Number.Contains(number))
+            var exams = await _examRepository.Get(e => e.Title.Contains(title) && e.Number.Contains(number))
                   .OrderBy(e => e.Number)
                   .DistinctBy(e => e.Number)
-                  .ToPagedList(1, pageSize);
+                  .ToPagedListAsync(1, pageSize);
 
             return _mapper.Map<IEnumerable<ExamAutoCompleteViewModel>>(exams);
         }

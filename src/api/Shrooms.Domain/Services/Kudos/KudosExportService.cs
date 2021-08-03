@@ -2,6 +2,7 @@
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Dynamic;
+using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
@@ -25,9 +26,9 @@ namespace Shrooms.Domain.Services.Kudos
             _excelBuilder = excelBuilder;
         }
 
-        public byte[] ExportToExcel(KudosLogsFilterDTO filter)
+        public async Task<byte[]> ExportToExcelAsync(KudosLogsFilterDTO filter)
         {
-            var kudosLogs = _kudosLogsDbSet
+            var kudos = await _kudosLogsDbSet
                 .Include(log => log.Employee)
                 .Where(log =>
                     log.OrganizationId == filter.OrganizationId &&
@@ -36,20 +37,21 @@ namespace Shrooms.Domain.Services.Kudos
                 .Where(KudosServiceHelper.UserFilter(filter.SearchUserId))
                 .GroupJoin(_userDbSet, log => log.CreatedBy, u => u.Id, KudosServiceHelper.MapKudosLogsToDto())
                 .OrderBy(string.Concat(filter.SortBy, " ", filter.SortOrder))
-                .AsEnumerable()
-                .Select(x => new List<object>
-                {
-                    x.Sender.FullName,
-                    x.Receiver.FullName,
-                    x.Type.Name,
-                    x.Multiplier,
-                    x.Points,
-                    x.Created,
-                    x.Comment,
-                    x.Status,
-                    x.Type.Value,
-                    x.RejectionMessage
-                });
+                .ToListAsync();
+
+            var kudosLogs = kudos.Select(x => new List<object>
+            {
+                x.Sender.FullName,
+                x.Receiver.FullName,
+                x.Type.Name,
+                x.Multiplier,
+                x.Points,
+                x.Created,
+                x.Comment,
+                x.Status,
+                x.Type.Value,
+                x.RejectionMessage
+            });
 
             var header = new List<string>
             {
@@ -65,10 +67,7 @@ namespace Shrooms.Domain.Services.Kudos
                 Resources.Models.Kudos.Kudos.ExportColumnRejectionMessage
             };
 
-            _excelBuilder.AddNewWorksheet(
-                BusinessLayerConstants.KudosLogExcelSheetName,
-                header,
-                kudosLogs);
+            _excelBuilder.AddNewWorksheet(BusinessLayerConstants.KudosLogExcelSheetName, header, kudosLogs);
 
             return _excelBuilder.GenerateByteArray();
         }

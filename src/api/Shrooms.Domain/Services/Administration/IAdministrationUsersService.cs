@@ -11,36 +11,36 @@ namespace Shrooms.Domain.Services.Administration
 {
     public interface IAdministrationUsersService
     {
-        bool UserEmailExists(string email);
+        Task<bool> UserEmailExistsAsync(string email);
 
         byte[] GetAllUsersExcel();
 
-        void ConfirmNewUser(string userId, UserAndOrganizationDTO userAndOrg);
+        Task ConfirmNewUserAsync(string userId, UserAndOrganizationDTO userAndOrg);
 
-        bool HasExistingExternalLogin(string email, string loginProvider);
+        Task<bool> HasExistingExternalLoginAsync(string email, string loginProvider);
 
-        Task<IdentityResult> CreateNewUserWithExternalLogin(ExternalLoginInfo info, string requestedOrganization);
+        Task<IdentityResult> CreateNewUserWithExternalLoginAsync(ExternalLoginInfo info, string requestedOrganization);
 
-        Task<IdentityResult> CreateNewUser(ApplicationUser user, string password, string requestedOrganization);
+        Task<IdentityResult> CreateNewUserAsync(ApplicationUser user, string password, string requestedOrganization);
 
-        IEnumerable<AdministrationUserDTO> GetAllUsers(string sortQuery, string search, FilterDTO[] filter, string includeProperties);
+        Task<IEnumerable<AdministrationUserDTO>> GetAllUsersAsync(string sortQuery, string search, FilterDTO[] filter, string includeProperties);
 
-        bool UserIsSoftDeleted(string email);
+        Task<bool> UserIsSoftDeletedAsync(string email);
 
-        void RestoreUser(string email);
+        Task RestoreUserAsync(string email);
 
-        Task AddProviderImage(string userId, ClaimsIdentity externalIdentity);
+        Task AddProviderImageAsync(string userId, ClaimsIdentity externalIdentity);
 
-        void NotifyAboutNewUser(ApplicationUser user, int orgId);
+        Task NotifyAboutNewUserAsync(ApplicationUser user, int orgId);
 
-        void SetUserTutorialStatusToComplete(string userId);
+        Task SetUserTutorialStatusToCompleteAsync(string userId);
 
-        bool GetUserTutorialStatus(string userId);
+        Task<bool> GetUserTutorialStatusAsync(string userId);
 
-        void AddProviderEmail(string userId, string provider, string email);
+        Task AddProviderEmailAsync(string userId, string provider, string email);
 
-        Task SendUserPasswordResetEmail(ApplicationUser user, string organizationName);
+        Task SendUserPasswordResetEmailAsync(ApplicationUser user, string organizationName);
 
-        Task SendUserVerificationEmail(ApplicationUser user, string organizationName);
+        Task SendUserVerificationEmailAsync(ApplicationUser user, string organizationName);
     }
 }

@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Excel;
 using NSubstitute;
 using NUnit.Framework;
@@ -19,8 +21,8 @@ namespace Shrooms.Tests.DomainService
     public class KudosExportServiceTests
     {
         private IUnitOfWork2 _uow;
-        private IDbSet<KudosLog> _kudosDbSet;
-        private IDbSet<ApplicationUser> _usersDbSet;
+        private DbSet<KudosLog> _kudosDbSet;
+        private DbSet<ApplicationUser> _usersDbSet;
         private IKudosExportService _kudosExportService;
         private ExcelBuilder _excelBuilder;
 
@@ -28,12 +30,12 @@ namespace Shrooms.Tests.DomainService
         public void TestInitializer()
         {
             _uow = Substitute.For<IUnitOfWork2>();
-            _kudosDbSet = Substitute.For<IDbSet<KudosLog>>();
-            _kudosDbSet.SetDbSetData(MockKudos());
+            _kudosDbSet = Substitute.For<DbSet<KudosLog>, IQueryable<KudosLog>, IDbAsyncEnumerable<KudosLog>>();
+            _kudosDbSet.SetDbSetDataForAsync(MockKudos());
             _uow.GetDbSet<KudosLog>().Returns(_kudosDbSet);
 
-            _usersDbSet = Substitute.For<IDbSet<ApplicationUser>>();
-            _usersDbSet.SetDbSetData(MockUsers());
+            _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IDbAsyncEnumerable<ApplicationUser>>();
+            _usersDbSet.SetDbSetDataForAsync(MockUsers());
             _uow.GetDbSet<ApplicationUser>().Returns(_usersDbSet);
 
             _excelBuilder = new ExcelBuilder();
@@ -44,7 +46,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Kudos_Should_Return_Excel_File()
+        public async Task Kudos_Should_Return_Excel_File()
         {
             var filter = new KudosLogsFilterDTO
             {
@@ -55,9 +57,9 @@ namespace Shrooms.Tests.DomainService
                 SortOrder = "desc"
             };
 
-            var stream = _kudosExportService.ExportToExcel(filter);
+            var stream = await _kudosExportService.ExportToExcelAsync(filter);
 
-            using (IExcelDataReader excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
+            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
             {
                 excelReader.IsFirstRowAsColumnNames = true;
                 var excelData = excelReader.AsDataSet();
@@ -77,7 +79,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Kudos_Should_Return_Filtered_Excel_File()
+        public async Task Kudos_Should_Return_Filtered_Excel_File()
         {
             var filter = new KudosLogsFilterDTO
             {
@@ -88,9 +90,9 @@ namespace Shrooms.Tests.DomainService
                 SortOrder = "desc"
             };
 
-            var stream = _kudosExportService.ExportToExcel(filter);
+            var stream = await _kudosExportService.ExportToExcelAsync(filter);
 
-            using (IExcelDataReader excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
+            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
             {
                 excelReader.IsFirstRowAsColumnNames = true;
                 var excelData = excelReader.AsDataSet();

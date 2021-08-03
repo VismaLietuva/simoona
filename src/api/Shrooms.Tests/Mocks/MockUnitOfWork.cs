@@ -8,7 +8,7 @@ namespace Shrooms.Tests.Mocks
 {
     public class MockUnitOfWork : IUnitOfWork
     {
-        private bool _disposed = false;
+        private bool _disposed;
         private readonly MockDbContext _mockDbContext;
         private readonly Dictionary<Type, object> _repositories;
 
@@ -18,7 +18,7 @@ namespace Shrooms.Tests.Mocks
             _repositories = new Dictionary<Type, object>();
         }
 
-        public IRepository<TEntity> GetRepository<TEntity>(int organziationId = 2)
+        public IRepository<TEntity> GetRepository<TEntity>(int organizationId = 2)
             where TEntity : class
         {
             if (_repositories.Keys.Contains(typeof(TEntity)))
@@ -30,10 +30,6 @@ namespace Shrooms.Tests.Mocks
 
             _repositories.Add(typeof(TEntity), repository);
             return repository;
-        }
-
-        public void Save()
-        {
         }
 
         public Task SaveAsync()

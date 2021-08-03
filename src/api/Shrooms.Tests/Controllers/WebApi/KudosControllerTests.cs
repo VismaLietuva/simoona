@@ -69,7 +69,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         }
 
         [Test]
-        public void Kudos_GetKudosLog_Should_Return_View_Model()
+        public async Task Kudos_GetKudosLog_Should_Return_View_Model()
         {
             // Arrange
             var filter = new KudosLogsFilterViewModel
@@ -96,10 +96,10 @@ namespace Shrooms.Tests.Controllers.WebApi
             _mapper.Map<KudosLogsFilterViewModel, KudosLogsFilterDTO>(filter)
                 .Returns(dto);
 
-            _kudosService.GetKudosLogs(null).ReturnsForAnyArgs(entries);
+            _kudosService.GetKudosLogsAsync(null).ReturnsForAnyArgs(entries);
 
             // Act
-            var response = _kudosController.GetKudosLogs(filter);
+            var response = await _kudosController.GetKudosLogs(filter);
 
             // Assert
             Assert.IsInstanceOf<PagedViewModel<KudosLogViewModel>>(response);

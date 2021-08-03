@@ -7,7 +7,7 @@ namespace Shrooms.Contracts.DAL
     {
         string ConnectionName { get; }
 
-        IDbSet<T> GetDbSet<T>()
+        DbSet<T> GetDbSet<T>()
             where T : class;
 
         void SaveChanges(bool useMetaTracking = true);

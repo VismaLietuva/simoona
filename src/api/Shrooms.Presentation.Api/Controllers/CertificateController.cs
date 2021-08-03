@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
 using MoreLinq;
-using PagedList;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Presentation.Api.Filters;
 using Shrooms.Presentation.WebViewModels.Models.Certificate;
+using X.PagedList;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
@@ -24,10 +24,7 @@ namespace Shrooms.Presentation.Api.Controllers
         private readonly IRepository<Exam> _examRepository;
         private readonly IRepository<Certificate> _certificateRepository;
 
-        public CertificateController(
-            IMapper mapper,
-            IUnitOfWork unitOfWork,
-            IPermissionService permissionService)
+        public CertificateController(IMapper mapper, IUnitOfWork unitOfWork, IPermissionService permissionService)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -40,7 +37,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Certificate)]
-        public IEnumerable<CertificateAutoCompleteViewModel> GetForAutocomplete(string s, int pageSize = WebApiConstants.DefaultAutocompleteListSize)
+        public async Task<IEnumerable<CertificateAutoCompleteViewModel>> GetForAutocomplete(string s, int pageSize = WebApiConstants.DefaultAutocompleteListSize)
         {
             if (string.IsNullOrWhiteSpace(s))
             {
@@ -48,10 +45,11 @@ namespace Shrooms.Presentation.Api.Controllers
             }
 
             var start = s.ToLower();
-            var certificates = _certificateRepository.Get(c => c.Name.ToLower().Contains(start), includeProperties: "Exams")
+            var certificates = await _certificateRepository.Get(c => c.Name.ToLower().Contains(start), includeProperties: "Exams")
                 .OrderBy(c => c.Name)
                 .DistinctBy(c => c.Name)
-                .ToPagedList(1, pageSize);
+                .ToPagedListAsync(1, pageSize);
+
             return _mapper.Map<IEnumerable<CertificateAutoCompleteViewModel>>(certificates);
         }
 
@@ -109,7 +107,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 return BadRequest();
             }
 
-            var model = _certificateRepository.GetByID(id);
+            var model = await _certificateRepository.GetByIdAsync(id);
             if (model == null)
             {
                 return NotFound();

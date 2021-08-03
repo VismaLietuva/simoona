@@ -50,8 +50,7 @@ namespace Shrooms.Domain.Services.Administration
         private readonly IKudosService _kudosService;
         private readonly IUnitOfWork2 _uow;
 
-        public AdministrationUsersService(
-            IMapper mapper,
+        public AdministrationUsersService(IMapper mapper,
             IUnitOfWork unitOfWork,
             IUnitOfWork2 uow,
             IUserAdministrationValidator userAdministrationValidator,
@@ -101,24 +100,22 @@ namespace Shrooms.Domain.Services.Administration
             }
         }
 
-        public bool UserIsSoftDeleted(string email)
+        public async Task<bool> UserIsSoftDeletedAsync(string email)
         {
-            var shroomsContext = _context as ShroomsDbContext;
-
-            if (shroomsContext == null)
+            if (_context is not ShroomsDbContext shroomsContext)
             {
                 throw new ArgumentNullException(nameof(shroomsContext));
             }
 
-            var user = shroomsContext
+            var user = await shroomsContext
                 .Users
                 .SqlQuery("SELECT * FROM [dbo].[AspNetUsers] WHERE Email = @email", new SqlParameter("@email", email))
-                .SingleOrDefault();
+                .SingleOrDefaultAsync();
 
             return user != null;
         }
 
-        public void RestoreUser(string email)
+        public async Task RestoreUserAsync(string email)
         {
             var shroomsContext = _context as ShroomsDbContext;
 
@@ -127,15 +124,14 @@ namespace Shrooms.Domain.Services.Administration
                 throw new ArgumentNullException(nameof(shroomsContext));
             }
 
-            shroomsContext
-                .Database
-                .ExecuteSqlCommand("UPDATE [dbo].[AspNetUsers] SET[IsDeleted] = '0' WHERE Email = @email", new SqlParameter("@email", email));
+            await shroomsContext.Database
+                .ExecuteSqlCommandAsync("UPDATE [dbo].[AspNetUsers] SET[IsDeleted] = '0' WHERE Email = @email", new SqlParameter("@email", email));
 
-            var user = _userManager.FindByEmail(email);
+            var user = await _userManager.FindByEmailAsync(email);
             AddNewUserRoles(user.Id);
         }
 
-        public async Task AddProviderImage(string userId, ClaimsIdentity externalIdentity)
+        public async Task AddProviderImageAsync(string userId, ClaimsIdentity externalIdentity)
         {
             var user = _usersDbSet.First(u => u.Id == userId);
             if (user.PictureId == null && externalIdentity.FindFirst("picture") != null)
@@ -146,48 +142,48 @@ namespace Shrooms.Domain.Services.Administration
             }
         }
 
-        public void NotifyAboutNewUser(ApplicationUser user, int orgId)
+        public async Task NotifyAboutNewUserAsync(ApplicationUser user, int orgId)
         {
-            _notificationService.NotifyAboutNewUser(user, orgId);
+            await _notificationService.NotifyAboutNewUserAsync(user, orgId);
         }
 
-        public async Task SendUserPasswordResetEmail(ApplicationUser user, string organizationName)
+        public async Task SendUserPasswordResetEmailAsync(ApplicationUser user, string organizationName)
         {
             var token = await _userManager.GeneratePasswordResetTokenAsync(user.Id);
 
             _notificationService.SendUserResetPasswordEmail(user, token, organizationName);
         }
 
-        public async Task SendUserVerificationEmail(ApplicationUser user, string orgazinationName)
+        public async Task SendUserVerificationEmailAsync(ApplicationUser user, string orgazinationName)
         {
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user.Id);
 
             _notificationService.SendUserVerificationEmail(user, token, orgazinationName);
         }
 
-        public void ConfirmNewUser(string userId, UserAndOrganizationDTO userAndOrg)
+        public async Task ConfirmNewUserAsync(string userId, UserAndOrganizationDTO userAndOrg)
         {
-            var applicationUser = _usersDbSet.First(user => user.Id == userId);
+            var applicationUser = await _usersDbSet.FirstAsync(user => user.Id == userId);
             _userAdministrationValidator.CheckIfEmploymentDateIsSet(applicationUser.EmploymentDate);
 
-            var hasRole = _userManager.IsInRole(userId, Contracts.Constants.Roles.FirstLogin);
+            var hasRole = await _userManager.IsInRoleAsync(userId, Contracts.Constants.Roles.FirstLogin);
             _userAdministrationValidator.CheckIfUserHasFirstLoginRole(hasRole);
 
-            var addRoleResult = _userManager.AddToRole(userId, Contracts.Constants.Roles.User);
-            var removeRoleResult = _userManager.RemoveFromRole(userId, Contracts.Constants.Roles.NewUser);
+            var addRoleResult = await _userManager.AddToRoleAsync(userId, Contracts.Constants.Roles.User);
+            var removeRoleResult = await _userManager.RemoveFromRoleAsync(userId, Contracts.Constants.Roles.NewUser);
 
             _userAdministrationValidator.CheckForAddingRemovingRoleErrors(addRoleResult.Errors.ToList(), removeRoleResult.Errors.ToList());
-            _notificationService.SendConfirmedNotificationEmail(applicationUser.Email, userAndOrg);
+            await _notificationService.SendConfirmedNotificationEmailAsync(applicationUser.Email, userAndOrg);
 
             SetTutorialStatus(applicationUser, false);
 
-            SetWelcomeKudos(applicationUser);
+            await SetWelcomeKudosAsync(applicationUser);
 
             AddUserToMainWall(userId);
-            _uow.SaveChanges(userAndOrg.UserId);
+            await _uow.SaveChangesAsync(userAndOrg.UserId);
         }
 
-        public async Task<IdentityResult> CreateNewUserWithExternalLogin(ExternalLoginInfo info, string requestedOrganization)
+        public async Task<IdentityResult> CreateNewUserWithExternalLoginAsync(ExternalLoginInfo info, string requestedOrganization)
         {
             var externalIdentity = info.ExternalIdentity;
             var userSettings =
@@ -225,7 +221,7 @@ namespace Shrooms.Domain.Services.Administration
             return result;
         }
 
-        public async Task<IdentityResult> CreateNewUser(ApplicationUser user, string password, string requestedOrganization)
+        public async Task<IdentityResult> CreateNewUserAsync(ApplicationUser user, string password, string requestedOrganization)
         {
             var userSettings =
                 _organizationDbSet.Where(o => o.ShortName == requestedOrganization)
@@ -253,14 +249,14 @@ namespace Shrooms.Domain.Services.Administration
 
             AddNewUserRoles(user.Id);
 
-            await SendUserVerificationEmail(user, requestedOrganization);
+            await SendUserVerificationEmailAsync(user, requestedOrganization);
 
             return result;
         }
 
-        public bool HasExistingExternalLogin(string email, string loginProvider)
+        public async Task<bool> HasExistingExternalLoginAsync(string email, string loginProvider)
         {
-            var user = _userManager.FindByEmail(email);
+            var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
                 return false;
@@ -270,19 +266,19 @@ namespace Shrooms.Domain.Services.Administration
             return hasLogin;
         }
 
-        public bool UserEmailExists(string email)
+        public async Task<bool> UserEmailExistsAsync(string email)
         {
-            var user = _userManager.FindByEmail(email);
+            var user = await _userManager.FindByEmailAsync(email);
             return user != null;
         }
 
-        public IEnumerable<AdministrationUserDTO> GetAllUsers(string sortQuery, string search, FilterDTO[] filterModel, string includeProperties)
+        public async Task<IEnumerable<AdministrationUserDTO>> GetAllUsersAsync(string sortQuery, string search, FilterDTO[] filterModel, string includeProperties)
         {
             includeProperties = $"{includeProperties}{(includeProperties != string.Empty ? "," : string.Empty)}Roles,Skills,JobPosition,Projects";
 
-            var applicationUsers = _applicationUserRepository
+            var applicationUsers = await _applicationUserRepository
                 .Get(GenerateQuery(search), orderBy: sortQuery.Contains(Contracts.Constants.Roles.NewUser) ? string.Empty : sortQuery, includeProperties: includeProperties)
-                .ToList();
+                .ToListAsync();
 
             var administrationUsers = _mapper.Map<IList<ApplicationUser>, IList<AdministrationUserDTO>>(applicationUsers);
 
@@ -301,21 +297,21 @@ namespace Shrooms.Domain.Services.Administration
             return administrationUsers;
         }
 
-        public void SetUserTutorialStatusToComplete(string userId)
+        public async Task SetUserTutorialStatusToCompleteAsync(string userId)
         {
-            var applicationUser = _usersDbSet.First(user => user.Id == userId);
+            var applicationUser = await _usersDbSet.FirstAsync(user => user.Id == userId);
             SetTutorialStatus(applicationUser, true);
-            _uow.SaveChanges(userId);
+            await _uow.SaveChangesAsync(userId);
         }
 
-        public bool GetUserTutorialStatus(string userId)
+        public async Task<bool> GetUserTutorialStatusAsync(string userId)
         {
-            return _usersDbSet.First(user => user.Id == userId).IsTutorialComplete;
+            return (await _usersDbSet.FirstAsync(user => user.Id == userId)).IsTutorialComplete;
         }
 
-        public void AddProviderEmail(string userId, string provider, string email)
+        public async Task AddProviderEmailAsync(string userId, string provider, string email)
         {
-            var user = _usersDbSet.First(u => u.Id == userId);
+            var user = await _usersDbSet.FirstAsync(u => u.Id == userId);
             if (provider == AuthenticationConstants.GoogleLoginProvider)
             {
                 user.GoogleEmail = email;
@@ -326,12 +322,12 @@ namespace Shrooms.Domain.Services.Administration
                 user.FacebookEmail = email;
             }
 
-            _uow.SaveChanges(userId);
+            await _uow.SaveChangesAsync(userId);
         }
 
-        private void SetWelcomeKudos(ApplicationUser applicationUser)
+        private async Task SetWelcomeKudosAsync(ApplicationUser applicationUser)
         {
-            var welcomeKudosDTO = _kudosService.GetWelcomeKudos();
+            var welcomeKudosDTO = await _kudosService.GetWelcomeKudosAsync();
 
             if (welcomeKudosDTO.WelcomeKudosAmount <= 0)
             {

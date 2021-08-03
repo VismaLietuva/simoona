@@ -87,7 +87,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [PermissionAuthorize(BasicPermissions.ApplicationUser)]
         public async Task<IHttpActionResult> GetWallNotifications()
         {
-            var settings = await _userService.GetWallNotificationSettings(GetUserAndOrganization());
+            var settings = await _userService.GetWallNotificationSettingsAsync(GetUserAndOrganization());
             var mappedsettings = _mapper.Map<UserNotificationsSettingsDto, UserNotificationsSettingsViewModel>(settings);
             return Ok(mappedsettings);
         }
@@ -123,12 +123,11 @@ namespace Shrooms.Presentation.Api.Controllers
         {
             var id = GetUserAndOrganization().UserId;
             var user = await _userService.GetApplicationUserAsync(id);
-            var logins = _userService.GetUserLogins(id);
+            var logins = await _userService.GetUserLoginsAsync(id);
             if (logins == null)
             {
                 return BadRequest();
             }
-
 
             var providers = new List<ProviderViewModel>();
             foreach (var login in logins)
@@ -146,10 +145,10 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpDelete]
         [Route("DeleteLogin")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public IHttpActionResult LoginsUnlink(string providerName)
+        public async Task<IHttpActionResult> LoginsUnlink(string providerName)
         {
             var userId = GetUserAndOrganization().UserId;
-            var logins = _userService.GetUserLogins(userId).ToList();
+            var logins = await _userService.GetUserLoginsAsync(userId);
 
             if (logins.Count > 1)
             {
@@ -157,7 +156,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 {
                     foreach (var login in logins.Where(l => l.LoginProvider == providerName))
                     {
-                        _userService.RemoveLogin(userId, new UserLoginInfo(login.LoginProvider, login.ProviderKey));
+                        await _userService.RemoveLoginAsync(userId, new UserLoginInfo(login.LoginProvider, login.ProviderKey));
                     }
                 }
                 catch (ArgumentException)

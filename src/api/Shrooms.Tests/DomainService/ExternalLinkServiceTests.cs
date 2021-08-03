@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
@@ -18,12 +19,12 @@ namespace Shrooms.Tests.DomainService
     public class ExternalLinkServiceTests
     {
         private IExternalLinkService _externalLinkService;
-        private IDbSet<ExternalLink> _externalLinkDbSet;
+        private DbSet<ExternalLink> _externalLinkDbSet;
 
         [SetUp]
         public void TestInitializer()
         {
-            _externalLinkDbSet = Substitute.For<IDbSet<ExternalLink>>();
+            _externalLinkDbSet = Substitute.For<DbSet<ExternalLink>, IQueryable<ExternalLink>, IDbAsyncEnumerable<ExternalLink>>();
 
             var uow = Substitute.For<IUnitOfWork2>();
 
@@ -38,7 +39,7 @@ namespace Shrooms.Tests.DomainService
             MockExternalLinks();
 
             var result = _externalLinkService.GetAll(2).ToList();
-            Assert.AreEqual(2, result.Count());
+            Assert.AreEqual(2, result.Count);
             Assert.AreEqual("Test1", result.First().Name);
         }
 
@@ -165,7 +166,7 @@ namespace Shrooms.Tests.DomainService
                 }
             };
 
-            _externalLinkDbSet.SetDbSetData(links.AsQueryable());
+            _externalLinkDbSet.SetDbSetDataForAsync(links.AsQueryable());
         }
 
         private void MockExternalLinks()
@@ -195,7 +196,7 @@ namespace Shrooms.Tests.DomainService
                 }
             }.AsQueryable();
 
-            _externalLinkDbSet.SetDbSetData(externalLinks);
+            _externalLinkDbSet.SetDbSetDataForAsync(externalLinks);
         }
     }
 }

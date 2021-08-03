@@ -10,7 +10,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
 
         Task<CommentCreatedDTO> CreateCommentAsync(NewCommentDTO commentDto);
 
-        void ToggleLike(int commentId, UserAndOrganizationDTO userOrg);
+        Task ToggleLikeAsync(int commentId, UserAndOrganizationDTO userOrg);
 
         Task DeleteCommentAsync(int id, UserAndOrganizationDTO userOrg);
 

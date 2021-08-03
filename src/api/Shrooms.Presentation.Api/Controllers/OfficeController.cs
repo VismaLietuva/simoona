@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
 using MoreLinq;
-using PagedList;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.ViewModels;
@@ -13,6 +14,7 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Presentation.Api.Filters;
 using Shrooms.Presentation.WebViewModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.PostModels;
+using X.PagedList;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
@@ -25,18 +27,19 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Office)]
-        public override IEnumerable<OfficeViewModel> GetAll(int maxResults = 0, string orderBy = null, string includeProperties = null)
+        public override Task<IEnumerable<OfficeViewModel>> GetAllAsync(int maxResults = 0, string orderBy = null, string includeProperties = null)
         {
-            return base.GetAll(maxResults, orderBy, includeProperties);
+            return base.GetAllAsync(maxResults, orderBy, includeProperties);
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Office)]
-        public OfficeViewModel GetDefault()
+        public async Task<OfficeViewModel> GetDefault()
         {
-            var office = _mapper.Map<Office, OfficeViewModel>(_repository.Get(o => o.IsDefault).FirstOrDefault());
+            var office = _mapper.Map<Office, OfficeViewModel>(await _repository.Get(o => o.IsDefault).FirstOrDefaultAsync());
+
             if (office == null)
             {
-                office = _mapper.Map<Office, OfficeViewModel>(_repository.Get().FirstOrDefault());
+                office = _mapper.Map<Office, OfficeViewModel>(await _repository.Get().FirstOrDefaultAsync());
             }
 
             return office ?? new OfficeViewModel();
@@ -59,8 +62,12 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [PermissionAuthorize(Permission = AdministrationPermissions.Office)]
-        public override PagedViewModel<OfficeViewModel> GetPaged(string includeProperties = null, int page = 1, int pageSize = WebApiConstants.DefaultPageSize,
-            string sort = null, string dir = "", string s = "")
+        public override async Task<PagedViewModel<OfficeViewModel>> GetPaged(string includeProperties = null,
+            int page = 1,
+            int pageSize = WebApiConstants.DefaultPageSize,
+            string sort = null,
+            string dir = "",
+            string s = "")
         {
             if (sort == "City" || sort == "Country" || sort == "Street" || sort == "Building")
             {
@@ -99,7 +106,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 });
             }));
 
-            var pagedList = officeViewModels.ToPagedList(page, pageSize);
+            var pagedList = await officeViewModels.ToPagedListAsync(page, pageSize);
 
             var pagedModel = new PagedViewModel<OfficeViewModel>
             {
@@ -113,7 +120,7 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [PermissionAuthorize(Permission = AdministrationPermissions.Office)]
-        public override HttpResponseMessage Post([FromBody]OfficePostViewModel model)
+        public override async Task<HttpResponseMessage> Post([FromBody] OfficePostViewModel model)
         {
             if (model == null)
             {
@@ -124,42 +131,42 @@ namespace Shrooms.Presentation.Api.Controllers
 
             if (office.IsDefault)
             {
-                ResetDefaultOffice();
+                await ResetDefaultOfficeAsync();
             }
 
             _repository.Insert(office);
-            _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
 
             return Request.CreateResponse(HttpStatusCode.Created);
         }
 
         [PermissionAuthorize(Permission = AdministrationPermissions.Office)]
-        public override HttpResponseMessage Put([FromBody]OfficePostViewModel viewModel)
+        public override async Task<HttpResponseMessage> Put([FromBody] OfficePostViewModel viewModel)
         {
             if (viewModel == null)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest);
             }
 
-            var model = _repository.GetByID(viewModel.Id);
+            var model = await _repository.GetByIdAsync(viewModel.Id);
             _mapper.Map(viewModel, model);
 
             if (model.IsDefault)
             {
-                ResetDefaultOffice();
-                model.IsDefault = true; // ResetDefaultOffice() in tests case also resets model.IsDefault
+                await ResetDefaultOfficeAsync();
+                model.IsDefault = true;
             }
 
             _repository.Update(model);
-            _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
 
             return Request.CreateResponse(HttpStatusCode.Created);
         }
 
         [PermissionAuthorize(Permission = AdministrationPermissions.Office)]
-        public override HttpResponseMessage Delete(int id)
+        public override async Task<HttpResponseMessage> Delete(int id)
         {
-            var office = _repository.Get(filter: of => of.Id == id, includeProperties: "Floors,Floors.Rooms,Floors.Rooms.ApplicationUsers").FirstOrDefault();
+            var office = await _repository.Get(filter: o => o.Id == id, includeProperties: "Floors,Floors.Rooms,Floors.Rooms.ApplicationUsers").FirstOrDefaultAsync();
 
             if (office == null)
             {
@@ -177,13 +184,14 @@ namespace Shrooms.Presentation.Api.Controllers
             });
 
             _repository.Delete(office);
-            _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
+
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
-        private void ResetDefaultOffice()
+        private async Task ResetDefaultOfficeAsync()
         {
-            _repository.Get(o => o.IsDefault).ForEach(o => o.IsDefault = false);
+            await _repository.Get(o => o.IsDefault).ForEachAsync(o => o.IsDefault = false);
         }
     }
 }

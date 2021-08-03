@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
+using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.DAL;
@@ -20,24 +22,25 @@ namespace Shrooms.Tests.DomainService
 {
     public class KudosBasketServiceTests
     {
-        private IDbSet<KudosLog> _kudosLogsDbSet;
-        private IDbSet<KudosBasket> _kudosBasketDbSet;
+        private DbSet<KudosLog> _kudosLogsDbSet;
+        private DbSet<KudosBasket> _kudosBasketDbSet;
+        private DbSet<ApplicationUser> _usersDbSet;
+        private DbSet<KudosType> _kudosTypesDbSet;
         private KudosBasketService _kudosBasketService;
         private KudosBasketValidator _kudosBasketValidator;
-        private IDbSet<ApplicationUser> _usersDbSet;
-        private IDbSet<KudosType> _kudosTypesDbSet;
         private IKudosService _kudosService;
 
         [SetUp]
         public void TestInitializer()
         {
-            _kudosLogsDbSet = Substitute.For<IDbSet<KudosLog>>();
-            _kudosBasketDbSet = Substitute.For<IDbSet<KudosBasket>>();
-            _usersDbSet = Substitute.For<IDbSet<ApplicationUser>>();
-            _kudosTypesDbSet = Substitute.For<IDbSet<KudosType>>();
-            _usersDbSet.SetDbSetData(MockDonator());
-            _kudosBasketDbSet.SetDbSetData(MockKudosBaskets());
-            _kudosTypesDbSet.SetDbSetData(MockKudosTypes());
+            _kudosLogsDbSet = Substitute.For<DbSet<KudosLog>, IQueryable<KudosLog>, IDbAsyncEnumerable<KudosLog>>();
+            _kudosBasketDbSet = Substitute.For<DbSet<KudosBasket>, IQueryable<KudosBasket>, IDbAsyncEnumerable<KudosBasket>>();
+            _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IDbAsyncEnumerable<ApplicationUser>>();
+            _kudosTypesDbSet = Substitute.For<DbSet<KudosType>, IQueryable<KudosType>, IDbAsyncEnumerable<KudosType>>();
+
+            _kudosBasketDbSet.SetDbSetDataForAsync(MockKudosBaskets());
+            _usersDbSet.SetDbSetDataForAsync(MockDonator());
+            _kudosTypesDbSet.SetDbSetDataForAsync(MockKudosTypes());
 
             var uow = Substitute.For<IUnitOfWork2>();
             uow.GetDbSet<KudosBasket>().Returns(_kudosBasketDbSet);
@@ -46,12 +49,13 @@ namespace Shrooms.Tests.DomainService
             uow.GetDbSet<KudosType>().Returns(_kudosTypesDbSet);
 
             _kudosBasketValidator = new KudosBasketValidator();
+
             var mockValidator = Substitute.For<IKudosBasketValidator>();
             _kudosService = Substitute.For<IKudosService>();
             _kudosBasketService = new KudosBasketService(uow, mockValidator, _kudosService);
         }
 
-        private IQueryable<KudosType> MockKudosTypes()
+        private static IQueryable<KudosType> MockKudosTypes()
         {
             var types = new List<KudosType>
             {
@@ -72,7 +76,7 @@ namespace Shrooms.Tests.DomainService
             return types;
         }
 
-        private IQueryable<KudosBasket> MockKudosBaskets()
+        private static IQueryable<KudosBasket> MockKudosBaskets()
         {
             var kudosBaskets = new List<KudosBasket>
             {
@@ -98,7 +102,7 @@ namespace Shrooms.Tests.DomainService
             return kudosBaskets.AsQueryable();
         }
 
-        private ICollection<KudosLog> MockBasketKudosLogs()
+        private static ICollection<KudosLog> MockBasketKudosLogs()
         {
             var kudosBasketLogs = new List<KudosLog>
             {
@@ -118,7 +122,7 @@ namespace Shrooms.Tests.DomainService
             return kudosBasketLogs;
         }
 
-        private IQueryable<ApplicationUser> MockDonator()
+        private static IQueryable<ApplicationUser> MockDonator()
         {
             var users = new List<ApplicationUser>
             {
@@ -135,49 +139,51 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_Only_One_Active_Baskets_Donations()
+        public async Task Should_Return_Only_One_Active_Baskets_Donations()
         {
             var userAndOrg = new UserAndOrganizationDTO
             {
                 OrganizationId = 2
             };
-            var result = _kudosBasketService.GetDonations(userAndOrg);
+
+            var result = await _kudosBasketService.GetDonationsAsync(userAndOrg);
             Assert.AreEqual(2, result.Count);
         }
 
         [Test]
-        public void Should_Map_Basket_Logs_Correctly()
+        public async Task Should_Map_Basket_Logs_Correctly()
         {
             var userAndOrg = new UserAndOrganizationDTO
             {
                 OrganizationId = 2
             };
-            var result = _kudosBasketService.GetDonations(userAndOrg);
+
+            var result = await _kudosBasketService.GetDonationsAsync(userAndOrg);
             Assert.AreEqual(15, result.First().DonationAmount);
             Assert.AreEqual(DateTime.Parse("2015-11-02"), result.First().DonationDate);
         }
 
         [Test]
-        public void Should_Return_Basket_Donations_With_Correctly_Mapped_Donator()
+        public async Task Should_Return_Basket_Donations_With_Correctly_Mapped_Donator()
         {
             var userAndOrg = new UserAndOrganizationDTO
             {
                 OrganizationId = 2
             };
-            var result = _kudosBasketService.GetDonations(userAndOrg);
+            var result = await _kudosBasketService.GetDonationsAsync(userAndOrg);
             Assert.AreEqual("testUserId", result.First().Donator.Id);
             Assert.AreEqual("Testas Testauskas", result.First().Donator.FullName);
         }
 
         [Test]
-        public void Should_Return_Basket_Donations_With_Correctly_Mapped_Deleted_Donator()
+        public async Task Should_Return_Basket_Donations_With_Correctly_Mapped_Deleted_Donator()
         {
             var userAndOrg = new UserAndOrganizationDTO
             {
                 OrganizationId = 2
             };
 
-            _kudosBasketDbSet.SetDbSetData(new List<KudosBasket>
+            _kudosBasketDbSet.SetDbSetDataForAsync(new List<KudosBasket>
             {
                 new KudosBasket
                 {
@@ -190,7 +196,7 @@ namespace Shrooms.Tests.DomainService
                 }
             });
 
-            var result = _kudosBasketService.GetDonations(userAndOrg);
+            var result = await _kudosBasketService.GetDonationsAsync(userAndOrg);
             Assert.AreEqual("Deleted Account", result.First().Donator.FullName);
         }
 
@@ -201,6 +207,7 @@ namespace Shrooms.Tests.DomainService
             {
                 IsActive = false
             };
+
             Assert.Throws<KudosBasketException>(() => _kudosBasketValidator.CheckIfBasketIsActive(basket));
         }
 
@@ -217,7 +224,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public void Should_Throw_Exception_If_Basket_Exists()
         {
-            var basketExists = true;
+            const bool basketExists = true;
             // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             Assert.Throws<Exception>(() => _kudosBasketValidator.CheckIfBasketAlreadyExists(basketExists));
         }
@@ -225,7 +232,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public void Should_Not_Throw_Exception_If_There_Are_No_Baskets()
         {
-            var basketExists = false;
+            const bool basketExists = false;
             // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             Assert.DoesNotThrow(() => _kudosBasketValidator.CheckIfBasketAlreadyExists(basketExists));
         }
@@ -245,7 +252,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_Existing_Basket()
+        public async Task Should_Return_Existing_Basket()
         {
             var userAndOrg = new UserAndOrganizationDTO
             {
@@ -253,15 +260,17 @@ namespace Shrooms.Tests.DomainService
             };
 
             // only one active and not deleted basket can be in a database
-            _kudosBasketDbSet.Remove(_kudosBasketDbSet.Find(11));
+            var kudosBasket = await _kudosBasketDbSet.FirstAsync(x => x.Id == 11);
+            // ReSharper disable once AssignNullToNotNullAttribute
+            _kudosBasketDbSet.Remove(kudosBasket);
 
-            var result = _kudosBasketService.GetKudosBasket(userAndOrg);
+            var result = await _kudosBasketService.GetKudosBasketAsync(userAndOrg);
             Assert.AreEqual(10, result.Id);
             Assert.AreEqual("test", result.Description);
         }
 
         [Test]
-        public void Should_Return_If_Basket_Widget_Is_Active()
+        public async Task Should_Return_If_Basket_Widget_Is_Active()
         {
             var userAndOrg = new UserAndOrganizationDTO
             {
@@ -269,11 +278,13 @@ namespace Shrooms.Tests.DomainService
             };
 
             // leave only one deactivated basket
-            _kudosBasketDbSet.Remove(_kudosBasketDbSet.Find(11));
-            var activeKudosBasket = _kudosBasketDbSet.First(x => x.Id == 10);
+            var kudosBasket = await _kudosBasketDbSet.FirstAsync(x => x.Id == 11);
+            _kudosBasketDbSet.Remove(kudosBasket);
+
+            var activeKudosBasket = await _kudosBasketDbSet.FirstAsync(x => x.Id == 10);
             activeKudosBasket.IsActive = false;
 
-            var result = _kudosBasketService.GetKudosBasketWidget(userAndOrg);
+            var result = await _kudosBasketService.GetKudosBasketWidgetAsync(userAndOrg);
             Assert.AreEqual(null, result);
         }
 
@@ -298,7 +309,7 @@ namespace Shrooms.Tests.DomainService
                 UserId = "testUserId",
                 OrganizationId = 2
             };
-            _kudosBasketService.DeleteKudosBasket(userAndOrg);
+            _kudosBasketService.DeleteKudosBasketAsync(userAndOrg);
             _kudosBasketDbSet.Received(1).Remove(Arg.Any<KudosBasket>());
         }
 
@@ -313,8 +324,9 @@ namespace Shrooms.Tests.DomainService
                 Title = "edited",
                 UserId = "testUserId"
             };
-            _kudosBasketService.EditKudosBasket(kudosBasketDto);
+            _kudosBasketService.EditKudosBasketAsync(kudosBasketDto);
             var editedBasket = _kudosBasketDbSet.First(basket => basket.Id == 10);
+
             Assert.AreEqual(kudosBasketDto.Title, editedBasket.Title);
             Assert.AreEqual(kudosBasketDto.Description, editedBasket.Description);
             Assert.AreEqual(kudosBasketDto.IsActive, editedBasket.IsActive);
@@ -322,7 +334,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Make_A_Donation()
+        public async Task Should_Make_A_Donation()
         {
             var donationDto = new KudosBasketDonationDTO
             {
@@ -331,13 +343,15 @@ namespace Shrooms.Tests.DomainService
                 UserId = "testUserId",
                 Id = 10
             };
-            _kudosBasketService.MakeDonation(donationDto);
-            var basket = _kudosBasketDbSet.First(b => b.Id == 10);
+
+            await _kudosBasketService.MakeDonationAsync(donationDto);
+            var basket = await _kudosBasketDbSet.FirstAsync(b => b.Id == 10);
+
             Assert.AreEqual(45, basket.KudosLogs.Sum(l => l.Points));
         }
 
         [Test]
-        public void Should_Create_Two_Kudos_Logs_On_Donation()
+        public async Task Should_Create_Two_Kudos_Logs_On_Donation()
         {
             var donationDto = new KudosBasketDonationDTO
             {
@@ -346,12 +360,13 @@ namespace Shrooms.Tests.DomainService
                 UserId = "testUserId",
                 Id = 10
             };
-            _kudosBasketService.MakeDonation(donationDto);
+
+            await _kudosBasketService.MakeDonationAsync(donationDto);
             _kudosLogsDbSet.Received(1).Add(Arg.Any<KudosLog>());
         }
 
         [Test]
-        public void Should_Recalculate_Donators_Kudos()
+        public async Task Should_Recalculate_Donators_Kudos()
         {
             var donationDto = new KudosBasketDonationDTO
             {
@@ -360,24 +375,27 @@ namespace Shrooms.Tests.DomainService
                 UserId = "testUserId",
                 Id = 10
             };
-            _kudosBasketService.MakeDonation(donationDto);
-            var user = _usersDbSet.First(u => u.Id == "testUserId");
-            _kudosService.Received(1).UpdateProfileKudosAsync(user, donationDto);
+
+            await _kudosBasketService.MakeDonationAsync(donationDto);
+
+            var user = await _usersDbSet.FirstAsync(u => u.Id == "testUserId");
+
+            await _kudosService.Received(1).UpdateProfileKudosAsync(user, donationDto);
         }
 
         [Test]
         public void Should_Throw_Kudos_Basket_Exception_If_Donator_Has_Insufficient_Kudos()
         {
-            var kudosRemaining = 50;
-            var kudosDonated = 60;
+            const int kudosRemaining = 50;
+            const int kudosDonated = 60;
             Assert.Throws<KudosBasketException>(() => _kudosBasketValidator.CheckIfUserHasEnoughKudos(kudosRemaining, kudosDonated));
         }
 
         [Test]
         public void Should_Not_Throw_Kudos_Basket_Exception_If_Donator_Has_Enough_Kudos()
         {
-            var kudosRemaining = 50;
-            var kudosDonated = 40;
+            const int kudosRemaining = 50;
+            const int kudosDonated = 40;
             Assert.DoesNotThrow(() => _kudosBasketValidator.CheckIfUserHasEnoughKudos(kudosRemaining, kudosDonated));
         }
     }

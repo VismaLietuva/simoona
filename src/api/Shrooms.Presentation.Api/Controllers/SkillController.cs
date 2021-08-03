@@ -1,15 +1,17 @@
 ﻿using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
-using PagedList;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Presentation.Api.Filters;
 using Shrooms.Presentation.WebViewModels.Models.Skill;
+using X.PagedList;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
@@ -30,14 +32,14 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [ValidationFilter]
         [PermissionAuthorize(Permission = BasicPermissions.Skill)]
-        public HttpResponseMessage Post(SkillPostViewModel model)
+        public async Task<HttpResponseMessage> Post(SkillPostViewModel model)
         {
-            var skill = _skillRepository.Get(s => s.Title == model.Title).FirstOrDefault();
+            var skill = await _skillRepository.Get(s => s.Title == model.Title).FirstOrDefaultAsync();
             if (skill == null)
             {
                 skill = _mapper.Map<Skill>(model);
                 _skillRepository.Insert(skill);
-                _unitOfWork.Save();
+                await _unitOfWork.SaveAsync();
             }
 
             return Request.CreateResponse(HttpStatusCode.Created, _mapper.Map<SkillMiniViewModel>(skill));
@@ -45,7 +47,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Skill)]
-        public IEnumerable<SkillAutoCompleteViewModel> GetForAutoComplete(string s, int pageSize = WebApiConstants.DefaultAutocompleteListSize)
+        public async Task<IEnumerable<SkillAutoCompleteViewModel>> GetForAutoComplete(string s, int pageSize = WebApiConstants.DefaultAutocompleteListSize)
         {
             if (string.IsNullOrWhiteSpace(s))
             {
@@ -53,9 +55,9 @@ namespace Shrooms.Presentation.Api.Controllers
             }
 
             s = s.ToLowerInvariant();
-            var skills = _skillRepository.Get(sk => sk.ShowInAutoComplete && sk.Title.ToLower().StartsWith(s))
+            var skills = await _skillRepository.Get(sk => sk.ShowInAutoComplete && sk.Title.ToLower().StartsWith(s))
                             .OrderBy(sk => sk.Title)
-                            .ToPagedList(1, pageSize);
+                            .ToPagedListAsync(1, pageSize);
 
             return _mapper.Map<IEnumerable<SkillAutoCompleteViewModel>>(skills);
         }

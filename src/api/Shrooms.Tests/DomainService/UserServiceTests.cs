@@ -30,22 +30,22 @@ namespace Shrooms.Tests.DomainService
     {
         private const string SendUserEmail = "noreply@shrooms.com";
 
-        private IUserService _userService;
-        private IDbSet<ApplicationUser> _usersDbSet;
-        private IDbSet<WallMember> _wallUsersDbSet;
-        private IDbSet<WallModerator> _wallModeratorsDbSet;
+        private DbSet<ApplicationUser> _usersDbSet;
+        private DbSet<WallMember> _wallUsersDbSet;
+        private DbSet<WallModerator> _wallModeratorsDbSet;
+        private DbSet<ApplicationRole> _rolesDbSet;
         private ShroomsUserManager _userManager;
-        private IDbSet<ApplicationRole> _rolesDbSet;
+        private IUserService _userService;
 
         [SetUp]
         public void Init()
         {
             var uow = Substitute.For<IUnitOfWork2>();
 
-            _usersDbSet = uow.MockDbSet(MockUsers());
-            _rolesDbSet = uow.MockDbSet(MockRolesForMailing());
-            _wallUsersDbSet = uow.MockDbSet<WallMember>();
-            _wallModeratorsDbSet = uow.MockDbSet<WallModerator>();
+            _usersDbSet = uow.MockDbSetForAsync(MockUsers());
+            _rolesDbSet = uow.MockDbSetForAsync(MockRolesForMailing());
+            _wallUsersDbSet = uow.MockDbSetForAsync<WallMember>();
+            _wallModeratorsDbSet = uow.MockDbSetForAsync<WallModerator>();
 
             var dbContext = Substitute.For<IDbContext>();
             var userStore = Substitute.For<IUserStore<ApplicationUser>>();
@@ -163,9 +163,9 @@ namespace Shrooms.Tests.DomainService
             var taskSource = new TaskCompletionSource<ApplicationUser>();
             taskSource.SetResult(users.First());
             _userManager.FindByIdAsync("userToDelete").Returns(taskSource.Task);
-            _usersDbSet.SetDbSetData(users);
-            _wallUsersDbSet.SetDbSetData(userWalls);
-            _wallModeratorsDbSet.SetDbSetData(moderators);
+            _usersDbSet.SetDbSetDataForAsync(users);
+            _wallUsersDbSet.SetDbSetDataForAsync(userWalls);
+            _wallModeratorsDbSet.SetDbSetDataForAsync(moderators);
 
             var userOrg = new UserAndOrganizationDTO
             {
@@ -174,7 +174,7 @@ namespace Shrooms.Tests.DomainService
             };
 
             // Act
-            _userService.Delete("userToDelete", userOrg);
+            _userService.DeleteAsync("userToDelete", userOrg);
 
             var deletedUser = _usersDbSet.First(x => x.Id == "userToDelete");
 
@@ -188,11 +188,11 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_User_Emails_Filterd_By_Permission()
+        public async Task Should_Return_User_Emails_Filterd_By_Permission()
         {
             MockRolesAndUsersForPermissionValidation();
 
-            var userEmails = _userService.GetUserEmailsWithPermission("TEST1_BASIC", 2).ToList();
+            var userEmails = await _userService.GetUserEmailsWithPermissionAsync("TEST1_BASIC", 2);
 
             Assert.AreEqual(1, userEmails.Count);
             Assert.AreEqual("user1", userEmails.First());
@@ -232,7 +232,7 @@ namespace Shrooms.Tests.DomainService
                 }
             };
 
-            UserNotificationsSettingsDto userSettings = new UserNotificationsSettingsDto
+            var userSettings = new UserNotificationsSettingsDto
             {
                 Walls = notificationSettings,
                 EventsAppNotifications = true,
@@ -245,17 +245,9 @@ namespace Shrooms.Tests.DomainService
             _userService.ChangeWallNotificationSettings(userSettings, userAndOrg);
 
             // Assert
-            Assert.AreEqual(
-                true,
-                _wallUsersDbSet.First(x => x.WallId == 1).EmailNotificationsEnabled);
-
-            Assert.AreEqual(
-                true,
-                _wallUsersDbSet.First(x => x.WallId == 3).EmailNotificationsEnabled);
-
-            Assert.AreEqual(
-                true,
-                _wallUsersDbSet.First(x => x.WallId == 4).EmailNotificationsEnabled);
+            Assert.AreEqual(true, _wallUsersDbSet.First(x => x.WallId == 1).EmailNotificationsEnabled);
+            Assert.AreEqual(true, _wallUsersDbSet.First(x => x.WallId == 3).EmailNotificationsEnabled);
+            Assert.AreEqual(true, _wallUsersDbSet.First(x => x.WallId == 4).EmailNotificationsEnabled);
         }
 
         [Test]
@@ -276,6 +268,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         #region Mocks
+
         private void MockRolesAndUsersForPermissionValidation()
         {
             var roles = new List<ApplicationRole>
@@ -318,7 +311,7 @@ namespace Shrooms.Tests.DomainService
                 }
             };
 
-            _rolesDbSet.SetDbSetData(roles.AsQueryable());
+            _rolesDbSet.SetDbSetDataForAsync(roles.AsQueryable());
 
             var user1 = Substitute.For<ApplicationUser>();
             user1.Email = "user1";
@@ -360,10 +353,10 @@ namespace Shrooms.Tests.DomainService
                 user3
             };
 
-            _usersDbSet.SetDbSetData(users);
+            _usersDbSet.SetDbSetDataForAsync(users);
         }
 
-        private IEnumerable<ApplicationRole> MockRolesForMailing()
+        private static IEnumerable<ApplicationRole> MockRolesForMailing()
         {
             var roles = new List<ApplicationRole>
             {
@@ -489,7 +482,7 @@ namespace Shrooms.Tests.DomainService
                 }
             }.AsQueryable();
 
-            _wallUsersDbSet.SetDbSetData(wallUsers);
+            _wallUsersDbSet.SetDbSetDataForAsync(wallUsers);
         }
 
         private void MockWallMembersForNotifications()
@@ -552,7 +545,7 @@ namespace Shrooms.Tests.DomainService
                 }
             }.AsQueryable();
 
-            _usersDbSet.SetDbSetData(users);
+            _usersDbSet.SetDbSetDataForAsync(users);
         }
 
         #endregion

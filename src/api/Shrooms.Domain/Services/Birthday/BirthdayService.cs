@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects.Models.Birthdays;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -23,30 +24,29 @@ namespace Shrooms.Domain.Services.Birthday
             _roleService = roleService;
         }
 
-        public IEnumerable<BirthdayDTO> GetWeeklyBirthdays(DateTime date)
+        public async Task<IEnumerable<BirthdayDTO>> GetWeeklyBirthdaysAsync(DateTime date)
         {
             var firstDayOfTheWeek = date
                 .AddDays(-(OneDay + (date.DayOfWeek != DayOfWeek.Saturday ? (int)date.DayOfWeek : -OneDay)))
                 .Date;
 
-            var lastDayOfTheWeek = firstDayOfTheWeek
-                .AddDays(SevenDays).Date;
+            var lastDayOfTheWeek = firstDayOfTheWeek.AddDays(SevenDays).Date;
 
-            var userBirthdays = GetUsersBirthdayInfo(firstDayOfTheWeek, lastDayOfTheWeek);
+            var userBirthdays = await GetUsersBirthdayInfoAsync(firstDayOfTheWeek, lastDayOfTheWeek);
 
             return userBirthdays.Select(MapUserBirthdayInfoToBirthdayDto(firstDayOfTheWeek, lastDayOfTheWeek));
         }
 
-        private IEnumerable<UserBirthdayInfoDTO> GetUsersBirthdayInfo(DateTime firstDayOfTheWeek, DateTime lastDayOfTheWeek)
+        private async Task<IEnumerable<UserBirthdayInfoDTO>> GetUsersBirthdayInfoAsync(DateTime firstDayOfTheWeek, DateTime lastDayOfTheWeek)
         {
-            return _userDbSet
+            return await _userDbSet
                     .Where(u => u.BirthDay.HasValue)
                     .Where(FilterWeeklyBirthdays(firstDayOfTheWeek, lastDayOfTheWeek))
                     .Where(_roleService.ExcludeUsersWithRole(Contracts.Constants.Roles.NewUser))
                     .OrderByDescending(x => x.BirthDay.Value.Month)
                     .ThenByDescending(x => x.BirthDay.Value.Day)
                     .Select(MapUserBirthdayInfo())
-                    .ToList();
+                    .ToListAsync();
         }
 
         private Expression<Func<ApplicationUser, bool>> FilterWeeklyBirthdays(DateTime firstDayOfTheWeek, DateTime lastDayOfTheWeek)
@@ -94,10 +94,10 @@ namespace Shrooms.Domain.Services.Birthday
         /// <summary>
         /// Need to process current birthday for edge cases like leaping year.
         /// </summary>
-        private DateTime GetBirthDayCurrentDate(DateTime userBirthDay, int year)
+        private static DateTime GetBirthDayCurrentDate(DateTime userBirthDay, int year)
         {
-            DateTime newDate = userBirthDay;
-            DateTime birthday = userBirthDay;
+            var newDate = userBirthDay;
+            var birthday = userBirthDay;
 
             try
             {
@@ -117,7 +117,7 @@ namespace Shrooms.Domain.Services.Birthday
         /// <summary>
         /// When birthday occurs in a week of the end of year. We need to get correct year.
         /// </summary>
-        private int GetYear(DateTime birthDay, DateTime firstDayOfTheWeek, DateTime lastDayOfTheWeek)
+        private static int GetYear(DateTime birthDay, DateTime firstDayOfTheWeek, DateTime lastDayOfTheWeek)
         {
             if (firstDayOfTheWeek.Year != lastDayOfTheWeek.Year)
             {

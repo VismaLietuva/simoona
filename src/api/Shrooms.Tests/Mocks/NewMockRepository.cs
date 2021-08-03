@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.DAL;
 using Shrooms.Infrastructure.Configuration;
@@ -18,7 +19,46 @@ namespace Shrooms.Tests.Mocks
             _listContext = context.Set<TEntity>().ToList();
         }
 
-        public override TEntity GetByID(object id)
+        public override Task<TEntity> GetByIdAsync(object id)
+        {
+            var entity = Find(id);
+            return Task.FromResult(entity);
+        }
+
+        public override void Insert(TEntity entity)
+        {
+            _listContext.Add(entity);
+            var queryable = _listContext.AsQueryable();
+
+            _dbSet.SetDbSetDataForAsync(queryable);
+        }
+
+        public override void Delete(TEntity entityToDelete)
+        {
+            _listContext.Remove(entityToDelete);
+            var queryable = _listContext.AsQueryable();
+            _dbSet.SetDbSetDataForAsync(queryable);
+        }
+
+        public override void Update(TEntity entity)
+        {
+            // Pretty dirty method, but for testing should be sufficient
+            var idProperty = entity.GetType().GetProperty("Id");
+
+            if (idProperty != null)
+            {
+                var id = idProperty.GetValue(entity, null);
+
+                var entityInList = Find(id);
+                _listContext.Remove(entityInList);
+                _listContext.Add(entity);
+            }
+
+            var queryable = _listContext.AsQueryable();
+            _dbSet.SetDbSetDataForAsync(queryable);
+        }
+
+        private TEntity Find(object id)
         {
             var entity = _listContext.Find(t =>
             {
@@ -44,38 +84,9 @@ namespace Shrooms.Tests.Mocks
                 return false;
             });
 
-            _dbSet.SetDbSetData(_listContext.AsQueryable());
-
+            var queryable = _listContext.AsQueryable();
+            _dbSet.SetDbSetDataForAsync(queryable);
             return entity;
-        }
-
-        public override void Insert(TEntity entity)
-        {
-            _listContext.Add(entity);
-            _dbSet.SetDbSetData(_listContext.AsQueryable());
-        }
-
-        public override void Delete(TEntity entityToDelete)
-        {
-            _listContext.Remove(entityToDelete);
-            _dbSet.SetDbSetData(_listContext.AsQueryable());
-        }
-
-        public override void Update(TEntity entity)
-        {
-            // Pretty dirty method, but for testing should be sufficient
-            var idProperty = entity.GetType().GetProperty("Id");
-
-            if (idProperty != null)
-            {
-                var id = idProperty.GetValue(entity, null);
-
-                var entityInList = GetByID(id);
-                _listContext.Remove(entityInList);
-                _listContext.Add(entity);
-            }
-
-            _dbSet.SetDbSetData(_listContext.AsQueryable());
         }
     }
 }

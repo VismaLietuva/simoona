@@ -15,29 +15,29 @@ namespace Shrooms.Domain.Services.UserService
 
         Task ChangeUserNotificationSettings(UserNotificationsSettingsDto settingsDto, UserAndOrganizationDTO userOrg);
 
-        Task Delete(string userToDelete, UserAndOrganizationDTO userOrg);
+        Task DeleteAsync(string userToDelete, UserAndOrganizationDTO userOrg);
 
         Task<LocalizationSettingsDto> GetUserLocalizationSettings(UserAndOrganizationDTO userOrg);
 
-        IEnumerable<string> GetUserEmailsWithPermission(string permissionName, int orgId);
+        Task<IList<string>> GetUserEmailsWithPermissionAsync(string permissionName, int orgId);
 
         Task<IEnumerable<string>> GetWallUserAppNotificationEnabledIdsAsync(string posterId, int wallId);
 
         Task<IList<string>> GetWallUsersEmailsAsync(string senderEmail, DataLayer.EntityModels.Models.Multiwall.Wall wall);
 
-        Task<UserNotificationsSettingsDto> GetWallNotificationSettings(UserAndOrganizationDTO userOrg);
+        Task<UserNotificationsSettingsDto> GetWallNotificationSettingsAsync(UserAndOrganizationDTO userOrg);
 
         void ChangeWallNotificationSettings(UserNotificationsSettingsDto wallNotificationsSettingsDto, UserAndOrganizationDTO userOrg);
 
-        IList<IdentityUserLogin> GetUserLogins(string id);
+        Task<IList<IdentityUserLogin>> GetUserLoginsAsync(string id);
 
-        void RemoveLogin(string id, UserLoginInfo loginInfo);
+        Task RemoveLoginAsync(string id, UserLoginInfo loginInfo);
 
         Task<ApplicationUser> GetApplicationUserAsync(string id);
 
         Task<IEnumerable<ApplicationUser>> GetUsersWithMentionNotificationsAsync(IEnumerable<string> mentionedUsersIds);
 
-        ApplicationUser GetApplicationUserOrDefault(string id);
+        Task<ApplicationUser> GetApplicationUserOrDefaultAsync(string id);
         IEnumerable<UserAutoCompleteDto> GetUsersForAutocomplete(string s);
     }
 }

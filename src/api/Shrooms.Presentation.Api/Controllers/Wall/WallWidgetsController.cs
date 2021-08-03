@@ -49,58 +49,58 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
         public async Task<WidgetsViewModel> Get([FromUri] GetWidgetsViewModel getWidgetsViewModel)
         {
             var userAndOrganization = GetUserAndOrganization();
+
             return new WidgetsViewModel
             {
                 KudosWidgetStats = await DefaultIfNotAuthorizedAsync(userAndOrganization, BasicPermissions.Kudos,
-                    () => GetKudosWidgetStats(getWidgetsViewModel.KudosTabOneMonths,
-                        getWidgetsViewModel.KudosTabOneAmount,
-                        getWidgetsViewModel.KudosTabTwoMonths,
+                    () => GetKudosWidgetStatsAsync(getWidgetsViewModel.KudosTabOneMonths, getWidgetsViewModel.KudosTabOneAmount, getWidgetsViewModel.KudosTabTwoMonths,
                         getWidgetsViewModel.KudosTabTwoAmount)),
-                LastKudosLogRecords = await DefaultIfNotAuthorizedAsync(userAndOrganization, BasicPermissions.Kudos, GetLastKudosLogRecords),
-                WeeklyBirthdays = await DefaultIfNotAuthorizedAsync(userAndOrganization, BasicPermissions.Birthday, GetWeeklyBirthdays),
-                KudosBasketWidget = await DefaultIfNotAuthorizedAsync(userAndOrganization, BasicPermissions.KudosBasket, GetKudosBasketWidget)
+                LastKudosLogRecords = await DefaultIfNotAuthorizedAsync(userAndOrganization, BasicPermissions.Kudos, GetLastKudosLogRecordsAsync),
+                WeeklyBirthdays = await DefaultIfNotAuthorizedAsync(userAndOrganization, BasicPermissions.Birthday, GetWeeklyBirthdaysAsync),
+                KudosBasketWidget = await DefaultIfNotAuthorizedAsync(userAndOrganization, BasicPermissions.KudosBasket, GetKudosBasketWidgetAsync)
             };
         }
 
-        private async Task<T> DefaultIfNotAuthorizedAsync<T>(UserAndOrganizationDTO userAndOrganization, string permission, Func<T> valueFactory)
+        private async Task<T> DefaultIfNotAuthorizedAsync<T>(UserAndOrganizationDTO userAndOrganization, string permission, Func<Task<T>> valueFactory)
         {
-            return await _permissionService.UserHasPermissionAsync(userAndOrganization, permission) ? valueFactory() : default;
+            return await _permissionService.UserHasPermissionAsync(userAndOrganization, permission) ? await valueFactory() : default;
         }
 
-        private IEnumerable<WallKudosLogViewModel> GetLastKudosLogRecords()
+        private async Task<IEnumerable<WallKudosLogViewModel>> GetLastKudosLogRecordsAsync()
         {
             var userAndOrg = GetUserAndOrganization();
-            var wallKudosLogsDto = _kudosService.GetLastKudosLogsForWall(userAndOrg);
+            var wallKudosLogsDto = await _kudosService.GetLastKudosLogsForWallAsync(userAndOrg);
             return _mapper.Map<IEnumerable<WallKudosLogDTO>, IEnumerable<WallKudosLogViewModel>>(wallKudosLogsDto);
         }
 
-        public KudosBasketWidgetViewModel GetKudosBasketWidget()
+        public async Task<KudosBasketWidgetViewModel> GetKudosBasketWidgetAsync()
         {
-            var basket = _kudosBasketService.GetKudosBasketWidget(GetUserAndOrganization());
+            var basket = await _kudosBasketService.GetKudosBasketWidgetAsync(GetUserAndOrganization());
             return basket == null ? null : _mapper.Map<KudosBasketDTO, KudosBasketWidgetViewModel>(basket);
         }
 
-        private IEnumerable<BirthdayViewModel> GetWeeklyBirthdays()
+        private async Task<IEnumerable<BirthdayViewModel>> GetWeeklyBirthdaysAsync()
         {
             var todayDate = DateTime.UtcNow;
-            var birthdaysDTO = _birthdayService.GetWeeklyBirthdays(todayDate);
+            var birthdaysDTO = await _birthdayService.GetWeeklyBirthdaysAsync(todayDate);
             var birthdays = _mapper.Map<IEnumerable<BirthdayDTO>, IEnumerable<BirthdayViewModel>>(birthdaysDTO);
             return birthdays;
         }
 
-        private IEnumerable<KudosListBasicDataViewModel> GetKudosWidgetStats(int tabOneMonths, int tabOneAmount, int tabTwoMonths, int tabTwoAmount)
+        private async Task<IEnumerable<KudosListBasicDataViewModel>> GetKudosWidgetStatsAsync(int tabOneMonths, int tabOneAmount, int tabTwoMonths, int tabTwoAmount)
         {
             var result = new List<KudosListBasicDataViewModel>
             {
-                CalculateStats(tabOneMonths, tabOneAmount),
-                CalculateStats(tabTwoMonths, tabTwoAmount)
+                await CalculateStatsAsync(tabOneMonths, tabOneAmount),
+                await CalculateStatsAsync(tabTwoMonths, tabTwoAmount)
             };
+
             return result;
         }
 
-        private KudosListBasicDataViewModel CalculateStats(int months, int amount)
+        private async Task<KudosListBasicDataViewModel> CalculateStatsAsync(int months, int amount)
         {
-            var kudosStatsDto = _kudosService.GetKudosStats(months, amount, User.Identity.GetOrganizationId());
+            var kudosStatsDto = await _kudosService.GetKudosStatsAsync(months, amount, User.Identity.GetOrganizationId());
             var stats = _mapper.Map<IEnumerable<KudosBasicDataDTO>, IEnumerable<KudosBasicDataViewModel>>(kudosStatsDto);
             return new KudosListBasicDataViewModel
             {

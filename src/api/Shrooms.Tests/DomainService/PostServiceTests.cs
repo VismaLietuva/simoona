@@ -23,23 +23,24 @@ namespace Shrooms.Tests.DomainService
     [TestFixture]
     public class PostServiceTests
     {
-        private IDbSet<Post> _postsDbSet;
+        private DbSet<Post> _postsDbSet;
+        private DbSet<Wall> _wallsDbSet;
+        private DbSet<ApplicationUser> _usersDbSet;
+        private DbSet<WallModerator> _wallModeratorsDbSet;
         private IPostService _postService;
-        private IDbSet<Wall> _wallsDbSet;
-        private IDbSet<ApplicationUser> _usersDbSet;
         private IPermissionService _permissionService;
-        private IDbSet<WallModerator> _wallModeratorsDbSet;
-        private string _userId = Guid.NewGuid().ToString();
+
+        private readonly string _userId = Guid.NewGuid().ToString();
 
         [SetUp]
         public void TestInitializer()
         {
             var uow = Substitute.For<IUnitOfWork2>();
 
-            _postsDbSet = uow.MockDbSet<Post>();
-            _wallsDbSet = uow.MockDbSet<Wall>();
-            _usersDbSet = uow.MockDbSet<ApplicationUser>();
-            _wallModeratorsDbSet = uow.MockDbSet<WallModerator>();
+            _postsDbSet = uow.MockDbSetForAsync<Post>();
+            _wallsDbSet = uow.MockDbSetForAsync<Wall>();
+            _usersDbSet = uow.MockDbSetForAsync<ApplicationUser>();
+            _wallModeratorsDbSet = uow.MockDbSetForAsync<WallModerator>();
 
             _permissionService = Substitute.For<IPermissionService>();
             var commentService = Substitute.For<ICommentService>();
@@ -59,7 +60,7 @@ namespace Shrooms.Tests.DomainService
                 }
             };
 
-            _postsDbSet.SetDbSetData(new List<Post> { post }.AsQueryable());
+            _postsDbSet.SetDbSetDataForAsync(new List<Post> { post }.AsQueryable());
             _postService.ToggleLikeAsync(1, new UserAndOrganizationDTO { UserId = "user1", OrganizationId = 2 });
 
             Assert.AreEqual("user1", _postsDbSet.First().Likes.First().UserId);
@@ -78,7 +79,7 @@ namespace Shrooms.Tests.DomainService
                 }
             };
 
-            _postsDbSet.SetDbSetData(new List<Post> { post }.AsQueryable());
+            _postsDbSet.SetDbSetDataForAsync(new List<Post> { post }.AsQueryable());
             _postService.ToggleLikeAsync(1, new UserAndOrganizationDTO { UserId = "user1", OrganizationId = 2 });
 
             Assert.AreEqual(0, _postsDbSet.First().Likes.Count);
@@ -87,8 +88,8 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public void Should_Throw_If_There_Is_No_Post_To_Be_Liked()
         {
-            _postsDbSet.SetDbSetData(new List<Post>().AsQueryable());
-            var ex = Assert.Throws<ValidationException>(() => _postService.ToggleLikeAsync(1, new UserAndOrganizationDTO { UserId = "user1", OrganizationId = 2 }));
+            _postsDbSet.SetDbSetDataForAsync(new List<Post>().AsQueryable());
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _postService.ToggleLikeAsync(1, new UserAndOrganizationDTO { UserId = "user1", OrganizationId = 2 }));
             Assert.AreEqual(ErrorCodes.ContentDoesNotExist, ex.ErrorCode);
         }
 
@@ -100,17 +101,17 @@ namespace Shrooms.Tests.DomainService
             {
                 new Wall { Id = 1, OrganizationId = 2 }
             };
-            _wallsDbSet.SetDbSetData(walls.AsQueryable());
+            _wallsDbSet.SetDbSetDataForAsync(walls.AsQueryable());
 
             // ReSharper disable once CollectionNeverUpdated.Local
             var posts = new List<Post>();
-            _postsDbSet.SetDbSetData(posts.AsQueryable());
+            _postsDbSet.SetDbSetDataForAsync(posts.AsQueryable());
 
             var users = new List<ApplicationUser>
             {
                 new ApplicationUser { Id = _userId }
             };
-            _usersDbSet.SetDbSetData(users.AsQueryable());
+            _usersDbSet.SetDbSetDataForAsync(users.AsQueryable());
 
             var newPostDto = new NewPostDTO
             {
@@ -138,17 +139,17 @@ namespace Shrooms.Tests.DomainService
             // Setup
             // ReSharper disable once CollectionNeverUpdated.Local
             var walls = new List<Wall>();
-            _wallsDbSet.SetDbSetData(walls.AsQueryable());
+            _wallsDbSet.SetDbSetDataForAsync(walls.AsQueryable());
 
             // ReSharper disable once CollectionNeverUpdated.Local
             var posts = new List<Post>();
-            _postsDbSet.SetDbSetData(posts.AsQueryable());
+            _postsDbSet.SetDbSetDataForAsync(posts.AsQueryable());
 
             var users = new List<ApplicationUser>
             {
                 new ApplicationUser { Id = "testUser" }
             };
-            _usersDbSet.SetDbSetData(users.AsQueryable());
+            _usersDbSet.SetDbSetDataForAsync(users.AsQueryable());
 
             var newPostDto = new NewPostDTO
             {
@@ -161,7 +162,7 @@ namespace Shrooms.Tests.DomainService
 
             // Act
             // Assert
-            var ex = Assert.Throws<ValidationException>(() => _postService.CreateNewPostAsync(newPostDto));
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _postService.CreateNewPostAsync(newPostDto));
             Assert.AreEqual(ErrorCodes.ContentDoesNotExist, ex.ErrorCode);
         }
 
@@ -174,8 +175,8 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 2
             };
 
-            _postsDbSet.SetDbSetData(new List<Post>().AsQueryable());
-            var ex = Assert.Throws<ValidationException>(() => _postService.HideWallPostAsync(1, userOrg));
+            _postsDbSet.SetDbSetDataForAsync(new List<Post>().AsQueryable());
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _postService.HideWallPostAsync(1, userOrg));
             Assert.AreEqual(ErrorCodes.ContentDoesNotExist, ex.ErrorCode);
         }
 
@@ -195,7 +196,7 @@ namespace Shrooms.Tests.DomainService
                 new WallModerator { WallId = wall.Id, UserId = "user2" }
             };
 
-            _wallModeratorsDbSet.SetDbSetData(wallModerators.AsQueryable());
+            _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
             _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Post).Returns(false);
 
             var posts = new List<Post>
@@ -204,7 +205,7 @@ namespace Shrooms.Tests.DomainService
                 new Post { Id = 1, Wall = wall, MessageBody = "post", AuthorId = "user2", IsHidden = false }
             };
 
-            _postsDbSet.SetDbSetData(posts.AsQueryable());
+            _postsDbSet.SetDbSetDataForAsync(posts.AsQueryable());
 
             var users = new List<ApplicationUser>
             {
@@ -212,9 +213,9 @@ namespace Shrooms.Tests.DomainService
                 new ApplicationUser { Id = "user2" }
             };
 
-            _usersDbSet.SetDbSetData(users.AsQueryable());
+            _usersDbSet.SetDbSetDataForAsync(users.AsQueryable());
 
-            Assert.Throws<UnauthorizedException>(() => _postService.HideWallPostAsync(1, userOrg));
+            Assert.ThrowsAsync<UnauthorizedException>(async () => await _postService.HideWallPostAsync(1, userOrg));
         }
 
         [Test]
@@ -233,7 +234,7 @@ namespace Shrooms.Tests.DomainService
                 new WallModerator { WallId = wall.Id, UserId = "user1" }
             };
 
-            _wallModeratorsDbSet.SetDbSetData(wallModerators.AsQueryable());
+            _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
             _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Post).Returns(true);
 
             var posts = new List<Post>
@@ -242,13 +243,13 @@ namespace Shrooms.Tests.DomainService
                 new Post { Id = 1, Wall = wall, MessageBody = "post", AuthorId = "user1", IsHidden = false }
             };
 
-            _postsDbSet.SetDbSetData(posts.AsQueryable());
+            _postsDbSet.SetDbSetDataForAsync(posts.AsQueryable());
 
             var users = new List<ApplicationUser>
             {
                 new ApplicationUser { Id = "user1" }
             };
-            _usersDbSet.SetDbSetData(users.AsQueryable());
+            _usersDbSet.SetDbSetDataForAsync(users.AsQueryable());
 
             _postService.HideWallPostAsync(1, userOrg);
 
@@ -265,13 +266,13 @@ namespace Shrooms.Tests.DomainService
             {
                 new Post { Id = 1, Wall = wall, MessageBody = "post", AuthorId = "user1", WallId = wall.Id }
             };
-            _postsDbSet.SetDbSetData(posts.AsQueryable());
+            _postsDbSet.SetDbSetDataForAsync(posts.AsQueryable());
 
             var wallModerators = new List<WallModerator>
             {
                 new WallModerator { WallId = wall.Id, UserId = "user2" }
             };
-            _wallModeratorsDbSet.SetDbSetData(wallModerators.AsQueryable());
+            _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
             var editPostDto = new EditPostDTO
             {
@@ -297,13 +298,13 @@ namespace Shrooms.Tests.DomainService
             {
                 new Post { Id = 1, Wall = wall, MessageBody = "post", AuthorId = "user1" }
             };
-            _postsDbSet.SetDbSetData(posts.AsQueryable());
+            _postsDbSet.SetDbSetDataForAsync(posts.AsQueryable());
 
             var wallModerators = new List<WallModerator>
             {
                 new WallModerator { WallId = wall.Id, UserId = "user2" }
             };
-            _wallModeratorsDbSet.SetDbSetData(wallModerators.AsQueryable());
+            _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
             var editPostDto = new EditPostDTO
             {
@@ -329,13 +330,13 @@ namespace Shrooms.Tests.DomainService
             {
                 new Post { Id = 1, Wall = wall, MessageBody = "post", AuthorId = "user1" }
             };
-            _postsDbSet.SetDbSetData(posts.AsQueryable());
+            _postsDbSet.SetDbSetDataForAsync(posts.AsQueryable());
 
             var wallModerators = new List<WallModerator>
             {
                 new WallModerator { WallId = wall.Id, UserId = "user2" }
             };
-            _wallModeratorsDbSet.SetDbSetData(wallModerators.AsQueryable());
+            _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
             var editPostDto = new EditPostDTO
             {
@@ -349,7 +350,7 @@ namespace Shrooms.Tests.DomainService
 
             // Act
             // Assert
-            Assert.Throws<UnauthorizedException>(() => _postService.EditPostAsync(editPostDto));
+            Assert.ThrowsAsync<UnauthorizedException>(async () => await _postService.EditPostAsync(editPostDto));
         }
 
         [Test]
@@ -358,7 +359,7 @@ namespace Shrooms.Tests.DomainService
             // Setup
             // ReSharper disable once CollectionNeverUpdated.Local
             var posts = new List<Post>();
-            _postsDbSet.SetDbSetData(posts.AsQueryable());
+            _postsDbSet.SetDbSetDataForAsync(posts.AsQueryable());
 
             var editPostDto = new EditPostDTO
             {
@@ -370,7 +371,7 @@ namespace Shrooms.Tests.DomainService
 
             // Act
             // Assert
-            var ex = Assert.Throws<ValidationException>(() => _postService.EditPostAsync(editPostDto));
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _postService.EditPostAsync(editPostDto));
             Assert.AreEqual(ErrorCodes.ContentDoesNotExist, ex.ErrorCode);
         }
 
@@ -380,7 +381,7 @@ namespace Shrooms.Tests.DomainService
             // Setup
             // ReSharper disable once CollectionNeverUpdated.Local
             var posts = new List<Post>();
-            _postsDbSet.SetDbSetData(posts.AsQueryable());
+            _postsDbSet.SetDbSetDataForAsync(posts.AsQueryable());
 
             var userOrg = new UserAndOrganizationDTO
             {
@@ -390,7 +391,7 @@ namespace Shrooms.Tests.DomainService
 
             // Act
             // Assert
-            var ex = Assert.Throws<ValidationException>(() => _postService.DeleteWallPostAsync(1, userOrg));
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _postService.DeleteWallPostAsync(1, userOrg));
             Assert.AreEqual(ErrorCodes.ContentDoesNotExist, ex.ErrorCode);
         }
 
@@ -403,13 +404,13 @@ namespace Shrooms.Tests.DomainService
             {
                 new Post { Id = 1, Wall = wall, MessageBody = "post", AuthorId = "user1" }
             };
-            _postsDbSet.SetDbSetData(posts.AsQueryable());
+            _postsDbSet.SetDbSetDataForAsync(posts.AsQueryable());
 
             var wallModerators = new List<WallModerator>
             {
                 new WallModerator { WallId = wall.Id, UserId = "user2" }
             };
-            _wallModeratorsDbSet.SetDbSetData(wallModerators.AsQueryable());
+            _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
             var userOrg = new UserAndOrganizationDTO
             {
@@ -421,7 +422,7 @@ namespace Shrooms.Tests.DomainService
 
             // Act
             // Assert
-            Assert.Throws<UnauthorizedException>(() => _postService.DeleteWallPostAsync(1, userOrg));
+            Assert.ThrowsAsync<UnauthorizedException>(async () => await _postService.DeleteWallPostAsync(1, userOrg));
         }
 
         [Test]
@@ -433,13 +434,13 @@ namespace Shrooms.Tests.DomainService
             {
                 new Post { Id = 1, Wall = wall, MessageBody = "post", AuthorId = "user1" }
             };
-            _postsDbSet.SetDbSetData(posts.AsQueryable());
+            _postsDbSet.SetDbSetDataForAsync(posts.AsQueryable());
 
             var wallModerators = new List<WallModerator>
             {
                 new WallModerator { WallId = wall.Id, UserId = "user2" }
             };
-            _wallModeratorsDbSet.SetDbSetData(wallModerators.AsQueryable());
+            _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
             var userOrg = new UserAndOrganizationDTO
             {
@@ -463,13 +464,13 @@ namespace Shrooms.Tests.DomainService
             {
                 new Post { Id = 1, Wall = wall, MessageBody = "post", AuthorId = "user1", WallId = wall.Id }
             };
-            _postsDbSet.SetDbSetData(posts.AsQueryable());
+            _postsDbSet.SetDbSetDataForAsync(posts.AsQueryable());
 
             var wallModerators = new List<WallModerator>
             {
                 new WallModerator { WallId = wall.Id, UserId = "user2" }
             };
-            _wallModeratorsDbSet.SetDbSetData(wallModerators.AsQueryable());
+            _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
             var userOrg = new UserAndOrganizationDTO
             {

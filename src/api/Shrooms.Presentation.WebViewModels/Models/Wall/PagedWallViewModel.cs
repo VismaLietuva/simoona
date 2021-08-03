@@ -1,4 +1,4 @@
-﻿using PagedList;
+﻿using X.PagedList;
 
 namespace Shrooms.Presentation.WebViewModels.Models.Wall
 {

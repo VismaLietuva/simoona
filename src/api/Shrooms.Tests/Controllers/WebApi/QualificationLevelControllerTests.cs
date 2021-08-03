@@ -39,21 +39,24 @@ namespace Shrooms.Tests.Controllers.WebApi
         [Test]
         public async Task QualificationLevel_Get_Should_Return_Correct_Id()
         {
-            var result = _qualificationLevelController.Get(1);
+            var result = await _qualificationLevelController.Get(1);
             var model = await result.Content.ReadAsAsync<QualificationLevelViewModel>();
 
             Assert.AreEqual(1, model.Id);
         }
 
         [Test]
-        public void QualificationLevel_Post_Should_Return_Created_Entity_If_Saved_Successfully()
+        public async Task QualificationLevel_Post_Should_Return_Created_Entity_If_Saved_Successfully()
         {
-            QualificationLevelPostViewModel model = new QualificationLevelPostViewModel();
-            model.Id = 0;
-            model.Name = "test";
-            model.SortOrder = 0;
+            var model = new QualificationLevelPostViewModel
+            {
+                Id = 0,
+                Name = "test",
+                SortOrder = 0
+            };
+
             _qualificationLevelController.Validate(model);
-            HttpResponseMessage response = _qualificationLevelController.Post(model);
+            var response = await _qualificationLevelController.Post(model);
 
             Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
         }

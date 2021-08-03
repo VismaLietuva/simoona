@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.Constants;
@@ -20,7 +21,7 @@ namespace Shrooms.Tests.DomainService
         public void TestInitializer()
         {
             var uow = Substitute.For<IUnitOfWork2>();
-            uow.MockDbSet(MockUsers());
+            uow.MockDbSetForAsync(MockUsers());
 
             var roleService = Substitute.For<IRoleService>();
             roleService.ExcludeUsersWithRole(Roles.NewUser).Returns(x => true);
@@ -28,7 +29,7 @@ namespace Shrooms.Tests.DomainService
             _birthdayService = new BirthdayService(uow, roleService);
         }
 
-        private IQueryable<ApplicationUser> MockUsers()
+        private static IQueryable<ApplicationUser> MockUsers()
         {
             return new List<ApplicationUser>
             {
@@ -113,10 +114,11 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_If_Get_This_Week_Birthdays_Returns_Wrong_Users_1()
+        public async Task Should_Return_If_Get_This_Week_Birthdays_Returns_Wrong_Users_1()
         {
             var time = new DateTime(2015, 11, 29);
-            var birthdays = _birthdayService.GetWeeklyBirthdays(time).ToArray();
+            var birthdays = (await _birthdayService.GetWeeklyBirthdaysAsync(time)).ToArray();
+
             Assert.AreEqual(3, birthdays.Length);
             Assert.AreEqual("testUserId2", birthdays[0].Id);
             Assert.AreEqual("Saturday", birthdays[0].DayOfWeek);
@@ -124,10 +126,11 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_If_Get_This_Week_Birthdays_Returns_Wrong_Users_2()
+        public async Task Should_Return_If_Get_This_Week_Birthdays_Returns_Wrong_Users_2()
         {
             var time = new DateTime(2015, 12, 05);
-            var birthdays = _birthdayService.GetWeeklyBirthdays(time).ToArray();
+            var birthdays = (await _birthdayService.GetWeeklyBirthdaysAsync(time)).ToArray();
+
             Assert.AreEqual(2, birthdays.Length);
             Assert.AreEqual("testUserId3", birthdays[1].Id);
             Assert.AreEqual("Sunday", birthdays[1].DayOfWeek);
@@ -135,10 +138,11 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_Correct_Year_In_DateString()
+        public async Task Should_Return_Correct_Year_In_DateString()
         {
             var time = new DateTime(2015, 12, 28);
-            var birthdays = _birthdayService.GetWeeklyBirthdays(time).ToArray();
+            var birthdays = (await _birthdayService.GetWeeklyBirthdaysAsync(time)).ToArray();
+
             Assert.AreEqual(2, birthdays.Length);
             Assert.AreEqual("christmasBirthdayUser", birthdays[0].Id);
             Assert.AreEqual("2015-12-27", birthdays[0].DateString);
@@ -149,10 +153,11 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_Feb_29_Birthdays()
+        public async Task Should_Return_Feb_29_Birthdays()
         {
             var time = new DateTime(2017, 02, 28);
-            var birthdays = _birthdayService.GetWeeklyBirthdays(time).ToArray();
+            var birthdays = (await _birthdayService.GetWeeklyBirthdaysAsync(time)).ToArray();
+
             Assert.AreEqual(3, birthdays.Length);
             Assert.AreEqual("februaryBirthdayUser3", birthdays[0].Id);
             Assert.AreEqual("februaryBirthdayUser1", birthdays[1].Id);
@@ -161,10 +166,11 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Handle_Leaping_Year_Correctly()
+        public async Task Should_Handle_Leaping_Year_Correctly()
         {
             var time = new DateTime(2016, 02, 28);
-            var birthdays = _birthdayService.GetWeeklyBirthdays(time).ToArray();
+            var birthdays = (await _birthdayService.GetWeeklyBirthdaysAsync(time)).ToArray();
+
             Assert.AreEqual(3, birthdays.Length);
             Assert.AreEqual("februaryBirthdayUser3", birthdays[0].Id);
             Assert.AreEqual("februaryBirthdayUser1", birthdays[1].Id);

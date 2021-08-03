@@ -13,8 +13,7 @@ namespace Shrooms.Authentification.Membership
     {
         private readonly ICustomCache<string, IEnumerable<string>> _permissionsCache;
 
-        public ShroomsUserManager(
-            IUserStore<ApplicationUser> store,
+        public ShroomsUserManager(IUserStore<ApplicationUser> store,
             IDataProtectionProvider dataProtectionProvider,
             IIdentityMessageService emailService,
             ShroomsClaimsIdentityFactory claimsIdentityFactory,
@@ -40,6 +39,7 @@ namespace Shrooms.Authentification.Membership
                 RequireLowercase = true,
                 RequireUppercase = true
             };
+
             UserTokenProvider = new DataProtectorTokenProvider<ApplicationUser>(dataProtectionProvider.Create("ASP.NET Identity"));
         }
 
@@ -49,27 +49,28 @@ namespace Shrooms.Authentification.Membership
             return email;
         }
 
-        public void RemoveLogins(string id)
+        public async Task RemoveLoginsAsync(string id)
         {
-            var logins = this.FindById(id).Logins.ToList();
+            var logins = (await FindByIdAsync(id)).Logins.ToList();
+
             foreach (var login in logins)
             {
-                this.RemoveLogin(id, new UserLoginInfo(login.LoginProvider, login.ProviderKey));
+                await RemoveLoginAsync(id, new UserLoginInfo(login.LoginProvider, login.ProviderKey));
             }
         }
 
-        public override Task<IdentityResult> AddToRoleAsync(string userId, string role)
+        public override async Task<IdentityResult> AddToRoleAsync(string userId, string role)
         {
-            var identityResult = base.AddToRoleAsync(userId, role);
+            var identityResult = await base.AddToRoleAsync(userId, role);
             _permissionsCache.TryRemoveEntry(userId);
             return identityResult;
         }
 
-        public override Task<IdentityResult> RemoveFromRoleAsync(string userId, string role)
+        public override async Task<IdentityResult> RemoveFromRoleAsync(string userId, string role)
         {
-            var identityRresult = base.RemoveFromRoleAsync(userId, role);
+            var identityResult = await base.RemoveFromRoleAsync(userId, role);
             _permissionsCache.TryRemoveEntry(userId);
-            return identityRresult;
+            return identityResult;
         }
 
         public override async Task<IdentityResult> AddLoginAsync(string userId, UserLoginInfo login)

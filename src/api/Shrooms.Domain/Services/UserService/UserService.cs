@@ -55,7 +55,7 @@ namespace Shrooms.Domain.Services.UserService
         public async Task ChangeUserLocalizationSettings(ChangeUserLocalizationSettingsDto settingsDto)
         {
             var user = await _usersDbSet
-                           .FirstAsync(u => u.Id == settingsDto.UserId && u.OrganizationId == settingsDto.OrganizationId);
+                .FirstAsync(u => u.Id == settingsDto.UserId && u.OrganizationId == settingsDto.OrganizationId);
 
             var culture = CultureInfo
                 .GetCultures(CultureTypes.SpecificCultures)
@@ -87,9 +87,9 @@ namespace Shrooms.Domain.Services.UserService
         public async Task ChangeUserNotificationSettings(UserNotificationsSettingsDto settingsDto, UserAndOrganizationDTO userOrg)
         {
             var settings = await _usersDbSet
-                               .Where(u => u.Id == userOrg.UserId && u.OrganizationId == userOrg.OrganizationId)
-                               .Select(u => u.NotificationsSettings)
-                               .FirstOrDefaultAsync();
+                .Where(u => u.Id == userOrg.UserId && u.OrganizationId == userOrg.OrganizationId)
+                .Select(u => u.NotificationsSettings)
+                .FirstOrDefaultAsync();
 
             if (settings == null)
             {
@@ -120,9 +120,9 @@ namespace Shrooms.Domain.Services.UserService
         public async Task<LocalizationSettingsDto> GetUserLocalizationSettings(UserAndOrganizationDTO userOrg)
         {
             var userSettings = await _usersDbSet
-                                   .Where(u => u.Id == userOrg.UserId && u.OrganizationId == userOrg.OrganizationId)
-                                   .Select(u => new { u.CultureCode, u.TimeZone })
-                                   .FirstAsync();
+                .Where(u => u.Id == userOrg.UserId && u.OrganizationId == userOrg.OrganizationId)
+                .Select(u => new { u.CultureCode, u.TimeZone })
+                .FirstAsync();
 
             var userCulture = CultureInfo.GetCultureInfo(userSettings.CultureCode);
 
@@ -146,24 +146,22 @@ namespace Shrooms.Domain.Services.UserService
             return settingsDto;
         }
 
-        public async Task Delete(string userToDelete, UserAndOrganizationDTO userOrg)
+        public async Task DeleteAsync(string userToDelete, UserAndOrganizationDTO userOrg)
         {
-            var user = _usersDbSet
-                .Single(u =>
-                    u.Id == userToDelete &&
-                    u.OrganizationId == userOrg.OrganizationId);
+            var user = await _usersDbSet
+                .SingleAsync(u => u.Id == userToDelete && u.OrganizationId == userOrg.OrganizationId);
 
             ClearUserKudos(user);
-            UnassignUserFromWalls(userToDelete, userOrg.OrganizationId);
-            _userManager.RemoveLogins(userToDelete);
+            await UnassignUserFromWallsAsync(userToDelete, userOrg.OrganizationId);
+            await _userManager.RemoveLoginsAsync(userToDelete);
 
-            await Anonymize(user, userOrg);
+            await AnonymizeAsync(user, userOrg);
 
             _usersDbSet.Remove(user);
-            _uow.SaveChanges(userOrg.UserId);
+            await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
-        private async Task Anonymize(ApplicationUser user, UserAndOrganizationDTO userOrg)
+        private async Task AnonymizeAsync(ApplicationUser user, UserAndOrganizationDTO userOrg)
         {
             await _pictureService.RemoveImageAsync(user.PictureId, userOrg.OrganizationId);
 
@@ -179,7 +177,7 @@ namespace Shrooms.Domain.Services.UserService
             user.PictureId = string.Empty;
             user.BirthDay = DateTime.UtcNow;
 
-            _uow.SaveChanges(userOrg.UserId);
+            await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
         public async Task<IEnumerable<string>> GetWallUserAppNotificationEnabledIdsAsync(string posterId, int wallId)
@@ -244,29 +242,29 @@ namespace Shrooms.Domain.Services.UserService
             return emails;
         }
 
-        public IEnumerable<string> GetUserEmailsWithPermission(string permissionName, int orgId)
+        public async Task<IList<string>> GetUserEmailsWithPermissionAsync(string permissionName, int orgId)
         {
-            var rolesWithPermission = _rolesDbSet
+            var rolesWithPermission = await _rolesDbSet
                 .Include(x => x.Permissions)
                 .Where(r => r.OrganizationId == orgId)
                 .Where(r => r.Permissions.Any(x => x.Name == permissionName))
                 .Select(role => role.Id)
-                .ToList();
+                .ToListAsync();
 
-            var userEmails = _usersDbSet
+            var userEmails = await _usersDbSet
                 .Where(e => e.Roles.Any(x => rolesWithPermission.Contains(x.RoleId)))
                 .Select(x => x.Email)
-                .ToList();
+                .ToListAsync();
 
             return userEmails;
         }
 
-        public async Task<UserNotificationsSettingsDto> GetWallNotificationSettings(UserAndOrganizationDTO userOrg)
+        public async Task<UserNotificationsSettingsDto> GetWallNotificationSettingsAsync(UserAndOrganizationDTO userOrg)
         {
             var settings = await _usersDbSet
-                               .Where(u => u.Id == userOrg.UserId && u.OrganizationId == userOrg.OrganizationId)
-                               .Select(u => u.NotificationsSettings)
-                               .FirstOrDefaultAsync();
+                .Where(u => u.Id == userOrg.UserId && u.OrganizationId == userOrg.OrganizationId)
+                .Select(u => u.NotificationsSettings)
+                .FirstOrDefaultAsync();
 
             var settingsDto = new UserNotificationsSettingsDto
             {
@@ -354,16 +352,17 @@ namespace Shrooms.Domain.Services.UserService
             _uow.SaveChanges(userOrg.UserId);
         }
 
-        public IList<IdentityUserLogin> GetUserLogins(string id)
+        public async Task<IList<IdentityUserLogin>> GetUserLoginsAsync(string id)
         {
-            return _userManager.FindById(id).Logins.ToList();
+            return (await _userManager.FindByIdAsync(id)).Logins.ToList();
         }
 
-        public void RemoveLogin(string id, UserLoginInfo loginInfo)
+        public async Task RemoveLoginAsync(string id, UserLoginInfo loginInfo)
         {
-            _userManager.RemoveLogin(id, loginInfo);
+            await _userManager.RemoveLoginAsync(id, loginInfo);
 
-            var user = _usersDbSet.First(u => u.Id == id);
+            var user = await _usersDbSet.FirstAsync(u => u.Id == id);
+
             if (loginInfo.LoginProvider == "Google")
             {
                 user.GoogleEmail = null;
@@ -374,7 +373,7 @@ namespace Shrooms.Domain.Services.UserService
                 user.FacebookEmail = null;
             }
 
-            _uow.SaveChanges(id);
+            await _uow.SaveChangesAsync(id);
         }
 
         public async Task<ApplicationUser> GetApplicationUserAsync(string id)
@@ -389,27 +388,27 @@ namespace Shrooms.Domain.Services.UserService
                 .ToListAsync();
         }
 
-        public ApplicationUser GetApplicationUserOrDefault(string id)
+        public async Task<ApplicationUser> GetApplicationUserOrDefaultAsync(string id)
         {
-            return _usersDbSet.Include(x => x.NotificationsSettings).FirstOrDefault(u => u.Id == id);
+            return await _usersDbSet.Include(x => x.NotificationsSettings).FirstOrDefaultAsync(u => u.Id == id);
         }
 
-        private void UnassignUserFromWalls(string userId, int tenantId)
+        private async Task UnassignUserFromWallsAsync(string userId, int tenantId)
         {
-            var memberships = _wallMembersDbSet
+            var memberships = await _wallMembersDbSet
                 .Include(m => m.Wall)
                 .Where(m => m.Wall.OrganizationId == tenantId && m.UserId == userId)
-                .ToList();
+                .ToListAsync();
 
             foreach (var membership in memberships)
             {
                 _wallMembersDbSet.Remove(membership);
             }
 
-            var moderatorMemberships = _wallModeratorsDbSet
+            var moderatorMemberships = await _wallModeratorsDbSet
                 .Include(m => m.Wall)
                 .Where(m => m.Wall.OrganizationId == tenantId && m.UserId == userId)
-                .ToList();
+                .ToListAsync();
 
             foreach (var moderator in moderatorMemberships)
             {
@@ -443,7 +442,7 @@ namespace Shrooms.Domain.Services.UserService
             }
         }
 
-        private void ClearUserKudos(ApplicationUser user)
+        private static void ClearUserKudos(ApplicationUser user)
         {
             user.RemainingKudos = 0;
             user.SpentKudos = 0;

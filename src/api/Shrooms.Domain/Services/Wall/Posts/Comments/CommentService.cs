@@ -20,10 +20,10 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
         private readonly ISystemClock _systemClock;
         private readonly IPermissionService _permissionService;
 
-        private readonly IDbSet<Post> _postsDbSet;
-        private readonly IDbSet<Comment> _commentsDbSet;
-        private readonly IDbSet<WallModerator> _wallModeratorsDbSet;
-        private readonly IDbSet<PostWatcher> _postWatchers;
+        private readonly DbSet<Post> _postsDbSet;
+        private readonly DbSet<Comment> _commentsDbSet;
+        private readonly DbSet<WallModerator> _wallModeratorsDbSet;
+        private readonly DbSet<PostWatcher> _postWatchers;
 
         public CommentService(IUnitOfWork2 uow, ISystemClock systemClock, IPermissionService permissionService)
         {
@@ -37,13 +37,11 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             _postWatchers = uow.GetDbSet<PostWatcher>();
         }
 
-        public void ToggleLike(int commentId, UserAndOrganizationDTO userOrg)
+        public async Task ToggleLikeAsync(int commentId, UserAndOrganizationDTO userOrg)
         {
-            var comment = _commentsDbSet
+            var comment = await _commentsDbSet
                 .Include(x => x.Post.Wall)
-                .FirstOrDefault(x =>
-                    x.Id == commentId &&
-                    x.Post.Wall.OrganizationId == userOrg.OrganizationId);
+                .FirstOrDefaultAsync(x => x.Id == commentId && x.Post.Wall.OrganizationId == userOrg.OrganizationId);
 
             if (comment == null)
             {
@@ -51,6 +49,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             }
 
             var like = comment.Likes.FirstOrDefault(x => x.UserId == userOrg.UserId);
+
             if (like == null)
             {
                 comment.Likes.Add(new Like(userOrg.UserId));
@@ -60,7 +59,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
                 comment.Likes.Remove(like);
             }
 
-            _uow.SaveChanges(userOrg.UserId);
+            await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
         public async Task<CommentCreatedDTO> CreateCommentAsync(NewCommentDTO commentDto)
@@ -74,7 +73,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Post does not exist");
             }
 
-            var watchEntity = _postWatchers.Find(commentDto.PostId, commentDto.UserId);
+            var watchEntity = await _postWatchers.FindAsync(commentDto.PostId, commentDto.UserId);
 
             var comment = new Comment
             {
@@ -125,7 +124,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             }
 
             var isWallModerator = await _wallModeratorsDbSet
-                                      .AnyAsync(x => x.UserId == commentDto.UserId && x.WallId == comment.Post.WallId) || commentDto.UserId == comment.CreatedBy;
+                .AnyAsync(x => x.UserId == commentDto.UserId && x.WallId == comment.Post.WallId) || commentDto.UserId == comment.CreatedBy;
 
             var isAdministrator = await _permissionService.UserHasPermissionAsync(commentDto, AdministrationPermissions.Post);
 
@@ -155,7 +154,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             }
 
             var isWallModerator = await _wallModeratorsDbSet
-                                      .AnyAsync(x => x.UserId == userOrg.UserId && x.WallId == comment.Post.WallId) || comment.CreatedBy == userOrg.UserId;
+                .AnyAsync(x => x.UserId == userOrg.UserId && x.WallId == comment.Post.WallId) || comment.CreatedBy == userOrg.UserId;
 
             var isAdministrator = await _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Post);
 
@@ -186,7 +185,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             }
 
             var isWallModerator = await _wallModeratorsDbSet
-                                      .AnyAsync(x => x.UserId == userOrg.UserId && x.WallId == comment.Post.WallId) || comment.CreatedBy == userOrg.UserId;
+                .AnyAsync(x => x.UserId == userOrg.UserId && x.WallId == comment.Post.WallId) || comment.CreatedBy == userOrg.UserId;
 
             var isAdministrator = await _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Post);
 

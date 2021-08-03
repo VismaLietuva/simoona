@@ -86,30 +86,30 @@ namespace Shrooms.Presentation.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (_administrationService.UserEmailExists(model.Email))
+            if (await _administrationService.UserEmailExistsAsync(model.Email))
             {
                 var user = await _userManager.FindByEmailAsync(model.Email);
 
-                if (user == null || user.EmailConfirmed || !_administrationService.HasExistingExternalLogin(model.Email, AuthenticationConstants.InternalLoginProvider))
+                if (user == null || user.EmailConfirmed || !await _administrationService.HasExistingExternalLoginAsync(model.Email, AuthenticationConstants.InternalLoginProvider))
                 {
                     return BadRequest("User already exists");
                 }
 
                 await _userManager.RemovePasswordAsync(user.Id);
                 await _userManager.AddPasswordAsync(user.Id, model.Password);
-                await _administrationService.SendUserVerificationEmail(user, RequestedOrganization);
+                await _administrationService.SendUserVerificationEmailAsync(user, RequestedOrganization);
 
                 return Ok();
             }
 
-            if (_administrationService.UserIsSoftDeleted(model.Email))
+            if (await _administrationService.UserIsSoftDeletedAsync(model.Email))
             {
-                _administrationService.RestoreUser(model.Email);
+                await _administrationService.RestoreUserAsync(model.Email);
 
                 return Ok();
             }
 
-            var result = await _administrationService.CreateNewUser(_mapper.Map<ApplicationUser>(model), model.Password, RequestedOrganization);
+            var result = await _administrationService.CreateNewUserAsync(_mapper.Map<ApplicationUser>(model), model.Password, RequestedOrganization);
 
             if (!result.Succeeded)
             {
@@ -134,9 +134,9 @@ namespace Shrooms.Presentation.Api.Controllers
             }
 
             Authentication.SignOut(DefaultAuthenticationTypes.ExternalCookie);
-            ClaimsIdentity oAuthIdentity = await _userManager.CreateIdentityAsync(user, OAuthDefaults.AuthenticationType);
-            ClaimsIdentity cookieIdentity = await _userManager.CreateIdentityAsync(user, CookieAuthenticationDefaults.AuthenticationType);
-            AuthenticationProperties properties = await CreateInitialRefreshToken(model.ClientId, user, oAuthIdentity);
+            var oAuthIdentity = await _userManager.CreateIdentityAsync(user, OAuthDefaults.AuthenticationType);
+            var cookieIdentity = await _userManager.CreateIdentityAsync(user, CookieAuthenticationDefaults.AuthenticationType);
+            var properties = await CreateInitialRefreshToken(model.ClientId, user, oAuthIdentity);
             properties.IsPersistent = model.IsPersistance;
 
             Authentication.SignIn(properties, oAuthIdentity, cookieIdentity);
@@ -161,7 +161,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 return Ok();
             }
 
-            await _administrationService.SendUserPasswordResetEmail(user, RequestedOrganization);
+            await _administrationService.SendUserPasswordResetEmailAsync(user, RequestedOrganization);
 
             return Ok();
         }
@@ -314,41 +314,42 @@ namespace Shrooms.Presentation.Api.Controllers
                 return InternalServerError();
             }
 
-            if (!_administrationService.UserEmailExists(info.Email))
+            if (!await _administrationService.UserEmailExistsAsync(info.Email))
             {
-                if (_administrationService.UserIsSoftDeleted(info.Email))
+                if (await _administrationService.UserIsSoftDeletedAsync(info.Email))
                 {
-                    _administrationService.RestoreUser(info.Email);
+                    await _administrationService.RestoreUserAsync(info.Email);
                 }
                 else
                 {
                     var requestedOrganization = RequestedOrganization;
-                    var result = await _administrationService.CreateNewUserWithExternalLogin(info, requestedOrganization);
+                    var result = await _administrationService.CreateNewUserWithExternalLoginAsync(info, requestedOrganization);
                     if (!result.Succeeded)
                     {
                         return GetErrorResult(result);
                     }
                 }
             }
-            else if (_administrationService.HasExistingExternalLogin(info.Email, info.Login.LoginProvider))
-            {
-                await _administrationService.AddProviderImage(_userManager.FindByEmail(info.Email).Id, info.ExternalIdentity);
-                return Ok("User already exists");
-            }
-            else if (_administrationService.HasExistingExternalLogin(info.Email, AuthenticationConstants.InternalLoginProvider))
+            else if (await _administrationService.HasExistingExternalLoginAsync(info.Email, info.Login.LoginProvider))
             {
                 var user = await _userManager.FindByEmailAsync(info.Email);
-                if (user != null && !user.EmailConfirmed)
+                await _administrationService.AddProviderImageAsync(user.Id, info.ExternalIdentity);
+                return Ok("User already exists");
+            }
+            else if (await _administrationService.HasExistingExternalLoginAsync(info.Email, AuthenticationConstants.InternalLoginProvider))
+            {
+                var user = await _userManager.FindByEmailAsync(info.Email);
+                if (user?.EmailConfirmed == false)
                 {
                     await _userManager.RemoveLoginAsync(user.Id, new UserLoginInfo(AuthenticationConstants.InternalLoginProvider, user.Id));
                     await _userManager.RemovePasswordAsync(user.Id);
                 }
             }
 
-            var userId = _userManager.FindByEmail(info.Email).Id;
+            var userId = (await _userManager.FindByEmailAsync(info.Email)).Id;
             await _userManager.AddLoginAsync(userId, info.Login);
-            await _administrationService.AddProviderImage(userId, info.ExternalIdentity);
-            _administrationService.AddProviderEmail(userId, info.Login.LoginProvider, info.Email);
+            await _administrationService.AddProviderImageAsync(userId, info.ExternalIdentity);
+            await _administrationService.AddProviderEmailAsync(userId, info.Login.LoginProvider, info.Email);
 
             return Ok();
         }
@@ -429,7 +430,7 @@ namespace Shrooms.Presentation.Api.Controllers
             };
             _refreshTokenService.RemoveTokenBySubject(userOrganization);
 
-            AuthenticationProperties properties = ApplicationOAuthProvider.CreateProperties(user.Id, clientId);
+            var properties = ApplicationOAuthProvider.CreateProperties(user.Id, clientId);
 
             var ticket = new AuthenticationTicket(oAuthIdentity, properties);
             var context = new AuthenticationTokenCreateContext(Request.GetOwinContext(), Startup.OAuthServerOptions.RefreshTokenFormat, ticket);
@@ -521,7 +522,7 @@ namespace Shrooms.Presentation.Api.Controllers
             Authentication.SignOut(DefaultAuthenticationTypes.ExternalCookie);
             var identity = new ClaimsIdentity(externalLogin.GetClaims(), OAuthDefaults.AuthenticationType);
             Authentication.SignIn(identity);
-            _administrationService.AddProviderEmail(userId, info.Login.LoginProvider, info.Email);
+            await _administrationService.AddProviderEmailAsync(userId, info.Login.LoginProvider, info.Email);
 
             return Ok();
         }
@@ -530,19 +531,20 @@ namespace Shrooms.Presentation.Api.Controllers
         {
             if (hasLogin)
             {
-                await UpdateCookiesAndLogin(user, externalLogin, clientId);
+                await UpdateCookiesAndLoginAsync(user, externalLogin, clientId);
             }
-            else if (_administrationService.UserEmailExists(externalLogin.Email))
+            else if (await _administrationService.UserEmailExistsAsync(externalLogin.Email))
             {
-                if (_administrationService.HasExistingExternalLogin(externalLogin.Email, externalLogin.LoginProvider))
+                if (await _administrationService.HasExistingExternalLoginAsync(externalLogin.Email, externalLogin.LoginProvider))
                 {
                     var uri = CreateErrorUri("providerExists");
                     Authentication.SignOut(DefaultAuthenticationTypes.ExternalCookie);
                     return Redirect(uri);
                 }
 
-                var userId = _userManager.FindByEmail(externalLogin.Email).Id;
+                var userId = (await _userManager.FindByEmailAsync(externalLogin.Email)).Id;
                 var info = await Authentication.GetExternalLoginInfoAsync();
+
                 if (await _userManager.AddLoginAsync(userId, info.Login) == null)
                 {
                     var uri = CreateErrorUri("error");
@@ -550,12 +552,12 @@ namespace Shrooms.Presentation.Api.Controllers
                     return Redirect(uri);
                 }
 
-                ClaimsIdentity identity = new ClaimsIdentity(externalLogin.GetClaims(), OAuthDefaults.AuthenticationType);
+                var identity = new ClaimsIdentity(externalLogin.GetClaims(), OAuthDefaults.AuthenticationType);
                 Authentication.SignIn(identity);
             }
             else
             {
-                ClaimsIdentity identity = new ClaimsIdentity(externalLogin.GetClaims(), OAuthDefaults.AuthenticationType);
+                var identity = new ClaimsIdentity(externalLogin.GetClaims(), OAuthDefaults.AuthenticationType);
                 Authentication.SignIn(identity);
             }
 
@@ -566,25 +568,25 @@ namespace Shrooms.Presentation.Api.Controllers
         {
             if (hasLogin)
             {
-                await UpdateCookiesAndLogin(user, externalLogin, clientId);
+                await UpdateCookiesAndLoginAsync(user, externalLogin, clientId);
             }
             else
             {
-                if (_administrationService.UserEmailExists(externalLogin.Email) == false)
+                if (await _administrationService.UserEmailExistsAsync(externalLogin.Email) == false)
                 {
                     var uri = CreateErrorUri("notFound");
                     Authentication.SignOut(DefaultAuthenticationTypes.ExternalCookie);
                     return Redirect(uri);
                 }
 
-                if (_administrationService.HasExistingExternalLogin(externalLogin.Email, externalLogin.LoginProvider))
+                if (await _administrationService.HasExistingExternalLoginAsync(externalLogin.Email, externalLogin.LoginProvider))
                 {
                     var uri = CreateErrorUri("providerExists");
                     Authentication.SignOut(DefaultAuthenticationTypes.ExternalCookie);
                     return Redirect(uri);
                 }
 
-                ClaimsIdentity identity = new ClaimsIdentity(externalLogin.GetClaims(), OAuthDefaults.AuthenticationType);
+                var identity = new ClaimsIdentity(externalLogin.GetClaims(), OAuthDefaults.AuthenticationType);
                 Authentication.SignIn(identity);
             }
 
@@ -598,15 +600,16 @@ namespace Shrooms.Presentation.Api.Controllers
             return $"{hostUri}#{tag}={encodedError}";
         }
 
-        private async Task UpdateCookiesAndLogin(ApplicationUser user, ExternalLoginData externalLogin, string clientId)
+        private async Task UpdateCookiesAndLoginAsync(ApplicationUser user, ExternalLoginData externalLogin, string clientId)
         {
             Authentication.SignOut(DefaultAuthenticationTypes.ExternalCookie);
-            ClaimsIdentity oAuthIdentity = await _userManager.CreateIdentityAsync(user, OAuthDefaults.AuthenticationType);
-            ClaimsIdentity cookieIdentity = await _userManager.CreateIdentityAsync(user, CookieAuthenticationDefaults.AuthenticationType);
-            AuthenticationProperties properties = await CreateInitialRefreshToken(clientId, user, oAuthIdentity);
+            var oAuthIdentity = await _userManager.CreateIdentityAsync(user, OAuthDefaults.AuthenticationType);
+            var cookieIdentity = await _userManager.CreateIdentityAsync(user, CookieAuthenticationDefaults.AuthenticationType);
+            var properties = await CreateInitialRefreshToken(clientId, user, oAuthIdentity);
+
             if ((externalLogin.LoginProvider == "Google" && user.GoogleEmail == null) || (externalLogin.LoginProvider == "Facebook" && user.FacebookEmail == null))
             {
-                _administrationService.AddProviderEmail(user.Id, externalLogin.LoginProvider, externalLogin.Email);
+                await _administrationService.AddProviderEmailAsync(user.Id, externalLogin.LoginProvider, externalLogin.Email);
             }
 
             Authentication.SignIn(properties, oAuthIdentity, cookieIdentity);

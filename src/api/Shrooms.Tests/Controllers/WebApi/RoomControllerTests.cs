@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using System.Data.Entity;
 using System.Net;
 using System.Net.Http;
 using System.Security.Claims;
@@ -29,9 +29,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         private IUnitOfWork _unitOfWork;
         private RoomController _roomController;
         private IUserStore<ApplicationUser> _userStore;
-        private IRoleStore<ApplicationRole, string> _roleStore;
         private ShroomsUserManager _userManager;
-        private ShroomsRoleManager _roleManager;
         private IRepository<ApplicationUser> _applicationUserRepository;
         private IMapper _mapper;
 
@@ -41,12 +39,10 @@ namespace Shrooms.Tests.Controllers.WebApi
             _unitOfWork = new MockUnitOfWork();
             _applicationUserRepository = _unitOfWork.GetRepository<ApplicationUser>();
             _userStore = MockIdentity.MockShroomsUserStore(_unitOfWork.DbContext);
-            _roleStore = MockIdentity.MockRoleStore();
             _userManager = MockIdentity.MockUserManager(_userStore, _unitOfWork.DbContext);
-            _roleManager = MockIdentity.MockRoleManager(_roleStore);
             _mapper = ModelMapper.Create();
 
-            _roomController = new RoomController(_mapper, _unitOfWork, _userManager, _roleManager);
+            _roomController = new RoomController(_mapper, _unitOfWork, _userManager);
             _roomController.ControllerContext = Substitute.For<HttpControllerContext>();
             _roomController.Request = new HttpRequestMessage();
             _roomController.Request.Properties.Add(HttpPropertyKeys.HttpConfigurationKey, new HttpConfiguration());
@@ -58,7 +54,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         [Test]
         public async Task Room_Get_Should_Return_Correct_View_Model()
         {
-            var result = _roomController.Get(1);
+            var result = await _roomController.Get(1);
             var room = await result.Content.ReadAsAsync<RoomViewModel>();
 
             Assert.IsInstanceOf<RoomViewModel>(room);
@@ -67,42 +63,42 @@ namespace Shrooms.Tests.Controllers.WebApi
         [Test]
         public async Task Room_Get_Should_Return_Correct_Id()
         {
-            var result = _roomController.Get(1);
+            var result = await _roomController.Get(1);
             var model = await result.Content.ReadAsAsync<RoomViewModel>();
 
             Assert.AreEqual(1, model.Id);
         }
 
         [Test]
-        public void Room_GetPaged_Should_Return_Correct_Paged_Model()
+        public async Task Room_GetPaged_Should_Return_Correct_Paged_Model()
         {
-            var rooms = _roomController.GetPaged();
+            var rooms = await _roomController.GetPaged();
             Assert.IsInstanceOf<PagedViewModel<RoomViewModel>>(rooms);
         }
 
         [Test]
-        public void Room_GetPaged_Should_Return_Correct_Page_Count()
+        public async Task Room_GetPaged_Should_Return_Correct_Page_Count()
         {
-            var rooms = _roomController.GetPaged(page: 1, pageSize: 2);
+            var rooms = await _roomController.GetPaged(page: 1, pageSize: 2);
             Assert.AreEqual(3, rooms.PageCount);
         }
 
         [Test]
-        public void Room_GetPagedByFloor_Should_Return_Correct_Paged_Model()
+        public async Task Room_GetPagedByFloor_Should_Return_Correct_Paged_Model()
         {
-            var rooms = _roomController.GetAllRoomsByFloor(floorId: 1);
+            var rooms = await _roomController.GetAllRoomsByFloor(floorId: 1);
             Assert.IsInstanceOf<PagedViewModel<RoomViewModel>>(rooms);
         }
 
         [Test]
-        public void Room_GetPagedByFloor_Should_Return_Correct_Page_Count()
+        public async Task Room_GetPagedByFloor_Should_Return_Correct_Page_Count()
         {
-            var rooms = _roomController.GetAllRoomsByFloor(floorId: 1, page: 1, pageSize: 2);
+            var rooms = await _roomController.GetAllRoomsByFloor(floorId: 1, page: 1, pageSize: 2);
             Assert.AreEqual(2, rooms.PageCount);
         }
 
         [Test]
-        public void Room_Post_Should_Return_Ok_Response_If()
+        public async Task Room_Post_Should_Return_Ok_Response_If()
         {
             var testRoom = new RoomPostViewModel
             {
@@ -112,12 +108,12 @@ namespace Shrooms.Tests.Controllers.WebApi
                 Coordinates = "111,222,333",
                 FloorId = 1,
                 ApplicationUsers = new List<ApplicationUserViewModel>
-                                {
-                                    new ApplicationUserViewModel
-                                        {
-                                            Id = "1"
-                                        }
-                                }
+                {
+                    new ApplicationUserViewModel
+                    {
+                        Id = "1"
+                    }
+                }
             };
 
             var userToReturn = _unitOfWork.GetDbContextAs<MockDbContext>().ApplicationUsers.Find(p => p.Id == "1");
@@ -127,22 +123,22 @@ namespace Shrooms.Tests.Controllers.WebApi
             _roomController.Request.SetConfiguration(new HttpConfiguration());
             _roomController.Validate(testRoom);
 
-            var response = _roomController.Post(testRoom);
+            var response = await _roomController.Post(testRoom);
 
             Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
         }
 
         [Test]
-        public void Room_Post_Should_Return_Bad_Request_If_Invalid_Room_Model_Provided()
+        public async Task Room_Post_Should_Return_Bad_Request_If_Invalid_Room_Model_Provided()
         {
-            var response = _roomController.Post(null);
+            var response = await _roomController.Post(null);
             Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         [Test]
-        public void Room_Put_Should_Return_Ok_Response_If()
+        public async Task Room_Put_Should_Return_Ok_Response_If()
         {
-            var applicationUser = _applicationUserRepository.Get().FirstOrDefault();
+            var applicationUser = await _applicationUserRepository.Get().FirstOrDefaultAsync();
             var applicationUserViewModel = _mapper.Map<ApplicationUser, ApplicationUserViewModel>(applicationUser);
 
             var testRoom = new RoomPostViewModel
@@ -153,21 +149,22 @@ namespace Shrooms.Tests.Controllers.WebApi
                 Coordinates = "111,222,333",
                 FloorId = 1,
                 ApplicationUsers = new List<ApplicationUserViewModel>
-                                {
-                                    applicationUserViewModel
-                                }
+                {
+                    applicationUserViewModel
+                }
             };
 
+            // ReSharper disable once PossibleNullReferenceException
             _userManager.FindByIdAsync(applicationUser.Id).Returns(Task.FromResult(applicationUser));
 
             _roomController.Validate(testRoom);
-            var response = _roomController.Put(testRoom);
+            var response = await _roomController.Put(testRoom);
 
             Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
         }
 
         [Test]
-        public void Room_Put_Should_Return_Not_Found_If_Updating_Invalid_Room()
+        public async Task Room_Put_Should_Return_Not_Found_If_Updating_Invalid_Room()
         {
             var testRoom = new RoomPostViewModel
             {
@@ -180,29 +177,29 @@ namespace Shrooms.Tests.Controllers.WebApi
             };
 
             _roomController.Validate(testRoom);
-            var response = _roomController.Put(testRoom);
+            var response = await _roomController.Put(testRoom);
 
             Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
         }
 
         [Test]
-        public void Room_Delete_Should_Return_Not_Found_If_Incorrect_Id_Provided()
+        public async Task Room_Delete_Should_Return_Not_Found_If_Incorrect_Id_Provided()
         {
             _roomController.Request = new HttpRequestMessage();
             _roomController.Request.SetConfiguration(new HttpConfiguration());
 
-            var response = _roomController.Delete(-1);
+            var response = await _roomController.Delete(-1);
 
             Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
         }
 
         [Test]
-        public void Room_Delete_Should_Return_Ok_If_Room_Deleted_SuccessfullyDeleteReturnOkResponse()
+        public async Task Room_Delete_Should_Return_Ok_If_Room_Deleted_SuccessfullyDeleteReturnOkResponse()
         {
             _roomController.Request = new HttpRequestMessage();
             _roomController.Request.SetConfiguration(new HttpConfiguration());
 
-            var response = _roomController.Delete(1);
+            var response = await _roomController.Delete(1);
 
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }

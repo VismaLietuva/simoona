@@ -41,7 +41,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         [Test]
         public async Task RoomType_Get_Should_Return_Correct_Id()
         {
-            var result = _roomController.Get(1);
+            var result = await _roomController.Get(1);
             var model = await result.Content.ReadAsAsync<RoomTypeViewModel>();
 
             Assert.AreEqual(1, model.Id);
@@ -50,7 +50,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         [Test]
         public async Task RoomType_Get_Should_Return_MeetingRoomTypeViewModel()
         {
-            var result = _roomController.Get(2);
+            var result = await _roomController.Get(2);
             var model = await result.Content.ReadAsAsync<RoomTypeViewModel>();
 
             Assert.AreEqual(2, model.Id);
@@ -59,26 +59,27 @@ namespace Shrooms.Tests.Controllers.WebApi
         }
 
         [Test]
-        public void RoomType_Get_Should_Return_Bad_Request_If_Incorrect_Id_Is_Provided()
+        public async Task RoomType_Get_Should_Return_Bad_Request_If_Incorrect_Id_Is_Provided()
         {
-            var model = _roomController.Get(-1);
+            var model = await _roomController.Get(-1);
 
             Assert.AreEqual(HttpStatusCode.BadRequest, model.StatusCode);
         }
 
         [Test]
-        public void RoomType_GetByFloor_Should_Return_List_Of_RoomTypeViewModel()
+        public async Task RoomType_GetByFloor_Should_Return_List_Of_RoomTypeViewModel()
         {
-            var model = _roomController.GetByFloor(1);
+            var model = await _roomController.GetByFloor(1);
 
             Assert.IsInstanceOf<IEnumerable<RoomTypeViewModel>>(model);
         }
 
         [Test]
-        public void RoomType_GetAll_Should_Return_Room_Types_Ordered_By_Name()
+        public async Task RoomType_GetAll_Should_Return_Room_Types_Ordered_By_Name()
         {
-            var models = _roomController.GetAll(orderBy: "Name") as List<RoomTypeViewModel>;
+            var models = await _roomController.GetAllAsync(orderBy: "Name") as List<RoomTypeViewModel>;
 
+            Assert.IsNotNull(models);
             Assert.AreEqual(5, models.Count);
             Assert.AreEqual("Kitchen", models[0].Name);
             Assert.AreEqual("Meeting Room", models[1].Name);
@@ -98,7 +99,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         }
 
         [Test]
-        public void RoomType_Create_Should_Return_Conflict_If_Room_Already_Exists()
+        public async Task RoomType_Create_Should_Return_Conflict_If_Room_Already_Exists()
         {
             var model = new RoomTypePostViewModel();
 
@@ -107,21 +108,21 @@ namespace Shrooms.Tests.Controllers.WebApi
             model.Name = "-";
 
             _roomController.Validate(model);
-            var response = _roomController.Post(model);
+            var response = await _roomController.Post(model);
 
             Assert.AreEqual(HttpStatusCode.Conflict, response.StatusCode);
         }
 
         [Test]
-        public void RoomType_Create_Should_Return_Conflict_If_Invalid_Data_Provided()
+        public async Task RoomType_Create_Should_Return_Conflict_If_Invalid_Data_Provided()
         {
-            var response = _roomController.Post(null);
+            var response = await _roomController.Post(null);
 
             Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         [Test]
-        public void RoomType_Create_Should_Return_Created_Room_If_Successfully_Created()
+        public async Task RoomType_Create_Should_Return_Created_Room_If_Successfully_Created()
         {
             var model = new RoomTypePostViewModel();
 
@@ -129,7 +130,7 @@ namespace Shrooms.Tests.Controllers.WebApi
             model.Name = "TEST create";
 
             _roomController.Validate(model);
-            var response = _roomController.Post(model);
+            var response = await _roomController.Post(model);
 
             Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
         }
@@ -137,13 +138,13 @@ namespace Shrooms.Tests.Controllers.WebApi
         [Test]
         public async Task RoomType_Update_Should_Return_Updated_Room_If_Successfully_Updated()
         {
-            var result = _roomController.Get(2);
+            var result = await _roomController.Get(2);
             var model = await result.Content.ReadAsAsync<RoomTypeViewModel>();
 
             model.Name = "Changed";
             model.Color = "#FEDCBA";
 
-            var result2 = _roomController.Get(2);
+            var result2 = await _roomController.Get(2);
             var model2 = await result2.Content.ReadAsAsync<RoomTypeViewModel>();
 
             Assert.AreNotEqual(model.Name, model2.Name);
@@ -151,18 +152,18 @@ namespace Shrooms.Tests.Controllers.WebApi
         }
 
         [Test]
-        public void RoomType_Put_Should_Return_Not_Found_If_Room_Not_Exists()
+        public async Task RoomType_Put_Should_Return_Not_Found_If_Room_Not_Exists()
         {
             var model = new RoomTypePostViewModel();
 
             _roomController.Validate(model);
-            var response = _roomController.Put(model);
+            var response = await _roomController.Put(model);
 
             Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
         }
 
         [Test]
-        public void RoomType_Put_Should_Return_Ok_If_Updated_Successfully()
+        public async Task RoomType_Put_Should_Return_Ok_If_Updated_Successfully()
         {
             var model = new RoomTypePostViewModel
             {
@@ -172,36 +173,37 @@ namespace Shrooms.Tests.Controllers.WebApi
             };
 
             _roomController.Validate(model);
-            var response = _roomController.Put(model);
+            var response = await _roomController.Put(model);
 
             Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
         }
 
         [Test]
-        public void RoomType_Delete_Should_Return_Not_Found_If_Incorrect_Id_Provided()
+        public async Task RoomType_Delete_Should_Return_Not_Found_If_Incorrect_Id_Provided()
         {
-            var message = _roomController.Delete(0);
+            var message = await _roomController.Delete(0);
 
             Assert.AreEqual(HttpStatusCode.NotFound, message.StatusCode);
         }
 
         [Test]
-        public void RoomType_Delete_Should_Return_Ok_And_Room_Type_If_Successfully_Deleted()
+        public async Task RoomType_Delete_Should_Return_Ok_And_Room_Type_If_Successfully_Deleted()
         {
-            var message = _roomController.Delete(1);
+            var message = await _roomController.Delete(1);
 
             Assert.AreEqual(HttpStatusCode.OK, message.StatusCode);
 
-            var model = _roomController.Get(1);
+            var model = await _roomController.Get(1);
 
             Assert.AreEqual(HttpStatusCode.BadRequest, model.StatusCode);
         }
 
         [Test]
-        public void RoomType_GetPaged_Should_Return_Paged_List()
+        public async Task RoomType_GetPaged_Should_Return_Paged_List()
         {
-            int pageIndex = 2, pageSize = 2;
-            var model = _roomController.GetPaged(page: pageIndex, pageSize: pageSize);
+            const int pageIndex = 2;
+            const int pageSize = 2;
+            var model = await _roomController.GetPaged(page: pageIndex, pageSize: pageSize);
 
             Assert.AreEqual(3, model.PageCount);
             Assert.AreEqual(pageSize, model.PageSize);
@@ -211,9 +213,9 @@ namespace Shrooms.Tests.Controllers.WebApi
         [Test]
         [TestCase("name", WebApiConstants.DefaultPageSize, "Kitchen", "#00FF00")]
         [TestCase("color", WebApiConstants.DefaultPageSize, "Unknown", "#000000")]
-        public void RoomType_GetPaged_Should_Return_Sorted_And_Paged_Room_Types(string sort, int pageSize, string firstName, string firstColor)
+        public async Task RoomType_GetPaged_Should_Return_Sorted_And_Paged_Room_Types(string sort, int pageSize, string firstName, string firstColor)
         {
-            var model = _roomController.GetPaged(sort: sort, pageSize: pageSize);
+            var model = await _roomController.GetPaged(pageSize: pageSize, sort: sort);
 
             Assert.AreEqual(firstName, model.PagedList[0].Name);
             Assert.AreEqual(firstColor, model.PagedList[0].Color);

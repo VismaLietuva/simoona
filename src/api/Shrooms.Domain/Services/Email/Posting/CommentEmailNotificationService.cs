@@ -69,7 +69,7 @@ namespace Shrooms.Domain.Services.Email.Posting
         public async Task SendEmailNotificationAsync(CommentCreatedDTO commentDto)
         {
             var commentCreator = await _userService.GetApplicationUserAsync(commentDto.CommentCreator);
-            var organization = _organizationService.GetOrganizationById(commentCreator.OrganizationId);
+            var organization = await _organizationService.GetOrganizationByIdAsync(commentCreator.OrganizationId);
 
             var mentionedUsers = (await GetMentionedUsersAsync(commentDto.MentionedUsersIds)).ToList();
             var destinationEmails = (await GetPostWatchersEmailsAsync(commentCreator.Email, commentDto.PostId, commentCreator.Id))

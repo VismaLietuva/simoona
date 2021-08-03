@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
@@ -488,14 +489,21 @@ namespace Shrooms.Tests.Mocks
         private static DbSet<T> CreateMock<T>(IQueryable<T> list)
             where T : class
         {
-            var mockSet = Substitute.For<DbSet<T>, IQueryable<T>>();
-            ((IQueryable<T>)mockSet).Provider.Returns(list.Provider);
-            ((IQueryable<T>)mockSet).Expression.Returns(list.Expression);
-            ((IQueryable<T>)mockSet).ElementType.Returns(list.ElementType);
-            ((IQueryable<T>)mockSet).GetEnumerator().Returns(_ => list.GetEnumerator());
-            mockSet.Include(Arg.Any<string>()).Returns(mockSet);
+            var mockedDbSet = Substitute.For<DbSet<T>, IQueryable<T>, IDbAsyncEnumerable<T>>();
 
-            return mockSet;
+            var queryableMockSet = (IQueryable<T>)mockedDbSet;
+            var dbAsyncEnumerableMockSet = (IDbAsyncEnumerable<T>)mockedDbSet;
+            dbAsyncEnumerableMockSet.GetAsyncEnumerator().Returns(_ => new MockDbAsyncEnumerator<T>(list.GetEnumerator()));
+            queryableMockSet.Provider.Returns(new MockDbAsyncQueryProvider<T>(list.Provider));
+
+            queryableMockSet.Expression.Returns(list.Expression);
+            queryableMockSet.ElementType.Returns(list.ElementType);
+            queryableMockSet.GetEnumerator().Returns(_ => list.GetEnumerator());
+            queryableMockSet.AsNoTracking().Returns(queryableMockSet);
+
+            mockedDbSet.Include(Arg.Any<string>()).Returns(mockedDbSet);
+
+            return mockedDbSet;
         }
 
         public new DbSet<T> Set<T>()

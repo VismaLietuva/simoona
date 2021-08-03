@@ -4,6 +4,7 @@ using Autofac;
 using Microsoft.Owin.Security.Facebook;
 using Newtonsoft.Json.Linq;
 using Shrooms.Domain.Services.Organizations;
+using Claim = System.Security.Claims.Claim;
 
 namespace Shrooms.Presentation.Api.Providers
 {
@@ -18,12 +19,12 @@ namespace Shrooms.Presentation.Api.Providers
                     if (claim.Key.Equals("first_name"))
                     {
                         var claimValue = claim.Value.ToString();
-                        context.Identity.AddClaim(new System.Security.Claims.Claim(ClaimTypes.GivenName, claimValue));
+                        context.Identity.AddClaim(new Claim(ClaimTypes.GivenName, claimValue));
                     }
                     else if (claim.Key.Equals("last_name"))
                     {
                         var claimValue = claim.Value.ToString();
-                        context.Identity.AddClaim(new System.Security.Claims.Claim(ClaimTypes.Surname, claimValue));
+                        context.Identity.AddClaim(new Claim(ClaimTypes.Surname, claimValue));
                     }
                     else if (claim.Key.Equals("picture"))
                     {
@@ -31,7 +32,7 @@ namespace Shrooms.Presentation.Api.Providers
                         bool.TryParse(json.SelectToken("data.is_silhouette").ToString(), out var isDefaultImage);
                         if (isDefaultImage == false)
                         {
-                            context.Identity.AddClaim(new System.Security.Claims.Claim("picture", json.SelectToken("data.url").ToString()));
+                            context.Identity.AddClaim(new Claim("picture", json.SelectToken("data.url").ToString()));
                         }
                     }
                 }

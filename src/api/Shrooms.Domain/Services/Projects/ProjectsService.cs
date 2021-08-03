@@ -20,9 +20,9 @@ namespace Shrooms.Domain.Services.Projects
 {
     public class ProjectsService : IProjectsService
     {
-        private readonly IDbSet<Skill> _skillsDbSet;
-        private readonly IDbSet<Project> _projectsDbSet;
-        private readonly IDbSet<ApplicationUser> _usersDbSet;
+        private readonly DbSet<Skill> _skillsDbSet;
+        private readonly DbSet<Project> _projectsDbSet;
+        private readonly DbSet<ApplicationUser> _usersDbSet;
 
         private readonly IUnitOfWork2 _uow;
         private readonly IWallService _wallService;
@@ -312,19 +312,19 @@ namespace Shrooms.Domain.Services.Projects
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
-        public bool ValidateManagerId(string userId, string managerId)
+        public async Task<bool> ValidateManagerIdAsync(string userId, string managerId)
         {
-            var user = _usersDbSet.Find(userId);
-            var manager = _usersDbSet.Find(managerId);
+            var user = await _usersDbSet.FindAsync(userId);
+            var manager = await _usersDbSet.FindAsync(managerId);
 
-            if (DataLayerConstants.OrganizationManagerUsername.Equals(user.UserName, StringComparison.InvariantCultureIgnoreCase) && user.Id == manager.Id)
+            if (user != null && DataLayerConstants.OrganizationManagerUsername.Equals(user.UserName, StringComparison.InvariantCultureIgnoreCase) && user.Id == manager.Id)
             {
                 return true;
             }
 
-            while (manager.Id != user.Id && manager.ManagerId != null && manager.ManagerId != manager.Id)
+            while (manager?.Id != user.Id && manager.ManagerId != null && manager.ManagerId != manager.Id)
             {
-                manager = _usersDbSet.Find(manager.ManagerId);
+                manager = await _usersDbSet.FindAsync(manager.ManagerId);
             }
 
             if (manager.Id == user.Id)

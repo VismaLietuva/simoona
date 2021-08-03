@@ -11,7 +11,6 @@ using System.Web.Script.Serialization;
 using AutoMapper;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
-using PagedList;
 using Shrooms.Authentification.Membership;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
@@ -39,6 +38,7 @@ using Shrooms.Presentation.WebViewModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.Profile.JobPosition;
 using Shrooms.Presentation.WebViewModels.Models.User;
 using WebApi.OutputCache.V2;
+using X.PagedList;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
@@ -128,7 +128,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 return Content(HttpStatusCode.MethodNotAllowed, "Employee has pending kudos");
             }
 
-            await _userService.Delete(id, GetUserAndOrganization());
+            await _userService.DeleteAsync(id, GetUserAndOrganization());
             return Ok();
         }
 
@@ -154,7 +154,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         #region private methods
 
-        private void UpdateRoles(ApplicationUser user, IEnumerable<string> roleIds)
+        private async Task UpdateRolesAsync(ApplicationUser user, IEnumerable<string> roleIds)
         {
             user.Roles.Clear();
             if (roleIds == null)
@@ -164,7 +164,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             foreach (var id in roleIds)
             {
-                var role = _rolesRepository.GetByID(id);
+                var role = await _rolesRepository.GetByIdAsync(id);
                 if (role == null)
                 {
                     throw new Exception(string.Format(Resources.Common.DoesNotExist + " Id: {1}", "Role", id));
@@ -233,7 +233,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [Route("GetPaged")]
         [HttpGet, HttpPost]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public PagedViewModel<AdministrationUserDTO> GetPaged(int page = 1,
+        public async Task<PagedViewModel<AdministrationUserDTO>> GetPaged(int page = 1,
             int pageSize = WebApiConstants.DefaultPageSize,
             string s = "",
             string sort = "LastName",
@@ -248,21 +248,19 @@ namespace Shrooms.Presentation.Api.Controllers
             {
                 filterModel = new JavaScriptSerializer().Deserialize<FilterDTO[]>(filter);
                 includeProperties += (includeProperties != string.Empty ? "," : string.Empty) + "Projects";
-                if (filterModel == null)
-                {
-                    filterModel = new[] { new JavaScriptSerializer().Deserialize<FilterDTO>(filter) };
-                }
+
+                filterModel ??= new[] { new JavaScriptSerializer().Deserialize<FilterDTO>(filter) };
             }
 
-            var administrationUsersDto = _administrationUsersService.GetAllUsers(sortQuery, s, filterModel, includeProperties);
+            var administrationUsersDto = await _administrationUsersService.GetAllUsersAsync(sortQuery, s, filterModel, includeProperties);
 
-            return PagedViewModel(page, pageSize, administrationUsersDto);
+            return await PagedViewModel(page, pageSize, administrationUsersDto);
         }
 
-        private PagedViewModel<T> PagedViewModel<T>(int page, int pageSize, IEnumerable<T> officeUsers)
+        private static async Task<PagedViewModel<T>> PagedViewModel<T>(int page, int pageSize, IEnumerable<T> officeUsers)
             where T : class
         {
-            var officeUserPagedViewModel = officeUsers.ToPagedList(page, pageSize);
+            var officeUserPagedViewModel = await officeUsers.ToPagedListAsync(page, pageSize);
 
             var pagedModel = new PagedViewModel<T>
             {
@@ -349,7 +347,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             try
             {
-                _administrationUsersService.ConfirmNewUser(id, userAndOrg);
+                _administrationUsersService.ConfirmNewUserAsync(id, userAndOrg);
                 return Ok();
             }
             catch (UserAdministrationException ex)
@@ -397,13 +395,13 @@ namespace Shrooms.Presentation.Api.Controllers
                 return Request.CreateResponse(HttpStatusCode.Forbidden);
             }
 
-            var user = _applicationUserRepository.GetByID(id);
+            var user = await _applicationUserRepository.GetByIdAsync(id);
             if (user == null)
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound, new[] { string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName) });
             }
 
-            var model = MapPersonalInfoAsync(user);
+            var model = await MapPersonalInfoAsync(user);
 
             return Request.CreateResponse(HttpStatusCode.OK, model);
         }
@@ -563,7 +561,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 return Request.CreateResponse(HttpStatusCode.Forbidden);
             }
 
-            var validatedModelInfo = ValidateModelInfo(model);
+            var validatedModelInfo = await ValidateModelInfoAsync(model);
             if (!validatedModelInfo.IsSuccessStatusCode)
             {
                 return validatedModelInfo;
@@ -587,7 +585,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             if (editorIsAdministrator && model.RoleIds != null)
             {
-                UpdateRoles(applicationUser, model.RoleIds);
+                await UpdateRolesAsync(applicationUser, model.RoleIds);
             }
 
             if (applicationUser.WorkingHours?.OrganizationId == 0)
@@ -603,18 +601,15 @@ namespace Shrooms.Presentation.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
-        private HttpResponseMessage ValidateModelInfo(ApplicationUserPutJobInfoViewModel model)
+        private async Task<HttpResponseMessage> ValidateModelInfoAsync(ApplicationUserPutJobInfoViewModel model)
         {
             if (model.ManagerId != null)
             {
-                var managerRole = _rolesRepository
-                    .Get()
-                    .FirstOrDefault(role => role.Name == Roles.Manager);
+                var managerRole = await _rolesRepository.Get().FirstOrDefaultAsync(role => role.Name == Roles.Manager);
 
-                var manager = _applicationUserRepository
-                    .Get(x => x.Id == model.ManagerId &&
-                              x.Roles.Any(y => y.RoleId == managerRole.Id))
-                    .FirstOrDefault();
+                var manager = await _applicationUserRepository
+                    .Get(x => x.Id == model.ManagerId && x.Roles.Any(y => y.RoleId == managerRole.Id))
+                    .FirstOrDefaultAsync();
 
                 if (manager == null)
                 {
@@ -622,7 +617,7 @@ namespace Shrooms.Presentation.Api.Controllers
                         string.Format(Resources.Common.DoesNotExist + " Id: {1}", Resources.Models.ApplicationUser.ApplicationUser.Manager, model.ManagerId));
                 }
 
-                if (!_projectService.ValidateManagerId(model.Id, model.ManagerId))
+                if (!await _projectService.ValidateManagerIdAsync(model.Id, model.ManagerId))
                 {
                     return Request.CreateResponse(HttpStatusCode.BadRequest, Resources.Common.WrongManager);
                 }
@@ -633,7 +628,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
 
-            var qualificationLevel = _qualificationLevelRepository.GetByID(model.QualificationLevelId);
+            var qualificationLevel = await _qualificationLevelRepository.GetByIdAsync(model.QualificationLevelId);
             if (qualificationLevel == null)
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound,
@@ -647,7 +642,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [ValidationFilter]
         [HttpPut]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        [InvalidateCacheOutput(nameof(WallWidgetsController.GetKudosBasketWidget), typeof(WallWidgetsController))]
+        [InvalidateCacheOutput(nameof(WallWidgetsController.GetKudosBasketWidgetAsync), typeof(WallWidgetsController))]
         public async Task<HttpResponseMessage> PutPersonalInfo(ApplicationUserPutPersonalInfoViewModel model)
         {
             var validatedModel = await ValidateModelAsync(model);
@@ -657,7 +652,7 @@ namespace Shrooms.Presentation.Api.Controllers
             }
 
             var userOrg = GetUserAndOrganization();
-            var user = _applicationUserRepository.GetByID(model.Id);
+            var user = await _applicationUserRepository.GetByIdAsync(model.Id);
 
             if (user == null)
             {
@@ -683,24 +678,22 @@ namespace Shrooms.Presentation.Api.Controllers
             _applicationUserRepository.Update(user);
             await _unitOfWork.SaveAsync();
 
-            var response = default(object);
-
-            if (!User.IsInRole(Roles.NewUser) || !_userManager.IsInRole(user.Id, Roles.FirstLogin))
+            if (!User.IsInRole(Roles.NewUser) || !await _userManager.IsInRoleAsync(user.Id, Roles.FirstLogin))
             {
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
 
             await _userManager.RemoveFromRoleAsync(User.Identity.GetUserId(), Roles.FirstLogin);
 
-            _administrationUsersService.NotifyAboutNewUser(user, userOrg.OrganizationId);
-            var requiresConfirmation = _organizationService.RequiresUserConfirmation(userOrg.OrganizationId);
+            await _administrationUsersService.NotifyAboutNewUserAsync(user, userOrg.OrganizationId);
+            var requiresConfirmation = await _organizationService.RequiresUserConfirmationAsync(userOrg.OrganizationId);
 
             if (!requiresConfirmation)
             {
-                _administrationUsersService.ConfirmNewUser(userOrg.UserId, userOrg);
+                await _administrationUsersService.ConfirmNewUserAsync(userOrg.UserId, userOrg);
             }
 
-            response = new { requiresConfirmation };
+            var response = new { requiresConfirmation };
 
             return Request.CreateResponse(HttpStatusCode.OK, response);
         }
@@ -746,13 +739,13 @@ namespace Shrooms.Presentation.Api.Controllers
                 return Request.CreateResponse(HttpStatusCode.Forbidden);
             }
 
-            var room = _roomRepository.GetByID(model.RoomId);
+            var room = await _roomRepository.GetByIdAsync(model.RoomId);
             if (room == null)
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound, new[] { string.Format(Resources.Common.DoesNotExist + " Id: " + model.RoomId, Resources.Models.Room.Room.EntityName) });
             }
 
-            var user = _applicationUserRepository.GetByID(model.Id);
+            var user = await _applicationUserRepository.GetByIdAsync(model.Id);
             if (user == null)
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound, new[] { string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName) });
@@ -766,6 +759,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             _applicationUserRepository.Update(user);
             await _unitOfWork.SaveAsync();
+
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
@@ -795,7 +789,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [Route("GetForAutoComplete")]
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public IEnumerable<ApplicationUserAutoCompleteViewModel> GetForAutoComplete(string s, int pageSize = WebApiConstants.DefaultAutocompleteListSize)
+        public async Task<IEnumerable<ApplicationUserAutoCompleteViewModel>> GetForAutoComplete(string s, int pageSize = WebApiConstants.DefaultAutocompleteListSize)
         {
             if (string.IsNullOrWhiteSpace(s))
             {
@@ -803,14 +797,14 @@ namespace Shrooms.Presentation.Api.Controllers
             }
 
             s = s.ToLowerInvariant();
-            var users = _applicationUserRepository
+            var users = await _applicationUserRepository
                 .Get(u => u.UserName.ToLower().StartsWith(s)
                           || (u.FirstName != null && u.FirstName.ToLower().StartsWith(s))
                           || (u.LastName != null && u.LastName.ToLower().StartsWith(s))
                           || (u.FirstName != null && u.LastName != null && (u.FirstName.ToLower() + " " + u.LastName.ToLower()).StartsWith(s)))
                 .Where(_roleService.ExcludeUsersWithRole(Roles.NewUser))
                 .OrderBy(u => u.Id)
-                .ToPagedList(1, pageSize);
+                .ToPagedListAsync(1, pageSize);
 
             return _mapper.Map<IEnumerable<ApplicationUserAutoCompleteViewModel>>(users);
         }
@@ -818,7 +812,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [Route("GetManagersForAutoComplete")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public IEnumerable<ApplicationUserAutoCompleteViewModel> GetManagersForAutoComplete(string s, string userId = null, int pageSize = WebApiConstants.DefaultAutocompleteListSize)
+        public async Task<IEnumerable<ApplicationUserAutoCompleteViewModel>> GetManagersForAutoComplete(string s, string userId = null, int pageSize = WebApiConstants.DefaultAutocompleteListSize)
         {
             if (string.IsNullOrWhiteSpace(s))
             {
@@ -832,28 +826,29 @@ namespace Shrooms.Presentation.Api.Controllers
 
             s = s.ToLowerInvariant();
 
-            var managerRole = _rolesRepository.Get().FirstOrDefault(role => role.Name == Roles.Manager);
+            var managerRole = await _rolesRepository.Get().FirstOrDefaultAsync(role => role.Name == Roles.Manager);
 
             if (WebApiConstants.OrganizationManagerUsername.Equals(User.Identity.Name, StringComparison.InvariantCultureIgnoreCase))
             {
-                var managersWithMantas = _applicationUserRepository
+                var managersWithMantas = await _applicationUserRepository
                     .Get(m => m.Roles.Any(r => r.RoleId == managerRole.Id) && (m.UserName.ToLower().StartsWith(s)
                                                                                || (m.FirstName != null && m.FirstName.ToLower().StartsWith(s))
                                                                                || (m.LastName != null && m.LastName.ToLower().StartsWith(s))
                                                                                || (m.FirstName != null && m.LastName != null && (m.FirstName.ToLower() + " " + m.LastName.ToLower()).StartsWith(s))))
                     .OrderBy(u => u.Id)
-                    .ToPagedList(1, pageSize);
+                    .ToPagedListAsync(1, pageSize);
+
                 return _mapper.Map<IEnumerable<ApplicationUserAutoCompleteViewModel>>(managersWithMantas);
             }
 
-            var managers = _applicationUserRepository
+            var managers = await _applicationUserRepository
                 .Get(m => m.Roles.Any(r => r.RoleId == managerRole.Id) && (m.Id != userId) && (m.UserName.ToLower().StartsWith(s)
                                                                                                || (m.FirstName != null && m.FirstName.ToLower().StartsWith(s))
                                                                                                || (m.LastName != null && m.LastName.ToLower().StartsWith(s))
                                                                                                || (m.FirstName != null && m.LastName != null &&
                                                                                                    (m.FirstName.ToLower() + " " + m.LastName.ToLower()).StartsWith(s))))
                 .OrderBy(u => u.Id)
-                .ToPagedList(1, pageSize);
+                .ToPagedListAsync(1, pageSize);
 
             return _mapper.Map<IEnumerable<ApplicationUserAutoCompleteViewModel>>(managers);
         }
@@ -862,7 +857,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [Route("CompleteTutorial")]
         public IHttpActionResult SetUserTutorialStatusToComplete()
         {
-            _administrationUsersService.SetUserTutorialStatusToComplete(GetUserAndOrganization().UserId);
+            _administrationUsersService.SetUserTutorialStatusToCompleteAsync(GetUserAndOrganization().UserId);
             return Ok();
         }
 
@@ -870,16 +865,16 @@ namespace Shrooms.Presentation.Api.Controllers
         [Route("TutorialStatus")]
         public IHttpActionResult GetUserTutorialStatus()
         {
-            var tutorialStatus = _administrationUsersService.GetUserTutorialStatus(GetUserAndOrganization().UserId);
+            var tutorialStatus = _administrationUsersService.GetUserTutorialStatusAsync(GetUserAndOrganization().UserId);
             return Ok(tutorialStatus);
         }
 
-        protected IEnumerable<ApplicationRole> GetUserRoles(string userId)
+        private IEnumerable<ApplicationRole> GetUserRoles(string userId)
         {
             return _rolesRepository.Get(r => r.Users.Any(u => u.UserId == userId));
         }
 
-        protected async Task<ApplicationUserPersonalInfoViewModel> MapPersonalInfoAsync(ApplicationUser user)
+        public async Task<ApplicationUserPersonalInfoViewModel> MapPersonalInfoAsync(ApplicationUser user)
         {
             var personalInfo = _mapper.Map<ApplicationUserPersonalInfoViewModel>(user);
 
@@ -894,7 +889,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return personalInfo;
         }
 
-        protected ApplicationUserJobInfoViewModel MapJobInfo(ApplicationUser user)
+        private ApplicationUserJobInfoViewModel MapJobInfo(ApplicationUser user)
         {
             var jobInfo = _mapper.Map<ApplicationUserJobInfoViewModel>(user);
             var roles = GetUserRoles(user.Id);
@@ -903,7 +898,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return jobInfo;
         }
 
-        protected ApplicationUserOfficeInfoViewModel MapOfficeInfo(ApplicationUser user)
+        private ApplicationUserOfficeInfoViewModel MapOfficeInfo(ApplicationUser user)
         {
             var officeInfo = _mapper.Map<ApplicationUserOfficeInfoViewModel>(user);
             return officeInfo;
@@ -914,7 +909,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return _mapper.Map<ApplicationUserShroomsInfoViewModel>(user);
         }
 
-        protected async Task<bool> CanAccessAsync(ApplicationUserBaseViewModel model)
+        private async Task<bool> CanAccessAsync(ApplicationUserBaseViewModel model)
         {
             return User.Identity.GetUserId() == model.Id || await _permissionService.UserHasPermissionAsync(GetUserAndOrganization(), AdministrationPermissions.ApplicationUser);
         }

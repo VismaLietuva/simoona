@@ -21,8 +21,8 @@ namespace Shrooms.Tests.DomainService
     {
         private IOrganizationService _organizationService;
         private IRoleService _roleService;
-        private IDbSet<Organization> _organizationsDbSet;
-        private IDbSet<ApplicationUser> _usersDbSet;
+        private DbSet<Organization> _organizationsDbSet;
+        private DbSet<ApplicationUser> _usersDbSet;
 
         [SetUp]
         public void Init()
@@ -30,18 +30,18 @@ namespace Shrooms.Tests.DomainService
             var uow = Substitute.For<IUnitOfWork2>();
             _roleService = Substitute.For<IRoleService>();
 
-            _organizationsDbSet = uow.MockDbSet<Organization>();
-            _usersDbSet = uow.MockDbSet<ApplicationUser>();
+            _organizationsDbSet = uow.MockDbSetForAsync<Organization>();
+            _usersDbSet = uow.MockDbSetForAsync<ApplicationUser>();
 
             _organizationService = new OrganizationService(uow, _roleService);
         }
 
         [Test]
-        public void Should_Get_Organization_By_Id()
+        public async Task Should_Get_Organization_By_Id()
         {
-            _organizationsDbSet.Find(1).Returns(new Organization { Id = 1, ShortName = "Organization1" });
+            _organizationsDbSet.FindAsync(1).Returns(new Organization { Id = 1, ShortName = "Organization1" });
 
-            var response = _organizationService.GetOrganizationById(1);
+            var response = await _organizationService.GetOrganizationByIdAsync(1);
 
             Assert.AreEqual(response.Id, 1);
             Assert.AreEqual(response.ShortName, "Organization1");
@@ -55,7 +55,7 @@ namespace Shrooms.Tests.DomainService
                 new Organization { Id = 1, ShortName = "Organization1" },
                 new Organization { Id = 2, ShortName = "Organization2" }
             };
-            _organizationsDbSet.SetDbSetData(organizations.AsQueryable());
+            _organizationsDbSet.SetDbSetDataForAsync(organizations.AsQueryable());
 
             var response = _organizationService.GetOrganizationByName("Organization2");
 
@@ -64,31 +64,31 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Get_Organization_Host_Name_By_Organization_Name()
+        public async Task Should_Get_Organization_Host_Name_By_Organization_Name()
         {
             var organizations = new List<Organization>
             {
                 new Organization { Id = 1, ShortName = "Organization1", HostName = "Host1" },
                 new Organization { Id = 2, ShortName = "Organization2", HostName = "Host2" }
             };
-            _organizationsDbSet.SetDbSetData(organizations);
+            _organizationsDbSet.SetDbSetDataForAsync(organizations);
 
-            var response = _organizationService.GetOrganizationHostNameAsync("Organization2");
+            var response = await _organizationService.GetOrganizationHostNameAsync("Organization2");
 
             Assert.AreEqual(response, "Host2");
         }
 
         [Test]
-        public void Should_Return_Organization_Email_Domain_Restriction()
+        public async Task Should_Return_Organization_Email_Domain_Restriction()
         {
             var organizations = new List<Organization>
             {
                 new Organization { Id = 1, ShortName = "Organization1", HostName = "Host1" },
                 new Organization { Id = 2, ShortName = "Organization2", HostName = "Host2", HasRestrictedAccess = true }
             };
-            _organizationsDbSet.SetDbSetData(organizations);
+            _organizationsDbSet.SetDbSetDataForAsync(organizations);
 
-            var response = _organizationService.GetOrganizationHostNameAsync("Organization2");
+            var response = await _organizationService.GetOrganizationHostNameAsync("Organization2");
 
             Assert.AreEqual(response, "Host2");
         }
@@ -101,20 +101,20 @@ namespace Shrooms.Tests.DomainService
                 new Organization { Id = 1, ShortName = "Organization1", HostName = "Host1" }
             };
 
-            _organizationsDbSet.SetDbSetData(organizations);
+            _organizationsDbSet.SetDbSetDataForAsync(organizations);
 
-            Assert.Throws<InvalidOrganizationException>(() => _organizationService.HasOrganizationEmailDomainRestrictionAsync("Organization2"));
+            Assert.ThrowsAsync<InvalidOrganizationException>(async () => await _organizationService.HasOrganizationEmailDomainRestrictionAsync("Organization2"));
         }
 
         [Test]
-        public void Should_Return_User_Organization()
+        public async Task Should_Return_User_Organization()
         {
             var organization = new Organization { Id = 1, ShortName = "Organization1", HostName = "Host1" };
             var user = new ApplicationUser { Id = "user1", Organization = organization };
 
-            _usersDbSet.Find("user1").Returns(user);
+            _usersDbSet.FindAsync("user1").Returns(user);
 
-            var response = _organizationService.GetUserOrganization(new ApplicationUser { Id = "user1" });
+            var response = await _organizationService.GetUserOrganizationAsync(new ApplicationUser { Id = "user1" });
 
             Assert.AreEqual(response.ShortName, "Organization1");
         }
@@ -128,7 +128,7 @@ namespace Shrooms.Tests.DomainService
                 new Organization { Id = 2, ShortName = "Organization2", HostName = "host2.com" }
             };
 
-            _organizationsDbSet.SetDbSetData(organizations);
+            _organizationsDbSet.SetDbSetDataForAsync(organizations);
 
             var response = await _organizationService.IsOrganizationHostValidAsync("organization1@host1c.om", "Organization1");
 
@@ -143,7 +143,7 @@ namespace Shrooms.Tests.DomainService
                 new Organization { Id = 1, ShortName = "Organization1", HostName = "host1.com", HasRestrictedAccess = true },
                 new Organization { Id = 2, ShortName = "Organization2", HostName = "host2.com" }
             };
-            _organizationsDbSet.SetDbSetData(organizations);
+            _organizationsDbSet.SetDbSetDataForAsync(organizations);
 
             var response = await _organizationService.IsOrganizationHostValidAsync("organization1@host1.com", "Organization1");
 
@@ -151,28 +151,28 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_Requires_User_Confirmation()
+        public async Task Should_Return_Requires_User_Confirmation()
         {
             var organizations = new List<Organization>
             {
                 new Organization { Id = 1, ShortName = "Organization1", RequiresUserConfirmation = true },
                 new Organization { Id = 2, ShortName = "Organization2" }
             };
-            _organizationsDbSet.SetDbSetData(organizations);
+            _organizationsDbSet.SetDbSetDataForAsync(organizations);
 
-            var response = _organizationService.RequiresUserConfirmation(1);
+            var response = await _organizationService.RequiresUserConfirmationAsync(1);
 
             Assert.IsTrue(response);
         }
 
         [Test]
-        public void Should_Get_Managing_Director()
+        public async Task Should_Get_Managing_Director()
         {
             var user = new ApplicationUser { Id = "user1", IsManagingDirector = true, FirstName = "John", LastName = "Doe", OrganizationId = 1 };
 
-            _usersDbSet.SetDbSetData(new List<ApplicationUser> { user });
+            _usersDbSet.SetDbSetDataForAsync(new List<ApplicationUser> { user });
 
-            var response = _organizationService.GetManagingDirector(1);
+            var response = await _organizationService.GetManagingDirectorAsync(1);
 
             Assert.AreEqual(response.UserId, "user1");
             Assert.AreEqual(response.FullName, "John Doe");
@@ -182,13 +182,13 @@ namespace Shrooms.Tests.DomainService
         public void Should_Throw_Exception_If_User_Has_No_Permission_To_Set_Managing_Director()
         {
             var userAndOrg = new UserAndOrganizationDTO { OrganizationId = 1, UserId = "user1" };
-            _roleService.HasRole("user1", Roles.Manager).Returns(false);
+            _ = _roleService.HasRoleAsync("user1", Roles.Manager).Returns(false);
 
-            Assert.Throws<ValidationException>(() => _organizationService.SetManagingDirector("user1", userAndOrg));
+            Assert.ThrowsAsync<ValidationException>(async () => await _organizationService.SetManagingDirectorAsync("user1", userAndOrg));
         }
 
         [Test]
-        public void Should_To_Set_Managing_Director()
+        public async Task Should_To_Set_Managing_Director()
         {
             var users = new List<ApplicationUser>
             {
@@ -197,12 +197,12 @@ namespace Shrooms.Tests.DomainService
                 new ApplicationUser { Id = "user3", IsManagingDirector = true, FirstName = "John", LastName = "Doe", OrganizationId = 1 }
             };
 
-            _usersDbSet.SetDbSetData(users);
+            _usersDbSet.SetDbSetDataForAsync(users);
 
             var userAndOrg = new UserAndOrganizationDTO { OrganizationId = 1, UserId = "user1" };
-            _roleService.HasRole("user1", Roles.Manager).Returns(true);
+            _roleService.HasRoleAsync("user1", Roles.Manager).Returns(true);
 
-            _organizationService.SetManagingDirector("user1", userAndOrg);
+            await _organizationService.SetManagingDirectorAsync("user1", userAndOrg);
 
             Assert.IsTrue(users[0].IsManagingDirector);
             Assert.IsFalse(users[1].IsManagingDirector);

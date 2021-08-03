@@ -65,7 +65,7 @@ namespace Shrooms.Domain.Services.Email.Posting
         {
             var postCreator = await _userService.GetApplicationUserAsync(post.User.UserId);
 
-            var organization = _organizationService.GetOrganizationById(postCreator.OrganizationId);
+            var organization = await _organizationService.GetOrganizationByIdAsync(postCreator.OrganizationId);
             var wall = await _wallsDbSet.SingleAsync(w => w.Id == post.WallId);
 
             var mentionedUsers = (await GetMentionedUsersAsync(post.MentionedUsersIds)).ToList();

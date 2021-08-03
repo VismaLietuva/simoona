@@ -41,7 +41,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         [Test]
         public async Task Floor_Get_Should_Return_View_Model()
         {
-            var result = _floorController.Get(1);
+            var result = await _floorController.Get(1);
             var floor = await result.Content.ReadAsAsync<FloorViewModel>();
 
             Assert.IsInstanceOf<FloorViewModel>(floor);
@@ -52,107 +52,107 @@ namespace Shrooms.Tests.Controllers.WebApi
         {
             const int id = 1;
 
-            var result = _floorController.Get(id);
+            var result = await _floorController.Get(id);
             var floor = await result.Content.ReadAsAsync<FloorViewModel>();
 
             Assert.AreEqual(id, floor.Id);
         }
 
         [Test]
-        public void Floor_GetByRoom_Should_Return_View_Model()
+        public async Task Floor_GetByRoom_Should_Return_View_Model()
         {
             const int roomId = 1;
-            var floor = _floorController.GetByRoom(roomId);
+            var floor = await _floorController.GetByRoom(roomId);
             Assert.IsInstanceOf<FloorViewModel>(floor);
         }
 
         [Test]
-        public void Floor_GetByRoom_Should_Return_Correct_Floor()
+        public async Task Floor_GetByRoom_Should_Return_Correct_Floor()
         {
-            var floor = _floorController.GetByRoom(2);
+            var floor = await _floorController.GetByRoom(2);
             Assert.AreEqual(1, floor.Id);
         }
 
         [Test]
-        public void Floor_GetByOffice_Should_Return_Floor_View_Model()
+        public async Task Floor_GetByOffice_Should_Return_Floor_View_Model()
         {
             const int roomId = 1;
 
-            var floor = _floorController.GetByOffice(roomId);
+            var floor = await _floorController.GetByOffice(roomId);
             Assert.IsInstanceOf<IEnumerable<FloorViewModel>>(floor);
         }
 
         [Test]
-        public void Floor_GetByOffice_Should_Return_Correct_Floors()
+        public async Task Floor_GetByOffice_Should_Return_Correct_Floors()
         {
-            var floor = _floorController.GetByOffice(1);
+            var floor = await _floorController.GetByOffice(1);
             Assert.AreEqual(1, floor.FirstOrDefault()?.Id);
         }
 
         [Test]
-        public void Floor_GetPaged_Should_Return_Paged_View_Model()
+        public async Task Floor_GetPaged_Should_Return_Paged_View_Model()
         {
-            var pagedFloors = _floorController.GetPaged(1);
+            var pagedFloors = await _floorController.GetPaged(1);
             Assert.IsInstanceOf<FloorViewPagedModel>(pagedFloors);
         }
 
         [Test]
-        public void GetManyReturnPageSizedNumberOfFloors()
+        public async Task GetManyReturnPageSizedNumberOfFloors()
         {
             const int pageSize = 2;
 
-            var pagedFloors = _floorController.GetPaged(1, 1, pageSize);
+            var pagedFloors = await _floorController.GetPaged(1, 1, pageSize);
             Assert.AreEqual(pageSize, pagedFloors.PagedList.Count);
         }
 
         [Test]
-        public void Floor_GetPaged_Should_Return_Correct_Floors_By_Page()
+        public async Task Floor_GetPaged_Should_Return_Correct_Floors_By_Page()
         {
-            var pagedFloors = _floorController.GetPaged(1, 2, 1);
+            var pagedFloors = await _floorController.GetPaged(1, 2, 1);
             Assert.AreEqual(2, pagedFloors.PagedList[0].Id);
         }
 
         [Test]
-        public void Floor_GetPaged_Should_Return_Floors_With_Rooms()
+        public async Task Floor_GetPaged_Should_Return_Floors_With_Rooms()
         {
-            var pagedFloors = _floorController.GetPaged(1, 1, 1);
+            var pagedFloors = await _floorController.GetPaged(1, 1, 1);
             Assert.IsNotNull(pagedFloors.PagedList[0].Rooms);
             Assert.AreEqual(3, pagedFloors.PagedList[0].Rooms.Count());
         }
 
         [Test]
-        public void Floor_GetPaged_Should_Filter_Floors_By_Parameters()
+        public async Task Floor_GetPaged_Should_Filter_Floors_By_Parameters()
         {
-            var pagedFloors = _floorController.GetPaged(1, 1, 20, "Z-Floor");
+            var pagedFloors = await _floorController.GetPaged(1, 1, 20, "Z-Floor");
             Assert.AreEqual(1, pagedFloors.PagedList.Count);
             Assert.AreEqual(2, pagedFloors.PagedList[0].Id);
         }
 
         [Test]
-        public void Floor_GetPaged_Should_Order_Floors_By_Parameters()
+        public async Task Floor_GetPaged_Should_Order_Floors_By_Parameters()
         {
-            var pagedFloors = _floorController.GetPaged(1, 1, 20, string.Empty, "Name descending");
+            var pagedFloors = await _floorController.GetPaged(1, 1, 20, string.Empty, "Name descending");
             Assert.AreEqual(2, pagedFloors.PagedList[0].Id);
             Assert.AreEqual(1, pagedFloors.PagedList[1].Id);
         }
 
         [Test]
-        public void Floor_GetPaged_Should_Return_Floors_With_Office()
+        public async Task Floor_GetPaged_Should_Return_Floors_With_Office()
         {
-            var pagedFloors = _floorController.GetPaged(-1, 1, 1);
+            var pagedFloors = await _floorController.GetPaged(-1, 1, 1);
             Assert.IsNotNull(pagedFloors.PagedList[0].Office);
             Assert.AreEqual(1, pagedFloors.PagedList[0].OfficeId);
         }
 
         [Test]
-        public void Floor_GetPaged_Should_Return_Floors_With_Correct_Users_Count()
+        public async Task Floor_GetPaged_Should_Return_Floors_With_Correct_Users_Count()
         {
-            var pagedFloors = _floorController.GetPaged(-1, 1, 1);
+            var pagedFloors = await _floorController.GetPaged(-1, 1, 1);
             Assert.AreEqual(3, pagedFloors.PagedList[0].ApplicationUsersCount);
         }
 
         [Test]
-        public void Floor_Post_Should_Return_Ok_Response()
+        public async Task Floor_Post_Should_Return_Ok_Response()
         {
             var model = new FloorPostViewModel
             {
@@ -164,26 +164,26 @@ namespace Shrooms.Tests.Controllers.WebApi
             _floorController.Request.SetConfiguration(new HttpConfiguration());
             _floorController.Validate(model);
 
-            var response = _floorController.Post(model);
+            var response = await _floorController.Post(model);
 
             Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
         }
 
         [Test]
-        public void Floor_Post_Should_Return_Not_Found_Response()
+        public async Task Floor_Post_Should_Return_Not_Found_Response()
         {
             var model = new FloorPostViewModel();
             _floorController.Request = new HttpRequestMessage();
             _floorController.Request.SetConfiguration(new HttpConfiguration());
             _floorController.Validate(model);
 
-            var response = _floorController.Put(model);
+            var response = await _floorController.Put(model);
 
             Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
         }
 
         [Test]
-        public void Floor_Put_Should_Return_Ok_Response()
+        public async Task Floor_Put_Should_Return_Ok_Response()
         {
             var model = new FloorPostViewModel
             {
@@ -196,24 +196,24 @@ namespace Shrooms.Tests.Controllers.WebApi
             _floorController.Request.SetConfiguration(new HttpConfiguration());
             _floorController.Validate(model);
 
-            var response = _floorController.Put(model);
+            var response = await _floorController.Put(model);
 
             Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
         }
 
         [Test]
-        public void Floor_Delete_Should_Return_Not_Found_Response()
+        public async Task Floor_Delete_Should_Return_Not_Found_Response()
         {
             _floorController.Request = new HttpRequestMessage();
             _floorController.Request.SetConfiguration(new HttpConfiguration());
 
-            var response = _floorController.Delete(-1);
+            var response = await _floorController.Delete(-1);
 
             Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
         }
 
         [Test]
-        public void Floor_Delete_Should_Return_Ok_Response()
+        public async Task Floor_Delete_Should_Return_Ok_Response()
         {
             var mockRepository = Substitute.For<IRepository<Floor>>();
 
@@ -223,18 +223,18 @@ namespace Shrooms.Tests.Controllers.WebApi
             _floorController.Request = new HttpRequestMessage();
             _floorController.Request.SetConfiguration(new HttpConfiguration());
 
-            var response = _floorController.Delete(1);
+            var response = await _floorController.Delete(1);
 
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
 
         [Test]
-        public void Floor_GetAllFloors_Should_Return_Floors()
+        public async Task Floor_GetAllFloors_Should_Return_Floors()
         {
             _floorController.Request = new HttpRequestMessage();
             _floorController.Request.SetConfiguration(new HttpConfiguration());
 
-            var response = _floorController.GetAllFloors(1);
+            var response = await _floorController.GetAllFloors(1);
 
             var mockOffice = _unitOfWork.GetDbContextAs<MockDbContext>().Offices.Find(o => o.Id == 1);
 

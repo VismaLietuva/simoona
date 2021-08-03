@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
 using Shrooms.Authentification.Membership;
@@ -22,46 +23,53 @@ namespace Shrooms.Presentation.Api.Controllers
     {
         private readonly IOrganizationService _organizationService;
 
-        public OrganizationController(IMapper mapper, IUnitOfWork unitOfWork, ShroomsUserManager userManager, ShroomsRoleManager roleManager, IOrganizationService organizationService)
-            : base(mapper, unitOfWork, userManager, roleManager)
+        public OrganizationController(IMapper mapper, IUnitOfWork unitOfWork, ShroomsUserManager userManager, IOrganizationService organizationService)
+            : base(mapper, unitOfWork, userManager)
         {
             _organizationService = organizationService;
         }
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Organization)]
-        public override HttpResponseMessage Get(int id, string includeProperties = "")
+        public override Task<HttpResponseMessage> Get(int id, string includeProperties = "")
         {
             return base.Get(id, includeProperties);
         }
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Organization)]
-        public override IEnumerable<OrganizationViewModel> GetAll(int maxResults = 0, string orderBy = null, string includeProperties = null)
+        public override Task<IEnumerable<OrganizationViewModel>> GetAllAsync(int maxResults = 0, string orderBy = null, string includeProperties = null)
         {
-            return base.GetAll(maxResults, orderBy, includeProperties);
+            return base.GetAllAsync(maxResults, orderBy, includeProperties);
         }
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Organization)]
-        public override PagedViewModel<OrganizationViewModel> GetPaged(string includeProperties = null, int page = 1,
-            int pageSize = WebApiConstants.DefaultPageSize, string sort = null, string dir = "", string s = "")
+        public override Task<PagedViewModel<OrganizationViewModel>> GetPaged(string includeProperties = null,
+            int page = 1,
+            int pageSize = WebApiConstants.DefaultPageSize,
+            string sort = null,
+            string dir = "",
+            string s = "")
         {
             return base.GetPaged(includeProperties, page, pageSize, sort, dir, s);
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Organization)]
-        protected override PagedViewModel<OrganizationViewModel> GetFilteredPaged(
-            string includeProperties = null, int page = 1, int pageSize = WebApiConstants.DefaultPageSize,
-            string sort = null, string dir = "", Expression<Func<Organization, bool>> filter = null)
+        protected override Task<PagedViewModel<OrganizationViewModel>> GetFilteredPagedAsync(string includeProperties = null,
+            int page = 1,
+            int pageSize = WebApiConstants.DefaultPageSize,
+            string sort = null,
+            string dir = "",
+            Expression<Func<Organization, bool>> filter = null)
         {
-            return base.GetFilteredPaged(includeProperties, page, pageSize, sort, dir, filter);
+            return base.GetFilteredPagedAsync(includeProperties, page, pageSize, sort, dir, filter);
         }
 
         [HttpPost]
         [ValidationFilter]
         [PermissionAuthorize(Permission = AdministrationPermissions.Organization)]
-        public override HttpResponseMessage Post([FromBody] OrganizationPostViewModel crudViewModel)
+        public override Task<HttpResponseMessage> Post([FromBody] OrganizationPostViewModel crudViewModel)
         {
             return base.Post(crudViewModel);
         }
@@ -69,14 +77,14 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [ValidationFilter]
         [PermissionAuthorize(Permission = AdministrationPermissions.Organization)]
-        public override HttpResponseMessage Put([FromBody] OrganizationPostViewModel crudViewModel)
+        public override Task<HttpResponseMessage> Put([FromBody] OrganizationPostViewModel crudViewModel)
         {
             return base.Put(crudViewModel);
         }
 
         [HttpDelete]
         [PermissionAuthorize(Permission = AdministrationPermissions.Organization)]
-        public override HttpResponseMessage Delete(int id)
+        public override Task<HttpResponseMessage> Delete(int id)
         {
             return base.Delete(id);
         }
@@ -85,7 +93,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [PermissionAuthorize(AdministrationPermissions.Organization)]
         public IHttpActionResult GetManagingDirector()
         {
-            var currentManagingDirector = _organizationService.GetManagingDirector(GetUserAndOrganization().OrganizationId);
+            var currentManagingDirector = _organizationService.GetManagingDirectorAsync(GetUserAndOrganization().OrganizationId);
             return Ok(currentManagingDirector);
         }
 
@@ -100,7 +108,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             try
             {
-                _organizationService.SetManagingDirector(userId, GetUserAndOrganization());
+                _organizationService.SetManagingDirectorAsync(userId, GetUserAndOrganization());
             }
             catch (ValidationException e)
             {

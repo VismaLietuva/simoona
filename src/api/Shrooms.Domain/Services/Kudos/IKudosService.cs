@@ -12,19 +12,19 @@ namespace Shrooms.Domain.Services.Kudos
     {
         Task CreateKudosType(NewKudosTypeDto dto);
 
-        Task UpdateKudosType(KudosTypeDTO dto);
+        Task UpdateKudosTypeAsync(KudosTypeDTO dto);
 
-        Task RemoveKudosType(int id, UserAndOrganizationDTO userOrg);
+        Task RemoveKudosTypeAsync(int id, UserAndOrganizationDTO userOrg);
 
         KudosTypeDTO GetSendKudosType(UserAndOrganizationDTO userOrg);
 
-        WelcomeKudosDTO GetWelcomeKudos();
+        Task<WelcomeKudosDTO> GetWelcomeKudosAsync();
 
         IEnumerable<KudosPieChartSliceDto> GetKudosPieChartData(int organizationId, string userId);
 
         IEnumerable<KudosTypeDTO> GetKudosTypes(UserAndOrganizationDTO userAndOrg);
 
-        Task<KudosTypeDTO> GetKudosType(int id, UserAndOrganizationDTO userOrg);
+        Task<KudosTypeDTO> GetKudosTypeAsync(int id, UserAndOrganizationDTO userOrg);
 
         IEnumerable<UserKudosInformationDTO> GetApprovedKudosList(string id, int organizationId);
 
@@ -34,11 +34,11 @@ namespace Shrooms.Domain.Services.Kudos
 
         Task RejectKudosAsync(KudosRejectDTO kudosRejectDTO);
 
-        UserKudosDTO GetUserKudosInformationById(string id, int organizationId);
+        Task<UserKudosDTO> GetUserKudosInformationByIdAsync(string id, int organizationId);
 
-        IEnumerable<WallKudosLogDTO> GetLastKudosLogsForWall(UserAndOrganizationDTO userAndOrg);
+        Task<IEnumerable<WallKudosLogDTO>> GetLastKudosLogsForWallAsync(UserAndOrganizationDTO userAndOrg);
 
-        decimal[] GetMonthlyKudosStatistics(string id);
+        Task<decimal[]> GetMonthlyKudosStatisticsAsync(string id);
 
         /// <summary>
         /// Adds kudos request where points are not calculated
@@ -51,15 +51,15 @@ namespace Shrooms.Domain.Services.Kudos
 
         void UpdateProfilesFromUserIds(IEnumerable<string> usersId, UserAndOrganizationDTO userOrg);
 
-        KudosLogsEntriesDto<MainKudosLogDTO> GetKudosLogs(KudosLogsFilterDTO options);
+        Task<KudosLogsEntriesDto<MainKudosLogDTO>> GetKudosLogsAsync(KudosLogsFilterDTO options);
 
-        KudosLogsEntriesDto<KudosUserLogDTO> GetUserKudosLogs(string userId, int page, int organizationId);
+        Task<KudosLogsEntriesDto<KudosUserLogDTO>> GetUserKudosLogsAsync(string userId, int page, int organizationId);
 
         int GetKudosTypeId(string kudosTypeName);
 
         Task<int> GetKudosTypeIdAsync(KudosTypeEnum kudosType);
 
-        IEnumerable<KudosBasicDataDTO> GetKudosStats(int months, int amount, int organizationId);
+        Task<IEnumerable<KudosBasicDataDTO>> GetKudosStatsAsync(int months, int amount, int organizationId);
 
         Task UpdateProfileKudosAsync(ApplicationUser user, UserAndOrganizationDTO userOrg);
 

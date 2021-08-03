@@ -37,11 +37,6 @@ namespace Shrooms.DataLayer.DAL
             return repository;
         }
 
-        public void Save()
-        {
-            DbContext.SaveChanges();
-        }
-
         public async Task SaveAsync()
         {
             await DbContext.SaveChangesAsync();

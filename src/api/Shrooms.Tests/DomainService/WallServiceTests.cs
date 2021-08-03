@@ -26,11 +26,11 @@ namespace Shrooms.Tests.DomainService
     [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalse")]
     public class WallServiceTests
     {
-        private IDbSet<Wall> _wallsDbSet;
+        private DbSet<Wall> _wallsDbSet;
+        private DbSet<WallModerator> _wallModeratorDbSet;
+        private DbSet<WallMember> _wallUsersDbSet;
+        private DbSet<ApplicationUser> _usersDbSet;
         private WallService _wallService;
-        private IDbSet<WallModerator> _wallModeratorDbSet;
-        private IDbSet<WallMember> _wallUsersDbSet;
-        private IDbSet<ApplicationUser> _usersDbSet;
         private IPermissionService _permissionService;
         private IUnitOfWork2 _uow;
 
@@ -39,10 +39,10 @@ namespace Shrooms.Tests.DomainService
         {
             _uow = Substitute.For<IUnitOfWork2>();
 
-            _wallsDbSet = _uow.MockDbSet<Wall>();
-            _wallModeratorDbSet = _uow.MockDbSet<WallModerator>();
-            _wallUsersDbSet = _uow.MockDbSet<WallMember>();
-            _usersDbSet = _uow.MockDbSet<ApplicationUser>();
+            _wallsDbSet = _uow.MockDbSetForAsync<Wall>();
+            _wallModeratorDbSet = _uow.MockDbSetForAsync<WallModerator>();
+            _wallUsersDbSet = _uow.MockDbSetForAsync<WallMember>();
+            _usersDbSet = _uow.MockDbSetForAsync<ApplicationUser>();
 
             _permissionService = Substitute.For<IPermissionService>();
             var roleService = Substitute.For<IRoleService>();
@@ -76,7 +76,7 @@ namespace Shrooms.Tests.DomainService
 
             var isWallAdministrator = false;
             _permissionService.UserHasPermissionAsync(updateWallDto, AdministrationPermissions.Wall).Returns(isWallAdministrator);
-            _wallsDbSet.SetDbSetData(walls.AsQueryable());
+            _wallsDbSet.SetDbSetDataForAsync(walls.AsQueryable());
 
             // Act
             _wallService.UpdateWallAsync(updateWallDto);
@@ -113,7 +113,7 @@ namespace Shrooms.Tests.DomainService
 
             var isWallAdministrator = true;
             _permissionService.UserHasPermissionAsync(updateWallDto, AdministrationPermissions.Wall).Returns(isWallAdministrator);
-            _wallsDbSet.SetDbSetData(walls.AsQueryable());
+            _wallsDbSet.SetDbSetDataForAsync(walls.AsQueryable());
 
             // Act
             _wallService.UpdateWallAsync(updateWallDto);
@@ -150,7 +150,7 @@ namespace Shrooms.Tests.DomainService
 
             var isWallAdministrator = true;
             _permissionService.UserHasPermissionAsync(updateWallDto, AdministrationPermissions.Wall).Returns(isWallAdministrator);
-            _wallsDbSet.SetDbSetData(walls.AsQueryable());
+            _wallsDbSet.SetDbSetDataForAsync(walls.AsQueryable());
 
             // Act
             _wallService.UpdateWallAsync(updateWallDto);
@@ -185,11 +185,11 @@ namespace Shrooms.Tests.DomainService
 
             var isWallAdministrator = false;
             _permissionService.UserHasPermissionAsync(updateWallDto, AdministrationPermissions.Wall).Returns(isWallAdministrator);
-            _wallsDbSet.SetDbSetData(walls.AsQueryable());
+            _wallsDbSet.SetDbSetDataForAsync(walls.AsQueryable());
 
             // Act
             // Assert
-            Assert.Throws<UnauthorizedException>(() => _wallService.UpdateWallAsync(updateWallDto));
+            Assert.ThrowsAsync<UnauthorizedException>(async () => await _wallService.UpdateWallAsync(updateWallDto));
         }
 
         [Test]
@@ -212,13 +212,13 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 2
             };
 
-            var isWallAdministrator = false;
+            const bool isWallAdministrator = false;
             _permissionService.UserHasPermissionAsync(updateWallDto, AdministrationPermissions.Wall).Returns(isWallAdministrator);
-            _wallsDbSet.SetDbSetData(walls.AsQueryable());
+            _wallsDbSet.SetDbSetDataForAsync(walls.AsQueryable());
 
             // Act
             // Assert
-            var ex = Assert.Throws<ValidationException>(() => _wallService.UpdateWallAsync(updateWallDto));
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _wallService.UpdateWallAsync(updateWallDto));
             Assert.AreEqual(ErrorCodes.ContentDoesNotExist, ex.ErrorCode);
         }
 
@@ -241,7 +241,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void User_Can_Follow_Wall()
+        public async Task User_Can_Follow_Wall()
         {
             // Arrange
             var member = new WallMember { Id = 2, UserId = "user1", WallId = 2 };
@@ -257,17 +257,17 @@ namespace Shrooms.Tests.DomainService
                 new ApplicationUser { Id = "user2", FirstName = "fname", LastName = "lname", PictureId = "pic", OrganizationId = 1, JobPosition = jobPosition }
             };
 
-            _usersDbSet.SetDbSetData(users);
-            _wallsDbSet.SetDbSetData(walls);
+            _usersDbSet.SetDbSetDataForAsync(users);
+            _wallsDbSet.SetDbSetDataForAsync(walls);
 
-            var tenantId = 1;
-            var userId = "user2";
+            const int tenantId = 1;
+            const string userId = "user2";
 
             // Act
-            _wallService.JoinOrLeaveWallAsync(2, userId, userId, tenantId, false);
+            await _wallService.JoinOrLeaveWallAsync(2, userId, userId, tenantId, false);
 
             // Assert
-            Assert.True(_wallsDbSet.First(x => x.Id == 2).Members.Any(m => m.UserId == userId));
+            Assert.True((await _wallsDbSet.FirstAsync(x => x.Id == 2)).Members.Any(m => m.UserId == userId));
         }
 
         [Test]
@@ -275,10 +275,10 @@ namespace Shrooms.Tests.DomainService
         {
             MockWallsForJoinLeave();
 
-            var tenantId = 2;
-            var userId = "user2";
+            const int tenantId = 2;
+            const string userId = "user2";
 
-            Assert.Throws<ValidationException>(() => _wallService.JoinOrLeaveWallAsync(2, userId, userId, tenantId, false));
+            Assert.ThrowsAsync<ValidationException>(async () => await _wallService.JoinOrLeaveWallAsync(2, userId, userId, tenantId, false));
         }
 
         [Test]
@@ -286,14 +286,14 @@ namespace Shrooms.Tests.DomainService
         {
             MockWallsForJoinLeave();
 
-            var tenantId = 2;
-            var userId = "user1";
+            const int tenantId = 2;
+            const string userId = "user1";
 
-            Assert.Throws<ValidationException>(() => _wallService.JoinOrLeaveWallAsync(1, userId, userId, tenantId, false));
+            Assert.ThrowsAsync<ValidationException>(async () => await _wallService.JoinOrLeaveWallAsync(1, userId, userId, tenantId, false));
         }
 
         [Test]
-        public void User_Can_Leave_Event_Wall()
+        public async Task User_Can_Leave_Event_Wall()
         {
             // Arrange
             var member4 = new WallMember { Id = 3, UserId = "user2", WallId = 4 };
@@ -309,14 +309,14 @@ namespace Shrooms.Tests.DomainService
                 new ApplicationUser { Id = "user2", FirstName = "fname", LastName = "lname", PictureId = "pic", OrganizationId = 2, JobPosition = jobPosition }
             };
 
-            _usersDbSet.SetDbSetData(users);
-            _wallsDbSet.SetDbSetData(walls);
+            _usersDbSet.SetDbSetDataForAsync(users);
+            _wallsDbSet.SetDbSetDataForAsync(walls);
 
-            var tenantId = 2;
-            var userId = "user2";
+            const int tenantId = 2;
+            const string userId = "user2";
 
             // Act
-            _wallService.JoinOrLeaveWallAsync(4, userId, userId, tenantId, true);
+            await _wallService.JoinOrLeaveWallAsync(4, userId, userId, tenantId, true);
 
             // Assert
             _wallUsersDbSet.Received(1).Remove(Arg.Is<WallMember>(u => u.WallId == 4));
@@ -327,15 +327,15 @@ namespace Shrooms.Tests.DomainService
         {
             MockWallsForJoinLeave();
 
-            var tenantId = 2;
-            var userId = "user1";
+            const int tenantId = 2;
+            const string userId = "user1";
 
-            var ex = Assert.Throws<ValidationException>(() => _wallService.JoinOrLeaveWallAsync(3, userId, userId, tenantId, false));
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _wallService.JoinOrLeaveWallAsync(3, userId, userId, tenantId, false));
             Assert.AreEqual(ErrorCodes.WallModeratorCanNotLeave, ex.ErrorCode);
         }
 
         [Test]
-        public void User_Can_Join_Event_Wall()
+        public async Task User_Can_Join_Event_Wall()
         {
             // Arrange
             var jobPosition = new JobPosition { Title = "jobpos" };
@@ -349,33 +349,33 @@ namespace Shrooms.Tests.DomainService
                 new ApplicationUser { Id = "user3", FirstName = "fname", LastName = "lname", PictureId = "pic", OrganizationId = 2, JobPosition = jobPosition }
             };
 
-            _usersDbSet.SetDbSetData(users);
-            _wallsDbSet.SetDbSetData(walls);
+            _usersDbSet.SetDbSetDataForAsync(users);
+            _wallsDbSet.SetDbSetDataForAsync(walls);
 
-            var tenantId = 2;
-            var userId = "user3";
+            const int tenantId = 2;
+            const string userId = "user3";
 
             // Act
-            _wallService.JoinOrLeaveWallAsync(4, userId, userId, tenantId, true);
+            await _wallService.JoinOrLeaveWallAsync(4, userId, userId, tenantId, true);
 
             // Assert
-            Assert.True(_wallsDbSet.First(w => w.Id == 4).Members.Any(m => m.UserId == userId));
+            Assert.True((await _wallsDbSet.FirstAsync(w => w.Id == 4)).Members.Any(m => m.UserId == userId));
         }
 
         [Test]
-        public void Wall_Moderator_Can_Add_User_To_Wall()
+        public async Task Wall_Moderator_Can_Add_User_To_Wall()
         {
             // Arrange
-            var moderatingUserId = "moderator1";
-            var attendingUserId = "user1";
-            var tenantId = 2;
+            const string moderatingUserId = "moderator1";
+            const string attendingUserId = "user1";
+            const int tenantId = 2;
 
             var jobPosition = new JobPosition { Title = "jobpos" };
             var users = new List<ApplicationUser>
             {
                 new ApplicationUser { Id = attendingUserId, OrganizationId = tenantId, JobPosition = jobPosition }
             };
-            _usersDbSet.SetDbSetData(users);
+            _usersDbSet.SetDbSetDataForAsync(users);
 
             var moderators = new List<WallModerator>
             {
@@ -386,17 +386,17 @@ namespace Shrooms.Tests.DomainService
             {
                 new Wall { Id = 1, OrganizationId = 2, Type = WallType.UserCreated, Moderators = moderators, Members = new List<WallMember>() }
             };
-            _wallsDbSet.SetDbSetData(walls);
+            _wallsDbSet.SetDbSetDataForAsync(walls);
 
             // Act
-            _wallService.JoinOrLeaveWallAsync(1, attendingUserId, moderatingUserId, tenantId, false);
+            await _wallService.JoinOrLeaveWallAsync(1, attendingUserId, moderatingUserId, tenantId, false);
 
             // Assert
             Assert.AreEqual(attendingUserId, walls.First().Members.First().UserId);
         }
 
         [Test]
-        public void Wall_Moderator_Can_Remove_User_From_Wall()
+        public async Task Wall_Moderator_Can_Remove_User_From_Wall()
         {
             // Arrange
             var moderatingUserId = "moderator1";
@@ -408,7 +408,7 @@ namespace Shrooms.Tests.DomainService
             {
                 new ApplicationUser { Id = userToRemoveId, OrganizationId = tenantId, FirstName = "fname", LastName = "lname", PictureId = "pic", JobPosition = jobPosition }
             };
-            _usersDbSet.SetDbSetData(users);
+            _usersDbSet.SetDbSetDataForAsync(users);
 
             var moderators = new List<WallModerator>
             {
@@ -424,10 +424,10 @@ namespace Shrooms.Tests.DomainService
             {
                 new Wall { Id = 1, OrganizationId = 2, Type = WallType.UserCreated, Moderators = moderators, Members = members }
             };
-            _wallsDbSet.SetDbSetData(walls);
+            _wallsDbSet.SetDbSetDataForAsync(walls);
 
             // Act
-            _wallService.JoinOrLeaveWallAsync(1, userToRemoveId, moderatingUserId, tenantId, false);
+            await _wallService.JoinOrLeaveWallAsync(1, userToRemoveId, moderatingUserId, tenantId, false);
 
             // Assert
             _wallUsersDbSet.Received(1).Remove(Arg.Is<WallMember>(u => u.WallId == 1));
@@ -437,11 +437,11 @@ namespace Shrooms.Tests.DomainService
         public void Wall_Moderator_Can_Not_Add_Non_Existent_User_To_Wall()
         {
             // Arrange
-            var moderatingUserId = "moderator1";
-            var attendingUserId = "user1";
-            var tenantId = 2;
+            const string moderatingUserId = "moderator1";
+            const string attendingUserId = "user1";
+            const int tenantId = 2;
 
-            _usersDbSet.SetDbSetData(new List<ApplicationUser>());
+            _usersDbSet.SetDbSetDataForAsync(new List<ApplicationUser>());
 
             var moderators = new List<WallModerator>
             {
@@ -452,10 +452,10 @@ namespace Shrooms.Tests.DomainService
             {
                 new Wall { Id = 1, OrganizationId = 2, Type = WallType.UserCreated, Moderators = moderators, Members = new List<WallMember>() }
             };
-            _wallsDbSet.SetDbSetData(walls);
+            _wallsDbSet.SetDbSetDataForAsync(walls);
 
             // Act, Assert
-            Assert.Throws<ValidationException>(() => _wallService.JoinOrLeaveWallAsync(1, attendingUserId, moderatingUserId, tenantId, false));
+            Assert.ThrowsAsync<ValidationException>(async () => await _wallService.JoinOrLeaveWallAsync(1, attendingUserId, moderatingUserId, tenantId, false));
         }
 
         [Test]
@@ -471,23 +471,23 @@ namespace Shrooms.Tests.DomainService
             {
                 new Wall { Id = 1, OrganizationId = 2, Type = WallType.UserCreated, Moderators = moderators, Members = new List<WallMember>() }
             };
-            _wallsDbSet.SetDbSetData(walls);
+            _wallsDbSet.SetDbSetDataForAsync(walls);
 
-            var tenantId = 2;
-            var attendingUserId = "user1";
-            var actingUserId = "user2";
+            const int tenantId = 2;
+            const string attendingUserId = "user1";
+            const string actingUserId = "user2";
 
             // Act, Assert
-            Assert.Throws<UnauthorizedException>(() => _wallService.JoinOrLeaveWallAsync(1, attendingUserId, actingUserId, tenantId, false));
+            Assert.ThrowsAsync<UnauthorizedException>(async () => await _wallService.JoinOrLeaveWallAsync(1, attendingUserId, actingUserId, tenantId, false));
         }
 
         [Test]
         public void Wall_User_Can_Not_Remove_User_From_Wall()
         {
             // Arrange
-            var tenantId = 2;
-            var userToRemoveId = "user1";
-            var actingUserId = "user2";
+            const int tenantId = 2;
+            const string userToRemoveId = "user1";
+            const string actingUserId = "user2";
 
             var moderators = new List<WallModerator>
             {
@@ -503,14 +503,14 @@ namespace Shrooms.Tests.DomainService
             {
                 new Wall { Id = 1, OrganizationId = 2, Type = WallType.UserCreated, Moderators = moderators, Members = members }
             };
-            _wallsDbSet.SetDbSetData(walls);
+            _wallsDbSet.SetDbSetDataForAsync(walls);
 
             // Act, Assert
-            Assert.Throws<UnauthorizedException>(() => _wallService.JoinOrLeaveWallAsync(1, userToRemoveId, actingUserId, tenantId, false));
+            Assert.ThrowsAsync<UnauthorizedException>(async () => await _wallService.JoinOrLeaveWallAsync(1, userToRemoveId, actingUserId, tenantId, false));
         }
 
         [Test]
-        public void Should_Add_Wall_Moderator_Successfully()
+        public async Task Should_Add_Wall_Moderator_Successfully()
         {
             MockWallsForAddRemoveModerators();
 
@@ -520,12 +520,12 @@ namespace Shrooms.Tests.DomainService
                 UserId = "user2"
             };
 
-            _wallService.AddModeratorAsync(1, "user2", userOrg);
+            await _wallService.AddModeratorAsync(1, "user2", userOrg);
             _wallModeratorDbSet.Received(1).Add(Arg.Is<WallModerator>(x => x.UserId == "user2" && x.WallId == 1));
         }
 
         [Test]
-        public void Should_Remove_Wall_Moderator_Successfully()
+        public async Task Should_Remove_Wall_Moderator_Successfully()
         {
             MockWallsForAddRemoveModerators();
 
@@ -535,7 +535,7 @@ namespace Shrooms.Tests.DomainService
                 UserId = "user2"
             };
 
-            _wallService.RemoveModeratorAsync(1, "user1", userOrg);
+            await _wallService.RemoveModeratorAsync(1, "user1", userOrg);
             _wallModeratorDbSet.Received(1).Remove(Arg.Is<WallModerator>(x => x.UserId == "user1" && x.WallId == 1));
         }
 
@@ -586,7 +586,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Delete_Only_User_Created_Wall()
+        public async Task Should_Delete_Only_User_Created_Wall()
         {
             MockWallsForDelete();
 
@@ -596,15 +596,15 @@ namespace Shrooms.Tests.DomainService
                 UserId = "userId"
             };
 
-            var wallToDelete = _wallsDbSet.First(x => x.Id == 2);
-            _wallService.DeleteWallAsync(2, userOrg, WallType.UserCreated);
+            var wallToDelete = await _wallsDbSet.FirstAsync(x => x.Id == 2);
+            await _wallService.DeleteWallAsync(2, userOrg, WallType.UserCreated);
 
             _wallsDbSet.Received(1).Remove(wallToDelete);
-            _uow.Received(1).SaveChanges(userOrg.UserId);
+            await _uow.Received(1).SaveChangesAsync(userOrg.UserId);
         }
 
         [Test]
-        public void Should_Delete_Only_Event_Wall()
+        public async Task Should_Delete_Only_Event_Wall()
         {
             MockWallsForDelete();
 
@@ -614,11 +614,11 @@ namespace Shrooms.Tests.DomainService
                 UserId = "userId"
             };
 
-            var wallToDelete = _wallsDbSet.First(x => x.Id == 3);
-            _wallService.DeleteWallAsync(3, userOrg, WallType.Events);
+            var wallToDelete = await _wallsDbSet.FirstAsync(x => x.Id == 3);
+            await _wallService.DeleteWallAsync(3, userOrg, WallType.Events);
 
             _wallsDbSet.Received(1).Remove(wallToDelete);
-            _uow.Received(1).SaveChanges(userOrg.UserId);
+            await _uow.Received(1).SaveChangesAsync(userOrg.UserId);
         }
 
         [Test]
@@ -632,7 +632,7 @@ namespace Shrooms.Tests.DomainService
                 UserId = "userId"
             };
 
-            Assert.Throws<ValidationException>(() => _wallService.DeleteWallAsync(1, userOrg, WallType.Events));
+            Assert.ThrowsAsync<ValidationException>(async () => await _wallService.DeleteWallAsync(1, userOrg, WallType.Events));
         }
 
         [Test]
@@ -646,7 +646,7 @@ namespace Shrooms.Tests.DomainService
                 UserId = "userId"
             };
 
-            Assert.Throws<ValidationException>(() => _wallService.DeleteWallAsync(1, userOrg, WallType.UserCreated));
+            Assert.ThrowsAsync<ValidationException>(async () => await _wallService.DeleteWallAsync(1, userOrg, WallType.UserCreated));
         }
 
         [Test]
@@ -662,7 +662,7 @@ namespace Shrooms.Tests.DomainService
 
             _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Wall).Returns(false);
 
-            Assert.Throws<UnauthorizedException>(() => _wallService.DeleteWallAsync(2, userOrg, WallType.UserCreated));
+            Assert.ThrowsAsync<UnauthorizedException>(async () => await _wallService.DeleteWallAsync(2, userOrg, WallType.UserCreated));
         }
 
         private static void MockRoleService(IRoleService roleService)
@@ -721,7 +721,7 @@ namespace Shrooms.Tests.DomainService
                 }
             };
 
-            _wallsDbSet.SetDbSetData(walls.AsQueryable());
+            _wallsDbSet.SetDbSetDataForAsync(walls.AsQueryable());
         }
 
         private void MockWallsForDetails()
@@ -801,8 +801,8 @@ namespace Shrooms.Tests.DomainService
                 }
             };
 
-            _wallsDbSet.SetDbSetData(walls.AsQueryable());
-            _wallUsersDbSet.SetDbSetData(new List<WallMember>().AsQueryable());
+            _wallsDbSet.SetDbSetDataForAsync(walls.AsQueryable());
+            _wallUsersDbSet.SetDbSetDataForAsync(new List<WallMember>().AsQueryable());
         }
 
         private void MockWallsForJoinLeave()
@@ -864,8 +864,8 @@ namespace Shrooms.Tests.DomainService
                 new ApplicationUser { Id = "user2", FirstName = "fname", LastName = "lname", PictureId = "pic", OrganizationId = 1 }
             };
 
-            _usersDbSet.SetDbSetData(users);
-            _wallsDbSet.SetDbSetData(walls);
+            _usersDbSet.SetDbSetDataForAsync(users);
+            _wallsDbSet.SetDbSetDataForAsync(walls);
         }
     }
 }

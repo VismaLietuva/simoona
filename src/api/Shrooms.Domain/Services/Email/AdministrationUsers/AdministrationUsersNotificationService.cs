@@ -1,5 +1,6 @@
 ﻿using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
@@ -33,12 +34,12 @@ namespace Shrooms.Domain.Services.Email.AdministrationUsers
             _userService = permissionService;
         }
 
-        public void SendConfirmedNotificationEmail(string userEmail, UserAndOrganizationDTO userAndOrg)
+        public async Task SendConfirmedNotificationEmailAsync(string userEmail, UserAndOrganizationDTO userAndOrg)
         {
-            var organizationNameAndContent = _organizationDbSet
-                    .Where(organization => organization.Id == userAndOrg.OrganizationId)
-                    .Select(organization => new { organization.ShortName, organization.WelcomeEmail })
-                    .FirstOrDefault();
+            var organizationNameAndContent = await _organizationDbSet
+                .Where(organization => organization.Id == userAndOrg.OrganizationId)
+                .Select(organization => new { organization.ShortName, organization.WelcomeEmail })
+                .FirstOrDefaultAsync();
 
             if (organizationNameAndContent == null)
             {
@@ -53,36 +54,33 @@ namespace Shrooms.Domain.Services.Email.AdministrationUsers
 
             var body = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.UserConfirmation);
 
-            _mailingService.SendEmailAsync(new EmailDto(userEmail, subject, body));
+            await _mailingService.SendEmailAsync(new EmailDto(userEmail, subject, body));
         }
 
-        public void NotifyAboutNewUser(ApplicationUser newUser, int orgId)
+        public async Task NotifyAboutNewUserAsync(ApplicationUser newUser, int orgId)
         {
-            var userAdministrationEmails = _userService.GetUserEmailsWithPermission(AdministrationPermissions.ApplicationUser, orgId).ToList();
+            var userAdministrationEmails = await _userService.GetUserEmailsWithPermissionAsync(AdministrationPermissions.ApplicationUser, orgId);
 
             if (!userAdministrationEmails.Any())
             {
                 return;
             }
 
-            var organizationName = _organizationDbSet
+            var organizationName = await _organizationDbSet
                 .Where(organization => organization.Id == orgId)
                 .Select(organization => organization.ShortName)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
 
             var newUserProfileUrl = _appSettings.UserProfileUrl(organizationName, newUser.Id);
             var userSettingsUrl = _appSettings.UserNotificationSettingsUrl(organizationName);
             var subject = string.Format(Resources.Common.NewUserConfirmEmailSubject);
 
-            var emailTemplateViewModel = new NotificationAboutNewUserEmailTemplateViewModel(
-                userSettingsUrl,
-                newUserProfileUrl,
-                newUser.FullName);
+            var emailTemplateViewModel = new NotificationAboutNewUserEmailTemplateViewModel(userSettingsUrl, newUserProfileUrl, newUser.FullName);
 
             var body = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.NotificationAboutNewUser);
 
             var emailDto = new EmailDto(userAdministrationEmails, subject, body);
-            _mailingService.SendEmailAsync(emailDto);
+            await _mailingService.SendEmailAsync(emailDto);
         }
 
         public void SendUserResetPasswordEmail(ApplicationUser user, string token, string organizationName)

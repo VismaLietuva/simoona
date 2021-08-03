@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Shrooms.Contracts.DataTransferObjects.Models.Birthdays;
 
 namespace Shrooms.Domain.Services.Birthday
 {
     public interface IBirthdayService
     {
-        IEnumerable<BirthdayDTO> GetWeeklyBirthdays(DateTime date);
+        Task<IEnumerable<BirthdayDTO>> GetWeeklyBirthdaysAsync(DateTime date);
     }
 }

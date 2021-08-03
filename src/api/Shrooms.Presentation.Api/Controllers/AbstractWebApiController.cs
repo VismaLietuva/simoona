@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Data.Entity;
 using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
-using PagedList;
 using Shrooms.Authentification.Membership;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
@@ -14,6 +14,7 @@ using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.ViewModels;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Presentation.Api.Filters;
+using X.PagedList;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
@@ -25,19 +26,17 @@ namespace Shrooms.Presentation.Api.Controllers
         protected readonly IUnitOfWork _unitOfWork;
         protected readonly IRepository<TModel> _repository;
 
-        protected ShroomsUserManager UserManager { get; set; }
-        protected ShroomsRoleManager RoleManager { get; set; }
+        protected readonly ShroomsUserManager _userManager;
 
-        protected readonly string _defaultOrderByProperty;
+        private readonly string _defaultOrderByProperty;
         protected readonly IMapper _mapper;
 
-        protected AbstractWebApiController(IMapper mapper, IUnitOfWork unitOfWork, ShroomsUserManager userManager, ShroomsRoleManager roleManager, string defaultOrderByProperty = null)
+        protected AbstractWebApiController(IMapper mapper, IUnitOfWork unitOfWork, ShroomsUserManager userManager, string defaultOrderByProperty = null)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _repository = _unitOfWork.GetRepository<TModel>();
-            UserManager = userManager;
-            RoleManager = roleManager;
+            _userManager = userManager;
             _defaultOrderByProperty = defaultOrderByProperty;
         }
 
@@ -50,9 +49,9 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [HttpGet]
-        public virtual HttpResponseMessage Get(int id, string includeProperties = "")
+        public virtual async Task<HttpResponseMessage> Get(int id, string includeProperties = "")
         {
-            var model = _repository.Get(f => f.Id == id, includeProperties: includeProperties).FirstOrDefault();
+            var model = await _repository.Get(f => f.Id == id, includeProperties: includeProperties).FirstOrDefaultAsync();
             if (model == null)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Resources.Common.NotFound);
@@ -62,24 +61,24 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [HttpGet]
-        public virtual IEnumerable<TViewModel> GetAll(int maxResults = 0, string orderBy = null, string includeProperties = null)
+        public virtual async Task<IEnumerable<TViewModel>> GetAllAsync(int maxResults = 0, string orderBy = null, string includeProperties = null)
         {
-            var model = _repository.Get(maxResults: maxResults, orderBy: orderBy ?? _defaultOrderByProperty, includeProperties: includeProperties);
+            var model = await _repository.Get(maxResults: maxResults, orderBy: orderBy ?? _defaultOrderByProperty, includeProperties: includeProperties).ToListAsync();
             return _mapper.Map<IEnumerable<TModel>, IEnumerable<TViewModel>>(model);
         }
 
         [HttpGet]
-        public virtual PagedViewModel<TViewModel> GetPaged(string includeProperties = null,
+        public virtual async Task<PagedViewModel<TViewModel>> GetPaged(string includeProperties = null,
             int page = 1,
             int pageSize = WebApiConstants.DefaultPageSize,
             string sort = null,
             string dir = "",
             string s = "")
         {
-            return GetFilteredPaged(includeProperties, page, pageSize, sort, dir);
+            return await GetFilteredPagedAsync(includeProperties, page, pageSize, sort, dir);
         }
 
-        protected virtual PagedViewModel<TViewModel> GetFilteredPaged(string includeProperties = null,
+        protected virtual async Task<PagedViewModel<TViewModel>> GetFilteredPagedAsync(string includeProperties = null,
             int page = 1,
             int pageSize = WebApiConstants.DefaultPageSize,
             string sort = null,
@@ -88,9 +87,9 @@ namespace Shrooms.Presentation.Api.Controllers
         {
             var sortQuery = string.IsNullOrEmpty(sort) ? null : $"{sort} {dir}";
 
-            var models = _repository
+            var models = await _repository
                 .Get(includeProperties: includeProperties, filter: filter, orderBy: sortQuery ?? _defaultOrderByProperty)
-                .ToPagedList(page, pageSize);
+                .ToPagedListAsync(page, pageSize);
 
             var abstractViewModels = _mapper.Map<IEnumerable<TModel>, IEnumerable<TViewModel>>(models);
             var pagedVm = new StaticPagedList<TViewModel>(abstractViewModels, models.PageNumber, models.PageSize, models.TotalItemCount);
@@ -108,7 +107,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpPost]
         [ValidationFilter]
-        public virtual HttpResponseMessage Post([FromBody] TPostViewModel crudViewModel)
+        public virtual async Task<HttpResponseMessage> Post([FromBody] TPostViewModel crudViewModel)
         {
             if (crudViewModel == null)
             {
@@ -116,14 +115,14 @@ namespace Shrooms.Presentation.Api.Controllers
             }
 
             // can not create new item with same id
-            if (_repository.GetByID(crudViewModel.Id) != null)
+            if (await _repository.GetByIdAsync(crudViewModel.Id) != null)
             {
                 return Request.CreateResponse(HttpStatusCode.Conflict);
             }
 
             var model = _mapper.Map<TPostViewModel, TModel>(crudViewModel);
             _repository.Insert(model);
-            _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
             crudViewModel.Id = model.Id;
 
             return Request.CreateResponse(HttpStatusCode.Created);
@@ -131,14 +130,14 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpPut]
         [ValidationFilter]
-        public virtual HttpResponseMessage Put([FromBody] TPostViewModel crudViewModel)
+        public virtual async Task<HttpResponseMessage> Put([FromBody] TPostViewModel crudViewModel)
         {
             if (crudViewModel == null)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest);
             }
 
-            var model = _repository.GetByID(crudViewModel.Id);
+            var model = await _repository.GetByIdAsync(crudViewModel.Id);
 
             if (model == null)
             {
@@ -147,15 +146,15 @@ namespace Shrooms.Presentation.Api.Controllers
 
             _mapper.Map(crudViewModel, model);
             _repository.Update(model);
-            _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
 
             return Request.CreateResponse(HttpStatusCode.Created);
         }
 
         [HttpDelete]
-        public virtual HttpResponseMessage Delete(int id)
+        public virtual async Task<HttpResponseMessage> Delete(int id)
         {
-            var model = _repository.GetByID(id);
+            var model = await _repository.GetByIdAsync(id);
 
             if (model == null)
             {
@@ -163,7 +162,7 @@ namespace Shrooms.Presentation.Api.Controllers
             }
 
             _repository.Delete(model);
-            _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
             return Request.CreateResponse(HttpStatusCode.OK);
         }
     }
