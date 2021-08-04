@@ -47,8 +47,8 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             try
             {
                 var refundLogs = await CreateKudosLogsAsync(lottery, userOrg);
-                await AddKudosLogs(lottery, refundLogs, userOrg);
-                await UpdateUserProfiles(lottery, refundLogs, userOrg);
+                await AddKudosLogsAsync(lottery, refundLogs, userOrg);
+                await UpdateUserProfilesAsync(lottery, refundLogs, userOrg);
             }
             catch (Exception e)
             {
@@ -57,7 +57,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             }
         }
 
-        private async Task UpdateUserProfiles(Lottery lottery, IEnumerable<AddKudosLogDTO> kudosLogs, UserAndOrganizationDTO userOrg)
+        private async Task UpdateUserProfilesAsync(Lottery lottery, IEnumerable<AddKudosLogDTO> kudosLogs, UserAndOrganizationDTO userOrg)
         {
             if (lottery.Status != (int)LotteryStatus.RefundLogsCreated)
             {
@@ -66,20 +66,20 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 
             var userIds = kudosLogs.Select(x => x.ReceivingUserIds.First());
 
-            _kudosService.UpdateProfilesFromUserIds(userIds, userOrg);
+            await _kudosService.UpdateProfilesFromUserIdsAsync(userIds, userOrg);
             lottery.Status = (int)LotteryStatus.Refunded;
 
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
-        private async Task AddKudosLogs(Lottery lottery, IEnumerable<AddKudosLogDTO> kudosLogs, UserAndOrganizationDTO userOrg)
+        private async Task AddKudosLogsAsync(Lottery lottery, IEnumerable<AddKudosLogDTO> kudosLogs, UserAndOrganizationDTO userOrg)
         {
             if (lottery.Status != (int)LotteryStatus.RefundStarted)
             {
                 return;
             }
 
-            _kudosService.AddRefundKudosLogs(kudosLogs);
+            await _kudosService.AddRefundKudosLogsAsync(kudosLogs);
             lottery.Status = (int)LotteryStatus.RefundLogsCreated;
 
             await _uow.SaveChangesAsync(userOrg.UserId);

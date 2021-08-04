@@ -28,15 +28,15 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Committees)]
-        public override Task<IEnumerable<CommitteeViewModel>> GetAllAsync(int maxResults = 0, string orderBy = null, string includeProperties = null)
+        public override async Task<IEnumerable<CommitteeViewModel>> GetAll(int maxResults = 0, string orderBy = null, string includeProperties = null)
         {
-            return base.GetAllAsync(maxResults, orderBy, includeProperties);
+            return await base.GetAll(maxResults, orderBy, includeProperties);
         }
 
         [PermissionAuthorize(Permission = AdministrationPermissions.Committees)]
-        public override Task<HttpResponseMessage> Delete(int id)
+        public override async Task<HttpResponseMessage> Delete(int id)
         {
-            return base.Delete(id);
+            return await base.Delete(id);
         }
 
         [HttpPut]
@@ -64,18 +64,18 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Committees)]
-        public HttpResponseMessage KudosCommittee()
+        public async Task<HttpResponseMessage> KudosCommittee()
         {
-            var kudosCommittee = _committeesService.GetKudosCommitteeAsync();
+            var kudosCommittee = await _committeesService.GetKudosCommitteeAsync();
 
             return Request.CreateResponse(HttpStatusCode.OK, kudosCommittee);
         }
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Committees)]
-        public HttpResponseMessage KudosCommitteeId()
+        public async Task<HttpResponseMessage> KudosCommitteeId()
         {
-            var id = _committeesService.GetKudosCommitteeIdAsync();
+            var id = await _committeesService.GetKudosCommitteeIdAsync();
 
             return Request.CreateResponse(HttpStatusCode.OK, new { id });
         }
@@ -141,7 +141,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             var userAndOrg = GetUserAndOrganization();
             try
             {
-                _committeesService.DeleteCommitteeSuggestion(committeeId, suggestionId, userAndOrg);
+                _committeesService.DeleteCommitteeSuggestionAsync(committeeId, suggestionId, userAndOrg);
             }
             catch (ServiceException ex)
             {

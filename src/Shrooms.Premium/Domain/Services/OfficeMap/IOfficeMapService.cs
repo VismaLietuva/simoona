@@ -6,12 +6,12 @@ namespace Shrooms.Premium.Domain.Services.OfficeMap
 {
     public interface IOfficeMapService
     {
-        Task<IEnumerable<OfficeDTO>> GetOffices();
-        IEnumerable<OfficeUserDTO> GetOfficeUsers(int floorId, string includeProperties);
-        IEnumerable<string> GetEmailsByOffice(int officeId);
-        IEnumerable<string> GetEmailsByFloor(int floorId);
-        IEnumerable<string> GetEmailsByRoom(int roomId);
+        Task<IEnumerable<OfficeDTO>> GetOfficesAsync();
+        Task<IEnumerable<OfficeUserDTO>> GetOfficeUsersAsync(int floorId, string includeProperties);
+        Task<IEnumerable<string>> GetEmailsByOfficeAsync(int officeId);
+        Task<IEnumerable<string>> GetEmailsByFloorAsync(int floorId);
+        Task<IEnumerable<string>> GetEmailsByRoomAsync(int roomId);
         Task<UserOfficeAndFloorDto> GetUserOfficeAndFloorAsync(string userId);
-        Task<int> GetOfficesCount();
+        Task<int> GetOfficesCountAsync();
     }
 }

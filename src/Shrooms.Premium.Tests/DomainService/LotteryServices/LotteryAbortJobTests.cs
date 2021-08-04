@@ -75,8 +75,8 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
 
             await _sut.RefundLotteryAsync(default, _userAndOrganization);
 
-            _kudosService.DidNotReceiveWithAnyArgs().AddRefundKudosLogs(default);
-            _kudosService.DidNotReceiveWithAnyArgs().UpdateProfilesFromUserIds(default, default);
+            await _kudosService.DidNotReceiveWithAnyArgs().AddRefundKudosLogsAsync(default);
+            await _kudosService.DidNotReceiveWithAnyArgs().UpdateProfilesFromUserIdsAsync(default, default);
         }
 
         [Test]
@@ -91,7 +91,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
 
             await _sut.RefundLotteryAsync(1, _userAndOrganization);
 
-            _kudosService.ReceivedWithAnyArgs().UpdateProfilesFromUserIds(default, default);
+            await _kudosService.ReceivedWithAnyArgs().UpdateProfilesFromUserIdsAsync(default, default);
             await _unitOfWork.ReceivedWithAnyArgs(requiredNumberOfCalls: 2).SaveChangesAsync((string)default);
         }
 

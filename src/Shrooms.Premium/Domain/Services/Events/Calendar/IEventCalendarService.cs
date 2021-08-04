@@ -9,6 +9,6 @@ namespace Shrooms.Premium.Domain.Services.Events.Calendar
     {
         Task SendInvitationAsync(EventJoinValidationDTO @event, IEnumerable<string> userIds, int orgId);
 
-        byte[] DownloadEvent(Guid eventId, int orgId);
+        Task<byte[]> DownloadEventAsync(Guid eventId, int orgId);
     }
 }

@@ -27,7 +27,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         }
 
         [HttpGet]
-        public IHttpActionResult GetBook([FromUri] BookMobileGetViewModel bookViewModel)
+        public async Task<IHttpActionResult> GetBook([FromUri] BookMobileGetViewModel bookViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -38,7 +38,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
 
             try
             {
-                var getBookDTO = _bookMobileService.GetBook(bookDTO);
+                var getBookDTO = await _bookMobileService.GetBookAsync(bookDTO);
                 var getBookViewModel = _mapper.Map<RetrievedBookInfoDTO, RetrievedMobileBookInfoViewModel>(getBookDTO);
                 return Ok(getBookViewModel);
             }
@@ -69,28 +69,28 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         }
 
         [HttpGet]
-        public IHttpActionResult GetUsersForAutoComplete(string search, int organizationId)
+        public async Task<IHttpActionResult> GetUsersForAutoComplete(string search, int organizationId)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var mobileUsersDTO = _bookMobileService.GetUsersForAutoComplete(search, organizationId);
+            var mobileUsersDTO = await _bookMobileService.GetUsersForAutoCompleteAsync(search, organizationId);
             var mobileUserViewModel = _mapper.Map<IEnumerable<MobileUserDTO>, IEnumerable<MobileUserViewModel>>(mobileUsersDTO);
             return Ok(mobileUserViewModel);
         }
 
         [HttpGet]
-        public IHttpActionResult GetOffices(int organizationId)
+        public async Task<IHttpActionResult> GetOffices(int organizationId)
         {
-            var officeBookDTO = _bookMobileService.GetOffices(organizationId);
+            var officeBookDTO = await _bookMobileService.GetOfficesAsync(organizationId);
             var officeBookViewModel = _mapper.Map<IEnumerable<OfficeBookDTO>, IEnumerable<OfficeBookViewModel>>(officeBookDTO);
             return Ok(officeBookViewModel);
         }
 
         [HttpPost]
-        public IHttpActionResult PostBook(BookMobilePostViewModel bookViewModel)
+        public async Task<IHttpActionResult> PostBook(BookMobilePostViewModel bookViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -101,7 +101,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
 
             try
             {
-                _bookMobileService.PostBook(bookDTO);
+                await _bookMobileService.PostBookAsync(bookDTO);
             }
             catch (BookException e)
             {
@@ -111,7 +111,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         }
 
         [HttpPut]
-        public IHttpActionResult ReturnBook(BookMobileReturnViewModel bookViewModel)
+        public async Task<IHttpActionResult> ReturnBook(BookMobileReturnViewModel bookViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -122,10 +122,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
 
             try
             {
-                var bookLogsDTO = _bookMobileService.ReturnBook(bookDTO);
+                var bookLogsDTO = await _bookMobileService.ReturnBookAsync(bookDTO);
                 var bookLogsViewModel = bookLogsDTO == null
                     ? null
                     : _mapper.Map<IEnumerable<BookMobileLogDTO>, IEnumerable<BookMobileLogViewModel>>(bookLogsDTO);
+
                 return Ok(bookLogsViewModel);
             }
             catch (BookException e)
@@ -135,11 +136,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         }
 
         [HttpPut]
-        public IHttpActionResult ReturnSpecificBook(int bookLogId)
+        public async Task<IHttpActionResult> ReturnSpecificBook(int bookLogId)
         {
             try
             {
-                _bookMobileService.ReturnSpecificBook(bookLogId);
+                await _bookMobileService.ReturnSpecificBookAsync(bookLogId);
             }
             catch (BookException e)
             {
@@ -150,7 +151,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         }
 
         [HttpPut]
-        public IHttpActionResult TakeBook(BookMobileTakeViewModel bookViewModel)
+        public async Task<IHttpActionResult> TakeBook(BookMobileTakeViewModel bookViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -161,7 +162,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
 
             try
             {
-                _bookService.TakeBookAsync(bookDTO);
+                await _bookService.TakeBookAsync(bookDTO);
                 return Ok();
             }
             catch (BookException e)

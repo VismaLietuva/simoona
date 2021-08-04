@@ -9,17 +9,17 @@ namespace Shrooms.Premium.Domain.Services.Books
 {
     public interface IBookService
     {
-        void AddBook(NewBookDTO bookDto);
+        Task AddBookAsync(NewBookDTO bookDto);
         Task TakeBookAsync(BookTakeDTO bookDTO);
-        void EditBook(EditBookDTO editedBook);
-        void DeleteBook(int bookOfficeId, UserAndOrganizationDTO userOrg);
+        Task EditBookAsync(EditBookDTO editedBook);
+        Task DeleteBookAsync(int bookOfficeId, UserAndOrganizationDTO userOrg);
         Task TakeBookAsync(int bookOfficeId, UserAndOrganizationDTO userAndOrg);
-        void ReturnBook(int bookOfficeId, UserAndOrganizationDTO userAndOrg);
+        Task ReturnBookAsync(int bookOfficeId, UserAndOrganizationDTO userAndOrg);
         Task ReportBookAsync(BookReportDTO bookReport, UserAndOrganizationDTO userAndOrg);
         void UpdateBookCovers();
-        Task<RetrievedBookInfoDTO> FindBookByIsbn(string isbn, int organizationId);
-        ILazyPaged<BooksByOfficeDTO> GetBooksByOffice(BooksByOfficeOptionsDTO options);
-        BookDetailsDTO GetBookDetails(int bookOfficeId, UserAndOrganizationDTO userOrg);
-        BookDetailsAdministrationDTO GetBookDetailsWithOffices(int bookOfficeId, UserAndOrganizationDTO userOrg);
+        Task<RetrievedBookInfoDTO> FindBookByIsbnAsync(string isbn, int organizationId);
+        Task<ILazyPaged<BooksByOfficeDTO>> GetBooksByOfficeAsync(BooksByOfficeOptionsDTO options);
+        Task<BookDetailsDTO> GetBookDetailsAsync(int bookOfficeId, UserAndOrganizationDTO userOrg);
+        Task<BookDetailsAdministrationDTO> GetBookDetailsWithOfficesAsync(int bookOfficeId, UserAndOrganizationDTO userOrg);
     }
 }

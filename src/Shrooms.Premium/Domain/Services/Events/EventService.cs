@@ -34,10 +34,10 @@ namespace Shrooms.Premium.Domain.Services.Events
         private readonly IEventParticipationService _eventParticipationService;
         private readonly IWallService _wallService;
         private readonly IMarkdownConverter _markdownConverter;
-        private readonly IDbSet<Event> _eventsDbSet;
-        private readonly IDbSet<EventType> _eventTypesDbSet;
-        private readonly IDbSet<ApplicationUser> _usersDbSet;
-        private readonly IDbSet<EventOption> _eventOptionsDbSet;
+        private readonly DbSet<Event> _eventsDbSet;
+        private readonly DbSet<EventType> _eventTypesDbSet;
+        private readonly DbSet<ApplicationUser> _usersDbSet;
+        private readonly DbSet<EventOption> _eventOptionsDbSet;
 
         private readonly IDbSet<Office> _officeDbSet;
 
@@ -90,13 +90,13 @@ namespace Shrooms.Premium.Domain.Services.Events
             await _wallService.DeleteWallAsync(@event.WallId, userOrg, WallType.Events);
         }
 
-        public EventEditDTO GetEventForEditing(Guid id, UserAndOrganizationDTO userOrg)
+        public async Task<EventEditDTO> GetEventForEditingAsync(Guid id, UserAndOrganizationDTO userOrg)
         {
-            var @event = _eventsDbSet
+            var @event = await _eventsDbSet
                 .Include(e => e.ResponsibleUser)
                 .Where(e => e.Id == id && e.OrganizationId == userOrg.OrganizationId)
                 .Select(MapToEventEditDto())
-                .SingleOrDefault();
+                .SingleOrDefaultAsync();
 
             _eventValidationService.CheckIfEventExists(@event);
             return @event;
@@ -156,7 +156,7 @@ namespace Shrooms.Premium.Domain.Services.Events
 
             _eventValidationService.CheckIfEventStartDateIsExpired(newEventDto.StartDate);
             _eventValidationService.CheckIfRegistrationDeadlineIsExpired(newEventDto.RegistrationDeadlineDate.Value);
-            ValidateEvent(newEventDto);
+            await ValidateEvent(newEventDto);
             _eventValidationService.CheckIfCreatingEventHasInsufficientOptions(newEventDto.MaxOptions, newEventDto.NewOptions.Count());
             _eventValidationService.CheckIfCreatingEventHasNoChoices(newEventDto.MaxOptions, newEventDto.NewOptions.Count());
 
@@ -198,7 +198,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             _eventValidationService.CheckIfCreatingEventHasInsufficientOptions(eventDto.MaxOptions, totalOptionsProvided);
             _eventValidationService.CheckIfCreatingEventHasNoChoices(eventDto.MaxOptions, totalOptionsProvided);
             _eventValidationService.CheckIfAttendOptionsAllowedToUpdate(eventDto, eventToUpdate);
-            ValidateEvent(eventDto);
+            await ValidateEvent(eventDto);
 
             if (eventDto.ResetParticipantList)
             {
@@ -214,11 +214,15 @@ namespace Shrooms.Premium.Domain.Services.Events
             eventToUpdate.Description = _markdownConverter.ConvertToHtml(eventToUpdate.Description);
         }
 
-        public void ToggleEventPin(Guid id)
+        public async Task ToggleEventPinAsync(Guid id)
         {
-            var @event = _eventsDbSet.Find(id);
-            @event.IsPinned = !@event.IsPinned;
-            _uow.SaveChanges();
+            var @event = await _eventsDbSet.FindAsync(id);
+
+            if (@event != null)
+            {
+                @event.IsPinned = !@event.IsPinned;
+                await _uow.SaveChangesAsync();
+            }
         }
 
         public async Task CheckIfEventExistsAsync(string eventId, int organizationId)
@@ -306,10 +310,10 @@ namespace Shrooms.Premium.Domain.Services.Events
             }
         }
 
-        private void ValidateEvent(CreateEventDto eventDto)
+        private async Task ValidateEvent(CreateEventDto eventDto)
         {
-            var userExists = _usersDbSet.Any(u => u.Id == eventDto.ResponsibleUserId);
-            var eventTypeExists = _eventTypesDbSet.Any(e => e.Id == eventDto.TypeId);
+            var userExists = await _usersDbSet.AnyAsync(u => u.Id == eventDto.ResponsibleUserId);
+            var eventTypeExists = await _eventTypesDbSet.AnyAsync(e => e.Id == eventDto.TypeId);
 
             _eventValidationService.CheckIfEndDateIsGreaterThanStartDate(eventDto.StartDate, eventDto.EndDate);
             // ReSharper disable once PossibleInvalidOperationException

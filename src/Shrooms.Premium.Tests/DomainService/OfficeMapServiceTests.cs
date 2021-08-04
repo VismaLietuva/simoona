@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using NSubstitute;
 using NUnit.Framework;
@@ -38,7 +40,9 @@ namespace Shrooms.Premium.Tests.DomainService
 
         private static void MockRoleService(IRoleService roleService)
         {
-            roleService.ExcludeUsersWithRole(Roles.NewUser).Returns(x => true);
+            var newRoleId = Guid.NewGuid().ToString();
+            roleService.GetRoleIdByNameAsync(Roles.NewUser).Returns(newRoleId);
+            roleService.ExcludeUsersWithRole(newRoleId).ReturnsForAnyArgs(x => true);
         }
 
         private IQueryable<ApplicationUser> MockUsers()
@@ -105,23 +109,23 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_If_Get_Emails_By_Office_Returns_Incorrect_Emails()
+        public async Task Should_Return_If_Get_Emails_By_Office_Returns_Incorrect_Emails()
         {
-            var emails = _officeMapService.GetEmailsByOffice(3);
+            var emails = await _officeMapService.GetEmailsByOfficeAsync(3);
             Assert.AreEqual(1, emails.Count());
         }
 
         [Test]
-        public void Should_Return_If_Get_Emails_By_Floor_Returns_Incorrect_Emails()
+        public async Task Should_Return_If_Get_Emails_By_Floor_Returns_Incorrect_Emails()
         {
-            var emails = _officeMapService.GetEmailsByFloor(1);
+            var emails = await _officeMapService.GetEmailsByFloorAsync(1);
             Assert.AreEqual(3, emails.Count());
         }
 
         [Test]
-        public void Should_Return_If_Get_Emails_By_Room_Returns_Incorrect_Emails()
+        public async Task Should_Return_If_Get_Emails_By_Room_Returns_Incorrect_Emails()
         {
-            var emails = _officeMapService.GetEmailsByRoom(1);
+            var emails = await _officeMapService.GetEmailsByRoomAsync(1);
             Assert.AreEqual(2, emails.Count());
         }
     }

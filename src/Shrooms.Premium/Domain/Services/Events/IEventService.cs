@@ -10,9 +10,9 @@ namespace Shrooms.Premium.Domain.Services.Events
         Task UpdateEventAsync(EditEventDTO eventDto);
         Task<CreateEventDto> CreateEventAsync(CreateEventDto newEventDto);
         Task DeleteAsync(Guid id, UserAndOrganizationDTO userOrg);
-        void ToggleEventPin(Guid id);
+        Task ToggleEventPinAsync(Guid id);
         Task<EventDetailsDTO> GetEventDetailsAsync(Guid id, UserAndOrganizationDTO userOrg);
-        EventEditDTO GetEventForEditing(Guid id, UserAndOrganizationDTO userOrg);
+        Task<EventEditDTO> GetEventForEditingAsync(Guid id, UserAndOrganizationDTO userOrg);
         Task CheckIfEventExistsAsync(string eventId, int organizationId);
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using MoreLinq;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
@@ -24,20 +25,22 @@ namespace Shrooms.Premium.Domain.Services.OrganizationalStructure
             _roleService = roleService;
         }
 
-        public OrganizationalStructureDTO GetOrganizationalStructure(UserAndOrganizationDTO userAndOrg)
+        public async Task<OrganizationalStructureDTO> GetOrganizationalStructureAsync(UserAndOrganizationDTO userAndOrg)
         {
-            var userList = _applicationUsersDbSet
+            var newUserRole = await _roleService.GetRoleIdByNameAsync(Roles.NewUser);
+
+            var userList = await _applicationUsersDbSet
                 .Where(u => u.OrganizationId == userAndOrg.OrganizationId)
-                .Where(_roleService.ExcludeUsersWithRole(Roles.NewUser))
+                .Where(_roleService.ExcludeUsersWithRole(newUserRole))
                 .Select(MapToOrganizationalStructureUserDTO())
-                .ToList();
+                .ToListAsync();
 
             var head = userList.First(u => u.IsManagingDirector);
             var result = MapUsersToOrganizationalStructureDTO(head, userList);
             return result;
         }
 
-        private Expression<Func<ApplicationUser, OrganizationalStructureUserDTO>> MapToOrganizationalStructureUserDTO()
+        private static Expression<Func<ApplicationUser, OrganizationalStructureUserDTO>> MapToOrganizationalStructureUserDTO()
         {
             return user => new OrganizationalStructureUserDTO
             {
@@ -50,7 +53,7 @@ namespace Shrooms.Premium.Domain.Services.OrganizationalStructure
             };
         }
 
-        private IEnumerable<OrganizationalStructureDTO> GetChildrens(IEnumerable<OrganizationalStructureUserDTO> userList, OrganizationalStructureUserDTO head)
+        private IEnumerable<OrganizationalStructureDTO> GetChildren(IList<OrganizationalStructureUserDTO> userList, OrganizationalStructureUserDTO head)
         {
             var childrenList = new List<OrganizationalStructureDTO>();
 
@@ -61,13 +64,13 @@ namespace Shrooms.Premium.Domain.Services.OrganizationalStructure
             return childrenList;
         }
 
-        private OrganizationalStructureDTO MapUsersToOrganizationalStructureDTO(OrganizationalStructureUserDTO user, IEnumerable<OrganizationalStructureUserDTO> userList)
+        private OrganizationalStructureDTO MapUsersToOrganizationalStructureDTO(OrganizationalStructureUserDTO user, IList<OrganizationalStructureUserDTO> userList)
         {
             return new OrganizationalStructureDTO
             {
                 FullName = user.FirstName + " " + user.LastName,
                 PictureId = user.PictureId,
-                Children = GetChildrens(userList, user)
+                Children = GetChildren(userList, user)
             };
         }
     }

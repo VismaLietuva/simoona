@@ -42,7 +42,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
             _vacationDomainService = vacationDomainService;
         }
 
-        public VacationImportStatusDTO UploadVacationReportFile(Stream fileStream)
+        public async Task<VacationImportStatusDTO> UploadVacationReportFileAsync(Stream fileStream)
         {
             var excelReader = ExcelReaderFactory.CreateBinaryReader(fileStream);
 
@@ -105,13 +105,13 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                 }
             }
 
-            _uow.SaveChanges();
+            await _uow.SaveChangesAsync();
             excelReader.Close();
 
             return importStatus;
         }
 
-        public async Task<VacationAvailableDaysDTO> GetAvailableDays(UserAndOrganizationDTO userOrgDto)
+        public async Task<VacationAvailableDaysDTO> GetAvailableDaysAsync(UserAndOrganizationDTO userOrgDto)
         {
             var user = await _applicationUserDbSet
                 .FirstAsync(u => u.Id == userOrgDto.UserId);
@@ -125,14 +125,14 @@ namespace Shrooms.Premium.Domain.Services.Vacations
             return availableDaysModel;
         }
 
-        private IEnumerable<string> GetWorksheetNames(IExcelDataReader excelReader)
+        private static IEnumerable<string> GetWorksheetNames(IExcelDataReader excelReader)
         {
             var workbook = excelReader.AsDataSet();
             var sheets = from DataTable sheet in workbook.Tables select sheet.TableName;
             return sheets;
         }
 
-        private IEnumerable<DataRow> GetWorksheetData(IExcelDataReader excelReader, string sheet, bool firstRowIsColumnNames = false)
+        private static IEnumerable<DataRow> GetWorksheetData(IExcelDataReader excelReader, string sheet, bool firstRowIsColumnNames = false)
         {
             excelReader.IsFirstRowAsColumnNames = firstRowIsColumnNames;
             var workSheet = excelReader.AsDataSet().Tables[sheet];

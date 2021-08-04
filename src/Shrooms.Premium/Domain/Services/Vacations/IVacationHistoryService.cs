@@ -5,6 +5,6 @@ namespace Shrooms.Premium.Domain.Services.Vacations
 {
     public interface IVacationHistoryService
     {
-        Task<VacationDTO[]> GetVacationHistory(string userId);
+        Task<VacationDTO[]> GetVacationHistoryAsync(string userId);
     }
 }

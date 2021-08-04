@@ -23,23 +23,23 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [Route("UpdateRecurringEvents")]
         public async Task UpdateRecurringEvents()
         {
-            await _webHookService.Events.UpdateRecurringEvents();
+            await _webHookService.Events.UpdateRecurringEventsAsync();
         }
 
         [HttpPost]
         [Route("RemindBooks")]
-        public void RemindBooks(int daysBefore)
+        public async Task RemindBooks(int daysBefore)
         {
-            _webHookService.Books.RemindAboutBooksAsync(daysBefore);
+            await _webHookService.Books.RemindAboutBooksAsync(daysBefore);
         }
 
         [HttpPost]
         [Route("GiveLoyaltyKudos")]
         [InvalidateCacheOutput("GetLastKudosLogRecords", typeof(KudosController))]
-        public void GiveLoyaltyKudos()
+        public async Task GiveLoyaltyKudos()
         {
             var organizationName = GetOrganizationName();
-            _webHookService.LoyaltyKudos.AwardEmployeesWithKudos(organizationName);
+            await _webHookService.LoyaltyKudos.AwardEmployeesWithKudosAsync(organizationName);
         }
 
         [HttpPost]
@@ -51,10 +51,10 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpPost]
         [Route("RemindEvents")]
-        public void RemindEvents()
+        public async Task RemindEvents()
         {
             var organizationName = GetOrganizationName();
-            _webHookService.EventJoinRemindService.SendNotifications(organizationName);
+            await _webHookService.EventJoinRemindService.SendNotificationsAsync(organizationName);
         }
     }
 }

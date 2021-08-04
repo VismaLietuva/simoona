@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects.Wall;
 using Shrooms.Contracts.Enums;
@@ -27,22 +28,22 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
         private readonly IUnitOfWork2 _uow;
         private readonly ISystemClock _systemClock;
         private readonly IWallService _wallService;
+        private readonly IApplicationSettings _appSettings;
 
-        public EventsWebHookService(IUnitOfWork2 uow, ISystemClock systemClock, IWallService wallService)
+        public EventsWebHookService(IUnitOfWork2 uow, ISystemClock systemClock, IWallService wallService, IApplicationSettings appSettings)
         {
             _uow = uow;
             _eventsDbSet = uow.GetDbSet<Event>();
             _eventOptionsDbSet = uow.GetDbSet<EventOption>();
 
             _systemClock = systemClock;
-
             _wallService = wallService;
+            _appSettings = appSettings;
         }
 
-        public async Task UpdateRecurringEvents()
+        public async Task UpdateRecurringEventsAsync()
         {
-            var eventsToUpdate =
-                await _eventsDbSet
+            var eventsToUpdate = await _eventsDbSet
                     .Include(e => e.EventOptions)
                     .Include(u => u.ResponsibleUser)
                     .Where(e => e.EventRecurring != EventRecurrenceOptions.None && e.EndDate < _systemClock.UtcNow && e.ResponsibleUser != null)
@@ -50,7 +51,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
 
             foreach (var @event in eventsToUpdate)
             {
-                var newWallId = await CreateEventWall(@event);
+                var newWallId = await CreateEventWallAsync(@event);
                 var newEvent = CreateNewEvent(@event, newWallId);
                 _eventsDbSet.Add(newEvent);
                 @event.EventRecurring = EventRecurrenceOptions.None;
@@ -86,7 +87,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
             };
         }
 
-        private async Task<int> CreateEventWall(Event @event)
+        private async Task<int> CreateEventWallAsync([NotNull]Event @event)
         {
             var wallDto = new CreateWallDto
             {
@@ -96,7 +97,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
                 MembersIds = new List<string> { @event.ResponsibleUserId },
                 Type = WallType.Events,
                 Logo = @event.ImageName,
-                OrganizationId = @event.OrganizationId.Value,
+                OrganizationId = @event.OrganizationId ?? _appSettings.DefaultOrganizationId,
                 UserId = @event.ResponsibleUserId,
                 Description = @event.Description
             };

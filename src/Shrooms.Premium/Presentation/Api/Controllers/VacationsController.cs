@@ -45,7 +45,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                 return BadRequest("File is too large");
             }
 
-            var importStatus = _vacationService.UploadVacationReportFile(await fileContent.ReadAsStreamAsync());
+            var importStatus = _vacationService.UploadVacationReportFileAsync(await fileContent.ReadAsStreamAsync());
 
             return Ok(importStatus);
         }
@@ -54,7 +54,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [PermissionAuthorize(Permission = BasicPermissions.Vacation)]
         public async Task<IHttpActionResult> AvailableDays()
         {
-            var availableDaysDto = await _vacationService.GetAvailableDays(GetUserAndOrganization());
+            var availableDaysDto = await _vacationService.GetAvailableDaysAsync(GetUserAndOrganization());
             var availableDaysViewModel = _mapper.Map<VacationAvailableDaysViewModel>(availableDaysDto);
 
             return Ok(availableDaysViewModel);
@@ -66,7 +66,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         {
             try
             {
-                var vacationDtos = await _vacationHistoryService.GetVacationHistory(User.Identity.GetUserId());
+                var vacationDtos = await _vacationHistoryService.GetVacationHistoryAsync(User.Identity.GetUserId());
                 var vacationModels = _mapper.Map<VacationDTO[], VacationViewModel[]>(vacationDtos);
                 return Ok(vacationModels);
             }

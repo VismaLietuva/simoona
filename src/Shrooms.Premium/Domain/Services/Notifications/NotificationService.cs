@@ -26,10 +26,7 @@ namespace Shrooms.Premium.Domain.Services.Notifications
 
         private readonly IMapper _mapper;
 
-        public NotificationService(
-            IUnitOfWork2 uow,
-            IMapper mapper,
-            IWallService wallService)
+        public NotificationService(IUnitOfWork2 uow, IMapper mapper, IWallService wallService)
         {
             _notificationDbSet = uow.GetDbSet<Notification>();
             _wallDbSet = uow.GetDbSet<Wall>();
@@ -55,7 +52,7 @@ namespace Shrooms.Premium.Domain.Services.Notifications
             return _mapper.Map<NotificationDto>(newNotification);
         }
 
-        public void CreateForEventJoinReminder(IEnumerable<string> usersToNotify, int orgId)
+        public async Task CreateForEventJoinReminderAsync(IEnumerable<string> usersToNotify, int orgId)
         {
             var newNotification = new Notification
             {
@@ -70,7 +67,7 @@ namespace Shrooms.Premium.Domain.Services.Notifications
             };
 
             _notificationDbSet.Add(newNotification);
-            _uow.SaveChanges(false);
+            await _uow.SaveChangesAsync(false);
         }
 
         private static IList<NotificationUser> MapNotificationUsersFromIds(IEnumerable<string> userIds)

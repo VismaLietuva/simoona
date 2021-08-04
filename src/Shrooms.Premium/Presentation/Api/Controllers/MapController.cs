@@ -95,6 +95,49 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             return await GetModelAsync(floor, true);
         }
 
+        [HttpGet]
+        [PermissionAuthorize(Permission = BasicPermissions.OfficeUsers)]
+        public async Task<IEnumerable<string>> GetUsersEmailsByOffice(int officeId)
+        {
+            var emails = await _officeMapService.GetEmailsByOfficeAsync(officeId);
+            return emails;
+        }
+
+        [HttpGet]
+        [PermissionAuthorize(Permission = BasicPermissions.OfficeUsers)]
+        public async Task<IEnumerable<string>> GetUsersEmailsByFloor(int floorId)
+        {
+            var emails = await _officeMapService.GetEmailsByFloorAsync(floorId);
+            return emails;
+        }
+
+        [HttpGet]
+        [PermissionAuthorize(Permission = BasicPermissions.OfficeUsers)]
+        public async Task<IEnumerable<string>> GetUsersEmailsByRoom(int roomId)
+        {
+            var emails = await _officeMapService.GetEmailsByRoomAsync(roomId);
+            return emails;
+        }
+
+        [HttpGet, HttpPost]
+        [PermissionAuthorize(Permission = BasicPermissions.OfficeUsers)]
+        public async Task<PagedViewModel<OfficeUserDTO>> GetPagedByFloor(int floorId, int page = 1, int pageSize = WebApiConstants.DefaultPageSize, string includeProperties = "")
+        {
+            var officeUsersDto = await _officeMapService.GetOfficeUsersAsync(floorId, includeProperties);
+
+            var officeUserPagedViewModel = await officeUsersDto.ToPagedListAsync(page, pageSize);
+
+            var pagedModel = new PagedViewModel<OfficeUserDTO>
+            {
+                PagedList = officeUserPagedViewModel,
+                PageCount = officeUserPagedViewModel.PageCount,
+                ItemCount = officeUserPagedViewModel.TotalItemCount,
+                PageSize = pageSize
+            };
+
+            return pagedModel;
+        }
+
         private async Task<MapViewModel> GetModelAsync(Floor floor, bool includeProperties = false)
         {
             if (floor == null)
@@ -128,49 +171,6 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             model.Floor.RoomTypes = _mapper.Map<IEnumerable<RoomType>, IEnumerable<MapRoomTypeViewModel>>(roomTypes);
 
             return model;
-        }
-
-        [HttpGet]
-        [PermissionAuthorize(Permission = BasicPermissions.OfficeUsers)]
-        public IEnumerable<string> GetUsersEmailsByOffice(int officeId)
-        {
-            var emails = _officeMapService.GetEmailsByOffice(officeId);
-            return emails;
-        }
-
-        [HttpGet]
-        [PermissionAuthorize(Permission = BasicPermissions.OfficeUsers)]
-        public IEnumerable<string> GetUsersEmailsByFloor(int floorId)
-        {
-            var emails = _officeMapService.GetEmailsByFloor(floorId);
-            return emails;
-        }
-
-        [HttpGet]
-        [PermissionAuthorize(Permission = BasicPermissions.OfficeUsers)]
-        public IEnumerable<string> GetUsersEmailsByRoom(int roomId)
-        {
-            var emails = _officeMapService.GetEmailsByRoom(roomId);
-            return emails;
-        }
-
-        [HttpGet, HttpPost]
-        [PermissionAuthorize(Permission = BasicPermissions.OfficeUsers)]
-        public async Task<PagedViewModel<OfficeUserDTO>> GetPagedByFloor(int floorId, int page = 1, int pageSize = WebApiConstants.DefaultPageSize, string includeProperties = "")
-        {
-            var officeUsersDto = _officeMapService.GetOfficeUsers(floorId, includeProperties);
-
-            var officeUserPagedViewModel = await officeUsersDto.ToPagedListAsync(page, pageSize);
-
-            var pagedModel = new PagedViewModel<OfficeUserDTO>
-            {
-                PagedList = officeUserPagedViewModel,
-                PageCount = officeUserPagedViewModel.PageCount,
-                ItemCount = officeUserPagedViewModel.TotalItemCount,
-                PageSize = pageSize
-            };
-
-            return pagedModel;
         }
     }
 }

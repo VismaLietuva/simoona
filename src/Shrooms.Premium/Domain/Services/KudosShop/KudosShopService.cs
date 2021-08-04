@@ -25,7 +25,7 @@ namespace Shrooms.Premium.Domain.Services.KudosShop
             _kudosShopItemsDbSet = uow.GetDbSet<KudosShopItem>();
         }
 
-        public async Task CreateItem(KudosShopItemDTO dto)
+        public async Task CreateItemAsync(KudosShopItemDTO dto)
         {
             var alreadyExists = await _kudosShopItemsDbSet
                 .AnyAsync(t => t.Name == dto.Name && t.OrganizationId == dto.OrganizationId);
@@ -55,7 +55,7 @@ namespace Shrooms.Premium.Domain.Services.KudosShop
             await _uow.SaveChangesAsync(dto.UserId);
         }
 
-        public async Task<KudosShopItemDTO> GetItem(int id, UserAndOrganizationDTO userOrg)
+        public async Task<KudosShopItemDTO> GetItemAsync(int id, UserAndOrganizationDTO userOrg)
         {
             var type = await _kudosShopItemsDbSet
                 .Where(t => t.Id == id && t.OrganizationId == userOrg.OrganizationId)
@@ -77,12 +77,12 @@ namespace Shrooms.Premium.Domain.Services.KudosShop
             return type;
         }
 
-        public bool ItemsExist(UserAndOrganizationDTO userOrg)
+        public async Task<bool> ItemsExistAsync(UserAndOrganizationDTO userOrg)
         {
-            return _kudosShopItemsDbSet.Any(t => t.OrganizationId == userOrg.OrganizationId);
+            return await _kudosShopItemsDbSet.AnyAsync(t => t.OrganizationId == userOrg.OrganizationId);
         }
 
-        public async Task<IEnumerable<KudosShopItemDTO>> GetAllItems(UserAndOrganizationDTO userOrg)
+        public async Task<IEnumerable<KudosShopItemDTO>> GetAllItemsAsync(UserAndOrganizationDTO userOrg)
         {
             var kudosTypesDTO = await _kudosShopItemsDbSet
                 .Where(t => t.OrganizationId == userOrg.OrganizationId)
@@ -92,7 +92,7 @@ namespace Shrooms.Premium.Domain.Services.KudosShop
             return kudosTypesDTO;
         }
 
-        public async Task UpdateItem(KudosShopItemDTO dto)
+        public async Task UpdateItemAsync(KudosShopItemDTO dto)
         {
             var alreadyExists = await _kudosShopItemsDbSet
                 .AnyAsync(t => t.Name == dto.Name && t.OrganizationId == dto.OrganizationId && t.Id != dto.Id);
@@ -118,7 +118,7 @@ namespace Shrooms.Premium.Domain.Services.KudosShop
             await _uow.SaveChangesAsync(dto.UserId);
         }
 
-        public async Task DeleteItem(int id, UserAndOrganizationDTO userOrg)
+        public async Task DeleteItemAsync(int id, UserAndOrganizationDTO userOrg)
         {
             var item = await _kudosShopItemsDbSet
                 .FirstOrDefaultAsync(e => e.Id == id && e.OrganizationId == userOrg.OrganizationId);

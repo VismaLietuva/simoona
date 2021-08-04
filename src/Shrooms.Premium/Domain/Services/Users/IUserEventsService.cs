@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Shrooms.Premium.Domain.Services.Users
 {
     public interface IUserEventsService
     {
-        IEnumerable<string> GetUsersWithAppReminders(IEnumerable<int> eventTypeIds);
+        Task<IEnumerable<string>> GetUsersWithAppRemindersAsync(IEnumerable<int> eventTypeIds);
 
-        IEnumerable<string> GetUsersWithEmailReminders(IEnumerable<int> eventTypeIds);
+        Task<IEnumerable<string>> GetUsersWithEmailRemindersAsync(IEnumerable<int> eventTypeIds);
     }
 }

@@ -81,7 +81,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         }
 
         [Test]
-        public void Should_Successfully_Join_Event_Without_Options()
+        public async Task Should_Successfully_Join_Event_Without_Options()
         {
             var eventGuid = MockEventWithoutOptions();
             MockUsers();
@@ -94,12 +94,13 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 UserId = "testUserId",
                 OrganizationId = 2
             };
-            _eventParticipationService.JoinAsync(eventJoinDto);
+
+            await _eventParticipationService.JoinAsync(eventJoinDto);
             _eventParticipantsDbSet.Received(1).Add(Arg.Any<EventParticipant>());
         }
 
         [Test]
-        public void Should_Successfully_Join_Event_With_Options()
+        public async Task Should_Successfully_Join_Event_With_Options()
         {
             var eventGuid = MockEventWithOptions();
             MockUsers();
@@ -112,7 +113,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 UserId = "testUserId",
                 OrganizationId = 2
             };
-            _eventParticipationService.JoinAsync(eventJoinDto);
+
+            await _eventParticipationService.JoinAsync(eventJoinDto);
             _eventParticipantsDbSet.Received(1).Add(Arg.Is<EventParticipant>(x => x.EventOptions.Count == 1));
         }
 
@@ -129,15 +131,15 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         [Test]
         public void Should_Not_Throw_If_Joining_User_Is_Not_Participating_In_Event()
         {
-            var isAlreadyParticipating = false;
+            const bool isAlreadyParticipating = false;
             Assert.DoesNotThrow(() => _eventValidationService.CheckIfUserAlreadyJoinedSameEvent(isAlreadyParticipating));
         }
 
         [Test]
         public void Should_Throw_If_Joining_User_Provided_Not_Enough_Options()
         {
-            var maxChoices = 2;
-            var choicesProvided = 0;
+            const int maxChoices = 2;
+            const int choicesProvided = 0;
             var ex = Assert.Throws<EventException>(() => _eventValidationService.CheckIfJoiningNotEnoughChoicesProvided(maxChoices, choicesProvided));
             Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventNotEnoughChoicesProvidedCode));
         }
@@ -155,7 +157,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         public void Should_Throw_If_Joining_Event_Is_Already_Full()
         {
             const int maxParticipants = 5;
-            var participantsCount = 6;
+            const int participantsCount = 6;
             var ex = Assert.Throws<EventException>(() => _eventValidationService.CheckIfEventHasEnoughPlaces(maxParticipants, participantsCount));
             Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventIsFullCode));
         }
@@ -163,7 +165,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         [Test]
         public void Should_Throw_If_Joining_Many_Users_One_Participant_Has_Already_Joined()
         {
-            var isAlreadyParticipating = true;
+            const bool isAlreadyParticipating = true;
             var ex = Assert.Throws<EventException>(() => _eventValidationService.CheckIfUserAlreadyJoinedSameEvent(isAlreadyParticipating));
             Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventUserAlreadyParticipatesCode));
         }
@@ -217,7 +219,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         }
 
         [Test]
-        public void Should_Leave_Event_That_Has_Not_Started()
+        public async Task Should_Leave_Event_That_Has_Not_Started()
         {
             var eventId = MockLeaveEvent();
             var userOrg = new UserAndOrganizationDTO
@@ -225,12 +227,13 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 OrganizationId = 2,
                 UserId = "user"
             };
-            _eventParticipationService.LeaveAsync(eventId, userOrg, "leave comment");
+
+            await _eventParticipationService.LeaveAsync(eventId, userOrg, "leave comment");
             _eventParticipantsDbSet.Received(1).Remove(Arg.Any<EventParticipant>());
         }
 
         [Test]
-        public void Should_Throw_When_Participant_Wasnt_removed()
+        public async Task Should_Throw_When_Participant_Wasnt_removed()
         {
             var eventId = MockRemoveParticipant();
             var userOrg = new UserAndOrganizationDTO
@@ -239,12 +242,12 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 UserId = "user"
             };
 
-            _eventParticipationService.ExpelAsync(eventId, userOrg, "user2");
+            await _eventParticipationService.ExpelAsync(eventId, userOrg, "user2");
             _eventParticipantsDbSet.Received(1).Remove(Arg.Any<EventParticipant>());
         }
 
         [Test]
-        public void Should_Throw_When_User_Has_No_Permission_To_Remove_Participant()
+        public async Task Should_Throw_When_User_Has_No_Permission_To_Remove_Participant()
         {
             var eventId = MockRemoveParticipant();
             var userOrg = new UserAndOrganizationDTO
@@ -253,12 +256,12 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 UserId = "user"
             };
 
-            _eventParticipationService.ExpelAsync(eventId, userOrg, "user2");
+            await _eventParticipationService.ExpelAsync(eventId, userOrg, "user2");
             _eventValidationServiceMock.Received(1).CheckIfUserHasPermission("user", "user", false);
         }
 
         [Test]
-        public void Should_Throw_If_Trying_To_Expell_Participant_From_Finished_Event()
+        public async Task Should_Throw_If_Trying_To_Expell_Participant_From_Finished_Event()
         {
             var eventId = MockRemoveParticipantWithExpiredEvent();
             var userOrg = new UserAndOrganizationDTO
@@ -267,7 +270,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 UserId = "user"
             };
 
-            _eventParticipationService.ExpelAsync(eventId, userOrg, "user2");
+            await _eventParticipationService.ExpelAsync(eventId, userOrg, "user2");
             _eventValidationServiceMock.Received(1).CheckIfEventEndDateIsExpired(Arg.Is<DateTime>(x => x < DateTime.UtcNow));
         }
 
@@ -287,7 +290,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         }
 
         [Test]
-        public void Should_Reset_Event_Participants()
+        public async Task Should_Reset_Event_Participants()
         {
             var eventId = MockResetAttendees();
             var user = new UserAndOrganizationDTO
@@ -295,104 +298,109 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 OrganizationId = 2,
                 UserId = "user1"
             };
-            _eventParticipationService.ResetAttendeesAsync(eventId, user);
+
+            await _eventParticipationService.ResetAttendeesAsync(eventId, user);
             _eventParticipantsDbSet.Received(3).Remove(Arg.Any<EventParticipant>());
         }
 
         [Test]
         public void Should_Throw_If_User_Is_Not_Creator_Or_Event_Admin()
         {
-            var userId = "user";
-            var eventCreatorId = "creator";
-            var isAdmin = false;
+            const string userId = "user";
+            const string eventCreatorId = "creator";
+            const bool isAdmin = false;
             Assert.Throws<EventException>(() => _eventValidationService.CheckIfUserHasPermission(userId, eventCreatorId, isAdmin));
         }
 
         [Test]
         public void Should_Not_Throw_If_User_Is_Creator_And_Not_Event_Admin()
         {
-            var userId = "creator";
-            var eventCreatorId = "creator";
-            var isAdmin = false;
+            const string userId = "creator";
+            const string eventCreatorId = "creator";
+            const bool isAdmin = false;
             Assert.DoesNotThrow(() => _eventValidationService.CheckIfUserHasPermission(userId, eventCreatorId, isAdmin));
         }
 
         [Test]
         public void Should_Not_Throw_If_User_Is_Event_Administrator()
         {
-            var userId = "user";
-            var eventCreatorId = "creator";
-            var isAdmin = true;
+            const string userId = "user";
+            const string eventCreatorId = "creator";
+            const bool isAdmin = true;
             Assert.DoesNotThrow(() => _eventValidationService.CheckIfUserHasPermission(userId, eventCreatorId, isAdmin));
         }
 
         [Test]
-        public void Should_Return_Only_Not_Participating_Users_While_Searching_For_Users_To_Join_Event()
+        public async Task Should_Return_Only_Not_Participating_Users_While_Searching_For_Users_To_Join_Event()
         {
             var eventId = MockEventAndUsersForSearch();
-            var searchString = "user";
+            const string searchString = "user";
             var userOrg = new UserAndOrganizationDTO
             {
                 OrganizationId = 2
             };
-            var result = _eventParticipationService.SearchForEventJoinAutocomplete(eventId, searchString, userOrg).ToList();
+
+            var result = (await _eventParticipationService.SearchForEventJoinAutocompleteAsync(eventId, searchString, userOrg)).ToList();
             Assert.AreEqual(3, result.Count);
             Assert.IsFalse(result.Any(x => x.Id == "user1"));
             Assert.IsFalse(result.Any(x => x.Id == "user2"));
         }
 
         [Test]
-        public void Should_Search_By_UserName()
+        public async Task Should_Search_By_UserName()
         {
             var eventId = MockEventAndUsersForSearch2();
-            var searchString = "clyde";
+            const string searchString = "clyde";
             var userOrg = new UserAndOrganizationDTO
             {
                 OrganizationId = 2
             };
-            var result = _eventParticipationService.SearchForEventJoinAutocomplete(eventId, searchString, userOrg).ToList();
+
+            var result = (await _eventParticipationService.SearchForEventJoinAutocompleteAsync(eventId, searchString, userOrg)).ToList();
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual("user4", result.First().Id);
         }
 
         [Test]
-        public void Should_Search_By_FirstName()
+        public async Task Should_Search_By_FirstName()
         {
             var eventId = MockEventAndUsersForSearch2();
-            var searchString = "User1f";
+            const string searchString = "User1f";
             var userOrg = new UserAndOrganizationDTO
             {
                 OrganizationId = 2
             };
-            var result = _eventParticipationService.SearchForEventJoinAutocomplete(eventId, searchString, userOrg).ToList();
+            var result = (await _eventParticipationService.SearchForEventJoinAutocompleteAsync(eventId, searchString, userOrg)).ToList();
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual("user1", result.First().Id);
         }
 
         [Test]
-        public void Should_Search_By_LastName()
+        public async Task Should_Search_By_LastName()
         {
             var eventId = MockEventAndUsersForSearch2();
-            var searchString = "User1l";
+            const string searchString = "User1l";
             var userOrg = new UserAndOrganizationDTO
             {
                 OrganizationId = 2
             };
-            var result = _eventParticipationService.SearchForEventJoinAutocomplete(eventId, searchString, userOrg).ToList();
+
+            var result = (await _eventParticipationService.SearchForEventJoinAutocompleteAsync(eventId, searchString, userOrg)).ToList();
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual("user1", result.First().Id);
         }
 
         [Test]
-        public void Should_Search_By_FullName()
+        public async Task Should_Search_By_FullName()
         {
             var eventId = MockEventAndUsersForSearch2();
-            var searchString = "User1fname user1l";
+            const string searchString = "User1fname user1l";
             var userOrg = new UserAndOrganizationDTO
             {
                 OrganizationId = 2
             };
-            var result = _eventParticipationService.SearchForEventJoinAutocomplete(eventId, searchString, userOrg).ToList();
+
+            var result = (await _eventParticipationService.SearchForEventJoinAutocompleteAsync(eventId, searchString, userOrg)).ToList();
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual("user1", result.First().Id);
         }
@@ -406,7 +414,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 .When(x => x.CheckIfEventExists((object)null))
                 .Do(_ => throw new EventException(PremiumErrorCodes.EventDoesNotExistCode));
 
-            Assert.Throws<EventException>(() => _eventParticipationService.UpdateSelectedOptions(dto), PremiumErrorCodes.EventDoesNotExistCode);
+            Assert.ThrowsAsync<EventException>(async () => await _eventParticipationService.UpdateSelectedOptionsAsync(dto), PremiumErrorCodes.EventDoesNotExistCode);
         }
 
         [Test]
@@ -418,7 +426,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 .When(x => x.CheckIfRegistrationDeadlineIsExpired(DateTime.Parse("2016-04-05")))
                 .Do(_ => throw new EventException(PremiumErrorCodes.EventRegistrationDeadlineIsExpired));
 
-            Assert.Throws<EventException>(() => _eventParticipationService.UpdateSelectedOptions(dto), PremiumErrorCodes.EventRegistrationDeadlineIsExpired);
+            Assert.ThrowsAsync<EventException>(async () => await _eventParticipationService.UpdateSelectedOptionsAsync(dto), PremiumErrorCodes.EventRegistrationDeadlineIsExpired);
         }
 
         [Test]
@@ -432,7 +440,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 .When(x => x.CheckIfProvidedOptionsAreValid(chosenOptionIds, Arg.Is<ICollection<EventOption>>(a => a.Count == 0)))
                 .Do(_ => throw new EventException(PremiumErrorCodes.EventRegistrationDeadlineIsExpired));
 
-            Assert.Throws<EventException>(() => _eventParticipationService.UpdateSelectedOptions(dto), PremiumErrorCodes.EventNoSuchOptionsCode);
+            Assert.ThrowsAsync<EventException>(async () => await _eventParticipationService.UpdateSelectedOptionsAsync(dto), PremiumErrorCodes.EventNoSuchOptionsCode);
         }
 
         [Test]
@@ -446,7 +454,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 .When(x => x.CheckIfJoiningNotEnoughChoicesProvided(1, 0))
                 .Do(_ => throw new EventException(PremiumErrorCodes.EventNotEnoughChoicesProvidedCode));
 
-            Assert.Throws<EventException>(() => _eventParticipationService.UpdateSelectedOptions(dto), PremiumErrorCodes.EventNotEnoughChoicesProvidedCode);
+            Assert.ThrowsAsync<EventException>(async () => await _eventParticipationService.UpdateSelectedOptionsAsync(dto), PremiumErrorCodes.EventNotEnoughChoicesProvidedCode);
         }
 
         [Test]
@@ -460,7 +468,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 .When(x => x.CheckIfJoiningTooManyChoicesProvided(1, 3))
                 .Do(_ => throw new EventException(PremiumErrorCodes.EventTooManyChoicesProvidedCode));
 
-            Assert.Throws<EventException>(() => _eventParticipationService.UpdateSelectedOptions(dto), PremiumErrorCodes.EventTooManyChoicesProvidedCode);
+            Assert.ThrowsAsync<EventException>(async () => await _eventParticipationService.UpdateSelectedOptionsAsync(dto), PremiumErrorCodes.EventTooManyChoicesProvidedCode);
         }
 
         [Test]
@@ -475,7 +483,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     a.Any(e => e.Rule == OptionRules.IgnoreSingleJoin) && a.Count > 1), OptionRules.IgnoreSingleJoin))
                 .Do(_ => throw new EventException(PremiumErrorCodes.EventChoiceCanBeSingleOnly));
 
-            Assert.Throws<EventException>(() => _eventParticipationService.UpdateSelectedOptions(dto), PremiumErrorCodes.EventChoiceCanBeSingleOnly);
+            Assert.ThrowsAsync<EventException>(async () => await _eventParticipationService.UpdateSelectedOptionsAsync(dto), PremiumErrorCodes.EventChoiceCanBeSingleOnly);
         }
 
         [Test]
@@ -490,14 +498,17 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     Arg.Is<List<string>>(a => a.All(p => p == "user" || p == "user2"))))
                 .Do(_ => throw new EventException(PremiumErrorCodes.EventUserNotParticipating));
 
-            Assert.Throws<EventException>(() => _eventParticipationService.UpdateSelectedOptions(dto), PremiumErrorCodes.EventUserNotParticipating);
+            Assert.ThrowsAsync<EventException>(async () => await _eventParticipationService.UpdateSelectedOptionsAsync(dto), PremiumErrorCodes.EventUserNotParticipating);
         }
 
         #region Mocks
 
         private static void MockRoleService(IRoleService roleService)
         {
-            roleService.ExcludeUsersWithRole(Roles.NewUser).Returns(x => true);
+            var newRoleId = Guid.NewGuid().ToString();
+            roleService.GetRoleIdByNameAsync(Roles.NewUser).Returns(newRoleId);
+
+            roleService.ExcludeUsersWithRole(newRoleId).ReturnsForAnyArgs(x => true);
         }
 
         private Guid MockEventWithParticipants()

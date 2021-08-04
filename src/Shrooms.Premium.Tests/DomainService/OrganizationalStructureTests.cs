@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
+using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.Constants;
@@ -35,7 +37,7 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_If_Result_Has_Incorrect_Info()
+        public async Task Should_Return_If_Result_Has_Incorrect_Info()
         {
             var userAndOrg = new UserAndOrganizationDTO
             {
@@ -43,7 +45,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 UserId = "0"
             };
 
-            var result = _organizationalStructureService.GetOrganizationalStructure(userAndOrg);
+            var result = await _organizationalStructureService.GetOrganizationalStructureAsync(userAndOrg);
             Assert.AreEqual("Name1 Surname1", result.FullName);
             Assert.AreEqual("Name2 Surname2", result.Children.First().FullName);
             Assert.AreEqual("Name3 Surname3", result.Children.ToArray()[1].FullName);
@@ -53,10 +55,12 @@ namespace Shrooms.Premium.Tests.DomainService
 
         private static void MockRoleService(IRoleService roleService)
         {
-            roleService.ExcludeUsersWithRole(Roles.NewUser).Returns(x => true);
+            var newRoleId = Guid.NewGuid().ToString();
+            roleService.GetRoleIdByNameAsync(Roles.NewUser).Returns(newRoleId);
+            roleService.ExcludeUsersWithRole(newRoleId).ReturnsForAnyArgs(x => true);
         }
 
-        private IQueryable<ApplicationUser> MockUsers()
+        private static IQueryable<ApplicationUser> MockUsers()
         {
             return new List<ApplicationUser>
             {

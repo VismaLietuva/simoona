@@ -24,8 +24,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
 
         private readonly IDbSet<ApplicationUser> _usersDbSet;
 
-        public EventNotificationService(
-            IUnitOfWork2 uow,
+        public EventNotificationService(IUnitOfWork2 uow,
             IMailTemplate mailTemplate,
             IMailingService mailingService,
             IApplicationSettings appSettings,

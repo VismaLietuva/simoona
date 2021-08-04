@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
+using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.DAL;
@@ -57,39 +58,39 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_If_Gets_Wrong_Users_From_Autocomplete()
+        public async Task Should_Return_If_Gets_Wrong_Users_From_Autocomplete()
         {
-            var result = _bookService.GetUsersForAutoComplete("Fir", 1).ToList();
+            var result = (await _bookService.GetUsersForAutoCompleteAsync("Fir", 1)).ToList();
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual("FirstName", result.First().FirstName);
         }
 
         [Test]
-        public void Should_Return_If_Gets_Wrong_User_From_Autocomplete_By_Full_Name()
+        public async Task Should_Return_If_Gets_Wrong_User_From_Autocomplete_By_Full_Name()
         {
-            var result = _bookService.GetUsersForAutoComplete("Eglė Vąlkyščkytė", 1).ToList();
+            var result = (await _bookService.GetUsersForAutoCompleteAsync("Eglė Eglė", 1)).ToList();
             Assert.AreEqual(1, result.Count);
-            Assert.AreEqual("Vąlkyščkytė", result.First().LastName);
+            Assert.AreEqual("Eglė", result.First().LastName);
         }
 
         [Test]
-        public void Should_Return_If_Gets_Wrong_User_From_Autocomplete_By_Username()
+        public async Task Should_Return_If_Gets_Wrong_User_From_Autocomplete_By_Username()
         {
-            var result = _bookService.GetUsersForAutoComplete("user", 1);
+            var result = await _bookService.GetUsersForAutoCompleteAsync("user", 1);
             Assert.AreEqual(1, result.Count());
         }
 
         [Test]
-        public void Should_Return_If_Gets_Wrong_Users_From_Autocomplete_By_Similar_Surname()
+        public async Task Should_Return_If_Gets_Wrong_Users_From_Autocomplete_By_Similar_Surname()
         {
-            var result = _bookService.GetUsersForAutoComplete("Surname", 1);
+            var result = await _bookService.GetUsersForAutoCompleteAsync("Surname", 1);
             Assert.AreEqual(2, result.Count());
         }
 
         [Test]
-        public void Should_Return_If_Gets_Wrong_Number_Of_Offices()
+        public async Task Should_Return_If_Gets_Wrong_Number_Of_Offices()
         {
-            var result = _bookService.GetOffices(1);
+            var result = await _bookService.GetOfficesAsync(1);
             Assert.AreEqual(2, result.Count());
         }
 
@@ -102,11 +103,12 @@ namespace Shrooms.Premium.Tests.DomainService
                 OfficeId = 1,
                 OrganizationId = 1
             };
-            Assert.Throws<BookException>(() => _bookService.GetBook(bookMobileGetDTO));
+
+            Assert.ThrowsAsync<BookException>(async () => await _bookService.GetBookAsync(bookMobileGetDTO));
         }
 
         [Test]
-        public void Should_Return_If_Get_Book_Result_Has_Invalid_Data()
+        public async Task Should_Return_If_Get_Book_Result_Has_Invalid_Data()
         {
             var bookMobileGetDTO = new BookMobileGetDTO
             {
@@ -115,15 +117,15 @@ namespace Shrooms.Premium.Tests.DomainService
                 OrganizationId = 1
             };
 
-            var result = _bookService.GetBook(bookMobileGetDTO);
+            var result = await _bookService.GetBookAsync(bookMobileGetDTO);
             Assert.AreEqual("Author1", result.Author);
         }
 
         [Test]
-        public void Should_Return_If_Get_Book_For_Post_Result_Has_Invalid_Data()
+        public async Task Should_Return_If_Get_Book_For_Post_Result_Has_Invalid_Data()
         {
-            var result = _bookService.GetBookForPostAsync("1", 1);
-            Assert.AreEqual("Author1", result.Result.Author);
+            var result = await _bookService.GetBookForPostAsync("1", 1);
+            Assert.AreEqual("Author1", result.Author);
         }
 
         [Test]
@@ -133,7 +135,7 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_If_Post_New_Book_Does_Not_Add_New_Book()
+        public async Task Should_Return_If_Post_New_Book_Does_Not_Add_New_Book()
         {
             var bookMobilePostDTO = new BookMobilePostDTO
             {
@@ -141,13 +143,13 @@ namespace Shrooms.Premium.Tests.DomainService
                 OrganizationId = 1
             };
 
-            _bookService.PostBook(bookMobilePostDTO);
+            await _bookService.PostBookAsync(bookMobilePostDTO);
             _booksDbSet.Received(1).Add(Arg.Any<Book>());
             _bookOfficesDbSet.Received(1).Add(Arg.Any<BookOffice>());
         }
 
         [Test]
-        public void Should_Return_If_Post_New_Book_Does_Not_Add_Book_To_Another_Office()
+        public async Task Should_Return_If_Post_New_Book_Does_Not_Add_Book_To_Another_Office()
         {
             var bookMobilePostDTO = new BookMobilePostDTO
             {
@@ -156,7 +158,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 OfficeId = 2
             };
 
-            _bookService.PostBook(bookMobilePostDTO);
+            await _bookService.PostBookAsync(bookMobilePostDTO);
             _bookOfficesDbSet.Received(1).Add(Arg.Any<BookOffice>());
         }
 
@@ -170,7 +172,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 OfficeId = 1
             };
 
-            Assert.Throws<BookException>(() => _bookService.PostBook(bookMobilePostDTO));
+            Assert.ThrowsAsync<BookException>(async () => await _bookService.PostBookAsync(bookMobilePostDTO));
         }
 
         [Test]
@@ -183,23 +185,23 @@ namespace Shrooms.Premium.Tests.DomainService
                 OfficeId = 5
             };
 
-            Assert.Throws<BookException>(() => _bookService.PostBook(bookMobilePostDTO));
+            Assert.ThrowsAsync<BookException>(async () => await _bookService.PostBookAsync(bookMobilePostDTO));
         }
 
         [Test]
         public void Should_Return_When_Not_Existing_Book_Is_Returned()
         {
-            Assert.Throws<BookException>(() => _bookService.ReturnSpecificBook(100));
+            Assert.ThrowsAsync<BookException>(async () => await _bookService.ReturnSpecificBookAsync(100));
         }
 
         [Test]
         public void Should_Return_When_Same_Book_Log_Is_Returned_Second_Time()
         {
-            Assert.Throws<BookException>(() => _bookService.ReturnSpecificBook(1));
+            Assert.ThrowsAsync<BookException>(async () => await _bookService.ReturnSpecificBookAsync(1));
         }
 
         [Test]
-        public void Should_Return_When_Gets_Incorrect_List_Of_Already_Borrowed_Books()
+        public async Task Should_Return_When_Gets_Incorrect_List_Of_Already_Borrowed_Books()
         {
             var bookMobileReturnDTO = new BookMobileReturnDTO
             {
@@ -208,7 +210,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 OfficeId = 1
             };
 
-            var result = _bookService.ReturnBook(bookMobileReturnDTO).ToList();
+            var result = (await _bookService.ReturnBookAsync(bookMobileReturnDTO)).ToList();
             Assert.AreEqual(2, result.Count);
             Assert.AreEqual(3, result.First().LogId);
         }
@@ -253,7 +255,7 @@ namespace Shrooms.Premium.Tests.DomainService
             new ApplicationUser
             {
                 FirstName = "Eglė",
-                LastName = "Vąlkyščkytė",
+                LastName = "Eglė",
                 UserName = "egle.valkysckyte@visma.com",
                 Email = "egle.valkysckyte@visma.com",
                 OrganizationId = 1

@@ -189,7 +189,7 @@ namespace Shrooms.Premium.Domain.Services.Committees
             return _mapper.Map<IEnumerable<CommitteeSuggestionDto>>(committeeSuggestions);
         }
 
-        public async Task DeleteCommitteeSuggestion(int committeeId, int suggestionId, UserAndOrganizationDTO userAndOrg)
+        public async Task DeleteCommitteeSuggestionAsync(int committeeId, int suggestionId, UserAndOrganizationDTO userAndOrg)
         {
             var committee = await _committeeDbSet
                 .Include(u => u.Suggestions)

@@ -8,28 +8,28 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
 {
     public interface IEventUtilitiesService
     {
-        string GetEventName(Guid eventId);
+        Task<string> GetEventNameAsync(Guid eventId);
 
         IEnumerable<object> GetRecurrenceOptions();
 
         Task DeleteByEventAsync(Guid eventId, string userId);
 
-        IEnumerable<EventTypeDTO> GetEventTypes(int organizationId);
+        Task<IEnumerable<EventTypeDTO>> GetEventTypesAsync(int organizationId);
 
-        void CreateEventType(CreateEventTypeDTO eventType);
+        Task CreateEventTypeAsync(CreateEventTypeDTO eventType);
 
-        void UpdateEventType(UpdateEventTypeDTO eventType);
+        Task UpdateEventTypeAsync(UpdateEventTypeDTO eventType);
 
-        void DeleteEventType(int id, UserAndOrganizationDTO userAndOrg);
+        Task DeleteEventTypeAsync(int id, UserAndOrganizationDTO userAndOrg);
 
-        EventTypeDTO GetEventType(int organizationId, int eventTypeId);
+        Task<EventTypeDTO> GetEventTypeAsync(int organizationId, int eventTypeId);
 
-        IEnumerable<EventTypeDTO> GetEventTypesToRemind(int organizationId);
+        Task<IEnumerable<EventTypeDTO>> GetEventTypesToRemindAsync(int organizationId);
 
         Task<IEnumerable<EventOptionCountDTO>> GetEventChosenOptionsAsync(Guid eventId, UserAndOrganizationDTO userAndOrg);
 
-        bool AnyEventsThisWeekByType(IEnumerable<int> eventTypeIds);
+        Task<bool> AnyEventsThisWeekByTypeAsync(IEnumerable<int> eventTypeIds);
 
-        IEnumerable<string> GetEventTypesSingleJoinGroups(int organizationId);
+        Task<IEnumerable<string>> GetEventTypesSingleJoinGroupsAsync(int organizationId);
     }
 }

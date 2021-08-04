@@ -18,8 +18,8 @@ namespace Shrooms.Premium.Domain.Services.Badges
         Task AddBadgeCategoryToKudosTypeAsync(int badgeCategoryId, int kudosTypeId, BadgeCalculationPolicyType calculationPolicy);
         Task AddBadgeToUserAsync(int badgeTypeId, string employeeId, int organizationId);
         Task<IList<BadgeCategory>> GetAllBadgeCategoriesAsync();
-        Task ActivateBadgeType(int badgeTypeId);
-        Task DeactivateBadgeType(int badgeTypeId);
+        Task ActivateBadgeTypeAsync(int badgeTypeId);
+        Task DeactivateBadgeTypeAsync(int badgeTypeId);
         Task DeleteBadgeTypeAsync(int badgeTypeId);
         Task DeleteBadgeCategoryAsync(int badgeCategoryId);
         Task DeleteBadgeCategoryFromKudosTypeAsync(int badgeCategoryId, int kudosTypeId);

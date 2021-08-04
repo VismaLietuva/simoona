@@ -169,9 +169,9 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.ServiceRequest)]
-        public IHttpActionResult KudosShopItemsExist()
+        public async Task<IHttpActionResult> KudosShopItemsExist()
         {
-            return Ok(_kudosShopService.ItemsExist(GetUserAndOrganization()));
+            return Ok(await _kudosShopService.ItemsExistAsync(GetUserAndOrganization()));
         }
 
         [HttpGet]
@@ -179,7 +179,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         public List<KudosShopItemViewModel> GetKudosShopItems()
         {
             var userOrganization = GetUserAndOrganization();
-            var kudosShopItemsTask = Task.Run(async () => await _kudosShopService.GetAllItems(userOrganization));
+            var kudosShopItemsTask = Task.Run(async () => await _kudosShopService.GetAllItemsAsync(userOrganization));
             var kudosShopItems = _mapper.Map<IEnumerable<KudosShopItemDTO>, IEnumerable<KudosShopItemViewModel>>(kudosShopItemsTask.Result);
             return kudosShopItems.ToList();
         }
@@ -201,7 +201,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpPost]
         [PermissionAuthorize(BasicPermissions.ServiceRequest)]
-        public IHttpActionResult PostComment([FromBody] ServiceRequestCommentPostViewModel postModel)
+        public async Task<IHttpActionResult> PostComment([FromBody] ServiceRequestCommentPostViewModel postModel)
         {
             if (!ModelState.IsValid)
             {
@@ -212,7 +212,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             try
             {
-                _serviceRequestService.CreateCommentAsync(comment, GetUserAndOrganization());
+                await _serviceRequestService.CreateCommentAsync(comment, GetUserAndOrganization());
             }
             catch (ValidationException e)
             {
@@ -224,7 +224,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpPost]
         [PermissionAuthorize(BasicPermissions.ServiceRequest)]
-        public IHttpActionResult Create(ServiceRequestCreateViewModel newServiceRequest)
+        public async Task<IHttpActionResult> Create(ServiceRequestCreateViewModel newServiceRequest)
         {
             if (!ModelState.IsValid)
             {
@@ -235,7 +235,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             try
             {
-                _serviceRequestService.CreateNewServiceRequestAsync(newServiceRequestDTO, GetUserAndOrganization());
+                await _serviceRequestService.CreateNewServiceRequestAsync(newServiceRequestDTO, GetUserAndOrganization());
             }
             catch (ValidationException e)
             {
@@ -247,7 +247,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpPut]
         [PermissionAuthorize(BasicPermissions.ServiceRequest)]
-        public IHttpActionResult Update(ServiceRequestUpdateViewModel serviceRequest)
+        public async Task<IHttpActionResult> Update(ServiceRequestUpdateViewModel serviceRequest)
         {
             if (!ModelState.IsValid)
             {
@@ -258,7 +258,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             try
             {
-                _serviceRequestService.UpdateServiceRequestAsync(serviceRequestDTO, GetUserAndOrganization());
+                await _serviceRequestService.UpdateServiceRequestAsync(serviceRequestDTO, GetUserAndOrganization());
             }
             catch (ValidationException e)
             {
@@ -274,11 +274,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpPut]
         [PermissionAuthorize(BasicPermissions.ServiceRequest)]
-        public IHttpActionResult MarkAsDone(int id)
+        public async Task<IHttpActionResult> MarkAsDone(int id)
         {
             try
             {
-                _serviceRequestService.MoveRequestToDoneAsync(id, GetUserAndOrganization());
+                await _serviceRequestService.MoveRequestToDoneAsync(id, GetUserAndOrganization());
             }
             catch (ValidationException e)
             {
@@ -310,16 +310,16 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.ServiceRequest)]
-        public IHttpActionResult GetServiceRequestCategories()
+        public async Task<IHttpActionResult> GetServiceRequestCategories()
         {
-            var serviceRequestCategoriesDto = _serviceRequestService.GetCategoriesAsync();
+            var serviceRequestCategoriesDto = await _serviceRequestService.GetCategoriesAsync();
 
             return Ok(serviceRequestCategoriesDto);
         }
 
         [HttpPost]
         [PermissionAuthorize(Permission = AdministrationPermissions.ServiceRequest)]
-        public IHttpActionResult CreateCategory(ServiceRequestCategoryCreateViewModel category)
+        public async Task<IHttpActionResult> CreateCategory(ServiceRequestCategoryCreateViewModel category)
         {
             if (!ModelState.IsValid)
             {
@@ -329,7 +329,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             try
             {
                 var newCategory = _mapper.Map<ServiceRequestCategoryCreateViewModel, ServiceRequestCategoryDTO>(category);
-                _serviceRequestService.CreateCategoryAsync(newCategory, GetUserAndOrganization().UserId);
+                await _serviceRequestService.CreateCategoryAsync(newCategory, GetUserAndOrganization().UserId);
                 return Ok();
             }
             catch (ValidationException e)
@@ -340,11 +340,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.ServiceRequest)]
-        public IHttpActionResult EditCategory(int categoryId)
+        public async Task<IHttpActionResult> EditCategory(int categoryId)
         {
             try
             {
-                var categoryDto = _serviceRequestService.GetCategory(categoryId);
+                var categoryDto = await _serviceRequestService.GetCategoryAsync(categoryId);
 
                 return Ok(categoryDto);
             }
@@ -356,7 +356,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpPut]
         [PermissionAuthorize(Permission = AdministrationPermissions.ServiceRequest)]
-        public IHttpActionResult EditCategory(ServiceRequestCategoryViewModel model)
+        public async Task<IHttpActionResult> EditCategory(ServiceRequestCategoryViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -366,7 +366,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             try
             {
                 var modelDto = _mapper.Map<ServiceRequestCategoryViewModel, ServiceRequestCategoryDTO>(model);
-                _serviceRequestService.EditCategoryAsync(modelDto, GetUserAndOrganization().UserId);
+                await _serviceRequestService.EditCategoryAsync(modelDto, GetUserAndOrganization().UserId);
 
                 return Ok();
             }
@@ -378,11 +378,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpDelete]
         [PermissionAuthorize(Permission = AdministrationPermissions.ServiceRequest)]
-        public IHttpActionResult RemoveCategory(int categoryId)
+        public async Task<IHttpActionResult> RemoveCategory(int categoryId)
         {
             try
             {
-                _serviceRequestService.DeleteCategory(categoryId, GetUserAndOrganization().UserId);
+                await _serviceRequestService.DeleteCategoryAsync(categoryId, GetUserAndOrganization().UserId);
 
                 return Ok();
             }

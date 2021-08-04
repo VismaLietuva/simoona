@@ -35,7 +35,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         [HttpPost]
         [Route("Create")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Book)]
-        public IHttpActionResult AddBook(NewBookViewModel book)
+        public async Task<IHttpActionResult> AddBook(NewBookViewModel book)
         {
             if (!ModelState.IsValid)
             {
@@ -46,7 +46,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
             SetOrganizationAndUser(bookDto);
             try
             {
-                _bookService.AddBook(bookDto);
+                await _bookService.AddBookAsync(bookDto);
                 return Ok();
             }
             catch (BookException e)
@@ -58,7 +58,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         [HttpDelete]
         [Route("Delete")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Book)]
-        public IHttpActionResult DeleteBook(int bookId)
+        public async Task<IHttpActionResult> DeleteBook(int bookId)
         {
             if (bookId < 1)
             {
@@ -68,7 +68,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
             var userOrg = GetUserAndOrganization();
             try
             {
-                _bookService.DeleteBook(bookId, userOrg);
+                await _bookService.DeleteBookAsync(bookId, userOrg);
                 return Ok();
             }
             catch (ArgumentException)
@@ -80,7 +80,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         [HttpPut]
         [Route("Edit")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Book)]
-        public IHttpActionResult EditBook(EditBookViewModel book)
+        public async Task<IHttpActionResult> EditBook(EditBookViewModel book)
         {
             if (!ModelState.IsValid)
             {
@@ -89,9 +89,10 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
 
             var bookDto = _mapper.Map<EditBookViewModel, EditBookDTO>(book);
             SetOrganizationAndUser(bookDto);
+
             try
             {
-                _bookService.EditBook(bookDto);
+                await _bookService.EditBookAsync(bookDto);
                 return Ok();
             }
             catch (BookException e)
@@ -103,7 +104,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         [HttpGet]
         [Route("ListByOffice")]
         [PermissionAuthorize(Permission = BasicPermissions.Book)]
-        public IHttpActionResult GetBooksByOffice(int officeId, int page = 1, string searchString = null)
+        public async Task<IHttpActionResult> GetBooksByOffice(int officeId, int page = 1, string searchString = null)
         {
             if (!string.IsNullOrEmpty(searchString) &&
                 searchString.Length < BusinessLayerConstants.MinCharactersInBookSearch ||
@@ -120,37 +121,37 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
             };
             SetOrganizationAndUser(options);
 
-            var bookDtos = _bookService.GetBooksByOffice(options);
-            var result = _mapper.Map<ILazyPaged<BooksByOfficeDTO>, ILazyPaged<BooksByOfficeViewModel>>(bookDtos);
+            var books = await _bookService.GetBooksByOfficeAsync(options);
+            var result = _mapper.Map<ILazyPaged<BooksByOfficeDTO>, ILazyPaged<BooksByOfficeViewModel>>(books);
             return Ok(result);
         }
 
         [HttpGet]
         [Route("Details")]
         [PermissionAuthorize(Permission = BasicPermissions.Book)]
-        public IHttpActionResult GetBookDetails(int bookOfficeId)
+        public async Task<IHttpActionResult> GetBookDetails(int bookOfficeId)
         {
             if (bookOfficeId < 1)
             {
                 return BadRequest();
             }
 
-            var bookWithLogsDto = _bookService.GetBookDetails(bookOfficeId, GetUserAndOrganization());
-            var result = _mapper.Map<BookDetailsDTO, BookDetailsViewModel>(bookWithLogsDto);
+            var bookWithLogs = await _bookService.GetBookDetailsAsync(bookOfficeId, GetUserAndOrganization());
+            var result = _mapper.Map<BookDetailsDTO, BookDetailsViewModel>(bookWithLogs);
             return Ok(result);
         }
 
         [HttpGet]
         [Route("DetailsForAdmin")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Book)]
-        public IHttpActionResult GetBookDetailsForAdministrator(int bookOfficeId)
+        public async Task<IHttpActionResult> GetBookDetailsForAdministrator(int bookOfficeId)
         {
             if (bookOfficeId < 1)
             {
                 return BadRequest();
             }
 
-            var bookWithLogsDto = _bookService.GetBookDetailsWithOffices(bookOfficeId, GetUserAndOrganization());
+            var bookWithLogsDto = await _bookService.GetBookDetailsWithOfficesAsync(bookOfficeId, GetUserAndOrganization());
             var result = _mapper.Map<BookDetailsAdministrationDTO, BookDetailsAdministrationViewModel>(bookWithLogsDto);
             return Ok(result);
         }
@@ -158,7 +159,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         [HttpPut]
         [Route("Return")]
         [PermissionAuthorize(Permission = BasicPermissions.Book)]
-        public IHttpActionResult ReturnBook(int bookOfficeId)
+        public async Task<IHttpActionResult> ReturnBook(int bookOfficeId)
         {
             if (bookOfficeId < 1)
             {
@@ -168,7 +169,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
             var userAndOrg = GetUserAndOrganization();
             try
             {
-                _bookService.ReturnBook(bookOfficeId, userAndOrg);
+                await _bookService.ReturnBookAsync(bookOfficeId, userAndOrg);
                 return Ok();
             }
             catch (BookException e)
@@ -180,7 +181,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         [HttpPut]
         [Route("Report")]
         [PermissionAuthorize(Permission = BasicPermissions.Book)]
-        public IHttpActionResult ReportMissingBook(BookReportViewModel bookReport)
+        public async Task<IHttpActionResult> ReportMissingBook(BookReportViewModel bookReport)
         {
             if (bookReport.BookOfficeId < 1)
             {
@@ -191,7 +192,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
             try
             {
                 var bookReportDto = _mapper.Map<BookReportViewModel, BookReportDTO>(bookReport);
-                _bookService.ReportBookAsync(bookReportDto, userAndOrg);
+                await _bookService.ReportBookAsync(bookReportDto, userAndOrg);
                 return Ok();
             }
             catch (BookException e)
@@ -203,7 +204,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         [HttpPut]
         [Route(template: "ReturnForAdmin")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Book)]
-        public IHttpActionResult ReturnBookForAdmin(int bookOfficeId, string userId)
+        public async Task<IHttpActionResult> ReturnBookForAdmin(int bookOfficeId, string userId)
         {
             if (bookOfficeId < 1)
             {
@@ -212,13 +213,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
 
             try
             {
-                _bookService.ReturnBook(
-                    bookOfficeId: bookOfficeId,
-                    userAndOrg: new UserAndOrganizationDTO
-                    {
-                        OrganizationId = User.Identity.GetOrganizationId(),
-                        UserId = userId
-                    });
+                await _bookService.ReturnBookAsync(bookOfficeId: bookOfficeId, userAndOrg: new UserAndOrganizationDTO
+                {
+                    OrganizationId = User.Identity.GetOrganizationId(),
+                    UserId = userId
+                });
                 return Ok();
             }
             catch (BookException e)
@@ -230,7 +229,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         [HttpPut]
         [Route("Take")]
         [PermissionAuthorize(Permission = BasicPermissions.Book)]
-        public IHttpActionResult TakeBook(int bookOfficeId)
+        public async Task<IHttpActionResult> TakeBook(int bookOfficeId)
         {
             if (bookOfficeId < 1)
             {
@@ -238,9 +237,10 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
             }
 
             var userAndOrg = GetUserAndOrganization();
+
             try
             {
-                _bookService.TakeBookAsync(bookOfficeId, userAndOrg);
+                await _bookService.TakeBookAsync(bookOfficeId, userAndOrg);
                 return Ok();
             }
             catch (BookException e)
@@ -258,7 +258,6 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
             return Ok();
         }
 
-
         [HttpGet]
         [Route("FindByIsbn")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Book)]
@@ -271,7 +270,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
 
             try
             {
-                var bookInfoDto = await _bookService.FindBookByIsbn(isbn, GetUserAndOrganization().OrganizationId);
+                var bookInfoDto = await _bookService.FindBookByIsbnAsync(isbn, GetUserAndOrganization().OrganizationId);
                 var result = _mapper.Map<RetrievedBookInfoDTO, RetrievedBookInfoViewModel>(bookInfoDto);
                 return Ok(result);
             }

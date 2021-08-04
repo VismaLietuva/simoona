@@ -23,7 +23,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Committee
         private readonly IApplicationSettings _appSettings;
         private readonly IMailingService _mailingService;
         private readonly IDbSet<CommitteeEntity> _committeeDbSet;
-        private readonly IDbSet<CommitteeSuggestion> _suggestionDbSet;
+        private readonly DbSet<CommitteeSuggestion> _suggestionDbSet;
 
         public CommitteeNotificationService(IUnitOfWork2 uow,
             IMailTemplate mailTemplate,
@@ -46,7 +46,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Committee
                 throw new ServiceException(Resources.Models.Committee.Committee.SuggestionCommiteNotFound);
             }
 
-            var suggestion = _suggestionDbSet.Find(createdDto.SuggestionId);
+            var suggestion = await _suggestionDbSet.FindAsync(createdDto.SuggestionId);
             if (suggestion == null)
             {
                 throw new ServiceException($"Suggestion {createdDto.SuggestionId} for committee {createdDto.CommitteeId} not found");

@@ -4,6 +4,7 @@ using System.Data.Entity;
 using System.Data.Entity.SqlServer;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
@@ -22,16 +23,18 @@ namespace Shrooms.Premium.Domain.Services.Users
             _eventParticipantsDb = uow.GetDbSet<EventParticipant>();
         }
 
-        public IEnumerable<string> GetUsersWithAppReminders(IEnumerable<int> eventTypeIds)
+        public async Task<IEnumerable<string>> GetUsersWithAppRemindersAsync(IEnumerable<int> eventTypeIds)
         {
-            return GetUserWithoutEventThisWeek(eventTypeIds, x => x.NotificationsSettings == null || x.NotificationsSettings.EventWeeklyReminderAppNotifications)
-                .Select(x => x.Id);
+            return await GetUserWithoutEventThisWeek(eventTypeIds, x => x.NotificationsSettings == null || x.NotificationsSettings.EventWeeklyReminderAppNotifications)
+                .Select(x => x.Id)
+                .ToListAsync();
         }
 
-        public IEnumerable<string> GetUsersWithEmailReminders(IEnumerable<int> eventTypeIds)
+        public async Task<IEnumerable<string>> GetUsersWithEmailRemindersAsync(IEnumerable<int> eventTypeIds)
         {
-            return GetUserWithoutEventThisWeek(eventTypeIds, x => x.NotificationsSettings == null || x.NotificationsSettings.EventWeeklyReminderEmailNotifications)
-                .Select(x => x.Email);
+            return await GetUserWithoutEventThisWeek(eventTypeIds, x => x.NotificationsSettings == null || x.NotificationsSettings.EventWeeklyReminderEmailNotifications)
+                .Select(x => x.Email)
+                .ToListAsync();
         }
 
         private IQueryable<ApplicationUser> GetUserWithoutEventThisWeek(IEnumerable<int> eventTypeIds, Expression<Func<ApplicationUser, bool>> userPredicate)

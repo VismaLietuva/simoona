@@ -17,13 +17,14 @@ namespace Shrooms.Premium.Domain.Services.Badges
     {
         private readonly IUnitOfWork2 _uow;
 
-        private readonly IDbSet<BadgeType> _badgeTypesDbSet;
-        private readonly IDbSet<BadgeCategory> _badgeCategoriesDbSet;
+        private readonly DbSet<BadgeType> _badgeTypesDbSet;
+        private readonly DbSet<BadgeCategory> _badgeCategoriesDbSet;
         private readonly IDbSet<BadgeCategoryKudosType> _badgeCategoryKudosTypesDbSet;
         private readonly IDbSet<BadgeLog> _badgeLogsDbSet;
 
         private readonly IDbSet<KudosLog> _kudosLogsDbSet;
         private readonly IDbSet<ApplicationUser> _usersDbSet;
+
         public BadgesService(IUnitOfWork2 uow)
         {
             _uow = uow;
@@ -37,13 +38,12 @@ namespace Shrooms.Premium.Domain.Services.Badges
             _usersDbSet = _uow.GetDbSet<ApplicationUser>();
         }
 
-        #region Create
         public async Task AddBadgeTypeAsync(string title,
-                                            string description,
-                                            int value,
-                                            string imageUrl,
-                                            string imageSmallUrl,
-                                            int badgeCategoryId)
+            string description,
+            int value,
+            string imageUrl,
+            string imageSmallUrl,
+            int badgeCategoryId)
         {
             var alreadyExists = await _badgeTypesDbSet
                 .AnyAsync(t => t.Title == title);
@@ -68,8 +68,7 @@ namespace Shrooms.Premium.Domain.Services.Badges
             await SaveChangesAsync();
         }
 
-        public async Task AddBadgeCategoryAsync(string title,
-                                                string description)
+        public async Task AddBadgeCategoryAsync(string title, string description)
         {
             var alreadyExists = await _badgeCategoriesDbSet
                 .AnyAsync(t => t.Title == title);
@@ -135,47 +134,40 @@ namespace Shrooms.Premium.Domain.Services.Badges
 
             await SaveChangesAsync();
         }
-        #endregion
 
-        #region Get
         public async Task<IList<BadgeCategory>> GetAllBadgeCategoriesAsync()
         {
             return await _badgeCategoriesDbSet
-                       .Include(x => x.RelationshipsWithKudosTypes.Select(y => y.KudosType))
-                       .Include(x => x.BadgeTypes)
-                       .AsNoTracking()
-                       .ToListAsync();
+                .Include(x => x.RelationshipsWithKudosTypes.Select(y => y.KudosType))
+                .Include(x => x.BadgeTypes)
+                .AsNoTracking()
+                .ToListAsync();
         }
 
-        #endregion
-
-        #region Update
-        public async Task ActivateBadgeType(int badgeTypeId)
+        public async Task ActivateBadgeTypeAsync(int badgeTypeId)
         {
-            var badgeType = GetBadgeType(badgeTypeId);
+            var badgeType = await GetBadgeTypeAsync(badgeTypeId);
             badgeType.IsActive = true;
             await SaveChangesAsync();
         }
 
-        public async Task DeactivateBadgeType(int badgeTypeId)
+        public async Task DeactivateBadgeTypeAsync(int badgeTypeId)
         {
-            var badgeType = GetBadgeType(badgeTypeId);
+            var badgeType = await GetBadgeTypeAsync(badgeTypeId);
             badgeType.IsActive = false;
             await SaveChangesAsync();
         }
-        #endregion
 
-        #region Delete
         public async Task DeleteBadgeTypeAsync(int badgeTypeId)
         {
-            var badgeType = GetBadgeType(badgeTypeId);
+            var badgeType = await GetBadgeTypeAsync(badgeTypeId);
             _badgeTypesDbSet.Remove(badgeType);
             await SaveChangesAsync();
         }
 
         public async Task DeleteBadgeCategoryAsync(int badgeCategoryId)
         {
-            var badgeCategory = _badgeCategoriesDbSet.Find(badgeCategoryId);
+            var badgeCategory = await _badgeCategoriesDbSet.FindAsync(badgeCategoryId);
 
             if (badgeCategory == null)
             {
@@ -189,14 +181,11 @@ namespace Shrooms.Premium.Domain.Services.Badges
         public async Task DeleteBadgeCategoryFromKudosTypeAsync(int badgeCategoryId, int kudosTypeId)
         {
             var relationship = await _badgeCategoryKudosTypesDbSet
-                                   .FirstAsync(x => x.BadgeCategoryId == badgeCategoryId && x.KudosTypeId == kudosTypeId);
+                .FirstAsync(x => x.BadgeCategoryId == badgeCategoryId && x.KudosTypeId == kudosTypeId);
 
             _badgeCategoryKudosTypesDbSet.Remove(relationship);
             await SaveChangesAsync();
         }
-        #endregion
-
-        #region Other
 
         public async Task AssignBadgesAsync()
         {
@@ -215,13 +204,13 @@ namespace Shrooms.Premium.Domain.Services.Badges
 
             List<ApplicationUser> users;
             if (categories.Any(x => x.Created >= oneDayAgo || x.Modified >= oneDayAgo
-                                    || x.BadgeTypes.Any(y => y.IsActive && (y.Created >= oneDayAgo || y.Modified >= oneDayAgo))))
+                                                           || x.BadgeTypes.Any(y => y.IsActive && (y.Created >= oneDayAgo || y.Modified >= oneDayAgo))))
             {
                 // We might have a new category or type, that means we have to take all users.
                 users = await _usersDbSet.Where(x => x.TotalKudos > 0)
-                                         .Include(x => x.BadgeLogs.Select(y => y.BadgeType))
-                                         .AsNoTracking()
-                                         .ToListAsync();
+                    .Include(x => x.BadgeLogs.Select(y => y.BadgeType))
+                    .AsNoTracking()
+                    .ToListAsync();
             }
             else
             {
@@ -230,21 +219,21 @@ namespace Shrooms.Premium.Domain.Services.Badges
                                                          && x.Modified > oneDayAgo
                                                          && !string.IsNullOrEmpty(x.EmployeeId)
                                                          && x.KudosSystemType != KudosTypeEnum.Minus)
-                                             .Select(x => x.Employee)
-                                             .Include(x => x.BadgeLogs.Select(y => y.BadgeType))
-                                             .Distinct(new EmployeeComparer())
-                                             .AsNoTracking()
-                                             .ToListAsync();
+                    .Select(x => x.Employee)
+                    .Include(x => x.BadgeLogs.Select(y => y.BadgeType))
+                    .Distinct(new EmployeeComparer())
+                    .AsNoTracking()
+                    .ToListAsync();
             }
 
             foreach (var user in users.AsParallel())
             {
                 var userId = user.Id;
                 var userKudosLogs = await _kudosLogsDbSet.Where(x => x.EmployeeId == userId
-                                                                  && x.Status == KudosStatus.Approved
-                                                                  && x.KudosSystemType != KudosTypeEnum.Minus)
-                                                         .AsNoTracking()
-                                                         .ToListAsync();
+                                                                     && x.Status == KudosStatus.Approved
+                                                                     && x.KudosSystemType != KudosTypeEnum.Minus)
+                    .AsNoTracking()
+                    .ToListAsync();
 
                 foreach (var category in categories.AsParallel())
                 {
@@ -271,15 +260,15 @@ namespace Shrooms.Premium.Domain.Services.Badges
 
                     var categoryId = category.Id;
                     var availableKudosWithGivenAmount = category.BadgeTypes.Where(x => x.IsActive && x.Value <= amount)
-                                                                           .ToList();
+                        .ToList();
                     if (!availableKudosWithGivenAmount.Any())
                     {
                         continue;
                     }
 
                     var userAlreadyHasTheseKudosTypes = user.BadgeLogs.Where(x => x.EmployeeId == userId && x.BadgeType.BadgeCategoryId == categoryId)
-                                                                      .Select(x => x.BadgeTypeId)
-                                                                      .ToList();
+                        .Select(x => x.BadgeTypeId)
+                        .ToList();
                     if (availableKudosWithGivenAmount.Count == userAlreadyHasTheseKudosTypes.Count)
                     {
                         continue;
@@ -295,12 +284,9 @@ namespace Shrooms.Premium.Domain.Services.Badges
             }
         }
 
-        #endregion
-
-        #region Private methods
-        private BadgeType GetBadgeType(int badgeTypeId)
+        private async Task<BadgeType> GetBadgeTypeAsync(int badgeTypeId)
         {
-            var badgeType = _badgeTypesDbSet.Find(badgeTypeId);
+            var badgeType = await _badgeTypesDbSet.FindAsync(badgeTypeId);
 
             if (badgeType == null)
             {
@@ -318,6 +304,5 @@ namespace Shrooms.Premium.Domain.Services.Badges
                 throw new ApplicationException("Changes could not be saved in BadgesService");
             }
         }
-        #endregion
     }
 }

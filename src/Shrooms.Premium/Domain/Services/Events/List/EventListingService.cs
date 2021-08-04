@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Enums;
@@ -35,21 +36,19 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             _eventsDbSet = uow.GetDbSet<Event>();
         }
 
-        public EventOptionsDTO GetEventOptions(Guid eventId, UserAndOrganizationDTO userOrg)
+        public async Task<EventOptionsDTO> GetEventOptionsAsync(Guid eventId, UserAndOrganizationDTO userOrg)
         {
-            var eventOptionsDto = _eventsDbSet
+            var eventOptionsDto = await _eventsDbSet
                 .Include(e => e.EventOptions)
-                .Where(e =>
-                    e.Id == eventId &&
-                    e.OrganizationId == userOrg.OrganizationId)
+                .Where(e => e.Id == eventId && e.OrganizationId == userOrg.OrganizationId)
                 .Select(MapOptionsToDto())
-                .SingleOrDefault();
+                .SingleOrDefaultAsync();
 
             _eventValidationService.CheckIfEventExists(eventOptionsDto);
             return eventOptionsDto;
         }
 
-        public IEnumerable<EventListItemDTO> GetEventsFiltered(EventsListingFilterArgs args, UserAndOrganizationDTO userOrganization)
+        public async Task<IEnumerable<EventListItemDTO>> GetEventsFilteredAsync(EventsListingFilterArgs args, UserAndOrganizationDTO userOrganization)
         {
             var officeSearchString = OfficeIdToString(args.OfficeId);
 
@@ -77,14 +76,14 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                 .Take(EventsConstants.EventsDefaultPageSize)
                 .Select(MapEventToListItemDto(userOrganization.UserId));
 
-            return events.ToList();
+            return await events.ToListAsync();
         }
 
-        public IEnumerable<EventListItemDTO> GetMyEvents(MyEventsOptionsDTO options, int page, int? officeId = null)
+        public async Task<IEnumerable<EventListItemDTO>> GetMyEventsAsync(MyEventsOptionsDTO options, int page, int? officeId = null)
         {
             var officeSearchString = OfficeIdToString(officeId);
             var myEventFilter = _eventFilters[options.Filter](options.UserId);
-            var events = _eventsDbSet
+            var events = await _eventsDbSet
                 .Include(x => x.EventParticipants)
                 .Include(x => x.Offices)
                 .Where(t => t.OrganizationId == options.OrganizationId)
@@ -95,7 +94,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                 .Skip((page - 1) * EventsConstants.EventsDefaultPageSize)
                 .Take(EventsConstants.EventsDefaultPageSize)
                 .Select(MapEventToListItemDto(options.UserId))
-                .ToList();
+                .ToListAsync();
 
             var orderedEvents = OrderEvents(events);
             return orderedEvents;
@@ -140,9 +139,9 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                 RegistrationDeadlineDate = e.RegistrationDeadline,
                 ParticipantsCount = e.EventParticipants.Count(p => p.AttendStatus == (int)AttendingStatus.Attending),
                 IsCreator = e.ResponsibleUserId == userId,
-                ParticipatingStatus = e.EventParticipants.FirstOrDefault(p => p.ApplicationUserId == userId) != null ?
-                                          e.EventParticipants.FirstOrDefault(p => p.ApplicationUserId == userId).AttendStatus :
-                                          (int)AttendingStatus.Idle,
+                ParticipatingStatus = e.EventParticipants.FirstOrDefault(p => p.ApplicationUserId == userId) != null
+                    ? e.EventParticipants.FirstOrDefault(p => p.ApplicationUserId == userId).AttendStatus
+                    : (int)AttendingStatus.Idle,
                 MaxChoices = e.MaxChoices
             };
         }

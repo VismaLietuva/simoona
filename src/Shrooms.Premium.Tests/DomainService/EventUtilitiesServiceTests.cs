@@ -33,19 +33,21 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
-        public void Should_Delete_Event_Options()
+        public async Task Should_Delete_Event_Options()
         {
             var eventId = MockCommentsForEvent();
-            _eventUtilitiesService.DeleteByEventAsync(eventId, "testUserId");
+            await _eventUtilitiesService.DeleteByEventAsync(eventId, "testUserId");
             _eventOptionsDbSet.Received(3).Remove(Arg.Any<EventOption>());
         }
 
         [Test]
-        public void Should_Return_Correctly_Mapped_Event_Types()
+        public async Task Should_Return_Correctly_Mapped_Event_Types()
         {
             MockEventTypes();
-            var organizationId = 2;
-            var result = _eventUtilitiesService.GetEventTypes(organizationId).ToList();
+            const int organizationId = 2;
+
+            var result = (await _eventUtilitiesService.GetEventTypesAsync(organizationId)).ToList();
+
             Assert.AreEqual(result.Count, 3);
             Assert.AreEqual(result.First(x => x.Id == 1).Name, "type1");
         }
@@ -68,13 +70,13 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_Event_Type_With_Active_Event()
+        public async Task Should_Return_Event_Type_With_Active_Event()
         {
             // Arrange
             MockEventTypes();
 
             // Act
-            var eventType = _eventUtilitiesService.GetEventType(3, 4);
+            var eventType = await _eventUtilitiesService.GetEventTypeAsync(3, 4);
 
             // Assert
             Assert.AreEqual(true, eventType.HasActiveEvents);
@@ -82,13 +84,13 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_Event_Type_With_Inactive_Event()
+        public async Task Should_Return_Event_Type_With_Inactive_Event()
         {
             // Arrange
             MockEventTypes();
 
             // Act
-            var eventType = _eventUtilitiesService.GetEventType(2, 3);
+            var eventType = await _eventUtilitiesService.GetEventTypeAsync(2, 3);
 
             // Assert
             Assert.AreEqual(false, eventType.HasActiveEvents);
@@ -97,23 +99,23 @@ namespace Shrooms.Premium.Tests.DomainService
 
         [TestCase(2, 1)]
         [TestCase(2111, 0)]
-        public void GetEventTypesToRemind_DifferentOrganizations_ReturnsCorrectAmountEventTypes(int orgId, int amount)
+        public async Task GetEventTypesToRemind_DifferentOrganizations_ReturnsCorrectAmountEventTypes(int orgId, int amount)
         {
             MockEventTypes();
 
-            var eventTypes = _eventUtilitiesService.GetEventTypesToRemind(orgId).ToList();
+            var eventTypes = (await _eventUtilitiesService.GetEventTypesToRemindAsync(orgId)).ToList();
 
-            Assert.AreEqual(amount, eventTypes.Count());
+            Assert.AreEqual(amount, eventTypes.Count);
         }
 
         [Test]
-        public void GetEventTypesToRemind_OrganizationIdFour_ReturnsCorrectEventType()
+        public async Task GetEventTypesToRemind_OrganizationIdFour_ReturnsCorrectEventType()
         {
             MockEventTypes();
 
-            var eventTypes = _eventUtilitiesService.GetEventTypesToRemind(4).ToList();
+            var eventTypes = (await _eventUtilitiesService.GetEventTypesToRemindAsync(4)).ToList();
 
-            Assert.AreEqual(1, eventTypes.Count());
+            Assert.AreEqual(1, eventTypes.Count);
             Assert.AreEqual(5, eventTypes.First().Id);
             Assert.AreEqual("type5", eventTypes.First().Name);
         }

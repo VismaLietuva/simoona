@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
@@ -29,18 +30,18 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
         [Route("Types")]
-        public IHttpActionResult GetEventTypes()
+        public async Task<IHttpActionResult> GetEventTypes()
         {
             var organizationId = GetUserAndOrganization().OrganizationId;
-            var typeDtos = _eventUtilitiesService.GetEventTypes(organizationId);
-            var result = _mapper.Map<IEnumerable<EventTypeDTO>, IEnumerable<EventTypeViewModel>>(typeDtos);
+            var types = await _eventUtilitiesService.GetEventTypesAsync(organizationId);
+            var result = _mapper.Map<IEnumerable<EventTypeDTO>, IEnumerable<EventTypeViewModel>>(types);
             return Ok(result);
         }
 
         [HttpGet]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
         [Route("Get")]
-        public IHttpActionResult Get(int id)
+        public async Task<IHttpActionResult> Get(int id)
         {
             if (id == 0)
             {
@@ -51,7 +52,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             try
             {
-                var eventTypeDto = _eventUtilitiesService.GetEventType(organizationId, id);
+                var eventTypeDto = await _eventUtilitiesService.GetEventTypeAsync(organizationId, id);
                 var eventTypeViewModel = _mapper.Map<EventTypeDTO, EventTypeViewModel>(eventTypeDto);
 
                 return Ok(eventTypeViewModel);
@@ -65,7 +66,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpPost]
         [Route("Create")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
-        public IHttpActionResult Create(CreateEventTypeViewModel eventTypeViewModel)
+        public async Task<IHttpActionResult> Create(CreateEventTypeViewModel eventTypeViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -78,7 +79,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             try
             {
-                _eventUtilitiesService.CreateEventType(eventTypeDto);
+                await _eventUtilitiesService.CreateEventTypeAsync(eventTypeDto);
             }
             catch (ValidationException e)
             {
@@ -91,7 +92,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpPut]
         [Route("Update")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
-        public IHttpActionResult Update(UpdateEventTypeViewModel eventTypeViewModel)
+        public async Task<IHttpActionResult> Update(UpdateEventTypeViewModel eventTypeViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -104,7 +105,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             try
             {
-                _eventUtilitiesService.UpdateEventType(eventTypeDto);
+                await _eventUtilitiesService.UpdateEventTypeAsync(eventTypeDto);
             }
             catch (ValidationException e)
             {
@@ -117,11 +118,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpDelete]
         [Route("Delete")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
-        public IHttpActionResult Delete(int id)
+        public async Task<IHttpActionResult> Delete(int id)
         {
             try
             {
-                _eventUtilitiesService.DeleteEventType(id, GetUserAndOrganization());
+                await _eventUtilitiesService.DeleteEventTypeAsync(id, GetUserAndOrganization());
                 return Ok();
             }
             catch (EventException e)
@@ -137,11 +138,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [Route("Groups")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
-        public IHttpActionResult GetSingleJoinGroupNames()
+        public async Task<IHttpActionResult> GetSingleJoinGroupNames()
         {
             try
             {
-                var groups = _eventUtilitiesService.GetEventTypesSingleJoinGroups(GetOrganizationId());
+                var groups = await _eventUtilitiesService.GetEventTypesSingleJoinGroupsAsync(GetOrganizationId());
 
                 return Ok(groups);
             }

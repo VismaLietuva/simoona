@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Premium.Domain.Services.Email.Event;
 using Shrooms.Premium.Domain.Services.Events.Utilities;
@@ -15,8 +16,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
         private readonly IEventNotificationService _eventNotificationService;
         private readonly IOrganizationService _organizationService;
 
-        public EventJoinRemindService(
-            INotificationService notificationService,
+        public EventJoinRemindService(INotificationService notificationService,
             IEventUtilitiesService eventUtilitiesService,
             IUserEventsService userEventsService,
             IEventNotificationService eventNotificationService,
@@ -29,11 +29,11 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
             _organizationService = organizationService;
         }
 
-        public void SendNotifications(string orgName)
+        public async Task SendNotificationsAsync(string orgName)
         {
-            var userOrg = _organizationService.GetOrganizationByName(orgName);
+            var userOrg = await _organizationService.GetOrganizationByNameAsync(orgName);
 
-            var typesToNotifyAbout = _eventUtilitiesService.GetEventTypesToRemind(userOrg.Id).ToList();
+            var typesToNotifyAbout = (await _eventUtilitiesService.GetEventTypesToRemindAsync(userOrg.Id)).ToList();
             var typeIdsToNotifyAbout = typesToNotifyAbout.Select(e => e.Id).ToList();
 
             if (!typesToNotifyAbout.Any())
@@ -41,23 +41,23 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
                 return;
             }
 
-            var anythingToJoin = _eventUtilitiesService.AnyEventsThisWeekByType(typeIdsToNotifyAbout);
+            var anythingToJoin = await _eventUtilitiesService.AnyEventsThisWeekByTypeAsync(typeIdsToNotifyAbout);
             if (!anythingToJoin)
             {
                 return;
             }
 
-            var usersToNotifyInApp = _userEventsService.GetUsersWithAppReminders(typeIdsToNotifyAbout).ToList();
-            var usersToNotifyEmail = _userEventsService.GetUsersWithEmailReminders(typeIdsToNotifyAbout).ToList();
+            var usersToNotifyInApp = (await _userEventsService.GetUsersWithAppRemindersAsync(typeIdsToNotifyAbout)).ToList();
+            var usersToNotifyEmail = (await _userEventsService.GetUsersWithEmailRemindersAsync(typeIdsToNotifyAbout)).ToList();
 
             if (usersToNotifyInApp.Any())
             {
-                _notificationService.CreateForEventJoinReminder(usersToNotifyInApp, userOrg.Id);
+                await _notificationService.CreateForEventJoinReminderAsync(usersToNotifyInApp, userOrg.Id);
             }
 
             if (usersToNotifyEmail.Any())
             {
-                _eventNotificationService.RemindUsersToJoinEventAsync(typesToNotifyAbout, usersToNotifyEmail, userOrg.Id);
+                await _eventNotificationService.RemindUsersToJoinEventAsync(typesToNotifyAbout, usersToNotifyEmail, userOrg.Id);
             }
         }
     }

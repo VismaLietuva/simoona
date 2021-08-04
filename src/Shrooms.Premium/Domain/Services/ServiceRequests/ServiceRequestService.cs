@@ -263,9 +263,9 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
             await _uow.SaveChangesAsync(userId);
         }
 
-        public ServiceRequestCategoryDTO GetCategory(int categoryId)
+        public async Task<ServiceRequestCategoryDTO> GetCategoryAsync(int categoryId)
         {
-            var category = _serviceRequestCategoryDbSet
+            var category = await _serviceRequestCategoryDbSet
                 .Where(x => x.Id == categoryId)
                 .Include(x => x.Assignees)
                 .Select(x => new ServiceRequestCategoryDTO
@@ -281,7 +281,7 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
                         PictureId = u.PictureId
                     })
                 })
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
 
             if (category == null)
             {
@@ -315,12 +315,12 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
             await _uow.SaveChangesAsync(userId);
         }
 
-        public void DeleteCategory(int categoryId, string userId)
+        public async Task DeleteCategoryAsync(int categoryId, string userId)
         {
-            var category = _serviceRequestCategoryDbSet
+            var category = await _serviceRequestCategoryDbSet
                 .Where(c => c.Id == categoryId && c.Name != ServiceRequestCategoryKudos)
                 .Include(x => x.Assignees)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
 
             if (category == null)
             {
@@ -328,7 +328,7 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
             }
 
             _serviceRequestCategoryDbSet.Remove(category);
-            _uow.SaveChanges(userId);
+            await _uow.SaveChangesAsync(userId);
         }
 
         private async Task<List<string>> GetCategoryAssigneesAsync(string categoryName)

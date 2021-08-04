@@ -48,16 +48,14 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
             await _uow.SaveChangesAsync(false);
         }
 
-        public string GetEventName(Guid eventId)
+        public async Task<string> GetEventNameAsync(Guid eventId)
         {
-            return _eventsDbSet
-                .Single(e => e.Id == eventId)
-                .Name;
+            return (await _eventsDbSet.SingleAsync(e => e.Id == eventId)).Name;
         }
 
-        public IEnumerable<EventTypeDTO> GetEventTypes(int organizationId)
+        public async Task<IEnumerable<EventTypeDTO>> GetEventTypesAsync(int organizationId)
         {
-            var eventTypes = _eventTypesDbSet
+            var eventTypes = await _eventTypesDbSet
                 .Where(x => x.OrganizationId == organizationId)
                 .Select(type => new EventTypeDTO
                 {
@@ -67,13 +65,14 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
                     IsShownWithMainEvents = type.IsShownWithMainEvents
                 })
                 .OrderByDescending(t => t.Name)
-                .ToList();
+                .ToListAsync();
+
             return eventTypes;
         }
 
-        public EventTypeDTO GetEventType(int organizationId, int eventTypeId)
+        public async Task<EventTypeDTO> GetEventTypeAsync(int organizationId, int eventTypeId)
         {
-            var eventType = _eventTypesDbSet
+            var eventType = await _eventTypesDbSet
                 .Include(x => x.Events)
                 .Where(x => x.OrganizationId == organizationId && x.Id == eventTypeId)
                 .Select(x => new EventTypeDTO
@@ -87,7 +86,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
                     HasActiveEvents = x.Events.Any(e => e.EndDate > DateTime.UtcNow
                                                      || e.EventRecurring != EventRecurrenceOptions.None)
                 })
-                .SingleOrDefault();
+                .SingleOrDefaultAsync();
 
             if (eventType == null)
             {
@@ -97,30 +96,31 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
             return eventType;
         }
 
-        public IEnumerable<EventTypeDTO> GetEventTypesToRemind(int organizationId)
+        public async Task<IEnumerable<EventTypeDTO>> GetEventTypesToRemindAsync(int organizationId)
         {
-            return _eventTypesDbSet
+            return await _eventTypesDbSet
                 .Where(x => x.SendWeeklyReminders && x.OrganizationId == organizationId)
                 .Select(x => new EventTypeDTO
                 {
                     Id = x.Id,
                     Name = x.Name
-                });
+                })
+                .ToListAsync();
         }
 
-        public void CreateEventType(CreateEventTypeDTO eventType)
+        public async Task CreateEventTypeAsync(CreateEventTypeDTO eventType)
         {
-            ValidateEventTypeName(eventType.Name, eventType.OrganizationId);
+            await ValidateEventTypeNameAsync(eventType.Name, eventType.OrganizationId);
 
             var entity = MapNewEventType(eventType);
             _eventTypesDbSet.Add(entity);
-            _uow.SaveChanges(eventType.UserId);
+            await _uow.SaveChangesAsync(eventType.UserId);
         }
 
-        public void UpdateEventType(UpdateEventTypeDTO eventType)
+        public async Task UpdateEventTypeAsync(UpdateEventTypeDTO eventType)
         {
-            var orgEventType = _eventTypesDbSet
-                .SingleOrDefault(x => x.OrganizationId == eventType.OrganizationId && x.Id == eventType.Id);
+            var orgEventType = await _eventTypesDbSet
+                .SingleOrDefaultAsync(x => x.OrganizationId == eventType.OrganizationId && x.Id == eventType.Id);
 
             if (orgEventType == null)
             {
@@ -129,7 +129,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
 
             if (eventType.Name != orgEventType.Name)
             {
-                ValidateEventTypeName(eventType.Name, eventType.OrganizationId);
+                await ValidateEventTypeNameAsync(eventType.Name, eventType.OrganizationId);
             }
 
             orgEventType.IsSingleJoin = eventType.IsSingleJoin;
@@ -140,24 +140,21 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
             orgEventType.SendWeeklyReminders = eventType.SendWeeklyReminders;
             orgEventType.IsShownWithMainEvents = eventType.IsShownWithMainEvents;
 
-            _uow.SaveChanges(eventType.UserId);
+            await _uow.SaveChangesAsync(eventType.UserId);
         }
 
-        public void DeleteEventType(int id, UserAndOrganizationDTO userAndOrg)
+        public async Task DeleteEventTypeAsync(int id, UserAndOrganizationDTO userAndOrg)
         {
-            var anyActiveEvents = _eventsDbSet
+            var anyActiveEvents = await _eventsDbSet
                 .Where(x => x.EventTypeId == id)
-                .Any(x => x.EndDate > DateTime.UtcNow
-                    || x.EventRecurring != EventRecurrenceOptions.None);
+                .AnyAsync(x => x.EndDate > DateTime.UtcNow || x.EventRecurring != EventRecurrenceOptions.None);
 
             if (anyActiveEvents)
             {
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Event type has active events");
             }
 
-            var eventType = _eventTypesDbSet
-                .SingleOrDefault(x => x.OrganizationId == userAndOrg.OrganizationId
-                    && x.Id == id);
+            var eventType = await _eventTypesDbSet.SingleOrDefaultAsync(x => x.OrganizationId == userAndOrg.OrganizationId && x.Id == id);
 
             if (eventType == null)
             {
@@ -165,7 +162,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
             }
 
             _eventTypesDbSet.Remove(eventType);
-            _uow.SaveChanges(userAndOrg.UserId);
+            await _uow.SaveChangesAsync(userAndOrg.UserId);
         }
 
         public IEnumerable<object> GetRecurrenceOptions()
@@ -195,28 +192,28 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
             return eventOptions;
         }
 
-        public bool AnyEventsThisWeekByType(IEnumerable<int> eventTypeIds)
+        public async Task<bool> AnyEventsThisWeekByTypeAsync(IEnumerable<int> eventTypeIds)
         {
-            return _eventsDbSet
-                .Any(x => SqlFunctions.DatePart("wk", x.StartDate) == SqlFunctions.DatePart("wk", DateTime.UtcNow) &&
+            return await _eventsDbSet
+                .AnyAsync(x => SqlFunctions.DatePart("wk", x.StartDate) == SqlFunctions.DatePart("wk", DateTime.UtcNow) &&
                           eventTypeIds.Contains(x.EventType.Id) &&
                           x.RegistrationDeadline > DateTime.UtcNow);
         }
 
-        public IEnumerable<string> GetEventTypesSingleJoinGroups(int organizationId)
+        public async Task<IEnumerable<string>> GetEventTypesSingleJoinGroupsAsync(int organizationId)
         {
-            return _eventTypesDbSet
+            return await _eventTypesDbSet
                 .Where(x => x.OrganizationId == organizationId &&
                             !string.IsNullOrEmpty(x.SingleJoinGroupName))
                 .Select(x => x.SingleJoinGroupName)
-                .Distinct();
+                .Distinct()
+                .ToListAsync();
         }
 
-        private void ValidateEventTypeName(string eventTypeName, int organizationId)
+        private async Task ValidateEventTypeNameAsync(string eventTypeName, int organizationId)
         {
-            var nameAlreadyExists = _eventTypesDbSet
-                            .Any(x => x.OrganizationId == organizationId
-                                && x.Name == eventTypeName);
+            var nameAlreadyExists = await _eventTypesDbSet
+                            .AnyAsync(x => x.OrganizationId == organizationId && x.Name == eventTypeName);
 
             if (nameAlreadyExists)
             {

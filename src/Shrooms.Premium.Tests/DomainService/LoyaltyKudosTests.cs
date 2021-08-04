@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.DAL;
@@ -453,7 +454,7 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
-        public void Should_Award_Employee_With_Loyalty_Kudos_OnlyAfter3Years()
+        public async Task Should_Award_Employee_With_Loyalty_Kudos_OnlyAfter3Years()
         {
             var user1 = new ApplicationUser { Id = "user1", OrganizationId = 2, EmploymentDate = DateTime.UtcNow.AddYears(-3).AddDays(-10) };
             var user2 = new ApplicationUser { Id = "user2", OrganizationId = 2, EmploymentDate = DateTime.UtcNow.AddYears(-3).AddDays(-10) };
@@ -482,12 +483,12 @@ namespace Shrooms.Premium.Tests.DomainService
             _kudosTypeDbSet.SetDbSetDataForAsync(new[] { loyaltyKudosType }.AsQueryable());
             _organizationsDbSet.SetDbSetDataForAsync(organizations.AsQueryable());
 
-            _loyaltyKudosService.AwardEmployeesWithKudos("tenant2");
+            await _loyaltyKudosService.AwardEmployeesWithKudosAsync("tenant2");
 
             // Let's fake that we execute bgr job the second day.
             kudosLogs.Add(new KudosLog { Id = 2, EmployeeId = "user1", Created = DateTime.UtcNow.AddMinutes(-5), KudosTypeName = "Loyalty", OrganizationId = 2, Status = KudosStatus.Approved, Points = 40, Employee = user1 });
             kudosLogs.Add(new KudosLog { Id = 2, EmployeeId = "user2", Created = DateTime.UtcNow.AddMinutes(-5), KudosTypeName = "Loyalty", OrganizationId = 2, Status = KudosStatus.Approved, Points = 40, Employee = user2 });
-            _loyaltyKudosService.AwardEmployeesWithKudos("tenant2");
+            await _loyaltyKudosService.AwardEmployeesWithKudosAsync("tenant2");
 
             _kudosLogsDbSet.Received(1).Add(Arg.Is<KudosLog>(x => x.EmployeeId == "user1"));
             _kudosLogsDbSet.Received(1).Add(Arg.Is<KudosLog>(x => x.EmployeeId == "user2"));
@@ -495,7 +496,7 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
-        public void Should_Award_Employee_With_Loyalty_Kudos_OnlyAfter2And3Years()
+        public async Task Should_Award_Employee_With_Loyalty_Kudos_OnlyAfter2And3Years()
         {
             var user1 = new ApplicationUser { Id = "user1", OrganizationId = 2, EmploymentDate = DateTime.UtcNow.AddYears(-3).AddDays(-10) };
             var user2 = new ApplicationUser { Id = "user2", OrganizationId = 2, EmploymentDate = DateTime.UtcNow.AddYears(-3).AddDays(-10) };
@@ -524,12 +525,12 @@ namespace Shrooms.Premium.Tests.DomainService
             _kudosTypeDbSet.SetDbSetDataForAsync(new[] { loyaltyKudosType }.AsQueryable());
             _organizationsDbSet.SetDbSetDataForAsync(organizations.AsQueryable());
 
-            _loyaltyKudosService.AwardEmployeesWithKudos("tenant2");
+            await _loyaltyKudosService.AwardEmployeesWithKudosAsync("tenant2");
 
             // Let's fake that we execute bgr job the second day.
             kudosLogs.Add(new KudosLog { Id = 2, EmployeeId = "user1", Created = DateTime.UtcNow.AddMinutes(-5), KudosTypeName = "Loyalty", OrganizationId = 2, Status = KudosStatus.Approved, Points = 40, Employee = user1 });
             kudosLogs.Add(new KudosLog { Id = 2, EmployeeId = "user2", Created = DateTime.UtcNow.AddMinutes(-5), KudosTypeName = "Loyalty", OrganizationId = 2, Status = KudosStatus.Approved, Points = 40, Employee = user2 });
-            _loyaltyKudosService.AwardEmployeesWithKudos("tenant2");
+            await _loyaltyKudosService.AwardEmployeesWithKudosAsync("tenant2");
 
             _kudosLogsDbSet.Received(2).Add(Arg.Is<KudosLog>(x => x.EmployeeId == "user1"));
             _kudosLogsDbSet.Received(3).Add(Arg.Is<KudosLog>(x => x.EmployeeId == "user2"));
@@ -537,7 +538,7 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
-        public void Should_Map_Retrieved_Users_KudosLogs_Organization_And_KudosType_Correctly()
+        public async Task Should_Map_Retrieved_Users_KudosLogs_Organization_And_KudosType_Correctly()
         {
             var user1 = new ApplicationUser { Id = "user1", OrganizationId = 2, EmploymentDate = DateTime.UtcNow.AddYears(-2).AddDays(-2) };
             var user2 = new ApplicationUser { Id = "user2", OrganizationId = 2, EmploymentDate = DateTime.UtcNow.AddYears(-2).AddDays(-2) };
@@ -570,7 +571,7 @@ namespace Shrooms.Premium.Tests.DomainService
             _kudosTypeDbSet.SetDbSetDataForAsync(new[] { loyaltyKudosType }.AsQueryable());
             _organizationsDbSet.SetDbSetDataForAsync(organizations.AsQueryable());
 
-            _loyaltyKudosService.AwardEmployeesWithKudos("tenant2");
+            await _loyaltyKudosService.AwardEmployeesWithKudosAsync("tenant2");
 
             _kudosLogsDbSet.Received(1).Add(Arg.Is<KudosLog>(x => x.EmployeeId == "user1"));
         }

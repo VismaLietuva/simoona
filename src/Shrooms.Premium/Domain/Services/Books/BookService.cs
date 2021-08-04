@@ -34,7 +34,8 @@ namespace Shrooms.Premium.Domain.Services.Books
     {
         private const int LastPage = 1;
         private const int BookQuantityZero = 0;
-        private static readonly object _newBookLock = new object();
+
+        private static readonly SemaphoreSlim _newBookLock = new SemaphoreSlim(1, 1);
         private static readonly SemaphoreSlim _takeBookLock = new SemaphoreSlim(1, 1);
 
         private readonly IUnitOfWork2 _uow;
@@ -54,8 +55,7 @@ namespace Shrooms.Premium.Domain.Services.Books
         private readonly IDbSet<ApplicationUser> _userDbSet;
         private readonly IDbSet<BookOffice> _bookOfficesDbSet;
 
-        public BookService(
-            IUnitOfWork2 uow,
+        public BookService(IUnitOfWork2 uow,
             IApplicationSettings appSettings,
             IRoleService roleService,
             IUserService userService,
@@ -86,7 +86,7 @@ namespace Shrooms.Premium.Domain.Services.Books
             _asyncRunner = asyncRunner;
         }
 
-        public ILazyPaged<BooksByOfficeDTO> GetBooksByOffice(BooksByOfficeOptionsDTO options)
+        public async Task<ILazyPaged<BooksByOfficeDTO>> GetBooksByOfficeAsync(BooksByOfficeOptionsDTO options)
         {
             var allBooks = _bookOfficesDbSet
                 .Include(x => x.Book)
@@ -97,38 +97,39 @@ namespace Shrooms.Premium.Domain.Services.Books
                 .OrderBy(x => x.Book.Title)
                 .Select(MapBooksWithReadersToDto(options.UserId));
 
-            var totalBooksCount = allBooks.Count();
+            var totalBooksCount = await allBooks.CountAsync();
             var entriesCountToSkip = EntriesCountToSkip(options.Page);
-            var books = allBooks
+            var books = await allBooks
                 .Skip(() => entriesCountToSkip)
                 .Take(() => BusinessLayerConstants.BooksPerPage)
-                .ToList();
+                .ToListAsync();
 
             var pageDto = new LazyPaged<BooksByOfficeDTO>(books, options.Page, BusinessLayerConstants.BooksPerPage, totalBooksCount);
             return pageDto;
         }
 
-        public BookDetailsDTO GetBookDetails(int bookOfficeId, UserAndOrganizationDTO userOrg)
+        public async Task<BookDetailsDTO> GetBookDetailsAsync(int bookOfficeId, UserAndOrganizationDTO userOrg)
         {
-            var bookOffice = _bookOfficesDbSet
+            var bookOffice = await _bookOfficesDbSet
                 .Include(x => x.Book)
                 .Include(x => x.BookLogs.Select(u => u.ApplicationUser))
                 .Where(x => x.Id == bookOfficeId && x.OrganizationId == userOrg.OrganizationId)
                 .Select(MapBookToDto())
-                .First();
+                .FirstAsync();
 
             bookOffice.BookLogs = bookOffice
                 .BookLogs
                 .OrderByDescending(x => x.TakenFrom)
                 .ToList();
+
             return bookOffice;
         }
 
-        public BookDetailsAdministrationDTO GetBookDetailsWithOffices(int bookOfficeId, UserAndOrganizationDTO userOrg)
+        public async Task<BookDetailsAdministrationDTO> GetBookDetailsWithOfficesAsync(int bookOfficeId, UserAndOrganizationDTO userOrg)
         {
             var bookDetailsAdmin = new BookDetailsAdministrationDTO
             {
-                BookDetails = GetBookDetails(bookOfficeId, userOrg)
+                BookDetails = await GetBookDetailsAsync(bookOfficeId, userOrg)
             };
 
             bookDetailsAdmin.QuantityByOffice = _bookOfficesDbSet
@@ -141,7 +142,7 @@ namespace Shrooms.Premium.Domain.Services.Books
             return bookDetailsAdmin;
         }
 
-        private Expression<Func<BookOffice, BookQuantityByOfficeDTO>> MapBookOfficeQuantitiesToDto()
+        private static Expression<Func<BookOffice, BookQuantityByOfficeDTO>> MapBookOfficeQuantitiesToDto()
         {
             return x => new BookQuantityByOfficeDTO
             {
@@ -151,24 +152,24 @@ namespace Shrooms.Premium.Domain.Services.Books
             };
         }
 
-        public void DeleteBook(int bookId, UserAndOrganizationDTO userOrg)
+        public async Task DeleteBookAsync(int bookId, UserAndOrganizationDTO userOrg)
         {
-            var bookOffices = _bookOfficesDbSet
+            var bookOffices = await _bookOfficesDbSet
                 .Include(x => x.Book)
                 .Include(x => x.BookLogs)
                 .Where(x => x.BookId == bookId && x.OrganizationId == userOrg.OrganizationId)
-                .ToList();
+                .ToListAsync();
 
             _bookServiceValidator.CheckIfBookOfficesFoundWhileDeleting(bookOffices.Any());
 
             UpdateMetaFields(userOrg, bookOffices);
-            _uow.SaveChanges(false);
+            await _uow.SaveChangesAsync(false);
 
             RemoveBookRelatedEntities(bookOffices);
-            _uow.SaveChanges(false);
+            await _uow.SaveChangesAsync(false);
         }
 
-        public async Task<RetrievedBookInfoDTO> FindBookByIsbn(string isbn, int organizationId)
+        public async Task<RetrievedBookInfoDTO> FindBookByIsbnAsync(string isbn, int organizationId)
         {
             var bookAlreadyExists = _booksDbSet
                 .Any(book =>
@@ -236,28 +237,29 @@ namespace Shrooms.Premium.Domain.Services.Books
             _asyncRunner.Run<IBooksNotificationService>(async notifier => await notifier.SendEmailAsync(book), _uow.ConnectionName);
         }
 
-        public void ReturnBook(int bookOfficeId, UserAndOrganizationDTO userAndOrg)
+        public async Task ReturnBookAsync(int bookOfficeId, UserAndOrganizationDTO userAndOrg)
         {
-            var log = _bookLogsDbSet
-                .FirstOrDefault(l => l.BookOfficeId == bookOfficeId
-                                     && l.ApplicationUserId == userAndOrg.UserId
-                                     && l.OrganizationId == userAndOrg.OrganizationId
-                                     && l.Returned == null);
+            var log = await _bookLogsDbSet
+                .FirstOrDefaultAsync(l => l.BookOfficeId == bookOfficeId
+                                          && l.ApplicationUserId == userAndOrg.UserId
+                                          && l.OrganizationId == userAndOrg.OrganizationId
+                                          && l.Returned == null);
 
             _bookServiceValidator.ThrowIfBookCannotBeReturned(log != null);
 
+            // ReSharper disable once PossibleNullReferenceException
             log.Returned = DateTime.UtcNow;
             log.Modified = DateTime.UtcNow;
             log.ModifiedBy = userAndOrg.UserId;
 
-            _uow.SaveChanges(false);
+            await _uow.SaveChangesAsync(false);
         }
 
         public async Task ReportBookAsync(BookReportDTO bookReport, UserAndOrganizationDTO userAndOrg)
         {
             var reportedOfficeBook = await _bookOfficesDbSet
                 .Include(p => p.Book)
-                .FirstOrDefaultAsync(p => p.Id == bookReport.BookOfficeId);
+                .FirstAsync(p => p.Id == bookReport.BookOfficeId);
 
             var user = await _userService.GetApplicationUserAsync(userAndOrg.UserId);
             var receivers = await _roleService.GetAdministrationRoleEmailsAsync(userAndOrg.OrganizationId);
@@ -276,21 +278,19 @@ namespace Shrooms.Premium.Domain.Services.Books
             await _mailingService.SendEmailAsync(emailData);
         }
 
-        public void AddBook(NewBookDTO bookDto)
+        public async Task AddBookAsync(NewBookDTO bookDto)
         {
-            lock (_newBookLock)
+            await _newBookLock.WaitAsync();
+
+            try
             {
-                var bookAlreadyExists = _booksDbSet
-                    .Any(book =>
-                        (bookDto.Isbn != null &&
-                         book.Code == bookDto.Isbn &&
-                         book.OrganizationId == bookDto.OrganizationId) ||
-                        (bookDto.Isbn == null &&
-                         book.OrganizationId == bookDto.OrganizationId &&
-                         book.Title == bookDto.Title));
+                var bookAlreadyExists = await _booksDbSet
+                    .AnyAsync(book =>
+                        (bookDto.Isbn != null && book.Code == bookDto.Isbn && book.OrganizationId == bookDto.OrganizationId) ||
+                        (bookDto.Isbn == null && book.OrganizationId == bookDto.OrganizationId && book.Title == bookDto.Title));
 
                 _bookServiceValidator.CheckIfBookAlreadyExists(bookAlreadyExists);
-                ValidateQuantifiedOffices(bookDto.QuantityByOffice.Select(o => o.OfficeId));
+                await ValidateQuantifiedOfficesAsync(bookDto.QuantityByOffice.Select(o => o.OfficeId));
                 ValidateQuantitiesValues(bookDto.QuantityByOffice.Select(o => o.BookQuantity));
 
                 var newBook = MapNewBookToEntity(bookDto);
@@ -300,15 +300,19 @@ namespace Shrooms.Premium.Domain.Services.Books
                     .Where(office => office.BookQuantity > BookQuantityZero)
                     .ForEach(office => _bookOfficesDbSet.Add(MapBookDtoToBookOfficeEntity(newBook, office, bookDto.UserId)));
 
-                _uow.SaveChanges(false);
+                await _uow.SaveChangesAsync(false);
+            }
+            finally
+            {
+                _newBookLock.Release();
             }
         }
 
-        public void EditBook(EditBookDTO editedBook)
+        public async Task EditBookAsync(EditBookDTO editedBook)
         {
-            var existingBook = _booksDbSet
+            var existingBook = await _booksDbSet
                 .Include(book => book.BookOffices)
-                .First(book =>
+                .FirstAsync(book =>
                     book.Id == editedBook.Id &&
                     book.OrganizationId == editedBook.OrganizationId);
 
@@ -323,7 +327,8 @@ namespace Shrooms.Premium.Domain.Services.Books
 
             ValidateQuantitiesValues(editedBook.QuantityByOffice.Select(o => o.BookQuantity));
             ManageQuantitiesInOffices(editedBook, existingBook);
-            _uow.SaveChanges(false);
+
+            await _uow.SaveChangesAsync(false);
         }
 
         public void UpdateBookCovers()
@@ -347,7 +352,7 @@ namespace Shrooms.Premium.Domain.Services.Books
                     v.Returned == null);
         }
 
-        private void ManageQuantitiesInOffices(EditBookDTO editedBook, Book existingBook)
+        private static void ManageQuantitiesInOffices(EditBookDTO editedBook, Book existingBook)
         {
             foreach (var officeQuantity in editedBook.QuantityByOffice)
             {
@@ -364,7 +369,7 @@ namespace Shrooms.Premium.Domain.Services.Books
             }
         }
 
-        private BookOffice MapBookDtoToBookOfficeEntity(Book newBook, NewBookQuantityDTO quantity, string createdBy)
+        private static BookOffice MapBookDtoToBookOfficeEntity(Book newBook, NewBookQuantityDTO quantity, string createdBy)
         {
             return new BookOffice
             {
@@ -378,7 +383,7 @@ namespace Shrooms.Premium.Domain.Services.Books
             };
         }
 
-        private Book MapNewBookToEntity(NewBookDTO bookDto)
+        private static Book MapNewBookToEntity(NewBookDTO bookDto)
         {
             return new Book
             {
@@ -395,10 +400,12 @@ namespace Shrooms.Premium.Domain.Services.Books
             };
         }
 
-        private void ValidateQuantifiedOffices(IEnumerable<int> officesIds)
+        private async Task ValidateQuantifiedOfficesAsync(IEnumerable<int> officesIds)
         {
-            officesIds.ForEach(officeId =>
-                _bookServiceValidator.CheckIfRequestedOfficesExist(_officesDbSet.Any(o => o.Id == officeId)));
+            foreach (var officeId in officesIds)
+            {
+                _bookServiceValidator.CheckIfRequestedOfficesExist(await _officesDbSet.AnyAsync(o => o.Id == officeId));
+            }
         }
 
         private void ValidateQuantitiesValues(IEnumerable<int> quantities)
@@ -409,7 +416,7 @@ namespace Shrooms.Premium.Domain.Services.Books
             }
         }
 
-        private void UpdateMetaFields(UserAndOrganizationDTO userOrg, IEnumerable<BookOffice> bookOffices)
+        private static void UpdateMetaFields(UserAndOrganizationDTO userOrg, IEnumerable<BookOffice> bookOffices)
         {
             bookOffices.ForEach(bookOffice =>
             {
@@ -429,15 +436,17 @@ namespace Shrooms.Premium.Domain.Services.Books
         private void RemoveBookRelatedEntities(IList<BookOffice> bookOffices)
         {
             var bookToRemove = bookOffices.First().Book;
+
             bookOffices.ToList().ForEach(bookOffice =>
             {
                 bookOffice.BookLogs.ToList().ForEach(log => _bookLogsDbSet.Remove(log));
                 _bookOfficesDbSet.Remove(bookOffice);
             });
+
             _booksDbSet.Remove(bookToRemove);
         }
 
-        private Expression<Func<BookOffice, BookDetailsDTO>> MapBookToDto()
+        private static Expression<Func<BookOffice, BookDetailsDTO>> MapBookToDto()
         {
             return x => new BookDetailsDTO
             {
@@ -463,7 +472,7 @@ namespace Shrooms.Premium.Domain.Services.Books
             };
         }
 
-        private Expression<Func<BookOffice, BooksByOfficeDTO>> MapBooksWithReadersToDto(string userId)
+        private static Expression<Func<BookOffice, BooksByOfficeDTO>> MapBooksWithReadersToDto(string userId)
         {
             return bookOffice => new BooksByOfficeDTO
             {
@@ -483,7 +492,7 @@ namespace Shrooms.Premium.Domain.Services.Books
             };
         }
 
-        private Expression<Func<BookOffice, bool>> OfficeFilter(int officeId)
+        private static Expression<Func<BookOffice, bool>> OfficeFilter(int officeId)
         {
             if (officeId == 0)
             {
@@ -498,7 +507,7 @@ namespace Shrooms.Premium.Domain.Services.Books
             return (pageRequested - LastPage) * BusinessLayerConstants.BooksPerPage;
         }
 
-        private RetrievedBookInfoDTO MapBookInfoToDto(ExternalBookInfo book)
+        private static RetrievedBookInfoDTO MapBookInfoToDto(ExternalBookInfo book)
         {
             var retrievedBookDto = new RetrievedBookInfoDTO
             {
@@ -511,7 +520,7 @@ namespace Shrooms.Premium.Domain.Services.Books
             return retrievedBookDto;
         }
 
-        private Expression<Func<BookOffice, MobileBookOfficeLogsDTO>> MapOfficebookWithLogsToDTO()
+        private static Expression<Func<BookOffice, MobileBookOfficeLogsDTO>> MapOfficebookWithLogsToDTO()
         {
             return b => new MobileBookOfficeLogsDTO
             {

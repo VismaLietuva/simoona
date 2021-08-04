@@ -7,11 +7,11 @@ namespace Shrooms.Premium.Domain.Services.KudosShop
 {
     public interface IKudosShopService
     {
-        Task CreateItem(KudosShopItemDTO dto);
-        Task<KudosShopItemDTO> GetItem(int id, UserAndOrganizationDTO userOrg);
-        bool ItemsExist(UserAndOrganizationDTO userOrg);
-        Task<IEnumerable<KudosShopItemDTO>> GetAllItems(UserAndOrganizationDTO userOrg);
-        Task UpdateItem(KudosShopItemDTO dto);
-        Task DeleteItem(int id, UserAndOrganizationDTO userOrg);
+        Task CreateItemAsync(KudosShopItemDTO dto);
+        Task<KudosShopItemDTO> GetItemAsync(int id, UserAndOrganizationDTO userOrg);
+        Task<bool> ItemsExistAsync(UserAndOrganizationDTO userOrg);
+        Task<IEnumerable<KudosShopItemDTO>> GetAllItemsAsync(UserAndOrganizationDTO userOrg);
+        Task UpdateItemAsync(KudosShopItemDTO dto);
+        Task DeleteItemAsync(int id, UserAndOrganizationDTO userOrg);
     }
 }

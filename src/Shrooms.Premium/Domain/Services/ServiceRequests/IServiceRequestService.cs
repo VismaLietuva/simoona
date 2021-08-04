@@ -17,11 +17,11 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
 
         Task CreateCategoryAsync(ServiceRequestCategoryDTO category, string userId);
 
-        ServiceRequestCategoryDTO GetCategory(int categoryId);
+        Task<ServiceRequestCategoryDTO> GetCategoryAsync(int categoryId);
 
         Task EditCategoryAsync(ServiceRequestCategoryDTO modelDto, string userId);
 
-        void DeleteCategory(int categoryId, string userId);
+        Task DeleteCategoryAsync(int categoryId, string userId);
 
         Task MoveRequestToDoneAsync(int requestId, UserAndOrganizationDTO userAndOrganizationDTO);
     }

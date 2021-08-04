@@ -42,7 +42,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Kudos
 
             try
             {
-                await _kudosShopService.CreateItem(createKudosShopItemDTO);
+                await _kudosShopService.CreateItemAsync(createKudosShopItemDTO);
                 return Ok();
             }
             catch (ValidationException e)
@@ -63,7 +63,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Kudos
 
             try
             {
-                var itemDto = await _kudosShopService.GetItem(id, GetUserAndOrganization());
+                var itemDto = await _kudosShopService.GetItemAsync(id, GetUserAndOrganization());
                 var result = _mapper.Map<KudosShopItemDTO, KudosShopItemViewModel>(itemDto);
                 return Ok(result);
             }
@@ -79,7 +79,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Kudos
         public async Task<IHttpActionResult> GetAllItems()
         {
             var userOrganization = GetUserAndOrganization();
-            var allListDto = await _kudosShopService.GetAllItems(userOrganization);
+            var allListDto = await _kudosShopService.GetAllItemsAsync(userOrganization);
             var result = _mapper.Map<IEnumerable<KudosShopItemDTO>, IEnumerable<KudosShopItemViewModel>>(allListDto);
             return Ok(result);
         }
@@ -99,7 +99,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Kudos
 
             try
             {
-                await _kudosShopService.UpdateItem(itemDTO);
+                await _kudosShopService.UpdateItemAsync(itemDTO);
                 return Ok();
             }
             catch (ValidationException e)
@@ -120,7 +120,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Kudos
 
             try
             {
-                await _kudosShopService.DeleteItem(id, GetUserAndOrganization());
+                await _kudosShopService.DeleteItemAsync(id, GetUserAndOrganization());
                 return Ok();
             }
             catch (ValidationException e)

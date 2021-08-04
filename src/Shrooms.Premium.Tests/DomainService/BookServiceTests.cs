@@ -75,7 +75,8 @@ namespace Shrooms.Premium.Tests.DomainService
             _organizationService = Substitute.For<IOrganizationService>();
             _bookServiceValidator = new BookServiceValidator();
             var asyncRunner = Substitute.For<IAsyncRunner>();
-            _bookService = new BookService(uow, _appSettings, _roleService, _userService, _mailingService, _mailTemplate, _organizationService, _bookInfoService, _bookServiceValidator, _validationService, asyncRunner);
+            _bookService = new BookService(uow, _appSettings, _roleService, _userService, _mailingService, _mailTemplate, _organizationService, _bookInfoService, _bookServiceValidator,
+                _validationService, asyncRunner);
         }
 
         [Test]
@@ -88,18 +89,18 @@ namespace Shrooms.Premium.Tests.DomainService
                 Url = "test",
                 Title = "asd"
             };
-            var result = await _bookService.FindBookByIsbn("123", 2);
+            var result = await _bookService.FindBookByIsbnAsync("123", 2);
             Assert.AreEqual(expected.Title, result.Title);
             Assert.AreEqual(expected.Url, result.Url);
             Assert.AreEqual(expected.Author, result.Author);
         }
 
         [Test]
-        public void Should_Return_Books_By_Office()
+        public async Task Should_Return_Books_By_Office()
         {
             MockBooksByOffice();
             var options = new BooksByOfficeOptionsDTO { OrganizationId = 2, OfficeId = 1, Page = 1, UserId = "testUserId" };
-            var res = _bookService.GetBooksByOffice(options);
+            var res = await _bookService.GetBooksByOfficeAsync(options);
             Assert.AreEqual(res.ItemCount, 2);
             Assert.AreEqual(res.Entries.First().QuantityLeft, 1);
             Assert.AreEqual(res.Entries.First().Readers.First().Id, "testUserId");
@@ -107,27 +108,27 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_Correct_Books_By_Office_Search_Results()
+        public async Task Should_Return_Correct_Books_By_Office_Search_Results()
         {
             MockBooksByOffice();
             var options = new BooksByOfficeOptionsDTO { OrganizationId = 2, OfficeId = 1, Page = 1, UserId = "testUserId", SearchString = "search" };
-            var res = _bookService.GetBooksByOffice(options);
+            var res = await _bookService.GetBooksByOfficeAsync(options);
             Assert.AreEqual(res.ItemCount, 1);
             Assert.AreEqual(res.Entries.First().Title, "Test2search");
         }
 
         [Test]
-        public void Should_Return_Correct_Books_Off_All_Offices()
+        public async Task Should_Return_Correct_Books_Off_All_Offices()
         {
             MockBooksByOffice();
             var options = new BooksByOfficeOptionsDTO { OrganizationId = 2, Page = 1 };
-            var res = _bookService.GetBooksByOffice(options);
+            var res = await _bookService.GetBooksByOfficeAsync(options);
 
             Assert.AreEqual(res.ItemCount, 3);
         }
 
         [Test]
-        public void Should_Return_Correctly_Mapped_Book_Details_To_User()
+        public async Task Should_Return_Correctly_Mapped_Book_Details_To_User()
         {
             MockGetBookDetails();
             var userOrg = new UserAndOrganizationDTO
@@ -135,7 +136,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 OrganizationId = 2,
                 UserId = "testUser2"
             };
-            var res = _bookService.GetBookDetails(2, userOrg);
+            var res = await _bookService.GetBookDetailsAsync(2, userOrg);
             Assert.AreEqual(2, res.BookLogs.Count());
             Assert.AreEqual(2, res.BookOfficeId);
             Assert.AreEqual(1, res.Id);
@@ -144,7 +145,7 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_Correctly_Mapped_Book_Details_To_Administrator()
+        public async Task Should_Return_Correctly_Mapped_Book_Details_To_Administrator()
         {
             MockGetBookDetails();
             var userOrg = new UserAndOrganizationDTO
@@ -152,21 +153,22 @@ namespace Shrooms.Premium.Tests.DomainService
                 OrganizationId = 2,
                 UserId = "testUser2"
             };
-            var res = _bookService.GetBookDetailsWithOffices(2, userOrg);
+            var res = await _bookService.GetBookDetailsWithOfficesAsync(2, userOrg);
             Assert.AreEqual(2, res.QuantityByOffice.Count());
             Assert.IsTrue(res.QuantityByOffice.Any(x => x.OfficeId == 1));
             Assert.IsTrue(res.QuantityByOffice.Any(x => x.OfficeId == 2));
         }
 
         [Test]
-        public void Should_Delete_Book_With_Its_Related_Entities()
+        public async Task Should_Delete_Book_With_Its_Related_Entities()
         {
             MockDeleteBookEntities();
             var userOrg = new UserAndOrganizationDTO
             {
                 OrganizationId = 2
             };
-            _bookService.DeleteBook(1, userOrg);
+
+            await _bookService.DeleteBookAsync(1, userOrg);
             _bookOfficesDbSet.Received(2).Remove(Arg.Any<BookOffice>());
         }
 
@@ -221,7 +223,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 UserId = "testUserId"
             };
 
-            Assert.Throws<ArgumentException>(() => _bookService.AddBook(newBookDto));
+            Assert.ThrowsAsync<ArgumentException>(async () => await _bookService.AddBookAsync(newBookDto));
         }
 
         [Test]
@@ -236,6 +238,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     Id = 1
                 }
             };
+
             _officesDbSet.SetDbSetDataForAsync(offices);
 
             var newBookDto = new NewBookDTO
@@ -255,7 +258,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 UserId = "testUserId"
             };
 
-            Assert.Throws<BookException>(() => _bookService.AddBook(newBookDto));
+            Assert.ThrowsAsync<BookException>(async () => await _bookService.AddBookAsync(newBookDto));
         }
 
         [Test]
@@ -299,7 +302,7 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
-        public void Should_Create_New_Book_And_Book_Office()
+        public async Task Should_Create_New_Book_And_Book_Office()
         {
             MockCreateNewBook();
             var newBookDto = new NewBookDTO
@@ -324,13 +327,13 @@ namespace Shrooms.Premium.Tests.DomainService
                 UserId = "testUserId"
             };
 
-            _bookService.AddBook(newBookDto);
+            await _bookService.AddBookAsync(newBookDto);
             _booksDbSet.Received(1).Add(Arg.Any<Book>());
             _bookOfficesDbSet.Received(1).Add(Arg.Any<BookOffice>());
         }
 
         [Test]
-        public void Should_Edit_Book_With_Quantities_In_Offices()
+        public async Task Should_Edit_Book_With_Quantities_In_Offices()
         {
             MockEditBook();
             var bookDto = new EditBookDTO
@@ -352,14 +355,17 @@ namespace Shrooms.Premium.Tests.DomainService
                     }
                 }
             };
-            _bookService.EditBook(bookDto);
-            var bookOffices = _booksDbSet.First().BookOffices;
+
+            await _bookService.EditBookAsync(bookDto);
+            var bookOffices = (await _booksDbSet.FirstAsync()).BookOffices;
+
             Assert.AreEqual(0, bookOffices.First(x => x.OfficeId == 1).Quantity);
             Assert.AreEqual(50, bookOffices.First(x => x.OfficeId == 2).Quantity);
             Assert.AreEqual("test1", _booksDbSet.First().Author);
         }
 
         #region Mocks
+
         private void MockCreateNewBook()
         {
             var offices = new List<Office>
@@ -707,6 +713,7 @@ namespace Shrooms.Premium.Tests.DomainService
             };
             _bookOfficesDbSet.SetDbSetDataForAsync(booksOfficeList.AsQueryable());
         }
+
         #endregion
     }
 }

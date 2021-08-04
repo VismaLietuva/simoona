@@ -17,6 +17,7 @@ using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
+using Shrooms.Premium.Domain.DomainServiceValidators.Events;
 using MailAttachment = System.Net.Mail.Attachment;
 
 namespace Shrooms.Premium.Domain.Services.Events.Calendar
@@ -25,18 +26,20 @@ namespace Shrooms.Premium.Domain.Services.Events.Calendar
     {
         private readonly IDbSet<ApplicationUser> _usersDbSet;
 
-        private readonly IDbSet<Event> _eventsDbSet;
-        private readonly IDbSet<Organization> _organizationsDbSet;
+        private readonly DbSet<Event> _eventsDbSet;
+        private readonly DbSet<Organization> _organizationsDbSet;
         private readonly IMailingService _mailingService;
         private readonly IApplicationSettings _appSettings;
+        private IEventValidationService _eventValidationService;
 
-        public EventCalendarService(IUnitOfWork2 uow, IMailingService mailingService, IApplicationSettings appSettings)
+        public EventCalendarService(IUnitOfWork2 uow, IMailingService mailingService, IApplicationSettings appSettings, IEventValidationService eventValidationService)
         {
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
             _eventsDbSet = uow.GetDbSet<Event>();
             _organizationsDbSet = uow.GetDbSet<Organization>();
             _mailingService = mailingService;
             _appSettings = appSettings;
+            _eventValidationService = eventValidationService;
         }
 
         public async Task SendInvitationAsync(EventJoinValidationDTO @event, IEnumerable<string> userIds, int orgId)
@@ -47,7 +50,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Calendar
                 .ToListAsync();
 
             var calendarEvent = MapToCalendarEvent(@event);
-            AddEventLinkToDescription(calendarEvent, @event.Id, orgId);
+            await AddEventLinkToDescriptionAsync(calendarEvent, @event.Id, orgId);
 
             var calendar = new Ical.Net.Calendar();
             calendar.Events.Add(calendarEvent);
@@ -63,12 +66,15 @@ namespace Shrooms.Premium.Domain.Services.Events.Calendar
             }
         }
 
-        public byte[] DownloadEvent(Guid eventId, int orgId)
+        public async Task<byte[]> DownloadEventAsync(Guid eventId, int orgId)
         {
-            var @event = _eventsDbSet.Find(eventId);
+            var @event = await _eventsDbSet.FindAsync(eventId);
+
+            _eventValidationService.CheckIfEventExists(@event);
 
             var calEvent = new CalendarEvent
             {
+                // ReSharper disable once PossibleNullReferenceException
                 Uid = @event.Id.ToString(),
                 Location = @event.Place,
                 Summary = @event.Name,
@@ -79,7 +85,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Calendar
                 Status = EventStatus.Confirmed
             };
 
-            AddEventLinkToDescription(calEvent, eventId, orgId);
+            await AddEventLinkToDescriptionAsync(calEvent, eventId, orgId);
             var cal = new Ical.Net.Calendar();
             cal.Events.Add(calEvent);
             var serializedCalendar = new CalendarSerializer().SerializeToString(cal);
@@ -88,9 +94,9 @@ namespace Shrooms.Premium.Domain.Services.Events.Calendar
             return calByteArray;
         }
 
-        private void AddEventLinkToDescription(CalendarEvent calEvent, Guid eventId, int orgId)
+        private async Task AddEventLinkToDescriptionAsync(CalendarEvent calEvent, Guid eventId, int orgId)
         {
-            var orgShortName = _organizationsDbSet.Find(orgId).ShortName;
+            var orgShortName = (await _organizationsDbSet.FindAsync(orgId))?.ShortName;
             var eventUrl = _appSettings.EventUrl(orgShortName, eventId.ToString());
             calEvent.Description += $"\n\n{eventUrl}";
         }

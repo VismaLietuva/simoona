@@ -1,7 +1,9 @@
-﻿namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.LoyaltyKudos
+﻿using System.Threading.Tasks;
+
+namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.LoyaltyKudos
 {
     public interface ILoyaltyKudosService
     {
-        void AwardEmployeesWithKudos(string organizationName);
+        Task AwardEmployeesWithKudosAsync(string organizationName);
     }
 }

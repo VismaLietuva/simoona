@@ -57,7 +57,7 @@ namespace Shrooms.Premium.Domain.Services.Email.ServiceRequest
 
             var emailTemplateViewModel = new ServiceRequestEmailTemplateViewModel(userNotificationSettingsUrl,
                 newServiceRequest.Title,
-                GetUserFullName(newServiceRequest.EmployeeId),
+                await GetUserFullNameAsync(newServiceRequest.EmployeeId),
                 serviceRequestUrl);
 
             var body = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.ServiceRequest);
@@ -86,7 +86,7 @@ namespace Shrooms.Premium.Domain.Services.Email.ServiceRequest
             var emailTemplateViewModel = new ServiceRequestCommentEmailTemplateViewModel(
                 userNotificationSettingsUrl,
                 serviceRequest.Title,
-                GetUserFullName(createdComment.CommentedEmployeeId),
+                await GetUserFullNameAsync(createdComment.CommentedEmployeeId),
                 createdComment.CommentContent,
                 serviceRequestUrl);
 
@@ -119,7 +119,7 @@ namespace Shrooms.Premium.Domain.Services.Email.ServiceRequest
 
             var emailTemplateViewModel = new ServiceRequestUpdateEmailTemplateViewModel(userNotificationSettingsUrl,
                 serviceRequest.Title,
-                GetUserFullName(userAndOrganizationDTO.UserId),
+                await GetUserFullNameAsync(userAndOrganizationDTO.UserId),
                 newStatusName,
                 serviceRequestUrl);
 
@@ -128,12 +128,12 @@ namespace Shrooms.Premium.Domain.Services.Email.ServiceRequest
             await _mailingService.SendEmailAsync(new EmailDto(email, subject, body));
         }
 
-        private string GetUserFullName(string userId)
+        private async Task<string> GetUserFullNameAsync(string userId)
         {
-            return _usersDbSet
+            return await _usersDbSet
                 .Where(u => u.Id == userId)
                 .Select(u => u.FirstName + " " + u.LastName)
-                .First();
+                .FirstAsync();
         }
 
         private async Task<string> GetOrganizationNameAsync(int? organizationId)

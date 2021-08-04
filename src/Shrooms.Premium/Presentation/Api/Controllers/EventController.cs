@@ -81,11 +81,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [Route("Types")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult GetEventTypes()
+        public async Task<IHttpActionResult> GetEventTypes()
         {
             var organizationId = GetUserAndOrganization().OrganizationId;
-            var typeDtos = _eventUtilitiesService.GetEventTypes(organizationId);
-            var result = _mapper.Map<IEnumerable<EventTypeDTO>, IEnumerable<EventTypeViewModel>>(typeDtos);
+            var types = await _eventUtilitiesService.GetEventTypesAsync(organizationId);
+            var result = _mapper.Map<IEnumerable<EventTypeDTO>, IEnumerable<EventTypeViewModel>>(types);
             return Ok(result);
         }
 
@@ -93,7 +93,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
         public async Task<IHttpActionResult> GetOffices()
         {
-            var offices = await _officeMapService.GetOffices();
+            var offices = await _officeMapService.GetOfficesAsync();
             var result = _mapper.Map<IEnumerable<OfficeDTO>, IEnumerable<EventOfficeViewModel>>(offices);
             return Ok(result);
         }
@@ -101,7 +101,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [Route("")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult GetEventsFiltered(string typeId = null,
+        public async Task<IHttpActionResult> GetEventsFiltered(string typeId = null,
             string officeId = null,
             int page = 1,
             DateTime? startDate = null,
@@ -129,7 +129,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             try
             {
-                var eventsListDto = _eventListingService.GetEventsFiltered(args, userOrganization);
+                var eventsListDto = await _eventListingService.GetEventsFilteredAsync(args, userOrganization);
                 var result = _mapper.Map<IEnumerable<EventListItemDTO>, IEnumerable<EventListItemViewModel>>(eventsListDto);
 
                 return Ok(result);
@@ -176,7 +176,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpPut]
         [Route("Update")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult UpdateEvent(UpdateEventViewModel eventViewModel)
+        public async Task<IHttpActionResult> UpdateEvent(UpdateEventViewModel eventViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -189,7 +189,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             try
             {
-                _eventService.UpdateEventAsync(eventDTO);
+                await _eventService.UpdateEventAsync(eventDTO);
             }
             catch (EventException e)
             {
@@ -202,7 +202,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [Route("MyEvents")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult GetMyEvents([FromUri] MyEventsOptionsViewModel options, string officeId, int page = 1)
+        public async Task<IHttpActionResult> GetMyEvents([FromUri] MyEventsOptionsViewModel options, string officeId, int page = 1)
         {
             int? officeIdNullable = null;
 
@@ -213,7 +213,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             var optionsDto = _mapper.Map<MyEventsOptionsViewModel, MyEventsOptionsDTO>(options);
             SetOrganizationAndUser(optionsDto);
-            var myEventsListDto = _eventListingService.GetMyEvents(optionsDto, page, officeIdNullable);
+            var myEventsListDto = await _eventListingService.GetMyEventsAsync(optionsDto, page, officeIdNullable);
             var result = _mapper.Map<IEnumerable<EventListItemDTO>, IEnumerable<EventListItemViewModel>>(myEventsListDto);
             return Ok(result);
         }
@@ -221,11 +221,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [Route("Options")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult GetEventOptions(Guid eventId)
+        public async Task<IHttpActionResult> GetEventOptions(Guid eventId)
         {
             try
             {
-                var eventOptionsDto = _eventListingService.GetEventOptions(eventId, GetUserAndOrganization());
+                var eventOptionsDto = await _eventListingService.GetEventOptionsAsync(eventId, GetUserAndOrganization());
                 var result = _mapper.Map<EventOptionsDTO, EventOptionsViewModel>(eventOptionsDto);
                 return Ok(result);
             }
@@ -238,11 +238,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpPatch]
         [Route("Pin")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
-        public IHttpActionResult ToggleEventPin(Guid eventId)
+        public async Task<IHttpActionResult> ToggleEventPin(Guid eventId)
         {
             try
             {
-                _eventService.ToggleEventPin(eventId);
+                await _eventService.ToggleEventPinAsync(eventId);
                 return Ok();
             }
             catch (EventException e)
@@ -253,12 +253,12 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet]
         [Route("Download")]
-        public IHttpActionResult DownloadEvent(Guid eventId)
+        public async Task<IHttpActionResult> DownloadEvent(Guid eventId)
         {
             try
             {
                 var userOrg = GetUserAndOrganization();
-                var stream = new ByteArrayContent(_calendarService.DownloadEvent(eventId, userOrg.OrganizationId));
+                var stream = new ByteArrayContent(await _calendarService.DownloadEventAsync(eventId, userOrg.OrganizationId));
                 var result = new HttpResponseMessage(HttpStatusCode.OK) { Content = stream };
                 return ResponseMessage(result);
             }
@@ -290,7 +290,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpPost]
         [Route("Join")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult Join(EventJoinViewModel joinOptions)
+        public async Task<IHttpActionResult> Join(EventJoinViewModel joinOptions)
         {
             if (!ModelState.IsValid)
             {
@@ -303,7 +303,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             try
             {
-                _eventParticipationService.JoinAsync(optionsDto);
+                await _eventParticipationService.JoinAsync(optionsDto);
                 return Ok();
             }
             catch (EventException e)
@@ -315,7 +315,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpPost]
         [Route("UpdateAttendStatus")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult UpdateAttendStatus(UpdateAttendStatusViewModel updateStatusViewModel)
+        public async Task<IHttpActionResult> UpdateAttendStatus(UpdateAttendStatusViewModel updateStatusViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -326,7 +326,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             SetOrganizationAndUser(updateAttendStatusDTO);
             try
             {
-                _eventParticipationService.UpdateAttendStatus(updateAttendStatusDTO);
+                await _eventParticipationService.UpdateAttendStatusAsync(updateAttendStatusDTO);
                 return Ok();
             }
             catch (EventException e)
@@ -345,7 +345,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                 var eventDto = await _eventService.GetEventDetailsAsync(eventId, GetUserAndOrganization());
                 var result = _mapper.Map<EventDetailsDTO, EventDetailsViewModel>(eventDto);
 
-                var officesCount = await _officeMapService.GetOfficesCount();
+                var officesCount = await _officeMapService.GetOfficesCountAsync();
                 result.IsForAllOffices = result.OfficesName.Count() == officesCount;
 
                 return Ok(result);
@@ -359,11 +359,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [Route("Update")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult GetEventForUpdate(Guid eventId)
+        public async Task<IHttpActionResult> GetEventForUpdate(Guid eventId)
         {
             try
             {
-                var eventDto = _eventService.GetEventForEditing(eventId, GetUserAndOrganization());
+                var eventDto = await _eventService.GetEventForEditingAsync(eventId, GetUserAndOrganization());
                 var result = _mapper.Map<EventEditDTO, EventEditViewModel>(eventDto);
                 return Ok(result);
             }
@@ -376,11 +376,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpDelete]
         [Route("Delete")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult Delete(Guid eventId)
+        public async Task<IHttpActionResult> Delete(Guid eventId)
         {
             try
             {
-                _eventService.DeleteAsync(eventId, GetUserAndOrganization());
+                await _eventService.DeleteAsync(eventId, GetUserAndOrganization());
                 return Ok();
             }
             catch (EventException e)
@@ -392,11 +392,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpDelete]
         [Route("Leave")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult Leave(Guid eventId, string leaveComment)
+        public async Task<IHttpActionResult> Leave(Guid eventId, string leaveComment)
         {
             try
             {
-                _eventParticipationService.LeaveAsync(eventId, GetUserAndOrganization(), leaveComment);
+                await _eventParticipationService.LeaveAsync(eventId, GetUserAndOrganization(), leaveComment);
                 return Ok();
             }
             catch (EventException e)
@@ -412,11 +412,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpDelete]
         [Route("Expel")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult Expel(Guid eventId, string userId)
+        public async Task<IHttpActionResult> Expel(Guid eventId, string userId)
         {
             try
             {
-                _eventParticipationService.ExpelAsync(eventId, GetUserAndOrganization(), userId);
+                await _eventParticipationService.ExpelAsync(eventId, GetUserAndOrganization(), userId);
                 return Ok();
             }
             catch (EventException e)
@@ -432,9 +432,9 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [Route("GetUsersForAutoComplete")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult SearchUser(string s, Guid eventId)
+        public async Task<IHttpActionResult> SearchUser(string s, Guid eventId)
         {
-            var searchResultDto = _eventParticipationService.SearchForEventJoinAutocomplete(eventId, s, GetUserAndOrganization());
+            var searchResultDto = await _eventParticipationService.SearchForEventJoinAutocompleteAsync(eventId, s, GetUserAndOrganization());
             var searchResult = _mapper.Map<IEnumerable<EventUserSearchResultDTO>, IEnumerable<EventUserSearchResultViewModel>>(searchResultDto);
             return Ok(searchResult);
         }
@@ -442,11 +442,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpPut]
         [Route("ResetAttendees")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult ResetAttendees(Guid eventId)
+        public async Task<IHttpActionResult> ResetAttendees(Guid eventId)
         {
             try
             {
-                _eventParticipationService.ResetAttendeesAsync(eventId, GetUserAndOrganization());
+                await _eventParticipationService.ResetAttendeesAsync(eventId, GetUserAndOrganization());
                 return Ok();
             }
             catch (EventException e)
@@ -478,7 +478,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [Route("MaxParticipants")]
         public IHttpActionResult GetMaxEventParticipants()
         {
-            var maxParticipants = _eventParticipationService.GetMaxParticipantsCount(GetUserAndOrganization());
+            var maxParticipants = _eventParticipationService.GetMaxParticipantsCountAsync(GetUserAndOrganization());
             return Ok(new { value = maxParticipants });
         }
 
@@ -523,7 +523,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpPost]
         [Route("Options")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public IHttpActionResult UpdateSelectedOptions(EventChangeOptionViewModel viewModel)
+        public async Task<IHttpActionResult> UpdateSelectedOptions(EventChangeOptionViewModel viewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -535,7 +535,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             try
             {
-                _eventParticipationService.UpdateSelectedOptions(changeOptionsDto);
+                await _eventParticipationService.UpdateSelectedOptionsAsync(changeOptionsDto);
                 return Ok();
             }
             catch (EventException e)

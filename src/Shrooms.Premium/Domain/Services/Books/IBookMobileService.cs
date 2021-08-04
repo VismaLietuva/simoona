@@ -6,17 +6,17 @@ namespace Shrooms.Premium.Domain.Services.Books
 {
     public interface IBookMobileService
     {
-        void PostBook(BookMobilePostDTO bookDTO);
+        Task PostBookAsync(BookMobilePostDTO bookDTO);
 
-        IEnumerable<BookMobileLogDTO> ReturnBook(BookMobileReturnDTO bookDTO);
+        Task<IEnumerable<BookMobileLogDTO>> ReturnBookAsync(BookMobileReturnDTO bookDTO);
 
-        void ReturnSpecificBook(int bookLogId);
+        Task ReturnSpecificBookAsync(int bookLogId);
 
-        RetrievedBookInfoDTO GetBook(BookMobileGetDTO bookDTO);
+        Task<RetrievedBookInfoDTO> GetBookAsync(BookMobileGetDTO bookDTO);
 
-        IEnumerable<MobileUserDTO> GetUsersForAutoComplete(string search, int organizationId);
+        Task<IEnumerable<MobileUserDTO>> GetUsersForAutoCompleteAsync(string search, int organizationId);
 
-        IEnumerable<OfficeBookDTO> GetOffices(int organizationId);
+        Task<IEnumerable<OfficeBookDTO>> GetOfficesAsync(int organizationId);
 
         Task<RetrievedBookInfoDTO> GetBookForPostAsync(string code, int organizationId);
     }

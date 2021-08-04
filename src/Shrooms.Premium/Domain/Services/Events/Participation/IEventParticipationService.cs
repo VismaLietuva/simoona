@@ -12,7 +12,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
         Task JoinAsync(EventJoinDTO joinDto, bool addedByColleague = false);
 
-        void UpdateAttendStatus(UpdateAttendStatusDTO updateAttendStatusDTO);
+        Task UpdateAttendStatusAsync(UpdateAttendStatusDTO updateAttendStatusDTO);
 
         Task DeleteByEventAsync(Guid eventId, string userId);
 
@@ -20,16 +20,16 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
         Task ResetAttendeesAsync(Guid eventId, UserAndOrganizationDTO userOrg);
 
-        IEnumerable<string> GetParticipantsEmailsIncludingHost(Guid eventId);
+        Task<IEnumerable<string>> GetParticipantsEmailsIncludingHostAsync(Guid eventId);
 
         Task ExpelAsync(Guid eventId, UserAndOrganizationDTO userOrg, string userId);
 
         Task<IEnumerable<EventParticipantDTO>> GetEventParticipantsAsync(Guid eventId, UserAndOrganizationDTO userAndOrg);
 
-        IEnumerable<EventUserSearchResultDTO> SearchForEventJoinAutocomplete(Guid eventId, string searchString, UserAndOrganizationDTO userOrg);
+        Task<IEnumerable<EventUserSearchResultDTO>> SearchForEventJoinAutocompleteAsync(Guid eventId, string searchString, UserAndOrganizationDTO userOrg);
 
-        int GetMaxParticipantsCount(UserAndOrganizationDTO userAndOrganizationDTO);
+        Task<int> GetMaxParticipantsCountAsync(UserAndOrganizationDTO userAndOrganizationDTO);
 
-        void UpdateSelectedOptions(EventChangeOptionsDTO changeOptionsDTO);
+        Task UpdateSelectedOptionsAsync(EventChangeOptionsDTO changeOptionsDTO);
     }
 }

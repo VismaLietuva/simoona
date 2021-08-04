@@ -34,9 +34,9 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
         }
 
         [Route("All")]
-        public IHttpActionResult GetAllLotteries()
+        public async Task<IHttpActionResult> GetAllLotteries()
         {
-            var lotteriesDTO = _lotteryService.GetLotteries(GetUserAndOrganization());
+            var lotteriesDTO = await _lotteryService.GetLotteriesAsync(GetUserAndOrganization());
 
             var result = _mapper.Map<IEnumerable<LotteryDetailsDTO>, IEnumerable<LotteryDetailsViewModel>>(lotteriesDTO);
 
@@ -93,7 +93,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
             try
             {
-                await _lotteryService.CreateLottery(createLotteryDTO);
+                await _lotteryService.CreateLotteryAsync(createLotteryDTO);
             }
             catch (LotteryException e)
             {
@@ -106,9 +106,9 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
         [HttpPatch]
         [Route("{id}/Abort")]
         [InvalidateCacheOutput("Get", typeof(LotteryWidgetController))]
-        public IHttpActionResult Abort(int id)
+        public async Task<IHttpActionResult> Abort(int id)
         {
-            var success = _lotteryService.AbortLottery(id, GetUserAndOrganization());
+            var success = await _lotteryService.AbortLotteryAsync(id, GetUserAndOrganization());
             if (!success)
             {
                 return Content((HttpStatusCode)422, "Lottery with such ID was not found");
@@ -136,18 +136,18 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
         [HttpPatch]
         [Route("{id}/Refund")]
-        public IHttpActionResult RefundParticipants(int id)
+        public async Task<IHttpActionResult> RefundParticipants(int id)
         {
-            _lotteryService.RefundParticipants(id, GetUserAndOrganization());
+            await _lotteryService.RefundParticipantsAsync(id, GetUserAndOrganization());
 
             return Ok();
         }
 
         [HttpGet]
         [Route("{id}/Status")]
-        public IHttpActionResult GetStatus(int id)
+        public async Task<IHttpActionResult> GetStatus(int id)
         {
-            var status = _lotteryService.GetLotteryStatus(id, GetUserAndOrganization());
+            var status = await _lotteryService.GetLotteryStatusAsync(id, GetUserAndOrganization());
 
             return Ok(status);
         }
@@ -155,14 +155,14 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
         [HttpPut]
         [Route("UpdateDrafted")]
         [InvalidateCacheOutput("Get", typeof(LotteryWidgetController))]
-        public IHttpActionResult UpdateDrafted(EditDraftedLotteryViewModel editLotteryViewModel)
+        public async Task<IHttpActionResult> UpdateDrafted(EditDraftedLotteryViewModel editLotteryViewModel)
         {
             try
             {
                 var editDraftedLotteryDTO = _mapper.Map<EditDraftedLotteryViewModel, LotteryDTO>(editLotteryViewModel);
                 SetOrganizationAndUser(editDraftedLotteryDTO);
 
-                _lotteryService.EditDraftedLotteryAsync(editDraftedLotteryDTO);
+                await _lotteryService.EditDraftedLotteryAsync(editDraftedLotteryDTO);
 
                 return Ok();
             }
@@ -175,14 +175,14 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
         [HttpPatch]
         [Route("UpdateStarted")]
         [InvalidateCacheOutput("Get", typeof(LotteryWidgetController))]
-        public IHttpActionResult UpdateStarted(EditStartedLotteryViewModel editLotteryViewModel)
+        public async Task<IHttpActionResult> UpdateStarted(EditStartedLotteryViewModel editLotteryViewModel)
         {
             try
             {
                 var editStartedLotteryDTO = _mapper.Map<EditStartedLotteryViewModel, EditStartedLotteryDTO>(editLotteryViewModel);
                 SetOrganizationAndUser(editStartedLotteryDTO);
 
-                _lotteryService.EditStartedLotteryAsync(editStartedLotteryDTO);
+                await _lotteryService.EditStartedLotteryAsync(editStartedLotteryDTO);
 
                 return Ok();
             }

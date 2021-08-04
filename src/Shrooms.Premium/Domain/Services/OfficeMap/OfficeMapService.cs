@@ -28,60 +28,68 @@ namespace Shrooms.Premium.Domain.Services.OfficeMap
             _roleService = roleService;
         }
 
-        public async Task<IEnumerable<OfficeDTO>> GetOffices()
+        public async Task<IEnumerable<OfficeDTO>> GetOfficesAsync()
         {
             var offices = await _officeDbSet.ToListAsync();
 
             return _mapper.Map<IEnumerable<Office>, IEnumerable<OfficeDTO>>(offices);
         }
 
-        public async Task<int> GetOfficesCount()
+        public async Task<int> GetOfficesCountAsync()
         {
             return await _officeDbSet.CountAsync();
         }
 
-        public IEnumerable<OfficeUserDTO> GetOfficeUsers(int floorId, string includeProperties)
+        public async Task<IEnumerable<OfficeUserDTO>> GetOfficeUsersAsync(int floorId, string includeProperties)
         {
-            var applicationUsers = _applicationUserRepository
+            var newUserRole = await _roleService.GetRoleIdByNameAsync(Roles.NewUser);
+
+            var applicationUsers = await _applicationUserRepository
                 .Get(e => e.Room.FloorId == floorId, includeProperties: includeProperties)
-                .Where(_roleService.ExcludeUsersWithRole(Roles.NewUser))
-                .ToList();
+                .Where(_roleService.ExcludeUsersWithRole(newUserRole))
+                .ToListAsync();
 
             return _mapper.Map<IEnumerable<ApplicationUser>, IEnumerable<OfficeUserDTO>>(applicationUsers);
         }
 
-        public IEnumerable<string> GetEmailsByOffice(int officeId)
+        public async Task<IEnumerable<string>> GetEmailsByOfficeAsync(int officeId)
         {
-            var usersEmail = _usersDbSet
+            var newUserRole = await _roleService.GetRoleIdByNameAsync(Roles.NewUser);
+
+            var usersEmail = await _usersDbSet
                .Include(x => x.Room)
                .Include(x => x.Room.Floor)
                .Where(x => x.Room.Floor.OfficeId == officeId)
-               .Where(_roleService.ExcludeUsersWithRole(Roles.NewUser))
+               .Where(_roleService.ExcludeUsersWithRole(newUserRole))
                .Select(x => x.Email)
-               .ToList();
+               .ToListAsync();
 
             return usersEmail;
         }
 
-        public IEnumerable<string> GetEmailsByFloor(int floorId)
+        public async Task<IEnumerable<string>> GetEmailsByFloorAsync(int floorId)
         {
-            var usersEmail = _usersDbSet
+            var newUserRole = await _roleService.GetRoleIdByNameAsync(Roles.NewUser);
+
+            var usersEmail = await _usersDbSet
                .Include(x => x.Room)
                .Where(x => x.Room.FloorId == floorId)
-               .Where(_roleService.ExcludeUsersWithRole(Roles.NewUser))
+               .Where(_roleService.ExcludeUsersWithRole(newUserRole))
                .Select(x => x.Email)
-               .ToList();
+               .ToListAsync();
 
             return usersEmail;
         }
 
-        public IEnumerable<string> GetEmailsByRoom(int roomId)
+        public async Task<IEnumerable<string>> GetEmailsByRoomAsync(int roomId)
         {
-            var usersEmail = _usersDbSet
+            var newUserRole = await _roleService.GetRoleIdByNameAsync(Roles.NewUser);
+
+            var usersEmail = await _usersDbSet
                 .Where(x => x.RoomId == roomId)
-                .Where(_roleService.ExcludeUsersWithRole(Roles.NewUser))
+                .Where(_roleService.ExcludeUsersWithRole(newUserRole))
                 .Select(x => x.Email)
-                .ToList();
+                .ToListAsync();
 
             return usersEmail;
         }

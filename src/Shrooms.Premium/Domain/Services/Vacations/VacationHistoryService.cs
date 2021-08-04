@@ -19,7 +19,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
         }
 
-        public async Task<VacationDTO[]> GetVacationHistory(string userId)
+        public async Task<VacationDTO[]> GetVacationHistoryAsync(string userId)
         {
             var user = await _usersDbSet.SingleAsync(u => u.Id == userId);
 

@@ -36,9 +36,7 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
                 query = query.Where(filter);
             }
 
-            var serviceRequests = (await query
-                    .OrderByDescending(x => x.Created)
-                    .ToListAsync())
+            var serviceRequests = (await query.OrderByDescending(x => x.Created).ToListAsync())
                 .Select(x => new List<object>
                 {
                     x.Title,

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using AutoMapper;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Infrastructure;
@@ -9,13 +11,15 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Premium.DataTransferObjects.Models.Kudos;
 using Shrooms.Premium.Domain.Services.Email.Kudos;
+using X.PagedList;
 
 namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.LoyaltyKudos
 {
     public class LoyaltyKudosService : ILoyaltyKudosService
     {
+        private static readonly SemaphoreSlim _concurrencyLock = new SemaphoreSlim(1, 1);
+
         private const string LoyaltyKudosTypeName = "Loyalty";
-        private static readonly object _concurrencyLock = new object();
 
         private readonly IUnitOfWork2 _uow;
         private readonly IDbSet<KudosLog> _kudosLogsDbSet;
@@ -40,24 +44,27 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.LoyaltyKudos
             _organizationsDbSet = uow.GetDbSet<Organization>();
         }
 
-        public void AwardEmployeesWithKudos(string organizationName)
+        public async Task AwardEmployeesWithKudosAsync(string organizationName)
         {
             var awardedEmployees = new List<AwardedKudosEmployeeDTO>();
-            lock (_concurrencyLock)
+
+            await _concurrencyLock.WaitAsync();
+
+            try
             {
                 if (string.IsNullOrEmpty(organizationName))
                 {
                     throw new ArgumentNullException(nameof(organizationName));
                 }
 
-                var organization = _organizationsDbSet
+                var organization = await _organizationsDbSet
                     .Where(o => o.ShortName == organizationName)
                     .Select(o => new
                     {
                         o.Id,
                         o.KudosYearlyMultipliers
                     })
-                    .Single();
+                    .SingleAsync();
 
                 var kudosYearlyMultipliers = GetKudosYearlyMultipliersArray(organization.KudosYearlyMultipliers);
                 if (kudosYearlyMultipliers == null)
@@ -65,9 +72,9 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.LoyaltyKudos
                     return;
                 }
 
-                var loyaltyType = _kudosTypesDbSet.SingleOrDefault(t => t.Name == LoyaltyKudosTypeName);
+                var loyaltyType = await _kudosTypesDbSet.SingleOrDefaultAsync(t => t.Name == LoyaltyKudosTypeName);
 
-                var loyaltyKudosLog = (from u in _usersDbSet
+                var loyaltyKudosLog = await (from u in _usersDbSet
                                        where u.OrganizationId == organization.Id && u.EmploymentDate.HasValue
                                        join kl in _kudosLogsDbSet
                                            on new { employeeId = u.Id, orgId = organization.Id, Status = KudosStatus.Approved, KudosTypeName = LoyaltyKudosTypeName }
@@ -78,17 +85,20 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.LoyaltyKudos
                                        {
                                            Employee = u,
                                            KudosAddedDate = kl == null ? (DateTime?)null : kl.Created
-                                       }).ToList();
+                                       }).ToListAsync();
 
-                var employeesReceivedLoyaltyKudos = loyaltyKudosLog
+                var employeesReceivedLoyaltyKudos = await loyaltyKudosLog
                     .GroupBy(l => l.Employee)
                     .Select(l => new EmployeeLoyaltyKudosDTO
                     {
                         Employee = l.Key,
-                        AwardedEmploymentYears = l.Where(log => log.Employee.EmploymentDate != null && log.KudosAddedDate != null).Select(log => GetLoyaltyKudosEmploymentYear(log.Employee.EmploymentDate.Value, log.KudosAddedDate.Value)),
+                        AwardedEmploymentYears = l
+                            .Where(log => log.Employee.EmploymentDate != null && log.KudosAddedDate != null)
+                            .Select(log => GetLoyaltyKudosEmploymentYear(log.Employee.EmploymentDate, log.KudosAddedDate.Value)),
+
                         AwardedLoyaltyKudosCount = l.Count(log => log.KudosAddedDate != null)
                     })
-                    .ToList();
+                    .ToListAsync();
 
                 foreach (var employeeLoyaltyKudos in employeesReceivedLoyaltyKudos)
                 {
@@ -106,12 +116,16 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.LoyaltyKudos
                     }
                 }
 
-                _uow.SaveChanges(false);
+                await _uow.SaveChangesAsync(false);
                 _asyncRunner.Run<IKudosPremiumNotificationService>(async notifier => await notifier.SendLoyaltyBotNotificationAsync(awardedEmployees), _uow.ConnectionName);
+            }
+            finally
+            {
+                _concurrencyLock.Release();
             }
         }
 
-        private int[] GetKudosYearlyMultipliersArray(string multipliers)
+        private static int[] GetKudosYearlyMultipliersArray(string multipliers)
         {
             if (string.IsNullOrEmpty(multipliers))
             {
@@ -128,10 +142,12 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.LoyaltyKudos
             }
         }
 
-        private int GetLoyaltyKudosEmploymentYear(DateTime employmentDate, DateTime loyaltyAddedDate)
+        private static int GetLoyaltyKudosEmploymentYear(DateTime? employmentDate, DateTime loyaltyAddedDate)
         {
-            var employmentYear = loyaltyAddedDate.Year - employmentDate.Year;
-            if (loyaltyAddedDate < employmentDate.AddYears(employmentYear))
+            employmentDate ??= DateTime.UtcNow;
+
+            var employmentYear = loyaltyAddedDate.Year - employmentDate.Value.Year;
+            if (loyaltyAddedDate < employmentDate.Value.AddYears(employmentYear))
             {
                 employmentYear = employmentYear >= 1 ? employmentYear - 1 : employmentYear;
             }

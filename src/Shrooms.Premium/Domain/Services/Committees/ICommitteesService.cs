@@ -13,6 +13,6 @@ namespace Shrooms.Premium.Domain.Services.Committees
         Task<int> GetKudosCommitteeIdAsync();
         Task PostSuggestionAsync(CommitteeSuggestionPostDTO modelDTO, string userId);
         Task<IEnumerable<CommitteeSuggestionDto>> GetCommitteeSuggestions(int id);
-        Task DeleteCommitteeSuggestion(int comitteeId, int suggestionId, UserAndOrganizationDTO userAndOrg);
+        Task DeleteCommitteeSuggestionAsync(int comitteeId, int suggestionId, UserAndOrganizationDTO userAndOrg);
     }
 }

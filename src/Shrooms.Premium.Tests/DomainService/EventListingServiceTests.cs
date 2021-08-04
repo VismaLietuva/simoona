@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.DAL;
@@ -39,7 +40,7 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_My_Events_As_A_Participant()
+        public async Task Should_Return_My_Events_As_A_Participant()
         {
             var eventGuids = MockEventsListTest();
             var myEventsOptions = new MyEventsOptionsDTO
@@ -50,7 +51,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 Filter = MyEventsOptions.Participant
             };
 
-            var result = _eventListingService.GetMyEvents(myEventsOptions, 1).ToList();
+            var result = (await _eventListingService.GetMyEventsAsync(myEventsOptions, 1)).ToList();
 
             Assert.AreEqual(result.Count, 3);
             Assert.AreEqual(result.First(x => x.Id == eventGuids[0]).ParticipatingStatus, 1);
@@ -58,7 +59,7 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_My_Events_As_A_Master()
+        public async Task Should_Return_My_Events_As_A_Master()
         {
             var eventGuids = MockEventsListTest();
             var myEventsOptions = new MyEventsOptionsDTO
@@ -69,14 +70,14 @@ namespace Shrooms.Premium.Tests.DomainService
                 Filter = MyEventsOptions.Host
             };
 
-            var result = _eventListingService.GetMyEvents(myEventsOptions, 1).ToList();
+            var result = (await _eventListingService.GetMyEventsAsync(myEventsOptions, 1)).ToList();
 
             Assert.AreEqual(result.Count, 1);
             Assert.IsTrue(result.First(x => x.Id == eventGuids[3]).IsCreator);
         }
 
         [Test]
-        public void Should_Return_Options_By_Event_Id()
+        public async Task Should_Return_Options_By_Event_Id()
         {
             var eventsGuids = MockEventOptionsWithEvents();
             var userOrg = new UserAndOrganizationDTO
@@ -84,7 +85,8 @@ namespace Shrooms.Premium.Tests.DomainService
                 OrganizationId = 2
             };
 
-            var result = _eventListingService.GetEventOptions(eventsGuids[1], userOrg);
+            var result = await _eventListingService.GetEventOptionsAsync(eventsGuids[1], userOrg);
+
             Assert.AreEqual(result.Options.Count(), 2);
             Assert.AreEqual(result.Options.First(o => o.Id == 4).Option, "Option1");
             Assert.AreEqual(result.Options.First(o => o.Id == 5).Option, "Option2");

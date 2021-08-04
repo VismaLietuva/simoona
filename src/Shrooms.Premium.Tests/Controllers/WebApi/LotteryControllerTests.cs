@@ -53,21 +53,21 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
         }
 
         [Test]
-        public void GetAllLotteries_Should_Return_Ok_With_IEnumerable_Of_LotteryDetails_ViewModel()
+        public async Task GetAllLotteries_Should_Return_Ok_With_IEnumerable_Of_LotteryDetails_ViewModel()
         {
             // Arrange
             _mapper.Map<IEnumerable<LotteryDetailsDTO>, IEnumerable<LotteryDetailsViewModel>>(LotteryDetailsDTO)
                 .Returns(LotteryDetailsViewModel);
 
-            _lotteryService.GetLotteries(UserAndOrganizationArg).Returns(LotteryDetailsDTO);
+            _lotteryService.GetLotteriesAsync(UserAndOrganizationArg).Returns(LotteryDetailsDTO);
 
             // Act
-            var response = _lotteryController.GetAllLotteries();
+            var response = await _lotteryController.GetAllLotteries();
 
             // Assert
             Assert.IsNotNull(response);
             Assert.IsInstanceOf<OkNegotiatedContentResult<IEnumerable<LotteryDetailsViewModel>>>(response);
-            _lotteryService.Received(1).GetLotteries(UserAndOrganizationArg);
+            await _lotteryService.Received(1).GetLotteriesAsync(UserAndOrganizationArg);
         }
 
         [Test]
@@ -116,35 +116,33 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
         }
 
         [Test]
-        public void Abort_Should_Return_Ok()
+        public async Task Abort_Should_Return_Ok()
         {
             // Arrange
-            _lotteryService
-                .AbortLottery(2, UserAndOrganizationArg)
-                .Returns(true);
+            _lotteryService.AbortLotteryAsync(2, UserAndOrganizationArg).Returns(true);
 
             // Act
-            var response = _lotteryController.Abort(2);
+            var response = await _lotteryController.Abort(2);
 
             // Assert
             Assert.IsNotNull(response);
             Assert.IsInstanceOf<OkResult>(response);
-            _lotteryService.Received(1).AbortLottery(2, UserAndOrganizationArg);
+            await _lotteryService.Received(1).AbortLotteryAsync(2, UserAndOrganizationArg);
         }
 
         [Test]
-        public void Abort_Should_Return_Unprocessable_Entity_Error()
+        public async Task Abort_Should_Return_Unprocessable_Entity_Error()
         {
             // Arrange
-            _lotteryService.AbortLottery(5, UserAndOrganizationArg).Returns(false);
+            _lotteryService.AbortLotteryAsync(5, UserAndOrganizationArg).Returns(false);
 
             // Act
-            var response = _lotteryController.Abort(5);
+            var response = await _lotteryController.Abort(5);
 
             // Assert
             Assert.IsNotNull(response);
             Assert.IsInstanceOf<NegotiatedContentResult<string>>(response);
-            _lotteryService.Received(1).AbortLottery(5, UserAndOrganizationArg);
+            await _lotteryService.Received(1).AbortLotteryAsync(5, UserAndOrganizationArg);
         }
 
         [Test]
@@ -169,7 +167,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Assert
             Assert.IsInstanceOf<InvalidModelStateResult>(response);
-            await _lotteryService.DidNotReceive().CreateLottery(lotteryDTO);
+            await _lotteryService.DidNotReceive().CreateLotteryAsync(lotteryDTO);
         }
 
         [Test]
@@ -193,7 +191,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             // Assert
             Assert.IsNotNull(response);
             Assert.IsInstanceOf<OkResult>(response);
-            await _lotteryService.Received(1).CreateLottery(lotteryDTO);
+            await _lotteryService.Received(1).CreateLotteryAsync(lotteryDTO);
         }
 
         [Test]
@@ -208,16 +206,16 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             {
                 Title = "test"
             };
-            _mapper.Map<CreateLotteryViewModel, LotteryDTO>(lotteryViewModel)
-                .Returns(lotteryDTO);
-            _lotteryService.CreateLottery(lotteryDTO).Throws(new LotteryException("Exception"));
+
+            _mapper.Map<CreateLotteryViewModel, LotteryDTO>(lotteryViewModel).Returns(lotteryDTO);
+            _lotteryService.CreateLotteryAsync(lotteryDTO).Throws(new LotteryException("Exception"));
 
             // Act
             var response = await _lotteryController.CreateLottery(lotteryViewModel);
 
             // Assert
             Assert.IsInstanceOf<BadRequestErrorMessageResult>(response);
-            await _lotteryService.Received(1).CreateLottery(lotteryDTO);
+            await _lotteryService.Received(1).CreateLotteryAsync(lotteryDTO);
         }
 
         [Test]
@@ -299,17 +297,17 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
         }
 
         [Test]
-        public void RefundParticipants_Should_Return_Ok()
+        public async Task RefundParticipants_Should_Return_Ok()
         {
             // Arrange
 
             // Act
-            var response = _lotteryController.RefundParticipants(1337);
+            var response = await _lotteryController.RefundParticipants(1337);
 
             // Assert
             Assert.IsNotNull(response);
             Assert.IsInstanceOf<OkResult>(response);
-            _lotteryService.Received(1).RefundParticipants(1337, UserAndOrganizationArg);
+            await _lotteryService.Received(1).RefundParticipantsAsync(1337, UserAndOrganizationArg);
         }
 
         [Test]
@@ -342,7 +340,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
         }
 
         [Test]
-        public void UpdateDrafted_Should_Return_Ok()
+        public async Task UpdateDrafted_Should_Return_Ok()
         {
             // Arrange
             var lotteryViewModel = new EditDraftedLotteryViewModel
@@ -360,16 +358,16 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 .Returns(lotteryDto);
 
             // Act
-            var response = _lotteryController.UpdateDrafted(lotteryViewModel);
+            var response = await _lotteryController.UpdateDrafted(lotteryViewModel);
 
             // Assert
             Assert.IsNotNull(response);
             Assert.IsInstanceOf<OkResult>(response);
-            _lotteryService.Received(1).EditDraftedLotteryAsync(lotteryDto);
+            await _lotteryService.Received(1).EditDraftedLotteryAsync(lotteryDto);
         }
 
         [Test]
-        public void UpdateDrafted_Should_Return_Bad_Request()
+        public async Task UpdateDrafted_Should_Return_Bad_Request()
         {
             // Arrange
             var lotteryViewModel = new EditDraftedLotteryViewModel
@@ -390,16 +388,16 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 .Do(_ => throw new LotteryException("Exception"));
 
             // Act
-            var response = _lotteryController.UpdateDrafted(lotteryViewModel);
+            var response = await _lotteryController.UpdateDrafted(lotteryViewModel);
 
             // Assert
             Assert.IsNotNull(response);
             Assert.IsInstanceOf<BadRequestErrorMessageResult>(response);
-            _lotteryService.Received(1).EditDraftedLotteryAsync(lotteryDto);
+            await _lotteryService.Received(1).EditDraftedLotteryAsync(lotteryDto);
         }
 
         [Test]
-        public void UpdateStarted_Should_Return_Ok()
+        public async Task UpdateStarted_Should_Return_Ok()
         {
             // Arrange
             var lotteryViewModel = new EditStartedLotteryViewModel
@@ -415,16 +413,16 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 .Returns(lotteryDto);
 
             // Act
-            var response = _lotteryController.UpdateStarted(lotteryViewModel);
+            var response = await _lotteryController.UpdateStarted(lotteryViewModel);
 
             // Assert
             Assert.IsNotNull(response);
             Assert.IsInstanceOf<OkResult>(response);
-            _lotteryService.Received(1).EditStartedLotteryAsync(lotteryDto);
+            await _lotteryService.Received(1).EditStartedLotteryAsync(lotteryDto);
         }
 
         [Test]
-        public void UpdateStarted_Should_Return_Bad_Request()
+        public async Task UpdateStarted_Should_Return_Bad_Request()
         {
             // Arrange
             var lotteryViewModel = new EditStartedLotteryViewModel
@@ -442,12 +440,12 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 .Do(_ => throw new LotteryException("Exception"));
 
             // Act
-            var response = _lotteryController.UpdateStarted(lotteryViewModel);
+            var response = await _lotteryController.UpdateStarted(lotteryViewModel);
 
             // Assert
             Assert.IsNotNull(response);
             Assert.IsInstanceOf<BadRequestErrorMessageResult>(response);
-            _lotteryService.Received(1).EditStartedLotteryAsync(lotteryDto);
+            await _lotteryService.Received(1).EditStartedLotteryAsync(lotteryDto);
         }
 
         [Test]
@@ -517,6 +515,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             UserId = "1"
         };
 
-        private UserAndOrganizationDTO UserAndOrganizationArg => Arg.Is<UserAndOrganizationDTO>(o => o.UserId == _userAndOrganization.UserId && o.OrganizationId == _userAndOrganization.OrganizationId);
+        private UserAndOrganizationDTO UserAndOrganizationArg =>
+            Arg.Is<UserAndOrganizationDTO>(o => o.UserId == _userAndOrganization.UserId && o.OrganizationId == _userAndOrganization.OrganizationId);
     }
 }

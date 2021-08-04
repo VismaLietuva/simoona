@@ -75,7 +75,8 @@ namespace Shrooms.Premium.Domain.Services.Books
                 }
             }
         }
-        private Expression<Func<BookLog, BookRemindDTO>> MapBookLogToBookRemindDto()
+
+        private static Expression<Func<BookLog, BookRemindDTO>> MapBookLogToBookRemindDto()
         {
             return book => new BookRemindDTO
             {

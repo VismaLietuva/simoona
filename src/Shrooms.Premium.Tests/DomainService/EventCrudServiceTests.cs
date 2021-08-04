@@ -65,7 +65,7 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
-        public void Should_Delete_Event()
+        public async Task Should_Delete_Event()
         {
             var eventId = MockEventDelete();
             var userAndOrganization = new UserAndOrganizationDTO
@@ -73,12 +73,13 @@ namespace Shrooms.Premium.Tests.DomainService
                 OrganizationId = 2,
                 UserId = "eventHostId"
             };
-            _eventService.DeleteAsync(eventId, userAndOrganization);
+
+            await _eventService.DeleteAsync(eventId, userAndOrganization);
             _eventsDbSet.Received(1).Remove(Arg.Is<Event>(x => x.Id == eventId));
         }
 
         [Test]
-        public void Should_Return_Event_For_Update()
+        public async Task Should_Return_Event_For_Update()
         {
             var eventId = MockEventWithAllChildEntities();
             var userOrg = new UserAndOrganizationDTO
@@ -87,7 +88,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 UserId = "userParticipant2"
             };
 
-            var result = _eventService.GetEventForEditing(eventId, userOrg);
+            var result = await _eventService.GetEventForEditingAsync(eventId, userOrg);
             Assert.AreEqual(2, result.Options.Count());
             Assert.NotNull(result.Location);
             Assert.NotNull(result.Name);
@@ -100,7 +101,7 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_Event_Types_For_Update()
+        public async Task Should_Return_Event_Types_For_Update()
         {
             var eventId = MockEventWithAllChildEntities();
             var userOrg = new UserAndOrganizationDTO
@@ -109,11 +110,12 @@ namespace Shrooms.Premium.Tests.DomainService
                 UserId = "userParticipant2"
             };
 
-            var result = _eventService.GetEventForEditing(eventId, userOrg);
+            var result = await _eventService.GetEventForEditingAsync(eventId, userOrg);
             Assert.AreEqual(3, result.TypeId);
         }
+
         [Test]
-        public void Should_Return_Created_Event_Without_Options()
+        public async Task Should_Return_Created_Event_Without_Options()
         {
             MockUsers();
             MockEventTypes();
@@ -133,13 +135,14 @@ namespace Shrooms.Premium.Tests.DomainService
                 Location = "place",
                 NewOptions = new List<NewEventOptionDTO>()
             };
-            _eventService.CreateEventAsync(newEvent);
+
+            await _eventService.CreateEventAsync(newEvent);
             _eventsDbSet.Received(1).Add(Arg.Any<Event>());
             _eventOptionsDbSet.Received(0).Add(Arg.Any<EventOption>());
         }
 
         [Test]
-        public void Should_Return_Created_Event_With_Wall()
+        public async Task Should_Return_Created_Event_With_Wall()
         {
             MockUsers();
             MockEventTypes();
@@ -159,19 +162,19 @@ namespace Shrooms.Premium.Tests.DomainService
                 Location = "place",
                 NewOptions = new List<NewEventOptionDTO>()
             };
-            _eventService.CreateEventAsync(newEvent);
-            _wallService.Received(1)
-                .CreateNewWallAsync(
-                    Arg.Is<CreateWallDto>(x =>
-                        x.Name == newEvent.Name &&
-                        x.Access == WallAccess.Private &&
-                        x.Type == WallType.Events &&
-                        x.ModeratorsIds.Count() == 1 &&
-                        x.ModeratorsIds.Any(y => y == newEvent.ResponsibleUserId)));
+
+            await _eventService.CreateEventAsync(newEvent);
+            await _wallService.Received(1)
+                .CreateNewWallAsync(Arg.Is<CreateWallDto>(x =>
+                    x.Name == newEvent.Name &&
+                    x.Access == WallAccess.Private &&
+                    x.Type == WallType.Events &&
+                    x.ModeratorsIds.Count() == 1 &&
+                    x.ModeratorsIds.Any(y => y == newEvent.ResponsibleUserId)));
         }
 
         [Test]
-        public void Should_Return_Created_Event_With_Options()
+        public async Task Should_Return_Created_Event_With_Options()
         {
             MockUsers();
             MockEventTypes();
@@ -201,7 +204,8 @@ namespace Shrooms.Premium.Tests.DomainService
                     }
                 }
             };
-            _eventService.CreateEventAsync(newEvent);
+
+            await _eventService.CreateEventAsync(newEvent);
             _eventsDbSet.Received(1).Add(Arg.Any<Event>());
             _eventOptionsDbSet.Received(2).Add(Arg.Any<EventOption>());
         }
@@ -873,7 +877,6 @@ namespace Shrooms.Premium.Tests.DomainService
                 }
             };
 
-
             var events = new List<Event>
             {
                 new Event
@@ -906,7 +909,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 new Office
                 {
                     Id = 1,
-                    Address = new Address { City = "Vilnius", Building = "Ofisas", Country="Lithuania", Street="Lvovo" },
+                    Address = new Address { City = "Vilnius", Building = "Ofisas", Country = "Lithuania", Street = "Lvovo" },
                     Name = "office1",
                     OrganizationId = 1
                 }
