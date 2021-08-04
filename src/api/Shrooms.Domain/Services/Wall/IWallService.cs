@@ -15,31 +15,31 @@ namespace Shrooms.Domain.Services.Wall
 
         Task UpdateWallAsync(UpdateWallDto updateWallDto);
 
-        Task<IEnumerable<WallMemberDto>> GetWallMembersAsync(int wallId, UserAndOrganizationDTO userOrg);
+        Task<IEnumerable<WallMemberDto>> GetWallMembersAsync(int wallId, UserAndOrganizationDto userOrg);
 
-        Task<WallDto> GetWallAsync(int wallId, UserAndOrganizationDTO userOrg);
+        Task<WallDto> GetWallAsync(int wallId, UserAndOrganizationDto userOrg);
 
-        Task<WallDto> GetWallDetailsAsync(int wallId, UserAndOrganizationDTO userOrg);
+        Task<WallDto> GetWallDetailsAsync(int wallId, UserAndOrganizationDto userOrg);
 
-        Task<IEnumerable<WallDto>> GetWallsListAsync(UserAndOrganizationDTO userOrg, WallsListFilter filter);
+        Task<IEnumerable<WallDto>> GetWallsListAsync(UserAndOrganizationDto userOrg, WallsListFilter filter);
 
-        Task<PostDTO> GetWallPostAsync(UserAndOrganizationDTO userAndOrg, int postId);
+        Task<PostDto> GetWallPostAsync(UserAndOrganizationDto userAndOrg, int postId);
 
-        Task DeleteWallAsync(int wallId, UserAndOrganizationDTO userOrg, WallType type);
+        Task DeleteWallAsync(int wallId, UserAndOrganizationDto userOrg, WallType type);
 
         Task<int> CreateNewWallAsync(CreateWallDto newWall);
 
-        Task<IEnumerable<string>> GetWallMembersIdsAsync(int wallId, UserAndOrganizationDTO userOrg);
+        Task<IEnumerable<string>> GetWallMembersIdsAsync(int wallId, UserAndOrganizationDto userOrg);
 
-        Task<IEnumerable<PostDTO>> GetWallPostsAsync(int pageNumber, int pageSize, UserAndOrganizationDTO userOrg, int? wallId);
+        Task<IEnumerable<PostDto>> GetWallPostsAsync(int pageNumber, int pageSize, UserAndOrganizationDto userOrg, int? wallId);
 
-        Task<IEnumerable<PostDTO>> SearchWallAsync(string searchString, UserAndOrganizationDTO userAndOrg, int pageNumber, int pageSize);
+        Task<IEnumerable<PostDto>> SearchWallAsync(string searchString, UserAndOrganizationDto userAndOrg, int pageNumber, int pageSize);
 
-        Task RemoveModeratorAsync(int wallId, string responsibleUserId, UserAndOrganizationDTO userAndOrg);
+        Task RemoveModeratorAsync(int wallId, string responsibleUserId, UserAndOrganizationDto userAndOrg);
 
-        Task AddModeratorAsync(int wallId, string responsibleUserId, UserAndOrganizationDTO userId);
+        Task AddModeratorAsync(int wallId, string responsibleUserId, UserAndOrganizationDto userId);
 
-        Task<IEnumerable<PostDTO>> GetAllPostsAsync(int page, int defaultPageSize, UserAndOrganizationDTO userAndOrg, int wallsType);
+        Task<IEnumerable<PostDto>> GetAllPostsAsync(int page, int defaultPageSize, UserAndOrganizationDto userAndOrg, int wallsType);
 
         Task AddMemberToWallsAsync(string userId, List<int> wallIds);
 

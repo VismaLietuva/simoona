@@ -21,7 +21,7 @@ namespace Shrooms.Domain.Services.RefreshTokens
             _refreshTokensDbSet = uow.GetDbSet<RefreshToken>();
         }
 
-        public async Task AddNewTokenAsync(RefreshTokenDTO tokenDto)
+        public async Task AddNewTokenAsync(RefreshTokenDto tokenDto)
         {
             var timestamp = DateTime.UtcNow;
             var newToken = new RefreshToken
@@ -49,7 +49,7 @@ namespace Shrooms.Domain.Services.RefreshTokens
             return refreshToken;
         }
 
-        public async Task RemoveTokenBySubjectAsync(UserAndOrganizationDTO userOrg)
+        public async Task RemoveTokenBySubjectAsync(UserAndOrganizationDto userOrg)
         {
             await RemoveTokenAsync(x =>
                 x.Subject == userOrg.UserId &&

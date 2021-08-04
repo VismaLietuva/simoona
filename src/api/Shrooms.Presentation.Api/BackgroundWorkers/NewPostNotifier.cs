@@ -27,7 +27,7 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
             _mapper = mapper;
         }
 
-        public async Task NotifyAsync(NewlyCreatedPostDTO createdPost, UserAndOrganizationHubDto userAndOrganizationHubDto)
+        public async Task NotifyAsync(NewlyCreatedPostDto createdPost, UserAndOrganizationHubDto userAndOrganizationHubDto)
         {
             await _postNotificationService.NotifyAboutNewPostAsync(createdPost);
 

@@ -16,15 +16,15 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<NewlyCreatedPostDTO, WallPostViewModel>();
-            CreateMap<NewPostDTO, WallPostViewModel>();
-            CreateMap<PostDTO, WallPostViewModel>();
+            CreateMap<NewlyCreatedPostDto, WallPostViewModel>();
+            CreateMap<NewPostDto, WallPostViewModel>();
+            CreateMap<PostDto, WallPostViewModel>();
         }
 
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<CreateWallPostViewModel, NewPostDTO>();
-            CreateMap<EditPostViewModel, EditPostDTO>();
+            CreateMap<CreateWallPostViewModel, NewPostDto>();
+            CreateMap<EditPostViewModel, EditPostDto>();
         }
     }
 }

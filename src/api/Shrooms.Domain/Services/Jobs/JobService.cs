@@ -24,11 +24,11 @@ namespace Shrooms.Domain.Services.Jobs
             _jobTypesDbSet = uow.GetDbSet<JobPosition>();
         }
 
-        public async Task<JobTypeDTO> GetJobTypeAsync(int id, UserAndOrganizationDTO userOrg)
+        public async Task<JobTypeDto> GetJobTypeAsync(int id, UserAndOrganizationDto userOrg)
         {
             var type = await _jobTypesDbSet
                 .Where(t => t.OrganizationId == userOrg.OrganizationId && t.Id == id)
-                .Select(MapJobTypesToDTO())
+                .Select(MapJobTypesToDto())
                 .FirstOrDefaultAsync();
 
             if (type == null)
@@ -39,20 +39,20 @@ namespace Shrooms.Domain.Services.Jobs
             return type;
         }
 
-        public async Task<IEnumerable<JobTypeDTO>> GetJobTypesAsync(UserAndOrganizationDTO userAndOrg)
+        public async Task<IEnumerable<JobTypeDto>> GetJobTypesAsync(UserAndOrganizationDto userAndOrg)
         {
-            var jobTypesDTO = await _jobTypesDbSet
+            var jobTypes = await _jobTypesDbSet
                 .Where(t => t.OrganizationId == userAndOrg.OrganizationId)
-                .Select(MapJobTypesToDTO())
+                .Select(MapJobTypesToDto())
                 .ToListAsync();
 
-            return jobTypesDTO;
+            return jobTypes;
         }
 
-        public async Task CreateJobTypeAsync(JobTypeDTO jobTypeDTO)
+        public async Task CreateJobTypeAsync(JobTypeDto jobType)
         {
             var alreadyExists = await _jobTypesDbSet
-                .AnyAsync(t => t.Title == jobTypeDTO.Title && t.OrganizationId == jobTypeDTO.OrganizationId);
+                .AnyAsync(t => t.Title == jobType.Title && t.OrganizationId == jobType.OrganizationId);
 
             if (alreadyExists)
             {
@@ -61,17 +61,17 @@ namespace Shrooms.Domain.Services.Jobs
 
             var newType = new JobPosition
             {
-                Title = jobTypeDTO.Title,
-                CreatedBy = jobTypeDTO.UserId,
-                OrganizationId = jobTypeDTO.OrganizationId
+                Title = jobType.Title,
+                CreatedBy = jobType.UserId,
+                OrganizationId = jobType.OrganizationId
             };
 
             _jobTypesDbSet.Add(newType);
 
-            await _uow.SaveChangesAsync(jobTypeDTO.UserId);
+            await _uow.SaveChangesAsync(jobType.UserId);
         }
 
-        public async Task RemoveJobTypeAsync(int id, UserAndOrganizationDTO userOrg)
+        public async Task RemoveJobTypeAsync(int id, UserAndOrganizationDto userOrg)
         {
             var type = await _jobTypesDbSet
                 .Where(t => t.OrganizationId == userOrg.OrganizationId && t.Id == id)
@@ -87,10 +87,10 @@ namespace Shrooms.Domain.Services.Jobs
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
-        public async Task UpdateJobTypeAsync(JobTypeDTO jobTypeDTO)
+        public async Task UpdateJobTypeAsync(JobTypeDto jobType)
         {
             var alreadyExists = await _jobTypesDbSet
-                .AnyAsync(t => t.Title == jobTypeDTO.Title && t.OrganizationId == jobTypeDTO.OrganizationId && t.Id != jobTypeDTO.Id);
+                .AnyAsync(t => t.Title == jobType.Title && t.OrganizationId == jobType.OrganizationId && t.Id != jobType.Id);
 
             if (alreadyExists)
             {
@@ -98,7 +98,7 @@ namespace Shrooms.Domain.Services.Jobs
             }
 
             var type = await _jobTypesDbSet
-                .Where(t => t.OrganizationId == jobTypeDTO.OrganizationId && t.Id == jobTypeDTO.Id)
+                .Where(t => t.OrganizationId == jobType.OrganizationId && t.Id == jobType.Id)
                 .FirstOrDefaultAsync();
 
             if (type == null)
@@ -106,14 +106,14 @@ namespace Shrooms.Domain.Services.Jobs
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Type not found");
             }
 
-            type.Title = jobTypeDTO.Title;
+            type.Title = jobType.Title;
 
-            await _uow.SaveChangesAsync(jobTypeDTO.UserId);
+            await _uow.SaveChangesAsync(jobType.UserId);
         }
 
-        private Expression<Func<JobPosition, JobTypeDTO>> MapJobTypesToDTO()
+        private static Expression<Func<JobPosition, JobTypeDto>> MapJobTypesToDto()
         {
-            return jobType => new JobTypeDTO
+            return jobType => new JobTypeDto
             {
                 Id = jobType.Id,
                 Title = jobType.Title

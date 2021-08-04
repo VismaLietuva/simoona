@@ -37,7 +37,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             _postWatchers = uow.GetDbSet<PostWatcher>();
         }
 
-        public async Task ToggleLikeAsync(int commentId, UserAndOrganizationDTO userOrg)
+        public async Task ToggleLikeAsync(int commentId, UserAndOrganizationDto userOrg)
         {
             var comment = await _commentsDbSet
                 .Include(x => x.Post.Wall)
@@ -62,7 +62,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
-        public async Task<CommentCreatedDTO> CreateCommentAsync(NewCommentDTO commentDto)
+        public async Task<CommentCreatedDto> CreateCommentAsync(NewCommentDto commentDto)
         {
             var post = await _postsDbSet
                 .Include(x => x.Wall)
@@ -100,7 +100,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
 
             await _uow.SaveChangesAsync(commentDto.UserId);
 
-            return new CommentCreatedDTO
+            return new CommentCreatedDto
             {
                 WallId = post.WallId,
                 CommentId = comment.Id,
@@ -112,7 +112,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             };
         }
 
-        public async Task EditCommentAsync(EditCommentDTO commentDto)
+        public async Task EditCommentAsync(EditCommentDto commentDto)
         {
             var comment = await _commentsDbSet
                 .Include(x => x.Post.Wall)
@@ -140,7 +140,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             await _uow.SaveChangesAsync(commentDto.UserId);
         }
 
-        public async Task DeleteCommentAsync(int commentId, UserAndOrganizationDTO userOrg)
+        public async Task DeleteCommentAsync(int commentId, UserAndOrganizationDto userOrg)
         {
             var comment = await _commentsDbSet
                 .Include(x => x.Post.Wall)
@@ -173,7 +173,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             return (await _commentsDbSet.FirstOrDefaultAsync(x => x.Id == commentId))?.MessageBody;
         }
 
-        public async Task HideCommentAsync(int commentId, UserAndOrganizationDTO userOrg)
+        public async Task HideCommentAsync(int commentId, UserAndOrganizationDto userOrg)
         {
             var comment = await _commentsDbSet
                 .Include(x => x.Post.Wall)

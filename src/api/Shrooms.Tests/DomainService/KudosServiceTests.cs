@@ -81,7 +81,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Return_All_Kudos_Logs()
         {
-            var filter = new KudosLogsFilterDTO
+            var filter = new KudosLogsFilterDto
             {
                 OrganizationId = 2,
                 Page = 1,
@@ -99,7 +99,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Return_Kudos_Logs_Filtered_By_Status_Approved()
         {
-            var filter = new KudosLogsFilterDTO
+            var filter = new KudosLogsFilterDto
             {
                 OrganizationId = 2,
                 Page = 1,
@@ -118,7 +118,7 @@ namespace Shrooms.Tests.DomainService
         public async Task Should_Return_Return_All_Kudos_Logs_With_Organization_Filter()
         {
             MockKudosLogsForOrganizationTest();
-            var filter = new KudosLogsFilterDTO
+            var filter = new KudosLogsFilterDto
             {
                 OrganizationId = 2,
                 Page = 1,
@@ -154,7 +154,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Return_Last_Five_Approved_Kudos_Logs()
         {
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2
             };
@@ -168,7 +168,7 @@ namespace Shrooms.Tests.DomainService
         public async Task Should_Return_Kudos_Logs_For_Wall_With_Organization_Filter()
         {
             MockKudosLogsForOrganizationTest();
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 1,
                 UserId = "UserId"
@@ -230,7 +230,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Return_All_Kudos_Types()
         {
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 UserId = "testUserId2"
             };
@@ -242,7 +242,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Return_Basic_Kudos_Types()
         {
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 UserId = "testUserId"
             };
@@ -254,7 +254,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Return_Active_Kudos_Types()
         {
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 UserId = "testUserId"
             };
@@ -272,7 +272,7 @@ namespace Shrooms.Tests.DomainService
         {
             MockKudosLogsForUpdate();
 
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 1,
                 UserId = "UserId"
@@ -286,7 +286,7 @@ namespace Shrooms.Tests.DomainService
         {
             MockKudosLogsForUpdate();
 
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "UserId2"
@@ -300,7 +300,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Return_If_Rejection_Doesnt_Update_Status()
         {
-            var kudosRejectDTO = new KudosRejectDTO
+            var kudosRejectDto = new KudosRejectDto
             {
                 OrganizationId = 2,
                 UserId = "testUserId",
@@ -308,7 +308,7 @@ namespace Shrooms.Tests.DomainService
                 KudosRejectionMessage = "testMessage"
             };
 
-            await _kudosService.RejectKudosAsync(kudosRejectDTO);
+            await _kudosService.RejectKudosAsync(kudosRejectDto);
 
             var log = await _kudosLogsDbSet.FirstAsync(x => x.Id == 1);
             Assert.AreEqual(KudosStatus.Rejected, log.Status);
@@ -320,7 +320,7 @@ namespace Shrooms.Tests.DomainService
         {
             MockKudosLogsForUpdate();
 
-            var kudosRejectDTO = new KudosRejectDTO
+            var kudosRejectDto = new KudosRejectDto
             {
                 OrganizationId = 1,
                 UserId = "testUserId",
@@ -328,7 +328,7 @@ namespace Shrooms.Tests.DomainService
                 KudosRejectionMessage = "testMessage"
             };
 
-            Assert.ThrowsAsync<InvalidOperationException>(async () => await _kudosService.RejectKudosAsync(kudosRejectDTO));
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await _kudosService.RejectKudosAsync(kudosRejectDto));
         }
 
         [Test]
@@ -340,7 +340,7 @@ namespace Shrooms.Tests.DomainService
                 EmploymentDate = DateTime.UtcNow.AddDays(-10)
             };
 
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 1,
                 UserId = "userId"
@@ -362,7 +362,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public void Should_Return_If_User_Has_No_Permission()
         {
-            var kudosLog = new AddKudosLogDTO
+            var kudosLog = new AddKudosLogDto
             {
                 OrganizationId = 2,
                 PointsTypeId = 1,
@@ -380,7 +380,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Return_If_Kudos_Logs_Has_Not_Been_Saved_1()
         {
-            var kudosLog = new AddKudosLogDTO
+            var kudosLog = new AddKudosLogDto
             {
                 OrganizationId = 2,
                 PointsTypeId = 5,
@@ -401,7 +401,7 @@ namespace Shrooms.Tests.DomainService
         {
             // Arrange
             const int explicitAmount = 1234564;
-            var kudosLog = new AddKudosLogDTO
+            var kudosLog = new AddKudosLogDto
             {
                 OrganizationId = 2,
                 PointsTypeId = 2,
@@ -427,7 +427,7 @@ namespace Shrooms.Tests.DomainService
                 new HttpRequest("", "http://shrooms", ""),
                 new HttpResponse(new StringWriter()));
 
-            var kudosLog = new AddKudosLogDTO
+            var kudosLog = new AddKudosLogDto
             {
                 OrganizationId = 2,
                 PointsTypeId = 2,
@@ -450,7 +450,7 @@ namespace Shrooms.Tests.DomainService
             _kudosTypesDbSet.SetDbSetDataForAsync(MockKudosTypes());
             _kudosLogsDbSet.SetDbSetDataForAsync(MockKudosLogs());
 
-            var kudosLog = new AddKudosLogDTO
+            var kudosLog = new AddKudosLogDto
             {
                 OrganizationId = 2,
                 PointsTypeId = 2,
@@ -467,7 +467,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public void Should_Return_When_User_Sends_Kudos_To_Himself()
         {
-            var kudosLog = new AddKudosLogDTO
+            var kudosLog = new AddKudosLogDto
             {
                 OrganizationId = 2,
                 PointsTypeId = 2,
@@ -486,7 +486,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public void Should_Return_If_User_Has_No_Available_Monthly_Kudos()
         {
-            var kudosLog = new AddKudosLogDTO
+            var kudosLog = new AddKudosLogDto
             {
                 OrganizationId = 2,
                 PointsTypeId = 2,
@@ -504,7 +504,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Return_If_Kudos_Logs_Has_Not_Been_Saved_3()
         {
-            var kudosLog = new AddKudosLogDTO
+            var kudosLog = new AddKudosLogDto
             {
                 OrganizationId = 2,
                 PointsTypeId = 3,
@@ -566,7 +566,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task GetKudosTypeSend_FromKudosTypes_ReturnsOnlySendType()
         {
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 UserId = "testUserId2"
             };
@@ -591,8 +591,8 @@ namespace Shrooms.Tests.DomainService
         {
             var permissionService = Substitute.For<IPermissionService>();
 
-            permissionService.UserHasPermissionAsync(Arg.Is<UserAndOrganizationDTO>(x => x.UserId == "testUserId"), Arg.Any<string>()).Returns(false);
-            permissionService.UserHasPermissionAsync(Arg.Is<UserAndOrganizationDTO>(x => x.UserId == "testUserId2"), Arg.Any<string>()).Returns(true);
+            permissionService.UserHasPermissionAsync(Arg.Is<UserAndOrganizationDto>(x => x.UserId == "testUserId"), Arg.Any<string>()).Returns(false);
+            permissionService.UserHasPermissionAsync(Arg.Is<UserAndOrganizationDto>(x => x.UserId == "testUserId2"), Arg.Any<string>()).Returns(true);
             return permissionService;
         }
 

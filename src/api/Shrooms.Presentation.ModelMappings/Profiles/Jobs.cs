@@ -14,14 +14,14 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<JobTypeDTO, JobTypeViewModel>();
-            CreateMap<JobTypeDTO, NewJobTypeViewModel>();
+            CreateMap<JobTypeDto, JobTypeViewModel>();
+            CreateMap<JobTypeDto, NewJobTypeViewModel>();
         }
 
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<JobTypeViewModel, JobTypeDTO>();
-            CreateMap<NewJobTypeViewModel, JobTypeDTO>();
+            CreateMap<JobTypeViewModel, JobTypeDto>();
+            CreateMap<NewJobTypeViewModel, JobTypeDto>();
         }
     }
 }

@@ -66,7 +66,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             _commentsDbSet = uow.GetDbSet<Comment>();
         }
 
-        public async Task SendEmailNotificationAsync(CommentCreatedDTO commentDto)
+        public async Task SendEmailNotificationAsync(CommentCreatedDto commentDto)
         {
             var commentCreator = await _userService.GetApplicationUserAsync(commentDto.CommentCreator);
             var organization = await _organizationService.GetOrganizationByIdAsync(commentCreator.OrganizationId);
@@ -87,7 +87,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             }
         }
 
-        private async Task SendMentionEmailsAsync(CommentCreatedDTO commentDto, IList<ApplicationUser> mentionedUsers, ApplicationUser commentCreator, Organization organization)
+        private async Task SendMentionEmailsAsync(CommentCreatedDto commentDto, IList<ApplicationUser> mentionedUsers, ApplicationUser commentCreator, Organization organization)
         {
             var comment = await _commentService.GetCommentBodyAsync(commentDto.CommentId);
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
@@ -123,7 +123,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             }
         }
 
-        private async Task SendPostWatcherEmailsAsync(CommentCreatedDTO commentDto, IList<string> emails, ApplicationUser commentCreator, Organization organization)
+        private async Task SendPostWatcherEmailsAsync(CommentCreatedDto commentDto, IList<string> emails, ApplicationUser commentCreator, Organization organization)
         {
             var comment = await LoadCommentAsync(commentDto.CommentId);
             var postLink = await GetPostLinkAsync(commentDto.WallType, commentDto.WallId, organization.ShortName, commentDto.PostId);

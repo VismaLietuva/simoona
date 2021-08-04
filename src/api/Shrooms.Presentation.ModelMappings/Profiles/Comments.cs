@@ -25,13 +25,13 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<EditCommentViewModel, EditCommentDTO>()
+            CreateMap<EditCommentViewModel, EditCommentDto>()
                 .IgnoreUserOrgDto();
-            CreateMap<NewCommentViewModel, NewCommentDTO>()
+            CreateMap<NewCommentViewModel, NewCommentDto>()
                 .IgnoreUserOrgDto();
-            CreateMap<CommentPostViewModel, EditCommentDTO>()
+            CreateMap<CommentPostViewModel, EditCommentDto>()
                 .IgnoreUserOrgDto();
-            CreateMap<CommentPostViewModel, NewCommentDTO>()
+            CreateMap<CommentPostViewModel, NewCommentDto>()
                 .IgnoreUserOrgDto();
         }
 

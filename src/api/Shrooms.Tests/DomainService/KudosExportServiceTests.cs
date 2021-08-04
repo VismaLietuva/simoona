@@ -48,7 +48,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Kudos_Should_Return_Excel_File()
         {
-            var filter = new KudosLogsFilterDTO
+            var filter = new KudosLogsFilterDto
             {
                 OrganizationId = 2,
                 SearchUserId = null,
@@ -81,7 +81,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Kudos_Should_Return_Filtered_Excel_File()
         {
-            var filter = new KudosLogsFilterDTO
+            var filter = new KudosLogsFilterDto
             {
                 OrganizationId = 2,
                 SearchUserId = "testUserId3",

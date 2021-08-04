@@ -6,7 +6,7 @@ namespace Shrooms.Domain.ServiceValidators.Validators.KudosBaskets
     public interface IKudosBasketValidator
     {
         void CheckIfBasketAlreadyExists(bool basketIsActive);
-        void CheckIfThereIsNoBasketYet(KudosBasketDTO basket);
+        void CheckIfThereIsNoBasketYet(KudosBasketDto basket);
         void CheckIfUserHasEnoughKudos(decimal remainingKudos, decimal donationAmount);
         void CheckIfBasketIsActive(KudosBasket basket);
     }

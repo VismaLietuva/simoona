@@ -2,7 +2,7 @@
 
 namespace Shrooms.Contracts.DataTransferObjects.Wall
 {
-    public class UpdateWallDto : UserAndOrganizationDTO
+    public class UpdateWallDto : UserAndOrganizationDto
     {
         public int Id { get; set; }
 

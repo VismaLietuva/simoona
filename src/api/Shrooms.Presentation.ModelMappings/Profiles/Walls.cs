@@ -26,7 +26,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
         private void CreateDtoToViewModelMappings()
         {
             CreateMap<WallDto, WallListViewModel>();
-            CreateMap<UserWallDTO, UserWallViewModel>();
+            CreateMap<UserWallDto, UserWallViewModel>();
             CreateMap<ModeratorDto, ModeratorViewModel>();
             CreateMap<WallMemberDto, WallMemberViewModel>();
         }
@@ -46,7 +46,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
         private void CreateEntitiesToDtoMappings()
         {
-            CreateMap<Post, PostDTO>()
+            CreateMap<Post, PostDto>()
                 .ForMember(m => m.Author, opt => opt.Ignore())
                 .ForMember(m => m.Likes, opt => opt.Ignore())
                 .ForMember(m => m.IsLiked, opt => opt.Ignore())

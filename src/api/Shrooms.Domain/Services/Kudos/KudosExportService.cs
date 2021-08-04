@@ -26,7 +26,7 @@ namespace Shrooms.Domain.Services.Kudos
             _excelBuilder = excelBuilder;
         }
 
-        public async Task<byte[]> ExportToExcelAsync(KudosLogsFilterDTO filter)
+        public async Task<byte[]> ExportToExcelAsync(KudosLogsFilterDto filter)
         {
             var kudos = await _kudosLogsDbSet
                 .Include(log => log.Employee)

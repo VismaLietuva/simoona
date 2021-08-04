@@ -159,7 +159,7 @@ namespace Shrooms.Domain.Services.Wall
             await _uow.SaveChangesAsync(updateWallDto.UserId);
         }
 
-        public async Task<WallDto> GetWallAsync(int wallId, UserAndOrganizationDTO userOrg)
+        public async Task<WallDto> GetWallAsync(int wallId, UserAndOrganizationDto userOrg)
         {
             var wall = await _wallsDbSet
                 .Where(x => x.Id == wallId && x.OrganizationId == userOrg.OrganizationId)
@@ -176,7 +176,7 @@ namespace Shrooms.Domain.Services.Wall
             return wall;
         }
 
-        public async Task<WallDto> GetWallDetailsAsync(int wallId, UserAndOrganizationDTO userOrg)
+        public async Task<WallDto> GetWallDetailsAsync(int wallId, UserAndOrganizationDto userOrg)
         {
             var wall = await _wallsDbSet
                 .Include(w => w.Members)
@@ -205,7 +205,7 @@ namespace Shrooms.Domain.Services.Wall
             return wall;
         }
 
-        public async Task<IEnumerable<WallDto>> GetWallsListAsync(UserAndOrganizationDTO userOrg, WallsListFilter filter)
+        public async Task<IEnumerable<WallDto>> GetWallsListAsync(UserAndOrganizationDto userOrg, WallsListFilter filter)
         {
             var walls = filter == WallsListFilter.Followed ? await GetUserFollowedWallsAsync(userOrg) : await GetAllOrNotFollowedWallsAsync(userOrg, filter);
 
@@ -214,17 +214,17 @@ namespace Shrooms.Domain.Services.Wall
             return walls;
         }
 
-        public async Task<IEnumerable<PostDTO>> GetWallPostsAsync(int pageNumber, int pageSize, UserAndOrganizationDTO userOrg, int? wallId)
+        public async Task<IEnumerable<PostDto>> GetWallPostsAsync(int pageNumber, int pageSize, UserAndOrganizationDto userOrg, int? wallId)
         {
             return await QueryForPostsAsync(userOrg, pageNumber, pageSize, wallId, null, null);
         }
 
-        public async Task<IEnumerable<PostDTO>> GetAllPostsAsync(int pageNumber, int pageSize, UserAndOrganizationDTO userOrg, int wallsType)
+        public async Task<IEnumerable<PostDto>> GetAllPostsAsync(int pageNumber, int pageSize, UserAndOrganizationDto userOrg, int wallsType)
         {
             return await QueryForPostsAsync(userOrg, pageNumber, pageSize, null, null, wallsType);
         }
 
-        public async Task<PostDTO> GetWallPostAsync(UserAndOrganizationDTO userOrg, int postId)
+        public async Task<PostDto> GetWallPostAsync(UserAndOrganizationDto userOrg, int postId)
         {
             var post = await _postsDbSet
                 .Include(p => p.Wall)
@@ -248,7 +248,7 @@ namespace Shrooms.Domain.Services.Wall
             return posts.FirstOrDefault();
         }
 
-        public async Task<IEnumerable<PostDTO>> SearchWallAsync(string searchString, UserAndOrganizationDTO userOrg, int pageNumber, int pageSize)
+        public async Task<IEnumerable<PostDto>> SearchWallAsync(string searchString, UserAndOrganizationDto userOrg, int pageNumber, int pageSize)
         {
             Expression<Func<Post, bool>> exp = post =>
                 post.MessageBody.Contains(searchString) ||
@@ -259,7 +259,7 @@ namespace Shrooms.Domain.Services.Wall
             return await QueryForPostsAsync(userOrg, pageNumber, pageSize, null, exp, null);
         }
 
-        public async Task<IEnumerable<WallMemberDto>> GetWallMembersAsync(int wallId, UserAndOrganizationDTO userOrg)
+        public async Task<IEnumerable<WallMemberDto>> GetWallMembersAsync(int wallId, UserAndOrganizationDto userOrg)
         {
             var wallExists = await _wallsDbSet
                 .AnyAsync(wall =>
@@ -292,7 +292,7 @@ namespace Shrooms.Domain.Services.Wall
             return wallMembers;
         }
 
-        public async Task<IEnumerable<string>> GetWallMembersIdsAsync(int wallId, UserAndOrganizationDTO userOrg)
+        public async Task<IEnumerable<string>> GetWallMembersIdsAsync(int wallId, UserAndOrganizationDto userOrg)
         {
             var wallExists = await _wallsDbSet.AnyAsync(wall =>
                     wall.Id == wallId &&
@@ -341,7 +341,7 @@ namespace Shrooms.Domain.Services.Wall
                 if (attendeeId != actorId)
                 {
                     var isModerator = wall.Moderators.Any(m => m.UserId == actorId);
-                    var isWallAdmin = await _permissionService.UserHasPermissionAsync(new UserAndOrganizationDTO { OrganizationId = tenantId, UserId = actorId }, AdministrationPermissions.Wall);
+                    var isWallAdmin = await _permissionService.UserHasPermissionAsync(new UserAndOrganizationDto { OrganizationId = tenantId, UserId = actorId }, AdministrationPermissions.Wall);
 
                     if (isModerator || isWallAdmin)
                     {
@@ -390,7 +390,7 @@ namespace Shrooms.Domain.Services.Wall
             }
         }
 
-        public async Task DeleteWallAsync(int wallId, UserAndOrganizationDTO userOrg, WallType type)
+        public async Task DeleteWallAsync(int wallId, UserAndOrganizationDto userOrg, WallType type)
         {
             var wall = await _wallsDbSet
                 .Include(x => x.Moderators)
@@ -418,7 +418,7 @@ namespace Shrooms.Domain.Services.Wall
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
-        public async Task RemoveModeratorAsync(int wallId, string responsibleUserId, UserAndOrganizationDTO userAndOrg)
+        public async Task RemoveModeratorAsync(int wallId, string responsibleUserId, UserAndOrganizationDto userAndOrg)
         {
             var wall = await _wallsDbSet
                 .Include(x => x.Moderators)
@@ -434,7 +434,7 @@ namespace Shrooms.Domain.Services.Wall
             await _uow.SaveChangesAsync(userAndOrg.UserId);
         }
 
-        public async Task AddModeratorAsync(int wallId, string responsibleUserId, UserAndOrganizationDTO userId)
+        public async Task AddModeratorAsync(int wallId, string responsibleUserId, UserAndOrganizationDto userId)
         {
             var wall = await _wallsDbSet
                 .Include(x => x.Moderators)
@@ -608,7 +608,7 @@ namespace Shrooms.Domain.Services.Wall
             _wallUsersDbSet.Remove(member);
         }
 
-        private async Task<IEnumerable<PostDTO>> QueryForPostsAsync(UserAndOrganizationDTO userOrg, int pageNumber, int pageSize, int? wallId, Expression<Func<Post, bool>> filter, int? wallsType)
+        private async Task<IEnumerable<PostDto>> QueryForPostsAsync(UserAndOrganizationDto userOrg, int pageNumber, int pageSize, int? wallId, Expression<Func<Post, bool>> filter, int? wallsType)
         {
             if (filter == null)
             {
@@ -667,11 +667,11 @@ namespace Shrooms.Domain.Services.Wall
             return await _usersDbSet.Where(user => userIds.Contains(user.Id)).ToListAsync();
         }
 
-        private IEnumerable<PostDTO> MapPostsWithChildEntitiesToDto(string userId, List<Post> posts, List<ApplicationUser> users, List<WallModerator> moderators, HashSet<int> watchedPosts)
+        private IEnumerable<PostDto> MapPostsWithChildEntitiesToDto(string userId, List<Post> posts, List<ApplicationUser> users, List<WallModerator> moderators, HashSet<int> watchedPosts)
         {
             foreach (var post in posts)
             {
-                var postDto = _mapper.Map<PostDTO>(post);
+                var postDto = _mapper.Map<PostDto>(post);
 
                 if (postDto.IsHidden)
                 {
@@ -736,7 +736,7 @@ namespace Shrooms.Domain.Services.Wall
                 .ToList();
         }
 
-        private bool WallIsValid(UserAndOrganizationDTO userOrg, int wallId)
+        private bool WallIsValid(UserAndOrganizationDto userOrg, int wallId)
         {
             var wallExists = _wallsDbSet.Any(w => w.Id == wallId && w.OrganizationId == userOrg.OrganizationId);
             if (!wallExists)
@@ -747,7 +747,7 @@ namespace Shrooms.Domain.Services.Wall
             return true;
         }
 
-        private async Task<IList<WallDto>> GetAllOrNotFollowedWallsAsync(UserAndOrganizationDTO userOrg, WallsListFilter filter)
+        private async Task<IList<WallDto>> GetAllOrNotFollowedWallsAsync(UserAndOrganizationDto userOrg, WallsListFilter filter)
         {
             var wallFilters = new Dictionary<WallsListFilter, Expression<Func<MultiwallWall, bool>>>
             {
@@ -777,7 +777,7 @@ namespace Shrooms.Domain.Services.Wall
             return walls;
         }
 
-        private async Task<IList<WallDto>> GetUserFollowedWallsAsync(UserAndOrganizationDTO userOrg)
+        private async Task<IList<WallDto>> GetUserFollowedWallsAsync(UserAndOrganizationDto userOrg)
         {
             var followedWalls = await _wallsDbSet
                 .Include(w => w.Members)

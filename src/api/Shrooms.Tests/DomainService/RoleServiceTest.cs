@@ -46,7 +46,7 @@ namespace Shrooms.Tests.DomainService
         {
             MockRolesForAutocomplete();
 
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2
             };
@@ -63,7 +63,7 @@ namespace Shrooms.Tests.DomainService
         {
             MockRoles();
 
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 1
             };
@@ -135,31 +135,31 @@ namespace Shrooms.Tests.DomainService
             }.AsQueryable();
 
             _permissionService.GetGroupNamesAsync(1).Returns(
-                new List<PermissionGroupDTO>
+                new List<PermissionGroupDto>
                 {
-                    new PermissionGroupDTO
+                    new PermissionGroupDto
                     {
                         Name = "permission1"
                     },
-                    new PermissionGroupDTO
+                    new PermissionGroupDto
                     {
                         Name = "permission2"
                     },
-                    new PermissionGroupDTO
+                    new PermissionGroupDto
                     {
                         Name = "permission3"
                     }
                 });
 
             _permissionService.GetRolePermissionsAsync("roleId1", 1).Returns(
-                new List<PermissionDTO>
+                new List<PermissionDto>
                 {
-                    new PermissionDTO
+                    new PermissionDto
                     {
                         Name = "PERMISSION1_BASIC",
                         Scope = PermissionScopes.Basic
                     },
-                    new PermissionDTO
+                    new PermissionDto
                     {
                         Name = "PERMISSION2_ADMIN",
                         Scope = PermissionScopes.Administration

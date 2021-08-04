@@ -137,7 +137,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Return_That_User_Is_Permitted()
         {
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 1,
                 UserId = "userId"
@@ -153,7 +153,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Return_That_User_Is_Not_Permitted()
         {
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "userId"

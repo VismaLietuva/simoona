@@ -48,20 +48,20 @@ namespace Shrooms.Tests.DomainService
         public async Task Should_Add_Update_Delete_Links_Successfully()
         {
             MockExternalLinksForCrud();
-            var updateDto = new AddEditDeleteExternalLinkDTO
+            var updateDto = new AddEditDeleteExternalLinkDto
             {
                 LinksToDelete = new[] { 1, 2 },
-                LinksToCreate = new List<NewExternalLinkDTO>
+                LinksToCreate = new List<NewExternalLinkDto>
                 {
-                    new NewExternalLinkDTO
+                    new NewExternalLinkDto
                     {
                         Name = "newLink1",
                         Url = "newLink2"
                     }
                 },
-                LinksToUpdate = new List<ExternalLinkDTO>
+                LinksToUpdate = new List<ExternalLinkDto>
                 {
-                    new ExternalLinkDTO
+                    new ExternalLinkDto
                     {
                         Id = 3,
                         Name = "modifiedLink3",
@@ -86,18 +86,18 @@ namespace Shrooms.Tests.DomainService
         public void Should_Throw_If_Trying_To_Add_Duplicate_Link()
         {
             MockExternalLinks();
-            var updateDto = new AddEditDeleteExternalLinkDTO
+            var updateDto = new AddEditDeleteExternalLinkDto
             {
                 LinksToDelete = new[] { 1, 2 },
-                LinksToCreate = new List<NewExternalLinkDTO>
+                LinksToCreate = new List<NewExternalLinkDto>
                 {
-                    new NewExternalLinkDTO
+                    new NewExternalLinkDto
                     {
                         Name = "Test1",
                         Url = "UrlTest1"
                     }
                 },
-                LinksToUpdate = new List<ExternalLinkDTO>(),
+                LinksToUpdate = new List<ExternalLinkDto>(),
                 OrganizationId = 2,
                 UserId = "testUser"
             };
@@ -110,13 +110,13 @@ namespace Shrooms.Tests.DomainService
         public void Should_Throw_If_Trying_To_Update_To_Duplicate_Link()
         {
             MockExternalLinks();
-            var updateDto = new AddEditDeleteExternalLinkDTO
+            var updateDto = new AddEditDeleteExternalLinkDto
             {
                 LinksToDelete = new[] { 1, 2 },
-                LinksToCreate = new List<NewExternalLinkDTO>(),
-                LinksToUpdate = new List<ExternalLinkDTO>
+                LinksToCreate = new List<NewExternalLinkDto>(),
+                LinksToUpdate = new List<ExternalLinkDto>
                 {
-                    new ExternalLinkDTO
+                    new ExternalLinkDto
                     {
                         Id = 3,
                         Name = "Test1",

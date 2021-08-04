@@ -11,16 +11,16 @@ namespace Shrooms.Domain.Services.Notifications
 {
     public interface INotificationService
     {
-        Task<IEnumerable<NotificationDto>> GetAllAsync(UserAndOrganizationDTO userOrg);
+        Task<IEnumerable<NotificationDto>> GetAllAsync(UserAndOrganizationDto userOrg);
 
-        Task MarkAsReadAsync(UserAndOrganizationDTO userOrg, IEnumerable<int> notificationIds);
+        Task MarkAsReadAsync(UserAndOrganizationDto userOrg, IEnumerable<int> notificationIds);
 
-        Task MarkAllAsReadAsync(UserAndOrganizationDTO userOrg);
+        Task MarkAllAsReadAsync(UserAndOrganizationDto userOrg);
 
-        Task<NotificationDto> CreateForPostAsync(UserAndOrganizationDTO userOrg, NewlyCreatedPostDTO post, int wallId, IEnumerable<string> membersToNotify);
+        Task<NotificationDto> CreateForPostAsync(UserAndOrganizationDto userOrg, NewlyCreatedPostDto post, int wallId, IEnumerable<string> membersToNotify);
 
-        Task<NotificationDto> CreateForCommentAsync(UserAndOrganizationDTO userOrg, CommentCreatedDTO comment, NotificationType type, IEnumerable<string> membersToNotify);
+        Task<NotificationDto> CreateForCommentAsync(UserAndOrganizationDto userOrg, CommentCreatedDto comment, NotificationType type, IEnumerable<string> membersToNotify);
 
-        Task<NotificationDto> CreateForWallAsync(UserAndOrganizationDTO userOrg, CreateWallDto wallDto, int wallId);
+        Task<NotificationDto> CreateForWallAsync(UserAndOrganizationDto userOrg, CreateWallDto wallDto, int wallId);
     }
 }

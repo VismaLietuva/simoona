@@ -22,6 +22,6 @@ namespace Shrooms.Domain.Services.Organizations
         Task<bool> IsOrganizationHostValidAsync(string email, string organizationName);
 
         Task<UserDto> GetManagingDirectorAsync(int organizationId);
-        Task SetManagingDirectorAsync(string userId, UserAndOrganizationDTO userAndOrganizationDTO);
+        Task SetManagingDirectorAsync(string userId, UserAndOrganizationDto userAndOrganizationDto);
     }
 }

@@ -105,7 +105,7 @@ namespace Shrooms.Presentation.Api.Controllers
             _pictureService = pictureService;
         }
 
-        private async Task<bool> HasPermissionAsync(UserAndOrganizationDTO userOrg, string permission)
+        private async Task<bool> HasPermissionAsync(UserAndOrganizationDto userOrg, string permission)
         {
             return await _permissionService.UserHasPermissionAsync(userOrg, permission);
         }
@@ -236,7 +236,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [Route("GetPaged")]
         [HttpGet, HttpPost]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public async Task<PagedViewModel<AdministrationUserDTO>> GetPaged(int page = 1,
+        public async Task<PagedViewModel<AdministrationUserDto>> GetPaged(int page = 1,
             int pageSize = WebApiConstants.DefaultPageSize,
             string s = "",
             string sort = "LastName",
@@ -245,14 +245,14 @@ namespace Shrooms.Presentation.Api.Controllers
             string includeProperties = "")
         {
             var sortQuery = string.IsNullOrEmpty(sort) ? null : $"{sort} {dir}";
-            FilterDTO[] filterModel = null;
+            FilterDto[] filterModel = null;
 
             if (!string.IsNullOrWhiteSpace(filter))
             {
-                filterModel = new JavaScriptSerializer().Deserialize<FilterDTO[]>(filter);
+                filterModel = new JavaScriptSerializer().Deserialize<FilterDto[]>(filter);
                 includeProperties += (includeProperties != string.Empty ? "," : string.Empty) + "Projects";
 
-                filterModel ??= new[] { new JavaScriptSerializer().Deserialize<FilterDTO>(filter) };
+                filterModel ??= new[] { new JavaScriptSerializer().Deserialize<FilterDto>(filter) };
             }
 
             var administrationUsersDto = await _administrationUsersService.GetAllUsersAsync(sortQuery, s, filterModel, includeProperties);
@@ -342,7 +342,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 return BadRequest();
             }
 
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = User.Identity.GetOrganizationId(),
                 UserId = User.Identity.GetUserId()

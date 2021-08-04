@@ -104,7 +104,7 @@ namespace Shrooms.Domain.Services.Organizations
             return managingDirector;
         }
 
-        public async Task SetManagingDirectorAsync(string userId, UserAndOrganizationDTO userAndOrganizationDTO)
+        public async Task SetManagingDirectorAsync(string userId, UserAndOrganizationDto userAndOrganizationDto)
         {
             if (!await _roleService.HasRoleAsync(userId, Contracts.Constants.Roles.Manager))
             {
@@ -113,7 +113,7 @@ namespace Shrooms.Domain.Services.Organizations
 
             var managingDirectors = await _usersDbSet
                 .Include(x => x.Roles)
-                .Where(x => x.OrganizationId == userAndOrganizationDTO.OrganizationId)
+                .Where(x => x.OrganizationId == userAndOrganizationDto.OrganizationId)
                 .Where(x => x.IsManagingDirector || x.Id == userId)
                 .ToListAsync();
 
@@ -126,7 +126,7 @@ namespace Shrooms.Domain.Services.Organizations
 
             newManagingDirector.IsManagingDirector = true;
 
-            await _uow.SaveChangesAsync(userAndOrganizationDTO.UserId);
+            await _uow.SaveChangesAsync(userAndOrganizationDto.UserId);
         }
 
         private static string GetHostFromEmail(string email)

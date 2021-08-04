@@ -32,7 +32,7 @@ namespace Shrooms.Presentation.Api.Filters
         {
             var permissionService = actionContext.Request.GetDependencyScope().GetService(typeof(IPermissionService)) as IPermissionService;
 
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 UserId = actionContext.Request.GetRequestContext().Principal.Identity.GetUserId(),
                 OrganizationId = actionContext.Request.GetRequestContext().Principal.Identity.GetOrganizationId()

@@ -13,7 +13,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<BirthdayDTO, BirthdayViewModel>();
+            CreateMap<BirthdayDto, BirthdayViewModel>();
         }
     }
 }

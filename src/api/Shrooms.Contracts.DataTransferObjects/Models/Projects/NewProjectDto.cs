@@ -2,7 +2,7 @@
 
 namespace Shrooms.Contracts.DataTransferObjects.Models.Projects
 {
-    public class NewProjectDto : UserAndOrganizationDTO
+    public class NewProjectDto : UserAndOrganizationDto
     {
         public string Title { get; set; }
 

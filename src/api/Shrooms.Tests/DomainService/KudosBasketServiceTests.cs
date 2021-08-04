@@ -141,7 +141,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Return_Only_One_Active_Baskets_Donations()
         {
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2
             };
@@ -153,7 +153,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Map_Basket_Logs_Correctly()
         {
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2
             };
@@ -166,7 +166,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Return_Basket_Donations_With_Correctly_Mapped_Donator()
         {
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2
             };
@@ -178,7 +178,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Return_Basket_Donations_With_Correctly_Mapped_Deleted_Donator()
         {
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2
             };
@@ -240,7 +240,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public void Should_Create_New_Basket()
         {
-            var newBasket = new KudosBasketCreateDTO
+            var newBasket = new KudosBasketCreateDto
             {
                 Description = "test",
                 Title = "test",
@@ -254,7 +254,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Return_Existing_Basket()
         {
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2
             };
@@ -272,7 +272,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Return_If_Basket_Widget_Is_Active()
         {
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2
             };
@@ -297,14 +297,14 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public void Should_Not_Throw_Kudos_Basket_Exception_If_There_Is_Basket_Created()
         {
-            var basket = new KudosBasketDTO();
+            var basket = new KudosBasketDto();
             Assert.DoesNotThrow(() => _kudosBasketValidator.CheckIfThereIsNoBasketYet(basket));
         }
 
         [Test]
         public async Task Should_Remove_Existing_Basket()
         {
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 UserId = "testUserId",
                 OrganizationId = 2
@@ -317,7 +317,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Edit_Existing_Kudos_Basket()
         {
-            var kudosBasketDto = new KudosBasketEditDTO
+            var kudosBasketDto = new KudosBasketEditDto
             {
                 Id = 10,
                 IsActive = false,
@@ -338,7 +338,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Make_A_Donation()
         {
-            var donationDto = new KudosBasketDonationDTO
+            var donationDto = new KudosBasketDonationDto
             {
                 DonationAmount = 20,
                 OrganizationId = 2,
@@ -355,7 +355,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Create_Two_Kudos_Logs_On_Donation()
         {
-            var donationDto = new KudosBasketDonationDTO
+            var donationDto = new KudosBasketDonationDto
             {
                 DonationAmount = 20,
                 OrganizationId = 2,
@@ -370,7 +370,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Recalculate_Donators_Kudos()
         {
-            var donationDto = new KudosBasketDonationDTO
+            var donationDto = new KudosBasketDonationDto
             {
                 DonationAmount = 20,
                 OrganizationId = 2,

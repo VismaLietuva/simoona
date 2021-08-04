@@ -84,7 +84,7 @@ namespace Shrooms.Domain.Services.UserService
             await _uow.SaveChangesAsync(settingsDto.UserId);
         }
 
-        public async Task ChangeUserNotificationSettingsAsync(UserNotificationsSettingsDto settingsDto, UserAndOrganizationDTO userOrg)
+        public async Task ChangeUserNotificationSettingsAsync(UserNotificationsSettingsDto settingsDto, UserAndOrganizationDto userOrg)
         {
             var settings = await _usersDbSet
                 .Where(u => u.Id == userOrg.UserId && u.OrganizationId == userOrg.OrganizationId)
@@ -117,7 +117,7 @@ namespace Shrooms.Domain.Services.UserService
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
-        public async Task<LocalizationSettingsDto> GetUserLocalizationSettingsAsync(UserAndOrganizationDTO userOrg)
+        public async Task<LocalizationSettingsDto> GetUserLocalizationSettingsAsync(UserAndOrganizationDto userOrg)
         {
             var userSettings = await _usersDbSet
                 .Where(u => u.Id == userOrg.UserId && u.OrganizationId == userOrg.OrganizationId)
@@ -146,7 +146,7 @@ namespace Shrooms.Domain.Services.UserService
             return settingsDto;
         }
 
-        public async Task DeleteAsync(string userToDelete, UserAndOrganizationDTO userOrg)
+        public async Task DeleteAsync(string userToDelete, UserAndOrganizationDto userOrg)
         {
             var user = await _usersDbSet
                 .SingleAsync(u => u.Id == userToDelete && u.OrganizationId == userOrg.OrganizationId);
@@ -161,7 +161,7 @@ namespace Shrooms.Domain.Services.UserService
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
-        private async Task AnonymizeAsync(ApplicationUser user, UserAndOrganizationDTO userOrg)
+        private async Task AnonymizeAsync(ApplicationUser user, UserAndOrganizationDto userOrg)
         {
             await _pictureService.RemoveImageAsync(user.PictureId, userOrg.OrganizationId);
 
@@ -214,7 +214,7 @@ namespace Shrooms.Domain.Services.UserService
                 .Where(user => user.UserName.StartsWith(s) || user.Email.StartsWith(s) || (user.FirstName + " " + user.LastName).StartsWith(s) || user.LastName.StartsWith(s))
                 .Where(_roleService.ExcludeUsersWithRole(newUserRoleId))
                 .Take(10)
-                .Select(MapUsersToAutocompleteDTO())
+                .Select(MapUsersToAutocompleteDto())
                 .ToListAsync();
 
             return users;
@@ -261,7 +261,7 @@ namespace Shrooms.Domain.Services.UserService
             return userEmails;
         }
 
-        public async Task<UserNotificationsSettingsDto> GetWallNotificationSettingsAsync(UserAndOrganizationDTO userOrg)
+        public async Task<UserNotificationsSettingsDto> GetWallNotificationSettingsAsync(UserAndOrganizationDto userOrg)
         {
             var settings = await _usersDbSet
                 .Where(u => u.Id == userOrg.UserId && u.OrganizationId == userOrg.OrganizationId)
@@ -299,7 +299,7 @@ namespace Shrooms.Domain.Services.UserService
             return settingsDto;
         }
 
-        public async Task ChangeWallNotificationSettingsAsync(UserNotificationsSettingsDto userNotificationsSettingsDto, UserAndOrganizationDTO userOrg)
+        public async Task ChangeWallNotificationSettingsAsync(UserNotificationsSettingsDto userNotificationsSettingsDto, UserAndOrganizationDto userOrg)
         {
             var wallIdsToUpdate = userNotificationsSettingsDto
                 .Walls
@@ -418,7 +418,7 @@ namespace Shrooms.Domain.Services.UserService
             }
         }
 
-        private static Expression<Func<ApplicationUser, UserAutoCompleteDto>> MapUsersToAutocompleteDTO()
+        private static Expression<Func<ApplicationUser, UserAutoCompleteDto>> MapUsersToAutocompleteDto()
         {
             return u => new UserAutoCompleteDto
             {

@@ -123,8 +123,8 @@ namespace Shrooms.Presentation.Api.Controllers
                 return BadRequest("Search string can't be empty");
             }
 
-            var rolesDTO = await _roleService.GetRolesForAutocompleteAsync(search, GetUserAndOrganization());
-            var rolesViewModel = _mapper.Map<IEnumerable<RoleDTO>, IEnumerable<RoleViewModel>>(rolesDTO);
+            var rolesDto = await _roleService.GetRolesForAutocompleteAsync(search, GetUserAndOrganization());
+            var rolesViewModel = _mapper.Map<IEnumerable<RoleDto>, IEnumerable<RoleViewModel>>(rolesDto);
             return Ok(rolesViewModel);
         }
 
@@ -134,7 +134,7 @@ namespace Shrooms.Presentation.Api.Controllers
         public async Task<IHttpActionResult> GetPermissionGroups()
         {
             var roleGroups = await _permissionService.GetGroupNamesAsync(GetUserAndOrganization().OrganizationId);
-            var roleGroupsViewModel = _mapper.Map<IEnumerable<PermissionGroupDTO>, IEnumerable<PermissionGroupViewModel>>(roleGroups);
+            var roleGroupsViewModel = _mapper.Map<IEnumerable<PermissionGroupDto>, IEnumerable<PermissionGroupViewModel>>(roleGroups);
             return Ok(roleGroupsViewModel);
         }
 
@@ -148,8 +148,8 @@ namespace Shrooms.Presentation.Api.Controllers
                 return BadRequest("roleId can't be empty");
             }
 
-            var roleDetailsDTO = await _roleService.GetRoleByIdAsync(GetUserAndOrganization(), roleId);
-            var roleDetailsViewModel = _mapper.Map<RoleDetailsDTO, RoleDetailsViewModel>(roleDetailsDTO);
+            var roleDetailsDto = await _roleService.GetRoleByIdAsync(GetUserAndOrganization(), roleId);
+            var roleDetailsViewModel = _mapper.Map<RoleDetailsDto, RoleDetailsViewModel>(roleDetailsDto);
             return Ok(roleDetailsViewModel);
         }
 

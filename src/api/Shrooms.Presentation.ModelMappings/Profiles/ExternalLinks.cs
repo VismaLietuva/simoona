@@ -14,16 +14,16 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<ExternalLinkDTO, ExternalLinkViewModel>();
+            CreateMap<ExternalLinkDto, ExternalLinkViewModel>();
         }
 
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<AddEditDeleteExternalLinkViewModel, AddEditDeleteExternalLinkDTO>()
+            CreateMap<AddEditDeleteExternalLinkViewModel, AddEditDeleteExternalLinkDto>()
                 .IgnoreUserOrgDto();
-            CreateMap<UpdatedExternalLinkViewModel, ExternalLinkDTO>();
-            CreateMap<NewExternalLinkViewModel, NewExternalLinkDTO>();
-            CreateMap<NewExternalLinkViewModel, ExternalLinkDTO>()
+            CreateMap<UpdatedExternalLinkViewModel, ExternalLinkDto>();
+            CreateMap<NewExternalLinkViewModel, NewExternalLinkDto>();
+            CreateMap<NewExternalLinkViewModel, ExternalLinkDto>()
                 .Ignore(x => x.Id);
         }
     }

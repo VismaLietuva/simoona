@@ -6,7 +6,7 @@ namespace Shrooms.Domain.Services.Email.AdministrationUsers
 {
     public interface IAdministrationNotificationService
     {
-        Task SendConfirmedNotificationEmailAsync(string userEmail, UserAndOrganizationDTO userAndOrg);
+        Task SendConfirmedNotificationEmailAsync(string userEmail, UserAndOrganizationDto userAndOrg);
 
         Task NotifyAboutNewUserAsync(ApplicationUser newUser, int orgId);
 

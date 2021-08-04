@@ -32,25 +32,25 @@ namespace Shrooms.Domain.Helpers
             return log => log.EmployeeId == userId;
         }
 
-        public static Expression<Func<KudosLog, IEnumerable<ApplicationUser>, MainKudosLogDTO>> MapKudosLogsToDto()
+        public static Expression<Func<KudosLog, IEnumerable<ApplicationUser>, MainKudosLogDto>> MapKudosLogsToDto()
         {
-            return (log, users) => new MainKudosLogDTO
+            return (log, users) => new MainKudosLogDto
             {
                 Comment = log.Comments,
                 Created = log.Created,
-                Sender = new KudosLogUserDTO
+                Sender = new KudosLogUserDto
                 {
                     Id = log.CreatedBy,
                     FullName = users.Select(u => u.FirstName + " " + u.LastName).FirstOrDefault() ?? string.Empty
                 },
                 Id = log.Id,
                 Points = log.Points,
-                Receiver = new KudosLogUserDTO
+                Receiver = new KudosLogUserDto
                 {
                     Id = log.Employee == null ? null : log.Employee.Id,
                     FullName = log.Employee == null ? string.Empty : log.Employee.FirstName + " " + log.Employee.LastName
                 },
-                Type = new KudosLogTypeDTO
+                Type = new KudosLogTypeDto
                 {
                     Name = log.KudosTypeName,
                     Value = log.KudosTypeValue,

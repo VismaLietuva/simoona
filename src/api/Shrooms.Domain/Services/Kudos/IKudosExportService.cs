@@ -5,6 +5,6 @@ namespace Shrooms.Domain.Services.Kudos
 {
     public interface IKudosExportService
     {
-        Task<byte[]> ExportToExcelAsync(KudosLogsFilterDTO filter);
+        Task<byte[]> ExportToExcelAsync(KudosLogsFilterDto filter);
     }
 }

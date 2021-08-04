@@ -3,7 +3,7 @@ using Shrooms.Contracts.Enums;
 
 namespace Shrooms.Contracts.DataTransferObjects.Wall
 {
-    public class CreateWallDto : UserAndOrganizationDTO
+    public class CreateWallDto : UserAndOrganizationDto
     {
         public string Name { get; set; }
 

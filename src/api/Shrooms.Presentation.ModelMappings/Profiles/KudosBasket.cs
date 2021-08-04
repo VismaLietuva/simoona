@@ -15,18 +15,18 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<KudosBasketLogDTO, KudosBasketLogViewModel>();
-            CreateMap<KudosBasketLogUserDTO, KudosBasketLogUserViewModel>();
-            CreateMap<KudosBasketDTO, KudosBasketViewModel>();
-            CreateMap<KudosBasketDTO, KudosBasketWidgetViewModel>();
-            CreateMap<KudosBasketCreateDTO, KudosBasketCreateViewModel>();
+            CreateMap<KudosBasketLogDto, KudosBasketLogViewModel>();
+            CreateMap<KudosBasketLogUserDto, KudosBasketLogUserViewModel>();
+            CreateMap<KudosBasketDto, KudosBasketViewModel>();
+            CreateMap<KudosBasketDto, KudosBasketWidgetViewModel>();
+            CreateMap<KudosBasketCreateDto, KudosBasketCreateViewModel>();
         }
 
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<KudosBasketCreateViewModel, KudosBasketCreateDTO>();
-            CreateMap<KudosBasketEditViewModel, KudosBasketEditDTO>();
-            CreateMap<KudosBasketDonateViewModel, KudosBasketDonationDTO>();
+            CreateMap<KudosBasketCreateViewModel, KudosBasketCreateDto>();
+            CreateMap<KudosBasketEditViewModel, KudosBasketEditDto>();
+            CreateMap<KudosBasketDonateViewModel, KudosBasketDonationDto>();
         }
     }
 }

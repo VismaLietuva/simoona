@@ -181,7 +181,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public void Should_Throw_Exception_If_User_Has_No_Permission_To_Set_Managing_Director()
         {
-            var userAndOrg = new UserAndOrganizationDTO { OrganizationId = 1, UserId = "user1" };
+            var userAndOrg = new UserAndOrganizationDto { OrganizationId = 1, UserId = "user1" };
             _ = _roleService.HasRoleAsync("user1", Roles.Manager).Returns(false);
 
             Assert.ThrowsAsync<ValidationException>(async () => await _organizationService.SetManagingDirectorAsync("user1", userAndOrg));
@@ -199,7 +199,7 @@ namespace Shrooms.Tests.DomainService
 
             _usersDbSet.SetDbSetDataForAsync(users);
 
-            var userAndOrg = new UserAndOrganizationDTO { OrganizationId = 1, UserId = "user1" };
+            var userAndOrg = new UserAndOrganizationDto { OrganizationId = 1, UserId = "user1" };
             _roleService.HasRoleAsync("user1", Roles.Manager).Returns(true);
 
             await _organizationService.SetManagingDirectorAsync("user1", userAndOrg);

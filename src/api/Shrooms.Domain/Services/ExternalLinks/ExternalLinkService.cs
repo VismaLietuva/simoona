@@ -23,11 +23,11 @@ namespace Shrooms.Domain.Services.ExternalLinks
             _externalLinkDbSet = uow.GetDbSet<ExternalLink>();
         }
 
-        public async Task<IEnumerable<ExternalLinkDTO>> GetAllAsync(int organizationId)
+        public async Task<IEnumerable<ExternalLinkDto>> GetAllAsync(int organizationId)
         {
             var externalLinks = await _externalLinkDbSet
                 .Where(x => x.OrganizationId == organizationId)
-                .Select(x => new ExternalLinkDTO
+                .Select(x => new ExternalLinkDto
                 {
                     Id = x.Id,
                     Name = x.Name,
@@ -38,7 +38,7 @@ namespace Shrooms.Domain.Services.ExternalLinks
             return externalLinks;
         }
 
-        public async Task UpdateLinksAsync(AddEditDeleteExternalLinkDTO updateLinksDto)
+        public async Task UpdateLinksAsync(AddEditDeleteExternalLinkDto updateLinksDto)
         {
             var timestamp = DateTime.UtcNow;
             await DuplicateValuesValidationAsync(updateLinksDto);
@@ -48,11 +48,11 @@ namespace Shrooms.Domain.Services.ExternalLinks
             await CreateNewLinksAsync(updateLinksDto, timestamp);
         }
 
-        private async Task DuplicateValuesValidationAsync(AddEditDeleteExternalLinkDTO updateLinksDto)
+        private async Task DuplicateValuesValidationAsync(AddEditDeleteExternalLinkDto updateLinksDto)
         {
             var externalLinks = await _externalLinkDbSet
                 .Where(x => x.OrganizationId == updateLinksDto.OrganizationId)
-                .Select(x => new ExternalLinkDTO
+                .Select(x => new ExternalLinkDto
                 {
                     Id = x.Id,
                     Name = x.Name,
@@ -67,7 +67,7 @@ namespace Shrooms.Domain.Services.ExternalLinks
             }
         }
 
-        private async Task CreateNewLinksAsync(AddEditDeleteExternalLinkDTO updateLinks, DateTime timestamp)
+        private async Task CreateNewLinksAsync(AddEditDeleteExternalLinkDto updateLinks, DateTime timestamp)
         {
             foreach (var link in updateLinks.LinksToCreate)
             {
@@ -87,7 +87,7 @@ namespace Shrooms.Domain.Services.ExternalLinks
             await _uow.SaveChangesAsync(false);
         }
 
-        private async Task DeleteLinksAsync(AddEditDeleteExternalLinkDTO updateLinks, DateTime timestamp)
+        private async Task DeleteLinksAsync(AddEditDeleteExternalLinkDto updateLinks, DateTime timestamp)
         {
             var linksToDelete = await _externalLinkDbSet
                 .Where(l =>
@@ -108,7 +108,7 @@ namespace Shrooms.Domain.Services.ExternalLinks
             }
         }
 
-        private async Task UpdateLinksAsync(AddEditDeleteExternalLinkDTO updateLinks, DateTime timestamp)
+        private async Task UpdateLinksAsync(AddEditDeleteExternalLinkDto updateLinks, DateTime timestamp)
         {
             var updatedLinksIds = updateLinks.LinksToUpdate.Select(l => l.Id);
 

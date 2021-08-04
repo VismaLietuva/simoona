@@ -42,7 +42,7 @@ namespace Shrooms.Domain.Services.KudosBaskets
             _kudosService = kudosService;
         }
 
-        public async Task<IList<KudosBasketLogDTO>> GetDonationsAsync(UserAndOrganizationDTO userAndOrg)
+        public async Task<IList<KudosBasketLogDto>> GetDonationsAsync(UserAndOrganizationDto userAndOrg)
         {
             var kudosBasket = await _kudosBasketsDbSet
                 .Include(basket => basket.KudosLogs.Select(log => log.Employee))
@@ -54,7 +54,7 @@ namespace Shrooms.Domain.Services.KudosBaskets
             return kudosLogDtos;
         }
 
-        public async Task<KudosBasketCreateDTO> CreateNewBasketAsync(KudosBasketCreateDTO newBasket)
+        public async Task<KudosBasketCreateDto> CreateNewBasketAsync(KudosBasketCreateDto newBasket)
         {
             var existsBasket = await _kudosBasketsDbSet.AnyAsync();
             _kudosBasketValidator.CheckIfBasketAlreadyExists(existsBasket);
@@ -80,7 +80,7 @@ namespace Shrooms.Domain.Services.KudosBaskets
             return newBasket;
         }
 
-        public async Task<KudosBasketDTO> GetKudosBasketWidgetAsync(UserAndOrganizationDTO userAndOrganization)
+        public async Task<KudosBasketDto> GetKudosBasketWidgetAsync(UserAndOrganizationDto userAndOrganization)
         {
             return await _kudosBasketsDbSet
                 .Include(b => b.KudosLogs)
@@ -89,7 +89,7 @@ namespace Shrooms.Domain.Services.KudosBaskets
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<KudosBasketDTO> GetKudosBasketAsync(UserAndOrganizationDTO userAndOrganization)
+        public async Task<KudosBasketDto> GetKudosBasketAsync(UserAndOrganizationDto userAndOrganization)
         {
             var kudosBasket = await _kudosBasketsDbSet
                 .Include(b => b.KudosLogs)
@@ -102,7 +102,7 @@ namespace Shrooms.Domain.Services.KudosBaskets
             return kudosBasket;
         }
 
-        public async Task DeleteKudosBasketAsync(UserAndOrganizationDTO userAndOrganization)
+        public async Task DeleteKudosBasketAsync(UserAndOrganizationDto userAndOrganization)
         {
             var foundBasket = await _kudosBasketsDbSet.FirstAsync(basket => basket.OrganizationId == userAndOrganization.OrganizationId);
 
@@ -115,7 +115,7 @@ namespace Shrooms.Domain.Services.KudosBaskets
             await _uow.SaveChangesAsync(false);
         }
 
-        public async Task EditKudosBasketAsync(KudosBasketEditDTO editedBasket)
+        public async Task EditKudosBasketAsync(KudosBasketEditDto editedBasket)
         {
             var basketToEdit = await _kudosBasketsDbSet.FirstAsync(basket => basket.Id == editedBasket.Id);
 
@@ -128,7 +128,7 @@ namespace Shrooms.Domain.Services.KudosBaskets
             await _uow.SaveChangesAsync();
         }
 
-        public async Task MakeDonationAsync(KudosBasketDonationDTO donation)
+        public async Task MakeDonationAsync(KudosBasketDonationDto donation)
         {
             await _donateLock.WaitAsync();
 
@@ -165,7 +165,7 @@ namespace Shrooms.Domain.Services.KudosBaskets
             }
         }
 
-        private static KudosLog CreateKudosLogForBasket(KudosBasketDonationDTO donation, KudosType kudosType, string logComment, string userId)
+        private static KudosLog CreateKudosLogForBasket(KudosBasketDonationDto donation, KudosType kudosType, string logComment, string userId)
         {
             var timestamp = DateTime.UtcNow;
             var kudosLog = new KudosLog
@@ -186,9 +186,9 @@ namespace Shrooms.Domain.Services.KudosBaskets
             return kudosLog;
         }
 
-        private static List<KudosBasketLogDTO> MapKudosLogsToDto(IOrderedEnumerable<KudosLog> kudosLogs)
+        private static List<KudosBasketLogDto> MapKudosLogsToDto(IOrderedEnumerable<KudosLog> kudosLogs)
         {
-            var kudosLogsDto = kudosLogs?.Select(log => new KudosBasketLogDTO
+            var kudosLogsDto = kudosLogs?.Select(log => new KudosBasketLogDto
             {
                 DonationAmount = log.Points,
                 DonationDate = log.Created,
@@ -199,9 +199,9 @@ namespace Shrooms.Domain.Services.KudosBaskets
             return kudosLogsDto;
         }
 
-        private static Expression<Func<KudosBasket, KudosBasketDTO>> MapKudosBasketToDto()
+        private static Expression<Func<KudosBasket, KudosBasketDto>> MapKudosBasketToDto()
         {
-            return b => new KudosBasketDTO
+            return b => new KudosBasketDto
             {
                 Id = b.Id,
                 Title = b.Title,
@@ -214,19 +214,19 @@ namespace Shrooms.Domain.Services.KudosBaskets
             };
         }
 
-        private static KudosBasketLogUserDTO MapUserToDto(ApplicationUser employee)
+        private static KudosBasketLogUserDto MapUserToDto(ApplicationUser employee)
         {
-            KudosBasketLogUserDTO userDto;
+            KudosBasketLogUserDto userDto;
             if (employee == null)
             {
-                userDto = new KudosBasketLogUserDTO
+                userDto = new KudosBasketLogUserDto
                 {
                     FullName = BusinessLayerConstants.DeletedUserName
                 };
             }
             else
             {
-                userDto = new KudosBasketLogUserDTO
+                userDto = new KudosBasketLogUserDto
                 {
                     Id = employee.Id,
                     FullName = $"{employee.FirstName} {employee.LastName}"

@@ -5,6 +5,6 @@ namespace Shrooms.Domain.Services.Email.Posting
 {
     public interface IPostNotificationService
     {
-        Task NotifyAboutNewPostAsync(NewlyCreatedPostDTO post);
+        Task NotifyAboutNewPostAsync(NewlyCreatedPostDto post);
     }
 }

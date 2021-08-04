@@ -48,10 +48,10 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
         [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
         public async Task<PagedViewModel<KudosLogViewModel>> GetKudosLogs([FromUri] KudosLogsFilterViewModel filter)
         {
-            var filterDto = _mapper.Map<KudosLogsFilterViewModel, KudosLogsFilterDTO>(filter);
+            var filterDto = _mapper.Map<KudosLogsFilterViewModel, KudosLogsFilterDto>(filter);
             SetOrganizationAndUser(filterDto);
             var kudosLogsEntriesDto = await _kudosService.GetKudosLogsAsync(filterDto);
-            var kudosLogsViewModel = _mapper.Map<IEnumerable<MainKudosLogDTO>, IEnumerable<KudosLogViewModel>>(kudosLogsEntriesDto.KudosLogs);
+            var kudosLogsViewModel = _mapper.Map<IEnumerable<MainKudosLogDto>, IEnumerable<KudosLogViewModel>>(kudosLogsEntriesDto.KudosLogs);
 
             var pagedKudosLogs = new PagedViewModel<KudosLogViewModel>
             {
@@ -72,7 +72,7 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
             }
 
             var kudosLogsEntriesDto = await _kudosService.GetUserKudosLogsAsync(userId, page, GetUserAndOrganization().OrganizationId);
-            var userKudosLogsViewModel = _mapper.Map<IEnumerable<KudosUserLogDTO>, IEnumerable<KudosUserLogViewModel>>(kudosLogsEntriesDto.KudosLogs);
+            var userKudosLogsViewModel = _mapper.Map<IEnumerable<KudosUserLogDto>, IEnumerable<KudosUserLogViewModel>>(kudosLogsEntriesDto.KudosLogs);
             var pagedKudosLogs = new PagedViewModel<KudosUserLogViewModel>
             {
                 PagedList = await userKudosLogsViewModel.ToPagedListAsync(FirstPage, BusinessLayerConstants.MaxKudosLogsPerPage),
@@ -143,7 +143,7 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
         public async Task<IEnumerable<KudosTypeViewModel>> GetKudosTypes()
         {
             var kudosTypeDto = await _kudosService.GetKudosTypesAsync(GetUserAndOrganization());
-            var kudosTypeViewModel = _mapper.Map<IEnumerable<KudosTypeDTO>, IEnumerable<KudosTypeViewModel>>(kudosTypeDto);
+            var kudosTypeViewModel = _mapper.Map<IEnumerable<KudosTypeDto>, IEnumerable<KudosTypeViewModel>>(kudosTypeDto);
 
             return kudosTypeViewModel;
         }
@@ -153,7 +153,7 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
         public async Task<KudosTypeViewModel> GetSendKudosType()
         {
             var kudosTypeDto = await _kudosService.GetSendKudosTypeAsync(GetUserAndOrganization());
-            return _mapper.Map<KudosTypeDTO, KudosTypeViewModel>(kudosTypeDto);
+            return _mapper.Map<KudosTypeDto, KudosTypeViewModel>(kudosTypeDto);
         }
 
         [HttpGet]
@@ -170,7 +170,7 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
             try
             {
                 var dto = await _kudosService.GetKudosTypeAsync(id, GetUserAndOrganization());
-                var result = _mapper.Map<KudosTypeDTO, KudosTypeViewModel>(dto);
+                var result = _mapper.Map<KudosTypeDto, KudosTypeViewModel>(dto);
 
                 return Ok(result);
             }
@@ -191,7 +191,7 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
                 return BadRequest(ModelState);
             }
 
-            var dto = _mapper.Map<KudosTypeViewModel, KudosTypeDTO>(model);
+            var dto = _mapper.Map<KudosTypeViewModel, KudosTypeDto>(model);
             SetOrganizationAndUser(dto);
 
             try
@@ -270,7 +270,7 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
                 return BadRequest(Resources.Models.Kudos.Kudos.KudosifyModalError);
             }
 
-            var kudosLogDto = _mapper.Map<AddKudosLogViewModel, AddKudosLogDTO>(kudosLog);
+            var kudosLogDto = _mapper.Map<AddKudosLogViewModel, AddKudosLogDto>(kudosLog);
             SetOrganizationAndUser(kudosLogDto);
             try
             {
@@ -321,7 +321,7 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
                 return BadRequest();
             }
 
-            var kudosRejectDto = _mapper.Map<KudosRejectViewModel, KudosRejectDTO>(kudosRejectModel);
+            var kudosRejectDto = _mapper.Map<KudosRejectViewModel, KudosRejectDto>(kudosRejectModel);
             SetOrganizationAndUser(kudosRejectDto);
 
             try
@@ -342,7 +342,7 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
             id ??= User.Identity.GetUserId();
 
             var userKudosDto = await _kudosService.GetUserKudosInformationByIdAsync(id, GetUserAndOrganization().OrganizationId);
-            var userKudosViewModel = _mapper.Map<UserKudosDTO, UserKudosViewModel>(userKudosDto);
+            var userKudosViewModel = _mapper.Map<UserKudosDto, UserKudosViewModel>(userKudosDto);
 
             var monthlyStatistics = await _kudosService.GetMonthlyKudosStatisticsAsync(id);
             userKudosViewModel.SentKudos = monthlyStatistics[0];
@@ -359,7 +359,7 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
             try
             {
                 var userKudosInformationDto = await _kudosService.GetApprovedKudosListAsync(id, GetUserAndOrganization().OrganizationId);
-                var result = _mapper.Map<IEnumerable<UserKudosInformationDTO>, IEnumerable<UserKudosInformationViewModel>>(userKudosInformationDto);
+                var result = _mapper.Map<IEnumerable<UserKudosInformationDto>, IEnumerable<UserKudosInformationViewModel>>(userKudosInformationDto);
                 return Ok(result);
             }
             catch (ValidationException e)
@@ -375,7 +375,7 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
         {
             var userAndOrg = GetUserAndOrganization();
             var wallKudosLogsDto = await _kudosService.GetLastKudosLogsForWallAsync(userAndOrg);
-            return _mapper.Map<IEnumerable<WallKudosLogDTO>, IEnumerable<WallKudosLogViewModel>>(wallKudosLogsDto);
+            return _mapper.Map<IEnumerable<WallKudosLogDto>, IEnumerable<WallKudosLogViewModel>>(wallKudosLogsDto);
         }
 
         [HttpGet]
@@ -389,7 +389,7 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
             }
 
             var kudosStatsDto = await _kudosService.GetKudosStatsAsync(months, amount, GetUserAndOrganization().OrganizationId);
-            var result = _mapper.Map<IEnumerable<KudosBasicDataDTO>, IEnumerable<KudosBasicDataViewModel>>(kudosStatsDto);
+            var result = _mapper.Map<IEnumerable<KudosBasicDataDto>, IEnumerable<KudosBasicDataViewModel>>(kudosStatsDto);
             return result;
         }
 
@@ -413,7 +413,7 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
         [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
         public async Task<IHttpActionResult> GetKudosLogAsExcel([FromUri] KudosLogsFilterViewModel filter)
         {
-            var filterDto = _mapper.Map<KudosLogsFilterViewModel, KudosLogsFilterDTO>(filter);
+            var filterDto = _mapper.Map<KudosLogsFilterViewModel, KudosLogsFilterDto>(filter);
             SetOrganizationAndUser(filterDto);
             try
             {
@@ -431,9 +431,9 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
         [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
         public async Task<IHttpActionResult> GetWelcomeKudos()
         {
-            var welcomeKudosDTO = await _kudosService.GetWelcomeKudosAsync();
+            var welcomeKudos = await _kudosService.GetWelcomeKudosAsync();
 
-            var result = _mapper.Map<WelcomeKudosDTO, WelcomeKudosViewModel>(welcomeKudosDTO);
+            var result = _mapper.Map<WelcomeKudosDto, WelcomeKudosViewModel>(welcomeKudos);
 
             return Ok(result);
         }
@@ -441,7 +441,7 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
         private async Task<KudosListBasicDataViewModel> CalculateStatsAsync(int months, int amount)
         {
             var kudosStatsDto = await _kudosService.GetKudosStatsAsync(months, amount, GetUserAndOrganization().OrganizationId);
-            var stats = _mapper.Map<IEnumerable<KudosBasicDataDTO>, IEnumerable<KudosBasicDataViewModel>>(kudosStatsDto);
+            var stats = _mapper.Map<IEnumerable<KudosBasicDataDto>, IEnumerable<KudosBasicDataViewModel>>(kudosStatsDto);
             return new KudosListBasicDataViewModel
             {
                 Users = stats,

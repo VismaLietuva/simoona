@@ -161,7 +161,7 @@ namespace Shrooms.Domain.Services.Administration
             await _notificationService.SendUserVerificationEmailAsync(user, token, orgazinationName);
         }
 
-        public async Task ConfirmNewUserAsync(string userId, UserAndOrganizationDTO userAndOrg)
+        public async Task ConfirmNewUserAsync(string userId, UserAndOrganizationDto userAndOrg)
         {
             var applicationUser = await _usersDbSet.FirstAsync(user => user.Id == userId);
             _userAdministrationValidator.CheckIfEmploymentDateIsSet(applicationUser.EmploymentDate);
@@ -269,7 +269,7 @@ namespace Shrooms.Domain.Services.Administration
             return user != null;
         }
 
-        public async Task<IEnumerable<AdministrationUserDTO>> GetAllUsersAsync(string sortQuery, string search, FilterDTO[] filterModel, string includeProperties)
+        public async Task<IEnumerable<AdministrationUserDto>> GetAllUsersAsync(string sortQuery, string search, FilterDto[] filterModel, string includeProperties)
         {
             includeProperties = $"{includeProperties}{(includeProperties != string.Empty ? "," : string.Empty)}Roles,Skills,JobPosition,Projects";
 
@@ -277,7 +277,7 @@ namespace Shrooms.Domain.Services.Administration
                 .Get(GenerateQuery(search), orderBy: sortQuery.Contains(Contracts.Constants.Roles.NewUser) ? string.Empty : sortQuery, includeProperties: includeProperties)
                 .ToListAsync();
 
-            var administrationUsers = _mapper.Map<IList<ApplicationUser>, IList<AdministrationUserDTO>>(applicationUsers);
+            var administrationUsers = _mapper.Map<IList<ApplicationUser>, IList<AdministrationUserDto>>(applicationUsers);
 
             await SetNewUsersValuesAsync(administrationUsers, applicationUsers);
 
@@ -324,9 +324,9 @@ namespace Shrooms.Domain.Services.Administration
 
         private async Task SetWelcomeKudosAsync(ApplicationUser applicationUser)
         {
-            var welcomeKudosDTO = await _kudosService.GetWelcomeKudosAsync();
+            var welcomeKudosDto = await _kudosService.GetWelcomeKudosAsync();
 
-            if (welcomeKudosDTO.WelcomeKudosAmount <= 0)
+            if (welcomeKudosDto.WelcomeKudosAmount <= 0)
             {
                 return;
             }
@@ -335,8 +335,8 @@ namespace Shrooms.Domain.Services.Administration
             {
                 EmployeeId = applicationUser.Id,
                 OrganizationId = applicationUser.OrganizationId,
-                Comments = welcomeKudosDTO.WelcomeKudosComment,
-                Points = welcomeKudosDTO.WelcomeKudosAmount,
+                Comments = welcomeKudosDto.WelcomeKudosComment,
+                Points = welcomeKudosDto.WelcomeKudosAmount,
                 Created = DateTime.UtcNow,
                 Modified = DateTime.UtcNow,
                 Status = KudosStatus.Pending,
@@ -436,7 +436,7 @@ namespace Shrooms.Domain.Services.Administration
             await _userManager.AddToRoleAsync(id, Contracts.Constants.Roles.FirstLogin);
         }
 
-        private async Task SetNewUsersValuesAsync(IList<AdministrationUserDTO> administrationUserDto, IEnumerable<ApplicationUser> applicationUsers)
+        private async Task SetNewUsersValuesAsync(IList<AdministrationUserDto> administrationUserDto, IEnumerable<ApplicationUser> applicationUsers)
         {
             var newUserRole = await _rolesRepository.Get(x => x.Name == Contracts.Constants.Roles.NewUser).Select(x => x.Id).FirstOrDefaultAsync();
 
@@ -449,9 +449,9 @@ namespace Shrooms.Domain.Services.Administration
             }
         }
 
-        private static IList<AdministrationUserDTO> FilterResults(IEnumerable<FilterDTO> filterModel, IList<AdministrationUserDTO> administrationUsers)
+        private static IList<AdministrationUserDto> FilterResults(IEnumerable<FilterDto> filterModel, IList<AdministrationUserDto> administrationUsers)
         {
-            IEnumerable<AdministrationUserDTO> filteredUsers = null;
+            IEnumerable<AdministrationUserDto> filteredUsers = null;
 
             foreach (var filterViewModel in filterModel)
             {

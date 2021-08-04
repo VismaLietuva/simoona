@@ -39,7 +39,7 @@ namespace Shrooms.Tests.Controllers.WebApi
             _wallService = Substitute.For<IWallService>();
             _notificationService = Substitute.For<INotificationService>();
             var permissionService = Substitute.For<IPermissionService>();
-            permissionService.UserHasPermissionAsync(Arg.Any<UserAndOrganizationDTO>(), Arg.Any<string>()).Returns(true);
+            permissionService.UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), Arg.Any<string>()).Returns(true);
 
             _wallController = new WallController(ModelMapper.Create(), _wallService, _notificationService, permissionService);
             _wallController.ControllerContext = Substitute.For<HttpControllerContext>();
@@ -169,13 +169,13 @@ namespace Shrooms.Tests.Controllers.WebApi
             var wallId = 1;
             var page = 1;
 
-            IEnumerable<PostDTO> posts = new List<PostDTO>
+            IEnumerable<PostDto> posts = new List<PostDto>
             {
-                new PostDTO
+                new PostDto
                 {
                     Id = 0
                 },
-                new PostDTO
+                new PostDto
                 {
                     Id = 1
                 }

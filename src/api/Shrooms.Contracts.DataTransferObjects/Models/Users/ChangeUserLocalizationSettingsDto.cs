@@ -1,6 +1,6 @@
 ﻿namespace Shrooms.Contracts.DataTransferObjects.Models.Users
 {
-    public class ChangeUserLocalizationSettingsDto : UserAndOrganizationDTO
+    public class ChangeUserLocalizationSettingsDto : UserAndOrganizationDto
     {
         public string LanguageCode { get; set; }
 

@@ -52,7 +52,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 return Forbidden();
             }
 
-            var commentDto = _mapper.Map<NewCommentViewModel, NewCommentDTO>(comment);
+            var commentDto = _mapper.Map<NewCommentViewModel, NewCommentDto>(comment);
             SetOrganizationAndUser(commentDto);
             var userHubDto = GetUserAndOrganizationHub();
 
@@ -82,7 +82,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            var editCommentDto = _mapper.Map<EditCommentViewModel, EditCommentDTO>(commentViewModel);
+            var editCommentDto = _mapper.Map<EditCommentViewModel, EditCommentDto>(commentViewModel);
             SetOrganizationAndUser(editCommentDto);
 
             try

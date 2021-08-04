@@ -39,7 +39,7 @@ namespace Shrooms.Domain.Services.Projects
             _permissionService = permissionService;
         }
 
-        public async Task<IEnumerable<ProjectsListItemDto>> GetProjectsAsync(UserAndOrganizationDTO userOrg)
+        public async Task<IEnumerable<ProjectsListItemDto>> GetProjectsAsync(UserAndOrganizationDto userOrg)
         {
             var projects = await _projectsDbSet
                 .Include(p => p.Attributes)
@@ -75,13 +75,13 @@ namespace Shrooms.Domain.Services.Projects
             return projects;
         }
 
-        public async Task<ProjectDetailsDto> GetProjectDetailsAsync(int projectId, UserAndOrganizationDTO userAndOrganizationDTO)
+        public async Task<ProjectDetailsDto> GetProjectDetailsAsync(int projectId, UserAndOrganizationDto userAndOrganizationDto)
         {
             var project = await _projectsDbSet
                 .Include(x => x.Members)
                 .Include(x => x.Owner)
                 .Include(x => x.Attributes)
-                .Where(x => x.OrganizationId == userAndOrganizationDTO.OrganizationId &&
+                .Where(x => x.OrganizationId == userAndOrganizationDto.OrganizationId &&
                             x.Id == projectId)
                 .Select(x => new ProjectDetailsDto
                 {
@@ -116,7 +116,7 @@ namespace Shrooms.Domain.Services.Projects
             return project;
         }
 
-        public async Task<EditProjectDisplayDto> GetProjectByIdAsyncAsync(int projectId, UserAndOrganizationDTO userOrg)
+        public async Task<EditProjectDisplayDto> GetProjectByIdAsyncAsync(int projectId, UserAndOrganizationDto userOrg)
         {
             var projectOwnerId = await _projectsDbSet.Where(p =>
                     p.Id == projectId &&
@@ -249,7 +249,7 @@ namespace Shrooms.Domain.Services.Projects
             await _uow.SaveChangesAsync(dto.UserId);
         }
 
-        public async Task DeleteAsync(int id, UserAndOrganizationDTO userOrg)
+        public async Task DeleteAsync(int id, UserAndOrganizationDto userOrg)
         {
             var project = await _projectsDbSet
                 .Include(p => p.Members)
@@ -273,7 +273,7 @@ namespace Shrooms.Domain.Services.Projects
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
-        public async Task ExpelMemberAsync(UserAndOrganizationDTO userAndOrg, int projectId, string expelUserId)
+        public async Task ExpelMemberAsync(UserAndOrganizationDto userAndOrg, int projectId, string expelUserId)
         {
             var project = await _projectsDbSet
                 .Include(x => x.Members)
@@ -291,7 +291,7 @@ namespace Shrooms.Domain.Services.Projects
             await _uow.SaveChangesAsync(userAndOrg.UserId);
         }
 
-        public async Task AddProjectsToUserAsync(string userId, IEnumerable<int> newProjectIds, UserAndOrganizationDTO userOrg)
+        public async Task AddProjectsToUserAsync(string userId, IEnumerable<int> newProjectIds, UserAndOrganizationDto userOrg)
         {
             var user = await _usersDbSet
                 .Include(x => x.Projects)
@@ -417,7 +417,7 @@ namespace Shrooms.Domain.Services.Projects
             return projectAttributes.Union(existingAttributes);
         }
 
-        private async Task ValidateExpelMemberAsync(Project project, UserAndOrganizationDTO userAndOrg)
+        private async Task ValidateExpelMemberAsync(Project project, UserAndOrganizationDto userAndOrg)
         {
             if (project == null)
             {
@@ -433,7 +433,7 @@ namespace Shrooms.Domain.Services.Projects
             }
         }
 
-        private async Task ValidateOwnershipPermissionsAsync(string ownerId, UserAndOrganizationDTO userOrg)
+        private async Task ValidateOwnershipPermissionsAsync(string ownerId, UserAndOrganizationDto userOrg)
         {
             var isAdministrator = await _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Project);
 

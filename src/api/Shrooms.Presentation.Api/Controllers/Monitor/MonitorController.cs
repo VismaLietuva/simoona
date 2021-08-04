@@ -30,8 +30,8 @@ namespace Shrooms.Presentation.Api.Controllers.Monitor
         [PermissionAuthorize(AdministrationPermissions.Monitor)]
         public async Task<IHttpActionResult> GetMonitorList()
         {
-            var monitorsDTO = await _monitorService.GetMonitorListAsync(GetUserAndOrganization().OrganizationId);
-            var monitorsViewModel = _mapper.Map<IEnumerable<MonitorDTO>, IEnumerable<MonitorViewModel>>(monitorsDTO);
+            var monitorsDto = await _monitorService.GetMonitorListAsync(GetUserAndOrganization().OrganizationId);
+            var monitorsViewModel = _mapper.Map<IEnumerable<MonitorDto>, IEnumerable<MonitorViewModel>>(monitorsDto);
             return Ok(monitorsViewModel);
         }
 
@@ -42,8 +42,8 @@ namespace Shrooms.Presentation.Api.Controllers.Monitor
         {
             try
             {
-                var monitorDTO = await _monitorService.GetMonitorDetailsAsync(GetUserAndOrganization().OrganizationId, monitorId);
-                var monitorViewModel = _mapper.Map<MonitorDTO, MonitorViewModel>(monitorDTO);
+                var monitorDto = await _monitorService.GetMonitorDetailsAsync(GetUserAndOrganization().OrganizationId, monitorId);
+                var monitorViewModel = _mapper.Map<MonitorDto, MonitorViewModel>(monitorDto);
                 return Ok(monitorViewModel);
             }
             catch (ValidationException e)
@@ -62,11 +62,11 @@ namespace Shrooms.Presentation.Api.Controllers.Monitor
                 return BadRequest(ModelState);
             }
 
-            var newMonitorDTO = _mapper.Map<CreateMonitorViewModel, MonitorDTO>(monitor);
+            var newMonitorDto = _mapper.Map<CreateMonitorViewModel, MonitorDto>(monitor);
 
             try
             {
-                await _monitorService.CreateMonitorAsync(newMonitorDTO, GetUserAndOrganization());
+                await _monitorService.CreateMonitorAsync(newMonitorDto, GetUserAndOrganization());
             }
             catch (ValidationException e)
             {
@@ -86,10 +86,10 @@ namespace Shrooms.Presentation.Api.Controllers.Monitor
                 return BadRequest(ModelState);
             }
 
-            var monitorDTO = _mapper.Map<MonitorViewModel, MonitorDTO>(monitor);
+            var monitorDto = _mapper.Map<MonitorViewModel, MonitorDto>(monitor);
             try
             {
-                await _monitorService.UpdateMonitorAsync(monitorDTO, GetUserAndOrganization());
+                await _monitorService.UpdateMonitorAsync(monitorDto, GetUserAndOrganization());
             }
             catch (ValidationException e)
             {

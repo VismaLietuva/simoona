@@ -6,9 +6,9 @@ namespace Shrooms.Presentation.Api.Helpers
 {
     public static class IdentityExtensions
     {
-        public static UserAndOrganizationDTO GetUserAndOrganization(this IIdentity identity)
+        public static UserAndOrganizationDto GetUserAndOrganization(this IIdentity identity)
         {
-            return new UserAndOrganizationDTO
+            return new UserAndOrganizationDto
             {
                 OrganizationId = identity.GetOrganizationId(),
                 UserId = identity.GetUserId()

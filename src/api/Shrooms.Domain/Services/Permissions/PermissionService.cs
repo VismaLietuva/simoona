@@ -25,7 +25,7 @@ namespace Shrooms.Domain.Services.Permissions
             _permissionsCache = permissionsCache;
         }
 
-        public bool UserHasPermission(UserAndOrganizationDTO userAndOrg, string permissionName)
+        public bool UserHasPermission(UserAndOrganizationDto userAndOrg, string permissionName)
         {
             if (!_permissionsCache.TryGetValue(userAndOrg.UserId, out var permissions))
             {
@@ -42,7 +42,7 @@ namespace Shrooms.Domain.Services.Permissions
             return isPermitted;
         }
 
-        public async Task<bool> UserHasPermissionAsync(UserAndOrganizationDTO userAndOrg, string permissionName)
+        public async Task<bool> UserHasPermissionAsync(UserAndOrganizationDto userAndOrg, string permissionName)
         {
             if (!_permissionsCache.TryGetValue(userAndOrg.UserId, out var permissions))
             {
@@ -59,12 +59,12 @@ namespace Shrooms.Domain.Services.Permissions
             return isPermitted;
         }
 
-        public async Task<IEnumerable<PermissionGroupDTO>> GetGroupNamesAsync(int organizationId)
+        public async Task<IEnumerable<PermissionGroupDto>> GetGroupNamesAsync(int organizationId)
         {
             var allPermissions = await GetPermissionsAsync(organizationId);
 
             return allPermissions
-                .Select(x => new PermissionGroupDTO
+                .Select(x => new PermissionGroupDto
                 {
                     Name = x.Name.Split(DataLayerConstants.PermissionSplitter).First().ToLower()
                 })
@@ -87,21 +87,21 @@ namespace Shrooms.Domain.Services.Permissions
             return permissions;
         }
 
-        public async Task<IEnumerable<PermissionDTO>> GetRolePermissionsAsync(string roleId, int organizationId)
+        public async Task<IEnumerable<PermissionDto>> GetRolePermissionsAsync(string roleId, int organizationId)
         {
             Expression<Func<Permission, bool>> roleFilter = x => x.Roles.Any(y => y.Id == roleId);
 
             return await GetPermissionsAsync(organizationId, roleFilter);
         }
 
-        private async Task<IEnumerable<PermissionDTO>> GetPermissionsAsync(int organizationId, Expression<Func<Permission, bool>> roleFilter = null)
+        private async Task<IEnumerable<PermissionDto>> GetPermissionsAsync(int organizationId, Expression<Func<Permission, bool>> roleFilter = null)
         {
             return await _permissionsDbSet
                 .Include(x => x.Module.Organizations)
                 .Include(x => x.Roles)
                 .Where(roleFilter ?? (x => true))
                 .Where(FilterActiveModules(organizationId))
-                .Select(x => new PermissionDTO
+                .Select(x => new PermissionDto
                 {
                     Id = x.Id,
                     Name = x.Name,

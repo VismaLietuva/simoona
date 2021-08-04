@@ -66,7 +66,7 @@ namespace Shrooms.Tests.DomainService
             };
 
             _commentsDbSet.SetDbSetDataForAsync(new List<Comment> { comment }.AsQueryable());
-            await _commentService.ToggleLikeAsync(1, new UserAndOrganizationDTO { UserId = "user1", OrganizationId = 2 });
+            await _commentService.ToggleLikeAsync(1, new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 });
 
             Assert.AreEqual("user1", (await _commentsDbSet.FirstAsync()).Likes.First().UserId);
         }
@@ -76,7 +76,7 @@ namespace Shrooms.Tests.DomainService
         {
             _commentsDbSet.SetDbSetDataForAsync(new List<Comment>().AsQueryable());
 
-            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _commentService.ToggleLikeAsync(1, new UserAndOrganizationDTO { UserId = "user1", OrganizationId = 2 }));
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _commentService.ToggleLikeAsync(1, new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 }));
             Assert.AreEqual(ErrorCodes.ContentDoesNotExist, ex.ErrorCode);
         }
 
@@ -97,7 +97,7 @@ namespace Shrooms.Tests.DomainService
             };
 
             _commentsDbSet.SetDbSetDataForAsync(new List<Comment> { comment }.AsQueryable());
-            await _commentService.ToggleLikeAsync(1, new UserAndOrganizationDTO { UserId = "user1", OrganizationId = 2 });
+            await _commentService.ToggleLikeAsync(1, new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 });
 
             Assert.AreEqual(0, (await _commentsDbSet.FirstAsync()).Likes.Count);
         }
@@ -124,7 +124,7 @@ namespace Shrooms.Tests.DomainService
             var expectedDateTime = DateTime.UtcNow;
             _systemClock.UtcNow.Returns(expectedDateTime);
 
-            var newCommentDto = new NewCommentDTO
+            var newCommentDto = new NewCommentDto
             {
                 MessageBody = "test",
                 OrganizationId = 2,
@@ -161,7 +161,7 @@ namespace Shrooms.Tests.DomainService
             };
             _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
-            var editCommentDto = new EditCommentDTO
+            var editCommentDto = new EditCommentDto
             {
                 Id = 1,
                 MessageBody = "edited comment",
@@ -194,7 +194,7 @@ namespace Shrooms.Tests.DomainService
             };
             _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
-            var editCommentDto = new EditCommentDTO
+            var editCommentDto = new EditCommentDto
             {
                 Id = 1,
                 MessageBody = "edited comment",
@@ -227,7 +227,7 @@ namespace Shrooms.Tests.DomainService
             };
             _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
-            var editCommentDto = new EditCommentDTO
+            var editCommentDto = new EditCommentDto
             {
                 Id = 1,
                 MessageBody = "edited comment",
@@ -255,7 +255,7 @@ namespace Shrooms.Tests.DomainService
 
             _commentsDbSet.SetDbSetDataForAsync(comments.AsQueryable());
 
-            var editCommentDto = new EditCommentDTO
+            var editCommentDto = new EditCommentDto
             {
                 Id = 2,
                 MessageBody = "edited comment",
@@ -282,7 +282,7 @@ namespace Shrooms.Tests.DomainService
 
             _commentsDbSet.SetDbSetDataForAsync(comments.AsQueryable());
 
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 UserId = "user1",
                 OrganizationId = 2
@@ -312,7 +312,7 @@ namespace Shrooms.Tests.DomainService
             };
             _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 UserId = "user3",
                 OrganizationId = 2
@@ -343,7 +343,7 @@ namespace Shrooms.Tests.DomainService
             };
             _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 UserId = "user3",
                 OrganizationId = 2
@@ -374,7 +374,7 @@ namespace Shrooms.Tests.DomainService
             };
             _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 UserId = "user2",
                 OrganizationId = 2

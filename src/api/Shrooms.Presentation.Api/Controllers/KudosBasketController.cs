@@ -35,7 +35,7 @@ namespace Shrooms.Presentation.Api.Controllers
             var userAndOrg = GetUserAndOrganization();
 
             var kudosDonations = await _kudosBasketService.GetDonationsAsync(userAndOrg);
-            var result = _mapper.Map<IList<KudosBasketLogDTO>, IList<KudosBasketLogViewModel>>(kudosDonations);
+            var result = _mapper.Map<IList<KudosBasketLogDto>, IList<KudosBasketLogViewModel>>(kudosDonations);
             return Ok(result);
         }
 
@@ -49,10 +49,10 @@ namespace Shrooms.Presentation.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            var newBasketDto = _mapper.Map<KudosBasketCreateViewModel, KudosBasketCreateDTO>(newBasket);
+            var newBasketDto = _mapper.Map<KudosBasketCreateViewModel, KudosBasketCreateDto>(newBasket);
             SetOrganizationAndUser(newBasketDto);
             newBasketDto = await _kudosBasketService.CreateNewBasketAsync(newBasketDto);
-            newBasket = _mapper.Map<KudosBasketCreateDTO, KudosBasketCreateViewModel>(newBasketDto);
+            newBasket = _mapper.Map<KudosBasketCreateDto, KudosBasketCreateViewModel>(newBasketDto);
             return Ok(newBasket);
         }
 
@@ -62,7 +62,7 @@ namespace Shrooms.Presentation.Api.Controllers
         public async Task<IHttpActionResult> GetKudosBasketWidget()
         {
             var basket = await _kudosBasketService.GetKudosBasketWidgetAsync(GetUserAndOrganization());
-            var basketViewModel = basket == null ? null : _mapper.Map<KudosBasketDTO, KudosBasketWidgetViewModel>(basket);
+            var basketViewModel = basket == null ? null : _mapper.Map<KudosBasketDto, KudosBasketWidgetViewModel>(basket);
             return Ok(basketViewModel);
         }
 
@@ -74,7 +74,7 @@ namespace Shrooms.Presentation.Api.Controllers
             try
             {
                 var basket = await _kudosBasketService.GetKudosBasketAsync(userAndOrg);
-                var basketViewModel = _mapper.Map<KudosBasketDTO, KudosBasketViewModel>(basket);
+                var basketViewModel = _mapper.Map<KudosBasketDto, KudosBasketViewModel>(basket);
                 return Ok(basketViewModel);
             }
             catch (KudosBasketException e)
@@ -103,7 +103,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            var editedBasketDto = _mapper.Map<KudosBasketEditViewModel, KudosBasketEditDTO>(editedBasket);
+            var editedBasketDto = _mapper.Map<KudosBasketEditViewModel, KudosBasketEditDto>(editedBasket);
             SetOrganizationAndUser(editedBasketDto);
             await _kudosBasketService.EditKudosBasketAsync(editedBasketDto);
             return Ok();
@@ -122,7 +122,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             try
             {
-                var donationDto = _mapper.Map<KudosBasketDonateViewModel, KudosBasketDonationDTO>(donation);
+                var donationDto = _mapper.Map<KudosBasketDonateViewModel, KudosBasketDonationDto>(donation);
                 SetOrganizationAndUser(donationDto);
                 await _kudosBasketService.MakeDonationAsync(donationDto);
             }

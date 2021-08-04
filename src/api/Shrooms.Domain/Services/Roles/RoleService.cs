@@ -33,11 +33,11 @@ namespace Shrooms.Domain.Services.Roles
             return x => x.Roles.All(y => y.RoleId != roleId);
         }
 
-        public async Task<IEnumerable<RoleDTO>> GetRolesForAutocompleteAsync(string search, UserAndOrganizationDTO userOrg)
+        public async Task<IEnumerable<RoleDto>> GetRolesForAutocompleteAsync(string search, UserAndOrganizationDto userOrg)
         {
             return await _roleDbSet
                 .Where(x => x.OrganizationId == userOrg.OrganizationId && x.Name.Contains(search))
-                .Select(x => new RoleDTO { Id = x.Id, Name = x.Name })
+                .Select(x => new RoleDto { Id = x.Id, Name = x.Name })
                 .ToListAsync();
         }
 
@@ -53,9 +53,9 @@ namespace Shrooms.Domain.Services.Roles
             return administrationRole.Users.Select(s => s.Email).ToList();
         }
 
-        public async Task<RoleDetailsDTO> GetRoleByIdAsync(UserAndOrganizationDTO userAndOrganizationDTO, string roleId)
+        public async Task<RoleDetailsDto> GetRoleByIdAsync(UserAndOrganizationDto userAndOrganizationDto, string roleId)
         {
-            return await GetRoleAsync(role => role.Id == roleId, userAndOrganizationDTO.OrganizationId);
+            return await GetRoleAsync(role => role.Id == roleId, userAndOrganizationDto.OrganizationId);
         }
 
         public async Task<bool> HasRoleAsync(string userId, string roleName)
@@ -73,11 +73,11 @@ namespace Shrooms.Domain.Services.Roles
                 .FirstOrDefaultAsync();
         }
 
-        private async Task<RoleDetailsDTO> GetRoleAsync(Expression<Func<ApplicationRole, bool>> roleFilter, int orgId, bool skipPermission = false)
+        private async Task<RoleDetailsDto> GetRoleAsync(Expression<Func<ApplicationRole, bool>> roleFilter, int orgId, bool skipPermission = false)
         {
             var role = await _roleDbSet
                 .Where(roleFilter)
-                .Select(x => new RoleDetailsDTO
+                .Select(x => new RoleDetailsDto
                 {
                     Id = x.Id,
                     Name = x.Name
@@ -94,11 +94,11 @@ namespace Shrooms.Domain.Services.Roles
             return role;
         }
 
-        private async Task<IEnumerable<RoleUserDTO>> GetUsersWithRoleAsync(string roleId)
+        private async Task<IEnumerable<RoleUserDto>> GetUsersWithRoleAsync(string roleId)
         {
             return await _userDbSet
                 .Where(x => x.Roles.Any(y => y.RoleId == roleId))
-                .Select(x => new RoleUserDTO
+                .Select(x => new RoleUserDto
                 {
                     Id = x.Id,
                     Email = x.Email,
@@ -107,13 +107,13 @@ namespace Shrooms.Domain.Services.Roles
                 .ToListAsync();
         }
 
-        private async Task<IEnumerable<PermissionGroupDTO>> GetGroupNamesByRoleAsync(int orgId, string roleId)
+        private async Task<IEnumerable<PermissionGroupDto>> GetGroupNamesByRoleAsync(int orgId, string roleId)
         {
             var groupNames = await _permissionService.GetGroupNamesAsync(orgId);
             var rolePermissions = (await _permissionService.GetRolePermissionsAsync(roleId, orgId)).ToList();
 
             var groupNamesWithScopes = groupNames
-                .Select(x => new PermissionGroupDTO
+                .Select(x => new PermissionGroupDto
                 {
                     Name = x.Name,
                     ActiveScope = rolePermissions.Any(y => y.Name.StartsWith(x.Name, StringComparison.OrdinalIgnoreCase) && y.Scope == PermissionScopes.Administration)

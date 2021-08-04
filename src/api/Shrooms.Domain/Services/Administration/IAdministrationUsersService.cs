@@ -15,7 +15,7 @@ namespace Shrooms.Domain.Services.Administration
 
         Task<byte[]> GetAllUsersExcelAsync();
 
-        Task ConfirmNewUserAsync(string userId, UserAndOrganizationDTO userAndOrg);
+        Task ConfirmNewUserAsync(string userId, UserAndOrganizationDto userAndOrg);
 
         Task<bool> HasExistingExternalLoginAsync(string email, string loginProvider);
 
@@ -23,7 +23,7 @@ namespace Shrooms.Domain.Services.Administration
 
         Task<IdentityResult> CreateNewUserAsync(ApplicationUser user, string password, string requestedOrganization);
 
-        Task<IEnumerable<AdministrationUserDTO>> GetAllUsersAsync(string sortQuery, string search, FilterDTO[] filter, string includeProperties);
+        Task<IEnumerable<AdministrationUserDto>> GetAllUsersAsync(string sortQuery, string search, FilterDto[] filter, string includeProperties);
 
         Task<bool> UserIsSoftDeletedAsync(string email);
 

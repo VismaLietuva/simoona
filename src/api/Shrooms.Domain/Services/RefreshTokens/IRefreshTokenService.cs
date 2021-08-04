@@ -9,7 +9,7 @@ namespace Shrooms.Domain.Services.RefreshTokens
     {
         Task RemoveTokenByIdAsync(string id);
         Task<RefreshToken> GetTokenTicketByIdAsync(string id);
-        Task AddNewTokenAsync(RefreshTokenDTO tokenDto);
-        Task RemoveTokenBySubjectAsync(UserAndOrganizationDTO userOrg);
+        Task AddNewTokenAsync(RefreshTokenDto tokenDto);
+        Task RemoveTokenBySubjectAsync(UserAndOrganizationDto userOrg);
     }
 }

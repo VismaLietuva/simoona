@@ -22,7 +22,7 @@ namespace Shrooms.Domain.Services.Support
             _applicationUsers = uow.GetDbSet<ApplicationUser>();
         }
 
-        public async Task SubmitTicketAsync(UserAndOrganizationDTO userAndOrganization, SupportDto support)
+        public async Task SubmitTicketAsync(UserAndOrganizationDto userAndOrganization, SupportDto support)
         {
             var currentApplicationUser = await _applicationUsers.SingleAsync(u => u.Id == userAndOrganization.UserId);
 

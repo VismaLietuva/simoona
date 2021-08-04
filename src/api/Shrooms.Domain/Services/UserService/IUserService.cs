@@ -13,11 +13,11 @@ namespace Shrooms.Domain.Services.UserService
     {
         Task ChangeUserLocalizationSettingsAsync(ChangeUserLocalizationSettingsDto settingsDto);
 
-        Task ChangeUserNotificationSettingsAsync(UserNotificationsSettingsDto settingsDto, UserAndOrganizationDTO userOrg);
+        Task ChangeUserNotificationSettingsAsync(UserNotificationsSettingsDto settingsDto, UserAndOrganizationDto userOrg);
 
-        Task DeleteAsync(string userToDelete, UserAndOrganizationDTO userOrg);
+        Task DeleteAsync(string userToDelete, UserAndOrganizationDto userOrg);
 
-        Task<LocalizationSettingsDto> GetUserLocalizationSettingsAsync(UserAndOrganizationDTO userOrg);
+        Task<LocalizationSettingsDto> GetUserLocalizationSettingsAsync(UserAndOrganizationDto userOrg);
 
         Task<IList<string>> GetUserEmailsWithPermissionAsync(string permissionName, int orgId);
 
@@ -25,9 +25,9 @@ namespace Shrooms.Domain.Services.UserService
 
         Task<IList<string>> GetWallUsersEmailsAsync(string senderEmail, DataLayer.EntityModels.Models.Multiwall.Wall wall);
 
-        Task<UserNotificationsSettingsDto> GetWallNotificationSettingsAsync(UserAndOrganizationDTO userOrg);
+        Task<UserNotificationsSettingsDto> GetWallNotificationSettingsAsync(UserAndOrganizationDto userOrg);
 
-        Task ChangeWallNotificationSettingsAsync(UserNotificationsSettingsDto wallNotificationsSettingsDto, UserAndOrganizationDTO userOrg);
+        Task ChangeWallNotificationSettingsAsync(UserNotificationsSettingsDto wallNotificationsSettingsDto, UserAndOrganizationDto userOrg);
 
         Task<IList<IdentityUserLogin>> GetUserLoginsAsync(string id);
 

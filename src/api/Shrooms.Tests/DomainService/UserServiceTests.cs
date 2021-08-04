@@ -127,7 +127,7 @@ namespace Shrooms.Tests.DomainService
             };
             _usersDbSet.SetDbSetDataForAsync(users);
 
-            var userOrg = new UserAndOrganizationDTO { UserId = "user1", OrganizationId = 2 };
+            var userOrg = new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 };
 
             // Act
             var result = await _userService.GetUserLocalizationSettingsAsync(userOrg);
@@ -167,7 +167,7 @@ namespace Shrooms.Tests.DomainService
             _wallUsersDbSet.SetDbSetDataForAsync(userWalls);
             _wallModeratorsDbSet.SetDbSetDataForAsync(moderators);
 
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 UserId = "admin",
                 OrganizationId = 2
@@ -204,7 +204,7 @@ namespace Shrooms.Tests.DomainService
             // Arrange
             MockUserWallNotifications();
 
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 1,
                 UserId = "UserId"

@@ -6,17 +6,17 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
 {
     public interface ICommentService
     {
-        Task EditCommentAsync(EditCommentDTO commentDto);
+        Task EditCommentAsync(EditCommentDto commentDto);
 
-        Task<CommentCreatedDTO> CreateCommentAsync(NewCommentDTO commentDto);
+        Task<CommentCreatedDto> CreateCommentAsync(NewCommentDto commentDto);
 
-        Task ToggleLikeAsync(int commentId, UserAndOrganizationDTO userOrg);
+        Task ToggleLikeAsync(int commentId, UserAndOrganizationDto userOrg);
 
-        Task DeleteCommentAsync(int id, UserAndOrganizationDTO userOrg);
+        Task DeleteCommentAsync(int id, UserAndOrganizationDto userOrg);
 
         Task<string> GetCommentBodyAsync(int id);
 
-        Task HideCommentAsync(int id, UserAndOrganizationDTO userOrg);
+        Task HideCommentAsync(int id, UserAndOrganizationDto userOrg);
 
         Task DeleteCommentsByPostAsync(int postId);
     }

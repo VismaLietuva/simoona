@@ -35,7 +35,7 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
             _postService = postService;
         }
 
-        public async Task NotifyAsync(CommentCreatedDTO commentDto, UserAndOrganizationHubDto userHubDto)
+        public async Task NotifyAsync(CommentCreatedDto commentDto, UserAndOrganizationHubDto userHubDto)
         {
             await _commentEmailNotificationService.SendEmailNotificationAsync(commentDto);
 
@@ -54,7 +54,7 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
             }
         }
 
-        private async Task SendNotificationAsync(CommentCreatedDTO commentDto, UserAndOrganizationHubDto userHubDto, NotificationType notificationType, IList<string> watchers)
+        private async Task SendNotificationAsync(CommentCreatedDto commentDto, UserAndOrganizationHubDto userHubDto, NotificationType notificationType, IList<string> watchers)
         {
             var notificationAuthorDto = await _notificationService.CreateForCommentAsync(userHubDto, commentDto, notificationType, watchers);
 

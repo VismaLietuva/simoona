@@ -68,12 +68,12 @@ namespace Shrooms.Tests.DomainService
         {
             MockExternalLinks();
 
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "1"
             };
-            var monitor = new MonitorDTO { Name = "Test1" };
+            var monitor = new MonitorDto { Name = "Test1" };
 
             var ex = Assert.ThrowsAsync<ValidationException>(async () => await _monitorService.CreateMonitorAsync(monitor, userAndOrg));
             Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.DuplicatesIntolerable));
@@ -84,13 +84,13 @@ namespace Shrooms.Tests.DomainService
         {
             MockExternalLinks();
 
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "1"
             };
 
-            var monitor = new MonitorDTO { Name = "Test4" };
+            var monitor = new MonitorDto { Name = "Test4" };
 
             await _monitorService.CreateMonitorAsync(monitor, userAndOrg);
             _monitorsDbSet.Received(1).Add(Arg.Any<Monitor>());
@@ -101,13 +101,13 @@ namespace Shrooms.Tests.DomainService
         {
             MockExternalLinks();
 
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "1"
             };
 
-            var monitor = new MonitorDTO { Name = "Test4", Id = 1 };
+            var monitor = new MonitorDto { Name = "Test4", Id = 1 };
 
             await _monitorService.UpdateMonitorAsync(monitor, userAndOrg);
             await _uow.Received(1).SaveChangesAsync(false);
@@ -118,13 +118,13 @@ namespace Shrooms.Tests.DomainService
         {
             MockExternalLinks();
 
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "1"
             };
 
-            var monitor = new MonitorDTO { Name = "Test2", Id = 1 };
+            var monitor = new MonitorDto { Name = "Test2", Id = 1 };
 
             var ex = Assert.ThrowsAsync<ValidationException>(async () => await _monitorService.UpdateMonitorAsync(monitor, userAndOrg));
             Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.DuplicatesIntolerable));
@@ -135,13 +135,13 @@ namespace Shrooms.Tests.DomainService
         {
             MockExternalLinks();
 
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "1"
             };
 
-            var monitor = new MonitorDTO { Name = "Test2", Id = 5 };
+            var monitor = new MonitorDto { Name = "Test2", Id = 5 };
 
             var ex = Assert.ThrowsAsync<ValidationException>(async () => await _monitorService.UpdateMonitorAsync(monitor, userAndOrg));
             Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.ContentDoesNotExist));

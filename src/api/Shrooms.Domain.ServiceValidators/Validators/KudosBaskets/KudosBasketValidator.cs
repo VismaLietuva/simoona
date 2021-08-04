@@ -7,7 +7,7 @@ namespace Shrooms.Domain.ServiceValidators.Validators.KudosBaskets
 {
     public class KudosBasketValidator : IKudosBasketValidator
     {
-        public void CheckIfThereIsNoBasketYet(KudosBasketDTO basket)
+        public void CheckIfThereIsNoBasketYet(KudosBasketDto basket)
         {
             if (basket == null)
             {

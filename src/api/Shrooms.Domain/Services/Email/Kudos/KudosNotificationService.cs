@@ -57,7 +57,7 @@ namespace Shrooms.Domain.Services.Email.Kudos
             await _mailingService.SendEmailAsync(new EmailDto(emailRecipient.Email, subject, body));
         }
 
-        public async Task NotifyAboutKudosSentAsync(AddKudosDTO kudosDto)
+        public async Task NotifyAboutKudosSentAsync(AddKudosDto kudosDto)
         {
             var organizationName = (await GetOrganizationNameAsync(kudosDto.KudosLog.OrganizationId)).ShortName;
 

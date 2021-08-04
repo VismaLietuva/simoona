@@ -2,7 +2,7 @@
 
 namespace Shrooms.Contracts.DataTransferObjects.Models.Kudos
 {
-    public class NewKudosTypeDto : UserAndOrganizationDTO
+    public class NewKudosTypeDto : UserAndOrganizationDto
     {
         public string Name { get; set; }
 

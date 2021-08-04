@@ -80,9 +80,9 @@ namespace Shrooms.Domain.Services.DailyMailingService
         {
             var messageBody = GetMessageBody(wallPosts, organizationShortName);
 
-            var emailDTO = new EmailDto(userEmail, BusinessLayerConstants.ShroomsInfoEmailSubject, messageBody);
+            var email = new EmailDto(userEmail, BusinessLayerConstants.ShroomsInfoEmailSubject, messageBody);
 
-            await _emailService.SendEmailAsync(emailDTO);
+            await _emailService.SendEmailAsync(email);
         }
 
         private static string GetMessageBody(IEnumerable<Post> wallPosts, string organizationShortName)

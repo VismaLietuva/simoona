@@ -7,6 +7,6 @@ namespace Shrooms.Domain.Services.Birthday
 {
     public interface IBirthdayService
     {
-        Task<IEnumerable<BirthdayDTO>> GetWeeklyBirthdaysAsync(DateTime date);
+        Task<IEnumerable<BirthdayDto>> GetWeeklyBirthdaysAsync(DateTime date);
     }
 }

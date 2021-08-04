@@ -12,9 +12,9 @@ namespace Shrooms.Domain.Services.Roles
     {
         Expression<Func<ApplicationUser, bool>> ExcludeUsersWithRole(string roleId);
 
-        Task<IEnumerable<RoleDTO>> GetRolesForAutocompleteAsync(string search, UserAndOrganizationDTO userAndOrg);
+        Task<IEnumerable<RoleDto>> GetRolesForAutocompleteAsync(string search, UserAndOrganizationDto userAndOrg);
 
-        Task<RoleDetailsDTO> GetRoleByIdAsync(UserAndOrganizationDTO userAndOrganizationDTO, string roleId);
+        Task<RoleDetailsDto> GetRoleByIdAsync(UserAndOrganizationDto userAndOrganizationDto, string roleId);
 
         Task<IList<string>> GetAdministrationRoleEmailsAsync(int orgId);
 

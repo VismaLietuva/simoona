@@ -46,43 +46,43 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
         private void CreateKudosLogDtoMappings()
         {
-            CreateMap<KudosType, KudosTypeDTO>();
+            CreateMap<KudosType, KudosTypeDto>();
 
-            CreateMap<KudosLog, UserKudosInformationDTO>();
+            CreateMap<KudosLog, UserKudosInformationDto>();
         }
 
         private void CreateWelcomeKudosMappings()
         {
-            CreateMap<WelcomeKudosDTO, WelcomeKudosViewModel>();
-            CreateMap<WelcomeKudosViewModel, WelcomeKudosDTO>();
+            CreateMap<WelcomeKudosDto, WelcomeKudosViewModel>();
+            CreateMap<WelcomeKudosViewModel, WelcomeKudosDto>();
         }
 
         private void CreateAdministrationMappings()
         {
-            CreateMap<ApplicationUser, AdministrationUserDTO>()
+            CreateMap<ApplicationUser, AdministrationUserDto>()
                 .ForMember(dest => dest.HasRoom, opt => opt.ResolveUsing(new AdministrationUserRoomResolver()))
                 .ForMember(dest => dest.JobTitle, opt => opt.MapFrom(u => u.JobPosition.Title));
 
-            CreateMap<Project, AdministrationProjectDTO>();
-            CreateMap<Skill, AdministrationSkillDTO>();
+            CreateMap<Project, AdministrationProjectDto>();
+            CreateMap<Skill, AdministrationSkillDto>();
         }
 
         private void CreateKudosViewModel()
         {
-            CreateMap<KudosTypeDTO, KudosTypeViewModel>();
+            CreateMap<KudosTypeDto, KudosTypeViewModel>();
             CreateMap<ApplicationUser, UserKudosViewModel>();
             CreateMap<KudosLog, UserKudosInformationViewModel>();
             CreateMap<KudosPieChartSliceDto, KudosPieChartSliceViewModel>();
             CreateMap<KudosType, KudosTypeViewModel>();
-            CreateMap<UserKudosInformationDTO, UserKudosInformationViewModel>();
-            CreateMap<KudosLogInputModel, KudosLogInputDTO>();
-            CreateMap<UserKudosDTO, UserKudosViewModel>();
+            CreateMap<UserKudosInformationDto, UserKudosInformationViewModel>();
+            CreateMap<KudosLogInputModel, KudosLogInputDto>();
+            CreateMap<UserKudosDto, UserKudosViewModel>();
         }
 
         private void CreateApplicationUserModelMappings()
         {
-            CreateMap<ApplicationUser, ApplicationUserDTO>();
-            CreateMap<ApplicationUserDTO, ApplicationUser>();
+            CreateMap<ApplicationUser, ApplicationUserDto>();
+            CreateMap<ApplicationUserDto, ApplicationUser>();
 
             CreateMap<ApplicationUser, ApplicationUserDetailsViewModel>()
                 .ForMember(dest => dest.Roles, opt => opt.Ignore())

@@ -515,7 +515,7 @@ namespace Shrooms.Tests.DomainService
         {
             MockWallsForAddRemoveModerators();
 
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "user2"
@@ -530,7 +530,7 @@ namespace Shrooms.Tests.DomainService
         {
             MockWallsForAddRemoveModerators();
 
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "user2"
@@ -545,7 +545,7 @@ namespace Shrooms.Tests.DomainService
         {
             MockWallsForDetails();
 
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "userId"
@@ -568,7 +568,7 @@ namespace Shrooms.Tests.DomainService
         {
             MockWallsForDetails();
 
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "userId"
@@ -591,7 +591,7 @@ namespace Shrooms.Tests.DomainService
         {
             MockWallsForDelete();
 
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "userId"
@@ -609,7 +609,7 @@ namespace Shrooms.Tests.DomainService
         {
             MockWallsForDelete();
 
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "userId"
@@ -627,7 +627,7 @@ namespace Shrooms.Tests.DomainService
         {
             MockWallsForDelete();
 
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "userId"
@@ -641,7 +641,7 @@ namespace Shrooms.Tests.DomainService
         {
             MockWallsForDelete();
 
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "userId"
@@ -655,7 +655,7 @@ namespace Shrooms.Tests.DomainService
         {
             MockWallsForDelete();
 
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "userId2"

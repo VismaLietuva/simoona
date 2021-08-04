@@ -9,19 +9,19 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
         protected override void Configure()
         {
             CreateDtoToViewModelMappings();
-            CreateViewModelToDTOMappings();
+            CreateViewModelToDtoMappings();
         }
 
-        private void CreateViewModelToDTOMappings()
+        private void CreateViewModelToDtoMappings()
         {
-            CreateMap<CreateMonitorViewModel, MonitorDTO>()
+            CreateMap<CreateMonitorViewModel, MonitorDto>()
                 .Ignore(x => x.Id);
-            CreateMap<MonitorViewModel, MonitorDTO>();
+            CreateMap<MonitorViewModel, MonitorDto>();
         }
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<MonitorDTO, MonitorViewModel>();
+            CreateMap<MonitorDto, MonitorViewModel>();
         }
     }
 }

@@ -24,7 +24,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return Content(System.Net.HttpStatusCode.BadRequest, new { ErrorCode = ex.ErrorCode, ErrorMessage = ex.ErrorMessage });
         }
 
-        public UserAndOrganizationDTO GetUserAndOrganization()
+        public UserAndOrganizationDto GetUserAndOrganization()
         {
             return User.Identity.GetUserAndOrganization();
         }
@@ -49,7 +49,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return User.Identity.GetOrganizationName();
         }
 
-        public void SetOrganizationAndUser(UserAndOrganizationDTO obj)
+        public void SetOrganizationAndUser(UserAndOrganizationDto obj)
         {
             obj.OrganizationId = User.Identity.GetOrganizationId();
             obj.UserId = User.Identity.GetUserId();

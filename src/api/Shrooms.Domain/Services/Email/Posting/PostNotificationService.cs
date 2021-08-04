@@ -61,7 +61,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             _projectsDbSet = uow.GetDbSet<Project>();
         }
 
-        public async Task NotifyAboutNewPostAsync(NewlyCreatedPostDTO post)
+        public async Task NotifyAboutNewPostAsync(NewlyCreatedPostDto post)
         {
             var postCreator = await _userService.GetApplicationUserAsync(post.User.UserId);
 
@@ -83,7 +83,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             }
         }
 
-        private async Task SendWallSubscriberEmailsAsync(NewlyCreatedPostDTO post,
+        private async Task SendWallSubscriberEmailsAsync(NewlyCreatedPostDto post,
             IEnumerable<string> destinationEmails,
             ApplicationUser postCreator,
             Organization organization,
@@ -109,7 +109,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             await _mailingService.SendEmailAsync(emailData);
         }
 
-        private async Task SendMentionEmailsAsync(NewlyCreatedPostDTO post, IEnumerable<ApplicationUser> mentionedUsers, ApplicationUser postCreator, Organization organization)
+        private async Task SendMentionEmailsAsync(NewlyCreatedPostDto post, IEnumerable<ApplicationUser> mentionedUsers, ApplicationUser postCreator, Organization organization)
         {
             var messageBody = _markdownConverter.ConvertToHtml(await _postService.GetPostBodyAsync(post.Id));
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);

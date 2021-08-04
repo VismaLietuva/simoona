@@ -7,9 +7,9 @@ namespace Shrooms.Domain.Services.Monitors
 {
     public interface IMonitorService
     {
-        Task<IEnumerable<MonitorDTO>> GetMonitorListAsync(int organizationId);
-        Task<MonitorDTO> GetMonitorDetailsAsync(int organizationId, int monitorId);
-        Task CreateMonitorAsync(MonitorDTO newMonitor, UserAndOrganizationDTO userAndOrganizationDTO);
-        Task UpdateMonitorAsync(MonitorDTO monitorDTO, UserAndOrganizationDTO userAndOrganizationDTO);
+        Task<IEnumerable<MonitorDto>> GetMonitorListAsync(int organizationId);
+        Task<MonitorDto> GetMonitorDetailsAsync(int organizationId, int monitorId);
+        Task CreateMonitorAsync(MonitorDto newMonitor, UserAndOrganizationDto userAndOrganizationDto);
+        Task UpdateMonitorAsync(MonitorDto monitorDto, UserAndOrganizationDto userAndOrganizationDto);
     }
 }

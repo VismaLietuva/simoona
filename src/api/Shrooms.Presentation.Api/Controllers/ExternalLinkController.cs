@@ -33,7 +33,7 @@ namespace Shrooms.Presentation.Api.Controllers
         public async Task<IHttpActionResult> GetAll()
         {
             var externalLinks = await _externalLinkService.GetAllAsync(GetUserAndOrganization().OrganizationId);
-            var externalLinksViewModel = _mapper.Map<IEnumerable<ExternalLinkDTO>, IEnumerable<ExternalLinkViewModel>>(externalLinks);
+            var externalLinksViewModel = _mapper.Map<IEnumerable<ExternalLinkDto>, IEnumerable<ExternalLinkViewModel>>(externalLinks);
             return Ok(externalLinksViewModel);
         }
 
@@ -48,7 +48,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            var updateLinksDto = _mapper.Map<AddEditDeleteExternalLinkViewModel, AddEditDeleteExternalLinkDTO>(updateLinksViewModel);
+            var updateLinksDto = _mapper.Map<AddEditDeleteExternalLinkViewModel, AddEditDeleteExternalLinkDto>(updateLinksViewModel);
             SetOrganizationAndUser(updateLinksDto);
 
             try

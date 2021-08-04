@@ -16,22 +16,22 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<KudosLogUserDTO, KudosLogUserViewModel>();
-            CreateMap<KudosLogTypeDTO, KudosLogTypeViewModel>();
-            CreateMap<KudosUserLogDTO, KudosUserLogViewModel>();
-            CreateMap<MainKudosLogDTO, KudosLogViewModel>();
-            CreateMap<WallKudosLogDTO, WallKudosLogViewModel>();
-            CreateMap<KudosBasicDataDTO, KudosBasicDataViewModel>();
+            CreateMap<KudosLogUserDto, KudosLogUserViewModel>();
+            CreateMap<KudosLogTypeDto, KudosLogTypeViewModel>();
+            CreateMap<KudosUserLogDto, KudosUserLogViewModel>();
+            CreateMap<MainKudosLogDto, KudosLogViewModel>();
+            CreateMap<WallKudosLogDto, WallKudosLogViewModel>();
+            CreateMap<KudosBasicDataDto, KudosBasicDataViewModel>();
         }
 
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<AddKudosLogViewModel, AddKudosLogDTO>();
-            CreateMap<KudosLogsFilterViewModel, KudosLogsFilterDTO>();
-            CreateMap<KudosRejectViewModel, KudosRejectDTO>();
-            CreateMap<KudosBasicDataViewModel, KudosBasicDataDTO>();
+            CreateMap<AddKudosLogViewModel, AddKudosLogDto>();
+            CreateMap<KudosLogsFilterViewModel, KudosLogsFilterDto>();
+            CreateMap<KudosRejectViewModel, KudosRejectDto>();
+            CreateMap<KudosBasicDataViewModel, KudosBasicDataDto>();
             CreateMap<NewKudosTypeViewModel, NewKudosTypeDto>();
-            CreateMap<KudosTypeViewModel, KudosTypeDTO>();
+            CreateMap<KudosTypeViewModel, KudosTypeDto>();
         }
     }
 }

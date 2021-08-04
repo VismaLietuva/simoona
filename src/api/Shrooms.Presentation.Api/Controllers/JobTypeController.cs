@@ -30,7 +30,7 @@ namespace Shrooms.Presentation.Api.Controllers
         public async Task<IHttpActionResult> GetJobTypes()
         {
             var jobTypeDto = await _jobService.GetJobTypesAsync(GetUserAndOrganization());
-            var jobTypeViewModel = _mapper.Map<IEnumerable<JobTypeDTO>, IEnumerable<JobTypeViewModel>>(jobTypeDto);
+            var jobTypeViewModel = _mapper.Map<IEnumerable<JobTypeDto>, IEnumerable<JobTypeViewModel>>(jobTypeDto);
 
             return Ok(jobTypeViewModel);
         }
@@ -48,7 +48,7 @@ namespace Shrooms.Presentation.Api.Controllers
             try
             {
                 var jobTypeDto = await _jobService.GetJobTypeAsync(id, GetUserAndOrganization());
-                var jobTypeViewModel = _mapper.Map<JobTypeDTO, JobTypeViewModel>(jobTypeDto);
+                var jobTypeViewModel = _mapper.Map<JobTypeDto, JobTypeViewModel>(jobTypeDto);
 
                 return Ok(jobTypeViewModel);
             }
@@ -68,7 +68,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            var jobTypeDto = _mapper.Map<NewJobTypeViewModel, JobTypeDTO>(jobTypeViewModel);
+            var jobTypeDto = _mapper.Map<NewJobTypeViewModel, JobTypeDto>(jobTypeViewModel);
             SetOrganizationAndUser(jobTypeDto);
 
             try
@@ -92,7 +92,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            var jobTypeDto = _mapper.Map<JobTypeViewModel, JobTypeDTO>(jobTypeViewModel);
+            var jobTypeDto = _mapper.Map<JobTypeViewModel, JobTypeDto>(jobTypeViewModel);
             SetOrganizationAndUser(jobTypeDto);
 
             try

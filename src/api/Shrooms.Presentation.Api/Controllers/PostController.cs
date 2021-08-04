@@ -81,7 +81,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 }
             }
 
-            var postModel = _mapper.Map<CreateWallPostViewModel, NewPostDTO>(wallPostViewModel);
+            var postModel = _mapper.Map<CreateWallPostViewModel, NewPostDto>(wallPostViewModel);
             SetOrganizationAndUser(postModel);
             var userHubDto = GetUserAndOrganizationHub();
 
@@ -111,7 +111,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            var editPostDto = _mapper.Map<EditPostDTO>(editedPost);
+            var editPostDto = _mapper.Map<EditPostDto>(editedPost);
             SetOrganizationAndUser(editPostDto);
             try
             {

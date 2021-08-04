@@ -13,9 +13,9 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<RoleDTO, RoleViewModel>();
-            CreateMap<RoleUserDTO, RoleUserViewModel>();
-            CreateMap<RoleDetailsDTO, RoleDetailsViewModel>();
+            CreateMap<RoleDto, RoleViewModel>();
+            CreateMap<RoleUserDto, RoleUserViewModel>();
+            CreateMap<RoleDetailsDto, RoleDetailsViewModel>();
         }
     }
 }

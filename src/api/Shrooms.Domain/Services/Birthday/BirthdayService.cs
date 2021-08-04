@@ -25,7 +25,7 @@ namespace Shrooms.Domain.Services.Birthday
             _roleService = roleService;
         }
 
-        public async Task<IEnumerable<BirthdayDTO>> GetWeeklyBirthdaysAsync(DateTime date)
+        public async Task<IEnumerable<BirthdayDto>> GetWeeklyBirthdaysAsync(DateTime date)
         {
             var firstDayOfTheWeek = date
                 .AddDays(-(OneDay + (date.DayOfWeek != DayOfWeek.Saturday ? (int)date.DayOfWeek : -OneDay)))
@@ -38,7 +38,7 @@ namespace Shrooms.Domain.Services.Birthday
             return userBirthdays.Select(MapUserBirthdayInfoToBirthdayDto(firstDayOfTheWeek, lastDayOfTheWeek));
         }
 
-        private async Task<IEnumerable<UserBirthdayInfoDTO>> GetUsersBirthdayInfoAsync(DateTime firstDayOfTheWeek, DateTime lastDayOfTheWeek)
+        private async Task<IEnumerable<UserBirthdayInfoDto>> GetUsersBirthdayInfoAsync(DateTime firstDayOfTheWeek, DateTime lastDayOfTheWeek)
         {
             var newUserRoleId = await _roleService.GetRoleIdByNameAsync(ConstantsRoles.NewUser);
 
@@ -69,9 +69,9 @@ namespace Shrooms.Domain.Services.Birthday
                      && x.BirthDay.Value.Month == lastDayOfTheWeek.Month);
         }
 
-        private static Expression<Func<ApplicationUser, UserBirthdayInfoDTO>> MapUserBirthdayInfo()
+        private static Expression<Func<ApplicationUser, UserBirthdayInfoDto>> MapUserBirthdayInfo()
         {
-            return user => new UserBirthdayInfoDTO
+            return user => new UserBirthdayInfoDto
             {
                 Id = user.Id,
                 FirstName = user.FirstName,
@@ -81,9 +81,9 @@ namespace Shrooms.Domain.Services.Birthday
             };
         }
 
-        private static Func<UserBirthdayInfoDTO, BirthdayDTO> MapUserBirthdayInfoToBirthdayDto(DateTime firstDayOfTheWeek, DateTime lastDayOfTheWeek)
+        private static Func<UserBirthdayInfoDto, BirthdayDto> MapUserBirthdayInfoToBirthdayDto(DateTime firstDayOfTheWeek, DateTime lastDayOfTheWeek)
         {
-            return userInfo => new BirthdayDTO
+            return userInfo => new BirthdayDto
             {
                 Id = userInfo.Id,
                 FirstName = userInfo.FirstName,

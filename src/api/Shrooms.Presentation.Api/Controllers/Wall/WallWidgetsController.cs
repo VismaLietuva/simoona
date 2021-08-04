@@ -61,7 +61,7 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
             };
         }
 
-        private async Task<T> DefaultIfNotAuthorizedAsync<T>(UserAndOrganizationDTO userAndOrganization, string permission, Func<Task<T>> valueFactory)
+        private async Task<T> DefaultIfNotAuthorizedAsync<T>(UserAndOrganizationDto userAndOrganization, string permission, Func<Task<T>> valueFactory)
         {
             return await _permissionService.UserHasPermissionAsync(userAndOrganization, permission) ? await valueFactory() : default;
         }
@@ -70,20 +70,20 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
         {
             var userAndOrg = GetUserAndOrganization();
             var wallKudosLogsDto = await _kudosService.GetLastKudosLogsForWallAsync(userAndOrg);
-            return _mapper.Map<IEnumerable<WallKudosLogDTO>, IEnumerable<WallKudosLogViewModel>>(wallKudosLogsDto);
+            return _mapper.Map<IEnumerable<WallKudosLogDto>, IEnumerable<WallKudosLogViewModel>>(wallKudosLogsDto);
         }
 
         public async Task<KudosBasketWidgetViewModel> GetKudosBasketWidgetAsync()
         {
             var basket = await _kudosBasketService.GetKudosBasketWidgetAsync(GetUserAndOrganization());
-            return basket == null ? null : _mapper.Map<KudosBasketDTO, KudosBasketWidgetViewModel>(basket);
+            return basket == null ? null : _mapper.Map<KudosBasketDto, KudosBasketWidgetViewModel>(basket);
         }
 
         private async Task<IEnumerable<BirthdayViewModel>> GetWeeklyBirthdaysAsync()
         {
             var todayDate = DateTime.UtcNow;
-            var birthdaysDTO = await _birthdayService.GetWeeklyBirthdaysAsync(todayDate);
-            var birthdays = _mapper.Map<IEnumerable<BirthdayDTO>, IEnumerable<BirthdayViewModel>>(birthdaysDTO);
+            var birthdaysDto = await _birthdayService.GetWeeklyBirthdaysAsync(todayDate);
+            var birthdays = _mapper.Map<IEnumerable<BirthdayDto>, IEnumerable<BirthdayViewModel>>(birthdaysDto);
             return birthdays;
         }
 
@@ -101,7 +101,7 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
         private async Task<KudosListBasicDataViewModel> CalculateStatsAsync(int months, int amount)
         {
             var kudosStatsDto = await _kudosService.GetKudosStatsAsync(months, amount, User.Identity.GetOrganizationId());
-            var stats = _mapper.Map<IEnumerable<KudosBasicDataDTO>, IEnumerable<KudosBasicDataViewModel>>(kudosStatsDto);
+            var stats = _mapper.Map<IEnumerable<KudosBasicDataDto>, IEnumerable<KudosBasicDataViewModel>>(kudosStatsDto);
             return new KudosListBasicDataViewModel
             {
                 Users = stats,

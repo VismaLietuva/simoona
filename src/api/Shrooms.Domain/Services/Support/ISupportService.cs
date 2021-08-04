@@ -6,6 +6,6 @@ namespace Shrooms.Domain.Services.Support
 {
     public interface ISupportService
     {
-        Task SubmitTicketAsync(UserAndOrganizationDTO userAndOrganization, SupportDto support);
+        Task SubmitTicketAsync(UserAndOrganizationDto userAndOrganization, SupportDto support);
     }
 }

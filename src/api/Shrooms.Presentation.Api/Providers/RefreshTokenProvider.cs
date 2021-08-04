@@ -40,7 +40,7 @@ namespace Shrooms.Presentation.Api.Providers
                 var refreshTokenId = Guid.NewGuid().ToString("n");
 
                 var refreshTokenLifeTimeInDays = Convert.ToInt16(ConfigurationManager.AppSettings["RefreshTokenLifeTimeInDays"]);
-                var token = new RefreshTokenDTO
+                var token = new RefreshTokenDto
                 {
                     Id = CryptoHelper.GetHash(refreshTokenId),
                     Subject = context.Ticket.Identity.GetUserId(),
@@ -53,7 +53,7 @@ namespace Shrooms.Presentation.Api.Providers
                 context.Ticket.Properties.ExpiresUtc = token.ExpiresUtc;
 
                 token.ProtectedTicket = context.SerializeTicket();
-                var userOrg = new UserAndOrganizationDTO
+                var userOrg = new UserAndOrganizationDto
                 {
                     OrganizationId = context.Ticket.Identity.GetOrganizationId(),
                     UserId = context.Ticket.Identity.GetUserId()

@@ -419,7 +419,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         private async Task<AuthenticationProperties> CreateInitialRefreshToken(string clientId, ApplicationUser user, ClaimsIdentity oAuthIdentity)
         {
-            var userOrganization = new UserAndOrganizationDTO
+            var userOrganization = new UserAndOrganizationDto
             {
                 OrganizationId = user.OrganizationId,
                 UserId = user.Id

@@ -62,7 +62,7 @@ namespace Shrooms.Tests.DomainService
             };
 
             _postsDbSet.SetDbSetDataForAsync(new List<Post> { post }.AsQueryable());
-            await _postService.ToggleLikeAsync(1, new UserAndOrganizationDTO { UserId = "user1", OrganizationId = 2 });
+            await _postService.ToggleLikeAsync(1, new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 });
 
             Assert.AreEqual("user1", _postsDbSet.First().Likes.First().UserId);
         }
@@ -81,7 +81,7 @@ namespace Shrooms.Tests.DomainService
             };
 
             _postsDbSet.SetDbSetDataForAsync(new List<Post> { post }.AsQueryable());
-            await _postService.ToggleLikeAsync(1, new UserAndOrganizationDTO { UserId = "user1", OrganizationId = 2 });
+            await _postService.ToggleLikeAsync(1, new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 });
 
             Assert.AreEqual(0, _postsDbSet.First().Likes.Count);
         }
@@ -90,7 +90,7 @@ namespace Shrooms.Tests.DomainService
         public void Should_Throw_If_There_Is_No_Post_To_Be_Liked()
         {
             _postsDbSet.SetDbSetDataForAsync(new List<Post>().AsQueryable());
-            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _postService.ToggleLikeAsync(1, new UserAndOrganizationDTO { UserId = "user1", OrganizationId = 2 }));
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _postService.ToggleLikeAsync(1, new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 }));
             Assert.AreEqual(ErrorCodes.ContentDoesNotExist, ex.ErrorCode);
         }
 
@@ -114,7 +114,7 @@ namespace Shrooms.Tests.DomainService
             };
             _usersDbSet.SetDbSetDataForAsync(users.AsQueryable());
 
-            var newPostDto = new NewPostDTO
+            var newPostDto = new NewPostDto
             {
                 MessageBody = "test",
                 OrganizationId = 2,
@@ -152,7 +152,7 @@ namespace Shrooms.Tests.DomainService
             };
             _usersDbSet.SetDbSetDataForAsync(users.AsQueryable());
 
-            var newPostDto = new NewPostDTO
+            var newPostDto = new NewPostDto
             {
                 MessageBody = "test",
                 OrganizationId = 2,
@@ -170,7 +170,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public void Should_Throw_If_There_Is_No_Post_To_Be_Hidden()
         {
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 UserId = "user1",
                 OrganizationId = 2
@@ -184,7 +184,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public void Should_Throw_If_Not_Authorized_To_Hide_Wall_Post()
         {
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 UserId = "user1",
                 OrganizationId = 2
@@ -222,7 +222,7 @@ namespace Shrooms.Tests.DomainService
         [Test]
         public async Task Should_Hide_Wall_Post()
         {
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 UserId = "user1",
                 OrganizationId = 2
@@ -275,7 +275,7 @@ namespace Shrooms.Tests.DomainService
             };
             _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
-            var editPostDto = new EditPostDTO
+            var editPostDto = new EditPostDto
             {
                 Id = 1,
                 MessageBody = "edited post",
@@ -307,7 +307,7 @@ namespace Shrooms.Tests.DomainService
             };
             _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
-            var editPostDto = new EditPostDTO
+            var editPostDto = new EditPostDto
             {
                 Id = 1,
                 MessageBody = "edited post",
@@ -339,7 +339,7 @@ namespace Shrooms.Tests.DomainService
             };
             _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
-            var editPostDto = new EditPostDTO
+            var editPostDto = new EditPostDto
             {
                 Id = 1,
                 MessageBody = "edited post",
@@ -362,7 +362,7 @@ namespace Shrooms.Tests.DomainService
             var posts = new List<Post>();
             _postsDbSet.SetDbSetDataForAsync(posts.AsQueryable());
 
-            var editPostDto = new EditPostDTO
+            var editPostDto = new EditPostDto
             {
                 Id = 1,
                 MessageBody = "edited post",
@@ -384,7 +384,7 @@ namespace Shrooms.Tests.DomainService
             var posts = new List<Post>();
             _postsDbSet.SetDbSetDataForAsync(posts.AsQueryable());
 
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 UserId = "user1",
                 OrganizationId = 2
@@ -413,7 +413,7 @@ namespace Shrooms.Tests.DomainService
             };
             _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 UserId = "user3",
                 OrganizationId = 2
@@ -443,7 +443,7 @@ namespace Shrooms.Tests.DomainService
             };
             _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 UserId = "user3",
                 OrganizationId = 2
@@ -473,7 +473,7 @@ namespace Shrooms.Tests.DomainService
             };
             _wallModeratorsDbSet.SetDbSetDataForAsync(wallModerators.AsQueryable());
 
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 UserId = "user2",
                 OrganizationId = 2

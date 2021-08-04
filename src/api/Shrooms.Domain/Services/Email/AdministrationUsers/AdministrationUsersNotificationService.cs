@@ -33,7 +33,7 @@ namespace Shrooms.Domain.Services.Email.AdministrationUsers
             _userService = permissionService;
         }
 
-        public async Task SendConfirmedNotificationEmailAsync(string userEmail, UserAndOrganizationDTO userAndOrg)
+        public async Task SendConfirmedNotificationEmailAsync(string userEmail, UserAndOrganizationDto userAndOrg)
         {
             var organizationNameAndContent = await _organizationDbSet
                 .Where(organization => organization.Id == userAndOrg.OrganizationId)

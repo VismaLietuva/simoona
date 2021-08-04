@@ -47,7 +47,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
             _postWatchers = uow.GetDbSet<PostWatcher>();
         }
 
-        public async Task<NewlyCreatedPostDTO> CreateNewPostAsync(NewPostDTO newPostDto)
+        public async Task<NewlyCreatedPostDto> CreateNewPostAsync(NewPostDto newPostDto)
         {
             await _postDeleteLock.WaitAsync();
 
@@ -97,7 +97,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
             }
         }
 
-        public async Task ToggleLikeAsync(int postId, UserAndOrganizationDTO userOrg)
+        public async Task ToggleLikeAsync(int postId, UserAndOrganizationDto userOrg)
         {
             await _postDeleteLock.WaitAsync();
 
@@ -130,7 +130,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
             }
         }
 
-        public async Task EditPostAsync(EditPostDTO editPostDto)
+        public async Task EditPostAsync(EditPostDto editPostDto)
         {
             await _postDeleteLock.WaitAsync();
 
@@ -172,7 +172,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
             return (await _postsDbSet.FirstOrDefaultAsync(p => p.Id == postId))?.MessageBody;
         }
 
-        public async Task DeleteWallPostAsync(int postId, UserAndOrganizationDTO userOrg)
+        public async Task DeleteWallPostAsync(int postId, UserAndOrganizationDto userOrg)
         {
             await _postDeleteLock.WaitAsync();
 
@@ -209,7 +209,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
             }
         }
 
-        public async Task HideWallPostAsync(int postId, UserAndOrganizationDTO userOrg)
+        public async Task HideWallPostAsync(int postId, UserAndOrganizationDto userOrg)
         {
             await _postDeleteLock.WaitAsync();
 
@@ -257,9 +257,9 @@ namespace Shrooms.Domain.Services.Wall.Posts
             return userDto;
         }
 
-        private static NewlyCreatedPostDTO MapNewlyCreatedPostToDto(Post post, UserDto user, WallType wallType, IEnumerable<string> mentionedUserIds)
+        private static NewlyCreatedPostDto MapNewlyCreatedPostToDto(Post post, UserDto user, WallType wallType, IEnumerable<string> mentionedUserIds)
         {
-            var newlyCreatedPostDto = new NewlyCreatedPostDTO
+            var newlyCreatedPostDto = new NewlyCreatedPostDto
             {
                 Id = post.Id,
                 MessageBody = post.MessageBody,
@@ -275,7 +275,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
             return newlyCreatedPostDto;
         }
 
-        public async Task ToggleWatchAsync(int postId, UserAndOrganizationDTO userAndOrg, bool shouldWatch)
+        public async Task ToggleWatchAsync(int postId, UserAndOrganizationDto userAndOrg, bool shouldWatch)
         {
             await _postDeleteLock.WaitAsync();
 

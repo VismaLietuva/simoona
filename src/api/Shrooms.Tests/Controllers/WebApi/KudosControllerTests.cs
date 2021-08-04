@@ -53,13 +53,13 @@ namespace Shrooms.Tests.Controllers.WebApi
         [Test]
         public async Task GetKudosTypes_Should_Return_IEnumerable_Of_KudosType_ViewModel()
         {
-            var userAndOrganization = new UserAndOrganizationDTO
+            var userAndOrganization = new UserAndOrganizationDto
             {
                 OrganizationId = 1,
                 UserId = "fd798623-166c-412d-a060-369d4c7b90eb"
             };
 
-            _kudosService.GetKudosTypesAsync(userAndOrganization).Returns(new List<KudosTypeDTO> { new KudosTypeDTO() });
+            _kudosService.GetKudosTypesAsync(userAndOrganization).Returns(new List<KudosTypeDto> { new KudosTypeDto() });
 
             var response = await _kudosController.GetKudosTypes();
 
@@ -76,22 +76,22 @@ namespace Shrooms.Tests.Controllers.WebApi
                 SearchUserId = "1"
             };
 
-            IEnumerable<MainKudosLogDTO> kudosLogs = new List<MainKudosLogDTO>
+            IEnumerable<MainKudosLogDto> kudosLogs = new List<MainKudosLogDto>
             {
-                new MainKudosLogDTO
+                new MainKudosLogDto
                 {
                     Id = 1
                 }
             };
 
-            var entries = new KudosLogsEntriesDto<MainKudosLogDTO>
+            var entries = new KudosLogsEntriesDto<MainKudosLogDto>
             {
                 KudosLogs = kudosLogs
             };
 
-            var dto = new KudosLogsFilterDTO();
+            var dto = new KudosLogsFilterDto();
 
-            _mapper.Map<KudosLogsFilterViewModel, KudosLogsFilterDTO>(filter)
+            _mapper.Map<KudosLogsFilterViewModel, KudosLogsFilterDto>(filter)
                 .Returns(dto);
 
             _kudosService.GetKudosLogsAsync(null).ReturnsForAnyArgs(entries);
@@ -113,9 +113,9 @@ namespace Shrooms.Tests.Controllers.WebApi
                 TotalPointsPerReceiver = explicitAmount
             };
 
-            var mappedRequest = new AddKudosLogDTO();
-            _mapper.Map<AddKudosLogViewModel, AddKudosLogDTO>(request).Returns(mappedRequest);
-            _permissionService.UserHasPermissionAsync(Arg.Any<UserAndOrganizationDTO>(), AdministrationPermissions.Kudos)
+            var mappedRequest = new AddKudosLogDto();
+            _mapper.Map<AddKudosLogViewModel, AddKudosLogDto>(request).Returns(mappedRequest);
+            _permissionService.UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), AdministrationPermissions.Kudos)
                 .Returns(true);
 
             // Act
@@ -136,9 +136,9 @@ namespace Shrooms.Tests.Controllers.WebApi
             {
                 TotalPointsPerReceiver = null
             };
-            var mappedRequest = new AddKudosLogDTO();
-            _mapper.Map<AddKudosLogViewModel, AddKudosLogDTO>(request).Returns(mappedRequest);
-            _permissionService.UserHasPermissionAsync(Arg.Any<UserAndOrganizationDTO>(), AdministrationPermissions.Kudos)
+            var mappedRequest = new AddKudosLogDto();
+            _mapper.Map<AddKudosLogViewModel, AddKudosLogDto>(request).Returns(mappedRequest);
+            _permissionService.UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), AdministrationPermissions.Kudos)
                 .Returns(true);
 
             // Act
@@ -161,9 +161,9 @@ namespace Shrooms.Tests.Controllers.WebApi
                 TotalPointsPerReceiver = explicitAmount
             };
 
-            var mappedRequest = new AddKudosLogDTO();
-            _mapper.Map<AddKudosLogViewModel, AddKudosLogDTO>(request).Returns(mappedRequest);
-            _permissionService.UserHasPermissionAsync(Arg.Any<UserAndOrganizationDTO>(), AdministrationPermissions.Kudos)
+            var mappedRequest = new AddKudosLogDto();
+            _mapper.Map<AddKudosLogViewModel, AddKudosLogDto>(request).Returns(mappedRequest);
+            _permissionService.UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), AdministrationPermissions.Kudos)
                 .Returns(false);
 
             // Act

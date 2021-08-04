@@ -7,11 +7,11 @@ namespace Shrooms.Domain.Services.Permissions
 {
     public interface IPermissionService
     {
-        Task<bool> UserHasPermissionAsync(UserAndOrganizationDTO userAndOrg, string permissionName);
-        Task<IEnumerable<PermissionGroupDTO>> GetGroupNamesAsync(int organizationId);
+        Task<bool> UserHasPermissionAsync(UserAndOrganizationDto userAndOrg, string permissionName);
+        Task<IEnumerable<PermissionGroupDto>> GetGroupNamesAsync(int organizationId);
         Task<IEnumerable<string>> GetUserPermissionsAsync(string userId, int organizationId);
-        Task<IEnumerable<PermissionDTO>> GetRolePermissionsAsync(string roleId, int organizationId);
+        Task<IEnumerable<PermissionDto>> GetRolePermissionsAsync(string roleId, int organizationId);
         void RemoveCache(string userId);
-        bool UserHasPermission(UserAndOrganizationDTO userAndOrg, string permissionName);
+        bool UserHasPermission(UserAndOrganizationDto userAndOrg, string permissionName);
     }
 }

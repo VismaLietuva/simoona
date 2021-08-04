@@ -9,13 +9,13 @@ namespace Shrooms.Domain.Services.Wall.Posts
 {
     public interface IPostService
     {
-        Task EditPostAsync(EditPostDTO editPostDto);
-        Task<NewlyCreatedPostDTO> CreateNewPostAsync(NewPostDTO newPostDto);
-        Task ToggleLikeAsync(int postId, UserAndOrganizationDTO userOrg);
+        Task EditPostAsync(EditPostDto editPostDto);
+        Task<NewlyCreatedPostDto> CreateNewPostAsync(NewPostDto newPostDto);
+        Task ToggleLikeAsync(int postId, UserAndOrganizationDto userOrg);
         Task<string> GetPostBodyAsync(int postId);
-        Task DeleteWallPostAsync(int postId, UserAndOrganizationDTO userOrg);
-        Task HideWallPostAsync(int postId, UserAndOrganizationDTO userOrg);
-        Task ToggleWatchAsync(int postId, UserAndOrganizationDTO userAndOrg, bool shouldWatch);
+        Task DeleteWallPostAsync(int postId, UserAndOrganizationDto userOrg);
+        Task HideWallPostAsync(int postId, UserAndOrganizationDto userOrg);
+        Task ToggleWatchAsync(int postId, UserAndOrganizationDto userAndOrg, bool shouldWatch);
         Task<IList<string>> GetPostWatchersForAppNotificationsAsync(int postId);
         Task<IList<ApplicationUser>> GetPostWatchersForEmailNotificationsAsync(int postId);
     }

@@ -125,8 +125,8 @@ namespace Shrooms.Presentation.Api.Controllers
                 return BadRequest("search string cannot be empty");
             }
 
-            var projectsDTO = await _projectsService.GetProjectsForAutocompleteAsync(name, GetUserAndOrganization().OrganizationId);
-            var result = _mapper.Map<IEnumerable<ProjectsAutoCompleteDto>, IEnumerable<ProjectsBasicInfoViewModel>>(projectsDTO);
+            var projectsDto = await _projectsService.GetProjectsForAutocompleteAsync(name, GetUserAndOrganization().OrganizationId);
+            var result = _mapper.Map<IEnumerable<ProjectsAutoCompleteDto>, IEnumerable<ProjectsBasicInfoViewModel>>(projectsDto);
 
             return Ok(result);
         }

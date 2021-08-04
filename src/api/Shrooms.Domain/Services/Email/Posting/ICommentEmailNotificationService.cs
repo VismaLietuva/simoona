@@ -5,6 +5,6 @@ namespace Shrooms.Domain.Services.Email.Posting
 {
     public interface ICommentEmailNotificationService
     {
-        Task SendEmailNotificationAsync(CommentCreatedDTO commentDto);
+        Task SendEmailNotificationAsync(CommentCreatedDto commentDto);
     }
 }
