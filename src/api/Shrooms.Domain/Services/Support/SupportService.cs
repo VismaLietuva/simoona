@@ -1,5 +1,5 @@
 ﻿using System.Data.Entity;
-using System.Linq;
+using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Support;
@@ -22,13 +22,13 @@ namespace Shrooms.Domain.Services.Support
             _applicationUsers = uow.GetDbSet<ApplicationUser>();
         }
 
-        public void SubmitTicket(UserAndOrganizationDTO userAndOrganization, SupportDto support)
+        public async Task SubmitTicketAsync(UserAndOrganizationDTO userAndOrganization, SupportDto support)
         {
-            var currentApplicationUser = _applicationUsers.Single(u => u.Id == userAndOrganization.UserId);
+            var currentApplicationUser = await _applicationUsers.SingleAsync(u => u.Id == userAndOrganization.UserId);
 
             var email = new EmailDto(currentApplicationUser.FullName, currentApplicationUser.Email, _applicationSettings.SupportEmail, $"{support.Type}: {support.Subject}", support.Message);
 
-            _mailingService.SendEmailAsync(email, true);
+            await _mailingService.SendEmailAsync(email, true);
         }
     }
 }

@@ -24,8 +24,7 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.BirthdayNotification
         private readonly IMailTemplate _mailTemplate;
         private readonly IApplicationSettings _appSettings;
 
-        public BirthdaysNotificationWebHookService(
-            IUnitOfWork2 uow,
+        public BirthdaysNotificationWebHookService(IUnitOfWork2 uow,
             IMailingService mailingService,
             IRoleService roleService,
             IMailTemplate mailTemplate,
@@ -63,7 +62,8 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.BirthdayNotification
             var currentOrganization = await _organizationsDbSet.FirstAsync(name => name.ShortName == organizationName);
 
             var receivers = await _roleService.GetAdministrationRoleEmailsAsync(currentOrganization.Id);
-            var model = new BirthdaysNotificationTemplateViewModel(GetFormattedEmployeesList(employees, organizationName, currentOrganization.ShortName), _appSettings.UserNotificationSettingsUrl(organizationName));
+            var model = new BirthdaysNotificationTemplateViewModel(GetFormattedEmployeesList(employees, organizationName, currentOrganization.ShortName),
+                _appSettings.UserNotificationSettingsUrl(organizationName));
             var content = _mailTemplate.Generate(model, EmailTemplateCacheKeys.BirthdaysNotification);
             var emailData = new EmailDto(receivers, Resources.Emails.Templates.BirthdaysNotificationEmailSubject, content);
 

@@ -21,16 +21,6 @@ namespace Shrooms.DataLayer.DAL
             return _context.Set<T>();
         }
 
-        public void SaveChanges(bool useMetaTracking)
-        {
-            _context.SaveChanges(useMetaTracking);
-        }
-
-        public void SaveChanges(string userId)
-        {
-            _context.SaveChanges(userId);
-        }
-
         public async Task<int> SaveChangesAsync(string userId)
         {
             return await _context.SaveChangesAsync(userId);

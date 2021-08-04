@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects.Models.ExternalLinks;
@@ -22,9 +23,9 @@ namespace Shrooms.Domain.Services.ExternalLinks
             _externalLinkDbSet = uow.GetDbSet<ExternalLink>();
         }
 
-        public IEnumerable<ExternalLinkDTO> GetAll(int organizationId)
+        public async Task<IEnumerable<ExternalLinkDTO>> GetAllAsync(int organizationId)
         {
-            var externalLinks = _externalLinkDbSet
+            var externalLinks = await _externalLinkDbSet
                 .Where(x => x.OrganizationId == organizationId)
                 .Select(x => new ExternalLinkDTO
                 {
@@ -32,24 +33,24 @@ namespace Shrooms.Domain.Services.ExternalLinks
                     Name = x.Name,
                     Url = x.Url
                 })
-                .ToList();
+                .ToListAsync();
 
             return externalLinks;
         }
 
-        public void UpdateLinks(AddEditDeleteExternalLinkDTO updateLinksDto)
+        public async Task UpdateLinksAsync(AddEditDeleteExternalLinkDTO updateLinksDto)
         {
             var timestamp = DateTime.UtcNow;
-            DuplicateValuesValidation(updateLinksDto);
+            await DuplicateValuesValidationAsync(updateLinksDto);
 
-            UpdateLinks(updateLinksDto, timestamp);
-            DeleteLinks(updateLinksDto, timestamp);
-            CreateNewLinks(updateLinksDto, timestamp);
+            await UpdateLinksAsync(updateLinksDto, timestamp);
+            await DeleteLinksAsync(updateLinksDto, timestamp);
+            await CreateNewLinksAsync(updateLinksDto, timestamp);
         }
 
-        private void DuplicateValuesValidation(AddEditDeleteExternalLinkDTO updateLinksDto)
+        private async Task DuplicateValuesValidationAsync(AddEditDeleteExternalLinkDTO updateLinksDto)
         {
-            var externalLinks = _externalLinkDbSet
+            var externalLinks = await _externalLinkDbSet
                 .Where(x => x.OrganizationId == updateLinksDto.OrganizationId)
                 .Select(x => new ExternalLinkDTO
                 {
@@ -57,7 +58,7 @@ namespace Shrooms.Domain.Services.ExternalLinks
                     Name = x.Name,
                     Url = x.Url
                 })
-                .ToList();
+                .ToListAsync();
 
             if (updateLinksDto.LinksToCreate.Any(c => externalLinks.Any(l => l.Name == c.Name || l.Url == c.Url)) ||
                 updateLinksDto.LinksToUpdate.Any(c => externalLinks.Any(l => l.Name == c.Name || l.Url == c.Url)))
@@ -66,7 +67,7 @@ namespace Shrooms.Domain.Services.ExternalLinks
             }
         }
 
-        private void CreateNewLinks(AddEditDeleteExternalLinkDTO updateLinks, DateTime timestamp)
+        private async Task CreateNewLinksAsync(AddEditDeleteExternalLinkDTO updateLinks, DateTime timestamp)
         {
             foreach (var link in updateLinks.LinksToCreate)
             {
@@ -83,34 +84,38 @@ namespace Shrooms.Domain.Services.ExternalLinks
                 _externalLinkDbSet.Add(newLink);
             }
 
-            _uow.SaveChanges(false);
+            await _uow.SaveChangesAsync(false);
         }
 
-        private void DeleteLinks(AddEditDeleteExternalLinkDTO updateLinks, DateTime timestamp)
+        private async Task DeleteLinksAsync(AddEditDeleteExternalLinkDTO updateLinks, DateTime timestamp)
         {
-            var linksToDelete = _externalLinkDbSet
+            var linksToDelete = await _externalLinkDbSet
                 .Where(l =>
                     updateLinks.LinksToDelete.Contains(l.Id) &&
                     l.OrganizationId == updateLinks.OrganizationId)
-                .ToList();
+                .ToListAsync();
+
             foreach (var link in linksToDelete)
             {
                 link.UpdateMetadata(updateLinks.UserId, timestamp);
             }
 
-            _uow.SaveChanges(false);
+            await _uow.SaveChangesAsync(false);
+
             foreach (var link in linksToDelete)
             {
                 _externalLinkDbSet.Remove(link);
             }
         }
 
-        private void UpdateLinks(AddEditDeleteExternalLinkDTO updateLinks, DateTime timestamp)
+        private async Task UpdateLinksAsync(AddEditDeleteExternalLinkDTO updateLinks, DateTime timestamp)
         {
             var updatedLinksIds = updateLinks.LinksToUpdate.Select(l => l.Id);
-            var linksToUpdate = _externalLinkDbSet
+
+            var linksToUpdate = await _externalLinkDbSet
                 .Where(l => updatedLinksIds.Contains(l.Id) && l.OrganizationId == updateLinks.OrganizationId)
-                .ToList();
+                .ToListAsync();
+
             foreach (var updatedLink in updateLinks.LinksToUpdate)
             {
                 var link = linksToUpdate.First(l => l.Id == updatedLink.Id);

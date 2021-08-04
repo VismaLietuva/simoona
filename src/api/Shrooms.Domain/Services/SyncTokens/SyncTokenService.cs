@@ -16,7 +16,7 @@ namespace Shrooms.Domain.Services.SyncTokens
             _syncTokenRepository = _unitOfWork.GetRepository<SyncToken>();
         }
 
-        public async Task<string> GetToken(string name)
+        public async Task<string> GetTokenAsync(string name)
         {
             var syncToken = await _syncTokenRepository.Get(n => n.Name == name).FirstOrDefaultAsync();
 

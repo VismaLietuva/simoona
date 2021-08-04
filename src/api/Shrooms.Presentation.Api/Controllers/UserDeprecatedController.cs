@@ -121,7 +121,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 return BadRequest();
             }
 
-            var canNotBeDeleted = _kudosService.HasPendingKudos(id);
+            var canNotBeDeleted = await _kudosService.HasPendingKudosAsync(id);
 
             if (canNotBeDeleted)
             {
@@ -134,9 +134,9 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [Route("GetUsersAsExcel")]
         [PermissionAuthorize(Permission = AdministrationPermissions.ApplicationUser)]
-        public HttpResponseMessage GetUsersAsExcel()
+        public async Task<HttpResponseMessage> GetUsersAsExcel()
         {
-            var excelBytes = _administrationUsersService.GetAllUsersExcel();
+            var excelBytes = await _administrationUsersService.GetAllUsersExcelAsync();
 
             var result = Request.CreateResponse(HttpStatusCode.OK);
             result.Content = new ByteArrayContent(excelBytes);
@@ -146,8 +146,7 @@ namespace Shrooms.Presentation.Api.Controllers
                     FileName = "Users.xlsx"
                 };
 
-            result.Content.Headers.ContentType = new MediaTypeHeaderValue(
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            result.Content.Headers.ContentType = new MediaTypeHeaderValue("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 
             return result;
         }
@@ -201,11 +200,13 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [Route("GetByRoom")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public IEnumerable<ApplicationUserViewModel> GetByRoom(int roomId, string includeProperties = "")
+        public async Task<IEnumerable<ApplicationUserViewModel>> GetByRoomAsync(int roomId, string includeProperties = "")
         {
+            var newUserRoleId = await _roleService.GetRoleIdByNameAsync(Roles.NewUser);
+
             var applicationUsers = _applicationUserRepository
                 .Get(e => e.Room.Id == roomId, includeProperties: includeProperties)
-                .Where(_roleService.ExcludeUsersWithRole(Roles.NewUser));
+                .Where(_roleService.ExcludeUsersWithRole(newUserRoleId));
 
             var applicationUsersViewModel = _mapper.Map<IEnumerable<ApplicationUser>, IEnumerable<ApplicationUserViewModel>>(applicationUsers);
             return applicationUsersViewModel;
@@ -213,11 +214,13 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [Route("GetByFloor")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public IEnumerable<ApplicationUserViewModel> GetByFloor(int floorId, string includeProperties = "")
+        public async Task<IEnumerable<ApplicationUserViewModel>> GetByFloorAsync(int floorId, string includeProperties = "")
         {
+            var newUserRoleId = await _roleService.GetRoleIdByNameAsync(Roles.NewUser);
+
             var applicationUsers = _applicationUserRepository
                 .Get(e => e.Room.FloorId == floorId, includeProperties: includeProperties)
-                .Where(_roleService.ExcludeUsersWithRole(Roles.NewUser));
+                .Where(_roleService.ExcludeUsersWithRole(newUserRoleId));
 
             return _mapper.Map<IEnumerable<ApplicationUser>, IEnumerable<ApplicationUserViewModel>>(applicationUsers);
         }
@@ -332,7 +335,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("ConfirmUser")]
         [PermissionAuthorize(Permission = AdministrationPermissions.ApplicationUser)]
-        public IHttpActionResult ConfirmUser(string id)
+        public async Task<IHttpActionResult> ConfirmUser(string id)
         {
             if (!ModelState.IsValid)
             {
@@ -347,7 +350,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             try
             {
-                _administrationUsersService.ConfirmNewUserAsync(id, userAndOrg);
+                await _administrationUsersService.ConfirmNewUserAsync(id, userAndOrg);
                 return Ok();
             }
             catch (UserAdministrationException ex)
@@ -796,13 +799,15 @@ namespace Shrooms.Presentation.Api.Controllers
                 return new List<ApplicationUserAutoCompleteViewModel>();
             }
 
+            var newUserRoleId = await _roleService.GetRoleIdByNameAsync(Roles.NewUser);
+
             s = s.ToLowerInvariant();
             var users = await _applicationUserRepository
                 .Get(u => u.UserName.ToLower().StartsWith(s)
                           || (u.FirstName != null && u.FirstName.ToLower().StartsWith(s))
                           || (u.LastName != null && u.LastName.ToLower().StartsWith(s))
                           || (u.FirstName != null && u.LastName != null && (u.FirstName.ToLower() + " " + u.LastName.ToLower()).StartsWith(s)))
-                .Where(_roleService.ExcludeUsersWithRole(Roles.NewUser))
+                .Where(_roleService.ExcludeUsersWithRole(newUserRoleId))
                 .OrderBy(u => u.Id)
                 .ToPagedListAsync(1, pageSize);
 
@@ -855,17 +860,17 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpPut]
         [Route("CompleteTutorial")]
-        public IHttpActionResult SetUserTutorialStatusToComplete()
+        public async Task<IHttpActionResult> SetUserTutorialStatusToComplete()
         {
-            _administrationUsersService.SetUserTutorialStatusToCompleteAsync(GetUserAndOrganization().UserId);
+            await _administrationUsersService.SetUserTutorialStatusToCompleteAsync(GetUserAndOrganization().UserId);
             return Ok();
         }
 
         [HttpGet]
         [Route("TutorialStatus")]
-        public IHttpActionResult GetUserTutorialStatus()
+        public async Task<IHttpActionResult> GetUserTutorialStatus()
         {
-            var tutorialStatus = _administrationUsersService.GetUserTutorialStatusAsync(GetUserAndOrganization().UserId);
+            var tutorialStatus = await _administrationUsersService.GetUserTutorialStatusAsync(GetUserAndOrganization().UserId);
             return Ok(tutorialStatus);
         }
 

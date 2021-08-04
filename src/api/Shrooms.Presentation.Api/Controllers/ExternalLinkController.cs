@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
@@ -29,9 +30,9 @@ namespace Shrooms.Presentation.Api.Controllers
         [Route("List")]
         [PermissionAuthorize(Permission = BasicPermissions.ExternalLink)]
         [CacheOutput(ServerTimeSpan = WebApiConstants.OneHour)]
-        public IHttpActionResult GetAll()
+        public async Task<IHttpActionResult> GetAll()
         {
-            var externalLinks = _externalLinkService.GetAll(GetUserAndOrganization().OrganizationId);
+            var externalLinks = await _externalLinkService.GetAllAsync(GetUserAndOrganization().OrganizationId);
             var externalLinksViewModel = _mapper.Map<IEnumerable<ExternalLinkDTO>, IEnumerable<ExternalLinkViewModel>>(externalLinks);
             return Ok(externalLinksViewModel);
         }
@@ -40,7 +41,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [Route("Update")]
         [PermissionAuthorize(Permission = AdministrationPermissions.ExternalLink)]
         [InvalidateCacheOutput(nameof(GetAll))]
-        public IHttpActionResult UpdateLinks(AddEditDeleteExternalLinkViewModel updateLinksViewModel)
+        public async Task<IHttpActionResult> UpdateLinks(AddEditDeleteExternalLinkViewModel updateLinksViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -52,7 +53,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             try
             {
-                _externalLinkService.UpdateLinks(updateLinksDto);
+                await _externalLinkService.UpdateLinksAsync(updateLinksDto);
             }
             catch (ValidationException e)
             {

@@ -32,7 +32,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
         private readonly IDbSet<ApplicationUser> _usersDbSet;
         private readonly IDbSet<WallModerator> _moderatorsDbSet;
         private readonly IDbSet<DataLayer.EntityModels.Models.Multiwall.Wall> _wallsDbSet;
-        private readonly IDbSet<PostWatcher> _postWatchers;
+        private readonly DbSet<PostWatcher> _postWatchers;
 
         public PostService(IUnitOfWork2 uow, IPermissionService permissionService, ICommentService commentService)
         {
@@ -167,9 +167,9 @@ namespace Shrooms.Domain.Services.Wall.Posts
             }
         }
 
-        public string GetPostBody(int postId)
+        public async Task<string> GetPostBodyAsync(int postId)
         {
-            return _postsDbSet.FirstOrDefault(p => p.Id == postId)?.MessageBody;
+            return (await _postsDbSet.FirstOrDefaultAsync(p => p.Id == postId))?.MessageBody;
         }
 
         public async Task DeleteWallPostAsync(int postId, UserAndOrganizationDTO userOrg)
@@ -281,7 +281,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
 
             try
             {
-                var entity = _postWatchers.Find(postId, userAndOrg.UserId);
+                var entity = await _postWatchers.FindAsync(postId, userAndOrg.UserId);
 
                 if (shouldWatch && entity == null)
                 {

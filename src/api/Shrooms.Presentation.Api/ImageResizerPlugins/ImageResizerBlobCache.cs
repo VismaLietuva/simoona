@@ -150,20 +150,20 @@ namespace Shrooms.Presentation.Api.ImageResizerPlugins
             {
                 var stream = new MemoryStream(4096);
                 await e.CreateAndWriteResultAsync(stream, e);
-                Upload(e.RequestCachingKey, stream, null);
+                await UploadAsync(e.RequestCachingKey, stream, null);
             }
 
             context.RemapHandler(new NoCacheAsyncHandler(e));
         }
 
-        private Task<ICloudBlob> GetBlobRefAsync(string virtualPath)
+        private async Task<ICloudBlob> GetBlobRefAsync(string virtualPath)
         {
             var subPath = StripPrefixWithTenant(virtualPath);
             var fileName = EncodeFileName(subPath);
             var tenantPart = GetTenantPart(virtualPath);
 
             var relativeBlobUrl = $"{_cloudBlobClient.BaseUri.OriginalString.TrimEnd('/', '\\')}/{BlobContainerName}/{tenantPart}/{fileName}";
-            return _cloudBlobClient.GetBlobReferenceFromServerAsync(new Uri(relativeBlobUrl));
+            return await _cloudBlobClient.GetBlobReferenceFromServerAsync(new Uri(relativeBlobUrl));
         }
 
         private CloudBlockBlob GetBlockBlobRef(string virtualPath)
@@ -181,7 +181,7 @@ namespace Shrooms.Presentation.Api.ImageResizerPlugins
 
         protected IBlobMetadata FetchMetadata(string virtualPath, NameValueCollection queryString)
         {
-            return AsyncUtils.RunSync(() => FetchMetadataAsync(virtualPath, queryString));
+            return AsyncUtils.RunSync(async () => await FetchMetadataAsync(virtualPath, queryString));
         }
 
         public override async Task<IBlobMetadata> FetchMetadataAsync(string virtualPath, NameValueCollection queryString)
@@ -235,7 +235,7 @@ namespace Shrooms.Presentation.Api.ImageResizerPlugins
 
         protected override void Upload(string virtualPath, MemoryStream memoryStream, NameValueCollection queryString)
         {
-            AsyncUtils.RunSync(() => UploadAsync(virtualPath, memoryStream, queryString));
+            AsyncUtils.RunSync(async () => await UploadAsync(virtualPath, memoryStream, queryString));
         }
 
         protected override async Task UploadAsync(string virtualPath, MemoryStream memoryStream, NameValueCollection queryString)

@@ -22,7 +22,7 @@ namespace Shrooms.Presentation.Api.Controllers
     public class RoomTypeController : AbstractWebApiController<RoomType, RoomTypeViewModel, RoomTypePostViewModel>
     {
         public RoomTypeController(IMapper mapper, IUnitOfWork unitOfWork)
-            : base(mapper, unitOfWork, defaultOrderByProperty: "Name")
+            : base(mapper, unitOfWork, "Name")
         {
         }
 
@@ -95,14 +95,14 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [PermissionAuthorize(Permission = AdministrationPermissions.RoomType)]
-        public override Task<PagedViewModel<RoomTypeViewModel>> GetPaged(string includeProperties = null,
+        public override async Task<PagedViewModel<RoomTypeViewModel>> GetPaged(string includeProperties = null,
             int page = 1,
             int pageSize = WebApiConstants.DefaultPageSize,
             string sort = null,
             string dir = "",
             string s = "")
         {
-            return GetFilteredPagedAsync(includeProperties, page, pageSize, sort, dir, p => p.Name.Contains(s));
+            return await GetFilteredPaged(includeProperties, page, pageSize, sort, dir, p => p.Name.Contains(s));
         }
 
         #endregion CRUD

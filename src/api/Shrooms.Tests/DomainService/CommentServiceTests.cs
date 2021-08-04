@@ -50,7 +50,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Like_Comment()
+        public async Task Should_Like_Comment()
         {
             var comment = new Comment
             {
@@ -66,9 +66,9 @@ namespace Shrooms.Tests.DomainService
             };
 
             _commentsDbSet.SetDbSetDataForAsync(new List<Comment> { comment }.AsQueryable());
-            _commentService.ToggleLikeAsync(1, new UserAndOrganizationDTO { UserId = "user1", OrganizationId = 2 });
+            await _commentService.ToggleLikeAsync(1, new UserAndOrganizationDTO { UserId = "user1", OrganizationId = 2 });
 
-            Assert.AreEqual("user1", _commentsDbSet.First().Likes.First().UserId);
+            Assert.AreEqual("user1", (await _commentsDbSet.FirstAsync()).Likes.First().UserId);
         }
 
         [Test]

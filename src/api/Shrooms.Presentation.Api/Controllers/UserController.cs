@@ -44,7 +44,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [InvalidateCacheOutput("GetKudosTypesForFilter", typeof(KudosController))]
         public async Task<IHttpActionResult> GetLocalizationSettings()
         {
-            var settingsDto = await _userService.GetUserLocalizationSettings(GetUserAndOrganization());
+            var settingsDto = await _userService.GetUserLocalizationSettingsAsync(GetUserAndOrganization());
             var result = _mapper.Map<LocalizationSettingsDto, LocalizationSettingsViewModel>(settingsDto);
             return Ok(result);
         }
@@ -73,7 +73,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             try
             {
-                await _userService.ChangeUserLocalizationSettings(dto);
+                await _userService.ChangeUserLocalizationSettingsAsync(dto);
                 return Ok();
             }
             catch (ValidationException e)
@@ -107,8 +107,8 @@ namespace Shrooms.Presentation.Api.Controllers
 
             try
             {
-                await _userService.ChangeUserNotificationSettings(userNotificationsSettingsDto, GetUserAndOrganization());
-                _userService.ChangeWallNotificationSettings(userNotificationsSettingsDto, GetUserAndOrganization());
+                await _userService.ChangeUserNotificationSettingsAsync(userNotificationsSettingsDto, GetUserAndOrganization());
+                await _userService.ChangeWallNotificationSettingsAsync(userNotificationsSettingsDto, GetUserAndOrganization());
                 return Ok();
             }
             catch (ValidationException e)
@@ -174,14 +174,14 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
         [Route("GetUsersForAutocomplete")]
-        public IEnumerable<ApplicationUserAutoCompleteViewModel> GetUsersForAutocomplete(string s)
+        public async Task<IEnumerable<ApplicationUserAutoCompleteViewModel>> GetUsersForAutocomplete(string s)
         {
-            var userAutoCompleteDto = _userService.GetUsersForAutocomplete(s);
+            var userAutoCompleteDto = await _userService.GetUsersForAutocompleteAsync(s);
             var result = _mapper.Map<IEnumerable<UserAutoCompleteDto>, IEnumerable<ApplicationUserAutoCompleteViewModel>>(userAutoCompleteDto);
             return result;
         }
 
-        private string GetEmail(ApplicationUser user, string provider)
+        private static string GetEmail(ApplicationUser user, string provider)
         {
             if (provider == AuthenticationConstants.GoogleLoginProvider)
             {

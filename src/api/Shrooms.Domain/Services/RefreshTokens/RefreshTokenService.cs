@@ -2,6 +2,7 @@
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.RefreshTokens;
@@ -20,7 +21,7 @@ namespace Shrooms.Domain.Services.RefreshTokens
             _refreshTokensDbSet = uow.GetDbSet<RefreshToken>();
         }
 
-        public void AddNewToken(RefreshTokenDTO tokenDto)
+        public async Task AddNewTokenAsync(RefreshTokenDTO tokenDto)
         {
             var timestamp = DateTime.UtcNow;
             var newToken = new RefreshToken
@@ -38,37 +39,36 @@ namespace Shrooms.Domain.Services.RefreshTokens
             };
 
             _refreshTokensDbSet.Add(newToken);
-            _uow.SaveChanges(false);
+            await _uow.SaveChangesAsync(false);
         }
 
-        public RefreshToken GetTokenTicketById(string id)
+        public async Task<RefreshToken> GetTokenTicketByIdAsync(string id)
         {
-            var refreshToken = _refreshTokensDbSet
-                .FirstOrDefault(x => x.Id == id);
+            var refreshToken = await _refreshTokensDbSet.FirstOrDefaultAsync(x => x.Id == id);
 
             return refreshToken;
         }
 
-        public void RemoveTokenBySubject(UserAndOrganizationDTO userOrg)
+        public async Task RemoveTokenBySubjectAsync(UserAndOrganizationDTO userOrg)
         {
-            RemoveToken(x =>
+            await RemoveTokenAsync(x =>
                 x.Subject == userOrg.UserId &&
                 x.OrganizationId == userOrg.OrganizationId);
         }
 
-        public void RemoveTokenById(string id)
+        public async Task RemoveTokenByIdAsync(string id)
         {
-            RemoveToken(x => x.Id == id);
+            await RemoveTokenAsync(x => x.Id == id);
         }
 
-        private void RemoveToken(Expression<Func<RefreshToken, bool>> filter)
+        private async Task RemoveTokenAsync(Expression<Func<RefreshToken, bool>> filter)
         {
             var refreshToken = _refreshTokensDbSet.FirstOrDefault(filter);
 
             if (refreshToken != null)
             {
                 _refreshTokensDbSet.Remove(refreshToken);
-                _uow.SaveChanges(false);
+                await _uow.SaveChangesAsync(false);
             }
         }
     }

@@ -75,7 +75,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("Edit")]
         [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Comment, BasicPermissions.EventWall)]
-        public IHttpActionResult EditComment(EditCommentViewModel commentViewModel)
+        public async Task<IHttpActionResult> EditComment(EditCommentViewModel commentViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -87,7 +87,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             try
             {
-                _commentService.EditCommentAsync(editCommentDto);
+                await _commentService.EditCommentAsync(editCommentDto);
                 return Ok();
             }
             catch (UnauthorizedException)
@@ -103,7 +103,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpDelete]
         [Route("Delete")]
         [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Comment, BasicPermissions.EventWall)]
-        public IHttpActionResult DeleteComment(int id)
+        public async Task<IHttpActionResult> DeleteComment(int id)
         {
             if (!ModelState.IsValid)
             {
@@ -112,7 +112,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             try
             {
-                _commentService.DeleteCommentAsync(id, GetUserAndOrganization());
+                await _commentService.DeleteCommentAsync(id, GetUserAndOrganization());
                 return Ok();
             }
             catch (UnauthorizedException)
@@ -128,7 +128,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("Hide")]
         [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Comment, BasicPermissions.EventWall)]
-        public IHttpActionResult HideComment(HideCommentViewModel comment)
+        public async Task<IHttpActionResult> HideComment(HideCommentViewModel comment)
         {
             if (!ModelState.IsValid)
             {
@@ -137,7 +137,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             try
             {
-                _commentService.HideCommentAsync(comment.Id, GetUserAndOrganization());
+                await _commentService.HideCommentAsync(comment.Id, GetUserAndOrganization());
                 return Ok();
             }
             catch (UnauthorizedException)
@@ -153,7 +153,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("Like")]
         [PermissionAuthorize(Permission = BasicPermissions.Post)]
-        public IHttpActionResult ToggleLike(int id)
+        public async Task<IHttpActionResult> ToggleLike(int id)
         {
             if (id <= 0)
             {
@@ -163,7 +163,7 @@ namespace Shrooms.Presentation.Api.Controllers
             var userAndOrg = GetUserAndOrganization();
             try
             {
-                _commentService.ToggleLikeAsync(id, userAndOrg);
+                await _commentService.ToggleLikeAsync(id, userAndOrg);
                 return Ok();
             }
             catch (ValidationException e)

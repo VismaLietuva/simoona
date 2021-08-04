@@ -78,13 +78,13 @@ namespace Shrooms.Domain.Services.Administration
             _kudosService = kudosService;
         }
 
-        public byte[] GetAllUsersExcel()
+        public async Task<byte[]> GetAllUsersExcelAsync()
         {
-            var applicationUsers = _usersDbSet
+            var applicationUsers = await _usersDbSet
                 .Include(user => user.WorkingHours)
                 .Include(user => user.JobPosition)
                 .Where(user => user.OrganizationId == 2)
-                .ToList();
+                .ToListAsync();
 
             using (var printer = new ExcelGenerator("Users"))
             {
@@ -128,17 +128,17 @@ namespace Shrooms.Domain.Services.Administration
                 .ExecuteSqlCommandAsync("UPDATE [dbo].[AspNetUsers] SET[IsDeleted] = '0' WHERE Email = @email", new SqlParameter("@email", email));
 
             var user = await _userManager.FindByEmailAsync(email);
-            AddNewUserRoles(user.Id);
+            await AddNewUserRolesAsync(user.Id);
         }
 
         public async Task AddProviderImageAsync(string userId, ClaimsIdentity externalIdentity)
         {
-            var user = _usersDbSet.First(u => u.Id == userId);
+            var user = await _usersDbSet.FirstAsync(u => u.Id == userId);
             if (user.PictureId == null && externalIdentity.FindFirst("picture") != null)
             {
                 byte[] data = data = await new WebClient().DownloadDataTaskAsync(externalIdentity.FindFirst("picture").Value);
                 user.PictureId = await _pictureService.UploadFromStreamAsync(new MemoryStream(data), "image/jpeg", Guid.NewGuid() + ".jpg", user.OrganizationId);
-                _uow.SaveChanges(userId);
+                await _uow.SaveChangesAsync(userId);
             }
         }
 
@@ -151,14 +151,14 @@ namespace Shrooms.Domain.Services.Administration
         {
             var token = await _userManager.GeneratePasswordResetTokenAsync(user.Id);
 
-            _notificationService.SendUserResetPasswordEmail(user, token, organizationName);
+            await _notificationService.SendUserResetPasswordEmailAsync(user, token, organizationName);
         }
 
         public async Task SendUserVerificationEmailAsync(ApplicationUser user, string orgazinationName)
         {
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user.Id);
 
-            _notificationService.SendUserVerificationEmail(user, token, orgazinationName);
+            await _notificationService.SendUserVerificationEmailAsync(user, token, orgazinationName);
         }
 
         public async Task ConfirmNewUserAsync(string userId, UserAndOrganizationDTO userAndOrg)
@@ -179,17 +179,16 @@ namespace Shrooms.Domain.Services.Administration
 
             await SetWelcomeKudosAsync(applicationUser);
 
-            AddUserToMainWall(userId);
+            await AddUserToMainWallAsync(userId);
             await _uow.SaveChangesAsync(userAndOrg.UserId);
         }
 
         public async Task<IdentityResult> CreateNewUserWithExternalLoginAsync(ExternalLoginInfo info, string requestedOrganization)
         {
             var externalIdentity = info.ExternalIdentity;
-            var userSettings =
-                _organizationDbSet.Where(o => o.ShortName == requestedOrganization)
-                    .Select(u => new { u.CultureCode, u.TimeZone })
-                    .First();
+            var userSettings = await _organizationDbSet.Where(o => o.ShortName == requestedOrganization)
+                .Select(u => new { u.CultureCode, u.TimeZone })
+                .FirstAsync();
 
             var user = new ApplicationUser
             {
@@ -197,7 +196,7 @@ namespace Shrooms.Domain.Services.Administration
                 Email = externalIdentity.FindFirst(ClaimTypes.Email).Value,
                 FirstName = externalIdentity.FindFirst(ClaimTypes.GivenName).Value,
                 LastName = externalIdentity.FindFirst(ClaimTypes.Surname).Value,
-                OrganizationId = _organizationService.GetOrganizationByName(requestedOrganization).Id,
+                OrganizationId = (await _organizationService.GetOrganizationByNameAsync(requestedOrganization)).Id,
                 EmploymentDate = DateTime.UtcNow,
                 CultureCode = userSettings.CultureCode ?? BusinessLayerConstants.DefaultCulture,
                 TimeZone = userSettings.TimeZone,
@@ -206,7 +205,7 @@ namespace Shrooms.Domain.Services.Administration
 
             if (externalIdentity.FindFirst("picture") != null)
             {
-                byte[] data = data = await new WebClient().DownloadDataTaskAsync(externalIdentity.FindFirst("picture").Value);
+                var data = await new WebClient().DownloadDataTaskAsync(externalIdentity.FindFirst("picture").Value);
                 var picture = await _pictureService.UploadFromStreamAsync(new MemoryStream(data), "image/jpeg", $"{Guid.NewGuid()}.jpg", user.OrganizationId);
                 user.PictureId = picture;
             }
@@ -217,18 +216,17 @@ namespace Shrooms.Domain.Services.Administration
                 return result;
             }
 
-            AddNewUserRoles(user.Id);
+            await AddNewUserRolesAsync(user.Id);
             return result;
         }
 
         public async Task<IdentityResult> CreateNewUserAsync(ApplicationUser user, string password, string requestedOrganization)
         {
-            var userSettings =
-                _organizationDbSet.Where(o => o.ShortName == requestedOrganization)
-                    .Select(u => new { u.CultureCode, u.TimeZone })
-                    .First();
+            var userSettings = await _organizationDbSet.Where(o => o.ShortName == requestedOrganization)
+                .Select(u => new { u.CultureCode, u.TimeZone })
+                .FirstAsync();
 
-            user.OrganizationId = _organizationService.GetOrganizationByName(requestedOrganization).Id;
+            user.OrganizationId = (await _organizationService.GetOrganizationByNameAsync(requestedOrganization)).Id;
             user.EmploymentDate = DateTime.UtcNow;
             user.CultureCode = userSettings.CultureCode ?? BusinessLayerConstants.DefaultCulture;
             user.TimeZone = userSettings.TimeZone;
@@ -247,8 +245,7 @@ namespace Shrooms.Domain.Services.Administration
                 return addLoginResult;
             }
 
-            AddNewUserRoles(user.Id);
-
+            await AddNewUserRolesAsync(user.Id);
             await SendUserVerificationEmailAsync(user, requestedOrganization);
 
             return result;
@@ -282,7 +279,7 @@ namespace Shrooms.Domain.Services.Administration
 
             var administrationUsers = _mapper.Map<IList<ApplicationUser>, IList<AdministrationUserDTO>>(applicationUsers);
 
-            SetNewUsersValues(administrationUsers, applicationUsers);
+            await SetNewUsersValuesAsync(administrationUsers, applicationUsers);
 
             if (filterModel != null)
             {
@@ -433,15 +430,15 @@ namespace Shrooms.Domain.Services.Administration
             user.IsTutorialComplete = tutorialStatus;
         }
 
-        private void AddNewUserRoles(string id)
+        private async Task AddNewUserRolesAsync(string id)
         {
-            _userManager.AddToRole(id, Contracts.Constants.Roles.NewUser);
-            _userManager.AddToRole(id, Contracts.Constants.Roles.FirstLogin);
+            await _userManager.AddToRoleAsync(id, Contracts.Constants.Roles.NewUser);
+            await _userManager.AddToRoleAsync(id, Contracts.Constants.Roles.FirstLogin);
         }
 
-        private void SetNewUsersValues(IList<AdministrationUserDTO> administrationUserDto, IEnumerable<ApplicationUser> applicationUsers)
+        private async Task SetNewUsersValuesAsync(IList<AdministrationUserDTO> administrationUserDto, IEnumerable<ApplicationUser> applicationUsers)
         {
-            var newUserRole = _rolesRepository.Get(x => x.Name == Contracts.Constants.Roles.NewUser).Select(x => x.Id).FirstOrDefault();
+            var newUserRole = await _rolesRepository.Get(x => x.Name == Contracts.Constants.Roles.NewUser).Select(x => x.Id).FirstOrDefaultAsync();
 
             var usersWaitingForConfirmationIds =
                 applicationUsers.Where(x => x.Roles.Any(y => y.RoleId == newUserRole)).Select(x => x.Id).ToList();
@@ -493,11 +490,11 @@ namespace Shrooms.Domain.Services.Administration
             return filteredUsers?.ToList() ?? administrationUsers;
         }
 
-        private void AddUserToMainWall(string userId)
+        private async Task AddUserToMainWallAsync(string userId)
         {
-            var mainWall = _wallsDbSet
+            var mainWall = await _wallsDbSet
                 .Include(x => x.Members)
-                .FirstOrDefault(x => x.Type == WallType.Main && x.Members.All(m => m.UserId != userId));
+                .FirstOrDefaultAsync(x => x.Type == WallType.Main && x.Members.All(m => m.UserId != userId));
 
             if (mainWall == null)
             {

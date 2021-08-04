@@ -13,7 +13,7 @@ namespace Shrooms.Domain.Services.Administration
     {
         Task<bool> UserEmailExistsAsync(string email);
 
-        byte[] GetAllUsersExcel();
+        Task<byte[]> GetAllUsersExcelAsync();
 
         Task ConfirmNewUserAsync(string userId, UserAndOrganizationDTO userAndOrg);
 

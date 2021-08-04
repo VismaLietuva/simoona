@@ -90,25 +90,25 @@ namespace Shrooms.Presentation.Api.Controllers
             var usersInModelIds = _mapper.Map<IEnumerable<ApplicationUserViewModel>, string[]>(roleViewModel.Users);
             var usersToAdd = await _applicationUserRepository.Get(u => u.Roles.Count(r => r.RoleId.Contains(roleViewModel.Id)) == 0 && usersInModelIds.Contains(u.Id)).ToListAsync();
 
-            usersToAdd.ForEach(async u =>
+            foreach (var user in usersToAdd)
             {
-                var state = await UserManager.AddToRoleAsync(u.Id, roleViewModel.Name);
+                var state = await UserManager.AddToRoleAsync(user.Id, roleViewModel.Name);
                 if (!state.Succeeded)
                 {
                     throw new SystemException(state.Errors.Aggregate(new StringBuilder(), (sb, a) => sb.AppendLine(string.Join(", ", a)), sb => sb.ToString()));
                 }
-            });
+            }
 
             var usersToRemove = await _applicationUserRepository.Get(u => u.Roles.Count(r => r.RoleId.Contains(roleViewModel.Id)) == 1 && !usersInModelIds.Contains(u.Id)).ToListAsync();
 
-            usersToRemove.ForEach(async u =>
+            foreach (var user in usersToRemove)
             {
-                var state = await UserManager.RemoveFromRoleAsync(u.Id, roleViewModel.Name);
+                var state = await UserManager.RemoveFromRoleAsync(user.Id, roleViewModel.Name);
                 if (!state.Succeeded)
                 {
                     throw new SystemException(state.Errors.Aggregate(new StringBuilder(), (sb, a) => sb.AppendLine(string.Join(", ", a)), sb => sb.ToString()));
                 }
-            });
+            }
         }
 
         #endregion
@@ -116,14 +116,14 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [Route("GetRolesForAutocomplete")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Role)]
-        public IHttpActionResult GetRolesForAutoComplete(string search)
+        public async Task<IHttpActionResult> GetRolesForAutoComplete(string search)
         {
             if (string.IsNullOrEmpty(search))
             {
                 return BadRequest("Search string can't be empty");
             }
 
-            var rolesDTO = _roleService.GetRolesForAutocomplete(search, GetUserAndOrganization());
+            var rolesDTO = await _roleService.GetRolesForAutocompleteAsync(search, GetUserAndOrganization());
             var rolesViewModel = _mapper.Map<IEnumerable<RoleDTO>, IEnumerable<RoleViewModel>>(rolesDTO);
             return Ok(rolesViewModel);
         }
@@ -208,7 +208,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Resources.Models.Role.Role.RoleNameExistsError);
             }
 
-            var role = await _roleRepository.Get(r => r.Id == roleViewModel.Id, includeProperties: "Permissions").FirstOrDefaultAsync();
+            var role = await _roleRepository.Get(r => r.Id == roleViewModel.Id, includeProperties: "Permissions").FirstAsync();
             _mapper.Map(roleViewModel, role);
 
             await AssignPermissionsToRoleAsync(roleViewModel, role);

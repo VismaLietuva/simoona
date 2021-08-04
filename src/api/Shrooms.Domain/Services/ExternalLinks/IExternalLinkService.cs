@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Shrooms.Contracts.DataTransferObjects.Models.ExternalLinks;
 
 namespace Shrooms.Domain.Services.ExternalLinks
 {
     public interface IExternalLinkService
     {
-        IEnumerable<ExternalLinkDTO> GetAll(int organizationId);
-        void UpdateLinks(AddEditDeleteExternalLinkDTO updateLinksDto);
+        Task<IEnumerable<ExternalLinkDTO>> GetAllAsync(int organizationId);
+        Task UpdateLinksAsync(AddEditDeleteExternalLinkDTO updateLinksDto);
     }
 }

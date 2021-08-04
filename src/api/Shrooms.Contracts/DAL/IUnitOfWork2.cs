@@ -10,10 +10,6 @@ namespace Shrooms.Contracts.DAL
         DbSet<T> GetDbSet<T>()
             where T : class;
 
-        void SaveChanges(bool useMetaTracking = true);
-
-        void SaveChanges(string userId);
-
         Task<int> SaveChangesAsync(string userId);
 
         Task<int> SaveChangesAsync(bool useMetaTracking = true);

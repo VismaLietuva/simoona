@@ -10,23 +10,23 @@ namespace Shrooms.Domain.Services.Kudos
 {
     public interface IKudosService
     {
-        Task CreateKudosType(NewKudosTypeDto dto);
+        Task CreateKudosTypeAsync(NewKudosTypeDto dto);
 
         Task UpdateKudosTypeAsync(KudosTypeDTO dto);
 
         Task RemoveKudosTypeAsync(int id, UserAndOrganizationDTO userOrg);
 
-        KudosTypeDTO GetSendKudosType(UserAndOrganizationDTO userOrg);
+        Task<KudosTypeDTO> GetSendKudosTypeAsync(UserAndOrganizationDTO userOrg);
 
         Task<WelcomeKudosDTO> GetWelcomeKudosAsync();
 
-        IEnumerable<KudosPieChartSliceDto> GetKudosPieChartData(int organizationId, string userId);
+        Task<IEnumerable<KudosPieChartSliceDto>> GetKudosPieChartDataAsync(int organizationId, string userId);
 
-        IEnumerable<KudosTypeDTO> GetKudosTypes(UserAndOrganizationDTO userAndOrg);
+        Task<IEnumerable<KudosTypeDTO>> GetKudosTypesAsync(UserAndOrganizationDTO userAndOrg);
 
         Task<KudosTypeDTO> GetKudosTypeAsync(int id, UserAndOrganizationDTO userOrg);
 
-        IEnumerable<UserKudosInformationDTO> GetApprovedKudosList(string id, int organizationId);
+        Task<IEnumerable<UserKudosInformationDTO>> GetApprovedKudosListAsync(string id, int organizationId);
 
         Task AddLotteryKudosLogAsync(AddKudosLogDTO kudosLogDTO, UserAndOrganizationDTO userOrg);
 
@@ -47,15 +47,15 @@ namespace Shrooms.Domain.Services.Kudos
         /// <param name="points">requested points</param>
         Task AddKudosLogAsync(AddKudosLogDTO kudosDto, decimal? points = null);
 
-        void AddRefundKudosLogs(IEnumerable<AddKudosLogDTO> kudosLogs);
+        Task AddRefundKudosLogsAsync(IEnumerable<AddKudosLogDTO> kudosLogs);
 
-        void UpdateProfilesFromUserIds(IEnumerable<string> usersId, UserAndOrganizationDTO userOrg);
+        Task UpdateProfilesFromUserIdsAsync(IEnumerable<string> usersId, UserAndOrganizationDTO userOrg);
 
         Task<KudosLogsEntriesDto<MainKudosLogDTO>> GetKudosLogsAsync(KudosLogsFilterDTO options);
 
         Task<KudosLogsEntriesDto<KudosUserLogDTO>> GetUserKudosLogsAsync(string userId, int page, int organizationId);
 
-        int GetKudosTypeId(string kudosTypeName);
+        Task<int> GetKudosTypeIdAsync(string kudosTypeName);
 
         Task<int> GetKudosTypeIdAsync(KudosTypeEnum kudosType);
 
@@ -63,6 +63,6 @@ namespace Shrooms.Domain.Services.Kudos
 
         Task UpdateProfileKudosAsync(ApplicationUser user, UserAndOrganizationDTO userOrg);
 
-        bool HasPendingKudos(string employeeId);
+        Task<bool> HasPendingKudosAsync(string employeeId);
     }
 }

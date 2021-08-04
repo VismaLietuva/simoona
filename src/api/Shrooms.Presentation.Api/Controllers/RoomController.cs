@@ -116,21 +116,21 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.Room)]
-        public IEnumerable<RoomViewModel> GetByFloor(int floorId, string includeProperties = "RoomType", bool includeWorkingRooms = true, bool includeNotWorkingRooms = true)
+        public async Task<IEnumerable<RoomViewModel>> GetByFloor(int floorId, string includeProperties = "RoomType", bool includeWorkingRooms = true, bool includeNotWorkingRooms = true)
         {
-            var rooms = GetRooms(floorId, includeProperties, includeWorkingRooms, includeNotWorkingRooms);
+            var rooms = await GetRooms(floorId, includeProperties, includeWorkingRooms, includeNotWorkingRooms);
             return _mapper.Map<IEnumerable<Room>, IEnumerable<RoomViewModel>>(rooms);
         }
 
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.Room)]
-        private IQueryable<Room> GetRooms(int floorId, string includeProperties, bool includeWorkingRooms, bool includeNotWorkingRooms)
+        private async Task<IList<Room>> GetRooms(int floorId, string includeProperties, bool includeWorkingRooms, bool includeNotWorkingRooms)
         {
             var rooms = _repository.Get(r => r.FloorId == floorId
                                              && ((includeWorkingRooms && r.RoomTypeId != null && r.RoomType.IsWorkingRoom) ||
                                                  (includeNotWorkingRooms && (r.RoomTypeId == null || !r.RoomType.IsWorkingRoom))),
                 includeProperties: includeProperties);
-            return rooms;
+            return await rooms.ToListAsync();
         }
 
         [HttpGet]
@@ -143,46 +143,46 @@ namespace Shrooms.Presentation.Api.Controllers
             string sort = null,
             string dir = "")
         {
-            return await base.GetFilteredPagedAsync(includeProperties, page, pageSize, sort, dir, r => (floorId == -1 || r.FloorId == floorId)
+            return await base.GetFilteredPaged(includeProperties, page, pageSize, sort, dir, r => (floorId == -1 || r.FloorId == floorId)
                                                                                                        && (r.Name + r.Number).Contains(s));
         }
 
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.Room)]
-        public override Task<HttpResponseMessage> Get(int id, string includeProperties = "")
+        public override async Task<HttpResponseMessage> Get(int id, string includeProperties = "")
         {
-            return base.Get(id, includeProperties);
+            return await base.Get(id, includeProperties);
         }
 
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.Room)]
-        public override Task<PagedViewModel<RoomViewModel>> GetPaged(string includeProperties = null,
+        public override async Task<PagedViewModel<RoomViewModel>> GetPaged(string includeProperties = null,
             int page = 1,
             int pageSize = WebApiConstants.DefaultPageSize,
             string sort = null,
             string dir = "",
             string s = "")
         {
-            return base.GetPaged(includeProperties, page, pageSize, sort, dir, s);
+            return await base.GetPaged(includeProperties, page, pageSize, sort, dir, s);
         }
 
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.Room)]
-        protected override Task<PagedViewModel<RoomViewModel>> GetFilteredPagedAsync(string includeProperties = null,
+        protected override async Task<PagedViewModel<RoomViewModel>> GetFilteredPaged(string includeProperties = null,
             int page = 1,
             int pageSize = WebApiConstants.DefaultPageSize,
             string sort = null,
             string dir = "",
             Expression<Func<Room, bool>> filter = null)
         {
-            return base.GetFilteredPagedAsync(includeProperties, page, pageSize, sort, dir, filter);
+            return await base.GetFilteredPaged(includeProperties, page, pageSize, sort, dir, filter);
         }
 
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.Room)]
-        public override Task<IEnumerable<RoomViewModel>> GetAllAsync(int maxResults = 0, string orderBy = null, string includeProperties = null)
+        public override async Task<IEnumerable<RoomViewModel>> GetAll(int maxResults = 0, string orderBy = null, string includeProperties = null)
         {
-            return base.GetAllAsync(maxResults, orderBy, includeProperties);
+            return await base.GetAll(maxResults, orderBy, includeProperties);
         }
 
         private async Task RemoveRoomForUsersAsync(RoomPostViewModel roomViewModel)

@@ -77,7 +77,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         [Test]
         public async Task RoomType_GetAll_Should_Return_Room_Types_Ordered_By_Name()
         {
-            var models = await _roomController.GetAllAsync(orderBy: "Name") as List<RoomTypeViewModel>;
+            var models = await _roomController.GetAll(orderBy: "Name") as List<RoomTypeViewModel>;
 
             Assert.IsNotNull(models);
             Assert.AreEqual(5, models.Count);

@@ -61,7 +61,7 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [HttpGet]
-        public virtual async Task<IEnumerable<TViewModel>> GetAllAsync(int maxResults = 0, string orderBy = null, string includeProperties = null)
+        public virtual async Task<IEnumerable<TViewModel>> GetAll(int maxResults = 0, string orderBy = null, string includeProperties = null)
         {
             var model = await _repository.Get(maxResults: maxResults, orderBy: orderBy ?? _defaultOrderByProperty, includeProperties: includeProperties).ToListAsync();
             return _mapper.Map<IEnumerable<TModel>, IEnumerable<TViewModel>>(model);
@@ -75,10 +75,10 @@ namespace Shrooms.Presentation.Api.Controllers
             string dir = "",
             string s = "")
         {
-            return await GetFilteredPagedAsync(includeProperties, page, pageSize, sort, dir);
+            return await GetFilteredPaged(includeProperties, page, pageSize, sort, dir);
         }
 
-        protected virtual async Task<PagedViewModel<TViewModel>> GetFilteredPagedAsync(string includeProperties = null,
+        protected virtual async Task<PagedViewModel<TViewModel>> GetFilteredPaged(string includeProperties = null,
             int page = 1,
             int pageSize = WebApiConstants.DefaultPageSize,
             string sort = null,

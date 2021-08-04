@@ -147,7 +147,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             await _mailingService.SendEmailAsync(emailData);
         }
 
-        public async Task<IEnumerable<ApplicationUser>> GetMentionedUsersAsync(IEnumerable<string> mentionIds)
+        private async Task<IEnumerable<ApplicationUser>> GetMentionedUsersAsync(IEnumerable<string> mentionIds)
         {
             return await _userService.GetUsersWithMentionNotificationsAsync(mentionIds);
         }

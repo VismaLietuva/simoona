@@ -44,7 +44,7 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
         [PermissionAuthorize(Permission = BasicPermissions.Post)]
         public async Task<IHttpActionResult> GetWallList(WallsListFilter filter)
         {
-            var wallList = await _wallService.GetWallsList(GetUserAndOrganization(), filter);
+            var wallList = await _wallService.GetWallsListAsync(GetUserAndOrganization(), filter);
             var mappedWallList = _mapper.Map<IEnumerable<WallDto>, IEnumerable<WallListViewModel>>(wallList);
             return Ok(mappedWallList);
         }
@@ -142,7 +142,7 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
             try
             {
                 var userAndOrg = GetUserAndOrganization();
-                var wallMembersDto = await _wallService.GetWallMembers(wallId, userAndOrg);
+                var wallMembersDto = await _wallService.GetWallMembersAsync(wallId, userAndOrg);
                 var result = _mapper.Map<IEnumerable<WallMemberDto>, IEnumerable<WallMemberViewModel>>(wallMembersDto);
                 return Ok(result);
             }
@@ -194,7 +194,7 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
         public async Task<IHttpActionResult> GetAllPagedWall(int page = 1, int wallsType = 1)
         {
             var userAndOrg = GetUserAndOrganization();
-            var wallPosts = await _wallService.GetAllPosts(page, WebApiConstants.DefaultPageSize, userAndOrg, wallsType);
+            var wallPosts = await _wallService.GetAllPostsAsync(page, WebApiConstants.DefaultPageSize, userAndOrg, wallsType);
 
             var mappedPosts = _mapper.Map<IEnumerable<WallPostViewModel>>(wallPosts);
             var pagedViewModel = new PagedWallViewModel<WallPostViewModel>
@@ -216,7 +216,7 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
             }
 
             var userAndOrg = GetUserAndOrganization();
-            var foundWallPosts = await _wallService.SearchWall(searchString, userAndOrg, page, WebApiConstants.DefaultPageSize);
+            var foundWallPosts = await _wallService.SearchWallAsync(searchString, userAndOrg, page, WebApiConstants.DefaultPageSize);
 
             var mappedPosts = _mapper.Map<IList<WallPostViewModel>>(foundWallPosts);
             var pagedViewModel = new PagedWallViewModel<WallPostViewModel>
@@ -259,7 +259,7 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
         [HttpPut]
         [Route("Edit")]
         [PermissionAuthorize(Permission = BasicPermissions.Wall)]
-        public IHttpActionResult EditWall(UpdateWallViewModel updateWallViewModel)
+        public async Task<IHttpActionResult> EditWall(UpdateWallViewModel updateWallViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -271,7 +271,7 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
 
             try
             {
-                _wallService.UpdateWallAsync(updateWallDto);
+                await _wallService.UpdateWallAsync(updateWallDto);
                 return Ok();
             }
             catch (ValidationException e)
@@ -287,7 +287,7 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
         [HttpDelete]
         [Route("Delete")]
         [PermissionAuthorize(Permission = BasicPermissions.Wall)]
-        public IHttpActionResult DeleteWall(int wallId)
+        public async Task<IHttpActionResult> DeleteWall(int wallId)
         {
             if (wallId <= 0)
             {
@@ -297,7 +297,7 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
             try
             {
                 var userAndOrg = GetUserAndOrganization();
-                _wallService.DeleteWallAsync(wallId, userAndOrg, WallType.UserCreated);
+                await _wallService.DeleteWallAsync(wallId, userAndOrg, WallType.UserCreated);
                 return Ok();
             }
             catch (ValidationException e)

@@ -51,7 +51,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         }
 
         [Test]
-        public void GetKudosTypes_Should_Return_IEnumerable_Of_KudosType_ViewModel()
+        public async Task GetKudosTypes_Should_Return_IEnumerable_Of_KudosType_ViewModel()
         {
             var userAndOrganization = new UserAndOrganizationDTO
             {
@@ -59,11 +59,9 @@ namespace Shrooms.Tests.Controllers.WebApi
                 UserId = "fd798623-166c-412d-a060-369d4c7b90eb"
             };
 
-            _kudosService.GetKudosTypes(userAndOrganization)
-                .Returns(new List<KudosTypeDTO>
-                    { new KudosTypeDTO() });
+            _kudosService.GetKudosTypesAsync(userAndOrganization).Returns(new List<KudosTypeDTO> { new KudosTypeDTO() });
 
-            var response = _kudosController.GetKudosTypes();
+            var response = await _kudosController.GetKudosTypes();
 
             Assert.IsInstanceOf<IEnumerable<KudosTypeViewModel>>(response);
         }

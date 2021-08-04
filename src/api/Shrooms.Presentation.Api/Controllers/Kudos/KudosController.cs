@@ -84,7 +84,7 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
 
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
         [CacheOutput(ServerTimeSpan = WebApiConstants.OneHour)]
-        public IEnumerable<KudosTypeViewModel> GetKudosTypesForFilter()
+        public async Task<IEnumerable<KudosTypeViewModel>> GetKudosTypesForFilter()
         {
             var types = new List<KudosTypeViewModel>
             {
@@ -97,7 +97,7 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
                 }
             };
 
-            foreach (var type in GetKudosTypes())
+            foreach (var type in await GetKudosTypes())
             {
                 types.Add(type);
             }
@@ -119,20 +119,20 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
-        public IEnumerable<string> GetKudosFilteringTypes()
+        public async Task<IEnumerable<string>> GetKudosFilteringTypes()
         {
             var statuses = new List<string> { BusinessLayerConstants.KudosFilteringTypeAllFilter };
-            var kudosTypeDto = _kudosService.GetKudosTypes(GetUserAndOrganization());
+            var kudosTypeDto = await _kudosService.GetKudosTypesAsync(GetUserAndOrganization());
             return statuses.Concat(kudosTypeDto.Select(s => s.Name));
         }
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
-        public IEnumerable<KudosPieChartSliceViewModel> KudosPieChartData(string userId = null)
+        public async Task<IEnumerable<KudosPieChartSliceViewModel>> KudosPieChartData(string userId = null)
         {
             userId ??= User.Identity.GetUserId();
 
-            var pieChartDto = _kudosService.GetKudosPieChartData(GetUserAndOrganization().OrganizationId, userId);
+            var pieChartDto = await _kudosService.GetKudosPieChartDataAsync(GetUserAndOrganization().OrganizationId, userId);
             var result = _mapper.Map<IEnumerable<KudosPieChartSliceDto>, IEnumerable<KudosPieChartSliceViewModel>>(pieChartDto);
             return result;
         }
@@ -140,9 +140,9 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
         [CacheOutput(ServerTimeSpan = WebApiConstants.OneHour)]
-        public IEnumerable<KudosTypeViewModel> GetKudosTypes()
+        public async Task<IEnumerable<KudosTypeViewModel>> GetKudosTypes()
         {
-            var kudosTypeDto = _kudosService.GetKudosTypes(GetUserAndOrganization());
+            var kudosTypeDto = await _kudosService.GetKudosTypesAsync(GetUserAndOrganization());
             var kudosTypeViewModel = _mapper.Map<IEnumerable<KudosTypeDTO>, IEnumerable<KudosTypeViewModel>>(kudosTypeDto);
 
             return kudosTypeViewModel;
@@ -150,9 +150,9 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
-        public KudosTypeViewModel GetSendKudosType()
+        public async Task<KudosTypeViewModel> GetSendKudosType()
         {
-            var kudosTypeDto = _kudosService.GetSendKudosType(GetUserAndOrganization());
+            var kudosTypeDto = await _kudosService.GetSendKudosTypeAsync(GetUserAndOrganization());
             return _mapper.Map<KudosTypeDTO, KudosTypeViewModel>(kudosTypeDto);
         }
 
@@ -221,7 +221,7 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
 
             try
             {
-                await _kudosService.CreateKudosType(dto);
+                await _kudosService.CreateKudosTypeAsync(dto);
                 return Ok();
             }
             catch (ValidationException e)
@@ -254,9 +254,9 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
-        public IHttpActionResult GetKudosTypeId(string kudosTypeName)
+        public async Task<IHttpActionResult> GetKudosTypeId(string kudosTypeName)
         {
-            var typeId = _kudosService.GetKudosTypeId(kudosTypeName);
+            var typeId = await _kudosService.GetKudosTypeIdAsync(kudosTypeName);
             return Ok(new { kudosTypeId = typeId });
         }
 
@@ -299,11 +299,11 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
         [HttpPost]
         [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
         [InvalidateCacheOutput("Get", typeof(WallWidgetsController))]
-        public IHttpActionResult ApproveKudos(int id)
+        public async Task<IHttpActionResult> ApproveKudos(int id)
         {
             try
             {
-                _kudosService.ApproveKudosAsync(id, GetUserAndOrganization());
+                await _kudosService.ApproveKudosAsync(id, GetUserAndOrganization());
                 return Ok();
             }
             catch (ValidationException e)
@@ -314,7 +314,7 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
 
         [HttpPost]
         [PermissionAuthorize(Permission = AdministrationPermissions.Kudos)]
-        public IHttpActionResult RejectKudos(KudosRejectViewModel kudosRejectModel)
+        public async Task<IHttpActionResult> RejectKudos(KudosRejectViewModel kudosRejectModel)
         {
             if (!ModelState.IsValid)
             {
@@ -326,7 +326,7 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
 
             try
             {
-                _kudosService.RejectKudosAsync(kudosRejectDto);
+                await _kudosService.RejectKudosAsync(kudosRejectDto);
                 return Ok();
             }
             catch (ValidationException e)
@@ -352,13 +352,13 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Kudos)]
-        public IHttpActionResult GetApprovedKudosList(string id = null)
+        public async Task<IHttpActionResult> GetApprovedKudosList(string id = null)
         {
             id ??= User.Identity.GetUserId();
 
             try
             {
-                var userKudosInformationDto = _kudosService.GetApprovedKudosList(id, GetUserAndOrganization().OrganizationId);
+                var userKudosInformationDto = await _kudosService.GetApprovedKudosListAsync(id, GetUserAndOrganization().OrganizationId);
                 var result = _mapper.Map<IEnumerable<UserKudosInformationDTO>, IEnumerable<UserKudosInformationViewModel>>(userKudosInformationDto);
                 return Ok(result);
             }

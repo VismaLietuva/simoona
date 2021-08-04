@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
@@ -15,25 +16,27 @@ namespace Shrooms.Domain.Services.Monitors
     {
         private readonly IUnitOfWork2 _uow;
         private readonly IDbSet<Monitor> _monitorsDbSet;
+
         public MonitorService(IUnitOfWork2 uow)
         {
             _uow = uow;
             _monitorsDbSet = uow.GetDbSet<Monitor>();
         }
 
-        public IEnumerable<MonitorDTO> GetMonitorList(int organizationId)
+        public async Task<IEnumerable<MonitorDTO>> GetMonitorListAsync(int organizationId)
         {
-            var monitors = _monitorsDbSet
+            var monitors = await _monitorsDbSet
                 .Where(x => x.OrganizationId == organizationId)
-                .Select(x => new MonitorDTO { Id = x.Id, Name = x.Name });
+                .Select(x => new MonitorDTO { Id = x.Id, Name = x.Name })
+                .ToListAsync();
 
             return monitors;
         }
 
-        public void CreateMonitor(MonitorDTO newMonitor, UserAndOrganizationDTO userAndOrganizationDTO)
+        public async Task CreateMonitorAsync(MonitorDTO newMonitor, UserAndOrganizationDTO userAndOrganizationDTO)
         {
-            if (_monitorsDbSet.Any(x => x.Name == newMonitor.Name &&
-                               x.OrganizationId == userAndOrganizationDTO.OrganizationId))
+            if (await _monitorsDbSet.AnyAsync(x => x.Name == newMonitor.Name &&
+                                                   x.OrganizationId == userAndOrganizationDTO.OrganizationId))
             {
                 throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "Monitor names should be unique");
             }
@@ -48,16 +51,17 @@ namespace Shrooms.Domain.Services.Monitors
                 Name = newMonitor.Name,
                 OrganizationId = userAndOrganizationDTO.OrganizationId
             };
+
             _monitorsDbSet.Add(monitor);
-            _uow.SaveChanges(false);
+            await _uow.SaveChangesAsync(false);
         }
 
-        public MonitorDTO GetMonitorDetails(int organizationId, int monitorId)
+        public async Task<MonitorDTO> GetMonitorDetailsAsync(int organizationId, int monitorId)
         {
-            var monitors = _monitorsDbSet
+            var monitors = await _monitorsDbSet
                 .Where(x => x.OrganizationId == organizationId && x.Id == monitorId)
                 .Select(x => new MonitorDTO { Id = x.Id, Name = x.Name })
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
 
             if (monitors == null)
             {
@@ -67,18 +71,18 @@ namespace Shrooms.Domain.Services.Monitors
             return monitors;
         }
 
-        public void UpdateMonitor(MonitorDTO monitorDTO, UserAndOrganizationDTO userAndOrganizationDTO)
+        public async Task UpdateMonitorAsync(MonitorDTO monitorDTO, UserAndOrganizationDTO userAndOrganizationDTO)
         {
-            var monitor = _monitorsDbSet.FirstOrDefault(x => x.Id == monitorDTO.Id &&
-                                         x.OrganizationId == userAndOrganizationDTO.OrganizationId);
+            var monitor = await _monitorsDbSet.FirstOrDefaultAsync(x => x.Id == monitorDTO.Id &&
+                                                                        x.OrganizationId == userAndOrganizationDTO.OrganizationId);
 
             if (monitor == null)
             {
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Monitor does not exist");
             }
 
-            var nameAlreadyExist = _monitorsDbSet.Any(x => x.Name == monitorDTO.Name &&
-                               x.OrganizationId == userAndOrganizationDTO.OrganizationId);
+            var nameAlreadyExist = await _monitorsDbSet.AnyAsync(x => x.Name == monitorDTO.Name &&
+                                                                      x.OrganizationId == userAndOrganizationDTO.OrganizationId);
 
             if (monitorDTO.Name != monitor.Name && nameAlreadyExist)
             {
@@ -88,7 +92,8 @@ namespace Shrooms.Domain.Services.Monitors
             monitor.Name = monitorDTO.Name;
             monitor.Modified = DateTime.UtcNow;
             monitor.ModifiedBy = userAndOrganizationDTO.UserId;
-            _uow.SaveChanges(false);
+
+            await _uow.SaveChangesAsync(false);
         }
     }
 }

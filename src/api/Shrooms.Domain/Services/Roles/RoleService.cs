@@ -28,25 +28,17 @@ namespace Shrooms.Domain.Services.Roles
             _permissionService = permissionService;
         }
 
-        public Expression<Func<ApplicationUser, bool>> ExcludeUsersWithRole(string roleName)
+        public Expression<Func<ApplicationUser, bool>> ExcludeUsersWithRole(string roleId)
         {
-            var roleId = GetRoleIdByName(roleName);
-
             return x => x.Roles.All(y => y.RoleId != roleId);
         }
 
-        public IEnumerable<string> GetRoleIdsByNames(params string[] names)
+        public async Task<IEnumerable<RoleDTO>> GetRolesForAutocompleteAsync(string search, UserAndOrganizationDTO userOrg)
         {
-            return _roleDbSet.Where(x => names.Any(n => n == x.Name)).Select(x => x.Id);
-        }
-
-        public IEnumerable<RoleDTO> GetRolesForAutocomplete(string search, UserAndOrganizationDTO userOrg)
-        {
-            return _roleDbSet
-                .Where(x => x.OrganizationId == userOrg.OrganizationId &&
-                            x.Name.Contains(search))
+            return await _roleDbSet
+                .Where(x => x.OrganizationId == userOrg.OrganizationId && x.Name.Contains(search))
                 .Select(x => new RoleDTO { Id = x.Id, Name = x.Name })
-                .ToList();
+                .ToListAsync();
         }
 
         public async Task<IList<string>> GetAdministrationRoleEmailsAsync(int orgId)
@@ -73,6 +65,14 @@ namespace Shrooms.Domain.Services.Roles
                 .AnyAsync(x => x.Name == roleName && x.Users.Any(u => u.UserId == userId));
         }
 
+        public async Task<string> GetRoleIdByNameAsync(string roleName)
+        {
+            return await _roleDbSet
+                .Where(x => x.Name == roleName)
+                .Select(x => x.Id)
+                .FirstOrDefaultAsync();
+        }
+
         private async Task<RoleDetailsDTO> GetRoleAsync(Expression<Func<ApplicationRole, bool>> roleFilter, int orgId, bool skipPermission = false)
         {
             var role = await _roleDbSet
@@ -92,14 +92,6 @@ namespace Shrooms.Domain.Services.Roles
             }
 
             return role;
-        }
-
-        private string GetRoleIdByName(string roleName)
-        {
-            return _roleDbSet
-                .Where(x => x.Name == roleName)
-                .Select(x => x.Id)
-                .FirstOrDefault();
         }
 
         private async Task<IEnumerable<RoleUserDTO>> GetUsersWithRoleAsync(string roleId)

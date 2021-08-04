@@ -104,7 +104,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("Edit")]
         [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Post, BasicPermissions.EventWall)]
-        public IHttpActionResult EditPost(EditPostViewModel editedPost)
+        public async Task<IHttpActionResult> EditPost(EditPostViewModel editedPost)
         {
             if (!ModelState.IsValid)
             {
@@ -115,7 +115,7 @@ namespace Shrooms.Presentation.Api.Controllers
             SetOrganizationAndUser(editPostDto);
             try
             {
-                _postService.EditPostAsync(editPostDto);
+                await _postService.EditPostAsync(editPostDto);
                 return Ok();
             }
             catch (UnauthorizedException)
@@ -131,7 +131,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpDelete]
         [Route("Delete")]
         [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Post, BasicPermissions.EventWall)]
-        public IHttpActionResult DeletePost(int id)
+        public async Task<IHttpActionResult> DeletePost(int id)
         {
             if (id <= 0)
             {
@@ -141,7 +141,7 @@ namespace Shrooms.Presentation.Api.Controllers
             var userAndOrg = GetUserAndOrganization();
             try
             {
-                _postService.DeleteWallPostAsync(id, userAndOrg);
+                await _postService.DeleteWallPostAsync(id, userAndOrg);
                 return Ok();
             }
             catch (UnauthorizedException)
@@ -157,7 +157,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("Hide")]
         [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Post, BasicPermissions.EventWall)]
-        public IHttpActionResult HidePost(HidePostViewModel post)
+        public async Task<IHttpActionResult> HidePost(HidePostViewModel post)
         {
             if (!ModelState.IsValid)
             {
@@ -167,7 +167,7 @@ namespace Shrooms.Presentation.Api.Controllers
             var userAndOrg = GetUserAndOrganization();
             try
             {
-                _postService.HideWallPostAsync(post.Id, userAndOrg);
+                await _postService.HideWallPostAsync(post.Id, userAndOrg);
                 return Ok();
             }
             catch (UnauthorizedException)
@@ -183,7 +183,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("Like")]
         [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Post, BasicPermissions.EventWall)]
-        public IHttpActionResult ToggleLike(int id)
+        public async Task<IHttpActionResult> ToggleLike(int id)
         {
             if (id <= 0)
             {
@@ -193,7 +193,7 @@ namespace Shrooms.Presentation.Api.Controllers
             var userAndOrg = GetUserAndOrganization();
             try
             {
-                _postService.ToggleLikeAsync(id, userAndOrg);
+                await _postService.ToggleLikeAsync(id, userAndOrg);
                 return Ok();
             }
             catch (ValidationException e)
@@ -205,7 +205,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("Watch")]
         [PermissionAuthorize(Permission = BasicPermissions.Post)]
-        public IHttpActionResult WatchPost(HidePostViewModel post)
+        public async Task<IHttpActionResult> WatchPost(HidePostViewModel post)
         {
             if (!ModelState.IsValid)
             {
@@ -215,7 +215,7 @@ namespace Shrooms.Presentation.Api.Controllers
             var userAndOrg = GetUserAndOrganization();
             try
             {
-                _postService.ToggleWatchAsync(post.Id, userAndOrg, true);
+                await _postService.ToggleWatchAsync(post.Id, userAndOrg, true);
             }
             catch (ValidationException e)
             {
@@ -228,7 +228,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("Unwatch")]
         [PermissionAuthorize(Permission = BasicPermissions.Post)]
-        public IHttpActionResult UnwatchPost(HidePostViewModel post)
+        public async Task<IHttpActionResult> UnwatchPost(HidePostViewModel post)
         {
             if (!ModelState.IsValid)
             {
@@ -238,7 +238,7 @@ namespace Shrooms.Presentation.Api.Controllers
             var userAndOrg = GetUserAndOrganization();
             try
             {
-                _postService.ToggleWatchAsync(post.Id, userAndOrg, false);
+                await _postService.ToggleWatchAsync(post.Id, userAndOrg, false);
             }
             catch (ValidationException e)
             {

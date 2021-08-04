@@ -15,13 +15,13 @@ namespace Shrooms.Domain.Services.Wall
 
         Task UpdateWallAsync(UpdateWallDto updateWallDto);
 
-        Task<IEnumerable<WallMemberDto>> GetWallMembers(int wallId, UserAndOrganizationDTO userOrg);
+        Task<IEnumerable<WallMemberDto>> GetWallMembersAsync(int wallId, UserAndOrganizationDTO userOrg);
 
         Task<WallDto> GetWallAsync(int wallId, UserAndOrganizationDTO userOrg);
 
         Task<WallDto> GetWallDetailsAsync(int wallId, UserAndOrganizationDTO userOrg);
 
-        Task<IEnumerable<WallDto>> GetWallsList(UserAndOrganizationDTO userOrg, WallsListFilter filter);
+        Task<IEnumerable<WallDto>> GetWallsListAsync(UserAndOrganizationDTO userOrg, WallsListFilter filter);
 
         Task<PostDTO> GetWallPostAsync(UserAndOrganizationDTO userAndOrg, int postId);
 
@@ -33,13 +33,13 @@ namespace Shrooms.Domain.Services.Wall
 
         Task<IEnumerable<PostDTO>> GetWallPostsAsync(int pageNumber, int pageSize, UserAndOrganizationDTO userOrg, int? wallId);
 
-        Task<IEnumerable<PostDTO>> SearchWall(string searchString, UserAndOrganizationDTO userAndOrg, int pageNumber, int pageSize);
+        Task<IEnumerable<PostDTO>> SearchWallAsync(string searchString, UserAndOrganizationDTO userAndOrg, int pageNumber, int pageSize);
 
         Task RemoveModeratorAsync(int wallId, string responsibleUserId, UserAndOrganizationDTO userAndOrg);
 
         Task AddModeratorAsync(int wallId, string responsibleUserId, UserAndOrganizationDTO userId);
 
-        Task<IEnumerable<PostDTO>> GetAllPosts(int page, int defaultPageSize, UserAndOrganizationDTO userAndOrg, int wallsType);
+        Task<IEnumerable<PostDTO>> GetAllPostsAsync(int page, int defaultPageSize, UserAndOrganizationDTO userAndOrg, int wallsType);
 
         Task AddMemberToWallsAsync(string userId, List<int> wallIds);
 

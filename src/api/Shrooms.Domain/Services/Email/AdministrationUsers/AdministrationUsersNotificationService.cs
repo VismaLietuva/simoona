@@ -20,8 +20,7 @@ namespace Shrooms.Domain.Services.Email.AdministrationUsers
         private readonly IMailTemplate _mailTemplate;
         private readonly IUserService _userService;
 
-        public AdministrationUsersNotificationService(
-            IUnitOfWork2 uow,
+        public AdministrationUsersNotificationService(IUnitOfWork2 uow,
             IMailingService mailingService,
             IApplicationSettings appSettings,
             IMailTemplate mailTemplate,
@@ -83,7 +82,7 @@ namespace Shrooms.Domain.Services.Email.AdministrationUsers
             await _mailingService.SendEmailAsync(emailDto);
         }
 
-        public void SendUserResetPasswordEmail(ApplicationUser user, string token, string organizationName)
+        public async Task SendUserResetPasswordEmailAsync(ApplicationUser user, string token, string organizationName)
         {
             var userSettingsUrl = _appSettings.UserNotificationSettingsUrl(organizationName);
             var resetUrl = _appSettings.ResetPasswordUrl(organizationName, user.UserName, token);
@@ -92,10 +91,10 @@ namespace Shrooms.Domain.Services.Email.AdministrationUsers
             var subject = string.Format(Resources.Common.UserResetPasswordEmailSubject);
             var content = _mailTemplate.Generate(resetPasswordTemplateViewModel, EmailTemplateCacheKeys.ResetPassword);
 
-            _mailingService.SendEmailAsync(new EmailDto(user.Email, subject, content));
+            await _mailingService.SendEmailAsync(new EmailDto(user.Email, subject, content));
         }
 
-        public void SendUserVerificationEmail(ApplicationUser user, string token, string organizationName)
+        public async Task SendUserVerificationEmailAsync(ApplicationUser user, string token, string organizationName)
         {
             var userSettingsUrl = _appSettings.UserNotificationSettingsUrl(organizationName);
             var verifyUrl = _appSettings.VerifyEmailUrl(organizationName, user.UserName, token);
@@ -104,7 +103,7 @@ namespace Shrooms.Domain.Services.Email.AdministrationUsers
             var subject = string.Format(Resources.Common.UserVerifyEmailSubject);
             var content = _mailTemplate.Generate(verifyEmailTemplateViewModel, EmailTemplateCacheKeys.VerifyEmail);
 
-            _mailingService.SendEmailAsync(new EmailDto(user.Email, subject, content));
+            await _mailingService.SendEmailAsync(new EmailDto(user.Email, subject, content));
         }
     }
 }

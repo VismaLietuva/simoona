@@ -59,8 +59,11 @@ namespace Shrooms.Presentation.Api.Providers
                     UserId = context.Ticket.Identity.GetUserId()
                 };
 
-                tokenService?.RemoveTokenBySubject(userOrg);
-                tokenService?.AddNewToken(token);
+                if (tokenService != null)
+                {
+                    await tokenService.RemoveTokenBySubjectAsync(userOrg);
+                    await tokenService.AddNewTokenAsync(token);
+                }
 
                 context.SetToken(refreshTokenId);
             }
@@ -86,12 +89,16 @@ namespace Shrooms.Presentation.Api.Providers
                 }
 
                 var hashedTokenId = CryptoHelper.GetHash(context.Token);
-                var refreshToken = tokenService?.GetTokenTicketById(hashedTokenId);
 
-                if (refreshToken != null)
+                if (tokenService != null)
                 {
-                    context.DeserializeTicket(refreshToken.ProtectedTicket);
-                    tokenService.RemoveTokenById(hashedTokenId);
+                    var refreshToken = await tokenService.GetTokenTicketByIdAsync(hashedTokenId);
+
+                    if (refreshToken != null)
+                    {
+                        context.DeserializeTicket(refreshToken.ProtectedTicket);
+                        await tokenService.RemoveTokenByIdAsync(hashedTokenId);
+                    }
                 }
             }
 

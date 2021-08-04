@@ -42,7 +42,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPost]
         [PermissionAuthorize(Permission = AdministrationPermissions.KudosBasket)]
         [InvalidateCacheOutput("Get", typeof(WallWidgetsController))]
-        public IHttpActionResult CreateNewKudosBasket(KudosBasketCreateViewModel newBasket)
+        public async Task<IHttpActionResult> CreateNewKudosBasket(KudosBasketCreateViewModel newBasket)
         {
             if (!ModelState.IsValid)
             {
@@ -51,7 +51,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             var newBasketDto = _mapper.Map<KudosBasketCreateViewModel, KudosBasketCreateDTO>(newBasket);
             SetOrganizationAndUser(newBasketDto);
-            newBasketDto = _kudosBasketService.CreateNewBasket(newBasketDto);
+            newBasketDto = await _kudosBasketService.CreateNewBasketAsync(newBasketDto);
             newBasket = _mapper.Map<KudosBasketCreateDTO, KudosBasketCreateViewModel>(newBasketDto);
             return Ok(newBasket);
         }
@@ -86,17 +86,17 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpDelete]
         [PermissionAuthorize(Permission = AdministrationPermissions.KudosBasket)]
         [InvalidateCacheOutput("Get", typeof(WallWidgetsController))]
-        public IHttpActionResult DeleteKudosBasket()
+        public async Task<IHttpActionResult> DeleteKudosBasket()
         {
             var userAndOrganization = GetUserAndOrganization();
-            _kudosBasketService.DeleteKudosBasketAsync(userAndOrganization);
+            await _kudosBasketService.DeleteKudosBasketAsync(userAndOrganization);
             return Ok();
         }
 
         [HttpPut]
         [PermissionAuthorize(Permission = AdministrationPermissions.KudosBasket)]
         [InvalidateCacheOutput("Get", typeof(WallWidgetsController))]
-        public IHttpActionResult EditKudosBasket(KudosBasketEditViewModel editedBasket)
+        public async Task<IHttpActionResult> EditKudosBasket(KudosBasketEditViewModel editedBasket)
         {
             if (!ModelState.IsValid)
             {
@@ -105,7 +105,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             var editedBasketDto = _mapper.Map<KudosBasketEditViewModel, KudosBasketEditDTO>(editedBasket);
             SetOrganizationAndUser(editedBasketDto);
-            _kudosBasketService.EditKudosBasketAsync(editedBasketDto);
+            await _kudosBasketService.EditKudosBasketAsync(editedBasketDto);
             return Ok();
         }
 
@@ -113,7 +113,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [PermissionAuthorize(Permission = BasicPermissions.KudosBasket)]
         [InvalidateCacheOutput("Get", typeof(WallWidgetsController))]
         [InvalidateCacheOutput("GetLastKudosLogRecords", typeof(KudosController))]
-        public IHttpActionResult MakeDonation(KudosBasketDonateViewModel donation)
+        public async Task<IHttpActionResult> MakeDonation(KudosBasketDonateViewModel donation)
         {
             if (!ModelState.IsValid)
             {
@@ -124,7 +124,7 @@ namespace Shrooms.Presentation.Api.Controllers
             {
                 var donationDto = _mapper.Map<KudosBasketDonateViewModel, KudosBasketDonationDTO>(donation);
                 SetOrganizationAndUser(donationDto);
-                _kudosBasketService.MakeDonationAsync(donationDto);
+                await _kudosBasketService.MakeDonationAsync(donationDto);
             }
             catch (KudosBasketException e)
             {

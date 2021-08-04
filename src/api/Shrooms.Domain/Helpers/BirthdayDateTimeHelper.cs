@@ -6,12 +6,12 @@ namespace Shrooms.Domain.Helpers
     {
         public static DateTime? RemoveYear(DateTime? date)
         {
-            if (date != null)
+            if (date.HasValue)
             {
                 return new DateTime(1904, date.Value.Month, date.Value.Day);
             }
 
-            return date;
+            return null;
         }
     }
 }

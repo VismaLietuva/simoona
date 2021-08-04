@@ -39,7 +39,7 @@ namespace Shrooms.Domain.Services.Projects
             _permissionService = permissionService;
         }
 
-        public async Task<IEnumerable<ProjectsListItemDto>> GetProjects(UserAndOrganizationDTO userOrg)
+        public async Task<IEnumerable<ProjectsListItemDto>> GetProjectsAsync(UserAndOrganizationDTO userOrg)
         {
             var projects = await _projectsDbSet
                 .Include(p => p.Attributes)
@@ -58,7 +58,7 @@ namespace Shrooms.Domain.Services.Projects
             return projects;
         }
 
-        public async Task<IEnumerable<ProjectsAutoCompleteDto>> GetProjectsForAutocomplete(string name, int organizationId)
+        public async Task<IEnumerable<ProjectsAutoCompleteDto>> GetProjectsForAutocompleteAsync(string name, int organizationId)
         {
             var nameInLowerCase = name.ToLower();
 
@@ -75,7 +75,7 @@ namespace Shrooms.Domain.Services.Projects
             return projects;
         }
 
-        public async Task<ProjectDetailsDto> GetProjectDetails(int projectId, UserAndOrganizationDTO userAndOrganizationDTO)
+        public async Task<ProjectDetailsDto> GetProjectDetailsAsync(int projectId, UserAndOrganizationDTO userAndOrganizationDTO)
         {
             var project = await _projectsDbSet
                 .Include(x => x.Members)
@@ -116,7 +116,7 @@ namespace Shrooms.Domain.Services.Projects
             return project;
         }
 
-        public async Task<EditProjectDisplayDto> GetProjectByIdAsync(int projectId, UserAndOrganizationDTO userOrg)
+        public async Task<EditProjectDisplayDto> GetProjectByIdAsyncAsync(int projectId, UserAndOrganizationDTO userOrg)
         {
             var projectOwnerId = await _projectsDbSet.Where(p =>
                     p.Id == projectId &&
@@ -158,7 +158,7 @@ namespace Shrooms.Domain.Services.Projects
             return project;
         }
 
-        public async Task NewProject(NewProjectDto dto)
+        public async Task NewProjectAsync(NewProjectDto dto)
         {
             var owningUserExists = await _usersDbSet
                 .AnyAsync(u => u.Id == dto.OwningUserId && u.OrganizationId == dto.OrganizationId);
@@ -172,7 +172,7 @@ namespace Shrooms.Domain.Services.Projects
                 .Where(u => dto.MembersIds.Contains(u.Id))
                 .ToListAsync();
 
-            var completeListOfAttributes = await ManageProjectAttributes(dto.Attributes);
+            var completeListOfAttributes = await ManageProjectAttributesAsync(dto.Attributes);
 
             var project = new Project
             {
@@ -235,14 +235,14 @@ namespace Shrooms.Domain.Services.Projects
 
             await _wallService.ReplaceMembersInWallAsync(project.Members.ToList(), project.WallId, dto.UserId);
 
-            var completeListOfAttributes = await ManageProjectAttributes(dto.Attributes);
+            var completeListOfAttributes = await ManageProjectAttributesAsync(dto.Attributes);
 
             project.Name = dto.Title;
             project.Desc = dto.Description;
             project.Logo = dto.Logo;
             project.OwnerId = dto.OwningUserId;
             project.Attributes = completeListOfAttributes.ToList();
-            UpdateProjectWallModerator(dto, project);
+            await UpdateProjectWallModeratorAsync(dto, project);
 
             await UpdateWallAsync(dto, project.WallId);
 
@@ -317,12 +317,18 @@ namespace Shrooms.Domain.Services.Projects
             var user = await _usersDbSet.FindAsync(userId);
             var manager = await _usersDbSet.FindAsync(managerId);
 
-            if (user != null && DataLayerConstants.OrganizationManagerUsername.Equals(user.UserName, StringComparison.InvariantCultureIgnoreCase) && user.Id == manager.Id)
+            if (user == null || manager == null)
+            {
+                return false;
+            }
+
+            if (DataLayerConstants.OrganizationManagerUsername.Equals(user.UserName, StringComparison.InvariantCultureIgnoreCase) && user.Id == manager.Id)
             {
                 return true;
             }
 
-            while (manager?.Id != user.Id && manager.ManagerId != null && manager.ManagerId != manager.Id)
+            // ReSharper disable once PossibleNullReferenceException
+            while (manager.Id != user.Id && manager.ManagerId != null && manager.ManagerId != manager.Id)
             {
                 manager = await _usersDbSet.FindAsync(manager.ManagerId);
             }
@@ -355,7 +361,7 @@ namespace Shrooms.Domain.Services.Projects
             await _wallService.UpdateWallAsync(updateWallDto);
         }
 
-        private void UpdateProjectWallModerator(EditProjectDto dto, Project project)
+        private async Task UpdateProjectWallModeratorAsync(EditProjectDto dto, Project project)
         {
             if (project.Wall.Moderators.Any())
             {
@@ -368,19 +374,19 @@ namespace Shrooms.Domain.Services.Projects
 
                 if (!dto.MembersIds.Contains(currentModeratorId))
                 {
-                    _wallService.RemoveMemberFromWallAsync(currentModeratorId, project.WallId);
+                    await _wallService.RemoveMemberFromWallAsync(currentModeratorId, project.WallId);
                 }
 
-                _wallService.RemoveModeratorAsync(project.WallId, project.Wall.Moderators.First().UserId, dto);
-                _wallService.AddModeratorAsync(project.WallId, dto.OwningUserId, dto);
+                await _wallService.RemoveModeratorAsync(project.WallId, project.Wall.Moderators.First().UserId, dto);
+                await _wallService.AddModeratorAsync(project.WallId, dto.OwningUserId, dto);
             }
             else
             {
-                _wallService.AddModeratorAsync(project.WallId, dto.OwningUserId, dto);
+                await _wallService.AddModeratorAsync(project.WallId, dto.OwningUserId, dto);
             }
         }
 
-        private async Task<IEnumerable<Skill>> ManageProjectAttributes(IEnumerable<string> submittedAttribute)
+        private async Task<IEnumerable<Skill>> ManageProjectAttributesAsync(IEnumerable<string> submittedAttribute)
         {
             var projectAttributes = new List<Skill>();
 

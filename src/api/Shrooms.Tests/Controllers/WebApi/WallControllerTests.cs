@@ -69,7 +69,7 @@ namespace Shrooms.Tests.Controllers.WebApi
                 }
             };
 
-            _wallService.GetWallsList(null, WallsListFilter.All).ReturnsForAnyArgs(Task.Run(() => walls));
+            _wallService.GetWallsListAsync(null, WallsListFilter.All).ReturnsForAnyArgs(Task.Run(() => walls));
 
             var response = await _wallController.GetWallList(WallsListFilter.All);
 
@@ -145,7 +145,7 @@ namespace Shrooms.Tests.Controllers.WebApi
                 }
             };
 
-            _wallService.GetWallMembers(wallId, null).ReturnsForAnyArgs(Task.Run(() => members));
+            _wallService.GetWallMembersAsync(wallId, null).ReturnsForAnyArgs(Task.Run(() => members));
 
             var response = await _wallController.GetWallMembers(wallId);
 
@@ -237,7 +237,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         }
 
         [Test]
-        public void Wall_EditWall_Should_Return_Invalid_Model_State()
+        public async Task Wall_EditWall_Should_Return_Invalid_Model_State()
         {
             var wall = new UpdateWallViewModel
             {
@@ -245,13 +245,13 @@ namespace Shrooms.Tests.Controllers.WebApi
             };
             _wallController.ModelState.AddModelError("test", "error");
 
-            var response = _wallController.EditWall(wall);
+            var response = await _wallController.EditWall(wall);
 
             Assert.IsInstanceOf<InvalidModelStateResult>(response);
         }
 
         [Test]
-        public void Wall_EditWall_Should_Return_Ok()
+        public async Task Wall_EditWall_Should_Return_Ok()
         {
             IEnumerable<ModeratorViewModel> moderators = new List<ModeratorViewModel>
             {
@@ -271,27 +271,27 @@ namespace Shrooms.Tests.Controllers.WebApi
                 Moderators = moderators
             };
 
-            var response = _wallController.EditWall(wall);
+            var response = await _wallController.EditWall(wall);
 
             Assert.IsInstanceOf<OkResult>(response);
         }
 
         [Test]
-        public void Wall_DeleteWall_Should_Return_Bad_Request()
+        public async Task Wall_DeleteWall_Should_Return_Bad_Request()
         {
-            var id = 0;
+            const int id = 0;
 
-            var response = _wallController.DeleteWall(id);
+            var response = await _wallController.DeleteWall(id);
 
             Assert.IsInstanceOf<BadRequestResult>(response);
         }
 
         [Test]
-        public void Wall_DeleteWall_Should_Return_Ok()
+        public async Task Wall_DeleteWall_Should_Return_Ok()
         {
-            var id = 1;
+            const int id = 1;
 
-            var response = _wallController.DeleteWall(id);
+            var response = await _wallController.DeleteWall(id);
 
             Assert.IsInstanceOf<OkResult>(response);
         }

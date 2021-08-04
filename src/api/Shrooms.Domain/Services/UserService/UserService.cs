@@ -52,7 +52,7 @@ namespace Shrooms.Domain.Services.UserService
             _roleService = roleService;
         }
 
-        public async Task ChangeUserLocalizationSettings(ChangeUserLocalizationSettingsDto settingsDto)
+        public async Task ChangeUserLocalizationSettingsAsync(ChangeUserLocalizationSettingsDto settingsDto)
         {
             var user = await _usersDbSet
                 .FirstAsync(u => u.Id == settingsDto.UserId && u.OrganizationId == settingsDto.OrganizationId);
@@ -84,7 +84,7 @@ namespace Shrooms.Domain.Services.UserService
             await _uow.SaveChangesAsync(settingsDto.UserId);
         }
 
-        public async Task ChangeUserNotificationSettings(UserNotificationsSettingsDto settingsDto, UserAndOrganizationDTO userOrg)
+        public async Task ChangeUserNotificationSettingsAsync(UserNotificationsSettingsDto settingsDto, UserAndOrganizationDTO userOrg)
         {
             var settings = await _usersDbSet
                 .Where(u => u.Id == userOrg.UserId && u.OrganizationId == userOrg.OrganizationId)
@@ -117,7 +117,7 @@ namespace Shrooms.Domain.Services.UserService
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
-        public async Task<LocalizationSettingsDto> GetUserLocalizationSettings(UserAndOrganizationDTO userOrg)
+        public async Task<LocalizationSettingsDto> GetUserLocalizationSettingsAsync(UserAndOrganizationDTO userOrg)
         {
             var userSettings = await _usersDbSet
                 .Where(u => u.Id == userOrg.UserId && u.OrganizationId == userOrg.OrganizationId)
@@ -206,14 +206,16 @@ namespace Shrooms.Domain.Services.UserService
             return userAppNotificationEnabledIds;
         }
 
-        public IEnumerable<UserAutoCompleteDto> GetUsersForAutocomplete(string s)
+        public async Task<IEnumerable<UserAutoCompleteDto>> GetUsersForAutocompleteAsync(string s)
         {
-            var users = _usersDbSet
+            var newUserRoleId = await _roleService.GetRoleIdByNameAsync(ConstantsRoles.NewUser);
+
+            var users = await _usersDbSet
                 .Where(user => user.UserName.StartsWith(s) || user.Email.StartsWith(s) || (user.FirstName + " " + user.LastName).StartsWith(s) || user.LastName.StartsWith(s))
-                .Where(_roleService.ExcludeUsersWithRole(ConstantsRoles.NewUser))
+                .Where(_roleService.ExcludeUsersWithRole(newUserRoleId))
                 .Take(10)
                 .Select(MapUsersToAutocompleteDTO())
-                .ToList();
+                .ToListAsync();
 
             return users;
         }
@@ -297,20 +299,20 @@ namespace Shrooms.Domain.Services.UserService
             return settingsDto;
         }
 
-        public void ChangeWallNotificationSettings(UserNotificationsSettingsDto userNotificationsSettingsDto, UserAndOrganizationDTO userOrg)
+        public async Task ChangeWallNotificationSettingsAsync(UserNotificationsSettingsDto userNotificationsSettingsDto, UserAndOrganizationDTO userOrg)
         {
             var wallIdsToUpdate = userNotificationsSettingsDto
                 .Walls
                 .Select(x => x.WallId)
                 .ToList();
 
-            var wallMembers = _wallMembersDbSet
+            var wallMembers = await _wallMembersDbSet
                 .Include(x => x.Wall)
                 .Where(x => x.UserId == userOrg.UserId &&
                             x.Wall.OrganizationId == userOrg.OrganizationId &&
                             wallIdsToUpdate.Contains(x.WallId) &&
                             x.Wall.Type == WallType.UserCreated)
-                .ToList();
+                .ToListAsync();
 
             foreach (var member in wallMembers)
             {
@@ -325,13 +327,13 @@ namespace Shrooms.Domain.Services.UserService
                     .IsAppNotificationEnabled;
             }
 
-            var eventOrProjectMembers = _wallMembersDbSet
+            var eventOrProjectMembers = await _wallMembersDbSet
                 .Include(x => x.Wall)
                 .Where(x => x.UserId == userOrg.UserId &&
                             x.Wall.OrganizationId == userOrg.OrganizationId &&
                             (x.Wall.Type == WallType.Events ||
                              x.Wall.Type == WallType.Project))
-                .ToList();
+                .ToListAsync();
 
             foreach (var member in eventOrProjectMembers)
             {
@@ -349,7 +351,7 @@ namespace Shrooms.Domain.Services.UserService
                 }
             }
 
-            _uow.SaveChanges(userOrg.UserId);
+            await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
         public async Task<IList<IdentityUserLogin>> GetUserLoginsAsync(string id)

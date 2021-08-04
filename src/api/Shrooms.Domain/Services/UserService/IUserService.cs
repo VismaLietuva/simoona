@@ -11,13 +11,13 @@ namespace Shrooms.Domain.Services.UserService
 {
     public interface IUserService
     {
-        Task ChangeUserLocalizationSettings(ChangeUserLocalizationSettingsDto settingsDto);
+        Task ChangeUserLocalizationSettingsAsync(ChangeUserLocalizationSettingsDto settingsDto);
 
-        Task ChangeUserNotificationSettings(UserNotificationsSettingsDto settingsDto, UserAndOrganizationDTO userOrg);
+        Task ChangeUserNotificationSettingsAsync(UserNotificationsSettingsDto settingsDto, UserAndOrganizationDTO userOrg);
 
         Task DeleteAsync(string userToDelete, UserAndOrganizationDTO userOrg);
 
-        Task<LocalizationSettingsDto> GetUserLocalizationSettings(UserAndOrganizationDTO userOrg);
+        Task<LocalizationSettingsDto> GetUserLocalizationSettingsAsync(UserAndOrganizationDTO userOrg);
 
         Task<IList<string>> GetUserEmailsWithPermissionAsync(string permissionName, int orgId);
 
@@ -27,7 +27,7 @@ namespace Shrooms.Domain.Services.UserService
 
         Task<UserNotificationsSettingsDto> GetWallNotificationSettingsAsync(UserAndOrganizationDTO userOrg);
 
-        void ChangeWallNotificationSettings(UserNotificationsSettingsDto wallNotificationsSettingsDto, UserAndOrganizationDTO userOrg);
+        Task ChangeWallNotificationSettingsAsync(UserNotificationsSettingsDto wallNotificationsSettingsDto, UserAndOrganizationDTO userOrg);
 
         Task<IList<IdentityUserLogin>> GetUserLoginsAsync(string id);
 
@@ -38,6 +38,6 @@ namespace Shrooms.Domain.Services.UserService
         Task<IEnumerable<ApplicationUser>> GetUsersWithMentionNotificationsAsync(IEnumerable<string> mentionedUsersIds);
 
         Task<ApplicationUser> GetApplicationUserOrDefaultAsync(string id);
-        IEnumerable<UserAutoCompleteDto> GetUsersForAutocomplete(string s);
+        Task<IEnumerable<UserAutoCompleteDto>> GetUsersForAutocompleteAsync(string s);
     }
 }

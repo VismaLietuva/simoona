@@ -2,6 +2,7 @@
 using System.Data.Entity;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
@@ -19,10 +20,7 @@ namespace Shrooms.Domain.Services.DailyMailingService
         private readonly IMailingService _emailService;
         private readonly ISystemClock _systemClock;
 
-        public DailyMailingService(
-            IUnitOfWork2 unitOfWork,
-            ISystemClock systemClock,
-            IMailingService emailService)
+        public DailyMailingService(IUnitOfWork2 unitOfWork, ISystemClock systemClock, IMailingService emailService)
         {
             _applicationUserDbSeb = unitOfWork.GetDbSet<ApplicationUser>();
             _postDbSet = unitOfWork.GetDbSet<Post>();
@@ -30,17 +28,17 @@ namespace Shrooms.Domain.Services.DailyMailingService
             _emailService = emailService;
         }
 
-        public void SendDigestedWallPosts()
+        public async Task SendDigestedWallPostsAsync()
         {
-            var todaysDate = _systemClock.UtcNow;
+            var todayDate = _systemClock.UtcNow;
             var yesterdaysDate = _systemClock.UtcNow.AddDays(-1);
 
             // Select users that want to receive emails at this hour
-            var usersToEmail = _applicationUserDbSeb
+            var usersToEmail = await _applicationUserDbSeb
                 .Include(u => u.Organization)
                 .Include(u => u.WallUsers.Select(y => y.Wall))
                 .Where(u => u.DailyMailingHour.HasValue && u.DailyMailingHour.Value.Hours == _systemClock.UtcNow.Hour)
-                .ToList();
+                .ToListAsync();
 
             if (!usersToEmail.Any())
             {
@@ -48,10 +46,10 @@ namespace Shrooms.Domain.Services.DailyMailingService
             }
 
             // Select new posts created in 24 hours
-            var postsToEmail = _postDbSet
+            var postsToEmail = await _postDbSet
                 .Include(p => p.Author)
-                .Where(p => p.Created <= todaysDate && p.Created > yesterdaysDate)
-                .ToList();
+                .Where(p => p.Created <= todayDate && p.Created > yesterdaysDate)
+                .ToListAsync();
 
             if (!postsToEmail.Any())
             {
@@ -73,30 +71,30 @@ namespace Shrooms.Domain.Services.DailyMailingService
                 // Send email if any posts left
                 if (sendPosts.Any())
                 {
-                    SendEmail(user.Email, sendPosts, user.Organization.ShortName);
+                    await SendEmailAsync(user.Email, sendPosts, user.Organization.ShortName);
                 }
             }
         }
 
-        private void SendEmail(string userEmail, IEnumerable<Post> wallPosts, string organizationShortName)
+        private async Task SendEmailAsync(string userEmail, IEnumerable<Post> wallPosts, string organizationShortName)
         {
             var messageBody = GetMessageBody(wallPosts, organizationShortName);
-            var messageSubject = BusinessLayerConstants.ShroomsInfoEmailSubject;
 
-            var emailDTO = new EmailDto(userEmail, messageSubject, messageBody);
+            var emailDTO = new EmailDto(userEmail, BusinessLayerConstants.ShroomsInfoEmailSubject, messageBody);
 
-            _emailService.SendEmailAsync(emailDTO);
+            await _emailService.SendEmailAsync(emailDTO);
         }
 
-        private string GetMessageBody(IEnumerable<Post> wallPosts, string organizationShortName)
+        private static string GetMessageBody(IEnumerable<Post> wallPosts, string organizationShortName)
         {
             var wallPostList = new StringBuilder();
             foreach (var post in wallPosts)
             {
-                var displayName = post.Author == null ? BusinessLayerConstants.DeletedUserName :
-                    (string.IsNullOrEmpty(post.Author.FirstName) && string.IsNullOrEmpty(post.Author.LastName)
-                    ? post.Author.UserName
-                    : $"{post.Author.FirstName} {post.Author.LastName}");
+                var displayName = post.Author == null
+                    ? BusinessLayerConstants.DeletedUserName
+                    : (string.IsNullOrEmpty(post.Author.FirstName) && string.IsNullOrEmpty(post.Author.LastName)
+                        ? post.Author.UserName
+                        : $"{post.Author.FirstName} {post.Author.LastName}");
 
                 // Could be some issues with time zones, because post.Created is UTC, local is server's (not user's) local
                 wallPostList.AppendFormat(

@@ -33,15 +33,15 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [PermissionAuthorize(Permission = AdministrationPermissions.Floor)]
-        public override Task<HttpResponseMessage> Post(FloorPostViewModel crudViewModel)
+        public override async Task<HttpResponseMessage> Post(FloorPostViewModel crudViewModel)
         {
-            return base.Post(crudViewModel);
+            return await base.Post(crudViewModel);
         }
 
         [PermissionAuthorize(Permission = AdministrationPermissions.Floor)]
-        public override Task<HttpResponseMessage> Put(FloorPostViewModel crudViewModel)
+        public override async Task<HttpResponseMessage> Put(FloorPostViewModel crudViewModel)
         {
-            return base.Put(crudViewModel);
+            return await base.Put(crudViewModel);
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Floor)]

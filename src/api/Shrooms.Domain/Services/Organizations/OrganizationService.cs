@@ -34,10 +34,10 @@ namespace Shrooms.Domain.Services.Organizations
         }
 
 #pragma warning disable S1449 //EF does does not understand Equals(invariant) or ToLowerInvariant()
-        public Organization GetOrganizationByName(string organizationName)
+        public async Task<Organization> GetOrganizationByNameAsync(string organizationName)
         {
-            return _organizationsDbSet
-                .Single(organization => organization.ShortName.ToLower() == organizationName.ToLower());
+            return await _organizationsDbSet
+                .SingleAsync(organization => organization.ShortName.ToLower() == organizationName.ToLower());
         }
 
         public async Task<string> GetOrganizationHostNameAsync(string organizationName)

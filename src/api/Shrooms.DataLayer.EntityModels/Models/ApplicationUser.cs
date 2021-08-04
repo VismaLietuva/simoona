@@ -153,6 +153,8 @@ namespace Shrooms.DataLayer.EntityModels.Models
             get
             {
                 var now = DateTime.UtcNow;
+                EmploymentDate ??= now;
+
                 var employmentYears = now.Year - EmploymentDate.Value.Year;
                 if (now < EmploymentDate.Value.AddYears(employmentYears))
                 {

@@ -12,7 +12,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
         Task EditPostAsync(EditPostDTO editPostDto);
         Task<NewlyCreatedPostDTO> CreateNewPostAsync(NewPostDTO newPostDto);
         Task ToggleLikeAsync(int postId, UserAndOrganizationDTO userOrg);
-        string GetPostBody(int postId);
+        Task<string> GetPostBodyAsync(int postId);
         Task DeleteWallPostAsync(int postId, UserAndOrganizationDTO userOrg);
         Task HideWallPostAsync(int postId, UserAndOrganizationDTO userOrg);
         Task ToggleWatchAsync(int postId, UserAndOrganizationDTO userAndOrg, bool shouldWatch);

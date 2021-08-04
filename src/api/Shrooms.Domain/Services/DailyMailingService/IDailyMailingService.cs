@@ -1,7 +1,9 @@
-﻿namespace Shrooms.Domain.Services.DailyMailingService
+﻿using System.Threading.Tasks;
+
+namespace Shrooms.Domain.Services.DailyMailingService
 {
     public interface IDailyMailingService
     {
-        void SendDigestedWallPosts();
+        Task SendDigestedWallPostsAsync();
     }
 }

@@ -10,8 +10,8 @@ namespace Shrooms.Domain.Services.Email.AdministrationUsers
 
         Task NotifyAboutNewUserAsync(ApplicationUser newUser, int orgId);
 
-        void SendUserResetPasswordEmail(ApplicationUser user, string token, string organizationName);
+        Task SendUserResetPasswordEmailAsync(ApplicationUser user, string token, string organizationName);
 
-        void SendUserVerificationEmail(ApplicationUser user, string token, string organizationName);
+        Task SendUserVerificationEmailAsync(ApplicationUser user, string token, string organizationName);
     }
 }

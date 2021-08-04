@@ -8,6 +8,7 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects.Models.Birthdays;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Services.Roles;
+using ConstantsRoles = Shrooms.Contracts.Constants.Roles;
 
 namespace Shrooms.Domain.Services.Birthday
 {
@@ -39,17 +40,19 @@ namespace Shrooms.Domain.Services.Birthday
 
         private async Task<IEnumerable<UserBirthdayInfoDTO>> GetUsersBirthdayInfoAsync(DateTime firstDayOfTheWeek, DateTime lastDayOfTheWeek)
         {
+            var newUserRoleId = await _roleService.GetRoleIdByNameAsync(ConstantsRoles.NewUser);
+
             return await _userDbSet
                     .Where(u => u.BirthDay.HasValue)
                     .Where(FilterWeeklyBirthdays(firstDayOfTheWeek, lastDayOfTheWeek))
-                    .Where(_roleService.ExcludeUsersWithRole(Contracts.Constants.Roles.NewUser))
+                    .Where(_roleService.ExcludeUsersWithRole(newUserRoleId))
                     .OrderByDescending(x => x.BirthDay.Value.Month)
                     .ThenByDescending(x => x.BirthDay.Value.Day)
                     .Select(MapUserBirthdayInfo())
                     .ToListAsync();
         }
 
-        private Expression<Func<ApplicationUser, bool>> FilterWeeklyBirthdays(DateTime firstDayOfTheWeek, DateTime lastDayOfTheWeek)
+        private static Expression<Func<ApplicationUser, bool>> FilterWeeklyBirthdays(DateTime firstDayOfTheWeek, DateTime lastDayOfTheWeek)
         {
             if (firstDayOfTheWeek.Month == lastDayOfTheWeek.Month)
             {
@@ -66,7 +69,7 @@ namespace Shrooms.Domain.Services.Birthday
                      && x.BirthDay.Value.Month == lastDayOfTheWeek.Month);
         }
 
-        private Expression<Func<ApplicationUser, UserBirthdayInfoDTO>> MapUserBirthdayInfo()
+        private static Expression<Func<ApplicationUser, UserBirthdayInfoDTO>> MapUserBirthdayInfo()
         {
             return user => new UserBirthdayInfoDTO
             {
@@ -78,7 +81,7 @@ namespace Shrooms.Domain.Services.Birthday
             };
         }
 
-        private Func<UserBirthdayInfoDTO, BirthdayDTO> MapUserBirthdayInfoToBirthdayDto(DateTime firstDayOfTheWeek, DateTime lastDayOfTheWeek)
+        private static Func<UserBirthdayInfoDTO, BirthdayDTO> MapUserBirthdayInfoToBirthdayDto(DateTime firstDayOfTheWeek, DateTime lastDayOfTheWeek)
         {
             return userInfo => new BirthdayDTO
             {
@@ -86,6 +89,7 @@ namespace Shrooms.Domain.Services.Birthday
                 FirstName = userInfo.FirstName,
                 LastName = userInfo.LastName,
                 PictureId = userInfo.PictureId,
+                // ReSharper disable once PossibleInvalidOperationException (values from DB retrieved as Where(u => u.BirthDay.HasValue)
                 DateString = GetBirthDayCurrentDate(userInfo.BirthDay.Value, GetYear(userInfo.BirthDay.Value, firstDayOfTheWeek, lastDayOfTheWeek)).ToString("yyyy-MM-dd"),
                 DayOfWeek = GetBirthDayCurrentDate(userInfo.BirthDay.Value, GetYear(userInfo.BirthDay.Value, firstDayOfTheWeek, lastDayOfTheWeek)).DayOfWeek.ToString()
             };

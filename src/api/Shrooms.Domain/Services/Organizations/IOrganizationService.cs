@@ -11,7 +11,7 @@ namespace Shrooms.Domain.Services.Organizations
 
         Task<bool> RequiresUserConfirmationAsync(int organizationId);
 
-        Organization GetOrganizationByName(string organizationName);
+        Task<Organization> GetOrganizationByNameAsync(string organizationName);
 
         Task<Organization> GetUserOrganizationAsync(ApplicationUser user);
 

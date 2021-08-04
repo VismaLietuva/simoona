@@ -27,9 +27,9 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Office)]
-        public override Task<IEnumerable<OfficeViewModel>> GetAllAsync(int maxResults = 0, string orderBy = null, string includeProperties = null)
+        public override async Task<IEnumerable<OfficeViewModel>> GetAll(int maxResults = 0, string orderBy = null, string includeProperties = null)
         {
-            return base.GetAllAsync(maxResults, orderBy, includeProperties);
+            return await base.GetAll(maxResults, orderBy, includeProperties);
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Office)]
@@ -46,9 +46,9 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Office)]
-        public IEnumerable<OfficeDropdownViewModel> GetAllOfficesForDropdown()
+        public async Task<IEnumerable<OfficeDropdownViewModel>> GetAllOfficesForDropdown()
         {
-            var offices = _repository.Get().ToList();
+            var offices = await _repository.Get().ToListAsync();
             var defaultOffice = offices.FirstOrDefault(x => x.Name == "Vilniaus ofisas" && x.OrganizationId == 2);
             if (defaultOffice != null)
             {
@@ -94,7 +94,7 @@ namespace Shrooms.Presentation.Api.Controllers
                                                   orderBy: sortString, includeProperties: includeProperties);
             }
 
-            var officesViewModel = _mapper.Map<IEnumerable<Office>, IEnumerable<OfficeViewModel>>(offices);
+            var officesViewModel = _mapper.Map<IEnumerable<Office>, IEnumerable<OfficeViewModel>>(await offices.ToListAsync());
 
             var officeViewModels = officesViewModel as IList<OfficeViewModel> ?? officesViewModel.ToList();
             officeViewModels.ForEach(o => o.Floors.ForEach(f =>

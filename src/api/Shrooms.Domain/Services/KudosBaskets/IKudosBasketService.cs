@@ -8,11 +8,11 @@ namespace Shrooms.Domain.Services.KudosBaskets
     public interface IKudosBasketService
     {
         Task<IList<KudosBasketLogDTO>> GetDonationsAsync(UserAndOrganizationDTO userAndOrg);
-        KudosBasketCreateDTO CreateNewBasket(KudosBasketCreateDTO newBasket);
+        Task<KudosBasketCreateDTO> CreateNewBasketAsync(KudosBasketCreateDTO newBasket);
         Task<KudosBasketDTO> GetKudosBasketAsync(UserAndOrganizationDTO userAndOrganization);
         Task<KudosBasketDTO> GetKudosBasketWidgetAsync(UserAndOrganizationDTO userAndOrganization);
         Task DeleteKudosBasketAsync(UserAndOrganizationDTO userAndOrganization);
-        void EditKudosBasketAsync(KudosBasketEditDTO editedBasket);
+        Task EditKudosBasketAsync(KudosBasketEditDTO editedBasket);
         Task MakeDonationAsync(KudosBasketDonationDTO donation);
     }
 }

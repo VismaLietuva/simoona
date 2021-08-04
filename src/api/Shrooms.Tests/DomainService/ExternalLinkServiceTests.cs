@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
+using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.Constants;
@@ -34,17 +35,17 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_All_External_Link_Depending_On_Organization()
+        public async Task Should_Return_All_External_Link_Depending_On_Organization()
         {
             MockExternalLinks();
 
-            var result = _externalLinkService.GetAll(2).ToList();
+            var result = (await _externalLinkService.GetAllAsync(2)).ToList();
             Assert.AreEqual(2, result.Count);
             Assert.AreEqual("Test1", result.First().Name);
         }
 
         [Test]
-        public void Should_Add_Update_Delete_Links_Successfully()
+        public async Task Should_Add_Update_Delete_Links_Successfully()
         {
             MockExternalLinksForCrud();
             var updateDto = new AddEditDeleteExternalLinkDTO
@@ -71,12 +72,14 @@ namespace Shrooms.Tests.DomainService
                 UserId = "testUser"
             };
 
-            _externalLinkService.UpdateLinks(updateDto);
+            await _externalLinkService.UpdateLinksAsync(updateDto);
 
             _externalLinkDbSet.Received(2).Remove(Arg.Any<ExternalLink>());
             _externalLinkDbSet.Received(1).Add(Arg.Any<ExternalLink>());
-            Assert.AreEqual("modifiedLink3", _externalLinkDbSet.First(x => x.Id == 3).Name);
-            Assert.AreEqual("http://link3modified.com", _externalLinkDbSet.First(x => x.Id == 3).Url);
+            var externalLink = await _externalLinkDbSet.FirstAsync(x => x.Id == 3);
+
+            Assert.AreEqual("modifiedLink3", externalLink.Name);
+            Assert.AreEqual("http://link3modified.com", externalLink.Url);
         }
 
         [Test]
@@ -99,7 +102,7 @@ namespace Shrooms.Tests.DomainService
                 UserId = "testUser"
             };
 
-            var ex = Assert.Throws<ValidationException>(() => _externalLinkService.UpdateLinks(updateDto));
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _externalLinkService.UpdateLinksAsync(updateDto));
             Assert.AreEqual(ErrorCodes.DuplicatesIntolerable, ex.ErrorCode);
         }
 
@@ -124,7 +127,7 @@ namespace Shrooms.Tests.DomainService
                 UserId = "testUser"
             };
 
-            var ex = Assert.Throws<ValidationException>(() => _externalLinkService.UpdateLinks(updateDto));
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _externalLinkService.UpdateLinksAsync(updateDto));
             Assert.AreEqual(ErrorCodes.DuplicatesIntolerable, ex.ErrorCode);
         }
 

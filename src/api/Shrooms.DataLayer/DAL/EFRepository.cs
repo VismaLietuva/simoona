@@ -105,7 +105,7 @@ namespace Shrooms.DataLayer.DAL
             return queryableSet;
         }
 
-        public virtual Task<IPagedList<TEntity>> GetPagedAsync(Expression<Func<TEntity, bool>> filter = null,
+        public virtual async Task<IPagedList<TEntity>> GetPagedAsync(Expression<Func<TEntity, bool>> filter = null,
             int maxResults = 0,
             string orderBy = null,
             string includeProperties = "",
@@ -116,7 +116,7 @@ namespace Shrooms.DataLayer.DAL
 
             page = page ?? 1;
 
-            return queryableSet.ToPagedListAsync(page.Value, pageSize);
+            return await queryableSet.ToPagedListAsync(page.Value, pageSize);
         }
 
         public virtual async Task<TEntity> GetByIdAsync(object id)

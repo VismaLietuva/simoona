@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Data.Entity;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -39,7 +39,7 @@ namespace Shrooms.Presentation.Api.Controllers
             _classifierModel = _mapper.Map(crudViewModel, _classifierModel, crudViewModel.GetType(), specificType) as AbstractClassifier;
 
             //TODO Need to fix Child saving issue when saving abstract classifier after removing children
-            RemoveAllChildren(_classifierModel);
+            await RemoveAllChildren(_classifierModel);
             UpdateChildren(crudViewModel, _classifierModel, specificType);
 
             _repository.Insert(_classifierModel);
@@ -61,7 +61,7 @@ namespace Shrooms.Presentation.Api.Controllers
             model = _mapper.Map(crudViewModel, model, crudViewModel.GetType(), specificType) as AbstractClassifier;
 
             //TODO Need to fix Child saving issue when saving abstract classifier after removing children
-            RemoveAllChildren(model);
+            await RemoveAllChildren(model);
             UpdateChildren(crudViewModel, model, specificType);
 
             _repository.Update(model);
@@ -70,7 +70,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.Created);
         }
 
-        public override Task<PagedViewModel<AbstractClassifierViewModel>> GetPaged(string includeProperties = null,
+        public override async Task<PagedViewModel<AbstractClassifierViewModel>> GetPaged(string includeProperties = null,
             int page = 1,
             int pageSize = WebApiConstants.DefaultPageSize,
             string sort = null,
@@ -79,7 +79,7 @@ namespace Shrooms.Presentation.Api.Controllers
         {
             sort ??= "Name Asc, OrganizationId Asc";
 
-            return GetFilteredPagedAsync(includeProperties, page, pageSize, sort, dir, f => f.Name.Contains(s));
+            return await GetFilteredPaged(includeProperties, page, pageSize, sort, dir, f => f.Name.Contains(s));
         }
 
         public IEnumerable<AbstractClassifierTypeViewModel> GetAbstractClassifierTypes()
@@ -100,13 +100,13 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<AbstractClassifierViewModel> GetChildrenForAutoComplete(string search, int id = 0)
+        public async Task<IEnumerable<AbstractClassifierViewModel>> GetChildrenForAutoComplete(string search, int id = 0)
         {
             IEnumerable<AbstractClassifierViewModel> childrenViewModel;
 
             if (!string.IsNullOrEmpty(search))
             {
-                var children = _classifierRepository.Get(o => o.Name.Contains(search) && o.Id != id);
+                var children = await _classifierRepository.Get(o => o.Name.Contains(search) && o.Id != id).ToListAsync();
                 childrenViewModel = _mapper.Map<IEnumerable<AbstractClassifier>, IEnumerable<AbstractClassifierViewModel>>(children);
             }
             else
@@ -117,9 +117,9 @@ namespace Shrooms.Presentation.Api.Controllers
             return childrenViewModel;
         }
 
-        public IEnumerable<AbstractClassifierViewModel> GetClassifiersWithoutMe()
+        public async Task<IEnumerable<AbstractClassifierViewModel>> GetClassifiersWithoutMe()
         {
-            var children = _classifierRepository.Get();
+            var children = await _classifierRepository.Get().ToListAsync();
             var childrenViewModel = _mapper.Map<IEnumerable<AbstractClassifier>, IEnumerable<AbstractClassifierViewModel>>(children);
             return childrenViewModel;
         }
@@ -145,10 +145,10 @@ namespace Shrooms.Presentation.Api.Controllers
             }
         }
 
-        private void RemoveAllChildren(AbstractClassifier classifierModel)
+        private async Task RemoveAllChildren(AbstractClassifier classifierModel)
         {
             var classifierModelId = classifierModel.Id;
-            classifierModel = _repository.Get(f => f.Id == classifierModelId, includeProperties: "Children").FirstOrDefault();
+            classifierModel = await _repository.Get(f => f.Id == classifierModelId, includeProperties: "Children").FirstOrDefaultAsync();
 
             if (classifierModel != null)
             {

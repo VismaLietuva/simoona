@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -53,7 +54,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Moderator_Can_Update_Wall()
+        public async Task Moderator_Can_Update_Wall()
         {
             // Arrange
             var moderators = new List<WallModerator> { new WallModerator { Id = 1, UserId = "user" } };
@@ -74,15 +75,15 @@ namespace Shrooms.Tests.DomainService
                 ModeratorsIds = new[] { "1" }
             };
 
-            var isWallAdministrator = false;
+            const bool isWallAdministrator = false;
             _permissionService.UserHasPermissionAsync(updateWallDto, AdministrationPermissions.Wall).Returns(isWallAdministrator);
             _wallsDbSet.SetDbSetDataForAsync(walls.AsQueryable());
 
             // Act
-            _wallService.UpdateWallAsync(updateWallDto);
+            await _wallService.UpdateWallAsync(updateWallDto);
 
             // Assert
-            var result = _wallsDbSet.First();
+            var result = await _wallsDbSet.FirstAsync();
             Assert.AreEqual(updateWallDto.Name, result.Name);
             Assert.AreEqual(updateWallDto.Logo, result.Logo);
             Assert.AreEqual(updateWallDto.Description, result.Description);
@@ -90,7 +91,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Administrator_Can_Update_Wall()
+        public async Task Administrator_Can_Update_Wall()
         {
             // Arrange
             var moderators = new List<WallModerator> { new WallModerator { Id = 1, UserId = "user1" } };
@@ -111,15 +112,15 @@ namespace Shrooms.Tests.DomainService
                 ModeratorsIds = new[] { "1" }
             };
 
-            var isWallAdministrator = true;
+            const bool isWallAdministrator = true;
             _permissionService.UserHasPermissionAsync(updateWallDto, AdministrationPermissions.Wall).Returns(isWallAdministrator);
             _wallsDbSet.SetDbSetDataForAsync(walls.AsQueryable());
 
             // Act
-            _wallService.UpdateWallAsync(updateWallDto);
+            await _wallService.UpdateWallAsync(updateWallDto);
 
             // Assert
-            var result = _wallsDbSet.First();
+            var result = await _wallsDbSet.FirstAsync();
             Assert.AreEqual(updateWallDto.Name, result.Name);
             Assert.AreEqual(updateWallDto.Logo, result.Logo);
             Assert.AreEqual(updateWallDto.Description, result.Description);
@@ -127,7 +128,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Wall_Administrator_And_Moderator_Can_Update_Wall()
+        public async Task Wall_Administrator_And_Moderator_Can_Update_Wall()
         {
             // Arrange
             var moderators = new List<WallModerator> { new WallModerator { Id = 1, UserId = "user" } };
@@ -148,15 +149,15 @@ namespace Shrooms.Tests.DomainService
                 ModeratorsIds = new[] { "1" }
             };
 
-            var isWallAdministrator = true;
+            const bool isWallAdministrator = true;
             _permissionService.UserHasPermissionAsync(updateWallDto, AdministrationPermissions.Wall).Returns(isWallAdministrator);
             _wallsDbSet.SetDbSetDataForAsync(walls.AsQueryable());
 
             // Act
-            _wallService.UpdateWallAsync(updateWallDto);
+            await _wallService.UpdateWallAsync(updateWallDto);
 
             // Assert
-            var result = _wallsDbSet.First();
+            var result = await _wallsDbSet.FirstAsync();
             Assert.AreEqual(updateWallDto.Name, result.Name);
             Assert.AreEqual(updateWallDto.Logo, result.Logo);
             Assert.AreEqual(updateWallDto.Description, result.Description);
@@ -183,7 +184,7 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 2
             };
 
-            var isWallAdministrator = false;
+            const bool isWallAdministrator = false;
             _permissionService.UserHasPermissionAsync(updateWallDto, AdministrationPermissions.Wall).Returns(isWallAdministrator);
             _wallsDbSet.SetDbSetDataForAsync(walls.AsQueryable());
 
@@ -399,9 +400,9 @@ namespace Shrooms.Tests.DomainService
         public async Task Wall_Moderator_Can_Remove_User_From_Wall()
         {
             // Arrange
-            var moderatingUserId = "moderator1";
-            var userToRemoveId = "user1";
-            var tenantId = 2;
+            const string moderatingUserId = "moderator1";
+            const string userToRemoveId = "user1";
+            const int tenantId = 2;
 
             var jobPosition = new JobPosition { Title = "jobpos" };
             var users = new List<ApplicationUser>
@@ -667,7 +668,9 @@ namespace Shrooms.Tests.DomainService
 
         private static void MockRoleService(IRoleService roleService)
         {
-            roleService.ExcludeUsersWithRole(Roles.NewUser).Returns(x => true);
+            var newRoleId = Guid.NewGuid().ToString();
+            roleService.GetRoleIdByNameAsync(Roles.NewUser).Returns(newRoleId);
+            roleService.ExcludeUsersWithRole(newRoleId).ReturnsForAnyArgs(x => true);
         }
 
         private void MockWallsForDelete()

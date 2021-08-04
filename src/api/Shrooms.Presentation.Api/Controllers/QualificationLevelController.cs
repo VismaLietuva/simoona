@@ -45,62 +45,62 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.QualificationLevel)]
-        public override Task<HttpResponseMessage> Get(int id, string includeProperties = "")
+        public override async Task<HttpResponseMessage> Get(int id, string includeProperties = "")
         {
-            return base.Get(id, includeProperties);
+            return await base.Get(id, includeProperties);
         }
 
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.QualificationLevel)]
-        public override Task<IEnumerable<QualificationLevelViewModel>> GetAllAsync(int maxResults = 0, string orderBy = null, string includeProperties = null)
+        public override async Task<IEnumerable<QualificationLevelViewModel>> GetAll(int maxResults = 0, string orderBy = null, string includeProperties = null)
         {
-            return base.GetAllAsync(maxResults, orderBy, includeProperties);
+            return await base.GetAll(maxResults, orderBy, includeProperties);
         }
 
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.QualificationLevel)]
-        public override Task<PagedViewModel<QualificationLevelViewModel>> GetPaged(string includeProperties = null,
+        public override async Task<PagedViewModel<QualificationLevelViewModel>> GetPaged(string includeProperties = null,
             int page = 1,
             int pageSize = WebApiConstants.DefaultPageSize,
             string sort = null,
             string dir = "",
             string s = "")
         {
-            return base.GetPaged(includeProperties, page, pageSize, sort, dir, s);
+            return await base.GetPaged(includeProperties, page, pageSize, sort, dir, s);
         }
 
         [PermissionAuthorize(BasicPermissions.QualificationLevel)]
-        protected override Task<PagedViewModel<QualificationLevelViewModel>> GetFilteredPagedAsync(string includeProperties = null,
+        protected override async Task<PagedViewModel<QualificationLevelViewModel>> GetFilteredPaged(string includeProperties = null,
             int page = 1,
             int pageSize = WebApiConstants.DefaultPageSize,
             string sort = null,
             string dir = "",
             Expression<Func<QualificationLevel, bool>> filter = null)
         {
-            return base.GetFilteredPagedAsync(includeProperties, page, pageSize, sort, dir, filter);
+            return await base.GetFilteredPaged(includeProperties, page, pageSize, sort, dir, filter);
         }
 
         [HttpPost]
         [ValidationFilter]
         [PermissionAuthorize(Permission = AdministrationPermissions.QualificationLevel)]
-        public override Task<HttpResponseMessage> Post([FromBody] QualificationLevelPostViewModel crudViewModel)
+        public override async Task<HttpResponseMessage> Post([FromBody] QualificationLevelPostViewModel crudViewModel)
         {
-            return base.Post(crudViewModel);
+            return await base.Post(crudViewModel);
         }
 
         [HttpPut]
         [ValidationFilter]
         [PermissionAuthorize(Permission = AdministrationPermissions.QualificationLevel)]
-        public override Task<HttpResponseMessage> Put([FromBody] QualificationLevelPostViewModel crudViewModel)
+        public override async Task<HttpResponseMessage> Put([FromBody] QualificationLevelPostViewModel crudViewModel)
         {
-            return base.Put(crudViewModel);
+            return await base.Put(crudViewModel);
         }
 
         [HttpDelete]
         [PermissionAuthorize(Permission = AdministrationPermissions.QualificationLevel)]
-        public override Task<HttpResponseMessage> Delete(int id)
+        public override async Task<HttpResponseMessage> Delete(int id)
         {
-            return base.Delete(id);
+            return await base.Delete(id);
         }
     }
 }

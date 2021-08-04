@@ -40,15 +40,16 @@ namespace Shrooms.Presentation.Api.Providers
                 await Task.CompletedTask;
             };
 
+            // ReSharper disable once AsyncVoidLambda
             OnApplyRedirect = async context =>
             {
-                using (var webReq = ioc.BeginLifetimeScope("AutofacWebRequest"))
+                using (var request = ioc.BeginLifetimeScope("AutofacWebRequest"))
                 {
-                    var org = webReq.Resolve(typeof(IOrganizationService)) as IOrganizationService;
+                    var org = request.Resolve(typeof(IOrganizationService)) as IOrganizationService;
                     var newRedirectUri = context.RedirectUri;
                     var organizationName = context.OwinContext.Get<string>("tenantName");
 
-                    if (org != null && (await org.HasOrganizationEmailDomainRestrictionAsync(organizationName)))
+                    if (org != null && await org.HasOrganizationEmailDomainRestrictionAsync(organizationName))
                     {
                         var validHostName = await org.GetOrganizationHostNameAsync(organizationName);
                         var hostDomainParameter = CreateHostDomainParameter(validHostName);

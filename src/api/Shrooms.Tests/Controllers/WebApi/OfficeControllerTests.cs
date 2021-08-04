@@ -45,7 +45,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         [Test]
         public async Task Office_GetAll_Should_Return_All_Offices()
         {
-            var result = (await _officeController.GetAllAsync()) as List<OfficeViewModel>;
+            var result = (await _officeController.GetAll()) as List<OfficeViewModel>;
             Assert.IsNotNull(result);
             Assert.AreEqual(result.Count, 4);
         }

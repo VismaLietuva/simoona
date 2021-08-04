@@ -24,7 +24,10 @@ namespace Shrooms.Tests.DomainService
             uow.MockDbSetForAsync(MockUsers());
 
             var roleService = Substitute.For<IRoleService>();
-            roleService.ExcludeUsersWithRole(Roles.NewUser).Returns(x => true);
+
+            var newRoleId = Guid.NewGuid().ToString();
+            roleService.GetRoleIdByNameAsync(Roles.NewUser).Returns(newRoleId);
+            roleService.ExcludeUsersWithRole(newRoleId).ReturnsForAnyArgs(x => true);
 
             _birthdayService = new BirthdayService(uow, roleService);
         }

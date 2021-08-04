@@ -7,14 +7,14 @@ namespace Shrooms.Domain.Services.Jobs
 {
     public interface IJobService
     {
-        Task CreateJobType(JobTypeDTO dto);
+        Task CreateJobTypeAsync(JobTypeDTO dto);
 
-        Task UpdateJobType(JobTypeDTO dto);
+        Task UpdateJobTypeAsync(JobTypeDTO dto);
 
-        Task RemoveJobType(int id, UserAndOrganizationDTO userOrg);
+        Task RemoveJobTypeAsync(int id, UserAndOrganizationDTO userOrg);
 
-        Task<JobTypeDTO> GetJobType(int id, UserAndOrganizationDTO userOrg);
+        Task<JobTypeDTO> GetJobTypeAsync(int id, UserAndOrganizationDTO userOrg);
 
-        Task<IEnumerable<JobTypeDTO>> GetJobTypes(UserAndOrganizationDTO userAndOrg);
+        Task<IEnumerable<JobTypeDTO>> GetJobTypesAsync(UserAndOrganizationDTO userAndOrg);
     }
 }

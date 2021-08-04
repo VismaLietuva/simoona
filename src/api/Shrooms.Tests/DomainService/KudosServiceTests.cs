@@ -181,19 +181,19 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_Kudos_Logs_For_Pie_Chart_With_Organization_Filter()
+        public async Task Should_Return_Kudos_Logs_For_Pie_Chart_With_Organization_Filter()
         {
             MockKudosLogsForPieChart();
-            var result = _kudosService.GetKudosPieChartData(1, "UserId").ToList();
+            var result = (await _kudosService.GetKudosPieChartDataAsync(1, "UserId")).ToList();
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual(3, result.First().Value);
         }
 
         [Test]
-        public void Should_Return_Kudos_Logs_For_Pie_Chart_With_Organization_Filter_2()
+        public async Task Should_Return_Kudos_Logs_For_Pie_Chart_With_Organization_Filter_2()
         {
             MockKudosLogsForPieChart();
-            var result = _kudosService.GetKudosPieChartData(2, "UserId").ToList();
+            var result = (await _kudosService.GetKudosPieChartDataAsync(2, "UserId")).ToList();
             Assert.AreEqual(2, result.Count);
             Assert.AreEqual(2, result.First().Value);
             Assert.AreEqual(10, result.ToArray()[1].Value);
@@ -201,22 +201,22 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_Approved_Kudos_Logs_With_Organization_Filter()
+        public async Task Should_Return_Approved_Kudos_Logs_With_Organization_Filter()
         {
-            _usersDbSet.Find("CreatedUserId");
+            await _usersDbSet.FindAsync("CreatedUserId");
 
             MockKudosLogsForApprovedList();
-            var result = _kudosService.GetApprovedKudosList("UserId", 1).ToList();
+            var result = (await _kudosService.GetApprovedKudosListAsync("UserId", 1)).ToList();
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual("Comment2", result.First().Comments);
             Assert.AreEqual("CreatedUserId", result.First().Sender.Id);
         }
 
         [Test]
-        public void Should_Return_Approved_Kudos_Logs_With_Organization_Filter_2()
+        public async Task Should_Return_Approved_Kudos_Logs_With_Organization_Filter_2()
         {
             MockKudosLogsForApprovedList();
-            var result = _kudosService.GetApprovedKudosList("UserId", 2).ToList();
+            var result = (await _kudosService.GetApprovedKudosListAsync("UserId", 2)).ToList();
             Assert.AreEqual(2, result.Count);
             Assert.AreEqual("Comment1", result.First().Comments);
             Assert.AreEqual("CreatedUserId", result.First().Sender.Id);
@@ -228,38 +228,38 @@ namespace Shrooms.Tests.DomainService
         #region GetKudosTypes
 
         [Test]
-        public void Should_Return_All_Kudos_Types()
+        public async Task Should_Return_All_Kudos_Types()
         {
             var userAndOrg = new UserAndOrganizationDTO
             {
                 UserId = "testUserId2"
             };
 
-            var types = _kudosService.GetKudosTypes(userAndOrg);
+            var types = await _kudosService.GetKudosTypesAsync(userAndOrg);
             Assert.AreEqual(5, types.Count());
         }
 
         [Test]
-        public void Should_Return_Basic_Kudos_Types()
+        public async Task Should_Return_Basic_Kudos_Types()
         {
             var userAndOrg = new UserAndOrganizationDTO
             {
                 UserId = "testUserId"
             };
 
-            var types = _kudosService.GetKudosTypes(userAndOrg);
+            var types = await _kudosService.GetKudosTypesAsync(userAndOrg);
             Assert.AreEqual(5, types.Count());
         }
 
         [Test]
-        public void Should_Return_Active_Kudos_Types()
+        public async Task Should_Return_Active_Kudos_Types()
         {
             var userAndOrg = new UserAndOrganizationDTO
             {
                 UserId = "testUserId"
             };
 
-            var types = _kudosService.GetKudosTypes(userAndOrg);
+            var types = await _kudosService.GetKudosTypesAsync(userAndOrg);
             Assert.IsTrue(types.Any(type => type.IsActive));
         }
 
@@ -282,7 +282,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_When_Kudos_Log_Was_Not_Approved()
+        public async Task Should_Return_When_Kudos_Log_Was_Not_Approved()
         {
             MockKudosLogsForUpdate();
 
@@ -292,13 +292,13 @@ namespace Shrooms.Tests.DomainService
                 UserId = "UserId2"
             };
 
-            _kudosService.ApproveKudosAsync(1, userAndOrg);
+            await _kudosService.ApproveKudosAsync(1, userAndOrg);
             Assert.AreEqual(_kudosLogsDbSet.First().Points, _kudosLogsDbSet.First().Employee.RemainingKudos);
             Assert.AreEqual(KudosStatus.Approved, _kudosLogsDbSet.First().Status);
         }
 
         [Test]
-        public void Should_Return_If_Rejection_Doesnt_Update_Status()
+        public async Task Should_Return_If_Rejection_Doesnt_Update_Status()
         {
             var kudosRejectDTO = new KudosRejectDTO
             {
@@ -308,9 +308,9 @@ namespace Shrooms.Tests.DomainService
                 KudosRejectionMessage = "testMessage"
             };
 
-            _kudosService.RejectKudosAsync(kudosRejectDTO);
+            await _kudosService.RejectKudosAsync(kudosRejectDTO);
 
-            var log = _kudosLogsDbSet.First(x => x.Id == 1);
+            var log = await _kudosLogsDbSet.FirstAsync(x => x.Id == 1);
             Assert.AreEqual(KudosStatus.Rejected, log.Status);
             Assert.AreEqual("testMessage", log.RejectionMessage);
         }
@@ -544,18 +544,18 @@ namespace Shrooms.Tests.DomainService
         #region HasPendingKudos
 
         [Test]
-        public void HasPendingKudos_Should_Return_True()
+        public async Task HasPendingKudos_Should_Return_True()
         {
             MockKudosLogsForStats();
-            var actual = _kudosService.HasPendingKudos("User1");
+            var actual = await _kudosService.HasPendingKudosAsync("User1");
             Assert.AreEqual(true, actual);
         }
 
         [Test]
-        public void HasPendingKudos_Should_Return_False()
+        public async Task HasPendingKudos_Should_Return_False()
         {
             MockKudosLogsForStats();
-            var actual = _kudosService.HasPendingKudos("User2");
+            var actual = await _kudosService.HasPendingKudosAsync("User2");
             Assert.AreEqual(false, actual);
         }
 
@@ -564,14 +564,14 @@ namespace Shrooms.Tests.DomainService
         #region GetKudosTypeSend
 
         [Test]
-        public void GetKudosTypeSend_FromKudosTypes_ReturnsOnlySendType()
+        public async Task GetKudosTypeSend_FromKudosTypes_ReturnsOnlySendType()
         {
             var userAndOrg = new UserAndOrganizationDTO
             {
                 UserId = "testUserId2"
             };
 
-            var result = _kudosService.GetSendKudosType(userAndOrg);
+            var result = await _kudosService.GetSendKudosTypeAsync(userAndOrg);
 
             Assert.AreEqual(result.Type, KudosTypeEnum.Send);
         }
@@ -582,10 +582,12 @@ namespace Shrooms.Tests.DomainService
 
         private static void MockRoleService(IRoleService roleService)
         {
-            roleService.ExcludeUsersWithRole(Roles.NewUser).Returns(x => true);
+            var newRoleId = Guid.NewGuid().ToString();
+            roleService.GetRoleIdByNameAsync(Roles.NewUser).Returns(newRoleId);
+            roleService.ExcludeUsersWithRole(newRoleId).ReturnsForAnyArgs(x => true);
         }
 
-        private IPermissionService MockPermissionService()
+        private static IPermissionService MockPermissionService()
         {
             var permissionService = Substitute.For<IPermissionService>();
 
@@ -594,7 +596,7 @@ namespace Shrooms.Tests.DomainService
             return permissionService;
         }
 
-        private IKudosServiceValidator MockServiceValidator()
+        private static IKudosServiceValidator MockServiceValidator()
         {
             var kudosServiceValidation = Substitute.For<IKudosServiceValidator>();
             kudosServiceValidation
@@ -618,19 +620,19 @@ namespace Shrooms.Tests.DomainService
 
         private void MockFindMethod()
         {
-            _organizationDbSet.Find(2).Returns(MockOrganization().FirstOrDefault(x => x.Id == 2));
+            _organizationDbSet.FindAsync(2).Returns(MockOrganization().FirstOrDefault(x => x.Id == 2));
 
-            _kudosTypesDbSet.Find(1).Returns(MockKudosTypes().FirstOrDefault(x => x.Id == 1));
-            _kudosTypesDbSet.Find(2).Returns(MockKudosTypes().FirstOrDefault(x => x.Id == 2));
-            _kudosTypesDbSet.Find(3).Returns(MockKudosTypes().FirstOrDefault(x => x.Id == 3));
-            _kudosTypesDbSet.Find(5).Returns(MockKudosTypes().FirstOrDefault(x => x.Id == 5));
+            _kudosTypesDbSet.FindAsync(1).Returns(MockKudosTypes().FirstOrDefault(x => x.Id == 1));
+            _kudosTypesDbSet.FindAsync(2).Returns(MockKudosTypes().FirstOrDefault(x => x.Id == 2));
+            _kudosTypesDbSet.FindAsync(3).Returns(MockKudosTypes().FirstOrDefault(x => x.Id == 3));
+            _kudosTypesDbSet.FindAsync(5).Returns(MockKudosTypes().FirstOrDefault(x => x.Id == 5));
 
-            _usersDbSet.Find("testUserId").Returns(MockUsers().FirstOrDefault(x => x.Id == "testUserId"));
-            _usersDbSet.Find("testUserId2").Returns(MockUsers().FirstOrDefault(x => x.Id == "testUserId2"));
-            _usersDbSet.Find("testUserId3").Returns(MockUsers().FirstOrDefault(x => x.Id == "testUserId3"));
-            _usersDbSet.Find("testUserId4").Returns(MockUsers().FirstOrDefault(x => x.Id == "testUserId4"));
-            _usersDbSet.Find("testUserId5").Returns(MockUsers().FirstOrDefault(x => x.Id == "testUserId5"));
-            _usersDbSet.Find("CreatedUserId").Returns(MockUsers().FirstOrDefault(x => x.Id == "CreatedUserId"));
+            _usersDbSet.FindAsync("testUserId").Returns(MockUsers().FirstOrDefault(x => x.Id == "testUserId"));
+            _usersDbSet.FindAsync("testUserId2").Returns(MockUsers().FirstOrDefault(x => x.Id == "testUserId2"));
+            _usersDbSet.FindAsync("testUserId3").Returns(MockUsers().FirstOrDefault(x => x.Id == "testUserId3"));
+            _usersDbSet.FindAsync("testUserId4").Returns(MockUsers().FirstOrDefault(x => x.Id == "testUserId4"));
+            _usersDbSet.FindAsync("testUserId5").Returns(MockUsers().FirstOrDefault(x => x.Id == "testUserId5"));
+            _usersDbSet.FindAsync("CreatedUserId").Returns(MockUsers().FirstOrDefault(x => x.Id == "CreatedUserId"));
         }
 
         private IQueryable<Organization> MockOrganization()

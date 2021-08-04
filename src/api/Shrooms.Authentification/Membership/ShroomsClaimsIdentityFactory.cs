@@ -18,10 +18,10 @@ namespace Shrooms.Authentification.Membership
             _context = context;
         }
 
-        public override Task<ClaimsIdentity> CreateAsync(UserManager<ApplicationUser, string> userManager, ApplicationUser user, string authenticationType)
+        public override async Task<ClaimsIdentity> CreateAsync(UserManager<ApplicationUser, string> userManager, ApplicationUser user, string authenticationType)
         {
             var contextUser = HttpContext.Current.User as ClaimsPrincipal;
-            var claimsIdentity = base.CreateAsync(userManager, user, authenticationType).Result;
+            var claimsIdentity = await base.CreateAsync(userManager, user, authenticationType);
             var organizationIdClaim = new Claim(WebApiConstants.ClaimOrganizationId, user.OrganizationId.ToString());
 
             if (!claimsIdentity.HasClaim(claim => claim.Type == ClaimTypes.GivenName))
@@ -48,7 +48,7 @@ namespace Shrooms.Authentification.Membership
                 claimsIdentity.AddClaim(contextUser.Claims.FirstOrDefault(c => c.Type == ClaimTypes.PrimarySid));
             }
 
-            return Task.FromResult(claimsIdentity);
+            return claimsIdentity;
         }
 
         private Organization GetOrganization(int? orgId)

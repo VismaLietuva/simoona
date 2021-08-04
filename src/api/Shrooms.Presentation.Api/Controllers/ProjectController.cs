@@ -30,7 +30,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [PermissionAuthorize(Permission = BasicPermissions.Project)]
         public async Task<IHttpActionResult> GetProjects()
         {
-            var projectsDto = await _projectsService.GetProjects(GetUserAndOrganization());
+            var projectsDto = await _projectsService.GetProjectsAsync(GetUserAndOrganization());
             var result = _mapper.Map<IEnumerable<ProjectsListItemDto>, IEnumerable<ProjectsListItemViewModel>>(projectsDto);
 
             return Ok(result);
@@ -51,7 +51,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             try
             {
-                await _projectsService.NewProject(dto);
+                await _projectsService.NewProjectAsync(dto);
             }
             catch (ValidationException e)
             {
@@ -73,7 +73,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             try
             {
-                var resultDto = await _projectsService.GetProjectByIdAsync(id, GetUserAndOrganization());
+                var resultDto = await _projectsService.GetProjectByIdAsyncAsync(id, GetUserAndOrganization());
                 var viewModel = _mapper.Map<EditProjectDisplayDto, EditProjectDisplayViewModel>(resultDto);
                 return Ok(viewModel);
             }
@@ -125,7 +125,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 return BadRequest("search string cannot be empty");
             }
 
-            var projectsDTO = await _projectsService.GetProjectsForAutocomplete(name, GetUserAndOrganization().OrganizationId);
+            var projectsDTO = await _projectsService.GetProjectsForAutocompleteAsync(name, GetUserAndOrganization().OrganizationId);
             var result = _mapper.Map<IEnumerable<ProjectsAutoCompleteDto>, IEnumerable<ProjectsBasicInfoViewModel>>(projectsDTO);
 
             return Ok(result);
@@ -163,7 +163,7 @@ namespace Shrooms.Presentation.Api.Controllers
         {
             try
             {
-                var projectDto = await _projectsService.GetProjectDetails(projectId, GetUserAndOrganization());
+                var projectDto = await _projectsService.GetProjectDetailsAsync(projectId, GetUserAndOrganization());
                 var result = _mapper.Map<ProjectDetailsDto, ProjectDetailsViewModel>(projectDto);
                 return Ok(result);
             }

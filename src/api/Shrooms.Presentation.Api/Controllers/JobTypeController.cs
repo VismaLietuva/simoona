@@ -29,7 +29,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [Route("Types")]
         public async Task<IHttpActionResult> GetJobTypes()
         {
-            var jobTypeDto = await _jobService.GetJobTypes(GetUserAndOrganization());
+            var jobTypeDto = await _jobService.GetJobTypesAsync(GetUserAndOrganization());
             var jobTypeViewModel = _mapper.Map<IEnumerable<JobTypeDTO>, IEnumerable<JobTypeViewModel>>(jobTypeDto);
 
             return Ok(jobTypeViewModel);
@@ -47,7 +47,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             try
             {
-                var jobTypeDto = await _jobService.GetJobType(id, GetUserAndOrganization());
+                var jobTypeDto = await _jobService.GetJobTypeAsync(id, GetUserAndOrganization());
                 var jobTypeViewModel = _mapper.Map<JobTypeDTO, JobTypeViewModel>(jobTypeDto);
 
                 return Ok(jobTypeViewModel);
@@ -73,7 +73,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             try
             {
-                await _jobService.CreateJobType(jobTypeDto);
+                await _jobService.CreateJobTypeAsync(jobTypeDto);
                 return Ok();
             }
             catch (ValidationException e)
@@ -97,7 +97,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             try
             {
-                await _jobService.UpdateJobType(jobTypeDto);
+                await _jobService.UpdateJobTypeAsync(jobTypeDto);
                 return Ok();
             }
             catch (ValidationException e)
@@ -118,7 +118,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             try
             {
-                await _jobService.RemoveJobType(id, GetUserAndOrganization());
+                await _jobService.RemoveJobTypeAsync(id, GetUserAndOrganization());
                 return Ok();
             }
             catch (ValidationException e)

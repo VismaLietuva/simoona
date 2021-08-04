@@ -24,7 +24,7 @@ namespace Shrooms.Domain.Services.Jobs
             _jobTypesDbSet = uow.GetDbSet<JobPosition>();
         }
 
-        public async Task<JobTypeDTO> GetJobType(int id, UserAndOrganizationDTO userOrg)
+        public async Task<JobTypeDTO> GetJobTypeAsync(int id, UserAndOrganizationDTO userOrg)
         {
             var type = await _jobTypesDbSet
                 .Where(t => t.OrganizationId == userOrg.OrganizationId && t.Id == id)
@@ -39,7 +39,7 @@ namespace Shrooms.Domain.Services.Jobs
             return type;
         }
 
-        public async Task<IEnumerable<JobTypeDTO>> GetJobTypes(UserAndOrganizationDTO userAndOrg)
+        public async Task<IEnumerable<JobTypeDTO>> GetJobTypesAsync(UserAndOrganizationDTO userAndOrg)
         {
             var jobTypesDTO = await _jobTypesDbSet
                 .Where(t => t.OrganizationId == userAndOrg.OrganizationId)
@@ -49,7 +49,7 @@ namespace Shrooms.Domain.Services.Jobs
             return jobTypesDTO;
         }
 
-        public async Task CreateJobType(JobTypeDTO jobTypeDTO)
+        public async Task CreateJobTypeAsync(JobTypeDTO jobTypeDTO)
         {
             var alreadyExists = await _jobTypesDbSet
                 .AnyAsync(t => t.Title == jobTypeDTO.Title && t.OrganizationId == jobTypeDTO.OrganizationId);
@@ -71,7 +71,7 @@ namespace Shrooms.Domain.Services.Jobs
             await _uow.SaveChangesAsync(jobTypeDTO.UserId);
         }
 
-        public async Task RemoveJobType(int id, UserAndOrganizationDTO userOrg)
+        public async Task RemoveJobTypeAsync(int id, UserAndOrganizationDTO userOrg)
         {
             var type = await _jobTypesDbSet
                 .Where(t => t.OrganizationId == userOrg.OrganizationId && t.Id == id)
@@ -87,7 +87,7 @@ namespace Shrooms.Domain.Services.Jobs
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
-        public async Task UpdateJobType(JobTypeDTO jobTypeDTO)
+        public async Task UpdateJobTypeAsync(JobTypeDTO jobTypeDTO)
         {
             var alreadyExists = await _jobTypesDbSet
                 .AnyAsync(t => t.Title == jobTypeDTO.Title && t.OrganizationId == jobTypeDTO.OrganizationId && t.Id != jobTypeDTO.Id);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.Constants;
@@ -48,7 +49,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Like_Post()
+        public async Task Should_Like_Post()
         {
             var post = new Post
             {
@@ -61,13 +62,13 @@ namespace Shrooms.Tests.DomainService
             };
 
             _postsDbSet.SetDbSetDataForAsync(new List<Post> { post }.AsQueryable());
-            _postService.ToggleLikeAsync(1, new UserAndOrganizationDTO { UserId = "user1", OrganizationId = 2 });
+            await _postService.ToggleLikeAsync(1, new UserAndOrganizationDTO { UserId = "user1", OrganizationId = 2 });
 
             Assert.AreEqual("user1", _postsDbSet.First().Likes.First().UserId);
         }
 
         [Test]
-        public void Should_Unlike_Post()
+        public async Task Should_Unlike_Post()
         {
             var post = new Post
             {
@@ -80,7 +81,7 @@ namespace Shrooms.Tests.DomainService
             };
 
             _postsDbSet.SetDbSetDataForAsync(new List<Post> { post }.AsQueryable());
-            _postService.ToggleLikeAsync(1, new UserAndOrganizationDTO { UserId = "user1", OrganizationId = 2 });
+            await _postService.ToggleLikeAsync(1, new UserAndOrganizationDTO { UserId = "user1", OrganizationId = 2 });
 
             Assert.AreEqual(0, _postsDbSet.First().Likes.Count);
         }
@@ -219,7 +220,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Hide_Wall_Post()
+        public async Task Should_Hide_Wall_Post()
         {
             var userOrg = new UserAndOrganizationDTO
             {
@@ -251,7 +252,7 @@ namespace Shrooms.Tests.DomainService
             };
             _usersDbSet.SetDbSetDataForAsync(users.AsQueryable());
 
-            _postService.HideWallPostAsync(1, userOrg);
+            await _postService.HideWallPostAsync(1, userOrg);
 
             Assert.AreEqual(posts[0].IsHidden, true);
             Assert.AreEqual(posts[1].IsHidden, false);
@@ -286,7 +287,7 @@ namespace Shrooms.Tests.DomainService
 
             // Act
             // Assert
-            Assert.DoesNotThrow(() => _postService.EditPostAsync(editPostDto));
+            Assert.DoesNotThrowAsync(async () => await _postService.EditPostAsync(editPostDto));
         }
 
         [Test]
@@ -318,7 +319,7 @@ namespace Shrooms.Tests.DomainService
 
             // Act
             // Assert
-            Assert.DoesNotThrow(() => _postService.EditPostAsync(editPostDto));
+            Assert.DoesNotThrowAsync(async () => await _postService.EditPostAsync(editPostDto));
         }
 
         [Test]
@@ -452,7 +453,7 @@ namespace Shrooms.Tests.DomainService
 
             // Act
             // Assert
-            Assert.DoesNotThrow(() => _postService.DeleteWallPostAsync(1, userOrg));
+            Assert.DoesNotThrowAsync(async () => await _postService.DeleteWallPostAsync(1, userOrg));
         }
 
         [Test]
@@ -482,7 +483,7 @@ namespace Shrooms.Tests.DomainService
 
             // Act
             // Assert
-            Assert.DoesNotThrow(() => _postService.DeleteWallPostAsync(1, userOrg));
+            Assert.DoesNotThrowAsync(async () => await _postService.DeleteWallPostAsync(1, userOrg));
         }
     }
 }

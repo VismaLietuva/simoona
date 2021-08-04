@@ -40,7 +40,7 @@ namespace Shrooms.Domain.Services.Email.Kudos
                 return;
             }
 
-            var organizationName = (await GetOrganizationName(kudosLog.OrganizationId)).ShortName;
+            var organizationName = (await GetOrganizationNameAsync(kudosLog.OrganizationId)).ShortName;
             var subject = Resources.Models.Kudos.Kudos.RejectedKudosEmailSubject;
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organizationName);
             var kudosProfileUrl = _appSettings.KudosProfileUrl(organizationName, kudosLog.CreatedBy);
@@ -59,7 +59,7 @@ namespace Shrooms.Domain.Services.Email.Kudos
 
         public async Task NotifyAboutKudosSentAsync(AddKudosDTO kudosDto)
         {
-            var organizationName = (await GetOrganizationName(kudosDto.KudosLog.OrganizationId)).ShortName;
+            var organizationName = (await GetOrganizationNameAsync(kudosDto.KudosLog.OrganizationId)).ShortName;
 
             var recipient = _usersDbSet
                 .Where(u => kudosDto.ReceivingUser.Id.Contains(u.Id))
@@ -81,8 +81,8 @@ namespace Shrooms.Domain.Services.Email.Kudos
 
         public async Task NotifyApprovedKudosRecipientAsync(KudosLog kudosLog)
         {
-            var organizationName = (await GetOrganizationName(kudosLog.OrganizationId)).ShortName;
-            var sendingUserFullName = await GetUserFullName(kudosLog.CreatedBy);
+            var organizationName = (await GetOrganizationNameAsync(kudosLog.OrganizationId)).ShortName;
+            var sendingUserFullName = await GetUserFullNameAsync(kudosLog.CreatedBy);
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organizationName);
             var kudosProfileUrl = _appSettings.KudosProfileUrl(organizationName, kudosLog.EmployeeId);
             var subject = Resources.Models.Kudos.Kudos.EmailSubject;
@@ -100,8 +100,8 @@ namespace Shrooms.Domain.Services.Email.Kudos
 
         public async Task NotifyApprovedKudosDecreaseRecipientAsync(KudosLog kudosLog)
         {
-            var organizationName = (await GetOrganizationName(kudosLog.OrganizationId)).ShortName;
-            var sendingUserFullName = await GetUserFullName(kudosLog.CreatedBy);
+            var organizationName = (await GetOrganizationNameAsync(kudosLog.OrganizationId)).ShortName;
+            var sendingUserFullName = await GetUserFullNameAsync(kudosLog.CreatedBy);
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organizationName);
             var kudosProfileUrl = _appSettings.KudosProfileUrl(organizationName, kudosLog.EmployeeId);
             var subject = Resources.Models.Kudos.Kudos.MinusKudosEmailSubject;
@@ -118,12 +118,12 @@ namespace Shrooms.Domain.Services.Email.Kudos
             await _mailingService.SendEmailAsync(new EmailDto(kudosLog.Employee.Email, subject, body));
         }
 
-        private async Task<Organization> GetOrganizationName(int orgId)
+        private async Task<Organization> GetOrganizationNameAsync(int orgId)
         {
             return await _organizationsDbSet.SingleAsync(x => x.Id == orgId);
         }
 
-        private async Task<string> GetUserFullName(string userId)
+        private async Task<string> GetUserFullNameAsync(string userId)
         {
             return await _usersDbSet
                 .Where(x => x.Id == userId)

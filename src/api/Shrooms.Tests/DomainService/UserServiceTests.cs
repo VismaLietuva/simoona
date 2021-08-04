@@ -69,7 +69,7 @@ namespace Shrooms.Tests.DomainService
             var changeCultureDto = new ChangeUserLocalizationSettingsDto { UserId = "user1", OrganizationId = 2, LanguageCode = "lt-LT", TimeZoneId = "Pacific Standard Time" };
 
             // Act
-            _userService.ChangeUserLocalizationSettings(changeCultureDto);
+            _userService.ChangeUserLocalizationSettingsAsync(changeCultureDto);
 
             // Assert
             var result = _usersDbSet.First();
@@ -91,7 +91,7 @@ namespace Shrooms.Tests.DomainService
 
             // Act, Assert
             var result = _usersDbSet.First();
-            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _userService.ChangeUserLocalizationSettings(changeSettingsDto));
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _userService.ChangeUserLocalizationSettingsAsync(changeSettingsDto));
             Assert.AreEqual(ErrorCodes.CultureUnsupported, ex.ErrorCode);
             Assert.AreEqual("en-US", result.CultureCode);
             Assert.AreEqual("FLE Standard Time", result.TimeZone);
@@ -111,7 +111,7 @@ namespace Shrooms.Tests.DomainService
 
             // Act, Assert
             var result = _usersDbSet.First();
-            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _userService.ChangeUserLocalizationSettings(changeSettingsDto));
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _userService.ChangeUserLocalizationSettingsAsync(changeSettingsDto));
             Assert.AreEqual(ErrorCodes.TimezoneUnsupported, ex.ErrorCode);
             Assert.AreEqual("en-US", result.CultureCode);
             Assert.AreEqual("FLE Standard Time", result.TimeZone);
@@ -130,7 +130,7 @@ namespace Shrooms.Tests.DomainService
             var userOrg = new UserAndOrganizationDTO { UserId = "user1", OrganizationId = 2 };
 
             // Act
-            var result = await _userService.GetUserLocalizationSettings(userOrg);
+            var result = await _userService.GetUserLocalizationSettingsAsync(userOrg);
 
             // Assert
             Assert.IsInstanceOf<LocalizationSettingsDto>(result);
@@ -242,7 +242,7 @@ namespace Shrooms.Tests.DomainService
             };
 
             // Act
-            _userService.ChangeWallNotificationSettings(userSettings, userAndOrg);
+            _userService.ChangeWallNotificationSettingsAsync(userSettings, userAndOrg);
 
             // Assert
             Assert.AreEqual(true, _wallUsersDbSet.First(x => x.WallId == 1).EmailNotificationsEnabled);

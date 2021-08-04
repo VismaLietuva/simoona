@@ -103,8 +103,9 @@ namespace Shrooms.Presentation.Api.Middlewares
             var responseBody = new
             {
                 errorCode = ErrorCodes.InvalidOrganization,
-                errorMessage = "Invalid organization",
+                errorMessage = "Invalid organization"
             };
+
             await context.Response.WriteAsync(Encoding.UTF8.GetBytes(responseBody.ToJson()));
         }
 

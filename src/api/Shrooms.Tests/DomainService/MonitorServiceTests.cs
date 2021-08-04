@@ -2,6 +2,7 @@
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
+using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.Constants;
@@ -35,21 +36,21 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Return_All_Monitors_Depending_On_Organization()
+        public async Task Should_Return_All_Monitors_Depending_On_Organization()
         {
             MockExternalLinks();
 
-            var result = _monitorService.GetMonitorList(2).ToList();
+            var result = (await _monitorService.GetMonitorListAsync(2)).ToList();
             Assert.AreEqual(2, result.Count);
             Assert.AreEqual("Test1", result.First().Name);
         }
 
         [Test]
-        public void Should_Return_Monitor_Details()
+        public async Task Should_Return_Monitor_Details()
         {
             MockExternalLinks();
 
-            var result = _monitorService.GetMonitorDetails(2, 2);
+            var result = await _monitorService.GetMonitorDetailsAsync(2, 2);
             Assert.AreEqual("Test2", result.Name);
         }
 
@@ -58,7 +59,7 @@ namespace Shrooms.Tests.DomainService
         {
             MockExternalLinks();
 
-            var ex = Assert.Throws<ValidationException>(() => _monitorService.GetMonitorDetails(2, 3));
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _monitorService.GetMonitorDetailsAsync(2, 3));
             Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.ContentDoesNotExist));
         }
 
@@ -74,12 +75,12 @@ namespace Shrooms.Tests.DomainService
             };
             var monitor = new MonitorDTO { Name = "Test1" };
 
-            var ex = Assert.Throws<ValidationException>(() => _monitorService.CreateMonitor(monitor, userAndOrg));
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _monitorService.CreateMonitorAsync(monitor, userAndOrg));
             Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.DuplicatesIntolerable));
         }
 
         [Test]
-        public void Should_Create_New_Monitor()
+        public async Task Should_Create_New_Monitor()
         {
             MockExternalLinks();
 
@@ -91,12 +92,12 @@ namespace Shrooms.Tests.DomainService
 
             var monitor = new MonitorDTO { Name = "Test4" };
 
-            _monitorService.CreateMonitor(monitor, userAndOrg);
+            await _monitorService.CreateMonitorAsync(monitor, userAndOrg);
             _monitorsDbSet.Received(1).Add(Arg.Any<Monitor>());
         }
 
         [Test]
-        public void Should_Update_Monitor()
+        public async Task Should_Update_Monitor()
         {
             MockExternalLinks();
 
@@ -108,8 +109,8 @@ namespace Shrooms.Tests.DomainService
 
             var monitor = new MonitorDTO { Name = "Test4", Id = 1 };
 
-            _monitorService.UpdateMonitor(monitor, userAndOrg);
-            _uow.Received(1).SaveChanges(false);
+            await _monitorService.UpdateMonitorAsync(monitor, userAndOrg);
+            await _uow.Received(1).SaveChangesAsync(false);
         }
 
         [Test]
@@ -125,7 +126,7 @@ namespace Shrooms.Tests.DomainService
 
             var monitor = new MonitorDTO { Name = "Test2", Id = 1 };
 
-            var ex = Assert.Throws<ValidationException>(() => _monitorService.UpdateMonitor(monitor, userAndOrg));
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _monitorService.UpdateMonitorAsync(monitor, userAndOrg));
             Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.DuplicatesIntolerable));
         }
 
@@ -142,7 +143,7 @@ namespace Shrooms.Tests.DomainService
 
             var monitor = new MonitorDTO { Name = "Test2", Id = 5 };
 
-            var ex = Assert.Throws<ValidationException>(() => _monitorService.UpdateMonitor(monitor, userAndOrg));
+            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _monitorService.UpdateMonitorAsync(monitor, userAndOrg));
             Assert.That(ex.ErrorCode, Is.EqualTo(ErrorCodes.ContentDoesNotExist));
         }
 

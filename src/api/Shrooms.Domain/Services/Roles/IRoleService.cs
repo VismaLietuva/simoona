@@ -10,16 +10,16 @@ namespace Shrooms.Domain.Services.Roles
 {
     public interface IRoleService
     {
-        Expression<Func<ApplicationUser, bool>> ExcludeUsersWithRole(string roleName);
+        Expression<Func<ApplicationUser, bool>> ExcludeUsersWithRole(string roleId);
 
-        IEnumerable<string> GetRoleIdsByNames(params string[] names);
-
-        IEnumerable<RoleDTO> GetRolesForAutocomplete(string search, UserAndOrganizationDTO userAndOrg);
+        Task<IEnumerable<RoleDTO>> GetRolesForAutocompleteAsync(string search, UserAndOrganizationDTO userAndOrg);
 
         Task<RoleDetailsDTO> GetRoleByIdAsync(UserAndOrganizationDTO userAndOrganizationDTO, string roleId);
 
         Task<IList<string>> GetAdministrationRoleEmailsAsync(int orgId);
 
         Task<bool> HasRoleAsync(string userId, string roleName);
+
+        Task<string> GetRoleIdByNameAsync(string roleName);
     }
 }

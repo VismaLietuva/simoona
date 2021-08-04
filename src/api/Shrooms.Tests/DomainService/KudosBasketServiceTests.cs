@@ -247,7 +247,7 @@ namespace Shrooms.Tests.DomainService
                 UserId = "testUserId",
                 OrganizationId = 2
             };
-            _kudosBasketService.CreateNewBasket(newBasket);
+            _kudosBasketService.CreateNewBasketAsync(newBasket);
             _kudosBasketDbSet.Received(1).Add(Arg.Any<KudosBasket>());
         }
 
@@ -302,19 +302,20 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Remove_Existing_Basket()
+        public async Task Should_Remove_Existing_Basket()
         {
             var userAndOrg = new UserAndOrganizationDTO
             {
                 UserId = "testUserId",
                 OrganizationId = 2
             };
-            _kudosBasketService.DeleteKudosBasketAsync(userAndOrg);
+
+            await _kudosBasketService.DeleteKudosBasketAsync(userAndOrg);
             _kudosBasketDbSet.Received(1).Remove(Arg.Any<KudosBasket>());
         }
 
         [Test]
-        public void Should_Edit_Existing_Kudos_Basket()
+        public async Task Should_Edit_Existing_Kudos_Basket()
         {
             var kudosBasketDto = new KudosBasketEditDTO
             {
@@ -324,8 +325,9 @@ namespace Shrooms.Tests.DomainService
                 Title = "edited",
                 UserId = "testUserId"
             };
-            _kudosBasketService.EditKudosBasketAsync(kudosBasketDto);
-            var editedBasket = _kudosBasketDbSet.First(basket => basket.Id == 10);
+
+            await _kudosBasketService.EditKudosBasketAsync(kudosBasketDto);
+            var editedBasket = await _kudosBasketDbSet.FirstAsync(basket => basket.Id == 10);
 
             Assert.AreEqual(kudosBasketDto.Title, editedBasket.Title);
             Assert.AreEqual(kudosBasketDto.Description, editedBasket.Description);

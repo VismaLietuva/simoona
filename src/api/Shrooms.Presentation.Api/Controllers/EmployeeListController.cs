@@ -48,7 +48,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return await GetFilteredPaged("WorkingHours,JobPosition", page, WebApiConstants.DefaultPageSize, sortBy, sortOrder);
         }
 
-        protected async Task<PagedViewModel<EmployeeListViewModel>> GetFilteredPaged(string includeProperties = null,
+        private async Task<PagedViewModel<EmployeeListViewModel>> GetFilteredPaged(string includeProperties = null,
             int page = 1,
             int pageSize = WebApiConstants.DefaultPageSize,
             string sort = null,
@@ -56,11 +56,13 @@ namespace Shrooms.Presentation.Api.Controllers
             Expression<Func<ApplicationUser, bool>> filter = null)
         {
             var isAdmin = await _permissionService.UserHasPermissionAsync(GetUserAndOrganization(), AdministrationPermissions.ApplicationUser);
+            var newUserRoleId = await _roleService.GetRoleIdByNameAsync(Roles.NewUser);
 
             var sortQuery = string.IsNullOrEmpty(sort) ? null : $"{sort} {dir}";
 
-            var models = await _applicationUserRepository.Get(includeProperties: includeProperties, filter: filter, orderBy: sortQuery)
-                .Where(_roleService.ExcludeUsersWithRole(Roles.NewUser))
+            var models = await _applicationUserRepository
+                .Get(includeProperties: includeProperties, filter: filter, orderBy: sortQuery)
+                .Where(_roleService.ExcludeUsersWithRole(newUserRoleId))
                 .ToPagedListAsync(page, pageSize);
 
             var employeeListViewModels = _mapper.Map<IEnumerable<ApplicationUser>, IEnumerable<EmployeeListViewModel>>(models);

@@ -42,7 +42,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Get_Correctly_Mapped_Roles_For_AutoComplete()
+        public async Task Should_Get_Correctly_Mapped_Roles_For_AutoComplete()
         {
             MockRolesForAutocomplete();
 
@@ -51,9 +51,9 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 2
             };
 
-            var roles = _roleService.GetRolesForAutocomplete("Test1", userOrg).ToList();
+            var roles = (await _roleService.GetRolesForAutocompleteAsync("Test1", userOrg)).ToList();
 
-            Assert.AreEqual(2, roles.Count());
+            Assert.AreEqual(2, roles.Count);
             Assert.AreEqual("roleId1", roles.ToArray()[0].Id);
             Assert.AreEqual("roleId3", roles.ToArray()[1].Id);
         }

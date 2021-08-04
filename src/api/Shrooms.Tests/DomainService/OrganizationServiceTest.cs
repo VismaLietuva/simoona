@@ -48,7 +48,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Get_Organization_By_Name()
+        public async Task Should_Get_Organization_By_Name()
         {
             var organizations = new List<Organization>
             {
@@ -57,7 +57,7 @@ namespace Shrooms.Tests.DomainService
             };
             _organizationsDbSet.SetDbSetDataForAsync(organizations.AsQueryable());
 
-            var response = _organizationService.GetOrganizationByName("Organization2");
+            var response = await _organizationService.GetOrganizationByNameAsync("Organization2");
 
             Assert.AreEqual(response.Id, 2);
             Assert.AreEqual(response.ShortName, "Organization2");

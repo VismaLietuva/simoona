@@ -31,75 +31,75 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Organization)]
-        public override Task<HttpResponseMessage> Get(int id, string includeProperties = "")
+        public override async Task<HttpResponseMessage> Get(int id, string includeProperties = "")
         {
-            return base.Get(id, includeProperties);
+            return await base.Get(id, includeProperties);
         }
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Organization)]
-        public override Task<IEnumerable<OrganizationViewModel>> GetAllAsync(int maxResults = 0, string orderBy = null, string includeProperties = null)
+        public override async Task<IEnumerable<OrganizationViewModel>> GetAll(int maxResults = 0, string orderBy = null, string includeProperties = null)
         {
-            return base.GetAllAsync(maxResults, orderBy, includeProperties);
+            return await base.GetAll(maxResults, orderBy, includeProperties);
         }
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Organization)]
-        public override Task<PagedViewModel<OrganizationViewModel>> GetPaged(string includeProperties = null,
+        public override async Task<PagedViewModel<OrganizationViewModel>> GetPaged(string includeProperties = null,
             int page = 1,
             int pageSize = WebApiConstants.DefaultPageSize,
             string sort = null,
             string dir = "",
             string s = "")
         {
-            return base.GetPaged(includeProperties, page, pageSize, sort, dir, s);
+            return await base.GetPaged(includeProperties, page, pageSize, sort, dir, s);
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Organization)]
-        protected override Task<PagedViewModel<OrganizationViewModel>> GetFilteredPagedAsync(string includeProperties = null,
+        protected override async Task<PagedViewModel<OrganizationViewModel>> GetFilteredPaged(string includeProperties = null,
             int page = 1,
             int pageSize = WebApiConstants.DefaultPageSize,
             string sort = null,
             string dir = "",
             Expression<Func<Organization, bool>> filter = null)
         {
-            return base.GetFilteredPagedAsync(includeProperties, page, pageSize, sort, dir, filter);
+            return await base.GetFilteredPaged(includeProperties, page, pageSize, sort, dir, filter);
         }
 
         [HttpPost]
         [ValidationFilter]
         [PermissionAuthorize(Permission = AdministrationPermissions.Organization)]
-        public override Task<HttpResponseMessage> Post([FromBody] OrganizationPostViewModel crudViewModel)
+        public override async Task<HttpResponseMessage> Post([FromBody] OrganizationPostViewModel crudViewModel)
         {
-            return base.Post(crudViewModel);
+            return await base.Post(crudViewModel);
         }
 
         [HttpPut]
         [ValidationFilter]
         [PermissionAuthorize(Permission = AdministrationPermissions.Organization)]
-        public override Task<HttpResponseMessage> Put([FromBody] OrganizationPostViewModel crudViewModel)
+        public override async Task<HttpResponseMessage> Put([FromBody] OrganizationPostViewModel crudViewModel)
         {
-            return base.Put(crudViewModel);
+            return await base.Put(crudViewModel);
         }
 
         [HttpDelete]
         [PermissionAuthorize(Permission = AdministrationPermissions.Organization)]
-        public override Task<HttpResponseMessage> Delete(int id)
+        public override async Task<HttpResponseMessage> Delete(int id)
         {
-            return base.Delete(id);
+            return await base.Delete(id);
         }
 
         [HttpGet]
         [PermissionAuthorize(AdministrationPermissions.Organization)]
-        public IHttpActionResult GetManagingDirector()
+        public async Task<IHttpActionResult> GetManagingDirector()
         {
-            var currentManagingDirector = _organizationService.GetManagingDirectorAsync(GetUserAndOrganization().OrganizationId);
+            var currentManagingDirector = await _organizationService.GetManagingDirectorAsync(GetUserAndOrganization().OrganizationId);
             return Ok(currentManagingDirector);
         }
 
         [HttpPost]
         [PermissionAuthorize(AdministrationPermissions.Organization)]
-        public IHttpActionResult SetManagingDirector(string userId)
+        public async Task<IHttpActionResult> SetManagingDirector(string userId)
         {
             if (string.IsNullOrEmpty(userId))
             {
@@ -108,7 +108,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             try
             {
-                _organizationService.SetManagingDirectorAsync(userId, GetUserAndOrganization());
+                await _organizationService.SetManagingDirectorAsync(userId, GetUserAndOrganization());
             }
             catch (ValidationException e)
             {

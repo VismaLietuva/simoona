@@ -7,19 +7,19 @@ namespace Shrooms.Domain.Services.Projects
 {
     public interface IProjectsService
     {
-        Task<IEnumerable<ProjectsListItemDto>> GetProjects(UserAndOrganizationDTO userOrg);
+        Task<IEnumerable<ProjectsListItemDto>> GetProjectsAsync(UserAndOrganizationDTO userOrg);
 
-        Task<IEnumerable<ProjectsAutoCompleteDto>> GetProjectsForAutocomplete(string name, int organizationId);
+        Task<IEnumerable<ProjectsAutoCompleteDto>> GetProjectsForAutocompleteAsync(string name, int organizationId);
 
-        Task NewProject(NewProjectDto dto);
+        Task NewProjectAsync(NewProjectDto dto);
 
-        Task<ProjectDetailsDto> GetProjectDetails(int projectId, UserAndOrganizationDTO userAndOrganizationDTO);
+        Task<ProjectDetailsDto> GetProjectDetailsAsync(int projectId, UserAndOrganizationDTO userAndOrganizationDTO);
 
         Task EditProjectAsync(EditProjectDto dto);
 
         Task DeleteAsync(int id, UserAndOrganizationDTO userOrg);
 
-        Task<EditProjectDisplayDto> GetProjectByIdAsync(int projectId, UserAndOrganizationDTO userOrg);
+        Task<EditProjectDisplayDto> GetProjectByIdAsyncAsync(int projectId, UserAndOrganizationDTO userOrg);
 
         Task ExpelMemberAsync(UserAndOrganizationDTO userAndOrganizationDTO, int projectId, string userId);
 

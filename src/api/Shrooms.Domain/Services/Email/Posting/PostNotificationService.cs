@@ -87,7 +87,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             IEnumerable<string> destinationEmails,
             ApplicationUser postCreator,
             Organization organization,
-            DataLayer.EntityModels.Models.Multiwall.Wall wall)
+            MultiwallWall wall)
         {
             var postLink = await GetPostLinkAsync(post.WallType, post.WallId, organization.ShortName, post.Id);
             var authorPictureUrl = _appSettings.PictureUrl(organization.ShortName, postCreator.PictureId);
@@ -111,7 +111,7 @@ namespace Shrooms.Domain.Services.Email.Posting
 
         private async Task SendMentionEmailsAsync(NewlyCreatedPostDTO post, IEnumerable<ApplicationUser> mentionedUsers, ApplicationUser postCreator, Organization organization)
         {
-            var messageBody = _markdownConverter.ConvertToHtml(_postService.GetPostBody(post.Id));
+            var messageBody = _markdownConverter.ConvertToHtml(await _postService.GetPostBodyAsync(post.Id));
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
             var postUrl = _appSettings.WallPostUrl(organization.ShortName, post.Id);
             const string subject = "You have been mentioned in the post";

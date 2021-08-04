@@ -2,7 +2,6 @@
 using System.Data.Entity;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -24,7 +23,7 @@ namespace Shrooms.Domain.Services.Picture
         public async Task<string> UploadFromImageAsync(Image image, string mimeType, string fileName, int orgId)
         {
             var pictureName = GetNewPictureName(fileName);
-            var tenantPicturesContainer = GetPictureContainer(orgId);
+            var tenantPicturesContainer = await GetPictureContainerAsync(orgId);
 
             await _storage.UploadPictureAsync(image, pictureName, mimeType, tenantPicturesContainer);
 
@@ -34,7 +33,7 @@ namespace Shrooms.Domain.Services.Picture
         public async Task<string> UploadFromStreamAsync(Stream stream, string mimeType, string fileName, int orgId)
         {
             var pictureName = GetNewPictureName(fileName);
-            var tenantPicturesContainer = GetPictureContainer(orgId);
+            var tenantPicturesContainer = await GetPictureContainerAsync(orgId);
 
             await _storage.UploadPictureAsync(stream, pictureName, mimeType, tenantPicturesContainer);
 
@@ -43,7 +42,7 @@ namespace Shrooms.Domain.Services.Picture
 
         public async Task RemoveImageAsync(string blobKey, int orgId)
         {
-            var tenantPicturesContainer = GetPictureContainer(orgId);
+            var tenantPicturesContainer = await GetPictureContainerAsync(orgId);
 
             await _storage.RemovePictureAsync(blobKey, tenantPicturesContainer);
         }
@@ -56,9 +55,9 @@ namespace Shrooms.Domain.Services.Picture
             return $"{id}{extension}";
         }
 
-        private string GetPictureContainer(int id)
+        private async Task<string> GetPictureContainerAsync(int id)
         {
-            var organization = _organizationsDbSet.First(x => x.Id == id);
+            var organization = await _organizationsDbSet.FirstAsync(x => x.Id == id);
 
             return organization.ShortName.ToLowerInvariant();
         }

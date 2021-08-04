@@ -218,12 +218,10 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [AllowAnonymous]
         [Route("InternalLogins")]
-        public IHttpActionResult GetInternalLogins()
+        public async Task<IHttpActionResult> GetInternalLogins()
         {
             var logins = new List<ExternalLoginViewModel>();
-            var organizationProviders = _organizationService
-                .GetOrganizationByName(RequestedOrganization)
-                .AuthenticationProviders;
+            var organizationProviders = (await _organizationService.GetOrganizationByNameAsync(RequestedOrganization)).AuthenticationProviders;
 
             if (!ContainsProvider(organizationProviders, AuthenticationConstants.InternalLoginProvider))
             {
@@ -241,7 +239,7 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [Route("Logout")]
-        public IHttpActionResult Logout()
+        public async Task<IHttpActionResult> Logout()
         {
             if (!User.Identity.IsAuthenticated)
             {
@@ -249,7 +247,7 @@ namespace Shrooms.Presentation.Api.Controllers
             }
 
             var userAndOrganization = GetUserAndOrganization();
-            _refreshTokenService.RemoveTokenBySubject(userAndOrganization);
+            await _refreshTokenService.RemoveTokenBySubjectAsync(userAndOrganization);
             _permissionService.RemoveCache(userAndOrganization.UserId);
             Authentication.SignOut();
 
@@ -258,14 +256,12 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [AllowAnonymous]
         [Route("ExternalLogins")]
-        public IHttpActionResult GetExternalLogins(string returnUrl, bool isLinkable = false)
+        public async Task<IHttpActionResult> GetExternalLogins(string returnUrl, bool isLinkable = false)
         {
             var descriptions = Authentication.GetExternalAuthenticationTypes();
             var logins = new List<ExternalLoginViewModel>();
 
-            var organizationProviders = _organizationService
-                .GetOrganizationByName(RequestedOrganization)
-                .AuthenticationProviders;
+            var organizationProviders = (await _organizationService.GetOrganizationByNameAsync(RequestedOrganization)).AuthenticationProviders;
 
             foreach (var description in descriptions)
             {
@@ -287,7 +283,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 state = RandomOAuthStateGenerator.Generate(StateStrengthInBits);
                 login = new ExternalLoginViewModel
                 {
-                    Name = description.Caption + "Registration",
+                    Name = $"{description.Caption}Registration",
                     Url = CreateUrl(description, returnUrl, state, isLinkable, true),
                     State = state
                 };
@@ -428,7 +424,8 @@ namespace Shrooms.Presentation.Api.Controllers
                 OrganizationId = user.OrganizationId,
                 UserId = user.Id
             };
-            _refreshTokenService.RemoveTokenBySubject(userOrganization);
+
+            await _refreshTokenService.RemoveTokenBySubjectAsync(userOrganization);
 
             var properties = ApplicationOAuthProvider.CreateProperties(user.Id, clientId);
 
@@ -445,7 +442,10 @@ namespace Shrooms.Presentation.Api.Controllers
             var userId = User.Identity.GetUserId();
             var organizationId = User.Identity.GetOrganizationId();
             var claimsIdentity = User.Identity as ClaimsIdentity;
+
             var user = await _userManager.FindByIdAsync(userId);
+            var permissions = await _permissionService.GetUserPermissionsAsync(userId, organizationId);
+
             var userInfo = new LoggedInUserInfoViewModel
             {
                 HasRegistered = true,
@@ -455,11 +455,12 @@ namespace Shrooms.Presentation.Api.Controllers
                 OrganizationName = claimsIdentity.FindFirstValue(WebApiConstants.ClaimOrganizationName),
                 OrganizationId = claimsIdentity.FindFirstValue(WebApiConstants.ClaimOrganizationId),
                 FullName = claimsIdentity.FindFirstValue(ClaimTypes.GivenName),
-                Permissions = await _permissionService.GetUserPermissionsAsync(userId, organizationId),
+                Permissions = permissions,
                 Impersonated = claimsIdentity?.Claims.Any(c => c.Type == WebApiConstants.ClaimUserImpersonation && c.Value == true.ToString()) ?? false,
                 CultureCode = user.CultureCode,
                 TimeZone = user.TimeZone
             };
+
             return userInfo;
         }
 

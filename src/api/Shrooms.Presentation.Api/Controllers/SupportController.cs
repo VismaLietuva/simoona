@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
@@ -27,7 +28,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [PermissionAuthorize(Permission = BasicPermissions.Support)]
         [HttpPost]
-        public HttpResponseMessage SubmitTicket(SupportPostViewModel support)
+        public async Task<HttpResponseMessage> SubmitTicket(SupportPostViewModel support)
         {
             var maxSupportTypeIndex = Enum.GetValues(typeof(SupportType)).Cast<int>().Max();
 
@@ -38,7 +39,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             var supportDto = _mapper.Map<SupportPostViewModel, SupportDto>(support);
 
-            _supportService.SubmitTicket(GetUserAndOrganization(), supportDto);
+            await _supportService.SubmitTicketAsync(GetUserAndOrganization(), supportDto);
 
             return Request.CreateResponse(HttpStatusCode.Created);
         }

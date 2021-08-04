@@ -1,4 +1,5 @@
-﻿using System.Web.Http;
+﻿using System.Threading.Tasks;
+using System.Web.Http;
 using Shrooms.Domain.Services.WebHookCallbacks;
 using Shrooms.Presentation.Api.Filters;
 
@@ -17,16 +18,16 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpPost]
         [Route("SendDailyMails")]
-        public void SendDailyMails()
+        public async Task SendDailyMails()
         {
-            _webHookService.DailyMails.SendDigestedWallPosts();
+            await _webHookService.DailyMails.SendDigestedWallPostsAsync();
         }
 
         [HttpPost]
         [Route("SendBirthdaysNotifications")]
-        public void SendBirthdaysNotifications()
+        public async Task SendBirthdaysNotifications()
         {
-            _webHookService.BirthdaysNotification.SendNotificationsAsync(GetOrganizationName());
+            await _webHookService.BirthdaysNotification.SendNotificationsAsync(GetOrganizationName());
         }
     }
 }
