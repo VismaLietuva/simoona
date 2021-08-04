@@ -25,24 +25,24 @@ namespace Shrooms.Premium.Domain.Services.OrganizationalStructure
             _roleService = roleService;
         }
 
-        public async Task<OrganizationalStructureDTO> GetOrganizationalStructureAsync(UserAndOrganizationDTO userAndOrg)
+        public async Task<OrganizationalStructureDto> GetOrganizationalStructureAsync(UserAndOrganizationDto userAndOrg)
         {
             var newUserRole = await _roleService.GetRoleIdByNameAsync(Roles.NewUser);
 
             var userList = await _applicationUsersDbSet
                 .Where(u => u.OrganizationId == userAndOrg.OrganizationId)
                 .Where(_roleService.ExcludeUsersWithRole(newUserRole))
-                .Select(MapToOrganizationalStructureUserDTO())
+                .Select(MapToOrganizationalStructureUserDto())
                 .ToListAsync();
 
             var head = userList.First(u => u.IsManagingDirector);
-            var result = MapUsersToOrganizationalStructureDTO(head, userList);
+            var result = MapUsersToOrganizationalStructureDto(head, userList);
             return result;
         }
 
-        private static Expression<Func<ApplicationUser, OrganizationalStructureUserDTO>> MapToOrganizationalStructureUserDTO()
+        private static Expression<Func<ApplicationUser, OrganizationalStructureUserDto>> MapToOrganizationalStructureUserDto()
         {
-            return user => new OrganizationalStructureUserDTO
+            return user => new OrganizationalStructureUserDto
             {
                 FirstName = user.FirstName,
                 IsManagingDirector = user.IsManagingDirector,
@@ -53,20 +53,20 @@ namespace Shrooms.Premium.Domain.Services.OrganizationalStructure
             };
         }
 
-        private IEnumerable<OrganizationalStructureDTO> GetChildren(IList<OrganizationalStructureUserDTO> userList, OrganizationalStructureUserDTO head)
+        private IEnumerable<OrganizationalStructureDto> GetChildren(IList<OrganizationalStructureUserDto> userList, OrganizationalStructureUserDto head)
         {
-            var childrenList = new List<OrganizationalStructureDTO>();
+            var childrenList = new List<OrganizationalStructureDto>();
 
             userList
                 .Where(user => user.ManagerId == head.Id)
-                .ForEach(user => childrenList.Add(MapUsersToOrganizationalStructureDTO(user, userList)));
+                .ForEach(user => childrenList.Add(MapUsersToOrganizationalStructureDto(user, userList)));
 
             return childrenList;
         }
 
-        private OrganizationalStructureDTO MapUsersToOrganizationalStructureDTO(OrganizationalStructureUserDTO user, IList<OrganizationalStructureUserDTO> userList)
+        private OrganizationalStructureDto MapUsersToOrganizationalStructureDto(OrganizationalStructureUserDto user, IList<OrganizationalStructureUserDto> userList)
         {
-            return new OrganizationalStructureDTO
+            return new OrganizationalStructureDto
             {
                 FullName = user.FirstName + " " + user.LastName,
                 PictureId = user.PictureId,

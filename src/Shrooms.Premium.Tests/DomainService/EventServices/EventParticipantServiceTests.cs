@@ -86,7 +86,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             var eventGuid = MockEventWithoutOptions();
             MockUsers();
             _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-03-28"));
-            var eventJoinDto = new EventJoinDTO
+            var eventJoinDto = new EventJoinDto
             {
                 ChosenOptions = new List<int>(),
                 ParticipantIds = new List<string> { "testUserId" },
@@ -105,7 +105,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             var eventGuid = MockEventWithOptions();
             MockUsers();
             _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-03-28"));
-            var eventJoinDto = new EventJoinDTO
+            var eventJoinDto = new EventJoinDto
             {
                 ChosenOptions = new List<int> { 1 },
                 ParticipantIds = new List<string> { "testUserId" },
@@ -176,7 +176,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             var eventGuid = MockEventWithOptions();
             MockUsers();
             _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-04-02"));
-            var eventJoinDto = new EventJoinDTO
+            var eventJoinDto = new EventJoinDto
             {
                 ParticipantIds = new List<string> { "testUserId", "1" },
                 ChosenOptions = new List<int> { 1 },
@@ -194,7 +194,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         {
             var eventGuid = MockEventWithParticipants();
             MockUsers();
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2
             };
@@ -209,7 +209,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         {
             MockLeaveEvent();
             var eventId = new Guid();
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "user"
@@ -222,7 +222,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         public async Task Should_Leave_Event_That_Has_Not_Started()
         {
             var eventId = MockLeaveEvent();
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "user"
@@ -236,7 +236,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         public async Task Should_Throw_When_Participant_Wasnt_removed()
         {
             var eventId = MockRemoveParticipant();
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "user"
@@ -250,7 +250,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         public async Task Should_Throw_When_User_Has_No_Permission_To_Remove_Participant()
         {
             var eventId = MockRemoveParticipant();
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "user"
@@ -264,7 +264,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         public async Task Should_Throw_If_Trying_To_Expell_Participant_From_Finished_Event()
         {
             var eventId = MockRemoveParticipantWithExpiredEvent();
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "user"
@@ -293,7 +293,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         public async Task Should_Reset_Event_Participants()
         {
             var eventId = MockResetAttendees();
-            var user = new UserAndOrganizationDTO
+            var user = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "user1"
@@ -335,7 +335,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         {
             var eventId = MockEventAndUsersForSearch();
             const string searchString = "user";
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2
             };
@@ -351,7 +351,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         {
             var eventId = MockEventAndUsersForSearch2();
             const string searchString = "clyde";
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2
             };
@@ -366,7 +366,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         {
             var eventId = MockEventAndUsersForSearch2();
             const string searchString = "User1f";
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2
             };
@@ -380,7 +380,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         {
             var eventId = MockEventAndUsersForSearch2();
             const string searchString = "User1l";
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2
             };
@@ -395,7 +395,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         {
             var eventId = MockEventAndUsersForSearch2();
             const string searchString = "User1fname user1l";
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2
             };
@@ -408,7 +408,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         [Test]
         public void Should_Throw_When_Event_Not_Found()
         {
-            var dto = new EventChangeOptionsDTO { EventId = Guid.Empty, OrganizationId = 1 };
+            var dto = new EventChangeOptionsDto { EventId = Guid.Empty, OrganizationId = 1 };
             _eventsDbSet.SetDbSetDataForAsync(new List<Event> { new Event { Id = Guid.NewGuid(), OrganizationId = 1 } }.AsQueryable());
             _eventValidationServiceMock
                 .When(x => x.CheckIfEventExists((object)null))
@@ -421,7 +421,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         public void Should_Throw_When_Registration_Deadline_Expired()
         {
             var guid = MockEventWithOptions();
-            var dto = new EventChangeOptionsDTO { EventId = guid, OrganizationId = 2, ChosenOptions = new List<int> { 1 } };
+            var dto = new EventChangeOptionsDto { EventId = guid, OrganizationId = 2, ChosenOptions = new List<int> { 1 } };
             _eventValidationServiceMock
                 .When(x => x.CheckIfRegistrationDeadlineIsExpired(DateTime.Parse("2016-04-05")))
                 .Do(_ => throw new EventException(PremiumErrorCodes.EventRegistrationDeadlineIsExpired));
@@ -434,7 +434,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         {
             var guid = MockEventWithOptions();
             var chosenOptionIds = new List<int> { -9999 };
-            var dto = new EventChangeOptionsDTO { EventId = guid, OrganizationId = 2, ChosenOptions = chosenOptionIds };
+            var dto = new EventChangeOptionsDto { EventId = guid, OrganizationId = 2, ChosenOptions = chosenOptionIds };
 
             _eventValidationServiceMock
                 .When(x => x.CheckIfProvidedOptionsAreValid(chosenOptionIds, Arg.Is<ICollection<EventOption>>(a => a.Count == 0)))
@@ -448,7 +448,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         {
             var guid = MockEventWithOptions();
             var chosenOptionIds = new List<int>();
-            var dto = new EventChangeOptionsDTO { EventId = guid, OrganizationId = 2, ChosenOptions = chosenOptionIds };
+            var dto = new EventChangeOptionsDto { EventId = guid, OrganizationId = 2, ChosenOptions = chosenOptionIds };
 
             _eventValidationServiceMock
                 .When(x => x.CheckIfJoiningNotEnoughChoicesProvided(1, 0))
@@ -462,7 +462,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         {
             var guid = MockEventWithOptions();
             var chosenOptionIds = new List<int> { 1, 2, 3 };
-            var dto = new EventChangeOptionsDTO { EventId = guid, OrganizationId = 2, ChosenOptions = chosenOptionIds };
+            var dto = new EventChangeOptionsDto { EventId = guid, OrganizationId = 2, ChosenOptions = chosenOptionIds };
 
             _eventValidationServiceMock
                 .When(x => x.CheckIfJoiningTooManyChoicesProvided(1, 3))
@@ -476,7 +476,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         {
             var guid = MockEventWithOptions();
             var chosenOptionIds = new List<int> { 1, 4 };
-            var dto = new EventChangeOptionsDTO { EventId = guid, OrganizationId = 2, ChosenOptions = chosenOptionIds };
+            var dto = new EventChangeOptionsDto { EventId = guid, OrganizationId = 2, ChosenOptions = chosenOptionIds };
 
             _eventValidationServiceMock
                 .When(x => x.CheckIfSingleChoiceSelectedWithRule(Arg.Is<ICollection<EventOption>>(a =>
@@ -491,7 +491,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         {
             var guid = MockEventWithOptions();
             var chosenOptionIds = new List<int> { 1 };
-            var dto = new EventChangeOptionsDTO { EventId = guid, OrganizationId = 2, ChosenOptions = chosenOptionIds, UserId = "1foo2bar" };
+            var dto = new EventChangeOptionsDto { EventId = guid, OrganizationId = 2, ChosenOptions = chosenOptionIds, UserId = "1foo2bar" };
 
             _eventValidationServiceMock
                 .When(x => x.CheckIfUserParticipatesInEvent("1foo2bar",

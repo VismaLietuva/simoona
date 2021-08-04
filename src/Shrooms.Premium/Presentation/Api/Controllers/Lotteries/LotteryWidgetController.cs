@@ -27,9 +27,9 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
         [PermissionAwareCacheOutputFilter(BasicPermissions.Lottery, ServerTimeSpan = WebApiConstants.OneHour)]
         public async Task<IEnumerable<LotteryWidgetViewModel>> Get()
         {
-            var lotteriesDTO = await _lotteryService.GetRunningLotteriesAsync(GetUserAndOrganization());
+            var lotteriesDto = await _lotteryService.GetRunningLotteriesAsync(GetUserAndOrganization());
 
-            return _mapper.Map<IEnumerable<LotteryDetailsDTO>, IEnumerable<LotteryWidgetViewModel>>(lotteriesDTO);
+            return _mapper.Map<IEnumerable<LotteryDetailsDto>, IEnumerable<LotteryWidgetViewModel>>(lotteriesDto);
         }
     }
 }

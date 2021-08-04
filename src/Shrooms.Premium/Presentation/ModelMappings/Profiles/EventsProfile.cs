@@ -18,26 +18,26 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<OfficeDTO, EventOfficeViewModel>();
-            CreateMap<EventTypeDTO, EventTypeViewModel>();
-            CreateMap<EventListItemDTO, EventListItemViewModel>()
+            CreateMap<OfficeDto, EventOfficeViewModel>();
+            CreateMap<EventTypeDto, EventTypeViewModel>();
+            CreateMap<EventListItemDto, EventListItemViewModel>()
                 .ForMember(dest => dest.OfficeIds, opt => opt.MapFrom(u => JsonConvert.DeserializeObject<string[]>(u.Offices.Value)));
-            CreateMap<EventOptionDTO, EventOptionViewModel>();
-            CreateMap<EventDetailsDTO, EventDetailsViewModel>()
+            CreateMap<EventOptionDto, EventOptionViewModel>();
+            CreateMap<EventDetailsDto, EventDetailsViewModel>()
                 .Ignore(x => x.Comments)
                 .Ignore(x => x.IsForAllOffices)
                 .ForMember(dest => dest.OfficesName, opt => opt.MapFrom(u => u.Offices.OfficeNames));
 
-            CreateMap<NewEventOptionDTO, NewEventOptionViewModel>();
-            CreateMap<NewEventOptionViewModel, NewEventOptionDTO>();
+            CreateMap<NewEventOptionDto, NewEventOptionViewModel>();
+            CreateMap<NewEventOptionViewModel, NewEventOptionDto>();
 
-            CreateMap<EventDetailsOptionDTO, EventDetailsOptionViewModel>();
-            CreateMap<EventDetailsParticipantDTO, EventDetailsParticipantViewModel>();
-            CreateMap<EventEditDTO, EventEditViewModel>()
+            CreateMap<EventDetailsOptionDto, EventDetailsOptionViewModel>();
+            CreateMap<EventDetailsParticipantDto, EventDetailsParticipantViewModel>();
+            CreateMap<EventEditDto, EventEditViewModel>()
                 .ForMember(dest => dest.OfficeIds, opt => opt.MapFrom(u => JsonConvert.DeserializeObject<string[]>(u.Offices.Value)));
-            CreateMap<EventOptionsDTO, EventOptionsViewModel>();
+            CreateMap<EventOptionsDto, EventOptionsViewModel>();
 
-            CreateMap<EventChangeOptionViewModel, EventChangeOptionsDTO>()
+            CreateMap<EventChangeOptionViewModel, EventChangeOptionsDto>()
                 .Ignore(x => x.OrganizationId)
                 .Ignore(x => x.UserId);
         }
@@ -49,25 +49,25 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
                 .Ignore(d => d.Id)
                 .Ignore(d => d.Offices)
                 .IgnoreUserOrgDto();
-            CreateMap<UpdateEventViewModel, EditEventDTO>()
+            CreateMap<UpdateEventViewModel, EditEventDto>()
                 .IgnoreUserOrgDto()
                 .Ignore(d => d.Offices);
-            CreateMap<MyEventsOptionsViewModel, MyEventsOptionsDTO>()
+            CreateMap<MyEventsOptionsViewModel, MyEventsOptionsDto>()
                 .IgnoreUserOrgDto();
-            CreateMap<EventJoinViewModel, EventJoinDTO>()
+            CreateMap<EventJoinViewModel, EventJoinDto>()
                 .Ignore(d => d.ParticipantIds)
                 .IgnoreUserOrgDto();
-            CreateMap<EventJoinMultipleViewModel, EventJoinDTO>()
+            CreateMap<EventJoinMultipleViewModel, EventJoinDto>()
                 .Ignore(d => d.AttendStatus)
                 .Ignore(d => d.AttendComment)
                 .IgnoreUserOrgDto();
-            CreateMap<EventOptionViewModel, EventOptionDTO>();
+            CreateMap<EventOptionViewModel, EventOptionDto>();
 
-            CreateMap<UpdateAttendStatusViewModel, UpdateAttendStatusDTO>()
+            CreateMap<UpdateAttendStatusViewModel, UpdateAttendStatusDto>()
                 .IgnoreUserOrgDto();
 
-            CreateMap<CreateEventTypeViewModel, CreateEventTypeDTO>().IgnoreUserOrgDto();
-            CreateMap<UpdateEventTypeViewModel, UpdateEventTypeDTO>().IgnoreUserOrgDto();
+            CreateMap<CreateEventTypeViewModel, CreateEventTypeDto>().IgnoreUserOrgDto();
+            CreateMap<UpdateEventTypeViewModel, UpdateEventTypeDto>().IgnoreUserOrgDto();
         }
 
         private void CreateEventsModelMappings()

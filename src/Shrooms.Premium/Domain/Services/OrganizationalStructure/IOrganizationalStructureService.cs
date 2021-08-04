@@ -6,6 +6,6 @@ namespace Shrooms.Premium.Domain.Services.OrganizationalStructure
 {
     public interface IOrganizationalStructureService
     {
-        Task<OrganizationalStructureDTO> GetOrganizationalStructureAsync(UserAndOrganizationDTO userAndOrg);
+        Task<OrganizationalStructureDto> GetOrganizationalStructureAsync(UserAndOrganizationDto userAndOrg);
     }
 }

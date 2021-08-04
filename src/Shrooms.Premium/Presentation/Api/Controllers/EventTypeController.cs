@@ -34,7 +34,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         {
             var organizationId = GetUserAndOrganization().OrganizationId;
             var types = await _eventUtilitiesService.GetEventTypesAsync(organizationId);
-            var result = _mapper.Map<IEnumerable<EventTypeDTO>, IEnumerable<EventTypeViewModel>>(types);
+            var result = _mapper.Map<IEnumerable<EventTypeDto>, IEnumerable<EventTypeViewModel>>(types);
             return Ok(result);
         }
 
@@ -53,7 +53,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             try
             {
                 var eventTypeDto = await _eventUtilitiesService.GetEventTypeAsync(organizationId, id);
-                var eventTypeViewModel = _mapper.Map<EventTypeDTO, EventTypeViewModel>(eventTypeDto);
+                var eventTypeViewModel = _mapper.Map<EventTypeDto, EventTypeViewModel>(eventTypeDto);
 
                 return Ok(eventTypeViewModel);
             }
@@ -73,7 +73,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            var eventTypeDto = _mapper.Map<CreateEventTypeViewModel, CreateEventTypeDTO>(eventTypeViewModel);
+            var eventTypeDto = _mapper.Map<CreateEventTypeViewModel, CreateEventTypeDto>(eventTypeViewModel);
 
             SetOrganizationAndUser(eventTypeDto);
 
@@ -99,7 +99,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            var eventTypeDto = _mapper.Map<UpdateEventTypeViewModel, UpdateEventTypeDTO>(eventTypeViewModel);
+            var eventTypeDto = _mapper.Map<UpdateEventTypeViewModel, UpdateEventTypeDto>(eventTypeViewModel);
 
             SetOrganizationAndUser(eventTypeDto);
 

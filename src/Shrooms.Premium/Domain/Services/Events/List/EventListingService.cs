@@ -36,7 +36,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             _eventsDbSet = uow.GetDbSet<Event>();
         }
 
-        public async Task<EventOptionsDTO> GetEventOptionsAsync(Guid eventId, UserAndOrganizationDTO userOrg)
+        public async Task<EventOptionsDto> GetEventOptionsAsync(Guid eventId, UserAndOrganizationDto userOrg)
         {
             var eventOptionsDto = await _eventsDbSet
                 .Include(e => e.EventOptions)
@@ -48,7 +48,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             return eventOptionsDto;
         }
 
-        public async Task<IEnumerable<EventListItemDTO>> GetEventsFilteredAsync(EventsListingFilterArgs args, UserAndOrganizationDTO userOrganization)
+        public async Task<IEnumerable<EventListItemDto>> GetEventsFilteredAsync(EventsListingFilterArgs args, UserAndOrganizationDto userOrganization)
         {
             var officeSearchString = OfficeIdToString(args.OfficeId);
 
@@ -79,7 +79,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             return await events.ToListAsync();
         }
 
-        public async Task<IEnumerable<EventListItemDTO>> GetMyEventsAsync(MyEventsOptionsDTO options, int page, int? officeId = null)
+        public async Task<IEnumerable<EventListItemDto>> GetMyEventsAsync(MyEventsOptionsDto options, int page, int? officeId = null)
         {
             var officeSearchString = OfficeIdToString(officeId);
             var myEventFilter = _eventFilters[options.Filter](options.UserId);
@@ -110,7 +110,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             return x => x.EventParticipants.Any(p => p.ApplicationUserId == userId);
         }
 
-        private static IEnumerable<EventListItemDTO> OrderEvents(List<EventListItemDTO> events)
+        private static IEnumerable<EventListItemDto> OrderEvents(List<EventListItemDto> events)
         {
             var orderedFutureEvents = events
                 .Where(e => e.StartDate > DateTime.UtcNow)
@@ -123,13 +123,13 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             return orderedFutureEvents.Concat(orderedPastEvents);
         }
 
-        private static Expression<Func<Event, EventListItemDTO>> MapEventToListItemDto(string userId)
+        private static Expression<Func<Event, EventListItemDto>> MapEventToListItemDto(string userId)
         {
-            return e => new EventListItemDTO
+            return e => new EventListItemDto
             {
                 Id = e.Id,
                 ImageName = e.ImageName,
-                Offices = new EventOfficesDTO { Value = e.Offices },
+                Offices = new EventOfficesDto { Value = e.Offices },
                 MaxParticipants = e.MaxParticipants,
                 IsPinned = e.IsPinned,
                 Name = e.Name,
@@ -146,12 +146,12 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             };
         }
 
-        private static Expression<Func<Event, EventOptionsDTO>> MapOptionsToDto()
+        private static Expression<Func<Event, EventOptionsDto>> MapOptionsToDto()
         {
-            return e => new EventOptionsDTO
+            return e => new EventOptionsDto
             {
                 MaxOptions = e.MaxChoices,
-                Options = e.EventOptions.Select(o => new EventOptionDTO
+                Options = e.EventOptions.Select(o => new EventOptionDto
                     {
                         Id = o.Id,
                         Option = o.Option,

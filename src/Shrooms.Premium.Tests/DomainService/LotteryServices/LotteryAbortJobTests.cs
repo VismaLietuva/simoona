@@ -51,7 +51,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
         [Test]
         public async Task RefundLottery_OrganizationIdDoesNotMatch_Exits()
         {
-            var userOrg = new UserAndOrganizationDTO { OrganizationId = 100 };
+            var userOrg = new UserAndOrganizationDto { OrganizationId = 100 };
             _lotteryService.GetLotteryAsync(Arg.Any<int>()).ReturnsForAnyArgs(GetLottery());
 
             await _sut.RefundLotteryAsync(default, userOrg);
@@ -136,7 +136,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             };
         }
 
-        private readonly UserAndOrganizationDTO _userAndOrganization = new UserAndOrganizationDTO
+        private readonly UserAndOrganizationDto _userAndOrganization = new UserAndOrganizationDto
         {
             OrganizationId = 1,
             UserId = "1"

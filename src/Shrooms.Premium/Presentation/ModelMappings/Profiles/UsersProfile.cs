@@ -13,7 +13,7 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<EventUserSearchResultDTO, EventUserSearchResultViewModel>();
+            CreateMap<EventUserSearchResultDto, EventUserSearchResultViewModel>();
         }
     }
 }

@@ -43,7 +43,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [PermissionAuthorize(Permission = AdministrationPermissions.Committees)]
         public override async Task<HttpResponseMessage> Put(CommitteePostViewModel postViewModel)
         {
-            var dto = _mapper.Map<CommitteePostViewModel, CommitteePostDTO>(postViewModel);
+            var dto = _mapper.Map<CommitteePostViewModel, CommitteePostDto>(postViewModel);
             try
             {
                 if (dto.Name != null && dto.Description != null)
@@ -84,7 +84,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [PermissionAuthorize(Permission = AdministrationPermissions.Committees)]
         public override async Task<HttpResponseMessage> Post(CommitteePostViewModel postViewModel)
         {
-            var dto = _mapper.Map<CommitteePostViewModel, CommitteePostDTO>(postViewModel);
+            var dto = _mapper.Map<CommitteePostViewModel, CommitteePostDto>(postViewModel);
             try
             {
                 if (dto.Name != null && dto.Description != null)
@@ -122,11 +122,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                 return Request.CreateResponse(HttpStatusCode.NotFound, new[] { Resources.Models.Committee.Committee.SuggestionCommiteNotFound });
             }
 
-            var modelDTO = _mapper.Map<CommitteeSuggestionPostDTO>(postViewModel);
+            var dto = _mapper.Map<CommitteeSuggestionPostDto>(postViewModel);
 
             try
             {
-                await _committeesService.PostSuggestionAsync(modelDTO, GetUserAndOrganization().UserId);
+                await _committeesService.PostSuggestionAsync(dto, GetUserAndOrganization().UserId);
             }
             catch (ServiceException ex)
             {

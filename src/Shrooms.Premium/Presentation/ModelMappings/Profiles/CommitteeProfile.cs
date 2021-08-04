@@ -17,8 +17,8 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<CommitteePostViewModel, CommitteePostDTO>();
-            CreateMap<CommitteeSuggestionPostViewModel, CommitteeSuggestionPostDTO>();
+            CreateMap<CommitteePostViewModel, CommitteePostDto>();
+            CreateMap<CommitteeSuggestionPostViewModel, CommitteeSuggestionPostDto>();
         }
 
         private void CreateViewModelMappings()
@@ -31,12 +31,12 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 
         private void CreateDtoMappings()
         {
-            CreateMap<CommitteePostDTO, Committee>()
+            CreateMap<CommitteePostDto, Committee>()
               .ForMember(dest => dest.Members, src => src.Ignore());
-            CreateMap<CommitteeSuggestionPostDTO, CommitteeSuggestion>();
+            CreateMap<CommitteeSuggestionPostDto, CommitteeSuggestion>();
 
-            CreateMap<Committee, CommitteeViewDTO>();
-            CreateMap<ApplicationUser, CommitteeMembersDTO>();
+            CreateMap<Committee, CommitteeViewDto>();
+            CreateMap<ApplicationUser, CommitteeMembersDto>();
             CreateMap<CommitteeSuggestion, CommitteeSuggestionDto>();
         }
     }

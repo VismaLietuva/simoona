@@ -13,8 +13,8 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 
         private void CreateLoyaltyKudosMappings()
         {
-            CreateMap<AwardedKudosEmployeeDTO, KudosLog>();
-            CreateMap<KudosLog, AwardedKudosEmployeeDTO>();
+            CreateMap<AwardedKudosEmployeeDto, KudosLog>();
+            CreateMap<KudosLog, AwardedKudosEmployeeDto>();
         }
     }
 }

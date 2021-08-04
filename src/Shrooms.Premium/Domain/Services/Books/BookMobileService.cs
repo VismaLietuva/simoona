@@ -42,7 +42,7 @@ namespace Shrooms.Premium.Domain.Services.Books
             _bookInfoService = bookInfoService;
         }
 
-        public async Task<IEnumerable<MobileUserDTO>> GetUsersForAutoCompleteAsync(string search, int organizationId)
+        public async Task<IEnumerable<MobileUserDto>> GetUsersForAutoCompleteAsync(string search, int organizationId)
         {
             var searchLowerCase = search;
 
@@ -54,30 +54,30 @@ namespace Shrooms.Premium.Domain.Services.Books
                     || u.Email.StartsWith(searchLowerCase)
                     || string.Concat(u.FirstName, " ", u.LastName).StartsWith(searchLowerCase))
                 .OrderBy(u => u.FirstName)
-                .Select(MapUsersToMobileUserDTO())
+                .Select(MapUsersToMobileUserDto())
                 .ToListAsync();
 
             return users;
         }
 
-        public async Task<IEnumerable<OfficeBookDTO>> GetOfficesAsync(int organizationId)
+        public async Task<IEnumerable<OfficeBookDto>> GetOfficesAsync(int organizationId)
         {
             var offices = await _officeDbSet
                 .Where(o => o.OrganizationId == organizationId)
-                .Select(o => new OfficeBookDTO { Id = o.Id, Name = o.Name })
+                .Select(o => new OfficeBookDto { Id = o.Id, Name = o.Name })
                 .ToListAsync();
 
             return offices;
         }
 
-        public async Task<RetrievedBookInfoDTO> GetBookAsync(BookMobileGetDTO bookDTO)
+        public async Task<RetrievedBookInfoDto> GetBookAsync(BookMobileGetDto bookDto)
         {
             var book = await _bookOfficeDbSet
                 .Include(b => b.Book)
-                .Where(b => b.Book.Code == bookDTO.Code
-                    && b.OfficeId == bookDTO.OfficeId
-                    && b.OrganizationId == bookDTO.OrganizationId)
-                .Select(MapBookToBookMobileGetDTO())
+                .Where(b => b.Book.Code == bookDto.Code
+                    && b.OfficeId == bookDto.OfficeId
+                    && b.OrganizationId == bookDto.OrganizationId)
+                .Select(MapBookToBookMobileGetDto())
                 .FirstOrDefaultAsync();
 
             _serviceValidator.ThrowIfBookDoesNotExist(book != null);
@@ -85,11 +85,11 @@ namespace Shrooms.Premium.Domain.Services.Books
             return book;
         }
 
-        public async Task<RetrievedBookInfoDTO> GetBookForPostAsync(string code, int organizationId)
+        public async Task<RetrievedBookInfoDto> GetBookForPostAsync(string code, int organizationId)
         {
             var book = _bookDbSet
                 .Where(b => b.Code == code && b.OrganizationId == organizationId)
-                .Select(MapBookToBookMobileGetForPostDTO())
+                .Select(MapBookToBookMobileGetForPostDto())
                 .FirstOrDefault();
 
             if (book == null)
@@ -100,7 +100,7 @@ namespace Shrooms.Premium.Domain.Services.Books
             return book;
         }
 
-        public async Task PostBookAsync(BookMobilePostDTO bookDTO)
+        public async Task PostBookAsync(BookMobilePostDto bookDto)
         {
             await _newBookLock.WaitAsync();
 
@@ -108,16 +108,16 @@ namespace Shrooms.Premium.Domain.Services.Books
             {
                 var book = await _bookDbSet
                     .Include(b => b.BookOffices)
-                    .FirstOrDefaultAsync(b => b.Code == bookDTO.Code && b.OrganizationId == bookDTO.OrganizationId);
+                    .FirstOrDefaultAsync(b => b.Code == bookDto.Code && b.OrganizationId == bookDto.OrganizationId);
 
                 if (book == null)
                 {
-                    AddNewBook(bookDTO);
+                    AddNewBook(bookDto);
                 }
                 else
                 {
-                    await ValidatePostBookAsync(bookDTO, book);
-                    AddBookToOtherOffice(bookDTO, book);
+                    await ValidatePostBookAsync(bookDto, book);
+                    AddBookToOtherOffice(bookDto, book);
                 }
 
                 await _uow.SaveChangesAsync(false);
@@ -128,17 +128,17 @@ namespace Shrooms.Premium.Domain.Services.Books
             }
         }
 
-        public async Task<IEnumerable<BookMobileLogDTO>> ReturnBookAsync(BookMobileReturnDTO bookDTO)
+        public async Task<IEnumerable<BookMobileLogDto>> ReturnBookAsync(BookMobileReturnDto bookDto)
         {
             var booksToReturn = await _bookLogDbSet
                  .Include(b => b.BookOffice)
                  .Include(b => b.BookOffice.Book)
                  .Include(b => b.ApplicationUser)
-                 .Where(b => b.BookOffice.Book.Code == bookDTO.Code
-                     && b.OrganizationId == bookDTO.OrganizationId
+                 .Where(b => b.BookOffice.Book.Code == bookDto.Code
+                     && b.OrganizationId == bookDto.OrganizationId
                      && b.Returned == null
-                     && b.BookOffice.OfficeId == bookDTO.OfficeId)
-                 .Select(MapBookToBookMobileLogDTO())
+                     && b.BookOffice.OfficeId == bookDto.OfficeId)
+                 .Select(MapBookToBookMobileLogDto())
                  .ToListAsync();
 
             _serviceValidator.ThrowIfThereIsNoBookToReturn(booksToReturn.Any());
@@ -165,9 +165,9 @@ namespace Shrooms.Premium.Domain.Services.Books
             await _uow.SaveChangesAsync(false);
         }
 
-        private static Expression<Func<ApplicationUser, MobileUserDTO>> MapUsersToMobileUserDTO()
+        private static Expression<Func<ApplicationUser, MobileUserDto>> MapUsersToMobileUserDto()
         {
-            return user => new MobileUserDTO
+            return user => new MobileUserDto
             {
                 FirstName = user.FirstName,
                 Id = user.Id,
@@ -175,9 +175,9 @@ namespace Shrooms.Premium.Domain.Services.Books
             };
         }
 
-        private static Expression<Func<Book, RetrievedBookInfoDTO>> MapBookToBookMobileGetForPostDTO()
+        private static Expression<Func<Book, RetrievedBookInfoDto>> MapBookToBookMobileGetForPostDto()
         {
-            return book => new RetrievedBookInfoDTO
+            return book => new RetrievedBookInfoDto
             {
                 Author = book.Author,
                 Url = book.Url,
@@ -185,16 +185,16 @@ namespace Shrooms.Premium.Domain.Services.Books
             };
         }
 
-        private async Task<RetrievedBookInfoDTO> GetInfoFromExternalApiAsync(string code)
+        private async Task<RetrievedBookInfoDto> GetInfoFromExternalApiAsync(string code)
         {
             var bookInfo = await _bookInfoService.FindBookByIsbnAsync(code);
             _serviceValidator.ThrowIfBookDoesNotExistGoogleApi(bookInfo != null);
-            return MapGoogleApiBookToDTO(bookInfo);
+            return MapGoogleApiBookToDto(bookInfo);
         }
 
-        private static RetrievedBookInfoDTO MapGoogleApiBookToDTO(ExternalBookInfo bookInfo)
+        private static RetrievedBookInfoDto MapGoogleApiBookToDto(ExternalBookInfo bookInfo)
         {
-            return new RetrievedBookInfoDTO
+            return new RetrievedBookInfoDto
             {
                 Author = bookInfo.Author,
                 Title = bookInfo.Title,
@@ -202,9 +202,9 @@ namespace Shrooms.Premium.Domain.Services.Books
             };
         }
 
-        private static Expression<Func<BookOffice, RetrievedBookInfoDTO>> MapBookToBookMobileGetDTO()
+        private static Expression<Func<BookOffice, RetrievedBookInfoDto>> MapBookToBookMobileGetDto()
         {
-            return book => new RetrievedBookInfoDTO
+            return book => new RetrievedBookInfoDto
             {
                 Author = book.Book.Author,
                 Url = book.Book.Url,
@@ -213,30 +213,30 @@ namespace Shrooms.Premium.Domain.Services.Books
             };
         }
 
-        private async Task ValidatePostBookAsync(BookMobilePostDTO bookDTO, Book book)
+        private async Task ValidatePostBookAsync(BookMobilePostDto bookDto, Book book)
         {
             var bookExistsInChosenOffice = book
                                 .BookOffices
-                                .Any((l => l.OfficeId == bookDTO.OfficeId));
+                                .Any((l => l.OfficeId == bookDto.OfficeId));
 
             _serviceValidator.ThrowIfBookExist(bookExistsInChosenOffice);
 
-            var officeExists = await _officeDbSet.AnyAsync(o => o.Id == bookDTO.OfficeId);
+            var officeExists = await _officeDbSet.AnyAsync(o => o.Id == bookDto.OfficeId);
 
             _serviceValidator.ThrowIfOfficeDoesNotExist(officeExists);
         }
 
-        private void AddNewBook(BookMobilePostDTO bookDTO)
+        private void AddNewBook(BookMobilePostDto bookDto)
         {
             var newBook = new Book
             {
-                Title = bookDTO.Title,
-                Author = bookDTO.Author,
-                Code = bookDTO.Code,
-                Url = bookDTO.Url,
-                OrganizationId = bookDTO.OrganizationId,
-                CreatedBy = bookDTO.ApplicationUserId,
-                ModifiedBy = bookDTO.ApplicationUserId,
+                Title = bookDto.Title,
+                Author = bookDto.Author,
+                Code = bookDto.Code,
+                Url = bookDto.Url,
+                OrganizationId = bookDto.OrganizationId,
+                CreatedBy = bookDto.ApplicationUserId,
+                ModifiedBy = bookDto.ApplicationUserId,
                 Created = DateTime.UtcNow,
                 Modified = DateTime.UtcNow
             };
@@ -246,38 +246,38 @@ namespace Shrooms.Premium.Domain.Services.Books
             var newBookOffice = new BookOffice
             {
                 Book = newBook,
-                OfficeId = bookDTO.OfficeId,
-                OrganizationId = bookDTO.OrganizationId,
+                OfficeId = bookDto.OfficeId,
+                OrganizationId = bookDto.OrganizationId,
                 Created = DateTime.UtcNow,
                 Modified = DateTime.UtcNow,
-                CreatedBy = bookDTO.ApplicationUserId,
-                ModifiedBy = bookDTO.ApplicationUserId,
+                CreatedBy = bookDto.ApplicationUserId,
+                ModifiedBy = bookDto.ApplicationUserId,
                 Quantity = OneBook
             };
 
             _bookOfficeDbSet.Add(newBookOffice);
         }
 
-        private void AddBookToOtherOffice(BookMobilePostDTO bookDTO, Book book)
+        private void AddBookToOtherOffice(BookMobilePostDto bookDto, Book book)
         {
             var newBookOffice = new BookOffice
             {
                 BookId = book.Id,
-                OfficeId = bookDTO.OfficeId,
-                OrganizationId = bookDTO.OrganizationId,
+                OfficeId = bookDto.OfficeId,
+                OrganizationId = bookDto.OrganizationId,
                 Created = DateTime.UtcNow,
                 Modified = DateTime.UtcNow,
-                CreatedBy = bookDTO.ApplicationUserId,
-                ModifiedBy = bookDTO.ApplicationUserId,
+                CreatedBy = bookDto.ApplicationUserId,
+                ModifiedBy = bookDto.ApplicationUserId,
                 Quantity = OneBook
             };
 
             _bookOfficeDbSet.Add(newBookOffice);
         }
 
-        private static Expression<Func<BookLog, BookMobileLogDTO>> MapBookToBookMobileLogDTO()
+        private static Expression<Func<BookLog, BookMobileLogDto>> MapBookToBookMobileLogDto()
         {
-            return log => new BookMobileLogDTO
+            return log => new BookMobileLogDto
             {
                 LogId = log.Id,
                 UserFullName = log.ApplicationUser.FirstName + " " + log.ApplicationUser.LastName

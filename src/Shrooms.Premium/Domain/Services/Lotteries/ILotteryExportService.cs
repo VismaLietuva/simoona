@@ -5,6 +5,6 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 {
     public interface ILotteryExportService
     {
-        Task<byte[]> ExportParticipantsAsync(int lotteryId, UserAndOrganizationDTO userAndOrg);
+        Task<byte[]> ExportParticipantsAsync(int lotteryId, UserAndOrganizationDto userAndOrg);
     }
 }

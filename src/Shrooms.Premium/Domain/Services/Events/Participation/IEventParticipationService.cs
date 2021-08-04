@@ -8,28 +8,28 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 {
     public interface IEventParticipationService
     {
-        Task AddColleagueAsync(EventJoinDTO joinDto);
+        Task AddColleagueAsync(EventJoinDto joinDto);
 
-        Task JoinAsync(EventJoinDTO joinDto, bool addedByColleague = false);
+        Task JoinAsync(EventJoinDto joinDto, bool addedByColleague = false);
 
-        Task UpdateAttendStatusAsync(UpdateAttendStatusDTO updateAttendStatusDTO);
+        Task UpdateAttendStatusAsync(UpdateAttendStatusDto updateAttendStatusDto);
 
         Task DeleteByEventAsync(Guid eventId, string userId);
 
-        Task LeaveAsync(Guid eventId, UserAndOrganizationDTO userOrg, string leaveComment);
+        Task LeaveAsync(Guid eventId, UserAndOrganizationDto userOrg, string leaveComment);
 
-        Task ResetAttendeesAsync(Guid eventId, UserAndOrganizationDTO userOrg);
+        Task ResetAttendeesAsync(Guid eventId, UserAndOrganizationDto userOrg);
 
         Task<IEnumerable<string>> GetParticipantsEmailsIncludingHostAsync(Guid eventId);
 
-        Task ExpelAsync(Guid eventId, UserAndOrganizationDTO userOrg, string userId);
+        Task ExpelAsync(Guid eventId, UserAndOrganizationDto userOrg, string userId);
 
-        Task<IEnumerable<EventParticipantDTO>> GetEventParticipantsAsync(Guid eventId, UserAndOrganizationDTO userAndOrg);
+        Task<IEnumerable<EventParticipantDto>> GetEventParticipantsAsync(Guid eventId, UserAndOrganizationDto userAndOrg);
 
-        Task<IEnumerable<EventUserSearchResultDTO>> SearchForEventJoinAutocompleteAsync(Guid eventId, string searchString, UserAndOrganizationDTO userOrg);
+        Task<IEnumerable<EventUserSearchResultDto>> SearchForEventJoinAutocompleteAsync(Guid eventId, string searchString, UserAndOrganizationDto userOrg);
 
-        Task<int> GetMaxParticipantsCountAsync(UserAndOrganizationDTO userAndOrganizationDTO);
+        Task<int> GetMaxParticipantsCountAsync(UserAndOrganizationDto userAndOrganizationDto);
 
-        Task UpdateSelectedOptionsAsync(EventChangeOptionsDTO changeOptionsDTO);
+        Task UpdateSelectedOptionsAsync(EventChangeOptionsDto changeOptionsDto);
     }
 }

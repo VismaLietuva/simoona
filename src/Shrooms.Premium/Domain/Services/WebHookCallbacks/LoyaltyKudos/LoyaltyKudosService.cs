@@ -46,7 +46,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.LoyaltyKudos
 
         public async Task AwardEmployeesWithKudosAsync(string organizationName)
         {
-            var awardedEmployees = new List<AwardedKudosEmployeeDTO>();
+            var awardedEmployees = new List<AwardedKudosEmployeeDto>();
 
             await _concurrencyLock.WaitAsync();
 
@@ -89,7 +89,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.LoyaltyKudos
 
                 var employeesReceivedLoyaltyKudos = await loyaltyKudosLog
                     .GroupBy(l => l.Employee)
-                    .Select(l => new EmployeeLoyaltyKudosDTO
+                    .Select(l => new EmployeeLoyaltyKudosDto
                     {
                         Employee = l.Key,
                         AwardedEmploymentYears = l
@@ -105,7 +105,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.LoyaltyKudos
                     try
                     {
                         var loyaltyKudosLogList = _loyaltyKudosCalculator.GetEmployeeLoyaltyKudosLog(employeeLoyaltyKudos, loyaltyType, organization.Id, kudosYearlyMultipliers);
-                        var awardedKudosEmployeeList = _mapper.Map<List<AwardedKudosEmployeeDTO>>(loyaltyKudosLogList);
+                        var awardedKudosEmployeeList = _mapper.Map<List<AwardedKudosEmployeeDto>>(loyaltyKudosLogList);
                         awardedEmployees.AddRange(awardedKudosEmployeeList);
 
                         loyaltyKudosLogList.ForEach(l => _kudosLogsDbSet.Add(l));

@@ -14,19 +14,19 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
 
         Task DeleteByEventAsync(Guid eventId, string userId);
 
-        Task<IEnumerable<EventTypeDTO>> GetEventTypesAsync(int organizationId);
+        Task<IEnumerable<EventTypeDto>> GetEventTypesAsync(int organizationId);
 
-        Task CreateEventTypeAsync(CreateEventTypeDTO eventType);
+        Task CreateEventTypeAsync(CreateEventTypeDto eventType);
 
-        Task UpdateEventTypeAsync(UpdateEventTypeDTO eventType);
+        Task UpdateEventTypeAsync(UpdateEventTypeDto eventType);
 
-        Task DeleteEventTypeAsync(int id, UserAndOrganizationDTO userAndOrg);
+        Task DeleteEventTypeAsync(int id, UserAndOrganizationDto userAndOrg);
 
-        Task<EventTypeDTO> GetEventTypeAsync(int organizationId, int eventTypeId);
+        Task<EventTypeDto> GetEventTypeAsync(int organizationId, int eventTypeId);
 
-        Task<IEnumerable<EventTypeDTO>> GetEventTypesToRemindAsync(int organizationId);
+        Task<IEnumerable<EventTypeDto>> GetEventTypesToRemindAsync(int organizationId);
 
-        Task<IEnumerable<EventOptionCountDTO>> GetEventChosenOptionsAsync(Guid eventId, UserAndOrganizationDTO userAndOrg);
+        Task<IEnumerable<EventOptionCountDto>> GetEventChosenOptionsAsync(Guid eventId, UserAndOrganizationDto userAndOrg);
 
         Task<bool> AnyEventsThisWeekByTypeAsync(IEnumerable<int> eventTypeIds);
 

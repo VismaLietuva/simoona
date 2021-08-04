@@ -97,27 +97,27 @@ namespace Shrooms.Premium.Tests.DomainService
         [Test]
         public void Should_Return_If_Validation_For_Not_Existing_Book_Fails()
         {
-            var bookMobileGetDTO = new BookMobileGetDTO
+            var bookMobileGetDto = new BookMobileGetDto
             {
                 Code = "0",
                 OfficeId = 1,
                 OrganizationId = 1
             };
 
-            Assert.ThrowsAsync<BookException>(async () => await _bookService.GetBookAsync(bookMobileGetDTO));
+            Assert.ThrowsAsync<BookException>(async () => await _bookService.GetBookAsync(bookMobileGetDto));
         }
 
         [Test]
         public async Task Should_Return_If_Get_Book_Result_Has_Invalid_Data()
         {
-            var bookMobileGetDTO = new BookMobileGetDTO
+            var bookMobileGetDto = new BookMobileGetDto
             {
                 Code = "1",
                 OfficeId = 1,
                 OrganizationId = 1
             };
 
-            var result = await _bookService.GetBookAsync(bookMobileGetDTO);
+            var result = await _bookService.GetBookAsync(bookMobileGetDto);
             Assert.AreEqual("Author1", result.Author);
         }
 
@@ -137,13 +137,13 @@ namespace Shrooms.Premium.Tests.DomainService
         [Test]
         public async Task Should_Return_If_Post_New_Book_Does_Not_Add_New_Book()
         {
-            var bookMobilePostDTO = new BookMobilePostDTO
+            var bookMobilePostDto = new BookMobilePostDto
             {
                 Code = "0",
                 OrganizationId = 1
             };
 
-            await _bookService.PostBookAsync(bookMobilePostDTO);
+            await _bookService.PostBookAsync(bookMobilePostDto);
             _booksDbSet.Received(1).Add(Arg.Any<Book>());
             _bookOfficesDbSet.Received(1).Add(Arg.Any<BookOffice>());
         }
@@ -151,41 +151,41 @@ namespace Shrooms.Premium.Tests.DomainService
         [Test]
         public async Task Should_Return_If_Post_New_Book_Does_Not_Add_Book_To_Another_Office()
         {
-            var bookMobilePostDTO = new BookMobilePostDTO
+            var bookMobilePostDto = new BookMobilePostDto
             {
                 Code = "1",
                 OrganizationId = 1,
                 OfficeId = 2
             };
 
-            await _bookService.PostBookAsync(bookMobilePostDTO);
+            await _bookService.PostBookAsync(bookMobilePostDto);
             _bookOfficesDbSet.Received(1).Add(Arg.Any<BookOffice>());
         }
 
         [Test]
         public void Should_Return_If_Post_New_Book_Create_Duplicate_In_Book_Office()
         {
-            var bookMobilePostDTO = new BookMobilePostDTO
+            var bookMobilePostDto = new BookMobilePostDto
             {
                 Code = "1",
                 OrganizationId = 1,
                 OfficeId = 1
             };
 
-            Assert.ThrowsAsync<BookException>(async () => await _bookService.PostBookAsync(bookMobilePostDTO));
+            Assert.ThrowsAsync<BookException>(async () => await _bookService.PostBookAsync(bookMobilePostDto));
         }
 
         [Test]
         public void Should_Return_If_Adds_Book_To_Not_Existing_Office()
         {
-            var bookMobilePostDTO = new BookMobilePostDTO
+            var bookMobilePostDto = new BookMobilePostDto
             {
                 Code = "1",
                 OrganizationId = 1,
                 OfficeId = 5
             };
 
-            Assert.ThrowsAsync<BookException>(async () => await _bookService.PostBookAsync(bookMobilePostDTO));
+            Assert.ThrowsAsync<BookException>(async () => await _bookService.PostBookAsync(bookMobilePostDto));
         }
 
         [Test]
@@ -203,14 +203,14 @@ namespace Shrooms.Premium.Tests.DomainService
         [Test]
         public async Task Should_Return_When_Gets_Incorrect_List_Of_Already_Borrowed_Books()
         {
-            var bookMobileReturnDTO = new BookMobileReturnDTO
+            var bookMobileReturnDto = new BookMobileReturnDto
             {
                 Code = "99",
                 OrganizationId = 1,
                 OfficeId = 1
             };
 
-            var result = (await _bookService.ReturnBookAsync(bookMobileReturnDTO)).ToList();
+            var result = (await _bookService.ReturnBookAsync(bookMobileReturnDto)).ToList();
             Assert.AreEqual(2, result.Count);
             Assert.AreEqual(3, result.First().LogId);
         }

@@ -9,8 +9,8 @@ namespace Shrooms.Premium.Domain.Services.Events.List
 {
     public interface IEventListingService
     {
-        Task<IEnumerable<EventListItemDTO>> GetMyEventsAsync(MyEventsOptionsDTO options, int page, int? officeId = null);
-        Task<EventOptionsDTO> GetEventOptionsAsync(Guid eventId, UserAndOrganizationDTO userOrg);
-        Task<IEnumerable<EventListItemDTO>> GetEventsFilteredAsync(EventsListingFilterArgs args, UserAndOrganizationDTO userOrganization);
+        Task<IEnumerable<EventListItemDto>> GetMyEventsAsync(MyEventsOptionsDto options, int page, int? officeId = null);
+        Task<EventOptionsDto> GetEventOptionsAsync(Guid eventId, UserAndOrganizationDto userOrg);
+        Task<IEnumerable<EventListItemDto>> GetEventsFilteredAsync(EventsListingFilterArgs args, UserAndOrganizationDto userOrganization);
     }
 }

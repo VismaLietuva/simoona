@@ -68,7 +68,7 @@ namespace Shrooms.Premium.Tests.DomainService
         public async Task Should_Delete_Event()
         {
             var eventId = MockEventDelete();
-            var userAndOrganization = new UserAndOrganizationDTO
+            var userAndOrganization = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "eventHostId"
@@ -82,7 +82,7 @@ namespace Shrooms.Premium.Tests.DomainService
         public async Task Should_Return_Event_For_Update()
         {
             var eventId = MockEventWithAllChildEntities();
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "userParticipant2"
@@ -104,7 +104,7 @@ namespace Shrooms.Premium.Tests.DomainService
         public async Task Should_Return_Event_Types_For_Update()
         {
             var eventId = MockEventWithAllChildEntities();
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "userParticipant2"
@@ -126,14 +126,14 @@ namespace Shrooms.Premium.Tests.DomainService
                 Name = "Name",
                 TypeId = 1,
                 ImageName = "qwer",
-                Offices = new EventOfficesDTO { Value = "[\"1\"]", OfficeNames = new List<string> { "office" } },
+                Offices = new EventOfficesDto { Value = "[\"1\"]", OfficeNames = new List<string> { "office" } },
                 Recurrence = EventRecurrenceOptions.EveryDay,
                 MaxOptions = 0,
                 MaxParticipants = 1,
                 OrganizationId = 1,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<NewEventOptionDTO>()
+                NewOptions = new List<NewEventOptionDto>()
             };
 
             await _eventService.CreateEventAsync(newEvent);
@@ -153,14 +153,14 @@ namespace Shrooms.Premium.Tests.DomainService
                 Name = "Name",
                 TypeId = 1,
                 ImageName = "qwer",
-                Offices = new EventOfficesDTO { Value = "[\"1\"]", OfficeNames = new List<string> { "office" } },
+                Offices = new EventOfficesDto { Value = "[\"1\"]", OfficeNames = new List<string> { "office" } },
                 Recurrence = EventRecurrenceOptions.EveryDay,
                 MaxOptions = 0,
                 MaxParticipants = 1,
                 OrganizationId = 1,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<NewEventOptionDTO>()
+                NewOptions = new List<NewEventOptionDto>()
             };
 
             await _eventService.CreateEventAsync(newEvent);
@@ -188,17 +188,17 @@ namespace Shrooms.Premium.Tests.DomainService
                 Recurrence = EventRecurrenceOptions.EveryDay,
                 MaxOptions = 1,
                 MaxParticipants = 1,
-                Offices = new EventOfficesDTO { Value = "[\"1\"]", OfficeNames = new List<string> { "office" } },
+                Offices = new EventOfficesDto { Value = "[\"1\"]", OfficeNames = new List<string> { "office" } },
                 OrganizationId = 1,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<NewEventOptionDTO>
+                NewOptions = new List<NewEventOptionDto>
                 {
-                    new NewEventOptionDTO
+                    new NewEventOptionDto
                     {
                         Option = "Type1"
                     },
-                    new NewEventOptionDTO
+                    new NewEventOptionDto
                     {
                         Option = "Type2"
                     }
@@ -228,13 +228,13 @@ namespace Shrooms.Premium.Tests.DomainService
                 OrganizationId = 1,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<NewEventOptionDTO>
+                NewOptions = new List<NewEventOptionDto>
                 {
-                    new NewEventOptionDTO
+                    new NewEventOptionDto
                     {
                         Option = "Type1"
                     },
-                    new NewEventOptionDTO
+                    new NewEventOptionDto
                     {
                         Option = "Type1"
                     }
@@ -262,13 +262,13 @@ namespace Shrooms.Premium.Tests.DomainService
                 OrganizationId = 1,
                 ResponsibleUserId = "2",
                 Location = "place",
-                NewOptions = new List<NewEventOptionDTO>
+                NewOptions = new List<NewEventOptionDto>
                 {
-                    new NewEventOptionDTO
+                    new NewEventOptionDto
                     {
                         Option = "Type1"
                     },
-                    new NewEventOptionDTO
+                    new NewEventOptionDto
                     {
                         Option = "Type2"
                     }
@@ -296,13 +296,13 @@ namespace Shrooms.Premium.Tests.DomainService
                 OrganizationId = 1,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<NewEventOptionDTO>
+                NewOptions = new List<NewEventOptionDto>
                 {
-                    new NewEventOptionDTO
+                    new NewEventOptionDto
                     {
                         Option = "Type1"
                     },
-                    new NewEventOptionDTO
+                    new NewEventOptionDto
                     {
                         Option = "Type2"
                     }
@@ -333,13 +333,13 @@ namespace Shrooms.Premium.Tests.DomainService
                 OrganizationId = 1,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<NewEventOptionDTO>
+                NewOptions = new List<NewEventOptionDto>
                 {
-                    new NewEventOptionDTO
+                    new NewEventOptionDto
                     {
                         Option = "Type1"
                     },
-                    new NewEventOptionDTO
+                    new NewEventOptionDto
                     {
                         Option = "Type2"
                     }
@@ -369,13 +369,13 @@ namespace Shrooms.Premium.Tests.DomainService
                 OrganizationId = 1,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<NewEventOptionDTO>
+                NewOptions = new List<NewEventOptionDto>
                 {
-                    new NewEventOptionDTO
+                    new NewEventOptionDto
                     {
                         Option = "Type1"
                     },
-                    new NewEventOptionDTO
+                    new NewEventOptionDto
                     {
                         Option = "Type2"
                     }
@@ -403,13 +403,13 @@ namespace Shrooms.Premium.Tests.DomainService
                 OrganizationId = 1,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<NewEventOptionDTO>
+                NewOptions = new List<NewEventOptionDto>
                 {
-                    new NewEventOptionDTO
+                    new NewEventOptionDto
                     {
                         Option = "Type1"
                     },
-                    new NewEventOptionDTO
+                    new NewEventOptionDto
                     {
                         Option = "Type2"
                     }
@@ -437,13 +437,13 @@ namespace Shrooms.Premium.Tests.DomainService
                 OrganizationId = 1,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<NewEventOptionDTO>
+                NewOptions = new List<NewEventOptionDto>
                 {
-                    new NewEventOptionDTO
+                    new NewEventOptionDto
                     {
                         Option = "Type1"
                     },
-                    new NewEventOptionDTO
+                    new NewEventOptionDto
                     {
                         Option = "Type2"
                     }
@@ -459,7 +459,7 @@ namespace Shrooms.Premium.Tests.DomainService
             MockUsers();
             MockEventTypes();
             MockEventsListTest();
-            var newEvent = new EditEventDTO
+            var newEvent = new EditEventDto
             {
                 Id = Guid.NewGuid(),
                 ResetParticipantList = false,
@@ -474,15 +474,15 @@ namespace Shrooms.Premium.Tests.DomainService
                 OrganizationId = 1,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<NewEventOptionDTO>(),
-                EditedOptions = new List<EventOptionDTO>
+                NewOptions = new List<NewEventOptionDto>(),
+                EditedOptions = new List<EventOptionDto>
                 {
-                    new EventOptionDTO
+                    new EventOptionDto
                     {
                         Id = 1,
                         Option = "edited1"
                     },
-                    new EventOptionDTO
+                    new EventOptionDto
                     {
                         Id = 2,
                         Option = "edited2"
@@ -500,7 +500,7 @@ namespace Shrooms.Premium.Tests.DomainService
             MockUsers();
             MockEventTypes();
             var eventsGuids = MockEventsListTest();
-            var newEvent = new EditEventDTO
+            var newEvent = new EditEventDto
             {
                 Id = eventsGuids[0],
                 UserId = "2",
@@ -516,15 +516,15 @@ namespace Shrooms.Premium.Tests.DomainService
                 OrganizationId = 2,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<NewEventOptionDTO>(),
-                EditedOptions = new List<EventOptionDTO>
+                NewOptions = new List<NewEventOptionDto>(),
+                EditedOptions = new List<EventOptionDto>
                 {
-                    new EventOptionDTO
+                    new EventOptionDto
                     {
                         Id = 1,
                         Option = "edited1"
                     },
-                    new EventOptionDTO
+                    new EventOptionDto
                     {
                         Id = 2,
                         Option = "edited2"
@@ -544,7 +544,7 @@ namespace Shrooms.Premium.Tests.DomainService
             var eventsGuids = MockEventsListTest();
             MockEventOptions();
 
-            var newEvent = new EditEventDTO
+            var newEvent = new EditEventDto
             {
                 Id = eventsGuids[0],
                 UserId = "1",
@@ -554,32 +554,32 @@ namespace Shrooms.Premium.Tests.DomainService
                 Name = "Name",
                 TypeId = 1,
                 ImageName = "qwer",
-                Offices = new EventOfficesDTO { OfficeNames = new List<string> { "office" } },
+                Offices = new EventOfficesDto { OfficeNames = new List<string> { "office" } },
                 Recurrence = EventRecurrenceOptions.EveryDay,
                 MaxOptions = 1,
                 MaxParticipants = 1,
                 OrganizationId = 2,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<NewEventOptionDTO>
+                NewOptions = new List<NewEventOptionDto>
                 {
-                    new NewEventOptionDTO
+                    new NewEventOptionDto
                     {
                         Option = "Type1"
                     },
-                    new NewEventOptionDTO
+                    new NewEventOptionDto
                     {
                         Option = "Type2"
                     }
                 },
-                EditedOptions = new List<EventOptionDTO>
+                EditedOptions = new List<EventOptionDto>
                 {
-                    new EventOptionDTO
+                    new EventOptionDto
                     {
                         Id = 1,
                         Option = "Edited1"
                     },
-                    new EventOptionDTO
+                    new EventOptionDto
                     {
                         Id = 2,
                         Option = "Edited2"
@@ -768,8 +768,8 @@ namespace Shrooms.Premium.Tests.DomainService
 
         private void MockPermissionService(IPermissionService permissionService)
         {
-            permissionService.UserHasPermissionAsync(Arg.Is<UserAndOrganizationDTO>(x => x.UserId == "1"), AdministrationPermissions.Event).Returns(true);
-            permissionService.UserHasPermissionAsync(Arg.Is<UserAndOrganizationDTO>(x => x.UserId == "2"), AdministrationPermissions.Event).Returns(false);
+            permissionService.UserHasPermissionAsync(Arg.Is<UserAndOrganizationDto>(x => x.UserId == "1"), AdministrationPermissions.Event).Returns(true);
+            permissionService.UserHasPermissionAsync(Arg.Is<UserAndOrganizationDto>(x => x.UserId == "2"), AdministrationPermissions.Event).Returns(false);
         }
 
         private Guid MockEventDelete()

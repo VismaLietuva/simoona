@@ -28,11 +28,11 @@ namespace Shrooms.Premium.Domain.Services.OfficeMap
             _roleService = roleService;
         }
 
-        public async Task<IEnumerable<OfficeDTO>> GetOfficesAsync()
+        public async Task<IEnumerable<OfficeDto>> GetOfficesAsync()
         {
             var offices = await _officeDbSet.ToListAsync();
 
-            return _mapper.Map<IEnumerable<Office>, IEnumerable<OfficeDTO>>(offices);
+            return _mapper.Map<IEnumerable<Office>, IEnumerable<OfficeDto>>(offices);
         }
 
         public async Task<int> GetOfficesCountAsync()
@@ -40,7 +40,7 @@ namespace Shrooms.Premium.Domain.Services.OfficeMap
             return await _officeDbSet.CountAsync();
         }
 
-        public async Task<IEnumerable<OfficeUserDTO>> GetOfficeUsersAsync(int floorId, string includeProperties)
+        public async Task<IEnumerable<OfficeUserDto>> GetOfficeUsersAsync(int floorId, string includeProperties)
         {
             var newUserRole = await _roleService.GetRoleIdByNameAsync(Roles.NewUser);
 
@@ -49,7 +49,7 @@ namespace Shrooms.Premium.Domain.Services.OfficeMap
                 .Where(_roleService.ExcludeUsersWithRole(newUserRole))
                 .ToListAsync();
 
-            return _mapper.Map<IEnumerable<ApplicationUser>, IEnumerable<OfficeUserDTO>>(applicationUsers);
+            return _mapper.Map<IEnumerable<ApplicationUser>, IEnumerable<OfficeUserDto>>(applicationUsers);
         }
 
         public async Task<IEnumerable<string>> GetEmailsByOfficeAsync(int officeId)

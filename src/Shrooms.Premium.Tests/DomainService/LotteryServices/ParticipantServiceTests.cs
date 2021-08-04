@@ -37,7 +37,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
 
             var result = await _participantService.GetParticipantsCountedAsync(lotteryId);
 
-            Assert.That(result, Is.All.Matches<LotteryParticipantDTO>(x => x.Tickets == tickets));
+            Assert.That(result, Is.All.Matches<LotteryParticipantDto>(x => x.Tickets == tickets));
         }
 
         [TestCase(1, 1, 2)]

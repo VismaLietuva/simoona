@@ -36,7 +36,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             _lotteryService = lotteryService;
         }
 
-        public async Task RefundLotteryAsync(int lotteryId, UserAndOrganizationDTO userOrg)
+        public async Task RefundLotteryAsync(int lotteryId, UserAndOrganizationDto userOrg)
         {
             var lottery = await _lotteryService.GetLotteryAsync(lotteryId);
             if (lottery == null || lottery.OrganizationId != userOrg.OrganizationId)
@@ -57,7 +57,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             }
         }
 
-        private async Task UpdateUserProfilesAsync(Lottery lottery, IEnumerable<AddKudosLogDTO> kudosLogs, UserAndOrganizationDTO userOrg)
+        private async Task UpdateUserProfilesAsync(Lottery lottery, IEnumerable<AddKudosLogDto> kudosLogs, UserAndOrganizationDto userOrg)
         {
             if (lottery.Status != (int)LotteryStatus.RefundLogsCreated)
             {
@@ -72,7 +72,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
-        private async Task AddKudosLogsAsync(Lottery lottery, IEnumerable<AddKudosLogDTO> kudosLogs, UserAndOrganizationDTO userOrg)
+        private async Task AddKudosLogsAsync(Lottery lottery, IEnumerable<AddKudosLogDto> kudosLogs, UserAndOrganizationDto userOrg)
         {
             if (lottery.Status != (int)LotteryStatus.RefundStarted)
             {
@@ -85,16 +85,16 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
-        private async Task<IList<AddKudosLogDTO>> CreateKudosLogsAsync(Lottery lottery, UserAndOrganizationDTO userOrg)
+        private async Task<IList<AddKudosLogDto>> CreateKudosLogsAsync(Lottery lottery, UserAndOrganizationDto userOrg)
         {
             var kudosTypeId = await _kudosService.GetKudosTypeIdAsync(KudosTypeEnum.Refund);
             var usersToRefund = await _participantService.GetParticipantsCountedAsync(lottery.Id);
-            var usersToSendKudos = new List<AddKudosLogDTO>();
+            var usersToSendKudos = new List<AddKudosLogDto>();
 
             foreach (var user in usersToRefund)
             {
                 var totalReturn = user.Tickets * lottery.EntryFee;
-                var kudosLog = new AddKudosLogDTO
+                var kudosLog = new AddKudosLogDto
                 {
                     ReceivingUserIds = new List<string> { user.UserId },
                     PointsTypeId = kudosTypeId,

@@ -36,7 +36,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         [Test]
         public async Task Should_Return_Excel_File_With_Participants()
         {
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2
             };
@@ -61,7 +61,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         [Test]
         public async Task Should_Return_Excel_File_With_Participants_And_Without_Options()
         {
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2
             };
@@ -82,7 +82,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         [Test]
         public async Task Should_Return_Excel_File_With_Options()
         {
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2
             };
@@ -113,27 +113,27 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             _excelBuilder?.Dispose();
         }
 
-        private Guid MockParticipantsWithOptionsForExport(UserAndOrganizationDTO userAndOrg)
+        private Guid MockParticipantsWithOptionsForExport(UserAndOrganizationDto userAndOrg)
         {
             var eventId = Guid.NewGuid();
 
-            var users = new List<EventParticipantDTO>
+            var users = new List<EventParticipantDto>
             {
-                new EventParticipantDTO
+                new EventParticipantDto
                 {
                     FirstName = "Name",
                     LastName = "Surname"
                 }
             };
 
-            var options = new List<EventOptionCountDTO>
+            var options = new List<EventOptionCountDto>
             {
-                new EventOptionCountDTO
+                new EventOptionCountDto
                 {
                    Option = "Option1",
                    Count = 2
                 },
-                new EventOptionCountDTO
+                new EventOptionCountDto
                 {
                    Option = "Option2",
                    Count = 1
@@ -145,13 +145,13 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             return eventId;
         }
 
-        private Guid MockParticipantsWithoutOptionsForExport(UserAndOrganizationDTO userAndOrg)
+        private Guid MockParticipantsWithoutOptionsForExport(UserAndOrganizationDto userAndOrg)
         {
             var eventId = Guid.NewGuid();
 
-            var users = new List<EventParticipantDTO>
+            var users = new List<EventParticipantDto>
             {
-                new EventParticipantDTO
+                new EventParticipantDto
                 {
                     FirstName = "Name",
                     LastName = "Surname"
@@ -159,7 +159,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             };
 
             // ReSharper disable once CollectionNeverUpdated.Local
-            var options = new List<EventOptionCountDTO>();
+            var options = new List<EventOptionCountDto>();
 
             _eventParticipationService.GetEventParticipantsAsync(eventId, userAndOrg).Returns(users);
             _eventUtilitiesService.GetEventChosenOptionsAsync(eventId, userAndOrg).Returns(options);

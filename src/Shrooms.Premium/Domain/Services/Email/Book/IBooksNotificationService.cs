@@ -5,6 +5,6 @@ namespace Shrooms.Premium.Domain.Services.Email.Book
 {
     public interface IBooksNotificationService
     {
-        Task SendEmailAsync(TakenBookDTO takenBook);
+        Task SendEmailAsync(TakenBookDto takenBook);
     }
 }

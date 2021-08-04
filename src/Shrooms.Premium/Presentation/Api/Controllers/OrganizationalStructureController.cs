@@ -26,8 +26,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [PermissionAuthorize(Permission = BasicPermissions.OrganizationalStructure)]
         public async Task<IHttpActionResult> GetOrganizationalStructure()
         {
-            var resultDTO = await _organizationalStructureService.GetOrganizationalStructureAsync(GetUserAndOrganization());
-            var resultViewModel = _mapper.Map<OrganizationalStructureDTO, OrganizationalStructureViewModel>(resultDTO);
+            var organizationDto = await _organizationalStructureService.GetOrganizationalStructureAsync(GetUserAndOrganization());
+            var resultViewModel = _mapper.Map<OrganizationalStructureDto, OrganizationalStructureViewModel>(organizationDto);
             return Ok(resultViewModel);
         }
     }

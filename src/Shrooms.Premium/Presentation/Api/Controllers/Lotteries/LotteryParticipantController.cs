@@ -30,7 +30,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
         public async Task<IHttpActionResult> GetParticipantsCounted(int id)
         {
             var participants = await _participantService.GetParticipantsCountedAsync(id);
-            var viewModel = _mapper.Map<IEnumerable<LotteryParticipantDTO>, IEnumerable<LotteryParticipantViewModel>>(participants);
+            var viewModel = _mapper.Map<IEnumerable<LotteryParticipantDto>, IEnumerable<LotteryParticipantViewModel>>(participants);
 
             return Ok(viewModel);
         }
@@ -41,7 +41,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
         public async Task<IHttpActionResult> GetPagedParticipants(int id, int page = 1, int pageSize = WebApiConstants.DefaultPageSize)
         {
             var pagedParticipants = await _participantService.GetPagedParticipantsAsync(id, page, pageSize);
-            var pagedModel = new PagedViewModel<LotteryParticipantDTO>
+            var pagedModel = new PagedViewModel<LotteryParticipantDto>
             {
                 PagedList = pagedParticipants,
                 PageCount = pagedParticipants.PageCount,

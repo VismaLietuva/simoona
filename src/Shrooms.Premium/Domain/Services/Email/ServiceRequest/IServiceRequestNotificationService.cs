@@ -6,8 +6,8 @@ namespace Shrooms.Premium.Domain.Services.Email.ServiceRequest
 {
     public interface IServiceRequestNotificationService
     {
-        Task NotifyAboutNewCommentAsync(ServiceRequestCreatedCommentDTO comment);
-        Task NotifyAboutNewServiceRequestAsync(CreatedServiceRequestDTO createdServiceReques);
-        Task NotifyAboutServiceRequestStatusUpdateAsync(UpdatedServiceRequestDTO updatedRequest, UserAndOrganizationDTO userAndOrganizationDTO);
+        Task NotifyAboutNewCommentAsync(ServiceRequestCreatedCommentDto comment);
+        Task NotifyAboutNewServiceRequestAsync(CreatedServiceRequestDto createdServiceRequest);
+        Task NotifyAboutServiceRequestStatusUpdateAsync(UpdatedServiceRequestDto updatedRequest, UserAndOrganizationDto userAndOrganizationDto);
     }
 }

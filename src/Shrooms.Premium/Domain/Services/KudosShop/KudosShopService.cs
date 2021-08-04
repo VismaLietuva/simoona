@@ -25,7 +25,7 @@ namespace Shrooms.Premium.Domain.Services.KudosShop
             _kudosShopItemsDbSet = uow.GetDbSet<KudosShopItem>();
         }
 
-        public async Task CreateItemAsync(KudosShopItemDTO dto)
+        public async Task CreateItemAsync(KudosShopItemDto dto)
         {
             var alreadyExists = await _kudosShopItemsDbSet
                 .AnyAsync(t => t.Name == dto.Name && t.OrganizationId == dto.OrganizationId);
@@ -55,11 +55,11 @@ namespace Shrooms.Premium.Domain.Services.KudosShop
             await _uow.SaveChangesAsync(dto.UserId);
         }
 
-        public async Task<KudosShopItemDTO> GetItemAsync(int id, UserAndOrganizationDTO userOrg)
+        public async Task<KudosShopItemDto> GetItemAsync(int id, UserAndOrganizationDto userOrg)
         {
             var type = await _kudosShopItemsDbSet
                 .Where(t => t.Id == id && t.OrganizationId == userOrg.OrganizationId)
-                .Select(t => new KudosShopItemDTO
+                .Select(t => new KudosShopItemDto
                 {
                     Id = t.Id,
                     Name = t.Name,
@@ -77,22 +77,22 @@ namespace Shrooms.Premium.Domain.Services.KudosShop
             return type;
         }
 
-        public async Task<bool> ItemsExistAsync(UserAndOrganizationDTO userOrg)
+        public async Task<bool> ItemsExistAsync(UserAndOrganizationDto userOrg)
         {
             return await _kudosShopItemsDbSet.AnyAsync(t => t.OrganizationId == userOrg.OrganizationId);
         }
 
-        public async Task<IEnumerable<KudosShopItemDTO>> GetAllItemsAsync(UserAndOrganizationDTO userOrg)
+        public async Task<IEnumerable<KudosShopItemDto>> GetAllItemsAsync(UserAndOrganizationDto userOrg)
         {
-            var kudosTypesDTO = await _kudosShopItemsDbSet
+            var kudosTypes = await _kudosShopItemsDbSet
                 .Where(t => t.OrganizationId == userOrg.OrganizationId)
-                .Select(MapKudosShopItemToKudosShopItemDTO())
+                .Select(MapKudosShopItemToKudosShopItemDto())
                 .ToListAsync();
 
-            return kudosTypesDTO;
+            return kudosTypes;
         }
 
-        public async Task UpdateItemAsync(KudosShopItemDTO dto)
+        public async Task UpdateItemAsync(KudosShopItemDto dto)
         {
             var alreadyExists = await _kudosShopItemsDbSet
                 .AnyAsync(t => t.Name == dto.Name && t.OrganizationId == dto.OrganizationId && t.Id != dto.Id);
@@ -118,7 +118,7 @@ namespace Shrooms.Premium.Domain.Services.KudosShop
             await _uow.SaveChangesAsync(dto.UserId);
         }
 
-        public async Task DeleteItemAsync(int id, UserAndOrganizationDTO userOrg)
+        public async Task DeleteItemAsync(int id, UserAndOrganizationDto userOrg)
         {
             var item = await _kudosShopItemsDbSet
                 .FirstOrDefaultAsync(e => e.Id == id && e.OrganizationId == userOrg.OrganizationId);
@@ -133,9 +133,9 @@ namespace Shrooms.Premium.Domain.Services.KudosShop
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
-        private Expression<Func<KudosShopItem, KudosShopItemDTO>> MapKudosShopItemToKudosShopItemDTO()
+        private static Expression<Func<KudosShopItem, KudosShopItemDto>> MapKudosShopItemToKudosShopItemDto()
         {
-            return kudosShopItem => new KudosShopItemDTO
+            return kudosShopItem => new KudosShopItemDto
             {
                 Id = kudosShopItem.Id,
                 Name = kudosShopItem.Name,

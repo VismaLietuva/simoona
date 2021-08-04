@@ -12,7 +12,7 @@ namespace Shrooms.Premium.Presentation.ModelMappings
             return expr.ForMember(selection, opt => opt.Ignore());
         }
 
-        public static IMappingExpression<TSrc, TDest> IgnoreUserOrgDto<TSrc, TDest>(this IMappingExpression<TSrc, TDest> expr) where TDest : UserAndOrganizationDTO
+        public static IMappingExpression<TSrc, TDest> IgnoreUserOrgDto<TSrc, TDest>(this IMappingExpression<TSrc, TDest> expr) where TDest : UserAndOrganizationDto
         {
             return expr
                 .ForMember(x => x.OrganizationId, opt => opt.Ignore())

@@ -180,7 +180,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         {
             var userOrganization = GetUserAndOrganization();
             var kudosShopItemsTask = Task.Run(async () => await _kudosShopService.GetAllItemsAsync(userOrganization));
-            var kudosShopItems = _mapper.Map<IEnumerable<KudosShopItemDTO>, IEnumerable<KudosShopItemViewModel>>(kudosShopItemsTask.Result);
+            var kudosShopItems = _mapper.Map<IEnumerable<KudosShopItemDto>, IEnumerable<KudosShopItemViewModel>>(kudosShopItemsTask.Result);
             return kudosShopItems.ToList();
         }
 
@@ -208,7 +208,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            var comment = _mapper.Map<ServiceRequestCommentPostViewModel, ServiceRequestCommentDTO>(postModel);
+            var comment = _mapper.Map<ServiceRequestCommentPostViewModel, ServiceRequestCommentDto>(postModel);
 
             try
             {
@@ -231,11 +231,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            var newServiceRequestDTO = _mapper.Map<ServiceRequestCreateViewModel, ServiceRequestDTO>(newServiceRequest);
+            var newServiceRequestDto = _mapper.Map<ServiceRequestCreateViewModel, ServiceRequestDto>(newServiceRequest);
 
             try
             {
-                await _serviceRequestService.CreateNewServiceRequestAsync(newServiceRequestDTO, GetUserAndOrganization());
+                await _serviceRequestService.CreateNewServiceRequestAsync(newServiceRequestDto, GetUserAndOrganization());
             }
             catch (ValidationException e)
             {
@@ -254,11 +254,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            var serviceRequestDTO = _mapper.Map<ServiceRequestUpdateViewModel, ServiceRequestDTO>(serviceRequest);
+            var serviceRequestDto = _mapper.Map<ServiceRequestUpdateViewModel, ServiceRequestDto>(serviceRequest);
 
             try
             {
-                await _serviceRequestService.UpdateServiceRequestAsync(serviceRequestDTO, GetUserAndOrganization());
+                await _serviceRequestService.UpdateServiceRequestAsync(serviceRequestDto, GetUserAndOrganization());
             }
             catch (ValidationException e)
             {
@@ -328,7 +328,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             try
             {
-                var newCategory = _mapper.Map<ServiceRequestCategoryCreateViewModel, ServiceRequestCategoryDTO>(category);
+                var newCategory = _mapper.Map<ServiceRequestCategoryCreateViewModel, ServiceRequestCategoryDto>(category);
                 await _serviceRequestService.CreateCategoryAsync(newCategory, GetUserAndOrganization().UserId);
                 return Ok();
             }
@@ -365,7 +365,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             try
             {
-                var modelDto = _mapper.Map<ServiceRequestCategoryViewModel, ServiceRequestCategoryDTO>(model);
+                var modelDto = _mapper.Map<ServiceRequestCategoryViewModel, ServiceRequestCategoryDto>(model);
                 await _serviceRequestService.EditCategoryAsync(modelDto, GetUserAndOrganization().UserId);
 
                 return Ok();

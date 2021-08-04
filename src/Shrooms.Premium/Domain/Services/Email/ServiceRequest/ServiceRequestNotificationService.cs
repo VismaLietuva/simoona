@@ -40,7 +40,7 @@ namespace Shrooms.Premium.Domain.Services.Email.ServiceRequest
             _appSettings = appSettings;
         }
 
-        public async Task NotifyAboutNewServiceRequestAsync(CreatedServiceRequestDTO createdServiceRequest)
+        public async Task NotifyAboutNewServiceRequestAsync(CreatedServiceRequestDto createdServiceRequest)
         {
             var newServiceRequest = await _serviceRequestDbSet.SingleAsync(s => s.Id == createdServiceRequest.ServiceRequestId);
             var organizationName = await GetOrganizationNameAsync(newServiceRequest.OrganizationId);
@@ -65,7 +65,7 @@ namespace Shrooms.Premium.Domain.Services.Email.ServiceRequest
             await _mailingService.SendEmailAsync(new EmailDto(emails, subject, body));
         }
 
-        public async Task NotifyAboutNewCommentAsync(ServiceRequestCreatedCommentDTO createdComment)
+        public async Task NotifyAboutNewCommentAsync(ServiceRequestCreatedCommentDto createdComment)
         {
             var serviceRequest = await _serviceRequestDbSet.SingleAsync(s => s.Id == createdComment.ServiceRequestId);
             var organizationName = await GetOrganizationNameAsync(serviceRequest.OrganizationId);
@@ -95,7 +95,7 @@ namespace Shrooms.Premium.Domain.Services.Email.ServiceRequest
             await _mailingService.SendEmailAsync(new EmailDto(emails, subject, body));
         }
 
-        public async Task NotifyAboutServiceRequestStatusUpdateAsync(UpdatedServiceRequestDTO updatedRequest, UserAndOrganizationDTO userAndOrganizationDTO)
+        public async Task NotifyAboutServiceRequestStatusUpdateAsync(UpdatedServiceRequestDto updatedRequest, UserAndOrganizationDto userAndOrganizationDto)
         {
             var serviceRequest = _serviceRequestDbSet.Single(s => s.Id == updatedRequest.ServiceRequestId);
             var newStatusName = _serviceRequestStatusDbSet.Where(x => x.Id == serviceRequest.StatusId).Select(x => x.Title).First();
@@ -104,7 +104,7 @@ namespace Shrooms.Premium.Domain.Services.Email.ServiceRequest
 
             var email = await _usersDbSet
                 .Where(x => x.Id == serviceRequest.EmployeeId)
-                .Where(x => x.Id != userAndOrganizationDTO.UserId)
+                .Where(x => x.Id != userAndOrganizationDto.UserId)
                 .Select(x => x.Email)
                 .FirstOrDefaultAsync();
 
@@ -119,7 +119,7 @@ namespace Shrooms.Premium.Domain.Services.Email.ServiceRequest
 
             var emailTemplateViewModel = new ServiceRequestUpdateEmailTemplateViewModel(userNotificationSettingsUrl,
                 serviceRequest.Title,
-                await GetUserFullNameAsync(userAndOrganizationDTO.UserId),
+                await GetUserFullNameAsync(userAndOrganizationDto.UserId),
                 newStatusName,
                 serviceRequestUrl);
 

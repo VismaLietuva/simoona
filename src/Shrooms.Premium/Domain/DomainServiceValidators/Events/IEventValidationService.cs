@@ -16,14 +16,14 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
         void CheckIfResponsibleUserNotExists(bool userExists);
         void CheckIfEventEndDateIsExpired(DateTime endDate);
         void CheckIfEventStartDateIsExpired(DateTime startDate);
-        void CheckIfOptionsAreDifferent(IEnumerable<NewEventOptionDTO> options);
+        void CheckIfOptionsAreDifferent(IEnumerable<NewEventOptionDto> options);
         void CheckIfSingleChoiceSelectedWithRule(ICollection<EventOption> options, OptionRules rule);
         void CheckIfUserAlreadyJoinedSameEvent(bool isParticipating);
         void CheckIfJoiningEventStartDateHasPassed(DateTime startDate);
         void CheckIfEventIsFull(int maxParticipants, int participantsCount);
         void CheckIfAttendStatusIsValid(int status);
-        void CheckIfAttendOptionIsAllowed(int attendStatus, EventJoinValidationDTO @event);
-        void CheckIfAttendOptionsAllowedToUpdate(EditEventDTO eventDto, Event eventToUpdate);
+        void CheckIfAttendOptionIsAllowed(int attendStatus, EventJoinValidationDto @event);
+        void CheckIfAttendOptionsAllowedToUpdate(EditEventDto eventDto, Event eventToUpdate);
         void CheckIfRegistrationDeadlineIsExpired(DateTime registrationDeadline);
         void CheckIfUserExistsInOtherSingleJoinEvent(bool anyEvents);
         void CheckIfEventHasEnoughPlaces(int maxParticipants, int participantCount);
@@ -36,7 +36,7 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
         void CheckIfUserHasPermissionToPin(bool newPinStatus, bool currentPinStatus, bool isAdmin);
         void CheckIfRegistrationDeadlineExceedsStartDate(DateTime registrationDeadline, DateTime startDate);
         void CheckIfProvidedOptionsAreValid(IEnumerable<int> providedOptionsCount, IEnumerable<EventOption> foundOptionsCount);
-        void CheckIfEventHasParticipants(IEnumerable<EventParticipantDTO> eventParticipants);
+        void CheckIfEventHasParticipants(IEnumerable<EventParticipantDto> eventParticipants);
         void CheckIfUserParticipatesInEvent(string userId, IEnumerable<string> participantIds);
         void CheckIfDateRangeExceededLimitOrNull(DateTime? start, DateTime? end);
     }

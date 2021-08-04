@@ -21,7 +21,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             _participantsDbSet = unitOfWork.GetDbSet<LotteryParticipant>();
         }
 
-        public async Task<IList<LotteryParticipantDTO>> GetParticipantsCountedAsync(int lotteryId)
+        public async Task<IList<LotteryParticipantDto>> GetParticipantsCountedAsync(int lotteryId)
         {
             return await _participantsDbSet
                 .Where(x => x.LotteryId == lotteryId)
@@ -31,7 +31,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 .ToListAsync();
         }
 
-        public async Task<IPagedList<LotteryParticipantDTO>> GetPagedParticipantsAsync(int lotteryId, int page, int pageSize)
+        public async Task<IPagedList<LotteryParticipantDto>> GetPagedParticipantsAsync(int lotteryId, int page, int pageSize)
         {
             var filteredParticipants = _participantsDbSet
                 .Where(x => x.LotteryId == lotteryId)
@@ -42,8 +42,8 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             return await filteredParticipants.ToPagedListAsync(page, pageSize);
         }
 
-        private Expression<Func<IGrouping<ApplicationUser, LotteryParticipant>, LotteryParticipantDTO>> MapToParticipantDto =>
-            group => new LotteryParticipantDTO
+        private Expression<Func<IGrouping<ApplicationUser, LotteryParticipant>, LotteryParticipantDto>> MapToParticipantDto =>
+            group => new LotteryParticipantDto
             {
                 UserId = group.Key.Id,
                 FullName = group.Key.FirstName + " " + group.Key.LastName,

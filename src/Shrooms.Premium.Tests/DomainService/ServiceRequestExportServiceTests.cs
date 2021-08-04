@@ -41,7 +41,7 @@ namespace Shrooms.Premium.Tests.DomainService
         [Test]
         public async Task ServiceRequests_Should_Return_Excel_File()
         {
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2
             };
@@ -69,7 +69,7 @@ namespace Shrooms.Premium.Tests.DomainService
         [Test]
         public async Task ServiceRequests_Should_Return_Excel_File_With_Filtered_Categories()
         {
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2
             };

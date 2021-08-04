@@ -55,7 +55,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             await _mailingService.SendEmailAsync(new EmailDto(emails, Resources.Models.Events.Events.ResetParticipantListEmailSubject, emailBody));
         }
 
-        public async Task RemindUsersToJoinEventAsync(IEnumerable<EventTypeDTO> eventTypes, IEnumerable<string> emails, int orgId)
+        public async Task RemindUsersToJoinEventAsync(IEnumerable<EventTypeDto> eventTypes, IEnumerable<string> emails, int orgId)
         {
             var organization = await _organizationService.GetOrganizationByIdAsync(orgId);
 

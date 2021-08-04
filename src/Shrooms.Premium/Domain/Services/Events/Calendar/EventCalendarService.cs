@@ -42,7 +42,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Calendar
             _eventValidationService = eventValidationService;
         }
 
-        public async Task SendInvitationAsync(EventJoinValidationDTO @event, IEnumerable<string> userIds, int orgId)
+        public async Task SendInvitationAsync(EventJoinValidationDto @event, IEnumerable<string> userIds, int orgId)
         {
             var emails = await _usersDbSet
                 .Where(u => userIds.Contains(u.Id))
@@ -101,7 +101,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Calendar
             calEvent.Description += $"\n\n{eventUrl}";
         }
 
-        private static CalendarEvent MapToCalendarEvent(EventJoinValidationDTO @event)
+        private static CalendarEvent MapToCalendarEvent(EventJoinValidationDto @event)
         {
             var calEvent = new CalendarEvent
             {

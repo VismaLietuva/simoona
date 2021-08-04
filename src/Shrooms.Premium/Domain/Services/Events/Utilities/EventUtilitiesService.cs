@@ -53,11 +53,11 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
             return (await _eventsDbSet.SingleAsync(e => e.Id == eventId)).Name;
         }
 
-        public async Task<IEnumerable<EventTypeDTO>> GetEventTypesAsync(int organizationId)
+        public async Task<IEnumerable<EventTypeDto>> GetEventTypesAsync(int organizationId)
         {
             var eventTypes = await _eventTypesDbSet
                 .Where(x => x.OrganizationId == organizationId)
-                .Select(type => new EventTypeDTO
+                .Select(type => new EventTypeDto
                 {
                     Id = type.Id,
                     IsSingleJoin = type.IsSingleJoin,
@@ -70,12 +70,12 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
             return eventTypes;
         }
 
-        public async Task<EventTypeDTO> GetEventTypeAsync(int organizationId, int eventTypeId)
+        public async Task<EventTypeDto> GetEventTypeAsync(int organizationId, int eventTypeId)
         {
             var eventType = await _eventTypesDbSet
                 .Include(x => x.Events)
                 .Where(x => x.OrganizationId == organizationId && x.Id == eventTypeId)
-                .Select(x => new EventTypeDTO
+                .Select(x => new EventTypeDto
                 {
                     Id = x.Id,
                     IsSingleJoin = x.IsSingleJoin,
@@ -96,11 +96,11 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
             return eventType;
         }
 
-        public async Task<IEnumerable<EventTypeDTO>> GetEventTypesToRemindAsync(int organizationId)
+        public async Task<IEnumerable<EventTypeDto>> GetEventTypesToRemindAsync(int organizationId)
         {
             return await _eventTypesDbSet
                 .Where(x => x.SendWeeklyReminders && x.OrganizationId == organizationId)
-                .Select(x => new EventTypeDTO
+                .Select(x => new EventTypeDto
                 {
                     Id = x.Id,
                     Name = x.Name
@@ -108,7 +108,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
                 .ToListAsync();
         }
 
-        public async Task CreateEventTypeAsync(CreateEventTypeDTO eventType)
+        public async Task CreateEventTypeAsync(CreateEventTypeDto eventType)
         {
             await ValidateEventTypeNameAsync(eventType.Name, eventType.OrganizationId);
 
@@ -117,7 +117,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
             await _uow.SaveChangesAsync(eventType.UserId);
         }
 
-        public async Task UpdateEventTypeAsync(UpdateEventTypeDTO eventType)
+        public async Task UpdateEventTypeAsync(UpdateEventTypeDto eventType)
         {
             var orgEventType = await _eventTypesDbSet
                 .SingleOrDefaultAsync(x => x.OrganizationId == eventType.OrganizationId && x.Id == eventType.Id);
@@ -143,7 +143,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
             await _uow.SaveChangesAsync(eventType.UserId);
         }
 
-        public async Task DeleteEventTypeAsync(int id, UserAndOrganizationDTO userAndOrg)
+        public async Task DeleteEventTypeAsync(int id, UserAndOrganizationDto userAndOrg)
         {
             var anyActiveEvents = await _eventsDbSet
                 .Where(x => x.EventTypeId == id)
@@ -174,7 +174,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
             return recurrenceOptions;
         }
 
-        public async Task<IEnumerable<EventOptionCountDTO>> GetEventChosenOptionsAsync(Guid eventId, UserAndOrganizationDTO userAndOrg)
+        public async Task<IEnumerable<EventOptionCountDto>> GetEventChosenOptionsAsync(Guid eventId, UserAndOrganizationDto userAndOrg)
         {
             var eventOptions = await _eventOptionsDbSet
                 .Include(e => e.EventParticipants)
@@ -182,7 +182,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
                 .Where(e => e.EventId == eventId
                     && e.Event.OrganizationId == userAndOrg.OrganizationId
                     && e.EventParticipants.Any(x => x.EventId == eventId))
-                .Select(e => new EventOptionCountDTO
+                .Select(e => new EventOptionCountDto
                 {
                     Option = e.Option,
                     Count = e.EventParticipants.Count(x => x.EventId == eventId)
@@ -221,7 +221,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
             }
         }
 
-        private static EventType MapNewEventType(CreateEventTypeDTO eventTypeDto)
+        private static EventType MapNewEventType(CreateEventTypeDto eventTypeDto)
         {
             var eventType = new EventType
             {

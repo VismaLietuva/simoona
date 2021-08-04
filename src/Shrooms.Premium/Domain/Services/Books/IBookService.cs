@@ -9,17 +9,17 @@ namespace Shrooms.Premium.Domain.Services.Books
 {
     public interface IBookService
     {
-        Task AddBookAsync(NewBookDTO bookDto);
-        Task TakeBookAsync(BookTakeDTO bookDTO);
-        Task EditBookAsync(EditBookDTO editedBook);
-        Task DeleteBookAsync(int bookOfficeId, UserAndOrganizationDTO userOrg);
-        Task TakeBookAsync(int bookOfficeId, UserAndOrganizationDTO userAndOrg);
-        Task ReturnBookAsync(int bookOfficeId, UserAndOrganizationDTO userAndOrg);
-        Task ReportBookAsync(BookReportDTO bookReport, UserAndOrganizationDTO userAndOrg);
+        Task AddBookAsync(NewBookDto bookDto);
+        Task TakeBookAsync(BookTakeDto bookDto);
+        Task EditBookAsync(EditBookDto editedBook);
+        Task DeleteBookAsync(int bookOfficeId, UserAndOrganizationDto userOrg);
+        Task TakeBookAsync(int bookOfficeId, UserAndOrganizationDto userAndOrg);
+        Task ReturnBookAsync(int bookOfficeId, UserAndOrganizationDto userAndOrg);
+        Task ReportBookAsync(BookReportDto bookReport, UserAndOrganizationDto userAndOrg);
         void UpdateBookCovers();
-        Task<RetrievedBookInfoDTO> FindBookByIsbnAsync(string isbn, int organizationId);
-        Task<ILazyPaged<BooksByOfficeDTO>> GetBooksByOfficeAsync(BooksByOfficeOptionsDTO options);
-        Task<BookDetailsDTO> GetBookDetailsAsync(int bookOfficeId, UserAndOrganizationDTO userOrg);
-        Task<BookDetailsAdministrationDTO> GetBookDetailsWithOfficesAsync(int bookOfficeId, UserAndOrganizationDTO userOrg);
+        Task<RetrievedBookInfoDto> FindBookByIsbnAsync(string isbn, int organizationId);
+        Task<ILazyPaged<BooksByOfficeDto>> GetBooksByOfficeAsync(BooksByOfficeOptionsDto options);
+        Task<BookDetailsDto> GetBookDetailsAsync(int bookOfficeId, UserAndOrganizationDto userOrg);
+        Task<BookDetailsAdministrationDto> GetBookDetailsWithOfficesAsync(int bookOfficeId, UserAndOrganizationDto userOrg);
     }
 }

@@ -11,7 +11,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.LoyaltyKudos
 
         IEnumerable<int> CalculateYearsToAwardFor(int yearsEmployed, int receivedLoyalties);
 
-        List<KudosLog> GetEmployeeLoyaltyKudosLog(EmployeeLoyaltyKudosDTO employeeLoyaltyKudos,
+        List<KudosLog> GetEmployeeLoyaltyKudosLog(EmployeeLoyaltyKudosDto employeeLoyaltyKudos,
                                                   KudosType loyaltyType,
                                                   int organizationId,
                                                   int[] kudosYearlyMultipliers);

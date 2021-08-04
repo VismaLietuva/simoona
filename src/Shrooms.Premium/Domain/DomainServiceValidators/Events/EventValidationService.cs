@@ -173,7 +173,7 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             }
         }
 
-        public void CheckIfAttendOptionIsAllowed(int attendStatus, EventJoinValidationDTO @event)
+        public void CheckIfAttendOptionIsAllowed(int attendStatus, EventJoinValidationDto @event)
         {
             if (attendStatus == (int)AttendingStatus.MaybeAttending && !@event.AllowMaybeGoing)
             {
@@ -186,7 +186,7 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             }
         }
 
-        public void CheckIfAttendOptionsAllowedToUpdate(EditEventDTO eventDto, Event eventToUpdate)
+        public void CheckIfAttendOptionsAllowedToUpdate(EditEventDto eventDto, Event eventToUpdate)
         {
             if ((eventDto.AllowMaybeGoing != eventToUpdate.AllowMaybeGoing || eventDto.AllowNotGoing != eventToUpdate.AllowNotGoing) && eventToUpdate.EventParticipants.Count > 0)
             {
@@ -247,7 +247,7 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             }
         }
 
-        public void CheckIfOptionsAreDifferent(IEnumerable<NewEventOptionDTO> options)
+        public void CheckIfOptionsAreDifferent(IEnumerable<NewEventOptionDto> options)
         {
             if (options == null)
             {
@@ -264,7 +264,7 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             }
         }
 
-        public void CheckIfEventHasParticipants(IEnumerable<EventParticipantDTO> eventParticipants)
+        public void CheckIfEventHasParticipants(IEnumerable<EventParticipantDto> eventParticipants)
         {
             if (!eventParticipants.Any())
             {

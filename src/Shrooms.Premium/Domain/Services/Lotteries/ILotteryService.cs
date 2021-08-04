@@ -12,34 +12,34 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
     {
         Task<Lottery> GetLotteryAsync(int lotteryId);
 
-        Task<LotteryDTO> CreateLotteryAsync(LotteryDTO newLotteryDTO);
+        Task<LotteryDto> CreateLotteryAsync(LotteryDto newLotteryDto);
 
-        Task EditDraftedLotteryAsync(LotteryDTO lotteryDTO);
+        Task EditDraftedLotteryAsync(LotteryDto lotteryDto);
 
-        Task EditStartedLotteryAsync(EditStartedLotteryDTO lotteryDTO);
+        Task EditStartedLotteryAsync(EditStartedLotteryDto lotteryDto);
 
-        Task<bool> AbortLotteryAsync(int lotteryId, UserAndOrganizationDTO userOrg);
+        Task<bool> AbortLotteryAsync(int lotteryId, UserAndOrganizationDto userOrg);
 
-        Task RefundParticipantsAsync(int lotteryId, UserAndOrganizationDTO userOrg);
+        Task RefundParticipantsAsync(int lotteryId, UserAndOrganizationDto userOrg);
 
-        Task FinishLotteryAsync(int lotteryId, UserAndOrganizationDTO userOrg);
+        Task FinishLotteryAsync(int lotteryId, UserAndOrganizationDto userOrg);
 
-        Task<LotteryStatsDTO> GetLotteryStatsAsync(int lotteryId, UserAndOrganizationDTO userOrg);
+        Task<LotteryStatsDto> GetLotteryStatsAsync(int lotteryId, UserAndOrganizationDto userOrg);
 
-        Task BuyLotteryTicketAsync(BuyLotteryTicketDTO lotteryTicketDTO, UserAndOrganizationDTO userOrg);
+        Task BuyLotteryTicketAsync(BuyLotteryTicketDto lotteryTicketDto, UserAndOrganizationDto userOrg);
 
-        Task<IEnumerable<LotteryDetailsDTO>> GetLotteriesAsync(UserAndOrganizationDTO userOrganization);
+        Task<IEnumerable<LotteryDetailsDto>> GetLotteriesAsync(UserAndOrganizationDto userOrganization);
 
-        Task<List<LotteryDetailsDTO>> GetRunningLotteriesAsync(UserAndOrganizationDTO userAndOrganization);
+        Task<List<LotteryDetailsDto>> GetRunningLotteriesAsync(UserAndOrganizationDto userAndOrganization);
 
-        Task<IEnumerable<LotteryDetailsDTO>> GetFilteredLotteriesAsync(string filter, UserAndOrganizationDTO userOrg);
+        Task<IEnumerable<LotteryDetailsDto>> GetFilteredLotteriesAsync(string filter, UserAndOrganizationDto userOrg);
 
-        Task<IPagedList<LotteryDetailsDTO>> GetPagedLotteriesAsync(GetPagedLotteriesArgs args);
+        Task<IPagedList<LotteryDetailsDto>> GetPagedLotteriesAsync(GetPagedLotteriesArgs args);
 
-        Task<LotteryDetailsDTO> GetLotteryDetailsAsync(int lotteryId, UserAndOrganizationDTO userOrg);
+        Task<LotteryDetailsDto> GetLotteryDetailsAsync(int lotteryId, UserAndOrganizationDto userOrg);
 
-        Task<LotteryStatusDTO> GetLotteryStatusAsync(int lotteryId, UserAndOrganizationDTO userOrg);
+        Task<LotteryStatusDto> GetLotteryStatusAsync(int lotteryId, UserAndOrganizationDto userOrg);
 
-        Task UpdateRefundFailedFlagAsync(int lotteryId, bool isFailed, UserAndOrganizationDTO userOrg);
+        Task UpdateRefundFailedFlagAsync(int lotteryId, bool isFailed, UserAndOrganizationDto userOrg);
     }
 }

@@ -54,7 +54,7 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Books
             }
         }
 
-        public void ThrowIfBookIsAlreadyBorrowed(MobileBookOfficeLogsDTO officeBookWithLogs)
+        public void ThrowIfBookIsAlreadyBorrowed(MobileBookOfficeLogsDto officeBookWithLogs)
         {
             if (officeBookWithLogs.LogsUserIDs == null)
             {

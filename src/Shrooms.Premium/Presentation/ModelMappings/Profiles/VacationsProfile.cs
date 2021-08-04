@@ -13,11 +13,11 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<VacationDTO, VacationViewModel>()
+            CreateMap<VacationDto, VacationViewModel>()
                 .ForMember(dest => dest.DateStart, opt => opt.MapFrom(src => src.DateFrom))
                 .ForMember(dest => dest.DateEnd, opt => opt.MapFrom(src => src.DateTo));
 
-            CreateMap<VacationAvailableDaysDTO, VacationAvailableDaysViewModel>();
+            CreateMap<VacationAvailableDaysDto, VacationAvailableDaysViewModel>();
         }
     }
 }

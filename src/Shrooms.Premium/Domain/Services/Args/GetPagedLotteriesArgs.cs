@@ -10,6 +10,6 @@ namespace Shrooms.Premium.Domain.Services.Args
 
         public int PageSize { get; set; }
 
-        public UserAndOrganizationDTO UserOrg { get; set; }
+        public UserAndOrganizationDto UserOrg { get; set; }
     }
 }

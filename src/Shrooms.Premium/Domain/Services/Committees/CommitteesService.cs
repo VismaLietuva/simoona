@@ -42,37 +42,37 @@ namespace Shrooms.Premium.Domain.Services.Committees
 
         #region private methods
 
-        private async Task<Committee> CreateCommitteeModelAsync(CommitteePostDTO modelDTO, Committee committeeModel = null)
+        private async Task<Committee> CreateCommitteeModelAsync(CommitteePostDto committeePostDto, Committee committeeModel = null)
         {
-            committeeModel = _mapper.Map(modelDTO, committeeModel) ?? _mapper.Map<CommitteePostDTO, Committee>(modelDTO);
-            await AddRemoveCommitteeMembersAsync(modelDTO, committeeModel);
+            committeeModel = _mapper.Map(committeePostDto, committeeModel) ?? _mapper.Map<CommitteePostDto, Committee>(committeePostDto);
+            await AddRemoveCommitteeMembersAsync(committeePostDto, committeeModel);
 
             if (committeeModel != null)
             {
-                await UpdateCommitteeLeadsAsync(modelDTO, committeeModel);
-                await UpdateCommitteeDelegatesAsync(modelDTO, committeeModel);
+                await UpdateCommitteeLeadsAsync(committeePostDto, committeeModel);
+                await UpdateCommitteeDelegatesAsync(committeePostDto, committeeModel);
             }
 
             return committeeModel;
         }
 
-        private async Task UpdateCommitteeLeadsAsync(CommitteePostDTO modelDto, Committee committee)
+        private async Task UpdateCommitteeLeadsAsync(CommitteePostDto committeePostDto, Committee committee)
         {
-            var newLeadsIds = modelDto.Leads.Select(x => x.Id).ToList();
+            var newLeadsIds = committeePostDto.Leads.Select(x => x.Id).ToList();
             var newLeads = await _usersDbSet.Where(x => newLeadsIds.Contains(x.Id)).ToListAsync();
             committee.Leads = newLeads;
         }
 
-        private async Task UpdateCommitteeDelegatesAsync(CommitteePostDTO modelDto, Committee committee)
+        private async Task UpdateCommitteeDelegatesAsync(CommitteePostDto committeePostDto, Committee committee)
         {
-            var newDelegatesIds = modelDto.Delegates.Select(x => x.Id).ToList();
+            var newDelegatesIds = committeePostDto.Delegates.Select(x => x.Id).ToList();
             var newDelegates = await _usersDbSet.Where(x => newDelegatesIds.Contains(x.Id)).ToListAsync();
             committee.Delegates = newDelegates;
         }
 
-        private async Task AddRemoveCommitteeMembersAsync(CommitteePostDTO modelDTO, Committee committeeModel)
+        private async Task AddRemoveCommitteeMembersAsync(CommitteePostDto committeePostDto, Committee committeeModel)
         {
-            var membersInModelIds = _mapper.Map<IEnumerable<ApplicationUserMinimalDto>, string[]>(modelDTO.Members);
+            var membersInModelIds = _mapper.Map<IEnumerable<ApplicationUserMinimalDto>, string[]>(committeePostDto.Members);
             if (committeeModel.Members != null)
             {
                 var membersInCommitteeIds = _mapper.Map<IEnumerable<ApplicationUser>, string[]>(committeeModel.Members);
@@ -90,9 +90,9 @@ namespace Shrooms.Premium.Domain.Services.Committees
             }
         }
 
-        private async Task ChangeKudosCommitteeAsync(CommitteePostDTO modelDTO)
+        private async Task ChangeKudosCommitteeAsync(CommitteePostDto committeePostDto)
         {
-            if (!modelDTO.IsKudosCommittee)
+            if (!committeePostDto.IsKudosCommittee)
             {
                 return;
             }
@@ -104,7 +104,7 @@ namespace Shrooms.Premium.Domain.Services.Committees
                 return;
             }
 
-            if (oldCommittee.Id == modelDTO.Id)
+            if (oldCommittee.Id == committeePostDto.Id)
             {
                 return;
             }
@@ -117,10 +117,10 @@ namespace Shrooms.Premium.Domain.Services.Committees
 
         #endregion
 
-        public async Task PutCommitteeAsync(CommitteePostDTO modelDTO)
+        public async Task PutCommitteeAsync(CommitteePostDto committeePostDto)
         {
             var committeeModel = await _committeeRepository
-                .Get(c => c.Id == modelDTO.Id, includeProperties: "Members,Leads,Delegates")
+                .Get(c => c.Id == committeePostDto.Id, includeProperties: "Members,Leads,Delegates")
                 .FirstOrDefaultAsync();
 
             if (committeeModel == null)
@@ -128,32 +128,32 @@ namespace Shrooms.Premium.Domain.Services.Committees
                 throw new ServiceException(Resources.Models.Committee.Committee.ModelNotFoundException);
             }
 
-            await ChangeKudosCommitteeAsync(modelDTO);
+            await ChangeKudosCommitteeAsync(committeePostDto);
 
-            await CreateCommitteeModelAsync(modelDTO, committeeModel);
+            await CreateCommitteeModelAsync(committeePostDto, committeeModel);
             _committeeRepository.Update(committeeModel);
 
             await _unitOfWork.SaveAsync();
         }
 
-        public async Task PostCommitteeAsync(CommitteePostDTO modelDTO)
+        public async Task PostCommitteeAsync(CommitteePostDto committeePostDto)
         {
-            if (await _committeeRepository.GetByIdAsync(modelDTO.Id) != null)
+            if (await _committeeRepository.GetByIdAsync(committeePostDto.Id) != null)
             {
                 throw new ServiceException(Resources.Models.Committee.Committee.CommitteeIdException);
             }
 
-            var committeeModel = await CreateCommitteeModelAsync(modelDTO);
-            await ChangeKudosCommitteeAsync(modelDTO);
+            var committeeModel = await CreateCommitteeModelAsync(committeePostDto);
+            await ChangeKudosCommitteeAsync(committeePostDto);
             _committeeRepository.Insert(committeeModel);
 
             await _unitOfWork.SaveAsync();
         }
 
-        public async Task PostSuggestionAsync(CommitteeSuggestionPostDTO modelDTO, string userId)
+        public async Task PostSuggestionAsync(CommitteeSuggestionPostDto dto, string userId)
         {
             var committee = await _committeeRepository
-                .Get(c => c.Id == modelDTO.CommitteeId, includeProperties: "Suggestions, Members")
+                .Get(c => c.Id == dto.CommitteeId, includeProperties: "Suggestions, Members")
                 .FirstOrDefaultAsync();
 
             if (committee == null)
@@ -161,7 +161,7 @@ namespace Shrooms.Premium.Domain.Services.Committees
                 throw new ServiceException(Resources.Models.Committee.Committee.SuggestionCommiteNotFound);
             }
 
-            var suggestion = _mapper.Map<CommitteeSuggestion>(modelDTO);
+            var suggestion = _mapper.Map<CommitteeSuggestion>(dto);
 
             suggestion.User = await _applicationUserRepository.GetByIdAsync(userId);
             suggestion.Date = DateTime.UtcNow;
@@ -189,7 +189,7 @@ namespace Shrooms.Premium.Domain.Services.Committees
             return _mapper.Map<IEnumerable<CommitteeSuggestionDto>>(committeeSuggestions);
         }
 
-        public async Task DeleteCommitteeSuggestionAsync(int committeeId, int suggestionId, UserAndOrganizationDTO userAndOrg)
+        public async Task DeleteCommitteeSuggestionAsync(int committeeId, int suggestionId, UserAndOrganizationDto userAndOrg)
         {
             var committee = await _committeeDbSet
                 .Include(u => u.Suggestions)
@@ -207,11 +207,11 @@ namespace Shrooms.Premium.Domain.Services.Committees
             await _uow.SaveChangesAsync(userAndOrg.UserId);
         }
 
-        public async Task<CommitteeViewDTO> GetKudosCommitteeAsync()
+        public async Task<CommitteeViewDto> GetKudosCommitteeAsync()
         {
             var kudosCommittee = await _committeeRepository.Get(k => k.IsKudosCommittee, includeProperties: "Members").FirstOrDefaultAsync();
 
-            var kudosCommitteeMapped = _mapper.Map<CommitteeViewDTO>(kudosCommittee);
+            var kudosCommitteeMapped = _mapper.Map<CommitteeViewDto>(kudosCommittee);
 
             return kudosCommitteeMapped;
         }

@@ -65,13 +65,13 @@ namespace Shrooms.Premium.Tests.DomainService
         {
             MockServiceRequests();
 
-            var comment = new ServiceRequestCommentDTO
+            var comment = new ServiceRequestCommentDto
             {
                 Content = "test content",
                 ServiceRequestId = 1
             };
 
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 1,
                 UserId = "UserId"
@@ -87,13 +87,13 @@ namespace Shrooms.Premium.Tests.DomainService
         {
             MockServiceRequests();
 
-            var comment = new ServiceRequestCommentDTO
+            var comment = new ServiceRequestCommentDto
             {
                 Content = "test content",
                 ServiceRequestId = 1
             };
 
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "UserId"
@@ -109,7 +109,7 @@ namespace Shrooms.Premium.Tests.DomainService
             MockServiceRequestPriorities();
             MockServiceRequestStatuses();
 
-            var serviceRequestDTO = new ServiceRequestDTO
+            var serviceRequestDto = new ServiceRequestDto
             {
                 Description = "testDescription",
                 PriorityId = 1,
@@ -117,13 +117,13 @@ namespace Shrooms.Premium.Tests.DomainService
                 Title = "tetsTitle"
             };
 
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "UserId"
             };
 
-            await _serviceRequestService.CreateNewServiceRequestAsync(serviceRequestDTO, userAndOrg);
+            await _serviceRequestService.CreateNewServiceRequestAsync(serviceRequestDto, userAndOrg);
             _serviceRequestsDbSet.Received(1).Add(Arg.Any<ServiceRequest>());
             await _uow.Received(1).SaveChangesAsync(false);
         }
@@ -135,7 +135,7 @@ namespace Shrooms.Premium.Tests.DomainService
             MockServiceRequestPriorities();
             MockServiceRequestStatuses();
 
-            var serviceRequestDTO = new ServiceRequestDTO
+            var serviceRequestDto = new ServiceRequestDto
             {
                 Description = "testDescription",
                 PriorityId = 2,
@@ -143,13 +143,13 @@ namespace Shrooms.Premium.Tests.DomainService
                 Title = "tetsTitle"
             };
 
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "UserId"
             };
 
-            Assert.ThrowsAsync<ValidationException>(async () => await _serviceRequestService.CreateNewServiceRequestAsync(serviceRequestDTO, userAndOrg));
+            Assert.ThrowsAsync<ValidationException>(async () => await _serviceRequestService.CreateNewServiceRequestAsync(serviceRequestDto, userAndOrg));
         }
 
         [Test]
@@ -159,7 +159,7 @@ namespace Shrooms.Premium.Tests.DomainService
             MockServiceRequestPriorities();
             MockServiceRequestStatuses();
 
-            var serviceRequestDTO = new ServiceRequestDTO
+            var serviceRequestDto = new ServiceRequestDto
             {
                 Description = "testDescription",
                 PriorityId = 1,
@@ -167,13 +167,13 @@ namespace Shrooms.Premium.Tests.DomainService
                 Title = "tetsTitle"
             };
 
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "UserId"
             };
 
-            Assert.ThrowsAsync<ValidationException>(async () => await _serviceRequestService.CreateNewServiceRequestAsync(serviceRequestDTO, userAndOrg));
+            Assert.ThrowsAsync<ValidationException>(async () => await _serviceRequestService.CreateNewServiceRequestAsync(serviceRequestDto, userAndOrg));
         }
 
         [Test]
@@ -185,7 +185,7 @@ namespace Shrooms.Premium.Tests.DomainService
             MockServiceRequestStatuses();
             MockPermissioService();
 
-            var serviceRequestDTO = new ServiceRequestDTO
+            var serviceRequestDto = new ServiceRequestDto
             {
                 Id = 1,
                 Description = "testDescription",
@@ -196,20 +196,20 @@ namespace Shrooms.Premium.Tests.DomainService
                 KudosAmmount = 1
             };
 
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 1,
                 UserId = "AdminId"
             };
 
-            await _serviceRequestService.UpdateServiceRequestAsync(serviceRequestDTO, userAndOrg);
+            await _serviceRequestService.UpdateServiceRequestAsync(serviceRequestDto, userAndOrg);
 
-            var updatedServiceRequest = await _serviceRequestsDbSet.FirstAsync(x => x.Id == serviceRequestDTO.Id);
+            var updatedServiceRequest = await _serviceRequestsDbSet.FirstAsync(x => x.Id == serviceRequestDto.Id);
 
             Assert.AreEqual("test1", updatedServiceRequest.CategoryName);
-            Assert.AreEqual(serviceRequestDTO.Title, updatedServiceRequest.Title);
-            Assert.AreEqual(serviceRequestDTO.PriorityId, updatedServiceRequest.PriorityId);
-            Assert.AreEqual(serviceRequestDTO.KudosAmmount, updatedServiceRequest.KudosAmmount);
+            Assert.AreEqual(serviceRequestDto.Title, updatedServiceRequest.Title);
+            Assert.AreEqual(serviceRequestDto.PriorityId, updatedServiceRequest.PriorityId);
+            Assert.AreEqual(serviceRequestDto.KudosAmmount, updatedServiceRequest.KudosAmmount);
 
             await _uow.Received(1).SaveChangesAsync(false);
         }
@@ -223,7 +223,7 @@ namespace Shrooms.Premium.Tests.DomainService
             MockServiceRequestStatuses();
             MockPermissioService();
 
-            var serviceRequestDTO = new ServiceRequestDTO
+            var serviceRequestDto = new ServiceRequestDto
             {
                 Id = 1,
                 Description = "testDescription",
@@ -233,19 +233,19 @@ namespace Shrooms.Premium.Tests.DomainService
                 StatusId = 2
             };
 
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 1,
                 UserId = "UserId"
             };
 
-            await _serviceRequestService.UpdateServiceRequestAsync(serviceRequestDTO, userAndOrg);
+            await _serviceRequestService.UpdateServiceRequestAsync(serviceRequestDto, userAndOrg);
 
-            var updatedServiceRequest = await _serviceRequestsDbSet.FirstAsync(x => x.Id == serviceRequestDTO.Id);
+            var updatedServiceRequest = await _serviceRequestsDbSet.FirstAsync(x => x.Id == serviceRequestDto.Id);
 
             Assert.AreEqual(null, updatedServiceRequest.CategoryName);
             Assert.AreEqual(null, updatedServiceRequest.Title);
-            Assert.AreEqual(serviceRequestDTO.PriorityId, updatedServiceRequest.PriorityId);
+            Assert.AreEqual(serviceRequestDto.PriorityId, updatedServiceRequest.PriorityId);
             Assert.AreEqual(null, updatedServiceRequest.KudosAmmount);
             Assert.AreEqual(1, updatedServiceRequest.StatusId);
 
@@ -261,7 +261,7 @@ namespace Shrooms.Premium.Tests.DomainService
             MockServiceRequestStatuses();
             MockPermissioService();
 
-            var serviceRequestDTO = new ServiceRequestDTO
+            var serviceRequestDto = new ServiceRequestDto
             {
                 Id = 1,
                 Description = "testDescription",
@@ -271,17 +271,17 @@ namespace Shrooms.Premium.Tests.DomainService
                 StatusId = 2
             };
 
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 1,
                 UserId = "AdminId"
             };
 
-            await _serviceRequestService.UpdateServiceRequestAsync(serviceRequestDTO, userAndOrg);
+            await _serviceRequestService.UpdateServiceRequestAsync(serviceRequestDto, userAndOrg);
 
-            var updatedServiceRequest = await _serviceRequestsDbSet.FirstAsync(x => x.Id == serviceRequestDTO.Id);
+            var updatedServiceRequest = await _serviceRequestsDbSet.FirstAsync(x => x.Id == serviceRequestDto.Id);
 
-            Assert.AreEqual(serviceRequestDTO.StatusId, updatedServiceRequest.StatusId);
+            Assert.AreEqual(serviceRequestDto.StatusId, updatedServiceRequest.StatusId);
 
             await _uow.Received(1).SaveChangesAsync(false);
         }
@@ -295,7 +295,7 @@ namespace Shrooms.Premium.Tests.DomainService
             MockServiceRequestStatuses();
             MockPermissioService();
 
-            var serviceRequestDTO = new ServiceRequestDTO
+            var serviceRequestDto = new ServiceRequestDto
             {
                 Id = 1,
                 Description = "testDescription",
@@ -305,13 +305,13 @@ namespace Shrooms.Premium.Tests.DomainService
                 StatusId = 2
             };
 
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 1,
                 UserId = "AnotherUserId"
             };
 
-            Assert.ThrowsAsync<UnauthorizedAccessException>(async () => await _serviceRequestService.UpdateServiceRequestAsync(serviceRequestDTO, userAndOrg));
+            Assert.ThrowsAsync<UnauthorizedAccessException>(async () => await _serviceRequestService.UpdateServiceRequestAsync(serviceRequestDto, userAndOrg));
         }
 
         [Test]
@@ -323,7 +323,7 @@ namespace Shrooms.Premium.Tests.DomainService
             MockServiceRequestStatuses();
             MockPermissioService();
 
-            var serviceRequestDTO = new ServiceRequestDTO
+            var serviceRequestDto = new ServiceRequestDto
             {
                 Id = 2,
                 Description = "testDescription",
@@ -333,27 +333,27 @@ namespace Shrooms.Premium.Tests.DomainService
                 StatusId = 1
             };
 
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 1,
                 UserId = "AdminId"
             };
 
-            Assert.ThrowsAsync<ValidationException>(async () => await _serviceRequestService.UpdateServiceRequestAsync(serviceRequestDTO, userAndOrg));
+            Assert.ThrowsAsync<ValidationException>(async () => await _serviceRequestService.UpdateServiceRequestAsync(serviceRequestDto, userAndOrg));
         }
 
         private void MockPermissioService()
         {
             _permissionService
-                .UserHasPermissionAsync(Arg.Is<UserAndOrganizationDTO>(x => x.UserId == "AdminId" && x.OrganizationId == 1), AdministrationPermissions.ServiceRequest)
+                .UserHasPermissionAsync(Arg.Is<UserAndOrganizationDto>(x => x.UserId == "AdminId" && x.OrganizationId == 1), AdministrationPermissions.ServiceRequest)
                 .Returns(true);
 
             _permissionService
-                .UserHasPermissionAsync(Arg.Is<UserAndOrganizationDTO>(x => x.UserId == "UserId" && x.OrganizationId == 1), AdministrationPermissions.ServiceRequest)
+                .UserHasPermissionAsync(Arg.Is<UserAndOrganizationDto>(x => x.UserId == "UserId" && x.OrganizationId == 1), AdministrationPermissions.ServiceRequest)
                 .Returns(false);
 
             _permissionService
-               .UserHasPermissionAsync(Arg.Is<UserAndOrganizationDTO>(x => x.UserId == "AnotherUserId" && x.OrganizationId == 1), AdministrationPermissions.ServiceRequest)
+               .UserHasPermissionAsync(Arg.Is<UserAndOrganizationDto>(x => x.UserId == "AnotherUserId" && x.OrganizationId == 1), AdministrationPermissions.ServiceRequest)
                .Returns(false);
         }
 

@@ -31,7 +31,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Kudos
             _employeeDbSet = uow.GetDbSet<ApplicationUser>();
         }
 
-        private async Task SendLoyaltyBotNotificationAsync(AwardedKudosEmployeeDTO kudosLog)
+        private async Task SendLoyaltyBotNotificationAsync(AwardedKudosEmployeeDto kudosLog)
         {
             var organization = await GetOrganizationAsync(kudosLog.OrganizationId);
             var employee = await _employeeDbSet.SingleAsync(s => s.Id == kudosLog.EmployeeId);
@@ -56,7 +56,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Kudos
             return await _organizationsDbSet.SingleAsync(x => x.Id == orgId);
         }
 
-        public async Task SendLoyaltyBotNotificationAsync(IEnumerable<AwardedKudosEmployeeDTO> awardedEmployees)
+        public async Task SendLoyaltyBotNotificationAsync(IEnumerable<AwardedKudosEmployeeDto> awardedEmployees)
         {
             foreach (var employee in awardedEmployees)
             {

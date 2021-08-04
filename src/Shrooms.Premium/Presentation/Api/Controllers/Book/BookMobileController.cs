@@ -34,12 +34,12 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
                 return BadRequest(ModelState);
             }
 
-            var bookDTO = _mapper.Map<BookMobileGetViewModel, BookMobileGetDTO>(bookViewModel);
+            var bookDto = _mapper.Map<BookMobileGetViewModel, BookMobileGetDto>(bookViewModel);
 
             try
             {
-                var getBookDTO = await _bookMobileService.GetBookAsync(bookDTO);
-                var getBookViewModel = _mapper.Map<RetrievedBookInfoDTO, RetrievedMobileBookInfoViewModel>(getBookDTO);
+                var getBookDto = await _bookMobileService.GetBookAsync(bookDto);
+                var getBookViewModel = _mapper.Map<RetrievedBookInfoDto, RetrievedMobileBookInfoViewModel>(getBookDto);
                 return Ok(getBookViewModel);
             }
             catch (BookException ex)
@@ -58,8 +58,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
 
             try
             {
-                var getBookDTO = await _bookMobileService.GetBookForPostAsync(code, organizationId);
-                var getBookViewModel = _mapper.Map<RetrievedBookInfoDTO, RetrievedBookForPostViewModel>(getBookDTO);
+                var getBookDto = await _bookMobileService.GetBookForPostAsync(code, organizationId);
+                var getBookViewModel = _mapper.Map<RetrievedBookInfoDto, RetrievedBookForPostViewModel>(getBookDto);
                 return Ok(getBookViewModel);
             }
             catch (BookException ex)
@@ -76,16 +76,16 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
                 return BadRequest(ModelState);
             }
 
-            var mobileUsersDTO = await _bookMobileService.GetUsersForAutoCompleteAsync(search, organizationId);
-            var mobileUserViewModel = _mapper.Map<IEnumerable<MobileUserDTO>, IEnumerable<MobileUserViewModel>>(mobileUsersDTO);
+            var mobileUsersDto = await _bookMobileService.GetUsersForAutoCompleteAsync(search, organizationId);
+            var mobileUserViewModel = _mapper.Map<IEnumerable<MobileUserDto>, IEnumerable<MobileUserViewModel>>(mobileUsersDto);
             return Ok(mobileUserViewModel);
         }
 
         [HttpGet]
         public async Task<IHttpActionResult> GetOffices(int organizationId)
         {
-            var officeBookDTO = await _bookMobileService.GetOfficesAsync(organizationId);
-            var officeBookViewModel = _mapper.Map<IEnumerable<OfficeBookDTO>, IEnumerable<OfficeBookViewModel>>(officeBookDTO);
+            var officeBookDto = await _bookMobileService.GetOfficesAsync(organizationId);
+            var officeBookViewModel = _mapper.Map<IEnumerable<OfficeBookDto>, IEnumerable<OfficeBookViewModel>>(officeBookDto);
             return Ok(officeBookViewModel);
         }
 
@@ -97,11 +97,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
                 return BadRequest(ModelState);
             }
 
-            var bookDTO = _mapper.Map<BookMobilePostViewModel, BookMobilePostDTO>(bookViewModel);
+            var bookDto = _mapper.Map<BookMobilePostViewModel, BookMobilePostDto>(bookViewModel);
 
             try
             {
-                await _bookMobileService.PostBookAsync(bookDTO);
+                await _bookMobileService.PostBookAsync(bookDto);
             }
             catch (BookException e)
             {
@@ -118,14 +118,15 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
                 return BadRequest(ModelState);
             }
 
-            var bookDTO = _mapper.Map<BookMobileReturnViewModel, BookMobileReturnDTO>(bookViewModel);
+            var bookDto = _mapper.Map<BookMobileReturnViewModel, BookMobileReturnDto>(bookViewModel);
 
             try
             {
-                var bookLogsDTO = await _bookMobileService.ReturnBookAsync(bookDTO);
-                var bookLogsViewModel = bookLogsDTO == null
+                var bookLogs = await _bookMobileService.ReturnBookAsync(bookDto);
+
+                var bookLogsViewModel = bookLogs == null
                     ? null
-                    : _mapper.Map<IEnumerable<BookMobileLogDTO>, IEnumerable<BookMobileLogViewModel>>(bookLogsDTO);
+                    : _mapper.Map<IEnumerable<BookMobileLogDto>, IEnumerable<BookMobileLogViewModel>>(bookLogs);
 
                 return Ok(bookLogsViewModel);
             }
@@ -158,11 +159,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
                 return BadRequest(ModelState);
             }
 
-            var bookDTO = _mapper.Map<BookMobileTakeViewModel, BookTakeDTO>(bookViewModel);
+            var bookDto = _mapper.Map<BookMobileTakeViewModel, BookTakeDto>(bookViewModel);
 
             try
             {
-                await _bookService.TakeBookAsync(bookDTO);
+                await _bookService.TakeBookAsync(bookDto);
                 return Ok();
             }
             catch (BookException e)

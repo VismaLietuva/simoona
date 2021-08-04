@@ -8,6 +8,6 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
 {
     public interface IServiceRequestExportService
     {
-        Task<byte[]> ExportToExcelAsync(UserAndOrganizationDTO userAndOrg, Expression<Func<ServiceRequest, bool>> filter);
+        Task<byte[]> ExportToExcelAsync(UserAndOrganizationDto userAndOrg, Expression<Func<ServiceRequest, bool>> filter);
     }
 }

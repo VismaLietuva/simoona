@@ -18,28 +18,28 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 
         private void CreateModelMappings()
         {
-            CreateMap<BookMobileDTO, Book>();
-            CreateMap<Book, BookMobileDTO>();
-            CreateMap<ApplicationUser, MobileUserDTO>();
+            CreateMap<BookMobileDto, Book>();
+            CreateMap<Book, BookMobileDto>();
+            CreateMap<ApplicationUser, MobileUserDto>();
         }
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<BookMobileGetDTO, BookMobileGetViewModel>();
-            CreateMap<OfficeBookDTO, OfficeBookViewModel>();
-            CreateMap<MobileUserDTO, MobileUserViewModel>();
-            CreateMap<BookMobileLogDTO, BookMobileLogViewModel>();
-            CreateMap<RetrievedBookInfoDTO, RetrievedMobileBookInfoViewModel>();
-            CreateMap<BookReportDTO, BookReportViewModel>();
+            CreateMap<BookMobileGetDto, BookMobileGetViewModel>();
+            CreateMap<OfficeBookDto, OfficeBookViewModel>();
+            CreateMap<MobileUserDto, MobileUserViewModel>();
+            CreateMap<BookMobileLogDto, BookMobileLogViewModel>();
+            CreateMap<RetrievedBookInfoDto, RetrievedMobileBookInfoViewModel>();
+            CreateMap<BookReportDto, BookReportViewModel>();
         }
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<BookMobilePostViewModel, BookMobilePostDTO>();
-            CreateMap<BookMobileReturnViewModel, BookMobileReturnDTO>();
-            CreateMap<BookMobileTakeViewModel, BookTakeDTO>();
-            CreateMap<BookMobileTakeSpecificViewModel, BookMobileTakeSpecificDTO>();
-            CreateMap<BookMobileGetViewModel, BookMobileGetDTO>();
-            CreateMap<BookReportViewModel, BookReportDTO>();
+            CreateMap<BookMobilePostViewModel, BookMobilePostDto>();
+            CreateMap<BookMobileReturnViewModel, BookMobileReturnDto>();
+            CreateMap<BookMobileTakeViewModel, BookTakeDto>();
+            CreateMap<BookMobileTakeSpecificViewModel, BookMobileTakeSpecificDto>();
+            CreateMap<BookMobileGetViewModel, BookMobileGetDto>();
+            CreateMap<BookReportViewModel, BookReportDto>();
         }
     }
 }

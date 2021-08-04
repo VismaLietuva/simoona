@@ -121,13 +121,13 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet, HttpPost]
         [PermissionAuthorize(Permission = BasicPermissions.OfficeUsers)]
-        public async Task<PagedViewModel<OfficeUserDTO>> GetPagedByFloor(int floorId, int page = 1, int pageSize = WebApiConstants.DefaultPageSize, string includeProperties = "")
+        public async Task<PagedViewModel<OfficeUserDto>> GetPagedByFloor(int floorId, int page = 1, int pageSize = WebApiConstants.DefaultPageSize, string includeProperties = "")
         {
             var officeUsersDto = await _officeMapService.GetOfficeUsersAsync(floorId, includeProperties);
 
             var officeUserPagedViewModel = await officeUsersDto.ToPagedListAsync(page, pageSize);
 
-            var pagedModel = new PagedViewModel<OfficeUserDTO>
+            var pagedModel = new PagedViewModel<OfficeUserDto>
             {
                 PagedList = officeUserPagedViewModel,
                 PageCount = officeUserPagedViewModel.PageCount,

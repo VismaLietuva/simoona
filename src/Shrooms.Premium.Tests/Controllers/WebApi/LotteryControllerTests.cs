@@ -56,10 +56,10 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
         public async Task GetAllLotteries_Should_Return_Ok_With_IEnumerable_Of_LotteryDetails_ViewModel()
         {
             // Arrange
-            _mapper.Map<IEnumerable<LotteryDetailsDTO>, IEnumerable<LotteryDetailsViewModel>>(LotteryDetailsDTO)
+            _mapper.Map<IEnumerable<LotteryDetailsDto>, IEnumerable<LotteryDetailsViewModel>>(LotteryDetailsDto)
                 .Returns(LotteryDetailsViewModel);
 
-            _lotteryService.GetLotteriesAsync(UserAndOrganizationArg).Returns(LotteryDetailsDTO);
+            _lotteryService.GetLotteriesAsync(UserAndOrganizationArg).Returns(LotteryDetailsDto);
 
             // Act
             var response = await _lotteryController.GetAllLotteries();
@@ -80,16 +80,17 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 Status = 1,
                 Title = "Hello"
             };
-            var lotteryDTO = new LotteryDetailsDTO
+
+            var lotteryDto = new LotteryDetailsDto
             {
                 Id = 2,
                 Status = 1,
                 Title = "Hello"
             };
 
-            _mapper.Map<LotteryDetailsDTO, LotteryDetailsViewModel>(lotteryDTO).Returns(lotteryViewModel);
+            _mapper.Map<LotteryDetailsDto, LotteryDetailsViewModel>(lotteryDto).Returns(lotteryViewModel);
 
-            _lotteryService.GetLotteryDetailsAsync(2, UserAndOrganizationArg).Returns(lotteryDTO);
+            _lotteryService.GetLotteryDetailsAsync(2, UserAndOrganizationArg).Returns(lotteryDto);
 
             // Act
             var response = await _lotteryController.GetLottery(2);
@@ -104,7 +105,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
         public async Task GetLottery_Should_Return_Unprocessable_Entity_Error()
         {
             // Arrange
-            _lotteryService.GetLotteryDetailsAsync(3000, UserAndOrganizationArg).Returns((LotteryDetailsDTO)null);
+            _lotteryService.GetLotteryDetailsAsync(3000, UserAndOrganizationArg).Returns((LotteryDetailsDto)null);
 
             // Act
             var response = await _lotteryController.GetLottery(3000);
@@ -153,12 +154,13 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             {
                 Title = "test"
             };
-            var lotteryDTO = new LotteryDTO
+
+            var lotteryDto = new LotteryDto
             {
                 Title = "test"
             };
-            _mapper.Map<CreateLotteryViewModel, LotteryDTO>(lotteryViewModel)
-                .Returns(lotteryDTO);
+
+            _mapper.Map<CreateLotteryViewModel, LotteryDto>(lotteryViewModel).Returns(lotteryDto);
 
             // Act
             _lotteryController.ModelState.AddModelError("model", "error");
@@ -167,7 +169,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Assert
             Assert.IsInstanceOf<InvalidModelStateResult>(response);
-            await _lotteryService.DidNotReceive().CreateLotteryAsync(lotteryDTO);
+            await _lotteryService.DidNotReceive().CreateLotteryAsync(lotteryDto);
         }
 
         [Test]
@@ -178,12 +180,13 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             {
                 Title = "test"
             };
-            var lotteryDTO = new LotteryDTO
+
+            var lotteryDto = new LotteryDto
             {
                 Title = "test"
             };
-            _mapper.Map<CreateLotteryViewModel, LotteryDTO>(lotteryViewModel)
-                .Returns(lotteryDTO);
+
+            _mapper.Map<CreateLotteryViewModel, LotteryDto>(lotteryViewModel).Returns(lotteryDto);
 
             // Act
             var response = await _lotteryController.CreateLottery(lotteryViewModel);
@@ -191,7 +194,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             // Assert
             Assert.IsNotNull(response);
             Assert.IsInstanceOf<OkResult>(response);
-            await _lotteryService.Received(1).CreateLotteryAsync(lotteryDTO);
+            await _lotteryService.Received(1).CreateLotteryAsync(lotteryDto);
         }
 
         [Test]
@@ -202,20 +205,21 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             {
                 Title = "test"
             };
-            var lotteryDTO = new LotteryDTO
+
+            var lotteryDto = new LotteryDto
             {
                 Title = "test"
             };
 
-            _mapper.Map<CreateLotteryViewModel, LotteryDTO>(lotteryViewModel).Returns(lotteryDTO);
-            _lotteryService.CreateLotteryAsync(lotteryDTO).Throws(new LotteryException("Exception"));
+            _mapper.Map<CreateLotteryViewModel, LotteryDto>(lotteryViewModel).Returns(lotteryDto);
+            _lotteryService.CreateLotteryAsync(lotteryDto).Throws(new LotteryException("Exception"));
 
             // Act
             var response = await _lotteryController.CreateLottery(lotteryViewModel);
 
             // Assert
             Assert.IsInstanceOf<BadRequestErrorMessageResult>(response);
-            await _lotteryService.Received(1).CreateLotteryAsync(lotteryDTO);
+            await _lotteryService.Received(1).CreateLotteryAsync(lotteryDto);
         }
 
         [Test]
@@ -227,13 +231,14 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 LotteryId = 1,
                 Tickets = 5
             };
-            var ticketDTO = new BuyLotteryTicketDTO
+
+            var ticketDto = new BuyLotteryTicketDto
             {
                 LotteryId = 1,
                 Tickets = 5
             };
-            _mapper.Map<BuyLotteryTicketViewModel, BuyLotteryTicketDTO>(ticketViewModel)
-                .Returns(ticketDTO);
+
+            _mapper.Map<BuyLotteryTicketViewModel, BuyLotteryTicketDto>(ticketViewModel).Returns(ticketDto);
 
             // Act
             var response = await _lotteryController.BuyLotteryTicket(ticketViewModel);
@@ -241,7 +246,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             // Assert
             Assert.IsNotNull(response);
             Assert.IsInstanceOf<OkResult>(response);
-            await _lotteryService.Received(1).BuyLotteryTicketAsync(ticketDTO, UserAndOrganizationArg);
+            await _lotteryService.Received(1).BuyLotteryTicketAsync(ticketDto, UserAndOrganizationArg);
         }
 
         [Test]
@@ -253,15 +258,16 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 LotteryId = 1,
                 Tickets = 5
             };
-            var ticketDTOModel = new BuyLotteryTicketDTO
+
+            var ticketDto = new BuyLotteryTicketDto
             {
                 LotteryId = 1,
                 Tickets = 5
             };
-            _mapper.Map<BuyLotteryTicketViewModel, BuyLotteryTicketDTO>(ticketViewModel)
-                .Returns(ticketDTOModel);
 
-            _lotteryService.BuyLotteryTicketAsync(ticketDTOModel, UserAndOrganizationArg).Throws(new LotteryException("Exception"));
+            _mapper.Map<BuyLotteryTicketViewModel, BuyLotteryTicketDto>(ticketViewModel).Returns(ticketDto);
+
+            _lotteryService.BuyLotteryTicketAsync(ticketDto, UserAndOrganizationArg).Throws(new LotteryException("Exception"));
 
             // Act
             var response = await _lotteryController.BuyLotteryTicket(ticketViewModel);
@@ -269,7 +275,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             // Assert
             Assert.IsNotNull(response);
             Assert.IsInstanceOf<BadRequestErrorMessageResult>(response);
-            await _lotteryService.Received(1).BuyLotteryTicketAsync(ticketDTOModel, UserAndOrganizationArg);
+            await _lotteryService.Received(1).BuyLotteryTicketAsync(ticketDto, UserAndOrganizationArg);
         }
 
         [Test]
@@ -284,7 +290,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 UserOrg = _userAndOrganization
             };
 
-            var pagedListAsync = await LotteryDetailsDTO.ToPagedListAsync(args.PageNumber, args.PageSize);
+            var pagedListAsync = await LotteryDetailsDto.ToPagedListAsync(args.PageNumber, args.PageSize);
             _lotteryService.GetPagedLotteriesAsync(args).Returns(pagedListAsync);
 
             // Act
@@ -292,7 +298,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Assert
             Assert.IsNotNull(response);
-            Assert.IsInstanceOf<OkNegotiatedContentResult<PagedViewModel<LotteryDetailsDTO>>>(response);
+            Assert.IsInstanceOf<OkNegotiatedContentResult<PagedViewModel<LotteryDetailsDto>>>(response);
             await _lotteryService.Received(1).GetPagedLotteriesAsync(Arg.Any<GetPagedLotteriesArgs>());
         }
 
@@ -349,12 +355,12 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 Title = "Hello"
             };
 
-            var lotteryDto = new LotteryDTO
+            var lotteryDto = new LotteryDto
             {
                 Id = 31,
                 Title = "Hello"
             };
-            _mapper.Map<EditDraftedLotteryViewModel, LotteryDTO>(lotteryViewModel)
+            _mapper.Map<EditDraftedLotteryViewModel, LotteryDto>(lotteryViewModel)
                 .Returns(lotteryDto);
 
             // Act
@@ -376,12 +382,12 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 Title = "Hello"
             };
 
-            var lotteryDto = new LotteryDTO
+            var lotteryDto = new LotteryDto
             {
                 Id = 31,
                 Title = "Hello"
             };
-            _mapper.Map<EditDraftedLotteryViewModel, LotteryDTO>(lotteryViewModel)
+            _mapper.Map<EditDraftedLotteryViewModel, LotteryDto>(lotteryViewModel)
                 .Returns(lotteryDto);
 
             _lotteryService.When(x => x.EditDraftedLotteryAsync(lotteryDto))
@@ -405,11 +411,11 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 Id = 31
             };
 
-            var lotteryDto = new EditStartedLotteryDTO
+            var lotteryDto = new EditStartedLotteryDto
             {
                 Id = 31
             };
-            _mapper.Map<EditStartedLotteryViewModel, EditStartedLotteryDTO>(lotteryViewModel)
+            _mapper.Map<EditStartedLotteryViewModel, EditStartedLotteryDto>(lotteryViewModel)
                 .Returns(lotteryDto);
 
             // Act
@@ -430,11 +436,11 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 Id = 31
             };
 
-            var lotteryDto = new EditStartedLotteryDTO
+            var lotteryDto = new EditStartedLotteryDto
             {
                 Id = 31
             };
-            _mapper.Map<EditStartedLotteryViewModel, EditStartedLotteryDTO>(lotteryViewModel)
+            _mapper.Map<EditStartedLotteryViewModel, EditStartedLotteryDto>(lotteryViewModel)
                 .Returns(lotteryDto);
             _lotteryService.When(x => x.EditStartedLotteryAsync(lotteryDto))
                 .Do(_ => throw new LotteryException("Exception"));
@@ -452,7 +458,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
         public async Task LotteryStats_Should_Return_Ok()
         {
             // Arrange
-            var lotteryStats = new LotteryStatsDTO
+            var lotteryStats = new LotteryStatsDto
             {
                 KudosSpent = 60,
                 TicketsSold = 30,
@@ -466,7 +472,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Assert
             Assert.IsNotNull(response);
-            Assert.IsInstanceOf<OkNegotiatedContentResult<LotteryStatsDTO>>(response);
+            Assert.IsInstanceOf<OkNegotiatedContentResult<LotteryStatsDto>>(response);
             await _lotteryService.Received(1).GetLotteryStatsAsync(13, UserAndOrganizationArg);
         }
 
@@ -474,7 +480,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
         public async Task LotteryStats_Should_Return_Unprocessable_Entity_Error()
         {
             // Arrange
-            _lotteryService.GetLotteryStatsAsync(13, UserAndOrganizationArg).Returns((LotteryStatsDTO)null);
+            _lotteryService.GetLotteryStatsAsync(13, UserAndOrganizationArg).Returns((LotteryStatsDto)null);
 
             // Act
             var response = await _lotteryController.LotteryStats(13);
@@ -485,16 +491,16 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             await _lotteryService.Received(1).GetLotteryStatsAsync(13, UserAndOrganizationArg);
         }
 
-        private IEnumerable<LotteryDetailsDTO> LotteryDetailsDTO => new List<LotteryDetailsDTO>
+        private IEnumerable<LotteryDetailsDto> LotteryDetailsDto => new List<LotteryDetailsDto>
         {
-            new LotteryDetailsDTO { Id = 1, Status = 2, EndDate = DateTime.Now.AddDays(2), Title = "Monitor", EntryFee = -5 },
-            new LotteryDetailsDTO { Id = 2, Status = 2, EndDate = DateTime.Now.AddDays(-5), Title = "Computer", EntryFee = 2 },
-            new LotteryDetailsDTO { Id = 3, Status = 3, EndDate = DateTime.Now.AddDays(4), Title = "Table", EntryFee = 2 },
-            new LotteryDetailsDTO { Id = 4, Status = 2, EndDate = DateTime.Now.AddDays(5), Title = "1000 kudos", EntryFee = 5 },
-            new LotteryDetailsDTO { Id = 5, Status = 3, EndDate = DateTime.Now.AddDays(5), Title = "100 kudos", EntryFee = 5 },
-            new LotteryDetailsDTO { Id = 6, Status = 4, EndDate = DateTime.Now.AddDays(5), Title = "10 kudos", EntryFee = 5 },
-            new LotteryDetailsDTO { Id = 7, Status = 1, EndDate = DateTime.Now.AddDays(5), Title = "10000 kudos", EntryFee = 5 },
-            new LotteryDetailsDTO { Id = 8, Status = 1, EndDate = DateTime.Now.AddDays(5), Title = "10 000 kudos", EntryFee = 5 }
+            new LotteryDetailsDto { Id = 1, Status = 2, EndDate = DateTime.Now.AddDays(2), Title = "Monitor", EntryFee = -5 },
+            new LotteryDetailsDto { Id = 2, Status = 2, EndDate = DateTime.Now.AddDays(-5), Title = "Computer", EntryFee = 2 },
+            new LotteryDetailsDto { Id = 3, Status = 3, EndDate = DateTime.Now.AddDays(4), Title = "Table", EntryFee = 2 },
+            new LotteryDetailsDto { Id = 4, Status = 2, EndDate = DateTime.Now.AddDays(5), Title = "1000 kudos", EntryFee = 5 },
+            new LotteryDetailsDto { Id = 5, Status = 3, EndDate = DateTime.Now.AddDays(5), Title = "100 kudos", EntryFee = 5 },
+            new LotteryDetailsDto { Id = 6, Status = 4, EndDate = DateTime.Now.AddDays(5), Title = "10 kudos", EntryFee = 5 },
+            new LotteryDetailsDto { Id = 7, Status = 1, EndDate = DateTime.Now.AddDays(5), Title = "10000 kudos", EntryFee = 5 },
+            new LotteryDetailsDto { Id = 8, Status = 1, EndDate = DateTime.Now.AddDays(5), Title = "10 000 kudos", EntryFee = 5 }
         };
 
         private IEnumerable<LotteryDetailsViewModel> LotteryDetailsViewModel => new List<LotteryDetailsViewModel>
@@ -509,13 +515,13 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             new LotteryDetailsViewModel { Id = 8, Status = 1, EndDate = DateTime.Now.AddDays(5), Title = "10 000 kudos", EntryFee = 5 }
         };
 
-        private readonly UserAndOrganizationDTO _userAndOrganization = new UserAndOrganizationDTO
+        private readonly UserAndOrganizationDto _userAndOrganization = new UserAndOrganizationDto
         {
             OrganizationId = 1,
             UserId = "1"
         };
 
-        private UserAndOrganizationDTO UserAndOrganizationArg =>
-            Arg.Is<UserAndOrganizationDTO>(o => o.UserId == _userAndOrganization.UserId && o.OrganizationId == _userAndOrganization.OrganizationId);
+        private UserAndOrganizationDto UserAndOrganizationArg =>
+            Arg.Is<UserAndOrganizationDto>(o => o.UserId == _userAndOrganization.UserId && o.OrganizationId == _userAndOrganization.OrganizationId);
     }
 }

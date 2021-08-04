@@ -19,7 +19,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
         }
 
-        public async Task<VacationDTO[]> GetVacationHistoryAsync(string userId)
+        public async Task<VacationDto[]> GetVacationHistoryAsync(string userId)
         {
             var user = await _usersDbSet.SingleAsync(u => u.Id == userId);
 
@@ -27,9 +27,9 @@ namespace Shrooms.Premium.Domain.Services.Vacations
             return vacationsInfo.Select(MapVacationInfoToDto).ToArray();
         }
 
-        private static VacationDTO MapVacationInfoToDto(VacationInfo vacationInfo)
+        private static VacationDto MapVacationInfoToDto(VacationInfo vacationInfo)
         {
-            return new VacationDTO
+            return new VacationDto
             {
                 DateFrom = vacationInfo.DateFrom,
                 DateTo = vacationInfo.DateTo

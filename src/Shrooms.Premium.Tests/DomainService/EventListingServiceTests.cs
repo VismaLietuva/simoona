@@ -43,7 +43,7 @@ namespace Shrooms.Premium.Tests.DomainService
         public async Task Should_Return_My_Events_As_A_Participant()
         {
             var eventGuids = MockEventsListTest();
-            var myEventsOptions = new MyEventsOptionsDTO
+            var myEventsOptions = new MyEventsOptionsDto
             {
                 OrganizationId = 2,
                 UserId = "testUser1",
@@ -62,7 +62,7 @@ namespace Shrooms.Premium.Tests.DomainService
         public async Task Should_Return_My_Events_As_A_Master()
         {
             var eventGuids = MockEventsListTest();
-            var myEventsOptions = new MyEventsOptionsDTO
+            var myEventsOptions = new MyEventsOptionsDto
             {
                 OrganizationId = 2,
                 UserId = "responsibleUserId2",
@@ -80,7 +80,7 @@ namespace Shrooms.Premium.Tests.DomainService
         public async Task Should_Return_Options_By_Event_Id()
         {
             var eventsGuids = MockEventOptionsWithEvents();
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2
             };

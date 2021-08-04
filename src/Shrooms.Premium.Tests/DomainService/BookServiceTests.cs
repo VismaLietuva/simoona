@@ -83,7 +83,7 @@ namespace Shrooms.Premium.Tests.DomainService
         public async Task Should_Return_Correctly_Mapped_Book_Info_By_Isbn()
         {
             MockBookRetrieval();
-            var expected = new RetrievedBookInfoDTO
+            var expected = new RetrievedBookInfoDto
             {
                 Author = "test",
                 Url = "test",
@@ -99,7 +99,7 @@ namespace Shrooms.Premium.Tests.DomainService
         public async Task Should_Return_Books_By_Office()
         {
             MockBooksByOffice();
-            var options = new BooksByOfficeOptionsDTO { OrganizationId = 2, OfficeId = 1, Page = 1, UserId = "testUserId" };
+            var options = new BooksByOfficeOptionsDto { OrganizationId = 2, OfficeId = 1, Page = 1, UserId = "testUserId" };
             var res = await _bookService.GetBooksByOfficeAsync(options);
             Assert.AreEqual(res.ItemCount, 2);
             Assert.AreEqual(res.Entries.First().QuantityLeft, 1);
@@ -111,7 +111,7 @@ namespace Shrooms.Premium.Tests.DomainService
         public async Task Should_Return_Correct_Books_By_Office_Search_Results()
         {
             MockBooksByOffice();
-            var options = new BooksByOfficeOptionsDTO { OrganizationId = 2, OfficeId = 1, Page = 1, UserId = "testUserId", SearchString = "search" };
+            var options = new BooksByOfficeOptionsDto { OrganizationId = 2, OfficeId = 1, Page = 1, UserId = "testUserId", SearchString = "search" };
             var res = await _bookService.GetBooksByOfficeAsync(options);
             Assert.AreEqual(res.ItemCount, 1);
             Assert.AreEqual(res.Entries.First().Title, "Test2search");
@@ -121,7 +121,7 @@ namespace Shrooms.Premium.Tests.DomainService
         public async Task Should_Return_Correct_Books_Off_All_Offices()
         {
             MockBooksByOffice();
-            var options = new BooksByOfficeOptionsDTO { OrganizationId = 2, Page = 1 };
+            var options = new BooksByOfficeOptionsDto { OrganizationId = 2, Page = 1 };
             var res = await _bookService.GetBooksByOfficeAsync(options);
 
             Assert.AreEqual(res.ItemCount, 3);
@@ -131,7 +131,7 @@ namespace Shrooms.Premium.Tests.DomainService
         public async Task Should_Return_Correctly_Mapped_Book_Details_To_User()
         {
             MockGetBookDetails();
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "testUser2"
@@ -148,7 +148,7 @@ namespace Shrooms.Premium.Tests.DomainService
         public async Task Should_Return_Correctly_Mapped_Book_Details_To_Administrator()
         {
             MockGetBookDetails();
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "testUser2"
@@ -163,7 +163,7 @@ namespace Shrooms.Premium.Tests.DomainService
         public async Task Should_Delete_Book_With_Its_Related_Entities()
         {
             MockDeleteBookEntities();
-            var userOrg = new UserAndOrganizationDTO
+            var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2
             };
@@ -201,20 +201,20 @@ namespace Shrooms.Premium.Tests.DomainService
         {
             _booksDbSet.SetDbSetDataForAsync(new List<Book>());
             _officesDbSet.SetDbSetDataForAsync(new List<Office>());
-            var newBookDto = new NewBookDTO
+            var newBookDto = new NewBookDto
             {
                 Author = "test",
                 Isbn = "123",
                 OrganizationId = 2,
                 Title = "test",
-                QuantityByOffice = new List<NewBookQuantityDTO>
+                QuantityByOffice = new List<NewBookQuantityDto>
                 {
-                    new NewBookQuantityDTO
+                    new NewBookQuantityDto
                     {
                         OfficeId = 1,
                         BookQuantity = 0
                     },
-                    new NewBookQuantityDTO
+                    new NewBookQuantityDto
                     {
                         OfficeId = 2,
                         BookQuantity = 0
@@ -241,15 +241,15 @@ namespace Shrooms.Premium.Tests.DomainService
 
             _officesDbSet.SetDbSetDataForAsync(offices);
 
-            var newBookDto = new NewBookDTO
+            var newBookDto = new NewBookDto
             {
                 Author = "test",
                 Isbn = "123",
                 OrganizationId = 2,
                 Title = "test",
-                QuantityByOffice = new List<NewBookQuantityDTO>
+                QuantityByOffice = new List<NewBookQuantityDto>
                 {
-                    new NewBookQuantityDTO
+                    new NewBookQuantityDto
                     {
                         OfficeId = 1,
                         BookQuantity = 0
@@ -269,7 +269,7 @@ namespace Shrooms.Premium.Tests.DomainService
             MockApplicationUsers();
             MockDeleteBookEntities();
 
-            var takeBook = new BookTakeDTO
+            var takeBook = new BookTakeDto
             {
                 ApplicationUserId = "testUser1",
                 BookOfficeId = 1,
@@ -287,7 +287,7 @@ namespace Shrooms.Premium.Tests.DomainService
             MockBooksByOffice();
 
             _userDbSet.SetDbSetDataForAsync(new List<ApplicationUser>());
-            var bookTake = new BookTakeDTO
+            var bookTake = new BookTakeDto
             {
                 ApplicationUserId = "testUser1",
                 BookOfficeId = 1,
@@ -305,20 +305,20 @@ namespace Shrooms.Premium.Tests.DomainService
         public async Task Should_Create_New_Book_And_Book_Office()
         {
             MockCreateNewBook();
-            var newBookDto = new NewBookDTO
+            var newBookDto = new NewBookDto
             {
                 Author = "test",
                 Isbn = "123",
                 OrganizationId = 2,
                 Title = "test",
-                QuantityByOffice = new List<NewBookQuantityDTO>
+                QuantityByOffice = new List<NewBookQuantityDto>
                 {
-                    new NewBookQuantityDTO
+                    new NewBookQuantityDto
                     {
                         OfficeId = 1,
                         BookQuantity = 0
                     },
-                    new NewBookQuantityDTO
+                    new NewBookQuantityDto
                     {
                         OfficeId = 2,
                         BookQuantity = 5
@@ -336,19 +336,19 @@ namespace Shrooms.Premium.Tests.DomainService
         public async Task Should_Edit_Book_With_Quantities_In_Offices()
         {
             MockEditBook();
-            var bookDto = new EditBookDTO
+            var bookDto = new EditBookDto
             {
                 OrganizationId = 2,
                 Author = "test1",
                 Id = 1,
-                QuantityByOffice = new List<NewBookQuantityDTO>
+                QuantityByOffice = new List<NewBookQuantityDto>
                 {
-                    new NewBookQuantityDTO
+                    new NewBookQuantityDto
                     {
                         BookQuantity = 0,
                         OfficeId = 1
                     },
-                    new NewBookQuantityDTO
+                    new NewBookQuantityDto
                     {
                         BookQuantity = 50,
                         OfficeId = 2

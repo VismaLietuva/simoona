@@ -7,8 +7,8 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 {
     public interface IParticipantService
     {
-        Task<IList<LotteryParticipantDTO>> GetParticipantsCountedAsync(int lotteryId);
+        Task<IList<LotteryParticipantDto>> GetParticipantsCountedAsync(int lotteryId);
 
-        Task<IPagedList<LotteryParticipantDTO>> GetPagedParticipantsAsync(int lotteryId, int page, int pageSize);
+        Task<IPagedList<LotteryParticipantDto>> GetPagedParticipantsAsync(int lotteryId, int page, int pageSize);
     }
 }

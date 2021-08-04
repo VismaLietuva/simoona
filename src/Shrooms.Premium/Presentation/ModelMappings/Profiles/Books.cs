@@ -19,23 +19,23 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<RetrievedBookInfoDTO, RetrievedBookForPostViewModel>();
+            CreateMap<RetrievedBookInfoDto, RetrievedBookForPostViewModel>();
 
-            CreateMap<RetrievedBookInfoDTO, RetrievedBookInfoViewModel>();
-            CreateMap<BooksByOfficeDTO, BooksByOfficeViewModel>();
-            CreateMap<BasicBookUserDTO, BasicBookUserViewModel>();
-            CreateMap<ILazyPaged<BooksByOfficeDTO>, ILazyPaged<BooksByOfficeViewModel>>();
-            CreateMap<BookDetailsDTO, BookDetailsViewModel>();
-            CreateMap<BookDetailsLogDTO, BookDetailsLogViewModel>();
-            CreateMap<BookDetailsAdministrationDTO, BookDetailsAdministrationViewModel>();
-            CreateMap<BookQuantityByOfficeDTO, BookQuantityByOfficeViewModel>();
+            CreateMap<RetrievedBookInfoDto, RetrievedBookInfoViewModel>();
+            CreateMap<BooksByOfficeDto, BooksByOfficeViewModel>();
+            CreateMap<BasicBookUserDto, BasicBookUserViewModel>();
+            CreateMap<ILazyPaged<BooksByOfficeDto>, ILazyPaged<BooksByOfficeViewModel>>();
+            CreateMap<BookDetailsDto, BookDetailsViewModel>();
+            CreateMap<BookDetailsLogDto, BookDetailsLogViewModel>();
+            CreateMap<BookDetailsAdministrationDto, BookDetailsAdministrationViewModel>();
+            CreateMap<BookQuantityByOfficeDto, BookQuantityByOfficeViewModel>();
         }
 
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<NewBookViewModel, NewBookDTO>();
-            CreateMap<NewBookQuantityViewModel, NewBookQuantityDTO>();
-            CreateMap<EditBookViewModel, EditBookDTO>();
+            CreateMap<NewBookViewModel, NewBookDto>();
+            CreateMap<NewBookQuantityViewModel, NewBookQuantityDto>();
+            CreateMap<EditBookViewModel, EditBookDto>();
         }
     }
 }

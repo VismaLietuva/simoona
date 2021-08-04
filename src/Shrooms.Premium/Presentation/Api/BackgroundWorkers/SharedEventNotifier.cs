@@ -19,7 +19,7 @@ namespace Shrooms.Premium.Presentation.Api.BackgroundWorkers
       _postNotificationService = postNotificationService;
     }
 
-    public async Task NotifyAsync(NewPostDTO postModel, NewlyCreatedPostDTO createdPost, UserAndOrganizationHubDto userHubDto)
+    public async Task NotifyAsync(NewPostDto postModel, NewlyCreatedPostDto createdPost, UserAndOrganizationHubDto userHubDto)
     {
       await _postNotificationService.NotifyAboutNewPostAsync(createdPost);
 

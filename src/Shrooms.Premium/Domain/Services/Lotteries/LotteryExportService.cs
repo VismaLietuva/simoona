@@ -15,15 +15,15 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             _excelBuilder = excelBuilder;
             _participantService = participantService;
         }
-        public async Task<byte[]> ExportParticipantsAsync(int lotteryId, UserAndOrganizationDTO userAndOrg)
+        public async Task<byte[]> ExportParticipantsAsync(int lotteryId, UserAndOrganizationDto userAndOrg)
         {
-            var participantsDTO = await _participantService.GetParticipantsCountedAsync(lotteryId);
+            var participants = await _participantService.GetParticipantsCountedAsync(lotteryId);
 
             var numberOfTicketsAdded = 0;
             var participantTickets = new List<string>();
             var tickets = new List<List<string>>();
 
-            foreach (var participant in participantsDTO)
+            foreach (var participant in participants)
             {
                 for (var i = 0; i < participant.Tickets; i++)
                 {

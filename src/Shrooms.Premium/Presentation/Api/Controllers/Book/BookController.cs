@@ -42,7 +42,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
                 return BadRequest(ModelState);
             }
 
-            var bookDto = _mapper.Map<NewBookViewModel, NewBookDTO>(book);
+            var bookDto = _mapper.Map<NewBookViewModel, NewBookDto>(book);
             SetOrganizationAndUser(bookDto);
             try
             {
@@ -87,7 +87,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
                 return BadRequest(ModelState);
             }
 
-            var bookDto = _mapper.Map<EditBookViewModel, EditBookDTO>(book);
+            var bookDto = _mapper.Map<EditBookViewModel, EditBookDto>(book);
             SetOrganizationAndUser(bookDto);
 
             try
@@ -113,7 +113,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
                 return BadRequest();
             }
 
-            var options = new BooksByOfficeOptionsDTO
+            var options = new BooksByOfficeOptionsDto
             {
                 OfficeId = officeId,
                 Page = page,
@@ -122,7 +122,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
             SetOrganizationAndUser(options);
 
             var books = await _bookService.GetBooksByOfficeAsync(options);
-            var result = _mapper.Map<ILazyPaged<BooksByOfficeDTO>, ILazyPaged<BooksByOfficeViewModel>>(books);
+            var result = _mapper.Map<ILazyPaged<BooksByOfficeDto>, ILazyPaged<BooksByOfficeViewModel>>(books);
             return Ok(result);
         }
 
@@ -137,7 +137,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
             }
 
             var bookWithLogs = await _bookService.GetBookDetailsAsync(bookOfficeId, GetUserAndOrganization());
-            var result = _mapper.Map<BookDetailsDTO, BookDetailsViewModel>(bookWithLogs);
+            var result = _mapper.Map<BookDetailsDto, BookDetailsViewModel>(bookWithLogs);
             return Ok(result);
         }
 
@@ -152,7 +152,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
             }
 
             var bookWithLogsDto = await _bookService.GetBookDetailsWithOfficesAsync(bookOfficeId, GetUserAndOrganization());
-            var result = _mapper.Map<BookDetailsAdministrationDTO, BookDetailsAdministrationViewModel>(bookWithLogsDto);
+            var result = _mapper.Map<BookDetailsAdministrationDto, BookDetailsAdministrationViewModel>(bookWithLogsDto);
             return Ok(result);
         }
 
@@ -191,7 +191,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
             var userAndOrg = GetUserAndOrganization();
             try
             {
-                var bookReportDto = _mapper.Map<BookReportViewModel, BookReportDTO>(bookReport);
+                var bookReportDto = _mapper.Map<BookReportViewModel, BookReportDto>(bookReport);
                 await _bookService.ReportBookAsync(bookReportDto, userAndOrg);
                 return Ok();
             }
@@ -213,7 +213,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
 
             try
             {
-                await _bookService.ReturnBookAsync(bookOfficeId: bookOfficeId, userAndOrg: new UserAndOrganizationDTO
+                await _bookService.ReturnBookAsync(bookOfficeId: bookOfficeId, userAndOrg: new UserAndOrganizationDto
                 {
                     OrganizationId = User.Identity.GetOrganizationId(),
                     UserId = userId
@@ -271,7 +271,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
             try
             {
                 var bookInfoDto = await _bookService.FindBookByIsbnAsync(isbn, GetUserAndOrganization().OrganizationId);
-                var result = _mapper.Map<RetrievedBookInfoDTO, RetrievedBookInfoViewModel>(bookInfoDto);
+                var result = _mapper.Map<RetrievedBookInfoDto, RetrievedBookInfoViewModel>(bookInfoDto);
                 return Ok(result);
             }
             catch (BookException e)

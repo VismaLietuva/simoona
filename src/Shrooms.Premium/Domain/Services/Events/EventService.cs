@@ -64,7 +64,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             _markdownConverter = markdownConverter;
         }
 
-        public async Task DeleteAsync(Guid id, UserAndOrganizationDTO userOrg)
+        public async Task DeleteAsync(Guid id, UserAndOrganizationDto userOrg)
         {
             var @event = await _eventsDbSet
                 .Include(e => e.EventOptions)
@@ -90,7 +90,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             await _wallService.DeleteWallAsync(@event.WallId, userOrg, WallType.Events);
         }
 
-        public async Task<EventEditDTO> GetEventForEditingAsync(Guid id, UserAndOrganizationDTO userOrg)
+        public async Task<EventEditDto> GetEventForEditingAsync(Guid id, UserAndOrganizationDto userOrg)
         {
             var @event = await _eventsDbSet
                 .Include(e => e.ResponsibleUser)
@@ -102,7 +102,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             return @event;
         }
 
-        public async Task<EventDetailsDTO> GetEventDetailsAsync(Guid id, UserAndOrganizationDTO userOrg)
+        public async Task<EventDetailsDto> GetEventDetailsAsync(Guid id, UserAndOrganizationDto userOrg)
         {
             var @event = await _eventsDbSet
                 .Include(e => e.ResponsibleUser)
@@ -174,7 +174,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             return newEventDto;
         }
 
-        public async Task UpdateEventAsync(EditEventDTO eventDto)
+        public async Task UpdateEventAsync(EditEventDto eventDto)
         {
             var eventToUpdate = await _eventsDbSet
                 .Include(e => e.EventOptions)
@@ -241,15 +241,15 @@ namespace Shrooms.Premium.Domain.Services.Events
             return newEventDto.RegistrationDeadlineDate ?? newEventDto.StartDate;
         }
 
-        private static Expression<Func<Event, EventEditDTO>> MapToEventEditDto()
+        private static Expression<Func<Event, EventEditDto>> MapToEventEditDto()
         {
-            return e => new EventEditDTO
+            return e => new EventEditDto
             {
                 Id = e.Id,
                 Description = e.Description,
                 ImageName = e.ImageName,
                 Location = e.Place,
-                Offices = new EventOfficesDTO { Value = e.Offices },
+                Offices = new EventOfficesDto { Value = e.Offices },
                 IsPinned = e.IsPinned,
                 Name = e.Name,
                 MaxOptions = e.MaxChoices,
@@ -264,7 +264,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                 // Do not use string interpolation here (EF won't be able to project it to SQL)
                 HostUserFullName = e.ResponsibleUser.FirstName + " " + e.ResponsibleUser.LastName,
                 TypeId = e.EventTypeId,
-                Options = e.EventOptions.Select(o => new EventOptionDTO
+                Options = e.EventOptions.Select(o => new EventOptionDto
                 {
                     Id = o.Id,
                     Option = o.Option,
@@ -273,7 +273,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             };
         }
 
-        private async Task UpdateWallAsync(Event currentEvent, EditEventDTO updatedEvent)
+        private async Task UpdateWallAsync(Event currentEvent, EditEventDto updatedEvent)
         {
             var updateWallDto = new UpdateWallDto
             {
@@ -323,7 +323,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             _eventValidationService.CheckIfTypeDoesNotExist(eventTypeExists);
         }
 
-        private void UpdateEventOptions(EditEventDTO editedEvent, Event @event)
+        private void UpdateEventOptions(EditEventDto editedEvent, Event @event)
         {
             foreach (var editedOption in editedEvent.EditedOptions)
             {
@@ -439,15 +439,15 @@ namespace Shrooms.Premium.Domain.Services.Events
             newEvent.AllowNotGoing = newEventDto.AllowNotGoing;
         }
 
-        private static Expression<Func<Event, EventDetailsDTO>> MapToEventDetailsDto(Guid eventId)
+        private static Expression<Func<Event, EventDetailsDto>> MapToEventDetailsDto(Guid eventId)
         {
-            return e => new EventDetailsDTO
+            return e => new EventDetailsDto
             {
                 Id = e.Id,
                 Description = e.Description,
                 ImageName = e.ImageName,
                 Name = e.Name,
-                Offices = new EventOfficesDTO { Value = e.Offices },
+                Offices = new EventOfficesDto { Value = e.Offices },
                 IsPinned = e.IsPinned,
                 Location = e.Place,
                 RegistrationDeadlineDate = e.RegistrationDeadline,
@@ -460,13 +460,13 @@ namespace Shrooms.Premium.Domain.Services.Events
                 HostUserId = e.ResponsibleUserId,
                 WallId = e.WallId,
                 HostUserFullName = e.ResponsibleUser.FirstName + " " + e.ResponsibleUser.LastName,
-                Options = e.EventOptions.Select(o => new EventDetailsOptionDTO
+                Options = e.EventOptions.Select(o => new EventDetailsOptionDto
                 {
                     Id = o.Id,
                     Name = o.Option,
                     Participants = o.EventParticipants
                         .Where(x => x.EventId == eventId && x.AttendStatus == (int)AttendingStatus.Attending)
-                        .Select(p => new EventDetailsParticipantDTO
+                        .Select(p => new EventDetailsParticipantDto
                         {
                             Id = p.Id,
                             UserId = p.ApplicationUser == null ? string.Empty : p.ApplicationUserId,
@@ -476,7 +476,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                             AttendComment = p.AttendComment
                         })
                 }),
-                Participants = e.EventParticipants.Select(p => new EventDetailsParticipantDTO
+                Participants = e.EventParticipants.Select(p => new EventDetailsParticipantDto
                 {
                     Id = p.Id,
                     UserId = p.ApplicationUser == null ? string.Empty : p.ApplicationUserId,

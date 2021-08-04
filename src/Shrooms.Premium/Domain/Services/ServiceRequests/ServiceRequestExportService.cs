@@ -23,7 +23,7 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
             _excelBuilder = excelBuilder;
         }
 
-        public async Task<byte[]> ExportToExcelAsync(UserAndOrganizationDTO userAndOrg, Expression<Func<ServiceRequest, bool>> filter)
+        public async Task<byte[]> ExportToExcelAsync(UserAndOrganizationDto userAndOrg, Expression<Func<ServiceRequest, bool>> filter)
         {
             var query = _serviceRequestsDbSet
                 .Include(x => x.Status)

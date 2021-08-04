@@ -67,7 +67,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             try
             {
                 var vacationDtos = await _vacationHistoryService.GetVacationHistoryAsync(User.Identity.GetUserId());
-                var vacationModels = _mapper.Map<VacationDTO[], VacationViewModel[]>(vacationDtos);
+                var vacationModels = _mapper.Map<VacationDto[], VacationViewModel[]>(vacationDtos);
                 return Ok(vacationModels);
             }
             catch (ValidationException e)

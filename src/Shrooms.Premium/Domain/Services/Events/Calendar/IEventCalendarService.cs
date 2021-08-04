@@ -7,7 +7,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Calendar
 {
     public interface IEventCalendarService
     {
-        Task SendInvitationAsync(EventJoinValidationDTO @event, IEnumerable<string> userIds, int orgId);
+        Task SendInvitationAsync(EventJoinValidationDto @event, IEnumerable<string> userIds, int orgId);
 
         Task<byte[]> DownloadEventAsync(Guid eventId, int orgId);
     }

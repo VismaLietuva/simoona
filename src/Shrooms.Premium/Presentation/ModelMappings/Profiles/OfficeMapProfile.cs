@@ -15,12 +15,12 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 
         private void CreateOfficeMapMappings()
         {
-            CreateMap<ApplicationUser, OfficeUserDTO>()
+            CreateMap<ApplicationUser, OfficeUserDto>()
                 .ForMember(dest => dest.JobTitle, opt => opt.MapFrom(u => u.JobPosition.Title));
 
-            CreateMap<Room, OfficeRoomDTO>();
+            CreateMap<Room, OfficeRoomDto>();
 
-            CreateMap<Office, OfficeDTO>();
+            CreateMap<Office, OfficeDto>();
         }
 
         private void CreateMapViewModelMappings()

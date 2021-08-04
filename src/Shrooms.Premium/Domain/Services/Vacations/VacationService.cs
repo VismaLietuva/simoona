@@ -42,17 +42,17 @@ namespace Shrooms.Premium.Domain.Services.Vacations
             _vacationDomainService = vacationDomainService;
         }
 
-        public async Task<VacationImportStatusDTO> UploadVacationReportFileAsync(Stream fileStream)
+        public async Task<VacationImportStatusDto> UploadVacationReportFileAsync(Stream fileStream)
         {
             var excelReader = ExcelReaderFactory.CreateBinaryReader(fileStream);
 
             var sheets = GetWorksheetNames(excelReader);
             var workSheet = GetWorksheetData(excelReader, sheets.First());
 
-            var importStatus = new VacationImportStatusDTO
+            var importStatus = new VacationImportStatusDto
             {
-                Imported = new List<VacationImportEntryDTO>(),
-                Skipped = new List<VacationImportEntryDTO>()
+                Imported = new List<VacationImportEntryDto>(),
+                Skipped = new List<VacationImportEntryDto>()
             };
 
             foreach (var row in workSheet)
@@ -85,7 +85,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                     userToUpdate.VacationUnusedTime = unusedTime;
                     userToUpdate.VacationLastTimeUpdated = DateTime.UtcNow;
 
-                    importStatus.Imported.Add(new VacationImportEntryDTO { Code = code, FullName = fullName });
+                    importStatus.Imported.Add(new VacationImportEntryDto { Code = code, FullName = fullName });
                 }
                 else
                 {
@@ -101,7 +101,7 @@ namespace Shrooms.Premium.Domain.Services.Vacations
                     exceptionTelemetry.Properties.Add("Entry last name, first name", fullName);
                     _telemetryClient.TrackException(exceptionTelemetry);
 
-                    importStatus.Skipped.Add(new VacationImportEntryDTO { Code = code, FullName = fullName });
+                    importStatus.Skipped.Add(new VacationImportEntryDto { Code = code, FullName = fullName });
                 }
             }
 
@@ -111,12 +111,12 @@ namespace Shrooms.Premium.Domain.Services.Vacations
             return importStatus;
         }
 
-        public async Task<VacationAvailableDaysDTO> GetAvailableDaysAsync(UserAndOrganizationDTO userOrgDto)
+        public async Task<VacationAvailableDaysDto> GetAvailableDaysAsync(UserAndOrganizationDto userOrgDto)
         {
             var user = await _applicationUserDbSet
                 .FirstAsync(u => u.Id == userOrgDto.UserId);
 
-            var availableDaysModel = new VacationAvailableDaysDTO
+            var availableDaysModel = new VacationAvailableDaysDto
             {
                 AvailableDays = Math.Truncate(user.VacationUnusedTime ?? 0),
                 LastTimeUpdated = user.VacationLastTimeUpdated

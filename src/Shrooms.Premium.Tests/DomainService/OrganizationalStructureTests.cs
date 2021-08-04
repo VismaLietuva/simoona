@@ -39,7 +39,7 @@ namespace Shrooms.Premium.Tests.DomainService
         [Test]
         public async Task Should_Return_If_Result_Has_Incorrect_Info()
         {
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 1,
                 UserId = "0"

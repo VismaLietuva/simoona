@@ -55,7 +55,7 @@ namespace Shrooms.Premium.Tests.DomainService
         [Test]
         public async Task Should_Return_Event_Chosen_Options()
         {
-            var userAndOrg = new UserAndOrganizationDTO
+            var userAndOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2
             };

@@ -85,7 +85,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         {
             var organizationId = GetUserAndOrganization().OrganizationId;
             var types = await _eventUtilitiesService.GetEventTypesAsync(organizationId);
-            var result = _mapper.Map<IEnumerable<EventTypeDTO>, IEnumerable<EventTypeViewModel>>(types);
+            var result = _mapper.Map<IEnumerable<EventTypeDto>, IEnumerable<EventTypeViewModel>>(types);
             return Ok(result);
         }
 
@@ -94,7 +94,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         public async Task<IHttpActionResult> GetOffices()
         {
             var offices = await _officeMapService.GetOfficesAsync();
-            var result = _mapper.Map<IEnumerable<OfficeDTO>, IEnumerable<EventOfficeViewModel>>(offices);
+            var result = _mapper.Map<IEnumerable<OfficeDto>, IEnumerable<EventOfficeViewModel>>(offices);
             return Ok(result);
         }
 
@@ -130,7 +130,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             try
             {
                 var eventsListDto = await _eventListingService.GetEventsFilteredAsync(args, userOrganization);
-                var result = _mapper.Map<IEnumerable<EventListItemDTO>, IEnumerable<EventListItemViewModel>>(eventsListDto);
+                var result = _mapper.Map<IEnumerable<EventListItemDto>, IEnumerable<EventListItemViewModel>>(eventsListDto);
 
                 return Ok(result);
             }
@@ -150,18 +150,18 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            var createEventDTO = _mapper.Map<CreateEventDto>(eventViewModel);
+            var createEventDto = _mapper.Map<CreateEventDto>(eventViewModel);
             var offices = eventViewModel.Offices.Select(p => p.ToString()).ToList();
 
-            createEventDTO.Offices = new EventOfficesDTO { Value = JsonConvert.SerializeObject(offices) };
-            SetOrganizationAndUser(createEventDTO);
+            createEventDto.Offices = new EventOfficesDto { Value = JsonConvert.SerializeObject(offices) };
+            SetOrganizationAndUser(createEventDto);
 
             CreateEventDto createdEvent;
 
             var userHubDto = GetUserAndOrganizationHub();
             try
             {
-                createdEvent = await _eventService.CreateEventAsync(createEventDTO);
+                createdEvent = await _eventService.CreateEventAsync(createEventDto);
 
                 _asyncRunner.Run<NewEventNotifier>(async notifier => { await notifier.Notify(createdEvent, userHubDto); }, GetOrganizationName());
             }
@@ -183,13 +183,13 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            var eventDTO = _mapper.Map<UpdateEventViewModel, EditEventDTO>(eventViewModel);
-            eventDTO.Offices = new EventOfficesDTO { Value = JsonConvert.SerializeObject(eventViewModel.Offices.Select(p => p.ToString()).ToList()) };
-            SetOrganizationAndUser(eventDTO);
+            var eventDto = _mapper.Map<UpdateEventViewModel, EditEventDto>(eventViewModel);
+            eventDto.Offices = new EventOfficesDto { Value = JsonConvert.SerializeObject(eventViewModel.Offices.Select(p => p.ToString()).ToList()) };
+            SetOrganizationAndUser(eventDto);
 
             try
             {
-                await _eventService.UpdateEventAsync(eventDTO);
+                await _eventService.UpdateEventAsync(eventDto);
             }
             catch (EventException e)
             {
@@ -211,10 +211,10 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                 officeIdNullable = officeIdParsed;
             }
 
-            var optionsDto = _mapper.Map<MyEventsOptionsViewModel, MyEventsOptionsDTO>(options);
+            var optionsDto = _mapper.Map<MyEventsOptionsViewModel, MyEventsOptionsDto>(options);
             SetOrganizationAndUser(optionsDto);
             var myEventsListDto = await _eventListingService.GetMyEventsAsync(optionsDto, page, officeIdNullable);
-            var result = _mapper.Map<IEnumerable<EventListItemDTO>, IEnumerable<EventListItemViewModel>>(myEventsListDto);
+            var result = _mapper.Map<IEnumerable<EventListItemDto>, IEnumerable<EventListItemViewModel>>(myEventsListDto);
             return Ok(result);
         }
 
@@ -226,7 +226,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             try
             {
                 var eventOptionsDto = await _eventListingService.GetEventOptionsAsync(eventId, GetUserAndOrganization());
-                var result = _mapper.Map<EventOptionsDTO, EventOptionsViewModel>(eventOptionsDto);
+                var result = _mapper.Map<EventOptionsDto, EventOptionsViewModel>(eventOptionsDto);
                 return Ok(result);
             }
             catch (EventException e)
@@ -273,12 +273,12 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
         public async Task<IHttpActionResult> AddColleague(EventJoinMultipleViewModel eventJoinModel)
         {
-            var eventJoinDTO = _mapper.Map<EventJoinMultipleViewModel, EventJoinDTO>(eventJoinModel);
-            SetOrganizationAndUser(eventJoinDTO);
+            var eventJoinDto = _mapper.Map<EventJoinMultipleViewModel, EventJoinDto>(eventJoinModel);
+            SetOrganizationAndUser(eventJoinDto);
 
             try
             {
-                await _eventParticipationService.AddColleagueAsync(eventJoinDTO);
+                await _eventParticipationService.AddColleagueAsync(eventJoinDto);
                 return Ok();
             }
             catch (EventException e)
@@ -297,7 +297,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            var optionsDto = _mapper.Map<EventJoinViewModel, EventJoinDTO>(joinOptions);
+            var optionsDto = _mapper.Map<EventJoinViewModel, EventJoinDto>(joinOptions);
             SetOrganizationAndUser(optionsDto);
             optionsDto.ParticipantIds = new List<string> { optionsDto.UserId };
 
@@ -322,11 +322,12 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            var updateAttendStatusDTO = _mapper.Map<UpdateAttendStatusViewModel, UpdateAttendStatusDTO>(updateStatusViewModel);
-            SetOrganizationAndUser(updateAttendStatusDTO);
+            var updateAttendStatusDto = _mapper.Map<UpdateAttendStatusViewModel, UpdateAttendStatusDto>(updateStatusViewModel);
+            SetOrganizationAndUser(updateAttendStatusDto);
+
             try
             {
-                await _eventParticipationService.UpdateAttendStatusAsync(updateAttendStatusDTO);
+                await _eventParticipationService.UpdateAttendStatusAsync(updateAttendStatusDto);
                 return Ok();
             }
             catch (EventException e)
@@ -343,7 +344,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             try
             {
                 var eventDto = await _eventService.GetEventDetailsAsync(eventId, GetUserAndOrganization());
-                var result = _mapper.Map<EventDetailsDTO, EventDetailsViewModel>(eventDto);
+                var result = _mapper.Map<EventDetailsDto, EventDetailsViewModel>(eventDto);
 
                 var officesCount = await _officeMapService.GetOfficesCountAsync();
                 result.IsForAllOffices = result.OfficesName.Count() == officesCount;
@@ -364,7 +365,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             try
             {
                 var eventDto = await _eventService.GetEventForEditingAsync(eventId, GetUserAndOrganization());
-                var result = _mapper.Map<EventEditDTO, EventEditViewModel>(eventDto);
+                var result = _mapper.Map<EventEditDto, EventEditViewModel>(eventDto);
                 return Ok(result);
             }
             catch (EventException e)
@@ -435,7 +436,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         public async Task<IHttpActionResult> SearchUser(string s, Guid eventId)
         {
             var searchResultDto = await _eventParticipationService.SearchForEventJoinAutocompleteAsync(eventId, s, GetUserAndOrganization());
-            var searchResult = _mapper.Map<IEnumerable<EventUserSearchResultDTO>, IEnumerable<EventUserSearchResultViewModel>>(searchResultDto);
+            var searchResult = _mapper.Map<IEnumerable<EventUserSearchResultDto>, IEnumerable<EventUserSearchResultViewModel>>(searchResultDto);
             return Ok(searchResult);
         }
 
@@ -501,7 +502,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                 return BadRequest(e.Message);
             }
 
-            var postModel = _mapper.Map<ShareEventViewModel, NewPostDTO>(shareEventViewModel);
+            var postModel = _mapper.Map<ShareEventViewModel, NewPostDto>(shareEventViewModel);
             SetOrganizationAndUser(postModel);
             var userHubDto = GetUserAndOrganizationHub();
 
@@ -530,7 +531,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            var changeOptionsDto = _mapper.Map<EventChangeOptionViewModel, EventChangeOptionsDTO>(viewModel);
+            var changeOptionsDto = _mapper.Map<EventChangeOptionViewModel, EventChangeOptionsDto>(viewModel);
             SetOrganizationAndUser(changeOptionsDto);
 
             try

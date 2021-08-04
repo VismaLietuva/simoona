@@ -11,46 +11,46 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
         {
             CreateViewModelToDtoMappings();
             CreateDtoMappings();
-            CreateLotteryToLotteryDetailDTOMappings();
+            CreateLotteryToLotteryDetailDtoMappings();
         }
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<LotteryDTO, CreateLotteryViewModel>();
-            CreateMap<CreateLotteryViewModel, LotteryDTO>();
+            CreateMap<LotteryDto, CreateLotteryViewModel>();
+            CreateMap<CreateLotteryViewModel, LotteryDto>();
 
-            CreateMap<LotteryDetailsDTO, LotteryDetailsViewModel>();
-            CreateMap<LotteryDetailsViewModel, LotteryDetailsDTO>();
+            CreateMap<LotteryDetailsDto, LotteryDetailsViewModel>();
+            CreateMap<LotteryDetailsViewModel, LotteryDetailsDto>();
 
-            CreateMap<EditDraftedLotteryViewModel, LotteryDTO>();
-            CreateMap<LotteryDTO, EditDraftedLotteryViewModel>();
+            CreateMap<EditDraftedLotteryViewModel, LotteryDto>();
+            CreateMap<LotteryDto, EditDraftedLotteryViewModel>();
 
-            CreateMap<EditStartedLotteryViewModel, EditStartedLotteryDTO>();
-            CreateMap<EditStartedLotteryDTO, EditStartedLotteryViewModel>();
+            CreateMap<EditStartedLotteryViewModel, EditStartedLotteryDto>();
+            CreateMap<EditStartedLotteryDto, EditStartedLotteryViewModel>();
 
-            CreateMap<BuyLotteryTicketViewModel, BuyLotteryTicketDTO>();
-            CreateMap<BuyLotteryTicketDTO, BuyLotteryTicketViewModel>();
+            CreateMap<BuyLotteryTicketViewModel, BuyLotteryTicketDto>();
+            CreateMap<BuyLotteryTicketDto, BuyLotteryTicketViewModel>();
 
-            CreateMap<LotteryParticipantViewModel, LotteryParticipantDTO>();
-            CreateMap<LotteryParticipantDTO, LotteryParticipantViewModel>();
-            CreateMap<LotteryWidgetViewModel, LotteryDetailsDTO>();
-            CreateMap<LotteryDetailsDTO, LotteryWidgetViewModel>();
+            CreateMap<LotteryParticipantViewModel, LotteryParticipantDto>();
+            CreateMap<LotteryParticipantDto, LotteryParticipantViewModel>();
+            CreateMap<LotteryWidgetViewModel, LotteryDetailsDto>();
+            CreateMap<LotteryDetailsDto, LotteryWidgetViewModel>();
         }
 
         private void CreateDtoMappings()
         {
-            CreateMap<LotteryDTO, Lottery>()
+            CreateMap<LotteryDto, Lottery>()
                 .Ignore(x => x.Id);
-            CreateMap<Lottery, LotteryDTO>()
+            CreateMap<Lottery, LotteryDto>()
                 .Ignore(x => x.Id);
 
-            CreateMap<LotteryDTO, Lottery>();
-            CreateMap<Lottery, LotteryDTO>();
+            CreateMap<LotteryDto, Lottery>();
+            CreateMap<Lottery, LotteryDto>();
         }
 
-        public void CreateLotteryToLotteryDetailDTOMappings()
+        private void CreateLotteryToLotteryDetailDtoMappings()
         {
-            CreateMap<Lottery, LotteryDetailsDTO>();
-            CreateMap<LotteryDetailsDTO, Lottery>();
+            CreateMap<Lottery, LotteryDetailsDto>();
+            CreateMap<LotteryDetailsDto, Lottery>();
         }
     }
 }

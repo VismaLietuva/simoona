@@ -45,9 +45,9 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
             _asyncRunner = asyncRunner;
         }
 
-        public async Task CreateNewServiceRequestAsync(ServiceRequestDTO newServiceRequestDTO, UserAndOrganizationDTO userAndOrganizationDTO)
+        public async Task CreateNewServiceRequestAsync(ServiceRequestDto newServiceRequestDto, UserAndOrganizationDto userAndOrganizationDto)
         {
-            await ValidateServiceRequestForCreateAsync(newServiceRequestDTO);
+            await ValidateServiceRequestForCreateAsync(newServiceRequestDto);
 
             var serviceRequestStatusId = await _serviceRequestStatusDbSet
                     .Where(x => x.Title.Equals("Open"))
@@ -55,7 +55,7 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
                     .FirstAsync();
 
             var serviceRequestCategory = await _serviceRequestCategoryDbSet
-                .FirstOrDefaultAsync(x => x.Id == newServiceRequestDTO.ServiceRequestCategoryId);
+                .FirstOrDefaultAsync(x => x.Id == newServiceRequestDto.ServiceRequestCategoryId);
 
             if (serviceRequestCategory == null)
             {
@@ -66,38 +66,38 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
 
             var serviceRequest = new ServiceRequest
             {
-                Description = newServiceRequestDTO.Description,
-                Title = newServiceRequestDTO.Title,
-                CreatedBy = userAndOrganizationDTO.UserId,
-                ModifiedBy = userAndOrganizationDTO.UserId,
-                EmployeeId = userAndOrganizationDTO.UserId,
-                KudosAmmount = newServiceRequestDTO.KudosAmmount,
-                OrganizationId = userAndOrganizationDTO.OrganizationId,
+                Description = newServiceRequestDto.Description,
+                Title = newServiceRequestDto.Title,
+                CreatedBy = userAndOrganizationDto.UserId,
+                ModifiedBy = userAndOrganizationDto.UserId,
+                EmployeeId = userAndOrganizationDto.UserId,
+                KudosAmmount = newServiceRequestDto.KudosAmmount,
+                OrganizationId = userAndOrganizationDto.OrganizationId,
                 CategoryName = serviceRequestCategory.Name,
                 StatusId = serviceRequestStatusId,
-                PriorityId = newServiceRequestDTO.PriorityId,
+                PriorityId = newServiceRequestDto.PriorityId,
                 Created = timestamp,
                 Modified = timestamp,
-                PictureId = newServiceRequestDTO.PictureId
+                PictureId = newServiceRequestDto.PictureId
             };
 
-            if (newServiceRequestDTO.KudosShopItemId != null)
+            if (newServiceRequestDto.KudosShopItemId != null)
             {
-                serviceRequest.KudosShopItemId = newServiceRequestDTO.KudosShopItemId;
+                serviceRequest.KudosShopItemId = newServiceRequestDto.KudosShopItemId;
             }
 
             _serviceRequestsDbSet.Add(serviceRequest);
             await _uow.SaveChangesAsync(false);
 
-            var srqDto = new CreatedServiceRequestDTO { ServiceRequestId = serviceRequest.Id };
+            var srqDto = new CreatedServiceRequestDto { ServiceRequestId = serviceRequest.Id };
             _asyncRunner.Run<IServiceRequestNotificationService>(async notifier => await notifier.NotifyAboutNewServiceRequestAsync(srqDto), _uow.ConnectionName);
         }
 
-        public async Task MoveRequestToDoneAsync(int requestId, UserAndOrganizationDTO userAndOrganizationDTO)
+        public async Task MoveRequestToDoneAsync(int requestId, UserAndOrganizationDto userAndOrganizationDto)
         {
             var serviceRequest = await _serviceRequestsDbSet
                 .Include(x => x.Status)
-                .FirstOrDefaultAsync(x => x.Id == requestId && x.OrganizationId == userAndOrganizationDTO.OrganizationId);
+                .FirstOrDefaultAsync(x => x.Id == requestId && x.OrganizationId == userAndOrganizationDto.OrganizationId);
 
             var doneStatus = await _serviceRequestStatusDbSet.SingleAsync(s => s.Title == "Done");
 
@@ -106,8 +106,8 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Service request does not exist");
             }
 
-            var isServiceRequestAdmin = await _permissionService.UserHasPermissionAsync(userAndOrganizationDTO, AdministrationPermissions.ServiceRequest);
-            var isServiceRequestCategoryAssignee = (await GetCategoryAssigneesAsync(serviceRequest.CategoryName)).Contains(userAndOrganizationDTO.UserId);
+            var isServiceRequestAdmin = await _permissionService.UserHasPermissionAsync(userAndOrganizationDto, AdministrationPermissions.ServiceRequest);
+            var isServiceRequestCategoryAssignee = (await GetCategoryAssigneesAsync(serviceRequest.CategoryName)).Contains(userAndOrganizationDto.UserId);
 
             if ((!isServiceRequestAdmin && !isServiceRequestCategoryAssignee) || serviceRequest.StatusId == doneStatus.Id)
             {
@@ -118,15 +118,15 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
 
             await _uow.SaveChangesAsync(false);
 
-            var statusDto = new UpdatedServiceRequestDTO { ServiceRequestId = requestId, NewStatusId = serviceRequest.StatusId };
-            _asyncRunner.Run<IServiceRequestNotificationService>(async notifier => await notifier.NotifyAboutServiceRequestStatusUpdateAsync(statusDto, userAndOrganizationDTO), _uow.ConnectionName);
+            var statusDto = new UpdatedServiceRequestDto { ServiceRequestId = requestId, NewStatusId = serviceRequest.StatusId };
+            _asyncRunner.Run<IServiceRequestNotificationService>(async notifier => await notifier.NotifyAboutServiceRequestStatusUpdateAsync(statusDto, userAndOrganizationDto), _uow.ConnectionName);
         }
 
-        public async Task UpdateServiceRequestAsync(ServiceRequestDTO serviceRequestDTO, UserAndOrganizationDTO userAndOrganizationDTO)
+        public async Task UpdateServiceRequestAsync(ServiceRequestDto serviceRequestDto, UserAndOrganizationDto userAndOrganizationDto)
         {
             var serviceRequest = await _serviceRequestsDbSet
                 .Include(x => x.Status)
-                .FirstOrDefaultAsync(x => x.Id == serviceRequestDTO.Id && x.OrganizationId == userAndOrganizationDTO.OrganizationId);
+                .FirstOrDefaultAsync(x => x.Id == serviceRequestDto.Id && x.OrganizationId == userAndOrganizationDto.OrganizationId);
 
             if (serviceRequest == null)
             {
@@ -138,21 +138,21 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
                 throw new ValidationException(PremiumErrorCodes.ServiceRequestIsClosed, "Kudos request status is done");
             }
 
-            await ValidateServiceRequestForCreateAsync(serviceRequestDTO);
-            await ValidateServiceRequestForUpdateAsync(serviceRequestDTO);
+            await ValidateServiceRequestForCreateAsync(serviceRequestDto);
+            await ValidateServiceRequestForUpdateAsync(serviceRequestDto);
 
-            var serviceRequestCategory = await _serviceRequestCategoryDbSet.FirstOrDefaultAsync(x => x.Id == serviceRequestDTO.ServiceRequestCategoryId);
+            var serviceRequestCategory = await _serviceRequestCategoryDbSet.FirstOrDefaultAsync(x => x.Id == serviceRequestDto.ServiceRequestCategoryId);
 
             if (serviceRequestCategory == null)
             {
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Service request category does not exist");
             }
 
-            var isServiceRequestAdmin = await _permissionService.UserHasPermissionAsync(userAndOrganizationDTO, AdministrationPermissions.ServiceRequest);
-            var isServiceRequestCreator = serviceRequest.EmployeeId == userAndOrganizationDTO.UserId;
-            var isServiceRequestCategoryAssignee = (await GetCategoryAssigneesAsync(serviceRequest.CategoryName)).Contains(userAndOrganizationDTO.UserId);
+            var isServiceRequestAdmin = await _permissionService.UserHasPermissionAsync(userAndOrganizationDto, AdministrationPermissions.ServiceRequest);
+            var isServiceRequestCreator = serviceRequest.EmployeeId == userAndOrganizationDto.UserId;
+            var isServiceRequestCategoryAssignee = (await GetCategoryAssigneesAsync(serviceRequest.CategoryName)).Contains(userAndOrganizationDto.UserId);
 
-            var statusHasBeenChanged = serviceRequest.StatusId != serviceRequestDTO.StatusId && isServiceRequestAdmin;
+            var statusHasBeenChanged = serviceRequest.StatusId != serviceRequestDto.StatusId && isServiceRequestAdmin;
 
             if (!isServiceRequestAdmin && !isServiceRequestCreator && !isServiceRequestCategoryAssignee)
             {
@@ -161,16 +161,16 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
 
             if (isServiceRequestAdmin || isServiceRequestCategoryAssignee)
             {
-                serviceRequest.Title = serviceRequestDTO.Title;
-                serviceRequest.StatusId = serviceRequestDTO.StatusId;
+                serviceRequest.Title = serviceRequestDto.Title;
+                serviceRequest.StatusId = serviceRequestDto.StatusId;
                 serviceRequest.CategoryName = serviceRequestCategory.Name;
-                serviceRequest.KudosAmmount = serviceRequestDTO.KudosAmmount;
+                serviceRequest.KudosAmmount = serviceRequestDto.KudosAmmount;
             }
 
-            serviceRequest.PriorityId = serviceRequestDTO.PriorityId;
-            serviceRequest.Description = serviceRequestDTO.Description;
-            serviceRequest.PictureId = serviceRequestDTO.PictureId;
-            serviceRequest.UpdateMetadata(userAndOrganizationDTO.UserId);
+            serviceRequest.PriorityId = serviceRequestDto.PriorityId;
+            serviceRequest.Description = serviceRequestDto.Description;
+            serviceRequest.PictureId = serviceRequestDto.PictureId;
+            serviceRequest.UpdateMetadata(userAndOrganizationDto.UserId);
 
             await _uow.SaveChangesAsync(false);
 
@@ -179,19 +179,19 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
                 return;
             }
 
-            var statusDto = new UpdatedServiceRequestDTO
+            var statusDto = new UpdatedServiceRequestDto
             {
-                ServiceRequestId = serviceRequestDTO.Id,
+                ServiceRequestId = serviceRequestDto.Id,
                 NewStatusId = serviceRequest.StatusId
             };
 
-            _asyncRunner.Run<IServiceRequestNotificationService>(async notifier => await notifier.NotifyAboutServiceRequestStatusUpdateAsync(statusDto, userAndOrganizationDTO), _uow.ConnectionName);
+            _asyncRunner.Run<IServiceRequestNotificationService>(async notifier => await notifier.NotifyAboutServiceRequestStatusUpdateAsync(statusDto, userAndOrganizationDto), _uow.ConnectionName);
         }
 
-        public async Task CreateCommentAsync(ServiceRequestCommentDTO comment, UserAndOrganizationDTO userAndOrganizationDTO)
+        public async Task CreateCommentAsync(ServiceRequestCommentDto comment, UserAndOrganizationDto userAndOrganizationDto)
         {
             var serviceRequest = await _serviceRequestsDbSet
-                    .SingleOrDefaultAsync(x => x.Id == comment.ServiceRequestId && x.OrganizationId == userAndOrganizationDTO.OrganizationId);
+                    .SingleOrDefaultAsync(x => x.Id == comment.ServiceRequestId && x.OrganizationId == userAndOrganizationDto.OrganizationId);
 
             if (serviceRequest == null)
             {
@@ -203,11 +203,11 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
             var serviceRequestComment = new ServiceRequestComment
             {
                 Content = comment.Content,
-                EmployeeId = userAndOrganizationDTO.UserId,
-                OrganizationId = userAndOrganizationDTO.OrganizationId,
+                EmployeeId = userAndOrganizationDto.UserId,
+                OrganizationId = userAndOrganizationDto.OrganizationId,
                 ServiceRequest = serviceRequest,
-                CreatedBy = userAndOrganizationDTO.UserId,
-                ModifiedBy = userAndOrganizationDTO.UserId,
+                CreatedBy = userAndOrganizationDto.UserId,
+                ModifiedBy = userAndOrganizationDto.UserId,
                 Modified = timestamp,
                 Created = timestamp
             };
@@ -215,7 +215,7 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
             _serviceRequestCommentsDbSet.Add(serviceRequestComment);
             await _uow.SaveChangesAsync(false);
 
-            var createdComment = new ServiceRequestCreatedCommentDTO
+            var createdComment = new ServiceRequestCreatedCommentDto
             {
                 ServiceRequestId = comment.ServiceRequestId,
                 CommentedEmployeeId = serviceRequestComment.EmployeeId,
@@ -225,11 +225,11 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
             _asyncRunner.Run<IServiceRequestNotificationService>(async notifier => await notifier.NotifyAboutNewCommentAsync(createdComment), _uow.ConnectionName);
         }
 
-        public async Task<IEnumerable<ServiceRequestCategoryDTO>> GetCategoriesAsync()
+        public async Task<IEnumerable<ServiceRequestCategoryDto>> GetCategoriesAsync()
         {
             var categories = await _serviceRequestCategoryDbSet
                 .Include(x => x.Assignees)
-                .Select(x => new ServiceRequestCategoryDTO
+                .Select(x => new ServiceRequestCategoryDto
                 {
                     Id = x.Id,
                     Name = x.Name,
@@ -247,7 +247,7 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
             return categories;
         }
 
-        public async Task CreateCategoryAsync(ServiceRequestCategoryDTO category, string userId)
+        public async Task CreateCategoryAsync(ServiceRequestCategoryDto category, string userId)
         {
             await ValidateCategoryNameAsync(category.Name);
             var assignees = category.Assignees.Select(x => x.Id).ToList();
@@ -263,12 +263,12 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
             await _uow.SaveChangesAsync(userId);
         }
 
-        public async Task<ServiceRequestCategoryDTO> GetCategoryAsync(int categoryId)
+        public async Task<ServiceRequestCategoryDto> GetCategoryAsync(int categoryId)
         {
             var category = await _serviceRequestCategoryDbSet
                 .Where(x => x.Id == categoryId)
                 .Include(x => x.Assignees)
-                .Select(x => new ServiceRequestCategoryDTO
+                .Select(x => new ServiceRequestCategoryDto
                 {
                     Id = x.Id,
                     Name = x.Name,
@@ -291,7 +291,7 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
             return category;
         }
 
-        public async Task EditCategoryAsync(ServiceRequestCategoryDTO modelDto, string userId)
+        public async Task EditCategoryAsync(ServiceRequestCategoryDto modelDto, string userId)
         {
             await ValidateCategoryNameAsync(modelDto.Name, modelDto.Id);
             var category = await _serviceRequestCategoryDbSet
@@ -347,9 +347,9 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
             return assignees.Select(x => x.Id).ToList();
         }
 
-        private async Task ValidateServiceRequestForUpdateAsync(ServiceRequestDTO serviceRequestDTO)
+        private async Task ValidateServiceRequestForUpdateAsync(ServiceRequestDto serviceRequest)
         {
-            var isServiceRequestStatusIdCorrect = await _serviceRequestStatusDbSet.FirstOrDefaultAsync(x => x.Id == serviceRequestDTO.StatusId);
+            var isServiceRequestStatusIdCorrect = await _serviceRequestStatusDbSet.FirstOrDefaultAsync(x => x.Id == serviceRequest.StatusId);
 
             if (isServiceRequestStatusIdCorrect == null)
             {
@@ -357,9 +357,9 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
             }
         }
 
-        private async Task ValidateServiceRequestForCreateAsync(ServiceRequestDTO newServiceRequestDTO)
+        private async Task ValidateServiceRequestForCreateAsync(ServiceRequestDto newServiceRequest)
         {
-            var isServiceRequestPriorityIdCorrect = await _serviceRequestPriorityDbSet.AnyAsync(x => x.Id == newServiceRequestDTO.PriorityId);
+            var isServiceRequestPriorityIdCorrect = await _serviceRequestPriorityDbSet.AnyAsync(x => x.Id == newServiceRequest.PriorityId);
 
             if (!isServiceRequestPriorityIdCorrect)
             {

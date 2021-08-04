@@ -7,12 +7,12 @@ namespace Shrooms.Premium.Domain.Services.Events
 {
     public interface IEventService
     {
-        Task UpdateEventAsync(EditEventDTO eventDto);
+        Task UpdateEventAsync(EditEventDto eventDto);
         Task<CreateEventDto> CreateEventAsync(CreateEventDto newEventDto);
-        Task DeleteAsync(Guid id, UserAndOrganizationDTO userOrg);
+        Task DeleteAsync(Guid id, UserAndOrganizationDto userOrg);
         Task ToggleEventPinAsync(Guid id);
-        Task<EventDetailsDTO> GetEventDetailsAsync(Guid id, UserAndOrganizationDTO userOrg);
-        Task<EventEditDTO> GetEventForEditingAsync(Guid id, UserAndOrganizationDTO userOrg);
+        Task<EventDetailsDto> GetEventDetailsAsync(Guid id, UserAndOrganizationDto userOrg);
+        Task<EventEditDto> GetEventForEditingAsync(Guid id, UserAndOrganizationDto userOrg);
         Task CheckIfEventExistsAsync(string eventId, int organizationId);
     }
 }

@@ -37,12 +37,12 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Kudos
                 return BadRequest(ModelState);
             }
 
-            var createKudosShopItemDTO = _mapper.Map<KudosShopItemViewModel, KudosShopItemDTO>(kudosShopItemViewModel);
-            SetOrganizationAndUser(createKudosShopItemDTO);
+            var createKudosShopItem = _mapper.Map<KudosShopItemViewModel, KudosShopItemDto>(kudosShopItemViewModel);
+            SetOrganizationAndUser(createKudosShopItem);
 
             try
             {
-                await _kudosShopService.CreateItemAsync(createKudosShopItemDTO);
+                await _kudosShopService.CreateItemAsync(createKudosShopItem);
                 return Ok();
             }
             catch (ValidationException e)
@@ -64,7 +64,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Kudos
             try
             {
                 var itemDto = await _kudosShopService.GetItemAsync(id, GetUserAndOrganization());
-                var result = _mapper.Map<KudosShopItemDTO, KudosShopItemViewModel>(itemDto);
+                var result = _mapper.Map<KudosShopItemDto, KudosShopItemViewModel>(itemDto);
                 return Ok(result);
             }
             catch (ValidationException e)
@@ -80,7 +80,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Kudos
         {
             var userOrganization = GetUserAndOrganization();
             var allListDto = await _kudosShopService.GetAllItemsAsync(userOrganization);
-            var result = _mapper.Map<IEnumerable<KudosShopItemDTO>, IEnumerable<KudosShopItemViewModel>>(allListDto);
+            var result = _mapper.Map<IEnumerable<KudosShopItemDto>, IEnumerable<KudosShopItemViewModel>>(allListDto);
             return Ok(result);
         }
 
@@ -94,12 +94,12 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Kudos
                 return BadRequest(ModelState);
             }
 
-            var itemDTO = _mapper.Map<KudosShopItemViewModel, KudosShopItemDTO>(kudosShopItemViewModel);
-            SetOrganizationAndUser(itemDTO);
+            var kudosShopItem = _mapper.Map<KudosShopItemViewModel, KudosShopItemDto>(kudosShopItemViewModel);
+            SetOrganizationAndUser(kudosShopItem);
 
             try
             {
-                await _kudosShopService.UpdateItemAsync(itemDTO);
+                await _kudosShopService.UpdateItemAsync(kudosShopItem);
                 return Ok();
             }
             catch (ValidationException e)

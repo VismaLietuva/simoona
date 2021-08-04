@@ -15,13 +15,13 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<NewlyCreatedPostDTO, EventPostViewModel>();
-            CreateMap<PostDTO, EventPostViewModel>();
+            CreateMap<NewlyCreatedPostDto, EventPostViewModel>();
+            CreateMap<PostDto, EventPostViewModel>();
         }
 
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<ShareEventViewModel, NewPostDTO>()
+            CreateMap<ShareEventViewModel, NewPostDto>()
                 .ForMember(dest => dest.SharedEventId, opt => opt.MapFrom(u => u.Id));
         }
     }

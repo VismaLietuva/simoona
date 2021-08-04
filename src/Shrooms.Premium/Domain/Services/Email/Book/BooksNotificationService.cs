@@ -31,7 +31,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Book
             _organizationsDbSet = uow.GetDbSet<Organization>();
         }
 
-        public async Task SendEmailAsync(TakenBookDTO takenBook)
+        public async Task SendEmailAsync(TakenBookDto takenBook)
         {
             var organizationName = await _organizationsDbSet
                 .Where(organization => organization.Id == takenBook.OrganizationId)

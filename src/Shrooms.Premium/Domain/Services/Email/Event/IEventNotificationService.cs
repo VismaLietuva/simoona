@@ -9,6 +9,6 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
     {
         Task NotifyRemovedEventParticipantsAsync(string eventName, Guid eventId, int orgId, IEnumerable<string> users);
 
-        Task RemindUsersToJoinEventAsync(IEnumerable<EventTypeDTO> eventType, IEnumerable<string> users, int orgId);
+        Task RemindUsersToJoinEventAsync(IEnumerable<EventTypeDto> eventType, IEnumerable<string> users, int orgId);
     }
 }

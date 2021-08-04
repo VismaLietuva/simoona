@@ -26,7 +26,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
             _excelBuilder = excelBuilder;
         }
 
-        public async Task<byte[]> ExportOptionsAndParticipantsAsync(Guid eventId, UserAndOrganizationDTO userAndOrg)
+        public async Task<byte[]> ExportOptionsAndParticipantsAsync(Guid eventId, UserAndOrganizationDto userAndOrg)
         {
             var participants = (await _eventParticipationService.GetEventParticipantsAsync(eventId, userAndOrg))
                 .Select(x => new List<string> { x.FirstName, x.LastName });

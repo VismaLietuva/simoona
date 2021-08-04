@@ -7,22 +7,22 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
 {
     public interface IServiceRequestService
     {
-        Task CreateCommentAsync(ServiceRequestCommentDTO comment, UserAndOrganizationDTO userAndOrganizationDTO);
+        Task CreateCommentAsync(ServiceRequestCommentDto comment, UserAndOrganizationDto userAndOrganizationDto);
 
-        Task CreateNewServiceRequestAsync(ServiceRequestDTO newServiceRequestDTO, UserAndOrganizationDTO userAndOrganizationDTO);
+        Task CreateNewServiceRequestAsync(ServiceRequestDto newServiceRequestDto, UserAndOrganizationDto userAndOrganizationDto);
 
-        Task UpdateServiceRequestAsync(ServiceRequestDTO serviceRequestDTO, UserAndOrganizationDTO userAndOrganizationDTO);
+        Task UpdateServiceRequestAsync(ServiceRequestDto serviceRequestDto, UserAndOrganizationDto userAndOrganizationDto);
 
-        Task<IEnumerable<ServiceRequestCategoryDTO>> GetCategoriesAsync();
+        Task<IEnumerable<ServiceRequestCategoryDto>> GetCategoriesAsync();
 
-        Task CreateCategoryAsync(ServiceRequestCategoryDTO category, string userId);
+        Task CreateCategoryAsync(ServiceRequestCategoryDto category, string userId);
 
-        Task<ServiceRequestCategoryDTO> GetCategoryAsync(int categoryId);
+        Task<ServiceRequestCategoryDto> GetCategoryAsync(int categoryId);
 
-        Task EditCategoryAsync(ServiceRequestCategoryDTO modelDto, string userId);
+        Task EditCategoryAsync(ServiceRequestCategoryDto modelDto, string userId);
 
         Task DeleteCategoryAsync(int categoryId, string userId);
 
-        Task MoveRequestToDoneAsync(int requestId, UserAndOrganizationDTO userAndOrganizationDTO);
+        Task MoveRequestToDoneAsync(int requestId, UserAndOrganizationDto userAndOrganizationDto);
     }
 }

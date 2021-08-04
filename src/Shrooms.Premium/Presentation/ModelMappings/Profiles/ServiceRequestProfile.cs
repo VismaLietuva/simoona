@@ -9,24 +9,24 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
     {
         protected override void Configure()
         {
-            CreateViewModelToDTOMappings();
+            CreateViewModelToDtoMappings();
             CreateViewModelMappings();
         }
 
-        private void CreateViewModelToDTOMappings()
+        private void CreateViewModelToDtoMappings()
         {
-            CreateMap<ServiceRequestCommentPostViewModel, ServiceRequestCommentDTO>();
-            CreateMap<ServiceRequestCreateViewModel, ServiceRequestDTO>()
+            CreateMap<ServiceRequestCommentPostViewModel, ServiceRequestCommentDto>();
+            CreateMap<ServiceRequestCreateViewModel, ServiceRequestDto>()
                 .Ignore(x => x.Id)
                 .Ignore(x => x.StatusId)
                 .Ignore(x => x.CategoryName);
-            CreateMap<ServiceRequestUpdateViewModel, ServiceRequestDTO>()
+            CreateMap<ServiceRequestUpdateViewModel, ServiceRequestDto>()
                 .Ignore(x => x.CategoryName);
 
             //Service request category mappings
-            CreateMap<ServiceRequestCategoryViewModel, ServiceRequestCategoryDTO>()
+            CreateMap<ServiceRequestCategoryViewModel, ServiceRequestCategoryDto>()
                 .Ignore(x => x.IsNecessary);
-            CreateMap<ServiceRequestCategoryCreateViewModel, ServiceRequestCategoryDTO>()
+            CreateMap<ServiceRequestCategoryCreateViewModel, ServiceRequestCategoryDto>()
                 .Ignore(x => x.IsNecessary)
                 .Ignore(x => x.Id);
         }

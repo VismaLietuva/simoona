@@ -47,7 +47,6 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.LoyaltyKudos
 
             var loyaltyLog = new KudosLog
             {
-                Created = recipient.EmploymentDate.Value.AddYears(yearOfEmployment),
                 Modified = timestamp,
                 CreatedBy = LoyaltyKudosBotName,
                 Comments = CreateLoyaltyKudosComment(yearOfEmployment),
@@ -59,6 +58,11 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.LoyaltyKudos
                 Status = KudosStatus.Approved,
                 OrganizationId = organizationId
             };
+
+            if (recipient.EmploymentDate.HasValue)
+            {
+                loyaltyLog.Created = recipient.EmploymentDate.Value.AddYears(yearOfEmployment);
+            }
 
             recipient.ReceiveKudos(loyaltyLog);
             return loyaltyLog;
@@ -76,7 +80,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.LoyaltyKudos
             return yearsToAwardFor;
         }
 
-        public List<KudosLog> GetEmployeeLoyaltyKudosLog(EmployeeLoyaltyKudosDTO employeeLoyaltyKudos,
+        public List<KudosLog> GetEmployeeLoyaltyKudosLog(EmployeeLoyaltyKudosDto employeeLoyaltyKudos,
                                                          KudosType loyaltyType,
                                                          int organizationId,
                                                          int[] kudosYearlyMultipliers)
