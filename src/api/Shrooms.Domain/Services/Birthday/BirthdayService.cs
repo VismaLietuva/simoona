@@ -35,7 +35,9 @@ namespace Shrooms.Domain.Services.Birthday
 
             var userBirthdays = await GetUsersBirthdayInfoAsync(firstDayOfTheWeek, lastDayOfTheWeek);
 
-            return userBirthdays.Select(MapUserBirthdayInfoToBirthdayDto(firstDayOfTheWeek, lastDayOfTheWeek));
+            return userBirthdays
+                .Select(MapUserBirthdayInfoToBirthdayDto(firstDayOfTheWeek, lastDayOfTheWeek))
+                .OrderByDescending(b => b.Date);
         }
 
         private async Task<IEnumerable<UserBirthdayInfoDto>> GetUsersBirthdayInfoAsync(DateTime firstDayOfTheWeek, DateTime lastDayOfTheWeek)
@@ -43,14 +45,13 @@ namespace Shrooms.Domain.Services.Birthday
             var newUserRoleId = await _roleService.GetRoleIdByNameAsync(ConstantsRoles.NewUser);
 
             return await _userDbSet
-                    .Where(u => u.BirthDay.HasValue)
-                    .Where(FilterWeeklyBirthdays(firstDayOfTheWeek, lastDayOfTheWeek))
-                    .Where(_roleService.ExcludeUsersWithRole(newUserRoleId))
-                    .OrderByDescending(x => x.BirthDay.Value.Year)
-                    .ThenByDescending(x => x.BirthDay.Value.Month)
-                    .ThenByDescending(x => x.BirthDay.Value.Day)
-                    .Select(MapUserBirthdayInfo())
-                    .ToListAsync();
+                .Where(u => u.BirthDay.HasValue)
+                .Where(FilterWeeklyBirthdays(firstDayOfTheWeek, lastDayOfTheWeek))
+                .Where(_roleService.ExcludeUsersWithRole(newUserRoleId))
+                .OrderByDescending(x => x.BirthDay.Value.Month)
+                .ThenByDescending(x => x.BirthDay.Value.Day)
+                .Select(MapUserBirthdayInfo())
+                .ToListAsync();
         }
 
         private static Expression<Func<ApplicationUser, bool>> FilterWeeklyBirthdays(DateTime firstDayOfTheWeek, DateTime lastDayOfTheWeek)
@@ -59,15 +60,15 @@ namespace Shrooms.Domain.Services.Birthday
             {
                 // When all week is in one month e.g from January 1 till January 8
                 return x => x.BirthDay.Value.Day > firstDayOfTheWeek.Day
-                         && x.BirthDay.Value.Day <= lastDayOfTheWeek.Day
-                         && x.BirthDay.Value.Month == lastDayOfTheWeek.Month;
+                            && x.BirthDay.Value.Day <= lastDayOfTheWeek.Day
+                            && x.BirthDay.Value.Month == lastDayOfTheWeek.Month;
             }
 
             // When week is separated into two months e.g from January 29 till February 5
             return x => (x.BirthDay.Value.Day > firstDayOfTheWeek.Day
-                     && x.BirthDay.Value.Month == firstDayOfTheWeek.Month)
-                     || (x.BirthDay.Value.Day <= lastDayOfTheWeek.Day
-                     && x.BirthDay.Value.Month == lastDayOfTheWeek.Month);
+                         && x.BirthDay.Value.Month == firstDayOfTheWeek.Month)
+                        || (x.BirthDay.Value.Day <= lastDayOfTheWeek.Day
+                            && x.BirthDay.Value.Month == lastDayOfTheWeek.Month);
         }
 
         private static Expression<Func<ApplicationUser, UserBirthdayInfoDto>> MapUserBirthdayInfo()
@@ -91,7 +92,7 @@ namespace Shrooms.Domain.Services.Birthday
                 LastName = userInfo.LastName,
                 PictureId = userInfo.PictureId,
                 // ReSharper disable once PossibleInvalidOperationException (values from DB retrieved as Where(u => u.BirthDay.HasValue)
-                DateString = GetBirthDayCurrentDate(userInfo.BirthDay.Value, GetYear(userInfo.BirthDay.Value, firstDayOfTheWeek, lastDayOfTheWeek)).ToString("yyyy-MM-dd"),
+                Date = GetBirthDayCurrentDate(userInfo.BirthDay.Value, GetYear(userInfo.BirthDay.Value, firstDayOfTheWeek, lastDayOfTheWeek)),
                 DayOfWeek = GetBirthDayCurrentDate(userInfo.BirthDay.Value, GetYear(userInfo.BirthDay.Value, firstDayOfTheWeek, lastDayOfTheWeek)).DayOfWeek.ToString()
             };
         }

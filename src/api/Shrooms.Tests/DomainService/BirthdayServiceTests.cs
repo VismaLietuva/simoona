@@ -112,6 +112,21 @@ namespace Shrooms.Tests.DomainService
                     FirstName = "Name",
                     LastName = "Surname",
                     BirthDay = new DateTime(1985, 03, 04)
+                },
+
+                new ApplicationUser
+                {
+                    Id = "endOfYearBirthdayUser1",
+                    FirstName = "Name",
+                    LastName = "Surname",
+                    BirthDay = new DateTime(1985, 12, 31)
+                },
+                new ApplicationUser
+                {
+                    Id = "endOfYearBirthdayUser2",
+                    FirstName = "Name",
+                    LastName = "Surname",
+                    BirthDay = new DateTime(1985, 12, 30)
                 }
             }.AsQueryable();
         }
@@ -146,13 +161,13 @@ namespace Shrooms.Tests.DomainService
             var time = new DateTime(2015, 12, 28);
             var birthdays = (await _birthdayService.GetWeeklyBirthdaysAsync(time)).ToArray();
 
-            Assert.AreEqual(2, birthdays.Length);
-            Assert.AreEqual("christmasBirthdayUser", birthdays[0].Id);
-            Assert.AreEqual("2015-12-27", birthdays[0].DateString);
-            Assert.AreEqual("Sunday", birthdays[0].DayOfWeek);
-            Assert.AreEqual("newYearBirthdayUser", birthdays[1].Id);
-            Assert.AreEqual("2016-01-01", birthdays[1].DateString);
-            Assert.AreEqual("Friday", birthdays[1].DayOfWeek);
+            Assert.AreEqual(4, birthdays.Length);
+            Assert.AreEqual("christmasBirthdayUser", birthdays[3].Id);
+            Assert.AreEqual("2015-12-27", birthdays[3].DateString);
+            Assert.AreEqual("Sunday", birthdays[3].DayOfWeek);
+            Assert.AreEqual("newYearBirthdayUser", birthdays[0].Id);
+            Assert.AreEqual("2016-01-01", birthdays[0].DateString);
+            Assert.AreEqual("Friday", birthdays[0].DayOfWeek);
         }
 
         [Test]
@@ -179,6 +194,18 @@ namespace Shrooms.Tests.DomainService
             Assert.AreEqual("februaryBirthdayUser1", birthdays[1].Id);
             Assert.AreEqual("2016-02-29", birthdays[1].DateString);
             Assert.AreEqual("februaryBirthdayUser2", birthdays[2].Id);
+        }
+
+        [Test]
+        public async Task Should_Correctly_Sort_Birthdays_At_End_Of_Year()
+        {
+            var time = new DateTime(2020, 12, 28);
+            var birthdays = (await _birthdayService.GetWeeklyBirthdaysAsync(time)).ToArray();
+
+            Assert.AreEqual(4, birthdays.Length);
+            Assert.AreEqual("newYearBirthdayUser", birthdays[0].Id);
+            Assert.AreEqual("endOfYearBirthdayUser1", birthdays[1].Id);
+            Assert.AreEqual("endOfYearBirthdayUser2", birthdays[2].Id);
         }
     }
 }

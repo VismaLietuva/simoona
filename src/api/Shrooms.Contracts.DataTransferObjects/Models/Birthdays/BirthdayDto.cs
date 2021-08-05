@@ -1,4 +1,6 @@
-﻿namespace Shrooms.Contracts.DataTransferObjects.Models.Birthdays
+﻿using System;
+
+namespace Shrooms.Contracts.DataTransferObjects.Models.Birthdays
 {
     public class BirthdayDto
     {
@@ -10,7 +12,9 @@
 
         public string DayOfWeek { get; set; }
 
-        public string DateString { get; set; }
+        public DateTime Date { get; set; }
+
+        public string DateString => Date.ToString("yyyy-MM-dd");
 
         public string PictureId { get; set; }
     }
