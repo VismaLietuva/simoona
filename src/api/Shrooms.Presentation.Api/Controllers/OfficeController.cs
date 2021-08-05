@@ -53,7 +53,7 @@ namespace Shrooms.Presentation.Api.Controllers
             if (defaultOffice != null)
             {
                 offices.Remove(defaultOffice);
-                offices.Insert(0, defaultOffice);
+                offices.Insert(index: 0, defaultOffice);
             }
 
             var mappedOffices = _mapper.Map<IEnumerable<OfficeDropdownViewModel>>(offices);
@@ -88,7 +88,7 @@ namespace Shrooms.Presentation.Api.Controllers
             }
             else
             {
-                offices = _repository.Get(filter: o => o.Address.City.Contains(s) || o.Address.Country.Contains(s)
+                offices = _repository.Get(o => o.Address.City.Contains(s) || o.Address.Country.Contains(s)
                                                     || o.Address.Street.Contains(s) || o.Address.Building.Contains(s)
                                                     || o.Name.Contains(s),
                                                   orderBy: sortString, includeProperties: includeProperties);
@@ -166,7 +166,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [PermissionAuthorize(Permission = AdministrationPermissions.Office)]
         public override async Task<HttpResponseMessage> Delete(int id)
         {
-            var office = await _repository.Get(filter: o => o.Id == id, includeProperties: "Floors,Floors.Rooms,Floors.Rooms.ApplicationUsers").FirstOrDefaultAsync();
+            var office = await _repository.Get(o => o.Id == id, includeProperties: "Floors,Floors.Rooms,Floors.Rooms.ApplicationUsers").FirstOrDefaultAsync();
 
             if (office == null)
             {

@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Configuration;
+using System.Net;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -40,7 +41,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [AllowAnonymous]
         public HttpResponseMessage ImpersonateEnabled()
         {
-            var key = System.Configuration.ConfigurationManager.AppSettings[WebApiConstants.ClaimUserImpersonation];
+            var key = ConfigurationManager.AppSettings[WebApiConstants.ClaimUserImpersonation];
             var enabled = key != null && bool.Parse(key);
 
             return Request.CreateResponse(HttpStatusCode.OK, new { enabled });

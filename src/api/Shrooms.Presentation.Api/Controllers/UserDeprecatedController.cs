@@ -68,8 +68,7 @@ namespace Shrooms.Presentation.Api.Controllers
         private readonly IKudosService _kudosService;
         private readonly IPictureService _pictureService;
 
-        public UserDeprecatedController(
-            IMapper mapper,
+        public UserDeprecatedController(IMapper mapper,
             IUnitOfWork unitOfWork,
             ShroomsUserManager userManager,
             IImpersonateService impersonateService,
@@ -177,9 +176,10 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [Route("GetAll")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public IEnumerable<ApplicationUserViewModel> GetAll()
+        public async Task<IEnumerable<ApplicationUserViewModel>> GetAll()
         {
-            return _mapper.Map<IEnumerable<ApplicationUser>, List<ApplicationUserViewModel>>(_applicationUserRepository.Get());
+            var applicationUsers = await _applicationUserRepository.Get().ToListAsync();
+            return _mapper.Map<IEnumerable<ApplicationUser>, List<ApplicationUserViewModel>>(applicationUsers);
         }
 
         [Route("Get")]
@@ -227,9 +227,9 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [Route("GetByUserName")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public ApplicationUserViewModel GetByUserName(string userName, string includeProperties = "")
+        public async Task<ApplicationUserViewModel> GetByUserName(string userName, string includeProperties = "")
         {
-            var applicationUser = _applicationUserRepository.Get(e => e.UserName == userName, includeProperties: includeProperties).FirstOrDefault();
+            var applicationUser = await _applicationUserRepository.Get(e => e.UserName == userName, includeProperties: includeProperties).FirstOrDefaultAsync();
             return _mapper.Map<ApplicationUser, ApplicationUserViewModel>(applicationUser);
         }
 
@@ -278,16 +278,16 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [Route("GetJobTitleForAutoComplete")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public List<string> GetJobTitleForAutoComplete(string query)
+        public async Task<List<string>> GetJobTitleForAutoComplete(string query)
         {
             var userOrg = GetUserAndOrganization();
             var q = query.ToLowerInvariant();
 
-            var jobPositions = _jobPositionsRepository
+            var jobPositions = await _jobPositionsRepository
                 .Get(p => p.OrganizationId == userOrg.OrganizationId && p.Title.ToLower().Contains(q))
                 .Select(p => p.Title)
                 .OrderBy(p => p)
-                .ToList();
+                .ToListAsync();
 
             return jobPositions;
         }
@@ -381,7 +381,7 @@ namespace Shrooms.Presentation.Api.Controllers
             {
                 Id = user.Id,
                 PersonalInfo = await MapPersonalInfoAsync(user),
-                JobInfo = MapJobInfo(user),
+                JobInfo = await MapJobInfoAsync(user),
                 OfficeInfo = MapOfficeInfo(user),
                 ShroomsInfo = MapShroomsInfo(user)
             };
@@ -424,7 +424,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 return Request.CreateResponse(HttpStatusCode.NotFound, new[] { string.Format(Resources.Common.DoesNotExist, Resources.Models.ApplicationUser.ApplicationUser.EntityName) });
             }
 
-            var model = MapJobInfo(user);
+            var model = await MapJobInfoAsync(user);
             var orgId = GetUserAndOrganization().OrganizationId;
 
             model.JobPositions = await _jobPositionsRepository
@@ -874,9 +874,9 @@ namespace Shrooms.Presentation.Api.Controllers
             return Ok(tutorialStatus);
         }
 
-        private IEnumerable<ApplicationRole> GetUserRoles(string userId)
+        private async Task<IEnumerable<ApplicationRole>> GetUserRoles(string userId)
         {
-            return _rolesRepository.Get(r => r.Users.Any(u => u.UserId == userId));
+            return await _rolesRepository.Get(r => r.Users.Any(u => u.UserId == userId)).ToListAsync();
         }
 
         public async Task<ApplicationUserPersonalInfoViewModel> MapPersonalInfoAsync(ApplicationUser user)
@@ -894,10 +894,10 @@ namespace Shrooms.Presentation.Api.Controllers
             return personalInfo;
         }
 
-        private ApplicationUserJobInfoViewModel MapJobInfo(ApplicationUser user)
+        private async Task<ApplicationUserJobInfoViewModel> MapJobInfoAsync(ApplicationUser user)
         {
             var jobInfo = _mapper.Map<ApplicationUserJobInfoViewModel>(user);
-            var roles = GetUserRoles(user.Id);
+            var roles = await _rolesRepository.Get(r => r.Users.Any(u => u.UserId == user.Id)).ToListAsync();
             jobInfo.Roles = _mapper.Map<IEnumerable<ApplicationRoleMiniViewModel>>(roles);
 
             return jobInfo;

@@ -28,8 +28,6 @@ namespace Shrooms.Presentation.Api.Controllers
         {
         }
 
-        #region CRUD
-
         [HttpPost]
         [PermissionAuthorize(Permission = AdministrationPermissions.Room)]
         public override async Task<HttpResponseMessage> Post([FromBody] RoomPostViewModel roomViewModel)
@@ -111,8 +109,6 @@ namespace Shrooms.Presentation.Api.Controllers
 
             return Request.CreateResponse(HttpStatusCode.OK);
         }
-
-        #endregion CRUD
 
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.Room)]

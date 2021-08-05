@@ -9,7 +9,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
-using Microsoft.AspNet.Identity;
 using Shrooms.Authentification.Membership;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
@@ -36,16 +35,15 @@ namespace Shrooms.Presentation.Api.Controllers
         private readonly IPermissionService _permissionService;
         private readonly IRepository<ApplicationRole> _roleRepository;
         private readonly IRepository<Permission> _permissionRepository;
-        private ICustomCache<string, IEnumerable<string>> _permissionsCache;
+        private readonly ICustomCache<string, IEnumerable<string>> _permissionsCache;
         private readonly IRepository<ApplicationUser> _applicationUserRepository;
 
         private readonly IRoleService _roleService;
 
-        public ShroomsRoleManager RoleManager { get; set; }
-        public ShroomsUserManager UserManager { get; set; }
+        private readonly ShroomsRoleManager _roleManager;
+        private readonly ShroomsUserManager _userManager;
 
-        public RolesController(
-            IMapper mapper,
+        public RolesController(IMapper mapper,
             IUnitOfWork unitOfWork,
             IPermissionService permissionService,
             ICustomCache<string, IEnumerable<string>> permissionsCache,
@@ -62,56 +60,9 @@ namespace Shrooms.Presentation.Api.Controllers
             _permissionRepository = unitOfWork.GetRepository<Permission>();
             _applicationUserRepository = unitOfWork.GetRepository<ApplicationUser>();
 
-            RoleManager = roleManager;
-            UserManager = userManager;
+            _roleManager = roleManager;
+            _userManager = userManager;
         }
-
-        #region private methods
-
-        private async Task AssignPermissionsToRoleAsync(RoleMiniViewModel roleViewModel, ApplicationRole role)
-        {
-            var filteredPermissions = GetFilter(roleViewModel.Permissions.ToList());
-            role.Permissions = await _permissionRepository.Get(filteredPermissions).ToListAsync();
-
-            _roleRepository.Update(role);
-            await _unitOfWork.SaveAsync();
-        }
-
-        private static Expression<Func<Permission, bool>> GetFilter(IList<PermissionGroupViewModel> permissions)
-        {
-            var adminControllers = permissions.Where(p => p.ActiveScope == PermissionScopes.Administration).Select(p => p.Name);
-            var basicControllers = permissions.Where(p => p.ActiveScope == PermissionScopes.Basic).Select(p => p.Name);
-
-            return p => adminControllers.Any(a => p.Name.StartsWith(a + "_")) || (basicControllers.Any(b => p.Name.StartsWith(b + "_")) && p.Scope == PermissionScopes.Basic);
-        }
-
-        private async Task AssignUsersToRole(RoleMiniViewModel roleViewModel)
-        {
-            var usersInModelIds = _mapper.Map<IEnumerable<ApplicationUserViewModel>, string[]>(roleViewModel.Users);
-            var usersToAdd = await _applicationUserRepository.Get(u => u.Roles.Count(r => r.RoleId.Contains(roleViewModel.Id)) == 0 && usersInModelIds.Contains(u.Id)).ToListAsync();
-
-            foreach (var user in usersToAdd)
-            {
-                var state = await UserManager.AddToRoleAsync(user.Id, roleViewModel.Name);
-                if (!state.Succeeded)
-                {
-                    throw new SystemException(state.Errors.Aggregate(new StringBuilder(), (sb, a) => sb.AppendLine(string.Join(", ", a)), sb => sb.ToString()));
-                }
-            }
-
-            var usersToRemove = await _applicationUserRepository.Get(u => u.Roles.Count(r => r.RoleId.Contains(roleViewModel.Id)) == 1 && !usersInModelIds.Contains(u.Id)).ToListAsync();
-
-            foreach (var user in usersToRemove)
-            {
-                var state = await UserManager.RemoveFromRoleAsync(user.Id, roleViewModel.Name);
-                if (!state.Succeeded)
-                {
-                    throw new SystemException(state.Errors.Aggregate(new StringBuilder(), (sb, a) => sb.AppendLine(string.Join(", ", a)), sb => sb.ToString()));
-                }
-            }
-        }
-
-        #endregion
 
         [HttpGet]
         [Route("GetRolesForAutocomplete")]
@@ -156,13 +107,13 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [Route("GetUsersForAutoComplete")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Role)]
-        public IEnumerable<ApplicationUserViewModel> GetUsersForAutoComplete(string s)
+        public async Task<IEnumerable<ApplicationUserViewModel>> GetUsersForAutoComplete(string s)
         {
             IEnumerable<ApplicationUserViewModel> applicationUserViewModels;
 
             if (!string.IsNullOrEmpty(s))
             {
-                var applicationUsers = _applicationUserRepository.Get(e => (e.FirstName + " " + e.LastName).Contains(s));
+                var applicationUsers = await _applicationUserRepository.Get(e => (e.FirstName + " " + e.LastName).Contains(s)).ToListAsync();
 
                 applicationUserViewModels = _mapper.Map<IEnumerable<ApplicationUser>, IEnumerable<ApplicationUserViewModel>>(applicationUsers);
             }
@@ -190,7 +141,7 @@ namespace Shrooms.Presentation.Api.Controllers
             role.CreatedTime = DateTime.UtcNow;
             role.OrganizationId = GetUserAndOrganization().OrganizationId;
 
-            await RoleManager.CreateAsync(role);
+            await _roleManager.CreateAsync(role);
             await AssignPermissionsToRoleAsync(roleViewModel, role);
             await AssignUsersToRole(roleViewModel);
             _permissionsCache.Clear();
@@ -220,16 +171,16 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [Route("Delete")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Role)]
-        public HttpResponseMessage Delete(string roleId)
+        public async Task<HttpResponseMessage> Delete(string roleId)
         {
-            var role = RoleManager.FindById(roleId);
+            var role = await _roleManager.FindByIdAsync(roleId);
 
             if (role == null)
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound);
             }
 
-            RoleManager.Delete(role);
+            await _roleManager.DeleteAsync(role);
             _permissionsCache.Clear();
 
             return Request.CreateResponse(HttpStatusCode.OK);
@@ -247,7 +198,7 @@ namespace Shrooms.Presentation.Api.Controllers
         {
             var sortString = string.IsNullOrEmpty(sort) ? null : $"{sort} {dir}";
 
-            var roles = GetRoles(sortString, includeProperties, s);
+            var roles = await GetRolesAsync(sortString, includeProperties, s);
 
             var rolesViewModel = _mapper.Map<IEnumerable<ApplicationRole>, IEnumerable<RoleViewModel>>(roles);
 
@@ -264,14 +215,57 @@ namespace Shrooms.Presentation.Api.Controllers
             return pagedModel;
         }
 
-        private IEnumerable<ApplicationRole> GetRoles(string sortString, string includeProperties, string s)
+        private async Task<IEnumerable<ApplicationRole>> GetRolesAsync(string sortString, string includeProperties, string s)
         {
             if (string.IsNullOrEmpty(s))
             {
-                return _roleRepository.Get(orderBy: sortString, includeProperties: includeProperties);
+                return await _roleRepository.Get(orderBy: sortString, includeProperties: includeProperties).ToListAsync();
             }
 
-            return _roleRepository.Get(r => r.Name.Contains(s) || r.Organization.ShortName.Contains(s), orderBy: sortString, includeProperties: includeProperties);
+            return await _roleRepository.Get(r => r.Name.Contains(s) || r.Organization.ShortName.Contains(s), orderBy: sortString, includeProperties: includeProperties).ToListAsync();
+        }
+
+        private async Task AssignPermissionsToRoleAsync(RoleMiniViewModel roleViewModel, ApplicationRole role)
+        {
+            var filteredPermissions = GetFilter(roleViewModel.Permissions.ToList());
+            role.Permissions = await _permissionRepository.Get(filteredPermissions).ToListAsync();
+
+            _roleRepository.Update(role);
+            await _unitOfWork.SaveAsync();
+        }
+
+        private static Expression<Func<Permission, bool>> GetFilter(IList<PermissionGroupViewModel> permissions)
+        {
+            var adminControllers = permissions.Where(p => p.ActiveScope == PermissionScopes.Administration).Select(p => p.Name);
+            var basicControllers = permissions.Where(p => p.ActiveScope == PermissionScopes.Basic).Select(p => p.Name);
+
+            return p => adminControllers.Any(a => p.Name.StartsWith(a + "_")) || (basicControllers.Any(b => p.Name.StartsWith(b + "_")) && p.Scope == PermissionScopes.Basic);
+        }
+
+        private async Task AssignUsersToRole(RoleMiniViewModel roleViewModel)
+        {
+            var usersInModelIds = _mapper.Map<IEnumerable<ApplicationUserViewModel>, string[]>(roleViewModel.Users);
+            var usersToAdd = await _applicationUserRepository.Get(u => u.Roles.Count(r => r.RoleId.Contains(roleViewModel.Id)) == 0 && usersInModelIds.Contains(u.Id)).ToListAsync();
+
+            foreach (var user in usersToAdd)
+            {
+                var state = await _userManager.AddToRoleAsync(user.Id, roleViewModel.Name);
+                if (!state.Succeeded)
+                {
+                    throw new SystemException(state.Errors.Aggregate(new StringBuilder(), (sb, a) => sb.AppendLine(string.Join(", ", a)), sb => sb.ToString()));
+                }
+            }
+
+            var usersToRemove = await _applicationUserRepository.Get(u => u.Roles.Count(r => r.RoleId.Contains(roleViewModel.Id)) == 1 && !usersInModelIds.Contains(u.Id)).ToListAsync();
+
+            foreach (var user in usersToRemove)
+            {
+                var state = await _userManager.RemoveFromRoleAsync(user.Id, roleViewModel.Name);
+                if (!state.Succeeded)
+                {
+                    throw new SystemException(state.Errors.Aggregate(new StringBuilder(), (sb, a) => sb.AppendLine(string.Join(", ", a)), sb => sb.ToString()));
+                }
+            }
         }
     }
 }

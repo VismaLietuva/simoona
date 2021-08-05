@@ -399,17 +399,17 @@ namespace Shrooms.Presentation.Api.Controllers
             // Linking accounts.
             if (userId != null)
             {
-                return await LinkAccounts(externalLogin, userId);
+                return await LinkAccountsAsync(externalLogin, userId);
             }
 
             // Registration process.
             if (isRegistration == true)
             {
-                return await RegisterOrLogin(user, externalLogin, client_Id, hasLogin);
+                return await RegisterOrLoginAsync(user, externalLogin, client_Id, hasLogin);
             }
 
             // Login process.
-            return await Login(user, externalLogin, client_Id, hasLogin);
+            return await LoginAsync(user, externalLogin, client_Id, hasLogin);
         }
 
         private static bool ContainsProvider(string providerList, string providerName)
@@ -511,7 +511,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return url;
         }
 
-        private async Task<IHttpActionResult> LinkAccounts(ExternalLoginData externalLogin, string userId)
+        private async Task<IHttpActionResult> LinkAccountsAsync(ExternalLoginData externalLogin, string userId)
         {
             var info = await Authentication.GetExternalLoginInfoAsync();
             if (await _userManager.AddLoginAsync(userId, info.Login) == null)
@@ -528,7 +528,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return Ok();
         }
 
-        private async Task<IHttpActionResult> RegisterOrLogin(ApplicationUser user, ExternalLoginData externalLogin, string clientId, bool hasLogin)
+        private async Task<IHttpActionResult> RegisterOrLoginAsync(ApplicationUser user, ExternalLoginData externalLogin, string clientId, bool hasLogin)
         {
             if (hasLogin)
             {
@@ -565,7 +565,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return Ok();
         }
 
-        private async Task<IHttpActionResult> Login(ApplicationUser user, ExternalLoginData externalLogin, string clientId, bool hasLogin)
+        private async Task<IHttpActionResult> LoginAsync(ApplicationUser user, ExternalLoginData externalLogin, string clientId, bool hasLogin)
         {
             if (hasLogin)
             {

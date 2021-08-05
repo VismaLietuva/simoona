@@ -1,4 +1,6 @@
-﻿using System.Web;
+﻿using System.Net;
+using System.Net.Http;
+using System.Web;
 using System.Web.Http;
 using NLog;
 
@@ -12,10 +14,10 @@ namespace Shrooms.Presentation.Api.Controllers
         {
             if (Request == null)
             {
-                Request = new System.Net.Http.HttpRequestMessage();
+                Request = new HttpRequestMessage();
             }
 
-            LogManager.GetCurrentClassLogger().Log(LogLevel.Info, new HttpException(404, "404 Not Found: /" + path));
+            LogManager.GetCurrentClassLogger().Log(LogLevel.Info, new HttpException((int)HttpStatusCode.NotFound, $"404 Not Found: /{path}"));
             return NotFound();
         }
     }

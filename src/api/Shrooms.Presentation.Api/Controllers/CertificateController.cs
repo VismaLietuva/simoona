@@ -75,25 +75,19 @@ namespace Shrooms.Presentation.Api.Controllers
             if (certificate == null)
             {
                 certificate = _mapper.Map<Certificate>(crudViewModel);
-                certificate.Exams = MapExams(crudViewModel);
+                certificate.Exams = await MapExamsAsync(crudViewModel);
                 _certificateRepository.Insert(certificate);
             }
             else
             {
                 certificate.InProgress = crudViewModel.InProgress;
-                var examsToAdd = MapExams(crudViewModel);
+                var examsToAdd = await MapExamsAsync(crudViewModel);
                 examsToAdd.ForEach(e => certificate.Exams.Add(e));
                 _certificateRepository.Update(certificate);
             }
 
             await _unitOfWork.SaveAsync();
             return Ok(_mapper.Map<CertificateMiniViewModel>(certificate));
-        }
-
-        private ICollection<Exam> MapExams(CertificatePostViewModel crudViewModel)
-        {
-            var examIds = _mapper.Map<int[]>(crudViewModel.Exams);
-            return _examRepository.Get(e => examIds.Contains(e.Id)).ToList();
         }
 
         [HttpDelete]
@@ -145,13 +139,19 @@ namespace Shrooms.Presentation.Api.Controllers
                 return NotFound();
             }
 
-            certificate.Exams = MapExams(crudViewModel);
+            certificate.Exams = await MapExamsAsync(crudViewModel);
             certificate.InProgress = crudViewModel.InProgress;
             _certificateRepository.Update(certificate);
 
             await _unitOfWork.SaveAsync();
 
             return Ok(_mapper.Map<CertificateMiniViewModel>(certificate));
+        }
+
+        private async Task<ICollection<Exam>> MapExamsAsync(CertificatePostViewModel crudViewModel)
+        {
+            var examIds = _mapper.Map<int[]>(crudViewModel.Exams);
+            return await _examRepository.Get(e => examIds.Contains(e.Id)).ToListAsync();
         }
     }
 }

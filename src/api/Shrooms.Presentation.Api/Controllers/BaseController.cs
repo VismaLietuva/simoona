@@ -1,4 +1,5 @@
-﻿using System.Web.Http;
+﻿using System.Net;
+using System.Web.Http;
 using System.Web.Http.Results;
 using Microsoft.AspNet.Identity;
 using Shrooms.Contracts.DataTransferObjects;
@@ -11,17 +12,17 @@ namespace Shrooms.Presentation.Api.Controllers
     {
         public StatusCodeResult Forbidden()
         {
-            return StatusCode(System.Net.HttpStatusCode.Forbidden);
+            return StatusCode(HttpStatusCode.Forbidden);
         }
 
         public StatusCodeResult UnsupportedMediaType()
         {
-            return StatusCode(System.Net.HttpStatusCode.UnsupportedMediaType);
+            return StatusCode(HttpStatusCode.UnsupportedMediaType);
         }
 
         public IHttpActionResult BadRequestWithError(ValidationException ex)
         {
-            return Content(System.Net.HttpStatusCode.BadRequest, new { ErrorCode = ex.ErrorCode, ErrorMessage = ex.ErrorMessage });
+            return Content(HttpStatusCode.BadRequest, new { ErrorCode = ex.ErrorCode, ErrorMessage = ex.ErrorMessage });
         }
 
         public UserAndOrganizationDto GetUserAndOrganization()

@@ -30,8 +30,7 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
         private readonly IKudosBasketService _kudosBasketService;
         private readonly IBirthdayService _birthdayService;
 
-        public WallWidgetsController(
-            IMapper mapper,
+        public WallWidgetsController(IMapper mapper,
             IKudosService kudosService,
             IPermissionService permissionService,
             IKudosBasketService kudosBasketService,

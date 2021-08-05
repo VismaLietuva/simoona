@@ -26,8 +26,6 @@ namespace Shrooms.Presentation.Api.Controllers
         {
         }
 
-        #region CRUD
-
         [PermissionAuthorize(Permission = AdministrationPermissions.RoomType)]
         public override async Task<HttpResponseMessage> Post([FromBody] RoomTypePostViewModel crudViewModel)
         {
@@ -104,8 +102,6 @@ namespace Shrooms.Presentation.Api.Controllers
         {
             return await GetFilteredPaged(includeProperties, page, pageSize, sort, dir, p => p.Name.Contains(s));
         }
-
-        #endregion CRUD
 
         private async Task<RoomType> GetByIdOrNameAsync(string name, int id = -1, string includeProperties = "")
         {
