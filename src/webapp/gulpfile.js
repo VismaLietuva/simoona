@@ -404,8 +404,8 @@ gulp.task('optimize', gulp.series('move-locales', 'inject', function(done) { //'
         // Get the custom javascript
         .pipe(jsAppFilter)
         .pipe($.ngAnnotate({
-            add: true
-        }))
+             add: true
+         }))
         .pipe(terser())
         .pipe(jsAppFilter.restore)
         // Get the vendor javascript

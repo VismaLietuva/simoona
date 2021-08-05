@@ -82,7 +82,7 @@
         vm.filter = {
             page: $state.params.page,
             dir: $state.params.dir,
-            sort: $state.params.sort ?? 'userName',
+            sort: $state.params.sort == null ? 'userName' : $state.params.sort,
             s: $state.params.s,
             filter: filterObject
         };
