@@ -46,7 +46,8 @@ namespace Shrooms.Domain.Services.Birthday
                     .Where(u => u.BirthDay.HasValue)
                     .Where(FilterWeeklyBirthdays(firstDayOfTheWeek, lastDayOfTheWeek))
                     .Where(_roleService.ExcludeUsersWithRole(newUserRoleId))
-                    .OrderByDescending(x => x.BirthDay.Value.Month)
+                    .OrderByDescending(x => x.BirthDay.Value.Year)
+                    .ThenByDescending(x => x.BirthDay.Value.Month)
                     .ThenByDescending(x => x.BirthDay.Value.Day)
                     .Select(MapUserBirthdayInfo())
                     .ToListAsync();
