@@ -266,7 +266,7 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
 
         public void CheckIfEventHasParticipants(IEnumerable<EventParticipantDto> eventParticipants)
         {
-            if (!eventParticipants.Any())
+            if (eventParticipants == null || !eventParticipants.Any())
             {
                 throw new EventException(PremiumErrorCodes.EventParticipantsNotFound);
             }

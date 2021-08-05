@@ -303,12 +303,12 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 .Include(e => e.EventParticipants.Select(x => x.ApplicationUser))
                 .Where(e => e.Id == eventId
                             && e.OrganizationId == userAndOrg.OrganizationId
-                            && e.EventParticipants.Any(p => p.AttendStatus == (int)AttendingStatus.Attending && p.ApplicationUserId == userAndOrg.UserId))
+                            && e.EventParticipants.Any(p => p.AttendStatus == (int)AttendingStatus.Attending)) // && p.ApplicationUserId == userAndOrg.UserId))
                 .Select(MapEventToParticipantDto())
                 .SingleOrDefaultAsync())?.ToList();
 
-            _eventValidationService.CheckIfEventExists(eventParticipants);
             _eventValidationService.CheckIfEventHasParticipants(eventParticipants);
+            _eventValidationService.CheckIfEventExists(eventParticipants);
 
             return eventParticipants;
         }

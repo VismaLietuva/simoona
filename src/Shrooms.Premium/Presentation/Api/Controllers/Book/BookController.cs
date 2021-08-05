@@ -106,9 +106,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
         [PermissionAuthorize(Permission = BasicPermissions.Book)]
         public async Task<IHttpActionResult> GetBooksByOffice(int officeId, int page = 1, string searchString = null)
         {
-            if (!string.IsNullOrEmpty(searchString) &&
-                searchString.Length < BusinessLayerConstants.MinCharactersInBookSearch ||
-                officeId < 1)
+            if (!string.IsNullOrEmpty(searchString) && searchString.Length < BusinessLayerConstants.MinCharactersInBookSearch || officeId < 1)
             {
                 return BadRequest();
             }
@@ -119,6 +117,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Book
                 Page = page,
                 SearchString = searchString
             };
+
             SetOrganizationAndUser(options);
 
             var books = await _bookService.GetBooksByOfficeAsync(options);
