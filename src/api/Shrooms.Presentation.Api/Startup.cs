@@ -69,7 +69,7 @@ namespace Shrooms.Presentation.Api
             app.UseWebApi(config);
         }
 
-        private void ConfigureSignalr(IAppBuilder app)
+        private static void ConfigureSignalr(IAppBuilder app)
         {
             app.Map("/signalr",
                 map =>

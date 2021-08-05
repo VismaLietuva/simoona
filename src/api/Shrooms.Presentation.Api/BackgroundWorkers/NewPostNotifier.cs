@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using JetBrains.Annotations;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Contracts.Infrastructure;
@@ -12,6 +13,7 @@ using Shrooms.Presentation.Api.Hubs;
 
 namespace Shrooms.Presentation.Api.BackgroundWorkers
 {
+    [UsedImplicitly]
     public class NewPostNotifier : IBackgroundWorker
     {
         private readonly IPostNotificationService _postNotificationService;
@@ -36,8 +38,8 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
             var notificationDto = await _notificationService.CreateForPostAsync(userAndOrganizationHubDto, createdPost, createdPost.WallId, membersToNotify);
 
             var notificationViewModel = _mapper.Map<NotificationViewModel>(notificationDto);
-            NotificationHub.SendNotificationToParticularUsers(notificationViewModel, userAndOrganizationHubDto, membersToNotify);
-            NotificationHub.SendWallNotification(createdPost.WallId, membersToNotify, createdPost.WallType, userAndOrganizationHubDto);
+            await NotificationHub.SendNotificationToParticularUsersAsync(notificationViewModel, userAndOrganizationHubDto, membersToNotify);
+            await NotificationHub.SendWallNotificationAsync(createdPost.WallId, membersToNotify, createdPost.WallType, userAndOrganizationHubDto);
         }
     }
 }

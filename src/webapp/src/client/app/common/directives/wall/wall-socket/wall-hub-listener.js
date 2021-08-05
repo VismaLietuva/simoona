@@ -17,18 +17,18 @@
 
     function notificationHub($rootScope, Hub, $timeout, authService, endPoint, wallService, notificationFactory) {
 
-        var hubConnection = null;
+        let hubConnection = null;
 
-        var allowConnection = false;
+        let allowConnection = false;
 
-        var hubConnectionStates = {
+        const hubConnectionStates = {
             connecting: 0,
             connected: 1,
             reconnecting: 2,
             disconnected: 4
         };
 
-        var factory = {
+        const factory = {
             initHubConnection: initHubConnection,
             disconnectFromHub: disconnectFromHub
         };
@@ -41,7 +41,7 @@
             allowConnection = true;
 
             if (!hubConnection) {
-                var hub = new Hub('Notification', {
+                const hub = new Hub('Notification', {
 
                     rootPath: endPoint + '/signalr',
 
@@ -51,20 +51,20 @@
                     },
                     //client side methods
                     listeners: {
-                        'newContent': function (wallId, wallType) {
-                            $rootScope.$apply(function () {
+                        'newContent': function(wallId, wallType) {
+                            $rootScope.$apply(function() {
                                 wallService.notifyAboutNewContentAvailable(wallId, wallType);
                             });
                         },
-                        'newNotification': function (notification) {
+                        'newNotification': function(notification) {
                             notificationFactory.addNotification(notification);
                         }
                     },
 
-                    'stateChanged': function (state) {
+                    'stateChanged': function(state) {
                         if (state.newState === hubConnectionStates.disconnected) {
                             if (allowConnection) {
-                                $timeout(function () {
+                                $timeout(function() {
                                     hubConnection.connect();
                                 }, 60000);
                             }

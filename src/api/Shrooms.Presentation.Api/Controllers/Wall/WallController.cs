@@ -246,7 +246,7 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
                 var userAndOrg = GetUserAndOrganization();
                 var notificationDto = await _notificationService.CreateForWallAsync(userAndOrg, wallDto, wallId);
 
-                NotificationHub.SendNotificationToAllUsers(_mapper.Map<NotificationViewModel>(notificationDto), GetUserAndOrganizationHub());
+                await NotificationHub.SendNotificationToAllUsersAsync(_mapper.Map<NotificationViewModel>(notificationDto), GetUserAndOrganizationHub());
 
                 return Ok(new { Id = wallId });
             }

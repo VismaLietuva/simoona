@@ -21,7 +21,7 @@
 
     function wallMenuNavigationController($state, wallService, appConfig, Analytics, errorHandler, notificationHub, leftMenuService) {
         /* jshint validthis: true */
-        var vm = this;
+        const vm = this;
 
         vm.wallServiceData = wallService.wallServiceData;
 
@@ -31,7 +31,7 @@
         vm.getAllWalls = getAllWalls;
 
         init();
-        
+
         ////////
 
         function init() {
@@ -69,9 +69,9 @@
             }
             leftMenuService.setStatus(false);
             document.getElementsByTagName('body')[0].classList.toggle('overflow');
-            
+
         }
-        
+
         function getAllWalls() {
             if($state.includes('Root.WithOrg.Client.Wall.All')) {
                 wallService.initWall(true, null);
@@ -80,7 +80,7 @@
             }
             leftMenuService.setStatus(false);
             document.getElementsByTagName('body')[0].classList.toggle('overflow');
-            
+
         }
     }
 })();

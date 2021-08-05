@@ -8,6 +8,7 @@ using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.ViewModels.Notifications;
+using X.PagedList;
 
 namespace Shrooms.Presentation.Api.Hubs
 {
@@ -17,56 +18,44 @@ namespace Shrooms.Presentation.Api.Hubs
         private static readonly ConcurrentDictionary<UserAndOrganizationHubDto, HubUser> _notificationHubUsers =
             new ConcurrentDictionary<UserAndOrganizationHubDto, HubUser>();
 
-        /// <summary>
-        /// Triggers New Content Available toolbox
-        /// </summary>
-        /// <param name="wallId"></param>
-        /// <param name="membersIds"></param>
-        /// <param name="wallType"></param>
-        /// <param name="userOrg"></param>
-        public static void SendWallNotification(int wallId, IEnumerable<string> membersIds, WallType wallType, UserAndOrganizationHubDto userOrg)
+        public static async Task SendWallNotificationAsync(int wallId, IEnumerable<string> membersIds, WallType wallType, UserAndOrganizationHubDto userOrg)
         {
             var notificationHub = GlobalHost.ConnectionManager.GetHubContext<NotificationHub>();
 
-            var connectionIds = _notificationHubUsers
+            var connectionIds = await _notificationHubUsers
                 .Where(u => membersIds.Contains(u.Key.UserId) &&
                             u.Key.OrganizationName == userOrg.OrganizationName &&
                             u.Key.OrganizationId == userOrg.OrganizationId)
                 .SelectMany(u => u.Value.ConnectionIds)
-                .ToList();
+                .ToListAsync();
 
             notificationHub.Clients.Clients(connectionIds).newContent(wallId, wallType);
         }
 
-        public static void SendNotificationToAllUsers(NotificationViewModel notification, UserAndOrganizationHubDto userOrg)
+        public static async Task SendNotificationToAllUsersAsync(NotificationViewModel notification, UserAndOrganizationHubDto userOrg)
         {
             var notificationHub = GlobalHost.ConnectionManager.GetHubContext<NotificationHub>();
 
-            var connectionIds = _notificationHubUsers
+            var connectionIds = await _notificationHubUsers
                 .Where(x => x.Key.UserId != userOrg.UserId &&
                             x.Key.OrganizationId == userOrg.OrganizationId &&
                             x.Key.OrganizationName == userOrg.OrganizationName)
                 .SelectMany(u => u.Value.ConnectionIds)
-                .ToList();
+                .ToListAsync();
 
             notificationHub.Clients.Clients(connectionIds).newNotification(notification);
         }
 
-        public static void SendNotificationToParticularUsers(NotificationViewModel notification, UserAndOrganizationHubDto userOrg, string memberId)
-        {
-            SendNotificationToParticularUsers(notification, userOrg, new List<string> { memberId });
-        }
-
-        public static void SendNotificationToParticularUsers(NotificationViewModel notification, UserAndOrganizationHubDto userOrg, IEnumerable<string> membersIds)
+        public static async Task SendNotificationToParticularUsersAsync(NotificationViewModel notification, UserAndOrganizationHubDto userOrg, IEnumerable<string> membersIds)
         {
             var notificationHub = GlobalHost.ConnectionManager.GetHubContext<NotificationHub>();
 
-            var connectionIds = _notificationHubUsers
+            var connectionIds = await _notificationHubUsers
                 .Where(u => membersIds.Contains(u.Key.UserId) &&
                             u.Key.OrganizationId == userOrg.OrganizationId &&
                             u.Key.OrganizationName == userOrg.OrganizationName)
                 .SelectMany(u => u.Value.ConnectionIds)
-                .ToList();
+                .ToListAsync();
 
             notificationHub.Clients.Clients(connectionIds).newNotification(notification);
         }

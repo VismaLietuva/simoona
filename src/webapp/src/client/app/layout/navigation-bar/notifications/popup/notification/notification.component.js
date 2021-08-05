@@ -41,7 +41,7 @@
 
     function popupNotificationController($translate, $state, notificationFactory, popupNotificationThumbSettings, notificationTypes) {
         /* jshint validthis: true */
-        var vm = this;
+        const vm = this;
 
         vm.notificationThumbSettings = popupNotificationThumbSettings;
         vm.notificationType = '';
@@ -57,7 +57,7 @@
             setTypeMessage();
             setNotificationLink();
         }
-        
+
         function isDeleteButton(eventTarget) {
             return angular.element(eventTarget).hasClass('popup-notification-delete-button') ? true : false;
         }
@@ -96,15 +96,15 @@
                     vm.notificationType = $translate.instant('navbar.followingPostCommentNotification');
                 break;
                 case notificationTypes.EventReminder:
-                    vm.notificationType = $translate.instant('navbar.eventReminderNotification', {name: vm.notification.description}); 
-                    vm.notification.title = $translate.instant('navbar.eventReminderNotifcationName');
+                    vm.notificationType = $translate.instant('navbar.eventReminderNotification', {name: vm.notification.description});
+                    vm.notification.title = $translate.instant('navbar.eventReminderNotificationName');
                 break;
                 default:
                     vm.notificationType = '';
                 break;
             }
         }
-        
+
         function setNotificationLink() {
             switch (vm.notification.type) {
                 case notificationTypes.NewEvent:
@@ -112,14 +112,14 @@
                         if(!isDeleteButton(event.target)) {
                             markAsRead(notificationId);
                             $state.go("Root.WithOrg.Client.Events.EventContent", {id: vm.notification.sourceIds.eventId}, {reload: true});
-                        }    
+                        }
                     }
                 break;
-                case notificationTypes.NewWall: 
+                case notificationTypes.NewWall:
                     vm.openNotification = function(event, notificationId) {
                         if(!isDeleteButton(event.target)) {
                             markAsRead(notificationId);
-                            $state.go("Root.WithOrg.Client.Wall.Item.Feed", {wall: vm.notification.sourceIds.wallId}, {reload: true});  
+                            $state.go("Root.WithOrg.Client.Wall.Item.Feed", {wall: vm.notification.sourceIds.wallId}, {reload: true});
                         }
                     }
                 break;
@@ -127,7 +127,7 @@
                     vm.openNotification = function(event, notificationId) {
                         if(!isDeleteButton(event.target)) {
                             markAsRead(notificationId);
-                            $state.go("Root.WithOrg.Client.Wall.Item.Feed", {post: vm.notification.sourceIds.postId}, {reload: true});  
+                            $state.go("Root.WithOrg.Client.Wall.Item.Feed", {post: vm.notification.sourceIds.postId}, {reload: true});
                         }
                     }
                 break;
@@ -135,7 +135,7 @@
                     vm.openNotification = function(event, notificationId) {
                         if(!isDeleteButton(event.target)) {
                             markAsRead(notificationId);
-                            $state.go("Root.WithOrg.Client.Events.EventContent", {id: vm.notification.sourceIds.eventId, postNotification: vm.notification.sourceIds.postId}, {reload: true});  
+                            $state.go("Root.WithOrg.Client.Events.EventContent", {id: vm.notification.sourceIds.eventId, postNotification: vm.notification.sourceIds.postId}, {reload: true});
                         }
                     }
                 break;
@@ -143,7 +143,7 @@
                     vm.openNotification = function(event, notificationId) {
                         if(!isDeleteButton(event.target)) {
                             markAsRead(notificationId);
-                            $state.go("Root.WithOrg.Client.Projects.ProjectContent", {id: vm.notification.sourceIds.projectId, postNotification: vm.notification.sourceIds.postId}, {reload: true});  
+                            $state.go("Root.WithOrg.Client.Projects.ProjectContent", {id: vm.notification.sourceIds.projectId, postNotification: vm.notification.sourceIds.postId}, {reload: true});
                         }
                     }
                 break;
@@ -151,7 +151,7 @@
                     vm.openNotification = function(event, notificationId) {
                         if(!isDeleteButton(event.target)) {
                             markAsRead(notificationId);
-                            $state.go("Root.WithOrg.Client.Wall.Item.Feed", {post: vm.notification.sourceIds.postId}, {reload: true});  
+                            $state.go("Root.WithOrg.Client.Wall.Item.Feed", {post: vm.notification.sourceIds.postId}, {reload: true});
                         }
                     }
                 break;
@@ -159,7 +159,7 @@
                     vm.openNotification = function(event, notificationId) {
                     if(!isDeleteButton(event.target)) {
                         markAsRead(notificationId);
-                        $state.go("Root.WithOrg.Client.Events.EventContent", {id: vm.notification.sourceIds.eventId, postNotification: vm.notification.sourceIds.postId}, {reload: true});  
+                        $state.go("Root.WithOrg.Client.Events.EventContent", {id: vm.notification.sourceIds.eventId, postNotification: vm.notification.sourceIds.postId}, {reload: true});
                         }
                     }
                 break;
@@ -167,7 +167,7 @@
                     vm.openNotification = function(event, notificationId) {
                     if(!isDeleteButton(event.target)) {
                         markAsRead(notificationId);
-                        $state.go("Root.WithOrg.Client.Projects.ProjectContent", {id: vm.notification.sourceIds.projectId, postNotification: vm.notification.sourceIds.postId}, {reload: true}); 
+                        $state.go("Root.WithOrg.Client.Projects.ProjectContent", {id: vm.notification.sourceIds.projectId, postNotification: vm.notification.sourceIds.postId}, {reload: true});
                         }
                     }
                 break;
@@ -176,7 +176,7 @@
                         if(!isDeleteButton(event.target)) {
                             markAsRead(notificationId);
                             if (vm.notification.sourceIds.postId != null){
-                                $state.go("Root.WithOrg.Client.Wall.Item.Feed", {post: vm.notification.sourceIds.postId}, {reload: true});  
+                                $state.go("Root.WithOrg.Client.Wall.Item.Feed", {post: vm.notification.sourceIds.postId}, {reload: true});
                             }
                             else if (vm.notification.sourceIds.eventId != null){
                                 $state.go("Root.WithOrg.Client.Events.EventContent", {id: vm.notification.sourceIds.eventId, postNotification: vm.notification.sourceIds.postId}, {reload: true});
@@ -184,7 +184,7 @@
                             else if (vm.notification.sourceIds.projectId != null){
                                 $state.go("Root.WithOrg.Client.Projects.ProjectContent", {id: vm.notification.sourceIds.projectId, postNotification: vm.notification.sourceIds.postId}, {reload: true});
                             }
-                            
+
                         }
                     }
                 break;
@@ -192,7 +192,7 @@
                     vm.openNotification = function(event, notificationId) {
                         if(!isDeleteButton(event.target)) {
                             markAsRead(notificationId);
-                            $state.go("Root.WithOrg.Client.Events.List.Type", {reload: true}); 
+                            $state.go("Root.WithOrg.Client.Events.List.Type", {reload: true});
                         }
                     }
                 break;

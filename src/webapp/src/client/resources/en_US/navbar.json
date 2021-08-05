@@ -58,7 +58,7 @@
   "newProjectPostNotification": "New post in {{ name }} project",
   "newEventPostNotification": "New post in {{ name }} event",
   "eventReminderNotification": "Join {{ name }} event this week",
-  "eventReminderNotifcationName": "Reminder",
+  "eventReminderNotificationName": "Reminder",
   "emailSubject": "You've received new kudos!",
   "wallPostCommentNotification": "Commented your post",
   "followingPostCommentNotification": "Commented the post you are following",

@@ -12,13 +12,12 @@
     ];
 
     function notificationFactory(notificationRepository, errorHandler, lodash) {
-        
-        var notification = {
+         const notification = {
             data: [],
             isBusy: false
         };
 
-        var service = {
+        const service = {
             notification: notification,
 
             init: init,
@@ -50,7 +49,7 @@
         {
             notificationRepository.markAsRead(notificationsIds).then(function (response){
                 lodash.remove(notification.data, function(value) {
-                    for (var key in response) {
+                    for (let key in response) {
                         if (response[key] === value.id) {
                             return true;
                         }
@@ -59,7 +58,7 @@
                 });
             }, errorHandler.handleErrorMessage);
         }
-        
+
         function markAllAsRead()
         {
             notificationRepository.markAllAsRead().then(function (){
@@ -75,9 +74,9 @@
         function updateNotifications()
         {
             notificationRepository.getNotifications().then(function (response){
-                var latestNotifications = response;
-                
-                var missingObjects = lodash.filter(response, function (obj) {
+                const latestNotifications = response;
+
+                const missingObjects = lodash.filter(response, function(obj) {
                     return !lodash.find(notification.data, obj);
                 });
 

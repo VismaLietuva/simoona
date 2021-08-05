@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
+using JetBrains.Annotations;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall.Comments;
 using Shrooms.Contracts.Enums;
@@ -14,6 +15,7 @@ using Shrooms.Presentation.Api.Hubs;
 
 namespace Shrooms.Presentation.Api.BackgroundWorkers
 {
+    [UsedImplicitly]
     public class NewCommentNotifier : IBackgroundWorker
     {
         private readonly IMapper _mapper;
@@ -40,7 +42,7 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
             await _commentEmailNotificationService.SendEmailNotificationAsync(commentDto);
 
             var membersToNotify = await _wallService.GetWallMembersIdsAsync(commentDto.WallId, userHubDto);
-            NotificationHub.SendWallNotification(commentDto.WallId, membersToNotify, commentDto.WallType, userHubDto);
+            await NotificationHub.SendWallNotificationAsync(commentDto.WallId, membersToNotify, commentDto.WallType, userHubDto);
 
             var postWatchers = await _postService.GetPostWatchersForAppNotificationsAsync(commentDto.PostId);
 
@@ -64,7 +66,7 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
             }
 
             var notification = _mapper.Map<NotificationViewModel>(notificationAuthorDto);
-            NotificationHub.SendNotificationToParticularUsers(notification, userHubDto, watchers);
+            await NotificationHub.SendNotificationToParticularUsersAsync(notification, userHubDto, watchers);
         }
     }
 }

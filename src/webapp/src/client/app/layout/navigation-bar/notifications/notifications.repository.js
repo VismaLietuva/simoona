@@ -7,9 +7,9 @@
     notificationRepository.$inject = ['$resource', 'endPoint'];
 
     function notificationRepository($resource, endPoint) {
-        var notificationUrl = endPoint + '/Notification/';
+        const notificationUrl = endPoint + '/Notification/';
 
-        var service = {
+        const service = {
             getNotifications: getNotifications,
             markAsRead: markAsRead,
             markAllAsRead: markAllAsRead

@@ -11,6 +11,7 @@ using Autofac.Integration.WebApi;
 using AutoMapper;
 using Hangfire;
 using Microsoft.Owin.Security.DataProtection;
+using Newtonsoft.Json;
 using Owin;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Infrastructure;
@@ -41,9 +42,14 @@ namespace Shrooms.IoC
             var modelMappings = Assembly.Load("Shrooms.Presentation.ModelMappings");
 
             builder.RegisterApiControllers(shroomsApi);
+
+            var settings = new JsonSerializerSettings();
+            settings.ContractResolver = new SignalRContractResolver();
+            var serializer = JsonSerializer.Create(settings);
+            builder.RegisterInstance(serializer).As<JsonSerializer>();
             builder.RegisterHubs(shroomsApi);
-            builder.RegisterAssemblyTypes(shroomsApi).
-                Where(t => typeof(IBackgroundWorker).IsAssignableFrom(t)).InstancePerDependency().AsSelf();
+
+            builder.RegisterAssemblyTypes(shroomsApi).Where(t => typeof(IBackgroundWorker).IsAssignableFrom(t)).InstancePerDependency().AsSelf();
             builder.RegisterType<AsyncRunner>().As<IAsyncRunner>().SingleInstance();
             builder.RegisterWebApiModelBinderProvider();
             builder.RegisterWebApiFilterProvider(config);
@@ -55,9 +61,7 @@ namespace Shrooms.IoC
 
             builder.RegisterType(typeof(UnitOfWork2)).As(typeof(IUnitOfWork2)).InstancePerRequest();
 
-            builder.Register(c => HttpContext.Current == null ?
-                    new ShroomsDbContext(c.Resolve<ITenantNameContainer>().TenantName) :
-                    new ShroomsDbContext(getConnectionStringName()))
+            builder.Register(c => HttpContext.Current == null ? new ShroomsDbContext(c.Resolve<ITenantNameContainer>().TenantName) : new ShroomsDbContext(getConnectionStringName()))
                 .As<IDbContext>().InstancePerRequest();
 
             builder.RegisterType(typeof(EfUnitOfWork)).As(typeof(IUnitOfWork)).InstancePerRequest();
@@ -68,7 +72,7 @@ namespace Shrooms.IoC
             builder.RegisterType<PostNotificationService>().As<IPostNotificationService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<CommentEmailNotificationService>().As<ICommentEmailNotificationService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.Register(_ => app.GetDataProtectionProvider()).InstancePerRequest();
-            builder.RegisterType<PermissionService>().As<IPermissionService>().PropertiesAutowired().InstancePerRequest(); //.EnableInterfaceTelemetryInterceptor();
+            builder.RegisterType<PermissionService>().As<IPermissionService>().PropertiesAutowired().InstancePerRequest();
             builder.RegisterType<SyncTokenService>().As<ISyncTokenService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<ImpersonateService>().As<IImpersonateService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<UserAdministrationValidator>().As<IUserAdministrationValidator>().InstancePerRequest();
@@ -164,7 +168,7 @@ namespace Shrooms.IoC
                 .AsSelf().SingleInstance();
 
             builder.Register(c => c.Resolve<MapperConfiguration>()
-                .CreateMapper(c.Resolve))
+                    .CreateMapper(c.Resolve))
                 .As<IMapper>()
                 .SingleInstance();
         }
