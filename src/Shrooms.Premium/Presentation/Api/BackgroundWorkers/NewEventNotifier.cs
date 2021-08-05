@@ -24,7 +24,7 @@ namespace Shrooms.Premium.Presentation.Api.BackgroundWorkers
         {
             var notification = await _notificationService.CreateForEventAsync(userAndOrganizationHubDto, eventDto);
 
-            NotificationHub.SendNotificationToAllUsers(_mapper.Map<NotificationViewModel>(notification), userAndOrganizationHubDto);
+            await NotificationHub.SendNotificationToAllUsersAsync(_mapper.Map<NotificationViewModel>(notification), userAndOrganizationHubDto);
         }
     }
 }

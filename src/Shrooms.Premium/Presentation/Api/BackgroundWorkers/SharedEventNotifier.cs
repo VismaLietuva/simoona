@@ -8,23 +8,23 @@ using Shrooms.Presentation.Api.Hubs;
 
 namespace Shrooms.Premium.Presentation.Api.BackgroundWorkers
 {
-  public class SharedEventNotifier : IBackgroundWorker
-  {
-    private readonly IWallService _wallService;
-    private readonly IPostNotificationService _postNotificationService;
-
-    public SharedEventNotifier(IWallService wallService, IPostNotificationService postNotificationService)
+    public class SharedEventNotifier : IBackgroundWorker
     {
-      _wallService = wallService;
-      _postNotificationService = postNotificationService;
-    }
+        private readonly IWallService _wallService;
+        private readonly IPostNotificationService _postNotificationService;
 
-    public async Task NotifyAsync(NewPostDto postModel, NewlyCreatedPostDto createdPost, UserAndOrganizationHubDto userHubDto)
-    {
-      await _postNotificationService.NotifyAboutNewPostAsync(createdPost);
+        public SharedEventNotifier(IWallService wallService, IPostNotificationService postNotificationService)
+        {
+            _wallService = wallService;
+            _postNotificationService = postNotificationService;
+        }
 
-      var membersToNotify = await _wallService.GetWallMembersIdsAsync(postModel.WallId, postModel);
-      NotificationHub.SendWallNotification(postModel.WallId, membersToNotify, createdPost.WallType, userHubDto);
+        public async Task NotifyAsync(NewPostDto postModel, NewlyCreatedPostDto createdPost, UserAndOrganizationHubDto userHubDto)
+        {
+            await _postNotificationService.NotifyAboutNewPostAsync(createdPost);
+
+            var membersToNotify = await _wallService.GetWallMembersIdsAsync(postModel.WallId, postModel);
+            await NotificationHub.SendWallNotificationAsync(postModel.WallId, membersToNotify, createdPost.WallType, userHubDto);
+        }
     }
-  }
 }
