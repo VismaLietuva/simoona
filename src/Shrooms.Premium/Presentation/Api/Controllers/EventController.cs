@@ -477,9 +477,9 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
         [Route("MaxParticipants")]
-        public IHttpActionResult GetMaxEventParticipants()
+        public async Task<IHttpActionResult> GetMaxEventParticipants()
         {
-            var maxParticipants = _eventParticipationService.GetMaxParticipantsCountAsync(GetUserAndOrganization());
+            var maxParticipants = await _eventParticipationService.GetMaxParticipantsCountAsync(GetUserAndOrganization());
             return Ok(new { value = maxParticipants });
         }
 

@@ -19,9 +19,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Kudos
         private readonly IMapper _mapper;
         private readonly IKudosShopService _kudosShopService;
 
-        public KudosShopController(
-            IMapper mapper,
-            IKudosShopService kudosShopService)
+        public KudosShopController(IMapper mapper, IKudosShopService kudosShopService)
         {
             _mapper = mapper;
             _kudosShopService = kudosShopService;

@@ -12,7 +12,7 @@ namespace Shrooms.Premium.Domain.Services.Committees
         Task<CommitteeViewDto> GetKudosCommitteeAsync();
         Task<int> GetKudosCommitteeIdAsync();
         Task PostSuggestionAsync(CommitteeSuggestionPostDto dto, string userId);
-        Task<IEnumerable<CommitteeSuggestionDto>> GetCommitteeSuggestions(int id);
+        Task<IEnumerable<CommitteeSuggestionDto>> GetCommitteeSuggestionsAsync(int id);
         Task DeleteCommitteeSuggestionAsync(int committeeId, int suggestionId, UserAndOrganizationDto userAndOrg);
     }
 }

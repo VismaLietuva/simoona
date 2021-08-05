@@ -180,7 +180,7 @@ namespace Shrooms.Premium.Domain.Services.Committees
             _asyncRunner.Run<ICommitteeNotificationService>(async notifier => await notifier.NotifyCommitteeMembersAboutNewSuggestionAsync(suggestionDto), _uow.ConnectionName);
         }
 
-        public async Task<IEnumerable<CommitteeSuggestionDto>> GetCommitteeSuggestions(int id)
+        public async Task<IEnumerable<CommitteeSuggestionDto>> GetCommitteeSuggestionsAsync(int id)
         {
             var committee = await _committeeRepository.Get(c => c.Id == id, includeProperties: "Suggestions.User").FirstOrDefaultAsync();
 

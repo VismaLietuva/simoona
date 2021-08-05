@@ -136,12 +136,12 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         }
 
         [PermissionAuthorize(Permission = AdministrationPermissions.Committees)]
-        public HttpResponseMessage DeleteSuggestion(int committeeId, int suggestionId)
+        public async Task<HttpResponseMessage> DeleteSuggestion(int committeeId, int suggestionId)
         {
             var userAndOrg = GetUserAndOrganization();
             try
             {
-                _committeesService.DeleteCommitteeSuggestionAsync(committeeId, suggestionId, userAndOrg);
+                await _committeesService.DeleteCommitteeSuggestionAsync(committeeId, suggestionId, userAndOrg);
             }
             catch (ServiceException ex)
             {
@@ -153,13 +153,13 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.Committees)]
-        public HttpResponseMessage GetSuggestions(int id)
+        public async Task<HttpResponseMessage> GetSuggestions(int id)
         {
             if (id == 0)
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound, new[] { Resources.Models.Committee.Committee.SuggestionCommiteNotFound });
             }
-            var suggestions = _committeesService.GetCommitteeSuggestions(id);
+            var suggestions = await _committeesService.GetCommitteeSuggestionsAsync(id);
 
             return Request.CreateResponse(HttpStatusCode.OK, _mapper.Map<IEnumerable<CommitteeSuggestionViewModel>>(suggestions));
         }

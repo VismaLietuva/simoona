@@ -41,8 +41,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         private readonly IPermissionService _permissionService;
         private readonly IMapper _mapper;
 
-        public ServiceRequestsController(
-            IMapper mapper,
+        public ServiceRequestsController(IMapper mapper,
             IUnitOfWork unitOfWork,
             IKudosShopService kudosShopService,
             IPermissionService permissionService,
@@ -155,16 +154,16 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.ServiceRequest)]
-        public List<ServiceRequestCategory> GetCategories()
+        public async Task<List<ServiceRequestCategory>> GetCategories()
         {
-            return _categoryRepository.Get().OrderBy(cat => cat.Name).ToList();
+            return await _categoryRepository.Get().OrderBy(cat => cat.Name).ToListAsync();
         }
 
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.ServiceRequest)]
-        public List<ServiceRequestPriority> GetPriorities()
+        public async Task<List<ServiceRequestPriority>> GetPriorities()
         {
-            return _priorityRepository.Get().ToList();
+            return await _priorityRepository.Get().ToListAsync();
         }
 
         [HttpGet]
@@ -176,26 +175,26 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.ServiceRequest)]
-        public List<KudosShopItemViewModel> GetKudosShopItems()
+        public async Task<IEnumerable<KudosShopItemViewModel>> GetKudosShopItems()
         {
             var userOrganization = GetUserAndOrganization();
-            var kudosShopItemsTask = Task.Run(async () => await _kudosShopService.GetAllItemsAsync(userOrganization));
-            var kudosShopItems = _mapper.Map<IEnumerable<KudosShopItemDto>, IEnumerable<KudosShopItemViewModel>>(kudosShopItemsTask.Result);
-            return kudosShopItems.ToList();
+            var kudosShopItemsTask = await _kudosShopService.GetAllItemsAsync(userOrganization);
+            var kudosShopItems = _mapper.Map<IEnumerable<KudosShopItemDto>, IEnumerable<KudosShopItemViewModel>>(kudosShopItemsTask);
+            return kudosShopItems;
         }
 
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.ServiceRequest)]
-        public List<ServiceRequestStatus> GetStatuses()
+        public async Task<List<ServiceRequestStatus>> GetStatuses()
         {
-            return _statusRepository.Get().ToList();
+            return await _statusRepository.Get().ToListAsync();
         }
 
         [HttpGet]
         [PermissionAuthorize(BasicPermissions.ServiceRequest)]
-        public IEnumerable<ServiceRequestCommentViewModel> GetComments(int requestId)
+        public async Task<IEnumerable<ServiceRequestCommentViewModel>> GetComments(int requestId)
         {
-            var model = _commentRepository.Get(includeProperties: "Employee", filter: c => c.ServiceRequestId == requestId);
+            var model = await _commentRepository.Get(includeProperties: "Employee", filter: c => c.ServiceRequestId == requestId).ToListAsync();
             return _mapper.Map<IEnumerable<ServiceRequestComment>, IEnumerable<ServiceRequestCommentViewModel>>(model);
         }
 
