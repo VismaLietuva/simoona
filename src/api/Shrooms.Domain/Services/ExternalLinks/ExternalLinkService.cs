@@ -61,7 +61,7 @@ namespace Shrooms.Domain.Services.ExternalLinks
                 .ToListAsync();
 
             if (updateLinksDto.LinksToCreate.Any(c => externalLinks.Any(l => l.Name == c.Name || l.Url == c.Url)) ||
-                updateLinksDto.LinksToUpdate.Any(c => externalLinks.Any(l => l.Name == c.Name || l.Url == c.Url)))
+                updateLinksDto.LinksToUpdate.Any(c => externalLinks.Any(l => (l.Name == c.Name || l.Url == c.Url) && l.Id != c.Id)))
             {
                 throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "Provided values must be unique");
             }

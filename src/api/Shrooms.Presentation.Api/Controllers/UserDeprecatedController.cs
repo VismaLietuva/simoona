@@ -321,7 +321,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             if (isAdmin)
             {
-                var roles = GetUserRoles(user.Id);
+                var roles = await GetUserRolesAsync(user.Id);
                 model.Roles = _mapper.Map<IEnumerable<ApplicationRoleMiniViewModel>>(roles);
             }
 
@@ -874,7 +874,7 @@ namespace Shrooms.Presentation.Api.Controllers
             return Ok(tutorialStatus);
         }
 
-        private async Task<IEnumerable<ApplicationRole>> GetUserRoles(string userId)
+        private async Task<IEnumerable<ApplicationRole>> GetUserRolesAsync(string userId)
         {
             return await _rolesRepository.Get(r => r.Users.Any(u => u.UserId == userId)).ToListAsync();
         }

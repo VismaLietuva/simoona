@@ -41,8 +41,10 @@ namespace Shrooms.Presentation.Api.Controllers
             if (!string.IsNullOrEmpty(search))
             {
                 var searchWords = search.Split(WebApiConstants.SearchSplitter);
+
                 return await GetFilteredPaged("WorkingHours,JobPosition", page, WebApiConstants.DefaultPageSize, sortBy, sortOrder,
-                    s => searchWords.Count(sw => s.FirstName.Contains(sw) || s.LastName.Contains(sw) || s.JobPosition.Title.Contains(sw)) == searchWords.Length);
+                    // ReSharper disable once UseCollectionCountProperty (EF projection)
+                    s => searchWords.Count(sw => s.FirstName.Contains(sw) || s.LastName.Contains(sw) || s.JobPosition.Title.Contains(sw)) == searchWords.Count());
             }
 
             return await GetFilteredPaged("WorkingHours,JobPosition", page, WebApiConstants.DefaultPageSize, sortBy, sortOrder);
@@ -66,8 +68,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 .ToPagedListAsync(page, pageSize);
 
             var employeeListViewModels = _mapper.Map<IEnumerable<ApplicationUser>, IEnumerable<EmployeeListViewModel>>(models);
-            var pagedModel = new StaticPagedList<EmployeeListViewModel>(employeeListViewModels, models.PageNumber, models.PageSize,
-                models.TotalItemCount);
+            var pagedModel = new StaticPagedList<EmployeeListViewModel>(employeeListViewModels, models.PageNumber, models.PageSize, models.TotalItemCount);
 
             if (!isAdmin)
             {
