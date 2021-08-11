@@ -40,10 +40,29 @@ namespace Shrooms.Domain.Services.Organizations
                 .SingleAsync(organization => organization.ShortName.ToLower() == organizationName.ToLower());
         }
 
+        public string GetOrganizationHostName(string organizationName)
+        {
+            var hostName = _organizationsDbSet.Single(organization => organization.ShortName.ToLower() == organizationName.ToLower()).HostName;
+            return hostName;
+        }
+
         public async Task<string> GetOrganizationHostNameAsync(string organizationName)
         {
             var hostName = (await _organizationsDbSet.SingleAsync(organization => organization.ShortName.ToLower() == organizationName.ToLower())).HostName;
             return hostName;
+        }
+
+        public bool HasOrganizationEmailDomainRestriction(string organizationName)
+        {
+            var organization = _organizationsDbSet
+                .SingleOrDefault(o => o.ShortName.ToLower() == organizationName.ToLower());
+
+            if (organization == null)
+            {
+                throw new InvalidOrganizationException();
+            }
+
+            return organization.HasRestrictedAccess;
         }
 
         public async Task<bool> HasOrganizationEmailDomainRestrictionAsync(string organizationName)

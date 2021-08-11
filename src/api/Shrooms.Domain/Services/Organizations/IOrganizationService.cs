@@ -15,7 +15,11 @@ namespace Shrooms.Domain.Services.Organizations
 
         Task<Organization> GetUserOrganizationAsync(ApplicationUser user);
 
+        string GetOrganizationHostName(string organizationName);
+
         Task<string> GetOrganizationHostNameAsync(string organizationName);
+
+        bool HasOrganizationEmailDomainRestriction(string organizationName);
 
         Task<bool> HasOrganizationEmailDomainRestrictionAsync(string organizationName);
 
