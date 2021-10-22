@@ -58,7 +58,6 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
                 .Ignore(d => d.ParticipantIds)
                 .IgnoreUserOrgDto();
             CreateMap<EventJoinMultipleViewModel, EventJoinDto>()
-                .Ignore(d => d.AttendStatus)
                 .Ignore(d => d.AttendComment)
                 .IgnoreUserOrgDto();
             CreateMap<EventOptionViewModel, EventOptionDto>();
