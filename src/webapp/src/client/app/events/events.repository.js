@@ -137,11 +137,12 @@
             }).$promise;
         }
 
-        function addColleagues(eventId, chosenOptions, participantIds) {
+        function addColleagues(eventId, chosenOptions, participantIds, attendStatus) {
             return $resource(eventUrl + 'AddColleague').save({
                 eventId: eventId,
                 chosenOptions: chosenOptions,
-                participantIds: participantIds
+                participantIds: participantIds,
+                attendStatus: attendStatus
             }).$promise;
         }
 

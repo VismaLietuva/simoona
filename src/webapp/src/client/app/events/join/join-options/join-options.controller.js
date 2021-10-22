@@ -125,7 +125,7 @@
                 var selectedOptionsId = lodash.map(vm.selectedOptions, 'id');
                 if (vm.isAddColleague) {
                     var participantIds = lodash.map(vm.participants, 'id');
-                    eventRepository.addColleagues(event.id, selectedOptionsId, participantIds)
+                    eventRepository.addColleagues(event.id, selectedOptionsId, participantIds, attendStatus.Attending)
                         .then(handleSuccessPromise, handleErrorPromise);
                 } else {
                     eventRepository.joinEvent(event.id, selectedOptionsId, attendStatus.Attending)
