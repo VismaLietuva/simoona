@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects.Models.ExternalLinks;
+using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Helpers;
@@ -31,7 +32,8 @@ namespace Shrooms.Domain.Services.ExternalLinks
                 {
                     Id = x.Id,
                     Name = x.Name,
-                    Url = x.Url
+                    Url = x.Url,
+                    Type =x.Type
                 })
                 .ToListAsync();
 
@@ -78,7 +80,8 @@ namespace Shrooms.Domain.Services.ExternalLinks
                     OrganizationId = updateLinks.OrganizationId,
                     Created = timestamp,
                     CreatedBy = updateLinks.UserId,
-                    Modified = timestamp
+                    Modified = timestamp,
+                    Type = link.Type
                 };
 
                 _externalLinkDbSet.Add(newLink);
@@ -124,6 +127,7 @@ namespace Shrooms.Domain.Services.ExternalLinks
                 link.Url = updatedLink.Url;
                 link.Modified = timestamp;
                 link.ModifiedBy = updateLinks.UserId;
+                link.Type = updatedLink.Type;
             }
         }
     }
