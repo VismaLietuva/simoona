@@ -6,22 +6,25 @@
         .constant('leftMenuGroups', {
             activities: { resource: 'navbar.activities', iconClass: 'glyphicon glyphicon-activity' },
             company: { resource: 'navbar.company', iconClass: 'glyphicon glyphicon-compass' },
-            externals: { resource: 'navbar.externals', iconClass: 'glyphicon glyphicon-new-window-alt' }
+            externalsImportant: { resource: 'navbar.externalsImportant', iconClass: 'glyphicon glyphicon-new-window-alt' },
+            externalsBasic: { resource: 'navbar.externalsBasic', iconClass: 'glyphicon glyphicon-new-window-alt' }
         })
         .controller('leftMenuController', leftMenuController);
 
     leftMenuController.$inject = [
         '$translate',
+        '$q',
         'menuNavigationFactory',
         'externalLinksRepository',
         'leftMenuGroups',
         'authService',
         'wallService',
-        'leftMenuService'
+        'leftMenuService',
+        'externalLinkTypes'
     ];
 
-    function leftMenuController($translate, menuNavigationFactory, externalLinksRepository, leftMenuGroups,
-        authService, wallService, leftMenuService) {
+    function leftMenuController($translate, $q, menuNavigationFactory, externalLinksRepository, leftMenuGroups,
+        authService, wallService, leftMenuService, externalLinkTypes) {
         /* jshint validthis: true */
         var vm = this;
 
@@ -31,6 +34,7 @@
         vm.isAuthenticated = authService.identity.isAuthenticated && !authService.isInRole('NewUser') && !authService.isInRole('External');
         vm.isAuthenticatedForWalls = authService.hasPermissions(['WALL_BASIC']);
         vm.sidebarOpen = true;
+        vm.externalLinkTypes = externalLinkTypes;
         vm.closeSidebar = closeSidebar;
         vm.overlayDismiss = overlayDismiss;
         vm.isSidebarOpen = isSidebarOpen;
@@ -38,17 +42,13 @@
 
         init();
 
-        ///////
-
-        $translate(leftMenuGroups.externals.resource).then(function() {
-            vm.isTranslating = false;
-        });
+        translateExternalLinks();
 
         function init() {
             if (authService.hasPermissions(['EXTERNALLINK_BASIC'])) {
                 vm.isLoading = true;
                 externalLinksRepository.getExternalLinks().then(function(response) {
-                    menuNavigationFactory.deleteLeftMenuGroup(leftMenuGroups.externals);
+                    menuNavigationFactory.deleteLeftMenuGroup(leftMenuGroups);
 
                     angular.forEach(response, defineMenuItem);
 
@@ -65,14 +65,34 @@
             }
         }
 
+        function translateExternalLinks() {
+            $q.all([
+                $translate(leftMenuGroups.externalsBasic.resource),
+                $translate(leftMenuGroups.externalsImportant.resource)
+            ]).then(vm.isTranslating = false);
+        }
+
         function defineMenuItem(item, index) {
-            menuNavigationFactory.defineLeftMenuItem({
+
+            let linkToAdd = {
                 url: item.url,
                 permission: 'EXTERNALLINK_BASIC',
                 name: item.name,
                 order: index,
-                group: leftMenuGroups.externals
-            });
+            }
+
+            switch (item.type) {
+                case vm.externalLinkTypes.Important:
+                    linkToAdd.group = leftMenuGroups.externalsImportant;
+                    menuNavigationFactory.defineLeftMenuItem(linkToAdd);
+                    break;
+
+                case vm.externalLinkTypes.Basic:
+                default:
+                    linkToAdd.group = leftMenuGroups.externalsBasic;
+                    menuNavigationFactory.defineLeftMenuItem(linkToAdd);
+                    break;
+            }
         }
 
         function overlayDismiss(e) {
@@ -90,5 +110,4 @@
             return leftMenuService.getStatus();
         }
     }
-
 })();
