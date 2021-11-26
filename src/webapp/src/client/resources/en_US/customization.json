@@ -6,6 +6,8 @@
     "linkNameNotUnique": "Link names must be unique",
     "linkUrlNotUnique": "Links must be unique",
     "name": "Name",
+    "linkType" : "Type",
+    "defaultSelectionOption" : "Please Select Type",
     "invalidUrl": "Invalid url address",
     "urlPlaceholder": "e.g. http://www.simoona.com/",
     "eventTypes": "Event types",
