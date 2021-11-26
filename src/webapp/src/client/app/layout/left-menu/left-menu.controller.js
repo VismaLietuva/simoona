@@ -82,12 +82,12 @@
             }
 
             switch (item.type) {
-                case vm.externalLinkTypes.Important:
+                case vm.externalLinkTypes.Important.type:
                     linkToAdd.group = leftMenuGroups.externalsImportant;
                     menuNavigationFactory.defineLeftMenuItem(linkToAdd);
                     break;
 
-                case vm.externalLinkTypes.Basic:
+                case vm.externalLinkTypes.Basic.type:
                 default:
                     linkToAdd.group = leftMenuGroups.externalsBasic;
                     menuNavigationFactory.defineLeftMenuItem(linkToAdd);

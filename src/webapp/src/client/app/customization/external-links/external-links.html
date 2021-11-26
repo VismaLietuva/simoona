@@ -70,11 +70,11 @@
                                     <select class="form-control dropdown" id="linkType{{$index}}"
                                             type="text"
                                             ng-model="link.type"
-                                            ng-options="item as item.linkType for item in vm.externalLinkTypes track by item.linkTypeValue"
+                                            ng-options="item as item.linkType | translate for item in vm.externalLinkTypes track by item.linkTypeValue"
                                             ng-init="link.type = vm.externalLinkTypes[link.type - 1]"
                                             required="false"
                                             ng-class="{'has-error': (externalLinkForm.linkName.$error.required && externalLinkForm.linkName.$dirty) || (externalLinkForm.linkName.$error.maxlength)}">
-                                        <option translate="customization.defaultSelectionOption" value=""></option>
+                                        <option translate="customization.defaultDropdownOption" value=""></option>
                                     </select>
                                 </div>
                             </div>

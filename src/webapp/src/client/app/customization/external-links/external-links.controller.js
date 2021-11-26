@@ -37,11 +37,10 @@
         vm.isUpdated = isUpdated;
         vm.isLoadingLinks = true;
 
-
         init();
 
         function init() {
-            addSelectionOptions();
+            addDropdownOptions();
 
             externalLinksRepository.getExternalLinks().then(function(response) {
                 vm.externalLinks = response;
@@ -101,9 +100,10 @@
             $state.go('Root.WithOrg.Admin.Customization.List');
         }
 
-        function addSelectionOptions() {
-            for(const type in externalLinkTypes) {
-                vm.externalLinkTypes.push({ linkType: type, linkTypeValue: externalLinkTypes[type] });
+        function addDropdownOptions() {
+            for(const value in externalLinkTypes) {
+                vm.externalLinkTypes.push({ linkType: externalLinkTypes[value].resource,
+                    linkTypeValue: externalLinkTypes[value].type});
             }
         }
 
