@@ -201,6 +201,7 @@ Task("BuildWebApp")
     .Does(() => 
 {
     NpmInstall(settings => settings.FromPath(webAppPath).WithLogLevel(NpmLogLevel.Error));
+    Gulp.Local.Execute(settings => settings.WithArguments("wiredep --silent").WorkingDirectory = webAppPath);
     Gulp.Local.Execute(settings => settings.WithArguments("build-dev --silent").WorkingDirectory = webAppPath);
     LogMessage(logFile, "Task BuildWebApp is finished successfully");
 })
