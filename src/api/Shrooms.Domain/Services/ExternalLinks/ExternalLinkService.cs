@@ -33,7 +33,7 @@ namespace Shrooms.Domain.Services.ExternalLinks
                     Id = x.Id,
                     Name = x.Name,
                     Url = x.Url,
-                    Type =x.Type
+                    Type = x.Type
                 })
                 .ToListAsync();
 
