@@ -7,6 +7,11 @@
             'simoonaApp.Customization',
             'simoonaApp.Common'
         ])
+        .constant("externalLinkTypes", {
+            'Basic' : { type: 1, resource: 'customization.linkTypeBasic' },
+            'Important' : { type: 2, resource: 'customization.linkTypeImportant' },
+        })
+
         .config(config)
         .run(init);
 
