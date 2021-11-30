@@ -13,6 +13,8 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
 
             Property(x => x.Url).IsRequired();
 
+            Property(x => x.Type).IsRequired();
+
             Property(x => x.Created).HasColumnType("datetime2");
 
             Property(x => x.Modified).HasColumnType("datetime2");

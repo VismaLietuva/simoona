@@ -97,6 +97,7 @@
     <Compile Include="DataTransferObjects\Wall\Posts\NewPostDto.cs" />
     <Compile Include="DataTransferObjects\Wall\Posts\PostDto.cs" />
     <Compile Include="DataTransferObjects\Wall\UpdateWallDto.cs" />
+    <Compile Include="Enums\ExternalLinkTypeEnum.cs" />
     <Compile Include="Enums\KudosTypeEnum.cs" />
     <Compile Include="Enums\LotteryStatus.cs" />
     <Compile Include="Enums\NotificationType.cs" />

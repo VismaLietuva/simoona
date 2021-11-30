@@ -843,6 +843,10 @@
     <Compile Include="Migrations\202106290801404_AddedJoinOptionsToEvents.Designer.cs">
       <DependentUpon>202106290801404_AddedJoinOptionsToEvents.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202111261144430_AddedExternalLinkTypes.cs" />
+    <Compile Include="Migrations\202111261144430_AddedExternalLinkTypes.Designer.cs">
+      <DependentUpon>202111261144430_AddedExternalLinkTypes.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
@@ -1402,6 +1406,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202106290801404_AddedJoinOptionsToEvents.resx">
       <DependentUpon>202106290801404_AddedJoinOptionsToEvents.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202111261144430_AddedExternalLinkTypes.resx">
+      <DependentUpon>202111261144430_AddedExternalLinkTypes.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

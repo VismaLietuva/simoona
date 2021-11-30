@@ -11,10 +11,11 @@
         'lodash',
         'externalLinksRepository',
         'notifySrv',
-        'errorHandler'
+        'errorHandler',
+        'externalLinkTypes'
     ];
 
-    function externalLinksController($rootScope, $state, lodash, externalLinksRepository, notifySrv, errorHandler) {
+    function externalLinksController($rootScope, $state, lodash, externalLinksRepository, notifySrv, errorHandler, externalLinkTypes) {
         /*jshint validthis: true */
         var vm = this;
 
@@ -22,7 +23,9 @@
 
         var tempLinkList = [];
         vm.externalLinks = [];
+        vm.externalLinkTypes = [];
         vm.linksToDelete = [];
+
         vm.urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&=]*)/;
 
         vm.addLink = addLink;
@@ -37,6 +40,8 @@
         init();
 
         function init() {
+            addDropdownOptions();
+
             externalLinksRepository.getExternalLinks().then(function(response) {
                 vm.externalLinks = response;
                 tempLinkList = angular.copy(vm.externalLinks);
@@ -47,7 +52,8 @@
         function addLink() {
             vm.externalLinks.push({
                 name: '',
-                url: ''
+                url: '',
+                type: ''
             });
         }
 
@@ -69,14 +75,15 @@
 
             if (!!vm.externalLinks.length) {
 
-                externalLinksUpdateObject.LinksToCreate = lodash.filter(vm.externalLinks, function(element) {
+                vm.externalLinks.forEach(link => link.type = link.type.linkTypeValue);
+
+                externalLinksUpdateObject.LinksToCreate = lodash.filter(vm.externalLinks, (element) => {
                     return !element.id;
                 });
 
-                externalLinksUpdateObject.LinksToUpdate = lodash.filter(vm.externalLinks, function(element) {
+                externalLinksUpdateObject.LinksToUpdate = lodash.filter(vm.externalLinks, (element) => {
                     return !!element.id;
                 });
-
             }
 
             externalLinksUpdateObject.LinksToDelete = vm.linksToDelete;
@@ -91,6 +98,13 @@
 
         function cancelLinksUpdate() {
             $state.go('Root.WithOrg.Admin.Customization.List');
+        }
+
+        function addDropdownOptions() {
+            for(const value in externalLinkTypes) {
+                vm.externalLinkTypes.push({ linkType: externalLinkTypes[value].resource,
+                    linkTypeValue: externalLinkTypes[value].type});
+            }
         }
 
         function isLinksUnique() {
