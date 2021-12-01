@@ -1,4 +1,6 @@
 ﻿using System;
+using Newtonsoft.Json;
+using Shrooms.Contracts.Enums;
 
 namespace Shrooms.DataLayer.EntityModels.Models.Multiwall
 {
@@ -8,10 +10,14 @@ namespace Shrooms.DataLayer.EntityModels.Models.Multiwall
 
         public DateTime Created { get; private set; }
 
-        public Like(string userId)
+        [JsonProperty("Type")]
+        public LikeTypeEnum Type { get; private set; }
+        
+        public Like(string userId, LikeTypeEnum likeType)
         {
             UserId = userId;
             Created = DateTime.UtcNow;
+            Type = likeType;
         }
     }
 }

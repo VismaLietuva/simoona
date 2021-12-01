@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Shrooms.Contracts.DataTransferObjects.Models.Users;
 using Shrooms.Contracts.DataTransferObjects.Users;
+using Shrooms.Contracts.DataTransferObjects.Wall.Likes;
 using Shrooms.Contracts.ViewModels.User;
 using Shrooms.Presentation.WebViewModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.User;
@@ -45,10 +46,8 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
                 .Ignore(x => x.FirstName)
                 .Ignore(x => x.LastName);
 
+            CreateMap<LikeDto, UserViewModel>();
             CreateMap<UserDto, UserViewModel>();
-            CreateMap<UserViewModel, UserDto>()
-                .Ignore(x => x.UserName);
-
             CreateMap<TimeZoneDto, TimeZoneViewModel>();
             CreateMap<LanguageDto, LanguageViewModel>();
             CreateMap<WallNotificationsDto, WallNotificationsViewModel>();
