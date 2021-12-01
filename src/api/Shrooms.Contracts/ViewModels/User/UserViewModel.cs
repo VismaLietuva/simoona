@@ -1,6 +1,4 @@
-﻿using Shrooms.Contracts.Enums;
-
-namespace Shrooms.Contracts.ViewModels.User
+﻿namespace Shrooms.Contracts.ViewModels.User
 {
     public class UserViewModel
     {
@@ -9,7 +7,5 @@ namespace Shrooms.Contracts.ViewModels.User
         public string FullName { get; set; }
 
         public string PictureId { get; set; }
-
-        public LikeTypeEnum LikeType { get; set; }
     }
 }

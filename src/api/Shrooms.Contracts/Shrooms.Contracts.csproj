@@ -127,6 +127,7 @@
     <Compile Include="ViewModels\PagedViewModel.cs" />
     <Compile Include="ViewModels\User\ApplicationUserMinimalViewModel.cs" />
     <Compile Include="ViewModels\User\UserViewModel.cs" />
+    <Compile Include="ViewModels\Wall\Likes\LikeViewModel.cs" />
     <Compile Include="ViewModels\Wall\Posts\CommentViewModel.cs" />
     <Compile Include="ViewModels\Wall\Posts\WallPostViewModel.cs" />
   </ItemGroup>
