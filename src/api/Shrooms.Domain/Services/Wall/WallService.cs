@@ -14,6 +14,7 @@ using Shrooms.Contracts.DataTransferObjects.Models.Wall.Moderator;
 using Shrooms.Contracts.DataTransferObjects.Users;
 using Shrooms.Contracts.DataTransferObjects.Wall;
 using Shrooms.Contracts.DataTransferObjects.Wall.Comments;
+using Shrooms.Contracts.DataTransferObjects.Wall.Likes;
 using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
@@ -727,12 +728,26 @@ namespace Shrooms.Domain.Services.Wall
             return user == null ? new UserDto { FullName = BusinessLayerConstants.DeletedUserName } : _mapper.Map<UserDto>(user);
         }
 
-        private IEnumerable<UserDto> MapLikesToDto(LikesCollection likes, IEnumerable<ApplicationUser> users)
+        private IEnumerable<LikeDto> MapLikesToDto(LikesCollection likes, IEnumerable<ApplicationUser> users)
         {
             return likes
-                .Select(like => users.FirstOrDefault(x => x.Id == like.UserId))
-                .Select(user => _mapper.Map<UserDto>(user))
-                .Where(user => user != null)
+                .Select(like => new { User = users.FirstOrDefault(user => user.Id == like.UserId), Like = like })
+                .Select(likeWithUserData =>
+                {
+                    if (likeWithUserData.User == null)
+                    {
+                        return null;
+                    }
+
+                    return new LikeDto
+                    {
+                        UserId = likeWithUserData.User.Id,
+                        FullName = likeWithUserData.User.FullName,
+                        PictureId = likeWithUserData.User.PictureId,
+                        LikeType = likeWithUserData.Like.Type
+                    };
+                })
+                .Where(like => like != null)
                 .ToList();
         }
 

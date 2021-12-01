@@ -3,6 +3,7 @@ using System.Web.Http;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall.Comments;
+using Shrooms.Contracts.DataTransferObjects.Wall.Likes;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.Infrastructure;
@@ -153,9 +154,9 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("Like")]
         [PermissionAuthorize(Permission = BasicPermissions.Post)]
-        public async Task<IHttpActionResult> ToggleLike(int id)
+        public async Task<IHttpActionResult> ToggleLike(AddLikeDto addLikeDto)
         {
-            if (id <= 0)
+            if (addLikeDto.Id <= 0)
             {
                 return BadRequest();
             }
@@ -163,7 +164,7 @@ namespace Shrooms.Presentation.Api.Controllers
             var userAndOrg = GetUserAndOrganization();
             try
             {
-                await _commentService.ToggleLikeAsync(id, userAndOrg);
+                await _commentService.ToggleLikeAsync(addLikeDto, userAndOrg);
                 return Ok();
             }
             catch (ValidationException e)

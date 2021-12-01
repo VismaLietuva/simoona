@@ -6,6 +6,7 @@ using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall.Comments;
+using Shrooms.Contracts.DataTransferObjects.Wall.Likes;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
@@ -36,12 +37,12 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             _wallModeratorsDbSet = uow.GetDbSet<WallModerator>();
             _postWatchers = uow.GetDbSet<PostWatcher>();
         }
-
-        public async Task ToggleLikeAsync(int commentId, UserAndOrganizationDto userOrg)
+        
+        public async Task ToggleLikeAsync(AddLikeDto addLikeDto, UserAndOrganizationDto userOrg)
         {
             var comment = await _commentsDbSet
                 .Include(x => x.Post.Wall)
-                .FirstOrDefaultAsync(x => x.Id == commentId && x.Post.Wall.OrganizationId == userOrg.OrganizationId);
+                .FirstOrDefaultAsync(x => x.Id == addLikeDto.Id && x.Post.Wall.OrganizationId == userOrg.OrganizationId);
 
             if (comment == null)
             {
@@ -52,7 +53,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
 
             if (like == null)
             {
-                comment.Likes.Add(new Like(userOrg.UserId));
+                comment.Likes.Add(new Like(userOrg.UserId, addLikeDto.LikeType));
             }
             else
             {

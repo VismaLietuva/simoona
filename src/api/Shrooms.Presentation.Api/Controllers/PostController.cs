@@ -3,6 +3,7 @@ using System.Web.Http;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts;
+using Shrooms.Contracts.DataTransferObjects.Wall.Likes;
 using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
@@ -183,9 +184,9 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("Like")]
         [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Post, BasicPermissions.EventWall)]
-        public async Task<IHttpActionResult> ToggleLike(int id)
+        public async Task<IHttpActionResult> ToggleLike(AddLikeDto addLikeDto)
         {
-            if (id <= 0)
+            if (addLikeDto.Id <= 0)
             {
                 return BadRequest();
             }
@@ -193,7 +194,7 @@ namespace Shrooms.Presentation.Api.Controllers
             var userAndOrg = GetUserAndOrganization();
             try
             {
-                await _postService.ToggleLikeAsync(id, userAndOrg);
+                await _postService.ToggleLikeAsync(addLikeDto, userAndOrg);
                 return Ok();
             }
             catch (ValidationException e)
