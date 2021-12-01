@@ -1,21 +1,22 @@
 ﻿<span ng-if="positionedLikes.length === 1" ng-cloak translate-cloak>
-    <span class="glyphicon glyphicon-thumbs-up link-color"></span>
+    <span>{{likeTypes[0].emoji}}</span>
     <span ng-if="!!user">
-        <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: positionedLikes[0].userId })" 
+        <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: positionedLikes[0].userId })"
            translate="common.you"></a>
         <span translate="wall.likeThis"></span>.
     </span>
-
     <span ng-if="!user">
         <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: positionedLikes[0].userId })">
             {{::positionedLikes[0].fullName}}</a>
         <span translate="wall.likesThis"></span>
     </span>
 </span>
+
 <span ng-if="positionedLikes.length === 2" ng-cloak translate-cloak>
-    <span class="glyphicon glyphicon-thumbs-up link-color"></span>
+    <span>{{likeTypes[0].emoji}}</span>
+    <span>{{likeTypes[1].emoji}}</span>
     <a ng-if="!!user"
-       ui-sref="Root.WithOrg.Client.Profiles.Details({ id: positionedLikes[0].userId })" 
+       ui-sref="Root.WithOrg.Client.Profiles.Details({ id: positionedLikes[0].userId })"
        translate="common.you"></a>
 
     <a ng-if="!user"
@@ -27,9 +28,20 @@
     <span translate="wall.likeThis"></span>.
 </span>
 <span ng-if="positionedLikes.length > 2" ng-cloak translate-cloak>
-    <span class="glyphicon glyphicon-thumbs-up link-color"></span>
-    <a ng-if="!!user" 
-       ui-sref="Root.WithOrg.Client.Profiles.Details({ id: positionedLikes[0].userId })" 
+    <span ng-repeat="like in likeTypes">
+        <a ace-message-like-list-popover
+           ng-if="filteredLikesByType[like.likeType].length > 1"
+           likes="filteredLikesByType[like.likeType]"
+           style="text-decoration: none"
+           popover-placement="top">{{like.emoji}}</a>
+
+        <span ng-if="filteredLikes[key].length <= 1">
+            {{like.emoji}}
+        </span>
+    </span>
+
+    <a ng-if="!!user"
+       ui-sref="Root.WithOrg.Client.Profiles.Details({ id: positionedLikes[0].userId })"
        translate="common.you"></a>
 
     <a ng-if="!user"
@@ -38,7 +50,7 @@
     <span translate="common.and"></span>
     <a ace-message-like-list-popover
        likes="positionedLikes"
-       popover-placement="right"
+       popover-placement="top"
        data-test-id="{{::likeType}}-like-others">
        <span translate="common.others"
              translate-values="{ likeCount: positionedLikes.length - 1 }"></span></a>

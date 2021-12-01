@@ -17,10 +17,11 @@
     wallLikeButtonController.$inject = [
         'messageLikeRepository',
         'lodash',
-        'authService'
+        'authService',
+        'likeTypes'
     ];
 
-    function wallLikeButtonController(messageLikeRepository, lodash, authService) {
+    function wallLikeButtonController(messageLikeRepository, lodash, authService, likeTypes) {
         /*jshint validthis: true */
         var vm = this;
 
@@ -28,13 +29,14 @@
         vm.unlikePost = unlikePost;
         vm.likeComment = likeComment;
         vm.unlikeComment = unlikeComment;
+        vm.likeTypes = likeTypes;
 
-        function likePost() {
+        function likePost($likeType) {
             if (vm.messageObject.id) {
-                addLikeToList();
+                addLikeToList($likeType);
                 vm.messageObject.isLiked = true;
 
-                messageLikeRepository.togglePostLike(vm.messageObject.id);
+                messageLikeRepository.togglePostLike(vm.messageObject.id, $likeType);
             }
         }
 
@@ -47,12 +49,12 @@
             }
         }
 
-        function likeComment() {
+        function likeComment($likeType) {
             if (vm.messageObject.id) {
-                addLikeToList();
+                addLikeToList($likeType);
                 vm.messageObject.isLiked = true;
 
-                messageLikeRepository.toggleCommentLike(vm.messageObject.id);
+                messageLikeRepository.toggleCommentLike(vm.messageObject.id, $likeType);
             }
         }
 
@@ -65,12 +67,13 @@
             }
         }
 
-        function addLikeToList() {
+        function addLikeToList($likeType) {
             if (!vm.messageObject.likes) {
                 vm.messageObject.likes = [];
             }
 
             vm.messageObject.likes.push({
+                likeType: $likeType,
                 pictureId: '',
                 userId: authService.identity.userId,
                 fullName: authService.identity.fullName
