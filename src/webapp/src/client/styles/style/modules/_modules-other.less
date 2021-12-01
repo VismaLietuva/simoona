@@ -37,6 +37,43 @@ input[type=text]::-ms-clear {
     border: none;
     background: none;
     color: #428bca;
+    position: relative;
+
+    &:hover .like-button-selections {
+        display: block;
+    }
+}
+
+.like-button-selections {
+    position: absolute;
+    display: none;
+    background: #fff;
+    height: 40px;
+    bottom: 20px;
+    width: 345px;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    border-radius: 50px;
+    padding: 1px;
+
+    button:first-child {
+        margin-left: 5px;
+    }
+
+    button {
+        border: 0;
+        border-radius: 50px;
+        background: transparent;
+        width: 14%;
+        height: 100%;
+        font-size: 2.55rem;
+        float: left;
+
+        transition: all 200ms linear;
+
+        &:hover {
+            transform: scale(1.2, 1.2) translate(0, -6px);
+        }
+    }
 }
 
 .message-like-button {
