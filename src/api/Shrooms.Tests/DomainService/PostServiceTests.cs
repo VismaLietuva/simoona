@@ -9,7 +9,9 @@ using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts;
+using Shrooms.Contracts.DataTransferObjects.Wall.Likes;
 using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
+using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
@@ -62,7 +64,8 @@ namespace Shrooms.Tests.DomainService
             };
 
             _postsDbSet.SetDbSetDataForAsync(new List<Post> { post }.AsQueryable());
-            await _postService.ToggleLikeAsync(1, new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 });
+            await _postService.ToggleLikeAsync(new AddLikeDto { Id = 1, LikeType = LikeTypeEnum.Like },
+                new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 });
 
             Assert.AreEqual("user1", _postsDbSet.First().Likes.First().UserId);
         }
@@ -73,7 +76,7 @@ namespace Shrooms.Tests.DomainService
             var post = new Post
             {
                 Id = 1,
-                Likes = new LikesCollection { new Like("user1") },
+                Likes = new LikesCollection { new Like("user1", LikeTypeEnum.Like) },
                 Wall = new Wall
                 {
                     OrganizationId = 2
@@ -81,7 +84,8 @@ namespace Shrooms.Tests.DomainService
             };
 
             _postsDbSet.SetDbSetDataForAsync(new List<Post> { post }.AsQueryable());
-            await _postService.ToggleLikeAsync(1, new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 });
+            await _postService.ToggleLikeAsync(new AddLikeDto { Id = 1, LikeType = LikeTypeEnum.Like },
+                new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 });
 
             Assert.AreEqual(0, _postsDbSet.First().Likes.Count);
         }
@@ -90,7 +94,11 @@ namespace Shrooms.Tests.DomainService
         public void Should_Throw_If_There_Is_No_Post_To_Be_Liked()
         {
             _postsDbSet.SetDbSetDataForAsync(new List<Post>().AsQueryable());
-            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _postService.ToggleLikeAsync(1, new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 }));
+
+            var ex = Assert.ThrowsAsync<ValidationException>(async () =>
+                await _postService.ToggleLikeAsync(new AddLikeDto { Id = 1, LikeType = LikeTypeEnum.Like },
+                    new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 }));
+
             Assert.AreEqual(ErrorCodes.ContentDoesNotExist, ex.ErrorCode);
         }
 
