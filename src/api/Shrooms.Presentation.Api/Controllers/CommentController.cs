@@ -156,12 +156,13 @@ namespace Shrooms.Presentation.Api.Controllers
         [PermissionAuthorize(Permission = BasicPermissions.Post)]
         public async Task<IHttpActionResult> ToggleLike(AddLikeDto addLikeDto)
         {
-            if (addLikeDto.Id <= 0)
+            if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return BadRequest(ModelState);
             }
 
             var userAndOrg = GetUserAndOrganization();
+
             try
             {
                 await _commentService.ToggleLikeAsync(addLikeDto, userAndOrg);

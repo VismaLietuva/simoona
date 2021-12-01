@@ -186,7 +186,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Post, BasicPermissions.EventWall)]
         public async Task<IHttpActionResult> ToggleLike(AddLikeDto addLikeDto)
         {
-            if (addLikeDto.Id <= 0)
+            if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
