@@ -395,5 +395,38 @@ namespace Shrooms.Tests.DomainService
             // Assert
             Assert.DoesNotThrowAsync(async () => await _commentService.DeleteCommentAsync(1, userOrg));
         }
+
+        [TestCase(0, LikeTypeEnum.Like)]
+        [TestCase(1, LikeTypeEnum.Love)]
+        [TestCase(2, LikeTypeEnum.Lol)]
+        [TestCase(3, LikeTypeEnum.Wow)]
+        [TestCase(4, LikeTypeEnum.Congrats)]
+        [TestCase(5, LikeTypeEnum.Sad)]
+        [TestCase(6, LikeTypeEnum.GrumpyCat)]
+        public async Task Should_Set_Correct_LikeType(int likeType, LikeTypeEnum expectedType)
+        {
+            // Setup
+            var comment = new Comment
+            {
+                Id = 1,
+                Likes = new LikesCollection(),
+                Post = new Post
+                {
+                    Wall = new Wall
+                    {
+                        OrganizationId = 2
+                    }
+                }
+            };
+
+            _commentsDbSet.SetDbSetDataForAsync(new List<Comment> { comment }.AsQueryable());
+
+            // Act
+            await _commentService.ToggleLikeAsync(new AddLikeDto { Id = comment.Id, LikeType = (LikeTypeEnum)likeType },
+                new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 });
+
+            // Assert
+            Assert.AreEqual(expectedType, _commentsDbSet.First().Likes.First().Type);
+        }
     }
 }
