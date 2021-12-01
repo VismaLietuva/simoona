@@ -101,18 +101,18 @@ namespace Shrooms.Domain.Services.Wall.Posts
         public async Task ToggleLikeAsync(AddLikeDto addLikeDto, UserAndOrganizationDto userOrg)
         {
             await _postDeleteLock.WaitAsync();
-            
+
             try
             {
                 var post = await _postsDbSet
                     .Include(x => x.Wall)
                     .FirstOrDefaultAsync(x => x.Id == addLikeDto.Id && x.Wall.OrganizationId == userOrg.OrganizationId);
-            
+
                 if (post == null)
                 {
                     throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Post does not exist");
                 }
-            
+
                 var like = post.Likes.FirstOrDefault(x => x.UserId == userOrg.UserId);
                 if (like == null)
                 {
@@ -122,7 +122,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
                 {
                     post.Likes.Remove(like);
                 }
-            
+
                 await _uow.SaveChangesAsync(userOrg.UserId);
             }
             finally

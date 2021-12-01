@@ -37,7 +37,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             _wallModeratorsDbSet = uow.GetDbSet<WallModerator>();
             _postWatchers = uow.GetDbSet<PostWatcher>();
         }
-        
+
         public async Task ToggleLikeAsync(AddLikeDto addLikeDto, UserAndOrganizationDto userOrg)
         {
             var comment = await _commentsDbSet

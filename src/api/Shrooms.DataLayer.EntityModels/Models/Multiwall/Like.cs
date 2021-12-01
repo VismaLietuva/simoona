@@ -12,7 +12,7 @@ namespace Shrooms.DataLayer.EntityModels.Models.Multiwall
 
         [JsonProperty("Type")]
         public LikeTypeEnum Type { get; private set; }
-        
+
         public Like(string userId, LikeTypeEnum likeType)
         {
             UserId = userId;

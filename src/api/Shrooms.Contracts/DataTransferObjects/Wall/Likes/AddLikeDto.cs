@@ -7,7 +7,7 @@ namespace Shrooms.Contracts.DataTransferObjects.Wall.Likes
     {
         [Required]
         public int Id { get; set; }
-        
+
         [Required]
         [EnumDataType(typeof(LikeTypeEnum))]
         public LikeTypeEnum LikeType { get; set; }
