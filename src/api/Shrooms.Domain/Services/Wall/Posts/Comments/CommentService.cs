@@ -53,7 +53,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
 
             if (like == null)
             {
-                comment.Likes.Add(new Like(userOrg.UserId, addLikeDto.LikeType));
+                comment.Likes.Add(new Like(userOrg.UserId, addLikeDto.Type));
             }
             else
             {

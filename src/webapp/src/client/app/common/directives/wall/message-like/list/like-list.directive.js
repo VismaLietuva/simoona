@@ -5,13 +5,13 @@
         .module('simoonaApp.Common')
         .directive('aceMessageLikeList', messageLikeList)
         .constant('likeTypes', [
-            { emoji: '👍', likeType: 0 },
-            { emoji: '❤️', likeType: 1 },
-            { emoji: '🤣', likeType: 2 },
-            { emoji: '😲', likeType: 3 },
-            { emoji: '👏', likeType: 4 },
-            { emoji: '😢', likeType: 5 },
-            { emoji: '😾', likeType: 6 }
+            { emoji: '👍', type: 0 },
+            { emoji: '❤️', type: 1 },
+            { emoji: '🤣', type: 2 },
+            { emoji: '😲', type: 3 },
+            { emoji: '👏', type: 4 },
+            { emoji: '😢', type: 5 },
+            { emoji: '😾', type: 6 }
         ]);
 
     messageLikeList.$inject = [
@@ -58,7 +58,7 @@
                         scope.user = likes[i];
                         scope.positionedLikes.push(likes[i]);
 
-                        addLikeType(likes[i].likeType, likes[i]);
+                        addLikeType(likes[i].type, likes[i]);
                     }
                 }
 
@@ -66,12 +66,12 @@
                     if (!!likes[i] && likes[i].userId !== authService.identity.userId) {
                         scope.positionedLikes.push(likes[i]);
 
-                        addLikeType(likes[i].likeType, likes[i]);
+                        addLikeType(likes[i].type, likes[i]);
                     }
                 }
 
                 // Sorting types to always keep the same order of emojis
-                scope.likeTypes.sort((a, b) => a.likeType > b.likeType ? 1 : -1);
+                scope.likeTypes.sort((a, b) => a.type > b.type ? 1 : -1);
             }
 
             function addLikeType(index, like) {

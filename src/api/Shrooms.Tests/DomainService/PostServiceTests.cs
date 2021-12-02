@@ -64,7 +64,7 @@ namespace Shrooms.Tests.DomainService
             };
 
             _postsDbSet.SetDbSetDataForAsync(new List<Post> { post }.AsQueryable());
-            await _postService.ToggleLikeAsync(new AddLikeDto { Id = 1, LikeType = LikeTypeEnum.Like },
+            await _postService.ToggleLikeAsync(new AddLikeDto { Id = 1, Type = LikeTypeEnum.Like },
                 new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 });
 
             Assert.AreEqual("user1", _postsDbSet.First().Likes.First().UserId);
@@ -84,7 +84,7 @@ namespace Shrooms.Tests.DomainService
             };
 
             _postsDbSet.SetDbSetDataForAsync(new List<Post> { post }.AsQueryable());
-            await _postService.ToggleLikeAsync(new AddLikeDto { Id = 1, LikeType = LikeTypeEnum.Like },
+            await _postService.ToggleLikeAsync(new AddLikeDto { Id = 1, Type = LikeTypeEnum.Like },
                 new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 });
 
             Assert.AreEqual(0, _postsDbSet.First().Likes.Count);
@@ -96,7 +96,7 @@ namespace Shrooms.Tests.DomainService
             _postsDbSet.SetDbSetDataForAsync(new List<Post>().AsQueryable());
 
             var ex = Assert.ThrowsAsync<ValidationException>(async () =>
-                await _postService.ToggleLikeAsync(new AddLikeDto { Id = 1, LikeType = LikeTypeEnum.Like },
+                await _postService.ToggleLikeAsync(new AddLikeDto { Id = 1, Type = LikeTypeEnum.Like },
                     new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 }));
 
             Assert.AreEqual(ErrorCodes.ContentDoesNotExist, ex.ErrorCode);
@@ -517,7 +517,7 @@ namespace Shrooms.Tests.DomainService
             _postsDbSet.SetDbSetDataForAsync(new List<Post> { post }.AsQueryable());
 
             // Act
-            await _postService.ToggleLikeAsync(new AddLikeDto { Id = post.Id, LikeType = (LikeTypeEnum)likeType },
+            await _postService.ToggleLikeAsync(new AddLikeDto { Id = post.Id, Type = (LikeTypeEnum)likeType },
                 new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 });
 
             // Assert

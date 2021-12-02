@@ -69,7 +69,7 @@ namespace Shrooms.Tests.DomainService
 
             _commentsDbSet.SetDbSetDataForAsync(new List<Comment> { comment }.AsQueryable());
 
-            await _commentService.ToggleLikeAsync(new AddLikeDto { Id = 1, LikeType = LikeTypeEnum.Like },
+            await _commentService.ToggleLikeAsync(new AddLikeDto { Id = 1, Type = LikeTypeEnum.Like },
                 new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 });
 
             Assert.AreEqual("user1", (await _commentsDbSet.FirstAsync()).Likes.First().UserId);
@@ -81,7 +81,7 @@ namespace Shrooms.Tests.DomainService
             _commentsDbSet.SetDbSetDataForAsync(new List<Comment>().AsQueryable());
 
             var ex = Assert.ThrowsAsync<ValidationException>(async () =>
-                await _commentService.ToggleLikeAsync(new AddLikeDto { Id = 1, LikeType = LikeTypeEnum.Like },
+                await _commentService.ToggleLikeAsync(new AddLikeDto { Id = 1, Type = LikeTypeEnum.Like },
                     new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 }));
 
             Assert.AreEqual(ErrorCodes.ContentDoesNotExist, ex.ErrorCode);
@@ -105,7 +105,7 @@ namespace Shrooms.Tests.DomainService
 
             _commentsDbSet.SetDbSetDataForAsync(new List<Comment> { comment }.AsQueryable());
 
-            await _commentService.ToggleLikeAsync(new AddLikeDto { Id = 1, LikeType = LikeTypeEnum.Like },
+            await _commentService.ToggleLikeAsync(new AddLikeDto { Id = 1, Type = LikeTypeEnum.Like },
                 new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 });
 
             Assert.AreEqual(0, (await _commentsDbSet.FirstAsync()).Likes.Count);
@@ -422,7 +422,7 @@ namespace Shrooms.Tests.DomainService
             _commentsDbSet.SetDbSetDataForAsync(new List<Comment> { comment }.AsQueryable());
 
             // Act
-            await _commentService.ToggleLikeAsync(new AddLikeDto { Id = comment.Id, LikeType = (LikeTypeEnum)likeType },
+            await _commentService.ToggleLikeAsync(new AddLikeDto { Id = comment.Id, Type = (LikeTypeEnum)likeType },
                 new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 });
 
             // Assert

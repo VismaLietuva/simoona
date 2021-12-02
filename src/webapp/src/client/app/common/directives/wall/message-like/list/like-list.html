@@ -37,8 +37,8 @@
     <div class="like-list-emoji-container">
         <span ng-repeat="like in likeTypes">
             <a ace-message-like-list-popover
-               ng-if="filteredLikesByType[like.likeType].length > 1"
-               likes="filteredLikesByType[like.likeType]"
+               ng-if="filteredLikesByType[like.type].length > 1"
+               likes="filteredLikesByType[like.type]"
                style="text-decoration: none"
                popover-placement="top">{{like.emoji}}</a>
 

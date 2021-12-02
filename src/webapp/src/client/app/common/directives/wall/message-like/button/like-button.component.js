@@ -73,7 +73,7 @@
             }
 
             vm.messageObject.likes.push({
-                likeType: $likeType,
+                type: $likeType,
                 pictureId: '',
                 userId: authService.identity.userId,
                 fullName: authService.identity.fullName

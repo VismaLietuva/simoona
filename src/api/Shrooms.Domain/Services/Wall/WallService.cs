@@ -744,7 +744,7 @@ namespace Shrooms.Domain.Services.Wall
                         UserId = likeWithUserData.User.Id,
                         FullName = likeWithUserData.User.FullName,
                         PictureId = likeWithUserData.User.PictureId,
-                        LikeType = likeWithUserData.Like.Type
+                        Type = likeWithUserData.Like.Type
                     };
                 })
                 .Where(like => like != null)

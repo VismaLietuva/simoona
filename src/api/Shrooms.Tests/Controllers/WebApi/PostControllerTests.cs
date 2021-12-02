@@ -55,7 +55,7 @@ namespace Shrooms.Tests.Controllers.WebApi
             var addLikeViewModel = new AddLikeViewModel
             {
                 Id = 1,
-                LikeType = (LikeTypeEnum)int.MaxValue
+                Type = (LikeTypeEnum)int.MaxValue
             };
 
             _postController.Validate(addLikeViewModel);
@@ -75,7 +75,7 @@ namespace Shrooms.Tests.Controllers.WebApi
             var addLikeViewModel = new AddLikeViewModel
             {
                 Id = 1,
-                LikeType = LikeTypeEnum.Like
+                Type = LikeTypeEnum.Like
             };
 
             _postController.Validate(addLikeViewModel);

@@ -29,7 +29,7 @@
                 }
             }).put({
                 id: id,
-                likeType: type
+                type: type
             }).$promise;
         }
 
@@ -40,7 +40,7 @@
                 }
             }).put({
                 id: id,
-                likeType: type
+                type: type
             }).$promise;
         }
     }
