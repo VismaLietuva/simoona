@@ -49,22 +49,24 @@
                 scope.likeTypes = [];
                 scope.filteredLikesByType = Array.from(Array(likeTypes.length), () => []);
 
-                if (likes.length) {
-                    for (var i = 0; i < likes.length; i++) {
-                        if (!!likes[i] && likes[i].userId === authService.identity.userId) {
-                            scope.user = likes[i];
-                            scope.positionedLikes.push(likes[i]);
+                if (!likes.length) {
+                    return;
+                }
 
-                            addLikeType(likes[i].likeType, likes[i]);
-                        }
+                for (var i = 0; i < likes.length; i++) {
+                    if (!!likes[i] && likes[i].userId === authService.identity.userId) {
+                        scope.user = likes[i];
+                        scope.positionedLikes.push(likes[i]);
+
+                        addLikeType(likes[i].likeType, likes[i]);
                     }
+                }
 
-                    for (var j = 0; j < likes.length; j++) {
-                        if (!!likes[j] && likes[j].userId !== authService.identity.userId) {
-                            scope.positionedLikes.push(likes[j]);
+                for (var i = 0; i < likes.length; i++) {
+                    if (!!likes[i] && likes[i].userId !== authService.identity.userId) {
+                        scope.positionedLikes.push(likes[i]);
 
-                            addLikeType(likes[j].likeType, likes[j]);
-                        }
+                        addLikeType(likes[i].likeType, likes[i]);
                     }
                 }
             }
