@@ -1,5 +1,8 @@
 ﻿<span ng-if="positionedLikes.length === 1" ng-cloak translate-cloak>
-    <span>{{likeTypes[0].emoji}}</span>
+    <span class="like-list-emoji-container">
+        <span>{{likeTypes[0].emoji}}</span>
+    </span>
+
     <span ng-if="!!user">
         <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: positionedLikes[0].userId })"
            translate="common.you"></a>
@@ -13,8 +16,11 @@
 </span>
 
 <span ng-if="positionedLikes.length === 2" ng-cloak translate-cloak>
-    <span>{{likeTypes[0].emoji}}</span>
-    <span>{{likeTypes[1].emoji}}</span>
+    <span class="like-list-emoji-container">
+        <span>{{likeTypes[0].emoji}}</span>
+        <span>{{likeTypes[1].emoji}}</span>
+    </span>
+
     <a ng-if="!!user"
        ui-sref="Root.WithOrg.Client.Profiles.Details({ id: positionedLikes[0].userId })"
        translate="common.you"></a>
@@ -28,17 +34,19 @@
     <span translate="wall.likeThis"></span>.
 </span>
 <span ng-if="positionedLikes.length > 2" ng-cloak translate-cloak>
-    <span ng-repeat="like in likeTypes">
-        <a ace-message-like-list-popover
-           ng-if="filteredLikesByType[like.likeType].length > 1"
-           likes="filteredLikesByType[like.likeType]"
-           style="text-decoration: none"
-           popover-placement="top">{{like.emoji}}</a>
+    <div class="like-list-emoji-container">
+        <span ng-repeat="like in likeTypes">
+            <a ace-message-like-list-popover
+               ng-if="filteredLikesByType[like.likeType].length > 1"
+               likes="filteredLikesByType[like.likeType]"
+               style="text-decoration: none"
+               popover-placement="top">{{like.emoji}}</a>
 
-        <span ng-if="filteredLikes[key].length <= 1">
-            {{like.emoji}}
+            <span ng-if="filteredLikes[key].length <= 1">
+                {{like.emoji}}
+            </span>
         </span>
-    </span>
+    </div>
 
     <a ng-if="!!user"
        ui-sref="Root.WithOrg.Client.Profiles.Details({ id: positionedLikes[0].userId })"
