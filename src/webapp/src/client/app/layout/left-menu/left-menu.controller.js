@@ -47,6 +47,7 @@
         function init() {
             if (authService.hasPermissions(['EXTERNALLINK_BASIC'])) {
                 vm.isLoading = true;
+
                 externalLinksRepository.getExternalLinks().then(function(response) {
                     menuNavigationFactory.deleteLeftMenuGroup(leftMenuGroups);
 
@@ -73,8 +74,7 @@
         }
 
         function defineMenuItem(item, index) {
-
-            let linkToAdd = {
+            var linkToAdd = {
                 url: item.url,
                 permission: 'EXTERNALLINK_BASIC',
                 name: item.name,
@@ -83,16 +83,35 @@
 
             switch (item.type) {
                 case vm.externalLinkTypes.Important.type:
+                    if(!isUniqueExternalUrl(leftMenuGroups.externalsImportant.menuItems, linkToAdd)) {
+                        break;
+                    }
                     linkToAdd.group = leftMenuGroups.externalsImportant;
                     menuNavigationFactory.defineLeftMenuItem(linkToAdd);
                     break;
 
                 case vm.externalLinkTypes.Basic.type:
                 default:
+                    if(!isUniqueExternalUrl(leftMenuGroups.externalsBasic.menuItems, linkToAdd)) {
+                        break;
+                    }
                     linkToAdd.group = leftMenuGroups.externalsBasic;
                     menuNavigationFactory.defineLeftMenuItem(linkToAdd);
                     break;
             }
+        }
+
+        function isUniqueExternalUrl(externals, newExternal) {
+            if (externals == null) {
+                return true;
+            }
+
+            for(const external of externals) {
+                if(external.url === newExternal.url) {
+                    return false;
+                }
+            }
+            return true;
         }
 
         function overlayDismiss(e) {
