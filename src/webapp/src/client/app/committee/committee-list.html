@@ -75,24 +75,30 @@
             <div class="kudos-committee-modal-header">
                 <h3> {{"committee.suggestions" | translate}} </h3>
             </div>
+
             <div class="row committees-info-body committee-suggestion-box-scroll">
                 <div class="committee-paragraph" ng-repeat="suggestion in suggestions">
                     <div class="comment-container">
                         <div class="comment-header">
-                            <div class="row">
-                                <div class="col-xs-7 col-md-12 col-lg-7">
-                                    <a data-ui-sref="Root.WithOrg.Client.Profiles.Details({ id: suggestion.user.id })">
-                                        <img ng-src="{{suggestion.user.pictureId | miniThumb}}" class="typeahead-photo" data-dismiss="modal" data-test-id="maximizedPicture" />
+                            <div class="row committee-suggestion-user-info-contents">
+                                <div class="row">
+                                    <a data-ui-sref="Root.WithOrg.Client.Profiles.Details({ id: suggestion.user.id })" class="col typeahead-photo-container">
+                                        <div>
+                                            <img ng-src="{{suggestion.user.pictureId | miniThumb}}" class="typeahead-photo" data-dismiss="modal" data-test-id="maximizedPicture" />
+                                        </div>
+                                    </a>
+
+                                    <a data-ui-sref="Root.WithOrg.Client.Profiles.Details({ id: suggestion.user.id })" class="col word-break committee-suggestion-user-name">
                                         <strong><span ng-bind-html="match.label | uibTypeaheadHighlight:query"></span></strong> {{suggestion.user.firstName}} {{suggestion.user.lastName}}
                                     </a>
-                                </div>
-                                <div class="col-sm-5 text-center hidden-xs hidden-md">
-                                    <div class="row">
-                                        <b class="span">{{suggestion.date| date: 'yyyy-MM-dd HH:mm'}}</b>
+
+                                    <div class="col committee-suggestion-date hidden-xs hidden-md">
+                                        <b>{{suggestion.date| date: 'yyyy-MM-dd HH:mm'}}</b>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
                         <p class="event-content-comment-content word-break text-center">
                             <b>{{suggestion.title}}</b>
                         </p>
