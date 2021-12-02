@@ -7,6 +7,7 @@ using Shrooms.Contracts.DataTransferObjects.Wall.Likes;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.Infrastructure;
+using Shrooms.Contracts.ViewModels.Wall.Likes;
 using Shrooms.Domain.Exceptions.Exceptions;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
@@ -154,7 +155,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPut]
         [Route("Like")]
         [PermissionAuthorize(Permission = BasicPermissions.Post)]
-        public async Task<IHttpActionResult> ToggleLike(AddLikeDto addLikeDto)
+        public async Task<IHttpActionResult> ToggleLike(AddLikeViewModel addLikeViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -162,6 +163,7 @@ namespace Shrooms.Presentation.Api.Controllers
             }
 
             var userAndOrg = GetUserAndOrganization();
+            var addLikeDto = _mapper.Map<AddLikeDto>(addLikeViewModel);
 
             try
             {

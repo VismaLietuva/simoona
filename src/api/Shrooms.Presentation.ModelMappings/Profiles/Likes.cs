@@ -9,11 +9,17 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
         protected override void Configure()
         {
             CreateDtoToViewModelMappings();
+            CreateViewModelToDtoMappings();
         }
 
         private void CreateDtoToViewModelMappings()
         {
             CreateMap<LikeDto, LikeViewModel>();
+        }
+
+        private void CreateViewModelToDtoMappings()
+        {
+            CreateMap<AddLikeViewModel, AddLikeDto>();
         }
     }
 }

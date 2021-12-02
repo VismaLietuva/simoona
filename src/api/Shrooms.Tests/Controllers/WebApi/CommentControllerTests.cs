@@ -8,9 +8,9 @@ using System.Web.Http.Controllers;
 using System.Web.Http.Hosting;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Contracts.DataTransferObjects.Wall.Likes;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
+using Shrooms.Contracts.ViewModels.Wall.Likes;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.Domain.Services.Wall.Posts.Comments;
@@ -52,16 +52,16 @@ namespace Shrooms.Tests.Controllers.WebApi
         public async Task ToggleLike_Should_Return_BadRequest()
         {
             // Arrange
-            var addLikeDto = new AddLikeDto
+            var addLikeViewModel = new AddLikeViewModel
             {
                 Id = 1,
                 LikeType = (LikeTypeEnum)int.MaxValue
             };
 
-            _commentController.Validate(addLikeDto);
+            _commentController.Validate(addLikeViewModel);
 
             // Act
-            var httpActionResult = await _commentController.ToggleLike(addLikeDto);
+            var httpActionResult = await _commentController.ToggleLike(addLikeViewModel);
             var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Assert
@@ -72,16 +72,16 @@ namespace Shrooms.Tests.Controllers.WebApi
         public async Task ToggleLike_Should_Return_Ok()
         {
             // Arrange
-            var addLikeDto = new AddLikeDto
+            var addLikeViewModel = new AddLikeViewModel
             {
                 Id = 1,
                 LikeType = LikeTypeEnum.Like
             };
 
-            _commentController.Validate(addLikeDto);
+            _commentController.Validate(addLikeViewModel);
 
             // Act
-            var httpActionResult = await _commentController.ToggleLike(addLikeDto);
+            var httpActionResult = await _commentController.ToggleLike(addLikeViewModel);
             var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Assert
