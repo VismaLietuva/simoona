@@ -69,6 +69,9 @@
                         addLikeType(likes[i].likeType, likes[i]);
                     }
                 }
+
+                // Sorting types to always keep the same order of emojis
+                scope.likeTypes.sort((a, b) => a.likeType > b.likeType ? 1 : -1);
             }
 
             function addLikeType(index, like) {
