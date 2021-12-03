@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Shrooms.Contracts.ViewModels.User;
+using Shrooms.Contracts.ViewModels.Wall.Likes;
 
 namespace Shrooms.Contracts.ViewModels.Wall.Posts
 {
@@ -18,7 +19,7 @@ namespace Shrooms.Contracts.ViewModels.Wall.Posts
 
         public int PostId { get; set; }
 
-        public IEnumerable<UserViewModel> Likes { get; set; }
+        public IEnumerable<LikeViewModel> Likes { get; set; }
 
         public UserViewModel Author { get; set; }
 

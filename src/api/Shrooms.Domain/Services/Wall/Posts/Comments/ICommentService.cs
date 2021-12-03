@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall.Comments;
+using Shrooms.Contracts.DataTransferObjects.Wall.Likes;
 
 namespace Shrooms.Domain.Services.Wall.Posts.Comments
 {
@@ -10,7 +11,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
 
         Task<CommentCreatedDto> CreateCommentAsync(NewCommentDto commentDto);
 
-        Task ToggleLikeAsync(int commentId, UserAndOrganizationDto userOrg);
+        Task ToggleLikeAsync(AddLikeDto addLikeDto, UserAndOrganizationDto userOrg);
 
         Task DeleteCommentAsync(int id, UserAndOrganizationDto userOrg);
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Shrooms.Contracts.DataTransferObjects.Users;
+using Shrooms.Contracts.DataTransferObjects.Wall.Likes;
 
 namespace Shrooms.Contracts.DataTransferObjects.Wall.Comments
 {
@@ -10,7 +11,7 @@ namespace Shrooms.Contracts.DataTransferObjects.Wall.Comments
         public string MessageBody { get; set; }
         public DateTime Created { get; set; }
         public bool IsLiked { get; set; }
-        public IEnumerable<UserDto> Likes { get; set; }
+        public IEnumerable<LikeDto> Likes { get; set; }
         public string PictureId { get; set; }
         public int PostId { get; set; }
         public UserDto Author { get; set; }

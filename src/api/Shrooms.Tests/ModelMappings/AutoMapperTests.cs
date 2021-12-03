@@ -50,5 +50,11 @@ namespace Shrooms.Tests.ModelMappings
         {
             _mapper.ConfigurationProvider.AssertConfigurationIsValid<Permissions>();
         }
+
+        [Test]
+        public void Mapping_Like_Models()
+        {
+            _mapper.ConfigurationProvider.AssertConfigurationIsValid<Likes>();
+        }
     }
 }

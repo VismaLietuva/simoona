@@ -93,6 +93,8 @@
     <Compile Include="DataTransferObjects\Users\UserDto.cs" />
     <Compile Include="DataTransferObjects\Wall\Comments\CommentDto.cs" />
     <Compile Include="DataTransferObjects\Wall\CreateWallDto.cs" />
+    <Compile Include="DataTransferObjects\Wall\Likes\AddLikeDto.cs" />
+    <Compile Include="DataTransferObjects\Wall\Likes\LikeDto.cs" />
     <Compile Include="DataTransferObjects\Wall\Posts\NewlyCreatedPostDto.cs" />
     <Compile Include="DataTransferObjects\Wall\Posts\NewPostDto.cs" />
     <Compile Include="DataTransferObjects\Wall\Posts\PostDto.cs" />
@@ -102,6 +104,7 @@
     <Compile Include="Enums\LotteryStatus.cs" />
     <Compile Include="Enums\NotificationType.cs" />
     <Compile Include="Enums\OptionRules.cs" />
+    <Compile Include="Enums\LikeTypeEnum.cs" />
     <Compile Include="Enums\WallAccess.cs" />
     <Compile Include="Enums\WallsType.cs" />
     <Compile Include="Enums\WallType.cs" />
@@ -124,6 +127,8 @@
     <Compile Include="ViewModels\PagedViewModel.cs" />
     <Compile Include="ViewModels\User\ApplicationUserMinimalViewModel.cs" />
     <Compile Include="ViewModels\User\UserViewModel.cs" />
+    <Compile Include="ViewModels\Wall\Likes\AddLikeViewModel.cs" />
+    <Compile Include="ViewModels\Wall\Likes\LikeViewModel.cs" />
     <Compile Include="ViewModels\Wall\Posts\CommentViewModel.cs" />
     <Compile Include="ViewModels\Wall\Posts\WallPostViewModel.cs" />
   </ItemGroup>

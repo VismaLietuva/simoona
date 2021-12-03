@@ -128,7 +128,6 @@
     <Compile Include="Models\Wall\WallsListFilter.cs" />
     <Compile Include="Models\Wall\WallUserAction.cs" />
     <Compile Include="Models\Wall\Posts\EditPostDto.cs" />
-    <Compile Include="Models\Wall\Likes\LikeDto.cs" />
     <Compile Include="Models\Wall\UserWallDto.cs" />
     <Compile Include="Models\Wall\WallDto.cs" />
     <Compile Include="Models\Wall\WallMemberDto.cs" />
