@@ -37,8 +37,8 @@
             postSuggestion: function (model) {
                 return $resource(committeesUrl + 'PostSuggestion').save(model).$promise;
             },
-            deleteSuggestion: function (comitteId, suggestionId) {
-                return $resource(committeesUrl + 'DeleteSuggestion').delete({ ComitteeId: comitteId, SuggestionId: suggestionId }).$promise;
+            deleteSuggestion: function (committeeId, suggestionId) {
+                return $resource(committeesUrl + 'DeleteSuggestion').delete({ CommitteeId: committeeId, SuggestionId: suggestionId }).$promise;
             },
             getSuggestions: function (committeeId) {
                 return $resource(committeesUrl + 'GetSuggestions').query( {id: committeeId}).$promise;
