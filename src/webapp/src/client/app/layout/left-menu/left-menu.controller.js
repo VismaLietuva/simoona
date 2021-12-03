@@ -48,7 +48,7 @@
             if (authService.hasPermissions(['EXTERNALLINK_BASIC'])) {
                 vm.isLoading = true;
                 externalLinksRepository.getExternalLinks().then(function(response) {
-                    menuNavigationFactory.deleteLeftMenuGroup(leftMenuGroups);
+                    deleteLeftMenuExternals();
 
                     angular.forEach(response, defineMenuItem);
 
@@ -75,8 +75,8 @@
         function defineMenuItem(item, index) {
 
             let linkToAdd = {
-                url: item.url,
                 permission: 'EXTERNALLINK_BASIC',
+                url: item.url,
                 name: item.name,
                 order: index,
             }
@@ -93,6 +93,11 @@
                     menuNavigationFactory.defineLeftMenuItem(linkToAdd);
                     break;
             }
+        }
+
+        function deleteLeftMenuExternals() {
+            menuNavigationFactory.deleteLeftMenuGroup(leftMenuGroups.externalsBasic);
+            menuNavigationFactory.deleteLeftMenuGroup(leftMenuGroups.externalsImportant);
         }
 
         function overlayDismiss(e) {
