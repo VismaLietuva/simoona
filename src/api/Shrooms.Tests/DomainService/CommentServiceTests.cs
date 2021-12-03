@@ -9,6 +9,8 @@ using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall.Comments;
+using Shrooms.Contracts.DataTransferObjects.Wall.Likes;
+using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -66,7 +68,9 @@ namespace Shrooms.Tests.DomainService
             };
 
             _commentsDbSet.SetDbSetDataForAsync(new List<Comment> { comment }.AsQueryable());
-            await _commentService.ToggleLikeAsync(1, new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 });
+
+            await _commentService.ToggleLikeAsync(new AddLikeDto { Id = 1, Type = LikeTypeEnum.Like },
+                new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 });
 
             Assert.AreEqual("user1", (await _commentsDbSet.FirstAsync()).Likes.First().UserId);
         }
@@ -76,7 +80,10 @@ namespace Shrooms.Tests.DomainService
         {
             _commentsDbSet.SetDbSetDataForAsync(new List<Comment>().AsQueryable());
 
-            var ex = Assert.ThrowsAsync<ValidationException>(async () => await _commentService.ToggleLikeAsync(1, new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 }));
+            var ex = Assert.ThrowsAsync<ValidationException>(async () =>
+                await _commentService.ToggleLikeAsync(new AddLikeDto { Id = 1, Type = LikeTypeEnum.Like },
+                    new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 }));
+
             Assert.AreEqual(ErrorCodes.ContentDoesNotExist, ex.ErrorCode);
         }
 
@@ -86,7 +93,7 @@ namespace Shrooms.Tests.DomainService
             var comment = new Comment
             {
                 Id = 1,
-                Likes = new LikesCollection { new Like("user1") },
+                Likes = new LikesCollection { new Like("user1", LikeTypeEnum.Like) },
                 Post = new Post
                 {
                     Wall = new Wall
@@ -97,7 +104,9 @@ namespace Shrooms.Tests.DomainService
             };
 
             _commentsDbSet.SetDbSetDataForAsync(new List<Comment> { comment }.AsQueryable());
-            await _commentService.ToggleLikeAsync(1, new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 });
+
+            await _commentService.ToggleLikeAsync(new AddLikeDto { Id = 1, Type = LikeTypeEnum.Like },
+                new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 });
 
             Assert.AreEqual(0, (await _commentsDbSet.FirstAsync()).Likes.Count);
         }
@@ -385,6 +394,39 @@ namespace Shrooms.Tests.DomainService
             // Act
             // Assert
             Assert.DoesNotThrowAsync(async () => await _commentService.DeleteCommentAsync(1, userOrg));
+        }
+
+        [TestCase(0, LikeTypeEnum.Like)]
+        [TestCase(1, LikeTypeEnum.Love)]
+        [TestCase(2, LikeTypeEnum.Lol)]
+        [TestCase(3, LikeTypeEnum.Wow)]
+        [TestCase(4, LikeTypeEnum.Congrats)]
+        [TestCase(5, LikeTypeEnum.Sad)]
+        [TestCase(6, LikeTypeEnum.GrumpyCat)]
+        public async Task Should_Set_Correct_LikeType(int likeType, LikeTypeEnum expectedType)
+        {
+            // Setup
+            var comment = new Comment
+            {
+                Id = 1,
+                Likes = new LikesCollection(),
+                Post = new Post
+                {
+                    Wall = new Wall
+                    {
+                        OrganizationId = 2
+                    }
+                }
+            };
+
+            _commentsDbSet.SetDbSetDataForAsync(new List<Comment> { comment }.AsQueryable());
+
+            // Act
+            await _commentService.ToggleLikeAsync(new AddLikeDto { Id = comment.Id, Type = (LikeTypeEnum)likeType },
+                new UserAndOrganizationDto { UserId = "user1", OrganizationId = 2 });
+
+            // Assert
+            Assert.AreEqual(expectedType, _commentsDbSet.First().Likes.First().Type);
         }
     }
 }

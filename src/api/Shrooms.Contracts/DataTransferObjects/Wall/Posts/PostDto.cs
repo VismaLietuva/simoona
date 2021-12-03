@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Shrooms.Contracts.DataTransferObjects.Users;
 using Shrooms.Contracts.DataTransferObjects.Wall.Comments;
+using Shrooms.Contracts.DataTransferObjects.Wall.Likes;
 using Shrooms.Contracts.Enums;
 
 namespace Shrooms.Contracts.DataTransferObjects.Wall.Posts
@@ -16,7 +17,7 @@ namespace Shrooms.Contracts.DataTransferObjects.Wall.Posts
         public UserDto Author { get; set; }
         public string SharedEventId { get; set; }
         public IEnumerable<CommentDto> Comments { get; set; }
-        public IEnumerable<UserDto> Likes { get; set; }
+        public IEnumerable<LikeDto> Likes { get; set; }
         public int WallId { get; set; }
         public string WallName { get; set; }
         public WallType WallType { get; set; }

@@ -22,20 +22,26 @@
 
         //////////
 
-        function togglePostLike(id) {
-            return $resource(postUrl + 'Like', {id: id}, {
+        function togglePostLike(id, type) {
+            return $resource(postUrl + 'Like', '', {
                 put: {
                     method: 'PUT'
                 }
-            }).put().$promise;
+            }).put({
+                id: id,
+                type: type
+            }).$promise;
         }
 
-        function toggleCommentLike(id) {
-            return $resource(commentUrl + 'Like', {id: id}, {
+        function toggleCommentLike(id, type) {
+            return $resource(commentUrl + 'Like', '',  {
                 put: {
                     method: 'PUT'
                 }
-            }).put().$promise;
+            }).put({
+                id: id,
+                type: type
+            }).$promise;
         }
     }
 }());

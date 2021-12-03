@@ -46,9 +46,6 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
                 .Ignore(x => x.LastName);
 
             CreateMap<UserDto, UserViewModel>();
-            CreateMap<UserViewModel, UserDto>()
-                .Ignore(x => x.UserName);
-
             CreateMap<TimeZoneDto, TimeZoneViewModel>();
             CreateMap<LanguageDto, LanguageViewModel>();
             CreateMap<WallNotificationsDto, WallNotificationsViewModel>();

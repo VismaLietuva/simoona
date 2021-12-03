@@ -9,6 +9,7 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts;
 using Shrooms.Contracts.DataTransferObjects.Users;
+using Shrooms.Contracts.DataTransferObjects.Wall.Likes;
 using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
@@ -97,7 +98,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
             }
         }
 
-        public async Task ToggleLikeAsync(int postId, UserAndOrganizationDto userOrg)
+        public async Task ToggleLikeAsync(AddLikeDto addLikeDto, UserAndOrganizationDto userOrg)
         {
             await _postDeleteLock.WaitAsync();
 
@@ -105,7 +106,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
             {
                 var post = await _postsDbSet
                     .Include(x => x.Wall)
-                    .FirstOrDefaultAsync(x => x.Id == postId && x.Wall.OrganizationId == userOrg.OrganizationId);
+                    .FirstOrDefaultAsync(x => x.Id == addLikeDto.Id && x.Wall.OrganizationId == userOrg.OrganizationId);
 
                 if (post == null)
                 {
@@ -115,7 +116,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
                 var like = post.Likes.FirstOrDefault(x => x.UserId == userOrg.UserId);
                 if (like == null)
                 {
-                    post.Likes.Add(new Like(userOrg.UserId));
+                    post.Likes.Add(new Like(userOrg.UserId, addLikeDto.Type));
                 }
                 else
                 {
