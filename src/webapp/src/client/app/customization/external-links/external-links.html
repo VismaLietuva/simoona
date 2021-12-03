@@ -67,7 +67,7 @@
                                 <label class="col-xs-12 col-sm-1"
                                        translate="customization.linkType"></label>
                                 <div class="col-xs-12 col-sm-2">
-                                    <select class="form-control dropdown" id="linkType{{$index}}"
+                                    <select class="form-control" id="linkType{{$index}}"
                                             type="text"
                                             ng-model="link.type"
                                             ng-options="item as item.linkType | translate for item in vm.externalLinkTypes track by item.linkTypeValue"
