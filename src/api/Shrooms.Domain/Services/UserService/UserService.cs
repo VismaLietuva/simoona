@@ -155,30 +155,11 @@ namespace Shrooms.Domain.Services.UserService
             await UnassignUserFromWallsAsync(userToDelete, userOrg.OrganizationId);
             await _userManager.RemoveLoginsAsync(userToDelete);
 
-            await AnonymizeAsync(user, userOrg);
-
             _usersDbSet.Remove(user);
-            await _uow.SaveChangesAsync(userOrg.UserId);
-        }
-
-        private async Task AnonymizeAsync(ApplicationUser user, UserAndOrganizationDto userOrg)
-        {
-            await _pictureService.RemoveImageAsync(user.PictureId, userOrg.OrganizationId);
-
-            var randomString = Guid.NewGuid().ToString();
-            user.Email = randomString;
-            user.FirstName = randomString;
-            user.LastName = randomString;
-            user.PhoneNumber = randomString;
-            user.UserName = randomString;
-            user.FacebookEmail = randomString;
-            user.GoogleEmail = randomString;
-            user.Bio = string.Empty;
-            user.PictureId = string.Empty;
-            user.BirthDay = DateTime.UtcNow;
 
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
+
 
         public async Task<IEnumerable<string>> GetWallUserAppNotificationEnabledIdsAsync(string posterId, int wallId)
         {
