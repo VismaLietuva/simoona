@@ -160,7 +160,6 @@ namespace Shrooms.Domain.Services.UserService
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
-
         public async Task<IEnumerable<string>> GetWallUserAppNotificationEnabledIdsAsync(string posterId, int wallId)
         {
             var newUserAndExternalRoles = await _rolesDbSet
