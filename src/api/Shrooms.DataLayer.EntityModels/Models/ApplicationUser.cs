@@ -43,6 +43,8 @@ namespace Shrooms.DataLayer.EntityModels.Models
 
         public bool IsAbsent { get; set; }
 
+        public bool IsAnonymized { get; set; }
+
         public string AbsentComment { get; set; }
 
         public decimal TotalKudos { get; set; }

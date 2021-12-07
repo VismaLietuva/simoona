@@ -15,6 +15,9 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
             Property(u => u.BirthDay)
                 .IsOptional();
 
+            Property(u => u.IsAnonymized)
+                .IsRequired();
+
             HasMany(u => u.Exams)
                 .WithMany(e => e.ApplicationUsers)
                 .Map(t => t.MapLeftKey("ApplicationUserId")
