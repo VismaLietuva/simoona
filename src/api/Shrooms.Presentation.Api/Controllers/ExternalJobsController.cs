@@ -29,5 +29,12 @@ namespace Shrooms.Presentation.Api.Controllers
         {
             await _webHookService.BirthdaysNotification.SendNotificationsAsync(GetOrganizationName());
         }
+
+        [HttpPost]
+        [Route("AnonymizeUsers")]
+        public async Task AnonymizeUsers()
+        {
+            await _webHookService.UsersAnonymization.AnonymizeUsersAsync(GetOrganizationId());
+        }
     }
 }
