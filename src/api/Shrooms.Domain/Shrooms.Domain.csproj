@@ -191,6 +191,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\SyncTokens\ISyncTokenService.cs" />
     <Compile Include="Services\SyncTokens\SyncTokenService.cs" />
+    <Compile Include="Services\WebHookCallbacks\UserAnonymization\UsersAnonymizationWebHookService.cs" />
+    <Compile Include="Services\WebHookCallbacks\UserAnonymization\IUsersAnonymizationWebHookService.cs" />
     <Compile Include="Services\WebHookCallbacks\BirthdayNotification\BirthdaysNotificationWebHookService.cs" />
     <Compile Include="Services\WebHookCallbacks\BirthdayNotification\IBirthdaysNotificationWebHookService.cs" />
     <Compile Include="Services\WebHookCallbacks\IWebHookCallbackServices.cs" />
