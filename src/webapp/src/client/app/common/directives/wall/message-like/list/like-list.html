@@ -17,8 +17,17 @@
 
 <span ng-if="positionedLikes.length === 2" ng-cloak translate-cloak>
     <span class="like-list-emoji-container">
-        <span>{{likeTypes[0].emoji}}</span>
-        <span>{{likeTypes[1].emoji}}</span>
+        <span ng-repeat="like in likeTypes">
+            <a ace-message-like-list-popover
+               ng-if="filteredLikesByType[like.type].length > 1"
+               likes="filteredLikesByType[like.type]"
+               style="text-decoration: none"
+               popover-placement="top">{{like.emoji}}</a>
+
+            <span ng-if="filteredLikes[key].length <= 1">
+                {{like.emoji}}
+            </span>
+        </span>
     </span>
 
     <a ng-if="!!user"

@@ -39,14 +39,20 @@ input[type=text]::-ms-clear {
     color: #428bca;
     position: relative;
 
-    &:hover .like-button-selections {
-        display: block;
+    &:hover .like-button-selections,
+    &:focus .like-button-selections,
+    &:active .like-button-selections {
+        visibility: visible;
+        opacity: 1;
+        transition-delay: 400ms;
     }
 }
 
 .like-button-selections {
+    display: block;
     position: absolute;
-    display: none;
+    visibility: hidden;
+    opacity: 0;
     background: #fff;
     height: 40px;
     bottom: 20px;
@@ -54,6 +60,10 @@ input[type=text]::-ms-clear {
     box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.05);
     border-radius: 50px;
     padding: 1px;
+    left: 50%;
+    transform: translateX(-20%);
+    transition: all 200ms ease-in-out;
+    transition-delay: 500ms;
 
     button:first-child {
         margin-left: 5px;
@@ -73,6 +83,15 @@ input[type=text]::-ms-clear {
         &:hover {
             transform: scale(1.2, 1.2) translate(0, -6px);
         }
+
+        @media (max-width: 375px) {
+            width: 38px;
+        }
+    }
+
+    @media (max-width: 375px) {
+        width: 285px;
+        transform: translateX(-25%);
     }
 }
 
