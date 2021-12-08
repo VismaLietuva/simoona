@@ -1,7 +1,7 @@
 <div class="message-like-button" ng-switch="vm.likeType">
 	<div ng-switch-when="post">
         <a ng-click="vm.likePost(0)"
-           class="like-button"
+           class="like-button noselect"
            has-permissions="['LIKE_BASIC']"
            ng-if="!vm.messageObject.isLiked"
            data-test-id="post-like">
@@ -14,17 +14,18 @@
 
             <span translate="wall.like"></span>
         </a>
-		<a ng-click="vm.unlikePost()"
-		   has-permissions="['LIKE_BASIC']"
+		<a class="noselect"
+           ng-click="vm.unlikePost()"
+           has-permissions="['LIKE_BASIC']"
 		   ng-if="vm.messageObject.isLiked"
 		   data-test-id="post-unlike">
-		   	<span translate="wall.dislike"></span>
+		   <span translate="wall.dislike"></span>
 		</a>
 	</div>
 
     <div ng-switch-default>
         <a ng-click="vm.likeComment(0)"
-           class="like-button"
+           class="like-button noselect"
            has-permissions="['LIKE_BASIC']"
            ng-if="!vm.messageObject.isLiked"
            data-test-id="comment-like">
@@ -37,11 +38,12 @@
 
             <span translate="wall.like"></span>
         </a>
-        <a ng-click="vm.unlikeComment()"
+        <a class="noselect"
+           ng-click="vm.unlikeComment()"
            has-permissions="['LIKE_BASIC']"
            ng-if="vm.messageObject.isLiked"
            data-test-id="comment-unlike">
-            <span translate="wall.dislike"></span>
+           <span translate="wall.dislike"></span>
         </a>
     </div>
 </div>
