@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Configuration;
+using System.Data.Entity;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
-using Shrooms.DataLayer.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Services.Picture;
 
@@ -14,17 +14,17 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.UserAnonymization
         private readonly int _anonymizeUsersAfterDays;
         private readonly int _anonymizeUsersPerRequest;
 
-        private readonly ShroomsDbContext _shroomsContext;
+        private readonly DbSet<ApplicationUser> _usersDbSet;
 
-        private readonly IUnitOfWork _uow;
+        private readonly IUnitOfWork2 _uow;
         private readonly IPictureService _pictureService;
 
-        public UsersAnonymizationWebHookService(IUnitOfWork uow, IPictureService pictureService)
+        public UsersAnonymizationWebHookService(IUnitOfWork2 uow, IPictureService pictureService)
         {
             _anonymizeUsersAfterDays = Convert.ToInt32(ConfigurationManager.AppSettings["AnonymizeUsersAfterDays"]);
             _anonymizeUsersPerRequest = Convert.ToInt32(ConfigurationManager.AppSettings["AnonymizeUsersPerRequest"]);
 
-            _shroomsContext = uow.GetDbContextAs<ShroomsDbContext>();
+            _usersDbSet = uow.GetDbSet<ApplicationUser>();
 
             _pictureService = pictureService;
             _uow = uow;
@@ -45,13 +45,13 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.UserAnonymization
                 new SqlParameter("@userLimit", _anonymizeUsersPerRequest)
             };
 
-            var usersToAnonymize = await _shroomsContext.Users.SqlQuery(sqlQuery, sqlParameters).ToListAsync();
+            var usersToAnonymize = await _usersDbSet.SqlQuery(sqlQuery, sqlParameters).ToListAsync();
 
             foreach (var user in usersToAnonymize)
             {
                 await AnonymizeAsync(user, organizationId);
 
-                await _uow.SaveAsync();
+                await _uow.SaveChangesAsync();
             }
         }
 
