@@ -56,7 +56,7 @@
                 }
 
                 if (scope.message.length > showMoreSettings.charactersCount) {
-                    scope.newMessage = scope.message.substring(0, showMoreSettings.charactersCount) + '...';
+                    scope.newMessage = getTruncatedMessage();
                     $compile(element.find('.show-more-container').html(showMoreButton))(scope);
                 } else {
                     scope.newMessage = scope.message;
@@ -72,7 +72,7 @@
 
             function showLess() {
                 element.children('.show-less-link').remove();
-                scope.newMessage = scope.message.substring(0, showMoreSettings.charactersCount) + '...';
+                scope.newMessage = getTruncatedMessage();
                 element.find('.show-more-container').html(showMoreButton);
                 $compile(element.contents())(scope);
             }
@@ -80,6 +80,20 @@
             function tagTermClick(event) {
                 var tagText = event.target.innerHTML;
                 wallService.searchWall(tagText);
+            }
+
+            function getTruncatedMessage() {
+                var message = scope.message.substring(0, showMoreSettings.charactersCount);
+
+                if(message.match(/\*\*/gi).length % 2 !== 0) {
+                    if(message[message.length - 1] === '*') {
+                        return message + '*...';
+                    }
+
+                    return message + '**...';
+                }
+
+                return message + "...";
             }
         }
     }
