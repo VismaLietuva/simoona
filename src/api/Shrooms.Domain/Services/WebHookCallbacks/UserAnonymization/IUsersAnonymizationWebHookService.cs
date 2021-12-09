@@ -4,6 +4,6 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.UserAnonymization
 {
     public interface IUsersAnonymizationWebHookService
     {
-        Task AnonymizeUsersAsync(int organizationId);
+        Task AnonymizeUsersAsync(string organizationName);
     }
 }
