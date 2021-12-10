@@ -61,7 +61,10 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.UserAnonymization
 
         private async Task AnonymizeAsync(ApplicationUser user, int organizationId)
         {
-            await _pictureService.RemoveImageAsync(user.PictureId, organizationId);
+            if (!string.IsNullOrEmpty(user.PictureId))
+            {
+                await _pictureService.RemoveImageAsync(user.PictureId, organizationId);
+            }
 
             var randomString = Guid.NewGuid().ToString();
 
