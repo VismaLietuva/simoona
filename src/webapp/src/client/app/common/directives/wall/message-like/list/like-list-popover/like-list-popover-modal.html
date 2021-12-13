@@ -1,0 +1,106 @@
+<div class="modal-header no-padding">
+    <div class="popover-modal-like-tabs">
+        <span class="pull-left noselect like-tab"
+              ng-class="{ true : 'selected-like-tab' }[vm.currentTab === vm.likeTypes.length]"
+              ng-if="vm.showAllLikesTab"
+              ng-click="vm.switchTab(vm.likeTypes.length)">
+            <b>All</b>
+        </span>
+
+        <span class="pull-left noselect"
+              ng-repeat="likeType in vm.likeTypes track by $index"
+              ng-click="vm.switchTab($index)">
+
+            <div class="like-tab"
+                 ng-class="{ true : 'selected-like-tab' }[vm.currentTab === $index]"
+                 ng-if="vm.modalLikes[likeType.type].length > 1">
+
+                <span>{{likeType.emoji}}</span>
+                <span class="popover-modal-like-tabs-count">
+                    {{vm.modalLikes[likeType.type].length - 1}}
+                </span>
+            </div>
+        </span>
+
+        <div class="pull-right like-tab"
+             type="button"
+             ng-click="vm.closeModal()">
+
+            <span aria-hidden="true">&times;</span>
+        </div>
+    </div>
+</div>
+
+<div class="modal-body popover-likes-modal-content">
+    <ul class="likes-list"
+        ng-repeat="likes in vm.modalLikes track by $index"
+        ng-if="vm.currentTab === vm.likeTypes.length">
+
+        <li ng-repeat="like in likes">
+
+            <a ng-if="$index > 0"
+               class="likes-list-img-link"
+               ui-sref="Root.WithOrg.Client.Profiles.Details({ id: like.userId })">
+                    <img class="likes-list-img"
+                         ng-src="{{:: like.pictureId | miniThumb}}"
+                         data-test-id="user-image-likes-list" />
+            </a>
+
+            <a ng-if="$index > 0"
+               ui-sref="Root.WithOrg.Client.Profiles.Details({ id: like.userId })">
+                    <span class="likes-list-span"
+                          data-test-id="like-list-name"
+                          ng-cloak>
+                            {{:: like.fullName}}
+                    </span>
+            </a>
+
+
+            <span class="noselect pull-right"
+                  ng-if="$index > 0"
+                  ui-sref="Root.WithOrg.Client.Profiles.Details({ id: like.userId })">
+                    <span class="likes-list-span likes-list-emoji noselect"
+                          data-test-id="like-list-name"
+                          ng-cloak>
+                            {{vm.likeTypes[like.type].emoji}}
+                    </span>
+            </span>
+        </li>
+    </ul>
+
+    <ul class="likes-list"
+        ng-repeat="likes in vm.modalLikes track by $index"
+        ng-if="vm.currentTab !== vm.likeTypes.length">
+
+        <span ng-if="likes.length > 1 && $index == vm.currentTab">
+            <li ng-repeat="like in likes">
+                <a ng-if="$index > 0"
+                   class="likes-list-img-link"
+                   ui-sref="Root.WithOrg.Client.Profiles.Details({ id: like.userId })">
+                    <img class="likes-list-img"
+                         ng-src="{{:: like.pictureId | miniThumb}}"
+                         data-test-id="user-image-likes-list" />
+                </a>
+
+                <a ng-if="$index > 0"
+                   ui-sref="Root.WithOrg.Client.Profiles.Details({ id: like.userId })">
+                        <span class="likes-list-span"
+                              data-test-id="like-list-name"
+                              ng-cloak>
+                                {{:: like.fullName}}
+                        </span>
+                </a>
+
+                <span class="noselect pull-right"
+                      ng-if="$index > 0"
+                      ui-sref="Root.WithOrg.Client.Profiles.Details({ id: like.userId })">
+                            <span class="likes-list-span noselect likes-list-emoji"
+                                  data-test-id="like-list-name"
+                                  ng-cloak>
+                                {{vm.likeTypes[like.type].emoji}}
+                            </span>
+                </span>
+            </li>
+        </span>
+    </ul>
+</div>
