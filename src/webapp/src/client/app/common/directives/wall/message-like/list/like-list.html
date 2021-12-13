@@ -19,9 +19,13 @@
     <span class="like-list-emoji-container">
         <span ng-repeat="like in likeTypes">
             <a ace-message-like-list-popover
+               modal-likes="filteredLikesByType"
+               modal-likes-tab="{{like.type}}"
                ng-if="filteredLikesByType[like.type].length > 1"
                likes="filteredLikesByType[like.type]"
                style="text-decoration: none"
+               popover-title="{{like.resource}}"
+               popover-emoji="{{like.emoji}}"
                popover-placement="top">{{like.emoji}}</a>
 
             <span ng-if="filteredLikes[key].length <= 1">
@@ -40,15 +44,20 @@
     <span translate="common.and"></span>
     <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: positionedLikes[1].userId })">
         {{::positionedLikes[1].fullName}}</a>
-    <span translate="wall.likeThis"></span>.
+    <span translate="wall.likeThis"></span>
 </span>
+
 <span ng-if="positionedLikes.length > 2" ng-cloak translate-cloak>
     <div class="like-list-emoji-container">
         <span ng-repeat="like in likeTypes">
             <a ace-message-like-list-popover
+               modal-likes="filteredLikesByType"
+               modal-likes-tab="{{like.type}}"
                ng-if="filteredLikesByType[like.type].length > 1"
                likes="filteredLikesByType[like.type]"
                style="text-decoration: none"
+               popover-title="{{like.resource}}"
+               popover-emoji="{{like.emoji}}"
                popover-placement="top">{{like.emoji}}</a>
 
             <span ng-if="filteredLikes[key].length <= 1">
@@ -65,11 +74,16 @@
        ui-sref="Root.WithOrg.Client.Profiles.Details({ id: positionedLikes[0].userId })">
         {{::positionedLikes[0].fullName}}</a>
     <span translate="common.and"></span>
+
     <a ace-message-like-list-popover
+       popover-title="All"
        likes="positionedLikes"
+       modal-likes="filteredLikesByType"
+       all-like-types="true"
        popover-placement="top"
        data-test-id="{{::likeType}}-like-others">
-       <span translate="common.others"
-             translate-values="{ likeCount: positionedLikes.length - 1 }"></span></a>
-    <span translate="wall.likeThis"></span>.
+       <span translate="common.others" translate-values="{ likeCount: positionedLikes.length - 1 }"></span>
+    </a>
+
+    <span translate="wall.likeThis"></span>
 </span>
