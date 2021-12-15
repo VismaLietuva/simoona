@@ -12,10 +12,10 @@
         '$templateCache',
         '$uibModal',
         'likeTypes',
-        'popoverLikesCount'
+        'popoverLikeCount'
     ];
 
-    function messageLikeListPopover($compile, $window, $templateCache, $uibModal, likeTypes, popoverLikesCount) {
+    function messageLikeListPopover($compile, $window, $templateCache, $uibModal, likeTypes, popoverLikeCount) {
         var lastLikePopoverElement;
         var directive = {
             restrict: 'A',
@@ -28,7 +28,7 @@
                 popoverTitle: '@',
                 popoverEmoji: '@',
                 allLikeTypes: '@',
-                modalLikesTab: '@'
+                currentModalLikeTab: '@'
             },
             link: linkFunc
         };
@@ -48,8 +48,8 @@
             });
 
             scope.likeTypes = likeTypes;
-            scope.popoverLikesCount = popoverLikesCount;
-            scope.hiddenUsersCount = (scope.likes.length - 1) - popoverLikesCount;
+            scope.popoverLikeCount = popoverLikeCount;
+            scope.hiddenUserCount = (scope.likes.length - 1) - popoverLikeCount;
 
             var html = $templateCache.get('messageLikeListPopoverTemplate.html');
             var popoverContent = $compile(html)(scope);

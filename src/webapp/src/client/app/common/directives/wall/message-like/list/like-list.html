@@ -20,7 +20,7 @@
         <span ng-repeat="like in likeTypes">
             <a ace-message-like-list-popover
                modal-likes="filteredLikesByType"
-               modal-likes-tab="{{like.type}}"
+               current-modal-like-tab="{{like.type}}"
                ng-if="filteredLikesByType[like.type].length > 1"
                likes="filteredLikesByType[like.type]"
                style="text-decoration: none"
@@ -52,7 +52,7 @@
         <span ng-repeat="like in likeTypes">
             <a ace-message-like-list-popover
                modal-likes="filteredLikesByType"
-               modal-likes-tab="{{like.type}}"
+               current-modal-like-tab="{{like.type}}"
                ng-if="filteredLikesByType[like.type].length > 1"
                likes="filteredLikesByType[like.type]"
                style="text-decoration: none"
@@ -76,7 +76,7 @@
     <span translate="common.and"></span>
 
     <a ace-message-like-list-popover
-       popover-title="All"
+       popover-title="common.emojiAll"
        likes="positionedLikes"
        modal-likes="filteredLikesByType"
        all-like-types="true"
