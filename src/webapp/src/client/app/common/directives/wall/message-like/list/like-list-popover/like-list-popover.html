@@ -1,26 +1,23 @@
 ﻿<span ng-transclude>
     <script type="text/ng-template" id="messageLikeListPopoverTemplate.html" class="popover-likes">
         <div class="popover-likes-title">
-            <p class="pull-left"><b>{{popoverTitle}}</b></p>
+            <p class="pull-left bold" translate="{{popoverTitle}}"></p>
             <p class="pull-right likes-title-emoji">{{popoverEmoji}}</p>
         </div>
 
         <div class="clearfix"></div>
 
         <ul class="likes-list" data-test-id="likes-popover-ul">
-            <li ng-repeat="like in likes|limitTo:popoverLikesCount + 1">
+            <li ng-repeat="like in likes|limitTo:popoverLikeCount + 1">
 
-                <a ng-if="$index > 0">
-                    <span class="likes-list-span word-break" data-test-id="like-list-name">
-                        {{:: like.fullName}}
-                    </span>
+                <a ng-if="$index > 0" class="likes-list-span" data-test-id="like-list-name">
+                    {{:: like.fullName}}
                 </a>
-
-                <p class="likes-list-span blue"
-                   ng-if="$index == popoverLikesCount && hiddenUsersCount > 0">
-                    and {{hiddenUsersCount}} more...
-                </p>
             </li>
+
+            <p class="likes-list-span blue" ng-if="hiddenUsersCount > 0">
+                and {{hiddenUserCount}} more...
+            </p>
         </ul>
     </script>
 </span>
