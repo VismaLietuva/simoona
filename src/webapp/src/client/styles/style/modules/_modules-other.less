@@ -849,20 +849,26 @@ div.post-text-container {
 .likes-list {
     list-style-type: none;
     margin-left: -40px;
+
+    li:first-child {
+        margin: 0;
+    }
+}
+
+.likes-list-item {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
 }
 
 .likes-list-img {
     width: 40px;
+    height: 40px;
+    object-fit: cover;
 }
 
 .likes-list-img-link {
     text-decoration: none !important;
-}
-
-.likes-list li {
-    margin-bottom: 5px;
-    display: flex;
-    align-items: center;
 }
 
 .likes-list-span {
@@ -888,6 +894,12 @@ div.post-text-container {
     margin-left: auto;
 }
 
+.popover-likes-list-item {
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+}
+
 .popover-modal-like-tabs {
     align-items: center;
     padding-left: 15px;
@@ -910,6 +922,10 @@ div.post-text-container {
     height: 350px;
     overflow-x: hidden;
     overflow-y: auto;
+
+    > ul {
+        margin-bottom: 0;
+    }
 
     li.span {
         margin-left: auto;

@@ -59,11 +59,11 @@
 
 <div class="modal-body popover-likes-modal-content">
     <!-- All likes list -->
-    <ul class="likes-list no-bottom-margin"
+    <ul class="likes-list"
         ng-repeat="likes in vm.modalLikes track by $index"
         ng-if="vm.currentLikeTab === vm.likeTypes.length">
 
-        <li ng-repeat="like in likes">
+        <li ng-repeat="like in likes" class="likes-list-item">
             <a ng-if="$index > 0"
                class="likes-list-img-link"
                ui-sref="Root.WithOrg.Client.Profiles.Details({ id: like.userId })">
@@ -96,7 +96,7 @@
         ng-if="vm.currentLikeTab !== vm.likeTypes.length">
 
         <span ng-if="likes.length > 1 && $index == vm.currentLikeTab">
-            <li ng-repeat="like in likes">
+            <li ng-repeat="like in likes" class="likes-list-item">
                 <a ng-if="$index > 0"
                    class="likes-list-img-link"
                    ui-sref="Root.WithOrg.Client.Profiles.Details({ id: like.userId })">

@@ -8,7 +8,7 @@
         <div class="clearfix"></div>
 
         <ul class="likes-list" data-test-id="likes-popover-ul">
-            <li ng-repeat="like in likes|limitTo:popoverLikeCount + 1">
+            <li class="popover-likes-list-item" ng-repeat="like in likes|limitTo:popoverLikeCount + 1">
 
                 <a ng-if="$index > 0" class="likes-list-span" data-test-id="like-list-name">
                     {{:: like.fullName}}
