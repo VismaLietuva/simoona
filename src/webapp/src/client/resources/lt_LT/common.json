@@ -199,5 +199,6 @@
   "emojiSad": "Liūdnas (-a)",
   "emojiGrumpyCat": "Piktas (-a)",
   "emojiAll" : "Visi",
-  "more" : "Daugiau"
+  "more" : "Daugiau",
+  "moreCount" : "ir dar {{one}}..."
 }
