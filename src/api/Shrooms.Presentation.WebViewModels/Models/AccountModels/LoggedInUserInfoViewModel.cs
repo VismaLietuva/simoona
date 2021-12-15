@@ -23,5 +23,7 @@ namespace Shrooms.Presentation.WebViewModels.Models.AccountModels
         public string CultureCode { get; set; }
 
         public string TimeZone { get; set; }
+
+        public string PictureId { get; set; }
     }
 }

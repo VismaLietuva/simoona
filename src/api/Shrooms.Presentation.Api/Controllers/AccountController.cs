@@ -458,7 +458,8 @@ namespace Shrooms.Presentation.Api.Controllers
                 Permissions = permissions,
                 Impersonated = claimsIdentity?.Claims.Any(c => c.Type == WebApiConstants.ClaimUserImpersonation && c.Value == true.ToString()) ?? false,
                 CultureCode = user.CultureCode,
-                TimeZone = user.TimeZone
+                TimeZone = user.TimeZone,
+                PictureId = user.PictureId
             };
 
             return userInfo;
