@@ -4,7 +4,7 @@
     angular
         .module('simoonaApp.Common')
         .directive('aceMessageLikeListPopover', messageLikeListPopover)
-        .constant('popoverLikesCount', 15);
+        .constant('popoverLikeCount', 10);
 
     messageLikeListPopover.$inject = [
         '$compile',
