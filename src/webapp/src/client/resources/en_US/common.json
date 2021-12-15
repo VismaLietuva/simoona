@@ -199,5 +199,6 @@
   "emojiSad": "Sad",
   "emojiGrumpyCat": "Angry",
   "emojiAll" : "All",
-  "more" : "More"
+  "more" : "More",
+  "moreCount" : "and {{one}} more..."
 }

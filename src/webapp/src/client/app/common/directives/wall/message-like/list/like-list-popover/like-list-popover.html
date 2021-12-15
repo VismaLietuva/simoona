@@ -15,8 +15,10 @@
                 </a>
             </li>
 
-            <p class="likes-list-span blue" ng-if="hiddenUserCount > 0">
-                and {{hiddenUserCount}} more...
+            <p class="likes-list-span blue"
+               ng-if="hiddenUserCount > 0"
+               translate="common.moreCount"
+               translate-values="{ 'one' : hiddenUserCount }">
             </p>
         </ul>
     </script>

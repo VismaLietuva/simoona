@@ -4,7 +4,8 @@
     angular
         .module('simoonaApp.Common')
         .directive('aceMessageLikeListPopover', messageLikeListPopover)
-        .constant('popoverLikeCount', 10);
+        .constant('popoverLikeCount', 10)
+        .constant('popoverSwitchPositionValue', { y: 385 });
 
     messageLikeListPopover.$inject = [
         '$compile',
@@ -12,10 +13,11 @@
         '$templateCache',
         '$uibModal',
         'likeTypes',
-        'popoverLikeCount'
+        'popoverLikeCount',
+        'popoverSwitchPositionValue'
     ];
 
-    function messageLikeListPopover($compile, $window, $templateCache, $uibModal, likeTypes, popoverLikeCount) {
+    function messageLikeListPopover($compile, $window, $templateCache, $uibModal, likeTypes, popoverLikeCount, popoverSwitchPositionValue) {
         var lastLikePopoverElement;
         var directive = {
             restrict: 'A',
@@ -24,7 +26,6 @@
             scope: {
                 likes: '=',
                 modalLikes: '=',
-                popoverPlacement: '@',
                 popoverTitle: '@',
                 popoverEmoji: '@',
                 allLikeTypes: '@',
@@ -57,12 +58,20 @@
             element.popover({
                 html: true,
                 content: popoverContent,
-                placement: scope.popoverPlacement,
-                trigger: 'hover',
+                placement: getPopoverPlacement,
+                trigger: 'hover'
             }).click(function (event) {
                 angular.element(this).popover('hide');
                 event.stopPropagation();
             });
+
+            function getPopoverPlacement() {
+                if(element[0].getBoundingClientRect().y > popoverSwitchPositionValue.y) {
+                    return 'top';
+                }
+
+                return 'bottom';
+            }
         }
     }
 
