@@ -190,5 +190,14 @@
   "manager": "Manager",
   "onlyWholeNumbers": "Whole numbers only",
   "apply": "Apply",
-  "clear": "Clear"
+  "clear": "Clear",
+  "emojiLike": "Like",
+  "emojiLove": "Love",
+  "emojiLol": "Haha",
+  "emojiWow": "Wow",
+  "emojiCongrats": "Congrats",
+  "emojiSad": "Sad",
+  "emojiGrumpyCat": "Angry",
+  "emojiAll" : "All",
+  "more" : "More"
 }

@@ -190,5 +190,14 @@
   "manager": "Vadovas",
   "onlyWholeNumbers": "Leidžiami tik sveikieji skaičiai",
   "apply": "Taikyti",
-  "clear": "Valyti"
+  "clear": "Valyti",
+  "emojiLike": "Patinka",
+  "emojiLove": "Labai patinka",
+  "emojiLol": "Cha cha",
+  "emojiWow": "Oho!",
+  "emojiCongrats": "Sveikinimai",
+  "emojiSad": "Liūdnas (-a)",
+  "emojiGrumpyCat": "Piktas (-a)",
+  "emojiAll" : "Visi",
+  "more" : "Daugiau"
 }
