@@ -77,12 +77,21 @@
         var vm = this;
 
         vm.modalLikes = popoverScope.modalLikes;
-        vm.currentTab = popoverScope.modalLikesTab;
+        vm.currentLikeTab = popoverScope.currentModalLikeTab;
         vm.likeTypes = likeTypes;
-        vm.showAllLikesTab = true;
 
-        vm.switchTab = switchTab;
+        vm.showAllLikesTab = true;
+        vm.dropdownOpen = false;
+        vm.currentTabCount = 0;
+        vm.firstRenderedTabIndex = -1;
+
+        vm.setLikeTab = setLikeTab;
+        vm.increaseTabCount = increaseTabCount;
+        vm.getTabCount = getTabCount;
+        vm.setFirstRenderedTabIndex = setFirstRenderedTabIndex;
         vm.closeModal = closeModal;
+        vm.toggleDropdown = toggleDropdown;
+
 
         init();
 
@@ -94,13 +103,17 @@
             }
 
             // By default show all likes
-            if(vm.currentTab === undefined) {
-                vm.currentTab = vm.likeTypes.length;
+            if(vm.currentLikeTab === undefined) {
+                vm.currentLikeTab = vm.likeTypes.length;
             }
         }
 
-        function switchTab(tabIndex) {
-            vm.currentTab = tabIndex;
+        function setLikeTab(tabIndex) {
+            if(vm.dropdownOpen) {
+                vm.dropdownOpen = false;
+            }
+
+            vm.currentLikeTab = tabIndex;
         }
 
         function canShowAllLikesTab() {
@@ -111,8 +124,28 @@
             return receivedLikes.length !== vm.likeTypes.length - 1;
         }
 
+        function toggleDropdown() {
+            vm.dropdownOpen = !vm.dropdownOpen;
+        }
+
         function closeModal() {
             $uibModalInstance.close();
+        }
+
+        function increaseTabCount() {
+            vm.currentTabCount++;
+        }
+
+        function getTabCount() {
+            return vm.currentTabCount;
+        }
+
+        function setFirstRenderedTabIndex(index) {
+            if(vm.firstRenderedTabIndex !== -1) {
+                return;
+            }
+
+            vm.firstRenderedTabIndex = index;
         }
     }
 }());
