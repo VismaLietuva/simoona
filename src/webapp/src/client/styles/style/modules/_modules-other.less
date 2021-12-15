@@ -849,24 +849,149 @@ div.post-text-container {
 .likes-list {
     list-style-type: none;
     margin-left: -40px;
-    max-height: 210px;
-    overflow: auto;
-}
-
-.likes-list li {
-    margin-top: 5px;
 }
 
 .likes-list-img {
-    width: 30px;
+    width: 40px;
 }
 
 .likes-list-img-link {
     text-decoration: none !important;
 }
 
+.likes-list li {
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+}
+
 .likes-list-span {
+    font-size: 14px;
+    height: auto;
+    padding: 0;
+    margin: 0;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow-x: hidden;
+}
+
+.likes-list-emoji {
+    font-size: 2rem;
+}
+
+.likes-title-emoji {
+    font-size: 1.5rem;
+}
+
+.likes-list-emoji-margin {
+    margin-left: auto;
+}
+
+.popover-modal-like-tabs {
+    align-items: center;
+    padding-left: 15px;
+
+    > span:hover {
+        background-color: rgba(200, 200, 200, 0.3);
+    }
+
+    > div {
+        opacity: 0.8;
+        margin-right: 14px;
+    }
+
+    > div:hover {
+        opacity: 1;
+    }
+}
+
+.popover-likes-modal-content {
+    height: 350px;
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    li.span {
+        margin-left: auto;
+    }
+}
+
+.like-tab {
+    padding: 1.3rem 1rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+
+.dropdown-like-container {
+    visibility: hidden;
+
+    .dropdown-like-menu {
+        height: 0;
+        overflow: hidden;
+        display: block !important;
+        padding: 0 !important;
+        left: 0 !important;
+        margin-top: 0;
+        background-color: transparent;
+        border: 0;
+        min-width: 100%;
+        cursor: default;
+        -webkit-transition: height 250ms ease;
+        transition: height 250ms ease;
+        box-shadow: none;
+
+        li > a:hover, .dropdown-like-menu li > a:focus {
+            color: #262626;
+            text-decoration: none;
+            background-color: #f5f5f5;
+        }
+
+        li > a {
+            display: block;
+            padding: 8px 20px;
+            clear: both;
+            font-weight: 400;
+            line-height: 1.42857143;
+            color: #333;
+            white-space: nowrap;
+            background-color: white;
+        }
+
+        li.firstItem > a {
+            margin-top: 5px !important;
+            display: block;
+        }
+    }
+
+    .open-dropdown-like-menu > .dropdown-like-menu {
+        height: 230px;
+    }
+}
+
+@media(max-width : 600px) {
+    .dropdown-like-container {
+        visibility: visible !important;
+    }
+
+    .hide-like-tab {
+        display: none;
+    }
+}
+
+.likes-list-fullName {
     margin-left: 5px;
+}
+
+.selected-like-tab {
+    background-color: #edeff2 !important;
+    color: #337ab7 !important;
+}
+
+.popover-modal-like-tabs-count {
+    font-weight: bold;
+    font-size: 1.25rem;
+    text-align: center;
 }
 
 .post-list-wrapper {
