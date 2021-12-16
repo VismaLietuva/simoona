@@ -26,6 +26,7 @@ namespace Shrooms.Tests.ModelMappings
                 cfg.AddProfile<Jobs>();
                 cfg.AddProfile<Notifications>();
                 cfg.AddProfile<Likes>();
+                cfg.AddProfile<VacationPages>();
             };
 
             var configuration = new MapperConfiguration(mappings);
