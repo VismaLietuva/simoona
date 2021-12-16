@@ -15,6 +15,7 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.UserAnonymization
         private readonly int _anonymizeUsersPerRequest;
 
         private readonly DbSet<ApplicationUser> _usersDbSet;
+        private readonly DbSet<Organization> _organizationsDbSet;
 
         private readonly IUnitOfWork2 _uow;
         private readonly IPictureService _pictureService;
@@ -25,13 +26,16 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.UserAnonymization
             _anonymizeUsersPerRequest = Convert.ToInt32(ConfigurationManager.AppSettings["AnonymizeUsersPerRequest"]);
 
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
+            _organizationsDbSet = uow.GetDbSet<Organization>();
 
             _pictureService = pictureService;
             _uow = uow;
         }
 
-        public async Task AnonymizeUsersAsync(int organizationId)
+        public async Task AnonymizeUsersAsync(string organizationName)
         {
+            var organization = await _organizationsDbSet.FirstAsync(org => org.ShortName == organizationName);
+
             var sqlQuery = @"SELECT TOP(@userLimit) * FROM [dbo].[AspNetUsers] WHERE
                              IsDeleted = 1 AND
                              OrganizationId = @organizationId AND
@@ -40,7 +44,7 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.UserAnonymization
 
             var sqlParameters = new object[]
             {
-                new SqlParameter("@organizationId", organizationId),
+                new SqlParameter("@organizationId", organization.Id),
                 new SqlParameter("@anonymizeAfterDays", _anonymizeUsersAfterDays),
                 new SqlParameter("@userLimit", _anonymizeUsersPerRequest)
             };
@@ -49,7 +53,7 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.UserAnonymization
 
             foreach (var user in usersToAnonymize)
             {
-                await AnonymizeAsync(user, organizationId);
+                await AnonymizeAsync(user, organization.Id);
 
                 await _uow.SaveChangesAsync();
             }
@@ -57,7 +61,10 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.UserAnonymization
 
         private async Task AnonymizeAsync(ApplicationUser user, int organizationId)
         {
-            await _pictureService.RemoveImageAsync(user.PictureId, organizationId);
+            if (!string.IsNullOrEmpty(user.PictureId))
+            {
+                await _pictureService.RemoveImageAsync(user.PictureId, organizationId);
+            }
 
             var randomString = Guid.NewGuid().ToString();
 

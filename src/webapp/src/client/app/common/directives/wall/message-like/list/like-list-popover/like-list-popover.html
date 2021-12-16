@@ -1,21 +1,25 @@
 ﻿<span ng-transclude>
-    <script type="text/ng-template" id="messageLikeListPopoverTemplate.html">
-        <a class="pull-right">
-            <span class="glyphicon glyphicon-remove" data-test-id="close-likes-button"></span></a>
+    <script type="text/ng-template" id="messageLikeListPopoverTemplate.html" class="popover-likes">
+        <div class="popover-likes-title">
+            <p class="pull-left bold" translate="{{popoverTitle}}"></p>
+            <p class="pull-right likes-title-emoji">{{popoverEmoji}}</p>
+        </div>
+
         <div class="clearfix"></div>
 
         <ul class="likes-list" data-test-id="likes-popover-ul">
-            <li ng-repeat="like in likes">
-                <a ng-if="$index > 0"
-                   class="likes-list-img-link"
-                   ui-sref="Root.WithOrg.Client.Profiles.Details({ id: like.userId })">
-                    <img class="likes-list-img"
-                         ng-src="{{:: like.pictureId | miniThumb}}"
-                         data-test-id="user-image-likes-list" /></a>
-                <a ng-if="$index > 0" ui-sref="Root.WithOrg.Client.Profiles.Details({ id: like.userId })">
-                    <span class="likes-list-span" data-test-id="like-list-name" ng-cloak>
-                        {{:: like.fullName}}</span></a>
+            <li class="popover-likes-list-item" ng-repeat="like in likes|limitTo:popoverLikeCount + 1">
+
+                <a ng-if="$index > 0" class="likes-list-span" data-test-id="like-list-name">
+                    {{:: like.fullName}}
+                </a>
             </li>
+
+            <p class="likes-list-span blue"
+               ng-if="hiddenUserCount > 0"
+               translate="common.moreCount"
+               translate-values="{ 'one' : hiddenUserCount }">
+            </p>
         </ul>
     </script>
 </span>

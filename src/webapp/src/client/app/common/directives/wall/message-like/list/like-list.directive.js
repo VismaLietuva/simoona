@@ -5,13 +5,13 @@
         .module('simoonaApp.Common')
         .directive('aceMessageLikeList', messageLikeList)
         .constant('likeTypes', [
-            { emoji: '👍', type: 0 },
-            { emoji: '❤️', type: 1 },
-            { emoji: '🤣', type: 2 },
-            { emoji: '😲', type: 3 },
-            { emoji: '👏', type: 4 },
-            { emoji: '😢', type: 5 },
-            { emoji: '😾', type: 6 }
+            { emoji: '👍', type: 0, resource: "common.emojiLike" },
+            { emoji: '❤️', type: 1, resource: "common.emojiLove" },
+            { emoji: '🤣', type: 2, resource: "common.emojiLol" },
+            { emoji: '😲', type: 3, resource: "common.emojiWow"},
+            { emoji: '👏', type: 4, resource: "common.emojiCongrats" },
+            { emoji: '😢', type: 5, resource: "common.emojiSad" },
+            { emoji: '😾', type: 6, resource: "common.emojiGrumpyCat" }
         ]);
 
     messageLikeList.$inject = [
@@ -39,6 +39,7 @@
                     makeList();
                 });
             });
+
 
             function makeList() {
                 var likes = scope.messageObject.likes;

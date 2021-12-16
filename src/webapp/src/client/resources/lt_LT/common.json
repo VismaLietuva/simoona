@@ -191,5 +191,15 @@
   "onlyWholeNumbers": "Leidžiami tik sveikieji skaičiai",
   "apply": "Taikyti",
   "clear": "Valyti",
-  "noContent": "Nėra įrašų..."
+  "noContent": "Nėra įrašų...",
+  "emojiLike": "Patinka",
+  "emojiLove": "Labai patinka",
+  "emojiLol": "Cha cha",
+  "emojiWow": "Oho!",
+  "emojiCongrats": "Sveikinimai",
+  "emojiSad": "Liūdnas (-a)",
+  "emojiGrumpyCat": "Piktas (-a)",
+  "emojiAll" : "Visi",
+  "more" : "Daugiau",
+  "moreCount" : "ir dar {{one}}..."
 }

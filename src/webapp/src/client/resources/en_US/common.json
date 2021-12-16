@@ -191,5 +191,15 @@
   "onlyWholeNumbers": "Whole numbers only",
   "apply": "Apply",
   "clear": "Clear",
-  "noContent": "No content..."
+  "noContent": "No content...",
+  "emojiLike": "Like",
+  "emojiLove": "Love",
+  "emojiLol": "Haha",
+  "emojiWow": "Wow",
+  "emojiCongrats": "Congrats",
+  "emojiSad": "Sad",
+  "emojiGrumpyCat": "Angry",
+  "emojiAll" : "All",
+  "more" : "More",
+  "moreCount" : "and {{one}} more..."
 }

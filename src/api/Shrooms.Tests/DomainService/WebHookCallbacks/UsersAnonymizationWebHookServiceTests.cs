@@ -19,6 +19,7 @@ namespace Shrooms.Tests.DomainService.WebHookCallbacks
         private UsersAnonymizationWebHookService _usersAnonymizationWebHookService;
 
         private DbSet<ApplicationUser> _usersDbSet;
+        private DbSet<Organization> _organizationsDbSet;
         private IPictureService _pictureService;
         private MockDbContext _mockDbContext;
         private IUnitOfWork2 _uow;
@@ -28,6 +29,8 @@ namespace Shrooms.Tests.DomainService.WebHookCallbacks
         {
             _mockDbContext = new MockDbContext();
 
+            _organizationsDbSet = Substitute.For<DbSet<Organization>, IQueryable<Organization>, IDbAsyncEnumerable<Organization>>();
+            _organizationsDbSet.SetDbSetDataForAsync(_mockDbContext.Organizations);
             _usersDbSet = Substitute.For<DbSet<ApplicationUser>, IQueryable<ApplicationUser>, IDbAsyncEnumerable<ApplicationUser>>();
             _usersDbSet.SetDbSetDataForAsync(_mockDbContext.ApplicationUsers);
 
@@ -44,6 +47,7 @@ namespace Shrooms.Tests.DomainService.WebHookCallbacks
 
             _uow = Substitute.For<IUnitOfWork2>();
             _uow.GetDbSet<ApplicationUser>().ReturnsForAnyArgs(_usersDbSet);
+            _uow.GetDbSet<Organization>().ReturnsForAnyArgs(_organizationsDbSet);
 
             _pictureService = Substitute.For<IPictureService>();
 
@@ -53,8 +57,11 @@ namespace Shrooms.Tests.DomainService.WebHookCallbacks
         [Test]
         public async Task Should_Anonymize_All_Users()
         {
+            // Arrange
+            var organization = _mockDbContext.Organizations.First();
+
             // Act
-            await _usersAnonymizationWebHookService.AnonymizeUsersAsync(TestConstants.DefaultOrganizationId);
+            await _usersAnonymizationWebHookService.AnonymizeUsersAsync(organization.ShortName);
 
             // Assert
             Assert.IsFalse(_usersDbSet.Any(user => !user.IsAnonymized));

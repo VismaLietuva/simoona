@@ -34,7 +34,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [Route("AnonymizeUsers")]
         public async Task AnonymizeUsers()
         {
-            await _webHookService.UsersAnonymization.AnonymizeUsersAsync(GetOrganizationId());
+            await _webHookService.UsersAnonymization.AnonymizeUsersAsync(GetOrganizationName());
         }
     }
 }
