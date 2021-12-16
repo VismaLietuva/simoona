@@ -132,6 +132,7 @@
     <Compile Include="DAL\EntityTypeConfigurations\PostWatcherConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\RefreshTokenConfiguration.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\RoomEntityConfig.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\VacationEntityConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\WallConfiguration.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\WallMembersConfiguration.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\WallModeratorsConfiguration.cs" />

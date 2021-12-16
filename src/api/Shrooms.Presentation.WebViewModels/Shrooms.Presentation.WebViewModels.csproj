@@ -103,6 +103,7 @@
     <Compile Include="Models\User\WallNotificationsViewModel.cs" />
     <Compile Include="Models\User\LocalizationSettingsViewModel.cs" />
     <Compile Include="Models\User\TimeZoneViewModel.cs" />
+    <Compile Include="Models\VacationPage\VacationPageViewModel.cs" />
     <Compile Include="Models\Wall\CreateWallViewModel.cs" />
     <Compile Include="Models\Wall\Moderator\ModeratorViewModel.cs" />
     <Compile Include="Models\Wall\Posts\Comments\EditCommentViewModel.cs" />

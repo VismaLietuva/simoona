@@ -142,6 +142,8 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<LotteryParticipant> LotteryParticipants { get; set; }
 
+        public virtual DbSet<VacationPage> VacationPages { get; set; }
+
         public string ConnectionName { get; }
 
         public int SaveChanges(string userId)
@@ -215,6 +217,7 @@ namespace Shrooms.DataLayer.DAL
             modelBuilder.Configurations.Add(new NotificationConfig());
             modelBuilder.Configurations.Add(new NotifiationUserConfig());
             modelBuilder.Configurations.Add(new PostWatcherConfig());
+            modelBuilder.Configurations.Add(new VacationEntityConfig());
 
             var convention = new AttributeToColumnAnnotationConvention<SqlDefaultValueAttribute, string>("SqlDefaultValue", (p, attributes) => attributes.Single().DefaultValue);
             modelBuilder.Conventions.Add(convention);

@@ -91,6 +91,7 @@
     <Compile Include="DataTransferObjects\UserAndOrganizationHubDto.cs" />
     <Compile Include="DataTransferObjects\Users\UserAutoCompleteDto.cs" />
     <Compile Include="DataTransferObjects\Users\UserDto.cs" />
+    <Compile Include="DataTransferObjects\VacationPages\VacationPageDto.cs" />
     <Compile Include="DataTransferObjects\Wall\Comments\CommentDto.cs" />
     <Compile Include="DataTransferObjects\Wall\CreateWallDto.cs" />
     <Compile Include="DataTransferObjects\Wall\Likes\AddLikeDto.cs" />

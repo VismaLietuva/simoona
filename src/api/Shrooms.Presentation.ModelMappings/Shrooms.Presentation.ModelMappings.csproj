@@ -75,6 +75,7 @@
     <Compile Include="Profiles\Permissions.cs" />
     <Compile Include="Profiles\Projects.cs" />
     <Compile Include="Profiles\Roles.cs" />
+    <Compile Include="Profiles\VacationPages.cs" />
     <Compile Include="Profiles\Walls.cs" />
     <Compile Include="Resolvers\AdministrationUserRoomResolver.cs" />
     <Compile Include="Profiles\Birthdays.cs" />
