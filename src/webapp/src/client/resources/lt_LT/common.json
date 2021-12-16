@@ -190,5 +190,6 @@
   "manager": "Vadovas",
   "onlyWholeNumbers": "Leidžiami tik sveikieji skaičiai",
   "apply": "Taikyti",
-  "clear": "Valyti"
+  "clear": "Valyti",
+  "noContent": "Nėra įrašų..."
 }
