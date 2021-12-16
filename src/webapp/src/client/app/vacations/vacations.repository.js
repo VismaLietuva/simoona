@@ -12,28 +12,33 @@
     ];
 
     function vacationsRepository($resource, shroomsFileUploader, endPoint) {
-        var vacationsUrl = endPoint + '/Vacations/';
+        var vacationsUrl = endPoint + '/VacationPage/';
 
         var service = {
-            getVacationHistory: getVacationHistory,
-            getAvailableDays: getAvailableDays,
-            uploadVacationFile: uploadVacationFile
+            getVacationContent: getVacationContent,
+            setVacationContent: setVacationContent
         }
 
         return service;
 
         /////////
 
-        function getVacationHistory() {
-            return $resource(vacationsUrl + 'GetVacationHistory').query().$promise;
+        function getVacationContent() {
+            return $resource(vacationsUrl + 'Get', '', {
+                'get' : {
+                    method: 'GET'
+                }
+            }).get().$promise;
         }
 
-        function getAvailableDays() {
-            return $resource(vacationsUrl + 'AvailableDays').get().$promise;
-        }
-
-        function uploadVacationFile(files) {
-            return shroomsFileUploader.upload(files, vacationsUrl + 'Upload');
+        function setVacationContent(newContent) {
+            return $resource(vacationsUrl + 'Edit', '', {
+                'put' : {
+                    method: 'PUT'
+                }
+            }).put({
+                content : newContent
+            }).$promise;
         }
     }
 })();
