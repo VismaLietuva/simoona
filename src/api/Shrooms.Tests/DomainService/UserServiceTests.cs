@@ -17,7 +17,6 @@ using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
-using Shrooms.Domain.Services.Picture;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.Domain.Services.UserService;
 using Shrooms.Tests.Extensions;
@@ -49,11 +48,10 @@ namespace Shrooms.Tests.DomainService
 
             var dbContext = Substitute.For<IDbContext>();
             var userStore = Substitute.For<IUserStore<ApplicationUser>>();
-            var pictureService = Substitute.For<IPictureService>();
             var roleService = Substitute.For<IRoleService>();
             _userManager = MockIdentity.MockUserManager(userStore, dbContext);
 
-            _userService = new UserService(uow, _userManager, pictureService, roleService);
+            _userService = new UserService(uow, _userManager, roleService);
         }
 
         [Test]
