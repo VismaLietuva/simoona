@@ -7,6 +7,13 @@
 
             <div class="panel-heading">
                 <span translate="common.vacations"></span>
+
+                <ace-message-actions class="pull-right"
+                                     is-admin="vm.allowEdit"
+                                     can-delete="false"
+                                     enable-editor="vm.enableEditor()"
+                                     ng-show="!vm.editFieldEnabled">
+                </ace-message-actions>
             </div>
 
             <form name="editPostForm" class="panel-body">
@@ -32,8 +39,6 @@
 
                     <a ng-click="vm.disableEditor()" translate="common.cancel"></a>
                 </div>
-
-                <a class="pull-right" ng-click="vm.enableEditor()" ng-if="!vm.editFieldEnabled && vm.allowEdit" translate="common.edit"></a>
             </form>
         </div>
     </div>
