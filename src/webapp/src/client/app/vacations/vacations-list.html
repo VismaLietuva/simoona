@@ -22,7 +22,7 @@
                 <span ng-if="!vm.editFieldEnabled && !vm.isLoading" markdown ng-bind-html="vm.content"></span>
                 <p ng-if="!vm.editFieldEnabled && !vm.isLoading && !vm.content" translate="common.noContent"></p>
 
-                <div class="vacation-edit-properties pull-left" ng-if="vm.editFieldEnabled">
+                <div class="vacation-edit-properties pull-right" ng-if="vm.editFieldEnabled">
                     <a class="vacation-save-property"
                        ng-model="save"
                        ng-disabled="editPostForm.$invalid"
@@ -33,7 +33,7 @@
                     <a ng-click="vm.disableEditor()" translate="common.cancel"></a>
                 </div>
 
-                <a ng-click="vm.enableEditor()" ng-if="!vm.editFieldEnabled && vm.allowEdit" translate="common.edit"></a>
+                <a class="pull-right" ng-click="vm.enableEditor()" ng-if="!vm.editFieldEnabled && vm.allowEdit" translate="common.edit"></a>
             </form>
         </div>
     </div>
