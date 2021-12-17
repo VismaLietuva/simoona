@@ -12,7 +12,8 @@
                 enableEditor: '&',
                 deleteMessage: '&',
                 currentWallId: '=',
-                isWallModule: '='
+                isWallModule: '=',
+                canDelete: '='
             },
             templateUrl: 'app/common/directives/wall/actions/actions.html',
             controller: messageActionsController,
