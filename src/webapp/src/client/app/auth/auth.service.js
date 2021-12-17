@@ -174,7 +174,8 @@
                 organizationName: response.organizationName,
                 organizationId: response.organizationId,
                 impersonated: response.impersonated,
-                hasCompletedWalkThrough: response.isTutorialComplete
+                hasCompletedWalkThrough: response.isTutorialComplete,
+                pictureId: response.pictureId
             };
 
             localStorageService.set('authorizationData', authorizationData);
@@ -204,8 +205,8 @@
 
         function requestToken(params) {
             const data = "grant_type=password" +
-                "&username=" + params.username + 
-                "&password=" + params.password + 
+                "&username=" + params.username +
+                "&password=" + params.password +
                 "&client_id=" + appConfig.clientId;
 
             return $resource(tokenUrl, {}, {
@@ -429,7 +430,7 @@
                 reload: true
             });
         }
-        
+
         function completeWalkThrough() {
             return $resource(applicationUrl + 'CompleteTutorial', '', {
                 put: {
@@ -437,7 +438,7 @@
                 }
             }).put().$promise;
         }
-        
+
         function walkThroughCompletionStatus() {
             var deferred = $q.defer();
 
