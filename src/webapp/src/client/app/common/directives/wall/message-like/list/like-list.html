@@ -21,13 +21,15 @@
             <a ace-message-like-list-popover
                modal-likes="filteredLikesByType"
                current-modal-like-tab="{{like.type}}"
-               ng-if="filteredLikesByType[like.type].length > 1"
+               ng-if="filteredLikesByType[like.type].length > 0"
                likes="filteredLikesByType[like.type]"
+               others="false"
+               modal-likes-all="positionedLikes"
                style="text-decoration: none"
                popover-title="{{like.resource}}"
                popover-emoji="{{like.emoji}}">{{like.emoji}}</a>
 
-            <span ng-if="filteredLikes[key].length <= 1">
+            <span ng-if="filteredLikes[key].length <= 0">
                 {{like.emoji}}
             </span>
         </span>
@@ -52,13 +54,15 @@
             <a ace-message-like-list-popover
                modal-likes="filteredLikesByType"
                current-modal-like-tab="{{like.type}}"
-               ng-if="filteredLikesByType[like.type].length > 1"
+               ng-if="filteredLikesByType[like.type].length > 0"
                likes="filteredLikesByType[like.type]"
+               others="false"
+               modal-likes-all="positionedLikes"
                style="text-decoration: none"
                popover-title="{{like.resource}}"
                popover-emoji="{{like.emoji}}">{{like.emoji}}</a>
 
-            <span ng-if="filteredLikes[key].length <= 1">
+            <span ng-if="filteredLikes[key].length <= 0">
                 {{like.emoji}}
             </span>
         </span>
@@ -78,6 +82,8 @@
        likes="positionedLikes"
        modal-likes="filteredLikesByType"
        all-like-types="true"
+       modal-likes-all="positionedLikes"
+       others="true"
        data-test-id="{{::likeType}}-like-others">
        <span translate="common.others" translate-values="{ likeCount: positionedLikes.length - 1 }"></span>
     </a>

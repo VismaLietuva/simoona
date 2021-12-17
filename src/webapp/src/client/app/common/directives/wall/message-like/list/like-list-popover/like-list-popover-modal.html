@@ -16,9 +16,9 @@
             <div class="like-tab"
                  ng-init="currentTabCount = vm.getTabCount(); vm.setFirstRenderedTabIndex($index);"
                  ng-class="{ 'selected-like-tab' : vm.currentLikeTab == $index, 'hide-like-tab' : currentTabCount > 0 }"
-                 ng-if="vm.modalLikes[likeType.type].length > 1">
+                 ng-if="vm.modalLikes[likeType.type].length > 0">
                 <span ng-init="vm.increaseTabCount()">{{likeType.emoji}}</span>
-                <span class="popover-modal-like-tabs-count">{{vm.modalLikes[likeType.type].length - 1}}</span>
+                <span class="popover-modal-like-tabs-count">{{vm.modalLikes[likeType.type].length}}</span>
             </div>
         </span>
 
@@ -38,9 +38,9 @@
                             ng-click="vm.setLikeTab($index + vm.firstRenderedTabIndex); vm.toggleDropdown()">
 
                             <a  ng-class="{ 'selected-like-tab' : vm.currentLikeTab == $index + vm.firstRenderedTabIndex }"
-                                ng-if="vm.modalLikes[likeType.type].length > 1 && vm.firstRenderedTabIndex != likeType.type">
+                                ng-if="vm.modalLikes[likeType.type].length > 0 && vm.firstRenderedTabIndex != likeType.type">
                                     {{likeType.emoji}}
-                                    <span class="bold">{{vm.modalLikes[likeType.type].length - 1}}</span>
+                                    <span class="bold">{{vm.modalLikes[likeType.type].length}}</span>
                             </a>
                         </li>
                     </div>
@@ -59,27 +59,21 @@
 
 <div class="modal-body popover-likes-modal-content">
     <!-- All likes list -->
-    <ul class="likes-list"
-        ng-repeat="likes in vm.modalLikes track by $index"
-        ng-if="vm.currentLikeTab === vm.likeTypes.length">
-
-        <li ng-repeat="like in likes" class="likes-list-item">
-            <a ng-if="$index > 0"
-               class="likes-list-img-link"
+    <ul class="likes-list" ng-if="vm.currentLikeTab === vm.likeTypes.length">
+        <li ng-repeat="like in vm.modalLikesAll" class="likes-list-item">
+            <a class="likes-list-img-link"
                ui-sref="Root.WithOrg.Client.Profiles.Details({ id: like.userId })">
                 <img class="likes-list-img"
                      ng-src="{{:: like.pictureId | miniThumb}}"
                      data-test-id="user-image-likes-list" />
             </a>
 
-            <a ng-if="$index > 0"
-               ui-sref="Root.WithOrg.Client.Profiles.Details({ id: like.userId })" class="likes-list-span likes-list-fullName"
+            <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: like.userId })" class="likes-list-span likes-list-fullName"
                data-test-id="like-list-name"  ng-cloak>
                 {{:: like.fullName}}
             </a>
 
             <span class="noselect pull-right likes-list-emoji-margin"
-                  ng-if="$index > 0"
                   ui-sref="Root.WithOrg.Client.Profiles.Details({ id: like.userId })">
                         <span class="likes-list-span noselect likes-list-emoji"
                               data-test-id="like-list-name"
@@ -95,24 +89,21 @@
         ng-repeat="likes in vm.modalLikes track by $index"
         ng-if="vm.currentLikeTab !== vm.likeTypes.length">
 
-        <span ng-if="likes.length > 1 && $index == vm.currentLikeTab">
+        <span ng-if="likes.length > 0 && $index == vm.currentLikeTab">
             <li ng-repeat="like in likes" class="likes-list-item">
-                <a ng-if="$index > 0"
-                   class="likes-list-img-link"
+                <a class="likes-list-img-link"
                    ui-sref="Root.WithOrg.Client.Profiles.Details({ id: like.userId })">
                     <img class="likes-list-img"
                          ng-src="{{:: like.pictureId | miniThumb}}"
                          data-test-id="user-image-likes-list" />
                 </a>
 
-                <a ng-if="$index > 0"
-                   ui-sref="Root.WithOrg.Client.Profiles.Details({ id: like.userId })" class="likes-list-span likes-list-fullName"
+                <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: like.userId })" class="likes-list-span likes-list-fullName"
                    data-test-id="like-list-name"  ng-cloak>
                     {{:: like.fullName}}
                 </a>
 
                 <span class="noselect pull-right likes-list-emoji-margin"
-                      ng-if="$index > 0"
                       ui-sref="Root.WithOrg.Client.Profiles.Details({ id: like.userId })">
                             <span class="likes-list-span noselect likes-list-emoji"
                                   data-test-id="like-list-name"

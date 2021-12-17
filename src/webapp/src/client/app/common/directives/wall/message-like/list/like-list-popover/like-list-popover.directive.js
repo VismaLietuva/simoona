@@ -14,10 +14,11 @@
         '$uibModal',
         'likeTypes',
         'popoverLikeCount',
-        'popoverSwitchPositionValue'
+        'popoverSwitchPositionValue',
+        'authService'
     ];
 
-    function messageLikeListPopover($compile, $window, $templateCache, $uibModal, likeTypes, popoverLikeCount, popoverSwitchPositionValue) {
+    function messageLikeListPopover($compile, $window, $templateCache, $uibModal, likeTypes, popoverLikeCount, popoverSwitchPositionValue, authService) {
         var lastLikePopoverElement;
         var directive = {
             restrict: 'A',
@@ -26,6 +27,8 @@
             scope: {
                 likes: '=',
                 modalLikes: '=',
+                modalLikesAll: '=',
+                others: '=',
                 popoverTitle: '@',
                 popoverEmoji: '@',
                 allLikeTypes: '@',
@@ -51,6 +54,7 @@
             scope.likeTypes = likeTypes;
             scope.popoverLikeCount = popoverLikeCount;
             scope.hiddenUserCount = (scope.likes.length - 1) - popoverLikeCount;
+            scope.currentUser = authService.identity.userId;
 
             var html = $templateCache.get('messageLikeListPopoverTemplate.html');
             var popoverContent = $compile(html)(scope);
@@ -86,6 +90,7 @@
         var vm = this;
 
         vm.modalLikes = popoverScope.modalLikes;
+        vm.modalLikesAll = popoverScope.modalLikesAll;
         vm.currentLikeTab = popoverScope.currentModalLikeTab;
         vm.likeTypes = likeTypes;
 
