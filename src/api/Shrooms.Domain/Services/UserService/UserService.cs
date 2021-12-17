@@ -18,7 +18,6 @@ using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.DataLayer.EntityModels.Models.Notifications;
-using Shrooms.Domain.Services.Picture;
 using Shrooms.Domain.Services.Roles;
 using ConstantsRoles = Shrooms.Contracts.Constants.Roles;
 using WallModel = Shrooms.DataLayer.EntityModels.Models.Multiwall.Wall;
@@ -35,10 +34,9 @@ namespace Shrooms.Domain.Services.UserService
 
         private readonly IUnitOfWork2 _uow;
         private readonly ShroomsUserManager _userManager;
-        private readonly IPictureService _pictureService;
         private readonly IRoleService _roleService;
 
-        public UserService(IUnitOfWork2 uow, ShroomsUserManager userManager, IPictureService pictureService, IRoleService roleService)
+        public UserService(IUnitOfWork2 uow, ShroomsUserManager userManager, IRoleService roleService)
         {
             _rolesDbSet = uow.GetDbSet<ApplicationRole>();
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
@@ -48,7 +46,6 @@ namespace Shrooms.Domain.Services.UserService
 
             _uow = uow;
             _userManager = userManager;
-            _pictureService = pictureService;
             _roleService = roleService;
         }
 
