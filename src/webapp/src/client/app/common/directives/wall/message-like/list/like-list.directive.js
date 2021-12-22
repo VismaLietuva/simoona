@@ -55,18 +55,12 @@
                 }
 
                 for (var i = 0; i < likes.length; i++) {
-                    if (!!likes[i] && likes[i].userId === authService.identity.userId) {
-                        scope.user = likes[i];
+                    if (!!likes[i]) {
+                        if(scope.user === null && likes[i].userId === authService.identity.userId) {
+                            scope.user = likes[i];
+                        }
+
                         scope.positionedLikes.push(likes[i]);
-
-                        addLikeType(likes[i].type, likes[i]);
-                    }
-                }
-
-                for (var i = 0; i < likes.length; i++) {
-                    if (!!likes[i] && likes[i].userId !== authService.identity.userId) {
-                        scope.positionedLikes.push(likes[i]);
-
                         addLikeType(likes[i].type, likes[i]);
                     }
                 }
@@ -78,9 +72,6 @@
             function addLikeType(index, like) {
                 if(!scope.likeTypes.contains(likeTypes[index])) {
                     scope.likeTypes.push(likeTypes[index]);
-
-                    // Add empty entry, because first one is hidden in popover
-                    scope.filteredLikesByType[index].push({});
                 }
 
                 scope.filteredLikesByType[index].push(like);
