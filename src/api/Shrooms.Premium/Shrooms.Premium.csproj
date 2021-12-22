@@ -167,6 +167,11 @@
       <HintPath>..\packages\RazorEngine.3.9.0\lib\net45\RazorEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Shrooms.Authentification, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Authentification\bin\$(Configuration)\Shrooms.Authentification.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Shrooms.Contracts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Contracts\bin\$(Configuration)\Shrooms.Contracts.dll</HintPath>
@@ -622,12 +627,6 @@
     <Content Include="EmailTemplates\ServiceRequests\UpdateServiceRequest.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="$(SimoonaCoreLocation)\src\api\Shrooms.Authentification\Shrooms.Authentification.csproj">
-      <Project>{da661aa0-3313-4c2d-81a9-c1a2b74f7317}</Project>
-      <Name>Shrooms.Authentification</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="RecycleWebapp" BeforeTargets="Clean" Condition=" '$(Configuration)|$(Platform)' != 'Release|AnyCPU' ">
