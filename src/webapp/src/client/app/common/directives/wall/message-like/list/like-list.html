@@ -1,54 +1,4 @@
-﻿<span ng-if="positionedLikes.length === 1" ng-cloak translate-cloak>
-    <span class="like-list-emoji-container">
-        <span>{{likeTypes[0].emoji}}</span>
-    </span>
-
-    <span ng-if="!!user">
-        <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: positionedLikes[0].userId })"
-           translate="common.you"></a>
-        <span translate="wall.likeThis"></span>.
-    </span>
-    <span ng-if="!user">
-        <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: positionedLikes[0].userId })">
-            {{::positionedLikes[0].fullName}}</a>
-        <span translate="wall.likesThis"></span>
-    </span>
-</span>
-
-<span ng-if="positionedLikes.length === 2" ng-cloak translate-cloak>
-    <span class="like-list-emoji-container">
-        <span ng-repeat="like in likeTypes">
-            <a ace-message-like-list-popover
-               modal-likes="filteredLikesByType"
-               current-modal-like-tab="{{like.type}}"
-               ng-if="filteredLikesByType[like.type].length > 0"
-               likes="filteredLikesByType[like.type]"
-               others="false"
-               modal-likes-all="positionedLikes"
-               style="text-decoration: none"
-               popover-title="{{like.resource}}"
-               popover-emoji="{{like.emoji}}">{{like.emoji}}</a>
-
-            <span ng-if="filteredLikes[key].length <= 0">
-                {{like.emoji}}
-            </span>
-        </span>
-    </span>
-
-    <a ng-if="!!user"
-       ui-sref="Root.WithOrg.Client.Profiles.Details({ id: positionedLikes[0].userId })"
-       translate="common.you"></a>
-
-    <a ng-if="!user"
-       ui-sref="Root.WithOrg.Client.Profiles.Details({ id: positionedLikes[0].userId })">
-        {{::positionedLikes[0].fullName}}</a>
-    <span translate="common.and"></span>
-    <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: positionedLikes[1].userId })">
-        {{::positionedLikes[1].fullName}}</a>
-    <span translate="wall.likeThis"></span>
-</span>
-
-<span ng-if="positionedLikes.length > 2" ng-cloak translate-cloak>
+﻿<span ng-if="positionedLikes.length > 0" ng-cloak translate-cloak>
     <div class="like-list-emoji-container">
         <span ng-repeat="like in likeTypes">
             <a ace-message-like-list-popover
@@ -68,25 +18,37 @@
         </span>
     </div>
 
-    <a ng-if="!!user"
-       ui-sref="Root.WithOrg.Client.Profiles.Details({ id: positionedLikes[0].userId })"
-       translate="common.you"></a>
+    <span ng-if="!user">
+        <a ace-message-like-list-popover
+            popover-title="common.emojiAll"
+            likes="positionedLikes"
+            modal-likes="filteredLikesByType"
+            all-like-types="true"
+            modal-likes-all="positionedLikes"
+            others="true"
+            data-test-id="{{::likeType}}-like-others">
+            <span>{{positionedLikes.length}}</span>
+        </a>
+    </span>
 
-    <a ng-if="!user"
-       ui-sref="Root.WithOrg.Client.Profiles.Details({ id: positionedLikes[0].userId })">
-        {{::positionedLikes[0].fullName}}</a>
-    <span translate="common.and"></span>
+    <span ng-if="user">
+        <a ng-if="positionedLikes.length === 1" ui-sref="Root.WithOrg.Client.Profiles.Details({ id: positionedLikes[0].userId })">{{positionedLikes[0].fullName}}</a>
+        <a ng-if="positionedLikes.length > 1" ui-sref="Root.WithOrg.Client.Profiles.Details({ id: positionedLikes[0].userId })" translate="common.you"></a>
 
-    <a ace-message-like-list-popover
-       popover-title="common.emojiAll"
-       likes="positionedLikes"
-       modal-likes="filteredLikesByType"
-       all-like-types="true"
-       modal-likes-all="positionedLikes"
-       others="true"
-       data-test-id="{{::likeType}}-like-others">
-       <span translate="common.others" translate-values="{ likeCount: positionedLikes.length - 1 }"></span>
-    </a>
+        <span ng-if="positionedLikes.length > 1">
+            <span translate="common.and"></span>
 
-    <span translate="wall.likeThis"></span>
+            <a ace-message-like-list-popover
+                popover-title="common.emojiAll"
+                likes="positionedLikes"
+                modal-likes="filteredLikesByType"
+                all-like-types="true"
+                modal-likes-all="positionedLikes"
+                others="true"
+                data-test-id="{{::likeType}}-like-others">
+                <span ng-if="positionedLikes.length === 2" translate="common.other" translate-values="{ likeCount: positionedLikes.length - 1 }"></span>
+                <span ng-if="positionedLikes.length > 2" translate="common.others" translate-values="{ likeCount: positionedLikes.length - 1 }"></span>
+            </a>
+        </span>
+    </span>
 </span>

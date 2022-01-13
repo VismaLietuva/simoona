@@ -170,6 +170,7 @@
   "deletePopupTitle": "Delete confirmation",
   "birthdayDateIsTooOld": "Smallest possible date is 1900-01-01",
   "and": "and",
+  "other": "{{ likeCount }} other",
   "others": "{{ likeCount }} others",
   "you": "You",
   "typeToFilterList": "Type to filter list...",
