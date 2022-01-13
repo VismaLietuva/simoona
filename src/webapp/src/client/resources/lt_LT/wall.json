@@ -23,8 +23,6 @@
   "commentMessageBody": "Komentaro žinutė",
   "postMessageBody": "Žinutė",
   "emptyMessageError": "Žinutė negali būti tuščia",
-  "likesThis": "tai mėgsta",
-  "likeThis": "tai patinka",
   "noEmptyComment": "Komentaras negali būti tuščias",
   "noEmptyPost": "Pranešimas negali būti tuščias",
   "tooLongComment": "Komentaro tekstas negali būti ilgesnis nei 5000 simbolių",

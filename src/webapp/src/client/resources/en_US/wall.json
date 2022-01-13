@@ -23,8 +23,6 @@
   "commentMessageBody": "Comment body",
   "postMessageBody": "Post body",
   "emptyMessageError": "Message can not be empty.",
-  "likesThis": "likes this",
-  "likeThis": "like this",
   "noEmptyComment": "Comment can't be empty",
   "noEmptyPost": "Post can't be empty",
   "tooLongComment": "The field Comment body can not be longer than 5000 characters",
