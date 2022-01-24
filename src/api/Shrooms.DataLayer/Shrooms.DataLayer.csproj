@@ -852,6 +852,10 @@
     <Compile Include="Migrations\202112070949308_AddedIsAnonymizedFieldToApplicationUser.Designer.cs">
       <DependentUpon>202112070949308_AddedIsAnonymizedFieldToApplicationUser.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202201241212379_AddedVacationPageModel.cs" />
+    <Compile Include="Migrations\202201241212379_AddedVacationPageModel.Designer.cs">
+      <DependentUpon>202201241212379_AddedVacationPageModel.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
@@ -1417,6 +1421,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202112070949308_AddedIsAnonymizedFieldToApplicationUser.resx">
       <DependentUpon>202112070949308_AddedIsAnonymizedFieldToApplicationUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202201241212379_AddedVacationPageModel.resx">
+      <DependentUpon>202201241212379_AddedVacationPageModel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
