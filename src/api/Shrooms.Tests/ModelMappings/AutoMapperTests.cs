@@ -56,5 +56,11 @@ namespace Shrooms.Tests.ModelMappings
         {
             _mapper.ConfigurationProvider.AssertConfigurationIsValid<Likes>();
         }
+
+        [Test]
+        public void Mapping_VacationPage_Models()
+        {
+            _mapper.ConfigurationProvider.AssertConfigurationIsValid<VacationPages>();
+        }
     }
 }

@@ -172,6 +172,8 @@
     <Compile Include="Services\KudosBaskets\KudosBasketService.cs" />
     <Compile Include="Services\RefreshTokens\IRefreshTokenService.cs" />
     <Compile Include="Services\RefreshTokens\RefreshTokenService.cs" />
+    <Compile Include="Services\VacationPages\IVacationPageService.cs" />
+    <Compile Include="Services\VacationPages\VacationPageService.cs" />
     <Compile Include="Services\Wall\Posts\Comments\CommentService.cs" />
     <Compile Include="Services\Wall\Posts\Comments\ICommentService.cs" />
     <Compile Include="Services\Impersonate\IImpersonateService.cs" />

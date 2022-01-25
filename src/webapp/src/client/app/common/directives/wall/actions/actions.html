@@ -11,7 +11,7 @@
                 <span translate="common.edit"></span>
             </a>
         </li>
-        <li>
+        <li ng-if="vm.canDelete || vm.canDelete === undefined">
             <a ace-confirmation-modal="vm.deleteMessage()" tabindex="-1" data-test-id="message-delete-button">
                 <span translate="common.delete"></span>
             </a>

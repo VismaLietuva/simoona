@@ -9,89 +9,56 @@
         '$rootScope',
         '$scope',
         'vacationsRepository',
-        'notifySrv',
-        'shroomsFileUploader',
-        'errorHandler'
+        'authService'
     ];
 
-    function vacationsController($rootScope, $scope, vacationsRepository, notifySrv,
-        shroomsFileUploader, errorHandler) {
-        var vm = this;
-
-        var uploadConfig = {
-            allowed: ["xls", "XLS"],
-            sizeLimit: 5000000,
-        };
-        var xlsVacationFile = null;
+    function vacationsController($rootScope, $scope, vacationsRepository, authService) {
 
         $rootScope.pageTitle = 'common.vacations';
 
-        vm.availableDays = {};
-        vm.isLoading = false;
+        var vm = this;
 
-        vm.uploadVacationFile = uploadVacationFile;
-        $scope.fileAttached = fileAttached;
+        vm.allowEdit = authService.hasPermissions(['APPLICATIONUSER_ADMINISTRATION']);
+        vm.isLoading = true;
+        vm.isTranslating = false;
+
+        vm.editableValue = vm.content;
+        vm.editFieldEnabled = false;
+
+        vm.enableEditor = enableEditor;
+        vm.disableEditor = disableEditor;
+        vm.editContent = editContent;
 
         init();
 
         //////////
 
         function init() {
+            vacationsRepository.getVacationContent().then(function (response) {
+                vm.content = response.content;
+                vm.isLoading = false;
+            }, function () {
+                vm.isLoading = false;
+            })
         }
 
-        function fileAttached(input) {
-            var isValid;
+        function editContent(editedContent) {
+            vm.content = editedContent;
 
-            if (input.value) {
-                isValid = shroomsFileUploader.validateCustomFileType(
-                    input.files,
-                    uploadConfig,
-                    showUploadAlert
-                );
-            }
-
-            if (isValid) {
-                xlsVacationFile = shroomsFileUploader.fileListToArray(input.files);
-                uploadVacationFile();
-            }
-
-            $scope.$apply();
+            vacationsRepository.setVacationContent(editedContent).then(function () {
+                disableEditor();
+            }, function () {
+                enableEditor();
+            });
         }
 
-        function uploadVacationFile() {
-            vacationsRepository.uploadVacationFile(xlsVacationFile).then(function (response) {
-                    notifySrv.success('vacations.vacationTimeReportImportedSuccessfully');
-                    vm.importStatus = response.data;
-                    getAvailableDays();
-                }, errorHandler.handleErrorMessage);
+        function enableEditor() {
+            vm.editFieldEnabled = true;
+            vm.editableValue = vm.content;
         }
 
-        function showUploadAlert(status) {
-            var statuses = {
-                success: success,
-                sizeError: sizeError,
-                typeError: typeError
-            }
-
-            if (statuses.hasOwnProperty(status)) {
-                statuses[status]();
-            }
-
-            function success() {}
-
-            function sizeError() {
-                notifySrv.error('vacations.fileTooLarge');
-            }
-
-            function typeError() {
-                notifySrv.error('vacations.fileTypeError');
-            }
-        }
-
-        function getAvailableDays() {
-            vacationsRepository.getAvailableDays().then(function (response) {
-                vm.availableDays = response;
-            }, errorHandler.handleErrorMessage);
+        function disableEditor() {
+            vm.editFieldEnabled = false;
         }
     }
 })();

@@ -54,6 +54,8 @@ namespace Shrooms.Tests.Mocks
 
         public List<Skill> Skills { get; set; }
 
+        public List<VacationPage> VacationPages { get; set; }
+
         public string ConnectionName => "SimoonaTest";
 
         public MockDbContext()
@@ -63,6 +65,8 @@ namespace Shrooms.Tests.Mocks
             CreateApplicationUsers();
 
             CreateRoles();
+
+            CreateVacationPages();
 
             #region Rooms
 
@@ -470,6 +474,17 @@ namespace Shrooms.Tests.Mocks
             };
 
             ApplicationUsers = new List<ApplicationUser> { applicationUser1, applicationUser2, applicationUser3, applicationUser4, applicationUser5, applicationUser6 };
+        }
+
+        private void CreateVacationPages()
+        {
+            var vacationPage = new VacationPage
+            {
+                Content = "sample content",
+                OrganizationId = TestConstants.DefaultOrganizationId
+            };
+
+            VacationPages = new List<VacationPage> { vacationPage };
         }
 
         private List<T> GetList<T>()
