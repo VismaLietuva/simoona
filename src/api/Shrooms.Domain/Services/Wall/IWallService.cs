@@ -39,7 +39,7 @@ namespace Shrooms.Domain.Services.Wall
 
         Task AddModeratorAsync(int wallId, string responsibleUserId, UserAndOrganizationDto userId);
 
-        Task<IEnumerable<PostDto>> GetAllPostsAsync(int page, int defaultPageSize, UserAndOrganizationDto userAndOrg, int wallsType);
+        Task<IEnumerable<PostDto>> GetAllPostsAsync(int page, int defaultPageSize, UserAndOrganizationDto userAndOrg, WallsListFilter filter);
 
         Task AddMemberToWallsAsync(string userId, List<int> wallIds);
 

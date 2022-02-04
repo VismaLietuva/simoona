@@ -90,6 +90,7 @@ namespace Shrooms.Domain.Services.Wall
                 {
                     UserId = x
                 }).ToList(),
+                IsHidden = newWallDto.IsHidden,
                 Members = newWallDto.MembersIds.Select(x => new WallMember
                 {
                     UserId = x,
@@ -140,6 +141,7 @@ namespace Shrooms.Domain.Services.Wall
             wall.Description = updateWallDto.Description;
             wall.Logo = updateWallDto.Logo;
             wall.Name = updateWallDto.Name;
+            wall.IsHidden = updateWallDto.IsHidden;
 
             foreach (var newMemberId in newMembersIds)
             {
@@ -191,7 +193,8 @@ namespace Shrooms.Domain.Services.Wall
                     Type = x.Type,
                     IsFollowing = x.Type == WallType.Main || x.Members.Any(m => m.UserId == userOrg.UserId),
                     Logo = x.Logo,
-                    TotalMembers = x.Members.Count
+                    TotalMembers = x.Members.Count,
+                    IsHidden = x.IsHidden
                 })
                 .SingleOrDefaultAsync();
 
@@ -217,12 +220,12 @@ namespace Shrooms.Domain.Services.Wall
 
         public async Task<IEnumerable<PostDto>> GetWallPostsAsync(int pageNumber, int pageSize, UserAndOrganizationDto userOrg, int? wallId)
         {
-            return await QueryForPostsAsync(userOrg, pageNumber, pageSize, wallId, null, null);
+            return await QueryForPostsAsync(userOrg, pageNumber, pageSize, wallId, null, WallsListFilter.None);
         }
 
-        public async Task<IEnumerable<PostDto>> GetAllPostsAsync(int pageNumber, int pageSize, UserAndOrganizationDto userOrg, int wallsType)
+        public async Task<IEnumerable<PostDto>> GetAllPostsAsync(int pageNumber, int pageSize, UserAndOrganizationDto userOrg, WallsListFilter filter)
         {
-            return await QueryForPostsAsync(userOrg, pageNumber, pageSize, null, null, wallsType);
+            return await QueryForPostsAsync(userOrg, pageNumber, pageSize, null, null, filter);
         }
 
         public async Task<PostDto> GetWallPostAsync(UserAndOrganizationDto userOrg, int postId)
@@ -257,7 +260,7 @@ namespace Shrooms.Domain.Services.Wall
                     comment.MessageBody.Contains(searchString) &&
                     comment.AuthorId != null);
 
-            return await QueryForPostsAsync(userOrg, pageNumber, pageSize, null, exp, null);
+            return await QueryForPostsAsync(userOrg, pageNumber, pageSize, null, exp, WallsListFilter.None);
         }
 
         public async Task<IEnumerable<WallMemberDto>> GetWallMembersAsync(int wallId, UserAndOrganizationDto userOrg)
@@ -609,7 +612,7 @@ namespace Shrooms.Domain.Services.Wall
             _wallUsersDbSet.Remove(member);
         }
 
-        private async Task<IEnumerable<PostDto>> QueryForPostsAsync(UserAndOrganizationDto userOrg, int pageNumber, int pageSize, int? wallId, Expression<Func<Post, bool>> filter, int? wallsType)
+        private async Task<IEnumerable<PostDto>> QueryForPostsAsync(UserAndOrganizationDto userOrg, int pageNumber, int pageSize, int? wallId, Expression<Func<Post, bool>> filter, WallsListFilter wallsListFilter)
         {
             if (filter == null)
             {
@@ -624,9 +627,7 @@ namespace Shrooms.Domain.Services.Wall
             }
             else
             {
-                wallsIds = wallsType == (int)WallsType.MyWalls
-                    ? (await GetWallsListAsync(userOrg, WallsListFilter.Followed)).Select(w => w.Id).ToList()
-                    : (await GetWallsListAsync(userOrg, WallsListFilter.All)).Select(w => w.Id).ToList();
+                wallsIds = (await GetWallsListAsync(userOrg, wallsListFilter)).Select(w => w.Id).ToList();
             }
 
             var entriesCountToSkip = (pageNumber - 1) * pageSize;
@@ -767,6 +768,7 @@ namespace Shrooms.Domain.Services.Wall
             var wallFilters = new Dictionary<WallsListFilter, Expression<Func<MultiwallWall, bool>>>
             {
                 { WallsListFilter.All, w => true },
+                { WallsListFilter.NotHidden, w => !w.IsHidden || (w.IsHidden && w.Members.Any(m => m.UserId == userOrg.UserId)) },
                 { WallsListFilter.NotFollowed, w => w.Members.All(m => m.UserId != userOrg.UserId) }
             };
 

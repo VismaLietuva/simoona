@@ -191,10 +191,10 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
         [HttpGet]
         [Route("AllPosts")]
         [PermissionAuthorize(Permission = BasicPermissions.Post)]
-        public async Task<IHttpActionResult> GetAllPagedWall(int page = 1, int wallsType = 1)
+        public async Task<IHttpActionResult> GetAllPagedWall(WallsListFilter filter, int page = 1)
         {
             var userAndOrg = GetUserAndOrganization();
-            var wallPosts = await _wallService.GetAllPostsAsync(page, WebApiConstants.DefaultPageSize, userAndOrg, wallsType);
+            var wallPosts = await _wallService.GetAllPostsAsync(page, WebApiConstants.DefaultPageSize, userAndOrg, filter);
 
             var mappedPosts = _mapper.Map<IEnumerable<WallPostViewModel>>(wallPosts);
             var pagedViewModel = new PagedWallViewModel<WallPostViewModel>
