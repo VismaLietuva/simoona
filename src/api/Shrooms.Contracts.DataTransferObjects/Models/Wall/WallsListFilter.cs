@@ -2,7 +2,9 @@
 {
     public enum WallsListFilter
     {
+        None,
         All,
+        NotHidden,
         Followed,
         NotFollowed
     }
