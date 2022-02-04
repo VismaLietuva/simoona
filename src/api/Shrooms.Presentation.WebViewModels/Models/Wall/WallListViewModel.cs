@@ -16,6 +16,8 @@ namespace Shrooms.Presentation.WebViewModels.Models.Wall
 
         public string Description { get; set; }
 
+        public bool IsHidden { get; set; }
+
         [JsonConverter(typeof(StringEnumConverter))]
         public WallType Type { get; set; }
 

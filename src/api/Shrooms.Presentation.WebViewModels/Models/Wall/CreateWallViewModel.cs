@@ -20,5 +20,8 @@ namespace Shrooms.Presentation.WebViewModels.Models.Wall
 
         [Required]
         public IEnumerable<ModeratorViewModel> Moderators { get; set; }
+
+        [Required]
+        public bool IsHidden { get; set; }
     }
 }
