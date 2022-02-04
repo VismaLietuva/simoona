@@ -856,6 +856,10 @@
     <Compile Include="Migrations\202201241212379_AddedVacationPageModel.Designer.cs">
       <DependentUpon>202201241212379_AddedVacationPageModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202202040814380_AddedIsHiddenFlagToWallModel.cs" />
+    <Compile Include="Migrations\202202040814380_AddedIsHiddenFlagToWallModel.Designer.cs">
+      <DependentUpon>202202040814380_AddedIsHiddenFlagToWallModel.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
@@ -1424,6 +1428,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202201241212379_AddedVacationPageModel.resx">
       <DependentUpon>202201241212379_AddedVacationPageModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202202040814380_AddedIsHiddenFlagToWallModel.resx">
+      <DependentUpon>202202040814380_AddedIsHiddenFlagToWallModel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
