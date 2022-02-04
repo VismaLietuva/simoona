@@ -194,7 +194,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         {
             var page = 1;
 
-            var response = await _wallController.GetAllPagedWall(page);
+            var response = await _wallController.GetAllPagedWall(WallsListFilter.None, page);
 
             Assert.IsInstanceOf<OkNegotiatedContentResult<PagedWallViewModel<WallPostViewModel>>>(response);
         }
