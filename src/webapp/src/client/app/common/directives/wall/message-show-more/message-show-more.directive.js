@@ -1,85 +1,132 @@
 (function () {
-    'use strict';
+    "use strict";
 
     angular
-        .module('simoonaApp.Common')
-        .constant('ShowMoreSettings', {
-            charactersCount: 1500
-        })
-        .directive('aceMessageShowMore', messageShowMore);
+        .module("simoonaApp.Common")
+        .directive("aceMessageShowMore", messageShowMore);
 
     messageShowMore.$inject = [
-        '$compile',
-        'wallService',
-        'ShowMoreSettings'
+        "$compile",
+        "wallService",
+        "$timeout",
+        "$window",
     ];
 
-    function messageShowMore($compile, wallService, showMoreSettings) {
+    function messageShowMore($compile, wallService, $timeout, $window) {
         var directive = {
-            restrict: 'A',
-            templateUrl: 'app/common/directives/wall/message-show-more/message-show-more.html',
+            restrict: "A",
+            templateUrl:
+                "app/common/directives/wall/message-show-more/message-show-more.html",
             scope: {
-                message: '@',
-                showMoreType: '@',
-                hasHashtagify: '='
+                message: "@",
+                showMoreType: "@",
+                hasHashtagify: "=",
             },
-            link: linkFunc
+            link: linkFunc,
         };
         return directive;
 
-        function linkFunc(scope, element, attrs) {
+        function linkFunc(scope, element) {
             scope.showMore = showMore;
             scope.showLess = showLess;
             scope.tagTermClick = tagTermClick;
 
-            scope.newMessage = '';
+            var isShowMoreLinkVisible = false;
 
-            var showMoreButton = '<a class="show-more-link" ng-click="showMore()" data-test-id="{{testIdShowMore}}">' +
+            var showMoreLink =
+                '<a class="show-more-link" ng-click="showMore()" data-test-id="{{testIdShowMore}}">' +
                 '{{"wall.showMore" | translate}}' +
-                '</a>';
+                "</a>";
 
-            var showLessButton = '<a class="show-less-link" ng-click="showLess()" data-test-id="{{testIdShowLess}}">' +
+            var showLessLink =
+                '<a class="show-less-link" ng-click="showLess()" data-test-id="{{testIdShowLess}}">' +
                 '{{"wall.showLess" | translate}}' +
-                '</a>';
+                "</a>";
 
             init();
 
             ////////////
 
             function init() {
-                if (scope.showMoreType === 'post') {
-                    scope.testIdShowMore = 'post-show-more';
-                    scope.testIdShowLess = 'post-show-less';
-                } else {
-                    scope.testIdShowMore = 'comment-show-more';
-                    scope.testIdShowLess = 'comment-show-less';
-                }
+                // using $timeout, because it will execute functions after loading DOM elements
+                $timeout(function () {
+                    if (isEllipsisActive(element.find(".post-text-container")[0])) {
+                        addShowMoreLink();
+                    }
 
-                if (scope.message.length > showMoreSettings.charactersCount) {
-                    scope.newMessage = scope.message.substring(0, showMoreSettings.charactersCount) + '...';
-                    $compile(element.find('.show-more-container').html(showMoreButton))(scope);
+                    angular.element($window).bind("resize", onResize);
+
+                    scope.$on("$destroy", cleanUp);
+                });
+
+                if (scope.showMoreType === "post") {
+                    scope.testIdShowMore = "post-show-more";
+                    scope.testIdShowLess = "post-show-less";
                 } else {
-                    scope.newMessage = scope.message;
+                    scope.testIdShowMore = "comment-show-more";
+                    scope.testIdShowLess = "comment-show-less";
                 }
             }
 
             function showMore() {
-                element.find('.show-more-link').remove();
-                scope.newMessage = scope.message;
-                element.append(showLessButton);
+                element.find(".show-more-link").remove();
+                element
+                    .find(".post-text-container")
+                    .removeClass("show-more-message-container");
+                element.find(".show-more-container").html(showLessLink);
                 $compile(element.contents())(scope);
             }
 
             function showLess() {
-                element.children('.show-less-link').remove();
-                scope.newMessage = scope.message.substring(0, showMoreSettings.charactersCount) + '...';
-                element.find('.show-more-container').html(showMoreButton);
+                element.find(".show-less-link").remove();
+                element
+                    .find(".post-text-container")
+                    .addClass("show-more-message-container");
+                
+                if(isEllipsisActive(element.find(".post-text-container")[0])) {
+                    element.find(".show-more-container").html(showMoreLink);
+                }
+
                 $compile(element.contents())(scope);
             }
 
             function tagTermClick(event) {
                 var tagText = event.target.innerHTML;
                 wallService.searchWall(tagText);
+            }
+
+            function isEllipsisActive(element) {
+                return element.scrollHeight > element.clientHeight;
+            }
+
+            function onResize() {
+                var ellipsisActive = isEllipsisActive(element.find(".post-text-container")[0]);
+
+                if (ellipsisActive && !isShowMoreLinkVisible) {
+                    addShowMoreLink();
+                    return;
+                }
+
+                if (!ellipsisActive && isShowMoreLinkVisible) {
+                    removeShowMoreLink();
+                }
+            }
+
+            function addShowMoreLink() {
+                $compile(
+                    element.find(".show-more-container").html(showMoreLink)
+                )(scope);
+
+                isShowMoreLinkVisible = true;
+            }
+
+            function removeShowMoreLink() {
+                element.find(".show-more-link").remove();
+                isShowMoreLinkVisible = false;
+            }
+
+            function cleanUp() {
+                angular.element($window).off("resize", onResize);
             }
         }
     }
