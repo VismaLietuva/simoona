@@ -1,8 +1,8 @@
-﻿<div class="post-text-container">
+﻿<div class="post-text-container show-more-message-container">
 	<span ng-if="!hasHashtagify" markdown
-	      ng-bind-html="newMessage"></span>
+	      ng-bind-html="message"></span>
 	<span ng-if="!!hasHashtagify" markdown
-		  ng-bind-html="newMessage" 
+		  ng-bind-html="message" 
 		  hashtagify="tagTermClick($event)"></span>
-	<span class="show-more-container"></span>
 </div>
+<span class="show-more-container"></span>
