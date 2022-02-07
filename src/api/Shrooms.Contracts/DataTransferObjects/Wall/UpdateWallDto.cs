@@ -12,6 +12,8 @@ namespace Shrooms.Contracts.DataTransferObjects.Wall
 
         public string Logo { get; set; }
 
+        public bool IsHiddenFromAllWalls { get; set; }
+
         public IEnumerable<string> ModeratorsIds { get; set; }
     }
 }

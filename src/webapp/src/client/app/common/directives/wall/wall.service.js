@@ -11,8 +11,8 @@
             wallLogoWidth: 150
         })
         .constant('WallsType', {
-            MyWalls: 1,
-            AllWalls: 2
+            MyWalls: 'followed',
+            AllWalls: 'notHiddenFromAllWalls'
         })
         .constant('WallsCount', {
             Min: 1
@@ -257,7 +257,7 @@
                 }, errorHandler.handleErrorMessage);
             } else {
                 if (!settings.wallId) {
-                    settings.wallsType = $state.current.url.contains('All') ? WallsType.AllWalls : WallsType.MyWalls;
+                    settings.filter = $state.current.url.contains('All') ? WallsType.AllWalls : WallsType.MyWalls;
                     wallPostRepository.getAllPosts(settings).then(function (response) {
                         addPostsToWall(response, true);
                         busy = false;

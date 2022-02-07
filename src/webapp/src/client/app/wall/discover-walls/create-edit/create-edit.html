@@ -100,6 +100,15 @@
                             <img ng-if="vm.states.isEdit && !vm.wallCroppedLogo && vm.wallLogo.length < 1" src="{{vm.wall.logo | imageThumb:vm.wallLogoSize:'crop'}}" />
                         </div>
                     </div>
+                    
+                    <!-- Wall hide checkbox -->
+                    <div class="form-group">
+                        <span class="col-xs-4"></span>
+                        <div class="col-xs-7 col-md-6 col-lg-5">
+                            <input class="checkbox" type="checkbox" ng-model="vm.wall.isHiddenFromAllWalls">
+                            <label class="wall-hide-checkbox" for="isDefault" translate="wall.hideCheckbox"></label>
+                        </div>
+                    </div>
 
                     <!-- Wall delete button left -->
                     <div class="pull-left">
