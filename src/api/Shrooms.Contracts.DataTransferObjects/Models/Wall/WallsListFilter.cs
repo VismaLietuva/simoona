@@ -4,7 +4,7 @@
     {
         None,
         All,
-        NotHidden,
+        NotHiddenFromAllWalls,
         Followed,
         NotFollowed
     }

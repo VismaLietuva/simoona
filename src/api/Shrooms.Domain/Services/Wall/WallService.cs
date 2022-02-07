@@ -768,7 +768,7 @@ namespace Shrooms.Domain.Services.Wall
             var wallFilters = new Dictionary<WallsListFilter, Expression<Func<MultiwallWall, bool>>>
             {
                 { WallsListFilter.All, w => true },
-                { WallsListFilter.NotHidden, w => !w.IsHiddenFromAllWalls || (w.IsHiddenFromAllWalls && w.Members.Any(m => m.UserId == userOrg.UserId)) },
+                { WallsListFilter.NotHiddenFromAllWalls, w => !w.IsHiddenFromAllWalls || w.Members.Any(m => m.UserId == userOrg.UserId) },
                 { WallsListFilter.NotFollowed, w => w.Members.All(m => m.UserId != userOrg.UserId) }
             };
 
