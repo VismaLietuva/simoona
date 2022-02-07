@@ -37,7 +37,7 @@ namespace Shrooms.Contracts.ViewModels.Wall.Posts
 
         public bool IsEdited { get; set; }
 
-        public bool IsHidden { get; set; }
+        public bool IsHiddenFromAllWalls { get; set; }
 
         public DateTime Modified { get; set; }
 
