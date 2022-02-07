@@ -12,7 +12,7 @@
         })
         .constant('WallsType', {
             MyWalls: 'followed',
-            AllWalls: 'nothidden'
+            AllWalls: 'notHiddenFromAllWalls'
         })
         .constant('WallsCount', {
             Min: 1
