@@ -606,6 +606,19 @@ input[type=text]::-ms-clear {
     padding-right: 5px;
 }
 
+.show-more-message-container {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 21;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+.show-more-container > a {
+    display: block;
+    margin: 1rem 0;
+ }
+
 .message-box {
     word-wrap: break-word;
     overflow: auto;
@@ -699,11 +712,6 @@ input[type=text]::-ms-clear {
     cursor: pointer;
     max-width: 100%;
     color: #1e8ac7;
-}
-
-.show-more-link {
-    /*float: right;*/
-    white-space: nowrap;
 }
 
 .comment-link {
@@ -1007,7 +1015,6 @@ div.post-text-container {
 }
 
 .post-list-wrapper {
-    margin-top: 12px;
     margin-bottom: 3px;
     font-size: 13px;
 }
