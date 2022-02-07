@@ -7,13 +7,13 @@ namespace Shrooms.DataLayer.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class AddedIsHiddenFlagToWallModel : IMigrationMetadata
+    public sealed partial class AddedIsHiddenFromAllWallsFlagToWallModel : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedIsHiddenFlagToWallModel));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedIsHiddenFromAllWallsFlagToWallModel));
         
         string IMigrationMetadata.Id
         {
-            get { return "202202040814380_AddedIsHiddenFlagToWallModel"; }
+            get { return "202202070857174_AddedIsHiddenFromAllWallsFlagToWallModel"; }
         }
         
         string IMigrationMetadata.Source

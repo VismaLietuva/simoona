@@ -16,7 +16,7 @@ namespace Shrooms.Contracts.DataTransferObjects.Models.Wall
 
         public string Description { get; set; }
 
-        public bool IsHidden { get; set; }
+        public bool IsHiddenFromAllWalls { get; set; }
 
         public IEnumerable<ModeratorDto> Moderators { get; set; }
 

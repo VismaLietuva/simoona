@@ -90,7 +90,7 @@ namespace Shrooms.Domain.Services.Wall
                 {
                     UserId = x
                 }).ToList(),
-                IsHidden = newWallDto.IsHidden,
+                IsHiddenFromAllWalls = newWallDto.IsHiddenFromAllWalls,
                 Members = newWallDto.MembersIds.Select(x => new WallMember
                 {
                     UserId = x,
@@ -141,7 +141,7 @@ namespace Shrooms.Domain.Services.Wall
             wall.Description = updateWallDto.Description;
             wall.Logo = updateWallDto.Logo;
             wall.Name = updateWallDto.Name;
-            wall.IsHidden = updateWallDto.IsHidden;
+            wall.IsHiddenFromAllWalls = updateWallDto.IsHiddenFromAllWalls;
 
             foreach (var newMemberId in newMembersIds)
             {
@@ -194,7 +194,7 @@ namespace Shrooms.Domain.Services.Wall
                     IsFollowing = x.Type == WallType.Main || x.Members.Any(m => m.UserId == userOrg.UserId),
                     Logo = x.Logo,
                     TotalMembers = x.Members.Count,
-                    IsHidden = x.IsHidden
+                    IsHiddenFromAllWalls = x.IsHiddenFromAllWalls
                 })
                 .SingleOrDefaultAsync();
 
@@ -768,7 +768,7 @@ namespace Shrooms.Domain.Services.Wall
             var wallFilters = new Dictionary<WallsListFilter, Expression<Func<MultiwallWall, bool>>>
             {
                 { WallsListFilter.All, w => true },
-                { WallsListFilter.NotHidden, w => !w.IsHidden || (w.IsHidden && w.Members.Any(m => m.UserId == userOrg.UserId)) },
+                { WallsListFilter.NotHidden, w => !w.IsHiddenFromAllWalls || (w.IsHiddenFromAllWalls && w.Members.Any(m => m.UserId == userOrg.UserId)) },
                 { WallsListFilter.NotFollowed, w => w.Members.All(m => m.UserId != userOrg.UserId) }
             };
 
