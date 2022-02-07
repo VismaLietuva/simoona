@@ -58,5 +58,5 @@
   "markdownSuggestions": "**bold** __underlined__ *italics* ~~strikethrough~~ `code`",
   "watch": "Watch",
   "unwatch": "Unwatch",
-  "hideCheckbox" : "&nbsp;Show only to followers"
+  "hideCheckbox" : "Show only to followers"
 }

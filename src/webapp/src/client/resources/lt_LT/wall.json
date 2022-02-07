@@ -58,5 +58,5 @@
   "markdownSuggestions": "**bold** __underlined__ *italics* ~~strikethrough~~ `code`",
   "watch": "Sekti",
   "unwatch": "Nesekti",
-  "hideCheckbox" : "&nbsp;Rodyti tik sekėjams"
+  "hideCheckbox" : "Rodyti tik sekėjams"
 }
