@@ -206,6 +206,14 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
         }
 
         [HttpGet]
+        [Route("AllPosts")]
+        [PermissionAuthorize(Permission = BasicPermissions.Post)]
+        public async Task<IHttpActionResult> GetAllPagedWallDeprecated(int page = 1, int wallsType = 1)
+        {
+            return await GetAllPagedWall((WallsListFilter)wallsType, page);
+        }
+
+        [HttpGet]
         [Route("Search")]
         [PermissionAuthorize(Permission = BasicPermissions.Post)]
         public async Task<IHttpActionResult> SearchWall(string searchString, int page = 1)
