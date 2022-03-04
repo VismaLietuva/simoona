@@ -44,5 +44,7 @@ namespace Shrooms.Contracts.ViewModels.Wall.Posts
         public DateTime LastEdit { get; set; }
 
         public bool IsWatched { get; set; }
+
+        public bool IsHidden { get; set; }
     }
 }
