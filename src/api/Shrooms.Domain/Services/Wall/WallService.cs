@@ -260,7 +260,7 @@ namespace Shrooms.Domain.Services.Wall
                     comment.MessageBody.Contains(searchString) &&
                     comment.AuthorId != null);
 
-            return await QueryForPostsAsync(userOrg, pageNumber, pageSize, null, exp, WallsListFilter.None);
+            return await QueryForPostsAsync(userOrg, pageNumber, pageSize, null, exp, WallsListFilter.All);
         }
 
         public async Task<IEnumerable<WallMemberDto>> GetWallMembersAsync(int wallId, UserAndOrganizationDto userOrg)
