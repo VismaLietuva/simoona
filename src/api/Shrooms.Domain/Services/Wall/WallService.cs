@@ -255,8 +255,9 @@ namespace Shrooms.Domain.Services.Wall
         public async Task<IEnumerable<PostDto>> SearchWallAsync(string searchString, UserAndOrganizationDto userOrg, int pageNumber, int pageSize)
         {
             Expression<Func<Post, bool>> exp = post =>
-                post.MessageBody.Contains(searchString) ||
+                (!post.IsHidden && post.MessageBody.Contains(searchString)) ||
                 post.Comments.Any(comment =>
+                    !comment.IsHidden &&
                     comment.MessageBody.Contains(searchString) &&
                     comment.AuthorId != null);
 
