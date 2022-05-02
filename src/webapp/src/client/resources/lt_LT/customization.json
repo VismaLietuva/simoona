@@ -45,5 +45,6 @@
     "assignees": "Atsakingi asmenys",
     "assigneesPlaceHolder": "Pridėkite atsakingus asmenis...",
     "singleJoinGroupLabel": "Vieno dalyvavimo grupė",
-    "isShownWithMainEvents": "Rodoma tarp pagrindinių renginių"
+    "isShownWithMainEvents": "Rodoma tarp pagrindinių renginių",
+    "sendEmailToManager": "Siųsti laišką coach'ui prisijungiant prie renginio"
 }
