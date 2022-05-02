@@ -7,13 +7,13 @@ namespace Shrooms.DataLayer.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class AddedSendEmailToCoachPropertyToEventType : IMigrationMetadata
+    public sealed partial class AddedSendEmailToManagerPropertyToEventType : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedSendEmailToCoachPropertyToEventType));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedSendEmailToManagerPropertyToEventType));
         
         string IMigrationMetadata.Id
         {
-            get { return "202204250813220_AddedSendEmailToCoachPropertyToEventType"; }
+            get { return "202204291158023_AddedSendEmailToManagerPropertyToEventType"; }
         }
         
         string IMigrationMetadata.Source

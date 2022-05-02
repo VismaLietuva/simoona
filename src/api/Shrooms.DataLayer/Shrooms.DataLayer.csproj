@@ -860,9 +860,9 @@
     <Compile Include="Migrations\202202070857174_AddedIsHiddenFromAllWallsFlagToWallModel.Designer.cs">
       <DependentUpon>202202070857174_AddedIsHiddenFromAllWallsFlagToWallModel.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202204250813220_AddedSendEmailToCoachPropertyToEventType.cs" />
-    <Compile Include="Migrations\202204250813220_AddedSendEmailToCoachPropertyToEventType.Designer.cs">
-      <DependentUpon>202204250813220_AddedSendEmailToCoachPropertyToEventType.cs</DependentUpon>
+    <Compile Include="Migrations\202204291158023_AddedSendEmailToManagerPropertyToEventType.cs" />
+    <Compile Include="Migrations\202204291158023_AddedSendEmailToManagerPropertyToEventType.Designer.cs">
+      <DependentUpon>202204291158023_AddedSendEmailToManagerPropertyToEventType.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
@@ -1437,8 +1437,8 @@
     <EmbeddedResource Include="Migrations\202202070857174_AddedIsHiddenFromAllWallsFlagToWallModel.resx">
       <DependentUpon>202202070857174_AddedIsHiddenFromAllWallsFlagToWallModel.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202204250813220_AddedSendEmailToCoachPropertyToEventType.resx">
-      <DependentUpon>202204250813220_AddedSendEmailToCoachPropertyToEventType.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202204291158023_AddedSendEmailToManagerPropertyToEventType.resx">
+      <DependentUpon>202204291158023_AddedSendEmailToManagerPropertyToEventType.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
