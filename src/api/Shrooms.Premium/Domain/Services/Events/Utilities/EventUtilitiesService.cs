@@ -83,7 +83,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
                     Name = x.Name,
                     SingleJoinGroupName = x.SingleJoinGroupName,
                     IsShownWithMainEvents = x.IsShownWithMainEvents,
-                    SendEmailToCoach = x.SendEmailToCoach,
+                    SendEmailToManager = x.SendEmailToManager,
                     HasActiveEvents = x.Events.Any(e => e.EndDate > DateTime.UtcNow
                                                      || e.EventRecurring != EventRecurrenceOptions.None)
                 })
@@ -140,7 +140,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
             orgEventType.Modified = DateTime.UtcNow;
             orgEventType.SendWeeklyReminders = eventType.SendWeeklyReminders;
             orgEventType.IsShownWithMainEvents = eventType.IsShownWithMainEvents;
-            orgEventType.SendEmailToCoach = eventType.SendEmailToCoach;
+            orgEventType.SendEmailToManager = eventType.SendEmailToManager;
 
             await _uow.SaveChangesAsync(eventType.UserId);
         }
@@ -236,7 +236,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
                 Name = eventTypeDto.Name,
                 SingleJoinGroupName = SetSingleJoinGroupName(eventTypeDto.IsSingleJoin, eventTypeDto.SingleJoinGroupName),
                 IsShownWithMainEvents = eventTypeDto.IsShownWithMainEvents,
-                SendEmailToCoach = eventTypeDto.SendEmailToCoach
+                SendEmailToManager = eventTypeDto.SendEmailToManager
             };
 
             return eventType;

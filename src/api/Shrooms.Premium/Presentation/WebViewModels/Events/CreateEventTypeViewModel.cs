@@ -17,6 +17,6 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
 
         public bool IsShownWithMainEvents { get; set; }
 
-        public bool SendEmailToCoach { get; set; }
+        public bool SendEmailToManager { get; set; }
     }
 }

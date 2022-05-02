@@ -14,7 +14,7 @@
 
         public bool IsShownWithMainEvents { get; set; }
 
-        public bool SendEmailToCoach { get; set; }
+        public bool SendEmailToManager { get; set; }
 
         public bool HasActiveEvents { get; set; }
     }

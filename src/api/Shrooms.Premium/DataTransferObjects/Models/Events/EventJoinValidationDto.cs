@@ -12,6 +12,7 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
         public int EventTypeId { get; set; }
         public string SingleJoinGroupName { get; set; }
         public bool IsSingleJoin { get; set; }
+        public bool SendEmailToManager { get; set; }
         public int MaxChoices { get; set; }
         public int MaxParticipants { get; set; }
         public string Name { get; set; }

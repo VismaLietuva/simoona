@@ -14,7 +14,7 @@ namespace Shrooms.DataLayer.EntityModels.Models.Events
 
         public bool IsShownWithMainEvents { get; set; }
 
-        public bool SendEmailToCoach { get; set; }
+        public bool SendEmailToManager { get; set; }
 
         public virtual ICollection<Event> Events { get; set; }
     }
