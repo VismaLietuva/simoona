@@ -162,13 +162,11 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 }
 
                 await _uow.SaveChangesAsync(false);
-                
+
+                await NotifyManagersAsync(joinDto, @event);
+
                 _asyncRunner.Run<IEventCalendarService>(async notifier => await notifier.SendInvitationAsync(@event, joinDto.ParticipantIds, joinDto.OrganizationId), _uow.ConnectionName);
 
-                if (@event.SendEmailToManager)
-                {
-                    await NotifyManagersAsync(joinDto, @event.Name, @event.Id, @event.StartDate, @event.EndDate);
-                }
             }
             finally
             {
@@ -287,13 +285,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             _eventValidationService.CheckIfEventEndDateIsExpired(@event.EndDate);
 
             await JoinOrLeaveEventWallAsync(@event.ResponsibleUserId, userId, @event.WallId, userOrg);
-
-            var removedParticipant = await RemoveParticipantAsync(userId, participant);
-
-            if (removedParticipant.Event.EventType.SendEmailToManager)
-            {
-                await NotifyManagerAsync(userOrg, removedParticipant);
-            }
+            await NotifyManagerAsync(userOrg, await RemoveParticipantAsync(userId, participant));
 
             _asyncRunner.Run<IEventNotificationService>(async notifier => await notifier.NotifyRemovedEventParticipantsAsync(@event.Name, @event.Id, userOrg.OrganizationId, new[] { userId }),
                 _uow.ConnectionName);
@@ -305,13 +297,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             _eventValidationService.CheckIfRegistrationDeadlineIsExpired(participant.Event.RegistrationDeadline);
 
             await JoinOrLeaveEventWallAsync(participant.Event.ResponsibleUserId, userOrg.UserId, participant.Event.WallId, userOrg);
-            
-            var removedParticipant = await RemoveParticipantAsync(userOrg.UserId, participant);
-
-            if (removedParticipant.Event.EventType.SendEmailToManager)
-            {
-                await NotifyManagerAsync(userOrg, removedParticipant);
-            }
+            await NotifyManagerAsync(userOrg, await RemoveParticipantAsync(userOrg.UserId, participant));
         }
 
         public async Task<IEnumerable<EventParticipantDto>> GetEventParticipantsAsync(Guid eventId, UserAndOrganizationDto userAndOrg)
@@ -376,8 +362,13 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             await _uow.SaveChangesAsync(changeOptionsDto.UserId);
         }
 
-        private async Task NotifyManagersAsync(EventJoinDto joinDto, string eventName, Guid eventId, DateTime startDate, DateTime endDate)
+        private async Task NotifyManagersAsync(EventJoinDto joinDto, EventJoinValidationDto eventJoinValidationDto)
         {
+            if (!eventJoinValidationDto.SendEmailToManager)
+            {
+                return;
+            }
+
             var users = await _usersDbSet
                 .Where(user => joinDto.ParticipantIds
                 .Contains(user.Id) && joinDto.OrganizationId == user.OrganizationId)
@@ -401,11 +392,11 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                     Email = user.Email,
                     ManagerEmail = manager.Email,
                     ManagerId = user.ManagerId,
-                    EventName = eventName,
-                    EventId = eventId,
+                    EventName = eventJoinValidationDto.Name,
+                    EventId = eventJoinValidationDto.Id,
                     OrganizationId = user.OrganizationId,
-                    EventStartDate = startDate,
-                    EventEndDate = endDate
+                    EventStartDate = eventJoinValidationDto.StartDate,
+                    EventEndDate = eventJoinValidationDto.EndDate
                 };
 
                 _asyncRunner.Run<IEventNotificationService>(
@@ -416,6 +407,11 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
         private async Task NotifyManagerAsync(UserAndOrganizationDto userOrg, EventParticipant participant)
         {
+            if (!participant.Event.EventType.SendEmailToManager)
+            {
+                return;
+            }
+
             var managerEmail = await _usersDbSet
                 .Where(user => user.Id == participant.ApplicationUser.ManagerId)
                 .Select(user => user.Email)
@@ -448,7 +444,9 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
         private async Task<EventParticipant> RemoveParticipantAsync(string userId, EventParticipant participant)
         {
             var timestamp = DateTime.UtcNow;
+
             participant.UpdateMetadata(userId, timestamp);
+
             await _uow.SaveChangesAsync(false);
 
             var removedParticipant = new EventParticipant
@@ -459,6 +457,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             };
 
             _eventParticipantsDbSet.Remove(participant);
+
             await _uow.SaveChangesAsync(false);
 
             return removedParticipant;
