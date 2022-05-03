@@ -374,13 +374,15 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 .Contains(user.Id) && joinDto.OrganizationId == user.OrganizationId)
                 .ToListAsync();
 
+            var managerIds = users.Select(user => user.ManagerId).ToHashSet();
+
+            var managers = await _usersDbSet
+                .Where(manager => managerIds.Contains(manager.Id))
+                .ToDictionaryAsync(manager => manager.Id, manager => manager.Email);
+;
             foreach (var user in users)
             {
-                var manager = await _usersDbSet
-                    .Where(u => user.ManagerId == u.Id && joinDto.OrganizationId == u.OrganizationId)
-                    .FirstOrDefaultAsync();
-
-                if (manager == null)
+                if (!managers.TryGetValue(user.ManagerId, out var managerEmail))
                 {
                     continue;
                 }
@@ -390,7 +392,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                     FirstName = user.FirstName,
                     LastName = user.LastName,
                     Email = user.Email,
-                    ManagerEmail = manager.Email,
+                    ManagerEmail = managerEmail,
                     ManagerId = user.ManagerId,
                     EventName = eventJoinValidationDto.Name,
                     EventId = eventJoinValidationDto.Id,
