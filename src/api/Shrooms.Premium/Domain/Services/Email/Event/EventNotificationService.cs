@@ -85,40 +85,26 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
 
         private EmailDto GetManagerNotifyEmailDto(UserEventAttendStatusChangeEmailDto userAttendStatusDto, string userNotificationSettingsUrl, string eventUrl, bool isJoiningEvent)
         {
-            if(!isJoiningEvent)
+            if (!isJoiningEvent)
             {
                 var emailTemplateLeaveViewModel = new EventCoacheeToCoachLeaveEmailTemplateViewModel(
                     userNotificationSettingsUrl,
-                    userAttendStatusDto.FullName,
-                    userAttendStatusDto.EventName,
+                    userAttendStatusDto,
                     eventUrl);
 
                 var emailLeaveBody = _mailTemplate.Generate(emailTemplateLeaveViewModel, EmailPremiumTemplateCacheKeys.EventCoacheeToCoachLeaveEmail);
 
-                return new EmailDto(
-                    userAttendStatusDto.FullName,
-                    userAttendStatusDto.Email,
-                    userAttendStatusDto.ManagerEmail,
-                    "Coachee paliko renginį",
-                    emailLeaveBody);
+                return new EmailDto(userAttendStatusDto, "Coachee paliko renginį", emailLeaveBody);
             }
 
             var emailTemplateJoinViewModel = new EventCoacheeToCoachJoinEmailTemplateViewModel(
                 userNotificationSettingsUrl,
-                userAttendStatusDto.FullName,
-                userAttendStatusDto.EventName,
-                userAttendStatusDto.EventStartDate,
-                userAttendStatusDto.EventEndDate,
+                userAttendStatusDto,
                 eventUrl);
 
             var emailJoinBody = _mailTemplate.Generate(emailTemplateJoinViewModel, EmailPremiumTemplateCacheKeys.EventCoacheeToCoachJoinEmail);
 
-            return new EmailDto(
-                userAttendStatusDto.FullName,
-                userAttendStatusDto.Email,
-                userAttendStatusDto.ManagerEmail,
-                "Coachee prisijungė prie renginio",
-                emailJoinBody);
+            return new EmailDto(userAttendStatusDto, "Coachee prisijungė prie renginio", emailJoinBody);
         }
     }
 }

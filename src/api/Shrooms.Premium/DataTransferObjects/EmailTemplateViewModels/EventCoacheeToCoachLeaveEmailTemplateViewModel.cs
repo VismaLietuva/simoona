@@ -1,4 +1,5 @@
 ﻿using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.DataTransferObjects.Users;
 
 namespace Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels
 {
@@ -12,13 +13,12 @@ namespace Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels
 
         public EventCoacheeToCoachLeaveEmailTemplateViewModel(
             string userNotificationSettingsUrl,
-            string coacheeFullName,
-            string eventName,
+            UserEventAttendStatusChangeEmailDto eventAttendStatusDto,
             string eventUrl)
             : base(userNotificationSettingsUrl)
         {
-            CoacheeFullName = coacheeFullName;
-            EventName = eventName;
+            CoacheeFullName = eventAttendStatusDto.FullName;
+            EventName = eventAttendStatusDto.EventName;
             EventUrl = eventUrl;
         }
     }

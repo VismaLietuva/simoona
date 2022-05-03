@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.DataTransferObjects.Users;
 
 namespace Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels
 {
@@ -18,17 +19,14 @@ namespace Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels
 
         public EventCoacheeToCoachJoinEmailTemplateViewModel(
             string userNotificationSettingsUrl,
-            string coacheeFullName,
-            string eventName,
-            DateTime eventStartDate,
-            DateTime eventEndDate,
+            UserEventAttendStatusChangeEmailDto eventAttendStatusDto,
             string eventUrl)
             : base(userNotificationSettingsUrl)
         {
-            CoacheeFullName = coacheeFullName;
-            EventName = eventName;
-            EventStartDate = eventStartDate;
-            EventEndDate = eventEndDate;
+            CoacheeFullName = eventAttendStatusDto.FullName;
+            EventName = eventAttendStatusDto.EventName;
+            EventStartDate = eventAttendStatusDto.EventStartDate;
+            EventEndDate = eventAttendStatusDto.EventEndDate;
             EventUrl = eventUrl;
         }
     }

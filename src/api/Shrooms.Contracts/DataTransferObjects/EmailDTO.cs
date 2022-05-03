@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net.Mail;
 using Shrooms.Contracts.Constants;
+using Shrooms.Contracts.DataTransferObjects.Users;
 
 namespace Shrooms.Contracts.DataTransferObjects
 {
@@ -48,6 +49,11 @@ namespace Shrooms.Contracts.DataTransferObjects
             Receivers = new List<string> { receiver };
             SenderEmail = BusinessLayerConstants.FromEmailAddress;
             SenderFullName = BusinessLayerConstants.EmailSenderName;
+        }
+
+        public EmailDto(UserEventAttendStatusChangeEmailDto userEventAttendStatusDto, string subject, string body)
+             : this(userEventAttendStatusDto.FullName, userEventAttendStatusDto.Email, new List<string> { userEventAttendStatusDto.ManagerEmail }, subject, body)
+        {
         }
     }
 }
