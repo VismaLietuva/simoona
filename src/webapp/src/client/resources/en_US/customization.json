@@ -46,5 +46,5 @@
     "assigneesPlaceHolder": "Add assignees...",
     "singleJoinGroupLabel": "Single join group",
     "isShownWithMainEvents": "Shown with main events",
-    "sendEmailToManager": "Send email to coach when joining event"
+    "sendEmailToManager": "Inform the coach about attending the event"
 }
