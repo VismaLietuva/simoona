@@ -223,7 +223,6 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
         public async Task<IEnumerable<string>> GetParticipantsEmailsIncludingHostAsync(Guid eventId)
         {
-            // what is this type?
             var emailsObj = await _eventsDbSet
                 .Include(e => e.EventParticipants)
                 .Where(e => e.Id == eventId)
@@ -279,7 +278,6 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             return users;
         }
 
-        // I changed the sequence of this
         public async Task ExpelAsync(Guid eventId, UserAndOrganizationDto userOrg, string userId)
         {
             var participant = await GetParticipantAsync(eventId, userOrg.OrganizationId, userId);
