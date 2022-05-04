@@ -13,6 +13,7 @@ using Shrooms.Domain.Services.Organizations;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
+using Shrooms.Resources.Models.Events;
 
 namespace Shrooms.Premium.Domain.Services.Email.Event
 {
@@ -94,7 +95,10 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
 
                 var emailLeaveBody = _mailTemplate.Generate(emailTemplateLeaveViewModel, EmailPremiumTemplateCacheKeys.EventCoacheeToCoachLeaveEmail);
 
-                return new EmailDto(userAttendStatusDto, "Coachee paliko renginį", emailLeaveBody);
+                var emailLeaveSubject = string.Format(Resources.Models.Events.Events.EventCoacheeLeaveEmailSubject,
+                    userAttendStatusDto.FullName, userAttendStatusDto.EventName);
+
+                return new EmailDto(userAttendStatusDto, emailLeaveSubject, emailLeaveBody);
             }
 
             var emailTemplateJoinViewModel = new EventCoacheeToCoachJoinEmailTemplateViewModel(
@@ -104,7 +108,10 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
 
             var emailJoinBody = _mailTemplate.Generate(emailTemplateJoinViewModel, EmailPremiumTemplateCacheKeys.EventCoacheeToCoachJoinEmail);
 
-            return new EmailDto(userAttendStatusDto, "Coachee prisijungė prie renginio", emailJoinBody);
+            var emailJoinSubject = string.Format(Resources.Models.Events.Events.EventCoacheeJoinEmailSubject,
+                userAttendStatusDto.FullName, userAttendStatusDto.EventName);
+
+            return new EmailDto(userAttendStatusDto, emailJoinSubject, emailJoinBody);
         }
     }
 }

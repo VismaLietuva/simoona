@@ -132,4 +132,10 @@
   <data name="WillNotEat" xml:space="preserve">
     <value>I will not eat at this event</value>
   </data>
+  <data name="EventCoacheeJoinEmailSubject" xml:space="preserve">
+    <value>Coachee {0} joined the event {1}</value>
+  </data>
+  <data name="EventCoacheeLeaveEmailSubject" xml:space="preserve">
+    <value>Coachee {0} left the event {1}</value>
+  </data>
 </root>
