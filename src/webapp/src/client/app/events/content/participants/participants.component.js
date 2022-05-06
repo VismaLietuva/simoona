@@ -33,7 +33,7 @@
 
         vm.isParticipantsLoading = false;
         vm.isMainParticipantList = true;
-        
+
         vm.eventStatus = eventStatus;
         vm.eventStatusService = eventStatusService;
         vm.participantsTabs = [{
@@ -97,6 +97,10 @@
 
                     vm.event.participantsCount = vm.event.participants.length;
 
+                    if(participant.eventStatus === attendStatus.Attending)
+                    {
+                        vm.event.goingCount -= 1;
+                    }
                 }, function(response) {
                     participant.isLoading = false;
 
