@@ -97,7 +97,7 @@
 
                     vm.event.participantsCount = vm.event.participants.length;
 
-                    if(participant.eventStatus === attendStatus.Attending)
+                    if(participant.attendStatus === attendStatus.Attending)
                     {
                         vm.event.goingCount -= 1;
                     }
