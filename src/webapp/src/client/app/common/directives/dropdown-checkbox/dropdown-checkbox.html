@@ -1,0 +1,15 @@
+<div class="dropdown">
+    <button class="btn btn-default dropdown-toggle checkbox-menu-btn" type="button"
+        data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+        <span translate="{{vm.translation}}" translate-values="{ one: vm.appliedTypes.size }"></span>
+        <span class="caret"></span>
+    </button>
+
+    <ul class="dropdown-menu checkbox-menu allow-focus" ng-click="$event.stopPropagation()">
+        <li ng-repeat="type in vm.types" ng-class="{ 'active' : vm.isTypeApplied(type)}">
+            <label>
+                <input type="checkbox" ng-click="vm.toggleType(type)"> {{type.name}}
+            </label>
+        </li>
+    </ul>
+</div>
