@@ -224,11 +224,12 @@
             }).$promise;
         }
 
-        function getEventsByTitle(searchString, page, typeId) {
+        function getEventsByTitle(searchString, page, typeIds, officeIds) {
             return $resource(`${eventUrl}GetEventsByTitle`).get({
                 searchString: searchString,
-                typeId: typeId,
-                page: page
+                typeIds: typeIds,
+                page: page,
+                officeIds: officeIds
             }).$promise;
         }
 
