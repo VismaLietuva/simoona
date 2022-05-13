@@ -82,7 +82,7 @@
             .state('Root.WithOrg.Client.Events.Details', {
                 url: '/Details',
                 templateUrl: 'app/events/details-list/details-list.html',
-                controller: 'EventDetailsListController',
+                controller: 'eventDetailsListController',
                 controllerAs: 'vm'
             })
             .state('Root.WithOrg.Client.Events.Details.Event', {
