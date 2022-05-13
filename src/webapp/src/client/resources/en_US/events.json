@@ -202,5 +202,16 @@
   "customRange": "Custom range",
   "selectDate": "Select date",
   "dateFilterInvalidRange": "Start date must be before end date",
-  "dateFilterMaxRangeError": "Maximum date range is 100 days"
+  "dateFilterMaxRangeError": "Maximum date range is 100 days",
+  "viewAllEventsInformation": "View information about events",
+  "filterEvents": "Search events...",
+  "tableTitle": "Title",
+  "tableStartDate": "Start date",
+  "tableEndDate": "End date",
+  "tableType": "Type",
+  "tableOffices": "Offices",
+  "tableParticipants": "Participants",
+  "extensiveDetailsTitle": "Event details",
+  "eventTypesDropdownButtonTitle": "Selected {{one}} types",
+  "eventOfficesDropdownButtonTitle":"Selected {{one}} offices"
 }

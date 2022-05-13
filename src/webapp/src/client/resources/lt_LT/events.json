@@ -202,5 +202,16 @@
   "customRange": "Pasirinkimas",
   "selectDate": "Pasirinkti datą",
   "dateFilterInvalidRange": "Pradžios data turi būti anksčiau nei pabaigos",
-  "dateFilterMaxRangeError": "Maksimalus datos diapazonas yra 100 dienų"
+  "dateFilterMaxRangeError": "Maksimalus datos diapazonas yra 100 dienų",
+  "viewAllEventsInformation": "Peržiūrėti informaciją",
+  "filterEvents": "Ieškoti renginių...",
+  "tableTitle": "Pavadinimas",
+  "tableStartDate": "Pradžios data",
+  "tableEndDate": "Pabaigos data",
+  "tableType": "Tipas",
+  "tableOffices": "Ofisai",
+  "tableParticipants": "Dalyviai",
+  "extensiveDetailsTitle": "Renginio informacija",
+  "eventTypesDropdownButtonTitle": "Pasirinkti {{one}} tipai",
+  "eventOfficesDropdownButtonTitle":"Pasirinkti {{one}} ofisai"
 }
