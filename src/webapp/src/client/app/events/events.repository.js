@@ -41,14 +41,17 @@
             getUserForAutoCompleteResponsiblePerson: getUserForAutoCompleteResponsiblePerson,
             exportParticipants: exportParticipants,
             getMaxEventParticipants: getMaxEventParticipants,
-            updateAttendStatus: updateAttendStatus
+            updateAttendStatus: updateAttendStatus,
+            getEventsByTitle: getEventsByTitle,
+            getExtensiveEventDetails: getExtensiveEventDetails
         };
+
         return service;
 
         /////////
 
         function getAllEvents() {
-            return $resource(eventUrl + 'All').query().$promise;
+            return $resource(eventUrl).query().$promise;
         }
 
         function getEventOffices() {
@@ -219,6 +222,20 @@
                 attendComment: attendComment,
                 eventId: eventId
             }).$promise;
+        }
+
+        function getEventsByTitle(searchString, page, typeId) {
+            return $resource(`${eventUrl}GetEventsByTitle`).get({
+                searchString: searchString,
+                typeId: typeId,
+                page: page
+            }).$promise;
+        }
+
+        function getExtensiveEventDetails(eventId) {
+            return $resource(`${eventUrl}GetExtensiveDetails`).get({
+                eventId: eventId
+            }).$promise
         }
     }
 })();
