@@ -19,10 +19,10 @@
                         </div>
                     </div>
                     <ace-dropdown-checkbox class="col-md-2 checkbox-menu-btn--mt" translation="events.eventTypesDropdownButtonTitle" types="vm.eventTypes" on-value-change="vm.eventTypesChange(types)"></ace-dropdown-checkbox>
-                    <ace-dropdown-checkbox class="col-md-2 checkbox-menu-btn--mt" translation="events.eventOfficesDropdownButtonTitle"></ace-dropdown-checkbox>
+                    <ace-dropdown-checkbox class="col-md-2 checkbox-menu-btn--mt" translation="events.eventOfficesDropdownButtonTitle" types="vm.officeTypes" on-value-change="vm.officeTypesChange(types)"></ace-dropdown-checkbox>
                 </div>
 
-                <wave-spinner ng-if="vm.isLoadingEventTypes && !vm.isLoadingEvents"></wave-spinner>
+                <wave-spinner ng-if="vm.isLoadingControls && !vm.isLoadingEvents"></wave-spinner>
 
                 <!-- Content -->
                 <wave-spinner ng-if="vm.isLoadingEvents"></wave-spinner>

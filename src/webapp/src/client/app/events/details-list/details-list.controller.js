@@ -1,77 +1,121 @@
 (function () {
-    'use strict';
+    "use strict";
     angular
-        .module('simoonaApp.Events')
-        .controller('EventDetailsListController', EventDetailsListController);
+        .module("simoonaApp.Events")
+        .controller("eventDetailsListController", eventDetailsListController);
 
-    EventDetailsListController.$inject = [
-        'authService',
-        'notifySrv',
-        'eventRepository',
-        '$state'
+    eventDetailsListController.$inject = [
+        "authService",
+        "notifySrv",
+        "eventRepository",
+        "$state",
     ];
 
-    function EventDetailsListController(authService, notifySrv, eventRepository, $state) {
+    function eventDetailsListController(
+        authService,
+        notifySrv,
+        eventRepository,
+        $state
+    ) {
         var vm = this;
 
         vm.isLoadingControls = true;
         vm.isLoadingEvents = true;
 
         vm.page = 1;
+        vm.filter = {
+            appliedEventTypes: undefined,
+            appliedOfficeTypes: undefined,
+        };
 
         vm.onListFilter = onListFilter;
-        vm.setFilter = setFilter;
         vm.changePage = changePage;
         vm.viewDetails = viewDetails;
         vm.eventTypesChange = eventTypesChange;
+        vm.officeTypesChange = officeTypesChange;
 
         loadEventTypes();
+        loadOfficeTypes();
         loadEvents();
 
-
         function loadEventTypes() {
-            eventRepository.getEventTypes().then(function (result) {
-                vm.eventTypes = result;
-                vm.isLoadingControls = false;
-            }, function () {
-                notifySrv.error('errorCodeMessages.messageError');
-            })
+            vm.isLoadingControls = true;
+            eventRepository.getEventTypes().then(
+                function (result) {
+                    vm.eventTypes = result;
+                    vm.isLoadingControls = false;
+                },
+                function () {
+                    notifySrv.error("errorCodeMessages.messageError");
+                }
+            );
         }
 
-        function loadEvents(searchString = "", page = 1, typeId = undefined) {
+        function loadEvents() {
             vm.isLoadingEvents = true;
-            eventRepository.getEventsByTitle(searchString, page, typeId).then(function (result) {
-                vm.events = result;
+            eventRepository
+                .getEventsByTitle(
+                    vm.filterText || "",
+                    vm.page,
+                    vm.filter.appliedEventTypes,
+                    vm.filter.appliedOfficeTypes
+                )
+                .then(
+                    function (result) {
+                        vm.events = result;
+                        vm.isLoadingEvents = false;
+                    },
+                    function () {
+                        notifySrv.error("errorCodeMessages.messageError");
+                    }
+                );
+        }
 
-                vm.isLoadingEvents = false;
-            }, function () {
-                notifySrv.error('errorCodeMessages.messageError');
-            });
+        function loadOfficeTypes() {
+            vm.isLoadingControls = true;
+            eventRepository.getEventOffices().then(
+                function (result) {
+                    vm.officeTypes = result;
+                    vm.isLoadingControls = false;
+                },
+                function () {
+                    notifySrv.error("errorCodeMessages.messageError");
+                }
+            );
         }
 
         function onListFilter() {
-            loadEvents(vm.filterText);
-        }
-
-        function setFilter(typeId) {
-            vm.filter = typeId;
-            vm.filterText = "";
             vm.page = 1;
-
-            loadEvents(vm.filterText, vm.page, typeId);
+            loadEvents();
         }
 
         function changePage(page) {
             vm.page = page;
-            loadEvents(vm.filterText, vm.page, vm.filter)
+            loadEvents();
         }
 
         function viewDetails(id) {
-            $state.go('Root.WithOrg.Client.Events.Details.Event', { id: id });
+            $state.go("Root.WithOrg.Client.Events.Details.Event", { id: id });
         }
 
-        function eventTypesChange(appliedTypes) {
-            console.log(appliedTypes);
+        function eventTypesChange(appliedEventTypes) {
+            loadEventsWithFilter(appliedEventTypes, "appliedEventTypes");
+        }
+
+        function officeTypesChange(appliedOfficeTypes) {
+            loadEventsWithFilter(appliedOfficeTypes, "appliedOfficeTypes");
+        }
+
+        function loadEventsWithFilter(filter, filterName) {
+            vm.page = 1;
+            vm.filterText = "";
+
+            vm.filter = {
+                ...vm.filter,
+                [filterName]: filter,
+            };
+
+            loadEvents();
         }
     }
 })();
