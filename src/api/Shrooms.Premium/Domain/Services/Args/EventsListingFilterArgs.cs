@@ -15,5 +15,7 @@ namespace Shrooms.Premium.Domain.Services.Args
         public DateTime? EndDate { get; set; }
 
         public int Page { get; set; }
+
+        public int PageSize { get; set; }
     }
 }
