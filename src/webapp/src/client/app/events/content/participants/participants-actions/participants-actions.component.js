@@ -36,7 +36,9 @@
             eventRepository.resetParticipantList(vm.event.id).then(function() {
                 vm.event.participants = [];
                 vm.event.participantsCount = 0;
-                vm.event.participatingStatus = attendStatus.NotAttending;
+                vm.event.participatingStatus = attendStatus.Idle;
+                vm.event.goingCount = 0;
+
                 if (!!vm.event.options.length) {
                     angular.forEach(vm.event.options, function(option) {
                         option.participants = [];
