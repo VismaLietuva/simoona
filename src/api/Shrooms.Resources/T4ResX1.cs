@@ -2946,7 +2946,7 @@ namespace Shrooms.Resources.Models.Events {
         ///        </item>
         ///    </list>
         ///</summary>
-        public static string EventCoacheeJoinEmailSubjectFormatted(params object[] args) { return GetResourceString("EventCoacheeJoinEmailSubject", args); }
+        public static string CoacheeJoinedEventEmailSubjectFormatted(params object[] args) { return GetResourceString("CoacheeJoinedEventEmailSubject", args); }
 
         ///<summary>
         ///    <list type='bullet'>
@@ -2959,13 +2959,13 @@ namespace Shrooms.Resources.Models.Events {
         ///    </list>
         ///</summary>
         [Utilities.Localized]
-        public static string EventCoacheeJoinEmailSubject => GetResourceString(EventCoacheeJoinEmailSubjectKey);
+        public static string CoacheeJoinedEventEmailSubject => GetResourceString(CoacheeJoinedEventEmailSubjectKey);
 
         /// <summary>
-        /// Resource key for <see cref="EventCoacheeJoinEmailSubject"/>
+        /// Resource key for <see cref="CoacheeJoinedEventEmailSubject"/>
         /// You can use it e.g. in validation attributes for <see cref="System.ComponentModel.DataAnnotations.ValidationAttribute.ErrorMessageResourceName"/> parameter.
         /// </summary>
-        public const string EventCoacheeJoinEmailSubjectKey = "EventCoacheeJoinEmailSubject";
+        public const string CoacheeJoinedEventEmailSubjectKey = "CoacheeJoinedEventEmailSubject";
     }
 }
 
@@ -2981,7 +2981,7 @@ namespace Shrooms.Resources.Models.Events {
         ///        </item>
         ///    </list>
         ///</summary>
-        public static string EventCoacheeLeaveEmailSubjectFormatted(params object[] args) { return GetResourceString("EventCoacheeLeaveEmailSubject", args); }
+        public static string CoacheeLeftEventEmailSubjectFormatted(params object[] args) { return GetResourceString("CoacheeLeftEventEmailSubject", args); }
 
         ///<summary>
         ///    <list type='bullet'>
@@ -2994,13 +2994,13 @@ namespace Shrooms.Resources.Models.Events {
         ///    </list>
         ///</summary>
         [Utilities.Localized]
-        public static string EventCoacheeLeaveEmailSubject => GetResourceString(EventCoacheeLeaveEmailSubjectKey);
+        public static string CoacheeLeftEventEmailSubject => GetResourceString(CoacheeLeftEventEmailSubjectKey);
 
         /// <summary>
-        /// Resource key for <see cref="EventCoacheeLeaveEmailSubject"/>
+        /// Resource key for <see cref="CoacheeLeftEventEmailSubject"/>
         /// You can use it e.g. in validation attributes for <see cref="System.ComponentModel.DataAnnotations.ValidationAttribute.ErrorMessageResourceName"/> parameter.
         /// </summary>
-        public const string EventCoacheeLeaveEmailSubjectKey = "EventCoacheeLeaveEmailSubject";
+        public const string CoacheeLeftEventEmailSubjectKey = "CoacheeLeftEventEmailSubject";
     }
 }
 
