@@ -98,7 +98,11 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                 var emailLeaveSubject = string.Format(Resources.Models.Events.Events.EventCoacheeLeaveEmailSubject,
                     userAttendStatusDto.FullName, userAttendStatusDto.EventName);
 
-                return new EmailDto(userAttendStatusDto, emailLeaveSubject, emailLeaveBody);
+                return new EmailDto(userAttendStatusDto.FullName,
+                    userAttendStatusDto.Email, 
+                    new List<string> { userAttendStatusDto.ManagerEmail },
+                    emailLeaveSubject, 
+                    emailLeaveBody);
             }
 
             var emailTemplateJoinViewModel = new EventCoacheeToCoachJoinEmailTemplateViewModel(
@@ -111,7 +115,11 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             var emailJoinSubject = string.Format(Resources.Models.Events.Events.EventCoacheeJoinEmailSubject,
                 userAttendStatusDto.FullName, userAttendStatusDto.EventName);
 
-            return new EmailDto(userAttendStatusDto, emailJoinSubject, emailJoinBody);
+            return new EmailDto(userAttendStatusDto.FullName,
+                    userAttendStatusDto.Email,
+                    new List<string> { userAttendStatusDto.ManagerEmail },
+                    emailJoinSubject, 
+                    emailJoinBody);
         }
     }
 }
