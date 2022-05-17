@@ -1,0 +1,8 @@
+{
+  "submitTicket": "Parekomenduokite drauga Simoonos komandai",
+  "name": "Vardas",
+  "message": "Kodėl nori parekomenduoti šį draugą?",
+  "lastName": "Pavardė",
+  "contact": "draugo elpaštas",
+  "success" : "Ačiū, greitai susisieksime su jumis ir jusu parekomenduotu žmogumi!"
+}

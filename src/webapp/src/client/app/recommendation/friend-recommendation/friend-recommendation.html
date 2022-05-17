@@ -1,0 +1,138 @@
+<div class="row body-container">
+    <div class="col-xs-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <span
+                    data-test-id="submit-ticket-header"
+                    translate="friendRecommendation.submitTicket"
+                ></span>
+            </div>
+            <div class="panel-body">
+                <form class="form-horizontal" name="recommendationForm">
+                    <div class="row">
+                        <div
+                            class="form-group required"
+                            ng-class="{'has-error': recommendationForm.name.$invalid && recommendationForm.name.$dirty}"
+                        >
+                            <label
+                                for="name"
+                                class="control-label col-xs-12 col-sm-3 col-md-4"
+                                translate="friendRecommendation.name"
+                            ></label>
+                            <div class="col-xs-12 col-sm-9 col-md-4">
+                                <input
+                                    id="name"
+                                    type="text"
+                                    class="form-control"
+                                    name="name"
+                                    ng-model="vm.ticket.name"
+                                    ng-maxlength="vm.recommendationSettings.nameLength"
+                                    data-test-id="recommendation-form-name-input"
+                                    required
+                                />
+                                <p
+                                    class="text-danger help-block"
+                                    ng-if="recommendationForm.name.$error.required && recommendationForm.name.$dirty"
+                                    translate="common.messageFieldIsRequired"
+                                ></p>
+                                <p
+                                    class="text-danger help-block"
+                                    ng-if="recommendationForm.name.$error.maxlength && recommendationForm.name.$dirty"
+                                    translate="common.messageInvalidLength"
+                                    translate-values="{ one: vm.recommendationSettings.nameLength }"
+                                ></p>
+                            </div>
+                        </div>
+                        <div
+                            class="form-group required"
+                            ng-class="{'has-error': recommendationForm.lastName.$invalid && recommendationForm.lastName.$dirty}"
+                        >
+                            <label
+                                for="lastName"
+                                class="control-label col-xs-12 col-sm-3 col-md-4"
+                                translate="friendRecommendation.lastName"
+                            ></label>
+                            <div class="col-xs-12 col-sm-9 col-md-4">
+                                <input
+                                    id="lastName"
+                                    type="text"
+                                    class="form-control"
+                                    name="lastName"
+                                    ng-model="vm.ticket.lastName"
+                                    ng-maxlength="vm.recommendationSettings.lastNameLength"
+                                    data-test-id="recommendation-form-lastName-input"
+                                    required
+                                />
+                                <p
+                                    class="text-danger help-block"
+                                    ng-if="recommendationForm.lastName.$error.required && recommendationForm.lastName.$dirty"
+                                    translate="common.messageFieldIsRequired"
+                                ></p>
+                                <p
+                                    class="text-danger help-block"
+                                    ng-if="recommendationForm.lastName.$error.maxlength && recommendationForm.lastName.$dirty"
+                                    translate="common.messageInvalidLength"
+                                    translate-values="{ one: vm.recommendationSettings.lastNameLength }"
+                                ></p>
+                            </div>
+                        </div>
+
+                        <div
+                            class="form-group required"
+                            ng-class="{'has-error': recommendationForm.contact.$invalid && recommendationForm.contact.$dirty}"
+                        >
+                            <label
+                                for="contact"
+                                class="control-label col-xs-12 col-sm-3 col-md-4"
+                                translate="friendRecommendation.contact"
+                            ></label>
+                            <div class="col-xs-12 col-sm-9 col-md-4">
+                                <input
+                                    id="contact"
+                                    type="text"
+                                    class="form-control"
+                                    name="contact"
+                                    ng-model="vm.ticket.contact"
+                                    ng-maxlength="vm.recommendationSettings.contactLength"
+                                    data-test-id="recommendation-form-contact-input"
+                                    required
+                                />
+                                <p
+                                    class="text-danger help-block"
+                                    ng-if="recommendationForm.contact.$error.required && recommendationForm.contact.$dirty"
+                                    translate="common.messageFieldIsRequired"
+                                ></p>
+                                <p
+                                    class="text-danger help-block"
+                                    ng-if="recommendationForm.contact.$error.maxlength && recommendationForm.contact.$dirty"
+                                    translate="common.messageInvalidLength"
+                                    translate-values="{ one: vm.recommendationSettings.contactLength }"
+                                ></p>
+                            </div>
+                        </div>
+
+                        <div class="form-group required" ng-class="{'has-error': recommendationForm.message.$invalid && recommendationForm.message.$dirty}">
+                            <label for="message" class="control-label col-xs-12 col-sm-3 col-md-4" translate="friendRecommendation.message"></label>
+                            <div class="col-xs-12 col-sm-9 col-md-4">
+                                <textarea id="message" name="message" class="form-control" ng-model="vm.ticket.message" ng-maxlength="vm.recommendationSettings.messageLength" rows="5" data-test-id="recommendation-form-message-input" required></textarea>
+                                <p class="text-danger help-block" ng-if="recommendationForm.message.$error.required && recommendationForm.message.$dirty" translate="common.messageFieldIsRequired"></p>
+                                <p class="text-danger help-block" ng-if="recommendationForm.message.$error.maxlength && recommendationForm.message.$dirty" translate="common.messageInvalidLength" translate-values="{ one: vm.recommendationSettings.messageLength }"></p>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="pull-right padding-top">
+                        <button
+                            class="btn btn-primary pull-right"
+                            ng-click="vm.submitTicket(vm.ticket)"
+                            ng-disabled="recommendationForm.$invalid"
+                            data-test-id="recommendation-form-save-button"
+                        >
+                            <span translate="common.save"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -206,6 +206,17 @@
                 </ul>
             </li>
             <li class="icon"
+            ng-if="vm.isAuthenticatedNotNewUser() && vm.showSimoonaSupport"
+            ng-class="{active: $state.includes('Root.WithOrg.Client.FriendRecommendation')}">
+            <a ui-sref="Root.WithOrg.Client.FriendRecommendation" 
+               class="navbar-last-child"
+               translate-attr-title="friendRecommendation.submitTicket" 
+               data-test-id="support-button"  
+               translate>
+                <span class="vismaicon vismaicon-menu vismaicon-message"></span>
+            </a>
+        </li>
+            <li class="icon"
                 ng-if="vm.isAuthenticatedNotNewUser() && vm.showSimoonaSupport"
                 ng-class="{active: $state.includes('Root.WithOrg.Client.SubmitTicket')}">
                 <a ui-sref="Root.WithOrg.Client.SubmitTicket" 
@@ -216,6 +227,7 @@
                     <span class="vismaicon vismaicon-menu vismaicon-message"></span>
                 </a>
             </li>
+            
 
         </ul>
     </div>

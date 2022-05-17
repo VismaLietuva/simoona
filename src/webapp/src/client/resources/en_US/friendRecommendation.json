@@ -1,0 +1,8 @@
+{
+  "submitTicket": "Recommend a friend to Simoona team",
+  "name": "Name",
+  "message": "Why do you want to recommend this friend?",
+  "lastName": "Last name",
+  "contact": "Friend email",
+  "success" : "Thank you, we will be contacting you and your recommendation soon!"
+}

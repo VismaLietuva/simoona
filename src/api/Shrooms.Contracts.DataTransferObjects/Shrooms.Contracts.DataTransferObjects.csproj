@@ -81,6 +81,7 @@
     <Compile Include="Models\Projects\EditProjectDto.cs" />
     <Compile Include="Models\Projects\NewProjectDto.cs" />
     <Compile Include="Models\Projects\ProjectsListItemDto.cs" />
+    <Compile Include="Models\Recommendation\RecommendationDto.cs" />
     <Compile Include="Models\Support\SupportDto.cs" />
     <Compile Include="Models\HubUser.cs" />
     <Compile Include="Models\ImageDto.cs" />

@@ -3,6 +3,7 @@ using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models;
 using Shrooms.Contracts.DataTransferObjects.Models.Administration;
 using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
+using Shrooms.Contracts.DataTransferObjects.Models.Recommendation;
 using Shrooms.Contracts.DataTransferObjects.Models.Support;
 using Shrooms.Contracts.ViewModels;
 using Shrooms.Contracts.ViewModels.User;
@@ -14,6 +15,7 @@ using Shrooms.Presentation.WebViewModels.Models.Certificate;
 using Shrooms.Presentation.WebViewModels.Models.ChangeProfile;
 using Shrooms.Presentation.WebViewModels.Models.Exam;
 using Shrooms.Presentation.WebViewModels.Models.PostModels;
+using Shrooms.Presentation.WebViewModels.Models.Recommendation;
 using Shrooms.Presentation.WebViewModels.Models.Roles;
 using Shrooms.Presentation.WebViewModels.Models.Skill;
 using Shrooms.Presentation.WebViewModels.Models.Support;
@@ -42,6 +44,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
         private void CreateMiscDtoMappings()
         {
             CreateMap<SupportPostViewModel, SupportDto>();
+            CreateMap<RecommendationPostViewModel, RecommendationDto>();
         }
 
         private void CreateKudosLogDtoMappings()

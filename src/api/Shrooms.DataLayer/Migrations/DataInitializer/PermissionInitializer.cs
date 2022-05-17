@@ -21,6 +21,7 @@ namespace Shrooms.DataLayer.Migrations.DataInitializer
                 .AddBasicPermission(permissionName: BasicPermissions.Birthday)
                 .AddBasicPermission(permissionName: BasicPermissions.Vacation, module: Modules.Vacation)
                 .AddBasicPermission(permissionName: BasicPermissions.Support)
+                .AddBasicPermission(permissionName: BasicPermissions.Recommendation)
                 .AddBasicPermission(permissionName: BasicPermissions.Committees)
                 .AddBasicPermission(permissionName: BasicPermissions.KudosBasket, module: Modules.KudosBasket)
                 .AddBasicPermission(permissionName: BasicPermissions.EmployeeList)

@@ -153,6 +153,7 @@
     <Compile Include="Modules\AdministrationUsers.cs" />
     <Compile Include="Modules\ExternalLinksModule.cs" />
     <Compile Include="Modules\JobModule.cs" />
+    <Compile Include="Modules\RecommendationModule.cs" />
     <Compile Include="Modules\SupportModule.cs" />
     <Compile Include="Modules\IdentityModule.cs" />
     <Compile Include="Modules\InfrastructureModule.cs" />

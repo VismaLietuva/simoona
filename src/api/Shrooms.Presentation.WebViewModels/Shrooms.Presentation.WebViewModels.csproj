@@ -92,6 +92,7 @@
     <Compile Include="Models\Projects\EditProjectViewModel.cs" />
     <Compile Include="Models\Projects\NewProjectViewModel.cs" />
     <Compile Include="Models\Projects\ProjectsListItemViewModel.cs" />
+    <Compile Include="Models\Recommendation\RecommendationPostViewModel.cs" />
     <Compile Include="Models\Roles\RoleDetailsViewModel.cs" />
     <Compile Include="Models\Roles\RoleUserViewModel.cs" />
     <Compile Include="Models\Users\Kudos\KudosBasicDataViewModel.cs" />

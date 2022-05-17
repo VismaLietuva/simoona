@@ -19,6 +19,7 @@
         public const string Vacation = "VACATIONS_BASIC";
         public const string Post = "POST_BASIC";
         public const string Support = "SUPPORT_BASIC";
+        public const string Recommendation = "RECOMMENDATION_BASIC";
         public const string Like = "LIKE_BASIC";
         public const string Organization = "ORGANIZATION_BASIC";
         public const string QualificationLevel = "QUALIFICATIONLEVEL_BASIC";
