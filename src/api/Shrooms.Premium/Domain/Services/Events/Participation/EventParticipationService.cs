@@ -104,21 +104,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 return;
             }
 
-            var userEventAttendStatusDto = @event.EventParticipants
-                .Select(participant => new UserEventAttendStatusChangeEmailDto
-                {
-                    FirstName = participant.ApplicationUser.FirstName,
-                    LastName = participant.ApplicationUser.LastName,
-                    Email = participant.ApplicationUser.Email,
-                    OrganizationId = participant.ApplicationUser.OrganizationId,
-                    EventName = @event.Name,
-                    EventId = @event.Id,
-                    EventEndDate = @event.EndDate,
-                    EventStartDate = @event.StartDate,
-                    ManagerEmail = participant.ApplicationUser.Manager.Email,
-                    ManagerId = participant.ApplicationUser.Manager.Id
-                })
-                .ToList();
+            var userEventAttendStatusDto = MapEventToUserEventAttendStatusChangeEmailDto(@event).ToList();
 
             await RemoveParticipantsAsync(@event, userOrg);
 
@@ -188,10 +174,12 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
                 await _uow.SaveChangesAsync(false);
 
-                await NotifyManagersAsync(joinDto, @event);
-
                 _asyncRunner.Run<IEventCalendarService>(async notifier => await notifier.SendInvitationAsync(@event, joinDto.ParticipantIds, joinDto.OrganizationId), _uow.ConnectionName);
 
+                if (@event.SendEmailToManager)
+                {
+                    await NotifyManagersAsync(joinDto, @event);
+                }
             }
             finally
             {
@@ -319,18 +307,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 return;
             }
 
-            var userEventAttendStatusDto = new UserEventAttendStatusChangeEmailDto
-            {
-                FirstName = participant.ApplicationUser.FirstName,
-                LastName = participant.ApplicationUser.LastName,
-                Email = participant.ApplicationUser.Email,
-                OrganizationId = userOrg.OrganizationId,
-                EventName = @event.Name,
-                EventId = @event.Id,
-                EventEndDate = @event.EndDate,
-                EventStartDate = @event.StartDate,
-                ManagerId = participant.ApplicationUser.ManagerId
-            };
+            var userEventAttendStatusDto = MapToUserEventAttendStatusChangeEmailDto(participant, @event);
 
             await RemoveParticipantsAsync(@event, userOrg);
 
@@ -354,19 +331,8 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 return;
             }
 
-            var userEventAttendStatusDto = new UserEventAttendStatusChangeEmailDto
-            {
-                FirstName = participant.ApplicationUser.FirstName,
-                LastName = participant.ApplicationUser.LastName,
-                Email = participant.ApplicationUser.Email,
-                OrganizationId = userOrg.OrganizationId,
-                EventName = participant.Event.Name,
-                EventId = eventId,
-                EventStartDate = participant.Event.StartDate,
-                EventEndDate = participant.Event.EndDate,
-                ManagerId = participant.ApplicationUser.ManagerId
-            };
-
+            var userEventAttendStatusDto = MapToUserEventAttendStatusChangeEmailDto(participant, @event);
+            
             await RemoveParticipantsAsync(participant.Event, userOrg);
 
             await NotifyManagerAsync(userEventAttendStatusDto);
@@ -445,11 +411,6 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
         private async Task NotifyManagersAsync(EventJoinDto joinDto, EventJoinValidationDto eventJoinValidationDto)
         {
-            if (!eventJoinValidationDto.SendEmailToManager)
-            {
-                return;
-            }
-
             var users = await _usersDbSet
                 .Where(user => joinDto.ParticipantIds
                 .Contains(user.Id) && joinDto.OrganizationId == user.OrganizationId)
@@ -468,20 +429,8 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                     continue;
                 }
 
-                var userAttendStatusDto = new UserEventAttendStatusChangeEmailDto
-                {
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    Email = user.Email,
-                    ManagerEmail = managerEmail,
-                    ManagerId = user.ManagerId,
-                    EventName = eventJoinValidationDto.Name,
-                    EventId = eventJoinValidationDto.Id,
-                    OrganizationId = user.OrganizationId,
-                    EventStartDate = eventJoinValidationDto.StartDate,
-                    EventEndDate = eventJoinValidationDto.EndDate
-                };
-
+                var userAttendStatusDto = MapToUserEventAttendStatusChangeEmailDto(user, eventJoinValidationDto, managerEmail);
+                
                 _asyncRunner.Run<IEventNotificationService>(
                     async notifier => await notifier.NotifyManagerAboutEventAsync(userAttendStatusDto, true),
                     _uow.ConnectionName);
@@ -554,6 +503,56 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 LastName = string.IsNullOrEmpty(p.ApplicationUser.LastName)
                     ? BusinessLayerConstants.DeletedUserLastName
                     : p.ApplicationUser.LastName
+            });
+        }
+
+        private static UserEventAttendStatusChangeEmailDto 
+            MapToUserEventAttendStatusChangeEmailDto(ApplicationUser user, EventJoinValidationDto eventJoinValidationDto, string managerEmail)
+        {
+            return new UserEventAttendStatusChangeEmailDto
+            {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                ManagerEmail = managerEmail,
+                ManagerId = user.ManagerId,
+                EventName = eventJoinValidationDto.Name,
+                EventId = eventJoinValidationDto.Id,
+                OrganizationId = user.OrganizationId,
+                EventStartDate = eventJoinValidationDto.StartDate,
+                EventEndDate = eventJoinValidationDto.EndDate
+            };
+        }
+
+        private static UserEventAttendStatusChangeEmailDto MapToUserEventAttendStatusChangeEmailDto(EventParticipant participant, Event @event)
+        {
+            return new UserEventAttendStatusChangeEmailDto
+            {
+                FirstName = participant.ApplicationUser.FirstName,
+                LastName = participant.ApplicationUser.LastName,
+                Email = participant.ApplicationUser.Email,
+                OrganizationId = participant.ApplicationUser.OrganizationId,
+                EventName = @event.Name,
+                EventId = @event.Id,
+                EventStartDate = @event.StartDate,
+                EventEndDate = @event.EndDate,
+                ManagerId = participant.ApplicationUser.ManagerId
+            };
+        }
+
+        private static IEnumerable<UserEventAttendStatusChangeEmailDto> MapEventToUserEventAttendStatusChangeEmailDto(Event @event)
+        {
+            return @event.EventParticipants.Select(participant => new UserEventAttendStatusChangeEmailDto
+            {
+                FirstName = participant.ApplicationUser.FirstName,
+                LastName = participant.ApplicationUser.LastName,
+                Email = participant.ApplicationUser.Email,
+                OrganizationId = participant.ApplicationUser.OrganizationId,
+                EventName = @event.Name,
+                EventEndDate = @event.EndDate,
+                EventStartDate = @event.StartDate,
+                ManagerEmail = participant.ApplicationUser.Manager.Email,
+                ManagerId = participant.ApplicationUser.ManagerId
             });
         }
 
