@@ -93,12 +93,16 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                     userAttendStatusDto,
                     eventUrl);
 
-                var emailLeaveBody = _mailTemplate.Generate(emailTemplateLeaveViewModel, EmailPremiumTemplateCacheKeys.EventCoacheeToCoachLeaveEmail);
+                var emailLeaveBody = _mailTemplate.Generate(emailTemplateLeaveViewModel, EmailPremiumTemplateCacheKeys.CoacheeLeftEvent);
 
-                var emailLeaveSubject = string.Format(Resources.Models.Events.Events.EventCoacheeLeaveEmailSubject,
+                var emailLeaveSubject = string.Format(Resources.Models.Events.Events.CoacheeLeftEventEmailSubject,
                     userAttendStatusDto.FullName, userAttendStatusDto.EventName);
 
-                return new EmailDto(userAttendStatusDto, emailLeaveSubject, emailLeaveBody);
+                return new EmailDto(userAttendStatusDto.FullName,
+                    userAttendStatusDto.Email, 
+                    new List<string> { userAttendStatusDto.ManagerEmail },
+                    emailLeaveSubject, 
+                    emailLeaveBody);
             }
 
             var emailTemplateJoinViewModel = new EventCoacheeToCoachJoinEmailTemplateViewModel(
@@ -106,12 +110,16 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                 userAttendStatusDto,
                 eventUrl);
 
-            var emailJoinBody = _mailTemplate.Generate(emailTemplateJoinViewModel, EmailPremiumTemplateCacheKeys.EventCoacheeToCoachJoinEmail);
+            var emailJoinBody = _mailTemplate.Generate(emailTemplateJoinViewModel, EmailPremiumTemplateCacheKeys.CoacheeJoinedEvent);
 
-            var emailJoinSubject = string.Format(Resources.Models.Events.Events.EventCoacheeJoinEmailSubject,
+            var emailJoinSubject = string.Format(Resources.Models.Events.Events.CoacheeJoinedEventEmailSubject,
                 userAttendStatusDto.FullName, userAttendStatusDto.EventName);
 
-            return new EmailDto(userAttendStatusDto, emailJoinSubject, emailJoinBody);
+            return new EmailDto(userAttendStatusDto.FullName,
+                    userAttendStatusDto.Email,
+                    new List<string> { userAttendStatusDto.ManagerEmail },
+                    emailJoinSubject, 
+                    emailJoinBody);
         }
     }
 }

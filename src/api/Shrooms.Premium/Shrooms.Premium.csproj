@@ -594,10 +594,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <Content Include="EmailTemplates\Events\CoacheeToCoachJoin.cshtml">
+    <Content Include="EmailTemplates\Events\CoacheeJoinedEvent.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="EmailTemplates\Events\CoacheeToCoachLeave.cshtml">
+    <Content Include="EmailTemplates\Events\CoacheeLeftEvent.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="packages.config" />
