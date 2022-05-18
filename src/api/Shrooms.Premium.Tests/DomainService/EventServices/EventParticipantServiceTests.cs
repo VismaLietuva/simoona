@@ -717,9 +717,6 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             // Arrange
             var eventId = MockResetAttendees(true);
             var extraCallForNotifyingUsersAboutBeingRemoved = 1;
-            
-            MockUsers();
-            
             var user = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
@@ -1017,7 +1014,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 EventType = new EventType
                 {
                     SendEmailToManager = sendEmailToManager
-                }
+                },
             };
 
             var option1 = new EventOption
@@ -1055,6 +1052,11 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     {
                         Id = "user1",
                         ManagerId = "testUserId",
+                        Manager = new ApplicationUser
+                        {
+                            Email = "email",
+                            Id = "testUserId"
+                        }
                     }
                 },
                 new EventParticipant
@@ -1068,6 +1070,11 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     {
                         Id = "user2",
                         ManagerId = "testUserId",
+                        Manager = new ApplicationUser
+                        {
+                            Email = "email",
+                            Id = "testUserId"
+                        }
                     }
                 },
                 new EventParticipant
@@ -1081,6 +1088,11 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     {
                         Id = "user3",
                         ManagerId = "testUserId",
+                        Manager = new ApplicationUser
+                        {
+                            Email = "email",
+                            Id = "testUserId"
+                        }
                     }
                 }
             };
