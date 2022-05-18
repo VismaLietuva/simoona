@@ -299,7 +299,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
             if (!@event.EventType.SendEmailToManager)
             {
-                await RemoveParticipantsAsync(@event, userOrg);
+                await RemoveParticipantAsync(participant, @event, userOrg);
 
                 _asyncRunner.Run<IEventNotificationService>(async notifier => await notifier.NotifyRemovedEventParticipantsAsync(@event.Name, @event.Id, userOrg.OrganizationId, new[] { userId }),
                     _uow.ConnectionName);
@@ -309,7 +309,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
             var userEventAttendStatusDto = MapToUserEventAttendStatusChangeEmailDto(participant, @event);
 
-            await RemoveParticipantsAsync(@event, userOrg);
+            await RemoveParticipantAsync(participant, @event, userOrg);
 
             _asyncRunner.Run<IEventNotificationService>(async notifier => await notifier.NotifyRemovedEventParticipantsAsync(@event.Name, @event.Id, userOrg.OrganizationId, new[] { userId }),
                 _uow.ConnectionName);
@@ -326,14 +326,14 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
             if (!participant.Event.EventType.SendEmailToManager)
             {
-                await RemoveParticipantsAsync(@event, userOrg);
-                
+                await RemoveParticipantAsync(participant, @event, userOrg);
+
                 return;
             }
 
             var userEventAttendStatusDto = MapToUserEventAttendStatusChangeEmailDto(participant, @event);
             
-            await RemoveParticipantsAsync(participant.Event, userOrg);
+            await RemoveParticipantAsync(participant, @event, userOrg);
 
             await NotifyManagerAsync(userEventAttendStatusDto);
         }
@@ -457,6 +457,19 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             {
                 await _wallService.JoinOrLeaveWallAsync(wallId, wallParticipantId, wallParticipantId, userOrg.OrganizationId, true);
             }
+        }
+
+        private async Task RemoveParticipantAsync(EventParticipant participant, Event @event, UserAndOrganizationDto userOrg)
+        {
+            var timestamp = DateTime.UtcNow;
+
+            participant.UpdateMetadata(userOrg.UserId, timestamp);
+
+            await JoinOrLeaveEventWallAsync(@event.ResponsibleUserId, participant.ApplicationUserId, @event.WallId, userOrg);
+
+            _eventParticipantsDbSet.Remove(participant);
+
+            await _uow.SaveChangesAsync(false);
         }
 
         private async Task RemoveParticipantsAsync(Event @event, UserAndOrganizationDto userOrg)
