@@ -14,5 +14,6 @@ namespace Shrooms.Premium.Domain.Services.Events
         Task<EventDetailsDto> GetEventDetailsAsync(Guid id, UserAndOrganizationDto userOrg);
         Task<EventEditDto> GetEventForEditingAsync(Guid id, UserAndOrganizationDto userOrg);
         Task CheckIfEventExistsAsync(string eventId, int organizationId);
+        Task<ExtensiveEventDetailsDto> GetExtensiveEventDetailsAsync(Guid eventId, UserAndOrganizationDto userOrg, int[] kudosTypes, int[] eventTypes);
     }
 }

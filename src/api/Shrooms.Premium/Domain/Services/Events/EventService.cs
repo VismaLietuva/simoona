@@ -13,6 +13,7 @@ using Shrooms.Contracts.DataTransferObjects.Wall;
 using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
+using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
@@ -38,6 +39,7 @@ namespace Shrooms.Premium.Domain.Services.Events
         private readonly DbSet<EventType> _eventTypesDbSet;
         private readonly DbSet<ApplicationUser> _usersDbSet;
         private readonly DbSet<EventOption> _eventOptionsDbSet;
+        private readonly DbSet<KudosLog> _kudosLogDbSet;
 
         private readonly IDbSet<Office> _officeDbSet;
 
@@ -55,6 +57,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
             _eventOptionsDbSet = uow.GetDbSet<EventOption>();
             _officeDbSet = uow.GetDbSet<Office>();
+            _kudosLogDbSet = uow.GetDbSet<KudosLog>();
 
             _permissionService = permissionService;
             _eventUtilitiesService = eventUtilitiesService;
@@ -144,6 +147,78 @@ namespace Shrooms.Premium.Domain.Services.Events
             }
 
             return @event;
+        }
+
+        public async Task<ExtensiveEventDetailsDto> GetExtensiveEventDetailsAsync(Guid eventId, UserAndOrganizationDto userOrg, int[] kudosTypes, int[] eventTypes)
+        {
+            var kudosTypesLength = kudosTypes.Length;
+            var eventTypesLength = eventTypes.Length;
+
+            var extensiveEventDetailsDto = await _eventsDbSet
+                .Include(e => e.EventParticipants)
+                .Include(e => e.ResponsibleUser)
+                .Where(e => e.Id == eventId && e.OrganizationId == userOrg.OrganizationId)
+                .Select(e => new ExtensiveEventDetailsDto
+                {
+                    Name = e.Name,
+                    StartDate = e.StartDate,
+                    EndDate = e.EndDate,
+                    HostFirstName = e.ResponsibleUser.FirstName,
+                    HostLastName = e.ResponsibleUser.LastName,
+                    HostUserId = e.ResponsibleUser.Id,
+                    Location = e.Place,
+                    Offices = e.Offices,
+                    ImageName = e.ImageName,
+                    Description = e.Description,
+                    ExtensiveParticipants = e.EventParticipants.Select(p => new ExtensiveEventParticipantDto
+                    {
+                        Id = p.ApplicationUser.Id,
+                        FirstName = p.ApplicationUser.FirstName,
+                        LastName = p.ApplicationUser.LastName,
+                        EmploymentDate = p.ApplicationUser.EmploymentDate,
+                        QualificationLevel = p.ApplicationUser.QualificationLevel.Name,
+                        JobTitle = p.ApplicationUser.JobPosition.Title,
+                        ManagerFirstName = p.ApplicationUser.Manager.FirstName,
+                        ManagerLastName = p.ApplicationUser.Manager.LastName,
+                        ManagerId = p.ApplicationUser.Manager.Id,
+                        Projects = p.ApplicationUser.Projects.Select(p => p.Name),
+                        Kudos = _kudosLogDbSet
+                            .Where(kudos => kudosTypesLength == 0 || kudosTypes.Contains(kudos.Id))
+                            .Sum(kudos => kudos.Points),
+                        PreviouslyAttendedConferences = p.ApplicationUser.Events
+                            .Where(evnt => evnt.EndDate < DateTime.UtcNow &&
+                                           (eventTypesLength == 0 || eventTypes.Contains(evnt.EventType.Id)))
+                            .Select(evnt => evnt.Name)
+                            .Distinct()
+                            .ToList()
+                        
+                        //PreviouslyAttendedConferences = e.EventParticipants
+                        //    .Where(participant => participant.ApplicationUser.Id == p.ApplicationUser.Id &&
+                        //                          participant.Event.EndDate < DateTime.UtcNow &&
+                        //                          (eventTypesLength == 0 || eventTypes.Contains(participant.Event.EventType.Id)))
+                        //    .Select(participant => participant.Event.Name)
+                        //    .Distinct()
+                        //    .ToList()
+                            
+                        //PreviouslyAttendedConferences = e.EventParticipants
+                        //    .Where(part => part.EventId == eventId && 
+                        //           part.Event.EndDate < DateTime.UtcNow && 
+                        //           (eventTypesLength == 0 || eventTypes.Contains(part.Event.EventType.Id)))
+                        //    .Select(part => part.Event.Name),
+                    })
+                })
+                .FirstOrDefaultAsync();
+
+            _eventValidationService.CheckIfEventExists(extensiveEventDetailsDto);
+
+            var officeIds = JsonConvert.DeserializeObject<List<int>>(extensiveEventDetailsDto.Offices);
+
+            extensiveEventDetailsDto.OfficeNames = await _officeDbSet
+                .Where(office => officeIds.Contains(office.Id))
+                .Select(office => office.Name)
+                .ToArrayAsync();
+
+            return extensiveEventDetailsDto;
         }
 
         public async Task<CreateEventDto> CreateEventAsync(CreateEventDto newEventDto)
