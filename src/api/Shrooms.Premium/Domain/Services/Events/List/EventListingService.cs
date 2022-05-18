@@ -7,11 +7,13 @@ using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Enums;
+using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Domain.DomainServiceValidators.Events;
 using Shrooms.Premium.Domain.Services.Args;
+using X.PagedList;
 
 namespace Shrooms.Premium.Domain.Services.Events.List
 {
@@ -29,11 +31,13 @@ namespace Shrooms.Premium.Domain.Services.Events.List
         private readonly IEventValidationService _eventValidationService;
 
         private readonly IDbSet<Event> _eventsDbSet;
+        private readonly IDbSet<Office> _officeDbSet;
 
         public EventListingService(IUnitOfWork2 uow, IEventValidationService eventValidationService)
         {
             _eventValidationService = eventValidationService;
             _eventsDbSet = uow.GetDbSet<Event>();
+            _officeDbSet = uow.GetDbSet<Office>();
         }
 
         public async Task<EventOptionsDto> GetEventOptionsAsync(Guid eventId, UserAndOrganizationDto userOrg)
@@ -77,6 +81,46 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                 .Select(MapEventToListItemDto(userOrganization.UserId));
 
             return await events.ToListAsync();
+        }
+
+        public async Task<IPagedList<EventDetailsListItemDto>> GetEventsFilteredByTitleAsync(string eventTitle, EventsListingFilterArgs args, UserAndOrganizationDto userAndOrganization)
+        {
+            var allOffices = await _officeDbSet
+                .ToDictionaryAsync(office => office.Id, office => office.Name);
+
+            var typeIdsLength = args.TypeIds.Length;
+            var officeIdsLength = args.OfficeIds.Length;
+
+            var officeIds = string.Join(" ", args.OfficeIds);
+
+            var events = await _eventsDbSet
+                .Include(e => e.EventParticipants)
+                .Include(e => e.EventType)
+                .Where(e => e.OrganizationId == userAndOrganization.OrganizationId)
+                .Where(e => eventTitle == null || e.Name.Contains(eventTitle))
+                //.Where(e => e.StartDate > DateTime.UtcNow) // TODO: remove comment before PR
+                .Where(e => typeIdsLength == 0 || args.TypeIds.Contains(e.EventTypeId))
+                .Where(e => officeIdsLength == 0 || args.OfficeIds.Any(c => e.Offices.Contains(c)))
+                .OrderByDescending(e => e.StartDate)
+                .Select(e => new EventDetailsListItemDto
+                {
+                    Id = e.Id,
+                    Name = e.Name,
+                    StartDate = e.StartDate,
+                    EndDate = e.EndDate,
+                    TypeName = e.EventType.Name,
+                    MaxParticipants = e.MaxParticipants,
+                    ParticipantsCount = e.EventParticipants.Count,
+                    Offices = e.Offices,
+                })
+                .ToPagedListAsync(args.Page, args.PageSize);
+
+            foreach (var e in events)
+            {
+                e.OfficeNames = e.OfficeIds.Select(officeId => allOffices[int.Parse(officeId)]);
+            }
+
+            return events;
         }
 
         public async Task<IEnumerable<EventListItemDto>> GetMyEventsAsync(MyEventsOptionsDto options, int page, int? officeId = null)
@@ -176,6 +220,11 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             return x => x.EventTypeId == typeId;
         }
 
+        private static Expression<Func<Event, bool>> EventTypesFilter(int[] types)
+        {
+            return x => types.Contains(x.EventTypeId);
+        }
+
         private static Expression<Func<Event, bool>> EventOfficeFilter(string office)
         {
             if (office == OutsideOffice || office == null)
@@ -185,8 +234,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
 
             return x => x.Offices.Contains(office) || x.Offices == OutsideOffice;
         }
-
-        private static Expression<Func<Event, bool>> SearchFilter(string searchString)
+Expression<Func<Event, bool>> SearchFilter(string searchString)
         {
             if (string.IsNullOrEmpty(searchString))
             {
