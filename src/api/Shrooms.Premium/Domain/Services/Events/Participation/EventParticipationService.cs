@@ -474,12 +474,8 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
         private async Task RemoveParticipantsAsync(Event @event, UserAndOrganizationDto userOrg)
         {
-            var timestamp = DateTime.UtcNow;
-
             foreach (var participant in @event.EventParticipants.ToList())
             {
-                participant.UpdateMetadata(userOrg.UserId, timestamp);
-
                 await JoinOrLeaveEventWallAsync(@event.ResponsibleUserId, participant.ApplicationUserId, @event.WallId, userOrg);
                 
                 _eventParticipantsDbSet.Remove(participant);
