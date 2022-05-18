@@ -465,6 +465,8 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
             participant.UpdateMetadata(userOrg.UserId, timestamp);
 
+            await _uow.SaveChangesAsync(false);
+
             await JoinOrLeaveEventWallAsync(@event.ResponsibleUserId, participant.ApplicationUserId, @event.WallId, userOrg);
 
             _eventParticipantsDbSet.Remove(participant);
