@@ -11,6 +11,7 @@ using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.Infrastructure;
+using Shrooms.Contracts.ViewModels;
 using Shrooms.Contracts.ViewModels.Wall.Posts;
 using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
@@ -29,6 +30,7 @@ using Shrooms.Premium.Presentation.WebViewModels.Events;
 using Shrooms.Premium.Presentation.WebViewModels.User;
 using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.Api.Filters;
+using X.PagedList;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers
 {
@@ -357,6 +359,28 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             }
         }
 
+        // TODO: add auth
+        [HttpGet]
+        [Route("GetExtensiveDetails")]
+        public async Task<IHttpActionResult> GetExtensiveEventDetails(Guid eventId, [FromUri] int[] kudosTypes, [FromUri] int[] eventTypes)
+        {
+            try
+            {
+                var extensiveEventDto = await _eventService.GetExtensiveEventDetailsAsync(eventId, GetUserAndOrganization(), kudosTypes, eventTypes);
+                var extensiveEventViewModel = _mapper.Map<ExtensiveEventDetailsDto, ExtensiveEventDetailsViewModel>(extensiveEventDto);
+
+                var officesCount = await _officeMapService.GetOfficesCountAsync();
+
+                extensiveEventViewModel.IsForAllOffices = extensiveEventViewModel.OfficeNames.Count() == officesCount;
+
+                return Ok(extensiveEventViewModel);
+            }
+            catch (EventException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
         [HttpGet]
         [Route("Update")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
@@ -538,6 +562,43 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             {
                 await _eventParticipationService.UpdateSelectedOptionsAsync(changeOptionsDto);
                 return Ok();
+            }
+            catch (EventException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        // TODO: add auth
+        [HttpGet]
+        [Route("GetEventsByTitle")]
+        public async Task<IHttpActionResult> GetEventsByTitle(string searchString, [FromUri] int[] typeIds, [FromUri] string[] officeIds, int page = 1, int pageSize = WebApiConstants.DefaultPageSize)
+        {
+            var args = new EventsListingFilterArgs
+            {
+                Page = page,
+                PageSize = pageSize,
+                TypeIds = typeIds,
+                OfficeIds = officeIds
+            };
+            
+            var userAndOrganization = GetUserAndOrganization();
+
+            try
+            {
+                var eventListItemsPagedDto = await _eventListingService.GetEventsFilteredByTitleAsync(searchString, args, userAndOrganization);
+                var eventListItemsViewModel = _mapper.Map<IEnumerable<EventDetailsListItemDto>, IEnumerable<EventDetailsListItemViewModel>>(eventListItemsPagedDto);
+                var pagedModel = new StaticPagedList<EventDetailsListItemViewModel>(eventListItemsViewModel, page, pageSize, eventListItemsPagedDto.TotalItemCount);
+
+                var pagedViewModel = new PagedViewModel<EventDetailsListItemViewModel>
+                {
+                    PagedList = pagedModel,
+                    PageCount = pagedModel.PageCount,
+                    ItemCount = pagedModel.TotalItemCount,
+                    PageSize = pagedModel.PageSize
+                };
+
+                return Ok(pagedViewModel);
             }
             catch (EventException e)
             {
