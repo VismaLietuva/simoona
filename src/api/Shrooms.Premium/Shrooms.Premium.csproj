@@ -316,11 +316,13 @@
     <Compile Include="DataTransferObjects\Models\Committees\CommitteeSuggestionPostDto.cs" />
     <Compile Include="DataTransferObjects\Models\Committees\CommitteeSuggestionDto.cs" />
     <Compile Include="DataTransferObjects\Models\Committees\CommitteeViewDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\ExtensiveEventDetailsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\CreateEventDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\CreateEventTypeDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EditEventDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventChangeOptionsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventDetailsDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\EventDetailsListItemDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventDetailsOptionDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventDetailsParticipantDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventEditDto.cs" />
@@ -335,6 +337,7 @@
     <Compile Include="DataTransferObjects\Models\Events\EventParticipantDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventTypeDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventUserSearchResultDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\ExtensiveEventParticipantDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\MyEventsOptionsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\NewEventOptionDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\UpdateAttendStatusDto.cs" />
@@ -530,6 +533,7 @@
     <Compile Include="Presentation\WebViewModels\Events\CreateEventViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventChangeOptionViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventDetailsCommentViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\EventDetailsListItemViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventDetailsOptionViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventDetailsParticipantViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventDetailsViewModel.cs" />
@@ -542,6 +546,7 @@
     <Compile Include="Presentation\WebViewModels\Events\EventOptionsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventOptionViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventTypeViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\ExtensiveEventDetailsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\MyEventsOptionsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\NewEventOptionViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\ShareEventViewModel.cs" />
