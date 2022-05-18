@@ -203,7 +203,7 @@
   "selectDate": "Select date",
   "dateFilterInvalidRange": "Start date must be before end date",
   "dateFilterMaxRangeError": "Maximum date range is 100 days",
-  "viewAllEventsInformation": "View information about events",
+  "viewAllEventsInformation": "View additional information",
   "filterEvents": "Search events...",
   "tableTitle": "Title",
   "tableStartDate": "Start date",
@@ -213,5 +213,15 @@
   "tableParticipants": "Participants",
   "extensiveDetailsTitle": "Event details",
   "eventTypesDropdownButtonTitle": "Selected {{one}} types",
-  "eventOfficesDropdownButtonTitle":"Selected {{one}} offices"
+  "eventOfficesDropdownButtonTitle":"Selected {{one}} offices",
+  "eventKudosDropdownButtonTitle": "Select {{one}} kudos types",
+  "tableEmployee": "Employee",
+  "tablePosition": "Position",
+  "tableHireDate": "Hire date",
+  "tableManager": "Manager",
+  "tableConferences": "Visited conferences",
+  "tableQualification": "Qualification",
+  "tableProjects": "Projects",
+  "tableKudos": "Kudos",
+  "empty": "None"
 }

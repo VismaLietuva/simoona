@@ -213,5 +213,15 @@
   "tableParticipants": "Dalyviai",
   "extensiveDetailsTitle": "Renginio informacija",
   "eventTypesDropdownButtonTitle": "Pasirinkti {{one}} tipai",
-  "eventOfficesDropdownButtonTitle":"Pasirinkti {{one}} ofisai"
+  "eventOfficesDropdownButtonTitle":"Pasirinkti {{one}} ofisai",
+  "eventKudosDropdownButtonTitle": "Pasirinkti {{one}} kudos tipai",
+  "tableEmployee": "Darbuotojas",
+  "tablePosition": "Pozicija",
+  "tableHireDate": "Įsidarbinimo data",
+  "tableManager": "Vadovas",
+  "tableConferences": "Konferencijos",
+  "tableQualification": "Kvalifikacija",
+  "tableProjects": "Projektai",
+  "tableKudos": "Kudos",
+  "empty": "Nėra"
 }
