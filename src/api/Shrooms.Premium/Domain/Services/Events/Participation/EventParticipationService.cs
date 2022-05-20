@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.DataTransferObjects.Users;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -71,6 +72,9 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             var @event = await _eventsDbSet
                 .Include(e => e.EventParticipants)
                 .Include(e => e.EventOptions)
+                .Include(e => e.EventType)
+                .Include(e => e.EventParticipants.Select(participant => participant.ApplicationUser))
+                .Include(e => e.EventParticipants.Select(participant => participant.ApplicationUser.Manager))
                 .SingleOrDefaultAsync(e => e.Id == eventId && e.OrganizationId == userOrg.OrganizationId);
 
             _eventValidationService.CheckIfEventExists(@event);
@@ -90,16 +94,24 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
             await _uow.SaveChangesAsync(false);
 
-            foreach (var participant in @event.EventParticipants.ToList())
+            if (!@event.EventType.SendEmailToManager)
             {
-                await JoinOrLeaveEventWallAsync(@event.ResponsibleUserId, participant.ApplicationUserId, @event.WallId, userOrg);
-                _eventParticipantsDbSet.Remove(participant);
+                await RemoveParticipantsAsync(@event, userOrg);
+
+                _asyncRunner.Run<IEventNotificationService>(async notifier => await notifier.NotifyRemovedEventParticipantsAsync(@event.Name, @event.Id, userOrg.OrganizationId, users),
+                    _uow.ConnectionName);
+
+                return;
             }
 
-            await _uow.SaveChangesAsync(false);
+            var userEventAttendStatusDto = MapEventToUserEventAttendStatusChangeEmailDto(@event).ToList();
+
+            await RemoveParticipantsAsync(@event, userOrg);
 
             _asyncRunner.Run<IEventNotificationService>(async notifier => await notifier.NotifyRemovedEventParticipantsAsync(@event.Name, @event.Id, userOrg.OrganizationId, users),
                 _uow.ConnectionName);
+
+            NotifyManagers(userEventAttendStatusDto);
         }
 
         public async Task AddColleagueAsync(EventJoinDto joinDto)
@@ -163,6 +175,11 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 await _uow.SaveChangesAsync(false);
 
                 _asyncRunner.Run<IEventCalendarService>(async notifier => await notifier.SendInvitationAsync(@event, joinDto.ParticipantIds, joinDto.OrganizationId), _uow.ConnectionName);
+
+                if (@event.SendEmailToManager)
+                {
+                    await NotifyManagersAsync(joinDto, @event);
+                }
             }
             finally
             {
@@ -276,25 +293,49 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             var @event = participant.Event;
 
             var isAdmin = await _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Event);
+            
             _eventValidationService.CheckIfUserHasPermission(userOrg.UserId, @event.ResponsibleUserId, isAdmin);
             _eventValidationService.CheckIfEventEndDateIsExpired(@event.EndDate);
 
-            await RemoveParticipantAsync(userId, participant);
+            if (!@event.EventType.SendEmailToManager)
+            {
+                await RemoveParticipantAsync(participant, @event, userOrg);
 
-            await JoinOrLeaveEventWallAsync(@event.ResponsibleUserId, userId, @event.WallId, userOrg);
+                _asyncRunner.Run<IEventNotificationService>(async notifier => await notifier.NotifyRemovedEventParticipantsAsync(@event.Name, @event.Id, userOrg.OrganizationId, new[] { userId }),
+                    _uow.ConnectionName);
+
+                return;
+            }
+
+            var userEventAttendStatusDto = MapToUserEventAttendStatusChangeEmailDto(participant, @event);
+
+            await RemoveParticipantAsync(participant, @event, userOrg);
 
             _asyncRunner.Run<IEventNotificationService>(async notifier => await notifier.NotifyRemovedEventParticipantsAsync(@event.Name, @event.Id, userOrg.OrganizationId, new[] { userId }),
                 _uow.ConnectionName);
+
+            await NotifyManagerAsync(userEventAttendStatusDto);
         }
 
         public async Task LeaveAsync(Guid eventId, UserAndOrganizationDto userOrg, string leaveComment)
         {
             var participant = await GetParticipantAsync(eventId, userOrg.OrganizationId, userOrg.UserId);
+            var @event = participant.Event;
+
             _eventValidationService.CheckIfRegistrationDeadlineIsExpired(participant.Event.RegistrationDeadline);
 
-            await JoinOrLeaveEventWallAsync(participant.Event.ResponsibleUserId, userOrg.UserId, participant.Event.WallId, userOrg);
+            if (!participant.Event.EventType.SendEmailToManager)
+            {
+                await RemoveParticipantAsync(participant, @event, userOrg);
 
-            await RemoveParticipantAsync(userOrg.UserId, participant);
+                return;
+            }
+
+            var userEventAttendStatusDto = MapToUserEventAttendStatusChangeEmailDto(participant, @event);
+            
+            await RemoveParticipantAsync(participant, @event, userOrg);
+
+            await NotifyManagerAsync(userEventAttendStatusDto);
         }
 
         public async Task<IEnumerable<EventParticipantDto>> GetEventParticipantsAsync(Guid eventId, UserAndOrganizationDto userAndOrg)
@@ -359,6 +400,57 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             await _uow.SaveChangesAsync(changeOptionsDto.UserId);
         }
 
+        private void NotifyManagers(IEnumerable<UserEventAttendStatusChangeEmailDto> userEventAttendStatusChangeEmailDtos)
+        {
+            foreach (var user in userEventAttendStatusChangeEmailDtos)
+            {
+                _asyncRunner.Run<IEventNotificationService>(async notifier => await notifier.NotifyManagerAboutEventAsync(user, false),
+                    _uow.ConnectionName);
+            }
+        }
+
+        private async Task NotifyManagersAsync(EventJoinDto joinDto, EventJoinValidationDto eventJoinValidationDto)
+        {
+            var users = await _usersDbSet
+                .Where(user => joinDto.ParticipantIds
+                .Contains(user.Id) && joinDto.OrganizationId == user.OrganizationId)
+                .ToListAsync();
+
+            var managerIds = users.Select(user => user.ManagerId).ToHashSet();
+
+            var managers = await _usersDbSet
+                .Where(manager => managerIds.Contains(manager.Id))
+                .ToDictionaryAsync(manager => manager.Id, manager => manager.Email);
+
+            foreach (var user in users)
+            {
+                if (!managers.TryGetValue(user.ManagerId, out var managerEmail))
+                {
+                    continue;
+                }
+
+                var userAttendStatusDto = MapToUserEventAttendStatusChangeEmailDto(user, eventJoinValidationDto, managerEmail);
+                
+                _asyncRunner.Run<IEventNotificationService>(
+                    async notifier => await notifier.NotifyManagerAboutEventAsync(userAttendStatusDto, true),
+                    _uow.ConnectionName);
+            }
+        }
+
+        private async Task NotifyManagerAsync(UserEventAttendStatusChangeEmailDto userAttendStatusDto)
+        {
+            var managerEmail = await _usersDbSet
+                .Where(user => user.Id == userAttendStatusDto.ManagerId)
+                .Select(user => user.Email)
+                .FirstOrDefaultAsync();
+
+            userAttendStatusDto.ManagerEmail = managerEmail;
+
+            _asyncRunner.Run<IEventNotificationService>(
+                async notifier => await notifier.NotifyManagerAboutEventAsync(userAttendStatusDto, false),
+                _uow.ConnectionName);
+        }
+
         private async Task JoinOrLeaveEventWallAsync(string responsibleUserId, string wallParticipantId, int wallId, UserAndOrganizationDto userOrg)
         {
             if (responsibleUserId != wallParticipantId)
@@ -367,13 +459,30 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             }
         }
 
-        private async Task RemoveParticipantAsync(string userId, EventParticipant participant)
+        private async Task RemoveParticipantAsync(EventParticipant participant, Event @event, UserAndOrganizationDto userOrg)
         {
             var timestamp = DateTime.UtcNow;
-            participant.UpdateMetadata(userId, timestamp);
+
+            participant.UpdateMetadata(userOrg.UserId, timestamp);
+
             await _uow.SaveChangesAsync(false);
 
+            await JoinOrLeaveEventWallAsync(@event.ResponsibleUserId, participant.ApplicationUserId, @event.WallId, userOrg);
+
             _eventParticipantsDbSet.Remove(participant);
+
+            await _uow.SaveChangesAsync(false);
+        }
+
+        private async Task RemoveParticipantsAsync(Event @event, UserAndOrganizationDto userOrg)
+        {
+            foreach (var participant in @event.EventParticipants.ToList())
+            {
+                await JoinOrLeaveEventWallAsync(@event.ResponsibleUserId, participant.ApplicationUserId, @event.WallId, userOrg);
+                
+                _eventParticipantsDbSet.Remove(participant);
+            }
+
             await _uow.SaveChangesAsync(false);
         }
 
@@ -381,7 +490,9 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
         {
             var participant = await _eventParticipantsDbSet
                 .Include(p => p.Event)
+                .Include(p => p.Event.EventType)
                 .Include(p => p.EventOptions)
+                .Include(p => p.ApplicationUser)
                 .SingleOrDefaultAsync(p => p.EventId == eventId &&
                                            p.Event.OrganizationId == userOrg &&
                                            p.ApplicationUserId == userId);
@@ -403,6 +514,56 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 LastName = string.IsNullOrEmpty(p.ApplicationUser.LastName)
                     ? BusinessLayerConstants.DeletedUserLastName
                     : p.ApplicationUser.LastName
+            });
+        }
+
+        private static UserEventAttendStatusChangeEmailDto 
+            MapToUserEventAttendStatusChangeEmailDto(ApplicationUser user, EventJoinValidationDto eventJoinValidationDto, string managerEmail)
+        {
+            return new UserEventAttendStatusChangeEmailDto
+            {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                ManagerEmail = managerEmail,
+                ManagerId = user.ManagerId,
+                EventName = eventJoinValidationDto.Name,
+                EventId = eventJoinValidationDto.Id,
+                OrganizationId = user.OrganizationId,
+                EventStartDate = eventJoinValidationDto.StartDate,
+                EventEndDate = eventJoinValidationDto.EndDate
+            };
+        }
+
+        private static UserEventAttendStatusChangeEmailDto MapToUserEventAttendStatusChangeEmailDto(EventParticipant participant, Event @event)
+        {
+            return new UserEventAttendStatusChangeEmailDto
+            {
+                FirstName = participant.ApplicationUser.FirstName,
+                LastName = participant.ApplicationUser.LastName,
+                Email = participant.ApplicationUser.Email,
+                OrganizationId = participant.ApplicationUser.OrganizationId,
+                EventName = @event.Name,
+                EventId = @event.Id,
+                EventStartDate = @event.StartDate,
+                EventEndDate = @event.EndDate,
+                ManagerId = participant.ApplicationUser.ManagerId
+            };
+        }
+
+        private static IEnumerable<UserEventAttendStatusChangeEmailDto> MapEventToUserEventAttendStatusChangeEmailDto(Event @event)
+        {
+            return @event.EventParticipants.Select(participant => new UserEventAttendStatusChangeEmailDto
+            {
+                FirstName = participant.ApplicationUser.FirstName,
+                LastName = participant.ApplicationUser.LastName,
+                Email = participant.ApplicationUser.Email,
+                OrganizationId = participant.ApplicationUser.OrganizationId,
+                EventName = @event.Name,
+                EventEndDate = @event.EndDate,
+                EventStartDate = @event.StartDate,
+                ManagerEmail = participant.ApplicationUser.Manager.Email,
+                ManagerId = participant.ApplicationUser.ManagerId
             });
         }
 
@@ -429,7 +590,8 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 Location = e.Place,
                 RegistrationDeadline = e.RegistrationDeadline,
                 ResponsibleUserId = e.ResponsibleUserId,
-                WallId = e.WallId
+                WallId = e.WallId,
+                SendEmailToManager = e.EventType.SendEmailToManager
             };
 
         private async Task ValidateSingleJoinAsync(EventJoinValidationDto validationDto, int orgId, string userId)

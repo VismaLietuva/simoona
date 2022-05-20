@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net.Mail;
 using Shrooms.Contracts.Constants;
+using Shrooms.Contracts.DataTransferObjects.Users;
 
 namespace Shrooms.Contracts.DataTransferObjects
 {

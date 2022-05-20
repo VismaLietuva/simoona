@@ -13,5 +13,7 @@
         public const string ServiceRequestComment = nameof(ServiceRequestComment);
         public const string ServiceRequest = nameof(ServiceRequest);
         public const string ServiceRequestUpdate = nameof(ServiceRequestUpdate);
+        public const string CoacheeJoinedEvent = nameof(CoacheeJoinedEvent);
+        public const string CoacheeLeftEvent = nameof(CoacheeLeftEvent);
     }
 }

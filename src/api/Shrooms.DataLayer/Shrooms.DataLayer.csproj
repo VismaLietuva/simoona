@@ -860,6 +860,10 @@
     <Compile Include="Migrations\202202070857174_AddedIsHiddenFromAllWallsFlagToWallModel.Designer.cs">
       <DependentUpon>202202070857174_AddedIsHiddenFromAllWallsFlagToWallModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202204291158023_AddedSendEmailToManagerPropertyToEventType.cs" />
+    <Compile Include="Migrations\202204291158023_AddedSendEmailToManagerPropertyToEventType.Designer.cs">
+      <DependentUpon>202204291158023_AddedSendEmailToManagerPropertyToEventType.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
@@ -1125,6 +1129,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201612191516299_AddEmailNotificationsEnabledColumnToWallMember.resx">
       <DependentUpon>201612191516299_AddEmailNotificationsEnabledColumnToWallMember.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201612211113315_AddTimeZoneToUser.resx">
       <DependentUpon>201612211113315_AddTimeZoneToUser.cs</DependentUpon>
@@ -1431,6 +1436,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202202070857174_AddedIsHiddenFromAllWallsFlagToWallModel.resx">
       <DependentUpon>202202070857174_AddedIsHiddenFromAllWallsFlagToWallModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202204291158023_AddedSendEmailToManagerPropertyToEventType.resx">
+      <DependentUpon>202204291158023_AddedSendEmailToManagerPropertyToEventType.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

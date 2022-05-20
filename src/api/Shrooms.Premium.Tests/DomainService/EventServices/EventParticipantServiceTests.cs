@@ -21,6 +21,7 @@ using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Domain.DomainExceptions.Event;
 using Shrooms.Premium.Domain.DomainServiceValidators.Events;
+using Shrooms.Premium.Domain.Services.Email.Event;
 using Shrooms.Premium.Domain.Services.Events.Participation;
 using Shrooms.Tests.Extensions;
 
@@ -42,6 +43,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         private EventValidationService _eventValidationService;
 
         private IWallService _wallService;
+
+        private IAsyncRunner _asyncRunner;
 
         [SetUp]
         public void TestInitializer()
@@ -67,7 +70,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             var roleService = Substitute.For<IRoleService>();
             MockRoleService(roleService);
             _wallService = Substitute.For<IWallService>();
-            var asyncRunner = Substitute.For<IAsyncRunner>();
+            _asyncRunner = Substitute.For<IAsyncRunner>();
 
             _eventParticipationService =
                 new EventParticipationService(
@@ -77,7 +80,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     permissionService,
                     _eventValidationServiceMock,
                     _wallService,
-                    asyncRunner);
+                    _asyncRunner);
         }
 
         [Test]
@@ -100,6 +103,32 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         }
 
         [Test]
+        public async Task Should_Successfully_Join_Event_Without_Options_When_Notifying_Managers()
+        {
+            // Arrange
+            var eventGuid = MockEventWithoutOptions(true);
+
+            MockUsers();
+
+            _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-03-28"));
+
+            var eventJoinDto = new EventJoinDto
+            {
+                ChosenOptions = new List<int>(),
+                ParticipantIds = new List<string> { "testUserId" },
+                EventId = eventGuid,
+                UserId = "testUserId",
+                OrganizationId = 2
+            };
+
+            // Act
+            await _eventParticipationService.JoinAsync(eventJoinDto);
+
+            // Assert
+            _eventParticipantsDbSet.Received(1).Add(Arg.Any<EventParticipant>());
+        }
+
+        [Test]
         public async Task Should_Successfully_Join_Event_With_Options()
         {
             var eventGuid = MockEventWithOptions();
@@ -115,6 +144,32 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             };
 
             await _eventParticipationService.JoinAsync(eventJoinDto);
+            _eventParticipantsDbSet.Received(1).Add(Arg.Is<EventParticipant>(x => x.EventOptions.Count == 1));
+        }
+
+        [Test]
+        public async Task Should_Successfully_Join_Event_With_Options_When_Notifying_Managers()
+        {
+            // Arrange
+            var eventGuid = MockEventWithOptions(true);
+
+            MockUsers();
+
+            _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-03-28"));
+
+            var eventJoinDto = new EventJoinDto
+            {
+                ChosenOptions = new List<int> { 1 },
+                ParticipantIds = new List<string> { "testUserId" },
+                EventId = eventGuid,
+                UserId = "testUserId",
+                OrganizationId = 2
+            };
+
+            // Act
+            await _eventParticipationService.JoinAsync(eventJoinDto);
+
+            // Assert
             _eventParticipantsDbSet.Received(1).Add(Arg.Is<EventParticipant>(x => x.EventOptions.Count == 1));
         }
 
@@ -501,6 +556,273 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             Assert.ThrowsAsync<EventException>(async () => await _eventParticipationService.UpdateSelectedOptionsAsync(dto), PremiumErrorCodes.EventUserNotParticipating);
         }
 
+        [Test]
+        public async Task Should_Send_Email_To_Manager_When_User_Successfully_Joined_Event_Without_Options()
+        {
+            // Arrange
+            var eventGuid = MockEventWithoutOptions(true);
+            MockUsers();
+
+            _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-03-28"));
+
+            var eventJoinDto = new EventJoinDto
+            {
+                ChosenOptions = new List<int>(),
+                ParticipantIds = new List<string> { "testUserId", "1" },
+                EventId = eventGuid,
+                UserId = "testUserId",
+                OrganizationId = 2
+            };
+
+            // Act
+            await _eventParticipationService.JoinAsync(eventJoinDto);
+
+            // Assert
+            _asyncRunner.Received(2).Run(Arg.Any<Func<IEventNotificationService, Task>>(), Arg.Any<string>());
+        }
+
+        [Test]
+        public async Task Should_Send_Email_To_Manager_When_User_Successfully_Joined_Event_With_Options()
+        {
+            // Arrange
+            var eventGuid = MockEventWithOptions(true);
+            
+            MockUsers();
+            
+            _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-03-28"));
+            
+            var eventJoinDto = new EventJoinDto
+            {
+                ChosenOptions = new List<int> { 1 },
+                ParticipantIds = new List<string> { "testUserId", "1" },
+                EventId = eventGuid,
+                UserId = "testUserId",
+                OrganizationId = 2
+            };
+
+            // Act
+            await _eventParticipationService.JoinAsync(eventJoinDto);
+
+            // Assert
+            _asyncRunner.Received(2).Run(Arg.Any<Func<IEventNotificationService, Task>>(), Arg.Any<string>());
+        }
+
+        [Test]
+        public async Task Should_Not_Send_Email_To_Manager_When_User_Joins_With_Options_And_Event_Type_Does_Not_Require_It()
+        {
+            // Arrange
+            var eventGuid = MockEventWithOptions(false);
+
+            MockUsers();
+
+            _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-03-28"));
+
+            var eventJoinDto = new EventJoinDto
+            {
+                ChosenOptions = new List<int> { 1 },
+                ParticipantIds = new List<string> { "testUserId", "1" },
+                EventId = eventGuid,
+                UserId = "testUserId",
+                OrganizationId = 2
+            };
+
+            // Act
+            await _eventParticipationService.JoinAsync(eventJoinDto);
+
+            // Assert
+            _asyncRunner.Received(0).Run(Arg.Any<Func<IEventNotificationService, Task>>(), Arg.Any<string>());
+        }
+
+        [Test]
+        public async Task Should_Not_Send_Email_To_Manager_When_User_Joins_Without_Options_And_Event_Type_Does_Not_Require_It()
+        {
+            // Arrange
+            var eventGuid = MockEventWithOptions(false);
+
+            MockUsers();
+
+            _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-03-28"));
+
+            var eventJoinDto = new EventJoinDto
+            {
+                ChosenOptions = new List<int> { 1 },
+                ParticipantIds = new List<string> { "testUserId", "1" },
+                EventId = eventGuid,
+                UserId = "testUserId",
+                OrganizationId = 2
+            };
+
+            // Act
+            await _eventParticipationService.JoinAsync(eventJoinDto);
+
+            // Assert
+            _asyncRunner.Received(0).Run(Arg.Any<Func<IEventNotificationService, Task>>(), Arg.Any<string>());
+        }
+
+        [Test]
+        public async Task Should_Send_Email_To_Manager_When_Multiple_Users_Are_Added_And_Successfully_Joined_Event()
+        {
+            // Arrange
+            var eventGuid = MockEventWithOptions(true);
+
+            MockUsers();
+
+            _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-03-28"));
+
+            var eventJoinDto = new EventJoinDto
+            {
+                ChosenOptions = new List<int> { 1 },
+                ParticipantIds = new List<string> { "testUserId", "1" },
+                EventId = eventGuid,
+                UserId = "testUserId",
+                OrganizationId = 2
+            };
+
+            // Act
+            await _eventParticipationService.AddColleagueAsync(eventJoinDto);
+
+            // Assert
+            _asyncRunner.Received(2).Run(Arg.Any<Func<IEventNotificationService, Task>>(), Arg.Any<string>());
+        }
+
+        [Test]
+        public async Task Should_Not_Send_Email_To_Manager_When_Multiple_Users_Are_Added_And_Event_Type_Does_Not_Require_It()
+        {
+            // Arrange
+            var eventGuid = MockEventWithOptions(false);
+
+            MockUsers();
+
+            _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-03-28"));
+
+            var eventJoinDto = new EventJoinDto
+            {
+                ChosenOptions = new List<int> { 1 },
+                ParticipantIds = new List<string> { "testUserId", "1" },
+                EventId = eventGuid,
+                UserId = "testUserId",
+                OrganizationId = 2
+            };
+
+            // Act
+            await _eventParticipationService.AddColleagueAsync(eventJoinDto);
+
+            // Assert
+            _asyncRunner.Received(0).Run(Arg.Any<Func<IEventNotificationService, Task>>(), Arg.Any<string>());
+        }
+
+        [Test]
+        public async Task Should_Send_Email_To_Manager_When_Event_Participants_Are_Resetted()
+        {
+            // Arrange
+            var eventId = MockResetAttendees(true);
+            var extraCallForNotifyingUsersAboutBeingRemoved = 1;
+            var user = new UserAndOrganizationDto
+            {
+                OrganizationId = 2,
+                UserId = "user1"
+            };
+
+            // Act
+            await _eventParticipationService.ResetAttendeesAsync(eventId, user);
+
+
+            // Assert
+            _asyncRunner.Received(3 + extraCallForNotifyingUsersAboutBeingRemoved)
+                .Run(Arg.Any<Func<IEventNotificationService, Task>>(), Arg.Any<string>());
+        }
+
+        [Test]
+        public async Task Should_Not_Send_Email_To_Manager_When_Event_Participants_Are_Resetted_And_Event_Type_Does_Not_Require_It()
+        {
+            // Arrange
+            var eventId = MockResetAttendees(false);
+            var extraCallForNotifyingUsersAboutBeingRemoved = 1;
+
+            MockUsers();
+
+            var user = new UserAndOrganizationDto
+            {
+                OrganizationId = 2,
+                UserId = "user1"
+            };
+
+            // Act
+            await _eventParticipationService.ResetAttendeesAsync(eventId, user);
+
+
+            // Assert
+            _asyncRunner.Received(extraCallForNotifyingUsersAboutBeingRemoved)
+                .Run(Arg.Any<Func<IEventNotificationService, Task>>(), Arg.Any<string>());
+        }
+
+        [Test]
+        public async Task Should_Send_Email_To_Manager_When_Event_Participant_Is_Expelled()
+        {
+            // Arrange
+            var eventId = MockRemoveParticipant(true);
+            var extraCallForNotifyingUsersAboutBeingRemoved = 1;
+
+            MockUsers();
+
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = 2,
+                UserId = "user"
+            };
+
+            // Act
+            await _eventParticipationService.ExpelAsync(eventId, userOrg, "user2");
+
+            // Assert
+            _asyncRunner.Received(1 + extraCallForNotifyingUsersAboutBeingRemoved)
+                .Run(Arg.Any<Func<IEventNotificationService, Task>>(), Arg.Any<string>());
+        }
+
+        [Test]
+        public async Task Should_Not_Send_Email_To_Manager_When_Event_Participant_Is_Expelled_And_Event_Type_Does_Not_Require_It()
+        {
+            // Arrange
+            var eventId = MockRemoveParticipant(false);
+            var extraCallForNotifyingUsersAboutBeingRemoved = 1;
+
+            MockUsers();
+
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = 2,
+                UserId = "user"
+            };
+
+            // Act
+            await _eventParticipationService.ExpelAsync(eventId, userOrg, "user2");
+
+            // Assert
+            _asyncRunner.Received(extraCallForNotifyingUsersAboutBeingRemoved)
+                .Run(Arg.Any<Func<IEventNotificationService, Task>>(), Arg.Any<string>());
+        }
+
+        [Test]
+        public async Task Should_Expel_Event_Participant_When_Notifying_Manager()
+        {
+            // Arrange
+            var eventId = MockRemoveParticipant(true);
+
+            MockUsers();
+
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = 2,
+                UserId = "user"
+            };
+
+            // Act
+            await _eventParticipationService.ExpelAsync(eventId, userOrg, "user2");
+
+            // Assert
+            _eventParticipantsDbSet.Received(1).Remove(Arg.Any<EventParticipant>());
+        }
+
         #region Mocks
 
         private static void MockRoleService(IRoleService roleService)
@@ -678,7 +1000,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             return eventId;
         }
 
-        private Guid MockResetAttendees()
+        // probably will need to use this
+        private Guid MockResetAttendees(bool sendEmailToManager = false)
         {
             var eventId = Guid.NewGuid();
 
@@ -687,7 +1010,11 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 Name = "test",
                 Id = eventId,
                 RegistrationDeadline = DateTime.Parse("2016-06-20"),
-                OrganizationId = 2
+                OrganizationId = 2,
+                EventType = new EventType
+                {
+                    SendEmailToManager = sendEmailToManager
+                },
             };
 
             var option1 = new EventOption
@@ -720,7 +1047,17 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     Event = @event,
                     EventOptions = new List<EventOption> { option1 },
                     EventId = eventId,
-                    ApplicationUserId = "user1"
+                    ApplicationUserId = "user1",
+                    ApplicationUser = new ApplicationUser
+                    {
+                        Id = "user1",
+                        ManagerId = "testUserId",
+                        Manager = new ApplicationUser
+                        {
+                            Email = "email",
+                            Id = "testUserId"
+                        }
+                    }
                 },
                 new EventParticipant
                 {
@@ -728,7 +1065,17 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     Event = @event,
                     EventOptions = new List<EventOption> { option2 },
                     EventId = eventId,
-                    ApplicationUserId = "user2"
+                    ApplicationUserId = "user2",
+                    ApplicationUser = new ApplicationUser
+                    {
+                        Id = "user2",
+                        ManagerId = "testUserId",
+                        Manager = new ApplicationUser
+                        {
+                            Email = "email",
+                            Id = "testUserId"
+                        }
+                    }
                 },
                 new EventParticipant
                 {
@@ -736,7 +1083,17 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     Event = @event,
                     EventOptions = new List<EventOption> { option3 },
                     EventId = eventId,
-                    ApplicationUserId = "user3"
+                    ApplicationUserId = "user3",
+                    ApplicationUser = new ApplicationUser
+                    {
+                        Id = "user3",
+                        ManagerId = "testUserId",
+                        Manager = new ApplicationUser
+                        {
+                            Email = "email",
+                            Id = "testUserId"
+                        }
+                    }
                 }
             };
             @event.EventOptions = new List<EventOption> { option1, option2, option3 };
@@ -746,6 +1103,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             return eventId;
         }
 
+        // possibly might need to use this
         private Guid MockLeaveEvent()
         {
             _eventValidationServiceMock.When(x => x.CheckIfParticipantExists(null)).Do(_ => throw new EventException("Exception"));
@@ -755,7 +1113,11 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 Name = "test",
                 Id = eventId,
                 RegistrationDeadline = DateTime.Parse("2016-06-20"),
-                OrganizationId = 2
+                OrganizationId = 2,
+                EventType = new EventType
+                {
+                    SendEmailToManager = false,
+                }
             };
 
             var eventOptions = new List<EventOption>
@@ -803,7 +1165,11 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 RegistrationDeadline = DateTime.Parse("2016-06-20"),
                 EndDate = DateTime.Parse("2015-01-01"),
                 OrganizationId = 2,
-                ResponsibleUserId = "user"
+                ResponsibleUserId = "user",
+                EventType = new EventType
+                {
+                    SendEmailToManager = false,
+                }
             };
 
             var participants = new List<EventParticipant>
@@ -832,7 +1198,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             return eventId;
         }
 
-        private Guid MockRemoveParticipant()
+        private Guid MockRemoveParticipant(bool sendEmailToManager = false)
         {
             var eventId = Guid.NewGuid();
             var @event = new Event
@@ -841,7 +1207,11 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 Id = eventId,
                 RegistrationDeadline = DateTime.Parse("2016-06-20"),
                 OrganizationId = 2,
-                ResponsibleUserId = "user"
+                ResponsibleUserId = "user",
+                EventType = new EventType
+                {
+                    SendEmailToManager = sendEmailToManager,
+                }
             };
 
             var participants = new List<EventParticipant>
@@ -853,7 +1223,12 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     EventOptions = new List<EventOption>(),
                     EventId = eventId,
                     ApplicationUserId = "user",
-                    AttendStatus = 1
+                    AttendStatus = 1,
+                    ApplicationUser = new ApplicationUser
+                    {
+                        ManagerId = "testUserId",
+                        Email = "testUserId"
+                    }
                 },
                 new EventParticipant
                 {
@@ -862,7 +1237,12 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     EventOptions = new List<EventOption>(),
                     EventId = eventId,
                     ApplicationUserId = "user2",
-                    AttendStatus = 1
+                    AttendStatus = 1,
+                    ApplicationUser = new ApplicationUser
+                    {
+                        ManagerId = "testUserId",
+                        Email = "testUserId"
+                    }
                 }
             };
 
@@ -870,7 +1250,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             return eventId;
         }
 
-        private Guid MockEventWithoutOptions()
+        private Guid MockEventWithoutOptions(bool sendEmailToManager = false)
         {
             var guid = Guid.NewGuid();
             var @event = new List<Event>
@@ -890,7 +1270,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     {
                         Name = "test type",
                         IsSingleJoin = false,
-                        Id = 1
+                        Id = 1,
+                        SendEmailToManager = sendEmailToManager
                     },
                     EventParticipants = new List<EventParticipant>(),
                     EventTypeId = 1
@@ -908,7 +1289,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     EventOptions = new List<EventOption>(),
                     EventId = defaultEvent.Id,
                     ApplicationUserId = "user",
-                    AttendStatus = 1
+                    AttendStatus = 1,
                 },
                 new EventParticipant
                 {
@@ -926,7 +1307,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             return guid;
         }
 
-        private Guid MockEventWithOptions()
+        private Guid MockEventWithOptions(bool sendEmailToManager = false)
         {
             var guid = Guid.NewGuid();
 
@@ -974,7 +1355,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     {
                         Name = "test type",
                         IsSingleJoin = false,
-                        Id = 1
+                        Id = 1,
+                        SendEmailToManager = sendEmailToManager
                     },
                     EventTypeId = 1
                 }
@@ -991,7 +1373,13 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     EventOptions = new List<EventOption>(),
                     EventId = defaultEvent.Id,
                     ApplicationUserId = "user",
-                    AttendStatus = 1
+                    ApplicationUser = new ApplicationUser
+                    {
+                        Id = "user",
+                        Email = "user",
+                        ManagerId = "user2"
+                    },
+                    AttendStatus = 1,
                 },
                 new EventParticipant
                 {
@@ -1000,6 +1388,12 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     EventOptions = new List<EventOption>(),
                     EventId = defaultEvent.Id,
                     ApplicationUserId = "user2",
+                    ApplicationUser = new ApplicationUser
+                    {
+                        Id = "user2",
+                        Email = "user2",
+                        ManagerId = "user",
+                    },
                     AttendStatus = 1
                 }
             };
@@ -1021,12 +1415,16 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 new ApplicationUser
                 {
                     Id = "1",
-                    OrganizationId = 2
+                    OrganizationId = 2,
+                    ManagerId = "testUserId",
+                    Email = "1@1.com"
                 },
                 new ApplicationUser
                 {
                     Id = "testUserId",
-                    OrganizationId = 2
+                    OrganizationId = 2,
+                    ManagerId = "1",
+                    Email = "testUserId@testUserId.com"
                 }
             };
             _usersDbSet.SetDbSetDataForAsync(types.AsQueryable());
