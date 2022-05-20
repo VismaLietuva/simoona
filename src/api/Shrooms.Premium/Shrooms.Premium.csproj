@@ -272,8 +272,8 @@
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\BookReminderEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\BookReportEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\BookTakenEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\EventCoacheeToCoachLeaveEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\EventCoacheeToCoachJoinEmailTemplateViewModel.cs" />
+    <Compile Include="DataTransferObjects\EmailTemplateViewModels\CoacheeLeftEventEmailTemplateViewModel.cs" />
+    <Compile Include="DataTransferObjects\EmailTemplateViewModels\CoacheeJoinedEventEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\CommitteeSuggestionEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\EventJoinRemindEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\EventParticipantExpelledEmailTemplateViewModel.cs" />
