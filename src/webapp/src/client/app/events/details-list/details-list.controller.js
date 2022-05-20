@@ -1,14 +1,14 @@
 (function () {
-    "use strict";
+    'use strict';
     angular
-        .module("simoonaApp.Events")
-        .controller("eventDetailsListController", eventDetailsListController);
+        .module('simoonaApp.Events')
+        .controller('eventDetailsListController', eventDetailsListController);
 
     eventDetailsListController.$inject = [
-        "authService",
-        "notifySrv",
-        "eventRepository",
-        "$state",
+        'authService',
+        'notifySrv',
+        'eventRepository',
+        '$state',
     ];
 
     function eventDetailsListController(
@@ -46,7 +46,7 @@
                     vm.isLoadingControls = false;
                 },
                 function () {
-                    notifySrv.error("errorCodeMessages.messageError");
+                    notifySrv.error('errorCodeMessages.messageError');
                 }
             );
         }
@@ -55,7 +55,7 @@
             vm.isLoadingEvents = true;
             eventRepository
                 .getEventsByTitle(
-                    vm.filterText || "",
+                    vm.filterText || '',
                     vm.page,
                     vm.filter.appliedEventTypes,
                     vm.filter.appliedOfficeTypes
@@ -66,7 +66,7 @@
                         vm.isLoadingEvents = false;
                     },
                     function () {
-                        notifySrv.error("errorCodeMessages.messageError");
+                        notifySrv.error('errorCodeMessages.messageError');
                     }
                 );
         }
@@ -79,7 +79,7 @@
                     vm.isLoadingControls = false;
                 },
                 function () {
-                    notifySrv.error("errorCodeMessages.messageError");
+                    notifySrv.error('errorCodeMessages.messageError');
                 }
             );
         }
@@ -95,20 +95,19 @@
         }
 
         function viewDetails(id) {
-            $state.go("Root.WithOrg.Client.Events.Details.Event", { id: id });
+            $state.go('Root.WithOrg.Client.Events.Details.Event', { id: id });
         }
 
         function eventTypesChange(appliedEventTypes) {
-            loadEventsWithFilter(appliedEventTypes, "appliedEventTypes");
+            loadEventsWithFilter(appliedEventTypes, 'appliedEventTypes');
         }
 
         function officeTypesChange(appliedOfficeTypes) {
-            loadEventsWithFilter(appliedOfficeTypes, "appliedOfficeTypes");
+            loadEventsWithFilter(appliedOfficeTypes, 'appliedOfficeTypes');
         }
 
         function loadEventsWithFilter(filter, filterName) {
             vm.page = 1;
-            vm.filterText = "";
 
             vm.filter = {
                 ...vm.filter,
