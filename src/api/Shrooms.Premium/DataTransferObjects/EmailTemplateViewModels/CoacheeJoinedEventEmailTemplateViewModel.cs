@@ -1,9 +1,10 @@
-﻿using Shrooms.Contracts.DataTransferObjects;
+﻿using System;
+using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Users;
 
 namespace Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels
 {
-    public class EventCoacheeToCoachLeaveEmailTemplateViewModel : BaseEmailTemplateViewModel
+    public class CoacheeJoinedEventEmailTemplateViewModel : BaseEmailTemplateViewModel
     {
         public string CoacheeFullName { get; set; }
 
@@ -11,7 +12,11 @@ namespace Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels
 
         public string EventUrl { get; set; }
 
-        public EventCoacheeToCoachLeaveEmailTemplateViewModel(
+        public DateTime EventStartDate { get; set; }
+
+        public DateTime EventEndDate { get; set; }
+
+        public CoacheeJoinedEventEmailTemplateViewModel(
             string userNotificationSettingsUrl,
             UserEventAttendStatusChangeEmailDto eventAttendStatusDto,
             string eventUrl)
@@ -19,6 +24,8 @@ namespace Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels
         {
             CoacheeFullName = eventAttendStatusDto.FullName;
             EventName = eventAttendStatusDto.EventName;
+            EventStartDate = eventAttendStatusDto.EventStartDate;
+            EventEndDate = eventAttendStatusDto.EventEndDate;
             EventUrl = eventUrl;
         }
     }

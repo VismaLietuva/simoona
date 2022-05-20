@@ -421,7 +421,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             var managers = await _usersDbSet
                 .Where(manager => managerIds.Contains(manager.Id))
                 .ToDictionaryAsync(manager => manager.Id, manager => manager.Email);
-;
+
             foreach (var user in users)
             {
                 if (!managers.TryGetValue(user.ManagerId, out var managerEmail))

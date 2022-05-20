@@ -88,7 +88,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
         {
             if (!isJoiningEvent)
             {
-                var emailTemplateLeaveViewModel = new EventCoacheeToCoachLeaveEmailTemplateViewModel(
+                var emailTemplateLeaveViewModel = new CoacheeLeftEventEmailTemplateViewModel(
                     userNotificationSettingsUrl,
                     userAttendStatusDto,
                     eventUrl);
@@ -105,7 +105,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                     emailLeaveBody);
             }
 
-            var emailTemplateJoinViewModel = new EventCoacheeToCoachJoinEmailTemplateViewModel(
+            var emailTemplateJoinViewModel = new CoacheeJoinedEventEmailTemplateViewModel(
                 userNotificationSettingsUrl,
                 userAttendStatusDto,
                 eventUrl);
