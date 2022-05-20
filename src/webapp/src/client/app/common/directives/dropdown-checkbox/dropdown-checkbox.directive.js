@@ -13,7 +13,8 @@
             scope: {
                 types: '=',
                 onValueChange: '&',
-                translation: '@'
+                translation: '@',
+                isExpanded: '='
             },
             controller: dropdownCheckboxController,
             controllerAs: 'vm',

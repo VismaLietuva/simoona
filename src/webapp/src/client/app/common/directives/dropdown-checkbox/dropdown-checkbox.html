@@ -1,14 +1,21 @@
 <div class="dropdown">
-    <button class="btn btn-default dropdown-toggle checkbox-menu-btn" type="button"
-        data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-        <span translate="{{vm.translation}}" translate-values="{ one: vm.appliedTypes.size }"></span>
-        <span class="caret"></span>
+    <button class="btn btn-default checkbox-menu-btn" type="button" ng-click="vm.isExpanded = !vm.isExpanded"
+        ng-blur="vm.isExpanded = false;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+
+        <span class="checkbox-menu-btn-text" translate="{{vm.translation}}"
+            translate-values="{ one: vm.appliedTypes.size }">
+        </span>
+
+        <span class="event-participant-heading-toggle expand-button-toggle glyphicon"
+            ng-class="{'glyphicon-chevron-up': vm.isExpanded, 'glyphicon-chevron-down': !vm.isExpanded}">
+        </span>
     </button>
 
     <ul class="dropdown-menu checkbox-menu allow-focus" ng-click="$event.stopPropagation()">
-        <li ng-repeat="type in vm.types" ng-class="{ 'active' : vm.isTypeApplied(type)}">
+        <li ng-repeat="type in vm.types" ng-class="{'active' : vm.isTypeApplied(type)}">
             <label>
-                <input type="checkbox" ng-click="vm.toggleType(type)"> {{type.name}}
+                <input type="checkbox" ng-click="vm.toggleType(type)">
+                {{type.name}}
             </label>
         </li>
     </ul>
