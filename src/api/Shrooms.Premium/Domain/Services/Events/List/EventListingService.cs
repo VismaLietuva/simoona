@@ -88,20 +88,21 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             var allOffices = await _officeDbSet
                 .ToDictionaryAsync(office => office.Id, office => office.Name);
 
+            var officesCount = allOffices.Count;
+
             var typeIdsLength = args.TypeIds.Length;
             var officeIdsLength = args.OfficeIds.Length;
-
-            var officeIds = string.Join(" ", args.OfficeIds);
 
             var events = await _eventsDbSet
                 .Include(e => e.EventParticipants)
                 .Include(e => e.EventType)
-                .Where(e => e.OrganizationId == userAndOrganization.OrganizationId)
-                .Where(e => eventTitle == null || e.Name.Contains(eventTitle))
+                .Where(e => (e.OrganizationId == userAndOrganization.OrganizationId) &&
+                            (eventTitle == null || e.Name.Contains(eventTitle)) &&
+                            (typeIdsLength == 0 || args.TypeIds.Contains(e.EventTypeId)) &&
+                            (officeIdsLength == 0 || args.OfficeIds.Any(c => e.Offices.Contains(c))))
                 //.Where(e => e.StartDate > DateTime.UtcNow) // TODO: remove comment before PR
-                .Where(e => typeIdsLength == 0 || args.TypeIds.Contains(e.EventTypeId))
-                .Where(e => officeIdsLength == 0 || args.OfficeIds.Any(c => e.Offices.Contains(c)))
                 .OrderByDescending(e => e.StartDate)
+                .ThenByDescending(e => e.Name)
                 .Select(e => new EventDetailsListItemDto
                 {
                     Id = e.Id,
@@ -112,6 +113,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                     MaxParticipants = e.MaxParticipants,
                     ParticipantsCount = e.EventParticipants.Count,
                     Offices = e.Offices,
+                    IsForAllOffices = officesCount == e.Offices.Length
                 })
                 .ToPagedListAsync(args.Page, args.PageSize);
 
@@ -218,11 +220,6 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             }
 
             return x => x.EventTypeId == typeId;
-        }
-
-        private static Expression<Func<Event, bool>> EventTypesFilter(int[] types)
-        {
-            return x => types.Contains(x.EventTypeId);
         }
 
         private static Expression<Func<Event, bool>> EventOfficeFilter(string office)
