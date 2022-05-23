@@ -24,6 +24,8 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
 
         public DateTime EndDate { get; set; }
 
+        public bool IsForAllOffices { get; set; }
+
         public IEnumerable<string> OfficeIds
         {
             get => Offices == null ? null : JsonConvert.DeserializeObject<string[]>(Offices);

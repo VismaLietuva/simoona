@@ -17,6 +17,8 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
 
         public int ParticipantsCount { get; set; }
 
+        public bool IsForAllOffices { get; set; }
+
         public DateTime StartDate { get; set; }
 
         public DateTime EndDate { get; set; }
