@@ -569,9 +569,9 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             }
         }
 
-        // TODO: add auth
         [HttpGet]
         [Route("GetEventsByTitle")]
+        [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
         public async Task<IHttpActionResult> GetEventsByTitle(string searchString, [FromUri] int[] typeIds, [FromUri] string[] officeIds, int page = 1, int pageSize = WebApiConstants.DefaultPageSize)
         {
             var args = new EventsListingFilterArgs
