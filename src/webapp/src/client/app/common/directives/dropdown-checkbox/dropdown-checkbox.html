@@ -1,22 +1,23 @@
-<div class="dropdown">
-    <button class="btn btn-default checkbox-menu-btn" type="button" ng-click="vm.isExpanded = !vm.isExpanded"
-        ng-blur="vm.isExpanded = false;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+<div class="checkbox-dropdown">
+    <button class="btn btn-default" type="button" ng-click="vm.isExpanded = !vm.isExpanded;"
+        data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 
-        <span class="checkbox-menu-btn-text" translate="{{vm.translation}}"
+        <span class="checkbox-menu-text" translate="{{vm.translation}}"
             translate-values="{ one: vm.appliedTypes.size }">
         </span>
 
-        <span class="event-participant-heading-toggle expand-button-toggle glyphicon"
+        <span class="expand-button-toggle glyphicon"
             ng-class="{'glyphicon-chevron-up': vm.isExpanded, 'glyphicon-chevron-down': !vm.isExpanded}">
         </span>
     </button>
-
-    <ul class="dropdown-menu checkbox-menu allow-focus" ng-click="$event.stopPropagation()">
-        <li ng-repeat="type in vm.types" ng-class="{'active' : vm.isTypeApplied(type)}">
-            <label>
-                <input type="checkbox" ng-click="vm.toggleType(type)">
-                {{type.name}}
-            </label>
-        </li>
-    </ul>
+    <div ng-mouseleave="vm.isExpanded = false;">
+        <ul class="checkbox-menu allow-focus" ng-if="vm.isExpanded">
+            <li ng-repeat="type in vm.types track by $index" ng-class="{ 'active' : vm.isTypeApplied(type) }">
+                <label>
+                    <input type="checkbox" ng-model="vm.appliedTypes[$index]" ng-click="vm.toggleType(type)">
+                    <span>{{type.name}}</span>
+                </label>
+            </li>
+        </ul>
+    </div>
 </div>
