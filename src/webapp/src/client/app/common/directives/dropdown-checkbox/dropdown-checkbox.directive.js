@@ -32,7 +32,6 @@
         vm.toggleType = toggleType;
         vm.isTypeApplied = isTypeApplied;
 
-
         function isTypeApplied(type) {
             return vm.appliedTypes.has(type.id);
         }
@@ -41,12 +40,12 @@
             if(vm.appliedTypes.has(type.id)) {
                 vm.appliedTypes.delete(type.id);
             } else {
-                vm.appliedTypes.set(type.id, true);
+                vm.appliedTypes.set(type.id, type.name);
             }
 
             // Send to consumer current selected types
             vm.onValueChange({
-                types: [...vm.appliedTypes.keys()]
+                types: [...vm.appliedTypes]
             });
         }
     }
