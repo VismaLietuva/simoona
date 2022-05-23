@@ -1581,19 +1581,33 @@ a.disabled.btn, fieldset[disabled] a.btn {
     max-width: 500px;
 }
 
-//-----------------------Dropdown with checkboxes----------------------------------
-.checkbox-menu-btn {
-    width: 100%;
-    display: block;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: none !important;
-    border: 1px solid #1b7bb3 !important;
+// Dropdown with multiple checkboxes
+.checkbox-dropdown:extend(.dropdown) {
+    box-sizing: border-box;
+
+    > div {
+        position: relative;
+    }
+
+    > button {
+        width: 100%;
+        display: block;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: none !important;
+        border: 1px solid #1b7bb3 !important;
+    }
 }
 
-.checkbox-menu-btn-text {
+.expand-button-toggle:extend(.event-participant-heading-toggle) {
+    float: none !important;
+    top: 0;
+    margin: 5px 5px 4px 2px;
+}
+
+.checkbox-menu-text {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
@@ -1603,20 +1617,31 @@ a.disabled.btn, fieldset[disabled] a.btn {
     color: #125e8a;
 }
 
-.checkbox-menu-btn--mt {
-    margin-top: 3px;
+.checkbox-menu:extend(.dropdown-menu) {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    display: block;
+    list-style-type: none;
+    position: absolute;
+    background-color: white;
 }
 
 .checkbox-menu li label {
-    display: block;
+    display: -webkit-box;
+    align-items: center;
     padding: 3px 10px;
     clear: both;
     font-weight: normal;
     line-height: 1.42857143;
     color: #333;
-    white-space: nowrap;
     margin: 0;
     transition: background-color .4s ease;
+
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .checkbox-menu li input {
