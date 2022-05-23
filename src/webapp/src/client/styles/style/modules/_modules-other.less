@@ -1625,10 +1625,11 @@ a.disabled.btn, fieldset[disabled] a.btn {
     list-style-type: none;
     position: absolute;
     background-color: white;
+    z-index: 1000;
 }
 
 .checkbox-menu li label {
-    display: -webkit-box;
+    display: flex;
     align-items: center;
     padding: 3px 10px;
     clear: both;
@@ -1637,11 +1638,6 @@ a.disabled.btn, fieldset[disabled] a.btn {
     color: #333;
     margin: 0;
     transition: background-color .4s ease;
-
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .checkbox-menu li input {
