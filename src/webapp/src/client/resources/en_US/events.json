@@ -203,7 +203,7 @@
   "selectDate": "Select date",
   "dateFilterInvalidRange": "Start date must be before end date",
   "dateFilterMaxRangeError": "Maximum date range is 100 days",
-  "viewAllEventsInformation": "View additional information",
+  "viewAllEventsInformation": "Search events",
   "filterEvents": "Search events...",
   "tableTitle": "Title",
   "tableStartDate": "Start date",
