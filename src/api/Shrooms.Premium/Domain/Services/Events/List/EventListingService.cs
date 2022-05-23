@@ -112,14 +112,14 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                     TypeName = e.EventType.Name,
                     MaxParticipants = e.MaxParticipants,
                     ParticipantsCount = e.EventParticipants.Count,
-                    Offices = e.Offices,
-                    IsForAllOffices = officesCount == e.Offices.Length
+                    Offices = e.Offices
                 })
                 .ToPagedListAsync(args.Page, args.PageSize);
 
             foreach (var e in events)
             {
                 e.OfficeNames = e.OfficeIds.Select(officeId => allOffices[int.Parse(officeId)]);
+                e.IsForAllOffices = e.OfficeIds.Count() == officesCount;
             }
 
             return events;
