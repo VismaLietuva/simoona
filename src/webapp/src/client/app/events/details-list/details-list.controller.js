@@ -5,14 +5,12 @@
         .controller('eventDetailsListController', eventDetailsListController);
 
     eventDetailsListController.$inject = [
-        'authService',
         'notifySrv',
         'eventRepository',
         '$state',
     ];
 
     function eventDetailsListController(
-        authService,
         notifySrv,
         eventRepository,
         $state
@@ -28,18 +26,23 @@
             appliedOfficeTypes: undefined,
         };
 
-        vm.onListFilter = onListFilter;
-        vm.changePage = changePage;
+        vm.onSearchFilter = onSearchFilter;
+        vm.loadEventsOnPage = loadEventsOnPage;
         vm.viewDetails = viewDetails;
-        vm.eventTypesChange = eventTypesChange;
-        vm.officeTypesChange = officeTypesChange;
+        vm.loadEventsWithNewlyAppliedFilter = loadEventsWithNewlyAppliedFilter;
 
-        loadEventTypes();
-        loadOfficeTypes();
-        loadEvents();
+        init();
+
+
+        function init() {
+            loadEventTypes();
+            loadOfficeTypes();
+            loadEvents();
+        }
 
         function loadEventTypes() {
             vm.isLoadingControls = true;
+
             eventRepository.getEventTypes().then(
                 function (result) {
                     vm.eventTypes = result;
@@ -53,6 +56,7 @@
 
         function loadEvents() {
             vm.isLoadingEvents = true;
+
             eventRepository
                 .getEventsByTitle(
                     vm.filterText || '',
@@ -73,6 +77,7 @@
 
         function loadOfficeTypes() {
             vm.isLoadingControls = true;
+
             eventRepository.getEventOffices().then(
                 function (result) {
                     vm.officeTypes = result;
@@ -84,13 +89,13 @@
             );
         }
 
-        function onListFilter() {
-            vm.page = 1;
-            loadEvents();
+        function onSearchFilter() {
+            loadEventsOnPage(1);
         }
 
-        function changePage(page) {
+        function loadEventsOnPage(page) {
             vm.page = page;
+
             loadEvents();
         }
 
@@ -98,23 +103,13 @@
             $state.go('Root.WithOrg.Client.Events.Details.Event', { id: id });
         }
 
-        function eventTypesChange(appliedEventTypes) {
-            loadEventsWithFilter(appliedEventTypes, 'appliedEventTypes');
-        }
-
-        function officeTypesChange(appliedOfficeTypes) {
-            loadEventsWithFilter(appliedOfficeTypes, 'appliedOfficeTypes');
-        }
-
-        function loadEventsWithFilter(filter, filterName) {
-            vm.page = 1;
-
+        function loadEventsWithNewlyAppliedFilter(filter, filterName) {
             vm.filter = {
                 ...vm.filter,
-                [filterName]: filter,
+                [filterName]: filter.map(f => f[0]),
             };
 
-            loadEvents();
+            loadEventsOnPage(1);
         }
     }
 })();
