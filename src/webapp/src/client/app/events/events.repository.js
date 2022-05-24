@@ -233,9 +233,11 @@
             }).$promise;
         }
 
-        function getExtensiveEventDetails(eventId) {
+        function getExtensiveEventDetails(eventId, kudosTypeNames, eventTypes) {
             return $resource(`${eventUrl}GetExtensiveDetails`).get({
-                eventId: eventId
+                eventId: eventId,
+                kudosTypeNames: kudosTypeNames,
+                eventTypes: eventTypes
             }).$promise
         }
     }
