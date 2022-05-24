@@ -359,14 +359,14 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             }
         }
 
-        // TODO: add auth
         [HttpGet]
         [Route("GetExtensiveDetails")]
-        public async Task<IHttpActionResult> GetExtensiveEventDetails(Guid eventId, [FromUri] int[] kudosTypes, [FromUri] int[] eventTypes)
+        [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
+        public async Task<IHttpActionResult> GetExtensiveEventDetails(Guid eventId, [FromUri] string[] kudosTypeNames, [FromUri] int[] eventTypes)
         {
             try
             {
-                var extensiveEventDto = await _eventService.GetExtensiveEventDetailsAsync(eventId, GetUserAndOrganization(), kudosTypes, eventTypes);
+                var extensiveEventDto = await _eventService.GetExtensiveEventDetailsAsync(eventId, GetUserAndOrganization(), kudosTypeNames, eventTypes);
                 var extensiveEventViewModel = _mapper.Map<ExtensiveEventDetailsDto, ExtensiveEventDetailsViewModel>(extensiveEventDto);
 
                 var officesCount = await _officeMapService.GetOfficesCountAsync();
