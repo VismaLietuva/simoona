@@ -1,13 +1,13 @@
-<div class="row body-container" has-permissions="['VACATIONS_BASIC']">
+<div class="row body-container" has-permissions="['EVENT_ADMINISTRATION']">
     <div class="col-xs-12">
         <div class="panel panel-default events-panel">
             <!-- Header -->
             <div class="panel-heading">
                 <span>{{vm.eventDetails.name}}</span>
-                <!-- <span translate="events.extensiveDetailsTitle"></span> -->
             </div>
 
             <wave-spinner ng-if="vm.isLoading && !vm.eventDetails"></wave-spinner>
+
             <div class="panel-body">
                 <!-- Content -->
                 <div class="event-description-body">
@@ -20,20 +20,16 @@
                         </div>
 
                         <div class="col-xs-12 col-sm-6 col-lg-3 event-details-registration-container">
-                            <div data-test-id="event-start-date-label"
-                                class="col-xs-12 event-details-start-date text-center">
+                            <div class="col-xs-12 event-details-start-date text-center">
                                 <span translate="events.eventStart"></span>
                             </div>
-                            <div data-test-id="event-start-time" class="col-xs-12 event-details-start-time text-center"
-                                ng-cloak>
+                            <div class="col-xs-12 event-details-start-time text-center" ng-cloak>
                                 {{vm.eventDetails.startDate | amUtc | amLocal | amDateFormat:'HH:mm'}}
                             </div>
-                            <div data-test-id="event-start-date" class="col-xs-12 event-details-start-date text-center"
-                                ng-cloak>
+                            <div class="col-xs-12 event-details-start-date text-center" ng-cloak>
                                 {{vm.eventDetails.startDate | amUtc | amLocal | amDateFormat:'MMMM DD'}}
                             </div>
                             <div class="col-xs-12 nopadding-left nopadding-right event-details-registration">
-                                <!-- TODO: figure out if it updates things properly -->
                                 <ace-event-status event="vm.eventDetails" is-details="true" is-add-colleague="false">
                                 </ace-event-status>
                             </div>
@@ -42,37 +38,53 @@
                         <div class="col-xs-12 col-lg-5 event-details-info-container">
                             <div class="col-xs-12">
                                 <span class="glyphicon glyphicon-clock"></span>
-                                <b><span translate="events.eventEndDate"></span>:</b>
-                                <span data-test-id="event-end-date" class="event-details-date" ng-cloak>
+                                <b>
+                                    <span translate="events.eventEndDate"></span>
+                                    :
+                                </b>
+                                <span class="event-details-date" ng-cloak>
                                     {{vm.eventDetails.endDate | amUtc | amLocal | amDateFormat:'YYYY-MM-DD HH:mm'}}
                                 </span>
                             </div>
                             <div class="col-xs-12">
                                 <span class="glyphicon glyphicon-map-marker"></span>
-                                <b><span ng-if="vm.eventDetails.officeNames.length < 2"
+                                <b>
+                                    <span ng-if="vm.eventDetails.officeNames.length < 2"
                                         translate="events.eventOffice"></span>
                                     <span ng-if="vm.eventDetails.officeNames.length > 1"
                                         translate="events.eventOffices"></span>
-                                    :</b>
-                                <span data-test-id="event-office" ng-cloak
-                                    ng-if="!vm.eventDetails.isForAllOffices && vm.eventDetails.officeNames"
+                                    :
+                                </b>
+                                <span ng-cloak ng-if="!vm.eventDetails.isForAllOffices && vm.eventDetails.officeNames"
                                     ng-repeat="officeName in vm.eventDetails.officeNames">
-                                    {{officeName}}{{$last ? '' :', '}}</span>
-                                <span data-test-id="event-office" ng-cloak
-                                    ng-if="vm.eventDetails.isForAllOffices || !vm.eventDetails.officeNames.length">{{"events.eventForOfficeAll"
-                                    | translate}}</span>
+                                    {{officeName}}{{$last ? '' :', '}}
+                                </span>
+                                <span ng-cloak
+                                    ng-if="vm.eventDetails.isForAllOffices || !vm.eventDetails.officeNames.length">
+                                    {{"events.eventForOfficeAll"
+                                    | translate}}
+                                </span>
                             </div>
                             <div class="col-xs-12">
                                 <span class="glyphicon glyphicon-map-marker"></span>
-                                <b><span translate="events.eventLocation"></span>:</b>
-                                <span data-test-id="event-location" ng-cloak>{{vm.eventDetails.location}}</span>
+                                <b>
+                                    <span translate="events.eventLocation"></span>
+                                    :
+                                </b>
+                                <span ng-cloak>{{vm.eventDetails.location}}</span>
                             </div>
                             <div class="col-xs-12">
                                 <span class="glyphicon glyphicon-user"></span>
-                                <b><span translate="events.responsiblePerson"></span> :</b>
-                                <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: vm.eventDetails.hostUserId })"><span
-                                        data-test-id="event-host" ng-cloak>{{vm.eventDetails.hostFirstName}}
-                                        {{vm.eventDetails.hostLastName}}</span></a>
+                                <b>
+                                    <span translate="events.responsiblePerson"></span>
+                                    :
+                                </b>
+                                <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: vm.eventDetails.hostUserId })">
+                                    <span ng-cloak>
+                                        {{vm.eventDetails.hostFirstName}}
+                                        {{vm.eventDetails.hostLastName}}
+                                    </span>
+                                </a>
                             </div>
                         </div>
                         <div class="clearfix"></div>
@@ -82,13 +94,15 @@
                     </div>
                 </div>
 
-                <div class="row" style="margin-top: 10px;" ng-if="vm.loadControls">
-                    <ace-dropdown-checkbox class="col-md-2 pull-right"
+                <!-- Filter controls -->
+                <div class="row event-details-list-filter-controls" ng-if="vm.loadControls">
+                    <ace-dropdown-checkbox class="col-md-2 col-xs-6 col-sm-4 pull-right"
                         translation="events.eventKudosDropdownButtonTitle" types="vm.kudosTypes"
-                        on-value-change="vm.setKudosTypes(types)"></ace-dropdown-checkbox>
-                    <ace-dropdown-checkbox class="col-md-2 pull-right"
+                        on-value-change="vm.setKudosTypes(types)" is-expanded="false"></ace-dropdown-checkbox>
+
+                    <ace-dropdown-checkbox class="col-md-2 col-xs-6 col-sm-4 pull-right"
                         translation="events.eventTypesDropdownButtonTitle" types="vm.eventTypes"
-                        on-value-change="vm.setConferenceTypes(types)"></ace-dropdown-checkbox>
+                        on-value-change="vm.setEventTypes(types)" is-expanded="false"></ace-dropdown-checkbox>
                 </div>
 
                 <table ng-if="vm.pageContent.length" class="nc-table">
@@ -96,72 +110,111 @@
                         <tr>
                             <th translate="events.tableEmployee"></th>
                             <th translate="events.tableHireDate" class="hidden-xs hidden-sm"></th>
-                            <th translate="events.tableQualification" class="hidden-xs hidden-sm"></th>
+                            <th translate="events.tableQualification" class="hidden-xs hidden-sm hidden-md"></th>
                             <th translate="events.tablePosition" class="hidden-xs hidden-sm"></th>
                             <th translate="events.tableManager" class="hidden-xs hidden-sm"></th>
                             <th translate="events.tableKudos" class="hidden-xs hidden-sm"></th>
-                            <th translate="events.tableConferences" class="hidden-xs hidden-sm"></th>
-                            <th translate="events.tableProjects"></th>
+                            <th translate="events.tableEvents"></th>
+                            <th translate="events.tableProjects" class="hidden-xs hidden-sm"></th>
+                            <th class="hidden-xs hidden-sm" ng-if="vm.showActionsColumn" translate="events.tableAction">
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="participant in vm.pageContent" ng-click="vm.viewDetails(event.id)">
-                            <td class="col-xs-4 word-break" data-test-id="book-title-and-author" ng-cloak>
+                        <tr ng-repeat-start="participant in vm.pageContent" ng-click="vm.viewDetails(event.id)">
+                            <td class="col-xs-2 word-break" ng-cloak>
                                 <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: participant.id })">
-                                    <span ng-cloak>{{participant.firstName}} {{participant.lastName}}</span>
+                                    <span ng-cloak>
+                                        {{participant.firstName}} {{participant.lastName}}
+                                    </span>
                                 </a>
                             </td>
-                            <td class="col-xs-2 hidden-xs hidden-sm" data-test-id="reader-full-name" ng-cloak>
-                                {{participant.employmentDate | amUtc | amLocal | amDateFormat:'YYYY-MM-DD HH:mm'}}
+                            <td class="col-xs-2 hidden-xs hidden-sm" ng-cloak>
+                                {{participant.employmentDate | amUtc | amLocal | amDateFormat:'YYYY-MM-DD'}}
                             </td>
-                            <td class="col-xs-2 hidden-xs hidden-sm" data-test-id="book-quantity-left" ng-cloak>
+                            <td class="col-xs hidden-xs hidden-sm hidden-md" ng-cloak>
                                 {{participant.qualificationLevel || ('events.empty' | translate) }}
                             </td>
-                            <td class="col-xs-2 hidden-xs hidden-sm" data-test-id="book-quantity-left" ng-cloak>
+                            <td class="col-xs-2 hidden-xs hidden-sm" ng-cloak>
                                 {{participant.jobTitle || ('events.empty' | translate) }}
                             </td>
-                            <td class="col-xs-2 hidden-xs hidden-sm" data-test-id="book-quantity-left" ng-cloak>
+                            <td class="col-xs-2 hidden-xs hidden-sm" ng-cloak>
                                 <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: participant.managerId })">
-                                    <span ng-cloak>{{participant.managerFirstName}}
-                                        {{participant.managerLastName}}</span>
+                                    <span ng-if="participant.managerFirstName" ng-cloak>
+                                        {{participant.managerFirstName}} {{participant.managerLastName}}
+                                    </span>
                                 </a>
+                                <span ng-if="!participant.managerFirstName" translate="events.empty"></span>
                             </td>
-                            <td class="col-xs-2 hidden-xs hidden-sm" data-test-id="book-quantity-left" ng-cloak>
+                            <td class="col-xs hidden-xs hidden-sm" ng-cloak>
                                 {{participant.kudos || ('events.empty' | translate) }}
                             </td>
-                            <td class="col-xs-2 hidden-xs hidden-sm" data-test-id="book-quantity-left" ng-cloak>
-                                <!-- TODO: add working link -->
-                                <!-- TODO: events.Empty -->
-                                <span ng-if="!participant.previouslyAttendedConferences.length"
-                                    translate="events.empty"></span>
-                                <ol>
-                                    <li
-                                        ng-repeat="conference in participant.previouslyAttendedConferences | limitTo: vm.settings.conferences.itemsLength">
-                                        <a ui-sref=" Root.WithOrg.Client.Events.EventContent({ id: conference.id })">
-                                            {{conference}}
-                                        </a>
+
+                            <!-- Events -->
+                            <td class="col-xs-2" ng-cloak>
+                                <span ng-if="!participant.visitedEvents.length" translate="events.empty"></span>
+                                <ul class="event-details-event-list" ng-if="participant.visitedEvents.length">
+                                    <li ng-if="!participant.isExpanded"
+                                        ng-repeat="event in participant.visitedEvents | limitTo: vm.settings.showItemsInEventsList track by $index">
+                                        <a
+                                            ui-sref=" Root.WithOrg.Client.Events.EventContent({ id: event.id })">{{event.name}}</a>
+                                        <span ng-if="participant.canBeExpanded &&
+                                                        !participant.isExpanded &&
+                                                        $index === vm.settings.showItemsInEventsList - 1"
+                                            translate="events.moreCount" translate-values="{ one: participant.visitedEvents.length -
+                                                            vm.settings.showItemsInEventsList }">
+                                        </span>
                                     </li>
-                                </ol>
-
-                                <show-more-btn show-array="participant.previouslyAttendedConferences"
-                                    show-length="vm.settings.conferences.itemsLength"
-                                    min-length="vm.settings.conferences.itemsMinLength" class="profile-show-more">
-                                </show-more-btn>
+                                </ul>
                             </td>
-                            <td class="col-xs-2" data-test-id="book-quantity-left" ng-cloak>
-                                <!-- TODO: add working link -->
-                                <!-- TODO: events.Empty -->
+
+                            <!-- Projects -->
+                            <td class="col-xs-4 hidden-xs hidden-sm" ng-cloak>
                                 <span ng-if="!participant.projects.length" translate="events.empty"></span>
+                                <ul class="event-details-project-list" ng-if="participant.projects.length">
+                                    <li ng-repeat="project in participant.projects">
+                                        <a
+                                            ui-sref=" Root.WithOrg.Client.Projects.ProjectContent({ id: project.id })">{{project.name}}</a>
+                                    </li>
+                                </ul>
+                            </td>
 
-                                <a
-                                    ng-repeat="project in participant.projects | limitTo: vm.settings.projects.itemsLength">
-                                    {{project}}
-                                </a>
+                            <!-- Expand button -->
+                            <td class="col-xs-1 hidden-xs hidden-sm ml-5" ng-if="vm.showActionsColumn">
+                                <ace-expand-button ng-if="participant.canBeExpanded"
+                                    is-expanded="participant.isExpanded"></ace-expand-button>
+                            </td>
+                        </tr>
 
-                                <show-more-btn show-array="participant.projects"
-                                    show-length="vm.settings.projects.itemsLength"
-                                    min-length="vm.settings.projects.itemsMinLength" class="profile-show-more">
-                                </show-more-btn>
+                        <!-- Additional row for displaying participated events -->
+                        <tr ng-repeat-end ng-if="participant.isExpanded">
+                            <td colspan="9" class="no-padding">
+                                <!-- Expansion content -->
+                                <table class="nc-table event-details-extension-table no-border">
+                                    <thead>
+                                        <tr>
+                                            <th translate="events.tableTitle" class="col-xs-3"></th>
+                                            <th translate="events.tableType" class="col-xs-2"></th>
+                                            <th translate="events.tableStartDate" class="hidden-xs hidden-sm"></th>
+                                            <th translate="events.tableEndDate" class="hidden-xs hidden-sm"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="event in participant.visitedEvents">
+                                            <td class="col-xs-2 col-sm-4" style="word-break: break-word;">
+                                                <a
+                                                    ui-sref=" Root.WithOrg.Client.Events.EventContent({ id: event.id })">{{event.name}}</a>
+                                            </td>
+                                            <td class="col-xs-2">{{event.typeName}}</td>
+                                            <td class="hidden-xs hidden-sm">
+                                                {{event.startDate | amUtc | amLocal | amDateFormat:'YYYY-MM-DD HH-MM'}}
+                                            </td>
+                                            <td class="hidden-xs hidden-sm">
+                                                {{event.endDate | amUtc | amLocal | amDateFormat:'YYYY-MM-DD HH-MM'}}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </td>
                         </tr>
                     </tbody>
@@ -170,7 +223,8 @@
                 <wave-spinner ng-if="vm.isLoading && !vm.pageContent.length"></wave-spinner>
 
                 <ace-list-pagination total-item-count="vm.eventDetails.extensiveParticipants.length"
-                    page-size="vm.pageSize" page-count="vm.eventDetails.extensiveParticipants.length / vm.pageSize"
+                    page-size="vm.settings.pageSize"
+                    page-count="vm.eventDetails.extensiveParticipants.length / vm.settings.pageSize"
                     current-page="vm.page" on-changed="vm.changePage(page)">
                 </ace-list-pagination>
             </div>

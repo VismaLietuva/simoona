@@ -5,91 +5,105 @@
         .module('simoonaApp.Events')
         .controller('eventDetailsController', eventDetailsController);
 
-
     eventDetailsController.$inject = [
-        'authService',
         'eventRepository',
         'kudosTypesRepository',
         '$stateParams',
         'eventSettings',
-        'notifySrv'
+        'notifySrv',
     ];
 
-    function eventDetailsController(authService, eventRepository, kudosTypesRepository, $stateParams, eventSettings, notifySrv) {
+    function eventDetailsController(
+        eventRepository,
+        kudosTypesRepository,
+        $stateParams,
+        eventSettings,
+        notifySrv
+    ) {
         var vm = this;
 
         vm.eventImageSize = {
             w: eventSettings.thumbWidth,
-            h: eventSettings.thumbHeight
+            h: eventSettings.thumbHeight,
         };
 
         vm.filter = {
             appliedKudos: undefined,
-            appliedConferences: undefined,
-        }
+            appliedEventTypes: undefined,
+        };
 
         vm.settings = {
-            projects: {
-                itemsLength: 1,
-                itemsMinLength: 1
-            },
-            conferences: {
-                itemsLength: 1,
-                itemsMinLength: 1
-            }
-        }
+            showItemsInEventsList: 3,
+            pageSize: 10
+        };
 
-        vm.pageSize = 2;
         vm.page = 1;
 
         vm.setKudosTypes = setKudosTypes;
-        vm.setConferenceTypes = setConferenceTypes;
+        vm.setEventTypes = setEventTypes;
         vm.changePage = changePage;
 
-        loadKudosTypes();
-        loadEventTypes();
-        loadEventDetails();
+        init();
 
+        function init() {
+            loadKudosTypes();
+            loadEventTypes();
+            loadEventDetails();
+        }
 
         function loadEventDetails() {
             vm.isLoading = true;
             vm.pageContent = undefined;
-            eventRepository.getExtensiveEventDetails($stateParams.id, vm.filter.appliedKudos, vm.filter.appliedConferences).then(function (result) {
-                vm.eventDetails = result;
-                loadPage();
-                vm.isLoading = false;
-                vm.loadControls = vm.eventDetails.extensiveParticipants.length || false;
-            }, function () {
-                notifySrv.error('errorCodeMessages.messageError');
-            })
+            eventRepository
+                .getExtensiveEventDetails(
+                    $stateParams.id,
+                    vm.filter.appliedKudos,
+                    vm.filter.appliedEventTypes
+                )
+                .then(
+                    function (result) {
+                        vm.eventDetails = result;
+                        changePage(1);
+                        vm.isLoading = false;
+                        vm.loadControls =
+                            vm.eventDetails.extensiveParticipants.length;
+                    },
+                    function () {
+                        notifySrv.error('errorCodeMessages.messageError');
+                    }
+                );
         }
 
         function loadKudosTypes() {
-            kudosTypesRepository.getKudosTypes().then(function(result) {
-                vm.kudosTypes = result;
-            }, function() {
-                notifySrv.error('errorCodeMessages.messageError');
-            })
+            kudosTypesRepository.getKudosTypes().then(
+                function (result) {
+                    vm.kudosTypes = result;
+                },
+                function () {
+                    notifySrv.error('errorCodeMessages.messageError');
+                }
+            );
         }
 
         function loadEventTypes() {
             eventRepository.getEventTypes().then(
                 function (result) {
                     vm.eventTypes = result;
-                }, function () {
-                    notifySrv.error("errorCodeMessages.messageError");
+                },
+                function () {
+                    notifySrv.error('errorCodeMessages.messageError');
                 }
             );
         }
 
         function setKudosTypes(types) {
-            vm.filter.appliedKudos = types;
+            vm.filter.appliedKudos = types.map((filter) => filter[1]);
 
             loadEventDetails();
         }
 
-        function setConferenceTypes(types) {
-            vm.filter.appliedConferences = types;
+        function setEventTypes(types) {
+            vm.filter.appliedEventTypes = types.map((filter) => filter[0]);
 
             loadEventDetails();
         }
@@ -101,9 +115,30 @@
         }
 
         function loadPage() {
-            vm.pageContent = vm.eventDetails
-                .extensiveParticipants
-                .slice((vm.page - 1) * vm.pageSize, (vm.page - 1) * vm.pageSize + vm.pageSize);
+            var start = (vm.page - 1) * vm.settings.pageSize;
+            var offset = vm.settings.pageSize;
+
+            vm.pageContent = vm.eventDetails.extensiveParticipants
+                .slice(
+                    start,
+                    start + offset
+                )
+                .map((participant) => ({
+                    ...participant,
+                    isExpanded: false,
+                    canBeExpanded:
+                        participant.visitedEvents.length >
+                        vm.settings.showItemsInEventsList
+                }));
+
+            vm.showActionsColumn = showActionsColumn();
+        }
+
+        function showActionsColumn() {
+            return (
+                vm.pageContent &&
+                vm.pageContent.find((participant) => participant.canBeExpanded)
+            );
         }
     }
 })();
