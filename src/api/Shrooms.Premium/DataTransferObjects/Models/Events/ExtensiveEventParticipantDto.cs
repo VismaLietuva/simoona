@@ -27,6 +27,8 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
         
         public IEnumerable<string> PreviouslyAttendedConferences { get; set; }
 
-        public IEnumerable<string> Projects { get; set; }
+        public IEnumerable<EventVisitedDto> VisitedEvents { get; set; }
+
+        public IEnumerable<EventProjectDto> Projects { get; set; }
     }
 }
