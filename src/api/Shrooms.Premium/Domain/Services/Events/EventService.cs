@@ -149,9 +149,9 @@ namespace Shrooms.Premium.Domain.Services.Events
             return @event;
         }
 
-        public async Task<ExtensiveEventDetailsDto> GetExtensiveEventDetailsAsync(Guid eventId, UserAndOrganizationDto userOrg, int[] kudosTypes, int[] eventTypes)
+        public async Task<ExtensiveEventDetailsDto> GetExtensiveEventDetailsAsync(Guid eventId, UserAndOrganizationDto userOrg, string[] kudosTypeNames, int[] eventTypes)
         {
-            var kudosTypesLength = kudosTypes.Length;
+            var kudosTypesLength = kudosTypeNames.Length;
             var eventTypesLength = eventTypes.Length;
 
             var extensiveEventDetailsDto = await _eventsDbSet
@@ -181,31 +181,34 @@ namespace Shrooms.Premium.Domain.Services.Events
                         ManagerFirstName = p.ApplicationUser.Manager.FirstName,
                         ManagerLastName = p.ApplicationUser.Manager.LastName,
                         ManagerId = p.ApplicationUser.Manager.Id,
-                        Projects = p.ApplicationUser.Projects.Select(p => p.Name),
+                        Projects = p.ApplicationUser.Projects.Select(p => new EventProjectDto
+                        {
+                            Id = p.Id,
+                            Name = p.Name
+                        }),
                         Kudos = _kudosLogDbSet
-                            .Where(kudos => kudosTypesLength == 0 || kudosTypes.Contains(kudos.Id))
+                            .Where(kudos => (kudosTypesLength == 0 || kudosTypeNames.Contains(kudos.KudosTypeName)) &&
+                                            (kudos.EmployeeId == p.ApplicationUser.Id) &&
+                                            (kudos.Status == KudosStatus.Approved))
                             .Sum(kudos => kudos.Points),
-                        PreviouslyAttendedConferences = p.ApplicationUser.Events
-                            .Where(evnt => evnt.EndDate < DateTime.UtcNow &&
-                                           (eventTypesLength == 0 || eventTypes.Contains(evnt.EventType.Id)))
-                            .Select(evnt => evnt.Name)
+                        VisitedEvents = p.ApplicationUser.Events
+                            .Where(visited => (visited.EndDate < DateTime.UtcNow) &&
+                                              (eventTypesLength == 0 || eventTypes.Contains(visited.EventType.Id)))
+                            .Select(visited => new EventVisitedDto
+                            {
+                                Id = visited.Id,
+                                Name = visited.Name,
+                                TypeName = visited.EventType.Name,
+                                StartDate = visited.StartDate,
+                                EndDate = visited.EndDate
+                            })
                             .Distinct()
+                            .OrderByDescending(visited => visited.EndDate)
                             .ToList()
-                        
-                        //PreviouslyAttendedConferences = e.EventParticipants
-                        //    .Where(participant => participant.ApplicationUser.Id == p.ApplicationUser.Id &&
-                        //                          participant.Event.EndDate < DateTime.UtcNow &&
-                        //                          (eventTypesLength == 0 || eventTypes.Contains(participant.Event.EventType.Id)))
-                        //    .Select(participant => participant.Event.Name)
-                        //    .Distinct()
-                        //    .ToList()
-                            
-                        //PreviouslyAttendedConferences = e.EventParticipants
-                        //    .Where(part => part.EventId == eventId && 
-                        //           part.Event.EndDate < DateTime.UtcNow && 
-                        //           (eventTypesLength == 0 || eventTypes.Contains(part.Event.EventType.Id)))
-                        //    .Select(part => part.Event.Name),
                     })
+                    .OrderByDescending(participant => participant.EmploymentDate)
+                    .ThenByDescending(participant => participant.Kudos)
+                    .ThenByDescending(participant => participant.VisitedEvents.Count())
                 })
                 .FirstOrDefaultAsync();
 
