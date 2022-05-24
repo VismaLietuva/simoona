@@ -211,7 +211,6 @@
   "tableType": "Type",
   "tableOffices": "Offices",
   "tableParticipants": "Participants",
-  "extensiveDetailsTitle": "Event details",
   "eventTypesDropdownButtonTitle": "Selected {{one}} event types",
   "eventOfficesDropdownButtonTitle":"Selected {{one}} offices",
   "eventKudosDropdownButtonTitle": "Selected {{one}} kudos types for calculations",
@@ -219,12 +218,13 @@
   "tablePosition": "Position",
   "tableHireDate": "Hire date",
   "tableManager": "Manager",
-  "tableConferences": "Events",
+  "tableEvents": "Events",
   "tableQualification": "Qualification",
   "tableProjects": "Projects",
   "tableKudos": "Kudos",
   "tableAction": "Actions",
   "buttonExpandEvents": "Expand",
   "buttonCollapseEvents": "Collapse",
-  "empty": "None"
+  "empty": "None",
+  "moreCount": "and {{one}} more..."
 }
