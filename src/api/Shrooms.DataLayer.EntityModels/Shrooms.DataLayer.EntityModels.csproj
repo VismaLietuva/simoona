@@ -81,6 +81,7 @@
     <Compile Include="Models\Books\BookLog.cs" />
     <Compile Include="Models\Books\BookOffice.cs" />
     <Compile Include="Models\Certificate.cs" />
+    <Compile Include="Models\FilterPreset.cs" />
     <Compile Include="Models\ILikeable.cs" />
     <Compile Include="Models\JobPosition.cs" />
     <Compile Include="Models\Kudos\KudosShopItem.cs" />
