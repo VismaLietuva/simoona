@@ -80,6 +80,8 @@
     <Compile Include="Models\ExternalLink\ExternalLinkViewModel.cs" />
     <Compile Include="Models\ExternalLink\NewExternalLinkViewModel.cs" />
     <Compile Include="Models\ExternalLink\UpdatedExternalLinkViewModel.cs" />
+    <Compile Include="Models\FilterPresets\CreateFilterPresetViewModel.cs" />
+    <Compile Include="Models\FilterPresets\FilterPresetItemViewModel.cs" />
     <Compile Include="Models\Jobs\NewJobTypeViewModel.cs" />
     <Compile Include="Models\Jobs\JobTypeViewModel.cs" />
     <Compile Include="Models\KudosTypes\NewKudosTypeViewModel.cs" />
