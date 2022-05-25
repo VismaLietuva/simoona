@@ -136,6 +136,7 @@
     <Compile Include="DAL\EntityTypeConfigurations\WallConfiguration.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\WallMembersConfiguration.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\WallModeratorsConfiguration.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\FilterPresetEntityConfig.cs" />
     <Compile Include="DAL\ShroomsContextConfiguration.cs" />
     <Compile Include="DAL\SoftDeleteHandler.cs" />
     <Compile Include="DAL\UnitOfWork2.cs" />
@@ -864,6 +865,10 @@
     <Compile Include="Migrations\202204291158023_AddedSendEmailToManagerPropertyToEventType.Designer.cs">
       <DependentUpon>202204291158023_AddedSendEmailToManagerPropertyToEventType.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202205251037133_AddedFilterPresetEntityModel.cs" />
+    <Compile Include="Migrations\202205251037133_AddedFilterPresetEntityModel.Designer.cs">
+      <DependentUpon>202205251037133_AddedFilterPresetEntityModel.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
@@ -1439,6 +1444,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202204291158023_AddedSendEmailToManagerPropertyToEventType.resx">
       <DependentUpon>202204291158023_AddedSendEmailToManagerPropertyToEventType.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202205251037133_AddedFilterPresetEntityModel.resx">
+      <DependentUpon>202205251037133_AddedFilterPresetEntityModel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
