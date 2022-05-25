@@ -1,30 +1,6 @@
-<!-- TODO: refactor -->
-<div class="dropdown">
-    <button class="btn btn-default dropdown-toggle expand-button" type="button" ng-click="vm.toggleExpandCollapse()"
-        style="background: none; border: 1px solid #1b7bb3; width: 0 !important; height: 42px !important; padding: 10px;">
-        <div>
-            <!-- <span translate="{{vm.expandCollapseText}}"></span> -->
-            <i class="event-participant-heading-toggle expand-button-toggle glyphicon" style="display: block !important;
-             padding: auto !important; content: none !important;"
-                ng-class="{'glyphicon-chevron-down': vm.isExpanded, 'glyphicon-chevron-right': !vm.isExpanded}">
-            </i>
-        </div>
-
-        <!-- <span style="font-weight: 400; color: #125e8a;" translate="{{vm.translation}}"
-            translate-values="{ one: vm.appliedTypes.size }"></span> -->
-    </button>
-    <style>
-        /* TODO: fix styles */
-        /* TODO: remove */
-        .expand-button {
-            width: 40px !important;
-            height: 40px !important;
-            border-radius: 50px;
-        }
-
-        .expand-button > span,
-        .expand-button > i {
-            display: inline-block;
-        }
-    </style>
-</div>
+<button class="dropdown btn btn-default dropdown-toggle event-details-expand-button "
+    ng-click="vm.toggleExpandCollapse()" type="button">
+    <i class="expand-button-toggle glyphicon pb-3"
+        ng-class="{'glyphicon-chevron-down': vm.isExpanded, 'glyphicon-chevron-right': !vm.isExpanded}">
+    </i>
+</button>
