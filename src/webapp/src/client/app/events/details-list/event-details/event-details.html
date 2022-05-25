@@ -146,8 +146,13 @@
                                 </a>
                                 <span ng-if="!participant.managerFirstName" translate="events.empty"></span>
                             </td>
+
+                            <!-- Kudos -->
                             <td class="col-xs hidden-xs hidden-sm" ng-cloak>
-                                {{participant.kudos || ('events.empty' | translate) }}
+                                <a ui-sref="Root.WithOrg.Client.Kudos.KudosUserInformation({ userId: participant.id })">
+                                    {{participant.kudos}}
+                                </a>
+                                <span ng-if="!participant.kudos" translate="events.empty"></span>
                             </td>
 
                             <!-- Events -->
