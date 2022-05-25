@@ -37,7 +37,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             try
             {
-                await _filterPresetService.CreateAsync(createDto);
+                await _filterPresetService.CreateAsync(createDto, GetUserAndOrganization());
              
                 return Ok();
             }
