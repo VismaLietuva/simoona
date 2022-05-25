@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.FilterPresets;
 using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -29,7 +30,7 @@ namespace Shrooms.Domain.Services.FilterPresets
         }
 
         // TODO: handle isDefault
-        public async Task CreateAsync(CreateFilterPresetDto createDto)
+        public async Task CreateAsync(CreateFilterPresetDto createDto, UserAndOrganizationDto userOrg)
         {
             await _filterPresetUpdateCreateLock.WaitAsync();
 
@@ -42,7 +43,7 @@ namespace Shrooms.Domain.Services.FilterPresets
 
                 _filterPresetDbSet.Add(filterPreset);
 
-                await _uow.SaveChangesAsync(false);
+                await _uow.SaveChangesAsync(userOrg.UserId);
             }
             finally
             {
