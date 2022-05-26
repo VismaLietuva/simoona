@@ -547,8 +547,11 @@
     <Compile Include="Presentation\WebViewModels\Events\EventOfficeViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventOptionsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventOptionViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\EventProjectViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventTypeViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\EventVisitedViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\ExtensiveEventDetailsViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\ExtensiveEventParticipantViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\MyEventsOptionsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\NewEventOptionViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\ShareEventViewModel.cs" />

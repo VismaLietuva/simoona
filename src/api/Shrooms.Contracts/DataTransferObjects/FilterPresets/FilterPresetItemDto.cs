@@ -1,5 +1,4 @@
-﻿// TODO: fix previous stuff... with view model
-using Shrooms.Contracts.Enums;
+﻿using Shrooms.Contracts.Enums;
 using System.Collections.Generic;
 
 namespace Shrooms.Contracts.DataTransferObjects.FilterPresets

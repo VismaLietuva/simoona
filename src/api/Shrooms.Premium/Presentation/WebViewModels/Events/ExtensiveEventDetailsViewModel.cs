@@ -28,6 +28,6 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
 
         public bool IsForAllOffices { get; set; }
 
-        public IEnumerable<ExtensiveEventParticipantDto> ExtensiveParticipants { get; set; }
+        public IEnumerable<ExtensiveEventParticipantViewModel> ExtensiveParticipants { get; set; }
     }
 }
