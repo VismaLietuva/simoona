@@ -6,7 +6,6 @@ using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models;
 using System.Data.Entity;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using System.Linq;
 using System;
@@ -24,34 +23,30 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
             _kudosTypesDbSet = uow.GetDbSet<KudosType>();
         }
 
-        public async Task CheckIfFilterPresetExistsAsync(CreateFilterPresetDto createDto)
+        public async Task CheckIfFilterPresetExistsAsync(FilterPresetDto createDto)
         {
-            await CheckIfFilterPresetExistsAsync(createDto.Name, createDto.Type);
-        }
+            var exists = await _filterPresetDbSet
+                .AnyAsync(p => p.Name == createDto.Name && p.ForPage == createDto.Type);
 
-        public async Task CheckIfFilterItemsExistsAsync(CreateFilterPresetDto createDto)
-        {
-            await CheckIfFilterItemsExistsAsync(createDto.Filters);
-        }
-
-        public void CheckIfFilterPresetItemsContainDuplicates(CreateFilterPresetDto createDto)
-        {
-            CheckIfFilterPresetItemsContainDuplicates(createDto.Filters);
-        }
-
-        private void CheckIfFilterPresetItemsContainDuplicates(IEnumerable<FilterPresetItemDto> presetItems)
-        {
-            foreach (var item in presetItems)
+            if (exists)
             {
-                CheckFilterPresetItemsContainDuplicates(item);
+                throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "Duplicates are not allowed");
             }
         }
 
-        private async Task CheckIfFilterItemsExistsAsync(IEnumerable<FilterPresetItemDto> presetItems)
+        public async Task CheckIfFilterItemsExistsAsync(FilterPresetDto createDto)
         {
-            foreach (var item in presetItems)
+            foreach (var item in createDto.Filters)
             {
                 await CheckFilterPresetItemFilterTypesAsync(item);
+            }
+        }
+
+        public void CheckIfFilterPresetItemsContainDuplicates(FilterPresetDto createDto)
+        {
+            foreach (var item in createDto.Filters)
+            {
+                CheckFilterPresetItemsContainDuplicates(item);
             }
         }
 
@@ -74,12 +69,22 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
                     await CheckKudosFilterTypesAsync(presetItem);
                     break;
                 case FilterType.Offices:
-                    throw new NotImplementedException();
+                    await CheckOfficeFilterTypesAsync(presetItem);
                     break;
                 case FilterType.Events:
-                    throw new NotImplementedException();
+                    await CheckEventFilterTypesAsync(presetItem);
                     break;
             }
+        }
+
+        private async Task CheckOfficeFilterTypesAsync(FilterPresetItemDto presetItem)
+        {
+            throw new NotImplementedException();
+        }
+
+        private async Task CheckEventFilterTypesAsync(FilterPresetItemDto presetItem)
+        {
+            throw new NotImplementedException();
         }
 
         private async Task CheckKudosFilterTypesAsync(FilterPresetItemDto presetItem)
@@ -93,18 +98,7 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
 
             if (!containsCorrectTypes)
             {
-                throw new ValidationException(ErrorCodes.IncorrectFilterType, "Specified filter does not exists");
-            }
-        }
-
-        private async Task CheckIfFilterPresetExistsAsync(string name, PageType type)
-        {
-            var exists = await _filterPresetDbSet
-                .AnyAsync(p => p.Name == name && p.ForPage == type);
-
-            if (exists)
-            {
-                throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "Duplicates are not allowed");
+                throw new ValidationException(ErrorCodes.IncorrectFilterType, "Specified Kudos filter does not exists");
             }
         }
     }

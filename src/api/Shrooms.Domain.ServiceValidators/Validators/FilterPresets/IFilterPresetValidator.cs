@@ -5,10 +5,10 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
 {
     public interface IFilterPresetValidator
     {
-        Task CheckIfFilterPresetExistsAsync(CreateFilterPresetDto createDto);
+        Task CheckIfFilterPresetExistsAsync(FilterPresetDto createDto);
 
-        Task CheckIfFilterItemsExistsAsync(CreateFilterPresetDto createDto);
+        Task CheckIfFilterItemsExistsAsync(FilterPresetDto createDto);
 
-        void CheckIfFilterPresetItemsContainDuplicates(CreateFilterPresetDto createDto);
+        void CheckIfFilterPresetItemsContainDuplicates(FilterPresetDto createDto);
     }
 }

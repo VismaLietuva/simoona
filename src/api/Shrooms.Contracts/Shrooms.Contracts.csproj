@@ -83,6 +83,7 @@
     <Compile Include="DataTransferObjects\BaseEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\CreateFilterPresetDto.cs" />
+    <Compile Include="DataTransferObjects\FilterPresets\FilterPresetDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\FilterPresetItemDto.cs" />
     <Compile Include="DataTransferObjects\ISoftDelete.cs" />
     <Compile Include="DataTransferObjects\ITrackable.cs" />
