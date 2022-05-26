@@ -34,6 +34,19 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
             await CheckIfFilterItemsExistsAsync(createDto.Filters);
         }
 
+        public void CheckIfFilterPresetItemsContainDuplicates(CreateFilterPresetDto createDto)
+        {
+            CheckIfFilterPresetItemsContainDuplicates(createDto.Filters);
+        }
+
+        private void CheckIfFilterPresetItemsContainDuplicates(IEnumerable<FilterPresetItemDto> presetItems)
+        {
+            foreach (var item in presetItems)
+            {
+                CheckFilterPresetItemsContainDuplicates(item);
+            }
+        }
+
         private async Task CheckIfFilterItemsExistsAsync(IEnumerable<FilterPresetItemDto> presetItems)
         {
             foreach (var item in presetItems)
@@ -42,10 +55,19 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
             }
         }
 
+        private void CheckFilterPresetItemsContainDuplicates(FilterPresetItemDto presetItem)
+        {
+            var currentCount = presetItem.Types.Count();
+            var distinctCount = presetItem.Types.Distinct().Count();
+
+            if (currentCount != distinctCount)
+            {
+                throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "Filter sequence cannot contain duplicates");
+            }
+        }
+
         private async Task CheckFilterPresetItemFilterTypesAsync(FilterPresetItemDto presetItem)
         {
-            // TODO: check if there are multiple sets added of the same filter
-            // TODO: check if there exists same [1, 1, 1, 1] or something like that
             switch (presetItem.ForType)
             {
                 case FilterType.Kudos:

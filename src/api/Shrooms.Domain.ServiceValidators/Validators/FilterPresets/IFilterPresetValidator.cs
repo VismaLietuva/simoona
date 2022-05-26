@@ -8,5 +8,7 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
         Task CheckIfFilterPresetExistsAsync(CreateFilterPresetDto createDto);
 
         Task CheckIfFilterItemsExistsAsync(CreateFilterPresetDto createDto);
+
+        void CheckIfFilterPresetItemsContainDuplicates(CreateFilterPresetDto createDto);
     }
 }

@@ -36,6 +36,8 @@ namespace Shrooms.Domain.Services.FilterPresets
 
             try
             {
+                _validator.CheckIfFilterPresetItemsContainDuplicates(createDto);
+
                 await _validator.CheckIfFilterPresetExistsAsync(createDto);
                 await _validator.CheckIfFilterItemsExistsAsync(createDto);
 
