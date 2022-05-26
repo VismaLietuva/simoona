@@ -66,10 +66,10 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
                 .Select(type => type.Name)
                 .ToListAsync();
 
-            var containsIncorrectType = kudosTypeNames
-                .Any(typeName => !presetItem.Types.Contains(typeName));
+            var containsCorrectTypes = presetItem.Types
+                .All(typeName => kudosTypeNames.Contains(typeName));
 
-            if (containsIncorrectType)
+            if (!containsCorrectTypes)
             {
                 throw new ValidationException(ErrorCodes.IncorrectFilterType, "Specified filter does not exists");
             }
