@@ -13,6 +13,8 @@ namespace Shrooms.DataLayer.EntityModels.Models.Multiwall
 
         public bool IsHiddenFromAllWalls { get; set; }
 
+        public bool AddForNewUsers { get; set; }
+
         public WallType Type { get; set; }
 
         public WallAccess Access { get; set; }
