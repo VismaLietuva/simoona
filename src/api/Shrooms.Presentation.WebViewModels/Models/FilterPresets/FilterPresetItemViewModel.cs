@@ -11,7 +11,7 @@ namespace Shrooms.Contracts.DataTransferObjects.FilterPresets
         public FilterType ForType { get; set; }
 
         [Required]
-        [MinLength(1)]
+        //[MinLength(1)]
         public IEnumerable<string> Types { get; set; }
     }
 }

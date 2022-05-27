@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Shrooms.Contracts.DataTransferObjects.FilterPresets
 {
-    public class FilterPresetDto
+    public class FilterPresetDto : UserAndOrganizationDto
     {
         public string Name { get; set; }
 

@@ -28,10 +28,12 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
             _eventTypeDbSet = uow.GetDbSet<EventType>();
         }
 
-        public async Task CheckIfFilterPresetExistsAsync(FilterPresetDto createDto)
+        public async Task CheckIfFilterPresetExistsAsync(FilterPresetDto presetDto)
         {
             var exists = await _filterPresetDbSet
-                .AnyAsync(p => p.Name == createDto.Name && p.ForPage == createDto.Type);
+                .AnyAsync(p => p.Name == presetDto.Name &&
+                          p.ForPage == presetDto.Type &&
+                          p.OrganizationId == presetDto.OrganizationId);
 
             if (exists)
             {
@@ -39,17 +41,17 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
             }
         }
 
-        public async Task CheckIfFilterItemsExistsAsync(FilterPresetDto createDto)
+        public async Task CheckIfFilterItemsExistsAsync(FilterPresetDto presetDto)
         {
-            foreach (var item in createDto.Filters)
+            foreach (var item in presetDto.Filters)
             {
-                await CheckFilterPresetItemFilterTypesAsync(item);
+                await CheckFilterPresetItemFilterTypesAsync(item, presetDto.OrganizationId);
             }
         }
 
-        public void CheckIfFilterPresetItemsContainDuplicates(FilterPresetDto createDto)
+        public void CheckIfFilterPresetItemsContainDuplicates(FilterPresetDto presetDto)
         {
-            foreach (var item in createDto.Filters)
+            foreach (var item in presetDto.Filters)
             {
                 CheckFilterPresetItemsContainDuplicates(item);
             }
@@ -66,7 +68,7 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
             }
         }
 
-        private async Task CheckFilterPresetItemFilterTypesAsync(FilterPresetItemDto presetItem)
+        private async Task CheckFilterPresetItemFilterTypesAsync(FilterPresetItemDto presetItem, int organizationId)
         {
             switch (presetItem.ForType)
             {
@@ -74,18 +76,19 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
                     await CheckKudosFilterTypesAsync(presetItem);
                     break;
                 case FilterType.Offices:
-                    await CheckOfficeFilterTypesAsync(presetItem);
+                    await CheckOfficeFilterTypesAsync(presetItem, organizationId);
                     break;
                 case FilterType.Events:
-                    await CheckEventFilterTypesAsync(presetItem);
+                    await CheckEventFilterTypesAsync(presetItem, organizationId);
                     break;
             }
         }
 
-        private async Task CheckOfficeFilterTypesAsync(FilterPresetItemDto presetItem)
+        private async Task CheckOfficeFilterTypesAsync(FilterPresetItemDto presetItem, int organizationId)
         {
             var count = await _officeDbSet
-                .Where(office => presetItem.Types.Contains(office.Id.ToString()))
+                .Where(office => presetItem.Types.Contains(office.Id.ToString()) &&
+                                 office.OrganizationId == organizationId)
                 .CountAsync();
 
             if (count != presetItem.Types.Count())
@@ -94,10 +97,11 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
             }
         }
 
-        private async Task CheckEventFilterTypesAsync(FilterPresetItemDto presetItem)
+        private async Task CheckEventFilterTypesAsync(FilterPresetItemDto presetItem, int organizationId)
         {
             var count = await _eventTypeDbSet
-                .Where(type => presetItem.Types.Contains(type.Id.ToString()))
+                .Where(type => presetItem.Types.Contains(type.Id.ToString()) &&
+                               type.OrganizationId == organizationId)
                 .CountAsync();
 
             if (count != presetItem.Types.Count())
@@ -106,6 +110,7 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
             }
         }
 
+        // Kudos types does not have an OrganizationId?
         private async Task CheckKudosFilterTypesAsync(FilterPresetItemDto presetItem)
         {
             var kudosTypeNames = await _kudosTypesDbSet

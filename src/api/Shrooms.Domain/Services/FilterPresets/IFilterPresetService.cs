@@ -6,8 +6,8 @@ namespace Shrooms.Domain.Services.FilterPresets
 {
     public interface IFilterPresetService
     {
-        Task CreateAsync(CreateFilterPresetDto createDto, UserAndOrganizationDto userOrg);
+        Task CreateAsync(CreateFilterPresetDto createDto);
 
-        Task UpdateAsync(EditFilterPresetDto editDto, UserAndOrganizationDto userOrg);
+        Task UpdateAsync(EditFilterPresetDto editDto);
     }
 }

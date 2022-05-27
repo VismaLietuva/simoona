@@ -4,6 +4,7 @@ using System.Web.Http;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.FilterPresets;
+using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Domain.Services.FilterPresets;
 using Shrooms.Presentation.Api.Filters;
@@ -24,6 +25,23 @@ namespace Shrooms.Presentation.Api.Controllers
             _filterPresetService = filterPresetService;
         }
 
+        [HttpGet]
+        [Route("GetForPage")]
+        [PermissionAuthorize(Permission = AdministrationPermissions.Administration)]
+        public async Task<IHttpActionResult> GetPresets(PageType forPage)
+        {
+            try
+            {
+                //return Ok(await _filterPresetService.GetForPageAsync(forPage));
+                throw new NotImplementedException();
+            }
+            catch (ValidationException e)
+            {
+                return BadRequestWithError(e);
+            }
+        }
+
+
         [HttpPut]
         [Route("Edit")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Administration)]
@@ -35,10 +53,14 @@ namespace Shrooms.Presentation.Api.Controllers
             }
 
             var editDto = _mapper.Map<EditFilterPresetViewModel, EditFilterPresetDto>(editViewModel);
+            var userOrg = GetUserAndOrganization();
+
+            editDto.UserId = userOrg.UserId;
+            editDto.OrganizationId = userOrg.OrganizationId;
 
             try
             {
-                await _filterPresetService.UpdateAsync(editDto, GetUserAndOrganization());
+                await _filterPresetService.UpdateAsync(editDto);
                 
                 return Ok();
             }
@@ -46,8 +68,6 @@ namespace Shrooms.Presentation.Api.Controllers
             {
                 return BadRequestWithError(e);
             }
-
-            throw new NotImplementedException();
         }
 
         [HttpPost]
@@ -61,10 +81,14 @@ namespace Shrooms.Presentation.Api.Controllers
             }
 
             var createDto = _mapper.Map<CreateFilterPresetViewModel, CreateFilterPresetDto>(createViewModel);
+            var userOrg = GetUserAndOrganization();
+
+            createDto.UserId = userOrg.UserId;
+            createDto.OrganizationId = userOrg.OrganizationId;
 
             try
             {
-                await _filterPresetService.CreateAsync(createDto, GetUserAndOrganization());
+                await _filterPresetService.CreateAsync(createDto);
              
                 return Ok();
             }
