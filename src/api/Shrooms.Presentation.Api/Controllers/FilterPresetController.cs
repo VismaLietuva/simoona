@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
@@ -23,6 +24,32 @@ namespace Shrooms.Presentation.Api.Controllers
             _filterPresetService = filterPresetService;
         }
 
+        [HttpPut]
+        [Route("Edit")]
+        [PermissionAuthorize(Permission = AdministrationPermissions.Administration)]
+        public async Task<IHttpActionResult> Edit(EditFilterPresetViewModel editViewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var editDto = _mapper.Map<EditFilterPresetViewModel, EditFilterPresetDto>(editViewModel);
+
+            try
+            {
+                await _filterPresetService.UpdateAsync(editDto, GetUserAndOrganization());
+                
+                return Ok();
+            }
+            catch (ValidationException e)
+            {
+                return BadRequestWithError(e);
+            }
+
+            throw new NotImplementedException();
+        }
+
         [HttpPost]
         [Route("Create")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Administration)]
@@ -30,7 +57,7 @@ namespace Shrooms.Presentation.Api.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest();
             }
 
             var createDto = _mapper.Map<CreateFilterPresetViewModel, CreateFilterPresetDto>(createViewModel);

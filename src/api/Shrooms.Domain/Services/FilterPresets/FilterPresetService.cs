@@ -2,7 +2,6 @@
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.FilterPresets;
-using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.ServiceValidators.Validators.FilterPresets;
 using System;
@@ -28,6 +27,41 @@ namespace Shrooms.Domain.Services.FilterPresets
             _filterPresetDbSet = uow.GetDbSet<FilterPreset>();
         }
 
+        public async Task UpdateAsync(EditFilterPresetDto editDto, UserAndOrganizationDto userOrg)
+        {
+            await _filterPresetUpdateCreateLock.WaitAsync();
+            
+            try
+            {
+                _validator.CheckIfFilterPresetItemsContainDuplicates(editDto);
+
+                await _validator.CheckIfFilterItemsExistsAsync(editDto);
+
+                var filterPreset = await _filterPresetDbSet
+                    .FirstAsync(filter => filter.Id == editDto.Id);
+
+                if (filterPreset.Name != editDto.Name)
+                {
+                    await _validator.CheckIfFilterPresetExistsAsync(editDto);
+                }
+
+                if (editDto.IsDefault)
+                {
+                    await ChangeCurrentDefaultFilterToNonDefaultAsync(filterPreset);
+                }
+
+                filterPreset.Name = editDto.Name;
+                filterPreset.ForPage = editDto.Type;
+                filterPreset.Preset = JsonConvert.SerializeObject(editDto);
+
+                await _uow.SaveChangesAsync(userOrg.UserId);
+            }
+            finally
+            {
+                _filterPresetUpdateCreateLock.Release();
+            }
+        }
+
         public async Task CreateAsync(CreateFilterPresetDto createDto, UserAndOrganizationDto userOrg)
         {
             await _filterPresetUpdateCreateLock.WaitAsync();
@@ -39,7 +73,7 @@ namespace Shrooms.Domain.Services.FilterPresets
                 await _validator.CheckIfFilterPresetExistsAsync(createDto);
                 await _validator.CheckIfFilterItemsExistsAsync(createDto);
 
-                var filterPreset = MapCreateFilterPresetDtoToFilterPreset(createDto, userOrg);
+                var filterPreset = MapFilterPresetDtoToFilterPreset(createDto, userOrg);
 
                 if (filterPreset.IsDefault)
                 {
@@ -69,7 +103,7 @@ namespace Shrooms.Domain.Services.FilterPresets
             }
         }
 
-        private static FilterPreset MapCreateFilterPresetDtoToFilterPreset(CreateFilterPresetDto createDto, UserAndOrganizationDto userOrg)
+        private static FilterPreset MapFilterPresetDtoToFilterPreset(FilterPresetDto createDto, UserAndOrganizationDto userOrg)
         {
             return new FilterPreset
             {
