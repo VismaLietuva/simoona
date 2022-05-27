@@ -81,6 +81,7 @@
     <Compile Include="Models\ExternalLink\NewExternalLinkViewModel.cs" />
     <Compile Include="Models\ExternalLink\UpdatedExternalLinkViewModel.cs" />
     <Compile Include="Models\FilterPresets\CreateFilterPresetViewModel.cs" />
+    <Compile Include="Models\FilterPresets\EditFilterPresetViewModel.cs" />
     <Compile Include="Models\FilterPresets\FilterPresetItemViewModel.cs" />
     <Compile Include="Models\Jobs\NewJobTypeViewModel.cs" />
     <Compile Include="Models\Jobs\JobTypeViewModel.cs" />
