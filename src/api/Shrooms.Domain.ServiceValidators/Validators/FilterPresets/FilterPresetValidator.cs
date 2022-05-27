@@ -9,18 +9,23 @@ using System.Threading.Tasks;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using System.Linq;
 using System;
+using Shrooms.DataLayer.EntityModels.Models.Events;
 
 namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
 {
     public class FilterPresetValidator : IFilterPresetValidator
     {
         private readonly IDbSet<FilterPreset> _filterPresetDbSet;
-        private readonly IDbSet<KudosType> _kudosTypesDbSet; 
+        private readonly IDbSet<KudosType> _kudosTypesDbSet;
+        private readonly IDbSet<Office> _officeDbSet;
+        private readonly IDbSet<EventType> _eventTypeDbSet;
 
         public FilterPresetValidator(IUnitOfWork2 uow)
         {
             _filterPresetDbSet = uow.GetDbSet<FilterPreset>();
             _kudosTypesDbSet = uow.GetDbSet<KudosType>();
+            _officeDbSet = uow.GetDbSet<Office>();
+            _eventTypeDbSet = uow.GetDbSet<EventType>();
         }
 
         public async Task CheckIfFilterPresetExistsAsync(FilterPresetDto createDto)
@@ -79,12 +84,26 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
 
         private async Task CheckOfficeFilterTypesAsync(FilterPresetItemDto presetItem)
         {
-            throw new NotImplementedException();
+            var count = await _officeDbSet
+                .Where(office => presetItem.Types.Contains(office.Id.ToString()))
+                .CountAsync();
+
+            if (count != presetItem.Types.Count())
+            {
+                throw new ValidationException(ErrorCodes.IncorrectFilterType, "Specified office filter type does not exists");
+            }
         }
 
         private async Task CheckEventFilterTypesAsync(FilterPresetItemDto presetItem)
         {
-            throw new NotImplementedException();
+            var count = await _eventTypeDbSet
+                .Where(type => presetItem.Types.Contains(type.Id.ToString()))
+                .CountAsync();
+
+            if (count != presetItem.Types.Count())
+            {
+                throw new ValidationException(ErrorCodes.IncorrectFilterType, "Specified event filter type does not exists");
+            }
         }
 
         private async Task CheckKudosFilterTypesAsync(FilterPresetItemDto presetItem)
