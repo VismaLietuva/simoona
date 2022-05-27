@@ -179,7 +179,7 @@ namespace Shrooms.Domain.Services.Administration
 
             await SetWelcomeKudosAsync(applicationUser);
 
-            await AddUserToWallsForNewUsers(userId);
+            await AddUserToWallsForNewUsers(userAndOrg);
             await _uow.SaveChangesAsync(userAndOrg.UserId);
         }
 
@@ -490,20 +490,20 @@ namespace Shrooms.Domain.Services.Administration
             return filteredUsers?.ToList() ?? administrationUsers;
         }
 
-        private async Task<IEnumerable<DataLayer.EntityModels.Models.Multiwall.Wall>> GetWallsForNewUsersAsync(string userId)
+        private async Task<IEnumerable<DataLayer.EntityModels.Models.Multiwall.Wall>> GetWallsForNewUsersAsync(UserAndOrganizationDto userOrg)
         {
             return await _wallsDbSet
                 .Include(wall => wall.Members)
-                .Where(wall => (wall.Type == WallType.Main ||
-                               (wall.AddForNewUsers && wall.Type == WallType.UserCreated)) &&
-                               (wall.Members.All(m => m.UserId != userId)))
-                .OrderByDescending(wall => wall.Type)
+                .Where(wall => wall.OrganizationId == userOrg.OrganizationId &&
+                       wall.Members.All(m => m.UserId != userOrg.UserId) &&
+                       (wall.Type == WallType.Main || (wall.AddForNewUsers && 
+                                                       wall.Type == WallType.UserCreated)))
                 .ToListAsync();
         }
 
-        private async Task AddUserToWallsForNewUsers(string userId)
+        private async Task AddUserToWallsForNewUsers(UserAndOrganizationDto userOrg)
         {
-            var walls = await GetWallsForNewUsersAsync(userId);
+            var walls = await GetWallsForNewUsersAsync(userOrg);
 
             if (!walls.Any())
             {
@@ -516,10 +516,10 @@ namespace Shrooms.Domain.Services.Administration
             {
                 var wallMember = new WallMember
                 {
-                    UserId = userId,
+                    UserId = userOrg.UserId,
                     Wall = wall,
-                    CreatedBy = userId,
-                    ModifiedBy = userId,
+                    CreatedBy = userOrg.UserId,
+                    ModifiedBy = userOrg.UserId,
                     Created = timestamp,
                     Modified = timestamp,
                     AppNotificationsEnabled = true,
