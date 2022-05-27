@@ -10,6 +10,7 @@ using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using System.Linq;
 using System;
 using Shrooms.DataLayer.EntityModels.Models.Events;
+using Shrooms.Contracts.DataTransferObjects;
 
 namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
 {
@@ -33,6 +34,18 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
             if (!Enum.IsDefined(typeof(PageType), page))
             {
                 throw new ValidationException(ErrorCodes.IncorrectType, "Page does not exists");
+            }
+        }
+
+
+        public async Task CheckIfFilterPresetExistsAsync(int id, UserAndOrganizationDto userOrg)
+        {
+            var exists = await _filterPresetDbSet
+                .AnyAsync(p => p.Id == id && p.OrganizationId == userOrg.OrganizationId);
+
+            if (!exists)
+            {
+                throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "Filter preset does not exists");
             }
         }
 

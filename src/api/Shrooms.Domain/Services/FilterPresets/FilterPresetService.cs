@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
 using System;
+using Shrooms.Contracts.DataTransferObjects;
 
 namespace Shrooms.Domain.Services.FilterPresets
 {
@@ -27,6 +28,18 @@ namespace Shrooms.Domain.Services.FilterPresets
             _validator = validator;
 
             _filterPresetDbSet = uow.GetDbSet<FilterPreset>();
+        }
+
+        public async Task DeleteAsync(int id, UserAndOrganizationDto userOrg)
+        {
+            await _validator.CheckIfFilterPresetExistsAsync(id, userOrg);
+
+            var preset = await _filterPresetDbSet
+                .FirstAsync(p => p.Id == id);
+
+            _filterPresetDbSet.Remove(preset);
+
+            await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
         public async Task<IEnumerable<FilterPresetDto>> GetPresetsForPageAsync(PageType type, int organizationId)

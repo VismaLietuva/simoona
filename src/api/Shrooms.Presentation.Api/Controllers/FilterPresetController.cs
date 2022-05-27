@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
@@ -25,6 +24,24 @@ namespace Shrooms.Presentation.Api.Controllers
             _mapper = mapper;
             _filterPresetService = filterPresetService;
         }
+
+        [HttpDelete]
+        [Route("Delete")]
+        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        public async Task<IHttpActionResult> Delete(int id)
+        {
+            try
+            {
+                await _filterPresetService.DeleteAsync(id, GetUserAndOrganization());
+
+                return Ok();
+            }
+            catch (ValidationException e)
+            {
+                return BadRequestWithError(e);
+            }
+        }
+
 
         [HttpGet]
         [Route("GetPresetsForPage")]
