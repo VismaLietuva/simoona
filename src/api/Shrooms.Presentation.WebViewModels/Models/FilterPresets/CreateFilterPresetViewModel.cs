@@ -14,7 +14,7 @@ namespace Shrooms.Presentation.WebViewModels.Models.FilterPresets
 
         [Required]
         [EnumDataType(typeof(PageType))]
-        public PageType Type { get; set; }
+        public PageType ForType { get; set; }
 
         [Required]
         public bool IsDefault { get; set; }

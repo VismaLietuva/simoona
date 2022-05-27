@@ -9,7 +9,7 @@ namespace Shrooms.Contracts.DataTransferObjects.FilterPresets
         
         public string Name { get; set; }
 
-        public PageType Type { get; set; }
+        public PageType ForPage { get; set; }
 
         public bool IsDefault { get; set; }
 

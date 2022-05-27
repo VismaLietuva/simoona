@@ -40,7 +40,7 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
         {
             var exists = await _filterPresetDbSet
                 .AnyAsync(p => p.Name == presetDto.Name &&
-                          p.ForPage == presetDto.Type &&
+                          p.ForPage == presetDto.ForPage &&
                           p.OrganizationId == presetDto.OrganizationId);
 
             if (exists)

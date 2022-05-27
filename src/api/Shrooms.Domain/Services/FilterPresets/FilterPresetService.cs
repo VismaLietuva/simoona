@@ -41,7 +41,7 @@ namespace Shrooms.Domain.Services.FilterPresets
                 {
                     Id = preset.Id,
                     Name = preset.Name,
-                    Type = preset.ForPage,
+                    ForPage = preset.ForPage,
                     IsDefault = preset.IsDefault,
                     Filters = JsonConvert.DeserializeObject<IEnumerable<FilterPresetItemDto>>(preset.Preset)
                 });
@@ -71,7 +71,7 @@ namespace Shrooms.Domain.Services.FilterPresets
                 }
 
                 filterPreset.Name = editDto.Name;
-                filterPreset.ForPage = editDto.Type;
+                filterPreset.ForPage = editDto.ForPage;
                 filterPreset.Preset = JsonConvert.SerializeObject(editDto.Filters);
 
                 await _uow.SaveChangesAsync(editDto.UserId);
@@ -131,7 +131,7 @@ namespace Shrooms.Domain.Services.FilterPresets
             {
                 Name = createDto.Name,
                 IsDefault = createDto.IsDefault,
-                ForPage = createDto.Type,
+                ForPage = createDto.ForPage,
                 Preset = JsonConvert.SerializeObject(createDto.Filters),
                 OrganizationId = organizationId,
             };
