@@ -5,6 +5,8 @@ namespace Shrooms.Contracts.DataTransferObjects.FilterPresets
 {
     public class FilterPresetDto : UserAndOrganizationDto
     {
+        public int Id { get; set; }
+        
         public string Name { get; set; }
 
         public PageType Type { get; set; }

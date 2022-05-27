@@ -28,6 +28,14 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
             _eventTypeDbSet = uow.GetDbSet<EventType>();
         }
 
+        public void CheckIfPageTypeExists(PageType page)
+        {
+            if (!Enum.IsDefined(typeof(PageType), page))
+            {
+                throw new ValidationException(ErrorCodes.IncorrectType, "Page does not exists");
+            }
+        }
+
         public async Task CheckIfFilterPresetExistsAsync(FilterPresetDto presetDto)
         {
             var exists = await _filterPresetDbSet
@@ -93,7 +101,7 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
 
             if (count != presetItem.Types.Count())
             {
-                throw new ValidationException(ErrorCodes.IncorrectFilterType, "Specified office filter type does not exists");
+                throw new ValidationException(ErrorCodes.IncorrectType, "Specified office filter type does not exists");
             }
         }
 
@@ -106,7 +114,7 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
 
             if (count != presetItem.Types.Count())
             {
-                throw new ValidationException(ErrorCodes.IncorrectFilterType, "Specified event filter type does not exists");
+                throw new ValidationException(ErrorCodes.IncorrectType, "Specified event filter type does not exists");
             }
         }
 
@@ -122,7 +130,7 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
 
             if (!containsCorrectTypes)
             {
-                throw new ValidationException(ErrorCodes.IncorrectFilterType, "Specified Kudos filter does not exists");
+                throw new ValidationException(ErrorCodes.IncorrectType, "Specified Kudos filter does not exists");
             }
         }
     }

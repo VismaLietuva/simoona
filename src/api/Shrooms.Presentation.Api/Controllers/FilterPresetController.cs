@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
@@ -26,14 +27,16 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [HttpGet]
-        [Route("GetForPage")]
-        [PermissionAuthorize(Permission = AdministrationPermissions.Administration)]
-        public async Task<IHttpActionResult> GetPresets(PageType forPage)
+        [Route("GetPresetsForPage")]
+        [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
+        public async Task<IHttpActionResult> GetPresets(PageType forPage) 
         {
             try
             {
-                //return Ok(await _filterPresetService.GetForPageAsync(forPage));
-                throw new NotImplementedException();
+                var presets = await _filterPresetService.GetPresetsForPageAsync(forPage, GetOrganizationId());
+                var presetsViewModel = _mapper.Map<IEnumerable<FilterPresetDto>, IEnumerable<FilterPresetViewModel>>(presets);
+
+                return Ok(presetsViewModel);
             }
             catch (ValidationException e)
             {

@@ -2,6 +2,5 @@
 {
     public class EditFilterPresetDto : FilterPresetDto
     {
-        public int Id { get; set; }
     }
 }

@@ -51,6 +51,6 @@
         public const int BadgeToKudosRelationshipNotFound = 1302;
 
         // Filter presets, 14**
-        public const int IncorrectFilterType = 1400;
+        public const int IncorrectType = 1400;
     }
 }

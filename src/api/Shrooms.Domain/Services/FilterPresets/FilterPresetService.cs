@@ -1,11 +1,15 @@
 ﻿using Newtonsoft.Json;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects.FilterPresets;
+using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.ServiceValidators.Validators.FilterPresets;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
+using System;
 
 namespace Shrooms.Domain.Services.FilterPresets
 {
@@ -23,6 +27,24 @@ namespace Shrooms.Domain.Services.FilterPresets
             _validator = validator;
 
             _filterPresetDbSet = uow.GetDbSet<FilterPreset>();
+        }
+
+        public async Task<IEnumerable<FilterPresetDto>> GetPresetsForPageAsync(PageType type, int organizationId)
+        {
+            _validator.CheckIfPageTypeExists(type);
+
+            return (await _filterPresetDbSet
+                .Where(preset => preset.OrganizationId == organizationId &&
+                                 preset.ForPage == type)
+                .ToListAsync())
+                .Select(preset => new FilterPresetDto
+                {
+                    Id = preset.Id,
+                    Name = preset.Name,
+                    Type = preset.ForPage,
+                    IsDefault = preset.IsDefault,
+                    Filters = JsonConvert.DeserializeObject<IEnumerable<FilterPresetItemDto>>(preset.Preset)
+                });
         }
 
         public async Task UpdateAsync(EditFilterPresetDto editDto)
@@ -50,7 +72,7 @@ namespace Shrooms.Domain.Services.FilterPresets
 
                 filterPreset.Name = editDto.Name;
                 filterPreset.ForPage = editDto.Type;
-                filterPreset.Preset = JsonConvert.SerializeObject(editDto);
+                filterPreset.Preset = JsonConvert.SerializeObject(editDto.Filters);
 
                 await _uow.SaveChangesAsync(editDto.UserId);
             }
@@ -110,7 +132,7 @@ namespace Shrooms.Domain.Services.FilterPresets
                 Name = createDto.Name,
                 IsDefault = createDto.IsDefault,
                 ForPage = createDto.Type,
-                Preset = JsonConvert.SerializeObject(createDto),
+                Preset = JsonConvert.SerializeObject(createDto.Filters),
                 OrganizationId = organizationId,
             };
         }
