@@ -10,8 +10,6 @@ namespace Shrooms.Contracts.DataTransferObjects.Users
 
         public string LastName { get; set; }
 
-        public string Email { get; set; }
-
         public int OrganizationId { get; set; }
 
         public string ManagerId { get; set; }
