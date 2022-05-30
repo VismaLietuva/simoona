@@ -864,6 +864,10 @@
     <Compile Include="Migrations\202204291158023_AddedSendEmailToManagerPropertyToEventType.Designer.cs">
       <DependentUpon>202204291158023_AddedSendEmailToManagerPropertyToEventType.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202205270910095_AddedAddForNewUsersProperty.cs" />
+    <Compile Include="Migrations\202205270910095_AddedAddForNewUsersProperty.Designer.cs">
+      <DependentUpon>202205270910095_AddedAddForNewUsersProperty.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
@@ -1439,6 +1443,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202204291158023_AddedSendEmailToManagerPropertyToEventType.resx">
       <DependentUpon>202204291158023_AddedSendEmailToManagerPropertyToEventType.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202205270910095_AddedAddForNewUsersProperty.resx">
+      <DependentUpon>202205270910095_AddedAddForNewUsersProperty.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
