@@ -205,5 +205,10 @@
   "moreCount" : "and {{one}} more...",
   "selectedCount": "{{one}} selected",
   "createFilterPreset": "Create preset",
-  "default": "Default"
+  "default": "Default",
+  "presetConfigurationHeading": "Preset configuration",
+  "presetConfigurationTableEvents": "Events",
+  "presetConfigurationTableOffices": "Offices",
+  "presetConfigurationTableKudos": "Kudos",
+  "presetConfigurationTableName": "Name"
 }

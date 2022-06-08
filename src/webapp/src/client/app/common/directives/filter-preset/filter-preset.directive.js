@@ -15,9 +15,9 @@
             offices: 2,
         })
         .constant('filterTypesRowTranslations',[
-            'events.tableEvents',
-            'events.tableKudos',
-            'events.tableOffices',
+            'common.presetConfigurationTableEvents',
+            'common.presetConfigurationTableKudos',
+            'common.presetConfigurationTableName',
         ]);
 
     filterPreset.$inject = [

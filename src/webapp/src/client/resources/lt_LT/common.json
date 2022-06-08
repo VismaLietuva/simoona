@@ -205,5 +205,10 @@
   "moreCount" : "ir dar {{one}}...",
   "selectedCount": "{{one}} pasirinkti",
   "createFilterPreset": "Sukurti šabloną",
-  "default": "Numatytas"
+  "default": "Numatytas",
+  "presetConfigurationHeading": "Šablonų konfiguracija",
+  "presetConfigurationTableEvents": "Renginiai",
+  "presetConfigurationTableOffices": "Ofisai",
+  "presetConfigurationTableKudos": "Kudos",
+  "presetConfigurationTableName": "Pavadinimas"
 }

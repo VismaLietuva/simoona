@@ -3,13 +3,13 @@
     <!-- TOOD: fix overflow -->
     <div class="panel panel-default filter-preset-modal-container">
         <div class="panel-heading filter-preset-modal-heading">
-            <span>Preset configuration</span>
+            <span translate="common.presetConfigurationHeading"></span>
         </div>
         <div class="p-10" ng-form name="form">
             <table class="nc-table" ng-if="vm.controls.length && !vm.allCheckedAsDeleted">
                 <thead>
                     <tr>
-                        <th translate="events.name">
+                        <th translate="common.presetConfigurationTableName">
                         <th ng-repeat="filterTypes in vm.loadedFilterTypes" translate="{{vm.filterTypesRowTranslations[filterTypes.filterType]}}">
                         <th translate="common.default">
                         <th class="text-center" translate="common.action">
