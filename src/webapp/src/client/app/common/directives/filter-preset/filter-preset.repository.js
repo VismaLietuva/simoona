@@ -22,13 +22,14 @@
 
         return service;
 
-        function updatePresets(presets) {
+        function updatePresets(presets, pageType) {
             return $resource(`${filterPresetUrl}/Update`, {}, {
                 post: {
                     withCredentials: true,
                     method: 'POST'
                 }
             }).post({
+                pageType: pageType,
                 presetsToUpdate: presets.presetsToUpdate,
                 presetsToAdd: presets.presetsToAdd,
                 presetsToRemove: presets.presetsToRemove

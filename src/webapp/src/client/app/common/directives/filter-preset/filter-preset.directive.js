@@ -241,7 +241,7 @@
         function applyUpdate() {
             var modifiedPresets = getModifiedPresets();
 
-            filterPresetRepository.updatePresets(modifiedPresets).then(
+            filterPresetRepository.updatePresets(modifiedPresets, vm.filterPageType).then(
                 function () {
                     syncControlsWithPresets(modifiedPresets);
 

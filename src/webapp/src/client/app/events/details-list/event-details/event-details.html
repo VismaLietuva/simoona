@@ -4,6 +4,13 @@
             <!-- Header -->
             <div class="panel-heading">
                 <span>{{vm.eventDetails.name}}</span>
+                <ace-filter-preset
+                    filter-page-type="{{vm.filterPageType}}"
+                    loaded-filter-types="vm.filterTypes"
+                    on-value-change="vm.applyFilterPreset(preset)"
+                    class="pull-right"
+                    modal-size="lg"
+                ></ace-filter-preset>
             </div>
 
             <wave-spinner ng-if="vm.isLoading && !vm.eventDetails"></wave-spinner>
@@ -96,13 +103,22 @@
 
                 <!-- Filter controls -->
                 <div class="row event-details-list-filter-controls" ng-if="vm.loadControls">
-                    <ace-dropdown-checkbox class="col-md-2 col-xs-6 col-sm-4 pull-right"
-                        translation="events.eventKudosDropdownButtonTitle" types="vm.kudosTypes"
-                        on-value-change="vm.setKudosTypes(types)" is-expanded="false"></ace-dropdown-checkbox>
+                    <ace-dropdown-checkbox
+                        class="col-md-2 col-xs-6 col-sm-4 pull-right"
+                        translation="events.eventKudosDropdownButtonTitle"
+                        types="vm.filterTypes.kudosTypes.filters"
+                        on-value-change="vm.setKudosTypes(types)"
+                        applied-types="vm.dropdownCheckboxes.kudosTypes"
+                        is-expanded="false">
+                    </ace-dropdown-checkbox>
 
                     <ace-dropdown-checkbox class="col-md-2 col-xs-6 col-sm-4 pull-right"
-                        translation="events.eventTypesDropdownButtonTitle" types="vm.eventTypes"
-                        on-value-change="vm.setEventTypes(types)" is-expanded="false"></ace-dropdown-checkbox>
+                        translation="events.eventTypesDropdownButtonTitle"
+                        types="vm.filterTypes.eventTypes.filters"
+                        applied-types="vm.dropdownCheckboxes.eventTypes"
+                        on-value-change="vm.setEventTypes(types)"
+                        is-expanded="false">
+                    </ace-dropdown-checkbox>
                 </div>
 
                 <table ng-if="vm.pageContent.length" class="nc-table">

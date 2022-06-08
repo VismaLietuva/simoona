@@ -107,42 +107,22 @@
         }
 
         function applyFilterPreset(preset) {
-            vm.dropdownCheckboxes.eventTypes = mapFilterPresetTypesToMap(
+            vm.dropdownCheckboxes.eventTypes = filterPresetService.mapFilterPresetTypesToMap(
                 preset,
-                filterTypes.events
+                filterTypes.events,
+                vm.filterTypes
             );
 
-            vm.dropdownCheckboxes.officeTypes = mapFilterPresetTypesToMap(
+            vm.dropdownCheckboxes.officeTypes = filterPresetService.mapFilterPresetTypesToMap(
                 preset,
-                filterTypes.offices
+                filterTypes.offices,
+                vm.filterTypes
             );
 
             applyFilter([...vm.dropdownCheckboxes.eventTypes], filterTypes.events);
             applyFilter([...vm.dropdownCheckboxes.officeTypes], filterTypes.offices);
 
             loadEventsOnPage(1);
-        }
-
-        function mapFilterPresetTypesToMap(preset, filterType) {
-            var presetTypes = filterPresetService.getFiltersByTypeFromResult(
-                preset.filters,
-                filterType
-            );
-
-            if (!presetTypes) {
-                return new Map();
-            }
-
-            var filters = Object.values(vm.filterTypes).find(
-                (filter) => filter.filterType == filterType
-            ).filters;
-
-            return new Map(
-                presetTypes.types.map((type) => [
-                    parseInt(type),
-                    filters.find((filter) => filter.id == type).name,
-                ])
-            );
         }
 
         function onSearchFilter() {

@@ -7,25 +7,43 @@
 
     eventDetailsController.$inject = [
         'eventRepository',
-        'kudosTypesRepository',
         '$stateParams',
         'eventSettings',
         'notifySrv',
+        'filterPresetRepository',
+        'filterPresetService',
+        'filterTypes',
+        'filterPageTypes'
     ];
 
     function eventDetailsController(
         eventRepository,
-        kudosTypesRepository,
         $stateParams,
         eventSettings,
-        notifySrv
+        notifySrv,
+        filterPresetRepository,
+        filterPresetService,
+        filterTypes,
+        filterPageTypes
     ) {
         var vm = this;
+
+        vm.filterPageType = filterPageTypes.extensiveEventDetails;
 
         vm.eventImageSize = {
             w: eventSettings.thumbWidth,
             h: eventSettings.thumbHeight,
         };
+
+        vm.filterTypes = {
+            eventTypes: undefined,
+            kudosTypes: undefined
+        }
+
+        vm.dropdownCheckboxes = {
+            eventTypes: new Map(),
+            kudosTypes: new Map()
+        }
 
         vm.filter = {
             appliedKudos: undefined,
@@ -42,13 +60,40 @@
         vm.setKudosTypes = setKudosTypes;
         vm.setEventTypes = setEventTypes;
         vm.changePage = changePage;
+        vm.applyFilterPreset = applyFilterPreset;
 
         init();
 
         function init() {
-            loadKudosTypes();
-            loadEventTypes();
+            loadFilters();
             loadEventDetails();
+        }
+
+        function loadFilters() {
+            vm.isLoading = true;
+
+            filterPresetRepository
+                .getFilters([filterTypes.events, filterTypes.kudos])
+                .then(
+                    function(result) {
+                        vm.filterTypes.eventTypes =
+                            filterPresetService.getFiltersByTypeFromResult(
+                                result,
+                                filterTypes.events
+                            );
+
+                        vm.filterTypes.kudosTypes =
+                            filterPresetService.getFiltersByTypeFromResult(
+                                result,
+                                filterTypes.kudos
+                            );
+
+                        vm.isLoading = false;
+                    },
+                    function() {
+                        notifySrv.error('errorCodeMessages.messageError');
+                    }
+                )
         }
 
         function loadEventDetails() {
@@ -74,28 +119,6 @@
                 );
         }
 
-        function loadKudosTypes() {
-            kudosTypesRepository.getKudosTypes().then(
-                function (result) {
-                    vm.kudosTypes = result;
-                },
-                function () {
-                    notifySrv.error('errorCodeMessages.messageError');
-                }
-            );
-        }
-
-        function loadEventTypes() {
-            eventRepository.getEventTypes().then(
-                function (result) {
-                    vm.eventTypes = result;
-                },
-                function () {
-                    notifySrv.error('errorCodeMessages.messageError');
-                }
-            );
-        }
-
         function setKudosTypes(types) {
             vm.filter.appliedKudos = types.map((filter) => filter[1]);
 
@@ -112,6 +135,25 @@
             vm.page = page;
 
             loadPage();
+        }
+
+        function applyFilterPreset(preset) {
+            vm.dropdownCheckboxes.eventTypes = filterPresetService.mapFilterPresetTypesToMap(
+                preset,
+                filterTypes.events,
+                vm.filterTypes
+            );
+
+            vm.dropdownCheckboxes.kudosTypes = filterPresetService.mapFilterPresetTypesToMap(
+                preset,
+                filterTypes.kudos,
+                vm.filterTypes
+            );
+
+            vm.filter.appliedEventTypes = [...vm.dropdownCheckboxes.eventTypes.keys()];
+            vm.filter.appliedKudos = [...vm.dropdownCheckboxes.kudosTypes.keys()];
+
+            loadEventDetails();
         }
 
         function loadPage() {
