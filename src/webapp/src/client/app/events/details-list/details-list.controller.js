@@ -77,6 +77,10 @@
                                 filterTypes.offices
                             );
 
+                        if (vm.notAppliedPreset !== undefined) {
+                            handleNotAppliedPreset();
+                        }
+
                         vm.isLoadingControls = false;
                     },
                     function () {
@@ -107,6 +111,12 @@
         }
 
         function applyFilterPreset(preset) {
+            if (!vm.filterTypes.eventTypes || !vm.filterTypes.officeTypes) {
+                vm.notAppliedPreset = preset;
+
+                return;
+            }
+
             vm.dropdownCheckboxes.eventTypes = filterPresetService.mapFilterPresetTypesToMap(
                 preset,
                 filterTypes.events,
@@ -149,6 +159,11 @@
         function loadEventsWithNewlyAppliedFilter(filter, filterName) {
             applyFilter(filter, filterName);
             loadEventsOnPage(1);
+        }
+
+        function handleNotAppliedPreset() {
+            vm.applyFilterPreset(vm.notAppliedPreset);
+            vm.notAppliedPreset = undefined;
         }
     }
 })();

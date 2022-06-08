@@ -88,6 +88,10 @@
                                 filterTypes.kudos
                             );
 
+                        if (vm.notAppliedPreset !== undefined) {
+                            handleNotAppliedPreset();
+                        }
+
                         vm.isLoading = false;
                     },
                     function() {
@@ -138,6 +142,11 @@
         }
 
         function applyFilterPreset(preset) {
+            if (!vm.filterTypes.eventTypes || !vm.filterTypes.kudosTypes) {
+                vm.notAppliedPreset = preset;
+                return;
+            }
+
             vm.dropdownCheckboxes.eventTypes = filterPresetService.mapFilterPresetTypesToMap(
                 preset,
                 filterTypes.events,
@@ -174,6 +183,11 @@
                 }));
 
             vm.showActionsColumn = showActionsColumn();
+        }
+
+        function handleNotAppliedPreset() {
+            vm.applyFilterPreset(vm.notAppliedPreset);
+            vm.notAppliedPreset = undefined;
         }
 
         function showActionsColumn() {
