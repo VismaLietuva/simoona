@@ -5,6 +5,13 @@
                 <!-- Header -->
                 <div class="panel-heading">
                     <span translate="events.eventsTitle"></span>
+                    <ace-filter-preset
+                        filter-page-type="{{vm.filterPageType}}"
+                        loaded-filter-types="vm.filterTypes"
+                        class="pull-right"
+                        on-value-change="vm.applyFilterPreset(preset)"
+                        modal-size="lg"
+                    ></ace-filter-preset>
                 </div>
                 <div class="panel-body">
                     <!-- Search bar -->
@@ -16,14 +23,18 @@
                                     translate />
                             </div>
                         </div>
+
                         <!-- Filters -->
                         <ace-dropdown-checkbox is-expanded="false" class="col-md-2 mt-3"
-                            translation="events.eventTypesDropdownButtonTitle" types="vm.eventTypes"
-                            on-value-change="vm.loadEventsWithNewlyAppliedFilter(types, 'appliedEventTypes')">
+                            translation="events.eventTypesDropdownButtonTitle" types="vm.filterTypes.eventTypes.filters"
+                            on-value-change="vm.loadEventsWithNewlyAppliedFilter(types, 'appliedEventTypes')"
+                            applied-types="vm.dropdownCheckboxes.eventTypes">
                         </ace-dropdown-checkbox>
+
                         <ace-dropdown-checkbox is-expanded="false" class="col-md-2 mt-3"
-                            translation="events.eventOfficesDropdownButtonTitle" types="vm.officeTypes"
-                            on-value-change="vm.loadEventsWithNewlyAppliedFilter(types, 'appliedOfficeTypes')">
+                            translation="events.eventOfficesDropdownButtonTitle" types="vm.filterTypes.officeTypes.filters"
+                            on-value-change="vm.loadEventsWithNewlyAppliedFilter(types, 'appliedOfficeTypes')"
+                            applied-types="vm.dropdownCheckboxes.officeTypes">
                         </ace-dropdown-checkbox>
                     </div>
 
