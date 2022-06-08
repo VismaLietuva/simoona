@@ -13,7 +13,12 @@
             events: 0,
             kudos: 1,
             offices: 2,
-        });
+        })
+        .constant('filterTypesRowTranslations',[
+            'events.tableEvents',
+            'events.tableKudos',
+            'events.tableOffices',
+        ]);
 
     filterPreset.$inject = [
         '$uibModal',
@@ -103,6 +108,7 @@
         'filterPageTypes',
         '$uibModalInstance',
         'notifySrv',
+        'filterTypesRowTranslations'
     ];
 
     function filterPresetController(
@@ -110,12 +116,14 @@
         filterPresetRepository,
         filterPageTypes,
         $uibModalInstance,
-        notifySrv
+        notifySrv,
+        filterTypesRowTranslations
     ) {
         var vm = this;
 
         vm.presets = scope.loadedPresets;
         vm.filterPageType = scope.filterPageType;
+        vm.filterTypesRowTranslations = filterTypesRowTranslations;
 
         vm.controls = null;
         vm.previousControlsState = null;

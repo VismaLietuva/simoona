@@ -204,5 +204,6 @@
   "more" : "Daugiau",
   "moreCount" : "ir dar {{one}}...",
   "selectedCount": "{{one}} pasirinkti",
-  "createFilterPreset": "Sukurti šabloną"
+  "createFilterPreset": "Sukurti šabloną",
+  "default": "Numatytas"
 }

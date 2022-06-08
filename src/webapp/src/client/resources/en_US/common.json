@@ -204,5 +204,6 @@
   "more" : "More",
   "moreCount" : "and {{one}} more...",
   "selectedCount": "{{one}} selected",
-  "createFilterPreset": "Create preset"
+  "createFilterPreset": "Create preset",
+  "default": "Default"
 }
