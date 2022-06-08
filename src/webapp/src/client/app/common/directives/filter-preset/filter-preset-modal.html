@@ -1,0 +1,75 @@
+<div>
+    <!-- TODO: add translations -->
+    <div class="panel panel-default filter-preset-modal-container">
+        <div class="panel-heading filter-preset-modal-heading">
+            <span>Preset configuration</span>
+        </div>
+        <div class="p-10" ng-form name="form">
+            <table class="nc-table" ng-if="vm.controls.length && !vm.allCheckedAsDeleted">
+                <thead>
+                    <tr>
+                        <!-- TODO: Make dynamic loading -->
+                        <th>Pavadinimas</th>
+                        <th>Renginiai</th>
+                        <th>Ofisai</th>
+                        <th>Numatytas</th>
+                        <th class="text-center">Veiksmai</th>
+                    </tr>
+                </thead>
+                <tr ng-repeat="control in vm.controls" ng-if="!control.isDeleted">
+                    <td>
+                        <!-- TODO: Fix error styles -->
+                        <input ng-maxlength="30" required id="presetName{{$index}}" name="presetName" ng-required="true"
+                            ng-model="vm.controls[$index].name" type="text"
+                            ng-class="{'has-error' : (form.presetName.$error.required || form.presetName.$error.maxlength) }">
+                        <p class="text-danger help-block" ng-if="externalLinkForm.linkName.$error.maxlength"
+                            translate="common.maxLengthError" translate-values="{ two: 30 }"></p>
+                    </td>
+
+                    <td class="col-xs-3" ng-repeat="filterTypes in vm.loadedFilterTypes">
+                        <ace-dropdown-checkbox is-expanded="false" types="filterTypes.filters"
+                            applied-types="vm.controls[$parent.$index].filters[$index].appliedTypes"
+                            translation="common.selectedCount"
+                            is-disabled="vm.controls[$parent.$index].filters[$index].isDisabled">
+                        </ace-dropdown-checkbox>
+                    </td>
+
+                    <td class="col-xs-1 text-center">
+                        <input type="checkbox" ng-checked="vm.controls[$index].isDefault"
+                            ng-click="vm.uncheckAllSelectedDefaultPresets(vm.controls[$index])"
+                            ng-model="vm.controls[$index].isDefault">
+                    </td>
+
+                    <td class="col-xs-2 text-center">
+                        <!-- Delete button -->
+                        <div class="external-link-delete-container">
+                            <a ng-click="vm.setPresetAsDeleted(control)" data-test-id="delete-external-link"
+                                translate-attr-title="common.delete" translate>
+                                <span class="vismaicon vismaicon-delete"></span>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Create button -->
+            <div class="wall-create-button text-center mb-10">
+                <a class="nc-btn nc-btn-default" ng-click="vm.spawnNewPresetControl()">
+                    <span class="vismaicon vismaicon-add2-circle"></span><span class="hidden-xs"
+                        translate="common.createFilterPreset"></span>
+                </a>
+            </div>
+
+            <div class="pull-right">
+                <!-- Save button -->
+                <button class="btn btn-primary" ng-disabled="form.$invalid || !vm.controls.length" ng-click="vm.applyUpdate()">
+                    <span translate="common.save"></span>
+                </button>
+                <!-- Cancel button -->
+                <button class="btn btn-default" ng-click="vm.cancelUpdate()">
+                    <span translate="common.cancel"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
