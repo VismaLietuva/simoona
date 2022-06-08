@@ -1,0 +1,8 @@
+<div>
+    <select name="form-control" class="filter-preset-select" ng-if="loadedPresets.length" type="text"
+        ng-options="item as item.name for item in loadedPresets" ng-init="selectedPreset" ng-model="selectedPreset" ng-change="sendSelectedPresetValues(selectedPreset)">
+    </select>
+
+    <a id="link" class="mt-2 glyphicon glyphicon-cogwheel dropdown-toggle post-comment-settings-icon">
+    </a>
+</div>
