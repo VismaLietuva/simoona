@@ -202,5 +202,7 @@
   "emojiGrumpyCat": "Piktas (-a)",
   "emojiAll" : "Visi",
   "more" : "Daugiau",
-  "moreCount" : "ir dar {{one}}..."
+  "moreCount" : "ir dar {{one}}...",
+  "selectedCount": "{{one}} pasirinkti",
+  "createFilterPreset": "Sukurti šabloną"
 }
