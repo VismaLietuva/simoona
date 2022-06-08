@@ -14,7 +14,8 @@
                 types: '=',
                 onValueChange: '&',
                 translation: '@',
-                isExpanded: '='
+                isExpanded: '=',
+                appliedTypes: '='
             },
             controller: dropdownCheckboxController,
             controllerAs: 'vm',
@@ -27,8 +28,10 @@
     function dropdownCheckboxController() {
         var vm = this;
 
-        vm.appliedTypes = new Map();
+        vm.isMouseOverMenu = false;
+        vm.isMouseOverButton = false;
 
+        vm.closeMenu = closeMenu;
         vm.toggleType = toggleType;
         vm.isTypeApplied = isTypeApplied;
 
@@ -47,6 +50,16 @@
             vm.onValueChange({
                 types: [...vm.appliedTypes]
             });
+        }
+
+        function closeMenu() {
+            if (!vm.isMouseOverMenu) {
+                vm.isExpanded = false;
+
+                if (vm.isMouseOverButton) {
+                    vm.isExpanded = true;
+                }
+            }
         }
     }
 })();
