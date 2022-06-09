@@ -1,7 +1,6 @@
 (function () {
     'use strict';
-    // TODO: add input validation
-    // TODO: check for duplicate names
+
     angular
         .module('simoonaApp.Common')
         .directive('aceFilterPreset', filterPreset)
