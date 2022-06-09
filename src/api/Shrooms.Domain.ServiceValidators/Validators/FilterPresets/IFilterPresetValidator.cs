@@ -1,8 +1,6 @@
-﻿using Shrooms.Contracts.DataTransferObjects;
-using Shrooms.Contracts.DataTransferObjects.FilterPresets;
+﻿using Shrooms.Contracts.DataTransferObjects.FilterPresets;
 using Shrooms.Contracts.Enums;
 using System.Collections;
-using System.Threading.Tasks;
 
 namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
 {
