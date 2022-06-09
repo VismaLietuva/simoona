@@ -1,28 +1,34 @@
 <div>
-    <!-- TODO: add translations -->
     <!-- TOOD: fix overflow -->
     <div class="panel panel-default filter-preset-modal-container">
         <div class="panel-heading filter-preset-modal-heading">
             <span translate="common.presetConfigurationHeading"></span>
         </div>
-        <div class="p-10" ng-form name="form">
+        <div ng-form name="mainForm" class="p-10">
             <table class="nc-table" ng-if="vm.controls.length && !vm.allCheckedAsDeleted">
                 <thead>
                     <tr>
                         <th translate="common.presetConfigurationTableName">
-                        <th ng-repeat="filterTypes in vm.loadedFilterTypes" translate="{{vm.filterTypesRowTranslations[filterTypes.filterType]}}">
+                        <th ng-repeat="filterTypes in vm.loadedFilterTypes"
+                            translate="{{vm.filterTypesRowTranslations[filterTypes.filterType]}}">
                         <th translate="common.default">
                         <th class="text-center" translate="common.action">
                     </tr>
                 </thead>
-                <tr ng-repeat="control in vm.controls" ng-if="!control.isDeleted">
+                <tr ng-repeat="control in vm.controls" ng-form name="form" ng-if="!control.isDeleted">
                     <td>
-                        <!-- TODO: Fix error styles -->
                         <input ng-maxlength="30" required id="presetName{{$index}}" name="presetName" ng-required="true"
                             ng-model="vm.controls[$index].name" type="text"
-                            ng-class="{'has-error' : (form.presetName.$error.required || form.presetName.$error.maxlength) }">
-                        <p class="text-danger help-block" ng-if="externalLinkForm.linkName.$error.maxlength"
+                            ng-class="{'has-error' : (form.presetName.$error.required && form.presetName.$dirty) || form.presetName.$error.maxlength || !vm.isNameUnique(vm.controls[$index]) }">
+
+                        <!-- Error messages -->
+                        <p class="text-danger help-block"
+                            ng-if="form.presetName.$error.required && form.presetName.$dirty"
+                            translate="common.messageFieldIsRequired"></p>
+                        <p class="text-danger help-block" ng-if="form.presetName.$error.maxlength"
                             translate="common.maxLengthError" translate-values="{ two: 30 }"></p>
+                        <p class="text-danger help-block" ng-if="!form.presetName.$error.maxlength && !vm.isNameUnique(vm.controls[$index])"
+                            translate="common.uniqueNameRequired"></p>
                     </td>
 
                     <td class="col-xs-3" ng-repeat="filterTypes in vm.loadedFilterTypes">
@@ -61,7 +67,8 @@
 
             <div class="pull-right">
                 <!-- Save button -->
-                <button class="btn btn-primary" ng-disabled="form.$invalid || !vm.controls.length" ng-click="vm.applyUpdate()">
+                <button class="btn btn-primary" ng-disabled="mainForm.$invalid || !vm.controls.length || !vm.isNamesUnique()"
+                    ng-click="vm.applyUpdate()">
                     <span translate="common.save"></span>
                 </button>
                 <!-- Cancel button -->

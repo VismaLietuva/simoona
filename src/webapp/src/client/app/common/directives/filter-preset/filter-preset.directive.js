@@ -142,6 +142,8 @@
         vm.uncheckAllSelectedDefaultPresets = uncheckAllSelectedDefaultPresets;
         vm.setPresetAsDeleted = setPresetAsDeleted;
         vm.spawnNewPresetControl = spawnNewPresetControl;
+        vm.isNameUnique = isNameUnique;
+        vm.isNamesUnique = isNamesUnique;
 
         init();
 
@@ -335,6 +337,34 @@
                 presetsToAdd,
                 presetsToUpdate,
             };
+        }
+
+        function isNameUnique(control) {
+            if (control.name === '') {
+                return true;
+            }
+
+            for (var c of vm.controls) {
+                if (c.name === control.name && c.id !== control.id) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        function isNamesUnique() {
+            var names = new Map();
+
+            for (var control of vm.controls) {
+                if (names.has(control.name)) {
+                    return false;
+                }
+
+                names.set(control.name, true);
+            }
+
+            return true;
         }
 
         function mapControlFiltersToPresetFilters(controlPreset) {

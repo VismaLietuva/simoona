@@ -19,6 +19,7 @@
   "messageInvalidEmail": "El. pašto adresas yra blogo formato",
   "messageFieldIsRequired": "Šis laukas yra privalomas",
   "messageRequiredField": "{{ one }} - privalomas laukas",
+  "uniqueNameRequired": "Negali būti dublikatų",
   "next": "Toliau",
   "no": "Ne",
   "noResults": "Nėra įrašų",

@@ -20,6 +20,7 @@
   "messageInvalidEmail": "Not a valid e-mail address",
   "messageFieldIsRequired": "This field is required",
   "messageRequiredField": "{{ one }} - is required field",
+  "uniqueNameRequired": "Cannot contain duplicates",
   "next": "Next",
   "no": "No",
   "noResults": "There are no entries found",
