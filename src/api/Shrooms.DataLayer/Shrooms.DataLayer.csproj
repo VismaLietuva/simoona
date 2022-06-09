@@ -869,9 +869,9 @@
     <Compile Include="Migrations\202205270910095_AddedAddForNewUsersProperty.Designer.cs">
       <DependentUpon>202205270910095_AddedAddForNewUsersProperty.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202205251037133_AddedFilterPresetEntityModel.cs" />
-    <Compile Include="Migrations\202205251037133_AddedFilterPresetEntityModel.Designer.cs">
-      <DependentUpon>202205251037133_AddedFilterPresetEntityModel.cs</DependentUpon>
+    <Compile Include="Migrations\202206091029077_AddedFilterPresetEntityModel.cs" />
+    <Compile Include="Migrations\202206091029077_AddedFilterPresetEntityModel.Designer.cs">
+      <DependentUpon>202206091029077_AddedFilterPresetEntityModel.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
@@ -1452,8 +1452,8 @@
     <EmbeddedResource Include="Migrations\202205270910095_AddedAddForNewUsersProperty.resx">
       <DependentUpon>202205270910095_AddedAddForNewUsersProperty.cs</DependentUpon>
     </EmbeddedResource>
-        <EmbeddedResource Include="Migrations\202205251037133_AddedFilterPresetEntityModel.resx">
-      <DependentUpon>202205251037133_AddedFilterPresetEntityModel.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202206091029077_AddedFilterPresetEntityModel.resx">
+      <DependentUpon>202206091029077_AddedFilterPresetEntityModel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

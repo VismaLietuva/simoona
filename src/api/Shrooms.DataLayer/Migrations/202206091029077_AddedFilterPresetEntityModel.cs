@@ -27,16 +27,12 @@ namespace Shrooms.DataLayer.Migrations
                 .ForeignKey("dbo.Organizations", t => t.OrganizationId, cascadeDelete: true)
                 .Index(t => t.OrganizationId);
             
-            AddColumn("dbo.EventTypes", "SendEmailToManager", c => c.Boolean(nullable: false));
-            DropColumn("dbo.Walls", "AddForNewUsers");
         }
         
         public override void Down()
         {
-            AddColumn("dbo.Walls", "AddForNewUsers", c => c.Boolean(nullable: false));
             DropForeignKey("dbo.FilterPresets", "OrganizationId", "dbo.Organizations");
             DropIndex("dbo.FilterPresets", new[] { "OrganizationId" });
-            DropColumn("dbo.EventTypes", "SendEmailToManager");
             DropTable("dbo.FilterPresets");
         }
     }

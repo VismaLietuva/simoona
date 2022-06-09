@@ -13,7 +13,7 @@ namespace Shrooms.DataLayer.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202205251037133_AddedFilterPresetEntityModel"; }
+            get { return "202206091029077_AddedFilterPresetEntityModel"; }
         }
         
         string IMigrationMetadata.Source
