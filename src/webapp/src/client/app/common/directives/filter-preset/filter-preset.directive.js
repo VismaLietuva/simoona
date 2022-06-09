@@ -49,6 +49,9 @@
 
         function linkFunc(scope, element) {
             angular.element('#link').bind('click', function () {
+                // Disable scrolling while modal is open
+                $(":root").css("overflow-y", 'hidden');
+
                 $uibModal.open({
                     templateUrl:
                         'app/common/directives/filter-preset/filter-preset-modal.html',
@@ -60,6 +63,11 @@
                         scope: scope,
                     },
                     size: scope.modalSize,
+                })
+                .closed
+                .then(function() {
+                    // Enable scrolling after modal is closed
+                    $(":root").css("overflow-y", '');
                 });
             });
 
