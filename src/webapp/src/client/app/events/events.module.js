@@ -86,6 +86,7 @@
                 controllerAs: 'vm'
             })
             .state('Root.WithOrg.Client.Events.Details.Event', {
+                parent: 'Root.WithOrg.Client.Events',
                 url: '/Event/:id',
                 templateUrl: 'app/events/details-list/event-details/event-details.html',
                 controller: 'eventDetailsController',
