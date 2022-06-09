@@ -404,6 +404,11 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
         {
             foreach (var user in userEventAttendStatusChangeEmailDtos)
             {
+                if (user.ManagerEmail == null)
+                {
+                    continue;
+                }
+
                 _asyncRunner.Run<IEventNotificationService>(async notifier => await notifier.NotifyManagerAboutEventAsync(user, false),
                     _uow.ConnectionName);
             }
@@ -421,9 +426,19 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             var managers = await _usersDbSet
                 .Where(manager => managerIds.Contains(manager.Id))
                 .ToDictionaryAsync(manager => manager.Id, manager => manager.Email);
-;
+
+            if (!managers.Any())
+            {
+                return;
+            }
+
             foreach (var user in users)
             {
+                if (user.ManagerId == null)
+                {
+                    return;
+                }
+
                 if (!managers.TryGetValue(user.ManagerId, out var managerEmail))
                 {
                     continue;
@@ -443,6 +458,11 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 .Where(user => user.Id == userAttendStatusDto.ManagerId)
                 .Select(user => user.Email)
                 .FirstOrDefaultAsync();
+
+            if (managerEmail == null)
+            {
+                return;
+            }
 
             userAttendStatusDto.ManagerEmail = managerEmail;
 
@@ -524,7 +544,6 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             {
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                Email = user.Email,
                 ManagerEmail = managerEmail,
                 ManagerId = user.ManagerId,
                 EventName = eventJoinValidationDto.Name,
@@ -541,7 +560,6 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             {
                 FirstName = participant.ApplicationUser.FirstName,
                 LastName = participant.ApplicationUser.LastName,
-                Email = participant.ApplicationUser.Email,
                 OrganizationId = participant.ApplicationUser.OrganizationId,
                 EventName = @event.Name,
                 EventId = @event.Id,
@@ -557,12 +575,11 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             {
                 FirstName = participant.ApplicationUser.FirstName,
                 LastName = participant.ApplicationUser.LastName,
-                Email = participant.ApplicationUser.Email,
                 OrganizationId = participant.ApplicationUser.OrganizationId,
                 EventName = @event.Name,
                 EventEndDate = @event.EndDate,
                 EventStartDate = @event.StartDate,
-                ManagerEmail = participant.ApplicationUser.Manager.Email,
+                ManagerEmail = participant.ApplicationUser.Manager?.Email,
                 ManagerId = participant.ApplicationUser.ManagerId
             });
         }
