@@ -8,21 +8,13 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
 {
     public interface IFilterPresetValidator
     {
-        //Task CheckIfFilterPresetExistsAsync(FilterPresetDto createDto);
-        
-        //Task CheckIfFilterPresetExistsAsync(int id, UserAndOrganizationDto userOr);
-
-        //Task CheckIfFilterItemsExistsAsync(FilterPresetDto createDto);
-
         void CheckIfFilterTypeIsValid(FilterType filterType);
 
         void CheckIfFilterTypesContainsDuplicates(FilterType[] filterTypes);
 
-        //void CheckIfFilterPresetItemsContainDuplicates(FilterPresetDto createDto);
-
         void CheckIfPageTypeExists(PageType page);
 
-        void CheckIfCountsAreEqual<T1, T2>(T1 obj1, T2 obj2)
+        void CheckIfCountsAreEqual<T1, T2>(T1 firstCollection, T2 secondCollection)
             where T1 : ICollection
             where T2 : ICollection;
 
