@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
@@ -25,14 +26,20 @@ namespace Shrooms.Presentation.Api.Controllers
             _filterPresetService = filterPresetService;
         }
 
-        [HttpDelete]
-        [Route("Delete")]
+        [HttpPost]
+        [Route("Update")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public async Task<IHttpActionResult> Delete(int id)
+        public async Task<IHttpActionResult> Update(AddEditDeleteFilterPresetViewModel updateViewModel)
         {
             try
             {
-                await _filterPresetService.DeleteAsync(id, GetUserAndOrganization());
+                var updateDto = _mapper.Map<AddEditDeleteFilterPresetViewModel, AddEditDeleteFilterPresetDto>(updateViewModel);
+                var userOrg = GetUserAndOrganization();
+
+                updateDto.UserId = userOrg.UserId;
+                updateDto.OrganizationId = userOrg.OrganizationId;
+
+                await _filterPresetService.UpdateAsync(updateDto);
 
                 return Ok();
             }
@@ -42,15 +49,14 @@ namespace Shrooms.Presentation.Api.Controllers
             }
         }
 
-
         [HttpGet]
         [Route("GetPresetsForPage")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public async Task<IHttpActionResult> GetPresets(PageType forPage) 
+        public async Task<IHttpActionResult> GetPresets(PageType pageType) 
         {
             try
             {
-                var presets = await _filterPresetService.GetPresetsForPageAsync(forPage, GetOrganizationId());
+                var presets = await _filterPresetService.GetPresetsForPageAsync(pageType, GetOrganizationId());
                 var presetsViewModel = _mapper.Map<IEnumerable<FilterPresetDto>, IEnumerable<FilterPresetViewModel>>(presets);
 
                 return Ok(presetsViewModel);
@@ -62,55 +68,17 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
 
-        [HttpPut]
-        [Route("Edit")]
+        [HttpGet]
+        [Route("GetFilters")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Administration)]
-        public async Task<IHttpActionResult> Edit(EditFilterPresetViewModel editViewModel)
+        public async Task<IHttpActionResult> GetFilters([FromUri] FilterType[] filterTypes)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
-
-            var editDto = _mapper.Map<EditFilterPresetViewModel, EditFilterPresetDto>(editViewModel);
-            var userOrg = GetUserAndOrganization();
-
-            editDto.UserId = userOrg.UserId;
-            editDto.OrganizationId = userOrg.OrganizationId;
-
             try
             {
-                await _filterPresetService.UpdateAsync(editDto);
-                
-                return Ok();
-            }
-            catch (ValidationException e)
-            {
-                return BadRequestWithError(e);
-            }
-        }
+                var filtersDto = await _filterPresetService.GetFiltersAsync(filterTypes, GetOrganizationId());
+                var filtersViewModel = _mapper.Map<IEnumerable<FiltersDto>, IEnumerable<FiltersViewModel>>(filtersDto);
 
-        [HttpPost]
-        [Route("Create")]
-        [PermissionAuthorize(Permission = AdministrationPermissions.Administration)]
-        public async Task<IHttpActionResult> Create(CreateFilterPresetViewModel createViewModel)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
-
-            var createDto = _mapper.Map<CreateFilterPresetViewModel, CreateFilterPresetDto>(createViewModel);
-            var userOrg = GetUserAndOrganization();
-
-            createDto.UserId = userOrg.UserId;
-            createDto.OrganizationId = userOrg.OrganizationId;
-
-            try
-            {
-                await _filterPresetService.CreateAsync(createDto);
-             
-                return Ok();
+                return Ok(filtersViewModel);
             }
             catch (ValidationException e)
             {

@@ -8,10 +8,9 @@ namespace Shrooms.Contracts.DataTransferObjects.FilterPresets
     {
         [Required]
         [EnumDataType(typeof(FilterType))]
-        public FilterType ForType { get; set; }
+        public FilterType FilterType { get; set; }
 
         [Required]
-        //[MinLength(1)]
         public IEnumerable<string> Types { get; set; }
     }
 }

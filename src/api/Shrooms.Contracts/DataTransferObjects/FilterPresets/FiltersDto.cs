@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 namespace Shrooms.Contracts.DataTransferObjects.FilterPresets
 {
-    public class FilterPresetItemDto
+    public class FiltersDto
     {
         public FilterType FilterType { get; set; }
 
-        public IEnumerable<string> Types { get; set; }
+        public IEnumerable<FilterDto> Filters { get; set; }
     }
 }

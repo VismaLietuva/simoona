@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace Shrooms.Contracts.DataTransferObjects.FilterPresets
 {
-    public class FilterPresetDto : UserAndOrganizationDto
+    public class FilterPresetDto
     {
         public int Id { get; set; }
         
         public string Name { get; set; }
 
-        public PageType ForPage { get; set; }
+        public PageType PageType { get; set; }
 
         public bool IsDefault { get; set; }
 

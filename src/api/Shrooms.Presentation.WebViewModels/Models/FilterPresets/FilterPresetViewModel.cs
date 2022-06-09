@@ -10,7 +10,7 @@ namespace Shrooms.Presentation.WebViewModels.Models.FilterPresets
 
         public string Name { get; set; }
 
-        public PageType ForType { get; set; }
+        public PageType PageType { get; set; }
 
         public bool IsDefault { get; set; }
 

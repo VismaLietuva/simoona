@@ -17,13 +17,12 @@ namespace Shrooms.Presentation.WebViewModels.Models.FilterPresets
 
         [Required]
         [EnumDataType(typeof(PageType))]
-        public PageType ForType { get; set; }
+        public PageType PageType { get; set; }
 
         [Required]
         public bool IsDefault { get; set; }
 
         [Required]
-        //[MinLength(1)]
         public IEnumerable<FilterPresetItemViewModel> Filters { get; set; }
     }
 }

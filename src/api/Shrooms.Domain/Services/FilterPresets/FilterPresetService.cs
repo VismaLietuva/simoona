@@ -9,8 +9,9 @@ using System.Data.Entity;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
+using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using System;
-using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.DataLayer.EntityModels.Models.Events;
 
 namespace Shrooms.Domain.Services.FilterPresets
 {
@@ -20,6 +21,10 @@ namespace Shrooms.Domain.Services.FilterPresets
 
         private readonly IUnitOfWork2 _uow;
         private readonly IDbSet<FilterPreset> _filterPresetDbSet;
+        private readonly IDbSet<KudosType> _kudosTypeDbSet;
+        private readonly IDbSet<Office> _officeDbSet;
+        private readonly IDbSet<EventType> _eventTypeDbSet;
+
         private readonly IFilterPresetValidator _validator;
 
         public FilterPresetService(IUnitOfWork2 uow, IFilterPresetValidator validator)
@@ -28,18 +33,9 @@ namespace Shrooms.Domain.Services.FilterPresets
             _validator = validator;
 
             _filterPresetDbSet = uow.GetDbSet<FilterPreset>();
-        }
-
-        public async Task DeleteAsync(int id, UserAndOrganizationDto userOrg)
-        {
-            await _validator.CheckIfFilterPresetExistsAsync(id, userOrg);
-
-            var preset = await _filterPresetDbSet
-                .FirstAsync(p => p.Id == id);
-
-            _filterPresetDbSet.Remove(preset);
-
-            await _uow.SaveChangesAsync(userOrg.UserId);
+            _kudosTypeDbSet = uow.GetDbSet<KudosType>();
+            _officeDbSet = uow.GetDbSet<Office>();
+            _eventTypeDbSet = uow.GetDbSet<EventType>();
         }
 
         public async Task<IEnumerable<FilterPresetDto>> GetPresetsForPageAsync(PageType type, int organizationId)
@@ -54,40 +50,27 @@ namespace Shrooms.Domain.Services.FilterPresets
                 {
                     Id = preset.Id,
                     Name = preset.Name,
-                    ForPage = preset.ForPage,
+                    PageType = preset.ForPage,
                     IsDefault = preset.IsDefault,
                     Filters = JsonConvert.DeserializeObject<IEnumerable<FilterPresetItemDto>>(preset.Preset)
                 });
         }
 
-        public async Task UpdateAsync(EditFilterPresetDto editDto)
+        public async Task UpdateAsync(AddEditDeleteFilterPresetDto updateDto)
         {
             await _filterPresetUpdateCreateLock.WaitAsync();
-            
+
             try
             {
-                _validator.CheckIfFilterPresetItemsContainDuplicates(editDto);
+                _validator.CheckIfMoreThanOneDefaultPresetExists(updateDto);
+                _validator.CheckIfUniqueNames(updateDto);
 
-                await _validator.CheckIfFilterItemsExistsAsync(editDto);
+                await UpdatePresetsAsync(updateDto);
+                await DeleteAsync(updateDto);
 
-                var filterPreset = await _filterPresetDbSet
-                    .FirstAsync(filter => filter.Id == editDto.Id);
+                CreatePresets(updateDto);
 
-                if (filterPreset.Name != editDto.Name)
-                {
-                    await _validator.CheckIfFilterPresetExistsAsync(editDto);
-                }
-
-                if (editDto.IsDefault)
-                {
-                    await ChangeCurrentDefaultFilterToNonDefaultAsync(filterPreset);
-                }
-
-                filterPreset.Name = editDto.Name;
-                filterPreset.ForPage = editDto.ForPage;
-                filterPreset.Preset = JsonConvert.SerializeObject(editDto.Filters);
-
-                await _uow.SaveChangesAsync(editDto.UserId);
+                await _uow.SaveChangesAsync(updateDto.UserId);
             }
             finally
             {
@@ -95,31 +78,144 @@ namespace Shrooms.Domain.Services.FilterPresets
             }
         }
 
-        public async Task CreateAsync(CreateFilterPresetDto createDto)
+        // TODO: refactor
+        public async Task<IEnumerable<FiltersDto>> GetFiltersAsync(FilterType[] filterTypes, int organizationId)
         {
-            await _filterPresetUpdateCreateLock.WaitAsync();
+            _validator.CheckIfFilterTypesContainsDuplicates(filterTypes);
 
-            try
+            var filters = new List<FiltersDto>();
+
+            foreach (var type in filterTypes)
             {
-                _validator.CheckIfFilterPresetItemsContainDuplicates(createDto);
+                _validator.CheckIfFilterTypeIsValid(type);
 
-                await _validator.CheckIfFilterPresetExistsAsync(createDto);
-                await _validator.CheckIfFilterItemsExistsAsync(createDto);
-
-                var filterPreset = MapFilterPresetDtoToFilterPreset(createDto, createDto.OrganizationId);
-
-                if (filterPreset.IsDefault)
+                switch (type)
                 {
-                    await ChangeCurrentDefaultFilterToNonDefaultAsync(filterPreset);
+                    case FilterType.Kudos:
+                        filters.Add(new FiltersDto
+                        {
+                            FilterType = FilterType.Kudos,
+                            Filters = await _kudosTypeDbSet
+                                .Select(kudos => new FilterDto
+                                {
+                                    Id = kudos.Id,
+                                    Name = kudos.Name
+                                })
+                                .ToListAsync()
+                        });
+                        break;
+
+                    case FilterType.Offices:
+                        filters.Add(new FiltersDto
+                        {
+                            FilterType = FilterType.Offices,
+                            Filters = await _officeDbSet
+                                .Select(office => new FilterDto
+                                {
+                                    Id = office.Id,
+                                    Name = office.Name
+                                })
+                                .ToListAsync()
+                        });
+                        break;
+
+                    case FilterType.Events:
+                        filters.Add(new FiltersDto
+                        {
+                            FilterType = FilterType.Events,
+                            Filters = await _eventTypeDbSet
+                            .Select(e => new FilterDto
+                            {
+                                Id = e.Id,
+                                Name = e.Name
+                            })
+                            .ToListAsync()
+                        });
+                        break;
+                }
+            }
+
+            return filters;
+        }
+
+        private async Task DeleteAsync(AddEditDeleteFilterPresetDto updateDto)
+        {
+            if (!updateDto.PresetsToRemove.Any())
+            {
+                return;
+            }
+
+            var presets = await _filterPresetDbSet
+                .Where(preset => 
+                    updateDto.PresetsToRemove.Contains(preset.Id) &&
+                    preset.OrganizationId == updateDto.OrganizationId)
+                .ToListAsync();
+
+            foreach (var preset in presets)
+            {
+                _filterPresetDbSet.Remove(preset);
+            }
+        }
+
+        private void CreatePresets(AddEditDeleteFilterPresetDto updateDto)
+        {
+            if (!updateDto.PresetsToAdd.Any())
+            {
+                return;
+            }
+
+            var timestamp = DateTime.UtcNow;
+
+            foreach (var preset in updateDto.PresetsToAdd)
+            {
+                var newPreset = new FilterPreset
+                {
+                    OrganizationId = updateDto.OrganizationId,
+                    CreatedBy = updateDto.UserId,
+                    Name = preset.Name,
+                    IsDefault = preset.IsDefault,
+                    ForPage = updateDto.PageType,
+                    Modified = timestamp,
+                    Created = timestamp,
+                    Preset = JsonConvert.SerializeObject(preset.Filters)
+                };
+
+                _filterPresetDbSet.Add(newPreset);
+            }
+        }
+
+        private async Task UpdatePresetsAsync(AddEditDeleteFilterPresetDto updateDto)
+        {
+            if (!updateDto.PresetsToUpdate.Any())
+            {
+                return;
+            }
+
+            var presetsToUpdateIds = updateDto.PresetsToUpdate.Select(preset => preset.Id)
+                .ToList();
+
+            var existingPresets = await _filterPresetDbSet
+                .Where(preset => presetsToUpdateIds.Contains(preset.Id))
+                .ToDictionaryAsync(preset => preset.Id, preset => preset);
+
+            _validator.CheckIfCountsAreEqual(presetsToUpdateIds, existingPresets);
+
+            foreach (var preset in updateDto.PresetsToUpdate)
+            {
+                if (!existingPresets.TryGetValue(preset.Id, out var presetToUpdate))
+                {
+                    continue;
                 }
 
-                _filterPresetDbSet.Add(filterPreset);
+                presetToUpdate.IsDefault = preset.IsDefault;
 
-                await _uow.SaveChangesAsync(createDto.UserId);
-            }
-            finally
-            {
-                _filterPresetUpdateCreateLock.Release();
+                if (presetToUpdate.IsDefault)
+                {
+                    await ChangeCurrentDefaultFilterToNonDefaultAsync(presetToUpdate);
+                }
+
+                presetToUpdate.Name = preset.Name;
+                presetToUpdate.Preset = JsonConvert.SerializeObject(preset.Filters);
             }
         }
 
@@ -136,18 +232,6 @@ namespace Shrooms.Domain.Services.FilterPresets
             {
                 defaultFilter.IsDefault = false;
             }
-        }
-
-        private static FilterPreset MapFilterPresetDtoToFilterPreset(FilterPresetDto createDto, int organizationId)
-        {
-            return new FilterPreset
-            {
-                Name = createDto.Name,
-                IsDefault = createDto.IsDefault,
-                ForPage = createDto.ForPage,
-                Preset = JsonConvert.SerializeObject(createDto.Filters),
-                OrganizationId = organizationId,
-            };
         }
     }
 }

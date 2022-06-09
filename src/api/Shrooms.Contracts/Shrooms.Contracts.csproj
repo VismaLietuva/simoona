@@ -82,10 +82,13 @@
     <Compile Include="DataTransferObjects\ApplicationUserMinimalDto.cs" />
     <Compile Include="DataTransferObjects\BaseEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailDto.cs" />
+    <Compile Include="DataTransferObjects\FilterPresets\AddEditDeleteFilterPresetDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\CreateFilterPresetDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\EditFilterPresetDto.cs" />
+    <Compile Include="DataTransferObjects\FilterPresets\FilterDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\FilterPresetDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\FilterPresetItemDto.cs" />
+    <Compile Include="DataTransferObjects\FilterPresets\FiltersDto.cs" />
     <Compile Include="DataTransferObjects\ISoftDelete.cs" />
     <Compile Include="DataTransferObjects\ITrackable.cs" />
     <Compile Include="DataTransferObjects\Kudos\AddKudosLogDto.cs" />

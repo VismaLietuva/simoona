@@ -11,6 +11,8 @@ using System.Linq;
 using System;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Contracts.DataTransferObjects;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
 {
@@ -33,117 +35,170 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
         {
             if (!Enum.IsDefined(typeof(PageType), page))
             {
-                throw new ValidationException(ErrorCodes.IncorrectType, "Page does not exists");
+                throw new ValidationException(ErrorCodes.InvalidType, "Page does not exists");
             }
         }
 
 
-        public async Task CheckIfFilterPresetExistsAsync(int id, UserAndOrganizationDto userOrg)
+        public void CheckIfFilterTypesContainsDuplicates(FilterType[] filterTypes)
         {
-            var exists = await _filterPresetDbSet
-                .AnyAsync(p => p.Id == id && p.OrganizationId == userOrg.OrganizationId);
+            var length = filterTypes.Length;
 
-            if (!exists)
-            {
-                throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "Filter preset does not exists");
-            }
-        }
-
-        public async Task CheckIfFilterPresetExistsAsync(FilterPresetDto presetDto)
-        {
-            var exists = await _filterPresetDbSet
-                .AnyAsync(p => p.Name == presetDto.Name &&
-                          p.ForPage == presetDto.ForPage &&
-                          p.OrganizationId == presetDto.OrganizationId);
-
-            if (exists)
+            if (filterTypes.Distinct().Count() != length)
             {
                 throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "Duplicates are not allowed");
             }
         }
 
-        public async Task CheckIfFilterItemsExistsAsync(FilterPresetDto presetDto)
+        public void CheckIfMoreThanOneDefaultPresetExists(AddEditDeleteFilterPresetDto updateDto)
         {
-            foreach (var item in presetDto.Filters)
+            var defaultPresetExistsInNewPresets = updateDto.PresetsToAdd.Any(preset => preset.IsDefault);
+            var defaultPresetExistsInUpdatedPresets = updateDto.PresetsToUpdate.Any(preset => preset.IsDefault);
+
+            if (defaultPresetExistsInNewPresets && defaultPresetExistsInUpdatedPresets)
             {
-                await CheckFilterPresetItemFilterTypesAsync(item, presetDto.OrganizationId);
+                throw new ValidationException(ErrorCodes.FilterPresetContainsMoreThanOneDefaultPreset,
+                    "Cannot have more than one default preset");
             }
         }
 
-        public void CheckIfFilterPresetItemsContainDuplicates(FilterPresetDto presetDto)
+        public void CheckIfFilterTypeIsValid(FilterType filterType)
         {
-            foreach (var item in presetDto.Filters)
+            if (!Enum.IsDefined(typeof(FilterType), filterType))
             {
-                CheckFilterPresetItemsContainDuplicates(item);
+                throw new ValidationException(ErrorCodes.InvalidType, "Filter does not exists");
             }
         }
 
-        private void CheckFilterPresetItemsContainDuplicates(FilterPresetItemDto presetItem)
+        public void CheckIfCountsAreEqual<T1, T2>(T1 firstCollection, T2 secondCollection)
+            where T1 : ICollection
+            where T2 : ICollection
         {
-            var currentCount = presetItem.Types.Count();
-            var distinctCount = presetItem.Types.Distinct().Count();
-
-            if (currentCount != distinctCount)
+            if (firstCollection.Count != secondCollection.Count)
             {
-                throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "Filter sequence cannot contain duplicates");
+                throw new ValidationException(ErrorCodes.FilterNotFound, "Filter does not exists");
             }
         }
 
-        private async Task CheckFilterPresetItemFilterTypesAsync(FilterPresetItemDto presetItem, int organizationId)
+        //public async Task CheckIfFilterPresetExistsAsync(int id, UserAndOrganizationDto userOrg)
+        //{
+        //    var exists = await _filterPresetDbSet
+        //        .AnyAsync(p => p.Id == id && p.OrganizationId == userOrg.OrganizationId);
+
+        //    if (!exists)
+        //    {
+        //        throw new ValidationException(ErrorCodes.FilterNotFound, "Filter preset does not exists");
+        //    }
+        //}
+
+        //public async Task CheckIfFilterPresetExistsAsync(FilterPresetDto presetDto)
+        //{
+        //    var exists = await _filterPresetDbSet
+        //        .AnyAsync(p => p.Name == presetDto.Name &&
+        //                  p.ForPage == presetDto.PageType &&
+        //                  p.OrganizationId == presetDto.OrganizationId);
+
+        //    if (exists)
+        //    {
+        //        throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "Duplicates are not allowed");
+        //    }
+        //}
+
+        //public async Task CheckIfFilterItemsExistsAsync(FilterPresetDto presetDto)
+        //{
+        //    foreach (var item in presetDto.Filters)
+        //    {
+        //        await CheckFilterPresetItemFilterTypesAsync(item, presetDto.OrganizationId);
+        //    }
+        //}
+
+        //public void CheckIfFilterPresetItemsContainDuplicates(FilterPresetDto presetDto)
+        //{
+        //    foreach (var item in presetDto.Filters)
+        //    {
+        //        CheckFilterPresetItemsContainDuplicates(item);
+        //    }
+        //}
+
+        //private void CheckFilterPresetItemsContainDuplicates(FilterPresetItemDto presetItem)
+        //{
+        //    var currentCount = presetItem.Types.Count();
+        //    var distinctCount = presetItem.Types.Distinct().Count();
+
+        //    if (currentCount != distinctCount)
+        //    {
+        //        throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "Filter sequence cannot contain duplicates");
+        //    }
+        //}
+
+        //private async Task CheckFilterPresetItemFilterTypesAsync(FilterPresetItemDto presetItem, int organizationId)
+        //{
+        //    switch (presetItem.FilterType)
+        //    {
+        //        case FilterType.Kudos:
+        //            await CheckKudosFilterTypesAsync(presetItem);
+        //            break;
+        //        case FilterType.Offices:
+        //            await CheckOfficeFilterTypesAsync(presetItem, organizationId);
+        //            break;
+        //        case FilterType.Events:
+        //            await CheckEventFilterTypesAsync(presetItem, organizationId);
+        //            break;
+        //    }
+        //}
+
+        //private async Task CheckOfficeFilterTypesAsync(FilterPresetItemDto presetItem, int organizationId)
+        //{
+        //    var count = await _officeDbSet
+        //        .Where(office => presetItem.Types.Contains(office.Id.ToString()) &&
+        //                         office.OrganizationId == organizationId)
+        //        .CountAsync();
+
+        //    if (count != presetItem.Types.Count())
+        //    {
+        //        throw new ValidationException(ErrorCodes.InvalidType, "Specified office filter type does not exists");
+        //    }
+        //}
+
+        //private async Task CheckEventFilterTypesAsync(FilterPresetItemDto presetItem, int organizationId)
+        //{
+        //    var count = await _eventTypeDbSet
+        //        .Where(type => presetItem.Types.Contains(type.Id.ToString()) &&
+        //                       type.OrganizationId == organizationId)
+        //        .CountAsync();
+
+        //    if (count != presetItem.Types.Count())
+        //    {
+        //        throw new ValidationException(ErrorCodes.InvalidType, "Specified event filter type does not exists");
+        //    }
+        //}
+
+        //// Kudos types does not have an OrganizationId?
+        //private async Task CheckKudosFilterTypesAsync(FilterPresetItemDto presetItem)
+        //{
+        //    var kudosTypeNames = await _kudosTypesDbSet
+        //        .Select(type => type.Name)
+        //        .ToListAsync();
+
+        //    var containsCorrectTypes = presetItem.Types
+        //        .All(typeName => kudosTypeNames.Contains(typeName));
+
+        //    if (!containsCorrectTypes)
+        //    {
+        //        throw new ValidationException(ErrorCodes.InvalidType, "Specified Kudos filter does not exists");
+        //    }
+        //}
+
+        public void CheckIfUniqueNames(AddEditDeleteFilterPresetDto updateDto)
         {
-            switch (presetItem.ForType)
+            var names = updateDto
+                .PresetsToAdd.Select(p => p.Name)
+                .Union(updateDto.PresetsToUpdate.Select(p => p.Name))
+                .ToList();
+
+            if (names.Distinct().Count() != names.Count)
             {
-                case FilterType.Kudos:
-                    await CheckKudosFilterTypesAsync(presetItem);
-                    break;
-                case FilterType.Offices:
-                    await CheckOfficeFilterTypesAsync(presetItem, organizationId);
-                    break;
-                case FilterType.Events:
-                    await CheckEventFilterTypesAsync(presetItem, organizationId);
-                    break;
-            }
-        }
-
-        private async Task CheckOfficeFilterTypesAsync(FilterPresetItemDto presetItem, int organizationId)
-        {
-            var count = await _officeDbSet
-                .Where(office => presetItem.Types.Contains(office.Id.ToString()) &&
-                                 office.OrganizationId == organizationId)
-                .CountAsync();
-
-            if (count != presetItem.Types.Count())
-            {
-                throw new ValidationException(ErrorCodes.IncorrectType, "Specified office filter type does not exists");
-            }
-        }
-
-        private async Task CheckEventFilterTypesAsync(FilterPresetItemDto presetItem, int organizationId)
-        {
-            var count = await _eventTypeDbSet
-                .Where(type => presetItem.Types.Contains(type.Id.ToString()) &&
-                               type.OrganizationId == organizationId)
-                .CountAsync();
-
-            if (count != presetItem.Types.Count())
-            {
-                throw new ValidationException(ErrorCodes.IncorrectType, "Specified event filter type does not exists");
-            }
-        }
-
-        // Kudos types does not have an OrganizationId?
-        private async Task CheckKudosFilterTypesAsync(FilterPresetItemDto presetItem)
-        {
-            var kudosTypeNames = await _kudosTypesDbSet
-                .Select(type => type.Name)
-                .ToListAsync();
-
-            var containsCorrectTypes = presetItem.Types
-                .All(typeName => kudosTypeNames.Contains(typeName));
-
-            if (!containsCorrectTypes)
-            {
-                throw new ValidationException(ErrorCodes.IncorrectType, "Specified Kudos filter does not exists");
+                throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "Preset names cannot contain duplicates");
             }
         }
     }
