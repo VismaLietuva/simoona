@@ -70,7 +70,7 @@
         }
 
         function loadFilters() {
-            vm.isLoading = true;
+            vm.areFiltersLoading = true;
 
             filterPresetRepository
                 .getFilters([filterTypes.events, filterTypes.kudos])
@@ -92,7 +92,7 @@
                             handleNotAppliedPreset();
                         }
 
-                        vm.isLoading = false;
+                        vm.areFiltersLoading = false;
                     },
                     function() {
                         notifySrv.error('errorCodeMessages.messageError');
@@ -142,11 +142,6 @@
         }
 
         function applyFilterPreset(preset) {
-            if (!vm.filterTypes.eventTypes || !vm.filterTypes.kudosTypes) {
-                vm.notAppliedPreset = preset;
-                return;
-            }
-
             vm.dropdownCheckboxes.eventTypes = filterPresetService.mapFilterPresetTypesToMap(
                 preset,
                 filterTypes.events,

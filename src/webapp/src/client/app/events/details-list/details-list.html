@@ -8,6 +8,7 @@
             <div class="panel-heading">
                 <span translate="events.eventsTitle"></span>
                 <ace-filter-preset
+                    ng-if="!vm.areControlsLoading"
                     filter-page-type="{{vm.filterPageType}}"
                     loaded-filter-types="vm.filterTypes"
                     class="pull-right"
@@ -53,7 +54,7 @@
                     </ace-dropdown-checkbox>
                 </div>
 
-                <wave-spinner ng-if="vm.isLoadingControls && !vm.isLoadingEvents"></wave-spinner>
+                <wave-spinner ng-if="vm.areControlsLoading && !vm.isLoadingEvents"></wave-spinner>
 
                 <!-- Content -->
                 <wave-spinner ng-if="vm.isLoadingEvents"></wave-spinner>

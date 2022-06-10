@@ -2,14 +2,16 @@
     <div class="col-xs-12">
         <div class="panel panel-default events-panel">
             <!-- Header -->
-            <div class="panel-heading">
+            <div class="panel-heading" ng-if="!vm.areFiltersLoading">
                 <span>{{vm.eventDetails.name}}</span>
                 <ace-filter-preset
+                    ng-if="!vm.areFiltersLoading"
                     filter-page-type="{{vm.filterPageType}}"
                     loaded-filter-types="vm.filterTypes"
                     on-value-change="vm.applyFilterPreset(preset)"
                     class="pull-right"
                     modal-size="lg"
+                    ng-class="{ 'hidden' : vm.isLoading && !vm.eventDetails }"
                 ></ace-filter-preset>
             </div>
 

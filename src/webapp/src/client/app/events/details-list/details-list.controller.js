@@ -25,7 +25,7 @@
     ) {
         var vm = this;
 
-        vm.isLoadingControls = true;
+        vm.areControlsLoading = true;
         vm.isLoadingEvents = true;
         vm.filterPageType = filterPageTypes.extensiveEventDetailsList;
 
@@ -59,7 +59,7 @@
         }
 
         function loadFilters() {
-            vm.isLoadingControls = true;
+            vm.areControlsLoading = true;
 
             filterPresetRepository
                 .getFilters([filterTypes.events, filterTypes.offices])
@@ -81,7 +81,7 @@
                             handleNotAppliedPreset();
                         }
 
-                        vm.isLoadingControls = false;
+                        vm.areControlsLoading = false;
                     },
                     function () {
                         notifySrv.error('errorCodeMessages.messageError');
@@ -111,12 +111,6 @@
         }
 
         function applyFilterPreset(preset) {
-            if (!vm.filterTypes.eventTypes || !vm.filterTypes.officeTypes) {
-                vm.notAppliedPreset = preset;
-
-                return;
-            }
-
             vm.dropdownCheckboxes.eventTypes = filterPresetService.mapFilterPresetTypesToMap(
                 preset,
                 filterTypes.events,
@@ -129,8 +123,8 @@
                 vm.filterTypes
             );
 
-            applyFilter([...vm.dropdownCheckboxes.eventTypes], filterTypes.events);
-            applyFilter([...vm.dropdownCheckboxes.officeTypes], filterTypes.offices);
+            applyFilter([...vm.dropdownCheckboxes.eventTypes], 'appliedEventTypes');
+            applyFilter([...vm.dropdownCheckboxes.officeTypes], 'appliedOfficeTypes');
 
             loadEventsOnPage(1);
         }
