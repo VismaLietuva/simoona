@@ -18,7 +18,6 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
             }
         }
 
-
         public void CheckIfFilterTypesContainsDuplicates(FilterType[] filterTypes)
         {
             var length = filterTypes.Length;
@@ -38,14 +37,6 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
             {
                 throw new ValidationException(ErrorCodes.FilterPresetContainsMoreThanOneDefaultPreset,
                     "Cannot have more than one default preset");
-            }
-        }
-
-        public void CheckIfFilterTypeIsValid(FilterType filterType)
-        {
-            if (!Enum.IsDefined(typeof(FilterType), filterType))
-            {
-                throw new ValidationException(ErrorCodes.InvalidType, "Filter does not exists");
             }
         }
 
@@ -69,6 +60,22 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
             if (names.Distinct().Count() != names.Count)
             {
                 throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "Preset names cannot contain duplicates");
+            }
+        }
+
+        public void CheckIfFilterTypesAreValid(FilterType[] filterTypes)
+        {
+            foreach (var filterType in filterTypes)
+            {
+                CheckIfFilterTypeIsValid(filterType);
+            }
+        }
+
+        private void CheckIfFilterTypeIsValid(FilterType filterType)
+        {
+            if (!Enum.IsDefined(typeof(FilterType), filterType))
+            {
+                throw new ValidationException(ErrorCodes.InvalidType, "Filter does not exists");
             }
         }
     }

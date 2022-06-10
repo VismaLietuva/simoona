@@ -50,7 +50,6 @@ namespace Shrooms.Domain.Services.FilterPresets
                 {
                     Id = preset.Id,
                     Name = preset.Name,
-                    PageType = preset.ForPage,
                     IsDefault = preset.IsDefault,
                     Filters = JsonConvert.DeserializeObject<IEnumerable<FilterPresetItemDto>>(preset.Preset)
                 });
@@ -70,7 +69,7 @@ namespace Shrooms.Domain.Services.FilterPresets
 
                 CreatePresets(updateDto);
 
-                await _uow.SaveChangesAsync(updateDto.UserId);
+                await _uow.SaveChangesAsync(updateDto.UserOrg.UserId);
             }
             finally
             {
@@ -78,64 +77,49 @@ namespace Shrooms.Domain.Services.FilterPresets
             }
         }
 
-        // TODO: refactor
         public async Task<IEnumerable<FiltersDto>> GetFiltersAsync(FilterType[] filterTypes, int organizationId)
         {
             _validator.CheckIfFilterTypesContainsDuplicates(filterTypes);
+            _validator.CheckIfFilterTypesAreValid(filterTypes);
 
-            var filters = new List<FiltersDto>();
+            var filtersDtos = new List<FiltersDto>();
 
             foreach (var type in filterTypes)
             {
-                _validator.CheckIfFilterTypeIsValid(type);
-
-                switch (type)
+                var filters = await GetFiltersQuery(type).ToListAsync();
+                var filtersDto = new FiltersDto
                 {
-                    case FilterType.Kudos:
-                        filters.Add(new FiltersDto
-                        {
-                            FilterType = FilterType.Kudos,
-                            Filters = await _kudosTypeDbSet
-                                .Select(kudos => new FilterDto
-                                {
-                                    Id = kudos.Id,
-                                    Name = kudos.Name
-                                })
-                                .ToListAsync()
-                        });
-                        break;
+                    FilterType = type,
+                    Filters = filters,
+                };
 
-                    case FilterType.Offices:
-                        filters.Add(new FiltersDto
-                        {
-                            FilterType = FilterType.Offices,
-                            Filters = await _officeDbSet
-                                .Select(office => new FilterDto
-                                {
-                                    Id = office.Id,
-                                    Name = office.Name
-                                })
-                                .ToListAsync()
-                        });
-                        break;
-
-                    case FilterType.Events:
-                        filters.Add(new FiltersDto
-                        {
-                            FilterType = FilterType.Events,
-                            Filters = await _eventTypeDbSet
-                            .Select(e => new FilterDto
-                            {
-                                Id = e.Id,
-                                Name = e.Name
-                            })
-                            .ToListAsync()
-                        });
-                        break;
-                }
+                filtersDtos.Add(filtersDto);
             }
 
-            return filters;
+            return filtersDtos;
+        }
+
+        private IQueryable<FilterDto> GetFiltersQuery(FilterType filterType)
+        {
+            return filterType switch
+            {
+                FilterType.Offices => _officeDbSet.Select(filter => new FilterDto
+                {
+                    Id = filter.Id,
+                    Name = filter.Name
+                }),
+                FilterType.Kudos => _kudosTypeDbSet.Select(filter => new FilterDto
+                {
+                    Id = filter.Id,
+                    Name = filter.Name
+                }),
+                FilterType.Events => _eventTypeDbSet.Select(filter => new FilterDto
+                {
+                    Id = filter.Id,
+                    Name = filter.Name
+                }),
+                _ => throw new NotImplementedException()
+            };
         }
 
         private async Task DeleteAsync(AddEditDeleteFilterPresetDto updateDto)
@@ -148,7 +132,7 @@ namespace Shrooms.Domain.Services.FilterPresets
             var presets = await _filterPresetDbSet
                 .Where(preset => 
                     updateDto.PresetsToRemove.Contains(preset.Id) &&
-                    preset.OrganizationId == updateDto.OrganizationId)
+                    preset.OrganizationId == updateDto.UserOrg.OrganizationId)
                 .ToListAsync();
 
             foreach (var preset in presets)
@@ -170,8 +154,8 @@ namespace Shrooms.Domain.Services.FilterPresets
             {
                 var newPreset = new FilterPreset
                 {
-                    OrganizationId = updateDto.OrganizationId,
-                    CreatedBy = updateDto.UserId,
+                    OrganizationId = updateDto.UserOrg.OrganizationId,
+                    CreatedBy = updateDto.UserOrg.UserId,
                     Name = preset.Name,
                     IsDefault = preset.IsDefault,
                     ForPage = updateDto.PageType,

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Shrooms.Contracts.DataTransferObjects.FilterPresets
 {
-    public class AddEditDeleteFilterPresetDto : UserAndOrganizationDto
+    public class AddEditDeleteFilterPresetDto
     {
         public string Name { get; set; }
 
@@ -14,5 +14,7 @@ namespace Shrooms.Contracts.DataTransferObjects.FilterPresets
         public IEnumerable<CreateFilterPresetDto> PresetsToAdd;
 
         public IEnumerable<int> PresetsToRemove;
+
+        public UserAndOrganizationDto UserOrg { get; set; }
     }
 }

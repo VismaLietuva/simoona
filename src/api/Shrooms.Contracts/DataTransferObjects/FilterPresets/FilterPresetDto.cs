@@ -1,5 +1,4 @@
-﻿using Shrooms.Contracts.Enums;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Shrooms.Contracts.DataTransferObjects.FilterPresets
 {
@@ -8,8 +7,6 @@ namespace Shrooms.Contracts.DataTransferObjects.FilterPresets
         public int Id { get; set; }
         
         public string Name { get; set; }
-
-        public PageType PageType { get; set; }
 
         public bool IsDefault { get; set; }
 

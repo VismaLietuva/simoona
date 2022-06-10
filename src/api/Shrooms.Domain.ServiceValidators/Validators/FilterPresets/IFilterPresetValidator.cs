@@ -6,7 +6,7 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
 {
     public interface IFilterPresetValidator
     {
-        void CheckIfFilterTypeIsValid(FilterType filterType);
+        void CheckIfFilterTypesAreValid(FilterType[] filterTypes);
 
         void CheckIfFilterTypesContainsDuplicates(FilterType[] filterTypes);
 

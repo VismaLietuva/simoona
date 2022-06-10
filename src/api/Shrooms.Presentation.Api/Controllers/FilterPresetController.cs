@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
@@ -34,10 +33,8 @@ namespace Shrooms.Presentation.Api.Controllers
             try
             {
                 var updateDto = _mapper.Map<AddEditDeleteFilterPresetViewModel, AddEditDeleteFilterPresetDto>(updateViewModel);
-                var userOrg = GetUserAndOrganization();
-
-                updateDto.UserId = userOrg.UserId;
-                updateDto.OrganizationId = userOrg.OrganizationId;
+                
+                updateDto.UserOrg = GetUserAndOrganization();
 
                 await _filterPresetService.UpdateAsync(updateDto);
 
