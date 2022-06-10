@@ -79,7 +79,14 @@
                 filterPresetRepository.getPresetsForPage(filterPageType).then(
                     function (response) {
                         scope.loadedPresets = response;
-                        sendSelectedPresetValues(getDefaultPreset());
+
+                        var presetToSend = getDefaultPreset();
+
+                        if (!presetToSend) {
+                            return;
+                        }
+
+                        sendSelectedPresetValues(presetToSend);
                     },
                     function () {
                         notifySrv.error('errorCodeMessages.messageError');
