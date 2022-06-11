@@ -67,7 +67,7 @@
 
             <div class="pull-right">
                 <!-- Save button -->
-                <button class="btn btn-primary" ng-disabled="mainForm.$invalid || !vm.controls.length || !vm.isNamesUnique()"
+                <button class="btn btn-primary" ng-disabled="mainForm.$invalid || !vm.controls.length || !vm.areNamesEqual()"
                     ng-click="vm.applyUpdate()">
                     <span translate="common.save"></span>
                 </button>

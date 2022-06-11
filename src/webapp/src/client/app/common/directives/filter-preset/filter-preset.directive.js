@@ -157,7 +157,7 @@
         vm.setPresetAsDeleted = setPresetAsDeleted;
         vm.spawnNewPresetControl = spawnNewPresetControl;
         vm.isNameUnique = isNameUnique;
-        vm.isNamesUnique = isNamesUnique;
+        vm.areNamesEqual = areNamesEqual;
 
         init();
 
@@ -258,14 +258,13 @@
             var modifiedPresets = getModifiedPresets();
 
             filterPresetRepository.updatePresets(modifiedPresets, vm.filterPageType).then(
-                function () {
-                    syncControlsWithPresets(modifiedPresets);
-
-                    // If new presets are created, we need to fetch data from the backend again so we can get the new presets' created ids.
-                    // Otherwise, updating the newly created preset will fail.
-                    if (modifiedPresets.presetsToAdd.length) {
-                        scope.loadFilterPresets(scope.filterPageType);
+                function (result) {
+                    if (result.addedPresets.length > 0) {
+                        // Set preset Ids that match the backend
+                        modifiedPresets.presetsToAdd = result.addedPresets;
                     }
+
+                    syncControlsWithPresets(modifiedPresets);
 
                     notifySrv.success('common.infoSaved');
                     $uibModalInstance.close();
@@ -367,7 +366,7 @@
             return true;
         }
 
-        function isNamesUnique() {
+        function areNamesEqual() {
             var names = new Map();
 
             for (var control of vm.controls) {
