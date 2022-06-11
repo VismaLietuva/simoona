@@ -87,6 +87,7 @@
     <Compile Include="Models\FilterPresets\FilterPresetViewModel.cs" />
     <Compile Include="Models\FilterPresets\FiltersViewModel.cs" />
     <Compile Include="Models\FilterPresets\FilterViewModel.cs" />
+    <Compile Include="Models\FilterPresets\UpdatedFilterPresetViewModel.cs" />
     <Compile Include="Models\Jobs\NewJobTypeViewModel.cs" />
     <Compile Include="Models\Jobs\JobTypeViewModel.cs" />
     <Compile Include="Models\KudosTypes\NewKudosTypeViewModel.cs" />

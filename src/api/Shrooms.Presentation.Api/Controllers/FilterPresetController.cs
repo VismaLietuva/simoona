@@ -36,9 +36,10 @@ namespace Shrooms.Presentation.Api.Controllers
                 
                 updateDto.UserOrg = GetUserAndOrganization();
 
-                await _filterPresetService.UpdateAsync(updateDto);
+                var updatedDto = await _filterPresetService.UpdateAsync(updateDto);
+                var updatedViewModel = _mapper.Map<UpdatedFilterPresetDto, UpdatedFilterPresetViewModel>(updatedDto);
 
-                return Ok();
+                return Ok(updatedViewModel);
             }
             catch (ValidationException e)
             {

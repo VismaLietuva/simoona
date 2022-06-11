@@ -55,7 +55,7 @@ namespace Shrooms.Domain.Services.FilterPresets
                 });
         }
 
-        public async Task UpdateAsync(AddEditDeleteFilterPresetDto updateDto)
+        public async Task<UpdatedFilterPresetDto> UpdateAsync(AddEditDeleteFilterPresetDto updateDto)
         {
             await _filterPresetUpdateCreateLock.WaitAsync();
 
@@ -64,12 +64,25 @@ namespace Shrooms.Domain.Services.FilterPresets
                 _validator.CheckIfMoreThanOneDefaultPresetExists(updateDto);
                 _validator.CheckIfUniqueNames(updateDto);
 
-                await UpdatePresetsAsync(updateDto);
-                await DeleteAsync(updateDto);
-
-                CreatePresets(updateDto);
+                var updatedPresets = await UpdatePresetsAsync(updateDto);
+                var removedPresets = await DeleteAsync(updateDto);
+                var addedPresets = CreatePresets(updateDto);
 
                 await _uow.SaveChangesAsync(updateDto.UserOrg.UserId);
+
+                return new UpdatedFilterPresetDto
+                {
+                    // Ids are assigned after SaveChangesAsync()
+                    AddedPresets = addedPresets?.Select(preset => new FilterPresetDto
+                    {
+                        Id = preset.Id,
+                        Name = preset.Name,
+                        IsDefault = preset.IsDefault,
+                        Filters = JsonConvert.DeserializeObject<IEnumerable<FilterPresetItemDto>>(preset.Preset)
+                    }),
+                    UpdatedPresets = updatedPresets,
+                    RemovedPresets = removedPresets
+                };
             }
             finally
             {
@@ -122,11 +135,11 @@ namespace Shrooms.Domain.Services.FilterPresets
             };
         }
 
-        private async Task DeleteAsync(AddEditDeleteFilterPresetDto updateDto)
+        private async Task<IEnumerable<FilterPresetDto>> DeleteAsync(AddEditDeleteFilterPresetDto updateDto)
         {
             if (!updateDto.PresetsToRemove.Any())
             {
-                return;
+                return null;
             }
 
             var presets = await _filterPresetDbSet
@@ -135,20 +148,34 @@ namespace Shrooms.Domain.Services.FilterPresets
                     preset.OrganizationId == updateDto.UserOrg.OrganizationId)
                 .ToListAsync();
 
+            var removedPresets = new List<FilterPresetDto>();
+
             foreach (var preset in presets)
             {
+                removedPresets.Add(new FilterPresetDto
+                {
+                    Id = preset.Id,
+                    Name = preset.Name,
+                    IsDefault = preset.IsDefault,
+                    Filters = JsonConvert.DeserializeObject<IEnumerable<FilterPresetItemDto>>(preset.Preset)
+                });
+
                 _filterPresetDbSet.Remove(preset);
             }
+
+            return removedPresets;
         }
 
-        private void CreatePresets(AddEditDeleteFilterPresetDto updateDto)
+        private IEnumerable<FilterPreset> CreatePresets(AddEditDeleteFilterPresetDto updateDto)
         {
             if (!updateDto.PresetsToAdd.Any())
             {
-                return;
+                return null;
             }
 
             var timestamp = DateTime.UtcNow;
+            
+            var presets = new List<FilterPreset>();
 
             foreach (var preset in updateDto.PresetsToAdd)
             {
@@ -164,15 +191,18 @@ namespace Shrooms.Domain.Services.FilterPresets
                     Preset = JsonConvert.SerializeObject(preset.Filters)
                 };
 
+                presets.Add(newPreset);
                 _filterPresetDbSet.Add(newPreset);
             }
+
+            return presets;
         }
 
-        private async Task UpdatePresetsAsync(AddEditDeleteFilterPresetDto updateDto)
+        private async Task<IEnumerable<FilterPresetDto>> UpdatePresetsAsync(AddEditDeleteFilterPresetDto updateDto)
         {
             if (!updateDto.PresetsToUpdate.Any())
             {
-                return;
+                return null;
             }
 
             var presetsToUpdateIds = updateDto.PresetsToUpdate.Select(preset => preset.Id)
@@ -201,6 +231,9 @@ namespace Shrooms.Domain.Services.FilterPresets
                 presetToUpdate.Name = preset.Name;
                 presetToUpdate.Preset = JsonConvert.SerializeObject(preset.Filters);
             }
+
+            // Not sure, if I should make copies, since values will be indentical
+            return updateDto.PresetsToUpdate;
         }
 
         private async Task ChangeCurrentDefaultFilterToNonDefaultAsync(FilterPreset preset)

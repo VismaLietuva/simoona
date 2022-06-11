@@ -18,6 +18,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
             CreateMap<FilterPresetDto, FilterPresetViewModel>();
             CreateMap<FilterDto, FilterViewModel>();
             CreateMap<FiltersDto, FiltersViewModel>();
+            CreateMap<UpdatedFilterPresetDto, UpdatedFilterPresetViewModel>();
         }
 
         private void CreateViewModelToDtoMappings()
