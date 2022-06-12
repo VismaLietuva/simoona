@@ -144,10 +144,7 @@
         }
 
         function applyFilter(filter, filterName) {
-            vm.filter = {
-                ...vm.filter,
-                [filterName]: filter.map((f) => f[0]),
-            };
+            vm.filter[filterName] = filter.map(f => f[0]);
         }
 
         function loadEventsWithNewlyAppliedFilter(filter, filterName) {
