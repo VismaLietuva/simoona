@@ -21,5 +21,7 @@ namespace Shrooms.Premium.Domain.Services.Args
         public int[] TypeIds { get; set; }
 
         public string[] OfficeIds { get; set; }
+
+        public int[] KudosTypeIds { get; set; }
     }
 }
