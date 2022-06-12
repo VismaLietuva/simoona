@@ -194,6 +194,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                         VisitedEvents = p.ApplicationUser.Events
                             .Where(visited => (visited.EndDate < DateTime.UtcNow) &&
                                               (eventTypesLength == 0 || eventTypes.Contains(visited.EventType.Id)))
+                            .Take(50)
                             .Select(visited => new EventVisitedDto
                             {
                                 Id = visited.Id,
