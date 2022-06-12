@@ -29,6 +29,7 @@
         var vm = this;
 
         vm.filterPageType = filterPageTypes.extensiveEventDetails;
+        vm.visitedEventsPreviewCount = 3;
 
         vm.eventImageSize = {
             w: eventSettings.thumbWidth,
@@ -50,23 +51,68 @@
             appliedEventTypes: undefined,
         };
 
-        vm.settings = {
-            showItemsInEventsList: 3,
-            pageSize: 10
-        };
-
+        vm.showActionsColumn = false;
         vm.page = 1;
 
-        vm.setKudosTypes = setKudosTypes;
-        vm.setEventTypes = setEventTypes;
-        vm.changePage = changePage;
         vm.applyFilterPreset = applyFilterPreset;
+        vm.setTypes = setTypes;
+        vm.loadParticipantsOnPage = loadParticipantsOnPage;
 
         init();
 
         function init() {
             loadFilters();
             loadEventDetails();
+            loadParticipants();
+        }
+
+        function loadEventDetails() {
+            vm.isLoading = true;
+
+            eventRepository
+                .getEventDetails($stateParams.id)
+                .then(function(result) {
+                    vm.eventDetails = result;
+                    vm.isLoading = false;
+                }, function() {
+                    notifySrv.error('errorCodeMessages.messageError');
+                })
+        }
+
+        function loadParticipants() {
+            vm.isLoadingParticipants = true;
+
+            eventRepository
+                .getEventParticipants(
+                    $stateParams.id,
+                    vm.filter.appliedKudos,
+                    vm.filter.appliedEventTypes,
+                    vm.page
+                )
+                .then(
+                    function(result) {
+                        vm.participants = result;
+                        vm.participants.pagedList = vm.participants.pagedList.map(
+                            function(element) {
+                                var canBeExpanded = vm.visitedEventsPreviewCount < element.visitedEvents.length;
+
+                                if (!vm.showActionsColumn && canBeExpanded) {
+                                    vm.showActionsColumn = true;
+                                }
+
+                                return {
+                                    ...element,
+                                    canBeExpanded: canBeExpanded,
+                                    isExpanded: false
+                                };
+                            }
+                        );
+                        vm.isLoadingParticipants = false;
+                    },
+                    function () {
+                        notifySrv.error('errorCodeMessages.messageError');
+                    }
+                )
         }
 
         function loadFilters() {
@@ -88,10 +134,6 @@
                                 filterTypes.kudos
                             );
 
-                        if (vm.notAppliedPreset !== undefined) {
-                            handleNotAppliedPreset();
-                        }
-
                         vm.areFiltersLoading = false;
                     },
                     function() {
@@ -100,45 +142,9 @@
                 )
         }
 
-        function loadEventDetails() {
-            vm.isLoading = true;
-            vm.pageContent = undefined;
-            eventRepository
-                .getExtensiveEventDetails(
-                    $stateParams.id,
-                    vm.filter.appliedKudos,
-                    vm.filter.appliedEventTypes
-                )
-                .then(
-                    function (result) {
-                        vm.eventDetails = result;
-                        changePage(1);
-                        vm.isLoading = false;
-                        vm.loadControls =
-                            vm.eventDetails.extensiveParticipants.length;
-                    },
-                    function () {
-                        notifySrv.error('errorCodeMessages.messageError');
-                    }
-                );
-        }
-
-        function setKudosTypes(types) {
-            vm.filter.appliedKudos = types.map((filter) => filter[1]);
-
-            loadEventDetails();
-        }
-
-        function setEventTypes(types) {
-            vm.filter.appliedEventTypes = types.map((filter) => filter[0]);
-
-            loadEventDetails();
-        }
-
-        function changePage(page) {
-            vm.page = page;
-
-            loadPage();
+        function setTypes(filterName, types) {
+            vm.filter[filterName] = types.map(filter => filter[0]);
+            loadParticipantsOnPage(1);
         }
 
         function applyFilterPreset(preset) {
@@ -157,39 +163,12 @@
             vm.filter.appliedEventTypes = [...vm.dropdownCheckboxes.eventTypes.keys()];
             vm.filter.appliedKudos = [...vm.dropdownCheckboxes.kudosTypes.keys()];
 
-            loadEventDetails();
+            loadParticipantsOnPage(1);
         }
 
-        function loadPage() {
-            var start = (vm.page - 1) * vm.settings.pageSize;
-            var offset = vm.settings.pageSize;
-
-            vm.pageContent = vm.eventDetails.extensiveParticipants
-                .slice(
-                    start,
-                    start + offset
-                )
-                .map((participant) => ({
-                    ...participant,
-                    isExpanded: false,
-                    canBeExpanded:
-                        participant.visitedEvents.length >
-                        vm.settings.showItemsInEventsList
-                }));
-
-            vm.showActionsColumn = showActionsColumn();
-        }
-
-        function handleNotAppliedPreset() {
-            vm.applyFilterPreset(vm.notAppliedPreset);
-            vm.notAppliedPreset = undefined;
-        }
-
-        function showActionsColumn() {
-            return (
-                vm.pageContent &&
-                vm.pageContent.find((participant) => participant.canBeExpanded)
-            );
+        function loadParticipantsOnPage(page) {
+            vm.page = page;
+            loadParticipants();
         }
     }
 })();

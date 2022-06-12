@@ -38,10 +38,6 @@
                             <div class="col-xs-12 event-details-start-date text-center" ng-cloak>
                                 {{vm.eventDetails.startDate | amUtc | amLocal | amDateFormat:'MMMM DD'}}
                             </div>
-                            <div class="col-xs-12 nopadding-left nopadding-right event-details-registration">
-                                <ace-event-status event="vm.eventDetails" is-details="true" is-add-colleague="false">
-                                </ace-event-status>
-                            </div>
                         </div>
 
                         <div class="col-xs-12 col-lg-5 event-details-info-container">
@@ -90,8 +86,7 @@
                                 </b>
                                 <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: vm.eventDetails.hostUserId })">
                                     <span ng-cloak>
-                                        {{vm.eventDetails.hostFirstName}}
-                                        {{vm.eventDetails.hostLastName}}
+                                        {{vm.eventDetails.hostUserFullName}}
                                     </span>
                                 </a>
                             </div>
@@ -104,12 +99,12 @@
                 </div>
 
                 <!-- Filter controls -->
-                <div class="row event-details-list-filter-controls" ng-if="vm.loadControls">
+                <div class="row event-details-list-filter-controls" ng-if="!vm.isLoading && vm.participants.pagedList.length">
                     <ace-dropdown-checkbox
                         class="col-md-2 col-xs-6 col-sm-4 pull-right"
                         translation="events.eventKudosDropdownButtonTitle"
                         types="vm.filterTypes.kudosTypes.filters"
-                        on-value-change="vm.setKudosTypes(types)"
+                        on-value-change="vm.setTypes('appliedKudos', types)"
                         applied-types="vm.dropdownCheckboxes.kudosTypes"
                         is-expanded="false">
                     </ace-dropdown-checkbox>
@@ -118,12 +113,12 @@
                         translation="events.eventTypesDropdownButtonTitle"
                         types="vm.filterTypes.eventTypes.filters"
                         applied-types="vm.dropdownCheckboxes.eventTypes"
-                        on-value-change="vm.setEventTypes(types)"
+                        on-value-change="vm.setTypes('appliedEventTypes', types)"
                         is-expanded="false">
                     </ace-dropdown-checkbox>
                 </div>
 
-                <table ng-if="vm.pageContent.length" class="nc-table">
+                <table ng-if="!vm.isLoadingParticipants && vm.participants.pagedList.length" class="nc-table">
                     <thead>
                         <tr>
                             <th translate="events.tableEmployee"></th>
@@ -139,7 +134,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat-start="participant in vm.pageContent" ng-click="vm.viewDetails(event.id)">
+                        <tr ng-repeat-start="participant in vm.participants.pagedList" ng-click="vm.viewDetails(event.id)">
                             <td class="col-xs-2 word-break" ng-cloak>
                                 <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: participant.id })">
                                     <span ng-cloak>
@@ -178,14 +173,14 @@
                                 <span ng-if="!participant.visitedEvents.length" translate="events.empty"></span>
                                 <ul class="event-details-event-list" ng-if="participant.visitedEvents.length">
                                     <li ng-if="!participant.isExpanded"
-                                        ng-repeat="event in participant.visitedEvents | limitTo: vm.settings.showItemsInEventsList track by $index">
+                                        ng-repeat="event in participant.visitedEvents | limitTo: vm.visitedEventsPreviewCount track by $index">
                                         <a
                                             ui-sref=" Root.WithOrg.Client.Events.EventContent({ id: event.id })">{{event.name}}</a>
                                         <span ng-if="participant.canBeExpanded &&
                                                         !participant.isExpanded &&
-                                                        $index === vm.settings.showItemsInEventsList - 1"
+                                                        $index === vm.visitedEventsPreviewCount - 1"
                                             translate="events.moreCount" translate-values="{ one: participant.visitedEvents.length -
-                                                            vm.settings.showItemsInEventsList }">
+                                                            vm.visitedEventsPreviewCount }">
                                         </span>
                                     </li>
                                 </ul>
@@ -243,12 +238,14 @@
                     </tbody>
                 </table>
 
-                <wave-spinner ng-if="vm.isLoading && !vm.pageContent.length"></wave-spinner>
+                <wave-spinner ng-if="vm.isLoadingParticipants"></wave-spinner>
 
-                <ace-list-pagination total-item-count="vm.eventDetails.extensiveParticipants.length"
-                    page-size="vm.settings.pageSize"
-                    page-count="vm.eventDetails.extensiveParticipants.length / vm.settings.pageSize"
-                    current-page="vm.page" on-changed="vm.changePage(page)">
+                <ace-list-pagination
+                    total-item-count="vm.participants.itemCount"
+                    page-size="vm.participants.pageSize"
+                    page-count="vm.participants.pageCount"
+                    current-page="vm.page"
+                    on-changed="vm.loadParticipantsOnPage(page)">
                 </ace-list-pagination>
             </div>
         </div>
