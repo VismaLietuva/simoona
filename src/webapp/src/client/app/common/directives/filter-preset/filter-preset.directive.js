@@ -358,7 +358,7 @@
             }
 
             for (var c of vm.controls) {
-                if (c.name === control.name && c.id !== control.id) {
+                if (c.name === control.name && c.id !== control.id && !c.isDeleted) {
                     return false;
                 }
             }
@@ -372,6 +372,10 @@
             for (var control of vm.controls) {
                 if (names.has(control.name)) {
                     return false;
+                }
+
+                if (control.isDeleted) {
+                    continue;
                 }
 
                 names.set(control.name, true);
