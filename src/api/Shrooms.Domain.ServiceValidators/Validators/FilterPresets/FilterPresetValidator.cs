@@ -5,11 +5,22 @@ using Shrooms.Contracts.Enums;
 using System.Linq;
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using Shrooms.Contracts.DAL;
+using Shrooms.DataLayer.EntityModels.Models;
+using System.Data.Entity;
 
 namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
 {
     public class FilterPresetValidator : IFilterPresetValidator
     {
+        private readonly DbSet<FilterPreset> _filterPresetsDbSet;
+
+        public FilterPresetValidator(IUnitOfWork2 uow)
+        {
+            _filterPresetsDbSet = uow.GetDbSet<FilterPreset>();
+        }
+
         public void CheckIfPageTypeExists(PageType page)
         {
             if (!Enum.IsDefined(typeof(PageType), page))
@@ -50,7 +61,7 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
             }
         }
 
-        public void CheckIfUniqueNames(AddEditDeleteFilterPresetDto updateDto)
+        public async void CheckIfUniqueNames(AddEditDeleteFilterPresetDto updateDto, IEnumerable<FilterPresetDto> removedPresets)
         {
             var names = updateDto
                 .PresetsToAdd.Select(p => p.Name)
@@ -58,6 +69,21 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
                 .ToList();
 
             if (names.Distinct().Count() != names.Count)
+            {
+                throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "Preset names cannot contain duplicates");
+            }
+
+            var namesFromDb = await _filterPresetsDbSet
+                .Where(preset => names.Contains(preset.Name))
+                .Select(preset => preset.Name)
+                .ToListAsync();
+
+            if (namesFromDb.Count != 0 && removedPresets.Count() != namesFromDb.Count)
+            {
+                throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "Preset names cannot contain duplicates");
+            }
+            
+            if (!removedPresets.All(preset => namesFromDb.Contains(preset.Name)))
             {
                 throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "Preset names cannot contain duplicates");
             }
