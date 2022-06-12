@@ -9,6 +9,7 @@ using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
+using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Domain.DomainServiceValidators.Events;
@@ -31,12 +32,18 @@ namespace Shrooms.Premium.Domain.Services.Events.List
         private readonly IEventValidationService _eventValidationService;
 
         private readonly IDbSet<Event> _eventsDbSet;
+        private readonly DbSet<KudosLog> _kudosLogDbSet;
+        private readonly DbSet<KudosType> _kudosTypesDbSet;
+        private readonly DbSet<EventParticipant> _eventParticipantsDbSet;
         private readonly IDbSet<Office> _officeDbSet;
 
         public EventListingService(IUnitOfWork2 uow, IEventValidationService eventValidationService)
         {
             _eventValidationService = eventValidationService;
             _eventsDbSet = uow.GetDbSet<Event>();
+            _kudosLogDbSet = uow.GetDbSet<KudosLog>();
+            _kudosTypesDbSet = uow.GetDbSet<KudosType>();
+            _eventParticipantsDbSet = uow.GetDbSet<EventParticipant>();
             _officeDbSet = uow.GetDbSet<Office>();
         }
 
@@ -123,6 +130,63 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             }
 
             return events;
+        }
+
+        public async Task<IPagedList<ExtensiveEventParticipantDto>> GetExtensiveParticipantsAsync(Guid eventId, EventsListingFilterArgs args, UserAndOrganizationDto userOrg)
+        {
+            var kudosTypesLength = args.KudosTypeIds.Length;
+            var eventTypesLength = args.TypeIds.Length;
+
+            var kudosTypeNames = await _kudosTypesDbSet
+                .Where(type => args.KudosTypeIds.Contains(type.Id))
+                .Select(type => type.Name)
+                .ToListAsync();
+
+            return await _eventParticipantsDbSet
+                .Include(p => p.ApplicationUser)
+                .Where(p => p.EventId == eventId)
+                .Select(p => new ExtensiveEventParticipantDto
+                {
+                    Id = p.ApplicationUser.Id,
+                    FirstName = p.ApplicationUser.FirstName,
+                    LastName = p.ApplicationUser.LastName,
+                    EmploymentDate = p.ApplicationUser.EmploymentDate,
+                    QualificationLevel = p.ApplicationUser.QualificationLevel.Name,
+                    JobTitle = p.ApplicationUser.JobPosition.Title,
+                    ManagerFirstName = p.ApplicationUser.Manager.FirstName,
+                    ManagerLastName = p.ApplicationUser.Manager.LastName,
+                    ManagerId = p.ApplicationUser.Manager.Id,
+                    Projects = p.ApplicationUser.Projects.Select(p => new EventProjectDto
+                    {
+                        Id = p.Id,
+                        Name = p.Name
+                    }),
+                    Kudos = _kudosLogDbSet
+                        .Where(kudos =>
+                            (kudosTypesLength == 0 || kudosTypeNames.Contains(kudos.KudosTypeName)) &&
+                            (kudos.EmployeeId == p.ApplicationUser.Id) &&
+                            (kudos.Status == KudosStatus.Approved))
+                        .Sum(kudos => kudos.Points),
+                    VisitedEvents = p.ApplicationUser.Events
+                            .Where(visited => (visited.EndDate < DateTime.UtcNow) &&
+                                              (eventTypesLength == 0 || args.TypeIds.Contains(visited.EventType.Id)))
+                            .Take(50)
+                            .Select(visited => new EventVisitedDto
+                            {
+                                Id = visited.Id,
+                                Name = visited.Name,
+                                TypeName = visited.EventType.Name,
+                                StartDate = visited.StartDate,
+                                EndDate = visited.EndDate
+                            })
+                            .Distinct()
+                            .OrderByDescending(visited => visited.EndDate)
+                            .ToList()
+                })
+                .OrderByDescending(p => p.EmploymentDate)
+                .ThenByDescending(p => p.Kudos)
+                .ThenByDescending(p => p.VisitedEvents.Count())
+                .ToPagedListAsync(args.Page, args.PageSize);
         }
 
         public async Task<IEnumerable<EventListItemDto>> GetMyEventsAsync(MyEventsOptionsDto options, int page, int? officeId = null)
@@ -231,7 +295,8 @@ namespace Shrooms.Premium.Domain.Services.Events.List
 
             return x => x.Offices.Contains(office) || x.Offices == OutsideOffice;
         }
-Expression<Func<Event, bool>> SearchFilter(string searchString)
+
+        private static Expression<Func<Event, bool>> SearchFilter(string searchString)
         {
             if (string.IsNullOrEmpty(searchString))
             {
