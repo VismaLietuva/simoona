@@ -43,7 +43,7 @@
             getMaxEventParticipants: getMaxEventParticipants,
             updateAttendStatus: updateAttendStatus,
             getEventsByTitle: getEventsByTitle,
-            getExtensiveEventDetails: getExtensiveEventDetails
+            getEventParticipants: getEventParticipants
         };
 
         return service;
@@ -233,12 +233,13 @@
             }).$promise;
         }
 
-        function getExtensiveEventDetails(eventId, kudosTypeNames, eventTypes) {
-            return $resource(`${eventUrl}GetExtensiveDetails`).get({
+        function getEventParticipants(eventId, kudosTypeIds, eventTypes, page) {
+            return $resource(`${eventUrl}GetPagedExtensiveParticipants`).get({
                 eventId: eventId,
-                kudosTypeNames: kudosTypeNames,
-                eventTypes: eventTypes
-            }).$promise
+                kudosTypeIds: kudosTypeIds,
+                eventTypes: eventTypes,
+                page: page
+            }).$promise;
         }
     }
 })();
