@@ -360,6 +360,45 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         }
 
         [HttpGet]
+        [Route("GetPagedExtensiveParticipants")]
+        public async Task<IHttpActionResult> GetPagedExtensiveParticipants(
+            Guid eventId,
+            [FromUri] int[] kudosTypeIds,
+            [FromUri] int[] eventTypes,
+            int page = 1,
+            int pageSize = WebApiConstants.DefaultPageSize)
+        {
+            try
+            {
+                var args = new EventsListingFilterArgs
+                {
+                    KudosTypeIds = kudosTypeIds,
+                    TypeIds = eventTypes,
+                    Page = page,
+                    PageSize = pageSize
+                };
+
+                var pagedParticipants = await _eventListingService.GetExtensiveParticipantsAsync(eventId, args, GetUserAndOrganization());
+                var pagedParticipantsViewModel = _mapper.Map<IEnumerable<ExtensiveEventParticipantDto>, IEnumerable<ExtensiveEventParticipantViewModel>>(pagedParticipants);
+
+                var pagedModel = new StaticPagedList<ExtensiveEventParticipantViewModel>(pagedParticipantsViewModel, page, pageSize, pagedParticipants.TotalItemCount);
+                var pagedViewModel = new PagedViewModel<ExtensiveEventParticipantViewModel>
+                {
+                    PagedList = pagedModel,
+                    PageCount = pagedModel.PageCount,
+                    ItemCount = pagedModel.TotalItemCount,
+                    PageSize = pageSize
+                };
+
+                return Ok(pagedViewModel);
+            }
+            catch (EventException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpGet]
         [Route("GetExtensiveDetails")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
         public async Task<IHttpActionResult> GetExtensiveEventDetails(Guid eventId, [FromUri] string[] kudosTypeNames, [FromUri] int[] eventTypes)
