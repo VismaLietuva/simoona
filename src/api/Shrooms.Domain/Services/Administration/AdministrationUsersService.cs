@@ -179,7 +179,7 @@ namespace Shrooms.Domain.Services.Administration
 
             await SetWelcomeKudosAsync(applicationUser);
 
-            await AddUserToWallsForNewUser(applicationUser, userAndOrg);
+            await AddWallsToNewUser(applicationUser, userAndOrg);
             await _uow.SaveChangesAsync(userAndOrg.UserId);
         }
 
@@ -490,7 +490,7 @@ namespace Shrooms.Domain.Services.Administration
             return filteredUsers?.ToList() ?? administrationUsers;
         }
 
-        private async Task<IList<DataLayer.EntityModels.Models.Multiwall.Wall>> GetWallsForNewUsersAsync(ApplicationUser applicationUser)
+        private async Task<IList<DataLayer.EntityModels.Models.Multiwall.Wall>> GetWallsToAddForNewUserAsync(ApplicationUser applicationUser)
         {
             return await _wallsDbSet
                 .Include(wall => wall.Members)
@@ -500,9 +500,9 @@ namespace Shrooms.Domain.Services.Administration
                 .ToListAsync();
         }
 
-        private async Task AddUserToWallsForNewUser(ApplicationUser applicationUser, UserAndOrganizationDto userOrg)
+        private async Task AddWallsToNewUser(ApplicationUser applicationUser, UserAndOrganizationDto userOrg)
         {
-            var walls = await GetWallsForNewUsersAsync(applicationUser);
+            var walls = await GetWallsToAddForNewUserAsync(applicationUser);
 
             if (!walls.Any())
             {
