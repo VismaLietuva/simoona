@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Shrooms.Premium.Presentation.WebViewModels.Events
+namespace Shrooms.Premium.DataTransferObjects.Models.Events
 {
-    public class EventVisitedViewModel
+    public class EventVisitedReportDto
     {
         public Guid Id { get; set; }
 

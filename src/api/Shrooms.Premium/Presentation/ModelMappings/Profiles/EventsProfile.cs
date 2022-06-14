@@ -35,10 +35,10 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 
             CreateMap<EventDetailsOptionDto, EventDetailsOptionViewModel>();
             CreateMap<EventDetailsParticipantDto, EventDetailsParticipantViewModel>();
-            CreateMap<EventVisitedDto, EventVisitedViewModel>();
-            CreateMap<EventProjectDto, EventProjectViewModel>();
+            CreateMap<EventVisitedReportDto, EventVisitedReportViewModel>();
+            CreateMap<EventProjectReportDto, EventProjectReportViewModel>();
             CreateMap<ExtensiveEventDetailsDto, ExtensiveEventDetailsViewModel>();
-            CreateMap<ExtensiveEventParticipantDto, ExtensiveEventParticipantViewModel>();
+            CreateMap<EventParticipantReportDto, EventParticipantReportViewModel>();
             
             CreateMap<EventEditDto, EventEditViewModel>()
                 .ForMember(dest => dest.OfficeIds, opt => opt.MapFrom(u => JsonConvert.DeserializeObject<string[]>(u.Offices.Value)));
@@ -74,13 +74,14 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 
             CreateMap<EventDetailsOptionViewModel, EventDetailsOptionDto>();
             CreateMap<EventDetailsParticipantViewModel, EventDetailsParticipantDto>();
-            CreateMap<EventVisitedViewModel, EventVisitedDto>();
-            CreateMap<EventProjectViewModel, EventProjectDto>();
+            CreateMap<EventVisitedReportViewModel, EventVisitedReportDto>();
+            CreateMap<EventProjectReportViewModel, EventProjectReportDto>();
             CreateMap<ExtensiveEventDetailsViewModel, ExtensiveEventDetailsDto>();
-            CreateMap<ExtensiveEventParticipantViewModel, ExtensiveEventParticipantDto>();
+            CreateMap<EventParticipantReportViewModel, EventParticipantReportDto>();
 
             CreateMap<CreateEventTypeViewModel, CreateEventTypeDto>().IgnoreUserOrgDto();
             CreateMap<UpdateEventTypeViewModel, UpdateEventTypeDto>().IgnoreUserOrgDto();
+            CreateMap<EventParticipantsReportListingArgsViewModel, EventParticipantsReportListingArgsDto>();
         }
 
         private void CreateEventsModelMappings()

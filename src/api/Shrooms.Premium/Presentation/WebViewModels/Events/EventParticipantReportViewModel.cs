@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Shrooms.Premium.DataTransferObjects.Models.Events
+namespace Shrooms.Premium.Presentation.WebViewModels.Events
 {
-    public class ExtensiveEventParticipantDto
+    public class EventParticipantReportViewModel
     {
         public string Id { get; set; }
 
@@ -24,11 +24,11 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
         public string ManagerId { get; set; }
 
         public decimal? Kudos { get; set; }
-        
+
         public IEnumerable<string> PreviouslyAttendedConferences { get; set; }
 
-        public IEnumerable<EventVisitedDto> VisitedEvents { get; set; }
+        public IEnumerable<EventVisitedReportViewModel> VisitedEvents { get; set; }
 
-        public IEnumerable<EventProjectDto> Projects { get; set; }
+        public IEnumerable<EventProjectReportViewModel> Projects { get; set; }
     }
 }

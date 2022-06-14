@@ -1,6 +1,6 @@
 ﻿namespace Shrooms.Premium.Presentation.WebViewModels.Events
 {
-    public class EventProjectViewModel
+    public class EventProjectReportViewModel
     {
         public int Id { get; set; }
 

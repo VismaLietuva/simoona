@@ -1,6 +1,6 @@
 ﻿namespace Shrooms.Premium.DataTransferObjects.Models.Events
 {
-    public class EventProjectDto
+    public class EventProjectReportDto
     {
         public int Id { get; set; }
 

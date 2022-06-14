@@ -360,59 +360,25 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         }
 
         [HttpGet]
-        [Route("GetPagedExtensiveParticipants")]
-        public async Task<IHttpActionResult> GetPagedExtensiveParticipants(
-            Guid eventId,
-            [FromUri] int[] kudosTypeIds,
-            [FromUri] int[] eventTypes,
-            int page = 1,
-            int pageSize = WebApiConstants.DefaultPageSize)
+        [Route("GetPagedReportParticipants")]
+        public async Task<IHttpActionResult> GetPagedReportParticipants([FromUri] EventParticipantsReportListingArgsViewModel reportArgsViewModel)
         {
             try
             {
-                var args = new EventsListingFilterArgs
-                {
-                    KudosTypeIds = kudosTypeIds,
-                    TypeIds = eventTypes,
-                    Page = page,
-                    PageSize = pageSize
-                };
+                var reportArgsDto = _mapper.Map<EventParticipantsReportListingArgsViewModel, EventParticipantsReportListingArgsDto>(reportArgsViewModel);
+                var pagedParticipants = await _eventListingService.GetExtensiveParticipantsAsync(reportArgsDto, GetUserAndOrganization());
+                var pagedParticipantsViewModel = _mapper.Map<IEnumerable<EventParticipantReportDto>, IEnumerable<EventParticipantReportViewModel>>(pagedParticipants);
 
-                var pagedParticipants = await _eventListingService.GetExtensiveParticipantsAsync(eventId, args, GetUserAndOrganization());
-                var pagedParticipantsViewModel = _mapper.Map<IEnumerable<ExtensiveEventParticipantDto>, IEnumerable<ExtensiveEventParticipantViewModel>>(pagedParticipants);
-
-                var pagedModel = new StaticPagedList<ExtensiveEventParticipantViewModel>(pagedParticipantsViewModel, page, pageSize, pagedParticipants.TotalItemCount);
-                var pagedViewModel = new PagedViewModel<ExtensiveEventParticipantViewModel>
+                var pagedModel = new StaticPagedList<EventParticipantReportViewModel>(pagedParticipantsViewModel, reportArgsViewModel.Page, reportArgsViewModel.PageSize, pagedParticipants.TotalItemCount);
+                var pagedViewModel = new PagedViewModel<EventParticipantReportViewModel>
                 {
                     PagedList = pagedModel,
                     PageCount = pagedModel.PageCount,
                     ItemCount = pagedModel.TotalItemCount,
-                    PageSize = pageSize
+                    PageSize = reportArgsViewModel.PageSize
                 };
 
                 return Ok(pagedViewModel);
-            }
-            catch (EventException e)
-            {
-                return BadRequest(e.Message);
-            }
-        }
-
-        [HttpGet]
-        [Route("GetExtensiveDetails")]
-        [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
-        public async Task<IHttpActionResult> GetExtensiveEventDetails(Guid eventId, [FromUri] string[] kudosTypeNames, [FromUri] int[] eventTypes)
-        {
-            try
-            {
-                var extensiveEventDto = await _eventService.GetExtensiveEventDetailsAsync(eventId, GetUserAndOrganization(), kudosTypeNames, eventTypes);
-                var extensiveEventViewModel = _mapper.Map<ExtensiveEventDetailsDto, ExtensiveEventDetailsViewModel>(extensiveEventDto);
-
-                var officesCount = await _officeMapService.GetOfficesCountAsync();
-
-                extensiveEventViewModel.IsForAllOffices = extensiveEventViewModel.OfficeNames.Count() == officesCount;
-
-                return Ok(extensiveEventViewModel);
             }
             catch (EventException e)
             {

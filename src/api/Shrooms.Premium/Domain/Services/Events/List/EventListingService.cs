@@ -132,20 +132,20 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             return events;
         }
 
-        public async Task<IPagedList<ExtensiveEventParticipantDto>> GetExtensiveParticipantsAsync(Guid eventId, EventsListingFilterArgs args, UserAndOrganizationDto userOrg)
+        public async Task<IPagedList<EventParticipantReportDto>> GetExtensiveParticipantsAsync(EventParticipantsReportListingArgsDto reportArgsDto, UserAndOrganizationDto userOrg)
         {
-            var kudosTypesLength = args.KudosTypeIds.Length;
-            var eventTypesLength = args.TypeIds.Length;
+            var kudosTypesLength = reportArgsDto.KudosTypeIds.Length;
+            var eventTypesLength = reportArgsDto.EventTypeIds.Length;
 
             var kudosTypeNames = await _kudosTypesDbSet
-                .Where(type => args.KudosTypeIds.Contains(type.Id))
+                .Where(type => reportArgsDto.KudosTypeIds.Contains(type.Id))
                 .Select(type => type.Name)
                 .ToListAsync();
 
             return await _eventParticipantsDbSet
                 .Include(p => p.ApplicationUser)
-                .Where(p => p.EventId == eventId)
-                .Select(p => new ExtensiveEventParticipantDto
+                .Where(p => p.EventId == reportArgsDto.EventId)
+                .Select(p => new EventParticipantReportDto
                 {
                     Id = p.ApplicationUser.Id,
                     FirstName = p.ApplicationUser.FirstName,
@@ -156,7 +156,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                     ManagerFirstName = p.ApplicationUser.Manager.FirstName,
                     ManagerLastName = p.ApplicationUser.Manager.LastName,
                     ManagerId = p.ApplicationUser.Manager.Id,
-                    Projects = p.ApplicationUser.Projects.Select(p => new EventProjectDto
+                    Projects = p.ApplicationUser.Projects.Select(p => new EventProjectReportDto
                     {
                         Id = p.Id,
                         Name = p.Name
@@ -169,9 +169,9 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                         .Sum(kudos => kudos.Points),
                     VisitedEvents = p.ApplicationUser.Events
                             .Where(visited => (visited.EndDate < DateTime.UtcNow) &&
-                                              (eventTypesLength == 0 || args.TypeIds.Contains(visited.EventType.Id)))
+                                              (eventTypesLength == 0 || reportArgsDto.EventTypeIds.Contains(visited.EventType.Id)))
                             .Take(50)
-                            .Select(visited => new EventVisitedDto
+                            .Select(visited => new EventVisitedReportDto
                             {
                                 Id = visited.Id,
                                 Name = visited.Name,
@@ -186,7 +186,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                 .OrderByDescending(p => p.EmploymentDate)
                 .ThenByDescending(p => p.Kudos)
                 .ThenByDescending(p => p.VisitedEvents.Count())
-                .ToPagedListAsync(args.Page, args.PageSize);
+                .ToPagedListAsync(reportArgsDto.Page, reportArgsDto.PageSize);
         }
 
         public async Task<IEnumerable<EventListItemDto>> GetMyEventsAsync(MyEventsOptionsDto options, int page, int? officeId = null)

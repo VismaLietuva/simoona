@@ -316,8 +316,9 @@
     <Compile Include="DataTransferObjects\Models\Committees\CommitteeSuggestionPostDto.cs" />
     <Compile Include="DataTransferObjects\Models\Committees\CommitteeSuggestionDto.cs" />
     <Compile Include="DataTransferObjects\Models\Committees\CommitteeViewDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventProjectDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventVisitedDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\EventParticipantsReportListingArgsDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\EventProjectReportDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\EventVisitedReportDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\ExtensiveEventDetailsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\CreateEventDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\CreateEventTypeDto.cs" />
@@ -339,7 +340,7 @@
     <Compile Include="DataTransferObjects\Models\Events\EventParticipantDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventTypeDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventUserSearchResultDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\ExtensiveEventParticipantDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\EventParticipantReportDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\MyEventsOptionsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\NewEventOptionDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\UpdateAttendStatusDto.cs" />
@@ -547,11 +548,12 @@
     <Compile Include="Presentation\WebViewModels\Events\EventOfficeViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventOptionsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventOptionViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\EventProjectViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\EventParticipantsReportListingArgsViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\EventProjectReportViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventTypeViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\EventVisitedViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\EventVisitedReportViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\ExtensiveEventDetailsViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\ExtensiveEventParticipantViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\EventParticipantReportViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\MyEventsOptionsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\NewEventOptionViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\ShareEventViewModel.cs" />
