@@ -39,7 +39,6 @@ namespace Shrooms.Premium.Domain.Services.Events
         private readonly DbSet<EventType> _eventTypesDbSet;
         private readonly DbSet<ApplicationUser> _usersDbSet;
         private readonly DbSet<EventOption> _eventOptionsDbSet;
-        private readonly DbSet<KudosLog> _kudosLogDbSet;
 
         private readonly IDbSet<Office> _officeDbSet;
 
@@ -57,7 +56,6 @@ namespace Shrooms.Premium.Domain.Services.Events
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
             _eventOptionsDbSet = uow.GetDbSet<EventOption>();
             _officeDbSet = uow.GetDbSet<Office>();
-            _kudosLogDbSet = uow.GetDbSet<KudosLog>();
 
             _permissionService = permissionService;
             _eventUtilitiesService = eventUtilitiesService;
@@ -147,82 +145,6 @@ namespace Shrooms.Premium.Domain.Services.Events
             }
 
             return @event;
-        }
-
-        public async Task<ExtensiveEventDetailsDto> GetExtensiveEventDetailsAsync(Guid eventId, UserAndOrganizationDto userOrg, string[] kudosTypeNames, int[] eventTypes)
-        {
-            var kudosTypesLength = kudosTypeNames.Length;
-            var eventTypesLength = eventTypes.Length;
-
-            var extensiveEventDetailsDto = await _eventsDbSet
-                .Include(e => e.EventParticipants)
-                .Include(e => e.ResponsibleUser)
-                .Where(e => e.Id == eventId && e.OrganizationId == userOrg.OrganizationId)
-                .Select(e => new ExtensiveEventDetailsDto
-                {
-                    Name = e.Name,
-                    StartDate = e.StartDate,
-                    EndDate = e.EndDate,
-                    HostFirstName = e.ResponsibleUser.FirstName,
-                    HostLastName = e.ResponsibleUser.LastName,
-                    HostUserId = e.ResponsibleUser.Id,
-                    Location = e.Place,
-                    Offices = e.Offices,
-                    ImageName = e.ImageName,
-                    Description = e.Description,
-                    ExtensiveParticipants = e.EventParticipants.Select(p => new ExtensiveEventParticipantDto
-                    {
-                        Id = p.ApplicationUser.Id,
-                        FirstName = p.ApplicationUser.FirstName,
-                        LastName = p.ApplicationUser.LastName,
-                        EmploymentDate = p.ApplicationUser.EmploymentDate,
-                        QualificationLevel = p.ApplicationUser.QualificationLevel.Name,
-                        JobTitle = p.ApplicationUser.JobPosition.Title,
-                        ManagerFirstName = p.ApplicationUser.Manager.FirstName,
-                        ManagerLastName = p.ApplicationUser.Manager.LastName,
-                        ManagerId = p.ApplicationUser.Manager.Id,
-                        Projects = p.ApplicationUser.Projects.Select(p => new EventProjectDto
-                        {
-                            Id = p.Id,
-                            Name = p.Name
-                        }),
-                        Kudos = _kudosLogDbSet
-                            .Where(kudos => (kudosTypesLength == 0 || kudosTypeNames.Contains(kudos.KudosTypeName)) &&
-                                            (kudos.EmployeeId == p.ApplicationUser.Id) &&
-                                            (kudos.Status == KudosStatus.Approved))
-                            .Sum(kudos => kudos.Points),
-                        VisitedEvents = p.ApplicationUser.Events
-                            .Where(visited => (visited.EndDate < DateTime.UtcNow) &&
-                                              (eventTypesLength == 0 || eventTypes.Contains(visited.EventType.Id)))
-                            .Take(50)
-                            .Select(visited => new EventVisitedDto
-                            {
-                                Id = visited.Id,
-                                Name = visited.Name,
-                                TypeName = visited.EventType.Name,
-                                StartDate = visited.StartDate,
-                                EndDate = visited.EndDate
-                            })
-                            .Distinct()
-                            .OrderByDescending(visited => visited.EndDate)
-                            .ToList()
-                    })
-                    .OrderByDescending(participant => participant.EmploymentDate)
-                    .ThenByDescending(participant => participant.Kudos)
-                    .ThenByDescending(participant => participant.VisitedEvents.Count())
-                })
-                .FirstOrDefaultAsync();
-
-            _eventValidationService.CheckIfEventExists(extensiveEventDetailsDto);
-
-            var officeIds = JsonConvert.DeserializeObject<List<int>>(extensiveEventDetailsDto.Offices);
-
-            extensiveEventDetailsDto.OfficeNames = await _officeDbSet
-                .Where(office => officeIds.Contains(office.Id))
-                .Select(office => office.Name)
-                .ToArrayAsync();
-
-            return extensiveEventDetailsDto;
         }
 
         public async Task<CreateEventDto> CreateEventAsync(CreateEventDto newEventDto)
