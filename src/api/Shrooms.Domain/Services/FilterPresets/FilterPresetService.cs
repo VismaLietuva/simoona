@@ -20,7 +20,8 @@ namespace Shrooms.Domain.Services.FilterPresets
         private static readonly SemaphoreSlim _filterPresetUpdateCreateLock = new SemaphoreSlim(1, 1);
 
         private readonly IUnitOfWork2 _uow;
-        private readonly IDbSet<FilterPreset> _filterPresetDbSet;
+        private readonly DbSet<FilterPreset> _filterPresetDbSet;
+
         private readonly IDbSet<KudosType> _kudosTypeDbSet;
         private readonly IDbSet<Office> _officeDbSet;
         private readonly IDbSet<EventType> _eventTypeDbSet;
@@ -66,16 +67,16 @@ namespace Shrooms.Domain.Services.FilterPresets
                 var updatedPresets = await UpdatePresetsAsync(updateDto);
                 var removedPresets = await DeleteAsync(updateDto);
                 
-                _validator.CheckIfUniqueNames(updateDto, removedPresets);
+                await _validator.CheckIfUniqueNamesAsync(updateDto, removedPresets);
 
                 var addedPresets = CreatePresets(updateDto);
 
                 await _uow.SaveChangesAsync(updateDto.UserOrg.UserId);
-
+                
                 return new UpdatedFilterPresetDto
                 {
                     // Ids are assigned after SaveChangesAsync()
-                    AddedPresets = addedPresets?.Select(preset => new FilterPresetDto
+                    AddedPresets = addedPresets.Select(preset => new FilterPresetDto
                     {
                         Id = preset.Id,
                         Name = preset.Name,
@@ -141,7 +142,7 @@ namespace Shrooms.Domain.Services.FilterPresets
         {
             if (!updateDto.PresetsToRemove.Any())
             {
-                return null;
+                return Enumerable.Empty<FilterPresetDto>();
             }
 
             var presets = await _filterPresetDbSet
@@ -150,20 +151,15 @@ namespace Shrooms.Domain.Services.FilterPresets
                     preset.OrganizationId == updateDto.UserOrg.OrganizationId)
                 .ToListAsync();
 
-            var removedPresets = new List<FilterPresetDto>();
-
-            foreach (var preset in presets)
+            var removedPresets = presets.Select(preset => new FilterPresetDto
             {
-                removedPresets.Add(new FilterPresetDto
-                {
-                    Id = preset.Id,
-                    Name = preset.Name,
-                    IsDefault = preset.IsDefault,
-                    Filters = JsonConvert.DeserializeObject<IEnumerable<FilterPresetItemDto>>(preset.Preset)
-                });
+                Id = preset.Id,
+                Name = preset.Name,
+                IsDefault = preset.IsDefault,
+                Filters = JsonConvert.DeserializeObject<IEnumerable<FilterPresetItemDto>>(preset.Preset)
+            });
 
-                _filterPresetDbSet.Remove(preset);
-            }
+            _filterPresetDbSet.RemoveRange(presets);
 
             return removedPresets;
         }
@@ -172,16 +168,13 @@ namespace Shrooms.Domain.Services.FilterPresets
         {
             if (!updateDto.PresetsToAdd.Any())
             {
-                return null;
+                return Enumerable.Empty<FilterPreset>();
             }
 
             var timestamp = DateTime.UtcNow;
-            
-            var presets = new List<FilterPreset>();
 
-            foreach (var preset in updateDto.PresetsToAdd)
-            {
-                var newPreset = new FilterPreset
+            var presets = updateDto.PresetsToAdd
+                .Select(preset => new FilterPreset
                 {
                     OrganizationId = updateDto.UserOrg.OrganizationId,
                     CreatedBy = updateDto.UserOrg.UserId,
@@ -191,11 +184,9 @@ namespace Shrooms.Domain.Services.FilterPresets
                     Modified = timestamp,
                     Created = timestamp,
                     Preset = JsonConvert.SerializeObject(preset.Filters)
-                };
+                });
 
-                presets.Add(newPreset);
-                _filterPresetDbSet.Add(newPreset);
-            }
+            _filterPresetDbSet.AddRange(presets);
 
             return presets;
         }
@@ -204,7 +195,7 @@ namespace Shrooms.Domain.Services.FilterPresets
         {
             if (!updateDto.PresetsToUpdate.Any())
             {
-                return null;
+                return Enumerable.Empty<FilterPresetDto>();
             }
 
             var presetsToUpdateIds = updateDto.PresetsToUpdate.Select(preset => preset.Id)
