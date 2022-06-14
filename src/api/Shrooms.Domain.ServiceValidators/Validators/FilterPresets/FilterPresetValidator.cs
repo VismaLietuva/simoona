@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 using System.Data.Entity;
+using System.Threading.Tasks;
 
 namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
 {
@@ -61,29 +62,26 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
             }
         }
 
-        public async void CheckIfUniqueNames(AddEditDeleteFilterPresetDto updateDto, IEnumerable<FilterPresetDto> removedPresets)
+        public async Task CheckIfUniqueNamesAsync(AddEditDeleteFilterPresetDto updateDto, IEnumerable<FilterPresetDto> removedPresets)
         {
-            var names = updateDto
-                .PresetsToAdd.Select(p => p.Name)
-                .Union(updateDto.PresetsToUpdate.Select(p => p.Name))
-                .ToList();
+            var updateDtoContainsNameDuplicates = updateDto.PresetsToUpdate
+                .Any(updatePreset => updateDto.PresetsToAdd.Any(addPreset => addPreset.Name == updatePreset.Name));
 
-            if (names.Distinct().Count() != names.Count)
+            if (updateDtoContainsNameDuplicates)
             {
                 throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "Preset names cannot contain duplicates");
             }
 
-            var namesFromDb = await _filterPresetsDbSet
-                .Where(preset => names.Contains(preset.Name))
-                .Select(preset => preset.Name)
+            var presets = await _filterPresetsDbSet
+                .Where(preset => preset.ForPage == updateDto.PageType)
                 .ToListAsync();
 
-            if (namesFromDb.Count != 0 && removedPresets.Count() != namesFromDb.Count)
-            {
-                throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "Preset names cannot contain duplicates");
-            }
-            
-            if (!removedPresets.All(preset => namesFromDb.Contains(preset.Name)))
+            var removedPresetNames = removedPresets
+                .Select(preset => preset.Name)
+                .ToList();
+
+            if (updateDto.PresetsToAdd.Any(preset => presets.Any(dbPreset => dbPreset.Name == preset.Name) && !removedPresetNames.Contains(preset.Name)) ||
+                updateDto.PresetsToUpdate.Any(preset => presets.Any(dbPreset => dbPreset.Name == preset.Name && dbPreset.Id != preset.Id) && !removedPresetNames.Contains(preset.Name)))
             {
                 throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "Preset names cannot contain duplicates");
             }

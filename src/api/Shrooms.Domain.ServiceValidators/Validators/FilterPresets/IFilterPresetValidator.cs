@@ -2,6 +2,7 @@
 using Shrooms.Contracts.Enums;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
 {
@@ -19,6 +20,6 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
 
         void CheckIfMoreThanOneDefaultPresetExists(AddEditDeleteFilterPresetDto updateDto);
 
-        void CheckIfUniqueNames(AddEditDeleteFilterPresetDto updateDto, IEnumerable<FilterPresetDto> removedPresets);
+        Task CheckIfUniqueNamesAsync(AddEditDeleteFilterPresetDto updateDto, IEnumerable<FilterPresetDto> removedPresets);
     }
 }
