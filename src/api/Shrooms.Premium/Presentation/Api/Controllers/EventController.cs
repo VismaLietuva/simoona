@@ -577,23 +577,14 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [Route("GetEventsByTitle")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
-        public async Task<IHttpActionResult> GetEventsByTitle(string searchString, [FromUri] int[] typeIds, [FromUri] string[] officeIds, int page = 1, int pageSize = WebApiConstants.DefaultPageSize)
+        public async Task<IHttpActionResult> GetEventsByTitle([FromUri] EventReportListingArgsViewModel reportArgsViewModel)
         {
-            var args = new EventsListingFilterArgs
-            {
-                Page = page,
-                PageSize = pageSize,
-                TypeIds = typeIds,
-                OfficeIds = officeIds
-            };
-            
-            var userAndOrganization = GetUserAndOrganization();
-
             try
             {
-                var eventListItemsPagedDto = await _eventListingService.GetEventsFilteredByTitleAsync(searchString, args, userAndOrganization);
+                var reportArgsDto = _mapper.Map<EventReportListingArgsViewModel, EventReportListingArgsDto>(reportArgsViewModel);
+                var eventListItemsPagedDto = await _eventListingService.GetEventsFilteredByTitleAsync(reportArgsDto, GetUserAndOrganization());
                 var eventListItemsViewModel = _mapper.Map<IEnumerable<EventDetailsListItemDto>, IEnumerable<EventDetailsListItemViewModel>>(eventListItemsPagedDto);
-                var pagedModel = new StaticPagedList<EventDetailsListItemViewModel>(eventListItemsViewModel, page, pageSize, eventListItemsPagedDto.TotalItemCount);
+                var pagedModel = new StaticPagedList<EventDetailsListItemViewModel>(eventListItemsViewModel, reportArgsViewModel.Page, reportArgsViewModel.PageSize, eventListItemsPagedDto.TotalItemCount);
 
                 var pagedViewModel = new PagedViewModel<EventDetailsListItemViewModel>
                 {

@@ -1,15 +1,14 @@
 ﻿using Shrooms.Contracts.DataTransferObjects.Paging;
-using System;
 using System.Collections.Generic;
 
 namespace Shrooms.Premium.DataTransferObjects.Models.Events
 {
-    public class EventParticipantsReportListingArgsDto : BasePagingDto
+    public class EventReportListingArgsDto : BasePagingDto
     {
-        public Guid EventId { get; set; }
-
-        public IEnumerable<int> KudosTypeIds { get; set; }
+        public string SearchString { get; set; }
 
         public IEnumerable<int> EventTypeIds { get; set; }
+
+        public IEnumerable<string> OfficeTypeIds { get; set; }
     }
 }

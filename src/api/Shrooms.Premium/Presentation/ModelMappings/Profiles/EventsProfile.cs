@@ -23,7 +23,6 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
             CreateMap<EventListItemDto, EventListItemViewModel>()
                 .ForMember(dest => dest.OfficeIds, opt => opt.MapFrom(u => JsonConvert.DeserializeObject<string[]>(u.Offices.Value)));
             CreateMap<EventDetailsListItemDto, EventDetailsListItemViewModel>();
-            CreateMap<ExtensiveEventDetailsDto, ExtensiveEventDetailsViewModel>();
             CreateMap<EventOptionDto, EventOptionViewModel>();
             CreateMap<EventDetailsDto, EventDetailsViewModel>()
                 .Ignore(x => x.Comments)
@@ -37,7 +36,6 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
             CreateMap<EventDetailsParticipantDto, EventDetailsParticipantViewModel>();
             CreateMap<EventVisitedReportDto, EventVisitedReportViewModel>();
             CreateMap<EventProjectReportDto, EventProjectReportViewModel>();
-            CreateMap<ExtensiveEventDetailsDto, ExtensiveEventDetailsViewModel>();
             CreateMap<EventParticipantReportDto, EventParticipantReportViewModel>();
             
             CreateMap<EventEditDto, EventEditViewModel>()
@@ -76,12 +74,12 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
             CreateMap<EventDetailsParticipantViewModel, EventDetailsParticipantDto>();
             CreateMap<EventVisitedReportViewModel, EventVisitedReportDto>();
             CreateMap<EventProjectReportViewModel, EventProjectReportDto>();
-            CreateMap<ExtensiveEventDetailsViewModel, ExtensiveEventDetailsDto>();
             CreateMap<EventParticipantReportViewModel, EventParticipantReportDto>();
 
             CreateMap<CreateEventTypeViewModel, CreateEventTypeDto>().IgnoreUserOrgDto();
             CreateMap<UpdateEventTypeViewModel, UpdateEventTypeDto>().IgnoreUserOrgDto();
             CreateMap<EventParticipantsReportListingArgsViewModel, EventParticipantsReportListingArgsDto>();
+            CreateMap<EventReportListingArgsViewModel, EventReportListingArgsDto>();
         }
 
         private void CreateEventsModelMappings()

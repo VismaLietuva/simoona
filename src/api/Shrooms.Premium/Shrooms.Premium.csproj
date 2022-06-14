@@ -318,8 +318,8 @@
     <Compile Include="DataTransferObjects\Models\Committees\CommitteeViewDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventParticipantsReportListingArgsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventProjectReportDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\EventReportListingArgsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventVisitedReportDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\ExtensiveEventDetailsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\CreateEventDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\CreateEventTypeDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EditEventDto.cs" />
@@ -550,9 +550,9 @@
     <Compile Include="Presentation\WebViewModels\Events\EventOptionViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventParticipantsReportListingArgsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventProjectReportViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\EventReportListingArgsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventTypeViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventVisitedReportViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\ExtensiveEventDetailsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventParticipantReportViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\MyEventsOptionsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\NewEventOptionViewModel.cs" />

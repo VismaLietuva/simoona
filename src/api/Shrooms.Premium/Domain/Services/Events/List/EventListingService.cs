@@ -90,23 +90,23 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             return await events.ToListAsync();
         }
 
-        public async Task<IPagedList<EventDetailsListItemDto>> GetEventsFilteredByTitleAsync(string eventTitle, EventsListingFilterArgs args, UserAndOrganizationDto userAndOrganization)
+        public async Task<IPagedList<EventDetailsListItemDto>> GetEventsFilteredByTitleAsync(EventReportListingArgsDto reportArgsDto, UserAndOrganizationDto userAndOrganization)
         {
             var allOffices = await _officeDbSet
                 .ToDictionaryAsync(office => office.Id, office => office.Name);
 
             var officesCount = allOffices.Count;
 
-            var typeIdsLength = args.TypeIds.Length;
-            var officeIdsLength = args.OfficeIds.Length;
+            var typeIdsLength = reportArgsDto.EventTypeIds.Count();
+            var officeIdsLength = reportArgsDto.OfficeTypeIds.Count();
 
             var events = await _eventsDbSet
                 .Include(e => e.EventParticipants)
                 .Include(e => e.EventType)
                 .Where(e => (e.OrganizationId == userAndOrganization.OrganizationId) &&
-                            (eventTitle == null || e.Name.Contains(eventTitle)) &&
-                            (typeIdsLength == 0 || args.TypeIds.Contains(e.EventTypeId)) &&
-                            (officeIdsLength == 0 || args.OfficeIds.Any(c => e.Offices.Contains(c))))
+                            (reportArgsDto.SearchString == null || e.Name.Contains(reportArgsDto.SearchString)) &&
+                            (typeIdsLength == 0 || reportArgsDto.EventTypeIds.Contains(e.EventTypeId)) &&
+                            (officeIdsLength == 0 || reportArgsDto.OfficeTypeIds.Any(c => e.Offices.Contains(c))))
                 //.Where(e => e.StartDate > DateTime.UtcNow) // TODO: remove comment before PR
                 .OrderByDescending(e => e.StartDate)
                 .ThenByDescending(e => e.Name)
@@ -121,7 +121,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                     ParticipantsCount = e.EventParticipants.Count,
                     Offices = e.Offices
                 })
-                .ToPagedListAsync(args.Page, args.PageSize);
+                .ToPagedListAsync(reportArgsDto.Page, reportArgsDto.PageSize);
 
             foreach (var e in events)
             {
@@ -132,10 +132,10 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             return events;
         }
 
-        public async Task<IPagedList<EventParticipantReportDto>> GetExtensiveParticipantsAsync(EventParticipantsReportListingArgsDto reportArgsDto, UserAndOrganizationDto userOrg)
+        public async Task<IPagedList<EventParticipantReportDto>> GetReportParticipantsAsync(EventParticipantsReportListingArgsDto reportArgsDto, UserAndOrganizationDto userOrg)
         {
-            var kudosTypesLength = reportArgsDto.KudosTypeIds.Length;
-            var eventTypesLength = reportArgsDto.EventTypeIds.Length;
+            var kudosTypesLength = reportArgsDto.KudosTypeIds.Count();
+            var eventTypesLength = reportArgsDto.EventTypeIds.Count();
 
             var kudosTypeNames = await _kudosTypesDbSet
                 .Where(type => reportArgsDto.KudosTypeIds.Contains(type.Id))

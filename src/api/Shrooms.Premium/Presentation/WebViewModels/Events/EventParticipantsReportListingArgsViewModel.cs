@@ -1,5 +1,6 @@
 ﻿using Shrooms.Contracts.ViewModels;
 using System;
+using System.Collections.Generic;
 
 namespace Shrooms.Premium.Presentation.WebViewModels.Events
 {
@@ -7,8 +8,8 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
     {
         public Guid EventId { get; set; }
 
-        public int[] KudosTypeIds { get; set; }
+        public IEnumerable<int> KudosTypeIds { get; set; }
 
-        public int[] EventTypeIds { get; set; }
+        public IEnumerable<int> EventTypeIds { get; set; }
     }
 }
