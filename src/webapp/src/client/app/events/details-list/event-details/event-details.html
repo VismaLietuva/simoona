@@ -1,3 +1,16 @@
+<!--
+    Things to do:
+        fix modal layout
+        fix errors when deleting default presets
+        make dropdown lose text on overflow
+        removed unused stuff...
+        fix wrong acitons tab appreatioeagoifvjsziofjiodsjfioszjiof
+        fix wrong office display
+        write tests XD
+    NOTES2:
+        try to encapsule filetering logic into... stuff.
+
+ -->
 <div class="row body-container" has-permissions="['EVENT_ADMINISTRATION']">
     <div class="col-xs-12">
         <div class="panel panel-default events-panel">
@@ -248,31 +261,7 @@
                         <tr ng-repeat-end ng-if="participant.isExpanded">
                             <td colspan="9" class="no-padding">
                                 <!-- Expansion content -->
-                                <table class="nc-table event-details-extension-table no-border">
-                                    <thead>
-                                        <tr>
-                                            <th translate="events.tableTitle" class="col-xs-3"></th>
-                                            <th translate="events.tableType" class="col-xs-2"></th>
-                                            <th translate="events.tableStartDate" class="hidden-xs hidden-sm"></th>
-                                            <th translate="events.tableEndDate" class="hidden-xs hidden-sm"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr ng-repeat="event in participant.visitedEvents">
-                                            <td class="col-xs-2 col-sm-4" style="word-break: break-word;">
-                                                <a
-                                                    ui-sref=" Root.WithOrg.Client.Events.EventContent({ id: event.id })">{{event.name}}</a>
-                                            </td>
-                                            <td class="col-xs-2">{{event.typeName}}</td>
-                                            <td class="hidden-xs hidden-sm">
-                                                {{event.startDate | amUtc | amLocal | amDateFormat:'YYYY-MM-DD HH-MM'}}
-                                            </td>
-                                            <td class="hidden-xs hidden-sm">
-                                                {{event.endDate | amUtc | amLocal | amDateFormat:'YYYY-MM-DD HH-MM'}}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                <ace-expand-participants visited-events="participant.visitedEvents"></ace-expand-participants>
                             </td>
                         </tr>
                     </tbody>
