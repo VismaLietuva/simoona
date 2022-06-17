@@ -57,34 +57,45 @@
                 <wave-spinner ng-if="vm.areControlsLoading && !vm.isLoadingEvents"></wave-spinner>
 
                 <!-- Content -->
-                <wave-spinner ng-if="vm.isLoadingEvents"></wave-spinner>
                 <table
                     class="nc-table nc-table-active"
-                    ng-if="!vm.isLoadingEvents && vm.events.pagedList.length"
+                    ng-if="vm.events.pagedList.length"
                 >
                     <thead>
                         <tr>
-                            <th translate="events.tableTitle"></th>
-                            <th
-                                translate="events.tableStartDate"
-                                class="hidden-xs hidden-sm"
-                            ></th>
-                            <th
-                                translate="events.tableEndDate"
-                                class="hidden-xs hidden-sm"
-                            ></th>
-                            <th
-                                translate="events.tableType"
-                                class="hidden-xs hidden-sm"
-                            ></th>
-                            <th
-                                translate="events.tableOffices"
-                                class="hidden-xs hidden-sm"
-                            ></th>
-                            <th translate="events.tableParticipants"></th>
+                            <th>
+                                <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="name">
+                                    <span translate="events.tableTitle"></span>
+                                </ace-sort-link>
+                            </th>
+                            <th class="hidden-xs hidden-sm">
+                                <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="startDate">
+                                    <span translate="events.tableStartDate"></span>
+                                </ace-sort-link>
+                            </th>
+                            <th class="hidden-xs hidden-sm">
+                                <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="endDate">
+                                    <span translate="events.tableEndDate"></span>
+                                </ace-sort-link>
+                            </th>
+                            <th class="hidden-xs hidden-sm">
+                                <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="eventType.name">
+                                    <span translate="events.tableType"></span>
+                                </ace-sort-link>
+                            </th>
+                            <th class="hidden-xs hidden-sm">
+                                <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="offices">
+                                    <span translate="events.tableOffices"></span>
+                                </ace-sort-link>
+                            </th>
+                            <th>
+                                <ace-sort-link class="nowrap" on-sort="vm.onSort" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="eventParticipants.Count">
+                                    <span translate="events.tableParticipants"></span>
+                                </ace-sort-link>
+                            </th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody ng-if="!vm.isLoadingEvents && vm.events.pagedList.length">
                         <tr
                             ng-repeat="event in vm.events.pagedList"
                             class="pointer"
@@ -133,6 +144,7 @@
                         </tr>
                     </tbody>
                 </table>
+                <wave-spinner ng-if="vm.isLoadingEvents"></wave-spinner>
 
                 <ace-list-pagination
                     total-item-count="vm.events.itemCount"

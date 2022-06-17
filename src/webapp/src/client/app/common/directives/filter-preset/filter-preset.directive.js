@@ -107,6 +107,10 @@
             }
 
             function sendSelectedPresetValues(selectedPreset) {
+                if (!selectedPreset) {
+                    return;
+                }
+
                 scope.selectedPreset = selectedPreset;
                 // Send to consumer
                 scope.onValueChange({

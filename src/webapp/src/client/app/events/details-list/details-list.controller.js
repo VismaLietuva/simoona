@@ -30,9 +30,12 @@
         vm.filterPageType = filterPageTypes.extensiveEventDetailsList;
 
         vm.page = 1;
+
         vm.filter = {
             appliedEventTypes: undefined,
             appliedOfficeTypes: undefined,
+            sortByColumnName: undefined,
+            sortDirection: undefined
         };
 
         vm.filterTypes = {
@@ -50,6 +53,7 @@
         vm.viewDetails = viewDetails;
         vm.loadEventsWithNewlyAppliedFilter = loadEventsWithNewlyAppliedFilter;
         vm.applyFilterPreset = applyFilterPreset;
+        vm.onSort = onSort;
 
         init();
 
@@ -77,10 +81,6 @@
                                 filterTypes.offices
                             );
 
-                        if (vm.notAppliedPreset !== undefined) {
-                            handleNotAppliedPreset();
-                        }
-
                         vm.areControlsLoading = false;
                     },
                     function () {
@@ -97,7 +97,9 @@
                     vm.filterText || '',
                     vm.page,
                     vm.filter.appliedEventTypes,
-                    vm.filter.appliedOfficeTypes
+                    vm.filter.appliedOfficeTypes,
+                    vm.filter.sortByColumnName,
+                    vm.filter.sortDirection
                 )
                 .then(
                     function (result) {
@@ -152,9 +154,11 @@
             loadEventsOnPage(1);
         }
 
-        function handleNotAppliedPreset() {
-            vm.applyFilterPreset(vm.notAppliedPreset);
-            vm.notAppliedPreset = undefined;
+        function onSort(sortBy, sortOrder) {
+            vm.filter.sortByColumnName = sortBy;
+            vm.filter.sortDirection = sortOrder;
+
+            loadEventsOnPage(1);
         }
     }
 })();

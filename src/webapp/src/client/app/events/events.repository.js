@@ -43,7 +43,8 @@
             getMaxEventParticipants: getMaxEventParticipants,
             updateAttendStatus: updateAttendStatus,
             getEventsByTitle: getEventsByTitle,
-            getEventParticipants: getEventParticipants
+            getEventParticipants: getEventParticipants,
+            getReportEventDetails: getReportEventDetails
         };
 
         return service;
@@ -224,21 +225,31 @@
             }).$promise;
         }
 
-        function getEventsByTitle(searchString, page, typeIds, officeIds) {
-            return $resource(`${eventUrl}GetEventsByTitle`).get({
-                searchString: searchString,
-                typeIds: typeIds,
-                page: page,
-                officeIds: officeIds
+        function getReportEventDetails(eventId) {
+            return $resource(`${eventUrl}GetReportEventDetails`).get({
+                eventId: eventId
             }).$promise;
         }
 
-        function getEventParticipants(eventId, kudosTypeIds, eventTypes, page) {
-            return $resource(`${eventUrl}GetPagedExtensiveParticipants`).get({
+        function getEventsByTitle(searchString, page, typeIds, officeIds, sortBy, sortOrder) {
+            return $resource(`${eventUrl}GetEventsByTitle`).get({
+                searchString: searchString,
+                eventTypeIds: typeIds,
+                page: page,
+                officeIds: officeIds,
+                sortByColumnName: sortBy,
+                sortDirection: sortOrder
+            }).$promise;
+        }
+
+        function getEventParticipants(eventId, kudosTypeIds, eventTypes, page, sortBy, sortOrder) {
+            return $resource(`${eventUrl}GetPagedReportParticipants`).get({
                 eventId: eventId,
                 kudosTypeIds: kudosTypeIds,
-                eventTypes: eventTypes,
-                page: page
+                eventTypeIds: eventTypes,
+                page: page,
+                sortByColumnName: sortBy,
+                sortDirection: sortOrder
             }).$promise;
         }
     }

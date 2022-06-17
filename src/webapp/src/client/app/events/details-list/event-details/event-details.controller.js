@@ -49,6 +49,8 @@
         vm.filter = {
             appliedKudos: undefined,
             appliedEventTypes: undefined,
+            sortByColumnName: undefined,
+            sortDirection: undefined
         };
 
         vm.showActionsColumn = false;
@@ -57,6 +59,7 @@
         vm.applyFilterPreset = applyFilterPreset;
         vm.setTypes = setTypes;
         vm.loadParticipantsOnPage = loadParticipantsOnPage;
+        vm.onSort = onSort;
 
         init();
 
@@ -70,7 +73,7 @@
             vm.isLoading = true;
 
             eventRepository
-                .getEventDetails($stateParams.id)
+                .getReportEventDetails($stateParams.id)
                 .then(function(result) {
                     vm.eventDetails = result;
                     vm.isLoading = false;
@@ -87,7 +90,9 @@
                     $stateParams.id,
                     vm.filter.appliedKudos,
                     vm.filter.appliedEventTypes,
-                    vm.page
+                    vm.page,
+                    vm.filter.sortByColumnName,
+                    vm.filter.sortDirection
                 )
                 .then(
                     function(result) {
@@ -169,6 +174,13 @@
         function loadParticipantsOnPage(page) {
             vm.page = page;
             loadParticipants();
+        }
+
+        function onSort(sortBy, sortOrder) {
+            vm.filter.sortByColumnName = sortBy;
+            vm.filter.sortDirection = sortOrder;
+
+            loadParticipantsOnPage(1);
         }
     }
 })();

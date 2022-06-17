@@ -118,22 +118,62 @@
                     </ace-dropdown-checkbox>
                 </div>
 
-                <table ng-if="!vm.isLoadingParticipants && vm.participants.pagedList.length" class="nc-table">
-                    <thead>
-                        <tr>
-                            <th translate="events.tableEmployee"></th>
-                            <th translate="events.tableHireDate" class="hidden-xs hidden-sm"></th>
-                            <th translate="events.tableQualification" class="hidden-xs hidden-sm hidden-md"></th>
-                            <th translate="events.tablePosition" class="hidden-xs hidden-sm"></th>
-                            <th translate="events.tableManager" class="hidden-xs hidden-sm"></th>
-                            <th translate="events.tableKudos" class="hidden-xs hidden-sm"></th>
-                            <th translate="events.tableEvents"></th>
-                            <th translate="events.tableProjects" class="hidden-xs hidden-sm"></th>
+                <table class="nc-table">
+                    <thead ng-if="vm.participants.pagedList.length" >
+                        <tr class="nowrap">
+                            <th>
+                                <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="firstName">
+                                    <span translate="events.tableEmployee"></span>
+                                </ace-sort-link>
+                            </th>
+
+                            <th class="hidden-xs hidden-sm">
+                                <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="employmentDate">
+                                    <span translate="events.tableHireDate"></span>
+                                </ace-sort-link>
+                            </th>
+
+                            <th class="hidden-xs hidden-sm hidden-md">
+                                <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="qualificationLevel">
+                                    <span translate="events.tableQualification"></span>
+                                </ace-sort-link>
+                            </th>
+
+                            <th class="hidden-xs hidden-sm">
+                                <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="jobTitle">
+                                    <span translate="events.tablePosition"></span>
+                                </ace-sort-link>
+                            </th>
+
+                            <th class="hidden-xs hidden-sm">
+                                <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="managerFirstName">
+                                    <span translate="events.tableManager"></span>
+                                </ace-sort-link>
+                            </th>
+
+                            <th class="hidden-xs hidden-sm">
+                                <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="kudos">
+                                    <span translate="events.tableKudos"></span>
+                                </ace-sort-link>
+                            </th>
+
+                            <th>
+                                <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="visitedEvents.Count">
+                                    <span translate="events.tableEvents"></span>
+                                </ace-sort-link>
+                            </th>
+
+                            <th class="hidden-xs hidden-sm">
+                                <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="projects.Count">
+                                    <span translate="events.tableProjects"></span>
+                                </ace-sort-link>
+                            </th>
+
                             <th class="hidden-xs hidden-sm" ng-if="vm.showActionsColumn" translate="events.tableAction">
                             </th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody ng-if="!vm.isLoadingParticipants && vm.participants.pagedList.length">
                         <tr ng-repeat-start="participant in vm.participants.pagedList" ng-click="vm.viewDetails(event.id)">
                             <td class="col-xs-2 word-break" ng-cloak>
                                 <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: participant.id })">
