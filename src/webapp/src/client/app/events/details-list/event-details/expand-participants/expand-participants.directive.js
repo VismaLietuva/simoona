@@ -27,8 +27,8 @@
         var vm = this;
 
         vm.filter = {
-            sortOrder: 'desc',
-            sortByColumnName: 'name'
+            sortOrder: undefined,
+            sortByColumnName: undefined
         };
 
         vm.onSort = onSort;
