@@ -13,7 +13,7 @@ using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Domain.DomainServiceValidators.Events;
-using Shrooms.Premium.Domain.Services.Args;
+using Shrooms.Domain.Extensions;
 using X.PagedList;
 
 namespace Shrooms.Premium.Domain.Services.Events.List
@@ -23,7 +23,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
         private const string OutsideOffice = "[]";
 
         private static readonly Dictionary<MyEventsOptions, Func<string, Expression<Func<Event, bool>>>>
-            _eventFilters = new Dictionary<MyEventsOptions, Func<string, Expression<Func<Event, bool>>>>
+            _eventFilters = new ()
             {
                 { MyEventsOptions.Host, MyEventsAsMasterFilter },
                 { MyEventsOptions.Participant, MyEventsAsParticipantFilter }
@@ -59,32 +59,32 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             return eventOptionsDto;
         }
 
-        public async Task<IEnumerable<EventListItemDto>> GetEventsFilteredAsync(EventsListingFilterArgs args, UserAndOrganizationDto userOrganization)
+        public async Task<IEnumerable<EventListItemDto>> GetEventsFilteredAsync(EventFilteredArgsDto filteredArgsDto, UserAndOrganizationDto userOrganization)
         {
-            var officeSearchString = OfficeIdToString(args.OfficeId);
+            var officeSearchString = OfficeIdToString(filteredArgsDto.OfficeIdParsed);
 
             var query = _eventsDbSet
                 .Include(x => x.EventParticipants)
                 .Include(x => x.EventType)
                 .Where(e => e.OrganizationId == userOrganization.OrganizationId)
-                .Where(EventTypeFilter(args.TypeId, args.IsOnlyMainEvents))
+                .Where(EventTypeFilter(filteredArgsDto.TypeIdParsed, filteredArgsDto.IsOnlyMainEvents))
                 .Where(EventOfficeFilter(officeSearchString));
 
-            if (args.StartDate is null || args.EndDate is null)
+            if (filteredArgsDto.StartDate is null || filteredArgsDto.EndDate is null)
             {
                 query = query.Where(e => e.EndDate > DateTime.UtcNow);
             }
             else
             {
-                _eventValidationService.CheckIfDateRangeExceededLimitOrNull(args.StartDate, args.EndDate);
-                query = query.Where(e => e.StartDate >= args.StartDate && e.EndDate <= args.EndDate);
+                _eventValidationService.CheckIfDateRangeExceededLimitOrNull(filteredArgsDto.StartDate, filteredArgsDto.EndDate);
+                query = query.Where(e => e.StartDate >= filteredArgsDto.StartDate && e.EndDate <= filteredArgsDto.EndDate);
             }
 
             var events = query
                 .OrderByDescending(e => e.IsPinned)
                 .ThenBy(e => e.StartDate)
-                .Skip((args.Page - 1) * EventsConstants.EventsDefaultPageSize)
-                .Take(EventsConstants.EventsDefaultPageSize)
+                .Skip((filteredArgsDto.Page - 1) * filteredArgsDto.PageSize)
+                .Take(filteredArgsDto.PageSize)
                 .Select(MapEventToListItemDto(userOrganization.UserId));
 
             return await events.ToListAsync();
@@ -108,8 +108,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                             (typeIdsLength == 0 || reportArgsDto.EventTypeIds.Contains(e.EventTypeId)) &&
                             (officeIdsLength == 0 || reportArgsDto.OfficeTypeIds.Any(c => e.Offices.Contains(c))))
                 //.Where(e => e.StartDate > DateTime.UtcNow) // TODO: remove comment before PR
-                .OrderByDescending(e => e.StartDate)
-                .ThenByDescending(e => e.Name)
+                .OrderByPropertyName(reportArgsDto, "StartDate", "desc")
                 .Select(e => new EventDetailsListItemDto
                 {
                     Id = e.Id,
@@ -183,27 +182,25 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                             .OrderByDescending(visited => visited.EndDate)
                             .ToList()
                 })
-                .OrderByDescending(p => p.EmploymentDate)
-                .ThenByDescending(p => p.Kudos)
-                .ThenByDescending(p => p.VisitedEvents.Count())
+                .OrderByPropertyName(reportArgsDto, "FirstName, LastName", "DESC")
                 .ToPagedListAsync(reportArgsDto.Page, reportArgsDto.PageSize);
         }
 
-        public async Task<IEnumerable<EventListItemDto>> GetMyEventsAsync(MyEventsOptionsDto options, int page, int? officeId = null)
+        public async Task<IEnumerable<EventListItemDto>> GetMyEventsAsync(MyEventsOptionsDto options, UserAndOrganizationDto userOrg, int? officeIdNullable = null)
         {
-            var officeSearchString = OfficeIdToString(officeId);
-            var myEventFilter = _eventFilters[options.Filter](options.UserId);
+            var officeSearchString = OfficeIdToString(officeIdNullable);
+            var myEventFilter = _eventFilters[options.Filter](userOrg.UserId);
             var events = await _eventsDbSet
                 .Include(x => x.EventParticipants)
                 .Include(x => x.Offices)
-                .Where(t => t.OrganizationId == options.OrganizationId)
+                .Where(t => t.OrganizationId == userOrg.OrganizationId)
                 .Where(SearchFilter(options.SearchString))
                 .Where(myEventFilter)
                 .Where(EventOfficeFilter(officeSearchString))
                 .OrderByDescending(e => e.StartDate)
-                .Skip((page - 1) * EventsConstants.EventsDefaultPageSize)
-                .Take(EventsConstants.EventsDefaultPageSize)
-                .Select(MapEventToListItemDto(options.UserId))
+                .Skip((options.Page - 1) * options.PageSize)
+                .Take(options.PageSize)
+                .Select(MapEventToListItemDto(userOrg.UserId))
                 .ToListAsync();
 
             var orderedEvents = OrderEvents(events);

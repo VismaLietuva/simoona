@@ -32,6 +32,11 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
             CreateMap<NewEventOptionDto, NewEventOptionViewModel>();
             CreateMap<NewEventOptionViewModel, NewEventOptionDto>();
 
+            CreateMap<EventFilteredArgsViewModel, EventFilteredArgsDto>()
+                .Ignore(opt => opt.TypeIdParsed)
+                .Ignore(opt => opt.OfficeIdParsed)
+                .Ignore(opt => opt.IsOnlyMainEvents);
+
             CreateMap<EventDetailsOptionDto, EventDetailsOptionViewModel>();
             CreateMap<EventDetailsParticipantDto, EventDetailsParticipantViewModel>();
             CreateMap<EventVisitedReportDto, EventVisitedReportViewModel>();
@@ -45,6 +50,9 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
             CreateMap<EventChangeOptionViewModel, EventChangeOptionsDto>()
                 .Ignore(x => x.OrganizationId)
                 .Ignore(x => x.UserId);
+
+            CreateMap<EventOfficesDto, EventOfficesViewModel>();
+            CreateMap<EventReportDetailsDto, EventReportDetailsViewModel>();
         }
 
         private void CreateViewModelToDtoMappings()
@@ -57,8 +65,7 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
             CreateMap<UpdateEventViewModel, EditEventDto>()
                 .IgnoreUserOrgDto()
                 .Ignore(d => d.Offices);
-            CreateMap<MyEventsOptionsViewModel, MyEventsOptionsDto>()
-                .IgnoreUserOrgDto();
+            CreateMap<MyEventsOptionsViewModel, MyEventsOptionsDto>();
             CreateMap<EventJoinViewModel, EventJoinDto>()
                 .Ignore(d => d.ParticipantIds)
                 .IgnoreUserOrgDto();

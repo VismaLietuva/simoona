@@ -4,7 +4,6 @@ using Shrooms.Contracts.DataTransferObjects.Models;
 using Shrooms.Contracts.DataTransferObjects.Models.Administration;
 using Shrooms.Contracts.DataTransferObjects.Models.Kudos;
 using Shrooms.Contracts.DataTransferObjects.Models.Support;
-using Shrooms.Contracts.DataTransferObjects.Paging;
 using Shrooms.Contracts.ViewModels;
 using Shrooms.Contracts.ViewModels.User;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -35,7 +34,6 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
             CreateKudosLogDtoMappings();
             CreateWelcomeKudosMappings();
             CreateMiscDtoMappings();
-            CreateBasePagingDtoMappings();
         }
 
         /// <summary>
@@ -44,11 +42,6 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
         private void CreateMiscDtoMappings()
         {
             CreateMap<SupportPostViewModel, SupportDto>();
-        }
-
-        private void CreateBasePagingDtoMappings()
-        {
-            CreateMap<BasePagingViewModel, BasePagingDto>();
         }
 
         private void CreateKudosLogDtoMappings()

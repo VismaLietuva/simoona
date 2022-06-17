@@ -90,12 +90,12 @@
     <Compile Include="DataTransferObjects\FilterPresets\FilterPresetItemDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\FiltersDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\UpdatedFilterPresetDto.cs" />
+    <Compile Include="Infrastructure\IPageable.cs" />
     <Compile Include="DataTransferObjects\ISoftDelete.cs" />
     <Compile Include="DataTransferObjects\ITrackable.cs" />
     <Compile Include="DataTransferObjects\Kudos\AddKudosLogDto.cs" />
     <Compile Include="DataTransferObjects\Notification\NotificationDto.cs" />
     <Compile Include="DataTransferObjects\Notification\SourcesDto.cs" />
-    <Compile Include="DataTransferObjects\Paging\BasePagingDto.cs" />
     <Compile Include="DataTransferObjects\UserAndOrganizationDto.cs" />
     <Compile Include="DataTransferObjects\UserAndOrganizationHubDto.cs" />
     <Compile Include="DataTransferObjects\Users\UserAutoCompleteDto.cs" />
@@ -132,10 +132,10 @@
     <Compile Include="Infrastructure\IExcelBuilder.cs" />
     <Compile Include="Infrastructure\IJobScheduler.cs" />
     <Compile Include="Infrastructure\ILogger.cs" />
+    <Compile Include="Infrastructure\ISortableProperty.cs" />
     <Compile Include="Infrastructure\ISystemClock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\AbstractViewModel.cs" />
-    <Compile Include="ViewModels\BasePagingViewModel.cs" />
     <Compile Include="ViewModels\Notifications\NotificationViewModel.cs" />
     <Compile Include="ViewModels\Notifications\SourcesViewModel.cs" />
     <Compile Include="ViewModels\PagedViewModel.cs" />

@@ -13,8 +13,8 @@ using Shrooms.Contracts.DataTransferObjects.Wall;
 using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
-using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Domain.Helpers;
+using Shrooms.Domain.Extensions;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.Premium.Constants;
@@ -22,6 +22,7 @@ using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Domain.DomainServiceValidators.Events;
 using Shrooms.Premium.Domain.Services.Events.Participation;
 using Shrooms.Premium.Domain.Services.Events.Utilities;
+using Shrooms.Premium.Domain.Services.OfficeMap;
 
 namespace Shrooms.Premium.Domain.Services.Events
 {
@@ -35,6 +36,7 @@ namespace Shrooms.Premium.Domain.Services.Events
         private readonly IEventParticipationService _eventParticipationService;
         private readonly IWallService _wallService;
         private readonly IMarkdownConverter _markdownConverter;
+        private readonly IOfficeMapService _officeMapService;
         private readonly DbSet<Event> _eventsDbSet;
         private readonly DbSet<EventType> _eventTypesDbSet;
         private readonly DbSet<ApplicationUser> _usersDbSet;
@@ -48,7 +50,8 @@ namespace Shrooms.Premium.Domain.Services.Events
             IEventValidationService eventValidationService,
             IEventParticipationService eventParticipationService,
             IWallService wallService,
-            IMarkdownConverter markdownConverter)
+            IMarkdownConverter markdownConverter,
+            IOfficeMapService officeMapService)
         {
             _uow = uow;
             _eventsDbSet = uow.GetDbSet<Event>();
@@ -63,6 +66,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             _eventParticipationService = eventParticipationService;
             _wallService = wallService;
             _markdownConverter = markdownConverter;
+            _officeMapService = officeMapService;
         }
 
         public async Task DeleteAsync(Guid id, UserAndOrganizationDto userOrg)
@@ -103,6 +107,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             return @event;
         }
 
+        // NOTE: there is a lot of unused information
         public async Task<EventDetailsDto> GetEventDetailsAsync(Guid id, UserAndOrganizationDto userOrg)
         {
             var @event = await _eventsDbSet
@@ -230,6 +235,39 @@ namespace Shrooms.Premium.Domain.Services.Events
         {
             var @event = await _eventsDbSet.FirstOrDefaultAsync(e => e.Id.ToString() == eventId && e.OrganizationId == organizationId);
             _eventValidationService.CheckIfEventExists(@event);
+        }
+
+        public async Task<EventReportDetailsDto> GetReportEventDetailsAsync(Guid id, UserAndOrganizationDto userOrg)
+        {
+            var @event = await _eventsDbSet
+                .Include(e => e.ResponsibleUser)
+                .Where(e => e.Id == id && e.OrganizationId == userOrg.OrganizationId)
+                .Select(e => new EventReportDetailsDto
+                {
+                    Name = e.Name,
+                    ImageName = e.ImageName,
+                    Location = e.Place,
+                    StartDate = e.StartDate,
+                    EndDate = e.EndDate,
+                    HostUserId = e.ResponsibleUserId,
+                    HostUserFullName = e.ResponsibleUser.FirstName + " " + e.ResponsibleUser.LastName,
+                    Offices = new EventOfficesDto
+                    {
+                        Value = e.Offices
+                    }
+                })
+                .SingleOrDefaultAsync();
+
+            _eventValidationService.CheckIfEventExists(@event);
+
+            @event.OfficeNames = await _officeDbSet
+                .Where(p => @event.Offices.Value.Contains(SqlFunctions.StringConvert((double)p.Id).Trim()))
+                .Select(p => p.Name)
+                .ToListAsync();
+
+            @event.IsForAllOffices = (await _officeMapService.GetOfficesCountAsync()) == @event.OfficeNames.Count();
+
+            return @event;
         }
 
         private static int FindOutMaxChoices(int eventOptionsCount, int maxOptions)
