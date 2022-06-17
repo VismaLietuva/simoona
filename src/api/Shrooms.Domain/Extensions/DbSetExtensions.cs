@@ -43,7 +43,7 @@ namespace Shrooms.Domain.Extensions
 
             if (!EntityHasProperty<TEntity>(propertyName))
             {
-                throw new ValidationException("Column name does not exist");
+                throw new ValidationException("Property name does not exist");
             }
 
             return query.OrderBy(string.Format("{0} {1}", propertyName, sortDirection));
