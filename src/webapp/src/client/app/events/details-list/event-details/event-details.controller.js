@@ -84,6 +84,7 @@
 
         function loadParticipants() {
             vm.isLoadingParticipants = true;
+            vm.showActionsColumn = false;
 
             eventRepository
                 .getEventParticipants(
