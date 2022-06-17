@@ -25,10 +25,10 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
 
         public decimal? Kudos { get; set; }
         
-        public IEnumerable<string> PreviouslyAttendedConferences { get; set; }
+        public ICollection<string> PreviouslyAttendedConferences { get; set; }
 
-        public IEnumerable<EventVisitedReportDto> VisitedEvents { get; set; }
+        public ICollection<EventVisitedReportDto> VisitedEvents { get; set; }
 
-        public IEnumerable<EventProjectReportDto> Projects { get; set; }
+        public ICollection<EventProjectReportDto> Projects { get; set; }
     }
 }

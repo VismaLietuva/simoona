@@ -155,11 +155,13 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                     ManagerFirstName = p.ApplicationUser.Manager.FirstName,
                     ManagerLastName = p.ApplicationUser.Manager.LastName,
                     ManagerId = p.ApplicationUser.Manager.Id,
-                    Projects = p.ApplicationUser.Projects.Select(p => new EventProjectReportDto
-                    {
-                        Id = p.Id,
-                        Name = p.Name
-                    }),
+                    Projects = p.ApplicationUser.Projects
+                        .Select(p => new EventProjectReportDto
+                        {
+                            Id = p.Id,
+                            Name = p.Name
+                        })
+                        .ToList(),
                     Kudos = _kudosLogDbSet
                         .Where(kudos =>
                             (kudosTypesLength == 0 || kudosTypeNames.Contains(kudos.KudosTypeName)) &&
