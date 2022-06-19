@@ -25,7 +25,6 @@ namespace Shrooms.Presentation.Api.Controllers
             _recommendationService = recommendationService;
         }
 
-        //[PermissionAuthorize(Permission = BasicPermissions.Recommendation)]
         [HttpPost]
         public async Task<HttpResponseMessage> SubmitTicket(RecommendationPostViewModel recommendation)
         {
@@ -33,7 +32,7 @@ namespace Shrooms.Presentation.Api.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest);
             }
-
+            
             var recommendationDto = _mapper.Map<RecommendationPostViewModel, RecommendationDto>(recommendation);
 
             await _recommendationService.SubmitTicketAsync(GetUserAndOrganization(), recommendationDto);

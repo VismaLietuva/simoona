@@ -206,14 +206,13 @@
                 </ul>
             </li>
             <li class="icon"
-            ng-if="vm.isAuthenticatedNotNewUser() && vm.showSimoonaSupport"
+            ng-if="vm.isAuthenticatedNotNewUser() &&  vm.showSimoonaRecommendations"
             ng-class="{active: $state.includes('Root.WithOrg.Client.FriendRecommendation')}">
             <a ui-sref="Root.WithOrg.Client.FriendRecommendation" 
-               class="navbar-last-child"
                translate-attr-title="friendRecommendation.submitTicket" 
-               data-test-id="support-button"  
+               data-test-id="recommendation-button"  
                translate>
-                <span class="vismaicon vismaicon-menu vismaicon-message"></span>
+                <span class="vismaicon vismaicon-menu vismaicon-recommendation"></span>
             </a>
         </li>
             <li class="icon"

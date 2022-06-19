@@ -27,7 +27,7 @@ namespace Shrooms.Domain.Services.Recommendation
         {
             var currentApplicationUser = await _applicationUsers.SingleAsync(u => u.Id == userAndOrganization.UserId);
 
-            var email = new EmailDto(currentApplicationUser.FullName, currentApplicationUser.Email, _applicationSettings.SupportEmail, $"{recommendation.Name}: {recommendation.LastName}: {recommendation.Contact}", recommendation.Message);
+            var email = new EmailDto(currentApplicationUser.FullName, currentApplicationUser.Email, _applicationSettings.SupportEmail, $"Friend recommendation", $"{recommendation.Message} <br> Name: {recommendation.Name} {recommendation.LastName} <br> Contact: {recommendation.Contact} ");
 
             await _mailingService.SendEmailAsync(email, true);
         }

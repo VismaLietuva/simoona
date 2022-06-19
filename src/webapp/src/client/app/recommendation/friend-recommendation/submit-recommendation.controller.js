@@ -33,7 +33,7 @@
             contact:'',
             message:''
         }; 
-       // vm.supportTypes = [];
+
 
         vm.recommendationSettings = recommendationSettings;
        

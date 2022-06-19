@@ -178,6 +178,7 @@
     <Compile Include="Controllers\WebApi\CommentControllerTests.cs" />
     <Compile Include="Controllers\WebApi\KudosControllerTests.cs" />
     <Compile Include="Controllers\WebApi\PostControllerTests.cs" />
+    <Compile Include="Controllers\WebApi\RecommendationControllerTest.cs" />
     <Compile Include="Controllers\WebApi\VacationPageControllerTests.cs" />
     <Compile Include="Controllers\WebApi\WallControllerTests.cs" />
     <Compile Include="DomainService\ApplicationUserTests.cs" />

@@ -72,6 +72,7 @@
         var orgName = authService.getOrganizationNameFromUrl();
         if (orgName){
             vm.showSimoonaSupport = orgName.toLowerCase() !== 'vismasuperlabs';
+            vm.showSimoonaRecommendations = orgName.toLowerCase() !== 'vismasuperlabs';
         }
         
         vm.searchQuery = {
