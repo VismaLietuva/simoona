@@ -87,7 +87,7 @@
             })
             .state('Root.WithOrg.Client.Events.Report.Event', {
                 parent: 'Root.WithOrg.Client.Events',
-                url: '/Event/:id',
+                url: '/Report/Event/:id',
                 templateUrl: 'app/events/event-report-list/event-report/event-report.html',
                 controller: 'eventReportController',
                 controllerAs: 'vm',
