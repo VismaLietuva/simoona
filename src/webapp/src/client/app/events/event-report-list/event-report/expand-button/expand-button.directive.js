@@ -7,7 +7,7 @@
 
     function expandButton() {
         var directive = {
-            templateUrl: 'app/events/details-list/event-details/expand-button/expand-button.html',
+            templateUrl: 'app/events/event-report-list/event-report/expand-button/expand-button.html',
             restrict: 'E',
             replace: true,
             scope: {

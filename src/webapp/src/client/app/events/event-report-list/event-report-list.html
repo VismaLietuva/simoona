@@ -3,15 +3,16 @@
     has-permissions="['EVENT_ADMINISTRATION']"
 >
     <div class="col-xs-12">
-        <div class="panel panel-default events-panel">
+        <div class="panel panel-default">
             <!-- Header -->
-            <div class="panel-heading">
+            <div class="panel-heading event-report-list-panel-heading">
                 <span translate="events.eventsTitle"></span>
                 <ace-filter-preset
-                    ng-if="!vm.areControlsLoading"
-                    filter-page-type="{{vm.filterPageType}}"
-                    loaded-filter-types="vm.filterTypes"
+                    ng-if="!vm.isLoading.controls"
+                    filter-page-type="{{vm.filter.pageType}}"
+                    loaded-filter-types="vm.filter.filterTypes"
                     class="pull-right"
+                    style="width: 100%;"
                     on-value-change="vm.applyFilterPreset(preset)"
                     modal-size="lg"
                 ></ace-filter-preset>
@@ -24,7 +25,8 @@
                             <input
                                 type="text"
                                 class="form-control event-search-bar"
-                                ng-change="vm.onSearchFilter()"
+                                ng-model-options="{ debounce: 350 }"
+                                ng-change="vm.loadEventsOnPage(1)"
                                 ng-model="vm.filterText"
                                 translate-attr-placeholder="events.filterEvents"
                                 translate
@@ -37,24 +39,24 @@
                         is-expanded="false"
                         class="col-md-2 mt-3"
                         translation="events.eventTypesDropdownButtonTitle"
-                        types="vm.filterTypes.eventTypes.filters"
-                        on-value-change="vm.loadEventsWithNewlyAppliedFilter(types, 'appliedEventTypes')"
-                        applied-types="vm.dropdownCheckboxes.eventTypes"
+                        types="vm.filter.filterTypes.events.filters"
+                        on-value-change="vm.loadEventsWithNewlyAppliedFilter(types, 'events')"
+                        applied-types="vm.filter.dropdown.events"
                     >
                     </ace-dropdown-checkbox>
 
                     <ace-dropdown-checkbox
                         is-expanded="false"
-                        class="col-md-2 mt-3"
+                        class="col-md-2 mt-3 mb-10"
                         translation="events.eventOfficesDropdownButtonTitle"
-                        types="vm.filterTypes.officeTypes.filters"
-                        on-value-change="vm.loadEventsWithNewlyAppliedFilter(types, 'appliedOfficeTypes')"
-                        applied-types="vm.dropdownCheckboxes.officeTypes"
+                        types="vm.filter.filterTypes.offices.filters"
+                        on-value-change="vm.loadEventsWithNewlyAppliedFilter(types, 'offices')"
+                        applied-types="vm.filter.dropdown.offices"
                     >
                     </ace-dropdown-checkbox>
                 </div>
 
-                <wave-spinner ng-if="vm.areControlsLoading && !vm.isLoadingEvents"></wave-spinner>
+                <wave-spinner ng-if="vm.isLoading.controls && !vm.isLoading.events"></wave-spinner>
 
                 <!-- Content -->
                 <table
@@ -62,40 +64,40 @@
                     ng-if="vm.events.pagedList.length"
                 >
                     <thead>
-                        <tr>
+                        <tr class="nowrap">
                             <th>
-                                <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="name">
+                                <ace-sort-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="name">
                                     <span translate="events.tableTitle"></span>
                                 </ace-sort-link>
                             </th>
                             <th class="hidden-xs hidden-sm">
-                                <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="startDate">
+                                <ace-sort-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="startDate">
                                     <span translate="events.tableStartDate"></span>
                                 </ace-sort-link>
                             </th>
                             <th class="hidden-xs hidden-sm">
-                                <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="endDate">
+                                <ace-sort-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="endDate">
                                     <span translate="events.tableEndDate"></span>
                                 </ace-sort-link>
                             </th>
                             <th class="hidden-xs hidden-sm">
-                                <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="eventType.name">
+                                <ace-sort-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="eventType.name">
                                     <span translate="events.tableType"></span>
                                 </ace-sort-link>
                             </th>
                             <th class="hidden-xs hidden-sm">
-                                <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="offices">
+                                <ace-sort-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="offices">
                                     <span translate="events.tableOffices"></span>
                                 </ace-sort-link>
                             </th>
                             <th>
-                                <ace-sort-link class="nowrap" on-sort="vm.onSort" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="eventParticipants.Count">
+                                <ace-sort-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="eventParticipants.Count">
                                     <span translate="events.tableParticipants"></span>
                                 </ace-sort-link>
                             </th>
                         </tr>
                     </thead>
-                    <tbody ng-if="!vm.isLoadingEvents && vm.events.pagedList.length">
+                    <tbody ng-if="!vm.isLoading.events && vm.events.pagedList.length">
                         <tr
                             ng-repeat="event in vm.events.pagedList"
                             class="pointer"
@@ -144,7 +146,8 @@
                         </tr>
                     </tbody>
                 </table>
-                <wave-spinner ng-if="vm.isLoadingEvents"></wave-spinner>
+
+                <wave-spinner ng-if="vm.isLoading.events"></wave-spinner>
 
                 <ace-list-pagination
                     total-item-count="vm.events.itemCount"

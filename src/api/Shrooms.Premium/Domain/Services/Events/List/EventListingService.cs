@@ -107,8 +107,8 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                             (reportArgsDto.SearchString == null || e.Name.Contains(reportArgsDto.SearchString)) &&
                             (typeIdsLength == 0 || reportArgsDto.EventTypeIds.Contains(e.EventTypeId)) &&
                             (officeIdsLength == 0 || reportArgsDto.OfficeTypeIds.Any(c => e.Offices.Contains(c))))
-                //.Where(e => e.StartDate > DateTime.UtcNow) // TODO: remove comment before PR
-                .OrderByPropertyName(reportArgsDto, "StartDate", "desc")
+                .Where(e => e.StartDate > DateTime.UtcNow)
+                .OrderByPropertyName(reportArgsDto)
                 .Select(e => new EventDetailsListItemDto
                 {
                     Id = e.Id,
@@ -184,7 +184,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                             .OrderByDescending(visited => visited.EndDate)
                             .ToList()
                 })
-                .OrderByPropertyName(reportArgsDto, "FirstName, LastName", "DESC")
+                .OrderByPropertyName(reportArgsDto)
                 .ToPagedListAsync(reportArgsDto.Page, reportArgsDto.PageSize);
         }
 

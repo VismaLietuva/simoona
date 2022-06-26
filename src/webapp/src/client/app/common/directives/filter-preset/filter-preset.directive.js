@@ -82,10 +82,6 @@
 
                         var presetToSend = getDefaultPreset();
 
-                        if (!presetToSend) {
-                            return;
-                        }
-
                         sendSelectedPresetValues(presetToSend);
                     },
                     function () {
@@ -108,10 +104,15 @@
 
             function sendSelectedPresetValues(selectedPreset) {
                 if (!selectedPreset) {
+                    scope.onValueChange({
+                        preset: undefined
+                    });
+
                     return;
                 }
 
                 scope.selectedPreset = selectedPreset;
+
                 // Send to consumer
                 scope.onValueChange({
                     preset: scope.selectedPreset,
@@ -302,7 +303,7 @@
             // Removing from loading presets presets that were checked as removed by the user
             scope.loadedPresets = vm.presets.filter(function (preset) {
                 if (controls.presetsToRemove.find(x => x === preset.id)) {
-                    if (preset.id === scope.selectedPreset.id) {
+                    if (scope.selectedPreset !== null && preset.id === scope.selectedPreset.id) {
                         scope.selectedPreset = null;
                     }
 

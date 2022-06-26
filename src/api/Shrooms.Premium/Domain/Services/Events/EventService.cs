@@ -107,7 +107,6 @@ namespace Shrooms.Premium.Domain.Services.Events
             return @event;
         }
 
-        // NOTE: there is a lot of unused information
         public async Task<EventDetailsDto> GetEventDetailsAsync(Guid id, UserAndOrganizationDto userOrg)
         {
             var @event = await _eventsDbSet

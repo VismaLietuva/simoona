@@ -1685,3 +1685,30 @@ a.disabled.btn, fieldset[disabled] a.btn {
     box-shadow: 1px 1px 0 #C72828 inset, -1px -1px 0 #C72828 inset !important;
     -webkit-box-shadow: 1px 1px 0 #C72828 inset, -1px -1px 0 #C72828 inset !important;
 }
+
+@media (max-width: 767px) {
+    .filter-preset-table > tbody,
+    .filter-preset-table > tbody > tr {
+        display: flex;
+        flex-direction: column;
+        border: 0;
+        margin-bottom: 15px !important;
+    }
+
+    .filter-preset-table > tbody > tr > td,
+    .filter-preset-table > tbody > tr > td:first-child,
+    .filter-preset-table > tbody > tr > td:last-child {
+        border: 0 !important;
+    }
+
+    .filter-preset-table > tbody > tr > td > span {
+        display: block;
+        text-align: left;
+        line-height: 2;
+    }
+
+}
+.filter-preset-delete-container {
+    text-align: center;
+    margin-top: 0px;
+}

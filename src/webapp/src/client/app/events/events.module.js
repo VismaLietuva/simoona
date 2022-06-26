@@ -79,17 +79,17 @@
                 controller: 'addNewEventController',
                 controllerAs: 'vm'
             })
-            .state('Root.WithOrg.Client.Events.Details', {
-                url: '/Details',
-                templateUrl: 'app/events/details-list/details-list.html',
-                controller: 'eventDetailsListController',
+            .state('Root.WithOrg.Client.Events.Report', {
+                url: '/Report',
+                templateUrl: 'app/events/event-report-list/event-report-list.html',
+                controller: 'eventReportListController',
                 controllerAs: 'vm'
             })
-            .state('Root.WithOrg.Client.Events.Details.Event', {
+            .state('Root.WithOrg.Client.Events.Report.Event', {
                 parent: 'Root.WithOrg.Client.Events',
                 url: '/Event/:id',
-                templateUrl: 'app/events/details-list/event-details/event-details.html',
-                controller: 'eventDetailsController',
+                templateUrl: 'app/events/event-report-list/event-report/event-report.html',
+                controller: 'eventReportController',
                 controllerAs: 'vm',
             });
     }

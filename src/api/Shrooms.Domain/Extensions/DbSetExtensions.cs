@@ -1,5 +1,4 @@
 ﻿using Shrooms.Contracts.Infrastructure;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Dynamic;
@@ -9,34 +8,35 @@ namespace Shrooms.Domain.Extensions
 {
     public static class DbSetExtensions
     {
-        private static readonly HashSet<string> _availableSortOrders = new ()
-        {
-            "asc",
-            "desc"
-        };
-
         public static IQueryable<TEntity> OrderByPropertyName<TEntity>(
             this IQueryable<TEntity> query, 
-            ISortableProperty sortableProperty,
-            string defaultSortingPropertyName = null,
-            string defaultSortDirection = "asc") where TEntity : class
+            ISortableProperty sortableProperty) where TEntity : class
         {
-            return query.OrderByPropertyName(sortableProperty.SortByColumnName, sortableProperty.SortDirection, defaultSortingPropertyName, defaultSortDirection);
+            return query.OrderByPropertyName(sortableProperty.SortByColumnName, sortableProperty.SortDirection);
         }
 
         public static IQueryable<TEntity> OrderByPropertyName<TEntity>(
             this IQueryable<TEntity> query, 
             string propertyName, 
-            string sortDirection,
-            string defaultSortPropertyName = null,
-            string defauultSortDirection = "asc") where TEntity : class
+            string sortDirection) where TEntity : class
         {
             if (propertyName == null || sortDirection == null)
             {
-                return query.OrderBy(string.Format("{0} {1}", defaultSortPropertyName, defauultSortDirection));
+                var firstProperty = typeof(TEntity)
+                    .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                    .FirstOrDefault();
+
+                if (firstProperty == null)
+                {
+                    throw new ValidationException($"Entity has to have at least one property");
+                }
+
+                return query.OrderBy(string.Format("{0} {1}", firstProperty.Name, "desc"));
             }
 
-            if (!_availableSortOrders.Contains(sortDirection.ToLower()))
+            sortDirection = sortDirection.ToLower();
+
+            if (sortDirection != "asc" && sortDirection != "desc")
             {
                 throw new ValidationException("Sort direction does not exist");
             }

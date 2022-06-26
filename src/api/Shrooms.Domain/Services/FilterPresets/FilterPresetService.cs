@@ -20,6 +20,7 @@ namespace Shrooms.Domain.Services.FilterPresets
         private static readonly SemaphoreSlim _filterPresetUpdateCreateLock = new SemaphoreSlim(1, 1);
 
         private readonly IUnitOfWork2 _uow;
+
         private readonly DbSet<FilterPreset> _filterPresetDbSet;
 
         private readonly IDbSet<KudosType> _kudosTypeDbSet;
@@ -102,7 +103,7 @@ namespace Shrooms.Domain.Services.FilterPresets
 
             foreach (var type in filterTypes)
             {
-                var filters = await GetFiltersQuery(type).ToListAsync();
+                var filters = await GetFiltersQueryByFilterType(type).ToListAsync();
                 var filtersDto = new FiltersDto
                 {
                     FilterType = type,
@@ -115,7 +116,7 @@ namespace Shrooms.Domain.Services.FilterPresets
             return filtersDtos;
         }
 
-        private IQueryable<FilterDto> GetFiltersQuery(FilterType filterType)
+        private IQueryable<FilterDto> GetFiltersQueryByFilterType(FilterType filterType)
         {
             return filterType switch
             {
@@ -172,23 +173,29 @@ namespace Shrooms.Domain.Services.FilterPresets
             }
 
             var timestamp = DateTime.UtcNow;
+            var addedPresets = new List<FilterPreset>();
 
-            var presets = updateDto.PresetsToAdd
-                .Select(preset => new FilterPreset
+            foreach (var presetDtoToAdd in updateDto.PresetsToAdd)
+            {
+                var presetToAdd = new FilterPreset
                 {
                     OrganizationId = updateDto.UserOrg.OrganizationId,
                     CreatedBy = updateDto.UserOrg.UserId,
-                    Name = preset.Name,
-                    IsDefault = preset.IsDefault,
+                    Name = presetDtoToAdd.Name,
+                    IsDefault = presetDtoToAdd.IsDefault,
                     ForPage = updateDto.PageType,
                     Modified = timestamp,
                     Created = timestamp,
-                    Preset = JsonConvert.SerializeObject(preset.Filters)
-                });
+                    Preset = JsonConvert.SerializeObject(presetDtoToAdd.Filters)
+                };
 
-            _filterPresetDbSet.AddRange(presets);
+                // AddRange() does not return assigned Id's after SaveChangesAsync(), but using Add() does
+                _filterPresetDbSet.Add(presetToAdd);
 
-            return presets;
+                addedPresets.Add(presetToAdd);
+            }
+
+            return addedPresets;
         }
 
         private async Task<IEnumerable<FilterPresetDto>> UpdatePresetsAsync(AddEditDeleteFilterPresetDto updateDto)
@@ -225,7 +232,6 @@ namespace Shrooms.Domain.Services.FilterPresets
                 presetToUpdate.Preset = JsonConvert.SerializeObject(preset.Filters);
             }
 
-            // Not sure, if I should make copies, since values will be indentical
             return updateDto.PresetsToUpdate;
         }
 

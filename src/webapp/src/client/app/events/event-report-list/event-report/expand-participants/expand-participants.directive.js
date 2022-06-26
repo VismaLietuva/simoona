@@ -7,7 +7,7 @@
 
     function aceExpandParticipants() {
         var directive = {
-            templateUrl: 'app/events/details-list/event-details/expand-participants/expand-participants.html',
+            templateUrl: 'app/events/event-report-list/event-report/expand-participants/expand-participants.html',
             restrict: 'E',
             replace: true,
             scope: {

@@ -4,14 +4,14 @@
             <div class="panel-heading">
                 <span translate="events.eventsTitle"></span>
                 <!-- Go to event analysis page button -->
-                <!-- TODO: add permissions -->
-                <div class="pull-right event-add-event-button">
-                    <a class="nc-btn nc-btn-default" ui-sref="Root.WithOrg.Client.Events.Details"
+                <div class="pull-right event-add-event-button" has-permissions="['EVENT_ADMINISTRATION']">
+                    <a class="nc-btn nc-btn-default" ui-sref="Root.WithOrg.Client.Events.Report"
                         translate-attr-title="events.viewAllEventsInformation" translate>
                         <span class="vismaicon vismaicon-search "></span><span class="hidden-xs hidden-sm"
                             translate="events.viewAllEventsInformation"></span>
                     </a>
                 </div>
+
                 <!-- Create event button -->
                 <div class="pull-right event-add-event-button">
                     <a class="nc-btn nc-btn-default" ui-sref="Root.WithOrg.Client.Events.AddEvents"
