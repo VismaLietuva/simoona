@@ -60,14 +60,14 @@
                 sortOrder: undefined,
             };
 
-            this.populateFilterTypes = function (response) {
+            this.setFilterTypes = function (response) {
                 this.filterTypes = constructObjectWithFilterNames(
                     findFilterByType,
                     response
                 );
             };
 
-            this.populateSortValues = function (sortBy, sortOrder) {
+            this.setSortValues = function (sortBy, sortOrder) {
                 this.appliedFilters.sortBy = sortBy;
                 this.appliedFilters.sortOrder = sortOrder;
             }

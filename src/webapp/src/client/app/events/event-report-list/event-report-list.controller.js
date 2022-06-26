@@ -58,7 +58,7 @@
                 .getFilters([filterTypes.events, filterTypes.offices])
                 .then(
                     function (result) {
-                        vm.filter.populateFilterTypes(result);
+                        vm.filter.setFilterTypes(result);
                         vm.isLoading.controls = false;
                     },
                     function () {
@@ -115,7 +115,7 @@
 
         function sortByColumn(sortBy, sortOrder) {
             onCompleteLoadFirstPage(function () {
-                vm.filter.populateSortValues(sortBy, sortOrder);
+                vm.filter.setSortValues(sortBy, sortOrder);
             });
         }
 
