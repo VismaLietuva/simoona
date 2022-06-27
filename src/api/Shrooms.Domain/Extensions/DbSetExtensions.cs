@@ -17,21 +17,12 @@ namespace Shrooms.Domain.Extensions
 
         public static IQueryable<TEntity> OrderByPropertyName<TEntity>(
             this IQueryable<TEntity> query, 
-            string propertyName, 
+            string propertyName,
             string sortDirection) where TEntity : class
         {
             if (propertyName == null || sortDirection == null)
             {
-                var firstProperty = typeof(TEntity)
-                    .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                    .FirstOrDefault();
-
-                if (firstProperty == null)
-                {
-                    throw new ValidationException($"Entity has to have at least one property");
-                }
-
-                return query.OrderBy(string.Format("{0} {1}", firstProperty.Name, "desc"));
+                return query.OrderByFirstPropertyName();
             }
 
             sortDirection = sortDirection.ToLower();
@@ -43,10 +34,24 @@ namespace Shrooms.Domain.Extensions
 
             if (!EntityHasProperty<TEntity>(propertyName))
             {
-                throw new ValidationException("Property name does not exist");
+                return query.OrderByFirstPropertyName();
             }
 
             return query.OrderBy(string.Format("{0} {1}", propertyName, sortDirection));
+        }
+
+        private static IQueryable<TEntity> OrderByFirstPropertyName<TEntity>(this IQueryable<TEntity> query)
+        {
+            var firstProperty = typeof(TEntity)
+                    .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                    .FirstOrDefault();
+
+            if (firstProperty == null)
+            {
+                throw new ValidationException($"Entity has to have at least one property");
+            }
+
+            return query.OrderBy(string.Format("{0} {1}", firstProperty.Name, "desc"));
         }
 
         private static bool EntityHasProperty<TEntity>(string propertyName) where TEntity : class
