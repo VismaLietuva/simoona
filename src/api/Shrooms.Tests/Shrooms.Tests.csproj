@@ -195,7 +195,7 @@
     <Compile Include="DomainService\KudosServiceTests.cs" />
     <Compile Include="DomainService\PostServiceTests.cs" />
     <Compile Include="DomainService\VacationPageServiceTests.cs" />
-    <Compile Include="DomainService\WallValidatorTests.cs" />
+    <Compile Include="DomainService\Validators\WallValidatorTests.cs" />
     <Compile Include="DomainService\WallServiceTests.cs" />
     <Compile Include="DomainService\WebHookCallbacks\UsersAnonymizationWebHookServiceTests.cs" />
     <Compile Include="Entities\KudosLogTests.cs" />

@@ -10,7 +10,7 @@ using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.Domain.ServiceValidators.Validators.Wall;
 using Shrooms.Tests.Extensions;
 
-namespace Shrooms.Tests.DomainService
+namespace Shrooms.Tests.DomainService.Validators
 {
     [TestFixture]
     public class WallValidatorTests
