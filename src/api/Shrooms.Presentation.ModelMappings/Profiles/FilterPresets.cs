@@ -23,12 +23,16 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<CreateFilterPresetViewModel, CreateFilterPresetDto>();
-            CreateMap<CreateFilterPresetViewModel, FilterPresetDto>();
+            CreateMap<CreateFilterPresetViewModel, CreateFilterPresetDto>()
+                .Ignore(opt => opt.Id);
+            CreateMap<CreateFilterPresetViewModel, FilterPresetDto>()
+                .Ignore(opt => opt.Id);
             CreateMap<FilterPresetItemViewModel, FilterPresetItemDto>();
             CreateMap<EditFilterPresetViewModel, EditFilterPresetDto>();
             CreateMap<EditFilterPresetViewModel, FilterPresetDto>();
-            CreateMap<AddEditDeleteFilterPresetViewModel, AddEditDeleteFilterPresetDto>();
+            CreateMap<AddEditDeleteFilterPresetViewModel, AddEditDeleteFilterPresetDto>()
+                .Ignore(opt => opt.UserOrg)
+                .Ignore(opt => opt.Name);
             CreateMap<FilterViewModel, FilterDto>();
             CreateMap<FiltersViewModel, FiltersDto>();
         }
