@@ -42,10 +42,17 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
 
         public void CheckIfMoreThanOneDefaultPresetExists(AddEditDeleteFilterPresetDto updateDto)
         {
-            var defaultPresetExistsInNewPresets = updateDto.PresetsToAdd.Any(preset => preset.IsDefault);
-            var defaultPresetExistsInUpdatedPresets = updateDto.PresetsToUpdate.Any(preset => preset.IsDefault);
+            var defaultPresetExistsInNewPresets = updateDto.PresetsToAdd
+                .Where(preset => preset.IsDefault)
+                .ToList();
 
-            if (defaultPresetExistsInNewPresets && defaultPresetExistsInUpdatedPresets)
+            var defaultPresetExistsInUpdatedPresets = updateDto.PresetsToUpdate
+                .Where(preset => preset.IsDefault)
+                .ToList();
+
+            if (defaultPresetExistsInNewPresets.Count > 1 || 
+                defaultPresetExistsInUpdatedPresets.Count > 1 ||
+                (defaultPresetExistsInNewPresets.Count > 0 && defaultPresetExistsInUpdatedPresets.Count > 0))
             {
                 throw new ValidationException(ErrorCodes.FilterPresetContainsMoreThanOneDefaultPreset,
                     "Cannot have more than one default preset");
