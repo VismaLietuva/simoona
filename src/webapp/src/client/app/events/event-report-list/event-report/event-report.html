@@ -4,8 +4,10 @@
             <!-- Header -->
             <div class="panel-heading" ng-if="!vm.isLoading.filters">
                 <div class="event-report-list-panel-heading">
+                    <div>
                         <span>{{vm.eventDetails.name}}</span>
-
+                    </div>
+                    <div class="col-md-6 event-report-filter-preset-container">
                         <ace-filter-preset
                             ng-if="!vm.isLoading.filters"
                             filter-page-type="{{vm.filter.pageType}}"
@@ -15,6 +17,7 @@
                             modal-size="lg"
                             ng-class="{ 'hidden' : vm.isLoading.events && !vm.eventDetails }"
                         ></ace-filter-preset>
+                    </div>
                 </div>
             </div>
 

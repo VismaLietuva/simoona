@@ -401,6 +401,26 @@
     padding-left: 10px;
 }
 
+
+.event-report-list-panel-heading {
+    display: flex;
+    justify-content: space-between;
+}
+
+@media (max-width: 767px) {
+    .event-report-list-panel-heading {
+        display: block;
+        padding-bottom: 50px;
+    }
+
+    .event-report-filter-preset-container {
+        float: left;
+        display: block;
+        padding-left: 10px;
+        padding-top: 10px;
+    }
+}
+
 .event-join-options {
     text-align: left;
     margin-left: 0px;
@@ -1018,9 +1038,4 @@
 .popover-date-item {
     display: block;
     margin-bottom: 5px;
-}
-
-.event-report-list-panel-heading {
-    display: flex;
-    justify-content: space-between;
 }
