@@ -43,17 +43,24 @@ namespace Shrooms.Premium.Tests.DomainService
         public async Task Should_Return_My_Events_As_A_Participant()
         {
             var eventGuids = MockEventsListTest();
-            var myEventsOptions = new MyEventsOptionsDto
+
+            var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
-                UserId = "testUser1",
-                SearchString = null,
-                Filter = MyEventsOptions.Participant
+                UserId = "testUser1"
             };
 
-            var result = (await _eventListingService.GetMyEventsAsync(myEventsOptions, 1)).ToList();
+            var myEventsOptions = new MyEventsOptionsDto
+            {
+                SearchString = null,
+                Filter = MyEventsOptions.Participant,
+                Page = 1,
+                PageSize = 10
+            };
 
-            Assert.AreEqual(result.Count, 3);
+            var result = (await _eventListingService.GetMyEventsAsync(myEventsOptions, userOrg)).ToList();
+
+            Assert.AreEqual(3, result.Count);
             Assert.AreEqual(result.First(x => x.Id == eventGuids[0]).ParticipatingStatus, 1);
             Assert.IsTrue(result.First(x => x.Id == eventGuids[2]).StartDate < result.First(x => x.Id == eventGuids[0]).StartDate);
         }
@@ -62,17 +69,24 @@ namespace Shrooms.Premium.Tests.DomainService
         public async Task Should_Return_My_Events_As_A_Master()
         {
             var eventGuids = MockEventsListTest();
-            var myEventsOptions = new MyEventsOptionsDto
+
+            var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "responsibleUserId2",
-                SearchString = null,
-                Filter = MyEventsOptions.Host
             };
 
-            var result = (await _eventListingService.GetMyEventsAsync(myEventsOptions, 1)).ToList();
+            var myEventsOptions = new MyEventsOptionsDto
+            {
+                SearchString = null,
+                Filter = MyEventsOptions.Host,
+                Page = 1,
+                PageSize = 10
+            };
 
-            Assert.AreEqual(result.Count, 1);
+            var result = (await _eventListingService.GetMyEventsAsync(myEventsOptions, userOrg)).ToList();
+
+            Assert.AreEqual(1, result.Count);
             Assert.IsTrue(result.First(x => x.Id == eventGuids[3]).IsCreator);
         }
 
