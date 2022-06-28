@@ -69,7 +69,15 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
             }
         }
 
-        public async Task CheckIfUniqueNamesAsync(AddEditDeleteFilterPresetDto updateDto, IEnumerable<FilterPresetDto> removedPresets)
+        public void CheckIfFilterPresetsContainsUniqueNames(IEnumerable<FilterPresetDto> filterPresetDtos)
+        {
+            if (filterPresetDtos.GroupBy(preset => preset.Name).Count() != filterPresetDtos.Count())
+            {
+                throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "Preset names cannot contain duplicates");
+            }
+        }
+        
+        public async Task CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(AddEditDeleteFilterPresetDto updateDto, IEnumerable<FilterPresetDto> removedPresets)
         {
             var updateDtoContainsNameDuplicates = updateDto.PresetsToUpdate
                 .Any(updatePreset => updateDto.PresetsToAdd.Any(addPreset => addPreset.Name == updatePreset.Name));
