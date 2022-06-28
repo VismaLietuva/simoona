@@ -84,7 +84,7 @@
     <Compile Include="DataTransferObjects\EmailDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\AddEditDeleteFilterPresetDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\CreateFilterPresetDto.cs" />
-    <Compile Include="DataTransferObjects\FilterPresets\EditFilterPresetDto.cs" />
+    <Compile Include="DataTransferObjects\FilterPresets\UpdateFilterPresetDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\FilterDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\FilterPresetDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\FilterPresetItemDto.cs" />

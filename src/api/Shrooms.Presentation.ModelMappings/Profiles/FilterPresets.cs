@@ -29,8 +29,8 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
             CreateMap<CreateFilterPresetViewModel, FilterPresetDto>()
                 .Ignore(opt => opt.Id);
             CreateMap<FilterPresetItemViewModel, FilterPresetItemDto>();
-            CreateMap<EditFilterPresetViewModel, EditFilterPresetDto>();
-            CreateMap<EditFilterPresetViewModel, FilterPresetDto>();
+            CreateMap<UpdateFilterPresetViewModel, UpdateFilterPresetDto>();
+            CreateMap<UpdateFilterPresetViewModel, FilterPresetDto>();
             CreateMap<AddEditDeleteFilterPresetViewModel, AddEditDeleteFilterPresetDto>()
                 .Ignore(opt => opt.UserOrg)
                 .Ignore(opt => opt.Name);

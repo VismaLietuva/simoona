@@ -10,10 +10,10 @@ namespace Shrooms.Presentation.WebViewModels.Models.FilterPresets
         [EnumDataType(typeof(PageType))]
         public PageType PageType { get; set; }
         
-        public IEnumerable<EditFilterPresetViewModel> PresetsToUpdate;
+        public IEnumerable<UpdateFilterPresetViewModel> PresetsToUpdate;
 
-        public IEnumerable<CreateFilterPresetViewModel> PresetsToAdd;
+        public IEnumerable<CreateFilterPresetViewModel> PresetsToCreate;
 
-        public IEnumerable<int> PresetsToRemove;
+        public IEnumerable<int> PresetsToDelete;
     }
 }

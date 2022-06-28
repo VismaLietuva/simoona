@@ -114,8 +114,8 @@ namespace Shrooms.Tests.DomainService.Validators
 
             var updateDtoWithMoreThanOneDefaultPreset = new AddEditDeleteFilterPresetDto
             {
-                PresetsToAdd = presetsToAddWithMoreThanOneDefault,
-                PresetsToUpdate = Enumerable.Empty<EditFilterPresetDto>()
+                PresetsToCreate = presetsToAddWithMoreThanOneDefault,
+                PresetsToUpdate = Enumerable.Empty<UpdateFilterPresetDto>()
             };
 
             // Assert
@@ -126,13 +126,13 @@ namespace Shrooms.Tests.DomainService.Validators
         public void Should_Throw_If_More_Than_One_Default_Preset_Exists_In_Presets_That_Are_Going_To_Be_Updated()
         {
             // Arrange
-            var presetsToUpdateWithMoreThanOneDefault = new List<EditFilterPresetDto>
+            var presetsToUpdateWithMoreThanOneDefault = new List<UpdateFilterPresetDto>
             {
-                new EditFilterPresetDto
+                new UpdateFilterPresetDto
                 {
                     IsDefault = true
                 },
-                new EditFilterPresetDto
+                new UpdateFilterPresetDto
                 {
                     IsDefault = true
                 }
@@ -140,7 +140,7 @@ namespace Shrooms.Tests.DomainService.Validators
 
             var updateDtoWithMoreThanOneDefaultPreset = new AddEditDeleteFilterPresetDto
             {
-                PresetsToAdd = Enumerable.Empty<CreateFilterPresetDto>(),
+                PresetsToCreate = Enumerable.Empty<CreateFilterPresetDto>(),
                 PresetsToUpdate = presetsToUpdateWithMoreThanOneDefault
             };
 
@@ -160,9 +160,9 @@ namespace Shrooms.Tests.DomainService.Validators
                 }
             };
 
-            var presetsToUpdateWithOneDefaultPreset = new List<EditFilterPresetDto>
+            var presetsToUpdateWithOneDefaultPreset = new List<UpdateFilterPresetDto>
             {
-                new EditFilterPresetDto
+                new UpdateFilterPresetDto
                 {
                     IsDefault = true
                 }
@@ -170,7 +170,7 @@ namespace Shrooms.Tests.DomainService.Validators
 
             var updateDtoWithMoreThanOneDefaultPreset = new AddEditDeleteFilterPresetDto
             {
-                PresetsToAdd = presetsToAddWithOneDefaultPreset,
+                PresetsToCreate = presetsToAddWithOneDefaultPreset,
                 PresetsToUpdate = presetsToUpdateWithOneDefaultPreset
             };
 
@@ -190,9 +190,9 @@ namespace Shrooms.Tests.DomainService.Validators
                 }
             };
 
-            var presetsToUpdateWithoutDefaultPreset = new List<EditFilterPresetDto>
+            var presetsToUpdateWithoutDefaultPreset = new List<UpdateFilterPresetDto>
             {
-                new EditFilterPresetDto
+                new UpdateFilterPresetDto
                 {
                     IsDefault = false
                 }
@@ -200,7 +200,7 @@ namespace Shrooms.Tests.DomainService.Validators
 
             var updateDtoWithOneDefaultPreset = new AddEditDeleteFilterPresetDto
             {
-                PresetsToAdd = presetsToAddWithOneDefaultPreset,
+                PresetsToCreate = presetsToAddWithOneDefaultPreset,
                 PresetsToUpdate = presetsToUpdateWithoutDefaultPreset
             };
 
@@ -220,9 +220,9 @@ namespace Shrooms.Tests.DomainService.Validators
                 }
             };
 
-            var presetsToUpdateWithoutDefaultPreset = new List<EditFilterPresetDto>
+            var presetsToUpdateWithoutDefaultPreset = new List<UpdateFilterPresetDto>
             {
-                new EditFilterPresetDto
+                new UpdateFilterPresetDto
                 {
                     IsDefault = false
                 }
@@ -230,7 +230,7 @@ namespace Shrooms.Tests.DomainService.Validators
 
             var updateDtoWithoutDefaultPreset = new AddEditDeleteFilterPresetDto
             {
-                PresetsToAdd = presetsToAddWithoutDefaultPreset,
+                PresetsToCreate = presetsToAddWithoutDefaultPreset,
                 PresetsToUpdate = presetsToUpdateWithoutDefaultPreset
             };
 
@@ -246,7 +246,7 @@ namespace Shrooms.Tests.DomainService.Validators
             {
                 new CreateFilterPresetDto()
             };
-            var secondCollection = new List<EditFilterPresetDto>();
+            var secondCollection = new List<UpdateFilterPresetDto>();
 
             // Assert
             Assert.Throws<ValidationException>(() => _filterPresetValidator.CheckIfCountsAreEqual(firstCollection, secondCollection));
@@ -257,7 +257,7 @@ namespace Shrooms.Tests.DomainService.Validators
         {
             // Arrange
             var firstCollection = new List<CreateFilterPresetDto>();
-            var secondCollection = new List<EditFilterPresetDto>();
+            var secondCollection = new List<UpdateFilterPresetDto>();
 
             // Assert
             Assert.DoesNotThrow(() => _filterPresetValidator.CheckIfCountsAreEqual(firstCollection, secondCollection));
@@ -347,9 +347,9 @@ namespace Shrooms.Tests.DomainService.Validators
                 }
             };
 
-            var presetsToUpdate = new List<EditFilterPresetDto>
+            var presetsToUpdate = new List<UpdateFilterPresetDto>
             {
-                new EditFilterPresetDto
+                new UpdateFilterPresetDto
                 {
                     Name = "I love writing tests"
                 }
@@ -357,7 +357,7 @@ namespace Shrooms.Tests.DomainService.Validators
 
             var updateDto = new AddEditDeleteFilterPresetDto
             {
-                PresetsToAdd = presetsToAdd,
+                PresetsToCreate = presetsToAdd,
                 PresetsToUpdate = presetsToUpdate
             };
 
@@ -381,9 +381,9 @@ namespace Shrooms.Tests.DomainService.Validators
                 }
             };
 
-            var presetsToUpdate = new List<EditFilterPresetDto>
+            var presetsToUpdate = new List<UpdateFilterPresetDto>
             {
-                new EditFilterPresetDto
+                new UpdateFilterPresetDto
                 {
                     Name = "I love writing tests"
                 }
@@ -391,7 +391,7 @@ namespace Shrooms.Tests.DomainService.Validators
 
             var updateDto = new AddEditDeleteFilterPresetDto
             {
-                PresetsToAdd = presetsToAdd,
+                PresetsToCreate = presetsToAdd,
                 PresetsToUpdate = presetsToUpdate
             };
 
@@ -425,8 +425,8 @@ namespace Shrooms.Tests.DomainService.Validators
 
             var updateDto = new AddEditDeleteFilterPresetDto
             {
-                PresetsToAdd = presetsToAdd,
-                PresetsToUpdate = Enumerable.Empty<EditFilterPresetDto>()
+                PresetsToCreate = presetsToAdd,
+                PresetsToUpdate = Enumerable.Empty<UpdateFilterPresetDto>()
             };
 
             // Assert
@@ -448,9 +448,9 @@ namespace Shrooms.Tests.DomainService.Validators
                 }
             };
 
-            var presetsToUpdate = new List<EditFilterPresetDto>()
+            var presetsToUpdate = new List<UpdateFilterPresetDto>()
             {
-                new EditFilterPresetDto
+                new UpdateFilterPresetDto
                 {
                     Name = "Deleted"
                 }
@@ -458,7 +458,7 @@ namespace Shrooms.Tests.DomainService.Validators
 
             var updateDto = new AddEditDeleteFilterPresetDto
             {
-                PresetsToAdd = Enumerable.Empty<CreateFilterPresetDto>(),
+                PresetsToCreate = Enumerable.Empty<CreateFilterPresetDto>(),
                 PresetsToUpdate = presetsToUpdate
             };
 
@@ -491,8 +491,8 @@ namespace Shrooms.Tests.DomainService.Validators
 
             var updateDto = new AddEditDeleteFilterPresetDto
             {
-                PresetsToAdd = presetsToAdd,
-                PresetsToUpdate = Enumerable.Empty<EditFilterPresetDto>()
+                PresetsToCreate = presetsToAdd,
+                PresetsToUpdate = Enumerable.Empty<UpdateFilterPresetDto>()
             };
 
             // Assert
@@ -515,9 +515,9 @@ namespace Shrooms.Tests.DomainService.Validators
 
             var removedPresets = Enumerable.Empty<FilterPresetDto>();
 
-            var presetsToUpdate = new List<EditFilterPresetDto>()
+            var presetsToUpdate = new List<UpdateFilterPresetDto>()
             {
-                new EditFilterPresetDto
+                new UpdateFilterPresetDto
                 {
                     Id = 2,
                     Name = "Name"
@@ -526,7 +526,7 @@ namespace Shrooms.Tests.DomainService.Validators
 
             var updateDto = new AddEditDeleteFilterPresetDto
             {
-                PresetsToAdd = Enumerable.Empty<CreateFilterPresetDto>(),
+                PresetsToCreate = Enumerable.Empty<CreateFilterPresetDto>(),
                 PresetsToUpdate = presetsToUpdate
             };
 

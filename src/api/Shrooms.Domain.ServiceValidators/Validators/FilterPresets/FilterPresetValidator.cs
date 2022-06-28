@@ -42,7 +42,7 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
 
         public void CheckIfMoreThanOneDefaultPresetExists(AddEditDeleteFilterPresetDto updateDto)
         {
-            var defaultPresetExistsInNewPresets = updateDto.PresetsToAdd
+            var defaultPresetExistsInNewPresets = updateDto.PresetsToCreate
                 .Where(preset => preset.IsDefault)
                 .ToList();
 
@@ -80,7 +80,7 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
         public async Task CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(AddEditDeleteFilterPresetDto updateDto, IEnumerable<FilterPresetDto> removedPresets)
         {
             var updateDtoContainsNameDuplicates = updateDto.PresetsToUpdate
-                .Any(updatePreset => updateDto.PresetsToAdd.Any(addPreset => addPreset.Name == updatePreset.Name));
+                .Any(updatePreset => updateDto.PresetsToCreate.Any(addPreset => addPreset.Name == updatePreset.Name));
 
             if (updateDtoContainsNameDuplicates)
             {
@@ -95,7 +95,7 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
                 .Select(preset => preset.Name)
                 .ToList();
 
-            if (updateDto.PresetsToAdd.Any(preset => presets.Any(dbPreset => dbPreset.Name == preset.Name) && !removedPresetNames.Contains(preset.Name)) ||
+            if (updateDto.PresetsToCreate.Any(preset => presets.Any(dbPreset => dbPreset.Name == preset.Name) && !removedPresetNames.Contains(preset.Name)) ||
                 updateDto.PresetsToUpdate.Any(preset => presets.Any(dbPreset => dbPreset.Name == preset.Name && dbPreset.Id != preset.Id) && !removedPresetNames.Contains(preset.Name)))
             {
                 throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "Preset names cannot contain duplicates");

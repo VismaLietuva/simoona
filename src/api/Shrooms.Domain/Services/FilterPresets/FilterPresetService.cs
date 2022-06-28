@@ -65,21 +65,21 @@ namespace Shrooms.Domain.Services.FilterPresets
             {
                 _validator.CheckIfMoreThanOneDefaultPresetExists(updateDto);
                 _validator.CheckIfFilterPresetsContainsUniqueNames(updateDto.PresetsToUpdate);
-                _validator.CheckIfFilterPresetsContainsUniqueNames(updateDto.PresetsToAdd);
+                _validator.CheckIfFilterPresetsContainsUniqueNames(updateDto.PresetsToCreate);
 
                 var updatedPresets = await UpdatePresetsAsync(updateDto);
-                var removedPresets = await DeleteAsync(updateDto);
+                var deletedPresets = await DeleteAsync(updateDto);
                 
-                await _validator.CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(updateDto, removedPresets);
+                await _validator.CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(updateDto, deletedPresets);
 
-                var addedPresets = CreatePresets(updateDto);
+                var createdPresets = CreatePresets(updateDto);
 
                 await _uow.SaveChangesAsync(updateDto.UserOrg.UserId);
                 
                 return new UpdatedFilterPresetDto
                 {
                     // Ids are assigned after SaveChangesAsync()
-                    AddedPresets = addedPresets.Select(preset => new FilterPresetDto
+                    CreatedPresets = createdPresets.Select(preset => new FilterPresetDto
                     {
                         Id = preset.Id,
                         Name = preset.Name,
@@ -87,7 +87,7 @@ namespace Shrooms.Domain.Services.FilterPresets
                         Filters = JsonConvert.DeserializeObject<IEnumerable<FilterPresetItemDto>>(preset.Preset)
                     }),
                     UpdatedPresets = updatedPresets,
-                    RemovedPresets = removedPresets
+                    DeletedPresets = deletedPresets
                 };
             }
             finally
@@ -143,14 +143,14 @@ namespace Shrooms.Domain.Services.FilterPresets
 
         private async Task<IEnumerable<FilterPresetDto>> DeleteAsync(AddEditDeleteFilterPresetDto updateDto)
         {
-            if (!updateDto.PresetsToRemove.Any())
+            if (!updateDto.PresetsToDelete.Any())
             {
                 return Enumerable.Empty<FilterPresetDto>();
             }
 
             var presets = await _filterPresetDbSet
                 .Where(preset => 
-                    updateDto.PresetsToRemove.Contains(preset.Id) &&
+                    updateDto.PresetsToDelete.Contains(preset.Id) &&
                     preset.OrganizationId == updateDto.UserOrg.OrganizationId)
                 .ToListAsync();
 
@@ -169,15 +169,15 @@ namespace Shrooms.Domain.Services.FilterPresets
 
         private IEnumerable<FilterPreset> CreatePresets(AddEditDeleteFilterPresetDto updateDto)
         {
-            if (!updateDto.PresetsToAdd.Any())
+            if (!updateDto.PresetsToCreate.Any())
             {
                 return Enumerable.Empty<FilterPreset>();
             }
 
             var timestamp = DateTime.UtcNow;
-            var addedPresets = new List<FilterPreset>();
+            var createdPresets = new List<FilterPreset>();
 
-            foreach (var presetDtoToAdd in updateDto.PresetsToAdd)
+            foreach (var presetDtoToAdd in updateDto.PresetsToCreate)
             {
                 var presetToAdd = new FilterPreset
                 {
@@ -194,10 +194,10 @@ namespace Shrooms.Domain.Services.FilterPresets
                 // AddRange() does not return assigned Id's after SaveChangesAsync(), but using Add() does
                 _filterPresetDbSet.Add(presetToAdd);
 
-                addedPresets.Add(presetToAdd);
+                createdPresets.Add(presetToAdd);
             }
 
-            return addedPresets;
+            return createdPresets;
         }
 
         private async Task<IEnumerable<FilterPresetDto>> UpdatePresetsAsync(AddEditDeleteFilterPresetDto updateDto)

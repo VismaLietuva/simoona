@@ -82,7 +82,7 @@
     <Compile Include="Models\ExternalLink\UpdatedExternalLinkViewModel.cs" />
     <Compile Include="Models\FilterPresets\AddEditDeleteFilterPresetViewModel.cs" />
     <Compile Include="Models\FilterPresets\CreateFilterPresetViewModel.cs" />
-    <Compile Include="Models\FilterPresets\EditFilterPresetViewModel.cs" />
+    <Compile Include="Models\FilterPresets\UpdateFilterPresetViewModel.cs" />
     <Compile Include="Models\FilterPresets\FilterPresetItemViewModel.cs" />
     <Compile Include="Models\FilterPresets\FilterPresetViewModel.cs" />
     <Compile Include="Models\FilterPresets\FiltersViewModel.cs" />

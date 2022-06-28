@@ -264,9 +264,9 @@
 
             filterPresetRepository.updatePresets(modifiedPresets, vm.filterPageType).then(
                 function (result) {
-                    if (result.addedPresets.length > 0) {
+                    if (result.createdPresets.length > 0) {
                         // Set preset Ids that match the backend
-                        modifiedPresets.presetsToAdd = result.addedPresets;
+                        modifiedPresets.presetsToCreate = result.createdPresets;
                     }
 
                     syncControlsWithPresets(modifiedPresets);
@@ -282,7 +282,7 @@
 
         function syncControlsWithPresets(controls) {
             // Add newly created presets
-            for (var preset of controls.presetsToAdd) {
+            for (var preset of controls.presetsToCreate) {
                 vm.presets.push(preset);
             }
 
@@ -302,7 +302,7 @@
 
             // Removing from loading presets presets that were checked as removed by the user
             scope.loadedPresets = vm.presets.filter(function (preset) {
-                if (controls.presetsToRemove.find(x => x === preset.id)) {
+                if (controls.presetsToDelete.find(x => x === preset.id)) {
                     if (scope.selectedPreset !== null && preset.id === scope.selectedPreset.id) {
                         scope.selectedPreset = null;
                     }
@@ -328,17 +328,17 @@
         }
 
         function getModifiedPresets() {
-            var presetsToRemove = [];
-            var presetsToAdd = [];
+            var presetsToDelete = [];
+            var presetsToCreate = [];
             var presetsToUpdate = [];
 
             for (var i = 0; i < vm.controls.length; i++) {
                 var preset = vm.controls[i];
 
                 if (preset.isDeleted && !preset.isNew) {
-                    presetsToRemove.push(preset.id);
+                    presetsToDelete.push(preset.id);
                 } else if (preset.isNew && !preset.isDeleted) {
-                    presetsToAdd.push({
+                    presetsToCreate.push({
                         ...preset,
                         filters: mapControlFiltersToPresetFilters(preset)
                     });
@@ -351,8 +351,8 @@
             }
 
             return {
-                presetsToRemove,
-                presetsToAdd,
+                presetsToDelete,
+                presetsToCreate,
                 presetsToUpdate,
             };
         }

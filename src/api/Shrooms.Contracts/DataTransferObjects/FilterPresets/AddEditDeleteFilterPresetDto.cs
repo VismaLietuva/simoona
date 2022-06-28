@@ -9,11 +9,11 @@ namespace Shrooms.Contracts.DataTransferObjects.FilterPresets
 
         public PageType PageType { get; set; }
 
-        public IEnumerable<EditFilterPresetDto> PresetsToUpdate;
+        public IEnumerable<UpdateFilterPresetDto> PresetsToUpdate;
 
-        public IEnumerable<CreateFilterPresetDto> PresetsToAdd;
+        public IEnumerable<CreateFilterPresetDto> PresetsToCreate;
 
-        public IEnumerable<int> PresetsToRemove;
+        public IEnumerable<int> PresetsToDelete;
 
         public UserAndOrganizationDto UserOrg { get; set; }
     }

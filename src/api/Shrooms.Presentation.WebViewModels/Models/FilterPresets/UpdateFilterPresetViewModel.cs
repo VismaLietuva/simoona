@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Shrooms.Presentation.WebViewModels.Models.FilterPresets
 {
-    public class EditFilterPresetViewModel
+    public class UpdateFilterPresetViewModel
     {
         [Required]
         public int Id { get; set; }

@@ -31,8 +31,8 @@
             }).post({
                 pageType: pageType,
                 presetsToUpdate: presets.presetsToUpdate,
-                presetsToAdd: presets.presetsToAdd,
-                presetsToRemove: presets.presetsToRemove
+                presetsToCreate: presets.presetsToCreate,
+                presetsToDelete: presets.presetsToDelete
             }).$promise;
         }
 
