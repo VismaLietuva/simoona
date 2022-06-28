@@ -64,11 +64,13 @@ namespace Shrooms.Domain.Services.FilterPresets
             try
             {
                 _validator.CheckIfMoreThanOneDefaultPresetExists(updateDto);
+                _validator.CheckIfFilterPresetsContainsUniqueNames(updateDto.PresetsToUpdate);
+                _validator.CheckIfFilterPresetsContainsUniqueNames(updateDto.PresetsToAdd);
 
                 var updatedPresets = await UpdatePresetsAsync(updateDto);
                 var removedPresets = await DeleteAsync(updateDto);
                 
-                await _validator.CheckIfUniqueNamesAsync(updateDto, removedPresets);
+                await _validator.CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(updateDto, removedPresets);
 
                 var addedPresets = CreatePresets(updateDto);
 
