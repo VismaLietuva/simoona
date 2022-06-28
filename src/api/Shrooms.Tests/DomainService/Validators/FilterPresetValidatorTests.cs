@@ -11,6 +11,7 @@ using System.Data.Entity.Infrastructure;
 using System.Linq;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.DataTransferObjects.FilterPresets;
+using Shrooms.Tests.Extensions;
 
 namespace Shrooms.Tests.DomainService.Validators
 {
@@ -25,8 +26,10 @@ namespace Shrooms.Tests.DomainService.Validators
         public void TestInitializer()
         {
             var uow = Substitute.For<IUnitOfWork2>();
+            var mockPresetData = new List<FilterPreset>();
 
             _filterPresetDbSet = Substitute.For<DbSet<FilterPreset>, IQueryable<FilterPreset>, IDbAsyncEnumerable<FilterPreset>>();
+            _filterPresetDbSet.SetDbSetDataForAsync(mockPresetData);
 
             uow.GetDbSet<FilterPreset>().Returns(_filterPresetDbSet);
 
@@ -288,6 +291,248 @@ namespace Shrooms.Tests.DomainService.Validators
 
             // Assert
             Assert.DoesNotThrow(() => _filterPresetValidator.CheckIfFilterTypesAreValid(validFilterTypes));
+        }
+
+        [Test]
+        public void Should_Throw_If_FilterPresets_Collection_Contains_Duplicate_Names()
+        {
+            // Arrange
+            var collectionWithDuplicateNames = new List<FilterPresetDto>
+            {
+                new FilterPresetDto
+                {
+                    Name = "Awesome filter preset"
+                },
+
+                new FilterPresetDto
+                {
+                    Name = "Awesome filter preset"
+                }
+            };
+
+            // Assert
+            Assert.Throws<ValidationException>(() => _filterPresetValidator.CheckIfFilterPresetsContainsUniqueNames(collectionWithDuplicateNames));
+        }
+
+        [Test]
+        public void Should_Not_Throw_If_FilterPresets_Collection_Does_Not_Contain_Duplicate_Names()
+        {
+            // Arrange
+            var collectionWithDuplicateNames = new List<FilterPresetDto>
+            {
+                new FilterPresetDto
+                {
+                    Name = "Another awesome filter preset"
+                },
+
+                new FilterPresetDto
+                {
+                    Name = "Awesome filter preset"
+                }
+            };
+
+            // Assert
+            Assert.DoesNotThrow(() => _filterPresetValidator.CheckIfFilterPresetsContainsUniqueNames(collectionWithDuplicateNames));
+        }
+
+        [Test]
+        public void Should_Throw_If_Presets_To_Add_And_Update_Contain_Duplicate_Names()
+        {
+            // Arrange
+            var presetsToAdd = new List<CreateFilterPresetDto>
+            {
+                new CreateFilterPresetDto
+                {
+                    Name = "I love writing tests"
+                }
+            };
+
+            var presetsToUpdate = new List<EditFilterPresetDto>
+            {
+                new EditFilterPresetDto
+                {
+                    Name = "I love writing tests"
+                }
+            };
+
+            var updateDto = new AddEditDeleteFilterPresetDto
+            {
+                PresetsToAdd = presetsToAdd,
+                PresetsToUpdate = presetsToUpdate
+            };
+
+            var removedPresets = Enumerable.Empty<FilterPresetDto>();
+
+            // Assert
+            Assert.ThrowsAsync<ValidationException>(async () => await _filterPresetValidator
+                .CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(updateDto, removedPresets));
+        }
+
+
+        [Test]
+        public void Should_Not_Throw_If_Presets_To_Add_And_Update_Does_Not_Contain_Duplicate_Names()
+        {
+            // Arrange
+            var presetsToAdd = new List<CreateFilterPresetDto>
+            {
+                new CreateFilterPresetDto
+                {
+                    Name = "I hate writing tests"
+                }
+            };
+
+            var presetsToUpdate = new List<EditFilterPresetDto>
+            {
+                new EditFilterPresetDto
+                {
+                    Name = "I love writing tests"
+                }
+            };
+
+            var updateDto = new AddEditDeleteFilterPresetDto
+            {
+                PresetsToAdd = presetsToAdd,
+                PresetsToUpdate = presetsToUpdate
+            };
+
+            var removedPresets = Enumerable.Empty<FilterPresetDto>();
+
+            // Assert
+            Assert.DoesNotThrowAsync(async () => await _filterPresetValidator
+                .CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(updateDto, removedPresets));
+        }
+
+        [Test]
+        public void Should_Not_Throw_If_Presets_To_Add_Contains_Duplicate_Name_But_That_Preset_Is_About_To_Be_Deleted()
+        {
+            // Arrange
+            var removedPresets = new List<FilterPresetDto>
+            {
+                new FilterPresetDto
+                {
+                    Id = 1,
+                    Name = "Deleted"
+                }
+            };
+
+            var presetsToAdd = new List<CreateFilterPresetDto>()
+            {
+                new CreateFilterPresetDto
+                {
+                    Name = "Deleted"
+                }
+            };
+
+            var updateDto = new AddEditDeleteFilterPresetDto
+            {
+                PresetsToAdd = presetsToAdd,
+                PresetsToUpdate = Enumerable.Empty<EditFilterPresetDto>()
+            };
+
+            // Assert
+            Assert.DoesNotThrowAsync(async () => 
+                await _filterPresetValidator.CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(updateDto, removedPresets));
+        }
+
+
+        [Test]
+        public void Should_Not_Throw_If_Presets_To_Update_Contains_Duplicate_Name_But_That_Preset_Is_About_To_Be_Deleted()
+        {
+            // Arrange
+            var removedPresets = new List<FilterPresetDto>
+            {
+                new FilterPresetDto
+                {
+                    Id = 1,
+                    Name = "Deleted"
+                }
+            };
+
+            var presetsToUpdate = new List<EditFilterPresetDto>()
+            {
+                new EditFilterPresetDto
+                {
+                    Name = "Deleted"
+                }
+            };
+
+            var updateDto = new AddEditDeleteFilterPresetDto
+            {
+                PresetsToAdd = Enumerable.Empty<CreateFilterPresetDto>(),
+                PresetsToUpdate = presetsToUpdate
+            };
+
+            // Assert
+            Assert.DoesNotThrowAsync(async () =>
+                await _filterPresetValidator.CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(updateDto, removedPresets));
+        }
+
+        [Test]
+        public void Should_Throw_If_Presets_To_Add_Contain_Name_That_Is_Already_Created()
+        {
+            // Arrange
+            _filterPresetDbSet.SetDbSetDataForAsync(new List<FilterPreset>
+            {
+                new FilterPreset
+                {
+                    Name = "Name"
+                }
+            });
+
+            var removedPresets = Enumerable.Empty<FilterPresetDto>();
+
+            var presetsToAdd = new List<CreateFilterPresetDto>()
+            {
+                new CreateFilterPresetDto
+                {
+                    Name = "Name"
+                }
+            };
+
+            var updateDto = new AddEditDeleteFilterPresetDto
+            {
+                PresetsToAdd = presetsToAdd,
+                PresetsToUpdate = Enumerable.Empty<EditFilterPresetDto>()
+            };
+
+            // Assert
+            Assert.ThrowsAsync<ValidationException>(async () =>
+                await _filterPresetValidator.CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(updateDto, removedPresets));
+        }
+
+        [Test]
+        public void Should_Throw_If_Presets_To_Update_Contain_Name_That_Is_Already_Created()
+        {
+            // Arrange
+            _filterPresetDbSet.SetDbSetDataForAsync(new List<FilterPreset>
+            {
+                new FilterPreset
+                {
+                    Id = 1,
+                    Name = "Name"
+                }
+            });
+
+            var removedPresets = Enumerable.Empty<FilterPresetDto>();
+
+            var presetsToUpdate = new List<EditFilterPresetDto>()
+            {
+                new EditFilterPresetDto
+                {
+                    Id = 2,
+                    Name = "Name"
+                }
+            };
+
+            var updateDto = new AddEditDeleteFilterPresetDto
+            {
+                PresetsToAdd = Enumerable.Empty<CreateFilterPresetDto>(),
+                PresetsToUpdate = presetsToUpdate
+            };
+
+            // Assert
+            Assert.ThrowsAsync<ValidationException>(async () =>
+                await _filterPresetValidator.CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(updateDto, removedPresets));
         }
     }
 }
