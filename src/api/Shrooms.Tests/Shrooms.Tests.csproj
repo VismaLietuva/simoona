@@ -204,6 +204,7 @@
     <Compile Include="Helpers\CustomUrlHelperTest.cs" />
     <Compile Include="Infrastructure\MailTemplateTests.cs" />
     <Compile Include="Mocks\MockAsyncQueryProvider.cs" />
+    <Compile Include="Mocks\MockModel.cs" />
     <Compile Include="ModelMappings\AutoMapperTests.cs" />
     <Compile Include="Mocks\MockPasswordHasher.cs" />
     <Compile Include="Mocks\MockPasswordValidator.cs" />
