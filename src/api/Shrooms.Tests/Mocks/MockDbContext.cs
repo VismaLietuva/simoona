@@ -56,6 +56,8 @@ namespace Shrooms.Tests.Mocks
 
         public List<VacationPage> VacationPages { get; set; }
 
+        public List<MockModel> MockModels { get; set; }
+
         public string ConnectionName => "SimoonaTest";
 
         public MockDbContext()
@@ -67,6 +69,8 @@ namespace Shrooms.Tests.Mocks
             CreateRoles();
 
             CreateVacationPages();
+
+            CreateMockModels();
 
             #region Rooms
 
@@ -340,6 +344,18 @@ namespace Shrooms.Tests.Mocks
                 new ApplicationRole
                 {
                     Name = "Admin"
+                }
+            };
+        }
+
+        private void CreateMockModels()
+        {
+            MockModels = new List<MockModel>
+            {
+                new MockModel
+                {
+                    Id = 1,
+                    Value = "Test value"
                 }
             };
         }
