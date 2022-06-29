@@ -200,6 +200,7 @@
     <Compile Include="DomainService\WallServiceTests.cs" />
     <Compile Include="DomainService\WebHookCallbacks\UsersAnonymizationWebHookServiceTests.cs" />
     <Compile Include="Entities\KudosLogTests.cs" />
+    <Compile Include="Extensions\DbSetExtensionsTests.cs" />
     <Compile Include="Extensions\MockingExtensions.cs" />
     <Compile Include="Helpers\CustomUrlHelperTest.cs" />
     <Compile Include="Infrastructure\MailTemplateTests.cs" />
