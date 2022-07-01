@@ -14,7 +14,6 @@ using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Domain.Helpers;
-using Shrooms.Domain.Extensions;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.Premium.Constants;
@@ -259,9 +258,11 @@ namespace Shrooms.Premium.Domain.Services.Events
 
             _eventValidationService.CheckIfEventExists(@event);
 
+            var officeIds = JsonConvert.DeserializeObject<IEnumerable<int>>(@event.Offices.Value);
+
             @event.OfficeNames = await _officeDbSet
-                .Where(p => @event.Offices.Value.Contains(SqlFunctions.StringConvert((double)p.Id).Trim()))
-                .Select(p => p.Name)
+                .Where(office => officeIds.Contains(office.Id))
+                .Select(office => office.Name)
                 .ToListAsync();
 
             @event.IsForAllOffices = (await _officeMapService.GetOfficesCountAsync()) == @event.OfficeNames.Count();
