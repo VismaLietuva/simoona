@@ -353,6 +353,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [Route("GetPagedReportParticipants")]
         public async Task<IHttpActionResult> GetPagedReportParticipants([FromUri] EventParticipantsReportListingArgsViewModel reportArgsViewModel)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             try
             {
                 var reportArgsDto = _mapper.Map<EventParticipantsReportListingArgsViewModel, EventParticipantsReportListingArgsDto>(reportArgsViewModel);
@@ -587,6 +592,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
         public async Task<IHttpActionResult> GetEventsByTitle([FromUri] EventReportListingArgsViewModel reportArgsViewModel)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             try
             {
                 var reportArgsDto = _mapper.Map<EventReportListingArgsViewModel, EventReportListingArgsDto>(reportArgsViewModel);
