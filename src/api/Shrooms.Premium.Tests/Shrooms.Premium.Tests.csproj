@@ -164,6 +164,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\WebApi\EventControllerTests.cs" />
     <Compile Include="Controllers\WebApi\LotteryControllerTests.cs" />
     <Compile Include="DomainService\BadgesServiceTests.cs" />
     <Compile Include="DomainService\BookMobileServiceTests.cs" />
