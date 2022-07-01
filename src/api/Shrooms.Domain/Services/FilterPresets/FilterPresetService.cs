@@ -40,6 +40,11 @@ namespace Shrooms.Domain.Services.FilterPresets
             _eventTypeDbSet = uow.GetDbSet<EventType>();
         }
 
+        public bool UpdatingFilterPresets 
+        {
+            get => _filterPresetUpdateCreateLock.CurrentCount == 0;
+        }
+
         public async Task<IEnumerable<FilterPresetDto>> GetPresetsForPageAsync(PageType type, int organizationId)
         {
             _validator.CheckIfPageTypeExists(type);
@@ -66,13 +71,20 @@ namespace Shrooms.Domain.Services.FilterPresets
                 _validator.CheckIfMoreThanOneDefaultPresetExists(updateDto);
                 _validator.CheckIfFilterPresetsContainsUniqueNames(updateDto.PresetsToUpdate);
                 _validator.CheckIfFilterPresetsContainsUniqueNames(updateDto.PresetsToCreate);
-
-                var updatedPresets = await UpdatePresetsAsync(updateDto);
-                var deletedPresets = await DeleteAsync(updateDto);
                 
+                await UpdatePresetsAsync(updateDto);
+                
+                var deletedPresets = await DeleteAsync(updateDto);
+
+                // Need to call this after deletion, because we receive preset Ids that need to be deleted and not presets themselves
                 await _validator.CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(updateDto, deletedPresets);
 
                 var createdPresets = CreatePresets(updateDto);
+
+                if (NewDefaultPresetWasSet(createdPresets, updateDto.PresetsToUpdate))
+                {
+                    await ChangeCurrentDefaultFilterToNonDefaultAsync(updateDto.PageType, updateDto.UserOrg.OrganizationId);
+                }
 
                 await _uow.SaveChangesAsync(updateDto.UserOrg.UserId);
                 
@@ -86,7 +98,7 @@ namespace Shrooms.Domain.Services.FilterPresets
                         IsDefault = preset.IsDefault,
                         Filters = JsonConvert.DeserializeObject<IEnumerable<FilterPresetItemDto>>(preset.Preset)
                     }),
-                    UpdatedPresets = updatedPresets,
+                    UpdatedPresets = updateDto.PresetsToUpdate,
                     DeletedPresets = deletedPresets
                 };
             }
@@ -116,6 +128,11 @@ namespace Shrooms.Domain.Services.FilterPresets
             }
 
             return filtersDtos;
+        }
+
+        private bool NewDefaultPresetWasSet(IEnumerable<FilterPreset> createdPresets, IEnumerable<FilterPresetDto> updatedPresets)
+        {
+            return createdPresets.Any(preset => preset.IsDefault) || updatedPresets.Any(preset => preset.IsDefault);
         }
 
         private IQueryable<FilterDto> GetFiltersQueryByFilterType(FilterType filterType)
@@ -200,11 +217,11 @@ namespace Shrooms.Domain.Services.FilterPresets
             return createdPresets;
         }
 
-        private async Task<IEnumerable<FilterPresetDto>> UpdatePresetsAsync(AddEditDeleteFilterPresetDto updateDto)
+        private async Task UpdatePresetsAsync(AddEditDeleteFilterPresetDto updateDto)
         {
             if (!updateDto.PresetsToUpdate.Any())
             {
-                return Enumerable.Empty<FilterPresetDto>();
+                return;
             }
 
             var presetsToUpdateIds = updateDto.PresetsToUpdate.Select(preset => preset.Id)
@@ -224,26 +241,18 @@ namespace Shrooms.Domain.Services.FilterPresets
                 }
 
                 presetToUpdate.IsDefault = preset.IsDefault;
-
-                if (presetToUpdate.IsDefault)
-                {
-                    await ChangeCurrentDefaultFilterToNonDefaultAsync(presetToUpdate);
-                }
-
                 presetToUpdate.Name = preset.Name;
                 presetToUpdate.Preset = JsonConvert.SerializeObject(preset.Filters);
             }
-
-            return updateDto.PresetsToUpdate;
         }
 
-        private async Task ChangeCurrentDefaultFilterToNonDefaultAsync(FilterPreset preset)
+        private async Task ChangeCurrentDefaultFilterToNonDefaultAsync(PageType pageType, int organizationId)
         {
             // Find current default filter
             var defaultFilter = await _filterPresetDbSet
                 .FirstOrDefaultAsync(filter => filter.IsDefault && 
-                                     filter.ForPage == preset.ForPage &&
-                                     filter.OrganizationId == preset.OrganizationId);
+                                     filter.ForPage == pageType &&
+                                     filter.OrganizationId == organizationId);
 
             // Change to non default
             if (defaultFilter != null)

@@ -13,5 +13,7 @@ namespace Shrooms.Domain.Services.FilterPresets
         Task<IEnumerable<FilterPresetDto>> GetPresetsForPageAsync(PageType type, int organizationId);
 
         Task<IEnumerable<FiltersDto>> GetFiltersAsync(FilterType[] filterTypes, int organizationId);
+
+        bool UpdatingFilterPresets { get; }
     }
 }
