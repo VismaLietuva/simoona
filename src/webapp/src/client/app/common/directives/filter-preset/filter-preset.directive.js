@@ -5,8 +5,8 @@
         .module('simoonaApp.Common')
         .directive('aceFilterPreset', filterPreset)
         .constant('filterPageTypes', {
-            extensiveEventDetailsList: 0,
-            extensiveEventDetails: 1,
+            eventReportList: 0,
+            eventReport: 1,
         })
         .constant('filterTypes', {
             events: 0,

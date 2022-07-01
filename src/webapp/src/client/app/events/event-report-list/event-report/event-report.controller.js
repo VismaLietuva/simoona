@@ -38,7 +38,7 @@
         };
 
         vm.filter = eventReportService.getEventReportFilter(
-            filterPageTypes.extensiveEventDetails,
+            filterPageTypes.eventReport,
             { name: 'events', type: filterTypes.events },
             { name: 'kudos', type: filterTypes.kudos }
         );
