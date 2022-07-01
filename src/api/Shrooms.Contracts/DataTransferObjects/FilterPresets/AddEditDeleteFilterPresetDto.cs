@@ -5,8 +5,6 @@ namespace Shrooms.Contracts.DataTransferObjects.FilterPresets
 {
     public class AddEditDeleteFilterPresetDto
     {
-        public string Name { get; set; }
-
         public PageType PageType { get; set; }
 
         public IEnumerable<UpdateFilterPresetDto> PresetsToUpdate;
