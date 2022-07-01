@@ -43,6 +43,28 @@ namespace Shrooms.Tests.Controllers.WebApi
         }
 
         [Test]
+        public async Task Update_Should_Return_Bad_Request_When_Called_With_Invalid_Page_Type()
+        {
+            // Arrange
+            var updateViewModel = new AddEditDeleteFilterPresetViewModel
+            {
+                PageType = (PageType)int.MaxValue,
+                PresetsToCreate = Enumerable.Empty<CreateFilterPresetViewModel>(),
+                PresetsToDelete = Enumerable.Empty<int>(),
+                PresetsToUpdate = Enumerable.Empty<UpdateFilterPresetViewModel>(),
+            };
+
+            // Act
+            _filterPresetController.Validate(updateViewModel);
+
+            var httpActionResult = await _filterPresetController.Update(updateViewModel);
+            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Test]
         public async Task Update_Should_Return_Ok()
         {
             // Arrange
