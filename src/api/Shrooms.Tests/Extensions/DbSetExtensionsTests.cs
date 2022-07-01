@@ -3,7 +3,10 @@ using Shrooms.Tests.Mocks;
 using Shrooms.Domain.Extensions;
 using System.Data.Entity;
 using System.ComponentModel.DataAnnotations;
+using System.Linq.Dynamic;
 using System.Linq;
+using System.Data.Entity.Core.Objects;
+using System.Text;
 
 namespace Shrooms.Tests.Extensions
 {
@@ -27,76 +30,89 @@ namespace Shrooms.Tests.Extensions
         }
 
         [Test]
-        public void Should_Return_Query_To_Sort_By_First_Property_If_Property_Name_Is_Not_Provided()
-        {
-            // Arrange ? linq query and test equality?
-            string propertyName = null;
-            var sortDirection = "asc";
-
-            // Act
-            var result = _mockDbSet.OrderByPropertyName(propertyName, sortDirection);
-
-            // Assert
-            Assert.IsInstanceOf<IQueryable<MockModel>>(result);
-        }
-
-        [Test]
-        public void Should_Return_Query_To_Sort_By_First_Property_If_Sort_Direction_Is_Not_Provided()
-        {
-            // Arrange
-            var propertyName = nameof(MockModel.Id);
-            string sortDirection = null;
-
-            // Act
-            var result = _mockDbSet.OrderByPropertyName(propertyName, sortDirection);
-
-            // Assert
-            Assert.IsInstanceOf<IQueryable<MockModel>>(result);
-        }
-
-        [Test]
-        public void Should_Return_Query_To_Sort_By_First_Property_If_Model_Does_Not_Have_Specified_Property()
+        public void Should_Return_Query_To_Order_By_First_Property_And_Order_By_Ascending_If_Property_Name_Is_Not_Provided()
         {
             // Arrange
             string propertyName = null;
-            string sortDirection = null;
+            var sortDirection = "asc";
+            
+            var expectedQuery = _mockDbSet.OrderBy("Id asc").ToString();
 
             // Act
-            var result = _mockDbSet.OrderByPropertyName(propertyName, sortDirection);
+            var actualQuery = _mockDbSet.OrderByPropertyName(propertyName, sortDirection).ToString();
 
             // Assert
-            Assert.IsInstanceOf<IQueryable<MockModel>>(result);
+            Assert.AreEqual(expectedQuery, actualQuery);
         }
 
         [Test]
-        public void Should_Return_Query_To_Sort_By_Specified_Property_Name()
+        public void Should_Return_Query_To_Order_By_First_Property_And_Order_By_Descending_If_Property_Name_Is_Not_Provided()
         {
             // Arrange
-            var propertyName = nameof(MockModel.Id);
-            var sortDirection = "asc";
+            string propertyName = null;
+            var sortDirection = "desc";
+
+            var expectedQuery = _mockDbSet.OrderBy("Id desc").ToString();
 
             // Act
-            var result = _mockDbSet.OrderByPropertyName(propertyName, sortDirection);
+            var actualQuery = _mockDbSet.OrderByPropertyName(propertyName, sortDirection).ToString();
 
             // Assert
-            Assert.IsInstanceOf<IQueryable<MockModel>>(result);
+            Assert.AreEqual(expectedQuery, actualQuery);
+        }
+
+        [Test]
+        public void Should_Return_Query_To_Order_By_First_Property_And_Order_By_Descending_If_Property_Name_And_Sort_Direction_Is_Not_Provided()
+        {
+            // Arrange
+            string propertyName = null;
+            string sortDirection = null;
+
+            var expectedQuery = _mockDbSet.OrderBy("Id desc").ToString();
+
+            // Act
+            var actualQuery = _mockDbSet.OrderByPropertyName(propertyName, sortDirection).ToString();
+
+            // Assert
+            Assert.AreEqual(expectedQuery, actualQuery);
+        }
+
+        [Test]
+        public void Should_Return_Query_To_Order_By_Specified_Property_And_Order_By_Descending_If_Sort_Direction_Is_Not_Provided()
+        {
+            // Arrange
+            var propertyName = nameof(MockModel.Value);
+            string sortDirection = null;
+
+            var expectedQuery = _mockDbSet.OrderBy("Value desc").ToString();
+
+            // Act
+            var actualQuery = _mockDbSet.OrderByPropertyName(propertyName, sortDirection).ToString();
+
+            // Assert
+            Assert.AreEqual(expectedQuery, actualQuery);
+        }
+
+        [Test]
+        public void Should_Return_Query_To_Order_By_Specified_Property_And_Order_By_Provided_Sort_Direction()
+        {
+            // Arrange
+            var propertyName = nameof(MockModel.Value);
+            var sortDirection = "asc";
+
+            var expectedQuery = _mockDbSet.OrderBy("Value asc").ToString();
+
+            // Act
+            var actualQuery = _mockDbSet.OrderByPropertyName(propertyName, sortDirection).ToString();
+
+            // Assert
+            Assert.AreEqual(expectedQuery, actualQuery);
         }
 
         [Test]
         public void Should_Throw_If_Model_Does_Not_Have_Any_Properties()
         {
             Assert.Throws<ValidationException>(() => _mockWithoutPropertiesDbSet.OrderByPropertyName("Id", "ASC"));
-        }
-
-        [Test]
-        public void Should_Throw_If_Sort_Direction_Does_Not_Exist()
-        {
-            // Arrange
-            var propertyName = nameof(MockModel.Id);
-            var invalidSortDirection = string.Empty;
-
-            // Assert
-            Assert.Throws<ValidationException>(() => _mockDbSet.OrderByPropertyName(propertyName, invalidSortDirection));
         }
     }
 }
