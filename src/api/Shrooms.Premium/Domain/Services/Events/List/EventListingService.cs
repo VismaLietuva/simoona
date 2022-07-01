@@ -90,7 +90,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             return await events.ToListAsync();
         }
 
-        public async Task<IPagedList<EventDetailsListItemDto>> GetEventsFilteredByTitleAsync(EventReportListingArgsDto reportArgsDto, UserAndOrganizationDto userAndOrganization)
+        public async Task<IPagedList<EventDetailsListItemDto>> GetNotStartedEventsFilteredByTitleAsync(EventReportListingArgsDto reportArgsDto, UserAndOrganizationDto userAndOrganization)
         {
             var allOffices = await _officeDbSet
                 .ToDictionaryAsync(office => office.Id, office => office.Name);
@@ -143,7 +143,8 @@ namespace Shrooms.Premium.Domain.Services.Events.List
 
             return await _eventParticipantsDbSet
                 .Include(p => p.ApplicationUser)
-                .Where(p => p.EventId == reportArgsDto.EventId)
+                .Where(p => p.EventId == reportArgsDto.EventId &&
+                            p.ApplicationUser.OrganizationId == userOrg.OrganizationId)
                 .Select(p => new EventParticipantReportDto
                 {
                     Id = p.ApplicationUser.Id,
@@ -166,11 +167,13 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                         .Where(kudos =>
                             (kudosTypesLength == 0 || kudosTypeNames.Contains(kudos.KudosTypeName)) &&
                             (kudos.EmployeeId == p.ApplicationUser.Id) &&
-                            (kudos.Status == KudosStatus.Approved))
+                            (kudos.Status == KudosStatus.Approved) &&
+                            (kudos.OrganizationId == userOrg.OrganizationId))
                         .Sum(kudos => kudos.Points),
                     VisitedEvents = p.ApplicationUser.Events
                             .Where(visited => (visited.EndDate < DateTime.UtcNow) &&
-                                              (eventTypesLength == 0 || reportArgsDto.EventTypeIds.Contains(visited.EventType.Id)))
+                                              (eventTypesLength == 0 || reportArgsDto.EventTypeIds.Contains(visited.EventType.Id)) &&
+                                              (visited.OrganizationId == userOrg.OrganizationId))
                             .Take(50)
                             .Select(visited => new EventVisitedReportDto
                             {
@@ -180,7 +183,6 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                                 StartDate = visited.StartDate,
                                 EndDate = visited.EndDate
                             })
-                            .Distinct()
                             .OrderByDescending(visited => visited.EndDate)
                             .ToList()
                 })

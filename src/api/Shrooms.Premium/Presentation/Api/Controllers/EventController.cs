@@ -600,7 +600,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             try
             {
                 var reportArgsDto = _mapper.Map<EventReportListingArgsViewModel, EventReportListingArgsDto>(reportArgsViewModel);
-                var eventListItemsPagedDto = await _eventListingService.GetEventsFilteredByTitleAsync(reportArgsDto, GetUserAndOrganization());
+                var eventListItemsPagedDto = await _eventListingService.GetNotStartedEventsFilteredByTitleAsync(reportArgsDto, GetUserAndOrganization());
                 var eventListItemsViewModel = _mapper.Map<IEnumerable<EventDetailsListItemDto>, IEnumerable<EventDetailsListItemViewModel>>(eventListItemsPagedDto);
                 var pagedModel = new StaticPagedList<EventDetailsListItemViewModel>(eventListItemsViewModel, reportArgsViewModel.Page, reportArgsViewModel.PageSize, eventListItemsPagedDto.TotalItemCount);
 
