@@ -56,6 +56,8 @@ namespace Shrooms.Tests.Mocks
 
         public List<VacationPage> VacationPages { get; set; }
 
+        public List<FilterPreset> FilterPresets { get; set; }
+
         public List<MockModel> MockModels { get; set; }
 
         public string ConnectionName => "SimoonaTest";
