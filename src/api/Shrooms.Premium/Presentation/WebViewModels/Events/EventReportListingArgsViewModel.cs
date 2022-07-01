@@ -7,7 +7,6 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
 {
     public class EventReportListingArgsViewModel : IPageable, ISortableProperty
     {
-        [Required]
         [MaxLength(Contracts.Constants.ValidationConstants.MaxCommentMessageBodyLength)]
         public string SearchString { get; set; }
 
