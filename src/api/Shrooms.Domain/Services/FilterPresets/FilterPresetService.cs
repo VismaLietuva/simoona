@@ -40,11 +40,6 @@ namespace Shrooms.Domain.Services.FilterPresets
             _eventTypeDbSet = uow.GetDbSet<EventType>();
         }
 
-        public bool UpdatingFilterPresets 
-        {
-            get => _filterPresetUpdateCreateLock.CurrentCount == 0;
-        }
-
         public async Task<IEnumerable<FilterPresetDto>> GetPresetsForPageAsync(PageType type, int organizationId)
         {
             _validator.CheckIfPageTypeExists(type);
