@@ -8,39 +8,36 @@ namespace Shrooms.Domain.Extensions
 {
     public static class DbSetExtensions
     {
+        private const string DefaultSortDirection = "desc";
+
         public static IQueryable<TEntity> OrderByPropertyName<TEntity>(
             this IQueryable<TEntity> query, 
             ISortableProperty sortableProperty) where TEntity : class
         {
             return query.OrderByPropertyName(sortableProperty.SortByColumnName, sortableProperty.SortDirection);
         }
-
+        
         public static IQueryable<TEntity> OrderByPropertyName<TEntity>(
             this IQueryable<TEntity> query, 
             string propertyName,
             string sortDirection) where TEntity : class
         {
-            if (propertyName == null || sortDirection == null)
+            sortDirection = sortDirection?.ToLower();
+            
+            if (sortDirection == null || (sortDirection != "asc" && sortDirection != "desc"))
             {
-                return query.OrderByFirstPropertyName();
+                sortDirection = DefaultSortDirection;
             }
 
-            sortDirection = sortDirection.ToLower();
-
-            if (sortDirection != "asc" && sortDirection != "desc")
+            if (propertyName == null || !EntityHasProperty<TEntity>(propertyName))
             {
-                throw new ValidationException("Sort direction does not exist");
-            }
-
-            if (!EntityHasProperty<TEntity>(propertyName))
-            {
-                return query.OrderByFirstPropertyName();
+                return query.OrderByFirstPropertyName(sortDirection);
             }
 
             return query.OrderBy(string.Format("{0} {1}", propertyName, sortDirection));
         }
 
-        private static IQueryable<TEntity> OrderByFirstPropertyName<TEntity>(this IQueryable<TEntity> query)
+        private static IQueryable<TEntity> OrderByFirstPropertyName<TEntity>(this IQueryable<TEntity> query, string sortDirection)
         {
             var firstProperty = typeof(TEntity)
                     .GetProperties(BindingFlags.Public | BindingFlags.Instance)
@@ -51,7 +48,7 @@ namespace Shrooms.Domain.Extensions
                 throw new ValidationException($"Entity has to have at least one property");
             }
 
-            return query.OrderBy(string.Format("{0} {1}", firstProperty.Name, "desc"));
+            return query.OrderBy(string.Format("{0} {1}", firstProperty.Name, sortDirection));
         }
 
         private static bool EntityHasProperty<TEntity>(string propertyName) where TEntity : class
