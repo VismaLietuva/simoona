@@ -2,7 +2,7 @@
 {
     public enum PageType
     {
-        EventDetailsList,
-        ExtensiveEventDetails
+        EventReportList,
+        EventReport
     }
 }

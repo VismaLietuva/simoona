@@ -83,7 +83,7 @@ namespace Shrooms.Tests.Controllers.WebApi
             _filterPresetService.GetPresetsForPageAsync(Arg.Any<PageType>(), Arg.Any<int>())
                 .Returns(Enumerable.Empty<FilterPresetDto>());
 
-            var pageType = PageType.EventDetailsList;
+            var pageType = PageType.EventReportList;
 
             // Act
             var httpActionResult = await _filterPresetController.GetPresets(pageType);
@@ -100,7 +100,7 @@ namespace Shrooms.Tests.Controllers.WebApi
             _filterPresetService.GetPresetsForPageAsync(Arg.Any<PageType>(), Arg.Any<int>())
                 .Throws(new ValidationException(0));
 
-            var pageType = PageType.EventDetailsList;
+            var pageType = PageType.EventReportList;
             
             // Act
             var httpActionResult = await _filterPresetController.GetPresets(pageType);

@@ -50,7 +50,7 @@ namespace Shrooms.Tests.DomainService.Validators
         public void Should_Not_Throw_If_PageType_Exists()
         {
             // Arrange
-            var validPageType = PageType.ExtensiveEventDetails;
+            var validPageType = PageType.EventReport;
 
             // Assert
             Assert.DoesNotThrow(() => _filterPresetValidator.CheckIfPageTypeExists(validPageType));
