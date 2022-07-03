@@ -159,7 +159,7 @@
                                 </ace-sort-link>
                             </th>
 
-                            <th>
+                            <th class="event-report-visited-events">
                                 <ace-sort-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="visitedEvents.Count">
                                     <span translate="events.tableEvents"></span>
                                 </ace-sort-link>
@@ -171,7 +171,7 @@
                                 </ace-sort-link>
                             </th>
 
-                            <th class="hidden-xs hidden-sm" ng-if="vm.showActionsColumn" translate="events.tableAction">
+                            <th class="hidden-xs hidden-sm event-report-action" ng-if="vm.showActionsColumn" translate="events.tableAction">
                             </th>
                         </tr>
                     </thead>
@@ -211,7 +211,7 @@
                             </td>
 
                             <!-- Events -->
-                            <td class="col-xs-2" ng-cloak>
+                            <td class="col-xs-2 event-report-visited-events" ng-cloak>
                                 <span ng-if="!participant.visitedEvents.length" translate="events.empty"></span>
                                 <ul class="event-report-event-list" ng-if="participant.visitedEvents.length">
                                     <li ng-if="!participant.isExpanded"
@@ -243,7 +243,7 @@
                             </td>
 
                             <!-- Expand button -->
-                            <td class="col-xs-1 hidden-xs hidden-sm ml-5 text-center" ng-if="vm.showActionsColumn">
+                            <td class="col-xs-1 hidden-xs hidden-sm ml-5 text-center event-report-action" ng-if="vm.showActionsColumn">
                                 <ace-expand-button ng-if="participant.canBeExpanded"
                                     is-expanded="participant.isExpanded"></ace-expand-button>
                             </td>
