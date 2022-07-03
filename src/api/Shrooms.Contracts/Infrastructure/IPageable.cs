@@ -2,8 +2,8 @@
 {
     public interface IPageable
     {
-        public int Page { get; set; }
+        int Page { get; set; }
 
-        public int PageSize { get; set; }
+        int PageSize { get; set; }
     }
 }

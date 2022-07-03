@@ -2,8 +2,8 @@
 {
     public interface ISortableProperty
     {
-        public string SortByColumnName { get; set; }
+        string SortByColumnName { get; set; }
 
-        public string SortDirection { get; set; }
+        string SortDirection { get; set; }
     }
 }
