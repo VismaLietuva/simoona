@@ -217,8 +217,11 @@
                                     <li ng-if="!participant.isExpanded"
                                         ng-repeat="event in participant.visitedEvents | limitTo: vm.visitedEventsPreviewCount track by $index">
                                         <a
+                                            class="event-report-event-name"
                                             ui-sref=" Root.WithOrg.Client.Events.EventContent({ id: event.id })">{{event.name}}</a>
-                                        <span ng-if="participant.canBeExpanded &&
+                                        <span
+                                            class="event-report-more-visited"
+                                            ng-if="participant.canBeExpanded &&
                                                         !participant.isExpanded &&
                                                         $index === vm.visitedEventsPreviewCount - 1"
                                             translate="events.moreCount" translate-values="{ one: participant.visitedEvents.length -
