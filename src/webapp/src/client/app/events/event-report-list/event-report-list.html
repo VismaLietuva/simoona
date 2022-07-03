@@ -11,7 +11,7 @@
                         <ace-filter-preset ng-if="!vm.isLoading.filters" filter-page-type="{{vm.filter.pageType}}"
                             loaded-filter-types="vm.filter.filterTypes" on-value-change="vm.applyFilterPreset(preset)"
                             class="pull-right" modal-size="lg"
-                            ng-class="{ 'hidden' : vm.isLoading.events && !vm.eventDetails }"></ace-filter-preset>
+                            ng-class="{ 'hidden' : vm.isLoading.filters }"></ace-filter-preset>
                     </div>
                 </div>
             </div>
