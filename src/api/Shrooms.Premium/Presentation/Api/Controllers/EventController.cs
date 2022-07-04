@@ -202,6 +202,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
         public async Task<IHttpActionResult> GetMyEvents([FromUri] MyEventsOptionsViewModel options)
         {
+            if (options == null || !ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
             int? officeIdNullable = null;
 
             if (options.OfficeId != "all" && int.TryParse(options.OfficeId, out var officeIdParsed))

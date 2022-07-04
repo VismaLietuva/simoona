@@ -10,6 +10,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
 
         public MyEventsOptions Filter { get; set; }
 
+        [Required]
         public string OfficeId { get; set; }
 
         [Range(1, int.MaxValue)]
