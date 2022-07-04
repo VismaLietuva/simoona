@@ -360,6 +360,10 @@
             for (var i = 0; i < vm.controls.length; i++) {
                 var preset = vm.controls[i];
 
+                if (preset.isNew && preset.isDeleted) {
+                    continue;
+                }
+
                 if (preset.isDeleted && !preset.isNew) {
                     presetsToDelete.push(preset.id);
                 } else if (preset.isNew && !preset.isDeleted) {
