@@ -17,7 +17,6 @@ using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.DataTransferObjects.Models.OfficeMap;
 using Shrooms.Premium.Domain.DomainExceptions.Event;
-using Shrooms.Premium.Domain.Services.Args;
 using Shrooms.Premium.Domain.Services.Events;
 using Shrooms.Premium.Domain.Services.Events.Calendar;
 using Shrooms.Premium.Domain.Services.Events.Export;
@@ -105,16 +104,25 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
         public async Task<IHttpActionResult> GetEventsFiltered([FromUri] EventFilteredArgsViewModel filteredArgsViewModel)
         {
-            var filteredArgsDto = _mapper.Map<EventFilteredArgsViewModel, EventFilteredArgsDto>(filteredArgsViewModel);
+            EventFilteredArgsDto filteredArgsDto;
 
-            if (int.TryParse(filteredArgsDto.TypeId, out var typeIdParsed))
+            if (filteredArgsViewModel != null)
             {
-                filteredArgsDto.TypeIdParsed = typeIdParsed;
+                filteredArgsDto = _mapper.Map<EventFilteredArgsViewModel, EventFilteredArgsDto>(filteredArgsViewModel);
+
+                if (int.TryParse(filteredArgsDto.TypeId, out var typeIdParsed))
+                {
+                    filteredArgsDto.TypeIdParsed = typeIdParsed;
+                }
+
+                if (int.TryParse(filteredArgsDto.OfficeId, out var officeIdParsed))
+                {
+                    filteredArgsDto.OfficeIdParsed = officeIdParsed;
+                }
             }
-
-            if (int.TryParse(filteredArgsDto.OfficeId, out var officeIdParsed))
+            else
             {
-                filteredArgsDto.OfficeIdParsed = officeIdParsed;
+                filteredArgsDto = new EventFilteredArgsDto();
             }
 
             try
