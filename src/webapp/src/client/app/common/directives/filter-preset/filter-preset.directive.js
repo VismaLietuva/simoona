@@ -67,13 +67,33 @@
                 .then(function() {
                     // Enable scrolling after modal is closed
                     $(":root").css("overflow-y", '');
+
+                    // Reload <select> in case the selected preset was changed through code
+                    if (scope.selectedPresetWasDeleted)
+                    {
+                        reloadSelect();
+
+                        scope.selectedPresetWasDeleted = false;
+                    }
                 });
             });
+
+            scope.reloading = false;
+            scope.selectedPresetWasDeleted = false;
 
             scope.sendSelectedPresetValues = sendSelectedPresetValues;
             scope.loadFilterPresets = loadFilterPresets;
 
             loadFilterPresets(scope.filterPageType);
+
+            function reloadSelect() {
+                scope.reloading = true;
+
+                setTimeout(() => {
+                    scope.reloading = false;
+                    sendSelectedPresetValues(scope.selectedPreset);
+                });
+            }
 
             function loadFilterPresets(filterPageType) {
                 filterPresetRepository.getPresetsForPage(filterPageType).then(
@@ -103,6 +123,10 @@
             }
 
             function sendSelectedPresetValues(selectedPreset) {
+                if (scope.selectedPresetWasDeleted) {
+                    return;
+                }
+
                 if (!selectedPreset) {
                     scope.onValueChange({
                         preset: undefined
@@ -318,6 +342,7 @@
             // Selecting the first preset if in previous steps the default/selected preset was removed
             if (!scope.selectedPreset) {
                 if (vm.presets.length > 0) {
+                    scope.selectedPresetWasDeleted = true;
                     scope.selectedPreset = vm.presets[0];
                 }
             }
