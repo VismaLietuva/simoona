@@ -93,7 +93,13 @@
         // This function is called after aceFilterPreset is initialized
         function applyFilterPreset(preset) {
             onCompleteLoadFirstPage(function() {
+                if (vm.currentPreset === preset) {
+                    return;
+                }
+
                 if (!preset) {
+                    vm.currentPreset = preset;
+
                     loadEventsOnPage(1);
 
                     return;
@@ -126,6 +132,7 @@
 
         function loadEventsOnPage(page) {
             vm.page = page;
+
             loadEvents();
         }
     }
