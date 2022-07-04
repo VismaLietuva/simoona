@@ -124,7 +124,10 @@ namespace Shrooms.Premium.Domain.Services.Events.List
 
             foreach (var e in events)
             {
-                e.OfficeNames = e.OfficeIds.Select(officeId => allOffices[int.Parse(officeId)]);
+                e.OfficeNames = e.OfficeIds
+                    .Select(officeId => allOffices.TryGetValue(int.Parse(officeId), out var value) ? value : string.Empty)
+                    .Where(name => name != string.Empty);
+
                 e.IsForAllOffices = e.OfficeIds.Count() == officesCount;
             }
 
