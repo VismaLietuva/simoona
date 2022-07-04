@@ -211,5 +211,6 @@
   "presetConfigurationTableEvents": "Renginiai",
   "presetConfigurationTableOffices": "Ofisai",
   "presetConfigurationTableKudos": "Kudos",
-  "presetConfigurationTableName": "Pavadinimas"
+  "presetConfigurationTableName": "Pavadinimas",
+  "updating": "Atnaujinama..."
 }

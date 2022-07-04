@@ -211,5 +211,6 @@
   "presetConfigurationTableEvents": "Events",
   "presetConfigurationTableOffices": "Offices",
   "presetConfigurationTableKudos": "Kudos",
-  "presetConfigurationTableName": "Name"
+  "presetConfigurationTableName": "Name",
+  "updating": "Updating..."
 }
