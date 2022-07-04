@@ -25,8 +25,6 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
 
         public decimal? Kudos { get; set; }
 
-        public ICollection<string> PreviouslyAttendedConferences { get; set; }
-
         public ICollection<EventVisitedReportViewModel> VisitedEvents { get; set; }
 
         public ICollection<EventProjectReportViewModel> Projects { get; set; }
