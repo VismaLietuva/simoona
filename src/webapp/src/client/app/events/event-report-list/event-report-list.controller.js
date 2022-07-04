@@ -26,7 +26,7 @@
         var vm = this;
 
         vm.isLoading = {
-            controls: true,
+            filters: true,
             events: true
         };
 
@@ -52,14 +52,14 @@
         }
 
         function loadFilters() {
-            vm.isLoading.controls = true;
+            vm.isLoading.filters = true;
 
             filterPresetRepository
                 .getFilters([filterTypes.events, filterTypes.offices])
                 .then(
                     function (result) {
                         vm.filter.setFilterTypes(result);
-                        vm.isLoading.controls = false;
+                        vm.isLoading.filters = false;
                     },
                     function () {
                         notifySrv.error('errorCodeMessages.messageError');
