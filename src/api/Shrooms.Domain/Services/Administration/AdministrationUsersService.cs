@@ -179,7 +179,7 @@ namespace Shrooms.Domain.Services.Administration
 
             await SetWelcomeKudosAsync(applicationUser);
 
-            await AddUserToWallsForNewUsers(userAndOrg);
+            await AddWallsToNewUser(applicationUser, userAndOrg);
             await _uow.SaveChangesAsync(userAndOrg.UserId);
         }
 
@@ -490,20 +490,19 @@ namespace Shrooms.Domain.Services.Administration
             return filteredUsers?.ToList() ?? administrationUsers;
         }
 
-        private async Task<IEnumerable<DataLayer.EntityModels.Models.Multiwall.Wall>> GetWallsForNewUsersAsync(UserAndOrganizationDto userOrg)
+        private async Task<IList<DataLayer.EntityModels.Models.Multiwall.Wall>> GetWallsToAddForNewUserAsync(ApplicationUser applicationUser)
         {
             return await _wallsDbSet
                 .Include(wall => wall.Members)
-                .Where(wall => wall.OrganizationId == userOrg.OrganizationId &&
-                       wall.Members.All(m => m.UserId != userOrg.UserId) &&
-                       (wall.Type == WallType.Main || (wall.AddForNewUsers && 
-                                                       wall.Type == WallType.UserCreated)))
+                .Where(wall => wall.OrganizationId == applicationUser.OrganizationId &&
+                    (wall.Type == WallType.Main || (wall.AddForNewUsers && wall.Type == WallType.UserCreated)) &&
+                    wall.Members.All(m => m.UserId != applicationUser.Id))
                 .ToListAsync();
         }
 
-        private async Task AddUserToWallsForNewUsers(UserAndOrganizationDto userOrg)
+        private async Task AddWallsToNewUser(ApplicationUser applicationUser, UserAndOrganizationDto userOrg)
         {
-            var walls = await GetWallsForNewUsersAsync(userOrg);
+            var walls = await GetWallsToAddForNewUserAsync(applicationUser);
 
             if (!walls.Any())
             {
@@ -516,7 +515,7 @@ namespace Shrooms.Domain.Services.Administration
             {
                 var wallMember = new WallMember
                 {
-                    UserId = userOrg.UserId,
+                    UserId = applicationUser.Id,
                     Wall = wall,
                     CreatedBy = userOrg.UserId,
                     ModifiedBy = userOrg.UserId,
