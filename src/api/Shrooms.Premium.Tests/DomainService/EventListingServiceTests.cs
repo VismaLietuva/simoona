@@ -336,15 +336,15 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
-        public async Task Should_Return_Paged_Report_Participants()
+        public async Task Should_Return_Report_Participants()
         {
             // Arrange
-            var eventId = MockEventsListTest()[4];
+            var eventWithParticipants = MockEventReportParticipantsTest()[0];
             var expectedParticipantCount = 2;
 
             var reportListingArgs = new EventParticipantsReportListingArgsDto
             {
-                EventId = eventId,
+                EventId = eventWithParticipants.Id,
                 KudosTypeIds = Enumerable.Empty<int>(),
                 EventTypeIds = Enumerable.Empty<int>(),
                 Page = 1,
@@ -353,7 +353,7 @@ namespace Shrooms.Premium.Tests.DomainService
 
             var userOrg = new UserAndOrganizationDto
             {
-                OrganizationId = 2,
+                OrganizationId = 3,
                 UserId = Guid.NewGuid().ToString()
             };
 
@@ -361,21 +361,19 @@ namespace Shrooms.Premium.Tests.DomainService
             var result = await _eventListingService.GetReportParticipantsAsync(reportListingArgs, userOrg);
 
             // Arrange
-            Assert.IsInstanceOf<IPagedList>(result);
             Assert.AreEqual(expectedParticipantCount, result.Count());
         }
 
         [Test]
-        public async Task Should_Return_Paged_Report_Participants_With_Filtered_VisitedEvents()
+        public async Task Should_Return_Report_Participants_With_Filtered_VisitedEvents()
         {
             // Arrange
-            var eventId = MockEventsListTest()[5];
-            var expectedParticipantCount = 1;
+            var eventWithParticipants = MockEventReportParticipantsTest()[0];
             var expectedVisitedEventsCount = 2;
 
             var reportListingArgs = new EventParticipantsReportListingArgsDto
             {
-                EventId = eventId,
+                EventId = eventWithParticipants.Id,
                 KudosTypeIds = Enumerable.Empty<int>(),
                 EventTypeIds = new List<int> { 1 },
                 Page = 1,
@@ -392,23 +390,19 @@ namespace Shrooms.Premium.Tests.DomainService
             var result = await _eventListingService.GetReportParticipantsAsync(reportListingArgs, userOrg);
 
             // Arrange
-            Assert.IsInstanceOf<IPagedList>(result);
-            Assert.AreEqual(expectedParticipantCount, result.Count());
             Assert.AreEqual(expectedVisitedEventsCount, result.First().VisitedEvents.Count);
             Assert.That(result.First().VisitedEvents, Is.All.Matches<EventVisitedReportDto>(visited => visited.TypeName == "Cool type"));
         }
 
         [Test]
-        public async Task Should_Return_Paged_Report_Participants_With_Only_Ended_Visited_Events()
+        public async Task Should_Return_Report_Participants_With_Only_Ended_Visited_Events()
         {
             // Arrange
-            var eventId = MockEventsListTest()[5];
-            var expectedParticipantCount = 1;
-            var expectedVisitedEventsCount = 3;
+            var eventWithParticipants = MockEventReportParticipantsTest()[0];
 
             var reportListingArgs = new EventParticipantsReportListingArgsDto
             {
-                EventId = eventId,
+                EventId = eventWithParticipants.Id,
                 KudosTypeIds = Enumerable.Empty<int>(),
                 EventTypeIds = Enumerable.Empty<int>(),
                 Page = 1,
@@ -425,19 +419,15 @@ namespace Shrooms.Premium.Tests.DomainService
             var result = await _eventListingService.GetReportParticipantsAsync(reportListingArgs, userOrg);
 
             // Arrange
-            Assert.IsInstanceOf<IPagedList>(result);
-            Assert.AreEqual(expectedParticipantCount, result.Count());
-            Assert.AreEqual(expectedVisitedEventsCount, result.First().VisitedEvents.Count);
             Assert.That(result.First().VisitedEvents, Is.All.Matches<EventVisitedReportDto>(visited => visited.EndDate < DateTime.UtcNow));
         }
 
         [Test]
-        public async Task Should_Return_Paged_Report_Participants_With_Visited_Events_Ordered_By_Descending_End_Date()
+        public async Task Should_Return_Report_Participants_With_Visited_Events_Ordered_By_Descending_End_Date()
         {
             // Arrange
-            var eventId = MockEventsListTest()[5];
-            var expectedParticipantCount = 1;
-            var expectedVisitedEventsCount = 3;
+            var eventWithParticipants = MockEventReportParticipantsTest()[0];
+
             var expectedOrder = new List<int>
             {
                 DateTime.UtcNow.AddDays(-1).DayOfYear,
@@ -447,7 +437,7 @@ namespace Shrooms.Premium.Tests.DomainService
 
             var reportListingArgs = new EventParticipantsReportListingArgsDto
             {
-                EventId = eventId,
+                EventId = eventWithParticipants.Id,
                 KudosTypeIds = Enumerable.Empty<int>(),
                 EventTypeIds = Enumerable.Empty<int>(),
                 Page = 1,
@@ -464,9 +454,6 @@ namespace Shrooms.Premium.Tests.DomainService
             var result = await _eventListingService.GetReportParticipantsAsync(reportListingArgs, userOrg);
 
             // Arrange
-            Assert.IsInstanceOf<IPagedList>(result);
-            Assert.AreEqual(expectedParticipantCount, result.Count());
-            Assert.AreEqual(expectedVisitedEventsCount, result.First().VisitedEvents.Count);
             CollectionAssert.AreEqual(expectedOrder, result.First().VisitedEvents.Select(visited => visited.EndDate.DayOfYear));
         }
 
@@ -474,15 +461,14 @@ namespace Shrooms.Premium.Tests.DomainService
         public async Task Should_Return_Paged_Report_Participants_With_Not_Filtered_Kudos_And_Includes_Only_Approved()
         {
             // Arrange
-            var eventId = MockEventsListTest()[5];
-            var expectedParticipantCount = 1;
+            var eventWithParticipants = MockEventReportParticipantsTest()[0];
             var expectedKudosPoints = 30;
-
             var reportListingArgs = new EventParticipantsReportListingArgsDto
             {
-                EventId = eventId,
+                EventId = eventWithParticipants.Id,
                 KudosTypeIds = Enumerable.Empty<int>(),
                 EventTypeIds = Enumerable.Empty<int>(),
+                SortByColumnName = "Kudos",
                 Page = 1,
                 PageSize = 10
             };
@@ -497,24 +483,21 @@ namespace Shrooms.Premium.Tests.DomainService
             var result = await _eventListingService.GetReportParticipantsAsync(reportListingArgs, userOrg);
 
             // Arrange
-            Assert.IsInstanceOf<IPagedList>(result);
-            Assert.AreEqual(expectedParticipantCount, result.Count());
             Assert.AreEqual(expectedKudosPoints, result.First().Kudos);
         }
 
         [Test]
-        public async Task Should_Return_Paged_Report_Participants_With_Filtered_Kudos_And_Includes_Only_Approved()
+        public async Task Should_Return_Report_Participants_With_Filtered_Kudos_And_Includes_Only_Approved()
         {
             // Arrange
-            var eventId = MockEventsListTest()[5];
-            var expectedParticipantCount = 1;
+            var eventWithParticipants = MockEventReportParticipantsTest()[0];
             var expectedKudosPoints = 20;
-
             var reportListingArgs = new EventParticipantsReportListingArgsDto
             {
-                EventId = eventId,
+                EventId = eventWithParticipants.Id,
                 KudosTypeIds = new List<int> { 1 },
                 EventTypeIds = Enumerable.Empty<int>(),
+                SortByColumnName = "Kudos",
                 Page = 1,
                 PageSize = 10
             };
@@ -529,8 +512,6 @@ namespace Shrooms.Premium.Tests.DomainService
             var result = await _eventListingService.GetReportParticipantsAsync(reportListingArgs, userOrg);
 
             // Arrange
-            Assert.IsInstanceOf<IPagedList>(result);
-            Assert.AreEqual(expectedParticipantCount, result.Count());
             Assert.AreEqual(expectedKudosPoints, result.First().Kudos);
         }
 
@@ -620,9 +601,263 @@ namespace Shrooms.Premium.Tests.DomainService
             return guids;
         }
 
+        private IList<Event> MockEventReportParticipantsTest()
+        {
+            var events = new List<Event>
+            {
+                new Event
+                {
+                    Id = Guid.NewGuid(),
+                    EndDate = DateTime.UtcNow.AddDays(-1),
+                    StartDate = DateTime.UtcNow.AddDays(-2),
+                    EventType = new EventType
+                    {
+                        Id = 1,
+                        Name = "Cool type"
+                    },
+                    OrganizationId = 3,
+                    Name = "Some kind of event",
+                    EventParticipants = new List<EventParticipant>(),
+                },
+
+                new Event
+                {
+                    Id = Guid.NewGuid(),
+                    EndDate = DateTime.UtcNow.AddDays(-2),
+                    StartDate = DateTime.UtcNow.AddDays(-3),
+                    EventType = new EventType
+                    {
+                        Id = 2,
+                        Name = "Awesome type"
+                    },
+                    OrganizationId = 3,
+                    Name = "Racing",
+                    EventParticipants = new List<EventParticipant>(),
+                },
+
+                new Event
+                {
+                    Id = Guid.NewGuid(),
+                    EndDate = DateTime.UtcNow.AddDays(-3),
+                    StartDate = DateTime.UtcNow.AddDays(-4),
+                    EventType = new EventType
+                    {
+                        Id = 1,
+                        Name = "Cool type"
+                    },
+                    OrganizationId = 3,
+                    Name = "Running",
+                    EventParticipants = new List<EventParticipant>(),
+                }
+            };
+
+            var participantUserIds = Enumerable.Repeat(0, 2).Select(_ => Guid.NewGuid().ToString()).ToList();
+
+            var kudosLogs = new List<KudosLog>
+            {
+                new KudosLog
+                {
+                    EmployeeId = participantUserIds[0],
+                    Status = KudosStatus.Approved,
+                    OrganizationId = 3,
+                    Points = 10,
+                    KudosTypeName = "Some name"
+                },
+
+                new KudosLog
+                {
+                    EmployeeId = participantUserIds[0],
+                    Status = KudosStatus.Approved,
+                    OrganizationId = 3,
+                    Points = 10,
+                    KudosTypeName = "Some name"
+                },
+
+                new KudosLog
+                {
+                    EmployeeId = participantUserIds[0],
+                    Status = KudosStatus.Pending,
+                    OrganizationId = 3,
+                    Points = 10,
+                    KudosTypeName = "Some name"
+                },
+
+                new KudosLog
+                {
+                    EmployeeId = participantUserIds[0],
+                    Status = KudosStatus.Rejected,
+                    OrganizationId = 3,
+                    Points = 10,
+                    KudosTypeName = "Some name"
+                },
+
+                new KudosLog
+                {
+                    EmployeeId = participantUserIds[0],
+                    Status = KudosStatus.Approved,
+                    OrganizationId = 3,
+                    Points = 10,
+                    KudosTypeName = "Awesome type over here"
+                }
+            };
+
+            var offices = new List<Office>
+            {
+                new Office
+                {
+                    Id = 1,
+                    Name = "First office"
+                },
+
+                new Office
+                {
+                    Id = 2,
+                    Name = "Second office"
+                }
+            };
+
+            var kudosTypes = new List<KudosType>
+            {
+                new KudosType
+                {
+                    Id = 1,
+                    Name = "Some name"
+                },
+
+                new KudosType
+                {
+                    Id = 2,
+                    Name = "Awesome type over here"
+                }
+            };
+
+            var managerId = Guid.NewGuid().ToString();
+
+            var participants = new List<EventParticipant>
+            {
+                new EventParticipant
+                {
+                    EventId = events[0].Id,
+                    ApplicationUserId = participantUserIds[0],
+                    ApplicationUser = new ApplicationUser
+                    {
+                        Id = participantUserIds[0],
+                        FirstName = "Arnold",
+                        LastName = "Something",
+                        EmploymentDate = DateTime.UtcNow,
+                        OrganizationId = 3,
+                        QualificationLevel = new QualificationLevel
+                        {
+                            Name = "Junior"
+                        },
+                        JobPosition = new JobPosition
+                        {
+                            Title = ".NET Developer"
+                        },
+                        Manager = new ApplicationUser
+                        {
+                            Id = managerId,
+                            FirstName = "Jonas",
+                            LastName = "Ma"
+                        },
+                        Projects = new List<Project>
+                        {
+                            new Project
+                            {
+                                Id = 1,
+                                Name = "Cool project"
+                            }
+                        }
+                    }
+                },
+                new EventParticipant
+                {
+                    EventId = events[1].Id,
+                    ApplicationUserId = participantUserIds[0],
+                    ApplicationUser = new ApplicationUser
+                    {
+                        Id = participantUserIds[0],
+                        FirstName = "Arnold",
+                        LastName = "Something",
+                        EmploymentDate = DateTime.UtcNow,
+                        OrganizationId = 3,
+                        QualificationLevel = new QualificationLevel
+                        {
+                            Name = "Junior"
+                        },
+                        JobPosition = new JobPosition
+                        {
+                            Title = ".NET Developer"
+                        },
+                        Manager = new ApplicationUser
+                        {
+                            Id = managerId,
+                            FirstName = "Jonas",
+                            LastName = "Ma"
+                        },
+                        Projects = new List<Project>
+                        {
+                            new Project
+                            {
+                                Id = 1,
+                                Name = "Cool project"
+                            }
+                        }
+                    }
+                },
+                new EventParticipant
+                {
+                    EventId = events[0].Id,
+                    ApplicationUserId = participantUserIds[1],
+                    ApplicationUser = new ApplicationUser
+                    {
+                        Id = participantUserIds[1],
+                        OrganizationId = 3,
+                        FirstName = "Joker",
+                        LastName = "Something",
+                        EmploymentDate = DateTime.UtcNow,
+                        QualificationLevel = new QualificationLevel
+                        {
+                            Name = "Junior"
+                        },
+                        JobPosition = new JobPosition
+                        {
+                            Title = ".NET Developer"
+                        },
+                        Manager = new ApplicationUser
+                        {
+                            Id = managerId,
+                            FirstName = "Jonas",
+                            LastName = "Ma"
+                        },
+                        Projects = new List<Project>
+                        {
+                            new Project
+                            {
+                                Id = 1,
+                                Name = "Cool project"
+                            }
+                        }
+                    }
+                },
+            };
+
+            events[0].EventParticipants = participants;
+            events[1].EventParticipants = participants;
+            events[2].EventParticipants = participants;
+
+            _eventsDbSet.SetDbSetDataForAsync(events);
+            _officeDbSet.SetDbSetDataForAsync(offices);
+            _kudosLogDbSet.SetDbSetDataForAsync(kudosLogs);
+            _kudosTypesDbSet.SetDbSetDataForAsync(kudosTypes);
+            _eventParticipantsDbSet.SetDbSetDataForAsync(participants);
+
+            return events;
+        }
+
         private Guid[] MockEventsListTest()
         {
-            var guids = Enumerable.Repeat(0, 6).Select(_ => Guid.NewGuid()).ToArray();
+            var guids = Enumerable.Repeat(0, 9).Select(_ => Guid.NewGuid()).ToArray();
 
             var participant1 = new EventParticipant
             {
@@ -980,70 +1215,8 @@ namespace Shrooms.Premium.Tests.DomainService
                 }
             };
 
-            var kudosTypes = new List<KudosType>
-            {
-                new KudosType
-                {
-                    Id = 1,
-                    Name = "Some name"
-                },
 
-                new KudosType
-                {
-                    Id = 2,
-                    Name = "Awesome type over here"
-                }
-            };
-
-            var kudosLogs = new List<KudosLog>
-            {
-                new KudosLog
-                {
-                    EmployeeId = "responsibleUserId6",
-                    Status = KudosStatus.Approved,
-                    OrganizationId = 3,
-                    Points = 10,
-                    KudosTypeName = "Some name"
-                },
-                
-                new KudosLog
-                {
-                    EmployeeId = "responsibleUserId6",
-                    Status = KudosStatus.Approved,
-                    OrganizationId = 3,
-                    Points = 10,
-                    KudosTypeName = "Some name"
-                },
-                
-                new KudosLog
-                {
-                    EmployeeId = "responsibleUserId6",
-                    Status = KudosStatus.Pending,
-                    OrganizationId = 3,
-                    Points = 10,
-                    KudosTypeName = "Some name"
-                },
-
-                new KudosLog
-                {
-                    EmployeeId = "responsibleUserId6",
-                    Status = KudosStatus.Rejected,
-                    OrganizationId = 3,
-                    Points = 10,
-                    KudosTypeName = "Some name"
-                },
-
-                new KudosLog
-                {
-                    EmployeeId = "responsibleUserId6",
-                    Status = KudosStatus.Approved,
-                    OrganizationId = 3,
-                    Points = 10,
-                    KudosTypeName = "Awesome type over here"
-                }
-            };
-
-            _eventsDbSet.SetDbSetDataForAsync(events.AsQueryable());
+            _eventsDbSet.SetDbSetDataForAsync(events);
             _eventParticipantsDbSet.SetDbSetDataForAsync(new List<EventParticipant> 
             { 
                 participant1, 
@@ -1054,8 +1227,6 @@ namespace Shrooms.Premium.Tests.DomainService
                 participant6
             });
             _officeDbSet.SetDbSetDataForAsync(offices);
-            _kudosTypesDbSet.SetDbSetDataForAsync(kudosTypes);
-            _kudosLogDbSet.SetDbSetDataForAsync(kudosLogs);
 
             return guids;
         }

@@ -173,21 +173,22 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                             (kudos.Status == KudosStatus.Approved) &&
                             (kudos.OrganizationId == userOrg.OrganizationId))
                         .Sum(kudos => kudos.Points),
-                    VisitedEvents = p.ApplicationUser.Events
-                            .Where(visited => (visited.EndDate < DateTime.UtcNow) &&
-                                              (eventTypesLength == 0 || reportArgsDto.EventTypeIds.Contains(visited.EventType.Id)) &&
-                                              (visited.OrganizationId == userOrg.OrganizationId))
-                            .Take(50)
-                            .Select(visited => new EventVisitedReportDto
-                            {
-                                Id = visited.Id,
-                                Name = visited.Name,
-                                TypeName = visited.EventType.Name,
-                                StartDate = visited.StartDate,
-                                EndDate = visited.EndDate
-                            })
-                            .OrderByDescending(visited => visited.EndDate)
-                            .ToList()
+                    VisitedEvents = _eventsDbSet
+                        .Where(e => e.EventParticipants.Any(participant => participant.ApplicationUserId == p.ApplicationUser.Id) &&
+                                    e.EndDate < DateTime.UtcNow &&
+                                    e.OrganizationId == userOrg.OrganizationId &&
+                                    (eventTypesLength == 0 || reportArgsDto.EventTypeIds.Contains(e.EventType.Id)))
+                        .OrderByDescending(e => e.EndDate)
+                        .Take(50)
+                        .Select(visited => new EventVisitedReportDto
+                        {
+                            Id = visited.Id,
+                            Name = visited.Name,
+                            TypeName = visited.EventType.Name,
+                            StartDate = visited.StartDate,
+                            EndDate = visited.EndDate
+                        })
+                        .ToList()
                 })
                 .OrderByPropertyName(reportArgsDto)
                 .ToPagedListAsync(reportArgsDto.Page, reportArgsDto.PageSize);
