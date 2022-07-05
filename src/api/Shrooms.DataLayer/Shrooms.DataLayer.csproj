@@ -136,6 +136,7 @@
     <Compile Include="DAL\EntityTypeConfigurations\WallConfiguration.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\WallMembersConfiguration.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\WallModeratorsConfiguration.cs" />
+    <Compile Include="DAL\FilterPresetEntityConfig.cs" />
     <Compile Include="DAL\ShroomsContextConfiguration.cs" />
     <Compile Include="DAL\SoftDeleteHandler.cs" />
     <Compile Include="DAL\UnitOfWork2.cs" />
