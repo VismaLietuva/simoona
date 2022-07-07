@@ -2,11 +2,8 @@
 using Shrooms.Tests.Mocks;
 using Shrooms.Domain.Extensions;
 using System.Data.Entity;
-using System.ComponentModel.DataAnnotations;
 using System.Linq.Dynamic;
 using System.Linq;
-using System.Data.Entity.Core.Objects;
-using System.Text;
 
 namespace Shrooms.Tests.Extensions
 {
