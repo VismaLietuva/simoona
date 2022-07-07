@@ -136,6 +136,7 @@
     <Compile Include="DAL\EntityTypeConfigurations\WallConfiguration.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\WallMembersConfiguration.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\WallModeratorsConfiguration.cs" />
+    <Compile Include="DAL\FilterPresetEntityConfig.cs" />
     <Compile Include="DAL\ShroomsContextConfiguration.cs" />
     <Compile Include="DAL\SoftDeleteHandler.cs" />
     <Compile Include="DAL\UnitOfWork2.cs" />
@@ -868,6 +869,14 @@
     <Compile Include="Migrations\202205270910095_AddedAddForNewUsersProperty.Designer.cs">
       <DependentUpon>202205270910095_AddedAddForNewUsersProperty.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202206091029077_AddedFilterPresetEntityModel.cs" />
+    <Compile Include="Migrations\202206091029077_AddedFilterPresetEntityModel.Designer.cs">
+      <DependentUpon>202206091029077_AddedFilterPresetEntityModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202207050924366_AddedPriorityToExternalLink.cs" />
+    <Compile Include="Migrations\202207050924366_AddedPriorityToExternalLink.Designer.cs">
+      <DependentUpon>202207050924366_AddedPriorityToExternalLink.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
@@ -1446,6 +1455,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202205270910095_AddedAddForNewUsersProperty.resx">
       <DependentUpon>202205270910095_AddedAddForNewUsersProperty.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202206091029077_AddedFilterPresetEntityModel.resx">
+      <DependentUpon>202206091029077_AddedFilterPresetEntityModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202207050924366_AddedPriorityToExternalLink.resx">
+      <DependentUpon>202207050924366_AddedPriorityToExternalLink.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

@@ -26,14 +26,16 @@ namespace Shrooms.Domain.Services.ExternalLinks
         public async Task<IEnumerable<ExternalLinkDto>> GetAllAsync(int organizationId)
         {
             var externalLinks = await _externalLinkDbSet
-                .Where(x => x.OrganizationId == organizationId)
-                .Select(x => new ExternalLinkDto
+                .Where(link => link.OrganizationId == organizationId)
+                .Select(link => new ExternalLinkDto
                 {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Url = x.Url,
-                    Type = x.Type
+                    Id = link.Id,
+                    Name = link.Name,
+                    Url = link.Url,
+                    Type = link.Type,
+                    Priority = link.Priority
                 })
+                .OrderByDescending(link => link.Priority)
                 .ToListAsync();
 
             return externalLinks;
@@ -80,7 +82,8 @@ namespace Shrooms.Domain.Services.ExternalLinks
                     Created = timestamp,
                     CreatedBy = updateLinks.UserId,
                     Modified = timestamp,
-                    Type = link.Type
+                    Type = link.Type,
+                    Priority = link.Priority,
                 };
 
                 _externalLinkDbSet.Add(newLink);
@@ -127,6 +130,7 @@ namespace Shrooms.Domain.Services.ExternalLinks
                 link.Modified = timestamp;
                 link.ModifiedBy = updateLinks.UserId;
                 link.Type = updatedLink.Type;
+                link.Priority = updatedLink.Priority;
             }
         }
     }

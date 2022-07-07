@@ -40,7 +40,7 @@ namespace Shrooms.Tests.DomainService
             MockExternalLinks();
 
             var result = (await _externalLinkService.GetAllAsync(2)).ToList();
-            Assert.AreEqual(2, result.Count);
+            Assert.AreEqual(3, result.Count);
             Assert.AreEqual("Test1", result.First().Name);
         }
 
@@ -131,6 +131,21 @@ namespace Shrooms.Tests.DomainService
             Assert.AreEqual(ErrorCodes.DuplicatesIntolerable, ex.ErrorCode);
         }
 
+        [Test]
+        public async Task Should_Return_All_External_Links_In_Descending_Order_By_Priority()
+        {
+            // Arrange
+            MockExternalLinks();
+
+            var expectedIdsOrder = new List<int> { 1, 4, 2 };
+
+            // Act
+            var result = await _externalLinkService.GetAllAsync(2);
+
+            // Assert
+            CollectionAssert.AreEqual(expectedIdsOrder, result.Select(link => link.Id));
+        }
+
         private void MockExternalLinksForCrud()
         {
             var links = new List<ExternalLink>
@@ -181,22 +196,33 @@ namespace Shrooms.Tests.DomainService
                     Id = 1,
                     Name = "Test1",
                     Url = "UrlTest1",
-                    OrganizationId = 2
+                    OrganizationId = 2,
+                    Priority = 10,
                 },
                 new ExternalLink
                 {
                     Id = 2,
                     Name = "Test2",
                     Url = "UrlTest2",
-                    OrganizationId = 2
+                    OrganizationId = 2,
+                    Priority = 0,
                 },
                 new ExternalLink
                 {
                     Id = 3,
                     Name = "Test3",
                     Url = "UrlTest3",
-                    OrganizationId = 1
-                }
+                    OrganizationId = 1,
+                    Priority = 5
+                },
+                new ExternalLink
+                {
+                    Id = 4,
+                    Name = "Test4",
+                    Url = "UrlTest4",
+                    OrganizationId = 2,
+                    Priority = 9,
+                },
             }.AsQueryable();
 
             _externalLinkDbSet.SetDbSetDataForAsync(externalLinks);

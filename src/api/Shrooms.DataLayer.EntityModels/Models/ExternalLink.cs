@@ -9,5 +9,7 @@ namespace Shrooms.DataLayer.EntityModels.Models
         public string Url { get; set; }
 
         public ExternalLinkTypeEnum Type { get; set; }
+
+        public int Priority { get; set; }
     }
 }
