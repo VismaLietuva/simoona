@@ -10,7 +10,7 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
     {
         void CheckIfFilterTypesAreValid(FilterType[] filterTypes);
 
-        void CheckIfFilterTypesContainsDuplicates(FilterType[] filterTypes);
+        void CheckIfFilterTypesContainDuplicates(FilterType[] filterTypes);
 
         void CheckIfPageTypeExists(PageType page);
 

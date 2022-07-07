@@ -160,7 +160,7 @@ namespace Shrooms.Tests
             // Assert
             _filterPresetValidator
                 .Received(1)
-                .CheckIfFilterTypesContainsDuplicates(Arg.Any<FilterType[]>());
+                .CheckIfFilterTypesContainDuplicates(Arg.Any<FilterType[]>());
 
             _filterPresetValidator
                 .Received(1)

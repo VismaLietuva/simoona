@@ -30,7 +30,7 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
             }
         }
 
-        public void CheckIfFilterTypesContainsDuplicates(FilterType[] filterTypes)
+        public void CheckIfFilterTypesContainDuplicates(FilterType[] filterTypes)
         {
             var length = filterTypes.Length;
 

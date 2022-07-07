@@ -105,7 +105,7 @@ namespace Shrooms.Domain.Services.FilterPresets
 
         public async Task<IEnumerable<FiltersDto>> GetFiltersAsync(FilterType[] filterTypes, int organizationId)
         {
-            _validator.CheckIfFilterTypesContainsDuplicates(filterTypes);
+            _validator.CheckIfFilterTypesContainDuplicates(filterTypes);
             _validator.CheckIfFilterTypesAreValid(filterTypes);
 
             var filtersDtos = new List<FiltersDto>();

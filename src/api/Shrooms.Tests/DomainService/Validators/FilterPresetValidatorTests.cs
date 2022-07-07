@@ -68,7 +68,7 @@ namespace Shrooms.Tests.DomainService.Validators
             };
 
             // Assert
-            Assert.Throws<ValidationException>(() => _filterPresetValidator.CheckIfFilterTypesContainsDuplicates(filterTypesWithDuplicates));
+            Assert.Throws<ValidationException>(() => _filterPresetValidator.CheckIfFilterTypesContainDuplicates(filterTypesWithDuplicates));
         }
 
         [Test]
@@ -83,7 +83,7 @@ namespace Shrooms.Tests.DomainService.Validators
             };
 
             // Assert
-            Assert.DoesNotThrow(() => _filterPresetValidator.CheckIfFilterTypesContainsDuplicates(filterTypesWithoutDuplicates));
+            Assert.DoesNotThrow(() => _filterPresetValidator.CheckIfFilterTypesContainDuplicates(filterTypesWithoutDuplicates));
         }
 
         [Test]
@@ -93,7 +93,7 @@ namespace Shrooms.Tests.DomainService.Validators
             var filterTypesEmpty = Array.Empty<FilterType>();
 
             // Assert
-            Assert.DoesNotThrow(() => _filterPresetValidator.CheckIfFilterTypesContainsDuplicates(filterTypesEmpty));
+            Assert.DoesNotThrow(() => _filterPresetValidator.CheckIfFilterTypesContainDuplicates(filterTypesEmpty));
         }
 
         [Test]
