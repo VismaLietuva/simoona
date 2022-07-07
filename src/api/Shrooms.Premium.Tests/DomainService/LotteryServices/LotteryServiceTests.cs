@@ -33,10 +33,12 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
         private IAsyncRunner _asyncRunner;
         private IParticipantService _participantService;
         private IUserService _userService;
+        private ISystemClock _systemClock;
 
         [SetUp]
         public void SetUp()
         {
+            _systemClock = Substitute.For<ISystemClock>();
             _unitOfWork = Substitute.For<IUnitOfWork2>();
             _lotteriesDb = _unitOfWork.MockDbSetForAsync<Lottery>();
             _lotteryParticipantsDb = _unitOfWork.MockDbSetForAsync<LotteryParticipant>();
@@ -49,7 +51,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             var kudosService = Substitute.For<IKudosService>();
             _mapper = Substitute.For<IMapper>();
 
-            _sut = new LotteryService(_unitOfWork, _mapper, _participantService, _userService, kudosService, _asyncRunner);
+            _sut = new LotteryService(_unitOfWork, _mapper, _participantService, _userService, kudosService, _asyncRunner, _systemClock);
         }
 
         [TestCase(0, "Invalid entry fee.")]
@@ -59,6 +61,8 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
         [TestCase(6, "Invalid entry fee.")]
         public void CreateLottery_IncorrectFieldValues_ThrowsException(int index, string message)
         {
+            _systemClock.UtcNow.Returns(DateTime.UtcNow);
+
             var lotteryDto = GetCreateLotteryDtoList()[index];
 
             var result = Assert.ThrowsAsync<LotteryException>(async () => await _sut.CreateLotteryAsync(lotteryDto));
@@ -96,6 +100,17 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             await _sut.EditDraftedLotteryAsync(new LotteryDto());
 
             await _unitOfWork.Received().SaveChangesAsync(false);
+        }
+
+        [Test]
+        public void EditDraftedLottery_EndDateInThePast_ThrowsException()
+        {
+            // Arrange
+            _lotteriesDb.FindAsync().ReturnsForAnyArgs(GetLottery(LotteryStatus.Drafted));
+            _systemClock.UtcNow.Returns(DateTime.UtcNow.AddDays(-1000));
+
+            // Assert
+            Assert.ThrowsAsync<LotteryException>(async () => await _sut.EditDraftedLotteryAsync(new LotteryDto()));
         }
 
         [Test]
@@ -302,6 +317,27 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             Assert.AreEqual("User does not have enough kudos for the purchase.", ex.Message);
         }
 
+        [Test]
+        public async Task BuyLotteryTicketAsync_LotteryAlreadyEnded_ThrowsException()
+        {
+            // Arrange
+            _systemClock.UtcNow.Returns(DateTime.UtcNow.AddDays(-1000));
+
+            MockParticipants();
+            MockLotteries();
+
+            var lotteryId = 1;
+
+            _mapper.Map<Lottery, LotteryDetailsDto>(default).ReturnsForAnyArgs(new LotteryDetailsDto { EntryFee = 1, EndDate = DateTime.UtcNow.AddDays(10) });
+            _userService.GetApplicationUserAsync(default).ReturnsForAnyArgs(new ApplicationUser { RemainingKudos = 100 });
+
+            // Act
+            await _sut.BuyLotteryTicketAsync(new BuyLotteryTicketDto { LotteryId = lotteryId, Tickets = 10 }, GetUserOrg());
+
+            // Assert
+            await _unitOfWork.ReceivedWithAnyArgs().SaveChangesAsync((string)default);
+        }
+
         [TestCase(1)]
         public async Task BuyLotteryTicketAsync_AbleToBuyTickets_BuysSuccessfully(int lotteryId)
         {
@@ -469,7 +505,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
                 Id = 4,
                 OrganizationId = 1,
                 Status = (int)status,
-                EndDate = DateTime.Now.AddDays(5),
+                EndDate = DateTime.UtcNow.AddDays(5),
                 Title = "1000 kudos",
                 EntryFee = 5,
                 IsRefundFailed = false
