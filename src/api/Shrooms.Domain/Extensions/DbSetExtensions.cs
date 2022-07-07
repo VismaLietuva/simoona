@@ -43,11 +43,6 @@ namespace Shrooms.Domain.Extensions
                     .GetProperties(BindingFlags.Public | BindingFlags.Instance)
                     .FirstOrDefault();
 
-            if (firstProperty == null)
-            {
-                throw new ValidationException($"Entity has to have at least one property");
-            }
-
             return query.OrderBy(string.Format("{0} {1}", firstProperty.Name, sortDirection));
         }
 

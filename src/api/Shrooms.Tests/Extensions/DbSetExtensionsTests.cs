@@ -13,12 +13,7 @@ namespace Shrooms.Tests.Extensions
     [TestFixture]
     public class DbSetExtensionsTests
     {
-        private class MockWithoutProperties
-        {
-        }
-
         private DbSet<MockModel> _mockDbSet;
-        private DbSet<MockWithoutProperties> _mockWithoutPropertiesDbSet;
 
         [SetUp]
         public void TestInitializer()
@@ -26,7 +21,6 @@ namespace Shrooms.Tests.Extensions
             var mockDbContext = new MockDbContext();
 
             _mockDbSet = mockDbContext.Set<MockModel>();
-            _mockWithoutPropertiesDbSet = mockDbContext.Set<MockWithoutProperties>();
         }
 
         [Test]
@@ -107,12 +101,6 @@ namespace Shrooms.Tests.Extensions
 
             // Assert
             Assert.AreEqual(expectedQuery, actualQuery);
-        }
-
-        [Test]
-        public void Should_Throw_If_Model_Does_Not_Have_Any_Properties()
-        {
-            Assert.Throws<ValidationException>(() => _mockWithoutPropertiesDbSet.OrderByPropertyName("Id", "ASC"));
         }
     }
 }
