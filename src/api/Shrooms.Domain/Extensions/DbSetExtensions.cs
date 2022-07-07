@@ -1,4 +1,5 @@
 ﻿using Shrooms.Contracts.Infrastructure;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Dynamic;
@@ -9,6 +10,8 @@ namespace Shrooms.Domain.Extensions
     public static class DbSetExtensions
     {
         private const string DefaultSortDirection = "asc";
+
+        private const BindingFlags Flags = BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance;
 
         public static IQueryable<TEntity> OrderByPropertyName<TEntity>(
             this IQueryable<TEntity> query, 
@@ -40,7 +43,7 @@ namespace Shrooms.Domain.Extensions
         private static IQueryable<TEntity> OrderByFirstPropertyName<TEntity>(this IQueryable<TEntity> query, string sortDirection)
         {
             var firstProperty = typeof(TEntity)
-                    .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                    .GetProperties(Flags)
                     .FirstOrDefault();
 
             return query.OrderBy($"{firstProperty.Name} {sortDirection}");
@@ -49,23 +52,12 @@ namespace Shrooms.Domain.Extensions
         private static bool EntityHasProperty<TEntity>(string propertyName) where TEntity : class
         {
             var propertyNames = propertyName.Split('.');
-            var bindingFlags = BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance;
-
-            var type = typeof(TEntity).GetProperty(propertyNames[0], bindingFlags);
-
-            if (type == null)
-            {
-                return false;
-            }
             
-            if (propertyNames.Length == 1)
-            {
-                return true;
-            }
+            var type = typeof(TEntity);
 
-            for (var i = 1; i < propertyNames.Length; i++)
+            foreach (var property in propertyNames)
             {
-                type = type.PropertyType.GetProperty(propertyNames[i], bindingFlags);
+                type = type.GetProperty(property, Flags)?.PropertyType;
 
                 if (type == null)
                 {
