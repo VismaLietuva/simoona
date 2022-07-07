@@ -198,7 +198,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 return;
             }
 
-            lottery.Status = (int)LotteryStatus.Ended;
+            lottery.Status = (int)LotteryStatus.Finished;
 
             await _uow.SaveChangesAsync(userOrg.UserId);
         }

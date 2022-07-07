@@ -62,7 +62,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
         [TestCase(LotteryStatus.Refunded)]
         [TestCase(LotteryStatus.Deleted)]
         [TestCase(LotteryStatus.Drafted)]
-        [TestCase(LotteryStatus.Ended)]
+        [TestCase(LotteryStatus.Finished)]
         [TestCase(LotteryStatus.Started)]
         public async Task RefundLottery_IncorrectLotteryStatuses_DoesNotAddKudos(LotteryStatus status)
         {
