@@ -180,6 +180,7 @@
   <ItemGroup>
     <Compile Include="Controllers\WebApi\CommentControllerTests.cs" />
     <Compile Include="Controllers\WebApi\FilterPresetControllerTests.cs" />
+    <Compile Include="Controllers\WebApi\ExternalLinkControllerTests.cs" />
     <Compile Include="Controllers\WebApi\KudosControllerTests.cs" />
     <Compile Include="Controllers\WebApi\PostControllerTests.cs" />
     <Compile Include="Controllers\WebApi\VacationPageControllerTests.cs" />
