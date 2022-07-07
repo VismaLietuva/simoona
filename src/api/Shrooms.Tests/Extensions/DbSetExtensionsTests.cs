@@ -53,13 +53,13 @@ namespace Shrooms.Tests.Extensions
         }
 
         [Test]
-        public void Should_Return_Query_To_Order_By_First_Property_And_Order_By_Descending_If_Property_Name_And_Sort_Direction_Is_Not_Provided()
+        public void Should_Return_Query_To_Order_By_First_Property_And_Order_By_Ascending_If_Property_Name_And_Sort_Direction_Is_Not_Provided()
         {
             // Arrange
             string propertyName = null;
             string sortDirection = null;
 
-            var expectedQuery = _mockDbSet.OrderBy("Id desc").ToString();
+            var expectedQuery = _mockDbSet.OrderBy("Id asc").ToString();
 
             // Act
             var actualQuery = _mockDbSet.OrderByPropertyName(propertyName, sortDirection).ToString();
@@ -69,13 +69,13 @@ namespace Shrooms.Tests.Extensions
         }
 
         [Test]
-        public void Should_Return_Query_To_Order_By_Specified_Property_And_Order_By_Descending_If_Sort_Direction_Is_Not_Provided()
+        public void Should_Return_Query_To_Order_By_Specified_Property_And_Order_By_Ascending_If_Sort_Direction_Is_Not_Provided()
         {
             // Arrange
             var propertyName = nameof(MockModel.Value);
             string sortDirection = null;
 
-            var expectedQuery = _mockDbSet.OrderBy("Value desc").ToString();
+            var expectedQuery = _mockDbSet.OrderBy("Value asc").ToString();
 
             // Act
             var actualQuery = _mockDbSet.OrderByPropertyName(propertyName, sortDirection).ToString();
