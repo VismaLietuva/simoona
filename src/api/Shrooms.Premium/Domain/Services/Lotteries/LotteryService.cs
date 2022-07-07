@@ -138,7 +138,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 return false;
             }
 
-            if (lottery.Status == (int)LotteryStatus.Started)
+            if (lottery.Status == (int)LotteryStatus.Started || lottery.Status == (int)LotteryStatus.Ended)
             {
                 lottery.Status = (int)LotteryStatus.RefundStarted;
                 await _uow.SaveChangesAsync();
