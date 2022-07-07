@@ -84,6 +84,11 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 
         public async Task EditDraftedLotteryAsync(LotteryDto lotteryDto)
         {
+            if (lotteryDto.EndDate < _systemClock.UtcNow)
+            {
+                throw new LotteryException("Lottery can't start in the past.");
+            }
+
             var lottery = await _lotteriesDbSet.FindAsync(lotteryDto.Id);
 
             if (lottery != null && lottery.Status != (int)LotteryStatus.Drafted)
