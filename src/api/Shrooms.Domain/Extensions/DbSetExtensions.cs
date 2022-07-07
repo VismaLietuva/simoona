@@ -8,7 +8,7 @@ namespace Shrooms.Domain.Extensions
 {
     public static class DbSetExtensions
     {
-        private const string DefaultSortDirection = "desc";
+        private const string DefaultSortDirection = "asc";
 
         public static IQueryable<TEntity> OrderByPropertyName<TEntity>(
             this IQueryable<TEntity> query, 
