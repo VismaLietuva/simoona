@@ -29,6 +29,11 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Lotteries
                 .Where(lottery => lottery.Status == (int)LotteryStatus.Started && lottery.EndDate < _systemClock.UtcNow)
                 .ToListAsync();
 
+            if (!lotteriesToUpdate.Any())
+            {
+                return;
+            }
+
             foreach (var lottery in lotteriesToUpdate)
             {
                 lottery.Status = (int)LotteryStatus.Ended;
