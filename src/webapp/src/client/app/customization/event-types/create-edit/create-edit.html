@@ -58,7 +58,7 @@
                     <!--event type with weekly reminders -->
                     <div class="form-group">
                         <label class="control-label col-xs-12 col-sm-4"></label>
-                        <div class="col-xs-12 col-sm-4">
+                        <div class="col-xs-12 col-sm-4 text-nowrap">
                             <input id="weeklyReminders" type="checkbox" class="event-form-checkbox"
                                 ng-model="vm.eventType.sendWeeklyReminders" />
                             <label for="weeklyReminders" class="control-label"
@@ -66,10 +66,21 @@
                         </div>
                     </div>
 
+                    <!-- send email to coach -->
+                    <div class="form-group event-form-coach">
+                        <label class="control-label col-xs-12 col-sm-4"></label>
+                        <div class="col-xs-12 col-sm-4 text-nowrap">
+                            <input id="sendEmailToManager" type="checkbox" class="event-form-checkbox"
+                                ng-model="vm.eventType.sendEmailToManager" />
+                            <label for="sendEmailToManager" class="control-label"
+                                translate="customization.sendEmailToManager"></label>
+                        </div>
+                    </div>
+
                     <!--is shown will all events in a list -->
                     <div class="form-group">
                         <label class="control-label col-xs-12 col-sm-4"></label>
-                        <div class="col-xs-12 col-sm-4">
+                        <div class="col-xs-12 col-sm-4 text-nowrap">
                             <input id="shownWithAll" type="checkbox" class="event-form-checkbox"
                                 ng-model="vm.eventType.isShownWithMainEvents" />
                             <label for="shownWithAll" class="control-label"

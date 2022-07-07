@@ -20,6 +20,8 @@ namespace Shrooms.Premium.EmailTemplates
             AddAndCompile(EmailPremiumTemplateCacheKeys.BookReport, @"EmailTemplates\Books\BookReport.cshtml", typeof(BookReportEmailTemplateViewModel));
             AddAndCompile(EmailPremiumTemplateCacheKeys.EventParticipantExpelled, @"EmailTemplates\Events\ParticipantExpelled.cshtml", typeof(EventParticipantExpelledEmailTemplateViewModel));
             AddAndCompile(EmailPremiumTemplateCacheKeys.EventJoinRemind, @"EmailTemplates\Events\RemindToJoin.cshtml", typeof(EventJoinRemindEmailTemplateViewModel));
+            AddAndCompile(EmailPremiumTemplateCacheKeys.CoacheeJoinedEvent, @"EmailTemplates\Events\CoacheeJoinedEvent.cshtml", typeof(CoacheeJoinedEventEmailTemplateViewModel));
+            AddAndCompile(EmailPremiumTemplateCacheKeys.CoacheeLeftEvent, @"EmailTemplates\Events\CoacheeLeftEvent.cshtml", typeof(CoacheeLeftEventEmailTemplateViewModel));
             AddAndCompile(EmailPremiumTemplateCacheKeys.BookTaken, @"EmailTemplates\Books\BookTaken.cshtml", typeof(BookTakenEmailTemplateViewModel));
             AddAndCompile(EmailPremiumTemplateCacheKeys.LoyaltyKudosReceived, @"EmailTemplates\LoyaltyKudos\LoyaltyKudosReceived.cshtml", typeof(LoyaltyKudosReceivedDecreasedEmailTemplateViewModel));
             AddAndCompile(EmailPremiumTemplateCacheKeys.LoyaltyKudosDecreased, @"EmailTemplates\LoyaltyKudos\LoyaltyKudosDecreased.cshtml", typeof(LoyaltyKudosReceivedDecreasedEmailTemplateViewModel));

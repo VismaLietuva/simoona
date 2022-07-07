@@ -179,7 +179,7 @@ namespace Shrooms.Domain.Services.Administration
 
             await SetWelcomeKudosAsync(applicationUser);
 
-            await AddUserToMainWallAsync(userId);
+            await AddWallsToNewUser(applicationUser, userAndOrg);
             await _uow.SaveChangesAsync(userAndOrg.UserId);
         }
 
@@ -490,31 +490,43 @@ namespace Shrooms.Domain.Services.Administration
             return filteredUsers?.ToList() ?? administrationUsers;
         }
 
-        private async Task AddUserToMainWallAsync(string userId)
+        private async Task<IList<DataLayer.EntityModels.Models.Multiwall.Wall>> GetWallsToAddForNewUserAsync(ApplicationUser applicationUser)
         {
-            var mainWall = await _wallsDbSet
-                .Include(x => x.Members)
-                .FirstOrDefaultAsync(x => x.Type == WallType.Main && x.Members.All(m => m.UserId != userId));
+            return await _wallsDbSet
+                .Include(wall => wall.Members)
+                .Where(wall => wall.OrganizationId == applicationUser.OrganizationId &&
+                    (wall.Type == WallType.Main || (wall.AddForNewUsers && wall.Type == WallType.UserCreated)) &&
+                    wall.Members.All(m => m.UserId != applicationUser.Id))
+                .ToListAsync();
+        }
 
-            if (mainWall == null)
+        private async Task AddWallsToNewUser(ApplicationUser applicationUser, UserAndOrganizationDto userOrg)
+        {
+            var walls = await GetWallsToAddForNewUserAsync(applicationUser);
+
+            if (!walls.Any())
             {
                 return;
             }
 
-            var timestamps = DateTime.UtcNow;
-            var userMainWall = new WallMember
-            {
-                UserId = userId,
-                Wall = mainWall,
-                CreatedBy = userId,
-                ModifiedBy = userId,
-                Created = timestamps,
-                Modified = timestamps,
-                AppNotificationsEnabled = true,
-                EmailNotificationsEnabled = true
-            };
+            var timestamp = DateTime.UtcNow;
 
-            _wallUsersDbSet.Add(userMainWall);
+            foreach (var wall in walls)
+            {
+                var wallMember = new WallMember
+                {
+                    UserId = applicationUser.Id,
+                    Wall = wall,
+                    CreatedBy = userOrg.UserId,
+                    ModifiedBy = userOrg.UserId,
+                    Created = timestamp,
+                    Modified = timestamp,
+                    AppNotificationsEnabled = true,
+                    EmailNotificationsEnabled = true
+                };
+
+                _wallUsersDbSet.Add(wallMember);
+            }
         }
     }
 }
