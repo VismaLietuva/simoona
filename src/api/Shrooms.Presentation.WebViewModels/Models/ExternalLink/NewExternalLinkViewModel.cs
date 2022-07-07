@@ -18,5 +18,8 @@ namespace Shrooms.Presentation.WebViewModels.Models.ExternalLink
         [Required]
         [EnumDataType(typeof(ExternalLinkTypeEnum))]
         public ExternalLinkTypeEnum Type { get; set; }
+
+        [Range(0, int.MaxValue)]
+        public int Priority { get; set; }
     }
 }
