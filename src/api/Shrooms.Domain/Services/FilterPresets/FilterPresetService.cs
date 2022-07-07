@@ -76,7 +76,7 @@ namespace Shrooms.Domain.Services.FilterPresets
 
                 var createdPresets = CreatePresets(updateDto);
 
-                if (NewDefaultPresetWasSet(createdPresets, updateDto.PresetsToUpdate))
+                if (IsNewDefaultPresetSet(createdPresets, updateDto.PresetsToUpdate))
                 {
                     await ChangeCurrentDefaultFilterToNonDefaultAsync(updateDto.PageType, updateDto.UserOrg.OrganizationId);
                 }
@@ -125,7 +125,7 @@ namespace Shrooms.Domain.Services.FilterPresets
             return filtersDtos;
         }
 
-        private bool NewDefaultPresetWasSet(IEnumerable<FilterPreset> createdPresets, IEnumerable<FilterPresetDto> updatedPresets)
+        private bool IsNewDefaultPresetSet(IEnumerable<FilterPreset> createdPresets, IEnumerable<FilterPresetDto> updatedPresets)
         {
             return createdPresets.Any(preset => preset.IsDefault) || updatedPresets.Any(preset => preset.IsDefault);
         }
