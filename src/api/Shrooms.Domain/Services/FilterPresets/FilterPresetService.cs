@@ -116,7 +116,7 @@ namespace Shrooms.Domain.Services.FilterPresets
                 var filtersDto = new FiltersDto
                 {
                     FilterType = type,
-                    Filters = filters,
+                    Filters = filters
                 };
 
                 filtersDtos.Add(filtersDto);
