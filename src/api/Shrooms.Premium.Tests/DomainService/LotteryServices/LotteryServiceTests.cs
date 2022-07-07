@@ -155,6 +155,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
 
         [TestCase(1)]
         [TestCase(4)]
+        [TestCase(8)]
         public async Task AbortLottery_StatusPossibleToAbort_AbortedSuccessfully(int lotteryId)
         {
             MockLotteries();
@@ -472,7 +473,17 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
                     OrganizationId = 12345,
                     Title = string.Empty,
                     EndDate = DateTime.UtcNow.AddDays(3)
-                }
+                },
+                new Lottery
+                {
+                    Id = 8,
+                    Title = "foo",
+                    OrganizationId = 1,
+                    Status = (int)LotteryStatus.Ended,
+                    EndDate = DateTime.Now.AddDays(2),
+                    EntryFee = 1,
+                    IsRefundFailed = false
+                },
             };
         }
 
