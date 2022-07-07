@@ -7,7 +7,7 @@ namespace Shrooms.Domain.Services.FilterPresets
 {
     public interface IFilterPresetService
     {
-        Task<UpdatedFilterPresetDto> UpdateAsync(AddEditDeleteFilterPresetDto updateDto);
+        Task<UpdatedFilterPresetDto> UpdateAsync(ManageFilterPresetDto manageFilterPresetDto);
 
         Task<IEnumerable<FilterPresetDto>> GetPresetsForPageAsync(PageType type, int organizationId);
 

@@ -28,7 +28,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpPost]
         [Route("Update")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public async Task<IHttpActionResult> Update(AddEditDeleteFilterPresetViewModel updateViewModel)
+        public async Task<IHttpActionResult> Update(ManageFilterPresetViewModel manageViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -37,7 +37,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
             try
             {
-                var updateDto = _mapper.Map<AddEditDeleteFilterPresetViewModel, AddEditDeleteFilterPresetDto>(updateViewModel);
+                var updateDto = _mapper.Map<ManageFilterPresetViewModel, ManageFilterPresetDto>(manageViewModel);
                 
                 updateDto.UserOrg = GetUserAndOrganization();
 

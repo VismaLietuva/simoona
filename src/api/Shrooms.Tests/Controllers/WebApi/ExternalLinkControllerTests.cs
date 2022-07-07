@@ -56,7 +56,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         public async Task UpdateLinks_Should_Return_Ok()
         {
             // Arrange
-            var updateLinksViewModel = new AddEditDeleteExternalLinkViewModel();
+            var updateLinksViewModel = new ManageExternalLinkViewModel();
 
             // Act
             var httpActionResult = await _externalLinkController.UpdateLinks(updateLinksViewModel);
@@ -70,7 +70,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         public async Task UpdateLinks_Should_Return_BadRequest_If_ModelState_Is_Not_Valid()
         {
             // Arrange
-            var updateLinksViewModel = new AddEditDeleteExternalLinkViewModel
+            var updateLinksViewModel = new ManageExternalLinkViewModel
             {
                 LinksToCreate = new List<NewExternalLinkViewModel>
                 {
@@ -96,10 +96,10 @@ namespace Shrooms.Tests.Controllers.WebApi
         public async Task UpdateLinks_Should_Return_BadRequest_If_Update_Fails()
         {
             // Arrange
-            _externalLinkService.UpdateLinksAsync(Arg.Any<AddEditDeleteExternalLinkDto>())
+            _externalLinkService.UpdateLinksAsync(Arg.Any<ManageExternalLinkDto>())
                 .Throws(new ValidationException(0));
             
-            var updateLinksViewModel = new AddEditDeleteExternalLinkViewModel();
+            var updateLinksViewModel = new ManageExternalLinkViewModel();
 
             // Act
             var httpActionResult = await _externalLinkController.UpdateLinks(updateLinksViewModel);

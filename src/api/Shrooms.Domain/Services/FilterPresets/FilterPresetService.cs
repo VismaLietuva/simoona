@@ -57,31 +57,31 @@ namespace Shrooms.Domain.Services.FilterPresets
                 });
         }
 
-        public async Task<UpdatedFilterPresetDto> UpdateAsync(AddEditDeleteFilterPresetDto updateDto)
+        public async Task<UpdatedFilterPresetDto> UpdateAsync(ManageFilterPresetDto manageFilterPresetDto)
         {
             await _filterPresetUpdateCreateLock.WaitAsync();
 
             try
             {
-                _validator.CheckIfMoreThanOneDefaultPresetExists(updateDto);
-                _validator.CheckIfFilterPresetsContainsUniqueNames(updateDto.PresetsToUpdate);
-                _validator.CheckIfFilterPresetsContainsUniqueNames(updateDto.PresetsToCreate);
+                _validator.CheckIfMoreThanOneDefaultPresetExists(manageFilterPresetDto);
+                _validator.CheckIfFilterPresetsContainsUniqueNames(manageFilterPresetDto.PresetsToUpdate);
+                _validator.CheckIfFilterPresetsContainsUniqueNames(manageFilterPresetDto.PresetsToCreate);
                 
-                await UpdatePresetsAsync(updateDto);
+                await UpdatePresetsAsync(manageFilterPresetDto);
                 
-                var deletedPresets = await DeleteAsync(updateDto);
+                var deletedPresets = await DeleteAsync(manageFilterPresetDto);
 
                 // Need to call this after deletion, because we receive preset Ids that need to be deleted and not presets themselves
-                await _validator.CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(updateDto, deletedPresets);
+                await _validator.CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(manageFilterPresetDto, deletedPresets);
 
-                var createdPresets = CreatePresets(updateDto);
+                var createdPresets = CreatePresets(manageFilterPresetDto);
 
-                if (IsNewDefaultPresetSet(createdPresets, updateDto.PresetsToUpdate))
+                if (IsNewDefaultPresetSet(createdPresets, manageFilterPresetDto.PresetsToUpdate))
                 {
-                    await ChangeCurrentDefaultFilterToNonDefaultAsync(updateDto.PageType, updateDto.UserOrg.OrganizationId);
+                    await ChangeCurrentDefaultFilterToNonDefaultAsync(manageFilterPresetDto.PageType, manageFilterPresetDto.UserOrg.OrganizationId);
                 }
 
-                await _uow.SaveChangesAsync(updateDto.UserOrg.UserId);
+                await _uow.SaveChangesAsync(manageFilterPresetDto.UserOrg.UserId);
                 
                 return new UpdatedFilterPresetDto
                 {
@@ -93,7 +93,7 @@ namespace Shrooms.Domain.Services.FilterPresets
                         IsDefault = preset.IsDefault,
                         Filters = JsonConvert.DeserializeObject<IEnumerable<FilterPresetItemDto>>(preset.Preset)
                     }),
-                    UpdatedPresets = updateDto.PresetsToUpdate,
+                    UpdatedPresets = manageFilterPresetDto.PresetsToUpdate,
                     DeletedPresets = deletedPresets
                 };
             }
@@ -153,17 +153,17 @@ namespace Shrooms.Domain.Services.FilterPresets
             };
         }
 
-        private async Task<IEnumerable<FilterPresetDto>> DeleteAsync(AddEditDeleteFilterPresetDto updateDto)
+        private async Task<IEnumerable<FilterPresetDto>> DeleteAsync(ManageFilterPresetDto manageFilterPresetDto)
         {
-            if (!updateDto.PresetsToDelete.Any())
+            if (!manageFilterPresetDto.PresetsToDelete.Any())
             {
                 return Enumerable.Empty<FilterPresetDto>();
             }
 
             var presets = await _filterPresetDbSet
-                .Where(preset => 
-                    updateDto.PresetsToDelete.Contains(preset.Id) &&
-                    preset.OrganizationId == updateDto.UserOrg.OrganizationId)
+                .Where(preset =>
+                    manageFilterPresetDto.PresetsToDelete.Contains(preset.Id) &&
+                    preset.OrganizationId == manageFilterPresetDto.UserOrg.OrganizationId)
                 .ToListAsync();
 
             var removedPresets = presets.Select(preset => new FilterPresetDto
@@ -179,9 +179,9 @@ namespace Shrooms.Domain.Services.FilterPresets
             return removedPresets;
         }
 
-        private IEnumerable<FilterPreset> CreatePresets(AddEditDeleteFilterPresetDto updateDto)
+        private IEnumerable<FilterPreset> CreatePresets(ManageFilterPresetDto manageFilterPresetDto)
         {
-            if (!updateDto.PresetsToCreate.Any())
+            if (!manageFilterPresetDto.PresetsToCreate.Any())
             {
                 return Enumerable.Empty<FilterPreset>();
             }
@@ -189,15 +189,15 @@ namespace Shrooms.Domain.Services.FilterPresets
             var timestamp = DateTime.UtcNow;
             var createdPresets = new List<FilterPreset>();
 
-            foreach (var presetDtoToAdd in updateDto.PresetsToCreate)
+            foreach (var presetDtoToAdd in manageFilterPresetDto.PresetsToCreate)
             {
                 var presetToAdd = new FilterPreset
                 {
-                    OrganizationId = updateDto.UserOrg.OrganizationId,
-                    CreatedBy = updateDto.UserOrg.UserId,
+                    OrganizationId = manageFilterPresetDto.UserOrg.OrganizationId,
+                    CreatedBy = manageFilterPresetDto.UserOrg.UserId,
                     Name = presetDtoToAdd.Name,
                     IsDefault = presetDtoToAdd.IsDefault,
-                    ForPage = updateDto.PageType,
+                    ForPage = manageFilterPresetDto.PageType,
                     Modified = timestamp,
                     Created = timestamp,
                     Preset = JsonConvert.SerializeObject(presetDtoToAdd.Filters)
@@ -212,14 +212,14 @@ namespace Shrooms.Domain.Services.FilterPresets
             return createdPresets;
         }
 
-        private async Task UpdatePresetsAsync(AddEditDeleteFilterPresetDto updateDto)
+        private async Task UpdatePresetsAsync(ManageFilterPresetDto manageFilterPresetDto)
         {
-            if (!updateDto.PresetsToUpdate.Any())
+            if (!manageFilterPresetDto.PresetsToUpdate.Any())
             {
                 return;
             }
 
-            var presetsToUpdateIds = updateDto.PresetsToUpdate.Select(preset => preset.Id)
+            var presetsToUpdateIds = manageFilterPresetDto.PresetsToUpdate.Select(preset => preset.Id)
                 .ToList();
 
             var existingPresets = await _filterPresetDbSet
@@ -228,7 +228,7 @@ namespace Shrooms.Domain.Services.FilterPresets
 
             _validator.CheckIfCountsAreEqual(presetsToUpdateIds, existingPresets);
 
-            foreach (var preset in updateDto.PresetsToUpdate)
+            foreach (var preset in manageFilterPresetDto.PresetsToUpdate)
             {
                 if (!existingPresets.TryGetValue(preset.Id, out var presetToUpdate))
                 {

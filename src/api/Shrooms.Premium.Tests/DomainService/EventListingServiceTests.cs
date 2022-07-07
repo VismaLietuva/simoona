@@ -469,6 +469,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 KudosTypeIds = Enumerable.Empty<int>(),
                 EventTypeIds = Enumerable.Empty<int>(),
                 SortByColumnName = "Kudos",
+                SortDirection = "desc",
                 Page = 1,
                 PageSize = 10
             };
@@ -498,6 +499,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 KudosTypeIds = new List<int> { 1 },
                 EventTypeIds = Enumerable.Empty<int>(),
                 SortByColumnName = "Kudos",
+                SortDirection= "desc",
                 Page = 1,
                 PageSize = 10
             };

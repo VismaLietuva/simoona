@@ -51,11 +51,11 @@ namespace Shrooms.Domain.Extensions
 
         private static bool EntityHasProperty<TEntity>(string propertyName) where TEntity : class
         {
-            var propertyNames = propertyName.Split('.');
+            var propertyNameParts = propertyName.Split('.');
             
             var type = typeof(TEntity);
 
-            foreach (var property in propertyNames)
+            foreach (var property in propertyNameParts)
             {
                 type = type.GetProperty(property, Flags)?.PropertyType;
 

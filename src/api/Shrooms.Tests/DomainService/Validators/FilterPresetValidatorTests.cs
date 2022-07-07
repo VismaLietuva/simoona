@@ -112,7 +112,7 @@ namespace Shrooms.Tests.DomainService.Validators
                 }
             };
 
-            var updateDtoWithMoreThanOneDefaultPreset = new AddEditDeleteFilterPresetDto
+            var updateDtoWithMoreThanOneDefaultPreset = new ManageFilterPresetDto
             {
                 PresetsToCreate = presetsToAddWithMoreThanOneDefault,
                 PresetsToUpdate = Enumerable.Empty<UpdateFilterPresetDto>()
@@ -138,7 +138,7 @@ namespace Shrooms.Tests.DomainService.Validators
                 }
             };
 
-            var updateDtoWithMoreThanOneDefaultPreset = new AddEditDeleteFilterPresetDto
+            var updateDtoWithMoreThanOneDefaultPreset = new ManageFilterPresetDto
             {
                 PresetsToCreate = Enumerable.Empty<CreateFilterPresetDto>(),
                 PresetsToUpdate = presetsToUpdateWithMoreThanOneDefault
@@ -168,14 +168,14 @@ namespace Shrooms.Tests.DomainService.Validators
                 }
             };
 
-            var updateDtoWithMoreThanOneDefaultPreset = new AddEditDeleteFilterPresetDto
+            var manageDtoWithMoreThanOneDefaultPreset = new ManageFilterPresetDto
             {
                 PresetsToCreate = presetsToAddWithOneDefaultPreset,
                 PresetsToUpdate = presetsToUpdateWithOneDefaultPreset
             };
 
             // Assert
-            Assert.Throws<ValidationException>(() => _filterPresetValidator.CheckIfMoreThanOneDefaultPresetExists(updateDtoWithMoreThanOneDefaultPreset));
+            Assert.Throws<ValidationException>(() => _filterPresetValidator.CheckIfMoreThanOneDefaultPresetExists(manageDtoWithMoreThanOneDefaultPreset));
         }
 
         [Test]
@@ -198,14 +198,14 @@ namespace Shrooms.Tests.DomainService.Validators
                 }
             };
 
-            var updateDtoWithOneDefaultPreset = new AddEditDeleteFilterPresetDto
+            var manageDtoWithOneDefaultPreset = new ManageFilterPresetDto
             {
                 PresetsToCreate = presetsToAddWithOneDefaultPreset,
                 PresetsToUpdate = presetsToUpdateWithoutDefaultPreset
             };
 
             // Assert
-            Assert.DoesNotThrow(() => _filterPresetValidator.CheckIfMoreThanOneDefaultPresetExists(updateDtoWithOneDefaultPreset));
+            Assert.DoesNotThrow(() => _filterPresetValidator.CheckIfMoreThanOneDefaultPresetExists(manageDtoWithOneDefaultPreset));
         }
 
         [Test]
@@ -228,14 +228,14 @@ namespace Shrooms.Tests.DomainService.Validators
                 }
             };
 
-            var updateDtoWithoutDefaultPreset = new AddEditDeleteFilterPresetDto
+            var manageDtoWithoutDefaultPreset = new ManageFilterPresetDto
             {
                 PresetsToCreate = presetsToAddWithoutDefaultPreset,
                 PresetsToUpdate = presetsToUpdateWithoutDefaultPreset
             };
 
             // Assert
-            Assert.DoesNotThrow(() => _filterPresetValidator.CheckIfMoreThanOneDefaultPresetExists(updateDtoWithoutDefaultPreset));
+            Assert.DoesNotThrow(() => _filterPresetValidator.CheckIfMoreThanOneDefaultPresetExists(manageDtoWithoutDefaultPreset));
         }
 
         [Test]
@@ -355,7 +355,7 @@ namespace Shrooms.Tests.DomainService.Validators
                 }
             };
 
-            var updateDto = new AddEditDeleteFilterPresetDto
+            var manageDto = new ManageFilterPresetDto
             {
                 PresetsToCreate = presetsToAdd,
                 PresetsToUpdate = presetsToUpdate
@@ -365,7 +365,7 @@ namespace Shrooms.Tests.DomainService.Validators
 
             // Assert
             Assert.ThrowsAsync<ValidationException>(async () => await _filterPresetValidator
-                .CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(updateDto, removedPresets));
+                .CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(manageDto, removedPresets));
         }
 
 
@@ -389,7 +389,7 @@ namespace Shrooms.Tests.DomainService.Validators
                 }
             };
 
-            var updateDto = new AddEditDeleteFilterPresetDto
+            var manageDto = new ManageFilterPresetDto
             {
                 PresetsToCreate = presetsToAdd,
                 PresetsToUpdate = presetsToUpdate
@@ -399,7 +399,7 @@ namespace Shrooms.Tests.DomainService.Validators
 
             // Assert
             Assert.DoesNotThrowAsync(async () => await _filterPresetValidator
-                .CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(updateDto, removedPresets));
+                .CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(manageDto, removedPresets));
         }
 
         [Test]
@@ -423,7 +423,7 @@ namespace Shrooms.Tests.DomainService.Validators
                 }
             };
 
-            var updateDto = new AddEditDeleteFilterPresetDto
+            var manageDto = new ManageFilterPresetDto
             {
                 PresetsToCreate = presetsToAdd,
                 PresetsToUpdate = Enumerable.Empty<UpdateFilterPresetDto>()
@@ -431,7 +431,7 @@ namespace Shrooms.Tests.DomainService.Validators
 
             // Assert
             Assert.DoesNotThrowAsync(async () => 
-                await _filterPresetValidator.CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(updateDto, removedPresets));
+                await _filterPresetValidator.CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(manageDto, removedPresets));
         }
 
 
@@ -456,7 +456,7 @@ namespace Shrooms.Tests.DomainService.Validators
                 }
             };
 
-            var updateDto = new AddEditDeleteFilterPresetDto
+            var manageDto = new ManageFilterPresetDto
             {
                 PresetsToCreate = Enumerable.Empty<CreateFilterPresetDto>(),
                 PresetsToUpdate = presetsToUpdate
@@ -464,7 +464,7 @@ namespace Shrooms.Tests.DomainService.Validators
 
             // Assert
             Assert.DoesNotThrowAsync(async () =>
-                await _filterPresetValidator.CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(updateDto, removedPresets));
+                await _filterPresetValidator.CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(manageDto, removedPresets));
         }
 
         [Test]
@@ -489,7 +489,7 @@ namespace Shrooms.Tests.DomainService.Validators
                 }
             };
 
-            var updateDto = new AddEditDeleteFilterPresetDto
+            var updateDto = new ManageFilterPresetDto
             {
                 PresetsToCreate = presetsToAdd,
                 PresetsToUpdate = Enumerable.Empty<UpdateFilterPresetDto>()
@@ -524,7 +524,7 @@ namespace Shrooms.Tests.DomainService.Validators
                 }
             };
 
-            var updateDto = new AddEditDeleteFilterPresetDto
+            var manageDto = new ManageFilterPresetDto
             {
                 PresetsToCreate = Enumerable.Empty<CreateFilterPresetDto>(),
                 PresetsToUpdate = presetsToUpdate
@@ -532,7 +532,7 @@ namespace Shrooms.Tests.DomainService.Validators
 
             // Assert
             Assert.ThrowsAsync<ValidationException>(async () =>
-                await _filterPresetValidator.CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(updateDto, removedPresets));
+                await _filterPresetValidator.CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(manageDto, removedPresets));
         }
     }
 }

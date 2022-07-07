@@ -19,7 +19,7 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<AddEditDeleteExternalLinkViewModel, AddEditDeleteExternalLinkDto>()
+            CreateMap<ManageExternalLinkViewModel, ManageExternalLinkDto>()
                 .IgnoreUserOrgDto();
             CreateMap<UpdatedExternalLinkViewModel, ExternalLinkDto>();
             CreateMap<NewExternalLinkViewModel, NewExternalLinkDto>();

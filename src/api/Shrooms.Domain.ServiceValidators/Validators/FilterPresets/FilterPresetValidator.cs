@@ -40,13 +40,13 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
             }
         }
 
-        public void CheckIfMoreThanOneDefaultPresetExists(AddEditDeleteFilterPresetDto updateDto)
+        public void CheckIfMoreThanOneDefaultPresetExists(ManageFilterPresetDto manageFilterPresetDto)
         {
-            var defaultPresetExistsInNewPresets = updateDto.PresetsToCreate
+            var defaultPresetExistsInNewPresets = manageFilterPresetDto.PresetsToCreate
                 .Where(preset => preset.IsDefault)
                 .ToList();
 
-            var defaultPresetExistsInUpdatedPresets = updateDto.PresetsToUpdate
+            var defaultPresetExistsInUpdatedPresets = manageFilterPresetDto.PresetsToUpdate
                 .Where(preset => preset.IsDefault)
                 .ToList();
 
@@ -77,10 +77,10 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
             }
         }
         
-        public async Task CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(AddEditDeleteFilterPresetDto updateDto, IEnumerable<FilterPresetDto> removedPresets)
+        public async Task CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(ManageFilterPresetDto manageFilterPresetDto, IEnumerable<FilterPresetDto> removedPresets)
         {
-            var updateDtoContainsNameDuplicates = updateDto.PresetsToUpdate
-                .Any(updatePreset => updateDto.PresetsToCreate.Any(addPreset => addPreset.Name == updatePreset.Name));
+            var updateDtoContainsNameDuplicates = manageFilterPresetDto.PresetsToUpdate
+                .Any(updatePreset => manageFilterPresetDto.PresetsToCreate.Any(addPreset => addPreset.Name == updatePreset.Name));
 
             if (updateDtoContainsNameDuplicates)
             {
@@ -88,15 +88,15 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
             }
 
             var presets = await _filterPresetsDbSet
-                .Where(preset => preset.ForPage == updateDto.PageType)
+                .Where(preset => preset.ForPage == manageFilterPresetDto.PageType)
                 .ToListAsync();
 
             var removedPresetNames = removedPresets
                 .Select(preset => preset.Name)
                 .ToList();
 
-            if (updateDto.PresetsToCreate.Any(preset => presets.Any(dbPreset => dbPreset.Name == preset.Name) && !removedPresetNames.Contains(preset.Name)) ||
-                updateDto.PresetsToUpdate.Any(preset => presets.Any(dbPreset => dbPreset.Name == preset.Name && dbPreset.Id != preset.Id) && !removedPresetNames.Contains(preset.Name)))
+            if (manageFilterPresetDto.PresetsToCreate.Any(preset => presets.Any(dbPreset => dbPreset.Name == preset.Name) && !removedPresetNames.Contains(preset.Name)) ||
+                manageFilterPresetDto.PresetsToUpdate.Any(preset => presets.Any(dbPreset => dbPreset.Name == preset.Name && dbPreset.Id != preset.Id) && !removedPresetNames.Contains(preset.Name)))
             {
                 throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "Preset names cannot contain duplicates");
             }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Shrooms.Contracts.DataTransferObjects.FilterPresets
 {
-    public class AddEditDeleteFilterPresetDto
+    public class ManageFilterPresetDto
     {
         public PageType PageType { get; set; }
 

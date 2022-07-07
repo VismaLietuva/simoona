@@ -3,7 +3,7 @@ using Shrooms.Presentation.WebViewModels.ValidationAttributes;
 
 namespace Shrooms.Presentation.WebViewModels.Models.ExternalLink
 {
-    public class AddEditDeleteExternalLinkViewModel
+    public class ManageExternalLinkViewModel
     {
         [HasNoDuplicateLinks]
         public IEnumerable<UpdatedExternalLinkViewModel> LinksToUpdate { get; set; }

@@ -18,10 +18,10 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
             where T1 : ICollection
             where T2 : ICollection;
 
-        void CheckIfMoreThanOneDefaultPresetExists(AddEditDeleteFilterPresetDto updateDto);
+        void CheckIfMoreThanOneDefaultPresetExists(ManageFilterPresetDto manageFilterPresetDto);
 
         void CheckIfFilterPresetsContainsUniqueNames(IEnumerable<FilterPresetDto> filterPresetDtos);
 
-        Task CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(AddEditDeleteFilterPresetDto updateDto, IEnumerable<FilterPresetDto> removedPresets);
+        Task CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(ManageFilterPresetDto manageFilterPresetDto, IEnumerable<FilterPresetDto> removedPresets);
     }
 }

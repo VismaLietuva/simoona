@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Shrooms.Presentation.WebViewModels.Models.FilterPresets
 {
-    public class AddEditDeleteFilterPresetViewModel
+    public class ManageFilterPresetViewModel
     {
         [Required]
         [EnumDataType(typeof(PageType))]

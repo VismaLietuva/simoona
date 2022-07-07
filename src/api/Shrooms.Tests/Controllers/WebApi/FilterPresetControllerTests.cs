@@ -46,7 +46,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         public async Task Update_Should_Return_Bad_Request_When_Called_With_Invalid_Page_Type()
         {
             // Arrange
-            var updateViewModel = new AddEditDeleteFilterPresetViewModel
+            var updateViewModel = new ManageFilterPresetViewModel
             {
                 PageType = (PageType)int.MaxValue,
                 PresetsToCreate = Enumerable.Empty<CreateFilterPresetViewModel>(),
@@ -68,10 +68,10 @@ namespace Shrooms.Tests.Controllers.WebApi
         public async Task Update_Should_Return_Ok()
         {
             // Arrange
-            _filterPresetService.UpdateAsync(Arg.Any<AddEditDeleteFilterPresetDto>())
+            _filterPresetService.UpdateAsync(Arg.Any<ManageFilterPresetDto>())
                 .Returns(new UpdatedFilterPresetDto());
 
-            var updateViewModel = new AddEditDeleteFilterPresetViewModel();
+            var updateViewModel = new ManageFilterPresetViewModel();
 
             // Act
             var httpActionResult = await _filterPresetController.Update(updateViewModel);
@@ -85,10 +85,10 @@ namespace Shrooms.Tests.Controllers.WebApi
         public async Task Update_Should_Return_BadRequest_When_ValidationException_Is_Thrown()
         {
             // Arrange
-            _filterPresetService.UpdateAsync(Arg.Any<AddEditDeleteFilterPresetDto>())
+            _filterPresetService.UpdateAsync(Arg.Any<ManageFilterPresetDto>())
                 .Throws(new ValidationException(0));
 
-            var updateViewModel = new AddEditDeleteFilterPresetViewModel();
+            var updateViewModel = new ManageFilterPresetViewModel();
 
             // Act
             var httpActionResult = await _filterPresetController.Update(updateViewModel);

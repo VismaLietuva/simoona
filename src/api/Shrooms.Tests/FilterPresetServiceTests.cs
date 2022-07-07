@@ -262,7 +262,7 @@ namespace Shrooms.Tests
                 OrganizationId = organizationId
             };
 
-            var updateDto = new AddEditDeleteFilterPresetDto
+            var updateDto = new ManageFilterPresetDto
             {
                 PageType = PageType.EventReport,
                 PresetsToUpdate = new List<UpdateFilterPresetDto>
@@ -291,12 +291,12 @@ namespace Shrooms.Tests
             await _filterPresetValidator
                 .Received(1)
                 .CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(
-                    Arg.Any<AddEditDeleteFilterPresetDto>(),
+                    Arg.Any<ManageFilterPresetDto>(),
                     Arg.Any<IEnumerable<FilterPresetDto>>());
 
             _filterPresetValidator
                 .Received(1)
-                .CheckIfMoreThanOneDefaultPresetExists(Arg.Any<AddEditDeleteFilterPresetDto>());
+                .CheckIfMoreThanOneDefaultPresetExists(Arg.Any<ManageFilterPresetDto>());
 
             _filterPresetValidator
                 .Received(2)
