@@ -34,7 +34,7 @@ namespace Shrooms.Domain.Extensions
                 return query.OrderByFirstPropertyName(sortDirection);
             }
 
-            return query.OrderBy(string.Format("{0} {1}", propertyName, sortDirection));
+            return query.OrderBy($"{propertyName} {sortDirection}");
         }
 
         private static IQueryable<TEntity> OrderByFirstPropertyName<TEntity>(this IQueryable<TEntity> query, string sortDirection)
@@ -43,7 +43,7 @@ namespace Shrooms.Domain.Extensions
                     .GetProperties(BindingFlags.Public | BindingFlags.Instance)
                     .FirstOrDefault();
 
-            return query.OrderBy(string.Format("{0} {1}", firstProperty.Name, sortDirection));
+            return query.OrderBy($"{firstProperty.Name} {sortDirection}");
         }
 
         private static bool EntityHasProperty<TEntity>(string propertyName) where TEntity : class
