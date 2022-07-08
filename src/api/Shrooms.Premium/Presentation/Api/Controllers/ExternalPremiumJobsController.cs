@@ -56,5 +56,12 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             var organizationName = GetOrganizationName();
             await _webHookService.EventJoinRemindService.SendNotificationsAsync(organizationName);
         }
+
+        [HttpPost]
+        [Route("ProcessExpiredLotteries")]
+        public async Task ProcessExpiredLotteries()
+        {
+            await _webHookService.LotteryStatusChangeService.ProcessExpiredLotteriesAsync();
+        }
     }
 }

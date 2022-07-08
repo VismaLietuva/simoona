@@ -31,13 +31,15 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
         private readonly IParticipantService _participantService;
         private readonly IUserService _userService;
         private readonly IKudosService _kudosService;
+        private readonly ISystemClock _systemClock;
 
         public LotteryService(IUnitOfWork2 uow,
             IMapper mapper,
             IParticipantService participantService,
             IUserService userService,
             IKudosService kudosService,
-            IAsyncRunner asyncRunner)
+            IAsyncRunner asyncRunner,
+            ISystemClock systemClock)
         {
             _uow = uow;
             _lotteriesDbSet = uow.GetDbSet<Lottery>();
@@ -47,6 +49,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             _participantService = participantService;
             _userService = userService;
             _kudosService = kudosService;
+            _systemClock = systemClock;
         }
 
         public async Task<Lottery> GetLotteryAsync(int lotteryId)
@@ -56,7 +59,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 
         public async Task<LotteryDto> CreateLotteryAsync(LotteryDto newLotteryDto)
         {
-            if (newLotteryDto.EndDate < DateTime.UtcNow)
+            if (newLotteryDto.EndDate < _systemClock.UtcNow)
             {
                 throw new LotteryException("Lottery can't start in the past.");
             }
@@ -84,6 +87,11 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 
         public async Task EditDraftedLotteryAsync(LotteryDto lotteryDto)
         {
+            if (lotteryDto.EndDate < _systemClock.UtcNow)
+            {
+                throw new LotteryException("Lottery can't start in the past.");
+            }
+
             var lottery = await _lotteriesDbSet.FindAsync(lotteryDto.Id);
 
             if (lottery != null && lottery.Status != (int)LotteryStatus.Drafted)
@@ -138,7 +146,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 return false;
             }
 
-            if (lottery.Status == (int)LotteryStatus.Started)
+            if (lottery.Status == (int)LotteryStatus.Started || lottery.Status == (int)LotteryStatus.Expired)
             {
                 lottery.Status = (int)LotteryStatus.RefundStarted;
                 await _uow.SaveChangesAsync();
@@ -291,7 +299,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 throw new LotteryException("User does not have enough kudos for the purchase.");
             }
 
-            if (DateTime.UtcNow > lotteryDetails.EndDate)
+            if (_systemClock.UtcNow > lotteryDetails.EndDate)
             {
                 throw new LotteryException("Lottery has already ended.");
             }
@@ -347,7 +355,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             return await _lotteriesDbSet.Where(p =>
                     p.OrganizationId == userAndOrganization.OrganizationId &&
                     p.Status == (int)LotteryStatus.Started &&
-                    p.EndDate > DateTime.UtcNow)
+                    p.EndDate > _systemClock.UtcNow)
                 .Select(MapLotteriesToListItemDto)
                 .OrderBy(_byEndDate)
                 .ToListAsync();
@@ -372,7 +380,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             var newLottery = _mapper.Map<LotteryDto, Lottery>(newLotteryDto);
 
             newLottery.CreatedBy = newLotteryDto.UserId;
-            newLottery.Modified = DateTime.UtcNow;
+            newLottery.Modified = _systemClock.UtcNow;
             newLottery.ModifiedBy = newLotteryDto.UserId;
             newLottery.IsRefundFailed = false;
 
@@ -389,17 +397,17 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             lottery.Images = draftedLotteryDto.Images;
         }
 
-        private static LotteryParticipant MapNewLotteryParticipant(BuyLotteryTicketDto lotteryTicketDto, UserAndOrganizationDto userOrg)
+        private LotteryParticipant MapNewLotteryParticipant(BuyLotteryTicketDto lotteryTicketDto, UserAndOrganizationDto userOrg)
         {
             return new LotteryParticipant
             {
                 LotteryId = lotteryTicketDto.LotteryId,
                 UserId = userOrg.UserId,
-                Joined = DateTime.Now,
+                Joined = _systemClock.UtcNow,
                 CreatedBy = userOrg.UserId,
                 ModifiedBy = userOrg.UserId,
-                Modified = DateTime.Now,
-                Created = DateTime.Now
+                Modified = _systemClock.UtcNow,
+                Created = _systemClock.UtcNow
             };
         }
     }

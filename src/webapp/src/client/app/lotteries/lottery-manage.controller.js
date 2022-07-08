@@ -14,7 +14,7 @@
 
     function lotteryManageController($state, lotteryRepository, $rootScope, notifySrv, $q, localeSrv, errorHandler,
         lotteryStatuses, lottery, pictureRepository, dataHandler, lotteryImageSettings, $timeout) {
-        
+
         var vm = this;
         vm.openDatePicker = openDatePicker;
         vm.startLottery = startLottery;
@@ -33,7 +33,7 @@
         vm.datePicker = {
             isOpen: false
         };
-        
+
         vm.states = {
             isCreate: $state.includes('Root.WithOrg.Admin.Lotteries.Create'),
             isEdit: $state.includes('Root.WithOrg.Admin.Lotteries.Edit')
@@ -50,6 +50,7 @@
                 vm.lottery.endDate = moment.utc(vm.lottery.endDate).local().startOf('minute').toDate();
                 vm.isStarted = vm.lottery.status === lotteryStatuses.started;
                 vm.isDrafted = vm.lottery.status === lotteryStatuses.drafted;
+                vm.isExpired = vm.lottery.status === lotteryStatuses.expired;
                 vm.isEnded = (vm.lottery.status !== lotteryStatuses.drafted) && (vm.lottery.status !== lotteryStatuses.started);
                 $rootScope.pageTitle = 'lotteries.editLottery';
             } else if (states.isCreate) {
@@ -157,7 +158,7 @@
         }
 
         function isPrimaryEditDisabled() {
-            return vm.states.isCreate === false && 
+            return vm.states.isCreate === false &&
                    (vm.states.isEdit && lottery.status === lotteryStatuses.drafted) === false;
         }
     };

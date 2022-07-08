@@ -8,6 +8,7 @@ namespace Shrooms.Contracts.Enums
         Ended,
         RefundStarted,
         RefundLogsCreated,
-        Refunded
+        Refunded,
+        Expired
     }
 }

@@ -41,6 +41,7 @@
     "drafted": "Drafted",
     "started": "Started",
     "deleted": "Deleted",
+    "expired": "Expired",
     "ended": "Ended",
     "refundStarted": "Refunding",
     "refundLogsCreated": "Refund logs created",

@@ -454,6 +454,8 @@
     <Compile Include="Domain\Services\WebHookCallbacks\Events\IEventJoinRemindService.cs" />
     <Compile Include="Domain\Services\WebHookCallbacks\Events\IEventsWebHookService.cs" />
     <Compile Include="Domain\Services\WebHookCallbacks\IWebHookCallbackPremiumServices.cs" />
+    <Compile Include="Domain\Services\WebHookCallbacks\Lotteries\ILotteryStatusChangeService.cs" />
+    <Compile Include="Domain\Services\WebHookCallbacks\Lotteries\LotteryStatusChangeService.cs" />
     <Compile Include="Domain\Services\WebHookCallbacks\LoyaltyKudos\ILoyaltyKudosCalculator.cs" />
     <Compile Include="Domain\Services\WebHookCallbacks\LoyaltyKudos\ILoyaltyKudosService.cs" />
     <Compile Include="Domain\Services\WebHookCallbacks\LoyaltyKudos\LoyaltyKudosCalculator.cs" />
@@ -653,6 +655,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="RecycleWebapp" BeforeTargets="Clean" Condition=" '$(Configuration)|$(Platform)' != 'Release|AnyCPU' ">
     <Message Text="Recycling web app..." Importance="High" />
