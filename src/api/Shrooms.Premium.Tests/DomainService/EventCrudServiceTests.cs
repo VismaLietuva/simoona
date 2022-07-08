@@ -23,6 +23,7 @@ using Shrooms.Premium.Domain.DomainServiceValidators.Events;
 using Shrooms.Premium.Domain.Services.Events;
 using Shrooms.Premium.Domain.Services.Events.Participation;
 using Shrooms.Premium.Domain.Services.Events.Utilities;
+using Shrooms.Premium.Domain.Services.OfficeMap;
 using Shrooms.Tests.Extensions;
 
 namespace Shrooms.Premium.Tests.DomainService
@@ -59,9 +60,17 @@ namespace Shrooms.Premium.Tests.DomainService
             var eventParticipationService = Substitute.For<IEventParticipationService>();
             var eventUtilitiesService = Substitute.For<IEventUtilitiesService>();
             var eventValidationService = new EventValidationService(_systemClockMock);
+            var officeMapService = Substitute.For<IOfficeMapService>();
             var markdownConverter = Substitute.For<IMarkdownConverter>();
 
-            _eventService = new EventService(_uow, _permissionService, eventUtilitiesService, eventValidationService, eventParticipationService, _wallService, markdownConverter);
+            _eventService = new EventService(_uow, 
+                _permissionService,
+                eventUtilitiesService,
+                eventValidationService,
+                eventParticipationService,
+                _wallService,
+                markdownConverter,
+                officeMapService);
         }
 
         [Test]

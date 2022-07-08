@@ -11,12 +11,12 @@ using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.Infrastructure;
+using Shrooms.Contracts.ViewModels;
 using Shrooms.Contracts.ViewModels.Wall.Posts;
 using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.DataTransferObjects.Models.OfficeMap;
 using Shrooms.Premium.Domain.DomainExceptions.Event;
-using Shrooms.Premium.Domain.Services.Args;
 using Shrooms.Premium.Domain.Services.Events;
 using Shrooms.Premium.Domain.Services.Events.Calendar;
 using Shrooms.Premium.Domain.Services.Events.Export;
@@ -29,6 +29,7 @@ using Shrooms.Premium.Presentation.WebViewModels.Events;
 using Shrooms.Premium.Presentation.WebViewModels.User;
 using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.Api.Filters;
+using X.PagedList;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers
 {
@@ -101,38 +102,35 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [Route("")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public async Task<IHttpActionResult> GetEventsFiltered(string typeId = null,
-            string officeId = null,
-            int page = 1,
-            DateTime? startDate = null,
-            DateTime? endDate = null)
+        public async Task<IHttpActionResult> GetEventsFiltered([FromUri] EventFilteredArgsViewModel filteredArgsViewModel)
         {
-            var args = new EventsListingFilterArgs
-            {
-                StartDate = startDate,
-                EndDate = endDate,
-                IsOnlyMainEvents = typeId == "main",
-                Page = page
-            };
+            EventFilteredArgsDto filteredArgsDto;
 
-            if (int.TryParse(typeId, out var typeIdParsed))
+            if (filteredArgsViewModel != null)
             {
-                args.TypeId = typeIdParsed;
+                filteredArgsDto = _mapper.Map<EventFilteredArgsViewModel, EventFilteredArgsDto>(filteredArgsViewModel);
+
+                if (int.TryParse(filteredArgsDto.TypeId, out var typeIdParsed))
+                {
+                    filteredArgsDto.TypeIdParsed = typeIdParsed;
+                }
+
+                if (int.TryParse(filteredArgsDto.OfficeId, out var officeIdParsed))
+                {
+                    filteredArgsDto.OfficeIdParsed = officeIdParsed;
+                }
             }
-
-            if (int.TryParse(officeId, out var officeIdParsed))
+            else
             {
-                args.OfficeId = officeIdParsed;
+                filteredArgsDto = new EventFilteredArgsDto();
             }
-
-            var userOrganization = GetUserAndOrganization();
 
             try
             {
-                var eventsListDto = await _eventListingService.GetEventsFilteredAsync(args, userOrganization);
-                var result = _mapper.Map<IEnumerable<EventListItemDto>, IEnumerable<EventListItemViewModel>>(eventsListDto);
+                var eventListDtos = await _eventListingService.GetEventsFilteredAsync(filteredArgsDto, GetUserAndOrganization());
+                var eventListViewModels = _mapper.Map<IEnumerable<EventListItemDto>, IEnumerable<EventListItemViewModel>>(eventListDtos);
 
-                return Ok(result);
+                return Ok(eventListViewModels);
             }
             catch (EventException e)
             {
@@ -202,19 +200,26 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         [HttpGet]
         [Route("MyEvents")]
         [PermissionAuthorize(Permission = BasicPermissions.Event)]
-        public async Task<IHttpActionResult> GetMyEvents([FromUri] MyEventsOptionsViewModel options, string officeId, int page = 1)
+        public async Task<IHttpActionResult> GetMyEvents([FromUri] MyEventsOptionsViewModel options)
         {
+            if (options == null || !ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
             int? officeIdNullable = null;
 
-            if (officeId != "all" && int.TryParse(officeId, out var officeIdParsed))
+            if (options.OfficeId != "all" && int.TryParse(options.OfficeId, out var officeIdParsed))
             {
                 officeIdNullable = officeIdParsed;
             }
 
             var optionsDto = _mapper.Map<MyEventsOptionsViewModel, MyEventsOptionsDto>(options);
-            SetOrganizationAndUser(optionsDto);
-            var myEventsListDto = await _eventListingService.GetMyEventsAsync(optionsDto, page, officeIdNullable);
+            
+            var myEventsListDto = await _eventListingService.GetMyEventsAsync(optionsDto, GetUserAndOrganization(), officeIdNullable);
+            
             var result = _mapper.Map<IEnumerable<EventListItemDto>, IEnumerable<EventListItemViewModel>>(myEventsListDto);
+            
             return Ok(result);
         }
 
@@ -350,6 +355,38 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                 result.IsForAllOffices = result.OfficesName.Count() == officesCount;
 
                 return Ok(result);
+            }
+            catch (EventException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("GetPagedReportParticipants")]
+        public async Task<IHttpActionResult> GetPagedReportParticipants([FromUri] EventParticipantsReportListingArgsViewModel reportArgsViewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var reportArgsDto = _mapper.Map<EventParticipantsReportListingArgsViewModel, EventParticipantsReportListingArgsDto>(reportArgsViewModel);
+                var pagedParticipants = await _eventListingService.GetReportParticipantsAsync(reportArgsDto, GetUserAndOrganization());
+                var pagedParticipantsViewModel = _mapper.Map<IEnumerable<EventParticipantReportDto>, IEnumerable<EventParticipantReportViewModel>>(pagedParticipants);
+
+                var pagedModel = new StaticPagedList<EventParticipantReportViewModel>(pagedParticipantsViewModel, reportArgsViewModel.Page, reportArgsViewModel.PageSize, pagedParticipants.TotalItemCount);
+                var pagedViewModel = new PagedViewModel<EventParticipantReportViewModel>
+                {
+                    PagedList = pagedModel,
+                    PageCount = pagedModel.PageCount,
+                    ItemCount = pagedModel.TotalItemCount,
+                    PageSize = pagedModel.PageSize
+                };
+
+                return Ok(pagedViewModel);
             }
             catch (EventException e)
             {
@@ -538,6 +575,57 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             {
                 await _eventParticipationService.UpdateSelectedOptionsAsync(changeOptionsDto);
                 return Ok();
+            }
+            catch (EventException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+        
+        [HttpGet]
+        [Route("GetReportEventDetails")]
+        [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
+        public async Task<IHttpActionResult> GetReportEventDetails(Guid eventId)
+        {
+            try
+            {
+                var eventReportDetailsDto = await _eventService.GetReportEventDetailsAsync(eventId, GetUserAndOrganization());
+                var eventReportDetailsViewModel = _mapper.Map<EventReportDetailsDto, EventReportDetailsViewModel>(eventReportDetailsDto);
+
+                return Ok(eventReportDetailsViewModel);
+            }
+            catch (EventException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("GetEventsByTitle")]
+        [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
+        public async Task<IHttpActionResult> GetEventsByTitle([FromUri] EventReportListingArgsViewModel reportArgsViewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var reportArgsDto = _mapper.Map<EventReportListingArgsViewModel, EventReportListingArgsDto>(reportArgsViewModel);
+                var eventListItemsPagedDto = await _eventListingService.GetNotStartedEventsFilteredByTitleAsync(reportArgsDto, GetUserAndOrganization());
+                var eventListItemsViewModel = _mapper.Map<IEnumerable<EventDetailsListItemDto>, IEnumerable<EventDetailsListItemViewModel>>(eventListItemsPagedDto);
+                var pagedModel = new StaticPagedList<EventDetailsListItemViewModel>(eventListItemsViewModel, reportArgsViewModel.Page, reportArgsViewModel.PageSize, eventListItemsPagedDto.TotalItemCount);
+
+                var pagedViewModel = new PagedViewModel<EventDetailsListItemViewModel>
+                {
+                    PagedList = pagedModel,
+                    PageCount = pagedModel.PageCount,
+                    ItemCount = pagedModel.TotalItemCount,
+                    PageSize = pagedModel.PageSize
+                };
+
+                return Ok(pagedViewModel);
             }
             catch (EventException e)
             {

@@ -13,5 +13,7 @@
 
         public const int ExamMaxTitleLength = 255;
         public const int ExamMaxNumberLength = 255;
+
+        public const int FilterPresetMaxNameLength = 30;
     }
 }

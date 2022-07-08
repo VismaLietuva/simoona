@@ -20,6 +20,7 @@
   "messageInvalidEmail": "Not a valid e-mail address",
   "messageFieldIsRequired": "This field is required",
   "messageRequiredField": "{{ one }} - is required field",
+  "uniqueNameRequired": "Cannot contain duplicates",
   "next": "Next",
   "no": "No",
   "noResults": "There are no entries found",
@@ -202,5 +203,14 @@
   "emojiGrumpyCat": "Angry",
   "emojiAll" : "All",
   "more" : "More",
-  "moreCount" : "and {{one}} more..."
+  "moreCount" : "and {{one}} more...",
+  "selectedCount": "{{one}} selected",
+  "createFilterPreset": "Create preset",
+  "default": "Default",
+  "presetConfigurationHeading": "Preset configuration",
+  "presetConfigurationTableEvents": "Events",
+  "presetConfigurationTableOffices": "Offices",
+  "presetConfigurationTableKudos": "Kudos",
+  "presetConfigurationTableName": "Name",
+  "updating": "Updating..."
 }

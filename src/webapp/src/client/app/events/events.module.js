@@ -78,6 +78,19 @@
                 templateUrl: 'app/events/create-edit/create-edit.html',
                 controller: 'addNewEventController',
                 controllerAs: 'vm'
+            })
+            .state('Root.WithOrg.Client.Events.Report', {
+                url: '/Report',
+                templateUrl: 'app/events/event-report-list/event-report-list.html',
+                controller: 'eventReportListController',
+                controllerAs: 'vm'
+            })
+            .state('Root.WithOrg.Client.Events.Report.Event', {
+                parent: 'Root.WithOrg.Client.Events',
+                url: '/Report/Event/:id',
+                templateUrl: 'app/events/event-report-list/event-report/event-report.html',
+                controller: 'eventReportController',
+                controllerAs: 'vm',
             });
     }
 

@@ -1,0 +1,274 @@
+<div class="row body-container" has-permissions="['EVENT_ADMINISTRATION']">
+    <div class="col-xs-12">
+        <div class="panel panel-default mb-10">
+            <!-- Header -->
+            <div class="panel-heading" ng-if="!vm.isLoading.filters">
+                <div class="event-report-list-panel-heading">
+                    <div>
+                        <span>{{vm.eventDetails.name}}</span>
+                    </div>
+                    <div class="col-md-6 event-report-filter-preset-container">
+                        <ace-filter-preset
+                            ng-if="!vm.isLoading.filters"
+                            filter-page-type="{{vm.filter.pageType}}"
+                            loaded-filter-types="vm.filter.filterTypes"
+                            on-value-change="vm.applyFilterPreset(preset)"
+                            class="pull-right"
+                            modal-size="lg"
+                            ng-class="{ 'hidden' : vm.isLoading.events && !vm.eventDetails }"
+                        ></ace-filter-preset>
+                    </div>
+                </div>
+            </div>
+
+            <wave-spinner ng-if="vm.isLoading.events && !vm.eventDetails"></wave-spinner>
+
+            <div class="panel-body">
+                <!-- Content -->
+                <div>
+                    <div class="row" ng-if="!vm.isLoading.events || vm.eventDetails">
+                        <div class="col-xs-12 col-sm-6 col-lg-4 text-center">
+                            <img class="event-details-image" alt="{{vm.eventDetails.name}}"
+                                ng-src="{{vm.eventDetails.imageName | imageThumb:vm.eventImageSize:'crop'}}"
+                                image-loading>
+                        </div>
+
+                        <div class="col-xs-12 col-sm-6 col-lg-3 event-details-registration-container">
+                            <div class="col-xs-12 event-report-start-date text-center">
+                                <span translate="events.eventStart"></span>
+                            </div>
+                            <div class="col-xs-12 event-report-start-time text-center" ng-cloak>
+                                {{vm.eventDetails.startDate | amUtc | amLocal | amDateFormat:'HH:mm'}}
+                            </div>
+                            <div class="col-xs-12 event-report-start-date text-center" ng-cloak>
+                                {{vm.eventDetails.startDate | amUtc | amLocal | amDateFormat:'MMMM DD'}}
+                            </div>
+                        </div>
+
+                        <div class="col-xs-12 col-lg-5 event-report-info-container">
+                            <div class="col-xs-12">
+                                <span class="glyphicon glyphicon-clock"></span>
+                                <b>
+                                    <span translate="events.eventEndDate"></span>
+                                    :
+                                </b>
+                                <span class="event-report-date" ng-cloak>
+                                    {{vm.eventDetails.endDate | amUtc | amLocal | amDateFormat:'YYYY-MM-DD HH:mm'}}
+                                </span>
+                            </div>
+                            <div class="col-xs-12">
+                                <span class="glyphicon glyphicon-map-marker"></span>
+                                <b>
+                                    <span ng-if="vm.eventDetails.officeNames.length < 2"
+                                        translate="events.eventOffice"></span>
+                                    <span ng-if="vm.eventDetails.officeNames.length > 1"
+                                        translate="events.eventOffices"></span>
+                                    :
+                                </b>
+                                <span ng-cloak ng-if="!vm.eventDetails.isForAllOffices && vm.eventDetails.officeNames"
+                                    ng-repeat="officeName in vm.eventDetails.officeNames">
+                                    {{officeName}}{{$last ? '' :', '}}
+                                </span>
+                                <span ng-cloak
+                                    ng-if="vm.eventDetails.isForAllOffices || !vm.eventDetails.officeNames.length">
+                                    {{"events.eventForOfficeAll"
+                                    | translate}}
+                                </span>
+                            </div>
+                            <div class="col-xs-12">
+                                <span class="glyphicon glyphicon-map-marker"></span>
+                                <b>
+                                    <span translate="events.eventLocation"></span>
+                                    :
+                                </b>
+                                <span ng-cloak>{{vm.eventDetails.location}}</span>
+                            </div>
+                            <div class="col-xs-12">
+                                <span class="glyphicon glyphicon-user"></span>
+                                <b>
+                                    <span translate="events.responsiblePerson"></span>
+                                    :
+                                </b>
+                                <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: vm.eventDetails.hostUserId })">
+                                    <span ng-cloak>
+                                        {{vm.eventDetails.hostUserFullName}}
+                                    </span>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+
+                <!-- Filter controls -->
+                <div class="row event-report-list-filter-controls" ng-if="!vm.isLoading.events && vm.participants.pagedList.length">
+                    <ace-dropdown-checkbox
+                        class="col-md-2 col-xs-6 col-sm-4 pull-right"
+                        translation="events.eventKudosDropdownButtonTitle"
+                        types="vm.filter.filterTypes.kudos.filters"
+                        on-value-change="vm.loadParticipantsWithNewlyAppliedFilter(types, 'kudos')"
+                        applied-types="vm.filter.dropdown.kudos"
+                        is-expanded="false">
+                    </ace-dropdown-checkbox>
+
+                    <ace-dropdown-checkbox class="col-md-2 col-xs-6 col-sm-4 pull-right"
+                        translation="events.eventTypesDropdownButtonTitle"
+                        types="vm.filter.filterTypes.events.filters"
+                        applied-types="vm.filter.dropdown.events"
+                        on-value-change="vm.loadParticipantsWithNewlyAppliedFilter(types, 'events')"
+                        is-expanded="false">
+                    </ace-dropdown-checkbox>
+                </div>
+
+                <table class="nc-table">
+                    <thead ng-if="vm.participants.pagedList.length" >
+                        <tr class="nowrap">
+                            <th>
+                                <ace-sort-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="firstName">
+                                    <span translate="events.tableEmployee"></span>
+                                </ace-sort-link>
+                            </th>
+
+                            <th class="hidden-xs hidden-sm">
+                                <ace-sort-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="employmentDate">
+                                    <span translate="events.tableHireDate"></span>
+                                </ace-sort-link>
+                            </th>
+
+                            <th class="hidden-xs hidden-sm hidden-md">
+                                <ace-sort-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="qualificationLevel">
+                                    <span translate="events.tableQualification"></span>
+                                </ace-sort-link>
+                            </th>
+
+                            <th class="hidden-xs hidden-sm">
+                                <ace-sort-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="jobTitle">
+                                    <span translate="events.tablePosition"></span>
+                                </ace-sort-link>
+                            </th>
+
+                            <th class="hidden-xs hidden-sm hidden-md">
+                                <ace-sort-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="managerFirstName">
+                                    <span translate="events.tableManager"></span>
+                                </ace-sort-link>
+                            </th>
+
+                            <th class="hidden-xs hidden-sm">
+                                <ace-sort-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="kudos">
+                                    <span translate="events.tableKudos"></span>
+                                </ace-sort-link>
+                            </th>
+
+                            <th class="event-report-visited-events">
+                                <ace-sort-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="visitedEvents.Count">
+                                    <span translate="events.tableEvents"></span>
+                                </ace-sort-link>
+                            </th>
+
+                            <th class="hidden-xs hidden-sm">
+                                <ace-sort-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="projects.Count">
+                                    <span translate="events.tableProjects"></span>
+                                </ace-sort-link>
+                            </th>
+
+                            <th class="hidden-xs hidden-sm event-report-action" ng-if="vm.showActionsColumn" translate="events.tableAction">
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody ng-if="!vm.isLoading.participants && vm.participants.pagedList.length">
+                        <tr ng-repeat-start="participant in vm.participants.pagedList" ng-click="vm.viewDetails(event.id)">
+                            <td class="col-xs-2 word-break" ng-cloak>
+                                <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: participant.id })">
+                                    <span ng-cloak>
+                                        {{participant.firstName}} {{participant.lastName}}
+                                    </span>
+                                </a>
+                            </td>
+                            <td class="col-xs-2 hidden-xs hidden-sm" ng-cloak>
+                                {{participant.employmentDate | amUtc | amLocal | amDateFormat:'YYYY-MM-DD'}}
+                            </td>
+                            <td class="col-xs hidden-xs hidden-sm hidden-md" ng-cloak>
+                                {{participant.qualificationLevel || ('events.empty' | translate) }}
+                            </td>
+                            <td class="col-xs-2 hidden-xs hidden-sm" ng-cloak>
+                                {{participant.jobTitle || ('events.empty' | translate) }}
+                            </td>
+                            <td class="col-xs-2 hidden-xs hidden-sm hidden-md" ng-cloak>
+                                <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: participant.managerId })">
+                                    <span ng-if="participant.managerFirstName" ng-cloak>
+                                        {{participant.managerFirstName}} {{participant.managerLastName}}
+                                    </span>
+                                </a>
+                                <span ng-if="!participant.managerFirstName" translate="events.empty"></span>
+                            </td>
+
+                            <!-- Kudos -->
+                            <td class="col-xs hidden-xs hidden-sm" ng-cloak>
+                                <a ui-sref="Root.WithOrg.Client.Kudos.KudosUserInformation({ userId: participant.id })">
+                                    {{participant.kudos}}
+                                </a>
+                                <span ng-if="!participant.kudos" translate="events.empty"></span>
+                            </td>
+
+                            <!-- Events -->
+                            <td class="col-xs-2 event-report-visited-events" ng-cloak>
+                                <span ng-if="!participant.visitedEvents.length" translate="events.empty"></span>
+                                <ul class="event-report-event-list" ng-if="participant.visitedEvents.length">
+                                    <li ng-if="!participant.isExpanded"
+                                        ng-repeat="event in participant.visitedEvents | limitTo: vm.visitedEventsPreviewCount track by $index">
+                                        <a
+                                            class="event-report-event-name"
+                                            ui-sref=" Root.WithOrg.Client.Events.EventContent({ id: event.id })">{{event.name}}</a>
+                                        <span
+                                            class="event-report-more-visited"
+                                            ng-if="participant.canBeExpanded &&
+                                                        !participant.isExpanded &&
+                                                        $index === vm.visitedEventsPreviewCount - 1"
+                                            translate="events.moreCount" translate-values="{ one: participant.visitedEvents.length -
+                                                            vm.visitedEventsPreviewCount }">
+                                        </span>
+                                    </li>
+                                </ul>
+                            </td>
+
+                            <!-- Projects -->
+                            <td class="col-xs-4 hidden-xs hidden-sm" ng-cloak>
+                                <span ng-if="!participant.projects.length" translate="events.empty"></span>
+                                <ul class="event-report-project-list" ng-if="participant.projects.length">
+                                    <li ng-repeat="project in participant.projects">
+                                        <a
+                                            ui-sref=" Root.WithOrg.Client.Projects.ProjectContent({ id: project.id })">{{project.name}}</a>
+                                    </li>
+                                </ul>
+                            </td>
+
+                            <!-- Expand button -->
+                            <td class="col-xs-1 hidden-xs hidden-sm ml-5 text-center event-report-action" ng-if="vm.showActionsColumn">
+                                <ace-expand-button ng-if="participant.canBeExpanded"
+                                    is-expanded="participant.isExpanded"></ace-expand-button>
+                            </td>
+                        </tr>
+
+                        <!-- Additional row for displaying participated events -->
+                        <tr ng-repeat-end ng-if="participant.isExpanded">
+                            <td colspan="9" class="no-padding">
+                                <!-- Expansion content -->
+                                <ace-expand-participants visited-events="participant.visitedEvents"></ace-expand-participants>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <wave-spinner ng-if="vm.isLoading.participants"></wave-spinner>
+
+                <ace-list-pagination
+                    total-item-count="vm.participants.itemCount"
+                    page-size="vm.participants.pageSize"
+                    page-count="vm.participants.pageCount"
+                    current-page="vm.page"
+                    on-changed="vm.loadParticipantsOnPage(page)">
+                </ace-list-pagination>
+            </div>
+        </div>
+    </div>
+</div>

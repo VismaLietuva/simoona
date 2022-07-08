@@ -41,14 +41,18 @@
             getUserForAutoCompleteResponsiblePerson: getUserForAutoCompleteResponsiblePerson,
             exportParticipants: exportParticipants,
             getMaxEventParticipants: getMaxEventParticipants,
-            updateAttendStatus: updateAttendStatus
+            updateAttendStatus: updateAttendStatus,
+            getEventsByTitle: getEventsByTitle,
+            getEventParticipants: getEventParticipants,
+            getReportEventDetails: getReportEventDetails
         };
+
         return service;
 
         /////////
 
         function getAllEvents() {
-            return $resource(eventUrl + 'All').query().$promise;
+            return $resource(eventUrl).query().$promise;
         }
 
         function getEventOffices() {
@@ -218,6 +222,34 @@
                 attendStatus: attendStatus,
                 attendComment: attendComment,
                 eventId: eventId
+            }).$promise;
+        }
+
+        function getReportEventDetails(eventId) {
+            return $resource(`${eventUrl}GetReportEventDetails`).get({
+                eventId: eventId
+            }).$promise;
+        }
+
+        function getEventsByTitle(searchString, page, typeIds, officeIds, sortBy, sortOrder) {
+            return $resource(`${eventUrl}GetEventsByTitle`).get({
+                searchString: searchString,
+                eventTypeIds: typeIds,
+                page: page,
+                officeIds: officeIds,
+                sortByColumnName: sortBy,
+                sortDirection: sortOrder
+            }).$promise;
+        }
+
+        function getEventParticipants(eventId, kudosTypeIds, eventTypes, page, sortBy, sortOrder) {
+            return $resource(`${eventUrl}GetPagedReportParticipants`).get({
+                eventId: eventId,
+                kudosTypeIds: kudosTypeIds,
+                eventTypeIds: eventTypes,
+                page: page,
+                sortByColumnName: sortBy,
+                sortDirection: sortOrder
             }).$promise;
         }
     }

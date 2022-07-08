@@ -2,7 +2,7 @@
 
 namespace Shrooms.Contracts.DataTransferObjects.Models.ExternalLinks
 {
-    public class AddEditDeleteExternalLinkDto : UserAndOrganizationDto
+    public class ManageExternalLinkDto : UserAndOrganizationDto
     {
         public IEnumerable<ExternalLinkDto> LinksToUpdate { get; set; }
 

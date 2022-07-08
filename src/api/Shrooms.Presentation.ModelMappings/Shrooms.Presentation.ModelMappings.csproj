@@ -68,6 +68,7 @@
   <ItemGroup>
     <Compile Include="Helpers.cs" />
     <Compile Include="Profiles\ExternalLinks.cs" />
+    <Compile Include="Profiles\FilterPresets.cs" />
     <Compile Include="Profiles\Jobs.cs" />
     <Compile Include="Profiles\Likes.cs" />
     <Compile Include="Profiles\Monitors.cs" />

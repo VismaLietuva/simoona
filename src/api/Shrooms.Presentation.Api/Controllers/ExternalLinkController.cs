@@ -41,14 +41,14 @@ namespace Shrooms.Presentation.Api.Controllers
         [Route("Update")]
         [PermissionAuthorize(Permission = AdministrationPermissions.ExternalLink)]
         [InvalidateCacheOutput(nameof(GetAll))]
-        public async Task<IHttpActionResult> UpdateLinks(AddEditDeleteExternalLinkViewModel updateLinksViewModel)
+        public async Task<IHttpActionResult> UpdateLinks(ManageExternalLinkViewModel manageLinksViewModel)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var updateLinksDto = _mapper.Map<AddEditDeleteExternalLinkViewModel, AddEditDeleteExternalLinkDto>(updateLinksViewModel);
+            var updateLinksDto = _mapper.Map<ManageExternalLinkViewModel, ManageExternalLinkDto>(manageLinksViewModel);
             SetOrganizationAndUser(updateLinksDto);
 
             try

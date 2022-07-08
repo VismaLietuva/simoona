@@ -1,0 +1,12 @@
+<div>
+    <a id="link" class="pull-right mt-2 w-0 glyphicon glyphicon-cogwheel dropdown-toggle post-comment-settings-icon">
+    </a>
+
+    <select name="form-control" class="pull-right w-full filter-preset-select" ng-if="loadedPresets.length && !reloading" type="text"
+        ng-options="item as item.name for item in loadedPresets" ng-init="selectedPreset" ng-model="selectedPreset" ng-change="sendSelectedPresetValues(selectedPreset)">
+    </select>
+
+    <select class="pull-right w-full filter-preset-select" ng-if="reloading">
+        <option>{{ 'common.updating' | translate }}</option>
+    </select>
+</div>

@@ -82,6 +82,15 @@
     <Compile Include="DataTransferObjects\ApplicationUserMinimalDto.cs" />
     <Compile Include="DataTransferObjects\BaseEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailDto.cs" />
+    <Compile Include="DataTransferObjects\FilterPresets\ManageFilterPresetDto.cs" />
+    <Compile Include="DataTransferObjects\FilterPresets\CreateFilterPresetDto.cs" />
+    <Compile Include="DataTransferObjects\FilterPresets\UpdateFilterPresetDto.cs" />
+    <Compile Include="DataTransferObjects\FilterPresets\FilterDto.cs" />
+    <Compile Include="DataTransferObjects\FilterPresets\FilterPresetDto.cs" />
+    <Compile Include="DataTransferObjects\FilterPresets\FilterPresetItemDto.cs" />
+    <Compile Include="DataTransferObjects\FilterPresets\FiltersDto.cs" />
+    <Compile Include="DataTransferObjects\FilterPresets\UpdatedFilterPresetDto.cs" />
+    <Compile Include="Infrastructure\IPageable.cs" />
     <Compile Include="DataTransferObjects\ISoftDelete.cs" />
     <Compile Include="DataTransferObjects\ITrackable.cs" />
     <Compile Include="DataTransferObjects\Kudos\AddKudosLogDto.cs" />
@@ -102,6 +111,7 @@
     <Compile Include="DataTransferObjects\Wall\Posts\PostDto.cs" />
     <Compile Include="DataTransferObjects\Wall\UpdateWallDto.cs" />
     <Compile Include="Enums\ExternalLinkTypeEnum.cs" />
+    <Compile Include="Enums\FilterType.cs" />
     <Compile Include="Enums\KudosTypeEnum.cs" />
     <Compile Include="Enums\LotteryStatus.cs" />
     <Compile Include="Enums\NotificationType.cs" />
@@ -122,6 +132,7 @@
     <Compile Include="Infrastructure\IExcelBuilder.cs" />
     <Compile Include="Infrastructure\IJobScheduler.cs" />
     <Compile Include="Infrastructure\ILogger.cs" />
+    <Compile Include="Infrastructure\ISortableProperty.cs" />
     <Compile Include="Infrastructure\ISystemClock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\AbstractViewModel.cs" />
