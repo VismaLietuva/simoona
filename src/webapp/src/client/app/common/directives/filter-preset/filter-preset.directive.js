@@ -367,15 +367,13 @@
                 if (preset.isDeleted && !preset.isNew) {
                     presetsToDelete.push(preset.id);
                 } else if (preset.isNew && !preset.isDeleted) {
-                    presetsToCreate.push({
-                        ...preset,
+                    presetsToCreate.push(Object.assign({
                         filters: mapControlFiltersToPresetFilters(preset)
-                    });
+                    }, preset));
                 } else if (isPresetUpdated(i)) {
-                    presetsToUpdate.push({
-                        ...preset,
-                        filters: mapControlFiltersToPresetFilters(preset),
-                    });
+                    presetsToUpdate.push(Object.assign({
+                        filters: mapControlFiltersToPresetFilters(preset)
+                    }, preset))
                 }
             }
 
