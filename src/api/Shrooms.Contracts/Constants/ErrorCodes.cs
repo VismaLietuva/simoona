@@ -49,5 +49,10 @@
         public const int BadgeTypeNotFound = 1300;
         public const int BadgeCategoryNotFound = 1301;
         public const int BadgeToKudosRelationshipNotFound = 1302;
+
+        // Filter presets, 14**
+        public const int InvalidType = 1400;
+        public const int FilterNotFound = 1403;
+        public const int FilterPresetContainsMoreThanOneDefaultPreset = 1404;
     }
 }

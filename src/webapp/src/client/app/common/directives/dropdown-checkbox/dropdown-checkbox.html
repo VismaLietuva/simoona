@@ -1,0 +1,26 @@
+<div class="checkbox-dropdown">
+    <button class="btn btn-default" type="button" ng-click="vm.isExpanded = !vm.isExpanded;"
+        data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"
+        ng-blur="vm.closeMenu()"
+        ng-mouseleave="vm.isMouseOverButton = false;"
+        ng-mouseenter="vm.isMouseOverButton = true;">
+
+        <span class="checkbox-menu-text" translate="{{vm.translation}}"
+            translate-values="{ one: vm.appliedTypes.size }">
+        </span>
+
+        <span class="expand-button-toggle glyphicon"
+            ng-class="{'glyphicon-chevron-up': vm.isExpanded, 'glyphicon-chevron-down': !vm.isExpanded}">
+        </span>
+    </button>
+    <div ng-mouseleave="vm.isMouseOverMenu = false;" ng-mouseenter="vm.isMouseOverMenu = true;">
+        <ul class="checkbox-menu allow-focus" ng-if="vm.isExpanded">
+            <li ng-repeat="type in vm.types track by $index" ng-class="{ 'active' : vm.isTypeApplied(type) }">
+                <label>
+                    <input ng-checked="vm.isTypeApplied(type)" ng-blur="vm.closeMenu()" type="checkbox" ng-model="vm.appliedTypes[$index]" ng-click="vm.toggleType(type)">
+                    <span>{{type.name}}</span>
+                </label>
+            </li>
+        </ul>
+    </div>
+</div>

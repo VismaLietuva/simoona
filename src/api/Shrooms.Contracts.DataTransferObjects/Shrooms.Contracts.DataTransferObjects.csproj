@@ -69,7 +69,7 @@
     <Compile Include="Models\Birthdays\BirthdayDto.cs" />
     <Compile Include="Models\Birthdays\UserBirthdayInfoDto.cs" />
     <Compile Include="Models\Emails\EmailSendingDto.cs" />
-    <Compile Include="Models\ExternalLinks\AddEditDeleteExternalLinkDto.cs" />
+    <Compile Include="Models\ExternalLinks\ManageExternalLinkDto.cs" />
     <Compile Include="Models\ExternalLinks\ExternalLinkDto.cs" />
     <Compile Include="Models\ExternalLinks\NewExternalLinkDto.cs" />
     <Compile Include="Models\Jobs\JobTypeDto.cs" />

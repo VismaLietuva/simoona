@@ -7,6 +7,6 @@ namespace Shrooms.Domain.Services.ExternalLinks
     public interface IExternalLinkService
     {
         Task<IEnumerable<ExternalLinkDto>> GetAllAsync(int organizationId);
-        Task UpdateLinksAsync(AddEditDeleteExternalLinkDto updateLinksDto);
+        Task UpdateLinksAsync(ManageExternalLinkDto manageLinksDto);
     }
 }

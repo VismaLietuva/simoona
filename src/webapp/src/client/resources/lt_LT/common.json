@@ -19,6 +19,7 @@
   "messageInvalidEmail": "El. pašto adresas yra blogo formato",
   "messageFieldIsRequired": "Šis laukas yra privalomas",
   "messageRequiredField": "{{ one }} - privalomas laukas",
+  "uniqueNameRequired": "Negali būti dublikatų",
   "next": "Toliau",
   "no": "Ne",
   "noResults": "Nėra įrašų",
@@ -202,5 +203,14 @@
   "emojiGrumpyCat": "Piktas (-a)",
   "emojiAll" : "Visi",
   "more" : "Daugiau",
-  "moreCount" : "ir dar {{one}}..."
+  "moreCount" : "ir dar {{one}}...",
+  "selectedCount": "{{one}} pasirinkti",
+  "createFilterPreset": "Sukurti šabloną",
+  "default": "Numatytas",
+  "presetConfigurationHeading": "Šablonų konfiguracija",
+  "presetConfigurationTableEvents": "Renginiai",
+  "presetConfigurationTableOffices": "Ofisai",
+  "presetConfigurationTableKudos": "Kudos",
+  "presetConfigurationTableName": "Pavadinimas",
+  "updating": "Atnaujinama..."
 }

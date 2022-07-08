@@ -1580,3 +1580,135 @@ a.disabled.btn, fieldset[disabled] a.btn {
 .settings-providers-status-tooltip .tooltip-inner {
     max-width: 500px;
 }
+
+// Dropdown with multiple checkboxes
+.checkbox-dropdown:extend(.dropdown) {
+    box-sizing: border-box;
+
+    > div {
+        position: relative;
+    }
+
+    > button {
+        width: 100%;
+        display: block;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: none !important;
+        border: 1px solid #1b7bb3 !important;
+    }
+}
+
+.expand-button-toggle:extend(.event-participant-heading-toggle) {
+    float: none !important;
+    top: 0;
+    margin: 5px 5px 4px 2px;
+}
+
+.checkbox-menu-text {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 400;
+    color: #125e8a;
+}
+
+.checkbox-menu:extend(.dropdown-menu) {
+    width: 100%;
+    min-width: 150px;
+    box-sizing: border-box;
+    display: block;
+    list-style-type: none;
+    position: absolute;
+    background-color: white;
+    z-index: 1000;
+}
+
+.checkbox-menu li label {
+    display: flex;
+    align-items: center;
+    padding: 3px 10px;
+    clear: both;
+    font-weight: normal;
+    line-height: 1.42857143;
+    color: #333;
+    margin: 0;
+    overflow-x: hidden;
+    transition: background-color .4s ease;
+}
+
+.checkbox-menu li input {
+    position: relative;
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-bottom: 3px;
+}
+
+.checkbox-menu li.active label {
+    font-weight: bold;
+}
+
+.checkbox-menu li label:hover,
+.checkbox-menu li label:focus {
+    background-color: #f5f5f5;
+}
+
+.checkbox-menu li.active label:hover,
+.checkbox-menu li.active label:focus {
+    background-color: #CCEBFF;
+}
+
+// Filter presets
+.filter-preset-select {
+    min-width: 150px;
+    border: 1px solid #dddddd;
+    margin-right: 10px;
+    border-radius: 5px;
+}
+
+.filter-preset-modal-container {
+    margin-bottom: 0px !important;
+    padding-bottom: 30px;
+}
+
+.filter-preset-modal-heading {
+    padding: 10px;
+    border-bottom: none;
+}
+
+.has-error, .has-error:focus {
+    border: 1px solid #C72828 !important;
+    box-shadow: 1px 1px 0 #C72828 inset, -1px -1px 0 #C72828 inset !important;
+    -webkit-box-shadow: 1px 1px 0 #C72828 inset, -1px -1px 0 #C72828 inset !important;
+}
+
+@media (max-width: 767px) {
+    .filter-preset-table > tbody,
+    .filter-preset-table > tbody > tr {
+        display: flex;
+        flex-direction: column;
+        border: 0;
+        margin-bottom: 15px !important;
+    }
+
+    .filter-preset-table > tbody > tr > td,
+    .filter-preset-table > tbody > tr > td:first-child,
+    .filter-preset-table > tbody > tr > td:last-child {
+        border: 0 !important;
+    }
+
+    .filter-preset-table > tbody > tr > td > span {
+        display: block;
+        text-align: left;
+        line-height: 2;
+    }
+
+}
+.filter-preset-delete-container {
+    text-align: center;
+    margin-top: 0px;
+}

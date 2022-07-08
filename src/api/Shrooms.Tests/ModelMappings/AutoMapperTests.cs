@@ -62,5 +62,11 @@ namespace Shrooms.Tests.ModelMappings
         {
             _mapper.ConfigurationProvider.AssertConfigurationIsValid<VacationPages>();
         }
+
+        [Test]
+        public void Mapping_FilterPreset_Models()
+        {
+            _mapper.ConfigurationProvider.AssertConfigurationIsValid<FilterPresets>();
+        }
     }
 }

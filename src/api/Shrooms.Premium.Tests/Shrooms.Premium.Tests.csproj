@@ -164,6 +164,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\WebApi\EventControllerTests.cs" />
     <Compile Include="Controllers\WebApi\LotteryControllerTests.cs" />
     <Compile Include="DomainService\BadgesServiceTests.cs" />
     <Compile Include="DomainService\BookMobileServiceTests.cs" />
@@ -172,6 +173,7 @@
     <Compile Include="DomainService\EventListingServiceTests.cs" />
     <Compile Include="DomainService\EventServices\EventExportServiceTests.cs" />
     <Compile Include="DomainService\EventServices\EventParticipantServiceTests.cs" />
+    <Compile Include="DomainService\EventServiceTests.cs" />
     <Compile Include="DomainService\EventUtilitiesServiceTests.cs" />
     <Compile Include="DomainService\LotteryServices\LotteryAbortJobTests.cs" />
     <Compile Include="DomainService\LotteryServices\LotteryServiceTests.cs" />

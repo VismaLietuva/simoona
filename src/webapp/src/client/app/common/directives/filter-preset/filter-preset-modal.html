@@ -1,0 +1,93 @@
+<div>
+    <div class="panel panel-default filter-preset-modal-container">
+        <div class="panel-heading filter-preset-modal-heading">
+            <span translate="common.presetConfigurationHeading"></span>
+        </div>
+        <div ng-form name="mainForm" class="p-10">
+            <table class="nc-table filter-preset-table" ng-if="vm.controls.length && !vm.allCheckedAsDeleted">
+                <thead class="hidden-xs">
+                    <tr class="info">
+                        <th translate="common.presetConfigurationTableName">
+                        <th ng-repeat="filterTypes in vm.loadedFilterTypes"
+                            translate="{{vm.filterTypesRowTranslations[filterTypes.filterType]}}">
+                        <th translate="common.default">
+                        <th class="text-center" translate="common.action">
+                    </tr>
+                </thead>
+
+                <tr ng-repeat="control in vm.controls" ng-form name="form" ng-if="!control.isDeleted">
+                    <td class="col-sm-2 col-md-3">
+                        <!-- Column name that is visible on small screen only -->
+                        <span class="bold hidden-sm hidden-md hidden-lg">{{ 'common.presetConfigurationTableName' | translate}}</span>
+
+                        <input ng-maxlength="30" required id="presetName{{$index}}" name="presetName" ng-required="true"
+                            ng-model="vm.controls[$index].name" type="text"
+                            ng-class="{'has-error' : (form.presetName.$error.required && form.presetName.$dirty) || form.presetName.$error.maxlength || !vm.isNameUnique(vm.controls[$index]) }">
+
+                        <!-- Error messages -->
+                        <p class="text-danger help-block"
+                            ng-if="form.presetName.$error.required && form.presetName.$dirty"
+                            translate="common.messageFieldIsRequired"></p>
+                        <p class="text-danger help-block" ng-if="form.presetName.$error.maxlength"
+                            translate="common.maxLengthError" translate-values="{ two: 30 }"></p>
+                        <p class="text-danger help-block" ng-if="!form.presetName.$error.maxlength && !vm.isNameUnique(vm.controls[$index])"
+                            translate="common.uniqueNameRequired"></p>
+                    </td>
+
+                    <td class="col-sm-3 col-md-3" ng-repeat="filterTypes in vm.loadedFilterTypes" th="{{vm.filterTypesRowTranslations[filterTypes.filterType] | translate}}">
+                        <!-- Column name that is visible on small screen only -->
+                        <span class="bold hidden-sm hidden-md hidden-lg">{{ vm.filterTypesRowTranslations[filterTypes.filterType] | translate}}</span>
+
+                        <ace-dropdown-checkbox is-expanded="false" types="filterTypes.filters"
+                            applied-types="vm.controls[$parent.$index].filters[$index].appliedTypes"
+                            translation="common.selectedCount"
+                            is-disabled="vm.controls[$parent.$index].filters[$index].isDisabled">
+                        </ace-dropdown-checkbox>
+                    </td>
+
+                    <td class="col-sm-1 col-md-1 text-center">
+                        <!-- Column name that is visible on small screen only -->
+                        <span class="bold hidden-sm hidden-md hidden-lg">{{'common.default' | translate}}</span>
+
+                        <input type="checkbox" ng-checked="vm.controls[$index].isDefault"
+                            ng-click="vm.uncheckAllSelectedDefaultPresets(vm.controls[$index])"
+                            ng-model="vm.controls[$index].isDefault">
+                    </td>
+
+                    <td class="col-sm-2 col-md-2 text-center">
+                        <!-- Column name that is visible on small screen only -->
+                        <span class="bold hidden-sm hidden-md hidden-lg">{{'common.action' | translate}}</span>
+
+                        <!-- Delete button -->
+                        <div class="filter-preset-delete-container">
+                            <a ng-click="vm.setPresetAsDeleted(control)" data-test-id="delete-external-link"
+                                translate-attr-title="common.delete" translate>
+                                <span class="vismaicon vismaicon-delete"></span>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Create button -->
+            <div class="wall-create-button text-center mb-10">
+                <a class="nc-btn nc-btn-default" ng-click="vm.spawnNewPresetControl()">
+                    <span class="vismaicon vismaicon-add2-circle"></span><span class="hidden-xs"
+                        translate="common.createFilterPreset"></span>
+                </a>
+            </div>
+
+            <div class="pull-right">
+                <!-- Save button -->
+                <button class="btn btn-primary" ng-disabled="mainForm.$invalid || !vm.controls.length || !vm.areNamesEqual()"
+                    ng-click="vm.applyUpdate()">
+                    <span translate="common.save"></span>
+                </button>
+                <!-- Cancel button -->
+                <button class="btn btn-default" ng-click="vm.cancelUpdate()">
+                    <span translate="common.cancel"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

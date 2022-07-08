@@ -196,6 +196,11 @@
     margin-top: 10px;
 }
 
+.event-search-bar {
+    display: inline-block;
+    border-color: #1b7bb3 !important;
+}
+
 .event-participant-list-expand-collapse-button {
     width: 100%;
     margin-top: 10px;
@@ -327,12 +332,24 @@
     }
 }
 
+.event-report-start-time,
 .event-details-start-time {
     color: #4D8400;
     font-size: 19px;
     font-weight: 600;
 }
 
+.event-report-expand-button {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50px;
+    background: none !important;
+    width: 40px !important;
+    height: 43px !important;
+    border: 1px solid #1b7bb3 !important;
+}
+
+.event-report-start-date,
 .event-details-start-date {
     color: #4D8400;
     font-size: 15px;
@@ -351,6 +368,7 @@
     }
 }
 
+.event-report-info-container,
 .event-details-info-container {
     color: #737373;
     div {
@@ -359,8 +377,70 @@
     }
 }
 
+.event-report-date,
 .event-details-date {
     display: inline-block;
+}
+
+.event-report-more-visited {
+    display: block;
+}
+
+.event-report-event-name {
+    word-break: break-word;
+}
+
+.event-report-extension-table {
+    margin-bottom: 0px;
+    border: 0px;
+    background-color: #fcfcfc;
+}
+
+.event-report-list-filter-controls {
+    margin: 10px 0;
+}
+
+.event-report-list-filter-controls > div {
+    padding-right: 0px;
+}
+
+.event-report-project-list,
+.event-report-event-list {
+    padding-left: 10px;
+}
+
+
+.event-report-list-panel-heading {
+    display: flex;
+    justify-content: space-between;
+}
+
+.event-report-action {
+    border-left: 1px solid #dddddd !important;
+}
+
+@media (max-width: 767px) {
+    .event-report-list-panel-heading {
+        display: block;
+        padding-bottom: 50px;
+    }
+
+    .event-report-filter-preset-container {
+        float: left;
+        display: block;
+        padding-left: 10px;
+        padding-top: 10px;
+    }
+
+    .event-report-visited-events {
+        border-right: 1px solid #dddddd !important;
+    }
+}
+
+@media (max-width: 991px) {
+    .event-report-visited-events {
+        border-right: 1px solid #dddddd !important;
+    }
 }
 
 .event-join-options {

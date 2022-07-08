@@ -128,6 +128,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\DbSetExtensions.cs" />
     <Compile Include="Helpers\BirthdayDateTimeHelper.cs" />
     <Compile Include="Helpers\CommonMarkMarkdownConverter.cs" />
     <Compile Include="Helpers\HtmlSanitizerHelper.cs" />
@@ -146,6 +147,8 @@
     <Compile Include="Services\Email\Posting\ICommentEmailNotificationService.cs" />
     <Compile Include="Services\ExternalLinks\ExternalLinkService.cs" />
     <Compile Include="Services\ExternalLinks\IExternalLinkService.cs" />
+    <Compile Include="Services\FilterPresets\FilterPresetService.cs" />
+    <Compile Include="Services\FilterPresets\IFilterPresetService.cs" />
     <Compile Include="Services\Jobs\IJobService.cs" />
     <Compile Include="Services\Jobs\JobService.cs" />
     <Compile Include="Services\Kudos\IKudosExportService.cs" />

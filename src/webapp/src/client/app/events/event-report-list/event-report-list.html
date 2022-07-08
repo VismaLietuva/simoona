@@ -1,0 +1,125 @@
+<div class="row body-container" has-permissions="['EVENT_ADMINISTRATION']">
+    <div class="col-xs-12">
+        <div class="panel panel-default">
+            <!-- Header -->
+            <div class="panel-heading event-report-list-panel-heading">
+                <div class="event-report-list-panel-heading w-full">
+                    <div>
+                        <span translate="events.eventsTitle"></span>
+                    </div>
+                    <div class="col-md-6 event-report-filter-preset-container">
+                        <ace-filter-preset ng-if="!vm.isLoading.filters" filter-page-type="{{vm.filter.pageType}}"
+                            loaded-filter-types="vm.filter.filterTypes" on-value-change="vm.applyFilterPreset(preset)"
+                            class="pull-right" modal-size="lg"
+                            ng-class="{ 'hidden' : vm.isLoading.filters }"></ace-filter-preset>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <!-- Search bar -->
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="flex form-group search-group search-group-lg padding-bot-10">
+                            <input type="text" class="form-control event-search-bar"
+                                ng-model-options="{ debounce: 350 }" ng-change="vm.loadEventsOnPage(1)"
+                                ng-model="vm.filterText" translate-attr-placeholder="events.filterEvents" translate>
+                        </div>
+                    </div>
+
+                    <!-- Filters -->
+                    <ace-dropdown-checkbox is-expanded="false" class="col-md-2 mt-3"
+                        translation="events.eventTypesDropdownButtonTitle" types="vm.filter.filterTypes.events.filters"
+                        on-value-change="vm.loadEventsWithNewlyAppliedFilter(types, 'events')"
+                        applied-types="vm.filter.dropdown.events">
+                    </ace-dropdown-checkbox>
+
+                    <ace-dropdown-checkbox is-expanded="false" class="col-md-2 mt-3 mb-10"
+                        translation="events.eventOfficesDropdownButtonTitle"
+                        types="vm.filter.filterTypes.offices.filters"
+                        on-value-change="vm.loadEventsWithNewlyAppliedFilter(types, 'offices')"
+                        applied-types="vm.filter.dropdown.offices">
+                    </ace-dropdown-checkbox>
+                </div>
+
+                <wave-spinner ng-if="vm.isLoading.filters && !vm.isLoading.events"></wave-spinner>
+
+                <!-- Content -->
+                <table class="nc-table nc-table-active" ng-if="vm.events.pagedList.length">
+                    <thead>
+                        <tr class="nowrap">
+                            <th>
+                                <ace-sort-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortOrder"
+                                    sort-field="vm.filter.sortByColumnName" sort-value="name">
+                                    <span translate="events.tableTitle"></span>
+                                </ace-sort-link>
+                            </th>
+                            <th class="hidden-xs hidden-sm">
+                                <ace-sort-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortOrder"
+                                    sort-field="vm.filter.sortByColumnName" sort-value="startDate">
+                                    <span translate="events.tableStartDate"></span>
+                                </ace-sort-link>
+                            </th>
+                            <th class="hidden-xs hidden-sm">
+                                <ace-sort-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortOrder"
+                                    sort-field="vm.filter.sortByColumnName" sort-value="endDate">
+                                    <span translate="events.tableEndDate"></span>
+                                </ace-sort-link>
+                            </th>
+                            <th class="hidden-xs hidden-sm">
+                                <ace-sort-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortOrder"
+                                    sort-field="vm.filter.sortByColumnName" sort-value="eventType.name">
+                                    <span translate="events.tableType"></span>
+                                </ace-sort-link>
+                            </th>
+                            <th class="hidden-xs hidden-sm">
+                                <ace-sort-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortOrder"
+                                    sort-field="vm.filter.sortByColumnName" sort-value="offices">
+                                    <span translate="events.tableOffices"></span>
+                                </ace-sort-link>
+                            </th>
+                            <th>
+                                <ace-sort-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortOrder"
+                                    sort-field="vm.filter.sortByColumnName" sort-value="eventParticipants.Count">
+                                    <span translate="events.tableParticipants"></span>
+                                </ace-sort-link>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody ng-if="!vm.isLoading.events && vm.events.pagedList.length">
+                        <tr ng-repeat="event in vm.events.pagedList" class="pointer"
+                            ng-click="vm.viewDetails(event.id)">
+                            <td class="col-xs-3 word-break" ng-cloak>
+                                {{event.name}}
+                            </td>
+                            <td class="col-xs-2 hidden-xs hidden-sm" ng-cloak>
+                                {{event.startDate | amUtc | amLocal |
+                                amDateFormat:'YYYY-MM-DD HH:mm'}}
+                            </td>
+                            <td class="col-xs-2 hidden-xs hidden-sm" ng-cloak>
+                                {{event.endDate | amUtc | amLocal |
+                                amDateFormat:'YYYY-MM-DD HH:mm'}}
+                            </td>
+                            <td class="col-xs-2 hidden-xs hidden-sm" ng-cloak>
+                                {{event.typeName}}
+                            </td>
+                            <td class="col-xs-2 hidden-xs hidden-sm" ng-cloak>
+                                {{event.isForAllOffices ?
+                                ('events.eventForOfficeAll' | translate) :
+                                event.officeNames.join(', ')}}
+                            </td>
+                            <td class="col-xs-2" ng-cloak>
+                                {{event.participantsCount}}/{{event.maxParticipants}}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <wave-spinner ng-if="vm.isLoading.events"></wave-spinner>
+
+                <ace-list-pagination total-item-count="vm.events.itemCount" page-size="vm.events.pageSize"
+                    page-count="vm.events.pageCount" current-page="vm.page" on-changed="vm.loadEventsOnPage(page)">
+                </ace-list-pagination>
+            </div>
+        </div>
+    </div>
+</div>
