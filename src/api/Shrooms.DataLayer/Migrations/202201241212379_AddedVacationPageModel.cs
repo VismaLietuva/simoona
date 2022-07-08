@@ -22,7 +22,6 @@ namespace Shrooms.DataLayer.Migrations
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Organizations", t => t.OrganizationId, cascadeDelete: true)
                 .Index(t => t.OrganizationId);
-            
         }
         
         public override void Down()

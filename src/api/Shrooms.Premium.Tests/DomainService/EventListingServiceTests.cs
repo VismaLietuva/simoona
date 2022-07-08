@@ -897,7 +897,6 @@ namespace Shrooms.Premium.Tests.DomainService
                 AttendStatus = 1,
                 Event = new Event
                 {
-
                 },
                 ApplicationUser = new ApplicationUser
                 {
@@ -930,7 +929,6 @@ namespace Shrooms.Premium.Tests.DomainService
                     },
                     Events = new List<Event>
                     {
-
                     }
                 }
             };
@@ -944,7 +942,6 @@ namespace Shrooms.Premium.Tests.DomainService
                 AttendStatus = 1,
                 Event = new Event
                 {
-
                 },
                 ApplicationUser = new ApplicationUser
                 {
@@ -977,7 +974,6 @@ namespace Shrooms.Premium.Tests.DomainService
                     },
                     Events = new List<Event>
                     {
-
                     }
                 }
             };
@@ -991,7 +987,6 @@ namespace Shrooms.Premium.Tests.DomainService
                 AttendStatus = 1,
                 Event = new Event
                 {
-
                 },
                 ApplicationUser = new ApplicationUser
                 {
