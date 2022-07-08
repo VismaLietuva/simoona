@@ -37,20 +37,20 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
         }
 
         [Test]
-        public async Task UpdateStartedLotteriesToEnded_NothingToUpdate_DoesNothing()
+        public async Task ProcessExpiredLotteries_NothingToProcess_DoesNothing()
         {
             // Arrange
             var lotteries = new List<Lottery>
             {
                 new Lottery
                 {
-                    Status = (int)LotteryStatus.Ended,
+                    Status = (int)LotteryStatus.Expired,
                     EndDate = DateTime.UtcNow
                 },
 
                 new Lottery
                 {
-                    Status = (int)LotteryStatus.Ended,
+                    Status = (int)LotteryStatus.Expired,
                     EndDate = DateTime.UtcNow
                 }
             };
@@ -58,14 +58,14 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             _lotteriesDbSet.SetDbSetDataForAsync(lotteries);
 
             // Act
-            await _lotteryStatusChangeService.UpdateStartedLotteriesToEndedAsync();
+            await _lotteryStatusChangeService.ProcessExpiredLotteriesAsync();
 
             // Assert
             await _uow.Received(0).SaveChangesAsync(Arg.Any<bool>());
         }
 
         [Test]
-        public async Task UpdateStartedLotteriesToEnded_FindsLotteriesThatAreStartedAndEndDateHasPassed_ChangesStatus()
+        public async Task ProcessExpiredLotteries_FindsLotteriesThatAreStartedAndEndDateHasPassed_ChangesStatus()
         {
             // Arrange
             _systemClock.UtcNow.Returns(DateTime.UtcNow.AddDays(1000));
@@ -88,7 +88,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             _lotteriesDbSet.SetDbSetDataForAsync(lotteries);
 
             // Act
-            await _lotteryStatusChangeService.UpdateStartedLotteriesToEndedAsync();
+            await _lotteryStatusChangeService.ProcessExpiredLotteriesAsync();
 
             // Assert
             await _uow.Received(1).SaveChangesAsync(Arg.Any<bool>());

@@ -5,10 +5,10 @@ namespace Shrooms.Contracts.Enums
         Drafted = 1,
         Started,
         Deleted,
-        Finished, // User finished the lottery
+        Ended,
         RefundStarted,
         RefundLogsCreated,
         Refunded,
-        Ended // Time ran out
+        Expired
     }
 }

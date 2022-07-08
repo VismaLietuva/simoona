@@ -58,10 +58,10 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         }
 
         [HttpPost]
-        [Route("UpdateLotteriesStatus")]
-        public async Task UpdateLotteriesStatus()
+        [Route("ProcessExpiredLotteries")]
+        public async Task ProcessExpiredLotteries()
         {
-            await _webHookService.LotteryStatusChangeService.UpdateStartedLotteriesToEndedAsync();
+            await _webHookService.LotteryStatusChangeService.ProcessExpiredLotteriesAsync();
         }
     }
 }

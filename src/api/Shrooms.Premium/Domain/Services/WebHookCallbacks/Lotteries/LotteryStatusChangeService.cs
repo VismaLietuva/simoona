@@ -23,20 +23,20 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Lotteries
             _lotteriesDbSet = uow.GetDbSet<Lottery>();
         }
 
-        public async Task UpdateStartedLotteriesToEndedAsync()
+        public async Task ProcessExpiredLotteriesAsync()
         {
-            var lotteriesToUpdate = await _lotteriesDbSet
+            var lotteriesToProcess = await _lotteriesDbSet
                 .Where(lottery => lottery.Status == (int)LotteryStatus.Started && lottery.EndDate < _systemClock.UtcNow)
                 .ToListAsync();
 
-            if (!lotteriesToUpdate.Any())
+            if (!lotteriesToProcess.Any())
             {
                 return;
             }
 
-            foreach (var lottery in lotteriesToUpdate)
+            foreach (var lottery in lotteriesToProcess)
             {
-                lottery.Status = (int)LotteryStatus.Ended;
+                lottery.Status = (int)LotteryStatus.Expired;
             }
 
             await _uow.SaveChangesAsync(false);

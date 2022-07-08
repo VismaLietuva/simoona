@@ -146,7 +146,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 return false;
             }
 
-            if (lottery.Status == (int)LotteryStatus.Started || lottery.Status == (int)LotteryStatus.Ended)
+            if (lottery.Status == (int)LotteryStatus.Started || lottery.Status == (int)LotteryStatus.Expired)
             {
                 lottery.Status = (int)LotteryStatus.RefundStarted;
                 await _uow.SaveChangesAsync();
@@ -206,7 +206,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 return;
             }
 
-            lottery.Status = (int)LotteryStatus.Finished;
+            lottery.Status = (int)LotteryStatus.Ended;
 
             await _uow.SaveChangesAsync(userOrg.UserId);
         }

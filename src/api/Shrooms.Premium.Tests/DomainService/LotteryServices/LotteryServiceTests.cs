@@ -371,8 +371,8 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
                 new LotteryDto { Id = 3, OrganizationId = 1, Status = (int)LotteryStatus.Deleted, EndDate = DateTime.Now.AddDays(4), Title = "Table", UserId = "5", EntryFee = 2 },
                 new LotteryDto { Id = 4, OrganizationId = 1, Status = (int)LotteryStatus.Started, EndDate = DateTime.Now.AddDays(5), Title = "1000 kudos", UserId = "5", EntryFee = 5 },
                 new LotteryDto { Id = 5, OrganizationId = 1, Status = (int)LotteryStatus.Deleted, EndDate = DateTime.Now.AddDays(5), Title = "100 kudos", UserId = "5", EntryFee = 5 },
-                new LotteryDto { Id = 6, OrganizationId = 1, Status = (int)LotteryStatus.Finished, EndDate = DateTime.Now.AddDays(5), Title = "10 kudos", UserId = "5", EntryFee = 5 },
-                new LotteryDto { Id = 7, OrganizationId = 1, Status = (int)LotteryStatus.Finished, EndDate = DateTime.Now.AddDays(5), Title = "10 kudos", UserId = "5", EntryFee = -5 }
+                new LotteryDto { Id = 6, OrganizationId = 1, Status = (int)LotteryStatus.Ended, EndDate = DateTime.Now.AddDays(5), Title = "10 kudos", UserId = "5", EntryFee = 5 },
+                new LotteryDto { Id = 7, OrganizationId = 1, Status = (int)LotteryStatus.Ended, EndDate = DateTime.Now.AddDays(5), Title = "10 kudos", UserId = "5", EntryFee = -5 }
             };
         }
 
@@ -435,7 +435,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
                     Id = 3,
                     Title = "barfoo",
                     OrganizationId = 1,
-                    Status = (int)LotteryStatus.Finished,
+                    Status = (int)LotteryStatus.Ended,
                     EndDate = DateTime.Now.AddDays(-2),
                     EntryFee = 1,
                     IsRefundFailed = false
@@ -461,7 +461,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
                 new Lottery
                 {
                     Id = 6,
-                    Status = (int)LotteryStatus.Finished,
+                    Status = (int)LotteryStatus.Ended,
                     OrganizationId = 12345,
                     Title = string.Empty,
                     EndDate = DateTime.UtcNow.AddDays(2)
@@ -469,7 +469,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
                 new Lottery
                 {
                     Id = 7,
-                    Status = (int)LotteryStatus.Finished,
+                    Status = (int)LotteryStatus.Ended,
                     OrganizationId = 12345,
                     Title = string.Empty,
                     EndDate = DateTime.UtcNow.AddDays(3)
@@ -479,7 +479,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
                     Id = 8,
                     Title = "foo",
                     OrganizationId = 1,
-                    Status = (int)LotteryStatus.Ended,
+                    Status = (int)LotteryStatus.Expired,
                     EndDate = DateTime.Now.AddDays(2),
                     EntryFee = 1,
                     IsRefundFailed = false
