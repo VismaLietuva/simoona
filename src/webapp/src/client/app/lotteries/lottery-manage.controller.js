@@ -50,7 +50,7 @@
                 vm.lottery.endDate = moment.utc(vm.lottery.endDate).local().startOf('minute').toDate();
                 vm.isStarted = vm.lottery.status === lotteryStatuses.started;
                 vm.isDrafted = vm.lottery.status === lotteryStatuses.drafted;
-                vm.isEndedByTime = vm.lottery.status === lotteryStatuses.endedByTime;
+                vm.isExpired = vm.lottery.status === lotteryStatuses.expired;
                 vm.isEnded = (vm.lottery.status !== lotteryStatuses.drafted) && (vm.lottery.status !== lotteryStatuses.started);
                 $rootScope.pageTitle = 'lotteries.editLottery';
             } else if (states.isCreate) {

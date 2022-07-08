@@ -16,7 +16,7 @@
             refundStarted: 5,
             refundLogsCreated: 6,
             refunded: 7,
-            endedByTime: 8
+            expired: 8
         })
         .config(config);
 

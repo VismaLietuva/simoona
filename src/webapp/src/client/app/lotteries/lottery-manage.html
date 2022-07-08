@@ -183,7 +183,7 @@
                             </button>
 
                             <button class="btn btn-primary"
-                                    ng-if="vm.isStarted || vm.isEndedByTime"
+                                    ng-if="vm.isStarted || vm.isExpired"
                                     ng-click="vm.finishLottery()">
                                 <span translate="lotteries.finish"></span>
                             </button>
@@ -200,7 +200,7 @@
                         <!--revoke button left -->
                         <div class="pull-left">
                             <div class="pull-left">
-                                <button ng-if="vm.isStarted || vm.isDrafted || vm.isEndedByTime"
+                                <button ng-if="vm.isStarted || vm.isDrafted || vm.isExpired"
                                         class="btn btn-danger"
                                         ace-confirmation-modal="vm.abortLottery(vm.lottery.id)"
                                         confirmation-modal-confirm="lotteries.revoke"
