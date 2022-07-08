@@ -1,5 +1,4 @@
-﻿
-namespace Shrooms.Contracts.DataTransferObjects.FilterPresets
+﻿namespace Shrooms.Contracts.DataTransferObjects.FilterPresets
 {
     public class CreateFilterPresetDto : FilterPresetDto
     {

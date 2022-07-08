@@ -38,9 +38,10 @@
         };
 
         vm.filter = eventReportService.getEventReportFilter(
-            filterPageTypes.eventReport,
-            { name: 'events', type: filterTypes.events },
-            { name: 'kudos', type: filterTypes.kudos }
+            filterPageTypes.eventReport, [
+                { name: 'events', type: filterTypes.events },
+                { name: 'kudos', type: filterTypes.kudos }
+            ]
         );
 
         vm.visitedEventsPreviewCount = visitedEventsPreviewCount;
@@ -105,11 +106,10 @@
                                     vm.showActionsColumn = true;
                                 }
 
-                                return {
-                                    ...element,
+                                return Object.assign({
                                     canBeExpanded: canBeExpanded,
                                     isExpanded: false,
-                                };
+                                }, element);
                             });
 
                         vm.isLoading.participants = false;

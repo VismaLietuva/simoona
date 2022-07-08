@@ -6,15 +6,14 @@
         .factory('eventReportService', eventReportService);
 
     function eventReportService() {
-        function eventReportFilter(pageType, ...filterTypes) {
+        function eventReportFilter(pageType, filterTypes) {
             function constructObjectWithFilterNames(func, response) {
                 var property = {};
 
                 filterTypes.forEach((filter) => {
-                    property = {
-                        ...property,
-                        [filter.name]: func(response, filter),
-                    };
+                    property = Object.assign({
+                        [filter.name]: func(response, filter)
+                    }, property);
                 });
 
                 return property;
@@ -54,11 +53,10 @@
 
             this.pageType = pageType;
 
-            this.appliedFilters = {
-                ...this.appliedFilters,
+            this.appliedFilters = Object.assign({
                 sortBy: undefined,
-                sortOrder: undefined,
-            };
+                sortOrder: undefined
+            }, this.appliedFilters);
 
             this.setFilterTypes = function (response) {
                 this.filterTypes = constructObjectWithFilterNames(
@@ -93,7 +91,7 @@
         }
 
         return {
-            getEventReportFilter: function (pageType, ...filterTypes) {
+            getEventReportFilter: function (pageType, filterTypes) {
                 return new eventReportFilter(pageType, filterTypes);
             },
         };
