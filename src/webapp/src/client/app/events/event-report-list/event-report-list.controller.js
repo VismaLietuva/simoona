@@ -31,9 +31,10 @@
         };
 
         vm.filter = eventReportService.getEventReportFilter(
-            filterPageTypes.eventReportList,
-            { name: 'events', type: filterTypes.events },
-            { name: 'offices', type: filterTypes.offices }
+            filterPageTypes.eventReportList, [
+                { name: 'events', type: filterTypes.events },
+                { name: 'offices', type: filterTypes.offices }
+            ]
         );
 
         vm.page = 1;
