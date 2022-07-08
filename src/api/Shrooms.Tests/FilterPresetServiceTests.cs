@@ -300,7 +300,7 @@ namespace Shrooms.Tests
 
             _filterPresetValidator
                 .Received(2)
-                .CheckIfFilterPresetsContainsUniqueNames(Arg.Any<IEnumerable<FilterPresetDto>>());
+                .CheckIfFilterPresetsContainUniqueNames(Arg.Any<IEnumerable<FilterPresetDto>>());
 
             Assert.NotNull(result.CreatedPresets
                 .FirstOrDefault(preset => preset.IsDefault == presetToCreate.IsDefault &&

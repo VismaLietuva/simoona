@@ -69,7 +69,7 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
             }
         }
 
-        public void CheckIfFilterPresetsContainsUniqueNames(IEnumerable<FilterPresetDto> filterPresetDtos)
+        public void CheckIfFilterPresetsContainUniqueNames(IEnumerable<FilterPresetDto> filterPresetDtos)
         {
             if (filterPresetDtos.GroupBy(preset => preset.Name).Count() != filterPresetDtos.Count())
             {

@@ -311,7 +311,7 @@ namespace Shrooms.Tests.DomainService.Validators
             };
 
             // Assert
-            Assert.Throws<ValidationException>(() => _filterPresetValidator.CheckIfFilterPresetsContainsUniqueNames(collectionWithDuplicateNames));
+            Assert.Throws<ValidationException>(() => _filterPresetValidator.CheckIfFilterPresetsContainUniqueNames(collectionWithDuplicateNames));
         }
 
         [Test]
@@ -332,7 +332,7 @@ namespace Shrooms.Tests.DomainService.Validators
             };
 
             // Assert
-            Assert.DoesNotThrow(() => _filterPresetValidator.CheckIfFilterPresetsContainsUniqueNames(collectionWithDuplicateNames));
+            Assert.DoesNotThrow(() => _filterPresetValidator.CheckIfFilterPresetsContainUniqueNames(collectionWithDuplicateNames));
         }
 
         [Test]

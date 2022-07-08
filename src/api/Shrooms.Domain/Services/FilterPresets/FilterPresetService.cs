@@ -64,8 +64,8 @@ namespace Shrooms.Domain.Services.FilterPresets
             try
             {
                 _validator.CheckIfMoreThanOneDefaultPresetExists(manageFilterPresetDto);
-                _validator.CheckIfFilterPresetsContainsUniqueNames(manageFilterPresetDto.PresetsToUpdate);
-                _validator.CheckIfFilterPresetsContainsUniqueNames(manageFilterPresetDto.PresetsToCreate);
+                _validator.CheckIfFilterPresetsContainUniqueNames(manageFilterPresetDto.PresetsToUpdate);
+                _validator.CheckIfFilterPresetsContainUniqueNames(manageFilterPresetDto.PresetsToCreate);
                 
                 await UpdatePresetsAsync(manageFilterPresetDto);
                 
