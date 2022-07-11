@@ -139,6 +139,8 @@
     <Compile Include="ServiceExceptions\ServiceException.cs" />
     <Compile Include="Services\Administration\IAdministrationUsersService.cs" />
     <Compile Include="Services\Administration\AdministrationUsersService.cs" />
+    <Compile Include="Services\BlacklistStates\BlacklistStateService.cs" />
+    <Compile Include="Services\BlacklistStates\IBlacklistStateService.cs" />
     <Compile Include="Services\Email\AdministrationUsers\AdministrationUsersNotificationService.cs" />
     <Compile Include="Services\Email\Kudos\IKudosNotificationService.cs" />
     <Compile Include="Services\Email\Kudos\KudosNotificationService.cs" />
