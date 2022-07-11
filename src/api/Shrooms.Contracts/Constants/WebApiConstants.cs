@@ -48,6 +48,10 @@
         public const int MaxPhoneNumberLength = 15;
         #endregion
 
+        #region BlacklistState
+        public const int DefaultBlacklistYearDuration = 2; 
+        #endregion
+
         public const int WallNameMaxLength = 35;
         public const int WallDescMaxLength = 128;
 
