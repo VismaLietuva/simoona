@@ -28,6 +28,7 @@ namespace Shrooms.Tests.ModelMappings
                 cfg.AddProfile<Likes>();
                 cfg.AddProfile<VacationPages>();
                 cfg.AddProfile<FilterPresets>();
+                cfg.AddProfile<BlacklistStates>();
             };
 
             var configuration = new MapperConfiguration(mappings);

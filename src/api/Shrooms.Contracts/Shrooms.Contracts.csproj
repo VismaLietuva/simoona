@@ -81,6 +81,9 @@
     <Compile Include="DAL\IUnitOfWork2.cs" />
     <Compile Include="DataTransferObjects\ApplicationUserMinimalDto.cs" />
     <Compile Include="DataTransferObjects\BaseEmailTemplateViewModel.cs" />
+    <Compile Include="DataTransferObjects\BlacklistStates\BlacklistStateDto.cs" />
+    <Compile Include="DataTransferObjects\BlacklistStates\CreateBlacklistStateDto.cs" />
+    <Compile Include="DataTransferObjects\BlacklistStates\UpdateBlacklistStateDto.cs" />
     <Compile Include="DataTransferObjects\EmailDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\ManageFilterPresetDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\CreateFilterPresetDto.cs" />
@@ -154,5 +157,6 @@
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
