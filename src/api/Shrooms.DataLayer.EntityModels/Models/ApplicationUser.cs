@@ -137,6 +137,8 @@ namespace Shrooms.DataLayer.EntityModels.Models
         [ForeignKey("JobPositionId")]
         public virtual JobPosition JobPosition { get; set; }
 
+        public virtual ICollection<BlacklistState> BlacklistStates { get; set; }
+
         public string TimeZone { get; set; }
 
         public virtual ICollection<NotificationUser> NotificationUsers { get; set; }
