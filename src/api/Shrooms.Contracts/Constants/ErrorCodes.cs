@@ -54,5 +54,8 @@
         public const int InvalidType = 1400;
         public const int FilterNotFound = 1403;
         public const int FilterPresetContainsMoreThanOneDefaultPreset = 1404;
+
+        // Filter presets, 15**
+        public const int BlacklistStateNotFound = 1500;
     }
 }
