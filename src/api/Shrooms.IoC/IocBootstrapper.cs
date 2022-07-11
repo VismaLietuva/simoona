@@ -94,6 +94,7 @@ namespace Shrooms.IoC
             builder.RegisterModule(new AdministrationUsers());
             builder.RegisterModule(new JobModule());
             builder.RegisterModule(new FilterPresetModule());
+            builder.RegisterModule(new BlacklistStateModule());
 
             RegisterExtensions(builder, new Logger());
             RegisterMapper(builder);
