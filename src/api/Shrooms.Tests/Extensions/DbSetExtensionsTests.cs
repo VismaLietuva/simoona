@@ -4,6 +4,7 @@ using Shrooms.Domain.Extensions;
 using System.Data.Entity;
 using System.Linq.Dynamic;
 using System.Linq;
+using Shrooms.Contracts.Infrastructure;
 
 namespace Shrooms.Tests.Extensions
 {
@@ -95,6 +96,40 @@ namespace Shrooms.Tests.Extensions
 
             // Act
             var actualQuery = _mockDbSet.OrderByPropertyName(propertyName, sortDirection).ToString();
+
+            // Assert
+            Assert.AreEqual(expectedQuery, actualQuery);
+        }
+
+        [TestCase("random")]
+        [TestCase("random desc;")]
+        [TestCase("Id value; Value id;")]
+        [TestCase("")]
+        [TestCase(";;")]
+        [TestCase("Id desc, Value asc;")]
+        public void Should_Return_Query_To_Order_By_First_Property_And_Order_By_Ascending_If_Invalid_String(string sortByProperties)
+        {
+            // Arrange
+            var expectedQuery = _mockDbSet.OrderBy("Id asc").ToString();
+
+            // Act
+            var actualQuery = _mockDbSet.OrderByPropertyNames(sortByProperties).ToString();
+
+            // Assert
+            Assert.AreEqual(expectedQuery, actualQuery);
+        }
+
+
+        [TestCase()]
+        public void Should_Return_Query_To_Order_By_Specified_Multiple_Properties()
+        {
+            // Arrange
+            var sortByProperties = "Value asc;Id desc;";
+
+            var expectedQuery = _mockDbSet.OrderBy("Value asc, Id desc").ToString();
+
+            // Act
+            var actualQuery = _mockDbSet.OrderByPropertyNames(sortByProperties).ToString();
 
             // Assert
             Assert.AreEqual(expectedQuery, actualQuery);
