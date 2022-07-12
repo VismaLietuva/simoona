@@ -132,6 +132,7 @@
     <Compile Include="Infrastructure\IExcelBuilder.cs" />
     <Compile Include="Infrastructure\IJobScheduler.cs" />
     <Compile Include="Infrastructure\ILogger.cs" />
+    <Compile Include="Infrastructure\ISortableProperties.cs" />
     <Compile Include="Infrastructure\ISortableProperty.cs" />
     <Compile Include="Infrastructure\ISystemClock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
