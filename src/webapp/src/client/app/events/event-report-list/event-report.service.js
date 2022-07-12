@@ -6,7 +6,7 @@
         .factory('eventReportService', eventReportService);
 
     function eventReportService() {
-        function eventReportFilter(pageType, filterTypes) {
+        function eventReportFilter(pageType, filterTypes, columnCount) {
             function constructObjectWithFilterNames(func, response) {
                 var property = {};
 
@@ -17,6 +17,13 @@
                 });
 
                 return property;
+            }
+
+            function copyObjectWithEmptySortValues(object) {
+                return Object.assign({
+                    sortBy: new Array(columnCount).fill(undefined),
+                    sortOrders: new Array(columnCount).fill(undefined)
+                }, object);
             }
 
             function findFilterByType(result, filter) {
@@ -53,10 +60,7 @@
 
             this.pageType = pageType;
 
-            this.appliedFilters = Object.assign({
-                sortBy: undefined,
-                sortOrder: undefined
-            }, this.appliedFilters);
+            this.appliedFilters = copyObjectWithEmptySortValues(this.appliedFilters);
 
             this.setFilterTypes = function (response) {
                 this.filterTypes = constructObjectWithFilterNames(
@@ -65,9 +69,9 @@
                 );
             };
 
-            this.setSortValues = function (sortBy, sortOrder) {
-                this.appliedFilters.sortBy = sortBy;
-                this.appliedFilters.sortOrder = sortOrder;
+            this.setSortValues = function (sortBy, sortOrder, position) {
+                this.appliedFilters.sortBy[position] = sortBy;
+                this.appliedFilters.sortOrders[position] = sortOrder;
             }
 
             this.updateAppliedFilter = function (filter, filterName) {
@@ -76,23 +80,46 @@
                     .map(f => f[0]);
             }
 
+            this.getSortString = function () {
+                var sortString = "";
+
+                for (var i = 0; i < columnCount; i++) {
+                    var sortBy = this.appliedFilters.sortBy[i];
+                    var sortOrder = this.appliedFilters.sortOrders[i];
+
+                    if (sortBy === undefined || sortOrder === undefined) {
+                        continue;
+                    }
+
+                    sortString += `${sortBy} ${sortOrder};`;
+                }
+
+                return sortString;
+            }
+
             this.updateAppliedFilters = function (preset) {
                 this.dropdown = constructObjectWithFilterNames(
                     mapFilterPresetTypesToMap.bind(this),
                     preset
                 );
 
+                var sortBy = this.appliedFilters.sortBy;
+                var sortOrders = this.appliedFilters.sortOrders;
+
                 this.appliedFilters = constructObjectWithFilterNames(
                     (dropdown, filter) =>
                         [...dropdown[filter.name]].map((f) => f[0]),
                     this.dropdown
                 );
+
+                this.appliedFilters.sortBy = sortBy;
+                this.appliedFilters.sortOrders = sortOrders;
             };
         }
 
         return {
-            getEventReportFilter: function (pageType, filterTypes) {
-                return new eventReportFilter(pageType, filterTypes);
+            getEventReportFilter: function (pageType, filterTypes, columnCount) {
+                return new eventReportFilter(pageType, filterTypes, columnCount);
             },
         };
     }
