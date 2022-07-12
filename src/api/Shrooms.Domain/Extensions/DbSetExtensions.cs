@@ -1,6 +1,5 @@
 ﻿using Shrooms.Contracts.Infrastructure;
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Dynamic;
 using System.Reflection;
@@ -11,7 +10,73 @@ namespace Shrooms.Domain.Extensions
     {
         private const string DefaultSortDirection = "asc";
 
+        private const char SortablePropertiesSeparator = ';';
+        private const char SortablePropertySeparator = ' ';
+        private const char PropertyNamePartsSeparator = '.';
+
         private const BindingFlags Flags = BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance;
+
+        public static IQueryable<TEntity> OrderByPropertyNames<TEntity>(
+            this IQueryable<TEntity> query,
+            ISortableProperties sortableProperties) where TEntity : class
+        {
+            if (sortableProperties == null)
+            {
+                return query.OrderByFirstPropertyName(DefaultSortDirection);
+            }
+
+            return query.OrderByPropertyNames(sortableProperties.SortByProperties);
+        }
+
+        public static IQueryable<TEntity> OrderByPropertyNames<TEntity>(
+            this IQueryable<TEntity> query,
+            string sortByProperties) where TEntity : class
+        {
+            if (sortByProperties == null)
+            {
+                return query.OrderByFirstPropertyName(DefaultSortDirection);
+            }
+
+            var properties = sortByProperties.Split(new char[] { SortablePropertiesSeparator },
+                StringSplitOptions.RemoveEmptyEntries);
+
+            if (!properties.Any())
+            {
+                return query.OrderByFirstPropertyName(DefaultSortDirection);
+            }
+
+            var orderString = string.Empty;
+
+            foreach (var property in properties)
+            {
+                var propertyParts = property.Split(SortablePropertySeparator);
+                var propertyName = propertyParts.FirstOrDefault();
+
+                if (propertyName == null)
+                {
+                    return query.OrderByFirstPropertyName(DefaultSortDirection);
+                }
+
+                var sortDirection = propertyParts.LastOrDefault();
+
+                if (!IsValidSortDirection(sortDirection))
+                {
+                    sortDirection = DefaultSortDirection;
+                }
+
+                if (!EntityHasProperty<TEntity>(propertyName))
+                {
+                    return query.OrderByFirstPropertyName(DefaultSortDirection);
+                }
+
+                orderString += $"{propertyName} {sortDirection},";
+            }
+
+            // Removing last comma
+            orderString = orderString.Substring(0, orderString.Length - 1);
+
+            return query.OrderBy(orderString);
+        }
 
         public static IQueryable<TEntity> OrderByPropertyName<TEntity>(
             this IQueryable<TEntity> query, 
@@ -27,7 +92,7 @@ namespace Shrooms.Domain.Extensions
         {
             sortDirection = sortDirection?.ToLower();
             
-            if (sortDirection == null || (sortDirection != "asc" && sortDirection != "desc"))
+            if (!IsValidSortDirection(sortDirection))
             {
                 sortDirection = DefaultSortDirection;
             }
@@ -51,7 +116,7 @@ namespace Shrooms.Domain.Extensions
 
         private static bool EntityHasProperty<TEntity>(string propertyName) where TEntity : class
         {
-            var propertyNameParts = propertyName.Split('.');
+            var propertyNameParts = propertyName.Split(PropertyNamePartsSeparator);
             
             var type = typeof(TEntity);
 
@@ -66,6 +131,16 @@ namespace Shrooms.Domain.Extensions
             }
 
             return true;
+        }
+
+        private static bool IsValidSortDirection(string sortDirection)
+        {
+            if (sortDirection == null)
+            {
+                return false;
+            }
+
+            return sortDirection == "asc" || sortDirection == "desc";
         }
     }
 }
