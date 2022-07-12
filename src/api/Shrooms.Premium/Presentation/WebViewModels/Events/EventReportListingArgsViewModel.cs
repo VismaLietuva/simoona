@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Shrooms.Premium.Presentation.WebViewModels.Events
 {
-    public class EventReportListingArgsViewModel : IPageable, ISortableProperty
+    public class EventReportListingArgsViewModel : IPageable, ISortableProperties
     {
         [MaxLength(Contracts.Constants.ValidationConstants.MaxCommentMessageBodyLength)]
         public string SearchString { get; set; }
@@ -14,14 +14,12 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
 
         public IEnumerable<string> OfficeTypeIds { get; set; }
 
-        public string SortByColumnName { get; set; }
-
-        public string SortDirection { get; set; }
-
         [Range(1, int.MaxValue)]
         public int Page { get; set; } = 1;
 
         [Range(1, int.MaxValue)]
         public int PageSize { get; set; } = EventsConstants.EventsDefaultPageSize;
+
+        public string SortByProperties { get; set; }
     }
 }

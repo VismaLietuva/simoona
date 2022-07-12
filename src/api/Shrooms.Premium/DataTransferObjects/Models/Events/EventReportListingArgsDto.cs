@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Shrooms.Premium.DataTransferObjects.Models.Events
 {
-    public class EventReportListingArgsDto : IPageable, ISortableProperty
+    public class EventReportListingArgsDto : IPageable, ISortableProperties
     {
         public string SearchString { get; set; }
 
@@ -11,12 +11,10 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
 
         public IEnumerable<string> OfficeTypeIds { get; set; }
 
-        public string SortByColumnName { get; set; }
-
-        public string SortDirection { get; set; }
-
         public int Page { get; set; }
 
         public int PageSize { get; set; }
+
+        public string SortByProperties { get; set; }
     }
 }

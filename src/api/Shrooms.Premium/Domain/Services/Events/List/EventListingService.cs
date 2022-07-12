@@ -108,7 +108,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                             (typeIdsLength == 0 || reportArgsDto.EventTypeIds.Contains(e.EventTypeId)) &&
                             (officeIdsLength == 0 || reportArgsDto.OfficeTypeIds.Any(c => e.Offices.Contains(c))))
                 .Where(e => e.StartDate > DateTime.UtcNow)
-                .OrderByPropertyName(reportArgsDto)
+                .OrderByPropertyNames(reportArgsDto)
                 .Select(e => new EventDetailsListItemDto
                 {
                     Id = e.Id,
@@ -190,7 +190,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                         })
                         .ToList()
                 })
-                .OrderByPropertyName(reportArgsDto)
+                .OrderByPropertyNames(reportArgsDto)
                 .ToPagedListAsync(reportArgsDto.Page, reportArgsDto.PageSize);
         }
 
