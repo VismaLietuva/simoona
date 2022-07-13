@@ -80,13 +80,6 @@ namespace Shrooms.Domain.Extensions
 
         public static IQueryable<TEntity> OrderByPropertyName<TEntity>(
             this IQueryable<TEntity> query, 
-            ISortableProperty sortableProperty) where TEntity : class
-        {
-            return query.OrderByPropertyName(sortableProperty.SortByColumnName, sortableProperty.SortDirection);
-        }
-        
-        public static IQueryable<TEntity> OrderByPropertyName<TEntity>(
-            this IQueryable<TEntity> query, 
             string propertyName,
             string sortDirection) where TEntity : class
         {
