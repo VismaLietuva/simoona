@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace Shrooms.Domain.Extensions
 {
-    public static class DbSetExtensions
+    public static class QueryableExtensions
     {
         private const string DefaultSortDirection = "asc";
 

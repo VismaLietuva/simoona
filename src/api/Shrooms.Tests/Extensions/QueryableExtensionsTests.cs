@@ -4,12 +4,11 @@ using Shrooms.Domain.Extensions;
 using System.Data.Entity;
 using System.Linq.Dynamic;
 using System.Linq;
-using Shrooms.Contracts.Infrastructure;
 
 namespace Shrooms.Tests.Extensions
 {
     [TestFixture]
-    public class DbSetExtensionsTests
+    public class QueryableExtensionsTests
     {
         private DbSet<MockModel> _mockDbSet;
 
