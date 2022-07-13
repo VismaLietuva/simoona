@@ -87,6 +87,7 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
             CreateMap<UpdateEventTypeViewModel, UpdateEventTypeDto>().IgnoreUserOrgDto();
             CreateMap<EventParticipantsReportListingArgsViewModel, EventParticipantsReportListingArgsDto>();
             CreateMap<EventReportListingArgsViewModel, EventReportListingArgsDto>();
+            CreateMap<EventParticipantVisitedEventsListingArgsViewModel, EventParticipantVisitedEventsListingArgsDto>();
         }
 
         private void CreateEventsModelMappings()
