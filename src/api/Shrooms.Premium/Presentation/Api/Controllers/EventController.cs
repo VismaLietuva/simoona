@@ -125,6 +125,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                 filteredArgsDto = new EventFilteredArgsDto();
             }
 
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             try
             {
                 var eventListDtos = await _eventListingService.GetEventsFilteredAsync(filteredArgsDto, GetUserAndOrganization());
