@@ -586,11 +586,11 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         {
             // Arrange
             var eventGuid = MockEventWithOptions(true);
-            
+
             MockUsers();
-            
+
             _systemClockMock.UtcNow.Returns(DateTime.Parse("2016-03-28"));
-            
+
             var eventJoinDto = new EventJoinDto
             {
                 ChosenOptions = new List<int> { 1 },
@@ -1014,7 +1014,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 EventType = new EventType
                 {
                     SendEmailToManager = sendEmailToManager
-                },
+                }
             };
 
             var option1 = new EventOption
@@ -1116,7 +1116,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 OrganizationId = 2,
                 EventType = new EventType
                 {
-                    SendEmailToManager = false,
+                    SendEmailToManager = false
                 }
             };
 
@@ -1168,7 +1168,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 ResponsibleUserId = "user",
                 EventType = new EventType
                 {
-                    SendEmailToManager = false,
+                    SendEmailToManager = false
                 }
             };
 
@@ -1210,7 +1210,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 ResponsibleUserId = "user",
                 EventType = new EventType
                 {
-                    SendEmailToManager = sendEmailToManager,
+                    SendEmailToManager = sendEmailToManager
                 }
             };
 
@@ -1289,7 +1289,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     EventOptions = new List<EventOption>(),
                     EventId = defaultEvent.Id,
                     ApplicationUserId = "user",
-                    AttendStatus = 1,
+                    AttendStatus = 1
                 },
                 new EventParticipant
                 {
@@ -1379,7 +1379,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                         Email = "user",
                         ManagerId = "user2"
                     },
-                    AttendStatus = 1,
+                    AttendStatus = 1
                 },
                 new EventParticipant
                 {
@@ -1392,7 +1392,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                     {
                         Id = "user2",
                         Email = "user2",
-                        ManagerId = "user",
+                        ManagerId = "user"
                     },
                     AttendStatus = 1
                 }

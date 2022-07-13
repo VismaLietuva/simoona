@@ -2,7 +2,6 @@
 using NUnit.Framework;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
-using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Domain.Helpers;
@@ -27,14 +26,11 @@ namespace Shrooms.Premium.Tests.DomainService
     {
         private DbSet<Event> _eventsDbSet;
         private DbSet<Office> _officeDbSet;
-        private DbSet<EventType> _eventTypesDbSet;
         private DbSet<ApplicationUser> _usersDbSet;
-        private DbSet<EventOption> _eventOptionsDbSet;
 
         private IUnitOfWork2 _uow;
         private IWallService _wallService;
         private IEventService _eventService;
-        private ISystemClock _systemClockMock;
         private IPermissionService _permissionService;
         private IOfficeMapService _officeMapService;
         private IEventValidationService _eventValidationService;
@@ -46,12 +42,9 @@ namespace Shrooms.Premium.Tests.DomainService
 
             _eventsDbSet = _uow.MockDbSetForAsync<Event>();
             _officeDbSet = _uow.MockDbSetForAsync<Office>();
-            _eventOptionsDbSet = _uow.MockDbSetForAsync<EventOption>();
             _usersDbSet = _uow.MockDbSetForAsync<ApplicationUser>();
-            _eventTypesDbSet = _uow.MockDbSetForAsync<EventType>();
 
             _permissionService = Substitute.For<IPermissionService>();
-            _systemClockMock = Substitute.For<ISystemClock>();
             _wallService = Substitute.For<IWallService>();
             _eventValidationService = Substitute.For<IEventValidationService>();
             _officeMapService = Substitute.For<IOfficeMapService>();
@@ -94,7 +87,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 OrganizationId = organizationId
             };
 
-            var offices = "[\"1\"]";
+            const string offices = "[\"1\"]";
 
             var eventId = Guid.NewGuid();
             var @event = new Event
@@ -105,7 +98,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 Offices = offices,
                 OrganizationId = organizationId,
                 ResponsibleUser = responsibleUser,
-                ResponsibleUserId = responsibleUserId,
+                ResponsibleUserId = responsibleUserId
             };
 
             _officeDbSet.SetDbSetDataForAsync(new List<Office> { office });

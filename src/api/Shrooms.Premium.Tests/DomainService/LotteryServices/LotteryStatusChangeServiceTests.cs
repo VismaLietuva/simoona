@@ -6,8 +6,6 @@ using Shrooms.Premium.Domain.Services.WebHookCallbacks.Lotteries;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Shrooms.Tests.Extensions;
 using Shrooms.Contracts.DAL;

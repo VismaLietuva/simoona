@@ -2,12 +2,13 @@
 using Shrooms.Tests.Mocks;
 using Shrooms.Domain.Extensions;
 using System.Data.Entity;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Dynamic;
-using System.Linq;
 
 namespace Shrooms.Tests.Extensions
 {
     [TestFixture]
+    [SuppressMessage("ReSharper", "ExpressionIsAlwaysNull")]
     public class DbSetExtensionsTests
     {
         private DbSet<MockModel> _mockDbSet;
@@ -25,8 +26,8 @@ namespace Shrooms.Tests.Extensions
         {
             // Arrange
             string propertyName = null;
-            var sortDirection = "asc";
-            
+            const string sortDirection = "asc";
+
             var expectedQuery = _mockDbSet.OrderBy("Id asc").ToString();
 
             // Act
@@ -41,7 +42,7 @@ namespace Shrooms.Tests.Extensions
         {
             // Arrange
             string propertyName = null;
-            var sortDirection = "desc";
+            const string sortDirection = "desc";
 
             var expectedQuery = _mockDbSet.OrderBy("Id desc").ToString();
 
@@ -72,7 +73,7 @@ namespace Shrooms.Tests.Extensions
         public void Should_Return_Query_To_Order_By_Specified_Property_And_Order_By_Ascending_If_Sort_Direction_Is_Not_Provided()
         {
             // Arrange
-            var propertyName = nameof(MockModel.Value);
+            const string propertyName = nameof(MockModel.Value);
             string sortDirection = null;
 
             var expectedQuery = _mockDbSet.OrderBy("Value asc").ToString();
@@ -88,8 +89,8 @@ namespace Shrooms.Tests.Extensions
         public void Should_Return_Query_To_Order_By_Specified_Property_And_Order_By_Provided_Sort_Direction()
         {
             // Arrange
-            var propertyName = nameof(MockModel.Value);
-            var sortDirection = "asc";
+            const string propertyName = nameof(MockModel.Value);
+            const string sortDirection = "asc";
 
             var expectedQuery = _mockDbSet.OrderBy("Value asc").ToString();
 

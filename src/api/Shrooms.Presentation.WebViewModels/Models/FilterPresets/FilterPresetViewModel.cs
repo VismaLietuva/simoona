@@ -1,5 +1,4 @@
-﻿using Shrooms.Contracts.DataTransferObjects.FilterPresets;
-using Shrooms.Contracts.Enums;
+﻿using Shrooms.Contracts.Enums;
 using System.Collections.Generic;
 
 namespace Shrooms.Presentation.WebViewModels.Models.FilterPresets

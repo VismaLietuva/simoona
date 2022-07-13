@@ -83,7 +83,7 @@ namespace Shrooms.Domain.Services.ExternalLinks
                     CreatedBy = manageLinks.UserId,
                     Modified = timestamp,
                     Type = link.Type,
-                    Priority = link.Priority,
+                    Priority = link.Priority
                 };
 
                 _externalLinkDbSet.Add(newLink);

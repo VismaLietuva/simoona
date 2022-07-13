@@ -50,7 +50,7 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
                 .Where(preset => preset.IsDefault)
                 .ToList();
 
-            if (defaultPresetExistsInNewPresets.Count > 1 || 
+            if (defaultPresetExistsInNewPresets.Count > 1 ||
                 defaultPresetExistsInUpdatedPresets.Count > 1 ||
                 (defaultPresetExistsInNewPresets.Count > 0 && defaultPresetExistsInUpdatedPresets.Count > 0))
             {
@@ -71,12 +71,14 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
 
         public void CheckIfFilterPresetsContainUniqueNames(IEnumerable<FilterPresetDto> filterPresetDtos)
         {
-            if (filterPresetDtos.GroupBy(preset => preset.Name).Count() != filterPresetDtos.Count())
+            var presetDtos = filterPresetDtos.ToList();
+
+            if (presetDtos.GroupBy(preset => preset.Name).Count() != presetDtos.Count())
             {
                 throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "Preset names cannot contain duplicates");
             }
         }
-        
+
         public async Task CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(ManageFilterPresetDto manageFilterPresetDto, IEnumerable<FilterPresetDto> removedPresets)
         {
             var updateDtoContainsNameDuplicates = manageFilterPresetDto.PresetsToUpdate

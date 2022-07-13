@@ -167,7 +167,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                     _eventValidationService.CheckIfUserAlreadyJoinedSameEvent(alreadyParticipates);
 
                     await ValidateSingleJoinAsync(@event, joinDto.OrganizationId, userId);
-                    await AddParticipanAsync(userId, @event.Id, @event.SelectedOptions);
+                    await AddParticipantAsync(userId, @event.Id, @event.SelectedOptions);
 
                     await JoinOrLeaveEventWallAsync(@event.ResponsibleUserId, userId, @event.WallId, joinDto);
                 }
@@ -293,7 +293,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             var @event = participant.Event;
 
             var isAdmin = await _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Event);
-            
+
             _eventValidationService.CheckIfUserHasPermission(userOrg.UserId, @event.ResponsibleUserId, isAdmin);
             _eventValidationService.CheckIfEventEndDateIsExpired(@event.EndDate);
 
@@ -332,7 +332,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             }
 
             var userEventAttendStatusDto = MapToUserEventAttendStatusChangeEmailDto(participant, @event);
-            
+
             await RemoveParticipantAsync(participant, @event, userOrg);
 
             await NotifyManagerAsync(userEventAttendStatusDto);
@@ -344,7 +344,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 .Include(e => e.EventParticipants.Select(x => x.ApplicationUser))
                 .Where(e => e.Id == eventId
                             && e.OrganizationId == userAndOrg.OrganizationId
-                            && e.EventParticipants.Any(p => p.AttendStatus == (int)AttendingStatus.Attending)) // && p.ApplicationUserId == userAndOrg.UserId))
+                            && e.EventParticipants.Any(p => p.AttendStatus == (int)AttendingStatus.Attending))
                 .Select(MapEventToParticipantDto())
                 .SingleOrDefaultAsync())?.ToList();
 
@@ -445,7 +445,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 }
 
                 var userAttendStatusDto = MapToUserEventAttendStatusChangeEmailDto(user, eventJoinValidationDto, managerEmail);
-                
+
                 _asyncRunner.Run<IEventNotificationService>(
                     async notifier => await notifier.NotifyManagerAboutEventAsync(userAttendStatusDto, true),
                     _uow.ConnectionName);
@@ -499,7 +499,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             foreach (var participant in @event.EventParticipants.ToList())
             {
                 await JoinOrLeaveEventWallAsync(@event.ResponsibleUserId, participant.ApplicationUserId, @event.WallId, userOrg);
-                
+
                 _eventParticipantsDbSet.Remove(participant);
             }
 
@@ -537,8 +537,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             });
         }
 
-        private static UserEventAttendStatusChangeEmailDto 
-            MapToUserEventAttendStatusChangeEmailDto(ApplicationUser user, EventJoinValidationDto eventJoinValidationDto, string managerEmail)
+        private static UserEventAttendStatusChangeEmailDto MapToUserEventAttendStatusChangeEmailDto(ApplicationUser user, EventJoinValidationDto eventJoinValidationDto, string managerEmail)
         {
             return new UserEventAttendStatusChangeEmailDto
             {
@@ -643,7 +642,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             _eventValidationService.CheckIfUserExistsInOtherSingleJoinEvent(anyEventsAlreadyJoined);
         }
 
-        private async Task AddParticipanAsync(string userId, Guid eventId, ICollection<EventOption> eventOptions)
+        private async Task AddParticipantAsync(string userId, Guid eventId, ICollection<EventOption> eventOptions)
         {
             var timeStamp = _systemClock.UtcNow;
             var participant = await _eventParticipantsDbSet

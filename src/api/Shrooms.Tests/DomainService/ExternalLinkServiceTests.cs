@@ -197,7 +197,7 @@ namespace Shrooms.Tests.DomainService
                     Name = "Test1",
                     Url = "UrlTest1",
                     OrganizationId = 2,
-                    Priority = 10,
+                    Priority = 10
                 },
                 new ExternalLink
                 {
@@ -205,7 +205,7 @@ namespace Shrooms.Tests.DomainService
                     Name = "Test2",
                     Url = "UrlTest2",
                     OrganizationId = 2,
-                    Priority = 0,
+                    Priority = 0
                 },
                 new ExternalLink
                 {
@@ -221,8 +221,8 @@ namespace Shrooms.Tests.DomainService
                     Name = "Test4",
                     Url = "UrlTest4",
                     OrganizationId = 2,
-                    Priority = 9,
-                },
+                    Priority = 9
+                }
             }.AsQueryable();
 
             _externalLinkDbSet.SetDbSetDataForAsync(externalLinks);

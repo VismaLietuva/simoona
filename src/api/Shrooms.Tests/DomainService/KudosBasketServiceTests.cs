@@ -238,7 +238,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void Should_Create_New_Basket()
+        public async Task Should_Create_New_Basket()
         {
             var newBasket = new KudosBasketCreateDto
             {
@@ -247,7 +247,8 @@ namespace Shrooms.Tests.DomainService
                 UserId = "testUserId",
                 OrganizationId = 2
             };
-            _kudosBasketService.CreateNewBasketAsync(newBasket);
+
+            await _kudosBasketService.CreateNewBasketAsync(newBasket);
             _kudosBasketDbSet.Received(1).Add(Arg.Any<KudosBasket>());
         }
 

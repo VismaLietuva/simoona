@@ -38,7 +38,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpPost]
         [Route("Create")]
-        [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Comment, BasicPermissions.EventWall)]
+        [PermissionAnyOfAuthorize(BasicPermissions.Comment, BasicPermissions.EventWall)]
         public async Task<IHttpActionResult> CreateComment(NewCommentViewModel comment)
         {
             if (!ModelState.IsValid)
@@ -76,7 +76,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpPut]
         [Route("Edit")]
-        [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Comment, BasicPermissions.EventWall)]
+        [PermissionAnyOfAuthorize(BasicPermissions.Comment, BasicPermissions.EventWall)]
         public async Task<IHttpActionResult> EditComment(EditCommentViewModel commentViewModel)
         {
             if (!ModelState.IsValid)
@@ -104,7 +104,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpDelete]
         [Route("Delete")]
-        [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Comment, BasicPermissions.EventWall)]
+        [PermissionAnyOfAuthorize(BasicPermissions.Comment, BasicPermissions.EventWall)]
         public async Task<IHttpActionResult> DeleteComment(int id)
         {
             if (!ModelState.IsValid)
@@ -129,7 +129,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpPut]
         [Route("Hide")]
-        [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Comment, BasicPermissions.EventWall)]
+        [PermissionAnyOfAuthorize(BasicPermissions.Comment, BasicPermissions.EventWall)]
         public async Task<IHttpActionResult> HideComment(HideCommentViewModel comment)
         {
             if (!ModelState.IsValid)

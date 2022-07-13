@@ -66,9 +66,9 @@ namespace Shrooms.Domain.Services.FilterPresets
                 _validator.CheckIfMoreThanOneDefaultPresetExists(manageFilterPresetDto);
                 _validator.CheckIfFilterPresetsContainUniqueNames(manageFilterPresetDto.PresetsToUpdate);
                 _validator.CheckIfFilterPresetsContainUniqueNames(manageFilterPresetDto.PresetsToCreate);
-                
+
                 await UpdatePresetsAsync(manageFilterPresetDto);
-                
+
                 var deletedPresets = await DeleteAsync(manageFilterPresetDto);
 
                 // Need to call this after deletion, because we receive preset Ids that need to be deleted and not presets themselves
@@ -82,7 +82,7 @@ namespace Shrooms.Domain.Services.FilterPresets
                 }
 
                 await _uow.SaveChangesAsync(manageFilterPresetDto.UserOrg.UserId);
-                
+
                 return new UpdatedFilterPresetDto
                 {
                     // Ids are assigned after SaveChangesAsync()
@@ -153,11 +153,11 @@ namespace Shrooms.Domain.Services.FilterPresets
             };
         }
 
-        private async Task<IEnumerable<FilterPresetDto>> DeleteAsync(ManageFilterPresetDto manageFilterPresetDto)
+        private async Task<IList<FilterPresetDto>> DeleteAsync(ManageFilterPresetDto manageFilterPresetDto)
         {
             if (!manageFilterPresetDto.PresetsToDelete.Any())
             {
-                return Enumerable.Empty<FilterPresetDto>();
+                return new List<FilterPresetDto>();
             }
 
             var presets = await _filterPresetDbSet
@@ -172,18 +172,18 @@ namespace Shrooms.Domain.Services.FilterPresets
                 Name = preset.Name,
                 IsDefault = preset.IsDefault,
                 Filters = JsonConvert.DeserializeObject<IEnumerable<FilterPresetItemDto>>(preset.Preset)
-            });
+            }).ToList();
 
             _filterPresetDbSet.RemoveRange(presets);
 
             return removedPresets;
         }
 
-        private IEnumerable<FilterPreset> CreatePresets(ManageFilterPresetDto manageFilterPresetDto)
+        private IList<FilterPreset> CreatePresets(ManageFilterPresetDto manageFilterPresetDto)
         {
             if (!manageFilterPresetDto.PresetsToCreate.Any())
             {
-                return Enumerable.Empty<FilterPreset>();
+                return new List<FilterPreset>();
             }
 
             var timestamp = DateTime.UtcNow;
@@ -245,7 +245,7 @@ namespace Shrooms.Domain.Services.FilterPresets
         {
             // Find current default filter
             var defaultFilter = await _filterPresetDbSet
-                .FirstOrDefaultAsync(filter => filter.IsDefault && 
+                .FirstOrDefaultAsync(filter => filter.IsDefault &&
                                      filter.ForPage == pageType &&
                                      filter.OrganizationId == organizationId);
 

@@ -1,5 +1,4 @@
 ﻿using Shrooms.Contracts.Constants;
-using Shrooms.Contracts.DataTransferObjects.FilterPresets;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 

@@ -1,6 +1,4 @@
 ﻿using Shrooms.Contracts.Infrastructure;
-using System;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Dynamic;
 using System.Reflection;
@@ -14,19 +12,19 @@ namespace Shrooms.Domain.Extensions
         private const BindingFlags Flags = BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance;
 
         public static IQueryable<TEntity> OrderByPropertyName<TEntity>(
-            this IQueryable<TEntity> query, 
+            this IQueryable<TEntity> query,
             ISortableProperty sortableProperty) where TEntity : class
         {
             return query.OrderByPropertyName(sortableProperty.SortByColumnName, sortableProperty.SortDirection);
         }
-        
+
         public static IQueryable<TEntity> OrderByPropertyName<TEntity>(
-            this IQueryable<TEntity> query, 
+            this IQueryable<TEntity> query,
             string propertyName,
             string sortDirection) where TEntity : class
         {
             sortDirection = sortDirection?.ToLower();
-            
+
             if (sortDirection == null || (sortDirection != "asc" && sortDirection != "desc"))
             {
                 sortDirection = DefaultSortDirection;
@@ -44,7 +42,7 @@ namespace Shrooms.Domain.Extensions
         {
             var firstProperty = typeof(TEntity)
                     .GetProperties(Flags)
-                    .FirstOrDefault();
+                    .First();
 
             return query.OrderBy($"{firstProperty.Name} {sortDirection}");
         }
@@ -52,7 +50,7 @@ namespace Shrooms.Domain.Extensions
         private static bool EntityHasProperty<TEntity>(string propertyName) where TEntity : class
         {
             var propertyNameParts = propertyName.Split('.');
-            
+
             var type = typeof(TEntity);
 
             foreach (var property in propertyNameParts)
