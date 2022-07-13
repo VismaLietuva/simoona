@@ -1,6 +1,6 @@
 ﻿namespace Shrooms.Contracts.Infrastructure
 {
-    public interface ISortableProperties
+    public interface ISortable
     {
         string SortByProperties { get; set; }
     }

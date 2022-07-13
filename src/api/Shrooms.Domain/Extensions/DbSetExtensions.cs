@@ -18,7 +18,7 @@ namespace Shrooms.Domain.Extensions
 
         public static IQueryable<TEntity> OrderByPropertyNames<TEntity>(
             this IQueryable<TEntity> query,
-            ISortableProperties sortableProperties) where TEntity : class
+            ISortable sortableProperties) where TEntity : class
         {
             if (sortableProperties == null)
             {

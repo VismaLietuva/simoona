@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Shrooms.Premium.DataTransferObjects.Models.Events
 {
-    public class EventReportListingArgsDto : IPageable, ISortableProperties
+    public class EventReportListingArgsDto : IPageable, ISortable
     {
         public string SearchString { get; set; }
 

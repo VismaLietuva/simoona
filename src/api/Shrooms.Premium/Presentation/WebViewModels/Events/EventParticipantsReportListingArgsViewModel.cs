@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Shrooms.Premium.Presentation.WebViewModels.Events
 {
-    public class EventParticipantsReportListingArgsViewModel : IPageable, ISortableProperties
+    public class EventParticipantsReportListingArgsViewModel : IPageable, ISortable
     {
         public Guid EventId { get; set; }
 
