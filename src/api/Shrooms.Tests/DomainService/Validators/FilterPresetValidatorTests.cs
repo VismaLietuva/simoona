@@ -26,6 +26,8 @@ namespace Shrooms.Tests.DomainService.Validators
         public void TestInitializer()
         {
             var uow = Substitute.For<IUnitOfWork2>();
+
+            // ReSharper disable once CollectionNeverUpdated.Local
             var mockPresetData = new List<FilterPreset>();
 
             _filterPresetDbSet = Substitute.For<DbSet<FilterPreset>, IQueryable<FilterPreset>, IDbAsyncEnumerable<FilterPreset>>();
@@ -40,7 +42,7 @@ namespace Shrooms.Tests.DomainService.Validators
         public void Should_Throw_If_PageType_Does_Not_Exist()
         {
             // Arrange
-            var invalidPageType = (PageType)int.MaxValue;
+            const PageType invalidPageType = (PageType)int.MaxValue;
 
             // Assert
             Assert.Throws<ValidationException>(() => _filterPresetValidator.CheckIfPageTypeExists(invalidPageType));
@@ -50,7 +52,7 @@ namespace Shrooms.Tests.DomainService.Validators
         public void Should_Not_Throw_If_PageType_Exists()
         {
             // Arrange
-            var validPageType = PageType.EventReport;
+            const PageType validPageType = PageType.EventReport;
 
             // Assert
             Assert.DoesNotThrow(() => _filterPresetValidator.CheckIfPageTypeExists(validPageType));
@@ -271,7 +273,7 @@ namespace Shrooms.Tests.DomainService.Validators
             {
                 (FilterType)int.MaxValue,
                 (FilterType)int.MinValue,
-                FilterType.Offices,
+                FilterType.Offices
             };
 
             // Assert
@@ -415,7 +417,7 @@ namespace Shrooms.Tests.DomainService.Validators
                 }
             };
 
-            var presetsToAdd = new List<CreateFilterPresetDto>()
+            var presetsToAdd = new List<CreateFilterPresetDto>
             {
                 new CreateFilterPresetDto
                 {
@@ -430,7 +432,7 @@ namespace Shrooms.Tests.DomainService.Validators
             };
 
             // Assert
-            Assert.DoesNotThrowAsync(async () => 
+            Assert.DoesNotThrowAsync(async () =>
                 await _filterPresetValidator.CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(manageDto, removedPresets));
         }
 
@@ -448,7 +450,7 @@ namespace Shrooms.Tests.DomainService.Validators
                 }
             };
 
-            var presetsToUpdate = new List<UpdateFilterPresetDto>()
+            var presetsToUpdate = new List<UpdateFilterPresetDto>
             {
                 new UpdateFilterPresetDto
                 {
@@ -481,7 +483,7 @@ namespace Shrooms.Tests.DomainService.Validators
 
             var removedPresets = Enumerable.Empty<FilterPresetDto>();
 
-            var presetsToAdd = new List<CreateFilterPresetDto>()
+            var presetsToAdd = new List<CreateFilterPresetDto>
             {
                 new CreateFilterPresetDto
                 {
@@ -515,7 +517,7 @@ namespace Shrooms.Tests.DomainService.Validators
 
             var removedPresets = Enumerable.Empty<FilterPresetDto>();
 
-            var presetsToUpdate = new List<UpdateFilterPresetDto>()
+            var presetsToUpdate = new List<UpdateFilterPresetDto>
             {
                 new UpdateFilterPresetDto
                 {

@@ -17,7 +17,7 @@ namespace Shrooms.Premium.Domain.Services.Args
         public int Page { get; set; }
 
         public int PageSize { get; set; }
-     
+
         public int[] TypeIds { get; set; }
 
         public string[] OfficeIds { get; set; }

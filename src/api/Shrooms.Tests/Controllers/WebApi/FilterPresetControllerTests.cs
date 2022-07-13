@@ -51,7 +51,7 @@ namespace Shrooms.Tests.Controllers.WebApi
                 PageType = (PageType)int.MaxValue,
                 PresetsToCreate = Enumerable.Empty<CreateFilterPresetViewModel>(),
                 PresetsToDelete = Enumerable.Empty<int>(),
-                PresetsToUpdate = Enumerable.Empty<UpdateFilterPresetViewModel>(),
+                PresetsToUpdate = Enumerable.Empty<UpdateFilterPresetViewModel>()
             };
 
             // Act
@@ -122,8 +122,8 @@ namespace Shrooms.Tests.Controllers.WebApi
             _filterPresetService.GetPresetsForPageAsync(Arg.Any<PageType>(), Arg.Any<int>())
                 .Throws(new ValidationException(0));
 
-            var pageType = PageType.EventReportList;
-            
+            const PageType pageType = PageType.EventReportList;
+
             // Act
             var httpActionResult = await _filterPresetController.GetPresets(pageType);
             var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
@@ -138,7 +138,7 @@ namespace Shrooms.Tests.Controllers.WebApi
             // Arrange
             _filterPresetService.GetFiltersAsync(Arg.Any<FilterType[]>(), Arg.Any<int>())
                 .Returns(Enumerable.Empty<FiltersDto>());
-            
+
             var filterTypes = new[]
             {
                 FilterType.Kudos,

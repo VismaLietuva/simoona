@@ -38,7 +38,7 @@ namespace Shrooms.Presentation.Api.Controllers
             try
             {
                 var updateDto = _mapper.Map<ManageFilterPresetViewModel, ManageFilterPresetDto>(manageViewModel);
-                
+
                 updateDto.UserOrg = GetUserAndOrganization();
 
                 var updatedDto = await _filterPresetService.UpdateAsync(updateDto);
@@ -55,7 +55,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [HttpGet]
         [Route("GetPresetsForPage")]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
-        public async Task<IHttpActionResult> GetPresets(PageType pageType) 
+        public async Task<IHttpActionResult> GetPresets(PageType pageType)
         {
             try
             {

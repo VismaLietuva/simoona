@@ -63,7 +63,7 @@ namespace Shrooms.Premium.Tests.DomainService
             var officeMapService = Substitute.For<IOfficeMapService>();
             var markdownConverter = Substitute.For<IMarkdownConverter>();
 
-            _eventService = new EventService(_uow, 
+            _eventService = new EventService(_uow,
                 _permissionService,
                 eventUtilitiesService,
                 eventValidationService,

@@ -327,7 +327,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             MockParticipants();
             MockLotteries();
 
-            var lotteryId = 1;
+            const int lotteryId = 1;
 
             _mapper.Map<Lottery, LotteryDetailsDto>(default).ReturnsForAnyArgs(new LotteryDetailsDto { EntryFee = 1, EndDate = DateTime.UtcNow.AddDays(10) });
             _userService.GetApplicationUserAsync(default).ReturnsForAnyArgs(new ApplicationUser { RemainingKudos = 100 });
@@ -483,7 +483,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
                     EndDate = DateTime.Now.AddDays(2),
                     EntryFee = 1,
                     IsRefundFailed = false
-                },
+                }
             };
         }
 

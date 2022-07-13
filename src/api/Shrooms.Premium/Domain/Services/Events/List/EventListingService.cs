@@ -160,10 +160,10 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                     ManagerLastName = p.ApplicationUser.Manager.LastName,
                     ManagerId = p.ApplicationUser.Manager.Id,
                     Projects = p.ApplicationUser.Projects
-                        .Select(p => new EventProjectReportDto
+                        .Select(pr => new EventProjectReportDto
                         {
-                            Id = p.Id,
-                            Name = p.Name
+                            Id = pr.Id,
+                            Name = pr.Name
                         })
                         .ToList(),
                     Kudos = _kudosLogDbSet

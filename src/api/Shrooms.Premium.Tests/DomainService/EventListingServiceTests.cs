@@ -85,7 +85,7 @@ namespace Shrooms.Premium.Tests.DomainService
             var userOrg = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
-                UserId = "responsibleUserId2",
+                UserId = "responsibleUserId2"
             };
 
             var myEventsOptions = new MyEventsOptionsDto
@@ -166,7 +166,7 @@ namespace Shrooms.Premium.Tests.DomainService
         {
             // Arrange
             MockEventsListTest();
-            
+
             var reportListingArgs = new EventReportListingArgsDto
             {
                 SearchString = "Drinking event",
@@ -197,7 +197,7 @@ namespace Shrooms.Premium.Tests.DomainService
             // Arrange
             MockEventsListTest();
 
-            var expectedCount = 3;
+            const int expectedCount = 3;
 
             var reportListingArgs = new EventReportListingArgsDto
             {
@@ -339,7 +339,7 @@ namespace Shrooms.Premium.Tests.DomainService
         {
             // Arrange
             var eventWithParticipants = MockEventReportParticipantsTest()[0];
-            var expectedParticipantCount = 2;
+            const int expectedParticipantCount = 2;
 
             var reportListingArgs = new EventParticipantsReportListingArgsDto
             {
@@ -360,7 +360,7 @@ namespace Shrooms.Premium.Tests.DomainService
             var result = await _eventListingService.GetReportParticipantsAsync(reportListingArgs, userOrg);
 
             // Arrange
-            Assert.AreEqual(expectedParticipantCount, result.Count());
+            Assert.AreEqual(expectedParticipantCount, result.Count);
         }
 
         [Test]
@@ -368,7 +368,7 @@ namespace Shrooms.Premium.Tests.DomainService
         {
             // Arrange
             var eventWithParticipants = MockEventReportParticipantsTest()[0];
-            var expectedVisitedEventsCount = 2;
+            const int expectedVisitedEventsCount = 2;
 
             var reportListingArgs = new EventParticipantsReportListingArgsDto
             {
@@ -461,7 +461,7 @@ namespace Shrooms.Premium.Tests.DomainService
         {
             // Arrange
             var eventWithParticipants = MockEventReportParticipantsTest()[0];
-            var expectedKudosPoints = 30;
+            const int expectedKudosPoints = 30;
             var reportListingArgs = new EventParticipantsReportListingArgsDto
             {
                 EventId = eventWithParticipants.Id,
@@ -490,7 +490,7 @@ namespace Shrooms.Premium.Tests.DomainService
         {
             // Arrange
             var eventWithParticipants = MockEventReportParticipantsTest()[0];
-            var expectedKudosPoints = 20;
+            const int expectedKudosPoints = 20;
             var reportListingArgs = new EventParticipantsReportListingArgsDto
             {
                 EventId = eventWithParticipants.Id,
@@ -596,7 +596,7 @@ namespace Shrooms.Premium.Tests.DomainService
             };
 
             _eventsDbSet.SetDbSetDataForAsync(events.AsQueryable());
-            
+
             return guids;
         }
 
@@ -616,7 +616,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     },
                     OrganizationId = 3,
                     Name = "Some kind of event",
-                    EventParticipants = new List<EventParticipant>(),
+                    EventParticipants = new List<EventParticipant>()
                 },
 
                 new Event
@@ -631,7 +631,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     },
                     OrganizationId = 3,
                     Name = "Racing",
-                    EventParticipants = new List<EventParticipant>(),
+                    EventParticipants = new List<EventParticipant>()
                 },
 
                 new Event
@@ -646,7 +646,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     },
                     OrganizationId = 3,
                     Name = "Running",
-                    EventParticipants = new List<EventParticipant>(),
+                    EventParticipants = new List<EventParticipant>()
                 }
             };
 
@@ -838,7 +838,7 @@ namespace Shrooms.Premium.Tests.DomainService
                             }
                         }
                     }
-                },
+                }
             };
 
             events[0].EventParticipants = participants;
@@ -882,7 +882,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 Created = DateTime.UtcNow.AddDays(-2),
                 Id = 3,
                 EventId = guids[1],
-                AttendStatus = 3,
+                AttendStatus = 3
             };
 
             var participant4 = new EventParticipant
@@ -892,9 +892,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 Id = 4,
                 EventId = guids[4],
                 AttendStatus = 1,
-                Event = new Event
-                {
-                },
+                Event = new Event(),
                 ApplicationUser = new ApplicationUser
                 {
                     OrganizationId = 2,
@@ -924,9 +922,7 @@ namespace Shrooms.Premium.Tests.DomainService
                             Name = "Cool project"
                         }
                     },
-                    Events = new List<Event>
-                    {
-                    }
+                    Events = new List<Event>()
                 }
             };
 
@@ -937,9 +933,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 Id = 5,
                 EventId = guids[4],
                 AttendStatus = 1,
-                Event = new Event
-                {
-                },
+                Event = new Event(),
                 ApplicationUser = new ApplicationUser
                 {
                     OrganizationId = 2,
@@ -969,9 +963,7 @@ namespace Shrooms.Premium.Tests.DomainService
                             Name = "Cool project"
                         }
                     },
-                    Events = new List<Event>
-                    {
-                    }
+                    Events = new List<Event>()
                 }
             };
 
@@ -982,9 +974,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 Id = 6,
                 EventId = guids[5],
                 AttendStatus = 1,
-                Event = new Event
-                {
-                },
+                Event = new Event(),
                 ApplicationUser = new ApplicationUser
                 {
                     OrganizationId = 3,
@@ -1019,14 +1009,14 @@ namespace Shrooms.Premium.Tests.DomainService
                         new Event
                         {
                             EndDate = DateTime.UtcNow.AddDays(-1),
-                            StartDate = DateTime.UtcNow.AddDays(-2), 
+                            StartDate = DateTime.UtcNow.AddDays(-2),
                             EventType = new EventType
                             {
                                 Id = 1,
                                 Name = "Cool type"
                             },
                             OrganizationId = 3,
-                            Name = "Some kind of event",
+                            Name = "Some kind of event"
                         },
 
                         new Event
@@ -1039,9 +1029,9 @@ namespace Shrooms.Premium.Tests.DomainService
                                 Name = "Awesome type"
                             },
                             OrganizationId = 3,
-                            Name = "Racing",
+                            Name = "Racing"
                         },
-                        
+
                         new Event
                         {
                             EndDate = DateTime.UtcNow.AddDays(-3),
@@ -1052,7 +1042,7 @@ namespace Shrooms.Premium.Tests.DomainService
                                 Name = "Cool type"
                             },
                             OrganizationId = 3,
-                            Name = "Running",
+                            Name = "Running"
                         }
                     }
                 }
@@ -1211,10 +1201,10 @@ namespace Shrooms.Premium.Tests.DomainService
 
 
             _eventsDbSet.SetDbSetDataForAsync(events);
-            _eventParticipantsDbSet.SetDbSetDataForAsync(new List<EventParticipant> 
-            { 
-                participant1, 
-                participant2, 
+            _eventParticipantsDbSet.SetDbSetDataForAsync(new List<EventParticipant>
+            {
+                participant1,
+                participant2,
                 participant3,
                 participant4,
                 participant5,

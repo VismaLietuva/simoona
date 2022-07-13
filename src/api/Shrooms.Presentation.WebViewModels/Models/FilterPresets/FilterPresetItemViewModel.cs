@@ -1,8 +1,8 @@
-﻿using Shrooms.Contracts.Enums;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Shrooms.Contracts.Enums;
 
-namespace Shrooms.Contracts.DataTransferObjects.FilterPresets
+namespace Shrooms.Presentation.WebViewModels.Models.FilterPresets
 {
     public class FilterPresetItemViewModel
     {

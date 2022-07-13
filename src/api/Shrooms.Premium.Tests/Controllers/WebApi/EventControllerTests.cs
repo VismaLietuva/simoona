@@ -43,7 +43,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             _eventService = Substitute.For<IEventService>();
             _eventListingService = Substitute.For<IEventListingService>();
-            
+
             var eventUtilitiesService = Substitute.For<IEventUtilitiesService>();
             var eventParticipationService = Substitute.For<IEventParticipationService>();
             var eventCalendarService = Substitute.For<IEventCalendarService>();

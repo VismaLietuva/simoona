@@ -42,7 +42,7 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
             CreateMap<EventVisitedReportDto, EventVisitedReportViewModel>();
             CreateMap<EventProjectReportDto, EventProjectReportViewModel>();
             CreateMap<EventParticipantReportDto, EventParticipantReportViewModel>();
-            
+
             CreateMap<EventEditDto, EventEditViewModel>()
                 .ForMember(dest => dest.OfficeIds, opt => opt.MapFrom(u => JsonConvert.DeserializeObject<string[]>(u.Offices.Value)));
             CreateMap<EventOptionsDto, EventOptionsViewModel>();

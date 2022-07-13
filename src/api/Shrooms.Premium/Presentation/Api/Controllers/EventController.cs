@@ -215,11 +215,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             }
 
             var optionsDto = _mapper.Map<MyEventsOptionsViewModel, MyEventsOptionsDto>(options);
-            
+
             var myEventsListDto = await _eventListingService.GetMyEventsAsync(optionsDto, GetUserAndOrganization(), officeIdNullable);
-            
+
             var result = _mapper.Map<IEnumerable<EventListItemDto>, IEnumerable<EventListItemViewModel>>(myEventsListDto);
-            
+
             return Ok(result);
         }
 
@@ -581,7 +581,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                 return BadRequest(e.Message);
             }
         }
-        
+
         [HttpGet]
         [Route("GetReportEventDetails")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Event)]

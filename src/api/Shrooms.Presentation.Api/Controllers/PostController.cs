@@ -40,7 +40,7 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [HttpGet]
-        [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Post, BasicPermissions.EventWall)]
+        [PermissionAnyOfAuthorize(BasicPermissions.Post, BasicPermissions.EventWall)]
         public async Task<IHttpActionResult> GetPost(int postId)
         {
             try
@@ -64,7 +64,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpPost]
         [Route("Create")]
-        [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Post, BasicPermissions.EventWall)]
+        [PermissionAnyOfAuthorize(BasicPermissions.Post, BasicPermissions.EventWall)]
         public async Task<IHttpActionResult> CreatePost(CreateWallPostViewModel wallPostViewModel)
         {
             if (!ModelState.IsValid)
@@ -105,7 +105,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpPut]
         [Route("Edit")]
-        [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Post, BasicPermissions.EventWall)]
+        [PermissionAnyOfAuthorize(BasicPermissions.Post, BasicPermissions.EventWall)]
         public async Task<IHttpActionResult> EditPost(EditPostViewModel editedPost)
         {
             if (!ModelState.IsValid)
@@ -132,7 +132,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpDelete]
         [Route("Delete")]
-        [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Post, BasicPermissions.EventWall)]
+        [PermissionAnyOfAuthorize(BasicPermissions.Post, BasicPermissions.EventWall)]
         public async Task<IHttpActionResult> DeletePost(int id)
         {
             if (id <= 0)
@@ -158,7 +158,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpPut]
         [Route("Hide")]
-        [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Post, BasicPermissions.EventWall)]
+        [PermissionAnyOfAuthorize(BasicPermissions.Post, BasicPermissions.EventWall)]
         public async Task<IHttpActionResult> HidePost(HidePostViewModel post)
         {
             if (!ModelState.IsValid)
@@ -184,7 +184,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpPut]
         [Route("Like")]
-        [PermissionAnyOfAuthorizeAttribute(BasicPermissions.Post, BasicPermissions.EventWall)]
+        [PermissionAnyOfAuthorize(BasicPermissions.Post, BasicPermissions.EventWall)]
         public async Task<IHttpActionResult> ToggleLike(AddLikeViewModel addLikeViewModel)
         {
             if (!ModelState.IsValid)
