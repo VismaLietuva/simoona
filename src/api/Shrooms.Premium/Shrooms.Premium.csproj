@@ -318,6 +318,7 @@
     <Compile Include="DataTransferObjects\Models\Committees\CommitteeViewDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventFilteredArgsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventParticipantsReportListingArgsDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\EventParticipantVisitedEventsListingArgsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventProjectReportDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventReportDetailsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventReportListingArgsDto.cs" />
@@ -555,6 +556,7 @@
     <Compile Include="Presentation\WebViewModels\Events\EventOptionsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventOptionViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventParticipantsReportListingArgsViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\EventParticipantVisitedEventsListingArgsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventProjectReportViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventReportDetailsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventReportListingArgsViewModel.cs" />
