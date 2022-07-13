@@ -30,11 +30,14 @@
             events: true
         };
 
+        var tableColumnCount = 6;
+
         vm.filter = eventReportService.getEventReportFilter(
             filterPageTypes.eventReportList, [
                 { name: 'events', type: filterTypes.events },
                 { name: 'offices', type: filterTypes.offices }
-            ]
+            ],
+            tableColumnCount
         );
 
         vm.page = 1;
@@ -77,8 +80,7 @@
                     vm.page,
                     vm.filter.appliedFilters.events,
                     vm.filter.appliedFilters.offices,
-                    vm.filter.appliedFilters.sortBy,
-                    vm.filter.appliedFilters.sortOrder
+                    vm.filter.getSortString()
                 )
                 .then(
                     function (result) {
@@ -120,9 +122,9 @@
             });
         }
 
-        function sortByColumn(sortBy, sortOrder) {
+        function sortByColumn(sortBy, sortOrder, position) {
             onCompleteLoadFirstPage(function () {
-                vm.filter.setSortValues(sortBy, sortOrder);
+                vm.filter.setSortValues(sortBy, sortOrder, position);
             });
         }
 

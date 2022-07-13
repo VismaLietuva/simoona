@@ -37,11 +37,14 @@
             filters: true,
         };
 
+        var tableColumnCount = 8;
+
         vm.filter = eventReportService.getEventReportFilter(
             filterPageTypes.eventReport, [
                 { name: 'events', type: filterTypes.events },
                 { name: 'kudos', type: filterTypes.kudos }
-            ]
+            ],
+            tableColumnCount
         );
 
         vm.visitedEventsPreviewCount = visitedEventsPreviewCount;
@@ -90,8 +93,7 @@
                     vm.filter.appliedFilters.kudos,
                     vm.filter.appliedFilters.events,
                     vm.page,
-                    vm.filter.appliedFilters.sortBy,
-                    vm.filter.appliedFilters.sortOrder
+                    vm.filter.getSortString()
                 )
                 .then(
                     function (result) {
@@ -160,9 +162,9 @@
             });
         }
 
-        function sortByColumn(sortBy, sortOrder) {
+        function sortByColumn(sortBy, sortOrder, position) {
             onCompleteLoadFirstPage(function () {
-                vm.filter.setSortValues(sortBy, sortOrder);
+                vm.filter.setSortValues(sortBy, sortOrder, position);
             });
         }
 
