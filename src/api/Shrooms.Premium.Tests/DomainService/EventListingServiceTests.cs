@@ -316,8 +316,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 OfficeTypeIds = Enumerable.Empty<string>(),
                 Page = 1,
                 PageSize = 10,
-                SortByColumnName = "Name",
-                SortDirection = "desc"
+                SortByProperties = "Name desc"
             };
 
             var userOrg = new UserAndOrganizationDto
@@ -468,8 +467,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 EventId = eventWithParticipants.Id,
                 KudosTypeIds = Enumerable.Empty<int>(),
                 EventTypeIds = Enumerable.Empty<int>(),
-                SortByColumnName = "Kudos",
-                SortDirection = "desc",
+                SortByProperties = "Kudos desc",
                 Page = 1,
                 PageSize = 10
             };
@@ -498,8 +496,7 @@ namespace Shrooms.Premium.Tests.DomainService
                 EventId = eventWithParticipants.Id,
                 KudosTypeIds = new List<int> { 1 },
                 EventTypeIds = Enumerable.Empty<int>(),
-                SortByColumnName = "Kudos",
-                SortDirection= "desc",
+                SortByProperties = "Kudos desc",
                 Page = 1,
                 PageSize = 10
             };
