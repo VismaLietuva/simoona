@@ -16,7 +16,7 @@
         .constant('filterTypesRowTranslations',[
             'common.presetConfigurationTableEvents',
             'common.presetConfigurationTableKudos',
-            'common.presetConfigurationTableName',
+            'common.presetConfigurationTableOffices',
         ]);
 
     filterPreset.$inject = [
