@@ -133,6 +133,31 @@ namespace Shrooms.Premium.Domain.Services.Events.List
 
             return events;
         }
+        
+        public async Task<IPagedList<EventVisitedReportDto>> GetEventParticipantVisitedReportEventsAsync(EventParticipantVisitedEventsListingArgsDto visitedArgsDto, UserAndOrganizationDto userOrg)
+        {
+            var eventTypesLength = visitedArgsDto.EventTypeIds.Count();
+            var visitedEvents = await _eventsDbSet
+                .Include(e => e.EventParticipants)
+                .Where(e => e.EventParticipants.Any(participant => participant.ApplicationUserId == visitedArgsDto.UserId) &&
+                                    e.EndDate < DateTime.UtcNow &&
+                                    e.OrganizationId == userOrg.OrganizationId &&
+                                    (eventTypesLength == 0 || visitedArgsDto.EventTypeIds.Contains(e.EventType.Id)) &&
+                                    e.StartDate >= visitedArgsDto.StartDate && 
+                                    e.EndDate <= visitedArgsDto.EndDate)
+                .Select(e => new EventVisitedReportDto
+                {
+                    Id = e.Id,
+                    Name = e.Name,
+                    TypeName = e.EventType.Name,
+                    StartDate = e.StartDate,
+                    EndDate = e.EndDate
+                })
+                .OrderByPropertyNames(visitedArgsDto)
+                .ToPagedListAsync(visitedArgsDto.Page, visitedArgsDto.PageSize);
+
+            return visitedEvents;
+        }
 
         public async Task<IPagedList<EventParticipantReportDto>> GetReportParticipantsAsync(EventParticipantsReportListingArgsDto reportArgsDto, UserAndOrganizationDto userOrg)
         {
