@@ -191,6 +191,7 @@
     <Compile Include="ModelMappings\ModelMapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestConstants.cs" />
+    <Compile Include="ValidationAttributes\DateTimeLessThanPresentDateAttributeTests.cs" />
     <Compile Include="ValidationAttributes\DateTimeLessThanDateTimeAttributeTests.cs" />
   </ItemGroup>
   <ItemGroup>
