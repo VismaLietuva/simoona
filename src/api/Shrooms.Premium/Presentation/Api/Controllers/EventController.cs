@@ -11,7 +11,6 @@ using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.Infrastructure;
-using Shrooms.Contracts.ViewModels;
 using Shrooms.Contracts.ViewModels.Wall.Posts;
 using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
@@ -29,6 +28,7 @@ using Shrooms.Premium.Presentation.WebViewModels.Events;
 using Shrooms.Premium.Presentation.WebViewModels.User;
 using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.Api.Filters;
+using Shrooms.Premium.Presentation.Api.Extensions;
 using X.PagedList;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers
@@ -379,19 +379,34 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             try
             {
                 var reportArgsDto = _mapper.Map<EventParticipantsReportListingArgsViewModel, EventParticipantsReportListingArgsDto>(reportArgsViewModel);
-                var pagedParticipants = await _eventListingService.GetReportParticipantsAsync(reportArgsDto, GetUserAndOrganization());
-                var pagedParticipantsViewModel = _mapper.Map<IEnumerable<EventParticipantReportDto>, IEnumerable<EventParticipantReportViewModel>>(pagedParticipants);
+                var pagedParticipantsDto = await _eventListingService.GetReportParticipantsAsync(reportArgsDto, GetUserAndOrganization());
+                var pagedParticipantsViewModel = _mapper.Map<IEnumerable<EventParticipantReportDto>, IEnumerable<EventParticipantReportViewModel>>(pagedParticipantsDto);
 
-                var pagedModel = new StaticPagedList<EventParticipantReportViewModel>(pagedParticipantsViewModel, reportArgsViewModel.Page, reportArgsViewModel.PageSize, pagedParticipants.TotalItemCount);
-                var pagedViewModel = new PagedViewModel<EventParticipantReportViewModel>
-                {
-                    PagedList = pagedModel,
-                    PageCount = pagedModel.PageCount,
-                    ItemCount = pagedModel.TotalItemCount,
-                    PageSize = pagedModel.PageSize
-                };
+                return Ok(pagedParticipantsDto.ToPagedViewModel(pagedParticipantsViewModel, reportArgsViewModel));
+            }
+            catch (EventException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
 
-                return Ok(pagedViewModel);
+        [HttpGet]
+        [Route("GetPagedVisitedReportEvents")]
+        [PermissionAuthorize(Permission = AdministrationPermissions.Event)]
+        public async Task<IHttpActionResult> GetPagedVisitedReportEvents([FromUri] EventParticipantVisitedEventsListingArgsViewModel visitedArgsViewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var visitedArgsDto = _mapper.Map<EventParticipantVisitedEventsListingArgsViewModel, EventParticipantVisitedEventsListingArgsDto>(visitedArgsViewModel);
+                var pagedVisitedEventsDto = await _eventListingService.GetEventParticipantVisitedReportEventsAsync(visitedArgsDto, GetUserAndOrganization());
+                var visitedEventsViewModels = _mapper.Map<IEnumerable<EventVisitedReportDto>, IEnumerable<EventVisitedReportViewModel>>(pagedVisitedEventsDto);
+                
+                return Ok(pagedVisitedEventsDto.ToPagedViewModel(visitedEventsViewModels, visitedArgsDto));
             }
             catch (EventException e)
             {
@@ -620,17 +635,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
                 var reportArgsDto = _mapper.Map<EventReportListingArgsViewModel, EventReportListingArgsDto>(reportArgsViewModel);
                 var eventListItemsPagedDto = await _eventListingService.GetNotStartedEventsFilteredByTitleAsync(reportArgsDto, GetUserAndOrganization());
                 var eventListItemsViewModel = _mapper.Map<IEnumerable<EventDetailsListItemDto>, IEnumerable<EventDetailsListItemViewModel>>(eventListItemsPagedDto);
-                var pagedModel = new StaticPagedList<EventDetailsListItemViewModel>(eventListItemsViewModel, reportArgsViewModel.Page, reportArgsViewModel.PageSize, eventListItemsPagedDto.TotalItemCount);
 
-                var pagedViewModel = new PagedViewModel<EventDetailsListItemViewModel>
-                {
-                    PagedList = pagedModel,
-                    PageCount = pagedModel.PageCount,
-                    ItemCount = pagedModel.TotalItemCount,
-                    PageSize = pagedModel.PageSize
-                };
-
-                return Ok(pagedViewModel);
+                return Ok(eventListItemsPagedDto.ToPagedViewModel(eventListItemsViewModel, reportArgsDto));
             }
             catch (EventException e)
             {
