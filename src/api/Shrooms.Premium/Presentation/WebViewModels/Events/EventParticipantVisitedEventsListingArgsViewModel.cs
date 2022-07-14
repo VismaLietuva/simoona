@@ -26,6 +26,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
         public DateTime? StartDate { get; set; }
         
         [Required]
+        [DateTimeLessThanPresentDate]
         public DateTime? EndDate { get; set; }
     }
 }
