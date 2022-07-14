@@ -30,7 +30,6 @@
         'sortMultipleLinkService'
     ];
 
-    // TOOD: export to service method that sorting thing?
     function expandParticipantsController($timeout, eventRepository, notifySrv, sortMultipleLinkService) {
         var vm = this;
 
