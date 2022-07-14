@@ -53,7 +53,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes
 
             if (type != typeof(DateTime))
             {
-                throw new ArgumentException($"Provided property is not of type DateTime but {type}");
+                throw new ArgumentException($"Provided property is not of type DateTime but of {type}");
             }
         }
     }
