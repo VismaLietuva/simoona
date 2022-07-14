@@ -102,7 +102,7 @@
                             vm.participants.pagedList.map(function (element) {
                                 var canBeExpanded =
                                     vm.visitedEventsPreviewCount <
-                                    element.visitedEvents.length;
+                                    element.totalVisitedEventCount;
 
                                 if (!vm.showActionsColumn && canBeExpanded) {
                                     vm.showActionsColumn = true;

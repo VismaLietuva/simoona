@@ -377,6 +377,24 @@
     }
 }
 
+.event-report-visited-events-container {
+    margin: 0;
+    border: 0;
+    background-color: white;
+}
+
+.event-report-expanded-date-container {
+    padding: 10px 0;
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    margin-right: 70px;
+
+    > span {
+        line-height: 1;
+    }
+}
+
 .event-report-date,
 .event-details-date {
     display: inline-block;
@@ -394,6 +412,15 @@
     margin-bottom: 0px;
     border: 0px;
     background-color: #fcfcfc;
+}
+
+.event-report-expanded-loading-container {
+    padding-top: 40px;
+    padding-bottom: 40px;
+
+    > wave-spinner {
+        margin: 0 !important;
+    }
 }
 
 .event-report-list-filter-controls {
@@ -419,6 +446,12 @@
     border-left: 1px solid #dddddd !important;
 }
 
+.event-report-expanded-content-container {
+    background-color: white;
+    border-top: 1px solid #dddddd;
+    border-bottom: 1px solid #dddddd;
+}
+
 @media (max-width: 767px) {
     .event-report-list-panel-heading {
         display: block;
@@ -438,6 +471,17 @@
 }
 
 @media (max-width: 991px) {
+    .event-report-expanded-date-container {
+        flex-flow: column-reverse;
+        float: left;
+        align-items: flex-start;
+
+        > span {
+            padding-top: 8px;
+            padding-bottom: 8px;
+        }
+    }
+
     .event-report-visited-events {
         border-right: 1px solid #dddddd !important;
     }

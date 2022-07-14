@@ -1,44 +1,73 @@
-<table class="nc-table event-report-extension-table no-border">
-    <thead>
-        <tr>
-            <th class="col-xs-3" >
-                <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="name">
-                    <span translate="events.tableTitle"></span>
-                </ace-sort-link>
-            </th>
+<div class="event-report-visited-events-container">
+    <table class="nc-table event-report-extension-table no-border">
+        <div class="event-report-expanded-date-container">
+            <div class="date-field pl-10">
+                <input type="text" class="hasDatepicker" uib-datepicker-popup="yyyy-MM-dd" popup-placement="bottom"
+                    ng-model="vm.datePickers.endDate.date"  is-open="vm.datePickers.endDate.isOpen" max-date="vm.datePickers.endDate.maxDate" ng-click="vm.openDatePicker($event, 'endDate')"
+                    ng-change="vm.loadVisitedEventsWithUpdatedDates()"
+                    datepicker-options="vm.datePickers.endDate.options" required wrapped>
+            </div>
+            <span class="pl-10" translate="common.to"></span>
+            <div class="date-field pl-10">
+                <input type="text" class="hasDatepicker" uib-datepicker-popup="yyyy-MM-dd" popup-placement="bottom"
+                    ng-model="vm.datePickers.startDate.date" ng-change="vm.loadVisitedEventsWithUpdatedDates()"  is-open="vm.datePickers.startDate.isOpen" max-date="vm.datePickers.startDate.maxDate" ng-click="vm.openDatePicker($event, 'startDate')"
+                    datepicker-options="vm.datePickers.startDate.options" required wrapped>
+            </div>
+            <span class="pl-10" translate="common.from"></span>
+        </div>
 
-            <th class="col-xs-2">
-                <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="typeName">
-                    <span translate="events.tableType"></span>
-                </ace-sort-link>
-            </th>
+        <thead>
+            <tr>
+                <th class="col-xs-3">
+                    <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.sortOrder"
+                        sort-field="vm.filter.sortByColumnName" sort-value="name">
+                        <span translate="events.tableTitle"></span>
+                    </ace-sort-link>
+                </th>
 
-            <th class="hidden-xs hidden-sm">
-                <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="startDate">
-                    <span translate="events.tableStartDate"></span>
-                </ace-sort-link>
-            </th>
+                <th class="col-xs-2">
+                    <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.sortOrder"
+                        sort-field="vm.filter.sortByColumnName" sort-value="typeName">
+                        <span translate="events.tableType"></span>
+                    </ace-sort-link>
+                </th>
 
-            <th class="hidden-xs hidden-sm">
-                <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="endDate">
-                    <span translate="events.tableEndDate"></span>
-                </ace-sort-link>
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr ng-repeat="event in vm.visitedEvents">
-            <td class="col-xs-2 col-sm-4" style="word-break: break-word;">
-                <a
-                    ui-sref=" Root.WithOrg.Client.Events.EventContent({ id: event.id })">{{event.name}}</a>
-            </td>
-            <td class="col-xs-2">{{event.typeName}}</td>
-            <td class="hidden-xs hidden-sm">
-                {{event.startDate | amUtc | amLocal | amDateFormat:'YYYY-MM-DD HH-MM'}}
-            </td>
-            <td class="hidden-xs hidden-sm">
-                {{event.endDate | amUtc | amLocal | amDateFormat:'YYYY-MM-DD HH-MM'}}
-            </td>
-        </tr>
-    </tbody>
-</table>
+                <th class="hidden-xs hidden-sm">
+                    <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.sortOrder"
+                        sort-field="vm.filter.sortByColumnName" sort-value="startDate">
+                        <span translate="events.tableStartDate"></span>
+                    </ace-sort-link>
+                </th>
+
+                <th class="hidden-xs hidden-sm">
+                    <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.sortOrder"
+                        sort-field="vm.filter.sortByColumnName" sort-value="endDate">
+                        <span translate="events.tableEndDate"></span>
+                    </ace-sort-link>
+                </th>
+            </tr>
+        </thead>
+        <tbody ng-if="!vm.isLoading">
+            <tr ng-repeat="event in vm.events.pagedList">
+                <td class="col-xs-2 col-sm-4" style="word-break: break-word;">
+                    <a ui-sref=" Root.WithOrg.Client.Events.EventContent({ id: event.id })">{{event.name}}</a>
+                </td>
+                <td class="col-xs-2">{{event.typeName}}</td>
+                <td class="hidden-xs hidden-sm">
+                    {{event.startDate | amUtc | amLocal | amDateFormat:'YYYY-MM-DD HH-MM'}}
+                </td>
+                <td class="hidden-xs hidden-sm">
+                    {{event.endDate | amUtc | amLocal | amDateFormat:'YYYY-MM-DD HH-MM'}}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div ng-if="vm.isLoading" class="event-report-expanded-loading-container">
+        <wave-spinner></wave-spinner>
+    </div>
+
+    <ace-list-pagination ng-if="!vm.isLoading" class="ml-10" total-item-count="vm.events.itemCount"
+        page-size="vm.events.pageSize" page-count="vm.events.pageCount" current-page="vm.page" on-changed="vm.loadVisitedEventsOnPage(page)">
+    </ace-list-pagination>
+</div>

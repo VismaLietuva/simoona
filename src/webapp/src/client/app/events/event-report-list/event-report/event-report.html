@@ -224,8 +224,7 @@
                                             ng-if="participant.canBeExpanded &&
                                                         !participant.isExpanded &&
                                                         $index === vm.visitedEventsPreviewCount - 1"
-                                            translate="events.moreCount" translate-values="{ one: participant.visitedEvents.length -
-                                                            vm.visitedEventsPreviewCount }">
+                                            translate="events.moreCount" translate-values="{ one: participant.totalVisitedEventCount - participant.visitedEvents.length }">
                                         </span>
                                     </li>
                                 </ul>
@@ -251,9 +250,9 @@
 
                         <!-- Additional row for displaying participated events -->
                         <tr ng-repeat-end ng-if="participant.isExpanded">
-                            <td colspan="9" class="no-padding">
+                            <td colspan="9" class="no-padding event-report-expanded-content-container">
                                 <!-- Expansion content -->
-                                <ace-expand-participants visited-events="participant.visitedEvents"></ace-expand-participants>
+                                <ace-expand-participants user-id="participant.id" event-types="vm.filter.appliedFilters.events"></ace-expand-participants>
                             </td>
                         </tr>
                     </tbody>
