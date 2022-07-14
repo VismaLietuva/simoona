@@ -26,11 +26,15 @@
     expandParticipantsController.$inject = [
         '$timeout',
         'eventRepository',
-        'notifySrv'
+        'notifySrv',
+        'sortMultipleLinkService'
     ];
 
-    function expandParticipantsController($timeout, eventRepository, notifySrv) {
+    // TOOD: export to service method that sorting thing?
+    function expandParticipantsController($timeout, eventRepository, notifySrv, sortMultipleLinkService) {
         var vm = this;
+
+        var columnCount = 4;
 
         var maxEndDate = moment().local().startOf('days').toDate();
         var defaultStartDate = moment(maxEndDate).subtract(1, 'year').toDate();
@@ -59,9 +63,12 @@
             }
         }
 
+        vm.sortValues = sortMultipleLinkService.getMultipleSort(columnCount);
+
         vm.loadVisitedEventsOnPage = loadVisitedEventsOnPage;
         vm.loadVisitedEventsWithUpdatedDates = loadVisitedEventsWithUpdatedDates;
         vm.openDatePicker = openDatePicker;
+        vm.sortByColumn = sortByColumn;
 
         init();
 
@@ -82,7 +89,7 @@
                 .getEventParticipantVisitedEvents(
                     vm.userId,
                     vm.page,
-                    'dont care about sorting for now',
+                    vm.sortValues.getSortString(),
                     vm.eventTypes,
                     vm.datePickers.startDate.date,
                     vm.datePickers.endDate.date
@@ -96,6 +103,12 @@
                         notifySrv.error('errorCodeMessages.messageError');
                     }
                 );
+        }
+
+        function sortByColumn(sortBy, sortOrder, position) {
+            onCompleteLoadFirstPage(function() {
+                vm.sortValues.setSortValues(sortBy, sortOrder, position);
+            });
         }
 
         function onCompleteLoadFirstPage(func) {

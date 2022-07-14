@@ -19,31 +19,27 @@
         <thead>
             <tr>
                 <th class="col-xs-3">
-                    <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.sortOrder"
-                        sort-field="vm.filter.sortByColumnName" sort-value="name">
+                    <ace-sort-multiple-link position="0" sort-dir="vm.sortValues.sortOrders[0]" sort-field="vm.sortValues.sortBy[0]" on-sort="vm.sortByColumn" sort-value="name">
                         <span translate="events.tableTitle"></span>
-                    </ace-sort-link>
+                    </ace-sort-multiple-link>
                 </th>
 
                 <th class="col-xs-2">
-                    <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.sortOrder"
-                        sort-field="vm.filter.sortByColumnName" sort-value="typeName">
+                    <ace-sort-multiple-link position="1" sort-dir="vm.sortValues.sortOrders[1]" sort-field="vm.sortValues.sortBy[1]" on-sort="vm.sortByColumn" sort-value="typeName">
                         <span translate="events.tableType"></span>
-                    </ace-sort-link>
+                    </ace-sort-multiple-link>
                 </th>
 
                 <th class="hidden-xs hidden-sm">
-                    <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.sortOrder"
-                        sort-field="vm.filter.sortByColumnName" sort-value="startDate">
+                    <ace-sort-multiple-link position="2" sort-dir="vm.sortValues.sortOrders[2]" sort-field="vm.sortValues.sortBy[2]" on-sort="vm.sortByColumn" sort-value="startDate">
                         <span translate="events.tableStartDate"></span>
-                    </ace-sort-link>
+                    </ace-sort-multiple-link>
                 </th>
 
                 <th class="hidden-xs hidden-sm">
-                    <ace-sort-link on-sort="vm.onSort" sort-dir="vm.filter.sortOrder"
-                        sort-field="vm.filter.sortByColumnName" sort-value="endDate">
+                    <ace-sort-multiple-link position="3" sort-dir="vm.sortValues.sortOrders[3]" sort-field="vm.sortValues.sortBy[3]" on-sort="vm.sortByColumn" sort-value="endDate">
                         <span translate="events.tableEndDate"></span>
-                    </ace-sort-link>
+                    </ace-sort-multiple-link>
                 </th>
             </tr>
         </thead>
