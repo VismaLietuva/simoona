@@ -204,7 +204,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                                     e.OrganizationId == userOrg.OrganizationId &&
                                     (eventTypesLength == 0 || reportArgsDto.EventTypeIds.Contains(e.EventType.Id)))
                         .OrderByDescending(e => e.EndDate)
-                        .Take(50)
+                        .Take(EventsConstants.EventReportVisitedEventPreviewCount)
                         .Select(visited => new EventVisitedReportDto
                         {
                             Id = visited.Id,
@@ -213,7 +213,12 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                             StartDate = visited.StartDate,
                             EndDate = visited.EndDate
                         })
-                        .ToList()
+                        .ToList(),
+                    TotalVisitedEventCount = _eventsDbSet
+                        .Count(e => e.EventParticipants.Any(participant => participant.ApplicationUserId == p.ApplicationUser.Id) &&
+                                    e.EndDate < DateTime.UtcNow &&
+                                    e.OrganizationId == userOrg.OrganizationId &&
+                                    (eventTypesLength == 0 || reportArgsDto.EventTypeIds.Contains(e.EventType.Id)))
                 })
                 .OrderByPropertyNames(reportArgsDto)
                 .ToPagedListAsync(reportArgsDto.Page, reportArgsDto.PageSize);
