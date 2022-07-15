@@ -37,7 +37,7 @@ namespace Shrooms.Domain.Services.VacationPages
                 _vacationPagesDbSet.Add(new VacationPage
                 {
                     Content = vacationPageDto.Content,
-                    OrganizationId = userAndOrg.OrganizationId,
+                    OrganizationId = userAndOrg.OrganizationId
                 });
 
                 await _uow.SaveChangesAsync();

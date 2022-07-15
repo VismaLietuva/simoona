@@ -77,12 +77,12 @@ namespace Shrooms.Tests
 
             _filterPresetDbSet.SetDbSetDataForAsync(mockData);
 
-            var expectedCount = 2;
-            var expectedFirstItemId = 1;
-            var expectedSecondItemId = 3;
-            
-            var pageType = PageType.EventReportList;
-            var organizationId = 1;
+            const int expectedCount = 2;
+            const int expectedFirstItemId = 1;
+            const int expectedSecondItemId = 3;
+
+            const PageType pageType = PageType.EventReportList;
+            const int organizationId = 1;
 
             // Act
             var actualResult = (await _filterPresetService.GetPresetsForPageAsync(pageType, organizationId))
@@ -145,7 +145,7 @@ namespace Shrooms.Tests
 
                 new KudosType
                 {
-                    Id = 2, 
+                    Id = 2,
                     Name = "Second kudos type"
                 }
             };
@@ -237,7 +237,7 @@ namespace Shrooms.Tests
                     OrganizationId = 1,
                     ForPage = PageType.EventReport,
                     Preset = string.Empty
-                },
+                }
             };
 
             _filterPresetDbSet.SetDbSetDataForAsync(mockFilterPresets);

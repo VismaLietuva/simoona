@@ -124,51 +124,51 @@
                     <thead ng-if="vm.participants.pagedList.length" >
                         <tr class="nowrap">
                             <th>
-                                <ace-sort-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="firstName">
+                                <ace-sort-multiple-link on-sort="vm.sortByColumn" position="0" sort-dir="vm.filter.sortOrders[0]" sort-field="vm.filter.sortBy[0]" sort-value="firstName">
                                     <span translate="events.tableEmployee"></span>
-                                </ace-sort-link>
+                                </ace-sort-multiple-link>
                             </th>
 
                             <th class="hidden-xs hidden-sm">
-                                <ace-sort-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="employmentDate">
+                                <ace-sort-multiple-link on-sort="vm.sortByColumn" position="1" sort-dir="vm.filter.sortOrders[1]" sort-field="vm.filter.sortBy[1]" sort-value="employmentDate">
                                     <span translate="events.tableHireDate"></span>
-                                </ace-sort-link>
+                                </ace-sort-multiple-link>
                             </th>
 
                             <th class="hidden-xs hidden-sm hidden-md">
-                                <ace-sort-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="qualificationLevel">
+                                <ace-sort-multiple-link on-sort="vm.sortByColumn" position="2" sort-dir="vm.filter.sortOrders[2]" sort-field="vm.filter.sortBy[2]" sort-value="qualificationLevel">
                                     <span translate="events.tableQualification"></span>
-                                </ace-sort-link>
+                                </ace-sort-multiple-link>
                             </th>
 
                             <th class="hidden-xs hidden-sm">
-                                <ace-sort-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="jobTitle">
+                                <ace-sort-multiple-link on-sort="vm.sortByColumn" position="3" sort-dir="vm.filter.sortOrders[3]" sort-field="vm.filter.sortBy[3]" sort-value="jobTitle">
                                     <span translate="events.tablePosition"></span>
-                                </ace-sort-link>
+                                </ace-sort-multiple-link>
                             </th>
 
                             <th class="hidden-xs hidden-sm hidden-md">
-                                <ace-sort-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="managerFirstName">
+                                <ace-sort-multiple-link on-sort="vm.sortByColumn" position="4" sort-dir="vm.filter.sortOrders[4]" sort-field="vm.filter.sortBy[4]" sort-value="managerFirstName">
                                     <span translate="events.tableManager"></span>
-                                </ace-sort-link>
+                                </ace-sort-multiple-link>
                             </th>
 
                             <th class="hidden-xs hidden-sm">
-                                <ace-sort-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="kudos">
+                                <ace-sort-multiple-link on-sort="vm.sortByColumn" position="5" sort-dir="vm.filter.sortOrders[5]" sort-field="vm.filter.sortBy[5]" sort-value="kudos">
                                     <span translate="events.tableKudos"></span>
-                                </ace-sort-link>
+                                </ace-sort-multiple-link>
                             </th>
 
                             <th class="event-report-visited-events">
-                                <ace-sort-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="visitedEvents.Count">
+                                <ace-sort-multiple-link on-sort="vm.sortByColumn" position="6" sort-dir="vm.filter.sortOrders[6]" sort-field="vm.filter.sortBy[6]" sort-value="visitedEvents.Count">
                                     <span translate="events.tableEvents"></span>
-                                </ace-sort-link>
+                                </ace-sort-multiple-link>
                             </th>
 
                             <th class="hidden-xs hidden-sm">
-                                <ace-sort-link on-sort="vm.sortByColumn" sort-dir="vm.filter.sortOrder" sort-field="vm.filter.sortByColumnName" sort-value="projects.Count">
+                                <ace-sort-multiple-link on-sort="vm.sortByColumn" position="7" sort-dir="vm.filter.sortOrders[7]" sort-field="vm.filter.sortBy[7]" sort-value="projects.Count">
                                     <span translate="events.tableProjects"></span>
-                                </ace-sort-link>
+                                </ace-sort-multiple-link>
                             </th>
 
                             <th class="hidden-xs hidden-sm event-report-action" ng-if="vm.showActionsColumn" translate="events.tableAction">

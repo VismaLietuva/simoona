@@ -5,7 +5,7 @@ namespace Shrooms.Contracts.DataTransferObjects.Users
     public class UserEventAttendStatusChangeEmailDto
     {
         public string FullName => $"{FirstName} {LastName}";
-        
+
         public string FirstName { get; set; }
 
         public string LastName { get; set; }

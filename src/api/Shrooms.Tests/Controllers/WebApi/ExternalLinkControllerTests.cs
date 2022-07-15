@@ -98,7 +98,7 @@ namespace Shrooms.Tests.Controllers.WebApi
             // Arrange
             _externalLinkService.UpdateLinksAsync(Arg.Any<ManageExternalLinkDto>())
                 .Throws(new ValidationException(0));
-            
+
             var updateLinksViewModel = new ManageExternalLinkViewModel();
 
             // Act

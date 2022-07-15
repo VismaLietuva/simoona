@@ -1,6 +1,4 @@
-﻿using Shrooms.Contracts.Enums;
-
-namespace Shrooms.Contracts.DataTransferObjects.FilterPresets
+﻿namespace Shrooms.Contracts.DataTransferObjects.FilterPresets
 {
     public class FilterDto
     {

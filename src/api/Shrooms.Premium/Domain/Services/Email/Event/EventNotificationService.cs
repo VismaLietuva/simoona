@@ -13,7 +13,6 @@ using Shrooms.Domain.Services.Organizations;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
-using Shrooms.Resources.Models.Events;
 
 namespace Shrooms.Premium.Domain.Services.Email.Event
 {
@@ -99,7 +98,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                     userAttendStatusDto.FullName, userAttendStatusDto.EventName);
 
                 return new EmailDto(new List<string> { userAttendStatusDto.ManagerEmail },
-                    emailLeaveSubject, 
+                    emailLeaveSubject,
                     emailLeaveBody);
             }
 
@@ -114,7 +113,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                 userAttendStatusDto.FullName, userAttendStatusDto.EventName);
 
             return new EmailDto(new List<string> { userAttendStatusDto.ManagerEmail },
-                    emailJoinSubject, 
+                    emailJoinSubject,
                     emailJoinBody);
         }
     }

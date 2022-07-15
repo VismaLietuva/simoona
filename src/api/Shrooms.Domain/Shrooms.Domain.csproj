@@ -128,7 +128,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Extensions\DbSetExtensions.cs" />
+    <Compile Include="Extensions\QueryableExtensions.cs" />
     <Compile Include="Helpers\BirthdayDateTimeHelper.cs" />
     <Compile Include="Helpers\CommonMarkMarkdownConverter.cs" />
     <Compile Include="Helpers\HtmlSanitizerHelper.cs" />

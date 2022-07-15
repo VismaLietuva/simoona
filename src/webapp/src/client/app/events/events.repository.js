@@ -231,25 +231,23 @@
             }).$promise;
         }
 
-        function getEventsByTitle(searchString, page, typeIds, officeIds, sortBy, sortOrder) {
+        function getEventsByTitle(searchString, page, typeIds, officeIds, sortByProperties) {
             return $resource(`${eventUrl}GetEventsByTitle`).get({
                 searchString: searchString,
                 eventTypeIds: typeIds,
                 page: page,
                 officeIds: officeIds,
-                sortByColumnName: sortBy,
-                sortDirection: sortOrder
+                sortByProperties: sortByProperties
             }).$promise;
         }
 
-        function getEventParticipants(eventId, kudosTypeIds, eventTypes, page, sortBy, sortOrder) {
+        function getEventParticipants(eventId, kudosTypeIds, eventTypes, page, sortByProperties) {
             return $resource(`${eventUrl}GetPagedReportParticipants`).get({
                 eventId: eventId,
                 kudosTypeIds: kudosTypeIds,
                 eventTypeIds: eventTypes,
                 page: page,
-                sortByColumnName: sortBy,
-                sortDirection: sortOrder
+                sortByProperties: sortByProperties
             }).$promise;
         }
     }
