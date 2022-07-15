@@ -27,7 +27,6 @@ namespace Shrooms.DataLayer.Migrations
                 .ForeignKey("dbo.AspNetUsers", t => t.UserId, cascadeDelete: true)
                 .Index(t => t.UserId)
                 .Index(t => t.OrganizationId);
-            
         }
         
         public override void Down()
