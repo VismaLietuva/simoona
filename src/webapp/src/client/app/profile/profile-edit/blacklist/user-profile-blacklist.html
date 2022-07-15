@@ -1,0 +1,50 @@
+<div class="tab-content">
+    <div class="tab-pane-content">
+        <form name="blacklistInfo" role="form" class="form-horizontal profile-form">
+            <!-- End date -->
+            <input-wrapper label-text="{{'applicationUser.blacklistEndDate' | translate}}" input-value="blacklistInfo.endDate"
+                classes="col-xs-12 col-sm-6 nopadding-left"
+                label-classes="control-label col-xs-12 col-sm-4 nopadding-left"
+                min-date="{{minDate | date: 'yyyy-MM-dd'}}">
+                <div class="date-field">
+                    <input type="text" name="endDate" id="endDate" class="hasDatepicker"
+                        uib-datepicker-popup="yyyy-MM-dd" popup-placement="bottom" ng-model="model.endDate"
+                        is-open="datePickers.endDate" ng-required="true"
+                        ng-change="onChangeValidateEndDate()"
+                        ng-click="openDatePicker($event, 'endDate')"
+                        datepicker-options="{ startingDay: 1, datepickerMode: 'year' }" required wrapped>
+                </div>
+            </input-wrapper>
+
+            <!-- Reason -->
+            <input-wrapper label-text="{{'applicationUser.blacklistReason' | translate}}" input-value="blacklistInfo.reason"
+                classes="col-xs-12 col-sm-6 nopadding-left"
+                label-classes="control-label col-xs-12 col-sm-4 nopadding-left">
+                <textarea type="text" id="reason" name="reason" ng-model="model.reason" class="form-control" ng-disabled="false"
+                    wrapped ng-maxlength="2000">
+                </textarea>
+            </input-wrapper>
+
+            <div ng-if="allowDeletion" class="top-space col-xs-offset-4 text-left">
+                <span class="ml-3 bold" translate="applicationUser.blacklistState" translate-values="{ one: (endDateDisplay | date: 'yyyy-MM-dd') }"></span>
+            </div>
+
+            <!-- Buttons -->
+            <div class="top-space col-xs-offset-4 text-left">
+                <button class="btn btn-primary" type="submit" ng-click="saveInfo()"
+                    ng-disabled="blacklistInfo.$invalid">
+                    <span class="glyphicon glyphicon-disk-save"></span>
+                    {{"common.save" | translate}}
+                </button>
+                <button ng-if="allowDeletion" ace-confirmation-modal="deleteFromBlacklist()" class="btn btn-danger" type="submit">
+                    <span class="glyphicon glyphicon-bin"></span>
+                    {{"common.delete" | translate}}
+                </button>
+                <button ui-sref="Root.WithOrg.Client.Profiles.Details({ id: info.id })" class="btn btn-default">
+                    {{"applicationUser.backToProfile" | translate}}
+                </button>
+            </div>
+        </form>
+        <div class="clearfix"></div>
+    </div>
+</div>
