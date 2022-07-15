@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Shrooms.Presentation.WebViewModels.Models.BlacklistStates;
 using Shrooms.Presentation.WebViewModels.Models.Certificate;
 using Shrooms.Presentation.WebViewModels.Models.Exam;
 using Shrooms.Presentation.WebViewModels.Models.Projects;
@@ -42,6 +43,8 @@ namespace Shrooms.Presentation.WebViewModels.Models.User
         public IEnumerable<ExamMiniViewModel> Exams { get; set; }
 
         public IEnumerable<ApplicationRoleMiniViewModel> Roles { get; set; }
+
+        public BlacklistStateViewModel BlacklistState { get; set; }
 
         public DateTime? EmploymentDate { get; set; }
 
