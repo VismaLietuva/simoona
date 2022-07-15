@@ -5,13 +5,21 @@
             <div class="applicationuser-headericon pull-left">
                 <span class="glyphicon glyphicon-user"></span>
             </div>
-            <div class="applicationuser-header">
-                <a ui-sref="Root.WithOrg.Client.Office({user: model.username})" data-test-id="profile-username-link">
-                    {{model.displayName()}}
-                </a>
-            </div>
-            <div class="applicationuser-subheader" data-test-id="profileJobTitle">
-                {{model.jobTitle}} <span ng-show="model.qualificationLevel.name" data-test-id="profileQualificationLevel">({{ model.qualificationLevel.name }})</span>
+            <div class="applicationuser-header-container">
+                <div>
+                    <div class="applicationuser-header">
+                        <a ui-sref="Root.WithOrg.Client.Office({user: model.username})" data-test-id="profile-username-link">
+                            {{model.displayName()}}
+                        </a>
+                    </div>
+                    <div class="applicationuser-subheader" data-test-id="profileJobTitle">
+                        {{model.jobTitle}} <span ng-show="model.qualificationLevel.name" data-test-id="profileQualificationLevel">({{ model.qualificationLevel.name }})</span>
+                    </div>
+                </div>
+
+                <div ng-if="model.blacklistState && (isAdmin || isCurrentUser)" class="applicationuser-blacklist-state">
+                    <span translate="applicationUser.blacklistedUntil" translate-values="{ one: (model.blacklistState.endDate | date:'yyyy-MM-dd') }"></span>
+                </div>
             </div>
         </div>
         <div class="panel-body profile-details-container">
@@ -21,10 +29,10 @@
                 </div>
                 <div class="clearfix"></div>
                 <div class="col-xs-12 profile-kudos-button" has-permissions="['KUDOS_BASIC']">
-                    <button type="button" 
-                         class="btn btn-success" 
+                    <button type="button"
+                         class="btn btn-success"
                          ga-track-event="['Kudos', 'profile go to kudos', 'opened']"
-                         ui-sref="Root.WithOrg.Client.Kudos.KudosUserInformation({ userId: model.id })" 
+                         ui-sref="Root.WithOrg.Client.Kudos.KudosUserInformation({ userId: model.id })"
                          data-test-id="profileKudosbutton">
                         {{"applicationUser.goToKudosPage" | translate}}
                     </button>
@@ -232,19 +240,19 @@
             </div>
             <div class="col-xs-12">
                 <div class="profile-edit-button top-space col-xs-12">
-                    <button class="btn btn-primary" 
-                            ng-if="isAdmin || isCurrentUser" 
-                            ui-sref="Root.WithOrg.Client.Profiles.Edit({ id: model.id, tab: 'Personal' })"  
-                            title="{{'common.edit' | translate}}" 
+                    <button class="btn btn-primary"
+                            ng-if="isAdmin || isCurrentUser"
+                            ui-sref="Root.WithOrg.Client.Profiles.Edit({ id: model.id, tab: 'Personal' })"
+                            title="{{'common.edit' | translate}}"
                             data-test-id="profileEditButton">
                         <span class="glyphicon glyphicon-pencil"></span>
                         <span>&nbsp;</span>
                         {{"common.edit" | translate}}
                     </button>
                     <span>&nbsp;</span>
-                    <button class="btn btn-primary" 
-                            ng-if="isAdmin && isNewUser()" 
-                            ng-disabled="isFirstLogin()" 
+                    <button class="btn btn-primary"
+                            ng-if="isAdmin && isNewUser()"
+                            ng-disabled="isFirstLogin()"
                             ng-click="confirmUser(model.id)">
                         {{"common.confirm" | translate}}
                     </button>
