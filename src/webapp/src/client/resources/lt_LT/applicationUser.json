@@ -155,5 +155,10 @@
   "emailNotVerified": "E-paštas nepatvirtinas",
   "emailVerifiedSucceessfully": "E-paštas sėkmingai patvirtinas",
   "emailVerifiedUnsuccessfully:": "E-pašto nepatvirtinas",
-  "passwordChangeSuccessful": "Slaptažodis sėkmingai pakeistas"
+  "passwordChangeSuccessful": "Slaptažodis sėkmingai pakeistas",
+  "blacklistedUntil": "Juodajame sąraše iki {{ one }}",
+  "blacklistInfo": "Juodasis sąrašas",
+  "blacklistEndDate": "Iki",
+  "blacklistReason": "Priežastis",
+  "blacklistState": "Šis žmogus įtrauktas į juodąjį sąrašą iki {{ one }}"
 }

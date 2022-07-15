@@ -155,5 +155,10 @@
   "emailNotVerified": "E-mail is not verified",
   "emailVerifiedSucceessfully": "E-mail verified successfully",
   "emailVerifiedUnsuccessfully:": "E-mail verification failed",
-  "passwordChangeSuccessful": "Password was changed successfully"
+  "passwordChangeSuccessful": "Password was changed successfully",
+  "blacklistedUntil": "Blacklisted until {{ one }}",
+  "blacklistInfo": "Blacklist",
+  "blacklistEndDate": "Until",
+  "blacklistReason": "Reason",
+  "blacklistState": "This person is blacklisted until {{ one }}"
 }
