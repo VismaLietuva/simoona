@@ -17,6 +17,7 @@
         var certificateUrl = endPoint + '/Certificate/';
         var examUrl = endPoint + '/Exam/';
         var hashtagsUrl = endPoint + '/Hashtags/';
+        var blacklistStateUrl = endPoint + '/BlacklistState/';
 
         var service = {
             getUserProfile: getUserProfile,
@@ -58,7 +59,11 @@
             confirmRoomChange: confirmRoomChange,
             rejectRoomChange: rejectRoomChange,
             impersonate: impersonate,
-            revertImpersonate: revertImpersonate
+            revertImpersonate: revertImpersonate,
+            getBlacklistState: getBlacklistState,
+            putBlacklistState: putBlacklistState,
+            deleteBlacklistState: deleteBlacklistState,
+            createBlacklistState: createBlacklistState
         };
 
         return service;
@@ -250,6 +255,39 @@
 
         function revertImpersonate() {
             return $resource(applicationUserUrl + 'RevertImpersonate', '', { put: { method: 'PUT' } }).put().$promise;
+        }
+
+        function getBlacklistState(sParams) {
+            return $resource(blacklistStateUrl + 'Get').get({
+                userId: sParams.id
+            }).$promise;
+        }
+
+        function putBlacklistState(params) {
+            return $resource(blacklistStateUrl + 'Update', '', {
+                put: {
+                    method: 'PUT',
+                    params: {
+                        userId: params.userId,
+                        endDate: params.endDate,
+                        reason: params.reason
+                    }
+                }
+            }).put().$promise;
+        }
+
+        function deleteBlacklistState(params) {
+            return $resource(blacklistStateUrl + 'Delete').delete({
+                userId: params.userId
+            }).$promise;
+        }
+
+        function createBlacklistState(params) {
+            return $resource(blacklistStateUrl + 'Create').save({
+                userId: params.userId,
+                endDate: params.endDate,
+                reason: params.reason
+            }).$promise;
         }
     }
 })();
