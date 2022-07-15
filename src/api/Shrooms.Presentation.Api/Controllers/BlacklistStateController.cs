@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
 using Shrooms.Contracts.DataTransferObjects.BlacklistStates;
@@ -83,6 +82,22 @@ namespace Shrooms.Presentation.Api.Controllers
             {
                 return BadRequestWithError(e);
             }
+        }
+
+        [HttpGet]
+        [Route("Get")]
+        public async Task<IHttpActionResult> GetBlacklistState(string userId)
+        {
+            var blacklistStateDto = await _blacklistStateService.FindAsync(userId, GetUserAndOrganization());
+
+            if (blacklistStateDto == null)
+            {
+                return NotFound();
+            }
+
+            var blacklistStateViewModel = _mapper.Map<BlacklistStateDto, BlacklistStateViewModel>(blacklistStateDto);
+
+            return Ok(blacklistStateViewModel);
         }
     }
 }
