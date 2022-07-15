@@ -402,9 +402,37 @@ input[type=text]::-ms-clear {
     margin: 0 10px 0 0;
 }
 
+.applicationuser-header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+@media(max-width: 1000px) {
+    .applicationuser-header-container {
+        display: block;
+    }
+
+    .applicationuser-blacklist-state {
+        margin-top: 10px;
+        word-wrap: break-word;
+    }
+}
+
 .applicationuser-header {
     font-size: 18px;
     font-weight: bold;
+}
+
+.applicationuser-blacklist-state {
+    color:white;
+    display: relative;
+    background-color: #337ab7;
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 1;
+    padding: 10px;
+    border-radius: 50px;
 }
 
 .applicationuser-subheader {
