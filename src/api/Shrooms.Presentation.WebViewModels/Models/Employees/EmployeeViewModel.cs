@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Shrooms.Presentation.WebViewModels.Models
+namespace Shrooms.Presentation.WebViewModels.Models.Employees
 {
-    public class EmployeeListViewModel
+    public class EmployeeViewModel
     {
         public string Id { get; set; }
 
@@ -17,12 +17,5 @@ namespace Shrooms.Presentation.WebViewModels.Models
         public string PhoneNumber { get; set; }
 
         public WorkingHourslWithOutLunchViewModel WorkingHours { get; set; }
-    }
-
-    public class WorkingHourslWithOutLunchViewModel
-    {
-        public TimeSpan? StartTime { get; set; }
-
-        public TimeSpan? EndTime { get; set; }
     }
 }

@@ -85,6 +85,9 @@
     <Compile Include="DataTransferObjects\BlacklistStates\CreateBlacklistStateDto.cs" />
     <Compile Include="DataTransferObjects\BlacklistStates\UpdateBlacklistStateDto.cs" />
     <Compile Include="DataTransferObjects\EmailDto.cs" />
+    <Compile Include="DataTransferObjects\Employees\EmployeeDto.cs" />
+    <Compile Include="DataTransferObjects\Employees\EmployeeListingArgsDto.cs" />
+    <Compile Include="DataTransferObjects\Employees\WorkingHourslWithOutLunchDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\ManageFilterPresetDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\CreateFilterPresetDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\UpdateFilterPresetDto.cs" />

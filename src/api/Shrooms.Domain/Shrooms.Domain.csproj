@@ -126,8 +126,12 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="X.PagedList, Version=8.1.0.0, Culture=neutral, PublicKeyToken=525ccaa9023f010c, processorArchitecture=MSIL">
+      <HintPath>..\packages\X.PagedList.8.1.0\lib\netstandard2.0\X.PagedList.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\PagedListExtensions.cs" />
     <Compile Include="Extensions\QueryableExtensions.cs" />
     <Compile Include="Helpers\BirthdayDateTimeHelper.cs" />
     <Compile Include="Helpers\CommonMarkMarkdownConverter.cs" />
@@ -147,6 +151,8 @@
     <Compile Include="Services\Email\AdministrationUsers\IAdministrationNotificationService.cs" />
     <Compile Include="Services\Email\Posting\CommentEmailNotificationService.cs" />
     <Compile Include="Services\Email\Posting\ICommentEmailNotificationService.cs" />
+    <Compile Include="Services\Employees\EmployeeListingService.cs" />
+    <Compile Include="Services\Employees\IEmployeeListingService.cs" />
     <Compile Include="Services\ExternalLinks\ExternalLinkService.cs" />
     <Compile Include="Services\ExternalLinks\IExternalLinkService.cs" />
     <Compile Include="Services\FilterPresets\FilterPresetService.cs" />
@@ -258,5 +264,6 @@
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

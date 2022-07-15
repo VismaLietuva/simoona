@@ -152,6 +152,7 @@
     <Compile Include="IocBootstrapper.cs" />
     <Compile Include="Modules\AdministrationUsers.cs" />
     <Compile Include="Modules\BlacklistStateModule.cs" />
+    <Compile Include="Modules\EmployeeModule.cs" />
     <Compile Include="Modules\FilterPresetModule.cs" />
     <Compile Include="Modules\ExternalLinksModule.cs" />
     <Compile Include="Modules\JobModule.cs" />
