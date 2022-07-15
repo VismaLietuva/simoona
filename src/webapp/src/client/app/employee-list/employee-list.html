@@ -6,22 +6,22 @@
             <thead>
                 <tr>
                     <th class="text-center">
-                        <ace-sort-link on-sort="onSort" sort-dir="filter.sortOrder" sort-field="filter.sortBy" sort-value="firstName">
+                        <ace-sort-multiple-link on-sort="onSort" position="0" sort-dir="filter.sortValues.sortOrders[0]" sort-field="filter.sortValues.sortBy[0]" sort-value="firstName">
                             <span translate="applicationUser.firstName"></span>
-                        </ace-sort-link>
-                        <ace-sort-link on-sort="onSort" sort-dir="filter.sortOrder" sort-field="filter.sortBy" sort-value="lastName">
+                        </ace-sort-multiple-link>
+                        <ace-sort-multiple-link on-sort="onSort" position="1" sort-dir="filter.sortValues.sortOrders[1]" sort-field="filter.sortValues.sortBy[1]" sort-value="lastName">
                             <span translate="applicationUser.lastName"></span>
-                        </ace-sort-link>
+                        </ace-sort-multiple-link>
                     </th>
                     <th class="text-center hidden-xs">
-                        <ace-sort-link on-sort="onSort" sort-dir="filter.sortOrder" sort-field="filter.sortBy" sort-value="birthDay">
+                        <ace-sort-multiple-link on-sort="onSort" position="2" sort-dir="filter.sortValues.sortOrders[2]" sort-field="filter.sortValues.sortBy[2]" sort-value="birthDay">
                             <span translate="applicationUser.birthday"></span>
-                        </ace-sort-link>
+                        </ace-sort-multiple-link>
                     </th>
                     <th class="text-center hidden-xs">
-                        <ace-sort-link on-sort="onSort" sort-dir="filter.sortOrder" sort-field="filter.sortBy" sort-value="jobPosition.Title">
+                        <ace-sort-multiple-link on-sort="onSort" position="3" sort-dir="filter.sortValues.sortOrders[3]" sort-field="filter.sortValues.sortBy[3]" sort-value="jobPosition.Title">
                             <span translate="applicationUser.jobTitle"></span>
-                        </ace-sort-link>
+                        </ace-sort-multiple-link>
                     </th>
                     <th ng-if="isAdmin" class="text-center hidden-xs">
                         <span translate="applicationUser.phoneNumber"></span>
