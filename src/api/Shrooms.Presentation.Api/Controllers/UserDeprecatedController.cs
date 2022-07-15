@@ -15,6 +15,7 @@ using Shrooms.Authentification.Membership;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.DataTransferObjects.BlacklistStates;
 using Shrooms.Contracts.DataTransferObjects.Models.Administration;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.ViewModels;
@@ -22,6 +23,7 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Exceptions.Exceptions.UserAdministration;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Administration;
+using Shrooms.Domain.Services.BlacklistStates;
 using Shrooms.Domain.Services.Impersonate;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.Organizations;
@@ -35,6 +37,7 @@ using Shrooms.Presentation.Api.Controllers.Wall;
 using Shrooms.Presentation.Api.Filters;
 using Shrooms.Presentation.Api.Helpers;
 using Shrooms.Presentation.WebViewModels.Models;
+using Shrooms.Presentation.WebViewModels.Models.BlacklistStates;
 using Shrooms.Presentation.WebViewModels.Models.Profile.JobPosition;
 using Shrooms.Presentation.WebViewModels.Models.User;
 using WebApi.OutputCache.V2;
@@ -67,6 +70,7 @@ namespace Shrooms.Presentation.Api.Controllers
         private readonly IProjectsService _projectService;
         private readonly IKudosService _kudosService;
         private readonly IPictureService _pictureService;
+        private readonly IBlacklistStateService _blacklistStateService;
 
         public UserDeprecatedController(IMapper mapper,
             IUnitOfWork unitOfWork,
@@ -80,7 +84,8 @@ namespace Shrooms.Presentation.Api.Controllers
             IRoleService roleService,
             IProjectsService projectService,
             IKudosService kudosService,
-            IPictureService pictureService)
+            IPictureService pictureService,
+            IBlacklistStateService blacklistStateService)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -102,6 +107,7 @@ namespace Shrooms.Presentation.Api.Controllers
             _projectService = projectService;
             _kudosService = kudosService;
             _pictureService = pictureService;
+            _blacklistStateService = blacklistStateService;
         }
 
         private async Task<bool> HasPermissionAsync(UserAndOrganizationDto userOrg, string permission)
@@ -309,6 +315,7 @@ namespace Shrooms.Presentation.Api.Controllers
             }
 
             var model = _mapper.Map<ApplicationUserDetailsViewModel>(user);
+
             await InfoWithAdditionalPermissionsAsync(user, model);
 
             return Request.CreateResponse(HttpStatusCode.OK, model);
@@ -329,6 +336,11 @@ namespace Shrooms.Presentation.Api.Controllers
             {
                 model.BirthDay = BirthdayDateTimeHelper.RemoveYear(model.BirthDay);
                 model.PhoneNumber = null;
+            }
+
+            if ((isAdmin || usersProfile) && _blacklistStateService.TryFindActiveBlacklistState(user.BlacklistStates, out var blacklistStateDto))
+            {
+                model.BlacklistState = _mapper.Map<BlacklistStateDto, BlacklistStateViewModel>(blacklistStateDto);
             }
         }
 
