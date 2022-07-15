@@ -4,12 +4,15 @@ using Shrooms.Contracts.DataTransferObjects.BlacklistStates;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.ServiceValidators.Validators.BlacklistStates;
+using System;
+using System.Collections.Generic;
 using System.Data.Entity;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Shrooms.Domain.Services.BlacklistStates
 {
-    // TODO: refactor
     public class BlacklistStateService : IBlacklistStateService
     {
         private readonly IUnitOfWork2 _uow;
@@ -50,29 +53,16 @@ namespace Shrooms.Domain.Services.BlacklistStates
 
             await _uow.SaveChangesAsync(userOrg.UserId);
 
-            return new BlacklistStateDto
-            {
-                UserId = blacklistState.UserId,
-                Reason = blacklistState.Reason,
-                EndDate = blacklistState.EndDate
-            };
+            return MapBlacklistStateToBlacklistStateDto(blacklistState);
         }
 
         public async Task<BlacklistStateDto> DeleteAsync(string userId, UserAndOrganizationDto userOrg)
         {
-            var blacklistState = await _blacklistStatesDbSet
-                .FirstOrDefaultAsync(blacklist => blacklist.UserId == userId &&
-                                                  blacklist.OrganizationId == userOrg.OrganizationId &&
-                                                  blacklist.EndDate > _systemClock.UtcNow);
+            var blacklistState = await _blacklistStatesDbSet.FirstOrDefaultAsync(FindActiveBlacklistState(userId, userOrg));
 
             _validator.CheckIfBlacklistStateExists(blacklistState);
 
-            var blacklistStateDto = new BlacklistStateDto
-            {
-                UserId = blacklistState.UserId,
-                Reason = blacklistState.Reason,
-                EndDate = blacklistState.EndDate
-            };
+            var blacklistStateDto = MapBlacklistStateToBlacklistStateDto(blacklistState);
 
             _blacklistStatesDbSet.Remove(blacklistState);
 
@@ -81,12 +71,21 @@ namespace Shrooms.Domain.Services.BlacklistStates
             return blacklistStateDto;
         }
 
+        public async Task<BlacklistStateDto> FindAsync(string userId, UserAndOrganizationDto userOrg)
+        {
+            var blacklistState = await _blacklistStatesDbSet.FirstOrDefaultAsync(FindActiveBlacklistState(userId, userOrg));
+
+            if (blacklistState == null)
+            {
+                return null;
+            }
+
+            return MapBlacklistStateToBlacklistStateDto(blacklistState);
+        }
+
         public async Task<BlacklistStateDto> UpdateAsync(UpdateBlacklistStateDto updateDto, UserAndOrganizationDto userOrg)
         {
-            var blacklistState = await _blacklistStatesDbSet
-                .FirstOrDefaultAsync(blacklist => blacklist.UserId == updateDto.UserId &&
-                                                  blacklist.OrganizationId == userOrg.OrganizationId &&
-                                                  blacklist.EndDate > _systemClock.UtcNow);
+            var blacklistState = await _blacklistStatesDbSet.FirstOrDefaultAsync(FindActiveBlacklistState(updateDto, userOrg));
 
             _validator.CheckIfBlacklistStateExists(blacklistState);
 
@@ -98,6 +97,49 @@ namespace Shrooms.Domain.Services.BlacklistStates
             await _uow.SaveChangesAsync(userOrg.UserId);
 
             return updateDto;
+        }
+
+        public bool TryFindActiveBlacklistState(ICollection<BlacklistState> blacklistStates, out BlacklistStateDto blacklistStateDto)
+        {
+            blacklistStateDto = null;
+
+            if (blacklistStates == null)
+            {
+                return false;
+            }
+
+            var blacklistState = blacklistStates.FirstOrDefault(blacklist => !blacklist.IsExpired);
+
+            if (blacklistState == null)
+            {
+                return false;
+            }
+
+            blacklistStateDto = MapBlacklistStateToBlacklistStateDto(blacklistState);
+
+            return true;
+        }
+
+        private Expression<Func<BlacklistState, bool>> FindActiveBlacklistState(BlacklistStateDto blacklistStateDto, UserAndOrganizationDto userOrg)
+        {
+            return FindActiveBlacklistState(blacklistStateDto.UserId, userOrg);
+        }
+
+        private Expression<Func<BlacklistState, bool>> FindActiveBlacklistState(string userId, UserAndOrganizationDto userOrg)
+        {
+            return blacklist => blacklist.UserId == userId &&
+                                blacklist.OrganizationId == userOrg.OrganizationId &&
+                                blacklist.EndDate > _systemClock.UtcNow;
+        }
+
+        private BlacklistStateDto MapBlacklistStateToBlacklistStateDto(BlacklistState blacklistState)
+        {
+            return new BlacklistStateDto
+            {
+                UserId = blacklistState.UserId,
+                Reason = blacklistState.Reason,
+                EndDate = blacklistState.EndDate
+            };
         }
     }
 }
