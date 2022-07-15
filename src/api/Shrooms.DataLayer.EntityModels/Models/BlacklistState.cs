@@ -13,5 +13,14 @@ namespace Shrooms.DataLayer.EntityModels.Models
         public virtual ApplicationUser User { get; set; }
      
         public DateTime EndDate { get; set; }
+
+        [NotMapped]
+        public bool IsExpired
+        {
+            get
+            {
+                return EndDate < DateTime.UtcNow;
+            }
+        }
     }
 }
