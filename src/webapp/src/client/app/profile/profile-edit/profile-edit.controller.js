@@ -8,24 +8,22 @@
         '$rootScope',
         '$scope',
         'model',
-        '$translate',
         'authService',
-        'tabName',
         'profileRepository',
         'notifySrv',
-        '$timeout',
         'lodash'];
 
-    function profileEditController($rootScope, $scope, model, $translate,
-        authService, tabName, profileRepository, notifySrv, $timeout, lodash) {
+    function profileEditController($rootScope, $scope, model, authService, profileRepository, notifySrv, lodash) {
 
         $rootScope.pageTitle = 'applicationUser.profile';
 
         $scope.hasOfficePermission = authService.hasPermissions(['OFFICE_BASIC', 'FLOOR_BASIC', 'ROOM_BASIC']);
+        $scope.hasApplicationUserPermission = authService.hasPermissions(['APPLICATIONUSER_ADMINISTRATION']);
 
         $scope.personalInfo = model;
         $scope.jobInfo = {};
         $scope.officeInfo = {};
+        $scope.blacklistInfo = {};
 
         $scope.displayedName = displayedName;
 
@@ -44,6 +42,10 @@
             if (tab === 'office' && !$scope.officeInfo.isLoaded) {
                 loadData(tab);
             }
+
+            if (tab === 'blacklist' && !$scope.blacklistInfo.isLoaded) {
+                loadData(tab);
+            }
         };
 
         function loadData(tab) {
@@ -52,9 +54,9 @@
                     $scope.jobInfo = response;
                     $scope.jobInfo.isLoaded = true;
 
-                    $scope.jobInfo.currentJobPosition = 
+                    $scope.jobInfo.currentJobPosition =
                         lodash.find(response.jobPositions, function(o) { return o.isSelected === true; });
-                    
+
                 }, onError);
             }
 
@@ -63,6 +65,15 @@
                     $scope.officeInfo = response;
                     $scope.officeInfo.isLoaded = true;
                 }, onError);
+            }
+
+            if (tab === 'blacklist') {
+                profileRepository.getBlacklistState($scope.personalInfo).then(function (response) {
+                    $scope.blacklistInfo = response;
+                    $scope.blacklistInfo.isLoaded = true;
+                }, function() {
+                    $scope.blacklistInfo.isLoaded = true;
+                });
             }
         }
 

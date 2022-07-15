@@ -1,6 +1,6 @@
 <div class="col-xs-12" translate-cloak>
     <h3 translate="applicationUser.profiles"></h3>
-    <h4 class="alert alert-warning" 
+    <h4 class="alert alert-warning"
         ng-if="isNewUser"
         translate="applicationUser.newUserWaitingForConfirmation"></h4>
     <uib-tabset>
@@ -12,10 +12,14 @@
                  ng-click="onTabChange('job')">
             <job-info id="jobInfo" ng-if="jobInfo.isLoaded" model="jobInfo"></job-info>
         </uib-tab>
-        <uib-tab ng-if="hasOfficePermission" 
-                 heading="{{'applicationUser.officeInfo' | translate}}" 
+        <uib-tab ng-if="hasOfficePermission"
+                 heading="{{'applicationUser.officeInfo' | translate}}"
                  ng-click="onTabChange('office')">
             <profile-office id="officePart" ng-if="officeInfo.isLoaded" model="officeInfo"></profile-office>
+        </uib-tab>
+        <uib-tab ng-if="!isNewUser && hasApplicationUserPermission" heading="{{'applicationUser.blacklistInfo' | translate}}"
+                 ng-click="onTabChange('blacklist')">
+                 <profile-blacklist ng-if="blacklistInfo.isLoaded" model="blacklistInfo"></profile-blacklist>
         </uib-tab>
     </uib-tabset>
 </div>
