@@ -15,5 +15,7 @@ namespace Shrooms.Presentation.WebViewModels.Models.Employees
 
         [Range(1, int.MaxValue)]
         public int PageSize { get; set; } = WebApiConstants.DefaultPageSize;
+
+        public bool ShowOnlyBlacklisted { get; set; }
     }
 }

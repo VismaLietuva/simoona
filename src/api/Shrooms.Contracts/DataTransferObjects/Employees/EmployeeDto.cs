@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Shrooms.Contracts.DataTransferObjects.BlacklistStates;
+using System;
 
 namespace Shrooms.Contracts.DataTransferObjects.Employees
 {
@@ -17,5 +18,7 @@ namespace Shrooms.Contracts.DataTransferObjects.Employees
         public string PhoneNumber { get; set; }
 
         public WorkingHourslWithOutLunchDto WorkingHours { get; set; }
+
+        public BlacklistStateDto BlacklistState { get; set; }
     }
 }

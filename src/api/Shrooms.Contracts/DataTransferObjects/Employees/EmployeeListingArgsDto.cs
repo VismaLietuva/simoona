@@ -11,5 +11,7 @@ namespace Shrooms.Contracts.DataTransferObjects.Employees
         public int Page { get; set; }
 
         public int PageSize { get; set; }
+
+        public bool ShowOnlyBlacklisted { get; set; }
     }
 }
