@@ -18,7 +18,7 @@
         $rootScope.pageTitle = 'applicationUser.profile';
 
         $scope.hasOfficePermission = authService.hasPermissions(['OFFICE_BASIC', 'FLOOR_BASIC', 'ROOM_BASIC']);
-        $scope.hasApplicationUserPermission = authService.hasPermissions(['APPLICATIONUSER_ADMINISTRATION']);
+        $scope.hasApplicationUserAdminPermission = authService.hasPermissions(['APPLICATIONUSER_ADMINISTRATION']);
 
         $scope.personalInfo = model;
         $scope.jobInfo = {};
