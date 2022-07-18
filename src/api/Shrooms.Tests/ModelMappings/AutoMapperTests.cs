@@ -68,5 +68,17 @@ namespace Shrooms.Tests.ModelMappings
         {
             _mapper.ConfigurationProvider.AssertConfigurationIsValid<FilterPresets>();
         }
+
+        [Test]
+        public void Mapping_Employee_Models()
+        {
+            _mapper.ConfigurationProvider.AssertConfigurationIsValid<Employees>();
+        }
+
+        [Test]
+        public void Mapping_BlacklistState_Models()
+        {
+            _mapper.ConfigurationProvider.AssertConfigurationIsValid<BlacklistStates>();
+        }
     }
 }
