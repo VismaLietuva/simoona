@@ -6,6 +6,7 @@ using Shrooms.Contracts.Exceptions;
 using Shrooms.Domain.Services.ExternalLinks;
 using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.WebViewModels.Models.ExternalLink;
+using Shrooms.Tests.Extensions;
 using Shrooms.Tests.ModelMappings;
 using System.Collections.Generic;
 using System.Net;
@@ -32,13 +33,7 @@ namespace Shrooms.Tests.Controllers.WebApi
             _externalLinkService = Substitute.For<IExternalLinkService>();
 
             _externalLinkController = new ExternalLinkController(_externalLinkService, ModelMapper.Create());
-
-            _externalLinkController.ControllerContext = Substitute.For<HttpControllerContext>();
-            _externalLinkController.Request = new HttpRequestMessage();
-            _externalLinkController.Request.Properties.Add(HttpPropertyKeys.HttpConfigurationKey, new HttpConfiguration());
-            _externalLinkController.Request.SetConfiguration(new HttpConfiguration());
-            _externalLinkController.RequestContext.Principal =
-                new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, "1"), new Claim("OrganizationId", "1") }));
+            _externalLinkController.SetUpControllerForTesting();
         }
 
         [Test]

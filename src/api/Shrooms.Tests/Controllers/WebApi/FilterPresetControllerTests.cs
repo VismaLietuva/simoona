@@ -7,6 +7,7 @@ using Shrooms.Contracts.Exceptions;
 using Shrooms.Domain.Services.FilterPresets;
 using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.WebViewModels.Models.FilterPresets;
+using Shrooms.Tests.Extensions;
 using Shrooms.Tests.ModelMappings;
 using System.Linq;
 using System.Net;
@@ -33,13 +34,7 @@ namespace Shrooms.Tests.Controllers.WebApi
             _filterPresetService = Substitute.For<IFilterPresetService>();
 
             _filterPresetController = new FilterPresetController(ModelMapper.Create(), _filterPresetService);
-
-            _filterPresetController.ControllerContext = Substitute.For<HttpControllerContext>();
-            _filterPresetController.Request = new HttpRequestMessage();
-            _filterPresetController.Request.Properties.Add(HttpPropertyKeys.HttpConfigurationKey, new HttpConfiguration());
-            _filterPresetController.Request.SetConfiguration(new HttpConfiguration());
-            _filterPresetController.RequestContext.Principal =
-                new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, "1"), new Claim("OrganizationId", "1") }));
+            _filterPresetController.SetUpControllerForTesting();
         }
 
         [Test]

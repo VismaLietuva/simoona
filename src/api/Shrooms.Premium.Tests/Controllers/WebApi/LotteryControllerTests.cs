@@ -19,6 +19,7 @@ using Shrooms.Premium.Domain.Services.Args;
 using Shrooms.Premium.Domain.Services.Lotteries;
 using Shrooms.Premium.Presentation.Api.Controllers.Lotteries;
 using Shrooms.Premium.Presentation.WebViewModels.Lotteries;
+using Shrooms.Tests.Extensions;
 using X.PagedList;
 
 namespace Shrooms.Premium.Tests.Controllers.WebApi
@@ -40,16 +41,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             _lotteryExportService = Substitute.For<ILotteryExportService>();
 
             _lotteryController = new LotteryController(_mapper, _lotteryService, _lotteryExportService);
-
-            _lotteryController.ControllerContext = Substitute.For<HttpControllerContext>();
-            _lotteryController.Request = new HttpRequestMessage();
-            _lotteryController.Request.Properties.Add(HttpPropertyKeys.HttpConfigurationKey, new HttpConfiguration());
-            _lotteryController.Request.SetConfiguration(new HttpConfiguration());
-            _lotteryController.RequestContext.Principal = new ClaimsPrincipal(new ClaimsIdentity(new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, "1"),
-                new Claim("OrganizationId", "1")
-            }));
+            _lotteryController.SetUpControllerForTesting();
         }
 
         [Test]

@@ -21,6 +21,7 @@ using Shrooms.Domain.Services.Wall;
 using Shrooms.Presentation.Api.Controllers.Wall;
 using Shrooms.Presentation.WebViewModels.Models.Wall;
 using Shrooms.Presentation.WebViewModels.Models.Wall.Moderator;
+using Shrooms.Tests.Extensions;
 using Shrooms.Tests.ModelMappings;
 
 namespace Shrooms.Tests.Controllers.WebApi
@@ -42,12 +43,7 @@ namespace Shrooms.Tests.Controllers.WebApi
             permissionService.UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), Arg.Any<string>()).Returns(true);
 
             _wallController = new WallController(ModelMapper.Create(), _wallService, _notificationService, permissionService);
-            _wallController.ControllerContext = Substitute.For<HttpControllerContext>();
-            _wallController.Request = new HttpRequestMessage();
-            _wallController.Request.Properties.Add(HttpPropertyKeys.HttpConfigurationKey, new HttpConfiguration());
-            _wallController.Request.SetConfiguration(new HttpConfiguration());
-            _wallController.RequestContext.Principal =
-                new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, "1") }));
+            _wallController.SetUpControllerForTesting();
         }
 
         [Test]

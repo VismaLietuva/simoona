@@ -15,6 +15,7 @@ using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.Domain.Services.Wall.Posts.Comments;
 using Shrooms.Presentation.Api.Controllers;
+using Shrooms.Tests.Extensions;
 using Shrooms.Tests.ModelMappings;
 
 namespace Shrooms.Tests.Controllers.WebApi
@@ -40,12 +41,7 @@ namespace Shrooms.Tests.Controllers.WebApi
             _commentController = new CommentController(ModelMapper.Create(), _commentService, _wallService,
                 _permissionService, _asyncRunner);
 
-            _commentController.ControllerContext = Substitute.For<HttpControllerContext>();
-            _commentController.Request = new HttpRequestMessage();
-            _commentController.Request.Properties.Add(HttpPropertyKeys.HttpConfigurationKey, new HttpConfiguration());
-            _commentController.Request.SetConfiguration(new HttpConfiguration());
-            _commentController.RequestContext.Principal =
-                new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, "1"), new Claim("OrganizationId", "1") }));
+            _commentController.SetUpControllerForTesting();
         }
 
         [Test]

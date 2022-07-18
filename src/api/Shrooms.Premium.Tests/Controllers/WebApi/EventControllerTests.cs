@@ -16,6 +16,7 @@ using Shrooms.Premium.Domain.Services.OfficeMap;
 using Shrooms.Premium.Presentation.Api.Controllers;
 using Shrooms.Premium.Presentation.WebViewModels.Events;
 using Shrooms.Premium.Tests.ModelMappings;
+using Shrooms.Tests.Extensions;
 using System;
 using System.Net;
 using System.Net.Http;
@@ -63,13 +64,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 postService,
                 officeMapService,
                 asyncRunner);
-
-            _eventController.ControllerContext = Substitute.For<HttpControllerContext>();
-            _eventController.Request = new HttpRequestMessage();
-            _eventController.Request.Properties.Add(HttpPropertyKeys.HttpConfigurationKey, new HttpConfiguration());
-            _eventController.Request.SetConfiguration(new HttpConfiguration());
-            _eventController.RequestContext.Principal =
-                new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, "1"), new Claim("OrganizationId", "1") }));
+            _eventController.SetUpControllerForTesting();
         }
 
         [Test]

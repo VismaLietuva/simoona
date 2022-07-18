@@ -13,6 +13,7 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.WebViewModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.PostModels;
+using Shrooms.Tests.Extensions;
 using Shrooms.Tests.Mocks;
 using Shrooms.Tests.ModelMappings;
 
@@ -30,12 +31,7 @@ namespace Shrooms.Tests.Controllers.WebApi
             _unitOfWork = new MockUnitOfWork();
 
             _roomController = new RoomTypeController(ModelMapper.Create(), _unitOfWork);
-            _roomController.ControllerContext = Substitute.For<HttpControllerContext>();
-            _roomController.Request = new HttpRequestMessage();
-            _roomController.Request.Properties.Add(HttpPropertyKeys.HttpConfigurationKey, new HttpConfiguration());
-            _roomController.Request.SetConfiguration(new HttpConfiguration());
-            _roomController.RequestContext.Principal =
-                new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, "1") }));
+            _roomController.SetUpControllerForTesting();
         }
 
         [Test]

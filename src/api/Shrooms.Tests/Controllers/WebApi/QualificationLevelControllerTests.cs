@@ -11,6 +11,7 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.WebViewModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.PostModels;
+using Shrooms.Tests.Extensions;
 using Shrooms.Tests.Mocks;
 using Shrooms.Tests.ModelMappings;
 
@@ -28,12 +29,7 @@ namespace Shrooms.Tests.Controllers.WebApi
             _unitOfWork = new MockUnitOfWork();
 
             _qualificationLevelController = new QualificationLevelController(ModelMapper.Create(), _unitOfWork);
-            _qualificationLevelController.ControllerContext = Substitute.For<HttpControllerContext>();
-            _qualificationLevelController.Request = new HttpRequestMessage();
-            _qualificationLevelController.Request.Properties.Add(HttpPropertyKeys.HttpConfigurationKey, new HttpConfiguration());
-            _qualificationLevelController.Request.SetConfiguration(new HttpConfiguration());
-            _qualificationLevelController.RequestContext.Principal =
-                new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, "1") }));
+            _qualificationLevelController.SetUpControllerForTesting();
         }
 
         [Test]

@@ -19,6 +19,7 @@ using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Presentation.Api.Controllers.Kudos;
 using Shrooms.Presentation.WebViewModels.Models.Users.Kudos;
+using Shrooms.Tests.Extensions;
 
 namespace Shrooms.Tests.Controllers.WebApi
 {
@@ -41,13 +42,7 @@ namespace Shrooms.Tests.Controllers.WebApi
             _permissionService = Substitute.For<IPermissionService>();
 
             _kudosController = new KudosController(_mapper, _kudosService, _kudosExportService, _permissionService);
-
-            _kudosController.ControllerContext = Substitute.For<HttpControllerContext>();
-            _kudosController.Request = new HttpRequestMessage();
-            _kudosController.Request.Properties.Add(HttpPropertyKeys.HttpConfigurationKey, new HttpConfiguration());
-            _kudosController.Request.SetConfiguration(new HttpConfiguration());
-            _kudosController.RequestContext.Principal =
-                new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, "1"), new Claim("OrganizationId", "1") }));
+            _kudosController.SetUpControllerForTesting();
         }
 
         [Test]
