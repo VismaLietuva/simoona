@@ -1784,3 +1784,21 @@ a.disabled.btn, fieldset[disabled] a.btn {
     left: 100%;
     transform: translate(-90%, 0);
 }
+
+// Employee list
+.employee-list-filters-container {
+    display: flex;
+    align-items: center;
+    padding-bottom: 10px;
+}
+
+@media (max-width: 767px) {
+    .employee-list-filters-container {
+        display: block;
+
+        > :last-child {
+            margin-top: 10px !important;
+            margin-left: 0px !important;
+        }
+    }
+}

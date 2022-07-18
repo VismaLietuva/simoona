@@ -160,5 +160,7 @@
   "blacklistInfo": "Blacklist",
   "blacklistEndDate": "Until",
   "blacklistReason": "Reason",
-  "blacklistState": "This person is blacklisted until {{ one }}"
+  "blacklistState": "This person is blacklisted until {{ one }}",
+  "blacklisted": "Blacklisted",
+  "showOnlyBlacklisted": "Show only blacklisted"
 }

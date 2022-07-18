@@ -160,5 +160,7 @@
   "blacklistInfo": "Juodasis sąrašas",
   "blacklistEndDate": "Iki",
   "blacklistReason": "Priežastis",
-  "blacklistState": "Šis žmogus įtrauktas į juodąjį sąrašą iki {{ one }}"
+  "blacklistState": "Šis žmogus įtrauktas į juodąjį sąrašą iki {{ one }}",
+  "blacklisted": "Juodajame sąraše",
+  "showOnlyBlacklisted": "Rodyti tik įtrauktus į juodąjį sąrašą"
 }

@@ -31,7 +31,8 @@
         $scope.filter = {
             page: 1,
             search: '',
-            sortValues: sortMultipleLinkService.getMultipleSort(4),
+            sortValues: sortMultipleLinkService.getMultipleSort(5),
+            showOnlyBlacklisted: false
         };
 
         $scope.getEmployeeList = function () {
@@ -40,6 +41,7 @@
                     page: $scope.filter.page,
                     search: $scope.filter.search,
                     sortByProperties: $scope.filter.sortValues.getSortString(),
+                    showOnlyBlacklisted: $scope.filter.showOnlyBlacklisted
                 })
                 .then(function (getPagedResponse) {
                     $scope.pagedEmployeeList = getPagedResponse;

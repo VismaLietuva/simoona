@@ -1,7 +1,11 @@
 <div has-permissions="['EMPLOYEELIST_BASIC']" class="col-xs-12">
     <div class="row">
         <h3 ng-cloak>{{"common.employeeList" | translate}}</h3>
-        <ace-item-list-filter filter-value="filter.search" on-filtering="onSearch"></ace-item-list-filter>
+        <div class="employee-list-filters-container">
+            <ace-item-list-filter class="pb-0" filter-value="filter.search" on-filtering="onSearch"></ace-item-list-filter>
+            <ace-slider-toggle-btn ng-if="isAdmin" translation="applicationUser.showOnlyBlacklisted" ng-click="onSearch()" value="filter.showOnlyBlacklisted" class="ml-10"></ace-slider-toggle-btn>
+        </div>
+
         <table class="table table-grey table-hover" ng-if="pagedEmployeeList.itemCount > 0">
             <thead>
                 <tr>
@@ -19,7 +23,7 @@
                         </ace-sort-multiple-link>
                     </th>
                     <th class="text-center hidden-xs">
-                        <ace-sort-multiple-link on-sort="onSort" position="3" sort-dir="filter.sortValues.sortOrders[3]" sort-field="filter.sortValues.sortBy[3]" sort-value="jobPosition.Title">
+                        <ace-sort-multiple-link on-sort="onSort" position="3" sort-dir="filter.sortValues.sortOrders[3]" sort-field="filter.sortValues.sortBy[3]" sort-value="jobTitle">
                             <span translate="applicationUser.jobTitle"></span>
                         </ace-sort-multiple-link>
                     </th>
@@ -29,14 +33,19 @@
                     <th class="text-center hidden-xs">
                         <span translate="applicationUser.workingHours"></span>
                     </th>
+                    <th ng-if="isAdmin && filter.showOnlyBlacklisted" class="text-center hidden-xs">
+                        <ace-sort-multiple-link on-sort="onSort" position="4" sort-dir="filter.sortValues.sortOrders[4]" sort-field="filter.sortValues.sortBy[4]" sort-value="blacklistState.endDate">
+                            <span translate="applicationUser.blacklisted"></span>
+                        </ace-sort-multiple-link>
+                    </th>
                 </tr>
             </thead>
             <tbody>
                 <tr data-ng-repeat="applicationUser in pagedEmployeeList.pagedList" id="lastId@(item.Id)">
-                    <td class="col-xs-4 text-center">
+                    <td class="col-xs-3 text-center">
                         <a data-ui-sref="Root.WithOrg.Client.Profiles.Details({ id: applicationUser.id })">{{applicationUser.firstName}} {{applicationUser.lastName}}</a>
                     </td>
-                    <td class="col-xs-2 text-center hidden-xs">
+                    <td class="text-center hidden-xs" ng-class="{'col-xs-2' : !filter.showOnlyBlacklisted}">
                         <span ng-if="isAdmin">
                             {{:: applicationUser.birthDay | date:'yyyy-MM-dd' }}
                         </span>
@@ -56,6 +65,9 @@
                         <div data-ng-if="applicationUser.workingHours.startTime != null && applicationUser.workingHours.endTime != null">
                             {{applicationUser.workingHours.startTime | time:'HH:mm'}} - {{applicationUser.workingHours.endTime | time:'HH:mm'}}
                         </div>
+                    </td>
+                    <td class="text-center hidden-xs" ng-if="isAdmin && filter.showOnlyBlacklisted">
+                        {{:: applicationUser.blacklistState.endDate | date:'yyyy-MM-dd'}}
                     </td>
                 </tr>
             </tbody>
