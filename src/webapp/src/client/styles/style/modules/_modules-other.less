@@ -1735,7 +1735,52 @@ a.disabled.btn, fieldset[disabled] a.btn {
     }
 
 }
+
 .filter-preset-delete-container {
     text-align: center;
     margin-top: 0px;
+}
+
+// Slider toggle button
+.slider-toggle-container {
+    display: flex;
+    align-items: center;
+}
+
+.slider-toggle-button {
+    position: relative;
+    display: block;
+    width: 50px;
+    height: 25px;
+    cursor: pointer;
+    background-color: #cccccc;
+    border: 2px solid #cccccc;
+    border-radius: 40px;
+    transition: all 1s ease;
+}
+
+.slider-toggle-button-circle {
+    position: absolute;
+    top: -3px;
+    transition: all 283ms ease;
+    left: 0%;
+    transform: translate(-10%, 0);
+    display: block;
+    height: 28px;
+    width: 28px;
+    background-color: #fff;
+    border-radius: 40px;
+}
+
+.slider-toggle-button-on {
+    background-color: #428bca;
+    border: 2px solid #428bca;
+}
+
+.slider-toggle-button-circle-on {
+    left: auto;
+    right: -3px;
+    transition: all 283ms ease;
+    left: 100%;
+    transform: translate(-90%, 0);
 }
