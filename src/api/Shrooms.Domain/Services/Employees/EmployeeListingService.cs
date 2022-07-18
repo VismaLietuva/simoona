@@ -54,6 +54,7 @@ namespace Shrooms.Domain.Services.Employees
                 .Where(searchFilter)
                 .Where(blacklistFilter)
                 .Where(_roleService.ExcludeUsersWithRole(newUserRoleId))
+                .Where(user => user.OrganizationId == userOrg.OrganizationId)
                 .Select(user => new EmployeeDto
                 {
                     Id = user.Id,
