@@ -11,13 +11,8 @@ using Shrooms.Tests.Extensions;
 using Shrooms.Tests.ModelMappings;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web.Http;
-using System.Web.Http.Controllers;
-using System.Web.Http.Hosting;
 
 namespace Shrooms.Tests.Controllers.WebApi
 {
