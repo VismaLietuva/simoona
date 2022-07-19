@@ -12,7 +12,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
 
         public string OfficeId { get; set; }
 
-        [DateTimeLessThanDateTime("EndDate")]
+        [DateTimeLessThanDateTime(nameof(EndDate))]
         public DateTime? StartDate { get; set; }
 
         public DateTime? EndDate { get; set; }

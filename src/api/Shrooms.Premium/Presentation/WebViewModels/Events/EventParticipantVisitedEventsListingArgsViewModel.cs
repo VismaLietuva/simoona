@@ -22,7 +22,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
         public IEnumerable<int> EventTypeIds { get; set; }
 
         [Required]
-        [DateTimeLessThanDateTime("EndDate")]
+        [DateTimeLessThanDateTime(nameof(EndDate))]
         public DateTime? StartDate { get; set; }
         
         [Required]
