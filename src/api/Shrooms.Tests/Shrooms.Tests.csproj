@@ -188,6 +188,7 @@
     <Compile Include="Controllers\WebApi\VacationPageControllerTests.cs" />
     <Compile Include="Controllers\WebApi\WallControllerTests.cs" />
     <Compile Include="DomainService\ApplicationUserTests.cs" />
+    <Compile Include="DomainService\BlacklistStateServiceTests.cs" />
     <Compile Include="DomainService\EmployeeListingServiceTests.cs" />
     <Compile Include="DomainService\ExternalLinkServiceTests.cs" />
     <Compile Include="DomainService\AdministrationUsersServiceTests.cs" />
