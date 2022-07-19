@@ -8,7 +8,17 @@ namespace Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes
     {
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            if (value == null || ((DateTime)value) <= DateTime.UtcNow)
+            if (value == null)
+            {
+                return ValidationResult.Success;
+            }
+
+            if (value is not DateTime)
+            {
+                throw new ArgumentException("The property must be of type DateTime");
+            }
+
+            if (value is DateTime date && date <= DateTime.UtcNow)
             {
                 return ValidationResult.Success;
             }
