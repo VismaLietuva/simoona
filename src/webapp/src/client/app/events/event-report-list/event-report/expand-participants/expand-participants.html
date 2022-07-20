@@ -1,21 +1,5 @@
 <div class="event-report-visited-events-container">
     <table class="nc-table event-report-extension-table no-border">
-        <div class="event-report-expanded-date-container">
-            <div class="date-field pl-10">
-                <input type="text" class="hasDatepicker" uib-datepicker-popup="yyyy-MM-dd" popup-placement="bottom"
-                    ng-model="vm.datePickers.endDate.date"  is-open="vm.datePickers.endDate.isOpen" max-date="vm.datePickers.endDate.maxDate" ng-click="vm.openDatePicker($event, 'endDate')"
-                    ng-change="vm.loadVisitedEventsWithUpdatedDates()"
-                    datepicker-options="vm.datePickers.endDate.options" required wrapped>
-            </div>
-            <span class="pl-10" translate="common.to"></span>
-            <div class="date-field pl-10">
-                <input type="text" class="hasDatepicker" uib-datepicker-popup="yyyy-MM-dd" popup-placement="bottom"
-                    ng-model="vm.datePickers.startDate.date" ng-change="vm.loadVisitedEventsWithUpdatedDates()"  is-open="vm.datePickers.startDate.isOpen" max-date="vm.datePickers.startDate.maxDate" ng-click="vm.openDatePicker($event, 'startDate')"
-                    datepicker-options="vm.datePickers.startDate.options" required wrapped>
-            </div>
-            <span class="pl-10" translate="common.from"></span>
-        </div>
-
         <thead>
             <tr>
                 <th class="col-xs-3">
