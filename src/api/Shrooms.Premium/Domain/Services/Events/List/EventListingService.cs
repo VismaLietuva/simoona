@@ -15,6 +15,7 @@ using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Domain.DomainServiceValidators.Events;
 using Shrooms.Domain.Extensions;
 using X.PagedList;
+using Shrooms.Contracts.Infrastructure;
 
 namespace Shrooms.Premium.Domain.Services.Events.List
 {
@@ -77,7 +78,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             else
             {
                 _eventValidationService.CheckIfDateRangeExceededLimitOrNull(filteredArgsDto.StartDate, filteredArgsDto.EndDate);
-                query = query.Where(e => e.StartDate >= filteredArgsDto.StartDate && e.EndDate <= filteredArgsDto.EndDate);
+                query = query.Where(FilterByDateInterval(filteredArgsDto));
             }
 
             var events = query
@@ -133,6 +134,27 @@ namespace Shrooms.Premium.Domain.Services.Events.List
 
             return events;
         }
+        
+        public async Task<IPagedList<EventVisitedReportDto>> GetEventParticipantVisitedReportEventsAsync(EventParticipantVisitedEventsListingArgsDto visitedArgsDto, UserAndOrganizationDto userOrg)
+        {
+            var eventTypesLength = visitedArgsDto.EventTypeIds.Count();
+            var visitedEvents = await _eventsDbSet
+                .Include(e => e.EventParticipants)
+                .Where(EventParticipantVisitedReportEventsFilter(visitedArgsDto, userOrg, eventTypesLength))
+                .Where(FilterByDateInterval(visitedArgsDto))
+                .Select(e => new EventVisitedReportDto
+                {
+                    Id = e.Id,
+                    Name = e.Name,
+                    TypeName = e.EventType.Name,
+                    StartDate = e.StartDate,
+                    EndDate = e.EndDate
+                })
+                .OrderByPropertyNames(visitedArgsDto)
+                .ToPagedListAsync(visitedArgsDto.Page, visitedArgsDto.PageSize);
+
+            return visitedEvents;
+        }
 
         public async Task<IPagedList<EventParticipantReportDto>> GetReportParticipantsAsync(EventParticipantsReportListingArgsDto reportArgsDto, UserAndOrganizationDto userOrg)
         {
@@ -179,7 +201,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                                     e.OrganizationId == userOrg.OrganizationId &&
                                     (eventTypesLength == 0 || reportArgsDto.EventTypeIds.Contains(e.EventType.Id)))
                         .OrderByDescending(e => e.EndDate)
-                        .Take(50)
+                        .Take(EventsConstants.EventReportVisitedEventPreviewCount)
                         .Select(visited => new EventVisitedReportDto
                         {
                             Id = visited.Id,
@@ -188,7 +210,12 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                             StartDate = visited.StartDate,
                             EndDate = visited.EndDate
                         })
-                        .ToList()
+                        .ToList(),
+                    TotalVisitedEventCount = _eventsDbSet
+                        .Count(e => e.EventParticipants.Any(participant => participant.ApplicationUserId == p.ApplicationUser.Id) &&
+                                    e.EndDate < DateTime.UtcNow &&
+                                    e.OrganizationId == userOrg.OrganizationId &&
+                                    (eventTypesLength == 0 || reportArgsDto.EventTypeIds.Contains(e.EventType.Id)))
                 })
                 .OrderByPropertyNames(reportArgsDto)
                 .ToPagedListAsync(reportArgsDto.Page, reportArgsDto.PageSize);
@@ -213,6 +240,19 @@ namespace Shrooms.Premium.Domain.Services.Events.List
 
             var orderedEvents = OrderEvents(events);
             return orderedEvents;
+        }
+
+        private static Expression<Func<Event, bool>> EventParticipantVisitedReportEventsFilter(EventParticipantVisitedEventsListingArgsDto visitedArgsDto, UserAndOrganizationDto userOrg, int eventTypesLength)
+        {
+            return e => e.EventParticipants.Any(participant => participant.ApplicationUserId == visitedArgsDto.UserId) &&
+                            e.EndDate < DateTime.UtcNow &&
+                            e.OrganizationId == userOrg.OrganizationId &&
+                            (eventTypesLength == 0 || visitedArgsDto.EventTypeIds.Contains(e.EventType.Id));
+        }
+
+        private static Expression<Func<Event, bool>> FilterByDateInterval(IFilterableByDate filterableByDate)
+        {
+            return x => x.StartDate >= filterableByDate.StartDate && x.EndDate <= filterableByDate.EndDate;
         }
 
         private static Expression<Func<Event, bool>> MyEventsAsMasterFilter(string userId)

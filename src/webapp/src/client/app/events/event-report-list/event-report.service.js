@@ -5,7 +5,12 @@
         .module('simoonaApp.Events')
         .factory('eventReportService', eventReportService);
 
-    function eventReportService() {
+
+    eventReportService.$inject = [
+        'sortMultipleLinkService'
+    ];
+
+    function eventReportService(sortMultipleLinkService) {
         function eventReportFilter(pageType, filterTypes, columnCount) {
             function constructObjectWithFilterNames(func, response) {
                 var property = {};
@@ -17,14 +22,6 @@
                 });
 
                 return property;
-            }
-
-            function copyObjectWithEmptySortValues(object) {
-                return Object.assign({
-                    sortBy: new Array(columnCount).fill(undefined),
-                    sortOrders: new Array(columnCount).fill(undefined),
-                    sortPriorities: []
-                }, object);
             }
 
             function findFilterByType(result, filter) {
@@ -61,7 +58,7 @@
 
             this.pageType = pageType;
 
-            this.appliedFilters = copyObjectWithEmptySortValues(this.appliedFilters);
+            this.appliedFilters.sortValues = sortMultipleLinkService.getMultipleSort(columnCount);
 
             this.setFilterTypes = function (response) {
                 this.filterTypes = constructObjectWithFilterNames(
@@ -71,17 +68,7 @@
             };
 
             this.setSortValues = function (sortBy, sortOrder, position) {
-                this.appliedFilters.sortBy[position] = sortBy;
-                this.appliedFilters.sortOrders[position] = sortOrder;
-
-                if (sortBy !== undefined &&
-                    sortOrder !== undefined &&
-                    this.appliedFilters.sortPriorities.find(priority => priority === position) == null) {
-                    this.appliedFilters.sortPriorities.push(position);
-                } else if (sortBy === undefined || sortOrder === undefined) {
-                    this.appliedFilters.sortPriorities = this.appliedFilters.sortPriorities
-                        .filter(priority => priority !== position);
-                }
+                this.appliedFilters.sortValues.setSortValues(sortBy, sortOrder, position);
             }
 
             this.updateAppliedFilter = function (filter, filterName) {
@@ -91,16 +78,7 @@
             }
 
             this.getSortString = function () {
-                var sortString = "";
-
-                for (var priority of this.appliedFilters.sortPriorities) {
-                    var sortBy = this.appliedFilters.sortBy[priority];
-                    var sortOrder = this.appliedFilters.sortOrders[priority];
-
-                    sortString += `${sortBy} ${sortOrder};`;
-                }
-
-                return sortString;
+                return this.appliedFilters.sortValues.getSortString();
             }
 
             this.updateAppliedFilters = function (preset) {
@@ -109,9 +87,7 @@
                     preset
                 );
 
-                var sortBy = this.appliedFilters.sortBy;
-                var sortOrders = this.appliedFilters.sortOrders;
-                var sortPriorities = this.appliedFilters.sortPriorities;
+                var sortValues = this.appliedFilters.sortValues;
 
                 this.appliedFilters = constructObjectWithFilterNames(
                     (dropdown, filter) =>
@@ -119,9 +95,7 @@
                     this.dropdown
                 );
 
-                this.appliedFilters.sortBy = sortBy;
-                this.appliedFilters.sortOrders = sortOrders;
-                this.appliedFilters.sortPriorities = sortPriorities;
+                this.appliedFilters.sortValues = sortValues;
             };
         }
 

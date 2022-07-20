@@ -90,6 +90,7 @@
     <Compile Include="DataTransferObjects\FilterPresets\FilterPresetItemDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\FiltersDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\UpdatedFilterPresetDto.cs" />
+    <Compile Include="Infrastructure\IFilterableByDate.cs" />
     <Compile Include="Infrastructure\IPageable.cs" />
     <Compile Include="DataTransferObjects\ISoftDelete.cs" />
     <Compile Include="DataTransferObjects\ITrackable.cs" />

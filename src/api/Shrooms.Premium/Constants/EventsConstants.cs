@@ -15,6 +15,8 @@
         public const int EventOptionsMinimumCount = 2;
         public const string EventParticipantsExcelTableName = "Event Participants";
         public const string EventOptionsExcelTableName = "Event Options";
+
+        public const int EventReportVisitedEventPreviewCount = 3;
     }
 
     public enum AttendingStatus

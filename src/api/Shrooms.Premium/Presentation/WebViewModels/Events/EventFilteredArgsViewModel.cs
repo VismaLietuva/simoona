@@ -1,16 +1,18 @@
 ﻿using Shrooms.Contracts.Infrastructure;
 using Shrooms.Premium.Constants;
+using Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes;
 using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Shrooms.Premium.Presentation.WebViewModels.Events
 {
-    public class EventFilteredArgsViewModel : IPageable
+    public class EventFilteredArgsViewModel : IPageable, IFilterableByDate
     {
         public string TypeId { get; set; }
 
         public string OfficeId { get; set; }
 
+        [DateTimeLessThanDateTime(nameof(EndDate))]
         public DateTime? StartDate { get; set; }
 
         public DateTime? EndDate { get; set; }
