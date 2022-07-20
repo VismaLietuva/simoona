@@ -196,6 +196,8 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                             (kudos.OrganizationId == userOrg.OrganizationId))
                         .Sum(kudos => kudos.Points),
                     VisitedEvents = _eventsDbSet
+                        .Where(FilterByDateInterval(reportArgsDto))
+                        // Due to the EF 6 bug, this expression cannot be exported to a method
                         .Where(e => e.EventParticipants.Any(participant => participant.ApplicationUserId == p.ApplicationUser.Id) &&
                                     e.EndDate < DateTime.UtcNow &&
                                     e.OrganizationId == userOrg.OrganizationId &&
@@ -212,6 +214,8 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                         })
                         .ToList(),
                     TotalVisitedEventCount = _eventsDbSet
+                        .Where(FilterByDateInterval(reportArgsDto))
+                        // Due to the EF 6 bug, this expression cannot be exported to a method
                         .Count(e => e.EventParticipants.Any(participant => participant.ApplicationUserId == p.ApplicationUser.Id) &&
                                     e.EndDate < DateTime.UtcNow &&
                                     e.OrganizationId == userOrg.OrganizationId &&
@@ -252,7 +256,12 @@ namespace Shrooms.Premium.Domain.Services.Events.List
 
         private static Expression<Func<Event, bool>> FilterByDateInterval(IFilterableByDate filterableByDate)
         {
-            return x => x.StartDate >= filterableByDate.StartDate && x.EndDate <= filterableByDate.EndDate;
+            return FilterByDateInterval(filterableByDate.StartDate.Value, filterableByDate.EndDate.Value);
+        }
+
+        private static Expression<Func<Event, bool>> FilterByDateInterval(DateTime startDate, DateTime endDate)
+        {
+            return x => x.StartDate >= startDate && x.EndDate <= endDate;
         }
 
         private static Expression<Func<Event, bool>> MyEventsAsMasterFilter(string userId)
