@@ -261,7 +261,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
 
         private static Expression<Func<Event, bool>> FilterByDateInterval(DateTime startDate, DateTime endDate)
         {
-            return x => x.StartDate >= startDate && x.EndDate <= endDate;
+            return e => e.StartDate >= startDate && e.EndDate <= endDate;
         }
 
         private static Expression<Func<Event, bool>> MyEventsAsMasterFilter(string userId)
