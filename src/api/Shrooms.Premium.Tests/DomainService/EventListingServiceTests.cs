@@ -347,7 +347,9 @@ namespace Shrooms.Premium.Tests.DomainService
                 KudosTypeIds = Enumerable.Empty<int>(),
                 EventTypeIds = Enumerable.Empty<int>(),
                 Page = 1,
-                PageSize = 10
+                PageSize = 10,
+                StartDate = DateTime.UtcNow.AddYears(-1),
+                EndDate = DateTime.UtcNow.AddYears(5),
             };
 
             var userOrg = new UserAndOrganizationDto
@@ -376,7 +378,9 @@ namespace Shrooms.Premium.Tests.DomainService
                 KudosTypeIds = Enumerable.Empty<int>(),
                 EventTypeIds = new List<int> { 1 },
                 Page = 1,
-                PageSize = 10
+                PageSize = 10,
+                StartDate = DateTime.UtcNow.AddYears(-1),
+                EndDate = DateTime.UtcNow.AddYears(5),
             };
 
             var userOrg = new UserAndOrganizationDto
@@ -405,7 +409,9 @@ namespace Shrooms.Premium.Tests.DomainService
                 KudosTypeIds = Enumerable.Empty<int>(),
                 EventTypeIds = Enumerable.Empty<int>(),
                 Page = 1,
-                PageSize = 10
+                PageSize = 10,
+                StartDate = DateTime.UtcNow.AddYears(-1),
+                EndDate = DateTime.UtcNow.AddYears(5)
             };
 
             var userOrg = new UserAndOrganizationDto
@@ -440,7 +446,9 @@ namespace Shrooms.Premium.Tests.DomainService
                 KudosTypeIds = Enumerable.Empty<int>(),
                 EventTypeIds = Enumerable.Empty<int>(),
                 Page = 1,
-                PageSize = 10
+                PageSize = 10,
+                StartDate = DateTime.UtcNow.AddYears(-1),
+                EndDate = DateTime.UtcNow.AddYears(5)
             };
 
             var userOrg = new UserAndOrganizationDto
@@ -469,7 +477,9 @@ namespace Shrooms.Premium.Tests.DomainService
                 EventTypeIds = Enumerable.Empty<int>(),
                 SortByProperties = "Kudos desc",
                 Page = 1,
-                PageSize = 10
+                PageSize = 10,
+                StartDate = DateTime.UtcNow.AddYears(-1),
+                EndDate = DateTime.UtcNow.AddYears(5),
             };
 
             var userOrg = new UserAndOrganizationDto
@@ -498,7 +508,9 @@ namespace Shrooms.Premium.Tests.DomainService
                 EventTypeIds = Enumerable.Empty<int>(),
                 SortByProperties = "Kudos desc",
                 Page = 1,
-                PageSize = 10
+                PageSize = 10,
+                StartDate = DateTime.UtcNow.AddYears(-1),
+                EndDate = DateTime.UtcNow.AddYears(5)
             };
 
             var userOrg = new UserAndOrganizationDto
@@ -542,6 +554,39 @@ namespace Shrooms.Premium.Tests.DomainService
 
             // Assert
             Assert.AreEqual(expectedCount, result.Count);
+        }
+
+        [Test]
+        public async Task Should_Return_Preview_Visited_Events_Filtered_By_Date_Interval()
+        {
+            // Arrange
+            var @event = MockEventReportParticipantsTest()[0];
+            var startDate = DateTime.UtcNow.AddDays(-20);
+            var endDate = DateTime.UtcNow;
+
+            var reportListingArgs = new EventParticipantsReportListingArgsDto
+            {
+                EventId = @event.Id,
+                KudosTypeIds = Enumerable.Empty<int>(),
+                EventTypeIds = Enumerable.Empty<int>(),
+                Page = 1,
+                PageSize = 10,
+                StartDate = startDate,
+                EndDate = endDate
+            };
+
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = 3,
+                UserId = Guid.NewGuid().ToString()
+            };
+
+            // Act
+            var result = await _eventListingService.GetReportParticipantsAsync(reportListingArgs, userOrg);
+
+            // Assert
+            Assert.That(result.SelectMany(participant => participant.VisitedEvents),
+                Is.All.Matches<EventVisitedReportDto>(visitedEvent => visitedEvent.StartDate >= startDate && visitedEvent.EndDate <= endDate));
         }
 
         [Test]

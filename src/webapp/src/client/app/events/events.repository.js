@@ -242,13 +242,15 @@
             }).$promise;
         }
 
-        function getEventParticipants(eventId, kudosTypeIds, eventTypes, page, sortByProperties) {
+        function getEventParticipants(eventId, kudosTypeIds, eventTypes, page, sortByProperties, startDate, endDate) {
             return $resource(`${eventUrl}GetPagedReportParticipants`).get({
                 eventId: eventId,
                 kudosTypeIds: kudosTypeIds,
                 eventTypeIds: eventTypes,
                 page: page,
-                sortByProperties: sortByProperties
+                sortByProperties: sortByProperties,
+                startDate: startDate,
+                endDate: endDate
             }).$promise;
         }
 

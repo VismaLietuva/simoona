@@ -8,6 +8,7 @@
 
     eventReportController.$inject = [
         'eventRepository',
+        '$timeout',
         '$stateParams',
         'eventSettings',
         'notifySrv',
@@ -20,6 +21,7 @@
 
     function eventReportController(
         eventRepository,
+        $timeout,
         $stateParams,
         eventSettings,
         notifySrv,
@@ -38,6 +40,30 @@
         };
 
         var tableColumnCount = 8;
+        var maxEndDate = moment().local().startOf('days').toDate();
+        var defaultStartDate = moment(maxEndDate).subtract(2, 'year').toDate();
+
+        vm.datePickers = {
+            startDate: {
+                isOpen: false,
+                date: defaultStartDate,
+                options: {
+                    startingDay: 1,
+                    datepickerMode: 'year',
+                    maxDate: moment(maxEndDate).subtract(1, 'day').toDate()
+                }
+            },
+            endDate: {
+                isOpen: false,
+                date: maxEndDate,
+                options: {
+                    startingDay: 1,
+                    datepickerMode: 'year',
+                    maxDate: maxEndDate,
+                    minDate: defaultStartDate
+                }
+            }
+        }
 
         vm.filter = eventReportService.getEventReportFilter(
             filterPageTypes.eventReport, [
@@ -61,10 +87,13 @@
         vm.loadParticipantsWithNewlyAppliedFilter = loadParticipantsWithNewlyAppliedFilter;
         vm.loadParticipantsOnPage = loadParticipantsOnPage;
         vm.sortByColumn = sortByColumn;
+        vm.openDatePicker = openDatePicker;
+        vm.loadVisitedEventsWithUpdatedDates = loadVisitedEventsWithUpdatedDates;
 
         init();
 
         function init() {
+            updateDateRestrictions();
             loadFilters();
             loadEventDetails();
         }
@@ -93,7 +122,9 @@
                     vm.filter.appliedFilters.kudos,
                     vm.filter.appliedFilters.events,
                     vm.page,
-                    vm.filter.getSortString()
+                    vm.filter.getSortString(),
+                    vm.datePickers.startDate.date,
+                    vm.datePickers.endDate.date
                 )
                 .then(
                     function (result) {
@@ -176,6 +207,35 @@
         function loadParticipantsOnPage(page) {
             vm.page = page;
             loadParticipants();
+        }
+
+        function openDatePicker($event, key) {
+            $event.preventDefault();
+            $event.stopPropagation();
+
+            closeAllDatePickers(key);
+
+            vm.datePickers[key].isOpen = true;
+
+            $timeout(function() {
+                $event.target.focus();
+            }, 100);
+        }
+
+        function closeAllDatePickers() {
+            vm.datePickers.startDate.isOpen = false;
+            vm.datePickers.endDate.isOpen = false;
+        }
+
+        function updateDateRestrictions() {
+            vm.datePickers.startDate.options.maxDate = moment.utc(vm.datePickers.endDate.date).local().startOf('day').toDate();
+            vm.datePickers.endDate.options.minDate = moment.utc(vm.datePickers.startDate.date).local().startOf('day').toDate();
+        }
+
+        function loadVisitedEventsWithUpdatedDates() {
+            onCompleteLoadFirstPage(function() {
+                updateDateRestrictions();
+            });
         }
     }
 })();

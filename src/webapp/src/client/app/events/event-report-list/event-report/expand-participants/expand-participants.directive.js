@@ -14,6 +14,8 @@
             scope: {
                 eventTypes: '=',
                 userId: '=',
+                startDate: '=',
+                endDate: '='
             },
             controller: expandParticipantsController,
             controllerAs: 'vm',
@@ -24,61 +26,27 @@
     }
 
     expandParticipantsController.$inject = [
-        '$timeout',
         'eventRepository',
         'notifySrv',
         'sortMultipleLinkService'
     ];
 
-    function expandParticipantsController($timeout, eventRepository, notifySrv, sortMultipleLinkService) {
+    function expandParticipantsController(eventRepository, notifySrv, sortMultipleLinkService) {
         var vm = this;
 
         var columnCount = 4;
 
-        var maxEndDate = moment().local().startOf('days').toDate();
-        var defaultStartDate = moment(maxEndDate).subtract(1, 'year').toDate();
-
         vm.page = 1;
-
-        vm.datePickers = {
-            startDate: {
-                isOpen: false,
-                date: defaultStartDate,
-                options: {
-                    startingDay: 1,
-                    datepickerMode: 'year',
-                    maxDate: moment(maxEndDate).subtract(1, 'day').toDate()
-                }
-            },
-            endDate: {
-                isOpen: false,
-                date: maxEndDate,
-                options: {
-                    startingDay: 1,
-                    datepickerMode: 'year',
-                    maxDate: maxEndDate,
-                    minDate: defaultStartDate
-                }
-            }
-        }
 
         vm.sortValues = sortMultipleLinkService.getMultipleSort(columnCount);
 
         vm.loadVisitedEventsOnPage = loadVisitedEventsOnPage;
-        vm.loadVisitedEventsWithUpdatedDates = loadVisitedEventsWithUpdatedDates;
-        vm.openDatePicker = openDatePicker;
         vm.sortByColumn = sortByColumn;
 
         init();
 
         function init() {
-            updateDateRestrictions();
             loadVisitedEvents();
-        }
-
-        function updateDateRestrictions() {
-            vm.datePickers.startDate.options.maxDate = moment.utc(vm.datePickers.endDate.date).local().startOf('day').toDate();
-            vm.datePickers.endDate.options.minDate = moment.utc(vm.datePickers.startDate.date).local().startOf('day').toDate();
         }
 
         function loadVisitedEvents() {
@@ -90,8 +58,8 @@
                     vm.page,
                     vm.sortValues.getSortString(),
                     vm.eventTypes,
-                    vm.datePickers.startDate.date,
-                    vm.datePickers.endDate.date
+                    vm.startDate,
+                    vm.endDate
                 )
                 .then(
                     function (response) {
@@ -115,33 +83,9 @@
             loadVisitedEventsOnPage(1);
         }
 
-        function loadVisitedEventsWithUpdatedDates() {
-            onCompleteLoadFirstPage(function() {
-                updateDateRestrictions();
-            });
-        }
-
         function loadVisitedEventsOnPage(page) {
             vm.page = page;
             loadVisitedEvents();
-        }
-
-        function openDatePicker($event, key) {
-            $event.preventDefault();
-            $event.stopPropagation();
-
-            closeAllDatePickers(key);
-
-            vm.datePickers[key].isOpen = true;
-
-            $timeout(function() {
-                $event.target.focus();
-            }, 100);
-        }
-
-        function closeAllDatePickers() {
-            vm.datePickers.startDate.isOpen = false;
-            vm.datePickers.endDate.isOpen = false;
         }
     }
 })();

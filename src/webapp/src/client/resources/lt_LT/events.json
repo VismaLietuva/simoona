@@ -226,5 +226,6 @@
   "buttonExpandEvents": "Išskleisti",
   "buttonCollapseEvents": "Suskleisti",
   "empty": "Nėra",
-  "moreCount": "ir dar {{one}}..."
+  "moreCount": "ir dar {{one}}...",
+  "eventReportDatePickers": "Rodyti aplankytus renginius"
 }

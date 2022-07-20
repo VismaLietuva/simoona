@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Shrooms.Premium.DataTransferObjects.Models.Events
 {
-    public class EventParticipantsReportListingArgsDto : IPageable, ISortable
+    public class EventParticipantsReportListingArgsDto : IPageable, ISortable, IFilterableByDate
     {
         public Guid EventId { get; set; }
 
@@ -17,5 +17,9 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
         public int PageSize { get; set; }
 
         public string SortByProperties { get; set; }
+
+        public DateTime? StartDate { get; set; }
+
+        public DateTime? EndDate { get; set; }
     }
 }

@@ -1,12 +1,13 @@
 ﻿using Shrooms.Contracts.Infrastructure;
 using Shrooms.Premium.Constants;
+using Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Shrooms.Premium.Presentation.WebViewModels.Events
 {
-    public class EventParticipantsReportListingArgsViewModel : IPageable, ISortable
+    public class EventParticipantsReportListingArgsViewModel : IPageable, ISortable, IFilterableByDate
     {
         public Guid EventId { get; set; }
 
@@ -21,5 +22,13 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
         public int PageSize { get; set; } = EventsConstants.EventsDefaultPageSize;
 
         public string SortByProperties { get; set; }
+
+        [Required]
+        [DateTimeLessThanDateTime(nameof(EndDate))]
+        public DateTime? StartDate { get; set; }
+
+        [Required]
+        [DateTimeLessThanPresentDate]
+        public DateTime? EndDate { get; set; }
     }
 }
