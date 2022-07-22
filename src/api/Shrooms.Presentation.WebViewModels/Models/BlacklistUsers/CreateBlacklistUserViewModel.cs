@@ -3,9 +3,9 @@ using Shrooms.Presentation.WebViewModels.ValidationAttributes;
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Shrooms.Presentation.WebViewModels.Models.BlacklistStates
+namespace Shrooms.Presentation.WebViewModels.Models.BlacklistUsers
 {
-    public class UpdateBlacklistStateViewModel
+    public class CreateBlacklistUserViewModel
     {
         [Required]
         public string UserId { get; set; }

@@ -1,5 +1,4 @@
-﻿using Shrooms.Presentation.WebViewModels.Models.BlacklistStates;
-using System;
+﻿using System;
 
 namespace Shrooms.Presentation.WebViewModels.Models.Employees
 {
@@ -19,6 +18,6 @@ namespace Shrooms.Presentation.WebViewModels.Models.Employees
 
         public WorkingHourslWithOutLunchViewModel WorkingHours { get; set; }
 
-        public BlacklistStateViewModel BlacklistState { get; set; }
+        public DateTime? BlacklistEndDate { get; set; }
     }
 }

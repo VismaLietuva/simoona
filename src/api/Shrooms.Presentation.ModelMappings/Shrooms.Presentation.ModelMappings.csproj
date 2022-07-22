@@ -67,7 +67,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helpers.cs" />
-    <Compile Include="Profiles\BlacklistStates.cs" />
+    <Compile Include="Profiles\BlacklistUsers.cs" />
     <Compile Include="Profiles\Employees.cs" />
     <Compile Include="Profiles\ExternalLinks.cs" />
     <Compile Include="Profiles\FilterPresets.cs" />

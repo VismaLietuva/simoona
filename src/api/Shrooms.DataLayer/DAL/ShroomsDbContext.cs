@@ -146,7 +146,7 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<FilterPreset> FilterPresets { get; set; }
 
-        public virtual DbSet<BlacklistState> BlacklistStates { get; set; }
+        public virtual DbSet<BlacklistUser> BlacklistUsers { get; set; }
 
         public string ConnectionName { get; }
 
@@ -223,7 +223,7 @@ namespace Shrooms.DataLayer.DAL
             modelBuilder.Configurations.Add(new PostWatcherConfig());
             modelBuilder.Configurations.Add(new VacationEntityConfig());
             modelBuilder.Configurations.Add(new FilterPresetEntityConfig());
-            modelBuilder.Configurations.Add(new BlacklistStateEntityConfig());
+            modelBuilder.Configurations.Add(new BlacklistUserEntityConfig());
 
             var convention = new AttributeToColumnAnnotationConvention<SqlDefaultValueAttribute, string>("SqlDefaultValue", (p, attributes) => attributes.Single().DefaultValue);
             modelBuilder.Conventions.Add(convention);

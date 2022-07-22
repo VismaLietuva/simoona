@@ -63,8 +63,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Validators\BlacklistStates\BlacklistStateValidator.cs" />
-    <Compile Include="Validators\BlacklistStates\IBlacklistStateValidator.cs" />
+    <Compile Include="Validators\BlacklistStates\BlacklistValidator.cs" />
+    <Compile Include="Validators\BlacklistStates\IBlacklistValidator.cs" />
     <Compile Include="Validators\FilterPresets\FilterPresetValidator.cs" />
     <Compile Include="Validators\FilterPresets\IFilterPresetValidator.cs" />
     <Compile Include="Validators\KudosBaskets\IKudosBasketValidator.cs" />

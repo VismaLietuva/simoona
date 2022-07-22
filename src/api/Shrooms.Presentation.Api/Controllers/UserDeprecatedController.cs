@@ -15,7 +15,7 @@ using Shrooms.Authentification.Membership;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
-using Shrooms.Contracts.DataTransferObjects.BlacklistStates;
+using Shrooms.Contracts.DataTransferObjects.BlacklistUsers;
 using Shrooms.Contracts.DataTransferObjects.Models.Administration;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.ViewModels;
@@ -37,7 +37,7 @@ using Shrooms.Presentation.Api.Controllers.Wall;
 using Shrooms.Presentation.Api.Filters;
 using Shrooms.Presentation.Api.Helpers;
 using Shrooms.Presentation.WebViewModels.Models;
-using Shrooms.Presentation.WebViewModels.Models.BlacklistStates;
+using Shrooms.Presentation.WebViewModels.Models.BlacklistUsers;
 using Shrooms.Presentation.WebViewModels.Models.Profile.JobPosition;
 using Shrooms.Presentation.WebViewModels.Models.User;
 using WebApi.OutputCache.V2;
@@ -70,7 +70,7 @@ namespace Shrooms.Presentation.Api.Controllers
         private readonly IProjectsService _projectService;
         private readonly IKudosService _kudosService;
         private readonly IPictureService _pictureService;
-        private readonly IBlacklistStateService _blacklistStateService;
+        private readonly IBlacklistService _blacklistStateService;
 
         public UserDeprecatedController(IMapper mapper,
             IUnitOfWork unitOfWork,
@@ -85,7 +85,7 @@ namespace Shrooms.Presentation.Api.Controllers
             IProjectsService projectService,
             IKudosService kudosService,
             IPictureService pictureService,
-            IBlacklistStateService blacklistStateService)
+            IBlacklistService blacklistStateService)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -338,9 +338,9 @@ namespace Shrooms.Presentation.Api.Controllers
                 model.PhoneNumber = null;
             }
 
-            if ((isAdmin || usersProfile) && _blacklistStateService.TryFindActiveBlacklistState(user.BlacklistStates, out var blacklistStateDto))
+            if ((isAdmin || usersProfile) && _blacklistStateService.TryFindActiveBlacklistState(user.BlacklistEntries, out var blacklistStateDto))
             {
-                model.BlacklistState = _mapper.Map<BlacklistStateDto, BlacklistStateViewModel>(blacklistStateDto);
+                model.BlacklistEntry = _mapper.Map<BlacklistUserDto, BlacklistUserViewModel>(blacklistStateDto);
             }
         }
 

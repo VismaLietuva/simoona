@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Shrooms.Contracts.DataTransferObjects.BlacklistStates
+namespace Shrooms.Contracts.DataTransferObjects.BlacklistUsers
 {
-    public class BlacklistStateDto
+    public class UpdateBlacklistUserDto
     {
         public string UserId { get; set; }
 

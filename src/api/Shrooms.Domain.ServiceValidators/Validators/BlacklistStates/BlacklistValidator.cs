@@ -1,33 +1,28 @@
 ﻿using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
-using Shrooms.Contracts.DataTransferObjects.BlacklistStates;
+using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
-using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using System.Data.Entity;
 using System.Threading.Tasks;
 
 namespace Shrooms.Domain.ServiceValidators.Validators.BlacklistStates
 {
-    public class BlacklistStateValidator : IBlacklistStateValidator
+    public class BlacklistValidator : IBlacklistValidator
     {
-        private readonly ISystemClock _systemClock;
-
-        private readonly IDbSet<BlacklistState> _blacklistStatesDbSet;
+        private readonly IDbSet<BlacklistUser> _blacklistStatesDbSet;
         private readonly IDbSet<ApplicationUser> _applicationUsersDbSet;
 
-        public BlacklistStateValidator(ISystemClock systemClock, IUnitOfWork2 uow)
+        public BlacklistValidator(IUnitOfWork2 uow)
         {
-            _systemClock = systemClock;
-
-            _blacklistStatesDbSet = uow.GetDbSet<BlacklistState>();
+            _blacklistStatesDbSet = uow.GetDbSet<BlacklistUser>();
             _applicationUsersDbSet = uow.GetDbSet<ApplicationUser>();
         }
 
-        public void CheckIfBlacklistStateExists(BlacklistState blacklistState)
+        public void CheckIfBlacklistUserExists(BlacklistUser blacklistUser)
         {
-            if (blacklistState == null)
+            if (blacklistUser == null)
             {
                 throw new ValidationException(ErrorCodes.BlacklistStateNotFound, "Blacklist state not found");
             }
@@ -41,11 +36,10 @@ namespace Shrooms.Domain.ServiceValidators.Validators.BlacklistStates
             }
         }
 
-        public async Task CheckIfUserIsAlreadyBlacklistedAsync(BlacklistStateDto blacklistStateDto, UserAndOrganizationDto userOrg)
+        public async Task CheckIfUserIsAlreadyBlacklistedAsync(string userId, UserAndOrganizationDto userOrg)
         {
-            if (await _blacklistStatesDbSet.AnyAsync(blacklist => blacklist.UserId == blacklistStateDto.UserId &&
-                                                                  blacklist.EndDate > _systemClock.UtcNow &&
-                                                                  blacklist.OrganizationId == userOrg.OrganizationId))
+            if (await _blacklistStatesDbSet.AnyAsync(blacklist => blacklist.UserId == userId &&
+                                                                  blacklist.Status == BlacklistStatus.Active))
             {
                 throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "User is already blacklisted");
             }

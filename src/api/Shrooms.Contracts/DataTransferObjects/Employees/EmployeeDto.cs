@@ -1,4 +1,4 @@
-﻿using Shrooms.Contracts.DataTransferObjects.BlacklistStates;
+﻿using Shrooms.Contracts.DataTransferObjects.BlacklistUsers;
 using System;
 
 namespace Shrooms.Contracts.DataTransferObjects.Employees
@@ -19,6 +19,6 @@ namespace Shrooms.Contracts.DataTransferObjects.Employees
 
         public WorkingHourslWithOutLunchDto WorkingHours { get; set; }
 
-        public BlacklistStateDto BlacklistState { get; set; }
+        public BlacklistUserDto BlacklistEntry { get; set; }
     }
 }

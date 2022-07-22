@@ -131,6 +131,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\DbSetExtensions.cs" />
     <Compile Include="Extensions\PagedListExtensions.cs" />
     <Compile Include="Extensions\QueryableExtensions.cs" />
     <Compile Include="Helpers\BirthdayDateTimeHelper.cs" />
@@ -143,8 +144,8 @@
     <Compile Include="ServiceExceptions\ServiceException.cs" />
     <Compile Include="Services\Administration\IAdministrationUsersService.cs" />
     <Compile Include="Services\Administration\AdministrationUsersService.cs" />
-    <Compile Include="Services\BlacklistStates\BlacklistStateService.cs" />
-    <Compile Include="Services\BlacklistStates\IBlacklistStateService.cs" />
+    <Compile Include="Services\BlacklistStates\BlacklistService.cs" />
+    <Compile Include="Services\BlacklistStates\IBlacklistService.cs" />
     <Compile Include="Services\Email\AdministrationUsers\AdministrationUsersNotificationService.cs" />
     <Compile Include="Services\Email\Kudos\IKudosNotificationService.cs" />
     <Compile Include="Services\Email\Kudos\KudosNotificationService.cs" />
@@ -204,6 +205,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\SyncTokens\ISyncTokenService.cs" />
     <Compile Include="Services\SyncTokens\SyncTokenService.cs" />
+    <Compile Include="Services\WebHookCallbacks\BlacklistUsers\BlacklistUserStatusChangeWebHookService.cs" />
+    <Compile Include="Services\WebHookCallbacks\BlacklistUsers\IBlacklistUserStatusChangeWebHookService.cs" />
     <Compile Include="Services\WebHookCallbacks\UserAnonymization\UsersAnonymizationWebHookService.cs" />
     <Compile Include="Services\WebHookCallbacks\UserAnonymization\IUsersAnonymizationWebHookService.cs" />
     <Compile Include="Services\WebHookCallbacks\BirthdayNotification\BirthdaysNotificationWebHookService.cs" />

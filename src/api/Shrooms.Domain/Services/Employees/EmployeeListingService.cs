@@ -1,8 +1,9 @@
 ﻿using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
-using Shrooms.Contracts.DataTransferObjects.BlacklistStates;
+using Shrooms.Contracts.DataTransferObjects.BlacklistUsers;
 using Shrooms.Contracts.DataTransferObjects.Employees;
+using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Extensions;
@@ -50,7 +51,7 @@ namespace Shrooms.Domain.Services.Employees
             var users = await _usersDbSet
                 .Include(user => user.WorkingHours)
                 .Include(user => user.JobPosition)
-                .Include(user => user.BlacklistStates)
+                .Include(user => user.BlacklistEntries)
                 .Where(searchFilter)
                 .Where(blacklistFilter)
                 .Where(_roleService.ExcludeUsersWithRole(newUserRoleId))
@@ -68,11 +69,11 @@ namespace Shrooms.Domain.Services.Employees
                         StartTime = user.WorkingHours.StartTime,
                         EndTime = user.WorkingHours.EndTime
                     },
-                    BlacklistState = user.BlacklistStates
-                        .Where(blacklistState => blacklistState.EndDate > _systemClock.UtcNow)
-                        .Select(blacklistState => new BlacklistStateDto
+                    BlacklistEntry = user.BlacklistEntries
+                        .Where(blacklistUser => blacklistUser.Status == BlacklistStatus.Active)
+                        .Select(blacklistUser => new BlacklistUserDto
                         {
-                            EndDate = blacklistState.EndDate,
+                            EndDate = blacklistUser.EndDate
                         })
                         .FirstOrDefault()
                 })
@@ -93,7 +94,7 @@ namespace Shrooms.Domain.Services.Employees
             {
                 employee.BirthDay = BirthdayDateTimeHelper.RemoveYear(employee.BirthDay);
                 employee.PhoneNumber = null;
-                employee.BlacklistState = null;
+                employee.BlacklistEntry = null;
             }
         }
 
@@ -104,7 +105,7 @@ namespace Shrooms.Domain.Services.Employees
                 return user => true;
             }
 
-            return user => user.BlacklistStates.Any(blacklistState => blacklistState.EndDate > _systemClock.UtcNow);
+            return user => user.BlacklistEntries.Any(blacklistUser => blacklistUser.Status == BlacklistStatus.Active);
         }
 
         private static Expression<Func<ApplicationUser, bool>> GetSearchStringFilter(EmployeeListingArgsDto employeeArgsDto)

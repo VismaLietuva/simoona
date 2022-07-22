@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Shrooms.Contracts.DataTransferObjects.Employees;
 using Shrooms.Presentation.WebViewModels.Models.Employees;
+using System;
 
 namespace Shrooms.Presentation.ModelMappings.Profiles
 {
@@ -19,7 +20,8 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
         private void CreateDtoToViewModelMappings()
         {
-            CreateMap<EmployeeDto, EmployeeViewModel>();
+            CreateMap<EmployeeDto, EmployeeViewModel>()
+                .ForMember(dest => dest.BlacklistEndDate, opt => opt.MapFrom(u => u.BlacklistEntry.EndDate));
             CreateMap<WorkingHourslWithOutLunchDto, WorkingHourslWithOutLunchViewModel>();
         }
     }

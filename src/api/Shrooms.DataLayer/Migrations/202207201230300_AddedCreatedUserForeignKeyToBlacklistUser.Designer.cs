@@ -7,13 +7,13 @@ namespace Shrooms.DataLayer.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class AddedBlacklistState : IMigrationMetadata
+    public sealed partial class AddedCreatedUserForeignKeyToBlacklistUser : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedBlacklistState));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedCreatedUserForeignKeyToBlacklistUser));
         
         string IMigrationMetadata.Id
         {
-            get { return "202207110752544_AddedBlacklistState"; }
+            get { return "202207201230300_AddedCreatedUserForeignKeyToBlacklistUser"; }
         }
         
         string IMigrationMetadata.Source
