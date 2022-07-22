@@ -1,0 +1,47 @@
+<div class="blacklist-history-container">
+    <div class="profile-blacklist-content col-xs-12">
+        <a class="mt-3" ng-click="vm.toggleHistory()">
+            <span>{{vm.showButtonTranslation | translate}}</span>
+        </a>
+    </div>
+
+    <!-- TODO: fix layout. mobile does not work well if there is no text :) -->
+    <div class="blacklist-history-timeline" ng-if="vm.blacklistHistoryExpanded">
+        <ul>
+            <li ng-repeat="entry in vm.blacklistEntries">
+                <div class="content">
+                    <p class="blacklist-history-status">
+                        {{ 'applicationUser.blacklistHistoryStatus' | translate }}:
+                        <span class="blacklist-history-state">{{vm.getStatusTranslation(entry.status) | translate}}</span>
+                    </p>
+                    <div class="blacklist-history-authors">
+                        <!-- Created -->
+                        <div>
+                            <span translate="applicationUser.createdBy"></span>
+                            <a class="profile-edit-blacklist-info-link"
+                                ui-sref="Root.WithOrg.Client.Profiles.Details({ id: entry.createdBy })">
+                                <span ng-cloak>
+                                    {{entry.createdByUserFirstName}} {{entry.createdByUserLastName}}
+                                </span>
+                            </a>
+                            <span>{{entry.created | date:'yyyy-MM-dd'}}</span>
+                        </div>
+                        <!-- Modified -->
+                        <div>
+                            <span translate="applicationUser.modifiedBy"></span>
+                            <a class="profile-edit-blacklist-info-link"
+                                ui-sref="Root.WithOrg.Client.Profiles.Details({ id: entry.modifiedBy })">
+                                <span ng-cloak>
+                                    {{entry.modifiedByUserFirstName}} {{entry.modifiedByUserLastName}}
+                                </span>
+                            </a>
+                            <span>{{entry.modified | date:'yyyy-MM-dd'}}</span>
+                        </div>
+                        <p class="blacklist-history-reason">{{entry.reason || ('applicationUser.noReason' | translate)}}</p>
+                    </div>
+                </div>
+            </li>
+            <div style="clear: both;"></div>
+        </ul>
+    </div>
+</div>
