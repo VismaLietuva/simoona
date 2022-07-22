@@ -13,7 +13,7 @@ using Shrooms.Domain.Extensions;
 using System.Linq.Expressions;
 using System;
 
-namespace Shrooms.Domain.Services.BlacklistStates
+namespace Shrooms.Domain.Services.BlacklistUsers
 {
     public class BlacklistService : IBlacklistService
     {
@@ -126,20 +126,7 @@ namespace Shrooms.Domain.Services.BlacklistStates
                 .Where(blacklistUser => blacklistUser.UserId == userId &&
                                         blacklistUser.OrganizationId == userOrg.OrganizationId &&
                                         blacklistUser.Status != BlacklistStatus.Active)
-                .Select(blacklistUser => new BlacklistUserDto
-                {
-                    UserId = blacklistUser.UserId,
-                    Reason = blacklistUser.Reason,
-                    EndDate = blacklistUser.EndDate,
-                    Modified = blacklistUser.Modified,
-                    Created = blacklistUser.Created,
-                    Status = blacklistUser.Status,
-                    ModifiedBy = blacklistUser.ModifiedBy,
-                    CreatedByUserFirstName = blacklistUser.CreatedByUser.FirstName,
-                    CreatedByUserLastName = blacklistUser.CreatedByUser.LastName,
-                    ModifiedByUserFirstName = blacklistUser.ModifiedByUser.FirstName,
-                    ModifiedByUserLastName = blacklistUser.ModifiedByUser.LastName
-                })
+                .Select(MapBlacklistUserToBlacklistUserDto())
                 .OrderByDescending(blacklistUser => blacklistUser.Created)
                 .ToListAsync();
         }
@@ -177,7 +164,25 @@ namespace Shrooms.Domain.Services.BlacklistStates
             };
         }
 
-        private Expression<Func<BlacklistUser, bool>> FindActiveBlacklistEntry(string userId, UserAndOrganizationDto userOrg)
+        private static Expression<Func<BlacklistUser, BlacklistUserDto>> MapBlacklistUserToBlacklistUserDto()
+        {
+            return blacklistUser => new BlacklistUserDto
+            {
+                UserId = blacklistUser.UserId,
+                Reason = blacklistUser.Reason,
+                EndDate = blacklistUser.EndDate,
+                Modified = blacklistUser.Modified,
+                Created = blacklistUser.Created,
+                Status = blacklistUser.Status,
+                ModifiedBy = blacklistUser.ModifiedBy,
+                CreatedByUserFirstName = blacklistUser.CreatedByUser.FirstName,
+                CreatedByUserLastName = blacklistUser.CreatedByUser.LastName,
+                ModifiedByUserFirstName = blacklistUser.ModifiedByUser.FirstName,
+                ModifiedByUserLastName = blacklistUser.ModifiedByUser.LastName
+            };
+        }
+
+        private static Expression<Func<BlacklistUser, bool>> FindActiveBlacklistEntry(string userId, UserAndOrganizationDto userOrg)
         {
             return blacklistUser => blacklistUser.UserId == userId &&
                                     blacklistUser.OrganizationId == userOrg.OrganizationId &&

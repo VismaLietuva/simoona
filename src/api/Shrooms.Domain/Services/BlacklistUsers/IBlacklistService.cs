@@ -4,7 +4,7 @@ using Shrooms.DataLayer.EntityModels.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Shrooms.Domain.Services.BlacklistStates
+namespace Shrooms.Domain.Services.BlacklistUsers
 {
     public interface IBlacklistService
     {
