@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using Shrooms.Domain.Services.WebHookCallbacks;
 using Shrooms.Domain.Services.WebHookCallbacks.BirthdayNotification;
+using Shrooms.Domain.Services.WebHookCallbacks.BlacklistUsers;
 using Shrooms.Domain.Services.WebHookCallbacks.UserAnonymization;
 using Shrooms.Infrastructure.Interceptors;
 
@@ -12,6 +13,7 @@ namespace Shrooms.IoC.Modules
         {
             builder.RegisterType<BirthdaysNotificationWebHookService>().As<IBirthdaysNotificationWebHookService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<UsersAnonymizationWebHookService>().As<IUsersAnonymizationWebHookService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            builder.RegisterType<BlacklistUserStatusChangeWebHookService>().As<IBlacklistUserStatusChangeWebHookService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
 
             builder.RegisterType<WebHookCallbackServices>().As<IWebHookCallbackServices>().InstancePerRequest().PropertiesAutowired().EnableInterfaceTelemetryInterceptor();
         }
