@@ -33,8 +33,8 @@
                     <th class="text-center hidden-xs">
                         <span translate="applicationUser.workingHours"></span>
                     </th>
-                    <th ng-if="isAdmin && filter.showOnlyBlacklisted" class="text-center hidden-xs">
-                        <ace-sort-multiple-link on-sort="onSort" position="4" sort-dir="filter.sortValues.sortOrders[4]" sort-field="filter.sortValues.sortBy[4]" sort-value="blacklistState.endDate">
+                    <th ng-if="isAdmin" class="text-center hidden-xs">
+                        <ace-sort-multiple-link on-sort="onSort" position="4" sort-dir="filter.sortValues.sortOrders[4]" sort-field="filter.sortValues.sortBy[4]" sort-value="blacklistEntry.endDate">
                             <span translate="applicationUser.blacklisted"></span>
                         </ace-sort-multiple-link>
                     </th>
@@ -45,7 +45,7 @@
                     <td class="col-xs-3 text-center">
                         <a data-ui-sref="Root.WithOrg.Client.Profiles.Details({ id: applicationUser.id })">{{applicationUser.firstName}} {{applicationUser.lastName}}</a>
                     </td>
-                    <td class="text-center hidden-xs" ng-class="{'col-xs-2' : !filter.showOnlyBlacklisted}">
+                    <td class="text-center hidden-xs" ng-class="{'col-xs-2' : !isAdmin}">
                         <span ng-if="isAdmin">
                             {{:: applicationUser.birthDay | date:'yyyy-MM-dd' }}
                         </span>
@@ -66,8 +66,8 @@
                             {{applicationUser.workingHours.startTime | time:'HH:mm'}} - {{applicationUser.workingHours.endTime | time:'HH:mm'}}
                         </div>
                     </td>
-                    <td class="text-center hidden-xs" ng-if="isAdmin && filter.showOnlyBlacklisted">
-                        {{:: applicationUser.blacklistState.endDate | date:'yyyy-MM-dd'}}
+                    <td class="text-center hidden-xs" ng-if="isAdmin">
+                        {{:: applicationUser.blacklistEndDate | date:'yyyy-MM-dd'}}
                     </td>
                 </tr>
             </tbody>

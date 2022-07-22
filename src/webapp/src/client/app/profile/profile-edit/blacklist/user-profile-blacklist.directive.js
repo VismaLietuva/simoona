@@ -70,6 +70,15 @@
                 profileRepository.createBlacklistState(params)
                     .then(function() {
                         $scope.allowDeletion = true;
+                        var fullNameParts = authService.identity.fullName.split(' ');
+                        var timestamp = moment().local().startOf('days').toDate();
+
+                        $scope.model.modifiedByUserFirstName = fullNameParts[0];
+                        $scope.model.modifiedByUserLastName = fullNameParts[1];
+                        $scope.model.createdByUserFirstName = fullNameParts[0];
+                        $scope.model.createdByUserLastName = fullNameParts[1];
+                        $scope.model.modified = timestamp;
+                        $scope.model.created = timestamp;
 
                         updateEndDateDisplay();
                         showSuccess();

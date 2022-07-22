@@ -8,17 +8,15 @@
             <div class="applicationuser-header-container">
                 <div>
                     <div class="applicationuser-header">
-                        <a ui-sref="Root.WithOrg.Client.Office({user: model.username})" data-test-id="profile-username-link">
+                        <a ui-sref="Root.WithOrg.Client.Office({user: model.username})"
+                            data-test-id="profile-username-link">
                             {{model.displayName()}}
                         </a>
                     </div>
                     <div class="applicationuser-subheader" data-test-id="profileJobTitle">
-                        {{model.jobTitle}} <span ng-show="model.qualificationLevel.name" data-test-id="profileQualificationLevel">({{ model.qualificationLevel.name }})</span>
+                        {{model.jobTitle}} <span ng-show="model.qualificationLevel.name"
+                            data-test-id="profileQualificationLevel">({{ model.qualificationLevel.name }})</span>
                     </div>
-                </div>
-
-                <div ng-if="model.blacklistState && (isAdmin || isCurrentUser)" class="applicationuser-blacklist-state">
-                    <span translate="applicationUser.blacklistedUntil" translate-values="{ one: (model.blacklistState.endDate | date:'yyyy-MM-dd') }"></span>
                 </div>
             </div>
         </div>
@@ -29,11 +27,10 @@
                 </div>
                 <div class="clearfix"></div>
                 <div class="col-xs-12 profile-kudos-button" has-permissions="['KUDOS_BASIC']">
-                    <button type="button"
-                         class="btn btn-success"
-                         ga-track-event="['Kudos', 'profile go to kudos', 'opened']"
-                         ui-sref="Root.WithOrg.Client.Kudos.KudosUserInformation({ userId: model.id })"
-                         data-test-id="profileKudosbutton">
+                    <button type="button" class="btn btn-success"
+                        ga-track-event="['Kudos', 'profile go to kudos', 'opened']"
+                        ui-sref="Root.WithOrg.Client.Kudos.KudosUserInformation({ userId: model.id })"
+                        data-test-id="profileKudosbutton">
                         {{"applicationUser.goToKudosPage" | translate}}
                     </button>
                 </div>
@@ -84,7 +81,9 @@
                     </div>
                     <div class="col-xs-12 col-md-8 panel-form-body" data-test-id="profileEmploymentDate">
                         {{model.employmentDate | date : 'yyyy-MM-dd'}}
-                        <a ng-if="isAdmin && !model.employmentDate" ui-sref="Root.WithOrg.Client.Profiles.Edit({ id: model.id, tab: 'Job' })" title="{{'applicationUser.employmentDateConfirmation' | translate}}">
+                        <a ng-if="isAdmin && !model.employmentDate"
+                            ui-sref="Root.WithOrg.Client.Profiles.Edit({ id: model.id, tab: 'Job' })"
+                            title="{{'applicationUser.employmentDateConfirmation' | translate}}">
                             <span class="glyphicon glyphicon-exclamation-sign text-danger"></span>
                         </a>
                     </div>
@@ -95,8 +94,11 @@
                             {{"applicationUser.fullTime" | translate}}
                         </label>
                     </div>
-                    <div class="col-xs-12 col-md-8 panel-form-body" ng-if="model.workingHours" data-test-id="profileFullTime">
-                        {{"common." + workFullTime | translate}} <span ng-show="!model.workingHours.fullTime">({{"applicationUser.partTimeHours" | translate}} - {{model.workingHours.partTimeHours}})</span>
+                    <div class="col-xs-12 col-md-8 panel-form-body" ng-if="model.workingHours"
+                        data-test-id="profileFullTime">
+                        {{"common." + workFullTime | translate}} <span
+                            ng-show="!model.workingHours.fullTime">({{"applicationUser.partTimeHours" | translate}} -
+                            {{model.workingHours.partTimeHours}})</span>
                     </div>
                 </div>
                 <div class="col-xs-12 nopadding">
@@ -105,11 +107,15 @@
                             {{"applicationUser.workingHours" | translate}}
                         </label>
                     </div>
-                    <div class="col-xs-12 col-md-8 panel-form-body" ng-if="model.workingHours" data-test-id="profileWorkingHours">
-                        {{model.workingHours.startTime | time:'HH:mm'}} <span ng-show="model.workingHours.startTime">-</span> {{model.workingHours.endTime | time:'HH:mm'}}
+                    <div class="col-xs-12 col-md-8 panel-form-body" ng-if="model.workingHours"
+                        data-test-id="profileWorkingHours">
+                        {{model.workingHours.startTime | time:'HH:mm'}} <span
+                            ng-show="model.workingHours.startTime">-</span> {{model.workingHours.endTime |
+                        time:'HH:mm'}}
                         <span ng-if="hasLunch()" data-test-id="profileLunchTime">
                             ({{"applicationUser.lunch" | translate}}: {{model.workingHours.lunchStart | time: 'HH:mm'}}
-                            <span ng-show="model.workingHours.lunchStart && model.workingHours.lunchEnd">-</span> {{model.workingHours.lunchEnd | time:'HH:mm'}})
+                            <span ng-show="model.workingHours.lunchStart && model.workingHours.lunchEnd">-</span>
+                            {{model.workingHours.lunchEnd | time:'HH:mm'}})
                         </span>
                     </div>
                 </div>
@@ -137,10 +143,8 @@
                                 </a>
                             </li>
                         </ul>
-                        <show-more-btn show-array="model.projects"
-                                       show-length="projectsLength"
-                                       min-length="minLength"
-                                       class="profile-show-more">
+                        <show-more-btn show-array="model.projects" show-length="projectsLength" min-length="minLength"
+                            class="profile-show-more">
                         </show-more-btn>
                     </div>
                 </div>
@@ -154,7 +158,8 @@
                         <span ng-if="model.roomId" data-test-id="profileLocationOfficeAndFloor">
                             {{model.room.floor.office.name}} / {{model.room.floor.name}} /
                         </span>
-                        <a ng-if="isPremium" ui-sref="Root.WithOrg.Client.Office({user: model.username})" data-test-id="profileLocationRoom">
+                        <a ng-if="isPremium" ui-sref="Root.WithOrg.Client.Office({user: model.username})"
+                            data-test-id="profileLocationRoom">
                             {{model.room.name}} {{model.room.number}}
                         </a>
                         <span ng-if="!isPremium" data-test-id="profileLocationRoom">
@@ -198,10 +203,8 @@
                                 {{ certificate.name }}
                             </li>
                         </ul>
-                        <show-more-btn show-array="model.certificates"
-                                       show-length="certificatesLength"
-                                       min-length="minLength"
-                                       class="profile-show-more">
+                        <show-more-btn show-array="model.certificates" show-length="certificatesLength"
+                            min-length="minLength" class="profile-show-more">
                         </show-more-btn>
                     </div>
                 </div>
@@ -217,10 +220,8 @@
                                 {{ (exam.number || '' ) + ' ' + exam.title }}
                             </li>
                         </ul>
-                        <show-more-btn show-array="model.exams"
-                                       show-length="examsLength"
-                                       min-length="minLength"
-                                       class="profile-show-more">
+                        <show-more-btn show-array="model.exams" show-length="examsLength" min-length="minLength"
+                            class="profile-show-more">
                         </show-more-btn>
                     </div>
                 </div>
@@ -238,22 +239,86 @@
                     </div>
                 </div>
             </div>
+
+            <hr class="gray-horizontal-rule" ng-if="showBlacklistHistory || showBlacklistInformation"></hr>
+
+            <!-- Blacklist information -->
+            <div class="col-xs-12 col-md-offset-3 col-md-9">
+                <div class="col-xs-12 nopadding" ng-if="showBlacklistInformation">
+                    <div class="col-xs-12 col-md-4 nopadding">
+                        <label class="control-label">
+                            {{ 'applicationUser.blacklistState' | translate }}
+                        </label>
+                    </div>
+                    <div class="col-xs-12 col-md-8 panel-form-body">
+                        <span>{{model.blacklistEntry.endDate | date:'yyyy-MM-dd'}}</span>
+                    </div>
+                </div>
+                <div class="col-xs-12 nopadding" ng-if="showBlacklistInformation">
+                    <div class="col-xs-12 col-md-4 nopadding">
+                        <label class="control-label">
+                            {{ 'applicationUser.blacklistReason' | translate }}
+                        </label>
+                    </div>
+                    <div class="col-xs-12 col-md-8 panel-form-body word-break">
+                        <span>{{model.blacklistEntry.reason || ('applicationUser.noReason' | translate)}}</span>
+                    </div>
+                </div>
+                <div class="col-xs-12 nopadding" ng-if="showBlacklistInformation">
+                    <div class="col-xs-12 col-md-4 nopadding">
+                        <label class="control-label">
+                            {{ 'applicationUser.createdBy' | translate }}
+                        </label>
+                    </div>
+                    <div class="col-xs-12 col-md-8 panel-form-body">
+                        <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: model.blacklistEntry.createdBy })">
+                            <span ng-cloak>
+                                {{model.blacklistEntry.createdByUserFirstName}}
+                                {{model.blacklistEntry.createdByUserLastName}}
+                            </span>
+                        </a>
+                        <span>{{model.blacklistEntry.created | date:'yyyy-MM-dd'}}</span>
+                    </div>
+                </div>
+                <div class="col-xs-12 nopadding" ng-if="showBlacklistInformation">
+                    <div class="col-xs-12 col-md-4 nopadding">
+                        <label class="control-label">
+                            {{ 'applicationUser.modifiedBy' | translate }}
+                        </label>
+                    </div>
+                    <div class="col-xs-12 col-md-8 panel-form-body">
+                        <a ui-sref="Root.WithOrg.Client.Profiles.Details({ id: model.blacklistEntry.modifiedBy })">
+                            <span ng-cloak>
+                                {{model.blacklistEntry.modifiedByUserFirstName}}
+                                {{model.blacklistEntry.modifiedByUserLastName}}
+                            </span>
+                        </a>
+                        <span>{{model.blacklistEntry.modified | date:'yyyy-MM-dd'}}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xs-12" ng-if="showBlacklistHistory">
+                <div class="profile-dots col-xs-12">
+                    ...
+                </div>
+                <div class="profile-blacklist-content col-xs-12">
+                    <ace-blacklist-history></ace-blacklist-history>
+                </div>
+            </div>
+
             <div class="col-xs-12">
                 <div class="profile-edit-button top-space col-xs-12">
-                    <button class="btn btn-primary"
-                            ng-if="isAdmin || isCurrentUser"
-                            ui-sref="Root.WithOrg.Client.Profiles.Edit({ id: model.id, tab: 'Personal' })"
-                            title="{{'common.edit' | translate}}"
-                            data-test-id="profileEditButton">
+                    <button class="btn btn-primary" ng-if="isAdmin || isCurrentUser"
+                        ui-sref="Root.WithOrg.Client.Profiles.Edit({ id: model.id, tab: 'Personal' })"
+                        title="{{'common.edit' | translate}}" data-test-id="profileEditButton">
                         <span class="glyphicon glyphicon-pencil"></span>
                         <span>&nbsp;</span>
                         {{"common.edit" | translate}}
                     </button>
                     <span>&nbsp;</span>
-                    <button class="btn btn-primary"
-                            ng-if="isAdmin && isNewUser()"
-                            ng-disabled="isFirstLogin()"
-                            ng-click="confirmUser(model.id)">
+                    <button class="btn btn-primary" ng-if="isAdmin && isNewUser()" ng-disabled="isFirstLogin()"
+                        ng-click="confirmUser(model.id)">
                         {{"common.confirm" | translate}}
                     </button>
                 </div>

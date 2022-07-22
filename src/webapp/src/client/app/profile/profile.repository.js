@@ -17,7 +17,7 @@
         var certificateUrl = endPoint + '/Certificate/';
         var examUrl = endPoint + '/Exam/';
         var hashtagsUrl = endPoint + '/Hashtags/';
-        var blacklistStateUrl = endPoint + '/BlacklistState/';
+        var blacklistStateUrl = endPoint + '/Blacklist/';
 
         var service = {
             getUserProfile: getUserProfile,
@@ -63,7 +63,8 @@
             getBlacklistState: getBlacklistState,
             putBlacklistState: putBlacklistState,
             deleteBlacklistState: deleteBlacklistState,
-            createBlacklistState: createBlacklistState
+            createBlacklistState: createBlacklistState,
+            getBlacklistHistory: getBlacklistHistory
         };
 
         return service;
@@ -277,17 +278,26 @@
         }
 
         function deleteBlacklistState(params) {
-            return $resource(blacklistStateUrl + 'Delete').delete({
-                userId: params.userId
-            }).$promise;
+            return $resource(blacklistStateUrl + 'Cancel', '', {
+                put: {
+                    method: 'PUT',
+                    params: {
+                        userId: params.userId
+                    }
+                }
+            }).put().$promise;
         }
 
         function createBlacklistState(params) {
-            return $resource(blacklistStateUrl + 'Create').save({
+            return $resource(blacklistStateUrl + 'Add').save({
                 userId: params.userId,
                 endDate: params.endDate,
                 reason: params.reason
             }).$promise;
+        }
+
+        function getBlacklistHistory(params) {
+            return $resource(blacklistStateUrl + 'History').query(params).$promise;
         }
     }
 })();

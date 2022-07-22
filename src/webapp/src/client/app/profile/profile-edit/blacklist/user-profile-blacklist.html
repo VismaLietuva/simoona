@@ -25,8 +25,25 @@
                 </textarea>
             </input-wrapper>
 
-            <div ng-if="allowDeletion" class="top-space col-xs-offset-4 text-left">
-                <span class="ml-3 bold" translate="applicationUser.blacklistState" translate-values="{ one: (endDateDisplay | date: 'yyyy-MM-dd') }"></span>
+            <hr ng-if="allowDeletion" class="profile-edit-blacklist-hr"></hr>
+            <div ng-if="allowDeletion" class="top-space col-xs-offset-4 text-left mt-0">
+                <p class="ml-3 profile-edit-blacklist-info-text" translate="applicationUser.blacklistState" translate-values="{ one: (endDateDisplay | date: 'yyyy-MM-dd') }"></p>
+                <span class="ml-3 profile-edit-blacklist-info-text" translate="applicationUser.modifiedBy"></span>
+                <a class="profile-edit-blacklist-info-link" ui-sref="Root.WithOrg.Client.Profiles.Details({ id: model.modifiedBy })">
+                    <span ng-cloak>
+                        {{model.modifiedByUserFirstName}} {{model.modifiedByUserLastName}}
+                    </span>
+                </a>
+                <span class="profile-edit-blacklist-info-text">{{model.modified | date: 'yyyy-MM-dd'}}</span>
+            </div>
+            <div ng-if="allowDeletion" class="top-space col-xs-offset-4 text-left mt-0">
+                <span class="ml-3 profile-edit-blacklist-info-text" translate="applicationUser.createdBy"></span>
+                <a class="profile-edit-blacklist-info-link" ui-sref="Root.WithOrg.Client.Profiles.Details({ id: model.createdBy })">
+                    <span ng-cloak>
+                        {{model.createdByUserFirstName}} {{model.createdByUserLastName}}
+                    </span>
+                </a>
+                <span class="profile-edit-blacklist-info-text">{{model.created | date: 'yyyy-MM-dd'}}</span>
             </div>
 
             <!-- Buttons -->
