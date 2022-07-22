@@ -162,5 +162,13 @@
   "blacklistReason": "Priežastis",
   "blacklistState": "Šis žmogus įtrauktas į juodąjį sąrašą iki {{ one }}",
   "blacklisted": "Juodajame sąraše",
-  "showOnlyBlacklisted": "Rodyti tik įtrauktus į juodąjį sąrašą"
+  "showOnlyBlacklisted": "Rodyti tik įtrauktus į juodąjį sąrašą",
+  "modifiedBy": "Paskutinį kartą modifikavo",
+  "createdBy": "Sukūrė",
+  "showBlacklistHistory": "Rodyti juodajo sąrašo istoriją",
+  "hideBlacklistHistory": "Neberodyti juodajo sąrašo istorijos",
+  "blacklistHistoryStatus": "Statusas",
+  "noReason": "Priežastis nenurodyta",
+  "blacklistHistoryStatusCanceled": "Atšaukta",
+  "blacklistHistoryStatusExpired": "Baigėsi"
 }

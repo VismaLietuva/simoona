@@ -162,5 +162,13 @@
   "blacklistReason": "Reason",
   "blacklistState": "This person is blacklisted until {{ one }}",
   "blacklisted": "Blacklisted",
-  "showOnlyBlacklisted": "Show only blacklisted"
+  "showOnlyBlacklisted": "Show only blacklisted",
+  "modifiedBy": "Last modification was made by",
+  "createdBy": "Created by",
+  "showBlacklistHistory": "Show blacklist history",
+  "hideBlacklistHistory": "Hide blacklist history",
+  "blacklistHistoryStatus": "Status",
+  "noReason": "No reason provided",
+  "blacklistHistoryStatusCanceled": "Canceled",
+  "blacklistHistoryStatusExpired": "Expired"
 }
