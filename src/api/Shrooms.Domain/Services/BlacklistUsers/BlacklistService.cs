@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
-using Shrooms.Domain.Extensions;
 using System.Linq.Expressions;
 using System;
 
@@ -85,7 +84,8 @@ namespace Shrooms.Domain.Services.BlacklistUsers
 
         public async Task UpdateAsync(UpdateBlacklistUserDto updateDto, UserAndOrganizationDto userOrg)
         {
-            var blacklistState = await GetActiveBlacklistUserAsync(updateDto.UserId, userOrg, false);
+            var blacklistState = await _blacklistStatesDbSet
+                .SingleOrDefaultAsync(FindActiveBlacklistEntry(updateDto.UserId, userOrg));
 
             _validator.CheckIfBlacklistUserExists(blacklistState);
 
@@ -129,15 +129,6 @@ namespace Shrooms.Domain.Services.BlacklistUsers
                 .Select(MapBlacklistUserToBlacklistUserDto())
                 .OrderByDescending(blacklistUser => blacklistUser.Created)
                 .ToListAsync();
-        }
-
-        private async Task<BlacklistUser> GetActiveBlacklistUserAsync(string userId, UserAndOrganizationDto userOrg, bool includeBlacklistDataHandlers = true)
-        {
-            return await _blacklistStatesDbSet
-                .ConditionalInclude(blacklistUser => blacklistUser.ModifiedByUser, includeBlacklistDataHandlers)
-                .FirstOrDefaultAsync(blacklistUser => blacklistUser.UserId == userId &&
-                                                      blacklistUser.OrganizationId == userOrg.OrganizationId &&
-                                                      blacklistUser.Status == BlacklistStatus.Active);
         }
 
         private BlacklistUserDto MapBlacklistUserToBlacklistUserDto(BlacklistUser blacklistUser)
