@@ -5,9 +5,9 @@
         </a>
     </div>
 
-    <!-- TODO: fix layout. mobile does not work well if there is no text :) -->
     <div class="blacklist-history-timeline" ng-if="vm.blacklistHistoryExpanded">
-        <ul>
+        <wave-spinner ng-if="vm.isLoading"></wave-spinner>
+        <ul ng-if="!vm.isLoading">
             <li ng-repeat="entry in vm.blacklistEntries">
                 <div class="content">
                     <p class="blacklist-history-status">
