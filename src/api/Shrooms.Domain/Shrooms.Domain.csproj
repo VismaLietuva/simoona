@@ -131,7 +131,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Extensions\DbSetExtensions.cs" />
     <Compile Include="Extensions\PagedListExtensions.cs" />
     <Compile Include="Extensions\QueryableExtensions.cs" />
     <Compile Include="Helpers\BirthdayDateTimeHelper.cs" />
