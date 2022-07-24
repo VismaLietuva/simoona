@@ -4,7 +4,6 @@ using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.BlacklistUsers;
 using Shrooms.Contracts.DataTransferObjects.Employees;
 using Shrooms.Contracts.Enums;
-using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Extensions;
 using Shrooms.Domain.Helpers;
@@ -25,19 +24,16 @@ namespace Shrooms.Domain.Services.Employees
 
         private readonly IPermissionService _permissionService;
         private readonly IRoleService _roleService;
-        private readonly ISystemClock _systemClock;
 
         public EmployeeListingService(
             IUnitOfWork2 uow, 
             IPermissionService permissionService,
-            IRoleService roleService,
-            ISystemClock systemClock)
+            IRoleService roleService)
         {
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
 
             _permissionService = permissionService;
             _roleService = roleService;
-            _systemClock = systemClock;
         }
 
         public async Task<IPagedList<EmployeeDto>> GetPagedEmployeesAsync(EmployeeListingArgsDto employeeArgsDto, UserAndOrganizationDto userOrg)

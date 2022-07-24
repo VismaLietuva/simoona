@@ -23,7 +23,7 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Exceptions.Exceptions.UserAdministration;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Administration;
-using Shrooms.Domain.Services.BlacklistStates;
+using Shrooms.Domain.Services.BlacklistUsers;
 using Shrooms.Domain.Services.Impersonate;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.Organizations;

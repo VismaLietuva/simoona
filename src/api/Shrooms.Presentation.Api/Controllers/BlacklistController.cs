@@ -2,9 +2,11 @@
 using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
+using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.BlacklistUsers;
 using Shrooms.Contracts.Exceptions;
-using Shrooms.Domain.Services.BlacklistStates;
+using Shrooms.Domain.Services.BlacklistUsers;
+using Shrooms.Presentation.Api.Filters;
 using Shrooms.Presentation.WebViewModels.Models.BlacklistUsers;
 
 namespace Shrooms.Presentation.Api.Controllers
@@ -24,6 +26,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpPost]
         [Route("Add")]
+        [PermissionAuthorize(Permission = AdministrationPermissions.ApplicationUser)]
         public async Task<IHttpActionResult> AddToBlacklist(CreateBlacklistUserViewModel createViewModel)
         {
             if (!ModelState.IsValid)
@@ -47,6 +50,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpPut]
         [Route("Update")]
+        [PermissionAuthorize(Permission = AdministrationPermissions.ApplicationUser)]
         public async Task<IHttpActionResult> UpdateBlacklist([FromUri] UpdateBlacklistUserViewModel updateViewModel)
         {
             if (!ModelState.IsValid)
@@ -70,6 +74,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpPut]
         [Route("Cancel")]
+        [PermissionAuthorize(Permission = AdministrationPermissions.ApplicationUser)]
         public async Task<IHttpActionResult> CancelBlacklist(string userId)
         {
             try
@@ -86,6 +91,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [Route("Get")]
+        [PermissionAuthorize(Permission = AdministrationPermissions.ApplicationUser)]
         public async Task<IHttpActionResult> GetActiveBlacklist(string userId)
         {
             var blacklistUserDto = await _blacklistService.FindAsync(userId, GetUserAndOrganization());
@@ -102,6 +108,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [Route("History")]
+        [PermissionAuthorize(Permission = AdministrationPermissions.ApplicationUser)]
         public async Task<IHttpActionResult> GetBlacklistHistory(string userId)
         {
             var blacklistUserDtos = await _blacklistService.GetAllExceptActiveAsync(userId, GetUserAndOrganization());
