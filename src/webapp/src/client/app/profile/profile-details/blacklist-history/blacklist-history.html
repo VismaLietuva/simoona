@@ -8,7 +8,7 @@
     <div class="blacklist-history-timeline" ng-if="vm.blacklistHistoryExpanded">
         <wave-spinner ng-if="vm.isLoading"></wave-spinner>
         <ul ng-if="!vm.isLoading">
-            <li ng-repeat="entry in vm.blacklistEntries">
+            <li ng-repeat="entry in vm.blacklistEntries" ng-class="{ 'last-blacklist-entry' : $last }">
                 <div class="content">
                     <p class="blacklist-history-status">
                         {{ 'applicationUser.blacklistHistoryStatus' | translate }}:
