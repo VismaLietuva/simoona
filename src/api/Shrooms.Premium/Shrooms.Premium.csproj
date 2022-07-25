@@ -318,6 +318,7 @@
     <Compile Include="DataTransferObjects\Models\Committees\CommitteeViewDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventFilteredArgsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventParticipantsReportListingArgsDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\EventParticipantVisitedEventsListingArgsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventProjectReportDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventReportDetailsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventReportListingArgsDto.cs" />
@@ -497,6 +498,7 @@
     <Compile Include="Presentation\Api\Controllers\OrganizationalStructureController.cs" />
     <Compile Include="Presentation\Api\Controllers\ServiceRequestsController.cs" />
     <Compile Include="Presentation\Api\Controllers\VacationsController.cs" />
+    <Compile Include="Presentation\Api\Extensions\PagedListExtensions.cs" />
     <Compile Include="Presentation\ModelMappings\Helpers.cs" />
     <Compile Include="Presentation\ModelMappings\Profiles\Books.cs" />
     <Compile Include="Presentation\ModelMappings\Profiles\BooksProfile.cs" />
@@ -555,6 +557,7 @@
     <Compile Include="Presentation\WebViewModels\Events\EventOptionsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventOptionViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventParticipantsReportListingArgsViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\EventParticipantVisitedEventsListingArgsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventProjectReportViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventReportDetailsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventReportListingArgsViewModel.cs" />
@@ -594,6 +597,8 @@
     <Compile Include="Presentation\WebViewModels\User\EventUserSearchResultViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Vacations\VacationAvailableDaysViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Vacations\VacationViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\ValidationAttributes\DateTimeLessThanDateTimeAttribute.cs" />
+    <Compile Include="Presentation\WebViewModels\ValidationAttributes\DateTimeLessThanPresentDateAttribute.cs" />
     <Compile Include="Presentation\WebViewModels\ValidationAttributes\MinValueAttribute.cs" />
     <Compile Include="Presentation\WebViewModels\ValidationAttributes\ValidEndDateAttribute.cs" />
     <Compile Include="Presentation\WebViewModels\ValidationAttributes\ValidRegistrationDeadlineDateAttribute.cs" />

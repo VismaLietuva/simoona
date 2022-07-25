@@ -7,34 +7,85 @@
 
     function aceExpandParticipants() {
         var directive = {
-            templateUrl: 'app/events/event-report-list/event-report/expand-participants/expand-participants.html',
+            templateUrl:
+                'app/events/event-report-list/event-report/expand-participants/expand-participants.html',
             restrict: 'E',
             replace: true,
             scope: {
-                visitedEvents: '='
+                eventTypes: '=',
+                userId: '=',
+                startDate: '=',
+                endDate: '='
             },
             controller: expandParticipantsController,
             controllerAs: 'vm',
             bindToController: true,
-        }
+        };
 
         return directive;
     }
 
-    expandParticipantsController.$inject = [ 'lodash' ];
+    expandParticipantsController.$inject = [
+        'eventRepository',
+        'notifySrv',
+        'sortMultipleLinkService'
+    ];
 
-    function expandParticipantsController(lodash) {
+    function expandParticipantsController(eventRepository, notifySrv, sortMultipleLinkService) {
         var vm = this;
 
-        vm.filter = {
-            sortOrder: undefined,
-            sortByColumnName: undefined
-        };
+        var columnCount = 4;
 
-        vm.onSort = onSort;
+        vm.page = 1;
 
-        function onSort(sortBy, sortOrder) {
-            vm.visitedEvents = lodash.orderBy(vm.visitedEvents, [sortBy], [sortOrder]);
+        vm.sortValues = sortMultipleLinkService.getMultipleSort(columnCount);
+
+        vm.loadVisitedEventsOnPage = loadVisitedEventsOnPage;
+        vm.sortByColumn = sortByColumn;
+
+        init();
+
+        function init() {
+            loadVisitedEvents();
+        }
+
+        function loadVisitedEvents() {
+            vm.isLoading = true;
+
+            eventRepository
+                .getEventParticipantVisitedEvents(
+                    vm.userId,
+                    vm.page,
+                    vm.sortValues.getSortString(),
+                    vm.eventTypes,
+                    vm.startDate,
+                    vm.endDate
+                )
+                .then(
+                    function (response) {
+                        vm.isLoading = false;
+                        vm.events = response;
+                    },
+                    function () {
+                        notifySrv.error('errorCodeMessages.messageError');
+                    }
+                );
+        }
+
+        function sortByColumn(sortBy, sortOrder, position) {
+            onCompleteLoadFirstPage(function() {
+                vm.sortValues.setSortValues(sortBy, sortOrder, position);
+            });
+        }
+
+        function onCompleteLoadFirstPage(func) {
+            func();
+            loadVisitedEventsOnPage(1);
+        }
+
+        function loadVisitedEventsOnPage(page) {
+            vm.page = page;
+            loadVisitedEvents();
         }
     }
 })();

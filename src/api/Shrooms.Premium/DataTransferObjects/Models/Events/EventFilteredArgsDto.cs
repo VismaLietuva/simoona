@@ -3,7 +3,7 @@ using System;
 
 namespace Shrooms.Premium.DataTransferObjects.Models.Events
 {
-    public class EventFilteredArgsDto : IPageable
+    public class EventFilteredArgsDto : IPageable, IFilterableByDate
     {
         public string TypeId { get; set; }
 

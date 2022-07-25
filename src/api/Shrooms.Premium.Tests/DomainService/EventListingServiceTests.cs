@@ -347,7 +347,9 @@ namespace Shrooms.Premium.Tests.DomainService
                 KudosTypeIds = Enumerable.Empty<int>(),
                 EventTypeIds = Enumerable.Empty<int>(),
                 Page = 1,
-                PageSize = 10
+                PageSize = 10,
+                StartDate = DateTime.UtcNow.AddYears(-1),
+                EndDate = DateTime.UtcNow.AddYears(5),
             };
 
             var userOrg = new UserAndOrganizationDto
@@ -376,7 +378,9 @@ namespace Shrooms.Premium.Tests.DomainService
                 KudosTypeIds = Enumerable.Empty<int>(),
                 EventTypeIds = new List<int> { 1 },
                 Page = 1,
-                PageSize = 10
+                PageSize = 10,
+                StartDate = DateTime.UtcNow.AddYears(-1),
+                EndDate = DateTime.UtcNow.AddYears(5),
             };
 
             var userOrg = new UserAndOrganizationDto
@@ -405,7 +409,9 @@ namespace Shrooms.Premium.Tests.DomainService
                 KudosTypeIds = Enumerable.Empty<int>(),
                 EventTypeIds = Enumerable.Empty<int>(),
                 Page = 1,
-                PageSize = 10
+                PageSize = 10,
+                StartDate = DateTime.UtcNow.AddYears(-1),
+                EndDate = DateTime.UtcNow.AddYears(5)
             };
 
             var userOrg = new UserAndOrganizationDto
@@ -440,7 +446,9 @@ namespace Shrooms.Premium.Tests.DomainService
                 KudosTypeIds = Enumerable.Empty<int>(),
                 EventTypeIds = Enumerable.Empty<int>(),
                 Page = 1,
-                PageSize = 10
+                PageSize = 10,
+                StartDate = DateTime.UtcNow.AddYears(-1),
+                EndDate = DateTime.UtcNow.AddYears(5)
             };
 
             var userOrg = new UserAndOrganizationDto
@@ -469,7 +477,9 @@ namespace Shrooms.Premium.Tests.DomainService
                 EventTypeIds = Enumerable.Empty<int>(),
                 SortByProperties = "Kudos desc",
                 Page = 1,
-                PageSize = 10
+                PageSize = 10,
+                StartDate = DateTime.UtcNow.AddYears(-1),
+                EndDate = DateTime.UtcNow.AddYears(5),
             };
 
             var userOrg = new UserAndOrganizationDto
@@ -498,7 +508,9 @@ namespace Shrooms.Premium.Tests.DomainService
                 EventTypeIds = Enumerable.Empty<int>(),
                 SortByProperties = "Kudos desc",
                 Page = 1,
-                PageSize = 10
+                PageSize = 10,
+                StartDate = DateTime.UtcNow.AddYears(-1),
+                EndDate = DateTime.UtcNow.AddYears(5)
             };
 
             var userOrg = new UserAndOrganizationDto
@@ -514,7 +526,479 @@ namespace Shrooms.Premium.Tests.DomainService
             Assert.AreEqual(expectedKudosPoints, result.First().Kudos);
         }
 
+        [Test]
+        public async Task Should_Return_Visited_Events_Filtered_By_Event_Type()
+        {
+            // Arrange
+            var expectedCount = 1;
+
+            MockVisitedReportEvents();
+
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = 2
+            };
+
+            var args = new EventParticipantVisitedEventsListingArgsDto
+            {
+                UserId = "testUser1",
+                Page = 1,
+                PageSize = 10,
+                EventTypeIds = new List<int> { 1 },
+                EndDate = DateTime.UtcNow.AddYears(10),
+                StartDate = DateTime.UtcNow.AddYears(-10)
+            };
+
+            // Act
+            var result = await _eventListingService.GetEventParticipantVisitedReportEventsAsync(args, userOrg);
+
+            // Assert
+            Assert.AreEqual(expectedCount, result.Count);
+        }
+
+        [Test]
+        public async Task Should_Return_Preview_Visited_Events_Filtered_By_Date_Interval()
+        {
+            // Arrange
+            var @event = MockEventReportParticipantsTest()[0];
+            var startDate = DateTime.UtcNow.AddDays(-20);
+            var endDate = DateTime.UtcNow;
+
+            var reportListingArgs = new EventParticipantsReportListingArgsDto
+            {
+                EventId = @event.Id,
+                KudosTypeIds = Enumerable.Empty<int>(),
+                EventTypeIds = Enumerable.Empty<int>(),
+                Page = 1,
+                PageSize = 10,
+                StartDate = startDate,
+                EndDate = endDate
+            };
+
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = 3,
+                UserId = Guid.NewGuid().ToString()
+            };
+
+            // Act
+            var result = await _eventListingService.GetReportParticipantsAsync(reportListingArgs, userOrg);
+
+            // Assert
+            Assert.That(result.SelectMany(participant => participant.VisitedEvents),
+                Is.All.Matches<EventVisitedReportDto>(visitedEvent => visitedEvent.StartDate >= startDate && visitedEvent.EndDate <= endDate));
+        }
+
+        [Test]
+        public async Task Should_Return_Visited_Events_Filtered_By_Date_Interval()
+        {
+            // Arrange
+            MockVisitedReportEvents();
+
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = 2
+            };
+
+            var args = new EventParticipantVisitedEventsListingArgsDto
+            {
+                UserId = "testUser1",
+                Page = 1,
+                PageSize = 10,
+                EventTypeIds = new List<int> { 1 },
+                EndDate = DateTime.UtcNow.AddYears(1),
+                StartDate = DateTime.UtcNow.AddDays(-5)
+            };
+
+            // Act
+            var result = await _eventListingService.GetEventParticipantVisitedReportEventsAsync(args, userOrg);
+
+            // Assert
+            Assert.That(result, Is.All.Matches<EventDetailsListItemDto>(item => item.StartDate >= args.StartDate && item.EndDate <= args.EndDate));
+        }
+
+        [Test]
+        public async Task Should_Return_Visited_Events_Ordered_By_Descending_End_Date()
+        {
+            // Arrange
+            var guids = MockVisitedReportEvents();
+
+            var expectedEventIdsByNameOrder = new List<Guid>
+            {
+                guids[2],
+                guids[3],
+                guids[0]
+            };
+
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = 2
+            };
+
+            var args = new EventParticipantVisitedEventsListingArgsDto
+            {
+                UserId = "testUser1",
+                Page = 1,
+                PageSize = 10,
+                EventTypeIds = new List<int>(),
+                EndDate = DateTime.UtcNow.AddYears(10),
+                StartDate = DateTime.UtcNow.AddYears(-10),
+                SortByProperties = "Name desc;"
+            };
+
+            // Act
+            var result = await _eventListingService.GetEventParticipantVisitedReportEventsAsync(args, userOrg);
+
+            // Assert
+            CollectionAssert.AreEqual(expectedEventIdsByNameOrder, result.Select(item => item.Id));
+        }
+
         #region Mocks
+
+        private Guid[] MockVisitedReportEvents()
+        {
+            var guids = Enumerable.Repeat(0, 9).Select(_ => Guid.NewGuid()).ToArray();
+
+            var participant1 = new EventParticipant
+            {
+                ApplicationUserId = "responsibleUserId",
+                Created = DateTime.UtcNow.AddDays(-2),
+                Id = 1,
+                EventId = guids[0],
+                AttendStatus = 1
+            };
+
+            var participant2 = new EventParticipant
+            {
+                ApplicationUserId = "testUser1",
+                Created = DateTime.UtcNow.AddDays(-2),
+                Id = 2,
+                EventId = guids[0],
+                AttendStatus = 1
+            };
+
+            var participant3 = new EventParticipant
+            {
+                ApplicationUserId = "testUser2",
+                Created = DateTime.UtcNow.AddDays(-2),
+                Id = 3,
+                EventId = guids[1],
+                AttendStatus = 3
+            };
+
+            var participant4 = new EventParticipant
+            {
+                ApplicationUserId = "responsibleUserId4",
+                Created = DateTime.UtcNow.AddDays(-2),
+                Id = 4,
+                EventId = guids[4],
+                AttendStatus = 1,
+                Event = new Event(),
+                ApplicationUser = new ApplicationUser
+                {
+                    OrganizationId = 2,
+                    Id = "responsibleUserId4",
+                    FirstName = "Name",
+                    LastName = "Baraton",
+                    EmploymentDate = DateTime.UtcNow,
+                    QualificationLevel = new QualificationLevel
+                    {
+                        Name = "Epic qualification"
+                    },
+                    JobPosition = new JobPosition
+                    {
+                        Title = ".NET Developer"
+                    },
+                    Manager = new ApplicationUser
+                    {
+                        Id = "PiotrPetrovic",
+                        FirstName = "Piotr",
+                        LastName = "Petrovic"
+                    },
+                    Projects = new List<Project>
+                    {
+                        new Project
+                        {
+                            Id = 1,
+                            Name = "Cool project"
+                        }
+                    },
+                    Events = new List<Event>()
+                }
+            };
+
+            var participant5 = new EventParticipant
+            {
+                ApplicationUserId = "responsibleUserId5",
+                Created = DateTime.UtcNow.AddDays(-2),
+                Id = 5,
+                EventId = guids[4],
+                AttendStatus = 1,
+                Event = new Event(),
+                ApplicationUser = new ApplicationUser
+                {
+                    OrganizationId = 2,
+                    Id = "testUser1",
+                    FirstName = "Cool name",
+                    LastName = "Baraton",
+                    EmploymentDate = DateTime.UtcNow,
+                    QualificationLevel = new QualificationLevel
+                    {
+                        Name = "Epic qualification"
+                    },
+                    JobPosition = new JobPosition
+                    {
+                        Title = ".NET Developer"
+                    },
+                    Manager = new ApplicationUser
+                    {
+                        Id = "PiotrPetrovic",
+                        FirstName = "Piotr",
+                        LastName = "Petrovic"
+                    },
+                    Projects = new List<Project>
+                    {
+                        new Project
+                        {
+                            Id = 1,
+                            Name = "Cool project"
+                        }
+                    },
+                    Events = new List<Event>()
+                }
+            };
+
+            var participant6 = new EventParticipant
+            {
+                ApplicationUserId = "responsibleUserId6",
+                Created = DateTime.UtcNow.AddDays(-2),
+                Id = 6,
+                EventId = guids[5],
+                AttendStatus = 1,
+                Event = new Event(),
+                ApplicationUser = new ApplicationUser
+                {
+                    OrganizationId = 3,
+                    Id = "responsibleUserId6",
+                    FirstName = "Anton",
+                    LastName = "Baraton",
+                    EmploymentDate = DateTime.UtcNow,
+                    QualificationLevel = new QualificationLevel
+                    {
+                        Name = "Epic qualification"
+                    },
+                    JobPosition = new JobPosition
+                    {
+                        Title = ".NET Developer"
+                    },
+                    Manager = new ApplicationUser
+                    {
+                        Id = "PiotrPetrovic",
+                        FirstName = "Piotr",
+                        LastName = "Petrovic"
+                    },
+                    Projects = new List<Project>
+                    {
+                        new Project
+                        {
+                            Id = 1,
+                            Name = "Cool project"
+                        }
+                    },
+                    Events = new List<Event>
+                    {
+                        new Event
+                        {
+                            EndDate = DateTime.UtcNow.AddDays(-1),
+                            StartDate = DateTime.UtcNow.AddDays(-2),
+                            EventType = new EventType
+                            {
+                                Id = 1,
+                                Name = "Cool type"
+                            },
+                            OrganizationId = 3,
+                            Name = "Some kind of event"
+                        },
+
+                        new Event
+                        {
+                            EndDate = DateTime.UtcNow.AddDays(-2),
+                            StartDate = DateTime.UtcNow.AddDays(-3),
+                            EventType = new EventType
+                            {
+                                Id = 2,
+                                Name = "Awesome type"
+                            },
+                            OrganizationId = 3,
+                            Name = "Racing"
+                        },
+
+                        new Event
+                        {
+                            EndDate = DateTime.UtcNow.AddDays(-3),
+                            StartDate = DateTime.UtcNow.AddDays(-4),
+                            EventType = new EventType
+                            {
+                                Id = 1,
+                                Name = "Cool type"
+                            },
+                            OrganizationId = 3,
+                            Name = "Running"
+                        }
+                    }
+                }
+            };
+
+            var events = new List<Event>
+            {
+                new Event
+                {
+                    Id = guids[0],
+                    StartDate = DateTime.UtcNow.AddDays(-10),
+                    EndDate = DateTime.UtcNow.AddDays(-5),
+                    Created = DateTime.UtcNow,
+                    EventTypeId = 1,
+                    ResponsibleUserId = "responsibleUserId",
+                    ImageName = "imageUrl",
+                    Name = "Drinking event",
+                    Place = "City",
+                    MaxParticipants = 15,
+                    OrganizationId = 2,
+                    EventParticipants = new List<EventParticipant> { participant1, participant2 },
+                    EventOptions = new List<EventOption>(),
+                    EventType = new EventType
+                    {
+                        Id = 1,
+                        IsShownWithMainEvents = true
+                    },
+                    Offices = "[\"1\", \"2\"]"
+                },
+                new Event
+                {
+                    Id = guids[1],
+                    StartDate = DateTime.UtcNow.AddDays(2),
+                    EndDate = DateTime.UtcNow.AddDays(2),
+                    Created = DateTime.UtcNow,
+                    EventTypeId = 2,
+                    ResponsibleUserId = "responsibleUserId",
+                    ImageName = "imageUrl",
+                    Name = "Drinking event",
+                    Place = "City",
+                    MaxParticipants = 15,
+                    OrganizationId = 3,
+                    EventParticipants = new List<EventParticipant> { participant3 },
+                    EventOptions = new List<EventOption>(),
+                    EventType = new EventType
+                    {
+                        Id = 2,
+                        IsShownWithMainEvents = true
+                    },
+                    Offices = "[\"1\", \"2\"]"
+                },
+                new Event
+                {
+                    Id = guids[2],
+                    StartDate = DateTime.UtcNow.AddDays(-6),
+                    EndDate = DateTime.UtcNow.AddYears(-5),
+                    Created = DateTime.UtcNow,
+                    EventTypeId = 3,
+                    ResponsibleUserId = "responsibleUserId",
+                    ImageName = "imageUrl",
+                    Name = "Some event",
+                    Place = "Some place",
+                    MaxParticipants = 10,
+                    OrganizationId = 2,
+                    EventParticipants = new List<EventParticipant> { participant2 },
+                    EventOptions = new List<EventOption>(),
+                    EventType = new EventType
+                    {
+                        Id = 3,
+                        IsShownWithMainEvents = true
+                    },
+                    Offices = "[\"1\", \"2\"]"
+                },
+                new Event
+                {
+                    Id = guids[3],
+                    StartDate = DateTime.UtcNow.AddDays(-10),
+                    EndDate = DateTime.UtcNow.AddDays(-5),
+                    Created = DateTime.UtcNow,
+                    EventTypeId = 3,
+                    ResponsibleUserId = "responsibleUserId2",
+                    ImageName = "imageUrl",
+                    Name = "Some event",
+                    Place = "Some place",
+                    MaxParticipants = 10,
+                    OrganizationId = 2,
+                    EventParticipants = new List<EventParticipant> { participant2 },
+                    EventOptions = new List<EventOption>(),
+                    EventType = new EventType
+                    {
+                        Id = 3,
+                        IsShownWithMainEvents = true
+                    },
+                    Offices = "[\"1\"]"
+                },
+                new Event
+                {
+                    Id = guids[4],
+                    StartDate = DateTime.UtcNow.AddYears(-5),
+                    EndDate = DateTime.UtcNow.AddYears(-1),
+                    Created = DateTime.UtcNow,
+                    EventTypeId = 3,
+                    ResponsibleUserId = "responsibleUserId3",
+                    ImageName = "imageUrl",
+                    Name = "Cool event",
+                    Place = "Cool place",
+                    MaxParticipants = 10,
+                    OrganizationId = 2,
+                    EventParticipants = new List<EventParticipant> { participant4, participant5 },
+                    EventOptions = new List<EventOption>(),
+                    EventType = new EventType
+                    {
+                        Id = 3,
+                        IsShownWithMainEvents = true
+                    },
+                    Offices = "[\"1\"]"
+                },
+                new Event
+                {
+                    Id = guids[5],
+                    StartDate = DateTime.UtcNow.AddDays(10),
+                    EndDate = DateTime.UtcNow.AddDays(21),
+                    Created = DateTime.UtcNow,
+                    EventTypeId = 3,
+                    ResponsibleUserId = "responsibleUserId3",
+                    ImageName = "imageUrl",
+                    Name = "Cool event",
+                    Place = "Cool place",
+                    MaxParticipants = 10,
+                    OrganizationId = 3,
+                    EventParticipants = new List<EventParticipant> { participant6 },
+                    EventOptions = new List<EventOption>(),
+                    EventType = new EventType
+                    {
+                        Id = 3,
+                        IsShownWithMainEvents = true
+                    },
+                    Offices = "[\"2\"]"
+                }
+            };
+
+            _eventsDbSet.SetDbSetDataForAsync(events);
+            _eventParticipantsDbSet.SetDbSetDataForAsync(new List<EventParticipant>
+            {
+                participant1,
+                participant2,
+                participant3,
+                participant4,
+                participant5,
+                participant6
+            });
+
+            return guids;
+        }
+
         private Guid[] MockEventOptionsWithEvents()
         {
             var guids = Enumerable.Repeat(0, 2).Select(_ => Guid.NewGuid()).ToArray();

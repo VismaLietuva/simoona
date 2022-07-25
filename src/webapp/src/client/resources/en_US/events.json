@@ -226,5 +226,6 @@
   "buttonExpandEvents": "Expand",
   "buttonCollapseEvents": "Collapse",
   "empty": "None",
-  "moreCount": "and {{one}} more..."
+  "moreCount": "and {{one}} more...",
+  "eventReportDatePickers": "Show visited events"
 }

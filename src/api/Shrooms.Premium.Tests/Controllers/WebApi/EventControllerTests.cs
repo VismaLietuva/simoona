@@ -196,5 +196,54 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             // Assert
             Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
         }
+
+        [Test]
+        public async Task GetPagedVisitedReportEvents_Should_Return_Bad_Request_When_EventException_Is_Thrown()
+        {
+            // Arrange
+            var visitedArgsViewModel = new EventParticipantVisitedEventsListingArgsViewModel();
+
+            _eventController.Validate(visitedArgsViewModel);
+
+            // Act
+            var httpActionResult = await _eventController.GetPagedVisitedReportEvents(visitedArgsViewModel);
+            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Test]
+        public async Task GetPagedVisitedReportEvents_Should_Return_Bad_Request_When_ModelState_Is_Invalid()
+        {
+            // Arrange
+            _eventListingService.GetEventParticipantVisitedReportEventsAsync(
+                Arg.Any<EventParticipantVisitedEventsListingArgsDto>(),
+                Arg.Any<UserAndOrganizationDto>())
+                .Throws(new EventException("Error"));
+            
+            var visitedArgsViewModel = new EventParticipantVisitedEventsListingArgsViewModel();
+
+            // Act
+            var httpActionResult = await _eventController.GetPagedVisitedReportEvents(visitedArgsViewModel);
+            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Test]
+        public async Task GetPagedVisitedReportEvents_Should_Return_Ok()
+        {
+            // Arrange
+            var visitedArgsViewModel = new EventParticipantVisitedEventsListingArgsViewModel();
+
+            // Act
+            var httpActionResult = await _eventController.GetPagedVisitedReportEvents(visitedArgsViewModel);
+            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        }
     }
 }

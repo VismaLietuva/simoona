@@ -44,7 +44,8 @@
             updateAttendStatus: updateAttendStatus,
             getEventsByTitle: getEventsByTitle,
             getEventParticipants: getEventParticipants,
-            getReportEventDetails: getReportEventDetails
+            getReportEventDetails: getReportEventDetails,
+            getEventParticipantVisitedEvents: getEventParticipantVisitedEvents
         };
 
         return service;
@@ -241,13 +242,26 @@
             }).$promise;
         }
 
-        function getEventParticipants(eventId, kudosTypeIds, eventTypes, page, sortByProperties) {
+        function getEventParticipants(eventId, kudosTypeIds, eventTypes, page, sortByProperties, startDate, endDate) {
             return $resource(`${eventUrl}GetPagedReportParticipants`).get({
                 eventId: eventId,
                 kudosTypeIds: kudosTypeIds,
                 eventTypeIds: eventTypes,
                 page: page,
-                sortByProperties: sortByProperties
+                sortByProperties: sortByProperties,
+                startDate: startDate,
+                endDate: endDate
+            }).$promise;
+        }
+
+        function getEventParticipantVisitedEvents(userId, page, sortByProperties, eventTypes, startDate, endDate) {
+            return $resource(`${eventUrl}GetPagedVisitedReportEvents`).get({
+                eventTypeIds: eventTypes,
+                userId: userId,
+                page: page,
+                sortByProperties: sortByProperties,
+                startDate: startDate,
+                endDate: endDate
             }).$promise;
         }
     }

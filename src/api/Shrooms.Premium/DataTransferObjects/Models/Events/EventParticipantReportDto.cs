@@ -25,6 +25,8 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
 
         public decimal? Kudos { get; set; }
 
+        public int TotalVisitedEventCount { get; set; }
+
         public ICollection<EventVisitedReportDto> VisitedEvents { get; set; }
 
         public ICollection<EventProjectReportDto> Projects { get; set; }
