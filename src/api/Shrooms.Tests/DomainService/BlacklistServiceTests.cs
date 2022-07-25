@@ -583,5 +583,56 @@ namespace Shrooms.Tests.DomainService
             // Assert
             Assert.IsNull(result);
         }
+
+        [Test]
+        public async Task GetAllExceptActiveAsync_ValidValues_DoesNotReturnActiveBlacklistEntries()
+        {
+            // Arrange
+            var userId = "Id";
+
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = 1
+            };
+
+            var blacklistUsers = new List<BlacklistUser>
+            {
+                new BlacklistUser
+                {
+                    UserId = userId,
+                    EndDate = DateTime.UtcNow.AddDays(10),
+                    OrganizationId = 1,
+                    Status = BlacklistStatus.Active,
+                    ModifiedByUser = new ApplicationUser(),
+                    CreatedByUser = new ApplicationUser()
+                },
+                new BlacklistUser
+                {
+                    UserId = userId,
+                    EndDate = DateTime.UtcNow.AddDays(-10),
+                    OrganizationId = 1,
+                    Status = BlacklistStatus.Expired,
+                    ModifiedByUser = new ApplicationUser(),
+                    CreatedByUser = new ApplicationUser()
+                },
+                new BlacklistUser
+                {
+                    UserId = "Id2",
+                    EndDate = DateTime.UtcNow.AddYears(20),
+                    OrganizationId = 1,
+                    Status = BlacklistStatus.Canceled,
+                    ModifiedByUser = new ApplicationUser(),
+                    CreatedByUser = new ApplicationUser()
+                }
+            };
+
+            _blacklistUsersDbSet.SetDbSetDataForAsync(blacklistUsers);
+
+            // Act
+            var result = await _blacklistService.GetAllExceptActiveAsync(userId, userOrg);
+
+            // Assert
+            Assert.That(result, Is.All.Matches<BlacklistUserDto>(entry => entry.Status != BlacklistStatus.Active));
+        }
     }
 }
