@@ -7,7 +7,7 @@ using Shrooms.DataLayer.EntityModels.Models;
 using System.Data.Entity;
 using System.Threading.Tasks;
 
-namespace Shrooms.Domain.ServiceValidators.Validators.BlacklistStates
+namespace Shrooms.Domain.ServiceValidators.Validators.BlacklistUsers
 {
     public class BlacklistValidator : IBlacklistValidator
     {

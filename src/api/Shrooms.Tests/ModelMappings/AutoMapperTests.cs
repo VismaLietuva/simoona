@@ -76,9 +76,9 @@ namespace Shrooms.Tests.ModelMappings
         }
 
         [Test]
-        public void Mapping_BlacklistState_Models()
+        public void Mapping_BlacklistUsers_Models()
         {
-            _mapper.ConfigurationProvider.AssertConfigurationIsValid<BlacklistStates>();
+            _mapper.ConfigurationProvider.AssertConfigurationIsValid<BlacklistUsers>();
         }
     }
 }

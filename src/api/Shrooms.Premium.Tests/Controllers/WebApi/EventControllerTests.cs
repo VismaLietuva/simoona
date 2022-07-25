@@ -59,6 +59,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 postService,
                 officeMapService,
                 asyncRunner);
+
             _eventController.SetUpControllerForTesting();
         }
 
@@ -221,7 +222,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 Arg.Any<EventParticipantVisitedEventsListingArgsDto>(),
                 Arg.Any<UserAndOrganizationDto>())
                 .Throws(new EventException("Error"));
-            
+
             var visitedArgsViewModel = new EventParticipantVisitedEventsListingArgsViewModel();
 
             // Act

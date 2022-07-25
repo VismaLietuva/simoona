@@ -338,9 +338,9 @@ namespace Shrooms.Presentation.Api.Controllers
                 model.PhoneNumber = null;
             }
 
-            if ((isAdmin || usersProfile) && _blacklistStateService.TryFindActiveBlacklistState(user.BlacklistEntries, out var blacklistStateDto))
+            if ((isAdmin || usersProfile) && _blacklistStateService.TryFindActiveBlacklistUserEntry(user.BlacklistEntries, out var blacklistUserDto))
             {
-                model.BlacklistEntry = _mapper.Map<BlacklistUserDto, BlacklistUserViewModel>(blacklistStateDto);
+                model.BlacklistEntry = _mapper.Map<BlacklistUserDto, BlacklistUserViewModel>(blacklistUserDto);
             }
         }
 

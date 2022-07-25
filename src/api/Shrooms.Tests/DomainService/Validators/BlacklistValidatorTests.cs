@@ -1,62 +1,57 @@
 ﻿using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using System;
 using System.Data.Entity;
 using Shrooms.Tests.Extensions;
-using Shrooms.Domain.ServiceValidators.Validators.BlacklistStates;
+using Shrooms.Domain.ServiceValidators.Validators.BlacklistUsers;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Exceptions;
 using System.Collections.Generic;
 using Shrooms.Contracts.DataTransferObjects;
-using Shrooms.Contracts.DataTransferObjects.BlacklistStates;
+using Shrooms.Contracts.Enums;
 
 namespace Shrooms.Tests.DomainService.Validators
 {
     [TestFixture]
-    public class BlacklistStateValidatorTests
+    public class BlacklistValidatorTests
     {
         private DbSet<ApplicationUser> _usersDbSet;
-        private DbSet<BlacklistState> _blacklistStatesDbSet;
+        private DbSet<BlacklistUser> _blacklistStatesDbSet;
 
-        private BlacklistStateValidator _validator;
+        private BlacklistValidator _validator;
 
         [SetUp]
         public void TestInitializer()
         {
-            var systemClock = Substitute.For<ISystemClock>();
-
-            systemClock.UtcNow.Returns(DateTime.UtcNow);
-
             var uow = Substitute.For<IUnitOfWork2>();
 
             _usersDbSet = uow.MockDbSetForAsync<ApplicationUser>();
-            _blacklistStatesDbSet = uow.MockDbSetForAsync<BlacklistState>();
+            _blacklistStatesDbSet = uow.MockDbSetForAsync<BlacklistUser>();
 
             uow.GetDbSet<ApplicationUser>().Returns(_usersDbSet);
-            uow.GetDbSet<BlacklistState>().Returns(_blacklistStatesDbSet);
+            uow.GetDbSet<BlacklistUser>().Returns(_blacklistStatesDbSet);
 
-            _validator = new BlacklistStateValidator(systemClock, uow);
+            _validator = new BlacklistValidator(uow);
         }
 
         [Test]
         public void CheckIfBlacklistStateExists_WhenBlacklistStateIsNull_ThrowsValidationException()
         {
-            Assert.Throws<ValidationException>(() => _validator.CheckIfBlacklistStateExists(null));
+            Assert.Throws<ValidationException>(() => _validator.CheckIfBlacklistUserExists(null));
         }
 
         [Test]
         public void CheckIfBlacklistStateExists_WhenBlacklistStateIsNotNull_DoesNotThrow()
         {
-            Assert.DoesNotThrow(() => _validator.CheckIfBlacklistStateExists(new BlacklistState()));
+            Assert.DoesNotThrow(() => _validator.CheckIfBlacklistUserExists(new BlacklistUser()));
         }
 
         [Test]
         public void CheckIfUserExistsAsync_WhenUserIsFound_DoesNotThrow()
         {
             // Arrange
-            var userId = "Id";
+            const string userId = "Id";
             var users = new List<ApplicationUser>
             {
                 new ApplicationUser
@@ -103,20 +98,14 @@ namespace Shrooms.Tests.DomainService.Validators
         }
 
         [Test]
-        public void CheckIfUserIsAlreadyBlacklistedAsync_WhenBlacklistStateIsFound_ThrowsValidationException()
+        public void CheckIfUserIsAlreadyBlacklistedAsync_WhenBlacklistEntryIsFound_ThrowsValidationException()
         {
             // Arrange
-            var userId = "Id";
+            const string userId = "Id";
 
-            var blacklistStateDto = new BlacklistStateDto
+            var blacklistUsers = new List<BlacklistUser>
             {
-                UserId = userId,
-                EndDate = DateTime.UtcNow.AddYears(1)
-            };
-
-            var blacklistStates = new List<BlacklistState>
-            {
-                new BlacklistState
+                new BlacklistUser
                 {
                     UserId = userId,
                     EndDate = DateTime.UtcNow.AddYears(1),
@@ -129,31 +118,26 @@ namespace Shrooms.Tests.DomainService.Validators
                 OrganizationId = 1
             };
 
-            _blacklistStatesDbSet.SetDbSetDataForAsync(blacklistStates);
+            _blacklistStatesDbSet.SetDbSetDataForAsync(blacklistUsers);
 
             // Assert
-            Assert.ThrowsAsync<ValidationException>(async () => await _validator.CheckIfUserIsAlreadyBlacklistedAsync(blacklistStateDto, userOrg));
+            Assert.ThrowsAsync<ValidationException>(async () => await _validator.CheckIfUserIsAlreadyBlacklistedAsync(userId, userOrg));
         }
 
         [Test]
-        public void CheckIfUserIsAlreadyBlacklistedAsync_WhenBlacklistStatesAreExpired_DoesNotThrow()
+        public void CheckIfUserIsAlreadyBlacklistedAsync_WhenBlacklistEntriesAreExpired_DoesNotThrow()
         {
             // Arrange
-            var userId = "Id";
+            const string userId = "Id";
 
-            var blacklistStateDto = new BlacklistStateDto
+            var blacklistUsers = new List<BlacklistUser>
             {
-                UserId = userId,
-                EndDate = DateTime.UtcNow.AddYears(1)
-            };
-
-            var blacklistStates = new List<BlacklistState>
-            {
-                new BlacklistState
+                new BlacklistUser
                 {
                     UserId = userId,
                     EndDate = DateTime.UtcNow.AddYears(-1),
-                    OrganizationId = 1
+                    OrganizationId = 1,
+                    Status = BlacklistStatus.Expired
                 }
             };
 
@@ -162,25 +146,19 @@ namespace Shrooms.Tests.DomainService.Validators
                 OrganizationId = 1
             };
 
-            _blacklistStatesDbSet.SetDbSetDataForAsync(blacklistStates);
+            _blacklistStatesDbSet.SetDbSetDataForAsync(blacklistUsers);
 
             // Assert
-            Assert.DoesNotThrowAsync(async () => await _validator.CheckIfUserIsAlreadyBlacklistedAsync(blacklistStateDto, userOrg));
+            Assert.DoesNotThrowAsync(async () => await _validator.CheckIfUserIsAlreadyBlacklistedAsync(userId, userOrg));
         }
 
         [Test]
         public void CheckIfUserIsAlreadyBlacklistedAsync_WhenBlacklistStateIsNotFound_DoesNotThrow()
         {
             // Arrange
-            var userId = "Id";
+            const string userId = "Id";
 
-            var blacklistStateDto = new BlacklistStateDto
-            {
-                UserId = userId,
-                EndDate = DateTime.UtcNow.AddYears(1)
-            };
-
-            var blacklistStates = new List<BlacklistState>();
+            var blacklistStates = new List<BlacklistUser>();
 
             var userOrg = new UserAndOrganizationDto
             {
@@ -190,7 +168,7 @@ namespace Shrooms.Tests.DomainService.Validators
             _blacklistStatesDbSet.SetDbSetDataForAsync(blacklistStates);
 
             // Assert
-            Assert.DoesNotThrowAsync(async () => await _validator.CheckIfUserIsAlreadyBlacklistedAsync(blacklistStateDto, userOrg));
+            Assert.DoesNotThrowAsync(async () => await _validator.CheckIfUserIsAlreadyBlacklistedAsync(userId, userOrg));
         }
     }
 }

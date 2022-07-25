@@ -1,6 +1,6 @@
 ﻿using Autofac;
 using Shrooms.Domain.Services.BlacklistUsers;
-using Shrooms.Domain.ServiceValidators.Validators.BlacklistStates;
+using Shrooms.Domain.ServiceValidators.Validators.BlacklistUsers;
 
 namespace Shrooms.IoC.Modules
 {

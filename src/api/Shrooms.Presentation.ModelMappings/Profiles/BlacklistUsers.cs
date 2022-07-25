@@ -14,8 +14,26 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<CreateBlacklistUserViewModel, BlacklistUserDto>();
-            CreateMap<UpdateBlacklistUserViewModel, BlacklistUserDto>();
+            CreateMap<CreateBlacklistUserViewModel, BlacklistUserDto>()
+                .Ignore(opt => opt.Modified)
+                .Ignore(opt => opt.ModifiedBy)
+                .Ignore(opt => opt.ModifiedByUserFirstName)
+                .Ignore(opt => opt.ModifiedByUserLastName)
+                .Ignore(opt => opt.Created)
+                .Ignore(opt => opt.CreatedBy)
+                .Ignore(opt => opt.CreatedByUserFirstName)
+                .Ignore(opt => opt.CreatedByUserLastName)
+                .Ignore(opt => opt.Status);
+            CreateMap<UpdateBlacklistUserViewModel, BlacklistUserDto>()
+                .Ignore(opt => opt.Modified)
+                .Ignore(opt => opt.ModifiedBy)
+                .Ignore(opt => opt.ModifiedByUserFirstName)
+                .Ignore(opt => opt.ModifiedByUserLastName)
+                .Ignore(opt => opt.Created)
+                .Ignore(opt => opt.CreatedBy)
+                .Ignore(opt => opt.CreatedByUserFirstName)
+                .Ignore(opt => opt.CreatedByUserLastName)
+                .Ignore(opt => opt.Status);
             CreateMap<CreateBlacklistUserViewModel, CreateBlacklistUserDto>();
             CreateMap<UpdateBlacklistUserViewModel, UpdateBlacklistUserDto>();
         }

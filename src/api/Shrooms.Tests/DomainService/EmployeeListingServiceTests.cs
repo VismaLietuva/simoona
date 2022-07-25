@@ -15,7 +15,6 @@ using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Employees;
 using Shrooms.Domain.Helpers;
 using System.Linq;
-using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace Shrooms.Tests.DomainService
 {
@@ -25,7 +24,6 @@ namespace Shrooms.Tests.DomainService
         private EmployeeListingService _employeeListingService;
 
         private DbSet<ApplicationUser> _usersDbSet;
-        private ISystemClock _systemClock;
         private IRoleService _roleService;
         private IPermissionService _permissionService;
 
@@ -38,15 +36,13 @@ namespace Shrooms.Tests.DomainService
 
             uow.GetDbSet<ApplicationUser>().Returns(_usersDbSet);
 
-            _systemClock = Substitute.For<ISystemClock>();
             _roleService = Substitute.For<IRoleService>();
             _permissionService = Substitute.For<IPermissionService>();
 
             _employeeListingService = new EmployeeListingService(
                 uow,
                 _permissionService,
-                _roleService,
-                _systemClock);
+                _roleService);
         }
 
         [Test]
@@ -88,7 +84,7 @@ namespace Shrooms.Tests.DomainService
             var result = await _employeeListingService.GetPagedEmployeesAsync(args, userOrg);
 
             // Assert
-            Assert.That(result, Is.All.Matches<EmployeeDto>(employee => employee.BlacklistState == null));
+            Assert.That(result, Is.All.Matches<EmployeeDto>(employee => employee.BlacklistEntry == null));
             Assert.That(result, Is.All.Matches<EmployeeDto>(employee => employee.PhoneNumber == null));
             Assert.That(result, Is.All.Matches<EmployeeDto>(employee => employee.BirthDay == expectedBirthdayValue));
         }
@@ -108,7 +104,7 @@ namespace Shrooms.Tests.DomainService
             var expectedEmployeeIds = employees
                 .Where(employee => employee.FirstName == "Anton")
                 .Select(employee => employee.Id);
-            
+
             _usersDbSet.SetDbSetDataForAsync(employees);
 
             _permissionService
@@ -198,7 +194,7 @@ namespace Shrooms.Tests.DomainService
             var result = await _employeeListingService.GetPagedEmployeesAsync(args, userOrg);
 
             // Assert
-            Assert.That(result, Is.All.Matches<EmployeeDto>(employee => employee.BlacklistState != null));
+            Assert.That(result, Is.All.Matches<EmployeeDto>(employee => employee.BlacklistEntry != null));
         }
 
         [Test]
@@ -297,7 +293,7 @@ namespace Shrooms.Tests.DomainService
                         StartTime = new TimeSpan(),
                         EndTime = new TimeSpan()
                     },
-                    BlacklistStates = new List<BlacklistState>()
+                    BlacklistEntries = new List<BlacklistUser>()
                 },
 
                 new ApplicationUser
@@ -317,7 +313,7 @@ namespace Shrooms.Tests.DomainService
                         StartTime = new TimeSpan(),
                         EndTime = new TimeSpan()
                     },
-                    BlacklistStates = new List<BlacklistState>()
+                    BlacklistEntries = new List<BlacklistUser>()
                 },
 
                 new ApplicationUser
@@ -337,9 +333,9 @@ namespace Shrooms.Tests.DomainService
                         StartTime = new TimeSpan(),
                         EndTime = new TimeSpan()
                     },
-                    BlacklistStates = new List<BlacklistState>
+                    BlacklistEntries = new List<BlacklistUser>
                     {
-                        new BlacklistState
+                        new BlacklistUser
                         {
                             EndDate = DateTime.MaxValue
                         }

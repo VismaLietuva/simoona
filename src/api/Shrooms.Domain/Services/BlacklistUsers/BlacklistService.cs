@@ -4,7 +4,7 @@ using Shrooms.Contracts.DataTransferObjects.BlacklistUsers;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
-using Shrooms.Domain.ServiceValidators.Validators.BlacklistStates;
+using Shrooms.Domain.ServiceValidators.Validators.BlacklistUsers;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -97,7 +97,7 @@ namespace Shrooms.Domain.Services.BlacklistUsers
             await _uow.SaveChangesAsync(false);
         }
 
-        public bool TryFindActiveBlacklistState(ICollection<BlacklistUser> blacklistUsers, out BlacklistUserDto blacklistUserDto)
+        public bool TryFindActiveBlacklistUserEntry(ICollection<BlacklistUser> blacklistUsers, out BlacklistUserDto blacklistUserDto)
         {
             blacklistUserDto = null;
 
