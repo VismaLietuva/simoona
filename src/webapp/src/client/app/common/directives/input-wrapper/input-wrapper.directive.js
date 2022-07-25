@@ -39,7 +39,7 @@
             scope.inputId = input.attr('id');
             scope.charLimit = input.attr('ng-maxlength');
             scope.minlength = input.attr('ng-minlength');
-            scope.minDate ||= '1900-01-01';
+            scope.minDate = scope.minDate || '1900-01-01';
 
             scope.isRequired = !!input.attr('required');
             scope.isExclamationMarkEnabled = scope.exclamationMark ? exclamatedTypes.indexOf(scope.inputType !== -1) : false;
