@@ -29,6 +29,12 @@
 
         $scope.isNewUser = authService.isInRole('NewUser');
 
+        init();
+
+        function init() {
+            reapplyTabdrop();
+        }
+
         function displayedName() {
             return $scope.personalInfo.firstName && $scope.personalInfo.lastName ?
                 $scope.personalInfo.firstName + ' ' + $scope.personalInfo.lastName : $scope.personalInfo.userName;
@@ -47,6 +53,12 @@
                 loadData(tab);
             }
         };
+
+        function reapplyTabdrop() {
+            setTimeout(function() {
+                $('.nav.nav-tabs').tabdrop('layout');
+            }, 100);
+        }
 
         function loadData(tab) {
             if (tab === 'job') {
