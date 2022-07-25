@@ -208,6 +208,7 @@
     <Compile Include="DomainService\Validators\FilterPresetValidatorTests.cs" />
     <Compile Include="DomainService\Validators\WallValidatorTests.cs" />
     <Compile Include="DomainService\WallServiceTests.cs" />
+    <Compile Include="DomainService\WebHookCallbacks\BlacklistUserStatusChangeWebHookServiceTests.cs" />
     <Compile Include="DomainService\WebHookCallbacks\UsersAnonymizationWebHookServiceTests.cs" />
     <Compile Include="Entities\KudosLogTests.cs" />
     <Compile Include="Extensions\QueryableExtensionsTests.cs" />
