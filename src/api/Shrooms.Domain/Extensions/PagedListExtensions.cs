@@ -5,7 +5,6 @@ using X.PagedList;
 
 namespace Shrooms.Domain.Extensions
 {
-    // TODO: Remove from Premium when another PR gets merged
     public static class PagedListExtensions
     {
         /// <summary>
