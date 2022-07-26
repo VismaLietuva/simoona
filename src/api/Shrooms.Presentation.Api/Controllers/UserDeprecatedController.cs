@@ -327,7 +327,7 @@ namespace Shrooms.Presentation.Api.Controllers
             var permissions = await _permissionService.GetUserPermissionsAsync(userOrg.UserId, userOrg.OrganizationId);
             
             var hasApplicationUserPermission = permissions.Contains(AdministrationPermissions.ApplicationUser);
-            var hasBlacklistPermission = permissions.Contains(AdministrationPermissions.Blacklist);
+            var hasBlacklistPermission = permissions.Contains(BasicPermissions.Blacklist);
 
             var usersProfile = User.Identity.GetUserId() == user.Id;
 

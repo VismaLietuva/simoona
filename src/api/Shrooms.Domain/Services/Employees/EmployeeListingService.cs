@@ -41,7 +41,7 @@ namespace Shrooms.Domain.Services.Employees
             var permissions = await _permissionService.GetUserPermissionsAsync(userOrg.UserId, userOrg.OrganizationId);
 
             var hasApplicationUserPermission = permissions.Contains(AdministrationPermissions.ApplicationUser);
-            var hasBlacklistPermission = permissions.Contains(AdministrationPermissions.Blacklist);
+            var hasBlacklistPermission = permissions.Contains(BasicPermissions.Blacklist);
 
             var newUserRoleId = await _roleService.GetRoleIdByNameAsync(Contracts.Constants.Roles.NewUser);
 

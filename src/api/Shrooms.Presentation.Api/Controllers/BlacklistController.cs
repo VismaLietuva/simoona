@@ -91,7 +91,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [Route("Get")]
-        [PermissionAuthorize(Permission = AdministrationPermissions.Blacklist)]
+        [PermissionAuthorize(Permission = BasicPermissions.Blacklist)]
         public async Task<IHttpActionResult> GetActiveBlacklist(string userId)
         {
             var blacklistUserDto = await _blacklistService.FindAsync(userId, GetUserAndOrganization());

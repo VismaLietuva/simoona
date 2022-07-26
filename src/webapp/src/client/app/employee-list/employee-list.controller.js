@@ -29,7 +29,7 @@
         ]);
 
         $scope.hasBlacklistPermission = authService.hasPermissions([
-            'BLACKLIST_ADMINISTRATION'
+            'BLACKLIST_BASIC'
         ]);
 
         $scope.filter = {

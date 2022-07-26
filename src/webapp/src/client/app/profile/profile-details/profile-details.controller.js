@@ -31,7 +31,7 @@
         $rootScope.pageTitle = 'applicationUser.entityName';
 
         $scope.isAdmin = authService.hasPermissions(['APPLICATIONUSER_ADMINISTRATION']);
-        $scope.hasBlacklistPermission = authService.hasPermissions(['BLACKLIST_ADMINISTRATION']);
+        $scope.hasBlacklistPermission = authService.hasPermissions(['BLACKLIST_BASIC']);
         $scope.identity = authService.identity;
         $scope.isCurrentUser = $stateParams.id === authService.identity.userId;
         $scope.isNewUser = isNewUser;
