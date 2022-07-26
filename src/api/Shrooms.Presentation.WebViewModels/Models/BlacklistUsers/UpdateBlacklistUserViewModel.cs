@@ -11,9 +11,9 @@ namespace Shrooms.Presentation.WebViewModels.Models.BlacklistUsers
         public string UserId { get; set; }
 
         [DateTimeNotExpired]
-        public DateTime EndDate { get; set; } = DateTime.UtcNow.AddYears(WebApiConstants.DefaultBlacklistYearDuration);
+        public DateTime EndDate { get; set; } = DateTime.UtcNow.AddYears(WebApiConstants.DefaultBlacklistDurationInYears);
 
-        [StringLength(ValidationConstants.BlacklistStateReasonMaxLength)]
+        [StringLength(ValidationConstants.BlacklistReasonMaxLength)]
         public string Reason { get; set; }
     }
 }

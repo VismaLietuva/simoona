@@ -70,7 +70,7 @@ namespace Shrooms.Presentation.Api.Controllers
         private readonly IProjectsService _projectService;
         private readonly IKudosService _kudosService;
         private readonly IPictureService _pictureService;
-        private readonly IBlacklistService _blacklistStateService;
+        private readonly IBlacklistService _blacklistService;
 
         public UserDeprecatedController(IMapper mapper,
             IUnitOfWork unitOfWork,
@@ -85,7 +85,7 @@ namespace Shrooms.Presentation.Api.Controllers
             IProjectsService projectService,
             IKudosService kudosService,
             IPictureService pictureService,
-            IBlacklistService blacklistStateService)
+            IBlacklistService blacklistService)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -107,7 +107,7 @@ namespace Shrooms.Presentation.Api.Controllers
             _projectService = projectService;
             _kudosService = kudosService;
             _pictureService = pictureService;
-            _blacklistStateService = blacklistStateService;
+            _blacklistService = blacklistService;
         }
 
         private async Task<bool> HasPermissionAsync(UserAndOrganizationDto userOrg, string permission)
@@ -343,7 +343,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 model.PhoneNumber = null;
             }
 
-            if ((hasBlacklistPermission || usersProfile) && _blacklistStateService.TryFindActiveBlacklistUserEntry(user.BlacklistEntries, out var blacklistUserDto))
+            if ((hasBlacklistPermission || usersProfile) && _blacklistService.TryFindActiveBlacklistUserEntry(user.BlacklistEntries, out var blacklistUserDto))
             {
                 model.BlacklistEntry = _mapper.Map<BlacklistUserDto, BlacklistUserViewModel>(blacklistUserDto);
             }

@@ -16,6 +16,6 @@
 
         public const int FilterPresetMaxNameLength = 30;
 
-        public const int BlacklistStateReasonMaxLength = 2000;
+        public const int BlacklistReasonMaxLength = 2000;
     }
 }

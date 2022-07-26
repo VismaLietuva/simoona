@@ -20,7 +20,7 @@ namespace Shrooms.Domain.Services.BlacklistUsers
         private readonly IBlacklistValidator _validator;
         private readonly ISystemClock _systemClock;
 
-        private readonly IDbSet<BlacklistUser> _blacklistStatesDbSet;
+        private readonly IDbSet<BlacklistUser> _blacklistUsersDbSet;
 
         public BlacklistService(IUnitOfWork2 uow, IBlacklistValidator validator, ISystemClock systemClock)
         {
@@ -28,7 +28,7 @@ namespace Shrooms.Domain.Services.BlacklistUsers
             _validator = validator;
             _systemClock = systemClock;
 
-            _blacklistStatesDbSet = uow.GetDbSet<BlacklistUser>();
+            _blacklistUsersDbSet = uow.GetDbSet<BlacklistUser>();
         }
 
         public async Task CreateAsync(CreateBlacklistUserDto createDto, UserAndOrganizationDto userOrg)
@@ -38,7 +38,7 @@ namespace Shrooms.Domain.Services.BlacklistUsers
 
             var timestamp = _systemClock.UtcNow;
 
-            var blacklistState = new BlacklistUser
+            var blacklistUser = new BlacklistUser
             {
                 UserId = createDto.UserId,
                 CreatedBy = userOrg.UserId,
@@ -51,14 +51,14 @@ namespace Shrooms.Domain.Services.BlacklistUsers
                 Status = BlacklistStatus.Active
             };
 
-            _blacklistStatesDbSet.Add(blacklistState);
+            _blacklistUsersDbSet.Add(blacklistUser);
 
             await _uow.SaveChangesAsync(false);
         }
 
         public async Task CancelAsync(string userId, UserAndOrganizationDto userOrg)
         {
-            var blacklistUser = await _blacklistStatesDbSet
+            var blacklistUser = await _blacklistUsersDbSet
                 .SingleOrDefaultAsync(FindActiveBlacklistEntry(userId, userOrg));
 
             _validator.CheckIfBlacklistUserExists(blacklistUser);
@@ -72,7 +72,7 @@ namespace Shrooms.Domain.Services.BlacklistUsers
 
         public async Task<BlacklistUserDto> FindAsync(string userId, UserAndOrganizationDto userOrg)
         {
-            var blacklistUser = await _blacklistStatesDbSet
+            var blacklistUser = await _blacklistUsersDbSet
                 .Include(entry => entry.CreatedByUser)
                 .Include(entry => entry.ModifiedByUser)
                 .SingleOrDefaultAsync(FindActiveBlacklistEntry(userId, userOrg));
@@ -84,7 +84,7 @@ namespace Shrooms.Domain.Services.BlacklistUsers
 
         public async Task UpdateAsync(UpdateBlacklistUserDto updateDto, UserAndOrganizationDto userOrg)
         {
-            var blacklistState = await _blacklistStatesDbSet
+            var blacklistState = await _blacklistUsersDbSet
                 .SingleOrDefaultAsync(FindActiveBlacklistEntry(updateDto.UserId, userOrg));
 
             _validator.CheckIfBlacklistUserExists(blacklistState);
@@ -120,7 +120,7 @@ namespace Shrooms.Domain.Services.BlacklistUsers
 
         public async Task<IEnumerable<BlacklistUserDto>> GetAllExceptActiveAsync(string userId, UserAndOrganizationDto userOrg)
         {
-            return await _blacklistStatesDbSet
+            return await _blacklistUsersDbSet
                 .Include(blacklistUser => blacklistUser.CreatedByUser)
                 .Include(blacklistUser => blacklistUser.ModifiedByUser)
                 .Where(blacklistUser => blacklistUser.UserId == userId &&

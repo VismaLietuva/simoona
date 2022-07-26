@@ -38,7 +38,7 @@
         $scope.isFirstLogin = isFirstLogin;
         $scope.confirmUser = confirmUser;
         $scope.isPremium = $window.isPremium;
-        $scope.showBlacklistHistory = $scope.hasBlacklistPermission && $scope.model.userBlacklistedMoreThanOnce;
+        $scope.showBlacklistHistory = $scope.hasBlacklistPermission && $scope.model.userWasPreviouslyBlacklisted;
         $scope.showBlacklistInformation = ($scope.isCurrentUser || $scope.hasBlacklistPermission) && $scope.model.blacklistEntry;
         $scope.blacklistHistoryExpanded = false;
         //$scope.submitJobInfo = submitJobInfo;

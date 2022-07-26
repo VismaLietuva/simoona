@@ -143,7 +143,7 @@ namespace Shrooms.DataLayer.EntityModels.Models
         public virtual ICollection<BlacklistUser> BlacklistEntries { get; set; }
 
         [NotMapped]
-        public bool UserBlacklistedMoreThanOnce
+        public bool UserWasPreviouslyBlacklisted
         {
             get
             {

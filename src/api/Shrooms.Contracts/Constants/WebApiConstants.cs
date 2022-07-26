@@ -49,7 +49,7 @@
         #endregion
 
         #region BlacklistState
-        public const int DefaultBlacklistYearDuration = 2; 
+        public const int DefaultBlacklistDurationInYears = 2; 
         #endregion
 
         public const int WallNameMaxLength = 35;

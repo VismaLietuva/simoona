@@ -46,7 +46,7 @@ namespace Shrooms.Presentation.WebViewModels.Models.User
 
         public BlacklistUserViewModel BlacklistEntry { get; set; }
 
-        public bool UserBlacklistedMoreThanOnce { get; set; }
+        public bool UserWasPreviouslyBlacklisted { get; set; }
 
         public DateTime? EmploymentDate { get; set; }
 

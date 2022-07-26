@@ -95,11 +95,11 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void CancelAsync_BlacklistStateDoesNotExists_ThrowsValidationException()
+        public void CancelAsync_BlacklistEntryDoesNotExists_ThrowsValidationException()
         {
             // Arrange
             var userId = "Id";
-            var blacklistStateToDelete = new BlacklistUser
+            var blacklistEntryToDelete = new BlacklistUser
             {
                 UserId = userId,
                 Reason = string.Empty,
@@ -112,7 +112,7 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 1
             };
 
-            _blacklistUsersDbSet.SetDbSetDataForAsync(new List<BlacklistUser> { blacklistStateToDelete });
+            _blacklistUsersDbSet.SetDbSetDataForAsync(new List<BlacklistUser> { blacklistEntryToDelete });
             _validator
                 .When(validator => validator.CheckIfBlacklistUserExists(Arg.Any<BlacklistUser>()))
                 .Do(validator => { throw new ValidationException(0); });
@@ -126,7 +126,7 @@ namespace Shrooms.Tests.DomainService
         {
             // Arrange
             var userId = "Id";
-            var blacklistStateToDelete = new BlacklistUser
+            var blacklistEntryToDelete = new BlacklistUser
             {
                 UserId = userId,
                 Reason = string.Empty,
@@ -140,7 +140,7 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 1
             };
 
-            _blacklistUsersDbSet.SetDbSetDataForAsync(new List<BlacklistUser> { blacklistStateToDelete });
+            _blacklistUsersDbSet.SetDbSetDataForAsync(new List<BlacklistUser> { blacklistEntryToDelete });
             _validator
                 .When(validator => validator.CheckIfBlacklistUserExists(Arg.Is((BlacklistUser)null)))
                 .Do(validator => { throw new ValidationException(0); });
@@ -154,7 +154,7 @@ namespace Shrooms.Tests.DomainService
         {
             // Arrange
             var userId = "Id";
-            var blacklistStateToCancel = new BlacklistUser
+            var blacklistEntryToCancel = new BlacklistUser
             {
                 UserId = userId,
                 Reason = string.Empty,
@@ -168,13 +168,13 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 1
             };
 
-            _blacklistUsersDbSet.SetDbSetDataForAsync(new List<BlacklistUser> { blacklistStateToCancel });
+            _blacklistUsersDbSet.SetDbSetDataForAsync(new List<BlacklistUser> { blacklistEntryToCancel });
 
             // Act
             await _blacklistService.CancelAsync(userId, userOrg);
 
             // Assert
-            Assert.AreEqual(BlacklistStatus.Canceled, blacklistStateToCancel.Status);
+            Assert.AreEqual(BlacklistStatus.Canceled, blacklistEntryToCancel.Status);
         }
 
         [Test]
@@ -468,7 +468,7 @@ namespace Shrooms.Tests.DomainService
                 CreatedByUser = new ApplicationUser()
             };
 
-            var blacklistStates = new List<BlacklistUser>
+            var blacklistUsers = new List<BlacklistUser>
             {
                 foundEntry,
                 new BlacklistUser
@@ -486,7 +486,7 @@ namespace Shrooms.Tests.DomainService
             };
 
             // Act 
-            var result = _blacklistService.TryFindActiveBlacklistUserEntry(blacklistStates, out _);
+            var result = _blacklistService.TryFindActiveBlacklistUserEntry(blacklistUsers, out _);
 
             // Assert
             Assert.IsTrue(result);
@@ -496,10 +496,10 @@ namespace Shrooms.Tests.DomainService
         public void TryFindActiveBlacklistUserEntry_WhenBlacklistEntryIsNotFound_ReturnsFalse()
         {
             // Arrange
-            var blacklistStates = new List<BlacklistUser>();
+            var blacklistUsers = new List<BlacklistUser>();
 
             // Act 
-            var result = _blacklistService.TryFindActiveBlacklistUserEntry(blacklistStates, out _);
+            var result = _blacklistService.TryFindActiveBlacklistUserEntry(blacklistUsers, out _);
 
             // Assert
             Assert.IsFalse(result);
@@ -509,10 +509,10 @@ namespace Shrooms.Tests.DomainService
         public void TryFindActiveBlacklistUserEntry_WhenBlacklistEntryIsNotFound_SetsResultToNull()
         {
             // Arrange
-            var blacklistStates = new List<BlacklistUser>();
+            var blacklistUsers = new List<BlacklistUser>();
 
             // Act 
-            _blacklistService.TryFindActiveBlacklistUserEntry(blacklistStates, out var result);
+            _blacklistService.TryFindActiveBlacklistUserEntry(blacklistUsers, out var result);
 
             // Assert
             Assert.IsNull(result);
@@ -552,7 +552,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public void TryFindActiveBlacklistUserEntry_WhenAllBlacklistStatesAreExpired_SetsResultToNull()
+        public void TryFindActiveBlacklistUserEntry_WhenAllBlacklistEntriesAreExpired_SetsResultToNull()
         {
             // Arrange
             var blacklistUsers = new List<BlacklistUser>

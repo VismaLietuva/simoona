@@ -19,6 +19,6 @@ namespace Shrooms.Domain.Services.BlacklistUsers
 
         Task UpdateAsync(UpdateBlacklistUserDto updateDto, UserAndOrganizationDto userOrg);
 
-        bool TryFindActiveBlacklistUserEntry(ICollection<BlacklistUser> blacklistStates, out BlacklistUserDto blacklistStateDto);
+        bool TryFindActiveBlacklistUserEntry(ICollection<BlacklistUser> blacklistUsers, out BlacklistUserDto blacklistUserDto);
     }
 }

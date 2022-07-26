@@ -11,12 +11,12 @@ namespace Shrooms.Domain.ServiceValidators.Validators.BlacklistUsers
 {
     public class BlacklistValidator : IBlacklistValidator
     {
-        private readonly IDbSet<BlacklistUser> _blacklistStatesDbSet;
+        private readonly IDbSet<BlacklistUser> _blacklistUsersDbSet;
         private readonly IDbSet<ApplicationUser> _applicationUsersDbSet;
 
         public BlacklistValidator(IUnitOfWork2 uow)
         {
-            _blacklistStatesDbSet = uow.GetDbSet<BlacklistUser>();
+            _blacklistUsersDbSet = uow.GetDbSet<BlacklistUser>();
             _applicationUsersDbSet = uow.GetDbSet<ApplicationUser>();
         }
 
@@ -24,7 +24,7 @@ namespace Shrooms.Domain.ServiceValidators.Validators.BlacklistUsers
         {
             if (blacklistUser == null)
             {
-                throw new ValidationException(ErrorCodes.BlacklistStateNotFound, "Blacklist state not found");
+                throw new ValidationException(ErrorCodes.BlacklistEntryNotFound, "Blacklist entry not found");
             }
         }
 
@@ -38,7 +38,7 @@ namespace Shrooms.Domain.ServiceValidators.Validators.BlacklistUsers
 
         public async Task CheckIfUserIsAlreadyBlacklistedAsync(string userId, UserAndOrganizationDto userOrg)
         {
-            if (await _blacklistStatesDbSet.AnyAsync(blacklist => blacklist.UserId == userId &&
+            if (await _blacklistUsersDbSet.AnyAsync(blacklist => blacklist.UserId == userId &&
                                                                   blacklist.Status == BlacklistStatus.Active))
             {
                 throw new ValidationException(ErrorCodes.DuplicatesIntolerable, "User is already blacklisted");

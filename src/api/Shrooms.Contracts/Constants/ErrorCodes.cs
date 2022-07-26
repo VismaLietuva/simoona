@@ -55,7 +55,7 @@
         public const int FilterNotFound = 1403;
         public const int FilterPresetContainsMoreThanOneDefaultPreset = 1404;
 
-        // Filter presets, 15**
-        public const int BlacklistStateNotFound = 1500;
+        // Blacklist, 15**
+        public const int BlacklistEntryNotFound = 1500;
     }
 }

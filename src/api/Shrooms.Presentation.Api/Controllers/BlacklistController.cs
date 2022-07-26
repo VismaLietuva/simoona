@@ -101,9 +101,9 @@ namespace Shrooms.Presentation.Api.Controllers
                 return NotFound();
             }
 
-            var blacklistStateViewModel = _mapper.Map<BlacklistUserDto, BlacklistUserViewModel>(blacklistUserDto);
+            var blacklistUserViewModel = _mapper.Map<BlacklistUserDto, BlacklistUserViewModel>(blacklistUserDto);
 
-            return Ok(blacklistStateViewModel);
+            return Ok(blacklistUserViewModel);
         }
 
         [HttpGet]
