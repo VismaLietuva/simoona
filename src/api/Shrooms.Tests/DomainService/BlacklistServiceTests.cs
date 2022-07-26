@@ -15,6 +15,7 @@ using System.Data.Entity;
 using Shrooms.Domain.Services.BlacklistUsers;
 using Shrooms.Contracts.DataTransferObjects.BlacklistUsers;
 using Shrooms.Contracts.Enums;
+using Shrooms.Domain.Services.Permissions;
 
 namespace Shrooms.Tests.DomainService
 {
@@ -23,6 +24,7 @@ namespace Shrooms.Tests.DomainService
     {
         private ISystemClock _systemClock;
         private IBlacklistValidator _validator;
+        private IPermissionService _permissionService;
 
         private DbSet<BlacklistUser> _blacklistUsersDbSet;
 
@@ -41,8 +43,9 @@ namespace Shrooms.Tests.DomainService
             _systemClock.UtcNow.Returns(DateTime.UtcNow);
 
             _validator = Substitute.For<IBlacklistValidator>();
+            _permissionService = Substitute.For<IPermissionService>();
 
-            _blacklistService = new BlacklistService(uow, _validator, _systemClock);
+            _blacklistService = new BlacklistService(uow, _validator, _systemClock, _permissionService);
         }
 
         [Test]
