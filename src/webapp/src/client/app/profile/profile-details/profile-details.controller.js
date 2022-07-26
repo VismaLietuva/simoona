@@ -48,6 +48,10 @@
         $scope.model.displayName = displayedName;
         $scope.minLength = 1;
         $scope.hasLunch = hasLunch;
+
+        $scope.redirectToTab = ($scope.isAdmin || $scope.isCurrentUser) ? 'Personal' : 'Blacklist';
+
+
 		if($scope.model.dailyMailingHour) {
 			$scope.model.dailyMailingHour = moment.utc($scope.model.dailyMailingHour, 'HH:mm:ss').local().format('HH:mm');
 		}

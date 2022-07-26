@@ -60,7 +60,7 @@
             rejectRoomChange: rejectRoomChange,
             impersonate: impersonate,
             revertImpersonate: revertImpersonate,
-            getBlacklistState: getBlacklistState,
+            getBlacklistEntry: getBlacklistEntry,
             putBlacklistState: putBlacklistState,
             deleteBlacklistState: deleteBlacklistState,
             createBlacklistState: createBlacklistState,
@@ -83,8 +83,8 @@
             return $resource(applicationUserUrl + 'ConfirmUser', { id: id }, { 'update': { method: 'PUT' } }).update().$promise;
         }
 
-        function getUserProfilePersonal(sParams) {
-            var url = applicationUserUrl + 'GetUserProfile/' + sParams.id + '/Personal';
+        function getUserProfilePersonal(userId) {
+            var url = applicationUserUrl + 'GetUserProfile/' + userId + '/Personal';
             return $resource(url).get({}).$promise;
         }
 
@@ -93,13 +93,13 @@
             return $resource(url).get({}).$promise;
         }
 
-        function getUserProfileJob(sParams) {
-            var url = applicationUserUrl + 'GetUserProfile/' + sParams.id + '/Job';
+        function getUserProfileJob(userId) {
+            var url = applicationUserUrl + 'GetUserProfile/' + userId + '/Job';
             return $resource(url).get({}).$promise;
         }
 
-        function getUserProfileOffice(sParams) {
-            var url = applicationUserUrl + 'GetUserProfile/' + sParams.id + '/Office';
+        function getUserProfileOffice(userId) {
+            var url = applicationUserUrl + 'GetUserProfile/' + userId + '/Office';
             return $resource(url).get({}).$promise;
         }
 
@@ -258,9 +258,9 @@
             return $resource(applicationUserUrl + 'RevertImpersonate', '', { put: { method: 'PUT' } }).put().$promise;
         }
 
-        function getBlacklistState(sParams) {
+        function getBlacklistEntry(userId) {
             return $resource(blacklistStateUrl + 'Get').get({
-                userId: sParams.id
+                userId: userId
             }).$promise;
         }
 

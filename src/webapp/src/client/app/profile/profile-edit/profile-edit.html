@@ -1,26 +1,25 @@
 <div class="col-xs-12" translate-cloak>
     <h3 translate="applicationUser.profiles"></h3>
-    <h4 class="alert alert-warning"
-        ng-if="isNewUser"
-        translate="applicationUser.newUserWaitingForConfirmation"></h4>
+    <h4 class="alert alert-warning" ng-if="isNewUser" translate="applicationUser.newUserWaitingForConfirmation"></h4>
 
-    <uib-tabset class="profile-edit-nav">
-        <uib-tab heading="{{'applicationUser.userInfo' | translate}}"
-                 ng-click="onTabChange('user')">
-            <profile-info id="infoPart" model="personalInfo"></profile-info>
+    <uib-tabset class="profile-edit-nav" active="activeTab">
+        <uib-tab index="tabNames.personal.id" heading="{{'applicationUser.userInfo' | translate}}"
+            ng-if="isCurrentUser || hasApplicationUserPermission"
+            ng-click="loadData('personal')">
+            <profile-info id="infoPart" ng-if="personalInfo.isLoaded" model="personalInfo"></profile-info>
         </uib-tab>
-        <uib-tab heading="{{'applicationUser.jobInfo' | translate}}"
-                 ng-click="onTabChange('job')">
+        <uib-tab index="tabNames.job.id" heading="{{'applicationUser.jobInfo' | translate}}" ng-click="loadData('job')"
+            ng-if="isCurrentUser || hasApplicationUserPermission">
             <job-info id="jobInfo" ng-if="jobInfo.isLoaded" model="jobInfo"></job-info>
         </uib-tab>
-        <uib-tab ng-if="hasOfficePermission"
-                 heading="{{'applicationUser.officeInfo' | translate}}"
-                 ng-click="onTabChange('office')">
+        <uib-tab index="tabNames.office.id" ng-if="hasOfficePermission && (isCurrentUser || hasApplicationUserPermission)" heading="{{'applicationUser.officeInfo' | translate}}"
+            ng-click="loadData('office')">
             <profile-office id="officePart" ng-if="officeInfo.isLoaded" model="officeInfo"></profile-office>
         </uib-tab>
-        <uib-tab ng-if="!isNewUser && hasBlacklistPermission" heading="{{'applicationUser.blacklistInfo' | translate}}"
-                 ng-click="onTabChange('blacklist')">
-                 <profile-blacklist id="blacklistInfo" ng-if="blacklistInfo.isLoaded" model="blacklistInfo"></profile-blacklist>
+        <uib-tab index="tabNames.blacklist.id" ng-if="!isNewUser && hasBlacklistPermission" heading="{{'applicationUser.blacklistInfo' | translate}}"
+            ng-click="loadData('blacklist')">
+            <profile-blacklist id="blacklistInfo" ng-if="blacklistInfo.isLoaded" model="blacklistInfo">
+            </profile-blacklist>
         </uib-tab>
     </uib-tabset>
 </div>
