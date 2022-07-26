@@ -170,5 +170,6 @@
   "blacklistHistoryStatus": "Status",
   "noReason": "No reason provided",
   "blacklistHistoryStatusCanceled": "Canceled",
-  "blacklistHistoryStatusExpired": "Expired"
+  "blacklistHistoryStatusExpired": "Expired",
+  "onlyVisibleToYou": "Only visible to you"
 }

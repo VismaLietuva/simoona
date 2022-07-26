@@ -170,5 +170,6 @@
   "blacklistHistoryStatus": "Statusas",
   "noReason": "Priežastis nenurodyta",
   "blacklistHistoryStatusCanceled": "Atšaukta",
-  "blacklistHistoryStatusExpired": "Baigėsi"
+  "blacklistHistoryStatusExpired": "Baigėsi",
+  "onlyVisibleToYou": "Matoma tik jums"
 }
