@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Linq.Expressions;
 using System;
+using Shrooms.Domain.Services.Permissions;
 
 namespace Shrooms.Domain.Services.BlacklistUsers
 {
@@ -19,14 +20,16 @@ namespace Shrooms.Domain.Services.BlacklistUsers
         private readonly IUnitOfWork2 _uow;
         private readonly IBlacklistValidator _validator;
         private readonly ISystemClock _systemClock;
+        private readonly IPermissionService _permissionService;
 
         private readonly IDbSet<BlacklistUser> _blacklistUsersDbSet;
 
-        public BlacklistService(IUnitOfWork2 uow, IBlacklistValidator validator, ISystemClock systemClock)
+        public BlacklistService(IUnitOfWork2 uow, IBlacklistValidator validator, ISystemClock systemClock, IPermissionService permissionService)
         {
             _uow = uow;
             _validator = validator;
             _systemClock = systemClock;
+            _permissionService = permissionService;
 
             _blacklistUsersDbSet = uow.GetDbSet<BlacklistUser>();
         }
@@ -120,6 +123,8 @@ namespace Shrooms.Domain.Services.BlacklistUsers
 
         public async Task<IEnumerable<BlacklistUserDto>> GetAllExceptActiveAsync(string userId, UserAndOrganizationDto userOrg)
         {
+            await _validator.CheckIfUserCanViewBlacklistHistoryAsync(userId, userOrg, _permissionService.UserHasPermissionAsync);
+
             return await _blacklistUsersDbSet
                 .Include(blacklistUser => blacklistUser.CreatedByUser)
                 .Include(blacklistUser => blacklistUser.ModifiedByUser)

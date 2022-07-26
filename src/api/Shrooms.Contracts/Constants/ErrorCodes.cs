@@ -57,5 +57,6 @@
 
         // Blacklist, 15**
         public const int BlacklistEntryNotFound = 1500;
+        public const int InvalidPermissionForBlacklistHistory = 1501;
     }
 }
