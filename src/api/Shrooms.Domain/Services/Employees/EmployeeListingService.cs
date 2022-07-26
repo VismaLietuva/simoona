@@ -46,7 +46,7 @@ namespace Shrooms.Domain.Services.Employees
             var newUserRoleId = await _roleService.GetRoleIdByNameAsync(Contracts.Constants.Roles.NewUser);
 
             var searchFilter = GetSearchStringFilter(employeeArgsDto);
-            var blacklistFilter = GetBlacklistFilter(employeeArgsDto, hasApplicationUserPermission);
+            var blacklistFilter = GetBlacklistFilter(employeeArgsDto, hasBlacklistPermission);
 
             var users = await _usersDbSet
                 .Include(user => user.WorkingHours)
