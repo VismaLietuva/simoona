@@ -4,6 +4,7 @@ using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models;
+using System;
 using System.Data.Entity;
 using System.Threading.Tasks;
 
@@ -25,6 +26,14 @@ namespace Shrooms.Domain.ServiceValidators.Validators.BlacklistUsers
             if (blacklistUser == null)
             {
                 throw new ValidationException(ErrorCodes.BlacklistEntryNotFound, "Blacklist entry not found");
+            }
+        }
+
+        public async Task CheckIfUserCanViewBlacklistHistoryAsync(string userId, UserAndOrganizationDto userOrg, Func<UserAndOrganizationDto, string, Task<bool>> permissionCheckFunction)
+        {
+            if (userId != userOrg.UserId || !await permissionCheckFunction(userOrg, BasicPermissions.Blacklist))
+            {
+                throw new ValidationException(ErrorCodes.InvalidPermissionForBlacklistHistory, "User does not have BLACKLIST_BASIC permission");
             }
         }
 

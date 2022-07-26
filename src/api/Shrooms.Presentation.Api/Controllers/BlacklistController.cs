@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
@@ -108,13 +109,19 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpGet]
         [Route("History")]
-        [PermissionAuthorize(Permission = AdministrationPermissions.Blacklist)]
         public async Task<IHttpActionResult> GetBlacklistHistory(string userId)
         {
-            var blacklistUserDtos = await _blacklistService.GetAllExceptActiveAsync(userId, GetUserAndOrganization());
-            var blacklistUserViewModels = _mapper.Map<IEnumerable<BlacklistUserDto>, IEnumerable<BlacklistUserViewModel>>(blacklistUserDtos);
+            try
+            {
+                var blacklistUserDtos = await _blacklistService.GetAllExceptActiveAsync(userId, GetUserAndOrganization());
+                var blacklistUserViewModels = _mapper.Map<IEnumerable<BlacklistUserDto>, IEnumerable<BlacklistUserViewModel>>(blacklistUserDtos);
 
-            return Ok(blacklistUserViewModels);
+                return Ok(blacklistUserViewModels);
+            }
+            catch (ValidationException)
+            {
+                return StatusCode(HttpStatusCode.Forbidden);
+            }
         }
     }
 }
