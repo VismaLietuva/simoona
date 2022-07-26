@@ -55,7 +55,7 @@
         ]);
 
         $scope.hasApplicationUserPermission = authService.hasPermissions([
-            'APPLICATIONUSER_ADMINISTRATION',
+            'APPLICATIONUSER_BASIC',
         ]);
 
         $scope.hasBlacklistPermission = authService.hasPermissions([
