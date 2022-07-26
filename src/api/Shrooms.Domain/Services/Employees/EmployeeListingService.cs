@@ -38,11 +38,15 @@ namespace Shrooms.Domain.Services.Employees
 
         public async Task<IPagedList<EmployeeDto>> GetPagedEmployeesAsync(EmployeeListingArgsDto employeeArgsDto, UserAndOrganizationDto userOrg)
         {
-            var isAdmin = await _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.ApplicationUser);
+            var permissions = await _permissionService.GetUserPermissionsAsync(userOrg.UserId, userOrg.OrganizationId);
+
+            var hasApplicationUserPermission = permissions.Contains(AdministrationPermissions.ApplicationUser);
+            var hasBlacklistPermission = permissions.Contains(AdministrationPermissions.Blacklist);
+
             var newUserRoleId = await _roleService.GetRoleIdByNameAsync(Contracts.Constants.Roles.NewUser);
 
             var searchFilter = GetSearchStringFilter(employeeArgsDto);
-            var blacklistFilter = GetBlacklistFilter(employeeArgsDto, isAdmin);
+            var blacklistFilter = GetBlacklistFilter(employeeArgsDto, hasApplicationUserPermission);
 
             var users = await _usersDbSet
                 .Include(user => user.WorkingHours)
@@ -75,28 +79,37 @@ namespace Shrooms.Domain.Services.Employees
                 })
                 .OrderByPropertyNames(employeeArgsDto)
                 .ToPagedListAsync(employeeArgsDto.Page, employeeArgsDto.PageSize);
-            
-            if (!isAdmin)
-            {
-                HidePrivateInformation(users);
-            }
+
+            HidePrivateInformationBasedOnPermissions(users, hasApplicationUserPermission, hasBlacklistPermission);
 
             return users;
         }
 
-        private void HidePrivateInformation(IPagedList<EmployeeDto> employees)
+        private void HidePrivateInformationBasedOnPermissions(IPagedList<EmployeeDto> employees, bool hasApplicationUserPermission, bool hasBlacklistPermission)
         {
+            if (hasApplicationUserPermission && hasBlacklistPermission)
+            {
+                return;
+            }
+
             foreach (var employee in employees)
             {
-                employee.BirthDay = BirthdayDateTimeHelper.RemoveYear(employee.BirthDay);
-                employee.PhoneNumber = null;
-                employee.BlacklistEntry = null;
+                if (!hasApplicationUserPermission)
+                {
+                    employee.BirthDay = BirthdayDateTimeHelper.RemoveYear(employee.BirthDay);
+                    employee.PhoneNumber = null;
+                }
+
+                if (!hasBlacklistPermission)
+                {
+                    employee.BlacklistEntry = null;
+                }
             }
         }
 
-        private Expression<Func<ApplicationUser, bool>> GetBlacklistFilter(EmployeeListingArgsDto employeeArgsDto, bool isAdmin)
+        private Expression<Func<ApplicationUser, bool>> GetBlacklistFilter(EmployeeListingArgsDto employeeArgsDto, bool hasBlacklistPermission)
         {
-            if (!employeeArgsDto.ShowOnlyBlacklisted || !isAdmin)
+            if (!employeeArgsDto.ShowOnlyBlacklisted || !hasBlacklistPermission)
             {
                 return user => true;
             }

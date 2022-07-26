@@ -323,22 +323,27 @@ namespace Shrooms.Presentation.Api.Controllers
 
         private async Task InfoWithAdditionalPermissionsAsync(ApplicationUser user, ApplicationUserDetailsViewModel model)
         {
-            var isAdmin = await _permissionService.UserHasPermissionAsync(GetUserAndOrganization(), AdministrationPermissions.ApplicationUser);
+            var userOrg = GetUserAndOrganization();
+            var permissions = await _permissionService.GetUserPermissionsAsync(userOrg.UserId, userOrg.OrganizationId);
+            
+            var hasApplicationUserPermission = permissions.Contains(AdministrationPermissions.ApplicationUser);
+            var hasBlacklistPermission = permissions.Contains(AdministrationPermissions.Blacklist);
+
             var usersProfile = User.Identity.GetUserId() == user.Id;
 
-            if (isAdmin)
+            if (hasApplicationUserPermission)
             {
                 var roles = await GetUserRolesAsync(user.Id);
                 model.Roles = _mapper.Map<IEnumerable<ApplicationRoleMiniViewModel>>(roles);
             }
 
-            if (!isAdmin && !usersProfile)
+            if (!hasApplicationUserPermission && !usersProfile)
             {
                 model.BirthDay = BirthdayDateTimeHelper.RemoveYear(model.BirthDay);
                 model.PhoneNumber = null;
             }
 
-            if ((isAdmin || usersProfile) && _blacklistStateService.TryFindActiveBlacklistUserEntry(user.BlacklistEntries, out var blacklistUserDto))
+            if ((hasBlacklistPermission || usersProfile) && _blacklistStateService.TryFindActiveBlacklistUserEntry(user.BlacklistEntries, out var blacklistUserDto))
             {
                 model.BlacklistEntry = _mapper.Map<BlacklistUserDto, BlacklistUserViewModel>(blacklistUserDto);
             }

@@ -18,7 +18,7 @@
                  ng-click="onTabChange('office')">
             <profile-office id="officePart" ng-if="officeInfo.isLoaded" model="officeInfo"></profile-office>
         </uib-tab>
-        <uib-tab ng-if="!isNewUser && hasApplicationUserAdminPermission" heading="{{'applicationUser.blacklistInfo' | translate}}"
+        <uib-tab ng-if="!isNewUser && hasBlacklistPermission" heading="{{'applicationUser.blacklistInfo' | translate}}"
                  ng-click="onTabChange('blacklist')">
                  <profile-blacklist id="blacklistInfo" ng-if="blacklistInfo.isLoaded" model="blacklistInfo"></profile-blacklist>
         </uib-tab>

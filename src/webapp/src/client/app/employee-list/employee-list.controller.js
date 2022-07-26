@@ -28,6 +28,10 @@
             'APPLICATIONUSER_ADMINISTRATION',
         ]);
 
+        $scope.hasBlacklistPermission = authService.hasPermissions([
+            'BLACKLIST_ADMINISTRATION'
+        ]);
+
         $scope.filter = {
             page: 1,
             search: '',

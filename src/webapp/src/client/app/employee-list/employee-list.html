@@ -3,7 +3,7 @@
         <h3 ng-cloak>{{"common.employeeList" | translate}}</h3>
         <div class="employee-list-filters-container">
             <ace-item-list-filter class="pb-0" filter-value="filter.search" on-filtering="onSearch"></ace-item-list-filter>
-            <ace-slider-toggle-btn ng-if="isAdmin" translation="applicationUser.showOnlyBlacklisted" ng-click="onSearch()" value="filter.showOnlyBlacklisted" class="ml-10"></ace-slider-toggle-btn>
+            <ace-slider-toggle-btn ng-if="hasBlacklistPermission" translation="applicationUser.showOnlyBlacklisted" ng-click="onSearch()" value="filter.showOnlyBlacklisted" class="ml-10"></ace-slider-toggle-btn>
         </div>
 
         <table class="table table-grey table-hover" ng-if="pagedEmployeeList.itemCount > 0">
@@ -33,7 +33,7 @@
                     <th class="text-center hidden-xs">
                         <span translate="applicationUser.workingHours"></span>
                     </th>
-                    <th ng-if="isAdmin" class="text-center hidden-xs">
+                    <th ng-if="hasBlacklistPermission" class="text-center hidden-xs">
                         <ace-sort-multiple-link on-sort="onSort" position="4" sort-dir="filter.sortValues.sortOrders[4]" sort-field="filter.sortValues.sortBy[4]" sort-value="blacklistEntry.endDate">
                             <span translate="applicationUser.blacklisted"></span>
                         </ace-sort-multiple-link>
@@ -66,7 +66,7 @@
                             {{applicationUser.workingHours.startTime | time:'HH:mm'}} - {{applicationUser.workingHours.endTime | time:'HH:mm'}}
                         </div>
                     </td>
-                    <td class="text-center hidden-xs" ng-if="isAdmin">
+                    <td class="text-center hidden-xs" ng-if="hasBlacklistPermission">
                         {{:: applicationUser.blacklistEndDate | date:'yyyy-MM-dd'}}
                     </td>
                 </tr>
