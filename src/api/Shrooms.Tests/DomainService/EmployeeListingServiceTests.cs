@@ -15,6 +15,7 @@ using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Employees;
 using Shrooms.Domain.Helpers;
 using System.Linq;
+using Shrooms.Contracts.Constants;
 
 namespace Shrooms.Tests.DomainService
 {
@@ -176,8 +177,8 @@ namespace Shrooms.Tests.DomainService
             _usersDbSet.SetDbSetDataForAsync(GetTestDataForGetPagedEmployeesAsync());
 
             _permissionService
-                .UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), Arg.Any<string>())
-                .Returns(true);
+                .GetUserPermissionsAsync(Arg.Any<string>(), Arg.Any<int>())
+                .Returns(new List<string> { BasicPermissions.Blacklist });
 
             _roleService
                 .ExcludeUsersWithRole(Arg.Any<string>())
