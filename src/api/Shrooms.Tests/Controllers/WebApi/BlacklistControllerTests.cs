@@ -212,5 +212,23 @@ namespace Shrooms.Tests.Controllers.WebApi
             // Assert
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
+
+        [Test]
+        public async Task GetBlacklistHistory_WhenExceptionIsThrown_ReturnsForbidden()
+        {
+            // Arrange
+            const string userId = "";
+
+            _blacklistService
+                .GetAllExceptActiveAsync(Arg.Any<string>(), Arg.Any<UserAndOrganizationDto>())
+                .Throws(new ValidationException(0));
+
+            // Act
+            var httpActionResult = await _blacklistController.GetBlacklistHistory(userId);
+            var response = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode);
+        }
     }
 }
