@@ -5,7 +5,7 @@ namespace Shrooms.Infrastructure.Extensions
     public static class NestedEnumerableExtensions
     {
         /// <summary>
-        /// Loops through doubly nested enumerable
+        /// Loops through double nested enumerable
         /// </summary>
         /// <returns>Row index and column index</returns>
         public static IEnumerable<(int, int)> GetRowsPositionEnumerator<T>(this IEnumerable<IEnumerable<T>> enumerable)
