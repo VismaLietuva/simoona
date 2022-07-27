@@ -16,6 +16,7 @@ using Shrooms.Domain.Services.BlacklistUsers;
 using Shrooms.Contracts.DataTransferObjects.BlacklistUsers;
 using Shrooms.Contracts.Enums;
 using Shrooms.Domain.Services.Permissions;
+using Shrooms.Contracts.Constants;
 
 namespace Shrooms.Tests.DomainService
 {
@@ -629,6 +630,10 @@ namespace Shrooms.Tests.DomainService
                 }
             };
 
+            _permissionService
+              .UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), Arg.Is(BasicPermissions.Blacklist))
+              .Returns(true);
+
             _blacklistUsersDbSet.SetDbSetDataForAsync(blacklistUsers);
 
             // Act
@@ -636,6 +641,82 @@ namespace Shrooms.Tests.DomainService
 
             // Assert
             Assert.That(result, Is.All.Matches<BlacklistUserDto>(entry => entry.Status != BlacklistStatus.Active));
+        }
+
+        [Test]
+        public async Task GetAllExceptActiveAsync_WhenUserDoesNotHaveBlacklistBasicPermissionButRequestUserAndUserIdMatches_DoesNotThrow()
+        {
+            // Arrange
+            var userId = "Same id";
+
+            var userOrg = new UserAndOrganizationDto
+            {
+                UserId = userId
+            };
+
+            _permissionService
+                .UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), Arg.Is(BasicPermissions.Blacklist))
+                .Returns(false);
+
+            // Assert
+            Assert.DoesNotThrowAsync(async () => await _blacklistService.GetAllExceptActiveAsync(userId, userOrg));
+        }
+
+        [Test]
+        public async Task GetAllExceptActiveAsync_WhenUserHasBlacklistBasicPermissionButRequestUserAndUserIdDoesNotMatch_DoesNotThrow()
+        {
+            // Arrange
+            var userId = "Id";
+
+            var userOrg = new UserAndOrganizationDto
+            {
+                UserId = "Random id"
+            };
+
+            _permissionService
+                .UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), Arg.Is(BasicPermissions.Blacklist))
+                .Returns(true);
+
+            // Assert
+            Assert.DoesNotThrowAsync(async () => await _blacklistService.GetAllExceptActiveAsync(userId, userOrg));
+        }
+
+        [Test]
+        public async Task GetAllExceptActiveAsync_WhenUserHasBlacklistBasicPermissionAndRequestUserAndUserIdMatches_DoesNotThrow()
+        {
+            // Arrange
+            var userId = "Same id";
+
+            var userOrg = new UserAndOrganizationDto
+            {
+                UserId = userId
+            };
+
+            _permissionService
+                .UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), Arg.Is(BasicPermissions.Blacklist))
+                .Returns(true);
+
+            // Assert
+            Assert.DoesNotThrowAsync(async () => await _blacklistService.GetAllExceptActiveAsync(userId, userOrg));
+        }
+
+        [Test]
+        public async Task GetAllExceptActiveAsync_WhenUserDoesNotHaveBlacklistBasicPermissionAndRequestUserAndUserIdDoesNotMatch_ThrowsValidationException()
+        {
+            // Arrange
+            var userId = "Id";
+
+            var userOrg = new UserAndOrganizationDto
+            {
+                UserId = "Random id"
+            };
+
+            _permissionService
+                .UserHasPermissionAsync(Arg.Any<UserAndOrganizationDto>(), Arg.Is(BasicPermissions.Blacklist))
+                .Returns(false);
+
+            // Assert
+            Assert.ThrowsAsync<ValidationException>(async () => await _blacklistService.GetAllExceptActiveAsync(userId, userOrg));
         }
     }
 }
