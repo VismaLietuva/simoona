@@ -31,7 +31,7 @@ namespace Shrooms.Domain.ServiceValidators.Validators.BlacklistUsers
 
         public async Task CheckIfUserCanViewBlacklistHistoryAsync(string userId, UserAndOrganizationDto userOrg, Func<UserAndOrganizationDto, string, Task<bool>> permissionCheckFunction)
         {
-            if (userId != userOrg.UserId || !await permissionCheckFunction(userOrg, BasicPermissions.Blacklist))
+            if (userId != userOrg.UserId && !await permissionCheckFunction(userOrg, BasicPermissions.Blacklist))
             {
                 throw new ValidationException(ErrorCodes.InvalidPermissionForBlacklistHistory, "User does not have BLACKLIST_BASIC permission");
             }
