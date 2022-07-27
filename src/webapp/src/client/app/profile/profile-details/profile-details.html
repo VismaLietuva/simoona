@@ -312,7 +312,7 @@
 
             <div class="col-xs-12">
                 <div class="profile-edit-button top-space col-xs-12">
-                    <button class="btn btn-primary" ng-if="isAdmin || isCurrentUser || hasBlacklistPermission"
+                    <button class="btn btn-primary" ng-if="isAdmin || isCurrentUser || hasBlacklistAdminPermission"
                         ui-sref="Root.WithOrg.Client.Profiles.Edit({ id: model.id, tab: redirectToTab })"
                         title="{{'common.edit' | translate}}" data-test-id="profileEditButton">
                         <span class="glyphicon glyphicon-pencil"></span>

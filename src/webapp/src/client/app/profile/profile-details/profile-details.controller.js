@@ -31,15 +31,16 @@
         $rootScope.pageTitle = 'applicationUser.entityName';
 
         $scope.isAdmin = authService.hasPermissions(['APPLICATIONUSER_ADMINISTRATION']);
-        $scope.hasBlacklistPermission = authService.hasPermissions(['BLACKLIST_BASIC']);
+        $scope.hasBlacklistBasicPermission = authService.hasPermissions(['BLACKLIST_BASIC']);
+        $scope.hasBlacklistAdminPermission = authService.hasPermissions(['BLACKLIST_ADMINISTRATION'])
         $scope.identity = authService.identity;
         $scope.isCurrentUser = $stateParams.id === authService.identity.userId;
         $scope.isNewUser = isNewUser;
         $scope.isFirstLogin = isFirstLogin;
         $scope.confirmUser = confirmUser;
         $scope.isPremium = $window.isPremium;
-        $scope.showBlacklistHistory = ($scope.isCurrentUser || $scope.hasBlacklistPermission) && $scope.model.userWasPreviouslyBlacklisted;
-        $scope.showBlacklistInformation = ($scope.isCurrentUser || $scope.hasBlacklistPermission) && $scope.model.blacklistEntry;
+        $scope.showBlacklistHistory = ($scope.isCurrentUser || $scope.hasBlacklistBasicPermission) && $scope.model.userWasPreviouslyBlacklisted;
+        $scope.showBlacklistInformation = ($scope.isCurrentUser || $scope.hasBlacklistBasicPermission) && $scope.model.blacklistEntry;
         $scope.blacklistHistoryExpanded = false;
         //$scope.submitJobInfo = submitJobInfo;
 
