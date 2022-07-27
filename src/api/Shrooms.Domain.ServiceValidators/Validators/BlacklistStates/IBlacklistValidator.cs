@@ -11,8 +11,6 @@ namespace Shrooms.Domain.ServiceValidators.Validators.BlacklistUsers
 
         Task CheckIfUserExistsAsync(string userId, UserAndOrganizationDto userOrg);
 
-        Task CheckIfUserCanViewBlacklistHistoryAsync(string userId, UserAndOrganizationDto userOrg, Func<UserAndOrganizationDto, string, Task<bool>> permissionCheckFunction);
-
         void CheckIfBlacklistUserExists(BlacklistUser blacklistState);
     }
 }

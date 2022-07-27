@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 using System.Linq.Expressions;
 using System;
 using Shrooms.Domain.Services.Permissions;
+using Shrooms.Contracts.Constants;
+using Shrooms.Contracts.Exceptions;
 
 namespace Shrooms.Domain.Services.BlacklistUsers
 {
@@ -123,7 +125,10 @@ namespace Shrooms.Domain.Services.BlacklistUsers
 
         public async Task<IEnumerable<BlacklistUserDto>> GetAllExceptActiveAsync(string userId, UserAndOrganizationDto userOrg)
         {
-            await _validator.CheckIfUserCanViewBlacklistHistoryAsync(userId, userOrg, _permissionService.UserHasPermissionAsync);
+            if (userId != userOrg.UserId && !await _permissionService.UserHasPermissionAsync(userOrg, BasicPermissions.Blacklist))
+            {
+                throw new ValidationException(ErrorCodes.InvalidPermissionForBlacklistHistory, "User does not have BLACKLIST_BASIC permission");
+            }
 
             return await _blacklistUsersDbSet
                 .Include(blacklistUser => blacklistUser.CreatedByUser)

@@ -29,14 +29,6 @@ namespace Shrooms.Domain.ServiceValidators.Validators.BlacklistUsers
             }
         }
 
-        public async Task CheckIfUserCanViewBlacklistHistoryAsync(string userId, UserAndOrganizationDto userOrg, Func<UserAndOrganizationDto, string, Task<bool>> permissionCheckFunction)
-        {
-            if (userId != userOrg.UserId && !await permissionCheckFunction(userOrg, BasicPermissions.Blacklist))
-            {
-                throw new ValidationException(ErrorCodes.InvalidPermissionForBlacklistHistory, "User does not have BLACKLIST_BASIC permission");
-            }
-        }
-
         public async Task CheckIfUserExistsAsync(string userId, UserAndOrganizationDto userOrg)
         {
             if (!await _applicationUsersDbSet.AnyAsync(user => user.Id == userId && user.OrganizationId == userOrg.OrganizationId))
