@@ -239,7 +239,7 @@
                     </div>
                 </div>
             </div>
-            <div class="profile-visible-message" ng-if="showBlacklistHistory || showBlacklistInformation">
+            <div class="profile-visible-message" ng-if="(showBlacklistHistory || showBlacklistInformation) && isCurrentUser">
                 <span translate="applicationUser.onlyVisibleToYou"></span>
                 <span class="glyphicon glyphicon-eye-close"></span>
             </div>
