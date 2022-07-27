@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using OfficeOpenXml;
+using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
+using Shrooms.Infrastructure.ExcelGenerator.Styles;
 
 namespace Shrooms.Infrastructure.ExcelGenerator
 {
@@ -17,7 +19,7 @@ namespace Shrooms.Infrastructure.ExcelGenerator
         {
             var worksheet = _package.Workbook.Worksheets.Add(sheetName);
             var worksheetBuilder = new ExcelWorksheetBuilder(worksheet);
-
+            
             worksheetBuilder
                 .WithHeader(headerItems)
                 .WithRows(rows)
@@ -26,13 +28,16 @@ namespace Shrooms.Infrastructure.ExcelGenerator
             return this;
         }
 
-        public IExcelBuilder AddNewWorksheet(string sheetName, IEnumerable<IEnumerable<object>> rows)
+        public IExcelBuilder AddNewWorksheet(string sheetName, IEnumerable<IEnumerable<object>> rows, ExcelBuilderStyles builderStyle)
         {
             var worksheet = _package.Workbook.Worksheets.Add(sheetName);
+
+            ApplyBuilderStyle(worksheet, builderStyle, rows);
+
             var worksheetBuilder = new ExcelWorksheetBuilder(worksheet);
 
             worksheetBuilder.WithRows(rows).Build();
-
+            
             return this;
         }
 
@@ -44,6 +49,30 @@ namespace Shrooms.Infrastructure.ExcelGenerator
         public void Dispose()
         {
             _package?.Dispose();
+        }
+
+        private void ApplyBuilderStyle(ExcelWorksheet worksheet, ExcelBuilderStyles builderStyle, IEnumerable<IEnumerable<object>> rows)
+        {
+            if (TryFindBuilderStyle(builderStyle, rows, out var style))
+            {
+                style.Apply(worksheet);
+            }
+        }
+
+        private bool TryFindBuilderStyle(ExcelBuilderStyles builderStyle, IEnumerable<IEnumerable<object>> rows, out ExcelBuilderStyleBase style)
+        {
+            switch (builderStyle)
+            {
+                case ExcelBuilderStyles.LotteryParticipants:
+                    style = new LotteryParticipantsBuilderStyle(rows);
+                    break;
+                case ExcelBuilderStyles.Default:
+                default:
+                    style = null;
+                    return false;
+            }
+
+            return true;
         }
     }
 }
