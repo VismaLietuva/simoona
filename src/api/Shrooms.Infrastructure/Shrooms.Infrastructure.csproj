@@ -136,7 +136,7 @@
     <Compile Include="ExcelGenerator\ExcelWorksheetBuilder.cs" />
     <Compile Include="ExcelGenerator\Styles\ExcelBuilderStyleBase.cs" />
     <Compile Include="ExcelGenerator\Styles\LotteryParticipantsBuilderStyle.cs" />
-    <Compile Include="Extensions\DoublyNestedEnumerableExtensions.cs" />
+    <Compile Include="Extensions\NestedEnumerableExtensions.cs" />
     <Compile Include="FeatureToggle\Feature.cs" />
     <Compile Include="FireAndForget\AsyncRunner.cs" />
     <Compile Include="FireAndForget\HangFireScheduler.cs" />
