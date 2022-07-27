@@ -32,12 +32,12 @@ namespace Shrooms.Infrastructure.ExcelGenerator
         {
             var worksheet = _package.Workbook.Worksheets.Add(sheetName);
 
+            new ExcelWorksheetBuilder(worksheet)
+                .WithRows(rows)
+                .Build();
+
             ApplyBuilderStyle(worksheet, builderStyle, rows);
 
-            var worksheetBuilder = new ExcelWorksheetBuilder(worksheet);
-
-            worksheetBuilder.WithRows(rows).Build();
-            
             return this;
         }
 
