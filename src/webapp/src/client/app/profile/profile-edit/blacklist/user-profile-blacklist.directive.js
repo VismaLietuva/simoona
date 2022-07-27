@@ -51,6 +51,7 @@
         }
 
         $scope.model.endDate = new Date($scope.model.endDate || getDefaultEndDate());
+        $scope.model.id = $stateParams.id;
 
         function saveInfo() {
             var params = {
