@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
 
 namespace Shrooms.Premium.Domain.Services.Lotteries
@@ -10,6 +11,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
     {
         private readonly IExcelBuilder _excelBuilder;
         private readonly IParticipantService _participantService;
+
         public LotteryExportService(IExcelBuilder excelBuilder, IParticipantService participantService)
         {
             _excelBuilder = excelBuilder;
@@ -40,7 +42,8 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             }
 
             tickets.Add(participantTickets);
-            _excelBuilder.AddNewWorksheet(BusinessLayerConstants.LotteryParticipantsExcelTableName, tickets);
+
+            _excelBuilder.AddNewWorksheet(BusinessLayerConstants.LotteryParticipantsExcelTableName, tickets, ExcelBuilderStyles.LotteryParticipants);
 
             return _excelBuilder.GenerateByteArray();
         }
