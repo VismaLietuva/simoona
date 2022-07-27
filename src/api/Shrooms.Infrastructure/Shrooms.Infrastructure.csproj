@@ -134,6 +134,9 @@
     <Compile Include="Email\Templating\MailTemplate.cs" />
     <Compile Include="ExcelGenerator\ExcelBuilder.cs" />
     <Compile Include="ExcelGenerator\ExcelWorksheetBuilder.cs" />
+    <Compile Include="ExcelGenerator\Styles\ExcelBuilderStyleBase.cs" />
+    <Compile Include="ExcelGenerator\Styles\LotteryParticipantsBuilderStyle.cs" />
+    <Compile Include="Extensions\DoublyNestedEnumerableExtensions.cs" />
     <Compile Include="FeatureToggle\Feature.cs" />
     <Compile Include="FireAndForget\AsyncRunner.cs" />
     <Compile Include="FireAndForget\HangFireScheduler.cs" />
