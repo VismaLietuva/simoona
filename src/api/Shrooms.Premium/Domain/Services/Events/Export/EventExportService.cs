@@ -14,16 +14,16 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
     {
         private readonly IEventParticipationService _eventParticipationService;
         private readonly IEventUtilitiesService _eventUtilitiesService;
-        private readonly IExcelBuilder _excelBuilder;
+        private readonly IExcelBuilderFactory _excelBuilderFactory;
 
         public EventExportService(
             IEventParticipationService eventParticipationService,
             IEventUtilitiesService eventUtilitiesService,
-            IExcelBuilder excelBuilder)
+            IExcelBuilderFactory excelBuilderFactory)
         {
             _eventParticipationService = eventParticipationService;
             _eventUtilitiesService = eventUtilitiesService;
-            _excelBuilder = excelBuilder;
+            _excelBuilderFactory = excelBuilderFactory;
         }
 
         public async Task<byte[]> ExportOptionsAndParticipantsAsync(Guid eventId, UserAndOrganizationDto userAndOrg)
@@ -35,36 +35,30 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
                 .Select(x => new List<string> { x.Option, x.Count.ToString() })
                 .ToList();
 
-            AddParticipants(participants);
+            var excelBuilder = _excelBuilderFactory.GetBuilder();
 
-            if (options.Any())
+            excelBuilder
+                .AddWorksheet(EventsConstants.EventParticipantsExcelTableName)
+                .AddHeader(
+                    Resources.Models.ApplicationUser.ApplicationUser.FirstName, 
+                    Resources.Models.ApplicationUser.ApplicationUser.LastName)
+                .AddRows(participants)
+                .AutoFitColumns();
+
+            if (!options.Any())
             {
-                AddOptions(options);
+                return excelBuilder.Build();
             }
 
-            return _excelBuilder.GenerateByteArray();
-        }
+            excelBuilder
+                .AddWorksheet(EventsConstants.EventOptionsExcelTableName)
+                .AddHeader(
+                    Resources.Models.Events.Events.Option,
+                    Resources.Models.Events.Events.Count)
+                .AddRows(options)
+                .AutoFitColumns();
 
-        private void AddOptions(IEnumerable<List<string>> options)
-        {
-            var header = new List<string>
-            {
-                Resources.Models.Events.Events.Option,
-                Resources.Models.Events.Events.Count
-            };
-
-            _excelBuilder.AddNewWorksheet(EventsConstants.EventOptionsExcelTableName, header, options);
-        }
-
-        private void AddParticipants(IEnumerable<List<string>> participants)
-        {
-            var header = new List<string>
-            {
-                Resources.Models.ApplicationUser.ApplicationUser.FirstName,
-                Resources.Models.ApplicationUser.ApplicationUser.LastName
-            };
-
-            _excelBuilder.AddNewWorksheet(EventsConstants.EventParticipantsExcelTableName, header, participants);
+            return excelBuilder.Build();
         }
     }
 }

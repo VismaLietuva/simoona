@@ -9,12 +9,12 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 {
     public class LotteryExportService : ILotteryExportService
     {
-        private readonly IExcelBuilder _excelBuilder;
+        private readonly IExcelBuilderFactory _excelBuilderFactory;
         private readonly IParticipantService _participantService;
 
-        public LotteryExportService(IExcelBuilder excelBuilder, IParticipantService participantService)
+        public LotteryExportService(IExcelBuilderFactory excelBuilderFactory, IParticipantService participantService)
         {
-            _excelBuilder = excelBuilder;
+            _excelBuilderFactory = excelBuilderFactory;
             _participantService = participantService;
         }
         public async Task<byte[]> ExportParticipantsAsync(int lotteryId, UserAndOrganizationDto userAndOrg)
@@ -43,9 +43,15 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 
             tickets.Add(participantTickets);
 
-            _excelBuilder.AddNewWorksheet(BusinessLayerConstants.LotteryParticipantsExcelTableName, tickets, ExcelBuilderStyles.LotteryParticipants);
+            var excelBuilder = _excelBuilderFactory.GetBuilder();
+            
+            excelBuilder
+                .AddWorksheet(BusinessLayerConstants.LotteryParticipantsExcelTableName)
+                .AddRows(tickets)
+                .AutoFitColumns()
+                .AddStyle(ExcelBuilderStyles.LotteryParticipants);
 
-            return _excelBuilder.GenerateByteArray();
+            return excelBuilder.Build();
         }
     }
 }

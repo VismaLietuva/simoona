@@ -15,12 +15,12 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
     public class ServiceRequestExportService : IServiceRequestExportService
     {
         private readonly IDbSet<ServiceRequest> _serviceRequestsDbSet;
-        private readonly IExcelBuilder _excelBuilder;
+        private readonly IExcelBuilderFactory _excelBuilderFactory;
 
-        public ServiceRequestExportService(IUnitOfWork2 uow, IExcelBuilder excelBuilder)
+        public ServiceRequestExportService(IUnitOfWork2 uow, IExcelBuilderFactory excelBuilderFactory)
         {
             _serviceRequestsDbSet = uow.GetDbSet<ServiceRequest>();
-            _excelBuilder = excelBuilder;
+            _excelBuilderFactory = excelBuilderFactory;
         }
 
         public async Task<byte[]> ExportToExcelAsync(UserAndOrganizationDto userAndOrg, Expression<Func<ServiceRequest, bool>> filter)
@@ -65,9 +65,15 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
                 Resources.Models.ServiceRequest.ServiceRequest.ExportColumnNameModified
             };
 
-            _excelBuilder.AddNewWorksheet(ServiceRequestConstants.ServiceRequestsExcelSheetName, header, serviceRequests);
+            var excelBuilder = _excelBuilderFactory.GetBuilder();
 
-            return _excelBuilder.GenerateByteArray();
+            excelBuilder
+                .AddWorksheet(ServiceRequestConstants.ServiceRequestsExcelSheetName)
+                .AddHeader(header)
+                .AddRows(serviceRequests)
+                .AutoFitColumns();
+
+            return excelBuilder.Build();
         }
     }
 }
