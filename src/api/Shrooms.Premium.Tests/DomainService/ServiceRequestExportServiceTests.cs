@@ -24,7 +24,7 @@ namespace Shrooms.Premium.Tests.DomainService
         private IUnitOfWork2 _uow;
         private DbSet<ServiceRequest> _serviceRequestsDbSet;
         private IServiceRequestExportService _serviceRequestExportService;
-        private IExcelBuilder _excelBuilder;
+        private IExcelBuilderFactory _excelBuilder;
 
         [SetUp]
         public void TestInitializer()
@@ -33,7 +33,7 @@ namespace Shrooms.Premium.Tests.DomainService
             _serviceRequestsDbSet = Substitute.For<DbSet<ServiceRequest>, IQueryable<ServiceRequest>, IDbAsyncEnumerable<ServiceRequest>>();
             _uow.GetDbSet<ServiceRequest>().Returns(_serviceRequestsDbSet);
 
-            _excelBuilder = new ExcelBuilder();
+            _excelBuilder = new ExcelBuilderFactory();
 
             _serviceRequestExportService = new ServiceRequestExportService(_uow, _excelBuilder);
         }
@@ -90,12 +90,6 @@ namespace Shrooms.Premium.Tests.DomainService
 
                 excelReader.Close();
             }
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            _excelBuilder?.Dispose();
         }
 
         private void MockServiceRequests()

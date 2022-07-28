@@ -24,7 +24,7 @@ namespace Shrooms.Tests.DomainService
         private DbSet<KudosLog> _kudosDbSet;
         private DbSet<ApplicationUser> _usersDbSet;
         private IKudosExportService _kudosExportService;
-        private ExcelBuilder _excelBuilder;
+        private ExcelBuilderFactory _excelBuilder;
 
         [SetUp]
         public void TestInitializer()
@@ -38,7 +38,7 @@ namespace Shrooms.Tests.DomainService
             _usersDbSet.SetDbSetDataForAsync(MockUsers());
             _uow.GetDbSet<ApplicationUser>().Returns(_usersDbSet);
 
-            _excelBuilder = new ExcelBuilder();
+            _excelBuilder = new ExcelBuilderFactory();
 
             _kudosExportService = new KudosExportService(
                 _uow,
@@ -105,13 +105,7 @@ namespace Shrooms.Tests.DomainService
                 excelReader.Close();
             }
         }
-
-        [TearDown]
-        public void TearDown()
-        {
-            _excelBuilder?.Dispose();
-        }
-
+        
         private IQueryable<KudosLog> MockKudos()
         {
             return new List<KudosLog>
