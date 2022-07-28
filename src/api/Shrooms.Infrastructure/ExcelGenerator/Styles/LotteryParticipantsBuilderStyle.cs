@@ -50,9 +50,7 @@ namespace Shrooms.Infrastructure.ExcelGenerator.Styles
 
             foreach (var position in GetPositionEnumerator(_rows))
             {
-                var realCellPosition = (position.Item1 + 1, position.Item2 + 1);
-
-                ApplyCellStyles(excelRange[realCellPosition.Item1, realCellPosition.Item2]);
+                ApplyCellStyles(excelRange[position.Item1, position.Item2]);
             }
         }
 
@@ -69,13 +67,13 @@ namespace Shrooms.Infrastructure.ExcelGenerator.Styles
 
         private IEnumerable<(int, int)> GetPositionEnumerator<T>(IEnumerable<IEnumerable<T>> enumerable)
         {
-            var currentRowIndex = -1;
+            var currentRowIndex = 0;
 
             foreach (var row in enumerable)
             {
                 currentRowIndex++;
 
-                var currentColumnIndex = 0;
+                var currentColumnIndex = 1;
 
                 foreach (var column in row)
                 {
