@@ -86,7 +86,7 @@ namespace Shrooms.Domain.Services.Administration
                 .Where(user => user.OrganizationId == 2)
                 .ToListAsync();
 
-            using (var printer = new ExcelGenerator("Users"))
+            using (var printer = new ExcelGeneratorDeprecated("Users"))
             {
                 printer.CenterColumns(2, 6);
                 printer.AddHeaderRow(HeaderRow());

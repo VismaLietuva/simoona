@@ -17,13 +17,13 @@ namespace Shrooms.Domain.Services.Kudos
     {
         private readonly IDbSet<KudosLog> _kudosLogsDbSet;
         private readonly IDbSet<ApplicationUser> _userDbSet;
-        private readonly IExcelBuilder _excelBuilder;
+        private readonly IExcelBuilderFactory _excelBuilderFactory;
 
-        public KudosExportService(IUnitOfWork2 uow, IExcelBuilder excelBuilder)
+        public KudosExportService(IUnitOfWork2 uow, IExcelBuilderFactory excelBuilderFactory)
         {
             _kudosLogsDbSet = uow.GetDbSet<KudosLog>();
             _userDbSet = uow.GetDbSet<ApplicationUser>();
-            _excelBuilder = excelBuilder;
+            _excelBuilderFactory = excelBuilderFactory;
         }
 
         public async Task<byte[]> ExportToExcelAsync(KudosLogsFilterDto filter)
@@ -67,9 +67,15 @@ namespace Shrooms.Domain.Services.Kudos
                 Resources.Models.Kudos.Kudos.ExportColumnRejectionMessage
             };
 
-            _excelBuilder.AddNewWorksheet(BusinessLayerConstants.KudosLogExcelSheetName, header, kudosLogs);
+            var excelBuilder = _excelBuilderFactory.GetBuilder();
 
-            return _excelBuilder.GenerateByteArray();
+            excelBuilder
+                .AddWorksheet(BusinessLayerConstants.KudosLogExcelSheetName)
+                .AddHeader(header)
+                .AddRows(kudosLogs)
+                .AutoFitColumns();
+
+            return excelBuilder.Build();
         }
     }
 }

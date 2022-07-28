@@ -91,6 +91,9 @@
     <Compile Include="DataTransferObjects\FilterPresets\FiltersDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\UpdatedFilterPresetDto.cs" />
     <Compile Include="Enums\ExcelBuilderStyles.cs" />
+    <Compile Include="Infrastructure\ExcelGenerator\IExcelBuilder.cs" />
+    <Compile Include="Infrastructure\ExcelGenerator\IExcelBuilderFactory.cs" />
+    <Compile Include="Infrastructure\ExcelGenerator\IExcelWorksheetBuilder.cs" />
     <Compile Include="Infrastructure\IFilterableByDate.cs" />
     <Compile Include="Infrastructure\IPageable.cs" />
     <Compile Include="DataTransferObjects\ISoftDelete.cs" />
@@ -131,7 +134,6 @@
     <Compile Include="Infrastructure\IAsyncRunner.cs" />
     <Compile Include="Infrastructure\IBackgroundWorker.cs" />
     <Compile Include="Infrastructure\ICustomCache.cs" />
-    <Compile Include="Infrastructure\IExcelBuilder.cs" />
     <Compile Include="Infrastructure\IJobScheduler.cs" />
     <Compile Include="Infrastructure\ILogger.cs" />
     <Compile Include="Infrastructure\ISortable.cs" />

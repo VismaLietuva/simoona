@@ -1,29 +1,49 @@
-﻿using System;
+﻿using OfficeOpenXml;
+using Shrooms.Contracts.Enums;
+using Shrooms.Contracts.Infrastructure.ExcelGenerator;
+using Shrooms.Infrastructure.ExcelGenerator.Styles;
+using System;
 using System.Collections.Generic;
-using OfficeOpenXml;
+using System.Linq;
 
 namespace Shrooms.Infrastructure.ExcelGenerator
 {
-    public class ExcelWorksheetBuilder
+    public class ExcelWorksheetBuilder : IExcelWorksheetBuilder
     {
-        private readonly ExcelWorksheet _worksheet;
-        private bool _withHeader;
-
         private const string DefaulDateFormat = "yyyy-mm-dd HH:mm:ss";
         private const string DefaultNumberFormat = "#";
         private const string DefaultDecimalFormat = "0.00";
 
-        public ExcelWorksheetBuilder(ExcelWorksheet worksheet)
+        private const int MaximumTextCharacterLength = 70;
+
+        private const int MinimmumColumnWidth = 5;
+        private const int MaximumColumnWidth = 60;
+
+        private readonly ExcelWorksheet _worksheet;
+        private readonly IEnumerable<IEnumerable<object>> _rows;
+
+        private readonly bool _isHeaderPresent;
+
+        public ExcelWorksheetBuilder(
+            ExcelWorksheet worksheet,
+            bool isHeaderPresent = false, 
+            IEnumerable<IEnumerable<object>> rows = null)
         {
             _worksheet = worksheet;
-            _withHeader = false;
+            _isHeaderPresent = isHeaderPresent;
+            _rows = rows;
         }
 
-        public ExcelWorksheetBuilder WithHeader(IEnumerable<string> headerItems)
+        public IExcelWorksheetBuilder AddHeader(params string[] headerParts)
         {
-            _withHeader = true;
+            return AddHeader(headerParts.AsEnumerable());
+        }
+
+        public IExcelWorksheetBuilder AddHeader(IEnumerable<string> headerParts)
+        {
             var index = 1;
-            foreach (var item in headerItems)
+
+            foreach (var item in headerParts)
             {
                 _worksheet.Cells[1, index].Value = item;
                 index++;
@@ -32,67 +52,126 @@ namespace Shrooms.Infrastructure.ExcelGenerator
             _worksheet.Cells[1, 1, 1, index - 1].AutoFilter = true;
             _worksheet.Cells[1, 1, 1, index - 1].Style.Font.Bold = true;
 
-            return this;
+            return new ExcelWorksheetBuilder(_worksheet, true, _rows);
         }
 
-        public ExcelWorksheetBuilder WithRows(IEnumerable<IEnumerable<object>> rows)
+        public IExcelWorksheetBuilder AddRows(IEnumerable<IEnumerable<object>> rows)
         {
-            var rowIndex = _withHeader ? 2 : 1;
-
-            foreach (var row in rows)
+            foreach (var cell in GetCellEnumerator(rows))
             {
-                WithRow(rowIndex++, row);
+                AddCellContent(cell);
+            }
+
+            return new ExcelWorksheetBuilder(_worksheet, _isHeaderPresent, rows);
+        }
+
+        public IExcelWorksheetBuilder AddStyle(ExcelBuilderStyles excelBuilderStyle = ExcelBuilderStyles.Default)
+        {
+            if (TryFindBuilderStyle(excelBuilderStyle, _rows, out var style))
+            {
+                style.Apply(_worksheet);
             }
 
             return this;
         }
 
-        public ExcelWorksheetBuilder WithRow(int rowIndex, IEnumerable<object> row)
+        public IExcelWorksheetBuilder AutoFitColumns(int minimumWidth, int maximumWidth)
         {
-            var columnIndex = 1;
-            foreach (var columnValue in row)
-            {
-                if (columnValue == null)
-                {
-                    _worksheet.Cells[rowIndex, columnIndex].Value = string.Empty;
-                }
-                else if (columnValue is DateTime)
-                {
-                    _worksheet.Cells[rowIndex, columnIndex].Value = columnValue;
-                    _worksheet.Cells[rowIndex, columnIndex].Style.Numberformat.Format = DefaulDateFormat;
-                }
-                else if (columnValue is int || columnValue is long)
-                {
-                    _worksheet.Cells[rowIndex, columnIndex].Value = columnValue;
-                    _worksheet.Cells[rowIndex, columnIndex].Style.Numberformat.Format = DefaultNumberFormat;
-                }
-                else if (columnValue is decimal)
-                {
-                    _worksheet.Cells[rowIndex, columnIndex].Value = columnValue;
-                    _worksheet.Cells[rowIndex, columnIndex].Style.Numberformat.Format = DefaultDecimalFormat;
-                }
-                else
-                {
-                    var text = columnValue.ToString();
-                    _worksheet.Cells[rowIndex, columnIndex].Value = text;
+            _worksheet.Cells.AutoFitColumns(minimumWidth, maximumWidth);
 
-                    // Wrap text if it is too long.
-                    if (text.Length > 70)
+            return this;
+        }
+
+        public IExcelWorksheetBuilder AutoFitColumns()
+        {
+            return AutoFitColumns(MinimmumColumnWidth, MaximumColumnWidth);
+        }
+
+        private void AddCellContent(ExcelCell cell)
+        {
+            var cellRange = _worksheet.Cells[cell.RowIndex, cell.ColumnIndex];
+
+            if (cell.Value == null)
+            {
+                cell.Value = string.Empty;
+                
+                return;
+            }
+
+            if (TryFindNumberFormat(cell.Value.GetType(), out var format))
+            {
+                cellRange.Value = cell.Value;
+                cellRange.Style.Numberformat.Format = format;
+
+                return;
+            }
+
+            var text = cell.Value.ToString();
+
+            cellRange.Value = text;
+
+            if (text.Length > MaximumTextCharacterLength)
+            {
+                cellRange.Style.WrapText = true;
+            }
+        }
+
+        private bool TryFindNumberFormat(Type type, out string format)
+        {
+            format = null;
+
+            if (type == typeof(DateTime))
+            {
+                format = DefaulDateFormat;
+            }
+            else if (type == typeof(long) || type == typeof(int))
+            {
+                format = DefaultNumberFormat;
+            }
+            else if (type == typeof(decimal))
+            {
+                format = DefaultDecimalFormat;
+            }
+
+            return format != null;
+        }
+
+        private bool TryFindBuilderStyle(ExcelBuilderStyles builderStyle, IEnumerable<IEnumerable<object>> rows, out ExcelBuilderStyleBase style)
+        {
+            switch (builderStyle)
+            {
+                case ExcelBuilderStyles.LotteryParticipants:
+                    style = new LotteryParticipantsBuilderStyle(rows);
+                    break;
+                case ExcelBuilderStyles.Default:
+                default:
+                    style = null;
+                    return false;
+            }
+
+            return true;
+        }
+
+        private IEnumerable<ExcelCell> GetCellEnumerator<T>(IEnumerable<IEnumerable<T>> enumerable)
+        {
+            var currentRowIndex = _isHeaderPresent ? 1 : 0;
+
+            foreach (var row in enumerable)
+            {
+                currentRowIndex++;
+
+                var currentColumnIndex = 1;
+
+                foreach (var column in row)
+                {
+                    yield return new ExcelCell
                     {
-                        _worksheet.Cells[rowIndex, columnIndex].Style.WrapText = true;
-                    }
+                        RowIndex = currentRowIndex,
+                        ColumnIndex = currentColumnIndex++,
+                        Value = column
+                    };
                 }
-
-                columnIndex++;
             }
-
-            return this;
-        }
-
-        public ExcelWorksheet Build()
-        {
-            _worksheet.Cells.AutoFitColumns(5, 60);
-            return _worksheet;
         }
     }
 }

@@ -38,7 +38,7 @@ namespace Shrooms.IoC.Modules
             builder.RegisterType<ApplicationSettings>().As<IApplicationSettings>().InstancePerLifetimeScope();
 
             builder.RegisterType<SystemClock>().As<ISystemClock>().SingleInstance();
-            builder.RegisterType<ExcelBuilder>().As<IExcelBuilder>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            builder.RegisterType<ExcelBuilderFactory>().As<IExcelBuilderFactory>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<MailTemplate>().As<IMailTemplate>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<DailyMailingService>().As<IDailyMailingService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<HangFireScheduler>().As<IJobScheduler>().InstancePerRequest();

@@ -1,15 +1,14 @@
 ﻿using OfficeOpenXml;
 using System.Collections.Generic;
 using OfficeOpenXml.Style;
-using Shrooms.Infrastructure.Extensions;
 using System.Linq;
 
 namespace Shrooms.Infrastructure.ExcelGenerator.Styles
 {
     public class LotteryParticipantsBuilderStyle : ExcelBuilderStyleBase
     {
-        private const int HeightPadding = 30;
-        private const int WidthPadding = 10;
+        private const int HeightPadding = 20;
+        private const int WidthPadding = 8;
         
         private readonly IEnumerable<IEnumerable<object>> _rows;
 
@@ -26,10 +25,10 @@ namespace Shrooms.Infrastructure.ExcelGenerator.Styles
             }
 
             ApplyStyles(worksheet);
-            IncreaseDefaultCellsSize(worksheet);
+            IncreaseDefaultCellSize(worksheet);
         }
 
-        private void IncreaseDefaultCellsSize(ExcelWorksheet worksheet)
+        private void IncreaseDefaultCellSize(ExcelWorksheet worksheet)
         {
             var rowCount = _rows.Count();
             var firstRowColumnCount = _rows.FirstOrDefault()?.Count() ?? 0;
@@ -49,7 +48,7 @@ namespace Shrooms.Infrastructure.ExcelGenerator.Styles
         {
             using var excelRange = worksheet.Cells;
 
-            foreach (var position in _rows.GetRowsPositionEnumerator())
+            foreach (var position in GetPositionEnumerator(_rows))
             {
                 var realCellPosition = (position.Item1 + 1, position.Item2 + 1);
 
@@ -66,6 +65,23 @@ namespace Shrooms.Infrastructure.ExcelGenerator.Styles
 
             cellRange.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
             cellRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+        }
+
+        private IEnumerable<(int, int)> GetPositionEnumerator<T>(IEnumerable<IEnumerable<T>> enumerable)
+        {
+            var currentRowIndex = -1;
+
+            foreach (var row in enumerable)
+            {
+                currentRowIndex++;
+
+                var currentColumnIndex = 0;
+
+                foreach (var column in row)
+                {
+                    yield return (currentRowIndex, currentColumnIndex++);
+                }
+            }
         }
     }
 }
