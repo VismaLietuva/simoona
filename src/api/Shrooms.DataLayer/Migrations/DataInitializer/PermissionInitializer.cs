@@ -81,7 +81,7 @@ namespace Shrooms.DataLayer.Migrations.DataInitializer
                 .AddAdminPermission(permissionName: AdministrationPermissions.KudosShop, withRoleNames: Roles.Administration)
                 .AddAdminPermission(permissionName: AdministrationPermissions.Job, withRoleNames: Roles.Administration)
                 .AddAdminPermission(permissionName: AdministrationPermissions.Lottery, withRoleNames: new[] { Roles.LotteryAdmin, Roles.Administration })
-                .AddAdminPermission(permissionName: AdministrationPermissions.Blacklist, withRoleNames: new[] { Roles.Admin });
+                .AddAdminPermission(permissionName: AdministrationPermissions.Blacklist, withRoleNames: new[] { Roles.Administration });
 
             permissionBuilder.UpdatePermissions();
         }

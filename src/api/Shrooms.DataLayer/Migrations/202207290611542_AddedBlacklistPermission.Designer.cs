@@ -13,7 +13,7 @@ namespace Shrooms.DataLayer.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202207260838384_AddedBlacklistPermission"; }
+            get { return "202207290611542_AddedBlacklistPermission"; }
         }
         
         string IMigrationMetadata.Source
