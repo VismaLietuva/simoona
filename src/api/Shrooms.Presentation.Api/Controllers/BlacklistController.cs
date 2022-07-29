@@ -26,7 +26,7 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [HttpPost]
-        [Route("Add")]
+        [Route("")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Blacklist)]
         public async Task<IHttpActionResult> AddToBlacklist(CreateBlacklistUserViewModel createViewModel)
         {
@@ -50,7 +50,7 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [HttpPut]
-        [Route("Update")]
+        [Route("")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Blacklist)]
         public async Task<IHttpActionResult> UpdateBlacklist([FromUri] UpdateBlacklistUserViewModel updateViewModel)
         {
@@ -74,13 +74,13 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [HttpPut]
-        [Route("Cancel")]
+        [Route("{id}/Cancel")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Blacklist)]
-        public async Task<IHttpActionResult> CancelBlacklist(string userId)
+        public async Task<IHttpActionResult> CancelBlacklist(string id)
         {
             try
             {
-                await _blacklistService.CancelAsync(userId, GetUserAndOrganization());
+                await _blacklistService.CancelAsync(id, GetUserAndOrganization());
 
                 return Ok();
             }
@@ -91,11 +91,11 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [HttpGet]
-        [Route("Get")]
+        [Route("{id}")]
         [PermissionAuthorize(Permission = BasicPermissions.Blacklist)]
-        public async Task<IHttpActionResult> GetActiveBlacklist(string userId)
+        public async Task<IHttpActionResult> GetActiveBlacklist(string id)
         {
-            var blacklistUserDto = await _blacklistService.FindAsync(userId, GetUserAndOrganization());
+            var blacklistUserDto = await _blacklistService.FindAsync(id, GetUserAndOrganization());
 
             if (blacklistUserDto == null)
             {
@@ -108,12 +108,12 @@ namespace Shrooms.Presentation.Api.Controllers
         }
 
         [HttpGet]
-        [Route("History")]
-        public async Task<IHttpActionResult> GetBlacklistHistory(string userId)
+        [Route("{id}/History")]
+        public async Task<IHttpActionResult> GetBlacklistHistory(string id)
         {
             try
             {
-                var blacklistUserDtos = await _blacklistService.GetAllExceptActiveAsync(userId, GetUserAndOrganization());
+                var blacklistUserDtos = await _blacklistService.GetAllExceptActiveAsync(id, GetUserAndOrganization());
                 var blacklistUserViewModels = _mapper.Map<IEnumerable<BlacklistUserDto>, IEnumerable<BlacklistUserViewModel>>(blacklistUserDtos);
 
                 return Ok(blacklistUserViewModels);

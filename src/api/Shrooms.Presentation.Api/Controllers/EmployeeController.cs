@@ -12,8 +12,8 @@ using Shrooms.Presentation.WebViewModels.Models.Employees;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
+    [RoutePrefix("Employees")]
     [Authorize]
-    [RoutePrefix("EmployeeList")]
     public class EmployeeController : BaseController
     {
         private readonly IMapper _mapper;
@@ -25,10 +25,10 @@ namespace Shrooms.Presentation.Api.Controllers
             _employeeListingService = employeeListingService;
         }
 
+        [Route("")]
         [HttpGet]
-        [Route("GetPaged")]
         [PermissionAuthorize(Permission = BasicPermissions.EmployeeList)]
-        public async Task<IHttpActionResult> GetPagedEmployees([FromUri] EmployeeListingArgsViewModel employeeArgsViewModel)
+        public virtual async Task<IHttpActionResult> GetPagedEmployees([FromUri] EmployeeListingArgsViewModel employeeArgsViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -48,6 +48,21 @@ namespace Shrooms.Presentation.Api.Controllers
             catch (ValidationException e)
             {
                 return BadRequestWithError(e);
+            }
+        }
+
+        [RoutePrefix("EmployeeList")]
+        public class EmployeeDeprecatedController : EmployeeController
+        {
+            public EmployeeDeprecatedController(IMapper mapper, IEmployeeListingService employeeListingService)
+                : base(mapper, employeeListingService)
+            {
+            }
+
+            [Route("GetPaged")]
+            public override Task<IHttpActionResult> GetPagedEmployees([FromUri] EmployeeListingArgsViewModel employeeArgsViewModel)
+            {
+                return base.GetPagedEmployees(employeeArgsViewModel);
             }
         }
     }

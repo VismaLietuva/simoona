@@ -259,13 +259,11 @@
         }
 
         function getBlacklistEntry(userId) {
-            return $resource(blacklistStateUrl + 'Get').get({
-                userId: userId
-            }).$promise;
+            return $resource(`${blacklistStateUrl}/${userId}`).get().$promise;
         }
 
         function putBlacklistState(params) {
-            return $resource(blacklistStateUrl + 'Update', '', {
+            return $resource(blacklistStateUrl, '', {
                 put: {
                     method: 'PUT',
                     params: {
@@ -278,18 +276,15 @@
         }
 
         function deleteBlacklistState(params) {
-            return $resource(blacklistStateUrl + 'Cancel', '', {
+            return $resource(`${blacklistStateUrl}/${params.userId}/Cancel`, '', {
                 put: {
-                    method: 'PUT',
-                    params: {
-                        userId: params.userId
-                    }
+                    method: 'PUT'
                 }
             }).put().$promise;
         }
 
         function createBlacklistState(params) {
-            return $resource(blacklistStateUrl + 'Add').save({
+            return $resource(blacklistStateUrl).save({
                 userId: params.userId,
                 endDate: params.endDate,
                 reason: params.reason
@@ -297,7 +292,7 @@
         }
 
         function getBlacklistHistory(params) {
-            return $resource(blacklistStateUrl + 'History').query(params).$promise;
+            return $resource(`${blacklistStateUrl}/${params.userId}/History`).query().$promise;
         }
     }
 })();

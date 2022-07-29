@@ -8,11 +8,11 @@
     employeeListRepository.$inject = ['$resource', 'endPoint'];
 
     function employeeListRepository($resource, endPoint) {
-        var employeeListUrl = endPoint + '/EmployeeList/';
+        var employeeListUrl = endPoint + '/Employees/';
 
         return {
             getPaged: function (params) {
-                return $resource(employeeListUrl + 'GetPaged', '', { 'query': { method: 'GET', isArray: false, params: params } }).query(params).$promise;
+                return $resource(employeeListUrl, '', { 'query': { method: 'GET', isArray: false, params: params } }).query(params).$promise;
             }
         }
     }
