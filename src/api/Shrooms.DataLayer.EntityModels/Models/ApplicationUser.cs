@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models.Badges;
 using Shrooms.DataLayer.EntityModels.Models.Books;
 using Shrooms.DataLayer.EntityModels.Models.Events;
@@ -55,31 +57,31 @@ namespace Shrooms.DataLayer.EntityModels.Models
 
         public decimal SpentKudos { get; set; }
 
-        [ForeignKey("Room")]
+        [ForeignKey(nameof(Room))]
         public int? RoomId { get; set; }
 
         public virtual Room Room { get; set; }
 
         public string PictureId { get; set; }
 
-        [ForeignKey("QualificationLevel")]
+        [ForeignKey(nameof(QualificationLevel))]
         public int? QualificationLevelId { get; set; }
 
         public virtual QualificationLevel QualificationLevel { get; set; }
 
         public string ManagerId { get; set; }
 
-        [ForeignKey("ManagerId")]
+        [ForeignKey(nameof(ManagerId))]
         public virtual ApplicationUser Manager { get; set; }
 
         public virtual ICollection<ApplicationUser> ManagedUsers { get; set; }
 
         public virtual ICollection<Committee.Committee> Committees { get; set; }
 
-        [InverseProperty("Leads")]
+        [InverseProperty(nameof(Committee.Committee.Leads))]
         public virtual ICollection<Committee.Committee> LeadingCommittees { get; set; }
 
-        [InverseProperty("Delegates")]
+        [InverseProperty(nameof(Committee.Committee.Delegates))]
         public virtual ICollection<Committee.Committee> DelegatingCommittees { get; set; }
 
         public int OrganizationId { get; set; }
@@ -134,8 +136,20 @@ namespace Shrooms.DataLayer.EntityModels.Models
 
         public int? JobPositionId { get; set; }
 
-        [ForeignKey("JobPositionId")]
+        [ForeignKey(nameof(JobPositionId))]
         public virtual JobPosition JobPosition { get; set; }
+
+        [InverseProperty(nameof(BlacklistUser.User))]
+        public virtual ICollection<BlacklistUser> BlacklistEntries { get; set; }
+
+        [NotMapped]
+        public bool UserWasPreviouslyBlacklisted
+        {
+            get
+            {
+                return BlacklistEntries.Any(entry => entry.Status != BlacklistStatus.Active);
+            }
+        }
 
         public string TimeZone { get; set; }
 

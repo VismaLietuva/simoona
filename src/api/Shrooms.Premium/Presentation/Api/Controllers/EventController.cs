@@ -28,8 +28,8 @@ using Shrooms.Premium.Presentation.WebViewModels.Events;
 using Shrooms.Premium.Presentation.WebViewModels.User;
 using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.Api.Filters;
-using Shrooms.Premium.Presentation.Api.Extensions;
 using X.PagedList;
+using Shrooms.Domain.Extensions;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers
 {

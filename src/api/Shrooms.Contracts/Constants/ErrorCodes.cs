@@ -54,5 +54,9 @@
         public const int InvalidType = 1400;
         public const int FilterNotFound = 1403;
         public const int FilterPresetContainsMoreThanOneDefaultPreset = 1404;
+
+        // Blacklist, 15**
+        public const int BlacklistEntryNotFound = 1500;
+        public const int InvalidPermissionForBlacklistHistory = 1501;
     }
 }

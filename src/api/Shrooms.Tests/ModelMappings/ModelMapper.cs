@@ -28,6 +28,8 @@ namespace Shrooms.Tests.ModelMappings
                 cfg.AddProfile<Likes>();
                 cfg.AddProfile<VacationPages>();
                 cfg.AddProfile<FilterPresets>();
+                cfg.AddProfile<BlacklistUsers>();
+                cfg.AddProfile<Employees>();
             };
 
             var configuration = new MapperConfiguration(mappings);

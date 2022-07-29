@@ -147,7 +147,7 @@ input.btn.btn-primary.add-new-btn{
                 height: 24px;
                 max-width: 150px;
                 display: flex;
-            }           
+            }
         }
     }
     label {
@@ -212,17 +212,30 @@ input.btn.btn-primary.add-new-btn{
         padding-right: 10px;
     }
     &.profile-form {
-        .form-group { 
+        .form-group {
             margin-left: 0;
         }
     }
 }
-
+.profile-blacklist-content,
 .profile-edit-button {
     flex: 0 1 100%;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+}
+
+.profile-dots {
+    flex: 0 1 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: -10px;
+    margin-bottom: 3px;
+    line-height: 1;
+    font-weight: 600;
+    font-size: 24px;
+    color: #dddddd;
 }
 
 .profile-image-thumb {
@@ -231,4 +244,51 @@ input.btn.btn-primary.add-new-btn{
 
 .profile-image {
     max-width: 200px;
+}
+
+.profile-edit-blacklist-info-text {
+    font-weight: 300;
+}
+
+.profile-edit-blacklist-info-link {
+    display: inline-block;
+}
+
+.profile-edit-blacklist-hr {
+    border-color: #dddddd;
+}
+
+.profile-edit-nav .dropdown-toggle {
+    z-index: 60 !important;
+    margin-left: 43px !important;
+}
+
+.profile-edit-nav .nav-tabs {
+    margin-right: 40px;
+}
+
+.profile-edit-nav .dropdown-menu {
+    right: -50px !important;
+}
+
+.profile-edit-nav .has-error,
+.profile-edit-nav .has-error:focus {
+    border: 0 !important;
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+}
+
+@media(max-width: 764px) {
+    .profile-edit-blacklist-author {
+        margin-left: 0 !important;
+    }
+}
+
+.profile-visible-message {
+    margin-left: auto;
+    margin-bottom: -10px;
+
+    > span {
+        color: #d4d4d4;
+    }
 }

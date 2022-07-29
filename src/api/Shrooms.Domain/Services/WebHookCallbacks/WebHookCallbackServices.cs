@@ -1,5 +1,6 @@
 ﻿using Shrooms.Domain.Services.DailyMailingService;
 using Shrooms.Domain.Services.WebHookCallbacks.BirthdayNotification;
+using Shrooms.Domain.Services.WebHookCallbacks.BlacklistUsers;
 using Shrooms.Domain.Services.WebHookCallbacks.UserAnonymization;
 
 namespace Shrooms.Domain.Services.WebHookCallbacks
@@ -11,5 +12,7 @@ namespace Shrooms.Domain.Services.WebHookCallbacks
         public IDailyMailingService DailyMails { get; set; }
 
         public IUsersAnonymizationWebHookService UsersAnonymization { get; set; }
+
+        public IBlacklistUserStatusChangeWebHookService BlacklistUserStatusChange { get; set; }
     }
 }

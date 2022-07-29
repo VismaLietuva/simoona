@@ -36,31 +36,24 @@
                             if (!$stateParams.id) {
                                 $stateParams.id = authService.identity.userId;
                             }
-                            
+
                             return profileRepository.getDetails($stateParams);
                         }
                     ]
                 }
             })
             .state('Root.WithOrg.Client.Profiles.Edit', {
-                url: '/:id/Edit', //:tab
+                url: '/:id/Edit/:tab',
                 templateUrl: 'app/profile/profile-edit/profile-edit.html',
                 controller: 'profileEditController',
                 reloadOnSearch: true,
                 resolve: {
-                    model: [
-                        '$stateParams', 'profileRepository',
-                        function ($stateParams, profileRepository) {
-                            return profileRepository.getUserProfilePersonal($stateParams);
-                        }
-                    ],
                     tabName: [
                         '$stateParams',
                         function ($stateParams) {
                             return $stateParams.tab || 'personal';
                         }
                     ]
-
                 }
             });
     }

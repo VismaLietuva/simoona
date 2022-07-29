@@ -178,7 +178,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\WebApi\BlacklistControllerTests.cs" />
     <Compile Include="Controllers\WebApi\CommentControllerTests.cs" />
+    <Compile Include="Controllers\WebApi\EmployeeControllerTests.cs" />
     <Compile Include="Controllers\WebApi\FilterPresetControllerTests.cs" />
     <Compile Include="Controllers\WebApi\ExternalLinkControllerTests.cs" />
     <Compile Include="Controllers\WebApi\KudosControllerTests.cs" />
@@ -186,6 +188,8 @@
     <Compile Include="Controllers\WebApi\VacationPageControllerTests.cs" />
     <Compile Include="Controllers\WebApi\WallControllerTests.cs" />
     <Compile Include="DomainService\ApplicationUserTests.cs" />
+    <Compile Include="DomainService\BlacklistServiceTests.cs" />
+    <Compile Include="DomainService\EmployeeListingServiceTests.cs" />
     <Compile Include="DomainService\ExternalLinkServiceTests.cs" />
     <Compile Include="DomainService\AdministrationUsersServiceTests.cs" />
     <Compile Include="DomainService\MonitorServiceTests.cs" />
@@ -200,9 +204,11 @@
     <Compile Include="DomainService\KudosServiceTests.cs" />
     <Compile Include="DomainService\PostServiceTests.cs" />
     <Compile Include="DomainService\VacationPageServiceTests.cs" />
+    <Compile Include="DomainService\Validators\BlacklistValidatorTests.cs" />
     <Compile Include="DomainService\Validators\FilterPresetValidatorTests.cs" />
     <Compile Include="DomainService\Validators\WallValidatorTests.cs" />
     <Compile Include="DomainService\WallServiceTests.cs" />
+    <Compile Include="DomainService\WebHookCallbacks\BlacklistUserStatusChangeWebHookServiceTests.cs" />
     <Compile Include="DomainService\WebHookCallbacks\UsersAnonymizationWebHookServiceTests.cs" />
     <Compile Include="Entities\KudosLogTests.cs" />
     <Compile Include="Extensions\QueryableExtensionsTests.cs" />

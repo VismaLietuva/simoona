@@ -6,48 +6,60 @@
 
     EmployeeListController.$inject = [
         '$scope',
-        '$stateParams',
         'employeeListRepository',
         'authService',
-        'notifySrv',
         '$rootScope',
-        '$translate',
         'employeeList',
-        '$timeout'
+        'sortMultipleLinkService',
     ];
 
-    function EmployeeListController($scope, $stateParams, employeeListRepository,
-        authService, notifySrv, $rootScope, $translate, employeeList, $timeout) {
-
+    function EmployeeListController(
+        $scope,
+        employeeListRepository,
+        authService,
+        $rootScope,
+        employeeList,
+        sortMultipleLinkService
+    ) {
         $scope.pagedEmployeeList = employeeList;
         $rootScope.pageTitle = 'common.employeeList';
 
-        $scope.isAdmin = authService.hasPermissions(['APPLICATIONUSER_ADMINISTRATION']);
+        $scope.isAdmin = authService.hasPermissions([
+            'APPLICATIONUSER_ADMINISTRATION',
+        ]);
+
+        $scope.hasBlacklistPermission = authService.hasPermissions([
+            'BLACKLIST_BASIC'
+        ]);
 
         $scope.filter = {
             page: 1,
-            sortOrder: 'asc',
-            sortBy: 'LastName',
-            search: ''
+            search: '',
+            sortValues: sortMultipleLinkService.getMultipleSort(5),
+            showOnlyBlacklisted: false
         };
 
         $scope.getEmployeeList = function () {
-            employeeListRepository.getPaged($scope.filter).then(function (getPagedResponse) {
-                $scope.pagedEmployeeList = getPagedResponse;
-            });
+            employeeListRepository
+                .getPaged({
+                    page: $scope.filter.page,
+                    search: $scope.filter.search,
+                    sortByProperties: $scope.filter.sortValues.getSortString(),
+                    showOnlyBlacklisted: $scope.filter.showOnlyBlacklisted
+                })
+                .then(function (getPagedResponse) {
+                    $scope.pagedEmployeeList = getPagedResponse;
+                });
         };
 
         $scope.searchReset = function () {
             $scope.filter.search = '';
-            $scope.filter.sortOrder = 'asc';
-            $scope.filter.sortBy = 'LastName';
             $scope.filter.page = 1;
             $scope.getEmployeeList();
         };
 
-        $scope.onSort = function (sortBy, sortOrder) {
-            $scope.filter.sortOrder = sortOrder;
-            $scope.filter.sortBy = sortBy;
+        $scope.onSort = function (sortBy, sortOrder, position) {
+            $scope.filter.sortValues.setSortValues(sortBy, sortOrder, position);
             $scope.filter.page = 1;
             $scope.getEmployeeList();
         };

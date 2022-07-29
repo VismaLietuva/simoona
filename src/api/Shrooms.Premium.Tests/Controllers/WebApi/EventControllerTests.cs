@@ -16,15 +16,11 @@ using Shrooms.Premium.Domain.Services.OfficeMap;
 using Shrooms.Premium.Presentation.Api.Controllers;
 using Shrooms.Premium.Presentation.WebViewModels.Events;
 using Shrooms.Premium.Tests.ModelMappings;
+using Shrooms.Tests.Extensions;
 using System;
 using System.Net;
-using System.Net.Http;
-using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web.Http;
-using System.Web.Http.Controllers;
-using System.Web.Http.Hosting;
 
 namespace Shrooms.Premium.Tests.Controllers.WebApi
 {
@@ -64,12 +60,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 officeMapService,
                 asyncRunner);
 
-            _eventController.ControllerContext = Substitute.For<HttpControllerContext>();
-            _eventController.Request = new HttpRequestMessage();
-            _eventController.Request.Properties.Add(HttpPropertyKeys.HttpConfigurationKey, new HttpConfiguration());
-            _eventController.Request.SetConfiguration(new HttpConfiguration());
-            _eventController.RequestContext.Principal =
-                new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, "1"), new Claim("OrganizationId", "1") }));
+            _eventController.SetUpControllerForTesting();
         }
 
         [Test]
@@ -231,7 +222,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 Arg.Any<EventParticipantVisitedEventsListingArgsDto>(),
                 Arg.Any<UserAndOrganizationDto>())
                 .Throws(new EventException("Error"));
-            
+
             var visitedArgsViewModel = new EventParticipantVisitedEventsListingArgsViewModel();
 
             // Act

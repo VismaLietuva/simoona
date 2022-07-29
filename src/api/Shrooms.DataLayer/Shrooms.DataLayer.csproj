@@ -105,6 +105,7 @@
     <Compile Include="DAL\EntityTypeConfigurations\Badges\BadgeCategoryKudosTypeEntityConfiguration.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\Badges\BadgeLogEntityConfiguration.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\Badges\BadgeTypeEntityConfiguration.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\BlacklistUserEntityConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\BookEntityConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\BookLogEntityConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\BookOfficeEntityConfig.cs" />
@@ -877,6 +878,18 @@
     <Compile Include="Migrations\202207050924366_AddedPriorityToExternalLink.Designer.cs">
       <DependentUpon>202207050924366_AddedPriorityToExternalLink.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202207200750309_AddedBlacklistUserEntity.cs" />
+    <Compile Include="Migrations\202207200750309_AddedBlacklistUserEntity.Designer.cs">
+      <DependentUpon>202207200750309_AddedBlacklistUserEntity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202207201230300_AddedCreatedUserForeignKeyToBlacklistUser.cs" />
+    <Compile Include="Migrations\202207201230300_AddedCreatedUserForeignKeyToBlacklistUser.Designer.cs">
+      <DependentUpon>202207201230300_AddedCreatedUserForeignKeyToBlacklistUser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202207290611542_AddedBlacklistPermission.cs" />
+    <Compile Include="Migrations\202207290611542_AddedBlacklistPermission.Designer.cs">
+      <DependentUpon>202207290611542_AddedBlacklistPermission.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
@@ -1461,6 +1474,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202207050924366_AddedPriorityToExternalLink.resx">
       <DependentUpon>202207050924366_AddedPriorityToExternalLink.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202207200750309_AddedBlacklistUserEntity.resx">
+      <DependentUpon>202207200750309_AddedBlacklistUserEntity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202207201230300_AddedCreatedUserForeignKeyToBlacklistUser.resx">
+      <DependentUpon>202207201230300_AddedCreatedUserForeignKeyToBlacklistUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202207290611542_AddedBlacklistPermission.resx">
+      <DependentUpon>202207290611542_AddedBlacklistPermission.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

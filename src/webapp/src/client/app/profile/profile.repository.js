@@ -17,6 +17,7 @@
         var certificateUrl = endPoint + '/Certificate/';
         var examUrl = endPoint + '/Exam/';
         var hashtagsUrl = endPoint + '/Hashtags/';
+        var blacklistStateUrl = endPoint + '/Blacklist/';
 
         var service = {
             getUserProfile: getUserProfile,
@@ -58,7 +59,12 @@
             confirmRoomChange: confirmRoomChange,
             rejectRoomChange: rejectRoomChange,
             impersonate: impersonate,
-            revertImpersonate: revertImpersonate
+            revertImpersonate: revertImpersonate,
+            getBlacklistEntry: getBlacklistEntry,
+            putBlacklistState: putBlacklistState,
+            deleteBlacklistState: deleteBlacklistState,
+            createBlacklistState: createBlacklistState,
+            getBlacklistHistory: getBlacklistHistory
         };
 
         return service;
@@ -77,8 +83,8 @@
             return $resource(applicationUserUrl + 'ConfirmUser', { id: id }, { 'update': { method: 'PUT' } }).update().$promise;
         }
 
-        function getUserProfilePersonal(sParams) {
-            var url = applicationUserUrl + 'GetUserProfile/' + sParams.id + '/Personal';
+        function getUserProfilePersonal(userId) {
+            var url = applicationUserUrl + 'GetUserProfile/' + userId + '/Personal';
             return $resource(url).get({}).$promise;
         }
 
@@ -87,13 +93,13 @@
             return $resource(url).get({}).$promise;
         }
 
-        function getUserProfileJob(sParams) {
-            var url = applicationUserUrl + 'GetUserProfile/' + sParams.id + '/Job';
+        function getUserProfileJob(userId) {
+            var url = applicationUserUrl + 'GetUserProfile/' + userId + '/Job';
             return $resource(url).get({}).$promise;
         }
 
-        function getUserProfileOffice(sParams) {
-            var url = applicationUserUrl + 'GetUserProfile/' + sParams.id + '/Office';
+        function getUserProfileOffice(userId) {
+            var url = applicationUserUrl + 'GetUserProfile/' + userId + '/Office';
             return $resource(url).get({}).$promise;
         }
 
@@ -250,6 +256,43 @@
 
         function revertImpersonate() {
             return $resource(applicationUserUrl + 'RevertImpersonate', '', { put: { method: 'PUT' } }).put().$promise;
+        }
+
+        function getBlacklistEntry(userId) {
+            return $resource(`${blacklistStateUrl}/${userId}`).get().$promise;
+        }
+
+        function putBlacklistState(params) {
+            return $resource(blacklistStateUrl, '', {
+                put: {
+                    method: 'PUT',
+                    params: {
+                        userId: params.userId,
+                        endDate: params.endDate,
+                        reason: params.reason
+                    }
+                }
+            }).put().$promise;
+        }
+
+        function deleteBlacklistState(params) {
+            return $resource(`${blacklistStateUrl}/${params.userId}/Cancel`, '', {
+                put: {
+                    method: 'PUT'
+                }
+            }).put().$promise;
+        }
+
+        function createBlacklistState(params) {
+            return $resource(blacklistStateUrl).save({
+                userId: params.userId,
+                endDate: params.endDate,
+                reason: params.reason
+            }).$promise;
+        }
+
+        function getBlacklistHistory(params) {
+            return $resource(`${blacklistStateUrl}/${params.userId}/History`).query().$promise;
         }
     }
 })();
