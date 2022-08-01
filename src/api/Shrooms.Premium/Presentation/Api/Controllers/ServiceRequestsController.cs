@@ -411,8 +411,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
 
             try
             {
-                var stream = new ByteArrayContent(await _serviceRequestExportService.ExportToExcelAsync(GetUserAndOrganization(), filter));
-                var result = new HttpResponseMessage(HttpStatusCode.OK) { Content = stream };
+                var content =await _serviceRequestExportService.ExportToExcelAsync(GetUserAndOrganization(), filter);
+                var result = new HttpResponseMessage(HttpStatusCode.OK) { Content = content };
                 return ResponseMessage(result);
             }
             catch (ValidationException e)

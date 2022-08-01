@@ -520,9 +520,9 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         {
             try
             {
-                var exportOptions = await _eventExportService.ExportOptionsAndParticipantsAsync(eventId, GetUserAndOrganization());
-                var stream = new ByteArrayContent(exportOptions);
-                var result = new HttpResponseMessage(HttpStatusCode.OK) { Content = stream };
+                var content = await _eventExportService.ExportOptionsAndParticipantsAsync(eventId, GetUserAndOrganization());
+                var result = new HttpResponseMessage(HttpStatusCode.OK) { Content = content };
+
                 return ResponseMessage(result);
             }
             catch (EventException e)

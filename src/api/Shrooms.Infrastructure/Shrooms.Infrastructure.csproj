@@ -134,11 +134,11 @@
     <Compile Include="Email\Templating\MailTemplate.cs" />
     <Compile Include="ExcelGenerator\ExcelBuilder.cs" />
     <Compile Include="ExcelGenerator\ExcelBuilderFactory.cs" />
-    <Compile Include="ExcelGenerator\ExcelCell.cs" />
-    <Compile Include="ExcelGenerator\ExcelGeneratorDeprecated.cs" />
+    <Compile Include="ExcelGenerator\ExcelColumn.cs" />
+    <Compile Include="ExcelGenerator\ExcelColumnInternal.cs" />
+    <Compile Include="ExcelGenerator\ExcelRow.cs" />
+    <Compile Include="ExcelGenerator\ExcelRowCollection.cs" />
     <Compile Include="ExcelGenerator\ExcelWorksheetBuilder.cs" />
-    <Compile Include="ExcelGenerator\Styles\ExcelBuilderStyleBase.cs" />
-    <Compile Include="ExcelGenerator\Styles\LotteryParticipantsBuilderStyle.cs" />
     <Compile Include="FeatureToggle\Feature.cs" />
     <Compile Include="FireAndForget\AsyncRunner.cs" />
     <Compile Include="FireAndForget\HangFireScheduler.cs" />

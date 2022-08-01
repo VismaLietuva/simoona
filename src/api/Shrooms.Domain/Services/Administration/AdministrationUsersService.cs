@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -18,6 +20,8 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Administration;
 using Shrooms.Contracts.Enums;
+using Shrooms.Contracts.Infrastructure;
+using Shrooms.Contracts.Infrastructure.ExcelGenerator;
 using Shrooms.DataLayer.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
@@ -28,12 +32,14 @@ using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.Picture;
 using Shrooms.Domain.ServiceValidators.Validators.UserAdministration;
 using Shrooms.Infrastructure.ExcelGenerator;
-using userRes = Shrooms.Resources.Models.ApplicationUser.ApplicationUser;
+using UserResources = Shrooms.Resources.Models.ApplicationUser.ApplicationUser;
 
 namespace Shrooms.Domain.Services.Administration
 {
     public class AdministrationUsersService : IAdministrationUsersService
     {
+        private const string UsersExcelWorksheetName = "Users";
+
         private readonly IRepository<ApplicationUser> _applicationUserRepository;
         private readonly IRepository<ApplicationRole> _rolesRepository;
         private readonly IDbSet<ApplicationUser> _usersDbSet;
@@ -49,6 +55,7 @@ namespace Shrooms.Domain.Services.Administration
         private readonly IAdministrationNotificationService _notificationService;
         private readonly IKudosService _kudosService;
         private readonly IUnitOfWork2 _uow;
+        private readonly IExcelBuilderFactory _excelBuilderFactory;
 
         public AdministrationUsersService(IMapper mapper,
             IUnitOfWork unitOfWork,
@@ -59,7 +66,8 @@ namespace Shrooms.Domain.Services.Administration
             IPictureService pictureService,
             IDbContext context,
             IAdministrationNotificationService notificationService,
-            IKudosService kudosService)
+            IKudosService kudosService,
+            IExcelBuilderFactory excelBuilderFactory)
         {
             _uow = uow;
             _mapper = mapper;
@@ -76,28 +84,40 @@ namespace Shrooms.Domain.Services.Administration
             _context = context;
             _notificationService = notificationService;
             _kudosService = kudosService;
+            _excelBuilderFactory = excelBuilderFactory;
         }
 
-        public async Task<byte[]> GetAllUsersExcelAsync()
+        public async Task<ByteArrayContent> GetAllUsersExcelAsync(string fileName, int organizationId)
         {
-            var applicationUsers = await _usersDbSet
+            var users = await _usersDbSet
                 .Include(user => user.WorkingHours)
                 .Include(user => user.JobPosition)
-                .Where(user => user.OrganizationId == 2)
+                .Where(user => user.OrganizationId == organizationId)
                 .ToListAsync();
 
-            using (var printer = new ExcelGeneratorDeprecated("Users"))
+            var excelBuilder = _excelBuilderFactory.GetBuilder();
+
+            excelBuilder
+                .AddWorksheet(UsersExcelWorksheetName)
+                .AddHeader(
+                    UserResources.FirstName,
+                    UserResources.LastName,
+                    UserResources.Birthday,
+                    UserResources.JobTitle,
+                    UserResources.PhoneNumber,
+                    UserResources.WorkingHours,
+                    UserResources.HasPicture)
+                .AddRows(users.AsQueryable(), MapUserToExcelRow());
+            
+            var content = new ByteArrayContent(excelBuilder.Build());
+
+            content.Headers.ContentType = new MediaTypeHeaderValue("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
             {
-                printer.CenterColumns(2, 6);
-                printer.AddHeaderRow(HeaderRow());
+                FileName = $"{fileName}.xlsx"
+            };
 
-                foreach (var user in applicationUsers)
-                {
-                    printer.AddRow(UserToUserRow(user));
-                }
-
-                return printer.Generate();
-            }
+            return content;
         }
 
         public async Task<bool> UserIsSoftDeletedAsync(string email)
@@ -322,6 +342,54 @@ namespace Shrooms.Domain.Services.Administration
             await _uow.SaveChangesAsync(userId);
         }
 
+        private static Expression<Func<ApplicationUser, IExcelRow>> MapUserToExcelRow()
+        {
+            return user => new ExcelRow
+            {
+                Columns = new List<IExcelColumn>
+                {
+                    new ExcelColumn
+                    {
+                        Value = user.FirstName
+                    },
+
+                    new ExcelColumn
+                    {
+                        Value = user.LastName
+                    },
+
+                    new ExcelColumn
+                    {
+                        Value = user.BirthDay,
+                        Format = ExcelWorksheetBuilderConstants.DateWithoutTimeFormat
+                    },
+
+                    new ExcelColumn
+                    {
+                        Value = user.JobPosition == null ? string.Empty : user.JobPosition.Title
+                    },
+
+                    new ExcelColumn
+                    {
+                        Value = StringToLong(user.PhoneNumber),
+                        Format = ExcelWorksheetBuilderConstants.NumberFormat
+                    },
+
+                    new ExcelColumn
+                    {
+                        Value = user.WorkingHours != null ? $"{user.WorkingHours.StartTime}-{user.WorkingHours.EndTime}" : string.Empty,
+                        SetHorizontalTextCenter = true
+                    },
+
+                    new ExcelColumn
+                    {
+                        Value = user.PictureId != null ? Resources.Common.Yes : Resources.Common.No,
+                        SetHorizontalTextCenter = true
+                    }
+                }
+            };
+        }
+
         private async Task SetWelcomeKudosAsync(ApplicationUser applicationUser)
         {
             var welcomeKudosDto = await _kudosService.GetWelcomeKudosAsync();
@@ -370,22 +438,6 @@ namespace Shrooms.Domain.Services.Administration
                 e.Room.RoomType.Name.Contains(n) ||
                 e.Room.Floor.Name.Contains(n) ||
                 e.Room.Floor.Office.Name.Contains(n)) == searchKeyWords.Count();
-        }
-
-        private static List<string> HeaderRow()
-        {
-            var result = new List<string>
-            {
-                userRes.FirstName,
-                userRes.LastName,
-                userRes.Birthday,
-                userRes.JobTitle,
-                userRes.PhoneNumber,
-                userRes.WorkingHours,
-                userRes.HasPicture
-            };
-
-            return result;
         }
 
         private static List<object> UserToUserRow(ApplicationUser user)

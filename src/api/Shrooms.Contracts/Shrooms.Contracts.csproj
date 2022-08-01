@@ -68,6 +68,7 @@
     <Compile Include="Constants\DataLayerConstants.cs" />
     <Compile Include="Constants\EmailTemplateCacheKeys.cs" />
     <Compile Include="Constants\ErrorCodes.cs" />
+    <Compile Include="Constants\ExcelWorksheetBuilderConstants.cs" />
     <Compile Include="Constants\KudosBasketConstants.cs" />
     <Compile Include="Constants\Modules.cs" />
     <Compile Include="Constants\PermissionScopes.cs" />
@@ -90,9 +91,12 @@
     <Compile Include="DataTransferObjects\FilterPresets\FilterPresetItemDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\FiltersDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\UpdatedFilterPresetDto.cs" />
-    <Compile Include="Enums\ExcelBuilderStyles.cs" />
+    <Compile Include="Infrastructure\ExcelGenerator\IExcelColumn.cs" />
     <Compile Include="Infrastructure\ExcelGenerator\IExcelBuilder.cs" />
     <Compile Include="Infrastructure\ExcelGenerator\IExcelBuilderFactory.cs" />
+    <Compile Include="Infrastructure\ExcelGenerator\IExcelColumnInternal.cs" />
+    <Compile Include="Infrastructure\ExcelGenerator\IExcelRow.cs" />
+    <Compile Include="Infrastructure\ExcelGenerator\IExcelRowCollection.cs" />
     <Compile Include="Infrastructure\ExcelGenerator\IExcelWorksheetBuilder.cs" />
     <Compile Include="Infrastructure\IFilterableByDate.cs" />
     <Compile Include="Infrastructure\IPageable.cs" />
