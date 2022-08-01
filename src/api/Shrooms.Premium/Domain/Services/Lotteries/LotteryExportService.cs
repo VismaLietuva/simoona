@@ -37,7 +37,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                     MapLotteryParticipantDtoToExcelCell(),
                     BusinessLayerConstants.LotteryParticipantsInRow)
                 .AddColumnsPadding(20)
-                .AddRowsPadding(20);
+                .AddRowPadding(20);
 
             return new ByteArrayContent(excelBuilder.Build());
         }

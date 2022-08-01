@@ -21,7 +21,7 @@ namespace Shrooms.Contracts.Infrastructure.ExcelGenerator
 
         IExcelWorksheetBuilder AutoFitColumns();
 
-        IExcelWorksheetBuilder AddRowsPadding(double padding);
+        IExcelWorksheetBuilder AddRowPadding(double padding);
 
         IExcelWorksheetBuilder AddColumnsPadding(double padding);
     }

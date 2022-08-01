@@ -117,7 +117,7 @@ namespace Shrooms.Infrastructure.ExcelGenerator
             return AddRows(excelRowCollection, applyAutoFit);
         }
 
-        public IExcelWorksheetBuilder AddRowsPadding(double padding)
+        public IExcelWorksheetBuilder AddRowPadding(double padding)
         {
             if (_excelRowCollection == null)
             {
@@ -149,10 +149,10 @@ namespace Shrooms.Infrastructure.ExcelGenerator
             var maxColumnCount = _excelRowCollection.Rows
                 .Max(row => row.Count());
 
-            return AddColumnsPadding(padding, maxColumnCount);
+            return AddColumnPadding(padding, maxColumnCount);
         }
 
-        public IExcelWorksheetBuilder AddColumnsPadding(double padding, int columnCount)
+        public IExcelWorksheetBuilder AddColumnPadding(double padding, int columnCount)
         {
             for (var i = 1; i <= columnCount; i++)
             {
