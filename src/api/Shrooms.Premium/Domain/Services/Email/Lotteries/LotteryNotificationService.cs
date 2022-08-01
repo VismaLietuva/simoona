@@ -42,7 +42,6 @@ namespace Shrooms.Premium.Domain.Services.Email.Lotteries
         {
             var userEmails = await _usersDbSet
                 .Include(user => user.NotificationsSettings)
-                .Where(user => user.OrganizationId == organizationId)
                 .Where(user => user.OrganizationId == organizationId &&
                                user.NotificationsSettings.CreatedLotteryEmailNotifications)
                 .Select(user => user.Email)
