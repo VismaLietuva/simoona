@@ -6,9 +6,9 @@ namespace Shrooms.Contracts.Infrastructure.ExcelGenerator
     {
         IExcelRow this[int index] { get; }
 
-        public IList<IExcelRow> Rows { get; }
+        IList<IExcelRow> Rows { get; }
 
-        public int Count { get; }
+        int Count { get; }
 
         void Add(IExcelRow excelRow);
     }

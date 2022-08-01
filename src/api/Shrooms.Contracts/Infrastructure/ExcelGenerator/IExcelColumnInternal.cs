@@ -2,10 +2,10 @@
 {
     public interface IExcelColumnInternal
     {
-        public int RowIndex { get; set; }
+        int RowIndex { get; set; }
 
-        public int ColumnIndex { get; set; }
+        int ColumnIndex { get; set; }
 
-        public IExcelColumn Column { get; set; }
+        IExcelColumn Column { get; set; }
     }
 }

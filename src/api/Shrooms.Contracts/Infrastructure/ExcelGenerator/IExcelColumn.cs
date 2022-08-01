@@ -2,14 +2,14 @@
 {
     public interface IExcelColumn
     {
-        public string Format { get; set; }
+        string Format { get; set; }
 
-        public bool SetBoldFont { get; set; }
+        bool SetBoldFont { get; set; }
 
-        public bool SetHorizontalTextCenter { get; set; }
+        bool SetHorizontalTextCenter { get; set; }
 
-        public bool SetVerticalTextCenter { get; set; }
+        bool SetVerticalTextCenter { get; set; }
 
-        public object Value { get; set; }
+        object Value { get; set; }
     }
 }
