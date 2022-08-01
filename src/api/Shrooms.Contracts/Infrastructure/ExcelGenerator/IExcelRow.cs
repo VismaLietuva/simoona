@@ -2,8 +2,8 @@
 
 namespace Shrooms.Contracts.Infrastructure.ExcelGenerator
 {
-    public interface IExcelRow
+    public interface IExcelRow : IEnumerable<IExcelColumn>
     {
-        IList<IExcelColumn> Columns { get; set; }
+        void Add(IExcelColumn column);
     }
 }

@@ -68,60 +68,57 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
         {
             return serviceRequest => new ExcelRow
             {
-                Columns = new List<IExcelColumn>
+                new ExcelColumn
                 {
-                    new ExcelColumn
-                    {
-                        Value = serviceRequest.Title
-                    },
+                    Value = serviceRequest.Title
+                },
 
-                    new ExcelColumn
-                    {
-                        Value = serviceRequest.Description
-                    },
+                new ExcelColumn
+                {
+                    Value = serviceRequest.Description
+                },
 
-                    new ExcelColumn
-                    {
-                        Value = serviceRequest.CategoryName
-                    },
+                new ExcelColumn
+                {
+                    Value = serviceRequest.CategoryName
+                },
 
-                    new ExcelColumn
-                    {
-                        Value = serviceRequest.Status != null ? serviceRequest.Status.Title : string.Empty
-                    },
+                new ExcelColumn
+                {
+                    Value = serviceRequest.Status != null ? serviceRequest.Status.Title : string.Empty
+                },
 
-                    new ExcelColumn
-                    {
-                        Value = serviceRequest.Priority != null ? serviceRequest.Priority.Title : string.Empty
-                    },
+                new ExcelColumn
+                {
+                    Value = serviceRequest.Priority != null ? serviceRequest.Priority.Title : string.Empty
+                },
 
-                    new ExcelColumn
-                    {
-                        Value = serviceRequest.Employee != null ? serviceRequest.Employee.FullName : string.Empty
-                    },
+                new ExcelColumn
+                {
+                    Value = serviceRequest.Employee != null ? serviceRequest.Employee.FullName : string.Empty
+                },
 
-                    new ExcelColumn
-                    {
-                        Value = serviceRequest.KudosAmmount,
-                        Format = ExcelWorksheetBuilderConstants.NumberFormat
-                    },
+                new ExcelColumn
+                {
+                    Value = serviceRequest.KudosAmmount,
+                    Format = ExcelWorksheetBuilderConstants.NumberFormat
+                },
 
-                    new ExcelColumn
-                    {
-                        Value = serviceRequest.KudosShopItem != null ? serviceRequest.KudosShopItem.Name : string.Empty
-                    },
+                new ExcelColumn
+                {
+                    Value = serviceRequest.KudosShopItem != null ? serviceRequest.KudosShopItem.Name : string.Empty
+                },
 
-                    new ExcelColumn
-                    {
-                        Value = serviceRequest.Created,
-                        Format = ExcelWorksheetBuilderConstants.DateFormat
-                    },
-
-                    new ExcelColumn
-                    {
-                        Value = serviceRequest.Modified,
-                        Format = ExcelWorksheetBuilderConstants.DateFormat
-                    }
+                new ExcelColumn
+                {
+                    Value = serviceRequest.Created,
+                    Format = ExcelWorksheetBuilderConstants.DateFormat
+                },
+                
+                new ExcelColumn
+                {
+                    Value = serviceRequest.Modified,
+                    Format = ExcelWorksheetBuilderConstants.DateFormat
                 }
             };
         }

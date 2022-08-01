@@ -67,18 +67,15 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
         {
             return option => new ExcelRow
             {
-                Columns = new List<IExcelColumn>
+                new ExcelColumn
                 {
-                    new ExcelColumn
-                    {
-                        Value = option.Option
-                    },
+                    Value = option.Option
+                },
 
-                    new ExcelColumn
-                    {
-                        Value = option.Count,
-                        Format = ExcelWorksheetBuilderConstants.NumberFormat
-                    }
+                new ExcelColumn
+                {
+                    Value = option.Count,
+                    Format = ExcelWorksheetBuilderConstants.NumberFormat
                 }
             };
         }
@@ -87,17 +84,14 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
         {
             return participant => new ExcelRow
             {
-                Columns = new List<IExcelColumn>
+                new ExcelColumn
                 {
-                    new ExcelColumn
-                    {
-                        Value = participant.FirstName
-                    },
+                    Value = participant.FirstName
+                },
 
-                    new ExcelColumn
-                    {
-                        Value = participant.LastName
-                    }
+                new ExcelColumn
+                {
+                    Value = participant.LastName
                 }
             };
         }

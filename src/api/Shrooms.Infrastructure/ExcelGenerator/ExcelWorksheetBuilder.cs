@@ -105,11 +105,11 @@ namespace Shrooms.Infrastructure.ExcelGenerator
                     excelRow = new ExcelRow();
                 }
 
-                excelRow.Columns.Add(mapFuction(column));
+                excelRow.Add(mapFuction(column));
                 columnIndex++;
             }
 
-            if (excelRow.Columns.Any())
+            if (excelRow.Any())
             {
                 excelRowCollection.Add(excelRow);
             }
@@ -147,7 +147,7 @@ namespace Shrooms.Infrastructure.ExcelGenerator
             }
 
             var maxColumnCount = _excelRowCollection.Rows
-                .Max(row => row.Columns.Count);
+                .Max(row => row.Count());
 
             return AddColumnsPadding(padding, maxColumnCount);
         }

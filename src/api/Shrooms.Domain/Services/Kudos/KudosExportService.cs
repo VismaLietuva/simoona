@@ -68,19 +68,55 @@ namespace Shrooms.Domain.Services.Kudos
         {
             return log => new ExcelRow
             {
-                Columns = new List<IExcelColumn>
+                new ExcelColumn 
+                { 
+                    Value = log.Sender.FullName 
+                },
+
+                new ExcelColumn 
+                { 
+                    Value = log.Receiver.FullName 
+                },
+                
+                new ExcelColumn 
+                { 
+                    Value = log.Type.Name 
+                },
+                
+                new ExcelColumn 
                 {
-                    new ExcelColumn { Value = log.Sender.FullName },
-                    new ExcelColumn { Value = log.Receiver.FullName },
-                    new ExcelColumn { Value = log.Type.Name },
-                    new ExcelColumn { Value = log.Multiplier, Format = ExcelWorksheetBuilderConstants.DecimalFormat },
-                    new ExcelColumn { Value = log.Points, Format = ExcelWorksheetBuilderConstants.DecimalFormat },
-                    new ExcelColumn { Value = log.Created, Format = ExcelWorksheetBuilderConstants.DateFormat },
-                    new ExcelColumn { Value = log.Comment },
-                    new ExcelColumn { Value = log.Status },
-                    new ExcelColumn { Value = log.Type.Value },
-                    new ExcelColumn { Value = log.RejectionMessage },
-                }
+                    Value = log.Multiplier, Format = ExcelWorksheetBuilderConstants.DecimalFormat
+                },
+
+                new ExcelColumn 
+                {
+                    Value = log.Points, Format = ExcelWorksheetBuilderConstants.DecimalFormat 
+                },
+                
+                new ExcelColumn 
+                {
+                    Value = log.Created, Format = ExcelWorksheetBuilderConstants.DateFormat 
+                },
+                
+                new ExcelColumn 
+                { 
+                    Value = log.Comment 
+                },
+                
+                new ExcelColumn 
+                {
+                    Value = log.Status 
+                },
+                
+                new ExcelColumn 
+                { 
+                    Value = log.Type.Value 
+                },
+                
+                new ExcelColumn 
+                {
+                    Value = log.RejectionMessage 
+                },
             };
         }
     }

@@ -108,7 +108,7 @@ namespace Shrooms.Domain.Services.Administration
                     UserResources.WorkingHours,
                     UserResources.HasPicture)
                 .AddRows(users.AsQueryable(), MapUserToExcelRow());
-            
+
             var content = new ByteArrayContent(excelBuilder.Build());
 
             content.Headers.ContentType = new MediaTypeHeaderValue("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -346,46 +346,43 @@ namespace Shrooms.Domain.Services.Administration
         {
             return user => new ExcelRow
             {
-                Columns = new List<IExcelColumn>
+                new ExcelColumn
                 {
-                    new ExcelColumn
-                    {
-                        Value = user.FirstName
-                    },
+                    Value = user.FirstName
+                },
 
-                    new ExcelColumn
-                    {
-                        Value = user.LastName
-                    },
+                new ExcelColumn
+                {
+                    Value = user.LastName
+                },
 
-                    new ExcelColumn
-                    {
-                        Value = user.BirthDay,
-                        Format = ExcelWorksheetBuilderConstants.DateWithoutTimeFormat
-                    },
+                new ExcelColumn
+                {
+                    Value = user.BirthDay,
+                    Format = ExcelWorksheetBuilderConstants.DateWithoutTimeFormat
+                },
 
-                    new ExcelColumn
-                    {
-                        Value = user.JobPosition == null ? string.Empty : user.JobPosition.Title
-                    },
+                new ExcelColumn
+                {
+                    Value = user.JobPosition == null ? string.Empty : user.JobPosition.Title
+                },
 
-                    new ExcelColumn
-                    {
-                        Value = StringToLong(user.PhoneNumber),
-                        Format = ExcelWorksheetBuilderConstants.NumberFormat
-                    },
+                new ExcelColumn
+                {
+                    Value = StringToLong(user.PhoneNumber),
+                    Format = ExcelWorksheetBuilderConstants.NumberFormat
+                },
 
-                    new ExcelColumn
-                    {
-                        Value = user.WorkingHours != null ? $"{user.WorkingHours.StartTime}-{user.WorkingHours.EndTime}" : string.Empty,
-                        SetHorizontalTextCenter = true
-                    },
+                new ExcelColumn
+                {
+                    Value = user.WorkingHours != null ? $"{user.WorkingHours.StartTime}-{user.WorkingHours.EndTime}" : string.Empty,
+                    SetHorizontalTextCenter = true
+                },
 
-                    new ExcelColumn
-                    {
-                        Value = user.PictureId != null ? Resources.Common.Yes : Resources.Common.No,
-                        SetHorizontalTextCenter = true
-                    }
+                new ExcelColumn
+                {
+                    Value = user.PictureId != null ? Resources.Common.Yes : Resources.Common.No,
+                    SetHorizontalTextCenter = true
                 }
             };
         }

@@ -43,7 +43,7 @@ namespace Shrooms.Infrastructure.ExcelGenerator
 
                 var currentColumnIndex = 1;
 
-                foreach (var cell in row.Columns)
+                foreach (var cell in row)
                 {
                     yield return new ExcelColumnInternal
                     {
