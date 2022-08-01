@@ -423,6 +423,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="BackgroundWorkers\NewCommentNotifier.cs" />
     <Compile Include="BackgroundWorkers\NewPostNotifier.cs" />
+    <Compile Include="Controllers\BlacklistController.cs" />
     <Compile Include="Controllers\FilterPresetController.cs" />
     <Compile Include="Controllers\VacationPageController.cs" />
     <Compile Include="Filters\PermissionAnyOfAuthorizeAttribute.cs" />
@@ -446,7 +447,7 @@
     <Compile Include="Controllers\CertificateController.cs" />
     <Compile Include="Controllers\CommentController.cs" />
     <Compile Include="Controllers\DefaultController.cs" />
-    <Compile Include="Controllers\EmployeeListController.cs" />
+    <Compile Include="Controllers\EmployeeController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\ExamController.cs" />
     <Compile Include="Controllers\SupportController.cs" />

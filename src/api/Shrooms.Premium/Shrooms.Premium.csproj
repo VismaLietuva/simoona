@@ -502,7 +502,6 @@
     <Compile Include="Presentation\Api\Controllers\OrganizationalStructureController.cs" />
     <Compile Include="Presentation\Api\Controllers\ServiceRequestsController.cs" />
     <Compile Include="Presentation\Api\Controllers\VacationsController.cs" />
-    <Compile Include="Presentation\Api\Extensions\PagedListExtensions.cs" />
     <Compile Include="Presentation\ModelMappings\Helpers.cs" />
     <Compile Include="Presentation\ModelMappings\Profiles\Books.cs" />
     <Compile Include="Presentation\ModelMappings\Profiles\BooksProfile.cs" />

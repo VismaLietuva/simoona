@@ -1,11 +1,6 @@
 ﻿using System.Net;
-using System.Net.Http;
-using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web.Http;
-using System.Web.Http.Controllers;
-using System.Web.Http.Hosting;
 using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.Enums;
@@ -15,6 +10,7 @@ using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.Presentation.Api.Controllers;
+using Shrooms.Tests.Extensions;
 using Shrooms.Tests.ModelMappings;
 
 namespace Shrooms.Tests.Controllers.WebApi
@@ -39,13 +35,7 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             _postController = new PostController(ModelMapper.Create(), _wallService, _postService,
                 _permissionService, _asyncRunner);
-
-            _postController.ControllerContext = Substitute.For<HttpControllerContext>();
-            _postController.Request = new HttpRequestMessage();
-            _postController.Request.Properties.Add(HttpPropertyKeys.HttpConfigurationKey, new HttpConfiguration());
-            _postController.Request.SetConfiguration(new HttpConfiguration());
-            _postController.RequestContext.Principal =
-                new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, "1"), new Claim("OrganizationId", "1") }));
+            _postController.SetUpControllerForTesting();
         }
 
         [Test]

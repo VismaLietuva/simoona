@@ -31,12 +31,17 @@
         $rootScope.pageTitle = 'applicationUser.entityName';
 
         $scope.isAdmin = authService.hasPermissions(['APPLICATIONUSER_ADMINISTRATION']);
+        $scope.hasBlacklistBasicPermission = authService.hasPermissions(['BLACKLIST_BASIC']);
+        $scope.hasBlacklistAdminPermission = authService.hasPermissions(['BLACKLIST_ADMINISTRATION'])
         $scope.identity = authService.identity;
         $scope.isCurrentUser = $stateParams.id === authService.identity.userId;
         $scope.isNewUser = isNewUser;
         $scope.isFirstLogin = isFirstLogin;
         $scope.confirmUser = confirmUser;
         $scope.isPremium = $window.isPremium;
+        $scope.showBlacklistHistory = ($scope.isCurrentUser || $scope.hasBlacklistBasicPermission) && $scope.model.userWasPreviouslyBlacklisted;
+        $scope.showBlacklistInformation = ($scope.isCurrentUser || $scope.hasBlacklistBasicPermission) && $scope.model.blacklistEntry;
+        $scope.blacklistHistoryExpanded = false;
         //$scope.submitJobInfo = submitJobInfo;
 
         $scope.isImpersonationEnabled = impersonate;
@@ -44,6 +49,10 @@
         $scope.model.displayName = displayedName;
         $scope.minLength = 1;
         $scope.hasLunch = hasLunch;
+
+        $scope.redirectToTab = ($scope.isAdmin || $scope.isCurrentUser) ? 'Personal' : 'Blacklist';
+
+
 		if($scope.model.dailyMailingHour) {
 			$scope.model.dailyMailingHour = moment.utc($scope.model.dailyMailingHour, 'HH:mm:ss').local().format('HH:mm');
 		}

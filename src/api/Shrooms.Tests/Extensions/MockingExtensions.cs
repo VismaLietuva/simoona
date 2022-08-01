@@ -2,6 +2,11 @@
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
+using System.Net.Http;
+using System.Security.Claims;
+using System.Web.Http;
+using System.Web.Http.Controllers;
+using System.Web.Http.Hosting;
 using NSubstitute;
 using Shrooms.Contracts.DAL;
 using Shrooms.Tests.Mocks;
@@ -10,6 +15,16 @@ namespace Shrooms.Tests.Extensions
 {
     public static class MockingExtensions
     {
+        public static void SetUpControllerForTesting(this ApiController controller)
+        {
+            controller.ControllerContext = Substitute.For<HttpControllerContext>();
+            controller.Request = new HttpRequestMessage();
+            controller.Request.Properties.Add(HttpPropertyKeys.HttpConfigurationKey, new HttpConfiguration());
+            controller.Request.SetConfiguration(new HttpConfiguration());
+            controller.RequestContext.Principal =
+                new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, "1"), new Claim("OrganizationId", "1") }));
+        }
+
         public static void SetDbSetDataForAsync<T>(this DbSet<T> mockedDbSet, IEnumerable<T> data)
             where T : class
         {

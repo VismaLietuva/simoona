@@ -1,27 +1,31 @@
 <div has-permissions="['EMPLOYEELIST_BASIC']" class="col-xs-12">
     <div class="row">
         <h3 ng-cloak>{{"common.employeeList" | translate}}</h3>
-        <ace-item-list-filter filter-value="filter.search" on-filtering="onSearch"></ace-item-list-filter>
+        <div class="employee-list-filters-container">
+            <ace-item-list-filter class="pb-0" filter-value="filter.search" on-filtering="onSearch"></ace-item-list-filter>
+            <ace-slider-toggle-btn ng-if="hasBlacklistPermission" translation="applicationUser.showOnlyBlacklisted" ng-click="onSearch()" value="filter.showOnlyBlacklisted" class="ml-10"></ace-slider-toggle-btn>
+        </div>
+
         <table class="table table-grey table-hover" ng-if="pagedEmployeeList.itemCount > 0">
             <thead>
                 <tr>
                     <th class="text-center">
-                        <ace-sort-link on-sort="onSort" sort-dir="filter.sortOrder" sort-field="filter.sortBy" sort-value="firstName">
+                        <ace-sort-multiple-link on-sort="onSort" position="0" sort-dir="filter.sortValues.sortOrders[0]" sort-field="filter.sortValues.sortBy[0]" sort-value="firstName">
                             <span translate="applicationUser.firstName"></span>
-                        </ace-sort-link>
-                        <ace-sort-link on-sort="onSort" sort-dir="filter.sortOrder" sort-field="filter.sortBy" sort-value="lastName">
+                        </ace-sort-multiple-link>
+                        <ace-sort-multiple-link on-sort="onSort" position="1" sort-dir="filter.sortValues.sortOrders[1]" sort-field="filter.sortValues.sortBy[1]" sort-value="lastName">
                             <span translate="applicationUser.lastName"></span>
-                        </ace-sort-link>
+                        </ace-sort-multiple-link>
                     </th>
                     <th class="text-center hidden-xs">
-                        <ace-sort-link on-sort="onSort" sort-dir="filter.sortOrder" sort-field="filter.sortBy" sort-value="birthDay">
+                        <ace-sort-multiple-link on-sort="onSort" position="2" sort-dir="filter.sortValues.sortOrders[2]" sort-field="filter.sortValues.sortBy[2]" sort-value="birthDay">
                             <span translate="applicationUser.birthday"></span>
-                        </ace-sort-link>
+                        </ace-sort-multiple-link>
                     </th>
                     <th class="text-center hidden-xs">
-                        <ace-sort-link on-sort="onSort" sort-dir="filter.sortOrder" sort-field="filter.sortBy" sort-value="jobPosition.Title">
+                        <ace-sort-multiple-link on-sort="onSort" position="3" sort-dir="filter.sortValues.sortOrders[3]" sort-field="filter.sortValues.sortBy[3]" sort-value="jobTitle">
                             <span translate="applicationUser.jobTitle"></span>
-                        </ace-sort-link>
+                        </ace-sort-multiple-link>
                     </th>
                     <th ng-if="isAdmin" class="text-center hidden-xs">
                         <span translate="applicationUser.phoneNumber"></span>
@@ -29,14 +33,19 @@
                     <th class="text-center hidden-xs">
                         <span translate="applicationUser.workingHours"></span>
                     </th>
+                    <th ng-if="hasBlacklistPermission" class="text-center hidden-xs">
+                        <ace-sort-multiple-link on-sort="onSort" position="4" sort-dir="filter.sortValues.sortOrders[4]" sort-field="filter.sortValues.sortBy[4]" sort-value="blacklistEntry.endDate">
+                            <span translate="applicationUser.blacklisted"></span>
+                        </ace-sort-multiple-link>
+                    </th>
                 </tr>
             </thead>
             <tbody>
                 <tr data-ng-repeat="applicationUser in pagedEmployeeList.pagedList" id="lastId@(item.Id)">
-                    <td class="col-xs-4 text-center">
+                    <td class="col-xs-3 text-center">
                         <a data-ui-sref="Root.WithOrg.Client.Profiles.Details({ id: applicationUser.id })">{{applicationUser.firstName}} {{applicationUser.lastName}}</a>
                     </td>
-                    <td class="col-xs-2 text-center hidden-xs">
+                    <td class="text-center hidden-xs" ng-class="{'col-xs-2' : !isAdmin}">
                         <span ng-if="isAdmin">
                             {{:: applicationUser.birthDay | date:'yyyy-MM-dd' }}
                         </span>
@@ -56,6 +65,9 @@
                         <div data-ng-if="applicationUser.workingHours.startTime != null && applicationUser.workingHours.endTime != null">
                             {{applicationUser.workingHours.startTime | time:'HH:mm'}} - {{applicationUser.workingHours.endTime | time:'HH:mm'}}
                         </div>
+                    </td>
+                    <td class="text-center hidden-xs" ng-if="hasBlacklistPermission">
+                        {{:: applicationUser.blacklistEndDate | date:'yyyy-MM-dd'}}
                     </td>
                 </tr>
             </tbody>

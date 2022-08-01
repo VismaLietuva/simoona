@@ -169,7 +169,7 @@
   "birthdayDateValidationError": "Birthday date can not be later than today",
   "deletePopupMessageTemplate": "Do you really want to delete {{ one }}?",
   "deletePopupTitle": "Delete confirmation",
-  "birthdayDateIsTooOld": "Smallest possible date is 1900-01-01",
+  "dateIsTooOld": "Smallest possible date is {{ one }}",
   "and": "and",
   "other": "{{ likeCount }} other",
   "others": "{{ likeCount }} others",

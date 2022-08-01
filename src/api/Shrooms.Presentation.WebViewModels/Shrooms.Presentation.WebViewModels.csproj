@@ -76,6 +76,11 @@
     <Compile Include="Models\AccountModels\ProviderViewModel.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationUserViewModel.cs" />
+    <Compile Include="Models\BlacklistUsers\BlacklistUserViewModel.cs" />
+    <Compile Include="Models\BlacklistUsers\UpdateBlacklistUserViewModel.cs" />
+    <Compile Include="Models\BlacklistUsers\CreateBlacklistUserViewModel.cs" />
+    <Compile Include="Models\Employees\EmployeeListingArgsViewModel.cs" />
+    <Compile Include="Models\Employees\WorkingHourslWithOutLunchViewModel.cs" />
     <Compile Include="Models\ExternalLink\ManageExternalLinkViewModel.cs" />
     <Compile Include="Models\ExternalLink\ExternalLinkViewModel.cs" />
     <Compile Include="Models\ExternalLink\NewExternalLinkViewModel.cs" />
@@ -163,7 +168,7 @@
     <Compile Include="Models\ChangeProfile\ChangeProfileOfficeViewModel.cs" />
     <Compile Include="Models\ChangeProfile\ChangeProfileViewModel.cs" />
     <Compile Include="Models\CommentViewModel.cs" />
-    <Compile Include="Models\EmployeeListViewModel.cs" />
+    <Compile Include="Models\Employees\EmployeeViewModel.cs" />
     <Compile Include="Models\Exam\ExamAutoCompleteViewModel.cs" />
     <Compile Include="Models\Exam\ExamMiniViewModel.cs" />
     <Compile Include="Models\Exam\ExamPostViewModel.cs" />

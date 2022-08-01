@@ -81,7 +81,13 @@
     <Compile Include="DAL\IUnitOfWork2.cs" />
     <Compile Include="DataTransferObjects\ApplicationUserMinimalDto.cs" />
     <Compile Include="DataTransferObjects\BaseEmailTemplateViewModel.cs" />
+    <Compile Include="DataTransferObjects\BlacklistUsers\BlacklistUserDto.cs" />
+    <Compile Include="DataTransferObjects\BlacklistUsers\CreateBlacklistUserDto.cs" />
+    <Compile Include="DataTransferObjects\BlacklistUsers\UpdateBlacklistUserDto.cs" />
     <Compile Include="DataTransferObjects\EmailDto.cs" />
+    <Compile Include="DataTransferObjects\Employees\EmployeeDto.cs" />
+    <Compile Include="DataTransferObjects\Employees\EmployeeListingArgsDto.cs" />
+    <Compile Include="DataTransferObjects\Employees\WorkingHourslWithOutLunchDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\ManageFilterPresetDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\CreateFilterPresetDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\UpdateFilterPresetDto.cs" />
@@ -90,6 +96,7 @@
     <Compile Include="DataTransferObjects\FilterPresets\FilterPresetItemDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\FiltersDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\UpdatedFilterPresetDto.cs" />
+    <Compile Include="Enums\BlacklistStatus.cs" />
     <Compile Include="Infrastructure\IFilterableByDate.cs" />
     <Compile Include="Infrastructure\IPageable.cs" />
     <Compile Include="DataTransferObjects\ISoftDelete.cs" />
@@ -155,5 +162,6 @@
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

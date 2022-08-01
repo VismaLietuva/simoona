@@ -12,10 +12,10 @@
             {{"common.messageFieldIsRequired" | translate}}
         </div>
         <div class="text-danger help-block" ng-if="errors.charMaxLimit()">
-            {{"common.fieldCharLimitExceeded" | translate : '{one : $scope.charLimit}'}}
+            <span translate="common.fieldCharLimitExceeded" translate-values="{one : charLimit}"></span>
         </div>
         <div class="text-danger help-block" ng-if="errors.charMinLimit()">
-            {{"common.fieldValueTooShort" | translate : '{one : $scope.minlength}'}}
+            <span translate="common.fieldValueTooShort" translate-values="{one : minlength}"></span>
         </div>
         <div class="text-danger help-block" ng-if="errors.email()">
             {{"common.messageInvalidEmail" | translate}}
@@ -27,7 +27,7 @@
             {{"common.invalidDate" | translate}}
         </div>
         <div class="text-danger help-block" ng-if="!errors.date() && errors.minDate()">
-            {{"common.birthdayDateIsTooOld" | translate}}
+            <span translate="common.dateIsTooOld" translate-values="{one: minDate}"></span>
         </div>
         <div class="text-danger help-block" ng-if="!errors.date() && errors.maxDate()">
             {{"common.birthdayDateValidationError" | translate}}

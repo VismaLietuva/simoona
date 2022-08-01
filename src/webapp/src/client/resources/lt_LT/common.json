@@ -168,7 +168,7 @@
   "birthdayDateValidationError": "Gimimo data negali būti vėlesnė nei dabar",
   "deletePopupMessageTemplate": "Ar jūs tikrai norite ištrinti {{ one }}?",
   "deletePopupTitle": "Ištrynimo patvirtinimas",
-  "birthdayDateIsTooOld": "Mažiausia galima datos reikšmė yra 1900-01-01",
+  "dateIsTooOld": "Mažiausia galima datos reikšmė yra {{ one }}",
   "and": "ir",
   "other": "{{ likeCount }} žmogus",
   "others": "{{ likeCount }} žmonės",

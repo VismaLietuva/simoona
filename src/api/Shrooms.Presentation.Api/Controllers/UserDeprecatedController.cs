@@ -15,6 +15,7 @@ using Shrooms.Authentification.Membership;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.DataTransferObjects.BlacklistUsers;
 using Shrooms.Contracts.DataTransferObjects.Models.Administration;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.ViewModels;
@@ -22,6 +23,7 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Exceptions.Exceptions.UserAdministration;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Administration;
+using Shrooms.Domain.Services.BlacklistUsers;
 using Shrooms.Domain.Services.Impersonate;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.Organizations;
@@ -35,6 +37,7 @@ using Shrooms.Presentation.Api.Controllers.Wall;
 using Shrooms.Presentation.Api.Filters;
 using Shrooms.Presentation.Api.Helpers;
 using Shrooms.Presentation.WebViewModels.Models;
+using Shrooms.Presentation.WebViewModels.Models.BlacklistUsers;
 using Shrooms.Presentation.WebViewModels.Models.Profile.JobPosition;
 using Shrooms.Presentation.WebViewModels.Models.User;
 using WebApi.OutputCache.V2;
@@ -67,6 +70,7 @@ namespace Shrooms.Presentation.Api.Controllers
         private readonly IProjectsService _projectService;
         private readonly IKudosService _kudosService;
         private readonly IPictureService _pictureService;
+        private readonly IBlacklistService _blacklistService;
 
         public UserDeprecatedController(IMapper mapper,
             IUnitOfWork unitOfWork,
@@ -80,7 +84,8 @@ namespace Shrooms.Presentation.Api.Controllers
             IRoleService roleService,
             IProjectsService projectService,
             IKudosService kudosService,
-            IPictureService pictureService)
+            IPictureService pictureService,
+            IBlacklistService blacklistService)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -102,6 +107,7 @@ namespace Shrooms.Presentation.Api.Controllers
             _projectService = projectService;
             _kudosService = kudosService;
             _pictureService = pictureService;
+            _blacklistService = blacklistService;
         }
 
         private async Task<bool> HasPermissionAsync(UserAndOrganizationDto userOrg, string permission)
@@ -309,6 +315,7 @@ namespace Shrooms.Presentation.Api.Controllers
             }
 
             var model = _mapper.Map<ApplicationUserDetailsViewModel>(user);
+
             await InfoWithAdditionalPermissionsAsync(user, model);
 
             return Request.CreateResponse(HttpStatusCode.OK, model);
@@ -316,19 +323,29 @@ namespace Shrooms.Presentation.Api.Controllers
 
         private async Task InfoWithAdditionalPermissionsAsync(ApplicationUser user, ApplicationUserDetailsViewModel model)
         {
-            var isAdmin = await _permissionService.UserHasPermissionAsync(GetUserAndOrganization(), AdministrationPermissions.ApplicationUser);
+            var userOrg = GetUserAndOrganization();
+            var permissions = await _permissionService.GetUserPermissionsAsync(userOrg.UserId, userOrg.OrganizationId);
+            
+            var hasApplicationUserPermission = permissions.Contains(AdministrationPermissions.ApplicationUser);
+            var hasBlacklistPermission = permissions.Contains(BasicPermissions.Blacklist);
+
             var usersProfile = User.Identity.GetUserId() == user.Id;
 
-            if (isAdmin)
+            if (hasApplicationUserPermission)
             {
                 var roles = await GetUserRolesAsync(user.Id);
                 model.Roles = _mapper.Map<IEnumerable<ApplicationRoleMiniViewModel>>(roles);
             }
 
-            if (!isAdmin && !usersProfile)
+            if (!hasApplicationUserPermission && !usersProfile)
             {
                 model.BirthDay = BirthdayDateTimeHelper.RemoveYear(model.BirthDay);
                 model.PhoneNumber = null;
+            }
+
+            if ((hasBlacklistPermission || usersProfile) && _blacklistService.TryFindActiveBlacklistUserEntry(user.BlacklistEntries, out var blacklistUserDto))
+            {
+                model.BlacklistEntry = _mapper.Map<BlacklistUserDto, BlacklistUserViewModel>(blacklistUserDto);
             }
         }
 
