@@ -1,0 +1,195 @@
+.blacklist-history-timeline {
+    word-break: break-word;
+    margin-bottom: -30px;
+}
+
+.blacklist-history-timeline ul {
+    padding-left: 0;
+}
+
+.blacklist-history-timeline ul li {
+    margin-bottom: 40px;
+}
+
+.blacklist-history-timeline ul li:last-child {
+    margin-bottom: 0 !important;
+    background-color: black;
+}
+
+.blacklist-history-authors {
+    font-weight: 300;
+}
+
+.blacklist-history-timeline ul li:first-child:before {
+    top: 40px;
+}
+
+.blacklist-history-timeline ul li::before {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    margin-top: 5px;
+    left: -4px;
+    background-color: #337ab7;
+    border-radius: 50%;
+    -webkit-box-shadow: 0 0 0 3px rgb(125 180 181 / 20%);
+    box-shadow: 0 0 0 3px rgb(125 180 181 / 20%);
+}
+
+.blacklist-history-state {
+    background-color: #dddddd;
+    border-radius: 25px;
+    padding: 5px;
+    font-weight: 400;
+}
+
+.blacklist-history-reason {
+    margin-top: 10px;
+}
+
+.blacklist-history-container {
+    width: 100%;
+    margin-bottom: -40px;
+}
+
+.blacklist-history-timeline ul li p {
+    font-weight: 300;
+}
+
+.blacklist-history-timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    width: 2px;
+    height: 100%;
+    margin-top: 30px;
+    background-color: #e4e4e4;
+}
+
+.profile-blacklist-content {
+    margin-bottom: 20px;
+}
+
+@media(min-width: 1000px) {
+    .blacklist-history-timeline {
+        word-break: break-word;
+        margin-bottom: -30px;
+        position: relative;
+        margin: 50px auto;
+        width: 100%;
+    }
+
+    .blacklist-history-timeline::before {
+        content: '';
+        position: absolute;
+        left: 50%;
+        width: 2px;
+        height: 100%;
+        background-color: #e4e4e4;
+    }
+
+    .blacklist-history-timeline ul li:hover .time {
+        transform: scale(1.1);
+    }
+
+    .blacklist-history-timeline ul li {
+        margin-bottom: 40px;
+        list-style: none;
+        position: relative;
+        width: 50%;
+        padding: 20px 40px;
+    }
+
+    .blacklist-history-timeline ul li:nth-child(odd) {
+        float: left;
+        text-align: right;
+        clear: both;
+    }
+
+    .blacklist-history-timeline ul li:nth-child(even) {
+        float: right;
+        text-align: left;
+        clear: both;
+    }
+
+    .blacklist-history-timeline ul li::before {
+        content: '';
+        position: absolute;
+        top: 30px;
+        width: 10px;
+        height: 10px;
+        left: auto;
+        border-radius: 50%;
+        -webkit-box-shadow: 0 0 0 3px rgb(125 180 181 / 20%);
+        box-shadow: 0 0 0 3px rgb(125 180 181 / 20%);
+    }
+
+    .blacklist-history-timeline ul li:nth-child(odd)::before {
+        right: -6px;
+    }
+
+    .blacklist-history-timeline ul li:nth-child(odd) .blacklist-history-status {
+        position: absolute;
+        right: -135px;
+        top: 30px;
+    }
+
+    .blacklist-history-timeline ul li:nth-child(even) .blacklist-history-status {
+        position: absolute;
+        left: -135px;
+        top: 30px;
+    }
+
+    .blacklist-history-timeline ul li:first-child .blacklist-history-status {
+        top: 40px;
+    }
+
+    .blacklist-history-timeline ul li:nth-child(even)::before {
+        left: -4px;
+    }
+
+    .blacklist-history-authors {
+        font-weight: 300;
+        display: inline-block;
+        font-size: 14px;
+        padding: 5px 10px;
+        margin-bottom: 15px;
+        border-radius: 20px;
+    }
+
+    .blacklist-history-timeline ul {
+        padding-left: 0;
+    }
+
+    .blacklist-history-timeline ul li:first-child:before {
+        top: 40px;
+    }
+
+    .blacklist-history-state {
+        background-color: #dddddd;
+        border-radius: 25px;
+        padding: 5px;
+        font-weight: 400;
+    }
+
+    .blacklist-history-reason {
+        margin-top: 10px;
+    }
+
+    .blacklist-history-container {
+        width: 100%;
+    }
+
+    .blacklist-history-timeline ul li p {
+        font-weight: 300;
+    }
+
+    .profile-blacklist-content {
+        margin-bottom: 20px;
+    }
+
+    .last-blacklist-entry {
+        margin-bottom: -50px !important;
+    }
+}

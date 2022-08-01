@@ -1,11 +1,6 @@
 ﻿using System.Net;
-using System.Net.Http;
-using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web.Http;
-using System.Web.Http.Controllers;
-using System.Web.Http.Hosting;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
 using NUnit.Framework;
@@ -14,6 +9,7 @@ using Shrooms.Contracts.DataTransferObjects.VacationPages;
 using Shrooms.Domain.Services.VacationPages;
 using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.WebViewModels.Models.VacationPage;
+using Shrooms.Tests.Extensions;
 using Shrooms.Tests.ModelMappings;
 
 namespace Shrooms.Tests.Controllers.WebApi
@@ -31,13 +27,7 @@ namespace Shrooms.Tests.Controllers.WebApi
             _vacationPageService = Substitute.For<IVacationPageService>();
 
             _vacationPageController = new VacationPageController(_vacationPageService, ModelMapper.Create());
-
-            _vacationPageController.ControllerContext = Substitute.For<HttpControllerContext>();
-            _vacationPageController.Request = new HttpRequestMessage();
-            _vacationPageController.Request.Properties.Add(HttpPropertyKeys.HttpConfigurationKey, new HttpConfiguration());
-            _vacationPageController.Request.SetConfiguration(new HttpConfiguration());
-            _vacationPageController.RequestContext.Principal =
-                new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, "1"), new Claim("OrganizationId", "1") }));
+            _vacationPageController.SetUpControllerForTesting();
         }
 
         [Test]

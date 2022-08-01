@@ -1,0 +1,9 @@
+<div class="slider-toggle-container">
+    <div class="slider-toggle-button" ng-class="{'slider-toggle-button-on' : vm.value}" ng-model="vm.value"
+        ng-click="vm.value = !vm.value">
+        <div class="slider-toggle-button-circle" ng-class="{'slider-toggle-button-circle-on' : vm.value }"
+            ng-model="vm.value">
+        </div>
+    </div>
+    <span class="ml-3" translate="{{vm.translation}}"></span>
+</div>

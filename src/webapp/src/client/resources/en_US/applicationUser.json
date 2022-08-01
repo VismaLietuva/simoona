@@ -155,5 +155,21 @@
   "emailNotVerified": "E-mail is not verified",
   "emailVerifiedSucceessfully": "E-mail verified successfully",
   "emailVerifiedUnsuccessfully:": "E-mail verification failed",
-  "passwordChangeSuccessful": "Password was changed successfully"
+  "passwordChangeSuccessful": "Password was changed successfully",
+  "blacklistedUntil": "Blacklisted until {{ one }}",
+  "blacklistInfo": "Blacklist",
+  "blacklistEndDate": "Until",
+  "blacklistReason": "Reason",
+  "blacklistState": "This person is blacklisted until {{ one }}",
+  "blacklisted": "Blacklisted",
+  "showOnlyBlacklisted": "Show only blacklisted",
+  "modifiedBy": "Last modification was made by",
+  "createdBy": "Created by",
+  "showBlacklistHistory": "Show blacklist history",
+  "hideBlacklistHistory": "Hide blacklist history",
+  "blacklistHistoryStatus": "Status",
+  "noReason": "No reason provided",
+  "blacklistHistoryStatusCanceled": "Canceled",
+  "blacklistHistoryStatusExpired": "Expired",
+  "onlyVisibleToYou": "Only visible to you"
 }

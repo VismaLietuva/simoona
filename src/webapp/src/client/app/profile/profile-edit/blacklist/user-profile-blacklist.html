@@ -1,0 +1,71 @@
+<div class="tab-content">
+    <div class="tab-pane-content">
+        <form name="blacklistInfo" role="form" class="form-horizontal profile-form">
+            <!-- End date -->
+            <input-wrapper label-text="{{'applicationUser.blacklistEndDate' | translate}}" input-value="blacklistInfo.endDate"
+                classes="col-xs-12 col-sm-6 nopadding-left"
+                label-classes="control-label col-xs-12 col-sm-4 nopadding-left"
+                min-date="{{minDate | date: 'yyyy-MM-dd'}}">
+                <div class="date-field">
+                    <input type="text" name="endDate" id="endDate" class="hasDatepicker"
+                        uib-datepicker-popup="yyyy-MM-dd" popup-placement="bottom" ng-model="model.endDate"
+                        is-open="datePickers.endDate" ng-required="true"
+                        ng-change="onChangeValidateEndDate()"
+                        ng-click="openDatePicker($event, 'endDate')"
+                        datepicker-options="{ startingDay: 1, datepickerMode: 'year' }" required wrapped>
+                </div>
+            </input-wrapper>
+
+            <!-- Reason -->
+            <input-wrapper label-text="{{'applicationUser.blacklistReason' | translate}}" input-value="blacklistInfo.reason"
+                classes="col-xs-12 col-sm-6 nopadding-left"
+                label-classes="control-label col-xs-12 col-sm-4 nopadding-left">
+                <textarea type="text" id="reason" name="reason" ng-model="model.reason" class="form-control" ng-disabled="false"
+                    wrapped ng-maxlength="2000">
+                </textarea>
+            </input-wrapper>
+
+            <hr ng-if="allowDeletion" class="profile-edit-blacklist-hr"></hr>
+            <div ng-if="allowDeletion" class="top-space col-xs-offset-4 text-left mt-0 profile-edit-blacklist-author">
+                <div class="ml-3">
+                    <p class="profile-edit-blacklist-info-text" translate="applicationUser.blacklistState" translate-values="{ one: (endDateDisplay | date: 'yyyy-MM-dd') }"></p>
+                    <span class="profile-edit-blacklist-info-text" translate="applicationUser.modifiedBy"></span>
+                    <a class="profile-edit-blacklist-info-link" ui-sref="Root.WithOrg.Client.Profiles.Details({ id: model.modifiedBy })">
+                        <span ng-cloak>
+                            {{model.modifiedByUserFirstName}} {{model.modifiedByUserLastName}}
+                        </span>
+                    </a>
+                    <span class="profile-edit-blacklist-info-text">{{model.modified | date: 'yyyy-MM-dd'}}</span>
+                </div>
+            </div>
+            <div ng-if="allowDeletion" class="top-space col-xs-offset-4 text-left mt-0 profile-edit-blacklist-author">
+                <div class="ml-3">
+                    <span class="profile-edit-blacklist-info-text" translate="applicationUser.createdBy"></span>
+                    <a class="profile-edit-blacklist-info-link" ui-sref="Root.WithOrg.Client.Profiles.Details({ id: model.createdBy })">
+                        <span ng-cloak>
+                            {{model.createdByUserFirstName}} {{model.createdByUserLastName}}
+                        </span>
+                    </a>
+                    <span class="profile-edit-blacklist-info-text">{{model.created | date: 'yyyy-MM-dd'}}</span>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="top-space col-xs-offset-4 text-left">
+                <button class="btn btn-primary" type="submit" ng-click="saveInfo()"
+                    ng-disabled="blacklistInfo.$invalid">
+                    <span class="glyphicon glyphicon-disk-save"></span>
+                    {{"common.save" | translate}}
+                </button>
+                <button ng-if="allowDeletion" ace-confirmation-modal="deleteFromBlacklist()" class="btn btn-danger" type="submit">
+                    <span class="glyphicon glyphicon-bin"></span>
+                    {{"common.delete" | translate}}
+                </button>
+                <button ui-sref="Root.WithOrg.Client.Profiles.Details({ id: model.id })" class="btn btn-default">
+                    {{"applicationUser.backToProfile" | translate}}
+                </button>
+            </div>
+        </form>
+        <div class="clearfix"></div>
+    </div>
+</div>

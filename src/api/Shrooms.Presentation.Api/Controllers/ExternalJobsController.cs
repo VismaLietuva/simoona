@@ -36,5 +36,12 @@ namespace Shrooms.Presentation.Api.Controllers
         {
             await _webHookService.UsersAnonymization.AnonymizeUsersAsync(GetOrganizationName());
         }
+
+        [HttpPost]
+        [Route("ProcessExpiredBlacklistUsers")]
+        public async Task ProcessExpiredBlacklistUsers()
+        {
+            await _webHookService.BlacklistUserStatusChange.ProcessExpiredBlacklistUsersAsync();
+        }
     }
 }

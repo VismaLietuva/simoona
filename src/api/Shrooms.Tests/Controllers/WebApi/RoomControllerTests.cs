@@ -2,11 +2,8 @@
 using System.Data.Entity;
 using System.Net;
 using System.Net.Http;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Http.Controllers;
-using System.Web.Http.Hosting;
 using AutoMapper;
 using Microsoft.AspNet.Identity;
 using NSubstitute;
@@ -18,6 +15,7 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.WebViewModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.PostModels;
+using Shrooms.Tests.Extensions;
 using Shrooms.Tests.Mocks;
 using Shrooms.Tests.ModelMappings;
 
@@ -43,12 +41,7 @@ namespace Shrooms.Tests.Controllers.WebApi
             _mapper = ModelMapper.Create();
 
             _roomController = new RoomController(_mapper, _unitOfWork, _userManager);
-            _roomController.ControllerContext = Substitute.For<HttpControllerContext>();
-            _roomController.Request = new HttpRequestMessage();
-            _roomController.Request.Properties.Add(HttpPropertyKeys.HttpConfigurationKey, new HttpConfiguration());
-            _roomController.Request.SetConfiguration(new HttpConfiguration());
-            _roomController.RequestContext.Principal =
-                new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, "1") }));
+            _roomController.SetUpControllerForTesting();
         }
 
         [Test]

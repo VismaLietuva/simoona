@@ -3,7 +3,7 @@ using Shrooms.Contracts.ViewModels;
 using System.Collections.Generic;
 using X.PagedList;
 
-namespace Shrooms.Premium.Presentation.Api.Extensions
+namespace Shrooms.Domain.Extensions
 {
     public static class PagedListExtensions
     {
@@ -14,7 +14,7 @@ namespace Shrooms.Premium.Presentation.Api.Extensions
         /// <param name="destination">IEnumerable<TDestination> that contains view models that were mapped from source</param>
         /// <param name="pageable">Parameters for page and page size</param>
         public static PagedViewModel<TDestination> ToPagedViewModel<TSource, TDestination>(
-            this IPagedList<TSource> source, 
+            this IPagedList<TSource> source,
             IEnumerable<TDestination> destination,
             IPageable pageable)
             where TSource : class

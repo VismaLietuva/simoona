@@ -12,6 +12,7 @@ using Shrooms.Presentation.ModelMappings.Resolvers;
 using Shrooms.Presentation.WebViewModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.Certificate;
 using Shrooms.Presentation.WebViewModels.Models.ChangeProfile;
+using Shrooms.Presentation.WebViewModels.Models.Employees;
 using Shrooms.Presentation.WebViewModels.Models.Exam;
 using Shrooms.Presentation.WebViewModels.Models.PostModels;
 using Shrooms.Presentation.WebViewModels.Models.Roles;
@@ -158,9 +159,6 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
             CreateMap<ApplicationUserShroomsInfoViewModel, ApplicationUser>();
             CreateMap<ApplicationUser, ApplicationUserShroomsInfoViewModel>();
-
-            CreateMap<ApplicationUser, EmployeeListViewModel>()
-                .ForMember(dest => dest.JobTitle, src => src.MapFrom(d => d.JobPosition.Title));
 
             CreateMap<ApplicationUser, ApplicationUserMinimalDto>();
             CreateMap<ApplicationUserMinimalDto, ApplicationUser>()
