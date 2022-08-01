@@ -43,9 +43,10 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
 
             var guid = MockParticipantsWithOptionsForExport(userAndOrg);
 
-            var stream = await _eventExportService.ExportOptionsAndParticipantsAsync(guid, userAndOrg);
+            var content = await _eventExportService.ExportOptionsAndParticipantsAsync(guid, userAndOrg);
+            var bytes = await content.ReadAsByteArrayAsync();
 
-            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
+            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(bytes)))
             {
                 excelReader.IsFirstRowAsColumnNames = true;
                 var excelData = excelReader.AsDataSet();
@@ -67,9 +68,10 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             };
             var guid = MockParticipantsWithoutOptionsForExport(userAndOrg);
 
-            var stream = await _eventExportService.ExportOptionsAndParticipantsAsync(guid, userAndOrg);
+            var content = await _eventExportService.ExportOptionsAndParticipantsAsync(guid, userAndOrg);
+            var bytes = await content.ReadAsByteArrayAsync();
 
-            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
+            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(bytes)))
             {
                 excelReader.IsFirstRowAsColumnNames = true;
                 var excelData = excelReader.AsDataSet();
@@ -88,9 +90,10 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             };
             var guid = MockParticipantsWithOptionsForExport(userAndOrg);
 
-            var stream = await _eventExportService.ExportOptionsAndParticipantsAsync(guid, userAndOrg);
+            var content = await _eventExportService.ExportOptionsAndParticipantsAsync(guid, userAndOrg);
+            var bytes = await content.ReadAsByteArrayAsync();
 
-            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
+            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(bytes)))
             {
                 excelReader.IsFirstRowAsColumnNames = true;
                 var excelData = excelReader.AsDataSet();

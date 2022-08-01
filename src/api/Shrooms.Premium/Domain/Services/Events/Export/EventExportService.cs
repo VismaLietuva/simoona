@@ -74,8 +74,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
 
                 new ExcelColumn
                 {
-                    Value = option.Count,
-                    Format = ExcelWorksheetBuilderConstants.NumberFormat
+                    Value = option.Count.ToString()
                 }
             };
         }

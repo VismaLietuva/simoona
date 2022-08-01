@@ -6,7 +6,7 @@ namespace Shrooms.Infrastructure.ExcelGenerator
 {
     public class ExcelRow : IExcelRow
     {
-        private IList<IExcelColumn> _columns { get; set; }
+        private readonly IList<IExcelColumn> _columns;
 
         public ExcelRow()
         {

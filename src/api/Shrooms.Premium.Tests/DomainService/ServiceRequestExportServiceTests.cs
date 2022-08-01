@@ -47,9 +47,10 @@ namespace Shrooms.Premium.Tests.DomainService
             };
             MockServiceRequests();
 
-            var stream = await _serviceRequestExportService.ExportToExcelAsync(userAndOrg, null);
+            var content = await _serviceRequestExportService.ExportToExcelAsync(userAndOrg, null);
+            var bytes = await content.ReadAsByteArrayAsync();
 
-            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
+            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(bytes)))
             {
                 excelReader.IsFirstRowAsColumnNames = true;
                 var excelData = excelReader.AsDataSet();
@@ -76,9 +77,11 @@ namespace Shrooms.Premium.Tests.DomainService
             MockServiceRequests();
 
             Expression<Func<ServiceRequest, bool>> filter = f => f.CategoryName == "Hardware";
-            var stream = await _serviceRequestExportService.ExportToExcelAsync(userAndOrg, filter);
 
-            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
+            var content = await _serviceRequestExportService.ExportToExcelAsync(userAndOrg, filter);
+            var bytes = await content.ReadAsByteArrayAsync();
+
+            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(bytes)))
             {
                 excelReader.IsFirstRowAsColumnNames = true;
                 var excelData = excelReader.AsDataSet();

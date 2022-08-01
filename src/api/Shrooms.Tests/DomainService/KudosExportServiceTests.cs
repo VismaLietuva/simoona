@@ -57,9 +57,10 @@ namespace Shrooms.Tests.DomainService
                 SortOrder = "desc"
             };
 
-            var stream = await _kudosExportService.ExportToExcelAsync(filter);
+            var content = await _kudosExportService.ExportToExcelAsync(filter);
+            var bytes = await content.ReadAsByteArrayAsync();
 
-            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
+            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(bytes)))
             {
                 excelReader.IsFirstRowAsColumnNames = true;
                 var excelData = excelReader.AsDataSet();
@@ -90,9 +91,10 @@ namespace Shrooms.Tests.DomainService
                 SortOrder = "desc"
             };
 
-            var stream = await _kudosExportService.ExportToExcelAsync(filter);
+            var content = await _kudosExportService.ExportToExcelAsync(filter);
+            var bytes = await content.ReadAsByteArrayAsync();
 
-            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
+            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(bytes)))
             {
                 excelReader.IsFirstRowAsColumnNames = true;
                 var excelData = excelReader.AsDataSet();
