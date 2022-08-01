@@ -65,7 +65,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
 
             var lotteryDto = GetCreateLotteryDtoList()[index];
 
-            var result = Assert.ThrowsAsync<LotteryException>(async () => await _sut.CreateLotteryAsync(lotteryDto));
+            var result = Assert.ThrowsAsync<LotteryException>(async () => await _sut.CreateLotteryAsync(lotteryDto, 1));
 
             Assert.That(result.Message, Is.EqualTo(message));
         }
@@ -76,7 +76,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             var lotteryDto = GetCreateLotteryDtoList()[3];
             _mapper.Map<LotteryDto, Lottery>(lotteryDto).Returns(GetLottery());
 
-            await _sut.CreateLotteryAsync(lotteryDto);
+            await _sut.CreateLotteryAsync(lotteryDto, 1);
 
             _lotteriesDb.ReceivedWithAnyArgs().Add(Arg.Any<Lottery>());
             await _unitOfWork.Received().SaveChangesAsync(lotteryDto.UserId);
@@ -87,7 +87,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
         {
             _lotteriesDb.FindAsync().ReturnsForAnyArgs(GetLottery());
 
-            var result = Assert.ThrowsAsync<LotteryException>(async () => await _sut.EditDraftedLotteryAsync(new LotteryDto()));
+            var result = Assert.ThrowsAsync<LotteryException>(async () => await _sut.EditDraftedLotteryAsync(new LotteryDto(), 1));
 
             Assert.That(result.Message, Is.EqualTo("Editing is forbidden for not drafted lottery."));
         }
@@ -97,7 +97,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
         {
             _lotteriesDb.FindAsync().ReturnsForAnyArgs(GetLottery(LotteryStatus.Drafted));
 
-            await _sut.EditDraftedLotteryAsync(new LotteryDto());
+            await _sut.EditDraftedLotteryAsync(new LotteryDto(), 1);
 
             await _unitOfWork.Received().SaveChangesAsync(false);
         }
@@ -110,7 +110,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             _systemClock.UtcNow.Returns(DateTime.UtcNow.AddDays(-1000));
 
             // Assert
-            Assert.ThrowsAsync<LotteryException>(async () => await _sut.EditDraftedLotteryAsync(new LotteryDto()));
+            Assert.ThrowsAsync<LotteryException>(async () => await _sut.EditDraftedLotteryAsync(new LotteryDto(), 1));
         }
 
         [Test]

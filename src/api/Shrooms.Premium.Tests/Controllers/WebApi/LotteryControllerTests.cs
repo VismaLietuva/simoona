@@ -156,7 +156,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
             // Assert
             Assert.IsInstanceOf<InvalidModelStateResult>(response);
-            await _lotteryService.DidNotReceive().CreateLotteryAsync(lotteryDto);
+            await _lotteryService.DidNotReceive().CreateLotteryAsync(lotteryDto, 1);
         }
 
         [Test]
@@ -181,7 +181,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             // Assert
             Assert.IsNotNull(response);
             Assert.IsInstanceOf<OkResult>(response);
-            await _lotteryService.Received(1).CreateLotteryAsync(lotteryDto);
+            await _lotteryService.Received(1).CreateLotteryAsync(lotteryDto, 1);
         }
 
         [Test]
@@ -199,14 +199,14 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             };
 
             _mapper.Map<CreateLotteryViewModel, LotteryDto>(lotteryViewModel).Returns(lotteryDto);
-            _lotteryService.CreateLotteryAsync(lotteryDto).Throws(new LotteryException("Exception"));
+            _lotteryService.CreateLotteryAsync(lotteryDto, 1).Throws(new LotteryException("Exception"));
 
             // Act
             var response = await _lotteryController.CreateLottery(lotteryViewModel);
 
             // Assert
             Assert.IsInstanceOf<BadRequestErrorMessageResult>(response);
-            await _lotteryService.Received(1).CreateLotteryAsync(lotteryDto);
+            await _lotteryService.Received(1).CreateLotteryAsync(lotteryDto, 1);
         }
 
         [Test]
@@ -356,7 +356,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             // Assert
             Assert.IsNotNull(response);
             Assert.IsInstanceOf<OkResult>(response);
-            await _lotteryService.Received(1).EditDraftedLotteryAsync(lotteryDto);
+            await _lotteryService.Received(1).EditDraftedLotteryAsync(lotteryDto, 1);
         }
 
         [Test]
@@ -377,7 +377,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             _mapper.Map<EditDraftedLotteryViewModel, LotteryDto>(lotteryViewModel)
                 .Returns(lotteryDto);
 
-            _lotteryService.When(x => x.EditDraftedLotteryAsync(lotteryDto))
+            _lotteryService.When(x => x.EditDraftedLotteryAsync(lotteryDto, 1))
                 .Do(_ => throw new LotteryException("Exception"));
 
             // Act
@@ -386,7 +386,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             // Assert
             Assert.IsNotNull(response);
             Assert.IsInstanceOf<BadRequestErrorMessageResult>(response);
-            await _lotteryService.Received(1).EditDraftedLotteryAsync(lotteryDto);
+            await _lotteryService.Received(1).EditDraftedLotteryAsync(lotteryDto, 1);
         }
 
         [Test]
