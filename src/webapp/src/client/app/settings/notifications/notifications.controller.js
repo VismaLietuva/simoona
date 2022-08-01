@@ -14,7 +14,7 @@
         'filterFilter'
     ];
 
-    function settingsNotificationsController(settingsRepository, appConfig, errorHandler, 
+    function settingsNotificationsController(settingsRepository, appConfig, errorHandler,
         notifySrv, Analytics, filterFilter) {
         /*jshint validthis: true */
         var vm = this;
@@ -54,6 +54,7 @@
                     vm.settings.followingPostsAppNotifications = response.followingPostsAppNotifications;
                     vm.settings.followingPostsEmailNotifications = response.followingPostsEmailNotifications;
                     vm.settings.mentionEmailNotifications = response.mentionEmailNotifications;
+                    vm.settings.createdLotteryEmailNotifications = response.createdLotteryEmailNotifications;
                 }
                 vm.isLoading = false;
             }, errorHandler.handleErrorMessage);

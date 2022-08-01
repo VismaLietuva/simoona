@@ -44,8 +44,8 @@
     ];
 
     window.modules = modulesList;
-    window.isPremium = false; // Enable/disable premium modules
-    window.lotteriesEnabled = false;
+    window.isPremium = true; // Enable/disable premium modules
+    window.lotteriesEnabled = true;
     window.usingAnimatedGifs = false; // Used to determine if back-end uses AnimatedGifs plugin
     window.usePostWatching = true; // Used to show/hide post watching feature
 
@@ -145,7 +145,7 @@
     function configuration($httpProvider, $locationProvider, cfpLoadingBarProvider,
         ChartJsProvider, AnalyticsProvider, environment, applicationInsightsServiceProvider) {
 
-        var options = { 
+        var options = {
             applicationName: '',
             appInsightsEnabled: false,
             appInsightsInstrumentationKey: 'appInsightsInstrumentationKeyValue'

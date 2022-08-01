@@ -57,5 +57,7 @@ namespace Shrooms.Contracts.Infrastructure
         string ResetPasswordUrl(string organization, string userName, string token);
 
         string VerifyEmailUrl(string organization, string userName, string token);
+
+        string FeedUrl(string tenant);
     }
 }

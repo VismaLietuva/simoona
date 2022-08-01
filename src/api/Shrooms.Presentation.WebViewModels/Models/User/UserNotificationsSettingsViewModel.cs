@@ -26,6 +26,8 @@ namespace Shrooms.Presentation.WebViewModels.Models.User
 
         public bool MentionEmailNotifications;
 
+        public bool CreatedLotteryEmailNotifications;
+
         public IEnumerable<WallNotificationsViewModel> Walls;
     }
 }

@@ -15,5 +15,6 @@
         public const string ServiceRequestUpdate = nameof(ServiceRequestUpdate);
         public const string CoacheeJoinedEvent = nameof(CoacheeJoinedEvent);
         public const string CoacheeLeftEvent = nameof(CoacheeLeftEvent);
+        public const string StartedLottery = nameof(StartedLottery);
     }
 }

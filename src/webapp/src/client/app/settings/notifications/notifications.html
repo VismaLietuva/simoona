@@ -2,9 +2,9 @@
 	<wave-spinner ng-if="vm.isLoading"></wave-spinner>
 	<div ng-if="!vm.isLoading">
 		<label class="control-label col-xs-12 col-sm-6" translate="settings.notifications_listLabel"></label>
-		<form ng-if="vm.settings.walls.length" 
-			name="notificationsForm" 
-			class="form-horizontal" 
+		<form ng-if="vm.settings.walls.length"
+			name="notificationsForm"
+			class="form-horizontal"
 			autocomplete="off">
 			<table class="nc-table nc-table-active">
 				<thead>
@@ -23,12 +23,12 @@
 							<label>{{ wall.wallName}}</label>
 							<span ng-show="wall.isMainWall" class="glyphicon glyphicon-exclamation-sign" uib-tooltip-template="'mainWallTemplate.html'" tooltip-placement="right" tooltip-append-to-body="true" tooltip-class="settings-notifications-status-tooltip"></span>
 						</td>
-						<td class="col-xs-4" 
+						<td class="col-xs-4"
 							data-test-id="wall-app-notification"
 							ng-cloak>
 							<input type="checkbox" ng-model="wall.isAppNotificationEnabled" ng-disabled="wall.isMainWall">
 						</td>
-						<td class="col-xs-4" 
+						<td class="col-xs-4"
 							data-test-id="wall-email-notification"
 							ng-cloak>
 							<input type="checkbox" ng-model="wall.isEmailNotificationEnabled" ng-disabled="wall.isMainWall">
@@ -156,15 +156,42 @@
 					</tr>
 				</tbody>
 			</table>
+            <table class="nc-table nc-table-active">
+				<thead>
+					<tr>
+						<th translate="settings.lotteries"></th>
+						<th translate="settings.app"></th>
+						<th translate="settings.email"></th>
+					</tr>
+				</thead>
+				<tbody>
+                    <tr>
+						<td class="col-xs-3 word-break"
+							translate-attr-title="settings.lotteryCreated"
+							translate="settings.lotteryCreated"
+							data-test-id="all-comments"
+							ng-cloak>
+						</td>
+						<td class="col-xs-4 notifications-item" ng-cloak>
+							<input type="checkbox" ng-disabled="true">
+						</td>
+
+						<td class="col-xs-4 notifications-item" ng-cloak>
+							<input type="checkbox" ng-model="vm.settings.createdLotteryEmailNotifications">
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
 			<div class="pull-right padding-top">
 				<button class="btn btn-primary"
-						ng-click="vm.save()" 
-						ng-disabled="notificationsForm.$invalid" 
+						ng-click="vm.save()"
+						ng-disabled="notificationsForm.$invalid"
 						data-test-id="notifications-form-update-button">
 					<span translate="common.save"></span>
 				</button>
-				<button class="btn btn-default" 
-						ui-sref="{{vm.appConfig.homeStateName}}" 
+				<button class="btn btn-default"
+						ui-sref="{{vm.appConfig.homeStateName}}"
 						data-test-id="notifications-form-cancel-button">
 					<span translate="common.cancel"></span>
 				</button>

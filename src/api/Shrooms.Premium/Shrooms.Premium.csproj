@@ -275,6 +275,7 @@
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\CoacheeLeftEventEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\CoacheeJoinedEventEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\CommitteeSuggestionEmailTemplateViewModel.cs" />
+    <Compile Include="DataTransferObjects\EmailTemplateViewModels\StartedLotteryEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\EventJoinRemindEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\EventParticipantExpelledEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\KudosReceivedDecreasedEmailTemplateViewModel.cs" />
@@ -358,6 +359,7 @@
     <Compile Include="DataTransferObjects\Models\Lotteries\EditStartedLotteryDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryDetailsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryParticipantDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Lotteries\LotteryStartedEmailDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryStatsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryStatusDto.cs" />
     <Compile Include="DataTransferObjects\Models\MobileBookOfficeLogsDto.cs" />
@@ -408,6 +410,8 @@
     <Compile Include="Domain\Services\Email\Event\IEventNotificationService.cs" />
     <Compile Include="Domain\Services\Email\Kudos\IKudosPremiumNotificationService.cs" />
     <Compile Include="Domain\Services\Email\Kudos\KudosPremiumNotificationService.cs" />
+    <Compile Include="Domain\Services\Email\Lotteries\ILotteryNotificationService.cs" />
+    <Compile Include="Domain\Services\Email\Lotteries\LotteryNotificationService.cs" />
     <Compile Include="Domain\Services\Email\ServiceRequest\IServiceRequestNotificationService.cs" />
     <Compile Include="Domain\Services\Email\ServiceRequest\ServiceRequestNotificationService.cs" />
     <Compile Include="Domain\Services\Events\Calendar\EventCalendarService.cs" />
@@ -619,6 +623,9 @@
     <Content Include="EmailTemplates\Events\CoacheeLeftEvent.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="EmailTemplates\Lotteries\StartedLottery.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

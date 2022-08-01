@@ -23,5 +23,7 @@
 	"myPosts": "Mano įrašai",
 	"iCommented": "Sekami įrašai",
 	"mention": "Mano vardo paminėjimai",
-	"providerEmail": "El. paštas"
+	"providerEmail": "El. paštas",
+    "lotteryCreated": "Naujos loterijos sukūrimas",
+    "lotteries": "Loterijos"
 }

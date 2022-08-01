@@ -62,6 +62,8 @@ namespace Shrooms.Infrastructure.Configuration
 
         public string VerifyEmailUrl(string organization, string userName, string token) => GetClientPath($"{organization}/Verify?UserName={HttpUtility.UrlEncode(userName)}&Token={HttpUtility.UrlEncode(token)}");
 
+        public string FeedUrl(string tenant) => GetClientPath($"{tenant}/Wall/Feed");
+
         public string ApiUrl => string.Format(ConfigurationManager.AppSettings["ApiUrl"]);
 
         private string GetClientPath(string relativePath) => Path.Combine(ClientUrl, relativePath);

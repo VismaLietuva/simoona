@@ -1,0 +1,105 @@
+﻿@using Shrooms.Contracts.Constants
+@model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.StartedLotteryEmailTemplateViewModel
+
+@{
+    Layout = EmailTemplateCacheKeys.HeaderFooterLayout;
+}
+
+<tr>
+    <td align="center">
+        <table align="center" border="0" cellpadding="0" cellspacing="0">
+            <tbody>
+                <tr>
+                    <td align="center" style="text-align:center;padding-left: 10px;padding-right:10px;padding-top: 20px;padding-bottom: 5px;border-bottom: 2px solid #0974B3;width: 280px;">
+                        <font style="font-family: 'Segoe UI',Helvetica,Arial,sans-serif; text-align: center;font-size: 18px;color: #0974B3;">
+                            New lottery created
+                        </font>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </td>
+</tr>
+<tr>
+    <td align="center" width="100%" style="width:100%;padding-top:20px;">
+        <table align="center" bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" style="box-shadow: 0 1px 0 rgba(0,0,0,.05);border-width: 1px;border-style: solid;border-color: #e7e7e7 #e7e7e7 #dbdbdb; min-height:90px; max-width: 690px;" width="95%">
+            <tbody>
+                <tr>
+                    <td>
+                        <table align="center" bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" style="min-height: 90px !important; max-width: 690px !important; border-radius: 20px !important; border-color: #1b7bb3 !important; margin-top: 10px !important; "
+                               width="95%">
+                            <tbody>
+                                <tr>
+                                    <td style="padding-top: 15px !important; padding-right: 20px !important; padding-left: 20px !important; max-width: 600px !important; ">
+                                        <span style="font-size: 20px;">
+                                            @Model.Title
+                                        </span>
+                                        <br />
+                                        <span style="font-size: 12px; line-height: 1; font-weight: 300;">
+                                            Lottery title*
+                                        </span>
+                                    </td>
+
+                                    <td rowspan="2" style="padding-right: 20px; padding-left: 20px; max-width: 400px; border-radius: 20px;">
+                                        <p style="color: #282828; line-height: 1; text-align: center;font-size: 14px;padding-left: 10px;padding-bottom: 15px;font-weight: 400;word-wrap: break-word;word-break: break-word; word-break: break-word;overflow-wrap: break-word; font-family: 'Segoe UI',Helvetica,Arial,sans-serif;margin: 0 0 0 0;">
+                                            <span style="font-size: 86px; line-height: 1; color: black; font-weight: bold;">@Model.EntryFee</span>
+                                            <span style="font-size: 32px; color: black;">Kudos</span>
+                                        </p>
+                                        <span style="color: black; margin-bottom: 10px; font-size: 12px; font-weight: 300; float: right !important;">
+                                            One ticket price*
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-top: 15px; padding-right: 20px; padding-left: 20px; max-width: 600px;">
+                                        <span style="font-size: 20px;">
+                                            @Convert.ToDateTime(Model.EndDate).ToString("yyyy-MM-dd hh:mm")
+                                        </span>
+                                        <br />
+                                        <span style="font-size: 12px; line-height: 1; font-weight: 300;">
+                                            End date*
+                                        </span>
+                                    </td>
+                                </tr>
+
+                                @if (Model.Description != null)
+                                {
+                                    <tr>
+                                        <td colspan="2" style="padding-top: 15px; padding-right: 20px; padding-left: 20px; max-width: 600px;">
+                                            <span style="font-size: 16px;">
+                                                @Model.Description
+                                            </span>
+                                            <br />
+                                            <span style="font-size: 12px; line-height: 1; font-weight: 300;">
+                                                Description*
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+            <tbody>
+                <tr>
+                    <td align="center" colspan="2" style="text-align:center;padding-bottom:15px; padding:10px;">
+                        <table align="center" style="text-align:center;" cellpadding="10">
+                            <tbody>
+                                <tr>
+                                    <td align="center" style="display:inline-block; background:#006199;">
+                                        <a href="@Model.FeedUrl" style="color:#ffffff; font-family:'Segoe UI',Helvetica,Arial,sans-serif; font-size:15px; line-height:15px; font-weight: 400; white-space:nowrap; text-decoration:none;" target="_blank">
+                                            Check out in Simoona
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </td>
+</tr>
+
+

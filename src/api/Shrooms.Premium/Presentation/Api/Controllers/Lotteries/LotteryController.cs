@@ -93,7 +93,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
             try
             {
-                await _lotteryService.CreateLotteryAsync(createLotteryDto);
+                await _lotteryService.CreateLotteryAsync(createLotteryDto, GetOrganizationId());
             }
             catch (LotteryException e)
             {
@@ -162,7 +162,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
                 var editDraftedLotteryDto = _mapper.Map<EditDraftedLotteryViewModel, LotteryDto>(editLotteryViewModel);
                 SetOrganizationAndUser(editDraftedLotteryDto);
 
-                await _lotteryService.EditDraftedLotteryAsync(editDraftedLotteryDto);
+                await _lotteryService.EditDraftedLotteryAsync(editDraftedLotteryDto, GetOrganizationId());
 
                 return Ok();
             }

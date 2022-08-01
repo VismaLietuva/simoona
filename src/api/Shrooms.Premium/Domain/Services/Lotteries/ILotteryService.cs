@@ -12,9 +12,9 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
     {
         Task<Lottery> GetLotteryAsync(int lotteryId);
 
-        Task<LotteryDto> CreateLotteryAsync(LotteryDto newLotteryDto);
+        Task<LotteryDto> CreateLotteryAsync(LotteryDto newLotteryDto, int organizationId);
 
-        Task EditDraftedLotteryAsync(LotteryDto lotteryDto);
+        Task EditDraftedLotteryAsync(LotteryDto lotteryDto, int organizationId);
 
         Task EditStartedLotteryAsync(EditStartedLotteryDto lotteryDto);
 

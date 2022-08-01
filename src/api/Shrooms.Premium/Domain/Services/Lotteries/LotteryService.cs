@@ -17,6 +17,7 @@ using Shrooms.Domain.Services.UserService;
 using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
 using Shrooms.Premium.Domain.DomainExceptions.Lotteries;
 using Shrooms.Premium.Domain.Services.Args;
+using Shrooms.Premium.Domain.Services.Email.Lotteries;
 using X.PagedList;
 
 namespace Shrooms.Premium.Domain.Services.Lotteries
@@ -32,7 +33,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
         private readonly IUserService _userService;
         private readonly IKudosService _kudosService;
         private readonly ISystemClock _systemClock;
-
+        
         public LotteryService(IUnitOfWork2 uow,
             IMapper mapper,
             IParticipantService participantService,
@@ -57,7 +58,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             return await _lotteriesDbSet.FindAsync(lotteryId);
         }
 
-        public async Task<LotteryDto> CreateLotteryAsync(LotteryDto newLotteryDto)
+        public async Task<LotteryDto> CreateLotteryAsync(LotteryDto newLotteryDto, int organizationId)
         {
             if (newLotteryDto.EndDate < _systemClock.UtcNow)
             {
@@ -80,12 +81,14 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 
             await _uow.SaveChangesAsync(newLotteryDto.UserId);
 
+            NotifyAboutStartedLottery(newLottery, organizationId);
+
             newLotteryDto.Id = newLottery.Id;
 
             return newLotteryDto;
         }
 
-        public async Task EditDraftedLotteryAsync(LotteryDto lotteryDto)
+        public async Task EditDraftedLotteryAsync(LotteryDto lotteryDto, int organizationId)
         {
             if (lotteryDto.EndDate < _systemClock.UtcNow)
             {
@@ -102,6 +105,8 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             UpdateDraftedLottery(lottery, lotteryDto);
 
             await _uow.SaveChangesAsync(false);
+
+            NotifyAboutStartedLottery(lottery, organizationId);
         }
 
         public async Task EditStartedLotteryAsync(EditStartedLotteryDto lotteryDto)
@@ -333,6 +338,17 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             await _kudosService.UpdateProfileKudosAsync(applicationUser, userOrg);
         }
 
+        public async Task<List<LotteryDetailsDto>> GetRunningLotteriesAsync(UserAndOrganizationDto userAndOrganization)
+        {
+            return await _lotteriesDbSet.Where(p =>
+                    p.OrganizationId == userAndOrganization.OrganizationId &&
+                    p.Status == (int)LotteryStatus.Started &&
+                    p.EndDate > _systemClock.UtcNow)
+                .Select(MapLotteriesToListItemDto)
+                .OrderBy(_byEndDate)
+                .ToListAsync();
+        }
+
         private async Task AddKudosLogForCheatingAsync(UserAndOrganizationDto userOrg, int entryFee, ApplicationUser applicationUser)
         {
             var kudosLog = new AddKudosLogDto
@@ -350,15 +366,23 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             await _kudosService.UpdateProfileKudosAsync(applicationUser, userOrg);
         }
 
-        public async Task<List<LotteryDetailsDto>> GetRunningLotteriesAsync(UserAndOrganizationDto userAndOrganization)
+        private void NotifyAboutStartedLottery(Lottery lottery, int organizationId)
         {
-            return await _lotteriesDbSet.Where(p =>
-                    p.OrganizationId == userAndOrganization.OrganizationId &&
-                    p.Status == (int)LotteryStatus.Started &&
-                    p.EndDate > _systemClock.UtcNow)
-                .Select(MapLotteriesToListItemDto)
-                .OrderBy(_byEndDate)
-                .ToListAsync();
+            if (lottery.Status != (int)LotteryStatus.Started)
+            {
+                return;
+            }
+
+            var lotteryStartedEmailDto = new LotteryStartedEmailDto
+            {
+                Title = lottery.Title,
+                EndDate = lottery.EndDate,
+                EntryFee = lottery.EntryFee,
+                Description = lottery.Description
+            };
+
+            _asyncRunner.Run<ILotteryNotificationService>(async notifier => await notifier.NotifyUsersAboutStartedLotteryAsync(lotteryStartedEmailDto, organizationId),
+                _uow.ConnectionName);
         }
 
         private readonly Expression<Func<LotteryDetailsDto, DateTime>> _byEndDate = e => e.EndDate;
