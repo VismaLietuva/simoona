@@ -1,10 +1,9 @@
 ﻿using System;
-using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.DataLayer.EntityModels.Models.Lottery;
 
 namespace Shrooms.Premium.DataTransferObjects.Models.Lotteries
 {
-    public class LotteryDto : UserAndOrganizationDto
+    public class LotteryDto
     {
         public int Id { get; set; }
         public int Status { get; set; }

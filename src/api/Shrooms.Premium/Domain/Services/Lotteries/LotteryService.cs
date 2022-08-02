@@ -58,7 +58,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             return await _lotteriesDbSet.FindAsync(lotteryId);
         }
 
-        public async Task<LotteryDto> CreateLotteryAsync(LotteryDto newLotteryDto, int organizationId)
+        public async Task<LotteryDto> CreateLotteryAsync(LotteryDto newLotteryDto, UserAndOrganizationDto userOrg)
         {
             if (newLotteryDto.EndDate < _systemClock.UtcNow)
             {
@@ -76,19 +76,19 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 throw new LotteryException("Invalid status of created lottery.");
             }
 
-            var newLottery = MapNewLottery(newLotteryDto);
+            var newLottery = MapNewLottery(newLotteryDto, userOrg);
             _lotteriesDbSet.Add(newLottery);
 
-            await _uow.SaveChangesAsync(newLotteryDto.UserId);
+            await _uow.SaveChangesAsync(userOrg.UserId);
 
-            NotifyAboutStartedLottery(newLottery, organizationId);
+            NotifyAboutStartedLottery(newLottery, userOrg);
 
             newLotteryDto.Id = newLottery.Id;
 
             return newLotteryDto;
         }
 
-        public async Task EditDraftedLotteryAsync(LotteryDto lotteryDto, int organizationId)
+        public async Task EditDraftedLotteryAsync(LotteryDto lotteryDto, UserAndOrganizationDto userOrg)
         {
             if (lotteryDto.EndDate < _systemClock.UtcNow)
             {
@@ -102,11 +102,11 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 throw new LotteryException("Editing is forbidden for not drafted lottery.");
             }
 
-            UpdateDraftedLottery(lottery, lotteryDto);
+            UpdateDraftedLottery(lottery, lotteryDto, userOrg);
 
             await _uow.SaveChangesAsync(false);
 
-            NotifyAboutStartedLottery(lottery, organizationId);
+            NotifyAboutStartedLottery(lottery, userOrg);
         }
 
         public async Task EditStartedLotteryAsync(EditStartedLotteryDto lotteryDto)
@@ -366,7 +366,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             await _kudosService.UpdateProfileKudosAsync(applicationUser, userOrg);
         }
 
-        private void NotifyAboutStartedLottery(Lottery lottery, int organizationId)
+        private void NotifyAboutStartedLottery(Lottery lottery, UserAndOrganizationDto userOrg)
         {
             if (lottery.Status != (int)LotteryStatus.Started)
             {
@@ -381,7 +381,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 Description = lottery.Description
             };
 
-            _asyncRunner.Run<ILotteryNotificationService>(async notifier => await notifier.NotifyUsersAboutStartedLotteryAsync(lotteryStartedEmailDto, organizationId),
+            _asyncRunner.Run<ILotteryNotificationService>(async notifier => await notifier.NotifyUsersAboutStartedLotteryAsync(lotteryStartedEmailDto, userOrg.OrganizationId),
                 _uow.ConnectionName);
         }
 
@@ -399,19 +399,21 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 RefundFailed = e.IsRefundFailed
             };
 
-        private Lottery MapNewLottery(LotteryDto newLotteryDto)
+        private Lottery MapNewLottery(LotteryDto newLotteryDto, UserAndOrganizationDto userOrg)
         {
             var newLottery = _mapper.Map<LotteryDto, Lottery>(newLotteryDto);
 
-            newLottery.CreatedBy = newLotteryDto.UserId;
+            newLottery.CreatedBy = userOrg.UserId;
+            newLottery.Created = _systemClock.UtcNow;
             newLottery.Modified = _systemClock.UtcNow;
-            newLottery.ModifiedBy = newLotteryDto.UserId;
+            newLottery.ModifiedBy = userOrg.UserId;
             newLottery.IsRefundFailed = false;
+            newLottery.OrganizationId = userOrg.OrganizationId;
 
             return newLottery;
         }
 
-        private static void UpdateDraftedLottery(Lottery lottery, LotteryDto draftedLotteryDto)
+        private static void UpdateDraftedLottery(Lottery lottery, LotteryDto draftedLotteryDto, UserAndOrganizationDto userOrg)
         {
             lottery.EntryFee = draftedLotteryDto.EntryFee;
             lottery.EndDate = draftedLotteryDto.EndDate;
@@ -419,6 +421,8 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             lottery.Status = draftedLotteryDto.Status;
             lottery.Title = draftedLotteryDto.Title;
             lottery.Images = draftedLotteryDto.Images;
+            lottery.Modified = DateTime.UtcNow;
+            lottery.ModifiedBy = userOrg.UserId;
         }
 
         private LotteryParticipant MapNewLotteryParticipant(BuyLotteryTicketDto lotteryTicketDto, UserAndOrganizationDto userOrg)
