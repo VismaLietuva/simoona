@@ -410,11 +410,12 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             newLottery.ModifiedBy = userOrg.UserId;
             newLottery.IsRefundFailed = false;
             newLottery.OrganizationId = userOrg.OrganizationId;
+            newLottery.GiftedTicketLimit = newLottery.GiftedTicketLimit;
 
             return newLottery;
         }
 
-        private static void UpdateDraftedLottery(Lottery lottery, LotteryDto draftedLotteryDto, UserAndOrganizationDto userOrg)
+        private void UpdateDraftedLottery(Lottery lottery, LotteryDto draftedLotteryDto, UserAndOrganizationDto userOrg)
         {
             lottery.EntryFee = draftedLotteryDto.EntryFee;
             lottery.EndDate = draftedLotteryDto.EndDate;
@@ -422,8 +423,9 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             lottery.Status = draftedLotteryDto.Status;
             lottery.Title = draftedLotteryDto.Title;
             lottery.Images = draftedLotteryDto.Images;
-            lottery.Modified = DateTime.UtcNow;
+            lottery.Modified = _systemClock.UtcNow;
             lottery.ModifiedBy = userOrg.UserId;
+            lottery.GiftedTicketLimit = draftedLotteryDto.GiftedTicketLimit;
         }
 
         private LotteryParticipant MapNewLotteryParticipant(BuyLotteryTicketDto lotteryTicketDto, UserAndOrganizationDto userOrg)
