@@ -644,7 +644,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public async Task GetAllExceptActiveAsync_WhenUserDoesNotHaveBlacklistBasicPermissionButRequestUserAndUserIdMatches_DoesNotThrow()
+        public void GetAllExceptActiveAsync_WhenUserDoesNotHaveBlacklistBasicPermissionButRequestUserAndUserIdMatches_DoesNotThrow()
         {
             // Arrange
             var userId = "Same id";
@@ -663,7 +663,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public async Task GetAllExceptActiveAsync_WhenUserHasBlacklistBasicPermissionButRequestUserAndUserIdDoesNotMatch_DoesNotThrow()
+        public void GetAllExceptActiveAsync_WhenUserHasBlacklistBasicPermissionButRequestUserAndUserIdDoesNotMatch_DoesNotThrow()
         {
             // Arrange
             var userId = "Id";
@@ -682,7 +682,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public async Task GetAllExceptActiveAsync_WhenUserHasBlacklistBasicPermissionAndRequestUserAndUserIdMatches_DoesNotThrow()
+        public void GetAllExceptActiveAsync_WhenUserHasBlacklistBasicPermissionAndRequestUserAndUserIdMatches_DoesNotThrow()
         {
             // Arrange
             var userId = "Same id";
@@ -701,7 +701,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public async Task GetAllExceptActiveAsync_WhenUserDoesNotHaveBlacklistBasicPermissionAndRequestUserAndUserIdDoesNotMatch_ThrowsValidationException()
+        public void GetAllExceptActiveAsync_WhenUserDoesNotHaveBlacklistBasicPermissionAndRequestUserAndUserIdDoesNotMatch_ThrowsValidationException()
         {
             // Arrange
             var userId = "Id";
