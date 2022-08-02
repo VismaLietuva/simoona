@@ -894,6 +894,10 @@
     <Compile Include="Migrations\202208011310165_AddedCreatedLotterySettingToNotifications.Designer.cs">
       <DependentUpon>202208011310165_AddedCreatedLotterySettingToNotifications.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202208020717301_AddedGiftedTicketLimitToLottery.cs" />
+    <Compile Include="Migrations\202208020717301_AddedGiftedTicketLimitToLottery.Designer.cs">
+      <DependentUpon>202208020717301_AddedGiftedTicketLimitToLottery.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
@@ -1490,6 +1494,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202208011310165_AddedCreatedLotterySettingToNotifications.resx">
       <DependentUpon>202208011310165_AddedCreatedLotterySettingToNotifications.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202208020717301_AddedGiftedTicketLimitToLottery.resx">
+      <DependentUpon>202208020717301_AddedGiftedTicketLimitToLottery.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
