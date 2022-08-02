@@ -375,6 +375,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 
             var lotteryStartedEmailDto = new LotteryStartedEmailDto
             {
+                Id = lottery.Id,
                 Title = lottery.Title,
                 EndDate = lottery.EndDate,
                 EntryFee = lottery.EntryFee,
