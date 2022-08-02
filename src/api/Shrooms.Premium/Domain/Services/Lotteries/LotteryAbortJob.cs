@@ -59,7 +59,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 
         private async Task UpdateUserProfilesAsync(Lottery lottery, IEnumerable<AddKudosLogDto> kudosLogs, UserAndOrganizationDto userOrg)
         {
-            if (lottery.Status != (int)LotteryStatus.RefundLogsCreated)
+            if (lottery.Status != LotteryStatus.RefundLogsCreated)
             {
                 return;
             }
@@ -67,20 +67,20 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             var userIds = kudosLogs.Select(x => x.ReceivingUserIds.First());
 
             await _kudosService.UpdateProfilesFromUserIdsAsync(userIds, userOrg);
-            lottery.Status = (int)LotteryStatus.Refunded;
+            lottery.Status = LotteryStatus.Refunded;
 
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
         private async Task AddKudosLogsAsync(Lottery lottery, IEnumerable<AddKudosLogDto> kudosLogs, UserAndOrganizationDto userOrg)
         {
-            if (lottery.Status != (int)LotteryStatus.RefundStarted)
+            if (lottery.Status != LotteryStatus.RefundStarted)
             {
                 return;
             }
 
             await _kudosService.AddRefundKudosLogsAsync(kudosLogs);
-            lottery.Status = (int)LotteryStatus.RefundLogsCreated;
+            lottery.Status = LotteryStatus.RefundLogsCreated;
 
             await _uow.SaveChangesAsync(userOrg.UserId);
         }

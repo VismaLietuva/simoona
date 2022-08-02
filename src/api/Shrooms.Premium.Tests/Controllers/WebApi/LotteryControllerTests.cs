@@ -7,6 +7,7 @@ using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.ViewModels;
 using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
 using Shrooms.Premium.Domain.DomainExceptions.Lotteries;
@@ -64,14 +65,14 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             var lotteryViewModel = new LotteryDetailsViewModel
             {
                 Id = 2,
-                Status = 1,
+                Status = LotteryStatus.Drafted,
                 Title = "Hello"
             };
 
             var lotteryDto = new LotteryDetailsDto
             {
                 Id = 2,
-                Status = 1,
+                Status = LotteryStatus.Drafted,
                 Title = "Hello"
             };
 
@@ -480,26 +481,26 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
 
         private IEnumerable<LotteryDetailsDto> LotteryDetailsDto => new List<LotteryDetailsDto>
         {
-            new LotteryDetailsDto { Id = 1, Status = 2, EndDate = DateTime.Now.AddDays(2), Title = "Monitor", EntryFee = -5 },
-            new LotteryDetailsDto { Id = 2, Status = 2, EndDate = DateTime.Now.AddDays(-5), Title = "Computer", EntryFee = 2 },
-            new LotteryDetailsDto { Id = 3, Status = 3, EndDate = DateTime.Now.AddDays(4), Title = "Table", EntryFee = 2 },
-            new LotteryDetailsDto { Id = 4, Status = 2, EndDate = DateTime.Now.AddDays(5), Title = "1000 kudos", EntryFee = 5 },
-            new LotteryDetailsDto { Id = 5, Status = 3, EndDate = DateTime.Now.AddDays(5), Title = "100 kudos", EntryFee = 5 },
-            new LotteryDetailsDto { Id = 6, Status = 4, EndDate = DateTime.Now.AddDays(5), Title = "10 kudos", EntryFee = 5 },
-            new LotteryDetailsDto { Id = 7, Status = 1, EndDate = DateTime.Now.AddDays(5), Title = "10000 kudos", EntryFee = 5 },
-            new LotteryDetailsDto { Id = 8, Status = 1, EndDate = DateTime.Now.AddDays(5), Title = "10 000 kudos", EntryFee = 5 }
+            new LotteryDetailsDto { Id = 1, Status = LotteryStatus.Started, EndDate = DateTime.Now.AddDays(2), Title = "Monitor", EntryFee = -5 },
+            new LotteryDetailsDto { Id = 2, Status = LotteryStatus.Started, EndDate = DateTime.Now.AddDays(-5), Title = "Computer", EntryFee = 2 },
+            new LotteryDetailsDto { Id = 3, Status = LotteryStatus.Deleted, EndDate = DateTime.Now.AddDays(4), Title = "Table", EntryFee = 2 },
+            new LotteryDetailsDto { Id = 4, Status = LotteryStatus.Started, EndDate = DateTime.Now.AddDays(5), Title = "1000 kudos", EntryFee = 5 },
+            new LotteryDetailsDto { Id = 5, Status = LotteryStatus.Deleted, EndDate = DateTime.Now.AddDays(5), Title = "100 kudos", EntryFee = 5 },
+            new LotteryDetailsDto { Id = 6, Status = LotteryStatus.Ended, EndDate = DateTime.Now.AddDays(5), Title = "10 kudos", EntryFee = 5 },
+            new LotteryDetailsDto { Id = 7, Status = LotteryStatus.Drafted, EndDate = DateTime.Now.AddDays(5), Title = "10000 kudos", EntryFee = 5 },
+            new LotteryDetailsDto { Id = 8, Status = LotteryStatus.Drafted, EndDate = DateTime.Now.AddDays(5), Title = "10 000 kudos", EntryFee = 5 }
         };
 
         private IEnumerable<LotteryDetailsViewModel> LotteryDetailsViewModel => new List<LotteryDetailsViewModel>
         {
-            new LotteryDetailsViewModel { Id = 1, Status = 2, EndDate = DateTime.Now.AddDays(2), Title = "Monitor", EntryFee = -5 },
-            new LotteryDetailsViewModel { Id = 2, Status = 2, EndDate = DateTime.Now.AddDays(-5), Title = "Computer", EntryFee = 2 },
-            new LotteryDetailsViewModel { Id = 3, Status = 3, EndDate = DateTime.Now.AddDays(4), Title = "Table", EntryFee = 2 },
-            new LotteryDetailsViewModel { Id = 4, Status = 2, EndDate = DateTime.Now.AddDays(5), Title = "1000 kudos", EntryFee = 5 },
-            new LotteryDetailsViewModel { Id = 5, Status = 3, EndDate = DateTime.Now.AddDays(5), Title = "100 kudos", EntryFee = 5 },
-            new LotteryDetailsViewModel { Id = 6, Status = 4, EndDate = DateTime.Now.AddDays(5), Title = "10 kudos", EntryFee = 5 },
-            new LotteryDetailsViewModel { Id = 7, Status = 1, EndDate = DateTime.Now.AddDays(5), Title = "10000 kudos", EntryFee = 5 },
-            new LotteryDetailsViewModel { Id = 8, Status = 1, EndDate = DateTime.Now.AddDays(5), Title = "10 000 kudos", EntryFee = 5 }
+            new LotteryDetailsViewModel { Id = 1, Status = LotteryStatus.Started, EndDate = DateTime.Now.AddDays(2), Title = "Monitor", EntryFee = -5 },
+            new LotteryDetailsViewModel { Id = 2, Status = LotteryStatus.Started, EndDate = DateTime.Now.AddDays(-5), Title = "Computer", EntryFee = 2 },
+            new LotteryDetailsViewModel { Id = 3, Status = LotteryStatus.Deleted, EndDate = DateTime.Now.AddDays(4), Title = "Table", EntryFee = 2 },
+            new LotteryDetailsViewModel { Id = 4, Status = LotteryStatus.Started, EndDate = DateTime.Now.AddDays(5), Title = "1000 kudos", EntryFee = 5 },
+            new LotteryDetailsViewModel { Id = 5, Status = LotteryStatus.Deleted, EndDate = DateTime.Now.AddDays(5), Title = "100 kudos", EntryFee = 5 },
+            new LotteryDetailsViewModel { Id = 6, Status = LotteryStatus.Ended, EndDate = DateTime.Now.AddDays(5), Title = "10 kudos", EntryFee = 5 },
+            new LotteryDetailsViewModel { Id = 7, Status = LotteryStatus.Drafted, EndDate = DateTime.Now.AddDays(5), Title = "10000 kudos", EntryFee = 5 },
+            new LotteryDetailsViewModel { Id = 8, Status = LotteryStatus.Drafted, EndDate = DateTime.Now.AddDays(5), Title = "10 000 kudos", EntryFee = 5 }
         };
 
         private readonly UserAndOrganizationDto _userAndOrganization = new UserAndOrganizationDto

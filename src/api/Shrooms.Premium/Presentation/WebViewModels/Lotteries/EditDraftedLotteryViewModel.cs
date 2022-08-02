@@ -1,4 +1,6 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
+using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models.Lottery;
 
 namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
@@ -7,7 +9,8 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
     {
         public int Id { get; set; }
         public string Title { get; set; }
-        public int Status { get; set; }
+        [EnumDataType(typeof(LotteryStatus))]
+        public LotteryStatus Status { get; set; }
         public string Description { get; set; }
         public DateTime EndDate { get; set; }
         public DateTime StartDate { get; set; }

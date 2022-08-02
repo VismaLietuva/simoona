@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using Shrooms.Contracts.Constants;
+using Shrooms.Contracts.Enums;
 
 namespace Shrooms.DataLayer.EntityModels.Models.Lottery
 {
@@ -13,7 +14,7 @@ namespace Shrooms.DataLayer.EntityModels.Models.Lottery
 
         public DateTime EndDate { get; set; }
 
-        public int Status { get; set; }
+        public LotteryStatus Status { get; set; }
 
         public int EntryFee { get; set; }
 

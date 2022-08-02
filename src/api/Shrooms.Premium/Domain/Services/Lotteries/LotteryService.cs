@@ -70,8 +70,8 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 throw new LotteryException("Invalid entry fee.");
             }
 
-            if (newLotteryDto.Status != (int)LotteryStatus.Started &&
-                newLotteryDto.Status != (int)LotteryStatus.Drafted)
+            if (newLotteryDto.Status != LotteryStatus.Started &&
+                newLotteryDto.Status != LotteryStatus.Drafted)
             {
                 throw new LotteryException("Invalid status of created lottery.");
             }
@@ -97,7 +97,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 
             var lottery = await _lotteriesDbSet.FindAsync(lotteryDto.Id);
 
-            if (lottery != null && lottery.Status != (int)LotteryStatus.Drafted)
+            if (lottery != null && lottery.Status != LotteryStatus.Drafted)
             {
                 throw new LotteryException("Editing is forbidden for not drafted lottery.");
             }
@@ -113,7 +113,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
         {
             var lottery = await _lotteriesDbSet.FindAsync(lotteryDto.Id);
 
-            if (lottery != null && lottery.Status != (int)LotteryStatus.Started)
+            if (lottery != null && lottery.Status != LotteryStatus.Started)
             {
                 throw new LotteryException("Lottery is not running.");
             }
@@ -151,20 +151,20 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 return false;
             }
 
-            if (lottery.Status == (int)LotteryStatus.Started || lottery.Status == (int)LotteryStatus.Expired)
+            if (lottery.Status == LotteryStatus.Started || lottery.Status == LotteryStatus.Expired)
             {
-                lottery.Status = (int)LotteryStatus.RefundStarted;
+                lottery.Status = LotteryStatus.RefundStarted;
                 await _uow.SaveChangesAsync();
 
                 _asyncRunner.Run<ILotteryAbortJob>(async notifier => await notifier.RefundLotteryAsync(lottery.Id, userOrg), _uow.ConnectionName);
             }
-            else if (lottery.Status == (int)LotteryStatus.Drafted)
+            else if (lottery.Status == LotteryStatus.Drafted)
             {
-                lottery.Status = (int)LotteryStatus.Deleted;
+                lottery.Status = LotteryStatus.Deleted;
                 await _uow.SaveChangesAsync();
             }
 
-            return lottery.Status == (int)LotteryStatus.Deleted || lottery.Status == (int)LotteryStatus.RefundStarted;
+            return lottery.Status == LotteryStatus.Deleted || lottery.Status == LotteryStatus.RefundStarted;
         }
 
         public async Task RefundParticipantsAsync(int lotteryId, UserAndOrganizationDto userOrg)
@@ -211,7 +211,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 return;
             }
 
-            lottery.Status = (int)LotteryStatus.Ended;
+            lottery.Status = LotteryStatus.Ended;
 
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
@@ -254,7 +254,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 .Where(x => x.Title.Contains(filter))
                 .Select(MapLotteriesToListItemDto)
                 .OrderByDescending(x => x.RefundFailed)
-                .ThenByDescending(x => x.Status == (int)LotteryStatus.Started || x.Status == (int)LotteryStatus.Drafted)
+                .ThenByDescending(x => x.Status == LotteryStatus.Started || x.Status == LotteryStatus.Drafted)
                 .ThenByDescending(_byEndDate)
                 .ToListAsync();
         }
@@ -342,7 +342,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
         {
             return await _lotteriesDbSet.Where(p =>
                     p.OrganizationId == userAndOrganization.OrganizationId &&
-                    p.Status == (int)LotteryStatus.Started &&
+                    p.Status == LotteryStatus.Started &&
                     p.EndDate > _systemClock.UtcNow)
                 .Select(MapLotteriesToListItemDto)
                 .OrderBy(_byEndDate)
@@ -368,7 +368,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 
         private void NotifyAboutStartedLottery(Lottery lottery, int organizationId)
         {
-            if (lottery.Status != (int)LotteryStatus.Started)
+            if (lottery.Status != LotteryStatus.Started)
             {
                 return;
             }

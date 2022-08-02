@@ -42,13 +42,13 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             {
                 new Lottery
                 {
-                    Status = (int)LotteryStatus.Expired,
+                    Status = LotteryStatus.Expired,
                     EndDate = DateTime.UtcNow
                 },
 
                 new Lottery
                 {
-                    Status = (int)LotteryStatus.Expired,
+                    Status = LotteryStatus.Expired,
                     EndDate = DateTime.UtcNow
                 }
             };
@@ -72,13 +72,13 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             {
                 new Lottery
                 {
-                    Status = (int)LotteryStatus.Started,
+                    Status = LotteryStatus.Started,
                     EndDate = DateTime.UtcNow
                 },
 
                 new Lottery
                 {
-                    Status = (int)LotteryStatus.Started,
+                    Status = LotteryStatus.Started,
                     EndDate = DateTime.UtcNow
                 }
             };

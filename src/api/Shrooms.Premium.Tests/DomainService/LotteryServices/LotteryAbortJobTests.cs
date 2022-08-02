@@ -70,7 +70,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             {
                 Id = 1,
                 OrganizationId = 1,
-                Status = (int)status
+                Status = status
             });
 
             await _sut.RefundLotteryAsync(default, _userAndOrganization);
@@ -86,7 +86,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
                 {
                     Id = 1,
                     OrganizationId = 1,
-                    Status = (int)LotteryStatus.RefundStarted
+                    Status = LotteryStatus.RefundStarted
                 });
 
             await _sut.RefundLotteryAsync(1, _userAndOrganization);
@@ -129,7 +129,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             {
                 Id = 1,
                 OrganizationId = 1,
-                Status = (int)LotteryStatus.RefundStarted,
+                Status = LotteryStatus.RefundStarted,
                 EndDate = DateTime.Now.AddDays(value: 2),
                 Title = "Monitor",
                 EntryFee = -5
