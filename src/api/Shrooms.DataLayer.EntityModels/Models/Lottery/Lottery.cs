@@ -21,5 +21,7 @@ namespace Shrooms.DataLayer.EntityModels.Models.Lottery
         public bool IsRefundFailed { get; set; }
 
         public virtual ImagesCollection Images { get; set; }
+
+        public int GiftedTicketLimit { get; set; }
     }
 }

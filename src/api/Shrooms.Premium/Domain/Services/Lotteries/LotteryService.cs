@@ -396,7 +396,8 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 EntryFee = e.EntryFee,
                 EndDate = e.EndDate,
                 Status = e.Status,
-                RefundFailed = e.IsRefundFailed
+                RefundFailed = e.IsRefundFailed,
+                GiftedTicketLimit = e.GiftedTicketLimit
             };
 
         private Lottery MapNewLottery(LotteryDto newLotteryDto)

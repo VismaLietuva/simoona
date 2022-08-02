@@ -15,5 +15,6 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Lotteries
         public ImagesCollection Images { get; set; }
         public int Participants { get; set; }
         public bool RefundFailed { get; set; }
+        public int GiftedTicketLimit { get; set; }
     }
 }

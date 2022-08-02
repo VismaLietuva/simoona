@@ -14,5 +14,6 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Lotteries
         public DateTime EndDate { get; set; }
         public int EntryFee { get; set; }
         public ImagesCollection Images { get; set; }
+        public int GiftedTicketLimit { get; set; }
     }
 }
