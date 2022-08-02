@@ -9,9 +9,6 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
     public class CreateLotteryViewModel
     {
         [Required]
-        public int? Id { get; set; }
-        
-        [Required]
         public string Title { get; set; }
         
         [StringLength(ValidationConstants.MaxPostMessageBodyLength)]
@@ -31,7 +28,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
         [Required]
         public ImagesCollection Images { get; set; }
 
-        [Range(1, int.MaxValue)]
+        [Range(0, int.MaxValue)]
         public int GiftedTicketLimit { get; set; }
     }
 }

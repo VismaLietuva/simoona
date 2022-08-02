@@ -30,7 +30,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
         public ImagesCollection Images { get; set; }
 
         [Required]
-        [Range(1, int.MaxValue)]
+        [Range(0, int.MaxValue)]
         public int? GiftedTicketLimit { get; set; }
     }
 }

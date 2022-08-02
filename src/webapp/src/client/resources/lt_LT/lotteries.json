@@ -60,5 +60,7 @@
     "kudosSpent": "Išleista 'Kudos': ",
     "userNameSurname": "Vardas, Pavardė",
     "ticketsBougth": "Nupirko bilietų",
-    "abortConfirmationMessage": "Ar jūs tikrai norite nutraukti šią loteriją?"
+    "abortConfirmationMessage": "Ar jūs tikrai norite nutraukti šią loteriją?",
+    "allowGiftingTickets": "Leisti dovanoti bilietus",
+    "giftedTicketLimit": "Bilietų limitas"
 }

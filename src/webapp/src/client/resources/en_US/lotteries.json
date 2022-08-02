@@ -60,5 +60,7 @@
     "kudosSpent": "Kudos spent: ",
     "userNameSurname": "Name, Surname",
     "ticketsBougth": "Tickets bought",
-    "abortConfirmationMessage": "Do you really want to abort this lottery?"
+    "abortConfirmationMessage": "Do you really want to abort this lottery?",
+    "allowGiftingTickets": "Tickets may be gifted",
+    "giftedTicketLimit": "Ticket limit"
 }
