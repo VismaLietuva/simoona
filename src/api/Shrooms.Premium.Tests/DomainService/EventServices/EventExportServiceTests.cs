@@ -21,14 +21,14 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         private IEventUtilitiesService _eventUtilitiesService;
         private IEventParticipationService _eventParticipationService;
         private IEventExportService _eventExportService;
-        private IExcelBuilder _excelBuilder;
+        private IExcelBuilderFactory _excelBuilder;
 
         [SetUp]
         public void TestInitializer()
         {
             _eventParticipationService = Substitute.For<IEventParticipationService>();
             _eventUtilitiesService = Substitute.For<IEventUtilitiesService>();
-            _excelBuilder = new ExcelBuilder();
+            _excelBuilder = new ExcelBuilderFactory();
 
             _eventExportService = new EventExportService(_eventParticipationService, _eventUtilitiesService, _excelBuilder);
         }
@@ -43,9 +43,10 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
 
             var guid = MockParticipantsWithOptionsForExport(userAndOrg);
 
-            var stream = await _eventExportService.ExportOptionsAndParticipantsAsync(guid, userAndOrg);
+            var content = await _eventExportService.ExportOptionsAndParticipantsAsync(guid, userAndOrg);
+            var bytes = await content.ReadAsByteArrayAsync();
 
-            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
+            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(bytes)))
             {
                 excelReader.IsFirstRowAsColumnNames = true;
                 var excelData = excelReader.AsDataSet();
@@ -67,9 +68,10 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             };
             var guid = MockParticipantsWithoutOptionsForExport(userAndOrg);
 
-            var stream = await _eventExportService.ExportOptionsAndParticipantsAsync(guid, userAndOrg);
+            var content = await _eventExportService.ExportOptionsAndParticipantsAsync(guid, userAndOrg);
+            var bytes = await content.ReadAsByteArrayAsync();
 
-            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
+            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(bytes)))
             {
                 excelReader.IsFirstRowAsColumnNames = true;
                 var excelData = excelReader.AsDataSet();
@@ -88,9 +90,10 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             };
             var guid = MockParticipantsWithOptionsForExport(userAndOrg);
 
-            var stream = await _eventExportService.ExportOptionsAndParticipantsAsync(guid, userAndOrg);
+            var content = await _eventExportService.ExportOptionsAndParticipantsAsync(guid, userAndOrg);
+            var bytes = await content.ReadAsByteArrayAsync();
 
-            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
+            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(bytes)))
             {
                 excelReader.IsFirstRowAsColumnNames = true;
                 var excelData = excelReader.AsDataSet();
@@ -105,12 +108,6 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
 
                 excelReader.Close();
             }
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            _excelBuilder?.Dispose();
         }
 
         private Guid MockParticipantsWithOptionsForExport(UserAndOrganizationDto userAndOrg)

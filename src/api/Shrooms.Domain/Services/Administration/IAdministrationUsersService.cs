@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
@@ -13,7 +14,7 @@ namespace Shrooms.Domain.Services.Administration
     {
         Task<bool> UserEmailExistsAsync(string email);
 
-        Task<byte[]> GetAllUsersExcelAsync();
+        Task<ByteArrayContent> GetAllUsersExcelAsync(string fileName, int organizationId);
 
         Task ConfirmNewUserAsync(string userId, UserAndOrganizationDto userAndOrg);
 

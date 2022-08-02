@@ -1,48 +1,55 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
+using Shrooms.Contracts.Infrastructure.ExcelGenerator;
+using Shrooms.Infrastructure.ExcelGenerator;
 
 namespace Shrooms.Premium.Domain.Services.Lotteries
 {
     public class LotteryExportService : ILotteryExportService
     {
-        private readonly IExcelBuilder _excelBuilder;
+        private readonly IExcelBuilderFactory _excelBuilderFactory;
         private readonly IParticipantService _participantService;
-        public LotteryExportService(IExcelBuilder excelBuilder, IParticipantService participantService)
+
+        public LotteryExportService(IExcelBuilderFactory excelBuilderFactory, IParticipantService participantService)
         {
-            _excelBuilder = excelBuilder;
+            _excelBuilderFactory = excelBuilderFactory;
             _participantService = participantService;
         }
-        public async Task<byte[]> ExportParticipantsAsync(int lotteryId, UserAndOrganizationDto userAndOrg)
+
+        public async Task<ByteArrayContent> ExportParticipantsAsync(int lotteryId, UserAndOrganizationDto userAndOrg)
         {
             var participants = await _participantService.GetParticipantsCountedAsync(lotteryId);
 
-            var numberOfTicketsAdded = 0;
-            var participantTickets = new List<string>();
-            var tickets = new List<List<string>>();
+            var tickets = participants
+                .SelectMany(participant => Enumerable.Repeat(participant.FullName, participant.Tickets));
 
-            foreach (var participant in participants)
+            var excelBuilder = _excelBuilderFactory.GetBuilder();
+
+            excelBuilder
+                .AddWorksheet(BusinessLayerConstants.LotteryParticipantsExcelTableName)
+                .AddColumnSequence(
+                    tickets,
+                    MapLotteryParticipantDtoToExcelCell(),
+                    BusinessLayerConstants.LotteryParticipantsInRow)
+                .AddColumnsPadding(20)
+                .AddRowPadding(20);
+
+            return new ByteArrayContent(excelBuilder.Build());
+        }
+
+        private static Func<string, IExcelColumn> MapLotteryParticipantDtoToExcelCell()
+        {
+            return participantFullName => new ExcelColumn
             {
-                for (var i = 0; i < participant.Tickets; i++)
-                {
-                    participantTickets.Add(participant.FullName);
-
-                    numberOfTicketsAdded++;
-
-                    if (numberOfTicketsAdded % BusinessLayerConstants.LotteryParticipantsInRow == 0)
-                    {
-                        tickets.Add(participantTickets);
-                        participantTickets = new List<string>();
-                    }
-                }
-            }
-
-            tickets.Add(participantTickets);
-            _excelBuilder.AddNewWorksheet(BusinessLayerConstants.LotteryParticipantsExcelTableName, tickets);
-
-            return _excelBuilder.GenerateByteArray();
+                Value = participantFullName,
+                SetHorizontalTextCenter = true,
+                SetVerticalTextCenter = true
+            };
         }
     }
 }

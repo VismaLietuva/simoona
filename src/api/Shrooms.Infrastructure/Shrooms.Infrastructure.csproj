@@ -133,12 +133,16 @@
     <Compile Include="Email\MailingService.cs" />
     <Compile Include="Email\Templating\MailTemplate.cs" />
     <Compile Include="ExcelGenerator\ExcelBuilder.cs" />
+    <Compile Include="ExcelGenerator\ExcelBuilderFactory.cs" />
+    <Compile Include="ExcelGenerator\ExcelColumn.cs" />
+    <Compile Include="ExcelGenerator\ExcelColumnInternal.cs" />
+    <Compile Include="ExcelGenerator\ExcelRow.cs" />
+    <Compile Include="ExcelGenerator\ExcelRowCollection.cs" />
     <Compile Include="ExcelGenerator\ExcelWorksheetBuilder.cs" />
     <Compile Include="FeatureToggle\Feature.cs" />
     <Compile Include="FireAndForget\AsyncRunner.cs" />
     <Compile Include="FireAndForget\HangFireScheduler.cs" />
     <Compile Include="FireAndForget\TenantNameContainer.cs" />
-    <Compile Include="ExcelGenerator\ExcelGenerator.cs" />
     <Compile Include="Interceptors\TelemetryLoggingInterceptor.cs" />
     <Compile Include="Interceptors\TelemetryLoggingInterceptorExtensions.cs" />
     <Compile Include="Logger\Logger.cs" />

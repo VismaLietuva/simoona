@@ -9,6 +9,7 @@ using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Authentification.Membership;
 using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.Domain.Exceptions.Exceptions.UserAdministration;
@@ -57,8 +58,10 @@ namespace Shrooms.Tests.DomainService
             _wallsDbSet = Substitute.For<DbSet<Wall>>();
             uow2.GetDbSet<Wall>().Returns(_wallsDbSet);
 
+            var excelBuilder = Substitute.For<IExcelBuilderFactory>();
+
             _userAdministrationValidator = new UserAdministrationValidator();
-            _administrationUsersService = new AdministrationUsersService(ModelMapper.Create(), uow, uow2, _userAdministrationValidator, _userManager, _organizationService, _pictureService, dbContext, _administrationUsersNotificationService, _kudosService);
+            _administrationUsersService = new AdministrationUsersService(ModelMapper.Create(), uow, uow2, _userAdministrationValidator, _userManager, _organizationService, _pictureService, dbContext, _administrationUsersNotificationService, _kudosService, excelBuilder);
         }
 
         [Test]

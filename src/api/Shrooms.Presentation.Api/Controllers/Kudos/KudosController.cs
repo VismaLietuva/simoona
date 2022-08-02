@@ -417,8 +417,13 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
             SetOrganizationAndUser(filterDto);
             try
             {
-                var stream = new ByteArrayContent(await _kudosExportService.ExportToExcelAsync(filterDto));
-                var result = new HttpResponseMessage(HttpStatusCode.OK) { Content = stream };
+                var content = await _kudosExportService.ExportToExcelAsync(filterDto);
+
+                var result = new HttpResponseMessage(HttpStatusCode.OK) 
+                {
+                    Content = content 
+                };
+
                 return ResponseMessage(result);
             }
             catch (ValidationException e)
