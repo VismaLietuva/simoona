@@ -42,7 +42,7 @@ namespace Shrooms.Presentation.Api.Controllers
         [PermissionAuthorize(Permission = BasicPermissions.ExternalLink)]
         public async Task<IHttpActionResult> GetExternalLink(int id)
         {
-            var externalLink = await _externalLinkService.FindAsync(id, GetUserAndOrganization());
+            var externalLink = await _externalLinkService.GetAsync(id, GetUserAndOrganization());
 
             if (externalLink == null)
             {

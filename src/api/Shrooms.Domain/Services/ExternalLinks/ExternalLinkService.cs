@@ -52,7 +52,7 @@ namespace Shrooms.Domain.Services.ExternalLinks
             await CreateNewLinksAsync(manageLinksDto, timestamp);
         }
 
-        public async Task<ExternalLinkDto> FindAsync(int externalLinkId, UserAndOrganizationDto userOrg)
+        public async Task<ExternalLinkDto> GetAsync(int externalLinkId, UserAndOrganizationDto userOrg)
         {
             var externalLink = await _externalLinkDbSet
                 .FirstOrDefaultAsync(link => link.Id == externalLinkId && link.OrganizationId == userOrg.OrganizationId);

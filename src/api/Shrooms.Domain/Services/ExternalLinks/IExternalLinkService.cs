@@ -9,7 +9,7 @@ namespace Shrooms.Domain.Services.ExternalLinks
     {
         Task<IEnumerable<ExternalLinkDto>> GetAllAsync(int organizationId);
 
-        Task<ExternalLinkDto> FindAsync(int externalLinkId, UserAndOrganizationDto userOrg);
+        Task<ExternalLinkDto> GetAsync(int externalLinkId, UserAndOrganizationDto userOrg);
 
         Task UpdateLinksAsync(ManageExternalLinkDto manageLinksDto);
     }
