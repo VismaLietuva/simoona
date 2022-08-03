@@ -10,20 +10,20 @@ namespace Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels
 
         public string Description { get; set; }
 
-        public string FeedUrl { get; set; }
+        public string LotteryUrl { get; set; }
 
         public DateTime EndDate { get; set; }
 
         public int EntryFee { get; set; }
 
-        public StartedLotteryEmailTemplateViewModel(LotteryStartedEmailDto startedDto, string feedUrl, string userNotificationSettingsUrl)
+        public StartedLotteryEmailTemplateViewModel(LotteryStartedEmailDto startedDto, string lotteryUrl, string userNotificationSettingsUrl)
             : base(userNotificationSettingsUrl)
         {
             Title = startedDto.Title;
             EndDate = startedDto.EndDate;
             EntryFee = startedDto.EntryFee;
             Description = startedDto.Description;
-            FeedUrl = feedUrl;
+            LotteryUrl = lotteryUrl;
         }
     }
 }

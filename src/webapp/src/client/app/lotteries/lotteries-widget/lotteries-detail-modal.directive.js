@@ -9,7 +9,7 @@
         })
         .directive('aceLotteriesDetailModal', lotteryDetailModal)
 
-        lotteryDetailModal.$inject = [
+    lotteryDetailModal.$inject = [
         '$uibModal'
     ];
 
@@ -17,14 +17,20 @@
         var directive = {
             restrict: 'A',
             scope: {
-                aceLotteriesDetailModal: '=?'
+                aceLotteriesDetailModal: '=?',
+                onInit: '&'
             },
             link: linkFunc
         };
+
         return directive;
 
         function linkFunc(scope, elem) {
-            elem.bind('click', function () {
+            elem.bind('click', openLotteryWidget);
+
+            onInitNotifyConsumer();
+
+            function openLotteryWidget() {
                 $uibModal.open({
                     templateUrl: 'app/lotteries/lotteries-widget/lotteries-detail-modal.html',
                     controller: lotteriesDetailController,
@@ -35,7 +41,14 @@
                         }
                     }
                 });
-            });
+            }
+
+            function onInitNotifyConsumer() {
+                scope.onInit({
+                    lotteryId: scope.aceLotteriesDetailModal,
+                    openLotteryWidget: openLotteryWidget
+                });
+            }
         }
     }
 
@@ -59,7 +72,7 @@
 
         vm.ticketCount = 0;
         vm.currentLottery = currentLottery;
-        
+
         vm.lotteryLoaded = false;
         vm.localeSrv = localeSrv;
         vm.notifySrv = notifySrv;
@@ -67,48 +80,47 @@
         vm.ticketUp = ticketUp;
         vm.ticketDown = ticketDown;
         vm.buyTickets = buyTickets;
-        if($window.lotteriesEnabled)
-        {
+
+        if ($window.lotteriesEnabled) {
             init();
         }
-        
- 
-       
-        
+
         function init() {
 
             lotteryRepository.getLottery(currentLottery)
-            .then(function(lottery){
-                vm.lottery = lottery;
-                vm.lotteryLoaded = true;
-            });
+                .then(function (lottery) {
+                    vm.lottery = lottery;
+                    vm.lotteryLoaded = true;
+                });
         }
+
         function cancel() {
             $uibModalInstance.dismiss('cancel');
         }
+
         function ticketUp() {
             vm.ticketCount += 1;
         }
+
         function ticketDown() {
-            if(vm.ticketCount > 0){
+            if (vm.ticketCount > 0) {
                 vm.ticketCount -= 1;
             }
         }
-        function buyTickets(){
-            if(vm.ticketCount > 0)
-            {
-                var lotteryTickets = {lotteryId: currentLottery, tickets: vm.ticketCount};
+
+        function buyTickets() {
+            if (vm.ticketCount > 0) {
+                var lotteryTickets = { lotteryId: currentLottery, tickets: vm.ticketCount };
 
                 lotteryRepository.buyTickets(lotteryTickets)
-                .then(function(){
-                    vm.notifySrv.success(vm.localeSrv.formatTranslation('lotteries.hasBeenBought', { one: vm.ticketCount, two: vm.lottery.title }));
-                    $uibModalInstance.close();
-                }, function (error) {
-                    errorHandler.handleErrorMessage(error);
-                });
+                    .then(function () {
+                        vm.notifySrv.success(vm.localeSrv.formatTranslation('lotteries.hasBeenBought', { one: vm.ticketCount, two: vm.lottery.title }));
+                        $uibModalInstance.close();
+                    }, function (error) {
+                        errorHandler.handleErrorMessage(error);
+                    });
             }
-            else
-            {
+            else {
                 vm.notifySrv.error(vm.localeSrv.formatTranslation('lotteries.invalidTicketNumber'));
             }
         }

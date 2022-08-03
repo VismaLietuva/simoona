@@ -1,10 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
+using Shrooms.Contracts.Infrastructure.ExcelGenerator;
+using Shrooms.Infrastructure.ExcelGenerator;
 using Shrooms.Premium.Constants;
+using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Domain.Services.Events.Participation;
 using Shrooms.Premium.Domain.Services.Events.Utilities;
 
@@ -14,57 +20,79 @@ namespace Shrooms.Premium.Domain.Services.Events.Export
     {
         private readonly IEventParticipationService _eventParticipationService;
         private readonly IEventUtilitiesService _eventUtilitiesService;
-        private readonly IExcelBuilder _excelBuilder;
+        private readonly IExcelBuilderFactory _excelBuilderFactory;
 
         public EventExportService(
             IEventParticipationService eventParticipationService,
             IEventUtilitiesService eventUtilitiesService,
-            IExcelBuilder excelBuilder)
+            IExcelBuilderFactory excelBuilderFactory)
         {
             _eventParticipationService = eventParticipationService;
             _eventUtilitiesService = eventUtilitiesService;
-            _excelBuilder = excelBuilder;
+            _excelBuilderFactory = excelBuilderFactory;
         }
 
-        public async Task<byte[]> ExportOptionsAndParticipantsAsync(Guid eventId, UserAndOrganizationDto userAndOrg)
+        public async Task<ByteArrayContent> ExportOptionsAndParticipantsAsync(Guid eventId, UserAndOrganizationDto userAndOrg)
         {
-            var participants = (await _eventParticipationService.GetEventParticipantsAsync(eventId, userAndOrg))
-                .Select(x => new List<string> { x.FirstName, x.LastName });
+            var participants = await _eventParticipationService.GetEventParticipantsAsync(eventId, userAndOrg);
+            var options = await _eventUtilitiesService.GetEventChosenOptionsAsync(eventId, userAndOrg);
 
-            var options = (await _eventUtilitiesService.GetEventChosenOptionsAsync(eventId, userAndOrg))
-                .Select(x => new List<string> { x.Option, x.Count.ToString() })
-                .ToList();
+            var excelBuilder = _excelBuilderFactory.GetBuilder();
 
-            AddParticipants(participants);
+            excelBuilder
+                .AddWorksheet(EventsConstants.EventParticipantsExcelTableName)
+                .AddHeader(
+                    Resources.Models.ApplicationUser.ApplicationUser.FirstName,
+                    Resources.Models.ApplicationUser.ApplicationUser.LastName)
+                .AddRows(participants.AsQueryable(), MapEventParticipantToExcelRow())
+                .AutoFitColumns();
 
-            if (options.Any())
+            if (!options.Any())
             {
-                AddOptions(options);
+                return new ByteArrayContent(excelBuilder.Build());
             }
 
-            return _excelBuilder.GenerateByteArray();
+            excelBuilder
+                .AddWorksheet(EventsConstants.EventOptionsExcelTableName)
+                .AddHeader(
+                    Resources.Models.Events.Events.Option,
+                    Resources.Models.Events.Events.Count)
+                .AddRows(options.AsQueryable(), MapEventOptionToExcelRow())
+                .AutoFitColumns();
+
+            return new ByteArrayContent(excelBuilder.Build());
         }
 
-        private void AddOptions(IEnumerable<List<string>> options)
+        private static Expression<Func<EventOptionCountDto, IExcelRow>> MapEventOptionToExcelRow()
         {
-            var header = new List<string>
+            return option => new ExcelRow
             {
-                Resources.Models.Events.Events.Option,
-                Resources.Models.Events.Events.Count
-            };
+                new ExcelColumn
+                {
+                    Value = option.Option
+                },
 
-            _excelBuilder.AddNewWorksheet(EventsConstants.EventOptionsExcelTableName, header, options);
+                new ExcelColumn
+                {
+                    Value = option.Count.ToString()
+                }
+            };
         }
 
-        private void AddParticipants(IEnumerable<List<string>> participants)
+        private static Expression<Func<EventParticipantDto, IExcelRow>> MapEventParticipantToExcelRow()
         {
-            var header = new List<string>
+            return participant => new ExcelRow
             {
-                Resources.Models.ApplicationUser.ApplicationUser.FirstName,
-                Resources.Models.ApplicationUser.ApplicationUser.LastName
-            };
+                new ExcelColumn
+                {
+                    Value = participant.FirstName
+                },
 
-            _excelBuilder.AddNewWorksheet(EventsConstants.EventParticipantsExcelTableName, header, participants);
+                new ExcelColumn
+                {
+                    Value = participant.LastName
+                }
+            };
         }
     }
 }

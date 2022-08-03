@@ -52,9 +52,9 @@ namespace Shrooms.Premium.Domain.Services.Email.Lotteries
                 .ShortName;
 
             var userNotificationSettingsUrl = _applicationSettings.UserNotificationSettingsUrl(organizationShortName);
-            var feedUrl = _applicationSettings.FeedUrl(organizationShortName);
+            var lotteryUrl = $"{_applicationSettings.FeedUrl(organizationShortName)}?lotteryId={startedDto.Id}";
 
-            var emailTemplateViewModel = new StartedLotteryEmailTemplateViewModel(startedDto, feedUrl, userNotificationSettingsUrl);
+            var emailTemplateViewModel = new StartedLotteryEmailTemplateViewModel(startedDto, lotteryUrl, userNotificationSettingsUrl);
             var emailBody = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.StartedLottery);
 
             var emailSubject = string.Format(Lottery.StartedLotteryEmailSubject, startedDto.Title);

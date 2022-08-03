@@ -1,4 +1,5 @@
 ﻿@using Shrooms.Contracts.Constants
+@using System
 @model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.StartedLotteryEmailTemplateViewModel
 
 @{
@@ -30,7 +31,22 @@
                                width="95%">
                             <tbody>
                                 <tr>
-                                    <td style="padding-top: 15px !important; padding-right: 20px !important; padding-left: 20px !important; max-width: 600px !important; ">
+                                    <td style="color:white;padding-top: 5px !important; padding-right: 20px !important; padding-left: 20px !important; max-width: 600px !important; ">
+                                        .
+                                    </td>
+
+                                    <td rowspan="3" style="padding-right: 20px; padding-left: 20px; max-width: 400px; border-radius: 20px;">
+                                        <p style="color: #282828; line-height: 1; text-align: center;font-size: 14px;padding-left: 10px;padding-bottom: 0;font-weight: 400;word-break: break-word;overflow-wrap: break-word; font-family: 'Segoe UI',Helvetica,Arial,sans-serif;margin: 0 0 0 0;">
+                                            <span style="font-size: 82px; line-height: 1; color: black; font-weight: bold;">@Model.EntryFee</span>
+                                            <span style="font-size: 32px; color: black;">Kudos</span>
+                                            <p style="color: black; font-size: 12px; font-weight: 300; line-height: 0; text-align: right;">
+                                                One ticket price*
+                                            </p>
+                                        </p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-right: 20px !important; padding-left: 20px !important; max-width: 600px !important; ">
                                         <br />
                                         <span style="font-size: 20px;">
                                             @Model.Title
@@ -41,20 +57,12 @@
                                         </span>
                                     </td>
 
-                                    <td rowspan="2" style="padding-right: 20px; padding-left: 20px; max-width: 400px; border-radius: 20px;">
-                                        <p style="color: #282828; line-height: 1; text-align: center;font-size: 14px;padding-left: 10px;padding-bottom: 15px;font-weight: 400;word-wrap: break-word;word-break: break-word; word-break: break-word;overflow-wrap: break-word; font-family: 'Segoe UI',Helvetica,Arial,sans-serif;margin: 0 0 0 0;">
-                                            <span style="font-size: 86px; line-height: 1; color: black; font-weight: bold;">@Model.EntryFee</span>
-                                            <span style="font-size: 32px; color: black;">Kudos</span>
-                                        </p>
-                                        <span style="color: black; margin-bottom: 10px; font-size: 12px; font-weight: 300; float: right !important;">
-                                            One ticket price*
-                                        </span>
-                                    </td>
                                 </tr>
                                 <tr>
                                     <td style="padding-top: 15px; padding-right: 20px; padding-left: 20px; max-width: 600px;">
                                         <span style="font-size: 20px;">
-                                            @Convert.ToDateTime(Model.EndDate).ToString("yyyy-MM-dd hh:mm")
+                                            @* TODO: Change this when timezone behaviour is implemented *@
+                                            @Convert.ToDateTime(TimeZoneInfo.ConvertTimeFromUtc(Model.EndDate, TimeZoneInfo.Local)).ToString("yyyy-MM-dd hh:mm")
                                         </span>
                                         <br />
                                         <span style="font-size: 12px; line-height: 1; font-weight: 300;">
@@ -89,7 +97,7 @@
                             <tbody>
                                 <tr>
                                     <td align="center" style="display:inline-block; background:#006199;">
-                                        <a href="@Model.FeedUrl" style="color:#ffffff; font-family:'Segoe UI',Helvetica,Arial,sans-serif; font-size:15px; line-height:15px; font-weight: 400; white-space:nowrap; text-decoration:none;" target="_blank">
+                                        <a href="@Model.LotteryUrl" style="color:#ffffff; font-family:'Segoe UI',Helvetica,Arial,sans-serif; font-size:15px; line-height:15px; font-weight: 400; white-space:nowrap; text-decoration:none;" target="_blank">
                                             Check out in Simoona
                                         </a>
                                     </td>

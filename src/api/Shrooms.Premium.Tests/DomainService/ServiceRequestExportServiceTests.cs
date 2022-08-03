@@ -24,7 +24,7 @@ namespace Shrooms.Premium.Tests.DomainService
         private IUnitOfWork2 _uow;
         private DbSet<ServiceRequest> _serviceRequestsDbSet;
         private IServiceRequestExportService _serviceRequestExportService;
-        private IExcelBuilder _excelBuilder;
+        private IExcelBuilderFactory _excelBuilder;
 
         [SetUp]
         public void TestInitializer()
@@ -33,7 +33,7 @@ namespace Shrooms.Premium.Tests.DomainService
             _serviceRequestsDbSet = Substitute.For<DbSet<ServiceRequest>, IQueryable<ServiceRequest>, IDbAsyncEnumerable<ServiceRequest>>();
             _uow.GetDbSet<ServiceRequest>().Returns(_serviceRequestsDbSet);
 
-            _excelBuilder = new ExcelBuilder();
+            _excelBuilder = new ExcelBuilderFactory();
 
             _serviceRequestExportService = new ServiceRequestExportService(_uow, _excelBuilder);
         }
@@ -47,9 +47,10 @@ namespace Shrooms.Premium.Tests.DomainService
             };
             MockServiceRequests();
 
-            var stream = await _serviceRequestExportService.ExportToExcelAsync(userAndOrg, null);
+            var content = await _serviceRequestExportService.ExportToExcelAsync(userAndOrg, null);
+            var bytes = await content.ReadAsByteArrayAsync();
 
-            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
+            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(bytes)))
             {
                 excelReader.IsFirstRowAsColumnNames = true;
                 var excelData = excelReader.AsDataSet();
@@ -76,9 +77,11 @@ namespace Shrooms.Premium.Tests.DomainService
             MockServiceRequests();
 
             Expression<Func<ServiceRequest, bool>> filter = f => f.CategoryName == "Hardware";
-            var stream = await _serviceRequestExportService.ExportToExcelAsync(userAndOrg, filter);
 
-            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(stream)))
+            var content = await _serviceRequestExportService.ExportToExcelAsync(userAndOrg, filter);
+            var bytes = await content.ReadAsByteArrayAsync();
+
+            using (var excelReader = ExcelReaderFactory.CreateOpenXmlReader(new MemoryStream(bytes)))
             {
                 excelReader.IsFirstRowAsColumnNames = true;
                 var excelData = excelReader.AsDataSet();
@@ -90,12 +93,6 @@ namespace Shrooms.Premium.Tests.DomainService
 
                 excelReader.Close();
             }
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            _excelBuilder?.Dispose();
         }
 
         private void MockServiceRequests()
