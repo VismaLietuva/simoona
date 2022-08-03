@@ -12,18 +12,18 @@ namespace Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels
 
         public string LotteryUrl { get; set; }
 
-        public DateTime EndDate { get; set; }
+        public DateTime ZonedEndDate { get; set; }
 
         public int EntryFee { get; set; }
 
-        public StartedLotteryEmailTemplateViewModel(LotteryStartedEmailDto startedDto, string lotteryUrl, string userNotificationSettingsUrl)
+        public StartedLotteryEmailTemplateViewModel(LotteryStartedEmailDto startedDto, string lotteryUrl, DateTime zonedEndDate, string userNotificationSettingsUrl)
             : base(userNotificationSettingsUrl)
         {
             Title = startedDto.Title;
-            EndDate = startedDto.EndDate;
             EntryFee = startedDto.EntryFee;
             Description = startedDto.Description;
             LotteryUrl = lotteryUrl;
+            ZonedEndDate = zonedEndDate;
         }
     }
 }

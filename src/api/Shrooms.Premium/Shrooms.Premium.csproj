@@ -360,6 +360,7 @@
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryDetailsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryParticipantDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryStartedEmailDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Lotteries\LotteryStartedEmailUserInfoDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryStatsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryStatusDto.cs" />
     <Compile Include="DataTransferObjects\Models\MobileBookOfficeLogsDto.cs" />

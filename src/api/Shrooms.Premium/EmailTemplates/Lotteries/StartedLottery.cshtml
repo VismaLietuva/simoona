@@ -1,5 +1,4 @@
 ﻿@using Shrooms.Contracts.Constants
-@using System
 @model Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels.StartedLotteryEmailTemplateViewModel
 
 @{
@@ -61,8 +60,7 @@
                                 <tr>
                                     <td style="padding-top: 15px; padding-right: 20px; padding-left: 20px; max-width: 600px;">
                                         <span style="font-size: 20px;">
-                                            @* TODO: Change this when timezone behaviour is implemented *@
-                                            @Convert.ToDateTime(TimeZoneInfo.ConvertTimeFromUtc(Model.EndDate, TimeZoneInfo.Local)).ToString("yyyy-MM-dd hh:mm")
+                                            @Model.ZonedEndDate.ToString("yyyy-MM-dd HH:mm")
                                         </span>
                                         <br />
                                         <span style="font-size: 12px; line-height: 1; font-weight: 300;">

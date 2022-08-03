@@ -11,6 +11,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Resources.Models.Lotteries;
+using System;
 
 namespace Shrooms.Premium.Domain.Services.Email.Lotteries
 {
@@ -40,11 +41,15 @@ namespace Shrooms.Premium.Domain.Services.Email.Lotteries
         
         public async Task NotifyUsersAboutStartedLotteryAsync(LotteryStartedEmailDto startedDto, int organizationId)
         {
-            var userEmails = await _usersDbSet
+            var userEmailsGroupedByTimeZone = await _usersDbSet
                 .Include(user => user.NotificationsSettings)
-                .Where(user => user.OrganizationId == organizationId &&
-                               user.NotificationsSettings.CreatedLotteryEmailNotifications)
-                .Select(user => user.Email)
+                .Where(user => user.NotificationsSettings.CreatedLotteryEmailNotifications)
+                .Select(user => new LotteryStartedEmailUserInfoDto
+                {
+                    Email = user.Email,
+                    TimeZone = user.TimeZone
+                })
+                .GroupBy(userInfo => userInfo.TimeZone)
                 .ToListAsync();
 
             var organizationShortName = (await _organizationService
@@ -54,12 +59,20 @@ namespace Shrooms.Premium.Domain.Services.Email.Lotteries
             var userNotificationSettingsUrl = _applicationSettings.UserNotificationSettingsUrl(organizationShortName);
             var lotteryUrl = $"{_applicationSettings.FeedUrl(organizationShortName)}?lotteryId={startedDto.Id}";
 
-            var emailTemplateViewModel = new StartedLotteryEmailTemplateViewModel(startedDto, lotteryUrl, userNotificationSettingsUrl);
-            var emailBody = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.StartedLottery);
-
             var emailSubject = string.Format(Lottery.StartedLotteryEmailSubject, startedDto.Title);
 
-            await _mailingService.SendEmailAsync(new EmailDto(userEmails, emailSubject, emailBody));
+            foreach (var emailGroup in userEmailsGroupedByTimeZone)
+            {
+                var timeZone = TimeZoneInfo.FindSystemTimeZoneById(emailGroup.Key);
+                var zonedDate = TimeZoneInfo.ConvertTimeFromUtc(startedDto.EndDate, timeZone);
+
+                var emailTemplateViewModel = new StartedLotteryEmailTemplateViewModel(startedDto, lotteryUrl, zonedDate, userNotificationSettingsUrl);
+                var emailBody = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.StartedLottery);
+                
+                var userEmails = emailGroup.Select(info => info.Email);
+
+                await _mailingService.SendEmailAsync(new EmailDto(userEmails, emailSubject, emailBody));
+            }
         }
     }
 }
