@@ -228,8 +228,9 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
         {
             try
             {
-                var stream = new ByteArrayContent(await _lotteryExportService.ExportParticipantsAsync(lotteryId, GetUserAndOrganization()));
-                var result = new HttpResponseMessage(HttpStatusCode.OK) { Content = stream };
+                var content = await _lotteryExportService.ExportParticipantsAsync(lotteryId, GetUserAndOrganization());
+                var result = new HttpResponseMessage(HttpStatusCode.OK) { Content = content };
+                
                 return ResponseMessage(result);
             }
             catch (LotteryException e)

@@ -1,29 +1,41 @@
-﻿using System;
+﻿using OfficeOpenXml;
+using OfficeOpenXml.Style;
+using Shrooms.Contracts.Constants;
+using Shrooms.Contracts.Infrastructure.ExcelGenerator;
+using System;
 using System.Collections.Generic;
-using OfficeOpenXml;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace Shrooms.Infrastructure.ExcelGenerator
 {
-    public class ExcelWorksheetBuilder
+    public class ExcelWorksheetBuilder : IExcelWorksheetBuilder
     {
         private readonly ExcelWorksheet _worksheet;
-        private bool _withHeader;
+        private readonly IExcelRowCollection _excelRowCollection;
 
-        private const string DefaulDateFormat = "yyyy-mm-dd HH:mm:ss";
-        private const string DefaultNumberFormat = "#";
-        private const string DefaultDecimalFormat = "0.00";
+        private readonly bool _isHeaderPresent;
 
-        public ExcelWorksheetBuilder(ExcelWorksheet worksheet)
+        public ExcelWorksheetBuilder(
+            ExcelWorksheet worksheet,
+            bool isHeaderPresent = false, 
+            IExcelRowCollection excelRowCollection = null)
         {
             _worksheet = worksheet;
-            _withHeader = false;
+            _isHeaderPresent = isHeaderPresent;
+            _excelRowCollection = excelRowCollection;
         }
 
-        public ExcelWorksheetBuilder WithHeader(IEnumerable<string> headerItems)
+        public IExcelWorksheetBuilder AddHeader(params string[] headerParts)
         {
-            _withHeader = true;
+            return AddHeader(headerParts.AsEnumerable());
+        }
+
+        public IExcelWorksheetBuilder AddHeader(IEnumerable<string> headerParts)
+        {
             var index = 1;
-            foreach (var item in headerItems)
+
+            foreach (var item in headerParts)
             {
                 _worksheet.Cells[1, index].Value = item;
                 index++;
@@ -32,67 +44,149 @@ namespace Shrooms.Infrastructure.ExcelGenerator
             _worksheet.Cells[1, 1, 1, index - 1].AutoFilter = true;
             _worksheet.Cells[1, 1, 1, index - 1].Style.Font.Bold = true;
 
+            return new ExcelWorksheetBuilder(_worksheet, true, _excelRowCollection);
+        }
+
+        public IExcelWorksheetBuilder AutoFitColumns(int minimumWidth, int maximumWidth)
+        {
+            _worksheet.Cells.AutoFitColumns(minimumWidth, maximumWidth);
+
             return this;
         }
 
-        public ExcelWorksheetBuilder WithRows(IEnumerable<IEnumerable<object>> rows)
+        public IExcelWorksheetBuilder AutoFitColumns()
         {
-            var rowIndex = _withHeader ? 2 : 1;
+            return AutoFitColumns(ExcelWorksheetBuilderConstants.MinimmumColumnWidth, ExcelWorksheetBuilderConstants.MaximumColumnWidth);
+        }
+        
+        public IExcelWorksheetBuilder AddRows<T>(IQueryable<T> data, Expression<Func<T, IExcelRow>> expression, bool applyAutoFit = true)
+        {
+            return AddRows(new ExcelRowCollection(data.Select(expression).ToList()), applyAutoFit);
+        }
 
-            foreach (var row in rows)
+        public IExcelWorksheetBuilder AddRows(IExcelRowCollection rowCollection, bool applyAutoFit = true)
+        {
+            foreach (var internalCell in rowCollection)
             {
-                WithRow(rowIndex++, row);
+                AddColumnContent(internalCell);
+            }
+
+            if (applyAutoFit)
+            {
+                AutoFitColumns();
+            }
+
+            return new ExcelWorksheetBuilder(_worksheet, _isHeaderPresent, rowCollection);
+        }
+
+        public IExcelWorksheetBuilder AddColumnsPadding(params double[] paddings)
+        {
+            var columnIndex = 1;
+
+            foreach (var padding in paddings)
+            {
+                _worksheet.Column(columnIndex++).Width += padding;
             }
 
             return this;
         }
 
-        public ExcelWorksheetBuilder WithRow(int rowIndex, IEnumerable<object> row)
+        public IExcelWorksheetBuilder AddColumnSequence<T>(IEnumerable<T> data, Func<T, IExcelColumn> mapFuction, int moveToNextRowAfter, bool applyAutoFit = true)
         {
-            var columnIndex = 1;
-            foreach (var columnValue in row)
+            var excelRowCollection = new ExcelRowCollection();
+            var excelRow = new ExcelRow();
+            var columnIndex = 0;
+
+            foreach (var column in data)
             {
-                if (columnValue == null)
+                if (columnIndex % moveToNextRowAfter == 0 && columnIndex != 0)
                 {
-                    _worksheet.Cells[rowIndex, columnIndex].Value = string.Empty;
-                }
-                else if (columnValue is DateTime)
-                {
-                    _worksheet.Cells[rowIndex, columnIndex].Value = columnValue;
-                    _worksheet.Cells[rowIndex, columnIndex].Style.Numberformat.Format = DefaulDateFormat;
-                }
-                else if (columnValue is int || columnValue is long)
-                {
-                    _worksheet.Cells[rowIndex, columnIndex].Value = columnValue;
-                    _worksheet.Cells[rowIndex, columnIndex].Style.Numberformat.Format = DefaultNumberFormat;
-                }
-                else if (columnValue is decimal)
-                {
-                    _worksheet.Cells[rowIndex, columnIndex].Value = columnValue;
-                    _worksheet.Cells[rowIndex, columnIndex].Style.Numberformat.Format = DefaultDecimalFormat;
-                }
-                else
-                {
-                    var text = columnValue.ToString();
-                    _worksheet.Cells[rowIndex, columnIndex].Value = text;
-
-                    // Wrap text if it is too long.
-                    if (text.Length > 70)
-                    {
-                        _worksheet.Cells[rowIndex, columnIndex].Style.WrapText = true;
-                    }
+                    excelRowCollection.Add(excelRow);
+                    excelRow = new ExcelRow();
                 }
 
+                excelRow.Add(mapFuction(column));
                 columnIndex++;
             }
 
+            if (excelRow.Any())
+            {
+                excelRowCollection.Add(excelRow);
+            }
+
+            return AddRows(excelRowCollection, applyAutoFit);
+        }
+
+        public IExcelWorksheetBuilder AddRowPadding(double padding)
+        {
+            if (_excelRowCollection == null)
+            {
+                throw new InvalidOperationException($"{nameof(AddRows)} or {nameof(AddColumnSequence)} has to be called");
+            }
+
+            var rowIndex = 1;
+
+            foreach (var excelRow in _excelRowCollection.Rows)
+            {
+                _worksheet.Row(rowIndex++).Height += padding;
+            }
+
             return this;
         }
 
-        public ExcelWorksheet Build()
+        public IExcelWorksheetBuilder AddColumnsPadding(double padding)
         {
-            _worksheet.Cells.AutoFitColumns(5, 60);
-            return _worksheet;
+            if (_excelRowCollection == null)
+            {
+                throw new InvalidOperationException($"{nameof(AddRows)} or {nameof(AddColumnSequence)} has to be called");
+            }
+
+            if (!_excelRowCollection.Rows.Any())
+            {
+                return this;
+            }
+
+            var maxColumnCount = _excelRowCollection.Rows
+                .Max(row => row.Count());
+
+            return AddColumnPadding(padding, maxColumnCount);
+        }
+
+        public IExcelWorksheetBuilder AddColumnPadding(double padding, int columnCount)
+        {
+            for (var i = 1; i <= columnCount; i++)
+            {
+                _worksheet.Column(i).Width += padding;
+            }
+
+            return this;
+        }
+
+        private void AddColumnContent(IExcelColumnInternal internalColumn)
+        {
+            var columnRange = GetColumnRange(internalColumn);
+            var columnStyle = columnRange.Style;
+
+            columnRange.Value = internalColumn.Column.Value ?? string.Empty;
+            columnRange.Style.Numberformat.Format = internalColumn.Column.Format ?? columnRange.Style.Numberformat.Format;
+            columnRange.Style.Font.Bold = internalColumn.Column.SetBoldFont;
+            columnRange.Style.VerticalAlignment = internalColumn.Column.SetHorizontalTextCenter ? ExcelVerticalAlignment.Center : columnRange.Style.VerticalAlignment;
+            columnRange.Style.HorizontalAlignment = internalColumn.Column.SetHorizontalTextCenter ? ExcelHorizontalAlignment.Center : columnRange.Style.HorizontalAlignment;
+
+            if (internalColumn.Column.Value is string stringValue && stringValue.Length > ExcelWorksheetBuilderConstants.MaximumTextCharacterLength)
+            {
+                columnStyle.WrapText = true;
+            }
+        }
+
+        private ExcelRange GetColumnRange(IExcelColumnInternal internalColumn)
+        {
+            if (!_isHeaderPresent)
+            {
+                return _worksheet.Cells[internalColumn.RowIndex, internalColumn.ColumnIndex];
+            }
+
+            return _worksheet.Cells[internalColumn.RowIndex + 1, internalColumn.ColumnIndex];
         }
     }
 }

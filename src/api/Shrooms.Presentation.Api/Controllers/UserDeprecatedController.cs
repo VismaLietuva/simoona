@@ -139,21 +139,16 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [Route("GetUsersAsExcel")]
         [PermissionAuthorize(Permission = AdministrationPermissions.ApplicationUser)]
-        public async Task<HttpResponseMessage> GetUsersAsExcel()
+        public async Task<IHttpActionResult> GetUsersAsExcel()
         {
-            var excelBytes = await _administrationUsersService.GetAllUsersExcelAsync();
+            var content = await _administrationUsersService.GetAllUsersExcelAsync("Users", GetOrganizationId());
 
-            var result = Request.CreateResponse(HttpStatusCode.OK);
-            result.Content = new ByteArrayContent(excelBytes);
-            result.Content.Headers.ContentDisposition =
-                new ContentDispositionHeaderValue("attachment")
-                {
-                    FileName = "Users.xlsx"
-                };
+            var result = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = content
+            };
 
-            result.Content.Headers.ContentType = new MediaTypeHeaderValue("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-
-            return result;
+            return ResponseMessage(result);
         }
 
         #region private methods

@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
-using OfficeOpenXml;
-using Shrooms.Contracts.Infrastructure;
+﻿using OfficeOpenXml;
+using Shrooms.Contracts.Infrastructure.ExcelGenerator;
 
 namespace Shrooms.Infrastructure.ExcelGenerator
 {
@@ -13,37 +12,16 @@ namespace Shrooms.Infrastructure.ExcelGenerator
             _package = new ExcelPackage();
         }
 
-        public IExcelBuilder AddNewWorksheet(string sheetName, IEnumerable<string> headerItems, IEnumerable<IEnumerable<object>> rows)
-        {
-            var worksheet = _package.Workbook.Worksheets.Add(sheetName);
-            var worksheetBuilder = new ExcelWorksheetBuilder(worksheet);
-
-            worksheetBuilder
-                .WithHeader(headerItems)
-                .WithRows(rows)
-                .Build();
-
-            return this;
-        }
-
-        public IExcelBuilder AddNewWorksheet(string sheetName, IEnumerable<IEnumerable<object>> rows)
-        {
-            var worksheet = _package.Workbook.Worksheets.Add(sheetName);
-            var worksheetBuilder = new ExcelWorksheetBuilder(worksheet);
-
-            worksheetBuilder.WithRows(rows).Build();
-
-            return this;
-        }
-
-        public byte[] GenerateByteArray()
+        public byte[] Build()
         {
             return _package.GetAsByteArray();
         }
 
-        public void Dispose()
+        public IExcelWorksheetBuilder AddWorksheet(string sheetName)
         {
-            _package?.Dispose();
+            var worksheet = _package.Workbook.Worksheets.Add(sheetName);
+
+            return new ExcelWorksheetBuilder(worksheet);
         }
     }
 }
