@@ -37,6 +37,23 @@ namespace Shrooms.Presentation.Api.Controllers
             return Ok(externalLinksViewModel);
         }
 
+        [HttpGet]
+        [Route("{id}")]
+        [PermissionAuthorize(Permission = BasicPermissions.ExternalLink)]
+        public async Task<IHttpActionResult> GetExternalLink(int id)
+        {
+            var externalLink = await _externalLinkService.GetAsync(id, GetUserAndOrganization());
+
+            if (externalLink == null)
+            {
+                return NotFound();
+            }
+
+            var externalLinkDto = _mapper.Map<ExternalLinkDto, ExternalLinkViewModel>(externalLink);
+
+            return Ok(externalLinkDto);
+        }
+
         [HttpPost]
         [Route("Update")]
         [PermissionAuthorize(Permission = AdministrationPermissions.ExternalLink)]
