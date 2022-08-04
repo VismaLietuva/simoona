@@ -62,5 +62,7 @@
     "ticketsBougth": "Nupirko bilietų",
     "abortConfirmationMessage": "Ar jūs tikrai norite nutraukti šią loteriją?",
     "allowGiftingTickets": "Leisti dovanoti bilietus",
-    "giftedTicketLimit": "Bilietų limitas"
+    "giftedTicketLimit": "Bilietų limitas",
+    "addPeople": "Pridėti žmonių...",
+    "giftTickets": "Dovanoti"
 }

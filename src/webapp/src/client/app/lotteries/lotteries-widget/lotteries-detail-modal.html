@@ -6,46 +6,42 @@
 </div>
 <wave-spinner ng-show="!vm.lotteryLoaded"></wave-spinner>
 <div class="modal-body" ng-show="vm.lotteryLoaded">
-    <form role="form">
+    <form name="form" role="form">
         <div class="form-group">
             <div class="row">
                 <div class="col-sm-6">
-                        <div id="lottery-pics" class="carousel slide lottery-detail-modal-carousel"
-                            data-ride="carousel">
-                            <!-- Indicators -->
-                            <ol class="carousel-indicators">
-                                <li data-target="#lottery-pics" data-slide-to="0" class="active"></li>
-                                <li ng-repeat="lottery in vm.lottery.images" class="others" ng-if="$index > 0"
-                                    data-target="#lottery-pics" data-slide-to="{{$index}}"></li>
-                            </ol>
+                    <div id="lottery-pics" class="carousel slide lottery-detail-modal-carousel" data-ride="carousel">
+                        <!-- Indicators -->
+                        <ol class="carousel-indicators">
+                            <li data-target="#lottery-pics" data-slide-to="0" class="active"></li>
+                            <li ng-repeat="lottery in vm.lottery.images" class="others" ng-if="$index > 0"
+                                data-target="#lottery-pics" data-slide-to="{{$index}}"></li>
+                        </ol>
 
-                            <!-- Content -->
-                            <div class="carousel-inner" role="listbox">
+                        <!-- Content -->
+                        <div class="carousel-inner" role="listbox">
 
-                                <!-- Slide 1 -->
-                                <div class="item active">
-                                    <img src="{{vm.lottery.images[0] | imageThumb:vm.lotteryImageSize:'crop'}}">
-                                </div>
-
-                                <!-- Other slides -->
-                                <div class="item" ng-repeat="lottery in vm.lottery.images" ng-if="$index > 0">
-                                    <img src="{{lottery | imageThumb:vm.lotteryImageSize:'crop'}}">
-                                </div>
+                            <!-- Slide 1 -->
+                            <div class="item active">
+                                <img src="{{vm.lottery.images[0] | imageThumb:vm.lotteryImageSize:'crop'}}">
                             </div>
 
-                            <!-- Previous/Next controls -->
-                            <a class="left carousel-control" data-target="#lottery-pics" role="button"
-                                data-slide="prev">
-                                <span class="icon-prev" aria-hidden="true"></span>
-                                <span class="sr-only"></span>
-                            </a>
-                            <a class="right carousel-control" data-target="#lottery-pics" role="button"
-                                data-slide="next">
-                                <span class="icon-next" aria-hidden="true"></span>
-                                <span class="sr-only"></span>
-                            </a>
-
+                            <!-- Other slides -->
+                            <div class="item" ng-repeat="lottery in vm.lottery.images" ng-if="$index > 0">
+                                <img src="{{lottery | imageThumb:vm.lotteryImageSize:'crop'}}">
+                            </div>
                         </div>
+
+                        <!-- Previous/Next controls -->
+                        <a class="left carousel-control" data-target="#lottery-pics" role="button" data-slide="prev">
+                            <span class="icon-prev" aria-hidden="true"></span>
+                            <span class="sr-only"></span>
+                        </a>
+                        <a class="right carousel-control" data-target="#lottery-pics" role="button" data-slide="next">
+                            <span class="icon-next" aria-hidden="true"></span>
+                            <span class="sr-only"></span>
+                        </a>
+                    </div>
                 </div>
                 <div class="col-sm-6 lottery-detail-modal-right-panel">
                     <div class="vertical-center">
@@ -65,29 +61,63 @@
                                         <span class="glyphicon glyphicon-plus"></span>
                                     </button>
                                 </span>
-                            </div>                                    
+                            </div>
                         </div>
-                            <button type="button" ng-click="vm.buyTickets()" ng-disabled="vm.ticketCount < 1"
-                                class="btn btn-primary"><span translate="lotteries.buy"></span></button>
+
+                        <button type="button" ng-click="vm.buyTickets()" ng-disabled="!vm.canBuyTickets()"
+                            class="btn btn-primary"><span translate="lotteries.buy"></span></button>
+
+                        <button type="button" ng-if="!vm.selectingUsers && vm.lottery.canGiftTickets" ng-click="vm.toggleUserSelection()"
+                            ng-disabled="!vm.canBuyTickets()" class="btn btn-info">
+                            <span class="glyphicon glyphicon-gift"></span>
+                            <span translate="lotteries.giftTickets"></span>
+                        </button>
+
+                        <button type="button" ng-if="vm.selectingUsers" ng-click="vm.cancelGiftingProcess()"
+                            class="btn btn-danger">
+                            <span translate="common.cancel"></span>
+                        </button>
                     </div>
+
                     <div class="lottery-detail-modal-total-cost">
-                                <label class><span translate="lotteries.totalCost"></span>
-                                    <b>{{vm.lottery.entryFee * vm.ticketCount}}</b></label>
-                        </div>
+                        <label class><span translate="lotteries.totalCost"></span>
+                            <b>{{vm.getTotalCost()}}</b></label>
+                    </div>
                 </div>
             </div>
+
+            <div class="row" ng-if="vm.selectingUsers">
+                <div class="col-sm-9">
+                    <tags-input class="mb-10" id="selectedUsers" name="selectedUsers" ng-model="vm.selectedUsers"
+                        add-from-autocomplete-only="true" display-property="fullName" add-on-enter="true"
+                        add-on-space="true" add-on-comma="true"
+                        ng-attr-placeholder="{{'lotteries.addPeople' | translate}}" replace-spaces-with-dashes="false"
+                        add-on-blur="true" wrapped>
+                        <auto-complete source="vm.getUsers($query)" min-length="1" max-results-to-show="5"
+                            debounce-delay="500"></auto-complete>
+                    </tags-input>
+                </div>
+
+                <div class="col-sm-3">
+                    <button ng-disabled="form.$invalid || vm.selectedUsers.length === 0" type="button" ng-click="vm.giftTickets()" class="btn btn-primary pull-right mt-2">
+                        <span class="glyphicon glyphicon-gift"></span>
+                        <span translate="common.confirm"></span>
+                    </button>
+                </div>
+            </div>
+
             <div class="lotteries-detail-modal-description-seperator hidden-xs">
             </div>
         </div>
-            <div class="lottery-end-date-component">
-                <label><span translate="lotteries.endDate"></span>
-                    <b>{{vm.lottery.endDate | convertToCurrentTimezone | date:'yyyy-MM-dd, HH:mm'}}</b></label>
+        <div class="lottery-end-date-component">
+            <label><span translate="lotteries.endDate"></span>
+                <b>{{vm.lottery.endDate | convertToCurrentTimezone | date:'yyyy-MM-dd, HH:mm'}}</b></label>
+        </div>
+        <div class="card lotteries-detail-modal-description">
+            <div class="card-body">
+                {{vm.lottery.description}}
             </div>
-            <div class="card lotteries-detail-modal-description">
-                <div class="card-body">
-                    {{vm.lottery.description}}
-                </div>
-            </div>
+        </div>
 </div>
 </form>
 <div class="lottery-details-modal-footer">
