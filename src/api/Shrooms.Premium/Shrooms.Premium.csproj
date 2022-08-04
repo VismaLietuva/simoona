@@ -358,6 +358,7 @@
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\EditStartedLotteryDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryDetailsDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Lotteries\LotteryListingArgsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryParticipantDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryStartedEmailDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryStartedEmailUserInfoDto.cs" />
@@ -388,9 +389,9 @@
     <Compile Include="Domain\DomainServiceValidators\Books\IBookServiceValidator.cs" />
     <Compile Include="Domain\DomainServiceValidators\Events\EventValidationService.cs" />
     <Compile Include="Domain\DomainServiceValidators\Events\IEventValidationService.cs" />
+    <Compile Include="Domain\DomainServiceValidators\Lotteries\ILotteryValidator.cs" />
+    <Compile Include="Domain\DomainServiceValidators\Lotteries\LotteryValidator.cs" />
     <Compile Include="Domain\EmployeeComparer.cs" />
-    <Compile Include="Domain\Services\Args\EventsListingFilterArgs.cs" />
-    <Compile Include="Domain\Services\Args\GetPagedLotteriesArgs.cs" />
     <Compile Include="Domain\Services\Badges\BadgesService.cs" />
     <Compile Include="Domain\Services\Badges\IBadgesService.cs" />
     <Compile Include="Domain\Services\Books\BookCoverService.cs" />
@@ -580,6 +581,7 @@
     <Compile Include="Presentation\WebViewModels\Lotteries\EditDraftedLotteryViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Lotteries\EditStartedLotteryViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Lotteries\LotteryDetailsViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Lotteries\LotteryListingArgsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Lotteries\LotteryParticipantViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Lotteries\LotteryWidgetViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Map\MapAllFloorsViewModel.cs" />
@@ -601,8 +603,11 @@
     <Compile Include="Presentation\WebViewModels\User\EventUserSearchResultViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Vacations\VacationAvailableDaysViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Vacations\VacationViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\ValidationAttributes\DateTimeGreaterThanPresentDateAttribute.cs" />
     <Compile Include="Presentation\WebViewModels\ValidationAttributes\DateTimeLessThanDateTimeAttribute.cs" />
     <Compile Include="Presentation\WebViewModels\ValidationAttributes\DateTimeLessThanPresentDateAttribute.cs" />
+    <Compile Include="Presentation\WebViewModels\ValidationAttributes\Lotteries\ValidLotteryStatusBaseAttribute.cs" />
+    <Compile Include="Presentation\WebViewModels\ValidationAttributes\Lotteries\ValidLotteryCreationStatusAttribute.cs" />
     <Compile Include="Presentation\WebViewModels\ValidationAttributes\MinValueAttribute.cs" />
     <Compile Include="Presentation\WebViewModels\ValidationAttributes\ValidEndDateAttribute.cs" />
     <Compile Include="Presentation\WebViewModels\ValidationAttributes\ValidRegistrationDeadlineDateAttribute.cs" />
