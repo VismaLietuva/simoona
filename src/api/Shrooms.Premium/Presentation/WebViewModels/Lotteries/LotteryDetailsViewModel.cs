@@ -15,5 +15,6 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
         public ImagesCollection Images { get; set; }
         public int Participants { get; set; }
         public int GiftedTicketLimit { get; set; }
+        public bool CanGiftTickets { get; set; }
     }
 }
