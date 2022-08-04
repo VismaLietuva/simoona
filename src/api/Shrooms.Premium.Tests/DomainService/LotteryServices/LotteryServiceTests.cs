@@ -299,7 +299,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             MockLotteries();
             _userService.GetApplicationUserAsync("1").ReturnsNullForAnyArgs();
 
-            await _sut.BuyLotteryTicketAsync(new BuyLotteryTicketDto { LotteryId = 1 }, new UserAndOrganizationDto { UserId = "1" });
+            await _sut.BuyLotteryTicketsAsync(new BuyLotteryTicketsDto { LotteryId = 1 }, new UserAndOrganizationDto { UserId = "1" });
 
             await _unitOfWork.DidNotReceiveWithAnyArgs().SaveChangesAsync((string)default);
         }
@@ -310,7 +310,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             MockLotteries();
             _userService.GetApplicationUserAsync(default).ReturnsForAnyArgs(new ApplicationUser());
 
-            await _sut.BuyLotteryTicketAsync(new BuyLotteryTicketDto { LotteryId = int.MaxValue }, GetUserOrg());
+            await _sut.BuyLotteryTicketsAsync(new BuyLotteryTicketsDto { LotteryId = int.MaxValue }, GetUserOrg());
 
             await _unitOfWork.DidNotReceiveWithAnyArgs().SaveChangesAsync((string)default);
         }
@@ -326,7 +326,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             _mapper.Map<Lottery, LotteryDetailsDto>(default).ReturnsForAnyArgs(new LotteryDetailsDto { EntryFee = 1 });
             _userService.GetApplicationUserAsync(default).ReturnsForAnyArgs(new ApplicationUser { RemainingKudos = 0 });
 
-            var ex = Assert.ThrowsAsync<LotteryException>(async () => await _sut.BuyLotteryTicketAsync(new BuyLotteryTicketDto { LotteryId = lotteryId, Tickets = 10 }, GetUserOrg()));
+            var ex = Assert.ThrowsAsync<LotteryException>(async () => await _sut.BuyLotteryTicketsAsync(new BuyLotteryTicketsDto { LotteryId = lotteryId, Tickets = 10 }, GetUserOrg()));
 
             Assert.AreEqual("User does not have enough kudos for the purchase.", ex.Message);
         }
@@ -346,7 +346,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             _userService.GetApplicationUserAsync(default).ReturnsForAnyArgs(new ApplicationUser { RemainingKudos = 100 });
 
             // Act
-            await _sut.BuyLotteryTicketAsync(new BuyLotteryTicketDto { LotteryId = lotteryId, Tickets = 10 }, GetUserOrg());
+            await _sut.BuyLotteryTicketsAsync(new BuyLotteryTicketsDto { LotteryId = lotteryId, Tickets = 10 }, GetUserOrg());
 
             // Assert
             await _unitOfWork.ReceivedWithAnyArgs().SaveChangesAsync((string)default);
@@ -360,7 +360,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             _mapper.Map<Lottery, LotteryDetailsDto>(default).ReturnsForAnyArgs(new LotteryDetailsDto { EntryFee = 1, EndDate = DateTime.UtcNow.AddDays(10) });
             _userService.GetApplicationUserAsync(default).ReturnsForAnyArgs(new ApplicationUser { RemainingKudos = 100 });
 
-            await _sut.BuyLotteryTicketAsync(new BuyLotteryTicketDto { LotteryId = lotteryId, Tickets = 10 }, GetUserOrg());
+            await _sut.BuyLotteryTicketsAsync(new BuyLotteryTicketsDto { LotteryId = lotteryId, Tickets = 10 }, GetUserOrg());
 
             await _unitOfWork.ReceivedWithAnyArgs().SaveChangesAsync((string)default);
         }

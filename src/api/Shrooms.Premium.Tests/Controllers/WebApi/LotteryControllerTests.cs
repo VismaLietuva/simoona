@@ -215,19 +215,19 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
         public async Task BuyLotteryTicket_Should_Return_Ok()
         {
             // Arrange
-            var ticketViewModel = new BuyLotteryTicketViewModel
+            var ticketViewModel = new BuyLotteryTicketsViewModel
             {
                 LotteryId = 1,
                 Tickets = 5
             };
 
-            var ticketDto = new BuyLotteryTicketDto
+            var ticketDto = new BuyLotteryTicketsDto
             {
                 LotteryId = 1,
                 Tickets = 5
             };
 
-            _mapper.Map<BuyLotteryTicketViewModel, BuyLotteryTicketDto>(ticketViewModel).Returns(ticketDto);
+            _mapper.Map<BuyLotteryTicketsViewModel, BuyLotteryTicketsDto>(ticketViewModel).Returns(ticketDto);
 
             // Act
             var response = await _lotteryController.BuyLotteryTicket(ticketViewModel);
@@ -235,28 +235,28 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             // Assert
             Assert.IsNotNull(response);
             Assert.IsInstanceOf<OkResult>(response);
-            await _lotteryService.Received(1).BuyLotteryTicketAsync(ticketDto, UserAndOrganizationArg);
+            await _lotteryService.Received(1).BuyLotteryTicketsAsync(ticketDto, UserAndOrganizationArg);
         }
 
         [Test]
         public async Task BuyLotteryTicket_Should_Return_Bad_Request()
         {
             // Arrange
-            var ticketViewModel = new BuyLotteryTicketViewModel
+            var ticketViewModel = new BuyLotteryTicketsViewModel
             {
                 LotteryId = 1,
                 Tickets = 5
             };
 
-            var ticketDto = new BuyLotteryTicketDto
+            var ticketDto = new BuyLotteryTicketsDto
             {
                 LotteryId = 1,
                 Tickets = 5
             };
 
-            _mapper.Map<BuyLotteryTicketViewModel, BuyLotteryTicketDto>(ticketViewModel).Returns(ticketDto);
+            _mapper.Map<BuyLotteryTicketsViewModel, BuyLotteryTicketsDto>(ticketViewModel).Returns(ticketDto);
 
-            _lotteryService.BuyLotteryTicketAsync(ticketDto, UserAndOrganizationArg).Throws(new LotteryException("Exception"));
+            _lotteryService.BuyLotteryTicketsAsync(ticketDto, UserAndOrganizationArg).Throws(new LotteryException("Exception"));
 
             // Act
             var response = await _lotteryController.BuyLotteryTicket(ticketViewModel);
@@ -264,7 +264,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             // Assert
             Assert.IsNotNull(response);
             Assert.IsInstanceOf<BadRequestErrorMessageResult>(response);
-            await _lotteryService.Received(1).BuyLotteryTicketAsync(ticketDto, UserAndOrganizationArg);
+            await _lotteryService.Received(1).BuyLotteryTicketsAsync(ticketDto, UserAndOrganizationArg);
         }
 
         [Test]

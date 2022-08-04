@@ -27,8 +27,8 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
             CreateMap<EditStartedLotteryViewModel, EditStartedLotteryDto>();
             CreateMap<EditStartedLotteryDto, EditStartedLotteryViewModel>();
 
-            CreateMap<BuyLotteryTicketViewModel, BuyLotteryTicketDto>();
-            CreateMap<BuyLotteryTicketDto, BuyLotteryTicketViewModel>();
+            CreateMap<BuyLotteryTicketsViewModel, BuyLotteryTicketsDto>();
+            CreateMap<BuyLotteryTicketsDto, BuyLotteryTicketsViewModel>();
 
             CreateMap<LotteryParticipantViewModel, LotteryParticipantDto>();
             CreateMap<LotteryParticipantDto, LotteryParticipantViewModel>();

@@ -354,7 +354,7 @@
     <Compile Include="DataTransferObjects\Models\Kudos\KudosShopItemDto.cs" />
     <Compile Include="DataTransferObjects\Models\LazyPaged\ILazyPaged.cs" />
     <Compile Include="DataTransferObjects\Models\LazyPaged\LazyPaged.cs" />
-    <Compile Include="DataTransferObjects\Models\Lotteries\BuyLotteryTicketDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Lotteries\BuyLotteryTicketsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\EditStartedLotteryDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryDetailsDto.cs" />
@@ -575,7 +575,7 @@
     <Compile Include="Presentation\WebViewModels\Events\UpdateEventTypeViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\UpdateEventViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\KudosShop\KudosShopItemViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Lotteries\BuyLotteryTicketViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Lotteries\BuyLotteryTicketsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Lotteries\CreateLotteryViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Lotteries\EditDraftedLotteryViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Lotteries\EditStartedLotteryViewModel.cs" />
