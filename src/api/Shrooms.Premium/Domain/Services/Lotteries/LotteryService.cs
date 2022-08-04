@@ -136,7 +136,9 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             }
 
             var lotteryDetailsDto = _mapper.Map<Lottery, LotteryDetailsDto>(lottery);
+
             lotteryDetailsDto.Participants = await _participantsDbSet.CountAsync(p => p.LotteryId == lotteryId);
+            lotteryDetailsDto.CanGiftTickets = lotteryDetailsDto.GiftedTicketLimit > 0;
 
             return lotteryDetailsDto;
         }
@@ -282,26 +284,20 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             };
         }
 
-        public async Task BuyLotteryTicketAsync(BuyLotteryTicketDto lotteryTicketDto, UserAndOrganizationDto userOrg)
+        public async Task BuyLotteryTicketsAsync(BuyLotteryTicketsDto buyLotteryTicketsDto, UserAndOrganizationDto userOrg)
         {
-            var applicationUser = await _userService.GetApplicationUserAsync(userOrg.UserId);
+            var buyerApplicationUser = await _userService.GetApplicationUserAsync(userOrg.UserId);
 
-            var lotteryDetails = await GetLotteryDetailsAsync(lotteryTicketDto.LotteryId, userOrg);
-
-            if (lotteryDetails is null || applicationUser is null)
+            if (buyerApplicationUser == null)
             {
-                return;
+                throw new LotteryException("Buyer was not found");
             }
 
-            if (lotteryTicketDto.Tickets <= 0)
-            {
-                await AddKudosLogForCheatingAsync(userOrg, lotteryDetails.EntryFee, applicationUser);
-                throw new LotteryException("Thanks for trying - you were charged double Kudos for this without getting a ticket.");
-            }
+            var lotteryDetails = await GetLotteryDetailsAsync(buyLotteryTicketsDto.LotteryId, userOrg);
 
-            if (applicationUser.RemainingKudos < lotteryDetails.EntryFee * lotteryTicketDto.Tickets)
+            if (lotteryDetails == null)
             {
-                throw new LotteryException("User does not have enough kudos for the purchase.");
+                throw new LotteryException("Lottery was not found");
             }
 
             if (_systemClock.UtcNow > lotteryDetails.EndDate)
@@ -309,33 +305,51 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 throw new LotteryException("Lottery has already ended.");
             }
 
+            if (!lotteryDetails.CanGiftTickets && buyLotteryTicketsDto.ReceivingUserIds?.Length != 0)
+            {
+                throw new LotteryException("This lottery does not allow gifting tickets");
+            }
+
+            if (lotteryDetails.CanGiftTickets && lotteryDetails.GiftedTicketLimit < buyLotteryTicketsDto.ReceivingUserIds?.Length * buyLotteryTicketsDto.Tickets)
+            {
+                throw new LotteryException("Cannot gift that many tickets");
+            }
+
+            if (buyLotteryTicketsDto.Tickets <= 0)
+            {
+                await AddKudosLogForCheatingAsync(userOrg, lotteryDetails.EntryFee, buyerApplicationUser);
+
+                throw new LotteryException("Thanks for trying - you were charged double Kudos for this without getting a ticket.");
+            }
+
+            var ticketCountMultiplier = buyLotteryTicketsDto.ReceivingUserIds?.Count() ?? 1;
+            var totalTicketsFee = lotteryDetails.EntryFee * buyLotteryTicketsDto.Tickets * ticketCountMultiplier;
+
+            if (buyerApplicationUser.RemainingKudos < totalTicketsFee)
+            {
+                throw new LotteryException("User does not have enough kudos for the purchase.");
+            }
+
             var kudosLog = new AddKudosLogDto
             {
                 ReceivingUserIds = new List<string> { userOrg.UserId },
                 PointsTypeId = await _kudosService.GetKudosTypeIdAsync(KudosTypeEnum.Minus),
-                MultiplyBy = lotteryTicketDto.Tickets * lotteryDetails.EntryFee,
-                Comment = $"{lotteryTicketDto.Tickets} ticket(s) for lottery {lotteryDetails.Title}",
+                MultiplyBy = totalTicketsFee,
+                Comment = $"{buyLotteryTicketsDto.Tickets * ticketCountMultiplier} ticket(s) for lottery {lotteryDetails.Title}",
                 UserId = userOrg.UserId,
                 OrganizationId = userOrg.OrganizationId
             };
 
             await _kudosService.AddLotteryKudosLogAsync(kudosLog, userOrg);
 
-            if (applicationUser.RemainingKudos < 0)
+            var ticketOwnerUserIds = buyLotteryTicketsDto.ReceivingUserIds ?? new string[] { userOrg.UserId };
+
+            foreach (var ticketOwnerId in ticketOwnerUserIds)
             {
-                kudosLog.PointsTypeId = await _kudosService.GetKudosTypeIdAsync(KudosTypeEnum.Refund);
-                await _kudosService.AddRefundKudosLogsAsync(new List<AddKudosLogDto> { kudosLog });
-            }
-            else
-            {
-                for (var i = 0; i < lotteryTicketDto.Tickets; i++)
-                {
-                    _participantsDbSet.Add(MapNewLotteryParticipant(lotteryTicketDto, userOrg));
-                }
+                AddLotteryTicketsForUser(buyLotteryTicketsDto.LotteryId, ticketOwnerId, userOrg.UserId, ticketCountMultiplier);
             }
 
-            await _uow.SaveChangesAsync(applicationUser.Id);
-            await _kudosService.UpdateProfileKudosAsync(applicationUser, userOrg);
+            await _uow.SaveChangesAsync(buyerApplicationUser.Id);
         }
 
         public async Task<List<LotteryDetailsDto>> GetRunningLotteriesAsync(UserAndOrganizationDto userAndOrganization)
@@ -347,6 +361,23 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 .Select(MapLotteriesToListItemDto)
                 .OrderBy(_byEndDate)
                 .ToListAsync();
+        }
+
+        private void AddLotteryTicketsForUser(int lotteryId, string userId, string buyerUserId, int ticketCount)
+        {
+            for (var i = 0; i < ticketCount; i++)
+            {
+                _participantsDbSet.Add(new LotteryParticipant
+                {
+                    LotteryId = lotteryId,
+                    UserId = userId,
+                    Joined = _systemClock.UtcNow,
+                    CreatedBy = buyerUserId,
+                    ModifiedBy = buyerUserId,
+                    Modified = _systemClock.UtcNow,
+                    Created = _systemClock.UtcNow,
+                });
+            }
         }
 
         private async Task AddKudosLogForCheatingAsync(UserAndOrganizationDto userOrg, int entryFee, ApplicationUser applicationUser)
@@ -398,7 +429,8 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 EndDate = e.EndDate,
                 Status = e.Status,
                 RefundFailed = e.IsRefundFailed,
-                GiftedTicketLimit = e.GiftedTicketLimit
+                GiftedTicketLimit = e.GiftedTicketLimit,
+                CanGiftTickets = e.GiftedTicketLimit != 0
             };
 
         private Lottery MapNewLottery(LotteryDto newLotteryDto, UserAndOrganizationDto userOrg)
@@ -429,7 +461,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             lottery.GiftedTicketLimit = draftedLotteryDto.GiftedTicketLimit;
         }
 
-        private LotteryParticipant MapNewLotteryParticipant(BuyLotteryTicketDto lotteryTicketDto, UserAndOrganizationDto userOrg)
+        private LotteryParticipant MapNewLotteryParticipant(BuyLotteryTicketsDto lotteryTicketDto, UserAndOrganizationDto userOrg)
         {
             return new LotteryParticipant
             {

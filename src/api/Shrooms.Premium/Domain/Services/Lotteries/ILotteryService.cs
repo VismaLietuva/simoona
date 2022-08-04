@@ -26,7 +26,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 
         Task<LotteryStatsDto> GetLotteryStatsAsync(int lotteryId, UserAndOrganizationDto userOrg);
 
-        Task BuyLotteryTicketAsync(BuyLotteryTicketDto lotteryTicketDto, UserAndOrganizationDto userOrg);
+        Task BuyLotteryTicketsAsync(BuyLotteryTicketsDto lotteryTicketDto, UserAndOrganizationDto userOrg);
 
         Task<IEnumerable<LotteryDetailsDto>> GetLotteriesAsync(UserAndOrganizationDto userOrganization);
 

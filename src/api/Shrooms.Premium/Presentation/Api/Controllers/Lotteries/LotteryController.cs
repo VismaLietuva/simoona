@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
+using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.ViewModels;
 using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
 using Shrooms.Premium.Domain.DomainExceptions.Lotteries;
@@ -118,18 +119,23 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
         [HttpPost]
         [Route("Enter")]
-        public async Task<IHttpActionResult> BuyLotteryTicket(BuyLotteryTicketViewModel lotteryTickets)
+        public async Task<IHttpActionResult> BuyLotteryTicket(BuyLotteryTicketsViewModel lotteryTickets)
         {
             try
             {
-                var buyLotteryTicket = _mapper.Map<BuyLotteryTicketViewModel, BuyLotteryTicketDto>(lotteryTickets);
-                await _lotteryService.BuyLotteryTicketAsync(buyLotteryTicket, GetUserAndOrganization());
+                var buyLotteryTicket = _mapper.Map<BuyLotteryTicketsViewModel, BuyLotteryTicketsDto>(lotteryTickets);
+
+                await _lotteryService.BuyLotteryTicketsAsync(buyLotteryTicket, GetUserAndOrganization());
 
                 return Ok();
             }
             catch (LotteryException ex)
             {
                 return BadRequest(ex.Message);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequestWithError(ex);
             }
         }
 
