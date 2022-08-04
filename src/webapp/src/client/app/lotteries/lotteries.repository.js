@@ -39,8 +39,8 @@
             return $resource(url + 'All').query().$promise;
         }
 
-        function getLottery(id) {
-            return $resource(url + `${id}/Details`).get().$promise;
+        function getLottery(id, params) {
+            return $resource(url + `${id}/Details`).get(params).$promise;
         }
 
         function create(lottery) {
@@ -70,7 +70,7 @@
                 }
             }).patch().$promise;
         }
-        
+
         function getLotteryListPaged(filters) {
             return $resource(url + 'Paged', '', {
                 'query': {
@@ -80,7 +80,7 @@
                 }
             }).query(filters).$promise;
         }
-        
+
         function finishLottery(id) {
             return $resource(url + `${id}/Finish`, '', {
                 patch: {
@@ -113,7 +113,7 @@
         function getLotteryStatistics(id) {
             return $resource(url + `${id}/Stats`).get().$promise;
         }
-        
+
         function exportParticipants(lotteryId) {
             return $http.get(url + 'Export?lotteryId=' + lotteryId, {
                 responseType: 'arraybuffer'

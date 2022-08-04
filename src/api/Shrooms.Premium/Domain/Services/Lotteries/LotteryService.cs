@@ -94,7 +94,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             await _uow.SaveChangesAsync(false);
         }
 
-        public async Task<LotteryDetailsDto> GetLotteryDetailsAsync(int lotteryId, UserAndOrganizationDto userOrg)
+        public async Task<LotteryDetailsDto> GetLotteryDetailsAsync(int lotteryId, bool includeRemainingKudos, UserAndOrganizationDto userOrg)
         {
             var lottery = await GetLotteryByIdAsync(lotteryId, userOrg);
 
@@ -103,7 +103,20 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 return null;
             }
 
-            return await MapLotteryToLotteryDetailsDtoAsync(lottery);
+            var detailsDto = MapLotteryToLotteryDetailsDto(lottery);
+
+            detailsDto.Participants = await _participantsDbSet.CountAsync(p => p.LotteryId == lottery.Id);
+
+            if (includeRemainingKudos)
+            {
+                var buyerApplicationUser = await _userService.GetApplicationUserAsync(userOrg.UserId);
+
+                _lotteryValidator.CheckIfBuyerExists(buyerApplicationUser);
+
+                detailsDto.RemainingKudos = buyerApplicationUser.RemainingKudos;
+            }
+
+            return detailsDto;
         }
 
         public async Task<bool> AbortLotteryAsync(int lotteryId, UserAndOrganizationDto userOrg)
@@ -253,7 +266,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 
             _lotteryValidator.CheckIfBuyerExists(buyerApplicationUser);
 
-            var lotteryDetails = await GetLotteryDetailsAsync(buyLotteryTicketsDto.LotteryId, userOrg);
+            var lotteryDetails = await GetLotteryDetailsAsync(buyLotteryTicketsDto.LotteryId, false, userOrg);
 
             _lotteryValidator.CheckIfLotteryExists(lotteryDetails);
             _lotteryValidator.CheckIfLotteryEnded(lotteryDetails);
@@ -402,7 +415,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             };
         }
 
-        private async Task<LotteryDetailsDto> MapLotteryToLotteryDetailsDtoAsync(Lottery lottery)
+        private LotteryDetailsDto MapLotteryToLotteryDetailsDto(Lottery lottery)
         {
             return new LotteryDetailsDto
             {
@@ -414,8 +427,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 EntryFee = lottery.EntryFee,
                 Images = lottery.Images,
                 RefundFailed = lottery.IsRefundFailed,
-                GiftedTicketLimit = lottery.GiftedTicketLimit,
-                Participants = await _participantsDbSet.CountAsync(p => p.LotteryId == lottery.Id)
+                GiftedTicketLimit = lottery.GiftedTicketLimit
             };
         }
 

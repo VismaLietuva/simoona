@@ -9,16 +9,14 @@
         })
         .directive('aceLotteriesDetailModal', lotteryDetailModal);
 
-    lotteryDetailModal.$inject = [
-        '$uibModal'
-    ];
+    lotteryDetailModal.$inject = ['$uibModal'];
 
     function lotteryDetailModal($uibModal) {
         var directive = {
             restrict: 'A',
             scope: {
                 aceLotteriesDetailModal: '=?',
-                onInit: '&'
+                onInit: '&',
             },
             link: linkFunc,
         };
@@ -47,7 +45,7 @@
             function onInitNotifyConsumer() {
                 scope.onInit({
                     lotteryId: scope.aceLotteriesDetailModal,
-                    openLotteryWidget: openLotteryWidget
+                    openLotteryWidget: openLotteryWidget,
                 });
             }
         }
@@ -62,9 +60,10 @@
         'localeSrv',
         'errorHandler',
         '$window',
-        'profileRepository'
+        'profileRepository',
     ];
 
+    // TODO: add remaining kudos count ?
     function lotteriesDetailController(
         $uibModalInstance,
         lotteryRepository,
@@ -108,7 +107,10 @@
         }
 
         function init() {
-            lotteryRepository.getLottery(currentLottery)
+            lotteryRepository
+                .getLottery(currentLottery, {
+                    includeRemainingKudos: true,
+                })
                 .then(function (lottery) {
                     vm.lottery = lottery;
                     vm.lotteryLoaded = true;
@@ -135,8 +137,9 @@
                     lotteryId: currentLottery,
                     tickets: vm.ticketCount,
                     receivingUserIds:
-                        vm.selectedUsers.length !== 0 ? vm.selectedUsers
-                            .map(user => user.id) : undefined
+                        vm.selectedUsers.length !== 0
+                            ? vm.selectedUsers.map((user) => user.id)
+                            : undefined,
                 };
 
                 lotteryRepository.buyTickets(lotteryTickets).then(
@@ -144,7 +147,12 @@
                         vm.notifySrv.success(
                             vm.localeSrv.formatTranslation(
                                 'lotteries.hasBeenBought',
-                                { one: vm.ticketCount * getTicketReceiversCount(), two: vm.lottery.title }
+                                {
+                                    one:
+                                        vm.ticketCount *
+                                        getTicketReceiversCount(),
+                                    two: vm.lottery.title,
+                                }
                             )
                         );
                         $uibModalInstance.close();
@@ -185,12 +193,14 @@
 
         function getUsers(search) {
             return profileRepository.getUserForAutoComplete({
-                s: search
+                s: search,
             });
         }
 
         function getTotalCost() {
-            return vm.lottery.entryFee * vm.ticketCount * getTicketReceiversCount();
+            return (
+                vm.lottery.entryFee * vm.ticketCount * getTicketReceiversCount()
+            );
         }
     }
 })();

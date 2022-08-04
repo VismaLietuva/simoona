@@ -64,9 +64,9 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
         [HttpGet]
         [Route("{id}/Details")]
-        public async Task<IHttpActionResult> GetLottery(int id)
+        public async Task<IHttpActionResult> GetLottery(int id, bool includeRemainingKudos = false)
         {
-            var lottery = await _lotteryService.GetLotteryDetailsAsync(id, GetUserAndOrganization());
+            var lottery = await _lotteryService.GetLotteryDetailsAsync(id, includeRemainingKudos, GetUserAndOrganization());
 
             if (lottery == null)
             {
