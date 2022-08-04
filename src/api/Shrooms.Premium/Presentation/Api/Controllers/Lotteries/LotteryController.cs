@@ -88,12 +88,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
                 return BadRequest(ModelState);
             }
 
-            var createLotteryDto = _mapper.Map<CreateLotteryViewModel, LotteryDto>(lotteryViewModel);
-            SetOrganizationAndUser(createLotteryDto);
-
             try
             {
-                await _lotteryService.CreateLotteryAsync(createLotteryDto);
+                var createLotteryDto = _mapper.Map<CreateLotteryViewModel, LotteryDto>(lotteryViewModel);
+
+                await _lotteryService.CreateLotteryAsync(createLotteryDto, GetUserAndOrganization());
             }
             catch (LotteryException e)
             {
@@ -160,9 +159,8 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
             try
             {
                 var editDraftedLotteryDto = _mapper.Map<EditDraftedLotteryViewModel, LotteryDto>(editLotteryViewModel);
-                SetOrganizationAndUser(editDraftedLotteryDto);
 
-                await _lotteryService.EditDraftedLotteryAsync(editDraftedLotteryDto);
+                await _lotteryService.EditDraftedLotteryAsync(editDraftedLotteryDto, GetUserAndOrganization());
 
                 return Ok();
             }

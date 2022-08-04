@@ -1,174 +1,151 @@
 <div>
-	<wave-spinner ng-if="vm.isLoading"></wave-spinner>
-	<div ng-if="!vm.isLoading">
-		<label class="control-label col-xs-12 col-sm-6" translate="settings.notifications_listLabel"></label>
-		<form ng-if="vm.settings.walls.length" 
-			name="notificationsForm" 
-			class="form-horizontal" 
-			autocomplete="off">
-			<table class="nc-table nc-table-active">
-				<thead>
-					<tr>
-						<th translate="settings.wall"></th>
-						<th translate="settings.app"></th>
-						<th translate="settings.email"></th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr ng-repeat="wall in vm.settings.walls">
-						<td class="col-xs-3 word-break"
-							title="{{:: wall.wallName}}"
-							data-test-id="wall-name"
-							ng-cloak>
-							<label>{{ wall.wallName}}</label>
-							<span ng-show="wall.isMainWall" class="glyphicon glyphicon-exclamation-sign" uib-tooltip-template="'mainWallTemplate.html'" tooltip-placement="right" tooltip-append-to-body="true" tooltip-class="settings-notifications-status-tooltip"></span>
-						</td>
-						<td class="col-xs-4" 
-							data-test-id="wall-app-notification"
-							ng-cloak>
-							<input type="checkbox" ng-model="wall.isAppNotificationEnabled" ng-disabled="wall.isMainWall">
-						</td>
-						<td class="col-xs-4" 
-							data-test-id="wall-email-notification"
-							ng-cloak>
-							<input type="checkbox" ng-model="wall.isEmailNotificationEnabled" ng-disabled="wall.isMainWall">
-						</td>
-					</tr>
-					<tr>
-						<td class="col-xs-3 word-break"
-							translate-attr-title="settings.events"
-							translate="settings.events"
-							data-test-id="all-events"
-							ng-cloak>
-						</td>
-						<td class="col-xs-4 notifications-item"
-							data-test-id="event-app-notification"
-							ng-cloak>
-							<input type="checkbox" ng-model="vm.settings.eventsAppNotifications">
-						</td>
-						<td class="col-xs-4 notifications-item"
-							data-test-id="event-email-notification"
-							ng-cloak>
-							<input type="checkbox" ng-model="vm.settings.eventsEmailNotifications">
-						</td>
-					</tr>
-					<tr>
-						<td class="col-xs-3 word-break"
-							translate-attr-title="settings.eventsRemind"
-							translate="settings.eventsRemind"
-							ng-cloak>
-						</td>
-						<td class="col-xs-4 notifications-item"
-							ng-cloak>
-							<input type="checkbox" ng-model="vm.settings.eventWeeklyReminderAppNotifications">
-						</td>
-						<td class="col-xs-4 notifications-item"
-							ng-cloak>
-							<input type="checkbox" ng-model="vm.settings.eventWeeklyReminderEmailNotifications">
-						</td>
-					</tr>
-					<tr>
-						<td class="col-xs-3 word-break"
-							translate-attr-title="settings.projects"
-							translate="settings.projects"
-							data-test-id="all-projects"
-							ng-cloak>
-						</td>
-						<td class="col-xs-4"
-							data-test-id="project-app-notification"
-							ng-cloak>
-							<input type="checkbox" ng-model="vm.settings.projectsAppNotifications">
-						</td>
-						<td class="col-xs-4"
-							data-test-id="project-email-notification"
-							ng-cloak>
-							<input type="checkbox" ng-model="vm.settings.projectsEmailNotifications">
-						</td>
-					</tr>
-				</tbody>
-				<script type="text/ng-template" id="mainWallTemplate.html">
+    <wave-spinner ng-if="vm.isLoading"></wave-spinner>
+    <div ng-if="!vm.isLoading">
+        <label class="control-label col-xs-12 col-sm-6" translate="settings.notifications_listLabel"></label>
+        <form ng-if="vm.settings.walls.length" name="notificationsForm" class="form-horizontal" autocomplete="off">
+            <table class="nc-table nc-table-active">
+                <thead>
+                    <tr>
+                        <th translate="settings.wall"></th>
+                        <th translate="settings.app"></th>
+                        <th translate="settings.email"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="wall in vm.settings.walls">
+                        <td class="col-xs-3 word-break" title="{{:: wall.wallName}}" data-test-id="wall-name" ng-cloak>
+                            <label>{{ wall.wallName}}</label>
+                            <span ng-show="wall.isMainWall" class="glyphicon glyphicon-exclamation-sign"
+                                uib-tooltip-template="'mainWallTemplate.html'" tooltip-placement="right"
+                                tooltip-append-to-body="true"
+                                tooltip-class="settings-notifications-status-tooltip"></span>
+                        </td>
+                        <td class="col-xs-4" data-test-id="wall-app-notification" ng-cloak>
+                            <input type="checkbox" ng-model="wall.isAppNotificationEnabled"
+                                ng-disabled="wall.isMainWall">
+                        </td>
+                        <td class="col-xs-4" data-test-id="wall-email-notification" ng-cloak>
+                            <input type="checkbox" ng-model="wall.isEmailNotificationEnabled"
+                                ng-disabled="wall.isMainWall">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-xs-3 word-break" translate-attr-title="settings.events"
+                            translate="settings.events" data-test-id="all-events" ng-cloak>
+                        </td>
+                        <td class="col-xs-4 notifications-item" data-test-id="event-app-notification" ng-cloak>
+                            <input type="checkbox" ng-model="vm.settings.eventsAppNotifications">
+                        </td>
+                        <td class="col-xs-4 notifications-item" data-test-id="event-email-notification" ng-cloak>
+                            <input type="checkbox" ng-model="vm.settings.eventsEmailNotifications">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-xs-3 word-break" translate-attr-title="settings.eventsRemind"
+                            translate="settings.eventsRemind" ng-cloak>
+                        </td>
+                        <td class="col-xs-4 notifications-item" ng-cloak>
+                            <input type="checkbox" ng-model="vm.settings.eventWeeklyReminderAppNotifications">
+                        </td>
+                        <td class="col-xs-4 notifications-item" ng-cloak>
+                            <input type="checkbox" ng-model="vm.settings.eventWeeklyReminderEmailNotifications">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-xs-3 word-break" translate-attr-title="settings.projects"
+                            translate="settings.projects" data-test-id="all-projects" ng-cloak>
+                        </td>
+                        <td class="col-xs-4" data-test-id="project-app-notification" ng-cloak>
+                            <input type="checkbox" ng-model="vm.settings.projectsAppNotifications">
+                        </td>
+                        <td class="col-xs-4" data-test-id="project-email-notification" ng-cloak>
+                            <input type="checkbox" ng-model="vm.settings.projectsEmailNotifications">
+                        </td>
+                    </tr>
+                </tbody>
+                <script type="text/ng-template" id="mainWallTemplate.html">
 					<p class="col-xs-12"><strong>{{vm.settings.mainWallName}}</strong> <span translate="settings.notifications_mainWallExplanation"></span></p>
 				</script>
-			</table>
-			<table class="nc-table nc-table-active">
-				<thead>
-					<tr>
-						<th translate="settings.comments"></th>
-						<th translate="settings.app"></th>
-						<th translate="settings.email"></th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td class="col-xs-3 word-break"
-							translate-attr-title="settings.myPosts"
-							translate="settings.myPosts"
-							data-test-id="all-comments"
-							ng-cloak>
-						</td>
-						<td class="col-xs-4 notifications-item"
-							data-test-id="comments-app-notification"
-							ng-cloak>
-							<input type="checkbox" ng-model="vm.settings.myPostsAppNotifications">
-						</td>
-						<td class="col-xs-4 notifications-item"
-							data-test-id="comments-email-notification"
-							ng-cloak>
-							<input type="checkbox" ng-model="vm.settings.myPostsEmailNotifications">
-						</td>
-					</tr>
-					<tr>
-						<td class="col-xs-3 word-break"
-							translate-attr-title="settings.iCommented"
-							translate="settings.iCommented"
-							data-test-id="all-comments"
-							ng-cloak>
-						</td>
-						<td class="col-xs-4 notifications-item"
-							data-test-id="comments-app-notification"
-							ng-cloak>
-							<input type="checkbox" ng-model="vm.settings.followingPostsAppNotifications">
-						</td>
-						<td class="col-xs-4 notifications-item"
-							data-test-id="comments-email-notification"
-								ng-cloak>
-							<input type="checkbox" ng-model="vm.settings.followingPostsEmailNotifications">
-						</td>
-					</tr>
-					<tr>
-						<td class="col-xs-3 word-break"
-							translate-attr-title="settings.mention"
-							translate="settings.mention"
-							data-test-id="all-comments"
-							ng-cloak>
-						</td>
-						<td class="col-xs-4 notifications-item"
-							data-test-id="comments-app-notification"
-							ng-cloak>
-							<input type="checkbox" ng-disabled="true">
-						</td>
+            </table>
+            <table class="nc-table nc-table-active">
+                <thead>
+                    <tr>
+                        <th translate="settings.comments"></th>
+                        <th translate="settings.app"></th>
+                        <th translate="settings.email"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="col-xs-3 word-break" translate-attr-title="settings.myPosts"
+                            translate="settings.myPosts" data-test-id="all-comments" ng-cloak>
+                        </td>
+                        <td class="col-xs-4 notifications-item" data-test-id="comments-app-notification" ng-cloak>
+                            <input type="checkbox" ng-model="vm.settings.myPostsAppNotifications">
+                        </td>
+                        <td class="col-xs-4 notifications-item" data-test-id="comments-email-notification" ng-cloak>
+                            <input type="checkbox" ng-model="vm.settings.myPostsEmailNotifications">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-xs-3 word-break" translate-attr-title="settings.iCommented"
+                            translate="settings.iCommented" data-test-id="all-comments" ng-cloak>
+                        </td>
+                        <td class="col-xs-4 notifications-item" data-test-id="comments-app-notification" ng-cloak>
+                            <input type="checkbox" ng-model="vm.settings.followingPostsAppNotifications">
+                        </td>
+                        <td class="col-xs-4 notifications-item" data-test-id="comments-email-notification" ng-cloak>
+                            <input type="checkbox" ng-model="vm.settings.followingPostsEmailNotifications">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-xs-3 word-break" translate-attr-title="settings.mention"
+                            translate="settings.mention" data-test-id="all-comments" ng-cloak>
+                        </td>
+                        <td class="col-xs-4 notifications-item" data-test-id="comments-app-notification" ng-cloak>
+                            <input type="checkbox" ng-disabled="true">
+                        </td>
 
-						<td class="col-xs-4 notifications-item"
-							data-test-id="comments-email-notification"
-								ng-cloak>
-							<input type="checkbox" ng-model="vm.settings.mentionEmailNotifications">
-						</td>
-					</tr>
-				</tbody>
-			</table>
-			<div class="pull-right padding-top">
-				<button class="btn btn-primary"
-						ng-click="vm.save()" 
-						ng-disabled="notificationsForm.$invalid" 
-						data-test-id="notifications-form-update-button">
-					<span translate="common.save"></span>
-				</button>
-				<button class="btn btn-default" 
-						ui-sref="{{vm.appConfig.homeStateName}}" 
-						data-test-id="notifications-form-cancel-button">
-					<span translate="common.cancel"></span>
-				</button>
-			</div>
-		</form>
-	</div>
+                        <td class="col-xs-4 notifications-item" data-test-id="comments-email-notification" ng-cloak>
+                            <input type="checkbox" ng-model="vm.settings.mentionEmailNotifications">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="nc-table nc-table-active">
+                <thead>
+                    <tr>
+                        <th translate="settings.lotteries"></th>
+                        <th translate="settings.app"></th>
+                        <th translate="settings.email"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="col-xs-3 word-break" translate-attr-title="settings.lotteryCreated"
+                            translate="settings.lotteryCreated" data-test-id="all-comments" ng-cloak>
+                        </td>
+                        <td class="col-xs-4 notifications-item" ng-cloak>
+                            <input type="checkbox" ng-disabled="true">
+                        </td>
+
+                        <td class="col-xs-4 notifications-item" ng-cloak>
+                            <input type="checkbox" ng-model="vm.settings.createdLotteryEmailNotifications">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="pull-right padding-top">
+                <button class="btn btn-primary" ng-click="vm.save()" ng-disabled="notificationsForm.$invalid"
+                    data-test-id="notifications-form-update-button">
+                    <span translate="common.save"></span>
+                </button>
+                <button class="btn btn-default" ui-sref="{{vm.appConfig.homeStateName}}"
+                    data-test-id="notifications-form-cancel-button">
+                    <span translate="common.cancel"></span>
+                </button>
+            </div>
+        </form>
+    </div>
 </div>

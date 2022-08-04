@@ -26,6 +26,8 @@ namespace Shrooms.Contracts.DataTransferObjects.Models.Users
 
         public bool MentionEmailNotifications;
 
+        public bool CreatedLotteryEmailNotifications;
+
         public IEnumerable<WallNotificationsDto> Walls;
     }
 }

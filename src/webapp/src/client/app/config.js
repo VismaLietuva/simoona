@@ -145,7 +145,7 @@
     function configuration($httpProvider, $locationProvider, cfpLoadingBarProvider,
         ChartJsProvider, AnalyticsProvider, environment, applicationInsightsServiceProvider) {
 
-        var options = { 
+        var options = {
             applicationName: '',
             appInsightsEnabled: false,
             appInsightsInstrumentationKey: 'appInsightsInstrumentationKeyValue'

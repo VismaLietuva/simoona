@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Shrooms.Infrastructure.Interceptors;
+using Shrooms.Premium.Domain.Services.Email.Lotteries;
 using Shrooms.Premium.Domain.Services.Lotteries;
 
 namespace Shrooms.Premium.IoC.Modules
@@ -26,6 +27,10 @@ namespace Shrooms.Premium.IoC.Modules
             builder.RegisterType<LotteryAbortJob>()
                 .As<ILotteryAbortJob>()
                 .EnableInterfaceTelemetryInterceptor();
+
+            builder.RegisterType<LotteryNotificationService>()
+                .As<ILotteryNotificationService>()
+                .InstancePerRequest();
         }
     }
 }

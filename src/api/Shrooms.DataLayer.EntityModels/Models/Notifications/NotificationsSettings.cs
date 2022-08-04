@@ -24,6 +24,8 @@
 
         public bool MentionEmailNotifications { get; set; }
 
+        public bool CreatedLotteryEmailNotifications { get; set; }
+
         public virtual ApplicationUser ApplicationUser { get; set; }
     }
 }

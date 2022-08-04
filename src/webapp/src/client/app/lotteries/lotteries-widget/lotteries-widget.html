@@ -1,6 +1,6 @@
 <div id="lotteries-wall-widget">
     <div class="lottery-activity-log-container" ng-repeat="lottery in latestLotteries"
-        ace-lotteries-detail-modal="lottery.id">
+        ace-lotteries-detail-modal="lottery.id" on-init="saveOpenLotteryWidgetFunction(lotteryId, openLotteryWidget)">
         <div class="lottery-activity-log-inner">
             <div class="lottery-activity-log-content-box">
                 <div class="lottery-activity-log-title">
