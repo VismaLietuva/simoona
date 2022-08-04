@@ -3,6 +3,8 @@ using System.ComponentModel.DataAnnotations;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models.Lottery;
+using Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes;
+using Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes.Lotteries;
 
 namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
 {
@@ -15,6 +17,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
         public string Description { get; set; }
         
         [Required]
+        [DateTimeGreaterThanPresentDate]
         public DateTime? EndDate { get; set; }
         
         [Required]
@@ -22,13 +25,13 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
         public int? EntryFee { get; set; }
         
         [Required]
-        [EnumDataType(typeof(LotteryStatus))]
+        [ValidLotteryCreationStatus]
         public LotteryStatus Status { get; set; }
 
         [Required]
         public ImagesCollection Images { get; set; }
 
-        [Range(0, int.MaxValue)]
+        [Range(0, int.MaxValue)]//TODO: change this somehow?
         public int GiftedTicketLimit { get; set; }
     }
 }

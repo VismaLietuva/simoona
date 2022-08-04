@@ -6,10 +6,9 @@ using System.Web.Http;
 using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.Exceptions;
-using Shrooms.Contracts.ViewModels;
+using Shrooms.Domain.Extensions;
 using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
 using Shrooms.Premium.Domain.DomainExceptions.Lotteries;
-using Shrooms.Premium.Domain.Services.Args;
 using Shrooms.Premium.Domain.Services.Lotteries;
 using Shrooms.Premium.Presentation.WebViewModels.Lotteries;
 using Shrooms.Presentation.Api.Controllers;
@@ -47,20 +46,20 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
         [HttpGet]
         [Route("Paged")]
         [PermissionAuthorize(Permission = AdministrationPermissions.Lottery)]
-        public async Task<IHttpActionResult> GetPagedLotteries(string filter = "", int page = 1, int pageSize = WebApiConstants.DefaultPageSize)
+        public async Task<IHttpActionResult> GetPagedLotteries([FromUri] LotteryListingArgsViewModel lotteryArgsViewModel)
         {
-            var args = new GetPagedLotteriesArgs { Filter = filter, PageNumber = page, PageSize = pageSize, UserOrg = GetUserAndOrganization() };
-            var pagedLotteriesDto = await _lotteryService.GetPagedLotteriesAsync(args);
-
-            var pagedLotteriesViewModel = new PagedViewModel<LotteryDetailsDto>
+            if (!ModelState.IsValid)
             {
-                PagedList = pagedLotteriesDto,
-                PageCount = pagedLotteriesDto.PageCount,
-                ItemCount = pagedLotteriesDto.TotalItemCount,
-                PageSize = pageSize
-            };
+                return BadRequest(ModelState);
+            }
 
-            return Ok(pagedLotteriesViewModel);
+            lotteryArgsViewModel ??= new LotteryListingArgsViewModel();
+
+            var lotteryArgsDto = _mapper.Map<LotteryListingArgsViewModel, LotteryListingArgsDto>(lotteryArgsViewModel);
+            var pagedLotteriesDto = await _lotteryService.GetPagedLotteriesAsync(lotteryArgsDto, GetUserAndOrganization());
+            var pagedLotteriesViewModel = _mapper.Map<IEnumerable<LotteryDetailsDto>, IEnumerable<LotteryDetailsViewModel>>(pagedLotteriesDto);
+
+            return Ok(pagedLotteriesDto.ToPagedViewModel(pagedLotteriesViewModel, lotteryArgsDto));
         }
 
         [HttpGet]
@@ -71,7 +70,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
             if (lottery == null)
             {
-                return Content((HttpStatusCode)422, "Lottery with such ID was not found");
+                return NotFound();
             }
 
             var lotteryViewModel = _mapper.Map<LotteryDetailsDto, LotteryDetailsViewModel>(lottery);
@@ -92,15 +91,15 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
             try
             {
                 var createLotteryDto = _mapper.Map<CreateLotteryViewModel, LotteryDto>(lotteryViewModel);
-
+                
                 await _lotteryService.CreateLotteryAsync(createLotteryDto, GetUserAndOrganization());
+                
+                return Ok();
             }
             catch (LotteryException e)
             {
                 return BadRequest(e.Message);
             }
-
-            return Ok();
         }
 
         [HttpPatch]
@@ -109,9 +108,10 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
         public async Task<IHttpActionResult> Abort(int id)
         {
             var success = await _lotteryService.AbortLotteryAsync(id, GetUserAndOrganization());
+
             if (!success)
             {
-                return Content((HttpStatusCode)422, "Lottery with such ID was not found");
+                return NotFound();
             }
 
             return Ok();
@@ -121,6 +121,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
         [Route("Enter")]
         public async Task<IHttpActionResult> BuyLotteryTicket(BuyLotteryTicketsViewModel lotteryTickets)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             try
             {
                 var buyLotteryTicket = _mapper.Map<BuyLotteryTicketsViewModel, BuyLotteryTicketsDto>(lotteryTickets);
@@ -162,6 +167,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
         [InvalidateCacheOutput("Get", typeof(LotteryWidgetController))]
         public async Task<IHttpActionResult> UpdateDrafted(EditDraftedLotteryViewModel editLotteryViewModel)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             try
             {
                 var editDraftedLotteryDto = _mapper.Map<EditDraftedLotteryViewModel, LotteryDto>(editLotteryViewModel);
@@ -181,12 +191,17 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
         [InvalidateCacheOutput("Get", typeof(LotteryWidgetController))]
         public async Task<IHttpActionResult> UpdateStarted(EditStartedLotteryViewModel editLotteryViewModel)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             try
             {
                 var editStartedLotteryDto = _mapper.Map<EditStartedLotteryViewModel, EditStartedLotteryDto>(editLotteryViewModel);
                 SetOrganizationAndUser(editStartedLotteryDto);
 
-                await _lotteryService.EditStartedLotteryAsync(editStartedLotteryDto);
+                await _lotteryService.EditStartedLotteryAsync(editStartedLotteryDto, GetUserAndOrganization());
 
                 return Ok();
             }
@@ -221,7 +236,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
             if (lotteryStats == null)
             {
-                return Content((HttpStatusCode)422, "Lottery with such ID was not found");
+                return NotFound();
             }
 
             return Ok(lotteryStats);
@@ -235,7 +250,10 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
             try
             {
                 var content = await _lotteryExportService.ExportParticipantsAsync(lotteryId, GetUserAndOrganization());
-                var result = new HttpResponseMessage(HttpStatusCode.OK) { Content = content };
+                var result = new HttpResponseMessage(HttpStatusCode.OK) 
+                {
+                    Content = content 
+                };
                 
                 return ResponseMessage(result);
             }

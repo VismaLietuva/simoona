@@ -38,7 +38,8 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 
         public async Task RefundLotteryAsync(int lotteryId, UserAndOrganizationDto userOrg)
         {
-            var lottery = await _lotteryService.GetLotteryAsync(lotteryId);
+            var lottery = await _lotteryService.GetLotteryByIdAsync(lotteryId, userOrg);
+
             if (lottery == null || lottery.OrganizationId != userOrg.OrganizationId)
             {
                 return;

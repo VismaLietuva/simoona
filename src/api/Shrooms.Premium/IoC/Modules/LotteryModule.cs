@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Shrooms.Infrastructure.Interceptors;
+using Shrooms.Premium.Domain.DomainServiceValidators.Lotteries;
 using Shrooms.Premium.Domain.Services.Email.Lotteries;
 using Shrooms.Premium.Domain.Services.Lotteries;
 
@@ -30,6 +31,10 @@ namespace Shrooms.Premium.IoC.Modules
 
             builder.RegisterType<LotteryNotificationService>()
                 .As<ILotteryNotificationService>()
+                .InstancePerRequest();
+
+            builder.RegisterType<LotteryValidator>()
+                .As<ILotteryValidator>()
                 .InstancePerRequest();
         }
     }
