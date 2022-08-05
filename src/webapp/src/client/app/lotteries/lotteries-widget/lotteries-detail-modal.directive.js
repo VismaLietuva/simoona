@@ -99,6 +99,8 @@
         vm.getTotalCost = getTotalCost;
         vm.getKudosAfterPurchase = getKudosAfterPurchase;
         vm.getRemainingGiftedTicketCount = getRemainingGiftedTicketCount;
+        vm.giftedTicketsLimitExceeded = giftedTicketsLimitExceeded;
+        vm.isTicketCountAnInteger = isTicketCountAnInteger;
 
         vm.getUsers = getUsers;
 
@@ -108,8 +110,7 @@
         if ($window.lotteriesEnabled) {
             init();
         }
-        // TODO: add validation message
-        // TODO: fix ticket count validation
+
         function init() {
             lotteryRepository
                 .getLottery(currentLottery, {
@@ -186,7 +187,8 @@
             return (
                 vm.ticketCount > 0 &&
                 !vm.selectingUsers &&
-                getKudosAfterPurchase() >= 0
+                getKudosAfterPurchase() >= 0 &&
+                isTicketCountAnInteger()
             );
         }
 
@@ -194,7 +196,8 @@
             return (
                 vm.selectedUsers.length > 0 &&
                 getKudosAfterPurchase() >= 0 &&
-                getRemainingGiftedTicketCount() >= 0
+                !giftedTicketsLimitExceeded() &&
+                isTicketCountAnInteger()
             );
         }
 
@@ -218,37 +221,29 @@
         }
 
         function getTotalCost() {
-            if (!vm.lottery) {
-                return 0;
-            }
-
             return (
                 vm.lottery.entryFee * vm.ticketCount * getTicketReceiversCount()
             );
         }
 
         function getKudosAfterPurchase() {
-            if (!vm.lottery) {
-                return 0;
-            }
-
             return vm.lottery.buyer.remainingKudos - getTotalCost();
         }
 
         function getRemainingGiftedTicketCount() {
-            if (!vm.lottery) {
-                return 0;
-            }
-
             var remainingGiftedTicketCount =
                 vm.lottery.buyer.remainingGiftedTicketCount -
                 vm.ticketCount * getTicketReceiversCount();
 
-            if (remainingGiftedTicketCount < 0) {
-                return 0;
-            }
-
             return remainingGiftedTicketCount;
+        }
+
+        function giftedTicketsLimitExceeded() {
+            return getRemainingGiftedTicketCount() < 0;
+        }
+
+        function isTicketCountAnInteger() {
+            return Number.isInteger(vm.ticketCount);
         }
     }
 })();

@@ -67,5 +67,6 @@
     "addPeople": "Pridėti žmonių...",
     "giftTickets": "Dovanoti",
     "kudosAfterPurchase": "Kudos kiekis po pirkimo",
-    "remainingGiftedTicketCount": "Dar galima padovanoti <b>{{one}}</b>"
+    "remainingGiftedTicketCount": "Dar galima padovanoti <b>{{one}}</b>",
+    "lotteryGiftedTicketCountExceeded": "Per didelis bilietų kiekis"
 }
