@@ -22,7 +22,7 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Lotteries
 
         void CheckIfLotteryIsStarted(Lottery lottery);
 
-        void CheckIfReceivingUsersExist(BuyLotteryTicketsDto buyLotteryTicketsDto);
+        void CheckIfGiftedTicketsReceiversExist(BuyLotteryTicketsDto buyLotteryTicketsDto);
 
         void CheckIfUserHasEnoughKudos(ApplicationUser buyerApplicationUser, int totalTicketCost);
 

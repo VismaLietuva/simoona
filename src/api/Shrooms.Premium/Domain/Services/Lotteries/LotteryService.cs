@@ -24,15 +24,16 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
     public class LotteryService : ILotteryService
     {
         private readonly IUnitOfWork2 _uow;
-        private readonly DbSet<Lottery> _lotteriesDbSet;
-        private readonly DbSet<LotteryParticipant> _participantsDbSet;
         private readonly IAsyncRunner _asyncRunner;
         private readonly IParticipantService _participantService;
         private readonly IUserService _userService;
         private readonly IKudosService _kudosService;
         private readonly ISystemClock _systemClock;
         private readonly ILotteryValidator _lotteryValidator;
-        
+
+        private readonly DbSet<Lottery> _lotteriesDbSet;
+        private readonly DbSet<LotteryParticipant> _participantsDbSet;
+
         public LotteryService(IUnitOfWork2 uow,
             IParticipantService participantService,
             IUserService userService,
@@ -276,7 +277,6 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             };
         }
 
-        // something does not work right
         public async Task BuyLotteryTicketsAsync(BuyLotteryTicketsDto buyLotteryTicketsDto, UserAndOrganizationDto userOrg)
         {
             var buyerApplicationUser = await _userService.GetApplicationUserAsync(userOrg.UserId);
@@ -290,10 +290,12 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 
             if (!CanGiftTickets(lotteryDetails))
             {
-                _lotteryValidator.CheckIfReceivingUsersExist(buyLotteryTicketsDto);
+                _lotteryValidator.CheckIfGiftedTicketsReceiversExist(buyLotteryTicketsDto);
             }
 
-            if (CanGiftTickets(lotteryDetails) && IsGiftingTickets(buyLotteryTicketsDto))
+            var isGiftingTickets = buyLotteryTicketsDto.ReceivingUserIds.Any();
+
+            if (CanGiftTickets(lotteryDetails) && isGiftingTickets)
             {
                 _lotteryValidator.CheckIfGiftedTicketLimitIsExceeded(lotteryDetails.Buyer, buyLotteryTicketsDto);
             }
@@ -305,10 +307,9 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 throw new LotteryException("Thanks for trying - you were charged double Kudos for this without getting a ticket.");
             }
 
-            var receiverCount = buyLotteryTicketsDto.ReceivingUserIds.Count();
+            var ticketReceiverCount = isGiftingTickets ? buyLotteryTicketsDto.ReceivingUserIds.Count() : 1;
 
-            var ticketCountMultiplier = receiverCount == 0 ? 1 : receiverCount;
-            var totalTicketCost = lotteryDetails.EntryFee * buyLotteryTicketsDto.Tickets * ticketCountMultiplier;
+            var totalTicketCost = lotteryDetails.EntryFee * buyLotteryTicketsDto.Tickets * ticketReceiverCount;
 
             _lotteryValidator.CheckIfUserHasEnoughKudos(buyerApplicationUser, totalTicketCost);
 
@@ -317,18 +318,18 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 ReceivingUserIds = new List<string> { userOrg.UserId },
                 PointsTypeId = await _kudosService.GetKudosTypeIdAsync(KudosTypeEnum.Minus),
                 MultiplyBy = totalTicketCost,
-                Comment = $"{buyLotteryTicketsDto.Tickets * ticketCountMultiplier} ticket(s) for lottery {lotteryDetails.Title}",
+                Comment = $"{buyLotteryTicketsDto.Tickets * ticketReceiverCount} ticket(s) for lottery {lotteryDetails.Title}",
                 UserId = userOrg.UserId,
                 OrganizationId = userOrg.OrganizationId
             };
 
             await _kudosService.AddLotteryKudosLogAsync(kudosLog, userOrg);
 
-            var ticketOwnerUserIds = buyLotteryTicketsDto.ReceivingUserIds ?? new string[] { userOrg.UserId };
+            var ticketOwnerUserIds = isGiftingTickets ? buyLotteryTicketsDto.ReceivingUserIds : new string[] { userOrg.UserId };
 
             foreach (var ticketOwnerId in ticketOwnerUserIds)
             {
-                AddLotteryTicketsForUser(buyLotteryTicketsDto.LotteryId, ticketOwnerId, userOrg.UserId, ticketCountMultiplier);
+                AddLotteryTicketsForUser(buyLotteryTicketsDto.LotteryId, ticketOwnerId, userOrg.UserId, ticketReceiverCount);
             }
 
             await _uow.SaveChangesAsync(buyerApplicationUser.Id);
@@ -337,10 +338,10 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 
         public async Task<List<LotteryDetailsDto>> GetRunningLotteriesAsync(UserAndOrganizationDto userAndOrganization)
         {
-            return await _lotteriesDbSet.Where(p =>
-                    p.OrganizationId == userAndOrganization.OrganizationId &&
-                    p.Status == LotteryStatus.Started &&
-                    p.EndDate > _systemClock.UtcNow)
+            return await _lotteriesDbSet
+                .Where(p => p.OrganizationId == userAndOrganization.OrganizationId &&
+                            p.Status == LotteryStatus.Started &&
+                            p.EndDate > _systemClock.UtcNow)
                 .Select(MapLotteriesToListItemDto)
                 .OrderBy(lottery => lottery.EndDate)
                 .ToListAsync();
@@ -349,11 +350,6 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
         public async Task<Lottery> GetLotteryByIdAsync(int id, UserAndOrganizationDto userOrg)
         {
             return await _lotteriesDbSet.FirstOrDefaultAsync(FindLotteryById(id, userOrg));
-        }
-
-        private bool IsGiftingTickets(BuyLotteryTicketsDto buyTicketsDto)
-        {
-            return buyTicketsDto.ReceivingUserIds.Length > 0;
         }
 
         private bool CanGiftTickets(LotteryDetailsDto detailsDto)

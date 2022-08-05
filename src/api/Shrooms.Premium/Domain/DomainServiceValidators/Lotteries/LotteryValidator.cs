@@ -7,6 +7,7 @@ using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
 using Shrooms.Premium.Domain.DomainExceptions.Lotteries;
 using System;
 using System.Data.Entity;
+using System.Linq;
 
 namespace Shrooms.Premium.Domain.DomainServiceValidators.Lotteries
 {
@@ -68,13 +69,14 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Lotteries
             CheckIfLotteryEnded(lotteryDto.EndDate, "Lottery can't start in the past.");
         }
 
-        public void CheckIfReceivingUsersExist(BuyLotteryTicketsDto buyLotteryTicketsDto)
+        public void CheckIfGiftedTicketsReceiversExist(BuyLotteryTicketsDto buyLotteryTicketsDto)
         {
-            if (buyLotteryTicketsDto.ReceivingUserIds?.Length != 0)
+            if (buyLotteryTicketsDto.ReceivingUserIds.Any())
             {
                 throw new LotteryException("This lottery does not allow gifting tickets");
             }
         }
+
         public void CheckIfUserHasEnoughKudos(ApplicationUser buyerApplicationUser, int totalTicketCost)
         {
             if (buyerApplicationUser.RemainingKudos < totalTicketCost)
