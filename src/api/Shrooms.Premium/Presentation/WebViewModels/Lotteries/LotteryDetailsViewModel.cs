@@ -26,6 +26,6 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
         
         public bool RefundFailed { get; set; }
 
-        public decimal? RemainingKudos { get; set; }
+        public LotteryDetailsBuyerViewModel Buyer { get; set; }
     }
 }

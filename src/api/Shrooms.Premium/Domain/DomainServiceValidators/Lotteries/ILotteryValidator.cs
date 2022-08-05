@@ -1,13 +1,12 @@
 ﻿using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Lottery;
 using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
-using System.Threading.Tasks;
 
 namespace Shrooms.Premium.Domain.DomainServiceValidators.Lotteries
 {
     public interface ILotteryValidator
     {
-        Task CheckIfGiftedTicketLimitIsExceededAsync(ApplicationUser buyer, LotteryDetailsDto detailsDto, BuyLotteryTicketsDto buyDto);
+        void CheckIfGiftedTicketLimitIsExceeded(LotteryDetailsBuyerDto buyerDto, BuyLotteryTicketsDto buyLotteryDto);
 
         void CheckIfBuyerExists(ApplicationUser applicationUser);
 

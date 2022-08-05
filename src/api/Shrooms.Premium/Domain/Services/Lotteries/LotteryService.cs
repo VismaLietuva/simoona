@@ -94,7 +94,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             await _uow.SaveChangesAsync(false);
         }
 
-        public async Task<LotteryDetailsDto> GetLotteryDetailsAsync(int lotteryId, bool includeRemainingKudos, UserAndOrganizationDto userOrg)
+        public async Task<LotteryDetailsDto> GetLotteryDetailsAsync(int lotteryId, bool includeBuyer, UserAndOrganizationDto userOrg)
         {
             var lottery = await GetLotteryByIdAsync(lotteryId, userOrg);
 
@@ -105,15 +105,31 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 
             var detailsDto = MapLotteryToLotteryDetailsDto(lottery);
 
-            detailsDto.Participants = await _participantsDbSet.CountAsync(p => p.LotteryId == lottery.Id);
+            var allLotteryParticipants = await _participantsDbSet
+                .Include(participant => participant.Lottery)
+                .Where(participant => participant.LotteryId == lotteryId &&
+                                      participant.Lottery.OrganizationId == userOrg.OrganizationId)
+                .ToListAsync();
 
-            if (includeRemainingKudos)
+
+            detailsDto.Participants = allLotteryParticipants.Count;
+
+            if (includeBuyer)
             {
                 var buyerApplicationUser = await _userService.GetApplicationUserAsync(userOrg.UserId);
 
                 _lotteryValidator.CheckIfBuyerExists(buyerApplicationUser);
 
-                detailsDto.RemainingKudos = buyerApplicationUser.RemainingKudos;
+                var previouslyGiftedTicketCount = allLotteryParticipants
+                    .Where(participant => participant.CreatedBy == userOrg.UserId &&
+                                          participant.UserId != userOrg.UserId)
+                    .Count();
+
+                detailsDto.Buyer = new LotteryDetailsBuyerDto
+                {
+                    RemainingGiftedTicketCount = detailsDto.GiftedTicketLimit - previouslyGiftedTicketCount,
+                    RemainingKudos = buyerApplicationUser.RemainingKudos
+                };
             }
 
             return detailsDto;
@@ -260,13 +276,14 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             };
         }
 
+        // something does not work right
         public async Task BuyLotteryTicketsAsync(BuyLotteryTicketsDto buyLotteryTicketsDto, UserAndOrganizationDto userOrg)
         {
             var buyerApplicationUser = await _userService.GetApplicationUserAsync(userOrg.UserId);
 
             _lotteryValidator.CheckIfBuyerExists(buyerApplicationUser);
 
-            var lotteryDetails = await GetLotteryDetailsAsync(buyLotteryTicketsDto.LotteryId, false, userOrg);
+            var lotteryDetails = await GetLotteryDetailsAsync(buyLotteryTicketsDto.LotteryId, true, userOrg);
 
             _lotteryValidator.CheckIfLotteryExists(lotteryDetails);
             _lotteryValidator.CheckIfLotteryEnded(lotteryDetails);
@@ -276,9 +293,9 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 _lotteryValidator.CheckIfReceivingUsersExist(buyLotteryTicketsDto);
             }
 
-            if (CanGiftTickets(lotteryDetails))
+            if (CanGiftTickets(lotteryDetails) && IsGiftingTickets(buyLotteryTicketsDto))
             {
-                await _lotteryValidator.CheckIfGiftedTicketLimitIsExceededAsync(buyerApplicationUser, lotteryDetails, buyLotteryTicketsDto);
+                _lotteryValidator.CheckIfGiftedTicketLimitIsExceeded(lotteryDetails.Buyer, buyLotteryTicketsDto);
             }
 
             if (!_lotteryValidator.IsValidTicketCount(buyLotteryTicketsDto))
@@ -288,7 +305,9 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 throw new LotteryException("Thanks for trying - you were charged double Kudos for this without getting a ticket.");
             }
 
-            var ticketCountMultiplier = buyLotteryTicketsDto.ReceivingUserIds?.Count() ?? 1;
+            var receiverCount = buyLotteryTicketsDto.ReceivingUserIds.Count();
+
+            var ticketCountMultiplier = receiverCount == 0 ? 1 : receiverCount;
             var totalTicketCost = lotteryDetails.EntryFee * buyLotteryTicketsDto.Tickets * ticketCountMultiplier;
 
             _lotteryValidator.CheckIfUserHasEnoughKudos(buyerApplicationUser, totalTicketCost);
@@ -313,6 +332,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             }
 
             await _uow.SaveChangesAsync(buyerApplicationUser.Id);
+            await _kudosService.UpdateProfileKudosAsync(buyerApplicationUser, userOrg);
         }
 
         public async Task<List<LotteryDetailsDto>> GetRunningLotteriesAsync(UserAndOrganizationDto userAndOrganization)
@@ -329,6 +349,11 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
         public async Task<Lottery> GetLotteryByIdAsync(int id, UserAndOrganizationDto userOrg)
         {
             return await _lotteriesDbSet.FirstOrDefaultAsync(FindLotteryById(id, userOrg));
+        }
+
+        private bool IsGiftingTickets(BuyLotteryTicketsDto buyTicketsDto)
+        {
+            return buyTicketsDto.ReceivingUserIds.Length > 0;
         }
 
         private bool CanGiftTickets(LotteryDetailsDto detailsDto)

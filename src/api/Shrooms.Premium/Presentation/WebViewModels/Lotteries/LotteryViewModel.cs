@@ -1,10 +1,10 @@
-﻿using System;
-using Shrooms.Contracts.Enums;
+﻿using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models.Lottery;
+using System;
 
-namespace Shrooms.Premium.DataTransferObjects.Models.Lotteries
+namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
 {
-    public class LotteryDto
+    public class LotteryViewModel
     {
         public int Id { get; set; }
 

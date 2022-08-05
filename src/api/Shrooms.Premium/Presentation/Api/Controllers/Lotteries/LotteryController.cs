@@ -64,9 +64,9 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
         [HttpGet]
         [Route("{id}/Details")]
-        public async Task<IHttpActionResult> GetLottery(int id, bool includeRemainingKudos = false)
+        public async Task<IHttpActionResult> GetLottery(int id, bool includeBuyer = false)
         {
-            var lottery = await _lotteryService.GetLotteryDetailsAsync(id, includeRemainingKudos, GetUserAndOrganization());
+            var lottery = await _lotteryService.GetLotteryDetailsAsync(id, includeBuyer, GetUserAndOrganization());
 
             if (lottery == null)
             {
@@ -81,7 +81,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
         [HttpPost]
         [Route("Create")]
         [InvalidateCacheOutput("Get", typeof(LotteryWidgetController))]
-        public async Task<IHttpActionResult> CreateLottery(CreateLotteryViewModel lotteryViewModel)
+        public async Task<IHttpActionResult> CreateLottery(CreateLotteryViewModel createViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -90,11 +90,13 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
             try
             {
-                var createLotteryDto = _mapper.Map<CreateLotteryViewModel, LotteryDto>(lotteryViewModel);
+                var createLotteryDto = _mapper.Map<CreateLotteryViewModel, LotteryDto>(createViewModel);
                 
-                await _lotteryService.CreateLotteryAsync(createLotteryDto, GetUserAndOrganization());
+                var lotteryDto = await _lotteryService.CreateLotteryAsync(createLotteryDto, GetUserAndOrganization());
                 
-                return Ok();
+                var lotteryViewModel = _mapper.Map<LotteryDto, LotteryViewModel>(lotteryDto);
+
+                return Ok(lotteryViewModel);
             }
             catch (LotteryException e)
             {
@@ -178,7 +180,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
 
                 await _lotteryService.EditDraftedLotteryAsync(editDraftedLotteryDto, GetUserAndOrganization());
 
-                return Ok();
+                return Ok(editLotteryViewModel);
             }
             catch (LotteryException e)
             {
@@ -199,11 +201,10 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
             try
             {
                 var editStartedLotteryDto = _mapper.Map<EditStartedLotteryViewModel, EditStartedLotteryDto>(editLotteryViewModel);
-                SetOrganizationAndUser(editStartedLotteryDto);
 
                 await _lotteryService.EditStartedLotteryAsync(editStartedLotteryDto, GetUserAndOrganization());
 
-                return Ok();
+                return Ok(editLotteryViewModel);
             }
             catch (LotteryException e)
             {

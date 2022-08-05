@@ -355,6 +355,7 @@
     <Compile Include="DataTransferObjects\Models\LazyPaged\ILazyPaged.cs" />
     <Compile Include="DataTransferObjects\Models\LazyPaged\LazyPaged.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\BuyLotteryTicketsDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Lotteries\LotteryDetailsBuyerDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\EditStartedLotteryDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryDetailsDto.cs" />
@@ -580,9 +581,11 @@
     <Compile Include="Presentation\WebViewModels\Lotteries\CreateLotteryViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Lotteries\EditDraftedLotteryViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Lotteries\EditStartedLotteryViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Lotteries\LotteryDetailsBuyerViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Lotteries\LotteryDetailsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Lotteries\LotteryListingArgsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Lotteries\LotteryParticipantViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Lotteries\LotteryViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Lotteries\LotteryWidgetViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Map\MapAllFloorsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Map\MapApplicationUserViewModel.cs" />

@@ -7,45 +7,30 @@ using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
 using Shrooms.Premium.Domain.DomainExceptions.Lotteries;
 using System;
 using System.Data.Entity;
-using System.Threading.Tasks;
 
 namespace Shrooms.Premium.Domain.DomainServiceValidators.Lotteries
 {
     public class LotteryValidator : ILotteryValidator
     {
-        private readonly IDbSet<LotteryParticipant> _lotteryParticipantsDbSet;
-
         private readonly ISystemClock _systemClock;
 
-        public LotteryValidator(ISystemClock systemClock, IUnitOfWork2 uow)
+        public LotteryValidator(ISystemClock systemClock)
         {
             _systemClock = systemClock;
-            _lotteryParticipantsDbSet = uow.GetDbSet<LotteryParticipant>();
         }
 
-        public async Task CheckIfGiftedTicketLimitIsExceededAsync(ApplicationUser buyer, LotteryDetailsDto detailsDto, BuyLotteryTicketsDto buyDto)
+        public void CheckIfGiftedTicketLimitIsExceeded(LotteryDetailsBuyerDto buyerDto, BuyLotteryTicketsDto buyLotteryDto)
         {
-            var totalTicketCount = buyDto.ReceivingUserIds.Length * buyDto.Tickets;
-            
-            var exception = new LotteryException($"Cannot gift more than {detailsDto.GiftedTicketLimit} tickets");
-
-            if (detailsDto.GiftedTicketLimit < totalTicketCount)
+            if (buyerDto.RemainingGiftedTicketCount == 0)
             {
-                throw exception;
+                throw new LotteryException($"Reached ticket limit");
             }
 
-            // Add participant collection to lottery?
-            var previouslyBoughtTicketCount = await _lotteryParticipantsDbSet
-                .Include(participant => participant.Lottery)
-                .CountAsync(participant => participant.LotteryId == detailsDto.Id &&
-                                           participant.Lottery.OrganizationId == buyer.OrganizationId &&
-                                           participant.CreatedBy == buyer.Id);
+            var totalTicketCount = buyLotteryDto.ReceivingUserIds.Length * buyLotteryDto.Tickets;
 
-            totalTicketCount += previouslyBoughtTicketCount;
-
-            if (detailsDto.GiftedTicketLimit < totalTicketCount)
+            if (buyerDto.RemainingGiftedTicketCount < totalTicketCount)
             {
-                throw exception;
+                throw new LotteryException($"Can only gift {buyerDto.RemainingGiftedTicketCount} tickets");
             }
         }
 

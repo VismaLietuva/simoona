@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Annotations;
 using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models.Lottery;
 
@@ -26,6 +27,7 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Lotteries
 
         public int GiftedTicketLimit { get; set; }
 
-        public decimal? RemainingKudos { get; set; }
+        [CanBeNull]
+        public LotteryDetailsBuyerDto Buyer { get; set; }
     }
 }
