@@ -147,7 +147,7 @@ namespace Shrooms.DataLayer.EntityModels.Models
         {
             get
             {
-                return BlacklistEntries.Any(entry => entry.Status != BlacklistStatus.Active);
+                return BlacklistEntries != null && BlacklistEntries.Any(entry => entry.Status != BlacklistStatus.Active);
             }
         }
 
