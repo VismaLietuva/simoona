@@ -52,6 +52,7 @@
     "refundFailedMessage": "System failed to refund users after aborting the lottery, you should start worrying about it.<br>First step you should take is to try refunding them again. You can do it by pressing the button below.",
     "startedRefunding": "Refund for lottery started!",
     "hasBeenBought": "Successfully bought {{ one }} tickets for \"{{ two }}\" lottery!",
+    "hasBeenGifted": "Successfully gifted {{ one }} tickets for \"{{ two }}\" lottery!",
     "invalidTicketNumber": "Invalid ticket count!",
     "cancel": "Return to lottery list",
     "lotteryStatsModalName": "Lottery statistics",
@@ -64,5 +65,7 @@
     "allowGiftingTickets": "Tickets may be gifted",
     "giftedTicketLimit": "Ticket limit",
     "addPeople": "Add people...",
-    "giftTickets": "Gift"
+    "giftTickets": "Gift",
+    "kudosAfterPurchase": "Kudos after purchase",
+    "remainingGiftedTicketCount": "You can gift <b>{{one}}</b> tickets"
 }

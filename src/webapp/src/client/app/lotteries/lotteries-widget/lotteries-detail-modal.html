@@ -67,8 +67,8 @@
                         <button type="button" ng-click="vm.buyTickets()" ng-disabled="!vm.canBuyTickets()"
                             class="btn btn-primary"><span translate="lotteries.buy"></span></button>
 
-                        <button type="button" ng-if="!vm.selectingUsers && vm.lottery.canGiftTickets" ng-click="vm.toggleUserSelection()"
-                            ng-disabled="!vm.canBuyTickets()" class="btn btn-info">
+                        <button type="button" ng-if="!vm.selectingUsers && vm.lottery.canGiftTickets"
+                            ng-click="vm.toggleUserSelection()" ng-disabled="!vm.canBuyTickets()" class="btn btn-info">
                             <span class="glyphicon glyphicon-gift"></span>
                             <span translate="lotteries.giftTickets"></span>
                         </button>
@@ -83,32 +83,37 @@
                         <label class><span translate="lotteries.totalCost"></span>
                             <b>{{vm.getTotalCost()}}</b></label>
                     </div>
+                    <div class="lottery-detail-modal-remaining-kudos">
+                        <label class><span translate="lotteries.kudosAfterPurchase"></span>
+                            <b>{{vm.getKudosAfterPurchase()}}</b></label>
+                    </div>
                 </div>
             </div>
 
-            <div class="row" ng-if="vm.selectingUsers">
-                <div class="col-sm-9">
-                    <tags-input class="mb-10" id="selectedUsers" name="selectedUsers" ng-model="vm.selectedUsers"
-                        add-from-autocomplete-only="true" display-property="fullName" add-on-enter="true"
-                        add-on-space="true" add-on-comma="true"
-                        ng-attr-placeholder="{{'lotteries.addPeople' | translate}}" replace-spaces-with-dashes="false"
-                        add-on-blur="true" wrapped>
-                        <auto-complete source="vm.getUsers($query)" min-length="1" max-results-to-show="5"
-                            debounce-delay="500"></auto-complete>
-                    </tags-input>
-                </div>
+            <div ng-if="vm.selectingUsers" class="lottery-gifting-user-selection-container">
+                <tags-input class="mb-3" id="selectedUsers" name="selectedUsers" ng-model="vm.selectedUsers"
+                    add-from-autocomplete-only="true" display-property="fullName" add-on-enter="true"
+                    add-on-space="true" add-on-comma="true" ng-attr-placeholder="{{'lotteries.addPeople' | translate}}"
+                    replace-spaces-with-dashes="false" add-on-blur="true" wrapped>
+                    <auto-complete source="vm.getUsers($query)" min-length="1" max-results-to-show="5"
+                        debounce-delay="500"></auto-complete>
+                </tags-input>
 
-                <div class="col-sm-3">
-                    <button ng-disabled="form.$invalid || vm.selectedUsers.length === 0" type="button" ng-click="vm.giftTickets()" class="btn btn-primary pull-right mt-2">
-                        <span class="glyphicon glyphicon-gift"></span>
-                        <span translate="common.confirm"></span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="lotteries-detail-modal-description-seperator hidden-xs">
+                <button ng-disabled="form.$invalid || !vm.canGiftTickets()" type="button" ng-click="vm.giftTickets()"
+                    class="btn btn-primary pull-right mt-2">
+                    <span class="glyphicon glyphicon-gift"></span>
+                    <span translate="common.confirm"></span>
+                </button>
             </div>
         </div>
+
+        <div ng-if="vm.selectingUsers">
+            <span translate="lotteries.remainingGiftedTicketCount" translate-values="{one: vm.getRemainingGiftedTicketCount()}"></span>
+        </div>
+
+        <div class="lotteries-detail-modal-description-seperator hidden-xs">
+        </div>
+
         <div class="lottery-end-date-component">
             <label><span translate="lotteries.endDate"></span>
                 <b>{{vm.lottery.endDate | convertToCurrentTimezone | date:'yyyy-MM-dd, HH:mm'}}</b></label>

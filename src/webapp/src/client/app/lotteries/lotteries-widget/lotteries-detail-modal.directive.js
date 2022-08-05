@@ -63,7 +63,6 @@
         'profileRepository',
     ];
 
-    // TODO: add remaining kudos count ?
     function lotteriesDetailController(
         $uibModalInstance,
         lotteryRepository,
@@ -94,25 +93,34 @@
         vm.buyTickets = buyTickets;
         vm.giftTickets = giftTickets;
         vm.canBuyTickets = canBuyTickets;
+        vm.canGiftTickets = canGiftTickets;
         vm.toggleUserSelection = toggleUserSelection;
         vm.cancelGiftingProcess = cancelGiftingProcess;
         vm.getTotalCost = getTotalCost;
+        vm.getKudosAfterPurchase = getKudosAfterPurchase;
+        vm.getRemainingGiftedTicketCount = getRemainingGiftedTicketCount;
 
         vm.getUsers = getUsers;
+
         vm.selectingUsers = false;
         vm.selectedUsers = [];
 
         if ($window.lotteriesEnabled) {
             init();
         }
-
+        // TODO: add validation message
+        // TODO: fix ticket count validation
         function init() {
             lotteryRepository
                 .getLottery(currentLottery, {
-                    includeRemainingKudos: true,
+                    includeBuyer: true,
                 })
                 .then(function (lottery) {
                     vm.lottery = lottery;
+                    vm.lottery.canGiftTickets =
+                        vm.lottery.giftedTicketLimit > 0 &&
+                        vm.lottery.buyer.remainingGiftedTicketCount > 0;
+
                     vm.lotteryLoaded = true;
                 });
         }
@@ -133,27 +141,27 @@
 
         function buyTickets() {
             if (vm.ticketCount > 0) {
+                var giftingTickets = vm.selectedUsers.length !== 0;
+
                 var lotteryTickets = {
                     lotteryId: currentLottery,
                     tickets: vm.ticketCount,
-                    receivingUserIds:
-                        vm.selectedUsers.length !== 0
-                            ? vm.selectedUsers.map((user) => user.id)
-                            : undefined,
+                    receivingUserIds: giftingTickets
+                        ? vm.selectedUsers.map((user) => user.id)
+                        : undefined,
                 };
 
                 lotteryRepository.buyTickets(lotteryTickets).then(
                     function () {
+                        var translation = giftingTickets
+                            ? 'lotteries.hasBeenGifted'
+                            : 'lotteries.hasBeenBought';
+
                         vm.notifySrv.success(
-                            vm.localeSrv.formatTranslation(
-                                'lotteries.hasBeenBought',
-                                {
-                                    one:
-                                        vm.ticketCount *
-                                        getTicketReceiversCount(),
-                                    two: vm.lottery.title,
-                                }
-                            )
+                            vm.localeSrv.formatTranslation(translation, {
+                                one: vm.ticketCount * getTicketReceiversCount(),
+                                two: vm.lottery.title,
+                            })
                         );
                         $uibModalInstance.close();
                     },
@@ -175,7 +183,19 @@
         }
 
         function canBuyTickets() {
-            return vm.ticketCount > 0 && !vm.selectingUsers;
+            return (
+                vm.ticketCount > 0 &&
+                !vm.selectingUsers &&
+                getKudosAfterPurchase() >= 0
+            );
+        }
+
+        function canGiftTickets() {
+            return (
+                vm.selectedUsers.length > 0 &&
+                getKudosAfterPurchase() >= 0 &&
+                getRemainingGiftedTicketCount() >= 0
+            );
         }
 
         function toggleUserSelection() {
@@ -198,9 +218,37 @@
         }
 
         function getTotalCost() {
+            if (!vm.lottery) {
+                return 0;
+            }
+
             return (
                 vm.lottery.entryFee * vm.ticketCount * getTicketReceiversCount()
             );
+        }
+
+        function getKudosAfterPurchase() {
+            if (!vm.lottery) {
+                return 0;
+            }
+
+            return vm.lottery.buyer.remainingKudos - getTotalCost();
+        }
+
+        function getRemainingGiftedTicketCount() {
+            if (!vm.lottery) {
+                return 0;
+            }
+
+            var remainingGiftedTicketCount =
+                vm.lottery.buyer.remainingGiftedTicketCount -
+                vm.ticketCount * getTicketReceiversCount();
+
+            if (remainingGiftedTicketCount < 0) {
+                return 0;
+            }
+
+            return remainingGiftedTicketCount;
         }
     }
 })();
