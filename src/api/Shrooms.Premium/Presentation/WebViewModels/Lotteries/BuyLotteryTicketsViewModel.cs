@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes;
+using System.ComponentModel.DataAnnotations;
 
 namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
 {
@@ -11,6 +12,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
         public int? Tickets { get; set; }
 
         [MinLength(1)]
+        [NoDuplicatesInCollection]
         public string[] ReceivingUserIds { get; set; }
     }
 }
