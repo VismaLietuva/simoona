@@ -8,6 +8,7 @@ using Shrooms.Premium.Domain.DomainExceptions.Lotteries;
 using System;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Shrooms.Premium.Domain.DomainServiceValidators.Lotteries
 {
@@ -15,9 +16,25 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Lotteries
     {
         private readonly ISystemClock _systemClock;
 
-        public LotteryValidator(ISystemClock systemClock)
+        private readonly DbSet<ApplicationUser> _usersDbSet;
+
+        public LotteryValidator(ISystemClock systemClock, IUnitOfWork2 uow)
         {
             _systemClock = systemClock;
+            
+            _usersDbSet = uow.GetDbSet<ApplicationUser>();
+        }
+        
+        public async Task CheckIfGiftReceiversExistAsync(BuyLotteryTicketsDto buyTicketsDto)
+        {
+            var foundUserCount = await _usersDbSet
+                .Where(user => buyTicketsDto.ReceivingUserIds.Contains(user.Id))
+                .CountAsync();
+
+            if (foundUserCount != buyTicketsDto.ReceivingUserIds.Length)
+            {
+                throw new LotteryException("Provided receivers were not found");
+            }
         }
 
         public void CheckIfGiftedTicketLimitIsExceeded(LotteryDetailsBuyerDto buyerDto, BuyLotteryTicketsDto buyLotteryDto)

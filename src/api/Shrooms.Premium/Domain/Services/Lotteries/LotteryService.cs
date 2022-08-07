@@ -298,6 +298,8 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             if (CanGiftTickets(lotteryDetails) && isGiftingTickets)
             {
                 _lotteryValidator.CheckIfGiftedTicketLimitIsExceeded(lotteryDetails.Buyer, buyLotteryTicketsDto);
+
+                await _lotteryValidator.CheckIfGiftReceiversExistAsync(buyLotteryTicketsDto);
             }
 
             if (!_lotteryValidator.IsValidTicketCount(buyLotteryTicketsDto))
@@ -313,12 +315,14 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 
             _lotteryValidator.CheckIfUserHasEnoughKudos(buyerApplicationUser, totalTicketCost);
 
+            var totalBoughtTicketCount = buyLotteryTicketsDto.Tickets * ticketReceiverCount;
+
             var kudosLog = new AddKudosLogDto
             {
                 ReceivingUserIds = new List<string> { userOrg.UserId },
                 PointsTypeId = await _kudosService.GetKudosTypeIdAsync(KudosTypeEnum.Minus),
                 MultiplyBy = totalTicketCost,
-                Comment = $"{buyLotteryTicketsDto.Tickets * ticketReceiverCount} ticket(s) for lottery {lotteryDetails.Title}",
+                Comment = $"{totalBoughtTicketCount} ticket(s) for lottery {lotteryDetails.Title}",
                 UserId = userOrg.UserId,
                 OrganizationId = userOrg.OrganizationId
             };
@@ -329,7 +333,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 
             foreach (var ticketOwnerId in ticketOwnerUserIds)
             {
-                AddLotteryTicketsForUser(buyLotteryTicketsDto.LotteryId, ticketOwnerId, userOrg.UserId, ticketReceiverCount);
+                AddLotteryTicketsForUser(buyLotteryTicketsDto.LotteryId, ticketOwnerId, userOrg.UserId, totalBoughtTicketCount);
             }
 
             await _uow.SaveChangesAsync(buyerApplicationUser.Id);
