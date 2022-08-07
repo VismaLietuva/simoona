@@ -606,6 +606,7 @@
     <Compile Include="Presentation\WebViewModels\User\EventUserSearchResultViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Vacations\VacationAvailableDaysViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Vacations\VacationViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\ValidationAttributes\NoDuplicatesInCollectionAttribute.cs" />
     <Compile Include="Presentation\WebViewModels\ValidationAttributes\DateTimeGreaterThanPresentDateAttribute.cs" />
     <Compile Include="Presentation\WebViewModels\ValidationAttributes\DateTimeLessThanDateTimeAttribute.cs" />
     <Compile Include="Presentation\WebViewModels\ValidationAttributes\DateTimeLessThanPresentDateAttribute.cs" />
