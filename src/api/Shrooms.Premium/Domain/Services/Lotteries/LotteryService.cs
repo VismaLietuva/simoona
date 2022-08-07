@@ -299,7 +299,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             {
                 _lotteryValidator.CheckIfGiftedTicketLimitIsExceeded(lotteryDetails.Buyer, buyLotteryTicketsDto);
 
-                await _lotteryValidator.CheckIfGiftReceiversExistAsync(buyLotteryTicketsDto);
+                await _lotteryValidator.CheckIfGiftReceiversExistAsync(buyLotteryTicketsDto, userOrg);
             }
 
             if (!_lotteryValidator.IsValidTicketCount(buyLotteryTicketsDto))
@@ -333,7 +333,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 
             foreach (var ticketOwnerId in ticketOwnerUserIds)
             {
-                AddLotteryTicketsForUser(buyLotteryTicketsDto.LotteryId, ticketOwnerId, userOrg.UserId, totalBoughtTicketCount);
+                AddLotteryTicketsForUser(buyLotteryTicketsDto.LotteryId, ticketOwnerId, userOrg.UserId, buyLotteryTicketsDto.Tickets);
             }
 
             await _uow.SaveChangesAsync(buyerApplicationUser.Id);

@@ -1,4 +1,5 @@
 ﻿using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -25,15 +26,22 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Lotteries
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
         }
         
-        public async Task CheckIfGiftReceiversExistAsync(BuyLotteryTicketsDto buyTicketsDto)
+        public async Task CheckIfGiftReceiversExistAsync(BuyLotteryTicketsDto buyTicketsDto, UserAndOrganizationDto userOrg)
         {
-            var foundUserCount = await _usersDbSet
-                .Where(user => buyTicketsDto.ReceivingUserIds.Contains(user.Id))
-                .CountAsync();
+            var userIds = await _usersDbSet
+                .Where(user => buyTicketsDto.ReceivingUserIds.Contains(user.Id) &&
+                               user.OrganizationId == userOrg.OrganizationId)
+                .Select(user => user.Id)
+                .ToListAsync();
 
-            if (foundUserCount != buyTicketsDto.ReceivingUserIds.Length)
+            if (userIds.Count != buyTicketsDto.ReceivingUserIds.Length)
             {
                 throw new LotteryException("Provided receivers were not found");
+            }
+
+            if (userIds.Contains(userOrg.UserId))
+            {
+                throw new LotteryException("Cannot gift tickets to yourself");
             }
         }
 
