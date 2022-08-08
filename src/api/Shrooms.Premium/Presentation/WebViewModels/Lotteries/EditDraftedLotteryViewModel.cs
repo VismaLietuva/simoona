@@ -1,8 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models.Lottery;
+using Shrooms.Premium.Constants;
 using Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes;
 
 namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
@@ -19,7 +19,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
         [EnumDataType(typeof(LotteryStatus))]
         public LotteryStatus? Status { get; set; }
 
-        [StringLength(ValidationConstants.MaxPostMessageBodyLength)] // change constnant?
+        [StringLength(ValidationConstants.LotteryDescriptionMaxLength)]
         public string Description { get; set; }
         
         [Required]

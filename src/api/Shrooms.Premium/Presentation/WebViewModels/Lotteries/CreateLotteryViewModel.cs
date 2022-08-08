@@ -1,8 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models.Lottery;
+using Shrooms.Premium.Constants;
 using Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes;
 using Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes.Lotteries;
 
@@ -13,7 +13,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
         [Required]
         public string Title { get; set; }
         
-        [StringLength(ValidationConstants.MaxPostMessageBodyLength)]
+        [StringLength(ValidationConstants.LotteryDescriptionMaxLength)]
         public string Description { get; set; }
         
         [Required]
