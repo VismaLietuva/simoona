@@ -68,5 +68,6 @@
     "giftTickets": "Gift",
     "kudosAfterPurchase": "Kudos after purchase",
     "remainingGiftedTicketCount": "You can gift <b>{{one}}</b> tickets",
-    "lotteryGiftedTicketCountExceeded": "Exceeded the ticket limit"
+    "lotteryGiftedTicketCountExceeded": "Exceeded the ticket limit",
+    "successDelete": "Successfully started refund process"
 }
