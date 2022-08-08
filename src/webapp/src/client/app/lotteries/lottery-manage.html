@@ -63,7 +63,7 @@
                             <div class="date-field">
                                 <input type="text" name="endDateInput" id="endDateInput" class="hasDatepicker"
                                     uib-datepicker-popup="yyyy-MM-dd" popup-placement="bottom"
-                                    datepicker-options="{ startingDay: 1 }" ng-model="vm.lottery.endDate"
+                                    ng-model="vm.lottery.endDate" datepicker-options="vm.datePicker.options"
                                     is-open="vm.datePicker.isOpen" ng-required="true"
                                     ng-click="vm.openDatePicker($event, 'isOpen')"
                                     ng-disabled="vm.isPrimaryEditDisabled" />
@@ -133,16 +133,15 @@
                         <label class="control-label col-xs-12 col-sm-4"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
                             <input id="moreOptions" type="checkbox" class="lottery-form-checkbox"
-                                ng-model="vm.allowGiftedTicketLimit"
-                                ng-disabled="vm.isPrimaryEditDisabled" />
+                                ng-model="vm.allowGiftedTicketLimit" ng-disabled="vm.isPrimaryEditDisabled" />
                             <label for="moreOptions" class="control-label"
                                 translate="lotteries.allowGiftingTickets"></label>
                         </div>
                     </div>
-                    <div class="form-group required"
-                        ng-if="vm.allowGiftedTicketLimit"
+                    <div class="form-group required" ng-if="vm.allowGiftedTicketLimit"
                         ng-class="{'has-error': lotteryForm.giftedTicketLimit.$invalid && lotteryForm.giftedTicketLimit.$dirty}">
-                        <label for="giftedTicketLimit" class="control-label col-xs-12 col-sm-4" translate="lotteries.giftedTicketLimit">
+                        <label for="giftedTicketLimit" class="control-label col-xs-12 col-sm-4"
+                            translate="lotteries.giftedTicketLimit">
                         </label>
                         <div class="col-xs-12 col-sm-4">
                             <input id="giftedTicketLimit" type="number" class="form-control" name="giftedTicketLimit"

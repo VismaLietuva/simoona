@@ -31,7 +31,11 @@
         };
 
         vm.datePicker = {
-            isOpen: false
+            isOpen: false,
+            options: {
+                minDate: moment().local().startOf('days').toDate(),
+                startingDay: 1
+            }
         };
 
         vm.states = {
