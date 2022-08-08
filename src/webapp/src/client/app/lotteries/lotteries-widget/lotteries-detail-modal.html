@@ -56,14 +56,14 @@
                             <div class="input-group">
                                 <span class="input-group-btn">
                                     <button type="button" class="btn btn-default btn-number" ng-click="vm.ticketDown()"
-                                        data-type="minus" data-field="quant[1]">
+                                        data-type="minus" data-field="quant[1]" ng-disabled="vm.selectingUsers">
                                         <span class="glyphicon glyphicon-minus"></span>
                                     </button>
                                 </span>
-                                <input type="number" name="quant[1]" class="form-control input-number"
+                                <input ng-disabled="vm.selectingUsers" type="number" name="quant[1]" class="form-control input-number"
                                     ng-model="vm.ticketCount" min="1" max="100">
                                 <span class="input-group-btn">
-                                    <button type="button" ng-click="vm.ticketUp()" class="btn btn-default btn-number"
+                                    <button type="button" ng-click="vm.ticketUp()" ng-disabled="vm.selectingUsers" class="btn btn-default btn-number"
                                         data-type="plus" data-field="quant[1]">
                                         <span class="glyphicon glyphicon-plus"></span>
                                     </button>
@@ -98,7 +98,10 @@
             </div>
 
             <div ng-if="vm.selectingUsers" class="lottery-gifting-user-selection-container mt-10">
-                <tags-input class="mb-3" id="selectedUsers" name="selectedUsers" ng-model="vm.selectedUsers"
+
+                <ace-gift-ticket-list class="" selected-users="vm.selectedUsers"></ace-gift-ticket-list>
+
+                <tags-input tag-class="{ 'hidden' : true }" class="mb-3 border-none" id="selectedUsers" name="selectedUsers" ng-model="vm.selectedUsers"
                     add-from-autocomplete-only="true" display-property="fullName" add-on-enter="true"
                     add-on-space="true" add-on-comma="true" ng-attr-placeholder="{{'lotteries.addPeople' | translate}}"
                     replace-spaces-with-dashes="false" add-on-blur="true" wrapped>
@@ -138,3 +141,8 @@
         <span translate="common.cancel"></span>
     </button>
 </div>
+<style>
+    .border-none .tags {
+        border: none !important;
+    }
+</style>

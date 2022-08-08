@@ -1,0 +1,98 @@
+ <!-- TODO: make sure mobile works (: -->
+<div class="lottery-gift-container">
+    <!-- Header -->
+    <!-- TODO: add translations -->
+    <div class="row m-0 lottery-gift-header-row hidden-xs" ng-if="vm.selectedUsers.length > 0">
+        <div class="col-sm-8 lottery-gift-header-col">
+            <span>Vardas</span>
+        </div>
+
+        <div class="col-sm-2 lottery-gift-header-col lottery-gift-center">
+            <span>Kiekis</span>
+        </div>
+
+        <div class="col-sm-2 lottery-gift-header-col">
+            <span>Veiksmas</span>
+        </div>
+    </div>
+    <!-- Content -->
+    <div class="row lottery-gift-row m-0" ng-repeat="user in vm.selectedUsers">
+        <div class="col-sm-8 lottery-gift-col">
+            <div class="lottery-gift-name">
+                <div class="lottery-gift-icon-container">
+                    <span class="glyphicon glyphicon-gift lottery-gift-icon"></span>
+                </div>
+                <span class="ml-5">{{user.fullName}}</span>
+            </div>
+        </div>
+
+        <div class="col-sm-2 lottery-gift-col lottery-gift-input-container">
+            <!-- TODO: add picker -->
+            <a>-</a>
+                <input type="text">
+            <a>+</a>
+        </div>
+
+        <div class="col-sm-2 lottery-gift-col lottery-gift-center">
+            <a ng-click="vm.deleteLink($index)" data-test-id="delete-external-link" translate-attr-title="common.delete" translate>
+                <span class="vismaicon vismaicon-delete"></span>
+            </a>
+        </div>
+    </div>
+
+    <style>
+        .lottery-gift-name {
+            display: flex;
+            align-items: center;
+        }
+
+        .lottery-gift-input-container {
+            display: flex;
+        }
+
+        .lottery-gift-header-col {
+            padding: 16px;
+            font-weight: bold;
+            color:#0974b3;
+        }
+
+        .lottery-gift-header-row {
+            border-top: 1px solid #f2f2f2;
+        }
+
+        .lottery-gift-row {
+            background: #fff;
+            border-radius: 2px;
+            box-shadow: 0 1px 1px rgb(0 0 0 / 5%), 0 1px 1px rgb(0 0 0 / 10%);
+            transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+            margin-bottom: 6px !important;
+            padding-top: 13px;
+            padding-bottom: 4px;
+        }
+
+        .lottery-gift-row:hover {
+            box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+        }
+
+        .lottery-gift-container {
+            box-sizing: border-box !important;
+        }
+
+        .lottery-gift-icon {
+            color: white;
+            margin-left: 5.5px;
+            margin-top: 2px;
+        }
+
+        .lottery-gift-icon-container {
+            background-color: #0974b3;
+            border-radius: 50px;
+            width: 25px;
+            height: 25px;
+        }
+
+        .lottery-gift-center {
+            text-align: center;
+        }
+    </style>
+</div>
