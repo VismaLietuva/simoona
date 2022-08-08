@@ -15,8 +15,8 @@ namespace Shrooms.Premium.IoC.Modules
                 .InstancePerRequest()
                 .EnableInterfaceTelemetryInterceptor();
 
-            builder.RegisterType<ParticipantService>()
-                .As<IParticipantService>()
+            builder.RegisterType<LotteryParticipantService>()
+                .As<ILotteryParticipantService>()
                 .InstancePerRequest()
                 .EnableInterfaceTelemetryInterceptor();
 

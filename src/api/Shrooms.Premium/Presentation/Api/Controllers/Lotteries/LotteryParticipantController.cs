@@ -16,10 +16,10 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
     [RoutePrefix("Lottery")]
     public class LotteryParticipantController : BaseController
     {
-        private readonly IParticipantService _participantService;
+        private readonly ILotteryParticipantService _participantService;
         private readonly IMapper _mapper;
 
-        public LotteryParticipantController(IParticipantService participantService, IMapper mapper)
+        public LotteryParticipantController(ILotteryParticipantService participantService, IMapper mapper)
         {
             _participantService = participantService;
             _mapper = mapper;

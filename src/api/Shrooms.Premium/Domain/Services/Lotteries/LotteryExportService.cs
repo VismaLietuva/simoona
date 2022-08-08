@@ -13,9 +13,9 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
     public class LotteryExportService : ILotteryExportService
     {
         private readonly IExcelBuilderFactory _excelBuilderFactory;
-        private readonly IParticipantService _participantService;
+        private readonly ILotteryParticipantService _participantService;
 
-        public LotteryExportService(IExcelBuilderFactory excelBuilderFactory, IParticipantService participantService)
+        public LotteryExportService(IExcelBuilderFactory excelBuilderFactory, ILotteryParticipantService participantService)
         {
             _excelBuilderFactory = excelBuilderFactory;
             _participantService = participantService;

@@ -25,7 +25,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
     {
         private readonly IUnitOfWork2 _uow;
         private readonly IAsyncRunner _asyncRunner;
-        private readonly IParticipantService _participantService;
+        private readonly ILotteryParticipantService _participantService;
         private readonly IUserService _userService;
         private readonly IKudosService _kudosService;
         private readonly ISystemClock _systemClock;
@@ -35,7 +35,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
         private readonly DbSet<LotteryParticipant> _participantsDbSet;
 
         public LotteryService(IUnitOfWork2 uow,
-            IParticipantService participantService,
+            ILotteryParticipantService participantService,
             IUserService userService,
             IKudosService kudosService,
             IAsyncRunner asyncRunner,

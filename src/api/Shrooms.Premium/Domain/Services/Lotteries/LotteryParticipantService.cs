@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Lottery;
 using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
@@ -12,11 +13,11 @@ using X.PagedList;
 
 namespace Shrooms.Premium.Domain.Services.Lotteries
 {
-    public class ParticipantService : IParticipantService
+    public class LotteryParticipantService : ILotteryParticipantService
     {
         private readonly IDbSet<LotteryParticipant> _participantsDbSet;
 
-        public ParticipantService(IUnitOfWork2 unitOfWork)
+        public LotteryParticipantService(IUnitOfWork2 unitOfWork)
         {
             _participantsDbSet = unitOfWork.GetDbSet<LotteryParticipant>();
         }
@@ -42,12 +43,28 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             return await filteredParticipants.ToPagedListAsync(page, pageSize);
         }
 
+        public async Task<IList<LotteryRefundParticipantDto>> GetParticipantsGroupedByBuyerIdAsync(int lotteryId, UserAndOrganizationDto userOrg)
+        {
+            return await _participantsDbSet
+                .Include(participant => participant.Lottery)
+                .Where(participant => participant.LotteryId == lotteryId &&
+                                      participant.Lottery.OrganizationId == userOrg.OrganizationId)
+                .GroupBy(participant => participant.CreatedBy)
+                .Select(group => new LotteryRefundParticipantDto
+                {
+                    BuyerId = group.Key,
+                    FullName = group.FirstOrDefault().User.FirstName + " " + group.FirstOrDefault().User.LastName,
+                    Tickets = group.Count()
+                })
+                .ToListAsync();
+        }
+
         private Expression<Func<IGrouping<ApplicationUser, LotteryParticipant>, LotteryParticipantDto>> MapToParticipantDto =>
             group => new LotteryParticipantDto
             {
                 UserId = group.Key.Id,
                 FullName = group.Key.FirstName + " " + group.Key.LastName,
-                Tickets = group.Distinct().Count()
+                Tickets = group.Distinct().Count(),
             };
     }
 }

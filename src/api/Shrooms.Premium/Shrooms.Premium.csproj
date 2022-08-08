@@ -361,6 +361,7 @@
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryDetailsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryListingArgsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryParticipantDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Lotteries\LotteryRefundParticipantDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryStartedEmailDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryStartedEmailUserInfoDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryStatsDto.cs" />
@@ -434,11 +435,11 @@
     <Compile Include="Domain\Services\Lotteries\ILotteryAbortJob.cs" />
     <Compile Include="Domain\Services\Lotteries\ILotteryExportService.cs" />
     <Compile Include="Domain\Services\Lotteries\ILotteryService.cs" />
-    <Compile Include="Domain\Services\Lotteries\IParticipantService.cs" />
+    <Compile Include="Domain\Services\Lotteries\ILotteryParticipantService.cs" />
     <Compile Include="Domain\Services\Lotteries\LotteryAbortJob.cs" />
     <Compile Include="Domain\Services\Lotteries\LotteryExportService.cs" />
     <Compile Include="Domain\Services\Lotteries\LotteryService.cs" />
-    <Compile Include="Domain\Services\Lotteries\ParticipantService.cs" />
+    <Compile Include="Domain\Services\Lotteries\LotteryParticipantService.cs" />
     <Compile Include="Domain\Services\Notifications\INotificationService.cs" />
     <Compile Include="Domain\Services\Notifications\NotificationService.cs" />
     <Compile Include="Domain\Services\OfficeMap\IOfficeMapService.cs" />

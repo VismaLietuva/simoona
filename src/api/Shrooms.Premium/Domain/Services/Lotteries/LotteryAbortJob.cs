@@ -15,14 +15,14 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
     public class LotteryAbortJob : ILotteryAbortJob
     {
         private readonly ILotteryService _lotteryService;
-        private readonly IParticipantService _participantService;
+        private readonly ILotteryParticipantService _participantService;
         private readonly IKudosService _kudosService;
         private readonly IAsyncRunner _asyncRunner;
         private readonly ILogger _logger;
         private readonly IUnitOfWork2 _uow;
 
         public LotteryAbortJob(IKudosService kudosService,
-            IParticipantService participantService,
+            ILotteryParticipantService participantService,
             ILogger logger,
             IAsyncRunner asyncRunner,
             IUnitOfWork2 uow,
@@ -48,6 +48,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             try
             {
                 var refundLogs = await CreateKudosLogsAsync(lottery, userOrg);
+
                 await AddKudosLogsAsync(lottery, refundLogs, userOrg);
                 await UpdateUserProfilesAsync(lottery, refundLogs, userOrg);
             }
@@ -89,7 +90,8 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
         private async Task<IList<AddKudosLogDto>> CreateKudosLogsAsync(Lottery lottery, UserAndOrganizationDto userOrg)
         {
             var kudosTypeId = await _kudosService.GetKudosTypeIdAsync(KudosTypeEnum.Refund);
-            var usersToRefund = await _participantService.GetParticipantsCountedAsync(lottery.Id);
+            var usersToRefund = await _participantService.GetParticipantsGroupedByBuyerIdAsync(lottery.Id, userOrg);
+            
             var usersToSendKudos = new List<AddKudosLogDto>();
 
             foreach (var user in usersToRefund)
@@ -97,7 +99,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 var totalReturn = user.Tickets * lottery.EntryFee;
                 var kudosLog = new AddKudosLogDto
                 {
-                    ReceivingUserIds = new List<string> { user.UserId },
+                    ReceivingUserIds = new List<string> { user.BuyerId },
                     PointsTypeId = kudosTypeId,
                     MultiplyBy = totalReturn,
                     Comment = CreateComment(lottery, totalReturn),
