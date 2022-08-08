@@ -53,7 +53,6 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 .Select(group => new LotteryRefundParticipantDto
                 {
                     BuyerId = group.Key,
-                    FullName = group.FirstOrDefault().User.FirstName + " " + group.FirstOrDefault().User.LastName,
                     Tickets = group.Count()
                 })
                 .ToListAsync();
