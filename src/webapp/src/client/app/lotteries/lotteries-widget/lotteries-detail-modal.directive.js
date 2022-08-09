@@ -82,7 +82,6 @@
         $window,
         profileRepository
     ) {
-        // TODO: fix validation styles in creating lotteries
         var vm = this;
 
         vm.lotteryImageSize = {

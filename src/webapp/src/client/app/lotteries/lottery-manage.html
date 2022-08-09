@@ -14,7 +14,7 @@
 
                     <!--lottery title-->
                     <div class="form-group required"
-                        ng-class="{'has-error': lotteryForm.title.$invalid && lotteryForm.title.$dirty}">
+                        ng-class="{'has-error has-error-remove-border': lotteryForm.title.$invalid && lotteryForm.title.$dirty}">
                         <label for="lotteryTitle" class="control-label col-xs-12 col-sm-4"
                             translate="lotteries.lotteryTitle"></label>
                         <div class="col-xs-12 col-sm-4">
@@ -32,7 +32,7 @@
 
                     <!--lottery fee -->
                     <div class="form-group required"
-                        ng-class="{'has-error': lotteryForm.entryFee.$invalid && lotteryForm.entryFee.$dirty}">
+                        ng-class="{'has-error has-error-remove-border': lotteryForm.entryFee.$invalid && lotteryForm.entryFee.$dirty}">
                         <label for="entryFee" class="control-label col-xs-12 col-sm-4" translate="lotteries.entryFee">
                         </label>
                         <div class="col-xs-12 col-sm-4">
@@ -56,7 +56,7 @@
                     </div>
 
                     <div class="form-group required"
-                        ng-class="{'has-error': lotteryForm.endDateInput.$invalid && lotteryForm.endDateInput.$dirty}">
+                        ng-class="{'has-error has-error-remove-border': lotteryForm.endDateInput.$invalid && lotteryForm.endDateInput.$dirty}">
                         <label for="endDateInput" class="control-label col-xs-12 col-sm-4"
                             translate="lotteries.endDate"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
@@ -74,8 +74,8 @@
                         </div>
                     </div>
                     <!--lottery end time-->
-                    <div class="form-group required"
-                        ng-class="{'has-error': lotteryForm.endDateInput.$invalid && lotteryForm.endDateInput.$dirty}">
+                    <!-- TODO: remove incorrect validation styling -->
+                    <div class="form-group required">
                         <label class="control-label col-xs-4 col-sm-4 event-timepicker-label"
                             translate="lotteries.endTime"></label>
                         <div class="col-xs-8 col-sm-6 col-md-4">
@@ -90,7 +90,7 @@
                     </div>
 
                     <!--lottery photo-->
-                    <div class="form-group required" ng-class="{'has-error': lotteryForm.image-file-input.$invalid}">
+                    <div class="form-group required" ng-class="{'has-error has-error-remove-border': lotteryForm.image-file-input.$invalid}">
                         <label for="image-file-input" class="control-label col-xs-12 col-sm-4"
                             translate="lotteries.photos"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
@@ -114,7 +114,7 @@
 
                     <!--lottery description -->
                     <div class="form-group"
-                        ng-class="{'has-error': lotteryForm.description.$invalid && lotteryForm.description.$dirty}">
+                        ng-class="{'has-error has-error-remove-border': lotteryForm.description.$invalid && lotteryForm.description.$dirty}">
                         <label for="lotteryDescription" class="control-label col-xs-12 col-sm-4"
                             translate="lotteries.description">
                         </label>
@@ -139,7 +139,7 @@
                         </div>
                     </div>
                     <div class="form-group required" ng-if="vm.allowGiftedTicketLimit"
-                        ng-class="{'has-error': lotteryForm.giftedTicketLimit.$invalid && lotteryForm.giftedTicketLimit.$dirty}">
+                        ng-class="{'has-error has-error-remove-border': lotteryForm.giftedTicketLimit.$invalid && lotteryForm.giftedTicketLimit.$dirty}">
                         <label for="giftedTicketLimit" class="control-label col-xs-12 col-sm-4"
                             translate="lotteries.giftedTicketLimit">
                         </label>
