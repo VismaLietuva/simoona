@@ -25,7 +25,6 @@
         return directive;
     }
 
-    // TODO: add modal fixing
     function flatTickerPickerController() {
         var vm = this;
 

@@ -29,6 +29,9 @@
             onInitNotifyConsumer();
 
             function openLotteryWidget() {
+                // Disable scrolling while modal is open
+                $(":root").css("overflow-y", 'hidden');
+
                 $uibModal.open({
                     templateUrl:
                         'app/lotteries/lotteries-widget/lotteries-detail-modal.html',
@@ -39,6 +42,11 @@
                             return scope.aceLotteriesDetailModal;
                         },
                     },
+                })
+                .closed
+                .then(function() {
+                    // Enable scrolling after modal is closed
+                    $(":root").css("overflow-y", '');
                 });
             }
 
