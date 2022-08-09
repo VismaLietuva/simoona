@@ -1,22 +1,22 @@
  <!-- TODO: make sure mobile works (: -->
 <div class="lottery-gift-container">
     <!-- Header -->
-    <!-- TODO: add translations -->
-    <div class="row m-0 lottery-gift-header-row hidden-xs" ng-if="vm.selectedUsers.length > 0">
+    <div class="row m-0 lottery-gift-header-row hidden-xs" ng-if="vm.selectedUsers.length > 0 && !vm.disableHeader">
         <div class="col-sm-8 lottery-gift-header-col">
-            <span>Vardas</span>
+            <span translate="lotteries.ticketReceiverName"></span>
+        </div>
+
+        <div class="col-sm-2 lottery-gift-header-col" ng-class="{ 'lottery-count-error lottery-error' : !!vm.showCountError }">
+            <span translate="lotteries.ticketReceiverCount"></span>
         </div>
 
         <div class="col-sm-2 lottery-gift-header-col lottery-gift-center">
-            <span>Kiekis</span>
-        </div>
-
-        <div class="col-sm-2 lottery-gift-header-col">
-            <span>Veiksmas</span>
+            <span translate="common.action"></span>
         </div>
     </div>
+
     <!-- Content -->
-    <div class="row lottery-gift-row m-0" ng-repeat="user in vm.selectedUsers">
+    <div class="row lottery-gift-row m-0" ng-repeat="user in vm.selectedUsers" ng-class="{ 'hide' : user.isDeleting }">
         <div class="col-sm-8 lottery-gift-col">
             <div class="lottery-gift-name">
                 <div class="lottery-gift-icon-container">
@@ -27,20 +27,25 @@
         </div>
 
         <div class="col-sm-2 lottery-gift-col lottery-gift-input-container">
-            <!-- TODO: add picker -->
-            <a>-</a>
-                <input type="text">
-            <a>+</a>
+            <ace-flat-ticket-picker min-ticket-count="1" max-ticket-count="10000" ticket-count="user.ticketCount" show-error="vm.showCountError"></ace-flat-ticket-picker>
         </div>
 
         <div class="col-sm-2 lottery-gift-col lottery-gift-center">
-            <a ng-click="vm.deleteLink($index)" data-test-id="delete-external-link" translate-attr-title="common.delete" translate>
+            <a ng-click="vm.removeUser(user)" translate-attr-title="common.delete" translate>
                 <span class="vismaicon vismaicon-delete"></span>
             </a>
         </div>
     </div>
 
     <style>
+        .lottery-error {
+            color: #d9534f !important;
+        }
+
+        .lottery-count-error::after {
+            content: '*';
+        }
+
         .lottery-gift-name {
             display: flex;
             align-items: center;

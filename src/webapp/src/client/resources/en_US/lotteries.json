@@ -67,7 +67,9 @@
     "addPeople": "Add people...",
     "giftTickets": "Gift",
     "kudosAfterPurchase": "Kudos after purchase",
-    "remainingGiftedTicketCount": "You can gift <b>{{one}}</b> tickets",
+    "remainingGiftedTicketCount": "You can gift <b>{{one}}</b> tickets in total",
     "lotteryGiftedTicketCountExceeded": "Exceeded the ticket limit",
-    "successDelete": "Successfully started refund process"
+    "successDelete": "Successfully started refund process",
+    "ticketReceiverName": "Full name",
+    "ticketReceiverCount": "Count"
 }

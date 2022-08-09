@@ -46,11 +46,10 @@
                     </div>
                 </div>
                 <div class="col-sm-6 lottery-detail-modal-right-panel">
-                    <p class="lottery-error-message"
-                        ng-if="vm.giftedTicketsLimitExceeded() && vm.selectingUsers && vm.isTicketCountAnInteger()"
-                        translate="lotteries.lotteryGiftedTicketCountExceeded"></p>
-                    <p class="lottery-error-message" ng-if="!vm.isTicketCountAnInteger()"
+                    <p class="lottery-error-message" ng-if="!vm.isTicketCountAnInteger() && !vm.selectingUsers"
                         translate="common.onlyWholeNumbers"></p>
+                    <p class="lottery-error-message" ng-if="vm.getKudosAfterPurchase() < 0"
+                        translate="Not enough kudos for purchase"></p>
                     <div class="vertical-center">
                         <div class="col-xs-10 lottery-detail-modal-counter">
                             <div class="input-group">
@@ -61,7 +60,7 @@
                                     </button>
                                 </span>
                                 <input ng-disabled="vm.selectingUsers" type="number" name="quant[1]" class="form-control input-number"
-                                    ng-model="vm.ticketCount" min="1" max="100">
+                                    ng-model="vm.ticketCount" ng-change="vm.onInvalidInputChangeToValidInput()">
                                 <span class="input-group-btn">
                                     <button type="button" ng-click="vm.ticketUp()" ng-disabled="vm.selectingUsers" class="btn btn-default btn-number"
                                         data-type="plus" data-field="quant[1]">
@@ -75,7 +74,7 @@
                             class="btn btn-primary"><span translate="lotteries.buy"></span></button>
 
                         <button type="button" ng-if="!vm.selectingUsers && vm.lottery.canGiftTickets"
-                            ng-click="vm.toggleUserSelection()" ng-disabled="!vm.canBuyTickets()" class="btn btn-info">
+                            ng-click="vm.toggleUserSelection()" class="btn btn-info">
                             <span class="glyphicon glyphicon-gift"></span>
                             <span translate="lotteries.giftTickets"></span>
                         </button>
@@ -99,7 +98,7 @@
 
             <div ng-if="vm.selectingUsers" class="lottery-gifting-user-selection-container mt-10">
 
-                <ace-gift-ticket-list class="" selected-users="vm.selectedUsers"></ace-gift-ticket-list>
+                <ace-gift-ticket-list show-count-error="vm.giftedTicketsLimitExceeded()" selected-users="vm.selectedUsers"></ace-gift-ticket-list>
 
                 <tags-input tag-class="{ 'hidden' : true }" class="mb-3 border-none" id="selectedUsers" name="selectedUsers" ng-model="vm.selectedUsers"
                     add-from-autocomplete-only="true" display-property="fullName" add-on-enter="true"
@@ -118,7 +117,7 @@
         </div>
 
         <div ng-if="vm.selectingUsers">
-            <span translate="lotteries.remainingGiftedTicketCount"
+            <span ng-class="{ 'show-error' : vm.giftedTicketsLimitExceeded() }" translate="lotteries.remainingGiftedTicketCount"
                 translate-values="{one: vm.lottery.buyer.remainingGiftedTicketCount }"></span>
         </div>
 
@@ -144,5 +143,18 @@
 <style>
     .border-none .tags {
         border: none !important;
+    }
+
+    .show-error {
+        color: #d9534f !important;
+    }
+
+    .show-error::after {
+        content: '*';
+        color: #d9534f !important;
+    }
+
+    .lottery-error-message {
+        color: #d9534f !important;
     }
 </style>

@@ -1,0 +1,41 @@
+<div class="ticket-picker-container">
+    <span ng-class="{ 'ticket-picker-error' : !!vm.showError }" class="ticker-picker-control ticket-picker-control-minus" ng-click="vm.decreaseCount()">-</span>
+    <input ng-class="{ 'ticket-picker-error' : !!vm.showError }" class="ticker-picker-input" type="number" ng-model-options='{ debounce: 300 }' ng-model="vm.ticketCount" ng-change="vm.onInvalidInputChangeToValidInput()">
+    <span ng-class="{ 'ticket-picker-error' : !!vm.showError }" class="ticker-picker-control" ng-click="vm.increaseCount()">+</span>
+
+    <style>
+        .ticker-picker-input {
+            text-align: center;
+            width: 36px;
+            border: none !important;
+        }
+
+        .ticket-picker-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ticket-picker-control-minus {
+            margin-bottom: 3px !important;
+        }
+
+        .ticker-picker-control:hover {
+            color: #26a5f0;
+        }
+
+        .ticker-picker-control {
+            cursor: pointer;
+            font-size: 26px;
+            line-height: 0;
+            font-weight: 500;
+            color: #0974b3;
+            user-select: none;
+        }
+
+        .ticket-picker-error {
+            color: #d9534f !important;
+            outline-color: #d9534f !important;
+        }
+    </style>
+</div>

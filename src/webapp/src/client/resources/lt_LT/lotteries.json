@@ -67,7 +67,9 @@
     "addPeople": "Pridėti žmonių...",
     "giftTickets": "Dovanoti",
     "kudosAfterPurchase": "Kudos kiekis po pirkimo",
-    "remainingGiftedTicketCount": "Dar galima padovanoti <b>{{one}}</b>",
+    "remainingGiftedTicketCount": "Iš viso gali padovanoti <b>{{one}}</b>",
     "lotteryGiftedTicketCountExceeded": "Per didelis bilietų kiekis",
-    "successDelete": "Sėkmingai pradėtas Kudos'ų grąžinimo procesas"
+    "successDelete": "Sėkmingai pradėtas Kudos'ų grąžinimo procesas",
+    "ticketReceiverName": "Vardas",
+    "ticketReceiverCount": "Kiekis"
 }

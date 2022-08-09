@@ -74,12 +74,16 @@
         $window,
         profileRepository
     ) {
+        // TODO: fix validation styles in creating lotteries
         var vm = this;
 
         vm.lotteryImageSize = {
             w: lotteryImageSettings.width,
             h: lotteryImageSettings.height,
         };
+
+        vm.minTicketCount = 1;
+        vm.maxTicketCount = 10000;
 
         vm.ticketCount = 1;
         vm.currentLottery = currentLottery;
@@ -101,6 +105,7 @@
         vm.getRemainingGiftedTicketCount = getRemainingGiftedTicketCount;
         vm.giftedTicketsLimitExceeded = giftedTicketsLimitExceeded;
         vm.isTicketCountAnInteger = isTicketCountAnInteger;
+        vm.onInvalidInputChangeToValidInput = onInvalidInputChangeToValidInput;
 
         vm.getUsers = getUsers;
 
@@ -196,8 +201,7 @@
             return (
                 vm.selectedUsers.length > 0 &&
                 getKudosAfterPurchase() >= 0 &&
-                !giftedTicketsLimitExceeded() &&
-                isTicketCountAnInteger()
+                !giftedTicketsLimitExceeded()
             );
         }
 
@@ -221,8 +225,17 @@
         }
 
         function getTotalCost() {
-            return (
-                vm.lottery.entryFee * vm.ticketCount * getTicketReceiversCount()
+            return vm.lottery.entryFee * getTotalTicketCount();
+        }
+
+        function getTotalTicketCount() {
+            if (!vm.selectingUsers) {
+                return vm.ticketCount;
+            }
+
+            return vm.selectedUsers.reduce(
+                (accumulator, curr) => accumulator + curr.ticketCount,
+                0
             );
         }
 
@@ -231,11 +244,7 @@
         }
 
         function getRemainingGiftedTicketCount() {
-            var remainingGiftedTicketCount =
-                vm.lottery.buyer.remainingGiftedTicketCount -
-                vm.ticketCount * getTicketReceiversCount();
-
-            return remainingGiftedTicketCount;
+            return vm.lottery.buyer.remainingGiftedTicketCount - getTotalTicketCount();
         }
 
         function giftedTicketsLimitExceeded() {
@@ -244,6 +253,16 @@
 
         function isTicketCountAnInteger() {
             return Number.isInteger(vm.ticketCount);
+        }
+
+        function onInvalidInputChangeToValidInput() {
+            if (vm.ticketCount < vm.minTicketCount) {
+                vm.ticketCount = vm.minTicketCount;
+            } else if (!Number.isInteger(vm.ticketCount)) {
+                vm.ticketCount = Math.round(vm.ticketCount);
+            } else if (vm.ticketCount > vm.maxTicketCount) {
+                vm.ticketCount = vm.maxTicketCount ;
+            }
         }
     }
 })();
