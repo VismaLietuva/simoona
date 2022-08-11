@@ -1,6 +1,4 @@
-﻿using Shrooms.Contracts.DataTransferObjects;
-
-namespace Shrooms.Premium.DataTransferObjects.Models.Lotteries
+﻿namespace Shrooms.Premium.DataTransferObjects.Models.Lotteries
 {
     public class EditStartedLotteryDto
     {

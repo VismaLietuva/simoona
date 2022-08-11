@@ -8,7 +8,6 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
         [Required]
         public int? Id { get; set; }
 
-        [Required]
         [StringLength(ValidationConstants.LotteryDescriptionMaxLength)]
         public string Description { get; set; }
     }

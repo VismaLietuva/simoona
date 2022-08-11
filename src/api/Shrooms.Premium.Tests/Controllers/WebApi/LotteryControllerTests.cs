@@ -90,7 +90,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             {
                 LotteryId = 1,
                 TicketCount = -10,
-                Receivers = Enumerable.Empty<LotteryTicketReceiverViewModel>()
+                Receivers = new LotteryTicketReceiverViewModel[0]
             };
 
             _sut.Validate(buyViewModel);
@@ -113,7 +113,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             {
                 LotteryId = 1,
                 TicketCount = -10,
-                Receivers = new List<LotteryTicketReceiverViewModel>
+                Receivers = new LotteryTicketReceiverViewModel[]
                 {
                     new LotteryTicketReceiverViewModel
                     {
@@ -142,7 +142,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             {
                 LotteryId = 1,
                 TicketCount = -10,
-                Receivers = new List<LotteryTicketReceiverViewModel>
+                Receivers = new LotteryTicketReceiverViewModel[]
                 {
                     new LotteryTicketReceiverViewModel
                     {
@@ -1204,27 +1204,6 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
             var args = new EditStartedLotteryViewModel
             {
                 Description = "test"
-            };
-
-            var expectedStatus = HttpStatusCode.BadRequest;
-
-            // Act
-            _sut.Validate(args);
-
-            var httpActionResult = await _sut.UpdateStarted(args);
-            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
-
-            // Arrange
-            Assert.AreEqual(expectedStatus, actual.StatusCode);
-        }
-
-        [Test]
-        public async Task UpdateStarted_DescriptionNotPresent_ReturnsBadRequest()
-        {
-            // Arrange
-            var args = new EditStartedLotteryViewModel
-            {
-                Id = 10,
             };
 
             var expectedStatus = HttpStatusCode.BadRequest;

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Shrooms.Premium.DataTransferObjects.Models.Lotteries
+﻿namespace Shrooms.Premium.DataTransferObjects.Models.Lotteries
 {
     public class BuyLotteryTicketsDto
     {
@@ -8,6 +6,6 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Lotteries
 
         public int TicketCount { get; set; }
 
-        public IEnumerable<LotteryTicketReceiverDto> Receivers { get; set; }
+        public LotteryTicketReceiverDto[] Receivers { get; set; }
     }
 }

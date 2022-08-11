@@ -1,5 +1,4 @@
 ﻿using Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
@@ -14,6 +13,6 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
 
         [MinLength(1)]
         [NoDuplicatesInCollection(nameof(LotteryTicketReceiverViewModel.UserId))]
-        public IEnumerable<LotteryTicketReceiverViewModel> Receivers { get; set; }
+        public LotteryTicketReceiverViewModel[] Receivers { get; set; }
     }
 }
