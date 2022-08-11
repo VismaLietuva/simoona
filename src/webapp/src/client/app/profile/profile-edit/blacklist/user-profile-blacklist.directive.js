@@ -56,7 +56,7 @@
         function saveInfo() {
             var params = {
                 userId: $stateParams.id,
-                endDate: $scope.model.endDate,
+                endDate: moment.utc($scope.model.endDate).toDate(),
                 reason: $scope.model.reason
             };
 
@@ -116,11 +116,11 @@
         }
 
         function getMinBlacklistingDate() {
-            return moment().local().startOf('days').add(1, 'days').toDate();
+            return moment().utc().local().startOf('days').add(1, 'days').toDate();
         }
 
         function getDefaultEndDate() {
-            return moment($scope.minDate).add(2, 'year').toDate();
+            return moment.utc($scope.minDate).local().add(2, 'year').toDate();
         }
 
         function showError() {
