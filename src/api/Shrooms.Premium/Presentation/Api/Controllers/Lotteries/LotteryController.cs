@@ -1,9 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System.Web.Http;
-using AutoMapper;
+﻿using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Domain.Extensions;
@@ -13,6 +8,11 @@ using Shrooms.Premium.Domain.Services.Lotteries;
 using Shrooms.Premium.Presentation.WebViewModels.Lotteries;
 using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.Api.Filters;
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Web.Http;
 using WebApi.OutputCache.V2;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
@@ -91,12 +91,10 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
             try
             {
                 var createLotteryDto = _mapper.Map<CreateLotteryViewModel, LotteryDto>(createViewModel);
-                
-                var lotteryDto = await _lotteryService.CreateLotteryAsync(createLotteryDto, GetUserAndOrganization());
-                
-                var lotteryViewModel = _mapper.Map<LotteryDto, LotteryViewModel>(lotteryDto);
 
-                return Ok(lotteryViewModel);
+                await _lotteryService.CreateLotteryAsync(createLotteryDto, GetUserAndOrganization());
+
+                return Ok(createViewModel);
             }
             catch (LotteryException e)
             {
@@ -251,11 +249,11 @@ namespace Shrooms.Premium.Presentation.Api.Controllers.Lotteries
             try
             {
                 var content = await _lotteryExportService.ExportParticipantsAsync(lotteryId, GetUserAndOrganization());
-                var result = new HttpResponseMessage(HttpStatusCode.OK) 
+                var result = new HttpResponseMessage(HttpStatusCode.OK)
                 {
-                    Content = content 
+                    Content = content
                 };
-                
+
                 return ResponseMessage(result);
             }
             catch (LotteryException e)

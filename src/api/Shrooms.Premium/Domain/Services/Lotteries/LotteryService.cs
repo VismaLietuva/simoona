@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using Shrooms.Contracts.DAL;
+﻿using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Kudos;
 using Shrooms.Contracts.Enums;
@@ -17,6 +11,12 @@ using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
 using Shrooms.Premium.Domain.DomainExceptions.Lotteries;
 using Shrooms.Premium.Domain.DomainServiceValidators.Lotteries;
 using Shrooms.Premium.Domain.Services.Email.Lotteries;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using X.PagedList;
 
 namespace Shrooms.Premium.Domain.Services.Lotteries
@@ -54,19 +54,17 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             _participantsDbSet = uow.GetDbSet<LotteryParticipant>();
         }
 
-        public async Task<LotteryDto> CreateLotteryAsync(LotteryDto newLotteryDto, UserAndOrganizationDto userOrg)
+        public async Task CreateLotteryAsync(LotteryDto newLotteryDto, UserAndOrganizationDto userOrg)
         {
             var newLottery = MapLotteryDtoToLottery(newLotteryDto, userOrg);
 
             _lotteriesDbSet.Add(newLottery);
 
             await _uow.SaveChangesAsync(userOrg.UserId);
-            
+
             newLotteryDto.Id = newLottery.Id;
 
             NotifyAboutStartedLottery(newLottery, userOrg);
-
-            return newLotteryDto;
         }
 
         public async Task EditDraftedLotteryAsync(LotteryDto lotteryDto, UserAndOrganizationDto userOrg)
@@ -148,7 +146,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             if (lottery.Status == LotteryStatus.Started || lottery.Status == LotteryStatus.Expired)
             {
                 lottery.Status = LotteryStatus.RefundStarted;
-                
+
                 await _uow.SaveChangesAsync();
 
                 _asyncRunner.Run<ILotteryAbortJob>(async notifier => await notifier.RefundLotteryAsync(lottery.Id, userOrg), _uow.ConnectionName);
@@ -277,67 +275,30 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             };
         }
 
-        public async Task BuyLotteryTicketsAsync(BuyLotteryTicketsDto buyLotteryTicketsDto, UserAndOrganizationDto userOrg)
+        public async Task BuyLotteryTicketsAsync(BuyLotteryTicketsDto buyTicketsDto, UserAndOrganizationDto userOrg)
         {
-            var buyerApplicationUser = await _userService.GetApplicationUserAsync(userOrg.UserId);
+            var buyerUser = await _userService.GetApplicationUserAsync(userOrg.UserId);
 
-            _lotteryValidator.CheckIfBuyerExists(buyerApplicationUser);
+            _lotteryValidator.CheckIfBuyerExists(buyerUser);
 
-            var lotteryDetails = await GetLotteryDetailsAsync(buyLotteryTicketsDto.LotteryId, true, userOrg);
+            var isGiftingTickets = buyTicketsDto.Receivers.Any();
 
-            _lotteryValidator.CheckIfLotteryExists(lotteryDetails);
-            _lotteryValidator.CheckIfLotteryEnded(lotteryDetails);
+            var lotteryDetailsDto = await GetLotteryDetailsAsync(buyTicketsDto.LotteryId, isGiftingTickets, userOrg);
 
-            if (!CanGiftTickets(lotteryDetails))
+            _lotteryValidator.CheckIfLotteryExists(lotteryDetailsDto);
+            _lotteryValidator.CheckIfLotteryEnded(lotteryDetailsDto);
+
+            if (isGiftingTickets)
             {
-                _lotteryValidator.CheckIfGiftedTicketsReceiversExist(buyLotteryTicketsDto);
+                await GiftLotteryTicketsAsync(buyerUser, lotteryDetailsDto, buyTicketsDto, userOrg);
+            }
+            else
+            {
+                await BuyLotteryTicketsAsync(buyerUser, lotteryDetailsDto, buyTicketsDto, userOrg);
             }
 
-            var isGiftingTickets = buyLotteryTicketsDto.ReceivingUserIds.Any();
-
-            if (CanGiftTickets(lotteryDetails) && isGiftingTickets)
-            {
-                _lotteryValidator.CheckIfGiftedTicketLimitIsExceeded(lotteryDetails.Buyer, buyLotteryTicketsDto);
-
-                await _lotteryValidator.CheckIfGiftReceiversExistAsync(buyLotteryTicketsDto, userOrg);
-            }
-
-            if (!_lotteryValidator.IsValidTicketCount(buyLotteryTicketsDto))
-            {
-                await AddKudosLogForCheatingAsync(userOrg, lotteryDetails.EntryFee, buyerApplicationUser);
-
-                throw new LotteryException("Thanks for trying - you were charged double Kudos for this without getting a ticket.");
-            }
-
-            var ticketReceiverCount = isGiftingTickets ? buyLotteryTicketsDto.ReceivingUserIds.Count() : 1;
-
-            var totalTicketCost = lotteryDetails.EntryFee * buyLotteryTicketsDto.Tickets * ticketReceiverCount;
-
-            _lotteryValidator.CheckIfUserHasEnoughKudos(buyerApplicationUser, totalTicketCost);
-
-            var totalBoughtTicketCount = buyLotteryTicketsDto.Tickets * ticketReceiverCount;
-
-            var kudosLog = new AddKudosLogDto
-            {
-                ReceivingUserIds = new List<string> { userOrg.UserId },
-                PointsTypeId = await _kudosService.GetKudosTypeIdAsync(KudosTypeEnum.Minus),
-                MultiplyBy = totalTicketCost,
-                Comment = $"{totalBoughtTicketCount} ticket(s) for lottery {lotteryDetails.Title}",
-                UserId = userOrg.UserId,
-                OrganizationId = userOrg.OrganizationId
-            };
-
-            await _kudosService.AddLotteryKudosLogAsync(kudosLog, userOrg);
-
-            var ticketOwnerUserIds = isGiftingTickets ? buyLotteryTicketsDto.ReceivingUserIds : new string[] { userOrg.UserId };
-
-            foreach (var ticketOwnerId in ticketOwnerUserIds)
-            {
-                AddLotteryTicketsForUser(buyLotteryTicketsDto.LotteryId, ticketOwnerId, userOrg.UserId, buyLotteryTicketsDto.Tickets);
-            }
-
-            await _uow.SaveChangesAsync(buyerApplicationUser.Id);
-            await _kudosService.UpdateProfileKudosAsync(buyerApplicationUser, userOrg);
+            await _uow.SaveChangesAsync(buyerUser.Id);
+            await _kudosService.UpdateProfileKudosAsync(buyerUser, userOrg);
         }
 
         public async Task<List<LotteryDetailsDto>> GetRunningLotteriesAsync(UserAndOrganizationDto userAndOrganization)
@@ -350,15 +311,84 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 .OrderBy(lottery => lottery.EndDate)
                 .ToListAsync();
         }
-        
+
         public async Task<Lottery> GetLotteryByIdAsync(int id, UserAndOrganizationDto userOrg)
         {
             return await _lotteriesDbSet.FirstOrDefaultAsync(FindLotteryById(id, userOrg));
         }
 
-        private bool CanGiftTickets(LotteryDetailsDto detailsDto)
+        private async Task BuyLotteryTicketsAsync(
+           ApplicationUser buyerUser,
+           LotteryDetailsDto lotteryDetailsDto,
+           BuyLotteryTicketsDto buyTicketsDto,
+           UserAndOrganizationDto userOrg)
         {
-            return detailsDto.GiftedTicketLimit > 0;
+            if (!_lotteryValidator.IsValidTicketCount(buyTicketsDto))
+            {
+                await AddKudosLogForCheatingAsync(userOrg, lotteryDetailsDto.EntryFee, buyerUser);
+
+                throw new LotteryException("Thanks for trying - you were charged double Kudos for this without getting a ticket.");
+            }
+
+            var totalTicketCost = lotteryDetailsDto.EntryFee * buyTicketsDto.TicketCount;
+
+            _lotteryValidator.CheckIfUserHasEnoughKudos(buyerUser, totalTicketCost);
+
+            var minusKudosTypeId = await _kudosService.GetKudosTypeIdAsync(KudosTypeEnum.Minus);
+
+            var kudosLog = new AddKudosLogDto
+            {
+                ReceivingUserIds = new List<string> { buyerUser.Id },
+                PointsTypeId = minusKudosTypeId,
+                MultiplyBy = totalTicketCost,
+                Comment = $"{buyTicketsDto.TicketCount} ticket(s) for lottery {lotteryDetailsDto.Title}",
+                UserId = buyerUser.Id,
+                OrganizationId = buyerUser.OrganizationId
+            };
+
+            await _kudosService.AddLotteryKudosLogAsync(kudosLog, userOrg);
+
+            AddLotteryTicketsForUser(lotteryDetailsDto.Id, buyerUser.Id, buyerUser.Id, buyTicketsDto.TicketCount);
+        }
+
+        private async Task GiftLotteryTicketsAsync(
+            ApplicationUser buyerUser,
+            LotteryDetailsDto lotteryDetailsDto,
+            BuyLotteryTicketsDto buyTicketsDto,
+            UserAndOrganizationDto userOrg)
+        {
+            _lotteryValidator.CheckIfLotteryAllowsGifting(lotteryDetailsDto);
+
+            var receivers = buyTicketsDto.Receivers;
+            var receiverIds = receivers.Select(receiver => receiver.UserId);
+
+            var totalTicketCount = receivers.Sum(receiver => receiver.TicketCount);
+
+            _lotteryValidator.CheckIfGiftedTicketLimitIsExceeded(lotteryDetailsDto.Buyer, totalTicketCount);
+            await _lotteryValidator.CheckIfGiftReceiversExistAsync(receiverIds, userOrg);
+
+            var totalTicketCost = lotteryDetailsDto.EntryFee * totalTicketCount;
+
+            _lotteryValidator.CheckIfUserHasEnoughKudos(buyerUser, totalTicketCost);
+
+            var kudosMinusTypeId = await _kudosService.GetKudosTypeIdAsync(KudosTypeEnum.Minus);
+
+            var kudosLog = new AddKudosLogDto
+            {
+                ReceivingUserIds = receiverIds,
+                PointsTypeId = kudosMinusTypeId,
+                MultiplyBy = totalTicketCost,
+                Comment = $"{buyTicketsDto.TicketCount} ticket(s) for lottery {lotteryDetailsDto.Title}",
+                UserId = buyerUser.Id,
+                OrganizationId = buyerUser.OrganizationId
+            };
+
+            await _kudosService.AddLotteryKudosLogAsync(kudosLog, userOrg);
+
+            foreach (var receiver in receivers)
+            {
+                AddLotteryTicketsForUser(lotteryDetailsDto.Id, receiver.UserId, buyerUser.Id, receiver.TicketCount);
+            }
         }
 
         private void AddLotteryTicketsForUser(int lotteryId, string userId, string buyerUserId, int ticketCount)

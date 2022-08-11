@@ -7,6 +7,7 @@ using Shrooms.DataLayer.EntityModels.Models.Lottery;
 using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
 using Shrooms.Premium.Domain.DomainExceptions.Lotteries;
 using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,37 +23,35 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Lotteries
         public LotteryValidator(ISystemClock systemClock, IUnitOfWork2 uow)
         {
             _systemClock = systemClock;
-            
+
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
         }
-        
-        public async Task CheckIfGiftReceiversExistAsync(BuyLotteryTicketsDto buyTicketsDto, UserAndOrganizationDto userOrg)
+
+        public async Task CheckIfGiftReceiversExistAsync(IEnumerable<string> receiverIds, UserAndOrganizationDto userOrg)
         {
-            var userIds = await _usersDbSet
-                .Where(user => buyTicketsDto.ReceivingUserIds.Contains(user.Id) &&
+            var foundReceiverIds = await _usersDbSet
+                .Where(user => receiverIds.Contains(user.Id) &&
                                user.OrganizationId == userOrg.OrganizationId)
                 .Select(user => user.Id)
                 .ToListAsync();
 
-            if (userIds.Count != buyTicketsDto.ReceivingUserIds.Length)
+            if (foundReceiverIds.Count != receiverIds.Count())
             {
                 throw new LotteryException("Provided receivers were not found");
             }
 
-            if (userIds.Contains(userOrg.UserId))
+            if (foundReceiverIds.Contains(userOrg.UserId))
             {
                 throw new LotteryException("Cannot gift tickets to yourself");
             }
         }
 
-        public void CheckIfGiftedTicketLimitIsExceeded(LotteryDetailsBuyerDto buyerDto, BuyLotteryTicketsDto buyLotteryDto)
+        public void CheckIfGiftedTicketLimitIsExceeded(LotteryDetailsBuyerDto buyerDto, int totalTicketCount)
         {
             if (buyerDto.RemainingGiftedTicketCount == 0)
             {
                 throw new LotteryException($"Reached ticket limit");
             }
-
-            var totalTicketCount = buyLotteryDto.ReceivingUserIds.Length * buyLotteryDto.Tickets;
 
             if (buyerDto.RemainingGiftedTicketCount < totalTicketCount)
             {
@@ -72,7 +71,7 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Lotteries
         {
             if (detailsDto == null)
             {
-                CheckIfLotteryExists((Lottery)null);
+                throw GetLotteryNotFoundException();
             }
         }
 
@@ -80,7 +79,7 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Lotteries
         {
             if (lottery == null)
             {
-                throw new LotteryException("Lottery was not found");
+                throw GetLotteryNotFoundException();
             }
         }
 
@@ -94,9 +93,9 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Lotteries
             CheckIfLotteryEnded(lotteryDto.EndDate, "Lottery can't start in the past.");
         }
 
-        public void CheckIfGiftedTicketsReceiversExist(BuyLotteryTicketsDto buyLotteryTicketsDto)
+        public void CheckIfLotteryAllowsGifting(LotteryDetailsDto lotteryDetailsDto)
         {
-            if (buyLotteryTicketsDto.ReceivingUserIds.Any())
+            if (lotteryDetailsDto.GiftedTicketLimit <= 0)
             {
                 throw new LotteryException("This lottery does not allow gifting tickets");
             }
@@ -128,7 +127,7 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Lotteries
 
         public bool IsValidTicketCount(BuyLotteryTicketsDto buyLotteryTicketsDto)
         {
-            return buyLotteryTicketsDto.Tickets > 0;
+            return buyLotteryTicketsDto.TicketCount > 0;
         }
 
         private void CheckIfLotteryEnded(DateTime endDate, string errorMessage)
@@ -137,6 +136,11 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Lotteries
             {
                 throw new LotteryException(errorMessage);
             }
+        }
+
+        private static LotteryException GetLotteryNotFoundException()
+        {
+            return new LotteryException("Lottery was not found");
         }
     }
 }

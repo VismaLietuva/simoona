@@ -1,27 +1,34 @@
 ﻿using Shrooms.Contracts.Enums;
-using Shrooms.Premium.Domain.DomainExceptions.Lotteries;
 using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes.Lotteries
 {
     [AttributeUsage(AttributeTargets.Property)]
-    public class ValidLotteryCreationStatusAttribute : ValidLotteryStatusBaseAttribute
+    public class ValidLotteryCreationStatusAttribute : ValidationAttribute
     {
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            var result = base.IsValid(value, validationContext);
-
-            if (result != ValidationResult.Success)
+            if (value == null)
             {
-                return result;
+                return ValidationResult.Success;
+            }
+
+            if (value is not LotteryStatus)
+            {
+                throw new ArgumentException($"The property must be of type {typeof(LotteryStatus)}");
+            }
+
+            if (!Enum.IsDefined(typeof(LotteryStatus), value))
+            {
+                return new ValidationResult($"Lottery status {value} is invalid");
             }
 
             var lotteryStatus = (LotteryStatus)value;
 
             if (lotteryStatus != LotteryStatus.Started && lotteryStatus != LotteryStatus.Drafted)
             {
-                throw new LotteryException($"Lottery status has to be {LotteryStatus.Started} or {LotteryStatus.Drafted}");
+                return new ValidationResult($"Lottery status has to be {LotteryStatus.Started} or {LotteryStatus.Drafted}");
             }
 
             return ValidationResult.Success;

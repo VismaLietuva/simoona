@@ -1,516 +1,1370 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Web.Http.Results;
-using AutoMapper;
-using NSubstitute;
+﻿using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Enums;
-using Shrooms.Contracts.ViewModels;
+using Shrooms.Contracts.Exceptions;
+using Shrooms.DataLayer.EntityModels.Models.Lottery;
 using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
 using Shrooms.Premium.Domain.DomainExceptions.Lotteries;
-using Shrooms.Premium.Domain.Services.Args;
 using Shrooms.Premium.Domain.Services.Lotteries;
 using Shrooms.Premium.Presentation.Api.Controllers.Lotteries;
 using Shrooms.Premium.Presentation.WebViewModels.Lotteries;
+using Shrooms.Premium.Tests.ModelMappings;
 using Shrooms.Tests.Extensions;
-using X.PagedList;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Shrooms.Premium.Tests.Controllers.WebApi
 {
     [TestFixture]
     public class LotteryControllerTests
     {
-        private LotteryController _lotteryController;
+        private LotteryController _sut;
 
-        private IMapper _mapper;
         private ILotteryService _lotteryService;
         private ILotteryExportService _lotteryExportService;
 
         [SetUp]
         public void TestInitializers()
         {
-            _mapper = Substitute.For<IMapper>();
             _lotteryService = Substitute.For<ILotteryService>();
             _lotteryExportService = Substitute.For<ILotteryExportService>();
 
-            _lotteryController = new LotteryController(_mapper, _lotteryService, _lotteryExportService);
-            _lotteryController.SetUpControllerForTesting();
+            _sut = new LotteryController(ModelMapper.Create(), _lotteryService, _lotteryExportService);
+            _sut.SetUpControllerForTesting();
         }
 
         [Test]
-        public async Task GetAllLotteries_Should_Return_Ok_With_IEnumerable_Of_LotteryDetails_ViewModel()
+        public async Task BuyLotteryTicket_InvalidLotteryId_ReturnsBadRequest()
         {
             // Arrange
-            _mapper.Map<IEnumerable<LotteryDetailsDto>, IEnumerable<LotteryDetailsViewModel>>(LotteryDetailsDto)
-                .Returns(LotteryDetailsViewModel);
+            var buyViewModel = new BuyLotteryTicketsViewModel
+            {
+                LotteryId = -1,
+                TicketCount = -10
+            };
 
-            _lotteryService.GetLotteriesAsync(UserAndOrganizationArg).Returns(LotteryDetailsDto);
+            _sut.Validate(buyViewModel);
+
+            var expected = HttpStatusCode.BadRequest;
 
             // Act
-            var response = await _lotteryController.GetAllLotteries();
+            var httpActionResult = await _sut.BuyLotteryTicket(buyViewModel);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
             // Assert
-            Assert.IsNotNull(response);
-            Assert.IsInstanceOf<OkNegotiatedContentResult<IEnumerable<LotteryDetailsViewModel>>>(response);
-            await _lotteryService.Received(1).GetLotteriesAsync(UserAndOrganizationArg);
+            Assert.AreEqual(expected, actual.StatusCode);
         }
 
         [Test]
-        public async Task GetLottery_Should_Return_Ok()
+        public async Task BuyLotteryTicket_LotteryIdNotPresent_ReturnsBadRequest()
         {
             // Arrange
-            var lotteryViewModel = new LotteryDetailsViewModel
+            var buyViewModel = new BuyLotteryTicketsViewModel
             {
-                Id = 2,
+                TicketCount = -10
+            };
+
+            _sut.Validate(buyViewModel);
+
+            var expected = HttpStatusCode.BadRequest;
+
+            // Act
+            var httpActionResult = await _sut.BuyLotteryTicket(buyViewModel);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Assert
+            Assert.AreEqual(expected, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task BuyLotteryTicket_ReceiversExistButDoesNotContainAnyEntries_ReturnsBadRequest()
+        {
+            // Arrange
+            var buyViewModel = new BuyLotteryTicketsViewModel
+            {
+                LotteryId = 1,
+                TicketCount = -10,
+                Receivers = Enumerable.Empty<LotteryTicketReceiverViewModel>()
+            };
+
+            _sut.Validate(buyViewModel);
+
+            var expected = HttpStatusCode.BadRequest;
+
+            // Act
+            var httpActionResult = await _sut.BuyLotteryTicket(buyViewModel);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Assert
+            Assert.AreEqual(expected, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task BuyLotteryTicket_ReceiversExistButReceiverDoesNotContainUserId_ReturnsBadRequest()
+        {
+            // Arrange
+            var buyViewModel = new BuyLotteryTicketsViewModel
+            {
+                LotteryId = 1,
+                TicketCount = -10,
+                Receivers = new List<LotteryTicketReceiverViewModel>
+                {
+                    new LotteryTicketReceiverViewModel
+                    {
+                        TicketCount = 1
+                    }
+                }
+            };
+
+            _sut.Validate(buyViewModel);
+
+            var expected = HttpStatusCode.BadRequest;
+
+            // Act
+            var httpActionResult = await _sut.BuyLotteryTicket(buyViewModel);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Assert
+            Assert.AreEqual(expected, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task BuyLotteryTicket_ReceiversExistButReceiverContainsInvalidTicketCount_ReturnsBadRequest()
+        {
+            // Arrange
+            var buyViewModel = new BuyLotteryTicketsViewModel
+            {
+                LotteryId = 1,
+                TicketCount = -10,
+                Receivers = new List<LotteryTicketReceiverViewModel>
+                {
+                    new LotteryTicketReceiverViewModel
+                    {
+                        UserId = Guid.NewGuid().ToString(),
+                        TicketCount = -10
+                    }
+                }
+            };
+
+            _sut.Validate(buyViewModel);
+
+            var expected = HttpStatusCode.BadRequest;
+
+            // Act
+            var httpActionResult = await _sut.BuyLotteryTicket(buyViewModel);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Assert
+            Assert.AreEqual(expected, actual.StatusCode);
+        }
+
+
+        [Test]
+        public async Task BuyLotteryTicket_ReceiversExistButThereAreDuplicateReceiverUserIds_ReturnsBadRequest()
+        {
+            // Arrange
+            var userId = Guid.NewGuid().ToString();
+
+            var buyViewModel = new BuyLotteryTicketsViewModel
+            {
+                LotteryId = 1,
+                TicketCount = -10,
+                Receivers = new LotteryTicketReceiverViewModel[]
+                {
+                    new LotteryTicketReceiverViewModel
+                    {
+                        UserId = userId,
+                        TicketCount = 10
+                    },
+
+                    new LotteryTicketReceiverViewModel
+                    {
+                        UserId = userId,
+                        TicketCount = 10
+                    }
+                }
+            };
+
+            _sut.Validate(buyViewModel);
+
+            var expected = HttpStatusCode.BadRequest;
+
+            // Act
+            var httpActionResult = await _sut.BuyLotteryTicket(buyViewModel);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Assert
+            Assert.AreEqual(expected, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task BuyLotteryTicket_ValidValuesWithoutReceivers_ReturnsOk()
+        {
+            // Arrange
+            var buyViewModel = new BuyLotteryTicketsViewModel
+            {
+                LotteryId = 1,
+                TicketCount = 10,
+            };
+
+            _sut.Validate(buyViewModel);
+
+            var expected = HttpStatusCode.OK;
+
+            // Act
+            var httpActionResult = await _sut.BuyLotteryTicket(buyViewModel);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Assert
+            Assert.AreEqual(expected, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task BuyLotteryTicket_ValidValuesWithReceivers_ReturnsOk()
+        {
+            // Arrange
+            var buyViewModel = new BuyLotteryTicketsViewModel
+            {
+                LotteryId = 1,
+                TicketCount = 10,
+                Receivers = new LotteryTicketReceiverViewModel[]
+                {
+                    new LotteryTicketReceiverViewModel
+                    {
+                        UserId = "id",
+                        TicketCount = 1
+                    },
+
+                    new LotteryTicketReceiverViewModel
+                    {
+                        UserId = "id 2",
+                        TicketCount = 1
+                    }
+                }
+            };
+
+            _sut.Validate(buyViewModel);
+
+            var expected = HttpStatusCode.OK;
+
+            // Act
+            var httpActionResult = await _sut.BuyLotteryTicket(buyViewModel);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Assert
+            Assert.AreEqual(expected, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task BuyLotteryTicket_LotteryExceptionThrown_ReturnsBadRequest()
+        {
+            // Arrange
+            var buyViewModel = new BuyLotteryTicketsViewModel
+            {
+                LotteryId = 1,
+                TicketCount = 10,
+                Receivers = new LotteryTicketReceiverViewModel[]
+                {
+                    new LotteryTicketReceiverViewModel
+                    {
+                        UserId = "id",
+                        TicketCount = 1
+                    },
+
+                    new LotteryTicketReceiverViewModel
+                    {
+                        UserId = "id 2",
+                        TicketCount = 1
+                    }
+                }
+            };
+
+            _lotteryService
+                .BuyLotteryTicketsAsync(Arg.Any<BuyLotteryTicketsDto>(), Arg.Any<UserAndOrganizationDto>())
+                .Throws(new LotteryException("Error"));
+
+            _sut.Validate(buyViewModel);
+
+            var expected = HttpStatusCode.BadRequest;
+
+            // Act
+            var httpActionResult = await _sut.BuyLotteryTicket(buyViewModel);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Assert
+            Assert.AreEqual(expected, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task BuyLotteryTicket_ValidationExceptionThrown_ReturnsBadRequest()
+        {
+            // Arrange
+            var buyViewModel = new BuyLotteryTicketsViewModel
+            {
+                LotteryId = 1,
+                TicketCount = 10,
+                Receivers = new LotteryTicketReceiverViewModel[]
+                {
+                    new LotteryTicketReceiverViewModel
+                    {
+                        UserId = "id",
+                        TicketCount = 1
+                    },
+
+                    new LotteryTicketReceiverViewModel
+                    {
+                        UserId = "id 2",
+                        TicketCount = 1
+                    }
+                }
+            };
+
+            _lotteryService
+                .BuyLotteryTicketsAsync(Arg.Any<BuyLotteryTicketsDto>(), Arg.Any<UserAndOrganizationDto>())
+                .Throws(new ValidationException(0));
+
+            _sut.Validate(buyViewModel);
+
+            var expected = HttpStatusCode.BadRequest;
+
+            // Act
+            var httpActionResult = await _sut.BuyLotteryTicket(buyViewModel);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Assert
+            Assert.AreEqual(expected, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task GetAllLotteries_ValidValues_ReturnsOk()
+        {
+            // Arrange
+            var expectedStatus = HttpStatusCode.OK;
+
+            // Act
+            var httpActionResult = await _sut.GetAllLotteries();
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Assert
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task GetPagedLotteries_ListingArgsAreNull_ReturnsOk()
+        {
+            // Arrange
+            LotteryListingArgsViewModel args = null;
+
+            var expectedStatus = HttpStatusCode.OK;
+
+            _sut.Validate(args);
+
+            // Act
+            var httpActionResult = await _sut.GetPagedLotteries(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task GetPagedLotteries_ValidValues_ReturnsOk()
+        {
+            // Assert
+            var args = new LotteryListingArgsViewModel();
+
+            var expectedStatus = HttpStatusCode.OK;
+
+            _sut.Validate(args);
+
+            // Act
+            var httpActionResult = await _sut.GetPagedLotteries(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task GetPagedLotteries_NegativePage_ReturnsBadRequest()
+        {
+            // Assert
+            var args = new LotteryListingArgsViewModel
+            {
+                Page = -1
+            };
+
+            var expectedStatus = HttpStatusCode.BadRequest;
+
+            _sut.Validate(args);
+
+            // Act
+            var httpActionResult = await _sut.GetPagedLotteries(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task GetPagedLotteries_NegativePageSize_ReturnsBadRequest()
+        {
+            // Assert
+            var args = new LotteryListingArgsViewModel
+            {
+                Page = 1,
+                PageSize = -10
+            };
+
+            var expectedStatus = HttpStatusCode.BadRequest;
+
+            _sut.Validate(args);
+
+            // Act
+            var httpActionResult = await _sut.GetPagedLotteries(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task GetLottery_ValidValues_ReturnsOk()
+        {
+            // Assert
+            const int id = 1;
+            var expectedStatus = HttpStatusCode.OK;
+
+            _lotteryService
+                .GetLotteryDetailsAsync(Arg.Any<int>(), Arg.Any<bool>(), Arg.Any<UserAndOrganizationDto>())
+                .Returns(new LotteryDetailsDto());
+
+            // Act
+            var httpActionResult = await _sut.GetLottery(id);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task GetLottery_InvalidId_ReturnsNotFound()
+        {
+            // Assert
+            const int id = 1;
+            var expectedStatus = HttpStatusCode.NotFound;
+
+            _lotteryService
+                .GetLotteryDetailsAsync(Arg.Any<int>(), Arg.Any<bool>(), Arg.Any<UserAndOrganizationDto>())
+                .Returns((LotteryDetailsDto)null);
+
+            // Act
+            var httpActionResult = await _sut.GetLottery(id);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task CreateLottery_ValidValues_ReturnsOk()
+        {
+            var args = new CreateLotteryViewModel
+            {
+                Title = "title",
+                Description = "desc",
+                EndDate = DateTime.UtcNow.AddYears(1),
+                EntryFee = 1,
+                Status = LotteryStatus.Started,
+                Images = new ImagesCollection(),
+                GiftedTicketLimit = 0
+            };
+
+            var expectedStatus = HttpStatusCode.OK;
+
+            _sut.Validate(args);
+
+            // Act
+            var httpActionResult = await _sut.CreateLottery(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task CreateLottery_WhenLotteryExceptionIsThrown_ReturnsBadRequest()
+        {
+            var args = new CreateLotteryViewModel
+            {
+                Title = "title",
+                Description = "desc",
+                EndDate = DateTime.UtcNow.AddYears(1),
+                EntryFee = 1,
+                Status = LotteryStatus.Started,
+                Images = new ImagesCollection(),
+                GiftedTicketLimit = 0
+            };
+
+            var expectedStatus = HttpStatusCode.BadRequest;
+
+            _lotteryService
+                .CreateLotteryAsync(Arg.Any<LotteryDto>(), Arg.Any<UserAndOrganizationDto>())
+                .Throws(new LotteryException("Error"));
+
+            _sut.Validate(args);
+
+            // Act
+            var httpActionResult = await _sut.CreateLottery(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task CreateLottery_TitleNotPresent_ReturnsBadRequest()
+        {
+            var args = new CreateLotteryViewModel
+            {
+                Description = "desc",
+                EndDate = DateTime.UtcNow.AddYears(1),
+                EntryFee = 1,
+                Status = LotteryStatus.Started,
+                Images = new ImagesCollection(),
+                GiftedTicketLimit = 0
+            };
+
+            var expectedStatus = HttpStatusCode.BadRequest;
+
+            _sut.Validate(args);
+
+            // Act
+            var httpActionResult = await _sut.CreateLottery(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task CreateLottery_DescriptionOverCharacterLimit_ReturnsBadRequest()
+        {
+            var args = new CreateLotteryViewModel
+            {
+                Title = "title",
+                Description = new string('d', 1000),
+                EndDate = DateTime.UtcNow.AddYears(1),
+                EntryFee = 1,
+                Status = LotteryStatus.Started,
+                Images = new ImagesCollection(),
+                GiftedTicketLimit = 0
+            };
+
+            var expectedStatus = HttpStatusCode.BadRequest;
+
+            _sut.Validate(args);
+
+            // Act
+            var httpActionResult = await _sut.CreateLottery(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task CreateLottery_EndDateLessThanPresentDate_ReturnsBadRequest()
+        {
+            var args = new CreateLotteryViewModel
+            {
+                Title = "title",
+                Description = "desc",
+                EndDate = DateTime.UtcNow.AddDays(-1),
+                EntryFee = 1,
+                Status = LotteryStatus.Started,
+                Images = new ImagesCollection(),
+                GiftedTicketLimit = 0
+            };
+
+            var expectedStatus = HttpStatusCode.BadRequest;
+
+            _sut.Validate(args);
+
+            // Act
+            var httpActionResult = await _sut.CreateLottery(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task CreateLottery_EndDateNotPresent_ReturnsBadRequest()
+        {
+            var args = new CreateLotteryViewModel
+            {
+                Title = "title",
+                Description = "desc",
+                EntryFee = 1,
+                Status = LotteryStatus.Started,
+                Images = new ImagesCollection(),
+                GiftedTicketLimit = 0
+            };
+
+            var expectedStatus = HttpStatusCode.BadRequest;
+
+            _sut.Validate(args);
+
+            // Act
+            var httpActionResult = await _sut.CreateLottery(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task CreateLottery_StatusNotPresent_ReturnsBadRequest()
+        {
+            var args = new CreateLotteryViewModel
+            {
+                Title = "title",
+                Description = "desc",
+                EndDate = DateTime.UtcNow.AddYears(1),
+                EntryFee = 1,
+                Images = new ImagesCollection(),
+                GiftedTicketLimit = 0
+            };
+
+            var expectedStatus = HttpStatusCode.BadRequest;
+
+            _sut.Validate(args);
+
+            // Act
+            var httpActionResult = await _sut.CreateLottery(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task CreateLottery_StatusIsNotStartedAndNotDraft_ReturnsBadRequest()
+        {
+            var args = new CreateLotteryViewModel
+            {
+                Title = "title",
+                Description = "desc",
+                EndDate = DateTime.UtcNow.AddYears(1),
+                EntryFee = 1,
+                Status = LotteryStatus.Ended,
+                Images = new ImagesCollection(),
+                GiftedTicketLimit = 0
+            };
+
+            var expectedStatus = HttpStatusCode.BadRequest;
+
+            _sut.Validate(args);
+
+            // Act
+            var httpActionResult = await _sut.CreateLottery(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task CreateLottery_NoImages_ReturnsBadRequest()
+        {
+            var args = new CreateLotteryViewModel
+            {
+                Title = "title",
+                Description = "desc",
+                EndDate = DateTime.UtcNow.AddYears(1),
+                EntryFee = 1,
+                Status = LotteryStatus.Started,
+                GiftedTicketLimit = 0
+            };
+
+            var expectedStatus = HttpStatusCode.BadRequest;
+
+            _sut.Validate(args);
+
+            // Act
+            var httpActionResult = await _sut.CreateLottery(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task CreateLottery_GiftedLimitLessThanZero_ReturnsBadRequest()
+        {
+            var args = new CreateLotteryViewModel
+            {
+                Title = "title",
+                Description = "desc",
+                EndDate = DateTime.UtcNow.AddYears(1),
+                EntryFee = 1,
+                Status = LotteryStatus.Started,
+                Images = new ImagesCollection(),
+                GiftedTicketLimit = -10
+            };
+
+            var expectedStatus = HttpStatusCode.BadRequest;
+
+            _sut.Validate(args);
+
+            // Act
+            var httpActionResult = await _sut.CreateLottery(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task Abort_ValidId_ReturnsOk()
+        {
+            // Arrange
+            var expectedStatus = HttpStatusCode.OK;
+            const int id = 1;
+
+            _lotteryService
+                .AbortLotteryAsync(Arg.Any<int>(), Arg.Any<UserAndOrganizationDto>())
+                .Returns(true);
+
+            // Act
+            var httpActionResult = await _sut.Abort(id);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task Abort_InvalidId_ReturnsNotFound()
+        {
+            // Arrange
+            var expectedStatus = HttpStatusCode.NotFound;
+            const int id = 1;
+
+            _lotteryService
+                .AbortLotteryAsync(Arg.Any<int>(), Arg.Any<UserAndOrganizationDto>())
+                .Returns(false);
+
+            // Act
+            var httpActionResult = await _sut.Abort(id);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task RefundParticipants_ValidValues_ReturnsOk()
+        {
+            // Arrange
+            const int id = 1;
+            var expectedStatus = HttpStatusCode.OK;
+
+            // Act
+            var httpActionResult = await _sut.RefundParticipants(id);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task GetStatus_ValidValues_ReturnsOk()
+        {
+            // Arrange
+            const int id = 1;
+            var expectedStatus = HttpStatusCode.OK;
+
+            // Act
+            var httpActionResult = await _sut.GetStatus(id);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task UpdateDrafted_ValidValues_ReturnsOk()
+        {
+            // Arrange
+            var args = new EditDraftedLotteryViewModel
+            {
+                Id = 1,
+                Title = "title",
                 Status = LotteryStatus.Drafted,
-                Title = "Hello"
+                EndDate = DateTime.UtcNow.AddYears(1),
+                EntryFee = 10,
+                Images = new ImagesCollection(),
+                GiftedTicketLimit = 10
             };
 
-            var lotteryDto = new LotteryDetailsDto
+            var expectedStatus = HttpStatusCode.OK;
+
+            // Act
+            _sut.Validate(args);
+
+            var httpActionResult = await _sut.UpdateDrafted(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task UpdateDrafted_LotteryExceptionThrown_ReturnsBadRequest()
+        {
+            // Arrange
+            var args = new EditDraftedLotteryViewModel
             {
-                Id = 2,
+                Id = 1,
+                Title = "title",
                 Status = LotteryStatus.Drafted,
-                Title = "Hello"
+                EndDate = DateTime.UtcNow.AddYears(1),
+                EntryFee = 10,
+                Images = new ImagesCollection(),
+                GiftedTicketLimit = 10
             };
 
-            _mapper.Map<LotteryDetailsDto, LotteryDetailsViewModel>(lotteryDto).Returns(lotteryViewModel);
+            var expectedStatus = HttpStatusCode.BadRequest;
 
-            _lotteryService.GetLotteryDetailsAsync(2, UserAndOrganizationArg).Returns(lotteryDto);
+            _lotteryService
+                .EditDraftedLotteryAsync(Arg.Any<LotteryDto>(), Arg.Any<UserAndOrganizationDto>())
+                .Throws(new LotteryException("Error"));
 
             // Act
-            var response = await _lotteryController.GetLottery(2);
+            _sut.Validate(args);
 
-            // Assert
-            Assert.IsNotNull(response);
-            Assert.IsInstanceOf<OkNegotiatedContentResult<LotteryDetailsViewModel>>(response);
-            await _lotteryService.Received(1).GetLotteryDetailsAsync(2, UserAndOrganizationArg);
+            var httpActionResult = await _sut.UpdateDrafted(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
         }
 
         [Test]
-        public async Task GetLottery_Should_Return_Unprocessable_Entity_Error()
+        public async Task UpdateDrafted_IdNotPresent_ReturnsBadRequest()
         {
             // Arrange
-            _lotteryService.GetLotteryDetailsAsync(3000, UserAndOrganizationArg).Returns((LotteryDetailsDto)null);
+            var args = new EditDraftedLotteryViewModel
+            {
+                Title = "title",
+                Status = LotteryStatus.Drafted,
+                EndDate = DateTime.UtcNow.AddYears(1),
+                EntryFee = 10,
+                Images = new ImagesCollection(),
+                GiftedTicketLimit = 10
+            };
+
+            var expectedStatus = HttpStatusCode.BadRequest;
 
             // Act
-            var response = await _lotteryController.GetLottery(3000);
+            _sut.Validate(args);
 
-            // Assert
-            Assert.IsNotNull(response);
-            Assert.IsInstanceOf<NegotiatedContentResult<string>>(response);
-            await _lotteryService.Received(1).GetLotteryDetailsAsync(3000, UserAndOrganizationArg);
+            var httpActionResult = await _sut.UpdateDrafted(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
+        }
+
+
+        [Test]
+        public async Task UpdateDrafted_TitleNotPresent_ReturnsBadRequest()
+        {
+            // Arrange
+            var args = new EditDraftedLotteryViewModel
+            {
+                Id = 1,
+                Status = LotteryStatus.Drafted,
+                EndDate = DateTime.UtcNow.AddYears(1),
+                EntryFee = 10,
+                Images = new ImagesCollection(),
+                GiftedTicketLimit = 10
+            };
+
+            var expectedStatus = HttpStatusCode.BadRequest;
+
+            // Act
+            _sut.Validate(args);
+
+            var httpActionResult = await _sut.UpdateDrafted(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
         }
 
         [Test]
-        public async Task Abort_Should_Return_Ok()
+        public async Task UpdateDrafted_StatusNotPresent_ReturnsBadRequest()
         {
             // Arrange
-            _lotteryService.AbortLotteryAsync(2, UserAndOrganizationArg).Returns(true);
+            var args = new EditDraftedLotteryViewModel
+            {
+                Id = 1,
+                Title = "title",
+                EndDate = DateTime.UtcNow.AddYears(1),
+                EntryFee = 10,
+                Images = new ImagesCollection(),
+                GiftedTicketLimit = 10
+            };
+
+            var expectedStatus = HttpStatusCode.BadRequest;
 
             // Act
-            var response = await _lotteryController.Abort(2);
+            _sut.Validate(args);
 
-            // Assert
-            Assert.IsNotNull(response);
-            Assert.IsInstanceOf<OkResult>(response);
-            await _lotteryService.Received(1).AbortLotteryAsync(2, UserAndOrganizationArg);
+            var httpActionResult = await _sut.UpdateDrafted(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
         }
 
         [Test]
-        public async Task Abort_Should_Return_Unprocessable_Entity_Error()
+        public async Task UpdateDrafted_StatusDoesNotExist_ReturnsBadRequest()
         {
             // Arrange
-            _lotteryService.AbortLotteryAsync(5, UserAndOrganizationArg).Returns(false);
+            var args = new EditDraftedLotteryViewModel
+            {
+                Id = 1,
+                Title = "title",
+                Status = (LotteryStatus)int.MaxValue,
+                EndDate = DateTime.UtcNow.AddYears(1),
+                EntryFee = 10,
+                Images = new ImagesCollection(),
+                GiftedTicketLimit = 10
+            };
+
+            var expectedStatus = HttpStatusCode.BadRequest;
 
             // Act
-            var response = await _lotteryController.Abort(5);
+            _sut.Validate(args);
 
-            // Assert
-            Assert.IsNotNull(response);
-            Assert.IsInstanceOf<NegotiatedContentResult<string>>(response);
-            await _lotteryService.Received(1).AbortLotteryAsync(5, UserAndOrganizationArg);
+            var httpActionResult = await _sut.UpdateDrafted(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
         }
 
         [Test]
-        public async Task CreateLottery_Should_Return_Invalid_Model_State()
+        public async Task UpdateDrafted_EndDateNotPresent_ReturnsBadRequest()
         {
             // Arrange
-            var lotteryViewModel = new CreateLotteryViewModel
+            var args = new EditDraftedLotteryViewModel
             {
-                Title = "test"
+                Id = 1,
+                Title = "title",
+                Status = LotteryStatus.Drafted,
+                EntryFee = 10,
+                Images = new ImagesCollection(),
+                GiftedTicketLimit = 10
             };
 
-            var lotteryDto = new LotteryDto
-            {
-                Title = "test"
-            };
-
-            _mapper.Map<CreateLotteryViewModel, LotteryDto>(lotteryViewModel).Returns(lotteryDto);
+            var expectedStatus = HttpStatusCode.BadRequest;
 
             // Act
-            _lotteryController.ModelState.AddModelError("model", "error");
+            _sut.Validate(args);
 
-            var response = await _lotteryController.CreateLottery(lotteryViewModel);
+            var httpActionResult = await _sut.UpdateDrafted(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
-            // Assert
-            Assert.IsInstanceOf<InvalidModelStateResult>(response);
-            await _lotteryService.DidNotReceive().CreateLotteryAsync(lotteryDto, new UserAndOrganizationDto());
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
         }
 
         [Test]
-        public async Task CreateLottery_Should_Return_Ok()
+        public async Task UpdateDrafted_EndDateLessThanPresent_ReturnsBadRequest()
         {
             // Arrange
-            var lotteryViewModel = new CreateLotteryViewModel
+            var args = new EditDraftedLotteryViewModel
             {
-                Title = "test"
+                Id = 1,
+                Title = "title",
+                Status = LotteryStatus.Drafted,
+                EndDate = DateTime.UtcNow.AddYears(-1),
+                EntryFee = 10,
+                Images = new ImagesCollection(),
+                GiftedTicketLimit = 10
             };
 
-            var lotteryDto = new LotteryDto
-            {
-                Title = "test"
-            };
-
-            _mapper.Map<CreateLotteryViewModel, LotteryDto>(lotteryViewModel).Returns(lotteryDto);
+            var expectedStatus = HttpStatusCode.BadRequest;
 
             // Act
-            var response = await _lotteryController.CreateLottery(lotteryViewModel);
+            _sut.Validate(args);
 
-            // Assert
-            Assert.IsNotNull(response);
-            Assert.IsInstanceOf<OkResult>(response);
-            await _lotteryService.Received(1).CreateLotteryAsync(lotteryDto, Arg.Any<UserAndOrganizationDto>());
+            var httpActionResult = await _sut.UpdateDrafted(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
         }
 
         [Test]
-        public async Task CreateLottery_Should_Return_Bad_Request()
+        public async Task UpdateDrafted_EntryFeeLessOrEqualZero_ReturnsBadRequest()
         {
             // Arrange
-            var userOrg = new UserAndOrganizationDto();
-            var lotteryViewModel = new CreateLotteryViewModel
+            var args = new EditDraftedLotteryViewModel
             {
-                Title = "test"
+                Id = 1,
+                Title = "title",
+                Status = LotteryStatus.Drafted,
+                EndDate = DateTime.UtcNow.AddYears(1),
+                EntryFee = 0,
+                Images = new ImagesCollection(),
+                GiftedTicketLimit = 10
             };
 
-            var lotteryDto = new LotteryDto
-            {
-                Title = "test"
-            };
-
-            _mapper.Map<CreateLotteryViewModel, LotteryDto>(lotteryViewModel).Returns(lotteryDto);
-            _lotteryService.CreateLotteryAsync(lotteryDto, Arg.Any<UserAndOrganizationDto>()).Throws(new LotteryException("Exception"));
+            var expectedStatus = HttpStatusCode.BadRequest;
 
             // Act
-            var response = await _lotteryController.CreateLottery(lotteryViewModel);
+            _sut.Validate(args);
 
-            // Assert
-            Assert.IsInstanceOf<BadRequestErrorMessageResult>(response);
-            await _lotteryService.Received(1).CreateLotteryAsync(lotteryDto, Arg.Any<UserAndOrganizationDto>());
+            var httpActionResult = await _sut.UpdateDrafted(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
         }
 
         [Test]
-        public async Task BuyLotteryTicket_Should_Return_Ok()
+        public async Task UpdateDrafted_EntryFeeNotPresent_ReturnsBadRequest()
         {
             // Arrange
-            var ticketViewModel = new BuyLotteryTicketsViewModel
+            var args = new EditDraftedLotteryViewModel
             {
-                LotteryId = 1,
-                Tickets = 5
+                Id = 1,
+                Title = "title",
+                Status = LotteryStatus.Drafted,
+                EndDate = DateTime.UtcNow.AddYears(1),
+                Images = new ImagesCollection(),
+                GiftedTicketLimit = 10
             };
 
-            var ticketDto = new BuyLotteryTicketsDto
-            {
-                LotteryId = 1,
-                Tickets = 5
-            };
-
-            _mapper.Map<BuyLotteryTicketsViewModel, BuyLotteryTicketsDto>(ticketViewModel).Returns(ticketDto);
+            var expectedStatus = HttpStatusCode.BadRequest;
 
             // Act
-            var response = await _lotteryController.BuyLotteryTicket(ticketViewModel);
+            _sut.Validate(args);
 
-            // Assert
-            Assert.IsNotNull(response);
-            Assert.IsInstanceOf<OkResult>(response);
-            await _lotteryService.Received(1).BuyLotteryTicketsAsync(ticketDto, UserAndOrganizationArg);
+            var httpActionResult = await _sut.UpdateDrafted(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
         }
 
         [Test]
-        public async Task BuyLotteryTicket_Should_Return_Bad_Request()
+        public async Task UpdateDrafted_NoImages_ReturnsBadRequest()
         {
             // Arrange
-            var ticketViewModel = new BuyLotteryTicketsViewModel
+            var args = new EditDraftedLotteryViewModel
             {
-                LotteryId = 1,
-                Tickets = 5
+                Id = 1,
+                Title = "title",
+                Status = LotteryStatus.Drafted,
+                EndDate = DateTime.UtcNow.AddYears(1),
+                EntryFee = 10,
+                GiftedTicketLimit = 10
             };
 
-            var ticketDto = new BuyLotteryTicketsDto
-            {
-                LotteryId = 1,
-                Tickets = 5
-            };
-
-            _mapper.Map<BuyLotteryTicketsViewModel, BuyLotteryTicketsDto>(ticketViewModel).Returns(ticketDto);
-
-            _lotteryService.BuyLotteryTicketsAsync(ticketDto, UserAndOrganizationArg).Throws(new LotteryException("Exception"));
+            var expectedStatus = HttpStatusCode.BadRequest;
 
             // Act
-            var response = await _lotteryController.BuyLotteryTicket(ticketViewModel);
+            _sut.Validate(args);
 
-            // Assert
-            Assert.IsNotNull(response);
-            Assert.IsInstanceOf<BadRequestErrorMessageResult>(response);
-            await _lotteryService.Received(1).BuyLotteryTicketsAsync(ticketDto, UserAndOrganizationArg);
+            var httpActionResult = await _sut.UpdateDrafted(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
         }
 
         [Test]
-        public async Task GetPagedLotteries_Should_Return_Ok()
+        public async Task UpdateDrafted_GiftedTicketLimitNotPresent_ReturnsBadRequest()
         {
             // Arrange
-            var args = new GetPagedLotteriesArgs
+            var args = new EditDraftedLotteryViewModel
             {
-                Filter = "",
-                PageNumber = 1,
-                PageSize = 10,
-                UserOrg = _userAndOrganization
+                Id = 1,
+                Title = "title",
+                Status = LotteryStatus.Drafted,
+                EndDate = DateTime.UtcNow.AddYears(1),
+                EntryFee = 10,
+                Images = new ImagesCollection()
             };
 
-            var pagedListAsync = await LotteryDetailsDto.ToPagedListAsync(args.PageNumber, args.PageSize);
-            _lotteryService.GetPagedLotteriesAsync(args).Returns(pagedListAsync);
+            var expectedStatus = HttpStatusCode.BadRequest;
 
             // Act
-            var response = await _lotteryController.GetPagedLotteries("", 1, 10);
+            _sut.Validate(args);
 
-            // Assert
-            Assert.IsNotNull(response);
-            Assert.IsInstanceOf<OkNegotiatedContentResult<PagedViewModel<LotteryDetailsDto>>>(response);
-            await _lotteryService.Received(1).GetPagedLotteriesAsync(Arg.Any<GetPagedLotteriesArgs>());
+            var httpActionResult = await _sut.UpdateDrafted(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
         }
 
         [Test]
-        public async Task RefundParticipants_Should_Return_Ok()
+        public async Task UpdateDrafted_GiftedTicketLimitLessThanZero_ReturnsBadRequest()
         {
             // Arrange
+            var args = new EditDraftedLotteryViewModel
+            {
+                Id = 1,
+                Title = "title",
+                Status = LotteryStatus.Drafted,
+                EndDate = DateTime.UtcNow.AddYears(1),
+                EntryFee = 10,
+                Images = new ImagesCollection(),
+                GiftedTicketLimit = -10
+            };
+
+            var expectedStatus = HttpStatusCode.BadRequest;
 
             // Act
-            var response = await _lotteryController.RefundParticipants(1337);
+            _sut.Validate(args);
 
-            // Assert
-            Assert.IsNotNull(response);
-            Assert.IsInstanceOf<OkResult>(response);
-            await _lotteryService.Received(1).RefundParticipantsAsync(1337, UserAndOrganizationArg);
+            var httpActionResult = await _sut.UpdateDrafted(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
         }
 
         [Test]
-        public async Task FinishLottery_Should_Return_Ok()
+        public async Task UpdateStarted_ValidValues_ReturnsOk()
         {
             // Arrange
+            var args = new EditStartedLotteryViewModel
+            {
+                Id = 10,
+                Description = "test"
+            };
+
+            var expectedStatus = HttpStatusCode.OK;
 
             // Act
-            var response = await _lotteryController.FinishLottery(37);
+            _sut.Validate(args);
 
-            // Assert
-            Assert.IsNotNull(response);
-            Assert.IsInstanceOf<OkResult>(response);
-            await _lotteryService.Received(1).FinishLotteryAsync(37, UserAndOrganizationArg);
+            var httpActionResult = await _sut.UpdateStarted(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
         }
 
         [Test]
-        public async Task FinishLottery_Should_Return_Bad_Request()
+        public async Task UpdateStarted_LotteryExceptionThrown_ReturnsBadRequest()
         {
             // Arrange
-            _lotteryService.FinishLotteryAsync(37, UserAndOrganizationArg).Throws(new LotteryException("Exception"));
+            var args = new EditStartedLotteryViewModel
+            {
+                Id = 10,
+                Description = "test"
+            };
+
+            _lotteryService
+                .EditStartedLotteryAsync(Arg.Any<EditStartedLotteryDto>(), Arg.Any<UserAndOrganizationDto>())
+                .Throws(new LotteryException("Error"));
+
+            var expectedStatus = HttpStatusCode.BadRequest;
 
             // Act
-            var response = await _lotteryController.FinishLottery(37);
+            _sut.Validate(args);
 
-            // Assert
-            Assert.IsNotNull(response);
-            Assert.IsInstanceOf<BadRequestErrorMessageResult>(response);
-            await _lotteryService.Received(1).FinishLotteryAsync(37, UserAndOrganizationArg);
+            var httpActionResult = await _sut.UpdateStarted(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
         }
 
         [Test]
-        public async Task UpdateDrafted_Should_Return_Ok()
+        public async Task UpdateStarted_IdNotPresent_ReturnsBadRequest()
         {
             // Arrange
-            var lotteryViewModel = new EditDraftedLotteryViewModel
+            var args = new EditStartedLotteryViewModel
             {
-                Id = 31,
-                Title = "Hello"
+                Description = "test"
             };
 
-            var lotteryDto = new LotteryDto
-            {
-                Id = 31,
-                Title = "Hello"
-            };
-            _mapper.Map<EditDraftedLotteryViewModel, LotteryDto>(lotteryViewModel)
-                .Returns(lotteryDto);
+            var expectedStatus = HttpStatusCode.BadRequest;
 
             // Act
-            var response = await _lotteryController.UpdateDrafted(lotteryViewModel);
+            _sut.Validate(args);
 
-            // Assert
-            Assert.IsNotNull(response);
-            Assert.IsInstanceOf<OkResult>(response);
-            await _lotteryService.Received(1).EditDraftedLotteryAsync(lotteryDto, Arg.Any<UserAndOrganizationDto>());
+            var httpActionResult = await _sut.UpdateStarted(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
         }
 
         [Test]
-        public async Task UpdateDrafted_Should_Return_Bad_Request()
+        public async Task UpdateStarted_DescriptionNotPresent_ReturnsBadRequest()
         {
             // Arrange
-            var lotteryViewModel = new EditDraftedLotteryViewModel
+            var args = new EditStartedLotteryViewModel
             {
-                Id = 31,
-                Title = "Hello"
+                Id = 10,
             };
 
-            var lotteryDto = new LotteryDto
-            {
-                Id = 31,
-                Title = "Hello"
-            };
-            _mapper.Map<EditDraftedLotteryViewModel, LotteryDto>(lotteryViewModel)
-                .Returns(lotteryDto);
-
-            _lotteryService.When(x => x.EditDraftedLotteryAsync(lotteryDto, Arg.Any<UserAndOrganizationDto>()))
-                .Do(_ => throw new LotteryException("Exception"));
+            var expectedStatus = HttpStatusCode.BadRequest;
 
             // Act
-            var response = await _lotteryController.UpdateDrafted(lotteryViewModel);
+            _sut.Validate(args);
 
-            // Assert
-            Assert.IsNotNull(response);
-            Assert.IsInstanceOf<BadRequestErrorMessageResult>(response);
-            await _lotteryService.Received(1).EditDraftedLotteryAsync(lotteryDto, Arg.Any<UserAndOrganizationDto>());
+            var httpActionResult = await _sut.UpdateStarted(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
         }
 
         [Test]
-        public async Task UpdateStarted_Should_Return_Ok()
+        public async Task UpdateStarted_DescriptionOverCharacterLimit_ReturnsBadRequest()
         {
             // Arrange
-            var lotteryViewModel = new EditStartedLotteryViewModel
+            var args = new EditStartedLotteryViewModel
             {
-                Id = 31
+                Id = 10,
+                Description = new string('-', 100000)
             };
 
-            var lotteryDto = new EditStartedLotteryDto
-            {
-                Id = 31
-            };
-            _mapper.Map<EditStartedLotteryViewModel, EditStartedLotteryDto>(lotteryViewModel)
-                .Returns(lotteryDto);
+            var expectedStatus = HttpStatusCode.BadRequest;
 
             // Act
-            var response = await _lotteryController.UpdateStarted(lotteryViewModel);
+            _sut.Validate(args);
 
-            // Assert
-            Assert.IsNotNull(response);
-            Assert.IsInstanceOf<OkResult>(response);
-            await _lotteryService.Received(1).EditStartedLotteryAsync(lotteryDto);
+            var httpActionResult = await _sut.UpdateStarted(args);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
         }
 
         [Test]
-        public async Task UpdateStarted_Should_Return_Bad_Request()
+        public async Task FinishLottery_ValidValues_ReturnsOk()
         {
             // Arrange
-            var lotteryViewModel = new EditStartedLotteryViewModel
-            {
-                Id = 31
-            };
-
-            var lotteryDto = new EditStartedLotteryDto
-            {
-                Id = 31
-            };
-            _mapper.Map<EditStartedLotteryViewModel, EditStartedLotteryDto>(lotteryViewModel)
-                .Returns(lotteryDto);
-            _lotteryService.When(x => x.EditStartedLotteryAsync(lotteryDto))
-                .Do(_ => throw new LotteryException("Exception"));
+            const int id = 1;
+            var expectedStatus = HttpStatusCode.OK;
 
             // Act
-            var response = await _lotteryController.UpdateStarted(lotteryViewModel);
+            var httpActionResult = await _sut.FinishLottery(id);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
-            // Assert
-            Assert.IsNotNull(response);
-            Assert.IsInstanceOf<BadRequestErrorMessageResult>(response);
-            await _lotteryService.Received(1).EditStartedLotteryAsync(lotteryDto);
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
         }
 
         [Test]
-        public async Task LotteryStats_Should_Return_Ok()
+        public async Task FinishLottery_LotteryExceptionThrown_ReturnsBadRequest()
         {
             // Arrange
-            var lotteryStats = new LotteryStatsDto
-            {
-                KudosSpent = 60,
-                TicketsSold = 30,
-                TotalParticipants = 15
-            };
+            const int id = 1;
+            var expectedStatus = HttpStatusCode.BadRequest;
 
-            _lotteryService.GetLotteryStatsAsync(13, UserAndOrganizationArg).Returns(lotteryStats);
+            _lotteryService
+                .FinishLotteryAsync(Arg.Any<int>(), Arg.Any<UserAndOrganizationDto>())
+                .Throws(new LotteryException("Error"));
 
             // Act
-            var response = await _lotteryController.LotteryStats(13);
+            var httpActionResult = await _sut.FinishLottery(id);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
-            // Assert
-            Assert.IsNotNull(response);
-            Assert.IsInstanceOf<OkNegotiatedContentResult<LotteryStatsDto>>(response);
-            await _lotteryService.Received(1).GetLotteryStatsAsync(13, UserAndOrganizationArg);
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
         }
 
         [Test]
-        public async Task LotteryStats_Should_Return_Unprocessable_Entity_Error()
+        public async Task LotteryStats_ValidValues_ReturnsOk()
         {
             // Arrange
-            _lotteryService.GetLotteryStatsAsync(13, UserAndOrganizationArg).Returns((LotteryStatsDto)null);
+            const int id = 1;
+            var expectedStatus = HttpStatusCode.OK;
+
+            _lotteryService
+                .GetLotteryStatsAsync(Arg.Any<int>(), Arg.Any<UserAndOrganizationDto>())
+                .Returns(new LotteryStatsDto());
 
             // Act
-            var response = await _lotteryController.LotteryStats(13);
+            var httpActionResult = await _sut.LotteryStats(id);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
 
-            // Assert
-            Assert.IsNotNull(response);
-            Assert.IsInstanceOf<NegotiatedContentResult<string>>(response);
-            await _lotteryService.Received(1).GetLotteryStatsAsync(13, UserAndOrganizationArg);
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
         }
 
-        private IEnumerable<LotteryDetailsDto> LotteryDetailsDto => new List<LotteryDetailsDto>
+        [Test]
+        public async Task LotteryStats_InvalidId_ReturnsNotFound()
         {
-            new LotteryDetailsDto { Id = 1, Status = LotteryStatus.Started, EndDate = DateTime.Now.AddDays(2), Title = "Monitor", EntryFee = -5 },
-            new LotteryDetailsDto { Id = 2, Status = LotteryStatus.Started, EndDate = DateTime.Now.AddDays(-5), Title = "Computer", EntryFee = 2 },
-            new LotteryDetailsDto { Id = 3, Status = LotteryStatus.Deleted, EndDate = DateTime.Now.AddDays(4), Title = "Table", EntryFee = 2 },
-            new LotteryDetailsDto { Id = 4, Status = LotteryStatus.Started, EndDate = DateTime.Now.AddDays(5), Title = "1000 kudos", EntryFee = 5 },
-            new LotteryDetailsDto { Id = 5, Status = LotteryStatus.Deleted, EndDate = DateTime.Now.AddDays(5), Title = "100 kudos", EntryFee = 5 },
-            new LotteryDetailsDto { Id = 6, Status = LotteryStatus.Ended, EndDate = DateTime.Now.AddDays(5), Title = "10 kudos", EntryFee = 5 },
-            new LotteryDetailsDto { Id = 7, Status = LotteryStatus.Drafted, EndDate = DateTime.Now.AddDays(5), Title = "10000 kudos", EntryFee = 5 },
-            new LotteryDetailsDto { Id = 8, Status = LotteryStatus.Drafted, EndDate = DateTime.Now.AddDays(5), Title = "10 000 kudos", EntryFee = 5 }
-        };
+            // Arrange
+            const int id = 1;
+            var expectedStatus = HttpStatusCode.NotFound;
 
-        private IEnumerable<LotteryDetailsViewModel> LotteryDetailsViewModel => new List<LotteryDetailsViewModel>
+            _lotteryService
+                .GetLotteryStatsAsync(Arg.Any<int>(), Arg.Any<UserAndOrganizationDto>())
+                .Returns((LotteryStatsDto)null);
+
+            // Act
+            var httpActionResult = await _sut.LotteryStats(id);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task Export_ValidValues_ReturnsOk()
         {
-            new LotteryDetailsViewModel { Id = 1, Status = LotteryStatus.Started, EndDate = DateTime.Now.AddDays(2), Title = "Monitor", EntryFee = -5 },
-            new LotteryDetailsViewModel { Id = 2, Status = LotteryStatus.Started, EndDate = DateTime.Now.AddDays(-5), Title = "Computer", EntryFee = 2 },
-            new LotteryDetailsViewModel { Id = 3, Status = LotteryStatus.Deleted, EndDate = DateTime.Now.AddDays(4), Title = "Table", EntryFee = 2 },
-            new LotteryDetailsViewModel { Id = 4, Status = LotteryStatus.Started, EndDate = DateTime.Now.AddDays(5), Title = "1000 kudos", EntryFee = 5 },
-            new LotteryDetailsViewModel { Id = 5, Status = LotteryStatus.Deleted, EndDate = DateTime.Now.AddDays(5), Title = "100 kudos", EntryFee = 5 },
-            new LotteryDetailsViewModel { Id = 6, Status = LotteryStatus.Ended, EndDate = DateTime.Now.AddDays(5), Title = "10 kudos", EntryFee = 5 },
-            new LotteryDetailsViewModel { Id = 7, Status = LotteryStatus.Drafted, EndDate = DateTime.Now.AddDays(5), Title = "10000 kudos", EntryFee = 5 },
-            new LotteryDetailsViewModel { Id = 8, Status = LotteryStatus.Drafted, EndDate = DateTime.Now.AddDays(5), Title = "10 000 kudos", EntryFee = 5 }
-        };
+            // Arrange
+            const int id = 1;
+            var expectedStatus = HttpStatusCode.OK;
 
-        private readonly UserAndOrganizationDto _userAndOrganization = new UserAndOrganizationDto
+            // Act
+            var httpActionResult = await _sut.Export(id);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
+        }
+
+        [Test]
+        public async Task Export_InvalidId_ReturnsBadRequest()
         {
-            OrganizationId = 1,
-            UserId = "1"
-        };
+            // Arrange
+            const int id = 1;
+            var expectedStatus = HttpStatusCode.BadRequest;
 
-        private UserAndOrganizationDto UserAndOrganizationArg =>
-            Arg.Is<UserAndOrganizationDto>(o => o.UserId == _userAndOrganization.UserId && o.OrganizationId == _userAndOrganization.OrganizationId);
+            _lotteryExportService
+                .ExportParticipantsAsync(Arg.Any<int>(), Arg.Any<UserAndOrganizationDto>())
+                .Throws(new LotteryException("Error"));
+
+            // Act
+            var httpActionResult = await _sut.Export(id);
+            var actual = await httpActionResult.ExecuteAsync(CancellationToken.None);
+
+            // Arrange
+            Assert.AreEqual(expectedStatus, actual.StatusCode);
+        }
     }
 }

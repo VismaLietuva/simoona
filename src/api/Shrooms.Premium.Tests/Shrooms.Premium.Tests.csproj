@@ -178,7 +178,7 @@
     <Compile Include="DomainService\LotteryServices\LotteryAbortJobTests.cs" />
     <Compile Include="DomainService\LotteryServices\LotteryServiceTests.cs" />
     <Compile Include="DomainService\LotteryServices\LotteryStatusChangeServiceTests.cs" />
-    <Compile Include="DomainService\LotteryServices\ParticipantServiceTests.cs" />
+    <Compile Include="DomainService\LotteryServices\LotteryParticipantServiceTests.cs" />
     <Compile Include="DomainService\LoyaltyKudosTests.cs" />
     <Compile Include="DomainService\OfficeMapServiceTests.cs" />
     <Compile Include="DomainService\OrganizationalStructureTests.cs" />
@@ -186,6 +186,7 @@
     <Compile Include="DomainService\ServiceRequestServiceTests.cs" />
     <Compile Include="DomainService\EventServices\EventJoinRemindServiceTests.cs" />
     <Compile Include="DomainService\VacationService\VacationDomainServiceTests.cs" />
+    <Compile Include="DomainService\Validators\LotteryValidatorTests.cs" />
     <Compile Include="Mocks\TestDbAsyncQueryProvider{TEntity}.cs" />
     <Compile Include="ModelMappings\AutoMapperTests.cs" />
     <Compile Include="ModelMappings\ModelMapper.cs" />
@@ -193,6 +194,8 @@
     <Compile Include="TestConstants.cs" />
     <Compile Include="ValidationAttributes\DateTimeLessThanPresentDateAttributeTests.cs" />
     <Compile Include="ValidationAttributes\DateTimeLessThanDateTimeAttributeTests.cs" />
+    <Compile Include="ValidationAttributes\NoDuplicatesInCollectionAttributeTests.cs" />
+    <Compile Include="ValidationAttributes\ValidLotteryCreationStatusAttributeTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

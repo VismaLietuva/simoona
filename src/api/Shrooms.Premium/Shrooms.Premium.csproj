@@ -366,6 +366,7 @@
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryStartedEmailUserInfoDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryStatsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryStatusDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Lotteries\LotteryTicketReceiverDto.cs" />
     <Compile Include="DataTransferObjects\Models\MobileBookOfficeLogsDto.cs" />
     <Compile Include="DataTransferObjects\Models\OfficeMap\OfficeDto.cs" />
     <Compile Include="DataTransferObjects\Models\OfficeMap\OfficeRoomDto.cs" />
@@ -586,6 +587,7 @@
     <Compile Include="Presentation\WebViewModels\Lotteries\LotteryDetailsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Lotteries\LotteryListingArgsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Lotteries\LotteryParticipantViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Lotteries\LotteryTicketReceiverViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Lotteries\LotteryViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Lotteries\LotteryWidgetViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Map\MapAllFloorsViewModel.cs" />
@@ -611,7 +613,6 @@
     <Compile Include="Presentation\WebViewModels\ValidationAttributes\DateTimeGreaterThanPresentDateAttribute.cs" />
     <Compile Include="Presentation\WebViewModels\ValidationAttributes\DateTimeLessThanDateTimeAttribute.cs" />
     <Compile Include="Presentation\WebViewModels\ValidationAttributes\DateTimeLessThanPresentDateAttribute.cs" />
-    <Compile Include="Presentation\WebViewModels\ValidationAttributes\Lotteries\ValidLotteryStatusBaseAttribute.cs" />
     <Compile Include="Presentation\WebViewModels\ValidationAttributes\Lotteries\ValidLotteryCreationStatusAttribute.cs" />
     <Compile Include="Presentation\WebViewModels\ValidationAttributes\MinValueAttribute.cs" />
     <Compile Include="Presentation\WebViewModels\ValidationAttributes\ValidEndDateAttribute.cs" />

@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Shrooms.Contracts.DataTransferObjects;
+﻿using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.DataLayer.EntityModels.Models.Lottery;
 using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using X.PagedList;
 
 namespace Shrooms.Premium.Domain.Services.Lotteries
@@ -11,7 +11,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
     {
         Task<Lottery> GetLotteryByIdAsync(int id, UserAndOrganizationDto userOrg);
 
-        Task<LotteryDto> CreateLotteryAsync(LotteryDto newLotteryDto, UserAndOrganizationDto userOrg);
+        Task CreateLotteryAsync(LotteryDto newLotteryDto, UserAndOrganizationDto userOrg);
 
         Task EditDraftedLotteryAsync(LotteryDto lotteryDto, UserAndOrganizationDto userOrg);
 

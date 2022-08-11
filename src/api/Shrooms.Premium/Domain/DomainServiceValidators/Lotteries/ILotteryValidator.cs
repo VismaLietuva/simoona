@@ -2,15 +2,16 @@
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Lottery;
 using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Shrooms.Premium.Domain.DomainServiceValidators.Lotteries
 {
     public interface ILotteryValidator
     {
-        Task CheckIfGiftReceiversExistAsync(BuyLotteryTicketsDto buyTicketsDto, UserAndOrganizationDto userOrg);
+        Task CheckIfGiftReceiversExistAsync(IEnumerable<string> receiverIds, UserAndOrganizationDto userOrg);
 
-        void CheckIfGiftedTicketLimitIsExceeded(LotteryDetailsBuyerDto buyerDto, BuyLotteryTicketsDto buyLotteryDto);
+        void CheckIfGiftedTicketLimitIsExceeded(LotteryDetailsBuyerDto buyerDto, int totalTicketCount);
 
         void CheckIfBuyerExists(ApplicationUser applicationUser);
 
@@ -26,7 +27,7 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Lotteries
 
         void CheckIfLotteryIsStarted(Lottery lottery);
 
-        void CheckIfGiftedTicketsReceiversExist(BuyLotteryTicketsDto buyLotteryTicketsDto);
+        void CheckIfLotteryAllowsGifting(LotteryDetailsDto lotteryDetailsDto);
 
         void CheckIfUserHasEnoughKudos(ApplicationUser buyerApplicationUser, int totalTicketCost);
 

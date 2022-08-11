@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Shrooms.Contracts.DAL;
+﻿using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Kudos;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models.Lottery;
 using Shrooms.Domain.Services.Kudos;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Shrooms.Premium.Domain.Services.Lotteries
 {
@@ -91,7 +91,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
         {
             var kudosTypeId = await _kudosService.GetKudosTypeIdAsync(KudosTypeEnum.Refund);
             var usersToRefund = await _participantService.GetParticipantsGroupedByBuyerIdAsync(lottery.Id, userOrg);
-            
+
             var usersToSendKudos = new List<AddKudosLogDto>();
 
             foreach (var user in usersToRefund)

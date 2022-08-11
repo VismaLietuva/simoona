@@ -10,7 +10,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
 
         [Range(1, int.MaxValue)]
         public int PageSize { get; set; } = WebApiConstants.DefaultPageSize;
-        
+
         [Range(1, int.MaxValue)]
         public int Page { get; set; } = 1;
     }

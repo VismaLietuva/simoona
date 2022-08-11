@@ -1,7 +1,7 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using X.PagedList;
 
 namespace Shrooms.Premium.Domain.Services.Lotteries

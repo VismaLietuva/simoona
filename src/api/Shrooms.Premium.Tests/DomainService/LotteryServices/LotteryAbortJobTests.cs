@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using NSubstitute;
+﻿using NSubstitute;
 using NSubstitute.ReturnsExtensions;
 using NUnit.Framework;
 using Shrooms.Contracts.DAL;
@@ -10,6 +8,8 @@ using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models.Lottery;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Premium.Domain.Services.Lotteries;
+using System;
+using System.Threading.Tasks;
 
 namespace Shrooms.Premium.Tests.DomainService.LotteryServices
 {
@@ -19,7 +19,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
         private ILotteryService _lotteryService;
         private ILotteryAbortJob _sut;
         private IKudosService _kudosService;
-        private IParticipantService _participantService;
+        private ILotteryParticipantService _participantService;
         private IUnitOfWork2 _unitOfWork;
         private IAsyncRunner _asyncRunner;
 
@@ -31,7 +31,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             _unitOfWork = Substitute.For<IUnitOfWork2>();
 
             _kudosService = Substitute.For<IKudosService>();
-            _participantService = Substitute.For<IParticipantService>();
+            _participantService = Substitute.For<ILotteryParticipantService>();
             _asyncRunner = Substitute.For<IAsyncRunner>();
             var logger = Substitute.For<ILogger>();
 
@@ -41,7 +41,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
         [Test]
         public async Task RefundLottery_WrongLotteryId_Exits()
         {
-            _lotteryService.GetLotteryAsync(1).ReturnsNull();
+            _lotteryService.GetLotteryByIdAsync(1, _userAndOrganization).ReturnsNull();
 
             await _sut.RefundLotteryAsync(1, _userAndOrganization);
 
@@ -52,7 +52,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
         public async Task RefundLottery_OrganizationIdDoesNotMatch_Exits()
         {
             var userOrg = new UserAndOrganizationDto { OrganizationId = 100 };
-            _lotteryService.GetLotteryAsync(Arg.Any<int>()).ReturnsForAnyArgs(GetLottery());
+            _lotteryService.GetLotteryByIdAsync(Arg.Any<int>(), userOrg).ReturnsForAnyArgs(GetLottery());
 
             await _sut.RefundLotteryAsync(default, userOrg);
 
@@ -66,7 +66,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
         [TestCase(LotteryStatus.Started)]
         public async Task RefundLottery_IncorrectLotteryStatuses_DoesNotAddKudos(LotteryStatus status)
         {
-            _lotteryService.GetLotteryAsync(Arg.Any<int>()).ReturnsForAnyArgs(new Lottery
+            _lotteryService.GetLotteryByIdAsync(Arg.Any<int>(), _userAndOrganization).ReturnsForAnyArgs(new Lottery
             {
                 Id = 1,
                 OrganizationId = 1,
@@ -82,12 +82,12 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
         [Test]
         public async Task RefundLottery_RefundableLottery_RefundsSuccessfully()
         {
-            _lotteryService.GetLotteryAsync(Arg.Any<int>()).ReturnsForAnyArgs(new Lottery
-                {
-                    Id = 1,
-                    OrganizationId = 1,
-                    Status = LotteryStatus.RefundStarted
-                });
+            _lotteryService.GetLotteryByIdAsync(Arg.Any<int>(), _userAndOrganization).ReturnsForAnyArgs(new Lottery
+            {
+                Id = 1,
+                OrganizationId = 1,
+                Status = LotteryStatus.RefundStarted
+            });
 
             await _sut.RefundLotteryAsync(1, _userAndOrganization);
 
@@ -98,7 +98,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
         [Test]
         public async Task RefundLottery_FailsGetKudosType_CatchesException()
         {
-            _lotteryService.GetLotteryAsync(Arg.Any<int>()).ReturnsForAnyArgs(GetLottery());
+            _lotteryService.GetLotteryByIdAsync(Arg.Any<int>(), _userAndOrganization).ReturnsForAnyArgs(GetLottery());
             _kudosService
                 .When(x => x.GetKudosTypeIdAsync(KudosTypeEnum.Refund))
                 .Do(_ => throw new ArgumentNullException());
@@ -112,7 +112,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
         public async Task RefundLottery_FailsSaveChangesToDatabase_CatchesException()
         {
             var lottery = GetLottery();
-            _lotteryService.GetLotteryAsync(Arg.Any<int>()).ReturnsForAnyArgs(lottery);
+            _lotteryService.GetLotteryByIdAsync(Arg.Any<int>(), _userAndOrganization).ReturnsForAnyArgs(lottery);
 
             _unitOfWork
                 .When(async x => await x.SaveChangesAsync(_userAndOrganization.UserId))

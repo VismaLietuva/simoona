@@ -74,8 +74,7 @@
                         </div>
                     </div>
                     <!--lottery end time-->
-                    <!-- TODO: remove incorrect validation styling -->
-                    <div class="form-group required">
+                    <div class="form-group required has-error-remove-border">
                         <label class="control-label col-xs-4 col-sm-4 event-timepicker-label"
                             translate="lotteries.endTime"></label>
                         <div class="col-xs-8 col-sm-6 col-md-4">
@@ -200,8 +199,6 @@
                     <ace-lotter-stats-modal></ace-lotter-stats-modal>
 
                     <!--abort button left -->
-
-                    <!--revoke button left -->
                     <div class="pull-left">
                         <div class="pull-left">
                             <button ng-if="vm.isStarted || vm.isDrafted || vm.isExpired" class="btn btn-danger"
@@ -215,6 +212,5 @@
                 </form>
             </div>
         </div>
-
     </div>
 </div>

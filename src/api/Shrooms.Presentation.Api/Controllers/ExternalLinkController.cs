@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Web.Http;
-using AutoMapper;
+﻿using AutoMapper;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.Models.ExternalLinks;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Domain.Services.ExternalLinks;
 using Shrooms.Presentation.Api.Filters;
 using Shrooms.Presentation.WebViewModels.Models.ExternalLink;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Web.Http;
 using WebApi.OutputCache.V2;
 
 namespace Shrooms.Presentation.Api.Controllers
@@ -35,6 +35,23 @@ namespace Shrooms.Presentation.Api.Controllers
             var externalLinks = await _externalLinkService.GetAllAsync(GetUserAndOrganization().OrganizationId);
             var externalLinksViewModel = _mapper.Map<IEnumerable<ExternalLinkDto>, IEnumerable<ExternalLinkViewModel>>(externalLinks);
             return Ok(externalLinksViewModel);
+        }
+
+        [HttpGet]
+        [Route("{id}")]
+        [PermissionAuthorize(Permission = BasicPermissions.ExternalLink)]
+        public async Task<IHttpActionResult> GetExternalLink(int id)
+        {
+            var externalLink = await _externalLinkService.GetAsync(id, GetUserAndOrganization());
+
+            if (externalLink == null)
+            {
+                return NotFound();
+            }
+
+            var externalLinkDto = _mapper.Map<ExternalLinkDto, ExternalLinkViewModel>(externalLink);
+
+            return Ok(externalLinkDto);
         }
 
         [HttpPost]

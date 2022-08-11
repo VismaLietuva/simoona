@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Globalization;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
+﻿using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Shrooms.Authentification.Membership;
 using Shrooms.Contracts.Constants;
@@ -19,6 +12,13 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.DataLayer.EntityModels.Models.Notifications;
 using Shrooms.Domain.Services.Roles;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Globalization;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using ConstantsRoles = Shrooms.Contracts.Constants.Roles;
 using WallModel = Shrooms.DataLayer.EntityModels.Models.Multiwall.Wall;
 
@@ -184,12 +184,16 @@ namespace Shrooms.Domain.Services.UserService
             return userAppNotificationEnabledIds;
         }
 
-        public async Task<IEnumerable<UserAutoCompleteDto>> GetUsersForAutocompleteAsync(string s)
+        public async Task<IEnumerable<UserAutoCompleteDto>> GetUsersForAutocompleteAsync(string s, bool includeSelf, UserAndOrganizationDto userOrg)
         {
             var newUserRoleId = await _roleService.GetRoleIdByNameAsync(ConstantsRoles.NewUser);
 
             var users = await _usersDbSet
-                .Where(user => user.UserName.StartsWith(s) || user.Email.StartsWith(s) || (user.FirstName + " " + user.LastName).StartsWith(s) || user.LastName.StartsWith(s))
+                .Where(user => (user.UserName.StartsWith(s) ||
+                               user.Email.StartsWith(s) ||
+                               (user.FirstName + " " + user.LastName).StartsWith(s) ||
+                               user.LastName.StartsWith(s)) &&
+                               (includeSelf || userOrg.UserId != user.Id))
                 .Where(_roleService.ExcludeUsersWithRole(newUserRoleId))
                 .Take(10)
                 .Select(MapUsersToAutocompleteDto())

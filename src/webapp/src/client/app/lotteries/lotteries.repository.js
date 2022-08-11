@@ -14,6 +14,7 @@
     function lotteryRepository($resource, endPoint, $http) {
         var url = endPoint + '/Lottery/';
         var lotteryWidgetUrl = endPoint + '/LotteryWidget/';
+        var userUrl = endPoint + '/User/';
 
         var service = {
             getAllLotteries: getAllLotteries,
@@ -30,7 +31,8 @@
             buyTickets: buyTickets,
             getLotteryStatistics: getLotteryStatistics,
             exportParticipants: exportParticipants,
-            getLotteryParticipants: getLotteryParticipants
+            getLotteryParticipants: getLotteryParticipants,
+            getUsersForAutoComplete: getUsersForAutoComplete
         };
         return service;
 
@@ -127,6 +129,10 @@
                     isArray: false
                 }
             }).query(filters).$promise;
+        }
+
+        function getUsersForAutoComplete(params) {
+            return $resource(`${userUrl}GetUsersForAutocomplete`).query(params).$promise;
         }
     }
 })();

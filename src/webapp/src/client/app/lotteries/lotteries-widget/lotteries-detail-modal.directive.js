@@ -67,8 +67,7 @@
         'notifySrv',
         'localeSrv',
         'errorHandler',
-        '$window',
-        'profileRepository',
+        '$window'
     ];
 
     function lotteriesDetailController(
@@ -79,8 +78,7 @@
         notifySrv,
         localeSrv,
         errorHandler,
-        $window,
-        profileRepository
+        $window
     ) {
         var vm = this;
 
@@ -113,6 +111,7 @@
         vm.giftedTicketsLimitExceeded = giftedTicketsLimitExceeded;
         vm.isTicketCountAnInteger = isTicketCountAnInteger;
         vm.onInvalidInputChangeToValidInput = onInvalidInputChangeToValidInput;
+        vm.disableTagRemoval = disableTagRemoval;
 
         vm.getUsers = getUsers;
 
@@ -158,9 +157,12 @@
 
                 var lotteryTickets = {
                     lotteryId: currentLottery,
-                    tickets: vm.ticketCount,
-                    receivingUserIds: giftingTickets
-                        ? vm.selectedUsers.map((user) => user.id)
+                    ticketCount: vm.ticketCount,
+                    receivers: giftingTickets
+                        ? vm.selectedUsers.map((user) => ({
+                            userId: user.id,
+                            ticketCount: user.ticketCount
+                        }))
                         : undefined,
                 };
 
@@ -226,8 +228,9 @@
         }
 
         function getUsers(search) {
-            return profileRepository.getUserForAutoComplete({
+            return lotteryRepository.getUsersForAutoComplete({
                 s: search,
+                includeSelf: false
             });
         }
 
@@ -241,7 +244,7 @@
             }
 
             return vm.selectedUsers.reduce(
-                (accumulator, curr) => accumulator + curr.ticketCount,
+                (accumulator , curr) => accumulator + curr.ticketCount,
                 0
             );
         }
@@ -270,6 +273,10 @@
             } else if (vm.ticketCount > vm.maxTicketCount) {
                 vm.ticketCount = vm.maxTicketCount ;
             }
+        }
+
+        function disableTagRemoval($tag) {
+            return false;
         }
     }
 })();

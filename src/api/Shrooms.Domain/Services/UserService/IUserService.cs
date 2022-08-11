@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
+﻿using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.Users;
 using Shrooms.Contracts.DataTransferObjects.Users;
 using Shrooms.DataLayer.EntityModels.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Shrooms.Domain.Services.UserService
 {
@@ -38,6 +38,6 @@ namespace Shrooms.Domain.Services.UserService
         Task<IEnumerable<ApplicationUser>> GetUsersWithMentionNotificationsAsync(IEnumerable<string> mentionedUsersIds);
 
         Task<ApplicationUser> GetApplicationUserOrDefaultAsync(string id);
-        Task<IEnumerable<UserAutoCompleteDto>> GetUsersForAutocompleteAsync(string s);
+        Task<IEnumerable<UserAutoCompleteDto>> GetUsersForAutocompleteAsync(string s, bool includeSelf, UserAndOrganizationDto userOrg);
     }
 }

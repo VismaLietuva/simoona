@@ -102,7 +102,8 @@
 
                 <tags-input tag-class="{ 'hidden' : true }" class="mb-3 border-none" id="selectedUsers" name="selectedUsers" ng-model="vm.selectedUsers"
                     add-from-autocomplete-only="true" display-property="fullName" add-on-enter="true"
-                    add-on-space="true" add-on-comma="true" ng-attr-placeholder="{{'lotteries.addPeople' | translate}}"
+                    key-property="id" add-on-space="true" add-on-comma="true" ng-attr-placeholder="{{'lotteries.addPeople' | translate}}"
+                    on-tag-removing="vm.disableTagRemoval($tag)"
                     replace-spaces-with-dashes="false" add-on-blur="true" wrapped>
                     <auto-complete source="vm.getUsers($query)" min-length="1" max-results-to-show="5"
                         debounce-delay="500"></auto-complete>
@@ -140,21 +141,3 @@
         <span translate="common.cancel"></span>
     </button>
 </div>
-<style>
-    .border-none .tags {
-        border: none !important;
-    }
-
-    .show-error {
-        color: #d9534f !important;
-    }
-
-    .show-error::after {
-        content: '*';
-        color: #d9534f !important;
-    }
-
-    .lottery-error-message {
-        color: #d9534f !important;
-    }
-</style>

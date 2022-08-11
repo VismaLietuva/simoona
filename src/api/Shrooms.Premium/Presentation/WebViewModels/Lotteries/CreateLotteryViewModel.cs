@@ -1,10 +1,10 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using Shrooms.Contracts.Enums;
+﻿using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models.Lottery;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes;
 using Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes.Lotteries;
+using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
 {
@@ -12,18 +12,18 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
     {
         [Required]
         public string Title { get; set; }
-        
+
         [StringLength(ValidationConstants.LotteryDescriptionMaxLength)]
         public string Description { get; set; }
-        
+
         [Required]
         [DateTimeGreaterThanPresentDate]
         public DateTime? EndDate { get; set; }
-        
+
         [Required]
         [Range(1, int.MaxValue)]
         public int? EntryFee { get; set; }
-        
+
         [Required]
         [ValidLotteryCreationStatus]
         public LotteryStatus Status { get; set; }
@@ -31,7 +31,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
         [Required]
         public ImagesCollection Images { get; set; }
 
-        [Range(0, int.MaxValue)]//TODO: change this somehow?
+        [Range(0, int.MaxValue)]
         public int GiftedTicketLimit { get; set; }
     }
 }

@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using System.Threading.Tasks;
-using Shrooms.Contracts.Constants;
+﻿using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Models.ExternalLinks;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Helpers;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Shrooms.Domain.Services.ExternalLinks
 {
@@ -49,6 +50,26 @@ namespace Shrooms.Domain.Services.ExternalLinks
             await UpdateLinksAsync(manageLinksDto, timestamp);
             await DeleteLinksAsync(manageLinksDto, timestamp);
             await CreateNewLinksAsync(manageLinksDto, timestamp);
+        }
+
+        public async Task<ExternalLinkDto> GetAsync(int externalLinkId, UserAndOrganizationDto userOrg)
+        {
+            var externalLink = await _externalLinkDbSet
+                .FirstOrDefaultAsync(link => link.Id == externalLinkId && link.OrganizationId == userOrg.OrganizationId);
+
+            if (externalLink == null)
+            {
+                return null;
+            }
+
+            return new ExternalLinkDto
+            {
+                Id = externalLink.Id,
+                Name = externalLink.Name,
+                Url = externalLink.Url,
+                Type = externalLink.Type,
+                Priority = externalLink.Priority
+            };
         }
 
         private async Task DuplicateValuesValidationAsync(ManageExternalLinkDto manageLinksDto)

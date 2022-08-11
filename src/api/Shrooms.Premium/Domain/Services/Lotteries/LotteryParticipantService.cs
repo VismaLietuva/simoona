@@ -1,14 +1,14 @@
+using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models.Lottery;
+using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Shrooms.Contracts.DAL;
-using Shrooms.Contracts.DataTransferObjects;
-using Shrooms.DataLayer.EntityModels.Models;
-using Shrooms.DataLayer.EntityModels.Models.Lottery;
-using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
 using X.PagedList;
 
 namespace Shrooms.Premium.Domain.Services.Lotteries

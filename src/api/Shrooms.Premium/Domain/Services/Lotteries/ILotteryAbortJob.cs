@@ -1,5 +1,5 @@
-﻿using System.Threading.Tasks;
-using Shrooms.Contracts.DataTransferObjects;
+﻿using Shrooms.Contracts.DataTransferObjects;
+using System.Threading.Tasks;
 
 namespace Shrooms.Premium.Domain.Services.Lotteries
 {

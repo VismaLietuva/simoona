@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
-using NSubstitute;
-using NSubstitute.ReturnsExtensions;
+﻿using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
@@ -17,8 +10,15 @@ using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.UserService;
 using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
 using Shrooms.Premium.Domain.DomainExceptions.Lotteries;
+using Shrooms.Premium.Domain.DomainServiceValidators.Lotteries;
+using Shrooms.Premium.Domain.Services.Email.Lotteries;
 using Shrooms.Premium.Domain.Services.Lotteries;
 using Shrooms.Tests.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Shrooms.Premium.Tests.DomainService.LotteryServices
 {
@@ -26,217 +26,519 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
     public class LotteryServiceTests
     {
         private ILotteryService _sut;
-        private IUnitOfWork2 _unitOfWork;
-        private DbSet<Lottery> _lotteriesDb;
-        private DbSet<LotteryParticipant> _lotteryParticipantsDb;
-        private IMapper _mapper;
+        private IUnitOfWork2 _uow;
+        private DbSet<Lottery> _lotteriesDbSet;
+        private DbSet<LotteryParticipant> _lotteryParticipantsDbSet;
         private IAsyncRunner _asyncRunner;
-        private IParticipantService _participantService;
+        private ILotteryParticipantService _participantService;
         private IUserService _userService;
         private ISystemClock _systemClock;
+        private ILotteryValidator _validator;
 
         [SetUp]
         public void SetUp()
         {
             _systemClock = Substitute.For<ISystemClock>();
-            _unitOfWork = Substitute.For<IUnitOfWork2>();
-            _lotteriesDb = _unitOfWork.MockDbSetForAsync<Lottery>();
-            _lotteryParticipantsDb = _unitOfWork.MockDbSetForAsync<LotteryParticipant>();
-            _unitOfWork.GetDbSet<Lottery>().Returns(_lotteriesDb);
-            _unitOfWork.GetDbSet<LotteryParticipant>().Returns(_lotteryParticipantsDb);
+            _uow = Substitute.For<IUnitOfWork2>();
+            _lotteriesDbSet = _uow.MockDbSetForAsync<Lottery>();
+            _lotteryParticipantsDbSet = _uow.MockDbSetForAsync<LotteryParticipant>();
+            _uow.GetDbSet<Lottery>().Returns(_lotteriesDbSet);
+            _uow.GetDbSet<LotteryParticipant>().Returns(_lotteryParticipantsDbSet);
 
             _asyncRunner = Substitute.For<IAsyncRunner>();
-            _participantService = Substitute.For<IParticipantService>();
+            _participantService = Substitute.For<ILotteryParticipantService>();
             _userService = Substitute.For<IUserService>();
+            _validator = Substitute.For<ILotteryValidator>();
             var kudosService = Substitute.For<IKudosService>();
-            _mapper = Substitute.For<IMapper>();
 
-            _sut = new LotteryService(_unitOfWork, _mapper, _participantService, _userService, kudosService, _asyncRunner, _systemClock);
-        }
-
-        [TestCase(0, "Invalid entry fee.")]
-        [TestCase(1, "Lottery can't start in the past.")]
-        [TestCase(2, "Invalid status of created lottery.")]
-        [TestCase(5, "Invalid status of created lottery.")]
-        [TestCase(6, "Invalid entry fee.")]
-        public void CreateLottery_IncorrectFieldValues_ThrowsException(int index, string message)
-        {
-            _systemClock.UtcNow.Returns(DateTime.UtcNow);
-
-            var userOrg = new UserAndOrganizationDto();
-
-            var lotteryDto = GetCreateLotteryDtoList()[index];
-
-            var result = Assert.ThrowsAsync<LotteryException>(async () => await _sut.CreateLotteryAsync(lotteryDto, userOrg));
-
-            Assert.That(result.Message, Is.EqualTo(message));
+            _sut = new LotteryService(
+                _uow,
+                _participantService,
+                _userService,
+                kudosService,
+                _asyncRunner,
+                _systemClock,
+                _validator);
         }
 
         [Test]
-        public async Task CreateLottery_CorrectLotteryDto_CreatesLottery()
-        {
-            var lotteryDto = GetCreateLotteryDtoList()[3];
-            var userOrg = new UserAndOrganizationDto
-            {
-                UserId = "Id"
-            };
-
-            _mapper.Map<LotteryDto, Lottery>(lotteryDto).Returns(GetLottery());
-
-            await _sut.CreateLotteryAsync(lotteryDto, userOrg);
-
-            _lotteriesDb.ReceivedWithAnyArgs().Add(Arg.Any<Lottery>());
-            await _unitOfWork.Received().SaveChangesAsync(userOrg.UserId);
-        }
-
-        [Test]
-        public void EditDraftedLottery_IncorrectLotteryStatus_ThrowsException()
-        {
-            var userOrg = new UserAndOrganizationDto();
-
-            _lotteriesDb.FindAsync().ReturnsForAnyArgs(GetLottery());
-
-            var result = Assert.ThrowsAsync<LotteryException>(async () => await _sut.EditDraftedLotteryAsync(new LotteryDto(), userOrg));
-
-            Assert.That(result.Message, Is.EqualTo("Editing is forbidden for not drafted lottery."));
-        }
-
-        [Test]
-        public async Task EditDraftedLottery_CorrectLotteryDto_EditsLotterySuccessfully()
-        {
-            var userOrg = new UserAndOrganizationDto();
-
-            _lotteriesDb.FindAsync().ReturnsForAnyArgs(GetLottery(LotteryStatus.Drafted));
-
-            await _sut.EditDraftedLotteryAsync(new LotteryDto(), userOrg);
-
-            await _unitOfWork.Received().SaveChangesAsync(false);
-        }
-
-        [Test]
-        public void EditDraftedLottery_EndDateInThePast_ThrowsException()
+        public async Task CreateLotteryAsync_CorrectValues_CreatesLottery()
         {
             // Arrange
+            var newLotteryDto = new LotteryDto();
             var userOrg = new UserAndOrganizationDto();
 
-            _lotteriesDb.FindAsync().ReturnsForAnyArgs(GetLottery(LotteryStatus.Drafted));
-            _systemClock.UtcNow.Returns(DateTime.UtcNow.AddDays(-1000));
+            // Act
+            await _sut.CreateLotteryAsync(newLotteryDto, userOrg);
 
             // Assert
-            Assert.ThrowsAsync<LotteryException>(async () => await _sut.EditDraftedLotteryAsync(new LotteryDto(), userOrg));
+            await _uow.Received().SaveChangesAsync(userOrg.UserId);
+        }
+
+
+        [Test]
+        public async Task CreateLotteryAsync_CreatedStartedLottery_SendsNotficationEmail()
+        {
+            // Arrange
+            var newLotteryDto = new LotteryDto
+            {
+                Status = LotteryStatus.Started
+            };
+
+            var userOrg = new UserAndOrganizationDto();
+
+            // Act
+            await _sut.CreateLotteryAsync(newLotteryDto, userOrg);
+
+            // Assert
+            _asyncRunner
+                .Received(1)
+                .Run(Arg.Any<Func<ILotteryNotificationService, Task>>(), Arg.Any<string>());
+        }
+
+
+        [Test]
+        public async Task CreateLotteryAsync_CreatedDraftedLottery_DoesNotSendNotficationEmail()
+        {
+            // Arrange
+            var newLotteryDto = new LotteryDto
+            {
+                Status = LotteryStatus.Drafted
+            };
+
+            var userOrg = new UserAndOrganizationDto();
+
+            // Act
+            await _sut.CreateLotteryAsync(newLotteryDto, userOrg);
+
+            // Assert
+            _asyncRunner
+                .Received(0)
+                .Run(Arg.Any<Func<ILotteryNotificationService, Task>>(), Arg.Any<string>());
         }
 
         [Test]
-        public void EditStartedLottery_IncorrectLotteryStatus_ThrowsException()
+        public async Task EditDraftedLotteryAsync_CorrectValues_EditsLottery()
         {
-            _lotteriesDb.FindAsync().ReturnsForAnyArgs(GetLottery(LotteryStatus.Refunded));
+            // Arrange
+            var lottery = CreateAndAddLotteryWithIdToDbSet(1);
 
-            var result = Assert.ThrowsAsync<LotteryException>(async () => await _sut.EditStartedLotteryAsync(new EditStartedLotteryDto()));
+            var lotteryDto = new LotteryDto
+            {
+                Id = lottery.Id
+            };
 
-            Assert.That(result.Message, Is.EqualTo("Lottery is not running."));
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = lottery.OrganizationId
+            };
+
+            // Act
+            await _sut.EditDraftedLotteryAsync(lotteryDto, userOrg);
+
+            // Assert
+            _validator
+                .Received(1)
+                .CheckIfLotteryExists(Arg.Any<Lottery>());
+
+            _validator
+                .Received(1)
+                .CheckIfLotteryIsDrafted(Arg.Any<Lottery>());
+
+            await _uow
+                .Received(1)
+                .SaveChangesAsync(Arg.Any<bool>());
         }
 
         [Test]
-        public async Task EditStartedLottery_CorrectLotteryDto_EditsLotterySuccessfully()
+        public async Task EditDraftedLotteryAsync_ChangeStatusToStarted_SendsNotificationEmail()
         {
-            _lotteriesDb.FindAsync().ReturnsForAnyArgs(GetLottery());
+            // Arrange
+            var lottery = CreateAndAddLotteryWithIdToDbSet(1);
 
-            await _sut.EditStartedLotteryAsync(new EditStartedLotteryDto());
+            var lotteryDto = new LotteryDto
+            {
+                Id = lottery.Id,
+                Status = LotteryStatus.Started
+            };
 
-            await _unitOfWork.Received().SaveChangesAsync(false);
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = lottery.OrganizationId
+            };
+
+            // Act
+            await _sut.EditDraftedLotteryAsync(lotteryDto, userOrg);
+
+            // Assert
+            _validator
+                .Received(1)
+                .CheckIfLotteryExists(Arg.Any<Lottery>());
+
+            _validator
+                .Received(1)
+                .CheckIfLotteryIsDrafted(Arg.Any<Lottery>());
+
+            _asyncRunner
+                .Received(1)
+                .Run(Arg.Any<Func<ILotteryNotificationService, Task>>(), Arg.Any<string>());
         }
 
         [Test]
-        public async Task GetLotteryDetails_NonExistentLottery_ReturnsNull()
+        public async Task EditDraftedLotteryAsync_ChangeStatusToDrafted_DoesNotSendNotificationEmail()
         {
+            // Arrange
+            var lottery = CreateAndAddLotteryWithIdToDbSet(1);
+
+            var lotteryDto = new LotteryDto
+            {
+                Id = lottery.Id,
+                Status = LotteryStatus.Drafted
+            };
+
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = lottery.OrganizationId
+            };
+
+            // Act
+            await _sut.EditDraftedLotteryAsync(lotteryDto, userOrg);
+
+            // Assert
+            _validator
+                .Received(1)
+                .CheckIfLotteryExists(Arg.Any<Lottery>());
+
+            _validator
+                .Received(1)
+                .CheckIfLotteryIsDrafted(Arg.Any<Lottery>());
+
+            _asyncRunner
+                .Received(0)
+                .Run(Arg.Any<Func<ILotteryNotificationService, Task>>(), Arg.Any<string>());
+        }
+
+        [Test]
+        public async Task EditStartedLottery_IncorrectLotteryStatus_ThrowsException()
+        {
+            // Arrange
+            var lottery = CreateAndAddLotteryWithIdToDbSet(1);
+
+            var lotteryDto = new LotteryDto
+            {
+                Id = lottery.Id,
+                Status = LotteryStatus.Drafted
+            };
+
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = lottery.OrganizationId
+            };
+
+            // Act
+            await _sut.EditDraftedLotteryAsync(lotteryDto, userOrg);
+
+            // Assert
+            await _uow
+                .Received(1)
+                .SaveChangesAsync(Arg.Any<bool>());
+        }
+
+        [Test]
+        public async Task GetLotteryDetailsAsync_WhenLotteryIsNotFound_ReturnsNull()
+        {
+            // Arrange
+            CreateAndAddLotteryWithIdToDbSet(1);
+
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = TestConstants.DefaultOrganizationId
+            };
+
+            // Act
+            var actual = await _sut.GetLotteryDetailsAsync(int.MaxValue, false, userOrg);
+
+            // Assert
+            Assert.IsNull(actual);
+        }
+
+        [Test]
+        public async Task GetLotteryDetailsAsync_CorrectValues_SetsCorrectLotteryParticipantCount()
+        {
+            // Arrange
+            var lottery = CreateAndAddLotteryWithIdToDbSet(1);
+
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = TestConstants.DefaultOrganizationId
+            };
+
+            var lotteryParticipants = new List<LotteryParticipant>
+            {
+                new LotteryParticipant
+                {
+                    Id = 1,
+                    LotteryId = lottery.Id,
+                    Lottery = lottery
+                },
+
+                new LotteryParticipant
+                {
+                    Id = 2,
+                    LotteryId = lottery.Id,
+                    Lottery = lottery
+                }
+            };
+
+            _lotteryParticipantsDbSet.SetDbSetDataForAsync(lotteryParticipants);
+
+            const int expected = 2;
+
+            // Act
+            var actual = await _sut.GetLotteryDetailsAsync(lottery.Id, false, userOrg);
+
+            // Assert
+            Assert.AreEqual(expected, actual.Participants);
+        }
+
+        [Test]
+        public async Task GetLotteryDetailsAsync_WhenIncludingBuyer_SetsBuyerValue()
+        {
+            // Arrange
+            var buyerId = Guid.NewGuid().ToString();
+            var lottery = CreateAndAddLotteryWithIdToDbSet(1);
+
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = TestConstants.DefaultOrganizationId
+            };
+
+            var lotteryParticipants = new List<LotteryParticipant>
+            {
+                new LotteryParticipant
+                {
+                    Id = 1,
+                    LotteryId = lottery.Id,
+                    Lottery = lottery,
+                    CreatedBy = buyerId
+                },
+
+                new LotteryParticipant
+                {
+                    Id = 2,
+                    LotteryId = lottery.Id,
+                    Lottery = lottery,
+                    CreatedBy = buyerId
+                }
+            };
+
+            _lotteryParticipantsDbSet.SetDbSetDataForAsync(lotteryParticipants);
+
+            _userService
+                .GetApplicationUserAsync(Arg.Any<string>())
+                .Returns(new ApplicationUser
+                {
+                    Id = buyerId
+                });
+
+            // Act
+            var actual = await _sut.GetLotteryDetailsAsync(lottery.Id, true, userOrg);
+
+            // Assert
+            _validator
+                .Received(1)
+                .CheckIfBuyerExists(Arg.Any<ApplicationUser>());
+
+            Assert.NotNull(actual.Buyer);
+        }
+
+        [Test]
+        public async Task GetLotteryDetailsAsync_WhenIncludingBuyer_SetsCorrectRemainingGiftedTicketCount()
+        {
+            // Arrange
+            var buyerId = Guid.NewGuid().ToString();
+
+            var lottery = new Lottery
+            {
+                Id = 1,
+                OrganizationId = TestConstants.DefaultOrganizationId,
+                GiftedTicketLimit = 10
+            };
+
+            _lotteriesDbSet.SetDbSetDataForAsync(new List<Lottery> { lottery });
+
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = TestConstants.DefaultOrganizationId,
+                UserId = buyerId
+            };
+
+            var lotteryParticipants = new List<LotteryParticipant>
+            {
+                new LotteryParticipant
+                {
+                    Id = 1,
+                    LotteryId = lottery.Id,
+                    Lottery = lottery,
+                    CreatedBy = buyerId
+                },
+
+                new LotteryParticipant
+                {
+                    Id = 2,
+                    LotteryId = lottery.Id,
+                    Lottery = lottery,
+                    CreatedBy = buyerId
+                }
+            };
+
+            _lotteryParticipantsDbSet.SetDbSetDataForAsync(lotteryParticipants);
+
+            _userService
+                .GetApplicationUserAsync(Arg.Any<string>())
+                .Returns(new ApplicationUser
+                {
+                    Id = buyerId
+                });
+
+            const int expected = 8;
+
+            // Act
+            var actual = await _sut.GetLotteryDetailsAsync(lottery.Id, true, userOrg);
+
+            // Assert
+            _validator
+                .Received(1)
+                .CheckIfBuyerExists(Arg.Any<ApplicationUser>());
+
+            Assert.AreEqual(expected, actual.Buyer.RemainingGiftedTicketCount);
+        }
+
+        [Test]
+        public async Task GetLotteryDetailsAsync_WhenNotIncludingBuyer_SetsBuyerToNull()
+        {
+            // Arrange
+            var lottery = CreateAndAddLotteryWithIdToDbSet(1);
+
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = TestConstants.DefaultOrganizationId
+            };
+
+            var lotteryParticipants = new List<LotteryParticipant>();
+
+            _lotteryParticipantsDbSet.SetDbSetDataForAsync(lotteryParticipants);
+
+            // Act
+            var actual = await _sut.GetLotteryDetailsAsync(lottery.Id, false, userOrg);
+
+            // Assert
+            Assert.IsNull(actual.Buyer);
+        }
+
+        [Test]
+        public async Task AbortLotteryAsync_NonExistentLottery_ReturnsFalse()
+        {
+            // Arrange
             MockLotteries();
 
-            var result = await _sut.GetLotteryDetailsAsync(default, default);
-
-            Assert.IsNull(result);
-        }
-
-        [Test]
-        public async Task AbortLottery_NonExistentLottery_ReturnsFalse()
-        {
-            MockLotteries();
-
+            // Act
             var result = await _sut.AbortLotteryAsync(default, default);
 
+            // Assert
             Assert.AreEqual(false, result);
         }
 
         [TestCase(1)]
         [TestCase(4)]
         [TestCase(8)]
-        public async Task AbortLottery_StatusPossibleToAbort_AbortedSuccessfully(int lotteryId)
+        public async Task AbortLotteryAsync_StatusPossibleToAbort_AbortedSuccessfully(int lotteryId)
         {
+            // Arrange
             MockLotteries();
 
+            // Act
             var result = await _sut.AbortLotteryAsync(lotteryId, GetUserOrg());
 
+            // Assert
             Assert.AreEqual(expected: true, result);
         }
 
         [Test]
-        public async Task RefundParticipants_NonExistentLottery_DoesNothing()
+        public async Task RefundParticipantsAsync_NonExistentLottery_DoesNothing()
         {
+            // Arrange
             MockLotteries();
 
+            // Act
             await _sut.RefundParticipantsAsync(default, default);
 
-            await _unitOfWork.DidNotReceiveWithAnyArgs().SaveChangesAsync(string.Empty);
+            // Assert
+            await _uow.DidNotReceiveWithAnyArgs().SaveChangesAsync(string.Empty);
             _asyncRunner.DidNotReceiveWithAnyArgs().Run<ILotteryAbortJob>(default, default);
         }
 
         [Test]
-        public async Task RefundsParticipants_RefundIsNotFailed_DoesNotStartRefund()
+        public async Task RefundParticipantsAsync_RefundIsNotFailed_DoesNotStartRefund()
         {
+            // Arrange
             MockLotteries();
 
+            // Act
             await _sut.RefundParticipantsAsync(1, GetUserOrg());
 
-            await _unitOfWork.DidNotReceiveWithAnyArgs().SaveChangesAsync(string.Empty);
+            // Assert
+            await _uow.DidNotReceiveWithAnyArgs().SaveChangesAsync(string.Empty);
             _asyncRunner.DidNotReceiveWithAnyArgs().Run<ILotteryAbortJob>(default, default);
         }
 
         [TestCase(5)]
-        public async Task RefundParticipants_RefundFailed_StartsNewRefund(int lotteryId)
+        public async Task RefundParticipantsAsync_RefundFailed_StartsNewRefund(int lotteryId)
         {
+            // Arrange
             MockLotteries();
             var userOrg = GetUserOrg();
 
+            // Act
             await _sut.RefundParticipantsAsync(lotteryId, userOrg);
 
-            await _unitOfWork.Received().SaveChangesAsync(userOrg.UserId);
+            // Assert
+            await _uow.Received().SaveChangesAsync(userOrg.UserId);
             _asyncRunner.ReceivedWithAnyArgs().Run<ILotteryAbortJob>(async notifier => await notifier.RefundLotteryAsync(lotteryId, userOrg), default);
         }
 
         [Test]
-        public async Task UpdateRefundFailedFlag_LotteryFound_FlagUpdated()
+        public async Task UpdateRefundFailedFlagAsync_LotteryFound_FlagUpdated()
         {
+            // Arrange
             MockLotteries();
             var userOrg = GetUserOrg();
 
+            // Act
             await _sut.UpdateRefundFailedFlagAsync(1, true, userOrg);
 
-            await _unitOfWork.Received().SaveChangesAsync(userOrg.UserId);
+            // Assert
+            await _uow.Received().SaveChangesAsync(userOrg.UserId);
         }
 
         [Test]
         public async Task FinishLotteryAsync_LotteryFound_ChangesStatus()
         {
+            // Arrange
             MockLotteries();
             var userOrg = GetUserOrg();
 
+            // Act
             await _sut.FinishLotteryAsync(1, userOrg);
 
-            await _unitOfWork.Received().SaveChangesAsync(userOrg.UserId);
+            // Assert
+            await _uow.Received().SaveChangesAsync(userOrg.UserId);
         }
 
         [Test]
-        public async Task GetLotteryStats_LotteryFound_ReturnsCorrectDto()
+        public async Task GetLotteryStatsAsync_LotteryFound_ReturnsCorrectDto()
         {
+            // Arrange
             MockLotteries();
             const int lotteryId = 1;
 
@@ -250,36 +552,45 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
                 TicketsSold = 10
             };
 
+            // Act
             var result = await _sut.GetLotteryStatsAsync(lotteryId, GetUserOrg());
 
+            // Assert
             Assert.AreEqual(expected.TotalParticipants, result.TotalParticipants);
             Assert.AreEqual(expected.KudosSpent, result.KudosSpent);
             Assert.AreEqual(expected.TicketsSold, result.TicketsSold);
         }
 
         [Test]
-        public async Task GetLotteries_OrganizationWithLotteries_ReturnsCorrectAmountOfLotteries()
+        public async Task GetLotteriesAsync_OrganizationWithLotteries_ReturnsCorrectAmountOfLotteries()
         {
+            // Arrange
             MockLotteries();
 
+            // Act
             var result = await _sut.GetLotteriesAsync(new UserAndOrganizationDto { OrganizationId = 12345 });
 
+            // Assert
             Assert.AreEqual(2, result.Count());
         }
 
         [Test]
-        public async Task GetFilteredLotteries_FilterSet_ReturnsCorrectAmountOfLotteries()
+        public async Task GetFilteredLotteriesAsync_FilterSet_ReturnsCorrectAmountOfLotteries()
         {
+            // Arrange
             MockLotteries();
 
+            // Act
             var result = await _sut.GetFilteredLotteriesAsync("foo", GetUserOrg());
 
+            // Assert
             Assert.AreEqual(3, result.Count());
         }
 
         [Test]
-        public async Task GetLotteryStatus_ExistingLottery_ReturnsCorrectStatusObject()
+        public async Task GetLotteryStatusAsync_ExistingLottery_ReturnsCorrectStatusObject()
         {
+            // Arrange
             MockLotteries();
             var expected = new LotteryStatusDto
             {
@@ -287,82 +598,207 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
                 RefundFailed = false
             };
 
+            // Act
             var result = await _sut.GetLotteryStatusAsync(1, GetUserOrg());
 
+            // Assert
             Assert.AreEqual(expected.LotteryStatus, result.LotteryStatus);
             Assert.AreEqual(expected.RefundFailed, result.RefundFailed);
         }
 
         [Test]
-        public async Task BuyLotteryTicketAsync_NonExistentUser_StopsExecuting()
-        {
-            MockLotteries();
-            _userService.GetApplicationUserAsync("1").ReturnsNullForAnyArgs();
-
-            await _sut.BuyLotteryTicketsAsync(new BuyLotteryTicketsDto { LotteryId = 1 }, new UserAndOrganizationDto { UserId = "1" });
-
-            await _unitOfWork.DidNotReceiveWithAnyArgs().SaveChangesAsync((string)default);
-        }
-
-        [Test]
-        public async Task BuyLotteryTicketAsync_NonExistentLottery_StopsExecuting()
-        {
-            MockLotteries();
-            _userService.GetApplicationUserAsync(default).ReturnsForAnyArgs(new ApplicationUser());
-
-            await _sut.BuyLotteryTicketsAsync(new BuyLotteryTicketsDto { LotteryId = int.MaxValue }, GetUserOrg());
-
-            await _unitOfWork.DidNotReceiveWithAnyArgs().SaveChangesAsync((string)default);
-        }
-
-        [Test]
-        public void BuyLotteryTicketAsync_NotEnoughKudos_ThrowsException()
-        {
-            MockParticipants();
-            MockLotteries();
-
-            const int lotteryId = 1;
-
-            _mapper.Map<Lottery, LotteryDetailsDto>(default).ReturnsForAnyArgs(new LotteryDetailsDto { EntryFee = 1 });
-            _userService.GetApplicationUserAsync(default).ReturnsForAnyArgs(new ApplicationUser { RemainingKudos = 0 });
-
-            var ex = Assert.ThrowsAsync<LotteryException>(async () => await _sut.BuyLotteryTicketsAsync(new BuyLotteryTicketsDto { LotteryId = lotteryId, Tickets = 10 }, GetUserOrg()));
-
-            Assert.AreEqual("User does not have enough kudos for the purchase.", ex.Message);
-        }
-
-        [Test]
-        public async Task BuyLotteryTicketAsync_LotteryAlreadyEnded_ThrowsException()
+        public void BuyLotteryTicketsAsync_WhenBuyingForYourselfAndNegativeTicketCount_ThrowsLotteryException()
         {
             // Arrange
-            _systemClock.UtcNow.Returns(DateTime.UtcNow.AddDays(-1000));
-
-            MockParticipants();
-            MockLotteries();
-
             const int lotteryId = 1;
+            const string buyerId = "id";
 
-            _mapper.Map<Lottery, LotteryDetailsDto>(default).ReturnsForAnyArgs(new LotteryDetailsDto { EntryFee = 1, EndDate = DateTime.UtcNow.AddDays(10) });
-            _userService.GetApplicationUserAsync(default).ReturnsForAnyArgs(new ApplicationUser { RemainingKudos = 100 });
+            var userOrg = new UserAndOrganizationDto
+            {
+                UserId = buyerId,
+                OrganizationId = TestConstants.DefaultOrganizationId
+            };
 
-            // Act
-            await _sut.BuyLotteryTicketsAsync(new BuyLotteryTicketsDto { LotteryId = lotteryId, Tickets = 10 }, GetUserOrg());
+            var buyerUser = new ApplicationUser
+            {
+                Id = buyerId,
+                OrganizationId = TestConstants.DefaultOrganizationId
+            };
+
+            var buyTicketsDto = new BuyLotteryTicketsDto
+            {
+                LotteryId = lotteryId,
+                TicketCount = -1,
+                Receivers = new LotteryTicketReceiverDto[0]
+            };
+
+            var lottery = CreateAndAddLotteryWithIdToDbSet(lotteryId);
+
+            _userService
+                .GetApplicationUserAsync(Arg.Is(buyerId))
+                .Returns(buyerUser);
+
+            _validator
+                .IsValidTicketCount(buyTicketsDto)
+                .Returns(false);
+
+            _lotteryParticipantsDbSet.SetDbSetDataForAsync(new List<LotteryParticipant>());
 
             // Assert
-            await _unitOfWork.ReceivedWithAnyArgs().SaveChangesAsync((string)default);
+            Assert.ThrowsAsync<LotteryException>(async () => await _sut.BuyLotteryTicketsAsync(buyTicketsDto, userOrg));
+
+            _validator
+                .Received(1)
+                .CheckIfBuyerExists(Arg.Is(buyerUser));
+
+            _validator
+                .Received(1)
+                .CheckIfLotteryExists(Arg.Any<LotteryDetailsDto>());
+
+            _validator
+                .Received(1)
+                .CheckIfLotteryEnded(Arg.Any<LotteryDetailsDto>());
         }
 
-        [TestCase(1)]
-        public async Task BuyLotteryTicketAsync_AbleToBuyTickets_BuysSuccessfully(int lotteryId)
+        [Test]
+        public async Task BuyLotteryTicketsAsync_WhenBuyingForYourself_BuysTickets()
         {
-            MockParticipants();
-            MockLotteries();
-            _mapper.Map<Lottery, LotteryDetailsDto>(default).ReturnsForAnyArgs(new LotteryDetailsDto { EntryFee = 1, EndDate = DateTime.UtcNow.AddDays(10) });
-            _userService.GetApplicationUserAsync(default).ReturnsForAnyArgs(new ApplicationUser { RemainingKudos = 100 });
+            // Arrange
+            const int lotteryId = 1;
+            const string buyerId = "id";
 
-            await _sut.BuyLotteryTicketsAsync(new BuyLotteryTicketsDto { LotteryId = lotteryId, Tickets = 10 }, GetUserOrg());
+            var userOrg = new UserAndOrganizationDto
+            {
+                UserId = buyerId,
+                OrganizationId = TestConstants.DefaultOrganizationId
+            };
 
-            await _unitOfWork.ReceivedWithAnyArgs().SaveChangesAsync((string)default);
+            var buyerUser = new ApplicationUser
+            {
+                Id = buyerId,
+                OrganizationId = TestConstants.DefaultOrganizationId
+            };
+
+            var buyTicketsDto = new BuyLotteryTicketsDto
+            {
+                LotteryId = lotteryId,
+                TicketCount = 10,
+                Receivers = new LotteryTicketReceiverDto[0]
+            };
+
+            CreateAndAddLotteryWithIdToDbSet(lotteryId);
+
+            _userService
+                .GetApplicationUserAsync(Arg.Is(buyerId))
+                .Returns(buyerUser);
+
+            _validator
+                .IsValidTicketCount(buyTicketsDto)
+                .Returns(true);
+
+            _lotteryParticipantsDbSet.SetDbSetDataForAsync(new List<LotteryParticipant>());
+
+            // Act
+            await _sut.BuyLotteryTicketsAsync(buyTicketsDto, userOrg);
+
+            // Assert
+            _validator
+                .Received(1)
+                .CheckIfBuyerExists(Arg.Is(buyerUser));
+
+            _validator
+                .Received(1)
+                .CheckIfLotteryExists(Arg.Any<LotteryDetailsDto>());
+
+            _validator
+                .Received(1)
+                .CheckIfLotteryEnded(Arg.Any<LotteryDetailsDto>());
+
+            _validator
+                .Received(1)
+                .CheckIfUserHasEnoughKudos(Arg.Is(buyerUser), Arg.Any<int>());
+
+            await _uow
+                .Received(1)
+                .SaveChangesAsync(Arg.Is(buyerUser.Id));
+        }
+
+        [Test]
+        public async Task BuyLotteryTicketsAsync_WhenGifting_BuysTickets()
+        {
+            // Arrange
+            const int lotteryId = 1;
+            const string buyerId = "id";
+
+            var userOrg = new UserAndOrganizationDto
+            {
+                UserId = buyerId,
+                OrganizationId = TestConstants.DefaultOrganizationId
+            };
+
+            var buyerUser = new ApplicationUser
+            {
+                Id = buyerId,
+                OrganizationId = TestConstants.DefaultOrganizationId
+            };
+
+            var buyTicketsDto = new BuyLotteryTicketsDto
+            {
+                LotteryId = lotteryId,
+                TicketCount = 10,
+                Receivers = new LotteryTicketReceiverDto[]
+                {
+                    new LotteryTicketReceiverDto
+                    {
+                        UserId = "id2",
+                        TicketCount = 10
+                    }
+                }
+            };
+
+            CreateAndAddLotteryWithIdToDbSet(lotteryId);
+
+            _userService
+                .GetApplicationUserAsync(Arg.Is(buyerId))
+                .Returns(buyerUser);
+
+            _lotteryParticipantsDbSet.SetDbSetDataForAsync(new List<LotteryParticipant>());
+
+            // Act
+            await _sut.BuyLotteryTicketsAsync(buyTicketsDto, userOrg);
+
+            // Assertmedia
+            _validator
+                .Received(2)
+                .CheckIfBuyerExists(Arg.Is(buyerUser));
+
+            _validator
+                .Received(1)
+                .CheckIfLotteryExists(Arg.Any<LotteryDetailsDto>());
+
+            _validator
+                .Received(1)
+                .CheckIfLotteryEnded(Arg.Any<LotteryDetailsDto>());
+
+            _validator
+                .Received(1)
+                .CheckIfLotteryAllowsGifting(Arg.Any<LotteryDetailsDto>());
+
+            _validator
+                .Received(1)
+                .CheckIfGiftedTicketLimitIsExceeded(Arg.Any<LotteryDetailsBuyerDto>(), Arg.Any<int>());
+
+            await _validator
+                .Received(1)
+                .CheckIfGiftReceiversExistAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<UserAndOrganizationDto>());
+
+            _validator
+                .Received(1)
+                .CheckIfUserHasEnoughKudos(Arg.Is(buyerUser), Arg.Any<int>());
+
+            await _uow
+                .Received(1)
+                .SaveChangesAsync(Arg.Is(buyerUser.Id));
         }
 
         [Test]
@@ -375,18 +811,42 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             Assert.AreEqual(2, result.Count);
         }
 
-        private static IList<LotteryDto> GetCreateLotteryDtoList()
+        [Test]
+        public async Task GetLotteryByIdAsync_ValidId_ReturnsLottery()
         {
-            return new List<LotteryDto>
+            // Arrange
+            var userOrg = new UserAndOrganizationDto
             {
-                new LotteryDto { Id = 1, Status = LotteryStatus.Started, EndDate = DateTime.Now.AddDays(2), Title = "Monitor", EntryFee = -5 },
-                new LotteryDto { Id = 2, Status = LotteryStatus.Started, EndDate = DateTime.Now.AddDays(-5), Title = "Computer", EntryFee = 2 },
-                new LotteryDto { Id = 3, Status = LotteryStatus.Deleted, EndDate = DateTime.Now.AddDays(4), Title = "Table", EntryFee = 2 },
-                new LotteryDto { Id = 4, Status = LotteryStatus.Started, EndDate = DateTime.Now.AddDays(5), Title = "1000 kudos", EntryFee = 5 },
-                new LotteryDto { Id = 5, Status = LotteryStatus.Deleted, EndDate = DateTime.Now.AddDays(5), Title = "100 kudos", EntryFee = 5 },
-                new LotteryDto { Id = 6, Status = LotteryStatus.Ended, EndDate = DateTime.Now.AddDays(5), Title = "10 kudos", EntryFee = 5 },
-                new LotteryDto { Id = 7, Status = LotteryStatus.Ended, EndDate = DateTime.Now.AddDays(5), Title = "10 kudos", EntryFee = -5 }
+                OrganizationId = TestConstants.DefaultOrganizationId
             };
+
+            const int expectedId = 1;
+
+            CreateAndAddLotteryWithIdToDbSet(expectedId);
+
+            // Act
+            var actual = await _sut.GetLotteryByIdAsync(expectedId, userOrg);
+
+            // Assert
+            Assert.AreEqual(actual.Id, expectedId);
+        }
+
+        [Test]
+        public async Task GetLotteryByIdAsync_NotValidId_ReturnsNull()
+        {
+            // Arrange
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = TestConstants.DefaultOrganizationId
+            };
+
+            _lotteriesDbSet.SetDbSetDataForAsync(new List<Lottery>());
+
+            // Act
+            var actual = await _sut.GetLotteryByIdAsync(1, userOrg);
+
+            // Assert
+            Assert.IsNull(actual);
         }
 
         private IList<LotteryParticipantDto> GetParticipantDto()
@@ -416,7 +876,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
         {
             var data = GetLotteries();
 
-            _lotteriesDb.SetDbSetDataForAsync(data.AsQueryable());
+            _lotteriesDbSet.SetDbSetDataForAsync(data.AsQueryable());
         }
 
         private static IList<Lottery> GetLotteries()
@@ -500,42 +960,6 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             };
         }
 
-        private void MockParticipants()
-        {
-            var data = GetParticipants();
-
-            _lotteryParticipantsDb.SetDbSetDataForAsync(data.AsQueryable());
-        }
-
-        private static IList<LotteryParticipant> GetParticipants()
-        {
-            return new List<LotteryParticipant>
-            {
-                new LotteryParticipant
-                {
-                    LotteryId = 1
-                },
-                new LotteryParticipant
-                {
-                    LotteryId = 2
-                }
-            };
-        }
-
-        private static Lottery GetLottery(LotteryStatus status = LotteryStatus.Started)
-        {
-            return new Lottery
-            {
-                Id = 4,
-                OrganizationId = 1,
-                Status = status,
-                EndDate = DateTime.UtcNow.AddDays(5),
-                Title = "1000 kudos",
-                EntryFee = 5,
-                IsRefundFailed = false
-            };
-        }
-
         private static UserAndOrganizationDto GetUserOrg()
         {
             return new UserAndOrganizationDto
@@ -543,6 +967,19 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
                 UserId = "5",
                 OrganizationId = 1
             };
+        }
+
+        private Lottery CreateAndAddLotteryWithIdToDbSet(int id)
+        {
+            var lottery = new Lottery
+            {
+                Id = id,
+                OrganizationId = TestConstants.DefaultOrganizationId
+            };
+
+            _lotteriesDbSet.SetDbSetDataForAsync(new List<Lottery> { lottery });
+
+            return lottery;
         }
     }
 }
