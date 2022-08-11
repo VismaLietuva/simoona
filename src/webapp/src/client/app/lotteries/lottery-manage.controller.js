@@ -33,7 +33,7 @@
         vm.datePicker = {
             isOpen: false,
             options: {
-                minDate: moment().local().startOf('days').toDate(),
+                minDate: moment().utc().startOf('days').toDate(),
                 startingDay: 1
             }
         };
