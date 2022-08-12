@@ -25,6 +25,7 @@ using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.RefreshTokens;
 using Shrooms.Presentation.WebViewModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.AccountModels;
+using Shrooms.Contracts.Infrastructure;
 
 namespace Shrooms.Presentation.Api.Controllers
 {
@@ -39,13 +40,20 @@ namespace Shrooms.Presentation.Api.Controllers
         private readonly IOrganizationService _organizationService;
         private readonly IRefreshTokenService _refreshTokenService;
         private readonly IAdministrationUsersService _administrationService;
+        private readonly IApplicationSettings _applicationSettings;
 
         private IAuthenticationManager Authentication => Request.GetOwinContext().Authentication;
 
         private string RequestedOrganization => Request.GetRequestedTenant();
 
-        public AccountController(IMapper mapper, ShroomsUserManager userManager, IPermissionService permissionService,
-            IOrganizationService organizationService, IRefreshTokenService refreshTokenService, IAdministrationUsersService administrationService)
+        public AccountController(
+            IMapper mapper, 
+            ShroomsUserManager userManager, 
+            IPermissionService permissionService,
+            IOrganizationService organizationService, 
+            IRefreshTokenService refreshTokenService, 
+            IAdministrationUsersService administrationService,
+            IApplicationSettings applicationSettings)
         {
             _mapper = mapper;
             _userManager = userManager;
@@ -53,6 +61,7 @@ namespace Shrooms.Presentation.Api.Controllers
             _organizationService = organizationService;
             _refreshTokenService = refreshTokenService;
             _administrationService = administrationService;
+            _applicationSettings = applicationSettings;
         }
 
         [HostAuthentication(DefaultAuthenticationTypes.ExternalBearer)]
@@ -136,8 +145,10 @@ namespace Shrooms.Presentation.Api.Controllers
             Authentication.SignOut(DefaultAuthenticationTypes.ExternalCookie);
             var oAuthIdentity = await _userManager.CreateIdentityAsync(user, OAuthDefaults.AuthenticationType);
             var cookieIdentity = await _userManager.CreateIdentityAsync(user, CookieAuthenticationDefaults.AuthenticationType);
+
             var properties = await CreateInitialRefreshToken(model.ClientId, user, oAuthIdentity);
-            properties.IsPersistent = model.IsPersistance;
+
+            SetCookieExpirationDateToAccessTokenLifeTime(properties);
 
             Authentication.SignIn(properties, oAuthIdentity, cookieIdentity);
 
@@ -615,6 +626,15 @@ namespace Shrooms.Presentation.Api.Controllers
             }
 
             Authentication.SignIn(properties, oAuthIdentity, cookieIdentity);
+        }
+
+        private void SetCookieExpirationDateToAccessTokenLifeTime(AuthenticationProperties properties)
+        {
+            // Set the .AspNet.Cookies. expiration date to the same date as the access token lifetime
+            var lifeTimeHoursTimeSpan = TimeSpan.FromHours(Convert.ToInt16(_applicationSettings.AccessTokenLifeTimeInHours));
+            var expirationDate = DateTime.UtcNow.Add(lifeTimeHoursTimeSpan);
+
+            properties.ExpiresUtc = DateTime.SpecifyKind(expirationDate, DateTimeKind.Utc);
         }
     }
 }
