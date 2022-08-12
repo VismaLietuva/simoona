@@ -620,8 +620,6 @@ namespace Shrooms.Presentation.Api.Controllers
             var cookieIdentity = await _userManager.CreateIdentityAsync(user, CookieAuthenticationDefaults.AuthenticationType);
             var properties = await CreateInitialRefreshToken(clientId, user, oAuthIdentity);
 
-            SetCookieExpirationDateToAccessTokenLifeTime(properties);
-
             if ((externalLogin.LoginProvider == "Google" && user.GoogleEmail == null) || (externalLogin.LoginProvider == "Facebook" && user.FacebookEmail == null))
             {
                 await _administrationService.AddProviderEmailAsync(user.Id, externalLogin.LoginProvider, externalLogin.Email);
