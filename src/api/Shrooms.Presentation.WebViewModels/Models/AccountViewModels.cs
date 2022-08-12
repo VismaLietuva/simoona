@@ -39,9 +39,6 @@ namespace Shrooms.Presentation.WebViewModels.Models
 
         [Required]
         public string ClientId { get; set; }
-
-        [Required]
-        public bool IsPersistance { get; set; }
     }
 
     public class RegisterViewModel
