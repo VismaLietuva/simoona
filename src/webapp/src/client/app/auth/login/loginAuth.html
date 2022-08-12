@@ -14,7 +14,7 @@
 						translate-attr-placeholder="applicationUser.enterEmailAddress"
 						translate
 						ng-cloak>
-				</div>			
+				</div>
 				<div class="form-group search-group search-group-lg padding-bot-10 required">
 					<input type="password"
 						class="form-control"
@@ -26,14 +26,7 @@
 			</div>
 
 			<div class="row">
-				<div class="col-xs-4 col-xs-offset-2">
-					<div class="checkbox">
-						<label>
-							<input type="checkbox" ng-model="vm.isPersistance"> {{ vm.rememberMe }}
-						</label>
-					</div>
-				</div>
-				<div class="col-xs-4">
+				<div class="col-xs-offset-6 col-xs-4">
 					<button type="button" class="auth-link" ng-click="vm.redirectToForgotPassword()">{{ vm.forgotPassword }}</button>
 				</div>
 			</div>
@@ -45,7 +38,7 @@
 				</button>
 			</div>
 		</form>
-		
+
 		<form name="login-form" ng-submit="vm.providerSignIn()">
 			<div class="col-xs-12" ng-show="vm.isGoogle" >
 				<wave-spinner ng-if="vm.isLoading"></wave-spinner>
@@ -69,17 +62,17 @@
 			</div>
 		</form>
     </div>
-    
+
 	<div class="register-form-placement" ng-if="!vm.isLoggingIn">
 		<div name="register-form" class="register-form-container">
 			<div class="col-xs-12 text-center auth-register-text">
 				<span>{{ vm.newEmployee }}</span><br>
-                <span> 
-					{{ vm.registerWith }} 
+                <span>
+					{{ vm.registerWith }}
 					<button ng-show="vm.isInternal" class="auth-link" ng-click="vm.register()">{{ vm.here }}</button>
 					<span ng-show="vm.isInternal && (vm.isGoogle || vm.isFacebook)">{{ vm.or }}</span>
 					<span ng-show="vm.isGoogle || vm.isFacebook">{{ vm.with }}</span>
-					<button ng-show="vm.isGoogle" class="auth-link" ng-click="vm.providerRegister('GoogleRegistration')">Google</button> 
+					<button ng-show="vm.isGoogle" class="auth-link" ng-click="vm.providerRegister('GoogleRegistration')">Google</button>
 					<span ng-show="vm.isGoogle && vm.isFacebook">{{ vm.or }}</span>
 					<button ng-show="vm.isFacebook" class="auth-link" ng-click="vm.providerRegister('FacebookRegistration')">Facebook</button>
 				</span>
