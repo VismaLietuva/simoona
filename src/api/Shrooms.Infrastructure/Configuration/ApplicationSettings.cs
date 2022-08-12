@@ -14,6 +14,8 @@ namespace Shrooms.Infrastructure.Configuration
 
         public int DefaultOrganizationId => int.Parse(ConfigurationManager.AppSettings["DefaultOrganizationId"]);
 
+        public int AccessTokenLifeTimeInHours => int.Parse(ConfigurationManager.AppSettings["AccessTokenLifeTimeInHours"]);
+
         public bool IsProductionBuild => bool.TryParse(ConfigurationManager.AppSettings["IsProductionBuild"], out var result) && result;
 
         public IEnumerable<string> OAuthRedirectUris => ConfigurationManager.AppSettings["OAuthRedirectUri"].Split(',');

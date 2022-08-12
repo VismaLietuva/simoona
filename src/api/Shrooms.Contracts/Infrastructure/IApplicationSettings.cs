@@ -10,6 +10,8 @@ namespace Shrooms.Contracts.Infrastructure
 
         int DefaultOrganizationId { get; }
 
+        int AccessTokenLifeTimeInHours { get; }
+
         bool IsProductionBuild { get; }
 
         string DemoAccountDefaultPictureId { get; }

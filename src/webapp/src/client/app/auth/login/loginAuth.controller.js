@@ -22,7 +22,7 @@
         var vm = this;
         var hashArray = authService.getHashArrayFromUrl();
         var access_token = hashArray['access_token'];
-        var redirect = $location.search().redirect; 
+        var redirect = $location.search().redirect;
 
         vm.organizationName = authService.getOrganizationNameFromUrl() || '';
         vm.endPoint = endPoint;
@@ -37,7 +37,6 @@
 
         vm.email = '';
         vm.password = '';
-        vm.isPersistance = false;
 
         vm.loginProvider = loginProvider;
         vm.providerSignIn = providerSignIn;
@@ -129,13 +128,12 @@
 
             const signInInfo = {
                 username: vm.email,
-                password: vm.password,
-                isPersistance: vm.isPersistance
+                password: vm.password
             };
 
             authService.requestToken(signInInfo).then(function(response) {
                 authService.getUserInfo(response.access_token).then(function(info) {
-                    authService.setAuthenticationData(info, response.access_token);            
+                    authService.setAuthenticationData(info, response.access_token);
                     authService.signIn(signInInfo);
 
                     if (redirect) {
@@ -153,7 +151,7 @@
                     notifySrv.error("applicationUser.emailNotVerified");
                 } else {
                     notifySrv.error("applicationUser.incorrectPasswordOrUserName");
-                }          
+                }
             });
         }
 
@@ -223,7 +221,7 @@
                 returnUrl += ':' + $location.port();
             }
 
-            returnUrl += '/' + vm.organizationName + '/Login';        
+            returnUrl += '/' + vm.organizationName + '/Login';
             if (redirect) returnUrl += '?redirect=' + redirect;
             return returnUrl;
         }
