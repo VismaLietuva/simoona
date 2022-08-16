@@ -31,8 +31,6 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 
         Task<List<LotteryDetailsDto>> GetRunningLotteriesAsync(UserAndOrganizationDto userAndOrganization);
 
-        Task<IEnumerable<LotteryDetailsDto>> GetFilteredLotteriesAsync(string filter, UserAndOrganizationDto userOrg);
-
         Task<IPagedList<LotteryDetailsDto>> GetPagedLotteriesAsync(LotteryListingArgsDto args, UserAndOrganizationDto userOrg);
 
         Task<LotteryDetailsDto> GetLotteryDetailsAsync(int lotteryId, bool includeRemainingKudos, UserAndOrganizationDto userOrg);

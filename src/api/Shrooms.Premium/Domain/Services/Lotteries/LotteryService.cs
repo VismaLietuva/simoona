@@ -17,6 +17,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Shrooms.Domain.Extensions;
 using X.PagedList;
 
 namespace Shrooms.Premium.Domain.Services.Lotteries
@@ -240,23 +241,17 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<LotteryDetailsDto>> GetFilteredLotteriesAsync(string filter, UserAndOrganizationDto userOrg)
-        {
-            return await _lotteriesDbSet
-                .Where(x => x.OrganizationId == userOrg.OrganizationId)
-                .Where(x => filter == null || x.Title.Contains(filter))
-                .Select(MapLotteriesToListItemDto)
-                .OrderByDescending(x => x.RefundFailed)
-                .ThenByDescending(x => x.Status == LotteryStatus.Started || x.Status == LotteryStatus.Drafted)
-                .ThenByDescending(lottery => lottery.EndDate)
-                .ToListAsync();
-        }
-
         public async Task<IPagedList<LotteryDetailsDto>> GetPagedLotteriesAsync(LotteryListingArgsDto args, UserAndOrganizationDto userOrg)
         {
-            var filteredLotteries = await GetFilteredLotteriesAsync(args.Filter, userOrg);
+            var sortable = args
+                .AddSortablePropertiesToStart((nameof(LotteryDetailsDto.RefundFailed), SortDirection.Descending));
 
-            return await filteredLotteries.ToPagedListAsync(args.Page, args.PageSize);
+            return await _lotteriesDbSet
+                .Where(lottery => lottery.OrganizationId == userOrg.OrganizationId &&
+                                  (args.Filter == null || lottery.Title.Contains(args.Filter)))
+                .Select(MapLotteriesToListItemDto)
+                .OrderByPropertyNames(sortable)
+                .ToPagedListAsync(args.Page, args.PageSize);
         }
 
         public async Task<LotteryStatusDto> GetLotteryStatusAsync(int lotteryId, UserAndOrganizationDto userOrg)

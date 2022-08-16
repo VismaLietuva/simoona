@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
 {
-    public class LotteryListingArgsViewModel : IPageable
+    public class LotteryListingArgsViewModel : IPageable, ISortable
     {
         public string Filter { get; set; }
 
@@ -13,5 +13,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
 
         [Range(1, int.MaxValue)]
         public int Page { get; set; } = 1;
+
+        public string SortByProperties { get; set; }
     }
 }
