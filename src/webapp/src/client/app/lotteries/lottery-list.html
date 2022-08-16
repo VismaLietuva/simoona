@@ -9,14 +9,14 @@
                 <thead>
                     <tr>
                         <th class="col-xs-3">
-                            <ace-sort-link on-sort="onSort" sort-dir="filter.dir" sort-field="filter.sort" sort-value="name"><span>{{"lotteries.lotteryTitle" | translate}}</span></ace-sort-link>
+                            <ace-sort-link on-sort="vm.onSort" sort-dir="filter.dir" sort-field="filter.sort" sort-value="title"><span>{{"lotteries.lotteryTitle" | translate}}</span></ace-sort-link>
                         </th>
                         <th class="col-xs-3">
-                            <ace-sort-link on-sort="onSort" sort-dir="filter.dir" sort-field="filter.sort" sort-value="title"><span>{{"lotteries.status" | translate}}</span></ace-sort-link>
+                            <ace-sort-link on-sort="vm.onSort" sort-dir="filter.dir" sort-field="filter.sort" sort-value="status"><span>{{"lotteries.status" | translate}}</span></ace-sort-link>
                         </th>
                         <th class="col-xs-3">
-                            <ace-sort-link on-sort="onSort" sort-dir="filter.dir" sort-field="filter.sort" sort-value="endDate"><span>{{"lotteries.endDate" | translate}}</span></ace-sort-link>
-                        </th>    
+                            <ace-sort-link on-sort="vm.onSort" sort-dir="filter.dir" sort-field="filter.sort" sort-value="endDate"><span>{{"lotteries.endDate" | translate}}</span></ace-sort-link>
+                        </th>
                         <th class="col-xs-3 text-center" ng-if="vm.allowEdit">
                             {{"common.actions" | translate}}
                         </th>
@@ -32,7 +32,7 @@
                         </td>
                         <td class="ng-binding">
                             {{lottery.endDate | convertToCurrentTimezone | date:'yyyy-MM-dd, HH:mm'}}
-                        </td>  
+                        </td>
                         <td ng-if="vm.allowEdit " class="text-center">
                             <a ui-sref="Root.WithOrg.Admin.Lotteries.Edit({ lotteryId : lottery.id})" class="btn btn-default glyphicon glyphicon-pencil" title="{{'common.edit' | translate}}"></a>
                             <a ng-if="vm.showRefundPage(lottery)" ui-sref="Root.WithOrg.Admin.Lotteries.Refund({ lotteryId : lottery.id})" class="btn btn-default glyphicon glyphicon-eye-open"></a>
