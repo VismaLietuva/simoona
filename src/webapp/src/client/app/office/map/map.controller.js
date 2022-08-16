@@ -217,6 +217,9 @@
 
         $scope.selectRoomById = function(id) {
             var selectedRoom;
+
+            id = parseInt(id);
+
             angular.forEach($scope.floor.rooms, function(room) {
                 if (room.id === id) {
                     $scope.selectRoom(room);
@@ -224,6 +227,7 @@
                     return;
                 }
             });
+
             return selectedRoom;
         };
 
