@@ -1,4 +1,5 @@
-﻿using Shrooms.Contracts.Enums;
+﻿using Shrooms.Contracts.Constants;
+using Shrooms.Contracts.Enums;
 using System;
 
 namespace Shrooms.Domain.Extensions
@@ -9,9 +10,9 @@ namespace Shrooms.Domain.Extensions
         {
             return sortDirection switch
             {
-                SortDirection.Ascending => "asc",
-                SortDirection.Descending => "desc",
-                _ => throw new ArgumentException($"Sort direction {sortDirection} is not supported"),
+                SortDirection.Ascending => SortDirectionConstants.Ascending,
+                SortDirection.Descending => SortDirectionConstants.Descending,
+                _ => throw new ArgumentException($"Sort direction {sortDirection} is invalid"),
             };
         }
     }
