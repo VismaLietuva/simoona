@@ -1,4 +1,5 @@
-﻿using Shrooms.Contracts.Infrastructure;
+﻿using Shrooms.Contracts.Constants;
+using Shrooms.Contracts.Infrastructure;
 using System;
 using System.Linq;
 using System.Linq.Dynamic;
@@ -8,7 +9,7 @@ namespace Shrooms.Domain.Extensions
 {
     public static class QueryableExtensions
     {
-        private const string DefaultSortDirection = "asc";
+        private const string DefaultSortDirection = SortDirectionConstants.Ascending;
 
         private const char SortablePropertiesSeparator = ';';
         private const char SortablePropertySeparator = ' ';
@@ -27,8 +28,8 @@ namespace Shrooms.Domain.Extensions
 
             return query.OrderByPropertyNames(sortableProperties.SortByProperties);
         }
-
-        public static IQueryable<TEntity> OrderByPropertyNames<TEntity>(
+        
+        private static IQueryable<TEntity> OrderByPropertyNames<TEntity>(
             this IQueryable<TEntity> query,
             string sortByProperties) where TEntity : class
         {
@@ -78,26 +79,6 @@ namespace Shrooms.Domain.Extensions
             return query.OrderBy(orderString);
         }
 
-        public static IQueryable<TEntity> OrderByPropertyName<TEntity>(
-            this IQueryable<TEntity> query, 
-            string propertyName,
-            string sortDirection) where TEntity : class
-        {
-            sortDirection = sortDirection?.ToLower();
-            
-            if (!IsValidSortDirection(sortDirection))
-            {
-                sortDirection = DefaultSortDirection;
-            }
-
-            if (propertyName == null || !EntityHasProperty<TEntity>(propertyName))
-            {
-                return query.OrderByFirstPropertyName(sortDirection);
-            }
-
-            return query.OrderBy($"{propertyName} {sortDirection}");
-        }
-
         private static IQueryable<TEntity> OrderByFirstPropertyName<TEntity>(this IQueryable<TEntity> query, string sortDirection)
         {
             var firstProperty = typeof(TEntity)
@@ -133,7 +114,7 @@ namespace Shrooms.Domain.Extensions
                 return false;
             }
 
-            return sortDirection == "asc" || sortDirection == "desc";
+            return sortDirection == SortDirectionConstants.Ascending || sortDirection == SortDirectionConstants.Descending;
         }
     }
 }

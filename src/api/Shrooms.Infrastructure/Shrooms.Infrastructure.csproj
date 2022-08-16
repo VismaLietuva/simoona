@@ -148,6 +148,7 @@
     <Compile Include="Logger\Logger.cs" />
     <Compile Include="CustomCache\CustomCache.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Sorting\Sortable.cs" />
     <Compile Include="Storage\AzureBlob\AzureSettings.cs" />
     <Compile Include="Storage\AzureBlob\AzureStorage.cs" />
     <Compile Include="Storage\FileSystem\FileSystemStorage.cs" />
