@@ -35,8 +35,6 @@
         activate();
 
         function activate() {
-
-
             $rootScope.$on('floorChange', function (e, floor) {
                 resetStateParams();
                 setScopeParams();
@@ -187,19 +185,13 @@
                 return;
             }
 
-            if ($scope.params.roomId) {
-                angular.forEach($scope.floor.rooms, function (value, key) {
-                    if (value.id === $scope.params.roomId && authService.identity.isAuthenticated) {
-                        value.selected = true;
-                    }
-                });
-            }
-
             if ($scope.params.coords) {
                 var coords = $scope.params.coords.split(',');
                 coords = { x: coords[0], y: coords[1] };
                 $scope.floor.pinCoords = coords;
             }
+
+            $scope.params.highlightedRoomId = $scope.params.roomId;
         }
     }
 })();
