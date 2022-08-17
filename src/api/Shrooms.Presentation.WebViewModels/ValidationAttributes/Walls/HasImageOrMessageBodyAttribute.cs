@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 
 namespace Shrooms.Presentation.WebViewModels.ValidationAttributes.Walls
 {
@@ -59,7 +58,12 @@ namespace Shrooms.Presentation.WebViewModels.ValidationAttributes.Walls
         {
             images = null;
             
-            if (value is not IEnumerable<string>)
+            if (value == null) // Cannot get type when object is null
+            {
+                return true;
+            }
+
+            if (value.GetType() != typeof(IEnumerable<string>))
             {
                 return false;
             }
