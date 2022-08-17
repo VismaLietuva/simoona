@@ -4,7 +4,7 @@ using NUnit.Framework;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
-using Shrooms.DataLayer.EntityModels.Models.Lottery;
+using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
 using Shrooms.Premium.Domain.DomainExceptions.Lotteries;
 using Shrooms.Premium.Domain.Services.Lotteries;
@@ -13,8 +13,6 @@ using Shrooms.Premium.Presentation.WebViewModels.Lotteries;
 using Shrooms.Premium.Tests.ModelMappings;
 using Shrooms.Tests.Extensions;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -482,7 +480,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 EndDate = DateTime.UtcNow.AddYears(1),
                 EntryFee = 1,
                 Status = LotteryStatus.Started,
-                Images = new ImagesCollection(),
+                Images = new ImageCollection(),
                 GiftedTicketLimit = 0
             };
 
@@ -508,7 +506,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 EndDate = DateTime.UtcNow.AddYears(1),
                 EntryFee = 1,
                 Status = LotteryStatus.Started,
-                Images = new ImagesCollection(),
+                Images = new ImageCollection(),
                 GiftedTicketLimit = 0
             };
 
@@ -537,7 +535,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 EndDate = DateTime.UtcNow.AddYears(1),
                 EntryFee = 1,
                 Status = LotteryStatus.Started,
-                Images = new ImagesCollection(),
+                Images = new ImageCollection(),
                 GiftedTicketLimit = 0
             };
 
@@ -563,7 +561,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 EndDate = DateTime.UtcNow.AddYears(1),
                 EntryFee = 1,
                 Status = LotteryStatus.Started,
-                Images = new ImagesCollection(),
+                Images = new ImageCollection(),
                 GiftedTicketLimit = 0
             };
 
@@ -589,7 +587,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 EndDate = DateTime.UtcNow.AddDays(-1),
                 EntryFee = 1,
                 Status = LotteryStatus.Started,
-                Images = new ImagesCollection(),
+                Images = new ImageCollection(),
                 GiftedTicketLimit = 0
             };
 
@@ -614,7 +612,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 Description = "desc",
                 EntryFee = 1,
                 Status = LotteryStatus.Started,
-                Images = new ImagesCollection(),
+                Images = new ImageCollection(),
                 GiftedTicketLimit = 0
             };
 
@@ -639,7 +637,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 Description = "desc",
                 EndDate = DateTime.UtcNow.AddYears(1),
                 EntryFee = 1,
-                Images = new ImagesCollection(),
+                Images = new ImageCollection(),
                 GiftedTicketLimit = 0
             };
 
@@ -665,7 +663,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 EndDate = DateTime.UtcNow.AddYears(1),
                 EntryFee = 1,
                 Status = LotteryStatus.Ended,
-                Images = new ImagesCollection(),
+                Images = new ImageCollection(),
                 GiftedTicketLimit = 0
             };
 
@@ -716,7 +714,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 EndDate = DateTime.UtcNow.AddYears(1),
                 EntryFee = 1,
                 Status = LotteryStatus.Started,
-                Images = new ImagesCollection(),
+                Images = new ImageCollection(),
                 GiftedTicketLimit = -10
             };
 
@@ -811,7 +809,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 Status = LotteryStatus.Drafted,
                 EndDate = DateTime.UtcNow.AddYears(1),
                 EntryFee = 10,
-                Images = new ImagesCollection(),
+                Images = new ImageCollection(),
                 GiftedTicketLimit = 10
             };
 
@@ -838,7 +836,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 Status = LotteryStatus.Drafted,
                 EndDate = DateTime.UtcNow.AddYears(1),
                 EntryFee = 10,
-                Images = new ImagesCollection(),
+                Images = new ImageCollection(),
                 GiftedTicketLimit = 10
             };
 
@@ -868,7 +866,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 Status = LotteryStatus.Drafted,
                 EndDate = DateTime.UtcNow.AddYears(1),
                 EntryFee = 10,
-                Images = new ImagesCollection(),
+                Images = new ImageCollection(),
                 GiftedTicketLimit = 10
             };
 
@@ -895,7 +893,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 Status = LotteryStatus.Drafted,
                 EndDate = DateTime.UtcNow.AddYears(1),
                 EntryFee = 10,
-                Images = new ImagesCollection(),
+                Images = new ImageCollection(),
                 GiftedTicketLimit = 10
             };
 
@@ -921,7 +919,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 Title = "title",
                 EndDate = DateTime.UtcNow.AddYears(1),
                 EntryFee = 10,
-                Images = new ImagesCollection(),
+                Images = new ImageCollection(),
                 GiftedTicketLimit = 10
             };
 
@@ -948,7 +946,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 Status = (LotteryStatus)int.MaxValue,
                 EndDate = DateTime.UtcNow.AddYears(1),
                 EntryFee = 10,
-                Images = new ImagesCollection(),
+                Images = new ImageCollection(),
                 GiftedTicketLimit = 10
             };
 
@@ -974,7 +972,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 Title = "title",
                 Status = LotteryStatus.Drafted,
                 EntryFee = 10,
-                Images = new ImagesCollection(),
+                Images = new ImageCollection(),
                 GiftedTicketLimit = 10
             };
 
@@ -1001,7 +999,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 Status = LotteryStatus.Drafted,
                 EndDate = DateTime.UtcNow.AddYears(-1),
                 EntryFee = 10,
-                Images = new ImagesCollection(),
+                Images = new ImageCollection(),
                 GiftedTicketLimit = 10
             };
 
@@ -1028,7 +1026,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 Status = LotteryStatus.Drafted,
                 EndDate = DateTime.UtcNow.AddYears(1),
                 EntryFee = 0,
-                Images = new ImagesCollection(),
+                Images = new ImageCollection(),
                 GiftedTicketLimit = 10
             };
 
@@ -1054,7 +1052,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 Title = "title",
                 Status = LotteryStatus.Drafted,
                 EndDate = DateTime.UtcNow.AddYears(1),
-                Images = new ImagesCollection(),
+                Images = new ImageCollection(),
                 GiftedTicketLimit = 10
             };
 
@@ -1107,7 +1105,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 Status = LotteryStatus.Drafted,
                 EndDate = DateTime.UtcNow.AddYears(1),
                 EntryFee = 10,
-                Images = new ImagesCollection()
+                Images = new ImageCollection()
             };
 
             var expectedStatus = HttpStatusCode.BadRequest;
@@ -1133,7 +1131,7 @@ namespace Shrooms.Premium.Tests.Controllers.WebApi
                 Status = LotteryStatus.Drafted,
                 EndDate = DateTime.UtcNow.AddYears(1),
                 EntryFee = 10,
-                Images = new ImagesCollection(),
+                Images = new ImageCollection(),
                 GiftedTicketLimit = -10
             };
 

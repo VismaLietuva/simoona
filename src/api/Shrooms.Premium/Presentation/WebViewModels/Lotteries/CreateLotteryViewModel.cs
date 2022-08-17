@@ -1,5 +1,5 @@
 ﻿using Shrooms.Contracts.Enums;
-using Shrooms.DataLayer.EntityModels.Models.Lottery;
+using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes;
 using Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes.Lotteries;
@@ -29,7 +29,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
         public LotteryStatus Status { get; set; }
 
         [Required]
-        public ImagesCollection Images { get; set; }
+        public ImageCollection Images { get; set; }
 
         [Range(0, int.MaxValue)]
         public int GiftedTicketLimit { get; set; }

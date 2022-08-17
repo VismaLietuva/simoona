@@ -2,9 +2,9 @@
 using System.Collections.ObjectModel;
 using Newtonsoft.Json;
 
-namespace Shrooms.DataLayer.EntityModels.Models.Lottery
+namespace Shrooms.DataLayer.EntityModels.Models
 {
-    public class ImagesCollection : Collection<string>
+    public class ImageCollection : Collection<string>
     {
         public void Add(ICollection<string> images)
         {

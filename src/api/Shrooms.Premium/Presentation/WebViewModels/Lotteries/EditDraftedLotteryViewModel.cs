@@ -1,5 +1,5 @@
 ﻿using Shrooms.Contracts.Enums;
-using Shrooms.DataLayer.EntityModels.Models.Lottery;
+using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes;
 using System;
@@ -31,7 +31,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
         public int? EntryFee { get; set; }
 
         [Required]
-        public ImagesCollection Images { get; set; }
+        public ImageCollection Images { get; set; }
 
         [Required]
         [Range(0, int.MaxValue)]
