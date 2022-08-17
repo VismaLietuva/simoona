@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Shrooms.Contracts.Constants;
+using Shrooms.Presentation.WebViewModels.ValidationAttributes.Walls;
 
 namespace Shrooms.Presentation.WebViewModels.Models.Wall.Posts.Comments
 {
@@ -13,6 +14,7 @@ namespace Shrooms.Presentation.WebViewModels.Models.Wall.Posts.Comments
         [MaxLength(ValidationConstants.MaxCommentMessageBodyLength)]
         public string MessageBody { get; set; }
 
+        [HasImageOrMessageBody(nameof(MessageBody))]
         public ICollection<string> Images { get; set; }
     }
 }

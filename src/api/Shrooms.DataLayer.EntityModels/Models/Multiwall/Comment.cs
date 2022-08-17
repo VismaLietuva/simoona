@@ -21,23 +21,10 @@ namespace Shrooms.DataLayer.EntityModels.Models.Multiwall
 
         public virtual Post Post { get; set; }
 
-        public string PictureId { get; set; }
+        public ImageCollection Images { get; set; }
 
         public DateTime LastEdit { get; set; }
 
         public bool IsHidden { get; set; }
-
-        public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
-            if (string.IsNullOrWhiteSpace(MessageBody) && PictureId == null)
-            {
-                yield return new ValidationResult("Message cannot be empty", new[] { "MessageBody", "PictureId" });
-            }
-
-            foreach (var error in base.Validate(validationContext))
-            {
-                yield return error;
-            }
-        }
     }
 }

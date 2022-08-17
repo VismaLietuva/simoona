@@ -132,6 +132,7 @@
     <Compile Include="Models\Wall\Widgets\KudosBasketWidgetViewModel.cs" />
     <Compile Include="Models\Wall\Widgets\WidgetsViewModel.cs" />
     <Compile Include="ValidationAttributes\DateTimeNotExpiredAttribute.cs" />
+    <Compile Include="ValidationAttributes\Walls\HasImageOrMessageBodyAttribute.cs" />
     <Compile Include="ValidationAttributes\HasNoDuplicateLinksAttribute.cs" />
     <Compile Include="ValidationAttributes\MinValueAttribute.cs" />
     <Compile Include="Models\AbstractClassifierAbstractViewModel.cs" />
