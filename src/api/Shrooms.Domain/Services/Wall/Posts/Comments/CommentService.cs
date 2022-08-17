@@ -9,6 +9,7 @@ using Shrooms.Contracts.DataTransferObjects.Models.Wall.Comments;
 using Shrooms.Contracts.DataTransferObjects.Wall.Likes;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.Infrastructure;
+using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.Domain.Exceptions.Exceptions;
 using Shrooms.Domain.Services.Permissions;
@@ -80,7 +81,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             {
                 AuthorId = commentDto.UserId,
                 MessageBody = commentDto.MessageBody,
-                PictureId = commentDto.PictureId,
+                Images = new ImageCollection(commentDto.Images),
                 PostId = commentDto.PostId,
                 Likes = new LikesCollection(),
                 LastEdit = DateTime.UtcNow
@@ -135,7 +136,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             }
 
             comment.MessageBody = commentDto.MessageBody;
-            comment.PictureId = commentDto.PictureId;
+            comment.Images = new ImageCollection(commentDto.Images);
             comment.LastEdit = DateTime.UtcNow;
 
             await _uow.SaveChangesAsync(commentDto.UserId);

@@ -15,7 +15,7 @@ namespace Shrooms.Presentation.WebViewModels.Models.Wall.Posts.Comments
         [MaxLength(ValidationConstants.MaxCommentMessageBodyLength)]
         public string MessageBody { get; set; }
 
-        public string PictureId { get; set; }
+        public IEnumerable<string> Images { get; set; }
 
         public IEnumerable<string> MentionedUserIds { get; set; }
     }

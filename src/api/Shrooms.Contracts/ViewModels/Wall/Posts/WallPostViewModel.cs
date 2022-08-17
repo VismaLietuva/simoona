@@ -23,7 +23,7 @@ namespace Shrooms.Contracts.ViewModels.Wall.Posts
 
         public IEnumerable<CommentViewModel> Comments { get; set; }
 
-        public string PictureId { get; set; }
+        public IEnumerable<string> Images { get; set; }
 
         public string SharedEventId { get; set; }
 

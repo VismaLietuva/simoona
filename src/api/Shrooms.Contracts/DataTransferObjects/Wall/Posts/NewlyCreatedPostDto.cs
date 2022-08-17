@@ -15,7 +15,7 @@ namespace Shrooms.Contracts.DataTransferObjects.Wall.Posts
 
         public string CreatedBy { get; set; }
 
-        public string PictureId { get; set; }
+        public IEnumerable<string> Images { get; set; }
 
         public UserDto User { get; set; }
 

@@ -68,7 +68,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
                     LastEdit = DateTime.UtcNow,
                     CreatedBy = newPostDto.UserId,
                     MessageBody = newPostDto.MessageBody,
-                    PictureId = newPostDto.PictureId,
+                    Images = new ImageCollection(newPostDto.Images),
                     SharedEventId = newPostDto.SharedEventId,
                     LastActivity = DateTime.UtcNow,
                     WallId = newPostDto.WallId,
@@ -157,7 +157,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
                 }
 
                 post.MessageBody = editPostDto.MessageBody;
-                post.PictureId = editPostDto.PictureId;
+                post.Images = new ImageCollection(editPostDto.Images);
                 post.LastEdit = DateTime.UtcNow;
 
                 await _uow.SaveChangesAsync(editPostDto.UserId);
@@ -264,7 +264,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
             {
                 Id = post.Id,
                 MessageBody = post.MessageBody,
-                PictureId = post.PictureId,
+                Images = post.Images,
                 Created = post.Created,
                 CreatedBy = post.CreatedBy,
                 User = user,
