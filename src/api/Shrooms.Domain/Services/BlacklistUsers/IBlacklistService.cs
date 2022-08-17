@@ -8,7 +8,6 @@ namespace Shrooms.Domain.Services.BlacklistUsers
 {
     public interface IBlacklistService
     {
-
         Task<IEnumerable<BlacklistUserDto>> GetAllExceptActiveAsync(string userId, UserAndOrganizationDto userOrg);
 
         Task<BlacklistUserDto> FindAsync(string userId, UserAndOrganizationDto userOrg);

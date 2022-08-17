@@ -1,35 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Shrooms.Contracts.DAL;
+﻿using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Kudos;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models.Lottery;
 using Shrooms.Domain.Services.Kudos;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Shrooms.Premium.Domain.Services.Lotteries
 {
     public class LotteryAbortJob : ILotteryAbortJob
     {
         private readonly ILotteryService _lotteryService;
-        private readonly IParticipantService _participantService;
+        private readonly ILotteryParticipantService _lotteryParticipantService;
         private readonly IKudosService _kudosService;
         private readonly IAsyncRunner _asyncRunner;
         private readonly ILogger _logger;
         private readonly IUnitOfWork2 _uow;
 
         public LotteryAbortJob(IKudosService kudosService,
-            IParticipantService participantService,
+            ILotteryParticipantService lotteryParticipantService,
             ILogger logger,
             IAsyncRunner asyncRunner,
             IUnitOfWork2 uow,
             ILotteryService lotteryService)
         {
             _kudosService = kudosService;
-            _participantService = participantService;
+            _lotteryParticipantService = lotteryParticipantService;
             _logger = logger;
             _asyncRunner = asyncRunner;
             _uow = uow;
@@ -38,7 +38,8 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 
         public async Task RefundLotteryAsync(int lotteryId, UserAndOrganizationDto userOrg)
         {
-            var lottery = await _lotteryService.GetLotteryAsync(lotteryId);
+            var lottery = await _lotteryService.GetLotteryByIdAsync(lotteryId, userOrg);
+
             if (lottery == null || lottery.OrganizationId != userOrg.OrganizationId)
             {
                 return;
@@ -47,6 +48,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             try
             {
                 var refundLogs = await CreateKudosLogsAsync(lottery, userOrg);
+
                 await AddKudosLogsAsync(lottery, refundLogs, userOrg);
                 await UpdateUserProfilesAsync(lottery, refundLogs, userOrg);
             }
@@ -59,7 +61,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 
         private async Task UpdateUserProfilesAsync(Lottery lottery, IEnumerable<AddKudosLogDto> kudosLogs, UserAndOrganizationDto userOrg)
         {
-            if (lottery.Status != (int)LotteryStatus.RefundLogsCreated)
+            if (lottery.Status != LotteryStatus.RefundLogsCreated)
             {
                 return;
             }
@@ -67,20 +69,20 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             var userIds = kudosLogs.Select(x => x.ReceivingUserIds.First());
 
             await _kudosService.UpdateProfilesFromUserIdsAsync(userIds, userOrg);
-            lottery.Status = (int)LotteryStatus.Refunded;
+            lottery.Status = LotteryStatus.Refunded;
 
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
         private async Task AddKudosLogsAsync(Lottery lottery, IEnumerable<AddKudosLogDto> kudosLogs, UserAndOrganizationDto userOrg)
         {
-            if (lottery.Status != (int)LotteryStatus.RefundStarted)
+            if (lottery.Status != LotteryStatus.RefundStarted)
             {
                 return;
             }
 
             await _kudosService.AddRefundKudosLogsAsync(kudosLogs);
-            lottery.Status = (int)LotteryStatus.RefundLogsCreated;
+            lottery.Status = LotteryStatus.RefundLogsCreated;
 
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
@@ -88,7 +90,8 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
         private async Task<IList<AddKudosLogDto>> CreateKudosLogsAsync(Lottery lottery, UserAndOrganizationDto userOrg)
         {
             var kudosTypeId = await _kudosService.GetKudosTypeIdAsync(KudosTypeEnum.Refund);
-            var usersToRefund = await _participantService.GetParticipantsCountedAsync(lottery.Id);
+            var usersToRefund = await _lotteryParticipantService.GetParticipantsGroupedByBuyerIdAsync(lottery.Id, userOrg);
+
             var usersToSendKudos = new List<AddKudosLogDto>();
 
             foreach (var user in usersToRefund)
@@ -96,7 +99,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 var totalReturn = user.Tickets * lottery.EntryFee;
                 var kudosLog = new AddKudosLogDto
                 {
-                    ReceivingUserIds = new List<string> { user.UserId },
+                    ReceivingUserIds = new List<string> { user.BuyerId },
                     PointsTypeId = kudosTypeId,
                     MultiplyBy = totalReturn,
                     Comment = CreateComment(lottery, totalReturn),

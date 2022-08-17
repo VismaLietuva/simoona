@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Shrooms.Contracts.DataTransferObjects.Models.ExternalLinks;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DataTransferObjects;
-using Shrooms.Contracts.DataTransferObjects.Models.ExternalLinks;
 
 namespace Shrooms.Domain.Services.ExternalLinks
 {

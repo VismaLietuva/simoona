@@ -31,7 +31,11 @@
         };
 
         vm.datePicker = {
-            isOpen: false
+            isOpen: false,
+            options: {
+                minDate: moment().utc().startOf('days').toDate(),
+                startingDay: 1
+            }
         };
 
         vm.states = {
@@ -52,6 +56,8 @@
                 vm.isDrafted = vm.lottery.status === lotteryStatuses.drafted;
                 vm.isExpired = vm.lottery.status === lotteryStatuses.expired;
                 vm.isEnded = (vm.lottery.status !== lotteryStatuses.drafted) && (vm.lottery.status !== lotteryStatuses.started);
+                vm.lottery.giftedTicketLimit = vm.lottery.giftedTicketLimit ?? 0;
+                vm.allowGiftedTicketLimit = vm.lottery.giftedTicketLimit !== 0;
                 $rootScope.pageTitle = 'lotteries.editLottery';
             } else if (states.isCreate) {
                 $rootScope.pageTitle = 'lotteries.createLottery';

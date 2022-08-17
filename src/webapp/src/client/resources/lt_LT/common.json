@@ -212,5 +212,7 @@
   "presetConfigurationTableOffices": "Ofisai",
   "presetConfigurationTableKudos": "Kudos",
   "presetConfigurationTableName": "Pavadinimas",
-  "updating": "Atnaujinama..."
+  "updating": "Atnaujinama...",
+  "valueLessThanMinimumErrorMessage": "Reikšmė turi būti didesnė nei {{ one }}",
+  "valueGreaterThanMaximumErrorMessage": "Reikšmė turi būti mažesnė nei {{ one }}"
 }

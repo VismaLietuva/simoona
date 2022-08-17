@@ -52,6 +52,7 @@
     "refundFailedMessage": "Deja, sistema nesugebėjo grąžinti Kudos.<br>Pirmiausia turėtumėte pabandyti juos grąžinti iš naujo. Tai padaryti galite paspaudę mygtuką esantį žemiau.",
     "startedRefunding": "Loterijos bilietų atlyginimas pradėtas!",
     "hasBeenBought": "Sėkmingai nusipirkti {{ one }} bilietai \"{{ two }}\" loterijoje!",
+    "hasBeenGifted": "Sėkmingai padovanoti {{ one }} bilietai \"{{ two }}\" loterijoje!",
     "invalidTicketNumber": "Neteisingas bilietų skaičius!",
     "cancel": "Grįžti į loterijų sąrašą",
     "lotteryStatsModalName": "Loterijos duomenys",
@@ -60,5 +61,15 @@
     "kudosSpent": "Išleista 'Kudos': ",
     "userNameSurname": "Vardas, Pavardė",
     "ticketsBougth": "Nupirko bilietų",
-    "abortConfirmationMessage": "Ar jūs tikrai norite nutraukti šią loteriją?"
+    "abortConfirmationMessage": "Ar jūs tikrai norite nutraukti šią loteriją?",
+    "allowGiftingTickets": "Leisti dovanoti bilietus",
+    "giftedTicketLimit": "Bilietų limitas",
+    "addPeople": "Pridėti žmonių...",
+    "giftTickets": "Dovanoti",
+    "kudosAfterPurchase": "Kudos kiekis po pirkimo",
+    "remainingGiftedTicketCount": "Iš viso gali padovanoti <b>{{one}}</b>",
+    "notEnoughKudos": "Neužtenka kudos'ų",
+    "successDelete": "Sėkmingai pradėtas Kudos'ų grąžinimo procesas",
+    "ticketReceiverName": "Vardas",
+    "ticketReceiverCount": "Kiekis"
 }

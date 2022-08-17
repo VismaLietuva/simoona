@@ -26,7 +26,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Lotteries
         public async Task ProcessExpiredLotteriesAsync()
         {
             var lotteriesToProcess = await _lotteriesDbSet
-                .Where(lottery => lottery.Status == (int)LotteryStatus.Started && lottery.EndDate < _systemClock.UtcNow)
+                .Where(lottery => lottery.Status == LotteryStatus.Started && lottery.EndDate < _systemClock.UtcNow)
                 .ToListAsync();
 
             if (!lotteriesToProcess.Any())
@@ -36,7 +36,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Lotteries
 
             foreach (var lottery in lotteriesToProcess)
             {
-                lottery.Status = (int)LotteryStatus.Expired;
+                lottery.Status = LotteryStatus.Expired;
             }
 
             await _uow.SaveChangesAsync(false);

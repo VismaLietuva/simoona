@@ -7,20 +7,18 @@
             height: 165,
             width: 291,
         })
-        .directive('aceLotteriesDetailModal', lotteryDetailModal)
+        .directive('aceLotteriesDetailModal', lotteryDetailModal);
 
-    lotteryDetailModal.$inject = [
-        '$uibModal'
-    ];
+    lotteryDetailModal.$inject = ['$uibModal'];
 
     function lotteryDetailModal($uibModal) {
         var directive = {
             restrict: 'A',
             scope: {
                 aceLotteriesDetailModal: '=?',
-                onInit: '&'
+                onInit: '&',
             },
-            link: linkFunc
+            link: linkFunc,
         };
 
         return directive;
@@ -31,22 +29,31 @@
             onInitNotifyConsumer();
 
             function openLotteryWidget() {
+                // Disable scrolling while modal is open
+                $(":root").css("overflow-y", 'hidden');
+
                 $uibModal.open({
-                    templateUrl: 'app/lotteries/lotteries-widget/lotteries-detail-modal.html',
+                    templateUrl:
+                        'app/lotteries/lotteries-widget/lotteries-detail-modal.html',
                     controller: lotteriesDetailController,
                     controllerAs: 'vm',
                     resolve: {
                         currentLottery: function () {
                             return scope.aceLotteriesDetailModal;
-                        }
-                    }
+                        },
+                    },
+                })
+                .closed
+                .then(function() {
+                    // Enable scrolling after modal is closed
+                    $(":root").css("overflow-y", '');
                 });
             }
 
             function onInitNotifyConsumer() {
                 scope.onInit({
                     lotteryId: scope.aceLotteriesDetailModal,
-                    openLotteryWidget: openLotteryWidget
+                    openLotteryWidget: openLotteryWidget,
                 });
             }
         }
@@ -63,14 +70,27 @@
         '$window'
     ];
 
-    function lotteriesDetailController($uibModalInstance, lotteryRepository, currentLottery, lotteryImageSettings, notifySrv, localeSrv, errorHandler, $window) {
+    function lotteriesDetailController(
+        $uibModalInstance,
+        lotteryRepository,
+        currentLottery,
+        lotteryImageSettings,
+        notifySrv,
+        localeSrv,
+        errorHandler,
+        $window
+    ) {
         var vm = this;
+
         vm.lotteryImageSize = {
             w: lotteryImageSettings.width,
-            h: lotteryImageSettings.height
+            h: lotteryImageSettings.height,
         };
 
-        vm.ticketCount = 0;
+        vm.minTicketCount = 1;
+        vm.maxTicketCount = 10000;
+
+        vm.ticketCount = 1;
         vm.currentLottery = currentLottery;
 
         vm.lotteryLoaded = false;
@@ -80,16 +100,39 @@
         vm.ticketUp = ticketUp;
         vm.ticketDown = ticketDown;
         vm.buyTickets = buyTickets;
+        vm.giftTickets = giftTickets;
+        vm.canBuyTickets = canBuyTickets;
+        vm.canGiftTickets = canGiftTickets;
+        vm.toggleUserSelection = toggleUserSelection;
+        vm.cancelGiftingProcess = cancelGiftingProcess;
+        vm.getTotalCost = getTotalCost;
+        vm.getKudosAfterPurchase = getKudosAfterPurchase;
+        vm.getRemainingGiftedTicketCount = getRemainingGiftedTicketCount;
+        vm.giftedTicketsLimitExceeded = giftedTicketsLimitExceeded;
+        vm.isTicketCountAnInteger = isTicketCountAnInteger;
+        vm.onInvalidInputChangeToValidInput = onInvalidInputChangeToValidInput;
+        vm.disableTagRemoval = disableTagRemoval;
+
+        vm.getUsers = getUsers;
+
+        vm.selectingUsers = false;
+        vm.selectedUsers = [];
 
         if ($window.lotteriesEnabled) {
             init();
         }
 
         function init() {
-
-            lotteryRepository.getLottery(currentLottery)
+            lotteryRepository
+                .getLottery(currentLottery, {
+                    includeBuyer: true,
+                })
                 .then(function (lottery) {
                     vm.lottery = lottery;
+                    vm.lottery.canGiftTickets =
+                        vm.lottery.giftedTicketLimit > 0 &&
+                        vm.lottery.buyer.remainingGiftedTicketCount > 0;
+
                     vm.lotteryLoaded = true;
                 });
         }
@@ -103,26 +146,137 @@
         }
 
         function ticketDown() {
-            if (vm.ticketCount > 0) {
+            if (vm.ticketCount > 1) {
                 vm.ticketCount -= 1;
             }
         }
 
         function buyTickets() {
             if (vm.ticketCount > 0) {
-                var lotteryTickets = { lotteryId: currentLottery, tickets: vm.ticketCount };
+                var giftingTickets = vm.selectedUsers.length !== 0;
 
-                lotteryRepository.buyTickets(lotteryTickets)
-                    .then(function () {
-                        vm.notifySrv.success(vm.localeSrv.formatTranslation('lotteries.hasBeenBought', { one: vm.ticketCount, two: vm.lottery.title }));
+                var lotteryTickets = {
+                    lotteryId: currentLottery,
+                    ticketCount: vm.ticketCount,
+                    receivers: giftingTickets
+                        ? vm.selectedUsers.map((user) => ({
+                            userId: user.id,
+                            ticketCount: user.ticketCount
+                        }))
+                        : undefined,
+                };
+
+                lotteryRepository.buyTickets(lotteryTickets).then(
+                    function () {
+                        var translation = giftingTickets
+                            ? 'lotteries.hasBeenGifted'
+                            : 'lotteries.hasBeenBought';
+
+                        vm.notifySrv.success(
+                            vm.localeSrv.formatTranslation(translation, {
+                                one: vm.ticketCount * getTicketReceiversCount(),
+                                two: vm.lottery.title,
+                            })
+                        );
                         $uibModalInstance.close();
-                    }, function (error) {
+                    },
+                    function (error) {
                         errorHandler.handleErrorMessage(error);
-                    });
+                    }
+                );
+            } else {
+                vm.notifySrv.error(
+                    vm.localeSrv.formatTranslation(
+                        'lotteries.invalidTicketNumber'
+                    )
+                );
             }
-            else {
-                vm.notifySrv.error(vm.localeSrv.formatTranslation('lotteries.invalidTicketNumber'));
+        }
+
+        function giftTickets() {
+            buyTickets();
+        }
+
+        function canBuyTickets() {
+            return (
+                vm.ticketCount > 0 &&
+                !vm.selectingUsers &&
+                getKudosAfterPurchase() >= 0 &&
+                isTicketCountAnInteger()
+            );
+        }
+
+        function canGiftTickets() {
+            return (
+                vm.selectedUsers.length > 0 &&
+                getKudosAfterPurchase() >= 0 &&
+                !giftedTicketsLimitExceeded()
+            );
+        }
+
+        function toggleUserSelection() {
+            vm.selectingUsers = !vm.selectingUsers;
+        }
+
+        function cancelGiftingProcess() {
+            vm.selectedUsers = [];
+            toggleUserSelection();
+        }
+
+        function getTicketReceiversCount() {
+            return vm.selectedUsers.length || 1;
+        }
+
+        function getUsers(search) {
+            return lotteryRepository.getUsersForAutoComplete({
+                s: search,
+                includeSelf: false
+            });
+        }
+
+        function getTotalCost() {
+            return vm.lottery.entryFee * getTotalTicketCount();
+        }
+
+        function getTotalTicketCount() {
+            if (!vm.selectingUsers) {
+                return vm.ticketCount;
             }
+
+            return vm.selectedUsers.reduce(
+                (accumulator , curr) => accumulator + curr.ticketCount,
+                0
+            );
+        }
+
+        function getKudosAfterPurchase() {
+            return vm.lottery.buyer.remainingKudos - getTotalCost();
+        }
+
+        function getRemainingGiftedTicketCount() {
+            return vm.lottery.buyer.remainingGiftedTicketCount - getTotalTicketCount();
+        }
+
+        function giftedTicketsLimitExceeded() {
+            return getRemainingGiftedTicketCount() < 0;
+        }
+
+        function isTicketCountAnInteger() {
+            return Number.isInteger(vm.ticketCount);
+        }
+
+        function onInvalidInputChangeToValidInput() {
+            if (vm.ticketCount < vm.minTicketCount) {
+                vm.ticketCount = vm.minTicketCount;
+            } else if (!Number.isInteger(vm.ticketCount)) {
+                vm.ticketCount = Math.round(vm.ticketCount);
+            } else if (vm.ticketCount > vm.maxTicketCount) {
+                vm.ticketCount = vm.maxTicketCount ;
+            }
+        }
+
+        function disableTagRemoval($tag) {
+            return false;
         }
     }
 })();

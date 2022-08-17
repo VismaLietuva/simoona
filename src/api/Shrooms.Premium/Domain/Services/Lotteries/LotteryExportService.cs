@@ -1,29 +1,29 @@
-﻿using System;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Shrooms.Contracts.Constants;
+﻿using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.ExcelGenerator;
 using Shrooms.Infrastructure.ExcelGenerator;
+using System;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Shrooms.Premium.Domain.Services.Lotteries
 {
     public class LotteryExportService : ILotteryExportService
     {
         private readonly IExcelBuilderFactory _excelBuilderFactory;
-        private readonly IParticipantService _participantService;
+        private readonly ILotteryParticipantService _lotteryParticipantService;
 
-        public LotteryExportService(IExcelBuilderFactory excelBuilderFactory, IParticipantService participantService)
+        public LotteryExportService(IExcelBuilderFactory excelBuilderFactory, ILotteryParticipantService lotteryParticipantService)
         {
             _excelBuilderFactory = excelBuilderFactory;
-            _participantService = participantService;
+            _lotteryParticipantService = lotteryParticipantService;
         }
 
         public async Task<ByteArrayContent> ExportParticipantsAsync(int lotteryId, UserAndOrganizationDto userAndOrg)
         {
-            var participants = await _participantService.GetParticipantsCountedAsync(lotteryId);
+            var participants = await _lotteryParticipantService.GetParticipantsCountedAsync(lotteryId);
 
             var tickets = participants
                 .SelectMany(participant => Enumerable.Repeat(participant.FullName, participant.Tickets));

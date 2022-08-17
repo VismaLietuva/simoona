@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Shrooms.Premium.Presentation.WebViewModels.Events;
+using System;
 using System.ComponentModel.DataAnnotations;
-using Shrooms.Premium.Presentation.WebViewModels.Events;
 
 namespace Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes
 {

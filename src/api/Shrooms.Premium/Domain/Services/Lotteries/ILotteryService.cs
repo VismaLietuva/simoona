@@ -1,22 +1,21 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Shrooms.Contracts.DataTransferObjects;
+﻿using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.DataLayer.EntityModels.Models.Lottery;
 using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
-using Shrooms.Premium.Domain.Services.Args;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using X.PagedList;
 
 namespace Shrooms.Premium.Domain.Services.Lotteries
 {
     public interface ILotteryService
     {
-        Task<Lottery> GetLotteryAsync(int lotteryId);
+        Task<Lottery> GetLotteryByIdAsync(int id, UserAndOrganizationDto userOrg);
 
-        Task<LotteryDto> CreateLotteryAsync(LotteryDto newLotteryDto, UserAndOrganizationDto userOrg);
+        Task CreateLotteryAsync(LotteryDto newLotteryDto, UserAndOrganizationDto userOrg);
 
         Task EditDraftedLotteryAsync(LotteryDto lotteryDto, UserAndOrganizationDto userOrg);
 
-        Task EditStartedLotteryAsync(EditStartedLotteryDto lotteryDto);
+        Task EditStartedLotteryAsync(EditStartedLotteryDto lotteryDto, UserAndOrganizationDto userOrg);
 
         Task<bool> AbortLotteryAsync(int lotteryId, UserAndOrganizationDto userOrg);
 
@@ -26,7 +25,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 
         Task<LotteryStatsDto> GetLotteryStatsAsync(int lotteryId, UserAndOrganizationDto userOrg);
 
-        Task BuyLotteryTicketAsync(BuyLotteryTicketDto lotteryTicketDto, UserAndOrganizationDto userOrg);
+        Task BuyLotteryTicketsAsync(BuyLotteryTicketsDto lotteryTicketDto, UserAndOrganizationDto userOrg);
 
         Task<IEnumerable<LotteryDetailsDto>> GetLotteriesAsync(UserAndOrganizationDto userOrganization);
 
@@ -34,9 +33,9 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 
         Task<IEnumerable<LotteryDetailsDto>> GetFilteredLotteriesAsync(string filter, UserAndOrganizationDto userOrg);
 
-        Task<IPagedList<LotteryDetailsDto>> GetPagedLotteriesAsync(GetPagedLotteriesArgs args);
+        Task<IPagedList<LotteryDetailsDto>> GetPagedLotteriesAsync(LotteryListingArgsDto args, UserAndOrganizationDto userOrg);
 
-        Task<LotteryDetailsDto> GetLotteryDetailsAsync(int lotteryId, UserAndOrganizationDto userOrg);
+        Task<LotteryDetailsDto> GetLotteryDetailsAsync(int lotteryId, bool includeRemainingKudos, UserAndOrganizationDto userOrg);
 
         Task<LotteryStatusDto> GetLotteryStatusAsync(int lotteryId, UserAndOrganizationDto userOrg);
 

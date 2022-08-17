@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Data.Entity;
-using System.Threading.Tasks;
-using NSubstitute;
+﻿using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -9,13 +6,16 @@ using Shrooms.DataLayer.EntityModels.Models.Lottery;
 using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
 using Shrooms.Premium.Domain.Services.Lotteries;
 using Shrooms.Tests.Extensions;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Threading.Tasks;
 
 namespace Shrooms.Premium.Tests.DomainService.LotteryServices
 {
     [TestFixture]
-    public class ParticipantServiceTests
+    public class LotteryParticipantServiceTests
     {
-        private IParticipantService _participantService;
+        private ILotteryParticipantService _participantService;
 
         private IUnitOfWork2 _unitOfWork;
         private DbSet<LotteryParticipant> _lotteryParticipants;
@@ -26,7 +26,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             _unitOfWork = Substitute.For<IUnitOfWork2>();
             _lotteryParticipants = _unitOfWork.MockDbSetForAsync<LotteryParticipant>();
 
-            _participantService = new ParticipantService(_unitOfWork);
+            _participantService = new LotteryParticipantService(_unitOfWork);
         }
 
         [TestCase(5, 2)]

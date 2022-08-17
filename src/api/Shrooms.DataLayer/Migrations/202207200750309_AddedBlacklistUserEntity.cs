@@ -29,7 +29,6 @@ namespace Shrooms.DataLayer.Migrations
                 .Index(t => t.UserId)
                 .Index(t => t.ModifiedBy)
                 .Index(t => t.OrganizationId);
-            
         }
         
         public override void Down()

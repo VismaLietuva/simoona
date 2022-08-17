@@ -1,8 +1,8 @@
 ﻿namespace Shrooms.Premium.DataTransferObjects.Models.Lotteries
 {
-    public class BuyLotteryTicketDto
+    public class LotteryRefundParticipantDto
     {
-        public int LotteryId { get; set; }
+        public string BuyerId { get; set; }
 
         public int Tickets { get; set; }
     }

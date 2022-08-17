@@ -1,0 +1,5 @@
+<div class="ticket-picker-container">
+    <span ng-class="{ 'ticket-picker-error' : !!vm.showError }" class="ticker-picker-control ticket-picker-control-minus" ng-click="vm.decreaseCount()">-</span>
+    <input ng-class="{ 'ticket-picker-error' : !!vm.showError }" class="ticker-picker-input" type="number" ng-model-options='{ debounce: 300 }' ng-model="vm.ticketCount" ng-change="vm.onInvalidInputChangeToValidInput()">
+    <span ng-class="{ 'ticket-picker-error' : !!vm.showError }" class="ticker-picker-control" ng-click="vm.increaseCount()">+</span>
+</div>

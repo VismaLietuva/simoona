@@ -32,5 +32,11 @@ namespace Shrooms.Premium.Tests.ModelMappings
         {
             _mapper.ConfigurationProvider.AssertConfigurationIsValid<OrganizationalStructureProfile>();
         }
+
+        [Test]
+        public void Mapping_Lotteries_Models()
+        {
+            _mapper.ConfigurationProvider.AssertConfigurationIsValid<LotteryProfile>();
+        }
     }
 }

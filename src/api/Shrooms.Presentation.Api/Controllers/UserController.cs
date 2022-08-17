@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Web.Http;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNet.Identity;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects.Models.Users;
@@ -15,6 +10,11 @@ using Shrooms.Presentation.Api.Controllers.Kudos;
 using Shrooms.Presentation.Api.Filters;
 using Shrooms.Presentation.WebViewModels.Models.AccountModels;
 using Shrooms.Presentation.WebViewModels.Models.User;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Web.Http;
 using WebApi.OutputCache.V2;
 
 namespace Shrooms.Presentation.Api.Controllers
@@ -172,11 +172,12 @@ namespace Shrooms.Presentation.Api.Controllers
             return Ok();
         }
 
+        [HttpGet]
         [PermissionAuthorize(Permission = BasicPermissions.ApplicationUser)]
         [Route("GetUsersForAutocomplete")]
-        public async Task<IEnumerable<ApplicationUserAutoCompleteViewModel>> GetUsersForAutocomplete(string s)
+        public async Task<IEnumerable<ApplicationUserAutoCompleteViewModel>> GetUsersForAutocomplete(string s, bool includeSelf = true)
         {
-            var userAutoCompleteDto = await _userService.GetUsersForAutocompleteAsync(s);
+            var userAutoCompleteDto = await _userService.GetUsersForAutocompleteAsync(s, includeSelf, GetUserAndOrganization());
             var result = _mapper.Map<IEnumerable<UserAutoCompleteDto>, IEnumerable<ApplicationUserAutoCompleteViewModel>>(userAutoCompleteDto);
             return result;
         }

@@ -212,5 +212,7 @@
   "presetConfigurationTableOffices": "Offices",
   "presetConfigurationTableKudos": "Kudos",
   "presetConfigurationTableName": "Name",
-  "updating": "Updating..."
+  "updating": "Updating...",
+  "valueLessThanMinimumErrorMessage": "Value must be larger than {{ one }}",
+  "valueGreaterThanMaximumErrorMessage": "Value must be less than {{ one }}"
 }

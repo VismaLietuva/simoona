@@ -1,0 +1,38 @@
+<div class="lottery-gift-container">
+    <!-- Header -->
+    <div class="row m-0 lottery-gift-header-row" ng-if="vm.selectedUsers.length > 0 && !vm.disableHeader">
+        <div class="col-xs-6 col-sm-8 lottery-gift-header-col">
+            <span translate="lotteries.ticketReceiverName"></span>
+        </div>
+
+        <div class="col-xs-3 col-sm-2 lottery-gift-header-col lottery-gift-center" ng-class="{ 'lottery-count-error lottery-error' : !!vm.showCountError }">
+            <span class="mr-5" translate="lotteries.ticketReceiverCount"></span>
+        </div>
+
+        <div class="col-xs-3 col-sm-2 lottery-gift-header-col lottery-gift-center">
+            <span translate="common.action"></span>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="row lottery-gift-row m-0" ng-repeat="user in vm.selectedUsers" ng-class="{ 'hide' : user.isDeleting }">
+        <div class="col-xs-6 col-sm-8 lottery-gift-col">
+            <div class="lottery-gift-name">
+                <div class="lottery-gift-icon-container">
+                    <span class="glyphicon glyphicon-gift lottery-gift-icon"></span>
+                </div>
+                <span class="ml-5 lottery-gift-fullname">{{user.fullName}}</span>
+            </div>
+        </div>
+
+        <div class="col-xs-3 col-sm-2 lottery-gift-col lottery-gift-input-container">
+            <ace-flat-ticket-picker min-ticket-count="1" max-ticket-count="10000" ticket-count="user.ticketCount" show-error="vm.showCountError"></ace-flat-ticket-picker>
+        </div>
+
+        <div class="col-xs-3 col-sm-2 lottery-gift-col lottery-gift-center">
+            <a ng-click="vm.removeUser(user)" translate-attr-title="common.delete" translate>
+                <span class="vismaicon vismaicon-delete"></span>
+            </a>
+        </div>
+    </div>
+</div>
