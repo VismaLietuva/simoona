@@ -63,7 +63,7 @@ namespace Shrooms.Presentation.WebViewModels.ValidationAttributes.Walls
                 return true;
             }
 
-            if (value.GetType() != typeof(IEnumerable<string>))
+            if (value is not IEnumerable<string>)
             {
                 return false;
             }

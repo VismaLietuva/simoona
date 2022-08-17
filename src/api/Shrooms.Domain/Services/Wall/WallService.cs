@@ -633,8 +633,6 @@ namespace Shrooms.Domain.Services.Wall
 
             var entriesCountToSkip = (pageNumber - 1) * pageSize;
 
-            var test = await _postsDbSet.OrderBy(x => x.Id).Take(19).ToListAsync();
-
             var posts = await _postsDbSet
                 .Include(post => post.Wall)
                 .Include(post => post.Comments)
