@@ -1,6 +1,6 @@
 ﻿using Shrooms.Contracts.Enums;
-using Shrooms.DataLayer.EntityModels.Models;
 using System;
+using System.Collections.Generic;
 
 namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
 {
@@ -18,7 +18,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Lotteries
 
         public int EntryFee { get; set; }
 
-        public ImageCollection Images { get; set; }
+        public IEnumerable<string> Images { get; set; }
 
         public int GiftedTicketLimit { get; set; }
     }

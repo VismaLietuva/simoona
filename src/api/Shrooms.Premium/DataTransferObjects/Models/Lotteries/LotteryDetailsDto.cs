@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -19,7 +20,7 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Lotteries
 
         public int EntryFee { get; set; }
 
-        public ImageCollection Images { get; set; }
+        public IEnumerable<string> Images { get; set; }
 
         public int Participants { get; set; }
 
