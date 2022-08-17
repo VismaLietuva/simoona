@@ -19,7 +19,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
         private ILotteryService _lotteryService;
         private ILotteryAbortJob _sut;
         private IKudosService _kudosService;
-        private ILotteryParticipantService _participantService;
+        private ILotteryParticipantService _lotteryParticipantService;
         private IUnitOfWork2 _unitOfWork;
         private IAsyncRunner _asyncRunner;
 
@@ -31,11 +31,11 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             _unitOfWork = Substitute.For<IUnitOfWork2>();
 
             _kudosService = Substitute.For<IKudosService>();
-            _participantService = Substitute.For<ILotteryParticipantService>();
+            _lotteryParticipantService = Substitute.For<ILotteryParticipantService>();
             _asyncRunner = Substitute.For<IAsyncRunner>();
             var logger = Substitute.For<ILogger>();
 
-            _sut = new LotteryAbortJob(_kudosService, _participantService, logger, _asyncRunner, _unitOfWork, _lotteryService);
+            _sut = new LotteryAbortJob(_kudosService, _lotteryParticipantService, logger, _asyncRunner, _unitOfWork, _lotteryService);
         }
 
         [Test]
@@ -45,7 +45,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
 
             await _sut.RefundLotteryAsync(1, _userAndOrganization);
 
-            await _participantService.DidNotReceiveWithAnyArgs().GetParticipantsCountedAsync(default);
+            await _lotteryParticipantService.DidNotReceiveWithAnyArgs().GetParticipantsCountedAsync(default);
         }
 
         [Test]
@@ -56,7 +56,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
 
             await _sut.RefundLotteryAsync(default, userOrg);
 
-            await _participantService.DidNotReceiveWithAnyArgs().GetParticipantsCountedAsync(default);
+            await _lotteryParticipantService.DidNotReceiveWithAnyArgs().GetParticipantsCountedAsync(default);
         }
 
         [TestCase(LotteryStatus.Refunded)]

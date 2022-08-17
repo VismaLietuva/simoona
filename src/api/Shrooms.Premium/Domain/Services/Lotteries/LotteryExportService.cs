@@ -13,17 +13,17 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
     public class LotteryExportService : ILotteryExportService
     {
         private readonly IExcelBuilderFactory _excelBuilderFactory;
-        private readonly ILotteryParticipantService _participantService;
+        private readonly ILotteryParticipantService _lotteryParticipantService;
 
-        public LotteryExportService(IExcelBuilderFactory excelBuilderFactory, ILotteryParticipantService participantService)
+        public LotteryExportService(IExcelBuilderFactory excelBuilderFactory, ILotteryParticipantService lotteryParticipantService)
         {
             _excelBuilderFactory = excelBuilderFactory;
-            _participantService = participantService;
+            _lotteryParticipantService = lotteryParticipantService;
         }
 
         public async Task<ByteArrayContent> ExportParticipantsAsync(int lotteryId, UserAndOrganizationDto userAndOrg)
         {
-            var participants = await _participantService.GetParticipantsCountedAsync(lotteryId);
+            var participants = await _lotteryParticipantService.GetParticipantsCountedAsync(lotteryId);
 
             var tickets = participants
                 .SelectMany(participant => Enumerable.Repeat(participant.FullName, participant.Tickets));
