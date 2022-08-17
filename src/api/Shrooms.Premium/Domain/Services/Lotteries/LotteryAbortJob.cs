@@ -15,21 +15,21 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
     public class LotteryAbortJob : ILotteryAbortJob
     {
         private readonly ILotteryService _lotteryService;
-        private readonly ILotteryParticipantService _participantService;
+        private readonly ILotteryParticipantService _lotteryParticipantService;
         private readonly IKudosService _kudosService;
         private readonly IAsyncRunner _asyncRunner;
         private readonly ILogger _logger;
         private readonly IUnitOfWork2 _uow;
 
         public LotteryAbortJob(IKudosService kudosService,
-            ILotteryParticipantService participantService,
+            ILotteryParticipantService lotteryParticipantService,
             ILogger logger,
             IAsyncRunner asyncRunner,
             IUnitOfWork2 uow,
             ILotteryService lotteryService)
         {
             _kudosService = kudosService;
-            _participantService = participantService;
+            _lotteryParticipantService = lotteryParticipantService;
             _logger = logger;
             _asyncRunner = asyncRunner;
             _uow = uow;
@@ -90,7 +90,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
         private async Task<IList<AddKudosLogDto>> CreateKudosLogsAsync(Lottery lottery, UserAndOrganizationDto userOrg)
         {
             var kudosTypeId = await _kudosService.GetKudosTypeIdAsync(KudosTypeEnum.Refund);
-            var usersToRefund = await _participantService.GetParticipantsGroupedByBuyerIdAsync(lottery.Id, userOrg);
+            var usersToRefund = await _lotteryParticipantService.GetParticipantsGroupedByBuyerIdAsync(lottery.Id, userOrg);
 
             var usersToSendKudos = new List<AddKudosLogDto>();
 
