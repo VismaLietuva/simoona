@@ -78,7 +78,7 @@
         }
 
         function handleFormSubmit(pictureId) {
-            vm.postForm.pictureId = pictureId;
+            vm.postForm.images = pictureId ? [pictureId] : null;
             mentionService.applyMentions(vm.postForm, vm.selectedMentions);
             vm.onCreatePost({ post: vm.postForm });
 
@@ -104,7 +104,7 @@
         }
 
         function attachImage(input) {
-            var options = { 
+            var options = {
                 canvas: true
             };
 

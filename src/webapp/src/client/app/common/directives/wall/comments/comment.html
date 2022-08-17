@@ -73,8 +73,8 @@
             </ace-soundcloud-player-link>
 
             <img class="comment-image"
-                 ng-if="!!vm.comment.pictureId && !vm.comment.isHidden"
-                 ng-src="{{:: vm.comment.pictureId | wallImageThumb}}"
+                 ng-if="!!vm.singlePictureId && !vm.comment.isHidden"
+                 ng-src="{{:: vm.singlePictureId | wallImageThumb}}"
                  ace-picture-modal="vm.comment.pictureId"
                  data-test-id="comment-picture" image-loading>
 

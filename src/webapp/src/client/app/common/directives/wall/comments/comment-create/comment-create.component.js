@@ -88,7 +88,7 @@
 
         function handleFormSubmit(pictureId) {
             vm.commentForm.postId = vm.post.id;
-            vm.commentForm.pictureId = pictureId;
+            vm.commentForm.images = pictureId ? [ pictureId ] : null;
             mentionService.applyMentions(vm.commentForm, vm.selectedMentions);
             wallCommentRepository.createComment(vm.commentForm).then(function() {
                 wallService.initWall(vm.isWallModule, vm.wallId);
@@ -114,7 +114,7 @@
         }
 
         function attachImage(input) {
-            var options = { 
+            var options = {
                 canvas: true
             };
 
@@ -154,7 +154,7 @@
             $scope.$apply();
         }
 
-        
+
         function selectMention(item) {
             vm.selectedMentions.push({id: item.id, fullName: item.label});
 

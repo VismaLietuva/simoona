@@ -50,7 +50,7 @@
                 wallId: wallId,
                 messageBody: post.messageBody,
                 mentionedUserIds: post.mentionedUserIds,
-                pictureId: post.pictureId
+                images: post.images
             }).$promise;
         }
 
@@ -63,7 +63,7 @@
                 id: post.id,
                 messageBody: post.messageBody,
                 mentions: post.mentions,
-                pictureId: post.pictureId
+                images: post.images
             }).$promise;
         }
 
