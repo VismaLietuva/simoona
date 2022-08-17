@@ -35,7 +35,7 @@
         vm.minimumCount = parseInt(vm.minTicketCount);
         vm.maximumCount = parseInt(vm.maxTicketCount);
 
-        vm.ticketCount = vm.ticketCount ?? vm.minimumCount;
+        vm.ticketCount = vm.ticketCount || vm.minimumCount;
 
         function onInvalidInputChangeToValidInput() {
             if (vm.ticketCount < vm.minimumCount) {
