@@ -44,8 +44,17 @@ namespace Shrooms.DataLayer.EntityModels.Models
                     return;
                 }
 
+                var isArray = value.EndsWith("[") && value.EndsWith("]");
+
+                if (!isArray)
+                {
+                    value = $"[\"{value}\"]";
+                }
+
                 var jsonData = JsonConvert.DeserializeObject<List<string>>(value);
+
                 Items.Clear();
+                
                 Add(jsonData);
             }
         }
