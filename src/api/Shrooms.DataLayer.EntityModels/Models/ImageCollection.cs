@@ -20,6 +20,25 @@ namespace Shrooms.DataLayer.EntityModels.Models
             AddImages(images);
         }
 
+        [JsonIgnore]
+        public string Serialized
+        {
+            get => JsonConvert.SerializeObject(this);
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    return;
+                }
+
+                var jsonData = JsonConvert.DeserializeObject<List<string>>(TransformToJsonArray(value));
+
+                Items.Clear();
+                
+                Add(jsonData);
+            }
+        }
+
         private void AddImages(IEnumerable<string> images)
         {
             foreach (var image in images)
@@ -33,30 +52,16 @@ namespace Shrooms.DataLayer.EntityModels.Models
             }
         }
 
-        [JsonIgnore]
-        public string Serialized
+        private string TransformToJsonArray(string value)
         {
-            get => JsonConvert.SerializeObject(this);
-            set
+            var isArray = value.StartsWith("[") && value.EndsWith("]");
+
+            if (!isArray)
             {
-                if (string.IsNullOrEmpty(value))
-                {
-                    return;
-                }
-
-                var isArray = value.EndsWith("[") && value.EndsWith("]");
-
-                if (!isArray)
-                {
-                    value = $"[\"{value}\"]";
-                }
-
-                var jsonData = JsonConvert.DeserializeObject<List<string>>(value);
-
-                Items.Clear();
-                
-                Add(jsonData);
+                return $"[\"{value}\"]";
             }
+
+            return value;
         }
     }
 }
