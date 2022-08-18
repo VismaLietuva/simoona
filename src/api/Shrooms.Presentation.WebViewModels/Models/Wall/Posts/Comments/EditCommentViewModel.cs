@@ -1,16 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Shrooms.Contracts.Constants;
+using Shrooms.Presentation.WebViewModels.ValidationAttributes;
 using Shrooms.Presentation.WebViewModels.ValidationAttributes.Walls;
 
 namespace Shrooms.Presentation.WebViewModels.Models.Wall.Posts.Comments
 {
     public class EditCommentViewModel
     {
-        [Required]
+        [MinValue(1)]
         public int Id { get; set; }
 
-        [Required]
         [MaxLength(ValidationConstants.MaxCommentMessageBodyLength)]
         public string MessageBody { get; set; }
 
