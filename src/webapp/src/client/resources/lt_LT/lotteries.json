@@ -71,5 +71,6 @@
     "notEnoughKudos": "Neužtenka kudos'ų",
     "successDelete": "Sėkmingai pradėtas Kudos'ų grąžinimo procesas",
     "ticketReceiverName": "Vardas",
-    "ticketReceiverCount": "Kiekis"
+    "ticketReceiverCount": "Kiekis",
+    "invalidEndDate": "Negalima nurodyti praėjusio laiko"
 }

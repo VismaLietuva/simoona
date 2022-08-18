@@ -73,6 +73,7 @@
     <Compile Include="Constants\Modules.cs" />
     <Compile Include="Constants\PermissionScopes.cs" />
     <Compile Include="Constants\Roles.cs" />
+    <Compile Include="Constants\SortDirectionConstants.cs" />
     <Compile Include="Constants\Templates.cs" />
     <Compile Include="Constants\ValidationConstants.cs" />
     <Compile Include="Constants\WebApiConstants.cs" />
@@ -97,6 +98,7 @@
     <Compile Include="DataTransferObjects\FilterPresets\FilterPresetItemDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\FiltersDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\UpdatedFilterPresetDto.cs" />
+    <Compile Include="Enums\SortDirection.cs" />
     <Compile Include="Infrastructure\ExcelGenerator\IExcelColumn.cs" />
     <Compile Include="Infrastructure\ExcelGenerator\IExcelBuilder.cs" />
     <Compile Include="Infrastructure\ExcelGenerator\IExcelBuilderFactory.cs" />

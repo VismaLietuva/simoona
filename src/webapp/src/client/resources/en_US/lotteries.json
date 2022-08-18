@@ -71,5 +71,6 @@
     "notEnoughKudos": "Not enough kudos for purchase",
     "successDelete": "Successfully started refund process",
     "ticketReceiverName": "Full name",
-    "ticketReceiverCount": "Count"
+    "ticketReceiverCount": "Count",
+    "invalidEndDate": "End time cannot be set in past"
 }

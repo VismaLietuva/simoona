@@ -218,6 +218,8 @@
     <Compile Include="Extensions\QueryableExtensionsTests.cs" />
     <Compile Include="Extensions\MockingExtensions.cs" />
     <Compile Include="Extensions\ViewModelTestingExtensions.cs" />
+    <Compile Include="Extensions\SortableExtensionsTests.cs" />
+    <Compile Include="Extensions\SortDirectionExtensionsTests.cs" />
     <Compile Include="FilterPresetServiceTests.cs" />
     <Compile Include="Helpers\CustomUrlHelperTest.cs" />
     <Compile Include="Infrastructure\MailTemplateTests.cs" />
