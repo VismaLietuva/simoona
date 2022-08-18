@@ -10,7 +10,7 @@ namespace Shrooms.Domain.Services.BlacklistUsers
     {
         Task<IEnumerable<BlacklistUserDto>> GetAllExceptActiveAsync(string userId, UserAndOrganizationDto userOrg);
 
-        Task<BlacklistUserDto> FindAsync(string userId, UserAndOrganizationDto userOrg);
+        Task<BlacklistUserDto> GetAsync(string userId, UserAndOrganizationDto userOrg);
         
         Task CreateAsync(CreateBlacklistUserDto createDto, UserAndOrganizationDto userOrg);
 

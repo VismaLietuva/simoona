@@ -74,7 +74,7 @@
                         </div>
                     </div>
                     <!--lottery end time-->
-                    <div class="form-group required has-error-remove-border">
+                    <div class="form-group required has-error-remove-border" ng-class="{ 'has-error' : !vm.isEndDateValid() }">
                         <label class="control-label col-xs-4 col-sm-4 event-timepicker-label"
                             translate="lotteries.endTime"></label>
                         <div class="col-xs-8 col-sm-6 col-md-4">
@@ -85,6 +85,7 @@
                             <p class="text-danger help-block"
                                 ng-if="lotteryForm.endDateInput.$invalid && lotteryForm.endDateInput.$dirty"
                                 translate="common.messageFieldIsRequired"></p>
+                            <p class="text-danger help-block" ng-if="!vm.isEndDateValid()" translate="lotteries.invalidEndDate"></p>
                         </div>
                     </div>
 
@@ -138,7 +139,7 @@
                         </div>
                     </div>
                     <div class="form-group required" ng-if="vm.allowGiftedTicketLimit"
-                        ng-class="{'has-error has-error-remove-border': lotteryForm.giftedTicketLimit.$invalid && lotteryForm.giftedTicketLimit.$dirty}">
+                        ng-class="{'has-error has-error-remove-border': lotteryForm.giftedTicketLimit.$invalid && lotteryForm.giftedTicketLimit.$dirty }">
                         <label for="giftedTicketLimit" class="control-label col-xs-12 col-sm-4"
                             translate="lotteries.giftedTicketLimit">
                         </label>
@@ -171,18 +172,18 @@
                         </button>
 
                         <button class="btn btn-primary" ng-if="vm.isDrafted" ng-click="vm.updateLottery(true)"
-                            ng-disabled="lotteryForm.$invalid || !(!!vm.lotteryCroppedImages.length || !!vm.lottery.images.length)">
+                            ng-disabled="lotteryForm.$invalid || !(!!vm.lotteryCroppedImages.length || !!vm.lottery.images.length) || !vm.isEndDateValid()">
                             <span translate="lotteries.start"></span>
                         </button>
 
                         <button class="btn btn-primary" ng-if="vm.states.isCreate" ng-click="vm.createLottery()"
-                            ng-disabled="lotteryForm.$invalid || !vm.lotteryCroppedImages.length">
+                            ng-disabled="lotteryForm.$invalid || !vm.lotteryCroppedImages.length || !vm.isEndDateValid()">
                             <span translate="lotteries.save"></span>
                         </button>
 
                         <button class="btn btn-primary" ng-if="vm.isDrafted || vm.isStarted"
                             ng-click="vm.updateLottery()"
-                            ng-disabled="lotteryForm.$invalid || !(!!vm.lotteryCroppedImages.length || !!vm.lottery.images.length)">
+                            ng-disabled="lotteryForm.$invalid || !(!!vm.lotteryCroppedImages.length || !!vm.lottery.images.length) || !vm.isEndDateValid()">
                             <span translate="lotteries.update"></span>
                         </button>
 

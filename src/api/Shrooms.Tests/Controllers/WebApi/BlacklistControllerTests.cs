@@ -164,7 +164,7 @@ namespace Shrooms.Tests.Controllers.WebApi
         public async Task GetActiveBlacklist_ValidValues_ReturnsOk()
         {
             // Arrange
-            _blacklistService.FindAsync(Arg.Any<string>(), Arg.Any<UserAndOrganizationDto>())
+            _blacklistService.GetAsync(Arg.Any<string>(), Arg.Any<UserAndOrganizationDto>())
                 .Returns(new BlacklistUserDto());
 
             const string userId = "";
@@ -184,7 +184,7 @@ namespace Shrooms.Tests.Controllers.WebApi
             const string userId = "";
 
             _blacklistService
-                .FindAsync(Arg.Any<string>(), Arg.Any<UserAndOrganizationDto>())
+                .GetAsync(Arg.Any<string>(), Arg.Any<UserAndOrganizationDto>())
                 .Returns((BlacklistUserDto)null);
 
             // Act
