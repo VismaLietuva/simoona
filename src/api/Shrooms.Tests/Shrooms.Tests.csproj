@@ -178,6 +178,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\ViewModels\Comments\EditCommentViewModelTests.cs" />
+    <Compile Include="Controllers\ViewModels\Comments\NewCommentViewModelTests.cs" />
+    <Compile Include="Controllers\ViewModels\Posts\CreateWallPostViewModelTests.cs" />
+    <Compile Include="Controllers\ViewModels\Posts\EditPostViewModelTests.cs" />
     <Compile Include="Controllers\WebApi\BlacklistControllerTests.cs" />
     <Compile Include="Controllers\WebApi\CommentControllerTests.cs" />
     <Compile Include="Controllers\WebApi\EmployeeControllerTests.cs" />
@@ -213,6 +217,7 @@
     <Compile Include="Entities\KudosLogTests.cs" />
     <Compile Include="Extensions\QueryableExtensionsTests.cs" />
     <Compile Include="Extensions\MockingExtensions.cs" />
+    <Compile Include="Extensions\ViewModelTestingExtensions.cs" />
     <Compile Include="FilterPresetServiceTests.cs" />
     <Compile Include="Helpers\CustomUrlHelperTest.cs" />
     <Compile Include="Infrastructure\MailTemplateTests.cs" />
@@ -234,6 +239,7 @@
     <Compile Include="Controllers\WebApi\RoomTypeControllerTest.cs" />
     <Compile Include="Mocks\MockDbContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ValidationAttributes\HasImageOrMessageBodyAttributeTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Shrooms.Contracts\Shrooms.Contracts.csproj">
@@ -309,6 +315,7 @@
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
