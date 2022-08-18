@@ -75,14 +75,12 @@ namespace Shrooms.Domain.Services.BlacklistUsers
             await _uow.SaveChangesAsync(false);
         }
 
-        public async Task<BlacklistUserDto> FindAsync(string userId, UserAndOrganizationDto userOrg)
+        public async Task<BlacklistUserDto> GetAsync(string userId, UserAndOrganizationDto userOrg)
         {
             var blacklistUser = await _blacklistUsersDbSet
                 .Include(entry => entry.CreatedByUser)
                 .Include(entry => entry.ModifiedByUser)
                 .SingleOrDefaultAsync(FindActiveBlacklistEntry(userId, userOrg));
-
-            _validator.CheckIfBlacklistUserExists(blacklistUser);
 
             return MapBlacklistUserToBlacklistUserDto(blacklistUser);
         }

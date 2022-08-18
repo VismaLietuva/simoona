@@ -182,7 +182,7 @@ namespace Shrooms.Tests.DomainService
         }
 
         [Test]
-        public async Task FindAsync_WhenMoreThanOneBlacklistUserEntryIsPresent_FindsActiveBlacklistEntry()
+        public async Task GetAsync_WhenMoreThanOneBlacklistUserEntryIsPresent_FindsActiveBlacklistEntry()
         {
             // Arrange
             var userId = "Id";
@@ -227,14 +227,14 @@ namespace Shrooms.Tests.DomainService
             _blacklistUsersDbSet.SetDbSetDataForAsync(blacklistUsers);
 
             // Act
-            var result = await _blacklistService.FindAsync(userId, userOrg);
+            var result = await _blacklistService.GetAsync(userId, userOrg);
 
             // Assert
             Assert.AreEqual(shouldFindThis.UserId, result.UserId);
         }
 
         [Test]
-        public async Task FindAsync_WhenAllBlacklistEntriesAreExpired_ReturnsNull()
+        public async Task GetAsync_WhenAllBlacklistEntriesAreExpired_ReturnsNull()
         {
             // Arrange
             var userId = "Id";
@@ -273,7 +273,7 @@ namespace Shrooms.Tests.DomainService
             _blacklistUsersDbSet.SetDbSetDataForAsync(blacklistUsers);
 
             // Act
-            var result = await _blacklistService.FindAsync(userId, userOrg);
+            var result = await _blacklistService.GetAsync(userId, userOrg);
 
             // Assert
             Assert.IsNull(result);
