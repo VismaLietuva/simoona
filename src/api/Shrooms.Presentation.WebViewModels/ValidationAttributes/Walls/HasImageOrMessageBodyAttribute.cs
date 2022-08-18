@@ -34,6 +34,11 @@ namespace Shrooms.Presentation.WebViewModels.ValidationAttributes.Walls
                 return ValidationResult.Success;
             }
 
+            if (messageBody == null && images == null)
+            {
+                return new ValidationResult("Content has to contain either message or image");
+            }
+
             var count = 0;
 
             foreach (var image in images)
@@ -85,6 +90,11 @@ namespace Shrooms.Presentation.WebViewModels.ValidationAttributes.Walls
             }
 
             var messageBodyObject = messageBodyPropertyInfo.GetValue(validationContext.ObjectInstance);
+
+            if (messageBodyObject == null) // Cannot get type when object is null
+            {
+                return true;
+            }
 
             if (messageBodyObject is not string)
             {
