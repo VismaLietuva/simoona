@@ -575,19 +575,6 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
         }
 
         [Test]
-        public async Task GetFilteredLotteriesAsync_FilterSet_ReturnsCorrectAmountOfLotteries()
-        {
-            // Arrange
-            MockLotteries();
-
-            // Act
-            var result = await _sut.GetFilteredLotteriesAsync("foo", GetUserOrg());
-
-            // Assert
-            Assert.AreEqual(3, result.Count());
-        }
-
-        [Test]
         public async Task GetLotteryStatusAsync_ExistingLottery_ReturnsCorrectStatusObject()
         {
             // Arrange
@@ -802,6 +789,89 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
         }
 
         [Test]
+        public async Task GetPagedLotteriesAsync_WhenFilterIsNotPresent_ReturnsAllLotteries()
+        {
+            // Arrange
+            var userOrg = new UserAndOrganizationDto
+            {
+                UserId = Guid.NewGuid().ToString(),
+                OrganizationId = TestConstants.DefaultOrganizationId
+            };
+
+            var args = new LotteryListingArgsDto
+            {
+                Filter = null,
+                SortByProperties = null,
+                PageSize = 10,
+                Page = 1
+            };
+
+            MockLotteries();
+
+            var expectedCount = 5;
+
+            // Act
+            var result = await _sut.GetPagedLotteriesAsync(args, userOrg);
+
+            // Assert
+            Assert.AreEqual(expectedCount, result.Count);
+        }
+
+        [Test]
+        public async Task GetPagedLotteriesAsync_WhenFilterIsPresent_ReturnsLotteriesThatContainFilter()
+        {
+            // Arrange
+            var userOrg = new UserAndOrganizationDto
+            {
+                UserId = Guid.NewGuid().ToString(),
+                OrganizationId = TestConstants.DefaultOrganizationId
+            };
+
+            var args = new LotteryListingArgsDto
+            {
+                Filter = "foobar",
+                SortByProperties = null,
+                PageSize = 10,
+                Page = 1
+            };
+
+            MockLotteries();
+
+            // Act
+            var result = await _sut.GetPagedLotteriesAsync(args, userOrg);
+
+            // Assert
+            Assert.That(result, Is.All.Matches<LotteryDetailsDto>(lottery => lottery.Title.Contains(args.Filter)));
+        }
+
+        [Test]
+        public async Task GetPagedLotteriesAsync_WhenCollectionContainsLotteriesThatFailedRefund_OrdersFailedRefundLotteriesFirst()
+        {
+            // Arrange
+            var userOrg = new UserAndOrganizationDto
+            {
+                UserId = Guid.NewGuid().ToString(),
+                OrganizationId = TestConstants.DefaultOrganizationId
+            };
+
+            var args = new LotteryListingArgsDto
+            {
+                Filter = null,
+                SortByProperties = null,
+                PageSize = 10,
+                Page = 1
+            };
+
+            MockLotteries();
+
+            // Act
+            var result = await _sut.GetPagedLotteriesAsync(args, userOrg);
+
+            // Assert
+            Assert.IsTrue(result.FirstOrDefault().RefundFailed);
+        }
+
+        [Test]
         public async Task GetRunningLotteries_OrganizationHasLotteries_ReturnsLotteries()
         {
             MockLotteries();
@@ -943,6 +1013,7 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
                 {
                     Id = 7,
                     Status = LotteryStatus.Ended,
+                    IsRefundFailed = true,
                     OrganizationId = 12345,
                     Title = string.Empty,
                     EndDate = DateTime.UtcNow.AddDays(3)
