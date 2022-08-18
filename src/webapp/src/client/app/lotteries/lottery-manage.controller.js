@@ -24,6 +24,7 @@
         vm.finishLottery = finishLottery;
         vm.removeImage = removeImage;
         vm.lotteryCroppedImages = [];
+        vm.isEndDateValid = isEndDateValid;
 
         vm.lotteryImageSize = {
             w: lotteryImageSettings.width,
@@ -166,6 +167,14 @@
         function isPrimaryEditDisabled() {
             return vm.states.isCreate === false &&
                    (vm.states.isEdit && lottery.status === lotteryStatuses.drafted) === false;
+        }
+
+        function isEndDateValid() {
+            if (!vm.lottery || !vm.lottery.endDate) {
+                return true;
+            }
+
+            return vm.lottery.endDate > moment().add(1, 'minutes').local().startOf('minute').toDate();
         }
     };
 })();
