@@ -73,17 +73,17 @@ namespace Shrooms.Presentation.Api.Controllers
             }
 
             var userAndOrg = GetUserAndOrganization();
+            var postModel = _mapper.Map<CreateWallPostViewModel, NewPostDto>(wallPostViewModel);
 
             if (!await _permissionService.UserHasPermissionAsync(userAndOrg, BasicPermissions.Post))
             {
-                var wall = await _wallService.GetWallAsync(wallPostViewModel.WallId, userAndOrg);
+                var wall = await _wallService.GetWallAsync(postModel.WallId, userAndOrg);
                 if (wall.Type != WallType.Events)
                 {
                     return Forbidden();
                 }
             }
 
-            var postModel = _mapper.Map<CreateWallPostViewModel, NewPostDto>(wallPostViewModel);
             SetOrganizationAndUser(postModel);
             var userHubDto = GetUserAndOrganizationHub();
 
