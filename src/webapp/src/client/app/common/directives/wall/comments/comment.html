@@ -75,7 +75,7 @@
             <img class="comment-image"
                  ng-if="!!vm.singlePictureId && !vm.comment.isHidden"
                  ng-src="{{:: vm.singlePictureId | wallImageThumb}}"
-                 ace-picture-modal="vm.comment.pictureId"
+                 ace-picture-modal="vm.singlePictureId"
                  data-test-id="comment-picture" image-loading>
 
             <ace-message-like ng-if="!vm.comment.isHidden" message-object="vm.comment" type="comment"></ace-message-like>

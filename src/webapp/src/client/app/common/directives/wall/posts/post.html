@@ -79,7 +79,7 @@
             <img class="post-image"
                  ng-if="!!vm.singleImageId && !vm.post.isHidden"
                  ng-src="{{:: vm.singleImageId | wallImageThumb}}"
-                 ace-picture-modal="vm.post.pictureId"
+                 ace-picture-modal="vm.singleImageId"
                  data-test-id="post-picture" image-loading>
 
             <ace-wall-shared-event ng-if="!!vm.post.sharedEventId && !vm.post.isHidden"
