@@ -72,6 +72,7 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
                 ModifiedBy = userAndOrganizationDto.UserId,
                 EmployeeId = userAndOrganizationDto.UserId,
                 KudosAmmount = newServiceRequestDto.KudosAmmount,
+                KudosShopItemId = newServiceRequestDto.KudosShopItemId,
                 OrganizationId = userAndOrganizationDto.OrganizationId,
                 CategoryName = serviceRequestCategory.Name,
                 StatusId = serviceRequestStatusId,
@@ -81,15 +82,12 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
                 PictureId = newServiceRequestDto.PictureId
             };
 
-            if (newServiceRequestDto.KudosShopItemId != null)
-            {
-                serviceRequest.KudosShopItemId = newServiceRequestDto.KudosShopItemId;
-            }
-
             _serviceRequestsDbSet.Add(serviceRequest);
+
             await _uow.SaveChangesAsync(false);
 
             var srqDto = new CreatedServiceRequestDto { ServiceRequestId = serviceRequest.Id };
+            
             _asyncRunner.Run<IServiceRequestNotificationService>(async notifier => await notifier.NotifyAboutNewServiceRequestAsync(srqDto), _uow.ConnectionName);
         }
 
