@@ -19,7 +19,7 @@
     ];
 
     function ServiceRequestController($rootScope, $scope, $stateParams, $uibModal, authService,
-        serviceRequestRepository, pagedServiceRequestList, dataHelper, errorHandler, notifySrv, lodash) {       
+        serviceRequestRepository, pagedServiceRequestList, dataHelper, errorHandler, notifySrv, lodash) {
 
         var openNewRequest = $stateParams.openNewRequest;
         $scope.edit = false;
@@ -46,7 +46,7 @@
         $rootScope.pageTitle = 'serviceRequest.serviceRequests';
 
         $scope.filter = {
-            includeProperties: 'Priority, Status, Employee',
+            includeProperties: 'Priority, Status, Employee, KudosShopItem',
             page: 1,
             sortOrder: 'desc',
             sortBy: 'Created',
@@ -122,15 +122,6 @@
             });
         }
 
-        function exportButtonClick() {
-            serviceRequestRepository.exportServiceRequests().then(function(response) {
-                var file = new Blob([response.data], {
-                    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;'
-                });
-                saveAs(file, 'service_requests.xlsx');
-            }, errorHandler.handleErrorMessage);
-        }
-
         function editServiceRequestButtonClick(serviceRequest) {
             $scope.edit = true;
             $scope.serviceRequest = serviceRequest;
@@ -140,6 +131,15 @@
                 scope: $scope,
                 backdrop: 'static'
             });
+        }
+
+        function exportButtonClick() {
+            serviceRequestRepository.exportServiceRequests().then(function(response) {
+                var file = new Blob([response.data], {
+                    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;'
+                });
+                saveAs(file, 'service_requests.xlsx');
+            }, errorHandler.handleErrorMessage);
         }
 
         function closeServiceRequestButtonClick(serviceRequest) {
@@ -191,14 +191,14 @@
             notifySrv.error(response.data.message);
             $scope.newComment.content = null;
         }
-        
+
         function hasEditableServiceRequests(requests) {
             var editableFields = 0;
             angular.forEach(requests, function(request) {
                 if (request.isCloseable) {
                     editableFields++;
                 }
-            });   
+            });
             return editableFields > 0;
         }
     }
