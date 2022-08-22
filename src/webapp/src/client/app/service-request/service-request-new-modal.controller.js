@@ -180,7 +180,7 @@
         };
 
         function isServiceRequestDone() {
-            return $scope.serviceRequest.status.title === 'Done';
+            return $scope.serviceRequest.status && $scope.serviceRequest.status.title === 'Done';
         }
 
         function isServiceRequestModelUpdated() {
