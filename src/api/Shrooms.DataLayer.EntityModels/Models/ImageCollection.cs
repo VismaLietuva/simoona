@@ -31,12 +31,23 @@ namespace Shrooms.DataLayer.EntityModels.Models
                     return;
                 }
 
-                var jsonData = JsonConvert.DeserializeObject<List<string>>(TransformToJsonArray(value));
+                if (!IsJsonArray(value))
+                {
+                    Add(value);
+                    return;
+                }
+
+                var jsonData = JsonConvert.DeserializeObject<List<string>>(value);
 
                 Items.Clear();
                 
                 Add(jsonData);
             }
+        }
+
+        private bool IsJsonArray(string value)
+        {
+            return value.StartsWith("[") && value.EndsWith("]");
         }
 
         private void AddImages(IEnumerable<string> images)
@@ -50,18 +61,6 @@ namespace Shrooms.DataLayer.EntityModels.Models
 
                 Add(image);
             }
-        }
-
-        private string TransformToJsonArray(string value)
-        {
-            var isArray = value.StartsWith("[") && value.EndsWith("]");
-
-            if (!isArray)
-            {
-                return $"[\"{value}\"]";
-            }
-
-            return value;
         }
     }
 }
