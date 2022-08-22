@@ -3,9 +3,9 @@
 
     angular
         .module('simoonaApp.ServiceRequest')
-        .controller('newRequestModalController', newRequestModalController);
+        .controller('createEditServiceRequestController', createEditServiceRequestController);
 
-    newRequestModalController.$inject = [
+    createEditServiceRequestController.$inject = [
         '$scope',
         '$uibModalInstance',
         'serviceRequestRepository',
@@ -18,7 +18,7 @@
         'dataHandler',
     ];
 
-    function newRequestModalController(
+    function createEditServiceRequestController(
         $scope,
         $uibModalInstance,
         serviceRequestRepository,

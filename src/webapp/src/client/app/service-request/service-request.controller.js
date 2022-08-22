@@ -115,8 +115,8 @@
             $scope.serviceRequest = {};
             $scope.setCategoryToKudos = setCategoryToKudos;
             $uibModal.open({
-                templateUrl: 'app/service-request/service-request-new-modal.html',
-                controller: 'newRequestModalController',
+                templateUrl: 'app/service-request/service-request-create-edit-modal.html',
+                controller: 'createEditServiceRequestController',
                 scope: $scope,
                 backdrop: 'static'
             });
@@ -126,8 +126,8 @@
             $scope.edit = true;
             $scope.serviceRequest = serviceRequest;
             $uibModal.open({
-                templateUrl: 'app/service-request/service-request-new-modal.html',
-                controller: 'newRequestModalController',
+                templateUrl: 'app/service-request/service-request-create-edit-modal.html',
+                controller: 'createEditServiceRequestController',
                 scope: $scope,
                 backdrop: 'static'
             });
