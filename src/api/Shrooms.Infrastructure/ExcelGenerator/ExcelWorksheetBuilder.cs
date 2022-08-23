@@ -1,6 +1,7 @@
 ﻿using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using Shrooms.Contracts.Constants;
+using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure.ExcelGenerator;
 using System;
 using System.Collections.Generic;
@@ -172,11 +173,31 @@ namespace Shrooms.Infrastructure.ExcelGenerator
             columnRange.Style.Font.Bold = internalColumn.Column.SetBoldFont;
             columnRange.Style.VerticalAlignment = internalColumn.Column.SetHorizontalTextCenter ? ExcelVerticalAlignment.Center : columnRange.Style.VerticalAlignment;
             columnRange.Style.HorizontalAlignment = internalColumn.Column.SetHorizontalTextCenter ? ExcelHorizontalAlignment.Center : columnRange.Style.HorizontalAlignment;
-
+            
             if (internalColumn.Column.Value is string stringValue && stringValue.Length > ExcelWorksheetBuilderConstants.MaximumTextCharacterLength)
             {
                 columnStyle.WrapText = true;
             }
+
+            ApplyBorderStyles(columnRange, internalColumn);
+        }
+
+        private void ApplyBorderStyles(ExcelRange columnRange, IExcelColumnInternal internalColumn)
+        {
+            columnRange.Style.Border.Top.Style = GetBorderStyle(internalColumn.Column.BorderTop);
+            columnRange.Style.Border.Bottom.Style = GetBorderStyle(internalColumn.Column.BorderBottom);
+            columnRange.Style.Border.Left.Style = GetBorderStyle(internalColumn.Column.BorderLeft);
+            columnRange.Style.Border.Right.Style = GetBorderStyle(internalColumn.Column.BorderRight);
+        }
+
+        private ExcelBorderStyle GetBorderStyle(ExcelBorderStylePicker excelBorder)
+        {
+            return excelBorder switch
+            {
+                ExcelBorderStylePicker.None => ExcelBorderStyle.None,
+                ExcelBorderStylePicker.Thin => ExcelBorderStyle.Thin,
+                _ => ExcelBorderStyle.None,
+            };
         }
 
         private ExcelRange GetColumnRange(IExcelColumnInternal internalColumn)
