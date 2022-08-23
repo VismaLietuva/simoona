@@ -3,7 +3,10 @@
 
     angular
         .module('simoonaApp.ServiceRequest')
-        .controller('createEditServiceRequestController', createEditServiceRequestController);
+        .controller(
+            'createEditServiceRequestController',
+            createEditServiceRequestController
+        );
 
     createEditServiceRequestController.$inject = [
         '$scope',
@@ -37,17 +40,20 @@
         $scope.maxKudosMinus = kudosifySettings.maxMinus;
         $scope.isAssignee = $scope.serviceRequest.isCloseable;
 
+        $scope.kudosCategoryName = 'Kudos';
+
         $scope.attachedFiles = [];
         $scope.attachImage = attachImage;
 
         $scope.isAdminOrAssignee = isAdminOrAssignee;
         $scope.isEditing = isEditing;
+        $scope.isKudosCategorySelected = isKudosCategorySelected;
         $scope.isServiceRequestDone = isServiceRequestDone;
-
 
         init();
 
         ////////////
+
 
         function init() {
             getShopItems();
@@ -65,25 +71,40 @@
         function getKudosCategories() {
             serviceRequestRepository.getCategories().then(function (response) {
                 $scope.categories = response;
-                if (!$scope.edit && $scope.setCategoryToKudos) {
-                    angular.forEach($scope.categories, function (category) {
-                        if (category.name === 'Kudos') {
-                            $scope.serviceRequest.serviceRequestCategory =
-                                category;
+
+                $scope.serviceRequest.serviceRequestCategory = lodash.find(
+                    $scope.categories,
+                    function (category) {
+                        if (
+                            $scope.setCategoryToKudos &&
+                            category.name === $scope.kudosCategoryName
+                        ) {
+                            return true;
                         }
-                    });
-                } else if (!$scope.edit) {
-                    $scope.serviceRequest.serviceRequestCategory =
-                        $scope.categories[0];
-                } else {
-                    $scope.serviceRequest.serviceRequestCategory = lodash.find(
-                        $scope.categories,
-                        {
-                            name: $scope.serviceRequest.categoryName,
+
+                        if (!isEditing()) {
+                            return true;
                         }
-                    );
+
+                        return (
+                            category.name === $scope.serviceRequest.categoryName
+                        );
+                    }
+                );
+
+                if (isEditing() && !isKudosCategorySelected()) {
+                    removeKudosCategory();
                 }
             });
+        }
+
+        function removeKudosCategory() {
+            $scope.categories = lodash.filter(
+                $scope.categories,
+                function (category) {
+                    return category.name !== $scope.kudosCategoryName;
+                }
+            );
         }
 
         function getPriorities() {
@@ -146,15 +167,19 @@
             uploadPromise.then(function (result) {
                 updateServiceRequestModel(result.data);
 
-                if (isKudosCategorySelected()) {
-                    $scope.serviceRequest.kudosShopItemId = $scope.serviceRequest.kudosShopItem.id;
+                if ($scope.serviceRequest.kudosShopItem && isKudosCategorySelected()) {
+                    $scope.serviceRequest.kudosShopItemId =
+                        $scope.serviceRequest.kudosShopItem.id;
                 }
 
                 var updateOrCreateRequest = isEditing()
                     ? serviceRequestRepository.put
                     : serviceRequestRepository.post;
 
-                updateOrCreateRequest($scope.serviceRequest).then(onSuccess, onError);
+                updateOrCreateRequest($scope.serviceRequest).then(
+                    onSuccess,
+                    onError
+                );
             });
         };
 
@@ -180,7 +205,10 @@
         };
 
         function isServiceRequestDone() {
-            return $scope.serviceRequest.status && $scope.serviceRequest.status.title === 'Done';
+            return (
+                $scope.serviceRequest.status &&
+                $scope.serviceRequest.status.title === 'Done'
+            );
         }
 
         function isServiceRequestModelUpdated() {
@@ -188,7 +216,14 @@
         }
 
         function isKudosCategorySelected() {
-            return $scope.serviceRequest.serviceRequestCategory.name === 'Kudos';
+            if (!$scope.serviceRequest.serviceRequestCategory) {
+                return false;
+            }
+
+            return (
+                $scope.serviceRequest.serviceRequestCategory.name ===
+                $scope.kudosCategoryName
+            );
         }
 
         function updateServiceRequestModel(pictureId) {
@@ -201,7 +236,8 @@
         }
 
         function fillShopItemInfo() {
-            $scope.serviceRequest.title = $scope.serviceRequest.kudosShopItem.name;
+            $scope.serviceRequest.title =
+                $scope.serviceRequest.kudosShopItem.name;
             $scope.serviceRequest.kudosAmmount =
                 $scope.serviceRequest.kudosShopItem.price;
             $scope.serviceRequest.description =

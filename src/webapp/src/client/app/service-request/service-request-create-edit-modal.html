@@ -11,13 +11,13 @@
             <label>{{"serviceRequest.category" | translate}}</label>
             <select data-test-id="serviceRequestCategory" name="category"
                 ng-model="serviceRequest.serviceRequestCategory" ng-change="resetShopItemFields()"
-                ng-disabled="serviceRequest.status.title === 'Done' && newServiceRequest.status.$pristine && serviceRequest.categoryName === 'Kudos'"
+                ng-disabled="(isEditing() && isKudosCategorySelected()) || serviceRequest.status.title === 'Done'"
                 class="form-control"
                 ng-options="category.name for category in categories track by category.id"></select>
         </div>
 
         <div class="form-group"
-            ng-if="!edit && serviceRequest.serviceRequestCategory.name === 'Kudos' && !!kudosShopItems.length">
+            ng-if="!edit && serviceRequest.serviceRequestCategory.name === kudosCategoryName && !!kudosShopItems.length">
             <label>
                 {{"serviceRequest.item" | translate}}
             </label>
@@ -29,11 +29,11 @@
         </div>
 
         <div class="form-group"
-            ng-class="{ 'has-error' : newServiceRequest.title.$invalid && !newServiceRequest.title.$pristine }"
+            ng-class="{ 'has-error has-error-remove-border' : newServiceRequest.title.$invalid && !newServiceRequest.title.$pristine }"
             ng-if="!(edit && !(isAdmin || isAssignee))">
             <label>{{"serviceRequest.title" | translate}}<span class="text-danger">*</span></label>
             <input data-test-id="serviceRequestTitle" type="text" name="title" class="form-control"
-                ng-disabled="(serviceRequest.status.title === 'Done' && newServiceRequest.status.$pristine) || (!!serviceRequest.kudosShopItem && serviceRequest.serviceRequestCategory.name === 'Kudos')"
+                ng-disabled="(serviceRequest.status.title === 'Done' && newServiceRequest.status.$pristine) || (!!serviceRequest.kudosShopItem && serviceRequest.serviceRequestCategory.name === kudosCategoryName)"
                 ng-model="serviceRequest.title" maxlength="300" required />
 
             <p data-test-id="serviceRequestTitleError"
@@ -45,7 +45,7 @@
             <label>{{"serviceRequest.status" | translate}}</label>
             <select data-test-id="serviceRequestStatus" name="status" ng-model="serviceRequest.status"
                 class="form-control"
-                ng-disabled="serviceRequest.serviceRequestCategory.name === 'Kudos' && serviceRequest.status.title === 'Done' && newServiceRequest.status.$pristine"
+                ng-disabled="serviceRequest.serviceRequestCategory.name === kudosCategoryName && serviceRequest.status.title === 'Done' && newServiceRequest.status.$pristine"
                 ng-options="'serviceRequest.' + status.title.toLowerCase() | translate for status in statuses track by status.id"></select>
         </div>
 
@@ -58,12 +58,12 @@
         </div>
 
         <div class="form-group"
-            ng-class="{ 'has-error' : newServiceRequest.kudos.$invalid && !newServiceRequest.kudos.$pristine }"
-            ng-if="serviceRequest.serviceRequestCategory.name === 'Kudos'">
+            ng-class="{ 'has-error has-error-remove-border' : newServiceRequest.kudos.$invalid && !newServiceRequest.kudos.$pristine }"
+            ng-if="serviceRequest.serviceRequestCategory.name === kudosCategoryName">
             <label>{{"common.minusKudosMailAmmount" | translate}}</label>
             <input data-test-id="serviceRequestKudos" type="number" name="kudos" ignore-mouse-wheel
                 class="form-control kudosify-modal-comments" ng-model="serviceRequest.kudosAmmount"
-                ng-disabled="(!(isAdmin || isAssignee) && edit) || (serviceRequest.status.title === 'Done' && newServiceRequest.status.$pristine) || (!!serviceRequest.kudosShopItem && serviceRequest.serviceRequestCategory.name === 'Kudos')"
+                ng-disabled="(!(isAdmin || isAssignee) && edit) || (serviceRequest.status.title === 'Done' && newServiceRequest.status.$pristine) || (!!serviceRequest.kudosShopItem && serviceRequest.serviceRequestCategory.name === kudosCategoryName)"
                 min="1" ng-maxlength="10" ng-pattern="/^\-?\d+$/" />
 
             <p ng-show="!newServiceRequest.kudos.$pristine && !newServiceRequest.kudos.$error.maxlength && newServiceRequest.kudos.$invalid"
@@ -75,11 +75,11 @@
         </div>
 
         <div class="form-group"
-            ng-class="{ 'has-error' : newServiceRequest.description.$invalid && !newServiceRequest.description.$pristine }">
+            ng-class="{ 'has-error has-error-remove-border' : newServiceRequest.description.$invalid && !newServiceRequest.description.$pristine }">
             <label>{{"serviceRequest.description" | translate}}</label>
             <textarea type="text" data-test-id="serviceRequestDescription" name="description"
                 ng-model="serviceRequest.description"
-                ng-disabled="(serviceRequest.status.title === 'Done' && newServiceRequest.status.$pristine) || (!!serviceRequest.kudosShopItem && serviceRequest.serviceRequestCategory.name === 'Kudos')"
+                ng-disabled="(serviceRequest.status.title === 'Done' && newServiceRequest.status.$pristine) || (!!serviceRequest.kudosShopItem && serviceRequest.serviceRequestCategory.name === kudosCategoryName)"
                 class="form-control kudosify-modal-comments" rows="3" ng-maxlength="1000"></textarea>
             <p data-test-id="serviceRequestDescriptionError"
                 ng-show="newServiceRequest.description.$error.required && !newServiceRequest.description.$pristine"
@@ -90,10 +90,10 @@
         </div>
         <div class="form-group" has-permissions="['PICTURE_BASIC']">
             <input id="pictureSelect" data-test-id="profileEditPicture" type="file" accept="image/*"
-                ng-disabled="(serviceRequest.status.title === 'Done' && newServiceRequest.status.$pristine) || (!!serviceRequest.kudosShopItem && serviceRequest.serviceRequestCategory.name === 'Kudos')"
+                ng-disabled="(serviceRequest.status.title === 'Done' && newServiceRequest.status.$pristine) || (!!serviceRequest.kudosShopItem && serviceRequest.serviceRequestCategory.name === kudosCategoryName)"
                 class="form-control" onchange="angular.element(this).scope().attachImage(this)">
 
-            <a onclick="$('#pictureSelect').click(); return false;">
+            <a class="service-request-image-container" onclick="$('#pictureSelect').click(); return false;">
                 <div ng-if="!attachedFiles.length">
                     <img ng-src="{{serviceRequest.pictureId | thumb}}" />
                 </div>

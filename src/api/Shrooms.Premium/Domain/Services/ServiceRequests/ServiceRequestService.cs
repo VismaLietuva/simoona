@@ -157,12 +157,22 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
                 throw new UnauthorizedAccessException();
             }
 
+            if (serviceRequest.CategoryName == ServiceRequestCategoryKudos && serviceRequestCategory.Name != ServiceRequestCategoryKudos)
+            {
+                throw new ValidationException(ErrorCodes.InvalidCategoryChange, $"Cannot change from {ServiceRequestCategoryKudos} category to {serviceRequestCategory.Name}");
+            }
+
+            if (serviceRequest.CategoryName != ServiceRequestCategoryKudos && serviceRequestCategory.Name == ServiceRequestCategoryKudos)
+            {
+                throw new ValidationException(ErrorCodes.InvalidCategoryChange, $"Cannot change from {serviceRequest.CategoryName} category to {ServiceRequestCategoryKudos}");
+            }
+
             if (isServiceRequestAdmin || isServiceRequestCategoryAssignee)
             {
                 serviceRequest.Title = serviceRequestDto.Title;
                 serviceRequest.StatusId = serviceRequestDto.StatusId;
                 serviceRequest.CategoryName = serviceRequestCategory.Name;
-                serviceRequest.KudosAmmount = serviceRequestDto.KudosAmmount;
+                serviceRequest.KudosAmmount = serviceRequest.KudosShopItemId == null ? serviceRequestDto.KudosAmmount : serviceRequest.KudosAmmount;
             }
 
             serviceRequest.PriorityId = serviceRequestDto.PriorityId;
