@@ -6,31 +6,36 @@
 <div class="modal-body">
     <form name="minusKudos" role="form">
 
-        <div class="form-group" ng-class="{ 'has-error has-error-remove-border' : minusKudos.whatFor.$invalid && !minusKudos.whatFor.$pristine }">
+        <div class="form-group"
+            ng-class="{ 'has-error has-error-remove-border' : minusKudos.whatFor.$invalid && !minusKudos.whatFor.$pristine }">
             <label>{{"common.minusKudosMailWhatFor" | translate}}</label>
-            <input data-test-id="minusKudosWhatFor" type="text" name="whatFor" class="form-control" ng-model="minusKudosModel.comment" required />
-            <p data-test-id="minusKudosWhatForError" ng-show="minusKudos.whatFor.$invalid && !minusKudos.whatFor.$pristine" class="help-block">{{"serviceRequest.titleError" | translate}}</p>
+            <input data-test-id="minusKudosWhatFor" type="text" name="whatFor" class="form-control"
+                ng-model="minusKudosModel.comment" required />
+            <p data-test-id="minusKudosWhatForError"
+                ng-show="minusKudos.whatFor.$invalid && !minusKudos.whatFor.$pristine" class="help-block">
+                {{"serviceRequest.titleError" | translate}}</p>
         </div>
 
-        <div class="form-group" ng-class="{ 'has-error has-error-remove-border' : minusKudos.ammount.$invalid && !minusKudos.ammount.$pristine }">
+        <div class="form-group"
+            ng-class="{ 'has-error has-error-remove-border' : minusKudos.ammount.$invalid && !minusKudos.ammount.$pristine }">
             <label>{{"common.minusKudosMailAmmount" | translate}}</label>
-            <input data-test-id="minusKudosAmmount" type="number" ignore-mouse-wheel name="ammount" class="form-control kudosify-modal-comments" ng-model="minusKudosModel.multiplyBy" required min="1" max="{{maxKudosMinus}}" ng-pattern="/^\-?\d+$/" />
-            <p data-test-id="minusKudosAmmountError" ng-show="minusKudos.ammount.$invalid && !minusKudos.ammount.$pristine" class="help-block">{{"serviceRequest.kudosError" | translate}}</p>
+            <input data-test-id="minusKudosAmmount" type="number" ignore-mouse-wheel name="ammount"
+                class="form-control kudosify-modal-comments" ng-model="minusKudosModel.multiplyBy" required min="1"
+                max="{{maxKudosMinus}}" ng-pattern="/^\-?\d+$/" />
+            <p data-test-id="minusKudosAmmountError"
+                ng-show="minusKudos.ammount.$invalid && !minusKudos.ammount.$pristine" class="help-block">
+                {{"serviceRequest.kudosError" | translate}}</p>
         </div>
 
     </form>
 </div>
 <div class="modal-footer">
-    <button class="btn btn-primary"
-            data-test-id="minusKudosSubmit"
-            ng-disabled="minusKudos.$invalid || isDisabled"
-            ng-click="submitMinusKudos()">
+    <button class="btn btn-primary" data-test-id="minusKudosSubmit" ng-disabled="minusKudos.$invalid || isDisabled"
+        ng-click="submitMinusKudos()">
         <span class="glyphicon glyphicon-disk-save"></span>
-        Save
+        {{"common.save" | translate}}
     </button>
-    <button class="btn btn-default"
-            data-test-id="serviceRequestCancel"
-            data-ng-click="cancel()">
-        Cancel
+    <button class="btn btn-default" data-test-id="serviceRequestCancel" data-ng-click="cancel()">
+        {{"common.cancel" | translate}}
     </button>
 </div>
