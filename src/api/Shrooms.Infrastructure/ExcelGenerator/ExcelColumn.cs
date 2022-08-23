@@ -1,4 +1,5 @@
-﻿using Shrooms.Contracts.Infrastructure.ExcelGenerator;
+﻿using Shrooms.Contracts.Enums;
+using Shrooms.Contracts.Infrastructure.ExcelGenerator;
 
 namespace Shrooms.Infrastructure.ExcelGenerator
 {
@@ -13,5 +14,13 @@ namespace Shrooms.Infrastructure.ExcelGenerator
         public bool SetVerticalTextCenter { get; set; }
 
         public object Value { get; set; }
+
+        public ExcelBorderStylePicker BorderTop { get; set; }
+
+        public ExcelBorderStylePicker BorderBottom { get; set; }
+
+        public ExcelBorderStylePicker BorderLeft { get; set; }
+
+        public ExcelBorderStylePicker BorderRight { get; set; }
     }
 }

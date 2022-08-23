@@ -1,5 +1,6 @@
 ﻿using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.ExcelGenerator;
 using Shrooms.Infrastructure.ExcelGenerator;
@@ -48,7 +49,11 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             {
                 Value = participantFullName,
                 SetHorizontalTextCenter = true,
-                SetVerticalTextCenter = true
+                SetVerticalTextCenter = true,
+                BorderTop = ExcelBorderStylePicker.Thin,
+                BorderBottom = ExcelBorderStylePicker.Thin,
+                BorderLeft = ExcelBorderStylePicker.Thin,
+                BorderRight = ExcelBorderStylePicker.Thin
             };
         }
     }
