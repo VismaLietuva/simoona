@@ -13,7 +13,6 @@
     <div ng-class="{ 'has-error' : newServiceRequest.newCommentField.$invalid && !newServiceRequest.newCommentField.$pristine }">
         <label>{{"serviceRequest.newCommentLabel" | translate}}</label>
         <textarea type="text"
-                ng-disabled="isServiceRequestDone()"
                   data-test-id="serviceRequestNewComment"
                   name="newCommentField"
                   ng-model="newComment.content"

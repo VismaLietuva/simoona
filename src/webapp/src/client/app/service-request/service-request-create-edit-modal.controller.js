@@ -39,6 +39,7 @@
         $scope.isDisabled = false;
         $scope.maxKudosMinus = kudosifySettings.maxMinus;
         $scope.isAssignee = $scope.serviceRequest.isCloseable;
+        $scope.wasDone = isServiceRequestDone();
 
         $scope.kudosCategoryName = 'Kudos';
 
@@ -139,16 +140,31 @@
         }
 
         $scope.submitRequestWithComment = function () {
+            if ($scope.wasDone && isServiceRequestDone() && !$scope.newComment.content) {
+                return;
+            }
+
+            if ($scope.wasDone && isServiceRequestDone()) {
+                $scope.newComment.ServiceRequestId = $scope.serviceRequest.id;
+                serviceRequestRepository
+                    .postComment($scope.newComment)
+                    .then(onSuccess, onError);
+
+                return;
+            }
+
             if (!$scope.newComment.content) {
                 $scope.submitServiceRequest();
                 $scope.isDisabled = true;
-            } else {
-                $scope.newComment.ServiceRequestId = $scope.serviceRequest.id;
-                $scope.isDisabled = true;
-                serviceRequestRepository
-                    .postComment($scope.newComment)
-                    .then($scope.submitServiceRequest, onError);
+                return;
             }
+
+            $scope.newComment.ServiceRequestId = $scope.serviceRequest.id;
+
+            $scope.isDisabled = true;
+            serviceRequestRepository
+                .postComment($scope.newComment)
+                .then($scope.submitServiceRequest, onError);
         };
 
         $scope.submitServiceRequest = function () {
@@ -161,7 +177,7 @@
             var uploadPromise = $scope.attachedFiles.length
                 ? pictureRepository.upload($scope.attachedFiles)
                 : Promise.resolve({
-                      data: undefined,
+                      data: $scope.serviceRequest.pictureId,
                   });
 
             uploadPromise.then(function (result) {

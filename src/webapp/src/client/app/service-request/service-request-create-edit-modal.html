@@ -33,7 +33,7 @@
             ng-if="!(edit && !(isAdmin || isAssignee))">
             <label>{{"serviceRequest.title" | translate}}<span class="text-danger">*</span></label>
             <input data-test-id="serviceRequestTitle" type="text" name="title" class="form-control"
-                ng-disabled="(serviceRequest.status.title === 'Done' && newServiceRequest.status.$pristine) || (!!serviceRequest.kudosShopItem && serviceRequest.serviceRequestCategory.name === kudosCategoryName)"
+                ng-disabled="isServiceRequestDone() || (!!serviceRequest.kudosShopItem && serviceRequest.serviceRequestCategory.name === kudosCategoryName)"
                 ng-model="serviceRequest.title" maxlength="300" required />
 
             <p data-test-id="serviceRequestTitleError"
@@ -53,7 +53,7 @@
             <label>{{"serviceRequest.priority" | translate}}</label>
             <select data-test-id="serviceRequestPriority" name="priority" ng-model="serviceRequest.priority"
                 class="form-control"
-                ng-disabled="serviceRequest.status.title === 'Done' && newServiceRequest.status.$pristine"
+                ng-disabled="isServiceRequestDone()"
                 ng-options="'serviceRequest.' + priority.title.toLowerCase() | translate for priority in priorities track by priority.id"></select>
         </div>
 
@@ -79,7 +79,7 @@
             <label>{{"serviceRequest.description" | translate}}</label>
             <textarea type="text" data-test-id="serviceRequestDescription" name="description"
                 ng-model="serviceRequest.description"
-                ng-disabled="(serviceRequest.status.title === 'Done' && newServiceRequest.status.$pristine) || (!!serviceRequest.kudosShopItem && serviceRequest.serviceRequestCategory.name === kudosCategoryName)"
+                ng-disabled="isServiceRequestDone() || (!!serviceRequest.kudosShopItem && serviceRequest.serviceRequestCategory.name === kudosCategoryName)"
                 class="form-control kudosify-modal-comments" rows="3" ng-maxlength="1000"></textarea>
             <p data-test-id="serviceRequestDescriptionError"
                 ng-show="newServiceRequest.description.$error.required && !newServiceRequest.description.$pristine"
@@ -90,7 +90,7 @@
         </div>
         <div class="form-group" has-permissions="['PICTURE_BASIC']">
             <input id="pictureSelect" data-test-id="profileEditPicture" type="file" accept="image/*"
-                ng-disabled="(serviceRequest.status.title === 'Done' && newServiceRequest.status.$pristine) || (!!serviceRequest.kudosShopItem && serviceRequest.serviceRequestCategory.name === kudosCategoryName)"
+                ng-disabled="isServiceRequestDone() || (!!serviceRequest.kudosShopItem && serviceRequest.serviceRequestCategory.name === kudosCategoryName)"
                 class="form-control" onchange="angular.element(this).scope().attachImage(this)">
 
             <a class="service-request-image-container" onclick="$('#pictureSelect').click(); return false;">
@@ -111,7 +111,7 @@
 <div class="modal-footer">
     <!-- Save button -->
     <button class="btn btn-primary" data-test-id="serviceRequestSubmit"
-        ng-disabled="newServiceRequest.$invalid || isDisabled || isServiceRequestDone()" ng-click="submitRequestWithComment()">
+        ng-disabled="newServiceRequest.$invalid || isDisabled" ng-click="submitRequestWithComment()">
         <span class="glyphicon glyphicon-disk-save"></span>
         {{"common.save" | translate}}
     </button>
