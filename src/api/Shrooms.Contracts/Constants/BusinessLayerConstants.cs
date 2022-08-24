@@ -64,7 +64,7 @@ namespace Shrooms.Contracts.Constants
         #region Lotteries
 
         public const string LotteryParticipantsExcelTableName = "Lottery Participants";
-        public const int LotteryParticipantsInRow = 4;
+        public const int LotteryParticipantsInRow = 3;
         #endregion
 
         #region Organization

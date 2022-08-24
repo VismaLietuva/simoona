@@ -37,8 +37,8 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                     tickets,
                     MapLotteryParticipantDtoToExcelCell(),
                     BusinessLayerConstants.LotteryParticipantsInRow)
-                .AddColumnsPadding(20)
-                .AddRowPadding(20);
+                .AddColumnsPadding(30)
+                .AddRowPadding(30);
 
             return new ByteArrayContent(excelBuilder.Build());
         }
@@ -50,6 +50,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 Value = participantFullName,
                 SetHorizontalTextCenter = true,
                 SetVerticalTextCenter = true,
+                WrapText = true,
                 BorderTop = ExcelBorderStylePicker.Thin,
                 BorderBottom = ExcelBorderStylePicker.Thin,
                 BorderLeft = ExcelBorderStylePicker.Thin,
