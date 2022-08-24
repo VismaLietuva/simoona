@@ -173,7 +173,9 @@ namespace Shrooms.Infrastructure.ExcelGenerator
             columnRange.Style.Font.Bold = internalColumn.Column.SetBoldFont;
             columnRange.Style.VerticalAlignment = internalColumn.Column.SetHorizontalTextCenter ? ExcelVerticalAlignment.Center : columnRange.Style.VerticalAlignment;
             columnRange.Style.HorizontalAlignment = internalColumn.Column.SetHorizontalTextCenter ? ExcelHorizontalAlignment.Center : columnRange.Style.HorizontalAlignment;
-            
+
+            columnStyle.WrapText = internalColumn.Column.WrapText;
+
             if (internalColumn.Column.Value is string stringValue && stringValue.Length > ExcelWorksheetBuilderConstants.MaximumTextCharacterLength)
             {
                 columnStyle.WrapText = true;
