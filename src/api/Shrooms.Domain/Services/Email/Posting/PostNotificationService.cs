@@ -66,7 +66,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             var organization = await _organizationService.GetOrganizationByIdAsync(postCreator.OrganizationId);
             var wall = await _wallsDbSet.SingleAsync(w => w.Id == post.WallId);
 
-            var mentionedUsers = await _userService.GetUsersWithMentionNotificationsAsync(post.MentionedUsersIds);
+            var mentionedUsers = await _userService.GetUsersWithMentionNotificationsAsync(post.MentionedUsersIds.Distinct());
 
             var wallUsersEmails = await _userService.GetWallUsersEmailsAsync(postCreator.Email, wall);
 
@@ -87,7 +87,7 @@ namespace Shrooms.Domain.Services.Email.Posting
         {
             var organization = await _organizationService.GetOrganizationByIdAsync(editPostDto.OrganizationId);
             var postCreator = await _postService.GetPostCreatorByIdAsync(editPostDto.Id);
-            var mentionedUsers = await _userService.GetUsersWithMentionNotificationsAsync(editPostDto.MentionedUserIds);
+            var mentionedUsers = await _userService.GetUsersWithMentionNotificationsAsync(editPostDto.MentionedUserIds.Distinct());
         
             await NotifyMentionedUsersAsync(editPostDto.Id, postCreator.FullName, mentionedUsers, organization.ShortName);
         }

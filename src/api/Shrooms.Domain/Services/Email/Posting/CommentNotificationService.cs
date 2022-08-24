@@ -69,7 +69,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             var commentCreator = await _userService.GetApplicationUserAsync(commentDto.CommentCreator);
             var organization = await _organizationService.GetOrganizationByIdAsync(commentCreator.OrganizationId);
 
-            var mentionedUsers = await _userService.GetUsersWithMentionNotificationsAsync(commentDto.MentionedUserIds);
+            var mentionedUsers = await _userService.GetUsersWithMentionNotificationsAsync(commentDto.MentionedUserIds.Distinct());
             
             var destinationEmails = (await GetPostWatchersEmailsAsync(commentCreator.Email, commentDto.PostId, commentCreator.Id))
                 .Except(mentionedUsers.Select(x => x.Email))
@@ -95,7 +95,7 @@ namespace Shrooms.Domain.Services.Email.Posting
         {
             var mentionCommentDto = await _commentService.GetMentionCommentByIdAsync(editCommentDto.Id);
             var organization = await _organizationService.GetOrganizationByIdAsync(editCommentDto.OrganizationId);
-            var mentionedUsers = await _userService.GetUsersWithMentionNotificationsAsync(editCommentDto.MentionedUserIds);
+            var mentionedUsers = await _userService.GetUsersWithMentionNotificationsAsync(editCommentDto.MentionedUserIds.Distinct());
 
             await NotifyMentionedUsersAsync(
                 editCommentDto.Id,
