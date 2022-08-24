@@ -5,33 +5,64 @@
         .module('simoonaApp.Common')
         .factory('mentionService', mentionService);
 
-    mentionService.$inject = [
-        'authService',
-        'wallCommentRepository'
-    ];
+    mentionService.$inject = [ 'wallCommentRepository' ];
 
-    function mentionService(authService, wallCommentRepository) {
+    function mentionService(wallCommentRepository) {
         var service = {
             getUsersForAutocomplete: getUsersForAutocomplete,
-            applyMentions: applyMentions
+            mentions: getMentions
         };
 
         return service;
 
-        function applyMentions(form, selectedMentionsFromList) {
-            form.mentionedUserIds = [];
+        function getMentions() {
+            return new mentions();
+        }
 
-            var parsedNamesFromTextBody = parseMentions(form.messageBody);
+        function mentions() {
+            this.selectedMentions = [];
+            this.employees = [];
 
-            parsedNamesFromTextBody = removeDuplicates(parsedNamesFromTextBody);
-            selectedMentionsFromList = removeDuplicates(selectedMentionsFromList, 'fullName');
+            this.invokeMention = function (term) {
+                if (!term) {
+                    return;
+                }
 
-            if (parsedNamesFromTextBody && selectedMentionsFromList) {
-                selectedMentionsFromList.forEach(function(cur) {
+                getUsersForAutocomplete(term).then((response) => {
+                    this.employees = response.map(function(cur) {
+                        return {
+                            id: cur.id,
+                            label: cur.fullName
+                        }
+                    });
+                });
+            }
+
+            this.selectMention = function (item) {
+                this.selectedMentions.push({id: item.id, fullName: item.label});
+
+                return `@${item.label.replace(' ', '_')}`;
+            }
+
+            this.getValidatedMentions = function (messageBody) {
+                var parsedNamesFromTextBody = parseMentions(messageBody);
+
+                parsedNamesFromTextBody = removeDuplicates(parsedNamesFromTextBody);
+                this.selectedMentions = removeDuplicates(this.selectedMentions, 'fullName');
+
+                if (!parsedNamesFromTextBody || !this.selectedMentions) {
+                    return undefined;
+                }
+
+                var mentionedUserIds = [];
+
+                this.selectedMentions.forEach(function(cur) {
                     if(parsedNamesFromTextBody.includes(cur.fullName)) {
-                        form.mentionedUserIds.push(cur.id);
+                        mentionedUserIds.push(cur.id);
                     }
                 });
+
+                return mentionedUserIds;
             }
         }
 
@@ -43,24 +74,28 @@
             var pattern = /\B@[\u00BF-\u1FFF\u2C00-\uD7FF\w]+/gi;
             var matches = text.match(pattern);
 
-            if (matches) {
-                matches = removeDuplicates(matches);
-
-                return matches.map(cur => {
-                    return cur.replace('@', '')
-                             .replace('_', ' ');
-                });
+            if (!matches) {
+                return;
             }
+
+            matches = removeDuplicates(matches);
+
+            return matches.map(cur => {
+                return cur.replace('@', '')
+                         .replace('_', ' ');
+            });
         }
 
         function removeDuplicates(myArr, prop) {
-            if (myArr) {
-                return myArr.filter((obj, pos, arr) => {
-                    return prop ? 
-                        arr.map(mapObj => mapObj[prop]).indexOf(obj[prop]) === pos : 
-                        arr.map(mapObj => mapObj).indexOf(obj) === pos;
-                });
+            if (!myArr) {
+                return undefined;
             }
+
+            return myArr.filter((obj, pos, arr) => {
+                return prop ?
+                    arr.map(mapObj => mapObj[prop]).indexOf(obj[prop]) === pos :
+                    arr.map(mapObj => mapObj).indexOf(obj) === pos;
+            });
         }
     }
 })();

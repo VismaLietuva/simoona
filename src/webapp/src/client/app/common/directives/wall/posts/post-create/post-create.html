@@ -3,7 +3,6 @@
     <form name="postForm">
 
         <div class="comment-input-emoji-container">
-
             <textarea class="form-control post-comment-textarea comment-input-text"
                 ng-model="vm.postForm.messageBody"
                 ng-maxlength="vm.maxLength"
@@ -13,9 +12,9 @@
                 type="text"
                 ng-click="vm.showSubmit()"
                 mentio mentio-typed-text="typedTerm"
-                mentio-search="vm.invokeMention(term)"
-                mentio-items="vm.employees | filter:label:typedTerm"
-                mentio-select="vm.selectMention(item)"
+                mentio-search="vm.mentions.invokeMention(term)"
+                mentio-items="vm.mentions.employees | filter:label:typedTerm"
+                mentio-select="vm.mentions.selectMention(item)"
                 placeholder={{vm.startConversation}}></textarea>
 
             <div class="emoji-picker-container">
@@ -26,7 +25,6 @@
             </div>
         </div>
         <div ng-if="vm.showSubmitButton" class="panel panel-footer-post">
-
             <div class="pull-right">
                 <span class="markdown-suggestion" translate="wall.markdownSuggestions"></span>
             </div>
@@ -42,7 +40,6 @@
                     <span class="vismaicon vismaicon-sm vismaicon-filled vismaicon-warning"></span>
                     <span translate="wall.mainWallCreatePostWarning"></span>
                 </div>
-
                 <length-counter max-length="vm.maxLength"
                                 current-length="postForm.messageBody.$viewValue.length"
                                 class="pull-right">
@@ -57,19 +54,16 @@
             </div>
 
             <div class="col-xs-12 pull-left nopadding">
-
                 <div ng-if="!!vm.attachedFiles.length"
                      data-test-id="image-preview-before-upload" translate="wall.imageAttachedPreview">
                 </div>
 
                 <div image-preview-thumb
-                     ng-if="vm.imageSource" 
-                     source="vm.imageSource" 
+                     ng-if="vm.imageSource"
+                     source="vm.imageSource"
                      sources="vm.attachedFiles">
                 </div>
-
             </div>
-
             <div class="clearfix"></div>
         </div>
     </form>
