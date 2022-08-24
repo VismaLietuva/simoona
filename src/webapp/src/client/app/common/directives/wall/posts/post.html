@@ -18,6 +18,7 @@
             </ace-message-user-profile>
         </div>
         <div class="post-content-margin">
+            <!-- Post edit form -->
             <form name="editPostForm" class="edit-text-area" ng-if="vm.editFieldEnabled">
                 <textarea name="messageBody"
                           class="form-control post-comment-textarea"
@@ -25,12 +26,16 @@
                           type="text"
                           ng-model="vm.editableValue"
                           ng-maxlength="vm.maxLength"
-                          valid-if-changed="{{vm.post.messageBody}}"
-                          data-test-id="post-edit-input-field" required></textarea>
+                          data-test-id="post-edit-input-field" required
+                          mentio=""
+                          mentio-typed-text="typedTerm"
+                          mentio-search="vm.mentions.invokeMention(term)"
+                          mentio-items="vm.mentions.employees | filter:label:typedTerm"
+                          mentio-select="vm.mentions.selectMention(item)"></textarea>
 
                 <div class="comment-edit-properties pull-right">
                     <a class="post-save-property"
-                       ng-disabled="editPostForm.$invalid"
+                       ng-disabled="editPostForm.$invalid || vm.editableValue === vm.post.messageBody"
                        ng-click="!editPostForm.$invalid && vm.editPost(vm.editableValue)"
                        data-test-id="post-edit-save-button" translate="common.save"></a>
 
