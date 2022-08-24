@@ -19,6 +19,7 @@ using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.UserService;
 using Shrooms.Domain.Services.Wall.Posts;
+using Shrooms.Resources.Models.Walls.Comments;
 using Shrooms.Domain.Services.Wall.Posts.Comments;
 using Shrooms.Resources.Emails;
 
@@ -107,8 +108,6 @@ namespace Shrooms.Domain.Services.Email.Posting
 
         private async Task SendMentionedUserEmailsAsync(int commentId, int postId, string commentCreatorFullName, IEnumerable<ApplicationUser> mentionedUsers, string organizationShortName)
         {
-            const string subject = "You have been mentioned in the post"; // TODO: use resource
-
             var comment = await _commentService.GetCommentBodyAsync(commentId);
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organizationShortName);
             var postUrl = _appSettings.WallPostUrl(organizationShortName, postId);
@@ -118,6 +117,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             foreach (var mentionedUser in mentionedUsers)
             {
                 var newMentionTemplateViewModel = new NewMentionTemplateViewModel(
+                    Comments.NewMentionEmailSubject,
                     mentionedUser.FullName,
                     commentCreatorFullName,
                     postUrl,
@@ -126,7 +126,7 @@ namespace Shrooms.Domain.Services.Email.Posting
 
                 var content = _mailTemplate.Generate(newMentionTemplateViewModel, EmailTemplateCacheKeys.NewMention);
 
-                var emailData = new EmailDto(mentionedUser.Email, subject, content);
+                var emailData = new EmailDto(mentionedUser.Email, Comments.NewMentionEmailSubject, content);
                 
                 await _mailingService.SendEmailAsync(emailData);
             }

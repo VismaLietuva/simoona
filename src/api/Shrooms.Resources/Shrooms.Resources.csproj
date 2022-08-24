@@ -86,6 +86,10 @@
     <EmbeddedResource Include="Models\Account\Account.resx" />
     <EmbeddedResource Include="Models\Lotteries\Lottery.lt-LT.resx" />
     <EmbeddedResource Include="Models\Lotteries\Lottery.resx" />
+    <EmbeddedResource Include="Models\Walls\Comments\Comments.lt-LT.resx" />
+    <EmbeddedResource Include="Models\Walls\Comments\Comments.resx" />
+    <EmbeddedResource Include="Models\Walls\Posts\Posts.lt-LT.resx" />
+    <EmbeddedResource Include="Models\Walls\Posts\Posts.resx" />
     <EmbeddedResource Include="Widgets\KudosBasket\KudosBasket.lt-LT.resx" />
     <EmbeddedResource Include="Widgets\KudosBasket\KudosBasket.resx" />
   </ItemGroup>

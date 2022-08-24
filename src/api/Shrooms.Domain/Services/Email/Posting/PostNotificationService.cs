@@ -18,6 +18,7 @@ using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.UserService;
 using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.Resources.Emails;
+using Shrooms.Resources.Models.Walls.Posts;
 using MultiwallWall = Shrooms.DataLayer.EntityModels.Models.Multiwall.Wall;
 
 namespace Shrooms.Domain.Services.Email.Posting
@@ -94,8 +95,6 @@ namespace Shrooms.Domain.Services.Email.Posting
 
         private async Task SendMentionerUserEmailsAsync(int postId, string postCreatorFullName, IEnumerable<ApplicationUser> mentionedUsers, string organizationShortName)
         {
-            const string subject = "You have been mentioned in the post"; // TODO: use resource
-
             var postBody = await _postService.GetPostBodyAsync(postId);
             var convertedPostBody = _markdownConverter.ConvertToHtml(postBody);
 
@@ -105,6 +104,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             foreach (var mentionedUser in mentionedUsers)
             {
                 var newMentionTemplateViewModel = new NewMentionTemplateViewModel(
+                    Posts.NewMentionEmailSubject,
                     mentionedUser.FullName,
                     postCreatorFullName,
                     postUrl,
@@ -113,7 +113,7 @@ namespace Shrooms.Domain.Services.Email.Posting
 
                 var content = _mailTemplate.Generate(newMentionTemplateViewModel, EmailTemplateCacheKeys.NewMention);
 
-                await _mailingService.SendEmailAsync(new EmailDto(mentionedUser.Email, subject, content));
+                await _mailingService.SendEmailAsync(new EmailDto(mentionedUser.Email, Posts.NewMentionEmailSubject, content));
             }
         }
 
