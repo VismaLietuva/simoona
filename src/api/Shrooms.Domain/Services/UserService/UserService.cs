@@ -366,10 +366,11 @@ namespace Shrooms.Domain.Services.UserService
             return await _usersDbSet.Include(x => x.NotificationsSettings).FirstAsync(u => u.Id == id);
         }
 
-        public async Task<IEnumerable<ApplicationUser>> GetUsersWithMentionNotificationsAsync(IEnumerable<string> ids)
+        public async Task<IEnumerable<ApplicationUser>> GetUsersWithMentionNotificationsAsync(IEnumerable<string> mentionedUserIds)
         {
-            return await _usersDbSet.Include(x => x.NotificationsSettings)
-                .Where(u => (u.NotificationsSettings == null || u.NotificationsSettings.MentionEmailNotifications) && ids.Contains(u.Id))
+            return await _usersDbSet
+                .Include(x => x.NotificationsSettings)
+                .Where(u => (u.NotificationsSettings == null || u.NotificationsSettings.MentionEmailNotifications) && mentionedUserIds.Contains(u.Id))
                 .ToListAsync();
         }
 

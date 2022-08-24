@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.DataTransferObjects.Models;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts;
 using Shrooms.Contracts.DataTransferObjects.Users;
 using Shrooms.Contracts.DataTransferObjects.Wall.Likes;
@@ -21,6 +22,7 @@ using Shrooms.Domain.Services.Wall.Posts.Comments;
 
 namespace Shrooms.Domain.Services.Wall.Posts
 {
+
     public class PostService : IPostService
     {
         private static readonly SemaphoreSlim _postDeleteLock = new SemaphoreSlim(1, 1);
@@ -245,37 +247,6 @@ namespace Shrooms.Domain.Services.Wall.Posts
             }
         }
 
-        private static UserDto MapUserToDto(ApplicationUser user)
-        {
-            var userDto = new UserDto
-            {
-                UserId = user.Id,
-                // ReSharper disable once HeapView.BoxingAllocation (Don't change to string interpolation, since EF won't handle project it to SQL)
-                FullName = user.FirstName + ' ' + user.LastName,
-                PictureId = user.PictureId
-            };
-
-            return userDto;
-        }
-
-        private static NewlyCreatedPostDto MapNewlyCreatedPostToDto(Post post, UserDto user, WallType wallType, IEnumerable<string> mentionedUserIds)
-        {
-            var newlyCreatedPostDto = new NewlyCreatedPostDto
-            {
-                Id = post.Id,
-                MessageBody = post.MessageBody,
-                Images = post.Images,
-                Created = post.Created,
-                CreatedBy = post.CreatedBy,
-                User = user,
-                WallType = wallType,
-                WallId = post.WallId,
-                MentionedUsersIds = mentionedUserIds
-            };
-
-            return newlyCreatedPostDto;
-        }
-
         public async Task ToggleWatchAsync(int postId, UserAndOrganizationDto userAndOrg, bool shouldWatch)
         {
             await _postDeleteLock.WaitAsync();
@@ -323,6 +294,65 @@ namespace Shrooms.Domain.Services.Wall.Posts
                 .Where(w => w.User != null)
                 .Select(w => w.User)
                 .ToListAsync();
+        }
+
+        public async Task<ApplicationUserDto> GetPostCreatorByIdAsync(int postId)
+        {
+            var post = await _postsDbSet
+                .Include(post => post.Author)
+                .SingleOrDefaultAsync(post => post.Id == postId);
+
+            if (post == null)
+            {
+                return null;
+            }
+
+            var author = post.Author;
+
+            return new ApplicationUserDto
+            {
+                Id = author.Id,
+                FirstName = author.FirstName,
+                LastName = author.LastName,
+                UserName = author.UserName,
+                Email = author.Email,
+                PictureId = author.PictureId,
+                EmploymentDate = author.EmploymentDate,
+                TotalKudos = author.TotalKudos,
+                RemainingKudos = author.RemainingKudos,
+                SpentKudos = author.SpentKudos
+            };
+        }
+
+        private static UserDto MapUserToDto(ApplicationUser user)
+        {
+            var userDto = new UserDto
+            {
+                UserId = user.Id,
+                // ReSharper disable once HeapView.BoxingAllocation (Don't change to string interpolation, since EF won't handle project it to SQL)
+                FullName = user.FirstName + ' ' + user.LastName,
+                PictureId = user.PictureId
+            };
+
+            return userDto;
+        }
+
+        private static NewlyCreatedPostDto MapNewlyCreatedPostToDto(Post post, UserDto user, WallType wallType, IEnumerable<string> mentionedUserIds)
+        {
+            var newlyCreatedPostDto = new NewlyCreatedPostDto
+            {
+                Id = post.Id,
+                MessageBody = post.MessageBody,
+                Images = post.Images,
+                Created = post.Created,
+                CreatedBy = post.CreatedBy,
+                User = user,
+                WallType = wallType,
+                WallId = post.WallId,
+                MentionedUsersIds = mentionedUserIds
+            };
+
+            return newlyCreatedPostDto;
         }
     }
 }

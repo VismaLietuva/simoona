@@ -90,10 +90,8 @@ namespace Shrooms.Presentation.Api.Controllers
             try
             {
                 var createdPost = await _postService.CreateNewPostAsync(postModel);
-                _asyncRunner.Run<NewPostNotifier>(async notifier =>
-                {
-                    await notifier.NotifyAsync(createdPost, userHubDto);
-                }, GetOrganizationName());
+
+                _asyncRunner.Run<PostNotifier>(async notifier => await notifier.NotifyAboutNewPostAsync(createdPost, userHubDto), GetOrganizationName());
 
                 return Ok(_mapper.Map<WallPostViewModel>(createdPost));
             }
@@ -114,10 +112,16 @@ namespace Shrooms.Presentation.Api.Controllers
             }
 
             var editPostDto = _mapper.Map<EditPostDto>(editedPost);
+
             SetOrganizationAndUser(editPostDto);
+
             try
             {
                 await _postService.EditPostAsync(editPostDto);
+                
+                _asyncRunner.Run<PostNotifier>(async notifier =>
+                    await notifier.NotifyUpdatedPostMentionsAsync(editPostDto), GetOrganizationName());
+
                 return Ok();
             }
             catch (UnauthorizedException)

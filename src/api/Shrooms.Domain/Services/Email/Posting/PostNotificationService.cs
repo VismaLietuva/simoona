@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +6,7 @@ using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels;
+using Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts;
 using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
@@ -31,21 +31,20 @@ namespace Shrooms.Domain.Services.Email.Posting
         private readonly IApplicationSettings _appSettings;
         private readonly IOrganizationService _organizationService;
         private readonly IMarkdownConverter _markdownConverter;
-        private readonly ILogger _logger;
 
         private readonly IDbSet<MultiwallWall> _wallsDbSet;
         private readonly IDbSet<Event> _eventsDbSet;
         private readonly IDbSet<Project> _projectsDbSet;
 
-        public PostNotificationService(IUnitOfWork2 uow,
+        public PostNotificationService(
+            IUnitOfWork2 uow,
             IUserService userService,
             IPostService postService,
             IMailTemplate mailTemplate,
             IMailingService mailingService,
             IApplicationSettings appSettings,
             IOrganizationService organizationService,
-            IMarkdownConverter markdownConverter,
-            ILogger logger)
+            IMarkdownConverter markdownConverter)
         {
             _appSettings = appSettings;
             _userService = userService;
@@ -54,9 +53,8 @@ namespace Shrooms.Domain.Services.Email.Posting
             _mailingService = mailingService;
             _organizationService = organizationService;
             _markdownConverter = markdownConverter;
-            _logger = logger;
 
-            _wallsDbSet = uow.GetDbSet<DataLayer.EntityModels.Models.Multiwall.Wall>();
+            _wallsDbSet = uow.GetDbSet<MultiwallWall>();
             _eventsDbSet = uow.GetDbSet<Event>();
             _projectsDbSet = uow.GetDbSet<Project>();
         }
@@ -68,22 +66,59 @@ namespace Shrooms.Domain.Services.Email.Posting
             var organization = await _organizationService.GetOrganizationByIdAsync(postCreator.OrganizationId);
             var wall = await _wallsDbSet.SingleAsync(w => w.Id == post.WallId);
 
-            var mentionedUsers = (await GetMentionedUsersAsync(post.MentionedUsersIds)).ToList();
-            var destinationEmails = (await _userService.GetWallUsersEmailsAsync(postCreator.Email, wall))
-                .Except(mentionedUsers.Select(x => x.Email)).ToList();
+            var mentionedUsers = await _userService.GetUsersWithMentionNotificationsAsync(post.MentionedUsersIds);
 
-            if (destinationEmails.Count > 0)
+            var wallUsersEmails = await _userService.GetWallUsersEmailsAsync(postCreator.Email, wall);
+
+            var destinationEmails = wallUsersEmails.Except(mentionedUsers.Select(x => x.Email));
+
+            if (destinationEmails.Any())
             {
                 await SendWallSubscriberEmailsAsync(post, destinationEmails, postCreator, organization, wall);
             }
 
-            if (mentionedUsers.Count > 0)
+            if (mentionedUsers.Any())
             {
-                await SendMentionEmailsAsync(post, mentionedUsers, postCreator, organization);
+                await NotifyMentionedUsersAsync(post.Id, postCreator.FullName, mentionedUsers, organization.ShortName);
             }
         }
 
-        private async Task SendWallSubscriberEmailsAsync(NewlyCreatedPostDto post,
+        public async Task NotifyMentionedUsersAsync(EditPostDto editPostDto)
+        {
+            var organization = await _organizationService.GetOrganizationByIdAsync(editPostDto.OrganizationId);
+            var postCreator = await _postService.GetPostCreatorByIdAsync(editPostDto.Id);
+            var mentionedUsers = await _userService.GetUsersWithMentionNotificationsAsync(editPostDto.MentionedUserIds);
+        
+            await NotifyMentionedUsersAsync(editPostDto.Id, postCreator.FullName, mentionedUsers, organization.ShortName);
+        }
+
+        private async Task NotifyMentionedUsersAsync(int postId, string postCreatorFullName, IEnumerable<ApplicationUser> mentionedUsers, string organizationShortName)
+        {
+            const string subject = "You have been mentioned in the post"; // TODO: use resource
+
+            var postBody = await _postService.GetPostBodyAsync(postId);
+            var convertedPostBody = _markdownConverter.ConvertToHtml(postBody);
+
+            var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organizationShortName);
+            var postUrl = _appSettings.WallPostUrl(organizationShortName, postId);
+
+            foreach (var mentionedUser in mentionedUsers)
+            {
+                var newMentionTemplateViewModel = new NewMentionTemplateViewModel(
+                    mentionedUser.FullName,
+                    postCreatorFullName,
+                    postUrl,
+                    userNotificationSettingsUrl,
+                    convertedPostBody);
+
+                var content = _mailTemplate.Generate(newMentionTemplateViewModel, EmailTemplateCacheKeys.NewMention);
+
+                await _mailingService.SendEmailAsync(new EmailDto(mentionedUser.Email, subject, content));
+            }
+        }
+
+        private async Task SendWallSubscriberEmailsAsync(
+            NewlyCreatedPostDto post,
             IEnumerable<string> destinationEmails,
             ApplicationUser postCreator,
             Organization organization,
@@ -109,52 +144,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             await _mailingService.SendEmailAsync(emailData);
         }
 
-        private async Task SendMentionEmailsAsync(NewlyCreatedPostDto post, IEnumerable<ApplicationUser> mentionedUsers, ApplicationUser postCreator, Organization organization)
-        {
-            var messageBody = _markdownConverter.ConvertToHtml(await _postService.GetPostBodyAsync(post.Id));
-            var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
-            var postUrl = _appSettings.WallPostUrl(organization.ShortName, post.Id);
-            const string subject = "You have been mentioned in the post";
-
-            foreach (var mentionedUser in mentionedUsers)
-            {
-                try
-                {
-                    if (mentionedUser.NotificationsSettings?.MentionEmailNotifications == false)
-                    {
-                        continue;
-                    }
-
-                    var newMentionTemplateViewModel = new NewMentionTemplateViewModel(mentionedUser.FullName,
-                        postCreator.FacebookEmail,
-                        postUrl,
-                        userNotificationSettingsUrl,
-                        messageBody);
-
-                    var content = _mailTemplate.Generate(newMentionTemplateViewModel, EmailTemplateCacheKeys.NewMention);
-
-                    var emailData = new EmailDto(mentionedUser.Email, subject, content);
-                    await _mailingService.SendEmailAsync(emailData);
-                }
-                catch (Exception e)
-                {
-                    _logger.Debug(e.Message, e);
-                }
-            }
-        }
-
-        private async Task<IEnumerable<ApplicationUser>> GetMentionedUsersAsync(IEnumerable<string> mentionedUsersIds)
-        {
-            if (mentionedUsersIds == null)
-            {
-                return Enumerable.Empty<ApplicationUser>();
-            }
-
-            var users = await _userService.GetUsersWithMentionNotificationsAsync(mentionedUsersIds);
-            return users;
-        }
-
-        private static string GetActionButtonTitle(DataLayer.EntityModels.Models.Multiwall.Wall wall)
+        private static string GetActionButtonTitle(MultiwallWall wall)
         {
             switch (wall.Type)
             {
@@ -167,7 +157,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             }
         }
 
-        private static string GetWallTitle(DataLayer.EntityModels.Models.Multiwall.Wall wall)
+        private static string GetWallTitle(MultiwallWall wall)
         {
             switch (wall.Type)
             {
