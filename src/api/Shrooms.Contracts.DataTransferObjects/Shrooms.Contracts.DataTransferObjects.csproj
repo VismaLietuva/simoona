@@ -122,6 +122,7 @@
     <Compile Include="Models\Users\TimeZoneDto.cs" />
     <Compile Include="Models\WallPosts\UserDto.cs" />
     <Compile Include="Models\Wall\Comments\CommentCreatedDto.cs" />
+    <Compile Include="Models\Wall\Comments\MentionCommentDto.cs" />
     <Compile Include="Models\Wall\Comments\EditCommentDto.cs" />
     <Compile Include="Models\Wall\Comments\NewCommentDto.cs" />
     <Compile Include="Models\Wall\Moderator\ModeratorDto.cs" />

@@ -17,6 +17,6 @@ namespace Shrooms.Contracts.DataTransferObjects.Models.Wall.Comments
 
         public string CommentCreator { get; set; }
 
-        public IEnumerable<string> MentionedUsersIds { get; set; }
+        public IEnumerable<string> MentionedUserIds { get; set; }
     }
 }

@@ -61,10 +61,9 @@ namespace Shrooms.Presentation.Api.Controllers
             try
             {
                 var commentCreatedDto = await _commentService.CreateCommentAsync(commentDto);
-                _asyncRunner.Run<NewCommentNotifier>(async notifier =>
-                {
-                    await notifier.NotifyAsync(commentCreatedDto, userHubDto);
-                }, GetOrganizationName());
+
+                _asyncRunner.Run<CommentNotifier>(async notifier =>
+                    await notifier.NotifyAsync(commentCreatedDto, userHubDto), GetOrganizationName());
 
                 return Ok(new { commentCreatedDto.CommentId });
             }
@@ -90,6 +89,10 @@ namespace Shrooms.Presentation.Api.Controllers
             try
             {
                 await _commentService.EditCommentAsync(editCommentDto);
+
+                _asyncRunner.Run<CommentNotifier>(async notifier =>
+                    await notifier.NotifyUpdatedCommentMentionsAsync(editCommentDto), GetOrganizationName());
+
                 return Ok();
             }
             catch (UnauthorizedException)

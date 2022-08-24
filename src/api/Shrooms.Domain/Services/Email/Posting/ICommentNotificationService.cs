@@ -3,8 +3,10 @@ using Shrooms.Contracts.DataTransferObjects.Models.Wall.Comments;
 
 namespace Shrooms.Domain.Services.Email.Posting
 {
-    public interface ICommentEmailNotificationService
+    public interface ICommentNotificationService
     {
         Task SendEmailNotificationAsync(CommentCreatedDto commentDto);
+
+        Task NotifyMentionedUsersAsync(EditCommentDto editCommentDto);
     }
 }

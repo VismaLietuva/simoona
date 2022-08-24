@@ -9,5 +9,7 @@ namespace Shrooms.Contracts.DataTransferObjects.Models.Wall.Comments
         public string MessageBody { get; set; }
 
         public ICollection<string> Images { get; set; }
+
+        public IEnumerable<string> MentionedUserIds { get; set; }
     }
 }

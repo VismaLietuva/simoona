@@ -16,5 +16,7 @@ namespace Shrooms.Presentation.WebViewModels.Models.Wall.Posts.Comments
 
         [HasImageOrMessageBody(nameof(MessageBody))]
         public ICollection<string> Images { get; set; }
+
+        public IEnumerable<string> MentionedUserIds { get; set; }
     }
 }

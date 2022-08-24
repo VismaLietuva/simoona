@@ -421,7 +421,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\FilterConfig.cs" />
-    <Compile Include="BackgroundWorkers\NewCommentNotifier.cs" />
+    <Compile Include="BackgroundWorkers\CommentNotifier.cs" />
     <Compile Include="BackgroundWorkers\PostNotifier.cs" />
     <Compile Include="Controllers\BlacklistController.cs" />
     <Compile Include="Controllers\FilterPresetController.cs" />
