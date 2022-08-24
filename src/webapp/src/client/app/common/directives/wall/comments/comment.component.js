@@ -23,6 +23,7 @@
         'wallCommentRepository',
         'wallService',
         'lodash',
+        'mentionService'
     ];
 
     function wallCommentController(
@@ -31,7 +32,8 @@
         youtubeSettings,
         wallCommentRepository,
         wallService,
-        lodash
+        lodash,
+        mentionService
     ) {
         /*jshint validthis: true */
         var vm = this;
@@ -51,6 +53,8 @@
         vm.youtubePreviewHeight = youtubeSettings.previewHeight;
         vm.singlePictureId = lodash.first(vm.comment.images);
 
+        vm.mentions = mentionService.mentions();
+
         //////////
 
         function editComment(messageBody) {
@@ -58,6 +62,8 @@
                 vm.disableEditor();
 
                 vm.comment.messageBody = messageBody;
+                vm.comment.mentionedUserIds = vm.mentions.getValidatedMentions(messageBody);
+
                 vm.isActionsEnabled = false;
 
                 wallCommentRepository.editComment(vm.comment).then(function () {
