@@ -79,7 +79,7 @@ namespace Shrooms.Domain.Services.Email.Posting
 
             if (mentionedUsers.Any())
             {
-                await NotifyMentionedUsersAsync(post.Id, postCreator.FullName, mentionedUsers, organization.ShortName);
+                await SendMentionerUserEmailsAsync(post.Id, postCreator.FullName, mentionedUsers, organization.ShortName);
             }
         }
 
@@ -89,10 +89,10 @@ namespace Shrooms.Domain.Services.Email.Posting
             var postCreator = await _postService.GetPostCreatorByIdAsync(editPostDto.Id);
             var mentionedUsers = await _userService.GetUsersWithMentionNotificationsAsync(editPostDto.MentionedUserIds.Distinct());
         
-            await NotifyMentionedUsersAsync(editPostDto.Id, postCreator.FullName, mentionedUsers, organization.ShortName);
+            await SendMentionerUserEmailsAsync(editPostDto.Id, postCreator.FullName, mentionedUsers, organization.ShortName);
         }
 
-        private async Task NotifyMentionedUsersAsync(int postId, string postCreatorFullName, IEnumerable<ApplicationUser> mentionedUsers, string organizationShortName)
+        private async Task SendMentionerUserEmailsAsync(int postId, string postCreatorFullName, IEnumerable<ApplicationUser> mentionedUsers, string organizationShortName)
         {
             const string subject = "You have been mentioned in the post"; // TODO: use resource
 

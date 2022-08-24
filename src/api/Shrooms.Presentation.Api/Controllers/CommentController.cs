@@ -63,7 +63,7 @@ namespace Shrooms.Presentation.Api.Controllers
                 var commentCreatedDto = await _commentService.CreateCommentAsync(commentDto);
 
                 _asyncRunner.Run<CommentNotifier>(async notifier =>
-                    await notifier.NotifyAsync(commentCreatedDto, userHubDto), GetOrganizationName());
+                    await notifier.NotifyAboutNewCommentAsync(commentCreatedDto, userHubDto), GetOrganizationName());
 
                 return Ok(new { commentCreatedDto.CommentId });
             }

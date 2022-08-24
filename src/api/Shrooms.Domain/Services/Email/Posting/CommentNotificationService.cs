@@ -64,7 +64,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             _commentsDbSet = uow.GetDbSet<Comment>();
         }
 
-        public async Task SendEmailNotificationAsync(CommentCreatedDto commentDto)
+        public async Task NotifyAboutNewCommentAsync(CommentCreatedDto commentDto)
         {
             var commentCreator = await _userService.GetApplicationUserAsync(commentDto.CommentCreator);
             var organization = await _organizationService.GetOrganizationByIdAsync(commentCreator.OrganizationId);
@@ -82,7 +82,7 @@ namespace Shrooms.Domain.Services.Email.Posting
 
             if (mentionedUsers.Any())
             {
-                await NotifyMentionedUsersAsync(
+                await SendMentionedUserEmailsAsync(
                     commentDto.CommentId,
                     commentDto.PostId,
                     commentCreator.FullName,
@@ -97,7 +97,7 @@ namespace Shrooms.Domain.Services.Email.Posting
             var organization = await _organizationService.GetOrganizationByIdAsync(editCommentDto.OrganizationId);
             var mentionedUsers = await _userService.GetUsersWithMentionNotificationsAsync(editCommentDto.MentionedUserIds.Distinct());
 
-            await NotifyMentionedUsersAsync(
+            await SendMentionedUserEmailsAsync(
                 editCommentDto.Id,
                 mentionCommentDto.PostId,
                 mentionCommentDto.AuthorFullName,
@@ -105,7 +105,7 @@ namespace Shrooms.Domain.Services.Email.Posting
                 organization.ShortName);
         }
 
-        private async Task NotifyMentionedUsersAsync(int commentId, int postId, string commentCreatorFullName, IEnumerable<ApplicationUser> mentionedUsers, string organizationShortName)
+        private async Task SendMentionedUserEmailsAsync(int commentId, int postId, string commentCreatorFullName, IEnumerable<ApplicationUser> mentionedUsers, string organizationShortName)
         {
             const string subject = "You have been mentioned in the post"; // TODO: use resource
 

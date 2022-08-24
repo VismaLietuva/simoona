@@ -39,9 +39,9 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
             _postService = postService;
         }
 
-        public async Task NotifyAsync(CommentCreatedDto commentDto, UserAndOrganizationHubDto userHubDto)
+        public async Task NotifyAboutNewCommentAsync(CommentCreatedDto commentDto, UserAndOrganizationHubDto userHubDto)
         {
-            await _commentNotificationService.SendEmailNotificationAsync(commentDto);
+            await _commentNotificationService.NotifyAboutNewCommentAsync(commentDto);
 
             var membersToNotify = await _wallService.GetWallMembersIdsAsync(commentDto.WallId, userHubDto);
             await NotificationHub.SendWallNotificationAsync(commentDto.WallId, membersToNotify, commentDto.WallType, userHubDto);
