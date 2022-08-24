@@ -12,6 +12,8 @@ namespace Shrooms.Contracts.Infrastructure.ExcelGenerator
 
         bool SetVerticalTextCenter { get; set; }
 
+        bool WrapText { get; set; }
+
         object Value { get; set; }
 
         ExcelBorderStylePicker BorderTop { get; set; }
