@@ -21,6 +21,7 @@
         '$scope',
         '$state',
         '$location',
+        '$timeout',
         'SmoothScroll',
         'wallSettings',
         'errorHandler',
@@ -38,6 +39,7 @@
         $scope,
         $state,
         $location,
+        $timeout,
         SmoothScroll,
         wallSettings,
         errorHandler,
@@ -163,7 +165,11 @@
 
         function enableEditor() {
             vm.editFieldEnabled = true;
-            vm.editableValue = vm.post.messageBody;
+
+            // Necessary to avoid no mentio-items attribute was provided error 
+            $timeout(function() {
+                vm.editableValue = vm.post.messageBody;
+            });
         }
 
         function disableEditor() {

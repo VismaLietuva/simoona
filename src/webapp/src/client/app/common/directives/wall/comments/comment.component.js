@@ -17,6 +17,7 @@
     });
 
     wallCommentController.$inject = [
+        '$timeout',
         'wallSettings',
         'errorHandler',
         'youtubeSettings',
@@ -27,6 +28,7 @@
     ];
 
     function wallCommentController(
+        $timeout,
         wallSettings,
         errorHandler,
         youtubeSettings,
@@ -95,7 +97,11 @@
 
         function enableEditor() {
             vm.editFieldEnabled = true;
-            vm.editableValue = vm.comment.messageBody;
+
+            // Necessary to avoid no mentio-items attribute was provided error 
+            $timeout(function() {
+                vm.editableValue = vm.comment.messageBody;
+            });
         }
 
         function disableEditor() {
