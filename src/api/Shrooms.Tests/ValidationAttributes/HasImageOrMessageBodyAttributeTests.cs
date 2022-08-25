@@ -149,5 +149,61 @@ namespace Shrooms.Tests.ValidationAttributes
             // Assert
             Assert.AreEqual(ValidationResult.Success, actual);
         }
+
+        [Test]
+        public void IsValid_MessageBodyIsNotNullAndPictureIdIsSet_ReturnsTrue()
+        {
+            // Arrange
+            var model = new Mock();
+
+            model.MessageBody = "not empty";
+            model.PictureId = "something";
+
+            var validationContext = new ValidationContext(model);
+
+            var attribute = new HasImageOrMessageBodyAttribute(nameof(Mock.MessageBody), nameof(Mock.PictureId));
+
+            // Act
+            var actual = attribute.GetValidationResult(null, validationContext);
+
+            // Assert
+            Assert.AreEqual(ValidationResult.Success, actual);
+        }
+
+        [Test]
+        public void IsValid_MessageBodyIsNullAndPictureIdIsSet_ReturnsTrue()
+        {
+            // Arrange
+            var model = new Mock();
+
+            model.PictureId = "something";
+
+            var validationContext = new ValidationContext(model);
+
+            var attribute = new HasImageOrMessageBodyAttribute(nameof(Mock.MessageBody), nameof(Mock.PictureId));
+
+            // Act
+            var actual = attribute.GetValidationResult(null, validationContext);
+
+            // Assert
+            Assert.AreEqual(ValidationResult.Success, actual);
+        }
+
+        [Test]
+        public void IsValid_MessageBodyIsNullAndPictureIdAndImagesAreNull_ReturnsFalse()
+        {
+            // Arrange
+            var model = new Mock();
+
+            var validationContext = new ValidationContext(model);
+
+            var attribute = new HasImageOrMessageBodyAttribute(nameof(Mock.MessageBody), nameof(Mock.PictureId));
+
+            // Act
+            var actual = attribute.GetValidationResult(null, validationContext);
+
+            // Assert
+            Assert.IsNotNull(actual.ErrorMessage);
+        }
     }
 }
