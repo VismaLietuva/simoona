@@ -62,38 +62,38 @@ namespace Shrooms.Domain.Services.Email.Posting
 
         public async Task NotifyAboutNewPostAsync(NewlyCreatedPostDto post)
         {
-            var postCreator = await _userService.GetApplicationUserAsync(post.User.UserId);
+            var postAuthor = await _userService.GetApplicationUserAsync(post.User.UserId);
 
-            var organization = await _organizationService.GetOrganizationByIdAsync(postCreator.OrganizationId);
+            var organization = await _organizationService.GetOrganizationByIdAsync(postAuthor.OrganizationId);
             var wall = await _wallsDbSet.SingleAsync(w => w.Id == post.WallId);
 
             var mentionedUsers = await _userService.GetUsersWithMentionNotificationsAsync(post.MentionedUsersIds.Distinct());
 
-            var wallUsersEmails = await _userService.GetWallUsersEmailsAsync(postCreator.Email, wall);
+            var wallUsersEmails = await _userService.GetWallUsersEmailsAsync(postAuthor.Email, wall);
 
             var destinationEmails = wallUsersEmails.Except(mentionedUsers.Select(x => x.Email));
 
             if (destinationEmails.Any())
             {
-                await SendWallSubscriberEmailsAsync(post, destinationEmails, postCreator, organization, wall);
+                await SendWallSubscriberEmailsAsync(post, destinationEmails, postAuthor, organization, wall);
             }
 
             if (mentionedUsers.Any())
             {
-                await SendMentionerUserEmailsAsync(post.Id, postCreator.FullName, mentionedUsers, organization.ShortName);
+                await SendMentionerUserEmailsAsync(post.Id, postAuthor.FullName, mentionedUsers, organization.ShortName);
             }
         }
 
         public async Task NotifyMentionedUsersAsync(EditPostDto editPostDto)
         {
             var organization = await _organizationService.GetOrganizationByIdAsync(editPostDto.OrganizationId);
-            var postCreator = await _postService.GetPostCreatorByIdAsync(editPostDto.Id);
+            var postAuthor = await _postService.GetPostCreatorByIdAsync(editPostDto.Id);
             var mentionedUsers = await _userService.GetUsersWithMentionNotificationsAsync(editPostDto.MentionedUserIds.Distinct());
         
-            await SendMentionerUserEmailsAsync(editPostDto.Id, postCreator.FullName, mentionedUsers, organization.ShortName);
+            await SendMentionerUserEmailsAsync(editPostDto.Id, postAuthor.FullName, mentionedUsers, organization.ShortName);
         }
 
-        private async Task SendMentionerUserEmailsAsync(int postId, string postCreatorFullName, IEnumerable<ApplicationUser> mentionedUsers, string organizationShortName)
+        private async Task SendMentionerUserEmailsAsync(int postId, string postAuthorFullName, IEnumerable<ApplicationUser> mentionedUsers, string organizationShortName)
         {
             var postBody = await _postService.GetPostBodyAsync(postId);
             var convertedPostBody = _markdownConverter.ConvertToHtml(postBody);
@@ -106,7 +106,7 @@ namespace Shrooms.Domain.Services.Email.Posting
                 var newMentionTemplateViewModel = new NewMentionTemplateViewModel(
                     Posts.NewMentionEmailSubject,
                     mentionedUser.FullName,
-                    postCreatorFullName,
+                    postAuthorFullName,
                     postUrl,
                     userNotificationSettingsUrl,
                     convertedPostBody);

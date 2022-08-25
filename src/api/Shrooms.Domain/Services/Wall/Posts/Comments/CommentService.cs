@@ -127,8 +127,8 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
                 WallId = post.WallId,
                 CommentId = comment.Id,
                 WallType = post.Wall.Type,
-                CommentCreator = comment.AuthorId,
-                PostCreator = post.AuthorId,
+                CommentAuthor = comment.AuthorId,
+                PostAuthor = post.AuthorId,
                 PostId = post.Id,
                 MentionedUserIds = commentDto.MentionedUserIds?.Distinct()
             };

@@ -67,18 +67,18 @@ namespace Shrooms.Domain.Services.Email.Posting
 
         public async Task NotifyAboutNewCommentAsync(CommentCreatedDto commentDto)
         {
-            var commentCreator = await _userService.GetApplicationUserAsync(commentDto.CommentCreator);
-            var organization = await _organizationService.GetOrganizationByIdAsync(commentCreator.OrganizationId);
+            var commentAuthor = await _userService.GetApplicationUserAsync(commentDto.CommentAuthor);
+            var organization = await _organizationService.GetOrganizationByIdAsync(commentAuthor.OrganizationId);
 
             var mentionedUsers = await _userService.GetUsersWithMentionNotificationsAsync(commentDto.MentionedUserIds.Distinct());
             
-            var destinationEmails = (await GetPostWatchersEmailsAsync(commentCreator.Email, commentDto.PostId, commentCreator.Id))
+            var destinationEmails = (await GetPostWatchersEmailsAsync(commentAuthor.Email, commentDto.PostId, commentAuthor.Id))
                 .Except(mentionedUsers.Select(x => x.Email))
                 .ToList();
 
             if (destinationEmails.Any())
             {
-                await SendPostWatcherEmailsAsync(commentDto, destinationEmails, commentCreator, organization);
+                await SendPostWatcherEmailsAsync(commentDto, destinationEmails, commentAuthor, organization);
             }
 
             if (mentionedUsers.Any())
@@ -86,7 +86,7 @@ namespace Shrooms.Domain.Services.Email.Posting
                 await SendMentionedUserEmailsAsync(
                     commentDto.CommentId,
                     commentDto.PostId,
-                    commentCreator.FullName,
+                    commentAuthor.FullName,
                     mentionedUsers,
                     organization.ShortName);
             }
@@ -106,7 +106,7 @@ namespace Shrooms.Domain.Services.Email.Posting
                 organization.ShortName);
         }
 
-        private async Task SendMentionedUserEmailsAsync(int commentId, int postId, string commentCreatorFullName, IEnumerable<ApplicationUser> mentionedUsers, string organizationShortName)
+        private async Task SendMentionedUserEmailsAsync(int commentId, int postId, string commentAuthorFullName, IEnumerable<ApplicationUser> mentionedUsers, string organizationShortName)
         {
             var comment = await _commentService.GetCommentBodyAsync(commentId);
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organizationShortName);
@@ -119,7 +119,7 @@ namespace Shrooms.Domain.Services.Email.Posting
                 var newMentionTemplateViewModel = new NewMentionTemplateViewModel(
                     Comments.NewMentionEmailSubject,
                     mentionedUser.FullName,
-                    commentCreatorFullName,
+                    commentAuthorFullName,
                     postUrl,
                     userNotificationSettingsUrl,
                     messageBody);
@@ -132,20 +132,20 @@ namespace Shrooms.Domain.Services.Email.Posting
             }
         }
 
-        private async Task SendPostWatcherEmailsAsync(CommentCreatedDto commentDto, IList<string> emails, ApplicationUser commentCreator, Organization organization)
+        private async Task SendPostWatcherEmailsAsync(CommentCreatedDto commentDto, IList<string> emails, ApplicationUser commentAuthor, Organization organization)
         {
             var comment = await LoadCommentAsync(commentDto.CommentId);
             var postLink = await GetPostLinkAsync(commentDto.WallType, commentDto.WallId, organization.ShortName, commentDto.PostId);
 
-            var authorPictureUrl = _appSettings.PictureUrl(organization.ShortName, commentCreator.PictureId);
+            var authorPictureUrl = _appSettings.PictureUrl(organization.ShortName, commentAuthor.PictureId);
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
 
-            var subject = string.Format(Templates.NewPostCommentEmailSubject, CutMessage(comment.Post.MessageBody), commentCreator.FullName);
+            var subject = string.Format(Templates.NewPostCommentEmailSubject, CutMessage(comment.Post.MessageBody), commentAuthor.FullName);
             var body = _markdownConverter.ConvertToHtml(comment.MessageBody);
 
             var emailTemplateViewModel = new NewCommentEmailTemplateViewModel(string.Format(EmailTemplates.PostCommentTitle, CutMessage(comment.Post.MessageBody)),
                 authorPictureUrl,
-                commentCreator.FullName,
+                commentAuthor.FullName,
                 postLink,
                 body,
                 userNotificationSettingsUrl,
@@ -153,15 +153,16 @@ namespace Shrooms.Domain.Services.Email.Posting
 
             var content = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.NewPostComment);
             var emailData = new EmailDto(emails, subject, content);
+
             await _mailingService.SendEmailAsync(emailData);
         }
         
-        private async Task<IList<string>> GetPostWatchersEmailsAsync(string senderEmail, int postId, string commentCreatorId)
+        private async Task<IList<string>> GetPostWatchersEmailsAsync(string senderEmail, int postId, string commentAuthorId)
         {
             var postWatchers = await _postService.GetPostWatchersForEmailNotificationsAsync(postId);
 
             return postWatchers
-                .Where(u => u.Email != senderEmail && u.Id != commentCreatorId)
+                .Where(u => u.Email != senderEmail && u.Id != commentAuthorId)
                 .Select(u => u.Email)
                 .Distinct()
                 .ToList();

@@ -90,7 +90,7 @@ namespace Shrooms.Domain.Services.Notifications
                                .SingleAsync();
 
             var commentCreator = await _userDbSet
-                                     .Where(x => x.Id == comment.CommentCreator)
+                                     .Where(x => x.Id == comment.CommentAuthor)
                                      .Select(c => new { c.FirstName, c.LastName, c.PictureId })
                                      .SingleAsync();
             var commentCreatorApplicationUser = new ApplicationUser

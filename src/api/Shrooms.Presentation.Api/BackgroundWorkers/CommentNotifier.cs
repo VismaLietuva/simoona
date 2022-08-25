@@ -49,7 +49,7 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
             var postWatchers = await _postService.GetPostWatchersForAppNotificationsAsync(commentDto.PostId);
 
             // Comment author doesn't need to receive notification about his own comment
-            postWatchers.Remove(commentDto.CommentCreator);
+            postWatchers.Remove(commentDto.CommentAuthor);
 
             // Send notification to other users
             if (postWatchers.Any())
@@ -73,6 +73,7 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
             }
 
             var notification = _mapper.Map<NotificationViewModel>(notificationAuthorDto);
+
             await NotificationHub.SendNotificationToParticularUsersAsync(notification, userHubDto, watchers);
         }
     }
