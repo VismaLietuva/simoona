@@ -14,6 +14,8 @@ namespace Shrooms.Tests.ValidationAttributes
             public int Number { get; set; }
 
             public string MessageBody { get; set; }
+
+            public string PictureId { get; set; }
         }
 
         [Test]
@@ -24,7 +26,7 @@ namespace Shrooms.Tests.ValidationAttributes
             var validationContext = new ValidationContext(model);
             string testValue = null;
 
-            var attribute = new HasImageOrMessageBodyAttribute(nameof(Mock.Number));
+            var attribute = new HasImageOrMessageBodyAttribute(nameof(Mock.Number), nameof(Mock.PictureId));
 
             // Assert
             Assert.Throws<ArgumentException>(() => attribute.GetValidationResult(testValue, validationContext));
@@ -38,7 +40,7 @@ namespace Shrooms.Tests.ValidationAttributes
             var validationContext = new ValidationContext(model);
             var testValue = string.Empty;
 
-            var attribute = new HasImageOrMessageBodyAttribute(nameof(Mock.MessageBody));
+            var attribute = new HasImageOrMessageBodyAttribute(nameof(Mock.MessageBody), nameof(Mock.PictureId));
 
             // Assert
             Assert.Throws<ArgumentException>(() => attribute.GetValidationResult(testValue, validationContext));
@@ -55,7 +57,7 @@ namespace Shrooms.Tests.ValidationAttributes
             var validationContext = new ValidationContext(model);
             IEnumerable<string> testValue = null;
 
-            var attribute = new HasImageOrMessageBodyAttribute(nameof(Mock.MessageBody));
+            var attribute = new HasImageOrMessageBodyAttribute(nameof(Mock.MessageBody), nameof(Mock.PictureId));
 
             // Act
             var actual = attribute.GetValidationResult(testValue, validationContext);
@@ -77,7 +79,7 @@ namespace Shrooms.Tests.ValidationAttributes
                 "image"
             };
 
-            var attribute = new HasImageOrMessageBodyAttribute(nameof(Mock.MessageBody));
+            var attribute = new HasImageOrMessageBodyAttribute(nameof(Mock.MessageBody), nameof(Mock.PictureId));
 
             // Act
             var actual = attribute.GetValidationResult(testValue, validationContext);
@@ -94,7 +96,7 @@ namespace Shrooms.Tests.ValidationAttributes
             var validationContext = new ValidationContext(model);
             var testValue = new List<string>();
 
-            var attribute = new HasImageOrMessageBodyAttribute(nameof(Mock.MessageBody));
+            var attribute = new HasImageOrMessageBodyAttribute(nameof(Mock.MessageBody), nameof(Mock.PictureId));
 
             // Act
             var actual = attribute.GetValidationResult(testValue, validationContext);
@@ -115,7 +117,7 @@ namespace Shrooms.Tests.ValidationAttributes
                 "image"
             };
 
-            var attribute = new HasImageOrMessageBodyAttribute(nameof(Mock.MessageBody));
+            var attribute = new HasImageOrMessageBodyAttribute(nameof(Mock.MessageBody), nameof(Mock.PictureId));
 
             // Act
             var actual = attribute.GetValidationResult(testValue, validationContext);
@@ -139,7 +141,7 @@ namespace Shrooms.Tests.ValidationAttributes
                 "image"
             };
 
-            var attribute = new HasImageOrMessageBodyAttribute(nameof(Mock.MessageBody));
+            var attribute = new HasImageOrMessageBodyAttribute(nameof(Mock.MessageBody), nameof(Mock.PictureId));
 
             // Act
             var actual = attribute.GetValidationResult(testValue, validationContext);
