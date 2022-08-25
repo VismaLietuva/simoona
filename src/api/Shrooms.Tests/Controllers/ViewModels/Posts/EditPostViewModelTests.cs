@@ -100,6 +100,20 @@ namespace Shrooms.Tests.Controllers.ViewModels.Posts
             Assert.IsFalse(viewModel.IsValid());
         }
 
+        [Test]
+        public void NewInstance_WithoutMessageBodyAndEmptyImageCollectionButPictureIdIsSet_ReturnsTrue()
+        {
+            // Arrange
+            var viewModel = CreateValidViewModel();
+
+            viewModel.Images = null;
+            viewModel.MessageBody = null;
+            viewModel.PictureId = "id";
+
+            // Assert
+            Assert.IsTrue(viewModel.IsValid());
+        }
+
         private EditPostViewModel CreateValidViewModel()
         {
             return new EditPostViewModel
