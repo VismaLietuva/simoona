@@ -5,6 +5,7 @@ using Shrooms.Contracts.ViewModels.Wall.Posts;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.Presentation.WebViewModels.Models.PostModels;
 using Shrooms.Presentation.WebViewModels.Models.Wall.Posts.Comments;
+using System.Collections.Generic;
 
 namespace Shrooms.Presentation.ModelMappings.Profiles
 {
@@ -26,9 +27,11 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
         private void CreateViewModelToDtoMappings()
         {
             CreateMap<EditCommentViewModel, EditCommentDto>()
-                .IgnoreUserOrgDto();
+                .IgnoreUserOrgDto()
+                .ForMember(dest => dest.Images, opt => opt.MapFrom(u => u.PictureId != null ? new List<string> { u.PictureId } : u.Images));
             CreateMap<NewCommentViewModel, NewCommentDto>()
-                .IgnoreUserOrgDto();
+                .IgnoreUserOrgDto()
+                .ForMember(dest => dest.Images, opt => opt.MapFrom(u => u.PictureId != null ? new List<string> { u.PictureId } : u.Images));
             CreateMap<CommentPostViewModel, EditCommentDto>()
                 .IgnoreUserOrgDto();
             CreateMap<CommentPostViewModel, NewCommentDto>()

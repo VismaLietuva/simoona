@@ -3,6 +3,7 @@ using Shrooms.Contracts.DataTransferObjects.Models.Wall.Posts;
 using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Contracts.ViewModels.Wall.Posts;
 using Shrooms.Presentation.WebViewModels.Models.Wall.Posts;
+using System.Collections.Generic;
 
 namespace Shrooms.Presentation.ModelMappings.Profiles
 {
@@ -23,8 +24,11 @@ namespace Shrooms.Presentation.ModelMappings.Profiles
 
         private void CreateViewModelToDtoMappings()
         {
-            CreateMap<CreateWallPostViewModel, NewPostDto>();
-            CreateMap<EditPostViewModel, EditPostDto>();
+            CreateMap<CreateWallPostViewModel, NewPostDto>()
+                .ForMember(dest => dest.Images, opt => opt.MapFrom(u => u.PictureId != null ? new List<string> { u.PictureId } : u.Images));
+
+            CreateMap<EditPostViewModel, EditPostDto>()
+                .ForMember(dest => dest.Images, opt => opt.MapFrom(u => u.PictureId != null ? new List<string> { u.PictureId } : u.Images));
         }
     }
 }
