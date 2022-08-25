@@ -8,25 +8,37 @@ namespace Shrooms.Presentation.WebViewModels.ValidationAttributes.Walls
     /// Supports only IEnumerable<string>
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
-    public class HasImageOrMessageBodyAttribute : ValidationAttribute
+    public class HasImageOrMessageBodyAttribute : ValidationAttribute // Can modify here
     {
         private readonly string _messageBodyProperty;
+        private readonly string _pictureIdProperty;
 
-        public HasImageOrMessageBodyAttribute(string messageBodyProperty)
+        public HasImageOrMessageBodyAttribute(string messageBodyProperty, string pictureIdProperty)
         {
             _messageBodyProperty = messageBodyProperty;
+            _pictureIdProperty = pictureIdProperty;
         }
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            if (!TryGetMessageBodyValue(validationContext, out var messageBody))
+            if (!TryGetStringValueFromProperty(validationContext, _pictureIdProperty, out var pictureId))
             {
-                throw new ArgumentException($"Provided property is not of type {typeof(string)}");
+                throw new ArgumentException(GetErrorMessage(typeof(string)));
+            }
+
+            if (pictureId != null)
+            {
+                return ValidationResult.Success;
+            }
+
+            if (!TryGetStringValueFromProperty(validationContext, _messageBodyProperty, out var messageBody))
+            {
+                throw new ArgumentException(GetErrorMessage(typeof(string)));
             }
 
             if (!TryGetImagesValue(value, out var images))
             {
-                throw new ArgumentException($"Provided property is not of type {typeof(IEnumerable<string>)}");
+                throw new ArgumentException(GetErrorMessage(typeof(IEnumerable<string>)));
             }
 
             if (messageBody != null && images == null)
@@ -59,6 +71,11 @@ namespace Shrooms.Presentation.WebViewModels.ValidationAttributes.Walls
             return ValidationResult.Success;
         }
 
+        private string GetErrorMessage(Type type)
+        {
+            return $"Provided property is not of type {type}";
+        }
+
         private bool TryGetImagesValue(object value, out IEnumerable<string> images)
         {
             images = null;
@@ -78,30 +95,30 @@ namespace Shrooms.Presentation.WebViewModels.ValidationAttributes.Walls
             return true;
         }
 
-        private bool TryGetMessageBodyValue(ValidationContext validationContext, out string messageBody)
+        private bool TryGetStringValueFromProperty(ValidationContext validationContext, string property, out string s)
         {
-            messageBody = null;
+            s = null;
 
-            var messageBodyPropertyInfo = validationContext.ObjectType.GetProperty(_messageBodyProperty);
+            var propertyInfo = validationContext.ObjectType.GetProperty(property);
 
-            if (messageBodyPropertyInfo == null)
+            if (propertyInfo == null)
             {
                 return false;
             }
 
-            var messageBodyObject = messageBodyPropertyInfo.GetValue(validationContext.ObjectInstance);
+            var valueObject = propertyInfo.GetValue(validationContext.ObjectInstance);
 
-            if (messageBodyObject == null) // Cannot get type when object is null
+            if (valueObject == null) // Cannot get type when object is null
             {
                 return true;
             }
 
-            if (messageBodyObject is not string)
+            if (valueObject is not string)
             {
                 return false;
             }
 
-            messageBody = messageBodyObject as string;
+            s = valueObject as string;
 
             return true;
         }

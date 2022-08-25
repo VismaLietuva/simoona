@@ -13,9 +13,11 @@ namespace Shrooms.Presentation.WebViewModels.Models.Wall.Posts
         [Range(1, int.MaxValue)]
         public int WallId { get; set; }
 
-        [HasImageOrMessageBody(nameof(MessageBody))]
+        [HasImageOrMessageBody(nameof(MessageBody), nameof(PictureId))]
         public IEnumerable<string> Images { get; set; }
 
         public IEnumerable<string> MentionedUserIds { get; set; }
+
+        public string PictureId { get; set; }
     }
 }
