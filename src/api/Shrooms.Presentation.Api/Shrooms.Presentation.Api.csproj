@@ -288,10 +288,6 @@
       <HintPath>..\packages\RazorEngine.3.9.0\lib\net45\RazorEngine.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ReallySimpleFeatureToggle, Version=1.1.63.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ReallySimpleFeatureToggle.1.1.63.0\lib\net40\ReallySimpleFeatureToggle.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Swashbuckle.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cd1bb07a5ac7c7bc, processorArchitecture=MSIL">
       <HintPath>..\packages\Swashbuckle.Core.5.2.2\lib\net40\Swashbuckle.Core.dll</HintPath>
       <Private>True</Private>
@@ -474,7 +470,6 @@
     <Compile Include="Controllers\Wall\WallController.cs" />
     <Compile Include="Controllers\ExternalJobsController.cs" />
     <Compile Include="Controllers\Wall\WallWidgetsController.cs" />
-    <Compile Include="Filters\FeatureToggleAttribute.cs" />
     <Compile Include="Filters\HMACAuthenticationAttribute.cs" />
     <Compile Include="Filters\BasicAuthenticationAttribute.cs" />
     <Compile Include="Filters\IdentityBasicAuthenticationAttribute.cs" />
