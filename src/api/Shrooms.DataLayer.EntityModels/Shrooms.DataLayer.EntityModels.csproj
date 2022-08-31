@@ -113,7 +113,6 @@
     <Compile Include="Models\Kudos\KudosType.cs" />
     <Compile Include="Models\Language.cs" />
     <Compile Include="Models\Multiwall\Like.cs" />
-    <Compile Include="Models\Monitors\Monitor.cs" />
     <Compile Include="Models\Multiwall\LikesCollection.cs" />
     <Compile Include="Models\Multiwall\Wall.cs" />
     <Compile Include="Models\Multiwall\WallModerator.cs" />

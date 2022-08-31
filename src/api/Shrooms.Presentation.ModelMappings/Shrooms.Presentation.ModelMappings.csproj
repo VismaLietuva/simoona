@@ -73,7 +73,6 @@
     <Compile Include="Profiles\FilterPresets.cs" />
     <Compile Include="Profiles\Jobs.cs" />
     <Compile Include="Profiles\Likes.cs" />
-    <Compile Include="Profiles\Monitors.cs" />
     <Compile Include="Profiles\Notifications.cs" />
     <Compile Include="Profiles\Permissions.cs" />
     <Compile Include="Profiles\Projects.cs" />

@@ -96,8 +96,6 @@
     <Compile Include="Models\Jobs\NewJobTypeViewModel.cs" />
     <Compile Include="Models\Jobs\JobTypeViewModel.cs" />
     <Compile Include="Models\KudosTypes\NewKudosTypeViewModel.cs" />
-    <Compile Include="Models\Monitors\CreateMonitorViewModel.cs" />
-    <Compile Include="Models\Monitors\MonitorViewModel.cs" />
     <Compile Include="Models\Profile\JobPosition\JobPositionViewModel.cs" />
     <Compile Include="Models\Projects\ProjectDetailsViewModel.cs" />
     <Compile Include="Models\Projects\ProjectsBasicInfoViewModel.cs" />

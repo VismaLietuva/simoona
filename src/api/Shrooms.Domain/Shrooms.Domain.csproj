@@ -172,8 +172,6 @@
     <Compile Include="Services\Projects\ProjectsService.cs" />
     <Compile Include="Services\Support\SupportService.cs" />
     <Compile Include="Services\Support\ISupportService.cs" />
-    <Compile Include="Services\Monitors\IMonitorService.cs" />
-    <Compile Include="Services\Monitors\MonitorService.cs" />
     <Compile Include="Services\Roles\IRoleService.cs" />
     <Compile Include="Services\Roles\RoleService.cs" />
     <Compile Include="Services\DailyMailingService\IDailyMailingService.cs" />

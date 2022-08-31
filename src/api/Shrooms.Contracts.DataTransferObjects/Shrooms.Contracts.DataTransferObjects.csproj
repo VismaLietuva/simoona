@@ -123,7 +123,6 @@
     <Compile Include="Models\Kudos\UserKudosDto.cs" />
     <Compile Include="Models\Kudos\UserKudosInformationDto.cs" />
     <Compile Include="Models\Kudos\WallKudosLogDto.cs" />
-    <Compile Include="Models\Monitors\MonitorDto.cs" />
     <Compile Include="Models\Organizations\OrganizationDto.cs" />
     <Compile Include="Models\Permissions\PermissionDto.cs" />
     <Compile Include="Models\Permissions\PermissionGroupDto.cs" />

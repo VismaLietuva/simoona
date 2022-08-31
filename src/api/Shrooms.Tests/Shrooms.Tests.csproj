@@ -202,7 +202,6 @@
     <Compile Include="DomainService\EmployeeListingServiceTests.cs" />
     <Compile Include="DomainService\ExternalLinkServiceTests.cs" />
     <Compile Include="DomainService\AdministrationUsersServiceTests.cs" />
-    <Compile Include="DomainService\MonitorServiceTests.cs" />
     <Compile Include="DomainService\OrganizationServiceTest.cs" />
     <Compile Include="DomainService\PermissionServiceTest.cs" />
     <Compile Include="DomainService\RoleServiceTest.cs" />

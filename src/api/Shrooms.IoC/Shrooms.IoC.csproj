@@ -164,7 +164,6 @@
     <Compile Include="Modules\InfrastructureModule.cs" />
     <Compile Include="Modules\KudosBasketModule.cs" />
     <Compile Include="Modules\KudosModule.cs" />
-    <Compile Include="Modules\MonitorsModule.cs" />
     <Compile Include="Modules\RefreshTokenModule.cs" />
     <Compile Include="Modules\RoleModule.cs" />
     <Compile Include="Modules\WallModule.cs" />

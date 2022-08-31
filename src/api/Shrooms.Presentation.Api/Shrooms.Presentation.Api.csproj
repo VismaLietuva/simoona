@@ -441,7 +441,6 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\JobTypeController.cs" />
     <Compile Include="Controllers\ExternalLinkController.cs" />
-    <Compile Include="Controllers\Monitor\MonitorController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\UserDeprecatedController.cs" />

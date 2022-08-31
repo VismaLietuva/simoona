@@ -124,7 +124,6 @@
     <Compile Include="DAL\EntityTypeConfigurations\EventParticipantEntityConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\KudosBasketEntityConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\KudosLogEntityConfig.cs" />
-    <Compile Include="DAL\EntityTypeConfigurations\MonitorConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\NotifiationUserConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\NotificationConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\OrganizationEntityConfig.cs" />
