@@ -13,7 +13,6 @@ using Shrooms.Contracts.DataTransferObjects.Wall;
 using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
-using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.Premium.Constants;
@@ -34,7 +33,6 @@ namespace Shrooms.Premium.Domain.Services.Events
         private readonly IEventValidationService _eventValidationService;
         private readonly IEventParticipationService _eventParticipationService;
         private readonly IWallService _wallService;
-        private readonly IMarkdownConverter _markdownConverter;
         private readonly IOfficeMapService _officeMapService;
         private readonly DbSet<Event> _eventsDbSet;
         private readonly DbSet<EventType> _eventTypesDbSet;
@@ -43,13 +41,13 @@ namespace Shrooms.Premium.Domain.Services.Events
 
         private readonly IDbSet<Office> _officeDbSet;
 
-        public EventService(IUnitOfWork2 uow,
+        public EventService(
+            IUnitOfWork2 uow,
             IPermissionService permissionService,
             IEventUtilitiesService eventUtilitiesService,
             IEventValidationService eventValidationService,
             IEventParticipationService eventParticipationService,
             IWallService wallService,
-            IMarkdownConverter markdownConverter,
             IOfficeMapService officeMapService)
         {
             _uow = uow;
@@ -64,7 +62,6 @@ namespace Shrooms.Premium.Domain.Services.Events
             _eventValidationService = eventValidationService;
             _eventParticipationService = eventParticipationService;
             _wallService = wallService;
-            _markdownConverter = markdownConverter;
             _officeMapService = officeMapService;
         }
 
@@ -171,8 +168,6 @@ namespace Shrooms.Premium.Domain.Services.Events
             MapNewOptions(newEventDto, newEvent);
             await _uow.SaveChangesAsync(newEventDto.UserId);
 
-            newEvent.Description = _markdownConverter.ConvertToHtml(newEvent.Description);
-
             newEventDto.Id = newEvent.Id.ToString();
 
             return newEventDto;
@@ -214,8 +209,6 @@ namespace Shrooms.Premium.Domain.Services.Events
             UpdateEventOptions(eventDto, eventToUpdate);
 
             await _uow.SaveChangesAsync(false);
-
-            eventToUpdate.Description = _markdownConverter.ConvertToHtml(eventToUpdate.Description);
         }
 
         public async Task ToggleEventPinAsync(Guid id)

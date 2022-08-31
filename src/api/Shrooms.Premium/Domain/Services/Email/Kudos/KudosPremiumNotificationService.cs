@@ -3,11 +3,10 @@ using System.Data.Entity;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
-using Shrooms.Premium.Constants;
-using Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Premium.DataTransferObjects.Models.Kudos;
 
 namespace Shrooms.Premium.Domain.Services.Email.Kudos
@@ -39,14 +38,14 @@ namespace Shrooms.Premium.Domain.Services.Email.Kudos
             var kudosProfileUrl = _appSettings.KudosProfileUrl(organization.ShortName, kudosLog.EmployeeId);
             var subject = Resources.Models.Kudos.Kudos.EmailSubject;
 
-            var emailTemplateViewModel = new LoyaltyKudosReceivedDecreasedEmailTemplateViewModel(userNotificationSettingsUrl,
+            var emailTemplateViewModel = new LoyaltyKudosReceivedEmailTemplateViewModel(userNotificationSettingsUrl,
                 kudosLog.Points,
                 kudosLog.KudosTypeName,
                 organization.Name,
                 kudosLog.Comments,
                 kudosProfileUrl);
 
-            var body = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.LoyaltyKudosReceived);
+            var body = _mailTemplate.Generate(emailTemplateViewModel);
 
             await _mailingService.SendEmailAsync(new EmailDto(employee.Email, subject, body));
         }

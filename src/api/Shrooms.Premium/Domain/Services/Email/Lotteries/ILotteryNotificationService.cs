@@ -1,4 +1,4 @@
-﻿using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
+﻿using Shrooms.Contracts.DataTransferObjects.EmailTemplateDtos;
 using System.Threading.Tasks;
 
 namespace Shrooms.Premium.Domain.Services.Email.Lotteries

@@ -51,7 +51,7 @@ namespace Shrooms.Domain.Services.Email.AdministrationUsers
 
             var emailTemplateViewModel = new UserConfirmationEmailTemplateViewModel(userSettingsUrl, mainPageUrl, organizationNameAndContent.WelcomeEmail);
 
-            var body = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.UserConfirmation);
+            var body = _mailTemplate.Generate(emailTemplateViewModel);
 
             await _mailingService.SendEmailAsync(new EmailDto(userEmail, subject, body));
         }
@@ -76,7 +76,7 @@ namespace Shrooms.Domain.Services.Email.AdministrationUsers
 
             var emailTemplateViewModel = new NotificationAboutNewUserEmailTemplateViewModel(userSettingsUrl, newUserProfileUrl, newUser.FullName);
 
-            var body = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.NotificationAboutNewUser);
+            var body = _mailTemplate.Generate(emailTemplateViewModel);
 
             var emailDto = new EmailDto(userAdministrationEmails, subject, body);
             await _mailingService.SendEmailAsync(emailDto);
@@ -89,7 +89,7 @@ namespace Shrooms.Domain.Services.Email.AdministrationUsers
 
             var resetPasswordTemplateViewModel = new ResetPasswordTemplateViewModel(user.FullName, userSettingsUrl, resetUrl);
             var subject = string.Format(Resources.Common.UserResetPasswordEmailSubject);
-            var content = _mailTemplate.Generate(resetPasswordTemplateViewModel, EmailTemplateCacheKeys.ResetPassword);
+            var content = _mailTemplate.Generate(resetPasswordTemplateViewModel);
 
             await _mailingService.SendEmailAsync(new EmailDto(user.Email, subject, content));
         }
@@ -101,7 +101,7 @@ namespace Shrooms.Domain.Services.Email.AdministrationUsers
 
             var verifyEmailTemplateViewModel = new VerifyEmailTemplateViewModel(user.FullName, userSettingsUrl, verifyUrl);
             var subject = string.Format(Resources.Common.UserVerifyEmailSubject);
-            var content = _mailTemplate.Generate(verifyEmailTemplateViewModel, EmailTemplateCacheKeys.VerifyEmail);
+            var content = _mailTemplate.Generate(verifyEmailTemplateViewModel);
 
             await _mailingService.SendEmailAsync(new EmailDto(user.Email, subject, content));
         }

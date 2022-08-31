@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
-using System.Linq.Dynamic;
+using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Resources;
 using System.Threading.Tasks;

@@ -25,6 +25,7 @@ using Shrooms.Domain.Services.Projects;
 using Shrooms.Domain.Services.SyncTokens;
 using Shrooms.Domain.ServiceValidators.Validators.UserAdministration;
 using Shrooms.Infrastructure.Email;
+using Shrooms.Infrastructure.Email.Cache;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Infrastructure.Interceptors;
 using Shrooms.Infrastructure.Logger;
@@ -51,6 +52,10 @@ namespace Shrooms.IoC
 
             builder.RegisterAssemblyTypes(shroomsApi).Where(t => typeof(IBackgroundWorker).IsAssignableFrom(t)).InstancePerDependency().AsSelf();
             builder.RegisterType<AsyncRunner>().As<IAsyncRunner>().SingleInstance();
+            
+            // Email templates
+            builder.RegisterType<MailTemplateCache>().As<IMailTemplateCache>().SingleInstance();
+
             builder.RegisterWebApiModelBinderProvider();
             builder.RegisterWebApiFilterProvider(config);
             builder.RegisterAssemblyTypes(dataLayer);
@@ -74,7 +79,6 @@ namespace Shrooms.IoC
             builder.Register(_ => app.GetDataProtectionProvider()).InstancePerRequest();
             builder.RegisterType<PermissionService>().As<IPermissionService>().PropertiesAutowired().InstancePerRequest();
             builder.RegisterType<SyncTokenService>().As<ISyncTokenService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
-            builder.RegisterType<ImpersonateService>().As<IImpersonateService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<UserAdministrationValidator>().As<IUserAdministrationValidator>().InstancePerRequest();
             builder.RegisterType<OrganizationService>().As<IOrganizationService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<ProjectsService>().As<IProjectsService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
@@ -89,7 +93,6 @@ namespace Shrooms.IoC
             builder.RegisterModule(new RefreshTokenModule());
             builder.RegisterModule(new ExternalLinksModule());
             builder.RegisterModule(new RoleModule());
-            builder.RegisterModule(new MonitorsModule());
             builder.RegisterModule(new SupportModule());
             builder.RegisterModule(new AdministrationUsers());
             builder.RegisterModule(new JobModule());

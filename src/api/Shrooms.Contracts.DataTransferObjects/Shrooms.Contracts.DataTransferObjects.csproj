@@ -49,16 +49,34 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EmailTemplateDtos\LotteryStartedEmailDto.cs" />
+    <Compile Include="EmailTemplateDtos\LotteryStartedEmailUserInfoDto.cs" />
     <Compile Include="EmailTemplateViewModels\BirthdaysNotificationEmployeeViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\BirthdaysNotificationTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\BookReminderEmailTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\BookReportEmailTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\BookTakenEmailTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\CoacheeJoinedEventEmailTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\CoacheeLeftEventEmailTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\CommitteeSuggestionEmailTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\EventJoinRemindEmailTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\EventParticipantExpelledEmailTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\KudosDecreasedEmailTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\KudosReceivedDecreasedEmailTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\KudosReceivedEmailTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\KudosRejectedEmailTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\KudosSentEmailTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\LoyaltyKudosDecreasedEmailTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\LoyaltyKudosReceivedEmailTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\NewCommentEmailTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\NewMentionTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\NewWallPostEmailTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\NotificationAboutNewUserEmailTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\ResetPasswordTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\ServiceRequestCommentEmailTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\ServiceRequestEmailTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\ServiceRequestUpdateEmailTemplateViewModel.cs" />
+    <Compile Include="EmailTemplateViewModels\StartedLotteryEmailTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\UserConfirmationEmailTemplateViewModel.cs" />
     <Compile Include="EmailTemplateViewModels\VerifyEmailTemplateViewModel.cs" />
     <Compile Include="Models\Administration\AdministrationProjectDto.cs" />

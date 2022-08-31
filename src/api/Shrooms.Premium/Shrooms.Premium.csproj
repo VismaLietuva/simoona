@@ -177,16 +177,6 @@
       <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Contracts\bin\$(Configuration)\Shrooms.Contracts.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Shrooms.Presentation.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Presentation.Api\bin\Shrooms.Presentation.Api.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Shrooms.Domain, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Domain\bin\$(Configuration)\Shrooms.Domain.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Shrooms.DataLayer.EntityModels, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.DataLayer.EntityModels\bin\$(Configuration)\Shrooms.DataLayer.EntityModels.dll</HintPath>
@@ -195,11 +185,6 @@
     <Reference Include="Shrooms.Resources, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Resources\bin\$(Configuration)\Shrooms.Resources.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Shrooms.Infrastructure, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SimoonaCoreLocation)\src\api\Shrooms.Infrastructure\bin\$(Configuration)\Shrooms.Infrastructure.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -269,19 +254,6 @@
     <Compile Include="Constants\PremiumErrorCodes.cs" />
     <Compile Include="Constants\ServiceRequestConstants.cs" />
     <Compile Include="Constants\ValidationConstants.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\BookReminderEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\BookReportEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\BookTakenEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\CoacheeLeftEventEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\CoacheeJoinedEventEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\CommitteeSuggestionEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\StartedLotteryEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\EventJoinRemindEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\EventParticipantExpelledEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\KudosReceivedDecreasedEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\ServiceRequestCommentEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\ServiceRequestEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\ServiceRequestUpdateEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\ExternalBookInfo.cs" />
     <Compile Include="DataTransferObjects\Models\Books\BasicBookDto.cs" />
     <Compile Include="DataTransferObjects\Models\Books\BookDetails\BookDetailsAdministrationDto.cs" />
@@ -314,16 +286,9 @@
     <Compile Include="DataTransferObjects\Models\Committees\CommitteeMembersDto.cs" />
     <Compile Include="DataTransferObjects\Models\Committees\CommitteePostDto.cs" />
     <Compile Include="DataTransferObjects\Models\Committees\CommitteeSuggestionCreatedDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Committees\CommitteeSuggestionPostDto.cs" />
     <Compile Include="DataTransferObjects\Models\Committees\CommitteeSuggestionDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Committees\CommitteeSuggestionPostDto.cs" />
     <Compile Include="DataTransferObjects\Models\Committees\CommitteeViewDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventFilteredArgsDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventParticipantsReportListingArgsDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventParticipantVisitedEventsListingArgsDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventProjectReportDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventReportDetailsDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventReportListingArgsDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventVisitedReportDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\CreateEventDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\CreateEventTypeDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EditEventDto.cs" />
@@ -333,6 +298,7 @@
     <Compile Include="DataTransferObjects\Models\Events\EventDetailsOptionDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventDetailsParticipantDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventEditDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\EventFilteredArgsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventJoinDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventJoinResultDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventJoinValidationDto.cs" />
@@ -342,9 +308,15 @@
     <Compile Include="DataTransferObjects\Models\Events\EventOptionDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventOptionsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventParticipantDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\EventParticipantReportDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\EventParticipantsReportListingArgsDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\EventParticipantVisitedEventsListingArgsDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\EventProjectReportDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\EventReportDetailsDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\EventReportListingArgsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventTypeDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventUserSearchResultDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventParticipantReportDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\EventVisitedReportDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\MyEventsOptionsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\NewEventOptionDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\UpdateAttendStatusDto.cs" />
@@ -355,15 +327,13 @@
     <Compile Include="DataTransferObjects\Models\LazyPaged\ILazyPaged.cs" />
     <Compile Include="DataTransferObjects\Models\LazyPaged\LazyPaged.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\BuyLotteryTicketsDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Lotteries\LotteryDetailsBuyerDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Lotteries\LotteryDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\EditStartedLotteryDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Lotteries\LotteryDetailsBuyerDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryDetailsDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Lotteries\LotteryDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryListingArgsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryParticipantDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryRefundParticipantDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Lotteries\LotteryStartedEmailDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Lotteries\LotteryStartedEmailUserInfoDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryStatsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryStatusDto.cs" />
     <Compile Include="DataTransferObjects\Models\Lotteries\LotteryTicketReceiverDto.cs" />
@@ -471,7 +441,6 @@
     <Compile Include="Domain\Services\WebHookCallbacks\LoyaltyKudos\LoyaltyKudosCalculator.cs" />
     <Compile Include="Domain\Services\WebHookCallbacks\LoyaltyKudos\LoyaltyKudosService.cs" />
     <Compile Include="Domain\Services\WebHookCallbacks\WebHookCallbackPremiumServices.cs" />
-    <Compile Include="EmailTemplates\EmailPremiumTemplatesCompiler.cs" />
     <Compile Include="Infrastructure\GoogleBookApiService\GoogleBookService.cs" />
     <Compile Include="Infrastructure\GoogleBookApiService\IBookInfoService.cs" />
     <Compile Include="Infrastructure\VacationBot\IVacationBotService.cs" />
@@ -628,15 +597,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <Content Include="EmailTemplates\Events\CoacheeJoinedEvent.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="EmailTemplates\Events\CoacheeLeftEvent.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <None Include="EmailTemplates\Lotteries\StartedLottery.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -644,41 +604,27 @@
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="EmailTemplates\Books\BookRemind.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="EmailTemplates\Books\BookReport.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="EmailTemplates\Books\BookTaken.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="EmailTemplates\Committees\CommitteesSuggestion.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="EmailTemplates\Events\ParticipantExpelled.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="EmailTemplates\Events\RemindToJoin.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="EmailTemplates\LoyaltyKudos\LoyaltyKudosDecreased.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="EmailTemplates\LoyaltyKudos\LoyaltyKudosReceived.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="EmailTemplates\ServiceRequests\NewServiceRequest.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="EmailTemplates\ServiceRequests\ServiceRequestComment.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="EmailTemplates\ServiceRequests\UpdateServiceRequest.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <ProjectReference Include="..\Shrooms.Contracts.DataTransferObjects\Shrooms.Contracts.DataTransferObjects.csproj">
+      <Project>{6611930d-880e-455c-8681-e0e2a33cf5a9}</Project>
+      <Name>Shrooms.Contracts.DataTransferObjects</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Shrooms.Domain\Shrooms.Domain.csproj">
+      <Project>{f75814b0-ade3-4e55-b44d-2ee966c41344}</Project>
+      <Name>Shrooms.Domain</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Shrooms.Infrastructure\Shrooms.Infrastructure.csproj">
+      <Project>{d9c5606d-3855-44a0-bdb3-98d963d63fcf}</Project>
+      <Name>Shrooms.Infrastructure</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Shrooms.Presentation.Api\Shrooms.Presentation.Api.csproj">
+      <Project>{D92E5D79-8D6B-410F-B9FC-0FCE46FBC116}</Project>
+      <Name>Shrooms.Presentation.Api</Name>
+      <Private>False</Private>
+    </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="RecycleWebapp" BeforeTargets="Clean" Condition=" '$(Configuration)|$(Platform)' != 'Release|AnyCPU' ">
     <Message Text="Recycling web app..." Importance="High" />

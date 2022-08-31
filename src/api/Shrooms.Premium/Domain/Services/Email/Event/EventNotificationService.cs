@@ -5,13 +5,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Contracts.DataTransferObjects.Users;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Services.Organizations;
-using Shrooms.Premium.Constants;
-using Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 
 namespace Shrooms.Premium.Domain.Services.Email.Event
@@ -51,7 +50,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             var eventUrl = _appSettings.EventUrl(organization.ShortName, eventId.ToString());
 
             var emailTemplateViewModel = new EventParticipantExpelledEmailTemplateViewModel(userNotificationSettingsUrl, eventName, eventUrl);
-            var emailBody = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.EventParticipantExpelled);
+            var emailBody = _mailTemplate.Generate(emailTemplateViewModel);
 
             await _mailingService.SendEmailAsync(new EmailDto(emails, Resources.Models.Events.Events.ResetParticipantListEmailSubject, emailBody));
         }
@@ -68,7 +67,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                 emailTemplateViewModel.EventTypes.Add(eventType.Name, _appSettings.EventListByTypeUrl(organization.ShortName, eventType.Id.ToString()));
             }
 
-            var emailBody = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.EventJoinRemind);
+            var emailBody = _mailTemplate.Generate(emailTemplateViewModel);
             await _mailingService.SendEmailAsync(new EmailDto(emails, $"Join weekly event now", emailBody));
         }
 
@@ -92,7 +91,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                     userAttendStatusDto,
                     eventUrl);
 
-                var emailLeaveBody = _mailTemplate.Generate(emailTemplateLeaveViewModel, EmailPremiumTemplateCacheKeys.CoacheeLeftEvent);
+                var emailLeaveBody = _mailTemplate.Generate(emailTemplateLeaveViewModel);
 
                 var emailLeaveSubject = string.Format(Resources.Models.Events.Events.CoacheeLeftEventEmailSubject,
                     userAttendStatusDto.FullName, userAttendStatusDto.EventName);
@@ -107,7 +106,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                 userAttendStatusDto,
                 eventUrl);
 
-            var emailJoinBody = _mailTemplate.Generate(emailTemplateJoinViewModel, EmailPremiumTemplateCacheKeys.CoacheeJoinedEvent);
+            var emailJoinBody = _mailTemplate.Generate(emailTemplateJoinViewModel);
 
             var emailJoinSubject = string.Format(Resources.Models.Events.Events.CoacheeJoinedEventEmailSubject,
                 userAttendStatusDto.FullName, userAttendStatusDto.EventName);

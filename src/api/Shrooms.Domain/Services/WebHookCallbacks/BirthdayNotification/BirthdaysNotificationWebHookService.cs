@@ -64,7 +64,7 @@ namespace Shrooms.Domain.Services.WebHookCallbacks.BirthdayNotification
             var receivers = await _roleService.GetAdministrationRoleEmailsAsync(currentOrganization.Id);
             var model = new BirthdaysNotificationTemplateViewModel(GetFormattedEmployeesList(employees, organizationName, currentOrganization.ShortName),
                 _appSettings.UserNotificationSettingsUrl(organizationName));
-            var content = _mailTemplate.Generate(model, EmailTemplateCacheKeys.BirthdaysNotification);
+            var content = _mailTemplate.Generate(model);
             var emailData = new EmailDto(receivers, Resources.Emails.Templates.BirthdaysNotificationEmailSubject, content);
 
             await _mailingService.SendEmailAsync(emailData);

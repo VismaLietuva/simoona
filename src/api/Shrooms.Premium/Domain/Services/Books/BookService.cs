@@ -9,6 +9,7 @@ using MoreLinq;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -16,9 +17,7 @@ using Shrooms.DataLayer.EntityModels.Models.Books;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.Roles;
 using Shrooms.Domain.Services.UserService;
-using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects;
-using Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Premium.DataTransferObjects.Models;
 using Shrooms.Premium.DataTransferObjects.Models.Books;
 using Shrooms.Premium.DataTransferObjects.Models.Books.BookDetails;
@@ -272,7 +271,7 @@ namespace Shrooms.Premium.Domain.Services.Books
             var bookReportTemplateViewModel = new BookReportEmailTemplateViewModel(reportedOfficeBook.Book.Title, reportedOfficeBook.Book.Author,
                 bookReport.Report, bookReport.Comment, bookUrl, user.FullName, userNotificationSettingsUrl);
 
-            var content = _mailTemplate.Generate(bookReportTemplateViewModel, EmailPremiumTemplateCacheKeys.BookReport);
+            var content = _mailTemplate.Generate(bookReportTemplateViewModel);
             var emailData = new EmailDto(receivers, subject, content);
 
             await _mailingService.SendEmailAsync(emailData);

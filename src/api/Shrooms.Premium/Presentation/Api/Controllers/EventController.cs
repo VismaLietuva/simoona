@@ -13,8 +13,6 @@ using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.ViewModels.Wall.Posts;
 using Shrooms.Domain.Services.Wall.Posts;
-using Shrooms.Premium.DataTransferObjects.Models.Events;
-using Shrooms.Premium.DataTransferObjects.Models.OfficeMap;
 using Shrooms.Premium.Domain.DomainExceptions.Event;
 using Shrooms.Premium.Domain.Services.Events;
 using Shrooms.Premium.Domain.Services.Events.Calendar;
@@ -30,6 +28,8 @@ using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.Api.Filters;
 using X.PagedList;
 using Shrooms.Domain.Extensions;
+using Shrooms.Premium.DataTransferObjects.Models.Events;
+using Shrooms.Premium.DataTransferObjects.Models.OfficeMap;
 
 namespace Shrooms.Premium.Presentation.Api.Controllers
 {
@@ -193,7 +193,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             try
             {
                 await _eventService.UpdateEventAsync(eventDto);
-            }
+            } 
             catch (EventException e)
             {
                 return BadRequest(e.Message);

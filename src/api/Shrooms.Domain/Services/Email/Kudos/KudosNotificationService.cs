@@ -53,7 +53,8 @@ namespace Shrooms.Domain.Services.Email.Kudos
                 kudosLog.RejectionMessage,
                 kudosProfileUrl);
 
-            var body = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.KudosRejected);
+            var body = _mailTemplate.Generate(emailTemplateViewModel);
+
             await _mailingService.SendEmailAsync(new EmailDto(emailRecipient.Email, subject, body));
         }
 
@@ -69,13 +70,15 @@ namespace Shrooms.Domain.Services.Email.Kudos
             var kudosProfileUrl = _appSettings.KudosProfileUrl(organizationName, kudosDto.ReceivingUser.Id);
             var subject = Resources.Models.Kudos.Kudos.EmailSubject;
 
-            var emailTemplateViewModel = new KudosSentEmailTemplateViewModel(userNotificationSettingsUrl,
+            var emailTemplateViewModel = new KudosSentEmailTemplateViewModel(
+                userNotificationSettingsUrl,
                 kudosDto.SendingUser.FullName,
                 kudosDto.TotalKudosPointsInLog,
                 kudosDto.KudosLog.Comment,
                 kudosProfileUrl);
 
-            var body = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.KudosSent);
+            var body = _mailTemplate.Generate(emailTemplateViewModel);
+
             await _mailingService.SendEmailAsync(new EmailDto(recipient, subject, body));
         }
 
@@ -87,14 +90,16 @@ namespace Shrooms.Domain.Services.Email.Kudos
             var kudosProfileUrl = _appSettings.KudosProfileUrl(organizationName, kudosLog.EmployeeId);
             var subject = Resources.Models.Kudos.Kudos.EmailSubject;
 
-            var emailTemplateViewModel = new KudosReceivedDecreasedEmailTemplateViewModel(userNotificationSettingsUrl,
+            var emailTemplateViewModel = new KudosReceivedEmailTemplateViewModel(
+                userNotificationSettingsUrl,
                 kudosLog.Points,
                 kudosLog.KudosTypeName,
                 sendingUserFullName ?? BusinessLayerConstants.DeletedUserName,
                 kudosLog.Comments,
                 kudosProfileUrl);
 
-            var body = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.KudosReceived);
+            var body = _mailTemplate.Generate(emailTemplateViewModel);
+
             await _mailingService.SendEmailAsync(new EmailDto(kudosLog.Employee.Email, subject, body));
         }
 
@@ -106,14 +111,15 @@ namespace Shrooms.Domain.Services.Email.Kudos
             var kudosProfileUrl = _appSettings.KudosProfileUrl(organizationName, kudosLog.EmployeeId);
             var subject = Resources.Models.Kudos.Kudos.MinusKudosEmailSubject;
 
-            var emailTemplateViewModel = new KudosReceivedDecreasedEmailTemplateViewModel(userNotificationSettingsUrl,
+            var emailTemplateViewModel = new KudosDecreasedEmailTemplateViewModel(
+                userNotificationSettingsUrl,
                 kudosLog.Points,
                 kudosLog.KudosTypeName,
                 sendingUserFullName ?? BusinessLayerConstants.DeletedUserName,
                 kudosLog.Comments,
                 kudosProfileUrl);
 
-            var body = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.KudosDecreased);
+            var body = _mailTemplate.Generate(emailTemplateViewModel);
 
             await _mailingService.SendEmailAsync(new EmailDto(kudosLog.Employee.Email, subject, body));
         }

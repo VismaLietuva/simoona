@@ -34,7 +34,6 @@ namespace Shrooms.Domain.Services.Email.Posting
         private readonly IApplicationSettings _appSettings;
         private readonly IOrganizationService _organizationService;
         private readonly IPostService _postService;
-        private readonly IMarkdownConverter _markdownConverter;
 
         private readonly IDbSet<Event> _eventsDbSet;
         private readonly IDbSet<Project> _projectsDbSet;
@@ -48,7 +47,6 @@ namespace Shrooms.Domain.Services.Email.Posting
             IMailingService mailingService,
             IApplicationSettings appSettings,
             IOrganizationService organizationService,
-            IMarkdownConverter markdownConverter,
             IPostService postService)
         {
             _appSettings = appSettings;
@@ -57,7 +55,6 @@ namespace Shrooms.Domain.Services.Email.Posting
             _mailTemplate = mailTemplate;
             _mailingService = mailingService;
             _organizationService = organizationService;
-            _markdownConverter = markdownConverter;
             _postService = postService;
 
             _eventsDbSet = uow.GetDbSet<Event>();
@@ -112,8 +109,6 @@ namespace Shrooms.Domain.Services.Email.Posting
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organizationShortName);
             var postUrl = _appSettings.WallPostUrl(organizationShortName, postId);
 
-            var messageBody = _markdownConverter.ConvertToHtml(comment);
-
             foreach (var mentionedUser in mentionedUsers)
             {
                 var newMentionTemplateViewModel = new NewMentionTemplateViewModel(
@@ -122,9 +117,9 @@ namespace Shrooms.Domain.Services.Email.Posting
                     commentAuthorFullName,
                     postUrl,
                     userNotificationSettingsUrl,
-                    messageBody);
+                    comment);
 
-                var content = _mailTemplate.Generate(newMentionTemplateViewModel, EmailTemplateCacheKeys.NewMention);
+                var content = _mailTemplate.Generate(newMentionTemplateViewModel);
 
                 var emailData = new EmailDto(mentionedUser.Email, Comments.NewMentionEmailSubject, content);
                 
@@ -141,17 +136,16 @@ namespace Shrooms.Domain.Services.Email.Posting
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
 
             var subject = string.Format(Templates.NewPostCommentEmailSubject, CutMessage(comment.Post.MessageBody), commentAuthor.FullName);
-            var body = _markdownConverter.ConvertToHtml(comment.MessageBody);
 
             var emailTemplateViewModel = new NewCommentEmailTemplateViewModel(string.Format(EmailTemplates.PostCommentTitle, CutMessage(comment.Post.MessageBody)),
                 authorPictureUrl,
                 commentAuthor.FullName,
                 postLink,
-                body,
+                comment.MessageBody,
                 userNotificationSettingsUrl,
                 EmailTemplates.DefaultActionButtonTitle);
 
-            var content = _mailTemplate.Generate(emailTemplateViewModel, EmailTemplateCacheKeys.NewPostComment);
+            var content = _mailTemplate.Generate(emailTemplateViewModel);
             var emailData = new EmailDto(emails, subject, content);
 
             await _mailingService.SendEmailAsync(emailData);

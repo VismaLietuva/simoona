@@ -19,7 +19,6 @@ namespace Shrooms.Tests.ModelMappings
                 cfg.AddProfile<Walls>();
                 cfg.AddProfile<Other>();
                 cfg.AddProfile<ExternalLinks>();
-                cfg.AddProfile<Monitors>();
                 cfg.AddProfile<Roles>();
                 cfg.AddProfile<Permissions>();
                 cfg.AddProfile<Projects>();

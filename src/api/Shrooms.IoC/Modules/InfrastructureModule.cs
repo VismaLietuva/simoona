@@ -2,15 +2,13 @@
 using Autofac;
 using Autofac.Core.Lifetime;
 using Hangfire;
-using ReallySimpleFeatureToggle;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
-using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.DailyMailingService;
 using Shrooms.Infrastructure.Configuration;
 using Shrooms.Infrastructure.CustomCache;
 using Shrooms.Infrastructure.Email;
-using Shrooms.Infrastructure.Email.Templating;
+using Shrooms.Infrastructure.Email.Templates;
 using Shrooms.Infrastructure.ExcelGenerator;
 using Shrooms.Infrastructure.FireAndForget;
 using Shrooms.Infrastructure.Interceptors;
@@ -27,7 +25,7 @@ namespace Shrooms.IoC.Modules
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterType<Logger>().As<ILogger>().InstancePerMatchingLifetimeScope(AutofacJobActivator.LifetimeScopeTag, MatchingScopeLifetimeTags.RequestLifetimeScopeTag);
-            builder.RegisterType<CommonMarkMarkdownConverter>().As<IMarkdownConverter>().InstancePerRequest();
+            
             builder.RegisterType<MailingService>().As<IMailingService>()
                 .InstancePerMatchingLifetimeScope(AutofacJobActivator.LifetimeScopeTag, MatchingScopeLifetimeTags.RequestLifetimeScopeTag)
                 .EnableInterfaceTelemetryInterceptor();
@@ -42,7 +40,6 @@ namespace Shrooms.IoC.Modules
             builder.RegisterType<MailTemplate>().As<IMailTemplate>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<DailyMailingService>().As<IDailyMailingService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<HangFireScheduler>().As<IJobScheduler>().InstancePerRequest();
-            builder.Register(_ => ReallySimpleFeature.Toggles.GetFeatureConfiguration()).As<IFeatureConfiguration>().SingleInstance();
 
             RegisterStorage(builder);
         }

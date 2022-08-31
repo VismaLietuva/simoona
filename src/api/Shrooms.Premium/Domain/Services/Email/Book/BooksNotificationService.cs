@@ -3,11 +3,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
-using Shrooms.Premium.Constants;
-using Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Premium.DataTransferObjects.Models.Books;
 
 namespace Shrooms.Premium.Domain.Services.Email.Book
@@ -48,7 +47,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Book
             var bookUrl = _appSettings.BookUrl(organizationName, takenBook.BookOfficeId, takenBook.OfficeId);
 
             var emailTemplateViewModel = new BookTakenEmailTemplateViewModel(userNotificationSettingsUrl, takenBook.Title, takenBook.Author, bookUrl);
-            var body = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.BookTaken);
+            var body = _mailTemplate.Generate(emailTemplateViewModel);
 
             await _mailingService.SendEmailAsync(new EmailDto(userEmail, subject, body));
         }

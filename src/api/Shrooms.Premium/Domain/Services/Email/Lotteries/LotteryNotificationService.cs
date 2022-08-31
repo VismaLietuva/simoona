@@ -4,14 +4,13 @@ using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Services.Organizations;
-using Shrooms.Premium.Constants;
-using Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels;
-using Shrooms.Premium.DataTransferObjects.Models.Lotteries;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Resources.Models.Lotteries;
 using System;
+using Shrooms.Contracts.DataTransferObjects.EmailTemplateDtos;
+using Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels;
 
 namespace Shrooms.Premium.Domain.Services.Email.Lotteries
 {
@@ -67,7 +66,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Lotteries
                 var zonedDate = TimeZoneInfo.ConvertTimeFromUtc(startedDto.EndDate, timeZone);
 
                 var emailTemplateViewModel = new StartedLotteryEmailTemplateViewModel(startedDto, lotteryUrl, zonedDate, userNotificationSettingsUrl);
-                var emailBody = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.StartedLottery);
+                var emailBody = _mailTemplate.Generate(emailTemplateViewModel);
                 
                 var userEmails = emailGroup.Select(info => info.Email);
 

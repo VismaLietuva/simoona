@@ -4,11 +4,10 @@ using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
-using Shrooms.Premium.Constants;
-using Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Premium.DataTransferObjects.Models.ServiceRequest;
 using ServiceRequestModel = Shrooms.DataLayer.EntityModels.Models.ServiceRequest;
 
@@ -60,7 +59,7 @@ namespace Shrooms.Premium.Domain.Services.Email.ServiceRequest
                 await GetUserFullNameAsync(newServiceRequest.EmployeeId),
                 serviceRequestUrl);
 
-            var body = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.ServiceRequest);
+            var body = _mailTemplate.Generate(emailTemplateViewModel);
 
             await _mailingService.SendEmailAsync(new EmailDto(emails, subject, body));
         }
@@ -90,7 +89,7 @@ namespace Shrooms.Premium.Domain.Services.Email.ServiceRequest
                 createdComment.CommentContent,
                 serviceRequestUrl);
 
-            var body = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.ServiceRequestComment);
+            var body = _mailTemplate.Generate(emailTemplateViewModel);
 
             await _mailingService.SendEmailAsync(new EmailDto(emails, subject, body));
         }
@@ -110,7 +109,7 @@ namespace Shrooms.Premium.Domain.Services.Email.ServiceRequest
 
             if (email == null)
             {
-                return;
+                return; 
             }
 
             var subject = Resources.Common.ServiceRequestAdminChangedStatusSubject;
@@ -123,7 +122,7 @@ namespace Shrooms.Premium.Domain.Services.Email.ServiceRequest
                 newStatusName,
                 serviceRequestUrl);
 
-            var body = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.ServiceRequestUpdate);
+            var body = _mailTemplate.Generate(emailTemplateViewModel);
 
             await _mailingService.SendEmailAsync(new EmailDto(email, subject, body));
         }

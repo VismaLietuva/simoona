@@ -311,6 +311,9 @@
       <HintPath>..\packages\System.Linq.Dynamic.1.0.6\lib\net40\System.Linq.Dynamic.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Linq.Dynamic.Core, Version=1.2.19.0, Culture=neutral, PublicKeyToken=0f07ec44de6ac832, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Linq.Dynamic.Core.1.2.19\lib\net46\System.Linq.Dynamic.Core.dll</HintPath>
+    </Reference>
     <Reference Include="System.Management" />
     <Reference Include="System.Net" />
     <Reference Include="System.Net.Http" />
@@ -442,7 +445,6 @@
     <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\UserDeprecatedController.cs" />
-    <Compile Include="Controllers\UserDeprecatedController.Impersonation.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\CertificateController.cs" />
     <Compile Include="Controllers\CommentController.cs" />

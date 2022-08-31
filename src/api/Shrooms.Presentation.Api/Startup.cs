@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Configuration;
-using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Cors;
@@ -20,6 +18,7 @@ using Owin;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.Infrastructure.Configuration;
+using Shrooms.Infrastructure.Email;
 using Shrooms.IoC;
 using Shrooms.Presentation.Api;
 using Shrooms.Presentation.Api.App_Start;
@@ -54,8 +53,9 @@ namespace Shrooms.Presentation.Api
 
             var container = IocBootstrapper.Bootstrap(app, ExtractConnString, config);
             config.DependencyResolver = new AutofacWebApiDependencyResolver(container);
-            GlobalHost.DependencyResolver = new Autofac.Integration.SignalR.AutofacDependencyResolver(container);
 
+            GlobalHost.DependencyResolver = new Autofac.Integration.SignalR.AutofacDependencyResolver(container);
+            
             ConfigureEmailTemplates();
 
             StartBackgroundWorker(app);
@@ -141,29 +141,10 @@ namespace Shrooms.Presentation.Api
 
         private static void ConfigureEmailTemplates()
         {
-            try
-            {
-                var type = typeof(IEmailTemplateCompiler);
-                var templateCompilerTypes = AppDomain.CurrentDomain.GetAssemblies()
-                    .SelectMany(s => s.GetTypes())
-                    .Where(p => p.IsClass && type.IsAssignableFrom(p));
+            var mailTemplateCache = GlobalHost.DependencyResolver.GetService(typeof(IMailTemplateCache)) as IMailTemplateCache;
+            var emailTemplateCompiler = new EmailTemplateCompiler(mailTemplateCache, AppDomain.CurrentDomain.BaseDirectory);
 
-                foreach (var templateCompilerType in templateCompilerTypes)
-                {
-                    var templateCompiler = Activator.CreateInstance(templateCompilerType) as IEmailTemplateCompiler;
-                    templateCompiler?.Register(AppDomain.CurrentDomain.BaseDirectory);
-                }
-            }
-            catch (ReflectionTypeLoadException ex)
-            {
-                var exceptions = ex.LoaderExceptions
-                    .Select(x => x.ToString())
-                    .Distinct()
-                    .Select(x => $"{x}");
-
-                var message = $"Failed to load assemblies.{Environment.NewLine}{string.Join(Environment.NewLine, exceptions)}";
-                throw new Exception(message);
-            }
+            emailTemplateCompiler.Register();
         }
 
         private static void ConfigureTelemetry()

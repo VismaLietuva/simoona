@@ -51,7 +51,6 @@ namespace Shrooms.Premium.Tests.DomainService
 
             var eventParticipationService = Substitute.For<IEventParticipationService>();
             var eventUtilitiesService = Substitute.For<IEventUtilitiesService>();
-            var markdownConverter = Substitute.For<IMarkdownConverter>();
 
             _eventService = new EventService(_uow,
                 _permissionService,
@@ -59,7 +58,6 @@ namespace Shrooms.Premium.Tests.DomainService
                 _eventValidationService,
                 eventParticipationService,
                 _wallService,
-                markdownConverter,
                 _officeMapService);
         }
 

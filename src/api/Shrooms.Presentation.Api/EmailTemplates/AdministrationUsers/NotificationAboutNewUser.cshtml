@@ -1,10 +1,4 @@
-﻿@using Shrooms.Contracts.Constants
-@model Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels.NotificationAboutNewUserEmailTemplateViewModel
-
-@{
-    Layout = EmailTemplateCacheKeys.HeaderFooterLayout;
-}
-<tr>
+﻿<tr>
     <td align="center">
         <table align="center" border="0" cellpadding="0" cellspacing="0">
             <tbody>
@@ -25,7 +19,7 @@
             <tbody>
                 <tr>
                     <td style="padding-left: 15px; padding-top: 15px; padding-right: 15px; max-width: 600px;">
-                        <p style="color: #282828; font-family: 'Segoe UI',Helvetica,Arial,sans-serif; text-align: center; font-size:14px; font-weight: 400; margin: 0 0 0 0;">New user "@Model.NewUserName"</p>
+                        <p style="color: #282828; font-family: 'Segoe UI',Helvetica,Arial,sans-serif; text-align: center; font-size:14px; font-weight: 400; margin: 0 0 0 0;">New user "@HtmlEncode(@Model.NewUserName)"</p>
                         <p style="color: #282828; font-family: 'Segoe UI',Helvetica,Arial,sans-serif; text-align: center; font-size:14px; font-weight: 400; margin: 0 0 0 0; padding-bottom:15px">has filled out necessary information and is waiting to be confirmed</p>
                     </td>
                 </tr>

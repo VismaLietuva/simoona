@@ -19,6 +19,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Shrooms.Domain.Extensions;
 using X.PagedList;
+using Shrooms.Contracts.DataTransferObjects.EmailTemplateDtos;
 
 namespace Shrooms.Premium.Domain.Services.Lotteries
 {
@@ -35,7 +36,8 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
         private readonly DbSet<Lottery> _lotteriesDbSet;
         private readonly DbSet<LotteryParticipant> _participantsDbSet;
 
-        public LotteryService(IUnitOfWork2 uow,
+        public LotteryService(
+            IUnitOfWork2 uow,
             ILotteryParticipantService participantService,
             IUserService userService,
             IKudosService kudosService,

@@ -18,7 +18,6 @@ using Shrooms.DataLayer.EntityModels.Models.Committee;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.DataLayer.EntityModels.Models.Lottery;
-using Shrooms.DataLayer.EntityModels.Models.Monitors;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.DataLayer.EntityModels.Models.Notifications;
 
@@ -120,8 +119,6 @@ namespace Shrooms.DataLayer.DAL
 
         public virtual DbSet<ExternalLink> ExternalLinks { get; set; }
 
-        public virtual DbSet<Monitor> Monitors { get; set; }
-
         public virtual DbSet<JobPosition> JobPosition { get; set; }
 
         public virtual DbSet<Project> Projects { get; set; }
@@ -217,7 +214,6 @@ namespace Shrooms.DataLayer.DAL
             modelBuilder.Configurations.Add(new WallModeratorsConfiguration());
             modelBuilder.Configurations.Add(new PostEntityConfig());
             modelBuilder.Configurations.Add(new ExternalLinkConfig());
-            modelBuilder.Configurations.Add(new MonitorConfig());
             modelBuilder.Configurations.Add(new NotificationConfig());
             modelBuilder.Configurations.Add(new NotifiationUserConfig());
             modelBuilder.Configurations.Add(new PostWatcherConfig());

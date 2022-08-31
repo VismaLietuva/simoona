@@ -2,7 +2,7 @@
 using Shrooms.Contracts.Infrastructure;
 using System;
 using System.Linq;
-using System.Linq.Dynamic;
+using System.Linq.Dynamic.Core;
 using System.Reflection;
 
 namespace Shrooms.Domain.Extensions

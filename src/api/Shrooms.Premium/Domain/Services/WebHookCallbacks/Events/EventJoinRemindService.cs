@@ -16,7 +16,8 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
         private readonly IEventNotificationService _eventNotificationService;
         private readonly IOrganizationService _organizationService;
 
-        public EventJoinRemindService(INotificationService notificationService,
+        public EventJoinRemindService(
+            INotificationService notificationService,
             IEventUtilitiesService eventUtilitiesService,
             IUserEventsService userEventsService,
             IEventNotificationService eventNotificationService,

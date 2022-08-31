@@ -22,7 +22,6 @@ using Shrooms.Domain.Services.Wall.Posts.Comments;
 
 namespace Shrooms.Domain.Services.Wall.Posts
 {
-
     public class PostService : IPostService
     {
         private static readonly SemaphoreSlim _postDeleteLock = new SemaphoreSlim(1, 1);

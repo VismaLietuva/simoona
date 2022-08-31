@@ -5,13 +5,12 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models.Books;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.UserService;
-using Shrooms.Premium.Constants;
-using Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Premium.DataTransferObjects.Models.Books;
 
 namespace Shrooms.Premium.Domain.Services.Books
@@ -64,7 +63,7 @@ namespace Shrooms.Premium.Domain.Services.Books
                     var formattedDate = $"{bookToRemind.TakenFrom:D}";
 
                     var bookRemindTemplateViewModel = new BookReminderEmailTemplateViewModel(bookToRemind.Title, bookToRemind.Author, formattedDate, bookUrl, user.FullName, userNotificationSettingsUrl);
-                    var content = _mailTemplate.Generate(bookRemindTemplateViewModel, EmailPremiumTemplateCacheKeys.BookRemind);
+                    var content = _mailTemplate.Generate(bookRemindTemplateViewModel);
 
                     var emailData = new EmailDto(user.Email, subject, content);
                     await _mailingService.SendEmailAsync(emailData);

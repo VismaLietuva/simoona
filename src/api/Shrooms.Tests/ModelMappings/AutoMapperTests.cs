@@ -34,12 +34,6 @@ namespace Shrooms.Tests.ModelMappings
         }
 
         [Test]
-        public void Mapping_Monitor_Models()
-        {
-            _mapper.ConfigurationProvider.AssertConfigurationIsValid<Monitors>();
-        }
-
-        [Test]
         public void Mapping_Role_Models()
         {
             _mapper.ConfigurationProvider.AssertConfigurationIsValid<Roles>();

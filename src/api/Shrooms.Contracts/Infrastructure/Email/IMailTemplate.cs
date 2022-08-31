@@ -4,7 +4,6 @@ namespace Shrooms.Contracts.Infrastructure.Email
 {
     public interface IMailTemplate
     {
-        string Generate<T>(T viewModel, string key)
-            where T : BaseEmailTemplateViewModel;
+        string Generate<T>(T viewModel) where T : BaseEmailTemplateViewModel;
     }
 }

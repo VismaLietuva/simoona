@@ -4,7 +4,6 @@ using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Script.Serialization;
@@ -24,7 +23,6 @@ using Shrooms.Domain.Exceptions.Exceptions.UserAdministration;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Administration;
 using Shrooms.Domain.Services.BlacklistUsers;
-using Shrooms.Domain.Services.Impersonate;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Domain.Services.Permissions;
@@ -47,7 +45,7 @@ namespace Shrooms.Presentation.Api.Controllers
 {
     [Authorize]
     [RoutePrefix("ApplicationUser")]
-    public partial class UserDeprecatedController
+    public partial class UserDeprecatedController : BaseController
     {
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
@@ -59,7 +57,6 @@ namespace Shrooms.Presentation.Api.Controllers
         private readonly IRepository<Exam> _examsRepository;
         private readonly IRepository<Skill> _skillsRepository;
         private readonly IRepository<JobPosition> _jobPositionsRepository;
-        private readonly IImpersonateService _impersonateService;
         private readonly IAdministrationUsersService _administrationUsersService;
         private readonly IPermissionService _permissionService;
         private readonly IUserService _userService;
@@ -72,10 +69,10 @@ namespace Shrooms.Presentation.Api.Controllers
         private readonly IPictureService _pictureService;
         private readonly IBlacklistService _blacklistService;
 
-        public UserDeprecatedController(IMapper mapper,
+        public UserDeprecatedController(
+            IMapper mapper,
             IUnitOfWork unitOfWork,
             ShroomsUserManager userManager,
-            IImpersonateService impersonateService,
             IAdministrationUsersService administrationUsersService,
             IPermissionService permissionService,
             IOrganizationService organizationService,
@@ -96,7 +93,6 @@ namespace Shrooms.Presentation.Api.Controllers
             _skillsRepository = _unitOfWork.GetRepository<Skill>();
             _jobPositionsRepository = _unitOfWork.GetRepository<JobPosition>();
             _qualificationLevelRepository = _unitOfWork.GetRepository<QualificationLevel>();
-            _impersonateService = impersonateService;
             _administrationUsersService = administrationUsersService;
             _permissionService = permissionService;
             _organizationService = organizationService;
@@ -134,6 +130,7 @@ namespace Shrooms.Presentation.Api.Controllers
             }
 
             await _userService.DeleteAsync(id, GetUserAndOrganization());
+
             return Ok();
         }
 

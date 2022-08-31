@@ -98,8 +98,11 @@
     <Compile Include="DataTransferObjects\FilterPresets\FilterPresetItemDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\FiltersDto.cs" />
     <Compile Include="DataTransferObjects\FilterPresets\UpdatedFilterPresetDto.cs" />
+    <Compile Include="DataTransferObjects\LayoutEmailTemplateViewModel.cs" />
     <Compile Include="Enums\ExcelBorderStylePicker.cs" />
     <Compile Include="Enums\SortDirection.cs" />
+    <Compile Include="Infrastructure\Email\ICompiledEmailTemplate.cs" />
+    <Compile Include="Infrastructure\Email\IMailTemplateCache.cs" />
     <Compile Include="Infrastructure\ExcelGenerator\IExcelColumn.cs" />
     <Compile Include="Infrastructure\ExcelGenerator\IExcelBuilder.cs" />
     <Compile Include="Infrastructure\ExcelGenerator\IExcelBuilderFactory.cs" />
