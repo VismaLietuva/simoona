@@ -50,7 +50,7 @@
     </ul>
 
     <div class="col-xs-12 nopadding">
-        <ace-list-alert ng-if="!vm.isEventsFound" alert-msg="events.noEvents"
+        <ace-list-alert ng-if="!vm.isEventsFound && !vm.isEventsLoading" alert-msg="events.noEvents"
             link-msg="{{'events.noEventsHere' | translate}}" alert-type="info"
             state="Root.WithOrg.Client.Events.AddEvents" ng-cloak translate-cloak>
         </ace-list-alert>
