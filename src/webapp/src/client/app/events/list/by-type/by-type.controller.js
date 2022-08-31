@@ -23,7 +23,7 @@
 
         vm.addMoreEvents = addMoreEvents;
 
-        vm.isEventsFound = true;
+        vm.isEventsFound = false;
         vm.isEventsLoading = false;
         vm.isScrollingEnabled = true;
         vm.eventsList = [];
@@ -73,7 +73,10 @@
         }
 
         function setResponseUtilities(data) {
-            vm.isEventsFound = !!data.length;
+            if (!vm.isEventsFound) {
+                vm.isEventsFound = !!data.length;
+            }
+
             vm.isEventsLoading = false;
             vm.itemsDisplayedInList += eventsSettings.eventsListPageSize;
         }
