@@ -12,7 +12,8 @@ using Shrooms.Infrastructure.Extensions;
 
 namespace Shrooms.Tests.Infrastructure
 {
-    internal class MailTemplateTests
+    [TestFixture]
+    public class MailTemplateTests
     {
         private IRazorEngine _razorEngine;
         private IMailTemplateCache _mailTemplateCache;
