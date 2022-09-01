@@ -50,7 +50,7 @@ namespace Shrooms.Infrastructure.Email
             AddAndCompile<CoacheeJoinedEventEmailTemplateViewModel>(_emailTemplateConfiguration.CoacheeJoinedEventEmailTemplateAbsolutePath, builder => builder.AddUsing(nameof(System)));
             AddAndCompile<CoacheeLeftEventEmailTemplateViewModel>(_emailTemplateConfiguration.CoacheeLeftEventEmailTemplateAbsolutePath);
             AddAndCompile<BookTakenEmailTemplateViewModel>(_emailTemplateConfiguration.BookTakenEmailTemplateAbsolutePath);
-            AddAndCompile<LoyaltyKudosReceivedEmailTemplateViewModel>(_emailTemplateConfiguration.KudosReceivedEmailTemplateAbsolutePath);
+            AddAndCompile<LoyaltyKudosReceivedEmailTemplateViewModel>(_emailTemplateConfiguration.LoyaltyKudosReceivedEmailTemplateAbsolutePath);
             AddAndCompile<LoyaltyKudosDecreasedEmailTemplateViewModel>(_emailTemplateConfiguration.LoyaltyKudosDecreasedEmailTemplateAbsolutePath);
             AddAndCompile<CommitteeSuggestionEmailTemplateViewModel>(_emailTemplateConfiguration.CommitteeSuggestionEmailTemplateAbsolutePath);
             AddAndCompile<ServiceRequestCommentEmailTemplateViewModel>(_emailTemplateConfiguration.ServiceRequestCommentEmailTemplateAbsolutePath);
