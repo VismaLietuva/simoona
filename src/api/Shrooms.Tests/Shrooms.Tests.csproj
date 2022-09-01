@@ -224,6 +224,7 @@
     <Compile Include="Extensions\SortDirectionExtensionsTests.cs" />
     <Compile Include="FilterPresetServiceTests.cs" />
     <Compile Include="Helpers\CustomUrlHelperTest.cs" />
+    <Compile Include="Infrastructure\EmailTemplateCompilerTests.cs" />
     <Compile Include="Infrastructure\MailTemplateTests.cs" />
     <Compile Include="Mocks\MockAsyncQueryProvider.cs" />
     <Compile Include="Mocks\MockModel.cs" />
