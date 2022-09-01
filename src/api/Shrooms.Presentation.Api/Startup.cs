@@ -142,7 +142,8 @@ namespace Shrooms.Presentation.Api
         private static void ConfigureEmailTemplates()
         {
             var mailTemplateCache = GlobalHost.DependencyResolver.GetService(typeof(IMailTemplateCache)) as IMailTemplateCache;
-            var emailTemplateCompiler = new EmailTemplateCompiler(mailTemplateCache, AppDomain.CurrentDomain.BaseDirectory);
+            var emailTemplateConfiguration = GlobalHost.DependencyResolver.GetService(typeof(IEmailTemplateConfiguration)) as IEmailTemplateConfiguration;
+            var emailTemplateCompiler = new EmailTemplateCompiler(mailTemplateCache, emailTemplateConfiguration);
 
             emailTemplateCompiler.Register();
         }

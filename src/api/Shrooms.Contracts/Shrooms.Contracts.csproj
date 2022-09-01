@@ -66,7 +66,6 @@
     <Compile Include="Constants\BasicPermissions.cs" />
     <Compile Include="Constants\BusinessLayerConstants.cs" />
     <Compile Include="Constants\DataLayerConstants.cs" />
-    <Compile Include="Constants\EmailTemplateCacheKeys.cs" />
     <Compile Include="Constants\ErrorCodes.cs" />
     <Compile Include="Constants\ExcelWorksheetBuilderConstants.cs" />
     <Compile Include="Constants\KudosBasketConstants.cs" />
@@ -102,6 +101,7 @@
     <Compile Include="Enums\ExcelBorderStylePicker.cs" />
     <Compile Include="Enums\SortDirection.cs" />
     <Compile Include="Infrastructure\Email\ICompiledEmailTemplate.cs" />
+    <Compile Include="Infrastructure\Email\IEmailTemplateConfiguration.cs" />
     <Compile Include="Infrastructure\Email\IMailTemplateCache.cs" />
     <Compile Include="Infrastructure\ExcelGenerator\IExcelColumn.cs" />
     <Compile Include="Infrastructure\ExcelGenerator\IExcelBuilder.cs" />

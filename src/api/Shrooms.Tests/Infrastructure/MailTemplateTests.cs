@@ -1,79 +1,82 @@
-﻿//using System;
-//using System.Diagnostics;
-//using System.Reflection;
-//using NUnit.Framework;
-//using Shrooms.Contracts.Constants;
-//using Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels;
-//using Shrooms.Infrastructure.Email.Templating;
+﻿using System;
+using System.IO;
+using NSubstitute;
+using NUnit.Framework;
+using RazorEngineCore;
+using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.DataTransferObjects.EmailTemplateViewModels;
+using Shrooms.Contracts.Infrastructure.Email;
+using Shrooms.Infrastructure.Email;
+using Shrooms.Infrastructure.Email.Templates;
+using Shrooms.Infrastructure.Extensions;
 
-//namespace Shrooms.Tests.Infrastructure
-//{
-//    internal class MailTemplateTests
-//    {
-//        private Stopwatch _stopWatch;
+namespace Shrooms.Tests.Infrastructure
+{
+    internal class MailTemplateTests
+    {
+        private IRazorEngine _razorEngine;
+        private IMailTemplateCache _mailTemplateCache;
+        private IEmailTemplateConfiguration _emailTemplateConfiguration;
+        private IRazorEngineCompiledTemplate<EmailTemplateBase<LayoutEmailTemplateViewModel>> _compiledLayoutTemplate;
 
-//        [OneTimeSetUp]
-//        public void TestOneTimeInitializer()
-//        {
-//            _stopWatch = Stopwatch.StartNew();
-//            TestContext.Progress.WriteLine("Started templates compilation");
+        private MailTemplate _sut;
 
-//            Assembly.Load("Shrooms.Contracts");
-//            Assembly.Load("Shrooms.Contracts.DataTransferObjects");
-//            Assembly.Load("Shrooms.Domain");
+        [SetUp]
+        public void TestInitializer()
+        {
+            _razorEngine = new RazorEngine();
+            _emailTemplateConfiguration = Substitute.ForPartsOf<EmailTemplateConfiguration>();
 
-//            var emailTemplatesConfig = new EmailTemplatesCompiler();
-//            emailTemplatesConfig.Register(AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\Shrooms.Presentation.Api");
+            _emailTemplateConfiguration.BaseDirectory
+                .Returns(AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\Shrooms.Presentation.Api");
 
-//            _stopWatch.Stop();
-//            TestContext.Progress.WriteLine("Finished templates compilation.");
-//            TestContext.Progress.WriteLine($"Duration: {_stopWatch.Elapsed}");
-//        }
+            _mailTemplateCache = Substitute.For<IMailTemplateCache>();
 
-//        [SetUp]
-//        public void TestInitializer()
-//        {
-//            _stopWatch = Stopwatch.StartNew();
-//        }
+            _compiledLayoutTemplate = SetUpCompiledLayoutTemplate();
 
-//        [TearDown]
-//        public void TearDown()
-//        {
-//            _stopWatch.Stop();
-//            TestContext.Progress.WriteLine($"Duration: {_stopWatch.Elapsed}");
-//        }
+            _sut = new MailTemplate(_mailTemplateCache);
+        }
 
-//        [Test]
-//        [TestCase(1)]
-//        [TestCase(3)]
-//        [TestCase(10)]
-//        public void Should_Generate_NewPost_EmailContent(int retries)
-//        {
-//            var mailTemplate = new MailTemplate();
+        [Test]
+        public void Run_NewWallPostEmailTemplateViewModel_ReturnsCompiledTemplate()
+        {
+            // Arrange
+            var compiledTemplate = SetUpCompiledTemplateFor<NewWallPostEmailTemplateViewModel>(_emailTemplateConfiguration.NewWallPostEmailTemplateAbsolutePath);
 
-//            var newWallPostEmailTemplateViewModel = new NewWallPostEmailTemplateViewModel(
-//                "WallTitle",
-//                "http://picture.example.com",
-//                "Iam Creator",
-//                "http://post.example.com/1",
-//                "body",
-//                "http://settings.example.com/1",
-//                "Read it");
+            _mailTemplateCache.Get<NewWallPostEmailTemplateViewModel>()
+                .Returns(compiledTemplate);
 
-//            var kudosSentEmailTemplateViewModel = new KudosSentEmailTemplateViewModel(
-//                "http://settings.example.com/1",
-//                "Iam Creator",
-//                10,
-//                "New kudos for you!",
-//                "http://profile.example.com/1");
+            var template = new NewWallPostEmailTemplateViewModel(
+                "Title",
+                "PictureUrl",
+                "FullName",
+                "PostDeepLink",
+                "MessageBody",
+                "Title",
+                "SettingsUrl");
 
-//            for (var i = 0; i < retries; i++)
-//            {
-//                TestContext.Progress.WriteLine($"Generating {i + 1}/{retries}");
+            // Act
+            var result = _sut.Generate(template);
 
-//                mailTemplate.Generate(newWallPostEmailTemplateViewModel, EmailTemplateCacheKeys.NewWallPost);
-//                mailTemplate.Generate(kudosSentEmailTemplateViewModel, EmailTemplateCacheKeys.KudosSent);
-//            }
-//        }
-//    }
-//}
+            // Assert
+            Assert.IsNotNull(result);
+        }
+
+        private ICompiledEmailTemplate SetUpCompiledTemplateFor<T>(string aboslutePath, Action<IRazorEngineCompilationOptionsBuilder> builder = null)
+            where T : BaseEmailTemplateViewModel
+        {
+            var emailTemplate = File.ReadAllText(aboslutePath);
+
+            return _razorEngine.Compile<T>(
+                emailTemplate,
+                _compiledLayoutTemplate,
+                builder);
+        }
+
+        private IRazorEngineCompiledTemplate<EmailTemplateBase<LayoutEmailTemplateViewModel>> SetUpCompiledLayoutTemplate()
+        {
+            return _razorEngine.Compile<EmailTemplateBase<LayoutEmailTemplateViewModel>>(
+                File.ReadAllText(_emailTemplateConfiguration.LayoutEmailTemplateAbsolutePath));
+        }
+    }
+}

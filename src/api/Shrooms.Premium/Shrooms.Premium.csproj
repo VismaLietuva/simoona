@@ -248,7 +248,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Constants\EmailPremiumTemplateCacheKeys.cs" />
     <Compile Include="Constants\EventsConstants.cs" />
     <Compile Include="Constants\KudosShopConstants.cs" />
     <Compile Include="Constants\PremiumErrorCodes.cs" />

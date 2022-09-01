@@ -13,15 +13,14 @@ namespace Shrooms.Infrastructure.Email
     {
         private readonly IMailTemplateCache _mailTemplateCache;
         private readonly IRazorEngine _razorEngine;
-
-        private readonly string _baseDir;
+        private readonly IEmailTemplateConfiguration _emailTemplateConfiguration;
 
         private IRazorEngineCompiledTemplate<EmailTemplateBase<LayoutEmailTemplateViewModel>> _compiledLayout;
-        // TODO: test out after clean up
-        public EmailTemplateCompiler(IMailTemplateCache mailTemplateCache, string baseDir)
+        
+        public EmailTemplateCompiler(IMailTemplateCache mailTemplateCache, IEmailTemplateConfiguration emailTemplateConfiguration)
         {
             _mailTemplateCache = mailTemplateCache;
-            _baseDir = baseDir;
+            _emailTemplateConfiguration = emailTemplateConfiguration;
 
             _razorEngine = new RazorEngineCore.RazorEngine();
         }
@@ -30,51 +29,44 @@ namespace Shrooms.Infrastructure.Email
         {
             _compiledLayout = CompileLayout();
 
-            AddAndCompile<NewWallPostEmailTemplateViewModel>(@"EmailTemplates\Wall\NewPost.cshtml");
-            AddAndCompile<NewMentionTemplateViewModel>(@"EmailTemplates\Wall\NewMention.cshtml");
-            AddAndCompile<KudosRejectedEmailTemplateViewModel>(@"EmailTemplates\Kudos\KudosRejected.cshtml");
-            AddAndCompile<KudosSentEmailTemplateViewModel>(@"EmailTemplates\Kudos\KudosSent.cshtml");
-            AddAndCompile<KudosReceivedEmailTemplateViewModel>(@"EmailTemplates\Kudos\KudosReceived.cshtml");
-            AddAndCompile<KudosDecreasedEmailTemplateViewModel>(@"EmailTemplates\Kudos\KudosDecreased.cshtml");
-            AddAndCompile<BirthdaysNotificationTemplateViewModel>(@"EmailTemplates\BirthdaysNotification.cshtml");
-            AddAndCompile<UserConfirmationEmailTemplateViewModel>(@"EmailTemplates\AdministrationUsers\UserConfirmation.cshtml");
-            AddAndCompile<NotificationAboutNewUserEmailTemplateViewModel>(@"EmailTemplates\AdministrationUsers\NotificationAboutNewUser.cshtml");
-            AddAndCompile<NewCommentEmailTemplateViewModel>(@"EmailTemplates\Wall\NewComment.cshtml");
-            AddAndCompile<ResetPasswordTemplateViewModel>(@"EmailTemplates\AdministrationUsers\UserResetPassword.cshtml");
-            AddAndCompile<VerifyEmailTemplateViewModel>(@"EmailTemplates\AdministrationUsers\UserVerifyEmail.cshtml");
-            
-            // Premium
-            AddAndCompile<BookReminderEmailTemplateViewModel>(@"EmailTemplates\Books\BookRemind.cshtml");
-            AddAndCompile<BookReportEmailTemplateViewModel>(@"EmailTemplates\Books\BookReport.cshtml");
-            AddAndCompile<EventParticipantExpelledEmailTemplateViewModel>(@"EmailTemplates\Events\ParticipantExpelled.cshtml");
-            AddAndCompile<EventJoinRemindEmailTemplateViewModel>(@"EmailTemplates\Events\RemindToJoin.cshtml");
-            AddAndCompile<CoacheeJoinedEventEmailTemplateViewModel>(@"EmailTemplates\Events\CoacheeJoinedEvent.cshtml", builder => builder.AddUsing(nameof(System)));
-            AddAndCompile<CoacheeLeftEventEmailTemplateViewModel>(@"EmailTemplates\Events\CoacheeLeftEvent.cshtml");
-            AddAndCompile<BookTakenEmailTemplateViewModel>(@"EmailTemplates\Books\BookTaken.cshtml");
-            AddAndCompile<LoyaltyKudosReceivedEmailTemplateViewModel>(@"EmailTemplates\LoyaltyKudos\LoyaltyKudosReceived.cshtml");
-            AddAndCompile<LoyaltyKudosDecreasedEmailTemplateViewModel>(@"EmailTemplates\LoyaltyKudos\LoyaltyKudosDecreased.cshtml");
-            AddAndCompile<CommitteeSuggestionEmailTemplateViewModel>(@"EmailTemplates\Committees\CommitteesSuggestion.cshtml");
-            AddAndCompile<ServiceRequestCommentEmailTemplateViewModel>(@"EmailTemplates\ServiceRequests\ServiceRequestComment.cshtml");
-            AddAndCompile<ServiceRequestEmailTemplateViewModel>(@"EmailTemplates\ServiceRequests\NewServiceRequest.cshtml");
-            AddAndCompile<ServiceRequestUpdateEmailTemplateViewModel>(@"EmailTemplates\ServiceRequests\UpdateServiceRequest.cshtml");
-            AddAndCompile<StartedLotteryEmailTemplateViewModel>(@"EmailTemplates\Lotteries\StartedLottery.cshtml");
-        }
+            AddAndCompile<NewWallPostEmailTemplateViewModel>(_emailTemplateConfiguration.NewWallPostEmailTemplateAbsolutePath);
+            AddAndCompile<NewMentionTemplateViewModel>(_emailTemplateConfiguration.NewMentionTemplateAbsolutePath);
+            AddAndCompile<KudosRejectedEmailTemplateViewModel>(_emailTemplateConfiguration.KudosRejectedEmailTemplateAbsolutePath);
+            AddAndCompile<KudosSentEmailTemplateViewModel>(_emailTemplateConfiguration.KudosSentEmailTemplateAbsolutePath);
+            AddAndCompile<KudosReceivedEmailTemplateViewModel>(_emailTemplateConfiguration.KudosReceivedEmailTemplateAbsolutePath);
+            AddAndCompile<KudosDecreasedEmailTemplateViewModel>(_emailTemplateConfiguration.KudosDecreasedEmailTemplateAbsolutePath);
+            AddAndCompile<BirthdaysNotificationTemplateViewModel>(_emailTemplateConfiguration.BirthdaysNotificationAbsolutePath);
+            AddAndCompile<UserConfirmationEmailTemplateViewModel>(_emailTemplateConfiguration.UserConfirmationEmailTemplateAbsolutePath);
+            AddAndCompile<NotificationAboutNewUserEmailTemplateViewModel>(_emailTemplateConfiguration.NotificationAboutNewUserEmailTemplateAbsolutePath);
+            AddAndCompile<NewCommentEmailTemplateViewModel>(_emailTemplateConfiguration.NewCommentEmailTemplateAbsolutePath);
+            AddAndCompile<ResetPasswordTemplateViewModel>(_emailTemplateConfiguration.ResetPasswordTemplateAbsolutePath);
+            AddAndCompile<VerifyEmailTemplateViewModel>(_emailTemplateConfiguration.VerifyEmailTemplateAbsolutePath);
 
-        private string ReadEmailTemplate(string relativePath)
-        {
-            return File.ReadAllText(Path.Combine(_baseDir, relativePath));
+            // Premium
+            AddAndCompile<BookReminderEmailTemplateViewModel>(_emailTemplateConfiguration.BookReminderEmailTemplateAbsolutePath);
+            AddAndCompile<BookReportEmailTemplateViewModel>(_emailTemplateConfiguration.BookReportEmailTemplateAbsolutePath);
+            AddAndCompile<EventParticipantExpelledEmailTemplateViewModel>(_emailTemplateConfiguration.EventParticipantExpelledEmailTemplateAbsolutePath);
+            AddAndCompile<EventJoinRemindEmailTemplateViewModel>(_emailTemplateConfiguration.EventJoinRemindEmailTemplateAbsolutePath);
+            AddAndCompile<CoacheeJoinedEventEmailTemplateViewModel>(_emailTemplateConfiguration.CoacheeJoinedEventEmailTemplateAbsolutePath, builder => builder.AddUsing(nameof(System)));
+            AddAndCompile<CoacheeLeftEventEmailTemplateViewModel>(_emailTemplateConfiguration.CoacheeLeftEventEmailTemplateAbsolutePath);
+            AddAndCompile<BookTakenEmailTemplateViewModel>(_emailTemplateConfiguration.BookTakenEmailTemplateAbsolutePath);
+            AddAndCompile<LoyaltyKudosReceivedEmailTemplateViewModel>(_emailTemplateConfiguration.KudosReceivedEmailTemplateAbsolutePath);
+            AddAndCompile<LoyaltyKudosDecreasedEmailTemplateViewModel>(_emailTemplateConfiguration.LoyaltyKudosDecreasedEmailTemplateAbsolutePath);
+            AddAndCompile<CommitteeSuggestionEmailTemplateViewModel>(_emailTemplateConfiguration.CommitteeSuggestionEmailTemplateAbsolutePath);
+            AddAndCompile<ServiceRequestCommentEmailTemplateViewModel>(_emailTemplateConfiguration.ServiceRequestCommentEmailTemplateAbsolutePath);
+            AddAndCompile<ServiceRequestEmailTemplateViewModel>(_emailTemplateConfiguration.ServiceRequestEmailTemplateAbsolutePath);
+            AddAndCompile<ServiceRequestUpdateEmailTemplateViewModel>(_emailTemplateConfiguration.ServiceRequestUpdateEmailTemplateAbsolutePath);
+            AddAndCompile<StartedLotteryEmailTemplateViewModel>(_emailTemplateConfiguration.StartedLotteryEmailTemplateAbsolutePath);
         }
 
         private IRazorEngineCompiledTemplate<EmailTemplateBase<LayoutEmailTemplateViewModel>> CompileLayout()
         {
-            var headerFooterTemplate = ReadEmailTemplate(@"EmailTemplates\HeaderFooter.cshtml");
-
-            return _razorEngine.Compile<EmailTemplateBase<LayoutEmailTemplateViewModel>>(headerFooterTemplate);
+            return _razorEngine.Compile<EmailTemplateBase<LayoutEmailTemplateViewModel>>(File.ReadAllText(_emailTemplateConfiguration.LayoutEmailTemplateAbsolutePath));
         }
 
-        private void AddAndCompile<T>(string relativePath, Action<IRazorEngineCompilationOptionsBuilder> builder = null) where T : BaseEmailTemplateViewModel
+        private void AddAndCompile<T>(string absolutePath, Action<IRazorEngineCompilationOptionsBuilder> builder = null) where T : BaseEmailTemplateViewModel
         {
-            var emailTemplate = ReadEmailTemplate(relativePath);
+            var emailTemplate = File.ReadAllText(absolutePath);
 
             var compiledTemplate = _razorEngine.Compile<T>(
                 emailTemplate,

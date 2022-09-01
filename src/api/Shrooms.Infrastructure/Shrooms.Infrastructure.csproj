@@ -174,6 +174,7 @@
     <Compile Include="Configuration\ApplicationSettings.cs" />
     <Compile Include="Email\Cache\MailTemplateCache.cs" />
     <Compile Include="Email\EmailTemplateCompiler.cs" />
+    <Compile Include="Email\EmailTemplateConfiguration.cs" />
     <Compile Include="Email\Templates\CompiledEmailTemplate.cs" />
     <Compile Include="Email\Templates\EmailTemplateBase.cs" />
     <Compile Include="Email\Templates\MailTemplate.cs" />

@@ -10,7 +10,7 @@ namespace Shrooms.Tests.Infrastructure
     public class EmailTemplateCompilerTests
     {
         private IMailTemplateCache _mailTemplateCache;
-        private string _baseDirectory;
+        private IEmailTemplateConfiguration _emailTemplateConfiguration;
 
         private EmailTemplateCompiler _sut;
 
@@ -18,9 +18,12 @@ namespace Shrooms.Tests.Infrastructure
         public void TestInitializer()
         {
             _mailTemplateCache = Substitute.For<IMailTemplateCache>();
-            _baseDirectory = AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\Shrooms.Presentation.Api";
+            _emailTemplateConfiguration = Substitute.ForPartsOf<EmailTemplateConfiguration>();
 
-            _sut = new EmailTemplateCompiler(_mailTemplateCache, _baseDirectory);
+            _emailTemplateConfiguration.BaseDirectory
+                .Returns(AppDomain.CurrentDomain.BaseDirectory + @"\..\..\..\Shrooms.Presentation.Api");
+
+            _sut = new EmailTemplateCompiler(_mailTemplateCache, _emailTemplateConfiguration);
         }
 
         [Test]

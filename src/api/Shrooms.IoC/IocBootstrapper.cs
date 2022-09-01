@@ -55,6 +55,7 @@ namespace Shrooms.IoC
             
             // Email templates
             builder.RegisterType<MailTemplateCache>().As<IMailTemplateCache>().SingleInstance();
+            builder.RegisterType<EmailTemplateConfiguration>().As<IEmailTemplateConfiguration>().SingleInstance();
 
             builder.RegisterWebApiModelBinderProvider();
             builder.RegisterWebApiFilterProvider(config);
