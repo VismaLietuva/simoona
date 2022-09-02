@@ -117,10 +117,6 @@
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="RazorEngine, Version=3.9.0.0, Culture=neutral, PublicKeyToken=9ee697374c7e744a, processorArchitecture=MSIL">
-      <HintPath>..\packages\RazorEngine.3.9.0\lib\net45\RazorEngine.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="RazorEngineCore, Version=2022.8.1.0, Culture=neutral, PublicKeyToken=c32700229a1808ba, processorArchitecture=MSIL">
       <HintPath>..\packages\RazorEngineCore.2022.8.1\lib\netstandard2.0\RazorEngineCore.dll</HintPath>
     </Reference>
