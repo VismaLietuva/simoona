@@ -253,6 +253,66 @@ namespace Shrooms.Premium.Tests.DomainService
         }
 
         [Test]
+        public void Should_Throw_When_Changing_Category_From_Kudos_To_Others()
+        {
+            // Arrange
+            MockServiceRequestForUpdate();
+            MockServiceRequestCategories();
+            MockServiceRequestPriorities();
+            MockServiceRequestStatuses();
+            MockPermissioService();
+
+            var userAndOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = 1,
+                UserId = "AdminId"
+            };
+
+            var serviceRequestDto = new ServiceRequestDto
+            {
+                Id = 2,
+                Description = "testDescription",
+                PriorityId = 1,
+                ServiceRequestCategoryId = 1,
+                Title = "tetsTitle",
+                StatusId = 2
+            };
+
+            // Assert
+            Assert.ThrowsAsync<ValidationException>(async () => await _serviceRequestService.UpdateServiceRequestAsync(serviceRequestDto, userAndOrg));
+        }
+
+        [Test]
+        public void Should_Throw_When_Changing_Category_From_Others_To_Kudos()
+        {
+            // Arrange
+            MockServiceRequestForUpdate();
+            MockServiceRequestCategories();
+            MockServiceRequestPriorities();
+            MockServiceRequestStatuses();
+            MockPermissioService();
+
+            var userAndOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = 1,
+                UserId = "AdminId"
+            };
+
+            var serviceRequestDto = new ServiceRequestDto
+            {
+                Id = 1,
+                Description = "testDescription",
+                PriorityId = 1,
+                ServiceRequestCategoryId = 2,
+                Title = "tetsTitle",
+                StatusId = 2
+            };
+
+            // Assert
+            Assert.ThrowsAsync<ValidationException>(async () => await _serviceRequestService.UpdateServiceRequestAsync(serviceRequestDto, userAndOrg));
+        }
+
+        [Test]
         public async Task Should_Return_Successfully_Updated_Service_Request_Status()
         {
             MockServiceRequestForUpdate();

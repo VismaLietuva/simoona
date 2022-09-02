@@ -32,6 +32,7 @@ namespace Shrooms.Premium.Domain.Services.ServiceRequests
                 .Include(x => x.Status)
                 .Include(x => x.Priority)
                 .Include(x => x.Employee)
+                .Include(x => x.KudosShopItem)
                 .Where(x => x.OrganizationId == userAndOrg.OrganizationId);
 
             if (filter != null)

@@ -1,6 +1,7 @@
 ﻿using System;
 using Shrooms.Contracts.ViewModels;
 using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.DataLayer.EntityModels.Models.Kudos;
 
 namespace Shrooms.Premium.Presentation.WebViewModels.ServiceRequests
 {
@@ -19,6 +20,8 @@ namespace Shrooms.Premium.Presentation.WebViewModels.ServiceRequests
         public string Description { get; set; }
 
         public ServiceRequestCategory ServiceRequestCategory { get; set; }
+
+        public KudosShopItem KudosShopItem { get; set; }
 
         public string CategoryName { get; set; }
 

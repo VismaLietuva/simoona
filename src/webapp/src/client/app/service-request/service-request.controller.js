@@ -19,7 +19,7 @@
     ];
 
     function ServiceRequestController($rootScope, $scope, $stateParams, $uibModal, authService,
-        serviceRequestRepository, pagedServiceRequestList, dataHelper, errorHandler, notifySrv, lodash) {       
+        serviceRequestRepository, pagedServiceRequestList, dataHelper, errorHandler, notifySrv, lodash) {
 
         var openNewRequest = $stateParams.openNewRequest;
         $scope.edit = false;
@@ -46,7 +46,7 @@
         $rootScope.pageTitle = 'serviceRequest.serviceRequests';
 
         $scope.filter = {
-            includeProperties: 'Priority, Status, Employee',
+            includeProperties: 'Priority, Status, Employee, KudosShopItem',
             page: 1,
             sortOrder: 'desc',
             sortBy: 'Created',
@@ -115,8 +115,19 @@
             $scope.serviceRequest = {};
             $scope.setCategoryToKudos = setCategoryToKudos;
             $uibModal.open({
-                templateUrl: 'app/service-request/service-request-new-modal.html',
-                controller: 'newRequestModalController',
+                templateUrl: 'app/service-request/service-request-create-edit-modal.html',
+                controller: 'createEditServiceRequestController',
+                scope: $scope,
+                backdrop: 'static'
+            });
+        }
+
+        function editServiceRequestButtonClick(serviceRequest) {
+            $scope.edit = true;
+            $scope.serviceRequest = serviceRequest;
+            $uibModal.open({
+                templateUrl: 'app/service-request/service-request-create-edit-modal.html',
+                controller: 'createEditServiceRequestController',
                 scope: $scope,
                 backdrop: 'static'
             });
@@ -129,17 +140,6 @@
                 });
                 saveAs(file, 'service_requests.xlsx');
             }, errorHandler.handleErrorMessage);
-        }
-
-        function editServiceRequestButtonClick(serviceRequest) {
-            $scope.edit = true;
-            $scope.serviceRequest = serviceRequest;
-            $uibModal.open({
-                templateUrl: 'app/service-request/service-request-new-modal.html',
-                controller: 'newRequestModalController',
-                scope: $scope,
-                backdrop: 'static'
-            });
         }
 
         function closeServiceRequestButtonClick(serviceRequest) {
@@ -191,14 +191,14 @@
             notifySrv.error(response.data.message);
             $scope.newComment.content = null;
         }
-        
+
         function hasEditableServiceRequests(requests) {
             var editableFields = 0;
             angular.forEach(requests, function(request) {
                 if (request.isCloseable) {
                     editableFields++;
                 }
-            });   
+            });
             return editableFields > 0;
         }
     }
