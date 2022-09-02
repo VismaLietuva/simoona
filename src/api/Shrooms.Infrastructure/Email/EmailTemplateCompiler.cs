@@ -22,7 +22,7 @@ namespace Shrooms.Infrastructure.Email
             _mailTemplateCache = mailTemplateCache;
             _emailTemplateConfiguration = emailTemplateConfiguration;
 
-            _razorEngine = new RazorEngineCore.RazorEngine();
+            _razorEngine = new RazorEngine();
         }
 
         public void Register()
