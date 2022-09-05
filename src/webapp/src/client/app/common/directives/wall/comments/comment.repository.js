@@ -41,7 +41,8 @@
             }).put({
                 id: comment.id,
                 messageBody: comment.messageBody,
-                images: comment.images
+                images: comment.images,
+                mentionedUserIds: comment.mentionedUserIds
             }).$promise;
         }
 

@@ -13,10 +13,10 @@ namespace Shrooms.Contracts.DataTransferObjects.Models.Wall.Comments
 
         public WallType WallType { get; set; }
 
-        public string PostCreator { get; set; }
+        public string PostAuthor { get; set; }
 
-        public string CommentCreator { get; set; }
+        public string CommentAuthor { get; set; }
 
-        public IEnumerable<string> MentionedUsersIds { get; set; }
+        public IEnumerable<string> MentionedUserIds { get; set; }
     }
 }

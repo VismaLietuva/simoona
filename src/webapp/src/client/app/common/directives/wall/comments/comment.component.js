@@ -17,21 +17,25 @@
     });
 
     wallCommentController.$inject = [
+        '$timeout',
         'wallSettings',
         'errorHandler',
         'youtubeSettings',
         'wallCommentRepository',
         'wallService',
         'lodash',
+        'mentionService'
     ];
 
     function wallCommentController(
+        $timeout,
         wallSettings,
         errorHandler,
         youtubeSettings,
         wallCommentRepository,
         wallService,
-        lodash
+        lodash,
+        mentionService
     ) {
         /*jshint validthis: true */
         var vm = this;
@@ -51,6 +55,8 @@
         vm.youtubePreviewHeight = youtubeSettings.previewHeight;
         vm.singlePictureId = lodash.first(vm.comment.images);
 
+        vm.mentions = mentionService.mentions();
+
         //////////
 
         function editComment(messageBody) {
@@ -58,6 +64,8 @@
                 vm.disableEditor();
 
                 vm.comment.messageBody = messageBody;
+                vm.comment.mentionedUserIds = vm.mentions.getValidatedMentions(messageBody);
+
                 vm.isActionsEnabled = false;
 
                 wallCommentRepository.editComment(vm.comment).then(function () {
@@ -89,7 +97,11 @@
 
         function enableEditor() {
             vm.editFieldEnabled = true;
-            vm.editableValue = vm.comment.messageBody;
+
+            // Necessary to avoid no mentio-items attribute was provided error 
+            $timeout(function() {
+                vm.editableValue = vm.comment.messageBody;
+            });
         }
 
         function disableEditor() {

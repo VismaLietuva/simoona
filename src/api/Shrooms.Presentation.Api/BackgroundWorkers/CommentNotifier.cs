@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using JetBrains.Annotations;
@@ -16,30 +17,31 @@ using Shrooms.Presentation.Api.Hubs;
 namespace Shrooms.Presentation.Api.BackgroundWorkers
 {
     [UsedImplicitly]
-    public class NewCommentNotifier : IBackgroundWorker
+    public class CommentNotifier : IBackgroundWorker
     {
         private readonly IMapper _mapper;
         private readonly IWallService _wallService;
         private readonly INotificationService _notificationService;
-        private readonly ICommentEmailNotificationService _commentEmailNotificationService;
+        private readonly ICommentNotificationService _commentNotificationService;
         private readonly IPostService _postService;
 
-        public NewCommentNotifier(IMapper mapper,
-                                  IWallService wallService,
-                                  INotificationService notificationService,
-                                  ICommentEmailNotificationService commentEmailNotificationService,
-                                  IPostService postService)
+        public CommentNotifier(
+            IMapper mapper,
+            IWallService wallService,
+            INotificationService notificationService,
+            ICommentNotificationService commentEmailNotificationService,
+            IPostService postService)
         {
             _mapper = mapper;
             _wallService = wallService;
             _notificationService = notificationService;
-            _commentEmailNotificationService = commentEmailNotificationService;
+            _commentNotificationService = commentEmailNotificationService;
             _postService = postService;
         }
 
-        public async Task NotifyAsync(CommentCreatedDto commentDto, UserAndOrganizationHubDto userHubDto)
+        public async Task NotifyAboutNewCommentAsync(CommentCreatedDto commentDto, UserAndOrganizationHubDto userHubDto)
         {
-            await _commentEmailNotificationService.SendEmailNotificationAsync(commentDto);
+            await _commentNotificationService.NotifyAboutNewCommentAsync(commentDto);
 
             var membersToNotify = await _wallService.GetWallMembersIdsAsync(commentDto.WallId, userHubDto);
             await NotificationHub.SendWallNotificationAsync(commentDto.WallId, membersToNotify, commentDto.WallType, userHubDto);
@@ -47,13 +49,18 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
             var postWatchers = await _postService.GetPostWatchersForAppNotificationsAsync(commentDto.PostId);
 
             // Comment author doesn't need to receive notification about his own comment
-            postWatchers.Remove(commentDto.CommentCreator);
+            postWatchers.Remove(commentDto.CommentAuthor);
 
             // Send notification to other users
-            if (postWatchers.Count > 0)
+            if (postWatchers.Any())
             {
                 await SendNotificationAsync(commentDto, userHubDto, NotificationType.FollowingComment, postWatchers);
             }
+        }
+
+        public async Task NotifyUpdatedCommentMentionsAsync(EditCommentDto editCommentDto)
+        {
+            await _commentNotificationService.NotifyMentionedUsersAsync(editCommentDto);
         }
 
         private async Task SendNotificationAsync(CommentCreatedDto commentDto, UserAndOrganizationHubDto userHubDto, NotificationType notificationType, IList<string> watchers)
@@ -66,6 +73,7 @@ namespace Shrooms.Presentation.Api.BackgroundWorkers
             }
 
             var notification = _mapper.Map<NotificationViewModel>(notificationAuthorDto);
+
             await NotificationHub.SendNotificationToParticularUsersAsync(notification, userHubDto, watchers);
         }
     }

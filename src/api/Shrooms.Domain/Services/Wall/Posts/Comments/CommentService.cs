@@ -5,13 +5,14 @@ using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
-using Shrooms.Contracts.DataTransferObjects.Models.Wall.Comments;
+using Shrooms.Contracts.DataTransferObjects.Wall.Comments;
 using Shrooms.Contracts.DataTransferObjects.Wall.Likes;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.Domain.Exceptions.Exceptions;
+using Shrooms.Contracts.DataTransferObjects.Models.Wall.Comments;
 using Shrooms.Domain.Services.Permissions;
 
 namespace Shrooms.Domain.Services.Wall.Posts.Comments
@@ -64,6 +65,25 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
+        public async Task<MentionCommentDto> GetMentionCommentByIdAsync(int commentId)
+        {
+            var comment = await _commentsDbSet
+                .Include(comment => comment.Author)
+                .SingleOrDefaultAsync(comment => comment.Id == commentId);
+            
+            if (comment == null)
+            {
+                return null;
+            }
+
+            return new MentionCommentDto
+            {
+                Id = comment.Id,
+                PostId = comment.PostId,
+                AuthorFullName = comment.Author.FullName
+            };
+        }
+
         public async Task<CommentCreatedDto> CreateCommentAsync(NewCommentDto commentDto)
         {
             var post = await _postsDbSet
@@ -107,10 +127,10 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
                 WallId = post.WallId,
                 CommentId = comment.Id,
                 WallType = post.Wall.Type,
-                CommentCreator = comment.AuthorId,
-                PostCreator = post.AuthorId,
+                CommentAuthor = comment.AuthorId,
+                PostAuthor = post.AuthorId,
                 PostId = post.Id,
-                MentionedUsersIds = commentDto.MentionedUserIds?.Distinct()
+                MentionedUserIds = commentDto.MentionedUserIds?.Distinct()
             };
         }
 

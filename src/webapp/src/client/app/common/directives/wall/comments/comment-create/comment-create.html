@@ -1,7 +1,7 @@
 <form name="commentForm">
 
     <div class="comment-input-emoji-container">
-        
+
         <textarea class="form-control comment-input-text"
               ng-model="vm.commentForm.messageBody"
               ng-maxlength="vm.maxLength"
@@ -12,12 +12,12 @@
               ng-model-options="{ debounce: 500 }"
               ng-click="vm.showSubmit()"
               mentio mentio-typed-text="typedTerm"
-              mentio-search="vm.invokeMention(term)"
-              mentio-items="vm.employees | filter:label:typedTerm"
-              mentio-select="vm.selectMention(item)"
+              mentio-search="vm.mentions.invokeMention(term)"
+              mentio-items="vm.mentions.employees | filter:label:typedTerm"
+              mentio-select="vm.mentions.selectMention(item)"
               placeholder={{vm.addComment}}>
         </textarea>
-        
+
         <div class="emoji-picker-container">
             <span class="emoji-picker-span"
             emoji-picker="vm.commentForm.messageBody"
@@ -28,7 +28,7 @@
     </div>
 
     <div ng-if="vm.showSubmitButton" class="panel panel-footer-comment">
-        
+
         <div class="col-xs-12 nopadding">
             <button class="btn btn-default pull-right"
                     ng-disabled="!vm.isSubmittable()"
@@ -59,7 +59,7 @@
 
             <div image-preview-thumb
                 ng-if="vm.imageSource"
-                source="vm.imageSource" 
+                source="vm.imageSource"
                 sources="vm.attachedFiles">
             </div>
         </div>

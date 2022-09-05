@@ -62,7 +62,7 @@
             }).put({
                 id: post.id,
                 messageBody: post.messageBody,
-                mentions: post.mentions,
+                mentionedUserIds: post.mentionedUserIds,
                 images: post.images
             }).$promise;
         }

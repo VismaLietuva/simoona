@@ -21,12 +21,17 @@
                           type="text"
                           ng-model="vm.editableValue"
                           ng-maxlength="vm.maxLength"
-                          valid-if-changed="{{vm.comment.messageBody}}"
-                          data-test-id="comment-edit-input-field" required></textarea>
+                          data-test-id="comment-edit-input-field"
+                          mentio
+                          mentio-typed-text="typedTerm"
+                          mentio-search="vm.mentions.invokeMention(term)"
+                          mentio-items="vm.mentions.employees | filter:label:typedTerm"
+                          mentio-select="vm.mentions.selectMention(item)"
+                          required></textarea>
 
                 <div class="comment-edit-properties pull-right">
                     <a class="comment-save-property"
-                       ng-disabled="editCommentForm.$invalid"
+                       ng-disabled="editCommentForm.$invalid || vm.editableValue === vm.comment.messageBody"
                        ng-click="!editCommentForm.$invalid && vm.editComment(vm.editableValue)"
                        data-test-id="comment-edit-save-button" translate="common.save"></a>
 

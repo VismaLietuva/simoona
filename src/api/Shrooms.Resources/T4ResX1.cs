@@ -5639,6 +5639,186 @@ namespace Shrooms.Resources.Models.Vacations {
     }
 }
 
+namespace Shrooms.Resources.Models.Walls.Comments {
+[Utilities.Localized]    public partial class Comments {
+
+        ///<summary>
+        /// Return this class as a Dictionary&lt;class, Dictionary&lt;key, value&gt;&gt;
+        ///</summary>
+        public static Dictionary<string, Dictionary<string, string>> GetAsDictionary()
+        {
+            return Utilities.GetResourcesByNameSpace("Models.Walls.Comments^Comments");
+        }
+
+        private static System.Resources.ResourceManager _resourceManager;
+
+        ///<summary>
+        /// Get the ResourceManager
+        ///</summary>
+        private static System.Resources.ResourceManager ResourceManager
+        {
+            get
+            {
+                return _resourceManager ?? (_resourceManager = new System.Resources.ResourceManager("Shrooms.Resources.Models.Walls.Comments.Comments", typeof(Comments).Assembly));
+            }
+        }
+
+        ///<summary>
+        ///    Get localized entry for a given key
+        ///</summary>
+        public static string GetResourceString(string key, params object[] args)
+        {
+            var value = ResourceManager.GetString(key, Thread.CurrentThread.CurrentCulture);
+
+            if (!string.IsNullOrEmpty(value))
+            {
+                var regex  = @"{\b\p{Lu}{3,}\b}";
+                var tokens = Regex.Matches(value, regex).Cast<Match>().Select(m => m.Value).ToList();
+                    tokens
+                        .ForEach(t =>
+                        {
+                            value = value.Replace(t, Utilities.GetReplacementString(t.Replace("{", "").Replace("}", "")));
+                        });
+
+                if (args.Any())
+                {
+                    regex  = @"{[0-9]{1}}";
+                    tokens = Regex.Matches(value, regex).Cast<Match>().Select(m => m.Value).ToList();
+
+                    if (tokens.Any())
+                    {
+                        // If argument length is less than token length, add an error message
+                        // This can happen if arguments are accidentally forgottent in a translation
+                        if (args.Count() < tokens.Count())
+                        {
+                            var newArgs = new List<object>();
+                            for (var i = 0; i < tokens.Count(); i++)
+                            {
+                                newArgs.Add(args.Length > i ? args[i] : "argument {" + i + "} is undefined");
+                            }
+
+                            args = newArgs.ToArray();
+                        }
+
+                        value = string.Format(value, args);
+                    }
+                }
+            }
+
+            return value;
+        }
+
+        ///<summary>
+        ///    <list type='bullet'>
+        ///        <item>
+        ///            <description>You have been mentioned in the comment</description>
+        ///        </item>
+        ///        <item>
+        ///            <description></description>
+        ///        </item>
+        ///    </list>
+        ///</summary>
+        [Utilities.Localized]
+        public static string NewMentionEmailSubject => GetResourceString(NewMentionEmailSubjectKey);
+
+        /// <summary>
+        /// Resource key for <see cref="NewMentionEmailSubject"/>
+        /// You can use it e.g. in validation attributes for <see cref="System.ComponentModel.DataAnnotations.ValidationAttribute.ErrorMessageResourceName"/> parameter.
+        /// </summary>
+        public const string NewMentionEmailSubjectKey = "NewMentionEmailSubject";
+    }
+}
+
+namespace Shrooms.Resources.Models.Walls.Posts {
+[Utilities.Localized]    public partial class Posts {
+
+        ///<summary>
+        /// Return this class as a Dictionary&lt;class, Dictionary&lt;key, value&gt;&gt;
+        ///</summary>
+        public static Dictionary<string, Dictionary<string, string>> GetAsDictionary()
+        {
+            return Utilities.GetResourcesByNameSpace("Models.Walls.Posts^Posts");
+        }
+
+        private static System.Resources.ResourceManager _resourceManager;
+
+        ///<summary>
+        /// Get the ResourceManager
+        ///</summary>
+        private static System.Resources.ResourceManager ResourceManager
+        {
+            get
+            {
+                return _resourceManager ?? (_resourceManager = new System.Resources.ResourceManager("Shrooms.Resources.Models.Walls.Posts.Posts", typeof(Posts).Assembly));
+            }
+        }
+
+        ///<summary>
+        ///    Get localized entry for a given key
+        ///</summary>
+        public static string GetResourceString(string key, params object[] args)
+        {
+            var value = ResourceManager.GetString(key, Thread.CurrentThread.CurrentCulture);
+
+            if (!string.IsNullOrEmpty(value))
+            {
+                var regex  = @"{\b\p{Lu}{3,}\b}";
+                var tokens = Regex.Matches(value, regex).Cast<Match>().Select(m => m.Value).ToList();
+                    tokens
+                        .ForEach(t =>
+                        {
+                            value = value.Replace(t, Utilities.GetReplacementString(t.Replace("{", "").Replace("}", "")));
+                        });
+
+                if (args.Any())
+                {
+                    regex  = @"{[0-9]{1}}";
+                    tokens = Regex.Matches(value, regex).Cast<Match>().Select(m => m.Value).ToList();
+
+                    if (tokens.Any())
+                    {
+                        // If argument length is less than token length, add an error message
+                        // This can happen if arguments are accidentally forgottent in a translation
+                        if (args.Count() < tokens.Count())
+                        {
+                            var newArgs = new List<object>();
+                            for (var i = 0; i < tokens.Count(); i++)
+                            {
+                                newArgs.Add(args.Length > i ? args[i] : "argument {" + i + "} is undefined");
+                            }
+
+                            args = newArgs.ToArray();
+                        }
+
+                        value = string.Format(value, args);
+                    }
+                }
+            }
+
+            return value;
+        }
+
+        ///<summary>
+        ///    <list type='bullet'>
+        ///        <item>
+        ///            <description>You have been mentioned in the post</description>
+        ///        </item>
+        ///        <item>
+        ///            <description></description>
+        ///        </item>
+        ///    </list>
+        ///</summary>
+        [Utilities.Localized]
+        public static string NewMentionEmailSubject => GetResourceString(NewMentionEmailSubjectKey);
+
+        /// <summary>
+        /// Resource key for <see cref="NewMentionEmailSubject"/>
+        /// You can use it e.g. in validation attributes for <see cref="System.ComponentModel.DataAnnotations.ValidationAttribute.ErrorMessageResourceName"/> parameter.
+        /// </summary>
+        public const string NewMentionEmailSubjectKey = "NewMentionEmailSubject";
+    }
+}
+
 namespace Shrooms.Resources.Widgets.KudosBasket {
 [Utilities.Localized]    public partial class KudosBasket {
 

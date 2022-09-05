@@ -50,8 +50,8 @@
         vm.isSearchingEmployee = false;
         vm.maxLength = wallSettings.postMaxLength;
         vm.thumbHeight = wallImageConfig.thumbHeight;
-        vm.invokeMention = invokeMention;
-        vm.selectMention = selectMention;
+
+        vm.mentions = mentionService.mentions();
 
         init();
 
@@ -89,7 +89,8 @@
         function handleFormSubmit(pictureId) {
             vm.commentForm.postId = vm.post.id;
             vm.commentForm.images = pictureId ? [ pictureId ] : null;
-            mentionService.applyMentions(vm.commentForm, vm.selectedMentions);
+            vm.commentForm.mentionedUserIds = vm.mentions.getValidatedMentions(vm.commentForm.messageBody);
+
             wallCommentRepository.createComment(vm.commentForm).then(function() {
                 wallService.initWall(vm.isWallModule, vm.wallId);
             }, errorHandler.handleErrorMessage);
@@ -152,26 +153,6 @@
                 notifySrv.error('wall.imageInvalidType');
             }
             $scope.$apply();
-        }
-
-
-        function selectMention(item) {
-            vm.selectedMentions.push({id: item.id, fullName: item.label});
-
-            return `@${item.label.replace(' ', '_')}`;
-        }
-
-        function invokeMention(term) {
-            if (term) {
-                mentionService.getUsersForAutocomplete(term).then(function(response) {
-                    vm.employees = response.map(function(cur) {
-                        return {
-                            id: cur.id,
-                            label: cur.fullName
-                        }
-                    });
-                });
-            }
         }
     }
 }());

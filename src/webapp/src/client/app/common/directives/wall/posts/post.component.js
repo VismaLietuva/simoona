@@ -21,6 +21,7 @@
         '$scope',
         '$state',
         '$location',
+        '$timeout',
         'SmoothScroll',
         'wallSettings',
         'errorHandler',
@@ -30,13 +31,15 @@
         'wallService',
         'notifySrv',
         '$window',
-        'lodash'
+        'lodash',
+        'mentionService'
     ];
 
     function wallPostController(
         $scope,
         $state,
         $location,
+        $timeout,
         SmoothScroll,
         wallSettings,
         errorHandler,
@@ -46,7 +49,8 @@
         wallService,
         notifySrv,
         $window,
-        lodash
+        lodash,
+        mentionService
     ) {
         /*jshint validthis: true */
         var vm = this;
@@ -78,6 +82,8 @@
         vm.unwatchPost = unwatchPost;
         vm.singleImageId = lodash.first(vm.post.images);
 
+        vm.mentions = mentionService.mentions();
+
         init();
 
         /////////
@@ -102,17 +108,21 @@
         }
 
         function editPost(messageBody) {
-            if (vm.isActionsEnabled) {
-                vm.disableEditor();
-
-                vm.post.messageBody = messageBody;
-                vm.isActionsEnabled = false;
-
-                wallPostRepository.editPost(vm.post).then(function () {
-                    vm.isActionsEnabled = true;
-                    wallService.initWall(vm.isWallModule, vm.wallId);
-                }, vm.handleErrorMessage);
+            if (!vm.isActionsEnabled) {
+                return;
             }
+
+            vm.disableEditor();
+
+            vm.post.messageBody = messageBody;
+            vm.post.mentionedUserIds = vm.mentions.getValidatedMentions(messageBody);
+
+            vm.isActionsEnabled = false;
+
+            wallPostRepository.editPost(vm.post).then(function () {
+                vm.isActionsEnabled = true;
+                wallService.initWall(vm.isWallModule, vm.wallId);
+            }, vm.handleErrorMessage);
         }
 
         function deletePost() {
@@ -155,7 +165,11 @@
 
         function enableEditor() {
             vm.editFieldEnabled = true;
-            vm.editableValue = vm.post.messageBody;
+
+            // Necessary to avoid no mentio-items attribute was provided error 
+            $timeout(function() {
+                vm.editableValue = vm.post.messageBody;
+            });
         }
 
         function disableEditor() {

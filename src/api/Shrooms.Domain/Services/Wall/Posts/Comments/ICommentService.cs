@@ -20,5 +20,7 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
         Task HideCommentAsync(int id, UserAndOrganizationDto userOrg);
 
         Task DeleteCommentsByPostAsync(int postId);
+
+        Task<MentionCommentDto> GetMentionCommentByIdAsync(int commentId);
     }
 }
