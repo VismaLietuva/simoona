@@ -8,7 +8,7 @@
                     {{::vm.post.wallName}}
                 </a>
             </div>
-           
+
         <div class="clearfix">
             <ace-message-user-profile user="vm.post.author"
                                       date="vm.post.created"
@@ -77,9 +77,9 @@
             </ace-soundcloud-player-link>
 
             <img class="post-image"
-                 ng-if="!!vm.post.pictureId && !vm.post.isHidden"
-                 ng-src="{{:: vm.post.pictureId | wallImageThumb}}"
-                 ace-picture-modal="vm.post.pictureId"
+                 ng-if="!!vm.singleImageId && !vm.post.isHidden"
+                 ng-src="{{:: vm.singleImageId | wallImageThumb}}"
+                 ace-picture-modal="vm.singleImageId"
                  data-test-id="post-picture" image-loading>
 
             <ace-wall-shared-event ng-if="!!vm.post.sharedEventId && !vm.post.isHidden"

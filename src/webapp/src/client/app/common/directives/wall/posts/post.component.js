@@ -1,23 +1,21 @@
-(function() {
+(function () {
     'use strict';
 
-    angular
-        .module('simoonaApp.Common')
-        .component('aceWallPost', {
-            replace: true,
-            bindings: {
-                post: '=',
-                isAdmin: '=',
-                hasHashtagify: '=',
-                isCollapsed: '=',
-                wallId: '=',
-                isWallModule: '=',
-                index: '='
-            },
-            templateUrl: 'app/common/directives/wall/posts/post.html',
-            controller: wallPostController,
-            controllerAs: 'vm'
-        });
+    angular.module('simoonaApp.Common').component('aceWallPost', {
+        replace: true,
+        bindings: {
+            post: '=',
+            isAdmin: '=',
+            hasHashtagify: '=',
+            isCollapsed: '=',
+            wallId: '=',
+            isWallModule: '=',
+            index: '=',
+        },
+        templateUrl: 'app/common/directives/wall/posts/post.html',
+        controller: wallPostController,
+        controllerAs: 'vm',
+    });
 
     wallPostController.$inject = [
         '$scope',
@@ -31,11 +29,25 @@
         'wallPostRepository',
         'wallService',
         'notifySrv',
-        '$window'
+        '$window',
+        'lodash'
     ];
 
-    function wallPostController($scope, $state, $location, SmoothScroll, wallSettings,
-        errorHandler, youtubeSettings, notificationFactory, wallPostRepository, wallService, notifySrv, $window) {
+    function wallPostController(
+        $scope,
+        $state,
+        $location,
+        SmoothScroll,
+        wallSettings,
+        errorHandler,
+        youtubeSettings,
+        notificationFactory,
+        wallPostRepository,
+        wallService,
+        notifySrv,
+        $window,
+        lodash
+    ) {
         /*jshint validthis: true */
         var vm = this;
 
@@ -64,13 +76,13 @@
         vm.notifyCopied = notifyCopied;
         vm.watchPost = watchPost;
         vm.unwatchPost = unwatchPost;
+        vm.singleImageId = lodash.first(vm.post.images);
 
         init();
-        
+
         /////////
 
-        function init()
-        {
+        function init() {
             isSeen(vm.post.id);
         }
 
@@ -82,13 +94,13 @@
                         notificationIds.push(notification.id);
                     }
                 });
-                if(!!notificationIds.length)
-                {
+                if (!!notificationIds.length) {
                     vm.markAsRead(notificationIds);
                     notificationIds = [];
                 }
             }
         }
+
         function editPost(messageBody) {
             if (vm.isActionsEnabled) {
                 vm.disableEditor();
@@ -96,7 +108,7 @@
                 vm.post.messageBody = messageBody;
                 vm.isActionsEnabled = false;
 
-                wallPostRepository.editPost(vm.post).then(function() {
+                wallPostRepository.editPost(vm.post).then(function () {
                     vm.isActionsEnabled = true;
                     wallService.initWall(vm.isWallModule, vm.wallId);
                 }, vm.handleErrorMessage);
@@ -109,7 +121,7 @@
 
                 vm.isActionsEnabled = false;
 
-                wallPostRepository.deletePost(vm.post).then(function() {
+                wallPostRepository.deletePost(vm.post).then(function () {
                     vm.isActionsEnabled = true;
                     wallService.initWall(vm.isWallModule, vm.wallId);
                 }, vm.handleErrorMessage);
@@ -149,12 +161,19 @@
         function disableEditor() {
             vm.editFieldEnabled = false;
         }
-        
+
         function getPostUrl(id) {
-            if ($state.includes('Root.WithOrg.Client.Events') || $state.includes('Root.WithOrg.Client.Projects')){
+            if (
+                $state.includes('Root.WithOrg.Client.Events') ||
+                $state.includes('Root.WithOrg.Client.Projects')
+            ) {
                 return $location.absUrl();
-            } else if ($state.includes('Root.WithOrg.Client.Wall.All')){
-                return $location.absUrl().split('?')[0].replace('/All', '/Feed') + '?post=' + id;
+            } else if ($state.includes('Root.WithOrg.Client.Wall.All')) {
+                return (
+                    $location.absUrl().split('?')[0].replace('/All', '/Feed') +
+                    '?post=' +
+                    id
+                );
             } else {
                 return $location.absUrl().split('?')[0] + '?post=' + id;
             }
@@ -172,10 +191,9 @@
 
         function unwatchPost() {
             if (vm.isActionsEnabled && vm.post.isWatched) {
-
                 vm.isActionsEnabled = false;
 
-                wallPostRepository.unwatchPost(vm.post).then(function() {
+                wallPostRepository.unwatchPost(vm.post).then(function () {
                     vm.isActionsEnabled = true;
                     vm.post.isWatched = false;
                 }, vm.handleErrorMessage);
@@ -184,14 +202,13 @@
 
         function watchPost() {
             if (vm.isActionsEnabled && !vm.post.isWatched) {
-
                 vm.isActionsEnabled = false;
 
-                wallPostRepository.watchPost(vm.post).then(function() {
+                wallPostRepository.watchPost(vm.post).then(function () {
                     vm.isActionsEnabled = true;
                     vm.post.isWatched = true;
                 }, vm.handleErrorMessage);
             }
         }
     }
-}());
+})();

@@ -126,7 +126,7 @@ namespace Shrooms.Tests.DomainService
             {
                 MessageBody = "test",
                 OrganizationId = 2,
-                PictureId = "pic",
+                Images = new List<string>(),
                 UserId = _userId,
                 WallId = walls.First().Id
             };
@@ -164,7 +164,7 @@ namespace Shrooms.Tests.DomainService
             {
                 MessageBody = "test",
                 OrganizationId = 2,
-                PictureId = "pic",
+                Images = new List<string>(),
                 UserId = "testUser",
                 WallId = 1
             };
@@ -288,7 +288,8 @@ namespace Shrooms.Tests.DomainService
                 Id = 1,
                 MessageBody = "edited post",
                 UserId = "user2",
-                OrganizationId = 2
+                OrganizationId = 2,
+                Images = new List<string>()
             };
 
             _permissionService.UserHasPermissionAsync(editPostDto, AdministrationPermissions.Post).Returns(false);
@@ -320,7 +321,8 @@ namespace Shrooms.Tests.DomainService
                 Id = 1,
                 MessageBody = "edited post",
                 UserId = "user3",
-                OrganizationId = 2
+                OrganizationId = 2,
+                Images = new List<string>()
             };
 
             _permissionService.UserHasPermissionAsync(editPostDto, AdministrationPermissions.Post).Returns(true);

@@ -65,7 +65,11 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
         public async Task CreateLotteryAsync_CorrectValues_CreatesLottery()
         {
             // Arrange
-            var newLotteryDto = new LotteryDto();
+            var newLotteryDto = new LotteryDto
+            {
+                Images = new List<string>()
+            };
+
             var userOrg = new UserAndOrganizationDto();
 
             // Act
@@ -82,7 +86,8 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             // Arrange
             var newLotteryDto = new LotteryDto
             {
-                Status = LotteryStatus.Started
+                Status = LotteryStatus.Started,
+                Images = new List<string>()
             };
 
             var userOrg = new UserAndOrganizationDto();
@@ -103,7 +108,8 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             // Arrange
             var newLotteryDto = new LotteryDto
             {
-                Status = LotteryStatus.Drafted
+                Status = LotteryStatus.Drafted,
+                Images = new List<string>()
             };
 
             var userOrg = new UserAndOrganizationDto();
@@ -125,7 +131,8 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
 
             var lotteryDto = new LotteryDto
             {
-                Id = lottery.Id
+                Id = lottery.Id,
+                Images = new List<string>()
             };
 
             var userOrg = new UserAndOrganizationDto
@@ -159,7 +166,8 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             var lotteryDto = new LotteryDto
             {
                 Id = lottery.Id,
-                Status = LotteryStatus.Started
+                Status = LotteryStatus.Started,
+                Images = new List<string>()
             };
 
             var userOrg = new UserAndOrganizationDto
@@ -193,7 +201,8 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             var lotteryDto = new LotteryDto
             {
                 Id = lottery.Id,
-                Status = LotteryStatus.Drafted
+                Status = LotteryStatus.Drafted,
+                Images = new List<string>()
             };
 
             var userOrg = new UserAndOrganizationDto
@@ -225,9 +234,10 @@ namespace Shrooms.Premium.Tests.DomainService.LotteryServices
             var lottery = CreateAndAddLotteryWithIdToDbSet(1);
 
             var lotteryDto = new LotteryDto
-            {
+            { 
                 Id = lottery.Id,
-                Status = LotteryStatus.Drafted
+                Status = LotteryStatus.Drafted,
+                Images = new List<string>()
             };
 
             var userOrg = new UserAndOrganizationDto

@@ -28,7 +28,7 @@
             return $resource(commentUrl + 'Create').save({
                 postId: comment.postId,
                 messageBody: comment.messageBody,
-                pictureId: comment.pictureId,
+                images: comment.images,
                 mentionedUserIds: comment.mentionedUserIds
             }).$promise;
         }
@@ -41,7 +41,7 @@
             }).put({
                 id: comment.id,
                 messageBody: comment.messageBody,
-                pictureId: comment.pictureId
+                images: comment.images
             }).$promise;
         }
 

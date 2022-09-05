@@ -632,6 +632,7 @@ namespace Shrooms.Domain.Services.Wall
             }
 
             var entriesCountToSkip = (pageNumber - 1) * pageSize;
+
             var posts = await _postsDbSet
                 .Include(post => post.Wall)
                 .Include(post => post.Comments)
@@ -679,7 +680,7 @@ namespace Shrooms.Domain.Services.Wall
                 if (postDto.IsHidden)
                 {
                     postDto.MessageBody = string.Empty;
-                    postDto.PictureId = string.Empty;
+                    postDto.Images = null;
                 }
 
                 postDto.IsEdited = post.LastEdit > post.Created;
@@ -697,11 +698,9 @@ namespace Shrooms.Domain.Services.Wall
                     MessageBody = c.IsHidden
                         ? string.Empty
                         : c.MessageBody,
-
-                    PictureId = c.IsHidden
-                        ? string.Empty
-                        : c.PictureId,
-
+                    Images = c.IsHidden
+                        ? null
+                        : c.Images,
                     Created = c.Created,
                     PostId = c.PostId,
                     CanModerate = moderators.Any(x => x.UserId == userId && x.WallId == c.Post.WallId) || c.AuthorId == userId,

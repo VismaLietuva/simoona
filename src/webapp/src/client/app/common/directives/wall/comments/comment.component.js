@@ -1,32 +1,38 @@
-(function() {
+(function () {
     'use strict';
 
-    angular
-        .module('simoonaApp.Common')
-        .component('aceWallComment', {
-            replace: true,
-            bindings: {
-                comment: '=',
-                isAdmin: '=',
-                wallId: '=',
-                isWallModule: '=',
-                hasHashtagify: '=',
-                isHidden: '<'
-            },
-            templateUrl: 'app/common/directives/wall/comments/comment.html',
-            controller: wallCommentController,
-            controllerAs: 'vm'
-        });
+    angular.module('simoonaApp.Common').component('aceWallComment', {
+        replace: true,
+        bindings: {
+            comment: '=',
+            isAdmin: '=',
+            wallId: '=',
+            isWallModule: '=',
+            hasHashtagify: '=',
+            isHidden: '<',
+        },
+        templateUrl: 'app/common/directives/wall/comments/comment.html',
+        controller: wallCommentController,
+        controllerAs: 'vm',
+    });
 
     wallCommentController.$inject = [
         'wallSettings',
         'errorHandler',
         'youtubeSettings',
         'wallCommentRepository',
-        'wallService'
+        'wallService',
+        'lodash',
     ];
 
-    function wallCommentController(wallSettings, errorHandler, youtubeSettings, wallCommentRepository, wallService) {
+    function wallCommentController(
+        wallSettings,
+        errorHandler,
+        youtubeSettings,
+        wallCommentRepository,
+        wallService,
+        lodash
+    ) {
         /*jshint validthis: true */
         var vm = this;
 
@@ -43,6 +49,7 @@
         vm.youtubeHeight = youtubeSettings.height;
         vm.youtubePreviewWidth = youtubeSettings.previewWidth;
         vm.youtubePreviewHeight = youtubeSettings.previewHeight;
+        vm.singlePictureId = lodash.first(vm.comment.images);
 
         //////////
 
@@ -53,7 +60,7 @@
                 vm.comment.messageBody = messageBody;
                 vm.isActionsEnabled = false;
 
-                wallCommentRepository.editComment(vm.comment).then(function() {
+                wallCommentRepository.editComment(vm.comment).then(function () {
                     vm.isActionsEnabled = true;
                     wallService.initWall(vm.isWallModule, vm.wallId);
                 }, vm.handleErrorMessage);
@@ -66,10 +73,12 @@
 
                 vm.isActionsEnabled = false;
 
-                wallCommentRepository.deleteComment(vm.comment).then(function() {
-                    vm.isActionsEnabled = true;
-                    wallService.initWall(vm.isWallModule, vm.wallId);
-                }, vm.handleErrorMessage);
+                wallCommentRepository
+                    .deleteComment(vm.comment)
+                    .then(function () {
+                        vm.isActionsEnabled = true;
+                        wallService.initWall(vm.isWallModule, vm.wallId);
+                    }, vm.handleErrorMessage);
             }
         }
 
@@ -87,4 +96,4 @@
             vm.editFieldEnabled = false;
         }
     }
-}());
+})();

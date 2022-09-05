@@ -17,6 +17,8 @@ namespace Shrooms.Contracts.ViewModels.Wall.Posts
 
         public string PictureId { get; set; }
 
+        public IEnumerable<string> Images { get; set; }
+
         public int PostId { get; set; }
 
         public IEnumerable<LikeViewModel> Likes { get; set; }

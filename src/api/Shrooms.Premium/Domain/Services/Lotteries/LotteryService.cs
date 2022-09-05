@@ -454,7 +454,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
                 Description = lotteryDto.Description,
                 EndDate = lotteryDto.EndDate,
                 EntryFee = lotteryDto.EntryFee,
-                Images = lotteryDto.Images,
+                Images = new ImageCollection(lotteryDto.Images),
                 GiftedTicketLimit = lotteryDto.GiftedTicketLimit,
                 Created = _systemClock.UtcNow,
                 CreatedBy = userOrg.UserId,
@@ -501,7 +501,7 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
             lottery.Description = draftedLotteryDto.Description;
             lottery.Status = draftedLotteryDto.Status;
             lottery.Title = draftedLotteryDto.Title;
-            lottery.Images = draftedLotteryDto.Images;
+            lottery.Images = new ImageCollection(draftedLotteryDto.Images);
             lottery.Modified = _systemClock.UtcNow;
             lottery.ModifiedBy = userOrg.UserId;
             lottery.GiftedTicketLimit = draftedLotteryDto.GiftedTicketLimit;
