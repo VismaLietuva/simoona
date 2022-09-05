@@ -50,20 +50,5 @@ namespace Shrooms.Presentation.Api.Controllers
                 return BadRequestWithError(e);
             }
         }
-
-        [RoutePrefix("EmployeeList")]
-        public class EmployeeDeprecatedController : EmployeeController
-        {
-            public EmployeeDeprecatedController(IMapper mapper, IEmployeeListingService employeeListingService)
-                : base(mapper, employeeListingService)
-            {
-            }
-
-            [Route("GetPaged")]
-            public override Task<IHttpActionResult> GetPagedEmployees([FromUri] EmployeeListingArgsViewModel employeeArgsViewModel)
-            {
-                return base.GetPagedEmployees(employeeArgsViewModel);
-            }
-        }
     }
 }
