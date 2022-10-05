@@ -76,17 +76,14 @@
                     htmlText,
                     'text/html'
                 );
+
                 var documentBody = documentObject.querySelector('body');
 
                 var allLinks = documentBody.querySelectorAll('a');
-
                 var markedText = htmlText;
 
                 for (var link of allLinks) {
-                    markedText = markedText.replace(
-                        link.parentNode.innerHTML,
-                        uniqueMark
-                    );
+                    markedText = markedText.replace(link, uniqueMark);
                 }
 
                 return {
