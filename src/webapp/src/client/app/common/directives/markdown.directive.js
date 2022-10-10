@@ -83,7 +83,7 @@
                 var markedText = htmlText;
 
                 for (var link of allLinks) {
-                    markedText = markedText.replace(link, uniqueMark);
+                    markedText = markedText.replace(link.outerHTML, uniqueMark);
                 }
 
                 return {
@@ -97,7 +97,7 @@
                 for (var link of markedObject.links) {
                     markedObject.text = markedObject.text.replace(
                         markedObject.mark,
-                        link.parentNode.innerHTML
+                        link.outerHTML
                     );
                 }
 
