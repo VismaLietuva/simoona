@@ -237,7 +237,7 @@
                 searchString: searchString,
                 eventTypeIds: typeIds,
                 page: page,
-                officeIds: officeIds,
+                officeTypeIds: officeIds,
                 sortByProperties: sortByProperties
             }).$promise;
         }

@@ -2,6 +2,9 @@
 {
     public static class EventsConstants
     {
+        public const string EventMainType = "main";
+        public const string EventAllType = "all";
+
         public const int EventNameMaxLength = 35;
         public const int EventTypeNameMaxLength = 30;
         public const int EventMinimumParticipants = 0;
