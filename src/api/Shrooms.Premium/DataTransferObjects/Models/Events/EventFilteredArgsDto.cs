@@ -17,8 +17,6 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
 
         public int? OfficeIdParsed { get; set; }
 
-        public bool IsOnlyMainEvents { get; set; }
-
         public int Page { get; set; }
 
         public int PageSize { get; set; }

@@ -68,7 +68,7 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                 .Include(x => x.EventParticipants)
                 .Include(x => x.EventType)
                 .Where(e => e.OrganizationId == userOrganization.OrganizationId)
-                .Where(EventTypeFilter(filteredArgsDto.TypeIdParsed, filteredArgsDto.IsOnlyMainEvents))
+                .Where(EventTypeFilter(filteredArgsDto))
                 .Where(EventOfficeFilter(officeSearchString));
 
             if (filteredArgsDto.StartDate is null || filteredArgsDto.EndDate is null)
@@ -325,19 +325,21 @@ namespace Shrooms.Premium.Domain.Services.Events.List
             };
         }
 
-        private static Expression<Func<Event, bool>> EventTypeFilter(int? typeId, bool includeOnlyMain = false)
+        private static Expression<Func<Event, bool>> EventTypeFilter(EventFilteredArgsDto filteredArgsDto)
         {
-            if (includeOnlyMain)
+            if (filteredArgsDto.TypeId == EventsConstants.EventMainType)
             {
                 return x => x.EventType.IsShownWithMainEvents;
             }
 
-            if (typeId == null || typeId == 0)
+            if (filteredArgsDto.TypeId == EventsConstants.EventAllType ||
+                filteredArgsDto.TypeIdParsed == null ||
+                filteredArgsDto.TypeIdParsed == 0)
             {
                 return x => true;
             }
 
-            return x => x.EventTypeId == typeId;
+            return x => x.EventTypeId == filteredArgsDto.TypeIdParsed;
         }
 
         private static Expression<Func<Event, bool>> EventOfficeFilter(string office)
