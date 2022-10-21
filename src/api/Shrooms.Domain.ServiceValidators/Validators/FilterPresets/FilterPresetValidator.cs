@@ -10,11 +10,17 @@ using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
 using System.Data.Entity;
 using System.Threading.Tasks;
+using Shrooms.DataLayer.EntityModels.Models.Events;
+using Shrooms.DataLayer.EntityModels.Models.Kudos;
 
 namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
 {
     public class FilterPresetValidator : IFilterPresetValidator
     {
+        private readonly DbSet<Office> _officeDbSet;
+        private readonly DbSet<EventType> _eventTypeDbSet;
+        private readonly DbSet<KudosType> _kudosTypeDbSet;
+
         private readonly DbSet<FilterPreset> _filterPresetsDbSet;
 
         public FilterPresetValidator(IUnitOfWork2 uow)
@@ -112,12 +118,54 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
             }
         }
 
+        public async Task CheckIfProvidedTypesInFiltersAreValidAsync(ManageFilterPresetDto manageFilterPresetDto)
+        {
+            var retrievedExistingTypes = new Dictionary<FilterType, List<string>>();
+
+            await CheckIfProvidedTypesInFiltersAreValidAsync(manageFilterPresetDto.PresetsToUpdate, retrievedExistingTypes);
+            await CheckIfProvidedTypesInFiltersAreValidAsync(manageFilterPresetDto.PresetsToCreate, retrievedExistingTypes);
+        }
+
+        private async Task CheckIfProvidedTypesInFiltersAreValidAsync(IEnumerable<FilterPresetDto> presets, Dictionary<FilterType, List<string>> retrievedExistingTypes)
+        {
+            foreach (var preset in presets)
+            {
+                foreach (var filter in preset.Filters)
+                {
+                    if (!retrievedExistingTypes.ContainsKey(filter.FilterType))
+                    {
+                        retrievedExistingTypes[filter.FilterType] = await GetTypeIdQueryByFilterType(filter.FilterType)
+                            .ToListAsync();
+                    }
+
+                    if (filter.Types.Any(type => !retrievedExistingTypes[filter.FilterType].Contains(type)))
+                    {
+                        throw new ValidationException(ErrorCodes.InvalidType, "Provided type does not exists");
+                    }
+                }
+            }
+        }
+
         private void CheckIfFilterTypeIsValid(FilterType filterType)
         {
             if (!Enum.IsDefined(typeof(FilterType), filterType))
             {
                 throw new ValidationException(ErrorCodes.InvalidType, "Filter does not exists");
             }
+        }
+
+        private IQueryable<string> GetTypeIdQueryByFilterType(FilterType filterType)
+        {
+            return filterType switch
+            {
+                FilterType.Offices => _officeDbSet.Select(filter => filter.Id.ToString()),
+
+                FilterType.Kudos => _kudosTypeDbSet.Select(filter => filter.Id.ToString()),
+
+                FilterType.Events => _eventTypeDbSet.Select(filter => filter.Id.ToString()),
+
+                _ => throw new NotImplementedException()
+            };
         }
     }
 }

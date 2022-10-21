@@ -14,6 +14,7 @@ using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.ViewModels;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Domain.Exceptions.Exceptions;
+using Shrooms.Domain.Services.FilterPresets;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Presentation.Api.Controllers.Wall;
@@ -36,7 +37,11 @@ namespace Shrooms.Presentation.Api.Controllers.Kudos
         private readonly IKudosExportService _kudosExportService;
         private readonly IPermissionService _permissionService;
 
-        public KudosController(IMapper mapper, IKudosService kudosService, IKudosExportService kudosExportService, IPermissionService permissionService)
+        public KudosController(
+            IMapper mapper,
+            IKudosService kudosService,
+            IKudosExportService kudosExportService,
+            IPermissionService permissionService)
         {
             _mapper = mapper;
             _kudosService = kudosService;

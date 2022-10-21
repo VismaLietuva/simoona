@@ -17,7 +17,7 @@ namespace Shrooms.Domain.Services.FilterPresets
 {
     public class FilterPresetService : IFilterPresetService
     {
-        private static readonly SemaphoreSlim _filterPresetUpdateCreateLock = new SemaphoreSlim(1, 1);
+        private static readonly SemaphoreSlim _lock = new (1, 1);
 
         private readonly IUnitOfWork2 _uow;
 
@@ -59,13 +59,15 @@ namespace Shrooms.Domain.Services.FilterPresets
 
         public async Task<UpdatedFilterPresetDto> UpdateAsync(ManageFilterPresetDto manageFilterPresetDto)
         {
-            await _filterPresetUpdateCreateLock.WaitAsync();
+            await _lock.WaitAsync();
 
             try
             {
                 _validator.CheckIfMoreThanOneDefaultPresetExists(manageFilterPresetDto);
                 _validator.CheckIfFilterPresetsContainUniqueNames(manageFilterPresetDto.PresetsToUpdate);
                 _validator.CheckIfFilterPresetsContainUniqueNames(manageFilterPresetDto.PresetsToCreate);
+
+                await _validator.CheckIfProvidedTypesInFiltersAreValidAsync(manageFilterPresetDto);
 
                 await UpdatePresetsAsync(manageFilterPresetDto);
 
@@ -99,7 +101,32 @@ namespace Shrooms.Domain.Services.FilterPresets
             }
             finally
             {
-                _filterPresetUpdateCreateLock.Release();
+                _lock.Release();
+            }
+        }
+
+        public async Task RemoveDeletedTypeFromPresetsAsync(string deletedTypeId, FilterType type)
+        {
+            await _lock.WaitAsync();
+
+            try
+            {
+                var presets = await _filterPresetDbSet.ToListAsync();
+
+                foreach (var preset in presets)
+                {
+                    var filters = JsonConvert.DeserializeObject<IEnumerable<FilterPresetItemDto>>(preset.Preset);
+
+                    RemoveDeletedTypeFromFilters(filters, deletedTypeId, type);
+
+                    preset.Preset = JsonConvert.SerializeObject(filters);
+                }
+
+                await _uow.SaveChangesAsync();
+            }
+            finally
+            {
+                _lock.Release();
             }
         }
 
@@ -123,6 +150,19 @@ namespace Shrooms.Domain.Services.FilterPresets
             }
 
             return filtersDtos;
+        }
+
+        private void RemoveDeletedTypeFromFilters(IEnumerable<FilterPresetItemDto> filters, string typeId, FilterType type)
+        {
+            foreach (var filter in filters)
+            {
+                if (filter.FilterType != type)
+                {
+                    continue;
+                }
+
+                filter.Types = filter.Types.Where(type => type != typeId);
+            }
         }
 
         private bool IsNewDefaultPresetSet(IEnumerable<FilterPreset> createdPresets, IEnumerable<FilterPresetDto> updatedPresets)

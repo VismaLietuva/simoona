@@ -21,10 +21,10 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Domain.Helpers;
 using Shrooms.Domain.Services.Email.Kudos;
+using Shrooms.Domain.Services.FilterPresets;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.ServiceValidators.Validators.Kudos;
 using Shrooms.Resources;
-using ConstantsRoles = Shrooms.Contracts.Constants.Roles;
 
 namespace Shrooms.Domain.Services.Kudos
 {
@@ -36,6 +36,7 @@ namespace Shrooms.Domain.Services.Kudos
         private readonly IMapper _mapper;
         private readonly IPermissionService _permissionService;
         private readonly IKudosServiceValidator _kudosServiceValidator;
+        private readonly IFilterPresetService _filterPresetService;
         private readonly IAsyncRunner _asyncRunner;
         private readonly DbSet<KudosLog> _kudosLogsDbSet;
         private readonly DbSet<KudosType> _kudosTypesDbSet;
@@ -57,13 +58,15 @@ namespace Shrooms.Domain.Services.Kudos
             IMapper mapper,
             IPermissionService permissionService,
             IKudosServiceValidator kudosServiceValidator,
-            IAsyncRunner asyncRunner)
+            IAsyncRunner asyncRunner,
+            IFilterPresetService filterPresetService)
         {
             _uow = uow;
             _mapper = mapper;
             _permissionService = permissionService;
             _kudosServiceValidator = kudosServiceValidator;
             _asyncRunner = asyncRunner;
+            _filterPresetService = filterPresetService;
             _kudosLogsDbSet = uow.GetDbSet<KudosLog>();
             _kudosTypesDbSet = uow.GetDbSet<KudosType>();
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
@@ -130,9 +133,13 @@ namespace Shrooms.Domain.Services.Kudos
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Type not found");
             }
 
+            var typeId = type.Id;
+
             _kudosTypesDbSet.Remove(type);
 
             await _uow.SaveChangesAsync(userOrg.UserId);
+
+            await _filterPresetService.RemoveDeletedTypeFromPresetsAsync(typeId.ToString(), FilterType.Kudos);
         }
 
         public async Task<KudosTypeDto> GetSendKudosTypeAsync(UserAndOrganizationDto userOrg)

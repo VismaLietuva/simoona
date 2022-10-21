@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.DataLayer.EntityModels.Models.Events;
+using Shrooms.Domain.Services.FilterPresets;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 
@@ -20,13 +22,19 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
         private readonly IDbSet<Event> _eventsDbSet;
         private readonly IDbSet<EventType> _eventTypesDbSet;
         private readonly IDbSet<EventOption> _eventOptionsDbSet;
+        
+        private readonly IFilterPresetService _filterPresetService;
 
-        public EventUtilitiesService(IUnitOfWork2 uow)
+        public EventUtilitiesService(
+            IUnitOfWork2 uow,
+            IFilterPresetService filterPresetService)
         {
             _uow = uow;
             _eventsDbSet = uow.GetDbSet<Event>();
             _eventTypesDbSet = uow.GetDbSet<EventType>();
             _eventOptionsDbSet = uow.GetDbSet<EventOption>();
+            
+            _filterPresetService = filterPresetService;
         }
 
         public async Task DeleteByEventAsync(Guid eventId, string userId)
@@ -163,8 +171,13 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Event type does not exist");
             }
 
+            var eventTypeId = eventType.Id;
+
             _eventTypesDbSet.Remove(eventType);
+
             await _uow.SaveChangesAsync(userAndOrg.UserId);
+
+            await _filterPresetService.RemoveDeletedTypeFromPresetsAsync(eventTypeId.ToString(), FilterType.Events);
         }
 
         public IEnumerable<object> GetRecurrenceOptions()
