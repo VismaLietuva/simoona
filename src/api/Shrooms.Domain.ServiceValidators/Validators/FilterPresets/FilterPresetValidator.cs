@@ -124,11 +124,18 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
         {
             var retrievedExistingTypes = new Dictionary<FilterType, List<string>>();
 
-            await CheckIfProvidedTypesInFiltersAreValidAsync(manageFilterPresetDto.PresetsToUpdate, retrievedExistingTypes);
-            await CheckIfProvidedTypesInFiltersAreValidAsync(manageFilterPresetDto.PresetsToCreate, retrievedExistingTypes);
+            await CheckIfProvidedTypesInFiltersAreValidAsync(
+                manageFilterPresetDto.PresetsToUpdate,
+                retrievedExistingTypes,
+                manageFilterPresetDto.UserOrg.OrganizationId);
+
+            await CheckIfProvidedTypesInFiltersAreValidAsync(
+                manageFilterPresetDto.PresetsToCreate,
+                retrievedExistingTypes,
+                manageFilterPresetDto.UserOrg.OrganizationId);
         }
 
-        private async Task CheckIfProvidedTypesInFiltersAreValidAsync(IEnumerable<FilterPresetDto> presets, Dictionary<FilterType, List<string>> retrievedExistingTypes)
+        private async Task CheckIfProvidedTypesInFiltersAreValidAsync(IEnumerable<FilterPresetDto> presets, Dictionary<FilterType, List<string>> retrievedExistingTypes, int organizationId)
         {
             foreach (var preset in presets)
             {
@@ -136,7 +143,7 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
                 {
                     if (!retrievedExistingTypes.ContainsKey(filter.FilterType))
                     {
-                        retrievedExistingTypes[filter.FilterType] = await GetTypeIdQueryByFilterType(filter.FilterType)
+                        retrievedExistingTypes[filter.FilterType] = await GetTypeIdQueryByFilterType(filter.FilterType, organizationId)
                             .ToListAsync();
                     }
 
@@ -156,15 +163,17 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
             }
         }
 
-        private IQueryable<string> GetTypeIdQueryByFilterType(FilterType filterType)
+        private IQueryable<string> GetTypeIdQueryByFilterType(FilterType filterType, int organizationId)
         {
             return filterType switch
             {
-                FilterType.Offices => _officeDbSet.Select(filter => filter.Id.ToString()),
+                FilterType.Offices => _officeDbSet.Where(office => office.OrganizationId == organizationId)
+                    .Select(office => office.Id.ToString()),
 
-                FilterType.Kudos => _kudosTypeDbSet.Select(filter => filter.Id.ToString()),
+                FilterType.Kudos => _kudosTypeDbSet.Select(kudos => kudos.Id.ToString()), // Does not have organization
 
-                FilterType.Events => _eventTypeDbSet.Select(filter => filter.Id.ToString()),
+                FilterType.Events => _eventTypeDbSet.Where(@event => @event.OrganizationId == organizationId)
+                    .Select(filter => filter.Id.ToString()),
 
                 _ => throw new NotImplementedException()
             };

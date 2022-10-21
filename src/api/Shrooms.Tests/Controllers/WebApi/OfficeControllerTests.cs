@@ -128,7 +128,7 @@ namespace Shrooms.Tests.Controllers.WebApi
 
             // Assert
             await _filterPresetService.Received(1)
-                .RemoveDeletedTypeFromPresetsAsync(Arg.Is(id.ToString()), FilterType.Offices);
+                .RemoveDeletedTypeFromPresetsAsync(Arg.Is(id.ToString()), FilterType.Offices, Arg.Any<int>());
         }
 
         [Test]

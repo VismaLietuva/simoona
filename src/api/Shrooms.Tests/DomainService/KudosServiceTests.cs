@@ -619,7 +619,7 @@ namespace Shrooms.Tests.DomainService
             // Assert
             await _filterPresetService
                 .Received(1)
-                .RemoveDeletedTypeFromPresetsAsync(Arg.Is(id.ToString()), Arg.Is(FilterType.Kudos));
+                .RemoveDeletedTypeFromPresetsAsync(Arg.Is(id.ToString()), Arg.Is(FilterType.Kudos), Arg.Is(0));
         }
 
         #endregion

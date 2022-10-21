@@ -194,7 +194,10 @@ namespace Shrooms.Presentation.Api.Controllers
 
             await _unitOfWork.SaveAsync();
 
-            await _filterPresetService.RemoveDeletedTypeFromPresetsAsync(officeId.ToString(), FilterType.Offices);
+            await _filterPresetService.RemoveDeletedTypeFromPresetsAsync(
+                officeId.ToString(),
+                FilterType.Offices,
+                GetOrganizationId());
 
             return Request.CreateResponse(HttpStatusCode.OK);
         }

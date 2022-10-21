@@ -177,7 +177,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
 
             await _uow.SaveChangesAsync(userAndOrg.UserId);
 
-            await _filterPresetService.RemoveDeletedTypeFromPresetsAsync(eventTypeId.ToString(), FilterType.Events);
+            await _filterPresetService.RemoveDeletedTypeFromPresetsAsync(eventTypeId.ToString(), FilterType.Events, userAndOrg.OrganizationId);
         }
 
         public IEnumerable<object> GetRecurrenceOptions()

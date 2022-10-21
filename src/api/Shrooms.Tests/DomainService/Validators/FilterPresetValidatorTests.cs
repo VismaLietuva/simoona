@@ -15,6 +15,7 @@ using Shrooms.Tests.Extensions;
 using System.Threading.Tasks;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
+using Shrooms.Contracts.DataTransferObjects;
 
 namespace Shrooms.Tests.DomainService.Validators
 {
@@ -301,6 +302,10 @@ namespace Shrooms.Tests.DomainService.Validators
 
             var manageDto = new ManageFilterPresetDto
             {
+                UserOrg = new UserAndOrganizationDto
+                {
+                    OrganizationId = 1
+                },
                 PresetsToCreate = createPresets,
                 PresetsToUpdate = updatePresets
             };
@@ -359,6 +364,10 @@ namespace Shrooms.Tests.DomainService.Validators
 
             var manageDto = new ManageFilterPresetDto
             {
+                UserOrg = new UserAndOrganizationDto
+                {
+                    OrganizationId = 1
+                },
                 PresetsToCreate = createPresets,
                 PresetsToUpdate = updatePresets
             };
@@ -673,6 +682,7 @@ namespace Shrooms.Tests.DomainService.Validators
                 new EventType
                 {
                     Id = 1,
+                    OrganizationId = 1
                 }
             });
 
@@ -688,7 +698,8 @@ namespace Shrooms.Tests.DomainService.Validators
             {
                 new Office
                 {
-                    Id = 1
+                    Id = 1,
+                    OrganizationId = 1
                 }
             });
         }

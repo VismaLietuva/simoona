@@ -139,7 +139,7 @@ namespace Shrooms.Domain.Services.Kudos
 
             await _uow.SaveChangesAsync(userOrg.UserId);
 
-            await _filterPresetService.RemoveDeletedTypeFromPresetsAsync(typeId.ToString(), FilterType.Kudos);
+            await _filterPresetService.RemoveDeletedTypeFromPresetsAsync(typeId.ToString(), FilterType.Kudos, default);
         }
 
         public async Task<KudosTypeDto> GetSendKudosTypeAsync(UserAndOrganizationDto userOrg)

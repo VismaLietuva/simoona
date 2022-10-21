@@ -146,7 +146,7 @@ namespace Shrooms.Premium.Tests.DomainService
 
             // Assert
             await _filterPresetService.Received(1)
-                .RemoveDeletedTypeFromPresetsAsync(Arg.Is(id.ToString()), Arg.Is(FilterType.Events));
+                .RemoveDeletedTypeFromPresetsAsync(Arg.Is(id.ToString()), Arg.Is(FilterType.Events), Arg.Is(userOrg.OrganizationId));
         }
 
         private Guid MockParticipantsWithOptionsForExport()
