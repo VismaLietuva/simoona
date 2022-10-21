@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.DataLayer.EntityModels.Models.Events;
+using Shrooms.Domain.Services.FilterPresets;
 using Shrooms.Premium.Domain.Services.Events.Utilities;
 using Shrooms.Tests.Extensions;
 
@@ -24,12 +25,13 @@ namespace Shrooms.Premium.Tests.DomainService
         public void TestInitializer()
         {
             var uow = Substitute.For<IUnitOfWork2>();
+            var filterPresetService = Substitute.For<IFilterPresetService>();
 
             _eventOptionsDbSet = uow.MockDbSetForAsync<EventOption>();
             _eventTypesDbSet = uow.MockDbSetForAsync<EventType>();
             _eventDbSet = uow.MockDbSetForAsync<Event>();
 
-            _eventUtilitiesService = new EventUtilitiesService(uow);
+            _eventUtilitiesService = new EventUtilitiesService(uow, filterPresetService);
         }
 
         [Test]

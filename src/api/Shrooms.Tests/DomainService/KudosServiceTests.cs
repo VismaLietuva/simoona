@@ -20,6 +20,7 @@ using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Domain.Exceptions.Exceptions.Kudos;
+using Shrooms.Domain.Services.FilterPresets;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Roles;
@@ -71,9 +72,10 @@ namespace Shrooms.Tests.DomainService
             var permissionService = MockPermissionService();
             var roleService = Substitute.For<IRoleService>();
             var asyncRunner = Substitute.For<IAsyncRunner>();
+            var filterPresetService = Substitute.For<IFilterPresetService>();
             MockRoleService(roleService);
 
-            _kudosService = new KudosService(_uow, uow2, _mapper, permissionService, kudosServiceValidation, asyncRunner);
+            _kudosService = new KudosService(_uow, uow2, _mapper, permissionService, kudosServiceValidation, asyncRunner, filterPresetService);
         }
 
         #region GetKudosLogs

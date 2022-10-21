@@ -4,10 +4,12 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using AutoMapper;
+using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.Domain.Services.FilterPresets;
 using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.WebViewModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.PostModels;
@@ -30,7 +32,10 @@ namespace Shrooms.Tests.Controllers.WebApi
             _unitOfWork = new MockUnitOfWork();
             _mapper = ModelMapper.Create();
 
-            _officeController = new OfficeController(_mapper, _unitOfWork);
+            var filterPresetService = Substitute.For<IFilterPresetService>();
+
+            _officeController = new OfficeController(_mapper, _unitOfWork, filterPresetService);
+
             _officeController.SetUpControllerForTesting();
         }
 
