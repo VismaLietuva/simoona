@@ -20,12 +20,14 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
         private readonly DbSet<Office> _officeDbSet;
         private readonly DbSet<EventType> _eventTypeDbSet;
         private readonly DbSet<KudosType> _kudosTypeDbSet;
-
         private readonly DbSet<FilterPreset> _filterPresetsDbSet;
 
         public FilterPresetValidator(IUnitOfWork2 uow)
         {
             _filterPresetsDbSet = uow.GetDbSet<FilterPreset>();
+            _officeDbSet = uow.GetDbSet<Office>();
+            _eventTypeDbSet = uow.GetDbSet<EventType>();
+            _kudosTypeDbSet = uow.GetDbSet<KudosType>();
         }
 
         public void CheckIfPageTypeExists(PageType page)
