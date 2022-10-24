@@ -9,8 +9,10 @@ using AutoMapper;
 using MoreLinq;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.ViewModels;
 using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.Domain.Services.FilterPresets;
 using Shrooms.Presentation.Api.Filters;
 using Shrooms.Presentation.WebViewModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.PostModels;
@@ -21,9 +23,12 @@ namespace Shrooms.Presentation.Api.Controllers
     [Authorize]
     public class OfficeController : AbstractWebApiController<Office, OfficeViewModel, OfficePostViewModel>
     {
-        public OfficeController(IMapper mapper, IUnitOfWork unitOfWork)
+        private readonly IFilterPresetService _filterPresetService;
+
+        public OfficeController(IMapper mapper, IUnitOfWork unitOfWork, IFilterPresetService filterPresetService)
             : base(mapper, unitOfWork)
         {
+            _filterPresetService = filterPresetService;
         }
 
         [PermissionAuthorize(Permission = BasicPermissions.Office)]
@@ -183,8 +188,16 @@ namespace Shrooms.Presentation.Api.Controllers
                 f.OfficeId = null;
             });
 
+            var officeId = office.Id;
+
             _repository.Delete(office);
+
             await _unitOfWork.SaveAsync();
+
+            await _filterPresetService.RemoveDeletedTypeFromPresetsAsync(
+                officeId.ToString(),
+                FilterType.Offices,
+                GetOrganizationId());
 
             return Request.CreateResponse(HttpStatusCode.OK);
         }

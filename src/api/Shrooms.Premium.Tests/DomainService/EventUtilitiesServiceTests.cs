@@ -7,7 +7,9 @@ using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models.Events;
+using Shrooms.Domain.Services.FilterPresets;
 using Shrooms.Premium.Domain.Services.Events.Utilities;
 using Shrooms.Tests.Extensions;
 
@@ -16,6 +18,9 @@ namespace Shrooms.Premium.Tests.DomainService
     public class EventUtilitiesServiceTests
     {
         private IEventUtilitiesService _eventUtilitiesService;
+
+        private IFilterPresetService _filterPresetService;
+
         private DbSet<EventType> _eventTypesDbSet;
         private DbSet<EventOption> _eventOptionsDbSet;
         private DbSet<Event> _eventDbSet;
@@ -25,11 +30,13 @@ namespace Shrooms.Premium.Tests.DomainService
         {
             var uow = Substitute.For<IUnitOfWork2>();
 
+            _filterPresetService = Substitute.For<IFilterPresetService>();
+
             _eventOptionsDbSet = uow.MockDbSetForAsync<EventOption>();
             _eventTypesDbSet = uow.MockDbSetForAsync<EventType>();
-            _eventDbSet = uow.MockDbSetForAsync<Event>();
+            _eventDbSet = uow.MockDbSetForAsync<Event>(new List<Event>());
 
-            _eventUtilitiesService = new EventUtilitiesService(uow);
+            _eventUtilitiesService = new EventUtilitiesService(uow, _filterPresetService);
         }
 
         [Test]
@@ -118,6 +125,28 @@ namespace Shrooms.Premium.Tests.DomainService
             Assert.AreEqual(1, eventTypes.Count);
             Assert.AreEqual(5, eventTypes.First().Id);
             Assert.AreEqual("type5", eventTypes.First().Name);
+        }
+
+        [Test]
+        public async Task DeleteEventType_WhenValid_RemovesTypeFromPresets()
+        {
+            // Arrange
+            const int id = 1;
+
+            var userOrg = new UserAndOrganizationDto
+            {
+                UserId = "Id",
+                OrganizationId = 2
+            };
+
+            MockEventTypes();
+
+            // Act
+            await _eventUtilitiesService.DeleteEventTypeAsync(id, userOrg);
+
+            // Assert
+            await _filterPresetService.Received(1)
+                .RemoveDeletedTypeFromPresetsAsync(Arg.Is(id.ToString()), Arg.Is(FilterType.Events), Arg.Is(userOrg.OrganizationId));
         }
 
         private Guid MockParticipantsWithOptionsForExport()

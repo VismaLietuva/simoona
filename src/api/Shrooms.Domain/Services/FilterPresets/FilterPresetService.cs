@@ -17,7 +17,7 @@ namespace Shrooms.Domain.Services.FilterPresets
 {
     public class FilterPresetService : IFilterPresetService
     {
-        private static readonly SemaphoreSlim _filterPresetUpdateCreateLock = new SemaphoreSlim(1, 1);
+        private static readonly SemaphoreSlim _lock = new (1, 1);
 
         private readonly IUnitOfWork2 _uow;
 
@@ -59,13 +59,15 @@ namespace Shrooms.Domain.Services.FilterPresets
 
         public async Task<UpdatedFilterPresetDto> UpdateAsync(ManageFilterPresetDto manageFilterPresetDto)
         {
-            await _filterPresetUpdateCreateLock.WaitAsync();
+            await _lock.WaitAsync();
 
             try
             {
                 _validator.CheckIfMoreThanOneDefaultPresetExists(manageFilterPresetDto);
                 _validator.CheckIfFilterPresetsContainUniqueNames(manageFilterPresetDto.PresetsToUpdate);
                 _validator.CheckIfFilterPresetsContainUniqueNames(manageFilterPresetDto.PresetsToCreate);
+
+                await _validator.CheckIfProvidedTypesInFiltersAreValidAsync(manageFilterPresetDto);
 
                 await UpdatePresetsAsync(manageFilterPresetDto);
 
@@ -99,7 +101,34 @@ namespace Shrooms.Domain.Services.FilterPresets
             }
             finally
             {
-                _filterPresetUpdateCreateLock.Release();
+                _lock.Release();
+            }
+        }
+
+        public async Task RemoveDeletedTypeFromPresetsAsync(string deletedTypeId, FilterType type, int organizationId)
+        {
+            await _lock.WaitAsync();
+
+            try
+            {
+                var presets = await _filterPresetDbSet.Where(preset => 
+                    preset.OrganizationId == organizationId || type == FilterType.Kudos) // Kudos type does not have organization
+                    .ToListAsync();
+
+                foreach (var preset in presets)
+                {
+                    var filters = JsonConvert.DeserializeObject<IEnumerable<FilterPresetItemDto>>(preset.Preset);
+
+                    RemoveDeletedTypeFromFilters(filters, deletedTypeId, type);
+
+                    preset.Preset = JsonConvert.SerializeObject(filters);
+                }
+
+                await _uow.SaveChangesAsync();
+            }
+            finally
+            {
+                _lock.Release();
             }
         }
 
@@ -112,7 +141,7 @@ namespace Shrooms.Domain.Services.FilterPresets
 
             foreach (var type in filterTypes)
             {
-                var filters = await GetFiltersQueryByFilterType(type).ToListAsync();
+                var filters = await GetFiltersQueryByFilterType(type, organizationId).ToListAsync();
                 var filtersDto = new FiltersDto
                 {
                     FilterType = type,
@@ -125,29 +154,44 @@ namespace Shrooms.Domain.Services.FilterPresets
             return filtersDtos;
         }
 
+        private void RemoveDeletedTypeFromFilters(IEnumerable<FilterPresetItemDto> filters, string typeId, FilterType type)
+        {
+            foreach (var filter in filters)
+            {
+                if (filter.FilterType != type)
+                {
+                    continue;
+                }
+
+                filter.Types = filter.Types.Where(type => type != typeId);
+            }
+        }
+
         private bool IsNewDefaultPresetSet(IEnumerable<FilterPreset> createdPresets, IEnumerable<FilterPresetDto> updatedPresets)
         {
             return createdPresets.Any(preset => preset.IsDefault) || updatedPresets.Any(preset => preset.IsDefault);
         }
 
-        private IQueryable<FilterDto> GetFiltersQueryByFilterType(FilterType filterType)
+        private IQueryable<FilterDto> GetFiltersQueryByFilterType(FilterType filterType, int organizationId)
         {
             return filterType switch
             {
-                FilterType.Offices => _officeDbSet.Select(filter => new FilterDto
+                FilterType.Offices => _officeDbSet.Where(office => office.OrganizationId == organizationId)
+                .Select(office => new FilterDto
                 {
-                    Id = filter.Id,
-                    Name = filter.Name
+                    Id = office.Id,
+                    Name = office.Name
                 }),
-                FilterType.Kudos => _kudosTypeDbSet.Select(filter => new FilterDto
+                FilterType.Kudos => _kudosTypeDbSet.Select(kudos => new FilterDto // Does not have organization
                 {
-                    Id = filter.Id,
-                    Name = filter.Name
+                    Id = kudos.Id,
+                    Name = kudos.Name
                 }),
-                FilterType.Events => _eventTypeDbSet.Select(filter => new FilterDto
+                FilterType.Events => _eventTypeDbSet.Where(@event => @event.OrganizationId == organizationId)
+                .Select(@event => new FilterDto
                 {
-                    Id = filter.Id,
-                    Name = filter.Name
+                    Id = @event.Id,
+                    Name = @event.Name
                 }),
                 _ => throw new NotImplementedException()
             };

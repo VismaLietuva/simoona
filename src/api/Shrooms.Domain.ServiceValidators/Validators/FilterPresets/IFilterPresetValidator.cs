@@ -22,6 +22,8 @@ namespace Shrooms.Domain.ServiceValidators.Validators.FilterPresets
 
         void CheckIfFilterPresetsContainUniqueNames(IEnumerable<FilterPresetDto> filterPresetDtos);
 
+        Task CheckIfProvidedTypesInFiltersAreValidAsync(ManageFilterPresetDto manageFilterPresetDto);
+
         Task CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(ManageFilterPresetDto manageFilterPresetDto, IEnumerable<FilterPresetDto> removedPresets);
     }
 }

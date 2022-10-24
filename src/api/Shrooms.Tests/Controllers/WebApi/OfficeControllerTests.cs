@@ -4,10 +4,13 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using AutoMapper;
+using NSubstitute;
 using NUnit.Framework;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.Domain.Services.FilterPresets;
 using Shrooms.Presentation.Api.Controllers;
 using Shrooms.Presentation.WebViewModels.Models;
 using Shrooms.Presentation.WebViewModels.Models.PostModels;
@@ -21,6 +24,7 @@ namespace Shrooms.Tests.Controllers.WebApi
     internal class OfficeControllerTests
     {
         private IUnitOfWork _unitOfWork;
+        private IFilterPresetService _filterPresetService;
         private OfficeController _officeController;
         private IMapper _mapper;
 
@@ -30,7 +34,10 @@ namespace Shrooms.Tests.Controllers.WebApi
             _unitOfWork = new MockUnitOfWork();
             _mapper = ModelMapper.Create();
 
-            _officeController = new OfficeController(_mapper, _unitOfWork);
+            _filterPresetService = Substitute.For<IFilterPresetService>();
+
+            _officeController = new OfficeController(_mapper, _unitOfWork, _filterPresetService);
+
             _officeController.SetUpControllerForTesting();
         }
 
@@ -108,6 +115,20 @@ namespace Shrooms.Tests.Controllers.WebApi
         {
             var result = await _officeController.Delete(default);
             Assert.AreEqual(result.StatusCode, HttpStatusCode.NotFound);
+        }
+
+        [Test]
+        public async Task Office_Delete_Removes_Types_From_Presets()
+        {
+            // Arrange
+            const int id = 1;
+
+            // Act
+            await _officeController.Delete(id);
+
+            // Assert
+            await _filterPresetService.Received(1)
+                .RemoveDeletedTypeFromPresetsAsync(Arg.Is(id.ToString()), FilterType.Offices, Arg.Any<int>());
         }
 
         [Test]

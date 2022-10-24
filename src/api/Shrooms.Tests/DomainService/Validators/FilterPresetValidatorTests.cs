@@ -12,6 +12,10 @@ using System.Linq;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.DataTransferObjects.FilterPresets;
 using Shrooms.Tests.Extensions;
+using System.Threading.Tasks;
+using Shrooms.DataLayer.EntityModels.Models.Events;
+using Shrooms.DataLayer.EntityModels.Models.Kudos;
+using Shrooms.Contracts.DataTransferObjects;
 
 namespace Shrooms.Tests.DomainService.Validators
 {
@@ -21,6 +25,9 @@ namespace Shrooms.Tests.DomainService.Validators
         private IFilterPresetValidator _filterPresetValidator;
 
         private DbSet<FilterPreset> _filterPresetDbSet;
+        private DbSet<Office> _officeDbSet;
+        private DbSet<EventType> _eventTypeDbSet;
+        private DbSet<KudosType> _kudosTypeDbSet;
 
         [SetUp]
         public void TestInitializer()
@@ -30,10 +37,17 @@ namespace Shrooms.Tests.DomainService.Validators
             // ReSharper disable once CollectionNeverUpdated.Local
             var mockPresetData = new List<FilterPreset>();
 
-            _filterPresetDbSet = Substitute.For<DbSet<FilterPreset>, IQueryable<FilterPreset>, IDbAsyncEnumerable<FilterPreset>>();
+            _officeDbSet = uow.MockDbSetForAsync<Office>();
+            _eventTypeDbSet = uow.MockDbSetForAsync<EventType>();
+            _kudosTypeDbSet = uow.MockDbSetForAsync<KudosType>();
+            _filterPresetDbSet = uow.MockDbSetForAsync<FilterPreset>();
+
             _filterPresetDbSet.SetDbSetDataForAsync(mockPresetData);
 
             uow.GetDbSet<FilterPreset>().Returns(_filterPresetDbSet);
+            uow.GetDbSet<EventType>().Returns(_eventTypeDbSet);
+            uow.GetDbSet<KudosType>().Returns(_kudosTypeDbSet);
+            uow.GetDbSet<Office>().Returns(_officeDbSet);
 
             _filterPresetValidator = new FilterPresetValidator(uow);
         }
@@ -238,6 +252,130 @@ namespace Shrooms.Tests.DomainService.Validators
 
             // Assert
             Assert.DoesNotThrow(() => _filterPresetValidator.CheckIfMoreThanOneDefaultPresetExists(manageDtoWithoutDefaultPreset));
+        }
+
+        [Test]
+        public void Should_Not_Throw_If_Given_Type_Exists()
+        {
+            // Arrange
+            var createPresets = new List<CreateFilterPresetDto>
+            {
+                new CreateFilterPresetDto
+                {
+                    Filters = new List<FilterPresetItemDto>
+                    {
+                        new FilterPresetItemDto
+                        {
+                            FilterType = FilterType.Events,
+                            Types = new List<string>() { "1" }
+                        },
+
+                        new FilterPresetItemDto
+                        {
+                            FilterType = FilterType.Offices,
+                            Types = new List<string>() { "1" }
+                        }
+                    }
+                }
+            };
+
+            var updatePresets = new List<UpdateFilterPresetDto>
+            {
+                new UpdateFilterPresetDto
+                {
+                    Filters = new List<FilterPresetItemDto>
+                    {
+                        new FilterPresetItemDto
+                        {
+                            FilterType = FilterType.Events,
+                            Types = new List<string>() { "1" }
+                        },
+
+                        new FilterPresetItemDto
+                        {
+                            FilterType = FilterType.Kudos,
+                            Types = new List<string>() { "1" }
+                        }
+                    }
+                }
+            };
+
+            var manageDto = new ManageFilterPresetDto
+            {
+                UserOrg = new UserAndOrganizationDto
+                {
+                    OrganizationId = 1
+                },
+                PresetsToCreate = createPresets,
+                PresetsToUpdate = updatePresets
+            };
+
+            MockTypes();
+
+            // Act
+            Assert.DoesNotThrowAsync(async () => await _filterPresetValidator.CheckIfProvidedTypesInFiltersAreValidAsync(manageDto));
+        }
+
+        [Test]
+        public void Should_Throw_If_Given_Type_Does_Not_Exist()
+        {
+            // Arrange
+            var createPresets = new List<CreateFilterPresetDto>
+            {
+                new CreateFilterPresetDto
+                {
+                    Filters = new List<FilterPresetItemDto>
+                    {
+                        new FilterPresetItemDto
+                        {
+                            FilterType = FilterType.Events,
+                            Types = new List<string>() { "121312" }
+                        },
+
+                        new FilterPresetItemDto
+                        {
+                            FilterType = FilterType.Offices,
+                            Types = new List<string>() { "23" }
+                        }
+                    }
+                }
+            };
+
+            var updatePresets = new List<UpdateFilterPresetDto>
+            {
+                new UpdateFilterPresetDto
+                {
+                    Filters = new List<FilterPresetItemDto>
+                    {
+                        new FilterPresetItemDto
+                        {
+                            FilterType = FilterType.Events,
+                            Types = new List<string>() { "0" }
+                        },
+
+                        new FilterPresetItemDto
+                        {
+                            FilterType = FilterType.Kudos,
+                            Types = new List<string>() { "1" }
+                        }
+                    }
+                }
+            };
+
+            var manageDto = new ManageFilterPresetDto
+            {
+                UserOrg = new UserAndOrganizationDto
+                {
+                    OrganizationId = 1
+                },
+                PresetsToCreate = createPresets,
+                PresetsToUpdate = updatePresets
+            };
+
+            MockTypes();
+
+            // Act
+            Assert.ThrowsAsync<ValidationException>(async () => await _filterPresetValidator.CheckIfProvidedTypesInFiltersAreValidAsync(manageDto));
         }
 
         [Test]
@@ -535,6 +673,35 @@ namespace Shrooms.Tests.DomainService.Validators
             // Assert
             Assert.ThrowsAsync<ValidationException>(async () =>
                 await _filterPresetValidator.CheckIfUpdatedAndAddedPresetsHaveUniqueNamesExcludingDeletedPresetsAsync(manageDto, removedPresets));
+        }
+
+        private void MockTypes()
+        {
+            _eventTypeDbSet.SetDbSetDataForAsync(new List<EventType>
+            {
+                new EventType
+                {
+                    Id = 1,
+                    OrganizationId = 1
+                }
+            });
+
+            _kudosTypeDbSet.SetDbSetDataForAsync(new List<KudosType>
+            {
+                new KudosType
+                {
+                    Id = 1
+                }
+            });
+
+            _officeDbSet.SetDbSetDataForAsync(new List<Office>
+            {
+                new Office
+                {
+                    Id = 1,
+                    OrganizationId = 1
+                }
+            });
         }
     }
 }

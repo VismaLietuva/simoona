@@ -5,6 +5,7 @@ using System.Data.Entity.Infrastructure;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Web;
 using AutoMapper;
@@ -20,6 +21,7 @@ using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.Domain.Exceptions.Exceptions.Kudos;
+using Shrooms.Domain.Services.FilterPresets;
 using Shrooms.Domain.Services.Kudos;
 using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Roles;
@@ -37,6 +39,7 @@ namespace Shrooms.Tests.DomainService
         private DbSet<ApplicationUser> _usersDbSet;
         private DbSet<KudosType> _kudosTypesDbSet;
         private DbSet<Organization> _organizationDbSet;
+        private IFilterPresetService _filterPresetService;
         private IUnitOfWork2 _uow;
         private IMapper _mapper;
 
@@ -71,9 +74,19 @@ namespace Shrooms.Tests.DomainService
             var permissionService = MockPermissionService();
             var roleService = Substitute.For<IRoleService>();
             var asyncRunner = Substitute.For<IAsyncRunner>();
+
+            _filterPresetService = Substitute.For<IFilterPresetService>();
+
             MockRoleService(roleService);
 
-            _kudosService = new KudosService(_uow, uow2, _mapper, permissionService, kudosServiceValidation, asyncRunner);
+            _kudosService = new KudosService(
+                _uow,
+                uow2,
+                _mapper,
+                permissionService,
+                kudosServiceValidation,
+                asyncRunner,
+                _filterPresetService);
         }
 
         #region GetKudosLogs
@@ -574,6 +587,39 @@ namespace Shrooms.Tests.DomainService
             var result = await _kudosService.GetSendKudosTypeAsync(userAndOrg);
 
             Assert.AreEqual(result.Type, KudosTypeEnum.Send);
+        }
+
+        #endregion
+
+        #region RemoveKudosType
+
+        [Test]
+        public async Task RemoveKudosType_WhenValid_RemovesTypeFromPresets()
+        {
+            // Arrange
+            const int id = 1;
+
+            var userOrg = new UserAndOrganizationDto
+            {
+                UserId = "Id"
+            };
+
+            _kudosTypesDbSet.SetDbSetDataForAsync(new List<KudosType>
+            {
+                new KudosType
+                {
+                    Id = id,
+                    Name = "Test"
+                }
+            });
+
+            // Act
+            await _kudosService.RemoveKudosTypeAsync(id, userOrg);
+
+            // Assert
+            await _filterPresetService
+                .Received(1)
+                .RemoveDeletedTypeFromPresetsAsync(Arg.Is(id.ToString()), Arg.Is(FilterType.Kudos), Arg.Is(0));
         }
 
         #endregion
