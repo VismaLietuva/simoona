@@ -169,6 +169,62 @@ namespace Shrooms.Tests
             Assert.That(result, Is.All.Matches<FiltersDto>(filtersDto => filterTypes.Contains(filtersDto.FilterType)));
         }
 
+        [TestCase("1", FilterType.Kudos, 1)]
+        [TestCase("2", FilterType.Offices, 2)]
+        [TestCase("3", FilterType.Events, 1)]
+        public async Task Should_Delete_Type_From_Preset(string typeId, FilterType type, int organizationId)
+        {
+            // Arrange
+            _eventTypeDbSet.SetDbSetDataForAsync(new List<EventType>
+            {
+                new EventType
+                {
+                    Id = 3,
+                    OrganizationId = 1
+                }
+            });
+
+            _kudosTypeDbSet.SetDbSetDataForAsync(new List<KudosType>
+            {
+                new KudosType
+                {
+                    Id = 1,
+                }
+            });
+
+            _officeDbSet.SetDbSetDataForAsync(new List<Office>
+            {
+                new Office
+                {
+                    Id = 2,
+                    OrganizationId = 2
+                }
+            });
+
+            var presets = new List<FilterPreset>
+            {
+                new FilterPreset
+                {
+                    OrganizationId = 1,
+                    Preset = "[{\"FilterType\":1,\"Types\":[\"1\"]},{\"FilterType\":0,\"Types\":[\"3\"]}]"
+                },
+
+                new FilterPreset
+                {
+                    OrganizationId = 2,
+                    Preset = "[{\"FilterType\":1,\"Types\":[\"1\"]},{\"FilterType\":2,\"Types\":[\"2\"]}]"
+                }
+            };
+
+            _filterPresetDbSet.SetDbSetDataForAsync(presets);
+
+            // Act
+            await _filterPresetService.RemoveDeletedTypeFromPresetsAsync(typeId, type, organizationId);
+
+            // Assert
+            Assert.IsFalse(presets.Any(preset => preset.Preset.Contains($"{{\"FilterType\":{type},\"Types\":[\"{typeId}\"]}}")));
+        }
+
         [TestCase(4, 0)]
         [TestCase(8, 1)]
         public async Task Should_Update_FilterPresets(int presetToDeleteId, int organizationId)
