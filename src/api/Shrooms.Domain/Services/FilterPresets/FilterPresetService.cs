@@ -111,7 +111,8 @@ namespace Shrooms.Domain.Services.FilterPresets
 
             try
             {
-                var presets = await _filterPresetDbSet.Where(preset => preset.OrganizationId == organizationId)
+                var presets = await _filterPresetDbSet.Where(preset => 
+                    preset.OrganizationId == organizationId || type == FilterType.Kudos) // Kudos type does not have organization
                     .ToListAsync();
 
                 foreach (var preset in presets)

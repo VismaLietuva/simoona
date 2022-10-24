@@ -169,7 +169,7 @@ namespace Shrooms.Tests
             Assert.That(result, Is.All.Matches<FiltersDto>(filtersDto => filterTypes.Contains(filtersDto.FilterType)));
         }
 
-        [TestCase("1", FilterType.Kudos, 1)]
+        [TestCase("1", FilterType.Kudos, 0)]
         [TestCase("2", FilterType.Offices, 2)]
         [TestCase("3", FilterType.Events, 1)]
         public async Task Should_Delete_Type_From_Preset(string typeId, FilterType type, int organizationId)
