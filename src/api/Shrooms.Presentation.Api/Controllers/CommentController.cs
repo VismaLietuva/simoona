@@ -38,7 +38,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpPost]
         [Route("Create")]
-        [PermissionAnyOfAuthorize(BasicPermissions.Comment, BasicPermissions.EventWall)]
+        [PermissionAnyOfAuthorize(BasicPermissions.Comment, BasicPermissions.Event)]
         public async Task<IHttpActionResult> CreateComment(NewCommentViewModel comment)
         {
             if (!ModelState.IsValid)
@@ -49,10 +49,6 @@ namespace Shrooms.Presentation.Api.Controllers
             var userAndOrg = GetUserAndOrganization();
 
             var wallPost = await _wallService.GetWallPostAsync(userAndOrg, comment.PostId);
-            if (!await _permissionService.UserHasPermissionAsync(userAndOrg, BasicPermissions.Comment) && wallPost.WallType != WallType.Events)
-            {
-                return Forbidden();
-            }
 
             var commentDto = _mapper.Map<NewCommentViewModel, NewCommentDto>(comment);
             SetOrganizationAndUser(commentDto);

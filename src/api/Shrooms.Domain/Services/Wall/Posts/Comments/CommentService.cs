@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
-using Shrooms.Contracts.DataTransferObjects.Wall.Comments;
 using Shrooms.Contracts.DataTransferObjects.Wall.Likes;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.Infrastructure;
