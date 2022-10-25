@@ -119,7 +119,10 @@ namespace Shrooms.Domain.Services.Wall
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Wall not found");
             }
 
-            var isWallAdmin = await _permissionService.UserHasPermissionAsync(updateWallDto, AdministrationPermissions.Wall);
+            var isWallAdmin = wall.Type != WallType.Events ?
+                await _permissionService.UserHasPermissionAsync(updateWallDto, AdministrationPermissions.Wall) :
+                await _permissionService.UserHasPermissionAsync(updateWallDto, AdministrationPermissions.Event);
+
             var isModerator = wall.Moderators.Any(m => m.UserId == updateWallDto.UserId);
 
             if (!isWallAdmin && !isModerator)
@@ -459,6 +462,7 @@ namespace Shrooms.Domain.Services.Wall
             await AddMemberToWallsAsync(responsibleUserId, new List<int> { wallId });
 
             _moderatorsDbSet.Add(newModerator);
+
             await _uow.SaveChangesAsync(userId.UserId);
         }
 
