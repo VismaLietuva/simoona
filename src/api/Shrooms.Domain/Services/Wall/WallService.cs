@@ -405,15 +405,10 @@ namespace Shrooms.Domain.Services.Wall
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist);
             }
 
-            var hasPermission = await _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Wall);
-
-            var isWallModerator = wall.Moderators.Any(x => x.UserId == userOrg.UserId) || hasPermission;
-            if (!isWallModerator)
-            {
-                throw new UnauthorizedException();
-            }
+            await CheckIfUserIsAllowedToModifyWallContentAsync(wall, userOrg);
 
             _wallsDbSet.Remove(wall);
+
             await _uow.SaveChangesAsync(userOrg.UserId);
         }
 
