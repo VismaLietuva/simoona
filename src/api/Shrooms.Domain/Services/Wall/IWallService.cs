@@ -55,6 +55,6 @@ namespace Shrooms.Domain.Services.Wall
             string createdBy,
             string permission,
             UserAndOrganizationDto userOrg,
-            bool checkForAdministrationEvent = true);
+            bool checkForAdministrationEventPermission = true);
     }
 }

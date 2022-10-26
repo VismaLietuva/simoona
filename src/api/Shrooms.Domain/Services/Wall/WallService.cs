@@ -582,7 +582,7 @@ namespace Shrooms.Domain.Services.Wall
             string createdBy,
             string permission,
             UserAndOrganizationDto userOrg,
-            bool checkForAdministrationEvent = true)
+            bool checkForAdministrationEventPermission = true)
         {
             var isModerator = createdBy == userOrg.UserId || await _moderatorsDbSet
                 .AnyAsync(moderator =>
@@ -594,7 +594,7 @@ namespace Shrooms.Domain.Services.Wall
                 isModerator,
                 permission,
                 userOrg,
-                checkForAdministrationEvent);
+                checkForAdministrationEventPermission);
         }
 
         private async Task CheckIfUserIsAllowedToModifyWallContentAsync(MultiwallWall wall, UserAndOrganizationDto userOrg)
@@ -609,14 +609,14 @@ namespace Shrooms.Domain.Services.Wall
             bool isModerator,
             string permission,
             UserAndOrganizationDto userOrg,
-            bool checkForAdministrationEvent)
+            bool checkForAdministrationEventPermission)
         {
             if (isModerator)
             {
                 return;
             }
 
-            var eventPermission = checkForAdministrationEvent ?
+            var eventPermission = checkForAdministrationEventPermission ?
                 AdministrationPermissions.Event :
                 BasicPermissions.Event;
 

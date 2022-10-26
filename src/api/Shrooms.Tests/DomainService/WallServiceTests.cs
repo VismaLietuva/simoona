@@ -50,6 +50,8 @@ namespace Shrooms.Tests.DomainService
 
             MockRoleService(roleService);
 
+            _uow.GetDbSet<WallModerator>().Returns(_wallModeratorDbSet);
+
             _wallService = new WallService(ModelMapper.Create(), _uow, _permissionService);
         }
 
@@ -664,6 +666,193 @@ namespace Shrooms.Tests.DomainService
             _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Wall).Returns(false);
 
             Assert.ThrowsAsync<UnauthorizedException>(async () => await _wallService.DeleteWallAsync(2, userOrg, WallType.UserCreated));
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void Should_Throw_When_Not_Moderator_Tries_To_Modify_Wall_Content(bool checkForAdministrationEventPermission)
+        {
+            // Arrange
+            const string createdBy = "other id";
+            const string permission = "test";
+
+            var userOrg = new UserAndOrganizationDto
+            {
+                UserId = "id",
+                OrganizationId = 1
+            };
+
+            var wall = new Wall();
+
+            _wallModeratorDbSet.SetDbSetDataForAsync(new List<WallModerator>());
+
+            _permissionService.UserHasPermissionAsync(userOrg, Arg.Any<string>())
+                .Returns(false);
+
+            // Assert
+            Assert.ThrowsAsync<UnauthorizedException>(async () => 
+                await _wallService.CheckIfUserIsAllowedToModifyWallContentAsync(
+                    wall,
+                    createdBy,
+                    permission,
+                    userOrg,
+                    checkForAdministrationEventPermission));
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void Should_Not_Throw_When_Not_Moderator_Tries_To_Modify_Wall_Content(bool checkForAdministrationEventPermission)
+        {
+            // Arrange
+            const string createdBy = "other id";
+            const string permission = "test";
+            const string userId = "id";
+            const int wallId = 1;
+
+            var userOrg = new UserAndOrganizationDto
+            {
+                UserId = userId,
+                OrganizationId = 1
+            };
+
+            var wallModerator = new WallModerator
+            {
+                UserId = userId,
+                WallId = wallId
+            };
+
+            var wall = new Wall
+            {
+                Id = wallId,
+                Type = WallType.Events
+            };
+
+            _wallModeratorDbSet.SetDbSetDataForAsync(new List<WallModerator> { wallModerator });
+
+            _permissionService.UserHasPermissionAsync(userOrg, Arg.Any<string>())
+                .Returns(false);
+
+            // Assert
+            Assert.DoesNotThrowAsync(async () =>
+                await _wallService.CheckIfUserIsAllowedToModifyWallContentAsync(
+                    wall,
+                    createdBy,
+                    permission,
+                    userOrg,
+                    checkForAdministrationEventPermission));
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void Should_Not_Throw_When_Owner_Tries_To_Modify_Wall_Content(bool checkForAdministrationEventPermission)
+        {
+            // Arrange
+            const string permission = "test";
+            const string userId = "id";
+            const string createdBy = userId;
+            const int wallId = 1;
+
+            var userOrg = new UserAndOrganizationDto
+            {
+                UserId = userId,
+                OrganizationId = 1
+            };
+
+            var wall = new Wall
+            {
+                Id = wallId,
+                Type = WallType.Events
+            };
+
+            _wallModeratorDbSet.SetDbSetDataForAsync(new List<WallModerator>());
+
+            _permissionService.UserHasPermissionAsync(userOrg, Arg.Any<string>())
+                .Returns(false);
+
+            // Assert
+            Assert.DoesNotThrowAsync(async () =>
+                await _wallService.CheckIfUserIsAllowedToModifyWallContentAsync(
+                    wall,
+                    createdBy,
+                    permission,
+                    userOrg,
+                    checkForAdministrationEventPermission));
+        }
+
+        [TestCase(BasicPermissions.Post, true)]
+        [TestCase(AdministrationPermissions.Post, false)]
+        [TestCase(BasicPermissions.Post, false)]
+        [TestCase(AdministrationPermissions.Post, true)]
+        public void Should_Throw_When_Permission_Is_Not_Found(string permission, bool checkForAdministrationEventPermission)
+        {
+            // Arrange
+            const string userId = "id";
+            const string createdBy = "other id";
+            const int wallId = 1;
+
+            var userOrg = new UserAndOrganizationDto
+            {
+                UserId = userId,
+                OrganizationId = 1
+            };
+
+            var wall = new Wall
+            {
+                Id = wallId,
+                Type = WallType.Events
+            };
+
+            _wallModeratorDbSet.SetDbSetDataForAsync(new List<WallModerator>());
+
+            _permissionService.UserHasPermissionAsync(userOrg, Arg.Any<string>())
+                .Returns(false);
+
+            // Assert
+            Assert.ThrowsAsync<UnauthorizedException>(async () =>
+                await _wallService.CheckIfUserIsAllowedToModifyWallContentAsync(
+                    wall,
+                    createdBy,
+                    permission,
+                    userOrg,
+                    checkForAdministrationEventPermission));
+        }
+
+        [TestCase(BasicPermissions.Post, true)]
+        [TestCase(AdministrationPermissions.Post, false)]
+        [TestCase(BasicPermissions.Post, false)]
+        [TestCase(AdministrationPermissions.Post, true)]
+        public void Should_Not_Throw_When_Permission_Is_Found(string permission, bool checkForAdministrationEventPermission)
+        {
+            // Arrange
+            const string userId = "id";
+            const string createdBy = "other id";
+            const int wallId = 1;
+
+            var userOrg = new UserAndOrganizationDto
+            {
+                UserId = userId,
+                OrganizationId = 1
+            };
+
+            var wall = new Wall
+            {
+                Id = wallId,
+                Type = WallType.Events
+            };
+
+            _wallModeratorDbSet.SetDbSetDataForAsync(new List<WallModerator>());
+
+            _permissionService.UserHasPermissionAsync(userOrg, Arg.Any<string>())
+                .Returns(true);
+
+            // Assert
+            Assert.DoesNotThrowAsync(async () =>
+                await _wallService.CheckIfUserIsAllowedToModifyWallContentAsync(
+                    wall,
+                    createdBy,
+                    permission,
+                    userOrg,
+                    checkForAdministrationEventPermission));
         }
 
         private static void MockRoleService(IRoleService roleService)

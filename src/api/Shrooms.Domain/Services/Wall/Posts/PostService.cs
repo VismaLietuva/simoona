@@ -126,7 +126,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
                     post.AuthorId,
                     BasicPermissions.Post,
                     userOrg,
-                    checkForAdministrationEvent: false);
+                    checkForAdministrationEventPermission: false);
 
                 var like = post.Likes.FirstOrDefault(x => x.UserId == userOrg.UserId);
                 if (like == null)
@@ -168,7 +168,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
                     post.CreatedBy,
                     AdministrationPermissions.Post,
                     userOrg: editPostDto,
-                    checkForAdministrationEvent: true);
+                    checkForAdministrationEventPermission: true);
 
                 post.MessageBody = editPostDto.MessageBody;
                 post.Images = new ImageCollection(editPostDto.Images);
@@ -209,7 +209,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
                     post.CreatedBy,
                     AdministrationPermissions.Post,
                     userOrg,
-                    checkForAdministrationEvent: true);
+                    checkForAdministrationEventPermission: true);
 
                 await _commentService.DeleteCommentsByPostAsync(post.Id);
                 _postsDbSet.Remove(post);
@@ -242,7 +242,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
                     post.CreatedBy,
                     AdministrationPermissions.Post,
                     userOrg,
-                    checkForAdministrationEvent: true);
+                    checkForAdministrationEventPermission: true);
 
                 post.IsHidden = true;
                 post.LastEdit = DateTime.UtcNow;
