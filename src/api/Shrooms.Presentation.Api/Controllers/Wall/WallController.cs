@@ -58,7 +58,7 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
         /// <returns>Wall details in HTTP response</returns>
         [HttpGet]
         [Route("Details")]
-        [PermissionAnyOfAuthorize(BasicPermissions.Post, BasicPermissions.EventWall)]
+        [PermissionAnyOfAuthorize(BasicPermissions.Post, BasicPermissions.Event)]
         public async Task<IHttpActionResult> GetWall(int wallId)
         {
             if (wallId <= 0)
@@ -154,7 +154,7 @@ namespace Shrooms.Presentation.Api.Controllers.Wall
 
         [HttpGet]
         [Route("Posts")]
-        [PermissionAnyOfAuthorize(BasicPermissions.Post, BasicPermissions.EventWall)]
+        [PermissionAnyOfAuthorize(BasicPermissions.Post, BasicPermissions.Event)]
         public async Task<IHttpActionResult> GetPagedWall(int wallId, int page = 1)
         {
             if (wallId <= 0)

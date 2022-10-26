@@ -11,7 +11,6 @@ namespace Shrooms.Domain.ServiceValidators.Validators.Wall
     public class WallValidator : IWallValidator
     {
         private readonly IDbSet<WallMember> _wallUsersDbSet;
-
         public WallValidator(IUnitOfWork2 uow)
         {
             _wallUsersDbSet = uow.GetDbSet<WallMember>();

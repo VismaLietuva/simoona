@@ -29,6 +29,7 @@ namespace Shrooms.Domain.Services.Wall.Posts
 
         private readonly IPermissionService _permissionService;
         private readonly ICommentService _commentService;
+        private readonly IWallService _wallService;
 
         private readonly IUnitOfWork2 _uow;
         private readonly IDbSet<Post> _postsDbSet;
@@ -37,11 +38,16 @@ namespace Shrooms.Domain.Services.Wall.Posts
         private readonly IDbSet<DataLayer.EntityModels.Models.Multiwall.Wall> _wallsDbSet;
         private readonly DbSet<PostWatcher> _postWatchers;
 
-        public PostService(IUnitOfWork2 uow, IPermissionService permissionService, ICommentService commentService)
+        public PostService(
+            IUnitOfWork2 uow,
+            IPermissionService permissionService,
+            ICommentService commentService,
+            IWallService wallService)
         {
             _uow = uow;
             _permissionService = permissionService;
             _commentService = commentService;
+            _wallService = wallService;
 
             _postsDbSet = uow.GetDbSet<Post>();
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
@@ -115,6 +121,14 @@ namespace Shrooms.Domain.Services.Wall.Posts
                     throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Post does not exist");
                 }
 
+                await _wallService.CheckIfUserIsAllowedToModifyWallContentAsync(
+                    post.WallId,
+                    post.AuthorId,
+                    post.Wall.Type,
+                    BasicPermissions.Post,
+                    BasicPermissions.Event,
+                    userOrg);
+
                 var like = post.Likes.FirstOrDefault(x => x.UserId == userOrg.UserId);
                 if (like == null)
                 {
@@ -150,13 +164,13 @@ namespace Shrooms.Domain.Services.Wall.Posts
                     throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Post not found");
                 }
 
-                var isWallModerator = await _moderatorsDbSet.AnyAsync(x => x.UserId == editPostDto.UserId && x.WallId == post.WallId) || post.CreatedBy == editPostDto.UserId;
-                var isAdministrator = await _permissionService.UserHasPermissionAsync(editPostDto, AdministrationPermissions.Post);
-
-                if (!isAdministrator && !isWallModerator)
-                {
-                    throw new UnauthorizedException();
-                }
+                await _wallService.CheckIfUserIsAllowedToModifyWallContentAsync(
+                    post.WallId,
+                    post.CreatedBy,
+                    post.Wall.Type,
+                    AdministrationPermissions.Post,
+                    AdministrationPermissions.Event,
+                    editPostDto);
 
                 post.MessageBody = editPostDto.MessageBody;
                 post.Images = new ImageCollection(editPostDto.Images);
@@ -192,14 +206,13 @@ namespace Shrooms.Domain.Services.Wall.Posts
                     throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Post not found");
                 }
 
-                var isWallModerator = await _moderatorsDbSet
-                    .AnyAsync(x => x.UserId == userOrg.UserId && x.WallId == post.WallId);
-
-                var isAdministrator = await _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Post);
-                if (!isAdministrator && !isWallModerator)
-                {
-                    throw new UnauthorizedException();
-                }
+                await _wallService.CheckIfUserIsAllowedToModifyWallContentAsync(
+                    post.WallId,
+                    post.CreatedBy,
+                    post.Wall.Type,
+                    AdministrationPermissions.Post,
+                    AdministrationPermissions.Event,
+                    userOrg);
 
                 await _commentService.DeleteCommentsByPostAsync(post.Id);
                 _postsDbSet.Remove(post);
@@ -227,14 +240,13 @@ namespace Shrooms.Domain.Services.Wall.Posts
                     throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Post not found");
                 }
 
-                var isWallModerator = await _moderatorsDbSet
-                    .AnyAsync(x => x.UserId == userOrg.UserId && x.WallId == post.WallId) || post.AuthorId == userOrg.UserId;
-
-                var isAdministrator = await _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Post);
-                if (!isAdministrator && !isWallModerator)
-                {
-                    throw new UnauthorizedException();
-                }
+                await _wallService.CheckIfUserIsAllowedToModifyWallContentAsync(
+                    post.WallId,
+                    post.CreatedBy,
+                    post.Wall.Type,
+                    AdministrationPermissions.Post,
+                    AdministrationPermissions.Event,
+                    userOrg);
 
                 post.IsHidden = true;
                 post.LastEdit = DateTime.UtcNow;

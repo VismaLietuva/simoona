@@ -38,7 +38,6 @@ namespace Shrooms.DataLayer.Migrations.DataInitializer
                 .AddBasicPermission(permissionName: BasicPermissions.OfficeUsers, withRoleNames: Roles.NewUser)
                 
                 .AddBasicPermission(permissionName: BasicPermissions.Event, withRoleNames: new[] { Roles.External, Roles.Intern })
-                .AddBasicPermission(permissionName: BasicPermissions.EventWall, withRoleNames: new[] { Roles.External, Roles.Intern })
                 .AddBasicPermission(permissionName: BasicPermissions.EventUsers, withRoleNames: Roles.NewUser)
                 
                 .AddBasicPermission(permissionName: BasicPermissions.Picture, withRoleNames: Roles.NewUser)

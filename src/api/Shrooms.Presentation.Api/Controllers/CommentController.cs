@@ -50,6 +50,11 @@ namespace Shrooms.Presentation.Api.Controllers
 
             var wallPost = await _wallService.GetWallPostAsync(userAndOrg, comment.PostId);
 
+            if (!await _permissionService.UserHasPermissionAsync(userAndOrg, BasicPermissions.Comment) && wallPost.WallType != WallType.Events)
+            {
+                return Forbidden();
+            }
+
             var commentDto = _mapper.Map<NewCommentViewModel, NewCommentDto>(comment);
             SetOrganizationAndUser(commentDto);
             var userHubDto = GetUserAndOrganizationHub();
@@ -71,7 +76,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpPut]
         [Route("Edit")]
-        [PermissionAnyOfAuthorize(BasicPermissions.Comment, BasicPermissions.EventWall)]
+        [PermissionAnyOfAuthorize(BasicPermissions.Comment, BasicPermissions.Event)]
         public async Task<IHttpActionResult> EditComment(EditCommentViewModel commentViewModel)
         {
             if (!ModelState.IsValid)
@@ -103,7 +108,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpDelete]
         [Route("Delete")]
-        [PermissionAnyOfAuthorize(BasicPermissions.Comment, BasicPermissions.EventWall)]
+        [PermissionAnyOfAuthorize(BasicPermissions.Comment, BasicPermissions.Event)]
         public async Task<IHttpActionResult> DeleteComment(int id)
         {
             if (!ModelState.IsValid)
@@ -128,7 +133,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpPut]
         [Route("Hide")]
-        [PermissionAnyOfAuthorize(BasicPermissions.Comment, BasicPermissions.EventWall)]
+        [PermissionAnyOfAuthorize(BasicPermissions.Comment, BasicPermissions.Event)]
         public async Task<IHttpActionResult> HideComment(HideCommentViewModel comment)
         {
             if (!ModelState.IsValid)
@@ -153,7 +158,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpPut]
         [Route("Like")]
-        [PermissionAuthorize(Permission = BasicPermissions.Post)]
+        [PermissionAnyOfAuthorize(BasicPermissions.Comment, BasicPermissions.Event)]
         public async Task<IHttpActionResult> ToggleLike(AddLikeViewModel addLikeViewModel)
         {
             if (!ModelState.IsValid)

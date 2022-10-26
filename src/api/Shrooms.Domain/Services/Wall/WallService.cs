@@ -119,16 +119,11 @@ namespace Shrooms.Domain.Services.Wall
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Wall not found");
             }
 
-            var isWallAdmin = wall.Type != WallType.Events ?
-                await _permissionService.UserHasPermissionAsync(updateWallDto, AdministrationPermissions.Wall) :
-                await _permissionService.UserHasPermissionAsync(updateWallDto, AdministrationPermissions.Event);
-
-            var isModerator = wall.Moderators.Any(m => m.UserId == updateWallDto.UserId);
-
-            if (!isWallAdmin && !isModerator)
-            {
-                throw new UnauthorizedException();
-            }
+            await CheckIfUserIsAllowedToModifyWallContentAsync(
+                wall,
+                AdministrationPermissions.Wall,
+                AdministrationPermissions.Event,
+                updateWallDto);
 
             IEnumerable<string> newMembersIds = new List<string>();
             IEnumerable<string> newModeratorsIds = new List<string>();
@@ -583,6 +578,60 @@ namespace Shrooms.Domain.Services.Wall
                         Fullname = m.Fullname
                     })
                     .ToList();
+            }
+        }
+
+        public async Task CheckIfUserIsAllowedToModifyWallContentAsync(
+            int wallId,
+            string createdBy,
+            WallType wallType,
+            string defaultPermission,
+            string eventPermission,
+            UserAndOrganizationDto userOrg)
+        {
+            var isModerator = createdBy == userOrg.UserId || await _moderatorsDbSet
+                .AnyAsync(moderator =>
+                    moderator.UserId == userOrg.UserId &&
+                    moderator.WallId == wallId);
+
+            await CheckIfUserIsAllowedToModifyWallContentAsync(
+                isModerator,
+                wallType,
+                defaultPermission,
+                eventPermission,
+                userOrg);
+        }
+
+        private async Task CheckIfUserIsAllowedToModifyWallContentAsync(
+            MultiwallWall wall,
+            string defaultPermission,
+            string eventPermission,
+            UserAndOrganizationDto userOrg)
+        {
+            var isModerator = wall.CreatedBy == userOrg.UserId || wall.Moderators.Any(m => m.UserId == userOrg.UserId);
+
+            await CheckIfUserIsAllowedToModifyWallContentAsync(
+                isModerator,
+                wall.Type,
+                defaultPermission,
+                eventPermission,
+                userOrg);
+        }
+
+        private async Task CheckIfUserIsAllowedToModifyWallContentAsync(
+            bool isModerator,
+            WallType wallType,
+            string defaultPermission,
+            string eventPermission,
+            UserAndOrganizationDto userOrg)
+        {
+            var hasRequiredPermission = wallType != WallType.Events ?
+                await _permissionService.UserHasPermissionAsync(userOrg, defaultPermission) :
+                await _permissionService.UserHasPermissionAsync(userOrg, eventPermission);
+
+            if (!hasRequiredPermission && !isModerator)
+            {
+                throw new UnauthorizedException();
             }
         }
 
