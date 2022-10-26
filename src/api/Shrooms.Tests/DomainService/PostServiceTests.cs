@@ -230,12 +230,11 @@ namespace Shrooms.Tests.DomainService
             _usersDbSet.SetDbSetDataForAsync(users.AsQueryable());
 
             _wallService.CheckIfUserIsAllowedToModifyWallContentAsync(
-                Arg.Any<int>(),
+                Arg.Any<Wall>(),
                 Arg.Any<string>(),
-                Arg.Any<WallType>(),
                 Arg.Is(AdministrationPermissions.Post),
-                Arg.Is(AdministrationPermissions.Event),
-                Arg.Any<UserAndOrganizationDto>())
+                Arg.Any<UserAndOrganizationDto>(),
+                Arg.Any<bool>())
                 .Returns(Task.FromException(new UnauthorizedException()));
 
             Assert.ThrowsAsync<UnauthorizedException>(async () => await _postService.HideWallPostAsync(1, userOrg));
@@ -372,12 +371,11 @@ namespace Shrooms.Tests.DomainService
             };
 
             _wallService.CheckIfUserIsAllowedToModifyWallContentAsync(
-                Arg.Any<int>(),
+                Arg.Any<Wall>(),
                 Arg.Any<string>(),
-                Arg.Any<WallType>(),
                 Arg.Is(AdministrationPermissions.Post),
-                Arg.Is(AdministrationPermissions.Event),
-                Arg.Any<UserAndOrganizationDto>())
+                Arg.Any<UserAndOrganizationDto>(),
+                Arg.Any<bool>())
                 .Returns(Task.FromException(new UnauthorizedException()));
 
             // Act
@@ -451,12 +449,11 @@ namespace Shrooms.Tests.DomainService
             };
 
             _wallService.CheckIfUserIsAllowedToModifyWallContentAsync(
-                 Arg.Any<int>(),
+                 Arg.Any<Wall>(),
                  Arg.Any<string>(),
-                 Arg.Any<WallType>(),
                  Arg.Is(AdministrationPermissions.Post),
-                 Arg.Is(AdministrationPermissions.Event),
-                 Arg.Any<UserAndOrganizationDto>())
+                 Arg.Any<UserAndOrganizationDto>(),
+                 Arg.Any<bool>())
                  .Returns(Task.FromException(new UnauthorizedException()));
 
             // Act

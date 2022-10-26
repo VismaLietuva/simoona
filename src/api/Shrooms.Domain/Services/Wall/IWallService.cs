@@ -6,6 +6,7 @@ using Shrooms.Contracts.DataTransferObjects.Wall;
 using Shrooms.Contracts.DataTransferObjects.Wall.Posts;
 using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models;
+using MultiwallWall = Shrooms.DataLayer.EntityModels.Models.Multiwall.Wall;
 
 namespace Shrooms.Domain.Services.Wall
 {
@@ -50,11 +51,10 @@ namespace Shrooms.Domain.Services.Wall
         Task ReplaceMembersInWallAsync(IEnumerable<ApplicationUser> newMembers, int wallId, string currentUserId);
         
         Task CheckIfUserIsAllowedToModifyWallContentAsync(
-            int wallId,
+            MultiwallWall wall,
             string createdBy,
-            WallType wallType,
-            string defaultPermission,
-            string eventPermission,
-            UserAndOrganizationDto userOrg);
+            string permission,
+            UserAndOrganizationDto userOrg,
+            bool checkForAdministrationEvent = true);
     }
 }

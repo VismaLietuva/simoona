@@ -122,12 +122,11 @@ namespace Shrooms.Domain.Services.Wall.Posts
                 }
 
                 await _wallService.CheckIfUserIsAllowedToModifyWallContentAsync(
-                    post.WallId,
+                    post.Wall,
                     post.AuthorId,
-                    post.Wall.Type,
                     BasicPermissions.Post,
-                    BasicPermissions.Event,
-                    userOrg);
+                    userOrg,
+                    checkForAdministrationEvent: false);
 
                 var like = post.Likes.FirstOrDefault(x => x.UserId == userOrg.UserId);
                 if (like == null)
@@ -165,12 +164,11 @@ namespace Shrooms.Domain.Services.Wall.Posts
                 }
 
                 await _wallService.CheckIfUserIsAllowedToModifyWallContentAsync(
-                    post.WallId,
+                    post.Wall,
                     post.CreatedBy,
-                    post.Wall.Type,
                     AdministrationPermissions.Post,
-                    AdministrationPermissions.Event,
-                    editPostDto);
+                    userOrg: editPostDto,
+                    checkForAdministrationEvent: true);
 
                 post.MessageBody = editPostDto.MessageBody;
                 post.Images = new ImageCollection(editPostDto.Images);
@@ -207,12 +205,11 @@ namespace Shrooms.Domain.Services.Wall.Posts
                 }
 
                 await _wallService.CheckIfUserIsAllowedToModifyWallContentAsync(
-                    post.WallId,
+                    post.Wall,
                     post.CreatedBy,
-                    post.Wall.Type,
                     AdministrationPermissions.Post,
-                    AdministrationPermissions.Event,
-                    userOrg);
+                    userOrg,
+                    checkForAdministrationEvent: true);
 
                 await _commentService.DeleteCommentsByPostAsync(post.Id);
                 _postsDbSet.Remove(post);
@@ -241,12 +238,11 @@ namespace Shrooms.Domain.Services.Wall.Posts
                 }
 
                 await _wallService.CheckIfUserIsAllowedToModifyWallContentAsync(
-                    post.WallId,
+                    post.Wall,
                     post.CreatedBy,
-                    post.Wall.Type,
                     AdministrationPermissions.Post,
-                    AdministrationPermissions.Event,
-                    userOrg);
+                    userOrg,
+                    checkForAdministrationEvent: true);
 
                 post.IsHidden = true;
                 post.LastEdit = DateTime.UtcNow;

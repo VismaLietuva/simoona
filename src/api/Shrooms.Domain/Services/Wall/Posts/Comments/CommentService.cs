@@ -54,12 +54,11 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             }
 
             await _wallService.CheckIfUserIsAllowedToModifyWallContentAsync(
-                comment.Post.WallId,
+                comment.Post.Wall,
                 comment.AuthorId,
-                comment.Post.Wall.Type,
                 BasicPermissions.Comment,
-                BasicPermissions.Event,
-                userOrg);
+                userOrg,
+                checkForAdministrationEvent: false);
 
             var like = comment.Likes.FirstOrDefault(x => x.UserId == userOrg.UserId);
 
@@ -156,12 +155,11 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             }
 
             await _wallService.CheckIfUserIsAllowedToModifyWallContentAsync(
-                comment.Post.Wall.Id,
+                comment.Post.Wall,
                 comment.CreatedBy,
-                comment.Post.Wall.Type,
                 AdministrationPermissions.Post,
-                AdministrationPermissions.Event,
-                commentDto);
+                userOrg: commentDto,
+                checkForAdministrationEvent: true);
 
             comment.MessageBody = commentDto.MessageBody;
             comment.Images = new ImageCollection(commentDto.Images);
@@ -182,14 +180,13 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             {
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Comment does not exist");
             }
-       
+
             await _wallService.CheckIfUserIsAllowedToModifyWallContentAsync(
-                comment.Post.Wall.Id,
+                comment.Post.Wall,
                 comment.CreatedBy,
-                comment.Post.Wall.Type,
                 AdministrationPermissions.Post,
-                AdministrationPermissions.Event,
-                userOrg);
+                userOrg,
+                checkForAdministrationEvent: true);
 
             _commentsDbSet.Remove(comment);
 
@@ -213,12 +210,11 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             }
 
             await _wallService.CheckIfUserIsAllowedToModifyWallContentAsync(
-                comment.Post.Wall.Id,
+                comment.Post.Wall,
                 comment.CreatedBy,
-                comment.Post.Wall.Type,
                 AdministrationPermissions.Post,
-                AdministrationPermissions.Event,
-                userOrg);
+                userOrg,
+                checkForAdministrationEvent: true);
 
             comment.IsHidden = true;
             comment.LastEdit = DateTime.UtcNow;
