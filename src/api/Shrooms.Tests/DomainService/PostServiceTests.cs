@@ -17,6 +17,7 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.Domain.Exceptions.Exceptions;
 using Shrooms.Domain.Services.Permissions;
+using Shrooms.Domain.Services.Wall;
 using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.Domain.Services.Wall.Posts.Comments;
 using Shrooms.Tests.Extensions;
@@ -46,8 +47,11 @@ namespace Shrooms.Tests.DomainService
             _wallModeratorsDbSet = uow.MockDbSetForAsync<WallModerator>();
 
             _permissionService = Substitute.For<IPermissionService>();
+            
             var commentService = Substitute.For<ICommentService>();
-            _postService = new PostService(uow, _permissionService, commentService);
+            var wallService = Substitute.For<IWallService>();
+
+            _postService = new PostService(uow, _permissionService, commentService, wallService);
         }
 
         [Test]

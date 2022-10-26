@@ -17,6 +17,7 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.Domain.Exceptions.Exceptions;
 using Shrooms.Domain.Services.Permissions;
+using Shrooms.Domain.Services.Wall;
 using Shrooms.Domain.Services.Wall.Posts.Comments;
 using Shrooms.Tests.Extensions;
 
@@ -48,7 +49,9 @@ namespace Shrooms.Tests.DomainService
             _systemClock = Substitute.For<ISystemClock>();
             _permissionService = Substitute.For<IPermissionService>();
 
-            _commentService = new CommentService(uow, _systemClock, _permissionService);
+            var wallService = Substitute.For<IWallService>();
+
+            _commentService = new CommentService(uow, _systemClock, _permissionService, wallService);
         }
 
         [Test]
