@@ -188,7 +188,7 @@ namespace Shrooms.Presentation.Api.Controllers
 
         [HttpPut]
         [Route("Like")]
-        [PermissionAnyOfAuthorize(BasicPermissions.Post, BasicPermissions.Event)] // TODO:... make event only work?
+        [PermissionAnyOfAuthorize(BasicPermissions.Post, BasicPermissions.Event)]
         public async Task<IHttpActionResult> ToggleLike(AddLikeViewModel addLikeViewModel)
         {
             if (!ModelState.IsValid)
