@@ -202,6 +202,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             _eventValidationService.CheckIfCreatingEventHasInsufficientOptions(eventDto.MaxOptions, totalOptionsProvided);
             _eventValidationService.CheckIfCreatingEventHasNoChoices(eventDto.MaxOptions, totalOptionsProvided);
             _eventValidationService.CheckIfAttendOptionsAllowedToUpdate(eventDto, eventToUpdate);
+
             await ValidateEvent(eventDto);
 
             if (eventDto.ResetParticipantList)
@@ -210,6 +211,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             }
 
             await UpdateWallAsync(eventToUpdate, eventDto);
+
             UpdateEventInfo(eventDto, eventToUpdate);
             UpdateEventOptions(eventDto, eventToUpdate);
 

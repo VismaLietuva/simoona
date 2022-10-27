@@ -38,7 +38,6 @@ namespace Shrooms.DataLayer.Migrations.DataInitializer
                 .AddBasicPermission(permissionName: BasicPermissions.OfficeUsers, withRoleNames: Roles.NewUser)
                 
                 .AddBasicPermission(permissionName: BasicPermissions.Event, withRoleNames: new[] { Roles.External, Roles.Intern })
-                .AddBasicPermission(permissionName: BasicPermissions.EventWall, withRoleNames: new[] { Roles.External, Roles.Intern })
                 .AddBasicPermission(permissionName: BasicPermissions.EventUsers, withRoleNames: Roles.NewUser)
                 
                 .AddBasicPermission(permissionName: BasicPermissions.Picture, withRoleNames: Roles.NewUser)
@@ -72,7 +71,6 @@ namespace Shrooms.DataLayer.Migrations.DataInitializer
                 .AddAdminPermission(permissionName: AdministrationPermissions.QualificationLevel, withRoleNames: Roles.Administration)
 
                 .AddAdminPermission(permissionName: AdministrationPermissions.Event, withRoleNames: new[] { Roles.Administration, Roles.EventsManagement })
-                .AddAdminPermission(permissionName: AdministrationPermissions.EventWall, withRoleNames: Roles.Administration)
 
                 .AddAdminPermission(permissionName: AdministrationPermissions.Vacation, withRoleNames: new[] { Roles.Accountant, Roles.Administration }, module: Modules.Vacation)
                 .AddAdminPermission(permissionName: AdministrationPermissions.Committees, withRoleNames: new[] { Roles.Administration, Roles.KudosAdmin })

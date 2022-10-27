@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
-using Shrooms.Contracts.DataTransferObjects.Wall.Comments;
 using Shrooms.Contracts.DataTransferObjects.Wall.Likes;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.Infrastructure;
@@ -14,6 +13,7 @@ using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.Domain.Exceptions.Exceptions;
 using Shrooms.Contracts.DataTransferObjects.Models.Wall.Comments;
 using Shrooms.Domain.Services.Permissions;
+using Shrooms.Contracts.Enums;
 
 namespace Shrooms.Domain.Services.Wall.Posts.Comments
 {
@@ -22,17 +22,19 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
         private readonly IUnitOfWork2 _uow;
         private readonly ISystemClock _systemClock;
         private readonly IPermissionService _permissionService;
+        private readonly IWallService _wallService;
 
         private readonly DbSet<Post> _postsDbSet;
         private readonly DbSet<Comment> _commentsDbSet;
         private readonly DbSet<WallModerator> _wallModeratorsDbSet;
         private readonly DbSet<PostWatcher> _postWatchers;
 
-        public CommentService(IUnitOfWork2 uow, ISystemClock systemClock, IPermissionService permissionService)
+        public CommentService(IUnitOfWork2 uow, ISystemClock systemClock, IPermissionService permissionService, IWallService wallService)
         {
             _uow = uow;
             _systemClock = systemClock;
             _permissionService = permissionService;
+            _wallService = wallService;
 
             _postsDbSet = uow.GetDbSet<Post>();
             _commentsDbSet = uow.GetDbSet<Comment>();
@@ -50,6 +52,13 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
             {
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Comment does not exist");
             }
+
+            await _wallService.CheckIfUserIsAllowedToModifyWallContentAsync(
+                comment.Post.Wall,
+                comment.AuthorId,
+                BasicPermissions.Comment,
+                userOrg,
+                checkForAdministrationEventPermission: false);
 
             var like = comment.Likes.FirstOrDefault(x => x.UserId == userOrg.UserId);
 
@@ -145,15 +154,12 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Comment does not exist");
             }
 
-            var isWallModerator = await _wallModeratorsDbSet
-                .AnyAsync(x => x.UserId == commentDto.UserId && x.WallId == comment.Post.WallId) || commentDto.UserId == comment.CreatedBy;
-
-            var isAdministrator = await _permissionService.UserHasPermissionAsync(commentDto, AdministrationPermissions.Post);
-
-            if (!isAdministrator && !isWallModerator)
-            {
-                throw new UnauthorizedException();
-            }
+            await _wallService.CheckIfUserIsAllowedToModifyWallContentAsync(
+                comment.Post.Wall,
+                comment.CreatedBy,
+                AdministrationPermissions.Post,
+                userOrg: commentDto,
+                checkForAdministrationEventPermission: true);
 
             comment.MessageBody = commentDto.MessageBody;
             comment.Images = new ImageCollection(commentDto.Images);
@@ -175,15 +181,12 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Comment does not exist");
             }
 
-            var isWallModerator = await _wallModeratorsDbSet
-                .AnyAsync(x => x.UserId == userOrg.UserId && x.WallId == comment.Post.WallId) || comment.CreatedBy == userOrg.UserId;
-
-            var isAdministrator = await _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Post);
-
-            if (!isAdministrator && !isWallModerator)
-            {
-                throw new UnauthorizedException();
-            }
+            await _wallService.CheckIfUserIsAllowedToModifyWallContentAsync(
+                comment.Post.Wall,
+                comment.CreatedBy,
+                AdministrationPermissions.Post,
+                userOrg,
+                checkForAdministrationEventPermission: true);
 
             _commentsDbSet.Remove(comment);
 
@@ -206,15 +209,12 @@ namespace Shrooms.Domain.Services.Wall.Posts.Comments
                 throw new ValidationException(ErrorCodes.ContentDoesNotExist, "Comment does not exist");
             }
 
-            var isWallModerator = await _wallModeratorsDbSet
-                .AnyAsync(x => x.UserId == userOrg.UserId && x.WallId == comment.Post.WallId) || comment.CreatedBy == userOrg.UserId;
-
-            var isAdministrator = await _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Post);
-
-            if (!isAdministrator && !isWallModerator)
-            {
-                throw new UnauthorizedException();
-            }
+            await _wallService.CheckIfUserIsAllowedToModifyWallContentAsync(
+                comment.Post.Wall,
+                comment.CreatedBy,
+                AdministrationPermissions.Post,
+                userOrg,
+                checkForAdministrationEventPermission: true);
 
             comment.IsHidden = true;
             comment.LastEdit = DateTime.UtcNow;

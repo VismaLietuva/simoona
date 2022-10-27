@@ -17,6 +17,7 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.Domain.Exceptions.Exceptions;
 using Shrooms.Domain.Services.Permissions;
+using Shrooms.Domain.Services.Wall;
 using Shrooms.Domain.Services.Wall.Posts;
 using Shrooms.Domain.Services.Wall.Posts.Comments;
 using Shrooms.Tests.Extensions;
@@ -32,6 +33,7 @@ namespace Shrooms.Tests.DomainService
         private DbSet<WallModerator> _wallModeratorsDbSet;
         private IPostService _postService;
         private IPermissionService _permissionService;
+        private IWallService _wallService;
 
         private readonly string _userId = Guid.NewGuid().ToString();
 
@@ -46,8 +48,11 @@ namespace Shrooms.Tests.DomainService
             _wallModeratorsDbSet = uow.MockDbSetForAsync<WallModerator>();
 
             _permissionService = Substitute.For<IPermissionService>();
+            _wallService = Substitute.For<IWallService>();
+
             var commentService = Substitute.For<ICommentService>();
-            _postService = new PostService(uow, _permissionService, commentService);
+
+            _postService = new PostService(uow, _permissionService, commentService, _wallService);
         }
 
         [Test]
@@ -224,6 +229,14 @@ namespace Shrooms.Tests.DomainService
 
             _usersDbSet.SetDbSetDataForAsync(users.AsQueryable());
 
+            _wallService.CheckIfUserIsAllowedToModifyWallContentAsync(
+                Arg.Any<Wall>(),
+                Arg.Any<string>(),
+                Arg.Is(AdministrationPermissions.Post),
+                Arg.Any<UserAndOrganizationDto>(),
+                Arg.Any<bool>())
+                .Returns(Task.FromException(new UnauthorizedException()));
+
             Assert.ThrowsAsync<UnauthorizedException>(async () => await _postService.HideWallPostAsync(1, userOrg));
         }
 
@@ -357,7 +370,13 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 2
             };
 
-            _permissionService.UserHasPermissionAsync(editPostDto, AdministrationPermissions.Post).Returns(false);
+            _wallService.CheckIfUserIsAllowedToModifyWallContentAsync(
+                Arg.Any<Wall>(),
+                Arg.Any<string>(),
+                Arg.Is(AdministrationPermissions.Post),
+                Arg.Any<UserAndOrganizationDto>(),
+                Arg.Any<bool>())
+                .Returns(Task.FromException(new UnauthorizedException()));
 
             // Act
             // Assert
@@ -429,7 +448,13 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 2
             };
 
-            _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Post).Returns(false);
+            _wallService.CheckIfUserIsAllowedToModifyWallContentAsync(
+                 Arg.Any<Wall>(),
+                 Arg.Any<string>(),
+                 Arg.Is(AdministrationPermissions.Post),
+                 Arg.Any<UserAndOrganizationDto>(),
+                 Arg.Any<bool>())
+                 .Returns(Task.FromException(new UnauthorizedException()));
 
             // Act
             // Assert

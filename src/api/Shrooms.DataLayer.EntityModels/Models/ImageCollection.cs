@@ -52,6 +52,11 @@ namespace Shrooms.DataLayer.EntityModels.Models
 
         private void AddImages(IEnumerable<string> images)
         {
+            if (images == null)
+            {
+                return;
+            }
+
             foreach (var image in images)
             {
                 if (string.IsNullOrEmpty(image))

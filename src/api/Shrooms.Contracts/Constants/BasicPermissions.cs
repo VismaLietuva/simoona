@@ -35,7 +35,6 @@
         public const string Wall = "WALL_BASIC";
 
         public const string Event = "EVENT_BASIC";
-        public const string EventWall = "EVENTWALL_BASIC";
         public const string EventUsers = "EVENTUSERS_BASIC";
         public const string Blacklist = "BLACKLIST_BASIC";
 

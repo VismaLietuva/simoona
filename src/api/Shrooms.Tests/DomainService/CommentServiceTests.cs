@@ -17,6 +17,7 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
 using Shrooms.Domain.Exceptions.Exceptions;
 using Shrooms.Domain.Services.Permissions;
+using Shrooms.Domain.Services.Wall;
 using Shrooms.Domain.Services.Wall.Posts.Comments;
 using Shrooms.Tests.Extensions;
 
@@ -31,6 +32,7 @@ namespace Shrooms.Tests.DomainService
         private ISystemClock _systemClock;
         private IPermissionService _permissionService;
         private ICommentService _commentService;
+        private IWallService _wallService;
 
         private readonly string _userId = Guid.NewGuid().ToString();
 
@@ -48,7 +50,9 @@ namespace Shrooms.Tests.DomainService
             _systemClock = Substitute.For<ISystemClock>();
             _permissionService = Substitute.For<IPermissionService>();
 
-            _commentService = new CommentService(uow, _systemClock, _permissionService);
+            _wallService = Substitute.For<IWallService>();
+
+            _commentService = new CommentService(uow, _systemClock, _permissionService, _wallService);
         }
 
         [Test]
@@ -246,7 +250,13 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 2
             };
 
-            _permissionService.UserHasPermissionAsync(editCommentDto, AdministrationPermissions.Post).Returns(false);
+            _wallService.CheckIfUserIsAllowedToModifyWallContentAsync(
+                Arg.Any<Wall>(),
+                Arg.Any<string>(),
+                Arg.Is(AdministrationPermissions.Post),
+                Arg.Any<UserAndOrganizationDto>(),
+                Arg.Any<bool>())
+                .Returns(Task.FromException(new UnauthorizedException()));
 
             // Act
             // Assert
@@ -329,9 +339,14 @@ namespace Shrooms.Tests.DomainService
                 OrganizationId = 2
             };
 
-            _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Post).Returns(false);
+            _wallService.CheckIfUserIsAllowedToModifyWallContentAsync(
+                  Arg.Any<Wall>(),
+                  Arg.Any<string>(),
+                  Arg.Is(AdministrationPermissions.Post),
+                  Arg.Any<UserAndOrganizationDto>(),
+                  Arg.Any<bool>())
+                  .Returns(Task.FromException(new UnauthorizedException()));
 
-            // Act
             // Assert
             Assert.ThrowsAsync<UnauthorizedException>(async () => await _commentService.DeleteCommentAsync(1, userOrg));
         }
