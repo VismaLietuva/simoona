@@ -36,7 +36,7 @@
         </li>
         <li class="list-group-item row" ng-if="!!serviceRequest.pictureId" ng-cloak>
             <strong ng-cloak>{{"serviceRequest.image" | translate}}: </strong>
-            <div>
+            <div class="service-request-image-container">
                 <img ng-src="{{serviceRequest.pictureId | thumb}}" ace-picture-modal="serviceRequest.pictureId "/>
             </div>
         </li>
