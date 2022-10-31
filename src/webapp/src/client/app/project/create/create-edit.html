@@ -11,21 +11,21 @@
                     <div class="form-group required" ng-class="{'has-error': projectForm.title.$invalid && projectForm.title.$dirty}">
                         <label for="projectName" class="control-label col-xs-12 col-sm-4" translate="projects.projectTitle"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
-                            <input id="projectTitle" 
-                                   type="text" 
-                                   class="form-control" 
-                                   name="title" 
-                                   ng-model="vm.project.title" 
-                                   ng-maxlength="vm.projectSettings.titleLength" 
-                                   data-test-id="project-form-title-input" 
+                            <input id="projectTitle"
+                                   type="text"
+                                   class="form-control"
+                                   name="title"
+                                   ng-model="vm.project.title"
+                                   ng-maxlength="vm.projectSettings.titleLength"
+                                   data-test-id="project-form-title-input"
                                    required/>
-                            <p class="text-danger help-block" 
-                               ng-if="projectForm.title.$error.required && projectForm.title.$dirty" 
+                            <p class="text-danger help-block"
+                               ng-if="projectForm.title.$error.required && projectForm.title.$dirty"
                                translate="common.messageFieldIsRequired">
                             </p>
-                            <p class="text-danger help-block" 
-                               ng-if="projectForm.title.$error.maxlength && projectForm.title.$dirty" 
-                               translate="common.messageInvalidLength" 
+                            <p class="text-danger help-block"
+                               ng-if="projectForm.title.$error.maxlength && projectForm.title.$dirty"
+                               translate="common.messageInvalidLength"
                                translate-values="{ one: vm.projectSettings.titleLength }">
                             </p>
                         </div>
@@ -34,17 +34,17 @@
                     <div class="form-group" ng-class="{'has-error': projectForm.description.$error.maxlength && projectForm.description.$dirty}">
                         <label for="description" class="control-label col-xs-12 col-sm-4" translate="projects.projectDescription"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
-                            <textarea id="description" 
-                                      name="description" 
-                                      class="form-control" 
-                                      ng-model="vm.project.description" 
-                                      ng-maxlength="vm.projectSettings.descriptionLength" 
-                                      rows="3" 
+                            <textarea id="description"
+                                      name="description"
+                                      class="form-control"
+                                      ng-model="vm.project.description"
+                                      ng-maxlength="vm.projectSettings.descriptionLength"
+                                      rows="3"
                                       data-test-id="project-form-project-description-input">
                             </textarea>
-                            <p class="text-danger help-block" 
-                               ng-if="projectForm.description.$error.maxlength && projectForm.description.$dirty" 
-                               translate="common.messageInvalidLength" 
+                            <p class="text-danger help-block"
+                               ng-if="projectForm.description.$error.maxlength && projectForm.description.$dirty"
+                               translate="common.messageInvalidLength"
                                translate-values="{ one: vm.projectSettings.descriptionLength }">
                             </p>
                         </div>
@@ -53,12 +53,12 @@
                     <div class="form-group required" ng-class="{'has-error': vm.isOwnerError}">
                         <label for="owner" class="control-label col-xs-12 col-sm-4" translate="projects.projectOwner"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
-                            <autocomplete id="owner" 
+                            <autocomplete id="owner"
                                           name="owner"
-                                          load-data="vm.autocompleteUser" 
+                                          load-data="vm.autocompleteUser"
                                           shown="fullName"
-                                          bound-model="vm.project.owner" 
-                                          with-image="true" 
+                                          bound-model="vm.project.owner"
+                                          with-image="true"
                                           data-test-id="project-form-owner-autocomplete-input">
                             </autocomplete>
                             <p class="text-danger help-block" ng-if="vm.isOwnerError" translate="common.messageFieldIsRequired"></p>
@@ -72,6 +72,7 @@
                                         data-test-id="project-members-input"
                                         name="projectMembers"
                                         ng-model="vm.members"
+                                        key-property="id"
                                         add-from-autocomplete-only="true"
                                         display-property="fullName"
                                         add-on-enter="true"
@@ -110,11 +111,11 @@
                     <div class="form-group" >
                         <label for="image-file-input" class="control-label col-xs-12 col-sm-4" translate="projects.projectLogo"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
-                            <ace-photo-crop-upload 
-                                images="vm.projectLogo" 
-                                is-crop-visible="vm.states.isCreate || !!vm.projectLogo || !vm.project.logo" 
-                                aspect-ratio="1.7" 
-                                result-image="vm.projectCroppedLogo" 
+                            <ace-photo-crop-upload
+                                images="vm.projectLogo"
+                                is-crop-visible="vm.states.isCreate || !!vm.projectLogo || !vm.project.logo"
+                                aspect-ratio="1.7"
+                                result-image="vm.projectCroppedLogo"
                                 image-size="vm.projectLogoSize">
                             </ace-photo-crop-upload>
                             <img ng-if="vm.states.isEdit && !vm.projectCroppedLogo && vm.projectLogo.length < 1 && vm.project.logo" src="{{vm.project.logo | imageThumb:vm.projectLogoSize:'crop'}}" />
@@ -131,17 +132,17 @@
                     </div>
                     <!--project buttons-->
                     <div class="pull-right">
-                        <button class="btn btn-primary" 
+                        <button class="btn btn-primary"
                                 ng-if="vm.states.isCreate"
                                 ng-click="vm.submitProjectForm(vm.createProject, true)"
-                                ng-disabled="projectForm.$invalid || !vm.project.owner || !vm.projectCroppedLogo" 
+                                ng-disabled="projectForm.$invalid || !vm.project.owner || !vm.projectCroppedLogo"
                                 data-test-id="project-form-save-button">
                             <span translate="common.save"></span>
                         </button>
-                        <button class="btn btn-primary" 
+                        <button class="btn btn-primary"
                                 ng-if="vm.states.isEdit"
                                 ng-click="vm.submitProjectForm(vm.updateProject, true)"
-                                ng-disabled="projectForm.$invalid || !vm.project.owner.id" 
+                                ng-disabled="projectForm.$invalid || !vm.project.owner.id"
                                 data-test-id="project-form-save-button">
                             <span translate="common.save"></span>
                         </button>

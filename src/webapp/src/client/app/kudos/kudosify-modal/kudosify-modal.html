@@ -26,6 +26,7 @@
                             name="kudosReceivers"
                             ng-model="vm.kudosReceivers"
                             add-from-autocomplete-only="true"
+                            key-property="id"
                             display-property="fullName"
                             add-on-enter="true"
                             add-on-space="true"
@@ -50,7 +51,7 @@
                         tooltip-append-to-body="true"
                         ng-model="vm.pointsType"
                         ng-click="vm.chooseKudosType(kudosType, $event)"
-                        data-test-id="{{kudosType.name}}" 
+                        data-test-id="{{kudosType.name}}"
                         ng-cloak>
                     {{:: kudosType.name}} ({{:: kudosType.value}})
                 </button>
