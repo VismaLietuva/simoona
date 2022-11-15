@@ -69,6 +69,7 @@
                         <div class="col-xs-7 col-md-6 col-lg-5" >
                             <tags-input name="wallModerators"
                                         id="moderators"
+                                        key-property="id"
                                         add-from-autocomplete-only="true"
                                         ng-model="vm.wall.moderators"
                                         display-property="fullName"
@@ -100,7 +101,7 @@
                             <img ng-if="vm.states.isEdit && !vm.wallCroppedLogo && vm.wallLogo.length < 1" src="{{vm.wall.logo | imageThumb:vm.wallLogoSize:'crop'}}" />
                         </div>
                     </div>
-                    
+
                     <!-- Wall hide checkbox -->
                     <div class="form-group">
                         <span class="col-xs-4"></span>

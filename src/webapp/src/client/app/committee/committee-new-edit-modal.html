@@ -35,7 +35,7 @@
                           ng-thumb="{ file: file, height: thumbHeight, class: 'user-thumb center-block cursorHand' }">
                         <canvas></canvas>
                     </span>
-                    
+
                     <label id="committeePictureBtn" class="btn btn-warning center-block">
                         <input id="pictureSelect"
                                data-test-id="pictureSelect"
@@ -54,6 +54,7 @@
                             ng-model="committee.leads"
                             add-from-autocomplete-only="true"
                             display-property="fullName"
+                            key-property="id"
                             add-on-enter="true"
                             add-on-space="true"
                             add-on-comma="true"
@@ -73,6 +74,7 @@
                 <label>{{"committee.members" | translate}}</label>
                 <tags-input id="members"
                             name="members"
+                            key-property="id"
                             ng-model="committee.members"
                             add-from-autocomplete-only="true"
                             display-property="fullName"
@@ -95,6 +97,7 @@
                 <label>{{"committee.delegates" | translate}}</label>
                 <tags-input id="delegates"
                             name="delegates"
+                            key-property="id"
                             ng-model="committee.delegates"
                             add-from-autocomplete-only="true"
                             display-property="fullName"
