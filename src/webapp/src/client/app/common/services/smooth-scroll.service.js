@@ -13,16 +13,17 @@
         /////
 
         function scrollTo(eID, offset) {
-            // This scrolling function 
+            // This scrolling function
             // is from http://www.itnewb.com/tutorial/Creating-the-Smooth-Scroll-Effect-with-JavaScript
-
             var i;
             var startY = currentYPosition();
             var stopY = elmYPosition(eID) - offset;
             var distance = stopY > startY ? stopY - startY : startY - stopY;
+
             if (distance < 100) {
-                scrollTo(0, stopY); return;
+                return;
             }
+
             var speed = Math.round(distance / 100);
             if (speed >= 20) speed = 20;
             var step = Math.round(distance / 25);
@@ -60,10 +61,12 @@
             var elm = document.getElementById(eID);
             var y = elm.offsetTop;
             var node = elm;
+
             while (node.offsetParent && node.offsetParent !== document.body) {
                 node = node.offsetParent;
                 y += node.offsetTop;
             }
+
             return y;
         }
     }
