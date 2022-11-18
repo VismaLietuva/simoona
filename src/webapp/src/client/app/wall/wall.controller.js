@@ -39,7 +39,6 @@
                             document.getElementById("minutes-sm").innerText = document.getElementById("minutes-lg").innerText = Math.floor((distance % (hour)) / (minute)),
                             document.getElementById("seconds-sm").innerText = document.getElementById("seconds-lg").innerText = Math.floor((distance % (minute)) / second);
                         }
-                        //seconds
                     }, 0)
                 //TEMPORARY COUNTER
 
