@@ -30,7 +30,7 @@
         
                         if (distance < 0) {
                             document.getElementById("heading").innerText = "Game of Thrones starts now!";
-                            document.getElementById("counting-sm").style.visibility = document.getElementById("counting-lg").style.visibility = 'hidden';
+                            document.getElementById("counting-sm").style.display = document.getElementById("counting-lg").style.display  = 'none';
                             
                             clearInterval(x);
                         } else {
