@@ -20,8 +20,7 @@
                 hour = minute * 60,
                 day = hour * 24;
         
-                //var gotStarts = new Date("Dec 9, 2022 18:00:00").getTime();
-                var gotStarts = new Date("Nov 18, 2022 13:10:20").getTime();
+                var gotStarts = new Date("Dec 9, 2022 18:00:00").getTime();
                 
                 const countDown = new Date(gotStarts).getTime();
                 const x = setInterval(function() {    
