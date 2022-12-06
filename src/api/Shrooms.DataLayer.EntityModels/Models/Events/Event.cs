@@ -40,6 +40,8 @@ namespace Shrooms.DataLayer.EntityModels.Models.Events
         [Range(0, short.MaxValue)]
         public int MaxParticipants { get; set; }
 
+        public int MaxVirtualParticipants { get; set; }
+
         [Range(0, short.MaxValue)]
         public int MaxChoices { get; set; }
 
