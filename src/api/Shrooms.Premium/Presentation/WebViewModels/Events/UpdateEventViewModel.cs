@@ -9,7 +9,6 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
         [Required]
         public Guid Id { get; set; }
 
-        [Required]
         public bool ResetParticipantList { get; set; }
 
         public IEnumerable<EventOptionViewModel> EditedOptions { get; set; }

@@ -467,6 +467,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             newEvent.ImageName = newEventDto.ImageName;
             newEvent.MaxChoices = newEventDto.MaxOptions;
             newEvent.MaxParticipants = newEventDto.MaxParticipants;
+            newEvent.MaxVirtualParticipants = newEventDto.MaxVirtualParticipants;
             newEvent.Place = newEventDto.Location;
             newEvent.ResponsibleUserId = newEventDto.ResponsibleUserId;
             newEvent.StartDate = newEventDto.StartDate;

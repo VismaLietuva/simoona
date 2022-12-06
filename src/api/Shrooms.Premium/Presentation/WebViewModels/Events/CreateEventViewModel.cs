@@ -35,7 +35,6 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
         [Required]
         public List<int> Offices { get; set; }
 
-        [Required]
         public bool IsPinned { get; set; }
 
         [Required]
@@ -45,14 +44,15 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
         [StringLength(EventsConstants.EventDescriptionMaxLength)]
         public string Description { get; set; }
 
-        [Required]
         [Range(EventsConstants.EventMinimumParticipants, EventsConstants.EventMaxParticipants)]
         public int MaxParticipants { get; set; }
+
+        [Range(EventsConstants.EventMinimumParticipants, EventsConstants.EventMaxParticipants)]
+        public int MaxVirtualParticipants { get; set; }
 
         [Range(EventsConstants.EventMinimumOptions, short.MaxValue)]
         public int MaxOptions { get; set; }
 
-        [Required]
         public int TypeId { get; set; }
 
         [Required]
