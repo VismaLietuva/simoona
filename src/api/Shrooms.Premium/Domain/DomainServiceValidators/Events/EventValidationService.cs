@@ -5,6 +5,7 @@ using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.Infrastructure;
+using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
@@ -61,9 +62,9 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             }
         }
 
-        public void CheckIfUserAlreadyJoinedSameEvent(bool isParticipating)
+        public void CheckIfUserAlreadyJoinedSameEvent(EventJoinDto joinDto, EventParticipantAttendDto participant)
         {
-            if (isParticipating)
+            if (participant != null && joinDto.AttendStatus == participant.AttendStatus)
             {
                 throw new EventException(PremiumErrorCodes.EventUserAlreadyParticipatesCode);
             }
@@ -186,6 +187,24 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             }
         }
 
+        public void CheckIfJoinAttendStatusIsValid(int attendStatus, EventJoinValidationDto @event)
+        {
+            if (attendStatus != (int)AttendingStatus.AttendingVirtually && attendStatus != (int)AttendingStatus.Attending)
+            {
+                throw new EventException(PremiumErrorCodes.EventAttendTypeIsNotAllowed);
+            }
+
+            if (attendStatus == (int)AttendingStatus.AttendingVirtually && @event.MaxVirtualParticipants == 0)
+            {
+                throw new EventException(PremiumErrorCodes.EventAttendTypeIsNotAllowed);
+            }
+
+            if (attendStatus == (int)AttendingStatus.Attending && @event.MaxParticipants == 0)
+            {
+                throw new EventException(PremiumErrorCodes.EventAttendTypeIsNotAllowed);
+            }
+        }
+
         public void CheckIfAttendOptionsAllowedToUpdate(EditEventDto eventDto, Event eventToUpdate)
         {
             if ((eventDto.AllowMaybeGoing != eventToUpdate.AllowMaybeGoing || eventDto.AllowNotGoing != eventToUpdate.AllowNotGoing) && eventToUpdate.EventParticipants.Count > 0)
@@ -272,9 +291,9 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             }
         }
 
-        public void CheckIfUserParticipatesInEvent(string userId, IEnumerable<string> participantIds)
+        public void CheckIfUserParticipatesInEvent(string userId, IEnumerable<EventParticipantAttendDto> participants)
         {
-            if (participantIds.All(p => p != userId))
+            if (participants.All(p => p.Id != userId))
             {
                 throw new EventException(PremiumErrorCodes.EventUserNotParticipating);
             }
@@ -286,6 +305,28 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             if (diff is null || diff > TimeSpan.FromDays(EventsConstants.EventsMaxDateFilterRangeInDays))
             {
                 throw new EventException(PremiumErrorCodes.EventDateFilterRangeInvalid);
+            }
+        }
+        
+        public void CheckIfCanJoinEvent(EventJoinDto joinDto, EventJoinValidationDto joinValidationDto)
+        {
+            var newParticipantCount = joinDto.ParticipantIds.Count();
+            var maxParticipantCount = joinDto.AttendStatus == (int)AttendingStatus.Attending ?
+                joinValidationDto.MaxParticipants :
+                joinValidationDto.MaxVirtualParticipants;
+            var participantCount = joinValidationDto.Participants.Count(participant => participant.AttendStatus == joinDto.AttendStatus);
+
+            if (maxParticipantCount < newParticipantCount + participantCount)
+            {
+                throw new EventException(PremiumErrorCodes.EventIsFullCode);
+            }
+        }
+
+        public void CheckIfAllRequestParticipantsHaveAccounts(List<ApplicationUser> users, ICollection<string> participantIds)
+        {
+            if (users.Count != participantIds.Count)
+            {
+                throw new EventException(PremiumErrorCodes.EventParticipantNotFound);
             }
         }
     }

@@ -125,7 +125,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
             try
             {
-                var @event = _eventsDbSet
+                var eventDto = _eventsDbSet
                     .Include(x => x.EventParticipants)
                     .Include(x => x.EventOptions)
                     .Include(x => x.EventType)
@@ -133,52 +133,41 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                     .Select(MapEventToJoinValidationDto)
                     .FirstOrDefault();
 
-                _eventValidationService.CheckIfEventExists(@event);
+                _eventValidationService.CheckIfEventExists(eventDto);
 
                 if (addedByColleague)
                 {
                     var hasPermission = await _permissionService.UserHasPermissionAsync(joinDto, AdministrationPermissions.Event);
-                    if (@event != null)
+                    if (eventDto != null)
                     {
-                        _eventValidationService.CheckIfUserHasPermission(joinDto.UserId, @event.ResponsibleUserId, hasPermission);
+                        _eventValidationService.CheckIfUserHasPermission(joinDto.UserId, eventDto.ResponsibleUserId, hasPermission);
                     }
                 }
 
                 // ReSharper disable once PossibleNullReferenceException
-                @event.SelectedOptions = @event.Options
+                eventDto.SelectedOptions = eventDto.Options
                     .Where(option => joinDto.ChosenOptions.Contains(option.Id))
                     .ToList();
 
-                _eventValidationService.CheckIfRegistrationDeadlineIsExpired(@event.RegistrationDeadline);
-                _eventValidationService.CheckIfProvidedOptionsAreValid(joinDto.ChosenOptions, @event.SelectedOptions);
-                _eventValidationService.CheckIfJoiningNotEnoughChoicesProvided(@event.MaxChoices, joinDto.ChosenOptions.Count());
-                _eventValidationService.CheckIfJoiningTooManyChoicesProvided(@event.MaxChoices, joinDto.ChosenOptions.Count());
-                _eventValidationService.CheckIfSingleChoiceSelectedWithRule(@event.SelectedOptions, OptionRules.IgnoreSingleJoin);
-                _eventValidationService.CheckIfEventHasEnoughPlaces(@event.MaxParticipants, @event.Participants.Count + joinDto.ParticipantIds.Count);
-                _eventValidationService.CheckIfAttendOptionIsAllowed(joinDto.AttendStatus, @event);
+                ValidateEventBeforeJoin(joinDto, eventDto);
 
                 foreach (var userId in joinDto.ParticipantIds)
                 {
-                    var userExists = await _usersDbSet.AnyAsync(x => x.Id == userId && x.OrganizationId == joinDto.OrganizationId);
+                    await ValidateParticipantIsValidUser(joinDto, userId);
+                    ValidateEventFirstTryJoin(joinDto, eventDto, userId);
+                    await ValidateSingleJoinForSameTypeEventsAsync(eventDto, joinDto.OrganizationId, userId);
 
-                    _eventValidationService.CheckIfUserExists(userExists);
-
-                    var alreadyParticipates = @event.Participants.Any(p => p == userId);
-                    _eventValidationService.CheckIfUserAlreadyJoinedSameEvent(alreadyParticipates);
-
-                    await ValidateSingleJoinAsync(@event, joinDto.OrganizationId, userId);
-                    await AddParticipantAsync(userId, @event.Id, @event.SelectedOptions);
-
-                    await JoinOrLeaveEventWallAsync(@event.ResponsibleUserId, userId, @event.WallId, joinDto);
+                    await AddParticipantAsync(userId, eventDto.Id, eventDto.SelectedOptions, joinDto.AttendStatus);
+                    await JoinOrLeaveEventWallAsync(eventDto.ResponsibleUserId, userId, eventDto.WallId, joinDto);
                 }
 
                 await _uow.SaveChangesAsync(false);
 
-                _asyncRunner.Run<IEventCalendarService>(async notifier => await notifier.SendInvitationAsync(@event, joinDto.ParticipantIds, joinDto.OrganizationId), _uow.ConnectionName);
+                _asyncRunner.Run<IEventCalendarService>(async notifier => await notifier.SendInvitationAsync(eventDto, joinDto.ParticipantIds, joinDto.OrganizationId), _uow.ConnectionName);
 
-                if (@event.SendEmailToManager)
+                if (eventDto.SendEmailToManager)
                 {
-                    await NotifyManagersAsync(joinDto, @event);
+                    await NotifyManagersAfterJoinAsync(joinDto, eventDto);
                 }
             }
             finally
@@ -186,6 +175,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 _semaphoreSlim.Release();
             }
         }
+
 
         public async Task UpdateAttendStatusAsync(UpdateAttendStatusDto updateAttendStatusDto)
         {
@@ -327,12 +317,10 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             if (!participant.Event.EventType.SendEmailToManager)
             {
                 await RemoveParticipantAsync(participant, @event, userOrg);
-
                 return;
             }
 
             var userEventAttendStatusDto = MapToUserEventAttendStatusChangeEmailDto(participant, @event);
-
             await RemoveParticipantAsync(participant, @event, userOrg);
 
             await NotifyManagerAsync(userEventAttendStatusDto);
@@ -388,7 +376,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             _eventValidationService.CheckIfSingleChoiceSelectedWithRule(eventEntity.SelectedOptions, OptionRules.IgnoreSingleJoin);
             _eventValidationService.CheckIfUserParticipatesInEvent(changeOptionsDto.UserId, eventEntity.Participants);
 
-            await ValidateSingleJoinAsync(eventEntity, changeOptionsDto.OrganizationId, changeOptionsDto.UserId);
+            await ValidateSingleJoinForSameTypeEventsAsync(eventEntity, changeOptionsDto.OrganizationId, changeOptionsDto.UserId);
 
             var participant = await _eventParticipantsDbSet
                 .Include(x => x.EventOptions)
@@ -398,6 +386,17 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             participant.EventOptions = eventEntity.SelectedOptions;
 
             await _uow.SaveChangesAsync(changeOptionsDto.UserId);
+        }
+
+        private void ValidateEventBeforeJoin(EventJoinDto joinDto, EventJoinValidationDto eventDto)
+        {
+            _eventValidationService.CheckIfRegistrationDeadlineIsExpired(eventDto.RegistrationDeadline);
+            _eventValidationService.CheckIfProvidedOptionsAreValid(joinDto.ChosenOptions, eventDto.SelectedOptions);
+            _eventValidationService.CheckIfJoiningNotEnoughChoicesProvided(eventDto.MaxChoices, joinDto.ChosenOptions.Count());
+            _eventValidationService.CheckIfJoiningTooManyChoicesProvided(eventDto.MaxChoices, joinDto.ChosenOptions.Count());
+            _eventValidationService.CheckIfSingleChoiceSelectedWithRule(eventDto.SelectedOptions, OptionRules.IgnoreSingleJoin);
+            _eventValidationService.CheckIfJoinAttendStatusIsValid(joinDto.AttendStatus, eventDto);
+            _eventValidationService.CheckIfCanJoinEvent(joinDto, eventDto);
         }
 
         private void NotifyManagers(IEnumerable<UserEventAttendStatusChangeEmailDto> userEventAttendStatusChangeEmailDtos)
@@ -414,12 +413,25 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             }
         }
 
-        private async Task NotifyManagersAsync(EventJoinDto joinDto, EventJoinValidationDto eventJoinValidationDto)
+        private void ValidateEventFirstTryJoin(EventJoinDto joinDto, EventJoinValidationDto eventDto, string userId)
+        {
+            var participant = eventDto.Participants.SingleOrDefault(p => p.Id == userId);
+            _eventValidationService.CheckIfUserAlreadyJoinedSameEvent(joinDto, participant);
+        }
+
+        private async Task ValidateParticipantIsValidUser(EventJoinDto joinDto, string userId)
+        {
+            var userExists = await _usersDbSet.AnyAsync(x => x.Id == userId && x.OrganizationId == joinDto.OrganizationId);
+            _eventValidationService.CheckIfUserExists(userExists);
+        }
+
+        private async Task NotifyManagersAfterJoinAsync(EventJoinDto joinDto, EventJoinValidationDto eventJoinValidationDto)
         {
             var users = await _usersDbSet
-                .Where(user => joinDto.ParticipantIds
-                .Contains(user.Id) && joinDto.OrganizationId == user.OrganizationId)
+                .Where(user => joinDto.ParticipantIds.Contains(user.Id) && joinDto.OrganizationId == user.OrganizationId)
                 .ToListAsync();
+
+            _eventValidationService.CheckIfAllRequestParticipantsHaveAccounts(users, joinDto.ParticipantIds);
 
             var managerIds = users.Select(user => user.ManagerId).ToHashSet();
 
@@ -432,24 +444,43 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 return;
             }
 
-            foreach (var user in users)
-            {
-                if (user.ManagerId == null)
+            var attendees = users.Join(eventJoinValidationDto.Participants,
+                user => user.Id,
+                participant => participant.Id,
+                (user, participant) => new
                 {
-                    return;
-                }
+                    User = user,
+                    AttendStatus = participant.AttendStatus
+                });
 
-                if (!managers.TryGetValue(user.ManagerId, out var managerEmail))
+            foreach (var attendee in attendees)
+            {
+                if (IsUserSwitchingJoinStatus(joinDto, attendee.AttendStatus) ||
+                    !TryGetManagerEmail(attendee.User, managers, out var managerEmail))
                 {
                     continue;
                 }
 
-                var userAttendStatusDto = MapToUserEventAttendStatusChangeEmailDto(user, eventJoinValidationDto, managerEmail);
+                var userAttendStatusDto = MapToUserEventAttendStatusChangeEmailDto(attendee.User, eventJoinValidationDto, managerEmail);
 
                 _asyncRunner.Run<IEventNotificationService>(
                     async notifier => await notifier.NotifyManagerAboutEventAsync(userAttendStatusDto, true),
                     _uow.ConnectionName);
             }
+        }
+
+        private static bool IsUserSwitchingJoinStatus(EventJoinDto joinDto, int attendStatus) =>
+            joinDto.AttendStatus != attendStatus;
+
+        private bool TryGetManagerEmail(ApplicationUser user, Dictionary<string, string> managers, out string managerEmail)
+        {
+            if (user.ManagerId == null)
+            {
+                managerEmail = null;
+                return false;
+            }
+
+            return managers.TryGetValue(user.ManagerId, out managerEmail);
         }
 
         private async Task NotifyManagerAsync(UserEventAttendStatusChangeEmailDto userAttendStatusDto)
@@ -473,10 +504,12 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
         private async Task JoinOrLeaveEventWallAsync(string responsibleUserId, string wallParticipantId, int wallId, UserAndOrganizationDto userOrg)
         {
-            if (responsibleUserId != wallParticipantId)
+            if (responsibleUserId == wallParticipantId)
             {
-                await _wallService.JoinOrLeaveWallAsync(wallId, wallParticipantId, wallParticipantId, userOrg.OrganizationId, true);
+                return;
             }
+
+            await _wallService.JoinOrLeaveWallAsync(wallId, wallParticipantId, wallParticipantId, userOrg.OrganizationId, true);
         }
 
         private async Task RemoveParticipantAsync(EventParticipant participant, Event @event, UserAndOrganizationDto userOrg)
@@ -587,10 +620,16 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             e => new EventJoinValidationDto
             {
                 Participants = e.EventParticipants
-                    .Where(x => x.AttendStatus == (int)AttendingStatus.Attending)
-                    .Select(x => x.ApplicationUserId)
+                    .Where(x => x.AttendStatus == (int)AttendingStatus.Attending ||
+                                x.AttendStatus == (int)AttendingStatus.AttendingVirtually)
+                    .Select(x => new EventParticipantAttendDto
+                    {
+                        Id = x.ApplicationUserId,
+                        AttendStatus = x.AttendStatus
+                    })
                     .ToList(),
                 MaxParticipants = e.MaxParticipants,
+                MaxVirtualParticipants = e.MaxVirtualParticipants,
                 StartDate = e.StartDate,
                 MaxChoices = e.MaxChoices,
                 Id = e.Id,
@@ -610,7 +649,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 SendEmailToManager = e.EventType.SendEmailToManager
             };
 
-        private async Task ValidateSingleJoinAsync(EventJoinValidationDto validationDto, int orgId, string userId)
+        private async Task ValidateSingleJoinForSameTypeEventsAsync(EventJoinValidationDto validationDto, int orgId, string userId)
         {
             if (validationDto.SelectedOptions.All(x => x.Rule == OptionRules.IgnoreSingleJoin) &&
                 validationDto.SelectedOptions.Count != 0 ||
@@ -642,7 +681,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             _eventValidationService.CheckIfUserExistsInOtherSingleJoinEvent(anyEventsAlreadyJoined);
         }
 
-        private async Task AddParticipantAsync(string userId, Guid eventId, ICollection<EventOption> eventOptions)
+        private async Task AddParticipantAsync(string userId, Guid eventId, ICollection<EventOption> eventOptions, int attendStatus)
         {
             var timeStamp = _systemClock.UtcNow;
             var participant = await _eventParticipantsDbSet
@@ -661,7 +700,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                     ModifiedBy = userId,
                     EventOptions = eventOptions,
                     AttendComment = string.Empty,
-                    AttendStatus = (int)AttendingStatus.Attending
+                    AttendStatus = attendStatus
                 };
                 _eventParticipantsDbSet.Add(newParticipant);
             }
@@ -670,7 +709,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 participant.Modified = timeStamp;
                 participant.ModifiedBy = userId;
                 participant.EventOptions = eventOptions;
-                participant.AttendStatus = (int)AttendingStatus.Attending;
+                participant.AttendStatus = attendStatus;
                 participant.AttendComment = string.Empty;
             }
         }

@@ -27,7 +27,8 @@
         NotAttending = 0,
         Attending,
         MaybeAttending,
-        Idle
+        Idle,
+        AttendingVirtually
     }
 
     public enum MyEventsOptions
