@@ -43,8 +43,6 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
 
         public string ResponsibleUserId { get; set; }
 
-        public bool ResetParticipantList { get; set; }
-
         public IEnumerable<NewEventOptionDto> NewOptions { get; set; }
     }
 }

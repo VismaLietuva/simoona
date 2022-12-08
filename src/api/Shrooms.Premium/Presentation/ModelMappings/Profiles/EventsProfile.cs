@@ -58,7 +58,6 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
         private void CreateViewModelToDtoMappings()
         {
             CreateMap<CreateEventViewModel, CreateEventDto>()
-                .Ignore(d => d.ResetParticipantList)
                 .Ignore(d => d.Id)
                 .Ignore(d => d.Offices)
                 .IgnoreUserOrgDto();

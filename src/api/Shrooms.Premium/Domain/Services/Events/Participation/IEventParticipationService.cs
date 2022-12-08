@@ -18,6 +18,10 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
         Task LeaveAsync(Guid eventId, UserAndOrganizationDto userOrg, string leaveComment);
 
+        Task ResetAllAttendeesAsync(Guid eventId, UserAndOrganizationDto userOrg);
+
+        Task ResetVirtualAttendeesAsync(Guid eventId, UserAndOrganizationDto userOrg);
+
         Task ResetAttendeesAsync(Guid eventId, UserAndOrganizationDto userOrg);
 
         Task<IEnumerable<string>> GetParticipantsEmailsIncludingHostAsync(Guid eventId);

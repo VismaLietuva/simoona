@@ -67,52 +67,14 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             _asyncRunner = asyncRunner;
         }
 
-        public async Task ResetAttendeesAsync(Guid eventId, UserAndOrganizationDto userOrg)
-        {
-            var @event = await _eventsDbSet
-                .Include(e => e.EventParticipants)
-                .Include(e => e.EventOptions)
-                .Include(e => e.EventType)
-                .Include(e => e.EventParticipants.Select(participant => participant.ApplicationUser))
-                .Include(e => e.EventParticipants.Select(participant => participant.ApplicationUser.Manager))
-                .SingleOrDefaultAsync(e => e.Id == eventId && e.OrganizationId == userOrg.OrganizationId);
+        public async Task ResetVirtualAttendeesAsync(Guid eventId, UserAndOrganizationDto userOrg) =>
+            await ResetAttendeesAsync(eventId, userOrg, AttendingStatus.AttendingVirtually);
 
-            _eventValidationService.CheckIfEventExists(@event);
-            var hasPermission = await _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Event);
+        public async Task ResetAttendeesAsync(Guid eventId, UserAndOrganizationDto userOrg) =>
+            await ResetAttendeesAsync(eventId, userOrg, AttendingStatus.Attending);
 
-            // ReSharper disable once PossibleNullReferenceException
-            _eventValidationService.CheckIfUserHasPermission(userOrg.UserId, @event.ResponsibleUserId, hasPermission);
-            _eventValidationService.CheckIfEventEndDateIsExpired(@event.EndDate);
-
-            var users = @event.EventParticipants.Select(p => p.ApplicationUserId).ToList();
-            var timestamp = DateTime.UtcNow;
-
-            foreach (var participant in @event.EventParticipants)
-            {
-                participant.UpdateMetadata(userOrg.UserId, timestamp);
-            }
-
-            await _uow.SaveChangesAsync(false);
-
-            if (!@event.EventType.SendEmailToManager)
-            {
-                await RemoveParticipantsAsync(@event, userOrg);
-
-                _asyncRunner.Run<IEventNotificationService>(async notifier => await notifier.NotifyRemovedEventParticipantsAsync(@event.Name, @event.Id, userOrg.OrganizationId, users),
-                    _uow.ConnectionName);
-
-                return;
-            }
-
-            var userEventAttendStatusDto = MapEventToUserEventAttendStatusChangeEmailDto(@event).ToList();
-
-            await RemoveParticipantsAsync(@event, userOrg);
-
-            _asyncRunner.Run<IEventNotificationService>(async notifier => await notifier.NotifyRemovedEventParticipantsAsync(@event.Name, @event.Id, userOrg.OrganizationId, users),
-                _uow.ConnectionName);
-
-            NotifyManagers(userEventAttendStatusDto);
-        }
+        public async Task ResetAllAttendeesAsync(Guid eventId, UserAndOrganizationDto userOrg) =>
+            await ResetAttendeesAsync(eventId, userOrg);
 
         public async Task AddColleagueAsync(EventJoinDto joinDto)
         {
@@ -424,6 +386,51 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             var userExists = await _usersDbSet.AnyAsync(x => x.Id == userId && x.OrganizationId == joinDto.OrganizationId);
             _eventValidationService.CheckIfUserExists(userExists);
         }
+
+        private async Task ResetAttendeesAsync(Guid eventId, UserAndOrganizationDto userOrg, AttendingStatus? status = null)
+        {
+            var @event = await _eventsDbSet
+              .Include(e => e.EventParticipants)
+              .Include(e => e.EventOptions)
+              .Include(e => e.EventType)
+              .Include(e => e.EventParticipants.Where(FilterParticipantByAttendStatus(status)).Select(participant => participant.ApplicationUser))
+              .Include(e => e.EventParticipants.Where(FilterParticipantByAttendStatus(status)).Select(participant => participant.ApplicationUser.Manager))
+              .SingleOrDefaultAsync(e => e.Id == eventId && e.OrganizationId == userOrg.OrganizationId);
+
+            _eventValidationService.CheckIfEventExists(@event);
+            var hasPermission = await _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Event);
+
+            // ReSharper disable once PossibleNullReferenceException
+            _eventValidationService.CheckIfUserHasPermission(userOrg.UserId, @event.ResponsibleUserId, hasPermission);
+            _eventValidationService.CheckIfEventEndDateIsExpired(@event.EndDate);
+
+            var users = @event.EventParticipants.Select(p => p.ApplicationUserId).ToList();
+            var timestamp = DateTime.UtcNow;
+
+            foreach (var participant in @event.EventParticipants)
+            {
+                participant.UpdateMetadata(userOrg.UserId, timestamp);
+            }
+
+            await _uow.SaveChangesAsync(false);
+
+            if (!@event.EventType.SendEmailToManager)
+            {
+                await RemoveParticipantsAsync(@event, userOrg);
+                _asyncRunner.Run<IEventNotificationService>(async notifier => await notifier.NotifyRemovedEventParticipantsAsync(@event.Name, @event.Id, userOrg.OrganizationId, users),
+                    _uow.ConnectionName);
+                return;
+            }
+
+            var userEventAttendStatusDto = MapEventToUserEventAttendStatusChangeEmailDto(@event).ToList();
+            await RemoveParticipantsAsync(@event, userOrg);
+            _asyncRunner.Run<IEventNotificationService>(async notifier => await notifier.NotifyRemovedEventParticipantsAsync(@event.Name, @event.Id, userOrg.OrganizationId, users),
+                _uow.ConnectionName);
+            NotifyManagers(userEventAttendStatusDto);
+        }
+
+        private static Func<EventParticipant, bool> FilterParticipantByAttendStatus(AttendingStatus? status) =>
+            participant => status == null || participant.AttendStatus == (int)status.Value;
 
         private async Task NotifyManagersAfterJoinAsync(EventJoinDto joinDto, EventJoinValidationDto eventJoinValidationDto)
         {

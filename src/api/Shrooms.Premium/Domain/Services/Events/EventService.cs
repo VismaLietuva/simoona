@@ -157,7 +157,6 @@ namespace Shrooms.Premium.Domain.Services.Events
 
             var hasPermissionToPin = await _permissionService.UserHasPermissionAsync(newEventDto, AdministrationPermissions.Event);
             _eventValidationService.CheckIfUserHasPermissionToPin(newEventDto.IsPinned, currentPinStatus: false, hasPermissionToPin);
-
             _eventValidationService.CheckIfEventStartDateIsExpired(newEventDto.StartDate);
             _eventValidationService.CheckIfRegistrationDeadlineIsExpired(newEventDto.RegistrationDeadlineDate.Value);
             await ValidateEvent(newEventDto);
@@ -190,13 +189,8 @@ namespace Shrooms.Premium.Domain.Services.Events
             eventDto.RegistrationDeadlineDate = SetRegistrationDeadline(eventDto);
 
             var hasPermission = await _permissionService.UserHasPermissionAsync(eventDto, AdministrationPermissions.Event);
+            
             _eventValidationService.CheckIfEventExists(eventToUpdate);
-
-            if (eventToUpdate == null)
-            {
-                return;
-            }
-
             _eventValidationService.CheckIfUserHasPermission(eventDto.UserId, eventToUpdate.ResponsibleUserId, hasPermission);
             _eventValidationService.CheckIfUserHasPermissionToPin(eventDto.IsPinned, eventToUpdate.IsPinned, hasPermission);
             _eventValidationService.CheckIfCreatingEventHasInsufficientOptions(eventDto.MaxOptions, totalOptionsProvided);
@@ -204,20 +198,27 @@ namespace Shrooms.Premium.Domain.Services.Events
             _eventValidationService.CheckIfAttendOptionsAllowedToUpdate(eventDto, eventToUpdate);
 
             await ValidateEvent(eventDto);
+            await ResetEventAttendessAsync(eventDto);
+            await UpdateWallAsync(eventToUpdate, eventDto);
+            UpdateEventInfo(eventDto, eventToUpdate);
+            UpdateEventOptions(eventDto, eventToUpdate);
+            
+            await _uow.SaveChangesAsync(false);
 
+            eventToUpdate.Description = _markdownConverter.ConvertToHtml(eventToUpdate.Description);
+        }
+
+        private async Task ResetEventAttendessAsync(EditEventDto eventDto)
+        {
             if (eventDto.ResetParticipantList)
             {
                 await _eventParticipationService.ResetAttendeesAsync(eventDto.Id, eventDto);
             }
 
-            await UpdateWallAsync(eventToUpdate, eventDto);
-
-            UpdateEventInfo(eventDto, eventToUpdate);
-            UpdateEventOptions(eventDto, eventToUpdate);
-
-            await _uow.SaveChangesAsync(false);
-
-            eventToUpdate.Description = _markdownConverter.ConvertToHtml(eventToUpdate.Description);
+            if (eventDto.ResetVirtualParticipantList)
+            {
+                await _eventParticipationService.ResetVirtualAttendeesAsync(eventDto.Id, eventDto);
+            }
         }
 
         public async Task ToggleEventPinAsync(Guid id)
