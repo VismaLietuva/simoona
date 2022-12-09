@@ -54,8 +54,10 @@
         };
 
         vm.resetParticipantList = false;
+        vm.resetVirtualParticipantList = false;
         vm.isRegistrationDeadlineEnabled = false;
         vm.isSaveButtonEnabled = true;
+        vm.allowJoiningVirtually = true;
         vm.eventSettings = eventSettings;
         vm.eventImageSize = {
             w: eventSettings.thumbWidth,
@@ -77,6 +79,7 @@
 
         vm.toggleOfficeSelection = toggleOfficeSelection;
         vm.toggleAllOffices = toggleAllOffices;
+        vm.manageVirtualParticipantCount = manageVirtualParticipantCount;
         vm.searchUsers = searchUsers;
         vm.addOption = addOption;
         vm.deleteOption = deleteOption;
@@ -141,6 +144,7 @@
             if ($stateParams.id) {
                 eventRepository.getEventUpdate($stateParams.id).then(function (event) {
                         vm.event = event;
+                        vm.allowJoiningVirtually = event.maxVirtualParticipants > 0;
                         setEventTypes();
                         vm.responsibleUser = {
                             id: vm.event.hostUserId,
@@ -195,7 +199,8 @@
                     imageName: '',
                     maxOptions: 1,
                     options: [],
-                    registrationDeadlineDate: null
+                    registrationDeadlineDate: null,
+                    maxVirtualParticipants: 0
                 };
 
                 eventRepository.getMaxEventParticipants().query(function (response) {
@@ -383,9 +388,7 @@
         }
 
         function setEvent() {
-            if (vm.states.isEdit && vm.resetParticipantList) {
-                vm.event.resetParticipantList = vm.event.maxParticipants < vm.minParticipants;
-            }
+            manageParticipantResets();
 
             if (!vm.isRegistrationDeadlineEnabled) {
                 vm.event.registrationDeadlineDate = vm.event.startDate;
@@ -446,6 +449,16 @@
             vm.event.endDate = moment(vm.event.endDate).local().startOf('minute').toDate();
         }
 
+        function manageParticipantResets() {
+            if (vm.states.isEdit && vm.resetParticipantList) {
+                vm.event.resetParticipantList = vm.event.maxParticipants < vm.minParticipants;
+            }
+
+            if (vm.states.isEdit && vm.resetVirtualParticipantList) {
+                vm.event.resetVirtualParticipantList = vm.event.maxVirtualParticipants < vm.minParticipants;
+            }
+        }
+
         function showRegistrationDeadline() {
             if (vm.isRegistrationDeadlineEnabled) {
                 vm.event.registrationDeadlineDate = vm.event.startDate;
@@ -461,6 +474,22 @@
             $timeout(function () {
                 $event.target.focus();
             }, 100);
+        }
+
+        function manageVirtualParticipantCount() {
+            if (vm.event.allowJoiningVirtually) {
+                return;
+            }
+
+            if (hasVirtualParticipantCountSet()) {
+                vm.event.resetVirtualParticipantList = true;
+            }
+
+            vm.event.maxVirtualParticipants = 0;
+        }
+
+        function hasVirtualParticipantCountSet() {
+            return vm.states.isEdit && vm.maxVirtualParticipants != 0;
         }
 
         function closeAllDatePickers(datePicker) {

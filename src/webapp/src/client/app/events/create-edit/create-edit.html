@@ -13,7 +13,7 @@
             </div>
             <div class="panel-body">
                 <form name="eventForm" class="form-horizontal" autocomplete="off">
-                    <!--event name-->
+                    <!-- event name -->
                     <div class="form-group required"
                         ng-class="{'has-error': eventForm.name.$invalid && eventForm.name.$dirty}">
                         <label for="eventName" class="control-label col-xs-12 col-sm-4"
@@ -21,7 +21,7 @@
                         <div class="col-xs-12 col-sm-6 col-md-4">
                             <input id="eventName" type="text" class="form-control" name="name" ng-model="vm.event.name"
                                 ng-maxlength="vm.eventSettings.nameLength" data-test-id="event-form-name-input"
-                                required />
+                                required>
                             <p class="text-danger help-block"
                                 ng-if="eventForm.name.$error.required && eventForm.name.$dirty"
                                 translate="common.messageFieldIsRequired"></p>
@@ -31,7 +31,7 @@
                                 translate-values="{ one: vm.eventSettings.nameLength }"></p>
                         </div>
                     </div>
-                    <!--event type-->
+                    <!-- event type -->
                     <div class="form-group required"
                         ng-class="{'has-error': eventForm.typeId.$invalid && eventForm.typeId.$dirty}">
                         <label for="typeId" class="control-label col-xs-12 col-sm-4"
@@ -47,7 +47,7 @@
                                 translate="common.messageFieldIsRequired"></p>
                         </div>
                     </div>
-                    <!--event start date-->
+                    <!-- event start date -->
                     <div class="form-group required"
                         ng-class="{'has-error': eventForm.startDateInput.$invalid && eventForm.startDateInput.$dirty || !vm.isStartDateValid()}">
                         <label for="startDateInput" class="control-label col-xs-12 col-sm-4"
@@ -58,7 +58,7 @@
                                     uib-datepicker-popup="yyyy-MM-dd" popup-placement="bottom"
                                     ng-model="vm.event.startDate" is-open="vm.datePickers.isOpenEventStartDatePicker"
                                     ng-required="true" datepicker-options="{ startingDay: 1 }"
-                                    ng-click="vm.openDatePicker($event, 'isOpenEventStartDatePicker')" />
+                                    ng-click="vm.openDatePicker($event, 'isOpenEventStartDatePicker')">
                             </div>
                             <p class="text-danger help-block"
                                 ng-if="!vm.event.startDate || eventForm.startDateInput.$invalid && eventForm.startDateInput.$dirty"
@@ -67,7 +67,7 @@
                                 translate="events.fieldEventDatePast"></p>
                         </div>
                     </div>
-                    <!--event start time-->
+                    <!-- event start time -->
                     <div class="form-group required"
                         ng-class="{'has-error': eventForm.startDateInput.$invalid && eventForm.startDateInput.$dirty || !vm.isStartDateValid()}">
                         <label class="control-label col-xs-4 col-sm-4 event-timepicker-label"
@@ -81,18 +81,18 @@
                                 translate="events.fieldEventTimePast"></p>
                         </div>
                     </div>
-                    <!--event isRegistrationDeadline -->
+                    <!-- event isRegistrationDeadline -->
                     <div class="form-group">
                         <label class="control-label col-xs-12 col-sm-4"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
                             <input id="isRegistrationDeadline" type="checkbox" class="event-form-checkbox"
                                 ng-model="vm.isRegistrationDeadlineEnabled" ng-click="vm.showRegistrationDeadline()"
-                                data-test-id="event-form-is-registration-deadline-input" />
+                                data-test-id="event-form-is-registration-deadline-input">
                             <label for="isRegistrationDeadline" class="control-label"
                                 translate="events.eventRegistrationDeadline"></label>
                         </div>
                     </div>
-                    <!--event registration deadline date-->
+                    <!-- event registration deadline date -->
                     <div ng-if="vm.isRegistrationDeadlineEnabled">
                         <div class="form-group required"
                             ng-class="{'has-error': (eventForm.registrationDeadlineDateInput.$invalid && eventForm.registrationDeadlineDateInput.$dirty) || vm.isDeadlineDateValid()}">
@@ -106,7 +106,7 @@
                                         datepicker-options="{ startingDay: 1 }"
                                         ng-model="vm.event.registrationDeadlineDate"
                                         is-open="vm.datePickers.isOpenEventDeadlineDatePicker" ng-required="true"
-                                        ng-click="vm.openDatePicker($event, 'isOpenEventDeadlineDatePicker')" />
+                                        ng-click="vm.openDatePicker($event, 'isOpenEventDeadlineDatePicker')">
                                 </div>
                                 <p class="text-danger help-block"
                                     ng-if="eventForm.registrationDeadlineDateInput.$invalid && eventForm.registrationDeadlineDateInput.$dirty || !vm.event.registrationDeadlineDate"
@@ -119,7 +119,7 @@
                                     translate="errorCodeMessages.messageEventDeadlineAfterStartDate"></p>
                             </div>
                         </div>
-                        <!--event registration deadline time-->
+                        <!-- event registration deadline time -->
                         <div class="form-group required"
                             ng-class="{'has-error': (eventForm.registrationDeadlineDateInput.$invalid && eventForm.registrationDeadlineDateInput.$dirty) || vm.isDeadlineDateValid()}">
                             <label class="control-label col-xs-4 col-sm-4 event-timepicker-label"
@@ -138,7 +138,7 @@
                             </div>
                         </div>
                     </div>
-                    <!--event endDate date-->
+                    <!-- event endDate date -->
                     <div class="form-group required"
                         ng-class="{'has-error': eventForm.endDateInput.$invalid && eventForm.endDateInput.$dirty || !vm.isEndDateValid()}">
                         <label for="endDateInput" class="control-label col-xs-12 col-sm-4"
@@ -149,7 +149,7 @@
                                     uib-datepicker-popup="yyyy-MM-dd" popup-placement="bottom"
                                     ng-model="vm.event.endDate" is-open="vm.datePickers.isOpenEventFinishDatePicker"
                                     ng-required="true" datepicker-options="{ startingDay: 1 }"
-                                    ng-click="vm.openDatePicker($event, 'isOpenEventFinishDatePicker')" />
+                                    ng-click="vm.openDatePicker($event, 'isOpenEventFinishDatePicker')">
                             </div>
                             <p class="text-danger help-block"
                                 ng-if="eventForm.endDateInput.$invalid && eventForm.endDateInput.$dirty"
@@ -158,7 +158,7 @@
                                 translate="events.fieldEventEndBeforeStartDate"></p>
                         </div>
                     </div>
-                    <!--event endDate time-->
+                    <!-- event endDate time -->
                     <div class="form-group required"
                         ng-class="{'has-error': eventForm.endDateInput.$invalid && eventForm.endDateInput.$dirty || !vm.isEndDateValid()}">
                         <label class="control-label col-xs-4 col-sm-4 event-timepicker-label"
@@ -173,7 +173,7 @@
                                 translate="events.fieldEventEndBeforeStartDate"></p>
                         </div>
                     </div>
-                    <!--event recurring-->
+                    <!-- event recurring -->
                     <div class="form-group required"
                         ng-class="{'has-error': eventForm.recurring.$invalid && eventForm.recurrence.$dirty}">
                         <label for="recurrence" class="control-label col-xs-12 col-sm-4"
@@ -185,29 +185,42 @@
                                 data-test-id="event-form-recurring-input" translate-cloak></select>
                         </div>
                     </div>
-                    <!--event join types-->
+                    <!-- event join types -->
                     <div class="form-group">
                         <label class="control-label col-xs-12 col-sm-4" translate="events.eventAttendOptions"></label>
-                        <div class="row">
-                            <div class="col-xs-6 col-sm-3 col-md-2">
-                                <input id="allowMaybeGoing" type="checkbox" class="event-form-checkbox" ng-model="vm.event.allowMaybeGoing" data-test-id="event-form-allow-maybe-going-input" />
-                                <label for="allowMaybeGoing" class="control-label" translate="events.eventAttendOptions_MaybeGoing"></label>
+                        <div>
+                            <div class="col-sm-2">
+                                <input id="allowJoiningVirtually" type="checkbox" class="event-form-checkbox"
+                                    ng-model="vm.allowJoiningVirtually" ng-change="vm.manageVirtualParticipantCount()">
+                                <label for="allowJoiningVirtually" class="control-label"
+                                    translate="events.eventAttendOptions_JoiningVirtually"></label>
                             </div>
 
-                            <div class="col-xs-6 col-sm-3 col-md-2">
-                                <input id="allowNotGoing" type="checkbox" class="event-form-checkbox" ng-model="vm.event.allowNotGoing" data-test-id="event-form-allow-not-going-input" />
-                                <label for="allowNotGoing" class="control-label" translate="events.eventAttendOptions_NotGoing"></label>
+                            <div class="col-sm-2">
+                                <input id="allowMaybeGoing" type="checkbox" class="event-form-checkbox"
+                                    ng-model="vm.event.allowMaybeGoing"
+                                    data-test-id="event-form-allow-maybe-going-input">
+                                <label for="allowMaybeGoing" class="control-label"
+                                    translate="events.eventAttendOptions_MaybeGoing"></label>
+                            </div>
+
+                            <div class="col-sm-2">
+                                <input id="allowNotGoing" type="checkbox" class="event-form-checkbox"
+                                    ng-model="vm.event.allowNotGoing" data-test-id="event-form-allow-not-going-input">
+                                <label for="allowNotGoing" class="control-label"
+                                    translate="events.eventAttendOptions_NotGoing"></label>
                             </div>
                         </div>
                     </div>
-                    <!--event office-->
+                    <!-- event office -->
                     <div class="form-group required"
                         ng-class="{'has-error': vm.isOfficeSelected != null && !vm.isOfficeSelected}">
-                        <label for="offices" class="control-label col-xs-12 col-sm-4" translate="events.eventOffices"></label>
+                        <label for="offices" class="control-label col-xs-12 col-sm-4"
+                            translate="events.eventOffices"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
                             <div class="checkbox">
-                                <label><input type="checkbox"
-                                        id="allOfficesChk"
+                                <label>
+                                    <input type="checkbox" id="allOfficesChk"
                                         ng-checked="vm.event.offices.length == vm.eventOffices.length"
                                         ng-click="vm.toggleAllOffices()">
                                     <span translate="events.eventOfficeAll"></span>
@@ -219,10 +232,11 @@
                             </div>
                             <div class="event-office-list-item-seperator">&nbsp;</div>
                             <div class="checkbox event-office-list-item" ng-repeat="office in vm.eventOffices">
-                                <label><input type="checkbox"
-                                        id="officeChk_{{office.id}}"
+                                <label>
+                                    <input type="checkbox" id="officeChk_{{office.id}}"
                                         ng-checked="vm.event.offices.indexOf(office.id) != -1"
-                                        ng-click="vm.toggleOfficeSelection(office)">{{office.name}}
+                                        ng-click="vm.toggleOfficeSelection(office)">
+                                    {{office.name}}
                                 </label>
                             </div>
 
@@ -231,7 +245,7 @@
                                 translate="common.messageFieldIsRequired"></p>
                         </div>
                     </div>
-                    <!--event location-->
+                    <!-- event location -->
                     <div class="form-group required"
                         ng-class="{'has-error': eventForm.location.$invalid && eventForm.location.$dirty}">
                         <label for="location" class="control-label col-xs-12 col-sm-4"
@@ -239,7 +253,7 @@
                         <div class="col-xs-12 col-sm-6 col-md-4">
                             <input id="location" type="text" class="form-control" name="location"
                                 ng-model="vm.event.location" ng-maxlength="vm.eventSettings.locationLength"
-                                data-test-id="event-form-location-input" required />
+                                data-test-id="event-form-location-input" required>
                             <p class="text-danger help-block"
                                 ng-if="eventForm.location.$error.required && eventForm.location.$dirty"
                                 translate="common.messageFieldIsRequired"></p>
@@ -249,7 +263,7 @@
                                 translate-values="{ one: vm.eventSettings.locationLength }"></p>
                         </div>
                     </div>
-                    <!--event max participants-->
+                    <!-- event max participants -->
                     <div class="form-group required"
                         ng-class="{'has-error': eventForm.maxParticipants.$invalid && eventForm.maxParticipants.$dirty}">
                         <label for="maxParticipants" class="control-label col-xs-12 col-sm-4"
@@ -258,12 +272,12 @@
                             <input id="maxParticipants" type="number" class="form-control" name="maxParticipants"
                                 ng-model="vm.event.maxParticipants" ng-pattern="/^(0|\-?[1-9][0-9]*)$/" min="0"
                                 steps="1" max="{{:: vm.eventSettings.participantsLength}}"
-                                data-test-id="event-form-max-participants-input" ignore-mouse-wheel required />
+                                data-test-id="event-form-max-participants-input" ignore-mouse-wheel required>
                             <div ng-if="vm.states.isEdit" ng-show="vm.event.maxParticipants < vm.minParticipants">
                                 <label for="resetParticipantList" translate="events.resetParticipantList"></label>
                                 <input id="resetParticipantList" type="checkbox" class="event-form-checkbox"
                                     ng-model="vm.resetParticipantList"
-                                    data-test-id="event-reset-participant-list-checkbox" />
+                                    data-test-id="event-reset-participant-list-checkbox">
                             </div>
                             <p class="text-danger help-block"
                                 ng-if="eventForm.maxParticipants.$error.required && eventForm.maxParticipants.$dirty"
@@ -273,16 +287,60 @@
                                 translate="events.wrongNumber"></p>
                             <p class="text-danger help-block"
                                 ng-if="eventForm.maxParticipants.$error.min && eventForm.maxParticipants.$dirty">
-                                <span translate="events.tooLittle"></span>0
+                                <span translate="events.tooLittle"></span>
+                                0
                             </p>
                             <p class="text-danger help-block"
                                 ng-if="eventForm.maxParticipants.$error.max && eventForm.maxParticipants.$dirty"
                                 ng-cloak>
-                                <span translate="events.tooMuch"></span> {{:: vm.eventSettings.participantsLength}}
+                                <span translate="events.tooMuch"></span>
+                                {{:: vm.eventSettings.participantsLength}}
                             </p>
                         </div>
                     </div>
-                    <!--event host-->
+
+                    <!-- event max virtual participants -->
+                    <div class="form-group required" ng-if="vm.allowJoiningVirtually"
+                        ng-class="{'has-error': eventForm.maxVirtualParticipants.$invalid && eventForm.maxVirtualParticipants.$dirty}">
+                        <!-- Label -->
+                        <label for="maxVirtualParticipants" class="control-label col-xs-12 col-sm-4"
+                            translate="events.eventMaxVirtualParticipants"></label>
+                        <!-- Container -->
+                        <div class="col-xs-12 col-sm-6 col-md-4">
+                            <!-- Max virtual participants input -->
+                            <input id="maxVirtualParticipants" type="number" class="form-control" name="maxVirtualParticipants"
+                                ng-model="vm.event.maxVirtualParticipants" ng-pattern="/^(0|\-?[1-9][0-9]*)$/" min="0"
+                                steps="1" max="{{:: vm.eventSettings.participantsLength}}"
+                                data-test-id="event-form-max-participants-input" ignore-mouse-wheel required>
+                            <!-- Reset participants checkbox thingy -->
+                            <div ng-if="vm.states.isEdit" ng-show="vm.event.maxVirtualParticipants < vm.minParticipants">
+                                <label for="resetVirtualParticipantList" translate="events.resetParticipantList"></label>
+                                <input id="resetVirtualParticipantList" type="checkbox" class="event-form-checkbox"
+                                    ng-model="vm.resetVirtualParticipantList"
+                                    data-test-id="event-reset-participant-list-checkbox">
+                            </div>
+                            <!-- Error messages -->
+                            <p class="text-danger help-block"
+                                ng-if="eventForm.maxVirtualParticipants.$error.required && eventForm.maxVirtualParticipants.$dirty"
+                                translate="common.messageFieldIsRequired"></p>
+                            <p class="text-danger help-block"
+                                ng-if="eventForm.maxVirtualParticipants.$error.pattern || eventForm.maxVirtualParticipants.$error.number"
+                                translate="events.wrongNumber"></p>
+                            <p class="text-danger help-block"
+                                ng-if="eventForm.maxVirtualParticipants.$error.min && eventForm.maxVirtualParticipants.$dirty">
+                                <span translate="events.tooLittle"></span>
+                                0
+                            </p>
+                            <p class="text-danger help-block"
+                                ng-if="eventForm.maxVirtualParticipants.$error.max && eventForm.maxVirtualParticipants.$dirty"
+                                ng-cloak>
+                                <span translate="events.tooMuch"></span>
+                                {{:: vm.eventSettings.participantsLength}}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- event host -->
                     <div class="form-group required" ng-class="{'has-error': vm.isResponsibleUserError}">
                         <label for="responsibleUser" class="control-label col-xs-12 col-sm-4"
                             translate="events.eventHost"></label>
@@ -295,7 +353,7 @@
                                 translate="common.messageFieldIsRequired"></p>
                         </div>
                     </div>
-                    <!--event description-->
+                    <!-- event description -->
                     <div class="form-group"
                         ng-class="{'has-error': eventForm.description.$error.maxlength && eventForm.description.$dirty}">
                         <label for="description" class="control-label col-xs-12 col-sm-4"
@@ -310,7 +368,7 @@
                                 translate-values="{ one: vm.eventSettings.descriptionLength }"></p>
                         </div>
                     </div>
-                    <!--event photo-->
+                    <!-- event photo -->
                     <div class="form-group required"
                         ng-class="{'has-error': eventForm.image-file-input.$invalid && eventForm.image-file-input.$dirty}">
                         <label for="image-file-input" class="control-label col-xs-12 col-sm-4"
@@ -320,7 +378,7 @@
                                 aspect-ratio="1.7" result-image="vm.eventCroppedImage" image-size="vm.eventImageSize">
                             </ace-photo-crop-upload>
                             <img ng-if="vm.states.isEdit && !vm.eventCroppedImage && !!vm.eventImage"
-                                src="{{vm.event.imageName | imageThumb:vm.eventImageSize:'crop'}}" />
+                                src="{{vm.event.imageName | imageThumb:vm.eventImageSize:'crop'}}">
                         </div>
                     </div>
                     <!-- event ignore single join checkbox -->
@@ -328,7 +386,7 @@
                         <label class="control-label col-xs-12 col-sm-4"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
                             <input id="ignoreOption" type="checkbox" class="event-form-checkbox"
-                                ng-model="vm.isIgnoreSingleJoinEnabled" ng-change="vm.isOptions = true" />
+                                ng-model="vm.isIgnoreSingleJoinEnabled" ng-change="vm.isOptions = true">
                             <label for="ignoreOption" class="label-word-break">
                                 {{'events.ignoreSingleJoinSelect' | translate}}
                                 <span class="glyphicon glyphicon-info-sign"
@@ -341,27 +399,28 @@
                     <!-- event ignore single join input -->
                     <div ng-if="vm.isIgnoreSingleJoinEnabled && vm.selectedType.isSingleJoin">
                         <div class="form-group">
-                            <label class="control-label col-xs-12 col-sm-4" translate="events.ignoreSingleJoinOtionLabel"></label>
+                            <label class="control-label col-xs-12 col-sm-4"
+                                translate="events.ignoreSingleJoinOtionLabel"></label>
                             <div class="col-xs-12 col-sm-6 col-md-4">
                                 <input type="text" class="form-control" translate
                                     translate-attr-placeholder="events.ignoreSingleJoinPlaceHolder"
-                                    ng-model="vm.ignoreSingleJoinOption.option" />
+                                    ng-model="vm.ignoreSingleJoinOption.option">
                             </div>
                         </div>
                     </div>
-                    <!--event isOptions -->
+                    <!-- event isOptions -->
                     <div class="form-group">
                         <label class="control-label col-xs-12 col-sm-4"></label>
                         <div class="col-xs-12 col-sm-6 col-md-4">
                             <input id="moreOptions" type="checkbox" class="event-form-checkbox" ng-model="vm.isOptions"
                                 ng-change="vm.isIgnoreSingleJoinEnabled = false"
-                                data-test-id="event-form-is-options-input" />
+                                data-test-id="event-form-is-options-input">
                             <label for="moreOptions" class="control-label"
                                 translate="events.eventOptionsSelect"></label>
                         </div>
                     </div>
                     <div ng-if="vm.isOptions">
-                        <!--event maxOptions -->
+                        <!-- event maxOptions -->
                         <div class="form-group required" ng-class="{'has-error': eventForm.maxOptions.$invalid}">
                             <label for="maxOptions" class="control-label col-xs-12 col-sm-4"
                                 translate="events.eventMaxAmountOfOptions"></label>
@@ -369,9 +428,10 @@
                                 <input id="maxOptions" type="number" name="maxOptions" class="form-control"
                                     ng-model="vm.event.maxOptions" ng-pattern="/^(0|\-?[1-9][0-9]*)$/" min="1" step="1"
                                     ng-max="vm.event.options.length" data-test-id="event-form-max-options-input"
-                                    ignore-mouse-wheel required />
+                                    ignore-mouse-wheel required>
                                 <p class="text-danger help-block" ng-if="eventForm.maxOptions.$error.min">
-                                    <span translate="events.tooLittle"></span> 1
+                                    <span translate="events.tooLittle"></span>
+                                    1
                                 </p>
                                 <p class="text-danger help-block" ng-if="eventForm.maxOptions.$error.max"
                                     translate="events.messageMaxOptionsIsBiggerThanOptions"></p>
@@ -383,7 +443,7 @@
                                     translate="common.messageFieldIsRequired"></p>
                             </div>
                         </div>
-                        <!--event options-->
+                        <!-- event options -->
                         <div ng-form name="optionsForm" class="form-group"
                             ng-repeat="option in vm.event.options track by $index"
                             ng-class="{'has-error': !vm.isValidOption(vm.event.options, option) || (optionsForm.option.$error.required && optionsForm.option.$dirty), 'required': $index === 0}">
@@ -392,14 +452,15 @@
                             <label class="control-label col-xs-12 col-sm-4" ng-if="!!$index"></label>
                             <div class="participant-option-input">
                                 <input id="option{{$index}}" name="option" type="text" class="form-control"
-                                    ng-model="option.option" data-test-id="event-form-option{{$index}}" required />
+                                    ng-model="option.option" data-test-id="event-form-option{{$index}}" required>
                                 <p class="text-danger help-block"
                                     ng-if="optionsForm.option.$error.required && optionsForm.option.$dirty"
                                     translate="common.messageFieldIsRequired"></p>
                                 <p class="text-danger help-block" ng-if="!vm.isValidOption(vm.event.options, option)"
                                     translate="events.nonUniqueOptions"></p>
                                 <p class="text-danger help-block" ng-if="vm.countOptions() < 2 && $index === 0">
-                                    <span style="color: red;" translate="events.twoOptionsRequired"></span></p>
+                                    <span style="color: red;" translate="events.twoOptionsRequired"></span>
+                                </p>
                             </div>
                             <a class="nc-btn nc-btn-default" ng-click="vm.deleteOption($index)"
                                 translate-attr-title="events.eventDeleteOption" data-test-id="event-form-delete-option"
@@ -407,15 +468,15 @@
                                 <span class="vismaicon vismaicon-delete vismaicon-form-group"></span>
                             </a>
                         </div>
-                        <!--event add option -->
+                        <!-- event add option -->
                         <div class="form-group">
                             <label class="control-label col-xs-12 col-sm-4"></label>
                             <div class="col-xs-12 col-sm-6 col-md-4">
                                 <a class="nc-btn nc-btn-default" ng-click="vm.addOption()"
                                     translate-attr-title="events.addOption" data-test-id="event-form-add-option"
                                     translate>
-                                    <span class="vismaicon vismaicon-add2-circle"></span><span
-                                        translate="events.addOption"></span>
+                                    <span class="vismaicon vismaicon-add2-circle"></span>
+                                    <span translate="events.addOption"></span>
                                 </a>
                             </div>
                         </div>
@@ -427,14 +488,14 @@
                             <span translate="common.delete"></span>
                         </button>
                     </div>
-                    <!--event buttons right -->
+                    <!-- event buttons right -->
                     <div class="pull-right">
                         <button class="btn btn-primary" ng-if="vm.states.isAdd"
-                            ng-click="vm.saveEvent(vm.createEvent, vm.eventImage)" ng-disabled="eventForm.$invalid ||  !vm.eventImage || !vm.responsibleUser.id ||
+                            ng-click="vm.saveEvent(vm.createEvent, vm.eventImage)"
+                            ng-disabled="eventForm.$invalid ||  !vm.eventImage || !vm.responsibleUser.id ||
                                          !vm.isEndDateValid() || vm.isDeadlineDateValid() || !vm.isStartDateValid() ||
                                          !vm.isOfficeSelected ||
-                                         !vm.isOptionsUnique() || !vm.eventCroppedImage || (vm.countOptions() < 2 && vm.isOptions)"
-                            data-test-id="event-form-save-button">
+                                         !vm.isOptionsUnique() || !vm.eventCroppedImage || (vm.countOptions() < 2 && vm.isOptions)" data-test-id="event-form-save-button">
                             <span translate="common.save"></span>
                         </button>
                         <button class="btn btn-primary" ng-if="vm.states.isEdit"
@@ -443,11 +504,12 @@
                             data-test-id="event-form-update-button">
                             <span translate="common.update"></span>
                         </button>
-                        <button ng-if="!vm.event.id" class="btn btn-default" ui-sref="Root.WithOrg.Client.Events.List.Type"
-                            data-test-id="event-form-cancel-button">
+                        <button ng-if="!vm.event.id" class="btn btn-default"
+                            ui-sref="Root.WithOrg.Client.Events.List.Type" data-test-id="event-form-cancel-button">
                             <span translate="common.cancel"></span>
                         </button>
-                        <button ng-if="vm.event.id" class="btn btn-default" ui-sref="Root.WithOrg.Client.Events.EventContent({id: vm.event.id})"
+                        <button ng-if="vm.event.id" class="btn btn-default"
+                            ui-sref="Root.WithOrg.Client.Events.EventContent({id: vm.event.id})"
                             data-test-id="event-form-cancel-button">
                             <span translate="common.cancel"></span>
                         </button>
