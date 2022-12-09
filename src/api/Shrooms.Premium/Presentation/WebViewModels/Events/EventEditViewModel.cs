@@ -21,6 +21,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
         public EventRecurrenceOptions Recurrence { get; set; }
 
         public bool AllowMaybeGoing { get; set; }
+
         public bool AllowNotGoing { get; set; }
 
         public IEnumerable<int> OfficeIds { get; set; }
@@ -34,6 +35,8 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
         public string Description { get; set; }
 
         public int MaxParticipants { get; set; }
+
+        public int MaxVirtualParticipants { get; set; }
 
         public int MaxOptions { get; set; }
 

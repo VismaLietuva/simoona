@@ -393,9 +393,14 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
               .Include(e => e.EventParticipants)
               .Include(e => e.EventOptions)
               .Include(e => e.EventType)
-              .Include(e => e.EventParticipants.Where(FilterParticipantByAttendStatus(status)).Select(participant => participant.ApplicationUser))
-              .Include(e => e.EventParticipants.Where(FilterParticipantByAttendStatus(status)).Select(participant => participant.ApplicationUser.Manager))
+              .Include(e => e.EventParticipants.Select(participant => participant.ApplicationUser))
+              .Include(e => e.EventParticipants.Select(participant => participant.ApplicationUser.Manager))
               .SingleOrDefaultAsync(e => e.Id == eventId && e.OrganizationId == userOrg.OrganizationId);
+
+            if (!@event.EventParticipants.Any())
+            {
+                return;
+            }
 
             _eventValidationService.CheckIfEventExists(@event);
             var hasPermission = await _permissionService.UserHasPermissionAsync(userOrg, AdministrationPermissions.Event);
@@ -404,9 +409,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             _eventValidationService.CheckIfUserHasPermission(userOrg.UserId, @event.ResponsibleUserId, hasPermission);
             _eventValidationService.CheckIfEventEndDateIsExpired(@event.EndDate);
 
-            var users = @event.EventParticipants.Select(p => p.ApplicationUserId).ToList();
             var timestamp = DateTime.UtcNow;
-
             foreach (var participant in @event.EventParticipants)
             {
                 participant.UpdateMetadata(userOrg.UserId, timestamp);
@@ -416,16 +419,12 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
             if (!@event.EventType.SendEmailToManager)
             {
-                await RemoveParticipantsAsync(@event, userOrg);
-                _asyncRunner.Run<IEventNotificationService>(async notifier => await notifier.NotifyRemovedEventParticipantsAsync(@event.Name, @event.Id, userOrg.OrganizationId, users),
-                    _uow.ConnectionName);
+                await RemoveParticipantsAsync(@event, userOrg, status);
                 return;
             }
 
             var userEventAttendStatusDto = MapEventToUserEventAttendStatusChangeEmailDto(@event).ToList();
-            await RemoveParticipantsAsync(@event, userOrg);
-            _asyncRunner.Run<IEventNotificationService>(async notifier => await notifier.NotifyRemovedEventParticipantsAsync(@event.Name, @event.Id, userOrg.OrganizationId, users),
-                _uow.ConnectionName);
+            await RemoveParticipantsAsync(@event, userOrg, status);
             NotifyManagers(userEventAttendStatusDto);
         }
 
@@ -534,14 +533,20 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             await _uow.SaveChangesAsync(false);
         }
 
-        private async Task RemoveParticipantsAsync(Event @event, UserAndOrganizationDto userOrg)
+        private async Task RemoveParticipantsAsync(Event @event, UserAndOrganizationDto userOrg, AttendingStatus? status)
         {
-            foreach (var participant in @event.EventParticipants.ToList())
+            var filteredParticipants = @event.EventParticipants.Where(FilterParticipantByAttendStatus(status));
+            var filteredParticipantIds = filteredParticipants.Select(participant => participant.ApplicationUserId);
+
+            foreach (var participant in filteredParticipants)
             {
                 await JoinOrLeaveEventWallAsync(@event.ResponsibleUserId, participant.ApplicationUserId, @event.WallId, userOrg);
-
                 _eventParticipantsDbSet.Remove(participant);
             }
+
+            _asyncRunner.Run<IEventNotificationService>(async notifier => 
+                await notifier.NotifyRemovedEventParticipantsAsync(@event.Name, @event.Id, userOrg.OrganizationId, filteredParticipantIds),
+                _uow.ConnectionName);
 
             await _uow.SaveChangesAsync(false);
         }

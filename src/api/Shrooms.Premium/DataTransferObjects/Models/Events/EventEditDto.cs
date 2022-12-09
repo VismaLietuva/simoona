@@ -21,6 +21,7 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
         public EventRecurrenceOptions Recurrence { get; set; }
 
         public bool AllowMaybeGoing { get; set; }
+
         public bool AllowNotGoing { get; set; }
 
         public EventOfficesDto Offices { get; set; }
@@ -34,6 +35,8 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
         public int TypeId { get; set; }
 
         public int MaxParticipants { get; set; }
+
+        public int MaxVirtualParticipants { get; set; }
 
         public int MaxOptions { get; set; }
 

@@ -296,6 +296,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                 Name = e.Name,
                 MaxOptions = e.MaxChoices,
                 MaxParticipants = e.MaxParticipants,
+                MaxVirtualParticipants = e.MaxVirtualParticipants,
                 Recurrence = e.EventRecurring,
                 AllowMaybeGoing = e.AllowMaybeGoing,
                 AllowNotGoing = e.AllowNotGoing,
