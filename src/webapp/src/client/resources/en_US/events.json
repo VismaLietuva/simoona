@@ -70,7 +70,7 @@
   "eventAction_Attending": "Going",
   "eventAction_MaybeAttending": "Maybe going",
   "eventAction_NotAttending": "Not going",
-  "eventAction_JoiningVirtually": "Joining virtually",
+  "eventAction_AttendingVirtually": "Joining virtually",
   "eventParticipantStatus_Attending": "Going",
   "eventParticipantStatus_MaybeAttending": "Maybe going",
   "eventParticipantStatus_NotAttending": "Not going",

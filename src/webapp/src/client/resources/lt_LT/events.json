@@ -70,7 +70,7 @@
   "eventAction_Attending": "Dalyvausiu",
   "eventAction_MaybeAttending": "Gal dalyvausiu",
   "eventAction_NotAttending": "Nedalyvausiu",
-  "eventAction_JoiningVirtually": "Dalyvausiu virtualiai",
+  "eventAction_AttendingVirtually": "Dalyvausiu virtualiai",
   "eventParticipantStatus_Attending": "Dalyvaus",
   "eventParticipantStatus_MaybeAttending": "Gal dalyvaus",
   "eventParticipantStatus_NotAttending": "Nedalyvaus",

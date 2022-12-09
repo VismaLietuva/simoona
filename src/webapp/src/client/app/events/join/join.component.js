@@ -17,7 +17,8 @@
             NotAttending: 0,
             Attending: 1,
             MaybeAttending: 2,
-            Idle: 3
+            Idle: 3,
+            AttendingVirtually: 4
         });
 
     eventJoinController.$inject = [
@@ -45,32 +46,36 @@
         vm.closeModal = closeModal;
 
         ////////
-        function joinEvent(eventId) {
-            if (vm.enableAction) {
-                if (canJoinEvent()) {
-                    vm.enableAction = false;
-                    Analytics.trackEvent('Events join', 'isAddColleague: ' + vm.isAddColleague, 'isDetails: ' + vm.isDetails);
-
-                    eventRepository.getEventOptions(eventId).then(function (responseEvent) {
-                        vm.event.maxChoices = responseEvent.maxOptions;
-                        vm.event.availableOptions = responseEvent.options;
-                        if (!vm.event.availableOptions.length && !vm.isAddColleague) {
-                            var selectedOptions = [];
-
-                            var comment = "";
-                            eventRepository.joinEvent(eventId, selectedOptions, attendStatus.Attending, comment).then(function () {
-                                handleEventJoin();
-                                notifySrv.success('events.joinedEvent');
-                            }, function (error) {
-                                vm.enableAction = true;
-                                errorHandler.handleErrorMessage(error);
-                            });
-                        } else {
-                            openOptionsModal();
-                        }
-                    });
-                }
+        function joinEvent(eventId, attendingStatus) {
+            if (!vm.enableAction) {
+                return;
             }
+
+            if (!canJoinEvent()) {
+                return;
+            }
+
+            vm.enableAction = false;
+            Analytics.trackEvent('Events join', 'isAddColleague: ' + vm.isAddColleague, 'isDetails: ' + vm.isDetails);
+
+            eventRepository.getEventOptions(eventId).then(function (responseEvent) {
+                vm.event.maxChoices = responseEvent.maxOptions;
+                vm.event.availableOptions = responseEvent.options;
+                if (!vm.event.availableOptions.length && !vm.isAddColleague) {
+                    var selectedOptions = [];
+
+                    var comment = "";
+                    eventRepository.joinEvent(eventId, selectedOptions, attendingStatus, comment).then(function () {
+                        handleEventJoin();
+                        notifySrv.success('events.joinedEvent');
+                    }, function (error) {
+                        vm.enableAction = true;
+                        errorHandler.handleErrorMessage(error);
+                    });
+                } else {
+                    openOptionsModal();
+                }
+            });
         }
 
         function leaveEvent(eventId) {
