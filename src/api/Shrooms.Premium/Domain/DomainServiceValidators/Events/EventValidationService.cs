@@ -62,9 +62,9 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             }
         }
 
-        public void CheckIfUserAlreadyJoinedSameEvent(EventJoinDto joinDto, EventParticipantAttendDto participant)
+        public void CheckIfUserAlreadyJoinedSameEvent(EventParticipantAttendDto participant)
         {
-            if (participant != null && joinDto.AttendStatus == participant.AttendStatus)
+            if (participant != null)
             {
                 throw new EventException(PremiumErrorCodes.EventUserAlreadyParticipatesCode);
             }
