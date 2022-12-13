@@ -53,14 +53,14 @@
         <!-- Event join dropdown states -->
         <ul class="dropdown-menu dropdown-menu-right dropdown-menu-wide participate-dropdown-menu">
             <!-- Attend -->
-            <li><a ng-if="vm.event.participatingStatus != vm.attendStatus.Attending" class="nc-btn nc-btn-default"
+            <li><a ng-if="vm.event.participatingStatus != vm.attendStatus.Attending && !vm.isParticipantsCapacityReached()" class="nc-btn nc-btn-default"
                     ng-click="vm.joinEvent(vm.event.id, vm.attendStatus.Attending)"
                     translate-attr-title="events.eventJoin" data-test-id="join-event-attending-button" translate>
                     <span class="vismaicon vismaicon-add2-circle"></span><span
                         translate="events.eventAction_Attending"></span></a>
             </li>
             <!-- Attend virtually -->
-            <li><a ng-if="vm.event.participatingStatus != vm.attendStatus.AttendingVirtually"
+            <li><a ng-if="vm.event.participatingStatus != vm.attendStatus.AttendingVirtually && !vm.isVirtualParticipantsCapacityReached()"
                     class="nc-btn nc-btn-default"
                     ng-click="vm.joinEvent(vm.event.id, vm.attendStatus.AttendingVirtually)"
                     translate-attr-title="events.eventJoin" data-tes t-id="join-event-attending-button" translate>
