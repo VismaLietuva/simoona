@@ -15,6 +15,7 @@
                 translate="events.areYouGoing"></span>
             <span class="caret"></span>
         </button>
+
         <!-- Going -->
         <button ng-if="vm.event.participatingStatus == vm.attendStatus.Attending"
             class="btn btn-primary dropdown-toggle event-attend-button" type="button" data-toggle="dropdown"
@@ -25,10 +26,10 @@
 
         <!-- Attending virtually -->
         <button ng-if="vm.event.participatingStatus == vm.attendStatus.AttendingVirtually"
-            class="btn btn-info dropdown-toggle event-attend-button" type="button" data-toggle="dropdown"
+            class="btn btn-primary dropdown-toggle event-attend-button" type="button" data-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false">
-            <span class="glyphicon glyphicon-ok">&nbsp;</span><span translate="events.eventAction_Attending"></span>
-            <span class="caret" style="background-position: 0 0;"></span>
+            <span class="glyphicon glyphicon-ok pr-6"></span><span translate="events.eventAction_AttendingVirtually"></span>
+            <span class="caret"></span>
         </button>
 
         <!-- Maybe -->
@@ -122,7 +123,7 @@
         <div ng-if="!vm.isVirtualParticipantsCapacityReached() && !vm.isParticipantsCapacityReached()">
             <a class="dropdown-toggle" type="button" data-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="false">
-                <span class="vismaicon vismaicon-other-circle"></span>
+                <span class="vismaicon vismaicon-other-circle -mt-3"></span>
             </a>
 
             <ul class="dropdown-menu dropdown-menu-right dropdown-menu-wide participate-list-dropdown-menu">
