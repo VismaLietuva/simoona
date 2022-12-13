@@ -4,11 +4,11 @@
     angular
         .module('simoonaApp.Events')
         .constant('eventStatus', {
-            InProgress : 1,
-            Finished : 2,
-            RegistrationIsClosed : 3,
-            Full : 4,
-            Join : 5
+            InProgress: 1,
+            Finished: 2,
+            RegistrationIsClosed: 3,
+            Full: 4,
+            Join: 5
         })
         .service('eventStatusService', eventStatusService);
 
@@ -30,30 +30,25 @@
         }
 
         function getEventStatus(event, isParticipantsList) {
-            if (event) {
-                var participantsCount;
-                if (!!event.participantsCount) {
-                    participantsCount = event.participantsCount;
-                }
-                else {
-                    participantsCount = 0;
-                }
-
-                if (!hasDatePassed(event.startDate) && hasDatePassed(event.endDate)) {
-                    return eventStatus.InProgress;
-                } else if (!hasDatePassed(event.startDate) && !hasDatePassed(event.endDate)) {
-                    return eventStatus.Finished;
-                } else if (!!event.registrationDeadlineDate && !hasDatePassed(event.registrationDeadlineDate)) {
-                    return eventStatus.RegistrationIsClosed;
-                } else if (event.maxParticipants <= participantsCount && (event.participatingStatus == attendStatus.NotAttending || event.participatingStatus == attendStatus.Idle || !!isParticipantsList)) {
-                    return eventStatus.Full;
-                } else {
-                    return eventStatus.Join;
-                }
+            if (!event) {
+                return 0;
             }
 
-            return 0;
+            if (!hasDatePassed(event.startDate) && hasDatePassed(event.endDate)) {
+                return eventStatus.InProgress;
+            } else if (!hasDatePassed(event.startDate) && !hasDatePassed(event.endDate)) {
+                return eventStatus.Finished;
+            } else if (!!event.registrationDeadlineDate && !hasDatePassed(event.registrationDeadlineDate)) {
+                return eventStatus.RegistrationIsClosed;
+            } else if (isEventFull(event) && (event.participatingStatus == attendStatus.NotAttending || event.participatingStatus == attendStatus.Idle || !!isParticipantsList)) {
+                return eventStatus.Full;
+            } else {
+                return eventStatus.Join;
+            }
+        }
+
+        function isEventFull(event) {
+            return event.maxParticipants <= event.participantsCount && event.maxVirtualParticipants <= event.virtualParticipantsCount;
         }
     }
-
 })();

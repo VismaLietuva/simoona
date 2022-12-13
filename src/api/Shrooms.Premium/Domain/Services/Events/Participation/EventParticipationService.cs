@@ -644,7 +644,8 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                     SqlFunctions.DatePart(WeekOfYear, e.StartDate) == SqlFunctions.DatePart(WeekOfYear, validationDto.StartDate) &&
                     e.StartDate.Year == validationDto.StartDate.Year &&
                     e.EventParticipants.Any(p => p.ApplicationUserId == userId &&
-                                                 (p.AttendStatus == (int)AttendingStatus.Attending || p.AttendStatus == (int)AttendingStatus.AttendingVirtually)));
+                                                 (p.AttendStatus == (int)AttendingStatus.Attending ||
+                                                  p.AttendStatus == (int)AttendingStatus.AttendingVirtually)));
 
             query = string.IsNullOrEmpty(validationDto.SingleJoinGroupName)
                 ? query.Where(x => x.EventType.Id == validationDto.EventTypeId)

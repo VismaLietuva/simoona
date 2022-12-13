@@ -24,6 +24,7 @@
     eventJoinController.$inject = [
         '$uibModal',
         'eventRepository',
+        'eventService',
         'notifySrv',
         'errorHandler',
         'authService',
@@ -31,8 +32,15 @@
         'attendStatus'
     ];
 
-    function eventJoinController($uibModal, eventRepository, notifySrv, errorHandler,
-        authService, Analytics, attendStatus) {
+    function eventJoinController(
+        $uibModal,
+        eventRepository,
+        eventService,
+        notifySrv,
+        errorHandler,
+        authService,
+        Analytics,
+        attendStatus) {
         /* jshint validthis: true */
         var vm = this;
 
@@ -44,6 +52,10 @@
         vm.hasDatePassed = hasDatePassed;
         vm.openJoinCommentModal = openJoinCommentModal;
         vm.closeModal = closeModal;
+
+        vm.isAttendingEvent = isAttendingEvent;
+        vm.isVirtualParticipantsCapacityReached = isVirtualParticipantsCapacityReached;
+        vm.isParticipantsCapacityReached = isParticipantsCapacityReached;
 
         ////////
         function joinEvent(eventId, attendingStatus) {
@@ -66,7 +78,7 @@
 
                     var comment = "";
                     eventRepository.joinEvent(eventId, selectedOptions, attendingStatus, comment).then(function () {
-                        handleEventJoin();
+                        handleEventJoin(attendingStatus);
                         notifySrv.success('events.joinedEvent');
                     }, function (error) {
                         vm.enableAction = true;
@@ -97,10 +109,43 @@
             }
         }
 
+        function isVirtualParticipantsCapacityReached() {
+            return getVirtualParticipantCount() >= vm.event.maxVirtualParticipants;
+        }
+
+        function isParticipantsCapacityReached() {
+            return getParticipantCount() >= vm.event.maxParticipants;
+        }
+
+        function getParticipantCount() {
+            return vm.event.participantsCount !== undefined ?
+                vm.event.participantsCount :
+                countAttendingParticipants();
+        }
+
+        function getVirtualParticipantCount() {
+            return vm.event.virtualParticipantsCount !== undefined ?
+                vm.event.virtualParticipantsCount :
+                countVirtuallyAttendingParticipants();
+        }
+
+        function countVirtuallyAttendingParticipants() {
+            return eventService.countParticipants(vm.event, attendStatus.AttendingVirtually);
+        }
+
+        function countAttendingParticipants() {
+            return eventService.countParticipants(vm.event, attendStatus.Attending);
+        }
+
+        function isAttendingEvent() {
+            return vm.event.participatingStatus == vm.attendStatus.Attending ||
+                   vm.event.participatingStatus == vm.attendStatus.AttendingVirtually;
+        }
+
         function updateEventStatus(eventId, changeToAttendStatus, comment) {
             if (vm.enableAction) {
                 eventRepository.updateAttendStatus(changeToAttendStatus, comment, eventId).then(function () {
-                    handleEventJoin();
+                    handleEventJoin(changeToAttendStatus);
 
                     if (changeToAttendStatus == attendStatus.MaybeAttending) {
                         notifySrv.success('events.maybeJoiningEvent');
@@ -140,41 +185,45 @@
 
         function handleEventLeave() {
             eventRepository.getEventDetails(vm.event.id).then(function (response) {
-                angular.copy(response, vm.event);
-
-                vm.event.options = response.options;
-                vm.event.participants = response.participants;
-                vm.event.participantsCount = recalculateJoinedParticipants();
+                updateLoadedEventDataFromDetails(response);
             });
             vm.enableAction = true;
             notifySrv.success('events.leaveEvent');
         }
 
-        function handleEventJoin() {
+        function handleEventJoin(attendStatus) {
             if (vm.isDetails) {
                 eventRepository.getEventDetails(vm.event.id).then(function (response) {
-                    angular.copy(response, vm.event);
-
-                    vm.event.options = response.options;
-                    vm.event.participants = response.participants;
-                    vm.event.participantsCount = recalculateJoinedParticipants();
+                    updateLoadedEventDataFromDetails(response);
+                    console.log('requst');
                 });
             } else {
-                vm.event.participatingStatus = attendStatus.Attending;
-                vm.event.participantsCount++;
+                vm.event.participatingStatus = attendStatus;
+                increaseParticipantCount(attendStatus);
             }
 
             vm.enableAction = true;
         }
 
-        function recalculateJoinedParticipants() {
-            var participantsCount = 0;
-            vm.event.participants.forEach(function (participant) {
-                if (participant.attendStatus == attendStatus.Attending) {
-                    participantsCount++;
-                }
-            });
-            return participantsCount;
+        function increaseParticipantCount(attendStatus) {
+            switch (attendStatus) {
+                case vm.attendStatus.Attending:
+                    vm.event.participantsCount++;
+                    break;
+                case vm.attendStatus.AttendingVirtually:
+                    vm.event.virtualParticipantsCount++;
+                    break;
+                default:
+                    console.error('Should not be used with ' + attendStatus);
+            }
+        }
+
+        function updateLoadedEventDataFromDetails(response) {
+            angular.copy(response, vm.event);
+            vm.event.options = response.options;
+            vm.event.participants = response.participants;
+            vm.event.participantsCount = countAttendingParticipants();
+            vm.event.virtualParticipantsCount = countVirtuallyAttendingParticipants();
         }
 
         function openOptionsModal() {

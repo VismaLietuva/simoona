@@ -500,6 +500,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                 AllowMaybeGoing = e.AllowMaybeGoing,
                 AllowNotGoing = e.AllowNotGoing,
                 MaxParticipants = e.MaxParticipants,
+                MaxVirtualParticipants = e.MaxVirtualParticipants,
                 MaxOptions = e.MaxChoices,
                 HostUserId = e.ResponsibleUserId,
                 WallId = e.WallId,

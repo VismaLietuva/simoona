@@ -22,9 +22,13 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
 
         public string Place { get; set; }
 
+        public int MaxVirtualParticipants { get; set; }
+
         public int MaxParticipants { get; set; }
 
         public int ParticipantsCount { get; set; }
+
+        public int VirtualParticipantsCount { get; set; }
 
         public bool IsCreator { get; set; }
 

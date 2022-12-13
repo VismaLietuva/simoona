@@ -6,6 +6,7 @@
     </a>
 </div>
 
+<!-- Event join states -->
 <div class="btn-group event-attend-dropdown-button" ng-if="!vm.isAddColleague && vm.isDetails">
     <div class="btn-group" role="group">
         <button ng-if="vm.event.participatingStatus == vm.attendStatus.Idle"
@@ -14,7 +15,7 @@
                 translate="events.areYouGoing"></span>
             <span class="caret"></span>
         </button>
-
+        <!-- Going -->
         <button ng-if="vm.event.participatingStatus == vm.attendStatus.Attending"
             class="btn btn-primary dropdown-toggle event-attend-button" type="button" data-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false">
@@ -22,6 +23,15 @@
             <span class="caret"></span>
         </button>
 
+        <!-- Attending virtually -->
+        <button ng-if="vm.event.participatingStatus == vm.attendStatus.AttendingVirtually"
+            class="btn btn-info dropdown-toggle event-attend-button" type="button" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            <span class="glyphicon glyphicon-ok">&nbsp;</span><span translate="events.eventAction_Attending"></span>
+            <span class="caret" style="background-position: 0 0;"></span>
+        </button>
+
+        <!-- Maybe -->
         <button ng-if="vm.event.participatingStatus == vm.attendStatus.MaybeAttending"
             class="btn btn-primary dropdown-toggle event-attend-button" type="button" data-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false">
@@ -30,6 +40,7 @@
             <span class="caret"></span>
         </button>
 
+        <!-- Not attending -->
         <button ng-if="vm.event.participatingStatus == vm.attendStatus.NotAttending"
             class="btn btn-danger dropdown-toggle event-attend-button" type="button" data-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false">
@@ -42,15 +53,16 @@
         <ul class="dropdown-menu dropdown-menu-right dropdown-menu-wide participate-dropdown-menu">
             <!-- Attend -->
             <li><a ng-if="vm.event.participatingStatus != vm.attendStatus.Attending" class="nc-btn nc-btn-default"
-                    ng-click="vm.joinEvent(vm.event.id, vm.attendStatus.Attending)" translate-attr-title="events.eventJoin"
-                    data-test-id="join-event-attending-button" translate>
+                    ng-click="vm.joinEvent(vm.event.id, vm.attendStatus.Attending)"
+                    translate-attr-title="events.eventJoin" data-test-id="join-event-attending-button" translate>
                     <span class="vismaicon vismaicon-add2-circle"></span><span
                         translate="events.eventAction_Attending"></span></a>
             </li>
             <!-- Attend virtually -->
-            <li><a ng-if="vm.event.participatingStatus != vm.attendStatus.AttendingVirtually" class="nc-btn nc-btn-default"
-                    ng-click="vm.joinEvent(vm.event.id, vm.attendStatus.AttendingVirtually)" translate-attr-title="events.eventJoin"
-                    data-test-id="join-event-attending-button" translate>
+            <li><a ng-if="vm.event.participatingStatus != vm.attendStatus.AttendingVirtually"
+                    class="nc-btn nc-btn-default"
+                    ng-click="vm.joinEvent(vm.event.id, vm.attendStatus.AttendingVirtually)"
+                    translate-attr-title="events.eventJoin" data-tes t-id="join-event-attending-button" translate>
                     <span class="vismaicon vismaicon-home"></span><span
                         translate="events.eventAction_AttendingVirtually"></span></a>
             </li>
@@ -89,15 +101,28 @@
     event="vm.event">
 </ace-event-options-change>
 
-<div class="dropdown text-nowrap" ng-if="!vm.isAddColleague && !vm.isDetails">
-    <a ng-if="vm.event.participatingStatus != vm.attendStatus.Attending || vm.event.participatingStatus == vm.attendStatus.Idle"
-        class="nc-btn nc-btn-default" ng-click="vm.joinEvent(vm.event.id)" translate-attr-title="events.eventJoin"
-        data-test-id="join-event-button" translate>
-        <span class="vismaicon vismaicon-add2-circle"></span><span translate="events.attend"></span>
-    </a>
-    <a ng-if="vm.event.participatingStatus == vm.attendStatus.Attending" class="nc-btn nc-btn-danger"
-        ng-click="vm.leaveEvent(vm.event.id, '')" translate-attr-title="events.eventLeave"
-        data-test-id="leave-event-button" translate>
+<div class="dropdown text-nowrap row" ng-if="!vm.isAddColleague && !vm.isDetails">
+    <div ng-if="!vm.isAttendingEvent()">
+        <!-- Join -->
+        <div
+            ng-class="{ 'col-xs-12' : vm.isVirtualParticipantsCapacityReached(), 'col-xs-6' : !vm.isVirtualParticipantsCapacityReached(), 'hidden' : vm.isParticipantsCapacityReached() }">
+            <a class="nc-btn nc-btn-default" ng-click="vm.joinEvent(vm.event.id, vm.attendStatus.Attending)"
+                translate-attr-title="events.eventJoin" data-test-id="join-event-button" translate>
+                <span class="vismaicon vismaicon-add2-circle"></span><span translate="events.attend"></span>
+            </a>
+        </div>
+        <!-- Virtual join -->
+        <div
+            ng-class="{ 'col-xs-12' : vm.isParticipantsCapacityReached(), 'col-xs-6' : !vm.isParticipantsCapacityReached(), 'hidden' : vm.isVirtualParticipantsCapacityReached() }">
+            <a class="nc-btn nc-btn-default" ng-click="vm.joinEvent(vm.event.id, vm.attendStatus.AttendingVirtually)"
+                translate-attr-title="events.eventJoin" data-test-id="join-event-button" translate>
+                <span class="vismaicon vismaicon-home"></span><span translate="events.attend"></span>
+            </a>
+        </div>
+    </div>
+    <!-- Event leave -->
+    <a ng-if="vm.isAttendingEvent()" class="nc-btn nc-btn-danger" ng-click="vm.leaveEvent(vm.event.id, '')"
+        translate-attr-title="events.eventLeave" data-test-id="leave-event-button" translate>
         <span class="vismaicon vismaicon-cancel-circle"></span><span translate="events.eventLeave"></span>
     </a>
 </div>

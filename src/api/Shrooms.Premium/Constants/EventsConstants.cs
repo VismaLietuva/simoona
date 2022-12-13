@@ -21,7 +21,7 @@
 
         public const int EventReportVisitedEventPreviewCount = 3;
     }
-
+    
     public enum AttendingStatus
     {
         NotAttending = 0,

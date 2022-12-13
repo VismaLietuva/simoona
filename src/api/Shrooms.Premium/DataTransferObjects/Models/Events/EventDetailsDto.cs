@@ -20,6 +20,7 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
         public string Location { get; set; }
         public string Description { get; set; }
         public int MaxParticipants { get; set; }
+        public int MaxVirtualParticipants { get; set; }
         public int MaxOptions { get; set; }
         public string HostUserFullName { get; set; }
         public string HostUserId { get; set; }

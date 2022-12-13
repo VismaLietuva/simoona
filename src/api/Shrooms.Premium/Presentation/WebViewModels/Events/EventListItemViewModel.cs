@@ -25,7 +25,11 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
 
         public int MaxParticipants { get; set; }
 
+        public int MaxVirtualParticipants { get; set; }
+
         public int ParticipantsCount { get; set; }
+
+        public int VirtualParticipantsCount { get; set; }
 
         public bool IsCreator { get; set; }
 
