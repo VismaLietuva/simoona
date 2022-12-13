@@ -101,25 +101,50 @@
     event="vm.event">
 </ace-event-options-change>
 
-<div class="dropdown text-nowrap row" ng-if="!vm.isAddColleague && !vm.isDetails">
+<div class="text-nowrap row" ng-if="!vm.isAddColleague && !vm.isDetails">
     <div ng-if="!vm.isAttendingEvent()">
         <!-- Join -->
-        <div
-            ng-class="{ 'col-xs-12' : vm.isVirtualParticipantsCapacityReached(), 'col-xs-6' : !vm.isVirtualParticipantsCapacityReached(), 'hidden' : vm.isParticipantsCapacityReached() }">
+        <div class="col-xs-12" ng-if="!vm.isParticipantsCapacityReached() && vm.isVirtualParticipantsCapacityReached()">
             <a class="nc-btn nc-btn-default" ng-click="vm.joinEvent(vm.event.id, vm.attendStatus.Attending)"
                 translate-attr-title="events.eventJoin" data-test-id="join-event-button" translate>
                 <span class="vismaicon vismaicon-add2-circle"></span><span translate="events.attend"></span>
             </a>
         </div>
         <!-- Virtual join -->
-        <div
-            ng-class="{ 'col-xs-12' : vm.isParticipantsCapacityReached(), 'col-xs-6' : !vm.isParticipantsCapacityReached(), 'hidden' : vm.isVirtualParticipantsCapacityReached() }">
+        <div class="col-xs-12" ng-if="!vm.isVirtualParticipantsCapacityReached() && vm.isParticipantsCapacityReached()">
             <a class="nc-btn nc-btn-default" ng-click="vm.joinEvent(vm.event.id, vm.attendStatus.AttendingVirtually)"
                 translate-attr-title="events.eventJoin" data-test-id="join-event-button" translate>
-                <span class="vismaicon vismaicon-home"></span><span translate="events.attend"></span>
+                <span class="vismaicon vismaicon-home"></span><span translate="events.attendVirtually"></span>
             </a>
         </div>
+
+        <!-- Join and virtual join available -->
+        <div ng-if="!vm.isVirtualParticipantsCapacityReached() && !vm.isParticipantsCapacityReached()">
+            <a class="dropdown-toggle" type="button" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">
+                <span class="vismaicon vismaicon-other-circle"></span>
+            </a>
+
+            <ul class="dropdown-menu dropdown-menu-right dropdown-menu-wide participate-list-dropdown-menu">
+                <!-- Attend -->
+                <li><a ng-if="vm.event.participatingStatus != vm.attendStatus.Attending" class="nc-btn nc-btn-default"
+                        ng-click="vm.joinEvent(vm.event.id, vm.attendStatus.Attending)"
+                        translate-attr-title="events.eventJoin" data-test-id="join-event-attending-button" translate>
+                        <span class="vismaicon vismaicon-add2-circle"></span><span
+                            translate="events.eventAction_Attending"></span></a>
+                </li>
+                <!-- Attend virtually -->
+                <li><a ng-if="vm.event.participatingStatus != vm.attendStatus.AttendingVirtually"
+                        class="nc-btn nc-btn-default"
+                        ng-click="vm.joinEvent(vm.event.id, vm.attendStatus.AttendingVirtually)"
+                        translate-attr-title="events.eventJoin" data-tes t-id="join-event-attending-button" translate>
+                        <span class="vismaicon vismaicon-home"></span><span
+                            translate="events.eventAction_AttendingVirtually"></span></a>
+                </li>
+            </ul>
+        </div>
     </div>
+
     <!-- Event leave -->
     <a ng-if="vm.isAttendingEvent()" class="nc-btn nc-btn-danger" ng-click="vm.leaveEvent(vm.event.id, '')"
         translate-attr-title="events.eventLeave" data-test-id="leave-event-button" translate>
