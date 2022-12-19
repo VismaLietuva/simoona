@@ -49,6 +49,8 @@
         vm.isDeleteVisible = isDeleteVisible;
         vm.isActiveTab = isActiveTab;
         vm.isExportVisible = isExportVisible;
+        vm.getTotalGoingParticipantCount = getTotalGoingParticipantCount;
+        vm.getTotalMaxParticipantCount = getTotalMaxParticipantCount;
 
         /////////
 
@@ -76,6 +78,14 @@
             return vm.event.goingCount > 0;
         }
 
+        function getTotalGoingParticipantCount() {
+            return vm.event.goingCount + vm.event.virtuallyGoingCount;
+        }
+
+        function getTotalMaxParticipantCount() {
+            return vm.event.maxParticipants + vm.event.maxVirtualParticipants;
+        }
+
         function expelUserFromEvent(participant) {
             Analytics.trackEvent('Events', 'expelUserFromEvent: ' + participant.userId, 'Event: ' + vm.event.id);
             if (!participant.isLoading) {
@@ -96,16 +106,23 @@
                     }
 
                     vm.event.participantsCount = vm.event.participants.length;
-
-                    if(participant.attendStatus === attendStatus.Attending)
-                    {
-                        vm.event.goingCount -= 1;
-                    }
+                    decreaseParticipantGoingCount(participant);
                 }, function(response) {
                     participant.isLoading = false;
-
                     errorHandler.handleErrorMessage(response, 'expelParticipant');
                 });
+            }
+        }
+
+        function decreaseParticipantGoingCount(participant) {
+            if(participant.attendStatus === attendStatus.Attending)
+            {
+                vm.event.goingCount--;
+            }
+
+            if(participant.attendStatus === attendStatus.AttendingVirtually)
+            {
+                vm.event.virtuallyGoingCount--;
             }
         }
     }

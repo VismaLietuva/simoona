@@ -53,6 +53,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
         public IEnumerable<EventDetailsParticipantViewModel> Participants { get; set; }
 
         public int GoingCount { get; set; }
+        public int VirtuallyGoingCount { get; set; }
         public int MaybeGoingCount { get; set; }
         public int NotGoingCount { get; set; }
     }
