@@ -19,6 +19,7 @@
         </div>
 
         <ul ng-if="!!vm.participants.length && vm.isExpanded" class="event-participant-list">
+            <!-- Attending -->
             <div ng-show="!!vm.attendingParticipants().length" class="panel panel-info" >
                 <div ng-show="vm.isMainParticipantList" class="panel-heading">{{'events.eventParticipantStatus_Attending' | translate}} ({{vm.attendingParticipants().length}})</div>
                 <div class="panel-body">
@@ -36,6 +37,25 @@
                 </div>
             </div>
 
+            <!-- Virtually attending -->
+            <div ng-show="!!vm.getAttendingVirtuallyParticipant().length" class="panel panel-info" >
+                <div ng-show="vm.isMainParticipantList" class="panel-heading">{{'events.eventParticipantStatus_JoiningVirtually' | translate}} ({{vm.getAttendingVirtuallyParticipant().length}})</div>
+                <div class="panel-body">
+                    <li ng-repeat="participant in vm.getAttendingVirtuallyParticipant()">
+                        <ace-event-participant participant="participant">
+                            <span ng-if="!!participant.userId && !participant.isLoading && vm.isDeleteVisible"
+                                class="event-participant-delete-button vismaicon vismaicon-cancel-circle"
+                                ace-confirmation-modal="vm.onLeaveEvent({participant: participant})"
+                                confirmation-modal-message="events.deleteUserConfirmationMessage"
+                                data-test-id="event-participant-delete-user" title="{{'common.delete' | translate}}"
+                                translate-cloak>
+                            </span>
+                        </ace-event-participant>
+                    </li>
+                </div>
+            </div>
+
+            <!-- Maybe attending -->
             <div ng-show="!!vm.maybeAttendingParticipants().length && vm.isMainParticipantList" class="panel panel-info">
                 <div class="panel-heading">{{'events.eventParticipantStatus_MaybeAttending' | translate}} ({{vm.maybeAttendingParticipants().length}})</div>
                 <div class="panel-body">
@@ -58,6 +78,7 @@
                 </div>
             </div>
 
+            <!-- Not attending -->
             <div ng-show="!!vm.notAttendingParticipants().length && vm.isMainParticipantList" class="panel panel-info">
                 <div class="panel-heading">{{'events.eventParticipantStatus_NotAttending' | translate}} ({{vm.notAttendingParticipants().length}})</div>
                 <div class="panel-body">
@@ -80,7 +101,7 @@
                 </div>
             </div>
         </ul>
-    </div>    
+    </div>
 
     <div ng-if="!vm.participants.length" class="event-no-participants text-center"
         translate="events.eventNoParticipants"></div>

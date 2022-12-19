@@ -23,13 +23,14 @@
         /* jshint validthis: true */
         var vm = this;
         vm.isExpanded = true;
-        
+
         vm.attendStatus = attendStatus;
         vm.expandCollapseText = 'events.collapse';
         vm.toggleExpandCollapse = toggleExpandCollapse;
         vm.attendingParticipants = getAttendingParticipants;
         vm.maybeAttendingParticipants = getMaybeAttendingParticipants;
         vm.notAttendingParticipants = getNotAttendingParticipants;
+        vm.getAttendingVirtuallyParticipant = getAttendingVirtuallyParticipants;
 
         function toggleExpandCollapse() {
             if(vm.isExpanded) {
@@ -51,6 +52,10 @@
 
         function getNotAttendingParticipants() {
             return getParticipantsByStatus(attendStatus.NotAttending);
+        }
+
+        function getAttendingVirtuallyParticipants() {
+            return getParticipantsByStatus(attendStatus.AttendingVirtually);
         }
 
         function getParticipantsByStatus(status) {
