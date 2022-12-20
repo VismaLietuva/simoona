@@ -37,7 +37,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
         private readonly IDbSet<Event> _eventsDbSet;
         private readonly IDbSet<ApplicationUser> _usersDbSet;
-        private readonly IDbSet<EventParticipant> _eventParticipantsDbSet;
+        private readonly DbSet<EventParticipant> _eventParticipantsDbSet;
 
         private readonly IRoleService _roleService;
         private readonly ISystemClock _systemClock;
@@ -74,7 +74,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             await ResetAttendeesAsync(eventId, userOrg, AttendingStatus.Attending);
 
         public async Task ResetAllAttendeesAsync(Guid eventId, UserAndOrganizationDto userOrg) =>
-            await ResetAttendeesAsync(eventId, userOrg);
+            await ResetAttendeesAsync(eventId, userOrg, null);
 
         public async Task AddColleagueAsync(EventJoinDto joinDto)
         {
@@ -352,7 +352,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             _eventValidationService.CheckIfUserExists(userExists);
         }
 
-        private async Task ResetAttendeesAsync(Guid eventId, UserAndOrganizationDto userOrg, AttendingStatus? status = null)
+        private async Task ResetAttendeesAsync(Guid eventId, UserAndOrganizationDto userOrg, AttendingStatus? status)
         {
             var @event = await _eventsDbSet
               .Include(e => e.EventParticipants)
@@ -503,17 +503,26 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             var filteredParticipants = @event.EventParticipants.Where(FilterParticipantByAttendStatus(status));
             var filteredParticipantIds = filteredParticipants.Select(participant => participant.ApplicationUserId);
 
+            await RemoveParticipantsFromEventWallAsync(@event, userOrg, filteredParticipants);
+            _eventParticipantsDbSet.RemoveRange(filteredParticipants);
+            await _uow.SaveChangesAsync(false);
+
+            NotifyRemovedParticipants(@event, userOrg, filteredParticipantIds);
+        }
+
+        private async Task RemoveParticipantsFromEventWallAsync(Event @event, UserAndOrganizationDto userOrg, IEnumerable<EventParticipant> filteredParticipants)
+        {
             foreach (var participant in filteredParticipants)
             {
                 await JoinOrLeaveEventWallAsync(@event.ResponsibleUserId, participant.ApplicationUserId, @event.WallId, userOrg);
-                _eventParticipantsDbSet.Remove(participant);
             }
+        }
 
-            _asyncRunner.Run<IEventNotificationService>(async notifier => 
-                await notifier.NotifyRemovedEventParticipantsAsync(@event.Name, @event.Id, userOrg.OrganizationId, filteredParticipantIds),
-                _uow.ConnectionName);
-
-            await _uow.SaveChangesAsync(false);
+        private void NotifyRemovedParticipants(Event @event, UserAndOrganizationDto userOrg, IEnumerable<string> filteredParticipantIds)
+        {
+            _asyncRunner.Run<IEventNotificationService>(async notifier =>
+                            await notifier.NotifyRemovedEventParticipantsAsync(@event.Name, @event.Id, userOrg.OrganizationId, filteredParticipantIds),
+                            _uow.ConnectionName);
         }
 
         private async Task<EventParticipant> GetParticipantAsync(Guid eventId, int userOrg, string userId)
