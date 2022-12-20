@@ -25,11 +25,28 @@
         'localeSrv',
         'lodash',
         'attendStatus',
-        'optionRules'
+        'optionRules',
+        'selectedAttendStatus'
     ];
 
-    function eventJoinOptionsController($state, $uibModalInstance, inputTypes, authService, errorHandler,
-        eventRepository, $translate, notifySrv, event, isDetails, isAddColleague, isChangeOptions, localeSrv, lodash, attendStatus, optionRules) {
+    function eventJoinOptionsController(
+        $state,
+        $uibModalInstance,
+        inputTypes,
+        authService,
+        errorHandler,
+        eventRepository,
+        $translate,
+        notifySrv,
+        event,
+        isDetails,
+        isAddColleague,
+        isChangeOptions,
+        localeSrv,
+        lodash,
+        attendStatus,
+        optionRules,
+        selectedAttendStatus) {
         /* jshint validthis: true */
         var vm = this;
 
@@ -125,10 +142,10 @@
                 var selectedOptionsId = lodash.map(vm.selectedOptions, 'id');
                 if (vm.isAddColleague) {
                     var participantIds = lodash.map(vm.participants, 'id');
-                    eventRepository.addColleagues(event.id, selectedOptionsId, participantIds, attendStatus.Attending)
+                    eventRepository.addColleagues(event.id, selectedOptionsId, participantIds, selectedAttendStatus)//TODO: handle add colleagues
                         .then(handleSuccessPromise, handleErrorPromise);
                 } else {
-                    eventRepository.joinEvent(event.id, selectedOptionsId, attendStatus.Attending)
+                    eventRepository.joinEvent(event.id, selectedOptionsId, selectedAttendStatus)
                         .then(handleSuccessPromise, handleErrorPromise);
                 }
             }

@@ -85,7 +85,7 @@
                         errorHandler.handleErrorMessage(error);
                     });
                 } else {
-                    openOptionsModal();
+                    openOptionsModal(attendingStatus);
                 }
             });
         }
@@ -226,7 +226,7 @@
             vm.event.virtualParticipantsCount = countVirtuallyAttendingParticipants();
         }
 
-        function openOptionsModal() {
+        function openOptionsModal(attendStatus) {
             vm.enableAction = true;
 
             $uibModal.open({
@@ -245,6 +245,9 @@
                     },
                     isChangeOptions: function () {
                         return false;
+                    },
+                    selectedAttendStatus: function() {
+                        return attendStatus;
                     }
                 }
             });
