@@ -511,7 +511,9 @@ namespace Shrooms.Premium.Domain.Services.Events
                     Id = o.Id,
                     Name = o.Option,
                     Participants = o.EventParticipants
-                        .Where(x => x.EventId == eventId && x.AttendStatus == (int)AttendingStatus.Attending)
+                        .Where(x => x.EventId == eventId &&
+                              (x.AttendStatus == (int)AttendingStatus.Attending || 
+                               x.AttendStatus == (int)AttendingStatus.AttendingVirtually))
                         .Select(p => new EventDetailsParticipantDto
                         {
                             Id = p.Id,
