@@ -75,7 +75,7 @@
         }
 
         function isExportVisible() {
-            return vm.event.goingCount > 0;
+            return getTotalGoingParticipantCount() > 0;
         }
 
         function getTotalGoingParticipantCount() {
