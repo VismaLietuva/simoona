@@ -260,9 +260,9 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
         {
             var eventParticipants = (await _eventsDbSet
                 .Include(e => e.EventParticipants.Select(x => x.ApplicationUser))
-                .Where(e => e.Id == eventId
-                            && e.OrganizationId == userAndOrg.OrganizationId
-                            && e.EventParticipants.Any(p => p.AttendStatus == (int)AttendingStatus.Attending))
+                .Where(e => e.Id == eventId &&
+                            e.OrganizationId == userAndOrg.OrganizationId &&
+                            e.EventParticipants.Any(p => p.AttendStatus == (int)AttendingStatus.Attending || p.AttendStatus == (int)AttendingStatus.AttendingVirtually))
                 .Select(MapEventToParticipantDto())
                 .SingleOrDefaultAsync())?.ToList();
 
