@@ -26,7 +26,8 @@
         'lodash',
         'attendStatus',
         'optionRules',
-        'selectedAttendStatus'
+        'selectedAttendStatus',
+        'eventService'
     ];
 
     function eventJoinOptionsController(
@@ -46,10 +47,12 @@
         lodash,
         attendStatus,
         optionRules,
-        selectedAttendStatus) {
+        selectedAttendStatus,
+        eventService) {
         /* jshint validthis: true */
         var vm = this;
 
+        vm.colleagueStatusOption = undefined;
         vm.options = event.availableOptions;
         vm.inputType = null;
         vm.isAddColleague = isAddColleague;
@@ -81,6 +84,10 @@
                 vm.inputType = inputTypes.radio;
             }
 
+            if (vm.isAddColleague) {
+                vm.availableAddColleagueStatuses = getAvailableAddColleagueAttendStatuses();
+            }
+
             eventRepository.getUserForAutoComplete(authService.identity.userName, event.id).then(function (response) {
                 for (var i = 0; response.length > i; i++) {
                     if (response[i].id === authService.identity.userId) {
@@ -92,6 +99,38 @@
 
         function getUserForAutoComplete(search) {
             return eventRepository.getUserForAutoComplete(search, event.id);
+        }
+
+        function getAvailableAddColleagueAttendStatuses() {
+            var statuses = [];
+
+            if (eventService.hasSpaceForVirtualParticipant(event)) {
+                statuses.push(toAttendStatusSelectOption(attendStatus.AttendingVirtually));
+            }
+
+            if (eventService.hasSpaceForParticipant(event)) {
+                statuses.push(toAttendStatusSelectOption(attendStatus.Attending));
+            }
+
+            return statuses;
+        }
+
+        function toAttendStatusSelectOption(attendStatus) {
+            return {
+                attendStatus: attendStatus,
+                translation: getAddColleagueAttendStatusTranslation(attendStatus)
+            }
+        }
+
+        function getAddColleagueAttendStatusTranslation(status) {
+            switch (status) {
+                case attendStatus.Attending:
+                    return "events.eventAddColleagueAttendingStatusOption";
+                case attendStatus.AttendingVirtually:
+                    return "events.eventAddColleagueAttendingVirtuallyStatusOption";
+                default:
+                    console.error('Attend status', status, 'is not supported');
+            }
         }
 
         function isOptionSelected(optionId) {
@@ -142,7 +181,7 @@
                 var selectedOptionsId = lodash.map(vm.selectedOptions, 'id');
                 if (vm.isAddColleague) {
                     var participantIds = lodash.map(vm.participants, 'id');
-                    eventRepository.addColleagues(event.id, selectedOptionsId, participantIds, selectedAttendStatus)//TODO: handle add colleagues
+                    eventRepository.addColleagues(event.id, selectedOptionsId, participantIds, vm.colleagueStatusOption.attendStatus)
                         .then(handleSuccessPromise, handleErrorPromise);
                 } else {
                     eventRepository.joinEvent(event.id, selectedOptionsId, selectedAttendStatus)
@@ -173,7 +212,7 @@
             }
 
             vm.isActionDisabled = false;
-            event.participatingStatus = attendStatus.Attending;
+            event.participatingStatus = attendStatus.Attending; // ?
             $uibModalInstance.close();
 
             notifySuccess();

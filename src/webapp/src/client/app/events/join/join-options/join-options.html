@@ -1,6 +1,8 @@
 <div class="event-options">
     <div class="modal-header">
-        <button type="button" class="close" ng-click="vm.closeModal()">&times;</button>
+        <button type="button" class="close" ng-click="vm.closeModal()">
+            &times;
+        </button>
         <h3 ng-if="!!vm.options.length" class="modal-title" translate="events.messageConfirmOptions"></h3>
         <h3 ng-if="!vm.options.length && !vm.isAddColleague" class="modal-title" translate="events.joinTitle"></h3>
         <h3 ng-if="!vm.options.length && vm.isAddColleague" class="modal-title"
@@ -23,7 +25,7 @@
                     tooltip-append-to-body="true" data-test-id="option-to-select">
                     <input id="selectedOption{{option.id}}" type="{{vm.inputType}}" name="option"
                         ng-click="vm.selectOption(option)" data-test-id="option-check-box"
-                        ng-checked="vm.isOptionSelected(option.id)">
+                        ng-checked="vm.isOptionSelected(option.id)" />
                     {{option.option}}
                 </label>
             </div>
@@ -37,6 +39,18 @@
                 debounce-delay="500"></auto-complete>
         </tags-input>
 
+        <div class="mt-10 event-add-colleagues-attend-status-container" ng-if="vm.isAddColleague">
+            <span class="mr-5" translate="events.eventAddColleagueSelectLabel"></span>
+            <select ng-show="vm.availableAddColleagueStatuses.length > 1"
+                ng-init="vm.colleagueStatusOption = vm.availableAddColleagueStatuses[0]"
+                class="event-add-colleagues-attend-status-select pull-right" ng-model="vm.colleagueStatusOption"
+                ng-options="option.translation | translate for option in vm.availableAddColleagueStatuses">
+            </select>
+            <span class="bold" ng-if="vm.availableAddColleagueStatuses.length === 1"
+                translate="{{vm.colleagueStatusOption.translation}}">
+            </span>
+        </div>
+
         <div class="clearfix"></div>
     </div>
     <div class="modal-footer">
@@ -46,8 +60,8 @@
             <span ng-if="!vm.isAddColleague" translate="events.eventJoin"></span>
             <span ng-if="vm.isAddColleague" translate="events.eventAdd"></span>
         </button>
-        <button class="btn btn-primary" ng-if="vm.isChangeOptions" translate="common.save" ng-click="vm.updateOptions()">
-        </button>
+        <button class="btn btn-primary" ng-if="vm.isChangeOptions" translate="common.save"
+            ng-click="vm.updateOptions()"></button>
         <button class="btn btn-default" ng-click="vm.closeModal()" data-test-id="close-event-modal-button">
             <span translate="common.cancel"></span>
         </button>
