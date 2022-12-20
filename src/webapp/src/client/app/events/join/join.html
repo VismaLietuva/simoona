@@ -121,9 +121,11 @@
 
         <!-- Join and virtual join available -->
         <div ng-if="!vm.isVirtualParticipantsCapacityReached() && !vm.isParticipantsCapacityReached()">
-            <a class="dropdown-toggle" type="button" data-toggle="dropdown"
+            <a class="nc-btn nc-btn-default" type="button" data-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="false">
-                <span class="vismaicon vismaicon-other-circle -mt-3"></span>
+                <span class="vismaicon vismaicon-other-circle my-auto event-list-item-dropdown-going-container">
+                    <span class="ml-3" translate="events.areYouGoing"></span>
+                </span>
             </a>
 
             <ul class="dropdown-menu dropdown-menu-right dropdown-menu-wide participate-list-dropdown-menu">
