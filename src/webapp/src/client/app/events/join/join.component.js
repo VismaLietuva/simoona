@@ -200,7 +200,6 @@
             if (vm.isDetails) {
                 eventRepository.getEventDetails(vm.event.id).then(function (response) {
                     updateLoadedEventDataFromDetails(response);
-                    console.log('requst');
                 });
             } else {
                 vm.event.participatingStatus = attendStatus;
