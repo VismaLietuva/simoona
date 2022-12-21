@@ -22,6 +22,14 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             _systemClock = systemClock;
         }
 
+        public void CheckIfAllParticipantsExist(ICollection<ApplicationUser> users, ICollection<string> participantIds)
+        {
+            if (users.Count != participantIds.Count)
+            {
+                throw new EventException(PremiumErrorCodes.EventParticipantNotFound);
+            }
+        }
+
         public void CheckIfParticipantExists(object participant)
         {
             if (participant == null)
@@ -59,14 +67,6 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             if (startDate < _systemClock.UtcNow)
             {
                 throw new EventException(PremiumErrorCodes.EventJoinStartDateHasPassedCode);
-            }
-        }
-
-        public void CheckIfUserAlreadyJoinedSameEvent(EventParticipantAttendDto participant)
-        {
-            if (participant != null)
-            {
-                throw new EventException(PremiumErrorCodes.EventUserAlreadyParticipatesCode);
             }
         }
 

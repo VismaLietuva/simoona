@@ -19,7 +19,6 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
         void CheckIfEventStartDateIsExpired(DateTime startDate);
         void CheckIfOptionsAreDifferent(IEnumerable<NewEventOptionDto> options);
         void CheckIfSingleChoiceSelectedWithRule(ICollection<EventOption> options, OptionRules rule);
-        void CheckIfUserAlreadyJoinedSameEvent(EventParticipantAttendDto participant);
         void CheckIfJoiningEventStartDateHasPassed(DateTime startDate);
         void CheckIfEventIsFull(int maxParticipants, int participantsCount);
         void CheckIfAttendStatusIsValid(int status);
@@ -43,5 +42,6 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
         void CheckIfUserParticipatesInEvent(string userId, IEnumerable<EventParticipantAttendDto> participants);
         void CheckIfDateRangeExceededLimitOrNull(DateTime? start, DateTime? end);
         void CheckIfAllRequestParticipantsHaveAccounts(List<ApplicationUser> users, ICollection<string> participantIds);
+        void CheckIfAllParticipantsExist(ICollection<ApplicationUser> users, ICollection<string> participantIds);
     }
 }
