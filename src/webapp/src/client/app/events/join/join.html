@@ -1,4 +1,4 @@
-<div class="text-center" ng-if="vm.isAddColleague">
+<div class="text-center" ng-if="vm.isAddColleague && !vm.isEventFull()">
     <a class="nc-btn nc-btn-default" ng-click="vm.joinEvent(vm.event.id)"
         title="{{'events.eventAddColleaguesButton' | translate}}" data-test-id="event-add-colleagues-button" ng-cloak
         translate-cloak>

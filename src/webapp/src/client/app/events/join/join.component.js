@@ -56,6 +56,7 @@
         vm.isAttendingEvent = isAttendingEvent;
         vm.isVirtualParticipantsCapacityReached = isVirtualParticipantsCapacityReached;
         vm.isParticipantsCapacityReached = isParticipantsCapacityReached;
+        vm.isEventFull = isEventFull;
 
         ////////
         function joinEvent(eventId, attendingStatus) {
@@ -107,6 +108,10 @@
                     });
                 }
             }
+        }
+
+        function isEventFull() {
+            return isVirtualParticipantsCapacityReached() && isParticipantsCapacityReached();
         }
 
         function isVirtualParticipantsCapacityReached() {
