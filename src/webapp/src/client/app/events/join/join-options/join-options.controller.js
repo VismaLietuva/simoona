@@ -104,12 +104,12 @@
         function getAvailableAddColleagueAttendStatuses() {
             var statuses = [];
 
-            if (eventService.hasSpaceForVirtualParticipant(event)) {
-                statuses.push(toAttendStatusSelectOption(attendStatus.AttendingVirtually));
-            }
-
             if (eventService.hasSpaceForParticipant(event)) {
                 statuses.push(toAttendStatusSelectOption(attendStatus.Attending));
+            }
+
+            if (eventService.hasSpaceForVirtualParticipant(event)) {
+                statuses.push(toAttendStatusSelectOption(attendStatus.AttendingVirtually));
             }
 
             return statuses;
@@ -168,9 +168,8 @@
                 handleErrorMessage('errorCodeMessages.messageNotEnoughOptions');
             } else if (vm.isAddColleague && !vm.participants.length) {
                 handleErrorMessage('events.noParticipantsError');
-            } else if (vm.isAddColleague && vm.participants.length + event.participants.length > event.maxParticipants) {
-                var participants = event.maxParticipants - event.participants.length;
-                handleErrorMessage($translate.instant('events.maxParticipantsError') + ' ' + participants);
+            } else if (vm.isAddColleague && isAddingTooManyParticipants()) {
+                handleErrorMessage(`${$translate.instant('events.maxParticipantsError')} ${getLeftParticipantCountForAdd()}`);
             } else if (!hasDatePassed(event.startDate)) {
                 handleErrorMessage('', 'errorCodeMessages.messageEventJoinStartedOrFinished');
                 $uibModalInstance.close();
@@ -188,6 +187,15 @@
                         .then(handleSuccessPromise, handleErrorPromise);
                 }
             }
+        }
+
+        function getLeftParticipantCountForAdd() {
+            var leftCount = vm.participants.length + event.participants.length - event.maxParticipants - event.maxVirtualParticipants;
+            return leftCount < 0 ? 0 : leftCount;
+        }
+
+        function isAddingTooManyParticipants() {
+            return vm.participants.length + event.participants.length > event.maxParticipants + event.maxVirtualParticipants;
         }
 
         function updateOptions() {
