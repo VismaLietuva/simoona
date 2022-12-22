@@ -8,18 +8,15 @@
             Finished: 2,
             RegistrationIsClosed: 3,
             Full: 4,
-            Join: 5
+            Join: 5,
         })
         .service('eventStatusService', eventStatusService);
 
-    eventStatusService.$inject = [
-        'eventStatus',
-        'attendStatus'
-    ];
+    eventStatusService.$inject = ['eventStatus', 'attendStatus'];
 
     function eventStatusService(eventStatus, attendStatus) {
         var service = {
-            getEventStatus: getEventStatus
+            getEventStatus: getEventStatus,
         };
         return service;
 
@@ -34,13 +31,24 @@
                 return 0;
             }
 
-            if (!hasDatePassed(event.startDate) && hasDatePassed(event.endDate)) {
+            if (
+                !hasDatePassed(event.startDate) &&
+                hasDatePassed(event.endDate)
+            ) {
                 return eventStatus.InProgress;
-            } else if (!hasDatePassed(event.startDate) && !hasDatePassed(event.endDate)) {
+            } else if (
+                !hasDatePassed(event.startDate) &&
+                !hasDatePassed(event.endDate)
+            ) {
                 return eventStatus.Finished;
-            } else if (!!event.registrationDeadlineDate && !hasDatePassed(event.registrationDeadlineDate)) {
+            } else if (
+                !!event.registrationDeadlineDate &&
+                !hasDatePassed(event.registrationDeadlineDate)
+            ) {
                 return eventStatus.RegistrationIsClosed;
-            } else if (isEventFull(event) && (event.participatingStatus == attendStatus.NotAttending || event.participatingStatus == attendStatus.Idle || !!isParticipantsList)) {
+            } else if (
+                isEventFull(event) && (event.participatingStatus == attendStatus.NotAttending || event.participatingStatus == attendStatus.Idle || !!isParticipantsList)
+            ) {
                 return eventStatus.Full;
             } else {
                 return eventStatus.Join;
@@ -48,7 +56,9 @@
         }
 
         function isEventFull(event) {
-            return event.maxParticipants <= event.participantsCount && event.maxVirtualParticipants <= event.virtualParticipantsCount;
+            return event.goingCount === undefined && event.virtuallyGoingCount === undefined
+                ? event.maxParticipants <= event.participantsCount && event.maxVirtualParticipants <= event.virtualParticipantsCount
+                : event.maxParticipants <= event.goingCount && event.maxVirtualParticipants <= event.virtuallyGoingCount
         }
     }
 })();
