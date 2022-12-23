@@ -146,59 +146,8 @@ namespace Shrooms.Premium.Domain.Services.Events.List
 
             return await _eventParticipantsDbSet
                 .Include(p => p.ApplicationUser)
-                .Where(p => p.EventId == reportArgsDto.EventId &&
-                            p.ApplicationUser.OrganizationId == userOrg.OrganizationId)
-                .Select(p => new EventParticipantReportDto
-                {
-                    Id = p.ApplicationUser.Id,
-                    FirstName = p.ApplicationUser.FirstName,
-                    LastName = p.ApplicationUser.LastName,
-                    EmploymentDate = p.ApplicationUser.EmploymentDate,
-                    QualificationLevel = p.ApplicationUser.QualificationLevel.Name,
-                    JobTitle = p.ApplicationUser.JobPosition.Title,
-                    ManagerFirstName = p.ApplicationUser.Manager.FirstName,
-                    ManagerLastName = p.ApplicationUser.Manager.LastName,
-                    ManagerId = p.ApplicationUser.Manager.Id,
-                    Projects = p.ApplicationUser.Projects
-                        .Select(pr => new EventProjectReportDto
-                        {
-                            Id = pr.Id,
-                            Name = pr.Name
-                        })
-                        .ToList(),
-                    Kudos = _kudosLogDbSet
-                        .Where(kudos =>
-                            (kudosTypesLength == 0 || kudosTypeNames.Contains(kudos.KudosTypeName)) &&
-                            (kudos.EmployeeId == p.ApplicationUser.Id) &&
-                            (kudos.Status == KudosStatus.Approved) &&
-                            (kudos.OrganizationId == userOrg.OrganizationId))
-                        .Sum(kudos => kudos.Points),
-                    VisitedEvents = _eventsDbSet
-                        .Where(FilterByDateInterval(reportArgsDto))
-                        // Due to the EF 6 bug, this expression cannot be exported to a method
-                        .Where(e => e.EventParticipants.Any(participant => participant.ApplicationUserId == p.ApplicationUser.Id) &&
-                                    e.EndDate < DateTime.UtcNow &&
-                                    e.OrganizationId == userOrg.OrganizationId &&
-                                    (eventTypesLength == 0 || reportArgsDto.EventTypeIds.Contains(e.EventType.Id)))
-                        .OrderByDescending(e => e.EndDate)
-                        .Take(EventsConstants.EventReportVisitedEventPreviewCount)
-                        .Select(visited => new EventVisitedReportDto
-                        {
-                            Id = visited.Id,
-                            Name = visited.Name,
-                            TypeName = visited.EventType.Name,
-                            StartDate = visited.StartDate,
-                            EndDate = visited.EndDate
-                        })
-                        .ToList(),
-                    TotalVisitedEventCount = _eventsDbSet
-                        .Where(FilterByDateInterval(reportArgsDto))
-                        // Due to the EF 6 bug, this expression cannot be exported to a method
-                        .Count(e => e.EventParticipants.Any(participant => participant.ApplicationUserId == p.ApplicationUser.Id) &&
-                                    e.EndDate < DateTime.UtcNow &&
-                                    e.OrganizationId == userOrg.OrganizationId &&
-                                    (eventTypesLength == 0 || reportArgsDto.EventTypeIds.Contains(e.EventType.Id)))
-                })
+                .Where(FilterByVisitedEvent(reportArgsDto, userOrg))
+                .Select(EventParticipantToReportParticipant(reportArgsDto, userOrg, kudosTypesLength, eventTypesLength, kudosTypeNames))
                 .OrderByPropertyNames(reportArgsDto)
                 .ToPagedListAsync(reportArgsDto.Page, reportArgsDto.PageSize);
         }
@@ -222,6 +171,72 @@ namespace Shrooms.Premium.Domain.Services.Events.List
 
             var orderedEvents = OrderEvents(events);
             return orderedEvents;
+        }
+
+        private Expression<Func<EventParticipant, EventParticipantReportDto>> EventParticipantToReportParticipant(EventParticipantsReportListingArgsDto reportArgsDto, UserAndOrganizationDto userOrg, int kudosTypesLength, int eventTypesLength, List<string> kudosTypeNames)
+        {
+            return p => new EventParticipantReportDto
+            {
+                Id = p.ApplicationUser.Id,
+                FirstName = p.ApplicationUser.FirstName,
+                LastName = p.ApplicationUser.LastName,
+                EmploymentDate = p.ApplicationUser.EmploymentDate,
+                QualificationLevel = p.ApplicationUser.QualificationLevel.Name,
+                JobTitle = p.ApplicationUser.JobPosition.Title,
+                ManagerFirstName = p.ApplicationUser.Manager.FirstName,
+                ManagerLastName = p.ApplicationUser.Manager.LastName,
+                ManagerId = p.ApplicationUser.Manager.Id,
+                Projects = p.ApplicationUser.Projects
+                                    .Select(pr => new EventProjectReportDto
+                                    {
+                                        Id = pr.Id,
+                                        Name = pr.Name
+                                    })
+                                    .ToList(),
+                Kudos = _kudosLogDbSet
+                                    .Where(kudos =>
+                                        (kudosTypesLength == 0 || kudosTypeNames.Contains(kudos.KudosTypeName)) &&
+                                        (kudos.EmployeeId == p.ApplicationUser.Id) &&
+                                        (kudos.Status == KudosStatus.Approved) &&
+                                        (kudos.OrganizationId == userOrg.OrganizationId))
+                                    .Sum(kudos => kudos.Points),
+                VisitedEvents = _eventsDbSet
+                                    .Where(FilterByDateInterval(reportArgsDto))
+                                    // Due to the EF 6 bug, this expression cannot be exported to a method
+                                    .Where(e => e.EventParticipants.Any(participant => participant.ApplicationUserId == p.ApplicationUser.Id &&
+                                                                        (participant.AttendStatus == (int)AttendingStatus.Attending ||
+                                                                         participant.AttendStatus == (int)AttendingStatus.AttendingVirtually)) &&
+                                                e.EndDate < DateTime.UtcNow &&
+                                                e.OrganizationId == userOrg.OrganizationId &&
+                                                (eventTypesLength == 0 || reportArgsDto.EventTypeIds.Contains(e.EventType.Id)))
+                                    .OrderByDescending(e => e.EndDate)
+                                    .Take(EventsConstants.EventReportVisitedEventPreviewCount)
+                                    .Select(visited => new EventVisitedReportDto
+                                    {
+                                        Id = visited.Id,
+                                        Name = visited.Name,
+                                        TypeName = visited.EventType.Name,
+                                        StartDate = visited.StartDate,
+                                        EndDate = visited.EndDate
+                                    })
+                                    .ToList(),
+                TotalVisitedEventCount = _eventsDbSet
+                                    .Where(FilterByDateInterval(reportArgsDto))
+                                    // Due to the EF 6 bug, this expression cannot be exported to a method
+                                    .Count(e => e.EventParticipants.Any(participant => participant.ApplicationUserId == p.ApplicationUser.Id &&
+                                                                        (participant.AttendStatus == (int)AttendingStatus.Attending ||
+                                                                         participant.AttendStatus == (int)AttendingStatus.AttendingVirtually)) &&
+                                                e.EndDate < DateTime.UtcNow &&
+                                                e.OrganizationId == userOrg.OrganizationId &&
+                                                (eventTypesLength == 0 || reportArgsDto.EventTypeIds.Contains(e.EventType.Id)))
+            };
+        }
+
+        private static Expression<Func<EventParticipant, bool>> FilterByVisitedEvent(EventParticipantsReportListingArgsDto reportArgsDto, UserAndOrganizationDto userOrg)
+        {
+            return p => p.EventId == reportArgsDto.EventId &&
+                        p.ApplicationUser.OrganizationId == userOrg.OrganizationId &&
+                        (p.AttendStatus == (int)AttendingStatus.Attending || p.AttendStatus == (int)AttendingStatus.AttendingVirtually);
         }
 
         private static Expression<Func<Event, bool>> EventParticipantVisitedReportEventsFilter(EventParticipantVisitedEventsListingArgsDto visitedArgsDto, UserAndOrganizationDto userOrg, int eventTypesLength)
