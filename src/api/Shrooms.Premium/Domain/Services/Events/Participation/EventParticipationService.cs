@@ -87,19 +87,41 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             try
             {
                 var eventDto = await GetJoinableEventAsync(joinDto);
-                await ValidateJoinAddPermissionsIfNeededAsync(joinDto, eventDto, addedByColleague);
+                await ValidateJoinAddPermissionsAsync(joinDto, eventDto, addedByColleague);
 
                 eventDto.SelectedOptions = GetSelectedOptions(eventDto, joinDto);
                 ValidateEventBeforeJoin(joinDto, eventDto);
-                var firstTimeParticipants = await AddAllParticipantsAsync(joinDto, eventDto);
+
+                var users = await GetUsersFromParticipantIdsAsync(joinDto.ParticipantIds);
+                var firstTimeParticipants = await AddAllFirstTimeParticipantsAsync(users, joinDto, eventDto);
+                await AddAllChangeStatusParticipantsAsync(joinDto, eventDto);
+                await _uow.SaveChangesAsync(false);
                 
-                SendEventInvitations(joinDto, eventDto);
-                NotifyManagersAfterJoinIfNeeded(eventDto, firstTimeParticipants);
+                NotifyJoinedUsers(joinDto, eventDto, firstTimeParticipants);
             }
             finally
             {
                 _semaphoreSlim.Release();
             }
+        }
+
+        private void NotifyJoinedUsers(EventJoinDto joinDto, EventJoinValidationDto eventDto, List<EventParticipantFirstTimeJoinDto> firstTimeParticipants)
+        {
+            SendEventInvitations(joinDto, eventDto);
+
+            if (eventDto.SendEmailToManager)
+            {
+                NotifyManagersAfterJoin(eventDto, firstTimeParticipants);
+            }
+        }
+
+        private async Task<List<ApplicationUser>> GetUsersFromParticipantIdsAsync(ICollection<string> participantIds)
+        {
+            var users = await _usersDbSet.Include(user => user.Manager)
+                .Where(user => participantIds.Contains(user.Id))
+                .ToListAsync();
+            _eventValidationService.CheckIfAllParticipantsExist(users, participantIds);
+            return users;
         }
 
         public async Task UpdateAttendStatusAsync(UpdateAttendStatusDto updateAttendStatusDto)
@@ -387,15 +409,10 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
         private static Func<EventParticipant, bool> FilterParticipantByAttendStatus(AttendingStatus? status) =>
             participant => status == null || participant.AttendStatus == (int)status.Value;
 
-        private void NotifyManagersAfterJoinIfNeeded(
+        private void NotifyManagersAfterJoin(
             EventJoinValidationDto eventJoinValidationDto,
             List<EventParticipantFirstTimeJoinDto> firstTimeParticipants)
         {
-            if (!eventJoinValidationDto.SendEmailToManager)
-            {
-                return;
-            }
-
             foreach (var participant in firstTimeParticipants)
             {
                 if (participant.ManagerId == null)
@@ -703,7 +720,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             return eventDto;
         }
 
-        private async Task ValidateJoinAddPermissionsIfNeededAsync(EventJoinDto joinDto, EventJoinValidationDto eventDto, bool addedByColleague)
+        private async Task ValidateJoinAddPermissionsAsync(EventJoinDto joinDto, EventJoinValidationDto eventDto, bool addedByColleague)
         {
             if (!addedByColleague)
             {
@@ -722,27 +739,20 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             _asyncRunner.Run<IEventCalendarService>(async notifier =>
                 await notifier.SendInvitationAsync(eventDto, joinDto.ParticipantIds, joinDto.OrganizationId), _uow.ConnectionName);
 
-        /// <summary>
-        /// Adds or changes participants attend status to a specific event
-        /// </summary>
-        /// <returns>Participants that joined this event for the first time</returns>
-        private async Task<List<EventParticipantFirstTimeJoinDto>> AddAllParticipantsAsync(EventJoinDto joinDto, EventJoinValidationDto eventDto)//Q: Feedback, out or returns? or different design?
+        private async Task<List<EventParticipantFirstTimeJoinDto>> AddAllFirstTimeParticipantsAsync(List<ApplicationUser> users, EventJoinDto joinDto, EventJoinValidationDto eventDto)
         {
-            var users = await _usersDbSet.Include(user => user.Manager)
-                .Where(user => joinDto.ParticipantIds.Contains(user.Id))
-                .ToListAsync();
-            _eventValidationService.CheckIfAllParticipantsExist(users, joinDto.ParticipantIds);
-
             var firstTimeJoinParticipantIds = joinDto.ParticipantIds.Where(id => !eventDto.Participants.Any(participant => participant.Id == id));
-            var attendStatusChangeParticipantIds = joinDto.ParticipantIds.Except(firstTimeJoinParticipantIds);
-
             await AddParticipantsAsync(firstTimeJoinParticipantIds, eventDto, joinDto);
-            await AddChangedStatusParticipantsAsync(attendStatusChangeParticipantIds, eventDto, joinDto);
-            await _uow.SaveChangesAsync(false);
-
+            
             return users.Where(user => firstTimeJoinParticipantIds.Contains(user.Id))
                 .Select(ApplicationUserToEventParticipantFirstTimeJoinDto())
                 .ToList();
+        }
+
+        private async Task AddAllChangeStatusParticipantsAsync(EventJoinDto joinDto, EventJoinValidationDto eventDto)
+        {
+            var attendStatusChangeParticipantIds = joinDto.ParticipantIds.Where(id => eventDto.Participants.Any(participant => participant.Id == id));
+            await AddChangedStatusParticipantsAsync(attendStatusChangeParticipantIds, eventDto, joinDto);
         }
 
         private static Func<ApplicationUser, EventParticipantFirstTimeJoinDto> ApplicationUserToEventParticipantFirstTimeJoinDto()
