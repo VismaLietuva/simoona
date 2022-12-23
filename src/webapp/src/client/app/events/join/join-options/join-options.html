@@ -43,7 +43,7 @@
             <span class="mr-5" translate="events.eventAddColleagueSelectLabel"></span>
             <select ng-show="vm.availableAddColleagueStatuses.length > 1"
                 ng-init="vm.colleagueStatusOption = vm.availableAddColleagueStatuses[0]"
-                class="event-add-colleagues-attend-status-select pull-right" ng-model="vm.colleagueStatusOption"
+                class="event-add-colleagues-attend-status-select pull-right form-control" ng-model="vm.colleagueStatusOption"
                 ng-options="option.translation | translate for option in vm.availableAddColleagueStatuses">
             </select>
             <span class="bold" ng-if="vm.availableAddColleagueStatuses.length === 1"
