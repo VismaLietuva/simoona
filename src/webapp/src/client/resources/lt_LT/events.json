@@ -235,5 +235,7 @@
   "buttonCollapseEvents": "Suskleisti",
   "empty": "Nėra",
   "moreCount": "ir dar {{one}}...",
-  "eventReportDatePickers": "Rodyti aplankytus renginius"
+  "eventReportDatePickers": "Rodyti aplankytus renginius",
+  "normalParticipantCountLabel": "Paprasti dalyviai",
+  "virtualParticipantCountLabel": "Virtualūs dalyviai"
 }

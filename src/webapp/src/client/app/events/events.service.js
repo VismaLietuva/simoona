@@ -9,7 +9,9 @@
         var service = {
             countParticipants: countParticipants,
             hasSpaceForVirtualParticipant: hasSpaceForVirtualParticipant,
-            hasSpaceForParticipant: hasSpaceForParticipant
+            hasSpaceForParticipant: hasSpaceForParticipant,
+            getTotalGoingParticipantCount: getTotalGoingParticipantCount,
+            getTotalMaxParticipantCount: getTotalMaxParticipantCount
         };
         return service;
 
@@ -23,6 +25,14 @@
 
         function hasSpaceForParticipant(event) {
             return event.goingCount < event.maxParticipants;
+        }
+
+        function getTotalGoingParticipantCount(event) {
+            return event.goingCount + event.virtuallyGoingCount;
+        }
+
+        function getTotalMaxParticipantCount(event) {
+            return event.maxParticipants + event.maxVirtualParticipants;
         }
     }
 })();

@@ -235,5 +235,7 @@
   "buttonCollapseEvents": "Collapse",
   "empty": "None",
   "moreCount": "and {{one}} more...",
-  "eventReportDatePickers": "Show visited events"
+  "eventReportDatePickers": "Show visited events",
+  "normalParticipantCountLabel": "Normal participants",
+  "virtualParticipantCountLabel": "Virtual participants"
 }

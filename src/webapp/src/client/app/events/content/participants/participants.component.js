@@ -20,14 +20,24 @@
         'eventParticipantsService',
         'eventStatusService',
         'eventStatus',
+        'eventService',
         'errorHandler',
         'lodash',
         'Analytics',
         'attendStatus'
     ];
 
-    function eventParticipantsController(eventRepository, authService, eventParticipantsService,
-        eventStatusService, eventStatus, errorHandler, lodash, Analytics, attendStatus) {
+    function eventParticipantsController(
+        eventRepository,
+        authService,
+        eventParticipantsService,
+        eventStatusService,
+        eventStatus,
+        eventService,
+        errorHandler,
+        lodash,
+        Analytics,
+        attendStatus) {
         /* jshint validthis: true */
         var vm = this;
 
@@ -79,11 +89,11 @@
         }
 
         function getTotalGoingParticipantCount() {
-            return vm.event.goingCount + vm.event.virtuallyGoingCount;
+            return eventService.getTotalGoingParticipantCount(vm.event);
         }
 
         function getTotalMaxParticipantCount() {
-            return vm.event.maxParticipants + vm.event.maxVirtualParticipants;
+            return eventService.getTotalMaxParticipantCount(vm.event);
         }
 
         function expelUserFromEvent(participant) {

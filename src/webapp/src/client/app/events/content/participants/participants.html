@@ -18,18 +18,16 @@
                  title="{{'events.eventParticipantsList' | translate}}" translate-cloak>
                 <input type="radio" />
                 <span translate="events.eventParticipants"></span>
-                <!-- Total participant count -->
-                <span class="badge badge-default" data-test-id="participants-count">
-                    {{vm.getTotalGoingParticipantCount()}}/{{vm.getTotalMaxParticipantCount()}}
+                    <!-- Total participant count -->
+                    <ace-joined-participant-count class="inline" event="vm.event"></ace-joined-participant-count>
                 </span>
             </div>
             <div class="clearfix"></div>
         </div>
         <div ng-if="!vm.event.options.length" class="event-participants-title">
             <span translate="events.eventParticipants"></span>
-            <!-- Total participant count -->
-            <span class="badge badge-default" data-test-id="participants-count">
-                {{vm.getTotalGoingParticipantCount()}}/{{vm.getTotalMaxParticipantCount()}}
+                <!-- Total participant count -->
+                <ace-joined-participant-count class="inline" event="vm.event"></ace-joined-participant-count>
             </span>
         </div>
     </div>
