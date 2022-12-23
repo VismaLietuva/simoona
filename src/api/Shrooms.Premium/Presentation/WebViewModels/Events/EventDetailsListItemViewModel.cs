@@ -13,9 +13,13 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
 
         public IEnumerable<string> OfficeNames { get; set; }
 
+        public int MaxVirtualParticipants { get; set; }
+
         public int MaxParticipants { get; set; }
 
-        public int ParticipantsCount { get; set; }
+        public int GoingCount { get; set; }
+
+        public int VirtuallyGoingCount { get; set; }
 
         public bool IsForAllOffices { get; set; }
 

@@ -95,46 +95,24 @@ namespace Shrooms.Premium.Domain.Services.Events.List
         {
             var allOffices = await _officeDbSet
                 .ToDictionaryAsync(office => office.Id, office => office.Name);
-
             var officesCount = allOffices.Count;
-
             var typeIdsLength = reportArgsDto.EventTypeIds.Count();
             var officeIdsLength = reportArgsDto.OfficeTypeIds.Count();
 
             var events = await _eventsDbSet
                 .Include(e => e.EventParticipants)
                 .Include(e => e.EventType)
-                .Where(e => (e.OrganizationId == userAndOrganization.OrganizationId) &&
-                            (reportArgsDto.SearchString == null || e.Name.Contains(reportArgsDto.SearchString)) &&
-                            (typeIdsLength == 0 || reportArgsDto.EventTypeIds.Contains(e.EventTypeId)) &&
-                            (officeIdsLength == 0 || reportArgsDto.OfficeTypeIds.Any(c => e.Offices.Contains(c))))
+                .Where(FilterBySearchArguments(reportArgsDto, userAndOrganization, typeIdsLength, officeIdsLength))
                 .Where(e => e.StartDate > DateTime.UtcNow)
                 .OrderByPropertyNames(reportArgsDto)
-                .Select(e => new EventDetailsListItemDto
-                {
-                    Id = e.Id,
-                    Name = e.Name,
-                    StartDate = e.StartDate,
-                    EndDate = e.EndDate,
-                    TypeName = e.EventType.Name,
-                    MaxParticipants = e.MaxParticipants,
-                    ParticipantsCount = e.EventParticipants.Count,
-                    Offices = e.Offices
-                })
+                .Select(MapEventToReportListEvent())
                 .ToPagedListAsync(reportArgsDto.Page, reportArgsDto.PageSize);
-
-            foreach (var e in events)
-            {
-                e.OfficeNames = e.OfficeIds
-                    .Select(officeId => allOffices.TryGetValue(int.Parse(officeId), out var value) ? value : string.Empty)
-                    .Where(name => name != string.Empty);
-
-                e.IsForAllOffices = e.OfficeIds.Count() == officesCount;
-            }
+            
+            SetOfficeValuesForEventReportItems(allOffices, officesCount, events);
 
             return events;
         }
-        
+
         public async Task<IPagedList<EventVisitedReportDto>> GetEventParticipantVisitedReportEventsAsync(EventParticipantVisitedEventsListingArgsDto visitedArgsDto, UserAndOrganizationDto userOrg)
         {
             var eventTypesLength = visitedArgsDto.EventTypeIds.Count();
@@ -365,5 +343,42 @@ namespace Shrooms.Premium.Domain.Services.Events.List
         }
 
         private static string OfficeIdToString(int? officeId) => officeId != null ? $@"""{officeId.ToString()}""" : OutsideOffice;
+
+        private static Expression<Func<Event, EventDetailsListItemDto>> MapEventToReportListEvent()
+        {
+            return e => new EventDetailsListItemDto
+            {
+                Id = e.Id,
+                Name = e.Name,
+                StartDate = e.StartDate,
+                EndDate = e.EndDate,
+                TypeName = e.EventType.Name,
+                MaxParticipants = e.MaxParticipants,
+                MaxVirtualParticipants = e.MaxVirtualParticipants,
+                GoingCount = e.EventParticipants.Count(participant => participant.AttendStatus == (int)AttendingStatus.Attending),
+                VirtuallyGoingCount = e.EventParticipants.Count(participant => participant.AttendStatus == (int)AttendingStatus.AttendingVirtually),
+                Offices = e.Offices
+            };
+        }
+
+        private static Expression<Func<Event, bool>> FilterBySearchArguments(EventReportListingArgsDto reportArgsDto, UserAndOrganizationDto userAndOrganization, int typeIdsLength, int officeIdsLength)
+        {
+            return e => (e.OrganizationId == userAndOrganization.OrganizationId) &&
+                        (reportArgsDto.SearchString == null || e.Name.Contains(reportArgsDto.SearchString)) &&
+                        (typeIdsLength == 0 || reportArgsDto.EventTypeIds.Contains(e.EventTypeId)) &&
+                        (officeIdsLength == 0 || reportArgsDto.OfficeTypeIds.Any(c => e.Offices.Contains(c)));
+        }
+
+        private static void SetOfficeValuesForEventReportItems(Dictionary<int, string> allOffices, int officesCount, IPagedList<EventDetailsListItemDto> events)
+        {
+            foreach (var e in events)
+            {
+                e.OfficeNames = e.OfficeIds
+                    .Select(officeId => allOffices.TryGetValue(int.Parse(officeId), out var value) ? value : string.Empty)
+                    .Where(name => name != string.Empty);
+
+                e.IsForAllOffices = e.OfficeIds.Count() == officesCount;
+            }
+        }
     }
 }
