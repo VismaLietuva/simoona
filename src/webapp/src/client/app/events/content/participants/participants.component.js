@@ -115,7 +115,8 @@
                         vm.event.isFull = false;
                     }
 
-                    vm.event.participantsCount = vm.event.participants.length;
+                    vm.event.participantsCount = eventService.countAttendingParticipants(vm.event);
+                    vm.event.virtualParticipantsCount = eventService.countVirtuallyAttendingParticipants(vm.event);
                     decreaseParticipantGoingCount(participant);
                 }, function(response) {
                     participant.isLoading = false;

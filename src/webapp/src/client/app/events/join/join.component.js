@@ -135,11 +135,11 @@
         }
 
         function countVirtuallyAttendingParticipants() {
-            return eventService.countParticipants(vm.event, attendStatus.AttendingVirtually);
+            return eventService.countVirtuallyAttendingParticipants(vm.event);
         }
 
         function countAttendingParticipants() {
-            return eventService.countParticipants(vm.event, attendStatus.Attending);
+            return eventService.countAttendingParticipants(vm.event);
         }
 
         function isAttendingEvent() {

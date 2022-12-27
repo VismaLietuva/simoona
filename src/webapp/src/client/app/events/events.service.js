@@ -5,15 +5,27 @@
         .module('simoonaApp.Events')
         .factory('eventService', eventService);
 
-    function eventService() {
+    eventService.$inject = [ 'attendStatus' ];
+
+    function eventService(attendStatus) {
         var service = {
             countParticipants: countParticipants,
             hasSpaceForVirtualParticipant: hasSpaceForVirtualParticipant,
             hasSpaceForParticipant: hasSpaceForParticipant,
             getTotalGoingParticipantCount: getTotalGoingParticipantCount,
-            getTotalMaxParticipantCount: getTotalMaxParticipantCount
+            getTotalMaxParticipantCount: getTotalMaxParticipantCount,
+            countVirtuallyAttendingParticipants: countVirtuallyAttendingParticipants,
+            countAttendingParticipants: countAttendingParticipants
         };
         return service;
+
+        function countAttendingParticipants(event) {
+            return countParticipants(event, attendStatus.Attending);
+        }
+
+        function countVirtuallyAttendingParticipants(event) {
+            return countParticipants(event, attendStatus.AttendingVirtually);
+        }
 
         function countParticipants(event, attendStatus) {
             return event.participants.reduce((sum, participant) => participant.attendStatus == attendStatus ? sum + 1 : 0, 0);
