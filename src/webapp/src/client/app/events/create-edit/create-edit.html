@@ -190,8 +190,7 @@
                         <label class="control-label col-xs-12 col-sm-4" translate="events.eventAttendOptions"></label>
                         <div>
                             <div class="col-sm-2">
-                                <input id="allowJoiningVirtually" type="checkbox" class="event-form-checkbox"
-                                    ng-model="vm.allowJoiningVirtually" ng-change="vm.manageVirtualParticipantCount()">
+                                <input id="allowJoiningVirtually" type="checkbox" class="event-form-checkbox" ng-model="vm.allowJoiningVirtually">
                                 <label for="allowJoiningVirtually" class="control-label"
                                     translate="events.eventAttendOptions_JoiningVirtually"></label>
                             </div>
@@ -312,12 +311,11 @@
                                 ng-model="vm.event.maxVirtualParticipants" ng-pattern="/^(0|\-?[1-9][0-9]*)$/" min="0"
                                 steps="1" max="{{:: vm.eventSettings.participantsLength}}"
                                 data-test-id="event-form-max-participants-input" ignore-mouse-wheel required>
-                            <!-- Reset participants checkbox thingy -->
-                            <div ng-if="vm.states.isEdit" ng-show="vm.event.maxVirtualParticipants < vm.minParticipants">
+                            <!-- Reset participants checkbox -->
+                            <div ng-if="vm.states.isEdit" ng-show="vm.event.maxVirtualParticipants < vm.minVirtualParticipants">
                                 <label for="resetVirtualParticipantList" translate="events.resetParticipantList"></label>
                                 <input id="resetVirtualParticipantList" type="checkbox" class="event-form-checkbox"
-                                    ng-model="vm.resetVirtualParticipantList"
-                                    data-test-id="event-reset-participant-list-checkbox">
+                                    ng-model="vm.resetVirtualParticipantList">
                             </div>
                             <!-- Error messages -->
                             <p class="text-danger help-block"

@@ -356,15 +356,6 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             }
         }
 
-        private EventParticipantAttendDto GetAttendingParticipant(EventJoinValidationDto validationDto, string userId) =>
-            validationDto.Participants.SingleOrDefault(p => p.Id == userId);
-
-        private async Task ValidateParticipantIsValidUser(EventJoinDto joinDto, string userId)
-        {
-            var userExists = await _usersDbSet.AnyAsync(x => x.Id == userId && x.OrganizationId == joinDto.OrganizationId);
-            _eventValidationService.CheckIfUserExists(userExists);
-        }
-
         private async Task ResetAttendeesAsync(Guid eventId, UserAndOrganizationDto userOrg, AttendingStatus? status)
         {
             var @event = await _eventsDbSet

@@ -11,14 +11,14 @@
             thumbHeight: 165,
             thumbWidth: 291,
             endDateHoursAddition: 2,
-            minOptions: 2
+            minOptions: 2,
         })
         .constant('recurringTypesResources', {
             0: 'none',
             1: 'everyDay',
             2: 'everyWeek',
             3: 'everyTwoWeeks',
-            4: 'everyMonth'
+            4: 'everyMonth',
         })
         .controller('addNewEventController', addNewEventController);
 
@@ -39,18 +39,34 @@
         'localeSrv',
         'lodash',
         'errorHandler',
-        'optionRules'
+        'optionRules',
     ];
 
-    function addNewEventController($rootScope, $scope, $stateParams, $state, $timeout, dataHandler,
-        authService, eventRepository, pictureRepository, eventSettings,
-        recurringTypesResources, $translate, notifySrv, localeSrv, lodash, errorHandler, optionRules) {
+    function addNewEventController(
+        $rootScope,
+        $scope,
+        $stateParams,
+        $state,
+        $timeout,
+        dataHandler,
+        authService,
+        eventRepository,
+        pictureRepository,
+        eventSettings,
+        recurringTypesResources,
+        $translate,
+        notifySrv,
+        localeSrv,
+        lodash,
+        errorHandler,
+        optionRules
+    ) {
         /* jshint validthis: true */
         var vm = this;
 
         vm.states = {
             isAdd: $state.includes('Root.WithOrg.Client.Events.AddEvents'),
-            isEdit: $state.includes('Root.WithOrg.Client.Events.EditEvent')
+            isEdit: $state.includes('Root.WithOrg.Client.Events.EditEvent'),
         };
 
         vm.resetParticipantList = false;
@@ -61,12 +77,14 @@
         vm.eventSettings = eventSettings;
         vm.eventImageSize = {
             w: eventSettings.thumbWidth,
-            h: eventSettings.thumbHeight
+            h: eventSettings.thumbHeight,
         };
         vm.endDateHoursAddition = eventSettings.endDateHoursAddition;
         vm.recurringTypesResources = recurringTypesResources;
 
-        $rootScope.pageTitle = vm.states.isAdd ? 'events.addTitle' : 'events.editTitle';
+        $rootScope.pageTitle = vm.states.isAdd
+            ? 'events.addTitle'
+            : 'events.editTitle';
 
         vm.isOfficeSelected = null;
         vm.eventOffices = [];
@@ -79,7 +97,6 @@
 
         vm.toggleOfficeSelection = toggleOfficeSelection;
         vm.toggleAllOffices = toggleAllOffices;
-        vm.manageVirtualParticipantCount = manageVirtualParticipantCount;
         vm.searchUsers = searchUsers;
         vm.addOption = addOption;
         vm.deleteOption = deleteOption;
@@ -111,7 +128,7 @@
             vm.datePickers = {
                 isOpenEventStartDatePicker: false,
                 isOpenEventFinishDatePicker: false,
-                isOpenEventDeadlineDatePicker: false
+                isOpenEventDeadlineDatePicker: false,
             };
 
             eventRepository.getEventOffices().then(function (response) {
@@ -127,8 +144,9 @@
             });
 
             function setEventTypes() {
-                $scope.$watch(function () {
-                        return vm.eventTypes
+                $scope.$watch(
+                    function () {
+                        return vm.eventTypes;
                     },
                     function () {
                         if (vm.eventTypes.length) {
@@ -136,33 +154,52 @@
                                 if (type.id == vm.event.typeId) {
                                     vm.selectedType = type;
                                 }
-                            })
+                            });
                         }
-                    });
+                    }
+                );
             }
 
             if ($stateParams.id) {
-                eventRepository.getEventUpdate($stateParams.id).then(function (event) {
+                eventRepository.getEventUpdate($stateParams.id).then(
+                    function (event) {
                         vm.event = event;
-                        vm.allowJoiningVirtually = event.maxVirtualParticipants > 0;
+                        vm.allowJoiningVirtually =
+                            event.maxVirtualParticipants > 0;
                         setEventTypes();
                         vm.responsibleUser = {
                             id: vm.event.hostUserId,
-                            fullName: vm.event.hostUserFullName
+                            fullName: vm.event.hostUserFullName,
                         };
 
-                        vm.minParticipants = vm.event.maxParticipants;
+                        vm.minParticipants = vm.event.maxParticipants; // ? how did i thought that this is correct
+                        vm.minVirtualParticipants = vm.event.maxVirtualParticipants;
 
-                        if (vm.event.startDate !== vm.event.registrationDeadlineDate) {
+                        if (
+                            vm.event.startDate !==
+                            vm.event.registrationDeadlineDate
+                        ) {
                             vm.isRegistrationDeadlineEnabled = true;
                         }
                         vm.event.offices = [];
                         vm.event.officeIds.forEach(function (value) {
                             vm.event.offices.push(value);
-                        })
-                        vm.event.registrationDeadlineDate = moment.utc(vm.event.registrationDeadlineDate).local().startOf('minute').toDate();
-                        vm.event.startDate = moment.utc(vm.event.startDate).local().startOf('minute').toDate();
-                        vm.event.endDate = moment.utc(vm.event.endDate).local().startOf('minute').toDate();
+                        });
+                        vm.event.registrationDeadlineDate = moment
+                            .utc(vm.event.registrationDeadlineDate)
+                            .local()
+                            .startOf('minute')
+                            .toDate();
+                        vm.event.startDate = moment
+                            .utc(vm.event.startDate)
+                            .local()
+                            .startOf('minute')
+                            .toDate();
+                        vm.event.endDate = moment
+                            .utc(vm.event.endDate)
+                            .local()
+                            .startOf('minute')
+                            .toDate();
 
                         if (!!vm.event.options.length) {
                             vm.isOptions = true;
@@ -178,9 +215,10 @@
                         errorHandler.handleErrorMessage(error);
 
                         $state.go('Root.WithOrg.Client.Events.List.Type', {
-                            type: 'all'
+                            type: 'all',
                         });
-                    });
+                    }
+                );
             } else {
                 getResponsiblePerson(authService.identity.userId);
 
@@ -188,8 +226,16 @@
                     name: '',
                     typeId: null,
                     offices: [],
-                    startDate: moment().add(1, 'hours').local().startOf('minute').toDate(),
-                    endDate: moment().add(3, 'hours').local().startOf('minute').toDate(),
+                    startDate: moment()
+                        .add(1, 'hours')
+                        .local()
+                        .startOf('minute')
+                        .toDate(),
+                    endDate: moment()
+                        .add(3, 'hours')
+                        .local()
+                        .startOf('minute')
+                        .toDate(),
                     isPinned: false,
                     allowMaybeGoing: true,
                     allowNotGoing: true,
@@ -200,23 +246,29 @@
                     maxOptions: 1,
                     options: [],
                     registrationDeadlineDate: null,
-                    maxVirtualParticipants: 0
+                    maxVirtualParticipants: 0,
                 };
 
-                eventRepository.getMaxEventParticipants().query(function (response) {
-                    vm.event.maxParticipants = response.value;
-                });
+                eventRepository
+                    .getMaxEventParticipants()
+                    .query(function (response) {
+                        vm.event.maxParticipants = response.value;
+                    });
 
                 addOption();
             }
 
-            $scope.$watch('vm.responsibleUser', function (newVal) {
-                if (newVal && !newVal.id) {
-                    vm.isResponsibleUserError = true;
-                } else {
-                    vm.isResponsibleUserError = null;
-                }
-            }, true);
+            $scope.$watch(
+                'vm.responsibleUser',
+                function (newVal) {
+                    if (newVal && !newVal.id) {
+                        vm.isResponsibleUserError = true;
+                    } else {
+                        vm.isResponsibleUserError = null;
+                    }
+                },
+                true
+            );
         }
 
         function toggleOfficeSelection(office) {
@@ -238,7 +290,7 @@
                 vm.event.offices = [];
                 angular.forEach(vm.eventOffices, function (office) {
                     vm.event.offices.push(office.id);
-                })
+                });
             }
 
             validateOfficeSelection();
@@ -253,20 +305,27 @@
         }
 
         function searchUsers(search) {
-            return eventRepository.getUserForAutoCompleteResponsiblePerson(search);
+            return eventRepository.getUserForAutoCompleteResponsiblePerson(
+                search
+            );
         }
 
         function getResponsiblePerson(userId) {
-            eventRepository.getUserResponsiblePersonById(userId).then(function (data) {
-                vm.responsibleUser = data;
-            });
+            eventRepository
+                .getUserResponsiblePersonById(userId)
+                .then(function (data) {
+                    vm.responsibleUser = data;
+                });
         }
 
         function isValidOption(options, option) {
             for (var i = 0; options.length > i; i++) {
-                if (options.indexOf(option) !== i &&
-                    option.option && options[i].option &&
-                    option.option === options[i].option) {
+                if (
+                    options.indexOf(option) !== i &&
+                    option.option &&
+                    options[i].option &&
+                    option.option === options[i].option
+                ) {
                     return false;
                 }
             }
@@ -286,7 +345,7 @@
 
         function addOption() {
             vm.event.options.push({
-                option: ''
+                option: '',
             });
         }
 
@@ -306,8 +365,11 @@
         }
 
         function countOptions() {
-            return vm.isIgnoreSingleJoinEnabled && vm.selectedType &&
-                    vm.selectedType.isSingleJoin ? vm.event.options.length + 1 : vm.event.options.length;
+            return vm.isIgnoreSingleJoinEnabled &&
+                vm.selectedType &&
+                vm.selectedType.isSingleJoin
+                ? vm.event.options.length + 1
+                : vm.event.options.length;
         }
 
         function togglePin() {
@@ -316,14 +378,19 @@
 
         function saveEvent(method, newImage) {
             if (newImage.length) {
-                var eventImageBlob = dataHandler.dataURItoBlob(vm.eventCroppedImage[0], vm.eventImage[0].type);
+                var eventImageBlob = dataHandler.dataURItoBlob(
+                    vm.eventCroppedImage[0],
+                    vm.eventImage[0].type
+                );
 
                 eventImageBlob.lastModifiedDate = new Date();
                 eventImageBlob.name = vm.eventImage[0].name;
 
-                pictureRepository.upload([eventImageBlob]).then(function (result) {
-                    method(result.data);
-                });
+                pictureRepository
+                    .upload([eventImageBlob])
+                    .then(function (result) {
+                        method(result.data);
+                    });
             } else {
                 method();
             }
@@ -334,7 +401,7 @@
                 notifySrv.success('events.successDelete');
 
                 $state.go('Root.WithOrg.Client.Events.List.Type', {
-                    type: 'all'
+                    type: 'all',
                 });
             }, errorHandler.handleErrorMessage);
         }
@@ -349,17 +416,19 @@
                     vm.event.imageName = image;
                 }
 
-                eventRepository.createEvent(vm.event).then(function (result) {
+                eventRepository.createEvent(vm.event).then(
+                    function (result) {
                         notifySrv.success('common.successfullySaved');
 
                         $state.go('Root.WithOrg.Client.Events.EventContent', {
-                            id: result.id
+                            id: result.id,
                         });
                     },
                     function (error) {
                         vm.isSaveButtonEnabled = true;
                         errorHandler.handleErrorMessage(error);
-                    });
+                    }
+                );
             }
         }
 
@@ -373,17 +442,19 @@
                     vm.event.imageName = image;
                 }
 
-                eventRepository.updateEvent(vm.event).then(function (result) {
+                eventRepository.updateEvent(vm.event).then(
+                    function (result) {
                         notifySrv.success('common.successfullySaved');
 
                         $state.go('Root.WithOrg.Client.Events.EventContent', {
-                            id: result.id
+                            id: result.id,
                         });
                     },
                     function (error) {
                         vm.isSaveButtonEnabled = true;
                         errorHandler.handleErrorMessage(error);
-                    });
+                    }
+                );
             }
         }
 
@@ -406,34 +477,47 @@
                 vm.event.newOptions = lodash.map(tempArray, (obj) => {
                     return {
                         option: obj.option,
-                        rule: optionRules.default
-                    }
+                        rule: optionRules.default,
+                    };
                 });
 
-                vm.event.editedOptions = lodash.filter(vm.event.options, function (element) {
-                    return !!element.id;
-                });
-
-                if (vm.isIgnoreSingleJoinEnabled && vm.selectedType.isSingleJoin) {
-                   var optionValue;
-
-                    if (!vm.ignoreSingleJoinOption || !vm.ignoreSingleJoinOption.option) {
-                        optionValue = localeSrv.translate('events.ignoreSingleJoinDefaultOption');
+                vm.event.editedOptions = lodash.filter(
+                    vm.event.options,
+                    function (element) {
+                        return !!element.id;
                     }
-                    else {
+                );
+
+                if (
+                    vm.isIgnoreSingleJoinEnabled &&
+                    vm.selectedType.isSingleJoin
+                ) {
+                    var optionValue;
+
+                    if (
+                        !vm.ignoreSingleJoinOption ||
+                        !vm.ignoreSingleJoinOption.option
+                    ) {
+                        optionValue = localeSrv.translate(
+                            'events.ignoreSingleJoinDefaultOption'
+                        );
+                    } else {
                         optionValue = vm.ignoreSingleJoinOption.option;
                     }
 
-                    if (vm.ignoreSingleJoinOption && vm.ignoreSingleJoinOption.id) {
+                    if (
+                        vm.ignoreSingleJoinOption &&
+                        vm.ignoreSingleJoinOption.id
+                    ) {
                         vm.event.editedOptions.push({
                             id: vm.ignoreSingleJoinOption.id,
                             option: optionValue,
-                            rule: optionRules.default
+                            rule: optionRules.default,
                         });
                     } else {
                         vm.event.newOptions.push({
                             option: optionValue,
-                            rule: optionRules.ignoreSingleJoin
+                            rule: optionRules.ignoreSingleJoin,
                         });
                     }
                 }
@@ -446,16 +530,27 @@
             }
 
             vm.event.responsibleUserId = vm.responsibleUser.id;
-            vm.event.endDate = moment(vm.event.endDate).local().startOf('minute').toDate();
+            vm.event.endDate = moment(vm.event.endDate)
+                .local()
+                .startOf('minute')
+                .toDate();
         }
 
         function manageParticipantResets() {
             if (vm.states.isEdit && vm.resetParticipantList) {
-                vm.event.resetParticipantList = vm.event.maxParticipants < vm.minParticipants;
+                vm.event.resetParticipantList =
+                    vm.event.maxParticipants < vm.minParticipants;
+            }
+
+            if (!vm.allowJoiningVirtually) {
+                vm.event.maxVirtualParticipants = 0;
+                vm.event.resetVirtualParticipantList = true;
+                return;
             }
 
             if (vm.states.isEdit && vm.resetVirtualParticipantList) {
-                vm.event.resetVirtualParticipantList = vm.event.maxVirtualParticipants < vm.minParticipants;
+                vm.event.resetVirtualParticipantList =
+                    vm.event.maxVirtualParticipants < vm.minVirtualParticipants;
             }
         }
 
@@ -474,22 +569,6 @@
             $timeout(function () {
                 $event.target.focus();
             }, 100);
-        }
-
-        function manageVirtualParticipantCount() {
-            if (vm.event.allowJoiningVirtually) {
-                return;
-            }
-
-            if (hasVirtualParticipantCountSet()) {
-                vm.event.resetVirtualParticipantList = true;
-            }
-
-            vm.event.maxVirtualParticipants = 0;
-        }
-
-        function hasVirtualParticipantCountSet() {
-            return vm.states.isEdit && vm.maxVirtualParticipants != 0;
         }
 
         function closeAllDatePickers(datePicker) {
@@ -518,18 +597,24 @@
 
         function isDeadlineDateValid() {
             if (vm.states.isAdd) {
-                return vm.isRegistrationDeadlineEnabled &&
+                return (
+                    vm.isRegistrationDeadlineEnabled &&
                     (vm.event.registrationDeadlineDate > vm.event.startDate ||
-                        vm.event.registrationDeadlineDate < vm.minStartDate);
+                        vm.event.registrationDeadlineDate < vm.minStartDate)
+                );
             } else {
-                return vm.isRegistrationDeadlineEnabled &&
+                return (
+                    vm.isRegistrationDeadlineEnabled &&
                     (vm.event.registrationDeadlineDate > vm.event.startDate ||
-                        !vm.event.registrationDeadlineDate);
+                        !vm.event.registrationDeadlineDate)
+                );
             }
         }
 
         function setIgnoreSingleJoinOption(options) {
-            var index = options.findIndex(o => o.rule == optionRules.ignoreSingleJoin);
+            var index = options.findIndex(
+                (o) => o.rule == optionRules.ignoreSingleJoin
+            );
 
             if (index > -1) {
                 vm.isIgnoreSingleJoinEnabled = true;
