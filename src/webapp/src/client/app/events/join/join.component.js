@@ -52,6 +52,7 @@
         vm.hasDatePassed = hasDatePassed;
         vm.openJoinCommentModal = openJoinCommentModal;
         vm.closeModal = closeModal;
+        vm.canShowChangeOptions = canShowChangeOptions;
 
         vm.isAttendingEvent = isAttendingEvent;
         vm.isVirtualParticipantsCapacityReached = isVirtualParticipantsCapacityReached;
@@ -284,6 +285,15 @@
 
         function hasDatePassed(date) {
             return moment.utc(date).local().isAfter();
+        }
+
+        function canShowChangeOptions() {
+            return isAttendingEvent() && !vm.isAddColleague && vm.isDetails;
+        }
+
+        function isAttendingEvent() {
+            return vm.event.participatingStatus === vm.attendStatus.AttendingVirtually ||
+                   vm.event.participatingStatus === vm.attendStatus.Attending;
         }
     }
 })();

@@ -97,10 +97,7 @@
     </div>
 </div>
 
-<ace-event-options-change
-    ng-if="vm.event.participatingStatus === vm.attendStatus.Attending && !vm.isAddColleague && vm.isDetails"
-    event="vm.event">
-</ace-event-options-change>
+<ace-event-options-change ng-if="vm.canShowChangeOptions()" event="vm.event" attend-status="vm.attendStatus"></ace-event-options-change>
 
 <div class="text-nowrap row" ng-if="!vm.isAddColleague && !vm.isDetails">
     <div ng-if="!vm.isAttendingEvent()">

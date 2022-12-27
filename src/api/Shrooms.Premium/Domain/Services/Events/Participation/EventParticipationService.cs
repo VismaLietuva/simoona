@@ -319,7 +319,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             _eventValidationService.CheckIfSingleChoiceSelectedWithRule(eventEntity.SelectedOptions, OptionRules.IgnoreSingleJoin);
             _eventValidationService.CheckIfUserParticipatesInEvent(changeOptionsDto.UserId, eventEntity.Participants);
 
-            await ValidateSingleJoinForSameTypeEventsIfNeededAsync(eventEntity, changeOptionsDto.OrganizationId, changeOptionsDto.UserId);
+            await ValidateSingleJoinForSameTypeEventsAsync(eventEntity, changeOptionsDto.OrganizationId, changeOptionsDto.UserId);
 
             var participant = await _eventParticipantsDbSet
                 .Include(x => x.EventOptions)
@@ -606,7 +606,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 SendEmailToManager = e.EventType.SendEmailToManager
             };
 
-        private async Task ValidateSingleJoinForSameTypeEventsIfNeededAsync(EventJoinValidationDto validationDto, int orgId, string userId)
+        private async Task ValidateSingleJoinForSameTypeEventsAsync(EventJoinValidationDto validationDto, int orgId, string userId)
         {
             if (validationDto.SelectedOptions.All(x => x.Rule == OptionRules.IgnoreSingleJoin) &&
                 validationDto.SelectedOptions.Count != 0 ||
@@ -777,7 +777,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
         {
             foreach (var userId in firstTimeJoinParticipantIds)
             {
-                await ValidateSingleJoinForSameTypeEventsIfNeededAsync(eventDto, joinDto.OrganizationId, userId);
+                await ValidateSingleJoinForSameTypeEventsAsync(eventDto, joinDto.OrganizationId, userId);
                 await AddParticipantAsync(eventDto, joinDto, userId);
             }
         }
