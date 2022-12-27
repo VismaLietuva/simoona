@@ -184,13 +184,6 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         }
 
         [Test]
-        public void Should_Not_Throw_If_Joining_User_Is_Not_Participating_In_Event()
-        {
-            const bool isAlreadyParticipating = false;
-            Assert.DoesNotThrow(() => _eventValidationService.CheckIfUserAlreadyJoinedSameEvent(isAlreadyParticipating));
-        }
-
-        [Test]
         public void Should_Throw_If_Joining_User_Provided_Not_Enough_Options()
         {
             const int maxChoices = 2;
@@ -215,14 +208,6 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             const int participantsCount = 6;
             var ex = Assert.Throws<EventException>(() => _eventValidationService.CheckIfEventHasEnoughPlaces(maxParticipants, participantsCount));
             Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventIsFullCode));
-        }
-
-        [Test]
-        public void Should_Throw_If_Joining_Many_Users_One_Participant_Has_Already_Joined()
-        {
-            const bool isAlreadyParticipating = true;
-            var ex = Assert.Throws<EventException>(() => _eventValidationService.CheckIfUserAlreadyJoinedSameEvent(isAlreadyParticipating));
-            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventUserAlreadyParticipatesCode));
         }
 
         [Test]
@@ -354,8 +339,8 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 UserId = "user1"
             };
 
-            await _eventParticipationService.ResetAttendeesAsync(eventId, user);
-            _eventParticipantsDbSet.Received(3).Remove(Arg.Any<EventParticipant>());
+            await _eventParticipationService.ResetAllAttendeesAsync(eventId, user);
+            _eventParticipantsDbSet.Received(1).RemoveRange(Arg.Any<IEnumerable<EventParticipant>>());
         }
 
         [Test]
@@ -549,8 +534,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             var dto = new EventChangeOptionsDto { EventId = guid, OrganizationId = 2, ChosenOptions = chosenOptionIds, UserId = "1foo2bar" };
 
             _eventValidationServiceMock
-                .When(x => x.CheckIfUserParticipatesInEvent("1foo2bar",
-                    Arg.Is<List<string>>(a => a.All(p => p == "user" || p == "user2"))))
+                .When(x => x.CheckIfUserParticipatesInEvent("1foo2bar", Arg.Any<IEnumerable<EventParticipantAttendDto>>()))
                 .Do(_ => throw new EventException(PremiumErrorCodes.EventUserNotParticipating));
 
             Assert.ThrowsAsync<EventException>(async () => await _eventParticipationService.UpdateSelectedOptionsAsync(dto), PremiumErrorCodes.EventUserNotParticipating);
@@ -724,7 +708,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             };
 
             // Act
-            await _eventParticipationService.ResetAttendeesAsync(eventId, user);
+            await _eventParticipationService.ResetAllAttendeesAsync(eventId, user);
 
 
             // Assert
@@ -748,7 +732,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             };
 
             // Act
-            await _eventParticipationService.ResetAttendeesAsync(eventId, user);
+            await _eventParticipationService.ResetAllAttendeesAsync(eventId, user);
 
 
             // Assert

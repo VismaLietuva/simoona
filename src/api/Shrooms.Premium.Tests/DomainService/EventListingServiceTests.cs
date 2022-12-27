@@ -1251,7 +1251,8 @@ namespace Shrooms.Premium.Tests.DomainService
                                 Name = "Cool project"
                             }
                         }
-                    }
+                    },
+                    AttendStatus = (int)AttendingStatus.AttendingVirtually
                 },
                 new EventParticipant
                 {
@@ -1286,7 +1287,8 @@ namespace Shrooms.Premium.Tests.DomainService
                                 Name = "Cool project"
                             }
                         }
-                    }
+                    },
+                    AttendStatus = (int)AttendingStatus.Attending
                 },
                 new EventParticipant
                 {
@@ -1321,7 +1323,8 @@ namespace Shrooms.Premium.Tests.DomainService
                                 Name = "Cool project"
                             }
                         }
-                    }
+                    },
+                    AttendStatus = (int)AttendingStatus.AttendingVirtually
                 }
             };
 
