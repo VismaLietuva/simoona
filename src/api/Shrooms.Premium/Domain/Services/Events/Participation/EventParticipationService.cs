@@ -67,11 +67,11 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             _asyncRunner = asyncRunner;
         }
 
-        public async Task ResetVirtualAttendeesAsync(Guid eventId, UserAndOrganizationDto userOrg) =>
-            await ResetAttendeesAsync(eventId, userOrg, AttendingStatus.AttendingVirtually);
+        public async Task ResetVirtualAttendeesAsync(Event @event, UserAndOrganizationDto userOrg) =>
+            await ResetAttendeesAsync(@event, userOrg, AttendingStatus.AttendingVirtually);
 
-        public async Task ResetAttendeesAsync(Guid eventId, UserAndOrganizationDto userOrg) =>
-            await ResetAttendeesAsync(eventId, userOrg, AttendingStatus.Attending);
+        public async Task ResetAttendeesAsync(Event @event, UserAndOrganizationDto userOrg) =>
+            await ResetAttendeesAsync(@event, userOrg, AttendingStatus.Attending);
 
         public async Task ResetAllAttendeesAsync(Guid eventId, UserAndOrganizationDto userOrg) =>
             await ResetAttendeesAsync(eventId, userOrg, null);
@@ -366,6 +366,11 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
               .Include(e => e.EventParticipants.Select(participant => participant.ApplicationUser.Manager))
               .SingleOrDefaultAsync(e => e.Id == eventId && e.OrganizationId == userOrg.OrganizationId);
 
+            await ResetAttendeesAsync(@event, userOrg, status);
+        }
+
+        private async Task ResetAttendeesAsync(Event @event, UserAndOrganizationDto userOrg, AttendingStatus? status)
+        {
             if (!@event.EventParticipants.Any())
             {
                 return;

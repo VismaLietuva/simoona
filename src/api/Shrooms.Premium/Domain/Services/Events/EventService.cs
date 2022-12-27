@@ -181,9 +181,12 @@ namespace Shrooms.Premium.Domain.Services.Events
         public async Task UpdateEventAsync(EditEventDto eventDto)
         {
             var eventToUpdate = await _eventsDbSet
-                .Include(e => e.EventOptions)
                 .Include(e => e.EventParticipants)
-                .FirstOrDefaultAsync(e => e.Id == eventDto.Id && e.OrganizationId == eventDto.OrganizationId);
+                .Include(e => e.EventOptions)
+                .Include(e => e.EventType)
+                .Include(e => e.EventParticipants.Select(participant => participant.ApplicationUser))
+                .Include(e => e.EventParticipants.Select(participant => participant.ApplicationUser.Manager))
+                .SingleOrDefaultAsync(e => e.Id == eventDto.Id && e.OrganizationId == eventDto.OrganizationId);
 
             var totalOptionsProvided = eventDto.NewOptions.Count() + eventDto.EditedOptions.Count();
             eventDto.MaxOptions = FindOutMaxChoices(totalOptionsProvided, eventDto.MaxOptions);
@@ -199,7 +202,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             _eventValidationService.CheckIfAttendOptionsAllowedToUpdate(eventDto, eventToUpdate);
 
             await ValidateEvent(eventDto);
-            await ResetEventAttendessAsync(eventDto);
+            await ResetEventAttendessAsync(eventToUpdate, eventDto);
             await UpdateWallAsync(eventToUpdate, eventDto);
             UpdateEventInfo(eventDto, eventToUpdate);
             UpdateEventOptions(eventDto, eventToUpdate);
@@ -209,16 +212,16 @@ namespace Shrooms.Premium.Domain.Services.Events
             eventToUpdate.Description = _markdownConverter.ConvertToHtml(eventToUpdate.Description);
         }
 
-        private async Task ResetEventAttendessAsync(EditEventDto eventDto)
+        private async Task ResetEventAttendessAsync(Event @event, EditEventDto eventDto)
         {
             if (eventDto.ResetParticipantList)
             {
-                await _eventParticipationService.ResetAttendeesAsync(eventDto.Id, eventDto);
+                await _eventParticipationService.ResetAttendeesAsync(@event, eventDto);
             }
 
             if (eventDto.ResetVirtualParticipantList)
             {
-                await _eventParticipationService.ResetVirtualAttendeesAsync(eventDto.Id, eventDto);
+                await _eventParticipationService.ResetVirtualAttendeesAsync(@event, eventDto);
             }
         }
 
