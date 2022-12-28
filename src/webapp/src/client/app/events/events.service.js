@@ -15,20 +15,25 @@
             getTotalGoingParticipantCount: getTotalGoingParticipantCount,
             getTotalMaxParticipantCount: getTotalMaxParticipantCount,
             countVirtuallyAttendingParticipants: countVirtuallyAttendingParticipants,
-            countAttendingParticipants: countAttendingParticipants
+            countAttendingParticipants: countAttendingParticipants,
+            countAllAttendingParticipants: countAllAttendingParticipants
         };
         return service;
 
         function countAttendingParticipants(event) {
-            return countParticipants(event, attendStatus.Attending);
+            return countParticipants(event, [attendStatus.Attending]);
         }
 
         function countVirtuallyAttendingParticipants(event) {
-            return countParticipants(event, attendStatus.AttendingVirtually);
+            return countParticipants(event, [attendStatus.AttendingVirtually]);
         }
 
-        function countParticipants(event, status) {
-            return event.participants.reduce((sum, participant) => participant.attendStatus == status ? sum + 1 : sum, 0);
+        function countAllAttendingParticipants(event) {
+            return countParticipants(event, [attendStatus.Attending, attendStatus.AttendingVirtually]);
+        }
+
+        function countParticipants(event, statuses) {
+            return event.participants.reduce((sum, participant) => statuses.includes(participant.attendStatus) ? sum + 1 : sum, 0);
         }
 
         function hasSpaceForVirtualParticipant(event) {

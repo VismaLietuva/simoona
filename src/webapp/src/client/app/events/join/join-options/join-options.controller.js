@@ -190,12 +190,11 @@
         }
 
         function getLeftParticipantCountForAdd() {
-            var leftCount = vm.participants.length + event.participants.length - event.maxParticipants - event.maxVirtualParticipants;
-            return leftCount < 0 ? 0 : leftCount;
+            return eventService.getTotalMaxParticipantCount(event) - eventService.countAllAttendingParticipants(event);
         }
 
         function isAddingTooManyParticipants() {
-            return vm.participants.length + event.participants.length > event.maxParticipants + event.maxVirtualParticipants;
+            return vm.participants.length + eventService.countAllAttendingParticipants(event) > eventService.getTotalMaxParticipantCount(event);
         }
 
         function updateOptions() {
