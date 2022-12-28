@@ -19,8 +19,19 @@
         </div>
 
         <ul ng-if="!!vm.participants.length && vm.isExpanded" class="event-participant-list">
+            <!-- Attending and virtually attending selected options -->
+            <div ng-if="!vm.isMainParticipantList" class="panel panel-info">
+                <div class="panel-body">
+                    <li ng-repeat="participant in vm.getAllAttendingParticipants()">
+                        <ace-event-participant participant="participant">
+                            <span ng-if="!!participant.userId && !participant.isLoading" translate-cloak></span>
+                        </ace-event-participant>
+                    </li>
+                </div>
+            </div>
+
             <!-- Attending -->
-            <div ng-show="!!vm.attendingParticipants().length" class="panel panel-info" >
+            <div ng-if="vm.isMainParticipantList" ng-show="!!vm.attendingParticipants().length" class="panel panel-info" >
                 <div ng-show="vm.isMainParticipantList" class="panel-heading">{{'events.eventParticipantStatus_Attending' | translate}} ({{vm.attendingParticipants().length}})</div>
                 <div class="panel-body">
                     <li ng-repeat="participant in vm.attendingParticipants()">
@@ -38,10 +49,10 @@
             </div>
 
             <!-- Virtually attending -->
-            <div ng-show="!!vm.getAttendingVirtuallyParticipant().length" class="panel panel-info" >
-                <div ng-show="vm.isMainParticipantList" class="panel-heading">{{'events.eventParticipantStatus_JoiningVirtually' | translate}} ({{vm.getAttendingVirtuallyParticipant().length}})</div>
+            <div ng-if="vm.isMainParticipantList" ng-show="!!vm.getAttendingVirtuallyParticipants().length" class="panel panel-info">
+                <div ng-show="vm.isMainParticipantList" class="panel-heading">{{'events.eventParticipantStatus_JoiningVirtually' | translate}} ({{vm.getAttendingVirtuallyParticipants().length}})</div>
                 <div class="panel-body">
-                    <li ng-repeat="participant in vm.getAttendingVirtuallyParticipant()">
+                    <li ng-repeat="participant in vm.getAttendingVirtuallyParticipants()">
                         <ace-event-participant participant="participant">
                             <span ng-if="!!participant.userId && !participant.isLoading && vm.isDeleteVisible"
                                 class="event-participant-delete-button vismaicon vismaicon-cancel-circle"
