@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
+using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 
 namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
@@ -21,9 +22,9 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
         void CheckIfSingleChoiceSelectedWithRule(ICollection<EventOption> options, OptionRules rule);
         void CheckIfJoiningEventStartDateHasPassed(DateTime startDate);
         void CheckIfEventIsFull(int maxParticipants, int participantsCount);
-        void CheckIfAttendStatusIsValid(int status);
-        void CheckIfJoinAttendStatusIsValid(int attendStatus, EventJoinValidationDto @event);
-        void CheckIfAttendOptionIsAllowed(int attendStatus, EventJoinValidationDto @event);
+        void CheckIfAttendStatusIsValid(AttendingStatus status);
+        void CheckIfJoinAttendStatusIsValid(AttendingStatus status, EventJoinValidationDto @event);
+        void CheckIfAttendOptionIsAllowed(AttendingStatus status, EventJoinValidationDto @event);
         void CheckIfAttendOptionsAllowedToUpdate(EditEventDto eventDto, Event eventToUpdate);
         void CheckIfRegistrationDeadlineIsExpired(DateTime registrationDeadline);
         void CheckIfUserExistsInOtherSingleJoinEvent(bool anyEvents);

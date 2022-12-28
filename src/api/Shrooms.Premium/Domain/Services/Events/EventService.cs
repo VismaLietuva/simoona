@@ -132,7 +132,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             @event.NotGoingCount = @event.Participants.Count(p => p.AttendStatus == (int)AttendingStatus.NotAttending);
 
             var participating = @event.Participants.FirstOrDefault(p => p.UserId == userOrg.UserId);
-            @event.ParticipatingStatus = participating?.AttendStatus ?? (int)AttendingStatus.Idle;
+            @event.ParticipatingStatus = (AttendingStatus?)participating?.AttendStatus ?? AttendingStatus.Idle;
 
             // If user has permissions - show all participants, otherwise show only current user and his own event options
             if (await _permissionService.UserHasPermissionAsync(userOrg, BasicPermissions.EventUsers))

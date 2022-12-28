@@ -639,7 +639,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
             _eventValidationService.CheckIfUserExistsInOtherSingleJoinEvent(anyEventsAlreadyJoined);
         }
 
-        private async Task CreateParticipantAsync(string userId, Guid eventId, ICollection<EventOption> eventOptions, int attendStatus)
+        private async Task CreateParticipantAsync(string userId, Guid eventId, ICollection<EventOption> eventOptions, AttendingStatus status)
         {
             var timeStamp = _systemClock.UtcNow;
             var participant = await _eventParticipantsDbSet
@@ -658,7 +658,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                     ModifiedBy = userId,
                     EventOptions = eventOptions,
                     AttendComment = string.Empty,
-                    AttendStatus = attendStatus
+                    AttendStatus = (int)status
                 };
                 _eventParticipantsDbSet.Add(newParticipant);
             }
@@ -667,19 +667,19 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                 participant.Modified = timeStamp;
                 participant.ModifiedBy = userId;
                 participant.EventOptions = eventOptions;
-                participant.AttendStatus = attendStatus;
+                participant.AttendStatus = (int)status;
                 participant.AttendComment = string.Empty;
             }
         }
 
-        private async Task AddParticipantWithStatusAsync(string userId, int attendingStatus, string attendComment, EventJoinValidationDto eventDto)
+        private async Task AddParticipantWithStatusAsync(string userId, AttendingStatus status, string attendComment, EventJoinValidationDto eventDto)
         {
             var timeStamp = _systemClock.UtcNow;
             var participant = await _eventParticipantsDbSet.FirstOrDefaultAsync(p => p.EventId == eventDto.Id && p.ApplicationUserId == userId);
 
             if (participant != null)
             {
-                participant.AttendStatus = attendingStatus;
+                participant.AttendStatus = (int)status;
                 participant.AttendComment = attendComment;
                 participant.Modified = timeStamp;
                 participant.ModifiedBy = userId;
@@ -695,7 +695,7 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
                     Modified = timeStamp,
                     ModifiedBy = userId,
                     AttendComment = attendComment,
-                    AttendStatus = attendingStatus
+                    AttendStatus = (int)status
                 };
 
                 _eventParticipantsDbSet.Add(newParticipant);

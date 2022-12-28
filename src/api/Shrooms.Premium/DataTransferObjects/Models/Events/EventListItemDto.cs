@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Shrooms.Premium.Constants;
+using System;
 
 namespace Shrooms.Premium.DataTransferObjects.Models.Events
 {
@@ -32,7 +33,7 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
 
         public bool IsCreator { get; set; }
 
-        public int ParticipatingStatus { get; set; }
+        public AttendingStatus ParticipatingStatus { get; set; }
 
         public int MaxChoices { get; set; }
     }

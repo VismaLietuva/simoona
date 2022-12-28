@@ -166,7 +166,7 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             }
         }
 
-        public void CheckIfAttendStatusIsValid(int status)
+        public void CheckIfAttendStatusIsValid(AttendingStatus status)
         {
             if (!Enum.IsDefined(typeof(AttendingStatus), status))
             {
@@ -174,32 +174,32 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             }
         }
 
-        public void CheckIfAttendOptionIsAllowed(int attendStatus, EventJoinValidationDto @event)
+        public void CheckIfAttendOptionIsAllowed(AttendingStatus status, EventJoinValidationDto @event)
         {
-            if (attendStatus == (int)AttendingStatus.MaybeAttending && !@event.AllowMaybeGoing)
+            if (status == AttendingStatus.MaybeAttending && !@event.AllowMaybeGoing)
             {
                 throw new EventException(PremiumErrorCodes.EventAttendTypeIsNotAllowed);
             }
 
-            if (attendStatus == (int)AttendingStatus.NotAttending && !@event.AllowNotGoing)
+            if (status == AttendingStatus.NotAttending && !@event.AllowNotGoing)
             {
                 throw new EventException(PremiumErrorCodes.EventAttendTypeIsNotAllowed);
             }
         }
 
-        public void CheckIfJoinAttendStatusIsValid(int attendStatus, EventJoinValidationDto @event)
+        public void CheckIfJoinAttendStatusIsValid(AttendingStatus status, EventJoinValidationDto @event)
         {
-            if (attendStatus != (int)AttendingStatus.AttendingVirtually && attendStatus != (int)AttendingStatus.Attending)
+            if (status != AttendingStatus.AttendingVirtually && status != AttendingStatus.Attending)
             {
                 throw new EventException(PremiumErrorCodes.EventAttendTypeIsNotAllowed);
             }
 
-            if (attendStatus == (int)AttendingStatus.AttendingVirtually && @event.MaxVirtualParticipants == 0)
+            if (status == AttendingStatus.AttendingVirtually && @event.MaxVirtualParticipants == 0)
             {
                 throw new EventException(PremiumErrorCodes.EventAttendTypeIsNotAllowed);
             }
 
-            if (attendStatus == (int)AttendingStatus.Attending && @event.MaxParticipants == 0)
+            if (status == AttendingStatus.Attending && @event.MaxParticipants == 0)
             {
                 throw new EventException(PremiumErrorCodes.EventAttendTypeIsNotAllowed);
             }
@@ -311,10 +311,10 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
         public void CheckIfCanJoinEvent(EventJoinDto joinDto, EventJoinValidationDto joinValidationDto)
         {
             var newParticipantCount = joinDto.ParticipantIds.Count();
-            var maxParticipantCount = joinDto.AttendStatus == (int)AttendingStatus.Attending ?
+            var maxParticipantCount = joinDto.AttendStatus == AttendingStatus.Attending ?
                 joinValidationDto.MaxParticipants :
                 joinValidationDto.MaxVirtualParticipants;
-            var participantCount = joinValidationDto.Participants.Count(participant => participant.AttendStatus == joinDto.AttendStatus);
+            var participantCount = joinValidationDto.Participants.Count(participant => (AttendingStatus)participant.AttendStatus == joinDto.AttendStatus);
 
             if (maxParticipantCount < newParticipantCount + participantCount)
             {

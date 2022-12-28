@@ -389,7 +389,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         [TestCase((AttendingStatus)int.MaxValue)]
         public void Should_Throw_If_Invalid_Attend_Status_Given_For_Join(AttendingStatus status)
         {
-            Assert.Throws<EventException>(() => _eventValidationService.CheckIfJoinAttendStatusIsValid((int)status, new EventJoinValidationDto()));
+            Assert.Throws<EventException>(() => _eventValidationService.CheckIfJoinAttendStatusIsValid(status, new EventJoinValidationDto()));
         }
 
         [TestCase(AttendingStatus.Attending)]
@@ -402,59 +402,59 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
                 MaxVirtualParticipants = 1
             };
 
-            Assert.DoesNotThrow(() => _eventValidationService.CheckIfJoinAttendStatusIsValid((int)status, validationDto));
+            Assert.DoesNotThrow(() => _eventValidationService.CheckIfJoinAttendStatusIsValid(status, validationDto));
         }
 
         [Test]
         public void Should_Throw_If_Can_Not_Join_Virtually()
         {
-            var status = (int)AttendingStatus.AttendingVirtually;
+            var status = AttendingStatus.AttendingVirtually;
             var validationDto = new EventJoinValidationDto
             {
                 MaxParticipants = 1,
                 MaxVirtualParticipants = 0
             };
 
-            Assert.Throws<EventException>(() => _eventValidationService.CheckIfJoinAttendStatusIsValid((int)status, validationDto));
+            Assert.Throws<EventException>(() => _eventValidationService.CheckIfJoinAttendStatusIsValid(status, validationDto));
         }
 
         [Test]
         public void Should_Not_Throw_If_Can_Join_Virtually()
         {
-            var status = (int)AttendingStatus.AttendingVirtually;
+            var status = AttendingStatus.AttendingVirtually;
             var validationDto = new EventJoinValidationDto
             {
                 MaxParticipants = 1,
                 MaxVirtualParticipants = 1
             };
 
-            Assert.DoesNotThrow(() => _eventValidationService.CheckIfJoinAttendStatusIsValid((int)status, validationDto));
+            Assert.DoesNotThrow(() => _eventValidationService.CheckIfJoinAttendStatusIsValid(status, validationDto));
         }
 
         [Test]
         public void Should_Throw_If_Can_Not_Join()
         {
-            var status = (int)AttendingStatus.Attending;
+            var status = AttendingStatus.Attending;
             var validationDto = new EventJoinValidationDto
             {
                 MaxParticipants = 0,
                 MaxVirtualParticipants = 0
             };
 
-            Assert.Throws<EventException>(() => _eventValidationService.CheckIfJoinAttendStatusIsValid((int)status, validationDto));
+            Assert.Throws<EventException>(() => _eventValidationService.CheckIfJoinAttendStatusIsValid(status, validationDto));
         }
 
         [Test]
         public void Should_Not_Throw_If_Can_Join()
         {
-            var status = (int)AttendingStatus.Attending;
+            var status = AttendingStatus.Attending;
             var validationDto = new EventJoinValidationDto
             {
                 MaxParticipants = 1,
                 MaxVirtualParticipants = 0
             };
 
-            Assert.DoesNotThrow(() => _eventValidationService.CheckIfJoinAttendStatusIsValid((int)status, validationDto));
+            Assert.DoesNotThrow(() => _eventValidationService.CheckIfJoinAttendStatusIsValid(status, validationDto));
         }
 
         [Test]
@@ -479,7 +479,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         {
             var joinDto = new EventJoinDto
             {
-                AttendStatus = (int)status,
+                AttendStatus = status,
                 ParticipantIds = new List<string> { "1", "2", "3" }
             };
 
@@ -499,7 +499,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         {
             var joinDto = new EventJoinDto
             {
-                AttendStatus = (int)status,
+                AttendStatus = status,
                 ParticipantIds = new List<string> { "1", "2", "3" }
             };
 

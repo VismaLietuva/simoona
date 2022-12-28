@@ -73,7 +73,7 @@ namespace Shrooms.Premium.Tests.DomainService
             var result = (await _eventListingService.GetMyEventsAsync(myEventsOptions, userOrg)).ToList();
 
             Assert.AreEqual(3, result.Count);
-            Assert.AreEqual(result.First(x => x.Id == eventGuids[0]).ParticipatingStatus, 1);
+            Assert.AreEqual(result.First(x => x.Id == eventGuids[0]).ParticipatingStatus, AttendingStatus.Attending);
             Assert.IsTrue(result.First(x => x.Id == eventGuids[2]).StartDate < result.First(x => x.Id == eventGuids[0]).StartDate);
         }
 

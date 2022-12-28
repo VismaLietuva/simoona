@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Shrooms.Premium.Constants;
+using System;
 using System.Collections.Generic;
 
 namespace Shrooms.Premium.DataTransferObjects.Models.Events
@@ -25,7 +26,7 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
         public string HostUserFullName { get; set; }
         public string HostUserId { get; set; }
         public bool IsFull { get; set; }
-        public int ParticipatingStatus { get; set; }
+        public AttendingStatus ParticipatingStatus { get; set; }
         public int WallId { get; set; }
         public IEnumerable<EventDetailsOptionDto> Options { get; set; }
         public IEnumerable<EventDetailsParticipantDto> Participants { get; set; }

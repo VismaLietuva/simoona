@@ -299,8 +299,8 @@ namespace Shrooms.Premium.Domain.Services.Events.List
                 ParticipantsCount = e.EventParticipants.Count(p => p.AttendStatus == (int)AttendingStatus.Attending),
                 IsCreator = e.ResponsibleUserId == userId,
                 ParticipatingStatus = e.EventParticipants.FirstOrDefault(p => p.ApplicationUserId == userId) != null
-                    ? e.EventParticipants.FirstOrDefault(p => p.ApplicationUserId == userId).AttendStatus
-                    : (int)AttendingStatus.Idle,
+                    ? (AttendingStatus)e.EventParticipants.FirstOrDefault(p => p.ApplicationUserId == userId).AttendStatus
+                    : AttendingStatus.Idle,
                 MaxChoices = e.MaxChoices
             };
         }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Shrooms.Premium.Constants;
+using System;
 using System.Collections.Generic;
 
 namespace Shrooms.Premium.Presentation.WebViewModels.Events
@@ -42,7 +43,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
 
         public bool IsFull { get; set; }
 
-        public int ParticipatingStatus { get; set; }
+        public AttendingStatus ParticipatingStatus { get; set; }
 
         public int WallId { get; set; }
 
