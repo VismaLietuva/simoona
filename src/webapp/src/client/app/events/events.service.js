@@ -27,8 +27,8 @@
             return countParticipants(event, attendStatus.AttendingVirtually);
         }
 
-        function countParticipants(event, attendStatus) {
-            return event.participants.reduce((sum, participant) => participant.attendStatus == attendStatus ? sum + 1 : 0, 0);
+        function countParticipants(event, status) {
+            return event.participants.reduce((sum, participant) => participant.attendStatus == status ? sum + 1 : sum, 0);
         }
 
         function hasSpaceForVirtualParticipant(event) {
