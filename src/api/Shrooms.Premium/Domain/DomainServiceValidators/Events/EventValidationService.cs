@@ -321,13 +321,5 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
                 throw new EventException(PremiumErrorCodes.EventIsFullCode);
             }
         }
-
-        public void CheckIfAllRequestParticipantsHaveAccounts(List<ApplicationUser> users, ICollection<string> participantIds)
-        {
-            if (users.Count != participantIds.Count)
-            {
-                throw new EventException(PremiumErrorCodes.EventParticipantNotFound);
-            }
-        }
     }
 }
