@@ -48,10 +48,8 @@
         }
 
         function managePopoverState() {
-            // Need to watch the value since event could be loaded after this component is initialized
             $scope.$watch('vm.event', function () {
                 vm.showPopover = hasMultipleJoinTypes();
-                vm.isOnlyVirtualParticipants = !vm.showPopover && vm.event.maxVirtualParticipants > 0;
             });
         }
 
