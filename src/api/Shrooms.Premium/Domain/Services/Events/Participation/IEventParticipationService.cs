@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 
 namespace Shrooms.Premium.Domain.Services.Events.Participation
@@ -18,7 +19,11 @@ namespace Shrooms.Premium.Domain.Services.Events.Participation
 
         Task LeaveAsync(Guid eventId, UserAndOrganizationDto userOrg, string leaveComment);
 
-        Task ResetAttendeesAsync(Guid eventId, UserAndOrganizationDto userOrg);
+        Task ResetAllAttendeesAsync(Guid eventId, UserAndOrganizationDto userOrg);
+
+        Task ResetVirtualAttendeesAsync(Event @event, UserAndOrganizationDto userOrg);
+
+        Task ResetAttendeesAsync(Event @event, UserAndOrganizationDto userOrg);
 
         Task<IEnumerable<string>> GetParticipantsEmailsIncludingHostAsync(Guid eventId);
 

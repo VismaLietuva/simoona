@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Shrooms.Contracts.Enums;
+using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
+using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 
 namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
@@ -18,15 +20,16 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
         void CheckIfEventStartDateIsExpired(DateTime startDate);
         void CheckIfOptionsAreDifferent(IEnumerable<NewEventOptionDto> options);
         void CheckIfSingleChoiceSelectedWithRule(ICollection<EventOption> options, OptionRules rule);
-        void CheckIfUserAlreadyJoinedSameEvent(bool isParticipating);
         void CheckIfJoiningEventStartDateHasPassed(DateTime startDate);
         void CheckIfEventIsFull(int maxParticipants, int participantsCount);
-        void CheckIfAttendStatusIsValid(int status);
-        void CheckIfAttendOptionIsAllowed(int attendStatus, EventJoinValidationDto @event);
+        void CheckIfAttendStatusIsValid(AttendingStatus status);
+        void CheckIfJoinAttendStatusIsValid(AttendingStatus status, EventJoinValidationDto @event);
+        void CheckIfAttendOptionIsAllowed(AttendingStatus status, EventJoinValidationDto @event);
         void CheckIfAttendOptionsAllowedToUpdate(EditEventDto eventDto, Event eventToUpdate);
         void CheckIfRegistrationDeadlineIsExpired(DateTime registrationDeadline);
         void CheckIfUserExistsInOtherSingleJoinEvent(bool anyEvents);
         void CheckIfEventHasEnoughPlaces(int maxParticipants, int participantCount);
+        void CheckIfCanJoinEvent(EventJoinDto joinDto, EventJoinValidationDto joinValidationDto);
         void CheckIfJoiningTooManyChoicesProvided(int maxChoices, int choicesTaken);
         void CheckIfCreatingEventHasNoChoices(int maxChoices, int eventOptionsCount);
         void CheckIfEndDateIsGreaterThanStartDate(DateTime startDate, DateTime endDate);
@@ -37,7 +40,8 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
         void CheckIfRegistrationDeadlineExceedsStartDate(DateTime registrationDeadline, DateTime startDate);
         void CheckIfProvidedOptionsAreValid(IEnumerable<int> providedOptionsCount, IEnumerable<EventOption> foundOptionsCount);
         void CheckIfEventHasParticipants(IEnumerable<EventParticipantDto> eventParticipants);
-        void CheckIfUserParticipatesInEvent(string userId, IEnumerable<string> participantIds);
+        void CheckIfUserParticipatesInEvent(string userId, IEnumerable<EventParticipantAttendDto> participants);
         void CheckIfDateRangeExceededLimitOrNull(DateTime? start, DateTime? end);
+        void CheckIfAllParticipantsExist(ICollection<ApplicationUser> users, ICollection<string> participantIds);
     }
 }

@@ -107,8 +107,8 @@
                                 ('events.eventForOfficeAll' | translate) :
                                 event.officeNames.join(', ')}}
                             </td>
-                            <td class="col-xs-2" ng-cloak>
-                                {{event.participantsCount}}/{{event.maxParticipants}}
+                            <td class="col-xs-2 text-center" ng-cloak>
+                                <ace-joined-participant-count event="event"></ace-joined-participant-count>
                             </td>
                         </tr>
                     </tbody>

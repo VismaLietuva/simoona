@@ -27,6 +27,13 @@
         padding: 20px 40px 20px 60px;
     }
 }
+
+.event-list-item-dropdown-going-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .event-office-list-item-seperator {
     line-height: 10px;
 }
@@ -100,8 +107,8 @@
 .event-list-item-inner-container {
     display: flex;
     flex-direction: column;
-    overflow: hidden;
     background-color: #FFF;
+    overflow: visible;
     min-height: 1px;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
     padding: 15px 0;
@@ -168,7 +175,7 @@
     color: #787878;
 }
 .event-attend-button {
-    width: 167px !important;
+    width: 195px !important;
 }
 
 .event-attend-idle-button {
@@ -190,6 +197,12 @@
 .participate-dropdown-menu {
     padding: 5px 0px 5px 0px;
     width: 100%;
+}
+
+.participate-list-dropdown-menu {
+    padding: 5px 0px 5px 0px;
+    width: 100%;
+    margin-top: 15px;
 }
 
 .event-attend-dropdown-button {
@@ -829,6 +842,18 @@
     }
 }
 
+.event-joined-participant-count-container {
+    .badge {
+        vertical-align: middle;
+        font-weight: 400;
+        background-color: @event-participants-tab-active-color;
+    }
+}
+
+.event-joined-participant-count-popover-label {
+    color: #125e8a;
+}
+
 .event-participants-container-body {
     padding: 10px;
     *.event-no-participants {
@@ -1031,6 +1056,25 @@
         color: #0974B3;
         font-style: italic;
     }
+}
+
+.event-add-colleagues-attend-status-container {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+
+    select {
+        max-width: 180px;
+    }
+}
+
+.event-add-colleagues-attend-status-select {
+    display: inline-block;
+    min-width: 150px;
+    font-weight: bold;
+    border: 1px solid #dddddd;
+    margin-right: 10px;
+    border-radius: 5px;
 }
 
 .event-loading-image-placeholder {

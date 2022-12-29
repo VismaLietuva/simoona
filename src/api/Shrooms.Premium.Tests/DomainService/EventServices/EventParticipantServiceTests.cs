@@ -184,13 +184,6 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         }
 
         [Test]
-        public void Should_Not_Throw_If_Joining_User_Is_Not_Participating_In_Event()
-        {
-            const bool isAlreadyParticipating = false;
-            Assert.DoesNotThrow(() => _eventValidationService.CheckIfUserAlreadyJoinedSameEvent(isAlreadyParticipating));
-        }
-
-        [Test]
         public void Should_Throw_If_Joining_User_Provided_Not_Enough_Options()
         {
             const int maxChoices = 2;
@@ -215,14 +208,6 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             const int participantsCount = 6;
             var ex = Assert.Throws<EventException>(() => _eventValidationService.CheckIfEventHasEnoughPlaces(maxParticipants, participantsCount));
             Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventIsFullCode));
-        }
-
-        [Test]
-        public void Should_Throw_If_Joining_Many_Users_One_Participant_Has_Already_Joined()
-        {
-            const bool isAlreadyParticipating = true;
-            var ex = Assert.Throws<EventException>(() => _eventValidationService.CheckIfUserAlreadyJoinedSameEvent(isAlreadyParticipating));
-            Assert.That(ex.Message, Is.EqualTo(PremiumErrorCodes.EventUserAlreadyParticipatesCode));
         }
 
         [Test]
@@ -345,17 +330,48 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         }
 
         [Test]
-        public async Task Should_Reset_Event_Participants()
+        public async Task Should_Reset_All_Event_Participants()
         {
-            var eventId = MockResetAttendees();
+            var @event = MockResetAttendees();
             var user = new UserAndOrganizationDto
             {
                 OrganizationId = 2,
                 UserId = "user1"
             };
 
-            await _eventParticipationService.ResetAttendeesAsync(eventId, user);
-            _eventParticipantsDbSet.Received(3).Remove(Arg.Any<EventParticipant>());
+            await _eventParticipationService.ResetAllAttendeesAsync(@event.Id, user);
+
+            _eventParticipantsDbSet.Received(1).RemoveRange(Arg.Any<IEnumerable<EventParticipant>>());
+        }
+
+        [Test]
+        public async Task Should_Reset_Event_Participants()
+        {
+            var @event = MockResetAttendees();
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = 2,
+                UserId = "user1"
+            };
+
+            await _eventParticipationService.ResetAttendeesAsync(@event, userOrg);
+
+            _eventParticipantsDbSet.Received(1).RemoveRange(Arg.Any<IEnumerable<EventParticipant>>());
+        }
+
+        [Test]
+        public async Task Should_Reset_Virtual_Event_Participants()
+        {
+            var @event = MockResetAttendees();
+            var userOrg = new UserAndOrganizationDto
+            {
+                OrganizationId = 2,
+                UserId = "user1"
+            };
+
+            await _eventParticipationService.ResetVirtualAttendeesAsync(@event, userOrg);
+
+            _eventParticipantsDbSet.Received(1).RemoveRange(Arg.Any<IEnumerable<EventParticipant>>());
         }
 
         [Test]
@@ -365,6 +381,136 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             const string eventCreatorId = "creator";
             const bool isAdmin = false;
             Assert.Throws<EventException>(() => _eventValidationService.CheckIfUserHasPermission(userId, eventCreatorId, isAdmin));
+        }
+
+        [TestCase(AttendingStatus.MaybeAttending)]
+        [TestCase(AttendingStatus.Idle)]
+        [TestCase(AttendingStatus.NotAttending)]
+        [TestCase((AttendingStatus)int.MaxValue)]
+        public void Should_Throw_If_Invalid_Attend_Status_Given_For_Join(AttendingStatus status)
+        {
+            Assert.Throws<EventException>(() => _eventValidationService.CheckIfJoinAttendStatusIsValid(status, new EventJoinValidationDto()));
+        }
+
+        [TestCase(AttendingStatus.Attending)]
+        [TestCase(AttendingStatus.AttendingVirtually)]
+        public void Should_Not_Throw_If_Valid_Attend_Status_Given_For_Join(AttendingStatus status)
+        {
+            var validationDto = new EventJoinValidationDto
+            {
+                MaxParticipants = 1,
+                MaxVirtualParticipants = 1
+            };
+
+            Assert.DoesNotThrow(() => _eventValidationService.CheckIfJoinAttendStatusIsValid(status, validationDto));
+        }
+
+        [Test]
+        public void Should_Throw_If_Can_Not_Join_Virtually()
+        {
+            var status = AttendingStatus.AttendingVirtually;
+            var validationDto = new EventJoinValidationDto
+            {
+                MaxParticipants = 1,
+                MaxVirtualParticipants = 0
+            };
+
+            Assert.Throws<EventException>(() => _eventValidationService.CheckIfJoinAttendStatusIsValid(status, validationDto));
+        }
+
+        [Test]
+        public void Should_Not_Throw_If_Can_Join_Virtually()
+        {
+            var status = AttendingStatus.AttendingVirtually;
+            var validationDto = new EventJoinValidationDto
+            {
+                MaxParticipants = 1,
+                MaxVirtualParticipants = 1
+            };
+
+            Assert.DoesNotThrow(() => _eventValidationService.CheckIfJoinAttendStatusIsValid(status, validationDto));
+        }
+
+        [Test]
+        public void Should_Throw_If_Can_Not_Join()
+        {
+            var status = AttendingStatus.Attending;
+            var validationDto = new EventJoinValidationDto
+            {
+                MaxParticipants = 0,
+                MaxVirtualParticipants = 0
+            };
+
+            Assert.Throws<EventException>(() => _eventValidationService.CheckIfJoinAttendStatusIsValid(status, validationDto));
+        }
+
+        [Test]
+        public void Should_Not_Throw_If_Can_Join()
+        {
+            var status = AttendingStatus.Attending;
+            var validationDto = new EventJoinValidationDto
+            {
+                MaxParticipants = 1,
+                MaxVirtualParticipants = 0
+            };
+
+            Assert.DoesNotThrow(() => _eventValidationService.CheckIfJoinAttendStatusIsValid(status, validationDto));
+        }
+
+        [Test]
+        public void Should_Throw_If_Not_All_Participants_Exist()
+        {
+            var foundUsers = new List<ApplicationUser>();
+            var participantIds = new List<string> { "id" };
+            Assert.Throws<EventException>(() => _eventValidationService.CheckIfAllParticipantsExist(foundUsers, participantIds));
+        }
+
+        [Test]
+        public void Should_Not_Throw_If_All_Participants_Exist()
+        {
+            var foundUsers = new List<ApplicationUser> { new ApplicationUser() };
+            var participantIds = new List<string> { "id" };
+            Assert.DoesNotThrow(() => _eventValidationService.CheckIfAllParticipantsExist(foundUsers, participantIds));
+        }
+
+        [TestCase(AttendingStatus.Attending)]
+        [TestCase(AttendingStatus.AttendingVirtually)]
+        public void Should_Not_Throw_If_User_Can_Join_Event(AttendingStatus status)
+        {
+            var joinDto = new EventJoinDto
+            {
+                AttendStatus = status,
+                ParticipantIds = new List<string> { "1", "2", "3" }
+            };
+
+            var validationDto = new EventJoinValidationDto
+            {
+                MaxVirtualParticipants = 3,
+                MaxParticipants = 3,
+                Participants = new List<EventParticipantAttendDto>()
+            };
+
+            Assert.DoesNotThrow(() => _eventValidationService.CheckIfCanJoinEvent(joinDto, validationDto));
+        }
+
+        [TestCase(AttendingStatus.Attending)]
+        [TestCase(AttendingStatus.AttendingVirtually)]
+        public void Should_Throw_If_Event_Participants_Capacity_Reached(AttendingStatus status)
+        {
+            var joinDto = new EventJoinDto
+            {
+                AttendStatus = status,
+                ParticipantIds = new List<string> { "1", "2", "3" }
+            };
+
+            var validationDto = new EventJoinValidationDto
+            {
+                MaxVirtualParticipants = 2,
+                MaxParticipants = 2,
+                Participants = new List<EventParticipantAttendDto>()
+            };
+
+            Assert.Throws<EventException>(() => _eventValidationService.CheckIfCanJoinEvent(joinDto, validationDto));
         }
 
         [Test]
@@ -549,8 +695,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             var dto = new EventChangeOptionsDto { EventId = guid, OrganizationId = 2, ChosenOptions = chosenOptionIds, UserId = "1foo2bar" };
 
             _eventValidationServiceMock
-                .When(x => x.CheckIfUserParticipatesInEvent("1foo2bar",
-                    Arg.Is<List<string>>(a => a.All(p => p == "user" || p == "user2"))))
+                .When(x => x.CheckIfUserParticipatesInEvent("1foo2bar", Arg.Any<IEnumerable<EventParticipantAttendDto>>()))
                 .Do(_ => throw new EventException(PremiumErrorCodes.EventUserNotParticipating));
 
             Assert.ThrowsAsync<EventException>(async () => await _eventParticipationService.UpdateSelectedOptionsAsync(dto), PremiumErrorCodes.EventUserNotParticipating);
@@ -715,7 +860,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         public async Task Should_Send_Email_To_Manager_When_Event_Participants_Are_Resetted()
         {
             // Arrange
-            var eventId = MockResetAttendees(true);
+            var @event = MockResetAttendees(true);
             var extraCallForNotifyingUsersAboutBeingRemoved = 1;
             var user = new UserAndOrganizationDto
             {
@@ -724,7 +869,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             };
 
             // Act
-            await _eventParticipationService.ResetAttendeesAsync(eventId, user);
+            await _eventParticipationService.ResetAllAttendeesAsync(@event.Id, user);
 
 
             // Assert
@@ -736,7 +881,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         public async Task Should_Not_Send_Email_To_Manager_When_Event_Participants_Are_Resetted_And_Event_Type_Does_Not_Require_It()
         {
             // Arrange
-            var eventId = MockResetAttendees(false);
+            var @event = MockResetAttendees(false);
             var extraCallForNotifyingUsersAboutBeingRemoved = 1;
 
             MockUsers();
@@ -748,7 +893,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             };
 
             // Act
-            await _eventParticipationService.ResetAttendeesAsync(eventId, user);
+            await _eventParticipationService.ResetAllAttendeesAsync(@event.Id, user);
 
 
             // Assert
@@ -1000,8 +1145,7 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             return eventId;
         }
 
-        // probably will need to use this
-        private Guid MockResetAttendees(bool sendEmailToManager = false)
+        private Event MockResetAttendees(bool sendEmailToManager = false)
         {
             var eventId = Guid.NewGuid();
 
@@ -1100,10 +1244,10 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             @event.EventParticipants = participants;
 
             _eventsDbSet.SetDbSetDataForAsync(new List<Event> { @event }.AsQueryable());
-            return eventId;
+            _eventParticipantsDbSet.SetDbSetDataForAsync(participants);
+            return @event;
         }
 
-        // possibly might need to use this
         private Guid MockLeaveEvent()
         {
             _eventValidationServiceMock.When(x => x.CheckIfParticipantExists(null)).Do(_ => throw new EventException("Exception"));

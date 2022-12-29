@@ -38,7 +38,7 @@
                         <img class="event-list-image" alt="{{:: event.name}}" title="{{:: event.name}}"
                             ng-src="{{event.imageName | imageThumb:{w:291,h:165}:'crop'}}" image-loading>
                     </a>
-                    <ace-progress-bar value="event.participantsCount" max="event.maxParticipants" full-danger="true">
+                    <ace-progress-bar value="vm.getTotalParticpantsCount(event)" max="vm.getTotalMaxParticipants(event)" full-danger="true">
                     </ace-progress-bar>
                 </div>
                 <!-- buttons -->

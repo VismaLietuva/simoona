@@ -1,0 +1,12 @@
+<span ng-transclude>
+    <script type="text/ng-template" id="joined-participant-count-popover.html">
+        <div>
+            <span class="event-joined-participant-count-popover-label"  translate="events.normalParticipantCountLabel"></span>
+            <span class="badge badge-default pull-right">{{event.goingCount}}/{{event.maxParticipants}}</span>
+        </div>
+        <div class="mt-3">
+            <span class="event-joined-participant-count-popover-label" translate="events.virtualParticipantCountLabel"></span>
+            <span class="badge badge-default pull-right">{{event.virtuallyGoingCount}}/{{event.maxVirtualParticipants}}</span>
+        </div>
+    </script>
+</span>

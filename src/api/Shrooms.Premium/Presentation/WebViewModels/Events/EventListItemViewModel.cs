@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Shrooms.Premium.Constants;
+using System;
 using System.Collections.Generic;
 
 namespace Shrooms.Premium.Presentation.WebViewModels.Events
@@ -25,11 +26,15 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
 
         public int MaxParticipants { get; set; }
 
+        public int MaxVirtualParticipants { get; set; }
+
         public int ParticipantsCount { get; set; }
+
+        public int VirtualParticipantsCount { get; set; }
 
         public bool IsCreator { get; set; }
 
-        public int ParticipatingStatus { get; set; }
+        public AttendingStatus ParticipatingStatus { get; set; }
 
         public int MaxChoices { get; set; }
     }

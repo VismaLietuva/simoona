@@ -40,7 +40,6 @@
                 });
             });
 
-
             function makeList() {
                 var likes = scope.messageObject.likes;
 

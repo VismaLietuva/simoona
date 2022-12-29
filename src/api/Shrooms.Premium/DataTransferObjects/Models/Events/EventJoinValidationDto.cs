@@ -15,6 +15,7 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
         public bool SendEmailToManager { get; set; }
         public int MaxChoices { get; set; }
         public int MaxParticipants { get; set; }
+        public int MaxVirtualParticipants { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
 
@@ -26,7 +27,7 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
         public ICollection<EventOption> SelectedOptions { get; set; }
         public DateTime RegistrationDeadline { get; set; }
         public DateTime StartDate { get; set; }
-        public List<string> Participants { get; set; }
+        public List<EventParticipantAttendDto> Participants { get; set; }
         public string ResponsibleUserId { get; set; }
         public int WallId { get; set; }
     }
