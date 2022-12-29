@@ -23,13 +23,15 @@
         /* jshint validthis: true */
         var vm = this;
         vm.isExpanded = true;
-        
+
         vm.attendStatus = attendStatus;
         vm.expandCollapseText = 'events.collapse';
         vm.toggleExpandCollapse = toggleExpandCollapse;
         vm.attendingParticipants = getAttendingParticipants;
         vm.maybeAttendingParticipants = getMaybeAttendingParticipants;
         vm.notAttendingParticipants = getNotAttendingParticipants;
+        vm.getAttendingVirtuallyParticipants = getAttendingVirtuallyParticipants;
+        vm.getAllAttendingParticipants = getAllAttendingParticipants;
 
         function toggleExpandCollapse() {
             if(vm.isExpanded) {
@@ -41,26 +43,28 @@
             vm.isExpanded = !vm.isExpanded;
         }
 
+        function getAllAttendingParticipants() {
+            return getParticipantsByStatuses([attendStatus.Attending, attendStatus.AttendingVirtually]);
+        }
+
         function getAttendingParticipants() {
-            return getParticipantsByStatus(attendStatus.Attending);
+            return getParticipantsByStatuses([attendStatus.Attending]);
         }
 
         function getMaybeAttendingParticipants() {
-            return getParticipantsByStatus(attendStatus.MaybeAttending);
+            return getParticipantsByStatuses([attendStatus.MaybeAttending]);
         }
 
         function getNotAttendingParticipants() {
-            return getParticipantsByStatus(attendStatus.NotAttending);
+            return getParticipantsByStatuses([attendStatus.NotAttending]);
         }
 
-        function getParticipantsByStatus(status) {
-            var participantsByStatus = [];
-            vm.participants.forEach(function(participant){
-                if (participant.attendStatus == status) {
-                    participantsByStatus.push(participant);
-                }
-            })
-            return participantsByStatus;
+        function getAttendingVirtuallyParticipants() {
+            return getParticipantsByStatuses([attendStatus.AttendingVirtually]);
+        }
+
+        function getParticipantsByStatuses(statuses) {
+            return vm.participants.filter(participant => statuses.includes(participant.attendStatus));
         }
     }
 })();

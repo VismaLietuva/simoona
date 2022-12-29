@@ -22,7 +22,7 @@
 
         vm.changeSelectedOptions = changeSelectedOptions;
         vm.isDeadline = isDeadline;
-        
+
 
         function changeSelectedOptions() {
             eventRepository.getEventOptions(vm.event.id).then(function (responseEvent) {
@@ -49,6 +49,9 @@
                     },
                     isAddColleague: function () {
                         return false;
+                    },
+                    selectedAttendStatus: function() {
+                        return undefined;
                     }
                 }
             });

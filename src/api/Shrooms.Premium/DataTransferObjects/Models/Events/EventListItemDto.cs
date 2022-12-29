@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Shrooms.Premium.Constants;
+using System;
 
 namespace Shrooms.Premium.DataTransferObjects.Models.Events
 {
@@ -22,13 +23,17 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
 
         public string Place { get; set; }
 
+        public int MaxVirtualParticipants { get; set; }
+
         public int MaxParticipants { get; set; }
 
         public int ParticipantsCount { get; set; }
 
+        public int VirtualParticipantsCount { get; set; }
+
         public bool IsCreator { get; set; }
 
-        public int ParticipatingStatus { get; set; }
+        public AttendingStatus ParticipatingStatus { get; set; }
 
         public int MaxChoices { get; set; }
     }

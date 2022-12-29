@@ -902,6 +902,10 @@
     <Compile Include="Migrations\202208170836246_ChangedPropertyOfPostAndCommentFromPictureIdToImageCollection.Designer.cs">
       <DependentUpon>202208170836246_ChangedPropertyOfPostAndCommentFromPictureIdToImageCollection.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202212290923244_AddedMaxVirtualParticipantsFieldToEvent.cs" />
+    <Compile Include="Migrations\202212290923244_AddedMaxVirtualParticipantsFieldToEvent.Designer.cs">
+      <DependentUpon>202212290923244_AddedMaxVirtualParticipantsFieldToEvent.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
@@ -1504,6 +1508,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202208170836246_ChangedPropertyOfPostAndCommentFromPictureIdToImageCollection.resx">
       <DependentUpon>202208170836246_ChangedPropertyOfPostAndCommentFromPictureIdToImageCollection.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202212290923244_AddedMaxVirtualParticipantsFieldToEvent.resx">
+      <DependentUpon>202212290923244_AddedMaxVirtualParticipantsFieldToEvent.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

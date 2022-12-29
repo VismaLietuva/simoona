@@ -25,14 +25,34 @@
         'localeSrv',
         'lodash',
         'attendStatus',
-        'optionRules'
+        'optionRules',
+        'selectedAttendStatus',
+        'eventService'
     ];
 
-    function eventJoinOptionsController($state, $uibModalInstance, inputTypes, authService, errorHandler,
-        eventRepository, $translate, notifySrv, event, isDetails, isAddColleague, isChangeOptions, localeSrv, lodash, attendStatus, optionRules) {
+    function eventJoinOptionsController(
+        $state,
+        $uibModalInstance,
+        inputTypes,
+        authService,
+        errorHandler,
+        eventRepository,
+        $translate,
+        notifySrv,
+        event,
+        isDetails,
+        isAddColleague,
+        isChangeOptions,
+        localeSrv,
+        lodash,
+        attendStatus,
+        optionRules,
+        selectedAttendStatus,
+        eventService) {
         /* jshint validthis: true */
         var vm = this;
 
+        vm.colleagueStatusOption = undefined;
         vm.options = event.availableOptions;
         vm.inputType = null;
         vm.isAddColleague = isAddColleague;
@@ -64,6 +84,10 @@
                 vm.inputType = inputTypes.radio;
             }
 
+            if (vm.isAddColleague) {
+                vm.availableAddColleagueStatuses = getAvailableAddColleagueAttendStatuses();
+            }
+
             eventRepository.getUserForAutoComplete(authService.identity.userName, event.id).then(function (response) {
                 for (var i = 0; response.length > i; i++) {
                     if (response[i].id === authService.identity.userId) {
@@ -75,6 +99,38 @@
 
         function getUserForAutoComplete(search) {
             return eventRepository.getUserForAutoComplete(search, event.id);
+        }
+
+        function getAvailableAddColleagueAttendStatuses() {
+            var statuses = [];
+
+            if (eventService.hasSpaceForParticipant(event)) {
+                statuses.push(toAttendStatusSelectOption(attendStatus.Attending));
+            }
+
+            if (eventService.hasSpaceForVirtualParticipant(event)) {
+                statuses.push(toAttendStatusSelectOption(attendStatus.AttendingVirtually));
+            }
+
+            return statuses;
+        }
+
+        function toAttendStatusSelectOption(attendStatus) {
+            return {
+                attendStatus: attendStatus,
+                translation: getAddColleagueAttendStatusTranslation(attendStatus)
+            }
+        }
+
+        function getAddColleagueAttendStatusTranslation(status) {
+            switch (status) {
+                case attendStatus.Attending:
+                    return "events.eventAddColleagueAttendingStatusOption";
+                case attendStatus.AttendingVirtually:
+                    return "events.eventAddColleagueAttendingVirtuallyStatusOption";
+                default:
+                    console.error('Attend status', status, 'is not supported');
+            }
         }
 
         function isOptionSelected(optionId) {
@@ -112,9 +168,8 @@
                 handleErrorMessage('errorCodeMessages.messageNotEnoughOptions');
             } else if (vm.isAddColleague && !vm.participants.length) {
                 handleErrorMessage('events.noParticipantsError');
-            } else if (vm.isAddColleague && vm.participants.length + event.participants.length > event.maxParticipants) {
-                var participants = event.maxParticipants - event.participants.length;
-                handleErrorMessage($translate.instant('events.maxParticipantsError') + ' ' + participants);
+            } else if (vm.isAddColleague && isAddingTooManyParticipants()) {
+                handleErrorMessage(`${$translate.instant('events.maxParticipantsError')} ${getLeftParticipantCountForAdd()}`);
             } else if (!hasDatePassed(event.startDate)) {
                 handleErrorMessage('', 'errorCodeMessages.messageEventJoinStartedOrFinished');
                 $uibModalInstance.close();
@@ -125,13 +180,21 @@
                 var selectedOptionsId = lodash.map(vm.selectedOptions, 'id');
                 if (vm.isAddColleague) {
                     var participantIds = lodash.map(vm.participants, 'id');
-                    eventRepository.addColleagues(event.id, selectedOptionsId, participantIds, attendStatus.Attending)
+                    eventRepository.addColleagues(event.id, selectedOptionsId, participantIds, vm.colleagueStatusOption.attendStatus)
                         .then(handleSuccessPromise, handleErrorPromise);
                 } else {
-                    eventRepository.joinEvent(event.id, selectedOptionsId, attendStatus.Attending)
+                    eventRepository.joinEvent(event.id, selectedOptionsId, selectedAttendStatus)
                         .then(handleSuccessPromise, handleErrorPromise);
                 }
             }
+        }
+
+        function getLeftParticipantCountForAdd() {
+            return eventService.getTotalMaxParticipantCount(event) - eventService.countAllAttendingParticipants(event);
+        }
+
+        function isAddingTooManyParticipants() {
+            return vm.participants.length + eventService.countAllAttendingParticipants(event) > eventService.getTotalMaxParticipantCount(event);
         }
 
         function updateOptions() {
@@ -156,7 +219,7 @@
             }
 
             vm.isActionDisabled = false;
-            event.participatingStatus = attendStatus.Attending;
+            event.participatingStatus = attendStatus.Attending; // ?
             $uibModalInstance.close();
 
             notifySuccess();

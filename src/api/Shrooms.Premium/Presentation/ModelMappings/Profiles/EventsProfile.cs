@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Newtonsoft.Json;
 using Shrooms.DataLayer.EntityModels.Models.Events;
-using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.DataTransferObjects.Models.OfficeMap;
 using Shrooms.Premium.Presentation.WebViewModels.Events;
@@ -58,7 +57,6 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
         private void CreateViewModelToDtoMappings()
         {
             CreateMap<CreateEventViewModel, CreateEventDto>()
-                .Ignore(d => d.ResetParticipantList)
                 .Ignore(d => d.Id)
                 .Ignore(d => d.Offices)
                 .IgnoreUserOrgDto();

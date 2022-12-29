@@ -504,7 +504,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
         {
             try
             {
-                await _eventParticipationService.ResetAttendeesAsync(eventId, GetUserAndOrganization());
+                await _eventParticipationService.ResetAllAttendeesAsync(eventId, GetUserAndOrganization());
                 return Ok();
             }
             catch (EventException e)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Shrooms.Contracts.DataTransferObjects;
+using Shrooms.Premium.Constants;
 
 namespace Shrooms.Premium.DataTransferObjects.Models.Events
 {
@@ -8,7 +9,7 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
     {
         public Guid EventId { get; set; }
 
-        public int AttendStatus { get; set; }
+        public AttendingStatus AttendStatus { get; set; }
 
         public string AttendComment { get; set; }
 

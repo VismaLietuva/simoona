@@ -30,7 +30,7 @@
         ////////
 
         function getAttendingParticipants() {
-            return getParticipantsByStatus(attendStatus.Attending);
+            return getParticipantsByStatuses([attendStatus.Attending, attendStatus.AttendingVirtually]);
         }
 
         function hasCurrentUserSelectedOption(participants) {
@@ -41,14 +41,8 @@
             });
         }
 
-        function getParticipantsByStatus(status) {
-            var participantsByStatus = [];
-            vm.participants.forEach(function(participant){
-                if (participant.attendStatus == status) {
-                    participantsByStatus.push(participant);
-                }
-            })
-            return participantsByStatus;
+        function getParticipantsByStatuses(statuses) {
+            return vm.participants.filter(participant => statuses.includes(participant.attendStatus));
         }
     }
 })();

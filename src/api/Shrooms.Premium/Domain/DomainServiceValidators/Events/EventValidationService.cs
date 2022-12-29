@@ -5,6 +5,7 @@ using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Exceptions;
 using Shrooms.Contracts.Infrastructure;
+using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
@@ -19,6 +20,14 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
         public EventValidationService(ISystemClock systemClock)
         {
             _systemClock = systemClock;
+        }
+
+        public void CheckIfAllParticipantsExist(ICollection<ApplicationUser> users, ICollection<string> participantIds)
+        {
+            if (users.Count != participantIds.Count)
+            {
+                throw new EventException(PremiumErrorCodes.EventParticipantNotFound);
+            }
         }
 
         public void CheckIfParticipantExists(object participant)
@@ -58,14 +67,6 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             if (startDate < _systemClock.UtcNow)
             {
                 throw new EventException(PremiumErrorCodes.EventJoinStartDateHasPassedCode);
-            }
-        }
-
-        public void CheckIfUserAlreadyJoinedSameEvent(bool isParticipating)
-        {
-            if (isParticipating)
-            {
-                throw new EventException(PremiumErrorCodes.EventUserAlreadyParticipatesCode);
             }
         }
 
@@ -165,7 +166,7 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             }
         }
 
-        public void CheckIfAttendStatusIsValid(int status)
+        public void CheckIfAttendStatusIsValid(AttendingStatus status)
         {
             if (!Enum.IsDefined(typeof(AttendingStatus), status))
             {
@@ -173,14 +174,32 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             }
         }
 
-        public void CheckIfAttendOptionIsAllowed(int attendStatus, EventJoinValidationDto @event)
+        public void CheckIfAttendOptionIsAllowed(AttendingStatus status, EventJoinValidationDto @event)
         {
-            if (attendStatus == (int)AttendingStatus.MaybeAttending && !@event.AllowMaybeGoing)
+            if (status == AttendingStatus.MaybeAttending && !@event.AllowMaybeGoing)
             {
                 throw new EventException(PremiumErrorCodes.EventAttendTypeIsNotAllowed);
             }
 
-            if (attendStatus == (int)AttendingStatus.NotAttending && !@event.AllowNotGoing)
+            if (status == AttendingStatus.NotAttending && !@event.AllowNotGoing)
+            {
+                throw new EventException(PremiumErrorCodes.EventAttendTypeIsNotAllowed);
+            }
+        }
+
+        public void CheckIfJoinAttendStatusIsValid(AttendingStatus status, EventJoinValidationDto @event)
+        {
+            if (status != AttendingStatus.AttendingVirtually && status != AttendingStatus.Attending)
+            {
+                throw new EventException(PremiumErrorCodes.EventAttendTypeIsNotAllowed);
+            }
+
+            if (status == AttendingStatus.AttendingVirtually && @event.MaxVirtualParticipants == 0)
+            {
+                throw new EventException(PremiumErrorCodes.EventAttendTypeIsNotAllowed);
+            }
+
+            if (status == AttendingStatus.Attending && @event.MaxParticipants == 0)
             {
                 throw new EventException(PremiumErrorCodes.EventAttendTypeIsNotAllowed);
             }
@@ -272,9 +291,9 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             }
         }
 
-        public void CheckIfUserParticipatesInEvent(string userId, IEnumerable<string> participantIds)
+        public void CheckIfUserParticipatesInEvent(string userId, IEnumerable<EventParticipantAttendDto> participants)
         {
-            if (participantIds.All(p => p != userId))
+            if (participants.All(p => p.Id != userId))
             {
                 throw new EventException(PremiumErrorCodes.EventUserNotParticipating);
             }
@@ -286,6 +305,20 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             if (diff is null || diff > TimeSpan.FromDays(EventsConstants.EventsMaxDateFilterRangeInDays))
             {
                 throw new EventException(PremiumErrorCodes.EventDateFilterRangeInvalid);
+            }
+        }
+        
+        public void CheckIfCanJoinEvent(EventJoinDto joinDto, EventJoinValidationDto joinValidationDto)
+        {
+            var newParticipantCount = joinDto.ParticipantIds.Count();
+            var maxParticipantCount = joinDto.AttendStatus == AttendingStatus.Attending ?
+                joinValidationDto.MaxParticipants :
+                joinValidationDto.MaxVirtualParticipants;
+            var participantCount = joinValidationDto.Participants.Count(participant => (AttendingStatus)participant.AttendStatus == joinDto.AttendStatus);
+
+            if (maxParticipantCount < newParticipantCount + participantCount)
+            {
+                throw new EventException(PremiumErrorCodes.EventIsFullCode);
             }
         }
     }

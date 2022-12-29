@@ -16,9 +16,13 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
 
         public string Offices { get; set; }
 
+        public int MaxVirtualParticipants { get; set; }
+
         public int MaxParticipants { get; set; }
 
-        public int ParticipantsCount { get; set; }
+        public int GoingCount { get; set; }
+
+        public int VirtuallyGoingCount { get; set; }
 
         public DateTime StartDate { get; set; }
 

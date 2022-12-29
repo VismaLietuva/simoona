@@ -14,14 +14,27 @@
         'eventRepository',
         'eventsSettings',
         'eventOfficeFactory',
-        'defaultEventTabsNames'
+        'eventService',
+        'defaultEventTabsNames',
+        'attendStatus'
     ];
 
-    function eventsByTypeController($scope, $stateParams, eventRepository, eventsSettings, eventOfficeFactory, defaultEventTabsNames) {
+    function eventsByTypeController(
+        $scope,
+        $stateParams,
+        eventRepository,
+        eventsSettings,
+        eventOfficeFactory,
+        eventService,
+        defaultEventTabsNames,
+        attendStatus) {
         /*jshint validthis: true */
         var vm = this;
 
         vm.addMoreEvents = addMoreEvents;
+
+        vm.getTotalMaxParticipants = getTotalMaxParticipants;
+        vm.getTotalParticpantsCount = getTotalParticpantsCount;
 
         vm.isEventsFound = false;
         vm.isEventsLoading = false;
@@ -29,11 +42,8 @@
         vm.eventsList = [];
         vm.eventsListPage = 1;
         vm.itemsDisplayedInList = 0;
-        init();
 
         ///////////
-
-        function init() {}
 
         function setEventOffices() {
             $scope.$watch(function () {
@@ -111,6 +121,26 @@
             } else {
                 vm.isScrollingEnabled = false;
             }
+        }
+
+        function getTotalParticpantsCount(event) {
+            if (!isParticipantsCountSet(event)) {
+                return calculateTotalJoinedParticipants();
+            }
+
+            return event.participantsCount + event.virtualParticipantsCount;
+        }
+
+        function getTotalMaxParticipants(event) {
+            return event.maxParticipants + event.maxVirtualParticipants;
+        }
+
+        function isParticipantsCountSet(event) {
+            return event.participantsCount !== undefined && event.virtualParticipantsCount !== undefined;
+        }
+
+        function calculateTotalJoinedParticipants() {
+            return eventService.countParticipants(attendStatus.Attending) + eventService.countParticipants(attendStatus.AttendingVirtually);
         }
     }
 })();

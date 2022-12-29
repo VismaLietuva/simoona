@@ -127,11 +127,12 @@ namespace Shrooms.Premium.Domain.Services.Events
             @event.IsFull = @event.Participants.Count(p => p.AttendStatus == (int)AttendingStatus.Attending) >= @event.MaxParticipants;
 
             @event.GoingCount = @event.Participants.Count(p => p.AttendStatus == (int)AttendingStatus.Attending);
+            @event.VirtuallyGoingCount = @event.Participants.Count(p => p.AttendStatus == (int)AttendingStatus.AttendingVirtually);
             @event.MaybeGoingCount = @event.Participants.Count(p => p.AttendStatus == (int)AttendingStatus.MaybeAttending);
             @event.NotGoingCount = @event.Participants.Count(p => p.AttendStatus == (int)AttendingStatus.NotAttending);
 
             var participating = @event.Participants.FirstOrDefault(p => p.UserId == userOrg.UserId);
-            @event.ParticipatingStatus = participating?.AttendStatus ?? (int)AttendingStatus.Idle;
+            @event.ParticipatingStatus = (AttendingStatus?)participating?.AttendStatus ?? AttendingStatus.Idle;
 
             // If user has permissions - show all participants, otherwise show only current user and his own event options
             if (await _permissionService.UserHasPermissionAsync(userOrg, BasicPermissions.EventUsers))
@@ -157,7 +158,6 @@ namespace Shrooms.Premium.Domain.Services.Events
 
             var hasPermissionToPin = await _permissionService.UserHasPermissionAsync(newEventDto, AdministrationPermissions.Event);
             _eventValidationService.CheckIfUserHasPermissionToPin(newEventDto.IsPinned, currentPinStatus: false, hasPermissionToPin);
-
             _eventValidationService.CheckIfEventStartDateIsExpired(newEventDto.StartDate);
             _eventValidationService.CheckIfRegistrationDeadlineIsExpired(newEventDto.RegistrationDeadlineDate.Value);
             await ValidateEvent(newEventDto);
@@ -181,22 +181,20 @@ namespace Shrooms.Premium.Domain.Services.Events
         public async Task UpdateEventAsync(EditEventDto eventDto)
         {
             var eventToUpdate = await _eventsDbSet
-                .Include(e => e.EventOptions)
                 .Include(e => e.EventParticipants)
-                .FirstOrDefaultAsync(e => e.Id == eventDto.Id && e.OrganizationId == eventDto.OrganizationId);
+                .Include(e => e.EventOptions)
+                .Include(e => e.EventType)
+                .Include(e => e.EventParticipants.Select(participant => participant.ApplicationUser))
+                .Include(e => e.EventParticipants.Select(participant => participant.ApplicationUser.Manager))
+                .SingleOrDefaultAsync(e => e.Id == eventDto.Id && e.OrganizationId == eventDto.OrganizationId);
 
             var totalOptionsProvided = eventDto.NewOptions.Count() + eventDto.EditedOptions.Count();
             eventDto.MaxOptions = FindOutMaxChoices(totalOptionsProvided, eventDto.MaxOptions);
             eventDto.RegistrationDeadlineDate = SetRegistrationDeadline(eventDto);
 
             var hasPermission = await _permissionService.UserHasPermissionAsync(eventDto, AdministrationPermissions.Event);
+            
             _eventValidationService.CheckIfEventExists(eventToUpdate);
-
-            if (eventToUpdate == null)
-            {
-                return;
-            }
-
             _eventValidationService.CheckIfUserHasPermission(eventDto.UserId, eventToUpdate.ResponsibleUserId, hasPermission);
             _eventValidationService.CheckIfUserHasPermissionToPin(eventDto.IsPinned, eventToUpdate.IsPinned, hasPermission);
             _eventValidationService.CheckIfCreatingEventHasInsufficientOptions(eventDto.MaxOptions, totalOptionsProvided);
@@ -204,20 +202,27 @@ namespace Shrooms.Premium.Domain.Services.Events
             _eventValidationService.CheckIfAttendOptionsAllowedToUpdate(eventDto, eventToUpdate);
 
             await ValidateEvent(eventDto);
-
-            if (eventDto.ResetParticipantList)
-            {
-                await _eventParticipationService.ResetAttendeesAsync(eventDto.Id, eventDto);
-            }
-
+            await ResetEventAttendessAsync(eventToUpdate, eventDto);
             await UpdateWallAsync(eventToUpdate, eventDto);
-
             UpdateEventInfo(eventDto, eventToUpdate);
             UpdateEventOptions(eventDto, eventToUpdate);
-
+            
             await _uow.SaveChangesAsync(false);
 
             eventToUpdate.Description = _markdownConverter.ConvertToHtml(eventToUpdate.Description);
+        }
+
+        private async Task ResetEventAttendessAsync(Event @event, EditEventDto eventDto)
+        {
+            if (eventDto.ResetParticipantList)
+            {
+                await _eventParticipationService.ResetAttendeesAsync(@event, eventDto);
+            }
+
+            if (eventDto.ResetVirtualParticipantList)
+            {
+                await _eventParticipationService.ResetVirtualAttendeesAsync(@event, eventDto);
+            }
         }
 
         public async Task ToggleEventPinAsync(Guid id)
@@ -295,6 +300,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                 Name = e.Name,
                 MaxOptions = e.MaxChoices,
                 MaxParticipants = e.MaxParticipants,
+                MaxVirtualParticipants = e.MaxVirtualParticipants,
                 Recurrence = e.EventRecurring,
                 AllowMaybeGoing = e.AllowMaybeGoing,
                 AllowNotGoing = e.AllowNotGoing,
@@ -467,6 +473,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             newEvent.ImageName = newEventDto.ImageName;
             newEvent.MaxChoices = newEventDto.MaxOptions;
             newEvent.MaxParticipants = newEventDto.MaxParticipants;
+            newEvent.MaxVirtualParticipants = newEventDto.MaxVirtualParticipants;
             newEvent.Place = newEventDto.Location;
             newEvent.ResponsibleUserId = newEventDto.ResponsibleUserId;
             newEvent.StartDate = newEventDto.StartDate;
@@ -497,6 +504,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                 AllowMaybeGoing = e.AllowMaybeGoing,
                 AllowNotGoing = e.AllowNotGoing,
                 MaxParticipants = e.MaxParticipants,
+                MaxVirtualParticipants = e.MaxVirtualParticipants,
                 MaxOptions = e.MaxChoices,
                 HostUserId = e.ResponsibleUserId,
                 WallId = e.WallId,
@@ -506,7 +514,9 @@ namespace Shrooms.Premium.Domain.Services.Events
                     Id = o.Id,
                     Name = o.Option,
                     Participants = o.EventParticipants
-                        .Where(x => x.EventId == eventId && x.AttendStatus == (int)AttendingStatus.Attending)
+                        .Where(x => x.EventId == eventId &&
+                              (x.AttendStatus == (int)AttendingStatus.Attending || 
+                               x.AttendStatus == (int)AttendingStatus.AttendingVirtually))
                         .Select(p => new EventDetailsParticipantDto
                         {
                             Id = p.Id,
