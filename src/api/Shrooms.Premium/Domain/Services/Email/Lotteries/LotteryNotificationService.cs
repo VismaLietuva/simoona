@@ -43,7 +43,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Lotteries
         {
             var userEmailsGroupedByTimeZone = await _usersDbSet
                 .Include(user => user.NotificationsSettings)
-                .Where(user => user.NotificationsSettings.CreatedLotteryEmailNotifications)
+                .Where(user => user.NotificationsSettings == null || user.NotificationsSettings.CreatedLotteryEmailNotifications)
                 .Select(user => new LotteryStartedEmailUserInfoDto
                 {
                     Email = user.Email,
