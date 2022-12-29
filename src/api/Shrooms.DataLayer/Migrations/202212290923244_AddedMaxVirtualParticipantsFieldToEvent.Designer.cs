@@ -13,7 +13,7 @@ namespace Shrooms.DataLayer.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202212061451224_AddedMaxVirtualParticipantsFieldToEvent"; }
+            get { return "202212290923244_AddedMaxVirtualParticipantsFieldToEvent"; }
         }
         
         string IMigrationMetadata.Source
