@@ -243,8 +243,8 @@ namespace Shrooms.Premium.Domain.Services.Lotteries
 
         public async Task<IPagedList<LotteryDetailsDto>> GetPagedLotteriesAsync(LotteryListingArgsDto args, UserAndOrganizationDto userOrg)
         {
-            var sortable = args
-                .AddSortablePropertiesToStart((nameof(LotteryDetailsDto.RefundFailed), SortDirection.Descending));
+            var sortable = args.AddSortablePropertiesToStart((nameof(LotteryDetailsDto.RefundFailed), SortDirection.Descending))
+                .AddSortablePropertiesToEnd((nameof(LotteryDetailsDto.Id), SortDirection.Descending));
 
             return await _lotteriesDbSet
                 .Where(lottery => lottery.OrganizationId == userOrg.OrganizationId &&
