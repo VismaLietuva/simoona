@@ -16,14 +16,14 @@ namespace Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes.Events
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            var number = value as int?;
-            if (!IsNumber(number))
+            var recurrenceOption = GetRecurrenceOption(validationContext);
+            if (IsOneTimeEvent(recurrenceOption))
             {
                 return ValidationResult.Success;
             }
 
-            var recurrenceOption = GetRecurrenceOption(validationContext);
-            if (IsOneTimeEvent(recurrenceOption))
+            var number = value as int?;
+            if (!IsNumber(number))
             {
                 return ValidationResult.Success;
             }
@@ -62,7 +62,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes.Events
 
         private static void CheckIfValueIsEventRecurrenceOption(object propertyValue)
         {
-            var type = propertyValue.GetType();
+            var type = propertyValue?.GetType();
             if (type != typeof(EventRecurrenceOptions))
             {
                 throw new ArgumentException($"Provided property is not of type {nameof(EventRecurrenceOptions)} but of type {type}");

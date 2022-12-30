@@ -195,6 +195,7 @@
     <Compile Include="ValidationAttributes\DateTimeLessThanPresentDateAttributeTests.cs" />
     <Compile Include="ValidationAttributes\DateTimeLessThanDateTimeAttributeTests.cs" />
     <Compile Include="ValidationAttributes\NoDuplicatesInCollectionAttributeTests.cs" />
+    <Compile Include="ValidationAttributes\RequireOneTimeEventAttributeTests.cs" />
     <Compile Include="ValidationAttributes\ValidLotteryCreationStatusAttributeTests.cs" />
   </ItemGroup>
   <ItemGroup>
