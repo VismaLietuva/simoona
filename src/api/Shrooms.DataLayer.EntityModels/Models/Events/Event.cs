@@ -24,8 +24,10 @@ namespace Shrooms.DataLayer.EntityModels.Models.Events
         public string Name { get; set; }
         public string ImageName { get; set; }
         public DateTime StartDate { get; set; }
+        public int? RemindBeforeStartInDays { get; set; }
         public DateTime EndDate { get; set; }
         public DateTime RegistrationDeadline { get; set; }
+        public int? RemindBeforeRegistrationDeadlineInDays { get; set; }
         public EventRecurrenceOptions EventRecurring { get; set; }
         public bool AllowMaybeGoing { get; set; }
         public bool AllowNotGoing { get; set; }
