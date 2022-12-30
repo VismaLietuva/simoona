@@ -1,6 +1,7 @@
 ﻿using System.Data.Entity;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Committee;
+using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.DataLayer.EntityModels.Models.Kudos;
 using Shrooms.DataLayer.EntityModels.Models.Lottery;
 using Shrooms.DataLayer.EntityModels.Models.Multiwall;
@@ -54,6 +55,8 @@ namespace Shrooms.DataLayer.DAL.EntityTypeConfigurations
             _modelBuilder.Entity<Project>()
                 .Map(m => m.Requires("IsDeleted").HasValue(false));
             _modelBuilder.Entity<NotificationsSettings>()
+                .Map(e => e.Requires("IsDeleted").HasValue(false));
+            _modelBuilder.Entity<EventNotification>()
                 .Map(e => e.Requires("IsDeleted").HasValue(false));
             _modelBuilder.ComplexType<LikesCollection>()
                 .Property(x => x.Serialized)

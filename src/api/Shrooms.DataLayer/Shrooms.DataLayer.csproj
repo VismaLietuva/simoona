@@ -910,6 +910,10 @@
     <Compile Include="Migrations\202212300831404_AddedNotificationForEvent.Designer.cs">
       <DependentUpon>202212300831404_AddedNotificationForEvent.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202212300851047_AddIsDeletedToEventNotification.cs" />
+    <Compile Include="Migrations\202212300851047_AddIsDeletedToEventNotification.Designer.cs">
+      <DependentUpon>202212300851047_AddIsDeletedToEventNotification.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
@@ -1518,6 +1522,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202212300831404_AddedNotificationForEvent.resx">
       <DependentUpon>202212300831404_AddedNotificationForEvent.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202212300851047_AddIsDeletedToEventNotification.resx">
+      <DependentUpon>202212300851047_AddIsDeletedToEventNotification.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
