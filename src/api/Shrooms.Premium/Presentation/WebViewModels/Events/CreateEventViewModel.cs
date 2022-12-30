@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using Hangfire.Annotations;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Premium.Constants;
+using Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes.Events;
 
 namespace Shrooms.Premium.Presentation.WebViewModels.Events
 {
@@ -20,11 +21,17 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
         [Required]
         public DateTime StartDate { get; set; }
 
+        [RequireOneTimeEvent(nameof(Recurrence)), Range(1, short.MaxValue)]
+        public int? RemindBeforeEventStartInDays { get; set; }
+
         [Required]
         public DateTime EndDate { get; set; }
 
         [Required]
         public DateTime? RegistrationDeadlineDate { get; set; }
+
+        [RequireOneTimeEvent(nameof(Recurrence)), Range(1, short.MaxValue)]
+        public int? RemindBeforeEventRegistrationDeadlineInDays { get; set; }
 
         [Required]
         public EventRecurrenceOptions Recurrence { get; set; }
