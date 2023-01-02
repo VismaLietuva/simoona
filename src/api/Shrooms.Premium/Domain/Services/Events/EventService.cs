@@ -117,7 +117,6 @@ namespace Shrooms.Premium.Domain.Services.Events
                 .Where(e => e.Id == id && e.OrganizationId == userOrg.OrganizationId)
                 .Select(MapToEventDetailsDto(id))
                 .SingleOrDefaultAsync();
-
             _eventValidationService.CheckIfEventExists(@event);
 
             // ReSharper disable once PossibleNullReferenceException
@@ -518,6 +517,11 @@ namespace Shrooms.Premium.Domain.Services.Events
             var requiresNotification = RequiresEventNotification(eventDto);
             var hasNotification = eventToUpdate.Notification != null;
             
+            if (!requiresNotification && !hasNotification)
+            {
+                return;
+            }
+
             if (requiresNotification && !hasNotification)
             {
                 AddEventNotification(eventDto, eventToUpdate);

@@ -31,6 +31,7 @@ namespace Shrooms.Premium.Tests.DomainService
     public class EventCrudServiceTests
     {
         private DbSet<Event> _eventsDbSet;
+        private DbSet<EventNotification> _eventNotificationsDbSet;
         private DbSet<Office> _officeDbSet;
         private DbSet<EventType> _eventTypesDbSet;
         private DbSet<ApplicationUser> _usersDbSet;
@@ -52,6 +53,7 @@ namespace Shrooms.Premium.Tests.DomainService
             _eventOptionsDbSet = _uow.MockDbSetForAsync<EventOption>();
             _usersDbSet = _uow.MockDbSetForAsync<ApplicationUser>();
             _eventTypesDbSet = _uow.MockDbSetForAsync<EventType>();
+            _eventNotificationsDbSet = _uow.MockDbSetForAsync<EventNotification>();
 
             _permissionService = Substitute.For<IPermissionService>();
             _systemClockMock = Substitute.For<ISystemClock>();
@@ -603,7 +605,7 @@ namespace Shrooms.Premium.Tests.DomainService
             await _uow.Received(1).SaveChangesAsync(false);
         }
 
-        private void MockEventTypes()
+        private List<EventType> MockEventTypes()
         {
             var types = new List<EventType>
             {
@@ -633,18 +635,343 @@ namespace Shrooms.Premium.Tests.DomainService
                 }
             };
             _eventTypesDbSet.SetDbSetDataForAsync(types.AsQueryable());
+            return types;
         }
 
-        private void MockUsers()
+        [Test]
+        public async Task Should_Create_Event_Notification()
         {
-            var types = new List<ApplicationUser>
+            var users = MockUsers();
+            MockEventTypes();
+            MockEventOptions();
+            var startDate = DateTime.UtcNow;
+            var createDto = new CreateEventDto
+            {
+                Name = "Event",
+                ImageName = "event-image-id",
+                StartDate = startDate,
+                EndDate = startDate.AddDays(20),
+                RegistrationDeadlineDate = startDate,
+                Recurrence = EventRecurrenceOptions.None,
+                Offices = new EventOfficesDto { Value = "[\"1\"]", OfficeNames = new List<string> { "office" } },
+                Location = "new york",
+                MaxParticipants = EventsConstants.EventMaxParticipants,
+                MaxVirtualParticipants = EventsConstants.EventMaxParticipants,
+                ResponsibleUserId = users.First().Id,
+                RemindBeforeEventRegistrationDeadlineInDays = 10,
+                RemindBeforeEventStartInDays = 10,
+                NewOptions = new List<NewEventOptionDto>(),
+                TypeId = 1,
+                MaxOptions = 0,
+                OrganizationId = 1,
+            };
+
+            await _eventService.CreateEventAsync(createDto);
+
+            _eventsDbSet.Received(1).Add(Arg.Is<Event>(e => e.Notification != null));
+        }
+
+        [Test]
+        public async Task Should_Not_Create_Event_Notification()
+        {
+            var users = MockUsers();
+            MockEventTypes();
+            MockEventOptions();
+            var startDate = DateTime.UtcNow;
+            var createDto = new CreateEventDto
+            {
+                Name = "Event",
+                ImageName = "event-image-id",
+                StartDate = startDate,
+                EndDate = startDate.AddDays(20),
+                RegistrationDeadlineDate = startDate,
+                Recurrence = EventRecurrenceOptions.None,
+                Offices = new EventOfficesDto { Value = "[\"1\"]", OfficeNames = new List<string> { "office" } },
+                Location = "new york",
+                MaxParticipants = EventsConstants.EventMaxParticipants,
+                MaxVirtualParticipants = EventsConstants.EventMaxParticipants,
+                ResponsibleUserId = users.First().Id,
+                NewOptions = new List<NewEventOptionDto>(),
+                TypeId = 1,
+                MaxOptions = 0,
+                OrganizationId = 1,
+            };
+
+            await _eventService.CreateEventAsync(createDto);
+
+            _eventsDbSet.Received(1).Add(Arg.Is<Event>(e => e.Notification == null));
+        }
+
+        [Test]
+        public async Task Should_Reset_OneTime_Event_StartDate_Reminder()
+        {
+            // Arrange
+            MockPermissionService(_permissionService);
+            var users = MockUsers();
+            var eventTypes = MockEventTypes();
+            MockEventOptions();
+            var office = MockOffices().First();
+            var eventId = Guid.NewGuid();
+
+            var notification = new EventNotification
+            {
+                EventId = eventId,
+                RemindBeforeEventStartInDays = 10,
+                EventStartNotified = true,
+            };
+            _eventNotificationsDbSet.SetDbSetDataForAsync(new[] { notification });
+
+            var @event = MockOneTimeEvent(users, eventTypes, office, eventId, notification);
+
+            var editDto = new EditEventDto
+            {
+                Id = @event.Id,
+                StartDate = DateTime.UtcNow.AddDays(4),
+                EndDate = DateTime.UtcNow.AddDays(4),
+                ImageName = "imageUrl",
+                Name = "Drinking event",
+                Location = "New location",
+                MaxParticipants = 15,
+                OrganizationId = 1,
+                Description = "desc",
+                Offices = new EventOfficesDto
+                {
+                    OfficeNames = new[] { office.Name },
+                    Value = $"[\"{office.Id}\"]"
+                },
+                RegistrationDeadlineDate = DateTime.UtcNow,
+                MaxOptions = 1,
+                ResponsibleUserId = users.First().Id,
+                TypeId = eventTypes.Last().Id,
+                NewOptions = new List<NewEventOptionDto>(),
+                EditedOptions = new List<EventOptionDto>(),
+                UserId = users.First().Id,
+                RemindBeforeEventStartInDays = notification.RemindBeforeEventStartInDays
+            };
+
+            // Act
+            await _eventService.UpdateEventAsync(editDto);
+
+            // Assert
+            Assert.IsFalse(_eventNotificationsDbSet.First().EventStartNotified);
+        }
+
+
+        [Test]
+        public async Task Should_Reset_OneTime_Event_RegistrationDeadline_Reminder()
+        {
+            // Arrange
+            MockPermissionService(_permissionService);
+            var users = MockUsers();
+            var eventTypes = MockEventTypes();
+            MockEventOptions();
+            var office = MockOffices().First();
+            var eventId = Guid.NewGuid();
+
+            var notification = new EventNotification
+            {
+                EventId = eventId,
+                RemindBeforeEventStartInDays = 10,
+                RemindBeforeEventRegistrationDeadlineInDays = 20,
+                EventStartNotified = true,
+                EventRegistrationDeadlineNotified = true
+            };
+            _eventNotificationsDbSet.SetDbSetDataForAsync(new[] { notification });
+
+            var @event = MockOneTimeEvent(users, eventTypes, office, eventId, notification);
+            
+            var editDto = new EditEventDto
+            {
+                Id = @event.Id,
+                StartDate = @event.StartDate,
+                EndDate = @event.EndDate,
+                ImageName = "imageUrl",
+                Name = "Drinking event",
+                Location = "New location",
+                MaxParticipants = 15,
+                OrganizationId = 1,
+                Description = "desc",
+                Offices = new EventOfficesDto
+                {
+                    OfficeNames = new[] { office.Name },
+                    Value = $"[\"{office.Id}\"]"
+                },
+                RegistrationDeadlineDate = @event.RegistrationDeadline.AddDays(-10),
+                MaxOptions = 1,
+                ResponsibleUserId = users.First().Id,
+                TypeId = eventTypes.Last().Id,
+                NewOptions = new List<NewEventOptionDto>(),
+                EditedOptions = new List<EventOptionDto>(),
+                UserId = users.First().Id,
+                RemindBeforeEventStartInDays = notification.RemindBeforeEventStartInDays,
+                RemindBeforeEventRegistrationDeadlineInDays = notification.RemindBeforeEventRegistrationDeadlineInDays
+            };
+
+            // Act
+            await _eventService.UpdateEventAsync(editDto);
+
+            // Assert
+            Assert.IsFalse(notification.EventRegistrationDeadlineNotified);
+        }
+
+        [Test]
+        public async Task Should_Removed_OneTime_Event_RegistrationDeadline_Reminder()
+        {
+            // Arrange
+            MockPermissionService(_permissionService);
+            var users = MockUsers();
+            var eventTypes = MockEventTypes();
+            MockEventOptions();
+            var office = MockOffices().First();
+            var eventId = Guid.NewGuid();
+
+            var notification = new EventNotification
+            {
+                EventId = eventId,
+                RemindBeforeEventStartInDays = 10,
+                RemindBeforeEventRegistrationDeadlineInDays = 20,
+                EventStartNotified = true,
+                EventRegistrationDeadlineNotified = false
+            };
+            _eventNotificationsDbSet.SetDbSetDataForAsync(new[] { notification });
+
+            var @event = MockOneTimeEvent(users, eventTypes, office, eventId, notification);
+
+            var editDto = new EditEventDto
+            {
+                Id = @event.Id,
+                StartDate = @event.StartDate,
+                EndDate = @event.EndDate,
+                ImageName = "imageUrl",
+                Name = "Drinking event",
+                Location = "New location",
+                MaxParticipants = 15,
+                OrganizationId = 1,
+                Description = "desc",
+                Offices = new EventOfficesDto
+                {
+                    OfficeNames = new[] { office.Name },
+                    Value = $"[\"{office.Id}\"]"
+                },
+                RegistrationDeadlineDate = @event.StartDate,
+                MaxOptions = 1,
+                ResponsibleUserId = users.First().Id,
+                TypeId = eventTypes.Last().Id,
+                NewOptions = new List<NewEventOptionDto>(),
+                EditedOptions = new List<EventOptionDto>(),
+                UserId = users.First().Id,
+                RemindBeforeEventStartInDays = notification.RemindBeforeEventStartInDays,
+                RemindBeforeEventRegistrationDeadlineInDays = notification.RemindBeforeEventRegistrationDeadlineInDays
+            };
+
+            // Act
+            await _eventService.UpdateEventAsync(editDto);
+
+            // Assert
+            Assert.IsTrue(notification.EventRegistrationDeadlineNotified);
+        }
+
+        [Test]
+        public async Task Should_Remove_OneTime_Event_Notification()
+        {
+            // Arrange
+            MockPermissionService(_permissionService);
+            var users = MockUsers();
+            var eventTypes = MockEventTypes();
+            MockEventOptions();
+            var office = MockOffices().First();
+            var eventId = Guid.NewGuid();
+
+            var notification = new EventNotification
+            {
+                EventId = eventId,
+                RemindBeforeEventStartInDays = 10,
+                RemindBeforeEventRegistrationDeadlineInDays = 20,
+                EventStartNotified = true,
+                EventRegistrationDeadlineNotified = false
+            };
+            _eventNotificationsDbSet.SetDbSetDataForAsync(new[] { notification });
+
+            var @event = MockOneTimeEvent(users, eventTypes, office, eventId, notification);
+
+            var editDto = new EditEventDto
+            {
+                Id = @event.Id,
+                StartDate = @event.StartDate,
+                EndDate = @event.EndDate,
+                ImageName = "imageUrl",
+                Name = "Drinking event",
+                Location = "New location",
+                MaxParticipants = 15,
+                OrganizationId = 1,
+                Description = "desc",
+                Offices = new EventOfficesDto
+                {
+                    OfficeNames = new[] { office.Name },
+                    Value = $"[\"{office.Id}\"]"
+                },
+                RegistrationDeadlineDate = @event.StartDate,
+                MaxOptions = 1,
+                ResponsibleUserId = users.First().Id,
+                TypeId = eventTypes.Last().Id,
+                NewOptions = new List<NewEventOptionDto>(),
+                EditedOptions = new List<EventOptionDto>(),
+                UserId = users.First().Id,
+                RemindBeforeEventStartInDays = null,
+                RemindBeforeEventRegistrationDeadlineInDays = null
+            };
+
+            // Act
+            await _eventService.UpdateEventAsync(editDto);
+
+            // Assert
+            _eventNotificationsDbSet.Received(1).Remove(Arg.Any<EventNotification>());
+        }
+
+        private List<ApplicationUser> MockUsers()
+        {
+            var users = new List<ApplicationUser>
             {
                 new ApplicationUser
                 {
-                    Id = "1"
+                    Id = "1",
+                    FirstName = "user3f",
+                    LastName = "user3l",
+                    PictureId = "test picture"
                 }
             };
-            _usersDbSet.SetDbSetDataForAsync(types.AsQueryable());
+            _usersDbSet.SetDbSetDataForAsync(users.AsQueryable());
+            return users;
+        }
+
+        private Event MockOneTimeEvent(List<ApplicationUser> users, List<EventType> eventTypes, Office office, Guid eventId, EventNotification notification)
+        {
+            var @event = new Event
+            {
+                Id = eventId,
+                StartDate = DateTime.UtcNow.AddDays(4),
+                EndDate = DateTime.UtcNow.AddDays(4),
+                Created = DateTime.UtcNow,
+                ResponsibleUserId = users.First().Id,
+                EventRecurring = EventRecurrenceOptions.None,
+                ImageName = "imageUrl",
+                Name = "Drinking event",
+                Place = "City",
+                MaxParticipants = 15,
+                OrganizationId = 1,
+                Description = "desc",
+                EventOptions = new List<EventOption>(),
+                EventParticipants = new List<EventParticipant>(),
+                Offices = $"[\"{office.Id}\"]",
+                RegistrationDeadline = DateTime.UtcNow,
+                MaxChoices = 1,
+                ResponsibleUser = users.First(),
+                EventType = eventTypes.Last(),
+                EventTypeId = eventTypes.Last().Id,
+                Notification = notification
+            };
+            _eventsDbSet.SetDbSetDataForAsync(new[] { @event });
+            return @event;
         }
 
         private Guid[] MockEventsListTest()
@@ -913,6 +1240,13 @@ namespace Shrooms.Premium.Tests.DomainService
 
             _eventsDbSet.SetDbSetDataForAsync(events.AsQueryable());
 
+            MockOffices();
+
+            return eventId;
+        }
+
+        private List<Office> MockOffices()
+        {
             var offices = new List<Office>
             {
                 new Office
@@ -925,8 +1259,7 @@ namespace Shrooms.Premium.Tests.DomainService
             };
 
             _officeDbSet.SetDbSetDataForAsync(offices.AsQueryable());
-
-            return eventId;
+            return offices;
         }
     }
 }

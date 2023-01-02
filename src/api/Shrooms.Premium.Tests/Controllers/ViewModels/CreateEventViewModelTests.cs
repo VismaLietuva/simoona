@@ -60,8 +60,8 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
                 Recurrence = recurrence,
                 Offices = new List<int>(),
                 Location = "new york",
-                MaxParticipants = EventsConstants.EventMaxParticipants - 1,
-                MaxVirtualParticipants = EventsConstants.EventMaxParticipants - 1,
+                MaxParticipants = EventsConstants.EventMaxParticipants,
+                MaxVirtualParticipants = EventsConstants.EventMaxParticipants,
                 ResponsibleUserId = "user-id"
             };
         }
