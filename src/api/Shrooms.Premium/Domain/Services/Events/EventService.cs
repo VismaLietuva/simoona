@@ -40,6 +40,7 @@ namespace Shrooms.Premium.Domain.Services.Events
         private readonly DbSet<EventType> _eventTypesDbSet;
         private readonly DbSet<ApplicationUser> _usersDbSet;
         private readonly DbSet<EventOption> _eventOptionsDbSet;
+        private readonly DbSet<EventNotification> _eventNotificationsDbSet;
 
         private readonly IDbSet<Office> _officeDbSet;
 
@@ -58,6 +59,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
             _eventOptionsDbSet = uow.GetDbSet<EventOption>();
             _officeDbSet = uow.GetDbSet<Office>();
+            _eventNotificationsDbSet = uow.GetDbSet<EventNotification>();
 
             _permissionService = permissionService;
             _eventUtilitiesService = eventUtilitiesService;
@@ -186,6 +188,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                 .Include(e => e.EventType)
                 .Include(e => e.EventParticipants.Select(participant => participant.ApplicationUser))
                 .Include(e => e.EventParticipants.Select(participant => participant.ApplicationUser.Manager))
+                .Include(e => e.Notification)
                 .SingleOrDefaultAsync(e => e.Id == eventDto.Id && e.OrganizationId == eventDto.OrganizationId);
 
             var totalOptionsProvided = eventDto.NewOptions.Count() + eventDto.EditedOptions.Count();
@@ -206,7 +209,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             await UpdateWallAsync(eventToUpdate, eventDto);
             UpdateEventInfo(eventDto, eventToUpdate);
             UpdateEventOptions(eventDto, eventToUpdate);
-            
+
             await _uow.SaveChangesAsync(false);
 
             eventToUpdate.Description = _markdownConverter.ConvertToHtml(eventToUpdate.Description);
@@ -461,7 +464,29 @@ namespace Shrooms.Premium.Domain.Services.Events
             return newEvent;
         }
 
-        private static void UpdateEventInfo(CreateEventDto newEventDto, Event newEvent)
+        private static void AddEventNotification(CreateEventDto newEventDto, Event newEvent)
+        {
+            var notification = new EventNotification
+            {
+                EventId = newEvent.Id,
+                RemindBeforeEventRegistrationDeadlineInDays = newEventDto.RemindBeforeEventRegistrationDeadlineInDays ?? 0,
+                RemindBeforeEventStartInDays = newEventDto.RemindBeforeEventStartInDays ?? 0
+            };
+            newEvent.Notification = notification;
+        }
+
+        private static bool RequiresEventNotification(CreateEventDto newEventDto)
+        {
+            return newEventDto.RemindBeforeEventStartInDays != null || newEventDto.RemindBeforeEventRegistrationDeadlineInDays != null;
+        }
+
+        private void UpdateEventInfo(CreateEventDto newEventDto, Event newEvent)
+        {
+            SetEventNotification(newEventDto, newEvent);
+            SetEventInfo(newEventDto, newEvent);
+        }
+
+        private static void SetEventInfo(CreateEventDto newEventDto, Event newEvent)
         {
             newEvent.Modified = DateTime.UtcNow;
             newEvent.ModifiedBy = newEventDto.UserId;
@@ -485,6 +510,51 @@ namespace Shrooms.Premium.Domain.Services.Events
             newEvent.IsPinned = newEventDto.IsPinned;
             newEvent.AllowMaybeGoing = newEventDto.AllowMaybeGoing;
             newEvent.AllowNotGoing = newEventDto.AllowNotGoing;
+        }
+
+        private void SetEventNotification(CreateEventDto eventDto, Event eventToUpdate)
+        {
+            var requiresNotification = RequiresEventNotification(eventDto);
+            var hasNotification = eventToUpdate.Notification != null;
+            
+            if (requiresNotification && !hasNotification)
+            {
+                AddEventNotification(eventDto, eventToUpdate);
+                return;
+            }
+
+            if (!requiresNotification && hasNotification)
+            {
+                _eventNotificationsDbSet.Remove(eventToUpdate.Notification);
+                return;
+            }
+
+            UpdateEventNotification(eventDto, eventToUpdate);
+        }
+
+        private static void UpdateEventNotification(CreateEventDto eventDto, Event eventToUpdate)
+        {
+            eventToUpdate.Notification.RemindBeforeEventRegistrationDeadlineInDays = eventDto.RemindBeforeEventRegistrationDeadlineInDays ?? 0;
+            eventToUpdate.Notification.RemindBeforeEventStartInDays = eventDto.RemindBeforeEventStartInDays ?? 0;
+
+            if (eventDto.StartDate > eventToUpdate.StartDate)
+            {
+                eventToUpdate.Notification.EventStartNotified = false;
+            }
+
+            if (IsRegistrationDeadlineBeingRemoved(eventDto, eventToUpdate))
+            {
+                eventToUpdate.Notification.EventRegistrationDeadlineNotified = true;
+            }
+            else if (eventDto.RegistrationDeadlineDate < eventToUpdate.RegistrationDeadline)
+            {
+                eventToUpdate.Notification.EventRegistrationDeadlineNotified = false;
+            }
+        }
+        
+        private static bool IsRegistrationDeadlineBeingRemoved(CreateEventDto eventDto, Event eventToUpdate)
+        {
+            return eventDto.RegistrationDeadlineDate != eventToUpdate.RegistrationDeadline && eventDto.RegistrationDeadlineDate == eventToUpdate.StartDate;
         }
 
         private static Expression<Func<Event, EventDetailsDto>> MapToEventDetailsDto(Guid eventId)

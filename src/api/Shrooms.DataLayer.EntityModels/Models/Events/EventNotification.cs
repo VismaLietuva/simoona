@@ -13,12 +13,12 @@ namespace Shrooms.DataLayer.EntityModels.Models.Events
 
         public Event Event { get; set; }
 
-        [Range(1, short.MaxValue)]
+        [Range(0, short.MaxValue)]
         public int RemindBeforeEventStartInDays { get; set; }
 
         public bool EventStartNotified { get; set; }
-
-        [Range(1, short.MaxValue)]
+   
+        [Range(0, short.MaxValue)]
         public int RemindBeforeEventRegistrationDeadlineInDays { get; set; }
 
         public bool EventRegistrationDeadlineNotified { get; set; }
