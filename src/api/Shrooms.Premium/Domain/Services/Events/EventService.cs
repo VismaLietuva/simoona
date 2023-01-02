@@ -469,15 +469,15 @@ namespace Shrooms.Premium.Domain.Services.Events
             var notification = new EventNotification
             {
                 EventId = newEvent.Id,
-                RemindBeforeEventRegistrationDeadlineInDays = newEventDto.RemindBeforeEventRegistrationDeadlineInDays ?? 0,
-                RemindBeforeEventStartInDays = newEventDto.RemindBeforeEventStartInDays ?? 0
+                RemindBeforeEventRegistrationDeadlineInDays = newEventDto.RemindBeforeEventRegistrationDeadlineInDays,
+                RemindBeforeEventStartInDays = newEventDto.RemindBeforeEventStartInDays
             };
             newEvent.Notification = notification;
         }
 
         private static bool RequiresEventNotification(CreateEventDto newEventDto)
         {
-            return newEventDto.RemindBeforeEventStartInDays != null || newEventDto.RemindBeforeEventRegistrationDeadlineInDays != null;
+            return newEventDto.RemindBeforeEventStartInDays != 0 || newEventDto.RemindBeforeEventRegistrationDeadlineInDays != 0;
         }
 
         private void UpdateEventInfo(CreateEventDto newEventDto, Event newEvent)
@@ -539,8 +539,8 @@ namespace Shrooms.Premium.Domain.Services.Events
 
         private static void UpdateEventNotification(CreateEventDto eventDto, Event eventToUpdate)
         {
-            eventToUpdate.Notification.RemindBeforeEventRegistrationDeadlineInDays = eventDto.RemindBeforeEventRegistrationDeadlineInDays ?? 0;
-            eventToUpdate.Notification.RemindBeforeEventStartInDays = eventDto.RemindBeforeEventStartInDays ?? 0;
+            eventToUpdate.Notification.RemindBeforeEventRegistrationDeadlineInDays = eventDto.RemindBeforeEventRegistrationDeadlineInDays;
+            eventToUpdate.Notification.RemindBeforeEventStartInDays = eventDto.RemindBeforeEventStartInDays;
 
             if (eventDto.StartDate > eventToUpdate.StartDate)
             {

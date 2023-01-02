@@ -756,7 +756,6 @@ namespace Shrooms.Premium.Tests.DomainService
             Assert.IsFalse(_eventNotificationsDbSet.First().EventStartNotified);
         }
 
-
         [Test]
         public async Task Should_Reset_OneTime_Event_RegistrationDeadline_Reminder()
         {
@@ -917,8 +916,8 @@ namespace Shrooms.Premium.Tests.DomainService
                 NewOptions = new List<NewEventOptionDto>(),
                 EditedOptions = new List<EventOptionDto>(),
                 UserId = users.First().Id,
-                RemindBeforeEventStartInDays = null,
-                RemindBeforeEventRegistrationDeadlineInDays = null
+                RemindBeforeEventStartInDays = 0,
+                RemindBeforeEventRegistrationDeadlineInDays = 0
             };
 
             // Act

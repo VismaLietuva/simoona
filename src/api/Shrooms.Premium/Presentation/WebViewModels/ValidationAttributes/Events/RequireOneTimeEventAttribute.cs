@@ -22,18 +22,12 @@ namespace Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes.Events
                 return ValidationResult.Success;
             }
 
-            var number = value as int?;
-            if (!IsNumber(number))
+            if (value is not int || (int)value == 0)
             {
                 return ValidationResult.Success;
             }
 
             return new ValidationResult("Value can only be set on one time event");
-        }
-
-        private static bool IsNumber(int? number)
-        {
-            return number != null && number.HasValue;
         }
 
         private static bool IsOneTimeEvent(EventRecurrenceOptions recurrenceOption)

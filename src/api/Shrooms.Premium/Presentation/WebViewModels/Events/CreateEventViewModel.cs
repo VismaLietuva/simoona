@@ -21,17 +21,16 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
         [Required]
         public DateTime StartDate { get; set; }
 
-        [RequireOneTimeEvent(nameof(Recurrence)), Range(1, short.MaxValue)]
-        public int? RemindBeforeEventStartInDays { get; set; }
+        [RequireOneTimeEvent(nameof(Recurrence)), Range(0, short.MaxValue)]
+        public int RemindBeforeEventStartInDays { get; set; }
 
         [Required]
         public DateTime EndDate { get; set; }
 
         [Required]
         public DateTime? RegistrationDeadlineDate { get; set; }
-
-        [RequireOneTimeEvent(nameof(Recurrence)), Range(1, short.MaxValue)]
-        public int? RemindBeforeEventRegistrationDeadlineInDays { get; set; }
+        [RequireOneTimeEvent(nameof(Recurrence)), Range(0, short.MaxValue)]
+        public int RemindBeforeEventRegistrationDeadlineInDays { get; set; }
 
         [Required]
         public EventRecurrenceOptions Recurrence { get; set; }
