@@ -113,6 +113,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             var @event = await _eventsDbSet
                 .Include(e => e.ResponsibleUser)
                 .Include(e => e.EventParticipants.Select(v => v.EventOptions))
+                .Include(e => e.Notification)
                 .Where(e => e.Id == id && e.OrganizationId == userOrg.OrganizationId)
                 .Select(MapToEventDetailsDto(id))
                 .SingleOrDefaultAsync();
@@ -579,6 +580,8 @@ namespace Shrooms.Premium.Domain.Services.Events
                 HostUserId = e.ResponsibleUserId,
                 WallId = e.WallId,
                 HostUserFullName = e.ResponsibleUser.FirstName + " " + e.ResponsibleUser.LastName,
+                RemindBeforeEventRegistrationDeadlineInDays = e.Notification != null ? e.Notification.RemindBeforeEventRegistrationDeadlineInDays : null,
+                RemindBeforeEventStartInDays = e.Notification != null ? e.Notification.RemindBeforeEventStartInDays : null,
                 Options = e.EventOptions.Select(o => new EventDetailsOptionDto
                 {
                     Id = o.Id,
