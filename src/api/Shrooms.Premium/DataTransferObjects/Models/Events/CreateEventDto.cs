@@ -15,9 +15,13 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
 
         public DateTime StartDate { get; set; }
 
+        public int? RemindBeforeEventStartInDays { get; set; }
+
         public DateTime EndDate { get; set; }
 
         public DateTime? RegistrationDeadlineDate { get; set; }
+
+        public int? RemindBeforeEventRegistrationDeadlineInDays { get; set; }
 
         public EventRecurrenceOptions Recurrence { get; set; }
 
