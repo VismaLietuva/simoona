@@ -190,12 +190,6 @@
                         <label class="control-label col-xs-12 col-sm-4" translate="events.eventAttendOptions"></label>
                         <div>
                             <div class="col-sm-2">
-                                <input id="allowJoiningVirtually" type="checkbox" class="event-form-checkbox" ng-model="vm.allowJoiningVirtually">
-                                <label for="allowJoiningVirtually" class="control-label"
-                                    translate="events.eventAttendOptions_JoiningVirtually"></label>
-                            </div>
-
-                            <div class="col-sm-2">
                                 <input id="allowMaybeGoing" type="checkbox" class="event-form-checkbox"
                                     ng-model="vm.event.allowMaybeGoing"
                                     data-test-id="event-form-allow-maybe-going-input">
@@ -208,6 +202,12 @@
                                     ng-model="vm.event.allowNotGoing" data-test-id="event-form-allow-not-going-input">
                                 <label for="allowNotGoing" class="control-label"
                                     translate="events.eventAttendOptions_NotGoing"></label>
+                            </div>
+
+                            <div class="col-sm-2">
+                                <input id="allowJoiningVirtually" type="checkbox" class="event-form-checkbox" ng-model="vm.allowJoiningVirtually">
+                                <label for="allowJoiningVirtually" class="control-label"
+                                    translate="events.eventAttendOptions_JoiningVirtually"></label>
                             </div>
                         </div>
                     </div>
