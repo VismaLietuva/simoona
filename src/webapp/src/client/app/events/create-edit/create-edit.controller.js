@@ -73,7 +73,7 @@
         vm.resetVirtualParticipantList = false;
         vm.isRegistrationDeadlineEnabled = false;
         vm.isSaveButtonEnabled = true;
-        vm.allowJoiningVirtually = true;
+        vm.allowJoiningVirtually = false;
         vm.eventSettings = eventSettings;
         vm.eventImageSize = {
             w: eventSettings.thumbWidth,
