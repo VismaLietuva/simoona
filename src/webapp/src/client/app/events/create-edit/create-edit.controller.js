@@ -542,7 +542,7 @@
                     vm.event.maxParticipants < vm.minParticipants;
             }
 
-            if (!vm.allowJoiningVirtually) {
+            if (!vm.allowJoiningVirtually && vm.minVirtualParticipants) {
                 vm.event.maxVirtualParticipants = 0;
                 vm.event.resetVirtualParticipantList = true;
                 return;
