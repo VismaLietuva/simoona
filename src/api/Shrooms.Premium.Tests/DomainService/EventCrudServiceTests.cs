@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
@@ -31,7 +32,7 @@ namespace Shrooms.Premium.Tests.DomainService
     public class EventCrudServiceTests
     {
         private DbSet<Event> _eventsDbSet;
-        private DbSet<EventNotification> _eventNotificationsDbSet;
+        private DbSet<EventReminder> _eventRemindersDbSet;
         private DbSet<Office> _officeDbSet;
         private DbSet<EventType> _eventTypesDbSet;
         private DbSet<ApplicationUser> _usersDbSet;
@@ -53,7 +54,7 @@ namespace Shrooms.Premium.Tests.DomainService
             _eventOptionsDbSet = _uow.MockDbSetForAsync<EventOption>();
             _usersDbSet = _uow.MockDbSetForAsync<ApplicationUser>();
             _eventTypesDbSet = _uow.MockDbSetForAsync<EventType>();
-            _eventNotificationsDbSet = _uow.MockDbSetForAsync<EventNotification>();
+            _eventRemindersDbSet = _uow.MockDbSetForAsync<EventReminder>();
 
             _permissionService = Substitute.For<IPermissionService>();
             _systemClockMock = Substitute.For<ISystemClock>();
@@ -144,7 +145,8 @@ namespace Shrooms.Premium.Tests.DomainService
                 OrganizationId = 1,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<NewEventOptionDto>()
+                NewOptions = new List<NewEventOptionDto>(),
+                Reminders = new List<EventReminderDto>()
             };
 
             await _eventService.CreateEventAsync(newEvent);
@@ -171,7 +173,8 @@ namespace Shrooms.Premium.Tests.DomainService
                 OrganizationId = 1,
                 ResponsibleUserId = "1",
                 Location = "place",
-                NewOptions = new List<NewEventOptionDto>()
+                NewOptions = new List<NewEventOptionDto>(),
+                Reminders = new List<EventReminderDto>()
             };
 
             await _eventService.CreateEventAsync(newEvent);
@@ -213,7 +216,8 @@ namespace Shrooms.Premium.Tests.DomainService
                     {
                         Option = "Type2"
                     }
-                }
+                },
+                Reminders = new List<EventReminderDto>()
             };
 
             await _eventService.CreateEventAsync(newEvent);
@@ -595,7 +599,8 @@ namespace Shrooms.Premium.Tests.DomainService
                         Id = 2,
                         Option = "Edited2"
                     }
-                }
+                },
+                Reminders = new List<EventReminderDto>()
             };
 
             await _eventService.UpdateEventAsync(newEvent);
@@ -658,17 +663,23 @@ namespace Shrooms.Premium.Tests.DomainService
                 MaxParticipants = EventsConstants.EventMaxParticipants,
                 MaxVirtualParticipants = EventsConstants.EventMaxParticipants,
                 ResponsibleUserId = users.First().Id,
-                RemindBeforeEventRegistrationDeadlineInDays = 10,
-                RemindBeforeEventStartInDays = 10,
                 NewOptions = new List<NewEventOptionDto>(),
                 TypeId = 1,
                 MaxOptions = 0,
                 OrganizationId = 1,
+                Reminders = new List<EventReminderDto>
+                {
+                    new EventReminderDto
+                    {
+                        RemindBeforeInDays = 10,
+                        Type = EventRemindType.Start
+                    }
+                }
             };
 
             await _eventService.CreateEventAsync(createDto);
 
-            _eventsDbSet.Received(1).Add(Arg.Is<Event>(e => e.Notification != null));
+            _eventsDbSet.Received(1).Add(Arg.Is<Event>(e => e.Reminders.Any()));
         }
 
         [Test]
@@ -695,65 +706,12 @@ namespace Shrooms.Premium.Tests.DomainService
                 TypeId = 1,
                 MaxOptions = 0,
                 OrganizationId = 1,
+                Reminders = new List<EventReminderDto>()
             };
 
             await _eventService.CreateEventAsync(createDto);
 
-            _eventsDbSet.Received(1).Add(Arg.Is<Event>(e => e.Notification == null));
-        }
-
-        [Test]
-        public async Task Should_Reset_OneTime_Event_StartDate_Reminder()
-        {
-            // Arrange
-            MockPermissionService(_permissionService);
-            var users = MockUsers();
-            var eventTypes = MockEventTypes();
-            MockEventOptions();
-            var office = MockOffices().First();
-            var eventId = Guid.NewGuid();
-
-            var notification = new EventNotification
-            {
-                EventId = eventId,
-                RemindBeforeEventStartInDays = 10,
-                EventStartNotified = true,
-            };
-            _eventNotificationsDbSet.SetDbSetDataForAsync(new[] { notification });
-
-            var @event = MockOneTimeEvent(users, eventTypes, office, eventId, notification);
-
-            var editDto = new EditEventDto
-            {
-                Id = @event.Id,
-                StartDate = DateTime.UtcNow.AddDays(4),
-                EndDate = DateTime.UtcNow.AddDays(4),
-                ImageName = "imageUrl",
-                Name = "Drinking event",
-                Location = "New location",
-                MaxParticipants = 15,
-                OrganizationId = 1,
-                Description = "desc",
-                Offices = new EventOfficesDto
-                {
-                    OfficeNames = new[] { office.Name },
-                    Value = $"[\"{office.Id}\"]"
-                },
-                RegistrationDeadlineDate = DateTime.UtcNow,
-                MaxOptions = 1,
-                ResponsibleUserId = users.First().Id,
-                TypeId = eventTypes.Last().Id,
-                NewOptions = new List<NewEventOptionDto>(),
-                EditedOptions = new List<EventOptionDto>(),
-                UserId = users.First().Id,
-                RemindBeforeEventStartInDays = notification.RemindBeforeEventStartInDays
-            };
-
-            // Act
-            await _eventService.UpdateEventAsync(editDto);
-
-            // Assert
-            Assert.IsFalse(_eventNotificationsDbSet.First().EventStartNotified);
+            _eventsDbSet.Received(1).Add(Arg.Is<Event>(e => !e.Reminders.Any()));
         }
 
         [Test]
@@ -767,18 +725,16 @@ namespace Shrooms.Premium.Tests.DomainService
             var office = MockOffices().First();
             var eventId = Guid.NewGuid();
 
-            var notification = new EventNotification
+            var reminder = new EventReminder
             {
                 EventId = eventId,
-                RemindBeforeEventStartInDays = 10,
-                RemindBeforeEventRegistrationDeadlineInDays = 20,
-                EventStartNotified = true,
-                EventRegistrationDeadlineNotified = true
+                Reminded = true,
+                Type = EventRemindType.Deadline,
+                RemindBeforeInDays = 20
             };
-            _eventNotificationsDbSet.SetDbSetDataForAsync(new[] { notification });
+            var reminders = new List<EventReminder> { reminder };
+            var @event = MockOneTimeEvent(users, eventTypes, office, eventId, reminders);
 
-            var @event = MockOneTimeEvent(users, eventTypes, office, eventId, notification);
-            
             var editDto = new EditEventDto
             {
                 Id = @event.Id,
@@ -802,19 +758,22 @@ namespace Shrooms.Premium.Tests.DomainService
                 NewOptions = new List<NewEventOptionDto>(),
                 EditedOptions = new List<EventOptionDto>(),
                 UserId = users.First().Id,
-                RemindBeforeEventStartInDays = notification.RemindBeforeEventStartInDays,
-                RemindBeforeEventRegistrationDeadlineInDays = notification.RemindBeforeEventRegistrationDeadlineInDays
+                Reminders = reminders.Select(reminder => new EventReminderDto
+                {
+                    Type = reminder.Type,
+                    RemindBeforeInDays = reminder.RemindBeforeInDays
+                })
             };
 
             // Act
             await _eventService.UpdateEventAsync(editDto);
 
             // Assert
-            Assert.IsFalse(notification.EventRegistrationDeadlineNotified);
+            Assert.IsFalse(reminder.Reminded);
         }
 
         [Test]
-        public async Task Should_Removed_OneTime_Event_RegistrationDeadline_Reminder()
+        public async Task Should_Reset_OneTime_Event_StartDate_Reminder()
         {
             // Arrange
             MockPermissionService(_permissionService);
@@ -824,17 +783,73 @@ namespace Shrooms.Premium.Tests.DomainService
             var office = MockOffices().First();
             var eventId = Guid.NewGuid();
 
-            var notification = new EventNotification
+            var reminder = new EventReminder
             {
                 EventId = eventId,
-                RemindBeforeEventStartInDays = 10,
-                RemindBeforeEventRegistrationDeadlineInDays = 20,
-                EventStartNotified = true,
-                EventRegistrationDeadlineNotified = false
+                Reminded = true,
+                Type = EventRemindType.Start,
+                RemindBeforeInDays = 10
             };
-            _eventNotificationsDbSet.SetDbSetDataForAsync(new[] { notification });
+            var reminders = new List<EventReminder> { reminder };
+            var @event = MockOneTimeEvent(users, eventTypes, office, eventId, reminders);
 
-            var @event = MockOneTimeEvent(users, eventTypes, office, eventId, notification);
+            var editDto = new EditEventDto
+            {
+                Id = @event.Id,
+                StartDate = @event.StartDate.AddDays(4),
+                EndDate = @event.EndDate.AddDays(4),
+                ImageName = "imageUrl",
+                Name = "Drinking event",
+                Location = "New location",
+                MaxParticipants = 15,
+                OrganizationId = 1,
+                Description = "desc",
+                Offices = new EventOfficesDto
+                {
+                    OfficeNames = new[] { office.Name },
+                    Value = $"[\"{office.Id}\"]"
+                },
+                RegistrationDeadlineDate = DateTime.UtcNow,
+                MaxOptions = 1,
+                ResponsibleUserId = users.First().Id,
+                TypeId = eventTypes.Last().Id,
+                NewOptions = new List<NewEventOptionDto>(),
+                EditedOptions = new List<EventOptionDto>(),
+                UserId = users.First().Id,
+                Reminders = reminders.Select(reminder => new EventReminderDto
+                {
+                    Type = reminder.Type,
+                    RemindBeforeInDays = reminder.RemindBeforeInDays
+                })
+            };
+
+            // Act
+            await _eventService.UpdateEventAsync(editDto);
+
+            // Assert
+            Assert.IsFalse(reminder.Reminded);
+        }
+
+        [Test]
+        public async Task Should_Remove_OneTime_Event_Reminder()
+        {
+            // Arrange
+            MockPermissionService(_permissionService);
+            var users = MockUsers();
+            var eventTypes = MockEventTypes();
+            MockEventOptions();
+            var office = MockOffices().First();
+            var eventId = Guid.NewGuid();
+
+            var reminder = new EventReminder
+            {
+                EventId = eventId,
+                Reminded = true,
+                Type = EventRemindType.Start,
+                RemindBeforeInDays = 10
+            };
+            var reminders = new List<EventReminder> { reminder };
+            var @event = MockOneTimeEvent(users, eventTypes, office, eventId, reminders);
 
             var editDto = new EditEventDto
             {
@@ -859,72 +874,18 @@ namespace Shrooms.Premium.Tests.DomainService
                 NewOptions = new List<NewEventOptionDto>(),
                 EditedOptions = new List<EventOptionDto>(),
                 UserId = users.First().Id,
-                RemindBeforeEventStartInDays = notification.RemindBeforeEventStartInDays,
-                RemindBeforeEventRegistrationDeadlineInDays = notification.RemindBeforeEventRegistrationDeadlineInDays
-            };
-
-            // Act
-            await _eventService.UpdateEventAsync(editDto);
-
-            // Assert
-            Assert.IsTrue(notification.EventRegistrationDeadlineNotified);
-        }
-
-        [Test]
-        public async Task Should_Remove_OneTime_Event_Notification()
-        {
-            // Arrange
-            MockPermissionService(_permissionService);
-            var users = MockUsers();
-            var eventTypes = MockEventTypes();
-            MockEventOptions();
-            var office = MockOffices().First();
-            var eventId = Guid.NewGuid();
-
-            var notification = new EventNotification
-            {
-                EventId = eventId,
-                RemindBeforeEventStartInDays = 10,
-                RemindBeforeEventRegistrationDeadlineInDays = 20,
-                EventStartNotified = true,
-                EventRegistrationDeadlineNotified = false
-            };
-            _eventNotificationsDbSet.SetDbSetDataForAsync(new[] { notification });
-
-            var @event = MockOneTimeEvent(users, eventTypes, office, eventId, notification);
-
-            var editDto = new EditEventDto
-            {
-                Id = @event.Id,
-                StartDate = @event.StartDate,
-                EndDate = @event.EndDate,
-                ImageName = "imageUrl",
-                Name = "Drinking event",
-                Location = "New location",
-                MaxParticipants = 15,
-                OrganizationId = 1,
-                Description = "desc",
-                Offices = new EventOfficesDto
+                Reminders = reminders.Select(reminder => new EventReminderDto
                 {
-                    OfficeNames = new[] { office.Name },
-                    Value = $"[\"{office.Id}\"]"
-                },
-                RegistrationDeadlineDate = @event.StartDate,
-                MaxOptions = 1,
-                ResponsibleUserId = users.First().Id,
-                TypeId = eventTypes.Last().Id,
-                NewOptions = new List<NewEventOptionDto>(),
-                EditedOptions = new List<EventOptionDto>(),
-                UserId = users.First().Id,
-                RemindBeforeEventStartInDays = 0,
-                RemindBeforeEventRegistrationDeadlineInDays = 0
+                    Type = reminder.Type,
+                    RemindBeforeInDays = 0
+                })
             };
 
             // Act
             await _eventService.UpdateEventAsync(editDto);
 
             // Assert
-            _eventNotificationsDbSet.Received(1).Remove(Arg.Any<EventNotification>());
+            _eventRemindersDbSet.Received(1).Remove(Arg.Is<EventReminder>(r => r.Id == reminder.Id));
         }
 
         private List<ApplicationUser> MockUsers()
@@ -943,7 +904,7 @@ namespace Shrooms.Premium.Tests.DomainService
             return users;
         }
 
-        private Event MockOneTimeEvent(List<ApplicationUser> users, List<EventType> eventTypes, Office office, Guid eventId, EventNotification notification)
+        private Event MockOneTimeEvent(List<ApplicationUser> users, List<EventType> eventTypes, Office office, Guid eventId, List<EventReminder> reminders)
         {
             var @event = new Event
             {
@@ -967,8 +928,9 @@ namespace Shrooms.Premium.Tests.DomainService
                 ResponsibleUser = users.First(),
                 EventType = eventTypes.Last(),
                 EventTypeId = eventTypes.Last().Id,
-                Notification = notification
+                Reminders = reminders
             };
+            _eventRemindersDbSet.SetDbSetDataForAsync(reminders);
             _eventsDbSet.SetDbSetDataForAsync(new[] { @event });
             return @event;
         }
@@ -1028,7 +990,8 @@ namespace Shrooms.Premium.Tests.DomainService
                             Id = 2,
                             Option = "Notyetedited2"
                         }
-                    }
+                    },
+                    Reminders = new List<EventReminder>()
                 },
                 new Event
                 {
@@ -1044,7 +1007,8 @@ namespace Shrooms.Premium.Tests.DomainService
                     MaxParticipants = 15,
                     OrganizationId = 3,
                     EventParticipants = new List<EventParticipant> { participant3 },
-                    EventOptions = new List<EventOption>()
+                    EventOptions = new List<EventOption>(),
+                    Reminders = new List<EventReminder>()
                 },
                 new Event
                 {
@@ -1060,7 +1024,8 @@ namespace Shrooms.Premium.Tests.DomainService
                     MaxParticipants = 10,
                     OrganizationId = 2,
                     EventParticipants = new List<EventParticipant> { participant2 },
-                    EventOptions = new List<EventOption>()
+                    EventOptions = new List<EventOption>(),
+                    Reminders = new List<EventReminder>()
                 },
                 new Event
                 {
@@ -1076,7 +1041,8 @@ namespace Shrooms.Premium.Tests.DomainService
                     MaxParticipants = 10,
                     OrganizationId = 2,
                     EventParticipants = new List<EventParticipant> { participant2 },
-                    EventOptions = new List<EventOption>()
+                    EventOptions = new List<EventOption>(),
+                    Reminders = new List<EventReminder>()
                 }
             };
             _eventsDbSet.SetDbSetDataForAsync(events.AsQueryable());

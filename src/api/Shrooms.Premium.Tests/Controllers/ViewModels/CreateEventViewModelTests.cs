@@ -12,37 +12,19 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
     public class CreateEventViewModelTests
     {
         [Test]
-        public void NewInstance_CreatingOneTimeEventAndHasRemindBeforeEventStartValueSet_ReturnsTrue()
+        public void NewInstance_CreatingOneTimeEventAndHasReminders_ReturnsTrue()
         {
             var model = CreateValid();
-            model.RemindBeforeEventStartInDays = 10;
+            model.Reminders = new List<EventReminderViewModel>();
 
             Assert.IsTrue(model.IsValid());
         }
 
         [Test]
-        public void NewInstance_CreatingRecurringEventAndHasRemindBeforeEventStartValueSet_ReturnsFalse()
+        public void NewInstance_CreatingRecurringEventAndHasReminders_ReturnsFalse()
         {
             var model = CreateValid(EventRecurrenceOptions.EveryWeek);
-            model.RemindBeforeEventStartInDays = 10;
-
-            Assert.IsFalse(model.IsValid());
-        }
-
-        [Test]
-        public void NewInstance_CreatingOneTimeEventAndHasRemindBeforeEventRegistrationDeadlineInDaysValueSet_ReturnsTrue()
-        {
-            var model = CreateValid();
-            model.RemindBeforeEventRegistrationDeadlineInDays = 10;
-
-            Assert.IsTrue(model.IsValid());
-        }
-
-        [Test]
-        public void NewInstance_CreatingRecurringEventAndHasRemindBeforeEventRegistrationDeadlineInDaysValueSet_ReturnsFalse()
-        {
-            var model = CreateValid(EventRecurrenceOptions.EveryWeek);
-            model.RemindBeforeEventRegistrationDeadlineInDays = 10;
+            model.Reminders = new List<EventReminderViewModel>();
 
             Assert.IsFalse(model.IsValid());
         }
