@@ -40,7 +40,7 @@ namespace Shrooms.Premium.Domain.Services.Events
         private readonly DbSet<EventType> _eventTypesDbSet;
         private readonly DbSet<ApplicationUser> _usersDbSet;
         private readonly DbSet<EventOption> _eventOptionsDbSet;
-        private readonly DbSet<EventNotification> _eventNotificationsDbSet;
+        private readonly DbSet<EventReminder> _eventRemindersDbSet;
 
         private readonly IDbSet<Office> _officeDbSet;
 
@@ -59,7 +59,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             _usersDbSet = uow.GetDbSet<ApplicationUser>();
             _eventOptionsDbSet = uow.GetDbSet<EventOption>();
             _officeDbSet = uow.GetDbSet<Office>();
-            _eventNotificationsDbSet = uow.GetDbSet<EventNotification>();
+            _eventRemindersDbSet = uow.GetDbSet<EventReminder>();
 
             _permissionService = permissionService;
             _eventUtilitiesService = eventUtilitiesService;
@@ -113,7 +113,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             var @event = await _eventsDbSet
                 .Include(e => e.ResponsibleUser)
                 .Include(e => e.EventParticipants.Select(v => v.EventOptions))
-                .Include(e => e.Notification)
+                .Include(e => e.Reminders)
                 .Where(e => e.Id == id && e.OrganizationId == userOrg.OrganizationId)
                 .Select(MapToEventDetailsDto(id))
                 .SingleOrDefaultAsync();
@@ -188,7 +188,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                 .Include(e => e.EventType)
                 .Include(e => e.EventParticipants.Select(participant => participant.ApplicationUser))
                 .Include(e => e.EventParticipants.Select(participant => participant.ApplicationUser.Manager))
-                .Include(e => e.Notification)
+                .Include(e => e.Reminders)
                 .SingleOrDefaultAsync(e => e.Id == eventDto.Id && e.OrganizationId == eventDto.OrganizationId);
 
             var totalOptionsProvided = eventDto.NewOptions.Count() + eventDto.EditedOptions.Count();
@@ -442,7 +442,8 @@ namespace Shrooms.Premium.Domain.Services.Events
                 CreatedBy = newEventDto.UserId,
                 OrganizationId = newEventDto.OrganizationId,
                 OfficeIds = JsonConvert.DeserializeObject<string[]>(newEventDto.Offices.Value),
-                IsPinned = newEventDto.IsPinned
+                IsPinned = newEventDto.IsPinned,
+                Reminders = new List<EventReminder>()
             };
 
             var newWall = new CreateWallDto
@@ -464,25 +465,9 @@ namespace Shrooms.Premium.Domain.Services.Events
             return newEvent;
         }
 
-        private static void AddEventNotification(CreateEventDto newEventDto, Event newEvent)
-        {
-            var notification = new EventNotification
-            {
-                EventId = newEvent.Id,
-                RemindBeforeEventRegistrationDeadlineInDays = newEventDto.RemindBeforeEventRegistrationDeadlineInDays,
-                RemindBeforeEventStartInDays = newEventDto.RemindBeforeEventStartInDays
-            };
-            newEvent.Notification = notification;
-        }
-
-        private static bool RequiresEventNotification(CreateEventDto newEventDto)
-        {
-            return newEventDto.RemindBeforeEventStartInDays != 0 || newEventDto.RemindBeforeEventRegistrationDeadlineInDays != 0;
-        }
-
         private void UpdateEventInfo(CreateEventDto newEventDto, Event newEvent)
         {
-            SetEventNotification(newEventDto, newEvent);
+            SetEventReminders(newEventDto, newEvent);
             SetEventInfo(newEventDto, newEvent);
         }
 
@@ -512,51 +497,83 @@ namespace Shrooms.Premium.Domain.Services.Events
             newEvent.AllowNotGoing = newEventDto.AllowNotGoing;
         }
 
-        private void SetEventNotification(CreateEventDto eventDto, Event eventToUpdate)
+        private void SetEventReminders(CreateEventDto eventDto, Event eventToUpdate)
         {
-            var requiresNotification = RequiresEventNotification(eventDto);
-            var hasNotification = eventToUpdate.Notification != null;
-            
-            if (!requiresNotification && !hasNotification)
+            var updateReminders = eventToUpdate.Reminders.Join(
+                eventDto.Reminders,
+                oldReminder => oldReminder.Type,
+                reminder => reminder.Type,
+                (oldReminder, reminder) => new { OldReminder = oldReminder, Reminder = reminder })
+                .ToList();
+            foreach (var updateReminder in updateReminders)
             {
-                return;
+                UpdateEventReminder(updateReminder.Reminder, updateReminder.OldReminder, eventDto, eventToUpdate);
             }
 
-            if (requiresNotification && !hasNotification)
-            {
-                AddEventNotification(eventDto, eventToUpdate);
-                return;
-            }
-
-            if (!requiresNotification && hasNotification)
-            {
-                _eventNotificationsDbSet.Remove(eventToUpdate.Notification);
-                return;
-            }
-
-            UpdateEventNotification(eventDto, eventToUpdate);
+            var newReminders = eventDto.Reminders.Where(reminder =>
+                !updateReminders.Any(updateReminder => updateReminder.Reminder.Type == reminder.Type) &&
+                reminder.RemindBeforeInDays != 0);
+            AddEventReminders(eventToUpdate, newReminders);
         }
 
-        private static void UpdateEventNotification(CreateEventDto eventDto, Event eventToUpdate)
+        private static void AddEventReminders(Event eventToUpdate, IEnumerable<EventReminderDto> newReminders)
         {
-            eventToUpdate.Notification.RemindBeforeEventRegistrationDeadlineInDays = eventDto.RemindBeforeEventRegistrationDeadlineInDays;
-            eventToUpdate.Notification.RemindBeforeEventStartInDays = eventDto.RemindBeforeEventStartInDays;
-
-            if (eventDto.StartDate > eventToUpdate.StartDate)
+            foreach (var reminder in newReminders)
             {
-                eventToUpdate.Notification.EventStartNotified = false;
-            }
-
-            if (IsRegistrationDeadlineBeingRemoved(eventDto, eventToUpdate))
-            {
-                eventToUpdate.Notification.EventRegistrationDeadlineNotified = true;
-            }
-            else if (eventDto.RegistrationDeadlineDate < eventToUpdate.RegistrationDeadline)
-            {
-                eventToUpdate.Notification.EventRegistrationDeadlineNotified = false;
+                eventToUpdate.Reminders.Add(new EventReminder
+                {
+                    RemindBeforeInDays = reminder.RemindBeforeInDays,
+                    Type = reminder.Type,
+                    Reminded = false
+                });
             }
         }
-        
+
+        private void UpdateEventReminder(
+            EventReminderDto reminder,
+            EventReminder oldReminder,
+            CreateEventDto createDto,
+            Event @event)
+        {
+            if (reminder.RemindBeforeInDays == 0)
+            {
+                _eventRemindersDbSet.Remove(oldReminder);
+                return;
+            }
+
+            oldReminder.RemindBeforeInDays = reminder.RemindBeforeInDays;
+
+            switch (reminder.Type)
+            {
+                case EventRemindType.Start:
+                    UpdateEventReminderStart(oldReminder, createDto, @event);
+                    break;
+                case EventRemindType.Deadline:
+                    UpdateEventReminderDeadline(oldReminder, createDto, @event);
+                    break;
+            }
+        }
+
+        private static void UpdateEventReminderDeadline(EventReminder oldReminder, CreateEventDto createDto, Event @event)
+        {
+            if (createDto.StartDate > @event.StartDate)
+            {
+                oldReminder.Reminded = false;
+            }
+        }
+
+        private static void UpdateEventReminderStart(EventReminder oldReminder, CreateEventDto createDto, Event @event)
+        {
+            if (createDto.RegistrationDeadlineDate < @event.RegistrationDeadline)
+            {
+                oldReminder.Reminded = false;
+            }
+            else if (IsRegistrationDeadlineBeingRemoved(createDto, @event))
+            {
+                oldReminder.Reminded = true;
+            }
+        }
+
         private static bool IsRegistrationDeadlineBeingRemoved(CreateEventDto eventDto, Event eventToUpdate)
         {
             return eventDto.RegistrationDeadlineDate != eventToUpdate.RegistrationDeadline && eventDto.RegistrationDeadlineDate == eventToUpdate.StartDate;
@@ -584,8 +601,11 @@ namespace Shrooms.Premium.Domain.Services.Events
                 HostUserId = e.ResponsibleUserId,
                 WallId = e.WallId,
                 HostUserFullName = e.ResponsibleUser.FirstName + " " + e.ResponsibleUser.LastName,
-                RemindBeforeEventRegistrationDeadlineInDays = e.Notification != null ? e.Notification.RemindBeforeEventRegistrationDeadlineInDays : null,
-                RemindBeforeEventStartInDays = e.Notification != null ? e.Notification.RemindBeforeEventStartInDays : null,
+                Reminders = e.Reminders.Select(reminder => new EventReminderDto
+                {
+                    RemindBeforeInDays = reminder.RemindBeforeInDays,
+                    Type = reminder.Type
+                }),
                 Options = e.EventOptions.Select(o => new EventDetailsOptionDto
                 {
                     Id = o.Id,

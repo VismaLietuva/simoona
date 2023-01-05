@@ -29,7 +29,9 @@ namespace Shrooms.DataLayer.EntityModels.Models.Events
         public EventRecurrenceOptions EventRecurring { get; set; }
         public bool AllowMaybeGoing { get; set; }
         public bool AllowNotGoing { get; set; }
-        public EventNotification Notification { get; set; }
+
+        public ICollection<EventReminder> Reminders { get; set; }
+
         [ForeignKey("Office")]
         public int? OfficeId { get; set; }
 

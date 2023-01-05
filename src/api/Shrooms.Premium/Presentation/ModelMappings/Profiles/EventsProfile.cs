@@ -4,6 +4,7 @@ using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.DataTransferObjects.Models.OfficeMap;
 using Shrooms.Premium.Presentation.WebViewModels.Events;
+using System.Linq;
 
 namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 {
@@ -52,6 +53,7 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 
             CreateMap<EventOfficesDto, EventOfficesViewModel>();
             CreateMap<EventReportDetailsDto, EventReportDetailsViewModel>();
+            CreateMap<EventReminderDto, EventReminderViewModel>();
         }
 
         private void CreateViewModelToDtoMappings()
@@ -86,6 +88,7 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
             CreateMap<EventParticipantsReportListingArgsViewModel, EventParticipantsReportListingArgsDto>();
             CreateMap<EventReportListingArgsViewModel, EventReportListingArgsDto>();
             CreateMap<EventParticipantVisitedEventsListingArgsViewModel, EventParticipantVisitedEventsListingArgsDto>();
+            CreateMap<EventReminderViewModel, EventReminderDto>();
         }
 
         private void CreateEventsModelMappings()

@@ -110,6 +110,7 @@
     <Compile Include="DAL\EntityTypeConfigurations\BookLogEntityConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\BookOfficeEntityConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\EventOptionEntityConfig.cs" />
+    <Compile Include="DAL\EntityTypeConfigurations\EventReminderEntityConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\EventTypeEntityConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\ExternalLinkConfig.cs" />
     <Compile Include="DAL\EntityTypeConfigurations\IdentityUserClaimEntityConfig.cs" />
@@ -906,9 +907,9 @@
     <Compile Include="Migrations\202212290923244_AddedMaxVirtualParticipantsFieldToEvent.Designer.cs">
       <DependentUpon>202212290923244_AddedMaxVirtualParticipantsFieldToEvent.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202212300831404_AddedNotificationForEvent.cs" />
-    <Compile Include="Migrations\202212300831404_AddedNotificationForEvent.Designer.cs">
-      <DependentUpon>202212300831404_AddedNotificationForEvent.cs</DependentUpon>
+    <Compile Include="Migrations\202301041040284_AddEventReminder.cs" />
+    <Compile Include="Migrations\202301041040284_AddEventReminder.Designer.cs">
+      <DependentUpon>202301041040284_AddEventReminder.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
@@ -1516,8 +1517,8 @@
     <EmbeddedResource Include="Migrations\202212290923244_AddedMaxVirtualParticipantsFieldToEvent.resx">
       <DependentUpon>202212290923244_AddedMaxVirtualParticipantsFieldToEvent.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202212300831404_AddedNotificationForEvent.resx">
-      <DependentUpon>202212300831404_AddedNotificationForEvent.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202301041040284_AddEventReminder.resx">
+      <DependentUpon>202301041040284_AddEventReminder.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

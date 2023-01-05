@@ -17,17 +17,12 @@ namespace Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes.Events
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             var recurrenceOption = GetRecurrenceOption(validationContext);
-            if (IsOneTimeEvent(recurrenceOption))
+            if (IsOneTimeEvent(recurrenceOption) || value == null)
             {
                 return ValidationResult.Success;
             }
 
-            if (value is not int || (int)value == 0)
-            {
-                return ValidationResult.Success;
-            }
-
-            return new ValidationResult("Value can only be set on one time event");
+            return new ValidationResult($"Value {nameof(value)} can only be set on one time event");
         }
 
         private static bool IsOneTimeEvent(EventRecurrenceOptions recurrenceOption)

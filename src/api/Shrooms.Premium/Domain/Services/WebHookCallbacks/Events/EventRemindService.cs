@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Premium.Domain.Services.Email.Event;
 using Shrooms.Premium.Domain.Services.Events.Utilities;
@@ -8,7 +9,7 @@ using Shrooms.Premium.Domain.Services.Users;
 
 namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
 {
-    public class EventJoinRemindService : IEventJoinRemindService
+    public class EventRemindService : IEventRemindService
     {
         private readonly INotificationService _notificationService;
         private readonly IEventUtilitiesService _eventUtilitiesService;
@@ -16,7 +17,8 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
         private readonly IEventNotificationService _eventNotificationService;
         private readonly IOrganizationService _organizationService;
 
-        public EventJoinRemindService(INotificationService notificationService,
+        public EventRemindService(
+            INotificationService notificationService,
             IEventUtilitiesService eventUtilitiesService,
             IUserEventsService userEventsService,
             IEventNotificationService eventNotificationService,
@@ -29,11 +31,18 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
             _organizationService = organizationService;
         }
 
-        public async Task SendNotificationsAsync(string orgName)
+        public async Task SendJoinedNotificationsAsync(string organizationName)
         {
-            var userOrg = await _organizationService.GetOrganizationByNameAsync(orgName);
+            var organization = await GetOrganizationAsync(organizationName);
+            var remindDto = await _userEventsService.GetRemindEventsAsync(organization);
+            await _eventNotificationService.RemindAllUsersAboutJoinedEventsAsync(remindDto, organization);
+        }
 
-            var typesToNotifyAbout = (await _eventUtilitiesService.GetEventTypesToRemindAsync(userOrg.Id)).ToList();
+        public async Task SendNotificationsAsync(string organizationName)
+        {
+            var organization = await GetOrganizationAsync(organizationName);
+
+            var typesToNotifyAbout = (await _eventUtilitiesService.GetEventTypesToRemindAsync(organization.Id)).ToList();
             var typeIdsToNotifyAbout = typesToNotifyAbout.Select(e => e.Id).ToList();
 
             if (!typesToNotifyAbout.Any())
@@ -52,13 +61,18 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
 
             if (usersToNotifyInApp.Any())
             {
-                await _notificationService.CreateForEventJoinReminderAsync(usersToNotifyInApp, userOrg.Id);
+                await _notificationService.CreateForEventJoinReminderAsync(usersToNotifyInApp, organization.Id);
             }
 
             if (usersToNotifyEmail.Any())
             {
-                await _eventNotificationService.RemindUsersToJoinEventAsync(typesToNotifyAbout, usersToNotifyEmail, userOrg.Id);
+                await _eventNotificationService.RemindUsersToJoinEventAsync(typesToNotifyAbout, usersToNotifyEmail, organization.Id);
             }
+        }
+
+        private async Task<Organization> GetOrganizationAsync(string organizationName)
+        {
+            return await _organizationService.GetOrganizationByNameAsync(organizationName);
         }
     }
 }
