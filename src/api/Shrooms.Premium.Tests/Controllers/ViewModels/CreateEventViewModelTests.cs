@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.Presentation.WebViewModels.Events;
@@ -11,6 +12,114 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
     [TestFixture]
     public class CreateEventViewModelTests
     {
+        [Test]
+        public void NewInstance_ZeroRemindNumber_ReturnsTrue()
+        {
+            var model = CreateValid();
+            model.Reminders = new List<EventReminderViewModel>
+            {
+                new EventReminderViewModel
+                {
+                    Type = EventRemindType.Start,
+                    RemindBeforeInDays = 0
+                }
+            };
+
+            Assert.IsTrue(model.IsValid());
+        }
+
+        [Test]
+        public void NewInstance_NegativeRemindNumber_ReturnsFalse()
+        {
+            var model = CreateValid();
+            model.Reminders = new List<EventReminderViewModel>
+            {
+                new EventReminderViewModel
+                {
+                    Type = EventRemindType.Start,
+                    RemindBeforeInDays = -10
+                }
+            };
+
+            Assert.IsFalse(model.IsValid());
+        }
+
+        [Test]
+        public void NewInstance_ReminderInvalidType_ReturnsFalse()
+        {
+            var model = CreateValid();
+            model.Reminders = new List<EventReminderViewModel>
+            {
+                new EventReminderViewModel
+                {
+                    Type = (EventRemindType)int.MaxValue
+                },
+            };
+
+            Assert.IsFalse(model.IsValid());
+        }
+
+        [Test]
+        public void NewInstance_TooManyReminders_ReturnsFalse()
+        {
+            var model = CreateValid();
+            model.Reminders = new List<EventReminderViewModel>
+            {
+                new EventReminderViewModel
+                {
+                    Type = EventRemindType.Start
+                },
+                new EventReminderViewModel
+                {
+                    Type = EventRemindType.Deadline
+                },
+                new EventReminderViewModel
+                {
+                    Type = (EventRemindType)int.MaxValue
+                },
+            };
+
+            Assert.IsFalse(model.IsValid());
+        }
+
+        [Test]
+        public void NewInstance_DuplicateReminderTypes_ReturnsFalse()
+        {
+            var model = CreateValid();
+            model.Reminders = new List<EventReminderViewModel>
+            {
+                new EventReminderViewModel
+                {
+                    Type = EventRemindType.Start
+                },
+                new EventReminderViewModel
+                {
+                    Type = EventRemindType.Start
+                }
+            };
+
+            Assert.IsFalse(model.IsValid());
+        }
+
+        [Test]
+        public void NewInstance_DifferentReminderTypes_ReturnsTrue()
+        {
+            var model = CreateValid();
+            model.Reminders = new List<EventReminderViewModel>
+            {
+                new EventReminderViewModel
+                {
+                    Type = EventRemindType.Deadline
+                },
+                new EventReminderViewModel
+                {
+                    Type = EventRemindType.Start
+                }
+            };
+
+            Assert.IsTrue(model.IsValid());
+        }
+
         [Test]
         public void NewInstance_CreatingOneTimeEventAndHasReminders_ReturnsTrue()
         {
