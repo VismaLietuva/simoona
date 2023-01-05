@@ -548,13 +548,14 @@ namespace Shrooms.Premium.Domain.Services.Events
                 case EventRemindType.Start:
                     UpdateEventReminderStart(oldReminder, createDto, @event);
                     break;
+
                 case EventRemindType.Deadline:
                     UpdateEventReminderDeadline(oldReminder, createDto, @event);
                     break;
             }
         }
 
-        private static void UpdateEventReminderDeadline(EventReminder oldReminder, CreateEventDto createDto, Event @event)
+        private static void UpdateEventReminderStart(EventReminder oldReminder, CreateEventDto createDto, Event @event)
         {
             if (createDto.StartDate > @event.StartDate)
             {
@@ -562,7 +563,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             }
         }
 
-        private static void UpdateEventReminderStart(EventReminder oldReminder, CreateEventDto createDto, Event @event)
+        private static void UpdateEventReminderDeadline(EventReminder oldReminder, CreateEventDto createDto, Event @event)
         {
             if (createDto.RegistrationDeadlineDate < @event.RegistrationDeadline)
             {
