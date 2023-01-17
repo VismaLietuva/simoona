@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Users;
+using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -25,7 +26,8 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
 
         private readonly IDbSet<ApplicationUser> _usersDbSet;
 
-        public EventNotificationService(IUnitOfWork2 uow,
+        public EventNotificationService(
+            IUnitOfWork2 uow,
             IMailTemplate mailTemplate,
             IMailingService mailingService,
             IApplicationSettings appSettings,
@@ -54,6 +56,19 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             var emailBody = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.EventParticipantExpelled);
 
             await _mailingService.SendEmailAsync(new EmailDto(emails, Resources.Models.Events.Events.ResetParticipantListEmailSubject, emailBody));
+        }
+        
+        public async Task RemindAllUsersAboutJoinedEventsAsync(RemindJoinedEventEmailDto remindDto, Organization organization)
+        {
+            var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
+            var emailsToSend = remindDto.RemindStartEvents.Select(MapEventStartEmailsToEmailContent(organization, userNotificationSettingsUrl))
+                .Union(remindDto.RemindDeadlineEvents.Select(MapEventDeadlineEmailsToEmailContent(organization, userNotificationSettingsUrl)))
+                .ToList();
+            
+            foreach (var emailContent in emailsToSend)
+            {
+                await _mailingService.SendEmailAsync(new EmailDto(emailContent.UserEmails, emailContent.Subject, emailContent.Body));
+            }
         }
 
         public async Task RemindUsersToJoinEventAsync(IEnumerable<EventTypeDto> eventTypes, IEnumerable<string> emails, int orgId)
@@ -115,6 +130,30 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             return new EmailDto(new List<string> { userAttendStatusDto.ManagerEmail },
                     emailJoinSubject,
                     emailJoinBody);
+        }
+
+        private Func<RemindEventStartEmailDto, (string Body, IEnumerable<string> UserEmails, string Subject)> MapEventStartEmailsToEmailContent(Organization organization, string userNotificationSettingsUrl)
+        {
+            return reminder =>
+            {
+                var eventUrl = _appSettings.EventUrl(organization.ShortName, reminder.EventId.ToString());
+                var eventEmailTemplate = new EventStartRemindEmailTemplateViewModel(userNotificationSettingsUrl, reminder.EventName, eventUrl);
+                var emailBody = _mailTemplate.Generate(eventEmailTemplate, EmailPremiumTemplateCacheKeys.EventStartRemind);
+                var subject = string.Format(Resources.Models.Events.Events.RemindEventStartEmailSubject, reminder.EventName);
+                return (Body: emailBody, reminder.UserEmails, Subject: subject);
+            };
+        }
+
+        private Func<RemindEventDeadlineEmailDto, (string Body, IEnumerable<string> UserEmails, string Subject)> MapEventDeadlineEmailsToEmailContent(Organization organization, string userNotificationSettingsUrl)
+        {
+            return reminder =>
+            {
+                var eventUrl = _appSettings.EventUrl(organization.ShortName, reminder.EventId.ToString());
+                var eventEmailTemplate = new EventDeadlineRemindEmailTemplateViewModel(userNotificationSettingsUrl, reminder.EventName, eventUrl);
+                var emailBody = _mailTemplate.Generate(eventEmailTemplate, EmailPremiumTemplateCacheKeys.EventDeadlineRemind);
+                var subject = string.Format(Resources.Models.Events.Events.RemindEventDeadlineEmailSubject, reminder.EventName);
+                return (Body: emailBody, reminder.UserEmails, Subject: subject);
+            };
         }
     }
 }

@@ -1,15 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Shrooms.Premium.DataTransferObjects.Models.Events
 {
     public class RemindEventDeadlineEmailDto
     {
-        public string UserEmail { get; set; }
+        public IEnumerable<string> UserEmails { get; set; }
+
+        public Guid EventId { get; set; }
 
         public string EventName { get; set; }
 
         public DateTime DeadlineDate { get; set; }
-
-        public string EventUrl { get; set; }
     }
 }

@@ -138,4 +138,10 @@
   <data name="CoacheeLeftEventEmailSubject" xml:space="preserve">
     <value>Coachee {0} left the event {1}</value>
   </data>
+  <data name="RemindEventDeadlineEmailSubject" xml:space="preserve">
+    <value>Registration closes soon for {0} event</value>
+  </data>
+  <data name="RemindEventStartEmailSubject" xml:space="preserve">
+    <value>Reminder for {0} event</value>
+  </data>
 </root>

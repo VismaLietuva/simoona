@@ -16,11 +16,25 @@ namespace Shrooms.Premium.Domain.Services.Users
     {
         private readonly IDbSet<ApplicationUser> _usersDb;
         private readonly IDbSet<EventParticipant> _eventParticipantsDb;
+        private readonly IDbSet<EventReminder> _eventRemindersDbSet;
+        
+        private readonly IUnitOfWork2 _uow;
 
         public UserEventsService(IUnitOfWork2 uow)
         {
+            _uow = uow;
             _usersDb = uow.GetDbSet<ApplicationUser>();
             _eventParticipantsDb = uow.GetDbSet<EventParticipant>();
+            _eventRemindersDbSet = uow.GetDbSet<EventReminder>();
+        }
+        
+        public async Task<IEnumerable<EventReminder>> GetNotCompletedRemindersAsync(Organization organization)
+        {
+            return await _eventRemindersDbSet.Include(reminder => reminder.Event)
+                .Include(reminder => reminder.Event.EventParticipants)
+                .Include(reminder => reminder.Event.EventParticipants.Select(participant => participant.ApplicationUser))
+                .Where(reminder => !reminder.Reminded && reminder.Event.OrganizationId == organization.Id)
+                .ToListAsync();
         }
 
         public async Task<IEnumerable<string>> GetUsersWithAppRemindersAsync(IEnumerable<int> eventTypeIds)
@@ -35,6 +49,15 @@ namespace Shrooms.Premium.Domain.Services.Users
             return await GetUserWithoutEventThisWeek(eventTypeIds, x => x.NotificationsSettings == null || x.NotificationsSettings.EventWeeklyReminderEmailNotifications)
                 .Select(x => x.Email)
                 .ToListAsync();
+        }
+
+        public async Task SetRemindersAsCompleteAsync(IEnumerable<EventReminder> reminders)
+        {
+            foreach (var reminder in reminders)
+            {
+                reminder.Reminded = true;
+            }
+            await _uow.SaveChangesAsync(false);
         }
 
         private IQueryable<ApplicationUser> GetUserWithoutEventThisWeek(IEnumerable<int> eventTypeIds, Expression<Func<ApplicationUser, bool>> userPredicate)

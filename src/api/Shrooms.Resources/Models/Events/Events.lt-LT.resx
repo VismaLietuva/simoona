@@ -138,4 +138,10 @@
   <data name="CoacheLeftEventEmailSubject" xml:space="preserve">
     <value>Coachee {0} paliko {1} renginį</value>
   </data>
+  <data name="RemindEventDeadlineEmailSubject" xml:space="preserve">
+    <value>Renginio {0} registracijos pabaigos priminimas</value>
+  </data>
+  <data name="RemindEventStartEmailSubject" xml:space="preserve">
+    <value>Renginio {0} priminimas</value>
+  </data>
 </root>

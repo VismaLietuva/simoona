@@ -9,7 +9,7 @@ namespace Shrooms.Premium.IoC.Modules
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<EventJoinRemindService>().As<IEventJoinRemindService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
+            builder.RegisterType<EventRemindService>().As<IEventRemindService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
             builder.RegisterType<UserEventsService>().As<IUserEventsService>().InstancePerRequest().EnableInterfaceTelemetryInterceptor();
         }
     }

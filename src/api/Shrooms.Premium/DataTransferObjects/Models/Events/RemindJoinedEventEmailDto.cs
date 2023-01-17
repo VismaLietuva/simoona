@@ -4,8 +4,8 @@ namespace Shrooms.Premium.DataTransferObjects.Models.Events
 {
     public class RemindJoinedEventEmailDto
     {
-        public ICollection<RemindEventStartEmailDto> RemindStartEvents { get; set; }
+        public IEnumerable<RemindEventStartEmailDto> RemindStartEvents { get; set; }
 
-        public ICollection<RemindEventDeadlineEmailDto> RemindDeadlineEvents { get; set; }
+        public IEnumerable<RemindEventDeadlineEmailDto> RemindDeadlineEvents { get; set; }
     }
 }
