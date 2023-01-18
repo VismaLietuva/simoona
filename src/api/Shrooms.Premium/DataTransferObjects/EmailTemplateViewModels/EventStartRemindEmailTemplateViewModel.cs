@@ -14,10 +14,12 @@ namespace Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels
         public EventStartRemindEmailTemplateViewModel(
             string userNotificationSettingsUrl,
             string name,
-            string url) : base(userNotificationSettingsUrl)
+            string url,
+            DateTime startDate) : base(userNotificationSettingsUrl)
         {
             Name = name;
             Url = url;
+            StartDate = startDate;
         }
     }
 }

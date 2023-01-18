@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Users;
-using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
@@ -137,7 +136,11 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             return reminder =>
             {
                 var eventUrl = _appSettings.EventUrl(organization.ShortName, reminder.EventId.ToString());
-                var eventEmailTemplate = new EventStartRemindEmailTemplateViewModel(userNotificationSettingsUrl, reminder.EventName, eventUrl);
+                var eventEmailTemplate = new EventStartRemindEmailTemplateViewModel(
+                    userNotificationSettingsUrl,
+                    reminder.EventName,
+                    eventUrl,
+                    reminder.StartDate);
                 var emailBody = _mailTemplate.Generate(eventEmailTemplate, EmailPremiumTemplateCacheKeys.EventStartRemind);
                 var subject = string.Format(Resources.Models.Events.Events.RemindEventStartEmailSubject, reminder.EventName);
                 return (Body: emailBody, reminder.UserEmails, Subject: subject);
@@ -149,7 +152,12 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             return reminder =>
             {
                 var eventUrl = _appSettings.EventUrl(organization.ShortName, reminder.EventId.ToString());
-                var eventEmailTemplate = new EventDeadlineRemindEmailTemplateViewModel(userNotificationSettingsUrl, reminder.EventName, eventUrl);
+                var eventEmailTemplate = new EventDeadlineRemindEmailTemplateViewModel(
+                    userNotificationSettingsUrl,
+                    reminder.EventName,
+                    eventUrl,
+                    reminder.StartDate,
+                    reminder.DeadlineDate);
                 var emailBody = _mailTemplate.Generate(eventEmailTemplate, EmailPremiumTemplateCacheKeys.EventDeadlineRemind);
                 var subject = string.Format(Resources.Models.Events.Events.RemindEventDeadlineEmailSubject, reminder.EventName);
                 return (Body: emailBody, reminder.UserEmails, Subject: subject);

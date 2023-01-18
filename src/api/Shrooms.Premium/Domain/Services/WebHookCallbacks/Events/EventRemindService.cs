@@ -122,6 +122,7 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
             return reminder => new RemindEventDeadlineEmailDto
             {
                 DeadlineDate = reminder.Event.RegistrationDeadline,
+                StartDate = reminder.Event.StartDate,
                 EventName = reminder.Event.Name,
                 EventId = reminder.Event.Id,
                 UserEmails = reminder.Event.EventParticipants.Select(participant => participant.ApplicationUser.Email).ToList()
