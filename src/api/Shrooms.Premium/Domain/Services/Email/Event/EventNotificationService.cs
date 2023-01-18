@@ -9,10 +9,12 @@ using Shrooms.Contracts.DataTransferObjects.Users;
 using Shrooms.Contracts.Infrastructure;
 using Shrooms.Contracts.Infrastructure.Email;
 using Shrooms.DataLayer.EntityModels.Models;
+using Shrooms.Domain.Extensions;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
+using Shrooms.Premium.DataTransferObjects.Models.Events.Reminders;
 
 namespace Shrooms.Premium.Domain.Services.Email.Event
 {
@@ -60,13 +62,21 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
         public async Task RemindAllUsersAboutJoinedEventsAsync(RemindJoinedEventEmailDto remindDto, Organization organization)
         {
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
-            var emailsToSend = remindDto.RemindStartEvents.Select(MapEventStartEmailsToEmailContent(organization, userNotificationSettingsUrl))
-                .Union(remindDto.RemindDeadlineEvents.Select(MapEventDeadlineEmailsToEmailContent(organization, userNotificationSettingsUrl)))
-                .ToList();
             
-            foreach (var emailContent in emailsToSend)
+            var emailsToSend = remindDto.RemindStartEvents.Select(MapRemindEventToEmailContent(
+                    Resources.Models.Events.Events.RemindEventStartEmailSubject,
+                    MapToEventRemindStartEmailTemplateWithCacheKey(organization, userNotificationSettingsUrl)))
+                .Union(remindDto.RemindDeadlineEvents.Select(MapRemindEventToEmailContent(
+                        Resources.Models.Events.Events.RemindEventDeadlineEmailSubject,
+                        MapToEventRemindDeadlineEmailTemplateWithCacheKey(organization, userNotificationSettingsUrl))))
+                .ToList();
+
+            foreach (var email in emailsToSend)
             {
-                await _mailingService.SendEmailAsync(new EmailDto(emailContent.UserEmails, emailContent.Subject, emailContent.Body));
+                foreach (var content in email.EmailContents)
+                {
+                    await _mailingService.SendEmailAsync(new EmailDto(content.UserEmails, email.Subject, content.EmailBody));
+                }
             }
         }
 
@@ -131,37 +141,49 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                     emailJoinBody);
         }
 
-        private Func<RemindEventStartEmailDto, (string Body, IEnumerable<string> UserEmails, string Subject)> MapEventStartEmailsToEmailContent(Organization organization, string userNotificationSettingsUrl)
+        private Func<T, (List<(string EmailBody, List<string> UserEmails)> EmailContents, string Subject)>
+            MapRemindEventToEmailContent<T, TResult>(string subjectResource, Func<string, T, (TResult, string)> mapToViewModelFunc) 
+            where TResult : BaseEmailTemplateViewModel
+            where T : RemindEventBaseDto
         {
             return reminder =>
             {
-                var eventUrl = _appSettings.EventUrl(organization.ShortName, reminder.EventId.ToString());
-                var eventEmailTemplate = new EventStartRemindEmailTemplateViewModel(
-                    userNotificationSettingsUrl,
-                    reminder.EventName,
-                    eventUrl,
-                    reminder.StartDate);
-                var emailBody = _mailTemplate.Generate(eventEmailTemplate, EmailPremiumTemplateCacheKeys.EventStartRemind);
-                var subject = string.Format(Resources.Models.Events.Events.RemindEventStartEmailSubject, reminder.EventName);
-                return (Body: emailBody, reminder.UserEmails, Subject: subject);
+                var subject = string.Format(subjectResource, reminder.EventName);
+                var emails = reminder.Receivers.GroupBy(receiver => receiver.TimeZone, receiver => receiver.Email)
+                    .Select(timeZoneGroup =>
+                    {
+                        var eventEmailTemplateWithCacheKey = mapToViewModelFunc(timeZoneGroup.Key, reminder);
+                        return (
+                            EmailBody: _mailTemplate.Generate(eventEmailTemplateWithCacheKey.Item1, eventEmailTemplateWithCacheKey.Item2),
+                            UserEmails: timeZoneGroup.ToList());
+                    }).ToList();
+                return (emails, subject);
             };
         }
 
-        private Func<RemindEventDeadlineEmailDto, (string Body, IEnumerable<string> UserEmails, string Subject)> MapEventDeadlineEmailsToEmailContent(Organization organization, string userNotificationSettingsUrl)
+        private Func<string, RemindEventStartEmailDto, (EventStartRemindEmailTemplateViewModel, string)>
+            MapToEventRemindStartEmailTemplateWithCacheKey(Organization organization, string userNotificationSettingsUrl)
         {
-            return reminder =>
-            {
-                var eventUrl = _appSettings.EventUrl(organization.ShortName, reminder.EventId.ToString());
-                var eventEmailTemplate = new EventDeadlineRemindEmailTemplateViewModel(
+            return (timeZoneKey, reminder) =>
+                (new EventStartRemindEmailTemplateViewModel(
                     userNotificationSettingsUrl,
                     reminder.EventName,
-                    eventUrl,
-                    reminder.StartDate,
-                    reminder.DeadlineDate);
-                var emailBody = _mailTemplate.Generate(eventEmailTemplate, EmailPremiumTemplateCacheKeys.EventDeadlineRemind);
-                var subject = string.Format(Resources.Models.Events.Events.RemindEventDeadlineEmailSubject, reminder.EventName);
-                return (Body: emailBody, reminder.UserEmails, Subject: subject);
-            };
+                    _appSettings.EventUrl(organization.ShortName, reminder.EventName),
+                    reminder.StartDate.ConvertToTimeZone(timeZoneKey)),
+                EmailPremiumTemplateCacheKeys.EventStartRemind);
+        }
+
+        private Func<string, RemindEventDeadlineEmailDto, (EventDeadlineRemindEmailTemplateViewModel, string)>
+            MapToEventRemindDeadlineEmailTemplateWithCacheKey(Organization organization, string userNotificationSettingsUrl)
+        {
+            return (timeZoneKey, reminder) =>
+                (new EventDeadlineRemindEmailTemplateViewModel(
+                    userNotificationSettingsUrl,
+                    reminder.EventName,
+                    _appSettings.EventUrl(organization.ShortName, reminder.EventName),
+                    reminder.StartDate.ConvertToTimeZone(timeZoneKey),
+                    reminder.DeadlineDate.ConvertToTimeZone(timeZoneKey)),
+                EmailPremiumTemplateCacheKeys.EventDeadlineRemind);
         }
     }
 }

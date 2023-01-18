@@ -352,9 +352,11 @@
     <Compile Include="DataTransferObjects\Models\Events\EventParticipantReportDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\MyEventsOptionsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\NewEventOptionDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\RemindEventDeadlineEmailDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\RemindEventStartEmailDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\RemindJoinedEventEmailDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\Reminders\RemindEventDeadlineEmailDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\Reminders\RemindEventBaseDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\Reminders\RemindEventStartEmailDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\Reminders\RemindJoinedEventEmailDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\Reminders\RemindReceiverDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\UpdateAttendStatusDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\UpdateEventTypeDto.cs" />
     <Compile Include="DataTransferObjects\Models\Kudos\AwardedKudosEmployeeDto.cs" />

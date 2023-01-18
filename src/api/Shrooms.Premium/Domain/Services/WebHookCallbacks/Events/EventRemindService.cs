@@ -7,7 +7,7 @@ using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Domain.Services.Organizations;
-using Shrooms.Premium.DataTransferObjects.Models.Events;
+using Shrooms.Premium.DataTransferObjects.Models.Events.Reminders;
 using Shrooms.Premium.Domain.Services.Email.Event;
 using Shrooms.Premium.Domain.Services.Events.Utilities;
 using Shrooms.Premium.Domain.Services.Notifications;
@@ -113,7 +113,11 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
                 StartDate = reminder.Event.StartDate,
                 EventName = reminder.Event.Name,
                 EventId = reminder.Event.Id,
-                UserEmails = reminder.Event.EventParticipants.Select(participant => participant.ApplicationUser.Email).ToList()
+                Receivers = reminder.Event.EventParticipants.Select(participant => new RemindReceiverDto 
+                {
+                    Email = participant.ApplicationUser.Email,
+                    TimeZone = participant.ApplicationUser.TimeZone,
+                }).ToList()
             };
         }
 
@@ -125,7 +129,11 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
                 StartDate = reminder.Event.StartDate,
                 EventName = reminder.Event.Name,
                 EventId = reminder.Event.Id,
-                UserEmails = reminder.Event.EventParticipants.Select(participant => participant.ApplicationUser.Email).ToList()
+                Receivers = reminder.Event.EventParticipants.Select(participant => new RemindReceiverDto
+                {
+                    Email = participant.ApplicationUser.Email,
+                    TimeZone = participant.ApplicationUser.TimeZone
+                }).ToList()
             };
         }
     }

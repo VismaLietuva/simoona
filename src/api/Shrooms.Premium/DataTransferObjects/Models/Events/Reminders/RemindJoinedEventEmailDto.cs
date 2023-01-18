@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Shrooms.Premium.DataTransferObjects.Models.Events
+namespace Shrooms.Premium.DataTransferObjects.Models.Events.Reminders
 {
     public class RemindJoinedEventEmailDto
     {
