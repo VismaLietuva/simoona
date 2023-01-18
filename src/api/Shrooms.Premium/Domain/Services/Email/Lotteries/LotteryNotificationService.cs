@@ -64,7 +64,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Lotteries
 
             foreach (var emailGroup in userEmailsGroupedByTimeZone)
             {
-                var localEndDate = startedDto.EndDate.ConvertToTimeZone(emailGroup.Key);
+                var localEndDate = startedDto.EndDate.ConvertUtcToTimeZone(emailGroup.Key);
                 var emailTemplateViewModel = new StartedLotteryEmailTemplateViewModel(startedDto, lotteryUrl, localEndDate, userNotificationSettingsUrl);
                 var emailBody = _mailTemplate.Generate(emailTemplateViewModel, EmailPremiumTemplateCacheKeys.StartedLottery);
                 var userEmails = emailGroup.Select(info => info.Email);

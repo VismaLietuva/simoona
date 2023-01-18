@@ -169,7 +169,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                     userNotificationSettingsUrl,
                     reminder.EventName,
                     _appSettings.EventUrl(organization.ShortName, reminder.EventName),
-                    reminder.StartDate.ConvertToTimeZone(timeZoneKey)),
+                    reminder.StartDate.ConvertUtcToTimeZone(timeZoneKey)),
                 EmailPremiumTemplateCacheKeys.EventStartRemind);
         }
 
@@ -181,8 +181,8 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                     userNotificationSettingsUrl,
                     reminder.EventName,
                     _appSettings.EventUrl(organization.ShortName, reminder.EventName),
-                    reminder.StartDate.ConvertToTimeZone(timeZoneKey),
-                    reminder.DeadlineDate.ConvertToTimeZone(timeZoneKey)),
+                    reminder.StartDate.ConvertUtcToTimeZone(timeZoneKey),
+                    reminder.DeadlineDate.ConvertUtcToTimeZone(timeZoneKey)),
                 EmailPremiumTemplateCacheKeys.EventDeadlineRemind);
         }
     }
