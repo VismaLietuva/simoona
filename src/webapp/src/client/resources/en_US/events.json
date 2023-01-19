@@ -237,5 +237,8 @@
   "moreCount": "and {{one}} more...",
   "eventReportDatePickers": "Show visited events",
   "normalParticipantCountLabel": "Normal participants",
-  "virtualParticipantCountLabel": "Virtual participants"
+  "virtualParticipantCountLabel": "Virtual participants",
+  "reminders": "Reminders",
+  "remindDaysBeforeEventStart": "days before event starts",
+  "remindDaysBeforeEventDeadline": "days before registration ends"
 }

@@ -237,5 +237,8 @@
   "moreCount": "ir dar {{one}}...",
   "eventReportDatePickers": "Rodyti aplankytus renginius",
   "normalParticipantCountLabel": "Paprasti dalyviai",
-  "virtualParticipantCountLabel": "Virtualūs dalyviai"
+  "virtualParticipantCountLabel": "Virtualūs dalyviai",
+  "reminders": "Priminimai",
+  "remindDaysBeforeEventStart": "dienos iki renginio pradžios",
+  "remindDaysBeforeEventDeadline": "dienos iki registracijos pabaigos"
 }
