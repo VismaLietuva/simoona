@@ -35,6 +35,7 @@
         public const string EventDateFilterRangeInvalid = "226";
         public const string EventAttendTypeIsNotAllowed = "227";
         public const string EventAttendTypeCannotBeChangedIfParticipantsJoined = "228";
+        public const string EventInvalidReminderType = "229";
 
 
         // Service Request, 7**

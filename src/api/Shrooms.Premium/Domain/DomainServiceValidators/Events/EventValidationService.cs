@@ -213,6 +213,19 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             }
         }
 
+        public void CheckIfDeadlineRemindersCanBeApplied(IEnumerable<EventReminderDto> reminders, Event eventToUpdate)
+        {
+            if (eventToUpdate.StartDate != eventToUpdate.RegistrationDeadline)
+            {
+                return;
+            }
+
+            if (reminders.Any(reminder => reminder.Type == EventRemindType.Deadline))
+            {
+                throw new EventException(PremiumErrorCodes.EventInvalidReminderType);
+            }
+        }
+
         public void CheckIfUserHasPermission(string userId, string responsibleUserId, bool hasPermission)
         {
             if (userId != responsibleUserId && !hasPermission)

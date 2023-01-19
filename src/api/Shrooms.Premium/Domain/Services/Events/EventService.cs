@@ -513,6 +513,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             var newReminders = eventDto.Reminders.Where(reminder =>
                 !updateReminders.Any(updateReminder => updateReminder.Reminder.Type == reminder.Type) &&
                 reminder.RemindBeforeInDays != 0);
+            _eventValidationService.CheckIfDeadlineRemindersCanBeApplied(eventDto.Reminders, eventToUpdate);
             AddEventReminders(eventToUpdate, newReminders);
         }
 
