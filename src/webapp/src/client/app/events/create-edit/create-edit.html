@@ -40,8 +40,7 @@
                             <select id="typeId" name="typeId" class="form-control" ng-model="vm.selectedType"
                                 ng-change="vm.event.typeId=vm.selectedType.id"
                                 ng-options="type as type.name for type in vm.eventTypes"
-                                data-test-id="event-form-event-type-input" required translate-cloak>
-                            </select>
+                                data-test-id="event-form-event-type-input" required translate-cloak></select>
                             <p class="text-danger help-block"
                                 ng-if="eventForm.typeId.$invalid && eventForm.typeId.$dirty"
                                 translate="common.messageFieldIsRequired"></p>
@@ -185,12 +184,50 @@
                                 data-test-id="event-form-recurring-input" translate-cloak></select>
                         </div>
                     </div>
+
+                    <!-- event reminders -->
+                    <div ng-if="vm.recurringTypesResources[vm.event.recurrence] === 'none' && (reminder.isVisible || $index === 0)"
+                        class="form-group required" ng-repeat="reminder in vm.reminders track by $index"
+                        ng-class="{'has-error': eventForm['reminder' + $index].$invalid && eventForm['reminder' + $index].$dirty}">
+                        <label ng-if="$index === 0" class="control-label col-xs-12 col-sm-4"
+                            translate="events.reminders"></label>
+                        <div class="col-xs-12 col-sm-6 col-md-4" ng-class="{ 'col-sm-offset-4' : $index !== 0 }"
+                            style="display: flex; align-items: center;">
+                            <input class="mr-5" type="checkbox" ng-model="reminder.isEnabled">
+                            <input class="mr-5" style="width: auto;" type="number" name="reminder{{$index}}"
+                                ng-model="reminder.value" ng-pattern="/^(0|\-?[1-9][0-9]*)$/"
+                                ng-disabled="!reminder.isEnabled" min="0" steps="1" max="{{:: vm.maxRemindBeforeDays}}"
+                                ignore-mouse-wheel required>
+                            <label class="mb-0" translate="{{reminder.translation}}"></label>
+
+                            <!-- error messages -->
+                            <p class="text-danger help-block"
+                                ng-if="eventForm['reminder' + $index].$error.required && eventForm['reminder' + $index].$dirty"
+                                translate="common.messageFieldIsRequired"></p>
+                            <p class="text-danger help-block"
+                                ng-if="eventForm['reminder' + $index].$error.pattern || eventForm['reminder' + $index].$error.number"
+                                translate="events.wrongNumber"></p>
+                            <p class="text-danger help-block"
+                                ng-if="eventForm['reminder' + $index].$error.min && eventForm['reminder' + $index].$dirty">
+                                <span translate="events.tooLittle"></span>
+                                0
+                            </p>
+                            <p class="text-danger help-block"
+                                ng-if="eventForm['reminder' + $index].$error.max && eventForm['reminder' + $index].$dirty"
+                                ng-cloak>
+                                <span translate="events.tooMuch"></span>
+                                {{:: vm.maxRemindBeforeDays }}
+                            </p>
+                        </div>
+                    </div>
+
                     <!-- event join types -->
                     <div class="form-group">
                         <label class="control-label col-xs-12 col-sm-4" translate="events.eventAttendOptions"></label>
                         <div>
                             <div class="col-sm-2">
-                                <input id="allowJoiningVirtually" type="checkbox" class="event-form-checkbox" ng-model="vm.allowJoiningVirtually">
+                                <input id="allowJoiningVirtually" type="checkbox" class="event-form-checkbox"
+                                    ng-model="vm.allowJoiningVirtually">
                                 <label for="allowJoiningVirtually" class="control-label"
                                     translate="events.eventAttendOptions_JoiningVirtually"></label>
                             </div>
@@ -227,7 +264,7 @@
                                 <span class="glyphicon glyphicon-info-sign"
                                     uib-tooltip-template="'targetOfficeTooltipTemplate.html'" tooltip-placement="right"
                                     tooltip-append-to-body="true" tooltip-class="service-request-status-tooltip"
-                                    style="font-size: 16px; color: #006fb0;"></span>
+                                    style="font-size: 16px; color: #006fb0"></span>
                             </div>
                             <div class="event-office-list-item-seperator">&nbsp;</div>
                             <div class="checkbox event-office-list-item" ng-repeat="office in vm.eventOffices">
@@ -307,13 +344,16 @@
                         <!-- Container -->
                         <div class="col-xs-12 col-sm-6 col-md-4">
                             <!-- Max virtual participants input -->
-                            <input id="maxVirtualParticipants" type="number" class="form-control" name="maxVirtualParticipants"
-                                ng-model="vm.event.maxVirtualParticipants" ng-pattern="/^(0|\-?[1-9][0-9]*)$/" min="0"
-                                steps="1" max="{{:: vm.eventSettings.participantsLength}}"
+                            <input id="maxVirtualParticipants" type="number" class="form-control"
+                                name="maxVirtualParticipants" ng-model="vm.event.maxVirtualParticipants"
+                                ng-pattern="/^(0|\-?[1-9][0-9]*)$/" min="0" steps="1"
+                                max="{{:: vm.eventSettings.participantsLength}}"
                                 data-test-id="event-form-max-participants-input" ignore-mouse-wheel required>
                             <!-- Reset participants checkbox -->
-                            <div ng-if="vm.states.isEdit" ng-show="vm.event.maxVirtualParticipants < vm.minVirtualParticipants">
-                                <label for="resetVirtualParticipantList" translate="events.resetParticipantList"></label>
+                            <div ng-if="vm.states.isEdit"
+                                ng-show="vm.event.maxVirtualParticipants < vm.minVirtualParticipants">
+                                <label for="resetVirtualParticipantList"
+                                    translate="events.resetParticipantList"></label>
                                 <input id="resetVirtualParticipantList" type="checkbox" class="event-form-checkbox"
                                     ng-model="vm.resetVirtualParticipantList">
                             </div>
@@ -390,7 +430,7 @@
                                 <span class="glyphicon glyphicon-info-sign"
                                     uib-tooltip-template="'singleJoinTooltipTemplate.html'" tooltip-placement="right"
                                     tooltip-append-to-body="true" tooltip-class="service-request-status-tooltip"
-                                    style="font-size: 16px; color: #006fb0;"></span>
+                                    style="font-size: 16px; color: #006fb0"></span>
                             </label>
                         </div>
                     </div>
@@ -457,7 +497,7 @@
                                 <p class="text-danger help-block" ng-if="!vm.isValidOption(vm.event.options, option)"
                                     translate="events.nonUniqueOptions"></p>
                                 <p class="text-danger help-block" ng-if="vm.countOptions() < 2 && $index === 0">
-                                    <span style="color: red;" translate="events.twoOptionsRequired"></span>
+                                    <span style="color: red" translate="events.twoOptionsRequired"></span>
                                 </p>
                             </div>
                             <a class="nc-btn nc-btn-default" ng-click="vm.deleteOption($index)"

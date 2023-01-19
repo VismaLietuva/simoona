@@ -20,6 +20,14 @@
             3: 'everyTwoWeeks',
             4: 'everyMonth',
         })
+        .constant('reminderTypes', {
+            start: 0,
+            deadline: 1
+        })
+        .constant('reminderDefaultValues', {
+            remindBeforeDays: 7,
+            maxRemindBeforeDays: 1000
+        })
         .controller('addNewEventController', addNewEventController);
 
     addNewEventController.$inject = [
@@ -40,6 +48,8 @@
         'lodash',
         'errorHandler',
         'optionRules',
+        'reminderTypes',
+        'reminderDefaultValues'
     ];
 
     function addNewEventController(
@@ -59,10 +69,15 @@
         localeSrv,
         lodash,
         errorHandler,
-        optionRules
+        optionRules,
+        reminderTypes,
+        reminderDefaultValues
     ) {
         /* jshint validthis: true */
         var vm = this;
+
+        vm.maxRemindBeforeDays = reminderDefaultValues.maxRemindBeforeDays;
+        vm.reminders = createReminders();
 
         vm.states = {
             isAdd: $state.includes('Root.WithOrg.Client.Events.AddEvents'),
@@ -172,7 +187,7 @@
                             fullName: vm.event.hostUserFullName,
                         };
 
-                        vm.minParticipants = vm.event.maxParticipants; // ? how did i thought that this is correct
+                        vm.minParticipants = vm.event.maxParticipants;
                         vm.minVirtualParticipants = vm.event.maxVirtualParticipants;
 
                         if (
@@ -430,6 +445,14 @@
                     }
                 );
             }
+        }
+
+        function createReminders() {
+            // Order is important. The array index is equivalent to the reminder type.
+            return [
+                { isVisible: true, isEnabled: false, value: reminderDefaultValues.remindBeforeDays, translation: 'events.remindDaysBeforeEventStart' },
+                { isVisible: true, isEnabled: false, value: reminderDefaultValues.remindBeforeDays, translation: 'events.remindDaysBeforeEventDeadline' }
+            ];
         }
 
         function updateEvent(image) {
