@@ -191,10 +191,9 @@
                         ng-class="{'has-error': eventForm['reminder' + $index].$invalid && eventForm['reminder' + $index].$dirty}">
                         <label ng-if="$index === 0" class="control-label col-xs-12 col-sm-4"
                             translate="events.reminders"></label>
-                        <div class="col-xs-12 col-sm-6 col-md-4" ng-class="{ 'col-sm-offset-4' : $index !== 0 }"
-                            style="display: flex; align-items: center;">
+                        <div class="event-reminder-item col-xs-12 col-sm-6 col-md-4" ng-class="{ 'col-sm-offset-4' : $index !== 0 }">
                             <input class="mr-5" type="checkbox" ng-model="reminder.isEnabled">
-                            <input class="mr-5" style="width: auto;" type="number" name="reminder{{$index}}"
+                            <input class="mr-5 event-reminder-item-days-input" type="number" name="reminder{{$index}}"
                                 ng-model="reminder.value" ng-pattern="/^(0|\-?[1-9][0-9]*)$/"
                                 ng-disabled="!reminder.isEnabled" min="0" steps="1" max="{{:: vm.maxRemindBeforeDays}}"
                                 ignore-mouse-wheel required>
