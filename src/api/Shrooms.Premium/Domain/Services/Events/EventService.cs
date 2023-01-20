@@ -100,6 +100,7 @@ namespace Shrooms.Premium.Domain.Services.Events
         {
             var @event = await _eventsDbSet
                 .Include(e => e.ResponsibleUser)
+                .Include(e => e.Reminders)
                 .Where(e => e.Id == id && e.OrganizationId == userOrg.OrganizationId)
                 .Select(MapToEventEditDto())
                 .SingleOrDefaultAsync();
@@ -314,6 +315,11 @@ namespace Shrooms.Premium.Domain.Services.Events
                 // Do not use string interpolation here (EF won't be able to project it to SQL)
                 HostUserFullName = e.ResponsibleUser.FirstName + " " + e.ResponsibleUser.LastName,
                 TypeId = e.EventTypeId,
+                Reminders = e.Reminders.Select(reminder => new EventReminderDto
+                {
+                    RemindBeforeInDays = reminder.RemindBeforeInDays,
+                    Type = reminder.Type
+                }),
                 Options = e.EventOptions.Select(o => new EventOptionDto
                 {
                     Id = o.Id,
@@ -512,8 +518,7 @@ namespace Shrooms.Premium.Domain.Services.Events
 
             var newReminders = eventDto.Reminders.Where(reminder =>
                 !updateReminders.Any(updateReminder => updateReminder.Reminder.Type == reminder.Type) &&
-                reminder.RemindBeforeInDays != 0);
-            _eventValidationService.CheckIfDeadlineRemindersCanBeApplied(eventDto.Reminders, eventToUpdate);
+                (eventDto.StartDate != eventDto.RegistrationDeadlineDate || reminder.Type != EventRemindType.Deadline));
             AddEventReminders(eventToUpdate, newReminders);
 
             var remindersToDelete = eventToUpdate.Reminders.Where(reminder =>

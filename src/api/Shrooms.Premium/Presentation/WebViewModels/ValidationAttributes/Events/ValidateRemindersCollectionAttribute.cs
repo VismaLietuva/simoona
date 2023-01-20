@@ -42,9 +42,9 @@ namespace Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes.Events
                 return new ValidationResult($"Invalid remind type found");
             }
 
-            if (reminders.Any(reminder => reminder.RemindBeforeInDays < 0))
+            if (reminders.Any(reminder => reminder.RemindBeforeInDays < 1))
             {
-                return new ValidationResult($"Specified reminder in days cannot be negative");
+                return new ValidationResult($"Specified reminder in days cannot be negative or zero");
             }
 
             return ValidationResult.Success;
