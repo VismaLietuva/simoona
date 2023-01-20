@@ -226,6 +226,7 @@
                         }
 
                         validateOfficeSelection();
+                        updateReminders();
                     },
                     function (error) {
                         errorHandler.handleErrorMessage(error);
@@ -285,6 +286,15 @@
                 },
                 true
             );
+        }
+
+        function updateReminders() {
+            for (var reminder of vm.event.reminders) {
+                var localReminder = vm.reminders[reminder.type];
+                localReminder.isVisible = true;
+                localReminder.isEnabled = true;
+                localReminder.value = reminder.remindBeforeInDays;
+            }
         }
 
         function toggleOfficeSelection(office) {
