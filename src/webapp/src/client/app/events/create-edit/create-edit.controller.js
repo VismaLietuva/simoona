@@ -131,6 +131,7 @@
         vm.isStartDateValid = isStartDateValid;
         vm.isEndDateValid = isEndDateValid;
         vm.isDeadlineDateValid = isDeadlineDateValid;
+        vm.isOneTimeEvent = isOneTimeEvent;
 
         init();
 
@@ -448,11 +449,20 @@
         }
 
         function createReminders() {
-            // Order is important. The array index is equivalent to the reminder type.
-            return [
-                { isVisible: true, isEnabled: false, value: reminderDefaultValues.remindBeforeDays, translation: 'events.remindDaysBeforeEventStart' },
-                { isVisible: true, isEnabled: false, value: reminderDefaultValues.remindBeforeDays, translation: 'events.remindDaysBeforeEventDeadline' }
-            ];
+            return {
+                [reminderTypes.start]: {
+                    isVisible: true,
+                    isEnabled: false,
+                    value: reminderDefaultValues.remindBeforeDays,
+                    translation: 'events.remindDaysBeforeEventStart'
+                },
+                [reminderTypes.deadline]: {
+                    isVisible: false,
+                    isEnabled: false,
+                    value: reminderDefaultValues.remindBeforeDays,
+                    translation: 'events.remindDaysBeforeEventDeadline'
+                }
+            }
         }
 
         function updateEvent(image) {
@@ -557,6 +567,21 @@
                 .local()
                 .startOf('minute')
                 .toDate();
+            vm.event.reminders = mapRemindersToRequestParameters();
+        }
+
+        function mapRemindersToRequestParameters() {
+            if (!isOneTimeEvent()) {
+                return [];
+            }
+
+            return Object.keys(vm.reminders)
+                .filter(key => vm.reminders[key].isEnabled && vm.reminders[key].isVisible)
+                .map(key => ({ remindBeforeInDays:  vm.reminders[key].value, type: key }));
+        }
+
+        function isOneTimeEvent() {
+            return vm.recurringTypesResources[vm.event.recurrence] === 'none';
         }
 
         function manageParticipantResets() {
@@ -581,6 +606,7 @@
             if (vm.isRegistrationDeadlineEnabled) {
                 vm.event.registrationDeadlineDate = vm.event.startDate;
             }
+            vm.reminders[reminderTypes.deadline].isVisible = !vm.reminders[reminderTypes.deadline].isVisible;
         }
 
         function openDatePicker($event, datePicker) {

@@ -186,7 +186,7 @@
                     </div>
 
                     <!-- event reminders -->
-                    <div ng-if="vm.recurringTypesResources[vm.event.recurrence] === 'none' && (reminder.isVisible || $index === 0)"
+                    <div ng-if="vm.isOneTimeEvent() && (reminder.isVisible || $index === 0)"
                         class="form-group required" ng-repeat="reminder in vm.reminders track by $index"
                         ng-class="{'has-error': eventForm['reminder' + $index].$invalid && eventForm['reminder' + $index].$dirty}">
                         <label ng-if="$index === 0" class="control-label col-xs-12 col-sm-4"
