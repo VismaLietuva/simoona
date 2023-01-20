@@ -141,10 +141,10 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                     emailJoinBody);
         }
 
-        private Func<T, (List<(string EmailBody, List<string> UserEmails)> EmailContents, string Subject)>
-            MapRemindEventToEmailContent<T, TResult>(string subjectResource, Func<string, T, (TResult, string)> mapToViewModelFunc) 
-            where TResult : BaseEmailTemplateViewModel
-            where T : RemindEventBaseDto
+        private Func<TDto, (List<(string EmailBody, List<string> UserEmails)> EmailContents, string Subject)>
+            MapRemindEventToEmailContent<TDto, TEmailTemplate>(string subjectResource, Func<string, TDto, (TEmailTemplate, string)> mapToViewModelFunc) 
+            where TEmailTemplate : BaseEmailTemplateViewModel
+            where TDto : IRemindEventDto
         {
             return reminder =>
             {

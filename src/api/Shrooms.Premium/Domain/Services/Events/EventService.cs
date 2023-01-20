@@ -515,6 +515,11 @@ namespace Shrooms.Premium.Domain.Services.Events
                 reminder.RemindBeforeInDays != 0);
             _eventValidationService.CheckIfDeadlineRemindersCanBeApplied(eventDto.Reminders, eventToUpdate);
             AddEventReminders(eventToUpdate, newReminders);
+
+            var remindersToDelete = eventToUpdate.Reminders.Where(reminder =>
+                !newReminders.Any(newReminder => newReminder.Type == reminder.Type) &&
+                !updateReminders.Any(updateReminder => updateReminder.OldReminder.Type == reminder.Type));
+            _eventRemindersDbSet.RemoveRange(remindersToDelete);
         }
 
         private static void AddEventReminders(Event eventToUpdate, IEnumerable<EventReminderDto> newReminders)
@@ -536,14 +541,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             CreateEventDto createDto,
             Event @event)
         {
-            if (reminder.RemindBeforeInDays == 0)
-            {
-                _eventRemindersDbSet.Remove(oldReminder);
-                return;
-            }
-
             oldReminder.RemindBeforeInDays = reminder.RemindBeforeInDays;
-
             switch (reminder.Type)
             {
                 case EventRemindType.Start:
