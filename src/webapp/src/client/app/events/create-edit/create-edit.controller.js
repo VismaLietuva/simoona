@@ -26,7 +26,7 @@
         })
         .constant('reminderDefaultValues', {
             remindBeforeDays: 7,
-            maxRemindBeforeDays: 1000
+            maxRemindBeforeDays: 100
         })
         .controller('addNewEventController', addNewEventController);
 
@@ -42,7 +42,6 @@
         'pictureRepository',
         'eventSettings',
         'recurringTypesResources',
-        '$translate',
         'notifySrv',
         'localeSrv',
         'lodash',
@@ -64,7 +63,6 @@
         pictureRepository,
         eventSettings,
         recurringTypesResources,
-        $translate,
         notifySrv,
         localeSrv,
         lodash,
@@ -132,6 +130,7 @@
         vm.isEndDateValid = isEndDateValid;
         vm.isDeadlineDateValid = isDeadlineDateValid;
         vm.isOneTimeEvent = isOneTimeEvent;
+        vm.resetReminder = resetReminder;
 
         init();
 
@@ -196,6 +195,7 @@
                             vm.event.registrationDeadlineDate
                         ) {
                             vm.isRegistrationDeadlineEnabled = true;
+                            vm.reminders[reminderTypes.deadline].isVisible = true;
                         }
                         vm.event.offices = [];
                         vm.event.officeIds.forEach(function (value) {
@@ -378,6 +378,10 @@
         function deleteOption(index) {
             vm.event.options.splice(index, 1);
             handleOptions();
+        }
+
+        function resetReminder(type) {
+            vm.reminders[type].value = reminderDefaultValues.remindBeforeDays;
         }
 
         function handleOptions() {
