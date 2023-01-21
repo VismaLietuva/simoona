@@ -13,7 +13,23 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
     public class CreateEventViewModelTests
     {
         [Test]
-        public void NewInstance_ZeroRemindNumber_ReturnsTrue()
+        public void NewInstance_ValidValues_ReturnsTrue()
+        {
+            var model = CreateValid();
+            model.Reminders = new List<EventReminderViewModel>
+            {
+                new EventReminderViewModel
+                {
+                    Type = EventRemindType.Start,
+                    RemindBeforeInDays = 1
+                }
+            };
+
+            Assert.IsTrue(model.IsValid());
+        }
+
+        [Test]
+        public void NewInstance_ZeroRemindNumber_ReturnsFalse()
         {
             var model = CreateValid();
             model.Reminders = new List<EventReminderViewModel>
@@ -25,7 +41,7 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
                 }
             };
 
-            Assert.IsTrue(model.IsValid());
+            Assert.IsFalse(model.IsValid());
         }
 
         [Test]
@@ -109,11 +125,13 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
             {
                 new EventReminderViewModel
                 {
-                    Type = EventRemindType.Deadline
+                    Type = EventRemindType.Deadline,
+                    RemindBeforeInDays = 1,
                 },
                 new EventReminderViewModel
                 {
-                    Type = EventRemindType.Start
+                    Type = EventRemindType.Start,
+                    RemindBeforeInDays = 1
                 }
             };
 
