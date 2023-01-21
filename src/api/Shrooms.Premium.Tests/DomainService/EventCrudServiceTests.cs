@@ -106,6 +106,7 @@ namespace Shrooms.Premium.Tests.DomainService
             Assert.NotNull(result.Name);
             Assert.NotNull(result.ImageName);
             Assert.NotNull(result.HostUserFullName);
+            Assert.NotNull(result.Reminders);
             Assert.NotNull(result.HostUserId);
             Assert.AreEqual(1, result.MaxOptions);
             Assert.AreEqual(3, result.MaxParticipants);
@@ -874,18 +875,16 @@ namespace Shrooms.Premium.Tests.DomainService
                 NewOptions = new List<NewEventOptionDto>(),
                 EditedOptions = new List<EventOptionDto>(),
                 UserId = users.First().Id,
-                Reminders = reminders.Select(reminder => new EventReminderDto
-                {
-                    Type = reminder.Type,
-                    RemindBeforeInDays = 0
-                })
+                Reminders = new List<EventReminderDto>()
             };
 
             // Act
             await _eventService.UpdateEventAsync(editDto);
 
             // Assert
-            _eventRemindersDbSet.Received(1).Remove(Arg.Is<EventReminder>(r => r.Id == reminder.Id));
+            _eventRemindersDbSet.Received(1)
+                .RemoveRange(Arg.Is<IEnumerable<EventReminder>>(reminders =>
+                    reminders.Any(r => r.Id == reminder.Id)));
         }
 
         private List<ApplicationUser> MockUsers()
@@ -1199,7 +1198,8 @@ namespace Shrooms.Premium.Tests.DomainService
                     ImageName = "image",
                     Place = "place",
                     EventType = eventTypes.Last(),
-                    EventTypeId = 3
+                    EventTypeId = 3,
+                    Reminders = new List<EventReminder>()
                 }
             };
 
