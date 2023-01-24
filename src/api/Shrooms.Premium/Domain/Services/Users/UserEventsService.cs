@@ -42,15 +42,6 @@ namespace Shrooms.Premium.Domain.Services.Users
                 .ToListAsync();
         }
 
-        private Expression<Func<EventReminder, bool>> FilterReadyReminders()
-        {
-            // Unable to refactor this due to EF not being able to translate more complex code to SQL.
-            return reminder => (reminder.Type == EventRemindType.Start &&
-                                DbFunctions.AddDays(reminder.Event.StartDate, -reminder.RemindBeforeInDays) <= _systemClock.UtcNow) ||
-                               (reminder.Type == EventRemindType.Deadline && 
-                                DbFunctions.AddDays(reminder.Event.RegistrationDeadline, -reminder.RemindBeforeInDays) <= _systemClock.UtcNow);
-        }
-
         public async Task<IEnumerable<string>> GetUsersWithAppRemindersAsync(IEnumerable<int> eventTypeIds)
         {
             return await GetUserWithoutEventThisWeek(eventTypeIds, x => x.NotificationsSettings == null || x.NotificationsSettings.EventWeeklyReminderAppNotifications)
@@ -72,6 +63,15 @@ namespace Shrooms.Premium.Domain.Services.Users
                 reminder.Reminded = true;
             }
             await _uow.SaveChangesAsync(false);
+        }
+
+        private Expression<Func<EventReminder, bool>> FilterReadyReminders()
+        {
+            // Unable to refactor this due to EF not being able to translate more complex code to SQL.
+            return reminder => (reminder.Type == EventRemindType.Start &&
+                                DbFunctions.AddDays(reminder.Event.StartDate, -reminder.RemindBeforeInDays) <= _systemClock.UtcNow) ||
+                               (reminder.Type == EventRemindType.Deadline &&
+                                DbFunctions.AddDays(reminder.Event.RegistrationDeadline, -reminder.RemindBeforeInDays) <= _systemClock.UtcNow);
         }
 
         private IQueryable<ApplicationUser> GetUserWithoutEventThisWeek(IEnumerable<int> eventTypeIds, Expression<Func<ApplicationUser, bool>> userPredicate)
