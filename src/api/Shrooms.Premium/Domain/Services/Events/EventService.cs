@@ -570,48 +570,48 @@ namespace Shrooms.Premium.Domain.Services.Events
 
         private void UpdateEventReminder(
             EventReminderDto reminder,
-            EventReminder oldReminder,
+            EventReminder reminderToUpdate,
             CreateEventDto createDto,
             Event @event)
         {
-            if (oldReminder.RemindBeforeInDays > reminder.RemindBeforeInDays)
+            if (reminderToUpdate.RemindBeforeInDays > reminder.RemindBeforeInDays)
             {
-                oldReminder.Reminded = false;
+                reminderToUpdate.Reminded = false;
             }
 
-            oldReminder.RemindBeforeInDays = reminder.RemindBeforeInDays;
-            oldReminder.Modified = _systemClock.UtcNow;
-            oldReminder.ModifiedBy = createDto.UserId;
+            reminderToUpdate.RemindBeforeInDays = reminder.RemindBeforeInDays;
+            reminderToUpdate.Modified = _systemClock.UtcNow;
+            reminderToUpdate.ModifiedBy = createDto.UserId;
 
             switch (reminder.Type)
             {
                 case EventRemindType.Start:
-                    UpdateEventReminderStart(oldReminder, createDto, @event);
+                    UpdateEventReminderStart(reminderToUpdate, createDto, @event);
                     break;
 
                 case EventRemindType.Deadline:
-                    UpdateEventReminderDeadline(oldReminder, createDto, @event);
+                    UpdateEventReminderDeadline(reminderToUpdate, createDto, @event);
                     break;
             }
         }
 
-        private static void UpdateEventReminderStart(EventReminder oldReminder, CreateEventDto createDto, Event @event)
+        private static void UpdateEventReminderStart(EventReminder reminderToUpdate, CreateEventDto createDto, Event @event)
         {
             if (createDto.StartDate != @event.StartDate)
             {
-                oldReminder.Reminded = false;
+                reminderToUpdate.Reminded = false;
             }
         }
 
-        private static void UpdateEventReminderDeadline(EventReminder oldReminder, CreateEventDto createDto, Event @event)
+        private static void UpdateEventReminderDeadline(EventReminder reminderToUpdate, CreateEventDto createDto, Event @event)
         {
             if (createDto.RegistrationDeadlineDate < @event.RegistrationDeadline)
             {
-                oldReminder.Reminded = false;
+                reminderToUpdate.Reminded = false;
             }
             else if (IsRegistrationDeadlineBeingRemoved(createDto, @event))
             {
-                oldReminder.Reminded = true;
+                reminderToUpdate.Reminded = true;
             }
         }
 
