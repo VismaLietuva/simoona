@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
-using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.Domain.Services.Organizations;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
@@ -24,7 +23,6 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
         private INotificationService _notificationService;
         private IEventNotificationService _eventNotificationService;
         private IOrganizationService _organizationService;
-        private ISystemClock _systemClock;
 
         [SetUp]
         public void SetUp()
@@ -34,15 +32,13 @@ namespace Shrooms.Premium.Tests.DomainService.EventServices
             _userEventsService = Substitute.For<IUserEventsService>();
             _eventNotificationService = Substitute.For<IEventNotificationService>();
             _organizationService = Substitute.For<IOrganizationService>();
-            _systemClock = Substitute.For<ISystemClock>();
 
             _sut = new EventRemindService(
                 _notificationService,
                 _eventUtilitiesService,
                 _userEventsService,
                 _eventNotificationService,
-                _organizationService,
-                _systemClock);
+                _organizationService);
         }
 
         [Test]

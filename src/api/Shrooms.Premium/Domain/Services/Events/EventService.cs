@@ -74,6 +74,7 @@ namespace Shrooms.Premium.Domain.Services.Events
         {
             var @event = await _eventsDbSet
                 .Include(e => e.EventOptions)
+                .Include(e => e.Reminders)
                 .Include(e => e.EventParticipants)
                 .SingleOrDefaultAsync(e => e.Id == id && e.OrganizationId == userOrg.OrganizationId);
 
@@ -88,7 +89,8 @@ namespace Shrooms.Premium.Domain.Services.Events
             @event.ModifiedBy = userOrg.UserId;
 
             await _eventParticipationService.DeleteByEventAsync(id, userOrg.UserId);
-            await _eventUtilitiesService.DeleteByEventAsync(id, userOrg.UserId);
+            await _eventUtilitiesService.DeleteEventOptionsAsync(id, userOrg.UserId);
+            await _eventUtilitiesService.DeleteEventRemindersAsync(@event.Reminders);
 
             _eventsDbSet.Remove(@event);
 
@@ -561,7 +563,7 @@ namespace Shrooms.Premium.Domain.Services.Events
 
         private static void UpdateEventReminderStart(EventReminder oldReminder, CreateEventDto createDto, Event @event)
         {
-            if (createDto.StartDate > @event.StartDate)
+            if (createDto.StartDate != @event.StartDate)
             {
                 oldReminder.Reminded = false;
             }

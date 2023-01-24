@@ -1,4 +1,5 @@
 ﻿using Shrooms.Contracts.Enums;
+using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Presentation.WebViewModels.Events;
 using System;
@@ -42,9 +43,11 @@ namespace Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes.Events
                 return new ValidationResult($"Invalid remind type found");
             }
 
-            if (reminders.Any(reminder => reminder.RemindBeforeInDays < 1))
+            if (reminders.Any(reminder => reminder.RemindBeforeInDays < ValidationConstants.EventReminderRemindBeforeInDaysMin || 
+                              reminder.RemindBeforeInDays > ValidationConstants.EventReminderRemindBeforeInDaysMax))
             {
-                return new ValidationResult($"Specified reminder in days cannot be negative or zero");
+                return new ValidationResult($"Specified reminder in days cannot be less than {ValidationConstants.EventReminderRemindBeforeInDaysMin} " +
+                    $"and more than {ValidationConstants.EventReminderRemindBeforeInDaysMax}");
             }
 
             return ValidationResult.Success;

@@ -11,7 +11,7 @@ namespace Shrooms.Premium.Domain.Services.Users
 
         Task<IEnumerable<string>> GetUsersWithEmailRemindersAsync(IEnumerable<int> eventTypeIds);
 
-        Task<IEnumerable<EventReminder>> GetNotCompletedRemindersAsync(Organization organization);
+        Task<IEnumerable<EventReminder>> GetReadyNotCompletedRemindersAsync(Organization organization);
 
         Task SetRemindersAsCompleteAsync(IEnumerable<EventReminder> reminders);
     }

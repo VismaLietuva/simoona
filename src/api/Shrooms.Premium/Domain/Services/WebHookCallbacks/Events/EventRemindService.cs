@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Shrooms.Contracts.Enums;
-using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Domain.Services.Organizations;
@@ -22,29 +20,35 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
         private readonly IUserEventsService _userEventsService;
         private readonly IEventNotificationService _eventNotificationService;
         private readonly IOrganizationService _organizationService;
-        private readonly ISystemClock _systemClock;
 
         public EventRemindService(
             INotificationService notificationService,
             IEventUtilitiesService eventUtilitiesService,
             IUserEventsService userEventsService,
             IEventNotificationService eventNotificationService,
-            IOrganizationService organizationService,
-            ISystemClock systemClock)
+            IOrganizationService organizationService)
         {
             _notificationService = notificationService;
             _eventUtilitiesService = eventUtilitiesService;
             _userEventsService = userEventsService;
             _eventNotificationService = eventNotificationService;
             _organizationService = organizationService;
-            _systemClock = systemClock;
         }
 
         public async Task SendJoinedNotificationsAsync(string organizationName)
         {
             var organization = await GetOrganizationAsync(organizationName);
-            var reminders = await _userEventsService.GetNotCompletedRemindersAsync(organization);
-            await _eventNotificationService.RemindAllUsersAboutJoinedEventsAsync(MapRemindersToRemindJoinedEvent(reminders), organization);
+            var reminders = await _userEventsService.GetReadyNotCompletedRemindersAsync(organization);
+
+            var startEmailDtos = reminders.Where(reminder => reminder.Type == EventRemindType.Start)
+                .Select(MapRemindStartEvent())
+                .ToList();
+            await _eventNotificationService.RemindUsersAboutStartDateOfJoinedEventsAsync(startEmailDtos, organization);
+            var deadlineEmailDtos = reminders.Where(reminder => reminder.Type == EventRemindType.Deadline)
+                .Select(MapRemindDeadlineEvent())
+                .ToList();
+            await _eventNotificationService.RemindUsersAboutDeadlineDateOfJoinedEventsAsync(deadlineEmailDtos, organization);
+
             await _userEventsService.SetRemindersAsCompleteAsync(reminders);
         }
 
@@ -83,27 +87,6 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
         private async Task<Organization> GetOrganizationAsync(string organizationName)
         {
             return await _organizationService.GetOrganizationByNameAsync(organizationName);
-        }
-
-        private RemindJoinedEventEmailDto MapRemindersToRemindJoinedEvent(IEnumerable<EventReminder> reminders)
-        {
-            var remindDeadlineEvents = reminders.Where(FilterByValidReminder(reminder => reminder.Event.RegistrationDeadline, EventRemindType.Deadline))
-                .Select(MapRemindDeadlineEvent())
-                .ToList();
-            var remindStartEvents = reminders.Where(FilterByValidReminder(reminder => reminder.Event.StartDate, EventRemindType.Start))
-                .Select(MapRemindStartEvent())
-                .ToList();
-
-            return new RemindJoinedEventEmailDto
-            {
-                RemindDeadlineEvents = remindDeadlineEvents,
-                RemindStartEvents = remindStartEvents
-            };
-        }
-
-        private Func<EventReminder, bool> FilterByValidReminder(Func<EventReminder, DateTime> dateFunc, EventRemindType type)
-        {
-            return reminder => reminder.Type == type && dateFunc(reminder).AddDays(-reminder.RemindBeforeInDays) >= _systemClock.UtcNow;
         }
 
         private Func<EventReminder, RemindEventStartEmailDto> MapRemindStartEvent()

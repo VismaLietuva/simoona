@@ -59,25 +59,24 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             await _mailingService.SendEmailAsync(new EmailDto(emails, Resources.Models.Events.Events.ResetParticipantListEmailSubject, emailBody));
         }
         
-        public async Task RemindAllUsersAboutJoinedEventsAsync(RemindJoinedEventEmailDto remindDto, Organization organization)
+        public async Task RemindUsersAboutDeadlineDateOfJoinedEventsAsync(IEnumerable<RemindEventDeadlineEmailDto> deadlineEmailDtos, Organization organization)
         {
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
-            
-            var emailsToSend = remindDto.RemindStartEvents.Select(MapRemindEventToEmailContent(
+            var emailsToSend = deadlineEmailDtos.Select(MapRemindEventToEmailContent(
+                    Resources.Models.Events.Events.RemindEventDeadlineEmailSubject,
+                    MapToEventRemindDeadlineEmailTemplateWithCacheKey(organization, userNotificationSettingsUrl)))
+                .ToList();
+            await SendEmailsAsync(emailsToSend);
+        }
+
+        public async Task RemindUsersAboutStartDateOfJoinedEventsAsync(IEnumerable<RemindEventStartEmailDto> startEmailDtos, Organization organization)
+        {
+            var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
+            var emailsToSend = startEmailDtos.Select(MapRemindEventToEmailContent(
                     Resources.Models.Events.Events.RemindEventStartEmailSubject,
                     MapToEventRemindStartEmailTemplateWithCacheKey(organization, userNotificationSettingsUrl)))
-                .Union(remindDto.RemindDeadlineEvents.Select(MapRemindEventToEmailContent(
-                        Resources.Models.Events.Events.RemindEventDeadlineEmailSubject,
-                        MapToEventRemindDeadlineEmailTemplateWithCacheKey(organization, userNotificationSettingsUrl))))
                 .ToList();
-
-            foreach (var email in emailsToSend)
-            {
-                foreach (var content in email.EmailContents)
-                {
-                    await _mailingService.SendEmailAsync(new EmailDto(content.UserEmails, email.Subject, content.EmailBody));
-                }
-            }
+            await SendEmailsAsync(emailsToSend);
         }
 
         public async Task RemindUsersToJoinEventAsync(IEnumerable<EventTypeDto> eventTypes, IEnumerable<string> emails, int orgId)
@@ -168,7 +167,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                 (new EventStartRemindEmailTemplateViewModel(
                     userNotificationSettingsUrl,
                     reminder.EventName,
-                    _appSettings.EventUrl(organization.ShortName, reminder.EventName),
+                    _appSettings.EventUrl(organization.ShortName, reminder.EventId.ToString()),
                     reminder.StartDate.ConvertUtcToTimeZone(timeZoneKey)),
                 EmailPremiumTemplateCacheKeys.EventStartRemind);
         }
@@ -180,10 +179,21 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                 (new EventDeadlineRemindEmailTemplateViewModel(
                     userNotificationSettingsUrl,
                     reminder.EventName,
-                    _appSettings.EventUrl(organization.ShortName, reminder.EventName),
+                    _appSettings.EventUrl(organization.ShortName, reminder.EventId.ToString()),
                     reminder.StartDate.ConvertUtcToTimeZone(timeZoneKey),
                     reminder.DeadlineDate.ConvertUtcToTimeZone(timeZoneKey)),
                 EmailPremiumTemplateCacheKeys.EventDeadlineRemind);
+        }
+
+        private async Task SendEmailsAsync(List<(List<(string EmailBody, List<string> UserEmails)> EmailContents, string Subject)> emailsToSend)
+        {
+            foreach (var email in emailsToSend)
+            {
+                foreach (var content in email.EmailContents)
+                {
+                    await _mailingService.SendEmailAsync(new EmailDto(content.UserEmails, email.Subject, content.EmailBody));
+                }
+            }
         }
     }
 }

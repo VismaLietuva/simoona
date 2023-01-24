@@ -6,6 +6,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Shrooms.Contracts.DAL;
+using Shrooms.Contracts.Enums;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Premium.Constants;
@@ -19,22 +21,33 @@ namespace Shrooms.Premium.Domain.Services.Users
         private readonly IDbSet<EventReminder> _eventRemindersDbSet;
         
         private readonly IUnitOfWork2 _uow;
+        private readonly ISystemClock _systemClock;
 
-        public UserEventsService(IUnitOfWork2 uow)
+        public UserEventsService(IUnitOfWork2 uow, ISystemClock systemClock)
         {
             _uow = uow;
+            _systemClock = systemClock;
             _usersDb = uow.GetDbSet<ApplicationUser>();
             _eventParticipantsDb = uow.GetDbSet<EventParticipant>();
             _eventRemindersDbSet = uow.GetDbSet<EventReminder>();
         }
         
-        public async Task<IEnumerable<EventReminder>> GetNotCompletedRemindersAsync(Organization organization)
+        public async Task<IEnumerable<EventReminder>> GetReadyNotCompletedRemindersAsync(Organization organization)
         {
             return await _eventRemindersDbSet.Include(reminder => reminder.Event)
                 .Include(reminder => reminder.Event.EventParticipants)
                 .Include(reminder => reminder.Event.EventParticipants.Select(participant => participant.ApplicationUser))
                 .Where(reminder => !reminder.Reminded && reminder.Event.OrganizationId == organization.Id)
+                .Where(FilterReadyReminders())
                 .ToListAsync();
+        }
+
+        private Expression<Func<EventReminder, bool>> FilterReadyReminders()
+        {
+            return reminder => (reminder.Type == EventRemindType.Start &&
+                                DbFunctions.AddDays(reminder.Event.StartDate, -reminder.RemindBeforeInDays) <= _systemClock.UtcNow) ||
+                               (reminder.Type == EventRemindType.Deadline &&
+                                DbFunctions.AddDays(reminder.Event.RegistrationDeadline, -reminder.RemindBeforeInDays) <= _systemClock.UtcNow);
         }
 
         public async Task<IEnumerable<string>> GetUsersWithAppRemindersAsync(IEnumerable<int> eventTypeIds)

@@ -43,7 +43,7 @@ namespace Shrooms.Premium.Tests.DomainService
         public async Task Should_Delete_Event_Options()
         {
             var eventId = MockCommentsForEvent();
-            await _eventUtilitiesService.DeleteByEventAsync(eventId, "testUserId");
+            await _eventUtilitiesService.DeleteEventOptionsAsync(eventId, "testUserId");
             _eventOptionsDbSet.Received(3).Remove(Arg.Any<EventOption>());
         }
 
