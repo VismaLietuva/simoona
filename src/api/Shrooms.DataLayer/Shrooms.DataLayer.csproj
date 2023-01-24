@@ -911,6 +911,10 @@
     <Compile Include="Migrations\202301041040284_AddEventReminder.Designer.cs">
       <DependentUpon>202301041040284_AddEventReminder.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202301240755238_AddBaseModelToEventReminder.cs" />
+    <Compile Include="Migrations\202301240755238_AddBaseModelToEventReminder.Designer.cs">
+      <DependentUpon>202301240755238_AddBaseModelToEventReminder.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\DataInitializer\ModulesInitializer.cs" />
     <Compile Include="Migrations\DataInitializer\PermissionBuilder.cs" />
@@ -1519,6 +1523,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202301041040284_AddEventReminder.resx">
       <DependentUpon>202301041040284_AddEventReminder.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202301240755238_AddBaseModelToEventReminder.resx">
+      <DependentUpon>202301240755238_AddBaseModelToEventReminder.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="sql_scripts\likes_migration.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

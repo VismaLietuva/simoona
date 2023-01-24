@@ -11,6 +11,7 @@ using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.DataTransferObjects;
 using Shrooms.Contracts.DataTransferObjects.Wall;
 using Shrooms.Contracts.Enums;
+using Shrooms.Contracts.Infrastructure;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Domain.Helpers;
@@ -36,12 +37,13 @@ namespace Shrooms.Premium.Domain.Services.Events
         private readonly IWallService _wallService;
         private readonly IMarkdownConverter _markdownConverter;
         private readonly IOfficeMapService _officeMapService;
+        private readonly ISystemClock _systemClock;
+
         private readonly DbSet<Event> _eventsDbSet;
         private readonly DbSet<EventType> _eventTypesDbSet;
         private readonly DbSet<ApplicationUser> _usersDbSet;
         private readonly DbSet<EventOption> _eventOptionsDbSet;
         private readonly DbSet<EventReminder> _eventRemindersDbSet;
-
         private readonly IDbSet<Office> _officeDbSet;
 
         public EventService(IUnitOfWork2 uow,
@@ -51,7 +53,8 @@ namespace Shrooms.Premium.Domain.Services.Events
             IEventParticipationService eventParticipationService,
             IWallService wallService,
             IMarkdownConverter markdownConverter,
-            IOfficeMapService officeMapService)
+            IOfficeMapService officeMapService,
+            ISystemClock systemClock)
         {
             _uow = uow;
             _eventsDbSet = uow.GetDbSet<Event>();
@@ -68,6 +71,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             _wallService = wallService;
             _markdownConverter = markdownConverter;
             _officeMapService = officeMapService;
+            _systemClock = systemClock;
         }
 
         public async Task DeleteAsync(Guid id, UserAndOrganizationDto userOrg)
@@ -90,7 +94,7 @@ namespace Shrooms.Premium.Domain.Services.Events
 
             await _eventParticipationService.DeleteByEventAsync(id, userOrg.UserId);
             await _eventUtilitiesService.DeleteEventOptionsAsync(id, userOrg.UserId);
-            await _eventUtilitiesService.DeleteEventRemindersAsync(@event.Reminders);
+            await RemoveEventRemindersAsync(@event.Reminders, userOrg.UserId);
 
             _eventsDbSet.Remove(@event);
 
@@ -169,7 +173,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             _eventValidationService.CheckIfCreatingEventHasInsufficientOptions(newEventDto.MaxOptions, newEventDto.NewOptions.Count());
             _eventValidationService.CheckIfCreatingEventHasNoChoices(newEventDto.MaxOptions, newEventDto.NewOptions.Count());
 
-            var newEvent = await MapNewEvent(newEventDto);
+            var newEvent = await MapNewEventAsync(newEventDto);
 
             _eventsDbSet.Add(newEvent);
 
@@ -210,7 +214,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             await ValidateEvent(eventDto);
             await ResetEventAttendessAsync(eventToUpdate, eventDto);
             await UpdateWallAsync(eventToUpdate, eventDto);
-            UpdateEventInfo(eventDto, eventToUpdate);
+            UpdateEventInfoAsync(eventDto, eventToUpdate);
             UpdateEventOptions(eventDto, eventToUpdate);
 
             await _uow.SaveChangesAsync(false);
@@ -442,7 +446,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             }
         }
 
-        private async Task<Event> MapNewEvent(CreateEventDto newEventDto)
+        private async Task<Event> MapNewEventAsync(CreateEventDto newEventDto)
         {
             var newEvent = new Event
             {
@@ -468,14 +472,14 @@ namespace Shrooms.Premium.Domain.Services.Events
 
             var wallId = await _wallService.CreateNewWallAsync(newWall);
             newEvent.WallId = wallId;
-            UpdateEventInfo(newEventDto, newEvent);
+            await UpdateEventInfoAsync(newEventDto, newEvent);
 
             return newEvent;
         }
 
-        private void UpdateEventInfo(CreateEventDto newEventDto, Event newEvent)
+        private async Task UpdateEventInfoAsync(CreateEventDto newEventDto, Event newEvent)
         {
-            SetEventReminders(newEventDto, newEvent);
+            await SetEventRemindersAsync(newEventDto, newEvent);
             SetEventInfo(newEventDto, newEvent);
         }
 
@@ -505,39 +509,61 @@ namespace Shrooms.Premium.Domain.Services.Events
             newEvent.AllowNotGoing = newEventDto.AllowNotGoing;
         }
 
-        private void SetEventReminders(CreateEventDto eventDto, Event eventToUpdate)
+        private async Task SetEventRemindersAsync(CreateEventDto createEventDto, Event eventToUpdate)
         {
             var updateReminders = eventToUpdate.Reminders.Join(
-                eventDto.Reminders,
+                createEventDto.Reminders,
                 oldReminder => oldReminder.Type,
                 reminder => reminder.Type,
                 (oldReminder, reminder) => new { OldReminder = oldReminder, Reminder = reminder })
                 .ToList();
             foreach (var updateReminder in updateReminders)
             {
-                UpdateEventReminder(updateReminder.Reminder, updateReminder.OldReminder, eventDto, eventToUpdate);
+                UpdateEventReminder(updateReminder.Reminder, updateReminder.OldReminder, createEventDto, eventToUpdate);
             }
 
-            var newReminders = eventDto.Reminders.Where(reminder =>
+            var newReminders = createEventDto.Reminders.Where(reminder => 
                 !updateReminders.Any(updateReminder => updateReminder.Reminder.Type == reminder.Type) &&
-                (eventDto.StartDate != eventDto.RegistrationDeadlineDate || reminder.Type != EventRemindType.Deadline));
-            AddEventReminders(eventToUpdate, newReminders);
+                (createEventDto.StartDate != createEventDto.RegistrationDeadlineDate || reminder.Type != EventRemindType.Deadline));
+            AddEventReminders(eventToUpdate, newReminders, createEventDto.UserId);
 
             var remindersToDelete = eventToUpdate.Reminders.Where(reminder =>
                 !newReminders.Any(newReminder => newReminder.Type == reminder.Type) &&
                 !updateReminders.Any(updateReminder => updateReminder.OldReminder.Type == reminder.Type));
+            await RemoveEventRemindersAsync(remindersToDelete, createEventDto.UserId);
+        }
+
+        private async Task RemoveEventRemindersAsync(IEnumerable<EventReminder> remindersToDelete, string userId)
+        {
+            if (!remindersToDelete.Any())
+            {
+                return;
+            }
+
+            var timestamp = _systemClock.UtcNow;
+            foreach (var reminder in remindersToDelete)
+            {
+                reminder.Modified = timestamp;
+                reminder.ModifiedBy = userId;
+            }
+            await _uow.SaveChangesAsync(false);
             _eventRemindersDbSet.RemoveRange(remindersToDelete);
         }
 
-        private static void AddEventReminders(Event eventToUpdate, IEnumerable<EventReminderDto> newReminders)
+        private void AddEventReminders(Event eventToUpdate, IEnumerable<EventReminderDto> newReminders, string userId)
         {
+            var timestamp = _systemClock.UtcNow;
             foreach (var reminder in newReminders)
             {
                 eventToUpdate.Reminders.Add(new EventReminder
                 {
                     RemindBeforeInDays = reminder.RemindBeforeInDays,
                     Type = reminder.Type,
-                    Reminded = false
+                    Reminded = false,
+                    Created = timestamp,
+                    CreatedBy = userId,
+                    Modified = timestamp,
+                    ModifiedBy = userId
                 });
             }
         }
@@ -549,6 +575,9 @@ namespace Shrooms.Premium.Domain.Services.Events
             Event @event)
         {
             oldReminder.RemindBeforeInDays = reminder.RemindBeforeInDays;
+            oldReminder.Modified = _systemClock.UtcNow;
+            oldReminder.ModifiedBy = createDto.UserId;
+
             switch (reminder.Type)
             {
                 case EventRemindType.Start:

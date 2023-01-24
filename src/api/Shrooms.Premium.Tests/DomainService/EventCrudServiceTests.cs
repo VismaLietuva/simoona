@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
@@ -43,6 +42,7 @@ namespace Shrooms.Premium.Tests.DomainService
         private IEventService _eventService;
         private ISystemClock _systemClockMock;
         private IPermissionService _permissionService;
+        private ISystemClock _systemClock;
 
         [SetUp]
         public void TestInitializer()
@@ -59,6 +59,7 @@ namespace Shrooms.Premium.Tests.DomainService
             _permissionService = Substitute.For<IPermissionService>();
             _systemClockMock = Substitute.For<ISystemClock>();
             _wallService = Substitute.For<IWallService>();
+            _systemClock = Substitute.For<ISystemClock>();
 
             var eventParticipationService = Substitute.For<IEventParticipationService>();
             var eventUtilitiesService = Substitute.For<IEventUtilitiesService>();
@@ -66,14 +67,16 @@ namespace Shrooms.Premium.Tests.DomainService
             var officeMapService = Substitute.For<IOfficeMapService>();
             var markdownConverter = Substitute.For<IMarkdownConverter>();
 
-            _eventService = new EventService(_uow,
+            _eventService = new EventService(
+                _uow,
                 _permissionService,
                 eventUtilitiesService,
                 eventValidationService,
                 eventParticipationService,
                 _wallService,
                 markdownConverter,
-                officeMapService);
+                officeMapService,
+                _systemClock);
         }
 
         [Test]
@@ -1074,6 +1077,7 @@ namespace Shrooms.Premium.Tests.DomainService
 
         private Guid MockEventDelete()
         {
+            var reminders = new List<EventReminder>();
             var eventId = Guid.NewGuid();
             var events = new List<Event>
             {
@@ -1085,11 +1089,13 @@ namespace Shrooms.Premium.Tests.DomainService
                     ImageName = "event image",
                     MaxParticipants = 10,
                     ResponsibleUserId = "eventHostId",
-                    OrganizationId = 2
+                    OrganizationId = 2,
+                    Reminders = reminders
                 }
             };
 
             _eventOptionsDbSet.SetDbSetDataForAsync(new List<EventOption>().AsQueryable());
+            _eventRemindersDbSet.SetDbSetDataForAsync(reminders);
             _eventsDbSet.SetDbSetDataForAsync(events.AsQueryable());
             return eventId;
         }

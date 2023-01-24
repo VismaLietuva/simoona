@@ -14,8 +14,6 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
         IEnumerable<object> GetRecurrenceOptions();
 
         Task DeleteEventOptionsAsync(Guid eventId, string userId);
-        
-        Task DeleteEventRemindersAsync(IEnumerable<EventReminder> reminders);
 
         Task<IEnumerable<EventTypeDto>> GetEventTypesAsync(int organizationId);
 

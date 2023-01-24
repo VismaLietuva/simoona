@@ -22,7 +22,6 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
         private readonly IDbSet<Event> _eventsDbSet;
         private readonly IDbSet<EventType> _eventTypesDbSet;
         private readonly IDbSet<EventOption> _eventOptionsDbSet;
-        private readonly DbSet<EventReminder> _eventRemindersDbSet;
         
         private readonly IFilterPresetService _filterPresetService;
 
@@ -34,15 +33,8 @@ namespace Shrooms.Premium.Domain.Services.Events.Utilities
             _eventsDbSet = uow.GetDbSet<Event>();
             _eventTypesDbSet = uow.GetDbSet<EventType>();
             _eventOptionsDbSet = uow.GetDbSet<EventOption>();
-            _eventRemindersDbSet = uow.GetDbSet<EventReminder>();
             
             _filterPresetService = filterPresetService;
-        }
-
-        public async Task DeleteEventRemindersAsync(IEnumerable<EventReminder> reminders)
-        {
-            _eventRemindersDbSet.RemoveRange(reminders);
-            await _uow.SaveChangesAsync(false);
         }
 
         public async Task DeleteEventOptionsAsync(Guid eventId, string userId)
