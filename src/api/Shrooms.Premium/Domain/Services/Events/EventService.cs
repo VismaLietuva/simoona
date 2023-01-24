@@ -574,6 +574,11 @@ namespace Shrooms.Premium.Domain.Services.Events
             CreateEventDto createDto,
             Event @event)
         {
+            if (oldReminder.RemindBeforeInDays > reminder.RemindBeforeInDays)
+            {
+                oldReminder.Reminded = false;
+            }
+
             oldReminder.RemindBeforeInDays = reminder.RemindBeforeInDays;
             oldReminder.Modified = _systemClock.UtcNow;
             oldReminder.ModifiedBy = createDto.UserId;
