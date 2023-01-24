@@ -44,9 +44,10 @@ namespace Shrooms.Premium.Domain.Services.Users
 
         private Expression<Func<EventReminder, bool>> FilterReadyReminders()
         {
+            // Unable to refactor this due to EF not being able to translate more complex code to SQL.
             return reminder => (reminder.Type == EventRemindType.Start &&
                                 DbFunctions.AddDays(reminder.Event.StartDate, -reminder.RemindBeforeInDays) <= _systemClock.UtcNow) ||
-                               (reminder.Type == EventRemindType.Deadline &&
+                               (reminder.Type == EventRemindType.Deadline && 
                                 DbFunctions.AddDays(reminder.Event.RegistrationDeadline, -reminder.RemindBeforeInDays) <= _systemClock.UtcNow);
         }
 
