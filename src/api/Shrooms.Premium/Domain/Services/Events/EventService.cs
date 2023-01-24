@@ -214,7 +214,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             await ValidateEvent(eventDto);
             await ResetEventAttendessAsync(eventToUpdate, eventDto);
             await UpdateWallAsync(eventToUpdate, eventDto);
-            UpdateEventInfoAsync(eventDto, eventToUpdate);
+            await UpdateEventInfoAsync(eventDto, eventToUpdate);
             UpdateEventOptions(eventDto, eventToUpdate);
 
             await _uow.SaveChangesAsync(false);
