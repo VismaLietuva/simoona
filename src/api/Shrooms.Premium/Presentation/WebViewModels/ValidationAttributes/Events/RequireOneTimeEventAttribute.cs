@@ -1,5 +1,7 @@
 ﻿using Shrooms.DataLayer.EntityModels.Models.Events;
 using System;
+using System.Collections;
+using System.Linq;
 using System.ComponentModel.DataAnnotations;
 
 namespace Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes.Events
@@ -17,7 +19,9 @@ namespace Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes.Events
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             var recurrenceOption = GetRecurrenceOption(validationContext);
-            if (IsOneTimeEvent(recurrenceOption) || value == null)
+            if (IsOneTimeEvent(recurrenceOption) ||
+                value == null ||
+                ((ICollection)value).Count == 0)
             {
                 return ValidationResult.Success;
             }
