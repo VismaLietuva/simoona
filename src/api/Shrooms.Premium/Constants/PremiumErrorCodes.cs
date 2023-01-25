@@ -36,7 +36,8 @@
         public const string EventAttendTypeIsNotAllowed = "227";
         public const string EventAttendTypeCannotBeChangedIfParticipantsJoined = "228";
         public const string EventInvalidReminderType = "229";
-
+        public const string EventReminderCannotBeRemoved = "230";
+        public const string EventReminderCannotBeUpdated = "231";
 
         // Service Request, 7**
         public const int ServiceRequestIsClosed = 700;

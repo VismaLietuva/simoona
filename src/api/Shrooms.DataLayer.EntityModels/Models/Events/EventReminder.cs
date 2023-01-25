@@ -16,6 +16,8 @@ namespace Shrooms.DataLayer.EntityModels.Models.Events
 
         public EventRemindType Type { get; set; }
         
-        public bool Reminded { get; set; }
+        public bool IsReminded { get; set; }
+
+        public int RemindedCount { get; set; }
     }
 }

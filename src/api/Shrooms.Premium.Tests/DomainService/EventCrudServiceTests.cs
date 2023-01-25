@@ -732,7 +732,7 @@ namespace Shrooms.Premium.Tests.DomainService
             var reminder = new EventReminder
             {
                 EventId = eventId,
-                Reminded = true,
+                IsReminded = true,
                 Type = EventRemindType.Deadline,
                 RemindBeforeInDays = 20
             };
@@ -773,7 +773,7 @@ namespace Shrooms.Premium.Tests.DomainService
             await _eventService.UpdateEventAsync(editDto);
 
             // Assert
-            Assert.IsFalse(reminder.Reminded);
+            Assert.IsFalse(reminder.IsReminded);
         }
 
         [Test]
@@ -790,7 +790,7 @@ namespace Shrooms.Premium.Tests.DomainService
             var reminder = new EventReminder
             {
                 EventId = eventId,
-                Reminded = true,
+                IsReminded = true,
                 Type = EventRemindType.Start,
                 RemindBeforeInDays = 10
             };
@@ -831,7 +831,7 @@ namespace Shrooms.Premium.Tests.DomainService
             await _eventService.UpdateEventAsync(editDto);
 
             // Assert
-            Assert.IsFalse(reminder.Reminded);
+            Assert.IsFalse(reminder.IsReminded);
         }
 
         [Test]
@@ -848,7 +848,7 @@ namespace Shrooms.Premium.Tests.DomainService
             var reminder = new EventReminder
             {
                 EventId = eventId,
-                Reminded = true,
+                IsReminded = true,
                 Type = EventRemindType.Start,
                 RemindBeforeInDays = 10
             };

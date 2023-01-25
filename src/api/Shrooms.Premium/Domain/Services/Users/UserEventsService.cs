@@ -5,6 +5,7 @@ using System.Data.Entity.SqlServer;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using LinqKit;
 using Shrooms.Contracts.DAL;
 using Shrooms.Contracts.Enums;
 using Shrooms.Contracts.Infrastructure;
@@ -34,11 +35,16 @@ namespace Shrooms.Premium.Domain.Services.Users
         
         public async Task<IEnumerable<EventReminder>> GetReadyNotCompletedRemindersAsync(Organization organization)
         {
+            var readyRemindersPredicate = PredicateBuilder.False<EventReminder>()
+                .Or(FilterReadyStartReminders())
+                .Or(FilterReadyDeadlineReminders())
+                .Expand();
+
             return await _eventRemindersDbSet.Include(reminder => reminder.Event)
                 .Include(reminder => reminder.Event.EventParticipants)
                 .Include(reminder => reminder.Event.EventParticipants.Select(participant => participant.ApplicationUser))
-                .Where(reminder => !reminder.Reminded && reminder.Event.OrganizationId == organization.Id)
-                .Where(FilterReadyReminders())
+                .Where(reminder => !reminder.IsReminded && reminder.Event.OrganizationId == organization.Id)
+                .Where(readyRemindersPredicate)
                 .ToListAsync();
         }
 
@@ -60,20 +66,24 @@ namespace Shrooms.Premium.Domain.Services.Users
         {
             foreach (var reminder in reminders)
             {
-                reminder.Reminded = true;
+                reminder.IsReminded = true;
+                reminder.RemindedCount++;
             }
             await _uow.SaveChangesAsync(false);
         }
 
-        private Expression<Func<EventReminder, bool>> FilterReadyReminders()
+        private Expression<Func<EventReminder, bool>> FilterReadyStartReminders()
         {
-            // Unable to refactor this due to EF not being able to translate more complex code to SQL.
-            return reminder => (reminder.Type == EventRemindType.Start &&
-                                DbFunctions.AddDays(reminder.Event.StartDate, -reminder.RemindBeforeInDays) <= _systemClock.UtcNow &&
-                                reminder.Event.StartDate > _systemClock.UtcNow) ||
-                               (reminder.Type == EventRemindType.Deadline &&
-                                DbFunctions.AddDays(reminder.Event.RegistrationDeadline, -reminder.RemindBeforeInDays) <= _systemClock.UtcNow &&
-                                reminder.Event.RegistrationDeadline > _systemClock.UtcNow);
+            return reminder => reminder.Type == EventRemindType.Start &&
+                               DbFunctions.AddDays(reminder.Event.StartDate, -reminder.RemindBeforeInDays) <= _systemClock.UtcNow &&
+                               reminder.Event.StartDate > _systemClock.UtcNow;
+        }
+
+        private Expression<Func<EventReminder, bool>> FilterReadyDeadlineReminders()
+        {
+            return reminder => reminder.Type == EventRemindType.Deadline &&
+                               DbFunctions.AddDays(reminder.Event.RegistrationDeadline, -reminder.RemindBeforeInDays) <= _systemClock.UtcNow &&
+                               reminder.Event.RegistrationDeadline > _systemClock.UtcNow;
         }
 
         private IQueryable<ApplicationUser> GetUserWithoutEventThisWeek(IEnumerable<int> eventTypeIds, Expression<Func<ApplicationUser, bool>> userPredicate)

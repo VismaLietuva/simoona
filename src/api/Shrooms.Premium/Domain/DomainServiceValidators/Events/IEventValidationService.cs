@@ -43,5 +43,7 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
         void CheckIfUserParticipatesInEvent(string userId, IEnumerable<EventParticipantAttendDto> participants);
         void CheckIfDateRangeExceededLimitOrNull(DateTime? start, DateTime? end);
         void CheckIfAllParticipantsExist(ICollection<ApplicationUser> users, ICollection<string> participantIds);
+        void CheckIfEventReminderCanBeRemoved(EventReminder reminder);
+        void CheckIfEventReminderCanBeUpdated(EventReminder reminder);
     }
 }

@@ -1,5 +1,5 @@
-﻿using Shrooms.Contracts.Enums;
-using Shrooms.Premium.Constants;
+﻿using Shrooms.Contracts.Constants;
+using Shrooms.Contracts.Enums;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Presentation.WebViewModels.Events;
 using System;

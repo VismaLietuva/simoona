@@ -321,5 +321,22 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
                 throw new EventException(PremiumErrorCodes.EventIsFullCode);
             }
         }
+
+        public void CheckIfEventReminderCanBeRemoved(EventReminder reminder)
+        {
+            if (reminder.RemindedCount > 0)
+            {
+                throw new EventException(PremiumErrorCodes.EventReminderCannotBeRemoved);
+            }
+        }
+
+        public void CheckIfEventReminderCanBeUpdated(EventReminder reminder)
+        {
+            if (reminder.RemindedCount > 0 &&
+                reminder.RemindBeforeInDays != reminder.RemindBeforeInDays)
+            {
+                throw new EventException(PremiumErrorCodes.EventReminderCannotBeUpdated);
+            }
+        }
     }
 }

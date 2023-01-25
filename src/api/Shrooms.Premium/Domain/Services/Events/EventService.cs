@@ -543,6 +543,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             var timestamp = _systemClock.UtcNow;
             foreach (var reminder in remindersToDelete)
             {
+                _eventValidationService.CheckIfEventReminderCanBeRemoved(reminder);
                 reminder.Modified = timestamp;
                 reminder.ModifiedBy = userId;
             }
@@ -559,7 +560,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                 {
                     RemindBeforeInDays = reminder.RemindBeforeInDays,
                     Type = reminder.Type,
-                    Reminded = false,
+                    IsReminded = false,
                     Created = timestamp,
                     CreatedBy = userId,
                     Modified = timestamp,
@@ -574,15 +575,6 @@ namespace Shrooms.Premium.Domain.Services.Events
             CreateEventDto createDto,
             Event @event)
         {
-            if (reminderToUpdate.RemindBeforeInDays > reminder.RemindBeforeInDays)
-            {
-                reminderToUpdate.Reminded = false;
-            }
-
-            reminderToUpdate.RemindBeforeInDays = reminder.RemindBeforeInDays;
-            reminderToUpdate.Modified = _systemClock.UtcNow;
-            reminderToUpdate.ModifiedBy = createDto.UserId;
-
             switch (reminder.Type)
             {
                 case EventRemindType.Start:
@@ -593,13 +585,18 @@ namespace Shrooms.Premium.Domain.Services.Events
                     UpdateEventReminderDeadline(reminderToUpdate, createDto, @event);
                     break;
             }
+            
+            _eventValidationService.CheckIfEventReminderCanBeUpdated(reminderToUpdate);
+            reminderToUpdate.RemindBeforeInDays = reminder.RemindBeforeInDays;
+            reminderToUpdate.Modified = _systemClock.UtcNow;
+            reminderToUpdate.ModifiedBy = createDto.UserId;
         }
 
         private static void UpdateEventReminderStart(EventReminder reminderToUpdate, CreateEventDto createDto, Event @event)
         {
             if (createDto.StartDate != @event.StartDate)
             {
-                reminderToUpdate.Reminded = false;
+                reminderToUpdate.IsReminded = false;
             }
         }
 
@@ -607,11 +604,11 @@ namespace Shrooms.Premium.Domain.Services.Events
         {
             if (createDto.RegistrationDeadlineDate < @event.RegistrationDeadline)
             {
-                reminderToUpdate.Reminded = false;
+                reminderToUpdate.IsReminded = false;
             }
             else if (IsRegistrationDeadlineBeingRemoved(createDto, @event))
             {
-                reminderToUpdate.Reminded = true;
+                reminderToUpdate.IsReminded = true;
             }
         }
 
