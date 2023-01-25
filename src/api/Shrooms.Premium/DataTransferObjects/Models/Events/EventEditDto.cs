@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Shrooms.DataLayer.EntityModels.Models.Events;
+using Shrooms.Premium.DataTransferObjects.Models.Events.Reminders;
 
 namespace Shrooms.Premium.DataTransferObjects.Models.Events
 {

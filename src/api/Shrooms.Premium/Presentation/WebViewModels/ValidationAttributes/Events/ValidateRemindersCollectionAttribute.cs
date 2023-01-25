@@ -1,6 +1,5 @@
 ﻿using Shrooms.Contracts.Constants;
 using Shrooms.Contracts.Enums;
-using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.Presentation.WebViewModels.Events;
 using System;
 using System.Collections.Generic;
@@ -21,7 +20,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes.Events
 
             if (value is not IEnumerable<EventReminderViewModel>)
             {
-                throw new ArgumentException($"Property is of type {value.GetType()} excepted {typeof(IEnumerable<EventReminderDto>)}");
+                throw new ArgumentException($"Property is of type {value.GetType()} excepted {typeof(IEnumerable<EventReminderViewModel>)}");
             }
 
             var reminders = ((IEnumerable<EventReminderViewModel>)value).ToList();

@@ -1,6 +1,6 @@
 ﻿using Shrooms.Contracts.Enums;
 
-namespace Shrooms.Premium.DataTransferObjects.Models.Events
+namespace Shrooms.Premium.DataTransferObjects.Models.Events.Reminders
 {
     public class EventReminderDto
     {

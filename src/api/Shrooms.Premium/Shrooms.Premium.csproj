@@ -275,8 +275,8 @@
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\CoacheeLeftEventEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\CoacheeJoinedEventEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\CommitteeSuggestionEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\EventDeadlineRemindEmailTemplateViewModel.cs" />
-    <Compile Include="DataTransferObjects\EmailTemplateViewModels\EventStartRemindEmailTemplateViewModel.cs" />
+    <Compile Include="DataTransferObjects\EmailTemplateViewModels\EventReminderDeadlineEmailTemplateViewModel.cs" />
+    <Compile Include="DataTransferObjects\EmailTemplateViewModels\EventReminderStartEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\StartedLotteryEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\EventJoinRemindEmailTemplateViewModel.cs" />
     <Compile Include="DataTransferObjects\EmailTemplateViewModels\EventParticipantExpelledEmailTemplateViewModel.cs" />
@@ -325,7 +325,7 @@
     <Compile Include="DataTransferObjects\Models\Events\EventParticipantsReportListingArgsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventParticipantVisitedEventsListingArgsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventProjectReportDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\EventReminderDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\Reminders\EventReminderDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventReportDetailsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventReportListingArgsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventVisitedReportDto.cs" />
@@ -352,10 +352,10 @@
     <Compile Include="DataTransferObjects\Models\Events\EventParticipantReportDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\MyEventsOptionsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\NewEventOptionDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\Reminders\RemindEventDeadlineEmailDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\Reminders\IRemindEventDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\Reminders\RemindEventStartEmailDto.cs" />
-    <Compile Include="DataTransferObjects\Models\Events\Reminders\RemindReceiverDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\Reminders\EventReminderDeadlineEmailDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\Reminders\IEventReminderEmailDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\Reminders\EventReminderStartEmailDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\Reminders\EventReminderEmailReceiverDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\UpdateAttendStatusDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\UpdateEventTypeDto.cs" />
     <Compile Include="DataTransferObjects\Models\Kudos\AwardedKudosEmployeeDto.cs" />

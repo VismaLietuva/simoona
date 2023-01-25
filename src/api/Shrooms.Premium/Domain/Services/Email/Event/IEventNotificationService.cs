@@ -16,8 +16,8 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
 
         Task NotifyManagerAboutEventAsync(UserEventAttendStatusChangeEmailDto userAttendStatusDto, bool isJoiningEvent);
 
-        Task RemindUsersAboutDeadlineDateOfJoinedEventsAsync(IEnumerable<RemindEventDeadlineEmailDto> deadlineEmailDtos, Organization organization);
+        Task RemindUsersAboutDeadlineDateOfJoinedEventsAsync(IEnumerable<EventReminderDeadlineEmailDto> deadlineEmailDtos, Organization organization);
 
-        Task RemindUsersAboutStartDateOfJoinedEventsAsync(IEnumerable<RemindEventStartEmailDto> startEmailDtos, Organization organization);
+        Task RemindUsersAboutStartDateOfJoinedEventsAsync(IEnumerable<EventReminderStartEmailDto> startEmailDtos, Organization organization);
     }
 }

@@ -3,7 +3,7 @@ using System;
 
 namespace Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels
 {
-    public class EventStartRemindEmailTemplateViewModel : BaseEmailTemplateViewModel
+    public class EventReminderDeadlineEmailTemplateViewModel : BaseEmailTemplateViewModel
     {
         public string Name { get; set; }
 
@@ -11,15 +11,19 @@ namespace Shrooms.Premium.DataTransferObjects.EmailTemplateViewModels
 
         public DateTime StartDate { get; set; }
 
-        public EventStartRemindEmailTemplateViewModel(
+        public DateTime DeadlineDate { get; set; }
+
+        public EventReminderDeadlineEmailTemplateViewModel(
             string userNotificationSettingsUrl,
             string name,
             string url,
-            DateTime startDate) : base(userNotificationSettingsUrl)
+            DateTime startDate,
+            DateTime deadlineDate) : base(userNotificationSettingsUrl)
         {
             Name = name;
             Url = url;
             StartDate = startDate;
+            DeadlineDate = deadlineDate;
         }
     }
 }

@@ -59,7 +59,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             await _mailingService.SendEmailAsync(new EmailDto(emails, Resources.Models.Events.Events.ResetParticipantListEmailSubject, emailBody));
         }
         
-        public async Task RemindUsersAboutDeadlineDateOfJoinedEventsAsync(IEnumerable<RemindEventDeadlineEmailDto> deadlineEmailDtos, Organization organization)
+        public async Task RemindUsersAboutDeadlineDateOfJoinedEventsAsync(IEnumerable<EventReminderDeadlineEmailDto> deadlineEmailDtos, Organization organization)
         {
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
             var emailsToSend = deadlineEmailDtos.Select(MapRemindEventToEmailContent(
@@ -69,7 +69,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             await SendEmailsAsync(emailsToSend);
         }
 
-        public async Task RemindUsersAboutStartDateOfJoinedEventsAsync(IEnumerable<RemindEventStartEmailDto> startEmailDtos, Organization organization)
+        public async Task RemindUsersAboutStartDateOfJoinedEventsAsync(IEnumerable<EventReminderStartEmailDto> startEmailDtos, Organization organization)
         {
             var userNotificationSettingsUrl = _appSettings.UserNotificationSettingsUrl(organization.ShortName);
             var emailsToSend = startEmailDtos.Select(MapRemindEventToEmailContent(
@@ -143,7 +143,7 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
         private Func<TDto, (List<(string EmailBody, List<string> UserEmails)> EmailContents, string Subject)>
             MapRemindEventToEmailContent<TDto, TEmailTemplate>(string subjectResource, Func<string, TDto, (TEmailTemplate, string)> mapToViewModelFunc) 
             where TEmailTemplate : BaseEmailTemplateViewModel
-            where TDto : IRemindEventDto
+            where TDto : IEventReminderEmailDto
         {
             return reminder =>
             {
@@ -160,11 +160,11 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
             };
         }
 
-        private Func<string, RemindEventStartEmailDto, (EventStartRemindEmailTemplateViewModel, string)>
+        private Func<string, EventReminderStartEmailDto, (EventReminderStartEmailTemplateViewModel, string)>
             MapToEventRemindStartEmailTemplateWithCacheKey(Organization organization, string userNotificationSettingsUrl)
         {
             return (timeZoneKey, reminder) =>
-                (new EventStartRemindEmailTemplateViewModel(
+                (new EventReminderStartEmailTemplateViewModel(
                     userNotificationSettingsUrl,
                     reminder.EventName,
                     _appSettings.EventUrl(organization.ShortName, reminder.EventId.ToString()),
@@ -172,11 +172,11 @@ namespace Shrooms.Premium.Domain.Services.Email.Event
                 EmailPremiumTemplateCacheKeys.EventStartRemind);
         }
 
-        private Func<string, RemindEventDeadlineEmailDto, (EventDeadlineRemindEmailTemplateViewModel, string)>
+        private Func<string, EventReminderDeadlineEmailDto, (EventReminderDeadlineEmailTemplateViewModel, string)>
             MapToEventRemindDeadlineEmailTemplateWithCacheKey(Organization organization, string userNotificationSettingsUrl)
         {
             return (timeZoneKey, reminder) =>
-                (new EventDeadlineRemindEmailTemplateViewModel(
+                (new EventReminderDeadlineEmailTemplateViewModel(
                     userNotificationSettingsUrl,
                     reminder.EventName,
                     _appSettings.EventUrl(organization.ShortName, reminder.EventId.ToString()),

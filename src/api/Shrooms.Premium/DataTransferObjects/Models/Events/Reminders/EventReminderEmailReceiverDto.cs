@@ -1,6 +1,6 @@
 ﻿namespace Shrooms.Premium.DataTransferObjects.Models.Events.Reminders
 {
-    public class RemindReceiverDto
+    public class EventReminderEmailReceiverDto
     {
         public string Email { get; set; }
 

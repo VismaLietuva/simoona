@@ -19,6 +19,7 @@ using Shrooms.Domain.Services.Permissions;
 using Shrooms.Domain.Services.Wall;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
+using Shrooms.Premium.DataTransferObjects.Models.Events.Reminders;
 using Shrooms.Premium.Domain.DomainServiceValidators.Events;
 using Shrooms.Premium.Domain.Services.Events.Participation;
 using Shrooms.Premium.Domain.Services.Events.Utilities;

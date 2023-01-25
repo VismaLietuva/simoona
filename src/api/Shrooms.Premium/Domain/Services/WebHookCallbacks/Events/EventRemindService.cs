@@ -89,14 +89,14 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
             return await _organizationService.GetOrganizationByNameAsync(organizationName);
         }
 
-        private Func<EventReminder, RemindEventStartEmailDto> MapRemindStartEvent()
+        private Func<EventReminder, EventReminderStartEmailDto> MapRemindStartEvent()
         {
-            return reminder => new RemindEventStartEmailDto
+            return reminder => new EventReminderStartEmailDto
             {
                 StartDate = reminder.Event.StartDate,
                 EventName = reminder.Event.Name,
                 EventId = reminder.Event.Id,
-                Receivers = reminder.Event.EventParticipants.Select(participant => new RemindReceiverDto 
+                Receivers = reminder.Event.EventParticipants.Select(participant => new EventReminderEmailReceiverDto 
                 {
                     Email = participant.ApplicationUser.Email,
                     TimeZone = participant.ApplicationUser.TimeZone,
@@ -104,15 +104,15 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
             };
         }
 
-        private Func<EventReminder, RemindEventDeadlineEmailDto> MapRemindDeadlineEvent()
+        private Func<EventReminder, EventReminderDeadlineEmailDto> MapRemindDeadlineEvent()
         {
-            return reminder => new RemindEventDeadlineEmailDto
+            return reminder => new EventReminderDeadlineEmailDto
             {
                 DeadlineDate = reminder.Event.RegistrationDeadline,
                 StartDate = reminder.Event.StartDate,
                 EventName = reminder.Event.Name,
                 EventId = reminder.Event.Id,
-                Receivers = reminder.Event.EventParticipants.Select(participant => new RemindReceiverDto
+                Receivers = reminder.Event.EventParticipants.Select(participant => new EventReminderEmailReceiverDto
                 {
                     Email = participant.ApplicationUser.Email,
                     TimeZone = participant.ApplicationUser.TimeZone
