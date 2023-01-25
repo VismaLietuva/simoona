@@ -103,13 +103,13 @@ namespace Shrooms.Premium.Domain.Services.Events
             await _wallService.DeleteWallAsync(@event.WallId, userOrg, WallType.Events);
         }
 
-        public async Task<EventEditDto> GetEventForEditingAsync(Guid id, UserAndOrganizationDto userOrg)
+        public async Task<EventEditDetailsDto> GetEventForEditingAsync(Guid id, UserAndOrganizationDto userOrg)
         {
             var @event = await _eventsDbSet
                 .Include(e => e.ResponsibleUser)
                 .Include(e => e.Reminders)
                 .Where(e => e.Id == id && e.OrganizationId == userOrg.OrganizationId)
-                .Select(MapToEventEditDto())
+                .Select(MapToEventEditDetailsDto())
                 .SingleOrDefaultAsync();
 
             _eventValidationService.CheckIfEventExists(@event);
@@ -297,9 +297,9 @@ namespace Shrooms.Premium.Domain.Services.Events
             return newEventDto.RegistrationDeadlineDate ?? newEventDto.StartDate;
         }
 
-        private static Expression<Func<Event, EventEditDto>> MapToEventEditDto()
+        private static Expression<Func<Event, EventEditDetailsDto>> MapToEventEditDetailsDto()
         {
-            return e => new EventEditDto
+            return e => new EventEditDetailsDto
             {
                 Id = e.Id,
                 Description = e.Description,
@@ -321,10 +321,11 @@ namespace Shrooms.Premium.Domain.Services.Events
                 // Do not use string interpolation here (EF won't be able to project it to SQL)
                 HostUserFullName = e.ResponsibleUser.FirstName + " " + e.ResponsibleUser.LastName,
                 TypeId = e.EventTypeId,
-                Reminders = e.Reminders.Select(reminder => new EventReminderDto
+                Reminders = e.Reminders.Select(reminder => new EventReminderDetailsDto
                 {
                     RemindBeforeInDays = reminder.RemindBeforeInDays,
-                    Type = reminder.Type
+                    Type = reminder.Type,
+                    RemindedCount = reminder.RemindedCount
                 }),
                 Options = e.EventOptions.Select(o => new EventOptionDto
                 {

@@ -13,7 +13,7 @@ namespace Shrooms.Premium.Domain.Services.Events
         Task ToggleEventPinAsync(Guid id);
         Task<EventDetailsDto> GetEventDetailsAsync(Guid id, UserAndOrganizationDto userOrg);
         Task<EventReportDetailsDto> GetReportEventDetailsAsync(Guid id, UserAndOrganizationDto userOrg);
-        Task<EventEditDto> GetEventForEditingAsync(Guid id, UserAndOrganizationDto userOrg);
+        Task<EventEditDetailsDto> GetEventForEditingAsync(Guid id, UserAndOrganizationDto userOrg);
         Task CheckIfEventExistsAsync(string eventId, int organizationId);
     }
 }

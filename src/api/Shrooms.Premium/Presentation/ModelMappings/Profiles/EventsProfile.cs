@@ -44,7 +44,7 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
             CreateMap<EventProjectReportDto, EventProjectReportViewModel>();
             CreateMap<EventParticipantReportDto, EventParticipantReportViewModel>();
 
-            CreateMap<EventEditDto, EventEditViewModel>()
+            CreateMap<EventEditDetailsDto, EventEditDetailsViewModel>()
                 .ForMember(dest => dest.OfficeIds, opt => opt.MapFrom(u => JsonConvert.DeserializeObject<string[]>(u.Offices.Value)));
             CreateMap<EventOptionsDto, EventOptionsViewModel>();
 
@@ -54,7 +54,10 @@ namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 
             CreateMap<EventOfficesDto, EventOfficesViewModel>();
             CreateMap<EventReportDetailsDto, EventReportDetailsViewModel>();
+
             CreateMap<EventReminderDto, EventReminderViewModel>();
+            CreateMap<EventReminderDetailsDto, EventReminderDetailsViewModel>()
+                .ForMember(dest => dest.IsDisabled, opt => opt.MapFrom(u => u.RemindedCount > 0));
         }
 
         private void CreateViewModelToDtoMappings()

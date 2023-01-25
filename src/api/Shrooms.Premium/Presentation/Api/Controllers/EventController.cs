@@ -422,7 +422,7 @@ namespace Shrooms.Premium.Presentation.Api.Controllers
             try
             {
                 var eventDto = await _eventService.GetEventForEditingAsync(eventId, GetUserAndOrganization());
-                var result = _mapper.Map<EventEditDto, EventEditViewModel>(eventDto);
+                var result = _mapper.Map<EventEditDetailsDto, EventEditDetailsViewModel>(eventDto);
                 return Ok(result);
             }
             catch (EventException e)

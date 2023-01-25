@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Shrooms.DataLayer.EntityModels.Models.Events;
+using Shrooms.Premium.DataTransferObjects.Models.Events.Reminders;
+using System;
 using System.Collections.Generic;
-using Shrooms.DataLayer.EntityModels.Models.Events;
 
-namespace Shrooms.Premium.Presentation.WebViewModels.Events
+namespace Shrooms.Premium.DataTransferObjects.Models.Events
 {
-    public class EventEditViewModel
+    public class EventEditDetailsDto
     {
         public Guid Id { get; set; }
 
@@ -24,15 +25,15 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
 
         public bool AllowNotGoing { get; set; }
 
-        public IEnumerable<int> OfficeIds { get; set; }
+        public EventOfficesDto Offices { get; set; }
 
         public bool IsPinned { get; set; }
 
         public string Location { get; set; }
 
-        public int TypeId { get; set; }
-
         public string Description { get; set; }
+
+        public int TypeId { get; set; }
 
         public int MaxParticipants { get; set; }
 
@@ -46,8 +47,8 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
 
         public bool ResetParticipantList { get; set; }
 
-        public IEnumerable<EventOptionViewModel> Options { get; set; }
+        public IEnumerable<EventOptionDto> Options { get; set; }
 
-        public IEnumerable<EventReminderViewModel> Reminders { get; set; }
+        public IEnumerable<EventReminderDetailsDto> Reminders { get; set; }
     }
 }

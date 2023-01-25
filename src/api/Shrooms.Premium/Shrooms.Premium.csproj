@@ -319,12 +319,14 @@
     <Compile Include="DataTransferObjects\Models\Committees\CommitteeSuggestionPostDto.cs" />
     <Compile Include="DataTransferObjects\Models\Committees\CommitteeSuggestionDto.cs" />
     <Compile Include="DataTransferObjects\Models\Committees\CommitteeViewDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\EventEditDetailsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventFilteredArgsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventParticipantAttendDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventParticipantFirstTimeJoinDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventParticipantsReportListingArgsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventParticipantVisitedEventsListingArgsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventProjectReportDto.cs" />
+    <Compile Include="DataTransferObjects\Models\Events\Reminders\EventReminderDetailsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\Reminders\EventReminderDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventReportDetailsDto.cs" />
     <Compile Include="DataTransferObjects\Models\Events\EventReportListingArgsDto.cs" />
@@ -563,7 +565,7 @@
     <Compile Include="Presentation\WebViewModels\Events\EventDetailsOptionViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventDetailsParticipantViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventDetailsViewModel.cs" />
-    <Compile Include="Presentation\WebViewModels\Events\EventEditViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\EventEditDetailsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventFilteredArgsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventJoinMultipleViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventJoinViewModel.cs" />
@@ -576,6 +578,7 @@
     <Compile Include="Presentation\WebViewModels\Events\EventParticipantsReportListingArgsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventParticipantVisitedEventsListingArgsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventProjectReportViewModel.cs" />
+    <Compile Include="Presentation\WebViewModels\Events\EventReminderDetailsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventReminderViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventReportDetailsViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Events\EventReportListingArgsViewModel.cs" />
