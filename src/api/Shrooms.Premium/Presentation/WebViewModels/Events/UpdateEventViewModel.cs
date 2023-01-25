@@ -7,7 +7,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
     public class UpdateEventViewModel : CreateEventViewModel
     {
         [Required]
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
 
         public bool ResetParticipantList { get; set; }
 

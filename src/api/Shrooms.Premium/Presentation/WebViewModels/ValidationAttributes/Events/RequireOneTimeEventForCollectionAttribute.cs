@@ -7,11 +7,11 @@ using System.ComponentModel.DataAnnotations;
 namespace Shrooms.Premium.Presentation.WebViewModels.ValidationAttributes.Events
 {
     [AttributeUsage(AttributeTargets.Property)]
-    public class RequireOneTimeEventAttribute : ValidationAttribute
+    public class RequireOneTimeEventForCollectionAttribute : ValidationAttribute
     {
         private readonly string _comparisonProperty;
 
-        public RequireOneTimeEventAttribute(string comparisonProperty)
+        public RequireOneTimeEventForCollectionAttribute(string comparisonProperty)
         {
             _comparisonProperty = comparisonProperty;
         }

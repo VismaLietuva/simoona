@@ -623,7 +623,7 @@
     <Compile Include="Presentation\WebViewModels\Vacations\VacationAvailableDaysViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\Vacations\VacationViewModel.cs" />
     <Compile Include="Presentation\WebViewModels\ValidationAttributes\Events\ValidateRemindersCollectionAttribute.cs" />
-    <Compile Include="Presentation\WebViewModels\ValidationAttributes\Events\RequireOneTimeEventAttribute.cs" />
+    <Compile Include="Presentation\WebViewModels\ValidationAttributes\Events\RequireOneTimeEventForCollectionAttribute.cs" />
     <Compile Include="Presentation\WebViewModels\ValidationAttributes\NoDuplicatesInCollectionAttribute.cs" />
     <Compile Include="Presentation\WebViewModels\ValidationAttributes\DateTimeGreaterThanPresentDateAttribute.cs" />
     <Compile Include="Presentation\WebViewModels\ValidationAttributes\DateTimeLessThanDateTimeAttribute.cs" />

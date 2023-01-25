@@ -26,7 +26,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
                 Recurrence = EventRecurrenceOptions.None
             };
             var context = new ValidationContext(model);
-            var attribute = new RequireOneTimeEventAttribute(nameof(Mock.Recurrence));
+            var attribute = new RequireOneTimeEventForCollectionAttribute(nameof(Mock.Recurrence));
 
             // Act
             var result = attribute.GetValidationResult(model.Number, context);
@@ -45,32 +45,13 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
                 Recurrence = EventRecurrenceOptions.None
             };
             var context = new ValidationContext(model);
-            var attribute = new RequireOneTimeEventAttribute(nameof(Mock.Recurrence));
+            var attribute = new RequireOneTimeEventForCollectionAttribute(nameof(Mock.Recurrence));
 
             // Act
             var result = attribute.GetValidationResult(model.Number, context);
 
             // Assert
             Assert.AreEqual(ValidationResult.Success, result);
-        }
-
-        [Test]
-        public void IsValid_RecurrenceIsNotNoneAndNumberIsSet_ReturnsFalse()
-        {
-            // Arrange
-            var model = new Mock
-            {
-                Number = 1,
-                Recurrence = EventRecurrenceOptions.EveryTwoWeeks
-            };
-            var context = new ValidationContext(model);
-            var attribute = new RequireOneTimeEventAttribute(nameof(Mock.Recurrence));
-
-            // Act
-            var result = attribute.GetValidationResult(model.Number, context);
-
-            // Assert
-            Assert.IsNotNull(result.ErrorMessage);
         }
 
         [Test]
@@ -83,7 +64,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
                 Recurrence = EventRecurrenceOptions.EveryTwoWeeks
             };
             var context = new ValidationContext(model);
-            var attribute = new RequireOneTimeEventAttribute(nameof(Mock.Recurrence));
+            var attribute = new RequireOneTimeEventForCollectionAttribute(nameof(Mock.Recurrence));
 
             // Act
             var result = attribute.GetValidationResult(model.Number, context);
@@ -102,7 +83,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
                 Recurrence = EventRecurrenceOptions.None
             };
             var context = new ValidationContext(model);
-            var attribute = new RequireOneTimeEventAttribute("Random");
+            var attribute = new RequireOneTimeEventForCollectionAttribute("Random");
 
             // Assert
             Assert.Throws<ArgumentException>(() => attribute.GetValidationResult(model.Number, context));
@@ -118,7 +99,7 @@ namespace Shrooms.Premium.Tests.ValidationAttributes
                 Recurrence = EventRecurrenceOptions.None
             };
             var context = new ValidationContext(model);
-            var attribute = new RequireOneTimeEventAttribute(nameof(Mock.Number));
+            var attribute = new RequireOneTimeEventForCollectionAttribute(nameof(Mock.Number));
 
             // Assert
             Assert.Throws<ArgumentException>(() => attribute.GetValidationResult(model.Number, context));

@@ -681,6 +681,7 @@ namespace Shrooms.Premium.Tests.DomainService
                     }
                 }
             };
+            _systemClock.UtcNow.Returns(startDate.AddDays(-10));
 
             await _eventService.CreateEventAsync(createDto);
 

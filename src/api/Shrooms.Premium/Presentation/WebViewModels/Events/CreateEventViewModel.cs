@@ -19,17 +19,17 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
         public string ImageName { get; set; }
 
         [Required]
-        public DateTime StartDate { get; set; }
+        public DateTime? StartDate { get; set; }
 
 
         [Required]
-        public DateTime EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
 
         [Required]
         public DateTime? RegistrationDeadlineDate { get; set; }
 
         [Required]
-        public EventRecurrenceOptions Recurrence { get; set; }
+        public EventRecurrenceOptions? Recurrence { get; set; }
 
         public bool AllowMaybeGoing { get; set; }
         public bool AllowNotGoing { get; set; }
@@ -62,7 +62,7 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
 
         public IEnumerable<NewEventOptionViewModel> NewOptions { get; set; }
 
-        [RequireOneTimeEvent(nameof(Recurrence)), ValidateRemindersCollection]
+        [RequireOneTimeEventForCollection(nameof(Recurrence)), ValidateRemindersCollection]
         public IEnumerable<EventReminderViewModel> Reminders { get; set; }
     }
 }

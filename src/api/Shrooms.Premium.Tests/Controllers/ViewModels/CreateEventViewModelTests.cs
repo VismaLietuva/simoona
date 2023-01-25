@@ -151,7 +151,10 @@ namespace Shrooms.Premium.Tests.Controllers.ViewModels
         public void NewInstance_CreatingRecurringEventAndHasReminders_ReturnsFalse()
         {
             var model = CreateValid(EventRecurrenceOptions.EveryWeek);
-            model.Reminders = new List<EventReminderViewModel>();
+            model.Reminders = new List<EventReminderViewModel>
+            {
+                new EventReminderViewModel()
+            };
 
             Assert.IsFalse(model.IsValid());
         }

@@ -163,12 +163,12 @@ namespace Shrooms.Premium.Domain.Services.Events
         public async Task<CreateEventDto> CreateEventAsync(CreateEventDto newEventDto)
         {
             newEventDto.MaxOptions = FindOutMaxChoices(newEventDto.NewOptions.Count(), newEventDto.MaxOptions);
-            newEventDto.RegistrationDeadlineDate = SetRegistrationDeadline(newEventDto);
+            newEventDto.RegistrationDeadlineDate = newEventDto.RegistrationDeadlineDate;
 
             var hasPermissionToPin = await _permissionService.UserHasPermissionAsync(newEventDto, AdministrationPermissions.Event);
             _eventValidationService.CheckIfUserHasPermissionToPin(newEventDto.IsPinned, currentPinStatus: false, hasPermissionToPin);
             _eventValidationService.CheckIfEventStartDateIsExpired(newEventDto.StartDate);
-            _eventValidationService.CheckIfRegistrationDeadlineIsExpired(newEventDto.RegistrationDeadlineDate.Value);
+            _eventValidationService.CheckIfRegistrationDeadlineIsExpired(newEventDto.RegistrationDeadlineDate);
             await ValidateEvent(newEventDto);
             _eventValidationService.CheckIfCreatingEventHasInsufficientOptions(newEventDto.MaxOptions, newEventDto.NewOptions.Count());
             _eventValidationService.CheckIfCreatingEventHasNoChoices(newEventDto.MaxOptions, newEventDto.NewOptions.Count());
@@ -200,7 +200,7 @@ namespace Shrooms.Premium.Domain.Services.Events
 
             var totalOptionsProvided = eventDto.NewOptions.Count() + eventDto.EditedOptions.Count();
             eventDto.MaxOptions = FindOutMaxChoices(totalOptionsProvided, eventDto.MaxOptions);
-            eventDto.RegistrationDeadlineDate = SetRegistrationDeadline(eventDto);
+            eventDto.RegistrationDeadlineDate = eventDto.RegistrationDeadlineDate;
 
             var hasPermission = await _permissionService.UserHasPermissionAsync(eventDto, AdministrationPermissions.Event);
             
@@ -292,11 +292,6 @@ namespace Shrooms.Premium.Domain.Services.Events
             return eventOptionsCount == NoOptions ? NoOptions : maxOptions;
         }
 
-        private static DateTime SetRegistrationDeadline(CreateEventDto newEventDto)
-        {
-            return newEventDto.RegistrationDeadlineDate ?? newEventDto.StartDate;
-        }
-
         private static Expression<Func<Event, EventEditDetailsDto>> MapToEventEditDetailsDto()
         {
             return e => new EventEditDetailsDto
@@ -380,7 +375,7 @@ namespace Shrooms.Premium.Domain.Services.Events
 
             _eventValidationService.CheckIfEndDateIsGreaterThanStartDate(eventDto.StartDate, eventDto.EndDate);
             // ReSharper disable once PossibleInvalidOperationException
-            _eventValidationService.CheckIfRegistrationDeadlineExceedsStartDate(eventDto.RegistrationDeadlineDate.Value, eventDto.StartDate);
+            _eventValidationService.CheckIfRegistrationDeadlineExceedsStartDate(eventDto.RegistrationDeadlineDate, eventDto.StartDate);
             _eventValidationService.CheckIfResponsibleUserNotExists(userExists);
             _eventValidationService.CheckIfOptionsAreDifferent(eventDto.NewOptions);
             _eventValidationService.CheckIfTypeDoesNotExist(eventTypeExists);
@@ -456,7 +451,10 @@ namespace Shrooms.Premium.Domain.Services.Events
                 OrganizationId = newEventDto.OrganizationId,
                 OfficeIds = JsonConvert.DeserializeObject<string[]>(newEventDto.Offices.Value),
                 IsPinned = newEventDto.IsPinned,
-                Reminders = new List<EventReminder>()
+                Reminders = new List<EventReminder>(),
+                StartDate = newEventDto.StartDate,
+                EndDate = newEventDto.EndDate,
+                RegistrationDeadline = newEventDto.RegistrationDeadlineDate
             };
 
             var newWall = new CreateWallDto
@@ -503,7 +501,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             newEvent.Name = newEventDto.Name;
 
             // ReSharper disable once PossibleInvalidOperationException
-            newEvent.RegistrationDeadline = newEventDto.RegistrationDeadlineDate.Value;
+            newEvent.RegistrationDeadline = newEventDto.RegistrationDeadlineDate;
 
             newEvent.IsPinned = newEventDto.IsPinned;
             newEvent.AllowMaybeGoing = newEventDto.AllowMaybeGoing;
