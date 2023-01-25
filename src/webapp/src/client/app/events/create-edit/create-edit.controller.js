@@ -86,7 +86,7 @@
         vm.resetVirtualParticipantList = false;
         vm.isRegistrationDeadlineEnabled = false;
         vm.isSaveButtonEnabled = true;
-        vm.allowJoiningVirtually = true;
+        vm.allowJoiningVirtually = false;
         vm.eventSettings = eventSettings;
         vm.eventImageSize = {
             w: eventSettings.thumbWidth,
@@ -604,7 +604,7 @@
                     vm.event.maxParticipants < vm.minParticipants;
             }
 
-            if (!vm.allowJoiningVirtually) {
+            if (!vm.allowJoiningVirtually && vm.minVirtualParticipants) {
                 vm.event.maxVirtualParticipants = 0;
                 vm.event.resetVirtualParticipantList = true;
                 return;
