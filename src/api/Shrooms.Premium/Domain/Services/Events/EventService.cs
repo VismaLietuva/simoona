@@ -451,10 +451,7 @@ namespace Shrooms.Premium.Domain.Services.Events
                 OrganizationId = newEventDto.OrganizationId,
                 OfficeIds = JsonConvert.DeserializeObject<string[]>(newEventDto.Offices.Value),
                 IsPinned = newEventDto.IsPinned,
-                Reminders = new List<EventReminder>(),
-                StartDate = newEventDto.StartDate,
-                EndDate = newEventDto.EndDate,
-                RegistrationDeadline = newEventDto.RegistrationDeadlineDate
+                Reminders = new List<EventReminder>()
             };
 
             var newWall = new CreateWallDto
@@ -524,7 +521,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             var newReminders = createEventDto.Reminders.Where(reminder => 
                 !updateReminders.Any(updateReminder => updateReminder.Reminder.Type == reminder.Type) &&
                 (createEventDto.StartDate != createEventDto.RegistrationDeadlineDate || reminder.Type != EventRemindType.Deadline));
-            AddEventReminders(eventToUpdate, newReminders, createEventDto.UserId);
+            AddEventReminders(eventToUpdate, createEventDto, newReminders, createEventDto.UserId);
 
             var remindersToDelete = eventToUpdate.Reminders.Where(reminder =>
                 !newReminders.Any(newReminder => newReminder.Type == reminder.Type) &&
@@ -532,7 +529,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             await RemoveEventRemindersAsync(
                 remindersToDelete,
                 createEventDto.UserId,
-                reminder => _eventValidationService.CheckIfEventReminderCanBeRemoved(eventToUpdate, reminder));
+                reminder => _eventValidationService.CheckIfEventReminderCanBeRemoved(createEventDto, reminder, createEventDto.Recurrence));
         }
 
         private async Task RemoveEventRemindersAsync(
@@ -556,12 +553,16 @@ namespace Shrooms.Premium.Domain.Services.Events
             _eventRemindersDbSet.RemoveRange(remindersToDelete);
         }
 
-        private void AddEventReminders(Event eventToUpdate, IEnumerable<EventReminderDto> newReminders, string userId)
+        private void AddEventReminders(
+            Event eventToUpdate,
+            CreateEventDto createEventDto,
+            IEnumerable<EventReminderDto> newReminders,
+            string userId)
         {
             var timestamp = _systemClock.UtcNow;
             foreach (var newReminder in newReminders)
             {
-                _eventValidationService.CheckIfEventReminderCanBeAdded(eventToUpdate, newReminder);
+                _eventValidationService.CheckIfEventReminderCanBeAdded(createEventDto, newReminder);
                 eventToUpdate.Reminders.Add(new EventReminder
                 {
                     RemindBeforeInDays = newReminder.RemindBeforeInDays,
@@ -594,7 +595,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             
             if (reminderToUpdate.RemindBeforeInDays != reminder.RemindBeforeInDays)
             {
-                _eventValidationService.CheckIfEventReminderCanBeUpdated(@event, reminderToUpdate);
+                _eventValidationService.CheckIfEventReminderCanBeUpdated(createDto, reminderToUpdate);
                 reminderToUpdate.RemindBeforeInDays = reminder.RemindBeforeInDays;
             }
 

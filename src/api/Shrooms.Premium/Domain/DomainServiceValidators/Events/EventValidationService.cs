@@ -323,47 +323,47 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             }
         }
 
-        public void CheckIfEventReminderCanBeRemoved(Event @event, EventReminder reminder)
+        public void CheckIfEventReminderCanBeRemoved(CreateEventDto createEventDto, EventReminder reminder, EventRecurrenceOptions newOption)
         {
-            if (!CanReminderBeChangedForEvent(@event, reminder))
+            if (!CanReminderBeChangedForEvent(createEventDto, reminder) && newOption == EventRecurrenceOptions.None)
             {
                 throw new EventException(PremiumErrorCodes.EventReminderCannotBeRemoved);
             }
         }
 
-        public void CheckIfEventReminderCanBeUpdated(Event @event, EventReminder reminder)
+        public void CheckIfEventReminderCanBeUpdated(CreateEventDto createEventDto, EventReminder reminder)
         {
-            if (!CanReminderBeChangedForEvent(@event, reminder))
+            if (!CanReminderBeChangedForEvent(createEventDto, reminder))
             {
                 throw new EventException(PremiumErrorCodes.EventReminderCannotBeUpdated);
             }
         }
 
-        private bool CanReminderBeChangedForEvent(Event @event, EventReminder reminder)
+        private bool CanReminderBeChangedForEvent(CreateEventDto createEventDto, EventReminder reminder)
         {
-            return reminder.RemindedCount <= 0 && !IsEventDateForReminderExpired(@event, reminder.Type);
+            return reminder.RemindedCount <= 0 && !IsEventDateForReminderExpired(createEventDto, reminder.Type);
         }
 
-        public void CheckIfEventReminderCanBeAdded(Event @event, EventReminderDto reminder)
+        public void CheckIfEventReminderCanBeAdded(CreateEventDto createEventDto, EventReminderDto reminder)
         {
-            if (IsEventDateForReminderExpired(@event, reminder.Type))
+            if (IsEventDateForReminderExpired(createEventDto, reminder.Type))
             {
                 throw new EventException(PremiumErrorCodes.EventReminderCannotBeAdded);
             }
         }
 
-        private bool IsEventDateForReminderExpired(Event @event, EventRemindType type)
+        private bool IsEventDateForReminderExpired(CreateEventDto createEventDto, EventRemindType type)
         {
-            var date = GetDateFromEvent(@event, type);
+            var date = GetDateFromEvent(createEventDto, type);
             return date <= _systemClock.UtcNow;
         }
 
-        private static DateTime GetDateFromEvent(Event @event, EventRemindType type)
+        private static DateTime GetDateFromEvent(CreateEventDto createEventDto, EventRemindType type)
         {
             return type switch
             {
-                EventRemindType.Start => @event.StartDate,
-                EventRemindType.Deadline => @event.RegistrationDeadline,
+                EventRemindType.Start => createEventDto.StartDate,
+                EventRemindType.Deadline => createEventDto.RegistrationDeadlineDate,
                 _ => throw new NotSupportedException($"Unable to get date for reminder of type {type}")
             };
         }
