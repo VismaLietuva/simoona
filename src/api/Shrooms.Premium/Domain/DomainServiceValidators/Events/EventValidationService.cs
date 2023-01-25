@@ -9,6 +9,7 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
+using Shrooms.Premium.DataTransferObjects.Models.Events.Reminders;
 using Shrooms.Premium.Domain.DomainExceptions.Event;
 
 namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
@@ -322,21 +323,49 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
             }
         }
 
-        public void CheckIfEventReminderCanBeRemoved(EventReminder reminder)
+        public void CheckIfEventReminderCanBeRemoved(Event @event, EventReminder reminder)
         {
-            if (reminder.RemindedCount > 0)
+            if (!CanReminderBeChangedForEvent(@event, reminder))
             {
                 throw new EventException(PremiumErrorCodes.EventReminderCannotBeRemoved);
             }
         }
 
-        public void CheckIfEventReminderCanBeUpdated(EventReminder reminder)
+        public void CheckIfEventReminderCanBeUpdated(Event @event, EventReminder reminder)
         {
-            if (reminder.RemindedCount > 0 &&
-                reminder.RemindBeforeInDays != reminder.RemindBeforeInDays)
+            if (!CanReminderBeChangedForEvent(@event, reminder))
             {
                 throw new EventException(PremiumErrorCodes.EventReminderCannotBeUpdated);
             }
+        }
+
+        private bool CanReminderBeChangedForEvent(Event @event, EventReminder reminder)
+        {
+            return reminder.RemindedCount <= 0 && !IsEventDateForReminderExpired(@event, reminder.Type);
+        }
+
+        public void CheckIfEventReminderCanBeAdded(Event @event, EventReminderDto reminder)
+        {
+            if (IsEventDateForReminderExpired(@event, reminder.Type))
+            {
+                throw new EventException(PremiumErrorCodes.EventReminderCannotBeAdded);
+            }
+        }
+
+        private bool IsEventDateForReminderExpired(Event @event, EventRemindType type)
+        {
+            var date = GetDateFromEvent(@event, type);
+            return date <= _systemClock.UtcNow;
+        }
+
+        private static DateTime GetDateFromEvent(Event @event, EventRemindType type)
+        {
+            return type switch
+            {
+                EventRemindType.Start => @event.StartDate,
+                EventRemindType.Deadline => @event.RegistrationDeadline,
+                _ => throw new NotSupportedException($"Unable to get date for reminder of type {type}")
+            };
         }
     }
 }

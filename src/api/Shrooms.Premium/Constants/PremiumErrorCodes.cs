@@ -38,6 +38,7 @@
         public const string EventInvalidReminderType = "229";
         public const string EventReminderCannotBeRemoved = "230";
         public const string EventReminderCannotBeUpdated = "231";
+        public const string EventReminderCannotBeAdded = "232";
 
         // Service Request, 7**
         public const int ServiceRequestIsClosed = 700;

@@ -5,6 +5,7 @@ using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.Events;
+using Shrooms.Premium.DataTransferObjects.Models.Events.Reminders;
 
 namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
 {
@@ -43,7 +44,8 @@ namespace Shrooms.Premium.Domain.DomainServiceValidators.Events
         void CheckIfUserParticipatesInEvent(string userId, IEnumerable<EventParticipantAttendDto> participants);
         void CheckIfDateRangeExceededLimitOrNull(DateTime? start, DateTime? end);
         void CheckIfAllParticipantsExist(ICollection<ApplicationUser> users, ICollection<string> participantIds);
-        void CheckIfEventReminderCanBeRemoved(EventReminder reminder);
-        void CheckIfEventReminderCanBeUpdated(EventReminder reminder);
+        void CheckIfEventReminderCanBeRemoved(Event @event, EventReminder reminder);
+        void CheckIfEventReminderCanBeUpdated(Event @event, EventReminder reminder);
+        void CheckIfEventReminderCanBeAdded(Event @event, EventReminderDto reminder);
     }
 }
