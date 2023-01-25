@@ -57,7 +57,5 @@ namespace Shrooms.Premium.Presentation.WebViewModels.Events
         public int VirtuallyGoingCount { get; set; }
         public int MaybeGoingCount { get; set; }
         public int NotGoingCount { get; set; }
-
-        public IEnumerable<EventReminderViewModel> Reminders { get; set; }
     }
 }
