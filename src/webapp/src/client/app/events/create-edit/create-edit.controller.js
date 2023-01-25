@@ -490,15 +490,20 @@
                 return true;
             }
 
+            return !canReminderBeModified(reminderType);
+        }
+
+        function canReminderBeModified(reminderType) {
             var eventDate = getDateFromEventBasedOnReminderType(reminderType);
             var currentDate = moment()
                 .local()
                 .startOf('minute')
                 .toDate();
-            return eventDate <= currentDate;
+            return eventDate > currentDate;
         }
 
         function getDateFromEventBasedOnReminderType(reminderType) {
+            reminderType = parseInt(reminderType);
             switch (reminderType) {
                 case reminderTypes.start:
                     return vm.event.startDate;
@@ -622,7 +627,10 @@
             }
 
             return Object.keys(vm.reminders)
-                .filter(key => vm.reminders[key].isEnabled && vm.reminders[key].isVisible)
+                .filter(key => (vm.reminders[key].isEnabled &&
+                                vm.reminders[key].isVisible &&
+                                canReminderBeModified(key)) ||
+                                vm.reminders[key].isDisabled)
                 .map(key => ({ remindBeforeInDays:  vm.reminders[key].value, type: key }));
         }
 
