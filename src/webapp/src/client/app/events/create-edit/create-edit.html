@@ -194,10 +194,10 @@
                             translate="events.reminders"></label>
                         <div class="event-reminder-item col-xs-12 col-sm-6 col-md-4"
                             ng-class="{ 'col-sm-offset-4' : $index !== 0 }">
-                            <input class="mr-5" type="checkbox" ng-model="reminder.isEnabled" ng-click="vm.resetReminder($index)">
+                            <input class="mr-5" type="checkbox" ng-model="reminder.isEnabled" ng-click="vm.resetReminder($index)" ng-disabled="vm.isReminderDisabled($index)">
                             <input class="mr-5 event-reminder-item-days-input" type="number" name="reminder{{$index}}"
                                 ng-model="reminder.value" ng-pattern="/^(0|\-?[1-9][0-9]*)$/"
-                                ng-disabled="!reminder.isEnabled" min="1" steps="1" max="{{:: vm.maxRemindBeforeDays}}"
+                                ng-disabled="vm.isReminderDisabled($index) || !reminder.isEnabled" min="1" steps="1" max="{{:: vm.maxRemindBeforeDays}}"
                                 ignore-mouse-wheel required>
                             <label class="mb-0" translate="{{reminder.translation}}"></label>
                         </div>

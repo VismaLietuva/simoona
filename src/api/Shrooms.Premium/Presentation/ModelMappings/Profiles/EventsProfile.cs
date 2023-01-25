@@ -5,7 +5,6 @@ using Shrooms.Premium.DataTransferObjects.Models.Events;
 using Shrooms.Premium.DataTransferObjects.Models.Events.Reminders;
 using Shrooms.Premium.DataTransferObjects.Models.OfficeMap;
 using Shrooms.Premium.Presentation.WebViewModels.Events;
-using System.Linq;
 
 namespace Shrooms.Premium.Presentation.ModelMappings.Profiles
 {

@@ -131,6 +131,7 @@
         vm.isDeadlineDateValid = isDeadlineDateValid;
         vm.isOneTimeEvent = isOneTimeEvent;
         vm.resetReminder = resetReminder;
+        vm.isReminderDisabled = isReminderDisabled;
 
         init();
 
@@ -206,11 +207,13 @@
                             .local()
                             .startOf('minute')
                             .toDate();
+
                         vm.event.startDate = moment
                             .utc(vm.event.startDate)
                             .local()
                             .startOf('minute')
                             .toDate();
+
                         vm.event.endDate = moment
                             .utc(vm.event.endDate)
                             .local()
@@ -294,6 +297,7 @@
                 localReminder.isVisible = true;
                 localReminder.isEnabled = true;
                 localReminder.value = reminder.remindBeforeInDays;
+                localReminder.isDisabled = reminder.isDisabled;
             }
         }
 
@@ -468,14 +472,40 @@
                     isVisible: true,
                     isEnabled: false,
                     value: reminderDefaultValues.remindBeforeDays,
-                    translation: 'events.remindDaysBeforeEventStart'
+                    translation: 'events.remindDaysBeforeEventStart',
+                    isDisabled: false
                 },
                 [reminderTypes.deadline]: {
                     isVisible: false,
                     isEnabled: false,
                     value: reminderDefaultValues.remindBeforeDays,
-                    translation: 'events.remindDaysBeforeEventDeadline'
+                    translation: 'events.remindDaysBeforeEventDeadline',
+                    isDisabled: false
                 }
+            }
+        }
+
+        function isReminderDisabled(reminderType) {
+            if (vm.reminders[reminderType].isDisabled) {
+                return true;
+            }
+
+            var eventDate = getDateFromEventBasedOnReminderType(reminderType);
+            var currentDate = moment()
+                .local()
+                .startOf('minute')
+                .toDate();
+            return eventDate <= currentDate;
+        }
+
+        function getDateFromEventBasedOnReminderType(reminderType) {
+            switch (reminderType) {
+                case reminderTypes.start:
+                    return vm.event.startDate;
+                case reminderTypes.deadline:
+                    return vm.event.registrationDeadlineDate ?? vm.event.startDate;
+                default:
+                    console.error('Reminder type ' + reminderType + ' is not supported');
             }
         }
 
@@ -577,10 +607,12 @@
             }
 
             vm.event.responsibleUserId = vm.responsibleUser.id;
+
             vm.event.endDate = moment(vm.event.endDate)
                 .local()
                 .startOf('minute')
                 .toDate();
+
             vm.event.reminders = mapRemindersToRequestParameters();
         }
 
