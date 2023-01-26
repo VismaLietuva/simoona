@@ -298,6 +298,7 @@
                 localReminder.isEnabled = true;
                 localReminder.value = reminder.remindBeforeInDays;
                 localReminder.isDisabled = reminder.isDisabled;
+                localReminder.isCreated = true;
             }
         }
 
@@ -629,7 +630,8 @@
             return Object.keys(vm.reminders)
                 .filter(key => (vm.reminders[key].isEnabled &&
                                 vm.reminders[key].isVisible &&
-                                canReminderBeModified(key)) ||
+                                (canReminderBeModified(key) ||
+                                vm.reminders[key].isCreated)) ||
                                 vm.reminders[key].isDisabled)
                 .map(key => ({ remindBeforeInDays:  vm.reminders[key].value, type: key }));
         }
