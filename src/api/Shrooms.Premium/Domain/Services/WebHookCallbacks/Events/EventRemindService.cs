@@ -5,6 +5,7 @@ using Shrooms.Contracts.Enums;
 using Shrooms.DataLayer.EntityModels.Models;
 using Shrooms.DataLayer.EntityModels.Models.Events;
 using Shrooms.Domain.Services.Organizations;
+using Shrooms.Premium.Constants;
 using Shrooms.Premium.DataTransferObjects.Models.Events.Reminders;
 using Shrooms.Premium.Domain.Services.Email.Event;
 using Shrooms.Premium.Domain.Services.Events.Utilities;
@@ -96,7 +97,8 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
                 StartDate = reminder.Event.StartDate,
                 EventName = reminder.Event.Name,
                 EventId = reminder.Event.Id,
-                Receivers = reminder.Event.EventParticipants.Select(participant => new EventReminderEmailReceiverDto 
+                Receivers = reminder.Event.EventParticipants.Where(FilterAttendingParticipants())
+                .Select(participant => new EventReminderEmailReceiverDto
                 {
                     Email = participant.ApplicationUser.Email,
                     TimeZone = participant.ApplicationUser.TimeZone,
@@ -112,12 +114,18 @@ namespace Shrooms.Premium.Domain.Services.WebHookCallbacks.Events
                 StartDate = reminder.Event.StartDate,
                 EventName = reminder.Event.Name,
                 EventId = reminder.Event.Id,
-                Receivers = reminder.Event.EventParticipants.Select(participant => new EventReminderEmailReceiverDto
+                Receivers = reminder.Event.EventParticipants.Where(FilterAttendingParticipants())
+                .Select(participant => new EventReminderEmailReceiverDto
                 {
                     Email = participant.ApplicationUser.Email,
                     TimeZone = participant.ApplicationUser.TimeZone
                 }).ToList()
             };
+        }
+
+        private static Func<EventParticipant, bool> FilterAttendingParticipants()
+        {
+            return participant => participant.AttendStatus == (int)AttendingStatus.Attending || participant.AttendStatus == (int)AttendingStatus.AttendingVirtually;
         }
     }
 }
