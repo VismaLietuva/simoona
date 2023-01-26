@@ -535,7 +535,7 @@ namespace Shrooms.Premium.Domain.Services.Events
         private async Task RemoveEventRemindersAsync(
             IEnumerable<EventReminder> remindersToDelete,
             string userId,
-            Action<EventReminder> validateReminderBeforeRemovalAction = null)
+            Action<EventReminder> validateReminderBeforeRemoval = null)
         {
             if (!remindersToDelete.Any())
             {
@@ -545,7 +545,7 @@ namespace Shrooms.Premium.Domain.Services.Events
             var timestamp = _systemClock.UtcNow;
             foreach (var reminder in remindersToDelete)
             {
-                validateReminderBeforeRemovalAction?.Invoke(reminder);
+                validateReminderBeforeRemoval?.Invoke(reminder);
                 reminder.Modified = timestamp;
                 reminder.ModifiedBy = userId;
             }
